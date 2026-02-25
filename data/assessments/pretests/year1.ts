@@ -1,0 +1,186 @@
+export type Question = {
+  id: string;
+  prompt: string;
+  options?: string[];
+  answerIndex?: number;
+  numberLine?: {
+    min: number;
+    max: number;
+    answer: number;
+  };
+};
+
+export const YEAR1_PRETEST: Question[] = [
+  {
+    type: "mcq",
+    id: "y1-q1",
+    prompt: "Circle the number 36 from this group: 17, 29, 36, 42",
+    options: ["17", "29", "36", "42"],
+    answer: "36",
+  },
+  {
+    type: "mcq",
+    id: "y1-q2",
+    prompt: "What number comes after 49?",
+    options: ["48", "49", "50", "51"],
+    answer: "50",
+  },
+  {
+    type: "mcq",
+    id: "y1-q3",
+    prompt: "Put these numbers in order (smallest to largest): 14, 8, 27",
+    options: ["14, 8, 27", "8, 14, 27", "27, 14, 8", "8, 27, 14"],
+    answer: "8, 14, 27",
+  },
+  {
+    id: "y1-q4",
+    type: "numberLine",
+    prompt: "Choose the correct spot 65 would be on this 0–100 number line.",
+    min: 0,
+    max: 100,
+    options: [20, 37, 65, 88],
+    answer: 65,
+  },
+  {
+    type: "mcq",
+    id: "y1-q5",
+    prompt: "Which is the largest? 75, 67, 82",
+    options: ["75", "67", "82", "They are the same"],
+    answer: "82",
+  },
+  {
+    type: "mcq",
+    id: "y1-q6",
+    prompt: "How many tens and ones are in 42?",
+    options: ["2 tens, 4 ones", "4 tens, 2 ones", "42 tens, 0 ones", "0 tens, 42 ones"],
+    answer: "4 tens, 2 ones",
+  },
+  {
+    type: "mcq",
+    id: "y1-q7",
+    prompt: "Partition 56 in a different way.",
+    options: ["50 + 6", "40 + 16", "Both A and B are correct", "60 - 6"],
+    answer: "Both A and B are correct",
+  },
+  {
+    type: "mab",
+    id: "y1-q8",
+    prompt: "Show 37 using tens and ones blocks.",
+    target: 37,
+    maxTens: 10,
+    maxOnes: 10,
+  },
+  {
+    type: "mcq",
+    id: "y1-q9",
+    prompt: "Skip count by 5s: 5, 10, __, 20",
+    options: ["11", "12", "15", "25"],
+    answer: "15",
+  },
+  {
+    type: "mcq",
+    id: "y1-q10",
+    prompt: "How many groups of 10 are in 60?",
+    options: ["5", "6", "7", "10"],
+    answer: "6",
+  },
+  {
+    id: "y1-q11",
+    type: "groups",
+    prompt: "Which option shows equal groups?",
+    options: [
+      { id: "A", label: "3 groups of 4", groups: [4, 4, 4] },
+      { id: "B", label: "2 groups of 5 and 1 group of 4", groups: [5, 5, 4] },
+      { id: "C", label: "Groups of 3, 4, and 5", groups: [3, 4, 5] },
+      { id: "D", label: "1 group of 12", groups: [12] },
+    ],
+    answerOptionId: "A",
+  },
+  {
+    type: "mcq",
+    id: "y1-q12",
+    prompt: "What is 9 + 7?",
+    options: ["14", "15", "16", "17"],
+    answer: "16",
+  },
+  {
+    type: "mcq",
+    id: "y1-q13",
+    prompt: "What is 15 - 6?",
+    options: ["7", "8", "9", "10"],
+    answer: "9",
+  },
+  {
+    type: "mcq",
+    id: "y1-q14",
+    prompt: "What number makes this true: 8 + __ = 12?",
+    options: ["3", "4", "5", "6"],
+    answer: "4",
+  },
+  {
+    type: "mcq",
+    id: "y1-q15",
+    prompt: "You have $2. You buy a toy for $1. How much change do you get?",
+    options: ["$0", "$1", "$2", "$3"],
+    answer: "$1",
+  },
+  {
+    type: "mcq",
+    id: "y1-q16",
+    prompt: "Which set of coins makes $1.00?",
+    options: [
+      "50c + 20c + 20c + 10c",
+      "50c + 20c + 20c + 5c",
+      "20c + 20c + 20c + 20c",
+      "50c + 50c + 10c",
+    ],
+    answer: "50c + 20c + 20c + 10c",
+  },
+  {
+    type: "mcq",
+    id: "y1-q17",
+    prompt: "Draw a picture to show 2 + 3 = ? (Choose the answer.)",
+    visual: { type: "dot_add", leftTarget: 2, rightTarget: 3, maxDots: 10 },
+    options: ["4", "5", "6", "7"],
+    answer: "5",
+  },
+  {
+    type: "mcq",
+    id: "y1-q18",
+    prompt: "Share 12 lollies between 4 friends. How many does each friend get?",
+    options: ["2", "3", "4", "6"],
+    answer: "3",
+  },
+  {
+    type: "mcq",
+    id: "y1-q19",
+    prompt: "Group 18 counters into sets of 3. How many groups?",
+    visual: {
+      type: "group_counters",
+      totalCounters: 36,
+      groups: 0,
+      groupSize: 3,
+      selectTarget: 18,
+    },
+    options: ["5", "6", "7", "8"],
+    answer: "6",
+  },
+  {
+    type: "mcq",
+    id: "y1-q20",
+    prompt: "Which grouping shows sharing is equal?",
+    visual: {
+      type: "group_counters",
+      totalCounters: 12,
+      groups: 3,
+    },
+    options: [
+      { label: "12 shared into 3 groups of 4", groups: [4, 4, 4] },
+      { label: "12 shared into 6, 6, and 0", groups: [6, 6, 0] },
+      { label: "12 shared into 5, 5, and 2", groups: [5, 5, 2] },
+      { label: "12 shared into 1 group of 12", groups: [12] },
+    ],
+    answerIndex: 0,
+    answer: "12 shared into 3 groups of 4",
+  },
+];
