@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { STORAGE_KEY } from "@/data/progress";
+import { supabase } from "@/lib/supabase";
 
 type StudentRecord = {
   id: string;
@@ -107,7 +108,7 @@ export default function LoginPage() {
     setCreatedCode(code);
   }
 
-  function handleStudentLogin() {
+  async function handleStudentLogin() {
     setStudentError(null);
     const code = studentCode.trim().toUpperCase();
     const name = studentName.trim();
@@ -116,11 +117,74 @@ export default function LoginPage() {
       setStudentError("Please enter class code, name, and 4-digit PIN.");
       return;
     }
-    const cls = classes[code];
+
+    // 1) Look up class in Supabase
+    const { data: cls } = await supabase
+      .from("classes")
+      .select("id, name, class_code")
+      .eq("class_code", code)
+      .maybeSingle();
+
     if (!cls) {
-      setStudentError("Class code not found.");
+      // Fallback: check localStorage classes too
+      const localCls = classes[code];
+      if (!localCls) {
+        setStudentError("Class code not found.");
+        return;
+      }
+      // Use legacy localStorage flow for old classes
+      handleLegacyStudentLogin(code, name, pin, localCls);
       return;
     }
+
+    // 2) Supabase auth: synthetic email from name + class code
+    const syntheticEmail = `${name.toLowerCase().replace(/\s+/g, "")}.${code.toLowerCase()}@leveluplearning.local`;
+
+    // Try sign in first (returning student)
+    const { data: signInData } = await supabase.auth.signInWithPassword({
+      email: syntheticEmail,
+      password: pin,
+    });
+
+    if (signInData?.user) {
+      router.push("/home");
+      return;
+    }
+
+    // New student - sign up
+    const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
+      email: syntheticEmail,
+      password: pin,
+      options: { data: { display_name: name, role: "student" } },
+    });
+
+    if (signUpErr) {
+      if (signUpErr.message.includes("already")) {
+        setStudentError("That name is taken in this class, or your PIN is wrong.");
+      } else {
+        setStudentError(signUpErr.message);
+      }
+      return;
+    }
+
+    const userId = signUpData.user?.id;
+    if (!userId) {
+      setStudentError("Sign up failed. Please try again.");
+      return;
+    }
+
+    // Create role + student record
+    await supabase.from("user_roles").insert({ user_id: userId, role: "student" as any });
+    await supabase.from("students").insert({
+      user_id: userId,
+      display_name: name,
+      class_id: cls.id,
+    });
+
+    router.push("/levels");
+  }
+
+  function handleLegacyStudentLogin(code: string, name: string, pin: string, cls: ClassRecord) {
     const existing = cls.students.find(
       (s) => s.firstName.toLowerCase() === name.toLowerCase() && s.pin === pin
     );
@@ -164,11 +228,6 @@ export default function LoginPage() {
       typeof parsed?.assignedWeek === "number";
     if (hasProgram) {
       router.push("/home");
-      return;
-    }
-    const hasPlacement = parsed?.hasCompletedPlacement === true;
-    if (!hasPlacement) {
-      router.push("/levels");
       return;
     }
     router.push("/levels");
