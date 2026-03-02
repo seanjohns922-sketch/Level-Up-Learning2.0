@@ -1,12 +1,16 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getLegendForYear } from "@/data/legends";
 import { readProgress, StudentProgress, writeProgress } from "@/data/progress";
 const PASS_THRESHOLD = 90;
 
-export default function ResultsPage() {
+export default function ResultsPageWrapper() {
+  return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><ResultsPage /></Suspense>;
+}
+
+function ResultsPage() {
   const router = useRouter();
   const sp = useSearchParams();
 

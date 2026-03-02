@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { POSTTESTS, type Question } from "@/data/assessments/posttests";
 import { getLegendForYear } from "@/data/legends";
@@ -32,7 +32,11 @@ function writeProgress(next: StudentProgress) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
 }
 
-export default function PostTestPage() {
+export default function PostTestPageWrapper() {
+  return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><PostTestPage /></Suspense>;
+}
+
+function PostTestPage() {
   const router = useRouter();
   const params = useSearchParams();
 

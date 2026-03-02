@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { readProgress, updateProgress } from "@/data/progress";
 import NumberLineTap from "@/components/NumberLineTap";
@@ -1543,7 +1543,11 @@ function makeSubtractionCountUpQuestion(): QuizQuestion {
   };
 }
 
-export default function SessionPage() {
+export default function SessionPageWrapper() {
+  return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><SessionPage /></Suspense>;
+}
+
+function SessionPage() {
   const router = useRouter();
   const sp = useSearchParams();
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getLegendForYear } from "@/data/legends";
 import { getProgramForYear } from "@/data/programs";
@@ -48,7 +48,11 @@ function isWeekComplete(p: WeekProgress) {
   return quizPassed || (lessonsDone && p.quizCompleted);
 }
 
-export default function ProgramPage() {
+export default function ProgramPageWrapper() {
+  return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><ProgramPage /></Suspense>;
+}
+
+function ProgramPage() {
   const router = useRouter();
   const sp = useSearchParams();
 
