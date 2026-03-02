@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { readProgress, updateProgress } from "@/data/progress";
 import NumberLineTap from "@/components/NumberLineTap";
@@ -11,6 +11,15 @@ import MoneyChange from "@/components/week7/MoneyChange";
 import MoneyEnough from "@/components/week7/MoneyEnough";
 import { ClickableDotGrid, ClickableDotRows } from "@/components/ClickableDots";
 import { StaticDotGrid, StaticDotRow, StaticDotRows } from "@/components/StaticDots";
+import {
+  YEAR1_LESSON_CONFIG,
+  YEAR1_WEEKLY_QUIZZES,
+  getLessonConfig,
+  getWeeklyQuizConfig,
+  getDifficultyFromTime,
+  type Difficulty,
+  type LessonConfig,
+} from "@/app/config/lesson-config";
 
 type WeekProgress = {
   lessonsCompleted: boolean[]; // [L1, L2, L3]
@@ -1553,6 +1562,53 @@ export default function SessionPage() {
   }
 
   // ---------------------------
+  // LESSON CONFIG + DIFFICULTY GATING
+  // ---------------------------
+  const lessonConfig = useMemo(
+    () => getLessonConfig(Number(week), n),
+    [week, n]
+  );
+  const quizConfig = useMemo(
+    () => getWeeklyQuizConfig(Number(week)),
+    [week]
+  );
+
+  // Session-stable start time (persists across re-renders)
+  const sessionKeyRef = useRef(`lul_session_${year}_w${week}_${type}_${n}`);
+  const [sessionStartTime] = useState<number>(() => {
+    if (typeof window === "undefined") return Date.now();
+    const stored = sessionStorage.getItem(sessionKeyRef.current);
+    if (stored) return Number(stored);
+    const now = Date.now();
+    sessionStorage.setItem(sessionKeyRef.current, String(now));
+    return now;
+  });
+
+  // Elapsed seconds + current difficulty gate
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const currentDifficulty = getDifficultyFromTime(elapsedSeconds);
+
+  useEffect(() => {
+    if (!isLesson) return;
+    const timer = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
+      setElapsedSeconds(Math.min(elapsed, 480)); // cap at 8 mins
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [isLesson, sessionStartTime]);
+
+  // Activity rotation within lesson's allowed pool
+  const activityBagRef = useRef<string[]>([]);
+  function getNextActivityId(): string {
+    if (!lessonConfig) return "fallback";
+    if (activityBagRef.current.length === 0) {
+      // Reshuffle the bag
+      activityBagRef.current = shuffle([...lessonConfig.allowedActivityIds]);
+    }
+    return activityBagRef.current.pop()!;
+  }
+
+  // ---------------------------
   // LESSON: Video -> Activities -> Complete
   // ---------------------------
   const [videoWatched, setVideoWatched] = useState(false);
@@ -1623,8 +1679,11 @@ export default function SessionPage() {
 
   // ---------------------------
   // QUIZ: 15-question mix from 3 lessons
+  // Uses YEAR1_WEEKLY_QUIZZES config: 5 questions per lesson, 80% pass
   // ---------------------------
   function buildQuizQuestions() {
+    const qConfig = quizConfig;
+    const questionsPerLesson = qConfig?.questionsPerLesson ?? 5;
     const questions: QuizQuestion[] = [];
     const weekNum = Number(week);
     const isWeek7 = weekNum === 7;
@@ -1827,15 +1886,15 @@ export default function SessionPage() {
           () => makeTypeNumberQuestion(0, rangeMax),
         ];
 
-    for (let i = 0; i < 5; i += 1) {
+    for (let i = 0; i < questionsPerLesson; i += 1) {
       const g = lesson1Generators[randInt(0, lesson1Generators.length - 1)];
       questions.push(g());
     }
-    for (let i = 0; i < 5; i += 1) {
+    for (let i = 0; i < questionsPerLesson; i += 1) {
       const g = lesson2Generators[randInt(0, lesson2Generators.length - 1)];
       questions.push(g());
     }
-    for (let i = 0; i < 5; i += 1) {
+    for (let i = 0; i < questionsPerLesson; i += 1) {
       const g = lesson3Generators[randInt(0, lesson3Generators.length - 1)];
       questions.push(g());
     }
@@ -1959,7 +2018,8 @@ export default function SessionPage() {
     const store = readStore();
     setQuizScore(store, year, week, score);
     writeStore(store);
-    if (score >= Math.ceil(quizQuestions.length * 0.8)) {
+    const passThreshold = (quizConfig?.passPercent ?? 80) / 100;
+    if (score >= Math.ceil(quizQuestions.length * passThreshold)) {
       completeWeek(Number(week));
     }
   }
@@ -1979,7 +2039,7 @@ export default function SessionPage() {
       setQuizGroupTaps((prev) => ({
         ...prev,
         [currentQuiz.id]: Array.from(
-          { length: currentQuiz.visual?.rows.length ?? 0 },
+          { length: (currentQuiz.visual?.type === "rows" ? currentQuiz.visual.rows.length : 0) },
           () => false
         ),
       }));
@@ -2350,12 +2410,12 @@ export default function SessionPage() {
                                     "inline-flex cursor-pointer",
                                     tapped ? "bg-emerald-50" : "bg-transparent",
                                   ].join(" ")}
-                                  style={{ gap: currentQuiz.visual.gap }}
+                                  style={{ gap: currentQuiz.visual?.type === "rows" ? currentQuiz.visual.gap : 0 }}
                                 >
                                   <StaticDotRow
                                     count={count}
-                                    dotSize={currentQuiz.visual.dotSize}
-                                    gap={currentQuiz.visual.gap}
+                                    dotSize={currentQuiz.visual?.type === "rows" ? currentQuiz.visual.dotSize : 14}
+                                    gap={currentQuiz.visual?.type === "rows" ? currentQuiz.visual.gap : 8}
                                   />
                                 </div>
                               );
@@ -2670,7 +2730,7 @@ export default function SessionPage() {
                   >
                     Back to Week
                   </button>
-                  {finalScore >= Math.ceil(quizQuestions.length * 0.8) ? (
+                  {finalScore >= Math.ceil(quizQuestions.length * ((quizConfig?.passPercent ?? 80) / 100)) ? (
                     <button
                       onClick={() =>
                         router.push(
@@ -2721,13 +2781,13 @@ export default function SessionPage() {
               MVP: quiz completion is saved locally.
             </p>
 
-            {quizSubmitted && finalScore >= Math.ceil(quizQuestions.length * 0.8) ? (
+            {quizSubmitted && finalScore >= Math.ceil(quizQuestions.length * ((quizConfig?.passPercent ?? 80) / 100)) ? (
               <div className="mt-4 rounded-xl border border-green-200 bg-green-50 p-3 text-sm font-bold text-green-800">
                 🎉 Congratulations — you’re one step closer to unlocking your Level Up Legend!
               </div>
             ) : null}
 
-            {quizSubmitted && finalScore < Math.ceil(quizQuestions.length * 0.8) ? (
+            {quizSubmitted && finalScore < Math.ceil(quizQuestions.length * ((quizConfig?.passPercent ?? 80) / 100)) ? (
               <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-bold text-amber-900 flex items-center justify-between gap-3">
                 <div>
                   You’re close! Let’s try the lessons again to build confidence.

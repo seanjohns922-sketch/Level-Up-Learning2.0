@@ -1,12 +1,25 @@
 export type Question = {
+  type?: string;
   id: string;
   prompt: string;
-  options: string[];
-  answerIndex: number;
+  options?: any[];
+  answer?: any;
+  answerIndex?: number;
+  answerOptionId?: string;
+  visual?: any;
+  min?: number;
+  max?: number;
+  target?: number;
+  maxTens?: number;
+  maxOnes?: number;
+  numberLine?: {
+    min: number;
+    max: number;
+    answer: number;
+  };
 };
 
 export const PREP_PRETEST: Question[] = [
-  // Paste your real Qs here
   {
     type: "mcq",
     id: "prep-q1",

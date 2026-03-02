@@ -19,13 +19,17 @@ type Prompt =
   | { type: "sub"; total: number; part: number; diff: number };
 
 function buildPrompts(): Prompt[] {
-  return [
-    { type: "add", a: 7, b: 0, sum: 15 },
-    { type: "add", a: 5, b: 0, sum: 12 },
-    { type: "sub", total: 14, part: 0, diff: 9 },
-    { type: "sub", total: 16, part: 0, diff: 7 },
-    { type: "add", a: 8, b: 0, sum: 13 },
-  ].map((p) => {
+  const raw: Array<
+    | { type: "add"; a: number; b: number; sum: number }
+    | { type: "sub"; total: number; part: number; diff: number }
+  > = [
+    { type: "add" as const, a: 7, b: 0, sum: 15 },
+    { type: "add" as const, a: 5, b: 0, sum: 12 },
+    { type: "sub" as const, total: 14, part: 0, diff: 9 },
+    { type: "sub" as const, total: 16, part: 0, diff: 7 },
+    { type: "add" as const, a: 8, b: 0, sum: 13 },
+  ];
+  return raw.map((p): Prompt => {
     if (p.type === "add") {
       return { ...p, b: p.sum - p.a };
     }

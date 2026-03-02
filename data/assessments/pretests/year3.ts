@@ -1,41 +1,6 @@
-export type Question =
-  | {
-      type: "mcq";
-      id: string;
-      prompt: string;
-      options: Array<string | { label: string; groups?: number[] }>;
-      answer: string;
-      answerIndex?: number;
-      visual?: Visual;
-    }
-  | {
-      type: "numberLine";
-      id: string;
-      prompt: string;
-      options: number[];
-      answer: number;
-      min: number;
-      max: number;
-    }
-  | {
-      type: "mab";
-      id: string;
-      prompt: string;
-      target: number;
-      maxTens?: number;
-      maxOnes?: number;
-    }
-  | {
-      id: string;
-      type: "groups";
-      prompt: string;
-      options: {
-        id: string;
-        label: string;
-        groups: number[];
-      }[];
-      answerOptionId: string;
-    };
+import type { Question } from "./prep";
+
+export type { Question };
 
 export type DotAddVisual = {
   type: "dot_add";

@@ -346,7 +346,7 @@ export default function PretestPage() {
         return acc + (answer === q.answerOptionId ? 1 : 0);
       }
       if (q.answerIndex !== undefined) {
-        const opt = q.options[q.answerIndex];
+        const opt = (q.options ?? [])[q.answerIndex ?? 0];
         const correctLabel = typeof opt === "string" ? opt : opt.label;
         return acc + (answer === correctLabel ? 1 : 0);
       }
@@ -416,7 +416,7 @@ export default function PretestPage() {
 
         {question.type === "mab" ? (
           <MabPicker
-            target={question.target}
+            target={question.target ?? 0}
             maxTens={question.maxTens ?? 10}
             maxOnes={question.maxOnes ?? 10}
             value={mab}
@@ -433,8 +433,10 @@ export default function PretestPage() {
                 {question.max}
               </div>
 
-              {question.options.map((n) => {
-                const pct = ((n - question.min) / (question.max - question.min)) * 100;
+              {(question.options ?? []).map((n: any) => {
+                const qMin = question.min ?? 0;
+                const qMax = question.max ?? 100;
+                const pct = ((n - qMin) / (qMax - qMin)) * 100;
                 const isSelected = selected === String(n);
 
                 return (
@@ -462,7 +464,7 @@ export default function PretestPage() {
           </div>
         ) : question.type === "groups" ? (
           <div className="grid gap-4">
-            {question.options.map((opt) => {
+            {(question.options ?? []).map((opt: any) => {
               const isSelected = selected === opt.id;
               return (
                 <button
@@ -494,7 +496,7 @@ export default function PretestPage() {
             ) : question.visual?.type === "group_counters" &&
               question.visual.groupSize !== undefined &&
               question.visual.selectTarget !== undefined &&
-              !question.options.some(
+              !(question.options ?? []).some(
                 (opt) => typeof opt !== "string" && opt.groups
               ) ? (
               <GroupCountersVisual
@@ -503,7 +505,7 @@ export default function PretestPage() {
                 selectTarget={question.visual.selectTarget}
               />
             ) : null}
-            {question.options.map((option) => {
+            {(question.options ?? []).map((option: any) => {
               const label = typeof option === "string" ? option : option.label;
               const isSelected = selected === label;
 

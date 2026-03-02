@@ -1,14 +1,6 @@
-export type Question = {
-  id: string;
-  prompt: string;
-  options?: string[];
-  answerIndex?: number;
-  numberLine?: {
-    min: number;
-    max: number;
-    answer: number;
-  };
-};
+import type { Question } from "./prep";
+
+export type { Question };
 
 export const YEAR1_PRETEST: Question[] = [
   {

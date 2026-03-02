@@ -1,4 +1,4 @@
-import { Question } from "./year3";
+import { Question } from "./prep";
 
 import { PREP_PRETEST } from "./prep";
 import { YEAR1_PRETEST } from "./year1";
