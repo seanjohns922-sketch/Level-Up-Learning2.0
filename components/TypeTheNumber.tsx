@@ -88,7 +88,7 @@ export default function TypeTheNumber({
     const correctWord = toWord(currentAnswer);
     const ok =
       mode === "word"
-        ? normalizeWord(typed) === correctWord
+        ? normalizeWord(typed) === normalizeWord(correctWord)
         : Number(typed) === currentAnswer;
 
     if (ok) {

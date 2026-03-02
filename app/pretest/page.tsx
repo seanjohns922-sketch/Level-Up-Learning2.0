@@ -375,8 +375,8 @@ export default function PretestPage() {
 
   if (!questions.length || !question) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center justify-center p-6">
-        <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-xl text-center">
+      <main className="min-h-screen bg-[#fbf7f1] flex items-center justify-center p-6">
+        <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-xl text-center">
           <h2 className="text-xl font-bold text-gray-800 mb-2">
             No questions found
           </h2>
@@ -384,8 +384,8 @@ export default function PretestPage() {
             We couldn&apos;t find a pre-test for {year}.
           </p>
           <button
-            onClick={() => router.push("/")}
-            className="px-5 py-2 rounded-xl font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition"
+            onClick={() => router.push("/levels")}
+            className="px-5 py-3 rounded-2xl font-bold bg-emerald-500 text-white hover:bg-emerald-600 transition"
           >
             Back to Home
           </button>
@@ -395,22 +395,22 @@ export default function PretestPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center justify-center p-6">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-xl">
-        <div className="flex items-center justify-between mb-4">
+    <main className="min-h-screen bg-[#fbf7f1] flex items-center justify-center p-6">
+      <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-2xl border border-white/70">
+        <div className="flex items-center justify-between mb-6">
           <button
-            onClick={() => router.push("/")}
-            className="text-sm text-indigo-700 hover:underline"
+            onClick={() => router.push("/levels")}
+            className="text-sm text-blue-600 hover:underline"
           >
-            ← Back
+            Back
           </button>
 
-          <div className="text-sm text-gray-500">
-            {year} • Pre-Test • {index + 1}/{questions.length}
+          <div className="text-sm text-gray-500 font-semibold">
+            {year} - Pre-Test - {index + 1}/{questions.length}
           </div>
         </div>
 
-        <h2 className="text-xl font-bold text-gray-800 mb-4">
+        <h2 className="text-2xl md:text-3xl font-extrabold text-gray-800 mb-6">
           {question.prompt}
         </h2>
 
@@ -450,7 +450,7 @@ export default function PretestPage() {
                     ].join(" ")}
                     style={{ left: `${pct}%` }}
                   >
-                    {isSelected ? "65" : ""}
+                    {n}
                   </button>
                 );
               })}
@@ -512,10 +512,10 @@ export default function PretestPage() {
                   key={label}
                   onClick={() => choose(label)}
                   className={[
-                    "text-left p-4 rounded-xl border transition",
+                    "text-left p-5 rounded-2xl border transition shadow-sm",
                     isSelected
-                      ? "border-indigo-800 bg-indigo-50"
-                      : "border-gray-200 hover:border-indigo-400 bg-white",
+                      ? "border-emerald-500 bg-emerald-50"
+                      : "border-gray-200 hover:border-emerald-300 bg-white",
                   ].join(" ")}
                 >
                   {label}
@@ -530,12 +530,12 @@ export default function PretestPage() {
           </div>
         )}
 
-        <div className="flex items-center justify-between mt-6">
+        <div className="flex items-center justify-between mt-8">
           <button
             onClick={prevQuestion}
             disabled={index === 0}
             className={[
-              "px-4 py-2 rounded-xl font-semibold transition",
+              "px-5 py-3 rounded-2xl font-semibold transition",
               index === 0
                 ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                 : "bg-gray-100 hover:bg-gray-200 text-gray-800",
@@ -549,10 +549,10 @@ export default function PretestPage() {
               onClick={finish}
               disabled={!isReady}
               className={[
-                "px-5 py-2 rounded-xl font-bold transition",
+                "px-6 py-3 rounded-2xl font-bold transition",
                 !isReady
                   ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  : "bg-green-500 text-white hover:bg-green-600",
+                  : "bg-emerald-500 text-white hover:bg-emerald-600",
               ].join(" ")}
             >
               Finish
@@ -562,10 +562,10 @@ export default function PretestPage() {
               onClick={nextQuestion}
               disabled={!isReady}
               className={[
-                "px-5 py-2 rounded-xl font-bold transition",
+                "px-6 py-3 rounded-2xl font-bold transition",
                 !isReady
                   ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  : "bg-indigo-600 text-white hover:bg-indigo-700",
+                  : "bg-emerald-500 text-white hover:bg-emerald-600",
               ].join(" ")}
             >
               Next

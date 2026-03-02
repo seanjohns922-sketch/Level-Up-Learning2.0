@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap");
 @import "tailwindcss";
 
 :root {
@@ -22,7 +23,7 @@
 body {
   background: linear-gradient(180deg,#9ee7b9 0%, #6fd18a 100%);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Nunito", "Avenir Next", "Trebuchet MS", sans-serif;
 }
 
 @keyframes lul_confetti_fall {

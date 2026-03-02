@@ -1911,7 +1911,7 @@ export default function SessionPage() {
     return quizQuestions.reduce((acc, q) => {
       if (q.kind === "typed") {
         const typed = normalizeWord(quizTyped[q.id] ?? "");
-        const correct = String(q.correctValue ?? "");
+        const correct = normalizeWord(String(q.correctValue ?? ""));
         return acc + (typed !== "" && typed === correct ? 1 : 0);
       }
       if (q.kind === "numberLineTap" || q.kind === "numberLineJump") {

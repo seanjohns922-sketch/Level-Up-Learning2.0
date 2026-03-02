@@ -81,7 +81,7 @@ export default function ResultsPage() {
   }, [showUnlock]);
 
   function goHome() {
-    router.push("/");
+    router.push("/home");
   }
 
   function goProgram() {
@@ -94,40 +94,40 @@ export default function ResultsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center justify-center p-6">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-xl text-center relative overflow-hidden">
-        <h1 className="text-2xl font-extrabold text-gray-800 mb-2">
+    <main className="min-h-screen bg-[#fbf7f1] flex items-center justify-center p-6">
+      <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-2xl text-center relative overflow-hidden border border-white/70">
+        <h1 className="text-3xl font-extrabold text-gray-800 mb-2">
           {year} Results
         </h1>
 
-        <div className="text-6xl font-extrabold text-indigo-700 mb-4">
-          {passedByProgram ? "✅" : `${scorePercent}%`}
+        <div className="text-7xl font-extrabold text-indigo-700 mb-6">
+          {passedByProgram ? "100%" : `${scorePercent}%`}
         </div>
 
         {passed ? (
-          <div className="rounded-xl border border-green-200 bg-green-50 p-4 text-left mb-4">
-            <div className="font-bold text-green-800 mb-1">✅ Legend Eligible</div>
-            <div className="text-sm text-green-900">
+          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-left mb-5">
+            <div className="font-bold text-emerald-800 mb-1">Legend Eligible</div>
+            <div className="text-sm text-emerald-900">
               {passedByProgram
                 ? "You completed the 12-week program."
                 : "You passed the pre-test."}
             </div>
           </div>
         ) : (
-          <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-left mb-4">
-            <div className="font-bold text-gray-800 mb-1">📘 Learning Path Assigned</div>
+          <div className="rounded-2xl border border-gray-200 bg-white p-5 text-left mb-5">
+            <div className="font-bold text-gray-800 mb-1">Learning Path Assigned</div>
             <div className="text-sm text-gray-700">
-              We’ve created a personalised 12-week program to strengthen your skills.
+              We've created a personalised 12-week program to strengthen your skills.
             </div>
           </div>
         )}
 
-        <div className="rounded-xl border border-gray-200 bg-white p-4 text-left mb-6">
-          <div className="font-bold text-gray-800 mb-1">What happens next?</div>
-          <div className="text-sm text-gray-700">
-            <div>• 3 lessons per week</div>
-            <div>• 1 quiz each week</div>
-            <div>• Legends unlock with mastery (pre-test pass OR program completion)</div>
+        <div className="rounded-2xl border border-gray-200 bg-white p-5 text-left mb-7">
+          <div className="font-bold text-gray-800 mb-2">What happens next?</div>
+          <div className="text-sm text-gray-700 space-y-1">
+            <div>- 3 lessons per week</div>
+            <div>- 1 quiz each week</div>
+            <div>- Legends unlock with mastery (pre-test pass OR program completion)</div>
           </div>
         </div>
 
@@ -135,13 +135,13 @@ export default function ResultsPage() {
           <div className="grid gap-3">
             <button
               onClick={goHome}
-              className="w-full py-3 rounded-xl bg-green-500 text-white font-bold hover:bg-green-600 transition"
+              className="w-full py-4 rounded-2xl bg-emerald-500 text-white font-bold text-lg hover:bg-emerald-600 transition"
             >
               Back to Home
             </button>
             <button
               onClick={goLegends}
-              className="w-full py-3 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition"
+              className="w-full py-4 rounded-2xl bg-indigo-600 text-white font-bold text-lg hover:bg-indigo-700 transition"
             >
               View My Legends
             </button>
@@ -149,7 +149,7 @@ export default function ResultsPage() {
         ) : (
           <button
             onClick={goProgram}
-            className="w-full py-3 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition"
+            className="w-full py-4 rounded-2xl bg-indigo-600 text-white font-bold text-lg hover:bg-indigo-700 transition"
           >
             Start Week 1
           </button>
@@ -191,7 +191,7 @@ export default function ResultsPage() {
                 </div>
 
                 <div className="text-sm text-gray-600 mb-4">
-                  {legend.strand} • {legend.year}
+                  {legend.strand} - {legend.year}
                 </div>
 
                 <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-4 text-left mb-5">

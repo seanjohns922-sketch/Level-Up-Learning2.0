@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getLegendForYear } from "@/data/legends";
 import { getProgramForYear } from "@/data/programs";
@@ -56,18 +56,13 @@ export default function ProgramPage() {
   const weekNum = Number(sp.get("week") ?? "1");
   const week = String(weekNum);
 
-  const store = readProgramStore();
+  const [store, setStore] = useState<ProgramProgressStore>({});
+  const [isClient, setIsClient] = useState(false);
 
-  const practiceDone = useMemo(() => {
-    if (typeof window === "undefined") return [] as string[];
-    const key = `lul_week_${year}_${weekNum}`;
-    try {
-      const raw = localStorage.getItem(key);
-      return raw ? (JSON.parse(raw) as string[]) : [];
-    } catch {
-      return [];
-    }
-  }, [year, weekNum]);
+  useEffect(() => {
+    setStore(readProgramStore());
+    setIsClient(true);
+  }, []);
 
   // gating: week N accessible only if week N-1 complete
   const prevWeekNum = Math.max(1, weekNum - 1);
@@ -142,10 +137,7 @@ export default function ProgramPage() {
     goToWeek(Math.max(1, weekNum - 1));
   }
 
-  const lessonsDoneCount =
-    year === "Year 1" && weekNum === 1
-      ? [1, 2, 3].filter((n) => practiceDone.includes(`y1-w1-l${n}`)).length
-      : progress.lessonsCompleted.filter(Boolean).length;
+  const lessonsDoneCount = progress.lessonsCompleted.filter(Boolean).length;
   const weekComplete = isWeekComplete(progress);
 
   useEffect(() => {
@@ -193,7 +185,7 @@ export default function ProgramPage() {
       <main className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center justify-center p-6">
         <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-xl text-center">
           <h1 className="text-2xl font-extrabold text-gray-800 mb-2">
-            🔒 Week {weekNum} Locked
+            Week {weekNum} Locked
           </h1>
           <p className="text-gray-600 mb-6">
             Complete Week {weekNum - 1} first (3 lessons + quiz) to unlock this week.
@@ -225,55 +217,73 @@ export default function ProgramPage() {
   const percent = Math.round((xp / totalXp) * 100);
 
   return (
-    <main className="min-h-screen bg-[url('/bg-waves.svg')] bg-no-repeat bg-top bg-cover">
-      {DEV_MODE ? (
+    <main className="min-h-screen bg-[#fbf7f1]">
+      {DEV_MODE && process.env.NODE_ENV === "development" ? (
         <div className="fixed bottom-4 right-4 px-4 py-2 bg-red-600 text-white font-extrabold rounded-xl shadow-lg z-50">
           DEV MODE
         </div>
       ) : null}
       <div className="max-w-5xl mx-auto px-6">
-        <div className="relative bg-green-400 text-white rounded-b-3xl overflow-hidden pt-6 pb-8 mb-6">
+        <div className="relative bg-gradient-to-br from-emerald-400 to-emerald-600 text-white rounded-b-3xl overflow-hidden pt-6 pb-10 mb-6">
           <div className="flex items-center justify-between px-4">
-              <button onClick={() => router.push("/")} className="text-white/90 text-sm px-3 py-2 rounded-full bg-white/10">
-                ← Home
-              </button>
+            <button
+              onClick={() => router.push("/home")}
+              className="text-white/90 text-sm px-3 py-2 rounded-full bg-white/10"
+            >
+              Back
+            </button>
 
-              <div className="flex items-center gap-3">
-                <div className="flex gap-2 items-center">
-                  <button onClick={prevWeek} aria-label="Previous week" className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30">←</button>
-                  <button onClick={nextWeek} aria-label="Next week" className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30">→</button>
-                </div>
-
-                <div className="text-sm text-white/90">{year} • 12-Week Program</div>
+            <div className="flex items-center gap-3">
+              <div className="flex gap-2 items-center">
+                <button
+                  onClick={prevWeek}
+                  aria-label="Previous week"
+                  className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30"
+                >
+                  &larr;
+                </button>
+                <button
+                  onClick={nextWeek}
+                  aria-label="Next week"
+                  className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30"
+                >
+                  &rarr;
+                </button>
               </div>
-            </div>
 
-          <div className="text-center mt-6 px-4">
-            <h1 className="text-3xl font-extrabold">Week {weekNum}</h1>
-            <div className="text-sm text-white/90 mt-1">
-              {weekComplete
-                ? "Completed"
-                : `Progress: ${lessonsDoneCount}/3 lessons + ${progress.quizCompleted ? "quiz done" : "quiz pending"}`}
-            </div>
-
-            <div className="mt-4 flex justify-center">
-              <div className="bg-white rounded-full px-4 py-3 w-full max-w-md">
-                <div className="bg-gray-200 rounded-full h-3 w-full overflow-hidden">
-                  <div className="bg-indigo-600 h-3" style={{ width: `${percent}%` }} />
-                </div>
-                <div className="text-xs text-gray-700 mt-2 text-center">{xp} / {totalXp} XP</div>
-              </div>
+              <div className="text-sm text-white/90">{year} - 12-Week Program</div>
             </div>
           </div>
 
-          {/* prev/next moved into top bar for a cleaner header */}
+          <div className="text-center mt-6 px-4">
+            <div className="inline-flex items-center gap-2 bg-white/20 px-4 py-1 rounded-full text-sm font-semibold">
+              Level 1 - 12-Week Program
+            </div>
+            <h1 className="text-4xl font-extrabold mt-3">Week {weekNum}</h1>
+            <div className="text-sm text-white/90 mt-1">
+              {isClient
+                ? weekComplete
+                  ? "Completed"
+                  : `${lessonsDoneCount}/3 lessons - ${progress.quizCompleted ? "quiz done" : "quiz pending"}`
+                : "0/3 lessons - quiz pending"}
+            </div>
+
+            <div className="mt-5 flex justify-center">
+              <div className="bg-white/80 rounded-full px-4 py-3 w-full max-w-md">
+                <div className="bg-white/60 rounded-full h-3 w-full overflow-hidden">
+                  <div className="bg-emerald-700 h-3" style={{ width: `${percent}%` }} />
+                </div>
+                <div className="text-xs text-emerald-900 mt-2 text-center">{xp} / {totalXp} XP</div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="bg-white rounded-3xl shadow-xl p-6">
-          {DEV_MODE ? (
-            <div className="mb-6 rounded-xl border border-yellow-300 bg-yellow-50 p-4">
+        <div className="bg-white rounded-3xl shadow-xl p-6 border border-white/70">
+          {DEV_MODE && process.env.NODE_ENV === "development" ? (
+            <div className="mb-6 rounded-2xl border border-yellow-300 bg-yellow-50 p-4">
               <div className="font-bold text-yellow-800 mb-2">
-                DEV MODE – Jump to any week
+                DEV MODE - Jump to any week
               </div>
               <div className="flex flex-wrap gap-2">
                 {Array.from({ length: 12 }).map((_, i) => (
@@ -294,9 +304,7 @@ export default function ProgramPage() {
             {items.map((item) => {
               const completed =
                 item.type === "lesson"
-                  ? year === "Year 1" && weekNum === 1
-                    ? practiceDone.includes(`y1-w1-l${item.n}`)
-                    : progress.lessonsCompleted[item.n - 1]
+                  ? progress.lessonsCompleted[item.n - 1]
                   : progress.quizCompleted;
 
               return (
@@ -304,13 +312,13 @@ export default function ProgramPage() {
                   key={`${item.type}-${item.n}`}
                   onClick={() => openItem(item)}
                   className={[
-                    "w-full text-left p-4 rounded-2xl border transition flex items-center gap-4",
-                    completed ? "border-green-200 bg-green-50" : "border-gray-100 bg-white",
+                    "w-full text-left p-5 rounded-3xl border transition flex items-center gap-4",
+                    completed ? "border-gray-200 bg-white" : "border-gray-100 bg-white",
                   ].join(" ")}
                 >
                   <div className="w-20 h-20 rounded-xl flex items-center justify-center bg-white/70">
-                    <div className="w-14 h-14 rounded-lg bg-green-100 flex items-center justify-center"> 
-                      {item.type === 'quiz' ? '★' : '📘'}
+                    <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center"> 
+                      {item.type === "quiz" ? "Quiz" : "Lesson"}
                     </div>
                   </div>
 
@@ -322,9 +330,9 @@ export default function ProgramPage() {
 
                   <div className="ml-auto">
                     {completed ? (
-                      <div className="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center">✓</div>
+                      <div className="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center">OK</div>
                     ) : (
-                      <div className="text-xs font-bold px-3 py-1 rounded-full border">TO DO</div>
+                      <div className="text-xs font-bold px-3 py-1 rounded-full border">START</div>
                     )}
                   </div>
                 </button>
@@ -334,14 +342,14 @@ export default function ProgramPage() {
 
           {/* Finish Program CTA */}
           {weekNum === 12 && weekComplete ? (
-            <div className="mt-6 rounded-xl border border-green-200 bg-green-50 p-4 text-left">
-              <div className="font-bold text-green-900 mb-2">🏁 Program Complete</div>
-              <div className="text-sm text-green-900 mb-4">You’ve completed all 12 weeks. Finish to unlock your Legend.</div>
+            <div className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-left">
+              <div className="font-bold text-emerald-900 mb-2">Program Complete</div>
+              <div className="text-sm text-emerald-900 mb-4">You've completed all 12 weeks. Finish to unlock your Legend.</div>
               <button
                 onClick={finishProgram}
-                className="w-full py-3 rounded-xl bg-green-500 text-white font-bold hover:bg-green-600 transition"
+                className="w-full py-3 rounded-2xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition"
               >
-                Finish Program → Unlock Legend
+                Finish Program - Unlock Legend
               </button>
             </div>
           ) : null}
