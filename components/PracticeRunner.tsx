@@ -233,7 +233,7 @@ export function PracticeRunner({
 
   function markWrong() {
     setStatus("wrong");
-    setTimeout(() => nextTask(), 1200);
+    setTimeout(() => setStatus("idle"), 1200);
   }
 
   function markCorrect() {
