@@ -96,12 +96,24 @@ function pad2(n: number) {
   return String(n).padStart(2, "0");
 }
 
-function Countdown({ seconds }: { seconds: number }) {
+function Countdown({ seconds, total }: { seconds: number; total: number }) {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
+  const pct = Math.max(0, Math.min(100, (seconds / total) * 100));
   return (
-    <div className="text-sm font-bold text-gray-600">
-      Time left: {m}:{pad2(s)}
+    <div className="flex items-center gap-3 flex-1">
+      <div className="flex-1 h-3 rounded-full bg-gray-100 overflow-hidden">
+        <div
+          className="h-full rounded-full transition-all duration-1000 ease-linear"
+          style={{
+            width: `${pct}%`,
+            background: pct > 50 ? 'hsl(145 65% 42%)' : pct > 20 ? 'hsl(42 95% 55%)' : 'hsl(0 72% 51%)',
+          }}
+        />
+      </div>
+      <span className="text-sm font-bold text-gray-500 tabular-nums whitespace-nowrap">
+        {m}:{pad2(s)}
+      </span>
     </div>
   );
 }
@@ -221,6 +233,7 @@ export function PracticeRunner({
 
   function markWrong() {
     setStatus("wrong");
+    setTimeout(() => nextTask(), 1200);
   }
 
   function markCorrect() {
@@ -250,28 +263,31 @@ export function PracticeRunner({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6">
-      <div className="flex items-start justify-between gap-4 mb-4">
-        <Countdown seconds={Math.max(0, secondsLeft)} />
+    <div className={[
+      "rounded-3xl border bg-white shadow-sm p-6 transition-all",
+      status === "correct" ? "border-emerald-200 animate-correct" : status === "wrong" ? "border-red-200 animate-wrong" : "border-gray-100",
+    ].join(" ")}>
+      <div className="flex items-center justify-between gap-4 mb-5">
+        <Countdown seconds={Math.max(0, secondsLeft)} total={totalSeconds} />
         <div
           className={[
-            "px-3 py-2 rounded-xl text-sm font-bold border",
+            "px-3 py-1.5 rounded-full text-xs font-extrabold tracking-wide transition-all",
             status === "correct"
-              ? "bg-green-50 border-green-200 text-green-800"
+              ? "bg-emerald-50 text-emerald-700"
               : status === "wrong"
-              ? "bg-red-50 border-red-200 text-red-800"
-              : "bg-gray-50 border-gray-200 text-gray-700",
+              ? "bg-red-50 text-red-700"
+              : "bg-gray-50 text-gray-400",
           ].join(" ")}
         >
           {status === "correct"
-            ? "✅ Correct"
+            ? "✓ Correct!"
             : status === "wrong"
-            ? "❌ Try again"
+            ? "✗ Try again"
             : "Practice"}
         </div>
       </div>
 
-      <div className="text-2xl font-extrabold text-gray-900 mb-5">
+      <div className="text-2xl font-extrabold text-gray-900 mb-5 leading-tight">
         {"prompt" in task ? task.prompt : ""}
       </div>
 

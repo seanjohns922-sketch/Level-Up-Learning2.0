@@ -83,29 +83,101 @@ export default function LoginPage() {
   const createdClass = createdCode ? classes[createdCode] : null;
 
   const classList = useMemo(() => Object.values(classes), [classes]);
+  const [teacherError, setTeacherError] = useState<string | null>(null);
+  const [teacherLoading, setTeacherLoading] = useState(false);
 
   function saveClasses(next: ClassesStore) {
     setClasses(next);
     writeClasses(next);
   }
 
-  function createClass() {
+  async function handleTeacherSignup() {
     if (!teacherEmail || !teacherPassword) return;
-    const code = generateCode();
-    const teacherInitials = teacherName ? initials(teacherName) : "";
-    const autoName = teacherInitials ? `3/4 ${teacherInitials}` : `Class ${code}`;
-    const name = className.trim() || autoName;
-    const record: ClassRecord = {
-      code,
-      name,
-      teacherEmail,
-      teacherName: teacherName.trim() || undefined,
-      students: [],
-      createdAt: new Date().toISOString(),
-    };
-    const next = { ...classes, [code]: record };
-    saveClasses(next);
-    setCreatedCode(code);
+    setTeacherError(null);
+    setTeacherLoading(true);
+
+    const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
+      email: teacherEmail,
+      password: teacherPassword,
+      options: { data: { display_name: teacherName || teacherEmail, role: "teacher" } },
+    });
+
+    if (signUpErr) {
+      setTeacherError(signUpErr.message);
+      setTeacherLoading(false);
+      return;
+    }
+
+    const userId = signUpData.user?.id;
+    if (!userId) {
+      setTeacherError("Sign up failed. Please try again.");
+      setTeacherLoading(false);
+      return;
+    }
+
+    // Create role + teacher record
+    await supabase.from("user_roles").insert({ user_id: userId, role: "teacher" as any });
+    await supabase.from("teachers").insert({
+      user_id: userId,
+      name: teacherName.trim() || teacherEmail,
+      email: teacherEmail,
+    } as any);
+
+    // Optionally create a class if name provided
+    if (className.trim()) {
+      const { data: code } = await supabase.rpc("generate_class_code");
+      if (code) {
+        const { data: teacherId } = await supabase.rpc("get_teacher_id");
+        if (teacherId) {
+          await supabase.from("classes").insert({
+            name: className.trim(),
+            year_level: "1",
+            class_code: code,
+            teacher_id: teacherId,
+          });
+          setCreatedCode(code);
+          // Also store locally for display
+          const record: ClassRecord = {
+            code,
+            name: className.trim(),
+            teacherEmail,
+            teacherName: teacherName.trim() || undefined,
+            students: [],
+            createdAt: new Date().toISOString(),
+          };
+          saveClasses({ ...classes, [code]: record });
+        }
+      }
+    }
+
+    setTeacherLoading(false);
+    router.push("/teacher/dashboard");
+  }
+
+  async function handleTeacherLogin() {
+    if (!teacherEmail || !teacherPassword) return;
+    setTeacherError(null);
+    setTeacherLoading(true);
+
+    const { data, error: signInErr } = await supabase.auth.signInWithPassword({
+      email: teacherEmail,
+      password: teacherPassword,
+    });
+
+    if (signInErr) {
+      setTeacherError(signInErr.message);
+      setTeacherLoading(false);
+      return;
+    }
+
+    if (data?.user) {
+      setTeacherLoading(false);
+      router.push("/teacher/dashboard");
+      return;
+    }
+
+    setTeacherError("Login failed.");
+    setTeacherLoading(false);
   }
 
   async function handleStudentLogin() {
@@ -439,12 +511,17 @@ export default function LoginPage() {
                 </div>
               ) : null}
 
+              {teacherError && (
+                <p className="text-sm text-red-600 font-bold text-center">{teacherError}</p>
+              )}
+
               <button
-                onClick={teacherMode === "signup" ? createClass : undefined}
-                className="mt-2 w-full py-4 rounded-2xl bg-[#9fd7b1] text-[#1f3b2a] font-black text-lg hover:bg-[#8fcea4] transition"
+                onClick={teacherMode === "signup" ? handleTeacherSignup : handleTeacherLogin}
+                disabled={teacherLoading}
+                className="mt-2 w-full py-4 rounded-2xl bg-[#9fd7b1] text-[#1f3b2a] font-black text-lg hover:bg-[#8fcea4] transition disabled:opacity-50"
                 type="button"
               >
-                {teacherMode === "signup" ? "Sign Up" : "Sign In"}
+                {teacherLoading ? "Please wait…" : teacherMode === "signup" ? "Sign Up" : "Sign In"}
               </button>
 
               {createdClass ? (
