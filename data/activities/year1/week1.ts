@@ -1,4 +1,5 @@
-import type { PracticeTask } from "./practice-task";
+import type { PracticeTask, Difficulty } from "./practice-task";
+import { diffRange } from "./practice-task";
 
 function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -34,9 +35,10 @@ function uniqueInts(n: number, min: number, max: number, avoid: number[] = []) {
   return Array.from(set);
 }
 
-export function genY1W1L1(): PracticeTask {
-  const answer = randInt(0, 50);
-  const distractors = uniqueInts(3, 0, 50)
+export function genY1W1L1(d: Difficulty): PracticeTask {
+  const [lo, hi] = diffRange(d, [0, 20], [0, 35], [0, 50]);
+  const answer = randInt(lo, hi);
+  const distractors = uniqueInts(3, lo, hi)
     .filter((x) => x !== answer)
     .slice(0, 3);
   const options = shuffle([String(answer), ...distractors.map(String)]);
@@ -46,6 +48,7 @@ export function genY1W1L1(): PracticeTask {
     prompt: `Tap the number ${answer}.`,
     options,
     answer: String(answer),
+    difficulty: d,
     feedback: {
       correct: "Nice!",
       wrong: "Try again — look carefully at the digits.",
@@ -53,9 +56,10 @@ export function genY1W1L1(): PracticeTask {
   };
 }
 
-export function genY1W1L1_AudioPick(): PracticeTask {
-  const target = randInt(0, 50);
-  const distractors = uniqueInts(5, 0, 50, [target]);
+export function genY1W1L1_AudioPick(d: Difficulty): PracticeTask {
+  const [lo, hi] = diffRange(d, [0, 20], [0, 35], [0, 50]);
+  const target = randInt(lo, hi);
+  const distractors = uniqueInts(5, lo, hi, [target]);
   const cards = shuffle([target, ...distractors]);
 
   return {
@@ -64,13 +68,15 @@ export function genY1W1L1_AudioPick(): PracticeTask {
     targetNumber: target,
     cards,
     speechText: String(target),
+    difficulty: d,
   };
 }
 
-export function genY1W1L1_NumberHunt(): PracticeTask {
-  const target = randInt(0, 50);
+export function genY1W1L1_NumberHunt(d: Difficulty): PracticeTask {
+  const [lo, hi] = diffRange(d, [0, 20], [0, 35], [0, 50]);
+  const target = randInt(lo, hi);
   const tilesCount = 24;
-  const distractors = uniqueInts(tilesCount - 1, 0, 50, [target]);
+  const distractors = uniqueInts(tilesCount - 1, lo, hi, [target]);
   const tiles = shuffle([target, ...distractors]);
 
   return {
@@ -78,12 +84,14 @@ export function genY1W1L1_NumberHunt(): PracticeTask {
     prompt: `Find ${target}.`,
     targetNumber: target,
     tiles,
+    difficulty: d,
   };
 }
 
-export function genY1W1L3_Order(): PracticeTask {
-  const count = Math.random() < 0.5 ? 3 : 4;
-  const nums = uniqueInts(count, 0, 30);
+export function genY1W1L3_Order(d: Difficulty): PracticeTask {
+  const [lo, hi] = diffRange(d, [0, 15], [0, 30], [0, 50]);
+  const count = d === "easy" ? 3 : Math.random() < 0.5 ? 3 : 4;
+  const nums = uniqueInts(count, lo, hi);
   const direction = Math.random() < 0.5 ? "ASC" : "DESC";
 
   return {
@@ -94,135 +102,148 @@ export function genY1W1L3_Order(): PracticeTask {
         : "Put the numbers in order (largest → smallest).",
     numbers: nums,
     direction,
+    difficulty: d,
   };
 }
 
-export function genY1W1L3_TypeNumber(): PracticeTask {
-  const answer = randInt(0, 30);
+export function genY1W1L3_TypeNumber(d: Difficulty): PracticeTask {
+  const [lo, hi] = diffRange(d, [0, 15], [0, 30], [0, 50]);
+  const answer = randInt(lo, hi);
   return {
     kind: "typeNumber",
     prompt: "Type this number.",
     answer,
-    min: 0,
-    max: 30,
+    min: lo,
+    max: hi,
+    difficulty: d,
   };
 }
 
-export function genY1W1L3_NumberLadder(): PracticeTask {
-  const min = 0;
-  const max = 30;
-  const start = randInt(min, max - 6);
+export function genY1W1L3_NumberLadder(d: Difficulty): PracticeTask {
+  const [lo, hi] = diffRange(d, [0, 15], [0, 30], [0, 50]);
+  const start = randInt(lo, hi - 6);
   const up = Math.random() < 0.5;
-  const delta = randInt(2, 6);
-  const target = up ? Math.min(start + delta, max) : Math.max(start - delta, min);
+  const delta = randInt(2, d === "hard" ? 8 : d === "medium" ? 6 : 4);
+  const target = up ? Math.min(start + delta, hi) : Math.max(start - delta, lo);
 
   return {
     kind: "numberLadder",
     prompt: "Number Ladder",
     start,
     target,
-    min,
-    max,
+    min: lo,
+    max: hi,
+    difficulty: d,
   };
 }
 
-export function genY1W1L3_NumberLineTap(): PracticeTask {
-  const min = 0;
-  const max = 50;
-  const target = randInt(min, max);
+export function genY1W1L3_NumberLineTap(d: Difficulty): PracticeTask {
+  const [lo, hi] = diffRange(d, [0, 20], [0, 35], [0, 50]);
+  const target = randInt(lo, hi);
   return {
     kind: "numberLineTap",
     prompt: `Tap where ${target} belongs.`,
-    min,
-    max,
+    min: lo,
+    max: hi,
     target,
+    difficulty: d,
   };
 }
 
-export function genY1W1L3_NumberLineJump(): PracticeTask {
-  const min = 0;
-  const max = 50;
-  const start = randInt(min, max - 5);
+export function genY1W1L3_NumberLineJump(d: Difficulty): PracticeTask {
+  const [lo, hi] = diffRange(d, [0, 20], [0, 35], [0, 50]);
+  const start = randInt(lo, hi - 5);
   const up = Math.random() < 0.5;
-  const step = Math.random() < 0.5 ? 1 : 10;
-  const jumps = randInt(2, 5);
-  const target = Math.min(max, Math.max(min, start + (up ? 1 : -1) * step * jumps));
+  const step = d === "easy" ? 1 : Math.random() < 0.5 ? 1 : 10;
+  const jumps = randInt(2, d === "hard" ? 5 : 3);
+  const target = Math.min(hi, Math.max(lo, start + (up ? 1 : -1) * step * jumps));
   return {
     kind: "numberLineJump",
     prompt: `Jump ${up ? "forward" : "back"} ${step}s.`,
-    min,
-    max,
+    min: lo,
+    max: hi,
     start,
     target,
     steps: [step, -step],
+    difficulty: d,
   };
 }
 
-export function genY1W1L3_ChartFill(): PracticeTask {
-  const min = 1;
-  const max = 100;
-  const missing = uniqueInts(5, min, max);
+export function genY1W1L3_ChartFill(d: Difficulty): PracticeTask {
+  const [lo, hi] = diffRange(d, [1, 50], [1, 80], [1, 100]);
+  const count = d === "easy" ? 3 : d === "medium" ? 5 : 7;
+  const missing = uniqueInts(count, lo, hi);
   return {
     kind: "chartFill",
     prompt: "Fill the missing numbers.",
-    min,
-    max,
+    min: lo,
+    max: hi,
     missing,
+    difficulty: d,
   };
 }
 
-export function genY1W1L1_MatchPairs(): PracticeTask {
+export function genY1W1L1_MatchPairs(d: Difficulty): PracticeTask {
+  const [lo, hi] = diffRange(d, [0, 20], [0, 35], [0, 50]);
   return {
     kind: "matchPairs",
     prompt: "Match the pairs.",
-    config: { min: 0, max: 50, pairsCount: 6, rounds: 1, mode: "number-number" },
+    config: { min: lo, max: hi, pairsCount: d === "easy" ? 4 : 6, rounds: 1, mode: "number-number" as const },
+    difficulty: d,
   };
 }
 
-export function generateWeek1Task(lessonId: string): PracticeTask {
+export function generateWeek1Task(lessonId: string, d: Difficulty = "easy"): PracticeTask {
   if (lessonId === "y1-w1-l1") {
     const kinds = [
-      genY1W1L1_AudioPick,
-      genY1W1L1_NumberHunt,
-      genY1W1L1_MatchPairs,
+      () => genY1W1L1_AudioPick(d),
+      () => genY1W1L1_NumberHunt(d),
+      () => genY1W1L1_MatchPairs(d),
     ];
-    const pick = kinds[pickFromBag(lessonId, kinds.length)];
-    return pick();
+    return kinds[pickFromBag(lessonId, kinds.length)]();
   }
   if (lessonId === "y1-w1-l2") {
-    const kinds = [genY1W1L2, genY1W1L2_FillTheJar, genY1W1L2_CountCircle];
-    const pick = kinds[pickFromBag(lessonId, kinds.length)];
-    return pick();
+    const kinds = [
+      () => genY1W1L2(d),
+      () => genY1W1L2_FillTheJar(d),
+      () => genY1W1L2_CountCircle(d),
+    ];
+    return kinds[pickFromBag(lessonId, kinds.length)]();
   }
   const kinds = [
-    genY1W1L3_Order,
-    genY1W1L3_TypeNumber,
-    genY1W1L3_NumberLadder,
+    () => genY1W1L3_Order(d),
+    () => genY1W1L3_TypeNumber(d),
+    () => genY1W1L3_NumberLadder(d),
   ];
-  const pick = kinds[pickFromBag(lessonId, kinds.length)];
-  return pick();
+  return kinds[pickFromBag(lessonId, kinds.length)]();
 }
 
-export function genY1W1L2_FillTheJar(): PracticeTask {
+export function genY1W1L2_FillTheJar(d: Difficulty): PracticeTask {
+  const [lo, hi] = diffRange(d, [5, 20], [10, 35], [10, 50]);
   return {
     kind: "fillTheJar",
     prompt: "Fill the jar to the target.",
-    config: { minTarget: 10, maxTarget: 50, rounds: 1, increments: [1, 2, 5, 10] },
+    config: { minTarget: lo, maxTarget: hi, rounds: 1, increments: [1, 2, 5, 10] },
+    difficulty: d,
   };
 }
 
-export function genY1W1L2(): PracticeTask {
+export function genY1W1L2(d: Difficulty): PracticeTask {
+  const [lo, hi] = diffRange(d, [3, 15], [5, 30], [5, 50]);
   return {
     kind: "countObjects",
     prompt: "How many counters?",
-    config: { min: 5, max: 50, rounds: 1, optionsCount: 4 },
+    config: { min: lo, max: hi, rounds: 1, optionsCount: 4 },
+    difficulty: d,
   };
 }
 
-export function genY1W1L2_CountCircle(): PracticeTask {
+export function genY1W1L2_CountCircle(d: Difficulty): PracticeTask {
+  const [lo, hi] = diffRange(d, [3, 15], [5, 30], [5, 50]);
   return {
     kind: "countCircle",
     prompt: "Circle the counters.",
-    config: { minTarget: 5, maxTarget: 50, totalDots: 36, rounds: 1 },
+    config: { minTarget: lo, maxTarget: hi, totalDots: d === "easy" ? 20 : 36, rounds: 1 },
+    difficulty: d,
   };
 }

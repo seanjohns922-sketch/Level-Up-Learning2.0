@@ -1,148 +1,77 @@
-import type { PracticeTask } from "./practice-task";
+import type { PracticeTask, Difficulty } from "./practice-task";
+import { diffRange } from "./practice-task";
 
 function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function makeSubtractPair(): { total: number; remove: number; answer: number } {
+function makeSubtractPair(d: Difficulty): { total: number; remove: number; answer: number } {
+  const maxTotal = d === "easy" ? 12 : d === "medium" ? 16 : 20;
   const r = Math.random();
-  let total = 10;
-  let remove = 5;
+  let total = 10, remove = 5;
 
   if (r < 0.4) {
-    // crossing 10
-    total = randInt(11, 20);
-    const minRemove = Math.max(2, total - 9);
-    remove = randInt(minRemove, 9);
+    total = randInt(d === "easy" ? 6 : 11, maxTotal);
+    const minRemove = Math.max(1, total - 9);
+    remove = randInt(minRemove, Math.min(d === "easy" ? 5 : 9, total - 1));
   } else if (r < 0.6) {
-    // doubles
-    const n = randInt(3, 10);
-    total = n + n;
-    remove = n;
+    const n = randInt(3, Math.floor(maxTotal / 2));
+    total = n + n; remove = n;
   } else if (r < 0.8) {
-    // near doubles
-    const n = randInt(3, 9);
-    const plusOne = Math.random() < 0.5;
-    total = n + (plusOne ? n + 1 : n - 1);
-    remove = n;
+    const n = randInt(3, Math.min(9, Math.floor(maxTotal / 2)));
+    total = n + (Math.random() < 0.5 ? n + 1 : n - 1); remove = n;
   } else {
-    total = randInt(6, 20);
+    total = randInt(6, maxTotal);
     remove = randInt(1, Math.min(10, total - 1));
   }
-
   return { total, remove, answer: total - remove };
-}
-
-function makeMentalMake10Pair() {
-  const total = randInt(11, 20);
-  const jumpToTen = total - 10;
-  const remove = randInt(Math.max(2, jumpToTen), 9);
-  return { total, remove, answer: total - remove };
-}
-
-function makeCountUpPair() {
-  const total = randInt(10, 20);
-  const remove = randInt(4, 10);
-  const answer = total - remove;
-  if (answer >= 2 && answer <= 7) return { total, remove, answer };
-  return { total, remove: Math.min(10, total - 3), answer: total - Math.min(10, total - 3) };
 }
 
 function makeOptions(answer: number, min = 0, max = 20) {
   const set = new Set<number>([answer]);
-  while (set.size < 4) {
-    const n = randInt(min, max);
-    set.add(n);
-  }
+  while (set.size < 4) set.add(randInt(min, max));
   return Array.from(set).sort(() => Math.random() - 0.5).map(String);
 }
 
 export function generateWeek6Task(
   lessonId: string,
-  ctx?: { secondsLeft: number; totalSeconds: number }
+  ctx?: { secondsLeft: number; totalSeconds: number },
+  d: Difficulty = "easy"
 ): PracticeTask {
   if (lessonId === "y1-w6-l1") {
-    const elapsed = ctx ? ctx.totalSeconds - ctx.secondsLeft : 0;
-    const easyMode = elapsed < 4 * 60;
-    const pair = easyMode
-      ? (() => {
-          const total = randInt(6, 12);
-          const remove = randInt(1, Math.min(5, total - 1));
-          return { total, remove, answer: total - remove };
-        })()
-      : makeSubtractPair();
-    const { total, remove } = pair;
+    const pair = makeSubtractPair(d);
     const modePick = randInt(0, 2);
-    const mode =
-      modePick === 0 ? "equation" : modePick === 1 ? "takeAway" : "startWith";
-    return {
-      kind: "subtractTakeAway",
-      total,
-      remove,
-      mode,
-    };
+    const mode = modePick === 0 ? "equation" : modePick === 1 ? "takeAway" : "startWith";
+    return { kind: "subtractTakeAway", total: pair.total, remove: pair.remove, mode, difficulty: d };
   }
 
   if (lessonId === "y1-w6-l2") {
-    const { total, remove } = makeSubtractPair();
+    const { total, remove } = makeSubtractPair(d);
     const modePick = randInt(0, 2);
-    if (modePick === 0) {
-      return {
-        kind: "subtractMissingPart",
-        total,
-        part: remove,
-        options: makeOptions(total - remove),
-      };
-    }
-    if (modePick === 1) {
-      return {
-        kind: "subtractMoveToTaken",
-        total,
-        remove,
-      };
-    }
-    return {
-      kind: "subtractBar",
-      total,
-      remove,
-      options: makeOptions(total - remove),
-    };
+    if (modePick === 0) return { kind: "subtractMissingPart", total, part: remove, options: makeOptions(total - remove), difficulty: d };
+    if (modePick === 1) return { kind: "subtractMoveToTaken", total, remove, difficulty: d };
+    return { kind: "subtractBar", total, remove, options: makeOptions(total - remove), difficulty: d };
   }
 
   if (lessonId === "y1-w6-l3") {
     const pick = randInt(0, 2);
     if (pick === 0) {
-      const { total, remove } = makeMentalMake10Pair();
-      return {
-        kind: "mentalSubtract",
-        strategy: "make10",
-        total,
-        remove,
-        options: makeOptions(total - remove),
-        answer: total - remove,
-      };
+      const maxTotal = d === "easy" ? 14 : 20;
+      const total = randInt(11, maxTotal);
+      const jumpToTen = total - 10;
+      const remove = randInt(Math.max(2, jumpToTen), Math.min(9, total - 1));
+      return { kind: "mentalSubtract", strategy: "make10", total, remove, options: makeOptions(total - remove), answer: total - remove, difficulty: d };
     }
     if (pick === 1) {
-      const { total, remove } = makeSubtractPair();
-      return {
-        kind: "mentalSubtract",
-        strategy: "factFamily",
-        total,
-        remove,
-        options: makeOptions(total - remove),
-        answer: total - remove,
-      };
+      const { total, remove } = makeSubtractPair(d);
+      return { kind: "mentalSubtract", strategy: "factFamily", total, remove, options: makeOptions(total - remove), answer: total - remove, difficulty: d };
     }
-    const { total, remove, answer } = makeCountUpPair();
-    return {
-      kind: "mentalSubtract",
-      strategy: "countUp",
-      total,
-      remove,
-      options: makeOptions(answer),
-      answer,
-    };
+    const maxTotal = d === "easy" ? 14 : 20;
+    const total = randInt(10, maxTotal);
+    const remove = randInt(4, Math.min(10, total - 1));
+    const answer = total - remove;
+    return { kind: "mentalSubtract", strategy: "countUp", total, remove, options: makeOptions(answer), answer, difficulty: d };
   }
 
-  return generateWeek6Task("y1-w6-l1", ctx);
+  return generateWeek6Task("y1-w6-l1", ctx, d);
 }
