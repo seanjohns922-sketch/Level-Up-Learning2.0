@@ -151,43 +151,44 @@ export default function LessonPage() {
               key={`${year}-${week}-${lessonId}`}
               minutes={8}
               getTask={(ctx) => {
+                const d = ctx?.difficulty ?? "easy";
                 if (effectiveLessonId.startsWith("y1-w2-")) {
-                  return generateWeek2Task(effectiveLessonId);
+                  return generateWeek2Task(effectiveLessonId, d);
                 }
                 if (effectiveLessonId.startsWith("y1-w3-")) {
-                  return generateWeek3Task(effectiveLessonId);
+                  return generateWeek3Task(effectiveLessonId, d);
                 }
                 if (effectiveLessonId.startsWith("y1-w4-")) {
-                  return generateWeek4Task(effectiveLessonId, ctx);
+                  return generateWeek4Task(effectiveLessonId, ctx, d);
                 }
                 if (effectiveLessonId.startsWith("y1-w5-")) {
-                  return generateWeek5Task(effectiveLessonId, ctx);
+                  return generateWeek5Task(effectiveLessonId, ctx, d);
                 }
                 if (effectiveLessonId.startsWith("y1-w6-")) {
-                  return generateWeek6Task(effectiveLessonId, ctx);
+                  return generateWeek6Task(effectiveLessonId, ctx, d);
                 }
                 if (effectiveLessonId.startsWith("y1-w7-")) {
-                  return generateWeek7Task(effectiveLessonId, ctx);
+                  return generateWeek7Task(effectiveLessonId, ctx, d);
                 }
                 if (effectiveLessonId.startsWith("y1-w8-")) {
-                  return generateWeek8Task(effectiveLessonId);
+                  return generateWeek8Task(effectiveLessonId, d);
                 }
                 if (effectiveLessonId.startsWith("y1-w9-")) {
-                  return generateWeek9Task(effectiveLessonId);
+                  return generateWeek9Task(effectiveLessonId, d);
                 }
                 if (effectiveLessonId.startsWith("y1-w10-")) {
-                  return generateWeek10Task(effectiveLessonId);
+                  return generateWeek10Task(effectiveLessonId, d);
                 }
                 if (effectiveLessonId.startsWith("y1-w11-")) {
-                  return generateWeek11Task(effectiveLessonId);
+                  return generateWeek11Task(effectiveLessonId, d);
                 }
                 if (effectiveLessonId.startsWith("y1-w12-")) {
-                  return generateWeek12Task(effectiveLessonId);
+                  return generateWeek12Task(effectiveLessonId, d);
                 }
                 if (effectiveLessonId.startsWith("y1-w1-")) {
-                  return generateWeek1Task(effectiveLessonId);
+                  return generateWeek1Task(effectiveLessonId, d);
                 }
-                return generateWeek1Task(effectiveLessonId);
+                return generateWeek1Task(effectiveLessonId, d);
               }}
               onComplete={completeLesson}
             />

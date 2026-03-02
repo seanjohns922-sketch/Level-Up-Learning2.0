@@ -1,4 +1,5 @@
-import type { PracticeTask } from "./practice-task";
+import type { PracticeTask, Difficulty } from "./practice-task";
+import { diffRange } from "./practice-task";
 
 function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -54,16 +55,15 @@ function uniqueInts(n: number, min: number, max: number, avoid: number[] = []) {
   return Array.from(set);
 }
 
-function genEqualGroups(): PracticeTask {
-  return {
-    kind: "equalGroups",
-    prompt: "Make equal groups.",
-  };
+function genEqualGroups(d: Difficulty): PracticeTask {
+  return { kind: "equalGroups", prompt: "Make equal groups.", difficulty: d };
 }
 
-function genEqualGroupsMcq(): PracticeTask {
-  const groups = randInt(3, 5);
-  const perGroup = randInt(2, 5);
+function genEqualGroupsMcq(d: Difficulty): PracticeTask {
+  const [gLo, gHi] = diffRange(d, [2, 3], [3, 4], [3, 5]);
+  const [pLo, pHi] = diffRange(d, [2, 3], [2, 4], [2, 5]);
+  const groups = randInt(gLo, gHi);
+  const perGroup = randInt(pLo, pHi);
   const total = groups * perGroup;
   const correct = Array.from({ length: groups }, () => perGroup);
 
@@ -77,51 +77,29 @@ function genEqualGroupsMcq(): PracticeTask {
     arr[j] = Math.max(1, arr[j] - 1);
     const sum = arr.reduce((a, b) => a + b, 0);
     if (sum !== total) continue;
-    const dup = options.some(
-      (o) => JSON.stringify(o.groups) === JSON.stringify(arr)
-    );
+    const dup = options.some((o) => JSON.stringify(o.groups) === JSON.stringify(arr));
     if (!dup) options.push({ groups: arr });
   }
   const shuffled = shuffle(options);
-  const correctIndex = shuffled.findIndex(
-    (o) => JSON.stringify(o.groups) === JSON.stringify(correct)
-  );
-  return {
-    kind: "equalGroupsMcq",
-    prompt: "Which picture shows equal groups?",
-    options: shuffled,
-    correctIndex,
-  };
+  const correctIndex = shuffled.findIndex((o) => JSON.stringify(o.groups) === JSON.stringify(correct));
+  return { kind: "equalGroupsMcq", prompt: "Which picture shows equal groups?", options: shuffled, correctIndex, difficulty: d };
 }
 
-function genMissingGroupSize(): PracticeTask {
-  const groups = randInt(2, 5);
-  const perGroup = randInt(2, 6);
+function genMissingGroupSize(d: Difficulty): PracticeTask {
+  const [gLo, gHi] = diffRange(d, [2, 3], [2, 4], [2, 5]);
+  const [pLo, pHi] = diffRange(d, [2, 3], [2, 5], [2, 6]);
+  const groups = randInt(gLo, gHi);
+  const perGroup = randInt(pLo, pHi);
   const total = groups * perGroup;
-  const options = shuffle(
-    uniqueInts(3, 2, 6, [perGroup]).concat(perGroup)
-  ).map(String);
-  return {
-    kind: "mcq",
-    prompt: `${groups} groups of __ makes ${total}`,
-    options,
-    answer: String(perGroup),
-  };
+  const options = shuffle(uniqueInts(3, 2, 6, [perGroup]).concat(perGroup)).map(String);
+  return { kind: "mcq", prompt: `${groups} groups of __ makes ${total}`, options, answer: String(perGroup), difficulty: d };
 }
 
-function genSkipCountMissing(config?: {
-  step: number;
-  start: number;
-  length: number;
-  minOption: number;
-  maxOption: number;
-}): PracticeTask {
+function genSkipCountMissing(d: Difficulty, config?: { step: number; start: number; length: number; minOption: number; maxOption: number }): PracticeTask {
   const step = config?.step ?? [2, 5, 10][randInt(0, 2)];
-  const length = config?.length ?? 5;
+  const length = config?.length ?? (d === "easy" ? 4 : d === "medium" ? 5 : 6);
   const maxStartDefault = Math.max(0, 50 - step * (length - 1));
-  const start =
-    config?.start ??
-    pickStartForStep(step, 0, maxStartDefault);
+  const start = config?.start ?? pickStartForStep(step, 0, maxStartDefault);
   const blankIndex = randInt(1, length - 1);
   const seq = Array.from({ length }, (_, i) => start + i * step);
   const answer = seq[blankIndex];
@@ -129,164 +107,72 @@ function genSkipCountMissing(config?: {
   const maxOption = config?.maxOption ?? answer + step * 2;
   const distractors = uniqueInts(3, minOption, maxOption, [answer]);
   const options = shuffle([answer, ...distractors]).map(String);
-  return {
-    kind: "mcq",
-    prompt: `Fill the missing number: ${seq
-      .map((v, i) => (i === blankIndex ? "__" : v))
-      .join(", ")}`,
-    options,
-    answer: String(answer),
-  };
+  return { kind: "mcq", prompt: `Fill the missing number: ${seq.map((v, i) => (i === blankIndex ? "__" : v)).join(", ")}`, options, answer: String(answer), difficulty: d };
 }
 
-function genSkipCountTrack(): PracticeTask {
+function genSkipCountTrack(d: Difficulty): PracticeTask {
   const steps = [2, 5, 10];
   const step = steps[randInt(0, steps.length - 1)];
-  const current = pickStartForStep(step, 0, 50);
+  const [lo, hi] = diffRange(d, [0, 20], [0, 35], [0, 50]);
+  const current = pickStartForStep(step, lo, hi);
   const answer = current + step;
-  const distractors = uniqueInts(3, answer - step * 2, answer + step * 2, [
-    answer,
-  ]).map((n) => Math.max(0, n));
+  const distractors = uniqueInts(3, answer - step * 2, answer + step * 2, [answer]).map((n) => Math.max(0, n));
   const options = shuffle([answer, ...distractors]).map(String);
-  return {
-    kind: "mcq",
-    prompt: `Tap the next number. Start at ${current}, count by ${step}s.`,
-    options,
-    answer: String(answer),
-  };
+  return { kind: "mcq", prompt: `Tap the next number. Start at ${current}, count by ${step}s.`, options, answer: String(answer), difficulty: d };
 }
 
-function genCountGroupsVisual(): PracticeTask {
-  const groups = randInt(4, 6);
-  const perGroup = randInt(2, 6);
+function genCountGroupsVisual(d: Difficulty): PracticeTask {
+  const [gLo, gHi] = diffRange(d, [2, 3], [3, 5], [4, 6]);
+  const [pLo, pHi] = diffRange(d, [2, 3], [2, 5], [2, 6]);
+  const groups = randInt(gLo, gHi);
+  const perGroup = randInt(pLo, pHi);
   const total = groups * perGroup;
-  const distractors = uniqueInts(
-    3,
-    Math.max(0, total - 6),
-    total + 6,
-    [total]
-  ).map((n) => Math.max(0, n));
+  const distractors = uniqueInts(3, Math.max(0, total - 6), total + 6, [total]).map((n) => Math.max(0, n));
   const options = shuffle([total, ...distractors]).map(String);
-  return {
-    kind: "groupCountVisual",
-    prompt: "How many altogether?",
-    groups,
-    perGroup,
-    options,
-    answer: String(total),
-  };
+  return { kind: "groupCountVisual", prompt: "How many altogether?", groups, perGroup, options, answer: String(total), difficulty: d };
 }
 
-function genCountGroups(): PracticeTask {
-  const groups = randInt(3, 6);
-  const perGroup = randInt(2, 5);
-  const total = groups * perGroup;
-  const distractors = uniqueInts(3, total - 5, total + 5, [total]).map((n) =>
-    Math.max(0, n)
-  );
-  const options = shuffle([total, ...distractors]).map(String);
-  return {
-    kind: "mcq",
-    prompt: `How many in ${groups} groups of ${perGroup}?`,
-    options,
-    answer: String(total),
-  };
+function genGroupBoxes(d: Difficulty): PracticeTask {
+  const [gLo, gHi] = diffRange(d, [2, 3], [3, 4], [3, 5]);
+  const [pLo, pHi] = diffRange(d, [2, 3], [2, 5], [2, 6]);
+  const groups = randInt(gLo, gHi);
+  const perGroup = randInt(pLo, pHi);
+  return { kind: "groupBoxes", prompt: `Make ${groups} groups of ${perGroup}.`, groups, perGroup, difficulty: d };
 }
 
-function genHowManyGroupsVisual(): PracticeTask {
-  const groups = randInt(3, 6);
-  const perGroup = randInt(2, 5);
-  const total = groups * perGroup;
-  const askForGroups = randInt(0, 1) === 0;
-  const answer = askForGroups ? groups : total;
-  const options = shuffle(
-    uniqueInts(3, Math.max(1, answer - 4), answer + 4, [answer]).concat(
-      [answer]
-    )
-  ).map(String);
-  return {
-    kind: "groupCountVisual",
-    prompt: askForGroups ? "How many groups?" : "How many altogether?",
-    groups,
-    perGroup,
-    options,
-    answer: String(answer),
-  };
-}
-
-function genGroupBoxes(): PracticeTask {
-  const groups = randInt(3, 5);
-  const perGroup = randInt(2, 6);
-  return {
-    kind: "groupBoxes",
-    prompt: `Make ${groups} groups of ${perGroup}.`,
-    groups,
-    perGroup,
-  };
-}
-
-function genGroupingEstimate(): PracticeTask {
-  const tensGroups = randInt(2, 6);
+function genGroupingEstimate(d: Difficulty): PracticeTask {
+  const [tLo, tHi] = diffRange(d, [2, 3], [2, 5], [2, 6]);
+  const tensGroups = randInt(tLo, tHi);
   const ones = randInt(1, 9);
   const total = tensGroups * 10 + ones;
-  const options = shuffle(
-    uniqueInts(3, Math.max(10, total - 8), total + 8, [total]).concat([total])
-  ).map(String);
-  return {
-    kind: "groupingEstimate",
-    prompt: "What number is shown?",
-    tensGroups,
-    ones,
-    options,
-    answer: String(total),
-  };
+  const options = shuffle(uniqueInts(3, Math.max(10, total - 8), total + 8, [total]).concat([total])).map(String);
+  return { kind: "groupingEstimate", prompt: "What number is shown?", tensGroups, ones, options, answer: String(total), difficulty: d };
 }
 
 export function generateWeek4Task(
   lessonId: string,
-  ctx?: { secondsLeft: number; totalSeconds: number }
+  ctx?: { secondsLeft: number; totalSeconds: number },
+  d: Difficulty = "easy"
 ): PracticeTask {
   if (lessonId === "y1-w4-l1") {
-    const kinds = [genEqualGroups, genEqualGroupsMcq, genMissingGroupSize];
+    const kinds = [() => genEqualGroups(d), () => genEqualGroupsMcq(d), () => genMissingGroupSize(d)];
     return kinds[pickFromBag(lessonId, kinds.length)]();
   }
   if (lessonId === "y1-w4-l2") {
-    const isHard = ctx ? ctx.secondsLeft <= 4 * 60 : false;
-    if (isHard) {
+    if (d === "hard") {
       const modes = [
-        () =>
-          genSkipCountMissing({
-            step: 2,
-            start: 0,
-            length: 6,
-            minOption: 0,
-            maxOption: 30,
-          }),
-        () =>
-          genSkipCountMissing({
-            step: 5,
-            start: 5,
-            length: 6,
-            minOption: 0,
-            maxOption: 40,
-          }),
-        () =>
-          genSkipCountMissing({
-            step: 10,
-            start: 60,
-            length: 5,
-            minOption: 60,
-            maxOption: 100,
-          }),
+        () => genSkipCountMissing(d, { step: 2, start: 0, length: 6, minOption: 0, maxOption: 30 }),
+        () => genSkipCountMissing(d, { step: 5, start: 5, length: 6, minOption: 0, maxOption: 40 }),
+        () => genSkipCountMissing(d, { step: 10, start: 60, length: 5, minOption: 60, maxOption: 100 }),
       ];
       return modes[pickFromBag(`${lessonId}-hard`, modes.length)]();
     }
-    const kinds = [genSkipCountMissing, genSkipCountTrack, genCountGroupsVisual];
+    const kinds = [() => genSkipCountMissing(d), () => genSkipCountTrack(d), () => genCountGroupsVisual(d)];
     return kinds[pickFromBag(lessonId, kinds.length)]();
   }
   if (lessonId === "y1-w4-l3") {
-    const kinds = [genHowManyGroupsVisual, genGroupBoxes, genGroupingEstimate];
+    const kinds = [() => genCountGroupsVisual(d), () => genGroupBoxes(d), () => genGroupingEstimate(d)];
     return kinds[pickFromBag(lessonId, kinds.length)]();
   }
-  return genCountGroups();
+  return genCountGroupsVisual(d);
 }

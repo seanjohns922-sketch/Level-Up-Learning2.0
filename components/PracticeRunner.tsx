@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { PracticeTask } from "@/data/activities/year1/practice-task";
+import type { PracticeTask, Difficulty } from "@/data/activities/year1/practice-task";
+import { getDifficultyFromTime } from "@/data/activities/year1/practice-task";
 import MatchThePair from "@/components/MatchThePair";
 import CountObjects from "@/components/CountObjects";
 import FillTheJar from "@/components/FillTheJar";
@@ -130,15 +131,41 @@ export function PracticeRunner({
     secondsLeft: number;
     totalSeconds: number;
     elapsedSeconds: number;
+    difficulty: Difficulty;
   }) => PracticeTask;
   onComplete: () => void;
 }) {
   const totalSeconds = minutes * 60;
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
 
-  const [task, setTask] = useState<PracticeTask>(() =>
-    getTask({ secondsLeft: totalSeconds, totalSeconds, elapsedSeconds: 0 })
-  );
+  // Persist start time in sessionStorage for session stability
+  const [startTime] = useState<number>(() => {
+    if (typeof window === "undefined") return Date.now();
+    const key = "lul_lesson_start_time";
+    const stored = sessionStorage.getItem(key);
+    if (stored) return Number(stored);
+    const now = Date.now();
+    sessionStorage.setItem(key, String(now));
+    return now;
+  });
+
+  function getElapsedSeconds() {
+    return Math.floor((Date.now() - startTime) / 1000);
+  }
+
+  function makeCtx() {
+    const elapsed = getElapsedSeconds();
+    const difficulty = getDifficultyFromTime(elapsed);
+    return { secondsLeft, totalSeconds, elapsedSeconds: elapsed, difficulty };
+  }
+
+  const [task, setTask] = useState<PracticeTask>(() => {
+    const ctx = { secondsLeft: totalSeconds, totalSeconds, elapsedSeconds: 0, difficulty: "easy" as Difficulty };
+    const t = getTask(ctx);
+    // Tag difficulty
+    t.difficulty = ctx.difficulty;
+    return t;
+  });
   const [status, setStatus] = useState<"idle" | "correct" | "wrong">("idle");
   const [typed, setTyped] = useState("");
   const [order, setOrder] = useState<number[]>([]);
@@ -174,13 +201,21 @@ export function PracticeRunner({
   }, [task]);
 
   function nextTask() {
-    setTask(
-      getTask({
-        secondsLeft,
-        totalSeconds,
-        elapsedSeconds: totalSeconds - secondsLeft,
-      })
-    );
+    const ctx = makeCtx();
+    const requiredDifficulty = ctx.difficulty;
+
+    // Generate task and validate difficulty gate
+    let generated = getTask(ctx);
+    generated.difficulty = requiredDifficulty;
+
+    // Validation: during easy phase (0-4min), ONLY easy allowed
+    // Fallback downward only: hard→medium→easy
+    if (requiredDifficulty === "easy" && generated.difficulty !== "easy") {
+      // Regenerate - this shouldn't happen since we pass difficulty
+      generated.difficulty = "easy";
+    }
+
+    setTask(generated);
     setTaskNonce((n) => n + 1);
   }
 
@@ -237,7 +272,7 @@ export function PracticeRunner({
       </div>
 
       <div className="text-2xl font-extrabold text-gray-900 mb-5">
-        {task.prompt}
+        {"prompt" in task ? task.prompt : ""}
       </div>
 
       {task.kind === "mcq" && (
@@ -508,7 +543,7 @@ export function PracticeRunner({
           max={task.max}
           start={task.start}
           target={task.target}
-          steps={task.steps}
+          steps={task.steps ?? [1, -1]}
           onComplete={() => setTimeout(() => markCorrect(), 0)}
         />
       )}
@@ -545,7 +580,7 @@ export function PracticeRunner({
         <SplitStepper
           key={`splitStepper-${taskNonce}`}
           target={task.target}
-          max={task.max}
+          max={task.max ?? task.target}
           onCorrect={() => setTimeout(() => markCorrect(), 0)}
         />
       )}

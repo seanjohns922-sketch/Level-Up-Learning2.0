@@ -1,4 +1,37 @@
-export type PracticeTask =
+export type Difficulty = "easy" | "medium" | "hard";
+
+/** Time-based difficulty gates (strict) */
+export function getDifficultyFromTime(elapsedSeconds: number): Difficulty {
+  if (elapsedSeconds < 240) return "easy";   // 0:00–4:00
+  if (elapsedSeconds < 390) return "medium"; // 4:00–6:30
+  return "hard";                              // 6:30–8:00
+}
+
+/** Scale a numeric range by difficulty */
+export function diffRange(
+  difficulty: Difficulty,
+  easy: [number, number],
+  medium: [number, number],
+  hard: [number, number]
+): [number, number] {
+  if (difficulty === "easy") return easy;
+  if (difficulty === "medium") return medium;
+  return hard;
+}
+
+/** Pick a value from difficulty-scaled range */
+export function diffPick(
+  difficulty: Difficulty,
+  easy: number,
+  medium: number,
+  hard: number
+): number {
+  if (difficulty === "easy") return easy;
+  if (difficulty === "medium") return medium;
+  return hard;
+}
+
+export type PracticeTask = (
   | {
       kind: "mcq";
       prompt: string;
@@ -38,31 +71,54 @@ export type PracticeTask =
         min?: number;
         max?: number;
         pairsCount?: number;
+        rounds?: number;
+        mode?: "number-number" | "number-word";
       };
     }
   | {
       kind: "countObjects";
       prompt: string;
-      options: number[];
-      answer: number;
+      options?: number[];
+      answer?: number;
+      config?: {
+        min?: number;
+        max?: number;
+        rounds?: number;
+        optionsCount?: number;
+      };
     }
   | {
       kind: "fillTheJar";
       prompt: string;
-      total: number;
-      target: number;
+      total?: number;
+      target?: number;
+      config?: {
+        minTarget?: number;
+        maxTarget?: number;
+        rounds?: number;
+        increments?: number[];
+      };
     }
   | {
       kind: "countCircle";
       prompt: string;
-      totalDots: number;
-      target: number;
+      totalDots?: number;
+      target?: number;
+      config?: {
+        minTarget?: number;
+        maxTarget?: number;
+        totalDots?: number;
+        rounds?: number;
+      };
     }
   | {
       kind: "typeNumber";
       prompt: string;
-      target: number;
-      word: string;
+      target?: number;
+      word?: string;
+      answer?: number;
+      min?: number;
+      max?: number;
     }
   | {
       kind: "numberLadder";
@@ -86,7 +142,8 @@ export type PracticeTask =
       max: number;
       start: number;
       target: number;
-      step: number;
+      step?: number;
+      steps?: number[];
     }
   | {
       kind: "chartFill";
@@ -111,6 +168,7 @@ export type PracticeTask =
       kind: "splitStepper";
       prompt: string;
       target: number;
+      max?: number;
     }
   | {
       kind: "mabBuild";
@@ -521,4 +579,5 @@ export type PracticeTask =
       kind: "howManyGroups";
       total: number;
       size: number;
-    };
+    }
+) & { difficulty?: Difficulty };

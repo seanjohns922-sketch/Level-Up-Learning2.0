@@ -1,4 +1,5 @@
-import type { PracticeTask } from "./practice-task";
+import type { PracticeTask, Difficulty } from "./practice-task";
+import { diffRange } from "./practice-task";
 
 function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -19,81 +20,68 @@ function makeOptions(answer: number, min = 1, max = 10) {
   return shuffle(Array.from(set)).map(String);
 }
 
-export function generateWeek9Task(lessonId: string): PracticeTask {
+export function generateWeek9Task(lessonId: string, d: Difficulty = "easy"): PracticeTask {
+  const [gLo, gHi] = diffRange(d, [2, 3], [2, 4], [2, 5]);
+  const [pLo, pHi] = diffRange(d, [2, 3], [2, 4], [2, 5]);
+
   if (lessonId === "y1-w9-l1") {
     const mode = randInt(0, 2);
     if (mode === 0) {
-      const groups = randInt(2, 5);
-      const perChild = randInt(2, 5);
+      const groups = randInt(gLo, gHi);
+      const perChild = randInt(pLo, pHi);
       const total = Math.min(20, groups * perChild);
-      return { kind: "shareDrag", total, groups };
+      return { kind: "shareDrag", total, groups, difficulty: d };
     }
     if (mode === 1) {
-      const groups = randInt(2, 5);
-      const perChild = randInt(2, 5);
+      const groups = randInt(gLo, gHi);
+      const perChild = randInt(pLo, pHi);
       const total = Math.min(20, groups * perChild);
-      return { kind: "shareDeal", total, groups };
+      return { kind: "shareDeal", total, groups, difficulty: d };
     }
-    const total = 10;
+    const total = d === "easy" ? 6 : 10;
     const groups = 3;
-    const distribution = [4, 3, 3];
-    return {
-      kind: "shareFair",
-      total,
-      groups,
-      distribution,
-      isFair: false,
-    };
+    const distribution = d === "easy" ? [2, 2, 2] : [4, 3, 3];
+    return { kind: "shareFair", total, groups, distribution, isFair: d === "easy", difficulty: d };
   }
 
   if (lessonId === "y1-w9-l2") {
     const mode = randInt(0, 2);
     if (mode === 0) {
-      const groups = randInt(2, 5);
-      const perGroup = randInt(2, 5);
-      const remainder = Math.random() < 0.5 ? 0 : randInt(1, groups - 1);
+      const groups = randInt(gLo, gHi);
+      const perGroup = randInt(pLo, pHi);
+      const remainder = d === "easy" ? 0 : Math.random() < 0.5 ? 0 : randInt(1, groups - 1);
       const total = groups * perGroup + remainder;
-      return { kind: "groupBoxesInput", total, groups };
+      return { kind: "groupBoxesInput", total, groups, difficulty: d };
     }
     if (mode === 1) {
-      const groups = randInt(2, 5);
-      const perGroup = randInt(2, 5);
-      const remainder = Math.random() < 0.5 ? 0 : randInt(1, groups - 1);
+      const groups = randInt(gLo, gHi);
+      const perGroup = randInt(pLo, pHi);
+      const remainder = d === "easy" ? 0 : Math.random() < 0.5 ? 0 : randInt(1, groups - 1);
       const total = groups * perGroup + remainder;
-      return { kind: "groupBoxesTap", total, groups };
+      return { kind: "groupBoxesTap", total, groups, difficulty: d };
     }
-    const groups = randInt(2, 5);
-    const perGroup = randInt(2, 5);
+    const groups = randInt(gLo, gHi);
+    const perGroup = randInt(pLo, pHi);
     const total = groups * perGroup;
-    const answer = perGroup;
-    return {
-      kind: "missingGroupSize",
-      total,
-      groups,
-      options: makeOptions(answer, 1, 10),
-      answer,
-    };
+    return { kind: "missingGroupSize", total, groups, options: makeOptions(perGroup, 1, 10), answer: perGroup, difficulty: d };
   }
 
   if (lessonId === "y1-w9-l3") {
     const mode = randInt(0, 2);
     if (mode === 0) {
-      const perBox = randInt(2, 5);
-      const groups = randInt(2, 5);
-      const total = perBox * groups;
-      return { kind: "packBoxes", total, perBox };
+      const perBox = randInt(pLo, pHi);
+      const groups = randInt(gLo, gHi);
+      return { kind: "packBoxes", total: perBox * groups, perBox, difficulty: d };
     }
     if (mode === 1) {
-      const size = randInt(2, 4);
-      const groups = randInt(3, 6);
-      const total = size * groups;
-      return { kind: "groupGrabBags", total, size };
+      const size = randInt(pLo, pHi);
+      const groups = randInt(gLo, gHi + 1);
+      return { kind: "groupGrabBags", total: size * groups, size, difficulty: d };
     }
-    const size = randInt(2, 5);
-    const groups = randInt(3, 6);
-    const total = size * groups;
-    return { kind: "howManyGroups", total, size };
+    const size = randInt(pLo, pHi);
+    const groups = randInt(gLo, gHi + 1);
+    return { kind: "howManyGroups", total: size * groups, size, difficulty: d };
   }
 
-  return generateWeek9Task("y1-w9-l1");
+  return generateWeek9Task("y1-w9-l1", d);
 }
