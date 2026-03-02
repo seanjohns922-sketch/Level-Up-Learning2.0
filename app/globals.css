@@ -1,38 +1,90 @@
-@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700&display=swap");
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: hsl(30 30% 96%);
+  --foreground: hsl(220 15% 15%);
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(220 15% 15%);
+  --primary: hsl(145 65% 42%);
+  --primary-foreground: hsl(0 0% 100%);
+  --primary-light: hsl(145 50% 94%);
+  --secondary: hsl(210 40% 96%);
+  --secondary-foreground: hsl(220 15% 30%);
+  --muted: hsl(220 10% 94%);
+  --muted-foreground: hsl(220 10% 50%);
+  --accent: hsl(42 95% 55%);
+  --accent-foreground: hsl(30 50% 20%);
+  --destructive: hsl(0 72% 51%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(220 10% 90%);
+  --ring: hsl(145 65% 42%);
+  --radius: 1rem;
+  --trust-blue: hsl(215 65% 52%);
+  --trust-blue-light: hsl(215 50% 95%);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-light: var(--primary-light);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-trust-blue: var(--trust-blue);
+  --color-trust-blue-light: var(--trust-blue-light);
+  --font-sans: "Nunito", "Avenir Next", "Trebuchet MS", sans-serif;
+  --font-display: "Quicksand", "Nunito", sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: linear-gradient(180deg,#9ee7b9 0%, #6fd18a 100%);
+  background: var(--background);
   color: var(--foreground);
   font-family: "Nunito", "Avenir Next", "Trebuchet MS", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Feedback animations */
+@keyframes lul_correct_pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes lul_wrong_shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
 }
 
 @keyframes lul_confetti_fall {
-  0% {
-    transform: translateY(0) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(700px) rotate(720deg);
-    opacity: 0;
-  }
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(700px) rotate(720deg); opacity: 0; }
 }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-correct { animation: lul_correct_pulse 0.4s ease; }
+.animate-wrong { animation: lul_wrong_shake 0.4s ease; }
