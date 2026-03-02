@@ -4,30 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { readProgress, StudentProgress } from "@/data/progress";
 import { getProgramForYear } from "@/data/programs";
-
-const PROGRAM_STORE_KEY = "lul_program_progress_v1";
-
-type WeekProgress = {
-  lessonsCompleted: boolean[];
-  quizCompleted: boolean;
-  quizScore?: number;
-};
-type ProgramProgressStore = Record<string, WeekProgress>;
-
-function readProgramStore(): ProgramProgressStore {
-  if (typeof window === "undefined") return {};
-  try {
-    const raw = localStorage.getItem(PROGRAM_STORE_KEY);
-    if (!raw) return {};
-    return JSON.parse(raw) as ProgramProgressStore;
-  } catch {
-    return {};
-  }
-}
-
-function getWeekProgress(store: ProgramProgressStore, year: string, week: number): WeekProgress {
-  return store[`${year}|${week}`] ?? { lessonsCompleted: [false, false, false], quizCompleted: false };
-}
+import { readProgramStore, getWeekProgress, isWeekComplete, type ProgramProgressStore } from "@/lib/program-progress";
 
 export default function StudentHomePage() {
   const router = useRouter();
@@ -54,6 +31,7 @@ export default function StudentHomePage() {
 
   function goLevels() { router.push("/levels"); }
   function goLegends() { router.push("/legends"); }
+  function goLessons() { router.push(`/program?year=${encodeURIComponent(year)}&week=${week}`); }
   function continueWeek() {
     router.push(`/program?year=${encodeURIComponent(year)}&week=${week}`);
   }
@@ -81,12 +59,21 @@ export default function StudentHomePage() {
     );
   }
 
+  // Compute weeks list for lessons view
+  const lastAllowedWeek = useMemo(() => {
+    let allowed = 1;
+    for (let w = 2; w <= 12; w++) {
+      if (isWeekComplete(getWeekProgress(store, year, w - 1))) allowed = w;
+      else break;
+    }
+    return allowed;
+  }, [year, store]);
+
   return (
     <main className="min-h-screen bg-[#f6f2ec]">
       {/* ── Green hero header ── */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600" />
-        {/* Decorative circles */}
         <div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-white/5" />
         <div className="absolute bottom-0 -left-16 h-48 w-48 rounded-full bg-white/5" />
 
@@ -181,8 +168,21 @@ export default function StudentHomePage() {
             </button>
           </div>
 
-          {/* Quick links */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* Quick links — 3 columns now with Lessons */}
+          <div className="grid grid-cols-3 gap-4">
+            <button
+              onClick={goLessons}
+              className="bg-white rounded-2xl border border-emerald-100 shadow-sm shadow-emerald-50 p-5 text-center hover:shadow-md hover:-translate-y-0.5 transition-all active:scale-[0.98] group"
+              type="button"
+            >
+              <div className="h-12 w-12 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" />
+                </svg>
+              </div>
+              <div className="text-sm font-bold text-gray-900">Lessons</div>
+            </button>
+
             <button
               onClick={goLegends}
               className="bg-white rounded-2xl border border-amber-100 shadow-sm shadow-amber-50 p-5 text-center hover:shadow-md hover:-translate-y-0.5 transition-all active:scale-[0.98] group"

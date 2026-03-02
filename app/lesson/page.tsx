@@ -18,6 +18,7 @@ import { generateWeek12Task } from "@/data/activities/year1/week12";
 import { generateWeek11Task } from "@/data/activities/year1/week11";
 import { getProgramForYear } from "@/data/programs";
 import { readProgress, updateProgress } from "@/data/progress";
+import { markLessonComplete } from "@/lib/program-progress";
 
 export default function LessonPageWrapper() {
   return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><LessonPage /></Suspense>;
@@ -34,6 +35,13 @@ function LessonPage() {
   const effectiveLessonId = lessonId.startsWith(expectedPrefix)
     ? lessonId
     : `y1-w${week}-l1`;
+
+  // Extract lesson number from lessonId (e.g. "y1-w1-l2" → 2)
+  const lessonNumber = useMemo(() => {
+    const match = effectiveLessonId.match(/l(\d+)$/);
+    return match ? Number(match[1]) : 1;
+  }, [effectiveLessonId]);
+
   const [started, setStarted] = useState(false);
   const lessonMeta = useMemo(() => {
     const program = getProgramForYear(year);
@@ -53,11 +61,8 @@ function LessonPage() {
   }, [effectiveLessonId, week, year]);
 
   function completeLesson() {
-    const key = `lul_week_${year}_${week}`;
-    const raw = localStorage.getItem(key);
-    const done: string[] = raw ? JSON.parse(raw) : [];
-    const next = Array.from(new Set([...done, lessonId]));
-    localStorage.setItem(key, JSON.stringify(next));
+    // Write to the shared program progress store so program/page.tsx sees it
+    markLessonComplete(year, week, lessonNumber);
 
     router.push(`/program?year=${encodeURIComponent(year)}&week=${week}`);
   }
@@ -70,9 +75,9 @@ function LessonPage() {
             onClick={() =>
               router.push(`/program?year=${encodeURIComponent(year)}&week=${week}`)
             }
-            className="text-sm text-blue-600 hover:underline font-bold"
+            className="text-sm text-emerald-600 hover:underline font-bold"
           >
-            Back to Week {week}
+            ← Back to Week {week}
           </button>
         </div>
 
@@ -80,10 +85,10 @@ function LessonPage() {
           <div className="rounded-3xl overflow-hidden shadow-xl border border-white/70 bg-white">
             <div className="bg-gradient-to-br from-emerald-400 to-emerald-600 text-white px-6 py-10">
               <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1 text-sm font-semibold mb-4">
-                Week {week} - Lesson {lessonMeta?.lesson ?? ""}
+                Week {week} – Lesson {lessonNumber}
               </div>
               <h1 className="text-4xl md:text-5xl font-extrabold mb-3">
-                {lessonMeta?.title ?? `Week ${week} Lesson ${lessonMeta?.lesson ?? ""}`}
+                {lessonMeta?.title ?? `Week ${week} Lesson ${lessonNumber}`}
               </h1>
               <div className="text-white/90 text-base">
                 {lessonMeta?.focus ?? "Focus"}
@@ -137,7 +142,7 @@ function LessonPage() {
         ) : (
           <>
             <h1 className="text-3xl font-extrabold text-gray-900 mb-2">
-              Week {week} Lesson {lessonMeta?.lesson ?? ""} Practice
+              Week {week} Lesson {lessonNumber} Practice
             </h1>
             {lessonMeta?.title ? (
               <div className="text-xl font-extrabold text-gray-900 mb-2">
