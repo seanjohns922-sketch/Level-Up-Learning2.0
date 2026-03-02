@@ -135,8 +135,8 @@ export default function LevelsPage() {
   const hasAssignedProgram =
     progress?.status === "ASSIGNED_PROGRAM" ||
     typeof progress?.assignedWeek === "number" ||
-    !!progress?.assignedProgram ||
-    !!progress?.currentProgram;
+    !!(progress as any)?.assignedProgram ||
+    !!(progress as any)?.currentProgram;
 
   return (
     <main className="min-h-screen bg-[#fbf7f1] px-6 py-10">

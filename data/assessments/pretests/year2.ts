@@ -1,9 +1,6 @@
-export type Question = {
-  id: string;
-  prompt: string;
-  options: string[];
-  answerIndex: number;
-};
+import type { Question } from "./prep";
+
+export type { Question };
 
 export const YEAR2_PRETEST: Question[] = [
   // Paste your real Qs here

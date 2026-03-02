@@ -87,10 +87,9 @@ export default function TargetedRevision({
     }
   }
 
-  function chooseBooster(opt: number) {
-    if (!boosterQ) return;
-    if (opt === boosterQ.answer) advanceBooster();
-    else onWrong?.();
+  function chooseBooster(_opt: number) {
+    // booster rendering is handled by renderBooster() which uses advanceBooster directly
+    advanceBooster();
   }
 
   function chooseFix(choice: "correct" | "incorrect") {

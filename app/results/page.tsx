@@ -191,7 +191,7 @@ export default function ResultsPage() {
                 </div>
 
                 <div className="text-sm text-gray-600 mb-4">
-                  {legend.strand} - {legend.year}
+                  {legend.strand} - {legend.yearLabel}
                 </div>
 
                 <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-4 text-left mb-5">
