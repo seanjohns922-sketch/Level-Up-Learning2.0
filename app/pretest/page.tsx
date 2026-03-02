@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { getPretestForYear, type Question } from "@/data/assessments/pretests";
 
@@ -287,7 +287,11 @@ function GroupCountersVisual({
     </div>
   );
 }
-export default function PretestPage() {
+export default function PretestPageWrapper() {
+  return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><PretestPage /></Suspense>;
+}
+
+function PretestPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 

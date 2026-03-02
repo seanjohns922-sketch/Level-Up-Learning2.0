@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { PracticeRunner } from "@/components/PracticeRunner";
@@ -18,7 +19,11 @@ import { generateWeek11Task } from "@/data/activities/year1/week11";
 import { getProgramForYear } from "@/data/programs";
 import { readProgress, updateProgress } from "@/data/progress";
 
-export default function LessonPage() {
+export default function LessonPageWrapper() {
+  return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><LessonPage /></Suspense>;
+}
+
+function LessonPage() {
   const router = useRouter();
   const params = useSearchParams();
 
