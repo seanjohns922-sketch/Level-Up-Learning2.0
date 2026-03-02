@@ -41,7 +41,11 @@ export default function StudentHomePage() {
 
   const year = progress?.year ?? "Year 1";
   const week = progress?.assignedWeek ?? 1;
-  const program = useMemo(() => getProgramForYear(year), [year]);
+  const curriculumYear = useMemo(() => {
+    const selected = getProgramForYear(year);
+    return selected.length > 0 ? year : "Year 1";
+  }, [year]);
+  const program = useMemo(() => getProgramForYear(curriculumYear), [curriculumYear]);
   const programWeek = useMemo(() => program.find((w) => w.week === week) ?? null, [program, week]);
   const wp = getWeekProgress(store, year, week);
   const lessonsDone = wp.lessonsCompleted.filter(Boolean).length;

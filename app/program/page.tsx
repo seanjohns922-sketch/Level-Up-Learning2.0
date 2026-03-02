@@ -45,10 +45,14 @@ function ProgramPage() {
   const router = useRouter();
   const sp = useSearchParams();
 
-  const year = sp.get("year") ?? "Year 3";
+  const year = sp.get("year") ?? "Year 1";
   const weekNum = Number(sp.get("week") ?? "1");
   const week = String(weekNum);
   const levelNum = parseInt(year.replace(/\D/g, ""), 10) || 1;
+  const curriculumYear = useMemo(() => {
+    const selected = getProgramForYear(year);
+    return selected.length > 0 ? year : "Year 1";
+  }, [year]);
 
   const [store, setStore] = useState<ProgramProgressStore>({});
   const [isClient, setIsClient] = useState(false);
@@ -71,34 +75,36 @@ function ProgramPage() {
   const progress = getWeekProgress(store, year, week);
 
   const items = useMemo(() => {
-    const program = getProgramForYear(year);
+    const program = getProgramForYear(curriculumYear);
     const weekPlan = program.find((w) => w.week === weekNum);
     const lessons = weekPlan?.lessons ?? [];
     return [
-      { type: "lesson" as const, n: 1, title: lessons[0]?.title ?? "Lesson 1" },
-      { type: "lesson" as const, n: 2, title: lessons[1]?.title ?? "Lesson 2" },
-      { type: "lesson" as const, n: 3, title: lessons[2]?.title ?? "Lesson 3" },
-      { type: "quiz" as const, n: 1, title: "Weekly Quiz" },
+      { type: "lesson" as const, n: 1, title: lessons[0]?.title ?? "Lesson 1", focus: lessons[0]?.focus ?? "" },
+      { type: "lesson" as const, n: 2, title: lessons[1]?.title ?? "Lesson 2", focus: lessons[1]?.focus ?? "" },
+      { type: "lesson" as const, n: 3, title: lessons[2]?.title ?? "Lesson 3", focus: lessons[2]?.focus ?? "" },
+      { type: "quiz" as const, n: 1, title: "Weekly Quiz", focus: "15 questions from all 3 lessons" },
     ];
-  }, [year, weekNum]);
+  }, [curriculumYear, weekNum]);
 
   function openItem(item: (typeof items)[number]) {
     if (!canAccessThisWeek) return;
 
-    // Lock logic: lessons sequential, quiz after all 3 lessons
-    if (item.type === "lesson") {
-      const lessonIdx = item.n - 1;
-      if (lessonIdx > 0 && !progress.lessonsCompleted[lessonIdx - 1]) return;
-    }
-    if (item.type === "quiz") {
-      if (progress.lessonsCompleted.filter(Boolean).length < 3) return;
+    if (!DEV_MODE) {
+      // Lock logic: lessons sequential, quiz after all 3 lessons
+      if (item.type === "lesson") {
+        const lessonIdx = item.n - 1;
+        if (lessonIdx > 0 && !progress.lessonsCompleted[lessonIdx - 1]) return;
+      }
+      if (item.type === "quiz") {
+        if (progress.lessonsCompleted.filter(Boolean).length < 3) return;
+      }
     }
 
-    if (item.type === "lesson" && year === "Year 1" && weekNum >= 1 && weekNum <= 12) {
-      router.push(`/lesson?year=${encodeURIComponent(year)}&week=${week}&lessonId=y1-w${weekNum}-l${item.n}`);
+    if (item.type === "lesson" && curriculumYear === "Year 1" && weekNum >= 1 && weekNum <= 12) {
+      router.push(`/lesson?year=${encodeURIComponent(curriculumYear)}&week=${week}&lessonId=y1-w${weekNum}-l${item.n}`);
       return;
     }
-    router.push(`/session?year=${encodeURIComponent(year)}&week=${week}&type=${item.type}&n=${item.n}`);
+    router.push(`/session?year=${encodeURIComponent(curriculumYear)}&week=${week}&type=${item.type}&n=${item.n}`);
   }
 
   function goToWeek(targetWeek: number) {
@@ -250,10 +256,12 @@ function ProgramPage() {
               const isLesson = item.type === "lesson";
               const completed = isLesson ? progress.lessonsCompleted[item.n - 1] : progress.quizCompleted;
 
-              // Lock states
+              // Lock states (demo mode unlocks everything)
               let locked = false;
-              if (isLesson && item.n > 1 && !progress.lessonsCompleted[item.n - 2]) locked = true;
-              if (!isLesson && lessonsDoneCount < 3) locked = true;
+              if (!DEV_MODE) {
+                if (isLesson && item.n > 1 && !progress.lessonsCompleted[item.n - 2]) locked = true;
+                if (!isLesson && lessonsDoneCount < 3) locked = true;
+              }
 
               return (
                 <button
@@ -289,6 +297,7 @@ function ProgramPage() {
                   <div className="flex-1 min-w-0">
                     <div className="text-xs text-gray-400 font-medium">{isLesson ? `Lesson ${item.n}` : "Weekly Quiz"}</div>
                     <div className="font-extrabold text-gray-900 truncate">{item.title}</div>
+                    <div className="text-xs text-gray-500 mt-0.5 truncate">{item.focus}</div>
                     <div className="text-xs text-gray-400 mt-0.5">{isLesson ? "10 XP" : "20 XP"}</div>
                   </div>
 
