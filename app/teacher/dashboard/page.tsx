@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 
 /* ── types ─────────────────────────────────────────── */
 type ClassRow = { id: string; class_code: string; name: string; year_level: string };
-type StudentRow = { id: string; display_name: string; class_id: string };
+type StudentRow = { id: string; display_name: string; class_id: string; user_id: string; pin?: string | null };
 type ProgressRow = {
   student_id: string;
   year: string;
@@ -108,6 +108,19 @@ export default function TeacherDashboardPage() {
     setTimeout(() => setCopiedCode(false), 2000);
   }
 
+  async function handleResetPin(student: StudentRow) {
+    const newPin = prompt(`Reset PIN for ${student.display_name}.\nEnter new 4-digit PIN:`);
+    if (!newPin || newPin.length !== 4 || !/^\d{4}$/.test(newPin)) {
+      alert("PIN must be exactly 4 digits.");
+      return;
+    }
+    await supabase.from("students").update({ pin: newPin } as any).eq("id", student.id);
+    setStudents((prev) =>
+      prev.map((s) => (s.id === student.id ? { ...s, pin: newPin } : s))
+    );
+    alert(`PIN for ${student.display_name} reset to ${newPin}.`);
+  }
+
   /* ── segment bar for a student's level ─── */
   function renderWeekBar(prog: ProgressRow | undefined) {
     const completedIds = prog ? parseCompletedLessons(prog.completed_lesson_ids) : [];
@@ -188,6 +201,18 @@ export default function TeacherDashboardPage() {
               <span className="font-bold text-gray-900">
                 {pretestScore != null ? `${pretestScore}%` : "—"}
               </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-500">PIN</span>
+              <div className="flex items-center gap-2">
+                <span className="font-mono font-bold text-gray-900">{student.pin ?? "—"}</span>
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleResetPin(student); }}
+                  className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-bold hover:bg-amber-200 transition"
+                >
+                  Reset
+                </button>
+              </div>
             </div>
           </div>
 

@@ -65,15 +65,15 @@ function JoinPage() {
 
     // Create synthetic email from username + class code
     const syntheticEmail = `${name.toLowerCase().replace(/\s+/g, "")}.${classCode.toLowerCase()}@leveluplearning.local`;
+    const paddedPin = pinVal + "xx"; // Pad to meet Supabase 6-char minimum
 
     // Try sign in first (returning student)
     const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
       email: syntheticEmail,
-      password: pinVal,
+      password: paddedPin,
     });
 
     if (signInData?.user) {
-      // Existing student - redirect to home
       router.push("/home");
       setLoading(false);
       return;
@@ -82,12 +82,11 @@ function JoinPage() {
     // New student - sign up
     const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
       email: syntheticEmail,
-      password: pinVal,
+      password: paddedPin,
       options: { data: { display_name: name, role: "student" } },
     });
 
     if (signUpErr) {
-      // If user already exists with different PIN
       if (signUpErr.message.includes("already")) {
         setError("That name is taken in this class. Try a different name or check your PIN.");
       } else {
@@ -104,15 +103,13 @@ function JoinPage() {
       return;
     }
 
-    // Create user role
     await supabase.from("user_roles").insert({ user_id: userId, role: "student" as any });
-
-    // Create student record linked to class
     await supabase.from("students").insert({
       user_id: userId,
       display_name: name,
       class_id: classId,
-    });
+      pin: pinVal,
+    } as any);
 
     router.push("/levels");
     setLoading(false);

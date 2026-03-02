@@ -139,11 +139,12 @@ export default function LoginPage() {
 
     // 2) Supabase auth: synthetic email from name + class code
     const syntheticEmail = `${name.toLowerCase().replace(/\s+/g, "")}.${code.toLowerCase()}@leveluplearning.local`;
+    const paddedPin = pin + "xx"; // Pad to meet Supabase 6-char minimum
 
     // Try sign in first (returning student)
     const { data: signInData } = await supabase.auth.signInWithPassword({
       email: syntheticEmail,
-      password: pin,
+      password: paddedPin,
     });
 
     if (signInData?.user) {
@@ -154,7 +155,7 @@ export default function LoginPage() {
     // New student - sign up
     const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
       email: syntheticEmail,
-      password: pin,
+      password: paddedPin,
       options: { data: { display_name: name, role: "student" } },
     });
 
@@ -173,13 +174,14 @@ export default function LoginPage() {
       return;
     }
 
-    // Create role + student record
+    // Create role + student record (store PIN for teacher access)
     await supabase.from("user_roles").insert({ user_id: userId, role: "student" as any });
     await supabase.from("students").insert({
       user_id: userId,
       display_name: name,
       class_id: cls.id,
-    });
+      pin: pin,
+    } as any);
 
     router.push("/levels");
   }
