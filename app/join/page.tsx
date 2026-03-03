@@ -13,6 +13,11 @@ export default function JoinPageWrapper() {
 function JoinPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Log env var presence once on mount
+  useState(() => {
+    console.log("[JoinPage] NEXT_PUBLIC_SUPABASE_URL present:", !!process.env.NEXT_PUBLIC_SUPABASE_URL);
+  });
   const codeFromUrl = searchParams.get("code") ?? "";
 
   const [classCode, setClassCode] = useState(codeFromUrl);
@@ -52,8 +57,9 @@ function JoinPage() {
       .select("id, name, class_code")
       .eq("class_code", upper)
       .maybeSingle();
+    if (lookupErr) { console.error("[JoinPage] class lookup error:", lookupErr); alert("Class lookup error: " + lookupErr.message); }
     if (!data) {
-      console.warn("[JoinPage] class not found:", upper, lookupErr);
+      console.warn("[JoinPage] class not found:", upper);
       setError("Class not found. Check the code and try again.");
       setLoading(false);
       return;
@@ -107,9 +113,11 @@ function JoinPage() {
     });
 
     if (signUpErr) {
+      console.error("[JoinPage] signup error:", signUpErr);
       if (signUpErr.message.includes("already")) {
         setError("That name is taken in this class. Try a different name or check your PIN.");
       } else {
+        alert("Signup error: " + signUpErr.message);
         setError(signUpErr.message);
       }
       setLoading(false);
@@ -124,6 +132,8 @@ function JoinPage() {
     }
 
     const { error: roleErr } = await supabase.from("user_roles").insert({ user_id: userId, role: "student" as any });
+    if (roleErr) { console.error("[JoinPage] role insert error:", roleErr); alert("Role insert error: " + roleErr.message); }
+
     const { data: insertedStudent, error: studErr } = await supabase
       .from("students")
       .insert({
@@ -134,8 +144,9 @@ function JoinPage() {
       } as any)
       .select("id, class_id")
       .single();
+    if (studErr) { console.error("[JoinPage] student insert error:", studErr); alert("Student insert error: " + studErr.message); }
 
-    console.log("[JoinPage] inserted student row:", insertedStudent, "roleErr:", roleErr, "studErr:", studErr);
+    console.log("[JoinPage] inserted student row:", insertedStudent);
 
     localStorage.setItem(ACTIVE_STUDENT_KEY, userId);
     clearStudentLocalProgress();

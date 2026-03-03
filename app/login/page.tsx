@@ -70,6 +70,11 @@ export default function LoginPageWrapper() {
 function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Log env var presence once on mount
+  useState(() => {
+    console.log("[LoginPage] NEXT_PUBLIC_SUPABASE_URL present:", !!process.env.NEXT_PUBLIC_SUPABASE_URL);
+  });
   const isDemoMode = searchParams.get("demo") === "1";
   const [tab, setTab] = useState<"student" | "teacher">("student");
   const [teacherMode, setTeacherMode] = useState<"login" | "signup">("login");
@@ -136,26 +141,31 @@ function LoginPage() {
     }
 
     // Create role + teacher record
-    await supabase.from("user_roles").insert({ user_id: userId, role: "teacher" as any });
-    await supabase.from("teachers").insert({
+    const { error: roleErr } = await supabase.from("user_roles").insert({ user_id: userId, role: "teacher" as any });
+    if (roleErr) { console.error("[TeacherSignup] role insert error:", roleErr); alert("Role insert error: " + roleErr.message); }
+
+    const { error: teacherInsertErr } = await supabase.from("teachers").insert({
       user_id: userId,
       name: teacherName.trim() || teacherEmail,
       email: teacherEmail,
     } as any);
+    if (teacherInsertErr) { console.error("[TeacherSignup] teacher insert error:", teacherInsertErr); alert("Teacher insert error: " + teacherInsertErr.message); }
 
     // Optionally create a class if name provided
     if (className.trim()) {
-      const { data: code } = await supabase.rpc("generate_class_code");
+      const { data: code, error: codeErr } = await supabase.rpc("generate_class_code");
+      if (codeErr) { console.error("[TeacherSignup] generate_class_code error:", codeErr); alert("Class code error: " + codeErr.message); }
       if (code) {
-        const { data: teacherId } = await supabase.rpc("get_teacher_id");
+        const { data: teacherId, error: tidErr } = await supabase.rpc("get_teacher_id");
+        if (tidErr) { console.error("[TeacherSignup] get_teacher_id error:", tidErr); alert("Teacher ID error: " + tidErr.message); }
         if (teacherId) {
-          await supabase.from("classes").insert({
+          const { error: classErr } = await supabase.from("classes").insert({
             name: className.trim(),
             year_level: "1",
             class_code: code,
             teacher_id: teacherId,
           });
-          // DB is the source of truth for class listings
+          if (classErr) { console.error("[TeacherSignup] class insert error:", classErr); alert("Class insert error: " + classErr.message); }
           setCreatedCode(code);
         }
       }
@@ -210,8 +220,9 @@ function LoginPage() {
       .eq("class_code", code)
       .maybeSingle();
 
+    if (clsErr) { console.error("[StudentJoin] class lookup error:", clsErr); alert("Class lookup error: " + clsErr.message); }
     if (!cls) {
-      console.warn("[StudentJoin] class not found for code:", code, clsErr);
+      console.warn("[StudentJoin] class not found for code:", code);
       setStudentError("Class code not found. Please check with your teacher.");
       return;
     }
@@ -262,6 +273,8 @@ function LoginPage() {
 
     // Create role + student record
     const { error: roleErr } = await supabase.from("user_roles").insert({ user_id: userId, role: "student" as any });
+    if (roleErr) { console.error("[StudentJoin] role insert error:", roleErr); alert("Student role insert error: " + roleErr.message); }
+
     const { data: insertedStudent, error: studErr } = await supabase
       .from("students")
       .insert({
@@ -272,8 +285,9 @@ function LoginPage() {
       } as any)
       .select("id, class_id")
       .single();
+    if (studErr) { console.error("[StudentJoin] student insert error:", studErr); alert("Student insert error: " + studErr.message); }
 
-    console.log("[StudentJoin] inserted student row:", insertedStudent, "roleErr:", roleErr, "studErr:", studErr);
+    console.log("[StudentJoin] inserted student row:", insertedStudent);
 
     localStorage.setItem(ACTIVE_STUDENT_KEY, userId);
     clearStudentLocalProgress();
