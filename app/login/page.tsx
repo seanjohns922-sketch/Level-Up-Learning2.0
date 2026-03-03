@@ -197,24 +197,22 @@ function LoginPage() {
       return;
     }
 
-    // 1) Look up class in Supabase
-    const { data: cls } = await supabase
+    console.log("[StudentJoin] code entered:", code);
+
+    // 1) Look up class in Supabase — DB only, no localStorage fallback
+    const { data: cls, error: clsErr } = await supabase
       .from("classes")
       .select("id, name, class_code")
       .eq("class_code", code)
       .maybeSingle();
 
     if (!cls) {
-      // Fallback: check localStorage classes too
-      const localCls = classes[code];
-      if (!localCls) {
-        setStudentError("Class code not found.");
-        return;
-      }
-      // Use legacy localStorage flow for old classes
-      handleLegacyStudentLogin(code, name, pin, localCls);
+      console.warn("[StudentJoin] class not found for code:", code, clsErr);
+      setStudentError("Class code not found. Please check with your teacher.");
       return;
     }
+
+    console.log("[StudentJoin] resolved class:", cls.id, cls.name);
 
     // 2) Supabase auth: synthetic email from name + class code
     const syntheticEmail = `${name.toLowerCase().replace(/\s+/g, "")}.${code.toLowerCase()}@leveluplearning.local`;
@@ -227,6 +225,7 @@ function LoginPage() {
     });
 
     if (signInData?.user) {
+      console.log("[StudentJoin] returning student signed in:", signInData.user.id);
       const seen = localStorage.getItem("lul_intro_seen") === "1";
       router.push(seen ? "/home" : "/onboarding/intro");
       return;
@@ -240,6 +239,7 @@ function LoginPage() {
     });
 
     if (signUpErr) {
+      console.error("[StudentJoin] signup error:", signUpErr.message);
       if (signUpErr.message.includes("already")) {
         setStudentError("That name is taken in this class, or your PIN is wrong.");
       } else {
@@ -254,67 +254,22 @@ function LoginPage() {
       return;
     }
 
-    // Create role + student record (store PIN for teacher access)
-    await supabase.from("user_roles").insert({ user_id: userId, role: "student" as any });
-    await supabase.from("students").insert({
+    // Create role + student record
+    const { error: roleErr } = await supabase.from("user_roles").insert({ user_id: userId, role: "student" as any });
+    const { error: studErr } = await supabase.from("students").insert({
       user_id: userId,
       display_name: name,
       class_id: cls.id,
       pin: pin,
     } as any);
 
+    console.log("[StudentJoin] student created:", userId, "class_id:", cls.id, "roleErr:", roleErr, "studErr:", studErr);
+
     const seen = localStorage.getItem("lul_intro_seen") === "1";
     router.push(seen ? "/levels" : "/onboarding/intro");
   }
 
-  function handleLegacyStudentLogin(code: string, name: string, pin: string, cls: ClassRecord) {
-    const existing = cls.students.find(
-      (s) => s.firstName.toLowerCase() === name.toLowerCase() && s.pin === pin
-    );
-    let student = existing;
-    if (!student) {
-      student = {
-        id: `${code}-${Date.now()}`,
-        firstName: name,
-        pin,
-        progressPercent: 0,
-        currentWeek: 1,
-        pretestPercent: null,
-      };
-      const updated: ClassRecord = {
-        ...cls,
-        students: [...cls.students, student],
-      };
-      const next = { ...classes, [code]: updated };
-      saveClasses(next);
-    }
-    localStorage.setItem(
-      ACTIVE_STUDENT_KEY,
-      JSON.stringify({ classCode: code, studentId: student.id })
-    );
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      router.push("/levels");
-      return;
-    }
-    let parsed: any = null;
-    try {
-      parsed = JSON.parse(raw);
-    } catch {
-      router.push("/");
-      return;
-    }
-    const hasProgram =
-      !!parsed?.assignedProgram ||
-      !!parsed?.currentProgram ||
-      parsed?.status === "ASSIGNED_PROGRAM" ||
-      typeof parsed?.assignedWeek === "number";
-    if (hasProgram) {
-      router.push("/home");
-      return;
-    }
-    router.push("/levels");
-  }
+  // Legacy localStorage flow removed — all joins now go through DB
 
   return (
     <main className="min-h-screen relative overflow-hidden bg-[#fbf7f1] px-6 py-10">

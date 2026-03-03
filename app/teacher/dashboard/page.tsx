@@ -100,12 +100,13 @@ export default function TeacherDashboardPage() {
   }
 
   async function loadClassData(classId: string, diffOnly: boolean) {
-    if (process.env.NODE_ENV === "development") console.log("[TeacherDashboard] loadClassData()", classId, diffOnly ? "(diff)" : "");
-    const { data: studs } = await supabase
+    console.log("[TeacherDashboard] loadClassData() class_id:", classId, diffOnly ? "(diff)" : "");
+    const { data: studs, error: studErr } = await supabase
       .from("students")
       .select("*")
       .eq("class_id", classId);
     const newStuds = studs ?? [];
+    console.log("[TeacherDashboard] students returned:", newStuds.length, "error:", studErr);
 
     let newProg: ProgressRow[] = [];
     if (newStuds.length > 0) {
