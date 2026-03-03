@@ -87,8 +87,15 @@ export default function TeacherDashboardPage() {
   async function loadClasses() {
     if (fetchingRef.current) return;
     fetchingRef.current = true;
-    if (process.env.NODE_ENV === "development") console.log("[TeacherDashboard] loadClasses()");
-    const { data: cls } = await supabase.from("classes").select("*");
+    console.log("[TeacherDashboard] loadClasses()");
+
+    // Get the teacher's id via the security-definer function
+    const { data: teacherId } = await supabase.rpc("get_teacher_id");
+    console.log("[TeacherDashboard] teacher_id from rpc:", teacherId);
+
+    const { data: cls, error: clsErr } = await supabase.from("classes").select("*");
+    console.log("[TeacherDashboard] classes loaded:", cls?.map(c => ({ id: c.id, code: c.class_code, name: c.name })), "error:", clsErr);
+
     setClasses(cls ?? []);
     if (cls && cls.length > 0) {
       setSelectedClassId(cls[0].id);
@@ -131,6 +138,8 @@ export default function TeacherDashboardPage() {
   }
 
   function selectClass(classId: string) {
+    const cls = classes.find(c => c.id === classId);
+    console.log("[TeacherDashboard] selectClass:", classId, "code:", cls?.class_code);
     setSelectedClassId(classId);
     setExpandedStudent(null);
     loadClassData(classId, false);
