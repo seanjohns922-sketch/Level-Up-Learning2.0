@@ -91,7 +91,16 @@ export default function StudentHomePage() {
             <button
               onClick={async () => {
                 await supabase.auth.signOut();
-                localStorage.removeItem("lul_progress_v1");
+                localStorage.removeItem("lul_student_progress_v1");
+                localStorage.removeItem("lul_program_progress_v1");
+                localStorage.removeItem("lul_active_student_v1");
+                try {
+                  Object.keys(localStorage).forEach((key) => {
+                    if (key.startsWith("lul_week_")) localStorage.removeItem(key);
+                  });
+                } catch {
+                  // ignore
+                }
                 router.push("/login");
               }}
               className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/15 backdrop-blur text-white text-sm font-bold hover:bg-white/25 transition"

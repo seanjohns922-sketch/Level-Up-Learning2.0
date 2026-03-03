@@ -73,7 +73,7 @@ function LoginPage() {
   const isDemoMode = searchParams.get("demo") === "1";
   const [tab, setTab] = useState<"student" | "teacher">("student");
   const [teacherMode, setTeacherMode] = useState<"login" | "signup">("login");
-  const [classes, setClasses] = useState<ClassesStore>(() => readClasses());
+  const [classes, setClasses] = useState<ClassesStore>({});
 
   const [teacherEmail, setTeacherEmail] = useState("");
   const [teacherPassword, setTeacherPassword] = useState("");
@@ -87,15 +87,28 @@ function LoginPage() {
   const [studentError, setStudentError] = useState<string | null>(null);
   const [showPin, setShowPin] = useState(false);
 
-  const createdClass = createdCode ? classes[createdCode] : null;
+  const createdClass = createdCode ? { name: className.trim() || "Class", code: createdCode } : null;
 
-  const classList = useMemo(() => Object.values(classes), [classes]);
+  const classList = useMemo<ClassRecord[]>(() => [], []);
   const [teacherError, setTeacherError] = useState<string | null>(null);
   const [teacherLoading, setTeacherLoading] = useState(false);
 
   function saveClasses(next: ClassesStore) {
     setClasses(next);
     writeClasses(next);
+  }
+
+  function clearStudentLocalProgress() {
+    if (typeof window === "undefined") return;
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem("lul_program_progress_v1");
+    try {
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith("lul_week_")) localStorage.removeItem(key);
+      });
+    } catch {
+      // ignore
+    }
   }
 
   async function handleTeacherSignup() {
@@ -142,17 +155,8 @@ function LoginPage() {
             class_code: code,
             teacher_id: teacherId,
           });
+          // DB is the source of truth for class listings
           setCreatedCode(code);
-          // Also store locally for display
-          const record: ClassRecord = {
-            code,
-            name: className.trim(),
-            teacherEmail,
-            teacherName: teacherName.trim() || undefined,
-            students: [],
-            createdAt: new Date().toISOString(),
-          };
-          saveClasses({ ...classes, [code]: record });
         }
       }
     }
@@ -226,6 +230,8 @@ function LoginPage() {
 
     if (signInData?.user) {
       console.log("[StudentJoin] returning student signed in:", signInData.user.id);
+      localStorage.setItem(ACTIVE_STUDENT_KEY, signInData.user.id);
+      clearStudentLocalProgress();
       const seen = localStorage.getItem("lul_intro_seen") === "1";
       router.push(seen ? "/home" : "/onboarding/intro");
       return;
@@ -265,6 +271,8 @@ function LoginPage() {
 
     console.log("[StudentJoin] student created:", userId, "class_id:", cls.id, "roleErr:", roleErr, "studErr:", studErr);
 
+    localStorage.setItem(ACTIVE_STUDENT_KEY, userId);
+    clearStudentLocalProgress();
     const seen = localStorage.getItem("lul_intro_seen") === "1";
     router.push(seen ? "/levels" : "/onboarding/intro");
   }

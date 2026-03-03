@@ -89,31 +89,65 @@ export default function TeacherDashboardPage() {
     fetchingRef.current = true;
     console.log("[TeacherDashboard] loadClasses()");
 
-    // Get the teacher's id via the security-definer function
-    const { data: teacherId } = await supabase.rpc("get_teacher_id");
-    console.log("[TeacherDashboard] teacher_id from rpc:", teacherId);
+    try {
+      // Get authenticated teacher profile id and only load that teacher's classes
+      const { data: teacherId, error: teacherErr } = await supabase.rpc("get_teacher_id");
+      console.log("[TeacherDashboard] teacher_id from rpc:", teacherId, "error:", teacherErr);
 
-    const { data: cls, error: clsErr } = await supabase.from("classes").select("*");
-    console.log("[TeacherDashboard] classes loaded:", cls?.map(c => ({ id: c.id, code: c.class_code, name: c.name })), "error:", clsErr);
+      if (!teacherId) {
+        setClasses([]);
+        setStudents([]);
+        setProgress([]);
+        setLoading(false);
+        return;
+      }
 
-    setClasses(cls ?? []);
-    if (cls && cls.length > 0) {
-      setSelectedClassId(cls[0].id);
-      selectedClassRef.current = cls[0].id;
-      await loadClassData(cls[0].id, false);
+      const { data: cls, error: clsErr } = await supabase
+        .from("classes")
+        .select("*")
+        .eq("teacher_id", teacherId)
+        .order("created_at", { ascending: false });
+
+      console.log(
+        "[TeacherDashboard] classes loaded:",
+        (cls ?? []).map((c) => ({ id: c.id, code: c.class_code, name: c.name })),
+        "error:",
+        clsErr
+      );
+
+      setClasses(cls ?? []);
+      if (cls && cls.length > 0) {
+        const firstClassId = cls[0].id;
+        setSelectedClassId(firstClassId);
+        selectedClassRef.current = firstClassId;
+        await loadClassData(firstClassId, false);
+      } else {
+        setSelectedClassId(null);
+        selectedClassRef.current = null;
+        setStudents([]);
+        setProgress([]);
+      }
+      setLoading(false);
+    } finally {
+      fetchingRef.current = false;
     }
-    setLoading(false);
-    fetchingRef.current = false;
   }
 
   async function loadClassData(classId: string, diffOnly: boolean) {
-    console.log("[TeacherDashboard] loadClassData() class_id:", classId, diffOnly ? "(diff)" : "");
+    const selected = classes.find((c) => c.id === classId);
+    console.log(
+      "[TeacherDashboard] loadClassData() class_id:",
+      classId,
+      "code:",
+      selected?.class_code,
+      diffOnly ? "(diff)" : ""
+    );
     const { data: studs, error: studErr } = await supabase
       .from("students")
       .select("*")
       .eq("class_id", classId);
     const newStuds = studs ?? [];
-    console.log("[TeacherDashboard] students returned:", newStuds.length, "error:", studErr);
+    console.log("[TeacherDashboard] students fetched for selectedClassId:", classId, "count:", newStuds.length, "error:", studErr);
 
     let newProg: ProgressRow[] = [];
     if (newStuds.length > 0) {
