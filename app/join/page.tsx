@@ -14,10 +14,6 @@ function JoinPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Log env var presence once on mount
-  useState(() => {
-    console.log("[JoinPage] NEXT_PUBLIC_SUPABASE_URL present:", !!process.env.NEXT_PUBLIC_SUPABASE_URL);
-  });
   const codeFromUrl = searchParams.get("code") ?? "";
 
   const [classCode, setClassCode] = useState(codeFromUrl);
@@ -27,7 +23,7 @@ function JoinPage() {
   const [pin, setPin] = useState("");
   const [showPin, setShowPin] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [step, setStep] = useState<"code" | "signup">(codeFromUrl ? "code" : "code");
+  const [step, setStep] = useState<"code" | "signup">("code");
   const [loading, setLoading] = useState(!!codeFromUrl);
 
   function clearStudentLocalProgress() {
@@ -50,24 +46,24 @@ function JoinPage() {
   async function lookupCode(code: string) {
     setLoading(true);
     setError(null);
-    const upper = code.trim().toUpperCase();
-    console.log("[JoinPage] looking up class code:", upper);
+    const normalizedCode = code.trim().toUpperCase();
+    console.log("[JoinPage] looking up class code:", normalizedCode);
     const { data, error: lookupErr } = await supabase
       .from("classes")
-      .select("id, name, class_code")
-      .eq("code", upper)
-      .maybeSingle();
-    if (lookupErr) { console.error("[JoinPage] class lookup error:", lookupErr); alert("Class lookup error: " + lookupErr.message); }
+      .select("id, code, name")
+      .eq("code", normalizedCode)
+      .single();
+    if (lookupErr) { console.error("[JoinPage] class lookup error:", lookupErr); alert("Class lookup error: " + lookupErr.message); setLoading(false); return; }
     if (!data) {
-      console.warn("[JoinPage] class not found:", upper);
+      console.warn("[JoinPage] class not found:", normalizedCode);
       setError("Class not found. Check the code and try again.");
       setLoading(false);
       return;
     }
-    console.log("[JoinPage] class lookup result:", { id: data.id, code: data.class_code });
+    console.log("[JoinPage] class lookup result:", { id: data.id, code: data.code });
     setClassName(data.name);
     setClassId(data.id);
-    setClassCode(data.class_code);
+    setClassCode(data.code);
     setStep("signup");
     setLoading(false);
   }
@@ -135,14 +131,13 @@ function JoinPage() {
     if (roleErr) { console.error("[JoinPage] role insert error:", roleErr); alert("Role insert error: " + roleErr.message); }
 
     const studentId = crypto.randomUUID();
-    const studentPin = String(Math.floor(1000 + Math.random() * 9000));
     const { data: insertedStudent, error: studErr } = await supabase
       .from("students")
       .insert({
         id: studentId,
         class_id: classId,
         display_name: name,
-        pin: studentPin,
+        pin: pinVal,
       } as any)
       .select("id, class_id")
       .single();
@@ -150,9 +145,12 @@ function JoinPage() {
 
     console.log("[JoinPage] inserted student row:", insertedStudent);
 
+    // Store student + class IDs and redirect
+    localStorage.setItem("lul_student_id", studentId);
+    localStorage.setItem("lul_class_id", classId);
     localStorage.setItem(ACTIVE_STUDENT_KEY, userId);
     clearStudentLocalProgress();
-    router.push("/levels");
+    router.push("/home");
     setLoading(false);
   }
 
