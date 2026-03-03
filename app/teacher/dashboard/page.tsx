@@ -59,6 +59,15 @@ export default function TeacherDashboardPage() {
     });
   }, []);
 
+  // Re-fetch students when tab gains focus (e.g. after a student joins)
+  useEffect(() => {
+    function handleFocus() {
+      if (selectedClassId) loadClassData(selectedClassId);
+    }
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
+  }, [selectedClassId]);
+
   async function loadClasses() {
     const { data: cls } = await supabase.from("classes").select("*");
     setClasses(cls ?? []);
