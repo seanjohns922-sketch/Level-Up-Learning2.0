@@ -31,16 +31,19 @@ function JoinPage() {
     setLoading(true);
     setError(null);
     const upper = code.trim().toUpperCase();
-    const { data } = await supabase
+    console.log("[JoinPage] looking up class code:", upper);
+    const { data, error: lookupErr } = await supabase
       .from("classes")
       .select("id, name, class_code")
       .eq("class_code", upper)
       .maybeSingle();
     if (!data) {
+      console.warn("[JoinPage] class not found:", upper, lookupErr);
       setError("Class not found. Check the code and try again.");
       setLoading(false);
       return;
     }
+    console.log("[JoinPage] resolved class:", data.id, data.name);
     setClassName(data.name);
     setClassId(data.id);
     setClassCode(data.class_code);
@@ -103,13 +106,15 @@ function JoinPage() {
       return;
     }
 
-    await supabase.from("user_roles").insert({ user_id: userId, role: "student" as any });
-    await supabase.from("students").insert({
+    const { error: roleErr } = await supabase.from("user_roles").insert({ user_id: userId, role: "student" as any });
+    const { error: studErr } = await supabase.from("students").insert({
       user_id: userId,
       display_name: name,
       class_id: classId,
       pin: pinVal,
     } as any);
+
+    console.log("[JoinPage] student created:", userId, "class_id:", classId, "roleErr:", roleErr, "studErr:", studErr);
 
     router.push("/levels");
     setLoading(false);
