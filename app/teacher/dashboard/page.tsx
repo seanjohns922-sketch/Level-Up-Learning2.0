@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 
 /* ── types ─────────────────────────────────────────── */
 type ClassRow = { id: string; class_code: string; name: string; year_level: string };
-type StudentRow = { id: string; display_name: string; class_id: string; user_id: string; pin?: string | null };
+type StudentRow = { id: string; display_name: string; class_id: string; user_id: string; pin?: string | null; qr_token?: string | null };
 type ProgressRow = {
   student_id: string;
   year: string;
@@ -39,6 +39,102 @@ function weekCompletionCount(completedIds: string[], week: number): number {
   // lesson ids like "y1-w3-l1", "y1-w3-l2", "y1-w3-l3"
   const prefix = `-w${week}-`;
   return completedIds.filter((id) => id.includes(prefix)).length;
+}
+
+/* ── QR section for expanded student panel ─── */
+function StudentQRSection({ student, classCode, className2, onRegenerate }: {
+  student: StudentRow;
+  classCode: string;
+  className2: string;
+  onRegenerate: (token: string) => void;
+}) {
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+  const [regenerating, setRegenerating] = useState(false);
+  const token = student.qr_token ?? "";
+
+  useEffect(() => {
+    if (!token) return;
+    const url = `${window.location.origin}/student?token=${token}`;
+    import("qrcode").then((QRCode) => {
+      QRCode.toDataURL(url, { width: 180, margin: 1 }).then((dataUrl: string) => {
+        setQrDataUrl(dataUrl);
+      });
+    });
+  }, [token]);
+
+  async function handleRegenerate() {
+    setRegenerating(true);
+    const { data, error } = await supabase.rpc("regenerate_student_qr", { student_uuid: student.id });
+    if (data && !error) {
+      onRegenerate(data);
+    }
+    setRegenerating(false);
+  }
+
+  function handlePrint() {
+    const printWindow = window.open("", "_blank");
+    if (!printWindow || !qrDataUrl) return;
+    printWindow.document.write(`<!DOCTYPE html><html><head><title>Login Card - ${student.display_name}</title>
+      <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',system-ui,sans-serif;display:flex;justify-content:center;padding:20px}
+      .card{border:2px solid #e5e7eb;border-radius:16px;padding:32px;width:340px;text-align:center}
+      .brand{font-size:14px;font-weight:800;color:#6b7280;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:20px}
+      .name{font-size:22px;font-weight:900;color:#111827;margin-bottom:4px}
+      .class{font-size:14px;color:#6b7280;margin-bottom:16px}
+      .qr{margin:16px auto}.qr img{width:160px;height:160px}
+      .scan-label{font-size:12px;color:#9ca3af;margin-bottom:16px}
+      .details{display:flex;justify-content:space-between;padding:12px 16px;background:#f9fafb;border-radius:12px;margin-top:12px}
+      .detail-label{font-size:11px;color:#9ca3af;text-transform:uppercase;font-weight:700}
+      .detail-value{font-size:16px;font-weight:800;color:#111827;font-family:monospace;letter-spacing:0.15em}
+      @media print{body{padding:0}.card{border:2px solid #d1d5db}}</style></head>
+      <body><div class="card">
+      <div class="brand">Level Up Learning</div>
+      <div class="name">${student.display_name}</div>
+      <div class="class">${className2}</div>
+      <div class="qr"><img src="${qrDataUrl}" alt="QR Code"/></div>
+      <div class="scan-label">Scan to log in</div>
+      <div class="details"><div><div class="detail-label">Class Code</div><div class="detail-value">${classCode}</div></div>
+      <div><div class="detail-label">PIN</div><div class="detail-value">${student.pin ?? "—"}</div></div></div>
+      </div><script>window.onload=function(){window.print()}</script></body></html>`);
+    printWindow.document.close();
+  }
+
+  return (
+    <div className="grid gap-3">
+      <div className="flex justify-between items-center">
+        <span className="text-gray-500 text-sm">PIN</span>
+        <span className="font-mono font-bold text-lg text-gray-900">{student.pin ?? "—"}</span>
+      </div>
+      {qrDataUrl ? (
+        <div className="flex justify-center">
+          <img src={qrDataUrl} alt="Student QR Code" className="w-32 h-32 rounded-lg" />
+        </div>
+      ) : token ? (
+        <p className="text-xs text-gray-400 text-center">Generating QR…</p>
+      ) : (
+        <p className="text-xs text-gray-400 text-center">No QR token</p>
+      )}
+      <div className="flex gap-2 justify-center">
+        <button
+          onClick={handleRegenerate}
+          disabled={regenerating}
+          className="text-xs px-3 py-1.5 rounded-full bg-blue-50 text-blue-700 font-bold hover:bg-blue-100 transition disabled:opacity-50"
+        >
+          {regenerating ? "Regenerating…" : "Regenerate QR"}
+        </button>
+        <button
+          onClick={handlePrint}
+          disabled={!qrDataUrl}
+          className="text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 font-bold hover:bg-gray-200 transition disabled:opacity-50 inline-flex items-center gap-1"
+        >
+          <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" />
+            <rect x="6" y="14" width="12" height="8" />
+          </svg>
+          Print Card
+        </button>
+      </div>
+    </div>
+  );
 }
 
 /* ── component ─────────────────────────────────────── */
@@ -267,7 +363,7 @@ export default function TeacherDashboardPage() {
 
     return (
       <div
-        className="bg-gray-50 border-t border-gray-100 px-6 py-4 grid md:grid-cols-2 gap-6"
+        className="bg-gray-50 border-t border-gray-100 px-6 py-4 grid md:grid-cols-3 gap-6"
         style={{ animation: "fadeIn 0.2s ease" }}
       >
         {/* Current Status */}
@@ -313,9 +409,7 @@ export default function TeacherDashboardPage() {
                 key={label}
                 className={[
                   "px-3 py-1 rounded-full text-xs font-bold",
-                  done
-                    ? "bg-emerald-100 text-emerald-700"
-                    : "bg-gray-200 text-gray-400",
+                  done ? "bg-emerald-100 text-emerald-700" : "bg-gray-200 text-gray-400",
                 ].join(" ")}
               >
                 {label} {done ? "✓" : "🔒"}
@@ -324,16 +418,13 @@ export default function TeacherDashboardPage() {
             <span
               className={[
                 "px-3 py-1 rounded-full text-xs font-bold",
-                quizUnlocked
-                  ? "bg-blue-100 text-blue-700"
-                  : "bg-gray-200 text-gray-400",
+                quizUnlocked ? "bg-blue-100 text-blue-700" : "bg-gray-200 text-gray-400",
               ].join(" ")}
             >
               Quiz {quizUnlocked ? "🔓" : "🔒"}
             </span>
           </div>
 
-          {/* Legend status */}
           {legends.length > 0 && (
             <div className="mt-4 flex items-center gap-2 text-sm">
               <span className="text-purple-600 font-bold">🏆 Legend Unlocked</span>
@@ -341,6 +432,15 @@ export default function TeacherDashboardPage() {
           )}
         </div>
 
+        {/* Login Details - QR + PIN */}
+        <div>
+          <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">🔐 Login Details</h4>
+          <StudentQRSection student={student} classCode={selectedClass?.class_code ?? ""} className2={selectedClass?.name ?? ""} onRegenerate={(newToken) => {
+            setStudents((prev) => prev.map((s) => s.id === student.id ? { ...s, qr_token: newToken } : s));
+          }} />
+        </div>
+
+        {/* Quiz History */}
         <div>
           <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Quiz History</h4>
           {(() => {
@@ -362,21 +462,11 @@ export default function TeacherDashboardPage() {
                       <div className="text-xs font-bold text-gray-500 mt-1 mb-0.5">Week {w}</div>
                       {attempts.length > 0 ? (
                         attempts.map((a: any, i: number) => (
-                          <div
-                            key={i}
-                            className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-white mb-0.5"
-                          >
+                          <div key={i} className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-white mb-0.5">
                             <span className="text-gray-600 text-xs">
                               Attempt {i + 1} — {a.score}/{a.total} ({a.percent}%)
                             </span>
-                            <span
-                              className={[
-                                "font-bold text-xs px-2 py-0.5 rounded-full",
-                                a.passed
-                                  ? "bg-emerald-100 text-emerald-700"
-                                  : "bg-red-100 text-red-600",
-                              ].join(" ")}
-                            >
+                            <span className={["font-bold text-xs px-2 py-0.5 rounded-full", a.passed ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-600"].join(" ")}>
                               {a.passed ? "✅ Pass" : "❌ Fail"}
                             </span>
                           </div>
@@ -384,12 +474,7 @@ export default function TeacherDashboardPage() {
                       ) : (
                         <div className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-white">
                           <span className="text-gray-600">Score: {wd?.score}/{wd?.total} ({wd?.percent}%)</span>
-                          <span
-                            className={[
-                              "font-bold text-xs px-2 py-0.5 rounded-full",
-                              wd?.passed ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-600",
-                            ].join(" ")}
-                          >
+                          <span className={["font-bold text-xs px-2 py-0.5 rounded-full", wd?.passed ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-600"].join(" ")}>
                             {wd?.passed ? "✅ Pass" : "❌ Fail"}
                           </span>
                         </div>
@@ -459,6 +544,17 @@ export default function TeacherDashboardPage() {
               className="px-4 py-2 rounded-xl bg-[#9fd7b1] text-[#1f3b2a] font-bold text-sm hover:bg-[#8fcea4] transition"
             >
               + New Class
+            </button>
+            <button
+              onClick={async () => {
+                await supabase.auth.signOut();
+                router.push("/login");
+              }}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-gray-500 hover:text-gray-700 hover:bg-gray-100 text-sm font-bold transition"
+              type="button"
+            >
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" /></svg>
+              Log Out
             </button>
           </div>
         </div>
