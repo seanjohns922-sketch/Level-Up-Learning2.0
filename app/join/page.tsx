@@ -84,7 +84,7 @@ function JoinPage() {
     setLoading(true);
 
     // Create synthetic email from username + class code
-    const syntheticEmail = `${name.toLowerCase().replace(/\s+/g, "")}.${classCode.toLowerCase()}@leveluplearning.local`;
+    const syntheticEmail = `${name.toLowerCase().replace(/\s+/g, "")}.${classCode.toLowerCase()}@leveluplearning.app`;
     const paddedPin = pinVal + "xx"; // Pad to meet Supabase 6-char minimum
 
     // Try sign in first (returning student)

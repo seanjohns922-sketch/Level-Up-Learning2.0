@@ -230,7 +230,7 @@ function LoginPage() {
     console.log("[StudentJoin] class lookup result:", { id: cls.id, code: cls.code });
 
     // 2) Supabase auth: synthetic email from name + class code
-    const syntheticEmail = `${name.toLowerCase().replace(/\s+/g, "")}.${code.toLowerCase()}@leveluplearning.local`;
+    const syntheticEmail = `${name.toLowerCase().replace(/\s+/g, "")}.${code.toLowerCase()}@leveluplearning.app`;
     const paddedPin = pin + "xx"; // Pad to meet Supabase 6-char minimum
 
     // Try sign in first (returning student)
