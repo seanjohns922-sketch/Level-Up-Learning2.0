@@ -3,7 +3,8 @@
 import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
-import { STORAGE_KEY } from "@/data/progress";
+import { ACTIVE_STUDENT_KEY, clearScopedProgress } from "@/data/progress";
+import { clearScopedProgramStore } from "@/lib/program-progress";
 import { supabase } from "@/lib/supabase";
 
 type StudentRecord = {
@@ -27,7 +28,6 @@ type ClassRecord = {
 type ClassesStore = Record<string, ClassRecord>;
 
 const CLASSES_KEY = "lul_classes_v1";
-const ACTIVE_STUDENT_KEY = "lul_active_student_v1";
 
 function readClasses(): ClassesStore {
   if (typeof window === "undefined") return {};
@@ -100,8 +100,8 @@ function LoginPage() {
 
   function clearStudentLocalProgress() {
     if (typeof window === "undefined") return;
-    localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem("lul_program_progress_v1");
+    clearScopedProgress();
+    clearScopedProgramStore();
     try {
       Object.keys(localStorage).forEach((key) => {
         if (key.startsWith("lul_week_")) localStorage.removeItem(key);
@@ -216,7 +216,7 @@ function LoginPage() {
       return;
     }
 
-    console.log("[StudentJoin] resolved class:", cls.id, cls.name);
+    console.log("[StudentJoin] class lookup result:", { id: cls.id, code: cls.class_code });
 
     // 2) Supabase auth: synthetic email from name + class code
     const syntheticEmail = `${name.toLowerCase().replace(/\s+/g, "")}.${code.toLowerCase()}@leveluplearning.local`;
@@ -262,14 +262,18 @@ function LoginPage() {
 
     // Create role + student record
     const { error: roleErr } = await supabase.from("user_roles").insert({ user_id: userId, role: "student" as any });
-    const { error: studErr } = await supabase.from("students").insert({
-      user_id: userId,
-      display_name: name,
-      class_id: cls.id,
-      pin: pin,
-    } as any);
+    const { data: insertedStudent, error: studErr } = await supabase
+      .from("students")
+      .insert({
+        user_id: userId,
+        display_name: name,
+        class_id: cls.id,
+        pin: pin,
+      } as any)
+      .select("id, class_id")
+      .single();
 
-    console.log("[StudentJoin] student created:", userId, "class_id:", cls.id, "roleErr:", roleErr, "studErr:", studErr);
+    console.log("[StudentJoin] inserted student row:", insertedStudent, "roleErr:", roleErr, "studErr:", studErr);
 
     localStorage.setItem(ACTIVE_STUDENT_KEY, userId);
     clearStudentLocalProgress();

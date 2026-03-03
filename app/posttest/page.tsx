@@ -4,33 +4,9 @@ import { Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { POSTTESTS, type Question } from "@/data/assessments/posttests";
 import { getLegendForYear } from "@/data/legends";
+import { readProgress, writeProgress, type StudentProgress } from "@/data/progress";
 
-type StudentProgress = {
-  year: string;
-  scorePercent: number;
-  status: "PASSED" | "ASSIGNED_PROGRAM";
-  assignedWeek?: number;
-  unlockedLegends: string[];
-  lastPostTestPercent?: number;
-};
-
-const STORAGE_KEY = "lul_student_progress_v1";
 const PASS_THRESHOLD = 90;
-
-function readProgress(): StudentProgress | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw) as StudentProgress;
-  } catch {
-    return null;
-  }
-}
-
-function writeProgress(next: StudentProgress) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-}
 
 export default function PostTestPageWrapper() {
   return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><PostTestPage /></Suspense>;

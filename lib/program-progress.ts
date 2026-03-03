@@ -6,6 +6,8 @@
  * to read/write, so data stays in sync.
  */
 
+import { ACTIVE_STUDENT_KEY } from "@/data/progress";
+
 export type WeekProgress = {
   lessonsCompleted: boolean[];   // [L1, L2, L3]
   quizCompleted: boolean;
@@ -16,6 +18,18 @@ export type ProgramProgressStore = Record<string, WeekProgress>;
 
 export const PROGRAM_STORE_KEY = "lul_program_progress_v1";
 
+function getActiveStudentScope() {
+  if (typeof window === "undefined") return "server";
+  const active = localStorage.getItem(ACTIVE_STUDENT_KEY);
+  if (active && active.trim()) return active.trim();
+  const isDemo = new URLSearchParams(window.location.search).get("demo") === "1";
+  return isDemo ? "demo" : "anon";
+}
+
+export function getScopedProgramStoreKey(scope = getActiveStudentScope()) {
+  return `lul:${scope}:program_progress_v1`;
+}
+
 function makeKey(year: string, week: number | string) {
   return `${year}|${week}`;
 }
@@ -23,7 +37,7 @@ function makeKey(year: string, week: number | string) {
 export function readProgramStore(): ProgramProgressStore {
   if (typeof window === "undefined") return {};
   try {
-    const raw = localStorage.getItem(PROGRAM_STORE_KEY);
+    const raw = localStorage.getItem(getScopedProgramStoreKey());
     if (!raw) return {};
     return JSON.parse(raw) as ProgramProgressStore;
   } catch {
@@ -33,7 +47,12 @@ export function readProgramStore(): ProgramProgressStore {
 
 export function writeProgramStore(store: ProgramProgressStore) {
   if (typeof window === "undefined") return;
-  localStorage.setItem(PROGRAM_STORE_KEY, JSON.stringify(store));
+  localStorage.setItem(getScopedProgramStoreKey(), JSON.stringify(store));
+}
+
+export function clearScopedProgramStore(scope = getActiveStudentScope()) {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(getScopedProgramStoreKey(scope));
 }
 
 export function getWeekProgress(store: ProgramProgressStore, year: string, week: number | string): WeekProgress {

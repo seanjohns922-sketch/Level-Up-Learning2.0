@@ -173,7 +173,7 @@ export default function TeacherDashboardPage() {
 
   function selectClass(classId: string) {
     const cls = classes.find(c => c.id === classId);
-    console.log("[TeacherDashboard] selectClass:", classId, "code:", cls?.class_code);
+    console.log("[TeacherDashboard] selectedClassId:", classId, "code:", cls?.class_code);
     setSelectedClassId(classId);
     setExpandedStudent(null);
     loadClassData(classId, false);
@@ -391,19 +391,24 @@ export default function TeacherDashboardPage() {
           <div>
             <h1 className="text-2xl font-black text-gray-900">Teacher Dashboard</h1>
             {selectedClass && (
-              <div className="flex items-center gap-3 mt-1">
-                <span className="text-sm text-gray-500">{selectedClass.name}</span>
-                <button
-                  onClick={copyCode}
-                  className="inline-flex items-center gap-1 text-xs font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full hover:bg-blue-100 transition"
-                >
-                  {copiedCode ? "Copied!" : selectedClass.class_code}
-                  <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="9" y="9" width="13" height="13" rx="2" />
-                    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
-                  </svg>
-                </button>
-              </div>
+              <>
+                <div className="flex items-center gap-3 mt-1">
+                  <span className="text-sm text-gray-500">{selectedClass.name}</span>
+                  <button
+                    onClick={copyCode}
+                    className="inline-flex items-center gap-1 text-xs font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full hover:bg-blue-100 transition"
+                  >
+                    {copiedCode ? "Copied!" : selectedClass.class_code}
+                    <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="9" y="9" width="13" height="13" rx="2" />
+                      <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                    </svg>
+                  </button>
+                </div>
+                <div className="text-[11px] text-gray-400 mt-1">
+                  Debug — Class ID: {selectedClass.id} • Students loaded: {classStudents.length}
+                </div>
+              </>
             )}
           </div>
 
