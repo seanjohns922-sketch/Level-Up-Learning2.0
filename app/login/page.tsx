@@ -334,7 +334,12 @@ export default function LoginPage() {
             Sign in to start your adventure
           </p>
           <button
-            onClick={() => router.push("/home")}
+            onClick={() => {
+              // Sign out any existing Supabase session to avoid auth pollution
+              supabase.auth.signOut().then(() => {
+                router.push("/home");
+              });
+            }}
             className="mt-4 inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#eef2f6] text-gray-600 font-semibold hover:bg-white shadow-sm"
             type="button"
           >

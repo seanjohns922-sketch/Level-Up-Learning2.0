@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
+/* eslint-disable @next/next/no-img-element */
 import { COINS, renderCoins } from "./moneyAssets";
 
 function speak(text: string) {
@@ -68,7 +68,8 @@ export default function MoneyMakeAmount({
     if (total !== target || autoMarked) return;
     setAutoMarked(true);
     onCorrect?.();
-  }, [hideCheck, total, target, autoMarked, onCorrect]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hideCheck, total, target, autoMarked]);
 
   const prompt = `Show me $${target} using the money below.`;
 
@@ -101,12 +102,10 @@ export default function MoneyMakeAmount({
             const coin = COINS.find((c) => c.value === v);
             if (!coin) return null;
             return (
-              <Image
+              <img
                 key={`${v}-${i}`}
                 src={coin.src}
                 alt={coin.label}
-                width={coin.type === "note" ? 70 : 44}
-                height={coin.type === "note" ? 44 : 44}
                 className={
                   coin.type === "note"
                     ? "h-11 w-20 object-contain"
@@ -126,11 +125,9 @@ export default function MoneyMakeAmount({
             className="px-4 py-3 rounded-2xl border hover:bg-gray-50 flex items-center gap-3 justify-center"
             type="button"
           >
-            <Image
+            <img
               src={coin.src}
               alt={coin.label}
-              width={coin.type === "note" ? 80 : 48}
-              height={48}
               className={coin.type === "note" ? "h-12 w-20 object-contain" : "h-12 w-12 object-contain"}
             />
             <span className="text-xl font-black">{coin.label}</span>

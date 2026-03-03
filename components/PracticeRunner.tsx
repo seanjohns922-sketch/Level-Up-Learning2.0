@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { PracticeTask, Difficulty } from "@/data/activities/year1/practice-task";
 import { getDifficultyFromTime } from "@/data/activities/year1/practice-task";
 import MatchThePair from "@/components/MatchThePair";
@@ -149,6 +149,9 @@ export function PracticeRunner({
 }) {
   const totalSeconds = minutes * 60;
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
+  const completedRef = useRef(false);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
   // Persist start time in sessionStorage for session stability
   const [startTime] = useState<number>(() => {
@@ -174,7 +177,6 @@ export function PracticeRunner({
   const [task, setTask] = useState<PracticeTask>(() => {
     const ctx = { secondsLeft: totalSeconds, totalSeconds, elapsedSeconds: 0, difficulty: "easy" as Difficulty };
     const t = getTask(ctx);
-    // Tag difficulty
     t.difficulty = ctx.difficulty;
     return t;
   });
@@ -190,8 +192,11 @@ export function PracticeRunner({
   }, []);
 
   useEffect(() => {
-    if (secondsLeft <= 0) onComplete();
-  }, [secondsLeft, onComplete]);
+    if (secondsLeft <= 0 && !completedRef.current) {
+      completedRef.current = true;
+      onCompleteRef.current();
+    }
+  }, [secondsLeft]);
 
   useEffect(() => {
     setStatus("idle");

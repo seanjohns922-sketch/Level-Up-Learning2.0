@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+/* eslint-disable @next/next/no-img-element */
 
 export const COINS = [
   { value: 10, src: "/coins/note-10.png", label: "$10", type: "note" as const },
@@ -28,12 +28,10 @@ export function renderCoins(amount: number) {
   return (
     <div className="flex flex-wrap items-center gap-2">
       {picks.map((coin, i) => (
-        <Image
+        <img
           key={`${coin.value}-${i}`}
           src={coin.src}
           alt={coin.label}
-          width={coin.type === "note" ? 70 : 44}
-          height={coin.type === "note" ? 44 : 44}
           className={coin.type === "note" ? "h-11 w-20 object-contain" : "h-11 w-11 object-contain"}
         />
       ))}

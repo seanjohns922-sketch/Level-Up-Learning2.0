@@ -58,6 +58,10 @@ function LessonPage() {
 
   useEffect(() => {
     setStarted(false);
+    // Clear session start time so PracticeRunner gets a fresh timer
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem("lul_lesson_start_time");
+    }
   }, [effectiveLessonId, week, year]);
 
   function completeLesson() {
