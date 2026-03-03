@@ -37,7 +37,21 @@ export default function TeacherClassesPage() {
   }, []);
 
   async function loadClasses() {
-    const { data: cls } = await supabase.from("classes").select("*");
+    const { data: teacherId, error: teacherErr } = await supabase.rpc("get_teacher_id");
+    if (!teacherId) {
+      console.warn("[TeacherClasses] missing teacher profile", teacherErr);
+      setClasses([]);
+      setStudents([]);
+      setLoading(false);
+      return;
+    }
+
+    const { data: cls } = await supabase
+      .from("classes")
+      .select("*")
+      .eq("teacher_id", teacherId)
+      .order("created_at", { ascending: false });
+
     setClasses(cls ?? []);
     if (cls && cls.length > 0) {
       const classIds = cls.map((c) => c.id);
@@ -46,6 +60,8 @@ export default function TeacherClassesPage() {
         .select("*")
         .in("class_id", classIds);
       setStudents(studs ?? []);
+    } else {
+      setStudents([]);
     }
     setLoading(false);
   }

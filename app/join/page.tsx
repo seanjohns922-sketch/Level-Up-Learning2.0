@@ -4,6 +4,8 @@ import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
+const ACTIVE_STUDENT_KEY = "lul_active_student_v1";
+
 export default function JoinPageWrapper() {
   return <Suspense fallback={<div className="min-h-screen bg-[#fbf7f1] flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><JoinPage /></Suspense>;
 }
@@ -22,6 +24,19 @@ function JoinPage() {
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState<"code" | "signup">(codeFromUrl ? "code" : "code");
   const [loading, setLoading] = useState(!!codeFromUrl);
+
+  function clearStudentLocalProgress() {
+    if (typeof window === "undefined") return;
+    localStorage.removeItem("lul_student_progress_v1");
+    localStorage.removeItem("lul_program_progress_v1");
+    try {
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith("lul_week_")) localStorage.removeItem(key);
+      });
+    } catch {
+      // ignore
+    }
+  }
 
   useEffect(() => {
     if (codeFromUrl) lookupCode(codeFromUrl);
@@ -77,6 +92,8 @@ function JoinPage() {
     });
 
     if (signInData?.user) {
+      localStorage.setItem(ACTIVE_STUDENT_KEY, signInData.user.id);
+      clearStudentLocalProgress();
       router.push("/home");
       setLoading(false);
       return;
@@ -116,6 +133,8 @@ function JoinPage() {
 
     console.log("[JoinPage] student created:", userId, "class_id:", classId, "roleErr:", roleErr, "studErr:", studErr);
 
+    localStorage.setItem(ACTIVE_STUDENT_KEY, userId);
+    clearStudentLocalProgress();
     router.push("/levels");
     setLoading(false);
   }
