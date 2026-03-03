@@ -55,6 +55,7 @@ export type Database = {
           created_at: string
           id: string
           pretest_score: number | null
+          quiz_scores: Json
           status: string
           student_id: string
           unlocked_legends: Json
@@ -67,6 +68,7 @@ export type Database = {
           created_at?: string
           id?: string
           pretest_score?: number | null
+          quiz_scores?: Json
           status?: string
           student_id: string
           unlocked_legends?: Json
@@ -79,6 +81,7 @@ export type Database = {
           created_at?: string
           id?: string
           pretest_score?: number | null
+          quiz_scores?: Json
           status?: string
           student_id?: string
           unlocked_legends?: Json

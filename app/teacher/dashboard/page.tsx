@@ -15,6 +15,7 @@ type ProgressRow = {
   pretest_score: number | null;
   completed_lesson_ids: any;
   unlocked_legends: any;
+  quiz_scores: any;
 };
 
 type WeekResult = { week: number; score: number; passed: boolean };
@@ -283,8 +284,8 @@ export default function TeacherDashboardPage() {
             </div>
             <div className="flex justify-between">
               <span className="text-gray-500">Pre-test</span>
-              <span className="font-bold text-gray-900">
-                {pretestScore != null ? `${pretestScore}%` : "—"}
+              <span className={`font-bold ${pretestScore != null ? "text-gray-900" : "text-gray-400"}`}>
+                {pretestScore != null ? `${pretestScore}%` : "Not completed"}
               </span>
             </div>
             <div className="flex justify-between items-center">
@@ -340,36 +341,65 @@ export default function TeacherDashboardPage() {
           )}
         </div>
 
-        {/* Quiz History */}
         <div>
           <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Quiz History</h4>
-          <div className="grid gap-1.5 text-sm max-h-48 overflow-y-auto">
-            {WEEKS.filter((w) => w <= currentWeek).map((w) => {
-              const wLessons = weekCompletionCount(completedIds, w);
-              const weekDone = wLessons >= 3;
-              return (
-                <div
-                  key={w}
-                  className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-white"
-                >
-                  <span className="text-gray-600">Week {w}</span>
-                  <span
-                    className={[
-                      "font-bold text-xs px-2 py-0.5 rounded-full",
-                      weekDone
-                        ? "bg-emerald-100 text-emerald-700"
-                        : "bg-gray-100 text-gray-400",
-                    ].join(" ")}
-                  >
-                    {weekDone ? "✅ Passed" : `${wLessons}/3`}
-                  </span>
-                </div>
-              );
-            })}
-            {currentWeek === 0 && (
-              <p className="text-gray-400 text-xs">No quiz data yet.</p>
-            )}
-          </div>
+          {(() => {
+            const qs: Record<string, any> = (prog?.quiz_scores && typeof prog.quiz_scores === "object") ? prog.quiz_scores as any : {};
+            const weekKeys = Object.keys(qs).map(Number).filter(n => !isNaN(n)).sort((a, b) => a - b);
+
+            if (weekKeys.length === 0) {
+              return <p className="text-gray-400 text-xs">No quiz attempts yet.</p>;
+            }
+
+            return (
+              <div className="grid gap-1.5 text-sm max-h-48 overflow-y-auto">
+                {weekKeys.map((w) => {
+                  const wd = qs[String(w)];
+                  const attempts: any[] = wd?.attempts ?? [];
+
+                  return (
+                    <div key={w}>
+                      <div className="text-xs font-bold text-gray-500 mt-1 mb-0.5">Week {w}</div>
+                      {attempts.length > 0 ? (
+                        attempts.map((a: any, i: number) => (
+                          <div
+                            key={i}
+                            className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-white mb-0.5"
+                          >
+                            <span className="text-gray-600 text-xs">
+                              Attempt {i + 1} — {a.score}/{a.total} ({a.percent}%)
+                            </span>
+                            <span
+                              className={[
+                                "font-bold text-xs px-2 py-0.5 rounded-full",
+                                a.passed
+                                  ? "bg-emerald-100 text-emerald-700"
+                                  : "bg-red-100 text-red-600",
+                              ].join(" ")}
+                            >
+                              {a.passed ? "✅ Pass" : "❌ Fail"}
+                            </span>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-white">
+                          <span className="text-gray-600">Score: {wd?.score}/{wd?.total} ({wd?.percent}%)</span>
+                          <span
+                            className={[
+                              "font-bold text-xs px-2 py-0.5 rounded-full",
+                              wd?.passed ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-600",
+                            ].join(" ")}
+                          >
+                            {wd?.passed ? "✅ Pass" : "❌ Fail"}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
         </div>
       </div>
     );
