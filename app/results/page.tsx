@@ -3,7 +3,8 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getLegendForYear } from "@/data/legends";
-import { readProgress, StudentProgress, writeProgress } from "@/data/progress";
+import { readProgress, StudentProgress, writeProgress, ACTIVE_STUDENT_KEY } from "@/data/progress";
+import { supabase } from "@/lib/supabase";
 const PASS_THRESHOLD = 90;
 
 export default function ResultsPageWrapper() {
@@ -60,6 +61,31 @@ function ResultsPage() {
     }
 
     writeProgress(next);
+
+    // Persist pretest score to DB
+    (async () => {
+      try {
+        const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY) : null;
+        if (!studentId) return;
+        // Upsert progress row with pretest_score
+        const { error } = await supabase
+          .from("progress")
+          .upsert(
+            {
+              student_id: studentId,
+              year,
+              pretest_score: scorePercent,
+              status: next.status === "PASSED" ? "PASSED" : "ASSIGNED_PROGRAM",
+              week: next.assignedWeek ?? null,
+            },
+            { onConflict: "student_id,year" }
+          );
+        if (error) console.warn("[Results] DB pretest save error:", error);
+        else console.log("[Results] Pretest score saved to DB:", scorePercent);
+      } catch (e) {
+        console.warn("[Results] DB pretest save failed:", e);
+      }
+    })();
 
     if (passed && !alreadyUnlocked) {
       setJustUnlocked(true);

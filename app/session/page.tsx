@@ -3,6 +3,8 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { readProgress, updateProgress } from "@/data/progress";
+import { ACTIVE_STUDENT_KEY } from "@/data/progress";
+import { supabase } from "@/lib/supabase";
 import NumberLineTap from "@/components/NumberLineTap";
 import NumberLineJump from "@/components/NumberLineJump";
 import NumberChartFill from "@/components/NumberChartFill";
@@ -29,7 +31,7 @@ type WeekProgress = {
 
 type ProgramProgressStore = Record<string, WeekProgress>; // key = `${year}|${week}`
 
-const ACTIVE_STUDENT_KEY = "lul_active_student_v1";
+// ACTIVE_STUDENT_KEY imported from @/data/progress
 
 function getScopedSessionStoreKey() {
   if (typeof window === "undefined") return "lul:server:session_program_progress_v1";
@@ -2025,16 +2027,65 @@ function SessionPage() {
 
   function submitQuiz() {
     const score = quizScore;
+    const total = quizQuestions.length;
+    const percent = total > 0 ? Math.round((score / total) * 100) : 0;
+    const passThreshold = (quizConfig?.passPercent ?? 80) / 100;
+    const passed = score >= Math.ceil(total * passThreshold);
+
     setFinalScore(score);
     setQuizSubmitted(true);
 
     const store = readStore();
     setQuizScore(store, year, week, score);
     writeStore(store);
-    const passThreshold = (quizConfig?.passPercent ?? 80) / 100;
-    if (score >= Math.ceil(quizQuestions.length * passThreshold)) {
+
+    if (passed) {
       completeWeek(Number(week));
     }
+
+    // Persist quiz score to DB
+    (async () => {
+      try {
+        const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY) : null;
+        if (!studentId) { console.warn("[Quiz] No active student ID, skipping DB save"); return; }
+        const yearLabel = year; // e.g. "Year 1"
+        const weekNum = week; // e.g. "1"
+
+        // Read existing quiz_scores for this progress row
+        const { data: existing } = await supabase
+          .from("progress")
+          .select("quiz_scores")
+          .eq("student_id", studentId)
+          .eq("year", yearLabel)
+          .maybeSingle();
+
+        const prevScores: Record<string, any> = (existing?.quiz_scores as any) ?? {};
+        const weekKey = String(weekNum);
+        const prevAttempts: any[] = prevScores[weekKey]?.attempts ?? [];
+        const attempt = { score, total, percent, passed, at: new Date().toISOString() };
+        const updatedWeek = {
+          score, total, percent, passed,
+          attempts: [...prevAttempts, attempt],
+        };
+        const updatedScores = { ...prevScores, [weekKey]: updatedWeek };
+
+        const { error } = await supabase
+          .from("progress")
+          .upsert(
+            {
+              student_id: studentId,
+              year: yearLabel,
+              quiz_scores: updatedScores,
+              week: passed ? Math.min(12, Number(weekNum) + 1) : Number(weekNum),
+            },
+            { onConflict: "student_id,year" }
+          );
+        if (error) console.warn("[Quiz] DB save error:", error);
+        else console.log("[Quiz] Quiz score saved to DB:", updatedWeek);
+      } catch (e) {
+        console.warn("[Quiz] DB save failed:", e);
+      }
+    })();
   }
 
   const currentQuiz = quizQuestions[quizIndex];
