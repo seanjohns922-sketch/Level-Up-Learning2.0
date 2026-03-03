@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import { STORAGE_KEY } from "@/data/progress";
 import { supabase } from "@/lib/supabase";
 
@@ -62,8 +63,14 @@ function initials(name: string) {
     .join("");
 }
 
-export default function LoginPage() {
+export default function LoginPageWrapper() {
+  return <Suspense fallback={<div className="min-h-screen bg-[#fbf7f1]" />}><LoginPage /></Suspense>;
+}
+
+function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isDemoMode = searchParams.get("demo") === "1";
   const [tab, setTab] = useState<"student" | "teacher">("student");
   const [teacherMode, setTeacherMode] = useState<"login" | "signup">("login");
   const [classes, setClasses] = useState<ClassesStore>(() => readClasses());
@@ -335,19 +342,20 @@ export default function LoginPage() {
           <p className="text-lg text-gray-500 mt-3">
             Sign in to start your adventure
           </p>
-          <button
-            onClick={() => {
-              // Sign out any existing Supabase session to avoid auth pollution
-              supabase.auth.signOut().then(() => {
-                const seen = localStorage.getItem("lul_intro_seen") === "1";
-                router.push(seen ? "/home" : "/onboarding/intro");
-              });
-            }}
-            className="mt-4 inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#eef2f6] text-gray-600 font-semibold hover:bg-white shadow-sm"
-            type="button"
-          >
-            Skip to Demo &rarr;
-          </button>
+          {isDemoMode && (
+            <button
+              onClick={() => {
+                supabase.auth.signOut().then(() => {
+                  const seen = localStorage.getItem("lul_intro_seen") === "1";
+                  router.push(seen ? "/home" : "/onboarding/intro");
+                });
+              }}
+              className="mt-4 inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#eef2f6] text-gray-600 font-semibold hover:bg-white shadow-sm"
+              type="button"
+            >
+              Skip to Demo &rarr;
+            </button>
+          )}
         </div>
 
         <div
