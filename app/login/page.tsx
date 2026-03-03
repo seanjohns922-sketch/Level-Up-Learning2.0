@@ -217,7 +217,7 @@ function LoginPage() {
     const { data: cls, error: clsErr } = await supabase
       .from("classes")
       .select("id, name, class_code")
-      .eq("class_code", code)
+      .eq("code", code)
       .maybeSingle();
 
     if (clsErr) { console.error("[StudentJoin] class lookup error:", clsErr); alert("Class lookup error: " + clsErr.message); }
@@ -275,13 +275,15 @@ function LoginPage() {
     const { error: roleErr } = await supabase.from("user_roles").insert({ user_id: userId, role: "student" as any });
     if (roleErr) { console.error("[StudentJoin] role insert error:", roleErr); alert("Student role insert error: " + roleErr.message); }
 
+    const newStudentId = crypto.randomUUID();
+    const generatedPin = String(Math.floor(1000 + Math.random() * 9000));
     const { data: insertedStudent, error: studErr } = await supabase
       .from("students")
       .insert({
-        user_id: userId,
-        display_name: name,
+        id: newStudentId,
         class_id: cls.id,
-        pin: pin,
+        display_name: name,
+        pin: generatedPin,
       } as any)
       .select("id, class_id")
       .single();

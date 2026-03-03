@@ -55,7 +55,7 @@ function JoinPage() {
     const { data, error: lookupErr } = await supabase
       .from("classes")
       .select("id, name, class_code")
-      .eq("class_code", upper)
+      .eq("code", upper)
       .maybeSingle();
     if (lookupErr) { console.error("[JoinPage] class lookup error:", lookupErr); alert("Class lookup error: " + lookupErr.message); }
     if (!data) {
@@ -134,13 +134,15 @@ function JoinPage() {
     const { error: roleErr } = await supabase.from("user_roles").insert({ user_id: userId, role: "student" as any });
     if (roleErr) { console.error("[JoinPage] role insert error:", roleErr); alert("Role insert error: " + roleErr.message); }
 
+    const studentId = crypto.randomUUID();
+    const studentPin = String(Math.floor(1000 + Math.random() * 9000));
     const { data: insertedStudent, error: studErr } = await supabase
       .from("students")
       .insert({
-        user_id: userId,
-        display_name: name,
+        id: studentId,
         class_id: classId,
-        pin: pinVal,
+        display_name: name,
+        pin: studentPin,
       } as any)
       .select("id, class_id")
       .single();
