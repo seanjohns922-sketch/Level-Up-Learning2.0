@@ -106,6 +106,7 @@ export type Database = {
           display_name: string
           id: string
           pin: string | null
+          qr_token: string | null
           user_id: string
         }
         Insert: {
@@ -114,6 +115,7 @@ export type Database = {
           display_name: string
           id?: string
           pin?: string | null
+          qr_token?: string | null
           user_id: string
         }
         Update: {
@@ -122,6 +124,7 @@ export type Database = {
           display_name?: string
           id?: string
           pin?: string | null
+          qr_token?: string | null
           user_id?: string
         }
         Relationships: [
@@ -182,6 +185,7 @@ export type Database = {
     }
     Functions: {
       generate_class_code: { Args: never; Returns: string }
+      generate_qr_token: { Args: never; Returns: string }
       get_student_id: { Args: never; Returns: string }
       get_teacher_id: { Args: never; Returns: string }
       has_role: {
@@ -190,6 +194,24 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      lookup_student_by_qr: {
+        Args: { token: string }
+        Returns: {
+          class_name: string
+          display_name: string
+          student_id: string
+          user_id: string
+        }[]
+      }
+      regenerate_student_qr: { Args: { student_uuid: string }; Returns: string }
+      verify_student_pin: {
+        Args: { pin_input: string; token: string }
+        Returns: {
+          class_code: string
+          display_name: string
+          user_id: string
+        }[]
       }
     }
     Enums: {
