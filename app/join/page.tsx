@@ -2,9 +2,9 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { ACTIVE_STUDENT_KEY, clearScopedProgress } from "@/data/progress";
+import { clearScopedProgramStore } from "@/lib/program-progress";
 import { supabase } from "@/lib/supabase";
-
-const ACTIVE_STUDENT_KEY = "lul_active_student_v1";
 
 export default function JoinPageWrapper() {
   return <Suspense fallback={<div className="min-h-screen bg-[#fbf7f1] flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><JoinPage /></Suspense>;
@@ -27,8 +27,8 @@ function JoinPage() {
 
   function clearStudentLocalProgress() {
     if (typeof window === "undefined") return;
-    localStorage.removeItem("lul_student_progress_v1");
-    localStorage.removeItem("lul_program_progress_v1");
+    clearScopedProgress();
+    clearScopedProgramStore();
     try {
       Object.keys(localStorage).forEach((key) => {
         if (key.startsWith("lul_week_")) localStorage.removeItem(key);
@@ -58,7 +58,7 @@ function JoinPage() {
       setLoading(false);
       return;
     }
-    console.log("[JoinPage] resolved class:", data.id, data.name);
+    console.log("[JoinPage] class lookup result:", { id: data.id, code: data.class_code });
     setClassName(data.name);
     setClassId(data.id);
     setClassCode(data.class_code);
@@ -124,14 +124,18 @@ function JoinPage() {
     }
 
     const { error: roleErr } = await supabase.from("user_roles").insert({ user_id: userId, role: "student" as any });
-    const { error: studErr } = await supabase.from("students").insert({
-      user_id: userId,
-      display_name: name,
-      class_id: classId,
-      pin: pinVal,
-    } as any);
+    const { data: insertedStudent, error: studErr } = await supabase
+      .from("students")
+      .insert({
+        user_id: userId,
+        display_name: name,
+        class_id: classId,
+        pin: pinVal,
+      } as any)
+      .select("id, class_id")
+      .single();
 
-    console.log("[JoinPage] student created:", userId, "class_id:", classId, "roleErr:", roleErr, "studErr:", studErr);
+    console.log("[JoinPage] inserted student row:", insertedStudent, "roleErr:", roleErr, "studErr:", studErr);
 
     localStorage.setItem(ACTIVE_STUDENT_KEY, userId);
     clearStudentLocalProgress();

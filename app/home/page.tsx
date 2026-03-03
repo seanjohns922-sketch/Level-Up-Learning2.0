@@ -2,9 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { readProgress, StudentProgress } from "@/data/progress";
+import { clearScopedProgress, readProgress, StudentProgress } from "@/data/progress";
 import { getProgramForYear } from "@/data/programs";
-import { readProgramStore, getWeekProgress, isWeekComplete, type ProgramProgressStore } from "@/lib/program-progress";
+import { clearScopedProgramStore, readProgramStore, getWeekProgress, isWeekComplete, type ProgramProgressStore } from "@/lib/program-progress";
 import { supabase } from "@/lib/supabase";
 
 export default function StudentHomePage() {
@@ -91,8 +91,8 @@ export default function StudentHomePage() {
             <button
               onClick={async () => {
                 await supabase.auth.signOut();
-                localStorage.removeItem("lul_student_progress_v1");
-                localStorage.removeItem("lul_program_progress_v1");
+                clearScopedProgress();
+                clearScopedProgramStore();
                 localStorage.removeItem("lul_active_student_v1");
                 try {
                   Object.keys(localStorage).forEach((key) => {

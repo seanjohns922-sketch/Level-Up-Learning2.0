@@ -29,7 +29,16 @@ type WeekProgress = {
 
 type ProgramProgressStore = Record<string, WeekProgress>; // key = `${year}|${week}`
 
-const STORAGE_KEY = "lul_program_progress_v1";
+const ACTIVE_STUDENT_KEY = "lul_active_student_v1";
+
+function getScopedSessionStoreKey() {
+  if (typeof window === "undefined") return "lul:server:session_program_progress_v1";
+  const active = localStorage.getItem(ACTIVE_STUDENT_KEY);
+  const scope = active && active.trim()
+    ? active.trim()
+    : (new URLSearchParams(window.location.search).get("demo") === "1" ? "demo" : "anon");
+  return `lul:${scope}:session_program_progress_v1`;
+}
 
 function makeKey(year: string, week: string) {
   return `${year}|${week}`;
@@ -38,7 +47,7 @@ function makeKey(year: string, week: string) {
 function readStore(): ProgramProgressStore {
   if (typeof window === "undefined") return {};
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(getScopedSessionStoreKey());
     if (!raw) return {};
     return JSON.parse(raw) as ProgramProgressStore;
   } catch {
@@ -48,7 +57,7 @@ function readStore(): ProgramProgressStore {
 
 function writeStore(store: ProgramProgressStore) {
   if (typeof window === "undefined") return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+  localStorage.setItem(getScopedSessionStoreKey(), JSON.stringify(store));
 }
 
 function getWeekProgress(

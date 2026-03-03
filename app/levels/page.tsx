@@ -2,13 +2,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { readProgress, STORAGE_KEY, StudentProgress } from "@/data/progress";
+import { clearScopedProgress, readProgress, StudentProgress } from "@/data/progress";
+import { clearScopedProgramStore } from "@/lib/program-progress";
 import { getProgramForYear } from "@/data/programs";
 
 function clearProgress() {
   if (typeof window === "undefined") return;
-  localStorage.removeItem(STORAGE_KEY);
-  localStorage.removeItem("lul_program_progress_v1");
+  clearScopedProgress();
+  clearScopedProgramStore();
   try {
     Object.keys(localStorage).forEach((key) => {
       if (key.startsWith("lul_week_")) localStorage.removeItem(key);
