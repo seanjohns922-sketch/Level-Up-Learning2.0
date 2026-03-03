@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { readProgress, StudentProgress } from "@/data/progress";
 import { getProgramForYear } from "@/data/programs";
 import { readProgramStore, getWeekProgress, isWeekComplete, type ProgramProgressStore } from "@/lib/program-progress";
+import { supabase } from "@/lib/supabase";
 
 export default function StudentHomePage() {
   const router = useRouter();
@@ -80,22 +81,25 @@ export default function StudentHomePage() {
         <div className="relative max-w-2xl mx-auto px-6 pt-6 pb-28">
           {/* Nav row */}
           <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => router.push("/login")}
-                className="h-10 w-10 rounded-full bg-white/15 backdrop-blur flex items-center justify-center text-white hover:bg-white/25 transition"
-                aria-label="Back"
-              >
-                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M15 18l-6-6 6-6" /></svg>
-              </button>
-              <button
-                onClick={() => router.push("/login")}
-                className="h-10 w-10 rounded-full bg-white/15 backdrop-blur flex items-center justify-center text-white hover:bg-white/25 transition"
-                aria-label="Sign out"
-              >
-                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" /></svg>
-              </button>
-            </div>
+            <button
+              onClick={() => router.push("/login")}
+              className="h-10 w-10 rounded-full bg-white/15 backdrop-blur flex items-center justify-center text-white hover:bg-white/25 transition"
+              aria-label="Back"
+            >
+              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M15 18l-6-6 6-6" /></svg>
+            </button>
+            <button
+              onClick={async () => {
+                await supabase.auth.signOut();
+                localStorage.removeItem("lul_progress_v1");
+                router.push("/login");
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/15 backdrop-blur text-white text-sm font-bold hover:bg-white/25 transition"
+              type="button"
+            >
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" /></svg>
+              Log Out
+            </button>
           </div>
 
           {/* Level badge + week */}
