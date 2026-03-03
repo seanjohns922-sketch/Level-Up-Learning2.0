@@ -216,8 +216,8 @@ function LoginPage() {
     // 1) Look up class in Supabase — DB only, no localStorage fallback
     const { data: cls, error: clsErr } = await supabase
       .from("classes")
-      .select("id, code, name")
-      .eq("code", code)
+      .select("id, class_code, name")
+      .eq("class_code", code)
       .single();
 
     if (clsErr) { console.error("[StudentJoin] class lookup error:", clsErr); alert("Class lookup error: " + clsErr.message); return; }
@@ -227,7 +227,7 @@ function LoginPage() {
       return;
     }
 
-    console.log("[StudentJoin] class lookup result:", { id: cls.id, code: cls.code });
+    console.log("[StudentJoin] class lookup result:", { id: cls.id, class_code: cls.class_code });
 
     // 2) Supabase auth: synthetic email from name + class code
     const syntheticEmail = `${name.toLowerCase().replace(/\s+/g, "")}.${code.toLowerCase()}@leveluplearning.app`;

@@ -50,8 +50,8 @@ function JoinPage() {
     console.log("[JoinPage] looking up class code:", normalizedCode);
     const { data, error: lookupErr } = await supabase
       .from("classes")
-      .select("id, code, name")
-      .eq("code", normalizedCode)
+      .select("id, class_code, name")
+      .eq("class_code", normalizedCode)
       .single();
     if (lookupErr) { console.error("[JoinPage] class lookup error:", lookupErr); alert("Class lookup error: " + lookupErr.message); setLoading(false); return; }
     if (!data) {
@@ -60,10 +60,10 @@ function JoinPage() {
       setLoading(false);
       return;
     }
-    console.log("[JoinPage] class lookup result:", { id: data.id, code: data.code });
+    console.log("[JoinPage] class lookup result:", { id: data.id, class_code: data.class_code });
     setClassName(data.name);
     setClassId(data.id);
-    setClassCode(data.code);
+    setClassCode(data.class_code);
     setStep("signup");
     setLoading(false);
   }
