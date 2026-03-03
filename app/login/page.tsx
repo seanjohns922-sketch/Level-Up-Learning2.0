@@ -220,7 +220,8 @@ export default function LoginPage() {
     });
 
     if (signInData?.user) {
-      router.push("/home");
+      const seen = localStorage.getItem("lul_intro_seen") === "1";
+      router.push(seen ? "/home" : "/onboarding/intro");
       return;
     }
 
@@ -255,7 +256,8 @@ export default function LoginPage() {
       pin: pin,
     } as any);
 
-    router.push("/levels");
+    const seen = localStorage.getItem("lul_intro_seen") === "1";
+    router.push(seen ? "/levels" : "/onboarding/intro");
   }
 
   function handleLegacyStudentLogin(code: string, name: string, pin: string, cls: ClassRecord) {
@@ -337,7 +339,8 @@ export default function LoginPage() {
             onClick={() => {
               // Sign out any existing Supabase session to avoid auth pollution
               supabase.auth.signOut().then(() => {
-                router.push("/home");
+                const seen = localStorage.getItem("lul_intro_seen") === "1";
+                router.push(seen ? "/home" : "/onboarding/intro");
               });
             }}
             className="mt-4 inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#eef2f6] text-gray-600 font-semibold hover:bg-white shadow-sm"
