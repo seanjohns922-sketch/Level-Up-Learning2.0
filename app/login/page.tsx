@@ -216,18 +216,18 @@ function LoginPage() {
     // 1) Look up class in Supabase — DB only, no localStorage fallback
     const { data: cls, error: clsErr } = await supabase
       .from("classes")
-      .select("id, name, class_code")
+      .select("id, code, name")
       .eq("code", code)
-      .maybeSingle();
+      .single();
 
-    if (clsErr) { console.error("[StudentJoin] class lookup error:", clsErr); alert("Class lookup error: " + clsErr.message); }
+    if (clsErr) { console.error("[StudentJoin] class lookup error:", clsErr); alert("Class lookup error: " + clsErr.message); return; }
     if (!cls) {
       console.warn("[StudentJoin] class not found for code:", code);
       setStudentError("Class code not found. Please check with your teacher.");
       return;
     }
 
-    console.log("[StudentJoin] class lookup result:", { id: cls.id, code: cls.class_code });
+    console.log("[StudentJoin] class lookup result:", { id: cls.id, code: cls.code });
 
     // 2) Supabase auth: synthetic email from name + class code
     const syntheticEmail = `${name.toLowerCase().replace(/\s+/g, "")}.${code.toLowerCase()}@leveluplearning.local`;
@@ -243,8 +243,7 @@ function LoginPage() {
       console.log("[StudentJoin] returning student signed in:", signInData.user.id);
       localStorage.setItem(ACTIVE_STUDENT_KEY, signInData.user.id);
       clearStudentLocalProgress();
-      const seen = localStorage.getItem("lul_intro_seen") === "1";
-      router.push(seen ? "/home" : "/onboarding/intro");
+      router.push("/home");
       return;
     }
 
@@ -276,14 +275,13 @@ function LoginPage() {
     if (roleErr) { console.error("[StudentJoin] role insert error:", roleErr); alert("Student role insert error: " + roleErr.message); }
 
     const newStudentId = crypto.randomUUID();
-    const generatedPin = String(Math.floor(1000 + Math.random() * 9000));
     const { data: insertedStudent, error: studErr } = await supabase
       .from("students")
       .insert({
         id: newStudentId,
         class_id: cls.id,
         display_name: name,
-        pin: generatedPin,
+        pin: pin,
       } as any)
       .select("id, class_id")
       .single();
@@ -291,10 +289,12 @@ function LoginPage() {
 
     console.log("[StudentJoin] inserted student row:", insertedStudent);
 
+    // Store IDs and redirect
+    localStorage.setItem("lul_student_id", newStudentId);
+    localStorage.setItem("lul_class_id", cls.id);
     localStorage.setItem(ACTIVE_STUDENT_KEY, userId);
     clearStudentLocalProgress();
-    const seen = localStorage.getItem("lul_intro_seen") === "1";
-    router.push(seen ? "/levels" : "/onboarding/intro");
+    router.push("/home");
   }
 
   // Legacy localStorage flow removed — all joins now go through DB
