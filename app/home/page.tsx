@@ -30,6 +30,16 @@ export default function StudentHomePage() {
   const overallPercent = Math.round((week / 12) * 100);
   const levelNum = parseInt(year.replace(/\D/g, ""), 10) || 1;
 
+  // Must be before any early return to satisfy Rules of Hooks
+  const lastAllowedWeek = useMemo(() => {
+    let allowed = 1;
+    for (let w = 2; w <= 12; w++) {
+      if (isWeekComplete(getWeekProgress(store, year, w - 1))) allowed = w;
+      else break;
+    }
+    return allowed;
+  }, [year, store]);
+
   function goLevels() { router.push("/levels"); }
   function goLegends() { router.push("/legends"); }
   function goLessons() { router.push(`/program?year=${encodeURIComponent(year)}&week=${week}`); }
@@ -59,16 +69,6 @@ export default function StudentHomePage() {
       </main>
     );
   }
-
-  // Compute weeks list for lessons view
-  const lastAllowedWeek = useMemo(() => {
-    let allowed = 1;
-    for (let w = 2; w <= 12; w++) {
-      if (isWeekComplete(getWeekProgress(store, year, w - 1))) allowed = w;
-      else break;
-    }
-    return allowed;
-  }, [year, store]);
 
   return (
     <main className="min-h-screen bg-[#f6f2ec]">
@@ -172,7 +172,7 @@ export default function StudentHomePage() {
             </button>
           </div>
 
-          {/* Quick links — 3 columns now with Lessons */}
+          {/* Quick links */}
           <div className="grid grid-cols-3 gap-4">
             <button
               onClick={goLessons}
@@ -219,7 +219,7 @@ export default function StudentHomePage() {
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center justify-between">
             <div>
               <div className="text-xs text-gray-400 font-medium">Pre-test Score</div>
-              <div className="text-3xl font-black text-gray-900 mt-0.5">{progress.scorePercent ?? 0}%</div>
+              <div className="text-3xl font-black text-gray-900 mt-0.5">{progress?.scorePercent ?? 0}%</div>
             </div>
             <div className="text-right">
               <div className="text-xs text-gray-400 font-medium">Status</div>
