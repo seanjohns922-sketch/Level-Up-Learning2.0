@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+/* eslint-disable @next/next/no-img-element */
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getAllLegends } from "@/data/legends";
@@ -197,12 +197,11 @@ export default function LegendsPage() {
                       unlocked ? "border-indigo-200" : "border-gray-200",
                     ].join(" ")}
                   >
-                    <Image
+                    <img
                       src={legend.avatar}
                       alt={legend.name}
-                      fill
                       className={[
-                        "object-cover",
+                        "absolute inset-0 w-full h-full object-cover",
                         unlocked ? "" : "blur-sm grayscale opacity-60",
                       ].join(" ")}
                     />
@@ -294,12 +293,11 @@ export default function LegendsPage() {
                         className="relative w-full aspect-[3/4] bg-white"
                         aria-label="View full card image"
                       >
-                        <Image
+                        <img
                           src={imgSrc}
                           alt={`${selected.name} card`}
-                          fill
                           className={[
-                            "object-cover",
+                            "absolute inset-0 w-full h-full object-cover",
                             unlocked ? "" : "blur-md grayscale opacity-70",
                           ].join(" ")}
                         />
@@ -406,12 +404,11 @@ export default function LegendsPage() {
               ✕
             </button>
             <div className="relative w-full h-[80vh] bg-black rounded-2xl overflow-hidden">
-              <Image
+              <img
                 src={showBack ? selected.cardBack : selected.cardFront}
                 alt={`${selected.name} full card`}
-                fill
                 className={[
-                  "object-contain",
+                  "absolute inset-0 w-full h-full object-contain",
                   unlockedIds.includes(selected.id) ? "" : "blur-md grayscale opacity-70",
                 ].join(" ")}
               />
