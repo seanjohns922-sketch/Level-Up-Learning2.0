@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
@@ -52,55 +52,87 @@ export default function TeacherDashboardPage() {
   const [activeYear, setActiveYear] = useState("Year 1");
   const [copiedCode, setCopiedCode] = useState(false);
 
+  // Refs to prevent duplicate fetches and stale closures
+  const mountedRef = useRef(false);
+  const selectedClassRef = useRef<string | null>(null);
+  const fetchingRef = useRef(false);
+  const renderCount = useRef(0);
+  renderCount.current++;
+  if (process.env.NODE_ENV === "development") {
+    console.log("[TeacherDashboard] render #", renderCount.current);
+  }
+
+  // Keep ref in sync
+  selectedClassRef.current = selectedClassId;
+
   useEffect(() => {
+    if (mountedRef.current) return;
+    mountedRef.current = true;
     supabase.auth.getUser().then(({ data }) => {
       if (!data.user) { router.push("/login"); return; }
       loadClasses();
     });
   }, []);
 
-  // Re-fetch students when tab gains focus (e.g. after a student joins)
+  // Re-fetch students when tab gains focus — uses ref to avoid dep on selectedClassId
   useEffect(() => {
     function handleFocus() {
-      if (selectedClassId) loadClassData(selectedClassId);
+      const cid = selectedClassRef.current;
+      if (cid) loadClassData(cid, true);
     }
     window.addEventListener("focus", handleFocus);
     return () => window.removeEventListener("focus", handleFocus);
-  }, [selectedClassId]);
+  }, []); // stable — no deps needed thanks to ref
 
   async function loadClasses() {
+    if (fetchingRef.current) return;
+    fetchingRef.current = true;
+    if (process.env.NODE_ENV === "development") console.log("[TeacherDashboard] loadClasses()");
     const { data: cls } = await supabase.from("classes").select("*");
     setClasses(cls ?? []);
     if (cls && cls.length > 0) {
       setSelectedClassId(cls[0].id);
-      await loadClassData(cls[0].id);
+      selectedClassRef.current = cls[0].id;
+      await loadClassData(cls[0].id, false);
     }
     setLoading(false);
+    fetchingRef.current = false;
   }
 
-  async function loadClassData(classId: string) {
+  async function loadClassData(classId: string, diffOnly: boolean) {
+    if (process.env.NODE_ENV === "development") console.log("[TeacherDashboard] loadClassData()", classId, diffOnly ? "(diff)" : "");
     const { data: studs } = await supabase
       .from("students")
       .select("*")
       .eq("class_id", classId);
-    setStudents(studs ?? []);
+    const newStuds = studs ?? [];
 
-    if (studs && studs.length > 0) {
-      const ids = studs.map((s) => s.id);
+    let newProg: ProgressRow[] = [];
+    if (newStuds.length > 0) {
+      const ids = newStuds.map((s) => s.id);
       const { data: prog } = await supabase
         .from("progress")
         .select("*")
         .in("student_id", ids);
-      setProgress(prog ?? []);
+      newProg = prog ?? [];
+    }
+
+    if (diffOnly) {
+      // Only update state if data actually changed — prevents unnecessary re-renders
+      const studJson = JSON.stringify(newStuds);
+      const progJson = JSON.stringify(newProg);
+      setStudents((prev) => JSON.stringify(prev) === studJson ? prev : newStuds);
+      setProgress((prev) => JSON.stringify(prev) === progJson ? prev : newProg);
     } else {
-      setProgress([]);
+      setStudents(newStuds);
+      setProgress(newProg);
     }
   }
 
   function selectClass(classId: string) {
     setSelectedClassId(classId);
     setExpandedStudent(null);
-    loadClassData(classId);
+    loadClassData(classId, false);
   }
 
   const selectedClass = classes.find((c) => c.id === selectedClassId);
