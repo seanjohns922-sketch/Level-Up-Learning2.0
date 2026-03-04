@@ -32,20 +32,11 @@ export default function TeacherClassesPage() {
         return;
       }
       setUser(data.user);
-      loadClasses();
+      loadClasses(data.user.id);
     });
   }, []);
 
-  async function loadClasses() {
-    const { data: teacherId, error: teacherErr } = await supabase.rpc("get_teacher_id");
-    if (!teacherId) {
-      console.warn("[TeacherClasses] missing teacher profile", teacherErr);
-      setClasses([]);
-      setStudents([]);
-      setLoading(false);
-      return;
-    }
-
+  async function loadClasses(teacherId: string) {
     const { data: cls } = await supabase
       .from("classes")
       .select("*")

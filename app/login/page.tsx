@@ -112,37 +112,34 @@ export default function LoginPage() {
       return;
     }
 
-    // Create teacher record (role table removed for MVP flow)
-    await supabase.from("teachers").insert({
-      user_id: userId,
-      name: teacherName.trim() || teacherEmail,
+    // Ensure teacher profile exists on teachers.id = auth.users.id
+    await supabase.from("teachers").upsert({
+      id: userId,
       email: teacherEmail,
-    } as any);
+      display_name: teacherName.trim() || teacherEmail,
+    });
 
     // Optionally create a class if name provided
     if (className.trim()) {
       const { data: code } = await supabase.rpc("generate_class_code");
       if (code) {
-        const { data: teacherId } = await supabase.rpc("get_teacher_id");
-        if (teacherId) {
-          await supabase.from("classes").insert({
-            name: className.trim(),
-            year_level: "1",
-            class_code: code,
-            teacher_id: teacherId,
-          });
-          setCreatedCode(code);
-          // Also store locally for display
-          const record: ClassRecord = {
-            code,
-            name: className.trim(),
-            teacherEmail,
-            teacherName: teacherName.trim() || undefined,
-            students: [],
-            createdAt: new Date().toISOString(),
-          };
-          saveClasses({ ...classes, [code]: record });
-        }
+        await supabase.from("classes").insert({
+          name: className.trim(),
+          year_level: "1",
+          class_code: code,
+          teacher_id: userId,
+        });
+        setCreatedCode(code);
+        // Also store locally for display
+        const record: ClassRecord = {
+          code,
+          name: className.trim(),
+          teacherEmail,
+          teacherName: teacherName.trim() || undefined,
+          students: [],
+          createdAt: new Date().toISOString(),
+        };
+        saveClasses({ ...classes, [code]: record });
       }
     }
 

@@ -167,7 +167,7 @@ export default function TeacherDashboardPage() {
     mountedRef.current = true;
     supabase.auth.getUser().then(({ data }) => {
       if (!data.user) { router.push("/login"); return; }
-      loadClasses();
+      loadClasses(data.user.id);
     });
   }, []);
 
@@ -181,23 +181,14 @@ export default function TeacherDashboardPage() {
     return () => window.removeEventListener("focus", handleFocus);
   }, []); // stable — no deps needed thanks to ref
 
-  async function loadClasses() {
+  async function loadClasses(teacherId: string) {
     if (fetchingRef.current) return;
     fetchingRef.current = true;
     console.log("[TeacherDashboard] loadClasses()");
 
     try {
-      // Get authenticated teacher profile id and only load that teacher's classes
-      const { data: teacherId, error: teacherErr } = await supabase.rpc("get_teacher_id");
-      console.log("[TeacherDashboard] teacher_id from rpc:", teacherId, "error:", teacherErr);
-
-      if (!teacherId) {
-        setClasses([]);
-        setStudents([]);
-        setProgress([]);
-        setLoading(false);
-        return;
-      }
+      // Load classes for current authenticated teacher id
+      console.log("[TeacherDashboard] teacher_id from auth:", teacherId);
 
       const { data: cls, error: clsErr } = await supabase
         .from("classes")

@@ -20,6 +20,34 @@ export default function NewClassPage() {
     });
   }, []);
 
+  async function ensureTeacherProfileId() {
+    const { data: authData } = await supabase.auth.getUser();
+    const user = authData.user;
+    if (!user) return null;
+
+    const { data: existingTeacher } = await supabase
+      .from("teachers")
+      .select("id")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (existingTeacher?.id) return existingTeacher.id;
+
+    const displayName =
+      (user.user_metadata?.display_name as string | undefined) ??
+      user.email ??
+      "Teacher";
+
+    const { error: upsertTeacherErr } = await supabase.from("teachers").upsert({
+      id: user.id,
+      email: user.email ?? null,
+      display_name: displayName,
+    });
+
+    if (upsertTeacherErr) return null;
+    return user.id;
+  }
+
   async function handleCreate() {
     if (!className.trim()) return;
     setCreating(true);
@@ -27,7 +55,7 @@ export default function NewClassPage() {
 
     try {
       // Get teacher id
-      const { data: teacherData } = await supabase.rpc("get_teacher_id");
+      const teacherData = await ensureTeacherProfileId();
       if (!teacherData) {
         setError("Teacher profile not found. Please log in again.");
         setCreating(false);
@@ -61,8 +89,9 @@ export default function NewClassPage() {
       const joinUrl = `${window.location.origin}/join?code=${code}`;
       const dataUrl = await QRCode.toDataURL(joinUrl, { width: 256, margin: 2 });
       setQrDataUrl(dataUrl);
-    } catch (e: any) {
-      setError(e.message ?? "Something went wrong");
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Something went wrong";
+      setError(message);
     }
     setCreating(false);
   }
