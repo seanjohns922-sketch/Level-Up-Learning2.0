@@ -1,6 +1,12 @@
 import { createClient } from "@supabase/supabase-js";
 
-export const supabase = createClient(
-  "https://dqncplrxjxvjqbmwcyia.supabase.co",
-  "sb_publishable_cvaUEdcS16I8T3EqAydiaA_ES8XRgOo"
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY;
+
+if (!supabaseUrl || !supabasePublishableKey) {
+  throw new Error(
+    "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY. Add them in Project Settings → Environment Variables and reload preview."
+  );
+}
+
+export const supabase = createClient(supabaseUrl, supabasePublishableKey);
