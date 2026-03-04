@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { QRCodeCanvas } from "qrcode.react";
+import QRCode from "qrcode";
 import { supabase } from "@/lib/supabase";
 
 export default function JoinPageWrapper() {
@@ -21,12 +21,33 @@ function JoinPage() {
   const [showPin, setShowPin] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [qrValue, setQrValue] = useState("");
+  const [qrDataUrl, setQrDataUrl] = useState("");
   const [step, setStep] = useState<"code" | "signup">(codeFromUrl ? "code" : "code");
   const [loading, setLoading] = useState(!!codeFromUrl);
 
   useEffect(() => {
     if (codeFromUrl) lookupCode(codeFromUrl);
   }, [codeFromUrl]);
+
+  useEffect(() => {
+    let mounted = true;
+    if (!qrValue) {
+      setQrDataUrl("");
+      return () => {
+        mounted = false;
+      };
+    }
+    QRCode.toDataURL(qrValue, { width: 220, margin: 1 })
+      .then((url) => {
+        if (mounted) setQrDataUrl(url);
+      })
+      .catch(() => {
+        if (mounted) setQrDataUrl("");
+      });
+    return () => {
+      mounted = false;
+    };
+  }, [qrValue]);
 
   async function lookupCode(code: string) {
     setLoading(true);
@@ -212,7 +233,11 @@ function JoinPage() {
               {qrValue && (
                 <div className="mt-6 flex flex-col items-center gap-3">
                   <div className="text-sm font-medium">Save this QR for next time</div>
-                  <QRCodeCanvas value={qrValue} size={220} />
+                  {qrDataUrl ? (
+                    <img src={qrDataUrl} alt="Student QR code" width={220} height={220} />
+                  ) : (
+                    <div className="text-xs opacity-70">Generating QR...</div>
+                  )}
                   <div className="text-xs opacity-70 break-all text-center">{qrValue}</div>
                   <button onClick={() => router.push("/home")} className="btn-primary">
                     Continue
