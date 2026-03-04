@@ -193,11 +193,54 @@ export default function LoginPage() {
     const { data: cls } = await supabase
       .from("classes")
       .select("id")
-      .eq("code", normalizedCode)
+      .eq("class_code", normalizedCode)
       .single();
 
     if (!cls) {
       setStudentError("Class code not found.");
+      return;
+    }
+
+    // Create synthetic auth user
+    const syntheticEmail = `${name.toLowerCase().replace(/[^a-z0-9]/g, "")}.${normalizedCode.toLowerCase()}@leveluplearning.app`;
+    const paddedPin = pin + "xx";
+    const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
+      email: syntheticEmail,
+      password: paddedPin,
+    });
+
+    if (signUpErr) {
+      console.error("[StudentJoin] signup error:", signUpErr.message);
+      if (signUpErr.message.includes("already")) {
+        // Try sign in instead
+        const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
+          email: syntheticEmail,
+          password: paddedPin,
+        });
+        if (signInErr) {
+          setStudentError("That name is taken in this class, or your PIN is wrong.");
+          return;
+        }
+        // Find existing student
+        const { data: existing } = await supabase
+          .from("students")
+          .select("id, class_id")
+          .eq("user_id", signInData.user.id)
+          .single();
+        if (existing) {
+          localStorage.setItem("lul_student_id", existing.id);
+          localStorage.setItem("lul_class_id", existing.class_id);
+          router.push("/home");
+          return;
+        }
+      }
+      setStudentError(signUpErr.message);
+      return;
+    }
+
+    const userId = signUpData.user?.id;
+    if (!userId) {
+      setStudentError("Could not create account.");
       return;
     }
 
@@ -208,6 +251,7 @@ export default function LoginPage() {
         class_id: cls.id,
         display_name: displayName.trim(),
         pin,
+        user_id: userId,
       })
       .select()
       .single();

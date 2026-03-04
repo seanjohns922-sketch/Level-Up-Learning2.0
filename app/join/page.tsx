@@ -55,8 +55,8 @@ function JoinPage() {
     const upper = code.trim().toUpperCase();
     const { data } = await supabase
       .from("classes")
-      .select("id, name, code")
-      .eq("code", upper)
+      .select("id, name, class_code")
+      .eq("class_code", upper)
       .maybeSingle();
     if (!data) {
       setError("Class not found. Check the code and try again.");
@@ -64,7 +64,7 @@ function JoinPage() {
       return;
     }
     setClassName(data.name);
-    setClassCode(data.code);
+    setClassCode(data.class_code);
     setStep("signup");
     setLoading(false);
   }
@@ -90,8 +90,8 @@ function JoinPage() {
     // 1) Find class
     const { data: klass, error: classErr } = await supabase
       .from("classes")
-      .select("id, code, name")
-      .eq("code", normalizedCode)
+      .select("id, class_code, name")
+      .eq("class_code", normalizedCode)
       .single();
 
     if (classErr || !klass) {
@@ -103,6 +103,27 @@ function JoinPage() {
     // 2) Create student
     const studentId = crypto.randomUUID();
 
+    // Create a synthetic auth user for the student
+    const syntheticEmail = `${cleanName.toLowerCase().replace(/[^a-z0-9]/g, "")}.${normalizedCode.toLowerCase()}@leveluplearning.app`;
+    const paddedPin = cleanPin + "xx";
+    const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
+      email: syntheticEmail,
+      password: paddedPin,
+    });
+
+    if (signUpErr) {
+      setError(signUpErr.message);
+      setLoading(false);
+      return;
+    }
+
+    const userId = signUpData.user?.id;
+    if (!userId) {
+      setError("Could not create account.");
+      setLoading(false);
+      return;
+    }
+
     const { data: student, error: studentErr } = await supabase
       .from("students")
       .insert({
@@ -110,6 +131,7 @@ function JoinPage() {
         class_id: klass.id,
         display_name: cleanName,
         pin: cleanPin,
+        user_id: userId,
       })
       .select("id, class_id, display_name")
       .single();
