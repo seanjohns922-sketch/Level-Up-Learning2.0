@@ -112,8 +112,7 @@ export default function LoginPage() {
       return;
     }
 
-    // Create role + teacher record
-    await supabase.from("user_roles").insert({ user_id: userId, role: "teacher" as any });
+    // Create teacher record (role table removed for MVP flow)
     await supabase.from("teachers").insert({
       user_id: userId,
       name: teacherName.trim() || teacherEmail,
