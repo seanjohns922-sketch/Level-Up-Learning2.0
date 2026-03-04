@@ -2,8 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ACTIVE_STUDENT_KEY, clearScopedProgress } from "@/data/progress";
-import { clearScopedProgramStore } from "@/lib/program-progress";
+import { QRCodeCanvas } from "qrcode.react";
 import { supabase } from "@/lib/supabase";
 
 export default function JoinPageWrapper() {
@@ -13,31 +12,17 @@ export default function JoinPageWrapper() {
 function JoinPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-
   const codeFromUrl = searchParams.get("code") ?? "";
 
   const [classCode, setClassCode] = useState(codeFromUrl);
   const [className, setClassName] = useState<string | null>(null);
-  const [classId, setClassId] = useState<string | null>(null);
-  const [username, setUsername] = useState("");
+  const [studentName, setStudentName] = useState("");
   const [pin, setPin] = useState("");
   const [showPin, setShowPin] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [step, setStep] = useState<"code" | "signup">("code");
+  const [qrValue, setQrValue] = useState("");
+  const [step, setStep] = useState<"code" | "signup">(codeFromUrl ? "code" : "code");
   const [loading, setLoading] = useState(!!codeFromUrl);
-
-  function clearStudentLocalProgress() {
-    if (typeof window === "undefined") return;
-    clearScopedProgress();
-    clearScopedProgramStore();
-    try {
-      Object.keys(localStorage).forEach((key) => {
-        if (key.startsWith("lul_week_")) localStorage.removeItem(key);
-      });
-    } catch {
-      // ignore
-    }
-  }
 
   useEffect(() => {
     if (codeFromUrl) lookupCode(codeFromUrl);
@@ -46,111 +31,91 @@ function JoinPage() {
   async function lookupCode(code: string) {
     setLoading(true);
     setError(null);
-    const normalizedCode = code.trim().toUpperCase();
-    console.log("[JoinPage] looking up class code:", normalizedCode);
-    const { data, error: lookupErr } = await supabase
+    const upper = code.trim().toUpperCase();
+    const { data } = await supabase
       .from("classes")
-      .select("id, class_code, name")
-      .eq("class_code", normalizedCode)
-      .single();
-    if (lookupErr) { console.error("[JoinPage] class lookup error:", lookupErr); alert("Class lookup error: " + lookupErr.message); setLoading(false); return; }
+      .select("id, name, code")
+      .eq("code", upper)
+      .maybeSingle();
     if (!data) {
-      console.warn("[JoinPage] class not found:", normalizedCode);
       setError("Class not found. Check the code and try again.");
       setLoading(false);
       return;
     }
-    console.log("[JoinPage] class lookup result:", { id: data.id, class_code: data.class_code });
     setClassName(data.name);
-    setClassId(data.id);
-    setClassCode(data.class_code);
+    setClassCode(data.code);
     setStep("signup");
     setLoading(false);
   }
 
   async function handleJoin() {
-    setError(null);
-    const name = username.trim();
-    const pinVal = pin.trim();
-    if (!name || pinVal.length < 4) {
-      setError("Enter your name and a 4-digit PIN.");
+    setError("");
+    const normalizedCode = classCode.trim().toUpperCase();
+    const cleanName = studentName.trim();
+    const cleanPin = pin.trim();
+
+    if (!normalizedCode || !cleanName || !cleanPin) {
+      setError("Please enter class code, name, and PIN.");
       return;
     }
-    if (!classId || !classCode) {
-      setError("No class selected.");
+
+    if (!/^\d{4}$/.test(cleanPin)) {
+      setError("PIN must be 4 digits.");
       return;
     }
 
     setLoading(true);
 
-    // Create synthetic email from username + class code
-    const syntheticEmail = `${name.toLowerCase().replace(/\s+/g, "")}.${classCode.toLowerCase()}@leveluplearning.app`;
-    const paddedPin = pinVal + "xx"; // Pad to meet Supabase 6-char minimum
+    // 1) Find class
+    const { data: klass, error: classErr } = await supabase
+      .from("classes")
+      .select("id, code, name")
+      .eq("code", normalizedCode)
+      .single();
 
-    // Try sign in first (returning student)
-    const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
-      email: syntheticEmail,
-      password: paddedPin,
-    });
-
-    if (signInData?.user) {
-      localStorage.setItem(ACTIVE_STUDENT_KEY, signInData.user.id);
-      clearStudentLocalProgress();
-      router.push("/home");
+    if (classErr || !klass) {
+      setError("Class code not found.");
       setLoading(false);
       return;
     }
 
-    // New student - sign up
-    const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
-      email: syntheticEmail,
-      password: paddedPin,
-      options: { data: { display_name: name, role: "student" } },
-    });
-
-    if (signUpErr) {
-      console.error("[JoinPage] signup error:", signUpErr);
-      if (signUpErr.message.includes("already")) {
-        setError("That name is taken in this class. Try a different name or check your PIN.");
-      } else {
-        alert("Signup error: " + signUpErr.message);
-        setError(signUpErr.message);
-      }
-      setLoading(false);
-      return;
-    }
-
-    const userId = signUpData.user?.id;
-    if (!userId) {
-      setError("Sign up failed. Please try again.");
-      setLoading(false);
-      return;
-    }
-
-    const { error: roleErr } = await supabase.from("user_roles").insert({ user_id: userId, role: "student" as any });
-    if (roleErr) { console.error("[JoinPage] role insert error:", roleErr); alert("Role insert error: " + roleErr.message); }
-
+    // 2) Create student
     const studentId = crypto.randomUUID();
-    const { data: insertedStudent, error: studErr } = await supabase
+
+    const { data: student, error: studentErr } = await supabase
       .from("students")
       .insert({
         id: studentId,
-        class_id: classId,
-        display_name: name,
-        pin: pinVal,
-      } as any)
-      .select("id, class_id")
+        class_id: klass.id,
+        display_name: cleanName,
+        pin: cleanPin,
+      })
+      .select("id, class_id, display_name")
       .single();
-    if (studErr) { console.error("[JoinPage] student insert error:", studErr); alert("Student insert error: " + studErr.message); }
 
-    console.log("[JoinPage] inserted student row:", insertedStudent);
+    if (studentErr || !student) {
+      setError(studentErr?.message ?? "Could not create student.");
+      setLoading(false);
+      return;
+    }
 
-    // Store student + class IDs and redirect
-    localStorage.setItem("lul_student_id", studentId);
-    localStorage.setItem("lul_class_id", classId);
-    localStorage.setItem(ACTIVE_STUDENT_KEY, userId);
-    clearStudentLocalProgress();
-    router.push("/home");
+    // 3) Persist session locally
+    localStorage.setItem("lul_student_id", student.id);
+    localStorage.setItem("lul_class_id", student.class_id);
+
+    // 4) Create QR payload for next time
+    const qrPayload = student.id;
+    setQrValue(qrPayload);
+
+    // 5) Optional event
+    await supabase.from("events").insert({
+      student_id: student.id,
+      class_id: student.class_id,
+      year_level: 1,
+      event_type: "student_created",
+      value: { method: "class_code_pin" },
+    });
+
     setLoading(false);
   }
 
@@ -197,7 +162,7 @@ function JoinPage() {
                 <div className="text-sm text-gray-500">Joining</div>
                 <div className="text-xl font-bold text-gray-900">{className}</div>
                 <button
-                  onClick={() => { setStep("code"); setClassName(null); setClassId(null); setError(null); }}
+                  onClick={() => { setStep("code"); setClassName(null); setError(null); }}
                   className="text-xs text-blue-500 hover:underline mt-1"
                 >
                   Change class
@@ -207,8 +172,8 @@ function JoinPage() {
               <label className="grid gap-1">
                 <span className="text-sm font-bold text-gray-600">Your Name</span>
                 <input
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  value={studentName}
+                  onChange={(e) => setStudentName(e.target.value)}
                   placeholder="Enter your first name"
                   className="px-4 py-4 rounded-2xl border border-gray-200 text-lg bg-white"
                 />
@@ -244,6 +209,16 @@ function JoinPage() {
               >
                 {loading ? "Joining…" : "Let's Go!"}
               </button>
+              {qrValue && (
+                <div className="mt-6 flex flex-col items-center gap-3">
+                  <div className="text-sm font-medium">Save this QR for next time</div>
+                  <QRCodeCanvas value={qrValue} size={220} />
+                  <div className="text-xs opacity-70 break-all text-center">{qrValue}</div>
+                  <button onClick={() => router.push("/home")} className="btn-primary">
+                    Continue
+                  </button>
+                </div>
+              )}
             </>
           )}
         </div>

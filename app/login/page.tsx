@@ -1,10 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense } from "react";
-import { ACTIVE_STUDENT_KEY, clearScopedProgress } from "@/data/progress";
-import { clearScopedProgramStore } from "@/lib/program-progress";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 type StudentRecord = {
@@ -28,7 +25,6 @@ type ClassRecord = {
 type ClassesStore = Record<string, ClassRecord>;
 
 const CLASSES_KEY = "lul_classes_v1";
-
 function readClasses(): ClassesStore {
   if (typeof window === "undefined") return {};
   try {
@@ -63,22 +59,11 @@ function initials(name: string) {
     .join("");
 }
 
-export default function LoginPageWrapper() {
-  return <Suspense fallback={<div className="min-h-screen bg-[#fbf7f1]" />}><LoginPage /></Suspense>;
-}
-
-function LoginPage() {
+export default function LoginPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-
-  // Log env var presence once on mount
-  useState(() => {
-    console.log("[LoginPage] NEXT_PUBLIC_SUPABASE_URL present:", !!process.env.NEXT_PUBLIC_SUPABASE_URL);
-  });
-  const isDemoMode = searchParams.get("demo") === "1";
   const [tab, setTab] = useState<"student" | "teacher">("student");
   const [teacherMode, setTeacherMode] = useState<"login" | "signup">("login");
-  const [classes, setClasses] = useState<ClassesStore>({});
+  const [classes, setClasses] = useState<ClassesStore>(() => readClasses());
 
   const [teacherEmail, setTeacherEmail] = useState("");
   const [teacherPassword, setTeacherPassword] = useState("");
@@ -92,28 +77,15 @@ function LoginPage() {
   const [studentError, setStudentError] = useState<string | null>(null);
   const [showPin, setShowPin] = useState(false);
 
-  const createdClass = createdCode ? { name: className.trim() || "Class", code: createdCode } : null;
+  const createdClass = createdCode ? classes[createdCode] : null;
 
-  const classList = useMemo<ClassRecord[]>(() => [], []);
+  const classList = useMemo(() => Object.values(classes), [classes]);
   const [teacherError, setTeacherError] = useState<string | null>(null);
   const [teacherLoading, setTeacherLoading] = useState(false);
 
   function saveClasses(next: ClassesStore) {
     setClasses(next);
     writeClasses(next);
-  }
-
-  function clearStudentLocalProgress() {
-    if (typeof window === "undefined") return;
-    clearScopedProgress();
-    clearScopedProgramStore();
-    try {
-      Object.keys(localStorage).forEach((key) => {
-        if (key.startsWith("lul_week_")) localStorage.removeItem(key);
-      });
-    } catch {
-      // ignore
-    }
   }
 
   async function handleTeacherSignup() {
@@ -141,32 +113,36 @@ function LoginPage() {
     }
 
     // Create role + teacher record
-    const { error: roleErr } = await supabase.from("user_roles").insert({ user_id: userId, role: "teacher" as any });
-    if (roleErr) { console.error("[TeacherSignup] role insert error:", roleErr); alert("Role insert error: " + roleErr.message); }
-
-    const { error: teacherInsertErr } = await supabase.from("teachers").insert({
+    await supabase.from("user_roles").insert({ user_id: userId, role: "teacher" as any });
+    await supabase.from("teachers").insert({
       user_id: userId,
       name: teacherName.trim() || teacherEmail,
       email: teacherEmail,
     } as any);
-    if (teacherInsertErr) { console.error("[TeacherSignup] teacher insert error:", teacherInsertErr); alert("Teacher insert error: " + teacherInsertErr.message); }
 
     // Optionally create a class if name provided
     if (className.trim()) {
-      const { data: code, error: codeErr } = await supabase.rpc("generate_class_code");
-      if (codeErr) { console.error("[TeacherSignup] generate_class_code error:", codeErr); alert("Class code error: " + codeErr.message); }
+      const { data: code } = await supabase.rpc("generate_class_code");
       if (code) {
-        const { data: teacherId, error: tidErr } = await supabase.rpc("get_teacher_id");
-        if (tidErr) { console.error("[TeacherSignup] get_teacher_id error:", tidErr); alert("Teacher ID error: " + tidErr.message); }
+        const { data: teacherId } = await supabase.rpc("get_teacher_id");
         if (teacherId) {
-          const { error: classErr } = await supabase.from("classes").insert({
+          await supabase.from("classes").insert({
             name: className.trim(),
             year_level: "1",
             class_code: code,
             teacher_id: teacherId,
           });
-          if (classErr) { console.error("[TeacherSignup] class insert error:", classErr); alert("Class insert error: " + classErr.message); }
           setCreatedCode(code);
+          // Also store locally for display
+          const record: ClassRecord = {
+            code,
+            name: className.trim(),
+            teacherEmail,
+            teacherName: teacherName.trim() || undefined,
+            students: [],
+            createdAt: new Date().toISOString(),
+          };
+          saveClasses({ ...classes, [code]: record });
         }
       }
     }
@@ -202,102 +178,51 @@ function LoginPage() {
   }
 
   async function handleStudentLogin() {
+    console.log("[StudentJoin] Starting join flow");
     setStudentError(null);
-    const code = studentCode.trim().toUpperCase();
-    const name = studentName.trim();
+    const normalizedCode = studentCode.trim().toUpperCase();
+    const displayName = studentName.trim();
+    const name = displayName;
     const pin = studentPin.trim();
-    if (!code || !name || pin.length !== 4) {
+    console.log("[StudentJoin] Normalized code:", normalizedCode);
+    if (!normalizedCode || !name || pin.length !== 4) {
       setStudentError("Please enter class code, name, and 4-digit PIN.");
       return;
     }
 
-    console.log("[StudentJoin] code entered:", code);
-
-    // 1) Look up class in Supabase — DB only, no localStorage fallback
-    const { data: cls, error: clsErr } = await supabase
+    const studentId = crypto.randomUUID();
+    const { data: cls } = await supabase
       .from("classes")
-      .select("id, class_code, name")
-      .eq("class_code", code)
+      .select("id")
+      .eq("code", normalizedCode)
       .single();
 
-    if (clsErr) { console.error("[StudentJoin] class lookup error:", clsErr); alert("Class lookup error: " + clsErr.message); return; }
     if (!cls) {
-      console.warn("[StudentJoin] class not found for code:", code);
-      setStudentError("Class code not found. Please check with your teacher.");
+      setStudentError("Class code not found.");
       return;
     }
 
-    console.log("[StudentJoin] class lookup result:", { id: cls.id, class_code: cls.class_code });
-
-    // 2) Supabase auth: synthetic email from name + class code
-    const syntheticEmail = `${name.toLowerCase().replace(/\s+/g, "")}.${code.toLowerCase()}@leveluplearning.app`;
-    const paddedPin = pin + "xx"; // Pad to meet Supabase 6-char minimum
-
-    // Try sign in first (returning student)
-    const { data: signInData } = await supabase.auth.signInWithPassword({
-      email: syntheticEmail,
-      password: paddedPin,
-    });
-
-    if (signInData?.user) {
-      console.log("[StudentJoin] returning student signed in:", signInData.user.id);
-      localStorage.setItem(ACTIVE_STUDENT_KEY, signInData.user.id);
-      clearStudentLocalProgress();
-      router.push("/home");
-      return;
-    }
-
-    // New student - sign up
-    const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
-      email: syntheticEmail,
-      password: paddedPin,
-      options: { data: { display_name: name, role: "student" } },
-    });
-
-    if (signUpErr) {
-      console.error("[StudentJoin] signup error:", signUpErr.message);
-      if (signUpErr.message.includes("already")) {
-        setStudentError("That name is taken in this class, or your PIN is wrong.");
-      } else {
-        setStudentError(signUpErr.message);
-      }
-      return;
-    }
-
-    const userId = signUpData.user?.id;
-    if (!userId) {
-      setStudentError("Sign up failed. Please try again.");
-      return;
-    }
-
-    // Create role + student record
-    const { error: roleErr } = await supabase.from("user_roles").insert({ user_id: userId, role: "student" as any });
-    if (roleErr) { console.error("[StudentJoin] role insert error:", roleErr); alert("Student role insert error: " + roleErr.message); }
-
-    const newStudentId = crypto.randomUUID();
-    const { data: insertedStudent, error: studErr } = await supabase
+    const { data: student } = await supabase
       .from("students")
       .insert({
-        id: newStudentId,
+        id: studentId,
         class_id: cls.id,
-        display_name: name,
-        pin: pin,
-      } as any)
-      .select("id, class_id")
+        display_name: displayName.trim(),
+        pin,
+      })
+      .select()
       .single();
-    if (studErr) { console.error("[StudentJoin] student insert error:", studErr); alert("Student insert error: " + studErr.message); }
 
-    console.log("[StudentJoin] inserted student row:", insertedStudent);
+    if (!student) {
+      setStudentError("Could not create student.");
+      return;
+    }
 
-    // Store IDs and redirect
-    localStorage.setItem("lul_student_id", newStudentId);
+    localStorage.setItem("lul_student_id", student.id);
     localStorage.setItem("lul_class_id", cls.id);
-    localStorage.setItem(ACTIVE_STUDENT_KEY, userId);
-    clearStudentLocalProgress();
+
     router.push("/home");
   }
-
-  // Legacy localStorage flow removed — all joins now go through DB
 
   return (
     <main className="min-h-screen relative overflow-hidden bg-[#fbf7f1] px-6 py-10">
@@ -325,20 +250,18 @@ function LoginPage() {
           <p className="text-lg text-gray-500 mt-3">
             Sign in to start your adventure
           </p>
-          {isDemoMode && (
-            <button
-              onClick={() => {
-                supabase.auth.signOut().then(() => {
-                  const seen = localStorage.getItem("lul_intro_seen") === "1";
-                  router.push(seen ? "/home" : "/onboarding/intro");
-                });
-              }}
-              className="mt-4 inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#eef2f6] text-gray-600 font-semibold hover:bg-white shadow-sm"
-              type="button"
-            >
-              Skip to Demo &rarr;
-            </button>
-          )}
+          <button
+            onClick={() => {
+              // Sign out any existing Supabase session to avoid auth pollution
+              supabase.auth.signOut().then(() => {
+                router.push("/home");
+              });
+            }}
+            className="mt-4 inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#eef2f6] text-gray-600 font-semibold hover:bg-white shadow-sm"
+            type="button"
+          >
+            Skip to Demo &rarr;
+          </button>
         </div>
 
         <div
