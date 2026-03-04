@@ -20,47 +20,27 @@ export default function NewClassPage() {
     });
   }, []);
 
-  async function ensureTeacherProfileId() {
-    const { data: authData } = await supabase.auth.getUser();
-    const user = authData.user;
-    if (!user) return null;
-
-    const { data: existingTeacher } = await supabase
-      .from("teachers")
-      .select("id")
-      .eq("id", user.id)
-      .maybeSingle();
-
-    if (existingTeacher?.id) return existingTeacher.id;
-
-    const displayName =
-      (user.user_metadata?.display_name as string | undefined) ??
-      user.email ??
-      "Teacher";
-
-    const { error: upsertTeacherErr } = await supabase.from("teachers").upsert({
-      id: user.id,
-      email: user.email ?? null,
-      display_name: displayName,
-    });
-
-    if (upsertTeacherErr) return null;
-    return user.id;
-  }
-
   async function handleCreate() {
     if (!className.trim()) return;
     setCreating(true);
     setError(null);
 
     try {
-      // Get teacher id
-      const teacherData = await ensureTeacherProfileId();
-      if (!teacherData) {
-        setError("Teacher profile not found. Please log in again.");
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        setError("Please log in again.");
         setCreating(false);
         return;
       }
+
+      await supabase.from("teachers").upsert({
+        id: user.id,
+        email: user.email ?? null,
+        display_name: user.user_metadata?.display_name ?? user.email ?? "Teacher",
+      });
 
       // Generate class code
       const { data: code } = await supabase.rpc("generate_class_code");
@@ -74,7 +54,7 @@ export default function NewClassPage() {
         name: className.trim(),
         year_level: yearLevel,
         class_code: code,
-        teacher_id: teacherData,
+        teacher_id: user.id,
       });
 
       if (insertErr) {
