@@ -22,44 +22,52 @@ export default function NewClassPage() {
 
   async function handleCreate() {
     if (!className.trim()) return;
+
     setCreating(true);
-    setError(null);
+    setError("");
 
     try {
       const {
         data: { user },
+        error: userErr,
       } = await supabase.auth.getUser();
 
-      if (!user) {
+      if (userErr || !user) {
         setError("Please log in again.");
-        setCreating(false);
         return;
       }
 
-      await supabase.from("teachers").upsert({
+      const displayName =
+        (user.user_metadata?.display_name as string | undefined) ??
+        user.email ??
+        "Teacher";
+
+      const { error: teacherErr } = await supabase.from("teachers").upsert({
         id: user.id,
         email: user.email ?? null,
-        display_name: user.user_metadata?.display_name ?? user.email ?? "Teacher",
+        display_name: displayName,
       });
 
-      // Generate class code
-      const { data: code } = await supabase.rpc("generate_class_code");
-      if (!code) {
-        setError("Could not generate class code.");
-        setCreating(false);
+      if (teacherErr) {
+        setError(`Couldn't create teacher profile: ${teacherErr.message}`);
         return;
       }
 
-      const { error: insertErr } = await supabase.from("classes").insert({
+      const { data: code, error: codeErr } = await supabase.rpc("generate_class_code");
+      if (codeErr || !code) {
+        setError(`Couldn't generate class code: ${codeErr?.message ?? "unknown error"}`);
+        return;
+      }
+
+      const { error: classErr } = await supabase.from("classes").insert({
         name: className.trim(),
         year_level: yearLevel,
         class_code: code,
         teacher_id: user.id,
       });
 
-      if (insertErr) {
-        setError(insertErr.message);
-        setCreating(false);
+      if (classErr) {
+        setError(`Couldn't create class: ${classErr.message}`);
         return;
       }
 
@@ -72,8 +80,9 @@ export default function NewClassPage() {
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "Something went wrong";
       setError(message);
+    } finally {
+      setCreating(false);
     }
-    setCreating(false);
   }
 
   return (
