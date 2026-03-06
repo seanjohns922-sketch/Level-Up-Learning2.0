@@ -3,7 +3,7 @@
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = "https://dqncplrxjxvjqbmwcyia.supabase.co";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+const supabaseAnonKey = "sb_publishable_cvaUEdcS16I8T3EqAydiaA_ES8XRgOo";
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
