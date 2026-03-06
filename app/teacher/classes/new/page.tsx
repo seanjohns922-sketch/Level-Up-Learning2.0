@@ -27,35 +27,17 @@ export default function NewClassPage() {
     setError("");
 
     try {
-      const {
-        data: { user },
-        error: userErr,
-      } = await supabase.auth.getUser();
-
-      if (userErr || !user) {
+      const { data: auth, error: userErr } = await supabase.auth.getUser();
+      if (userErr || !auth?.user) {
         setError("Please log in again.");
         return;
       }
 
-      const displayName =
-        (user.user_metadata?.display_name as string | undefined) ??
-        user.email ??
-        "Teacher";
-
-      const { error: teacherErr } = await supabase.from("teachers").upsert({
-        id: user.id,
-        email: user.email ?? null,
-        display_name: displayName,
-      });
-
-      if (teacherErr) {
-        setError(`Couldn't create teacher profile: ${teacherErr.message}`);
-        return;
-      }
+      const user = auth.user;
 
       const { data: code, error: codeErr } = await supabase.rpc("generate_class_code");
       if (codeErr || !code) {
-        setError(`Couldn't generate class code: ${codeErr?.message ?? "unknown error"}`);
+        setError("Could not generate a class code. Try again.");
         return;
       }
 
@@ -67,13 +49,12 @@ export default function NewClassPage() {
       });
 
       if (classErr) {
-        setError(`Couldn't create class: ${classErr.message}`);
+        setError(classErr.message);
         return;
       }
 
       setCreatedCode(code);
 
-      // Generate QR
       const joinUrl = `${window.location.origin}/join?code=${code}`;
       const dataUrl = await QRCode.toDataURL(joinUrl, { width: 256, margin: 2 });
       setQrDataUrl(dataUrl);
