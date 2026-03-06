@@ -20,6 +20,15 @@ export default function NewClassPage() {
     });
   }, []);
 
+  function generateLocalClassCode(length = 5) {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let code = "";
+    for (let i = 0; i < length; i += 1) {
+      code += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return code;
+  }
+
   async function handleCreate() {
     if (!className.trim()) return;
 
@@ -35,18 +44,55 @@ export default function NewClassPage() {
 
       const user = auth.user;
 
-      const { data: code, error: codeErr } = await supabase.rpc("generate_class_code");
-      if (codeErr || !code) {
-        setError("Could not generate a class code. Try again.");
-        return;
+      let code = "";
+      const { data: rpcCode, error: codeErr } = await supabase.rpc("generate_class_code");
+      if (codeErr || !rpcCode) {
+        console.error("[create-class] generate_class_code failed, using local fallback", codeErr);
+        code = generateLocalClassCode();
+      } else {
+        code = rpcCode;
       }
 
-      const { error: classErr } = await supabase.from("classes").insert({
+      let { error: classErr } = await supabase.from("classes").insert({
         name: className.trim(),
         year_level: yearLevel,
         class_code: code,
         teacher_id: user.id,
       });
+
+      if (classErr && /row-level security|get_teacher_id|permission/i.test(classErr.message)) {
+        const displayName =
+          (user.user_metadata?.display_name as string | undefined) ??
+          user.email ??
+          "Teacher";
+
+        await supabase
+          .from("teachers")
+          .upsert(
+            {
+              id: user.id,
+              user_id: user.id,
+              name: displayName,
+              email: user.email ?? `${user.id}@placeholder.local`,
+            },
+            { onConflict: "user_id" },
+          );
+
+        await supabase.from("teachers").upsert({
+          id: user.id,
+          display_name: displayName,
+          email: user.email ?? `${user.id}@placeholder.local`,
+        });
+
+        const retry = await supabase.from("classes").insert({
+          name: className.trim(),
+          year_level: yearLevel,
+          class_code: code,
+          teacher_id: user.id,
+        });
+
+        classErr = retry.error;
+      }
 
       if (classErr) {
         setError(classErr.message);
