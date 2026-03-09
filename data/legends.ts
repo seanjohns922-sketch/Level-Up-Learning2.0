@@ -65,7 +65,7 @@ const LEGENDS: Legend[] = [
     strand: "Number",
     name: "Numbot Counter",
     description: "Counts, orders, and groups with confidence.",
-    stars: 2,
+    stars: 1,
     stats: { calculation: 40, speed: 40, accuracy: 45 },
     images: {
       avatar: "/cards/numbot-counter-y1-front.png",
