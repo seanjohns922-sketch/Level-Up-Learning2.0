@@ -36,11 +36,7 @@ const LEGENDS: Legend[] = [
     name: "Numbot Solver",
     description: "Solves multi-step number problems using efficient strategies and precision.",
     stars: 4,
-    stats: {
-      calculation: 65,
-      speed: 70,
-      accuracy: 60,
-    },
+    stats: { calculation: 65, speed: 70, accuracy: 60 },
     images: {
       avatar: "/cards/numbot-solver-y4-front.png",
       cardFront: "/cards/numbot-solver-y4-front.png",
