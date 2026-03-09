@@ -36,11 +36,7 @@ const LEGENDS: Legend[] = [
     name: "Numbot Solver",
     description: "Solves multi-step number problems using efficient strategies and precision.",
     stars: 4,
-    stats: {
-      calculation: 65,
-      speed: 70,
-      accuracy: 60,
-    },
+    stats: { calculation: 65, speed: 70, accuracy: 60 },
     images: {
       avatar: "/cards/numbot-solver-y4-front.png",
       cardFront: "/cards/numbot-solver-y4-front.png",
@@ -55,7 +51,7 @@ const LEGENDS: Legend[] = [
     strand: "Number",
     name: "Numbot Bouncer",
     description: "Foundation number champion in training.",
-    stars: 2,
+    stars: 0.5,
     stats: { calculation: 35, speed: 30, accuracy: 40 },
     images: {
       avatar: "/cards/numbot-bouncer-y0-front.png",
@@ -69,7 +65,7 @@ const LEGENDS: Legend[] = [
     strand: "Number",
     name: "Numbot Counter",
     description: "Counts, orders, and groups with confidence.",
-    stars: 2,
+    stars: 1,
     stats: { calculation: 40, speed: 40, accuracy: 45 },
     images: {
       avatar: "/cards/numbot-counter-y1-front.png",
@@ -83,7 +79,7 @@ const LEGENDS: Legend[] = [
     strand: "Number",
     name: "Numbot Builder",
     description: "Builds strategies and partitions numbers efficiently.",
-    stars: 3,
+    stars: 2,
     stats: { calculation: 50, speed: 50, accuracy: 50 },
     images: {
       avatar: "/cards/numbot-builder-y2-front.png",
@@ -111,7 +107,7 @@ const LEGENDS: Legend[] = [
     strand: "Number",
     name: "Numbot Calculator",
     description: "Calculates efficiently and explains strategies clearly.",
-    stars: 4,
+    stars: 5,
     stats: { calculation: 75, speed: 70, accuracy: 75 },
     images: {
       avatar: "/cards/numbot-calculator-y5-front.png",
@@ -125,7 +121,7 @@ const LEGENDS: Legend[] = [
     strand: "Number",
     name: "Numbot Equationator",
     description: "Masters complex number thinking and equations.",
-    stars: 5,
+    stars: 6,
     stats: { calculation: 85, speed: 80, accuracy: 85 },
     images: {
       avatar: "/cards/numbot-equationator-y6-front.png",
