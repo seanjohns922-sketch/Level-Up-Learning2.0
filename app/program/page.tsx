@@ -53,7 +53,7 @@ function ProgramPage() {
   }, [weekNum, year]);
 
   const prevProgress = getWeekProgress(store, year, Math.max(1, weekNum - 1));
-  const canAccessThisWeek = DEV_MODE ? true : weekNum === 1 ? true : isWeekComplete(prevProgress);
+  const canAccessThisWeek = DEMO_MODE ? true : weekNum === 1 ? true : isWeekComplete(prevProgress);
 
   const lastAllowedWeek = useMemo(() => {
     if (DEV_MODE) return 12;
