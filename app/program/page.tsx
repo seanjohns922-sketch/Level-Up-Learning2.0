@@ -4,7 +4,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getLegendForYear } from "@/data/legends";
 import { getProgramForYear } from "@/data/programs";
-import { DEV_MODE } from "@/data/config";
+import { DEV_MODE, DEMO_MODE } from "@/data/config";
 import { readProgress, updateProgress, writeProgress } from "@/data/progress";
 import type { StudentProgress } from "@/data/progress";
 import {
@@ -53,10 +53,10 @@ function ProgramPage() {
   }, [weekNum, year]);
 
   const prevProgress = getWeekProgress(store, year, Math.max(1, weekNum - 1));
-  const canAccessThisWeek = DEV_MODE ? true : weekNum === 1 ? true : isWeekComplete(prevProgress);
+  const canAccessThisWeek = DEMO_MODE ? true : weekNum === 1 ? true : isWeekComplete(prevProgress);
 
   const lastAllowedWeek = useMemo(() => {
-    if (DEV_MODE) return 12;
+    if (DEMO_MODE) return 12;
     let allowed = 1;
     for (let w = 2; w <= 12; w++) {
       if (isWeekComplete(getWeekProgress(store, year, w - 1))) allowed = w;
@@ -82,7 +82,7 @@ function ProgramPage() {
   function openItem(item: (typeof items)[number]) {
     if (!canAccessThisWeek) return;
 
-    if (!DEV_MODE) {
+    if (!DEMO_MODE) {
       if (item.type === "lesson") {
         const lessonIdx = item.n - 1;
         if (lessonIdx > 0 && !progress.lessonsCompleted[lessonIdx - 1]) return;
@@ -101,7 +101,7 @@ function ProgramPage() {
 
   function goToWeek(targetWeek: number) {
     const clamped = Math.max(1, Math.min(12, targetWeek));
-    if (!DEV_MODE && clamped > lastAllowedWeek) {
+    if (!DEMO_MODE && clamped > lastAllowedWeek) {
       router.push(`/program?year=${encodeURIComponent(year)}&week=${lastAllowedWeek}`);
       return;
     }
@@ -244,7 +244,7 @@ function ProgramPage() {
               const completed = isLesson ? progress.lessonsCompleted[item.n - 1] : progress.quizCompleted;
 
               let locked = false;
-              if (!DEV_MODE) {
+              if (!DEMO_MODE) {
                 if (isLesson && item.n > 1 && !progress.lessonsCompleted[item.n - 2]) locked = true;
                 if (!isLesson && lessonsDoneCount < 3) locked = true;
               }

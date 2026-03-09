@@ -6,6 +6,7 @@ import { clearScopedProgress, readProgress, StudentProgress } from "@/data/progr
 import { getProgramForYear } from "@/data/programs";
 import { clearScopedProgramStore, readProgramStore, getWeekProgress, isWeekComplete, type ProgramProgressStore } from "@/lib/program-progress";
 import { supabase } from "@/lib/supabase";
+import { DEMO_MODE } from "@/data/config";
 
 export default function StudentHomePage() {
   const router = useRouter();
