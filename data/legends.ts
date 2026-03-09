@@ -51,7 +51,7 @@ const LEGENDS: Legend[] = [
     strand: "Number",
     name: "Numbot Bouncer",
     description: "Foundation number champion in training.",
-    stars: 2,
+    stars: 0.5,
     stats: { calculation: 35, speed: 30, accuracy: 40 },
     images: {
       avatar: "/cards/numbot-bouncer-y0-front.png",
