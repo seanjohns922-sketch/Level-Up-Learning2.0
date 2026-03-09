@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { getLegendForYear } from "@/data/legends";
 import { readProgress, StudentProgress, writeProgress, ACTIVE_STUDENT_KEY } from "@/data/progress";
 import { supabase } from "@/lib/supabase";
+import LegendUnlockReveal from "@/components/LegendUnlockReveal";
 const PASS_THRESHOLD = 90;
 
 export default function ResultsPageWrapper() {
