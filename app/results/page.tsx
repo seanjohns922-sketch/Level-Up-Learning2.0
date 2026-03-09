@@ -177,68 +177,17 @@ function ResultsPage() {
           MVP mode: progress saved locally on this device
         </p>
 
-        {/* Unlock Modal */}
-        {showUnlock && justUnlocked ? (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/40 p-4">
-            <div className="relative w-full max-w-md rounded-2xl bg-white shadow-2xl p-6 border border-gray-200 overflow-hidden">
-              <div className="pointer-events-none absolute inset-0 overflow-hidden">
-                {confetti.map((c) => (
-                  <span
-                    key={c.i}
-                    className="absolute top-[-20px] rounded-sm"
-                    style={{
-                      left: `${c.left}%`,
-                      width: `${c.size}px`,
-                      height: `${c.size * 1.6}px`,
-                      transform: `rotate(${c.rot}deg)`,
-                      animation: `lul_confetti_fall ${c.dur}s ease-in ${c.delay}s forwards`,
-                      background: c.color,
-                      zIndex: 1,
-                    }}
-                  />
-                ))}
-              </div>
-
-              <div className="relative text-center" style={{ zIndex: 2 }}>
-                <div className="text-sm font-bold tracking-widest text-indigo-700 mb-2">
-                  LEGEND UNLOCKED
-                </div>
-
-                <div className="text-3xl font-extrabold text-gray-800 mb-2">
-                  {legend.name}
-                </div>
-
-                <div className="text-sm text-gray-600 mb-4">
-                  {legend.strand} - {legend.yearLabel}
-                </div>
-
-                <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-4 text-left mb-5">
-                  <div className="font-bold text-indigo-900 mb-1">Added to your collection</div>
-                  <div className="text-sm text-indigo-900">{legend.description}</div>
-                </div>
-
-                <div className="grid gap-3">
-                  <button
-                    onClick={() => {
-                      setShowUnlock(false);
-                      goLegends();
-                    }}
-                    className="w-full py-3 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition"
-                  >
-                    View My Legends
-                  </button>
-
-                  <button
-                    onClick={() => setShowUnlock(false)}
-                    className="w-full py-3 rounded-xl bg-gray-100 text-gray-800 font-bold hover:bg-gray-200 transition"
-                  >
-                    Continue
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : null}
+        {/* Cinematic Legend Unlock */}
+        {showUnlock && justUnlocked && (
+          <LegendUnlockReveal
+            legend={legend}
+            onContinue={() => setShowUnlock(false)}
+            onViewLegends={() => {
+              setShowUnlock(false);
+              goLegends();
+            }}
+          />
+        )}
       </div>
     </main>
   );
