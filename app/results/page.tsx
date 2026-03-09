@@ -98,19 +98,6 @@ function ResultsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [passed, year, scorePercent, legend.id]);
 
-  const confetti = useMemo(() => {
-    const colors = ["#22c55e", "#6366f1", "#f59e0b", "#ef4444", "#06b6d4", "#a855f7"];
-    return Array.from({ length: 70 }).map((_, i) => {
-      const left = Math.random() * 100;
-      const delay = Math.random() * 0.4;
-      const dur = 1.8 + Math.random() * 0.9;
-      const rot = Math.random() * 360;
-      const size = 8 + Math.random() * 10;
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      return { i, left, delay, dur, rot, size, color };
-    });
-  }, [showUnlock]);
-
   function goHome() {
     router.push("/home");
   }
