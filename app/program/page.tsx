@@ -82,7 +82,7 @@ function ProgramPage() {
   function openItem(item: (typeof items)[number]) {
     if (!canAccessThisWeek) return;
 
-    if (!DEV_MODE) {
+    if (!DEMO_MODE) {
       if (item.type === "lesson") {
         const lessonIdx = item.n - 1;
         if (lessonIdx > 0 && !progress.lessonsCompleted[lessonIdx - 1]) return;
