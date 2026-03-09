@@ -4,7 +4,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getLegendForYear } from "@/data/legends";
 import { getProgramForYear } from "@/data/programs";
-import { DEV_MODE } from "@/data/config";
+import { DEV_MODE, DEMO_MODE } from "@/data/config";
 import { readProgress, updateProgress, writeProgress } from "@/data/progress";
 import type { StudentProgress } from "@/data/progress";
 import {
