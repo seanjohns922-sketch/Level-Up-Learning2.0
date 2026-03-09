@@ -88,3 +88,36 @@ body {
 
 .animate-correct { animation: lul_correct_pulse 0.4s ease; }
 .animate-wrong { animation: lul_wrong_shake 0.4s ease; }
+
+/* Legend Unlock Reveal */
+@keyframes legendGlow {
+  0% { transform: scale(0.2); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: scale(1.8); opacity: 0.3; }
+}
+
+@keyframes sparkleFloat {
+  0% { transform: scale(0) translate(0, 0); opacity: 0; }
+  20% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0) translate(var(--drift, 30px), -60px); opacity: 0; }
+}
+
+@keyframes confettiFall {
+  0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) translateX(var(--drift, 0px)) rotate(720deg); opacity: 0; }
+}
+
+@keyframes shineSweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+@keyframes shimmerText {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
