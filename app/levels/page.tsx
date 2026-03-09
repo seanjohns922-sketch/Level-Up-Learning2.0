@@ -164,7 +164,7 @@ export default function LevelsPage() {
         <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
           {levels.map((level) => {
             const isSelected = selectedYear === level.id;
-            const isUnlocked = !hasAssignedProgram || level.id === unlockedYear;
+            const isUnlocked = DEMO_MODE || !hasAssignedProgram || level.id === unlockedYear;
             return (
               <button
                 key={level.id}
