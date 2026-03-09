@@ -13,6 +13,14 @@ export default function NewClassPage() {
   const [createdCode, setCreatedCode] = useState<string | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const yearLevelOptions = [
+    { value: 1, label: "Year 1" },
+    { value: 2, label: "Year 2" },
+    { value: 3, label: "Year 3" },
+    { value: 4, label: "Year 4" },
+    { value: 5, label: "Year 5" },
+    { value: 6, label: "Year 6" },
+  ];
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -136,8 +144,10 @@ export default function NewClassPage() {
                 onChange={(e) => setYearLevel(e.target.value)}
                 className="px-4 py-3 rounded-2xl border border-gray-200 bg-white"
               >
-                {[1, 2, 3, 4, 5, 6].map((y) => (
-                  <option key={y} value={String(y)}>Year {y}</option>
+                {yearLevelOptions.map((option) => (
+                  <option key={option.value} value={String(option.value)}>
+                    {option.label}
+                  </option>
                 ))}
               </select>
             </label>
