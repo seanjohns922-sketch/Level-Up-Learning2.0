@@ -121,7 +121,7 @@ const LEGENDS: Legend[] = [
     strand: "Number",
     name: "Numbot Equationator",
     description: "Masters complex number thinking and equations.",
-    stars: 5,
+    stars: 6,
     stats: { calculation: 85, speed: 80, accuracy: 85 },
     images: {
       avatar: "/cards/numbot-equationator-y6-front.png",
