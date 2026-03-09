@@ -244,7 +244,7 @@ function ProgramPage() {
               const completed = isLesson ? progress.lessonsCompleted[item.n - 1] : progress.quizCompleted;
 
               let locked = false;
-              if (!DEV_MODE) {
+              if (!DEMO_MODE) {
                 if (isLesson && item.n > 1 && !progress.lessonsCompleted[item.n - 2]) locked = true;
                 if (!isLesson && lessonsDoneCount < 3) locked = true;
               }
