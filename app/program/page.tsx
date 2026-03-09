@@ -101,7 +101,7 @@ function ProgramPage() {
 
   function goToWeek(targetWeek: number) {
     const clamped = Math.max(1, Math.min(12, targetWeek));
-    if (!DEV_MODE && clamped > lastAllowedWeek) {
+    if (!DEMO_MODE && clamped > lastAllowedWeek) {
       router.push(`/program?year=${encodeURIComponent(year)}&week=${lastAllowedWeek}`);
       return;
     }
