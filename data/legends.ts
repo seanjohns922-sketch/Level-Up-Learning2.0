@@ -79,7 +79,7 @@ const LEGENDS: Legend[] = [
     strand: "Number",
     name: "Numbot Builder",
     description: "Builds strategies and partitions numbers efficiently.",
-    stars: 3,
+    stars: 2,
     stats: { calculation: 50, speed: 50, accuracy: 50 },
     images: {
       avatar: "/cards/numbot-builder-y2-front.png",
