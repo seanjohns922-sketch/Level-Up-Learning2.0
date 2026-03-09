@@ -21,13 +21,15 @@ function normalizeLegend(l: LegendAny) {
 
 function StarsRow({ stars, size = "md" }: { stars: number; size?: "sm" | "md" }) {
   const total = 6;
-  const full = Math.max(0, Math.min(total, Math.round(stars)));
   const sz = size === "sm" ? "text-sm" : "text-lg";
   return (
     <div className={`${sz} flex gap-0.5`}>
-      {Array.from({ length: total }).map((_, i) => (
-        <span key={i} className={i < full ? "text-accent drop-shadow-sm" : "text-muted"}>★</span>
-      ))}
+      {Array.from({ length: total }).map((_, i) => {
+        const filled = stars - i;
+        if (filled >= 1) return <span key={i} className="text-accent drop-shadow-sm">★</span>;
+        if (filled >= 0.5) return <span key={i} className="text-accent drop-shadow-sm opacity-60">★</span>;
+        return <span key={i} className="text-muted">★</span>;
+      })}
     </div>
   );
 }
