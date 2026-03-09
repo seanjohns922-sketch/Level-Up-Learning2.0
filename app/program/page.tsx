@@ -56,7 +56,7 @@ function ProgramPage() {
   const canAccessThisWeek = DEMO_MODE ? true : weekNum === 1 ? true : isWeekComplete(prevProgress);
 
   const lastAllowedWeek = useMemo(() => {
-    if (DEV_MODE) return 12;
+    if (DEMO_MODE) return 12;
     let allowed = 1;
     for (let w = 2; w <= 12; w++) {
       if (isWeekComplete(getWeekProgress(store, year, w - 1))) allowed = w;
