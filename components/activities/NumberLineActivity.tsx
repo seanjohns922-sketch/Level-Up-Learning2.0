@@ -17,8 +17,11 @@ export default function NumberLineActivity({
   const [isCorrect, setIsCorrect] = useState(false);
 
   const ticks = useMemo(() => {
+    const span = questionData.max - questionData.min;
+    // Use 100 increments for large ranges, otherwise use step
+    const tickStep = span >= 200 ? 100 : questionData.step;
     const values: number[] = [];
-    for (let current = questionData.min; current <= questionData.max; current += questionData.step) {
+    for (let current = questionData.min; current <= questionData.max; current += tickStep) {
       values.push(current);
     }
     if (values[values.length - 1] !== questionData.max) values.push(questionData.max);
