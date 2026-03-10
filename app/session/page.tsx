@@ -2347,7 +2347,7 @@ function SessionPage() {
                       <button
                         type="button"
                         onClick={() => speak(currentQuiz?.prompt ?? "")}
-                        className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-50"
+                         className="px-3 py-2 rounded-xl border border-border text-sm font-bold text-foreground hover:bg-secondary transition"
                       >
                         🔊 Read
                       </button>
