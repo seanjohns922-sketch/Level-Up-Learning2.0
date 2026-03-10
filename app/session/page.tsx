@@ -2834,11 +2834,11 @@ function SessionPage() {
                     )
                   }
                   disabled={!currentAnswered}
-                  className={[
-                    "px-5 py-2 rounded-xl font-bold transition",
+                   className={[
+                    "px-6 py-3 rounded-2xl font-bold transition",
                     currentAnswered
-                      ? "bg-indigo-600 text-white hover:bg-indigo-700"
-                      : "bg-gray-200 text-gray-400 cursor-not-allowed",
+                      ? "bg-trust-blue text-white hover:opacity-90"
+                      : "bg-muted text-muted-foreground cursor-not-allowed",
                   ].join(" ")}
                 >
                   Next
