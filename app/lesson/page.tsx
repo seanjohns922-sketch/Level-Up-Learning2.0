@@ -4,8 +4,7 @@ import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { PracticeRunner } from "@/components/PracticeRunner";
-import { LessonRenderer } from "@/components/lesson/LessonRenderer";
-import type { ActivityType } from "@/data/programs/buildProgram";
+import { Year2LessonEngine } from "@/components/lesson/Year2LessonEngine";
 import { generateWeek1Task } from "@/data/activities/year1/week1";
 import { generateWeek2Task } from "@/data/activities/year1/week2";
 import { generateWeek3Task } from "@/data/activities/year1/week3";
@@ -68,9 +67,15 @@ function LessonPage() {
   }, [effectiveLessonId, week, year]);
 
   function completeLesson() {
-    // Write to the shared program progress store so program/page.tsx sees it
     markLessonComplete(year, week, lessonNumber);
+    router.push(`/program?year=${encodeURIComponent(year)}&week=${week}`);
+  }
 
+  function markLessonDone() {
+    markLessonComplete(year, week, lessonNumber);
+  }
+
+  function goBackToProgram() {
     router.push(`/program?year=${encodeURIComponent(year)}&week=${week}`);
   }
 
@@ -225,11 +230,11 @@ function LessonPage() {
             </div>
 
             <div className="bg-background px-6 py-8">
-              {lessonMeta?.activityType ? (
-                <LessonRenderer
-                  activityType={lessonMeta.activityType as ActivityType}
-                  config={lessonMeta.config}
-                  prompt={lessonMeta.title}
+              {lessonMeta?.activities?.length ? (
+                <Year2LessonEngine
+                  lesson={lessonMeta}
+                  onTimedComplete={markLessonDone}
+                  onExit={goBackToProgram}
                 />
               ) : (
                 <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
@@ -238,16 +243,6 @@ function LessonPage() {
                   </div>
                 </div>
               )}
-
-              <div className="mt-6 flex justify-end">
-                <button
-                  onClick={completeLesson}
-                  className="rounded-2xl bg-gradient-to-r from-primary to-primary/80 px-6 py-3 text-lg font-extrabold text-primary-foreground hover:opacity-90 transition-all active:scale-[0.98] shadow-lg"
-                  style={{ boxShadow: "0 8px 24px -8px hsl(var(--primary) / 0.4)" }}
-                >
-                  Mark Lesson Complete
-                </button>
-              </div>
             </div>
           </div>
         )}

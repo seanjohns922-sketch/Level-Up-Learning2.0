@@ -1,3 +1,5 @@
+import type { LessonActivity } from "./types";
+
 export type CurriculumCode =
   | "AC9M1N01"
   | "AC9M1N02"
@@ -23,6 +25,7 @@ export type Lesson = {
   curriculum: CurriculumCode[];
   activityType?: string;
   config?: Record<string, unknown>;
+  activities?: LessonActivity[];
 };
 
 export type WeekPlan = {

@@ -1,65 +1,41 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
+import type { NumberOrderQuestion } from "@/data/activities/year2/lessonEngine";
 
-type Props = {
-  config: {
-    min: number;
-    max: number;
-    count: number;
-    ascending?: boolean;
-  };
-};
-
-function shuffle<T>(items: T[]) {
-  const next = [...items];
-  for (let index = next.length - 1; index > 0; index -= 1) {
-    const swapIndex = Math.floor(Math.random() * (index + 1));
-    [next[index], next[swapIndex]] = [next[swapIndex], next[index]];
-  }
-  return next;
-}
-
-export default function NumberOrder({ config }: Props) {
-  const [numbers, setNumbers] = useState<number[]>([]);
+export default function NumberOrder({
+  questionData,
+  onCorrect,
+  onWrong,
+}: {
+  questionData: NumberOrderQuestion;
+  onCorrect?: () => void;
+  onWrong?: () => void;
+}) {
   const [selected, setSelected] = useState<number[]>([]);
-  const [correct, setCorrect] = useState<number[]>([]);
-  const [attempt, setAttempt] = useState(0);
 
-  useEffect(() => {
-    const generated = new Set<number>();
-
-    while (generated.size < config.count) {
-      const n = Math.floor(Math.random() * (config.max - config.min + 1)) + config.min;
-      generated.add(n);
-    }
-
-    const pool = Array.from(generated);
-    const sorted = [...pool].sort((a, b) =>
-      config.ascending === false ? b - a : a - b
-    );
-
-    setNumbers(shuffle(pool));
-    setCorrect(sorted);
-    setSelected([]);
-  }, [config, attempt]);
+  const correctOrder = useMemo(
+    () =>
+      [...questionData.numbers].sort((a, b) =>
+        questionData.ascending ? a - b : b - a
+      ),
+    [questionData.ascending, questionData.numbers]
+  );
 
   function selectNumber(n: number) {
     if (selected.includes(n)) return;
-    setSelected([...selected, n]);
+    const next = [...selected, n];
+    setSelected(next);
+    if (next.length === correctOrder.length) {
+      const isCorrect = next.every((value, index) => value === correctOrder[index]);
+      if (isCorrect) onCorrect?.();
+      else onWrong?.();
+    }
   }
 
   function removeLast() {
     setSelected((current) => current.slice(0, -1));
   }
-
-  function resetRound() {
-    setAttempt((current) => current + 1);
-  }
-
-  const isCorrect =
-    selected.length === correct.length &&
-    selected.every((v, i) => v === correct[i]);
 
   return (
     <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -69,30 +45,20 @@ export default function NumberOrder({ config }: Props) {
             Number Order
           </div>
           <h2 className="mt-2 text-2xl font-black text-gray-900">
-            Order the numbers from{" "}
-            {config.ascending === false ? "largest to smallest" : "smallest to largest"}
+            {questionData.prompt}
           </h2>
         </div>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={removeLast}
-            className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50"
-          >
-            Undo
-          </button>
-          <button
-            type="button"
-            onClick={resetRound}
-            className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50"
-          >
-            New set
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={removeLast}
+          className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50"
+        >
+          Undo
+        </button>
       </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {numbers.map((n, idx) => (
+        {questionData.numbers.map((n, idx) => (
           <button
             key={`${n}-${idx}`}
             type="button"
@@ -114,7 +80,6 @@ export default function NumberOrder({ config }: Props) {
         <h3 className="text-sm font-bold uppercase tracking-wide text-indigo-700">
           Your order
         </h3>
-
         <div className="mt-4 flex flex-wrap gap-3">
           {selected.length > 0 ? (
             selected.map((n, i) => (
@@ -131,16 +96,6 @@ export default function NumberOrder({ config }: Props) {
             </div>
           )}
         </div>
-      </div>
-
-      <div className="mt-4 text-sm font-bold">
-        {isCorrect ? (
-          <span className="text-emerald-700">Correct.</span>
-        ) : selected.length === correct.length ? (
-          <span className="text-red-700">Order is not correct yet. Try a new set.</span>
-        ) : (
-          <span className="text-gray-500">Keep arranging the numbers.</span>
-        )}
       </div>
     </div>
   );

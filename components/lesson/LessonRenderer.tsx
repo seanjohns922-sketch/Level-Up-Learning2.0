@@ -1,16 +1,30 @@
 "use client";
 
-import type { ActivityType } from "@/data/programs/buildProgram";
 import AdditionStrategy from "@/components/activities/AdditionStrategy";
+import MultipleChoiceActivity from "@/components/activities/MultipleChoiceActivity";
 import NumberOrder from "@/components/activities/NumberOrder";
 import NumberLineActivity from "@/components/activities/NumberLineActivity";
 import PartitionExpand from "@/components/activities/PartitionExpand";
 import PlaceValueBuilder from "@/components/activities/PlaceValueBuilder";
+import TypedResponseActivity from "@/components/activities/TypedResponseActivity";
+import type {
+  AdditionStrategyQuestion,
+  MultipleChoiceQuestion,
+  NumberLineQuestion,
+  NumberOrderQuestion,
+  PartitionExpandQuestion,
+  PlaceValueBuilderQuestion,
+  TypedResponseQuestion,
+  Year2QuestionData,
+} from "@/data/activities/year2/lessonEngine";
+import type { LessonActivity } from "@/data/programs/types";
 
 type LessonRendererProps = {
-  activityType: ActivityType;
-  config?: Record<string, unknown>;
+  activity: LessonActivity;
   prompt: string;
+  questionData: Year2QuestionData;
+  onCorrect?: () => void;
+  onWrong?: () => void;
 };
 
 function PlaceholderActivity({
@@ -38,50 +52,76 @@ function PlaceholderActivity({
 }
 
 export function LessonRenderer({
-  activityType,
-  config,
+  activity,
   prompt,
+  questionData,
+  onCorrect,
+  onWrong,
 }: LessonRendererProps) {
-  switch (activityType) {
+  switch (activity.activityType) {
     case "place_value_builder":
-      return <PlaceValueBuilder config={config} />;
+      return (
+        <PlaceValueBuilder
+          questionData={questionData as PlaceValueBuilderQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
+        />
+      );
     case "number_order":
       return (
         <NumberOrder
-          config={{
-            min: typeof config?.min === "number" ? config.min : 100,
-            max: typeof config?.max === "number" ? config.max : 1000,
-            count: typeof config?.count === "number" ? config.count : 4,
-            ascending:
-              typeof config?.ascending === "boolean" ? config.ascending : true,
-          }}
+          questionData={questionData as NumberOrderQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
         />
       );
     case "partition_expand":
-      return <PartitionExpand config={config} />;
+      return (
+        <PartitionExpand
+          questionData={questionData as PartitionExpandQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
+        />
+      );
     case "number_line":
-      return <NumberLineActivity config={config} />;
-    case "odd_even_sort":
-      return <PlaceholderActivity label="Odd / Even Sort" prompt={prompt} config={config} />;
+      return (
+        <NumberLineActivity
+          questionData={questionData as NumberLineQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
+        />
+      );
     case "addition_strategy":
-      return <AdditionStrategy config={config} />;
-    case "subtraction_strategy":
-      return <PlaceholderActivity label="Subtraction Strategy" prompt={prompt} config={config} />;
-    case "fact_family":
-      return <PlaceholderActivity label="Fact Family" prompt={prompt} config={config} />;
-    case "equal_groups":
-      return <PlaceholderActivity label="Equal Groups" prompt={prompt} config={config} />;
-    case "arrays":
-      return <PlaceholderActivity label="Arrays" prompt={prompt} config={config} />;
-    case "skip_count":
-      return <PlaceholderActivity label="Skip Count" prompt={prompt} config={config} />;
-    case "division_groups":
-      return <PlaceholderActivity label="Division Groups" prompt={prompt} config={config} />;
-    case "mixed_word_problem":
-      return <PlaceholderActivity label="Mixed Word Problem" prompt={prompt} config={config} />;
-    case "review_quiz":
-      return <PlaceholderActivity label="Review Quiz" prompt={prompt} config={config} />;
+      return (
+        <AdditionStrategy
+          questionData={questionData as AdditionStrategyQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
+        />
+      );
+    case "multiple_choice":
+      return (
+        <MultipleChoiceActivity
+          questionData={questionData as MultipleChoiceQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
+        />
+      );
+    case "typed_response":
+      return (
+        <TypedResponseActivity
+          questionData={questionData as TypedResponseQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
+        />
+      );
     default:
-      return <PlaceholderActivity label="Activity" prompt={prompt} config={config} />;
+      return (
+        <PlaceholderActivity
+          label={activity.activityType.replace(/_/g, " ")}
+          prompt={prompt}
+          config={activity.config}
+        />
+      );
   }
 }

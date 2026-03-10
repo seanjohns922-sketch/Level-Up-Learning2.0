@@ -1,28 +1,12 @@
 import type { CurriculumCode, WeekPlan } from "./year1";
-
-export type ActivityType =
-  | "place_value_builder"
-  | "number_order"
-  | "partition_expand"
-  | "number_line"
-  | "odd_even_sort"
-  | "addition_strategy"
-  | "subtraction_strategy"
-  | "fact_family"
-  | "equal_groups"
-  | "arrays"
-  | "skip_count"
-  | "division_groups"
-  | "mixed_word_problem"
-  | "review_quiz";
+import type { ActivityType, LessonActivity } from "./types";
 
 export type ProgramRow = {
   week: number;
   focus: string;
   lesson: number;
   topic: string;
-  activityType: ActivityType;
-  config: Record<string, unknown>;
+  activities: LessonActivity[];
   activity: string;
   curriculum: CurriculumCode[];
 };
@@ -62,8 +46,7 @@ export function buildProgram(
           focus: row.focus,
           activityIdeas: [row.activity],
           curriculum: row.curriculum,
-          activityType: row.activityType,
-          config: row.config,
+          activities: row.activities,
         })),
       };
     });
