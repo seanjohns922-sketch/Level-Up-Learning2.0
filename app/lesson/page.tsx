@@ -72,46 +72,46 @@ function LessonPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#fbf7f1] flex items-center justify-center px-6 py-10">
+    <main className="min-h-screen bg-background flex items-center justify-center px-6 py-10">
       <div className="w-full max-w-5xl">
         <div className="mb-4">
           <button
             onClick={() =>
               router.push(`/program?year=${encodeURIComponent(year)}&week=${week}`)
             }
-            className="text-sm text-emerald-600 hover:underline font-bold"
+            className="text-sm text-primary hover:underline font-bold"
           >
             ← Back to Week {week}
           </button>
         </div>
 
         {!started ? (
-          <div className="rounded-3xl overflow-hidden shadow-xl border border-white/70 bg-white">
-            <div className="bg-gradient-to-br from-emerald-400 to-emerald-600 text-white px-6 py-10">
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1 text-sm font-semibold mb-4">
-                Week {week} – Lesson {lessonNumber}
+          <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
+            <div className="bg-gradient-to-br from-primary to-primary/80 text-white px-6 py-8">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1 text-sm font-semibold mb-3">
+                {year} • Week {week}
               </div>
-              <h1 className="text-4xl md:text-5xl font-extrabold mb-3">
+              <h1 className="text-3xl md:text-4xl font-extrabold font-display mb-2">
                 {lessonMeta?.title ?? `Week ${week} Lesson ${lessonNumber}`}
               </h1>
-              <div className="text-white/90 text-base">
-                {lessonMeta?.focus ?? "Focus"}
-              </div>
+              <p className="text-white/80 text-sm">
+                {lessonMeta?.focus ?? "Watch the video and complete activities"}
+              </p>
             </div>
 
-            <div className="bg-[#fbf7f1] px-6 py-10">
-              <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-6 mb-8">
-                <div className="flex items-center gap-2 text-gray-900 font-bold mb-5">
-                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+            <div className="bg-background px-6 py-8">
+              <div className="bg-card rounded-3xl border border-border shadow-sm p-6 mb-8">
+                <div className="flex items-center gap-2 text-foreground font-bold mb-5">
+                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-trust-blue-light text-trust-blue">
                     <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M8 5v14l11-7z" />
                     </svg>
                   </span>
                   Lesson Video
                 </div>
-                <div className="aspect-video rounded-2xl border-2 border-dashed border-gray-200 bg-white flex items-center justify-center text-gray-500">
+                <div className="aspect-video rounded-2xl border-2 border-dashed border-border bg-card flex items-center justify-center text-muted-foreground">
                   <div className="text-center">
-                    <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+                    <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-trust-blue-light text-trust-blue">
                       <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M8 5v14l11-7z" />
                       </svg>
@@ -121,45 +121,41 @@ function LessonPage() {
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 mb-8">
-                <div className="flex items-center gap-2 font-bold text-emerald-900 mb-2">
-                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-                    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.6-4.9-2.6-4.9 2.6.9-5.6-4-3.9 5.5-.8z" />
-                    </svg>
-                  </span>
-                  Keep going!
+              <div className="rounded-2xl border border-primary/20 bg-primary-light p-6 mb-8">
+                <div className="flex items-center gap-2 font-bold text-primary mb-2">
+                  ✨ Keep going!
                 </div>
-                <div className="text-sm text-emerald-900">
+                <div className="text-sm text-foreground/80">
                   Keep working to unlock your Level Up Legend.
                 </div>
               </div>
 
               <button
                 onClick={() => setStarted(true)}
-                className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-extrabold text-xl hover:from-emerald-600 hover:to-emerald-700 transition"
+                className="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-extrabold text-xl hover:opacity-90 transition-all active:scale-[0.98] shadow-lg"
+                style={{ boxShadow: "0 8px 24px -8px hsl(var(--primary) / 0.4)" }}
               >
                 Begin Practice
               </button>
             </div>
           </div>
         ) : (
-          <>
-            <h1 className="text-3xl font-extrabold text-gray-900 mb-2">
-              Week {week} Lesson {lessonNumber} Practice
-            </h1>
-            {lessonMeta?.title ? (
-              <div className="text-xl font-extrabold text-gray-900 mb-2">
-                {lessonMeta.title}
+          <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
+            <div className="bg-gradient-to-br from-primary to-primary/80 text-white px-6 py-8">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1 text-sm font-semibold mb-3">
+                {year} • Week {week}
               </div>
-            ) : null}
-            {lessonMeta ? (
-              <div className="mb-4">
-                <div className="text-sm text-gray-600 mt-1">
-                  Focus: {lessonMeta.focus}
-                </div>
-              </div>
-            ) : null}
+              <h1 className="text-3xl md:text-4xl font-extrabold font-display">
+                Lesson {lessonNumber} Practice
+              </h1>
+              {lessonMeta?.title && (
+                <p className="text-white/80 text-sm mt-1">{lessonMeta.title}</p>
+              )}
+              {lessonMeta?.focus && (
+                <p className="text-white/60 text-xs mt-1">Focus: {lessonMeta.focus}</p>
+              )}
+            </div>
+            <div className="bg-background px-6 py-8">
 
             <PracticeRunner
               key={`${year}-${week}-${lessonId}`}
