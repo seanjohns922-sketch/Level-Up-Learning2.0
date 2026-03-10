@@ -131,9 +131,10 @@ export function Year2LessonEngine({
   function handleWrong() {
     if (finished) return;
     setStatus("wrong");
+    setQuestionsAnswered((value) => value + 1);
     timeoutRef.current = setTimeout(() => {
-      setStatus("idle");
-    }, 900);
+      loadNextQuestion();
+    }, 1200);
   }
 
   const accuracy =
