@@ -2878,7 +2878,7 @@ function SessionPage() {
                       )}&lessonId=y1-w${week}-l1`
                     )
                   }
-                  className="px-4 py-2 rounded-xl bg-amber-600 text-white font-bold hover:bg-amber-700 transition"
+                  className="px-4 py-3 rounded-2xl bg-accent text-accent-foreground font-bold hover:opacity-90 transition"
                 >
                   Back to Lesson 1
                 </button>
