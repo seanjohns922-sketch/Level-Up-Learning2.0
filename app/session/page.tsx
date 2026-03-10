@@ -2331,7 +2331,7 @@ function SessionPage() {
               {quizQuestions.length ? (
                 <div className="rounded-2xl border border-border p-5 bg-secondary/30">
                   <div className="flex items-center justify-between mb-3">
-                    <div className="text-sm font-bold text-gray-700">
+                    <div className="text-sm font-bold text-foreground">
                       Question {quizIndex + 1} of {quizQuestions.length}
                     </div>
                     <div className="text-xs text-gray-500">
