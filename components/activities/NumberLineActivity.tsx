@@ -17,8 +17,11 @@ export default function NumberLineActivity({
   const [isCorrect, setIsCorrect] = useState(false);
 
   const ticks = useMemo(() => {
+    const span = questionData.max - questionData.min;
+    // Use 100 increments for large ranges, otherwise use step
+    const tickStep = span >= 200 ? 100 : questionData.step;
     const values: number[] = [];
-    for (let current = questionData.min; current <= questionData.max; current += questionData.step) {
+    for (let current = questionData.min; current <= questionData.max; current += tickStep) {
       values.push(current);
     }
     if (values[values.length - 1] !== questionData.max) values.push(questionData.max);
@@ -107,7 +110,7 @@ export default function NumberLineActivity({
               className="absolute top-4 flex flex-col items-center pointer-events-none"
               style={{ left: `${correctPct}%`, transform: "translateX(-50%)" }}
             >
-              <div className="w-5 h-5 rounded-full bg-primary border-2 border-primary-foreground shadow-md" />
+              <div className="w-4 h-4 rounded-full bg-primary border-2 border-primary-foreground shadow-md" />
               <span className="mt-1 text-xs font-bold text-primary">{questionData.expected}</span>
             </div>
           )}
@@ -120,7 +123,7 @@ export default function NumberLineActivity({
             >
               <div
                 className={[
-                  "w-6 h-6 rounded-full border-3 shadow-lg transition-colors",
+                  "w-4 h-4 rounded-full border-2 shadow-lg transition-colors",
                   checked
                     ? isCorrect
                       ? "bg-primary border-primary-foreground"
