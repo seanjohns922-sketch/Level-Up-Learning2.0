@@ -105,6 +105,18 @@ export default function LevelsPage() {
       return { label: "Start Pre-Test", onClick: () => {}, disabled: true };
     }
 
+    if (DEMO_MODE) {
+      const selectedProgram = getProgramForYear(selectedYear);
+      const fallbackYear = "Year 1";
+      const targetYear = selectedProgram.length > 0 ? selectedYear : fallbackYear;
+      return {
+        label: `Open ${targetYear} Program`,
+        onClick: () =>
+          router.push(`/program?year=${encodeURIComponent(targetYear)}&week=1`),
+        disabled: false,
+      };
+    }
+
     if (hasProgressForSelected && progress?.status === "ASSIGNED_PROGRAM") {
       return {
         label: `Continue Week ${savedWeek ?? 1}`,

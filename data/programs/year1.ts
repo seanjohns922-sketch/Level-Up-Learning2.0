@@ -7,6 +7,10 @@ export type CurriculumCode =
   | "AC9M1N06"
   | "AC9M2N01"
   | "AC9M2N02"
+  | "AC9M2N03"
+  | "AC9M2N04"
+  | "AC9M2N05"
+  | "AC9M2N06"
   | "ALL";
 
 export type Lesson = {
@@ -17,6 +21,8 @@ export type Lesson = {
   focus: string;
   activityIdeas: string[];
   curriculum: CurriculumCode[];
+  activityType?: string;
+  config?: Record<string, unknown>;
 };
 
 export type WeekPlan = {

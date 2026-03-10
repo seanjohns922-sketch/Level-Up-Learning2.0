@@ -164,7 +164,7 @@ function ProgramPage() {
 
   return (
     <main className="min-h-screen bg-[#f6f2ec]">
-      {DEV_MODE && process.env.NODE_ENV === "development" && (
+      {DEV_MODE && (
         <div className="fixed bottom-4 right-4 px-4 py-2 bg-red-600 text-white font-extrabold rounded-xl shadow-lg z-50">DEV MODE</div>
       )}
 
@@ -225,7 +225,7 @@ function ProgramPage() {
       {/* ── Lesson cards ── */}
       <div className="-mt-12 relative z-10 pb-12 px-6">
         <div className="max-w-2xl mx-auto">
-          {DEV_MODE && process.env.NODE_ENV === "development" && (
+          {DEV_MODE && (
             <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4">
               <div className="font-bold text-amber-800 mb-2 text-sm">DEV – Jump to any week</div>
               <div className="flex flex-wrap gap-2">
