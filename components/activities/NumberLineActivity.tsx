@@ -34,9 +34,8 @@ export default function NumberLineActivity({
       const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
       const raw = questionData.min + pct * range;
 
-      // Snap to nearest step unit for cleaner placement
-      const snapUnit = questionData.step;
-      const snapped = Math.round(raw / snapUnit) * snapUnit;
+      // Snap to nearest integer like Level 1
+      const snapped = Math.round(raw);
       const clamped = Math.max(questionData.min, Math.min(questionData.max, snapped));
 
       setPlaced(clamped);
