@@ -2129,22 +2129,39 @@ function SessionPage() {
   // UI
   // ---------------------------
   return (
-    <main className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center justify-center p-6">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-xl">
-        <div className="flex items-center justify-between mb-6">
+    <main className="min-h-screen bg-background flex items-center justify-center px-6 py-10">
+      <div className="w-full max-w-5xl">
+        <div className="mb-4">
           <button
             onClick={backToWeek}
-            className="text-sm text-indigo-700 hover:underline"
+            className="text-sm text-primary hover:underline font-bold"
           >
             ← Back to Week {week}
           </button>
-
-          <div className="text-sm text-gray-500">
-            {year} • Week {week}
-          </div>
         </div>
 
-        <h1 className="text-2xl font-extrabold text-gray-800 mb-2">{title}</h1>
+        {/* Wrapper card */}
+        <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
+          {/* Hero gradient header */}
+          <div className={[
+            "text-white px-6 py-8",
+            isLesson
+              ? "bg-gradient-to-br from-primary to-primary/80"
+              : "bg-gradient-to-br from-trust-blue to-trust-blue/80",
+          ].join(" ")}>
+            <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1 text-sm font-semibold mb-3">
+              {year} • Week {week}
+            </div>
+            <h1 className="text-3xl md:text-4xl font-extrabold font-display">{title}</h1>
+            {isLesson && (
+              <p className="text-white/80 text-sm mt-1">Watch the video and complete activities</p>
+            )}
+            {!isLesson && (
+              <p className="text-white/80 text-sm mt-1">Answer all questions, then submit</p>
+            )}
+          </div>
+
+          <div className="bg-background px-6 py-8">
 
         {isLesson ? (
           <>
