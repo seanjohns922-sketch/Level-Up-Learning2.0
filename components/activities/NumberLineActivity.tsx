@@ -110,7 +110,7 @@ export default function NumberLineActivity({
               className="absolute top-4 flex flex-col items-center pointer-events-none"
               style={{ left: `${correctPct}%`, transform: "translateX(-50%)" }}
             >
-              <div className="w-5 h-5 rounded-full bg-primary border-2 border-primary-foreground shadow-md" />
+              <div className="w-4 h-4 rounded-full bg-primary border-2 border-primary-foreground shadow-md" />
               <span className="mt-1 text-xs font-bold text-primary">{questionData.expected}</span>
             </div>
           )}
