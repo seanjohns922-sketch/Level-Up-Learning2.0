@@ -2763,11 +2763,11 @@ function SessionPage() {
                           <button
                             key={`${currentQuiz.id}-${oi}`}
                             onClick={() => chooseQuiz(quizIndex, oi)}
-                            className={[
-                              "text-left p-3 rounded-xl border transition",
+                             className={[
+                              "text-left px-4 py-3 rounded-2xl border-2 font-semibold transition-all",
                               selected
-                                ? "border-indigo-800 bg-indigo-50"
-                                : "border-gray-200 hover:border-indigo-400 bg-white",
+                                ? "border-trust-blue bg-trust-blue-light text-foreground shadow-sm"
+                                : "border-border bg-card hover:border-trust-blue/40 text-foreground",
                             ].join(" ")}
                           >
                             {opt}
