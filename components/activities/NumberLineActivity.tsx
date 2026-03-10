@@ -53,8 +53,8 @@ export default function NumberLineActivity({
     const difference = Math.abs(placed - questionData.expected);
     const allowed =
       questionData.mode === "estimate"
-        ? Math.max(1, Math.floor(questionData.step / 2))
-        : 0;
+        ? Math.max(5, Math.floor(questionData.step / 2))
+        : 5;
 
     if (difference <= allowed) {
       setIsCorrect(true);
