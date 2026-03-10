@@ -4,6 +4,8 @@ import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { PracticeRunner } from "@/components/PracticeRunner";
+import { LessonRenderer } from "@/components/lesson/LessonRenderer";
+import type { ActivityType } from "@/data/programs/buildProgram";
 import { generateWeek1Task } from "@/data/activities/year1/week1";
 import { generateWeek2Task } from "@/data/activities/year1/week2";
 import { generateWeek3Task } from "@/data/activities/year1/week3";
@@ -30,11 +32,12 @@ function LessonPage() {
 
   const year = params.get("year") ?? "Year 1";
   const week = Number(params.get("week") ?? "1");
-  const lessonId = params.get("lessonId") ?? "y1-w1-l1";
-  const expectedPrefix = `y1-w${week}-`;
+  const yearNumber = parseInt(year.replace(/\D/g, ""), 10) || 1;
+  const lessonId = params.get("lessonId") ?? `y${yearNumber}-w1-l1`;
+  const expectedPrefix = `y${yearNumber}-w${week}-`;
   const effectiveLessonId = lessonId.startsWith(expectedPrefix)
     ? lessonId
-    : `y1-w${week}-l1`;
+    : `y${yearNumber}-w${week}-l1`;
 
   // Extract lesson number from lessonId (e.g. "y1-w1-l2" → 2)
   const lessonNumber = useMemo(() => {
@@ -139,7 +142,7 @@ function LessonPage() {
               </button>
             </div>
           </div>
-        ) : (
+        ) : year === "Year 1" ? (
           <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
             <div className="bg-gradient-to-br from-primary to-primary/80 text-white px-6 py-8">
               <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1 text-sm font-semibold mb-3">
@@ -202,6 +205,49 @@ function LessonPage() {
               }}
               onComplete={completeLesson}
             />
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
+            <div className="bg-gradient-to-br from-primary to-primary/80 text-white px-6 py-8">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1 text-sm font-semibold mb-3">
+                {year} • Week {week}
+              </div>
+              <h1 className="text-3xl md:text-4xl font-extrabold font-display">
+                Lesson {lessonNumber} Practice
+              </h1>
+              {lessonMeta?.title && (
+                <p className="text-white/80 text-sm mt-1">{lessonMeta.title}</p>
+              )}
+              {lessonMeta?.focus && (
+                <p className="text-white/60 text-xs mt-1">Focus: {lessonMeta.focus}</p>
+              )}
+            </div>
+
+            <div className="bg-background px-6 py-8">
+              {lessonMeta?.activityType ? (
+                <LessonRenderer
+                  activityType={lessonMeta.activityType as ActivityType}
+                  config={lessonMeta.config}
+                  prompt={lessonMeta.title}
+                />
+              ) : (
+                <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+                  <div className="text-sm font-bold text-gray-900">
+                    Activity configuration missing for this lesson.
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-6 flex justify-end">
+                <button
+                  onClick={completeLesson}
+                  className="rounded-2xl bg-gradient-to-r from-primary to-primary/80 px-6 py-3 text-lg font-extrabold text-primary-foreground hover:opacity-90 transition-all active:scale-[0.98] shadow-lg"
+                  style={{ boxShadow: "0 8px 24px -8px hsl(var(--primary) / 0.4)" }}
+                >
+                  Mark Lesson Complete
+                </button>
+              </div>
             </div>
           </div>
         )}

@@ -92,8 +92,11 @@ function ProgramPage() {
       }
     }
 
-    if (item.type === "lesson" && curriculumYear === "Year 1" && weekNum >= 1 && weekNum <= 12) {
-      router.push(`/lesson?year=${encodeURIComponent(curriculumYear)}&week=${week}&lessonId=y1-w${weekNum}-l${item.n}`);
+    if (item.type === "lesson") {
+      const yearNumber = parseInt(curriculumYear.replace(/\D/g, ""), 10) || 1;
+      router.push(
+        `/lesson?year=${encodeURIComponent(curriculumYear)}&week=${week}&lessonId=y${yearNumber}-w${weekNum}-l${item.n}`
+      );
       return;
     }
     router.push(`/session?year=${encodeURIComponent(curriculumYear)}&week=${week}&type=${item.type}&n=${item.n}`);

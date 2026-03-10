@@ -9,6 +9,7 @@ export type ActivityType =
   | "addition_strategy"
   | "subtraction_strategy"
   | "fact_family"
+  | "equal_groups"
   | "arrays"
   | "skip_count"
   | "division_groups"

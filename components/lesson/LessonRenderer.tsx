@@ -1,7 +1,11 @@
 "use client";
 
 import type { ActivityType } from "@/data/programs/buildProgram";
+import AdditionStrategy from "@/components/activities/AdditionStrategy";
 import NumberOrder from "@/components/activities/NumberOrder";
+import NumberLineActivity from "@/components/activities/NumberLineActivity";
+import PartitionExpand from "@/components/activities/PartitionExpand";
+import PlaceValueBuilder from "@/components/activities/PlaceValueBuilder";
 
 type LessonRendererProps = {
   activityType: ActivityType;
@@ -40,7 +44,7 @@ export function LessonRenderer({
 }: LessonRendererProps) {
   switch (activityType) {
     case "place_value_builder":
-      return <PlaceholderActivity label="Place Value Builder" prompt={prompt} config={config} />;
+      return <PlaceValueBuilder config={config} />;
     case "number_order":
       return (
         <NumberOrder
@@ -48,21 +52,25 @@ export function LessonRenderer({
             min: typeof config?.min === "number" ? config.min : 100,
             max: typeof config?.max === "number" ? config.max : 1000,
             count: typeof config?.count === "number" ? config.count : 4,
+            ascending:
+              typeof config?.ascending === "boolean" ? config.ascending : true,
           }}
         />
       );
     case "partition_expand":
-      return <PlaceholderActivity label="Partition & Expand" prompt={prompt} config={config} />;
+      return <PartitionExpand config={config} />;
     case "number_line":
-      return <PlaceholderActivity label="Number Line" prompt={prompt} config={config} />;
+      return <NumberLineActivity config={config} />;
     case "odd_even_sort":
       return <PlaceholderActivity label="Odd / Even Sort" prompt={prompt} config={config} />;
     case "addition_strategy":
-      return <PlaceholderActivity label="Addition Strategy" prompt={prompt} config={config} />;
+      return <AdditionStrategy config={config} />;
     case "subtraction_strategy":
       return <PlaceholderActivity label="Subtraction Strategy" prompt={prompt} config={config} />;
     case "fact_family":
       return <PlaceholderActivity label="Fact Family" prompt={prompt} config={config} />;
+    case "equal_groups":
+      return <PlaceholderActivity label="Equal Groups" prompt={prompt} config={config} />;
     case "arrays":
       return <PlaceholderActivity label="Arrays" prompt={prompt} config={config} />;
     case "skip_count":

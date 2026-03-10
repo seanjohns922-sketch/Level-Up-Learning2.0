@@ -344,7 +344,7 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 1,
     topic: "Model multiplication as equal groups",
     activity: "Make groups with counters",
-    activityType: "arrays",
+    activityType: "equal_groups",
     config: {
       minGroups: 2,
       maxGroups: 5,
