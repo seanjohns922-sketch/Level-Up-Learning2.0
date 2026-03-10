@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { clearScopedProgress, readProgress, StudentProgress } from "@/data/progress";
+import { clearScopedProgress, readProgress, writeProgress, StudentProgress } from "@/data/progress";
 import { clearScopedProgramStore } from "@/lib/program-progress";
 import { getProgramForYear } from "@/data/programs";
 import { DEMO_MODE } from "@/data/config";
@@ -111,8 +111,19 @@ export default function LevelsPage() {
       const targetYear = selectedProgram.length > 0 ? selectedYear : fallbackYear;
       return {
         label: `Open ${targetYear} Program`,
-        onClick: () =>
-          router.push(`/program?year=${encodeURIComponent(targetYear)}&week=1`),
+        onClick: () => {
+          const existing = readProgress();
+          if (!existing || existing.year !== targetYear) {
+            writeProgress({
+              year: targetYear,
+              scorePercent: 0,
+              status: "ASSIGNED_PROGRAM",
+              assignedWeek: 1,
+              unlockedLegends: existing?.unlockedLegends ?? [],
+            });
+          }
+          router.push("/home");
+        },
         disabled: false,
       };
     }
