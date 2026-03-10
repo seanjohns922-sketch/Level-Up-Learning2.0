@@ -2847,9 +2847,9 @@ function SessionPage() {
                 <button
                   onClick={submitQuiz}
                   disabled={!quizComplete}
-                  className={[
-                    "px-5 py-2 rounded-xl font-bold transition",
-                    quizComplete ? "bg-green-500 text-white hover:bg-green-600" : "bg-gray-200 text-gray-400 cursor-not-allowed",
+                   className={[
+                    "px-6 py-3 rounded-2xl font-bold transition",
+                    quizComplete ? "bg-primary text-primary-foreground hover:opacity-90" : "bg-muted text-muted-foreground cursor-not-allowed",
                   ].join(" ")}
                 >
                   Submit Quiz
