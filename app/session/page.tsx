@@ -2784,11 +2784,11 @@ function SessionPage() {
               <button
                 onClick={() => setQuizIndex((i) => Math.max(0, i - 1))}
                 disabled={quizIndex === 0}
-                className={[
-                  "px-4 py-2 rounded-xl font-bold transition",
+                 className={[
+                  "px-4 py-3 rounded-2xl font-bold transition",
                   quizIndex === 0
-                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                    : "bg-gray-100 text-gray-800 hover:bg-gray-200",
+                    ? "bg-muted text-muted-foreground cursor-not-allowed"
+                    : "bg-secondary text-secondary-foreground hover:bg-muted",
                 ].join(" ")}
               >
                 Back
