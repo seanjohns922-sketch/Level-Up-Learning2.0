@@ -2165,169 +2165,168 @@ function SessionPage() {
 
         {isLesson ? (
           <>
-            <div className="rounded-xl border border-gray-200 p-4 bg-gray-50 text-left mb-4">
-              <div className="font-bold text-gray-800 mb-1">Step 1: Watch the video</div>
-              <div className="text-sm text-gray-600 mb-3">
-                MVP placeholder. Next we’ll embed your real video.
+            {/* Video section */}
+            <div className="bg-card rounded-3xl border border-border shadow-sm p-6 mb-8">
+              <div className="flex items-center gap-2 text-foreground font-bold mb-5">
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-trust-blue-light text-trust-blue">
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </span>
+                Lesson Video
               </div>
-
-              <div className="rounded-xl border border-gray-200 bg-white p-4 mb-3">
-                <div className="text-sm text-gray-700">🎥 Video placeholder</div>
+              <div className="aspect-video rounded-2xl border-2 border-dashed border-border bg-card flex items-center justify-center text-muted-foreground">
+                <div className="text-center">
+                  <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-trust-blue-light text-trust-blue">
+                    <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
+                  <div>Video coming soon</div>
+                </div>
               </div>
-
-              <label className="flex items-center gap-2 text-sm text-gray-700">
+              <label className="flex items-center gap-3 text-sm text-foreground mt-4 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={videoWatched}
                   onChange={(e) => setVideoWatched(e.target.checked)}
+                  className="h-5 w-5 rounded border-border accent-primary"
                 />
                 I watched the video
               </label>
             </div>
 
+            {/* Activities section */}
             <div
               className={[
-                "rounded-xl border p-4 text-left mb-6 transition",
-                videoWatched ? "border-gray-200 bg-white" : "border-gray-200 bg-gray-50 opacity-60",
+                "bg-card rounded-3xl border border-border shadow-sm p-6 mb-8 transition-all",
+                !videoWatched ? "opacity-50 pointer-events-none" : "",
               ].join(" ")}
             >
-              <div className="font-bold text-gray-800 mb-1">Step 2: Do the activities</div>
-              <div className="text-sm text-gray-600 mb-4">
-                Complete all activities to unlock “Complete Lesson”.
+              <div className="flex items-center gap-2 text-foreground font-bold mb-5">
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary-light text-primary">
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.6-4.9-2.6-4.9 2.6.9-5.6-4-3.9 5.5-.8z" />
+                  </svg>
+                </span>
+                Activities
               </div>
 
-              <div className="mb-5">
-                <div className="font-semibold text-gray-800 mb-2">
-                  Activity 1: {activity1.prompt}
-                </div>
-                <div className="grid gap-2">
-                  {activity1.options.map((opt, idx) => {
-                    const selected = mcq1 === idx;
-                    return (
-                      <button
-                        key={opt}
-                        disabled={!videoWatched}
-                        onClick={() => setMcq1(idx)}
-                        className={[
-                          "text-left p-3 rounded-xl border transition",
-                          selected ? "border-indigo-800 bg-indigo-50" : "border-gray-200 hover:border-indigo-400 bg-white",
-                          !videoWatched ? "cursor-not-allowed" : "",
-                        ].join(" ")}
-                      >
-                        {opt}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="mb-5">
-                <div className="font-semibold text-gray-800 mb-2">
-                  Activity 2: {activity2.prompt}
-                </div>
-                <div className="grid gap-2">
-                  {activity2.options.map((opt, idx) => {
-                    const selected = mcq2 === idx;
-                    return (
-                      <button
-                        key={opt}
-                        disabled={!videoWatched}
-                        onClick={() => setMcq2(idx)}
-                        className={[
-                          "text-left p-3 rounded-xl border transition",
-                          selected ? "border-indigo-800 bg-indigo-50" : "border-gray-200 hover:border-indigo-400 bg-white",
-                          !videoWatched ? "cursor-not-allowed" : "",
-                        ].join(" ")}
-                      >
-                        {opt}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div>
-                <div className="font-semibold text-gray-800 mb-2">
-                  Activity 3: {activity3.prompt}
-                </div>
-
-                <div className="flex items-center gap-2 mb-2">
-                  <button
-                    disabled={!videoWatched}
-                    onClick={shuffleOrder}
-                    className={[
-                      "px-3 py-2 rounded-xl text-sm font-bold transition",
-                      videoWatched ? "bg-gray-100 hover:bg-gray-200 text-gray-800" : "bg-gray-200 text-gray-400 cursor-not-allowed",
-                    ].join(" ")}
-                  >
-                    Shuffle
-                  </button>
-
-                  <div className="text-sm text-gray-600">
-                    Correct:{" "}
-                    <span className={orderCorrect ? "font-bold text-green-700" : "font-semibold"}>
-                      {orderCorrect ? "Yes" : "Not yet"}
-                    </span>
+              <div className="space-y-6">
+                <div className="rounded-2xl border border-border bg-secondary/30 p-5">
+                  <div className="font-semibold text-foreground mb-3">Activity 1: {activity1.prompt}</div>
+                  <div className="grid gap-2">
+                    {activity1.options.map((opt, idx) => {
+                      const selected = mcq1 === idx;
+                      return (
+                        <button
+                          key={opt}
+                          disabled={!videoWatched}
+                          onClick={() => setMcq1(idx)}
+                          className={[
+                            "text-left px-4 py-3 rounded-2xl border-2 font-semibold transition-all",
+                            selected
+                              ? "border-primary bg-primary-light text-foreground shadow-sm"
+                              : "border-border bg-card hover:border-primary/40 text-foreground",
+                            !videoWatched ? "cursor-not-allowed" : "",
+                          ].join(" ")}
+                        >
+                          {opt}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
-                <div className="grid gap-2">
-                  {order.map((item, idx) => (
-                    <div
-                      key={`${item}-${idx}`}
-                      className="flex items-center justify-between p-3 rounded-xl border border-gray-200 bg-white"
+                <div className="rounded-2xl border border-border bg-secondary/30 p-5">
+                  <div className="font-semibold text-foreground mb-3">Activity 2: {activity2.prompt}</div>
+                  <div className="grid gap-2">
+                    {activity2.options.map((opt, idx) => {
+                      const selected = mcq2 === idx;
+                      return (
+                        <button
+                          key={opt}
+                          disabled={!videoWatched}
+                          onClick={() => setMcq2(idx)}
+                          className={[
+                            "text-left px-4 py-3 rounded-2xl border-2 font-semibold transition-all",
+                            selected
+                              ? "border-primary bg-primary-light text-foreground shadow-sm"
+                              : "border-border bg-card hover:border-primary/40 text-foreground",
+                            !videoWatched ? "cursor-not-allowed" : "",
+                          ].join(" ")}
+                        >
+                          {opt}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-border bg-secondary/30 p-5">
+                  <div className="font-semibold text-foreground mb-3">Activity 3: {activity3.prompt}</div>
+                  <div className="flex items-center gap-3 mb-3">
+                    <button
+                      disabled={!videoWatched}
+                      onClick={shuffleOrder}
+                      className={[
+                        "px-4 py-2 rounded-xl text-sm font-bold transition",
+                        videoWatched
+                          ? "bg-secondary hover:bg-muted text-secondary-foreground"
+                          : "bg-muted text-muted-foreground cursor-not-allowed",
+                      ].join(" ")}
                     >
-                      <div className="font-bold text-gray-800">{item}</div>
-                      <div className="flex gap-2">
-                        <button
-                          disabled={!videoWatched}
-                          onClick={() => moveUp(idx)}
-                          className={[
-                            "px-3 py-1 rounded-lg text-sm font-bold transition",
-                            videoWatched ? "bg-gray-100 hover:bg-gray-200" : "bg-gray-200 text-gray-400 cursor-not-allowed",
-                          ].join(" ")}
-                        >
-                          ↑
-                        </button>
-                        <button
-                          disabled={!videoWatched}
-                          onClick={() => moveDown(idx)}
-                          className={[
-                            "px-3 py-1 rounded-lg text-sm font-bold transition",
-                            videoWatched ? "bg-gray-100 hover:bg-gray-200" : "bg-gray-200 text-gray-400 cursor-not-allowed",
-                          ].join(" ")}
-                        >
-                          ↓
-                        </button>
-                      </div>
+                      🔀 Shuffle
+                    </button>
+                    <div className="text-sm text-muted-foreground">
+                      {orderCorrect ? (
+                        <span className="font-bold text-primary">✓ Correct!</span>
+                      ) : (
+                        <span className="font-semibold">Not yet</span>
+                      )}
                     </div>
-                  ))}
+                  </div>
+                  <div className="grid gap-2">
+                    {order.map((item, idx) => (
+                      <div
+                        key={`${item}-${idx}`}
+                        className="flex items-center justify-between px-4 py-3 rounded-2xl border-2 border-border bg-card"
+                      >
+                        <div className="font-bold text-foreground text-lg">{item}</div>
+                        <div className="flex gap-2">
+                          <button disabled={!videoWatched} onClick={() => moveUp(idx)} className="px-3 py-1 rounded-xl text-sm font-bold bg-secondary hover:bg-muted text-secondary-foreground transition">↑</button>
+                          <button disabled={!videoWatched} onClick={() => moveDown(idx)} className="px-3 py-1 rounded-xl text-sm font-bold bg-secondary hover:bg-muted text-secondary-foreground transition">↓</button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
+            </div>
+
+            {/* Motivation banner */}
+            <div className="rounded-2xl border border-primary/20 bg-primary-light p-6 mb-8">
+              <div className="flex items-center gap-2 font-bold text-primary mb-2">✨ Keep going!</div>
+              <div className="text-sm text-foreground/80">Keep working to unlock your Level Up Legend.</div>
             </div>
 
             <button
               onClick={completeLesson}
               disabled={!videoWatched || !activitiesComplete}
               className={[
-                "w-full py-3 rounded-xl font-bold transition",
+                "w-full py-4 rounded-2xl font-extrabold text-xl transition-all active:scale-[0.98]",
                 videoWatched && activitiesComplete
-                  ? "bg-green-500 text-white hover:bg-green-600"
-                  : "bg-gray-200 text-gray-400 cursor-not-allowed",
+                  ? "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:opacity-90 shadow-lg"
+                  : "bg-muted text-muted-foreground cursor-not-allowed",
               ].join(" ")}
+              style={videoWatched && activitiesComplete ? { boxShadow: "0 8px 24px -8px hsl(var(--primary) / 0.4)" } : undefined}
             >
               Complete Lesson
             </button>
-
-            <p className="text-xs text-gray-400 mt-3">MVP progress is saved locally.</p>
           </>
         ) : (
           <>
-            <div className="rounded-xl border border-gray-200 p-4 bg-white text-left mb-6">
-              <div className="font-bold text-gray-800 mb-1">Quiz</div>
-              <div className="text-sm text-gray-600 mb-4">
-                Answer all questions, then submit.
-              </div>
+            <div className="bg-card rounded-3xl border border-border shadow-sm p-6 mb-6">
 
               {quizQuestions.length ? (
                 <div className="rounded-xl border border-gray-200 p-4 bg-gray-50">
