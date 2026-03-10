@@ -53,8 +53,8 @@ export default function NumberLineActivity({
     const difference = Math.abs(placed - questionData.expected);
     const allowed =
       questionData.mode === "estimate"
-        ? Math.max(1, Math.floor(questionData.step / 2))
-        : 0;
+        ? Math.max(5, Math.floor(questionData.step / 2))
+        : 5;
 
     if (difference <= allowed) {
       setIsCorrect(true);
@@ -131,18 +131,6 @@ export default function NumberLineActivity({
                     : "bg-accent-foreground border-accent",
                 ].join(" ")}
               />
-              <span
-                className={[
-                  "mt-1 text-xs font-bold",
-                  checked
-                    ? isCorrect
-                      ? "text-primary"
-                      : "text-destructive"
-                    : "text-foreground",
-                ].join(" ")}
-              >
-                {placed}
-              </span>
             </div>
           )}
         </div>
