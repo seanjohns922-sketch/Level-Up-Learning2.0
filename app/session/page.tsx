@@ -2334,7 +2334,7 @@ function SessionPage() {
                     <div className="text-sm font-bold text-foreground">
                       Question {quizIndex + 1} of {quizQuestions.length}
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-muted-foreground">
                       {Math.round(((quizIndex + 1) / quizQuestions.length) * 100)}%
                     </div>
                   </div>
