@@ -131,18 +131,6 @@ export default function NumberLineActivity({
                     : "bg-accent-foreground border-accent",
                 ].join(" ")}
               />
-              <span
-                className={[
-                  "mt-1 text-xs font-bold",
-                  checked
-                    ? isCorrect
-                      ? "text-primary"
-                      : "text-destructive"
-                    : "text-foreground",
-                ].join(" ")}
-              >
-                {placed}
-              </span>
             </div>
           )}
         </div>
