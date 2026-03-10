@@ -1,6 +1,7 @@
 "use client";
 
 import type { ActivityType } from "@/data/programs/buildProgram";
+import NumberOrder from "@/components/activities/NumberOrder";
 
 type LessonRendererProps = {
   activityType: ActivityType;
@@ -41,7 +42,15 @@ export function LessonRenderer({
     case "place_value_builder":
       return <PlaceholderActivity label="Place Value Builder" prompt={prompt} config={config} />;
     case "number_order":
-      return <PlaceholderActivity label="Number Order" prompt={prompt} config={config} />;
+      return (
+        <NumberOrder
+          config={{
+            min: typeof config?.min === "number" ? config.min : 100,
+            max: typeof config?.max === "number" ? config.max : 1000,
+            count: typeof config?.count === "number" ? config.count : 4,
+          }}
+        />
+      );
     case "partition_expand":
       return <PlaceholderActivity label="Partition & Expand" prompt={prompt} config={config} />;
     case "number_line":

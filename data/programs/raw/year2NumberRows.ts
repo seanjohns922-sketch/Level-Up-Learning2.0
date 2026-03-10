@@ -44,7 +44,7 @@ export const year2NumberRows: ProgramRow[] = [
     config: {
       min: 100,
       max: 1000,
-      count: 5,
+      count: 4,
       ascending: true,
     },
     curriculum: ["AC9M2N01"],
