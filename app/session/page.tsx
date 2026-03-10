@@ -2794,7 +2794,7 @@ function SessionPage() {
                 Back
               </button>
 
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-muted-foreground">
                 {quizSubmitted
                   ? `Final Score: ${finalScore}/${quizQuestions.length} (${Math.round(
                       (finalScore / Math.max(1, quizQuestions.length)) * 100
