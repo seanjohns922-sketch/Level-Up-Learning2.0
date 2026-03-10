@@ -2820,7 +2820,7 @@ function SessionPage() {
                           )}`
                         )
                       }
-                      className="px-5 py-2 rounded-xl font-bold transition bg-indigo-600 text-white hover:bg-indigo-700"
+                      className="px-5 py-3 rounded-2xl font-bold transition bg-trust-blue text-white hover:opacity-90"
                     >
                       Go to Week {Math.min(12, Number(week) + 1)}
                     </button>
