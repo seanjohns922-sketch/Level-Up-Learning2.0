@@ -132,7 +132,7 @@ export default function StudentHomePage() {
             onLessons={continueWeek}
             onLegends={goLegends}
             onLevels={goLevels}
-            onTowerMap={() => router.push("/program?year=" + encodeURIComponent(year) + "&week=" + week)}
+            onTowerMap={() => router.push("/tower-map")}
             scorePercent={progress?.scorePercent ?? 0}
             week={week}
           />
