@@ -111,8 +111,21 @@ export default function LevelsPage() {
       const targetYear = selectedProgram.length > 0 ? selectedYear : fallbackYear;
       return {
         label: `Open ${targetYear} Program`,
-        onClick: () =>
-          router.push(`/program?year=${encodeURIComponent(targetYear)}&week=1`),
+        onClick: () => {
+          // Write minimal progress so home page knows which year to show
+          const { writeProgress, readProgress } = require("@/data/progress");
+          const existing = readProgress();
+          if (!existing || existing.year !== targetYear) {
+            writeProgress({
+              year: targetYear,
+              scorePercent: 0,
+              status: "ASSIGNED_PROGRAM",
+              assignedWeek: 1,
+              unlockedLegends: existing?.unlockedLegends ?? [],
+            });
+          }
+          router.push("/home");
+        },
         disabled: false,
       };
     }
