@@ -1624,66 +1624,9 @@ function SessionPage() {
   }
 
   // ---------------------------
-  // LESSON: Video -> Activities -> Complete
+  // LESSON: Intro screen -> Begin Practice -> Complete
   // ---------------------------
-  const [videoWatched, setVideoWatched] = useState(false);
-
-  const activity1 = useMemo(
-    () => ({
-      prompt: "Which number is the largest?",
-      options: ["48", "84", "54", "45"],
-      correctIndex: 1,
-    }),
-    []
-  );
-
-  const activity2 = useMemo(
-    () => ({
-      prompt: "What is 7 + 8?",
-      options: ["14", "15", "16", "17"],
-      correctIndex: 1,
-    }),
-    []
-  );
-
-  const activity3 = useMemo(
-    () => ({
-      prompt: "Put these in order from smallest to largest:",
-      start: ["305", "530", "350"],
-      correct: ["305", "350", "530"],
-    }),
-    []
-  );
-
-  const [mcq1, setMcq1] = useState<number | null>(null);
-  const [mcq2, setMcq2] = useState<number | null>(null);
-  const [order, setOrder] = useState<string[]>(activity3.start);
-
-  function shuffleOrder() {
-    const copy = [...order];
-    for (let i = copy.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [copy[i], copy[j]] = [copy[j], copy[i]];
-    }
-    setOrder(copy);
-  }
-
-  function moveUp(idx: number) {
-    if (idx === 0) return;
-    const copy = [...order];
-    [copy[idx - 1], copy[idx]] = [copy[idx], copy[idx - 1]];
-    setOrder(copy);
-  }
-
-  function moveDown(idx: number) {
-    if (idx === order.length - 1) return;
-    const copy = [...order];
-    [copy[idx + 1], copy[idx]] = [copy[idx], copy[idx + 1]];
-    setOrder(copy);
-  }
-
-  const orderCorrect = JSON.stringify(order) === JSON.stringify(activity3.correct);
-  const activitiesComplete = mcq1 !== null && mcq2 !== null && orderCorrect;
+  const [lessonStarted, setLessonStarted] = useState(false);
 
   function completeLesson() {
     const store = readStore();
