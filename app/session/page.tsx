@@ -2129,209 +2129,225 @@ function SessionPage() {
   // UI
   // ---------------------------
   return (
-    <main className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center justify-center p-6">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-xl">
-        <div className="flex items-center justify-between mb-6">
+    <main className="min-h-screen bg-background flex items-center justify-center px-6 py-10">
+      <div className="w-full max-w-5xl">
+        <div className="mb-4">
           <button
             onClick={backToWeek}
-            className="text-sm text-indigo-700 hover:underline"
+            className="text-sm text-primary hover:underline font-bold"
           >
             ← Back to Week {week}
           </button>
-
-          <div className="text-sm text-gray-500">
-            {year} • Week {week}
-          </div>
         </div>
 
-        <h1 className="text-2xl font-extrabold text-gray-800 mb-2">{title}</h1>
+        {/* Wrapper card */}
+        <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
+          {/* Hero gradient header */}
+          <div className={[
+            "text-white px-6 py-8",
+            isLesson
+              ? "bg-gradient-to-br from-primary to-primary/80"
+              : "bg-gradient-to-br from-trust-blue to-trust-blue/80",
+          ].join(" ")}>
+            <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1 text-sm font-semibold mb-3">
+              {year} • Week {week}
+            </div>
+            <h1 className="text-3xl md:text-4xl font-extrabold font-display">{title}</h1>
+            {isLesson && (
+              <p className="text-white/80 text-sm mt-1">Watch the video and complete activities</p>
+            )}
+            {!isLesson && (
+              <p className="text-white/80 text-sm mt-1">Answer all questions, then submit</p>
+            )}
+          </div>
+
+          <div className="bg-background px-6 py-8">
 
         {isLesson ? (
           <>
-            <div className="rounded-xl border border-gray-200 p-4 bg-gray-50 text-left mb-4">
-              <div className="font-bold text-gray-800 mb-1">Step 1: Watch the video</div>
-              <div className="text-sm text-gray-600 mb-3">
-                MVP placeholder. Next we’ll embed your real video.
+            {/* Video section */}
+            <div className="bg-card rounded-3xl border border-border shadow-sm p-6 mb-8">
+              <div className="flex items-center gap-2 text-foreground font-bold mb-5">
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-trust-blue-light text-trust-blue">
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </span>
+                Lesson Video
               </div>
-
-              <div className="rounded-xl border border-gray-200 bg-white p-4 mb-3">
-                <div className="text-sm text-gray-700">🎥 Video placeholder</div>
+              <div className="aspect-video rounded-2xl border-2 border-dashed border-border bg-card flex items-center justify-center text-muted-foreground">
+                <div className="text-center">
+                  <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-trust-blue-light text-trust-blue">
+                    <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
+                  <div>Video coming soon</div>
+                </div>
               </div>
-
-              <label className="flex items-center gap-2 text-sm text-gray-700">
+              <label className="flex items-center gap-3 text-sm text-foreground mt-4 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={videoWatched}
                   onChange={(e) => setVideoWatched(e.target.checked)}
+                  className="h-5 w-5 rounded border-border accent-primary"
                 />
                 I watched the video
               </label>
             </div>
 
+            {/* Activities section */}
             <div
               className={[
-                "rounded-xl border p-4 text-left mb-6 transition",
-                videoWatched ? "border-gray-200 bg-white" : "border-gray-200 bg-gray-50 opacity-60",
+                "bg-card rounded-3xl border border-border shadow-sm p-6 mb-8 transition-all",
+                !videoWatched ? "opacity-50 pointer-events-none" : "",
               ].join(" ")}
             >
-              <div className="font-bold text-gray-800 mb-1">Step 2: Do the activities</div>
-              <div className="text-sm text-gray-600 mb-4">
-                Complete all activities to unlock “Complete Lesson”.
+              <div className="flex items-center gap-2 text-foreground font-bold mb-5">
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary-light text-primary">
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.6-4.9-2.6-4.9 2.6.9-5.6-4-3.9 5.5-.8z" />
+                  </svg>
+                </span>
+                Activities
               </div>
 
-              <div className="mb-5">
-                <div className="font-semibold text-gray-800 mb-2">
-                  Activity 1: {activity1.prompt}
-                </div>
-                <div className="grid gap-2">
-                  {activity1.options.map((opt, idx) => {
-                    const selected = mcq1 === idx;
-                    return (
-                      <button
-                        key={opt}
-                        disabled={!videoWatched}
-                        onClick={() => setMcq1(idx)}
-                        className={[
-                          "text-left p-3 rounded-xl border transition",
-                          selected ? "border-indigo-800 bg-indigo-50" : "border-gray-200 hover:border-indigo-400 bg-white",
-                          !videoWatched ? "cursor-not-allowed" : "",
-                        ].join(" ")}
-                      >
-                        {opt}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="mb-5">
-                <div className="font-semibold text-gray-800 mb-2">
-                  Activity 2: {activity2.prompt}
-                </div>
-                <div className="grid gap-2">
-                  {activity2.options.map((opt, idx) => {
-                    const selected = mcq2 === idx;
-                    return (
-                      <button
-                        key={opt}
-                        disabled={!videoWatched}
-                        onClick={() => setMcq2(idx)}
-                        className={[
-                          "text-left p-3 rounded-xl border transition",
-                          selected ? "border-indigo-800 bg-indigo-50" : "border-gray-200 hover:border-indigo-400 bg-white",
-                          !videoWatched ? "cursor-not-allowed" : "",
-                        ].join(" ")}
-                      >
-                        {opt}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div>
-                <div className="font-semibold text-gray-800 mb-2">
-                  Activity 3: {activity3.prompt}
-                </div>
-
-                <div className="flex items-center gap-2 mb-2">
-                  <button
-                    disabled={!videoWatched}
-                    onClick={shuffleOrder}
-                    className={[
-                      "px-3 py-2 rounded-xl text-sm font-bold transition",
-                      videoWatched ? "bg-gray-100 hover:bg-gray-200 text-gray-800" : "bg-gray-200 text-gray-400 cursor-not-allowed",
-                    ].join(" ")}
-                  >
-                    Shuffle
-                  </button>
-
-                  <div className="text-sm text-gray-600">
-                    Correct:{" "}
-                    <span className={orderCorrect ? "font-bold text-green-700" : "font-semibold"}>
-                      {orderCorrect ? "Yes" : "Not yet"}
-                    </span>
+              <div className="space-y-6">
+                <div className="rounded-2xl border border-border bg-secondary/30 p-5">
+                  <div className="font-semibold text-foreground mb-3">Activity 1: {activity1.prompt}</div>
+                  <div className="grid gap-2">
+                    {activity1.options.map((opt, idx) => {
+                      const selected = mcq1 === idx;
+                      return (
+                        <button
+                          key={opt}
+                          disabled={!videoWatched}
+                          onClick={() => setMcq1(idx)}
+                          className={[
+                            "text-left px-4 py-3 rounded-2xl border-2 font-semibold transition-all",
+                            selected
+                              ? "border-primary bg-primary-light text-foreground shadow-sm"
+                              : "border-border bg-card hover:border-primary/40 text-foreground",
+                            !videoWatched ? "cursor-not-allowed" : "",
+                          ].join(" ")}
+                        >
+                          {opt}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
-                <div className="grid gap-2">
-                  {order.map((item, idx) => (
-                    <div
-                      key={`${item}-${idx}`}
-                      className="flex items-center justify-between p-3 rounded-xl border border-gray-200 bg-white"
+                <div className="rounded-2xl border border-border bg-secondary/30 p-5">
+                  <div className="font-semibold text-foreground mb-3">Activity 2: {activity2.prompt}</div>
+                  <div className="grid gap-2">
+                    {activity2.options.map((opt, idx) => {
+                      const selected = mcq2 === idx;
+                      return (
+                        <button
+                          key={opt}
+                          disabled={!videoWatched}
+                          onClick={() => setMcq2(idx)}
+                          className={[
+                            "text-left px-4 py-3 rounded-2xl border-2 font-semibold transition-all",
+                            selected
+                              ? "border-primary bg-primary-light text-foreground shadow-sm"
+                              : "border-border bg-card hover:border-primary/40 text-foreground",
+                            !videoWatched ? "cursor-not-allowed" : "",
+                          ].join(" ")}
+                        >
+                          {opt}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-border bg-secondary/30 p-5">
+                  <div className="font-semibold text-foreground mb-3">Activity 3: {activity3.prompt}</div>
+                  <div className="flex items-center gap-3 mb-3">
+                    <button
+                      disabled={!videoWatched}
+                      onClick={shuffleOrder}
+                      className={[
+                        "px-4 py-2 rounded-xl text-sm font-bold transition",
+                        videoWatched
+                          ? "bg-secondary hover:bg-muted text-secondary-foreground"
+                          : "bg-muted text-muted-foreground cursor-not-allowed",
+                      ].join(" ")}
                     >
-                      <div className="font-bold text-gray-800">{item}</div>
-                      <div className="flex gap-2">
-                        <button
-                          disabled={!videoWatched}
-                          onClick={() => moveUp(idx)}
-                          className={[
-                            "px-3 py-1 rounded-lg text-sm font-bold transition",
-                            videoWatched ? "bg-gray-100 hover:bg-gray-200" : "bg-gray-200 text-gray-400 cursor-not-allowed",
-                          ].join(" ")}
-                        >
-                          ↑
-                        </button>
-                        <button
-                          disabled={!videoWatched}
-                          onClick={() => moveDown(idx)}
-                          className={[
-                            "px-3 py-1 rounded-lg text-sm font-bold transition",
-                            videoWatched ? "bg-gray-100 hover:bg-gray-200" : "bg-gray-200 text-gray-400 cursor-not-allowed",
-                          ].join(" ")}
-                        >
-                          ↓
-                        </button>
-                      </div>
+                      🔀 Shuffle
+                    </button>
+                    <div className="text-sm text-muted-foreground">
+                      {orderCorrect ? (
+                        <span className="font-bold text-primary">✓ Correct!</span>
+                      ) : (
+                        <span className="font-semibold">Not yet</span>
+                      )}
                     </div>
-                  ))}
+                  </div>
+                  <div className="grid gap-2">
+                    {order.map((item, idx) => (
+                      <div
+                        key={`${item}-${idx}`}
+                        className="flex items-center justify-between px-4 py-3 rounded-2xl border-2 border-border bg-card"
+                      >
+                        <div className="font-bold text-foreground text-lg">{item}</div>
+                        <div className="flex gap-2">
+                          <button disabled={!videoWatched} onClick={() => moveUp(idx)} className="px-3 py-1 rounded-xl text-sm font-bold bg-secondary hover:bg-muted text-secondary-foreground transition">↑</button>
+                          <button disabled={!videoWatched} onClick={() => moveDown(idx)} className="px-3 py-1 rounded-xl text-sm font-bold bg-secondary hover:bg-muted text-secondary-foreground transition">↓</button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
+            </div>
+
+            {/* Motivation banner */}
+            <div className="rounded-2xl border border-primary/20 bg-primary-light p-6 mb-8">
+              <div className="flex items-center gap-2 font-bold text-primary mb-2">✨ Keep going!</div>
+              <div className="text-sm text-foreground/80">Keep working to unlock your Level Up Legend.</div>
             </div>
 
             <button
               onClick={completeLesson}
               disabled={!videoWatched || !activitiesComplete}
               className={[
-                "w-full py-3 rounded-xl font-bold transition",
+                "w-full py-4 rounded-2xl font-extrabold text-xl transition-all active:scale-[0.98]",
                 videoWatched && activitiesComplete
-                  ? "bg-green-500 text-white hover:bg-green-600"
-                  : "bg-gray-200 text-gray-400 cursor-not-allowed",
+                  ? "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:opacity-90 shadow-lg"
+                  : "bg-muted text-muted-foreground cursor-not-allowed",
               ].join(" ")}
+              style={videoWatched && activitiesComplete ? { boxShadow: "0 8px 24px -8px hsl(var(--primary) / 0.4)" } : undefined}
             >
               Complete Lesson
             </button>
-
-            <p className="text-xs text-gray-400 mt-3">MVP progress is saved locally.</p>
           </>
         ) : (
           <>
-            <div className="rounded-xl border border-gray-200 p-4 bg-white text-left mb-6">
-              <div className="font-bold text-gray-800 mb-1">Quiz</div>
-              <div className="text-sm text-gray-600 mb-4">
-                Answer all questions, then submit.
-              </div>
+            <div className="bg-card rounded-3xl border border-border shadow-sm p-6 mb-6">
 
               {quizQuestions.length ? (
-                <div className="rounded-xl border border-gray-200 p-4 bg-gray-50">
+                <div className="rounded-2xl border border-border p-5 bg-secondary/30">
                   <div className="flex items-center justify-between mb-3">
-                    <div className="text-sm font-bold text-gray-700">
+                    <div className="text-sm font-bold text-foreground">
                       Question {quizIndex + 1} of {quizQuestions.length}
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-muted-foreground">
                       {Math.round(((quizIndex + 1) / quizQuestions.length) * 100)}%
                     </div>
                   </div>
 
                   {!isMoneyQuiz ? (
                     <div className="flex items-start justify-between gap-3 mb-2">
-                      <div className="font-semibold text-gray-800">
+                      <div className="font-semibold text-foreground">
                         {currentQuiz?.prompt}
                       </div>
                       <button
                         type="button"
                         onClick={() => speak(currentQuiz?.prompt ?? "")}
-                        className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-50"
+                         className="px-3 py-2 rounded-xl border border-border text-sm font-bold text-foreground hover:bg-secondary transition"
                       >
                         🔊 Read
                       </button>
@@ -2341,7 +2357,7 @@ function SessionPage() {
                       <button
                         type="button"
                         onClick={() => speak(currentQuiz?.prompt ?? "")}
-                        className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-50"
+                        className="px-3 py-2 rounded-xl border border-border text-sm font-bold text-foreground hover:bg-secondary transition"
                       >
                         🔊 Read
                       </button>
@@ -2735,7 +2751,7 @@ function SessionPage() {
                         <button
                           type="button"
                           onClick={() => speak(currentQuiz.audioText ?? "")}
-                          className="mb-2 px-4 py-3 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition w-full"
+                          className="mb-2 px-4 py-3 rounded-2xl bg-trust-blue text-white font-bold hover:opacity-90 transition w-full"
                         >
                           🔊 Listen
                         </button>
@@ -2747,11 +2763,11 @@ function SessionPage() {
                           <button
                             key={`${currentQuiz.id}-${oi}`}
                             onClick={() => chooseQuiz(quizIndex, oi)}
-                            className={[
-                              "text-left p-3 rounded-xl border transition",
+                             className={[
+                              "text-left px-4 py-3 rounded-2xl border-2 font-semibold transition-all",
                               selected
-                                ? "border-indigo-800 bg-indigo-50"
-                                : "border-gray-200 hover:border-indigo-400 bg-white",
+                                ? "border-trust-blue bg-trust-blue-light text-foreground shadow-sm"
+                                : "border-border bg-card hover:border-trust-blue/40 text-foreground",
                             ].join(" ")}
                           >
                             {opt}
@@ -2768,17 +2784,17 @@ function SessionPage() {
               <button
                 onClick={() => setQuizIndex((i) => Math.max(0, i - 1))}
                 disabled={quizIndex === 0}
-                className={[
-                  "px-4 py-2 rounded-xl font-bold transition",
+                 className={[
+                  "px-4 py-3 rounded-2xl font-bold transition",
                   quizIndex === 0
-                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                    : "bg-gray-100 text-gray-800 hover:bg-gray-200",
+                    ? "bg-muted text-muted-foreground cursor-not-allowed"
+                    : "bg-secondary text-secondary-foreground hover:bg-muted",
                 ].join(" ")}
               >
                 Back
               </button>
 
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-muted-foreground">
                 {quizSubmitted
                   ? `Final Score: ${finalScore}/${quizQuestions.length} (${Math.round(
                       (finalScore / Math.max(1, quizQuestions.length)) * 100
@@ -2790,7 +2806,7 @@ function SessionPage() {
                 <div className="flex items-center gap-3">
                   <button
                     onClick={backToWeek}
-                    className="px-5 py-2 rounded-xl font-bold transition bg-gray-100 text-gray-800 hover:bg-gray-200"
+                    className="px-5 py-3 rounded-2xl font-bold transition bg-secondary text-secondary-foreground hover:bg-muted"
                   >
                     Back to Week
                   </button>
@@ -2804,7 +2820,7 @@ function SessionPage() {
                           )}`
                         )
                       }
-                      className="px-5 py-2 rounded-xl font-bold transition bg-indigo-600 text-white hover:bg-indigo-700"
+                      className="px-5 py-3 rounded-2xl font-bold transition bg-trust-blue text-white hover:opacity-90"
                     >
                       Go to Week {Math.min(12, Number(week) + 1)}
                     </button>
@@ -2818,11 +2834,11 @@ function SessionPage() {
                     )
                   }
                   disabled={!currentAnswered}
-                  className={[
-                    "px-5 py-2 rounded-xl font-bold transition",
+                   className={[
+                    "px-6 py-3 rounded-2xl font-bold transition",
                     currentAnswered
-                      ? "bg-indigo-600 text-white hover:bg-indigo-700"
-                      : "bg-gray-200 text-gray-400 cursor-not-allowed",
+                      ? "bg-trust-blue text-white hover:opacity-90"
+                      : "bg-muted text-muted-foreground cursor-not-allowed",
                   ].join(" ")}
                 >
                   Next
@@ -2831,9 +2847,9 @@ function SessionPage() {
                 <button
                   onClick={submitQuiz}
                   disabled={!quizComplete}
-                  className={[
-                    "px-5 py-2 rounded-xl font-bold transition",
-                    quizComplete ? "bg-green-500 text-white hover:bg-green-600" : "bg-gray-200 text-gray-400 cursor-not-allowed",
+                   className={[
+                    "px-6 py-3 rounded-2xl font-bold transition",
+                    quizComplete ? "bg-primary text-primary-foreground hover:opacity-90" : "bg-muted text-muted-foreground cursor-not-allowed",
                   ].join(" ")}
                 >
                   Submit Quiz
@@ -2841,18 +2857,16 @@ function SessionPage() {
               )}
             </div>
 
-            <p className="text-xs text-gray-400">
-              MVP: quiz completion is saved locally.
-            </p>
+            
 
             {quizSubmitted && finalScore >= Math.ceil(quizQuestions.length * ((quizConfig?.passPercent ?? 80) / 100)) ? (
-              <div className="mt-4 rounded-xl border border-green-200 bg-green-50 p-3 text-sm font-bold text-green-800">
+              <div className="mt-4 rounded-2xl border border-primary/20 bg-primary-light p-4 text-sm font-bold text-primary">
                 🎉 Congratulations — you’re one step closer to unlocking your Level Up Legend!
               </div>
             ) : null}
 
             {quizSubmitted && finalScore < Math.ceil(quizQuestions.length * ((quizConfig?.passPercent ?? 80) / 100)) ? (
-              <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-bold text-amber-900 flex items-center justify-between gap-3">
+              <div className="mt-4 rounded-2xl border border-accent/30 p-4 text-sm font-bold text-accent-foreground flex items-center justify-between gap-3" style={{ background: "hsl(42 95% 97%)" }}>
                 <div>
                   You’re close! Let’s try the lessons again to build confidence.
                 </div>
@@ -2864,7 +2878,7 @@ function SessionPage() {
                       )}&lessonId=y1-w${week}-l1`
                     )
                   }
-                  className="px-4 py-2 rounded-xl bg-amber-600 text-white font-bold hover:bg-amber-700 transition"
+                  className="px-4 py-3 rounded-2xl bg-accent text-accent-foreground font-bold hover:opacity-90 transition"
                 >
                   Back to Lesson 1
                 </button>
@@ -2872,7 +2886,9 @@ function SessionPage() {
             ) : null}
           </>
         )}
-      </div>
+          </div>{/* end bg-background px-6 py-8 */}
+        </div>{/* end wrapper card */}
+      </div>{/* end max-w-5xl */}
     </main>
   );
 }
