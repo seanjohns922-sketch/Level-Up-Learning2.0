@@ -75,7 +75,7 @@ export default function NumberLineTap({
             <div
               key={t}
               className="absolute top-4 text-center pointer-events-none"
-              style={{ left: `calc(16px + ${pct}% * (100% - 32px) / 100%)`, transform: "translateX(-50%)" }}
+              style={{ left: `${pct}%`, transform: "translateX(-50%)" }}
             >
               <div className="mx-auto h-4 w-0.5 bg-muted-foreground/40" />
               <div className="mt-1 text-xs font-bold text-muted-foreground">{t}</div>
@@ -87,7 +87,7 @@ export default function NumberLineTap({
         {markerPct !== null && (
           <div
             className="absolute top-6 flex flex-col items-center pointer-events-none"
-            style={{ left: `calc(16px + ${markerPct}% * (100% - 32px) / 100%)`, transform: "translateX(-50%)" }}
+            style={{ left: `${markerPct}%`, transform: "translateX(-50%)" }}
           >
             <div
               className={[
