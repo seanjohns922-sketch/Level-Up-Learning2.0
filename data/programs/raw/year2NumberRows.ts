@@ -370,11 +370,19 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 1,
     topic: "Use jump strategy for subtraction",
     activity: "Jump back on number line",
-    activities: genericActivities("subtraction_strategy", {
-      min: 0,
-      max: 100,
-      mode: "jump",
-    }),
+    activities: interactiveActivities(
+      "subtraction_strategy",
+      {
+        min: 0,
+        max: 100,
+        mode: "jump",
+      },
+      genericActivities("subtraction_strategy", {
+        min: 0,
+        max: 100,
+        mode: "jump",
+      })
+    ),
     curriculum: ["AC9M2N04"],
   },
   {
@@ -383,11 +391,19 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 2,
     topic: "Use split strategy to subtract 2-digit numbers",
     activity: "Split and subtract each place",
-    activities: genericActivities("subtraction_strategy", {
-      min: 10,
-      max: 99,
-      mode: "split",
-    }),
+    activities: interactiveActivities(
+      "subtraction_strategy",
+      {
+        min: 10,
+        max: 99,
+        mode: "split",
+      },
+      genericActivities("subtraction_strategy", {
+        min: 10,
+        max: 99,
+        mode: "split",
+      })
+    ),
     curriculum: ["AC9M2N04"],
   },
   {
@@ -396,11 +412,19 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 3,
     topic: "Use fact strategies to subtract",
     activity: "Subtract using known facts",
-    activities: genericActivities("subtraction_strategy", {
-      min: 0,
-      max: 100,
-      mode: "fact_strategy",
-    }),
+    activities: interactiveActivities(
+      "subtraction_strategy",
+      {
+        min: 0,
+        max: 100,
+        mode: "fact_strategy",
+      },
+      genericActivities("subtraction_strategy", {
+        min: 0,
+        max: 100,
+        mode: "fact_strategy",
+      })
+    ),
     curriculum: ["AC9M2N04"],
   },
   {
@@ -409,11 +433,19 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 1,
     topic: "Recognise fact families for + and -",
     activity: "Use triangle cards",
-    activities: genericActivities("fact_family", {
-      min: 0,
-      max: 20,
-      mode: "recognise",
-    }),
+    activities: interactiveActivities(
+      "fact_family",
+      {
+        min: 0,
+        max: 20,
+        mode: "recognise",
+      },
+      genericActivities("fact_family", {
+        min: 0,
+        max: 20,
+        mode: "recognise",
+      })
+    ),
     curriculum: ["AC9M2N05"],
   },
   {
@@ -422,11 +454,19 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 2,
     topic: "Write 4 number sentences from a fact family",
     activity: "Write related facts from 3 numbers",
-    activities: genericActivities("fact_family", {
-      min: 0,
-      max: 20,
-      mode: "write_sentences",
-    }),
+    activities: interactiveActivities(
+      "fact_family",
+      {
+        min: 0,
+        max: 20,
+        mode: "write_sentences",
+      },
+      genericActivities("fact_family", {
+        min: 0,
+        max: 20,
+        mode: "write_sentences",
+      })
+    ),
     curriculum: ["AC9M2N05"],
   },
   {
@@ -435,11 +475,19 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 3,
     topic: "Use fact families to solve word problems",
     activity: "Match fact families to word problems",
-    activities: genericActivities("fact_family", {
-      min: 0,
-      max: 20,
-      mode: "word_problems",
-    }),
+    activities: interactiveActivities(
+      "fact_family",
+      {
+        min: 0,
+        max: 20,
+        mode: "word_problems",
+      },
+      genericActivities("fact_family", {
+        min: 0,
+        max: 20,
+        mode: "word_problems",
+      })
+    ),
     curriculum: ["AC9M2N05"],
   },
   {
@@ -493,12 +541,21 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 1,
     topic: "Recall and skip count by 2s",
     activity: "Skip count using number lines",
-    activities: genericActivities("skip_count", {
-      min: 0,
-      max: 100,
-      step: 2,
-      mode: "forward",
-    }),
+    activities: interactiveActivities(
+      "skip_count",
+      {
+        min: 0,
+        max: 100,
+        step: 2,
+        mode: "forward",
+      },
+      genericActivities("skip_count", {
+        min: 0,
+        max: 100,
+        step: 2,
+        mode: "forward",
+      })
+    ),
     curriculum: ["AC9M2N03"],
   },
   {
@@ -507,12 +564,21 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 2,
     topic: "Recall and skip count by 5s",
     activity: "Chant and recall facts with music",
-    activities: genericActivities("skip_count", {
-      min: 0,
-      max: 100,
-      step: 5,
-      mode: "forward",
-    }),
+    activities: interactiveActivities(
+      "skip_count",
+      {
+        min: 0,
+        max: 100,
+        step: 5,
+        mode: "forward",
+      },
+      genericActivities("skip_count", {
+        min: 0,
+        max: 100,
+        step: 5,
+        mode: "forward",
+      })
+    ),
     curriculum: ["AC9M2N03"],
   },
   {
@@ -521,12 +587,21 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 3,
     topic: "Recall and skip count by 10s",
     activity: "Write and recall fact families",
-    activities: genericActivities("skip_count", {
-      min: 0,
-      max: 1000,
-      step: 10,
-      mode: "forward",
-    }),
+    activities: interactiveActivities(
+      "skip_count",
+      {
+        min: 0,
+        max: 1000,
+        step: 10,
+        mode: "forward",
+      },
+      genericActivities("skip_count", {
+        min: 0,
+        max: 1000,
+        step: 10,
+        mode: "forward",
+      })
+    ),
     curriculum: ["AC9M2N03"],
   },
   {

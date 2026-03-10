@@ -52,6 +52,36 @@ export type AdditionStrategyQuestion = {
   mode: "jump" | "split" | "friendly_numbers";
 };
 
+export type SubtractionStrategyQuestion = {
+  kind: "subtraction_strategy";
+  prompt: string;
+  hint: string;
+  total: number;
+  remove: number;
+  answer: number;
+  options: number[];
+  mode: "jump" | "split" | "fact_strategy";
+};
+
+export type FactFamilyQuestion = {
+  kind: "fact_family";
+  prompt: string;
+  family: [number, number, number];
+  options: string[];
+  answer: string;
+  mode: "recognise" | "write_sentences" | "word_problems";
+};
+
+export type SkipCountQuestion = {
+  kind: "skip_count";
+  prompt: string;
+  sequence: number[];
+  answer: number;
+  options: number[];
+  step: number;
+  mode: "forward";
+};
+
 export type MultipleChoiceQuestion = {
   kind: "multiple_choice";
   prompt: string;
@@ -74,6 +104,9 @@ export type Year2QuestionData =
   | PartitionExpandQuestion
   | NumberLineQuestion
   | AdditionStrategyQuestion
+  | SubtractionStrategyQuestion
+  | FactFamilyQuestion
+  | SkipCountQuestion
   | MultipleChoiceQuestion
   | TypedResponseQuestion;
 
@@ -294,6 +327,97 @@ function generateInteractiveQuestion(
       answer,
       options: uniqueNumberOptions(answer).map(Number),
       mode,
+    };
+  }
+
+  if (activityType === "subtraction_strategy") {
+    const min = typeof config.min === "number" ? config.min : 0;
+    const max = typeof config.max === "number" ? config.max : 100;
+    const mode =
+      config.mode === "split" || config.mode === "fact_strategy"
+        ? config.mode
+        : "jump";
+    let total = randInt(Math.max(12, min), Math.max(20, max));
+    let remove = randInt(2, Math.min(18, total - 1));
+
+    if (mode === "split") {
+      total = randInt(30, Math.max(40, max));
+      remove = randInt(11, Math.min(19, total - 1));
+    }
+
+    if (mode === "fact_strategy") {
+      total = randInt(12, Math.max(20, max));
+      remove = randInt(2, 9);
+    }
+
+    const answer = total - remove;
+    return {
+      kind: "subtraction_strategy",
+      prompt: `Solve ${total} - ${remove}.`,
+      hint:
+        mode === "jump"
+          ? `Start at ${total} and jump back ${remove}.`
+          : mode === "split"
+          ? `Split ${remove} into tens and ones, then subtract each part.`
+          : "Use a known fact or inverse addition fact.",
+      total,
+      remove,
+      answer,
+      options: uniqueNumberOptions(answer, 10).map(Number),
+      mode,
+    };
+  }
+
+  if (activityType === "fact_family") {
+    const mode =
+      config.mode === "write_sentences" || config.mode === "word_problems"
+        ? config.mode
+        : "recognise";
+    const a = randInt(2, 9);
+    const b = randInt(1, 9);
+    const total = a + b;
+    const family: [number, number, number] = [a, b, total];
+    const correctSentence =
+      mode === "write_sentences"
+        ? `${total} - ${a} = ${b}`
+        : mode === "word_problems"
+        ? `${a} + ${b} = ${total}`
+        : `${b} + ${a} = ${total}`;
+
+    const distractors = shuffle([
+      `${total} + ${a} = ${b}`,
+      `${a} - ${b} = ${total}`,
+      `${total} - ${b} = ${a + 1}`,
+    ]);
+
+    return {
+      kind: "fact_family",
+      prompt:
+        mode === "write_sentences"
+          ? "Choose a correct number sentence from this fact family."
+          : mode === "word_problems"
+          ? "Choose the number sentence that matches this fact family."
+          : "Which sentence belongs to this fact family?",
+      family,
+      options: shuffle([correctSentence, ...distractors]).slice(0, 4),
+      answer: correctSentence,
+      mode,
+    };
+  }
+
+  if (activityType === "skip_count") {
+    const step = typeof config.step === "number" ? config.step : 2;
+    const start = randInt(0, 5) * step;
+    const sequence = [start, start + step, start + step * 2, start + step * 3];
+    const answer = start + step * 4;
+    return {
+      kind: "skip_count",
+      prompt: `Keep skip counting by ${step}.`,
+      sequence,
+      answer,
+      options: uniqueNumberOptions(answer, step * 3).map(Number),
+      step,
+      mode: "forward",
     };
   }
 

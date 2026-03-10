@@ -1,19 +1,25 @@
 "use client";
 
 import AdditionStrategy from "@/components/activities/AdditionStrategy";
+import FactFamily from "@/components/activities/FactFamily";
 import MultipleChoiceActivity from "@/components/activities/MultipleChoiceActivity";
 import NumberOrder from "@/components/activities/NumberOrder";
 import NumberLineActivity from "@/components/activities/NumberLineActivity";
 import PartitionExpand from "@/components/activities/PartitionExpand";
 import PlaceValueBuilder from "@/components/activities/PlaceValueBuilder";
+import SkipCount from "@/components/activities/SkipCount";
+import SubtractionStrategy from "@/components/activities/SubtractionStrategy";
 import TypedResponseActivity from "@/components/activities/TypedResponseActivity";
 import type {
   AdditionStrategyQuestion,
+  FactFamilyQuestion,
   MultipleChoiceQuestion,
   NumberLineQuestion,
   NumberOrderQuestion,
   PartitionExpandQuestion,
   PlaceValueBuilderQuestion,
+  SkipCountQuestion,
+  SubtractionStrategyQuestion,
   TypedResponseQuestion,
   Year2QuestionData,
 } from "@/data/activities/year2/lessonEngine";
@@ -95,6 +101,30 @@ export function LessonRenderer({
       return (
         <AdditionStrategy
           questionData={questionData as AdditionStrategyQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
+        />
+      );
+    case "subtraction_strategy":
+      return (
+        <SubtractionStrategy
+          questionData={questionData as SubtractionStrategyQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
+        />
+      );
+    case "fact_family":
+      return (
+        <FactFamily
+          questionData={questionData as FactFamilyQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
+        />
+      );
+    case "skip_count":
+      return (
+        <SkipCount
+          questionData={questionData as SkipCountQuestion}
           onCorrect={onCorrect}
           onWrong={onWrong}
         />
