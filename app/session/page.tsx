@@ -2341,7 +2341,7 @@ function SessionPage() {
 
                   {!isMoneyQuiz ? (
                     <div className="flex items-start justify-between gap-3 mb-2">
-                      <div className="font-semibold text-gray-800">
+                      <div className="font-semibold text-foreground">
                         {currentQuiz?.prompt}
                       </div>
                       <button
