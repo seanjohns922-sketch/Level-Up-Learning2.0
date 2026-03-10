@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { clearScopedProgress, readProgress, StudentProgress } from "@/data/progress";
+import { clearScopedProgress, readProgress, writeProgress, StudentProgress } from "@/data/progress";
 import { clearScopedProgramStore } from "@/lib/program-progress";
 import { getProgramForYear } from "@/data/programs";
 import { DEMO_MODE } from "@/data/config";
