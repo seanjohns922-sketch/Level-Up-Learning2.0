@@ -2860,7 +2860,7 @@ function SessionPage() {
             
 
             {quizSubmitted && finalScore >= Math.ceil(quizQuestions.length * ((quizConfig?.passPercent ?? 80) / 100)) ? (
-              <div className="mt-4 rounded-xl border border-green-200 bg-green-50 p-3 text-sm font-bold text-green-800">
+              <div className="mt-4 rounded-2xl border border-primary/20 bg-primary-light p-4 text-sm font-bold text-primary">
                 🎉 Congratulations — you’re one step closer to unlocking your Level Up Legend!
               </div>
             ) : null}
