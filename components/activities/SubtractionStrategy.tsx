@@ -32,22 +32,65 @@ export default function SubtractionStrategy({
         <p className="mt-2 text-sm text-gray-600">{questionData.hint}</p>
       </div>
 
-      <div className="mt-6 rounded-2xl border border-indigo-100 bg-indigo-50 p-4">
-        <div className="text-xs font-bold uppercase tracking-wide text-indigo-700">
-          Strategy model
+      {questionData.mode === "jump" && (() => {
+        const tens = Math.floor(questionData.remove / 10) * 10;
+        const ones = questionData.remove % 10;
+        const afterTens = questionData.total - tens;
+        return (
+          <div className="mt-6 rounded-2xl border border-indigo-100 bg-indigo-50 p-4">
+            <div className="text-xs font-bold uppercase tracking-wide text-indigo-700">
+              Jump back strategy
+            </div>
+            <div className="mt-2 text-sm font-bold text-gray-700">
+              Start at {questionData.total} and jump back {questionData.remove}.
+            </div>
+            {tens > 0 && (
+              <div className="mt-1 text-sm font-bold text-gray-700">
+                {questionData.total} → {afterTens} (−{tens})
+              </div>
+            )}
+            {ones > 0 && (
+              <div className="text-sm font-bold text-gray-700">
+                {afterTens} → ? (−{ones})
+              </div>
+            )}
+            {tens === 0 && (
+              <div className="mt-1 text-sm font-bold text-gray-700">
+                {questionData.total} → ? (−{ones})
+              </div>
+            )}
+          </div>
+        );
+      })()}
+
+      {questionData.mode === "split" && (() => {
+        const tens = Math.floor(questionData.remove / 10) * 10;
+        const ones = questionData.remove % 10;
+        return (
+          <div className="mt-6 rounded-2xl border border-indigo-100 bg-indigo-50 p-4">
+            <div className="text-xs font-bold uppercase tracking-wide text-indigo-700">
+              Split strategy
+            </div>
+            <div className="mt-2 text-sm font-bold text-gray-700">
+              Split {questionData.remove} into {tens} and {ones}.
+            </div>
+            <div className="mt-1 text-sm font-bold text-gray-700">
+              {questionData.total} − {tens} − {ones} = ?
+            </div>
+          </div>
+        );
+      })()}
+
+      {questionData.mode === "fact_strategy" && (
+        <div className="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
+          <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">
+            Think addition
+          </div>
+          <div className="mt-2 text-sm font-bold text-gray-700">
+            {questionData.remove} + ? = {questionData.total}
+          </div>
         </div>
-        <div className="mt-2 text-3xl font-black text-indigo-900">
-          {questionData.mode === "jump" &&
-            `${questionData.total} -> ${questionData.answer}`}
-          {questionData.mode === "split" && (() => {
-            const tens = Math.floor(questionData.remove / 10) * 10;
-            const ones = questionData.remove % 10;
-            return `${questionData.total} - ${tens} - ${ones}`;
-          })()}
-          {questionData.mode === "fact_strategy" &&
-            `${questionData.answer} + ${questionData.remove} = ${questionData.total}`}
-        </div>
-      </div>
+      )}
 
       <div className="mt-6 grid gap-3">
         {questionData.options.map((option) => (
