@@ -2329,7 +2329,7 @@ function SessionPage() {
             <div className="bg-card rounded-3xl border border-border shadow-sm p-6 mb-6">
 
               {quizQuestions.length ? (
-                <div className="rounded-xl border border-gray-200 p-4 bg-gray-50">
+                <div className="rounded-2xl border border-border p-5 bg-secondary/30">
                   <div className="flex items-center justify-between mb-3">
                     <div className="text-sm font-bold text-gray-700">
                       Question {quizIndex + 1} of {quizQuestions.length}
