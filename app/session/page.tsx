@@ -2806,7 +2806,7 @@ function SessionPage() {
                 <div className="flex items-center gap-3">
                   <button
                     onClick={backToWeek}
-                    className="px-5 py-2 rounded-xl font-bold transition bg-gray-100 text-gray-800 hover:bg-gray-200"
+                    className="px-5 py-3 rounded-2xl font-bold transition bg-secondary text-secondary-foreground hover:bg-muted"
                   >
                     Back to Week
                   </button>
