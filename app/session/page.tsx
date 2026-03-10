@@ -2751,7 +2751,7 @@ function SessionPage() {
                         <button
                           type="button"
                           onClick={() => speak(currentQuiz.audioText ?? "")}
-                          className="mb-2 px-4 py-3 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition w-full"
+                          className="mb-2 px-4 py-3 rounded-2xl bg-trust-blue text-white font-bold hover:opacity-90 transition w-full"
                         >
                           🔊 Listen
                         </button>
