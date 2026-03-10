@@ -1624,66 +1624,9 @@ function SessionPage() {
   }
 
   // ---------------------------
-  // LESSON: Video -> Activities -> Complete
+  // LESSON: Intro screen -> Begin Practice -> Complete
   // ---------------------------
-  const [videoWatched, setVideoWatched] = useState(false);
-
-  const activity1 = useMemo(
-    () => ({
-      prompt: "Which number is the largest?",
-      options: ["48", "84", "54", "45"],
-      correctIndex: 1,
-    }),
-    []
-  );
-
-  const activity2 = useMemo(
-    () => ({
-      prompt: "What is 7 + 8?",
-      options: ["14", "15", "16", "17"],
-      correctIndex: 1,
-    }),
-    []
-  );
-
-  const activity3 = useMemo(
-    () => ({
-      prompt: "Put these in order from smallest to largest:",
-      start: ["305", "530", "350"],
-      correct: ["305", "350", "530"],
-    }),
-    []
-  );
-
-  const [mcq1, setMcq1] = useState<number | null>(null);
-  const [mcq2, setMcq2] = useState<number | null>(null);
-  const [order, setOrder] = useState<string[]>(activity3.start);
-
-  function shuffleOrder() {
-    const copy = [...order];
-    for (let i = copy.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [copy[i], copy[j]] = [copy[j], copy[i]];
-    }
-    setOrder(copy);
-  }
-
-  function moveUp(idx: number) {
-    if (idx === 0) return;
-    const copy = [...order];
-    [copy[idx - 1], copy[idx]] = [copy[idx], copy[idx - 1]];
-    setOrder(copy);
-  }
-
-  function moveDown(idx: number) {
-    if (idx === order.length - 1) return;
-    const copy = [...order];
-    [copy[idx + 1], copy[idx]] = [copy[idx], copy[idx + 1]];
-    setOrder(copy);
-  }
-
-  const orderCorrect = JSON.stringify(order) === JSON.stringify(activity3.correct);
-  const activitiesComplete = mcq1 !== null && mcq2 !== null && orderCorrect;
+  const [lessonStarted, setLessonStarted] = useState(false);
 
   function completeLesson() {
     const store = readStore();
@@ -2154,10 +2097,11 @@ function SessionPage() {
             </div>
             <h1 className="text-3xl md:text-4xl font-extrabold font-display">{title}</h1>
             {isLesson && (
-              <p className="text-white/80 text-sm mt-1">Watch the video and complete activities</p>
-            )}
-            {!isLesson && (
-              <p className="text-white/80 text-sm mt-1">Answer all questions, then submit</p>
+              <p className="text-white/80 text-sm mt-1">
+                {isLesson
+                  ? (lessonStarted ? "Complete the timed practice" : "Watch the video and begin practice")
+                  : "Answer all questions, then submit"}
+              </p>
             )}
           </div>
 
@@ -2165,164 +2109,58 @@ function SessionPage() {
 
         {isLesson ? (
           <>
-            {/* Video section */}
-            <div className="bg-card rounded-3xl border border-border shadow-sm p-6 mb-8">
-              <div className="flex items-center gap-2 text-foreground font-bold mb-5">
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-trust-blue-light text-trust-blue">
-                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </span>
-                Lesson Video
-              </div>
-              <div className="aspect-video rounded-2xl border-2 border-dashed border-border bg-card flex items-center justify-center text-muted-foreground">
-                <div className="text-center">
-                  <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-trust-blue-light text-trust-blue">
-                    <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
+            {!lessonStarted ? (
+              <>
+                {/* Video section */}
+                <div className="bg-card rounded-3xl border border-border shadow-sm p-6 mb-8">
+                  <div className="flex items-center gap-2 text-foreground font-bold mb-5">
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-trust-blue-light text-trust-blue">
+                      <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </span>
+                    Lesson Video
                   </div>
-                  <div>Video coming soon</div>
-                </div>
-              </div>
-              <label className="flex items-center gap-3 text-sm text-foreground mt-4 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={videoWatched}
-                  onChange={(e) => setVideoWatched(e.target.checked)}
-                  className="h-5 w-5 rounded border-border accent-primary"
-                />
-                I watched the video
-              </label>
-            </div>
-
-            {/* Activities section */}
-            <div
-              className={[
-                "bg-card rounded-3xl border border-border shadow-sm p-6 mb-8 transition-all",
-                !videoWatched ? "opacity-50 pointer-events-none" : "",
-              ].join(" ")}
-            >
-              <div className="flex items-center gap-2 text-foreground font-bold mb-5">
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary-light text-primary">
-                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.6-4.9-2.6-4.9 2.6.9-5.6-4-3.9 5.5-.8z" />
-                  </svg>
-                </span>
-                Activities
-              </div>
-
-              <div className="space-y-6">
-                <div className="rounded-2xl border border-border bg-secondary/30 p-5">
-                  <div className="font-semibold text-foreground mb-3">Activity 1: {activity1.prompt}</div>
-                  <div className="grid gap-2">
-                    {activity1.options.map((opt, idx) => {
-                      const selected = mcq1 === idx;
-                      return (
-                        <button
-                          key={opt}
-                          disabled={!videoWatched}
-                          onClick={() => setMcq1(idx)}
-                          className={[
-                            "text-left px-4 py-3 rounded-2xl border-2 font-semibold transition-all",
-                            selected
-                              ? "border-primary bg-primary-light text-foreground shadow-sm"
-                              : "border-border bg-card hover:border-primary/40 text-foreground",
-                            !videoWatched ? "cursor-not-allowed" : "",
-                          ].join(" ")}
-                        >
-                          {opt}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border border-border bg-secondary/30 p-5">
-                  <div className="font-semibold text-foreground mb-3">Activity 2: {activity2.prompt}</div>
-                  <div className="grid gap-2">
-                    {activity2.options.map((opt, idx) => {
-                      const selected = mcq2 === idx;
-                      return (
-                        <button
-                          key={opt}
-                          disabled={!videoWatched}
-                          onClick={() => setMcq2(idx)}
-                          className={[
-                            "text-left px-4 py-3 rounded-2xl border-2 font-semibold transition-all",
-                            selected
-                              ? "border-primary bg-primary-light text-foreground shadow-sm"
-                              : "border-border bg-card hover:border-primary/40 text-foreground",
-                            !videoWatched ? "cursor-not-allowed" : "",
-                          ].join(" ")}
-                        >
-                          {opt}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border border-border bg-secondary/30 p-5">
-                  <div className="font-semibold text-foreground mb-3">Activity 3: {activity3.prompt}</div>
-                  <div className="flex items-center gap-3 mb-3">
-                    <button
-                      disabled={!videoWatched}
-                      onClick={shuffleOrder}
-                      className={[
-                        "px-4 py-2 rounded-xl text-sm font-bold transition",
-                        videoWatched
-                          ? "bg-secondary hover:bg-muted text-secondary-foreground"
-                          : "bg-muted text-muted-foreground cursor-not-allowed",
-                      ].join(" ")}
-                    >
-                      🔀 Shuffle
-                    </button>
-                    <div className="text-sm text-muted-foreground">
-                      {orderCorrect ? (
-                        <span className="font-bold text-primary">✓ Correct!</span>
-                      ) : (
-                        <span className="font-semibold">Not yet</span>
-                      )}
+                  <div className="aspect-video rounded-2xl border-2 border-dashed border-border bg-card flex items-center justify-center text-muted-foreground">
+                    <div className="text-center">
+                      <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-trust-blue-light text-trust-blue">
+                        <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </div>
+                      <div>Video coming soon</div>
                     </div>
                   </div>
-                  <div className="grid gap-2">
-                    {order.map((item, idx) => (
-                      <div
-                        key={`${item}-${idx}`}
-                        className="flex items-center justify-between px-4 py-3 rounded-2xl border-2 border-border bg-card"
-                      >
-                        <div className="font-bold text-foreground text-lg">{item}</div>
-                        <div className="flex gap-2">
-                          <button disabled={!videoWatched} onClick={() => moveUp(idx)} className="px-3 py-1 rounded-xl text-sm font-bold bg-secondary hover:bg-muted text-secondary-foreground transition">↑</button>
-                          <button disabled={!videoWatched} onClick={() => moveDown(idx)} className="px-3 py-1 rounded-xl text-sm font-bold bg-secondary hover:bg-muted text-secondary-foreground transition">↓</button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
                 </div>
-              </div>
-            </div>
 
-            {/* Motivation banner */}
-            <div className="rounded-2xl border border-primary/20 bg-primary-light p-6 mb-8">
-              <div className="flex items-center gap-2 font-bold text-primary mb-2">✨ Keep going!</div>
-              <div className="text-sm text-foreground/80">Keep working to unlock your Level Up Legend.</div>
-            </div>
+                {/* Motivation banner */}
+                <div className="rounded-2xl border border-primary/20 bg-primary-light p-6 mb-8">
+                  <div className="flex items-center gap-2 font-bold text-primary mb-2">✨ Keep going!</div>
+                  <div className="text-sm text-foreground/80">Keep working to unlock your Level Up Legend.</div>
+                </div>
 
-            <button
-              onClick={completeLesson}
-              disabled={!videoWatched || !activitiesComplete}
-              className={[
-                "w-full py-4 rounded-2xl font-extrabold text-xl transition-all active:scale-[0.98]",
-                videoWatched && activitiesComplete
-                  ? "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:opacity-90 shadow-lg"
-                  : "bg-muted text-muted-foreground cursor-not-allowed",
-              ].join(" ")}
-              style={videoWatched && activitiesComplete ? { boxShadow: "0 8px 24px -8px hsl(var(--primary) / 0.4)" } : undefined}
-            >
-              Complete Lesson
-            </button>
+                <button
+                  onClick={() => setLessonStarted(true)}
+                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-extrabold text-xl hover:opacity-90 transition-all active:scale-[0.98] shadow-lg"
+                  style={{ boxShadow: "0 8px 24px -8px hsl(var(--primary) / 0.4)" }}
+                >
+                  Begin Practice
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="text-center mb-6">
+                  <div className="text-sm text-muted-foreground">Timed practice — complete questions to finish the lesson</div>
+                </div>
+                <button
+                  onClick={completeLesson}
+                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-extrabold text-xl hover:opacity-90 transition-all active:scale-[0.98] shadow-lg"
+                  style={{ boxShadow: "0 8px 24px -8px hsl(var(--primary) / 0.4)" }}
+                >
+                  Complete Lesson
+                </button>
+              </>
+            )}
           </>
         ) : (
           <>
