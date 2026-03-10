@@ -2857,9 +2857,7 @@ function SessionPage() {
               )}
             </div>
 
-            <p className="text-xs text-gray-400">
-              MVP: quiz completion is saved locally.
-            </p>
+            
 
             {quizSubmitted && finalScore >= Math.ceil(quizQuestions.length * ((quizConfig?.passPercent ?? 80) / 100)) ? (
               <div className="mt-4 rounded-xl border border-green-200 bg-green-50 p-3 text-sm font-bold text-green-800">
