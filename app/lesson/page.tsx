@@ -202,7 +202,8 @@ function LessonPage() {
               }}
               onComplete={completeLesson}
             />
-          </>
+            </div>
+          </div>
         )}
       </div>
     </main>
