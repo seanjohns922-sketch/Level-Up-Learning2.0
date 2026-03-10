@@ -216,7 +216,7 @@ function LessonPage() {
           <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
             <div className="bg-gradient-to-br from-primary to-primary/80 text-white px-6 py-8">
               <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1 text-sm font-semibold mb-3">
-                {year} • Week {week}
+                Level {yearNumber} • Week {week} • Lesson {lessonNumber}
               </div>
               <h1 className="text-3xl md:text-4xl font-extrabold font-display">
                 Lesson {lessonNumber} Practice
