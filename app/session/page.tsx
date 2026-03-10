@@ -2866,7 +2866,7 @@ function SessionPage() {
             ) : null}
 
             {quizSubmitted && finalScore < Math.ceil(quizQuestions.length * ((quizConfig?.passPercent ?? 80) / 100)) ? (
-              <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-bold text-amber-900 flex items-center justify-between gap-3">
+              <div className="mt-4 rounded-2xl border border-accent/30 p-4 text-sm font-bold text-accent-foreground flex items-center justify-between gap-3" style={{ background: "hsl(42 95% 97%)" }}>
                 <div>
                   You’re close! Let’s try the lessons again to build confidence.
                 </div>
