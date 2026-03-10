@@ -112,8 +112,6 @@ export default function LevelsPage() {
       return {
         label: `Open ${targetYear} Program`,
         onClick: () => {
-          // Write minimal progress so home page knows which year to show
-          const { writeProgress, readProgress } = require("@/data/progress");
           const existing = readProgress();
           if (!existing || existing.year !== targetYear) {
             writeProgress({
