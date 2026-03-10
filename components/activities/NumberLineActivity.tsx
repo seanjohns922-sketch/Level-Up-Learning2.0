@@ -123,7 +123,7 @@ export default function NumberLineActivity({
             >
               <div
                 className={[
-                  "w-6 h-6 rounded-full border-3 shadow-lg transition-colors",
+                  "w-4 h-4 rounded-full border-2 shadow-lg transition-colors",
                   checked
                     ? isCorrect
                       ? "bg-primary border-primary-foreground"
