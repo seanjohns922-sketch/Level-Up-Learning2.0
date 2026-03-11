@@ -115,7 +115,7 @@ export default function NumberHunt({
 
       <div className="rounded-2xl border bg-white p-5 mb-4">
         <div className="text-2xl sm:text-3xl font-extrabold text-gray-900">
-          Find <span className="text-indigo-600">{round.target}</span>
+          Find <span className="text-teal-600">{round.target}</span>
         </div>
         <div className="text-sm text-gray-500 mt-1">
           Tap the correct number tile.
