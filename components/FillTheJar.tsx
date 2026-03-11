@@ -103,7 +103,7 @@ export default function FillTheJar({
 
       <div className="rounded-2xl border bg-white p-5 mb-4">
         <div className="text-2xl sm:text-3xl font-extrabold text-gray-900">
-          Fill the jar to <span className="text-indigo-600">{target}</span>
+          Fill the jar to <span className="text-teal-600">{target}</span>
         </div>
         <div className="text-sm text-gray-500 mt-1">
           Tap buttons to add counters. Don’t go over!
