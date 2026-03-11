@@ -66,7 +66,7 @@ export default function StrategySelect({
           onClick={() => setStrategy("countUp")}
           className={[
             "px-4 py-3 rounded-xl border font-bold",
-            strategy === "countUp" ? "border-indigo-600 bg-indigo-50" : "border-gray-200 hover:bg-gray-50",
+            strategy === "countUp" ? "border-teal-600 bg-teal-50" : "border-gray-200 hover:bg-gray-50",
           ].join(" ")}
         >
           Count up
