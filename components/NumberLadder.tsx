@@ -46,7 +46,7 @@ export default function NumberLadder({
               key={n}
               className={[
                 "w-24 h-10 flex items-center justify-center rounded-lg border font-bold",
-                n === pos ? "bg-indigo-600 text-white" : "bg-white",
+                n === pos ? "bg-teal-600 text-white" : "bg-white",
               ].join(" ")}
             >
               {n}
