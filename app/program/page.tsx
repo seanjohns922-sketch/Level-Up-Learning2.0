@@ -201,7 +201,7 @@ function ProgramPage() {
               Level {levelNum} – 12-Week Program
             </span>
             <h1 className="text-4xl md:text-5xl font-black text-white mt-3 tracking-tight">Week {weekNum}</h1>
-            <p className="text-emerald-100 mt-2 text-sm font-medium">
+            <p className="text-teal-100 mt-2 text-sm font-medium">
               {isClient
                 ? weekComplete
                   ? "✅ Completed"
