@@ -71,7 +71,7 @@ export default function GroupBoxesTap({
       <div className="mt-4 flex items-center gap-3">
         <button
           onClick={check}
-          className="px-5 py-3 rounded-xl bg-indigo-600 text-white font-extrabold hover:bg-indigo-700 transition"
+          className="px-5 py-3 rounded-xl bg-teal-600 text-white font-extrabold hover:bg-teal-700 transition"
           type="button"
         >
           Check

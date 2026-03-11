@@ -71,7 +71,7 @@ export default function SplitStepper({
 
       <button
         onClick={check}
-        className="px-5 py-3 rounded-xl bg-indigo-600 text-white font-extrabold"
+        className="px-5 py-3 rounded-xl bg-teal-600 text-white font-extrabold"
       >
         Check
       </button>

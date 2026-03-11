@@ -55,7 +55,7 @@ export default function SubtractMissingPart({
             className={[
               "w-full text-left px-5 py-4 rounded-2xl border text-2xl font-black transition",
               picked === opt
-                ? "border-indigo-600 bg-indigo-50"
+                ? "border-teal-600 bg-teal-50"
                 : "border-gray-200 hover:bg-gray-50",
             ].join(" ")}
             type="button"
