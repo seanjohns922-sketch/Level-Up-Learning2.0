@@ -23,7 +23,7 @@ const REALMS: RealmDef[] = [
   {
     id: "number-nexus",
     name: "Number Nexus",
-    legendLine: "Numbots",
+    legendLine: "Numbot Collection",
     icon: <Zap className="h-6 w-6" />,
     totalLegends: 7,
     status: "open",
