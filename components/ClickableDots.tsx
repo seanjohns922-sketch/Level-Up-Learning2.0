@@ -71,7 +71,7 @@ export function ClickableDotRows({
   dotSize = 14,
   gap = 8,
   rowGap = 10,
-  activeClassName = "bg-indigo-600",
+  activeClassName = "bg-teal-600",
   inactiveClassName = "bg-white",
   borderClassName = "border border-gray-200",
   highlightRow,
