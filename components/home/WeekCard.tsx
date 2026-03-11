@@ -21,9 +21,12 @@ export default function WeekCard({ week, lessonsDone, topic, lessons, onContinue
         </span>
         <span className="text-xs text-muted-foreground font-medium">{lessonsDone}/3 done</span>
       </div>
-      <h2 className="text-xl font-black text-foreground leading-tight">
-        {topic ?? "Your current focus"}
-      </h2>
+      <div className="flex items-center gap-2">
+        <h2 className="text-xl font-black text-foreground leading-tight">
+          {topic ?? "Your current focus"}
+        </h2>
+        <ReadAloudBtn text={`Week ${week}. ${topic ?? "Your current focus"}. ${lessonsDone} of 3 lessons done. ${lessons.map(l => `Lesson ${l.lesson}: ${l.title}`).join(". ")}`} />
+      </div>
 
       <div className="mt-3.5 grid gap-2">
         {lessons.map((lesson) => (
