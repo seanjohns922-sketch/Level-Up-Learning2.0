@@ -79,8 +79,8 @@ export default function MentalAdd({
       const need = Math.max(0, 10 - a);
       const leftover = Math.max(0, b - need);
       return (
-        <div className="mt-4 rounded-2xl border border-indigo-100 bg-indigo-50 p-4">
-          <div className="text-xs font-bold text-indigo-700 mb-3">
+        <div className="mt-4 rounded-2xl border border-teal-100 bg-teal-50 p-4">
+          <div className="text-xs font-bold text-teal-700 mb-3">
             Make 10, then add the rest
           </div>
           <div className="grid gap-3">
