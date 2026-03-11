@@ -129,9 +129,9 @@ export default function PartPartWhole({
           ) : null}
         </div>
 
-        <div className="col-span-2 rounded-2xl border-2 border-indigo-200 bg-indigo-50 p-5 text-center">
-          <div className="text-xs font-bold text-indigo-700 mb-2">Whole</div>
-          <div className="text-5xl font-black text-indigo-900">
+        <div className="col-span-2 rounded-2xl border-2 border-teal-200 bg-teal-50 p-5 text-center">
+          <div className="text-xs font-bold text-teal-700 mb-2">Whole</div>
+          <div className="text-5xl font-black text-teal-900">
             {mode === "missingWhole" ? "?" : whole}
           </div>
           {showDots && showWhole ? (
