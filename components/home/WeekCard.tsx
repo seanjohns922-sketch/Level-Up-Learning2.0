@@ -1,5 +1,7 @@
 "use client";
 
+import ReadAloudBtn from "@/components/ReadAloudBtn";
+
 type Lesson = { id: string; lesson: number; title: string };
 
 type Props = {
