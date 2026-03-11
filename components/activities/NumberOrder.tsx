@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { NumberOrderQuestion } from "@/data/activities/year2/lessonEngine";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 export default function NumberOrder({
   questionData,
