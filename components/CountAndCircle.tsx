@@ -103,7 +103,7 @@ export default function CountAndCircle({
               className={[
                 "w-10 h-10 rounded-full border-2 transition",
                 on
-                  ? "bg-indigo-600 border-indigo-700"
+                  ? "bg-teal-600 border-teal-700"
                   : "bg-white border-gray-300 hover:bg-gray-50",
               ].join(" ")}
               type="button"
