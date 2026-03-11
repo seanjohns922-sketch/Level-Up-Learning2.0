@@ -85,7 +85,7 @@ export default function NumberOrder({
             selected.map((n, i) => (
               <div
                 key={`${n}-${i}`}
-                className="rounded-xl bg-white px-4 py-3 text-xl font-black text-indigo-900 shadow-sm"
+                className="rounded-xl bg-white px-4 py-3 text-xl font-black text-teal-900 shadow-sm"
               >
                 {n}
               </div>
