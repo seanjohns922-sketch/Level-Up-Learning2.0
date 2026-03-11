@@ -53,7 +53,7 @@ export default function SubtractMoveToTaken({
                 <button
                   key={i}
                   onClick={() => toggle(i)}
-                  className="h-9 w-9 rounded-full border-2 border-indigo-600 bg-indigo-100"
+                  className="h-9 w-9 rounded-full border-2 border-teal-600 bg-teal-100"
                   type="button"
                 />
               ) : null
