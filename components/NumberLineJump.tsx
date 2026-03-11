@@ -39,7 +39,7 @@ export default function NumberLineJump({
       <div className="rounded-2xl border bg-white p-4 mb-4">
         <div className="flex items-center justify-between">
           <div className="text-sm text-gray-500">Current</div>
-          <div className="text-3xl font-extrabold text-indigo-700">{pos}</div>
+          <div className="text-3xl font-extrabold text-teal-700">{pos}</div>
         </div>
       </div>
 
