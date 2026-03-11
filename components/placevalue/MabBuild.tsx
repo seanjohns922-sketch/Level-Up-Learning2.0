@@ -64,7 +64,7 @@ export default function MabBuild({
                       key={k}
                       className={[
                         "h-2 rounded",
-                        selected ? "bg-indigo-600/60" : "bg-gray-200",
+                        selected ? "bg-teal-600/60" : "bg-gray-200",
                       ].join(" ")}
                     />
                   ))}
