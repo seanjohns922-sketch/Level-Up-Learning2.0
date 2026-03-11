@@ -76,7 +76,7 @@ export default function StrategySelect({
           onClick={() => setStrategy("takeAway")}
           className={[
             "px-4 py-3 rounded-xl border font-bold",
-            strategy === "takeAway" ? "border-indigo-600 bg-indigo-50" : "border-gray-200 hover:bg-gray-50",
+            strategy === "takeAway" ? "border-teal-600 bg-teal-50" : "border-gray-200 hover:bg-gray-50",
           ].join(" ")}
         >
           Take away one by one

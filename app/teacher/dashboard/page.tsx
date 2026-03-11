@@ -418,7 +418,7 @@ export default function TeacherDashboardPage() {
 
           {legends.length > 0 && (
             <div className="mt-4 flex items-center gap-2 text-sm">
-              <span className="text-purple-600 font-bold">🏆 Legend Unlocked</span>
+              <span className="text-teal-600 font-bold">🏆 Legend Unlocked</span>
             </div>
           )}
         </div>

@@ -153,7 +153,7 @@ export default function PlaceValueBuilder({
         <button
           type="button"
           onClick={check}
-          className="rounded-xl bg-indigo-600 px-5 py-3 font-black text-white hover:bg-indigo-700"
+          className="rounded-xl bg-teal-600 px-5 py-3 font-black text-white hover:bg-teal-700"
         >
           Check answer
         </button>

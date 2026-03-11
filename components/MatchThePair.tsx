@@ -215,7 +215,7 @@ export default function MatchThePair({
       "w-full rounded-2xl border px-4 py-5 text-left font-extrabold text-lg sm:text-xl",
       "transition active:scale-[0.98]",
       c.matched ? "bg-green-50 border-green-300 text-green-900" : "bg-white border-gray-200 hover:bg-gray-50",
-      picked ? "ring-2 ring-indigo-400 border-indigo-400" : "",
+      picked ? "ring-2 ring-teal-400 border-teal-400" : "",
       mismatch ? "bg-red-50 border-red-300 ring-red-300" : "",
       matchFlash ? "bg-green-50 border-green-300 ring-green-300" : "",
       locked && !c.matched ? "cursor-not-allowed opacity-95" : "",
