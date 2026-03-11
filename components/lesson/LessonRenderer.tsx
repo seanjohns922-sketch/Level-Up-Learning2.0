@@ -57,6 +57,17 @@ function PlaceholderActivity({
   );
 }
 
+function logFallback(
+  activity: LessonActivity,
+  questionData: Year2QuestionData
+) {
+  console.warn("LessonRenderer fallback", {
+    activityType: activity.activityType,
+    questionKind: questionData?.kind,
+    questionData,
+  });
+}
+
 export function LessonRenderer({
   activity,
   prompt,
@@ -67,6 +78,7 @@ export function LessonRenderer({
   switch (activity.activityType) {
     case "place_value_builder":
       if (questionData.kind !== "place_value_builder") {
+        logFallback(activity, questionData);
         return <PlaceholderActivity label="Place Value Builder" prompt={prompt} config={activity.config} />;
       }
       return (
@@ -78,6 +90,7 @@ export function LessonRenderer({
       );
     case "number_order":
       if (questionData.kind !== "number_order") {
+        logFallback(activity, questionData);
         return <PlaceholderActivity label="Number Order" prompt={prompt} config={activity.config} />;
       }
       return (
@@ -89,6 +102,7 @@ export function LessonRenderer({
       );
     case "partition_expand":
       if (questionData.kind !== "partition_expand") {
+        logFallback(activity, questionData);
         return <PlaceholderActivity label="Partition Expand" prompt={prompt} config={activity.config} />;
       }
       return (
@@ -100,6 +114,7 @@ export function LessonRenderer({
       );
     case "number_line":
       if (questionData.kind !== "number_line") {
+        logFallback(activity, questionData);
         return <PlaceholderActivity label="Number Line" prompt={prompt} config={activity.config} />;
       }
       return (
@@ -111,6 +126,7 @@ export function LessonRenderer({
       );
     case "addition_strategy":
       if (questionData.kind !== "addition_strategy") {
+        logFallback(activity, questionData);
         return <PlaceholderActivity label="Addition Strategy" prompt={prompt} config={activity.config} />;
       }
       return (
@@ -122,6 +138,7 @@ export function LessonRenderer({
       );
     case "subtraction_strategy":
       if (questionData.kind !== "subtraction_strategy") {
+        logFallback(activity, questionData);
         return <PlaceholderActivity label="Subtraction Strategy" prompt={prompt} config={activity.config} />;
       }
       return (
@@ -133,6 +150,7 @@ export function LessonRenderer({
       );
     case "fact_family":
       if (questionData.kind !== "fact_family") {
+        logFallback(activity, questionData);
         return <PlaceholderActivity label="Fact Family" prompt={prompt} config={activity.config} />;
       }
       return (
@@ -144,6 +162,7 @@ export function LessonRenderer({
       );
     case "skip_count":
       if (questionData.kind !== "skip_count") {
+        logFallback(activity, questionData);
         return <PlaceholderActivity label="Skip Count" prompt={prompt} config={activity.config} />;
       }
       return (
@@ -155,6 +174,7 @@ export function LessonRenderer({
       );
     case "multiple_choice":
       if (questionData.kind !== "multiple_choice") {
+        logFallback(activity, questionData);
         return <PlaceholderActivity label="Multiple Choice" prompt={prompt} config={activity.config} />;
       }
       return (
@@ -166,6 +186,7 @@ export function LessonRenderer({
       );
     case "typed_response":
       if (questionData.kind !== "typed_response") {
+        logFallback(activity, questionData);
         return <PlaceholderActivity label="Typed Response" prompt={prompt} config={activity.config} />;
       }
       return (

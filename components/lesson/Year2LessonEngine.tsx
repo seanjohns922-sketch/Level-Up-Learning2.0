@@ -160,6 +160,14 @@ export function Year2LessonEngine({
     [accuracy, correctAnswers, questionsAnswered]
   );
 
+  useEffect(() => {
+    console.log("Year2 activity", {
+      activityType: currentActivity?.activityType,
+      questionKind: currentQuestion?.kind,
+      question: currentQuestion,
+    });
+  }, [currentActivity, currentQuestion]);
+
   if (finished) {
     return (
       <div className="rounded-3xl border bg-white shadow-sm p-6 border-gray-100">
