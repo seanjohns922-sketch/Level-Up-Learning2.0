@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { TypedResponseQuestion } from "@/data/activities/year2/lessonEngine";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 function normalize(value: string) {
   return value.trim().toLowerCase().replace(/\s+/g, " ");
