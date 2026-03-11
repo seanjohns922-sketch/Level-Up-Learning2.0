@@ -370,7 +370,7 @@ export default function LoginPage() {
 
               <button
                 onClick={handleStudentLogin}
-                className="mt-1 w-full py-3.5 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-700 text-white font-black text-lg hover:opacity-90 transition shadow-lg shadow-teal-900/20 active:scale-[0.98]"
+                className="mt-1 w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 text-white font-black text-lg hover:opacity-90 transition shadow-lg shadow-amber-900/20 active:scale-[0.98]"
                 type="button"
               >
                 Let&apos;s Go!
@@ -456,7 +456,7 @@ export default function LoginPage() {
               <button
                 onClick={teacherMode === "signup" ? handleTeacherSignup : handleTeacherLogin}
                 disabled={teacherLoading}
-                className="mt-1 w-full py-3.5 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-700 text-white font-black text-lg hover:opacity-90 transition shadow-lg shadow-teal-900/20 active:scale-[0.98] disabled:opacity-50"
+                className="mt-1 w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 text-white font-black text-lg hover:opacity-90 transition shadow-lg shadow-amber-900/20 active:scale-[0.98] disabled:opacity-50"
                 type="button"
               >
                 {teacherLoading ? "Please wait…" : teacherMode === "signup" ? "Sign Up" : "Log In"}
