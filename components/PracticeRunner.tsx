@@ -240,7 +240,7 @@ export function PracticeRunner({
                 {Array.from({ length: t.groups }).map((_: unknown, gi: number) => (
                   <div key={gi} className="flex items-center gap-2">
                     {Array.from({ length: t.perGroup }).map((__: unknown, di: number) => (
-                      <span key={di} className="inline-block h-5 w-5 rounded-full bg-indigo-600" />
+                      <span key={di} className="inline-block h-5 w-5 rounded-full bg-teal-600" />
                     ))}
                   </div>
                 ))}
