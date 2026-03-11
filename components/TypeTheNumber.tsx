@@ -110,7 +110,7 @@ export default function TypeTheNumber({
         {mode === "word" ? "Type the word:" : "Type this number:"}
       </div>
 
-      <div className="text-6xl font-black text-indigo-600 mb-6">
+      <div className="text-6xl font-black text-teal-600 mb-6">
         {currentAnswer}
       </div>
 
