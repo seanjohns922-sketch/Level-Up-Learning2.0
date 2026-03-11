@@ -451,7 +451,7 @@ function PretestPage() {
                       "absolute top-1/2 -translate-y-1/2 -translate-x-1/2",
                       "w-14 h-14 rounded-full border-2 font-extrabold",
                       isSelected
-                        ? "border-indigo-600 bg-indigo-50 text-indigo-700"
+                        ? "border-teal-600 bg-teal-50 text-teal-700"
                         : "border-gray-300 bg-white hover:bg-gray-50",
                     ].join(" ")}
                     style={{ left: `${pct}%` }}
