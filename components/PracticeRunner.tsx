@@ -202,8 +202,13 @@ export function PracticeRunner({
       </div>
 
       {isBuiltinKind && (
-        <div className="text-2xl font-extrabold text-gray-900 mb-5 leading-tight">
-          {"prompt" in task ? (task as any).prompt : ""}
+        <div className="flex items-center gap-2 mb-5">
+          <div className="text-2xl font-extrabold text-gray-900 leading-tight">
+            {"prompt" in task ? (task as any).prompt : ""}
+          </div>
+          {"prompt" in task && (task as any).prompt && (
+            <ReadAloudBtn text={(task as any).prompt} />
+          )}
         </div>
       )}
 
