@@ -32,11 +32,11 @@ export default function AdditionStrategy({
         <p className="mt-2 text-sm text-gray-600">{questionData.hint}</p>
       </div>
 
-      <div className="mt-6 rounded-2xl border border-indigo-100 bg-indigo-50 p-4">
-        <div className="text-xs font-bold uppercase tracking-wide text-indigo-700">
+      <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">
+        <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
           Strategy model
         </div>
-        <div className="mt-2 text-3xl font-black text-indigo-900">
+        <div className="mt-2 text-3xl font-black text-teal-900">
           {questionData.mode === "jump" &&
             `${questionData.a} -> ${questionData.answer}`}
           {questionData.mode === "split" &&
