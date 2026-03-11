@@ -130,7 +130,7 @@ export default function NumbotCollectionPage() {
   return (
     <main className="min-h-screen bg-background">
       {/* Hero */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-teal-500/10 via-primary/5 to-card">
+      <div className="relative overflow-hidden bg-gradient-to-br from-teal-500/10 via-teal-400/5 to-card">
         <div className="absolute inset-0 pointer-events-none">
           {["🤖", "⚙️", "🔢", "✨", "🏆", "💎"].map((emoji, i) => (
             <span
