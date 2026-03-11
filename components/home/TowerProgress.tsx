@@ -1,5 +1,7 @@
 "use client";
 
+import ReadAloudBtn from "@/components/ReadAloudBtn";
+
 type Props = {
   towerStrength: number;
   fogCleared: number;
@@ -7,10 +9,15 @@ type Props = {
   legendAvatar: string;
 };
 
-export default function TowerProgress({ towerStrength, fogCleared, legendName, legendAvatar }: Props) {
+export default function TowerProgress({ towerStrength, fogCleared, legendName }: Props) {
+  const summaryText = `Tower Strength is ${towerStrength} percent. Fog Cleared is ${fogCleared} percent. Your next legend is ${legendName}.`;
+
   return (
     <div className="bg-card rounded-3xl border border-border shadow-sm p-5 flex flex-col">
-      <h3 className="text-xs font-extrabold text-muted-foreground tracking-wider mb-3">TOWER STATUS</h3>
+      <div className="flex items-center gap-2 mb-3">
+        <h3 className="text-xs font-extrabold text-muted-foreground tracking-wider">TOWER STATUS</h3>
+        <ReadAloudBtn text={summaryText} />
+      </div>
 
       <div className="grid gap-3 flex-1">
         {/* Tower Strength */}
@@ -35,11 +42,8 @@ export default function TowerProgress({ towerStrength, fogCleared, legendName, l
           </div>
         </div>
 
-        {/* Current Legend */}
+        {/* Current Legend — text only */}
         <div className="flex items-center gap-2.5 rounded-xl bg-amber-50 border border-amber-100/60 px-3 py-2 mt-1">
-          <div className="h-9 w-9 rounded-lg bg-white shadow-sm border border-amber-100 flex items-center justify-center overflow-hidden flex-shrink-0">
-            <img src={legendAvatar} alt={legendName} className="h-7 w-7 object-contain" />
-          </div>
           <div>
             <div className="text-[10px] font-extrabold text-amber-600 tracking-wide">NEXT LEGEND</div>
             <div className="text-xs font-bold text-foreground">{legendName}</div>

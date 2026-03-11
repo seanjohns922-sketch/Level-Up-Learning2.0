@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { TypedResponseQuestion } from "@/data/activities/year2/lessonEngine";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 function normalize(value: string) {
   return value.trim().toLowerCase().replace(/\s+/g, " ");
@@ -28,9 +29,10 @@ export default function TypedResponseActivity({
       <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">
         Typed Response
       </div>
-      <h2 className="mt-2 text-2xl font-black text-gray-900">
-        {questionData.prompt}
-      </h2>
+      <div className="flex items-center gap-2 mt-2">
+        <h2 className="text-2xl font-black text-gray-900">{questionData.prompt}</h2>
+        <ReadAloudBtn text={questionData.prompt} />
+      </div>
       {questionData.helper ? (
         <p className="mt-2 text-sm text-gray-600">{questionData.helper}</p>
       ) : null}

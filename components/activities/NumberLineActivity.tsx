@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useCallback } from "react";
 import type { NumberLineQuestion } from "@/data/activities/year2/lessonEngine";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 export default function NumberLineActivity({
   questionData,
@@ -74,9 +75,10 @@ export default function NumberLineActivity({
         <div className="text-xs font-bold uppercase tracking-wide text-primary">
           Number Line
         </div>
-        <h2 className="mt-2 text-2xl font-black text-foreground">
-          {questionData.prompt}
-        </h2>
+        <div className="flex items-center gap-2 mt-2">
+          <h2 className="text-2xl font-black text-foreground">{questionData.prompt}</h2>
+          <ReadAloudBtn text={`${questionData.prompt}. ${questionData.helper}`} />
+        </div>
         <p className="mt-2 text-sm text-muted-foreground">{questionData.helper}</p>
       </div>
 

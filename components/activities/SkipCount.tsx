@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { SkipCountQuestion } from "@/data/activities/year2/lessonEngine";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 export default function SkipCount({
   questionData,
@@ -26,9 +27,10 @@ export default function SkipCount({
         <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">
           Skip Count
         </div>
-        <h2 className="mt-2 text-2xl font-black text-gray-900">
-          {questionData.prompt}
-        </h2>
+        <div className="flex items-center gap-2 mt-2">
+          <h2 className="text-2xl font-black text-gray-900">{questionData.prompt}</h2>
+          <ReadAloudBtn text={questionData.prompt} />
+        </div>
       </div>
 
       <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">

@@ -4,18 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { PracticeTask, Difficulty } from "@/data/activities/year1/practice-task";
 import { getDifficultyFromTime } from "@/data/activities/year1/practice-task";
 import { TaskRenderer } from "@/components/TaskRenderer";
-
-function speak(text: string) {
-  if (typeof window === "undefined") return;
-  const synth = window.speechSynthesis;
-  if (!synth) return;
-  synth.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.rate = 0.9;
-  u.pitch = 1.0;
-  u.volume = 1.0;
-  synth.speak(u);
-}
+import { speak } from "@/lib/speak";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 function pad2(n: number) {
   return String(n).padStart(2, "0");
@@ -212,8 +202,13 @@ export function PracticeRunner({
       </div>
 
       {isBuiltinKind && (
-        <div className="text-2xl font-extrabold text-gray-900 mb-5 leading-tight">
-          {"prompt" in task ? (task as any).prompt : ""}
+        <div className="flex items-center gap-2 mb-5">
+          <div className="text-2xl font-extrabold text-gray-900 leading-tight">
+            {"prompt" in task ? (task as any).prompt : ""}
+          </div>
+          {"prompt" in task && (task as any).prompt && (
+            <ReadAloudBtn text={(task as any).prompt} />
+          )}
         </div>
       )}
 

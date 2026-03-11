@@ -4,6 +4,7 @@ import { Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { POSTTESTS, type Question } from "@/data/assessments/posttests";
 import { getLegendForYear } from "@/data/legends";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { readProgress, writeProgress, type StudentProgress } from "@/data/progress";
 
 const PASS_THRESHOLD = 90;
@@ -133,8 +134,11 @@ function PostTestPage() {
             </div>
           </div>
 
-          <div className="text-lg font-extrabold text-gray-800 mb-4">
-            {q.prompt}
+          <div className="flex items-center gap-2 mb-4">
+            <div className="text-lg font-extrabold text-gray-800">
+              {q.prompt}
+            </div>
+            <ReadAloudBtn text={q.prompt} />
           </div>
 
           <div className="grid gap-2">

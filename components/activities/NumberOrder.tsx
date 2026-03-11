@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { NumberOrderQuestion } from "@/data/activities/year2/lessonEngine";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 export default function NumberOrder({
   questionData,
@@ -44,9 +45,10 @@ export default function NumberOrder({
           <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">
             Number Order
           </div>
-          <h2 className="mt-2 text-2xl font-black text-gray-900">
-            {questionData.prompt}
-          </h2>
+          <div className="flex items-center gap-2 mt-2">
+            <h2 className="text-2xl font-black text-gray-900">{questionData.prompt}</h2>
+            <ReadAloudBtn text={questionData.prompt} />
+          </div>
         </div>
         <button
           type="button"

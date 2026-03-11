@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { getPretestForYear, type Question } from "@/data/assessments/pretests";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 function MabPicker({
   target,
@@ -414,9 +415,12 @@ function PretestPage() {
           </div>
         </div>
 
-        <h2 className="text-2xl md:text-3xl font-extrabold text-gray-800 mb-6">
-          {question.prompt}
-        </h2>
+        <div className="flex items-center gap-2 mb-6">
+          <h2 className="text-2xl md:text-3xl font-extrabold text-gray-800">
+            {question.prompt}
+          </h2>
+          <ReadAloudBtn text={question.prompt} size="md" />
+        </div>
 
         {question.type === "mab" ? (
           <MabPicker
