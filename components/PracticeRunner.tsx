@@ -296,7 +296,7 @@ export function PracticeRunner({
         return (
           <div className="grid gap-4">
             <div className="flex items-center justify-between gap-3">
-              <button type="button" onClick={() => { speak(t.speechText ?? String(t.targetNumber)); setHasPlayed(true); }} className="px-5 py-3 rounded-2xl bg-indigo-600 text-white font-extrabold text-xl hover:bg-indigo-700 transition">🔊 Listen</button>
+              <button type="button" onClick={() => { speak(t.speechText ?? String(t.targetNumber)); setHasPlayed(true); }} className="px-5 py-3 rounded-2xl bg-teal-600 text-white font-extrabold text-xl hover:bg-teal-700 transition">🔊 Listen</button>
               <div className="text-sm font-bold text-gray-600">{hasPlayed ? "Now tap the number." : "Tap Listen first."}</div>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
