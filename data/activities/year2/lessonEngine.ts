@@ -737,7 +737,10 @@ export function generateYear2Question(
     activity.activityType === "number_order" ||
     activity.activityType === "partition_expand" ||
     activity.activityType === "number_line" ||
-    activity.activityType === "addition_strategy"
+    activity.activityType === "addition_strategy" ||
+    activity.activityType === "subtraction_strategy" ||
+    activity.activityType === "fact_family" ||
+    activity.activityType === "skip_count"
   ) {
     return generateInteractiveQuestion(activity.activityType, config) as Year2QuestionData;
   }
@@ -762,3 +765,24 @@ export function generateYear2Question(
     lesson
   );
 }
+
+export function generateQuestionForActivity(
+  activity: LessonActivity,
+  lessonTitle: string
+): Year2QuestionData {
+  return generateYear2Question(
+    {
+      id: "year2-fallback",
+      week: 0,
+      lesson: 0,
+      title: lessonTitle,
+      focus: lessonTitle,
+      activityIdeas: [],
+      curriculum: ["ALL"],
+      activities: [activity],
+    },
+    activity
+  );
+}
+
+export const generateYear2QuestionFromActivity = generateQuestionForActivity;
