@@ -285,7 +285,7 @@ export function PracticeRunner({
             </div>
             <div className="flex items-center gap-3">
               <button onClick={() => setOrder([])} className="px-5 py-3 rounded-2xl bg-gray-100 text-gray-800 font-extrabold text-xl hover:bg-gray-200 transition">Reset</button>
-              <button onClick={check} className="flex-1 px-5 py-3 rounded-2xl bg-indigo-600 text-white font-extrabold text-xl hover:bg-indigo-700 transition">Check</button>
+              <button onClick={check} className="flex-1 px-5 py-3 rounded-2xl bg-teal-600 text-white font-extrabold text-xl hover:bg-teal-700 transition">Check</button>
             </div>
           </div>
         );
