@@ -4,6 +4,7 @@ import { Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { POSTTESTS, type Question } from "@/data/assessments/posttests";
 import { getLegendForYear } from "@/data/legends";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { readProgress, writeProgress, type StudentProgress } from "@/data/progress";
 
 const PASS_THRESHOLD = 90;
