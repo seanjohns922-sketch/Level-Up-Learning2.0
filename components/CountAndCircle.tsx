@@ -83,7 +83,7 @@ export default function CountAndCircle({
 
       <div className="rounded-2xl border bg-white p-5 mb-4">
         <div className="text-2xl font-extrabold text-gray-900">
-          Circle <span className="text-indigo-600">{target}</span> counters
+          Circle <span className="text-teal-600">{target}</span> counters
         </div>
 
         {status === "correct" && (
