@@ -17,10 +17,10 @@ export default function TowerProgress({ towerStrength, fogCleared, legendName, l
         <div>
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs font-bold text-foreground">⚡ Tower Strength</span>
-            <span className="text-xs font-extrabold text-purple-600">{towerStrength}%</span>
+            <span className="text-xs font-extrabold text-teal-600">{towerStrength}%</span>
           </div>
-          <div className="h-2 rounded-full bg-purple-100 overflow-hidden">
-            <div className="h-full rounded-full bg-gradient-to-r from-purple-500 to-violet-500 transition-all duration-500" style={{ width: `${towerStrength}%` }} />
+          <div className="h-2 rounded-full bg-teal-100 overflow-hidden">
+            <div className="h-full rounded-full bg-gradient-to-r from-teal-500 to-emerald-500 transition-all duration-500" style={{ width: `${towerStrength}%` }} />
           </div>
         </div>
 

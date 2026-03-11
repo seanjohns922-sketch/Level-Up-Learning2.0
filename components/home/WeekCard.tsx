@@ -36,7 +36,7 @@ export default function WeekCard({ week, lessonsDone, topic, lessons, onContinue
 
       <button
         onClick={onContinue}
-        className="mt-5 w-full py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-violet-600 text-white font-extrabold text-base flex items-center justify-center gap-2 shadow-lg shadow-purple-200 hover:shadow-purple-300 hover:brightness-110 transition-all active:scale-[0.98]"
+        className="mt-5 w-full py-3.5 rounded-2xl bg-gradient-to-r from-teal-600 to-emerald-600 text-white font-extrabold text-base flex items-center justify-center gap-2 shadow-lg shadow-teal-200 hover:shadow-teal-300 hover:brightness-110 transition-all active:scale-[0.98]"
         type="button"
       >
         <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" /></svg>

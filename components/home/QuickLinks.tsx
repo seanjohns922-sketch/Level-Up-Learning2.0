@@ -15,7 +15,7 @@ export default function QuickLinks({ onLessons, onLegends, onLevels, onTowerMap,
       {/* Tower Map prominent button */}
       <button
         onClick={onTowerMap}
-        className="w-full py-4 rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-500 text-white font-extrabold text-base flex items-center justify-center gap-2.5 shadow-lg shadow-purple-200/60 hover:shadow-purple-300 hover:brightness-110 transition-all active:scale-[0.98]"
+        className="w-full py-4 rounded-2xl bg-gradient-to-r from-teal-500 via-teal-600 to-emerald-600 text-white font-extrabold text-base flex items-center justify-center gap-2.5 shadow-lg shadow-teal-200/60 hover:shadow-teal-300 hover:brightness-110 transition-all active:scale-[0.98]"
         type="button"
       >
         <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
