@@ -84,7 +84,7 @@ export default function GroupBoxesBuilder({
               </button>
               <button
                 onClick={() => addTo(i)}
-                className="px-3 py-2 rounded-xl bg-indigo-600 text-white font-bold"
+                className="px-3 py-2 rounded-xl bg-teal-600 text-white font-bold"
                 type="button"
               >
                 +
