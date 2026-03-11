@@ -175,7 +175,7 @@ export default function NumbotCollectionPage() {
             </div>
             <div className="h-3 rounded-full bg-card border border-border overflow-hidden shadow-inner">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-teal-500 via-teal-400 to-emerald-400 transition-all duration-700"
+                className="h-full rounded-full bg-gradient-to-r from-teal-600 via-teal-500 to-emerald-400 transition-all duration-700"
                 style={{ width: `${totalCount > 0 ? (collectedCount / totalCount) * 100 : 0}%` }}
               />
             </div>
