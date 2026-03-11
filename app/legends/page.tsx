@@ -27,7 +27,7 @@ const REALMS: RealmDef[] = [
     icon: <Zap className="h-6 w-6" />,
     totalLegends: 7,
     status: "open",
-    route: "/number-nexus",
+    route: "/legends/number",
     gradient: "from-teal-500/15 to-emerald-500/10",
     borderColor: "border-teal-400/40",
     iconBg: "bg-teal-500/15 text-teal-500",
