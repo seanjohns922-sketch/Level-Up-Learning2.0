@@ -34,9 +34,9 @@ export default function MissionCard({ legend, week, lessonsDone }: Props) {
               : `Complete your number lessons to strengthen the Tower of Knowledge and unlock ${legend.name}!`}
           </p>
           <div className="mt-2 flex items-center gap-2">
-            <div className="h-1.5 flex-1 rounded-full bg-purple-200/60 overflow-hidden">
+             <div className="h-1.5 flex-1 rounded-full bg-teal-200/60 overflow-hidden">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-purple-500 to-violet-500 transition-all duration-500"
+                className="h-full rounded-full bg-gradient-to-r from-teal-500 to-emerald-500 transition-all duration-500"
                 style={{ width: `${Math.round((lessonsDone / 3) * 100)}%` }}
               />
             </div>
