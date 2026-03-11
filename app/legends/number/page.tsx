@@ -193,7 +193,7 @@ export default function NumbotCollectionPage() {
         <h2 className="text-xs font-extrabold text-muted-foreground tracking-[0.15em] mb-4">NUMBOT LEGENDS</h2>
         <div className="space-y-4">
           {sortedLegends.map((legend) => {
-            const status = getLegendStatus(legend, unlockedIds, year);
+            const status = getLegendStatus(legend, unlockedIds);
             return <LegendCard key={legend.id} legend={legend} status={status} />;
           })}
         </div>
