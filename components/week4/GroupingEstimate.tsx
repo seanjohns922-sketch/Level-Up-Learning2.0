@@ -29,7 +29,7 @@ export default function GroupingEstimate({
               {Array.from({ length: 10 }).map((__, di) => (
                 <span
                   key={di}
-                  className="inline-block h-4 w-4 rounded-full bg-indigo-600"
+                  className="inline-block h-4 w-4 rounded-full bg-teal-600"
                 />
               ))}
             </div>

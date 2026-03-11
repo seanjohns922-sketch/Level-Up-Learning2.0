@@ -98,7 +98,7 @@ export default function ClimbLadder({
             key={i}
             className={[
               "inline-flex items-center justify-center rounded-full text-xs font-bold",
-              i <= pos ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-500",
+              i <= pos ? "bg-teal-600 text-white" : "bg-gray-100 text-gray-500",
             ].join(" ")}
             style={{ width: 26, height: 26 }}
           >

@@ -130,7 +130,7 @@ export default function TypeTheNumber({
 
       <button
         onClick={check}
-        className="w-full py-4 bg-indigo-600 text-white font-extrabold rounded-xl"
+        className="w-full py-4 bg-teal-600 text-white font-extrabold rounded-xl"
       >
         Check
       </button>

@@ -86,7 +86,7 @@ export default function SubtractMoveToTaken({
         </div>
         <button
           onClick={check}
-          className="px-5 py-3 rounded-xl bg-indigo-600 text-white font-extrabold hover:bg-indigo-700 transition"
+          className="px-5 py-3 rounded-xl bg-teal-600 text-white font-extrabold hover:bg-teal-700 transition"
           type="button"
         >
           Check

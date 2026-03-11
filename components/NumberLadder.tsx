@@ -65,7 +65,7 @@ export default function NumberLadder({
         </button>
         <button
           onClick={() => step(1)}
-          className="flex-1 py-4 bg-indigo-600 text-white rounded-xl font-extrabold"
+          className="flex-1 py-4 bg-teal-600 text-white rounded-xl font-extrabold"
           type="button"
         >
           +1
