@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { FactFamilyQuestion } from "@/data/activities/year2/lessonEngine";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 export default function FactFamily({
   questionData,
