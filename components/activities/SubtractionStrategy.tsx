@@ -37,8 +37,8 @@ export default function SubtractionStrategy({
         const ones = questionData.remove % 10;
         const afterTens = questionData.total - tens;
         return (
-          <div className="mt-6 rounded-2xl border border-indigo-100 bg-indigo-50 p-4">
-            <div className="text-xs font-bold uppercase tracking-wide text-indigo-700">
+          <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">
+            <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
               Jump back strategy
             </div>
             <div className="mt-2 text-sm font-bold text-gray-700">
