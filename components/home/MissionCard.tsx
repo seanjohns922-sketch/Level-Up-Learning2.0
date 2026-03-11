@@ -14,7 +14,7 @@ export default function MissionCard({ legend, week, lessonsDone }: Props) {
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-teal-50 via-emerald-50 to-cyan-50 rounded-3xl border border-teal-100/60 shadow-lg shadow-teal-100/30 p-5">
       {/* Decorative glow */}
-      <div className="absolute -top-8 -right-8 h-24 w-24 rounded-full bg-purple-200/30 blur-2xl" />
+      <div className="absolute -top-8 -right-8 h-24 w-24 rounded-full bg-teal-200/30 blur-2xl" />
 
       <div className="relative flex items-start gap-4">
         {/* Legend avatar */}
