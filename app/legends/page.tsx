@@ -167,7 +167,7 @@ function RealmCard({ realm, collected, onClick }: { realm: RealmDef; collected: 
             {realm.name}
           </h3>
           <p className={`text-sm mt-0.5 ${isLocked ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
-            {isLocked ? "Future Realm" : `Legend Line: ${realm.legendLine}`}
+            {isLocked ? "Future Realm" : isComingSoon ? `Coming Soon: ${realm.legendLine}` : `${realm.legendLine}`}
           </p>
 
           <div className="mt-3">
