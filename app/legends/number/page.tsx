@@ -2,19 +2,16 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Lock, Sparkles, Star, Target } from "lucide-react";
+import { ArrowLeft, Lock, Sparkles, Star } from "lucide-react";
 import { readProgress, type StudentProgress } from "@/data/progress";
 import { getAllLegends, type Legend } from "@/data/legends";
 import { YEAR_ORDER } from "@/data/yearOrder";
 
 function getLegendStatus(
   legend: Legend,
-  unlockedIds: string[],
-  currentYear: string
-): "unlocked" | "current" | "locked" {
-  if (unlockedIds.includes(legend.id)) return "unlocked";
-  if (legend.yearLabel === currentYear) return "current";
-  return "locked";
+  unlockedIds: string[]
+): "unlocked" | "locked" {
+  return unlockedIds.includes(legend.id) ? "unlocked" : "locked";
 }
 
 function StatBar({ label, value }: { label: string; value: number }) {
@@ -32,33 +29,24 @@ function StatBar({ label, value }: { label: string; value: number }) {
   );
 }
 
-function LegendCard({ legend, status }: { legend: Legend; status: "unlocked" | "current" | "locked" }) {
+function LegendCard({ legend, status }: { legend: Legend; status: "unlocked" | "locked" }) {
   const isLocked = status === "locked";
-  const isCurrent = status === "current";
 
   return (
     <div
       className={`relative rounded-2xl border-2 p-4 transition-all duration-300 ${
-        isCurrent
-          ? "bg-gradient-to-br from-amber-500/10 to-amber-500/5 border-amber-400/40 shadow-lg shadow-amber-500/5"
-          : isLocked
+        isLocked
           ? "bg-card border-border opacity-55"
           : "bg-gradient-to-br from-primary/5 to-accent/5 border-primary/30 shadow-md"
       }`}
     >
       {/* Status badge */}
       <div className="absolute -top-2.5 right-3">
-        {status === "unlocked" && (
+        {status === "unlocked" ? (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500 text-[9px] font-extrabold text-white shadow-md">
             <Star className="h-2.5 w-2.5" fill="currentColor" /> UNLOCKED
           </span>
-        )}
-        {status === "current" && (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500 text-[9px] font-extrabold text-white shadow-md animate-pulse">
-            <Target className="h-2.5 w-2.5" /> CURRENT
-          </span>
-        )}
-        {status === "locked" && (
+        ) : (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-muted text-[9px] font-extrabold text-muted-foreground shadow-md">
             <Lock className="h-2.5 w-2.5" /> LOCKED
           </span>
@@ -69,7 +57,7 @@ function LegendCard({ legend, status }: { legend: Legend; status: "unlocked" | "
         {/* Card image */}
         <div
           className={`relative flex-shrink-0 h-20 w-14 rounded-lg overflow-hidden border-2 ${
-            isLocked ? "border-border grayscale" : isCurrent ? "border-amber-400/30" : "border-primary/20"
+            isLocked ? "border-border grayscale" : "border-primary/20"
           }`}
         >
           <img
@@ -102,7 +90,7 @@ function LegendCard({ legend, status }: { legend: Legend; status: "unlocked" | "
             </div>
           )}
 
-          {/* Stats for unlocked / current */}
+          {/* Stats for unlocked */}
           {!isLocked && (
             <div className="mt-2 space-y-1">
               <StatBar label="Calc" value={legend.stats.calculation} />
@@ -112,13 +100,6 @@ function LegendCard({ legend, status }: { legend: Legend; status: "unlocked" | "
           )}
         </div>
       </div>
-
-      {/* Current target glow */}
-      {isCurrent && (
-        <div className="absolute -inset-px rounded-2xl pointer-events-none" style={{
-          background: "linear-gradient(135deg, hsla(42,95%,55%,0.06), transparent, hsla(42,95%,55%,0.04))",
-        }} />
-      )}
     </div>
   );
 }
@@ -212,7 +193,7 @@ export default function NumbotCollectionPage() {
         <h2 className="text-xs font-extrabold text-muted-foreground tracking-[0.15em] mb-4">NUMBOT LEGENDS</h2>
         <div className="space-y-4">
           {sortedLegends.map((legend) => {
-            const status = getLegendStatus(legend, unlockedIds, year);
+            const status = getLegendStatus(legend, unlockedIds);
             return <LegendCard key={legend.id} legend={legend} status={status} />;
           })}
         </div>
