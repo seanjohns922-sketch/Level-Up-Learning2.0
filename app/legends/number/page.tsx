@@ -171,7 +171,7 @@ export default function NumbotCollectionPage() {
           <div className="mt-6 max-w-sm">
             <div className="flex items-center justify-between text-sm mb-1.5">
               <span className="font-bold text-foreground">{collectedCount} / {totalCount} collected</span>
-              <span className="font-bold text-teal-500">{totalCount > 0 ? Math.round((collectedCount / totalCount) * 100) : 0}%</span>
+              <span className="font-bold text-teal-600">{totalCount > 0 ? Math.round((collectedCount / totalCount) * 100) : 0}%</span>
             </div>
             <div className="h-3 rounded-full bg-card border border-border overflow-hidden shadow-inner">
               <div
