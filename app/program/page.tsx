@@ -173,7 +173,7 @@ function ProgramPage() {
 
       {/* ── Green hero ── */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600" />
+        <div className="absolute inset-0 bg-gradient-to-br from-teal-600 via-teal-700 to-emerald-800" />
         <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-white/5" />
         <div className="absolute bottom-0 -left-16 h-48 w-48 rounded-full bg-white/5" />
 
