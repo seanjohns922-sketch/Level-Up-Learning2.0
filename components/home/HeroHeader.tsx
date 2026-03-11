@@ -13,7 +13,7 @@ export default function HeroHeader({ levelNum, week, lessonsDone, overallPercent
   return (
     <div className="relative overflow-hidden">
       {/* Gradient background with magical particles */}
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-purple-600 to-violet-700" />
+      <div className="absolute inset-0 bg-gradient-to-br from-teal-600 via-teal-700 to-emerald-800" />
       <div className="absolute inset-0 opacity-20">
         {[...Array(6)].map((_, i) => (
           <div
@@ -62,7 +62,7 @@ export default function HeroHeader({ levelNum, week, lessonsDone, overallPercent
           <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight">
             Week {week} of 12
           </h1>
-          <p className="text-purple-100 mt-1.5 text-sm font-medium">
+          <p className="text-teal-100 mt-1.5 text-sm font-medium">
             {lessonsDone}/3 lessons completed · Number Nexus
           </p>
 
@@ -74,7 +74,7 @@ export default function HeroHeader({ levelNum, week, lessonsDone, overallPercent
                 style={{ width: `${overallPercent}%` }}
               />
             </div>
-            <p className="text-xs text-purple-200 mt-1.5 font-medium">Tower Progress: Week {week}/12</p>
+            <p className="text-xs text-teal-200 mt-1.5 font-medium">Tower Progress: Week {week}/12</p>
           </div>
         </div>
       </div>

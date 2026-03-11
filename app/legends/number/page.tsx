@@ -130,7 +130,7 @@ export default function NumbotCollectionPage() {
   return (
     <main className="min-h-screen bg-background">
       {/* Hero */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-teal-500/10 via-primary/5 to-card">
+      <div className="relative overflow-hidden bg-gradient-to-br from-teal-500/10 via-teal-400/5 to-card">
         <div className="absolute inset-0 pointer-events-none">
           {["🤖", "⚙️", "🔢", "✨", "🏆", "💎"].map((emoji, i) => (
             <span
@@ -155,7 +155,7 @@ export default function NumbotCollectionPage() {
             >
               <ArrowLeft className="h-3.5 w-3.5" /> My Legends
             </button>
-            <div className="inline-flex items-center gap-1.5 text-sm font-bold text-muted-foreground bg-card px-4 py-1.5 rounded-full border border-border shadow-sm">
+            <div className="inline-flex items-center gap-1.5 text-sm font-bold text-teal-700 bg-teal-50 px-4 py-1.5 rounded-full border border-teal-200 shadow-sm">
               <Sparkles className="h-3.5 w-3.5 text-teal-500" /> Number Nexus
             </div>
           </div>
@@ -171,11 +171,11 @@ export default function NumbotCollectionPage() {
           <div className="mt-6 max-w-sm">
             <div className="flex items-center justify-between text-sm mb-1.5">
               <span className="font-bold text-foreground">{collectedCount} / {totalCount} collected</span>
-              <span className="font-bold text-teal-500">{totalCount > 0 ? Math.round((collectedCount / totalCount) * 100) : 0}%</span>
+              <span className="font-bold text-teal-600">{totalCount > 0 ? Math.round((collectedCount / totalCount) * 100) : 0}%</span>
             </div>
             <div className="h-3 rounded-full bg-card border border-border overflow-hidden shadow-inner">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-teal-500 via-teal-400 to-emerald-400 transition-all duration-700"
+                className="h-full rounded-full bg-gradient-to-r from-teal-600 via-teal-500 to-emerald-400 transition-all duration-700"
                 style={{ width: `${totalCount > 0 ? (collectedCount / totalCount) * 100 : 0}%` }}
               />
             </div>
@@ -199,7 +199,7 @@ export default function NumbotCollectionPage() {
         </div>
 
         {/* Tip */}
-        <div className="mt-10 rounded-2xl border-2 border-teal-500/20 bg-teal-500/5 p-5 flex items-start gap-3">
+        <div className="mt-10 rounded-2xl border-2 border-teal-400/20 bg-teal-50/50 p-5 flex items-start gap-3">
           <span className="text-2xl flex-shrink-0">💡</span>
           <div>
             <div className="font-bold text-foreground mb-0.5">How to collect Numbots</div>
