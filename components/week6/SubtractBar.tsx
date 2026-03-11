@@ -57,7 +57,7 @@ export default function SubtractBar({
                 key={i}
                 className={[
                   "text-center",
-                  i + 1 === answer ? "font-bold text-indigo-700" : "",
+                  i + 1 === answer ? "font-bold text-teal-700" : "",
                 ].join(" ")}
               >
                 {i + 1}
