@@ -125,7 +125,7 @@ export default function CountAndCircle({
 
         <button
           onClick={check}
-          className="px-6 py-3 rounded-xl bg-indigo-600 text-white font-extrabold"
+          className="px-6 py-3 rounded-xl bg-teal-600 text-white font-extrabold"
         >
           Check
         </button>

@@ -107,7 +107,7 @@ export function StaticDotGrid({
   rows,
   dotSize = 16,
   gap = 8,
-  activeClassName = "bg-indigo-600",
+  activeClassName = "bg-teal-600",
   inactiveClassName = "bg-white",
   borderClassName = "border border-gray-200",
 }: DotGridProps) {
