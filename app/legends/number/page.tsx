@@ -2,117 +2,22 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Lock, Sparkles, Star } from "lucide-react";
+import { ArrowLeft, Sparkles } from "lucide-react";
 import { readProgress, type StudentProgress } from "@/data/progress";
 import { getAllLegends, type Legend } from "@/data/legends";
 import { YEAR_ORDER } from "@/data/yearOrder";
-
-function getLegendStatus(
-  legend: Legend,
-  unlockedIds: string[]
-): "unlocked" | "locked" {
-  return unlockedIds.includes(legend.id) ? "unlocked" : "locked";
-}
-
-function StatBar({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="flex items-center gap-2">
-      <span className="text-[10px] font-bold text-muted-foreground w-16 shrink-0">{label}</span>
-      <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
-        <div
-          className="h-full rounded-full bg-gradient-to-r from-primary to-accent transition-all duration-500"
-          style={{ width: `${value}%` }}
-        />
-      </div>
-      <span className="text-[10px] font-extrabold text-foreground w-7 text-right">{value}</span>
-    </div>
-  );
-}
-
-function LegendCard({ legend, status }: { legend: Legend; status: "unlocked" | "locked" }) {
-  const isLocked = status === "locked";
-
-  return (
-    <div
-      className={`relative rounded-2xl border-2 p-4 transition-all duration-300 ${
-        isLocked
-          ? "bg-card border-border opacity-55"
-          : "bg-gradient-to-br from-primary/5 to-accent/5 border-primary/30 shadow-md"
-      }`}
-    >
-      {/* Status badge */}
-      <div className="absolute -top-2.5 right-3">
-        {status === "unlocked" ? (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500 text-[9px] font-extrabold text-white shadow-md">
-            <Star className="h-2.5 w-2.5" fill="currentColor" /> UNLOCKED
-          </span>
-        ) : (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-muted text-[9px] font-extrabold text-muted-foreground shadow-md">
-            <Lock className="h-2.5 w-2.5" /> LOCKED
-          </span>
-        )}
-      </div>
-
-      <div className="flex items-start gap-3 mt-1">
-        {/* Card image */}
-        <div
-          className={`relative flex-shrink-0 h-20 w-14 rounded-lg overflow-hidden border-2 ${
-            isLocked ? "border-border grayscale" : "border-primary/20"
-          }`}
-        >
-          <img
-            src={legend.images.cardFront}
-            alt={legend.name}
-            className={`h-full w-full object-cover ${isLocked ? "blur-[2px] opacity-40" : ""}`}
-          />
-          {isLocked && (
-            <div className="absolute inset-0 flex items-center justify-center bg-background/40">
-              <Lock className="h-4 w-4 text-muted-foreground" />
-            </div>
-          )}
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <p className="text-[10px] font-extrabold text-muted-foreground tracking-wider">{legend.yearLabel.toUpperCase()}</p>
-          <h4 className={`text-sm font-extrabold leading-tight ${isLocked ? "text-muted-foreground" : "text-foreground"}`}>
-            {legend.name}
-          </h4>
-          <p className={`text-[11px] mt-0.5 leading-snug ${isLocked ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
-            {legend.description}
-          </p>
-
-          {/* Star rating */}
-          {!isLocked && (
-            <div className="flex items-center gap-0.5 mt-1.5">
-              {Array.from({ length: Math.ceil(legend.stars) }).map((_, i) => (
-                <Star key={i} className="h-3 w-3 text-amber-400" fill="currentColor" />
-              ))}
-            </div>
-          )}
-
-          {/* Stats for unlocked */}
-          {!isLocked && (
-            <div className="mt-2 space-y-1">
-              <StatBar label="Calc" value={legend.stats.calculation} />
-              <StatBar label="Speed" value={legend.stats.speed} />
-              <StatBar label="Accuracy" value={legend.stats.accuracy} />
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
+import BinderCard from "@/components/legends/BinderCard";
+import LegendDetailModal from "@/components/legends/LegendDetailModal";
 
 export default function NumbotCollectionPage() {
   const router = useRouter();
   const [progress, setProgress] = useState<StudentProgress | null>(null);
+  const [selectedLegend, setSelectedLegend] = useState<Legend | null>(null);
 
   useEffect(() => {
     setProgress(readProgress());
   }, []);
 
-  const year = progress?.year ?? "Year 1";
   const unlockedIds = progress?.unlockedLegends ?? [];
 
   const allLegends = useMemo(() => getAllLegends(), []);
@@ -129,7 +34,7 @@ export default function NumbotCollectionPage() {
 
   return (
     <main className="min-h-screen bg-background">
-      {/* Hero */}
+      {/* Hero — kept exactly as before */}
       <div className="relative overflow-hidden bg-gradient-to-br from-teal-500/10 via-teal-400/5 to-card">
         <div className="absolute inset-0 pointer-events-none">
           {["🤖", "⚙️", "🔢", "✨", "🏆", "💎"].map((emoji, i) => (
@@ -188,13 +93,23 @@ export default function NumbotCollectionPage() {
         </svg>
       </div>
 
-      {/* Legend cards */}
+      {/* Card Binder Grid */}
       <div className="max-w-2xl mx-auto px-6 py-8">
-        <h2 className="text-xs font-extrabold text-muted-foreground tracking-[0.15em] mb-4">NUMBOT LEGENDS</h2>
-        <div className="space-y-4">
+        <h2 className="text-xs font-extrabold text-muted-foreground tracking-[0.15em] mb-5">
+          CARD BINDER
+        </h2>
+
+        <div className="grid grid-cols-3 gap-3 sm:gap-4">
           {sortedLegends.map((legend) => {
-            const status = getLegendStatus(legend, unlockedIds);
-            return <LegendCard key={legend.id} legend={legend} status={status} />;
+            const isUnlocked = unlockedIds.includes(legend.id);
+            return (
+              <BinderCard
+                key={legend.id}
+                legend={legend}
+                isUnlocked={isUnlocked}
+                onClick={() => setSelectedLegend(legend)}
+              />
+            );
           })}
         </div>
 
@@ -209,6 +124,14 @@ export default function NumbotCollectionPage() {
           </div>
         </div>
       </div>
+
+      {/* Detail Modal */}
+      {selectedLegend && (
+        <LegendDetailModal
+          legend={selectedLegend}
+          onClose={() => setSelectedLegend(null)}
+        />
+      )}
     </main>
   );
 }
