@@ -4,18 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { PracticeTask, Difficulty } from "@/data/activities/year1/practice-task";
 import { getDifficultyFromTime } from "@/data/activities/year1/practice-task";
 import { TaskRenderer } from "@/components/TaskRenderer";
-
-function speak(text: string) {
-  if (typeof window === "undefined") return;
-  const synth = window.speechSynthesis;
-  if (!synth) return;
-  synth.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.rate = 0.9;
-  u.pitch = 1.0;
-  u.volume = 1.0;
-  synth.speak(u);
-}
+import { speak } from "@/lib/speak";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 function pad2(n: number) {
   return String(n).padStart(2, "0");
