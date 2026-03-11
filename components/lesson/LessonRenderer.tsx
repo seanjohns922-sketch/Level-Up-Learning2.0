@@ -66,6 +66,9 @@ export function LessonRenderer({
 }: LessonRendererProps) {
   switch (activity.activityType) {
     case "place_value_builder":
+      if (questionData.kind !== "place_value_builder") {
+        return <PlaceholderActivity label="Place Value Builder" prompt={prompt} config={activity.config} />;
+      }
       return (
         <PlaceValueBuilder
           questionData={questionData as PlaceValueBuilderQuestion}
@@ -74,6 +77,9 @@ export function LessonRenderer({
         />
       );
     case "number_order":
+      if (questionData.kind !== "number_order") {
+        return <PlaceholderActivity label="Number Order" prompt={prompt} config={activity.config} />;
+      }
       return (
         <NumberOrder
           questionData={questionData as NumberOrderQuestion}
@@ -82,6 +88,9 @@ export function LessonRenderer({
         />
       );
     case "partition_expand":
+      if (questionData.kind !== "partition_expand") {
+        return <PlaceholderActivity label="Partition Expand" prompt={prompt} config={activity.config} />;
+      }
       return (
         <PartitionExpand
           questionData={questionData as PartitionExpandQuestion}
@@ -90,6 +99,9 @@ export function LessonRenderer({
         />
       );
     case "number_line":
+      if (questionData.kind !== "number_line") {
+        return <PlaceholderActivity label="Number Line" prompt={prompt} config={activity.config} />;
+      }
       return (
         <NumberLineActivity
           questionData={questionData as NumberLineQuestion}
@@ -98,6 +110,9 @@ export function LessonRenderer({
         />
       );
     case "addition_strategy":
+      if (questionData.kind !== "addition_strategy") {
+        return <PlaceholderActivity label="Addition Strategy" prompt={prompt} config={activity.config} />;
+      }
       return (
         <AdditionStrategy
           questionData={questionData as AdditionStrategyQuestion}
@@ -106,6 +121,9 @@ export function LessonRenderer({
         />
       );
     case "subtraction_strategy":
+      if (questionData.kind !== "subtraction_strategy") {
+        return <PlaceholderActivity label="Subtraction Strategy" prompt={prompt} config={activity.config} />;
+      }
       return (
         <SubtractionStrategy
           questionData={questionData as SubtractionStrategyQuestion}
@@ -114,6 +132,9 @@ export function LessonRenderer({
         />
       );
     case "fact_family":
+      if (questionData.kind !== "fact_family") {
+        return <PlaceholderActivity label="Fact Family" prompt={prompt} config={activity.config} />;
+      }
       return (
         <FactFamily
           questionData={questionData as FactFamilyQuestion}
@@ -122,6 +143,9 @@ export function LessonRenderer({
         />
       );
     case "skip_count":
+      if (questionData.kind !== "skip_count") {
+        return <PlaceholderActivity label="Skip Count" prompt={prompt} config={activity.config} />;
+      }
       return (
         <SkipCount
           questionData={questionData as SkipCountQuestion}
@@ -130,6 +154,9 @@ export function LessonRenderer({
         />
       );
     case "multiple_choice":
+      if (questionData.kind !== "multiple_choice") {
+        return <PlaceholderActivity label="Multiple Choice" prompt={prompt} config={activity.config} />;
+      }
       return (
         <MultipleChoiceActivity
           questionData={questionData as MultipleChoiceQuestion}
@@ -138,6 +165,9 @@ export function LessonRenderer({
         />
       );
     case "typed_response":
+      if (questionData.kind !== "typed_response") {
+        return <PlaceholderActivity label="Typed Response" prompt={prompt} config={activity.config} />;
+      }
       return (
         <TypedResponseActivity
           questionData={questionData as TypedResponseQuestion}
