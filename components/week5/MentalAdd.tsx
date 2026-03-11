@@ -107,7 +107,7 @@ export default function MentalAdd({
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="rounded-xl border border-indigo-300 bg-indigo-100 px-4 py-2 font-black text-indigo-900">
+              <div className="rounded-xl border border-teal-300 bg-teal-100 px-4 py-2 font-black text-teal-900">
                 10
               </div>
               <div className="text-gray-500 font-bold">+</div>
