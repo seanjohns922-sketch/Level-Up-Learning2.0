@@ -20,6 +20,7 @@ import { generateWeek11Task } from "@/data/activities/year1/week11";
 import { getProgramForYear } from "@/data/programs";
 import { readProgress, updateProgress } from "@/data/progress";
 import { markLessonComplete } from "@/lib/program-progress";
+import { getLessonChrome } from "@/lib/levelTheme";
 
 export default function LessonPageWrapper() {
   return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><LessonPage /></Suspense>;
@@ -43,6 +44,7 @@ function LessonPage() {
     const match = effectiveLessonId.match(/l(\d+)$/);
     return match ? Number(match[1]) : 1;
   }, [effectiveLessonId]);
+  const lessonChrome = useMemo(() => getLessonChrome(yearNumber), [yearNumber]);
 
   const [started, setStarted] = useState(false);
   const lessonMeta = useMemo(() => {
@@ -87,7 +89,7 @@ function LessonPage() {
             onClick={() =>
               router.push(`/program?year=${encodeURIComponent(year)}&week=${week}`)
             }
-            className="text-sm text-primary hover:underline font-bold"
+            className={`text-sm font-bold transition-colors ${lessonChrome.backLinkClass}`}
           >
             ← Back to Week {week}
           </button>
@@ -95,7 +97,7 @@ function LessonPage() {
 
         {!started ? (
           <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
-            <div className="bg-gradient-to-br from-primary to-primary/80 text-white px-6 py-8">
+            <div className={`${lessonChrome.heroClass} text-white px-6 py-8`}>
               <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1 text-sm font-semibold mb-3">
                 Level {yearNumber} • Week {week} • Lesson {lessonNumber}
               </div>
@@ -129,8 +131,8 @@ function LessonPage() {
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-primary/20 bg-primary-light p-6 mb-8">
-                <div className="flex items-center gap-2 font-bold text-primary mb-2">
+              <div className={lessonChrome.calloutClass}>
+                <div className={lessonChrome.calloutTextClass}>
                   ✨ Keep going!
                 </div>
                 <div className="text-sm text-foreground/80">
@@ -140,8 +142,7 @@ function LessonPage() {
 
               <button
                 onClick={() => setStarted(true)}
-                className="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-extrabold text-xl hover:opacity-90 transition-all active:scale-[0.98] shadow-lg"
-                style={{ boxShadow: "0 8px 24px -8px hsl(var(--primary) / 0.4)" }}
+                className={lessonChrome.buttonClass}
               >
                 Begin Practice
               </button>
@@ -149,7 +150,7 @@ function LessonPage() {
           </div>
         ) : year === "Year 1" ? (
           <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
-            <div className="bg-gradient-to-br from-primary to-primary/80 text-white px-6 py-8">
+            <div className={`${lessonChrome.heroClass} text-white px-6 py-8`}>
               <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1 text-sm font-semibold mb-3">
                 Level {yearNumber} • Week {week} • Lesson {lessonNumber}
               </div>
@@ -214,7 +215,7 @@ function LessonPage() {
           </div>
         ) : (
           <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
-            <div className="bg-gradient-to-br from-primary to-primary/80 text-white px-6 py-8">
+            <div className={`${lessonChrome.heroClass} text-white px-6 py-8`}>
               <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1 text-sm font-semibold mb-3">
                 Level {yearNumber} • Week {week} • Lesson {lessonNumber}
               </div>
