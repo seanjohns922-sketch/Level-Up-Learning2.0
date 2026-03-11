@@ -24,7 +24,7 @@ export default function MissionCard({ legend, week, lessonsDone }: Props) {
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-700 text-xs font-extrabold tracking-wide">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-700 text-xs font-extrabold tracking-wide">
               ⚡ MISSION
             </span>
           </div>
