@@ -56,7 +56,7 @@ export default function StrategySelect({
           onClick={() => setStrategy("make10")}
           className={[
             "px-4 py-3 rounded-xl border font-bold",
-            strategy === "make10" ? "border-indigo-600 bg-indigo-50" : "border-gray-200 hover:bg-gray-50",
+            strategy === "make10" ? "border-teal-600 bg-teal-50" : "border-gray-200 hover:bg-gray-50",
           ].join(" ")}
         >
           Jump back to 10
