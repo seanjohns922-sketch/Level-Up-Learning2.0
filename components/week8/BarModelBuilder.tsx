@@ -41,8 +41,8 @@ export default function BarModelBuilder({
           {part} + ? = {total}
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex-1 h-8 rounded-lg bg-indigo-200" style={{ flexGrow: part }} />
-          <div className="flex-1 h-8 rounded-lg bg-indigo-400" style={{ flexGrow: missing }} />
+          <div className="flex-1 h-8 rounded-lg bg-teal-200" style={{ flexGrow: part }} />
+          <div className="flex-1 h-8 rounded-lg bg-teal-400" style={{ flexGrow: missing }} />
         </div>
       </div>
 
