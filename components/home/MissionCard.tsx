@@ -12,7 +12,7 @@ export default function MissionCard({ legend, week, lessonsDone }: Props) {
   const allDone = lessonsDone >= 3;
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-indigo-50 via-purple-50 to-violet-50 rounded-3xl border border-purple-100/60 shadow-lg shadow-purple-100/30 p-5">
+    <div className="relative overflow-hidden bg-gradient-to-br from-teal-50 via-emerald-50 to-cyan-50 rounded-3xl border border-teal-100/60 shadow-lg shadow-teal-100/30 p-5">
       {/* Decorative glow */}
       <div className="absolute -top-8 -right-8 h-24 w-24 rounded-full bg-purple-200/30 blur-2xl" />
 
