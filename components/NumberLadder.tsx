@@ -36,7 +36,7 @@ export default function NumberLadder({
 
       <div className="text-2xl font-extrabold mb-2">
         Climb from <span className="text-gray-900">{start}</span> to{" "}
-        <span className="text-indigo-600">{target}</span>
+        <span className="text-teal-600">{target}</span>
       </div>
 
       <div className="flex justify-center my-6">
