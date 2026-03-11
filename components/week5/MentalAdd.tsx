@@ -66,7 +66,7 @@ export default function MentalAdd({
               "h-5 w-5 rounded-full border",
               highlightIndex === i
                 ? "border-amber-500 bg-amber-200"
-                : "border-indigo-600 bg-indigo-100",
+                : "border-teal-600 bg-teal-100",
             ].join(" ")}
           />
         ))}
