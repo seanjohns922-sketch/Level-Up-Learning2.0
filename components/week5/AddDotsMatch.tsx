@@ -104,7 +104,7 @@ export default function AddDotsMatch({
             {Array.from({ length: total }).map((_, i) => (
               <span
                 key={i}
-                className="inline-block h-6 w-6 rounded-full border-2 border-indigo-600 bg-indigo-100"
+                className="inline-block h-6 w-6 rounded-full border-2 border-teal-600 bg-teal-100"
                 aria-hidden
               />
             ))}
