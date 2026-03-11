@@ -16,7 +16,6 @@ function PostTestPage() {
   const router = useRouter();
   const params = useSearchParams();
 
-  // year comes from query: /posttest?year=Year%203
   const year = params.get("year") ?? "Year 3";
 
   const test = useMemo(() => {
@@ -60,7 +59,6 @@ function PostTestPage() {
     const prev = readProgress();
     const unlockedLegends = prev?.unlockedLegends ?? [];
 
-    // Unlock the legend if they pass post-test
     const legend = getLegendForYear(year);
     const didPass = percent >= PASS_THRESHOLD;
     const nextUnlocked = didPass
@@ -79,13 +77,12 @@ function PostTestPage() {
     writeProgress(nextProgress);
     setSubmitted(true);
 
-    // Send to results (reuse your existing results page)
     router.push(`/results?year=${encodeURIComponent(year)}&score=${correct}&total=${questions.length}&posttest=1`);
   }
 
   if (!questions.length) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center justify-center p-6">
+      <main className="min-h-screen bg-gradient-to-br from-teal-50 to-emerald-100 flex items-center justify-center p-6">
         <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-xl text-center">
           <h1 className="text-2xl font-extrabold text-gray-800 mb-2">
             Post-Test not found
@@ -95,7 +92,7 @@ function PostTestPage() {
           </p>
           <button
             onClick={() => router.push("/")}
-            className="w-full py-3 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition"
+            className="w-full py-3 rounded-xl bg-teal-600 text-white font-bold hover:bg-teal-700 transition"
           >
             Back to Home
           </button>
@@ -105,12 +102,12 @@ function PostTestPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center justify-center p-6">
+    <main className="min-h-screen bg-gradient-to-br from-teal-50 to-emerald-100 flex items-center justify-center p-6">
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-2xl">
         <div className="flex items-center justify-between mb-6">
           <button
             onClick={() => router.push("/")}
-            className="text-sm text-indigo-700 hover:underline"
+            className="text-sm text-teal-700 hover:underline"
           >
             ← Home
           </button>
@@ -148,7 +145,7 @@ function PostTestPage() {
                 className={[
                   "text-left w-full px-4 py-3 rounded-xl border font-semibold transition",
                   picked === opt
-                    ? "border-indigo-500 bg-indigo-50 text-gray-900"
+                    ? "border-teal-500 bg-teal-50 text-gray-900"
                     : "border-gray-200 bg-white hover:bg-gray-50 text-gray-800",
                 ].join(" ")}
               >
@@ -179,7 +176,7 @@ function PostTestPage() {
               className={[
                 "px-6 py-3 rounded-xl font-bold transition",
                 picked
-                  ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                  ? "bg-teal-600 text-white hover:bg-teal-700"
                   : "bg-gray-200 text-gray-500 cursor-not-allowed",
               ].join(" ")}
             >

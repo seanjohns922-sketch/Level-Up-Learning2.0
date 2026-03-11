@@ -55,7 +55,7 @@ export default function SplitStepper({
                 </button>
                 <button
                   onClick={() => item.set((v: number) => clamp(v + 1))}
-                  className="rounded-lg bg-indigo-600 text-white px-3 py-2 font-bold"
+                  className="rounded-lg bg-teal-600 text-white px-3 py-2 font-bold"
                 >
                   +1
                 </button>
@@ -71,7 +71,7 @@ export default function SplitStepper({
 
       <button
         onClick={check}
-        className="px-5 py-3 rounded-xl bg-indigo-600 text-white font-extrabold"
+        className="px-5 py-3 rounded-xl bg-teal-600 text-white font-extrabold"
       >
         Check
       </button>

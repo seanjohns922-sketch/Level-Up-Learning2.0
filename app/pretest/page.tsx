@@ -47,9 +47,9 @@ function MabPicker({
                 onClick={() => toggleTens(i)}
                 className={[
                   "w-10 h-20 rounded-xl border-2 transition",
-                  selected
-                    ? "border-indigo-600 bg-indigo-50"
-                    : "border-gray-200 bg-white hover:bg-gray-50",
+                   selected
+                     ? "border-teal-600 bg-teal-50"
+                     : "border-gray-200 bg-white hover:bg-gray-50",
                 ].join(" ")}
                 title={selected ? "Tap to remove" : "Tap to add"}
               >
@@ -59,7 +59,7 @@ function MabPicker({
                       key={k}
                       className={[
                         "h-2 rounded",
-                        selected ? "bg-indigo-600/60" : "bg-gray-200",
+                        selected ? "bg-teal-600/60" : "bg-gray-200",
                       ].join(" ")}
                     />
                   ))}
@@ -82,9 +82,9 @@ function MabPicker({
                 onClick={() => toggleOnes(i)}
                 className={[
                   "w-10 h-10 rounded-lg border-2 transition",
-                  selected
-                    ? "border-indigo-600 bg-indigo-50"
-                    : "border-gray-200 bg-white hover:bg-gray-50",
+                   selected
+                     ? "border-teal-600 bg-teal-50"
+                     : "border-gray-200 bg-white hover:bg-gray-50",
                 ].join(" ")}
                 title={selected ? "Tap to remove" : "Tap to add"}
               >
@@ -167,7 +167,7 @@ function DotAddVisual({
           className={[
             "h-8 w-8 rounded-full border transition",
             on
-              ? "bg-indigo-600 border-indigo-700"
+               ? "bg-teal-600 border-teal-700"
               : "bg-white border-gray-300 hover:bg-gray-50",
           ].join(" ")}
           aria-label={`${side} dot ${i + 1}`}
@@ -219,7 +219,7 @@ function EqualSharingPreview({
           className="rounded-xl border border-gray-300 bg-gray-50 p-3 flex flex-wrap gap-1 w-24"
         >
           {Array.from({ length: size }).map((_, j) => (
-            <div key={j} className="h-4 w-4 rounded-full bg-indigo-600" />
+            <div key={j} className="h-4 w-4 rounded-full bg-teal-600" />
           ))}
         </div>
       ))}
@@ -267,7 +267,7 @@ function GroupCountersVisual({
             className={[
               "h-10 w-10 rounded-full border transition",
               on
-                ? "bg-indigo-600 border-indigo-700"
+                ? "bg-teal-600 border-teal-700"
                 : "bg-white border-gray-300 hover:bg-gray-50",
             ].join(" ")}
             aria-label={`counter ${i + 1}`}
@@ -451,7 +451,7 @@ function PretestPage() {
                       "absolute top-1/2 -translate-y-1/2 -translate-x-1/2",
                       "w-14 h-14 rounded-full border-2 font-extrabold",
                       isSelected
-                        ? "border-indigo-600 bg-indigo-50 text-indigo-700"
+                        ? "border-teal-600 bg-teal-50 text-teal-700"
                         : "border-gray-300 bg-white hover:bg-gray-50",
                     ].join(" ")}
                     style={{ left: `${pct}%` }}
@@ -477,7 +477,7 @@ function PretestPage() {
                   className={[
                     "w-full rounded-2xl border p-5 text-left transition",
                     isSelected
-                      ? "border-indigo-500 bg-indigo-50"
+                      ? "border-teal-500 bg-teal-50"
                       : "border-gray-200 bg-white hover:bg-gray-50",
                   ].join(" ")}
                 >

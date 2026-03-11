@@ -41,9 +41,9 @@ export default function SubtractMissingPart({
           <div className="text-xs font-bold text-gray-500 mb-2">Part</div>
           <div className="text-4xl font-black text-gray-900">?</div>
         </div>
-        <div className="col-span-2 rounded-2xl border-2 border-indigo-200 bg-indigo-50 p-5 text-center">
-          <div className="text-xs font-bold text-indigo-700 mb-2">Whole</div>
-          <div className="text-5xl font-black text-indigo-900">{total}</div>
+        <div className="col-span-2 rounded-2xl border-2 border-teal-200 bg-teal-50 p-5 text-center">
+          <div className="text-xs font-bold text-teal-700 mb-2">Whole</div>
+          <div className="text-5xl font-black text-teal-900">{total}</div>
         </div>
       </div>
 
@@ -55,7 +55,7 @@ export default function SubtractMissingPart({
             className={[
               "w-full text-left px-5 py-4 rounded-2xl border text-2xl font-black transition",
               picked === opt
-                ? "border-indigo-600 bg-indigo-50"
+                ? "border-teal-600 bg-teal-50"
                 : "border-gray-200 hover:bg-gray-50",
             ].join(" ")}
             type="button"
