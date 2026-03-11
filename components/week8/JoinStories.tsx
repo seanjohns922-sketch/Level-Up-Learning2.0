@@ -61,8 +61,8 @@ export default function JoinStories({
                 count={a}
                 dotSize={20}
                 gap={6}
-                activeClassName="bg-indigo-500"
-                borderClassName="border border-indigo-600"
+                activeClassName="bg-teal-500"
+                borderClassName="border border-teal-600"
               />
             </div>
             <div className="rounded-xl border border-gray-200 bg-white p-3">
