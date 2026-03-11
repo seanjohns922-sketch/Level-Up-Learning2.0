@@ -128,3 +128,11 @@ body {
   85% { opacity: 1; }
   100% { opacity: 0; transform: translateY(-100vh) translateX(var(--drift, 0px)); }
 }
+
+@keyframes nexusFlicker {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  20% { opacity: 1; transform: scale(1.2); }
+  40% { opacity: 0.5; transform: scale(0.9); }
+  60% { opacity: 0.9; transform: scale(1.1); }
+  80% { opacity: 0.2; transform: scale(0.7); }
+}
