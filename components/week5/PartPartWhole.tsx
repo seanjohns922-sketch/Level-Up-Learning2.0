@@ -139,7 +139,7 @@ export default function PartPartWhole({
               {Array.from({ length: whole }).map((_, i) => (
                 <span
                   key={i}
-                  className="inline-block h-4 w-4 rounded-full bg-indigo-700"
+                  className="inline-block h-4 w-4 rounded-full bg-teal-700"
                 />
               ))}
             </div>

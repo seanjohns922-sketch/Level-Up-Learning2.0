@@ -161,7 +161,7 @@ export default function FillTheJar({
           <button
             key={inc}
             onClick={() => add(inc)}
-            className="rounded-2xl bg-indigo-600 text-white px-4 py-4 text-xl font-extrabold hover:bg-indigo-700 transition active:scale-[0.98]"
+            className="rounded-2xl bg-teal-600 text-white px-4 py-4 text-xl font-extrabold hover:bg-teal-700 transition active:scale-[0.98]"
           >
             +{inc}
           </button>

@@ -90,7 +90,7 @@ export default function NumberChartFill({
                 "rounded-lg border text-sm font-bold py-2",
                 isMissing
                   ? isFilled
-                    ? "bg-indigo-600 text-white border-indigo-700"
+                    ? "bg-teal-600 text-white border-teal-700"
                     : "bg-white border-gray-300 hover:bg-gray-50"
                   : "bg-gray-50 text-gray-600 border-gray-200",
               ].join(" ")}
