@@ -63,7 +63,7 @@ export default function SubtractTakeAway({
               "h-9 w-9 rounded-full border-2 transition",
               isRemoved
                 ? "border-gray-300 bg-gray-100 opacity-40"
-                : "border-indigo-600 bg-indigo-100",
+                : "border-teal-600 bg-teal-100",
             ].join(" ")}
             type="button"
           />
