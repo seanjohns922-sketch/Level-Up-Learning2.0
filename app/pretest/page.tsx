@@ -219,7 +219,7 @@ function EqualSharingPreview({
           className="rounded-xl border border-gray-300 bg-gray-50 p-3 flex flex-wrap gap-1 w-24"
         >
           {Array.from({ length: size }).map((_, j) => (
-            <div key={j} className="h-4 w-4 rounded-full bg-indigo-600" />
+            <div key={j} className="h-4 w-4 rounded-full bg-teal-600" />
           ))}
         </div>
       ))}
