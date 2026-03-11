@@ -44,7 +44,7 @@ export default function SkipCount({
               {value}
             </div>
           ))}
-          <div className="rounded-xl border-2 border-dashed border-indigo-300 px-5 py-3 text-3xl font-black text-indigo-700">
+          <div className="rounded-xl border-2 border-dashed border-teal-300 px-5 py-3 text-3xl font-black text-teal-700">
             ?
           </div>
         </div>
