@@ -155,7 +155,7 @@ export default function NumbotCollectionPage() {
             >
               <ArrowLeft className="h-3.5 w-3.5" /> My Legends
             </button>
-            <div className="inline-flex items-center gap-1.5 text-sm font-bold text-muted-foreground bg-card px-4 py-1.5 rounded-full border border-border shadow-sm">
+            <div className="inline-flex items-center gap-1.5 text-sm font-bold text-teal-700 bg-teal-50 px-4 py-1.5 rounded-full border border-teal-200 shadow-sm">
               <Sparkles className="h-3.5 w-3.5 text-teal-500" /> Number Nexus
             </div>
           </div>
