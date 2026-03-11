@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { PlaceValueBuilderQuestion, PlaceValueName } from "@/data/activities/year2/lessonEngine";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
