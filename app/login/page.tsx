@@ -41,24 +41,6 @@ function writeClasses(store: ClassesStore) {
   localStorage.setItem(CLASSES_KEY, JSON.stringify(store));
 }
 
-function generateCode() {
-  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let out = "";
-  for (let i = 0; i < 5; i += 1) {
-    out += alphabet[Math.floor(Math.random() * alphabet.length)];
-  }
-  return out;
-}
-
-function initials(name: string) {
-  return name
-    .trim()
-    .split(/\s+/)
-    .map((n) => n[0]?.toUpperCase() ?? "")
-    .slice(0, 2)
-    .join("");
-}
-
 export default function LoginPage() {
   const router = useRouter();
   const [tab, setTab] = useState<"student" | "teacher">("student");
@@ -78,7 +60,6 @@ export default function LoginPage() {
   const [showPin, setShowPin] = useState(false);
 
   const createdClass = createdCode ? classes[createdCode] : null;
-
   const classList = useMemo(() => Object.values(classes), [classes]);
   const [teacherError, setTeacherError] = useState<string | null>(null);
   const [teacherLoading, setTeacherLoading] = useState(false);
@@ -112,14 +93,12 @@ export default function LoginPage() {
       return;
     }
 
-    // Ensure teacher profile exists on teachers.id = auth.users.id
     await supabase.from("teachers").upsert({
       id: userId,
       email: teacherEmail,
       display_name: teacherName.trim() || teacherEmail,
     });
 
-    // Optionally create a class if name provided
     if (className.trim()) {
       const { data: code } = await supabase.rpc("generate_class_code");
       if (code) {
@@ -130,7 +109,6 @@ export default function LoginPage() {
           teacher_id: userId,
         });
         setCreatedCode(code);
-        // Also store locally for display
         const record: ClassRecord = {
           code,
           name: className.trim(),
@@ -174,19 +152,16 @@ export default function LoginPage() {
   }
 
   async function handleStudentLogin() {
-    console.log("[StudentJoin] Starting join flow");
     setStudentError(null);
     const normalizedCode = studentCode.trim().toUpperCase();
     const displayName = studentName.trim();
     const name = displayName;
     const pin = studentPin.trim();
-    console.log("[StudentJoin] Normalized code:", normalizedCode);
     if (!normalizedCode || !name || pin.length !== 4) {
       setStudentError("Please enter class code, name, and 4-digit PIN.");
       return;
     }
 
-    const studentId = crypto.randomUUID();
     const { data: cls } = await supabase
       .from("classes")
       .select("id")
@@ -198,7 +173,6 @@ export default function LoginPage() {
       return;
     }
 
-    // Create synthetic auth user
     const syntheticEmail = `${name.toLowerCase().replace(/[^a-z0-9]/g, "")}.${normalizedCode.toLowerCase()}@leveluplearning.app`;
     const paddedPin = pin + "xx";
     const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
@@ -207,9 +181,7 @@ export default function LoginPage() {
     });
 
     if (signUpErr) {
-      console.error("[StudentJoin] signup error:", signUpErr.message);
       if (signUpErr.message.includes("already")) {
-        // Try sign in instead
         const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
           email: syntheticEmail,
           password: paddedPin,
@@ -218,7 +190,6 @@ export default function LoginPage() {
           setStudentError("That name is taken in this class, or your PIN is wrong.");
           return;
         }
-        // Find existing student
         const { data: existing } = await supabase
           .from("students")
           .select("id, class_id")
@@ -241,6 +212,7 @@ export default function LoginPage() {
       return;
     }
 
+    const studentId = crypto.randomUUID();
     const { data: student } = await supabase
       .from("students")
       .insert({
@@ -260,64 +232,69 @@ export default function LoginPage() {
 
     localStorage.setItem("lul_student_id", student.id);
     localStorage.setItem("lul_class_id", cls.id);
-
     router.push("/home");
   }
 
   return (
-    <main className="min-h-screen relative overflow-hidden bg-[#fbf7f1] px-6 py-10">
-      <div className="absolute -top-24 -left-24 h-80 w-80 rounded-full bg-[#efe7d8] opacity-70" />
-      <div className="absolute top-12 right-8 h-56 w-56 rounded-full bg-[#e8f1ff] opacity-70" />
-      <div className="absolute bottom-0 left-[-100px] h-80 w-80 rounded-full bg-[#f1f7ee] opacity-70" />
+    <main className="min-h-screen relative overflow-hidden flex flex-col items-center justify-start">
+      {/* Full-bleed fantasy background */}
+      <div className="absolute inset-0">
+        <img
+          src="/images/login-bg.jpg"
+          alt=""
+          className="w-full h-full object-cover"
+        />
+        {/* Dark overlay for readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-black/50" />
+      </div>
 
-      <div className="absolute left-10 top-28 h-3 w-3 rounded-full bg-[#d7c9b3]" />
-      <div className="absolute right-28 top-40 h-2.5 w-2.5 rounded-full bg-[#e6cfa7]" />
-      <div className="absolute left-16 bottom-40 h-4 w-4 rounded-full bg-[#cfe3cf]" />
-      <div className="absolute right-16 bottom-28 h-3 w-3 rounded-full bg-[#f0d7b1]" />
-
-      <div className="relative max-w-4xl mx-auto">
-        <div
-          className="text-center mb-8"
-          style={{ animation: "fadeUp 0.6s ease both" }}
-        >
-          <h1
-            className="text-5xl md:text-6xl font-black text-[#1f2937] tracking-tight"
-            style={{ fontFamily: "'Nunito', 'Avenir Next', 'Trebuchet MS', sans-serif" }}
-          >
-            Level Up
-            <span className="block">Learning</span>
-          </h1>
-          <p className="text-lg text-gray-500 mt-3">
-            Sign in to start your adventure
-          </p>
+      {/* Content */}
+      <div className="relative z-10 w-full max-w-lg mx-auto px-4 pt-6 pb-10 flex flex-col items-center">
+        {/* Skip to Demo */}
+        <div className="w-full flex justify-end mb-2">
           <button
             onClick={() => {
-              // Sign out any existing Supabase session to avoid auth pollution
-              supabase.auth.signOut().then(() => {
-                router.push("/home");
-              });
+              supabase.auth.signOut().then(() => router.push("/home"));
             }}
-            className="mt-4 inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#eef2f6] text-gray-600 font-semibold hover:bg-white shadow-sm"
+            className="px-4 py-1.5 rounded-full bg-white/20 backdrop-blur text-white/90 text-sm font-semibold hover:bg-white/30 transition"
             type="button"
           >
             Skip to Demo &rarr;
           </button>
         </div>
 
+        {/* Title area */}
+        <div className="text-center mb-6" style={{ animation: "fadeUp 0.6s ease both" }}>
+          <h1
+            className="text-5xl md:text-6xl font-black text-white tracking-tight drop-shadow-lg"
+            style={{ fontFamily: "'Nunito', 'Avenir Next', 'Trebuchet MS', sans-serif" }}
+          >
+            Level Up
+            <span className="block">Learning</span>
+          </h1>
+          <p className="text-base text-white/70 mt-2 italic">
+            Climb the Tower. Master the Worlds.
+            <br />
+            Unlock your Legend.
+          </p>
+        </div>
+
+        {/* Frosted glass card */}
         <div
-          className="bg-white/80 backdrop-blur rounded-[28px] shadow-xl border border-white p-6 md:p-8"
+          className="w-full bg-white/30 backdrop-blur-xl rounded-[28px] shadow-2xl border border-white/40 p-6 md:p-8"
           style={{ animation: "fadeUp 0.7s ease both 0.1s" }}
         >
-          <div className="flex items-center justify-center mb-6">
-            <div className="inline-flex rounded-2xl bg-[#edf1f4] p-1 w-full max-w-lg">
+          {/* Tab toggle */}
+          <div className="flex items-center justify-center mb-5">
+            <div className="inline-flex rounded-2xl bg-white/40 p-1 w-full">
               <button
                 type="button"
                 onClick={() => setTab("student")}
                 className={[
-                  "flex-1 py-2 rounded-xl font-bold",
+                  "flex-1 py-2.5 rounded-xl font-bold text-sm transition",
                   tab === "student"
                     ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-500",
+                    : "text-gray-700",
                 ].join(" ")}
               >
                 Student
@@ -326,10 +303,10 @@ export default function LoginPage() {
                 type="button"
                 onClick={() => setTab("teacher")}
                 className={[
-                  "flex-1 py-2 rounded-xl font-bold",
+                  "flex-1 py-2.5 rounded-xl font-bold text-sm transition",
                   tab === "teacher"
                     ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-500",
+                    : "text-gray-700",
                 ].join(" ")}
               >
                 Teacher / Parent
@@ -338,45 +315,45 @@ export default function LoginPage() {
           </div>
 
           {tab === "student" ? (
-            <div className="grid gap-4 max-w-xl mx-auto">
-              <p className="text-sm text-gray-500 text-center">
-                Enter your class code, name &amp; PIN - new accounts are created automatically!
+            <div className="grid gap-3">
+              <p className="text-xs text-gray-600 text-center">
+                Enter your class code, name &amp; PIN
               </p>
 
               <label className="grid gap-1">
-                <span className="text-sm font-bold text-gray-600">Class Code</span>
+                <span className="text-xs font-bold text-gray-700">Class Code</span>
                 <input
                   value={studentCode}
                   onChange={(e) => setStudentCode(e.target.value)}
                   placeholder="E.G. K9F2Q"
-                  className="px-4 py-4 rounded-2xl border border-gray-200 text-lg font-semibold tracking-[0.4em] text-center uppercase bg-white"
+                  className="px-4 py-3 rounded-xl border border-white/60 text-base font-semibold tracking-[0.3em] text-center uppercase bg-white/70 backdrop-blur focus:outline-none focus:ring-2 focus:ring-teal-400/50"
                 />
               </label>
 
               <label className="grid gap-1">
-                <span className="text-sm font-bold text-gray-600">Your Name</span>
+                <span className="text-xs font-bold text-gray-700">Your Name</span>
                 <input
                   value={studentName}
                   onChange={(e) => setStudentName(e.target.value)}
                   placeholder="Enter your first name"
-                  className="px-4 py-4 rounded-2xl border border-gray-200 text-lg bg-white"
+                  className="px-4 py-3 rounded-xl border border-white/60 text-base bg-white/70 backdrop-blur focus:outline-none focus:ring-2 focus:ring-teal-400/50"
                 />
               </label>
 
               <label className="grid gap-1">
-                <span className="text-sm font-bold text-gray-600">4-Digit PIN</span>
+                <span className="text-xs font-bold text-gray-700">4-Digit PIN</span>
                 <div className="relative">
                   <input
                     value={studentPin}
                     onChange={(e) => setStudentPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                    placeholder="...."
-                    className="w-full px-4 py-4 rounded-2xl border border-gray-200 text-lg tracking-[0.6em] text-center bg-white"
+                    placeholder="····"
+                    className="w-full px-4 py-3 rounded-xl border border-white/60 text-base tracking-[0.5em] text-center bg-white/70 backdrop-blur focus:outline-none focus:ring-2 focus:ring-teal-400/50"
                     type={showPin ? "text" : "password"}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPin((prev) => !prev)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                     aria-label={showPin ? "Hide PIN" : "Show PIN"}
                   >
                     <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
@@ -387,29 +364,30 @@ export default function LoginPage() {
                 </div>
               </label>
 
-              {studentError ? (
-                <div className="text-sm font-bold text-red-600 text-center">{studentError}</div>
-              ) : null}
+              {studentError && (
+                <div className="text-sm font-bold text-red-600 text-center bg-red-50/80 rounded-lg py-1">{studentError}</div>
+              )}
 
               <button
                 onClick={handleStudentLogin}
-                className="mt-2 w-full py-4 rounded-2xl bg-[#9fd7b1] text-[#1f3b2a] font-black text-xl hover:bg-[#8fcea4] transition shadow-sm"
+                className="mt-1 w-full py-3.5 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-700 text-white font-black text-lg hover:opacity-90 transition shadow-lg shadow-teal-900/20 active:scale-[0.98]"
                 type="button"
               >
-                Let's Go!
+                Let&apos;s Go!
               </button>
             </div>
           ) : (
-            <div className="grid gap-4 max-w-2xl mx-auto">
-              <div className="flex items-center justify-center gap-4">
+            <div className="grid gap-3">
+              {/* Login / Signup toggle */}
+              <div className="flex items-center justify-center gap-3 mb-1">
                 <button
                   type="button"
                   onClick={() => setTeacherMode("login")}
                   className={[
-                    "px-6 py-2 rounded-full font-bold",
+                    "px-5 py-1.5 rounded-full font-bold text-sm transition",
                     teacherMode === "login"
-                      ? "bg-[#e8f1ff] text-[#2b4b7b]"
-                      : "text-gray-500",
+                      ? "bg-white/60 text-gray-900"
+                      : "text-gray-600",
                   ].join(" ")}
                 >
                   Log In
@@ -418,115 +396,78 @@ export default function LoginPage() {
                   type="button"
                   onClick={() => setTeacherMode("signup")}
                   className={[
-                    "px-6 py-2 rounded-full font-bold",
+                    "px-5 py-1.5 rounded-full font-bold text-sm transition",
                     teacherMode === "signup"
-                      ? "bg-[#e8f1ff] text-[#2b4b7b]"
-                      : "text-gray-500",
+                      ? "bg-white/60 text-gray-900"
+                      : "text-gray-600",
                   ].join(" ")}
                 >
                   Sign Up
                 </button>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-4">
-                <label className="grid gap-1">
-                  <span className="text-sm font-bold text-gray-600">Email</span>
-                  <input
-                    value={teacherEmail}
-                    onChange={(e) => setTeacherEmail(e.target.value)}
-                    placeholder="teacher@school.edu"
-                    className="px-4 py-4 rounded-2xl border border-gray-200 bg-white"
-                  />
-                </label>
-                <label className="grid gap-1">
-                  <span className="text-sm font-bold text-gray-600">Password</span>
-                  <input
-                    value={teacherPassword}
-                    onChange={(e) => setTeacherPassword(e.target.value)}
-                    placeholder="********"
-                    type="password"
-                    className="px-4 py-4 rounded-2xl border border-gray-200 bg-white"
-                  />
-                </label>
-              </div>
+              <label className="grid gap-1">
+                <span className="text-xs font-bold text-gray-700">Email</span>
+                <input
+                  value={teacherEmail}
+                  onChange={(e) => setTeacherEmail(e.target.value)}
+                  placeholder="teacher@school.edu"
+                  className="px-4 py-3 rounded-xl border border-white/60 bg-white/70 backdrop-blur focus:outline-none focus:ring-2 focus:ring-teal-400/50"
+                />
+              </label>
+              <label className="grid gap-1">
+                <span className="text-xs font-bold text-gray-700">Password</span>
+                <input
+                  value={teacherPassword}
+                  onChange={(e) => setTeacherPassword(e.target.value)}
+                  placeholder="********"
+                  type="password"
+                  className="px-4 py-3 rounded-xl border border-white/60 bg-white/70 backdrop-blur focus:outline-none focus:ring-2 focus:ring-teal-400/50"
+                />
+              </label>
 
-              {teacherMode === "signup" ? (
-                <div className="grid md:grid-cols-2 gap-4">
+              {teacherMode === "signup" && (
+                <>
                   <label className="grid gap-1">
-                    <span className="text-sm font-bold text-gray-600">Teacher Name (optional)</span>
+                    <span className="text-xs font-bold text-gray-700">Teacher Name (optional)</span>
                     <input
                       value={teacherName}
                       onChange={(e) => setTeacherName(e.target.value)}
                       placeholder="Ms Johnson"
-                      className="px-4 py-4 rounded-2xl border border-gray-200 bg-white"
+                      className="px-4 py-3 rounded-xl border border-white/60 bg-white/70 backdrop-blur focus:outline-none focus:ring-2 focus:ring-teal-400/50"
                     />
                   </label>
                   <label className="grid gap-1">
-                    <span className="text-sm font-bold text-gray-600">Class Name (optional)</span>
+                    <span className="text-xs font-bold text-gray-700">Class Name (optional)</span>
                     <input
                       value={className}
                       onChange={(e) => setClassName(e.target.value)}
                       placeholder="3/4 SJ"
-                      className="px-4 py-4 rounded-2xl border border-gray-200 bg-white"
+                      className="px-4 py-3 rounded-xl border border-white/60 bg-white/70 backdrop-blur focus:outline-none focus:ring-2 focus:ring-teal-400/50"
                     />
                   </label>
-                </div>
-              ) : null}
+                </>
+              )}
 
               {teacherError && (
-                <p className="text-sm text-red-600 font-bold text-center">{teacherError}</p>
+                <p className="text-sm text-red-600 font-bold text-center bg-red-50/80 rounded-lg py-1">{teacherError}</p>
               )}
 
               <button
                 onClick={teacherMode === "signup" ? handleTeacherSignup : handleTeacherLogin}
                 disabled={teacherLoading}
-                className="mt-2 w-full py-4 rounded-2xl bg-[#9fd7b1] text-[#1f3b2a] font-black text-lg hover:bg-[#8fcea4] transition disabled:opacity-50"
+                className="mt-1 w-full py-3.5 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-700 text-white font-black text-lg hover:opacity-90 transition shadow-lg shadow-teal-900/20 active:scale-[0.98] disabled:opacity-50"
                 type="button"
               >
-                {teacherLoading ? "Please wait…" : teacherMode === "signup" ? "Sign Up" : "Sign In"}
+                {teacherLoading ? "Please wait…" : teacherMode === "signup" ? "Sign Up" : "Log In"}
               </button>
 
-              {createdClass ? (
-                <div className="rounded-2xl border border-[#cfe1ff] bg-[#eef4ff] p-4">
-                  <div className="text-sm font-bold text-[#2b4b7b]">Class Created</div>
-                  <div className="text-sm text-[#2b4b7b]">Name: {createdClass.name}</div>
-                  <div className="text-sm text-[#2b4b7b]">Code: {createdClass.code}</div>
+              {createdClass && (
+                <div className="rounded-xl border border-teal-200/60 bg-teal-50/80 p-3 text-sm">
+                  <div className="font-bold text-teal-800">Class Created</div>
+                  <div className="text-teal-700">Name: {createdClass.name} · Code: {createdClass.code}</div>
                 </div>
-              ) : null}
-
-              {classList.length ? (
-                <div className="rounded-2xl border border-gray-200 bg-white p-4">
-                  <div className="text-sm font-bold text-gray-700 mb-2">Your Classes</div>
-                  <div className="grid gap-3">
-                    {classList.map((cls) => (
-                      <div
-                        key={cls.code}
-                        className="rounded-xl border border-gray-200 p-3"
-                      >
-                        <div className="font-bold text-gray-900">{cls.name}</div>
-                        <div className="text-xs text-gray-500">Code: {cls.code}</div>
-                        <div className="mt-2 text-xs font-semibold text-gray-600">
-                          Students: {cls.students.length}
-                        </div>
-                        <div className="mt-2 grid gap-2">
-                          {cls.students.map((s) => (
-                            <div
-                              key={s.id}
-                              className="flex items-center justify-between text-xs text-gray-600"
-                            >
-                              <div>{s.firstName}</div>
-                              <div>{s.progressPercent}% - Week {s.currentWeek}</div>
-                            </div>
-                          ))}
-                          {cls.students.length === 0 ? (
-                            <div className="text-xs text-gray-400">No students yet.</div>
-                          ) : null}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
+              )}
             </div>
           )}
         </div>
