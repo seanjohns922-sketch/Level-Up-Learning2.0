@@ -18,7 +18,7 @@ export default function MissionCard({ legend, week, lessonsDone }: Props) {
 
       <div className="relative flex items-start gap-4">
         {/* Legend avatar */}
-        <div className="flex-shrink-0 h-16 w-16 rounded-2xl bg-white shadow-md border border-purple-100 flex items-center justify-center overflow-hidden">
+        <div className="flex-shrink-0 h-16 w-16 rounded-2xl bg-white shadow-md border border-teal-100 flex items-center justify-center overflow-hidden">
           <img src={legend.images.avatar} alt={legend.name} className="h-14 w-14 object-contain" />
         </div>
 
