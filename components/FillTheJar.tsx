@@ -141,7 +141,7 @@ export default function FillTheJar({
               {dots.map((i) => (
                 <div
                   key={i}
-                  className="rounded-full bg-indigo-600"
+                  className="rounded-full bg-teal-600"
                   style={{ width: layout.dotSize, height: layout.dotSize }}
                 />
               ))}
