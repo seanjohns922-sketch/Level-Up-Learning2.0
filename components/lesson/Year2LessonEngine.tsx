@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { LessonRenderer } from "@/components/lesson/LessonRenderer";
 import { generateYear2Question, type Year2QuestionData } from "@/data/activities/year2/lessonEngine";
 import { pickWeightedIndex } from "@/lib/weightedRandom";
+import type { LessonActivity } from "@/data/programs/types";
 import type { Lesson } from "@/data/programs/year1";
 
 function pad2(n: number) {
@@ -38,6 +39,13 @@ function Countdown({ seconds, total }: { seconds: number; total: number }) {
   );
 }
 
+type CurrentTurn = {
+  activityIndex: number;
+  activity: LessonActivity;
+  question: Year2QuestionData;
+  key: number;
+};
+
 export function Year2LessonEngine({
   lesson,
   onTimedComplete,
@@ -52,9 +60,7 @@ export function Year2LessonEngine({
   const [status, setStatus] = useState<"idle" | "correct" | "wrong">("idle");
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
-  const [currentActivityIndex, setCurrentActivityIndex] = useState(0);
-  const [currentQuestion, setCurrentQuestion] = useState<Year2QuestionData | null>(null);
-  const [questionKey, setQuestionKey] = useState(0);
+  const [currentTurn, setCurrentTurn] = useState<CurrentTurn | null>(null);
   const [finished, setFinished] = useState(false);
   const bagRef = useRef<number[]>([]);
   const lastIndexRef = useRef<number | null>(null);
@@ -62,7 +68,8 @@ export function Year2LessonEngine({
   const markedCompleteRef = useRef(false);
 
   const activities = lesson.activities ?? [];
-  const currentActivity = activities[currentActivityIndex] ?? null;
+  const currentActivity = currentTurn?.activity ?? null;
+  const currentQuestion = currentTurn?.question ?? null;
 
   function clearPendingTimeout() {
     if (timeoutRef.current) {
@@ -81,10 +88,12 @@ export function Year2LessonEngine({
 
     const nextActivity = activities[picked.index];
     const nextQuestion = generateYear2Question(lesson, nextActivity);
-
-    setCurrentActivityIndex(picked.index);
-    setCurrentQuestion(nextQuestion);
-    setQuestionKey((value) => value + 1);
+    setCurrentTurn((current) => ({
+      activityIndex: picked.index,
+      activity: nextActivity,
+      question: nextQuestion,
+      key: (current?.key ?? 0) + 1,
+    }));
     setStatus("idle");
   }
 
@@ -93,6 +102,7 @@ export function Year2LessonEngine({
     setStatus("idle");
     setQuestionsAnswered(0);
     setCorrectAnswers(0);
+    setCurrentTurn(null);
     setFinished(false);
     bagRef.current = [];
     lastIndexRef.current = null;
@@ -159,14 +169,6 @@ export function Year2LessonEngine({
     ],
     [accuracy, correctAnswers, questionsAnswered]
   );
-
-  useEffect(() => {
-    console.log("Year2 activity", {
-      activityType: currentActivity?.activityType,
-      questionKind: currentQuestion?.kind,
-      question: currentQuestion,
-    });
-  }, [currentActivity, currentQuestion]);
 
   if (finished) {
     return (
@@ -244,7 +246,7 @@ export function Year2LessonEngine({
 
       {currentActivity && currentQuestion ? (
         <LessonRenderer
-          key={questionKey}
+          key={currentTurn?.key}
           activity={currentActivity}
           prompt={lesson.title}
           questionData={currentQuestion}
