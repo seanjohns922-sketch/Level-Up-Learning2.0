@@ -415,9 +415,12 @@ function PretestPage() {
           </div>
         </div>
 
-        <h2 className="text-2xl md:text-3xl font-extrabold text-gray-800 mb-6">
-          {question.prompt}
-        </h2>
+        <div className="flex items-center gap-2 mb-6">
+          <h2 className="text-2xl md:text-3xl font-extrabold text-gray-800">
+            {question.prompt}
+          </h2>
+          <ReadAloudBtn text={question.prompt} size="md" />
+        </div>
 
         {question.type === "mab" ? (
           <MabPicker

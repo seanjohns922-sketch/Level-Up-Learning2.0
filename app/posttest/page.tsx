@@ -134,8 +134,11 @@ function PostTestPage() {
             </div>
           </div>
 
-          <div className="text-lg font-extrabold text-gray-800 mb-4">
-            {q.prompt}
+          <div className="flex items-center gap-2 mb-4">
+            <div className="text-lg font-extrabold text-gray-800">
+              {q.prompt}
+            </div>
+            <ReadAloudBtn text={q.prompt} />
           </div>
 
           <div className="grid gap-2">
