@@ -13,7 +13,7 @@ export default function HeroHeader({ levelNum, week, lessonsDone, overallPercent
   return (
     <div className="relative overflow-hidden">
       {/* Gradient background with magical particles */}
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-purple-600 to-violet-700" />
+      <div className="absolute inset-0 bg-gradient-to-br from-teal-600 via-teal-700 to-emerald-800" />
       <div className="absolute inset-0 opacity-20">
         {[...Array(6)].map((_, i) => (
           <div
