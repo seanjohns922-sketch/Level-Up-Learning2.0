@@ -57,7 +57,7 @@ export default function HeroHeader({ levelNum, week, lessonsDone, overallPercent
         <div className="text-center">
           <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-4 py-1.5 rounded-full text-sm font-bold text-white mb-3">
             <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor"><polygon points="12,2 15,10 22,10 16,15 18,22 12,18 6,22 8,15 2,10 9,10" /></svg>
-            LEVEL {levelNum} — TOWER OF KNOWLEDGE
+            LEVEL {levelNum} — NUMBER NEXUS
           </div>
           <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight">
             Week {week} of 12
