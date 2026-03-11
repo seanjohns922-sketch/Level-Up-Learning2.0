@@ -158,26 +158,12 @@ export default function NumberNexusPage() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden">
-      {/* Mechanical background textures */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 20% 30%, hsla(180,40%,20%,0.15) 0%, transparent 50%),
-                            radial-gradient(circle at 80% 70%, hsla(145,40%,20%,0.1) 0%, transparent 50%)`,
-        }} />
-        {/* Gear pattern overlay */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{
-          backgroundImage: `repeating-conic-gradient(from 0deg, transparent 0deg 30deg, hsla(180,50%,50%,0.3) 30deg 60deg)`,
-          backgroundSize: "80px 80px",
-        }} />
-        {/* Circuit lines */}
-        <svg className="absolute inset-0 w-full h-full opacity-[0.04]">
-          <pattern id="circuit" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
-            <path d="M30 0 L30 20 M30 40 L30 60 M0 30 L20 30 M40 30 L60 30" stroke="hsl(180,60%,50%)" strokeWidth="0.5" fill="none" />
-            <circle cx="30" cy="30" r="2" fill="hsl(180,60%,50%)" />
-          </pattern>
-          <rect width="100%" height="100%" fill="url(#circuit)" />
-        </svg>
-      </div>
+      {/* Background image */}
+      <div
+        className="absolute inset-0 bg-cover bg-top bg-no-repeat pointer-events-none"
+        style={{ backgroundImage: "url('/images/number-nexus-bg.jpg')" }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-950/30 via-slate-950/50 to-slate-950/95 pointer-events-none" />
 
       {/* Header */}
       <div className="relative z-10 px-4 pt-4 pb-2 flex items-center justify-between">
