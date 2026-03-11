@@ -23,11 +23,11 @@ const REALMS: RealmDef[] = [
   {
     id: "number-nexus",
     name: "Number Nexus",
-    legendLine: "Numbots",
+    legendLine: "Numbot Collection",
     icon: <Zap className="h-6 w-6" />,
     totalLegends: 7,
     status: "open",
-    route: "/number-nexus",
+    route: "/legends/number",
     gradient: "from-teal-500/15 to-emerald-500/10",
     borderColor: "border-teal-400/40",
     iconBg: "bg-teal-500/15 text-teal-500",
@@ -167,7 +167,7 @@ function RealmCard({ realm, collected, onClick }: { realm: RealmDef; collected: 
             {realm.name}
           </h3>
           <p className={`text-sm mt-0.5 ${isLocked ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
-            {isLocked ? "Future Realm" : `Legend Line: ${realm.legendLine}`}
+            {isLocked ? "Future Realm" : isComingSoon ? `Coming Soon: ${realm.legendLine}` : `${realm.legendLine}`}
           </p>
 
           <div className="mt-3">
