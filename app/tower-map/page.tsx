@@ -121,7 +121,7 @@ export default function TowerMapPage() {
           >
             {realm.active ? (
               <button
-                onClick={() => router.push("/home")}
+                onClick={() => router.push("/number-nexus")}
                 className="group flex flex-col items-center cursor-pointer"
               >
                 {/* Glow */}
