@@ -73,7 +73,7 @@ export default function PartitionExpand({
               value={values[item.key]}
               onChange={(event) => setValue(item.key, event.target.value)}
               inputMode="numeric"
-              className="mt-3 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-3xl font-black text-gray-900 outline-none focus:border-indigo-500"
+              className="mt-3 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-3xl font-black text-gray-900 outline-none focus:border-teal-500"
               placeholder="0"
             />
           </label>
