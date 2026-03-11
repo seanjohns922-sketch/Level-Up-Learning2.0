@@ -40,7 +40,7 @@ export default function MissionCard({ legend, week, lessonsDone }: Props) {
                 style={{ width: `${Math.round((lessonsDone / 3) * 100)}%` }}
               />
             </div>
-            <span className="text-xs font-bold text-purple-600">{lessonsDone}/3</span>
+            <span className="text-xs font-bold text-teal-600">{lessonsDone}/3</span>
           </div>
         </div>
       </div>
