@@ -167,21 +167,23 @@ export default function NumberNexusPage() {
 
       {/* Floating light particles */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {Array.from({ length: 18 }).map((_, i) => {
-          const size = 2 + (i % 4) * 1.5;
-          const left = ((i * 37 + 11) % 100);
-          const delay = (i * 1.7) % 12;
-          const duration = 14 + (i % 5) * 4;
-          const drift = -20 + (i % 7) * 8;
-          const opacity = 0.15 + (i % 3) * 0.12;
-          const color = i % 3 === 0
+        {Array.from({ length: 30 }).map((_, i) => {
+          const size = 2 + (i % 5) * 1.2;
+          const left = ((i * 31 + 7) % 100);
+          const delay = (i * 1.3) % 14;
+          const duration = 12 + (i % 6) * 3.5;
+          const drift = -25 + (i % 9) * 6;
+          const opacity = 0.15 + (i % 4) * 0.1;
+          const color = i % 4 === 0
             ? "hsla(42, 95%, 65%, VAR)"
-            : i % 3 === 1
+            : i % 4 === 1
             ? "hsla(175, 60%, 55%, VAR)"
-            : "hsla(215, 65%, 60%, VAR)";
+            : i % 4 === 2
+            ? "hsla(215, 65%, 60%, VAR)"
+            : "hsla(280, 50%, 65%, VAR)";
           return (
             <div
-              key={i}
+              key={`p-${i}`}
               className="absolute rounded-full"
               style={{
                 width: size,
@@ -189,10 +191,39 @@ export default function NumberNexusPage() {
                 left: `${left}%`,
                 bottom: `-${size}px`,
                 opacity: 0,
-                background: `radial-gradient(circle, ${color.replace("VAR", "0.9")}, ${color.replace("VAR", "0")})`,
-                boxShadow: `0 0 ${size * 3}px ${color.replace("VAR", String(opacity))}`,
+                background: `radial-gradient(circle, ${color.replace(/VAR/g, "0.9")}, ${color.replace(/VAR/g, "0")})`,
+                boxShadow: `0 0 ${size * 3}px ${color.replace(/VAR/g, String(opacity))}`,
                 animation: `nexusFloat ${duration}s ${delay}s ease-in-out infinite`,
                 ["--drift" as string]: `${drift}px`,
+              }}
+            />
+          );
+        })}
+
+        {/* Flickering stars */}
+        {Array.from({ length: 24 }).map((_, i) => {
+          const size = 1 + (i % 3) * 0.8;
+          const left = ((i * 43 + 13) % 98) + 1;
+          const top = ((i * 29 + 5) % 55) + 2;
+          const delay = (i * 0.9) % 6;
+          const duration = 2 + (i % 4) * 1.2;
+          const color = i % 3 === 0
+            ? "hsla(42, 90%, 80%, 0.9)"
+            : i % 3 === 1
+            ? "hsla(195, 70%, 75%, 0.8)"
+            : "hsla(0, 0%, 95%, 0.7)";
+          return (
+            <div
+              key={`s-${i}`}
+              className="absolute rounded-full"
+              style={{
+                width: size,
+                height: size,
+                left: `${left}%`,
+                top: `${top}%`,
+                background: color,
+                boxShadow: `0 0 ${size * 4}px ${color}, 0 0 ${size * 2}px ${color}`,
+                animation: `nexusFlicker ${duration}s ${delay}s ease-in-out infinite`,
               }}
             />
           );
