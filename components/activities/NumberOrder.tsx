@@ -91,7 +91,7 @@ export default function NumberOrder({
               </div>
             ))
           ) : (
-            <div className="text-sm font-bold text-indigo-700">
+            <div className="text-sm font-bold text-teal-700">
               Tap the cards in order.
             </div>
           )}
