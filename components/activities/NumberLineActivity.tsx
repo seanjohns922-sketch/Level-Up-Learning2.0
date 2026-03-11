@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useCallback } from "react";
 import type { NumberLineQuestion } from "@/data/activities/year2/lessonEngine";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 export default function NumberLineActivity({
   questionData,
