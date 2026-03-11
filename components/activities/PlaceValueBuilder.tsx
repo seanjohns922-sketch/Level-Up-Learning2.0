@@ -80,11 +80,16 @@ export default function PlaceValueBuilder({
         <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">
           Place Value Builder
         </div>
-        <h2 className="mt-2 text-2xl font-black text-gray-900">
-          {questionData.hiddenPlace
-            ? `Find the missing ${placeLabel(questionData.hiddenPlace).toLowerCase()} digit`
-            : "Build the number with hundreds, tens, and ones"}
-        </h2>
+        <div className="flex items-center gap-2 mt-2">
+          <h2 className="text-2xl font-black text-gray-900">
+            {questionData.hiddenPlace
+              ? `Find the missing ${placeLabel(questionData.hiddenPlace).toLowerCase()} digit`
+              : "Build the number with hundreds, tens, and ones"}
+          </h2>
+          <ReadAloudBtn text={questionData.hiddenPlace
+            ? `Find the missing ${placeLabel(questionData.hiddenPlace).toLowerCase()} digit. Target number: ${questionData.target}`
+            : `Build the number with hundreds, tens, and ones. Target number: ${questionData.target}`} />
+        </div>
         <p className="mt-2 text-sm text-gray-600">
           Target number:{" "}
           <span className="font-black text-gray-900">{questionData.target}</span>
