@@ -76,8 +76,8 @@ export default function NumberOrder({
         ))}
       </div>
 
-      <div className="mt-8 rounded-2xl border border-indigo-100 bg-indigo-50 p-5">
-        <h3 className="text-sm font-bold uppercase tracking-wide text-indigo-700">
+      <div className="mt-8 rounded-2xl border border-teal-100 bg-teal-50 p-5">
+        <h3 className="text-sm font-bold uppercase tracking-wide text-teal-700">
           Your order
         </h3>
         <div className="mt-4 flex flex-wrap gap-3">
