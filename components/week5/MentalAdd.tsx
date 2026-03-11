@@ -127,7 +127,7 @@ export default function MentalAdd({
             Doubles are the same
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-xl border border-purple-200 bg-white p-3">
+            <div className="rounded-xl border border-teal-200 bg-white p-3">
               <div className="text-xs font-bold text-gray-600 mb-2">Left</div>
               <DotGrid count={a} />
             </div>
