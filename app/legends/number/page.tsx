@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Lock, Sparkles, Star, Target } from "lucide-react";
+import { ArrowLeft, Lock, Sparkles, Star } from "lucide-react";
 import { readProgress, type StudentProgress } from "@/data/progress";
 import { getAllLegends, type Legend } from "@/data/legends";
 import { YEAR_ORDER } from "@/data/yearOrder";
