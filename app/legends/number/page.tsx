@@ -9,12 +9,9 @@ import { YEAR_ORDER } from "@/data/yearOrder";
 
 function getLegendStatus(
   legend: Legend,
-  unlockedIds: string[],
-  currentYear: string
-): "unlocked" | "current" | "locked" {
-  if (unlockedIds.includes(legend.id)) return "unlocked";
-  if (legend.yearLabel === currentYear) return "current";
-  return "locked";
+  unlockedIds: string[]
+): "unlocked" | "locked" {
+  return unlockedIds.includes(legend.id) ? "unlocked" : "locked";
 }
 
 function StatBar({ label, value }: { label: string; value: number }) {
