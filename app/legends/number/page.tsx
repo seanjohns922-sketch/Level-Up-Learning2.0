@@ -199,7 +199,7 @@ export default function NumbotCollectionPage() {
         </div>
 
         {/* Tip */}
-        <div className="mt-10 rounded-2xl border-2 border-teal-500/20 bg-teal-500/5 p-5 flex items-start gap-3">
+        <div className="mt-10 rounded-2xl border-2 border-teal-400/20 bg-teal-50/50 p-5 flex items-start gap-3">
           <span className="text-2xl flex-shrink-0">💡</span>
           <div>
             <div className="font-bold text-foreground mb-0.5">How to collect Numbots</div>

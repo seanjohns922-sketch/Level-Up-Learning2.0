@@ -74,7 +74,7 @@ export default function HeroHeader({ levelNum, week, lessonsDone, overallPercent
                 style={{ width: `${overallPercent}%` }}
               />
             </div>
-            <p className="text-xs text-purple-200 mt-1.5 font-medium">Tower Progress: Week {week}/12</p>
+            <p className="text-xs text-teal-200 mt-1.5 font-medium">Tower Progress: Week {week}/12</p>
           </div>
         </div>
       </div>
