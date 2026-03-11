@@ -22,7 +22,7 @@ function DotRow({
             className={[
               "w-9 h-9 rounded-full border-2 transition",
               on
-                ? "border-indigo-600 bg-indigo-100"
+                ? "border-teal-600 bg-teal-100"
                 : "border-gray-300 bg-white hover:bg-gray-50",
             ].join(" ")}
             type="button"
