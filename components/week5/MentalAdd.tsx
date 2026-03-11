@@ -122,8 +122,8 @@ export default function MentalAdd({
 
     if (strategy === "double") {
       return (
-        <div className="mt-4 rounded-2xl border border-purple-100 bg-purple-50 p-4">
-          <div className="text-xs font-bold text-purple-700 mb-3">
+        <div className="mt-4 rounded-2xl border border-teal-100 bg-teal-50 p-4">
+          <div className="text-xs font-bold text-teal-700 mb-3">
             Doubles are the same
           </div>
           <div className="grid gap-4 md:grid-cols-2">
