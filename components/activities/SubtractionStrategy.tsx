@@ -101,7 +101,7 @@ export default function SubtractionStrategy({
             className={[
               "rounded-2xl border px-5 py-4 text-left text-2xl font-black transition",
               picked === option
-                ? "border-indigo-300 bg-indigo-50 text-indigo-900"
+                ? "border-teal-300 bg-teal-50 text-teal-900"
                 : "border-gray-200 bg-white text-gray-900 hover:bg-gray-50",
             ].join(" ")}
           >

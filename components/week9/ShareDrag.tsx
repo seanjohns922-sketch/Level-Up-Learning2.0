@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ClickableDotRow } from "@/components/ClickableDots";
 
 function Counter() {
-  return <span className="h-6 w-6 rounded-full border border-indigo-600 bg-indigo-500 inline-block" />;
+  return <span className="h-6 w-6 rounded-full border border-teal-600 bg-teal-500 inline-block" />;
 }
 
 export default function ShareDrag({
