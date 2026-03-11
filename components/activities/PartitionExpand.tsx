@@ -80,11 +80,11 @@ export default function PartitionExpand({
         ))}
       </div>
 
-      <div className="mt-6 rounded-2xl border border-indigo-100 bg-indigo-50 p-4">
-        <div className="text-xs font-bold uppercase tracking-wide text-indigo-700">
+      <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">
+        <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
           Your expression
         </div>
-        <div className="mt-2 text-3xl font-black text-indigo-900">
+        <div className="mt-2 text-3xl font-black text-teal-900">
           {numericValue("hundreds")} + {numericValue("tens")} + {numericValue("ones")} ={" "}
           {numericValue("hundreds") + numericValue("tens") + numericValue("ones")}
         </div>
