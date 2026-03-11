@@ -163,20 +163,18 @@ export default function TowerMapPage() {
 
       {/* Story panel */}
       <div className="fixed bottom-0 inset-x-0 z-30">
-        <div className="max-w-xl mx-auto px-4 pb-3">
-          <div className="bg-stone-900/85 backdrop-blur-xl border border-amber-400/25 rounded-2xl px-4 py-3 shadow-2xl">
-            <div className="flex items-start gap-2.5">
-              <div className="flex-shrink-0 h-8 w-8 rounded-lg bg-amber-400/20 flex items-center justify-center">
-                <Sparkles className="h-4 w-4 text-amber-300" />
+        <div className="max-w-md mx-auto px-3 pb-2">
+          <div className="bg-stone-900/85 backdrop-blur-xl border border-amber-400/25 rounded-xl px-3 py-2 shadow-2xl">
+            <div className="flex items-center gap-2">
+              <div className="flex-shrink-0 h-6 w-6 rounded-md bg-amber-400/20 flex items-center justify-center">
+                <Sparkles className="h-3 w-3 text-amber-300" />
               </div>
               <div>
-                <p className="text-xs font-bold text-amber-100 leading-snug">
+                <p className="text-[10px] font-bold text-amber-100 leading-snug">
                   The Tower of Knowledge is powered by many realms.
                 </p>
-                <p className="text-[10px] text-amber-200/60 mt-0.5 leading-relaxed">
-                  <span className="text-emerald-400 font-extrabold">Number Nexus</span> is
-                  the first realm open on your journey. Complete lessons to strengthen the
-                  Tower and push back the Fog of Forgetfulness!
+                <p className="text-[9px] text-amber-200/60 leading-snug">
+                  <span className="text-emerald-400 font-extrabold">Number Nexus</span> is the first realm open. Complete lessons to strengthen the Tower!
                 </p>
               </div>
             </div>
