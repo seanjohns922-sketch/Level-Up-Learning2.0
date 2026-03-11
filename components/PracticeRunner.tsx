@@ -315,7 +315,7 @@ export function PracticeRunner({
           <div className="grid gap-4">
             <div className="flex items-center justify-between gap-3">
               <div className="text-sm text-gray-500">Tap the correct number tile.</div>
-              <button type="button" onClick={() => speak(String(t.targetNumber))} className="px-3 py-2 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition">🔊 Hear number</button>
+              <button type="button" onClick={() => speak(String(t.targetNumber))} className="px-3 py-2 rounded-xl bg-teal-600 text-white font-bold hover:bg-teal-700 transition">🔊 Hear number</button>
             </div>
             <div className="grid grid-cols-5 sm:grid-cols-6 gap-2">
               {t.tiles.map((n: number) => (

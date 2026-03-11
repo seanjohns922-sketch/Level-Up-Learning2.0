@@ -8,7 +8,7 @@ function TenFrame({ filled }: { filled: number }) {
           key={i}
           className={[
             "h-6 w-6 rounded-full border",
-            i < filled ? "bg-indigo-500 border-indigo-600" : "bg-white border-gray-200",
+            i < filled ? "bg-teal-500 border-teal-600" : "bg-white border-gray-200",
           ].join(" ")}
         />
       ))}
