@@ -70,7 +70,7 @@ export default function GroupBoxesBuilder({
               {Array.from({ length: count }).map((_, di) => (
                 <span
                   key={di}
-                  className="inline-block h-6 w-6 rounded-full bg-indigo-600"
+                  className="inline-block h-6 w-6 rounded-full bg-teal-600"
                 />
               ))}
             </div>
