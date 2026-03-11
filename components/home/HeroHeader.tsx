@@ -1,5 +1,7 @@
 "use client";
 
+import ReadAloudBtn from "@/components/ReadAloudBtn";
+
 type Props = {
   levelNum: number;
   week: number;
