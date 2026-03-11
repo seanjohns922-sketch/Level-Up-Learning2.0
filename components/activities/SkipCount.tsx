@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { SkipCountQuestion } from "@/data/activities/year2/lessonEngine";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 export default function SkipCount({
   questionData,
