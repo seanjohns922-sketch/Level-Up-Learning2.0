@@ -477,7 +477,7 @@ function PretestPage() {
                   className={[
                     "w-full rounded-2xl border p-5 text-left transition",
                     isSelected
-                      ? "border-indigo-500 bg-indigo-50"
+                      ? "border-teal-500 bg-teal-50"
                       : "border-gray-200 bg-white hover:bg-gray-50",
                   ].join(" ")}
                 >

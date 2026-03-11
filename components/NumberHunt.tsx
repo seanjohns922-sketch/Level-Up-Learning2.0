@@ -143,7 +143,7 @@ export default function NumberHunt({
             "rounded-2xl border px-0 py-4 sm:py-5 text-center font-extrabold text-lg sm:text-xl",
             "transition active:scale-[0.98]",
             "bg-white hover:bg-gray-50",
-            isSelected && status === "idle" ? "border-indigo-500" : "border-gray-200",
+            isSelected && status === "idle" ? "border-teal-500" : "border-gray-200",
             isSelected && status === "correct"
               ? "border-green-500 bg-green-50"
               : "",
