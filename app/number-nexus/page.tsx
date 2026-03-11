@@ -165,6 +165,40 @@ export default function NumberNexusPage() {
       />
       <div className="absolute inset-0 bg-gradient-to-b from-slate-950/30 via-slate-950/50 to-slate-950/95 pointer-events-none" />
 
+      {/* Floating light particles */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {Array.from({ length: 18 }).map((_, i) => {
+          const size = 2 + (i % 4) * 1.5;
+          const left = ((i * 37 + 11) % 100);
+          const delay = (i * 1.7) % 12;
+          const duration = 14 + (i % 5) * 4;
+          const drift = -20 + (i % 7) * 8;
+          const opacity = 0.15 + (i % 3) * 0.12;
+          const color = i % 3 === 0
+            ? "hsla(42, 95%, 65%, VAR)"
+            : i % 3 === 1
+            ? "hsla(175, 60%, 55%, VAR)"
+            : "hsla(215, 65%, 60%, VAR)";
+          return (
+            <div
+              key={i}
+              className="absolute rounded-full"
+              style={{
+                width: size,
+                height: size,
+                left: `${left}%`,
+                bottom: `-${size}px`,
+                opacity: 0,
+                background: `radial-gradient(circle, ${color.replace("VAR", "0.9")}, ${color.replace("VAR", "0")})`,
+                boxShadow: `0 0 ${size * 3}px ${color.replace("VAR", String(opacity))}`,
+                animation: `nexusFloat ${duration}s ${delay}s ease-in-out infinite`,
+                ["--drift" as string]: `${drift}px`,
+              }}
+            />
+          );
+        })}
+      </div>
+
       {/* Header */}
       <div className="relative z-10 px-4 pt-4 pb-2 flex items-center justify-between">
         <button
