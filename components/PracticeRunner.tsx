@@ -262,7 +262,7 @@ export function PracticeRunner({
           <Dots count={(task as any).count} />
           <div className="flex items-center gap-3">
             <input value={typed} onChange={(e) => setTyped(e.target.value.replace(/[^\d]/g, ""))} inputMode="numeric" placeholder="Type your answer" className="flex-1 px-4 py-3 rounded-2xl border border-gray-200 text-xl font-bold" />
-            <button onClick={check} className="px-5 py-3 rounded-2xl bg-indigo-600 text-white font-extrabold text-xl hover:bg-indigo-700 transition">Check</button>
+            <button onClick={check} className="px-5 py-3 rounded-2xl bg-teal-600 text-white font-extrabold text-xl hover:bg-teal-700 transition">Check</button>
           </div>
         </div>
       )}
