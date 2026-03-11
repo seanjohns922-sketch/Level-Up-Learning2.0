@@ -39,7 +39,7 @@ export default function SkipCount({
           {questionData.sequence.map((value) => (
             <div
               key={value}
-              className="rounded-xl bg-white px-5 py-3 text-3xl font-black text-indigo-900 shadow-sm"
+              className="rounded-xl bg-white px-5 py-3 text-3xl font-black text-teal-900 shadow-sm"
             >
               {value}
             </div>
