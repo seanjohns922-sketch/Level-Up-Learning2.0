@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { getPretestForYear, type Question } from "@/data/assessments/pretests";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 function MabPicker({
   target,
