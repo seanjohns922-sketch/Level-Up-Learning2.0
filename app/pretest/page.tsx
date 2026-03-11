@@ -82,9 +82,9 @@ function MabPicker({
                 onClick={() => toggleOnes(i)}
                 className={[
                   "w-10 h-10 rounded-lg border-2 transition",
-                  selected
-                    ? "border-indigo-600 bg-indigo-50"
-                    : "border-gray-200 bg-white hover:bg-gray-50",
+                   selected
+                     ? "border-teal-600 bg-teal-50"
+                     : "border-gray-200 bg-white hover:bg-gray-50",
                 ].join(" ")}
                 title={selected ? "Tap to remove" : "Tap to add"}
               >
