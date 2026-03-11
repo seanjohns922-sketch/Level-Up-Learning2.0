@@ -84,8 +84,8 @@ export default function JoinStories({
                 count={a}
                 dotSize={20}
                 gap={6}
-                activeClassName="bg-indigo-500"
-                borderClassName="border border-indigo-600"
+                activeClassName="bg-teal-500"
+                borderClassName="border border-teal-600"
               />
               <StaticDotRow
                 count={b}
