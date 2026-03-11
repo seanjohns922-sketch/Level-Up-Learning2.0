@@ -51,7 +51,7 @@ export default function ChooseSkipCount({
             onClick={() => choose(opt)}
             className={[
               "w-full text-left px-4 py-3 rounded-xl border font-bold",
-              picked === opt ? "border-indigo-500 bg-indigo-50" : "border-gray-200 hover:bg-gray-50",
+              picked === opt ? "border-teal-500 bg-teal-50" : "border-gray-200 hover:bg-gray-50",
             ].join(" ")}
           >
             {opt}

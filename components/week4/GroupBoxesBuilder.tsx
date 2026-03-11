@@ -70,7 +70,7 @@ export default function GroupBoxesBuilder({
               {Array.from({ length: count }).map((_, di) => (
                 <span
                   key={di}
-                  className="inline-block h-6 w-6 rounded-full bg-indigo-600"
+                  className="inline-block h-6 w-6 rounded-full bg-teal-600"
                 />
               ))}
             </div>
@@ -84,7 +84,7 @@ export default function GroupBoxesBuilder({
               </button>
               <button
                 onClick={() => addTo(i)}
-                className="px-3 py-2 rounded-xl bg-indigo-600 text-white font-bold"
+                className="px-3 py-2 rounded-xl bg-teal-600 text-white font-bold"
                 type="button"
               >
                 +
@@ -97,7 +97,7 @@ export default function GroupBoxesBuilder({
       <div className="mt-4 flex items-center gap-3">
         <button
           onClick={check}
-          className="px-5 py-3 rounded-xl bg-indigo-600 text-white font-extrabold hover:bg-indigo-700"
+          className="px-5 py-3 rounded-xl bg-teal-600 text-white font-extrabold hover:bg-teal-700"
           type="button"
         >
           Check

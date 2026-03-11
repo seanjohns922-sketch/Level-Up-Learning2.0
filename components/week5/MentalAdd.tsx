@@ -66,7 +66,7 @@ export default function MentalAdd({
               "h-5 w-5 rounded-full border",
               highlightIndex === i
                 ? "border-amber-500 bg-amber-200"
-                : "border-indigo-600 bg-indigo-100",
+                : "border-teal-600 bg-teal-100",
             ].join(" ")}
           />
         ))}
@@ -79,13 +79,13 @@ export default function MentalAdd({
       const need = Math.max(0, 10 - a);
       const leftover = Math.max(0, b - need);
       return (
-        <div className="mt-4 rounded-2xl border border-indigo-100 bg-indigo-50 p-4">
-          <div className="text-xs font-bold text-indigo-700 mb-3">
+        <div className="mt-4 rounded-2xl border border-teal-100 bg-teal-50 p-4">
+          <div className="text-xs font-bold text-teal-700 mb-3">
             Make 10, then add the rest
           </div>
           <div className="grid gap-3">
             <div className="flex items-center gap-3">
-              <div className="rounded-xl border border-indigo-200 bg-white px-4 py-2 font-bold text-indigo-900">
+              <div className="rounded-xl border border-teal-200 bg-white px-4 py-2 font-bold text-teal-900">
                 {a}
               </div>
               <div className="text-gray-500 font-bold">+</div>
@@ -94,7 +94,7 @@ export default function MentalAdd({
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="rounded-xl border border-indigo-200 bg-white px-4 py-2 font-bold text-indigo-900">
+              <div className="rounded-xl border border-teal-200 bg-white px-4 py-2 font-bold text-teal-900">
                 {a}
               </div>
               <div className="text-gray-500 font-bold">+</div>
@@ -107,7 +107,7 @@ export default function MentalAdd({
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="rounded-xl border border-indigo-300 bg-indigo-100 px-4 py-2 font-black text-indigo-900">
+              <div className="rounded-xl border border-teal-300 bg-teal-100 px-4 py-2 font-black text-teal-900">
                 10
               </div>
               <div className="text-gray-500 font-bold">+</div>
@@ -122,16 +122,16 @@ export default function MentalAdd({
 
     if (strategy === "double") {
       return (
-        <div className="mt-4 rounded-2xl border border-purple-100 bg-purple-50 p-4">
-          <div className="text-xs font-bold text-purple-700 mb-3">
+        <div className="mt-4 rounded-2xl border border-teal-100 bg-teal-50 p-4">
+          <div className="text-xs font-bold text-teal-700 mb-3">
             Doubles are the same
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-xl border border-purple-200 bg-white p-3">
+            <div className="rounded-xl border border-teal-200 bg-white p-3">
               <div className="text-xs font-bold text-gray-600 mb-2">Left</div>
               <DotGrid count={a} />
             </div>
-            <div className="rounded-xl border border-purple-200 bg-white p-3">
+            <div className="rounded-xl border border-teal-200 bg-white p-3">
               <div className="text-xs font-bold text-gray-600 mb-2">Right</div>
               <DotGrid count={b} />
             </div>
@@ -184,7 +184,7 @@ export default function MentalAdd({
             className={[
               "w-full text-left px-5 py-4 rounded-2xl border text-2xl font-black transition",
               picked === v
-                ? "border-indigo-600 bg-indigo-50"
+                ? "border-teal-600 bg-teal-50"
                 : "border-gray-200 hover:bg-gray-50",
             ].join(" ")}
             type="button"

@@ -33,12 +33,12 @@ export default function CompareBars({
       <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 grid gap-3">
         <div>
           <div className="text-xs font-bold text-gray-600 mb-2">Tom</div>
-          <div className="h-6 rounded-lg bg-indigo-400" style={{ width: `${(a / max) * 100}%` }} />
+          <div className="h-6 rounded-lg bg-teal-400" style={{ width: `${(a / max) * 100}%` }} />
           <div className="text-xs text-gray-600 mt-1">{a}</div>
         </div>
         <div>
           <div className="text-xs font-bold text-gray-600 mb-2">Mia</div>
-          <div className="h-6 rounded-lg bg-indigo-200" style={{ width: `${(b / max) * 100}%` }} />
+          <div className="h-6 rounded-lg bg-teal-200" style={{ width: `${(b / max) * 100}%` }} />
           <div className="text-xs text-gray-600 mt-1">{b}</div>
         </div>
         <div className="mt-2">

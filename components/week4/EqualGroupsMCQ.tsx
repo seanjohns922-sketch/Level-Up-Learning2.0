@@ -57,7 +57,7 @@ export default function EqualGroupsMCQ({
                     {Array.from({ length: count }).map((_, di) => (
                       <span
                         key={di}
-                        className="h-3 w-3 rounded-full bg-indigo-600"
+                        className="h-3 w-3 rounded-full bg-teal-600"
                       />
                     ))}
                   </div>

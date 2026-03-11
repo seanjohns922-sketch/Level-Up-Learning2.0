@@ -62,7 +62,7 @@ export default function NumberChartFill({
                 isDone
                   ? "bg-gray-100 text-gray-500 border-gray-200 cursor-not-allowed"
                   : isActive
-                  ? "bg-indigo-100 text-indigo-800 border-indigo-300"
+                  ? "bg-teal-100 text-teal-800 border-teal-300"
                   : "bg-white text-gray-800 border-gray-300 hover:bg-gray-50",
               ].join(" ")}
             >
@@ -90,7 +90,7 @@ export default function NumberChartFill({
                 "rounded-lg border text-sm font-bold py-2",
                 isMissing
                   ? isFilled
-                    ? "bg-indigo-600 text-white border-indigo-700"
+                    ? "bg-teal-600 text-white border-teal-700"
                     : "bg-white border-gray-300 hover:bg-gray-50"
                   : "bg-gray-50 text-gray-600 border-gray-200",
               ].join(" ")}

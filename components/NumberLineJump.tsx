@@ -39,7 +39,7 @@ export default function NumberLineJump({
       <div className="rounded-2xl border bg-white p-4 mb-4">
         <div className="flex items-center justify-between">
           <div className="text-sm text-gray-500">Current</div>
-          <div className="text-3xl font-extrabold text-indigo-700">{pos}</div>
+          <div className="text-3xl font-extrabold text-teal-700">{pos}</div>
         </div>
       </div>
 
@@ -48,7 +48,7 @@ export default function NumberLineJump({
           <button
             key={s}
             onClick={() => move(s)}
-            className="rounded-xl bg-indigo-600 text-white px-4 py-4 text-xl font-extrabold hover:bg-indigo-700 transition"
+            className="rounded-xl bg-teal-600 text-white px-4 py-4 text-xl font-extrabold hover:bg-teal-700 transition"
           >
             {s > 0 ? `+${s}` : s}
           </button>

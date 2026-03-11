@@ -330,7 +330,7 @@ export default function TeacherDashboardPage() {
           );
         })}
         {hasLegend && (
-          <span className="ml-2 text-xs font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full whitespace-nowrap">
+          <span className="ml-2 text-xs font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full whitespace-nowrap">
             🏆 Legend
           </span>
         )}
@@ -418,7 +418,7 @@ export default function TeacherDashboardPage() {
 
           {legends.length > 0 && (
             <div className="mt-4 flex items-center gap-2 text-sm">
-              <span className="text-purple-600 font-bold">🏆 Legend Unlocked</span>
+              <span className="text-teal-600 font-bold">🏆 Legend Unlocked</span>
             </div>
           )}
         </div>

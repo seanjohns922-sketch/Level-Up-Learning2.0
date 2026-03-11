@@ -40,12 +40,12 @@ export default function TypedResponseActivity({
           value={typed}
           onChange={(event) => setTyped(event.target.value)}
           placeholder={questionData.placeholder ?? "Type your answer"}
-          className="w-full max-w-md rounded-xl border border-gray-300 px-4 py-3 text-lg font-bold text-gray-900 outline-none focus:border-indigo-500"
+          className="w-full max-w-md rounded-xl border border-gray-300 px-4 py-3 text-lg font-bold text-gray-900 outline-none focus:border-teal-500"
         />
         <button
           type="button"
           onClick={check}
-          className="rounded-xl bg-indigo-600 px-5 py-3 font-black text-white hover:bg-indigo-700"
+          className="rounded-xl bg-teal-600 px-5 py-3 font-black text-white hover:bg-teal-700"
         >
           Check answer
         </button>

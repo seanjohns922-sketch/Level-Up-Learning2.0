@@ -54,7 +54,7 @@ export default function MabBuild({
                 className={[
                   "w-10 h-20 rounded-xl border-2 transition",
                   selected
-                    ? "border-indigo-600 bg-indigo-50"
+                    ? "border-teal-600 bg-teal-50"
                     : "border-gray-200 bg-white hover:bg-gray-50",
                 ].join(" ")}
               >
@@ -64,7 +64,7 @@ export default function MabBuild({
                       key={k}
                       className={[
                         "h-2 rounded",
-                        selected ? "bg-indigo-600/60" : "bg-gray-200",
+                        selected ? "bg-teal-600/60" : "bg-gray-200",
                       ].join(" ")}
                     />
                   ))}
@@ -88,7 +88,7 @@ export default function MabBuild({
                 className={[
                   "w-10 h-10 rounded-lg border-2 transition",
                   selected
-                    ? "border-indigo-600 bg-indigo-50"
+                    ? "border-teal-600 bg-teal-50"
                     : "border-gray-200 bg-white hover:bg-gray-50",
                 ].join(" ")}
               />

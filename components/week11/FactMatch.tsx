@@ -114,7 +114,7 @@ export default function FactMatch({
                 isMatched
                   ? "border-emerald-300 bg-emerald-50 text-emerald-800"
                   : isOpen
-                  ? "border-indigo-300 bg-indigo-50"
+                  ? "border-teal-300 bg-teal-50"
                   : "border-gray-200 bg-white hover:bg-gray-50",
               ].join(" ")}
             >

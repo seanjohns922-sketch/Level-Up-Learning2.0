@@ -76,8 +76,8 @@ export default function NumberOrder({
         ))}
       </div>
 
-      <div className="mt-8 rounded-2xl border border-indigo-100 bg-indigo-50 p-5">
-        <h3 className="text-sm font-bold uppercase tracking-wide text-indigo-700">
+      <div className="mt-8 rounded-2xl border border-teal-100 bg-teal-50 p-5">
+        <h3 className="text-sm font-bold uppercase tracking-wide text-teal-700">
           Your order
         </h3>
         <div className="mt-4 flex flex-wrap gap-3">
@@ -85,13 +85,13 @@ export default function NumberOrder({
             selected.map((n, i) => (
               <div
                 key={`${n}-${i}`}
-                className="rounded-xl bg-white px-4 py-3 text-xl font-black text-indigo-900 shadow-sm"
+                className="rounded-xl bg-white px-4 py-3 text-xl font-black text-teal-900 shadow-sm"
               >
                 {n}
               </div>
             ))
           ) : (
-            <div className="text-sm font-bold text-indigo-700">
+            <div className="text-sm font-bold text-teal-700">
               Tap the cards in order.
             </div>
           )}

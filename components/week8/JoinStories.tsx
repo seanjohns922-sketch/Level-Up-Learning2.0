@@ -61,8 +61,8 @@ export default function JoinStories({
                 count={a}
                 dotSize={20}
                 gap={6}
-                activeClassName="bg-indigo-500"
-                borderClassName="border border-indigo-600"
+                activeClassName="bg-teal-500"
+                borderClassName="border border-teal-600"
               />
             </div>
             <div className="rounded-xl border border-gray-200 bg-white p-3">
@@ -84,8 +84,8 @@ export default function JoinStories({
                 count={a}
                 dotSize={20}
                 gap={6}
-                activeClassName="bg-indigo-500"
-                borderClassName="border border-indigo-600"
+                activeClassName="bg-teal-500"
+                borderClassName="border border-teal-600"
               />
               <StaticDotRow
                 count={b}
@@ -103,7 +103,7 @@ export default function JoinStories({
             <button
               type="button"
               onClick={() => setJoined(true)}
-              className="px-5 py-3 rounded-xl bg-indigo-600 text-white font-extrabold hover:bg-indigo-700 transition"
+              className="px-5 py-3 rounded-xl bg-teal-600 text-white font-extrabold hover:bg-teal-700 transition"
             >
               Join
             </button>

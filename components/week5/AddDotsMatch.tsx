@@ -22,7 +22,7 @@ function DotRow({
             className={[
               "w-9 h-9 rounded-full border-2 transition",
               on
-                ? "border-indigo-600 bg-indigo-100"
+                ? "border-teal-600 bg-teal-100"
                 : "border-gray-300 bg-white hover:bg-gray-50",
             ].join(" ")}
             aria-label={`dot ${i + 1}`}
@@ -104,7 +104,7 @@ export default function AddDotsMatch({
             {Array.from({ length: total }).map((_, i) => (
               <span
                 key={i}
-                className="inline-block h-6 w-6 rounded-full border-2 border-indigo-600 bg-indigo-100"
+                className="inline-block h-6 w-6 rounded-full border-2 border-teal-600 bg-teal-100"
                 aria-hidden
               />
             ))}
@@ -113,7 +113,7 @@ export default function AddDotsMatch({
 
         <button
           onClick={check}
-          className="px-5 py-3 rounded-xl bg-indigo-600 text-white font-extrabold hover:bg-indigo-700 transition"
+          className="px-5 py-3 rounded-xl bg-teal-600 text-white font-extrabold hover:bg-teal-700 transition"
           type="button"
         >
           Check

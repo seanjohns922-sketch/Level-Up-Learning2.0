@@ -63,7 +63,7 @@ export default function SubtractTakeAway({
               "h-9 w-9 rounded-full border-2 transition",
               isRemoved
                 ? "border-gray-300 bg-gray-100 opacity-40"
-                : "border-indigo-600 bg-indigo-100",
+                : "border-teal-600 bg-teal-100",
             ].join(" ")}
             type="button"
           />
@@ -75,7 +75,7 @@ export default function SubtractTakeAway({
         </div>
         <button
           onClick={check}
-          className="px-5 py-3 rounded-xl bg-indigo-600 text-white font-extrabold hover:bg-indigo-700 transition"
+          className="px-5 py-3 rounded-xl bg-teal-600 text-white font-extrabold hover:bg-teal-700 transition"
           type="button"
         >
           Check

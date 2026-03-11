@@ -83,7 +83,7 @@ export default function CountAndCircle({
 
       <div className="rounded-2xl border bg-white p-5 mb-4">
         <div className="text-2xl font-extrabold text-gray-900">
-          Circle <span className="text-indigo-600">{target}</span> counters
+          Circle <span className="text-teal-600">{target}</span> counters
         </div>
 
         {status === "correct" && (
@@ -103,7 +103,7 @@ export default function CountAndCircle({
               className={[
                 "w-10 h-10 rounded-full border-2 transition",
                 on
-                  ? "bg-indigo-600 border-indigo-700"
+                  ? "bg-teal-600 border-teal-700"
                   : "bg-white border-gray-300 hover:bg-gray-50",
               ].join(" ")}
               type="button"
@@ -125,7 +125,7 @@ export default function CountAndCircle({
 
         <button
           onClick={check}
-          className="px-6 py-3 rounded-xl bg-indigo-600 text-white font-extrabold"
+          className="px-6 py-3 rounded-xl bg-teal-600 text-white font-extrabold"
         >
           Check
         </button>

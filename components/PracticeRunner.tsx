@@ -240,7 +240,7 @@ export function PracticeRunner({
                 {Array.from({ length: t.groups }).map((_: unknown, gi: number) => (
                   <div key={gi} className="flex items-center gap-2">
                     {Array.from({ length: t.perGroup }).map((__: unknown, di: number) => (
-                      <span key={di} className="inline-block h-5 w-5 rounded-full bg-indigo-600" />
+                      <span key={di} className="inline-block h-5 w-5 rounded-full bg-teal-600" />
                     ))}
                   </div>
                 ))}
@@ -262,7 +262,7 @@ export function PracticeRunner({
           <Dots count={(task as any).count} />
           <div className="flex items-center gap-3">
             <input value={typed} onChange={(e) => setTyped(e.target.value.replace(/[^\d]/g, ""))} inputMode="numeric" placeholder="Type your answer" className="flex-1 px-4 py-3 rounded-2xl border border-gray-200 text-xl font-bold" />
-            <button onClick={check} className="px-5 py-3 rounded-2xl bg-indigo-600 text-white font-extrabold text-xl hover:bg-indigo-700 transition">Check</button>
+            <button onClick={check} className="px-5 py-3 rounded-2xl bg-teal-600 text-white font-extrabold text-xl hover:bg-teal-700 transition">Check</button>
           </div>
         </div>
       )}
@@ -285,7 +285,7 @@ export function PracticeRunner({
             </div>
             <div className="flex items-center gap-3">
               <button onClick={() => setOrder([])} className="px-5 py-3 rounded-2xl bg-gray-100 text-gray-800 font-extrabold text-xl hover:bg-gray-200 transition">Reset</button>
-              <button onClick={check} className="flex-1 px-5 py-3 rounded-2xl bg-indigo-600 text-white font-extrabold text-xl hover:bg-indigo-700 transition">Check</button>
+              <button onClick={check} className="flex-1 px-5 py-3 rounded-2xl bg-teal-600 text-white font-extrabold text-xl hover:bg-teal-700 transition">Check</button>
             </div>
           </div>
         );
@@ -296,7 +296,7 @@ export function PracticeRunner({
         return (
           <div className="grid gap-4">
             <div className="flex items-center justify-between gap-3">
-              <button type="button" onClick={() => { speak(t.speechText ?? String(t.targetNumber)); setHasPlayed(true); }} className="px-5 py-3 rounded-2xl bg-indigo-600 text-white font-extrabold text-xl hover:bg-indigo-700 transition">🔊 Listen</button>
+              <button type="button" onClick={() => { speak(t.speechText ?? String(t.targetNumber)); setHasPlayed(true); }} className="px-5 py-3 rounded-2xl bg-teal-600 text-white font-extrabold text-xl hover:bg-teal-700 transition">🔊 Listen</button>
               <div className="text-sm font-bold text-gray-600">{hasPlayed ? "Now tap the number." : "Tap Listen first."}</div>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -315,7 +315,7 @@ export function PracticeRunner({
           <div className="grid gap-4">
             <div className="flex items-center justify-between gap-3">
               <div className="text-sm text-gray-500">Tap the correct number tile.</div>
-              <button type="button" onClick={() => speak(String(t.targetNumber))} className="px-3 py-2 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition">🔊 Hear number</button>
+              <button type="button" onClick={() => speak(String(t.targetNumber))} className="px-3 py-2 rounded-xl bg-teal-600 text-white font-bold hover:bg-teal-700 transition">🔊 Hear number</button>
             </div>
             <div className="grid grid-cols-5 sm:grid-cols-6 gap-2">
               {t.tiles.map((n: number) => (

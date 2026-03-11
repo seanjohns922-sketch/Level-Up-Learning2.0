@@ -32,8 +32,8 @@ export default function MentalSubtract({
       const jumpToTen = total - 10;
       const rest = remove - jumpToTen;
       return (
-        <div className="mt-4 rounded-2xl border border-indigo-100 bg-indigo-50 p-4">
-          <div className="text-xs font-bold text-indigo-700 mb-2">
+        <div className="mt-4 rounded-2xl border border-teal-100 bg-teal-50 p-4">
+          <div className="text-xs font-bold text-teal-700 mb-2">
             Make 10 first
           </div>
           <div className="text-sm font-bold text-gray-700">
@@ -98,7 +98,7 @@ export default function MentalSubtract({
             className={[
               "w-full text-left px-5 py-4 rounded-2xl border text-2xl font-black transition",
               picked === opt
-                ? "border-indigo-600 bg-indigo-50"
+                ? "border-teal-600 bg-teal-50"
                 : "border-gray-200 hover:bg-gray-50",
             ].join(" ")}
             type="button"

@@ -37,8 +37,8 @@ export default function SubtractionStrategy({
         const ones = questionData.remove % 10;
         const afterTens = questionData.total - tens;
         return (
-          <div className="mt-6 rounded-2xl border border-indigo-100 bg-indigo-50 p-4">
-            <div className="text-xs font-bold uppercase tracking-wide text-indigo-700">
+          <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">
+            <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
               Jump back strategy
             </div>
             <div className="mt-2 text-sm font-bold text-gray-700">
@@ -67,8 +67,8 @@ export default function SubtractionStrategy({
         const tens = Math.floor(questionData.remove / 10) * 10;
         const ones = questionData.remove % 10;
         return (
-          <div className="mt-6 rounded-2xl border border-indigo-100 bg-indigo-50 p-4">
-            <div className="text-xs font-bold uppercase tracking-wide text-indigo-700">
+          <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">
+            <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
               Split strategy
             </div>
             <div className="mt-2 text-sm font-bold text-gray-700">
@@ -101,7 +101,7 @@ export default function SubtractionStrategy({
             className={[
               "rounded-2xl border px-5 py-4 text-left text-2xl font-black transition",
               picked === option
-                ? "border-indigo-300 bg-indigo-50 text-indigo-900"
+                ? "border-teal-300 bg-teal-50 text-teal-900"
                 : "border-gray-200 bg-white text-gray-900 hover:bg-gray-50",
             ].join(" ")}
           >

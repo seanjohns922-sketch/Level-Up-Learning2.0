@@ -143,7 +143,7 @@ export default function CountObjects({
                 key={i}
                 className={[
                   "rounded-full border",
-                  filled ? "bg-indigo-600 border-indigo-700" : "bg-white border-gray-200",
+                  filled ? "bg-teal-600 border-teal-700" : "bg-white border-gray-200",
                 ].join(" ")}
                 style={{
                   width: layout.dotSize,

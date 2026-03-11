@@ -7,7 +7,7 @@ function JumpRow({ from, jump, to }: { from: number; jump: number; to: number })
     <div className="flex items-center gap-3 text-sm font-bold text-gray-700">
       <div className="px-3 py-1 rounded-lg bg-gray-100">${from}</div>
       <div className="text-gray-500">→</div>
-      <div className="px-3 py-1 rounded-lg bg-indigo-50 text-indigo-700">+{jump}</div>
+      <div className="px-3 py-1 rounded-lg bg-teal-50 text-teal-700">+{jump}</div>
       <div className="text-gray-500">→</div>
       <div className="px-3 py-1 rounded-lg bg-gray-100">${to}</div>
     </div>

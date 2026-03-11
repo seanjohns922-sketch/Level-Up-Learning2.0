@@ -31,20 +31,20 @@ export default function SkipCount({
         </h2>
       </div>
 
-      <div className="mt-6 rounded-2xl border border-indigo-100 bg-indigo-50 p-4">
-        <div className="text-xs font-bold uppercase tracking-wide text-indigo-700">
+      <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">
+        <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
           Sequence
         </div>
         <div className="mt-2 flex flex-wrap gap-3">
           {questionData.sequence.map((value) => (
             <div
               key={value}
-              className="rounded-xl bg-white px-5 py-3 text-3xl font-black text-indigo-900 shadow-sm"
+              className="rounded-xl bg-white px-5 py-3 text-3xl font-black text-teal-900 shadow-sm"
             >
               {value}
             </div>
           ))}
-          <div className="rounded-xl border-2 border-dashed border-indigo-300 px-5 py-3 text-3xl font-black text-indigo-700">
+          <div className="rounded-xl border-2 border-dashed border-teal-300 px-5 py-3 text-3xl font-black text-teal-700">
             ?
           </div>
         </div>
@@ -59,7 +59,7 @@ export default function SkipCount({
             className={[
               "rounded-2xl border px-5 py-4 text-left text-2xl font-black transition",
               picked === option
-                ? "border-indigo-300 bg-indigo-50 text-indigo-900"
+                ? "border-teal-300 bg-teal-50 text-teal-900"
                 : "border-gray-200 bg-white text-gray-900 hover:bg-gray-50",
             ].join(" ")}
           >

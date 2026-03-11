@@ -57,7 +57,7 @@ export default function SubtractBar({
                 key={i}
                 className={[
                   "text-center",
-                  i + 1 === answer ? "font-bold text-indigo-700" : "",
+                  i + 1 === answer ? "font-bold text-teal-700" : "",
                 ].join(" ")}
               >
                 {i + 1}
@@ -81,7 +81,7 @@ export default function SubtractBar({
             className={[
               "w-full text-left px-5 py-4 rounded-2xl border text-2xl font-black transition",
               picked === opt
-                ? "border-indigo-600 bg-indigo-50"
+                ? "border-teal-600 bg-teal-50"
                 : "border-gray-200 hover:bg-gray-50",
             ].join(" ")}
             type="button"

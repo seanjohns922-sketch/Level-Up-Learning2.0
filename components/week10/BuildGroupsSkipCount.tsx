@@ -50,7 +50,7 @@ export default function BuildGroupsSkipCount({
         <button
           type="button"
           onClick={makeGroup}
-          className="px-4 py-2 rounded-xl bg-indigo-600 text-white font-extrabold hover:bg-indigo-700 transition"
+          className="px-4 py-2 rounded-xl bg-teal-600 text-white font-extrabold hover:bg-teal-700 transition"
         >
           Make a group of {perGroup}
         </button>

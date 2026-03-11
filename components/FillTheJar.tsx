@@ -103,7 +103,7 @@ export default function FillTheJar({
 
       <div className="rounded-2xl border bg-white p-5 mb-4">
         <div className="text-2xl sm:text-3xl font-extrabold text-gray-900">
-          Fill the jar to <span className="text-indigo-600">{target}</span>
+          Fill the jar to <span className="text-teal-600">{target}</span>
         </div>
         <div className="text-sm text-gray-500 mt-1">
           Tap buttons to add counters. Don’t go over!
@@ -141,7 +141,7 @@ export default function FillTheJar({
               {dots.map((i) => (
                 <div
                   key={i}
-                  className="rounded-full bg-indigo-600"
+                  className="rounded-full bg-teal-600"
                   style={{ width: layout.dotSize, height: layout.dotSize }}
                 />
               ))}
@@ -161,7 +161,7 @@ export default function FillTheJar({
           <button
             key={inc}
             onClick={() => add(inc)}
-            className="rounded-2xl bg-indigo-600 text-white px-4 py-4 text-xl font-extrabold hover:bg-indigo-700 transition active:scale-[0.98]"
+            className="rounded-2xl bg-teal-600 text-white px-4 py-4 text-xl font-extrabold hover:bg-teal-700 transition active:scale-[0.98]"
           >
             +{inc}
           </button>

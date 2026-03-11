@@ -150,7 +150,7 @@ export default function EqualGroupsMaker({
       <div className="mt-5 flex items-center gap-3">
         <button
           onClick={check}
-          className="px-5 py-3 rounded-2xl bg-indigo-600 text-white font-extrabold hover:bg-indigo-700"
+          className="px-5 py-3 rounded-2xl bg-teal-600 text-white font-extrabold hover:bg-teal-700"
           type="button"
         >
           Check

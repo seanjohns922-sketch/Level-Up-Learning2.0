@@ -53,7 +53,7 @@ export default function SubtractMoveToTaken({
                 <button
                   key={i}
                   onClick={() => toggle(i)}
-                  className="h-9 w-9 rounded-full border-2 border-indigo-600 bg-indigo-100"
+                  className="h-9 w-9 rounded-full border-2 border-teal-600 bg-teal-100"
                   type="button"
                 />
               ) : null
@@ -86,7 +86,7 @@ export default function SubtractMoveToTaken({
         </div>
         <button
           onClick={check}
-          className="px-5 py-3 rounded-xl bg-indigo-600 text-white font-extrabold hover:bg-indigo-700 transition"
+          className="px-5 py-3 rounded-xl bg-teal-600 text-white font-extrabold hover:bg-teal-700 transition"
           type="button"
         >
           Check

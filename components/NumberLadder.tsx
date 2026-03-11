@@ -36,7 +36,7 @@ export default function NumberLadder({
 
       <div className="text-2xl font-extrabold mb-2">
         Climb from <span className="text-gray-900">{start}</span> to{" "}
-        <span className="text-indigo-600">{target}</span>
+        <span className="text-teal-600">{target}</span>
       </div>
 
       <div className="flex justify-center my-6">
@@ -46,7 +46,7 @@ export default function NumberLadder({
               key={n}
               className={[
                 "w-24 h-10 flex items-center justify-center rounded-lg border font-bold",
-                n === pos ? "bg-indigo-600 text-white" : "bg-white",
+                n === pos ? "bg-teal-600 text-white" : "bg-white",
               ].join(" ")}
             >
               {n}
@@ -65,7 +65,7 @@ export default function NumberLadder({
         </button>
         <button
           onClick={() => step(1)}
-          className="flex-1 py-4 bg-indigo-600 text-white rounded-xl font-extrabold"
+          className="flex-1 py-4 bg-teal-600 text-white rounded-xl font-extrabold"
           type="button"
         >
           +1

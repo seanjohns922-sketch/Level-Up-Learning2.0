@@ -22,7 +22,7 @@ function DotRow({
             className={[
               "w-9 h-9 rounded-full border-2 transition",
               on
-                ? "border-indigo-600 bg-indigo-100"
+                ? "border-teal-600 bg-teal-100"
                 : "border-gray-300 bg-white hover:bg-gray-50",
             ].join(" ")}
             type="button"
@@ -105,7 +105,7 @@ export default function PartPartWhole({
               {Array.from({ length: a }).map((_, i) => (
                 <span
                   key={i}
-                  className="inline-block h-4 w-4 rounded-full bg-indigo-600"
+                  className="inline-block h-4 w-4 rounded-full bg-teal-600"
                 />
               ))}
             </div>
@@ -122,16 +122,16 @@ export default function PartPartWhole({
               {Array.from({ length: b }).map((_, i) => (
                 <span
                   key={i}
-                  className="inline-block h-4 w-4 rounded-full bg-indigo-600"
+                  className="inline-block h-4 w-4 rounded-full bg-teal-600"
                 />
               ))}
             </div>
           ) : null}
         </div>
 
-        <div className="col-span-2 rounded-2xl border-2 border-indigo-200 bg-indigo-50 p-5 text-center">
-          <div className="text-xs font-bold text-indigo-700 mb-2">Whole</div>
-          <div className="text-5xl font-black text-indigo-900">
+        <div className="col-span-2 rounded-2xl border-2 border-teal-200 bg-teal-50 p-5 text-center">
+          <div className="text-xs font-bold text-teal-700 mb-2">Whole</div>
+          <div className="text-5xl font-black text-teal-900">
             {mode === "missingWhole" ? "?" : whole}
           </div>
           {showDots && showWhole ? (
@@ -139,7 +139,7 @@ export default function PartPartWhole({
               {Array.from({ length: whole }).map((_, i) => (
                 <span
                   key={i}
-                  className="inline-block h-4 w-4 rounded-full bg-indigo-700"
+                  className="inline-block h-4 w-4 rounded-full bg-teal-700"
                 />
               ))}
             </div>
@@ -182,7 +182,7 @@ export default function PartPartWhole({
           />
           <button
             onClick={checkTyped}
-            className="px-5 py-3 rounded-xl bg-indigo-600 text-white font-extrabold hover:bg-indigo-700 transition"
+            className="px-5 py-3 rounded-xl bg-teal-600 text-white font-extrabold hover:bg-teal-700 transition"
             type="button"
           >
             Check
@@ -194,7 +194,7 @@ export default function PartPartWhole({
         <div className="mt-6 flex items-center justify-end">
           <button
             onClick={checkBuild}
-            className="px-5 py-3 rounded-xl bg-indigo-600 text-white font-extrabold hover:bg-indigo-700 transition"
+            className="px-5 py-3 rounded-xl bg-teal-600 text-white font-extrabold hover:bg-teal-700 transition"
             type="button"
           >
             Check
