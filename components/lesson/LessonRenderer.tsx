@@ -1,10 +1,14 @@
 "use client";
 
 import AdditionStrategy from "@/components/activities/AdditionStrategy";
+import Arrays from "@/components/activities/Arrays";
+import DivisionGroups from "@/components/activities/DivisionGroups";
 import FactFamily from "@/components/activities/FactFamily";
+import MixedWordProblem from "@/components/activities/MixedWordProblem";
 import MultipleChoiceActivity from "@/components/activities/MultipleChoiceActivity";
 import NumberOrder from "@/components/activities/NumberOrder";
 import NumberLineActivity from "@/components/activities/NumberLineActivity";
+import OddEvenSort from "@/components/activities/OddEvenSort";
 import PartitionExpand from "@/components/activities/PartitionExpand";
 import PlaceValueBuilder from "@/components/activities/PlaceValueBuilder";
 import SkipCount from "@/components/activities/SkipCount";
@@ -12,12 +16,17 @@ import SubtractionStrategy from "@/components/activities/SubtractionStrategy";
 import TypedResponseActivity from "@/components/activities/TypedResponseActivity";
 import type {
   AdditionStrategyQuestion,
+  ArraysQuestion,
+  DivisionGroupsQuestion,
   FactFamilyQuestion,
+  MixedWordProblemQuestion,
   MultipleChoiceQuestion,
   NumberLineQuestion,
   NumberOrderQuestion,
+  OddEvenSortQuestion,
   PartitionExpandQuestion,
   PlaceValueBuilderQuestion,
+  ReviewQuizQuestion,
   SkipCountQuestion,
   SubtractionStrategyQuestion,
   TypedResponseQuestion,
@@ -69,6 +78,30 @@ function getSafeQuestion(
 
   logFallback(activity, questionData);
   return generateQuestionForActivity(activity, prompt);
+}
+
+function renderNestedActivity({
+  activityType,
+  questionData,
+  prompt,
+  onCorrect,
+  onWrong,
+}: {
+  activityType: LessonActivity["activityType"];
+  questionData: Year2QuestionData;
+  prompt: string;
+  onCorrect?: () => void;
+  onWrong?: () => void;
+}) {
+  return (
+    <LessonRenderer
+      activity={{ activityType, weight: 1, config: {} }}
+      prompt={prompt}
+      questionData={questionData}
+      onCorrect={onCorrect}
+      onWrong={onWrong}
+    />
+  );
 }
 
 export function LessonRenderer({
@@ -144,6 +177,58 @@ export function LessonRenderer({
         />
       );
     }
+    case "arrays": {
+      const safeQuestion = getSafeQuestion(activity, questionData, prompt);
+      if (safeQuestion.kind !== "arrays") {
+        return <ErrorCard message="Array question failed to load." />;
+      }
+      return (
+        <Arrays
+          questionData={safeQuestion as ArraysQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
+        />
+      );
+    }
+    case "division_groups": {
+      const safeQuestion = getSafeQuestion(activity, questionData, prompt);
+      if (safeQuestion.kind !== "division_groups") {
+        return <ErrorCard message="Division groups question failed to load." />;
+      }
+      return (
+        <DivisionGroups
+          questionData={safeQuestion as DivisionGroupsQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
+        />
+      );
+    }
+    case "mixed_word_problem": {
+      const safeQuestion = getSafeQuestion(activity, questionData, prompt);
+      if (safeQuestion.kind !== "mixed_word_problem") {
+        return <ErrorCard message="Mixed word problem failed to load." />;
+      }
+      return (
+        <MixedWordProblem
+          questionData={safeQuestion as MixedWordProblemQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
+        />
+      );
+    }
+    case "review_quiz": {
+      const safeQuestion = getSafeQuestion(activity, questionData, prompt);
+      if (safeQuestion.kind !== "review_quiz") {
+        return <ErrorCard message="Review quiz failed to load." />;
+      }
+      return renderNestedActivity({
+        activityType: safeQuestion.activityType,
+        questionData: safeQuestion.question,
+        prompt,
+        onCorrect,
+        onWrong,
+      });
+    }
     case "subtraction_strategy": {
       const safeQuestion = getSafeQuestion(activity, questionData, prompt);
       if (safeQuestion.kind !== "subtraction_strategy") {
@@ -165,6 +250,19 @@ export function LessonRenderer({
       return (
         <FactFamily
           questionData={safeQuestion as FactFamilyQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
+        />
+      );
+    }
+    case "odd_even_sort": {
+      const safeQuestion = getSafeQuestion(activity, questionData, prompt);
+      if (safeQuestion.kind !== "odd_even_sort") {
+        return <ErrorCard message="Odd and even question failed to load." />;
+      }
+      return (
+        <OddEvenSort
+          questionData={safeQuestion as OddEvenSortQuestion}
           onCorrect={onCorrect}
           onWrong={onWrong}
         />

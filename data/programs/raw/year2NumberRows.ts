@@ -268,11 +268,26 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 1,
     topic: "Identify odd and even numbers",
     activity: "Use counters to sort odd/even",
-    activities: genericActivities("odd_even_sort", {
-      min: 0,
-      max: 1000,
-      mode: "identify",
-    }),
+    activities: [
+      makeActivity("odd_even_sort", 2, {
+        min: 0,
+        max: 30,
+        count: 6,
+        mode: "identify",
+      }),
+      makeActivity("number_order", 1, {
+        min: 0,
+        max: 30,
+        count: 4,
+        ascending: true,
+      }),
+      makeActivity("multiple_choice", 1, {
+        min: 0,
+        max: 30,
+        mode: "identify",
+        sourceActivityType: "odd_even_sort",
+      }),
+    ],
     curriculum: ["AC9M2N03"],
   },
   {
@@ -281,11 +296,26 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 2,
     topic: "Sort and explain odd/even patterns",
     activity: "Use hundreds charts to find patterns",
-    activities: genericActivities("odd_even_sort", {
-      min: 0,
-      max: 1000,
-      mode: "pattern",
-    }),
+    activities: [
+      makeActivity("odd_even_sort", 2, {
+        min: 0,
+        max: 40,
+        count: 6,
+        mode: "pattern",
+      }),
+      makeActivity("number_line", 1, {
+        min: 0,
+        max: 40,
+        step: 2,
+        mode: "placement",
+      }),
+      makeActivity("typed_response", 1, {
+        min: 0,
+        max: 40,
+        mode: "pattern",
+        sourceActivityType: "odd_even_sort",
+      }),
+    ],
     curriculum: ["AC9M2N03"],
   },
   {
@@ -294,11 +324,25 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 3,
     topic: "Add odd/even and explore results",
     activity: "Test sums of odd/even numbers",
-    activities: genericActivities("odd_even_sort", {
-      min: 0,
-      max: 100,
-      mode: "odd_even_sums",
-    }),
+    activities: [
+      makeActivity("odd_even_sort", 2, {
+        min: 0,
+        max: 50,
+        count: 6,
+        mode: "odd_even_sums",
+      }),
+      makeActivity("addition_strategy", 1, {
+        min: 0,
+        max: 50,
+        mode: "jump",
+      }),
+      makeActivity("multiple_choice", 1, {
+        min: 0,
+        max: 50,
+        mode: "odd_even_sums",
+        sourceActivityType: "odd_even_sort",
+      }),
+    ],
     curriculum: ["AC9M2N03"],
   },
   {
@@ -511,13 +555,29 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 2,
     topic: "Model multiplication as arrays",
     activity: "Build arrays with rows and columns",
-    activities: genericActivities("arrays", {
-      minRows: 2,
-      maxRows: 5,
-      minColumns: 2,
-      maxColumns: 5,
-      mode: "arrays",
-    }),
+    activities: [
+      makeActivity("arrays", 2, {
+        minRows: 2,
+        maxRows: 5,
+        minColumns: 2,
+        maxColumns: 5,
+        mode: "arrays",
+      }),
+      makeActivity("skip_count", 1, {
+        min: 0,
+        max: 100,
+        step: 2,
+        mode: "forward",
+      }),
+      makeActivity("multiple_choice", 1, {
+        minRows: 2,
+        maxRows: 5,
+        minColumns: 2,
+        maxColumns: 5,
+        mode: "arrays",
+        sourceActivityType: "arrays",
+      }),
+    ],
     curriculum: ["AC9M2N05"],
   },
   {
@@ -526,13 +586,28 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 3,
     topic: "Link multiplication to repeated addition",
     activity: "Write repeated addition sentences",
-    activities: genericActivities("arrays", {
-      minRows: 2,
-      maxRows: 5,
-      minColumns: 2,
-      maxColumns: 5,
-      mode: "repeated_addition",
-    }),
+    activities: [
+      makeActivity("arrays", 2, {
+        minRows: 2,
+        maxRows: 5,
+        minColumns: 2,
+        maxColumns: 5,
+        mode: "repeated_addition",
+      }),
+      makeActivity("fact_family", 1, {
+        min: 0,
+        max: 20,
+        mode: "recognise",
+      }),
+      makeActivity("typed_response", 1, {
+        minRows: 2,
+        maxRows: 5,
+        minColumns: 2,
+        maxColumns: 5,
+        mode: "repeated_addition",
+        sourceActivityType: "arrays",
+      }),
+    ],
     curriculum: ["AC9M2N05"],
   },
   {
@@ -610,11 +685,26 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 1,
     topic: "Model division as sharing",
     activity: "Share items equally in groups",
-    activities: genericActivities("division_groups", {
-      minTotal: 4,
-      maxTotal: 20,
-      mode: "sharing",
-    }),
+    activities: [
+      makeActivity("division_groups", 2, {
+        minTotal: 6,
+        maxTotal: 24,
+        mode: "sharing",
+      }),
+      makeActivity("arrays", 1, {
+        minRows: 2,
+        maxRows: 4,
+        minColumns: 2,
+        maxColumns: 5,
+        mode: "arrays",
+      }),
+      makeActivity("multiple_choice", 1, {
+        minTotal: 6,
+        maxTotal: 24,
+        mode: "sharing",
+        sourceActivityType: "division_groups",
+      }),
+    ],
     curriculum: ["AC9M2N06"],
   },
   {
@@ -623,11 +713,25 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 2,
     topic: "Model division as grouping",
     activity: "Draw groups to match division",
-    activities: genericActivities("division_groups", {
-      minTotal: 4,
-      maxTotal: 20,
-      mode: "grouping",
-    }),
+    activities: [
+      makeActivity("division_groups", 2, {
+        minTotal: 6,
+        maxTotal: 24,
+        mode: "grouping",
+      }),
+      makeActivity("skip_count", 1, {
+        min: 0,
+        max: 100,
+        step: 2,
+        mode: "forward",
+      }),
+      makeActivity("typed_response", 1, {
+        minTotal: 6,
+        maxTotal: 24,
+        mode: "grouping",
+        sourceActivityType: "division_groups",
+      }),
+    ],
     curriculum: ["AC9M2N06"],
   },
   {
@@ -636,11 +740,24 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 3,
     topic: "Link division to multiplication",
     activity: "Use inverse to check answers",
-    activities: genericActivities("division_groups", {
-      minTotal: 4,
-      maxTotal: 20,
-      mode: "inverse_link",
-    }),
+    activities: [
+      makeActivity("division_groups", 2, {
+        minTotal: 6,
+        maxTotal: 24,
+        mode: "inverse_link",
+      }),
+      makeActivity("fact_family", 1, {
+        min: 0,
+        max: 20,
+        mode: "recognise",
+      }),
+      makeActivity("multiple_choice", 1, {
+        minTotal: 6,
+        maxTotal: 24,
+        mode: "inverse_link",
+        sourceActivityType: "division_groups",
+      }),
+    ],
     curriculum: ["AC9M2N06"],
   },
   {
@@ -649,12 +766,26 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 1,
     topic: "Choose operation to solve problem",
     activity: "Read problem and underline clues",
-    activities: genericActivities("mixed_word_problem", {
-      min: 0,
-      max: 100,
-      mode: "choose_operation",
-      operations: ["+", "-", "x", "/"],
-    }),
+    activities: [
+      makeActivity("mixed_word_problem", 2, {
+        min: 0,
+        max: 100,
+        mode: "choose_operation",
+        operations: ["+", "-", "x", "/"],
+      }),
+      makeActivity("addition_strategy", 1, {
+        min: 0,
+        max: 100,
+        mode: "jump",
+      }),
+      makeActivity("multiple_choice", 1, {
+        min: 0,
+        max: 100,
+        mode: "choose_operation",
+        operations: ["+", "-", "x", "/"],
+        sourceActivityType: "mixed_word_problem",
+      }),
+    ],
     curriculum: ["AC9M2N06"],
   },
   {
@@ -663,12 +794,26 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 2,
     topic: "Solve 2-step problems with + and -",
     activity: "Draw steps in a 2-step problem",
-    activities: genericActivities("mixed_word_problem", {
-      min: 0,
-      max: 100,
-      mode: "two_step_add_sub",
-      operations: ["+", "-"],
-    }),
+    activities: [
+      makeActivity("mixed_word_problem", 2, {
+        min: 0,
+        max: 100,
+        mode: "two_step_add_sub",
+        operations: ["+", "-"],
+      }),
+      makeActivity("subtraction_strategy", 1, {
+        min: 0,
+        max: 100,
+        mode: "jump",
+      }),
+      makeActivity("typed_response", 1, {
+        min: 0,
+        max: 100,
+        mode: "two_step_add_sub",
+        operations: ["+", "-"],
+        sourceActivityType: "mixed_word_problem",
+      }),
+    ],
     curriculum: ["AC9M2N06"],
   },
   {
@@ -677,12 +822,26 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 3,
     topic: "Solve problems with x and /",
     activity: "Use operation mats to solve",
-    activities: genericActivities("mixed_word_problem", {
-      min: 0,
-      max: 50,
-      mode: "mult_div_problems",
-      operations: ["x", "/"],
-    }),
+    activities: [
+      makeActivity("mixed_word_problem", 2, {
+        min: 0,
+        max: 50,
+        mode: "mult_div_problems",
+        operations: ["x", "/"],
+      }),
+      makeActivity("division_groups", 1, {
+        minTotal: 6,
+        maxTotal: 24,
+        mode: "inverse_link",
+      }),
+      makeActivity("multiple_choice", 1, {
+        min: 0,
+        max: 50,
+        mode: "mult_div_problems",
+        operations: ["x", "/"],
+        sourceActivityType: "mixed_word_problem",
+      }),
+    ],
     curriculum: ["AC9M2N06"],
   },
   {
@@ -691,9 +850,30 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 1,
     topic: "Revision stations",
     activity: "Rotate through revision tasks",
-    activities: genericActivities("review_quiz", {
-      mode: "revision_stations",
-    }),
+    activities: [
+      makeActivity("review_quiz", 2, {
+        mode: "revision_stations",
+        reviewActivities: [
+          "skip_count",
+          "arrays",
+          "fact_family",
+          "number_line",
+        ],
+      }),
+      makeActivity("skip_count", 1, {
+        min: 0,
+        max: 100,
+        step: 5,
+        mode: "forward",
+      }),
+      makeActivity("arrays", 1, {
+        minRows: 2,
+        maxRows: 5,
+        minColumns: 2,
+        maxColumns: 5,
+        mode: "arrays",
+      }),
+    ],
     curriculum: ["AC9M2N06"],
   },
   {
@@ -702,9 +882,27 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 2,
     topic: "Math games and group challenges",
     activity: "Compete in team math games",
-    activities: genericActivities("review_quiz", {
-      mode: "team_challenges",
-    }),
+    activities: [
+      makeActivity("review_quiz", 2, {
+        mode: "team_challenges",
+        reviewActivities: [
+          "division_groups",
+          "fact_family",
+          "addition_strategy",
+          "odd_even_sort",
+        ],
+      }),
+      makeActivity("division_groups", 1, {
+        minTotal: 6,
+        maxTotal: 24,
+        mode: "grouping",
+      }),
+      makeActivity("fact_family", 1, {
+        min: 0,
+        max: 20,
+        mode: "recognise",
+      }),
+    ],
     curriculum: ["AC9M2N06"],
   },
   {
@@ -713,9 +911,29 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 3,
     topic: "End-of-unit quiz",
     activity: "Complete individual review quiz",
-    activities: genericActivities("review_quiz", {
-      mode: "final_quiz",
-    }),
+    activities: [
+      makeActivity("review_quiz", 2, {
+        mode: "final_quiz",
+        reviewActivities: [
+          "skip_count",
+          "arrays",
+          "division_groups",
+          "mixed_word_problem",
+          "addition_strategy",
+          "subtraction_strategy",
+        ],
+      }),
+      makeActivity("mixed_word_problem", 1, {
+        min: 0,
+        max: 60,
+        mode: "choose_operation",
+        operations: ["+", "-", "x", "/"],
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "final_quiz",
+        sourceActivityType: "review_quiz",
+      }),
+    ],
     curriculum: ["AC9M2N06"],
   },
 ];
