@@ -70,16 +70,16 @@ export default function StudentHomePage() {
 
   if (!progress) {
     return (
-      <main className="min-h-screen relative flex items-center justify-center p-6">
+      <main className="min-h-screen relative flex items-end justify-center p-6 pb-10">
         <div className="fixed inset-0 z-0">
-          <img src="/images/tower-hub-bg.jpg" alt="" className="w-full h-full object-cover" style={{ filter: "blur(2px)" }} />
+          <img src="/images/tower-hub-bg.jpg" alt="" className="w-full h-full object-cover" style={{ filter: "blur(2px)", objectPosition: "center 30%" }} />
           <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.08)" }} />
           {[...Array(12)].map((_, i) => (
             <div key={i} className="absolute rounded-full" style={{ width: 3 + (i % 3), height: 3 + (i % 3), left: `${8 + (i * 7.7) % 84}%`, bottom: `${(i * 8.3) % 70}%`, background: i % 2 === 0 ? "rgba(255,200,80,0.5)" : "rgba(255,255,255,0.35)", animation: `floatUp ${7 + (i % 4) * 2}s linear infinite`, animationDelay: `${(i * 1.1) % 6}s` }} />
           ))}
         </div>
         <div
-          className="relative z-10 bg-white/90 backdrop-blur-xl rounded-3xl p-10 w-full max-w-lg text-center"
+          className="relative z-10 bg-white/90 backdrop-blur-xl rounded-3xl p-8 w-full max-w-md text-center"
           style={{ boxShadow: "0 20px 40px rgba(0,0,0,0.18), 0 6px 12px rgba(0,0,0,0.08)" }}
         >
           {/* Glowing Tower Emblem */}
