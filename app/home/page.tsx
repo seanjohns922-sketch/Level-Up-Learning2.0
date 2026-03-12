@@ -84,7 +84,7 @@ export default function StudentHomePage() {
         >
           {/* Glowing Tower Emblem */}
           <div
-            className="mx-auto h-24 w-24 rounded-full flex items-center justify-center mb-6"
+            className="mx-auto h-18 w-18 rounded-full flex items-center justify-center mb-4 -mt-14"
             style={{
               background: "radial-gradient(circle, #fff3c4, #f4e6a6)",
               boxShadow: "0 0 20px rgba(255,210,120,0.35), 0 0 40px rgba(255,200,80,0.15)",
