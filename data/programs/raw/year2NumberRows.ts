@@ -46,17 +46,20 @@ export const year2NumberRows: ProgramRow[] = [
         min: 100,
         max: 1000,
         placeValues: ["hundreds", "tens", "ones"],
-        showMAB: true,
+        visualMode: "mab",
+        mode: "identify_number",
       },
       [
         makeActivity("multiple_choice", 1, {
           min: 100,
           max: 1000,
+          mode: "identify_number",
           sourceActivityType: "place_value_builder",
         }),
         makeActivity("typed_response", 1, {
           min: 100,
           max: 1000,
+          mode: "identify_number",
           sourceActivityType: "place_value_builder",
         }),
       ]
@@ -75,18 +78,21 @@ export const year2NumberRows: ProgramRow[] = [
         min: 100,
         max: 1000,
         placeValues: ["hundreds", "tens", "ones"],
+        visualMode: "mab",
         hideOnePlaceValue: true,
       },
       [
         makeActivity("multiple_choice", 1, {
           min: 100,
           max: 1000,
+          mode: "missing_mab_part",
           sourceActivityType: "place_value_builder",
           hideOnePlaceValue: true,
         }),
         makeActivity("typed_response", 1, {
           min: 100,
           max: 1000,
+          mode: "missing_mab_part",
           sourceActivityType: "place_value_builder",
           hideOnePlaceValue: true,
         }),
@@ -139,6 +145,8 @@ export const year2NumberRows: ProgramRow[] = [
         min: 100,
         max: 999,
         placeValues: ["hundreds", "tens", "ones"],
+        visualMode: "mab",
+        mode: "identify_place",
       }),
       makeActivity("multiple_choice", 1, {
         min: 100,

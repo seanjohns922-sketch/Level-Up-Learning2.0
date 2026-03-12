@@ -6,9 +6,14 @@ export type PlaceValueName = "hundreds" | "tens" | "ones";
 export type PlaceValueBuilderQuestion = {
   kind: "place_value_builder";
   prompt: string;
-  target: number;
+  hundreds: number | null;
+  tens: number | null;
+  ones: number | null;
+  answer: number;
+  mode: "identify_number" | "identify_place" | "missing_mab_part";
+  place?: PlaceValueName;
+  visualMode: "mab";
   placeValues: PlaceValueName[];
-  hiddenPlace: PlaceValueName | null;
 };
 
 export type NumberOrderQuestion = {
@@ -193,6 +198,14 @@ type GenericConfig = Record<string, unknown> & {
   operations?: string[];
   sourceActivityType?: ActivityType;
   reviewActivities?: ActivityType[];
+  visualMode?: string;
+  showMAB?: boolean;
+  minRows?: number;
+  maxRows?: number;
+  minColumns?: number;
+  maxColumns?: number;
+  minTotal?: number;
+  maxTotal?: number;
 };
 
 function randInt(min: number, max: number) {
@@ -260,19 +273,59 @@ function generateInteractiveQuestion(
     const max = typeof config.max === "number" ? config.max : 999;
     const target = randInt(min, max);
     const places = supportedPlaces(config);
-    const hiddenPlace =
+    const hundreds = digitForPlace(target, "hundreds");
+    const tens = digitForPlace(target, "tens");
+    const ones = digitForPlace(target, "ones");
+    const place =
+      places[randInt(0, places.length - 1)] ?? "ones";
+    const mode =
       config.hideOnePlaceValue === true
-        ? places[randInt(0, places.length - 1)]
-        : null;
+        ? "missing_mab_part"
+        : config.mode === "identify_place"
+        ? "identify_place"
+        : "identify_number";
+
+    if (mode === "identify_place") {
+      return {
+        kind: "place_value_builder",
+        prompt: `How many ${placeLabel(place)} are shown?`,
+        hundreds,
+        tens,
+        ones,
+        answer: digitForPlace(target, place),
+        mode,
+        place,
+        visualMode: "mab",
+        placeValues: places,
+      };
+    }
+
+    if (mode === "missing_mab_part") {
+      return {
+        kind: "place_value_builder",
+        prompt: "What is the missing value?",
+        hundreds: place === "hundreds" ? null : hundreds,
+        tens: place === "tens" ? null : tens,
+        ones: place === "ones" ? null : ones,
+        answer:
+          place === "hundreds" ? hundreds * 100 : place === "tens" ? tens * 10 : ones,
+        mode,
+        place,
+        visualMode: "mab",
+        placeValues: places,
+      };
+    }
 
     return {
       kind: "place_value_builder",
-      prompt: hiddenPlace
-        ? `Find the missing ${placeLabel(hiddenPlace)} digit in ${target}.`
-        : `Build the number ${target}.`,
-      target,
+      prompt: "What number is shown by the MAB blocks?",
+      hundreds,
+      tens,
+      ones,
+      answer: target,
+      mode: "identify_number",
+      visualMode: "mab",
       placeValues: places,
-      hiddenPlace,
     };
   }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { PlaceValueBuilderQuestion, PlaceValueName } from "@/data/activities/year2/lessonEngine";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 
@@ -14,16 +14,69 @@ function placeLabel(place: PlaceValueName) {
   return "Ones";
 }
 
-function digitForPlace(value: number, place: PlaceValueName) {
-  if (place === "hundreds") return Math.floor(value / 100) % 10;
-  if (place === "tens") return Math.floor(value / 10) % 10;
-  return value % 10;
-}
-
 function unitValue(place: PlaceValueName) {
   if (place === "hundreds") return 100;
   if (place === "tens") return 10;
   return 1;
+}
+
+function placeCount(questionData: PlaceValueBuilderQuestion, place: PlaceValueName) {
+  if (place === "hundreds") return questionData.hundreds;
+  if (place === "tens") return questionData.tens;
+  return questionData.ones;
+}
+
+function MABVisual({
+  place,
+  count,
+}: {
+  place: PlaceValueName;
+  count: number | null;
+}) {
+  if (count === null) {
+    return (
+      <div className="flex min-h-20 items-center justify-center rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50 text-3xl font-black text-amber-700">
+        ?
+      </div>
+    );
+  }
+
+  if (place === "hundreds") {
+    return (
+      <div className="grid grid-cols-3 gap-2">
+        {Array.from({ length: count }).map((_, index) => (
+          <div
+            key={index}
+            className="h-12 w-12 rounded-xl border border-teal-300 bg-teal-100 shadow-sm"
+          />
+        ))}
+      </div>
+    );
+  }
+
+  if (place === "tens") {
+    return (
+      <div className="flex flex-wrap gap-2">
+        {Array.from({ length: count }).map((_, index) => (
+          <div
+            key={index}
+            className="h-4 w-20 rounded-full border border-cyan-300 bg-cyan-100 shadow-sm"
+          />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {Array.from({ length: count }).map((_, index) => (
+        <div
+          key={index}
+          className="h-5 w-5 rounded-md border border-emerald-300 bg-emerald-100 shadow-sm"
+        />
+      ))}
+    </div>
+  );
 }
 
 export default function PlaceValueBuilder({
@@ -35,42 +88,29 @@ export default function PlaceValueBuilder({
   onCorrect?: () => void;
   onWrong?: () => void;
 }) {
-  const [digits, setDigits] = useState<Record<PlaceValueName, number>>(() => {
-    const initial: Record<PlaceValueName, number> = {
-      hundreds:
-        questionData.hiddenPlace === "hundreds"
-          ? 0
-          : questionData.hiddenPlace
-          ? digitForPlace(questionData.target, "hundreds")
-          : 0,
-      tens:
-        questionData.hiddenPlace === "tens"
-          ? 0
-          : questionData.hiddenPlace
-          ? digitForPlace(questionData.target, "tens")
-          : 0,
-      ones:
-        questionData.hiddenPlace === "ones"
-          ? 0
-          : questionData.hiddenPlace
-          ? digitForPlace(questionData.target, "ones")
-          : 0,
-    };
+  const [response, setResponse] = useState(0);
 
-    return initial;
-  });
+  useEffect(() => {
+    setResponse(0);
+  }, [questionData]);
 
-  const builtValue = digits.hundreds * 100 + digits.tens * 10 + digits.ones;
+  const visibleTotal = useMemo(
+    () =>
+      (questionData.hundreds ?? 0) * 100 +
+      (questionData.tens ?? 0) * 10 +
+      (questionData.ones ?? 0),
+    [questionData.hundreds, questionData.ones, questionData.tens]
+  );
 
-  function setDigit(place: PlaceValueName, next: number) {
-    setDigits((current) => ({
-      ...current,
-      [place]: clamp(next, 0, 9),
-    }));
-  }
+  const answerLabel =
+    questionData.mode === "identify_number"
+      ? "What number is shown?"
+      : questionData.mode === "identify_place"
+      ? `How many ${placeLabel(questionData.place ?? "ones").toLowerCase()}?`
+      : `Missing ${placeLabel(questionData.place ?? "ones").toLowerCase()} value`;
 
   function check() {
-    if (builtValue === questionData.target) onCorrect?.();
+    if (response === questionData.answer) onCorrect?.();
     else onWrong?.();
   }
 
@@ -81,65 +121,29 @@ export default function PlaceValueBuilder({
           Place Value Builder
         </div>
         <div className="flex items-center gap-2 mt-2">
-          <h2 className="text-2xl font-black text-gray-900">
-            {questionData.hiddenPlace
-              ? `Find the missing ${placeLabel(questionData.hiddenPlace).toLowerCase()} digit`
-              : "Build the number with hundreds, tens, and ones"}
-          </h2>
-          <ReadAloudBtn text={questionData.hiddenPlace
-            ? `Find the missing ${placeLabel(questionData.hiddenPlace).toLowerCase()} digit. Target number: ${questionData.target}`
-            : `Build the number with hundreds, tens, and ones. Target number: ${questionData.target}`} />
+          <h2 className="text-2xl font-black text-gray-900">{questionData.prompt}</h2>
+          <ReadAloudBtn text={questionData.prompt} />
         </div>
-        <p className="mt-2 text-sm text-gray-600">
-          Target number:{" "}
-          <span className="font-black text-gray-900">{questionData.target}</span>
-        </p>
+        <p className="mt-2 text-sm text-gray-600">{answerLabel}</p>
       </div>
 
       <div className="mt-6 grid gap-4 md:grid-cols-3">
         {questionData.placeValues.map((place) => {
-          const actual = digitForPlace(questionData.target, place);
-          const isLocked = questionData.hiddenPlace !== null && questionData.hiddenPlace !== place;
-          const displayValue = isLocked ? actual : digits[place];
+          const count = placeCount(questionData, place);
 
           return (
             <div key={place} className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
               <div className="text-xs font-bold uppercase tracking-wide text-gray-500">
                 {placeLabel(place)}
               </div>
-              <div className="mt-2 text-4xl font-black text-gray-900">{displayValue}</div>
-              <div className="mt-3 text-sm text-gray-600">
-                Value: {displayValue * unitValue(place)}
+              <div className="mt-4">
+                <MABVisual place={place} count={count} />
               </div>
-              {isLocked ? (
-                <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-800">
-                  Given to the learner
-                </div>
-              ) : (
-                <div className="mt-4 grid grid-cols-3 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setDigit(place, digits[place] - 1)}
-                    className="rounded-xl border border-gray-200 bg-white px-3 py-2 font-black text-gray-700 hover:bg-gray-100"
-                  >
-                    -1
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setDigit(place, 0)}
-                    className="rounded-xl border border-gray-200 bg-white px-3 py-2 font-black text-gray-700 hover:bg-gray-100"
-                  >
-                    0
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setDigit(place, digits[place] + 1)}
-                    className="rounded-xl bg-emerald-600 px-3 py-2 font-black text-white hover:bg-emerald-700"
-                  >
-                    +1
-                  </button>
-                </div>
-              )}
+              <div className="mt-3 text-sm text-gray-600">
+                {count === null
+                  ? "Missing part"
+                  : `${count} × ${unitValue(place)} = ${count * unitValue(place)}`}
+              </div>
             </div>
           );
         })}
@@ -147,15 +151,22 @@ export default function PlaceValueBuilder({
 
       <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">
         <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
-          Built Number
+          MAB Total
         </div>
         <div className="mt-2 text-3xl font-black text-teal-900">
-          {digits.hundreds} hundreds + {digits.tens} tens + {digits.ones} ones ={" "}
-          {builtValue}
+          {(questionData.hundreds ?? 0)} hundreds + {(questionData.tens ?? 0)} tens + {(questionData.ones ?? 0)} ones ={" "}
+          {visibleTotal}
         </div>
       </div>
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
+        <input
+          type="number"
+          value={response}
+          onChange={(event) => setResponse(clamp(Number(event.target.value), 0, 999))}
+          placeholder="Type your answer"
+          className="w-full max-w-xs rounded-xl border border-gray-300 px-4 py-3 text-lg font-bold text-gray-900 outline-none focus:border-teal-500"
+        />
         <button
           type="button"
           onClick={check}
