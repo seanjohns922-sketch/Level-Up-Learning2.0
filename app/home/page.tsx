@@ -92,7 +92,21 @@ export default function StudentHomePage() {
   }
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen relative">
+      {/* Immersive realm background */}
+      <div className="fixed inset-0 z-0">
+        <img
+          src="/images/number-nexus-home-bg.jpg"
+          alt=""
+          className="w-full h-full object-cover"
+        />
+        <div
+          className="absolute inset-0"
+          style={{ background: "linear-gradient(rgba(6,20,35,0.55), rgba(6,20,35,0.70) 40%, rgba(6,20,35,0.82) 70%, rgba(6,20,35,0.92))" }}
+        />
+      </div>
+
+      <div className="relative z-10">
       <HeroHeader
         levelNum={levelNum}
         week={week}
@@ -137,6 +151,7 @@ export default function StudentHomePage() {
             week={week}
           />
         </div>
+      </div>
       </div>
     </main>
   );
