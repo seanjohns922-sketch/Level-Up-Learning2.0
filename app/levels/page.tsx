@@ -164,11 +164,18 @@ export default function LevelsPage() {
     !!(progress as any)?.currentProgram;
 
   return (
-    <main className="min-h-screen bg-[#fbf7f1] px-6 py-10">
-      <div className="max-w-5xl mx-auto">
+    <main className="min-h-screen relative px-6 py-10">
+      <div className="fixed inset-0 z-0">
+        <img src="/images/tower-hub-bg.jpg" alt="" className="w-full h-full object-cover" style={{ filter: "blur(3px) brightness(1.05)" }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(rgba(10,20,30,0.40) 0%, rgba(10,20,30,0.55) 50%, rgba(10,20,30,0.65) 100%)" }} />
+        {[...Array(10)].map((_, i) => (
+          <div key={i} className="absolute rounded-full" style={{ width: 3 + (i % 3), height: 3 + (i % 3), left: `${6 + (i * 9.1) % 88}%`, bottom: `${(i * 9.7) % 65}%`, background: i % 2 === 0 ? "rgba(255,200,80,0.5)" : "rgba(255,255,255,0.3)", animation: `floatUp ${8 + (i % 4) * 2}s linear infinite`, animationDelay: `${(i * 1.3) % 7}s` }} />
+        ))}
+      </div>
+      <div className="max-w-5xl mx-auto relative z-10">
         <button
           onClick={goHome}
-          className="text-sm text-blue-600 hover:underline mb-6"
+          className="text-sm text-white/80 hover:text-white hover:underline mb-6"
           type="button"
         >
           Back to Dashboard
@@ -176,12 +183,12 @@ export default function LevelsPage() {
 
         <div className="text-center mb-8">
           <h1
-            className="text-5xl md:text-6xl font-black text-[#1f2937] tracking-tight"
+            className="text-5xl md:text-6xl font-black text-white tracking-tight drop-shadow-lg"
             style={{ fontFamily: "'Nunito', 'Avenir Next', 'Trebuchet MS', sans-serif" }}
           >
             Level Up Learning
           </h1>
-          <p className="text-gray-500 mt-2 text-lg">Choose your level</p>
+          <p className="text-white/70 mt-2 text-lg">Choose your level</p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
@@ -197,11 +204,11 @@ export default function LevelsPage() {
                   setSelectedYear(level.id);
                 }}
                 className={[
-                  "relative rounded-3xl border p-6 text-left shadow-sm transition",
+                  "relative rounded-3xl border p-6 text-left shadow-sm transition backdrop-blur-md",
                   !isUnlocked ? "opacity-60 cursor-not-allowed" : "",
                   isSelected
                     ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white border-blue-500"
-                    : "bg-white border-gray-200 hover:shadow-md",
+                    : "bg-white/80 border-white/30 text-gray-800 hover:shadow-md hover:bg-white/90",
                 ].join(" ")}
               >
                 <div className="flex items-center gap-3">
