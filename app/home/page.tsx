@@ -111,7 +111,7 @@ export default function StudentHomePage() {
         {/* Vertical gradient overlay — lighter in middle to reveal the world */}
         <div
           className="absolute inset-0"
-          style={{ background: "linear-gradient(rgba(5,20,35,0.85) 0%, rgba(5,20,35,0.55) 30%, rgba(5,20,35,0.45) 50%, rgba(5,20,35,0.70) 100%)" }}
+          style={{ background: "linear-gradient(rgba(5,20,35,0.90) 0%, rgba(5,20,35,0.90) 30%, rgba(5,20,35,0.90) 50%, rgba(5,20,35,0.90) 100%)" }}
         />
         {/* Teal glow behind Numbot (right side) */}
         <div
