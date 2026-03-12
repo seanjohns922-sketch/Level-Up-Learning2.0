@@ -168,9 +168,72 @@ export default function LevelsPage() {
       <div className="fixed inset-0 z-0">
         <img src="/images/tower-plaza-bg.jpg" alt="" className="w-full h-full object-cover" style={{ filter: "blur(2px)" }} />
         <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.05)" }} />
-        {[...Array(10)].map((_, i) => (
-          <div key={i} className="absolute rounded-full" style={{ width: 3 + (i % 3), height: 3 + (i % 3), left: `${6 + (i * 9.1) % 88}%`, bottom: `${(i * 9.7) % 65}%`, background: i % 2 === 0 ? "rgba(255,200,80,0.5)" : "rgba(255,255,255,0.3)", animation: `floatUp ${8 + (i % 4) * 2}s linear infinite`, animationDelay: `${(i * 1.3) % 7}s` }} />
-        ))}
+
+        {/* Dense tower-centered particles — warm golds, whites, pale yellows */}
+        {[...Array(50)].map((_, i) => {
+          const isCentered = i < 20; // first 20 cluster near tower center
+          const left = isCentered
+            ? 35 + Math.sin(i * 1.7) * 15 // 35–50% range (tower area)
+            : (i * 7.3 + 3) % 94;
+          const bottom = (i * 6.1 + 2) % 85;
+          const size = 2 + (i % 5) * 0.8;
+          const duration = 6 + (i % 7) * 2.5;
+          const delay = (i * 0.6) % 12;
+          const drift = (i % 3 === 0) ? `${(i % 2 === 0 ? 1 : -1) * (8 + i % 12)}px` : "0px";
+          const colors = [
+            "rgba(255,210,80,0.6)",
+            "rgba(255,255,255,0.45)",
+            "rgba(255,230,130,0.5)",
+            "rgba(255,200,60,0.35)",
+            "rgba(255,255,220,0.55)",
+            "rgba(255,180,50,0.4)",
+          ];
+          const color = colors[i % colors.length];
+          const opacity = 0.3 + (i % 5) * 0.15;
+
+          return (
+            <div
+              key={`p${i}`}
+              className="absolute rounded-full"
+              style={{
+                width: size,
+                height: size,
+                left: `${left}%`,
+                bottom: `${bottom}%`,
+                background: color,
+                opacity,
+                boxShadow: i % 4 === 0 ? `0 0 ${4 + i % 6}px ${color}` : "none",
+                animation: `floatUp ${duration}s linear infinite`,
+                animationDelay: `${delay}s`,
+                ["--drift" as any]: drift,
+              }}
+            />
+          );
+        })}
+
+        {/* Sparkle layer — larger, pulsing, fewer */}
+        {[...Array(12)].map((_, i) => {
+          const left = 25 + (i * 4.7) % 50;
+          const bottom = 10 + (i * 7.3) % 60;
+          const size = 4 + (i % 3) * 2;
+          return (
+            <div
+              key={`s${i}`}
+              className="absolute rounded-full"
+              style={{
+                width: size,
+                height: size,
+                left: `${left}%`,
+                bottom: `${bottom}%`,
+                background: "rgba(255,240,180,0.6)",
+                boxShadow: `0 0 ${6 + i % 4}px rgba(255,210,100,0.4)`,
+                animation: `floatUp ${10 + (i % 4) * 3}s linear infinite, pulseGlow ${2 + (i % 3)}s ease-in-out infinite`,
+                animationDelay: `${(i * 1.5) % 8}s`,
+                opacity: 0.5 + (i % 3) * 0.2,
+              }}
+            />
+          );
+        })}
       </div>
       <div className="max-w-5xl mx-auto relative z-10">
         <button
