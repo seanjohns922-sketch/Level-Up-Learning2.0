@@ -85,10 +85,10 @@ export default function HeroHeader({ levelNum, week, lessonsDone, overallPercent
         </div>
       </div>
 
-      {/* Wave divider */}
+      {/* Wave divider — transparent to let realm bg continue */}
       <div className="absolute bottom-0 left-0 right-0">
         <svg viewBox="0 0 1440 60" fill="none" className="w-full h-auto">
-          <path d="M0 60V30C240 0 480 0 720 30C960 60 1200 60 1440 30V60H0Z" fill="hsl(30 30% 96%)" />
+          <path d="M0 60V30C240 0 480 0 720 30C960 60 1200 60 1440 30V60H0Z" fill="rgba(6,20,35,0.15)" />
         </svg>
       </div>
     </div>
