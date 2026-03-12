@@ -204,11 +204,11 @@ export default function LevelsPage() {
                   setSelectedYear(level.id);
                 }}
                 className={[
-                  "relative rounded-3xl border p-6 text-left shadow-sm transition",
+                  "relative rounded-3xl border p-6 text-left shadow-sm transition backdrop-blur-md",
                   !isUnlocked ? "opacity-60 cursor-not-allowed" : "",
                   isSelected
                     ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white border-blue-500"
-                    : "bg-white border-gray-200 hover:shadow-md",
+                    : "bg-white/80 border-white/30 text-gray-800 hover:shadow-md hover:bg-white/90",
                 ].join(" ")}
               >
                 <div className="flex items-center gap-3">
