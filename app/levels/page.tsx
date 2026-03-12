@@ -175,7 +175,7 @@ export default function LevelsPage() {
       <div className="max-w-5xl mx-auto relative z-10">
         <button
           onClick={goHome}
-          className="text-sm text-blue-600 hover:underline mb-6"
+          className="text-sm text-white/80 hover:text-white hover:underline mb-6"
           type="button"
         >
           Back to Dashboard
