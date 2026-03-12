@@ -78,17 +78,37 @@ export default function StudentHomePage() {
             <div key={i} className="absolute rounded-full" style={{ width: 3 + (i % 3), height: 3 + (i % 3), left: `${8 + (i * 7.7) % 84}%`, bottom: `${(i * 8.3) % 70}%`, background: i % 2 === 0 ? "rgba(255,200,80,0.5)" : "rgba(255,255,255,0.35)", animation: `floatUp ${7 + (i % 4) * 2}s linear infinite`, animationDelay: `${(i * 1.1) % 6}s` }} />
           ))}
         </div>
-        <div className="relative z-10 bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl p-10 w-full max-w-lg text-center">
-          <div className="mx-auto h-20 w-20 rounded-2xl bg-amber-50 flex items-center justify-center mb-5">
-            <svg viewBox="0 0 24 24" className="h-10 w-10 text-amber-500" fill="none" stroke="currentColor" strokeWidth="2">
-              <polygon points="12,2 15,10 22,10 16,15 18,22 12,18 6,22 8,15 2,10 9,10" />
+        <div
+          className="relative z-10 bg-white/90 backdrop-blur-xl rounded-3xl p-10 w-full max-w-lg text-center"
+          style={{ boxShadow: "0 20px 40px rgba(0,0,0,0.18), 0 6px 12px rgba(0,0,0,0.08)" }}
+        >
+          {/* Glowing Tower Emblem */}
+          <div
+            className="mx-auto h-24 w-24 rounded-full flex items-center justify-center mb-6"
+            style={{
+              background: "radial-gradient(circle, #fff3c4, #f4e6a6)",
+              boxShadow: "0 0 20px rgba(255,210,120,0.35), 0 0 40px rgba(255,200,80,0.15)",
+            }}
+          >
+            <svg viewBox="0 0 24 24" className="h-11 w-11 text-amber-600 drop-shadow" fill="none" stroke="currentColor" strokeWidth="1.8">
+              {/* Tower silhouette */}
+              <path d="M8 22V10L12 4l4 6v12" strokeLinejoin="round" />
+              <path d="M6 22h12" strokeLinecap="round" />
+              <path d="M10 14h4" strokeLinecap="round" />
+              <path d="M10 18h4" strokeLinecap="round" />
+              {/* Star on top */}
+              <polygon points="12,2 13,3.5 14.5,3.5 13.5,4.5 14,6 12,5 10,6 10.5,4.5 9.5,3.5 11,3.5" fill="currentColor" stroke="none" />
             </svg>
           </div>
-          <h1 className="text-3xl font-black text-gray-800 mb-2">Welcome to Level Up Learning</h1>
+
+          <p className="text-sm font-semibold text-amber-600/80 uppercase tracking-widest mb-1">Welcome to the</p>
+          <h1 className="text-3xl font-black text-gray-800 mb-2 uppercase tracking-wide">Tower of Knowledge</h1>
           <p className="text-gray-500 mb-8">Choose your level to begin your adventure.</p>
+
           <button
             onClick={goLevels}
-            className="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-primary text-primary-foreground font-extrabold text-lg shadow-lg hover:brightness-110 transition"
+            className="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-primary text-primary-foreground font-extrabold text-lg hover:brightness-110 transition"
+            style={{ boxShadow: "0 6px 14px rgba(30,160,90,0.35)" }}
             type="button"
           >
             Choose Level →
