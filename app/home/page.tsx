@@ -99,11 +99,69 @@ export default function StudentHomePage() {
           src="/images/number-nexus-home-bg.jpg"
           alt=""
           className="w-full h-full object-cover"
+          style={{ filter: "brightness(1.15) contrast(1.08)" }}
         />
+        {/* Vertical gradient overlay — lighter in middle to reveal the world */}
         <div
           className="absolute inset-0"
-          style={{ background: "linear-gradient(rgba(6,20,35,0.55), rgba(6,20,35,0.70) 40%, rgba(6,20,35,0.82) 70%, rgba(6,20,35,0.92))" }}
+          style={{ background: "linear-gradient(rgba(5,20,35,0.85) 0%, rgba(5,20,35,0.55) 30%, rgba(5,20,35,0.45) 50%, rgba(5,20,35,0.70) 100%)" }}
         />
+        {/* Teal glow behind Numbot (right side) */}
+        <div
+          className="absolute animate-pulse"
+          style={{
+            width: 400,
+            height: 400,
+            right: "8%",
+            top: "20%",
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(31,209,181,0.22) 0%, transparent 70%)",
+            filter: "blur(40px)",
+            animationDuration: "4s",
+          }}
+        />
+        {/* Circuit glow accents — left side */}
+        <div
+          className="absolute"
+          style={{
+            width: 300,
+            height: "80%",
+            left: 0,
+            top: "10%",
+            background: "linear-gradient(180deg, transparent, rgba(31,209,181,0.12) 50%, transparent)",
+            filter: "blur(30px)",
+            animation: "pulse 5s cubic-bezier(0.4,0,0.6,1) infinite",
+          }}
+        />
+        {/* Circuit glow accents — right side */}
+        <div
+          className="absolute"
+          style={{
+            width: 300,
+            height: "80%",
+            right: 0,
+            top: "10%",
+            background: "linear-gradient(180deg, transparent, rgba(31,209,181,0.10) 50%, transparent)",
+            filter: "blur(30px)",
+            animation: "pulse 6s cubic-bezier(0.4,0,0.6,1) infinite 1s",
+          }}
+        />
+        {/* Floating particles */}
+        {[...Array(18)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full"
+            style={{
+              width: 2 + (i % 4),
+              height: 2 + (i % 4),
+              left: `${5 + (i * 5.3) % 90}%`,
+              bottom: `${(i * 7.1) % 60}%`,
+              background: i % 3 === 0 ? "rgba(31,209,181,0.6)" : "rgba(255,255,255,0.4)",
+              animation: `floatUp ${6 + (i % 5) * 2}s linear infinite`,
+              animationDelay: `${(i * 0.8) % 8}s`,
+            }}
+          />
+        ))}
       </div>
 
       <div className="relative z-10">
