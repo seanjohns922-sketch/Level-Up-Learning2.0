@@ -79,13 +79,13 @@ export default function StudentHomePage() {
           ))}
         </div>
         <div className="relative z-10 bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl p-10 w-full max-w-lg text-center">
-          <div className="mx-auto h-20 w-20 rounded-2xl bg-primary-light flex items-center justify-center mb-5">
-            <svg viewBox="0 0 24 24" className="h-10 w-10 text-primary" fill="none" stroke="currentColor" strokeWidth="2">
+          <div className="mx-auto h-20 w-20 rounded-2xl bg-amber-50 flex items-center justify-center mb-5">
+            <svg viewBox="0 0 24 24" className="h-10 w-10 text-amber-500" fill="none" stroke="currentColor" strokeWidth="2">
               <polygon points="12,2 15,10 22,10 16,15 18,22 12,18 6,22 8,15 2,10 9,10" />
             </svg>
           </div>
-          <h1 className="text-3xl font-black text-foreground mb-2">Welcome to Level Up Learning</h1>
-          <p className="text-muted-foreground mb-8">Choose your level to begin your adventure.</p>
+          <h1 className="text-3xl font-black text-gray-800 mb-2">Welcome to Level Up Learning</h1>
+          <p className="text-gray-500 mb-8">Choose your level to begin your adventure.</p>
           <button
             onClick={goLevels}
             className="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-primary text-primary-foreground font-extrabold text-lg shadow-lg hover:brightness-110 transition"

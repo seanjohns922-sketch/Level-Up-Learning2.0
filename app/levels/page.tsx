@@ -164,8 +164,15 @@ export default function LevelsPage() {
     !!(progress as any)?.currentProgram;
 
   return (
-    <main className="min-h-screen bg-[#fbf7f1] px-6 py-10">
-      <div className="max-w-5xl mx-auto">
+    <main className="min-h-screen relative px-6 py-10">
+      <div className="fixed inset-0 z-0">
+        <img src="/images/tower-hub-bg.jpg" alt="" className="w-full h-full object-cover" style={{ filter: "blur(3px) brightness(1.05)" }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(rgba(10,20,30,0.40) 0%, rgba(10,20,30,0.55) 50%, rgba(10,20,30,0.65) 100%)" }} />
+        {[...Array(10)].map((_, i) => (
+          <div key={i} className="absolute rounded-full" style={{ width: 3 + (i % 3), height: 3 + (i % 3), left: `${6 + (i * 9.1) % 88}%`, bottom: `${(i * 9.7) % 65}%`, background: i % 2 === 0 ? "rgba(255,200,80,0.5)" : "rgba(255,255,255,0.3)", animation: `floatUp ${8 + (i % 4) * 2}s linear infinite`, animationDelay: `${(i * 1.3) % 7}s` }} />
+        ))}
+      </div>
+      <div className="max-w-5xl mx-auto relative z-10">
         <button
           onClick={goHome}
           className="text-sm text-blue-600 hover:underline mb-6"
