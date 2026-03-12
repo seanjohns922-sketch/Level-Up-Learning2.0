@@ -125,6 +125,12 @@ export default function PlaceValueBuilder({
           <ReadAloudBtn text={questionData.prompt} />
         </div>
         <p className="mt-2 text-sm text-gray-600">{answerLabel}</p>
+        {questionData.mode === "missing_mab_part" ? (
+          <div className="mt-4 inline-flex items-center gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-900">
+            Target number:
+            <span className="text-2xl font-black">{questionData.targetNumber}</span>
+          </div>
+        ) : null}
       </div>
 
       <div className="mt-6 grid gap-4 md:grid-cols-3">
@@ -149,15 +155,38 @@ export default function PlaceValueBuilder({
         })}
       </div>
 
-      <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">
-        <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
-          MAB Total
+      {questionData.mode === "identify_number" ? (
+        <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">
+          <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
+            Work it out
+          </div>
+          <div className="mt-2 text-lg font-bold text-teal-900">
+            Count the hundreds, tens, and ones blocks to find the number.
+          </div>
         </div>
-        <div className="mt-2 text-3xl font-black text-teal-900">
-          {(questionData.hundreds ?? 0)} hundreds + {(questionData.tens ?? 0)} tens + {(questionData.ones ?? 0)} ones ={" "}
-          {visibleTotal}
+      ) : questionData.mode === "missing_mab_part" ? (
+        <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">
+          <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
+            Known blocks
+          </div>
+          <div className="mt-2 text-3xl font-black text-teal-900">
+            {(questionData.hundreds ?? 0)} hundreds + {(questionData.tens ?? 0)} tens + {(questionData.ones ?? 0)} ones ={" "}
+            {visibleTotal}
+          </div>
+          <div className="mt-2 text-sm text-teal-800">
+            Use the target number to work out the missing value.
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">
+          <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
+            Place value clue
+          </div>
+          <div className="mt-2 text-3xl font-black text-teal-900">
+            {questionData.targetNumber}
+          </div>
+        </div>
+      )}
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
         <input

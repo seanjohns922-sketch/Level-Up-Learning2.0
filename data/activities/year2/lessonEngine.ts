@@ -9,6 +9,7 @@ export type PlaceValueBuilderQuestion = {
   hundreds: number | null;
   tens: number | null;
   ones: number | null;
+  targetNumber: number;
   answer: number;
   mode: "identify_number" | "identify_place" | "missing_mab_part";
   place?: PlaceValueName;
@@ -292,6 +293,7 @@ function generateInteractiveQuestion(
         hundreds,
         tens,
         ones,
+        targetNumber: target,
         answer: digitForPlace(target, place),
         mode,
         place,
@@ -307,6 +309,7 @@ function generateInteractiveQuestion(
         hundreds: place === "hundreds" ? null : hundreds,
         tens: place === "tens" ? null : tens,
         ones: place === "ones" ? null : ones,
+        targetNumber: target,
         answer:
           place === "hundreds" ? hundreds * 100 : place === "tens" ? tens * 10 : ones,
         mode,
@@ -322,6 +325,7 @@ function generateInteractiveQuestion(
       hundreds,
       tens,
       ones,
+      targetNumber: target,
       answer: target,
       mode: "identify_number",
       visualMode: "mab",
