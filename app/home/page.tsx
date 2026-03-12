@@ -152,6 +152,7 @@ export default function StudentHomePage() {
           />
         </div>
       </div>
+      </div>
     </main>
   );
 }

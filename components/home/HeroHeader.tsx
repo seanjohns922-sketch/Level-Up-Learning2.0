@@ -15,8 +15,8 @@ type Props = {
 export default function HeroHeader({ levelNum, week, lessonsDone, overallPercent, onBack, onLogout }: Props) {
   return (
     <div className="relative overflow-hidden">
-      {/* Gradient background with magical particles */}
-      <div className={`absolute inset-0 ${LEVEL2_HERO_GRADIENT}`} />
+      {/* Transparent gradient overlay — realm bg shows through */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-transparent" />
       <div className="absolute inset-0 opacity-20">
         {[...Array(6)].map((_, i) => (
           <div
