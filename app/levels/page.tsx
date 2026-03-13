@@ -166,7 +166,7 @@ export default function LevelsPage() {
   return (
     <main className="min-h-screen relative px-6 py-10">
       <div className="fixed inset-0 z-0">
-        <img src="/images/tower-plaza-bg.jpg" alt="" className="w-full h-full object-cover" style={{ filter: "blur(0.5px) saturate(0.75)", objectPosition: "center 20%" }} />
+        <img src="/images/tower-plaza-bg.jpg" alt="" className="w-full h-full object-cover" style={{ filter: "blur(0.5px) saturate(1.15) brightness(1.12)", objectPosition: "center 20%" }} />
         <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.08)" }} />
 
         {/* Golden light rays from tower center */}
@@ -296,10 +296,10 @@ export default function LevelsPage() {
             ← Back to Dashboard
           </button>
           <h1
-            className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-wide leading-tight"
+            className="text-5xl md:text-6xl lg:text-7xl font-black text-white tracking-wide leading-tight"
             style={{
               fontFamily: "'Quicksand', 'Nunito', sans-serif",
-              textShadow: "0 6px 20px rgba(0,0,0,0.35), 0 0 40px rgba(255,210,80,0.2)",
+              textShadow: "0 10px 30px rgba(0,0,0,0.35), 0 0 60px rgba(255,210,80,0.25)",
             }}
           >
             Choose Your Path
@@ -341,10 +341,11 @@ export default function LevelsPage() {
 
         {/* Right column — level grid */}
         <div className="md:w-[62%] flex flex-col justify-center">
-          <div className="grid grid-cols-2 gap-3 max-w-md ml-auto mr-auto md:mr-8">
-            {levels.map((level) => {
+          <div className="grid grid-cols-2 gap-3.5 max-w-lg ml-auto mr-auto md:mr-8">
+            {levels.map((level, idx) => {
               const isSelected = selectedYear === level.id;
               const isUnlocked = DEMO_MODE || !hasAssignedProgram || level.id === unlockedYear;
+              const isLastOdd = idx === levels.length - 1 && levels.length % 2 === 1;
               return (
                 <button
                   key={level.id}
@@ -354,73 +355,29 @@ export default function LevelsPage() {
                     setSelectedYear(level.id);
                   }}
                   className={[
-                    "relative rounded-2xl border p-4 text-left transition-all duration-300",
-                    !isUnlocked ? "opacity-50 cursor-not-allowed" : "cursor-pointer",
+                    "relative border px-5 py-4 text-center transition-all duration-300",
+                    !isUnlocked ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:scale-[1.03]",
                     isSelected ? "border-blue-400/60" : "border-white/30 hover:border-white/50",
+                    isLastOdd ? "col-span-2 max-w-[calc(50%-0.44rem)] mx-auto" : "",
                   ].join(" ")}
-                  style={isSelected ? {
-                    background: "rgba(80,130,255,0.75)",
-                    backdropFilter: "blur(12px)",
-                    boxShadow: "0 0 20px rgba(80,120,255,0.35), 0 8px 20px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2)",
-                  } : {
-                    background: "rgba(255,255,255,0.82)",
-                    backdropFilter: "blur(12px)",
-                    boxShadow: "0 8px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.4)",
+                  style={{
+                    borderRadius: "18px",
+                    ...(isSelected ? {
+                      background: "rgba(80,130,255,0.75)",
+                      backdropFilter: "blur(12px)",
+                      boxShadow: "0 0 20px rgba(80,120,255,0.35), 0 10px 30px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2)",
+                    } : {
+                      background: "rgba(255,255,255,0.92)",
+                      backdropFilter: "blur(12px)",
+                      boxShadow: "0 10px 30px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.4)",
+                    }),
                   }}
                 >
-                  <div className="flex items-center gap-2.5">
-                    <div
-                      className="h-9 w-9 rounded-xl flex items-center justify-center shrink-0"
-                      style={{
-                        background: isSelected ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.06)",
-                      }}
-                    >
-                      {level.icon === "sprout" ? (
-                        <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke={isSelected ? "white" : "#334155"} strokeWidth="2">
-                          <path d="M12 20v-6" />
-                          <path d="M7 11c3 0 5-2 5-5-3 0-5 2-5 5z" />
-                          <path d="M17 11c-3 0-5-2-5-5 3 0 5 2 5 5z" />
-                        </svg>
-                      ) : null}
-                      {level.icon === "numbers" ? (
-                        <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke={isSelected ? "white" : "#334155"} strokeWidth="2">
-                          <rect x="3" y="3" width="18" height="18" rx="4" />
-                          <path d="M7 10h4M7 14h4M13 10h4M13 14h4" />
-                        </svg>
-                      ) : null}
-                      {level.icon === "tiles" ? (
-                        <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke={isSelected ? "white" : "#334155"} strokeWidth="2">
-                          <path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM15 15h6v6h-6z" />
-                        </svg>
-                      ) : null}
-                      {level.icon === "bolt" ? (
-                        <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke={isSelected ? "white" : "#334155"} strokeWidth="2">
-                          <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" />
-                        </svg>
-                      ) : null}
-                      {level.icon === "rocket" ? (
-                        <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke={isSelected ? "white" : "#334155"} strokeWidth="2">
-                          <path d="M5 19l4-2 2 2-2 4-4-4z" />
-                          <path d="M14 3l7 7-8 8-7-7 8-8z" />
-                        </svg>
-                      ) : null}
-                      {level.icon === "trophy" ? (
-                        <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke={isSelected ? "white" : "#334155"} strokeWidth="2">
-                          <path d="M8 21h8M12 17v4M7 4h10l-1 6H8L7 4z" />
-                        </svg>
-                      ) : null}
-                      {level.icon === "crown" ? (
-                        <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke={isSelected ? "white" : "#334155"} strokeWidth="2">
-                          <path d="M3 7l4 4 5-6 5 6 4-4-2 10H5L3 7z" />
-                        </svg>
-                      ) : null}
-                    </div>
-                    <span className={`text-sm font-bold ${isSelected ? "text-white" : "text-slate-800"}`}>
-                      {level.label}
-                    </span>
-                  </div>
+                  <span className={`text-sm font-bold ${isSelected ? "text-white" : "text-slate-800"}`}>
+                    {level.label}
+                  </span>
                   {!isUnlocked ? (
-                    <div className="absolute right-3 top-3 text-slate-400/60">
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400/60">
                       <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
                         <rect x="4" y="11" width="16" height="9" rx="2" />
                         <path d="M8 11V7a4 4 0 018 0v4" />
@@ -432,7 +389,7 @@ export default function LevelsPage() {
             })}
           </div>
 
-          <div className="max-w-md ml-auto mr-auto md:mr-8 mt-4">
+          <div className="max-w-lg ml-auto mr-auto md:mr-8 mt-4">
             <button
               onClick={primaryCta.onClick}
               disabled={primaryCta.disabled}
