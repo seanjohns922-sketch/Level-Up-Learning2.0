@@ -79,8 +79,8 @@ export default function StudentHomePage() {
           ))}
         </div>
         <div
-          className="relative z-10 bg-white/30 backdrop-blur-md rounded-3xl p-8 w-full max-w-md text-center"
-          style={{ boxShadow: "0 20px 40px rgba(0,0,0,0.10), 0 6px 12px rgba(0,0,0,0.05)" }}
+          className="relative z-10 rounded-3xl p-8 w-full max-w-md text-center"
+          style={{ background: "rgba(255,255,255,0.85)", border: "1px solid rgba(255,255,255,0.4)", boxShadow: "0 20px 40px rgba(0,0,0,0.15), 0 6px 12px rgba(0,0,0,0.05)" }}
         >
           {/* Level Up Learning Mascot */}
           <div
