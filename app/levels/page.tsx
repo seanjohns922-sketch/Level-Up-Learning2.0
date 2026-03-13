@@ -389,7 +389,7 @@ export default function LevelsPage() {
             })}
           </div>
 
-          <div className="max-w-md ml-auto mr-auto md:mr-8 mt-4">
+          <div className="max-w-lg ml-auto mr-auto md:mr-8 mt-4">
             <button
               onClick={primaryCta.onClick}
               disabled={primaryCta.disabled}
