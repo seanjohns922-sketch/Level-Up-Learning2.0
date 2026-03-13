@@ -126,7 +126,7 @@ export default function StudentHomePage() {
           src="/images/number-nexus-home-bg.jpg"
           alt=""
           className="w-full h-full object-cover"
-          style={{ filter: "brightness(1.15) contrast(1.08)" }}
+          style={{ filter: "brightness(1.3) contrast(1.12) saturate(1.15)" }}
         />
       {/* Subtle vignette — edges only, world stays bright */}
         <div
