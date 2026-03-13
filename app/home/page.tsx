@@ -188,19 +188,20 @@ export default function StudentHomePage() {
             animationDuration: "5s",
           }}
         />
-        {/* Floating particles */}
-        {[...Array(18)].map((_, i) => (
+        {/* Floating particles — dense magical dust */}
+        {[...Array(60)].map((_, i) => (
           <div
             key={i}
             className="absolute rounded-full"
             style={{
-              width: 2 + (i % 4),
-              height: 2 + (i % 4),
-              left: `${5 + (i * 5.3) % 90}%`,
-              bottom: `${(i * 7.1) % 60}%`,
-              background: i % 3 === 0 ? "rgba(31,209,181,0.6)" : "rgba(255,255,255,0.4)",
-              animation: `floatUp ${6 + (i % 5) * 2}s linear infinite`,
-              animationDelay: `${(i * 0.8) % 8}s`,
+              width: 2 + (i % 5),
+              height: 2 + (i % 5),
+              left: `${3 + (i * 4.7) % 94}%`,
+              bottom: `${(i * 5.3) % 80}%`,
+              background: i % 4 === 0 ? "rgba(31,209,181,0.7)" : i % 4 === 1 ? "rgba(56,230,200,0.5)" : i % 4 === 2 ? "rgba(255,255,255,0.5)" : "rgba(255,220,100,0.4)",
+              animation: `floatUp ${5 + (i % 6) * 2}s linear infinite`,
+              animationDelay: `${(i * 0.6) % 10}s`,
+              opacity: 0.3 + (i % 4) * 0.15,
             }}
           />
         ))}
