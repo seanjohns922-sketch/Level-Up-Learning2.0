@@ -296,10 +296,10 @@ export default function LevelsPage() {
             ← Back to Dashboard
           </button>
           <h1
-            className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-wide leading-tight"
+            className="text-5xl md:text-6xl lg:text-7xl font-black text-white tracking-wide leading-tight"
             style={{
               fontFamily: "'Quicksand', 'Nunito', sans-serif",
-              textShadow: "0 6px 20px rgba(0,0,0,0.35), 0 0 40px rgba(255,210,80,0.2)",
+              textShadow: "0 10px 30px rgba(0,0,0,0.35), 0 0 60px rgba(255,210,80,0.25)",
             }}
           >
             Choose Your Path
