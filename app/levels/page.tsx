@@ -336,7 +336,7 @@ export default function LevelsPage() {
                   <div
                     className={[
                       "h-10 w-10 rounded-2xl flex items-center justify-center",
-                      isSelected ? "bg-white/20" : "bg-[#eef2f6]",
+                      isSelected ? "bg-white/20" : "bg-white/20",
                     ].join(" ")}
                   >
                     {level.icon === "sprout" ? (
