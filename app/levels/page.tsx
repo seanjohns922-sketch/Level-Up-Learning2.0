@@ -169,27 +169,77 @@ export default function LevelsPage() {
         <img src="/images/tower-plaza-bg.jpg" alt="" className="w-full h-full object-cover" style={{ filter: "blur(0.5px) saturate(0.75)" }} />
         <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.08)" }} />
 
-        {/* Dense tower-centered particles — warm golds, whites, pale yellows */}
-        {[...Array(50)].map((_, i) => {
-          const isCentered = i < 20; // first 20 cluster near tower center
+        {/* Golden light rays from tower center */}
+        <div
+          className="absolute"
+          style={{
+            left: "50%",
+            top: "35%",
+            width: "140vw",
+            height: "140vw",
+            transform: "translate(-50%, -50%)",
+            pointerEvents: "none",
+          }}
+        >
+          {[...Array(8)].map((_, i) => {
+            const angle = i * 45;
+            return (
+              <div
+                key={`ray${i}`}
+                className="absolute"
+                style={{
+                  left: "50%",
+                  top: "50%",
+                  width: "4px",
+                  height: "50%",
+                  transformOrigin: "bottom center",
+                  transform: `translateX(-50%) rotate(${angle}deg)`,
+                  background: `linear-gradient(to top, rgba(255,210,80,0.3), rgba(255,230,130,0.08) 60%, transparent)`,
+                  filter: "blur(8px)",
+                  animation: `rayPulse ${4 + (i % 3)}s ease-in-out infinite`,
+                  animationDelay: `${i * 0.5}s`,
+                }}
+              />
+            );
+          })}
+        </div>
+
+        {/* Radial glow from tower */}
+        <div
+          className="absolute pointer-events-none"
+          style={{
+            left: "50%",
+            top: "35%",
+            width: "60vw",
+            height: "60vw",
+            transform: "translate(-50%, -50%)",
+            background: "radial-gradient(circle, rgba(255,210,80,0.15) 0%, rgba(255,180,50,0.05) 40%, transparent 70%)",
+            animation: "rayPulse 5s ease-in-out infinite",
+          }}
+        />
+
+        {/* Dense magic particles — 75 total */}
+        {[...Array(75)].map((_, i) => {
+          const isCentered = i < 25;
           const left = isCentered
-            ? 35 + Math.sin(i * 1.7) * 15 // 35–50% range (tower area)
-            : (i * 7.3 + 3) % 94;
-          const bottom = (i * 6.1 + 2) % 85;
-          const size = 2 + (i % 5) * 0.8;
-          const duration = 6 + (i % 7) * 2.5;
-          const delay = (i * 0.6) % 12;
-          const drift = (i % 3 === 0) ? `${(i % 2 === 0 ? 1 : -1) * (8 + i % 12)}px` : "0px";
+            ? 30 + Math.sin(i * 1.7) * 20
+            : (i * 5.3 + 3) % 96;
+          const bottom = (i * 4.1 + 2) % 90;
+          const size = 2 + (i % 6) * 0.7;
+          const duration = 6 + (i % 8) * 2;
+          const delay = (i * 0.4) % 14;
+          const drift = (i % 3 === 0) ? `${(i % 2 === 0 ? 1 : -1) * (8 + i % 15)}px` : "0px";
           const colors = [
-            "rgba(255,210,80,0.6)",
-            "rgba(255,255,255,0.45)",
-            "rgba(255,230,130,0.5)",
-            "rgba(255,200,60,0.35)",
-            "rgba(255,255,220,0.55)",
-            "rgba(255,180,50,0.4)",
+            "rgba(255,210,80,0.55)",
+            "rgba(255,255,255,0.4)",
+            "rgba(255,230,130,0.45)",
+            "rgba(255,200,60,0.3)",
+            "rgba(255,255,220,0.5)",
+            "rgba(255,180,50,0.35)",
+            "rgba(255,240,160,0.45)",
           ];
           const color = colors[i % colors.length];
-          const opacity = 0.3 + (i % 5) * 0.15;
+          const opacity = 0.2 + (i % 6) * 0.08;
 
           return (
             <div
@@ -202,7 +252,7 @@ export default function LevelsPage() {
                 bottom: `${bottom}%`,
                 background: color,
                 opacity,
-                boxShadow: i % 4 === 0 ? `0 0 ${4 + i % 6}px ${color}` : "none",
+                boxShadow: i % 3 === 0 ? `0 0 ${3 + i % 5}px ${color}` : "none",
                 animation: `floatUp ${duration}s linear infinite`,
                 animationDelay: `${delay}s`,
                 ["--drift" as any]: drift,
@@ -211,11 +261,11 @@ export default function LevelsPage() {
           );
         })}
 
-        {/* Sparkle layer — larger, pulsing, fewer */}
-        {[...Array(12)].map((_, i) => {
-          const left = 25 + (i * 4.7) % 50;
-          const bottom = 10 + (i * 7.3) % 60;
-          const size = 4 + (i % 3) * 2;
+        {/* Sparkle layer — larger, pulsing */}
+        {[...Array(16)].map((_, i) => {
+          const left = 20 + (i * 3.9) % 60;
+          const bottom = 8 + (i * 6.1) % 65;
+          const size = 3 + (i % 4) * 1.5;
           return (
             <div
               key={`s${i}`}
@@ -225,11 +275,11 @@ export default function LevelsPage() {
                 height: size,
                 left: `${left}%`,
                 bottom: `${bottom}%`,
-                background: "rgba(255,240,180,0.6)",
-                boxShadow: `0 0 ${6 + i % 4}px rgba(255,210,100,0.4)`,
-                animation: `floatUp ${10 + (i % 4) * 3}s linear infinite, pulseGlow ${2 + (i % 3)}s ease-in-out infinite`,
-                animationDelay: `${(i * 1.5) % 8}s`,
-                opacity: 0.5 + (i % 3) * 0.2,
+                background: "rgba(255,240,180,0.55)",
+                boxShadow: `0 0 ${5 + i % 5}px rgba(255,210,100,0.35)`,
+                animation: `floatUp ${9 + (i % 5) * 2.5}s linear infinite, pulseGlow ${2 + (i % 3)}s ease-in-out infinite`,
+                animationDelay: `${(i * 1.2) % 10}s`,
+                opacity: 0.4 + (i % 4) * 0.15,
               }}
             />
           );
