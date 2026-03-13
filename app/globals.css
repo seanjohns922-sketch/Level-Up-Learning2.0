@@ -143,3 +143,13 @@ body {
   90% { opacity: 1; }
   100% { transform: translateY(-120vh) scale(0.5); opacity: 0; }
 }
+
+@keyframes rayPulse {
+  0%, 100% { opacity: 0.12; transform: scaleY(1); }
+  50% { opacity: 0.25; transform: scaleY(1.05); }
+}
+
+@keyframes rayRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
