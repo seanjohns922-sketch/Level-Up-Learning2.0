@@ -166,7 +166,7 @@ export default function LevelsPage() {
   return (
     <main className="min-h-screen relative px-6 py-10">
       <div className="fixed inset-0 z-0">
-        <img src="/images/tower-hub-bg.jpg" alt="" className="w-full h-full object-cover" style={{ filter: "blur(0.5px) saturate(1.15) brightness(1.05) contrast(1.05)", objectPosition: "center 30%", transform: "scale(1.15)", transformOrigin: "center 35%" }} />
+        <img src="/images/tower-hub-bg.jpg" alt="" className="w-full h-full object-cover" style={{ filter: "saturate(1.15) brightness(1.05) contrast(1.05)", objectPosition: "center 30%", transform: "scale(1.15)", transformOrigin: "center 35%" }} />
         {/* Cinematic gradient overlay matching login page */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/5 to-black/45" />
         {/* Warm vignette for depth */}
@@ -323,7 +323,6 @@ export default function LevelsPage() {
                 className="px-5 py-2.5 rounded-2xl text-sm font-bold transition"
                 style={{
                   background: "rgba(255,255,255,0.85)",
-                  backdropFilter: "blur(10px)",
                   boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
                 }}
               >
@@ -335,7 +334,6 @@ export default function LevelsPage() {
               className="px-5 py-2.5 rounded-2xl text-sm font-bold transition"
               style={{
                 background: "rgba(255,255,255,0.65)",
-                backdropFilter: "blur(10px)",
                 boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
               }}
             >
@@ -379,11 +377,9 @@ export default function LevelsPage() {
                       border: isSelected ? "2px solid rgba(100,150,255,0.5)" : "1.5px solid rgba(200,190,170,0.5)",
                       ...(isSelected ? {
                         background: "linear-gradient(135deg, #5E8BFF, #4F7DF3)",
-                        backdropFilter: "blur(12px)",
                         boxShadow: "0 0 0 2px rgba(80,120,255,0.3), 0 6px 14px rgba(80,120,255,0.25), 0 12px 32px rgba(80,120,255,0.2), inset 0 1px 0 rgba(255,255,255,0.25)",
                       } : {
                         background: "linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(245,240,230,0.9) 100%)",
-                        backdropFilter: "blur(12px)",
                         boxShadow: "0 6px 14px rgba(0,0,0,0.12), 0 12px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.7)",
                       }),
                     }}
@@ -436,7 +432,6 @@ export default function LevelsPage() {
                   } : {
                     background: "linear-gradient(135deg, #5E8BFF, #4F7DF3)",
                     border: "2px solid rgba(100,150,255,0.5)",
-                    backdropFilter: "blur(12px)",
                     boxShadow: "0 0 0 2px rgba(80,120,255,0.3), 0 6px 14px rgba(80,120,255,0.25), 0 12px 32px rgba(80,120,255,0.2), inset 0 1px 0 rgba(255,255,255,0.25)",
                   }),
                 }}
