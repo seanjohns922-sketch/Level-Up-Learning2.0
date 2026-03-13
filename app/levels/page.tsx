@@ -166,7 +166,7 @@ export default function LevelsPage() {
   return (
     <main className="min-h-screen relative px-6 py-10">
       <div className="fixed inset-0 z-0">
-        <img src="/images/login-bg.jpg" alt="" className="w-full h-full object-cover" style={{ filter: "blur(0.5px) saturate(1.35) brightness(1.18) contrast(1.08)", objectPosition: "center 20%", transform: "scale(1.12)", transformOrigin: "center 35%" }} />
+        <img src="/images/tower-hub-bg.jpg" alt="" className="w-full h-full object-cover" style={{ filter: "blur(0.5px) saturate(1.15) brightness(1.05) contrast(1.05)", objectPosition: "center 30%", transform: "scale(1.15)", transformOrigin: "center 35%" }} />
         {/* Cinematic gradient overlay matching login page */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/5 to-black/45" />
         {/* Warm vignette for depth */}
