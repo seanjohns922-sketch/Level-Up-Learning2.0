@@ -133,44 +133,59 @@ export default function StudentHomePage() {
           className="absolute inset-0 pointer-events-none"
           style={{ boxShadow: "inset 0 0 120px 40px rgba(5,20,35,0.35), inset 0 -60px 80px -20px rgba(5,20,35,0.25)" }}
         />
-        {/* Teal glow behind Numbot (right side) */}
+        {/* Bright teal glow behind Numbot (right side) */}
         <div
           className="absolute animate-pulse"
           style={{
-            width: 400,
-            height: 400,
-            right: "8%",
-            top: "20%",
+            width: 500,
+            height: 500,
+            right: "5%",
+            top: "15%",
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(31,209,181,0.22) 0%, transparent 70%)",
-            filter: "blur(40px)",
-            animationDuration: "4s",
+            background: "radial-gradient(circle, rgba(31,209,181,0.45) 0%, rgba(16,185,160,0.15) 40%, transparent 70%)",
+            filter: "blur(30px)",
+            animationDuration: "3s",
           }}
         />
-        {/* Circuit glow accents — left side */}
+        {/* Bright circuit glow accents — left side */}
         <div
           className="absolute"
           style={{
-            width: 300,
+            width: 350,
             height: "80%",
             left: 0,
             top: "10%",
-            background: "linear-gradient(180deg, transparent, rgba(31,209,181,0.12) 50%, transparent)",
-            filter: "blur(30px)",
-            animation: "pulse 5s cubic-bezier(0.4,0,0.6,1) infinite",
+            background: "linear-gradient(180deg, transparent, rgba(31,209,181,0.25) 50%, transparent)",
+            filter: "blur(25px)",
+            animation: "pulse 4s cubic-bezier(0.4,0,0.6,1) infinite",
           }}
         />
-        {/* Circuit glow accents — right side */}
+        {/* Bright circuit glow accents — right side */}
         <div
           className="absolute"
           style={{
-            width: 300,
+            width: 350,
             height: "80%",
             right: 0,
             top: "10%",
-            background: "linear-gradient(180deg, transparent, rgba(31,209,181,0.10) 50%, transparent)",
-            filter: "blur(30px)",
-            animation: "pulse 6s cubic-bezier(0.4,0,0.6,1) infinite 1s",
+            background: "linear-gradient(180deg, transparent, rgba(31,209,181,0.20) 50%, transparent)",
+            filter: "blur(25px)",
+            animation: "pulse 5s cubic-bezier(0.4,0,0.6,1) infinite 1s",
+          }}
+        />
+        {/* Central energy glow */}
+        <div
+          className="absolute animate-pulse"
+          style={{
+            width: 600,
+            height: 300,
+            left: "50%",
+            top: "30%",
+            transform: "translateX(-50%)",
+            borderRadius: "50%",
+            background: "radial-gradient(ellipse, rgba(56,230,200,0.2) 0%, transparent 70%)",
+            filter: "blur(40px)",
+            animationDuration: "5s",
           }}
         />
         {/* Floating particles */}
