@@ -548,13 +548,29 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 1,
     topic: "Model multiplication as equal groups",
     activity: "Make groups with counters",
-    activities: genericActivities("equal_groups", {
-      minGroups: 2,
-      maxGroups: 5,
-      minItemsPerGroup: 2,
-      maxItemsPerGroup: 5,
-      mode: "equal_groups",
-    }),
+    activities: [
+      makeActivity("equal_groups", 2, {
+        minGroups: 2,
+        maxGroups: 5,
+        minItemsPerGroup: 2,
+        maxItemsPerGroup: 5,
+        mode: "equal_groups",
+      }),
+      makeActivity("skip_count", 1, {
+        min: 0,
+        max: 100,
+        step: 2,
+        mode: "forward",
+      }),
+      makeActivity("multiple_choice", 1, {
+        minGroups: 2,
+        maxGroups: 5,
+        minItemsPerGroup: 2,
+        maxItemsPerGroup: 5,
+        mode: "equal_groups",
+        sourceActivityType: "equal_groups",
+      }),
+    ],
     curriculum: ["AC9M2N05"],
   },
   {

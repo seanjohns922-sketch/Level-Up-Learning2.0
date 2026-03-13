@@ -1,6 +1,7 @@
 "use client";
 
 import AdditionStrategy from "@/components/activities/AdditionStrategy";
+import EqualGroups from "@/components/activities/EqualGroups";
 import Arrays from "@/components/activities/Arrays";
 import DivisionGroups from "@/components/activities/DivisionGroups";
 import FactFamily from "@/components/activities/FactFamily";
@@ -16,6 +17,7 @@ import SubtractionStrategy from "@/components/activities/SubtractionStrategy";
 import TypedResponseActivity from "@/components/activities/TypedResponseActivity";
 import type {
   AdditionStrategyQuestion,
+  EqualGroupsQuestion,
   ArraysQuestion,
   DivisionGroupsQuestion,
   FactFamilyQuestion,
@@ -172,6 +174,19 @@ export function LessonRenderer({
       return (
         <AdditionStrategy
           questionData={safeQuestion as AdditionStrategyQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
+        />
+      );
+    }
+    case "equal_groups": {
+      const safeQuestion = getSafeQuestion(activity, questionData, prompt);
+      if (safeQuestion.kind !== "equal_groups") {
+        return <ErrorCard message="Equal groups question failed to load." />;
+      }
+      return (
+        <EqualGroups
+          questionData={safeQuestion as EqualGroupsQuestion}
           onCorrect={onCorrect}
           onWrong={onWrong}
         />

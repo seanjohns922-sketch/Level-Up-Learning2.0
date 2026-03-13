@@ -58,6 +58,16 @@ export type AdditionStrategyQuestion = {
   mode: "jump" | "split" | "friendly_numbers";
 };
 
+export type EqualGroupsQuestion = {
+  kind: "equal_groups";
+  prompt: string;
+  groups: number;
+  itemsPerGroup: number;
+  answer: number;
+  options: number[];
+  mode: "equal_groups";
+};
+
 export type ArraysQuestion = {
   kind: "arrays";
   prompt: string;
@@ -94,6 +104,7 @@ export type ReviewQuizInnerQuestion =
   | PartitionExpandQuestion
   | NumberLineQuestion
   | AdditionStrategyQuestion
+  | EqualGroupsQuestion
   | ArraysQuestion
   | DivisionGroupsQuestion
   | MixedWordProblemQuestion
@@ -175,6 +186,7 @@ export type Year2QuestionData =
   | PartitionExpandQuestion
   | NumberLineQuestion
   | AdditionStrategyQuestion
+  | EqualGroupsQuestion
   | ArraysQuestion
   | DivisionGroupsQuestion
   | MixedWordProblemQuestion
@@ -201,6 +213,10 @@ type GenericConfig = Record<string, unknown> & {
   reviewActivities?: ActivityType[];
   visualMode?: string;
   showMAB?: boolean;
+  minGroups?: number;
+  maxGroups?: number;
+  minItemsPerGroup?: number;
+  maxItemsPerGroup?: number;
   minRows?: number;
   maxRows?: number;
   minColumns?: number;
@@ -455,6 +471,28 @@ function generateInteractiveQuestion(
       answer,
       options: uniqueNumberOptions(answer).map(Number),
       mode,
+    };
+  }
+
+  if (activityType === "equal_groups") {
+    const minGroups = typeof config.minGroups === "number" ? config.minGroups : 2;
+    const maxGroups = typeof config.maxGroups === "number" ? config.maxGroups : 5;
+    const minItemsPerGroup =
+      typeof config.minItemsPerGroup === "number" ? config.minItemsPerGroup : 2;
+    const maxItemsPerGroup =
+      typeof config.maxItemsPerGroup === "number" ? config.maxItemsPerGroup : 5;
+    const groups = randInt(minGroups, maxGroups);
+    const itemsPerGroup = randInt(minItemsPerGroup, maxItemsPerGroup);
+    const answer = groups * itemsPerGroup;
+
+    return {
+      kind: "equal_groups",
+      prompt: "How many objects are in all the equal groups?",
+      groups,
+      itemsPerGroup,
+      answer,
+      options: uniqueNumberOptions(answer, 6).map(Number),
+      mode: "equal_groups",
     };
   }
 
@@ -793,6 +831,14 @@ function randomReviewConfig(activityType: ActivityType): GenericConfig {
         min: 0,
         max: 100,
         mode: (["jump", "split", "friendly_numbers"] as const)[randInt(0, 2)],
+      };
+    case "equal_groups":
+      return {
+        minGroups: 2,
+        maxGroups: 5,
+        minItemsPerGroup: 2,
+        maxItemsPerGroup: 5,
+        mode: "equal_groups",
       };
     case "subtraction_strategy":
       return {
@@ -1160,6 +1206,7 @@ export function generateYear2Question(
     activity.activityType === "partition_expand" ||
     activity.activityType === "number_line" ||
     activity.activityType === "addition_strategy" ||
+    activity.activityType === "equal_groups" ||
     activity.activityType === "arrays" ||
     activity.activityType === "division_groups" ||
     activity.activityType === "mixed_word_problem" ||
