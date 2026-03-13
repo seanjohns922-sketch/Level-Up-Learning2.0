@@ -320,12 +320,17 @@ export default function LevelsPage() {
                   setSelectedYear(level.id);
                 }}
                 className={[
-                  "relative rounded-3xl border p-6 text-left shadow-sm transition backdrop-blur-md",
+                  "relative rounded-3xl border p-6 text-left transition-all duration-300 backdrop-blur-xl",
                   !isUnlocked ? "opacity-60 cursor-not-allowed" : "",
                   isSelected
-                    ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white border-blue-500"
-                    : "bg-white/80 border-white/30 text-gray-800 hover:shadow-md hover:bg-white/90",
+                    ? "bg-blue-500/80 text-white border-blue-400/60"
+                    : "bg-white/20 border-white/40 text-white hover:bg-white/30",
                 ].join(" ")}
+                style={isSelected ? {
+                  boxShadow: "0 0 25px rgba(80,120,255,0.4), 0 8px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2)",
+                } : {
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.3)",
+                }}
               >
                 <div className="flex items-center gap-3">
                   <div
