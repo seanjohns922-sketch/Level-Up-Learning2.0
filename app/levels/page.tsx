@@ -323,7 +323,6 @@ export default function LevelsPage() {
                 className="px-5 py-2.5 rounded-2xl text-sm font-bold transition"
                 style={{
                   background: "rgba(255,255,255,0.85)",
-                  backdropFilter: "blur(10px)",
                   boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
                 }}
               >
