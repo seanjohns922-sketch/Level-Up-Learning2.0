@@ -285,154 +285,171 @@ export default function LevelsPage() {
           );
         })}
       </div>
-      <div className="max-w-5xl mx-auto relative z-10">
-        <button
-          onClick={goHome}
-          className="text-sm text-white/80 hover:text-white hover:underline mb-6"
-          type="button"
-        >
-          Back to Dashboard
-        </button>
-
-        <div className="text-center mb-8">
+      <div className="relative z-10 min-h-screen flex flex-col md:flex-row items-stretch px-4 md:px-8 py-8 gap-6">
+        {/* Left column — hero text */}
+        <div className="md:w-[38%] flex flex-col justify-center items-start px-4 md:px-8">
+          <button
+            onClick={goHome}
+            className="text-sm text-white/80 hover:text-white hover:underline mb-8"
+            type="button"
+          >
+            ← Back to Dashboard
+          </button>
           <h1
-            className="text-5xl md:text-6xl font-black text-white tracking-widest uppercase drop-shadow-lg"
+            className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-wide leading-tight"
             style={{
               fontFamily: "'Quicksand', 'Nunito', sans-serif",
-              textShadow: "0 0 30px rgba(255,210,80,0.3), 0 2px 8px rgba(0,0,0,0.3)",
+              textShadow: "0 6px 20px rgba(0,0,0,0.35), 0 0 40px rgba(255,210,80,0.2)",
             }}
           >
-            Level Up Learning
+            Choose Your Path
           </h1>
-          <p className="text-amber-100 mt-2 text-lg font-semibold tracking-wide drop-shadow-md">Choose Your Path</p>
-        </div>
+          <p
+            className="text-amber-100/90 mt-4 text-lg font-medium tracking-wide max-w-xs"
+            style={{ textShadow: "0 2px 8px rgba(0,0,0,0.3)" }}
+          >
+            Select a learning level to begin your journey.
+          </p>
 
-        <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-          {levels.map((level) => {
-            const isSelected = selectedYear === level.id;
-            const isUnlocked = DEMO_MODE || !hasAssignedProgram || level.id === unlockedYear;
-            return (
+          <div className="mt-8 flex items-center gap-3">
+            {showLegendsButton ? (
               <button
-                key={level.id}
-                type="button"
-                onClick={() => {
-                  if (!isUnlocked) return;
-                  setSelectedYear(level.id);
-                }}
-                className={[
-                  "relative rounded-3xl border p-6 text-left transition-all duration-300 backdrop-blur-xl",
-                  !isUnlocked ? "opacity-60 cursor-not-allowed" : "",
-                  isSelected
-                    ? "bg-blue-500/80 text-white border-blue-400/60"
-                    : "bg-white/20 border-white/40 text-white hover:bg-white/30",
-                ].join(" ")}
-                style={isSelected ? {
-                  boxShadow: "0 0 25px rgba(80,120,255,0.4), 0 8px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2)",
-                } : {
-                  boxShadow: "0 8px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.3)",
+                onClick={goLegends}
+                className="px-5 py-2.5 rounded-2xl text-sm font-bold transition"
+                style={{
+                  background: "rgba(255,255,255,0.85)",
+                  backdropFilter: "blur(10px)",
+                  boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
                 }}
               >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={[
-                      "h-10 w-10 rounded-2xl flex items-center justify-center",
-                      isSelected ? "bg-white/20" : "bg-white/20",
-                    ].join(" ")}
-                  >
-                    {level.icon === "sprout" ? (
-                      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M12 20v-6" />
-                        <path d="M7 11c3 0 5-2 5-5-3 0-5 2-5 5z" />
-                        <path d="M17 11c-3 0-5-2-5-5 3 0 5 2 5 5z" />
-                      </svg>
-                    ) : null}
-                    {level.icon === "numbers" ? (
-                      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
-                        <rect x="3" y="3" width="18" height="18" rx="4" />
-                        <path d="M7 10h4M7 14h4M13 10h4M13 14h4" />
-                      </svg>
-                    ) : null}
-                    {level.icon === "tiles" ? (
-                      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM15 15h6v6h-6z" />
-                      </svg>
-                    ) : null}
-                    {level.icon === "bolt" ? (
-                      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" />
-                      </svg>
-                    ) : null}
-                    {level.icon === "rocket" ? (
-                      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M5 19l4-2 2 2-2 4-4-4z" />
-                        <path d="M14 3l7 7-8 8-7-7 8-8z" />
-                      </svg>
-                    ) : null}
-                    {level.icon === "trophy" ? (
-                      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M8 21h8M12 17v4M7 4h10l-1 6H8L7 4z" />
-                      </svg>
-                    ) : null}
-                    {level.icon === "crown" ? (
-                      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M3 7l4 4 5-6 5 6 4-4-2 10H5L3 7z" />
-                      </svg>
-                    ) : null}
-                  </div>
-                  <div className="text-lg font-bold">
-                    {level.label}
-                  </div>
-                </div>
-                {!isUnlocked ? (
-                  <div className="absolute right-4 top-4 text-white/40">
-                    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
-                      <rect x="4" y="11" width="16" height="9" rx="2" />
-                      <path d="M8 11V7a4 4 0 018 0v4" />
-                    </svg>
-                  </div>
-                ) : null}
+                My Legends
               </button>
-            );
-          })}
+            ) : null}
+            <button
+              onClick={resetMvp}
+              className="px-5 py-2.5 rounded-2xl text-sm font-bold transition"
+              style={{
+                background: "rgba(255,255,255,0.65)",
+                backdropFilter: "blur(10px)",
+                boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
+              }}
+            >
+              Reset
+            </button>
+          </div>
         </div>
 
-        <div className="max-w-3xl mx-auto mt-8">
-          <button
-            onClick={primaryCta.onClick}
-            disabled={primaryCta.disabled}
-            className={[
-              "w-full py-4 rounded-2xl font-black text-xl transition",
-              primaryCta.disabled
-                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                : "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700",
-            ].join(" ")}
-          >
-            {primaryCta.label}
-          </button>
-        </div>
+        {/* Right column — level grid */}
+        <div className="md:w-[62%] flex flex-col justify-center">
+          <div className="grid grid-cols-2 gap-3 max-w-md ml-auto mr-auto md:mr-8">
+            {levels.map((level) => {
+              const isSelected = selectedYear === level.id;
+              const isUnlocked = DEMO_MODE || !hasAssignedProgram || level.id === unlockedYear;
+              return (
+                <button
+                  key={level.id}
+                  type="button"
+                  onClick={() => {
+                    if (!isUnlocked) return;
+                    setSelectedYear(level.id);
+                  }}
+                  className={[
+                    "relative rounded-2xl border p-4 text-left transition-all duration-300",
+                    !isUnlocked ? "opacity-50 cursor-not-allowed" : "cursor-pointer",
+                    isSelected ? "border-blue-400/60" : "border-white/30 hover:border-white/50",
+                  ].join(" ")}
+                  style={isSelected ? {
+                    background: "rgba(80,130,255,0.75)",
+                    backdropFilter: "blur(12px)",
+                    boxShadow: "0 0 20px rgba(80,120,255,0.35), 0 8px 20px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2)",
+                  } : {
+                    background: "rgba(255,255,255,0.82)",
+                    backdropFilter: "blur(12px)",
+                    boxShadow: "0 8px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.4)",
+                  }}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div
+                      className="h-9 w-9 rounded-xl flex items-center justify-center shrink-0"
+                      style={{
+                        background: isSelected ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.06)",
+                      }}
+                    >
+                      {level.icon === "sprout" ? (
+                        <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke={isSelected ? "white" : "#334155"} strokeWidth="2">
+                          <path d="M12 20v-6" />
+                          <path d="M7 11c3 0 5-2 5-5-3 0-5 2-5 5z" />
+                          <path d="M17 11c-3 0-5-2-5-5 3 0 5 2 5 5z" />
+                        </svg>
+                      ) : null}
+                      {level.icon === "numbers" ? (
+                        <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke={isSelected ? "white" : "#334155"} strokeWidth="2">
+                          <rect x="3" y="3" width="18" height="18" rx="4" />
+                          <path d="M7 10h4M7 14h4M13 10h4M13 14h4" />
+                        </svg>
+                      ) : null}
+                      {level.icon === "tiles" ? (
+                        <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke={isSelected ? "white" : "#334155"} strokeWidth="2">
+                          <path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM15 15h6v6h-6z" />
+                        </svg>
+                      ) : null}
+                      {level.icon === "bolt" ? (
+                        <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke={isSelected ? "white" : "#334155"} strokeWidth="2">
+                          <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" />
+                        </svg>
+                      ) : null}
+                      {level.icon === "rocket" ? (
+                        <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke={isSelected ? "white" : "#334155"} strokeWidth="2">
+                          <path d="M5 19l4-2 2 2-2 4-4-4z" />
+                          <path d="M14 3l7 7-8 8-7-7 8-8z" />
+                        </svg>
+                      ) : null}
+                      {level.icon === "trophy" ? (
+                        <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke={isSelected ? "white" : "#334155"} strokeWidth="2">
+                          <path d="M8 21h8M12 17v4M7 4h10l-1 6H8L7 4z" />
+                        </svg>
+                      ) : null}
+                      {level.icon === "crown" ? (
+                        <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke={isSelected ? "white" : "#334155"} strokeWidth="2">
+                          <path d="M3 7l4 4 5-6 5 6 4-4-2 10H5L3 7z" />
+                        </svg>
+                      ) : null}
+                    </div>
+                    <span className={`text-sm font-bold ${isSelected ? "text-white" : "text-slate-800"}`}>
+                      {level.label}
+                    </span>
+                  </div>
+                  {!isUnlocked ? (
+                    <div className="absolute right-3 top-3 text-slate-400/60">
+                      <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="4" y="11" width="16" height="9" rx="2" />
+                        <path d="M8 11V7a4 4 0 018 0v4" />
+                      </svg>
+                    </div>
+                  ) : null}
+                </button>
+              );
+            })}
+          </div>
 
-        <div className="max-w-3xl mx-auto mt-6 flex items-center justify-center gap-3">
-          {showLegendsButton ? (
+          <div className="max-w-md ml-auto mr-auto md:mr-8 mt-4">
             <button
-              onClick={goLegends}
-              className="px-6 py-3 rounded-2xl bg-white border border-amber-100 text-gray-900 font-bold hover:shadow-md transition"
+              onClick={primaryCta.onClick}
+              disabled={primaryCta.disabled}
+              className={[
+                "w-full py-3.5 rounded-2xl font-bold text-base transition-all duration-200",
+                primaryCta.disabled
+                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  : "text-white",
+              ].join(" ")}
+              style={!primaryCta.disabled ? {
+                background: "linear-gradient(135deg, #34d399, #059669)",
+                boxShadow: "0 8px 24px rgba(5,150,105,0.3)",
+              } : undefined}
             >
-              My Legends
+              {primaryCta.label}
             </button>
-          ) : (
-            <button
-              disabled
-              className="px-6 py-3 rounded-2xl bg-gray-100 text-gray-400 font-bold cursor-not-allowed"
-            >
-              My Legends
-            </button>
-          )}
-          <button
-            onClick={resetMvp}
-            className="px-6 py-3 rounded-2xl bg-white border border-gray-200 text-gray-700 font-bold hover:shadow-md transition"
-          >
-            Reset
-          </button>
+          </div>
         </div>
       </div>
     </main>
