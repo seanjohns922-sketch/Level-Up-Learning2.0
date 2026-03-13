@@ -341,7 +341,7 @@ export default function LevelsPage() {
 
         {/* Right column — level grid */}
         <div className="md:w-[62%] flex flex-col justify-center">
-          <div className="grid grid-cols-2 gap-3.5 max-w-lg ml-auto mr-auto md:mr-8">
+          <div className="grid grid-cols-2 gap-4 max-w-md ml-auto mr-auto md:mr-8">
             {levels.map((level, idx) => {
               const isSelected = selectedYear === level.id;
               const isUnlocked = DEMO_MODE || !hasAssignedProgram || level.id === unlockedYear;
@@ -355,25 +355,26 @@ export default function LevelsPage() {
                     setSelectedYear(level.id);
                   }}
                   className={[
-                    "relative border px-5 py-4 text-center transition-all duration-300",
+                    "relative text-center transition-all duration-300",
                     !isUnlocked ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:scale-[1.03]",
-                    isSelected ? "border-blue-400/60" : "border-white/30 hover:border-white/50",
-                    isLastOdd ? "col-span-2 max-w-[calc(50%-0.44rem)] mx-auto" : "",
+                    isLastOdd ? "col-span-2 max-w-[calc(50%-0.5rem)] mx-auto" : "",
                   ].join(" ")}
                   style={{
-                    borderRadius: "18px",
+                    borderRadius: "14px",
+                    padding: "14px 24px",
+                    border: isSelected ? "2px solid rgba(80,130,255,0.5)" : "1.5px solid rgba(200,190,170,0.5)",
                     ...(isSelected ? {
                       background: "rgba(80,130,255,0.75)",
                       backdropFilter: "blur(12px)",
-                      boxShadow: "0 0 20px rgba(80,120,255,0.35), 0 10px 30px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2)",
+                      boxShadow: "0 0 20px rgba(80,120,255,0.35), 0 8px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2)",
                     } : {
-                      background: "rgba(255,255,255,0.92)",
+                      background: "linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(245,240,230,0.9) 100%)",
                       backdropFilter: "blur(12px)",
-                      boxShadow: "0 10px 30px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.4)",
+                      boxShadow: "0 4px 16px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.6)",
                     }),
                   }}
                 >
-                  <span className={`text-sm font-bold ${isSelected ? "text-white" : "text-slate-800"}`}>
+                  <span className={`text-base font-bold tracking-wide ${isSelected ? "text-white" : "text-slate-700"}`}>
                     {level.label}
                   </span>
                   {!isUnlocked ? (
