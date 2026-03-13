@@ -128,10 +128,10 @@ export default function StudentHomePage() {
           className="w-full h-full object-cover"
           style={{ filter: "brightness(1.15) contrast(1.08)" }}
         />
-        {/* Vertical gradient overlay — lighter in middle to reveal the world */}
+      {/* Subtle vignette — edges only, world stays bright */}
         <div
-          className="absolute inset-0"
-          style={{ background: "linear-gradient(rgba(5,20,35,0.90) 0%, rgba(5,20,35,0.90) 30%, rgba(5,20,35,0.90) 50%, rgba(5,20,35,0.90) 100%)" }}
+          className="absolute inset-0 pointer-events-none"
+          style={{ boxShadow: "inset 0 0 120px 40px rgba(5,20,35,0.35), inset 0 -60px 80px -20px rgba(5,20,35,0.25)" }}
         />
         {/* Teal glow behind Numbot (right side) */}
         <div
