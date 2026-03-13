@@ -16,7 +16,7 @@ export default function HeroHeader({ levelNum, week, lessonsDone, overallPercent
   return (
     <div className="relative overflow-hidden">
       {/* Transparent gradient overlay — realm bg shows through */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-black/8 to-transparent" />
       <div className="absolute inset-0 opacity-20">
         {[...Array(6)].map((_, i) => (
           <div
@@ -88,7 +88,7 @@ export default function HeroHeader({ levelNum, week, lessonsDone, overallPercent
       {/* Wave divider — transparent to let realm bg continue */}
       <div className="absolute bottom-0 left-0 right-0">
         <svg viewBox="0 0 1440 60" fill="none" className="w-full h-auto">
-          <path d="M0 60V30C240 0 480 0 720 30C960 60 1200 60 1440 30V60H0Z" fill="rgba(6,20,35,0.15)" />
+          <path d="M0 60V30C240 0 480 0 720 30C960 60 1200 60 1440 30V60H0Z" fill="rgba(6,20,35,0.08)" />
         </svg>
       </div>
     </div>

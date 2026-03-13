@@ -126,66 +126,82 @@ export default function StudentHomePage() {
           src="/images/number-nexus-home-bg.jpg"
           alt=""
           className="w-full h-full object-cover"
-          style={{ filter: "brightness(1.15) contrast(1.08)" }}
+          style={{ filter: "brightness(1.3) contrast(1.12) saturate(1.15)" }}
         />
-        {/* Vertical gradient overlay — lighter in middle to reveal the world */}
+      {/* Subtle vignette — edges only, world stays bright */}
         <div
-          className="absolute inset-0"
-          style={{ background: "linear-gradient(rgba(5,20,35,0.90) 0%, rgba(5,20,35,0.90) 30%, rgba(5,20,35,0.90) 50%, rgba(5,20,35,0.90) 100%)" }}
+          className="absolute inset-0 pointer-events-none"
+          style={{ boxShadow: "inset 0 0 120px 40px rgba(5,20,35,0.35), inset 0 -60px 80px -20px rgba(5,20,35,0.25)" }}
         />
-        {/* Teal glow behind Numbot (right side) */}
+        {/* Bright teal glow behind Numbot (right side) */}
         <div
           className="absolute animate-pulse"
           style={{
-            width: 400,
-            height: 400,
-            right: "8%",
-            top: "20%",
+            width: 500,
+            height: 500,
+            right: "5%",
+            top: "15%",
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(31,209,181,0.22) 0%, transparent 70%)",
-            filter: "blur(40px)",
-            animationDuration: "4s",
+            background: "radial-gradient(circle, rgba(31,209,181,0.45) 0%, rgba(16,185,160,0.15) 40%, transparent 70%)",
+            filter: "blur(30px)",
+            animationDuration: "3s",
           }}
         />
-        {/* Circuit glow accents — left side */}
+        {/* Bright circuit glow accents — left side */}
         <div
           className="absolute"
           style={{
-            width: 300,
+            width: 350,
             height: "80%",
             left: 0,
             top: "10%",
-            background: "linear-gradient(180deg, transparent, rgba(31,209,181,0.12) 50%, transparent)",
-            filter: "blur(30px)",
-            animation: "pulse 5s cubic-bezier(0.4,0,0.6,1) infinite",
+            background: "linear-gradient(180deg, transparent, rgba(31,209,181,0.25) 50%, transparent)",
+            filter: "blur(25px)",
+            animation: "pulse 4s cubic-bezier(0.4,0,0.6,1) infinite",
           }}
         />
-        {/* Circuit glow accents — right side */}
+        {/* Bright circuit glow accents — right side */}
         <div
           className="absolute"
           style={{
-            width: 300,
+            width: 350,
             height: "80%",
             right: 0,
             top: "10%",
-            background: "linear-gradient(180deg, transparent, rgba(31,209,181,0.10) 50%, transparent)",
-            filter: "blur(30px)",
-            animation: "pulse 6s cubic-bezier(0.4,0,0.6,1) infinite 1s",
+            background: "linear-gradient(180deg, transparent, rgba(31,209,181,0.20) 50%, transparent)",
+            filter: "blur(25px)",
+            animation: "pulse 5s cubic-bezier(0.4,0,0.6,1) infinite 1s",
           }}
         />
-        {/* Floating particles */}
-        {[...Array(18)].map((_, i) => (
+        {/* Central energy glow */}
+        <div
+          className="absolute animate-pulse"
+          style={{
+            width: 600,
+            height: 300,
+            left: "50%",
+            top: "30%",
+            transform: "translateX(-50%)",
+            borderRadius: "50%",
+            background: "radial-gradient(ellipse, rgba(56,230,200,0.2) 0%, transparent 70%)",
+            filter: "blur(40px)",
+            animationDuration: "5s",
+          }}
+        />
+        {/* Floating particles — dense magical dust */}
+        {[...Array(60)].map((_, i) => (
           <div
             key={i}
             className="absolute rounded-full"
             style={{
-              width: 2 + (i % 4),
-              height: 2 + (i % 4),
-              left: `${5 + (i * 5.3) % 90}%`,
-              bottom: `${(i * 7.1) % 60}%`,
-              background: i % 3 === 0 ? "rgba(31,209,181,0.6)" : "rgba(255,255,255,0.4)",
-              animation: `floatUp ${6 + (i % 5) * 2}s linear infinite`,
-              animationDelay: `${(i * 0.8) % 8}s`,
+              width: 2 + (i % 5),
+              height: 2 + (i % 5),
+              left: `${3 + (i * 4.7) % 94}%`,
+              bottom: `${(i * 5.3) % 80}%`,
+              background: i % 4 === 0 ? "rgba(31,209,181,0.7)" : i % 4 === 1 ? "rgba(56,230,200,0.5)" : i % 4 === 2 ? "rgba(255,255,255,0.5)" : "rgba(255,220,100,0.4)",
+              animation: `floatUp ${5 + (i % 6) * 2}s linear infinite`,
+              animationDelay: `${(i * 0.6) % 10}s`,
+              opacity: 0.3 + (i % 4) * 0.15,
             }}
           />
         ))}
