@@ -388,22 +388,30 @@ export default function LevelsPage() {
                 </button>
               );
             })}
-          </div>
-
-          <div className="max-w-lg ml-auto mr-auto md:mr-8 mt-4">
+            {/* CTA button spanning full grid width */}
             <button
               onClick={primaryCta.onClick}
               disabled={primaryCta.disabled}
               className={[
-                "w-full py-3.5 rounded-2xl font-bold text-base transition-all duration-200",
+                "col-span-2 py-3.5 font-bold text-base transition-all duration-300",
                 primaryCta.disabled
-                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  : "text-white",
+                  ? "cursor-not-allowed"
+                  : "text-white cursor-pointer hover:scale-[1.02]",
               ].join(" ")}
-              style={!primaryCta.disabled ? {
-                background: "linear-gradient(135deg, #34d399, #059669)",
-                boxShadow: "0 8px 24px rgba(5,150,105,0.3)",
-              } : undefined}
+              style={{
+                borderRadius: "14px",
+                ...(primaryCta.disabled ? {
+                  background: "linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(245,240,230,0.9) 100%)",
+                  border: "1.5px solid rgba(200,190,170,0.5)",
+                  color: "rgba(100,116,139,0.6)",
+                  boxShadow: "0 4px 16px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6)",
+                } : {
+                  background: "rgba(80,130,255,0.75)",
+                  border: "2px solid rgba(80,130,255,0.5)",
+                  backdropFilter: "blur(12px)",
+                  boxShadow: "0 0 20px rgba(80,120,255,0.35), 0 8px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2)",
+                }),
+              }}
             >
               {primaryCta.label}
             </button>
