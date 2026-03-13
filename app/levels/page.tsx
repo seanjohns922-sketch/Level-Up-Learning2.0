@@ -384,7 +384,7 @@ export default function LevelsPage() {
                   </div>
                 </div>
                 {!isUnlocked ? (
-                  <div className="absolute right-4 top-4 text-gray-400">
+                  <div className="absolute right-4 top-4 text-white/40">
                     <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
                       <rect x="4" y="11" width="16" height="9" rx="2" />
                       <path d="M8 11V7a4 4 0 018 0v4" />
