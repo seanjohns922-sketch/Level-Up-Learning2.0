@@ -101,7 +101,7 @@ export default function StudentHomePage() {
             </svg>
           </div>
 
-          <p className="text-sm font-semibold text-amber-600/80 uppercase tracking-widest mb-1">Welcome to the</p>
+          <p className="text-sm font-semibold text-amber-800 uppercase tracking-widest mb-1">Welcome to the</p>
           <h1 className="text-3xl font-black text-gray-800 mb-2 uppercase tracking-wide">Tower of Knowledge</h1>
           <p className="text-gray-500 mb-8">Choose your level to begin your adventure.</p>
 
