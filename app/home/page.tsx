@@ -82,23 +82,19 @@ export default function StudentHomePage() {
           className="relative z-10 bg-white/30 backdrop-blur-md rounded-3xl p-8 w-full max-w-md text-center"
           style={{ boxShadow: "0 20px 40px rgba(0,0,0,0.10), 0 6px 12px rgba(0,0,0,0.05)" }}
         >
-          {/* Glowing Tower Emblem */}
+          {/* Level Up Learning Mascot */}
           <div
-            className="mx-auto h-18 w-18 rounded-full flex items-center justify-center mb-4 -mt-14"
+            className="mx-auto mb-4 -mt-16"
             style={{
-              background: "radial-gradient(circle, #fff3c4, #f4e6a6)",
-              boxShadow: "0 0 20px rgba(255,210,120,0.35), 0 0 40px rgba(255,200,80,0.15)",
+              filter: "drop-shadow(0 0 12px rgba(255,210,120,0.4)) drop-shadow(0 4px 8px rgba(0,0,0,0.15))",
             }}
           >
-            <svg viewBox="0 0 24 24" className="h-11 w-11 text-amber-600 drop-shadow" fill="none" stroke="currentColor" strokeWidth="1.8">
-              {/* Tower silhouette */}
-              <path d="M8 22V10L12 4l4 6v12" strokeLinejoin="round" />
-              <path d="M6 22h12" strokeLinecap="round" />
-              <path d="M10 14h4" strokeLinecap="round" />
-              <path d="M10 18h4" strokeLinecap="round" />
-              {/* Star on top */}
-              <polygon points="12,2 13,3.5 14.5,3.5 13.5,4.5 14,6 12,5 10,6 10.5,4.5 9.5,3.5 11,3.5" fill="currentColor" stroke="none" />
-            </svg>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/logo.png"
+              alt="Level Up Learning mascot"
+              className="h-24 w-auto mx-auto object-contain"
+            />
           </div>
 
           <p className="text-sm font-semibold text-amber-800 uppercase tracking-widest mb-1">Welcome to the</p>
