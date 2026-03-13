@@ -304,7 +304,7 @@ export default function LevelsPage() {
           >
             Level Up Learning
           </h1>
-          <p className="text-amber-200/80 mt-2 text-lg font-medium tracking-wide">Choose Your Path</p>
+          <p className="text-amber-100 mt-2 text-lg font-semibold tracking-wide drop-shadow-md">Choose Your Path</p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
