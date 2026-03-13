@@ -79,8 +79,8 @@ export default function StudentHomePage() {
           ))}
         </div>
         <div
-          className="relative z-10 bg-white/90 backdrop-blur-xl rounded-3xl p-8 w-full max-w-md text-center"
-          style={{ boxShadow: "0 20px 40px rgba(0,0,0,0.18), 0 6px 12px rgba(0,0,0,0.08)" }}
+          className="relative z-10 bg-white/30 backdrop-blur-md rounded-3xl p-8 w-full max-w-md text-center"
+          style={{ boxShadow: "0 20px 40px rgba(0,0,0,0.10), 0 6px 12px rgba(0,0,0,0.05)" }}
         >
           {/* Glowing Tower Emblem */}
           <div
