@@ -166,8 +166,8 @@ export default function LevelsPage() {
   return (
     <main className="min-h-screen relative px-6 py-10">
       <div className="fixed inset-0 z-0">
-        <img src="/images/tower-plaza-bg.jpg" alt="" className="w-full h-full object-cover" style={{ filter: "blur(2px)" }} />
-        <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.05)" }} />
+        <img src="/images/tower-plaza-bg.jpg" alt="" className="w-full h-full object-cover" style={{ filter: "blur(0.5px) saturate(0.75)" }} />
+        <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.08)" }} />
 
         {/* Dense tower-centered particles — warm golds, whites, pale yellows */}
         {[...Array(50)].map((_, i) => {
