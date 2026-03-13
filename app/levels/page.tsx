@@ -377,11 +377,9 @@ export default function LevelsPage() {
                       border: isSelected ? "2px solid rgba(100,150,255,0.5)" : "1.5px solid rgba(200,190,170,0.5)",
                       ...(isSelected ? {
                         background: "linear-gradient(135deg, #5E8BFF, #4F7DF3)",
-                        backdropFilter: "blur(12px)",
                         boxShadow: "0 0 0 2px rgba(80,120,255,0.3), 0 6px 14px rgba(80,120,255,0.25), 0 12px 32px rgba(80,120,255,0.2), inset 0 1px 0 rgba(255,255,255,0.25)",
                       } : {
                         background: "linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(245,240,230,0.9) 100%)",
-                        backdropFilter: "blur(12px)",
                         boxShadow: "0 6px 14px rgba(0,0,0,0.12), 0 12px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.7)",
                       }),
                     }}
