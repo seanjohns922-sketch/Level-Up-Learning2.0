@@ -166,8 +166,13 @@ export default function LevelsPage() {
   return (
     <main className="min-h-screen relative px-6 py-10">
       <div className="fixed inset-0 z-0">
-        <img src="/images/tower-plaza-bg.jpg" alt="" className="w-full h-full object-cover" style={{ filter: "blur(0.5px) saturate(1.15) brightness(1.12)", objectPosition: "center 20%" }} />
-        <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.08)" }} />
+        <img src="/images/tower-plaza-bg.jpg" alt="" className="w-full h-full object-cover" style={{ filter: "blur(0.5px) saturate(1.35) brightness(1.18) contrast(1.08)", objectPosition: "center 20%" }} />
+        {/* Cinematic gradient overlay matching login page */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/5 to-black/45" />
+        {/* Warm vignette for depth */}
+        <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at center 35%, transparent 40%, rgba(0,0,0,0.35) 100%)" }} />
+        {/* Warm glow behind tower light source */}
+        <div className="absolute pointer-events-none" style={{ left: "50%", top: "30%", width: "50vw", height: "50vw", transform: "translate(-50%, -50%)", background: "radial-gradient(circle, rgba(255,220,100,0.18) 0%, rgba(255,200,80,0.08) 35%, transparent 65%)" }} />
 
         {/* Golden light rays from tower center */}
         <div
