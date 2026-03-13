@@ -296,12 +296,15 @@ export default function LevelsPage() {
 
         <div className="text-center mb-8">
           <h1
-            className="text-5xl md:text-6xl font-black text-white tracking-tight drop-shadow-lg"
-            style={{ fontFamily: "'Nunito', 'Avenir Next', 'Trebuchet MS', sans-serif" }}
+            className="text-5xl md:text-6xl font-black text-white tracking-widest uppercase drop-shadow-lg"
+            style={{
+              fontFamily: "'Quicksand', 'Nunito', sans-serif",
+              textShadow: "0 0 30px rgba(255,210,80,0.3), 0 2px 8px rgba(0,0,0,0.3)",
+            }}
           >
             Level Up Learning
           </h1>
-          <p className="text-white/70 mt-2 text-lg">Choose your level</p>
+          <p className="text-amber-200/80 mt-2 text-lg font-medium tracking-wide">Choose Your Path</p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
