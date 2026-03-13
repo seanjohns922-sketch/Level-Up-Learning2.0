@@ -16,7 +16,7 @@ export default function HeroHeader({ levelNum, week, lessonsDone, overallPercent
   return (
     <div className="relative overflow-hidden">
       {/* Transparent gradient overlay — realm bg shows through */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-black/8 to-transparent" />
       <div className="absolute inset-0 opacity-20">
         {[...Array(6)].map((_, i) => (
           <div
