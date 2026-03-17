@@ -281,10 +281,66 @@ function supportedPlaces(config: GenericConfig) {
     : (["hundreds", "tens", "ones"] as PlaceValueName[]);
 }
 
+function getYear2DifficultyProfile(week: number) {
+  if (week <= 2) {
+    return {
+      addSubMax: 50,
+      addSubExtensionMax: 80,
+      groupsMax: 5,
+      itemsMax: 6,
+      divisionTotalMax: 24,
+      factFamilyMax: 20,
+      skipCountMax: 100,
+      skipCountExtraSteps: [2, 5, 10],
+      wordProblemMax: 40,
+    };
+  }
+  if (week <= 5) {
+    return {
+      addSubMax: 100,
+      addSubExtensionMax: 120,
+      groupsMax: 6,
+      itemsMax: 8,
+      divisionTotalMax: 36,
+      factFamilyMax: 30,
+      skipCountMax: 120,
+      skipCountExtraSteps: [2, 3, 4, 5, 10],
+      wordProblemMax: 70,
+    };
+  }
+  if (week <= 8) {
+    return {
+      addSubMax: 140,
+      addSubExtensionMax: 170,
+      groupsMax: 8,
+      itemsMax: 9,
+      divisionTotalMax: 48,
+      factFamilyMax: 40,
+      skipCountMax: 150,
+      skipCountExtraSteps: [2, 3, 4, 5, 10],
+      wordProblemMax: 100,
+    };
+  }
+  return {
+    addSubMax: 180,
+    addSubExtensionMax: 220,
+    groupsMax: 10,
+    itemsMax: 10,
+    divisionTotalMax: 60,
+    factFamilyMax: 50,
+    skipCountMax: 200,
+    skipCountExtraSteps: [2, 3, 4, 5, 10],
+    wordProblemMax: 140,
+  };
+}
+
 function generateInteractiveQuestion(
   activityType: ActivityType,
-  config: GenericConfig
+  config: GenericConfig,
+  week: number
 ): Year2QuestionData | null {
+  const profile = getYear2DifficultyProfile(week);
+
   if (activityType === "place_value_builder") {
     const min = typeof config.min === "number" ? config.min : 100;
     const max = typeof config.max === "number" ? config.max : 999;
@@ -437,7 +493,7 @@ function generateInteractiveQuestion(
 
   if (activityType === "addition_strategy") {
     const min = typeof config.min === "number" ? config.min : 0;
-    const max = typeof config.max === "number" ? config.max : 100;
+    const max = typeof config.max === "number" ? config.max : profile.addSubMax;
     const mode =
       config.mode === "split" || config.mode === "friendly_numbers"
         ? config.mode
@@ -446,14 +502,14 @@ function generateInteractiveQuestion(
     let b = randInt(2, 18);
 
     if (mode === "split") {
-      a = randInt(10, 89);
-      b = randInt(10, 19);
+      a = randInt(18, Math.max(30, Math.min(99, max)));
+      b = randInt(12, Math.min(39, Math.max(12, profile.addSubMax / 3)));
     }
 
     if (mode === "friendly_numbers") {
-      a = randInt(20, 89);
+      a = randInt(20, Math.max(29, Math.min(profile.addSubExtensionMax, 189)));
       const bridge = 10 - (a % 10 || 10);
-      b = bridge + randInt(1, 8);
+      b = bridge + randInt(2, 12);
     }
 
     const answer = a + b;
@@ -476,11 +532,16 @@ function generateInteractiveQuestion(
 
   if (activityType === "equal_groups") {
     const minGroups = typeof config.minGroups === "number" ? config.minGroups : 2;
-    const maxGroups = typeof config.maxGroups === "number" ? config.maxGroups : 5;
+    const maxGroups =
+      typeof config.maxGroups === "number"
+        ? Math.max(config.maxGroups, Math.min(config.maxGroups + 2, profile.groupsMax))
+        : profile.groupsMax;
     const minItemsPerGroup =
       typeof config.minItemsPerGroup === "number" ? config.minItemsPerGroup : 2;
     const maxItemsPerGroup =
-      typeof config.maxItemsPerGroup === "number" ? config.maxItemsPerGroup : 5;
+      typeof config.maxItemsPerGroup === "number"
+        ? Math.max(config.maxItemsPerGroup, Math.min(config.maxItemsPerGroup + 2, profile.itemsMax))
+        : profile.itemsMax;
     const groups = randInt(minGroups, maxGroups);
     const itemsPerGroup = randInt(minItemsPerGroup, maxItemsPerGroup);
     const answer = groups * itemsPerGroup;
@@ -498,11 +559,16 @@ function generateInteractiveQuestion(
 
   if (activityType === "arrays") {
     const minRows = typeof config.minRows === "number" ? config.minRows : 2;
-    const maxRows = typeof config.maxRows === "number" ? config.maxRows : 5;
+    const maxRows =
+      typeof config.maxRows === "number"
+        ? Math.max(config.maxRows, Math.min(config.maxRows + 2, profile.groupsMax))
+        : Math.min(8, profile.groupsMax);
     const minColumns =
       typeof config.minColumns === "number" ? config.minColumns : 2;
     const maxColumns =
-      typeof config.maxColumns === "number" ? config.maxColumns : 5;
+      typeof config.maxColumns === "number"
+        ? Math.max(config.maxColumns, Math.min(config.maxColumns + 2, profile.itemsMax))
+        : Math.min(10, profile.itemsMax);
     const rows = randInt(minRows, maxRows);
     const columns = randInt(minColumns, maxColumns);
     const answer = rows * columns;
@@ -524,12 +590,15 @@ function generateInteractiveQuestion(
 
   if (activityType === "division_groups") {
     const minTotal = typeof config.minTotal === "number" ? config.minTotal : 6;
-    const maxTotal = typeof config.maxTotal === "number" ? config.maxTotal : 24;
+    const maxTotal =
+      typeof config.maxTotal === "number"
+        ? Math.max(config.maxTotal, profile.divisionTotalMax)
+        : profile.divisionTotalMax;
     const mode =
       config.mode === "grouping" || config.mode === "inverse_link"
         ? config.mode
         : "sharing";
-    const candidateGroupSizes = [2, 3, 4, 5].filter((size) => size <= maxTotal);
+    const candidateGroupSizes = [2, 3, 4, 5, 6, 8, 10].filter((size) => size <= maxTotal);
     const groupSize =
       candidateGroupSizes[randInt(0, candidateGroupSizes.length - 1)] ?? 2;
     const minMultiplier = Math.max(2, Math.ceil(minTotal / groupSize));
@@ -555,7 +624,7 @@ function generateInteractiveQuestion(
 
   if (activityType === "mixed_word_problem") {
     const min = typeof config.min === "number" ? config.min : 0;
-    const max = typeof config.max === "number" ? config.max : 50;
+    const max = typeof config.max === "number" ? config.max : profile.wordProblemMax;
     const mode =
       config.mode === "two_step_add_sub" || config.mode === "mult_div_problems"
         ? config.mode
@@ -563,8 +632,8 @@ function generateInteractiveQuestion(
 
     if (mode === "two_step_add_sub") {
       const start = randInt(Math.max(10, min), Math.max(20, max));
-      const add = randInt(2, 10);
-      const remove = randInt(1, 9);
+      const add = randInt(4, 18);
+      const remove = randInt(2, 12);
       const answer = start + add - remove;
       return {
         kind: "mixed_word_problem",
@@ -579,8 +648,8 @@ function generateInteractiveQuestion(
 
     if (mode === "mult_div_problems") {
       if (randInt(0, 1) === 0) {
-        const groups = randInt(2, 5);
-        const perGroup = randInt(2, 6);
+        const groups = randInt(3, Math.min(8, profile.groupsMax));
+        const perGroup = randInt(2, Math.min(10, profile.itemsMax));
         const answer = groups * perGroup;
         return {
           kind: "mixed_word_problem",
@@ -593,8 +662,8 @@ function generateInteractiveQuestion(
         };
       }
 
-      const groups = randInt(2, 5);
-      const perGroup = randInt(2, 6);
+      const groups = randInt(3, Math.min(8, profile.groupsMax));
+      const perGroup = randInt(2, Math.min(10, profile.itemsMax));
       const total = groups * perGroup;
       return {
         kind: "mixed_word_problem",
@@ -610,7 +679,7 @@ function generateInteractiveQuestion(
     const operation = shuffle(["+", "-", "x", "/"])[0];
     if (operation === "+") {
       const start = randInt(Math.max(5, min), Math.max(12, max - 10));
-      const extra = randInt(2, 10);
+      const extra = randInt(4, 18);
       const answer = start + extra;
       return {
         kind: "mixed_word_problem",
@@ -625,7 +694,7 @@ function generateInteractiveQuestion(
 
     if (operation === "-") {
       const start = randInt(Math.max(12, min), Math.max(20, max));
-      const used = randInt(2, Math.min(10, start - 1));
+      const used = randInt(3, Math.min(18, start - 1));
       const answer = start - used;
       return {
         kind: "mixed_word_problem",
@@ -639,8 +708,8 @@ function generateInteractiveQuestion(
     }
 
     if (operation === "x") {
-      const groups = randInt(2, 5);
-      const perGroup = randInt(2, 6);
+      const groups = randInt(3, Math.min(8, profile.groupsMax));
+      const perGroup = randInt(2, Math.min(10, profile.itemsMax));
       const answer = groups * perGroup;
       return {
         kind: "mixed_word_problem",
@@ -653,8 +722,8 @@ function generateInteractiveQuestion(
       };
     }
 
-    const groupSize = randInt(2, 5);
-    const groups = randInt(2, 5);
+    const groupSize = randInt(2, Math.min(10, profile.itemsMax));
+    const groups = randInt(3, Math.min(8, profile.groupsMax));
     const total = groupSize * groups;
     return {
       kind: "mixed_word_problem",
@@ -669,7 +738,7 @@ function generateInteractiveQuestion(
 
   if (activityType === "subtraction_strategy") {
     const min = typeof config.min === "number" ? config.min : 0;
-    const max = typeof config.max === "number" ? config.max : 100;
+    const max = typeof config.max === "number" ? config.max : profile.addSubMax;
     const mode =
       config.mode === "split" || config.mode === "fact_strategy"
         ? config.mode
@@ -678,13 +747,13 @@ function generateInteractiveQuestion(
     let remove = randInt(2, Math.min(18, total - 1));
 
     if (mode === "split") {
-      total = randInt(30, Math.max(40, max));
-      remove = randInt(11, Math.min(19, total - 1));
+      total = randInt(34, Math.max(48, max));
+      remove = randInt(12, Math.min(39, total - 1));
     }
 
     if (mode === "fact_strategy") {
-      total = randInt(12, Math.max(20, max));
-      remove = randInt(2, 9);
+      total = randInt(20, Math.max(30, max));
+      remove = randInt(3, 12);
     }
 
     const answer = total - remove;
@@ -710,8 +779,8 @@ function generateInteractiveQuestion(
       config.mode === "write_sentences" || config.mode === "word_problems"
         ? config.mode
         : "recognise";
-    const a = randInt(2, 9);
-    const b = randInt(1, 9);
+    const a = randInt(2, Math.min(10, Math.floor(profile.factFamilyMax / 4) + 2));
+    const b = randInt(1, Math.min(profile.factFamilyMax - a, a + 4));
     const total = a + b;
     const family: [number, number, number] = [a, b, total];
     const correctSentence =
@@ -744,7 +813,7 @@ function generateInteractiveQuestion(
 
   if (activityType === "odd_even_sort") {
     const min = typeof config.min === "number" ? config.min : 0;
-    const max = typeof config.max === "number" ? config.max : 30;
+    const max = typeof config.max === "number" ? config.max : Math.min(80, profile.addSubMax);
     const count = typeof config.count === "number" ? config.count : 6;
     const mode =
       config.mode === "pattern" || config.mode === "odd_even_sums"
@@ -775,7 +844,10 @@ function generateInteractiveQuestion(
   }
 
   if (activityType === "skip_count") {
-    const step = typeof config.step === "number" ? config.step : 2;
+    const step =
+      typeof config.step === "number"
+        ? config.step
+        : profile.skipCountExtraSteps[randInt(0, profile.skipCountExtraSteps.length - 1)] ?? 2;
     const start = randInt(0, 5) * step;
     const sequence = [start, start + step, start + step * 2, start + step * 3];
     const answer = start + step * 4;
@@ -898,8 +970,9 @@ function generateGenericQuestion(
   config: GenericConfig,
   lesson: Lesson
 ): MultipleChoiceQuestion | TypedResponseQuestion {
+  const profile = getYear2DifficultyProfile(lesson.week);
   const min = typeof config.min === "number" ? config.min : 0;
-  const max = typeof config.max === "number" ? config.max : 100;
+  const max = typeof config.max === "number" ? config.max : profile.addSubMax;
   const step = typeof config.step === "number" ? config.step : 10;
 
   const asMultipleChoice = activityType === "multiple_choice";
@@ -927,7 +1000,7 @@ function generateGenericQuestion(
     const count = typeof config.count === "number" ? config.count : 4;
     const values = new Set<number>();
     while (values.size < count) {
-      values.add(randInt(Math.max(10, min), Math.max(20, max)));
+      values.add(randInt(Math.max(10, min), Math.max(40, max)));
     }
     const numbers = Array.from(values);
     const smallest = Math.min(...numbers);
@@ -1019,8 +1092,8 @@ function generateGenericQuestion(
   }
 
   if (sourceActivityType === "addition_strategy") {
-    const a = randInt(Math.max(0, min), Math.max(min + 10, max - 5));
-    const b = randInt(2, 18);
+    const a = randInt(Math.max(0, min), Math.max(min + 20, max - 10));
+    const b = randInt(4, Math.min(28, Math.max(8, profile.addSubMax / 4)));
     const answer = String(a + b);
     return asMultipleChoice
       ? {
@@ -1056,8 +1129,8 @@ function generateGenericQuestion(
   }
 
   if (sourceActivityType === "subtraction_strategy") {
-    const total = randInt(20, Math.max(30, max));
-    const remove = randInt(2, Math.min(18, total - 1));
+    const total = randInt(20, Math.max(40, max));
+    const remove = randInt(3, Math.min(28, total - 1));
     const answer = String(total - remove);
     return asMultipleChoice
       ? {
@@ -1075,8 +1148,8 @@ function generateGenericQuestion(
   }
 
   if (sourceActivityType === "fact_family") {
-    const a = randInt(2, 9);
-    const b = randInt(1, a - 1);
+    const a = randInt(2, Math.min(12, Math.floor(profile.factFamilyMax / 3)));
+    const b = randInt(1, Math.max(2, Math.min(a, profile.factFamilyMax - a)));
     const total = a + b;
     const answer = String(total - a);
     return asMultipleChoice
@@ -1095,8 +1168,8 @@ function generateGenericQuestion(
   }
 
   if (sourceActivityType === "equal_groups" || sourceActivityType === "arrays") {
-    const groups = randInt(2, 5);
-    const perGroup = randInt(2, 5);
+    const groups = randInt(3, Math.min(8, profile.groupsMax));
+    const perGroup = randInt(2, Math.min(10, profile.itemsMax));
     const answer = String(groups * perGroup);
     return asMultipleChoice
       ? {
@@ -1114,7 +1187,10 @@ function generateGenericQuestion(
   }
 
   if (sourceActivityType === "skip_count") {
-    const by = typeof config.step === "number" ? config.step : 2;
+    const by =
+      typeof config.step === "number"
+        ? config.step
+        : profile.skipCountExtraSteps[randInt(0, profile.skipCountExtraSteps.length - 1)] ?? 2;
     const start = randInt(0, 5) * by;
     const answer = String(start + by * 3);
     const prompt = `${start}, ${start + by}, ${start + by * 2}, ?`;
@@ -1134,8 +1210,8 @@ function generateGenericQuestion(
   }
 
   if (sourceActivityType === "division_groups") {
-    const perGroup = randInt(2, 5);
-    const groups = randInt(2, 5);
+    const perGroup = randInt(2, Math.min(10, profile.itemsMax));
+    const groups = randInt(3, Math.min(8, profile.groupsMax));
     const total = perGroup * groups;
     const answer = String(groups);
     return asMultipleChoice
@@ -1154,8 +1230,8 @@ function generateGenericQuestion(
   }
 
   if (sourceActivityType === "mixed_word_problem") {
-    const a = randInt(10, 40);
-    const b = randInt(2, 15);
+    const a = randInt(20, Math.max(40, profile.wordProblemMax));
+    const b = randInt(4, Math.min(20, Math.max(8, profile.wordProblemMax / 6)));
     const isAdd = randInt(0, 1) === 0;
     const answer = String(isAdd ? a + b : a - b);
     return asMultipleChoice
@@ -1215,7 +1291,7 @@ export function generateYear2Question(
     activity.activityType === "odd_even_sort" ||
     activity.activityType === "skip_count"
   ) {
-    return generateInteractiveQuestion(activity.activityType, config) as Year2QuestionData;
+    return generateInteractiveQuestion(activity.activityType, config, lesson.week) as Year2QuestionData;
   }
 
   if (
