@@ -5,6 +5,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { readProgress, updateProgress } from "@/data/progress";
 import { ACTIVE_STUDENT_KEY } from "@/data/progress";
 import { supabase } from "@/lib/supabase";
+import { getProgramForYear } from "@/data/programs";
+import {
+  generateQuestionForActivity,
+  type MultipleChoiceQuestion as Year2MultipleChoiceQuestion,
+  type TypedResponseQuestion as Year2TypedResponseQuestion,
+} from "@/data/activities/year2/lessonEngine";
 import NumberLineTap from "@/components/NumberLineTap";
 import NumberLineJump from "@/components/NumberLineJump";
 import NumberChartFill from "@/components/NumberChartFill";
@@ -22,6 +28,8 @@ import {
   type Difficulty,
   type LessonConfig,
 } from "@/app/config/lesson-config";
+import type { Lesson, WeekPlan } from "@/data/programs/year1";
+import type { LessonActivity } from "@/data/programs/types";
 
 type WeekProgress = {
   lessonsCompleted: boolean[]; // [L1, L2, L3]
@@ -103,6 +111,8 @@ function setQuizScore(store: ProgramProgressStore, year: string, week: string, s
 
 type QuizQuestion = {
   id: string;
+  lessonNumber?: number;
+  skill?: string;
   kind:
     | "mcq"
     | "typed"
@@ -175,6 +185,185 @@ type QuizQuestion = {
     answer: "YES" | "NO";
   };
 };
+
+type LessonBreakdown = {
+  lessonNumber: number;
+  correct: number;
+  total: number;
+  percent: number;
+  skill?: string;
+};
+
+function chooseYear2QuizSource(lesson: Lesson): LessonActivity | null {
+  const activities = lesson.activities ?? [];
+
+  return (
+    activities.find(
+      (activity) =>
+        activity.activityType !== "multiple_choice" &&
+        activity.activityType !== "typed_response" &&
+        activity.activityType !== "review_quiz"
+    ) ??
+    activities.find(
+      (activity) =>
+        activity.activityType === "multiple_choice" ||
+        activity.activityType === "typed_response"
+    ) ??
+    null
+  );
+}
+
+function toYear2QuizQuestion(
+  question: Year2MultipleChoiceQuestion | Year2TypedResponseQuestion,
+  lessonNumber: number,
+  skill: string,
+  index: number
+): QuizQuestion {
+  if (question.kind === "multiple_choice") {
+    return {
+      id: `q${index}`,
+      lessonNumber,
+      skill,
+      kind: "mcq",
+      prompt: question.prompt,
+      options: question.options,
+      correctIndex: question.options.findIndex((option) => option === question.answer),
+    };
+  }
+
+  return {
+    id: `q${index}`,
+    lessonNumber,
+    skill,
+    kind: "typed",
+    prompt: question.prompt,
+    correctValue: question.answer,
+  };
+}
+
+function buildYear2WeeklyQuizQuestions(
+  weekPlan: WeekPlan,
+  questionsPerLesson: number
+): QuizQuestion[] {
+  const questions: QuizQuestion[] = [];
+
+  weekPlan.lessons.slice(0, 3).forEach((lesson, lessonIndex) => {
+    const sourceActivity = chooseYear2QuizSource(lesson);
+    if (!sourceActivity) return;
+
+    for (let i = 0; i < questionsPerLesson; i += 1) {
+      const questionType =
+        i === questionsPerLesson - 1 ? "typed_response" : "multiple_choice";
+      const question = generateQuestionForActivity(
+        {
+          activityType: questionType,
+          weight: 1,
+          config:
+            sourceActivity.activityType === "multiple_choice" ||
+            sourceActivity.activityType === "typed_response"
+              ? sourceActivity.config
+              : {
+                  ...sourceActivity.config,
+                  sourceActivityType: sourceActivity.activityType,
+                },
+        },
+        lesson.title
+      );
+
+      if (question.kind === "multiple_choice" || question.kind === "typed_response") {
+        questions.push(
+          toYear2QuizQuestion(
+            question,
+            lessonIndex + 1,
+            sourceActivity.activityType,
+            questions.length + 1
+          )
+        );
+      }
+    }
+  });
+
+  return questions;
+}
+
+function isQuizQuestionCorrect(
+  q: QuizQuestion,
+  quizAnswers: Record<string, number>,
+  quizTyped: Record<string, string>,
+  quizLineAnswers: Record<string, number>,
+  quizChartDone: Record<string, boolean>,
+  quizMabAnswers: Record<string, { tens: number; ones: number; touched: boolean }>,
+  quizMoneyAnswers: Record<string, { attempted: boolean; correct: boolean }>
+) {
+  if (q.kind === "typed") {
+    const typed = normalizeWord(quizTyped[q.id] ?? "");
+    const correct = normalizeWord(String(q.correctValue ?? ""));
+    return typed !== "" && typed === correct;
+  }
+  if (q.kind === "numberLineTap" || q.kind === "numberLineJump") {
+    const picked = quizLineAnswers[q.id];
+    const target = q.line?.target;
+    return typeof picked === "number" && picked === target;
+  }
+  if (q.kind === "chartFill") {
+    return quizChartDone[q.id] === true;
+  }
+  if (q.kind === "mab") {
+    const ans = quizMabAnswers[q.id];
+    const target = q.mab?.target ?? 0;
+    return !!ans && ans.tens * 10 + ans.ones === target;
+  }
+  if (q.kind === "moneyMake" || q.kind === "moneyChange" || q.kind === "moneyEnough") {
+    return quizMoneyAnswers[q.id]?.correct === true;
+  }
+  const chosen = quizAnswers[q.id];
+  return chosen === q.correctIndex;
+}
+
+function buildLessonBreakdown(
+  questions: QuizQuestion[],
+  quizAnswers: Record<string, number>,
+  quizTyped: Record<string, string>,
+  quizLineAnswers: Record<string, number>,
+  quizChartDone: Record<string, boolean>,
+  quizMabAnswers: Record<string, { tens: number; ones: number; touched: boolean }>,
+  quizMoneyAnswers: Record<string, { attempted: boolean; correct: boolean }>,
+  questionsPerLesson: number
+): LessonBreakdown[] {
+  const breakdown = new Map<number, LessonBreakdown>();
+
+  questions.forEach((q, index) => {
+    const lessonNumber = q.lessonNumber ?? Math.floor(index / questionsPerLesson) + 1;
+    const current = breakdown.get(lessonNumber) ?? {
+      lessonNumber,
+      correct: 0,
+      total: 0,
+      percent: 0,
+      skill: q.skill,
+    };
+    current.total += 1;
+    if (isQuizQuestionCorrect(
+      q,
+      quizAnswers,
+      quizTyped,
+      quizLineAnswers,
+      quizChartDone,
+      quizMabAnswers,
+      quizMoneyAnswers
+    )) {
+      current.correct += 1;
+    }
+    if (!current.skill && q.skill) current.skill = q.skill;
+    breakdown.set(lessonNumber, current);
+  });
+
+  return Array.from(breakdown.values())
+    .sort((a, b) => a.lessonNumber - b.lessonNumber)
+    .map((item) => ({
+      ...item,
+      percent: item.total > 0 ? Math.round((item.correct / item.total) * 100) : 0,
+    }));
+}
 
 function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -1642,6 +1831,15 @@ function SessionPage() {
   function buildQuizQuestions() {
     const qConfig = quizConfig;
     const questionsPerLesson = qConfig?.questionsPerLesson ?? 5;
+    if (year === "Year 2") {
+      const weekPlan = getProgramForYear(year).find(
+        (plan) => plan.week === Number(week)
+      );
+      if (weekPlan) {
+        return buildYear2WeeklyQuizQuestions(weekPlan, questionsPerLesson);
+      }
+    }
+
     const questions: QuizQuestion[] = [];
     const weekNum = Number(week);
     const isWeek7 = weekNum === 7;
@@ -1926,30 +2124,15 @@ function SessionPage() {
 
   const quizScore = useMemo(() => {
     return quizQuestions.reduce((acc, q) => {
-      if (q.kind === "typed") {
-        const typed = normalizeWord(quizTyped[q.id] ?? "");
-        const correct = normalizeWord(String(q.correctValue ?? ""));
-        return acc + (typed !== "" && typed === correct ? 1 : 0);
-      }
-      if (q.kind === "numberLineTap" || q.kind === "numberLineJump") {
-        const picked = quizLineAnswers[q.id];
-        const target = q.line?.target;
-        return acc + (typeof picked === "number" && picked === target ? 1 : 0);
-      }
-      if (q.kind === "chartFill") {
-        return acc + (quizChartDone[q.id] ? 1 : 0);
-      }
-      if (q.kind === "mab") {
-        const ans = quizMabAnswers[q.id];
-        const target = q.mab?.target ?? 0;
-        if (!ans) return acc;
-        return acc + (ans.tens * 10 + ans.ones === target ? 1 : 0);
-      }
-      if (q.kind === "moneyMake" || q.kind === "moneyChange" || q.kind === "moneyEnough") {
-        return acc + (quizMoneyAnswers[q.id]?.correct ? 1 : 0);
-      }
-      const chosen = quizAnswers[q.id];
-      return acc + (chosen === q.correctIndex ? 1 : 0);
+      return acc + (isQuizQuestionCorrect(
+        q,
+        quizAnswers,
+        quizTyped,
+        quizLineAnswers,
+        quizChartDone,
+        quizMabAnswers,
+        quizMoneyAnswers
+      ) ? 1 : 0);
     }, 0);
   }, [
     quizAnswers,
@@ -1960,6 +2143,29 @@ function SessionPage() {
     quizMabAnswers,
     quizMoneyAnswers,
   ]);
+  const lessonBreakdown = useMemo(
+    () =>
+      buildLessonBreakdown(
+        quizQuestions,
+        quizAnswers,
+        quizTyped,
+        quizLineAnswers,
+        quizChartDone,
+        quizMabAnswers,
+        quizMoneyAnswers,
+        quizConfig?.questionsPerLesson ?? 5
+      ),
+    [
+      quizAnswers,
+      quizChartDone,
+      quizConfig?.questionsPerLesson,
+      quizLineAnswers,
+      quizMabAnswers,
+      quizMoneyAnswers,
+      quizQuestions,
+      quizTyped,
+    ]
+  );
 
   function completeWeek(currentWeek: number) {
     const p = readProgress();
@@ -1972,6 +2178,7 @@ function SessionPage() {
     const score = quizScore;
     const total = quizQuestions.length;
     const percent = total > 0 ? Math.round((score / total) * 100) : 0;
+    const passRate = percent;
     const passThreshold = (quizConfig?.passPercent ?? 80) / 100;
     const passed = score >= Math.ceil(total * passThreshold);
 
@@ -2005,9 +2212,22 @@ function SessionPage() {
         const prevScores: Record<string, any> = (existing?.quiz_scores as any) ?? {};
         const weekKey = String(weekNum);
         const prevAttempts: any[] = prevScores[weekKey]?.attempts ?? [];
-        const attempt = { score, total, percent, passed, at: new Date().toISOString() };
+        const attempt = {
+          score,
+          total,
+          percent,
+          passRate,
+          passed,
+          lessonBreakdown,
+          at: new Date().toISOString(),
+        };
         const updatedWeek = {
-          score, total, percent, passed,
+          score,
+          total,
+          percent,
+          passRate,
+          passed,
+          lessonBreakdown,
           attempts: [...prevAttempts, attempt],
         };
         const updatedScores = { ...prevScores, [weekKey]: updatedWeek };
@@ -2633,7 +2853,7 @@ function SessionPage() {
               </button>
 
               <div className="text-sm text-muted-foreground">
-                {quizSubmitted
+              {quizSubmitted
                   ? `Final Score: ${finalScore}/${quizQuestions.length} (${Math.round(
                       (finalScore / Math.max(1, quizQuestions.length)) * 100
                     )}%)`
@@ -2700,6 +2920,32 @@ function SessionPage() {
             {quizSubmitted && finalScore >= Math.ceil(quizQuestions.length * ((quizConfig?.passPercent ?? 80) / 100)) ? (
               <div className="mt-4 rounded-2xl border border-primary/20 bg-primary-light p-4 text-sm font-bold text-primary">
                 🎉 Congratulations — you’re one step closer to unlocking your Level Up Legend!
+              </div>
+            ) : null}
+
+            {quizSubmitted ? (
+              <div className="mt-4 rounded-2xl border border-gray-200 bg-white p-4">
+                <div className="text-sm font-bold text-gray-900">
+                  Pass Rate: {Math.round((finalScore / Math.max(1, quizQuestions.length)) * 100)}%
+                </div>
+                <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                  {lessonBreakdown.map((item) => (
+                    <div key={item.lessonNumber} className="rounded-xl bg-gray-50 p-3">
+                      <div className="text-xs font-bold uppercase tracking-wide text-gray-500">
+                        Lesson {item.lessonNumber}
+                      </div>
+                      <div className="mt-1 text-lg font-black text-gray-900">
+                        {item.correct}/{item.total}
+                      </div>
+                      <div className="text-sm text-gray-600">{item.percent}%</div>
+                      {item.skill ? (
+                        <div className="mt-1 text-xs text-gray-500">
+                          {item.skill.replace(/_/g, " ")}
+                        </div>
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
               </div>
             ) : null}
 

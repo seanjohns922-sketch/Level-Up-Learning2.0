@@ -444,6 +444,20 @@ export default function TeacherDashboardPage() {
 
             return (
               <div className="grid gap-1.5 text-sm max-h-48 overflow-y-auto">
+                {(() => {
+                  const allAttempts = weekKeys.flatMap((w) => {
+                    const wd = qs[String(w)];
+                    return wd?.attempts ?? [];
+                  });
+                  if (allAttempts.length === 0) return null;
+                  const passedCount = allAttempts.filter((a: any) => a.passed).length;
+                  const passRate = Math.round((passedCount / allAttempts.length) * 100);
+                  return (
+                    <div className="mb-2 rounded-lg bg-amber-50 px-3 py-2 text-xs font-bold text-amber-900">
+                      Quiz pass rate: {passedCount}/{allAttempts.length} ({passRate}%)
+                    </div>
+                  );
+                })()}
                 {weekKeys.map((w) => {
                   const wd = qs[String(w)];
                   const attempts: any[] = wd?.attempts ?? [];
@@ -453,13 +467,27 @@ export default function TeacherDashboardPage() {
                       <div className="text-xs font-bold text-gray-500 mt-1 mb-0.5">Week {w}</div>
                       {attempts.length > 0 ? (
                         attempts.map((a: any, i: number) => (
-                          <div key={i} className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-white mb-0.5">
-                            <span className="text-gray-600 text-xs">
-                              Attempt {i + 1} — {a.score}/{a.total} ({a.percent}%)
-                            </span>
-                            <span className={["font-bold text-xs px-2 py-0.5 rounded-full", a.passed ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-600"].join(" ")}>
-                              {a.passed ? "✅ Pass" : "❌ Fail"}
-                            </span>
+                          <div key={i} className="py-1.5 px-3 rounded-lg bg-white mb-0.5">
+                            <div className="flex items-center justify-between">
+                              <span className="text-gray-600 text-xs">
+                                Attempt {i + 1} — {a.score}/{a.total} ({a.percent}%)
+                              </span>
+                              <span className={["font-bold text-xs px-2 py-0.5 rounded-full", a.passed ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-600"].join(" ")}>
+                                {a.passed ? "✅ Pass" : "❌ Fail"}
+                              </span>
+                            </div>
+                            <div className="mt-1 text-[11px] text-gray-500">
+                              Pass rate: {a.passRate ?? a.percent ?? 0}%
+                            </div>
+                            {Array.isArray(a.lessonBreakdown) && a.lessonBreakdown.length > 0 ? (
+                              <div className="mt-1 grid gap-1">
+                                {a.lessonBreakdown.map((item: any) => (
+                                  <div key={item.lessonNumber} className="text-[11px] text-gray-500">
+                                    Lesson {item.lessonNumber}: {item.correct}/{item.total} ({item.percent}%)
+                                  </div>
+                                ))}
+                              </div>
+                            ) : null}
                           </div>
                         ))
                       ) : (
