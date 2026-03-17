@@ -352,7 +352,7 @@ export default function LevelsPage() {
                 background: "radial-gradient(circle at center, rgba(255,255,255,0.12), transparent 70%)",
               }}
             />
-            <div className="relative grid grid-cols-2 gap-4">
+            <div className="relative grid grid-cols-2 gap-[18px]">
               {levels.map((level, idx) => {
                 const isSelected = selectedYear === level.id;
                 const isUnlocked = DEMO_MODE || !hasAssignedProgram || level.id === unlockedYear;
@@ -366,39 +366,40 @@ export default function LevelsPage() {
                       setSelectedYear(level.id);
                     }}
                     className={[
-                      "relative text-center transition-all duration-200",
+                      "relative text-center",
                       !isUnlocked ? "opacity-50 cursor-not-allowed" : "cursor-pointer",
-                      isLastOdd ? "col-span-2 max-w-[calc(50%-0.5rem)] mx-auto" : "",
+                      isLastOdd ? "col-span-2 max-w-[calc(50%-9px)] mx-auto" : "",
                     ].join(" ")}
                     style={{
                       borderRadius: "16px",
-                      padding: "14px 24px",
-                      transform: isSelected ? "translateY(-2px)" : undefined,
-                      border: isSelected ? "2px solid rgba(100,150,255,0.5)" : "1.5px solid rgba(200,190,170,0.5)",
+                      padding: "18px 26px",
+                      transition: "all 0.18s ease",
+                      transform: isSelected ? "translateY(-2px)" : "translateY(0)",
+                      border: isSelected ? "none" : "1px solid rgba(255,255,255,0.4)",
                       ...(isSelected ? {
                         background: "linear-gradient(135deg, #5E8BFF, #4F7DF3)",
-                        boxShadow: "0 0 0 2px rgba(80,120,255,0.3), 0 6px 14px rgba(80,120,255,0.25), 0 12px 32px rgba(80,120,255,0.2), inset 0 1px 0 rgba(255,255,255,0.25)",
+                        boxShadow: "0 0 0 2px rgba(90,140,255,0.35), 0 10px 30px rgba(80,120,255,0.40)",
                       } : {
-                        background: "linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(245,240,230,0.9) 100%)",
-                        boxShadow: "0 6px 14px rgba(0,0,0,0.12), 0 12px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.7)",
+                        background: "rgba(255,255,255,0.92)",
+                        boxShadow: "0 6px 14px rgba(0,0,0,0.18), 0 14px 28px rgba(0,0,0,0.20)",
                       }),
                     }}
                     onMouseEnter={(e) => {
                       if (!isUnlocked) return;
                       e.currentTarget.style.transform = "translateY(-4px)";
                       if (!isSelected) {
-                        e.currentTarget.style.boxShadow = "0 8px 18px rgba(0,0,0,0.16), 0 16px 40px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.7)";
+                        e.currentTarget.style.boxShadow = "0 10px 22px rgba(0,0,0,0.22), 0 18px 36px rgba(0,0,0,0.25)";
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (!isUnlocked) return;
                       e.currentTarget.style.transform = isSelected ? "translateY(-2px)" : "translateY(0)";
                       if (!isSelected) {
-                        e.currentTarget.style.boxShadow = "0 6px 14px rgba(0,0,0,0.12), 0 12px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.7)";
+                        e.currentTarget.style.boxShadow = "0 6px 14px rgba(0,0,0,0.18), 0 14px 28px rgba(0,0,0,0.20)";
                       }
                     }}
                   >
-                    <span className={`text-base font-bold tracking-wide ${isSelected ? "text-white" : "text-slate-700"}`}>
+                    <span className={`text-base font-semibold tracking-wide ${isSelected ? "text-white" : "text-slate-700"}`}>
                       {level.label}
                     </span>
                     {!isUnlocked ? (
@@ -417,29 +418,37 @@ export default function LevelsPage() {
                 onClick={primaryCta.onClick}
                 disabled={primaryCta.disabled}
                 className={[
-                  "col-span-2 py-3.5 font-bold text-base transition-all duration-200",
+                  "col-span-2 font-bold text-base",
                   primaryCta.disabled
                     ? "cursor-not-allowed"
                     : "text-white cursor-pointer",
                 ].join(" ")}
                 style={{
-                  borderRadius: "16px",
+                  borderRadius: "18px",
+                  padding: "20px",
+                  transition: "all 0.18s ease",
                   ...(primaryCta.disabled ? {
-                    background: "linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(245,240,230,0.9) 100%)",
-                    border: "1.5px solid rgba(200,190,170,0.5)",
+                    background: "rgba(255,255,255,0.92)",
+                    border: "1px solid rgba(255,255,255,0.4)",
                     color: "rgba(100,116,139,0.6)",
-                    boxShadow: "0 6px 14px rgba(0,0,0,0.12), 0 12px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.7)",
+                    boxShadow: "0 6px 14px rgba(0,0,0,0.18), 0 14px 28px rgba(0,0,0,0.20)",
                   } : {
                     background: "linear-gradient(135deg, #5E8BFF, #4F7DF3)",
-                    border: "2px solid rgba(100,150,255,0.5)",
-                    boxShadow: "0 0 0 2px rgba(80,120,255,0.3), 0 6px 14px rgba(80,120,255,0.25), 0 12px 32px rgba(80,120,255,0.2), inset 0 1px 0 rgba(255,255,255,0.25)",
+                    border: "none",
+                    boxShadow: "0 10px 30px rgba(80,120,255,0.45)",
                   }),
                 }}
                 onMouseEnter={(e) => {
-                  if (!primaryCta.disabled) e.currentTarget.style.transform = "translateY(-3px)";
+                  if (!primaryCta.disabled) {
+                    e.currentTarget.style.transform = "translateY(-4px)";
+                    e.currentTarget.style.boxShadow = "0 14px 36px rgba(80,120,255,0.55)";
+                  }
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = "translateY(0)";
+                  if (!primaryCta.disabled) {
+                    e.currentTarget.style.boxShadow = "0 10px 30px rgba(80,120,255,0.45)";
+                  }
                 }}
               >
                 {primaryCta.label}
