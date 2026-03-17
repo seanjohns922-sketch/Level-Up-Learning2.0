@@ -9,7 +9,10 @@ import { getProgramForYear } from "@/data/programs";
 import {
   generateQuestionForActivity,
   type MultipleChoiceQuestion as Year2MultipleChoiceQuestion,
+  type PlaceValueBuilderQuestion as Year2PlaceValueBuilderQuestion,
+  type PartitionExpandQuestion as Year2PartitionExpandQuestion,
   type TypedResponseQuestion as Year2TypedResponseQuestion,
+  type Year2QuestionData,
 } from "@/data/activities/year2/lessonEngine";
 import NumberLineTap from "@/components/NumberLineTap";
 import NumberLineJump from "@/components/NumberLineJump";
@@ -159,6 +162,7 @@ type QuizQuestion = {
     target: number;
     start?: number;
     steps?: number[];
+    showTargetLabel?: boolean;
   };
   chart?: {
     min: number;
@@ -241,6 +245,366 @@ function toYear2QuizQuestion(
   };
 }
 
+function numericOptionStrings(answer: number, spread: number, min = 0) {
+  const lower = Math.max(min, answer - spread);
+  const upper = Math.max(lower + 6, answer + spread);
+  return shuffle(uniqueInts(3, lower, upper, [answer]).concat([answer]).map(String));
+}
+
+function placeValueSummary(question: Year2PlaceValueBuilderQuestion) {
+  const hundreds = question.hundreds === null ? "? hundreds" : `${question.hundreds} hundreds`;
+  const tens = question.tens === null ? "? tens" : `${question.tens} tens`;
+  const ones = question.ones === null ? "? ones" : `${question.ones} ones`;
+  return `${hundreds}, ${tens}, ${ones}`;
+}
+
+function buildAlternativePartition(question: Year2PartitionExpandQuestion) {
+  const { standard } = question;
+  if (standard.hundreds >= 100) {
+    return {
+      hundreds: standard.hundreds - 100,
+      tens: standard.tens + 100,
+      ones: standard.ones,
+    };
+  }
+
+  return {
+    hundreds: standard.hundreds,
+    tens: Math.max(0, standard.tens - 10),
+    ones: standard.ones + 10,
+  };
+}
+
+function buildYear2QuizSources(lesson: Lesson): LessonActivity[] {
+  const activities = lesson.activities ?? [];
+  const reviewActivity = activities.find((activity) => activity.activityType === "review_quiz");
+  const reviewActivities = Array.isArray(reviewActivity?.config?.reviewActivities)
+    ? (reviewActivity?.config?.reviewActivities as string[])
+    : null;
+
+  if (reviewActivities?.length) {
+    return reviewActivities.map((activityType) => {
+      const existing = activities.find((activity) => activity.activityType === activityType);
+      return (
+        existing ?? {
+          activityType: activityType as LessonActivity["activityType"],
+          weight: 1,
+          config: {},
+        }
+      );
+    });
+  }
+
+  const source = chooseYear2QuizSource(lesson);
+  return source ? [source] : [];
+}
+
+function toQuizQuestionFromYear2Data(
+  questionData: Year2QuestionData,
+  lessonNumber: number,
+  skill: string,
+  index: number,
+  questionIndexInLesson: number
+): QuizQuestion | null {
+  const useTyped = questionIndexInLesson === 4;
+
+  if (questionData.kind === "multiple_choice" || questionData.kind === "typed_response") {
+    return toYear2QuizQuestion(
+      questionData as Year2MultipleChoiceQuestion | Year2TypedResponseQuestion,
+      lessonNumber,
+      skill,
+      index
+    );
+  }
+
+  if (questionData.kind === "place_value_builder") {
+    const prompt =
+      questionData.mode === "missing_mab_part"
+        ? `The number is ${questionData.targetNumber}. The MAB shows ${placeValueSummary(questionData)}. What is the missing value?`
+        : questionData.mode === "identify_place"
+        ? `The MAB shows ${placeValueSummary(questionData)}. How many ${questionData.place ?? "ones"} are shown?`
+        : `The MAB shows ${placeValueSummary(questionData)}. What number is shown?`;
+    const options = numericOptionStrings(
+      questionData.answer,
+      Math.max(10, questionData.answer > 99 ? 100 : 10)
+    );
+
+    return useTyped
+      ? {
+          id: `q${index}`,
+          lessonNumber,
+          skill,
+          kind: "typed",
+          prompt,
+          correctValue: String(questionData.answer),
+        }
+      : {
+          id: `q${index}`,
+          lessonNumber,
+          skill,
+          kind: "mcq",
+          prompt,
+          options,
+          correctIndex: options.findIndex((option) => option === String(questionData.answer)),
+        };
+  }
+
+  if (questionData.kind === "partition_expand") {
+    if (questionData.mode === "partition" || questionData.mode === "expand") {
+      const target =
+        questionData.standard.hundreds + questionData.standard.tens + questionData.standard.ones;
+      const answerText = `${questionData.standard.hundreds} + ${questionData.standard.tens} + ${questionData.standard.ones}`;
+      const options = shuffle([
+        answerText,
+        `${questionData.standard.hundreds + 100} + ${Math.max(0, questionData.standard.tens - 100)} + ${questionData.standard.ones}`,
+        `${target - 10} + 10 + 0`,
+        `${questionData.standard.hundreds} + ${questionData.standard.tens + 10} + ${Math.max(0, questionData.standard.ones - 10)}`,
+      ]);
+      return useTyped
+        ? {
+            id: `q${index}`,
+            lessonNumber,
+            skill,
+            kind: "typed",
+            prompt: `How many tens are in ${target}?`,
+            correctValue: String(questionData.standard.tens / 10),
+          }
+        : {
+            id: `q${index}`,
+            lessonNumber,
+            skill,
+            kind: "mcq",
+            prompt: `Which expanded form matches ${target}?`,
+            options,
+            correctIndex: options.findIndex((option) => option === answerText),
+          };
+    }
+
+    if (questionData.mode === "flexible_partition") {
+      const alternative = buildAlternativePartition(questionData);
+      const answer = `${alternative.hundreds} + ${alternative.tens} + ${alternative.ones}`;
+      const options = shuffle([
+        answer,
+        `${questionData.standard.hundreds} + ${questionData.standard.tens} + ${questionData.standard.ones}`,
+        `${questionData.target - 10} + 10 + 0`,
+        `${questionData.target - 1} + 0 + 1`,
+      ]);
+      return {
+        id: `q${index}`,
+        lessonNumber,
+        skill,
+        kind: "mcq",
+        prompt: `Which is a different way to partition ${questionData.target}?`,
+        options,
+        correctIndex: options.findIndex((option) => option === answer),
+      };
+    }
+  }
+
+  if (questionData.kind === "number_order") {
+    const askSmallest = questionIndexInLesson % 2 === 0;
+    const answer = String(askSmallest ? Math.min(...questionData.numbers) : Math.max(...questionData.numbers));
+    const options = shuffle(questionData.numbers.map(String));
+    return useTyped
+      ? {
+          id: `q${index}`,
+          lessonNumber,
+          skill,
+          kind: "typed",
+          prompt: `${askSmallest ? "Type the smallest" : "Type the largest"} number: ${questionData.numbers.join(", ")}`,
+          correctValue: answer,
+        }
+      : {
+          id: `q${index}`,
+          lessonNumber,
+          skill,
+          kind: "mcq",
+          prompt: `${askSmallest ? "Which number is the smallest" : "Which number is the largest"}: ${questionData.numbers.join(", ")}?`,
+          options,
+          correctIndex: options.findIndex((option) => option === answer),
+        };
+  }
+
+  if (questionData.kind === "number_line") {
+    const rangePadding = Math.max(questionData.step * 2, 20);
+    return {
+      id: `q${index}`,
+      lessonNumber,
+      skill,
+      kind: "numberLineTap",
+      prompt: questionData.prompt,
+      line: {
+        min:
+          questionData.mode === "rounding"
+            ? Math.max(0, questionData.expected - rangePadding)
+            : questionData.min,
+        max:
+          questionData.mode === "rounding"
+            ? questionData.expected + rangePadding
+            : questionData.max,
+        target: questionData.expected,
+        showTargetLabel: false,
+      },
+    };
+  }
+
+  if (questionData.kind === "equal_groups") {
+    const options = questionData.options.map(String);
+    return {
+      id: `q${index}`,
+      lessonNumber,
+      skill,
+      kind: useTyped ? "typed" : "mcq",
+      prompt: questionData.prompt,
+      correctValue: useTyped ? String(questionData.answer) : undefined,
+      options: useTyped ? undefined : options,
+      correctIndex: useTyped ? undefined : options.findIndex((option) => option === String(questionData.answer)),
+      visual: {
+        type: "rows",
+        rows: Array.from({ length: questionData.groups }, () => questionData.itemsPerGroup),
+        dotSize: 16,
+        gap: 8,
+        rowGap: 12,
+      },
+    };
+  }
+
+  if (questionData.kind === "arrays") {
+    const visual = {
+      type: "dots" as const,
+      count: questionData.rows * questionData.columns,
+      cols: questionData.columns,
+      rows: questionData.rows,
+      dotSize: 16,
+      gap: 8,
+    };
+
+    if (questionData.mode === "repeated_addition" && questionData.repeatedAddition) {
+      const options = questionData.options.map(String);
+      return {
+        id: `q${index}`,
+        lessonNumber,
+        skill,
+        kind: "mcq",
+        prompt: questionData.prompt,
+        options,
+        correctIndex: options.findIndex((option) => option === questionData.repeatedAddition),
+        visual,
+      };
+    }
+
+    const options = questionData.options.map(String);
+    return {
+      id: `q${index}`,
+      lessonNumber,
+      skill,
+      kind: useTyped ? "typed" : "mcq",
+      prompt: questionData.prompt,
+      correctValue: useTyped ? String(questionData.answer) : undefined,
+      options: useTyped ? undefined : options,
+      correctIndex: useTyped ? undefined : options.findIndex((option) => option === String(questionData.answer)),
+      visual,
+    };
+  }
+
+  if (questionData.kind === "division_groups") {
+    const options = questionData.options.map(String);
+    return {
+      id: `q${index}`,
+      lessonNumber,
+      skill,
+      kind: useTyped ? "typed" : "mcq",
+      prompt: questionData.prompt,
+      correctValue: useTyped ? String(questionData.answer) : undefined,
+      options: useTyped ? undefined : options,
+      correctIndex: useTyped ? undefined : options.findIndex((option) => option === String(questionData.answer)),
+    };
+  }
+
+  if (questionData.kind === "mixed_word_problem") {
+    const options = questionData.options.map(String);
+    return {
+      id: `q${index}`,
+      lessonNumber,
+      skill,
+      kind: useTyped ? "typed" : "mcq",
+      prompt: questionData.prompt,
+      correctValue: useTyped ? String(questionData.answer) : undefined,
+      options: useTyped ? undefined : options,
+      correctIndex: useTyped ? undefined : options.findIndex((option) => option === String(questionData.answer)),
+    };
+  }
+
+  if (questionData.kind === "odd_even_sort") {
+    if (questionData.mode === "pattern" && questionData.patternOptions && questionData.patternAnswer) {
+      return {
+        id: `q${index}`,
+        lessonNumber,
+        skill,
+        kind: "mcq",
+        prompt: "What pattern do you notice?",
+        options: questionData.patternOptions,
+        correctIndex: questionData.patternOptions.findIndex(
+          (option) => option === questionData.patternAnswer
+        ),
+      };
+    }
+
+    const targetBucket = questionIndexInLesson % 2 === 0 ? "even" : "odd";
+    const candidates = questionData.numbers
+      .map((value, itemIndex) => ({
+        value,
+        label: questionData.labels?.[itemIndex] ?? String(value),
+      }))
+      .filter(({ value }) => (targetBucket === "even" ? value % 2 === 0 : value % 2 !== 0));
+    const answer = candidates[0]?.label ?? (questionData.labels?.[0] ?? String(questionData.numbers[0]));
+    const options = shuffle(
+      questionData.numbers
+        .map((value, itemIndex) => questionData.labels?.[itemIndex] ?? String(value))
+        .slice(0, 4)
+    );
+    if (!options.includes(answer)) options[0] = answer;
+    return {
+      id: `q${index}`,
+      lessonNumber,
+      skill,
+      kind: "mcq",
+      prompt:
+        questionData.mode === "odd_even_sums"
+          ? `Which sum has a ${targetBucket} answer?`
+          : `Which number is ${targetBucket}?`,
+      options,
+      correctIndex: options.findIndex((option) => option === answer),
+    };
+  }
+
+  if (questionData.kind === "review_quiz") {
+    return toQuizQuestionFromYear2Data(
+      questionData.question,
+      lessonNumber,
+      questionData.activityType,
+      index,
+      questionIndexInLesson
+    );
+  }
+
+  if ("options" in questionData && Array.isArray(questionData.options) && "answer" in questionData) {
+    const options = questionData.options.map(String);
+    return {
+      id: `q${index}`,
+      lessonNumber,
+      skill,
+      kind: useTyped ? "typed" : "mcq",
+      prompt: questionData.prompt,
+      correctValue: useTyped ? String(questionData.answer) : undefined,
+      options: useTyped ? undefined : options,
+      correctIndex: useTyped ? undefined : options.findIndex((option) => option === String(questionData.answer)),
+    };
+  }
+
+  return null;
+}
+
 function buildYear2WeeklyQuizQuestions(
   weekPlan: WeekPlan,
   questionsPerLesson: number
@@ -248,37 +612,21 @@ function buildYear2WeeklyQuizQuestions(
   const questions: QuizQuestion[] = [];
 
   weekPlan.lessons.slice(0, 3).forEach((lesson, lessonIndex) => {
-    const sourceActivity = chooseYear2QuizSource(lesson);
-    if (!sourceActivity) return;
+    const sourceActivities = buildYear2QuizSources(lesson);
+    if (!sourceActivities.length) return;
 
     for (let i = 0; i < questionsPerLesson; i += 1) {
-      const questionType =
-        i === questionsPerLesson - 1 ? "typed_response" : "multiple_choice";
-      const question = generateQuestionForActivity(
-        {
-          activityType: questionType,
-          weight: 1,
-          config:
-            sourceActivity.activityType === "multiple_choice" ||
-            sourceActivity.activityType === "typed_response"
-              ? sourceActivity.config
-              : {
-                  ...sourceActivity.config,
-                  sourceActivityType: sourceActivity.activityType,
-                },
-        },
-        lesson.title
+      const sourceActivity = sourceActivities[i % sourceActivities.length];
+      const question = generateQuestionForActivity(sourceActivity, lesson.title);
+      const quizQuestion = toQuizQuestionFromYear2Data(
+        question,
+        lessonIndex + 1,
+        sourceActivity.activityType,
+        questions.length + 1,
+        i
       );
-
-      if (question.kind === "multiple_choice" || question.kind === "typed_response") {
-        questions.push(
-          toYear2QuizQuestion(
-            question,
-            lessonIndex + 1,
-            sourceActivity.activityType,
-            questions.length + 1
-          )
-        );
+      if (quizQuestion) {
+        questions.push(quizQuestion);
       }
     }
   });
@@ -2678,9 +3026,11 @@ function SessionPage() {
 
                   {currentQuiz?.kind === "numberLineTap" && currentQuiz.line ? (
                     <div className="rounded-2xl border bg-white p-4 mb-3">
-                      <div className="text-2xl font-extrabold text-gray-900 mb-3">
-                        {currentQuiz.line.target}
-                      </div>
+                      {currentQuiz.line.showTargetLabel !== false ? (
+                        <div className="text-2xl font-extrabold text-gray-900 mb-3">
+                          {currentQuiz.line.target}
+                        </div>
+                      ) : null}
                       <NumberLineTap
                         min={currentQuiz.line.min}
                         max={currentQuiz.line.max}

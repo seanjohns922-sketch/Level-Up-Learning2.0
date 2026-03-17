@@ -41,12 +41,21 @@ export default function DivisionGroups({
           <div className="rounded-xl bg-white px-4 py-3 text-3xl font-black text-teal-900 shadow-sm">
             {questionData.total}
           </div>
-          <div className="text-lg font-bold text-teal-800">shared into groups of</div>
-          <div className="rounded-xl bg-white px-4 py-3 text-3xl font-black text-teal-900 shadow-sm">
-            {questionData.groupSize}
+          <div className="text-lg font-bold text-teal-800">
+            {questionData.mode === "sharing" ? "shared equally into" : "shared into groups of"}
           </div>
-          <div className="text-lg font-bold text-teal-800">= ? groups</div>
+          <div className="rounded-xl bg-white px-4 py-3 text-3xl font-black text-teal-900 shadow-sm">
+            {questionData.mode === "sharing" ? questionData.groups : questionData.groupSize}
+          </div>
+          <div className="text-lg font-bold text-teal-800">
+            {questionData.mode === "sharing" ? "= ? in each group" : "= ? groups"}
+          </div>
         </div>
+        {questionData.mode === "inverse_link" && questionData.inverseFact ? (
+          <div className="mt-4 rounded-xl bg-white px-4 py-3 text-sm font-bold text-teal-900 shadow-sm">
+            Use the inverse fact: {questionData.inverseFact}
+          </div>
+        ) : null}
       </div>
 
       <div className="mt-6 grid gap-3">

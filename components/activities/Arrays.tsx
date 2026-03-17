@@ -13,11 +13,16 @@ export default function Arrays({
   onCorrect?: () => void;
   onWrong?: () => void;
 }) {
-  const [picked, setPicked] = useState<number | null>(null);
+  const [picked, setPicked] = useState<number | string | null>(null);
 
-  function choose(option: number) {
+  function choose(option: number | string) {
     setPicked(option);
-    if (option === questionData.answer) onCorrect?.();
+    if (
+      (questionData.mode === "repeated_addition" && option === questionData.repeatedAddition) ||
+      (questionData.mode !== "repeated_addition" && option === questionData.answer)
+    ) {
+      onCorrect?.();
+    }
     else onWrong?.();
   }
 
@@ -55,6 +60,11 @@ export default function Arrays({
             ? `${questionData.rows} rows of ${questionData.columns}`
             : `${questionData.rows} rows × ${questionData.columns} columns`}
         </div>
+        {questionData.mode === "repeated_addition" && questionData.repeatedAddition ? (
+          <div className="mt-2 text-sm text-teal-900">
+            Think: {questionData.columns} added {questionData.rows} times.
+          </div>
+        ) : null}
       </div>
 
       <div className="mt-6 grid gap-3">

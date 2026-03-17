@@ -37,7 +37,10 @@ export default function PartitionExpand({
 
     const isCorrect =
       questionData.mode === "flexible_partition"
-        ? hundreds + tens + ones === questionData.target
+        ? hundreds + tens + ones === questionData.target &&
+          (hundreds !== questionData.standard.hundreds ||
+            tens !== questionData.standard.tens ||
+            ones !== questionData.standard.ones)
         : hundreds === questionData.standard.hundreds &&
           tens === questionData.standard.tens &&
           ones === questionData.standard.ones;
@@ -86,11 +89,16 @@ export default function PartitionExpand({
         <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
           Your expression
         </div>
-        <div className="mt-2 text-3xl font-black text-teal-900">
-          {numericValue("hundreds")} + {numericValue("tens")} + {numericValue("ones")} ={" "}
-          {numericValue("hundreds") + numericValue("tens") + numericValue("ones")}
+          <div className="mt-2 text-3xl font-black text-teal-900">
+            {numericValue("hundreds")} + {numericValue("tens")} + {numericValue("ones")} ={" "}
+            {numericValue("hundreds") + numericValue("tens") + numericValue("ones")}
+          </div>
+          {questionData.mode === "flexible_partition" ? (
+            <div className="mt-2 text-sm text-teal-800">
+              Make the same total in a different way from the standard partition.
+            </div>
+          ) : null}
         </div>
-      </div>
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
         <button

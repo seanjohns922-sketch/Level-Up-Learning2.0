@@ -19,10 +19,14 @@ export default function NumberLineActivity({
 
   const ticks = useMemo(() => {
     const span = questionData.max - questionData.min;
-    // Use 100 increments for large ranges, otherwise use step
-    const tickStep = span >= 200 ? 100 : questionData.step;
+    const approxTickCount = Math.max(4, Math.min(10, Math.floor(span / Math.max(1, questionData.step))));
+    const instructionalStep = Math.max(1, questionData.step);
+    const displayStep =
+      approxTickCount > 10
+        ? instructionalStep * Math.ceil(approxTickCount / 10)
+        : instructionalStep;
     const values: number[] = [];
-    for (let current = questionData.min; current <= questionData.max; current += tickStep) {
+    for (let current = questionData.min; current <= questionData.max; current += displayStep) {
       values.push(current);
     }
     if (values[values.length - 1] !== questionData.max) values.push(questionData.max);
@@ -55,7 +59,7 @@ export default function NumberLineActivity({
     const allowed =
       questionData.mode === "estimate"
         ? Math.max(5, Math.floor(questionData.step / 2))
-        : 5;
+        : Math.max(1, Math.floor(questionData.step / 4));
 
     if (difference <= allowed) {
       setIsCorrect(true);

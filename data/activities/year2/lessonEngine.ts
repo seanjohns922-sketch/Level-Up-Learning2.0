@@ -74,18 +74,21 @@ export type ArraysQuestion = {
   rows: number;
   columns: number;
   answer: number;
-  options: number[];
+  options: (number | string)[];
   mode: "arrays" | "repeated_addition";
+  repeatedAddition?: string;
 };
 
 export type DivisionGroupsQuestion = {
   kind: "division_groups";
   prompt: string;
   total: number;
+  groups: number;
   groupSize: number;
   answer: number;
   options: number[];
   mode: "sharing" | "grouping" | "inverse_link";
+  inverseFact?: string;
 };
 
 export type MixedWordProblemQuestion = {
@@ -96,6 +99,7 @@ export type MixedWordProblemQuestion = {
   operationLabel: string;
   helper: string;
   mode: "choose_operation" | "two_step_add_sub" | "mult_div_problems";
+  showStrategyClue?: boolean;
 };
 
 export type ReviewQuizInnerQuestion =
@@ -147,11 +151,14 @@ export type OddEvenSortQuestion = {
   kind: "odd_even_sort";
   prompt: string;
   numbers: number[];
+  labels?: string[];
   answer: {
     odd: number[];
     even: number[];
   };
   mode: "identify" | "pattern" | "odd_even_sums";
+  patternOptions?: string[];
+  patternAnswer?: string;
 };
 
 export type SkipCountQuestion = {
@@ -573,18 +580,33 @@ function generateInteractiveQuestion(
     const columns = randInt(minColumns, maxColumns);
     const answer = rows * columns;
     const mode = config.mode === "repeated_addition" ? "repeated_addition" : "arrays";
+    const repeatedAddition = Array.from({ length: rows }, () => columns).join(" + ");
+    const repeatedAdditionOptions = shuffle(
+      Array.from(
+        new Set([
+          repeatedAddition,
+          Array.from({ length: columns }, () => rows).join(" + "),
+          `${answer} + ${columns}`,
+          Array.from({ length: rows }, () => Math.max(1, columns - 1)).join(" + "),
+        ])
+      )
+    ).slice(0, 4);
 
     return {
       kind: "arrays",
       prompt:
         mode === "repeated_addition"
-          ? "How many dots are there in the array? Use repeated addition if it helps."
+          ? "Which repeated addition sentence matches the array?"
           : "How many dots are in the array?",
       rows,
       columns,
       answer,
-      options: uniqueNumberOptions(answer, Math.max(rows, columns) * 2).map(Number),
+      options:
+        mode === "repeated_addition"
+          ? repeatedAdditionOptions
+          : uniqueNumberOptions(answer, Math.max(rows, columns) * 2).map(Number),
       mode,
+      repeatedAddition,
     };
   }
 
@@ -595,7 +617,7 @@ function generateInteractiveQuestion(
         ? Math.max(config.maxTotal, profile.divisionTotalMax)
         : profile.divisionTotalMax;
     const mode =
-      config.mode === "grouping" || config.mode === "inverse_link"
+      config.mode === "grouping" || config.mode === "inverse_link" || config.mode === "sharing"
         ? config.mode
         : "sharing";
     const candidateGroupSizes = [2, 3, 4, 5, 6, 8, 10].filter((size) => size <= maxTotal);
@@ -603,8 +625,8 @@ function generateInteractiveQuestion(
       candidateGroupSizes[randInt(0, candidateGroupSizes.length - 1)] ?? 2;
     const minMultiplier = Math.max(2, Math.ceil(minTotal / groupSize));
     const maxMultiplier = Math.max(minMultiplier, Math.floor(maxTotal / groupSize));
-    const answer = randInt(minMultiplier, maxMultiplier);
-    const total = groupSize * answer;
+    const groups = randInt(minMultiplier, maxMultiplier);
+    const total = groupSize * groups;
 
     return {
       kind: "division_groups",
@@ -612,13 +634,15 @@ function generateInteractiveQuestion(
         mode === "grouping"
           ? `${total} objects are put into groups of ${groupSize}. How many groups are there?`
           : mode === "inverse_link"
-          ? `${total} divided into groups of ${groupSize} gives how many groups?`
-          : `${total} objects are shared equally into groups of ${groupSize}. How many groups are there?`,
+          ? `${total} divided into groups of ${groupSize} gives how many groups? Which multiplication fact checks it?`
+          : `${total} objects are shared equally into ${groups} groups. How many are in each group?`,
       total,
+      groups,
       groupSize,
-      answer,
-      options: uniqueNumberOptions(answer, 4).map(Number),
+      answer: mode === "sharing" ? groupSize : groups,
+      options: uniqueNumberOptions(mode === "sharing" ? groupSize : groups, 4).map(Number),
       mode,
+      inverseFact: `${groups} × ${groupSize} = ${total}`,
     };
   }
 
@@ -643,6 +667,7 @@ function generateInteractiveQuestion(
         operationLabel: "Two-step add/subtract",
         helper: "Work through the story in order: add first, then subtract.",
         mode,
+        showStrategyClue: true,
       };
     }
 
@@ -659,6 +684,7 @@ function generateInteractiveQuestion(
           operationLabel: "Multiply",
           helper: "Think of equal groups or repeated addition.",
           mode,
+          showStrategyClue: true,
         };
       }
 
@@ -673,6 +699,7 @@ function generateInteractiveQuestion(
         operationLabel: "Divide",
         helper: "Ask how many equal groups fit into the total.",
         mode,
+        showStrategyClue: true,
       };
     }
 
@@ -687,8 +714,9 @@ function generateInteractiveQuestion(
         answer,
         options: uniqueNumberOptions(answer, 8).map(Number),
         operationLabel: "Addition",
-        helper: "Look for words like more or altogether.",
+        helper: "Read the whole story first. Decide whether the amount is growing, shrinking, grouped, or shared.",
         mode,
+        showStrategyClue: false,
       };
     }
 
@@ -702,8 +730,9 @@ function generateInteractiveQuestion(
         answer,
         options: uniqueNumberOptions(answer, 8).map(Number),
         operationLabel: "Subtraction",
-        helper: "Look for words like left or taken away.",
+        helper: "Read the whole story first. Decide whether the amount is growing, shrinking, grouped, or shared.",
         mode,
+        showStrategyClue: false,
       };
     }
 
@@ -717,8 +746,9 @@ function generateInteractiveQuestion(
         answer,
         options: uniqueNumberOptions(answer, 8).map(Number),
         operationLabel: "Multiplication",
-        helper: "Equal groups usually mean multiply.",
+        helper: "Read the whole story first. Decide whether the amount is growing, shrinking, grouped, or shared.",
         mode,
+        showStrategyClue: false,
       };
     }
 
@@ -731,8 +761,9 @@ function generateInteractiveQuestion(
       answer: groups,
       options: uniqueNumberOptions(groups, 4).map(Number),
       operationLabel: "Division",
-      helper: "If a total is split into equal groups, divide.",
+      helper: "Read the whole story first. Decide whether the amount is growing, shrinking, grouped, or shared.",
       mode,
+      showStrategyClue: false,
     };
   }
 
@@ -819,27 +850,65 @@ function generateInteractiveQuestion(
       config.mode === "pattern" || config.mode === "odd_even_sums"
         ? config.mode
         : "identify";
-    const values = new Set<number>();
+    const labels: string[] = [];
+    let numbers: number[] = [];
 
-    while (values.size < count) {
-      values.add(randInt(min, max));
+    if (mode === "odd_even_sums") {
+      const expressions = new Map<string, number>();
+      while (expressions.size < count) {
+        const a = randInt(1, Math.max(9, Math.floor(max / 2)));
+        const b = randInt(1, Math.max(9, Math.floor(max / 2)));
+        expressions.set(`${a} + ${b}`, a + b);
+      }
+      const paired = shuffle(Array.from(expressions.entries()));
+      labels.push(...paired.map(([expression]) => expression));
+      numbers = paired.map(([, value]) => value);
+    } else {
+      const values = new Set<number>();
+      if (mode === "pattern") {
+        const start = randInt(min, Math.max(min + 6, max - 6));
+        for (let offset = 0; offset < count; offset += 1) {
+          values.add(start + offset);
+        }
+      } else {
+        while (values.size < count) {
+          values.add(randInt(min, max));
+        }
+      }
+      numbers = shuffle(Array.from(values));
+      labels.push(...numbers.map(String));
     }
 
-    const numbers = shuffle(Array.from(values));
+    const patternOptions =
+      mode === "pattern"
+        ? shuffle([
+            "Odd and even numbers alternate one after the other.",
+            "All even numbers are bigger than odd numbers.",
+            "Odd numbers always end in 0 or 5.",
+            "Even numbers cannot be next to each other.",
+          ])
+        : undefined;
+
     return {
       kind: "odd_even_sort",
       prompt:
         mode === "pattern"
-          ? "Sort the numbers into odd and even to spot the pattern."
+          ? "Sort the numbers into odd and even, then choose the pattern you notice."
           : mode === "odd_even_sums"
-          ? "Sort the results into odd and even."
+          ? "Work out each sum, then sort the results into odd and even."
           : "Sort the numbers into odd and even.",
       numbers,
+      labels,
       answer: {
         odd: numbers.filter((value) => value % 2 !== 0),
         even: numbers.filter((value) => value % 2 === 0),
       },
       mode,
+      patternOptions,
+      patternAnswer:
+        mode === "pattern"
+          ? "Odd and even numbers alternate one after the other."
+          : undefined,
     };
   }
 
@@ -871,7 +940,7 @@ function randomReviewConfig(activityType: ActivityType): GenericConfig {
       return {
         min: 0,
         max: 100,
-        step: [2, 5, 10][randInt(0, 2)],
+        step: [2, 3, 4, 5, 10][randInt(0, 4)],
         mode: "forward",
       };
     case "arrays":
@@ -980,19 +1049,65 @@ function generateGenericQuestion(
   if (sourceActivityType === "place_value_builder") {
     const target = randInt(Math.max(100, min || 100), Math.max(200, max || 999));
     const place = (["hundreds", "tens", "ones"] as PlaceValueName[])[randInt(0, 2)];
-    const answer = String(digitForPlace(target, place));
+    const partition = partitionNumber(target);
+    const mode =
+      config.mode === "identify_place" || config.mode === "missing_mab_part"
+        ? config.mode
+        : "identify_number";
+    const mabSummary = `${partition.hundreds / 100} hundreds, ${partition.tens / 10} tens, ${partition.ones} ones`;
+
+    if (mode === "missing_mab_part") {
+      const hiddenValue =
+        place === "hundreds" ? partition.hundreds : place === "tens" ? partition.tens : partition.ones;
+      const visibleSummary = [
+        place === "hundreds" ? "? hundreds" : `${partition.hundreds / 100} hundreds`,
+        place === "tens" ? "? tens" : `${partition.tens / 10} tens`,
+        place === "ones" ? "? ones" : `${partition.ones} ones`,
+      ].join(", ");
+      return asMultipleChoice
+        ? {
+            kind: "multiple_choice",
+            prompt: `The number is ${target}. The MAB shows ${visibleSummary}. What is the missing value?`,
+            options: uniqueNumberOptions(hiddenValue, Math.max(4, hiddenValue || 4)),
+            answer: String(hiddenValue),
+          }
+        : {
+            kind: "typed_response",
+            prompt: `The number is ${target}. The MAB shows ${visibleSummary}. What is the missing value?`,
+            answer: String(hiddenValue),
+            placeholder: "Type the missing value",
+          };
+    }
+
+    if (mode === "identify_place") {
+      const answer = String(digitForPlace(target, place));
+      return asMultipleChoice
+        ? {
+            kind: "multiple_choice",
+            prompt: `The MAB shows ${mabSummary}. How many ${placeLabel(place).toLowerCase()} are shown?`,
+            options: uniqueNumberOptions(Number(answer), 4),
+            answer,
+          }
+        : {
+            kind: "typed_response",
+            prompt: `The MAB shows ${mabSummary}. How many ${placeLabel(place).toLowerCase()} are shown?`,
+            answer,
+            placeholder: "Type the count",
+          };
+    }
+
     return asMultipleChoice
       ? {
           kind: "multiple_choice",
-          prompt: `What is the ${placeLabel(place)} digit in ${target}?`,
-          options: uniqueNumberOptions(Number(answer), 4),
-          answer,
+          prompt: `The MAB shows ${mabSummary}. What number is shown?`,
+          options: uniqueNumberOptions(target, 80),
+          answer: String(target),
         }
       : {
           kind: "typed_response",
-          prompt: `Type the ${placeLabel(place)} digit in ${target}.`,
-          answer,
-          placeholder: "Type a digit",
+          prompt: `The MAB shows ${mabSummary}. What number is shown?`,
+          answer: String(target),
+          placeholder: "Type the number",
         };
   }
 
@@ -1029,6 +1144,32 @@ function generateGenericQuestion(
     const target = randInt(Math.max(100, min), Math.max(150, max || 999));
     const standard = partitionNumber(target);
     const answerText = `${standard.hundreds} + ${standard.tens} + ${standard.ones}`;
+    const altText =
+      standard.hundreds >= 100
+        ? `${standard.hundreds - 100} + ${standard.tens + 100} + ${standard.ones}`
+        : `${standard.hundreds} + ${Math.max(0, standard.tens - 10)} + ${standard.ones + 10}`;
+
+    if (config.mode === "flexible_partition") {
+      return asMultipleChoice
+        ? {
+            kind: "multiple_choice",
+            prompt: `Which is a different way to partition ${target}?`,
+            options: shuffle([
+              altText,
+              answerText,
+              `${standard.hundreds + 100} + ${Math.max(0, standard.tens - 100)} + ${standard.ones}`,
+              `${target - 1} + 0 + 1`,
+            ]),
+            answer: altText,
+          }
+        : {
+            kind: "typed_response",
+            prompt: `Type a different partition for ${target}. How many tens would you have after regrouping one hundred?`,
+            answer: String((standard.tens + 100) / 10),
+            placeholder: "Type the tens value",
+          };
+    }
+
     return asMultipleChoice
       ? {
           kind: "multiple_choice",
@@ -1230,27 +1371,51 @@ function generateGenericQuestion(
   }
 
   if (sourceActivityType === "mixed_word_problem") {
-    const a = randInt(20, Math.max(40, profile.wordProblemMax));
-    const b = randInt(4, Math.min(20, Math.max(8, profile.wordProblemMax / 6)));
-    const isAdd = randInt(0, 1) === 0;
-    const answer = String(isAdd ? a + b : a - b);
+    const sourceQuestion = generateInteractiveQuestion("mixed_word_problem", config, lesson.week);
+    if (!sourceQuestion || sourceQuestion.kind !== "mixed_word_problem") {
+      return {
+        kind: "typed_response",
+        prompt: `Solve the mixed word problem.`,
+        answer: "0",
+        placeholder: "Type the answer",
+      };
+    }
     return asMultipleChoice
       ? {
           kind: "multiple_choice",
-          prompt: isAdd
-            ? `A student had ${a} stickers and got ${b} more. How many now?`
-            : `A student had ${a} stickers and used ${b}. How many left?`,
-          options: uniqueNumberOptions(Number(answer), 8),
-          answer,
+          prompt: sourceQuestion.prompt,
+          options: sourceQuestion.options.map(String),
+          answer: String(sourceQuestion.answer),
+          helper: sourceQuestion.showStrategyClue === false ? sourceQuestion.helper : undefined,
         }
       : {
           kind: "typed_response",
-          prompt: isAdd
-            ? `A student had ${a} stickers and got ${b} more. How many now?`
-            : `A student had ${a} stickers and used ${b}. How many left?`,
-          answer,
+          prompt: sourceQuestion.prompt,
+          answer: String(sourceQuestion.answer),
+          helper: sourceQuestion.helper,
           placeholder: "Type the answer",
         };
+  }
+
+  if (sourceActivityType === "review_quiz") {
+    const reviewActivities =
+      config.reviewActivities?.filter((value): value is ActivityType => value !== "review_quiz") ?? [
+        "skip_count",
+        "arrays",
+        "fact_family",
+        "number_line",
+        "addition_strategy",
+        "subtraction_strategy",
+        "division_groups",
+        "odd_even_sort",
+      ];
+    const selectedType = reviewActivities[randInt(0, reviewActivities.length - 1)] ?? "skip_count";
+    return generateGenericQuestion(
+      activityType,
+      selectedType,
+      randomReviewConfig(selectedType),
+      lesson
+    );
   }
 
   const quizPrompt = `Quick review for ${lesson.title}.`;

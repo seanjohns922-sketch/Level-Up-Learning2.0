@@ -34,14 +34,16 @@ export default function MixedWordProblem({
         <p className="mt-2 text-sm text-gray-600">{questionData.helper}</p>
       </div>
 
-      <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">
-        <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
-          Strategy clue
+      {questionData.showStrategyClue !== false ? (
+        <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">
+          <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
+            Strategy clue
+          </div>
+          <div className="mt-2 text-lg font-bold text-teal-900">
+            {questionData.operationLabel}
+          </div>
         </div>
-        <div className="mt-2 text-lg font-bold text-teal-900">
-          {questionData.operationLabel}
-        </div>
-      </div>
+      ) : null}
 
       <div className="mt-6 grid gap-3">
         {questionData.options.map((option) => (

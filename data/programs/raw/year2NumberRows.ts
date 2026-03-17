@@ -956,6 +956,14 @@ export const year2NumberRows: ProgramRow[] = [
       makeActivity("typed_response", 1, {
         mode: "final_quiz",
         sourceActivityType: "review_quiz",
+        reviewActivities: [
+          "skip_count",
+          "arrays",
+          "division_groups",
+          "mixed_word_problem",
+          "addition_strategy",
+          "subtraction_strategy",
+        ],
       }),
     ],
     curriculum: ["AC9M2N06"],
