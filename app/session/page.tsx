@@ -296,9 +296,7 @@ function isQuizQuestionCorrect(
   quizMoneyAnswers: Record<string, { attempted: boolean; correct: boolean }>
 ) {
   if (q.kind === "typed") {
-    const typed = normalizeWord(quizTyped[q.id] ?? "");
-    const correct = normalizeWord(String(q.correctValue ?? ""));
-    return typed !== "" && typed === correct;
+    return isTypedAnswerCorrect(quizTyped[q.id] ?? "", q.correctValue);
   }
   if (q.kind === "numberLineTap" || q.kind === "numberLineJump") {
     const picked = quizLineAnswers[q.id];
@@ -444,6 +442,83 @@ function normalizeWord(input: string) {
     .toLowerCase()
     .trim()
     .replace(/[^a-z]/g, "");
+}
+
+function numberToWords(n: number): string {
+  const ones = [
+    "zero",
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "ten",
+    "eleven",
+    "twelve",
+    "thirteen",
+    "fourteen",
+    "fifteen",
+    "sixteen",
+    "seventeen",
+    "eighteen",
+    "nineteen",
+  ];
+  const tens = [
+    "",
+    "",
+    "twenty",
+    "thirty",
+    "forty",
+    "fifty",
+    "sixty",
+    "seventy",
+    "eighty",
+    "ninety",
+  ];
+
+  if (!Number.isFinite(n)) return String(n);
+  if (n < 0) return `minus ${numberToWords(Math.abs(n))}`;
+  if (n < 20) return ones[n];
+  if (n < 100) {
+    const ten = Math.floor(n / 10);
+    const remainder = n % 10;
+    return remainder === 0 ? tens[ten] : `${tens[ten]} ${ones[remainder]}`;
+  }
+  if (n < 1000) {
+    const hundred = Math.floor(n / 100);
+    const remainder = n % 100;
+    return remainder === 0
+      ? `${ones[hundred]} hundred`
+      : `${ones[hundred]} hundred ${numberToWords(remainder)}`;
+  }
+
+  return String(n);
+}
+
+function normalizeAnswerText(input: string) {
+  return input
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]/g, "");
+}
+
+function isTypedAnswerCorrect(rawTyped: string, rawCorrect: string | undefined) {
+  const typed = normalizeAnswerText(rawTyped);
+  if (typed === "") return false;
+
+  const correctText = String(rawCorrect ?? "");
+  if (typed === normalizeAnswerText(correctText)) return true;
+
+  const numericCorrect = Number(correctText);
+  if (!Number.isNaN(numericCorrect)) {
+    return typed === normalizeAnswerText(numberToWords(numericCorrect));
+  }
+
+  return false;
 }
 
 function makeFindNumberQuestion(min: number, max: number): QuizQuestion {
