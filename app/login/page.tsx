@@ -266,8 +266,8 @@ export default function LoginPage() {
         {/* Title area */}
         <div className="text-center mb-6" style={{ animation: "fadeUp 0.6s ease both" }}>
           <h1
-            className="text-5xl md:text-6xl font-black text-white tracking-tight drop-shadow-lg"
-            style={{ fontFamily: "'Nunito', 'Avenir Next', 'Trebuchet MS', sans-serif" }}
+            className="text-5xl md:text-6xl font-black text-white tracking-tight"
+            style={{ fontFamily: "'Nunito', 'Avenir Next', 'Trebuchet MS', sans-serif", textShadow: "0 2px 12px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.4)" }}
           >
             Level Up
             <span className="block">Learning</span>
