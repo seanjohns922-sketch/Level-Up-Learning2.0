@@ -4,6 +4,20 @@ import { useMemo, useState, useCallback } from "react";
 import type { NumberLineQuestion } from "@/data/activities/year2/lessonEngine";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 
+/* Pick a clean tick step so we get 5–11 labelled ticks */
+function niceStep(span: number): number {
+  if (span <= 10) return 1;
+  if (span <= 20) return 2;
+  if (span <= 50) return 5;
+  if (span <= 100) return 10;
+  if (span <= 200) return 20;
+  if (span <= 500) return 50;
+  if (span <= 1000) return 100;
+  if (span <= 2000) return 200;
+  if (span <= 5000) return 500;
+  return 1000;
+}
+
 export default function NumberLineActivity({
   questionData,
   onCorrect,
@@ -17,23 +31,35 @@ export default function NumberLineActivity({
   const [checked, setChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
 
+  const range = questionData.max - questionData.min || 1;
+
   const ticks = useMemo(() => {
     const span = questionData.max - questionData.min;
-    const approxTickCount = Math.max(4, Math.min(10, Math.floor(span / Math.max(1, questionData.step))));
-    const instructionalStep = Math.max(1, questionData.step);
-    const displayStep =
-      approxTickCount > 10
-        ? instructionalStep * Math.ceil(approxTickCount / 10)
-        : instructionalStep;
+    const step = niceStep(span);
     const values: number[] = [];
-    for (let current = questionData.min; current <= questionData.max; current += displayStep) {
-      values.push(current);
-    }
+    const start = Math.ceil(questionData.min / step) * step;
+    for (let v = start; v <= questionData.max; v += step) values.push(v);
+    if (values[0] !== questionData.min) values.unshift(questionData.min);
     if (values[values.length - 1] !== questionData.max) values.push(questionData.max);
     return values;
-  }, [questionData.max, questionData.min, questionData.step]);
+  }, [questionData.max, questionData.min]);
 
-  const range = questionData.max - questionData.min || 1;
+  /* Also compute minor ticks (unlabelled) for visual density */
+  const minorTicks = useMemo(() => {
+    const span = questionData.max - questionData.min;
+    const majorStep = niceStep(span);
+    // minor ticks = half of major, only if span allows it and won't be too many
+    const minorStep = majorStep / 2;
+    if (minorStep < 1 || span / minorStep > 40) return [];
+    const values: number[] = [];
+    const start = Math.ceil(questionData.min / minorStep) * minorStep;
+    for (let v = start; v <= questionData.max; v += minorStep) {
+      // skip if it's already a major tick
+      if (v % majorStep === 0 && v >= questionData.min) continue;
+      values.push(v);
+    }
+    return values;
+  }, [questionData.max, questionData.min]);
 
   const handleLineClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
@@ -41,14 +67,11 @@ export default function NumberLineActivity({
       const rect = e.currentTarget.getBoundingClientRect();
       const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
       const raw = questionData.min + pct * range;
-
-      // Snap to nearest integer like Level 1
       const snapped = Math.round(raw);
       const clamped = Math.max(questionData.min, Math.min(questionData.max, snapped));
-
       setPlaced(clamped);
     },
-    [checked, questionData.min, questionData.max, questionData.step, range]
+    [checked, questionData.min, questionData.max, range]
   );
 
   function check() {
@@ -88,24 +111,58 @@ export default function NumberLineActivity({
 
       {/* Clickable number line */}
       <div
-        className="mt-8 rounded-2xl border border-border bg-muted/30 px-6 py-8 cursor-pointer select-none"
+        className="mt-8 rounded-2xl border border-border bg-muted/30 px-8 py-8 cursor-pointer select-none"
         onClick={handleLineClick}
       >
-        <div className="relative mx-auto h-20 max-w-3xl">
+        <div className="relative mx-auto max-w-3xl" style={{ height: 80 }}>
           {/* Base line */}
-          <div className="absolute left-0 right-0 top-10 h-1 rounded-full bg-border" />
+          <div
+            className="absolute left-0 right-0 bg-primary/70 rounded-full"
+            style={{ top: 36, height: 3 }}
+          />
+          {/* End caps */}
+          <div
+            className="absolute bg-primary/70 rounded-full"
+            style={{ left: 0, top: 20, width: 3, height: 36 }}
+          />
+          <div
+            className="absolute bg-primary/70 rounded-full"
+            style={{ right: 0, top: 20, width: 3, height: 36 }}
+          />
 
-          {/* Tick marks */}
+          {/* Minor tick marks (unlabelled) */}
+          {minorTicks.map((tick) => {
+            const left = ((tick - questionData.min) / range) * 100;
+            return (
+              <div
+                key={`m-${tick}`}
+                className="absolute pointer-events-none"
+                style={{ left: `${left}%`, transform: "translateX(-50%)", top: 24 }}
+              >
+                <div
+                  className="mx-auto bg-primary/30 rounded-full"
+                  style={{ width: 2, height: 24 }}
+                />
+              </div>
+            );
+          })}
+
+          {/* Major tick marks (labelled) */}
           {ticks.map((tick) => {
             const left = ((tick - questionData.min) / range) * 100;
             return (
               <div
                 key={tick}
-                className="absolute top-0 text-center pointer-events-none"
-                style={{ left: `${left}%`, transform: "translateX(-50%)" }}
+                className="absolute text-center pointer-events-none"
+                style={{ left: `${left}%`, transform: "translateX(-50%)", top: 16 }}
               >
-                <div className="mx-auto h-6 w-0.5 bg-muted-foreground/40" />
-                <div className="mt-1 text-xs font-bold text-muted-foreground">{tick}</div>
+                <div
+                  className="mx-auto bg-primary/60 rounded-full"
+                  style={{ width: 3, height: 40 }}
+                />
+                <div className="mt-1.5 text-sm font-bold text-foreground whitespace-nowrap">
+                  {tick}
+                </div>
               </div>
             );
           })}
@@ -113,23 +170,23 @@ export default function NumberLineActivity({
           {/* Correct answer marker (shown after check) */}
           {checked && correctPct !== null && !isCorrect && (
             <div
-              className="absolute top-4 flex flex-col items-center pointer-events-none"
-              style={{ left: `${correctPct}%`, transform: "translateX(-50%)" }}
+              className="absolute flex flex-col items-center pointer-events-none"
+              style={{ left: `${correctPct}%`, transform: "translateX(-50%)", top: 22 }}
             >
-              <div className="w-4 h-4 rounded-full bg-primary border-2 border-primary-foreground shadow-md" />
-              <span className="mt-1 text-xs font-bold text-primary">{questionData.expected}</span>
+              <div className="w-5 h-5 rounded-full bg-primary border-2 border-primary-foreground shadow-md" />
+              <span className="mt-0.5 text-xs font-bold text-primary">{questionData.expected}</span>
             </div>
           )}
 
           {/* User's placed marker */}
           {markerPct !== null && (
             <div
-              className="absolute top-4 flex flex-col items-center pointer-events-none"
-              style={{ left: `${markerPct}%`, transform: "translateX(-50%)" }}
+              className="absolute flex flex-col items-center pointer-events-none"
+              style={{ left: `${markerPct}%`, transform: "translateX(-50%)", top: 22 }}
             >
               <div
                 className={[
-                  "w-4 h-4 rounded-full border-2 shadow-lg transition-colors",
+                  "w-5 h-5 rounded-full border-2 shadow-lg transition-colors",
                   checked
                     ? isCorrect
                       ? "bg-primary border-primary-foreground"
