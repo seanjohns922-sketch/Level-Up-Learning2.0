@@ -143,7 +143,7 @@ export type FactFamilyQuestion = {
   prompt: string;
   family: [number, number, number];
   options: string[];
-  answer: string;
+  answers: string[];
   mode: "recognise" | "write_sentences" | "word_problems";
 };
 
