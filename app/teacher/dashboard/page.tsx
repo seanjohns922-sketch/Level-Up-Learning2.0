@@ -163,14 +163,14 @@ export default function TeacherDashboardPage() {
   // Keep ref in sync
   selectedClassRef.current = selectedClassId;
 
+  const { user: authUser, loading: authLoading } = useAuthGuard();
+
   useEffect(() => {
+    if (authLoading || !authUser) return;
     if (mountedRef.current) return;
     mountedRef.current = true;
-    supabase.auth.getUser().then(({ data }) => {
-      if (!data.user) { router.push("/login"); return; }
-      loadClasses(data.user.id);
-    });
-  }, []);
+    loadClasses(authUser.id);
+  }, [authLoading, authUser]);
 
   // Re-fetch students when tab gains focus — uses ref to avoid dep on selectedClassId
   useEffect(() => {
