@@ -6,9 +6,17 @@ function randInt(min: number, max: number) {
 }
 
 function makeAddends(d: Difficulty) {
-  const [lo, hi] = diffRange(d, [0, 10], [0, 15], [0, 20]);
-  const maxDots = d === "hard" ? 15 : 10;
+  const [lo, hi] = diffRange(d, [0, 10], [0, 15], [10, 99]);
+  const maxDots = d === "hard" ? 20 : 10;
   const target = randInt(lo, hi);
+  if (d === "hard") {
+    const a = randInt(10, Math.min(target, 99));
+    const b = target - a;
+    if (b >= 10 && b <= 99) return { a, b, maxDots };
+    const safeA = randInt(10, 50);
+    const safeB = randInt(10, 49);
+    return { a: safeA, b: safeB, maxDots };
+  }
   for (let i = 0; i < 20; i += 1) {
     const a = randInt(0, Math.min(target, maxDots));
     const b = target - a;
