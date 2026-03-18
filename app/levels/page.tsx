@@ -110,7 +110,7 @@ export default function LevelsPage() {
       const fallbackYear = "Year 1";
       const targetYear = selectedProgram.length > 0 ? selectedYear : fallbackYear;
       return {
-        label: `Open ${targetYear} Program`,
+        label: `Enter the Tower`,
         onClick: () => {
           const existing = readProgress();
           if (!existing || existing.year !== targetYear) {
@@ -122,7 +122,7 @@ export default function LevelsPage() {
               unlockedLegends: existing?.unlockedLegends ?? [],
             });
           }
-          router.push("/home");
+          router.push(`/realms?level=${encodeURIComponent(targetYear)}`);
         },
         disabled: false,
       };
