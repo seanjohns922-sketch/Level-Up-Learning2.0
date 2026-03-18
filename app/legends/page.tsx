@@ -150,8 +150,8 @@ export default function LegendsPage() {
         alt=""
         className="absolute inset-0 w-full h-full object-cover object-[center_35%]"
       />
-      {/* Overlay for readability */}
-      <div className="absolute inset-0 bg-black/25" />
+      {/* Very light scrim for text readability only */}
+      <div className="absolute inset-0 bg-black/10" />
 
       {/* Content */}
       <div className="relative z-10 min-h-screen flex flex-col">
