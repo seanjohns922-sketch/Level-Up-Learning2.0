@@ -60,6 +60,7 @@ export function Year2LessonEngine({
   const lastIndexRef = useRef<number | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const markedCompleteRef = useRef(false);
+  const scoredThisTurnRef = useRef(false);
 
   const activities = lesson.activities ?? [];
   const currentActivity = activities[currentActivityIndex] ?? null;
@@ -86,6 +87,7 @@ export function Year2LessonEngine({
     setCurrentQuestion(nextQuestion);
     setQuestionKey((value) => value + 1);
     setStatus("idle");
+    scoredThisTurnRef.current = false;
   }
 
   useEffect(() => {
@@ -97,6 +99,7 @@ export function Year2LessonEngine({
     bagRef.current = [];
     lastIndexRef.current = null;
     markedCompleteRef.current = false;
+    scoredThisTurnRef.current = false;
     loadNextQuestion();
 
     const interval = setInterval(() => {
@@ -119,7 +122,8 @@ export function Year2LessonEngine({
   }, [finished, onTimedComplete, secondsLeft]);
 
   function handleCorrect() {
-    if (finished || status !== "idle") return;
+    if (finished || status !== "idle" || scoredThisTurnRef.current) return;
+    scoredThisTurnRef.current = true;
     clearPendingTimeout();
     setStatus("correct");
     setQuestionsAnswered((value) => value + 1);
@@ -130,7 +134,8 @@ export function Year2LessonEngine({
   }
 
   function handleWrong() {
-    if (finished || status !== "idle") return;
+    if (finished || status !== "idle" || scoredThisTurnRef.current) return;
+    scoredThisTurnRef.current = true;
     clearPendingTimeout();
     setStatus("wrong");
     setQuestionsAnswered((value) => value + 1);

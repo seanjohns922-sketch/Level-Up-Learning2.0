@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { OddEvenSortQuestion } from "@/data/activities/year2/lessonEngine";
 
@@ -18,6 +18,7 @@ export default function OddEvenSort({
   const [placements, setPlacements] = useState<Record<string, Bucket | null>>({});
   const [pickedPattern, setPickedPattern] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const submittedRef = useRef(false);
 
   useEffect(() => {
     const nextPlacements = Object.fromEntries(
@@ -26,6 +27,7 @@ export default function OddEvenSort({
     setPlacements(nextPlacements);
     setPickedPattern(null);
     setSubmitted(false);
+    submittedRef.current = false;
   }, [questionData]);
 
   const allPlaced = useMemo(
@@ -36,7 +38,7 @@ export default function OddEvenSort({
   useEffect(() => {
     if (!allPlaced) return;
     if (questionData.mode === "pattern" && !pickedPattern) return;
-    if (submitted) return;
+    if (submittedRef.current) return;
 
     const placedCorrectly = questionData.numbers.every((value, index) => {
       const expected: Bucket = value % 2 === 0 ? "even" : "odd";
@@ -45,13 +47,14 @@ export default function OddEvenSort({
     const patternCorrect =
       questionData.mode !== "pattern" || pickedPattern === questionData.patternAnswer;
 
+    submittedRef.current = true;
     setSubmitted(true);
     if (placedCorrectly && patternCorrect) onCorrect?.();
     else onWrong?.();
-  }, [allPlaced, onCorrect, onWrong, pickedPattern, placements, questionData.mode, questionData.numbers, questionData.patternAnswer, submitted]);
+  }, [allPlaced, onCorrect, onWrong, pickedPattern, placements, questionData.mode, questionData.numbers, questionData.patternAnswer]);
 
   function assign(value: number, index: number, bucket: Bucket) {
-    if (submitted) return;
+    if (submittedRef.current) return;
     setPlacements((current) => ({
       ...current,
       [`${value}-${index}`]: bucket,
