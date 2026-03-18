@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { Lock, Sparkles, ChevronRight, Zap, Clock, Mountain, Compass, Triangle, BarChart3, Dices, BookOpen, Feather, Languages } from "lucide-react";
 import { getAllLegends } from "@/data/legends";
 import { readProgress, type StudentProgress } from "@/data/progress";
+import RealmCard from "@/components/legends/RealmCard";
 
-type RealmDef = {
+export type RealmDef = {
   id: string;
   name: string;
   legendLine: string;
@@ -14,9 +15,8 @@ type RealmDef = {
   totalLegends: number;
   status: "open" | "coming-soon" | "locked";
   route?: string;
-  gradient: string;
-  borderColor: string;
-  iconBg: string;
+  glowColor: string;
+  borderGlow: string;
 };
 
 const REALMS: RealmDef[] = [
@@ -24,177 +24,104 @@ const REALMS: RealmDef[] = [
     id: "number-nexus",
     name: "Number Nexus",
     legendLine: "Numbot Collection",
-    icon: <Zap className="h-6 w-6" />,
+    icon: <Zap className="h-5 w-5" />,
     totalLegends: 7,
     status: "open",
     route: "/legends/number",
-    gradient: "from-teal-500/15 to-emerald-500/10",
-    borderColor: "border-teal-400/40",
-    iconBg: "bg-teal-500/15 text-teal-500",
+    glowColor: "rgba(45, 212, 160, 0.25)",
+    borderGlow: "rgba(45, 212, 160, 0.6)",
   },
   {
     id: "chronorok",
     name: "Chronorok",
     legendLine: "Time Legends",
-    icon: <Clock className="h-6 w-6" />,
+    icon: <Clock className="h-5 w-5" />,
     totalLegends: 7,
     status: "coming-soon",
-    gradient: "from-amber-500/10 to-orange-500/5",
-    borderColor: "border-amber-400/30",
-    iconBg: "bg-amber-500/10 text-amber-500",
+    glowColor: "rgba(245, 180, 50, 0.2)",
+    borderGlow: "rgba(245, 180, 50, 0.5)",
   },
   {
     id: "measurelands",
     name: "Measurelands",
     legendLine: "Measure Titans",
-    icon: <Mountain className="h-6 w-6" />,
+    icon: <Mountain className="h-5 w-5" />,
     totalLegends: 7,
     status: "locked",
-    gradient: "from-slate-500/5 to-slate-500/5",
-    borderColor: "border-border",
-    iconBg: "bg-muted text-muted-foreground",
+    glowColor: "transparent",
+    borderGlow: "rgba(255,255,255,0.15)",
   },
   {
     id: "starpath-realm",
     name: "Starpath Realm",
     legendLine: "Star Navigators",
-    icon: <Compass className="h-6 w-6" />,
+    icon: <Compass className="h-5 w-5" />,
     totalLegends: 7,
     status: "locked",
-    gradient: "from-slate-500/5 to-slate-500/5",
-    borderColor: "border-border",
-    iconBg: "bg-muted text-muted-foreground",
+    glowColor: "transparent",
+    borderGlow: "rgba(255,255,255,0.15)",
   },
   {
     id: "pattern-peaks",
     name: "Pattern Peaks",
     legendLine: "Pattern Weavers",
-    icon: <Triangle className="h-6 w-6" />,
+    icon: <Triangle className="h-5 w-5" />,
     totalLegends: 7,
     status: "locked",
-    gradient: "from-slate-500/5 to-slate-500/5",
-    borderColor: "border-border",
-    iconBg: "bg-muted text-muted-foreground",
+    glowColor: "transparent",
+    borderGlow: "rgba(255,255,255,0.15)",
   },
   {
     id: "statistica",
     name: "Statistica",
     legendLine: "Data Guardians",
-    icon: <BarChart3 className="h-6 w-6" />,
+    icon: <BarChart3 className="h-5 w-5" />,
     totalLegends: 7,
     status: "locked",
-    gradient: "from-slate-500/5 to-slate-500/5",
-    borderColor: "border-border",
-    iconBg: "bg-muted text-muted-foreground",
+    glowColor: "transparent",
+    borderGlow: "rgba(255,255,255,0.15)",
   },
   {
     id: "chance-hollow",
     name: "Chance Hollow",
     legendLine: "Fortune Seekers",
-    icon: <Dices className="h-6 w-6" />,
+    icon: <Dices className="h-5 w-5" />,
     totalLegends: 7,
     status: "locked",
-    gradient: "from-slate-500/5 to-slate-500/5",
-    borderColor: "border-border",
-    iconBg: "bg-muted text-muted-foreground",
+    glowColor: "transparent",
+    borderGlow: "rgba(255,255,255,0.15)",
   },
   {
     id: "reading-ridge",
     name: "Reading Ridge",
     legendLine: "Lore Keepers",
-    icon: <BookOpen className="h-6 w-6" />,
+    icon: <BookOpen className="h-5 w-5" />,
     totalLegends: 7,
     status: "locked",
-    gradient: "from-slate-500/5 to-slate-500/5",
-    borderColor: "border-border",
-    iconBg: "bg-muted text-muted-foreground",
+    glowColor: "transparent",
+    borderGlow: "rgba(255,255,255,0.15)",
   },
   {
     id: "inkwell-wilds",
     name: "Inkwell Wilds",
     legendLine: "Script Spirits",
-    icon: <Feather className="h-6 w-6" />,
+    icon: <Feather className="h-5 w-5" />,
     totalLegends: 7,
     status: "locked",
-    gradient: "from-slate-500/5 to-slate-500/5",
-    borderColor: "border-border",
-    iconBg: "bg-muted text-muted-foreground",
+    glowColor: "transparent",
+    borderGlow: "rgba(255,255,255,0.15)",
   },
   {
     id: "runehaven-peaks",
     name: "Runehaven Peaks",
     legendLine: "Rune Masters",
-    icon: <Languages className="h-6 w-6" />,
+    icon: <Languages className="h-5 w-5" />,
     totalLegends: 7,
     status: "locked",
-    gradient: "from-slate-500/5 to-slate-500/5",
-    borderColor: "border-border",
-    iconBg: "bg-muted text-muted-foreground",
+    glowColor: "transparent",
+    borderGlow: "rgba(255,255,255,0.15)",
   },
 ];
-
-function RealmCard({ realm, collected, onClick }: { realm: RealmDef; collected: number; onClick?: () => void }) {
-  const isOpen = realm.status === "open";
-  const isComingSoon = realm.status === "coming-soon";
-  const isLocked = realm.status === "locked";
-
-  return (
-    <button
-      onClick={isOpen ? onClick : undefined}
-      disabled={!isOpen}
-      className={`relative w-full rounded-2xl border-2 text-left p-5 transition-all duration-300 overflow-hidden group ${
-        isOpen
-          ? `bg-gradient-to-br ${realm.gradient} ${realm.borderColor} hover:-translate-y-1 hover:shadow-lg hover:shadow-teal-500/10 cursor-pointer`
-          : isComingSoon
-          ? `bg-gradient-to-br ${realm.gradient} ${realm.borderColor} opacity-80 cursor-default`
-          : "bg-card border-border opacity-50 cursor-default"
-      }`}
-    >
-      {/* Shine on hover for open realms */}
-      {isOpen && (
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-[200%] transition-transform duration-1000" />
-        </div>
-      )}
-
-      <div className="flex items-start gap-4">
-        <div className={`h-12 w-12 rounded-xl flex items-center justify-center flex-shrink-0 ${realm.iconBg}`}>
-          {isLocked ? <Lock className="h-5 w-5" /> : realm.icon}
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <h3 className={`font-extrabold text-lg leading-tight ${isLocked ? "text-muted-foreground" : "text-foreground"}`}>
-            {realm.name}
-          </h3>
-          <p className={`text-sm mt-0.5 ${isLocked ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
-            {isLocked ? "Future Realm" : isComingSoon ? `Coming Soon: ${realm.legendLine}` : `${realm.legendLine}`}
-          </p>
-
-          <div className="mt-3">
-            {isOpen && (
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-bold text-primary">
-                  {collected} / {realm.totalLegends} collected
-                </span>
-                <ChevronRight className="h-4 w-4 text-primary group-hover:translate-x-1 transition-transform" />
-              </div>
-            )}
-            {isComingSoon && (
-              <span className="inline-flex items-center gap-1.5 text-xs font-extrabold px-3 py-1 rounded-full bg-amber-500/15 text-amber-600">
-                <Sparkles className="h-3 w-3" /> Coming Soon
-              </span>
-            )}
-            {isLocked && (
-              <span className="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground/60">
-                <Lock className="h-3 w-3" /> Unlock in future updates
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-    </button>
-  );
-}
 
 export default function LegendsPage() {
   const router = useRouter();
@@ -211,90 +138,125 @@ export default function LegendsPage() {
     return all.filter((l) => unlockedIds.includes(l.id)).length;
   }, [unlockedIds]);
 
-  const totalCollected = numbotCollected; // Only numbots for now
+  const totalCollected = numbotCollected;
   const totalLegends = REALMS.reduce((sum, r) => sum + r.totalLegends, 0);
+  const pct = totalLegends > 0 ? Math.round((totalCollected / totalLegends) * 100) : 0;
 
   return (
-    <main className="min-h-screen bg-background">
-      {/* Hero header */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-accent/5 to-card">
-        <div className="absolute inset-0 pointer-events-none">
-          {["⭐", "🏆", "✨", "🎖️", "💎", "🌟"].map((emoji, i) => (
-            <span
-              key={i}
-              className="absolute text-2xl opacity-10"
-              style={{
-                top: `${12 + i * 14}%`,
-                left: `${8 + i * 16}%`,
-                transform: `rotate(${i * 25 - 50}deg)`,
-              }}
-            >
-              {emoji}
-            </span>
-          ))}
-        </div>
+    <main className="relative min-h-screen overflow-hidden">
+      {/* Full-screen fantasy background */}
+      <img
+        src="/images/legends-bg.jpg"
+        alt=""
+        className="absolute inset-0 w-full h-full object-cover object-[center_35%]"
+      />
+      {/* Overlay for readability */}
+      <div className="absolute inset-0 bg-black/20" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50" />
 
-        <div className="relative max-w-3xl mx-auto px-6 pt-6 pb-10">
-          <div className="flex items-center justify-between mb-8">
+      {/* Content */}
+      <div className="relative z-10 min-h-screen flex flex-col">
+        {/* Header */}
+        <div className="max-w-4xl mx-auto w-full px-5 pt-5 pb-2">
+          <div className="flex items-center justify-between mb-6">
             <button
               onClick={() => router.push("/home")}
-              className="text-sm font-bold text-primary hover:text-primary/80 transition flex items-center gap-1"
+              className="text-sm font-bold text-amber-200 hover:text-white transition flex items-center gap-1"
+              style={{ textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}
             >
               ← Home
             </button>
-            <div className="text-sm font-bold text-muted-foreground bg-card px-4 py-1.5 rounded-full border border-border shadow-sm">
+            <div
+              className="text-sm font-bold px-4 py-1.5 rounded-full border shadow-sm"
+              style={{
+                background: "rgba(255,255,255,0.15)",
+                backdropFilter: "blur(8px)",
+                WebkitBackdropFilter: "blur(8px)",
+                borderColor: "rgba(255,255,255,0.25)",
+                color: "rgba(255,255,255,0.9)",
+                textShadow: "0 1px 3px rgba(0,0,0,0.3)",
+              }}
+            >
               My Legends
             </div>
           </div>
 
-          <h1 className="text-4xl md:text-5xl font-black text-foreground tracking-tight">
+          <h1
+            className="text-4xl md:text-5xl font-black text-white tracking-tight text-center"
+            style={{
+              fontFamily: "'Quicksand', 'Nunito', sans-serif",
+              textShadow: "0 2px 16px rgba(0,0,0,0.5), 0 0 40px rgba(245,180,50,0.3)",
+            }}
+          >
             Level Up Legends
           </h1>
-          <p className="text-muted-foreground mt-2 text-lg max-w-lg">
+          <p
+            className="text-center mt-1.5 text-base max-w-md mx-auto"
+            style={{ color: "rgba(255,255,255,0.75)", textShadow: "0 1px 6px rgba(0,0,0,0.4)" }}
+          >
             Unlock powerful legends across the realms of knowledge.
           </p>
 
-          {/* Overall progress */}
-          <div className="mt-6 max-w-sm">
+          {/* Progress bar */}
+          <div className="mt-5 max-w-sm mx-auto">
             <div className="flex items-center justify-between text-sm mb-1.5">
-              <span className="font-bold text-foreground">{totalCollected} / {totalLegends} total legends</span>
-              <span className="font-bold text-accent">{Math.round((totalCollected / totalLegends) * 100)}%</span>
+              <span className="font-bold text-white" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}>
+                {totalCollected} / {totalLegends} total legends
+              </span>
+              <span className="font-bold text-amber-300" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}>
+                {pct}%
+              </span>
             </div>
-            <div className="h-3 rounded-full bg-card border border-border overflow-hidden shadow-inner">
+            <div
+              className="h-3 rounded-full overflow-hidden shadow-inner"
+              style={{
+                background: "rgba(255,255,255,0.15)",
+                border: "1px solid rgba(255,255,255,0.2)",
+              }}
+            >
               <div
-                className="h-full rounded-full bg-gradient-to-r from-primary via-primary to-accent transition-all duration-700"
-                style={{ width: `${(totalCollected / totalLegends) * 100}%` }}
+                className="h-full rounded-full transition-all duration-700"
+                style={{
+                  width: `${pct}%`,
+                  background: "linear-gradient(90deg, hsl(145, 65%, 42%), hsl(42, 95%, 55%))",
+                  boxShadow: "0 0 8px rgba(45,212,160,0.4)",
+                }}
               />
             </div>
           </div>
         </div>
 
-        {/* Wave divider */}
-        <svg className="absolute bottom-0 w-full" viewBox="0 0 1440 40" fill="none" preserveAspectRatio="none" style={{ height: 40 }}>
-          <path d="M0 40V20C240 0 480 0 720 20C960 40 1200 40 1440 20V40H0Z" fill="hsl(var(--background))" />
-        </svg>
-      </div>
+        {/* Realm Grid */}
+        <div className="max-w-4xl mx-auto w-full px-5 py-6 flex-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {REALMS.map((realm) => (
+              <RealmCard
+                key={realm.id}
+                realm={realm}
+                collected={realm.id === "number-nexus" ? numbotCollected : 0}
+                onClick={realm.route ? () => router.push(realm.route!) : undefined}
+              />
+            ))}
+          </div>
 
-      {/* Realm Grid */}
-      <div className="max-w-3xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {REALMS.map((realm) => (
-            <RealmCard
-              key={realm.id}
-              realm={realm}
-              collected={realm.id === "number-nexus" ? numbotCollected : 0}
-              onClick={realm.route ? () => router.push(realm.route!) : undefined}
-            />
-          ))}
-        </div>
-
-        {/* Tip */}
-        <div className="mt-10 rounded-2xl border-2 border-accent/20 bg-accent/5 p-5 flex items-start gap-3">
-          <span className="text-2xl flex-shrink-0">💡</span>
-          <div>
-            <div className="font-bold text-foreground mb-0.5">How to unlock Legends</div>
-            <div className="text-sm text-muted-foreground">
-              Complete lessons in each realm to collect powerful legends. Pass the pre-test or finish the full 12-week program to unlock a Legend!
+          {/* Tip */}
+          <div
+            className="mt-8 rounded-2xl p-5 flex items-start gap-3"
+            style={{
+              background: "rgba(255,255,255,0.12)",
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+              border: "1px solid rgba(255,255,255,0.2)",
+            }}
+          >
+            <span className="text-2xl flex-shrink-0">💡</span>
+            <div>
+              <div className="font-bold text-white mb-0.5" style={{ textShadow: "0 1px 3px rgba(0,0,0,0.3)" }}>
+                How to unlock Legends
+              </div>
+              <div className="text-sm" style={{ color: "rgba(255,255,255,0.7)" }}>
+                Complete lessons in each realm to collect powerful legends. Pass the pre-test or finish the full 12-week program to unlock a Legend!
+              </div>
             </div>
           </div>
         </div>
