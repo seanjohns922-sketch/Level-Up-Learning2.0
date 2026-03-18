@@ -156,16 +156,14 @@ export default function PlaceValueBuilder({
       </div>
 
       {questionData.mode === "identify_number" ? (
-        <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">
-          <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
-            Work it out
-          </div>
-          <div className="mt-2 text-lg font-bold text-teal-900">
+        <div className="mt-3 rounded-xl border border-teal-100 bg-teal-50 p-3">
+          <div className="text-xs font-bold uppercase tracking-wide text-teal-700">Work it out</div>
+          <div className="mt-1 text-sm font-bold text-teal-900">
             Count the hundreds, tens, and ones blocks to find the number.
           </div>
         </div>
       ) : questionData.mode === "missing_mab_part" ? (
-        <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">
+        <div className="mt-3 rounded-xl border border-teal-100 bg-teal-50 p-3">
           <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
             Known blocks
           </div>
