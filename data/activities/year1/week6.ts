@@ -6,7 +6,12 @@ function randInt(min: number, max: number) {
 }
 
 function makeSubtractPair(d: Difficulty): { total: number; remove: number; answer: number } {
-  const maxTotal = d === "easy" ? 12 : d === "medium" ? 16 : 20;
+  if (d === "hard") {
+    const total = randInt(30, 99);
+    const remove = randInt(10, total - 1);
+    return { total, remove, answer: total - remove };
+  }
+  const maxTotal = d === "easy" ? 12 : 16;
   const r = Math.random();
   let total = 10, remove = 5;
 

@@ -60,7 +60,7 @@ function makeMentalAddTask(d: Difficulty) {
   let strategy: "make10" | "double" | "nearDouble" = "make10";
   let a = 0, b = 0;
 
-  const maxA = d === "easy" ? 5 : d === "medium" ? 7 : 9;
+  const maxA = d === "easy" ? 5 : d === "medium" ? 7 : 50;
   const r = Math.random();
 
   if (r < 0.4) {
