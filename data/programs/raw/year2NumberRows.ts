@@ -543,7 +543,7 @@ export const year2NumberRows: ProgramRow[] = [
     curriculum: ["AC9M2N05"],
   },
   {
-    week: 8,
+    week: 9,
     focus: "Multiplication - Groups & Arrays",
     lesson: 1,
     topic: "Model multiplication as equal groups",
@@ -574,7 +574,7 @@ export const year2NumberRows: ProgramRow[] = [
     curriculum: ["AC9M2N05"],
   },
   {
-    week: 8,
+    week: 9,
     focus: "Multiplication - Groups & Arrays",
     lesson: 2,
     topic: "Model multiplication as arrays",
@@ -605,7 +605,7 @@ export const year2NumberRows: ProgramRow[] = [
     curriculum: ["AC9M2N05"],
   },
   {
-    week: 8,
+    week: 9,
     focus: "Multiplication - Groups & Arrays",
     lesson: 3,
     topic: "Link multiplication to repeated addition",
@@ -635,7 +635,7 @@ export const year2NumberRows: ProgramRow[] = [
     curriculum: ["AC9M2N05"],
   },
   {
-    week: 9,
+    week: 8,
     focus: "Multiplication - 2s, 5s, 10s",
     lesson: 1,
     topic: "Recall and skip count by 2s",
@@ -658,7 +658,7 @@ export const year2NumberRows: ProgramRow[] = [
     curriculum: ["AC9M2N03"],
   },
   {
-    week: 9,
+    week: 8,
     focus: "Multiplication - 2s, 5s, 10s",
     lesson: 2,
     topic: "Recall and skip count by 5s",
@@ -681,7 +681,7 @@ export const year2NumberRows: ProgramRow[] = [
     curriculum: ["AC9M2N03"],
   },
   {
-    week: 9,
+    week: 8,
     focus: "Multiplication - 2s, 5s, 10s",
     lesson: 3,
     topic: "Recall and skip count by 10s",
