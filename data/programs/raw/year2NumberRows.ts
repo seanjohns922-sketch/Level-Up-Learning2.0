@@ -557,7 +557,7 @@ export const year2NumberRows: ProgramRow[] = [
         maxItemsPerGroup: 5,
         mode: "equal_groups",
       }),
-      makeActivity("skip_count", 1, {
+      makeActivity("arrays", 1, {
         minRows: 2,
         maxRows: 5,
         minColumns: 2,
