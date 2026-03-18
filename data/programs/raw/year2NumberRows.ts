@@ -309,7 +309,7 @@ export const year2NumberRows: ProgramRow[] = [
         min: 0,
         max: 40,
         count: 6,
-        mode: "pattern",
+        mode: "identify",
       }),
       makeActivity("number_line", 1, {
         min: 0,
