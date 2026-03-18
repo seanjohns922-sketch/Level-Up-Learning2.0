@@ -242,10 +242,10 @@ export default function LoginPage() {
         <img
           src="/images/login-bg.jpg"
           alt=""
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover object-top"
         />
         {/* Dark overlay for readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-black/50" />
+        <div className="absolute inset-0 bg-black/30" />
       </div>
 
       {/* Content */}
@@ -266,8 +266,8 @@ export default function LoginPage() {
         {/* Title area */}
         <div className="text-center mb-6" style={{ animation: "fadeUp 0.6s ease both" }}>
           <h1
-            className="text-5xl md:text-6xl font-black text-white tracking-tight drop-shadow-lg"
-            style={{ fontFamily: "'Nunito', 'Avenir Next', 'Trebuchet MS', sans-serif" }}
+            className="text-5xl md:text-6xl font-black text-white tracking-tight"
+            style={{ fontFamily: "'Nunito', 'Avenir Next', 'Trebuchet MS', sans-serif", textShadow: "0 2px 12px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.4)" }}
           >
             Level Up
             <span className="block">Learning</span>
@@ -281,7 +281,7 @@ export default function LoginPage() {
 
         {/* Frosted glass card */}
         <div
-          className="w-full bg-white/30 backdrop-blur-xl rounded-[28px] shadow-2xl border border-white/40 p-6 md:p-8"
+          className="w-full bg-white/40 backdrop-blur-xl rounded-[28px] shadow-2xl border border-white/40 p-6 md:p-8"
           style={{ animation: "fadeUp 0.7s ease both 0.1s" }}
         >
           {/* Tab toggle */}
