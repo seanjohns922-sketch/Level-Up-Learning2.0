@@ -532,12 +532,12 @@ export const year2NumberRows: ProgramRow[] = [
       "fact_family",
       {
         min: 12,
-        max: 40,
+        max: 100,
         mode: "word_problems",
       },
       genericActivities("fact_family", {
         min: 12,
-        max: 40,
+        max: 100,
         mode: "word_problems",
       })
     ),

@@ -1309,6 +1309,49 @@ function generateInteractiveQuestion(
       };
     }
 
+    if (mode === "word_problems") {
+      const wordTemplates = [
+        {
+          story: `There are ${a} red apples and ${b} green apples on a table. How many apples are there altogether?`,
+          answer: `${a} + ${b} = ${total}`,
+        },
+        {
+          story: `A baker made ${total} cupcakes. ${a} were chocolate. How many were vanilla?`,
+          answer: `${total} - ${a} = ${b}`,
+        },
+        {
+          story: `${b} birds were sitting on a fence. More birds joined them. Now there are ${total} birds. How many birds joined?`,
+          answer: `${total} - ${b} = ${a}`,
+        },
+        {
+          story: `Sam has ${b} toy cars and ${a} toy trucks. How many toys does Sam have in total?`,
+          answer: `${b} + ${a} = ${total}`,
+        },
+        {
+          story: `There were ${total} children in the playground. ${b} went inside. How many are still outside?`,
+          answer: `${total} - ${b} = ${a}`,
+        },
+      ];
+      const chosen = wordTemplates[randInt(0, wordTemplates.length - 1)];
+      const wrongSentences = allCorrect
+        .filter((s) => s !== chosen.answer)
+        .concat([
+          `${total} + ${a} = ${b}`,
+          `${a} - ${b} = ${total}`,
+        ]);
+      const distractorPicks = shuffle(wrongSentences).slice(0, 3);
+      const options = shuffle([chosen.answer, ...distractorPicks]);
+
+      return {
+        kind: "fact_family",
+        prompt: chosen.story,
+        family,
+        options,
+        answers: [chosen.answer],
+        mode,
+      };
+    }
+
     const distractors = shuffle([
       `${total} + ${a} = ${b}`,
       `${a} - ${b} = ${total}`,
