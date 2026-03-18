@@ -133,7 +133,7 @@ export default function PlaceValueBuilder({
         ) : null}
       </div>
 
-      <div className="mt-6 grid gap-4 md:grid-cols-3">
+      <div className="mt-3 grid gap-3 md:grid-cols-3">
         {questionData.placeValues.map((place) => {
           const count = placeCount(questionData, place);
 
