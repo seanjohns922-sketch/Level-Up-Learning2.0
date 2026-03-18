@@ -151,8 +151,7 @@ export default function LegendsPage() {
         className="absolute inset-0 w-full h-full object-cover object-[center_35%]"
       />
       {/* Overlay for readability */}
-      <div className="absolute inset-0 bg-black/20" />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50" />
+      <div className="absolute inset-0 bg-black/25" />
 
       {/* Content */}
       <div className="relative z-10 min-h-screen flex flex-col">
