@@ -59,9 +59,9 @@ export default function SkipCount({
       </div>
 
       <div className="mt-6 grid gap-3">
-        {questionData.options.map((option) => (
+        {questionData.options.map((option, index) => (
           <button
-            key={option}
+            key={`${option}-${index}`}
             type="button"
             onClick={() => choose(option)}
             className={[
