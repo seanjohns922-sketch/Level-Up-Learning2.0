@@ -6,9 +6,17 @@ function randInt(min: number, max: number) {
 }
 
 function makeAddends(d: Difficulty) {
-  const [lo, hi] = diffRange(d, [0, 10], [0, 15], [0, 20]);
-  const maxDots = d === "hard" ? 15 : 10;
+  const [lo, hi] = diffRange(d, [0, 10], [0, 15], [10, 99]);
+  const maxDots = d === "hard" ? 20 : 10;
   const target = randInt(lo, hi);
+  if (d === "hard") {
+    const a = randInt(10, Math.min(target, 99));
+    const b = target - a;
+    if (b >= 10 && b <= 99) return { a, b, maxDots };
+    const safeA = randInt(10, 50);
+    const safeB = randInt(10, 49);
+    return { a: safeA, b: safeB, maxDots };
+  }
   for (let i = 0; i < 20; i += 1) {
     const a = randInt(0, Math.min(target, maxDots));
     const b = target - a;
@@ -19,7 +27,12 @@ function makeAddends(d: Difficulty) {
 }
 
 function makeParts(d: Difficulty): { a: number; b: number; whole: number } {
-  const maxWhole = d === "easy" ? 10 : d === "medium" ? 15 : 20;
+  if (d === "hard") {
+    const a = randInt(10, 50);
+    const b = randInt(10, 49);
+    return { a, b, whole: a + b };
+  }
+  const maxWhole = d === "easy" ? 10 : 15;
   const r = Math.random();
   if (r < 0.2) {
     const a = randInt(1, Math.min(9, maxWhole - 1));
@@ -47,7 +60,7 @@ function makeMentalAddTask(d: Difficulty) {
   let strategy: "make10" | "double" | "nearDouble" = "make10";
   let a = 0, b = 0;
 
-  const maxA = d === "easy" ? 5 : d === "medium" ? 7 : 9;
+  const maxA = d === "easy" ? 5 : d === "medium" ? 7 : 50;
   const r = Math.random();
 
   if (r < 0.4) {
