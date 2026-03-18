@@ -38,17 +38,23 @@ export default function SkipCount({
           Sequence
         </div>
         <div className="mt-2 flex flex-wrap gap-3">
-          {questionData.sequence.map((value) => (
+          {questionData.sequence.map((value, idx) => (
             <div
-              key={value}
-              className="rounded-xl bg-white px-5 py-3 text-3xl font-black text-teal-900 shadow-sm"
+              key={`${value}-${idx}`}
+              className={`rounded-xl px-5 py-3 text-3xl font-black shadow-sm ${
+                value === -1
+                  ? "border-2 border-dashed border-teal-300 bg-teal-50 text-teal-700"
+                  : "bg-white text-teal-900"
+              }`}
             >
-              {value}
+              {value === -1 ? "?" : value}
             </div>
           ))}
-          <div className="rounded-xl border-2 border-dashed border-teal-300 px-5 py-3 text-3xl font-black text-teal-700">
-            ?
-          </div>
+          {!questionData.sequence.includes(-1) && (
+            <div className="rounded-xl border-2 border-dashed border-teal-300 px-5 py-3 text-3xl font-black text-teal-700">
+              ?
+            </div>
+          )}
         </div>
       </div>
 
