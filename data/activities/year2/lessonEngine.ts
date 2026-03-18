@@ -369,7 +369,7 @@ const YEAR2_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
   },
   fact_family: {
     allowedModes: ["recognise", "write_sentences", "word_problems"],
-    maxFactValue: 12,
+    maxFactValue: 25,
   },
   equal_groups: {
     allowedModes: ["equal_groups"],
