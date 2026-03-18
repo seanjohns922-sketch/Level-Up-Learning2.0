@@ -143,7 +143,7 @@ export type FactFamilyQuestion = {
   prompt: string;
   family: [number, number, number];
   options: string[];
-  answer: string;
+  answers: string[];
   mode: "recognise" | "write_sentences" | "word_problems";
 };
 
@@ -369,7 +369,7 @@ const YEAR2_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
   },
   fact_family: {
     allowedModes: ["recognise", "write_sentences", "word_problems"],
-    maxFactValue: 12,
+    maxFactValue: 25,
   },
   equal_groups: {
     allowedModes: ["equal_groups"],
@@ -1268,43 +1268,47 @@ function generateInteractiveQuestion(
       config.mode === "write_sentences" || config.mode === "word_problems"
         ? config.mode
         : "recognise";
-    const aMax = Math.max(3, Math.min(20, Math.floor(configuredMax / 2)));
+    const aMax = Math.max(3, Math.min(50, Math.floor(configuredMax / 2)));
     const aMinBase =
       mode === "recognise"
         ? Math.max(2, Math.floor(configuredMin / 4))
         : Math.max(4, Math.floor(configuredMin / 3));
     const aMin = Math.min(aMax, aMinBase);
     const a = randInt(aMin, aMax);
-    const bMax = Math.max(2, Math.min(20, configuredMax - a));
+    const bMax = Math.max(2, Math.min(50, configuredMax - a));
     const bMin = Math.min(bMax, aMinBase);
     const b = randInt(bMin, bMax);
     const total = a + b;
     const family: [number, number, number] = [a, b, total];
-    const correctSentence =
-      mode === "write_sentences"
-        ? `${total} - ${a} = ${b}`
-        : mode === "word_problems"
-        ? `${a} + ${b} = ${total}`
-        : `${b} + ${a} = ${total}`;
+
+    // All 4 valid fact family sentences
+    const allCorrect = [
+      `${a} + ${b} = ${total}`,
+      `${b} + ${a} = ${total}`,
+      `${total} - ${a} = ${b}`,
+      `${total} - ${b} = ${a}`,
+    ];
+    // Remove duplicates (when a === b)
+    const correctSet = Array.from(new Set(allCorrect));
 
     const distractors = shuffle([
       `${total} + ${a} = ${b}`,
       `${a} - ${b} = ${total}`,
-      `${total} - ${b} = ${a + randInt(1, 2)}`,
-      `${a} + ${b + randInt(1, 2)} = ${total}`,
-    ]);
+      `${total} - ${b} = ${a + randInt(1, 3)}`,
+      `${a} + ${b + randInt(1, 3)} = ${total}`,
+    ]).filter((d) => !correctSet.includes(d));
+
+    // Pick 2 correct + 2 distractors so students must find the right ones
+    const pickedCorrect = shuffle(correctSet).slice(0, 2);
+    const pickedDistractors = distractors.slice(0, 2);
+    const options = shuffle([...pickedCorrect, ...pickedDistractors]);
 
     return {
       kind: "fact_family",
-      prompt:
-        mode === "write_sentences"
-          ? "Choose a correct number sentence from this fact family."
-          : mode === "word_problems"
-          ? "Choose the number sentence that matches this fact family."
-          : "Which sentence belongs to this fact family?",
+      prompt: "Select all sentences that belong to this fact family.",
       family,
-      options: shuffle([correctSentence, ...distractors]).slice(0, 4),
-      answer: correctSentence,
+      options,
+      answers: pickedCorrect,
       mode,
     };
   }
@@ -1421,7 +1425,7 @@ function randomReviewConfig(activityType: ActivityType): GenericConfig {
     case "fact_family":
       return {
         min: 0,
-        max: 20,
+        max: 100,
         mode: (["recognise", "write_sentences", "word_problems"] as const)[
           randInt(0, 2)
         ],
