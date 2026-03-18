@@ -192,7 +192,11 @@ export default function PlaceValueBuilder({
         <input
           type="number"
           value={response}
-          onChange={(event) => setResponse(clamp(Number(event.target.value), 0, 999))}
+          onChange={(event) => {
+            const val = event.target.value;
+            if (val === "") { setResponse(""); return; }
+            setResponse(clamp(Number(val), 0, 999));
+          }}
           placeholder="Type your answer"
           className="w-full max-w-xs rounded-xl border border-gray-300 px-4 py-3 text-lg font-bold text-gray-900 outline-none focus:border-teal-500"
         />
