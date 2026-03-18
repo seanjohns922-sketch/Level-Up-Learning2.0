@@ -231,13 +231,13 @@ export function Year2LessonEngine({
         </div>
       </div>
 
-      <div className="mb-5 grid gap-3 sm:grid-cols-3">
+      <div className="mb-3 grid gap-2 sm:grid-cols-3 shrink-0">
         {summary.map((item) => (
-          <div key={item.label} className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3">
+          <div key={item.label} className="rounded-2xl border border-gray-200 bg-gray-50 px-3 py-2">
             <div className="text-xs font-bold uppercase tracking-wide text-gray-500">
               {item.label}
             </div>
-            <div className="mt-1 text-xl font-black text-gray-900">{item.value}</div>
+            <div className="mt-0.5 text-lg font-black text-gray-900">{item.value}</div>
           </div>
         ))}
       </div>
