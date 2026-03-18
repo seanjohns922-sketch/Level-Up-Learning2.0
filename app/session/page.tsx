@@ -7,11 +7,13 @@ import { ACTIVE_STUDENT_KEY } from "@/data/progress";
 import { supabase } from "@/lib/supabase";
 import { getProgramForYear } from "@/data/programs";
 import {
-  generateQuestionForActivity,
+  buildYear2QuizActivityPool,
+  generateQuestionForLessonActivity,
   type MultipleChoiceQuestion as Year2MultipleChoiceQuestion,
   type PlaceValueBuilderQuestion as Year2PlaceValueBuilderQuestion,
   type PartitionExpandQuestion as Year2PartitionExpandQuestion,
   type TypedResponseQuestion as Year2TypedResponseQuestion,
+  type Year2PolicyViolation,
   type Year2QuestionData,
 } from "@/data/activities/year2/lessonEngine";
 import NumberLineTap from "@/components/NumberLineTap";
@@ -198,25 +200,6 @@ type LessonBreakdown = {
   skill?: string;
 };
 
-function chooseYear2QuizSource(lesson: Lesson): LessonActivity | null {
-  const activities = lesson.activities ?? [];
-
-  return (
-    activities.find(
-      (activity) =>
-        activity.activityType !== "multiple_choice" &&
-        activity.activityType !== "typed_response" &&
-        activity.activityType !== "review_quiz"
-    ) ??
-    activities.find(
-      (activity) =>
-        activity.activityType === "multiple_choice" ||
-        activity.activityType === "typed_response"
-    ) ??
-    null
-  );
-}
-
 function toYear2QuizQuestion(
   question: Year2MultipleChoiceQuestion | Year2TypedResponseQuestion,
   lessonNumber: number,
@@ -276,27 +259,19 @@ function buildAlternativePartition(question: Year2PartitionExpandQuestion) {
 }
 
 function buildYear2QuizSources(lesson: Lesson): LessonActivity[] {
-  const activities = lesson.activities ?? [];
-  const reviewActivity = activities.find((activity) => activity.activityType === "review_quiz");
-  const reviewActivities = Array.isArray(reviewActivity?.config?.reviewActivities)
-    ? (reviewActivity?.config?.reviewActivities as string[])
-    : null;
-
-  if (reviewActivities?.length) {
-    return reviewActivities.map((activityType) => {
-      const existing = activities.find((activity) => activity.activityType === activityType);
-      return (
-        existing ?? {
-          activityType: activityType as LessonActivity["activityType"],
-          weight: 1,
-          config: {},
-        }
-      );
-    });
+  const { activities, violations } = buildYear2QuizActivityPool(lesson, {
+    allowGenericFallback: false,
+  });
+  if (violations.length > 0) {
+    const summary = violations
+      .map((violation: Year2PolicyViolation) => `${violation.reason}: ${violation.message}`)
+      .join(" | ");
+    if (process.env.NODE_ENV !== "production") {
+      throw new Error(`[Year2QuizPolicy] ${lesson.title}: ${summary}`);
+    }
+    console.error(`[Year2QuizPolicy] ${lesson.title}: ${summary}`);
   }
-
-  const source = chooseYear2QuizSource(lesson);
-  return source ? [source] : [];
+  return activities;
 }
 
 function toQuizQuestionFromYear2Data(
@@ -617,7 +592,7 @@ function buildYear2WeeklyQuizQuestions(
 
     for (let i = 0; i < questionsPerLesson; i += 1) {
       const sourceActivity = sourceActivities[i % sourceActivities.length];
-      const question = generateQuestionForActivity(sourceActivity, lesson.title);
+      const question = generateQuestionForLessonActivity(lesson, sourceActivity);
       const quizQuestion = toQuizQuestionFromYear2Data(
         question,
         lessonIndex + 1,

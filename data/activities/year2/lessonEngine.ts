@@ -230,6 +230,179 @@ type GenericConfig = Record<string, unknown> & {
   maxColumns?: number;
   minTotal?: number;
   maxTotal?: number;
+  allowGenericFallback?: boolean;
+};
+
+type ValidationReason = "alignment" | "difficulty" | "visual_missing" | "mode_blocked";
+
+export type Year2PolicyViolation = {
+  reason: ValidationReason;
+  message: string;
+  activityType: ActivityType;
+  lessonWeek: number;
+  lessonTitle: string;
+};
+
+export type Year2PolicyValidation = {
+  valid: boolean;
+  violations: Year2PolicyViolation[];
+};
+
+type Year2DifficultyContract = {
+  weekMin: number;
+  weekMax: number;
+  addSubMax: number;
+  addSubExtensionMax: number;
+  groupsMax: number;
+  itemsMax: number;
+  divisionTotalMax: number;
+  factFamilyMax: number;
+  skipCountMax: number;
+  skipCountExtraSteps: number[];
+  wordProblemMax: number;
+};
+
+type ActivityPolicy = {
+  allowedModes?: string[];
+  requiresVisual?: boolean;
+  maxByContract?: Partial<
+    Record<
+      | "max"
+      | "maxGroups"
+      | "maxItemsPerGroup"
+      | "maxRows"
+      | "maxColumns"
+      | "maxTotal",
+      keyof Omit<
+        Year2DifficultyContract,
+        "weekMin" | "weekMax" | "skipCountExtraSteps"
+      >
+    >
+  >;
+  maxFactValue?: number;
+  maxByWeek?: number;
+  blockedFocusKeywords?: string[];
+};
+
+const YEAR2_DIFFICULTY_CONTRACTS: Year2DifficultyContract[] = [
+  {
+    weekMin: 1,
+    weekMax: 2,
+    addSubMax: 50,
+    addSubExtensionMax: 80,
+    groupsMax: 5,
+    itemsMax: 6,
+    divisionTotalMax: 24,
+    factFamilyMax: 20,
+    skipCountMax: 1000,
+    skipCountExtraSteps: [2, 5, 10],
+    wordProblemMax: 40,
+  },
+  {
+    weekMin: 3,
+    weekMax: 5,
+    addSubMax: 100,
+    addSubExtensionMax: 120,
+    groupsMax: 6,
+    itemsMax: 8,
+    divisionTotalMax: 36,
+    factFamilyMax: 30,
+    skipCountMax: 1000,
+    skipCountExtraSteps: [2, 3, 4, 5, 10],
+    wordProblemMax: 70,
+  },
+  {
+    weekMin: 6,
+    weekMax: 8,
+    addSubMax: 140,
+    addSubExtensionMax: 170,
+    groupsMax: 8,
+    itemsMax: 9,
+    divisionTotalMax: 48,
+    factFamilyMax: 40,
+    skipCountMax: 1000,
+    skipCountExtraSteps: [2, 3, 4, 5, 10],
+    wordProblemMax: 100,
+  },
+  {
+    weekMin: 9,
+    weekMax: 12,
+    addSubMax: 180,
+    addSubExtensionMax: 220,
+    groupsMax: 10,
+    itemsMax: 10,
+    divisionTotalMax: 60,
+    factFamilyMax: 50,
+    skipCountMax: 1000,
+    skipCountExtraSteps: [2, 3, 4, 5, 10],
+    wordProblemMax: 140,
+  },
+];
+
+const YEAR2_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
+  place_value_builder: {
+    allowedModes: ["identify_number", "identify_place", "missing_mab_part"],
+    requiresVisual: true,
+  },
+  number_order: {
+  },
+  partition_expand: {
+    allowedModes: ["partition", "expand", "flexible_partition"],
+  },
+  number_line: {
+    allowedModes: ["placement", "rounding", "estimate"],
+    requiresVisual: true,
+  },
+  odd_even_sort: {
+    allowedModes: ["identify", "pattern", "odd_even_sums"],
+    blockedFocusKeywords: ["addition", "subtraction", "division"],
+  },
+  addition_strategy: {
+    allowedModes: ["jump", "split", "friendly_numbers"],
+    maxByContract: { max: "addSubExtensionMax" },
+    blockedFocusKeywords: ["odd & even", "division"],
+  },
+  subtraction_strategy: {
+    allowedModes: ["jump", "split", "fact_strategy"],
+    maxByContract: { max: "addSubExtensionMax" },
+    blockedFocusKeywords: ["odd & even"],
+  },
+  fact_family: {
+    allowedModes: ["recognise", "write_sentences", "word_problems"],
+    maxFactValue: 12,
+  },
+  equal_groups: {
+    allowedModes: ["equal_groups"],
+    requiresVisual: true,
+    maxByContract: {
+      maxGroups: "groupsMax",
+      maxItemsPerGroup: "itemsMax",
+    },
+  },
+  arrays: {
+    allowedModes: ["arrays", "repeated_addition"],
+    requiresVisual: true,
+    maxByContract: {
+      maxRows: "groupsMax",
+      maxColumns: "itemsMax",
+    },
+  },
+  skip_count: {
+    allowedModes: ["forward"],
+    blockedFocusKeywords: ["division - equal groups"],
+  },
+  division_groups: {
+    allowedModes: ["sharing", "grouping", "inverse_link"],
+    requiresVisual: true,
+    maxByContract: { maxTotal: "divisionTotalMax" },
+  },
+  mixed_word_problem: {
+    allowedModes: ["choose_operation", "two_step_add_sub", "mult_div_problems"],
+    maxByContract: { max: "wordProblemMax" },
+  },
+  review_quiz: {},
+  multiple_choice: {},
+  typed_response: {},
 };
 
 function randInt(min: number, max: number) {
@@ -289,56 +462,323 @@ function supportedPlaces(config: GenericConfig) {
 }
 
 function getYear2DifficultyProfile(week: number) {
-  if (week <= 2) {
-    return {
-      addSubMax: 50,
-      addSubExtensionMax: 80,
-      groupsMax: 5,
-      itemsMax: 6,
-      divisionTotalMax: 24,
-      factFamilyMax: 20,
-      skipCountMax: 100,
-      skipCountExtraSteps: [2, 5, 10],
-      wordProblemMax: 40,
-    };
-  }
-  if (week <= 5) {
-    return {
-      addSubMax: 100,
-      addSubExtensionMax: 120,
-      groupsMax: 6,
-      itemsMax: 8,
-      divisionTotalMax: 36,
-      factFamilyMax: 30,
-      skipCountMax: 120,
-      skipCountExtraSteps: [2, 3, 4, 5, 10],
-      wordProblemMax: 70,
-    };
-  }
-  if (week <= 8) {
-    return {
-      addSubMax: 140,
-      addSubExtensionMax: 170,
-      groupsMax: 8,
-      itemsMax: 9,
-      divisionTotalMax: 48,
-      factFamilyMax: 40,
-      skipCountMax: 150,
-      skipCountExtraSteps: [2, 3, 4, 5, 10],
-      wordProblemMax: 100,
-    };
-  }
+  const contract =
+    YEAR2_DIFFICULTY_CONTRACTS.find(
+      (candidate) => week >= candidate.weekMin && week <= candidate.weekMax
+    ) ?? YEAR2_DIFFICULTY_CONTRACTS[YEAR2_DIFFICULTY_CONTRACTS.length - 1];
+
   return {
-    addSubMax: 180,
-    addSubExtensionMax: 220,
-    groupsMax: 10,
-    itemsMax: 10,
-    divisionTotalMax: 60,
-    factFamilyMax: 50,
-    skipCountMax: 200,
-    skipCountExtraSteps: [2, 3, 4, 5, 10],
-    wordProblemMax: 140,
+    addSubMax: contract.addSubMax,
+    addSubExtensionMax: contract.addSubExtensionMax,
+    groupsMax: contract.groupsMax,
+    itemsMax: contract.itemsMax,
+    divisionTotalMax: contract.divisionTotalMax,
+    factFamilyMax: contract.factFamilyMax,
+    skipCountMax: contract.skipCountMax,
+    skipCountExtraSteps: contract.skipCountExtraSteps,
+    wordProblemMax: contract.wordProblemMax,
   };
+}
+
+function asNumber(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function normalizeFocus(focus: string) {
+  return focus.trim().toLowerCase();
+}
+
+function buildViolation(
+  reason: ValidationReason,
+  lesson: Lesson,
+  activityType: ActivityType,
+  message: string
+): Year2PolicyViolation {
+  return {
+    reason,
+    activityType,
+    lessonWeek: lesson.week,
+    lessonTitle: lesson.title,
+    message,
+  };
+}
+
+function addViolation(
+  list: Year2PolicyViolation[],
+  reason: ValidationReason,
+  lesson: Lesson,
+  activityType: ActivityType,
+  message: string
+) {
+  list.push(buildViolation(reason, lesson, activityType, message));
+}
+
+function validateConfigAgainstPolicy(
+  lesson: Lesson,
+  activity: LessonActivity,
+  policy: ActivityPolicy,
+  profile: ReturnType<typeof getYear2DifficultyProfile>,
+  violations: Year2PolicyViolation[]
+) {
+  const config = (activity.config ?? {}) as GenericConfig;
+  const mode = typeof config.mode === "string" ? config.mode : undefined;
+
+  if (policy.allowedModes && mode && !policy.allowedModes.includes(mode)) {
+    addViolation(
+      violations,
+      "mode_blocked",
+      lesson,
+      activity.activityType,
+      `Mode "${mode}" is not allowed for ${activity.activityType}.`
+    );
+  }
+
+  if (policy.requiresVisual && activity.activityType === "place_value_builder") {
+    const visualMode = typeof config.visualMode === "string" ? config.visualMode : "mab";
+    if (visualMode !== "mab") {
+      addViolation(
+        violations,
+        "visual_missing",
+        lesson,
+        activity.activityType,
+        "Place value builder requires MAB visual mode."
+      );
+    }
+  }
+
+  if (policy.maxByContract) {
+    for (const [configField, contractField] of Object.entries(policy.maxByContract)) {
+      const configured = asNumber(config[configField as keyof GenericConfig]);
+      if (configured !== null && configured > profile[contractField]) {
+        addViolation(
+          violations,
+          "difficulty",
+          lesson,
+          activity.activityType,
+          `Config "${configField}" exceeds allowed ${profile[contractField]} for week ${lesson.week}.`
+        );
+      }
+    }
+  }
+
+  if (activity.activityType === "skip_count") {
+    const step = asNumber(config.step);
+    if (step !== null && !profile.skipCountExtraSteps.includes(step)) {
+      addViolation(
+        violations,
+        "difficulty",
+        lesson,
+        activity.activityType,
+        `Skip count step ${step} is outside allowed steps for week ${lesson.week}.`
+      );
+    }
+  }
+
+  if (activity.activityType === "mixed_word_problem" && Array.isArray(config.operations)) {
+    const operations = config.operations.filter((value): value is string => typeof value === "string");
+    const mode = typeof config.mode === "string" ? config.mode : "choose_operation";
+    if (mode === "mult_div_problems" && operations.some((operation) => operation === "+" || operation === "-")) {
+      addViolation(
+        violations,
+        "alignment",
+        lesson,
+        activity.activityType,
+        "mult_div_problems mode must not include + or - operations."
+      );
+    }
+    if (mode === "two_step_add_sub" && operations.some((operation) => operation === "x" || operation === "/")) {
+      addViolation(
+        violations,
+        "alignment",
+        lesson,
+        activity.activityType,
+        "two_step_add_sub mode must not include x or / operations."
+      );
+    }
+  }
+
+  if (activity.activityType === "fact_family" && policy.maxFactValue) {
+    const configuredMax = asNumber(config.max);
+    if (configuredMax !== null && configuredMax > policy.maxFactValue * 4) {
+      addViolation(
+        violations,
+        "difficulty",
+        lesson,
+        activity.activityType,
+        `Fact family max is too high for Year 2 expectations.`
+      );
+    }
+  }
+}
+
+function validateQuestionAgainstPolicy(
+  lesson: Lesson,
+  activity: LessonActivity,
+  policy: ActivityPolicy,
+  question: Year2QuestionData,
+  profile: ReturnType<typeof getYear2DifficultyProfile>,
+  violations: Year2PolicyViolation[]
+) {
+  if (question.kind !== activity.activityType && activity.activityType !== "review_quiz") {
+    addViolation(
+      violations,
+      "alignment",
+      lesson,
+      activity.activityType,
+      `Generated question kind "${question.kind}" does not match activity type "${activity.activityType}".`
+    );
+  }
+
+  if (policy.allowedModes && "mode" in question && typeof question.mode === "string") {
+    if (!policy.allowedModes.includes(question.mode)) {
+      addViolation(
+        violations,
+        "mode_blocked",
+        lesson,
+        activity.activityType,
+        `Question mode "${question.mode}" is not allowed for ${activity.activityType}.`
+      );
+    }
+  }
+
+  if (policy.requiresVisual && question.kind === "place_value_builder" && question.visualMode !== "mab") {
+    addViolation(
+      violations,
+      "visual_missing",
+      lesson,
+      activity.activityType,
+      "Generated place value question is missing required MAB visual mode."
+    );
+  }
+
+  if (question.kind === "addition_strategy" && question.answer > profile.addSubExtensionMax) {
+    addViolation(
+      violations,
+      "difficulty",
+      lesson,
+      activity.activityType,
+      `Addition result ${question.answer} exceeds week difficulty contract.`
+    );
+  }
+
+  if (question.kind === "subtraction_strategy" && question.total > profile.addSubExtensionMax) {
+    addViolation(
+      violations,
+      "difficulty",
+      lesson,
+      activity.activityType,
+      `Subtraction total ${question.total} exceeds week difficulty contract.`
+    );
+  }
+
+  if (question.kind === "division_groups" && question.total > profile.divisionTotalMax) {
+    addViolation(
+      violations,
+      "difficulty",
+      lesson,
+      activity.activityType,
+      `Division total ${question.total} exceeds week difficulty contract.`
+    );
+  }
+
+  if (question.kind === "fact_family" && Math.max(...question.family) > profile.factFamilyMax) {
+    addViolation(
+      violations,
+      "difficulty",
+      lesson,
+      activity.activityType,
+      `Fact family values exceed week difficulty contract.`
+    );
+  }
+
+  if (question.kind === "skip_count" && !profile.skipCountExtraSteps.includes(question.step)) {
+    addViolation(
+      violations,
+      "difficulty",
+      lesson,
+      activity.activityType,
+      `Skip count step ${question.step} is outside allowed steps for week ${lesson.week}.`
+    );
+  }
+}
+
+export function validateLessonActivityIntent(
+  lesson: Lesson,
+  activity: LessonActivity,
+  question?: Year2QuestionData
+): Year2PolicyValidation {
+  const profile = getYear2DifficultyProfile(lesson.week);
+  const policy = YEAR2_ACTIVITY_POLICY[activity.activityType];
+  const violations: Year2PolicyViolation[] = [];
+  const focus = normalizeFocus(lesson.focus);
+
+  if (!policy) {
+    addViolation(
+      violations,
+      "alignment",
+      lesson,
+      activity.activityType,
+      `No activity policy is defined for ${activity.activityType}.`
+    );
+    return { valid: false, violations };
+  }
+
+  validateConfigAgainstPolicy(lesson, activity, policy, profile, violations);
+
+  if (focus.includes("odd & even") && (activity.activityType === "addition_strategy" || activity.activityType === "subtraction_strategy")) {
+    addViolation(
+      violations,
+      "alignment",
+      lesson,
+      activity.activityType,
+      "Odd & even lessons must not include standalone addition/subtraction strategy activities."
+    );
+  }
+
+  if (focus.includes("division - equal groups") && activity.activityType === "skip_count") {
+    addViolation(
+      violations,
+      "alignment",
+      lesson,
+      activity.activityType,
+      "Division lessons must not include skip count as an instructional activity."
+    );
+  }
+
+  if (policy.blockedFocusKeywords && policy.blockedFocusKeywords.some((keyword) => focus.includes(keyword))) {
+    addViolation(
+      violations,
+      "alignment",
+      lesson,
+      activity.activityType,
+      `${activity.activityType} is blocked for focus "${lesson.focus}".`
+    );
+  }
+
+  if (question) {
+    validateQuestionAgainstPolicy(lesson, activity, policy, question, profile, violations);
+  }
+
+  return {
+    valid: violations.length === 0,
+    violations,
+  };
+}
+
+function assertPolicyValidation(
+  validation: Year2PolicyValidation,
+  context: string
+) {
+  if (validation.valid) return;
+  const summary = validation.violations
+    .map((violation) => `${violation.reason}: ${violation.message}`)
+    .join(" | ");
+
+  if (process.env.NODE_ENV !== "production") {
+    throw new Error(`[Year2Policy:${context}] ${summary}`);
+  }
+
+  console.error(`[Year2Policy:${context}] ${summary}`);
 }
 
 function generateInteractiveQuestion(
@@ -1435,12 +1875,81 @@ function generateGenericQuestion(
       };
 }
 
+export function buildYear2QuizActivityPool(
+  lesson: Lesson,
+  options?: {
+    allowGenericFallback?: boolean;
+  }
+): {
+  activities: LessonActivity[];
+  violations: Year2PolicyViolation[];
+} {
+  const allowGenericFallback = options?.allowGenericFallback === true;
+  const activities = lesson.activities ?? [];
+  const pool: LessonActivity[] = [];
+  const violations: Year2PolicyViolation[] = [];
+  const instructional = activities.filter(
+    (activity) =>
+      activity.activityType !== "multiple_choice" &&
+      activity.activityType !== "typed_response" &&
+      activity.activityType !== "review_quiz"
+  );
+
+  if (instructional.length > 0) {
+    for (const activity of instructional) {
+      const validation = validateLessonActivityIntent(lesson, activity);
+      if (validation.valid) {
+        pool.push(activity);
+      } else {
+        violations.push(...validation.violations);
+      }
+    }
+  }
+
+  const reviewActivity = activities.find((activity) => activity.activityType === "review_quiz");
+  const reviewTypes =
+    ((reviewActivity?.config ?? {}) as GenericConfig).reviewActivities?.filter(
+      (value): value is ActivityType => value !== "review_quiz"
+    ) ?? [];
+
+  for (const type of reviewTypes) {
+    const existing = activities.find((activity) => activity.activityType === type);
+    const candidate: LessonActivity =
+      existing ??
+      ({
+        activityType: type,
+        weight: 1,
+        config: randomReviewConfig(type),
+      } as LessonActivity);
+    const validation = validateLessonActivityIntent(lesson, candidate);
+    if (validation.valid) {
+      pool.push(candidate);
+    } else {
+      violations.push(...validation.violations);
+    }
+  }
+
+  if (pool.length === 0 && allowGenericFallback) {
+    const generic = activities.filter(
+      (activity) =>
+        activity.activityType === "multiple_choice" ||
+        activity.activityType === "typed_response"
+    );
+    pool.push(...generic);
+  }
+
+  return { activities: pool, violations };
+}
+
 export function generateYear2Question(
   lesson: Lesson,
   activity: LessonActivity
 ): Year2QuestionData {
   const config = (activity.config ?? {}) as GenericConfig;
+  const preValidation = validateLessonActivityIntent(lesson, activity);
+  assertPolicyValidation(preValidation, "pre_generate");
 
+  let question: Year2QuestionData;
   if (
     activity.activityType === "place_value_builder" ||
     activity.activityType === "number_order" ||
@@ -1456,23 +1965,19 @@ export function generateYear2Question(
     activity.activityType === "odd_even_sort" ||
     activity.activityType === "skip_count"
   ) {
-    return generateInteractiveQuestion(activity.activityType, config, lesson.week) as Year2QuestionData;
-  }
-
-  if (
+    question = generateInteractiveQuestion(activity.activityType, config, lesson.week) as Year2QuestionData;
+  } else if (
     activity.activityType === "multiple_choice" ||
     activity.activityType === "typed_response"
   ) {
     const sourceActivityType = config.sourceActivityType ?? "place_value_builder";
-    return generateGenericQuestion(
+    question = generateGenericQuestion(
       activity.activityType,
       sourceActivityType,
       config,
       lesson
     );
-  }
-
-  if (activity.activityType === "review_quiz") {
+  } else if (activity.activityType === "review_quiz") {
     const reviewActivities =
       config.reviewActivities?.filter(
         (value): value is ActivityType => value !== "review_quiz"
@@ -1492,37 +1997,60 @@ export function generateYear2Question(
       config.mode === "team_challenges" || config.mode === "final_quiz"
         ? config.mode
         : "revision_stations";
-    const question = generateQuestionForActivity(
+    const questionForReview = generateQuestionForLessonActivity(
+      lesson,
       {
         activityType: selectedType,
         weight: 1,
         config: randomReviewConfig(selectedType),
-      },
-      lesson.title
+      }
     ) as ReviewQuizInnerQuestion;
 
-    return {
+    question = {
       kind: "review_quiz",
       prompt: "Review challenge",
       activityType: selectedType,
-      question,
+      question: questionForReview,
       mode,
+    };
+  } else if (config.allowGenericFallback === true) {
+    question = generateGenericQuestion(
+      "multiple_choice",
+      activity.activityType,
+      config,
+      lesson
+    );
+  } else {
+    const unknownValidation: Year2PolicyValidation = {
+      valid: false,
+      violations: [
+        buildViolation(
+          "alignment",
+          lesson,
+          activity.activityType,
+          `No generation path exists for activity type "${activity.activityType}".`
+        ),
+      ],
+    };
+    assertPolicyValidation(unknownValidation, "missing_generator");
+    question = {
+      kind: "typed_response",
+      prompt: "This activity configuration is invalid.",
+      answer: "0",
+      placeholder: "Policy blocked",
     };
   }
 
-  return generateGenericQuestion(
-    "multiple_choice",
-    activity.activityType,
-    config,
-    lesson
-  );
+  const postValidation = validateLessonActivityIntent(lesson, activity, question);
+  assertPolicyValidation(postValidation, "post_generate");
+  return question;
 }
 
 export function generateQuestionForActivity(
   activity: LessonActivity,
   lessonTitle: string
 ): Year2QuestionData {
-  return generateYear2Question(
+  return generateQuestionForLessonActivity(
     {
       id: "year2-fallback",
       week: 0,
@@ -1535,6 +2063,13 @@ export function generateQuestionForActivity(
     },
     activity
   );
+}
+
+export function generateQuestionForLessonActivity(
+  lesson: Lesson,
+  activity: LessonActivity
+): Year2QuestionData {
+  return generateYear2Question(lesson, activity);
 }
 
 export const generateYear2QuestionFromActivity = generateQuestionForActivity;

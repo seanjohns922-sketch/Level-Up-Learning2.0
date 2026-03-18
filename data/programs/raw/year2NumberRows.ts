@@ -339,10 +339,11 @@ export const year2NumberRows: ProgramRow[] = [
         count: 6,
         mode: "odd_even_sums",
       }),
-      makeActivity("addition_strategy", 1, {
+      makeActivity("number_line", 1, {
         min: 0,
         max: 50,
-        mode: "jump",
+        step: 2,
+        mode: "placement",
       }),
       makeActivity("multiple_choice", 1, {
         min: 0,
@@ -557,10 +558,11 @@ export const year2NumberRows: ProgramRow[] = [
         mode: "equal_groups",
       }),
       makeActivity("skip_count", 1, {
-        min: 0,
-        max: 100,
-        step: 2,
-        mode: "forward",
+        minRows: 2,
+        maxRows: 5,
+        minColumns: 2,
+        maxColumns: 6,
+        mode: "arrays",
       }),
       makeActivity("multiple_choice", 1, {
         minGroups: 2,
@@ -587,11 +589,12 @@ export const year2NumberRows: ProgramRow[] = [
         maxColumns: 5,
         mode: "arrays",
       }),
-      makeActivity("skip_count", 1, {
-        min: 0,
-        max: 100,
-        step: 2,
-        mode: "forward",
+      makeActivity("arrays", 1, {
+        minRows: 2,
+        maxRows: 4,
+        minColumns: 2,
+        maxColumns: 6,
+        mode: "arrays",
       }),
       makeActivity("multiple_choice", 1, {
         minRows: 2,
@@ -743,11 +746,12 @@ export const year2NumberRows: ProgramRow[] = [
         maxTotal: 24,
         mode: "grouping",
       }),
-      makeActivity("skip_count", 1, {
-        min: 0,
-        max: 100,
-        step: 2,
-        mode: "forward",
+      makeActivity("arrays", 1, {
+        minRows: 2,
+        maxRows: 4,
+        minColumns: 2,
+        maxColumns: 6,
+        mode: "arrays",
       }),
       makeActivity("typed_response", 1, {
         minTotal: 6,
