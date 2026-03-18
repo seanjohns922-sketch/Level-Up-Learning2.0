@@ -82,8 +82,8 @@ function LessonPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background flex items-center justify-center px-6 py-10">
-      <div className="w-full max-w-5xl">
+    <main className="h-screen bg-background flex flex-col items-center justify-start px-4 py-3 overflow-hidden">
+      <div className="w-full max-w-5xl flex flex-col flex-1 min-h-0">
         <div className="mb-4">
           <button
             onClick={() =>
