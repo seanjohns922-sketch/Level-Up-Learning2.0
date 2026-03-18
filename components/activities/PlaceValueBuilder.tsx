@@ -4,10 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import type { PlaceValueBuilderQuestion, PlaceValueName } from "@/data/activities/year2/lessonEngine";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 
-function clamp(n: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, n));
-}
-
 function placeLabel(place: PlaceValueName) {
   if (place === "hundreds") return "Hundreds";
   if (place === "tens") return "Tens";
@@ -43,11 +39,11 @@ function MABVisual({
 
   if (place === "hundreds") {
     return (
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-1.5">
         {Array.from({ length: count }).map((_, index) => (
           <div
             key={index}
-            className="h-12 w-12 rounded-xl border border-teal-300 bg-teal-100 shadow-sm"
+            className="h-10 w-10 rounded-lg border border-teal-300 bg-teal-100 shadow-sm"
           />
         ))}
       </div>
@@ -60,7 +56,7 @@ function MABVisual({
         {Array.from({ length: count }).map((_, index) => (
           <div
             key={index}
-            className="h-4 w-20 rounded-full border border-cyan-300 bg-cyan-100 shadow-sm"
+            className="h-3 w-16 rounded-full border border-cyan-300 bg-cyan-100 shadow-sm"
           />
         ))}
       </div>
@@ -72,7 +68,7 @@ function MABVisual({
       {Array.from({ length: count }).map((_, index) => (
         <div
           key={index}
-          className="h-5 w-5 rounded-md border border-emerald-300 bg-emerald-100 shadow-sm"
+          className="h-4 w-4 rounded-sm border border-emerald-300 bg-emerald-100 shadow-sm"
         />
       ))}
     </div>
@@ -88,7 +84,7 @@ export default function PlaceValueBuilder({
   onCorrect?: () => void;
   onWrong?: () => void;
 }) {
-  const [response, setResponse] = useState<number | string>("");
+  const [response, setResponse] = useState("");
 
   useEffect(() => {
     setResponse("");
@@ -110,12 +106,19 @@ export default function PlaceValueBuilder({
       : `Missing ${placeLabel(questionData.place ?? "ones").toLowerCase()} value`;
 
   function check() {
-    if (Number(response) === questionData.answer) onCorrect?.();
+    const cleaned = response.trim();
+    if (cleaned === "") return;
+    const numericResponse = Number(cleaned);
+    if (!Number.isFinite(numericResponse)) {
+      onWrong?.();
+      return;
+    }
+    if (numericResponse === questionData.answer) onCorrect?.();
     else onWrong?.();
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+    <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
       <div>
         <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">
           Place Value Builder
@@ -124,25 +127,25 @@ export default function PlaceValueBuilder({
           <h2 className="text-2xl font-black text-gray-900">{questionData.prompt}</h2>
           <ReadAloudBtn text={questionData.prompt} />
         </div>
-        <p className="mt-2 text-sm text-gray-600">{answerLabel}</p>
+        <p className="mt-1.5 text-sm text-gray-600">{answerLabel}</p>
         {questionData.mode === "missing_mab_part" ? (
-          <div className="mt-4 inline-flex items-center gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-900">
+          <div className="mt-3 inline-flex items-center gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-bold text-amber-900">
             Target number:
             <span className="text-2xl font-black">{questionData.targetNumber}</span>
           </div>
         ) : null}
       </div>
 
-      <div className="mt-3 grid gap-3 md:grid-cols-3">
+      <div className="mt-4 grid gap-3 md:grid-cols-3">
         {questionData.placeValues.map((place) => {
           const count = placeCount(questionData, place);
 
           return (
-            <div key={place} className="rounded-xl border border-gray-200 bg-gray-50 p-3">
+            <div key={place} className="rounded-2xl border border-gray-200 bg-gray-50 p-3">
               <div className="text-xs font-bold uppercase tracking-wide text-gray-500">
                 {placeLabel(place)}
               </div>
-              <div className="mt-2">
+              <div className="mt-3">
                 <MABVisual place={place} count={count} />
               </div>
               <div className="mt-2 text-sm text-gray-600">
@@ -156,18 +159,20 @@ export default function PlaceValueBuilder({
       </div>
 
       {questionData.mode === "identify_number" ? (
-        <div className="mt-3 rounded-xl border border-teal-100 bg-teal-50 p-3">
-          <div className="text-xs font-bold uppercase tracking-wide text-teal-700">Work it out</div>
-          <div className="mt-1 text-sm font-bold text-teal-900">
+        <div className="mt-4 rounded-2xl border border-teal-100 bg-teal-50 p-3">
+          <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
+            Work it out
+          </div>
+          <div className="mt-1.5 text-base font-bold text-teal-900">
             Count the hundreds, tens, and ones blocks to find the number.
           </div>
         </div>
       ) : questionData.mode === "missing_mab_part" ? (
-        <div className="mt-3 rounded-xl border border-teal-100 bg-teal-50 p-3">
+        <div className="mt-4 rounded-2xl border border-teal-100 bg-teal-50 p-3">
           <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
             Known blocks
           </div>
-          <div className="mt-2 text-3xl font-black text-teal-900">
+          <div className="mt-1.5 text-2xl font-black text-teal-900">
             {(questionData.hundreds ?? 0)} hundreds + {(questionData.tens ?? 0)} tens + {(questionData.ones ?? 0)} ones ={" "}
             {visibleTotal}
           </div>
@@ -176,21 +181,22 @@ export default function PlaceValueBuilder({
           </div>
         </div>
       ) : (
-        <div className="mt-3 rounded-xl border border-teal-100 bg-teal-50 p-3">
-          <div className="text-xs font-bold uppercase tracking-wide text-teal-700">Place value clue</div>
-          <div className="mt-1 text-2xl font-black text-teal-900">{questionData.targetNumber}</div>
+        <div className="mt-4 rounded-2xl border border-teal-100 bg-teal-50 p-3">
+          <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
+            Place value clue
+          </div>
+          <div className="mt-1.5 text-2xl font-black text-teal-900">
+            {questionData.targetNumber}
+          </div>
         </div>
       )}
 
-      <div className="mt-3 flex flex-wrap items-center gap-3">
+      <div className="mt-4 flex flex-wrap items-center gap-3">
         <input
-          type="number"
+          type="text"
+          inputMode="numeric"
           value={response}
-          onChange={(event) => {
-            const val = event.target.value;
-            if (val === "") { setResponse(""); return; }
-            setResponse(clamp(Number(val), 0, 999));
-          }}
+          onChange={(event) => setResponse(event.target.value.replace(/[^\d]/g, ""))}
           placeholder="Type your answer"
           className="w-full max-w-xs rounded-xl border border-gray-300 px-4 py-3 text-lg font-bold text-gray-900 outline-none focus:border-teal-500"
         />

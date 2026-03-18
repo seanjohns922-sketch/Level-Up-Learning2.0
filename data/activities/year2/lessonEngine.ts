@@ -1246,12 +1246,25 @@ function generateInteractiveQuestion(
   }
 
   if (activityType === "fact_family") {
+    const configuredMin = typeof config.min === "number" ? Math.max(0, config.min) : 0;
+    const configuredMax =
+      typeof config.max === "number"
+        ? Math.min(config.max, profile.factFamilyMax)
+        : profile.factFamilyMax;
     const mode =
       config.mode === "write_sentences" || config.mode === "word_problems"
         ? config.mode
         : "recognise";
-    const a = randInt(2, Math.min(10, Math.floor(profile.factFamilyMax / 4) + 2));
-    const b = randInt(1, Math.min(profile.factFamilyMax - a, a + 4));
+    const aMax = Math.max(3, Math.min(20, Math.floor(configuredMax / 2)));
+    const aMinBase =
+      mode === "recognise"
+        ? Math.max(2, Math.floor(configuredMin / 4))
+        : Math.max(4, Math.floor(configuredMin / 3));
+    const aMin = Math.min(aMax, aMinBase);
+    const a = randInt(aMin, aMax);
+    const bMax = Math.max(2, Math.min(20, configuredMax - a));
+    const bMin = Math.min(bMax, aMinBase);
+    const b = randInt(bMin, bMax);
     const total = a + b;
     const family: [number, number, number] = [a, b, total];
     const correctSentence =
@@ -1264,7 +1277,8 @@ function generateInteractiveQuestion(
     const distractors = shuffle([
       `${total} + ${a} = ${b}`,
       `${a} - ${b} = ${total}`,
-      `${total} - ${b} = ${a + 1}`,
+      `${total} - ${b} = ${a + randInt(1, 2)}`,
+      `${a} + ${b + randInt(1, 2)} = ${total}`,
     ]);
 
     return {
@@ -1729,8 +1743,17 @@ function generateGenericQuestion(
   }
 
   if (sourceActivityType === "fact_family") {
-    const a = randInt(2, Math.min(12, Math.floor(profile.factFamilyMax / 3)));
-    const b = randInt(1, Math.max(2, Math.min(a, profile.factFamilyMax - a)));
+    const configuredMin = typeof config.min === "number" ? Math.max(0, config.min) : 0;
+    const configuredMax =
+      typeof config.max === "number"
+        ? Math.min(config.max, profile.factFamilyMax)
+        : profile.factFamilyMax;
+    const aMax = Math.max(3, Math.min(18, Math.floor(configuredMax / 2)));
+    const aMin = Math.min(aMax, Math.max(2, Math.floor(configuredMin / 3)));
+    const a = randInt(aMin, aMax);
+    const bMax = Math.max(2, Math.min(18, configuredMax - a));
+    const bMin = Math.min(bMax, Math.max(2, Math.floor(configuredMin / 4)));
+    const b = randInt(bMin, bMax);
     const total = a + b;
     const answer = String(total - a);
     return asMultipleChoice

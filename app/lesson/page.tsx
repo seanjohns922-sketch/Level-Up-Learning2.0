@@ -82,9 +82,9 @@ function LessonPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background flex flex-col items-center justify-start px-4 py-6">
-      <div className="w-full max-w-5xl">
-        <div className="mb-2 shrink-0">
+    <main className="min-h-screen bg-background flex items-start justify-center px-4 py-6">
+      <div className="w-full max-w-6xl">
+        <div className="mb-4">
           <button
             onClick={() =>
               router.push(`/program?year=${encodeURIComponent(year)}&week=${week}`)
@@ -97,7 +97,7 @@ function LessonPage() {
 
         {!started ? (
           <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
-            <div className={`${lessonChrome.heroClass} text-white px-6 py-8`}>
+            <div className={`${lessonChrome.heroClass} text-white px-5 py-6`}>
               <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1 text-sm font-semibold mb-3">
                 Level {yearNumber} • Week {week} • Lesson {lessonNumber}
               </div>
@@ -154,7 +154,7 @@ function LessonPage() {
               <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1 text-sm font-semibold mb-3">
                 Level {yearNumber} • Week {week} • Lesson {lessonNumber}
               </div>
-              <h1 className="text-3xl md:text-4xl font-extrabold font-display">
+              <h1 className="text-2xl md:text-3xl font-extrabold font-display">
                 Lesson {lessonNumber} Practice
               </h1>
               {lessonMeta?.title && (
@@ -229,7 +229,7 @@ function LessonPage() {
               )}
             </div>
 
-            <div className="bg-background px-6 py-8">
+            <div className="bg-background px-4 py-5">
               {lessonMeta?.activities?.length ? (
                 <Year2LessonEngine
                   lesson={lessonMeta}

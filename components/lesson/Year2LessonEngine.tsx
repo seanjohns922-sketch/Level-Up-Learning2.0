@@ -160,17 +160,9 @@ export function Year2LessonEngine({
     [accuracy, correctAnswers, questionsAnswered]
   );
 
-  useEffect(() => {
-    console.log("Year2 activity", {
-      activityType: currentActivity?.activityType,
-      questionKind: currentQuestion?.kind,
-      question: currentQuestion,
-    });
-  }, [currentActivity, currentQuestion]);
-
   if (finished) {
     return (
-      <div className="rounded-3xl border bg-white shadow-sm p-6 border-gray-100">
+      <div className="rounded-3xl border bg-white shadow-sm p-5 border-gray-100">
         <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">
           Lesson Complete
         </div>
@@ -179,7 +171,7 @@ export function Year2LessonEngine({
           Eight minutes are up. Here is the lesson summary.
         </p>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-3">
+        <div className="mt-4 grid gap-2 sm:grid-cols-3">
           {summary.map((item) => (
             <div key={item.label} className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
               <div className="text-xs font-bold uppercase tracking-wide text-gray-500">
@@ -207,7 +199,7 @@ export function Year2LessonEngine({
   return (
     <div
       className={[
-        "rounded-3xl border bg-white shadow-sm p-4 transition-all flex flex-col",
+        "rounded-3xl border bg-white shadow-sm p-4 transition-all",
         status === "correct"
           ? "border-emerald-200"
           : status === "wrong"
@@ -215,7 +207,7 @@ export function Year2LessonEngine({
           : "border-gray-100",
       ].join(" ")}
     >
-      <div className="flex items-center justify-between gap-4 mb-3 shrink-0">
+      <div className="flex items-center justify-between gap-3 mb-3">
         <Countdown seconds={Math.max(0, secondsLeft)} total={totalSeconds} />
         <div
           className={[
@@ -231,7 +223,7 @@ export function Year2LessonEngine({
         </div>
       </div>
 
-      <div className="mb-3 grid gap-2 sm:grid-cols-3 shrink-0">
+      <div className="mb-3 grid gap-2 sm:grid-cols-3">
         {summary.map((item) => (
           <div key={item.label} className="rounded-2xl border border-gray-200 bg-gray-50 px-3 py-2">
             <div className="text-xs font-bold uppercase tracking-wide text-gray-500">

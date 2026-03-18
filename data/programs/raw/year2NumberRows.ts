@@ -489,13 +489,13 @@ export const year2NumberRows: ProgramRow[] = [
     activities: interactiveActivities(
       "fact_family",
       {
-        min: 0,
-        max: 20,
+        min: 8,
+        max: 30,
         mode: "recognise",
       },
       genericActivities("fact_family", {
-        min: 0,
-        max: 20,
+        min: 8,
+        max: 30,
         mode: "recognise",
       })
     ),
@@ -510,13 +510,13 @@ export const year2NumberRows: ProgramRow[] = [
     activities: interactiveActivities(
       "fact_family",
       {
-        min: 0,
-        max: 20,
+        min: 10,
+        max: 40,
         mode: "write_sentences",
       },
       genericActivities("fact_family", {
-        min: 0,
-        max: 20,
+        min: 10,
+        max: 40,
         mode: "write_sentences",
       })
     ),
@@ -531,13 +531,13 @@ export const year2NumberRows: ProgramRow[] = [
     activities: interactiveActivities(
       "fact_family",
       {
-        min: 0,
-        max: 20,
+        min: 12,
+        max: 40,
         mode: "word_problems",
       },
       genericActivities("fact_family", {
-        min: 0,
-        max: 20,
+        min: 12,
+        max: 40,
         mode: "word_problems",
       })
     ),
