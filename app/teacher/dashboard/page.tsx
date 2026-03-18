@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { useAuthGuard } from "@/lib/useAuthGuard";
 
 /* ── types ─────────────────────────────────────────── */
 type ClassRow = { id: string; class_code: string; name: string; year_level: string };
