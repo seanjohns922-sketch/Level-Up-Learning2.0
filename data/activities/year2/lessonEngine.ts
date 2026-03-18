@@ -1425,7 +1425,7 @@ function randomReviewConfig(activityType: ActivityType): GenericConfig {
     case "fact_family":
       return {
         min: 0,
-        max: 20,
+        max: 100,
         mode: (["recognise", "write_sentences", "word_problems"] as const)[
           randInt(0, 2)
         ],
