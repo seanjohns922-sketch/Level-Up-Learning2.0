@@ -115,7 +115,7 @@ export default function PlaceValueBuilder({
   }
 
   return (
-    <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
       <div>
         <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">
           Place Value Builder
