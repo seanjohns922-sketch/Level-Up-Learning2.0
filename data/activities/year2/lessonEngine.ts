@@ -1449,9 +1449,31 @@ function generateInteractiveQuestion(
       typeof config.step === "number"
         ? config.step
         : profile.skipCountExtraSteps[randInt(0, profile.skipCountExtraSteps.length - 1)] ?? 2;
-    const start = randInt(0, 5) * step;
+    const configMax = typeof config.max === "number" ? config.max : 100;
+    const maxStart = Math.max(0, Math.floor(configMax / step) - 6);
+    const startMultiplier = randInt(0, maxStart);
+    const start = startMultiplier * step;
     const sequence = [start, start + step, start + step * 2, start + step * 3];
     const answer = start + step * 4;
+
+    // Occasionally present a missing-in-middle challenge
+    const missingMiddle = randInt(0, 3) === 0 && sequence.length >= 4;
+    if (missingMiddle) {
+      const gapIndex = randInt(1, 2); // remove 2nd or 3rd element
+      const missingValue = sequence[gapIndex];
+      const displaySeq = [...sequence, answer];
+      displaySeq[gapIndex] = -1; // sentinel for "?"
+      return {
+        kind: "skip_count" as const,
+        prompt: `Fill in the missing number. Skip count by ${step}.`,
+        sequence: displaySeq,
+        answer: missingValue,
+        options: uniqueNumberOptions(missingValue, step * 3).map(Number),
+        step,
+        mode: "forward" as const,
+      };
+    }
+
     return {
       kind: "skip_count",
       prompt: `Keep skip counting by ${step}.`,
