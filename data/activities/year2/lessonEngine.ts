@@ -420,9 +420,16 @@ function shuffle<T>(items: T[]) {
 
 function uniqueNumberOptions(answer: number, spread = 12) {
   const values = new Set<number>([answer]);
-  while (values.size < 4) {
+  let attempts = 0;
+  while (values.size < 4 && attempts < 100) {
+    attempts++;
     const offset = randInt(-spread, spread);
-    values.add(Math.max(0, answer + offset));
+    const candidate = Math.max(0, answer + offset);
+    if (candidate !== answer || values.size === 0) values.add(candidate);
+  }
+  // Fallback: if spread is too small, widen it
+  while (values.size < 4) {
+    values.add(answer + values.size);
   }
   return shuffle(Array.from(values)).map(String);
 }
