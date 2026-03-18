@@ -27,7 +27,12 @@ function makeAddends(d: Difficulty) {
 }
 
 function makeParts(d: Difficulty): { a: number; b: number; whole: number } {
-  const maxWhole = d === "easy" ? 10 : d === "medium" ? 15 : 20;
+  if (d === "hard") {
+    const a = randInt(10, 50);
+    const b = randInt(10, 49);
+    return { a, b, whole: a + b };
+  }
+  const maxWhole = d === "easy" ? 10 : 15;
   const r = Math.random();
   if (r < 0.2) {
     const a = randInt(1, Math.min(9, maxWhole - 1));
