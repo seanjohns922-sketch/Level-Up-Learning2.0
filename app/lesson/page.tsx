@@ -229,7 +229,7 @@ function LessonPage() {
               )}
             </div>
 
-            <div className="bg-background px-4 py-4 flex-1 min-h-0 overflow-auto">
+            <div className="bg-background px-6 py-8">
               {lessonMeta?.activities?.length ? (
                 <Year2LessonEngine
                   lesson={lessonMeta}
