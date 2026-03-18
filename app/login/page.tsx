@@ -281,7 +281,7 @@ export default function LoginPage() {
 
         {/* Frosted glass card */}
         <div
-          className="w-full bg-white/30 backdrop-blur-xl rounded-[28px] shadow-2xl border border-white/40 p-6 md:p-8"
+          className="w-full bg-white/40 backdrop-blur-xl rounded-[28px] shadow-2xl border border-white/40 p-6 md:p-8"
           style={{ animation: "fadeUp 0.7s ease both 0.1s" }}
         >
           {/* Tab toggle */}
