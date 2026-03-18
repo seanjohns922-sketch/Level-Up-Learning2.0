@@ -5,6 +5,7 @@ import EqualGroups from "@/components/activities/EqualGroups";
 import Arrays from "@/components/activities/Arrays";
 import DivisionGroups from "@/components/activities/DivisionGroups";
 import FactFamily from "@/components/activities/FactFamily";
+import FactFamilyWrite from "@/components/activities/FactFamilyWrite";
 import MixedWordProblem from "@/components/activities/MixedWordProblem";
 import MultipleChoiceActivity from "@/components/activities/MultipleChoiceActivity";
 import NumberOrder from "@/components/activities/NumberOrder";
