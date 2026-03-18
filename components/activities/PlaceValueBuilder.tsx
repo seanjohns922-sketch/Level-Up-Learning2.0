@@ -138,8 +138,8 @@ export default function PlaceValueBuilder({
           const count = placeCount(questionData, place);
 
           return (
-            <div key={place} className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
-              <div className="text-xs font-bold uppercase tracking-wide text-gray-500">
+            <div key={place} className="rounded-xl border border-gray-200 bg-gray-50 p-3">
+              <div className="text-xs font-bold uppercase tracking-wide text-gray-500">{placeLabel(place)}</div>
                 {placeLabel(place)}
               </div>
               <div className="mt-4">
