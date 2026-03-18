@@ -2,6 +2,20 @@
 
 import { useMemo, useState } from "react";
 
+/* Pick a clean tick step so we get 5–11 labelled ticks */
+function niceStep(span: number): number {
+  if (span <= 10) return 1;
+  if (span <= 20) return 2;
+  if (span <= 50) return 5;
+  if (span <= 100) return 10;
+  if (span <= 200) return 20;
+  if (span <= 500) return 50;
+  if (span <= 1000) return 100;
+  if (span <= 2000) return 200;
+  if (span <= 5000) return 500;
+  return 1000;
+}
+
 export default function NumberLineTap({
   min,
   max,
@@ -20,22 +34,29 @@ export default function NumberLineTap({
 
   const range = max - min || 1;
 
-  // Generate sensible tick spacing
   const ticks = useMemo(() => {
     const span = max - min;
-    let step = 1;
-    if (span > 200) step = 50;
-    else if (span > 100) step = 20;
-    else if (span > 50) step = 10;
-    else if (span > 20) step = 5;
-    else if (span > 10) step = 2;
-
-    const arr: number[] = [];
+    const step = niceStep(span);
+    const values: number[] = [];
     const start = Math.ceil(min / step) * step;
-    for (let n = start; n <= max; n += step) arr.push(n);
-    if (arr[0] !== min) arr.unshift(min);
-    if (arr[arr.length - 1] !== max) arr.push(max);
-    return arr;
+    for (let v = start; v <= max; v += step) values.push(v);
+    if (values[0] !== min) values.unshift(min);
+    if (values[values.length - 1] !== max) values.push(max);
+    return values;
+  }, [min, max]);
+
+  const minorTicks = useMemo(() => {
+    const span = max - min;
+    const majorStep = niceStep(span);
+    const minorStep = majorStep / 2;
+    if (minorStep < 1 || span / minorStep > 40) return [];
+    const values: number[] = [];
+    const start = Math.ceil(min / minorStep) * minorStep;
+    for (let v = start; v <= max; v += minorStep) {
+      if (v % majorStep === 0 && v >= min) continue;
+      values.push(v);
+    }
+    return values;
   }, [min, max]);
 
   function handleClick(e: React.MouseEvent<HTMLDivElement>) {
@@ -58,57 +79,96 @@ export default function NumberLineTap({
   return (
     <div className="w-full">
       <div className="text-sm text-muted-foreground mb-3">
-        👆 Tap on the number line to place <span className="font-bold text-foreground">{target}</span>
+        👆 Tap on the number line to place{" "}
+        <span className="font-bold text-foreground">{target}</span>
       </div>
 
       <div
-        className="relative h-24 cursor-pointer select-none rounded-2xl border border-border bg-muted/30 px-4"
+        className="relative cursor-pointer select-none rounded-2xl border border-border bg-muted/30 px-6"
+        style={{ height: 100 }}
         onClick={handleClick}
       >
         {/* Base line */}
-        <div className="absolute left-4 right-4 top-10 h-1 rounded-full bg-border" />
+        <div
+          className="absolute left-6 right-6 bg-primary/70 rounded-full"
+          style={{ top: 36, height: 3 }}
+        />
+        {/* End caps */}
+        <div
+          className="absolute bg-primary/70 rounded-full"
+          style={{ left: 24, top: 20, width: 3, height: 36 }}
+        />
+        <div
+          className="absolute bg-primary/70 rounded-full"
+          style={{ right: 24, top: 20, width: 3, height: 36 }}
+        />
 
-        {/* Tick marks */}
-        {ticks.map((t) => {
-          const pct = ((t - min) / range) * 100;
-          return (
+        {/* Inner container for ticks & markers, inset to match line */}
+        <div className="absolute left-6 right-6 top-0 bottom-0">
+          {/* Minor ticks */}
+          {minorTicks.map((t) => {
+            const pct = ((t - min) / range) * 100;
+            return (
+              <div
+                key={`m-${t}`}
+                className="absolute pointer-events-none"
+                style={{ left: `${pct}%`, transform: "translateX(-50%)", top: 24 }}
+              >
+                <div
+                  className="mx-auto bg-primary/30 rounded-full"
+                  style={{ width: 2, height: 24 }}
+                />
+              </div>
+            );
+          })}
+
+          {/* Major ticks */}
+          {ticks.map((t) => {
+            const pct = ((t - min) / range) * 100;
+            return (
+              <div
+                key={t}
+                className="absolute text-center pointer-events-none"
+                style={{ left: `${pct}%`, transform: "translateX(-50%)", top: 16 }}
+              >
+                <div
+                  className="mx-auto bg-primary/60 rounded-full"
+                  style={{ width: 3, height: 40 }}
+                />
+                <div className="mt-1.5 text-sm font-bold text-foreground whitespace-nowrap">
+                  {t}
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Placed marker */}
+          {markerPct !== null && (
             <div
-              key={t}
-              className="absolute top-4 text-center pointer-events-none"
-              style={{ left: `${pct}%`, transform: "translateX(-50%)" }}
+              className="absolute flex flex-col items-center pointer-events-none"
+              style={{ left: `${markerPct}%`, transform: "translateX(-50%)", top: 22 }}
             >
-              <div className="mx-auto h-4 w-0.5 bg-muted-foreground/40" />
-              <div className="mt-1 text-xs font-bold text-muted-foreground">{t}</div>
-            </div>
-          );
-        })}
-
-        {/* Placed marker */}
-        {markerPct !== null && (
-          <div
-            className="absolute top-6 flex flex-col items-center pointer-events-none"
-            style={{ left: `${markerPct}%`, transform: "translateX(-50%)" }}
-          >
-            <div
-              className={[
-                "w-6 h-6 rounded-full border-2 shadow-lg transition-colors",
-                correct
-                  ? "bg-primary border-primary-foreground"
-                  : value === target
+              <div
+                className={[
+                  "w-5 h-5 rounded-full border-2 shadow-lg transition-colors",
+                  correct
                     ? "bg-primary border-primary-foreground"
-                    : "bg-destructive border-destructive-foreground",
-              ].join(" ")}
-            />
-            <span
-              className={[
-                "mt-0.5 text-xs font-bold",
-                correct ? "text-primary" : "text-foreground",
-              ].join(" ")}
-            >
-              {value}
-            </span>
-          </div>
-        )}
+                    : value === target
+                      ? "bg-primary border-primary-foreground"
+                      : "bg-destructive border-destructive-foreground",
+                ].join(" ")}
+              />
+              <span
+                className={[
+                  "mt-0.5 text-xs font-bold",
+                  correct ? "text-primary" : "text-foreground",
+                ].join(" ")}
+              >
+                {value}
+              </span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Feedback */}
