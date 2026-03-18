@@ -207,7 +207,7 @@ export function Year2LessonEngine({
   return (
     <div
       className={[
-        "rounded-3xl border bg-white shadow-sm p-6 transition-all",
+        "rounded-3xl border bg-white shadow-sm p-4 transition-all flex flex-col",
         status === "correct"
           ? "border-emerald-200"
           : status === "wrong"
