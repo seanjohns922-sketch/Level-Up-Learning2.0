@@ -242,7 +242,7 @@ export default function LoginPage() {
         <img
           src="/images/login-bg.jpg"
           alt=""
-          className="w-full h-full object-cover object-top"
+          className="w-full h-full object-cover object-[center_65%]"
         />
         {/* Dark overlay for readability */}
         <div className="absolute inset-0 bg-black/30" />
