@@ -1291,6 +1291,17 @@ function generateInteractiveQuestion(
     // Remove duplicates (when a === b)
     const correctSet = Array.from(new Set(allCorrect));
 
+    if (mode === "write_sentences") {
+      return {
+        kind: "fact_family",
+        prompt: "Write 4 number sentences for this fact family.",
+        family,
+        options: [],
+        answers: correctSet,
+        mode,
+      };
+    }
+
     const distractors = shuffle([
       `${total} + ${a} = ${b}`,
       `${a} - ${b} = ${total}`,
