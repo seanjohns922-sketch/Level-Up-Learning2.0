@@ -82,9 +82,9 @@ function LessonPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background flex items-center justify-center px-6 py-10">
-      <div className="w-full max-w-5xl">
-        <div className="mb-4">
+    <main className="h-screen bg-background flex flex-col items-center justify-start px-4 py-3 overflow-hidden">
+      <div className="w-full max-w-5xl flex flex-col flex-1 min-h-0">
+        <div className="mb-2 shrink-0">
           <button
             onClick={() =>
               router.push(`/program?year=${encodeURIComponent(year)}&week=${week}`)
@@ -149,8 +149,8 @@ function LessonPage() {
             </div>
           </div>
         ) : year === "Year 1" ? (
-          <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
-            <div className={`${lessonChrome.heroClass} text-white px-6 py-8`}>
+          <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card flex flex-col flex-1 min-h-0">
+            <div className={`${lessonChrome.heroClass} text-white px-4 py-4 shrink-0`}>
               <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1 text-sm font-semibold mb-3">
                 Level {yearNumber} • Week {week} • Lesson {lessonNumber}
               </div>
@@ -164,7 +164,7 @@ function LessonPage() {
                 <p className="text-white/60 text-xs mt-1">Focus: {lessonMeta.focus}</p>
               )}
             </div>
-            <div className="bg-background px-6 py-8">
+            <div className="bg-background px-4 py-4 flex-1 min-h-0 overflow-auto">
 
             <PracticeRunner
               key={`${year}-${week}-${lessonId}`}
@@ -214,9 +214,9 @@ function LessonPage() {
             </div>
           </div>
         ) : (
-          <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
-            <div className={`${lessonChrome.heroClass} text-white px-6 py-8`}>
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1 text-sm font-semibold mb-3">
+          <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card flex flex-col flex-1 min-h-0">
+            <div className={`${lessonChrome.heroClass} text-white px-4 py-4 shrink-0`}>
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1 text-sm font-semibold mb-2">
                 Level {yearNumber} • Week {week} • Lesson {lessonNumber}
               </div>
               <h1 className="text-3xl md:text-4xl font-extrabold font-display">
@@ -230,7 +230,7 @@ function LessonPage() {
               )}
             </div>
 
-            <div className="bg-background px-6 py-8">
+            <div className="bg-background px-4 py-4 flex-1 min-h-0 overflow-auto">
               {lessonMeta?.activities?.length ? (
                 <Year2LessonEngine
                   lesson={lessonMeta}

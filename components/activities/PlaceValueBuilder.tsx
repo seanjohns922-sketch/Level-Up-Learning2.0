@@ -88,10 +88,10 @@ export default function PlaceValueBuilder({
   onCorrect?: () => void;
   onWrong?: () => void;
 }) {
-  const [response, setResponse] = useState(0);
+  const [response, setResponse] = useState<number | string>("");
 
   useEffect(() => {
-    setResponse(0);
+    setResponse("");
   }, [questionData]);
 
   const visibleTotal = useMemo(
@@ -110,12 +110,12 @@ export default function PlaceValueBuilder({
       : `Missing ${placeLabel(questionData.place ?? "ones").toLowerCase()} value`;
 
   function check() {
-    if (response === questionData.answer) onCorrect?.();
+    if (Number(response) === questionData.answer) onCorrect?.();
     else onWrong?.();
   }
 
   return (
-    <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
       <div>
         <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">
           Place Value Builder
@@ -133,19 +133,19 @@ export default function PlaceValueBuilder({
         ) : null}
       </div>
 
-      <div className="mt-6 grid gap-4 md:grid-cols-3">
+      <div className="mt-3 grid gap-3 md:grid-cols-3">
         {questionData.placeValues.map((place) => {
           const count = placeCount(questionData, place);
 
           return (
-            <div key={place} className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+            <div key={place} className="rounded-xl border border-gray-200 bg-gray-50 p-3">
               <div className="text-xs font-bold uppercase tracking-wide text-gray-500">
                 {placeLabel(place)}
               </div>
-              <div className="mt-4">
+              <div className="mt-2">
                 <MABVisual place={place} count={count} />
               </div>
-              <div className="mt-3 text-sm text-gray-600">
+              <div className="mt-2 text-sm text-gray-600">
                 {count === null
                   ? "Missing part"
                   : `${count} × ${unitValue(place)} = ${count * unitValue(place)}`}
@@ -156,16 +156,14 @@ export default function PlaceValueBuilder({
       </div>
 
       {questionData.mode === "identify_number" ? (
-        <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">
-          <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
-            Work it out
-          </div>
-          <div className="mt-2 text-lg font-bold text-teal-900">
+        <div className="mt-3 rounded-xl border border-teal-100 bg-teal-50 p-3">
+          <div className="text-xs font-bold uppercase tracking-wide text-teal-700">Work it out</div>
+          <div className="mt-1 text-sm font-bold text-teal-900">
             Count the hundreds, tens, and ones blocks to find the number.
           </div>
         </div>
       ) : questionData.mode === "missing_mab_part" ? (
-        <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">
+        <div className="mt-3 rounded-xl border border-teal-100 bg-teal-50 p-3">
           <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
             Known blocks
           </div>
@@ -178,21 +176,21 @@ export default function PlaceValueBuilder({
           </div>
         </div>
       ) : (
-        <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">
-          <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
-            Place value clue
-          </div>
-          <div className="mt-2 text-3xl font-black text-teal-900">
-            {questionData.targetNumber}
-          </div>
+        <div className="mt-3 rounded-xl border border-teal-100 bg-teal-50 p-3">
+          <div className="text-xs font-bold uppercase tracking-wide text-teal-700">Place value clue</div>
+          <div className="mt-1 text-2xl font-black text-teal-900">{questionData.targetNumber}</div>
         </div>
       )}
 
-      <div className="mt-6 flex flex-wrap items-center gap-3">
+      <div className="mt-3 flex flex-wrap items-center gap-3">
         <input
           type="number"
           value={response}
-          onChange={(event) => setResponse(clamp(Number(event.target.value), 0, 999))}
+          onChange={(event) => {
+            const val = event.target.value;
+            if (val === "") { setResponse(""); return; }
+            setResponse(clamp(Number(val), 0, 999));
+          }}
           placeholder="Type your answer"
           className="w-full max-w-xs rounded-xl border border-gray-300 px-4 py-3 text-lg font-bold text-gray-900 outline-none focus:border-teal-500"
         />
