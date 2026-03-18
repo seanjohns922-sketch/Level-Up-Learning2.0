@@ -149,8 +149,8 @@ function LessonPage() {
             </div>
           </div>
         ) : year === "Year 1" ? (
-          <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
-            <div className={`${lessonChrome.heroClass} text-white px-6 py-8`}>
+          <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card flex flex-col flex-1 min-h-0">
+            <div className={`${lessonChrome.heroClass} text-white px-4 py-4 shrink-0`}>
               <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1 text-sm font-semibold mb-3">
                 Level {yearNumber} • Week {week} • Lesson {lessonNumber}
               </div>
