@@ -139,13 +139,13 @@ export default function PlaceValueBuilder({
 
           return (
             <div key={place} className="rounded-xl border border-gray-200 bg-gray-50 p-3">
-              <div className="text-xs font-bold uppercase tracking-wide text-gray-500">{placeLabel(place)}</div>
+              <div className="text-xs font-bold uppercase tracking-wide text-gray-500">
                 {placeLabel(place)}
               </div>
-              <div className="mt-4">
+              <div className="mt-2">
                 <MABVisual place={place} count={count} />
               </div>
-              <div className="mt-3 text-sm text-gray-600">
+              <div className="mt-2 text-sm text-gray-600">
                 {count === null
                   ? "Missing part"
                   : `${count} × ${unitValue(place)} = ${count * unitValue(place)}`}
