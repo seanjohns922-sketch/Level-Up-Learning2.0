@@ -17,6 +17,7 @@ export default function OddEvenSort({
 }) {
   const [placements, setPlacements] = useState<Record<string, Bucket | null>>({});
   const [pickedPattern, setPickedPattern] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
     const nextPlacements = Object.fromEntries(
@@ -24,6 +25,7 @@ export default function OddEvenSort({
     ) as Record<string, Bucket | null>;
     setPlacements(nextPlacements);
     setPickedPattern(null);
+    setSubmitted(false);
   }, [questionData]);
 
   const allPlaced = useMemo(
@@ -34,6 +36,7 @@ export default function OddEvenSort({
   useEffect(() => {
     if (!allPlaced) return;
     if (questionData.mode === "pattern" && !pickedPattern) return;
+    if (submitted) return;
 
     const placedCorrectly = questionData.numbers.every((value, index) => {
       const expected: Bucket = value % 2 === 0 ? "even" : "odd";
@@ -42,11 +45,13 @@ export default function OddEvenSort({
     const patternCorrect =
       questionData.mode !== "pattern" || pickedPattern === questionData.patternAnswer;
 
+    setSubmitted(true);
     if (placedCorrectly && patternCorrect) onCorrect?.();
     else onWrong?.();
-  }, [allPlaced, onCorrect, onWrong, pickedPattern, placements, questionData.mode, questionData.numbers, questionData.patternAnswer]);
+  }, [allPlaced, onCorrect, onWrong, pickedPattern, placements, questionData.mode, questionData.numbers, questionData.patternAnswer, submitted]);
 
   function assign(value: number, index: number, bucket: Bucket) {
+    if (submitted) return;
     setPlacements((current) => ({
       ...current,
       [`${value}-${index}`]: bucket,
@@ -145,12 +150,14 @@ export default function OddEvenSort({
               <button
                 key={option}
                 type="button"
+                disabled={submitted}
                 onClick={() => setPickedPattern(option)}
                 className={[
                   "rounded-xl border px-4 py-3 text-left text-sm font-bold transition",
                   pickedPattern === option
                     ? "border-teal-300 bg-white text-teal-900"
                     : "border-transparent bg-white/70 text-gray-700 hover:bg-white",
+                  submitted ? "opacity-60 cursor-not-allowed" : "",
                 ].join(" ")}
               >
                 {option}

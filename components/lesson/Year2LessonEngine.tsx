@@ -119,7 +119,8 @@ export function Year2LessonEngine({
   }, [finished, onTimedComplete, secondsLeft]);
 
   function handleCorrect() {
-    if (finished) return;
+    if (finished || status !== "idle") return;
+    clearPendingTimeout();
     setStatus("correct");
     setQuestionsAnswered((value) => value + 1);
     setCorrectAnswers((value) => value + 1);
@@ -129,7 +130,8 @@ export function Year2LessonEngine({
   }
 
   function handleWrong() {
-    if (finished) return;
+    if (finished || status !== "idle") return;
+    clearPendingTimeout();
     setStatus("wrong");
     setQuestionsAnswered((value) => value + 1);
     timeoutRef.current = setTimeout(() => {

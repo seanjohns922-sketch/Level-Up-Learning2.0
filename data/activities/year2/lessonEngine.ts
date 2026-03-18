@@ -735,6 +735,19 @@ export function validateLessonActivityIntent(
     );
   }
 
+  if (
+    focus.includes("odd & even") &&
+    (activity.activityType === "number_line" || activity.activityType === "number_order")
+  ) {
+    addViolation(
+      violations,
+      "alignment",
+      lesson,
+      activity.activityType,
+      "Odd & even lessons must not include number line/order activities."
+    );
+  }
+
   if (focus.includes("division - equal groups") && activity.activityType === "skip_count") {
     addViolation(
       violations,

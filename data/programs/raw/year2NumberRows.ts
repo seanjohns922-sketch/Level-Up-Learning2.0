@@ -283,11 +283,11 @@ export const year2NumberRows: ProgramRow[] = [
         count: 6,
         mode: "identify",
       }),
-      makeActivity("number_order", 1, {
+      makeActivity("typed_response", 1, {
         min: 0,
         max: 30,
-        count: 4,
-        ascending: true,
+        mode: "identify",
+        sourceActivityType: "odd_even_sort",
       }),
       makeActivity("multiple_choice", 1, {
         min: 0,
@@ -311,11 +311,11 @@ export const year2NumberRows: ProgramRow[] = [
         count: 6,
         mode: "identify",
       }),
-      makeActivity("number_line", 1, {
+      makeActivity("multiple_choice", 1, {
         min: 0,
         max: 40,
-        step: 2,
-        mode: "placement",
+        mode: "pattern",
+        sourceActivityType: "odd_even_sort",
       }),
       makeActivity("typed_response", 1, {
         min: 0,
@@ -339,11 +339,11 @@ export const year2NumberRows: ProgramRow[] = [
         count: 6,
         mode: "odd_even_sums",
       }),
-      makeActivity("number_line", 1, {
+      makeActivity("typed_response", 1, {
         min: 0,
         max: 50,
-        step: 2,
-        mode: "placement",
+        mode: "odd_even_sums",
+        sourceActivityType: "odd_even_sort",
       }),
       makeActivity("multiple_choice", 1, {
         min: 0,
