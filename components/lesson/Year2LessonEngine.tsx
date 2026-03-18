@@ -215,7 +215,7 @@ export function Year2LessonEngine({
           : "border-gray-100",
       ].join(" ")}
     >
-      <div className="flex items-center justify-between gap-4 mb-5">
+      <div className="flex items-center justify-between gap-4 mb-3 shrink-0">
         <Countdown seconds={Math.max(0, secondsLeft)} total={totalSeconds} />
         <div
           className={[
