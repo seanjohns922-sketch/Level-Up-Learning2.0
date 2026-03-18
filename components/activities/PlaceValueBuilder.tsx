@@ -88,10 +88,10 @@ export default function PlaceValueBuilder({
   onCorrect?: () => void;
   onWrong?: () => void;
 }) {
-  const [response, setResponse] = useState(0);
+  const [response, setResponse] = useState<number | string>("");
 
   useEffect(() => {
-    setResponse(0);
+    setResponse("");
   }, [questionData]);
 
   const visibleTotal = useMemo(
