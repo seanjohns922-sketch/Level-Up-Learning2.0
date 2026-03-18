@@ -31,7 +31,12 @@ export default function OddEvenSort({
   }, [questionData]);
 
   const allPlaced = useMemo(
-    () => questionData.numbers.every((value, index) => placements[`${value}-${index}`] !== null),
+    () =>
+      questionData.numbers.length > 0 &&
+      questionData.numbers.every((value, index) => {
+        const key = `${value}-${index}`;
+        return key in placements && placements[key] !== null;
+      }),
     [placements, questionData.numbers]
   );
 
