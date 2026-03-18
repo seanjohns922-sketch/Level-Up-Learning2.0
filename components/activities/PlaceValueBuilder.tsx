@@ -182,7 +182,7 @@ export default function PlaceValueBuilder({
         </div>
       )}
 
-      <div className="mt-6 flex flex-wrap items-center gap-3">
+      <div className="mt-3 flex flex-wrap items-center gap-3">
         <input
           type="number"
           value={response}
