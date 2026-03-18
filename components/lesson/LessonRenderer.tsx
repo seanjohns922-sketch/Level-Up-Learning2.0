@@ -263,9 +263,19 @@ export function LessonRenderer({
       if (safeQuestion.kind !== "fact_family") {
         return <ErrorCard message="Fact family question failed to load." />;
       }
+      const ffQuestion = safeQuestion as FactFamilyQuestion;
+      if (ffQuestion.mode === "write_sentences") {
+        return (
+          <FactFamilyWrite
+            questionData={ffQuestion}
+            onCorrect={onCorrect}
+            onWrong={onWrong}
+          />
+        );
+      }
       return (
         <FactFamily
-          questionData={safeQuestion as FactFamilyQuestion}
+          questionData={ffQuestion}
           onCorrect={onCorrect}
           onWrong={onWrong}
         />
