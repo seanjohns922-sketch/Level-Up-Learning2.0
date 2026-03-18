@@ -176,13 +176,9 @@ export default function PlaceValueBuilder({
           </div>
         </div>
       ) : (
-        <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">
-          <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
-            Place value clue
-          </div>
-          <div className="mt-2 text-3xl font-black text-teal-900">
-            {questionData.targetNumber}
-          </div>
+        <div className="mt-3 rounded-xl border border-teal-100 bg-teal-50 p-3">
+          <div className="text-xs font-bold uppercase tracking-wide text-teal-700">Place value clue</div>
+          <div className="mt-1 text-2xl font-black text-teal-900">{questionData.targetNumber}</div>
         </div>
       )}
 
