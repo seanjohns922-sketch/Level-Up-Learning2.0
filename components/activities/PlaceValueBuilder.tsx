@@ -110,7 +110,7 @@ export default function PlaceValueBuilder({
       : `Missing ${placeLabel(questionData.place ?? "ones").toLowerCase()} value`;
 
   function check() {
-    if (response === questionData.answer) onCorrect?.();
+    if (Number(response) === questionData.answer) onCorrect?.();
     else onWrong?.();
   }
 
