@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { useAuthGuard } from "@/lib/useAuthGuard";
 import QRCode from "qrcode";
 
 export default function NewClassPage() {
   const router = useRouter();
+  const { loading: authLoading } = useAuthGuard();
   const [className, setClassName] = useState("");
   const [yearLevel, setYearLevel] = useState("1");
   const [creating, setCreating] = useState(false);
@@ -21,12 +23,6 @@ export default function NewClassPage() {
     { value: 5, label: "Year 5" },
     { value: 6, label: "Year 6" },
   ];
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (!data.user) router.push("/login");
-    });
-  }, []);
 
   function generateLocalClassCode(length = 5) {
     const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";

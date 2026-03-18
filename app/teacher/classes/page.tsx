@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { useAuthGuard } from "@/lib/useAuthGuard";
 
 type ClassRow = {
   id: string;
@@ -20,21 +21,17 @@ type StudentRow = {
 
 export default function TeacherClassesPage() {
   const router = useRouter();
+  const { user: authUser, loading: authLoading } = useAuthGuard();
   const [classes, setClasses] = useState<ClassRow[]>([]);
   const [students, setStudents] = useState<StudentRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (!data.user) {
-        router.push("/login");
-        return;
-      }
-      setUser(data.user);
-      loadClasses(data.user.id);
-    });
-  }, []);
+    if (authLoading || !authUser) return;
+    setUser(authUser);
+    loadClasses(authUser.id);
+  }, [authLoading, authUser]);
 
   async function loadClasses(teacherId: string) {
     const { data: cls } = await supabase
