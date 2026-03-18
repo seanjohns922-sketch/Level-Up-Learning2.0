@@ -337,13 +337,6 @@ export default function RealmCarousel() {
         </div>
       </div>
 
-      {/* Portal pulse animation */}
-      <style jsx>{`
-        @keyframes portalPulse {
-          0%, 100% { transform: scale(1.5); opacity: 0.4; }
-          50% { transform: scale(1.7); opacity: 0.7; }
-        }
-      `}</style>
     </main>
   );
 }
