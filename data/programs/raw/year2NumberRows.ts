@@ -621,10 +621,12 @@ export const year2NumberRows: ProgramRow[] = [
         maxColumns: 5,
         mode: "repeated_addition",
       }),
-      makeActivity("fact_family", 1, {
-        min: 0,
-        max: 20,
-        mode: "recognise",
+      makeActivity("equal_groups", 1, {
+        minGroups: 2,
+        maxGroups: 5,
+        minItemsPerGroup: 2,
+        maxItemsPerGroup: 5,
+        mode: "equal_groups",
       }),
       makeActivity("typed_response", 1, {
         minRows: 2,
