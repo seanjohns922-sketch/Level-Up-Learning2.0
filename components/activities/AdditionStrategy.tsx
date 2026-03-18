@@ -40,7 +40,7 @@ export default function AdditionStrategy({
         </div>
         <div className="mt-2 text-3xl font-black text-teal-900">
           {questionData.mode === "jump" &&
-            `${questionData.a} -> ${questionData.answer}`}
+            `Start at ${questionData.a}, jump +${questionData.b}`}
           {questionData.mode === "split" &&
             `${questionData.a} + ${Math.floor(questionData.b / 10) * 10} + ${
               questionData.b % 10
