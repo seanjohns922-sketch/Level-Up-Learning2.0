@@ -712,6 +712,7 @@ function generateAdditionStrategyQuestion(
     hint = "Make a friendly ten first, then add the rest.";
   }
 
+  if (!prompt) prompt = `Solve ${a} + ${b}.`;
   const answer = a + b;
   return {
     kind: "addition_strategy",
