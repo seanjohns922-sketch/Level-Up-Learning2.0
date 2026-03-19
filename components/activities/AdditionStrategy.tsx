@@ -45,6 +45,12 @@ export default function AdditionStrategy({
             `${questionData.a} + ${Math.floor(questionData.b / 10) * 10} + ${
               questionData.b % 10
             }`}
+          {questionData.mode === "doubles" &&
+            `Double ${questionData.a} → ${questionData.a} + ${questionData.a}`}
+          {questionData.mode === "near_doubles" && (() => {
+            const smaller = Math.min(questionData.a, questionData.b);
+            return `Double ${smaller} = ${smaller * 2}, then +1 → ${smaller * 2 + 1}`;
+          })()}
           {questionData.mode === "friendly_numbers" && (() => {
             const bridge = 10 - (questionData.a % 10 || 10);
             return `${questionData.a} + ${bridge} + ${questionData.b - bridge}`;

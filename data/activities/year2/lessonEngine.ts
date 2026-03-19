@@ -58,7 +58,7 @@ export type AdditionStrategyQuestion = {
   b: number;
   answer: number;
   options: number[];
-  mode: "jump" | "split" | "friendly_numbers";
+  mode: "jump" | "split" | "friendly_numbers" | "doubles" | "near_doubles";
 };
 
 export type EqualGroupsQuestion = {
@@ -1093,11 +1093,24 @@ function generateInteractiveQuestion(
     const min = typeof config.min === "number" ? config.min : 0;
     const max = typeof config.max === "number" ? config.max : profile.addSubMax;
     const mode =
-      config.mode === "split" || config.mode === "friendly_numbers"
+      config.mode === "split" || config.mode === "friendly_numbers" || config.mode === "doubles" || config.mode === "near_doubles"
         ? config.mode
         : "jump";
     let a = randInt(min, Math.max(min, max - 10));
     let b = randInt(2, 18);
+
+    if (mode === "doubles") {
+      const n = randInt(2, Math.min(50, Math.floor(max / 2)));
+      a = n;
+      b = n;
+    }
+
+    if (mode === "near_doubles") {
+      const n = randInt(2, Math.min(50, Math.floor(max / 2)));
+      a = n;
+      b = Math.random() < 0.5 ? n + 1 : n - 1;
+      if (b < 1) b = n + 1;
+    }
 
     if (mode === "split") {
       a = randInt(18, Math.max(30, Math.min(99, max)));
@@ -1119,6 +1132,10 @@ function generateInteractiveQuestion(
           ? `Start at ${a} and jump ${b} more.`
           : mode === "split"
           ? `Split ${b} into tens and ones.`
+          : mode === "doubles"
+          ? `Double ${a}! What is ${a} + ${a}?`
+          : mode === "near_doubles"
+          ? `Think: double ${Math.min(a, b)}, then adjust by 1.`
           : "Make a friendly ten first, then add the rest.",
       a,
       b,
