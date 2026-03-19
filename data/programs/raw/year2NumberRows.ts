@@ -797,7 +797,7 @@ export const year2NumberRows: ProgramRow[] = [
   },
   {
     week: 8,
-    focus: "Multiplication - Groups & Arrays",
+    focus: "Multiplication - 2s, 5s, 10s",
     lesson: 2,
     topic: "Model multiplication as arrays",
     activity: "Build arrays with rows and columns. Explain what the array shows.",
