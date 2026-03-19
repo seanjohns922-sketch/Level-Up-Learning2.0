@@ -404,6 +404,7 @@ const YEAR2_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
   review_quiz: {},
   multiple_choice: {},
   typed_response: {},
+  speed_round: {},
 };
 
 function randInt(min: number, max: number) {
