@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 
+const fmt = (n: number) => n.toLocaleString();
+
 /* Pick a clean tick step so we get 5–11 labelled ticks */
 function niceStep(span: number): number {
   if (span <= 10) return 1;
