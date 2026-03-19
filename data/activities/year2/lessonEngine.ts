@@ -1035,19 +1035,27 @@ function generateInteractiveQuestion(
   }
 
   if (activityType === "arrays") {
-    const minRows = typeof config.minRows === "number" ? config.minRows : 2;
-    const maxRows =
-      typeof config.maxRows === "number"
-        ? Math.max(config.maxRows, Math.min(config.maxRows + 2, profile.groupsMax))
-        : Math.min(8, profile.groupsMax);
-    const minColumns =
-      typeof config.minColumns === "number" ? config.minColumns : 2;
-    const maxColumns =
-      typeof config.maxColumns === "number"
-        ? Math.max(config.maxColumns, Math.min(config.maxColumns + 2, profile.itemsMax))
-        : Math.min(10, profile.itemsMax);
-    const rows = randInt(minRows, maxRows);
-    const columns = randInt(minColumns, maxColumns);
+    const allowed = config.allowedGroupSizes;
+    let rows: number;
+    let columns: number;
+    if (allowed && allowed.length > 0) {
+      rows = allowed[randInt(0, allowed.length - 1)];
+      columns = allowed[randInt(0, allowed.length - 1)];
+    } else {
+      const minRows = typeof config.minRows === "number" ? config.minRows : 2;
+      const maxRows =
+        typeof config.maxRows === "number"
+          ? Math.max(config.maxRows, Math.min(config.maxRows + 2, profile.groupsMax))
+          : Math.min(8, profile.groupsMax);
+      const minColumns =
+        typeof config.minColumns === "number" ? config.minColumns : 2;
+      const maxColumns =
+        typeof config.maxColumns === "number"
+          ? Math.max(config.maxColumns, Math.min(config.maxColumns + 2, profile.itemsMax))
+          : Math.min(10, profile.itemsMax);
+      rows = randInt(minRows, maxRows);
+      columns = randInt(minColumns, maxColumns);
+    }
     const answer = rows * columns;
     const mode = config.mode === "repeated_addition" ? "repeated_addition" : "arrays";
     const repeatedAddition = Array.from({ length: rows }, () => columns).join(" + ");
