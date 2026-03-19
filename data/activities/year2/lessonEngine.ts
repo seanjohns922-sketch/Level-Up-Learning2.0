@@ -464,7 +464,8 @@ function placeLabel(place: PlaceValueName) {
 
 function partitionNumber(value: number) {
   return {
-    hundreds: Math.floor(value / 100) * 100,
+    ...(value >= 1000 ? { thousands: Math.floor(value / 1000) * 1000 } : {}),
+    hundreds: Math.floor((value % 1000) / 100) * 100,
     tens: Math.floor((value % 100) / 10) * 10,
     ones: value % 10,
   };
