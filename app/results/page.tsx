@@ -399,6 +399,7 @@ function ResultsPage() {
       {showUnlock && justUnlocked && (
         <LegendUnlockReveal
           legend={legend}
+          scorePercent={displayPercent}
           onContinue={() => setShowUnlock(false)}
           onViewLegends={() => { setShowUnlock(false); goLegends(); }}
         />
