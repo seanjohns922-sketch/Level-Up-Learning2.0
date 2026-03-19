@@ -40,26 +40,29 @@ export default function AdditionStrategy({
         </div>
         <div className="mt-2 text-3xl font-black text-teal-900">
           {questionData.mode === "jump" &&
-            `Start at ${questionData.a}, jump +${questionData.b}`}
+            `Start at ${questionData.a}, jump +${questionData.b} → ?`}
           {questionData.mode === "split" &&
             `${questionData.a} + ${Math.floor(questionData.b / 10) * 10} + ${
               questionData.b % 10
-            }`}
+            } = ?`}
           {questionData.mode === "doubles" && (() => {
             const n = questionData.a;
             const tens = Math.floor(n / 10) * 10;
             const ones = n % 10;
-            if (ones === 0) return `Double ${n} = ${n * 2}`;
+            if (ones === 0) return `Double ${n} = ?`;
             return `Double ${tens} = ${tens * 2}, double ${ones} = ${ones * 2} → ${tens * 2} + ${ones * 2} = ?`;
           })()}
           {questionData.mode === "near_doubles" && (() => {
             const smaller = Math.min(questionData.a, questionData.b);
+            const sTens = Math.floor(smaller / 10) * 10;
+            const sOnes = smaller % 10;
             const difference = Math.abs(questionData.a - questionData.b);
-            return `Double ${smaller} = ${smaller * 2}, then +${difference} → ${smaller * 2 + difference}`;
+            if (sOnes === 0) return `Double ${smaller} = ${smaller * 2}, then +${difference} = ?`;
+            return `Double ${sTens} = ${sTens * 2}, double ${sOnes} = ${sOnes * 2} → ${sTens * 2} + ${sOnes * 2} = ${smaller * 2}, then +${difference} = ?`;
           })()}
           {questionData.mode === "friendly_numbers" && (() => {
             const bridge = 10 - (questionData.a % 10 || 10);
-            return `${questionData.a} + ${bridge} + ${questionData.b - bridge}`;
+            return `${questionData.a} + ${bridge} = ${questionData.a + bridge}, then + ${questionData.b - bridge} = ?`;
           })()}
         </div>
       </div>
