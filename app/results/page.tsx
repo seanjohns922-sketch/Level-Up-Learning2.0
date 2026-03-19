@@ -95,6 +95,7 @@ function ResultsPage() {
   const score = Number(sp.get("score") ?? "0");
   const total = Number(sp.get("total") ?? "0");
   const source = sp.get("source") ?? "pretest";
+  const isPostTest = sp.get("posttest") === "1";
 
   const scorePercent = useMemo(() => {
     if (!total || total <= 0) return 0;
