@@ -1718,9 +1718,9 @@ function generateGenericQuestion(
           }
         : {
             kind: "typed_response",
-            prompt: `Type a different partition for ${target}. How many tens would you have after regrouping one hundred?`,
-            answer: String((standard.tens + 100) / 10),
-            placeholder: "Type the tens value",
+            prompt: `${target} = ${standard.hundreds} + ${standard.tens} + ${standard.ones}. If 1 hundred is regrouped into 10 tens, how many tens are there now?`,
+            answer: String(standard.tens / 10 + 10),
+            placeholder: "Type the number of tens",
           };
     }
 
