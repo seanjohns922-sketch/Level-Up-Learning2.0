@@ -231,6 +231,7 @@ type GenericConfig = Record<string, unknown> & {
   minTotal?: number;
   maxTotal?: number;
   allowGenericFallback?: boolean;
+  allowedGroupSizes?: number[];
 };
 
 type ValidationReason = "alignment" | "difficulty" | "visual_missing" | "mode_blocked";
@@ -998,19 +999,28 @@ function generateInteractiveQuestion(
   }
 
   if (activityType === "equal_groups") {
-    const minGroups = typeof config.minGroups === "number" ? config.minGroups : 2;
-    const maxGroups =
-      typeof config.maxGroups === "number"
-        ? Math.max(config.maxGroups, Math.min(config.maxGroups + 2, profile.groupsMax))
-        : profile.groupsMax;
-    const minItemsPerGroup =
-      typeof config.minItemsPerGroup === "number" ? config.minItemsPerGroup : 2;
-    const maxItemsPerGroup =
-      typeof config.maxItemsPerGroup === "number"
-        ? Math.max(config.maxItemsPerGroup, Math.min(config.maxItemsPerGroup + 2, profile.itemsMax))
-        : profile.itemsMax;
-    const groups = randInt(minGroups, maxGroups);
-    const itemsPerGroup = randInt(minItemsPerGroup, maxItemsPerGroup);
+    const allowed = config.allowedGroupSizes;
+    let groups: number;
+    let itemsPerGroup: number;
+    if (allowed && allowed.length > 0) {
+      // Both groups count and items-per-group picked from allowed sizes
+      groups = allowed[randInt(0, allowed.length - 1)];
+      itemsPerGroup = allowed[randInt(0, allowed.length - 1)];
+    } else {
+      const minGroups = typeof config.minGroups === "number" ? config.minGroups : 2;
+      const maxGroups =
+        typeof config.maxGroups === "number"
+          ? Math.max(config.maxGroups, Math.min(config.maxGroups + 2, profile.groupsMax))
+          : profile.groupsMax;
+      const minItemsPerGroup =
+        typeof config.minItemsPerGroup === "number" ? config.minItemsPerGroup : 2;
+      const maxItemsPerGroup =
+        typeof config.maxItemsPerGroup === "number"
+          ? Math.max(config.maxItemsPerGroup, Math.min(config.maxItemsPerGroup + 2, profile.itemsMax))
+          : profile.itemsMax;
+      groups = randInt(minGroups, maxGroups);
+      itemsPerGroup = randInt(minItemsPerGroup, maxItemsPerGroup);
+    }
     const answer = groups * itemsPerGroup;
 
     return {
@@ -1025,19 +1035,27 @@ function generateInteractiveQuestion(
   }
 
   if (activityType === "arrays") {
-    const minRows = typeof config.minRows === "number" ? config.minRows : 2;
-    const maxRows =
-      typeof config.maxRows === "number"
-        ? Math.max(config.maxRows, Math.min(config.maxRows + 2, profile.groupsMax))
-        : Math.min(8, profile.groupsMax);
-    const minColumns =
-      typeof config.minColumns === "number" ? config.minColumns : 2;
-    const maxColumns =
-      typeof config.maxColumns === "number"
-        ? Math.max(config.maxColumns, Math.min(config.maxColumns + 2, profile.itemsMax))
-        : Math.min(10, profile.itemsMax);
-    const rows = randInt(minRows, maxRows);
-    const columns = randInt(minColumns, maxColumns);
+    const allowed = config.allowedGroupSizes;
+    let rows: number;
+    let columns: number;
+    if (allowed && allowed.length > 0) {
+      rows = allowed[randInt(0, allowed.length - 1)];
+      columns = allowed[randInt(0, allowed.length - 1)];
+    } else {
+      const minRows = typeof config.minRows === "number" ? config.minRows : 2;
+      const maxRows =
+        typeof config.maxRows === "number"
+          ? Math.max(config.maxRows, Math.min(config.maxRows + 2, profile.groupsMax))
+          : Math.min(8, profile.groupsMax);
+      const minColumns =
+        typeof config.minColumns === "number" ? config.minColumns : 2;
+      const maxColumns =
+        typeof config.maxColumns === "number"
+          ? Math.max(config.maxColumns, Math.min(config.maxColumns + 2, profile.itemsMax))
+          : Math.min(10, profile.itemsMax);
+      rows = randInt(minRows, maxRows);
+      columns = randInt(minColumns, maxColumns);
+    }
     const answer = rows * columns;
     const mode = config.mode === "repeated_addition" ? "repeated_addition" : "arrays";
     const repeatedAddition = Array.from({ length: rows }, () => columns).join(" + ");
@@ -1080,7 +1098,11 @@ function generateInteractiveQuestion(
       config.mode === "grouping" || config.mode === "inverse_link" || config.mode === "sharing"
         ? config.mode
         : "sharing";
-    const candidateGroupSizes = [2, 3, 4, 5, 6, 8, 10].filter((size) => size <= maxTotal);
+    const allowedSizes = config.allowedGroupSizes;
+    const candidateGroupSizes = (allowedSizes && allowedSizes.length > 0
+      ? allowedSizes
+      : [2, 3, 4, 5, 6, 8, 10]
+    ).filter((size) => size <= maxTotal);
     const groupSize =
       candidateGroupSizes[randInt(0, candidateGroupSizes.length - 1)] ?? 2;
     const minMultiplier = Math.max(2, Math.ceil(minTotal / groupSize));

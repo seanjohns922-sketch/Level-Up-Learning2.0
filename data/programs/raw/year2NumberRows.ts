@@ -739,24 +739,15 @@ export const year2NumberRows: ProgramRow[] = [
     ),
     activities: [
       makeActivity("equal_groups", 2, {
-        minGroups: 2,
-        maxGroups: 5,
-        minItemsPerGroup: 2,
-        maxItemsPerGroup: 5,
+        allowedGroupSizes: [2, 3, 5, 10],
         mode: "equal_groups",
       }),
       makeActivity("arrays", 1, {
-        minRows: 2,
-        maxRows: 5,
-        minColumns: 2,
-        maxColumns: 6,
+        allowedGroupSizes: [2, 3, 5, 10],
         mode: "arrays",
       }),
       makeActivity("multiple_choice", 1, {
-        minGroups: 2,
-        maxGroups: 5,
-        minItemsPerGroup: 2,
-        maxItemsPerGroup: 5,
+        allowedGroupSizes: [2, 3, 5, 10],
         mode: "equal_groups",
         sourceActivityType: "equal_groups",
       }),
@@ -775,24 +766,15 @@ export const year2NumberRows: ProgramRow[] = [
     ),
     activities: [
       makeActivity("arrays", 2, {
-        minRows: 2,
-        maxRows: 5,
-        minColumns: 2,
-        maxColumns: 5,
+        allowedGroupSizes: [2, 3, 5, 10],
         mode: "arrays",
       }),
       makeActivity("arrays", 1, {
-        minRows: 2,
-        maxRows: 4,
-        minColumns: 2,
-        maxColumns: 6,
+        allowedGroupSizes: [2, 3, 5, 10],
         mode: "arrays",
       }),
       makeActivity("multiple_choice", 1, {
-        minRows: 2,
-        maxRows: 5,
-        minColumns: 2,
-        maxColumns: 5,
+        allowedGroupSizes: [2, 3, 5, 10],
         mode: "arrays",
         sourceActivityType: "arrays",
       }),
@@ -811,10 +793,7 @@ export const year2NumberRows: ProgramRow[] = [
     ),
     activities: [
       makeActivity("arrays", 2, {
-        minRows: 2,
-        maxRows: 5,
-        minColumns: 2,
-        maxColumns: 5,
+        allowedGroupSizes: [2, 3, 5, 10],
         mode: "repeated_addition",
       }),
       makeActivity("fact_family", 1, {
@@ -823,10 +802,7 @@ export const year2NumberRows: ProgramRow[] = [
         mode: "recognise",
       }),
       makeActivity("typed_response", 1, {
-        minRows: 2,
-        maxRows: 5,
-        minColumns: 2,
-        maxColumns: 5,
+        allowedGroupSizes: [2, 3, 5, 10],
         mode: "repeated_addition",
         sourceActivityType: "arrays",
       }),
@@ -846,19 +822,18 @@ export const year2NumberRows: ProgramRow[] = [
     activities: [
       makeActivity("division_groups", 2, {
         minTotal: 6,
-        maxTotal: 24,
+        maxTotal: 30,
+        allowedGroupSizes: [2, 3, 5, 10],
         mode: "sharing",
       }),
       makeActivity("arrays", 1, {
-        minRows: 2,
-        maxRows: 4,
-        minColumns: 2,
-        maxColumns: 5,
+        allowedGroupSizes: [2, 3, 5, 10],
         mode: "arrays",
       }),
       makeActivity("multiple_choice", 1, {
         minTotal: 6,
-        maxTotal: 24,
+        maxTotal: 30,
+        allowedGroupSizes: [2, 3, 5, 10],
         mode: "sharing",
         sourceActivityType: "division_groups",
       }),
@@ -878,19 +853,18 @@ export const year2NumberRows: ProgramRow[] = [
     activities: [
       makeActivity("division_groups", 2, {
         minTotal: 6,
-        maxTotal: 24,
+        maxTotal: 30,
+        allowedGroupSizes: [2, 3, 5, 10],
         mode: "grouping",
       }),
       makeActivity("arrays", 1, {
-        minRows: 2,
-        maxRows: 4,
-        minColumns: 2,
-        maxColumns: 6,
+        allowedGroupSizes: [2, 3, 5, 10],
         mode: "arrays",
       }),
       makeActivity("typed_response", 1, {
         minTotal: 6,
-        maxTotal: 24,
+        maxTotal: 30,
+        allowedGroupSizes: [2, 3, 5, 10],
         mode: "grouping",
         sourceActivityType: "division_groups",
       }),
@@ -910,7 +884,8 @@ export const year2NumberRows: ProgramRow[] = [
     activities: [
       makeActivity("division_groups", 2, {
         minTotal: 6,
-        maxTotal: 24,
+        maxTotal: 30,
+        allowedGroupSizes: [2, 3, 5, 10],
         mode: "inverse_link",
       }),
       makeActivity("fact_family", 1, {
@@ -920,7 +895,8 @@ export const year2NumberRows: ProgramRow[] = [
       }),
       makeActivity("multiple_choice", 1, {
         minTotal: 6,
-        maxTotal: 24,
+        maxTotal: 30,
+        allowedGroupSizes: [2, 3, 5, 10],
         mode: "inverse_link",
         sourceActivityType: "division_groups",
       }),
