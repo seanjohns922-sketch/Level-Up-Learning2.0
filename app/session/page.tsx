@@ -6,6 +6,7 @@ import { readProgress, updateProgress } from "@/data/progress";
 import { ACTIVE_STUDENT_KEY } from "@/data/progress";
 import { supabase } from "@/lib/supabase";
 import { getProgramForYear } from "@/data/programs";
+import PostTestTransition from "@/components/PostTestTransition";
 import {
   buildYear2QuizActivityPool,
   generateQuestionForLessonActivity,
@@ -2215,10 +2216,19 @@ function SessionPage() {
   // ---------------------------
   const [lessonStarted, setLessonStarted] = useState(false);
 
+  const [showPostTestTransition, setShowPostTestTransition] = useState(false);
+
   function completeLesson() {
     const store = readStore();
     setLessonComplete(store, year, week, n);
     writeStore(store);
+
+    // After Week 12 Lesson 3, route to post-test transition
+    if (Number(week) === 12 && n === 3) {
+      setShowPostTestTransition(true);
+      return;
+    }
+
     backToWeek();
   }
 
@@ -2689,6 +2699,10 @@ function SessionPage() {
   // ---------------------------
   // UI
   // ---------------------------
+  if (showPostTestTransition) {
+    return <PostTestTransition year={year} />;
+  }
+
   return (
     <main className="min-h-screen bg-background flex items-center justify-center px-6 py-10">
       <div className="w-full max-w-5xl">
