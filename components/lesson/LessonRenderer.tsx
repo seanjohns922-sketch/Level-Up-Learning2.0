@@ -16,6 +16,8 @@ import PlaceValueBuilder from "@/components/activities/PlaceValueBuilder";
 import SkipCount from "@/components/activities/SkipCount";
 import SubtractionStrategy from "@/components/activities/SubtractionStrategy";
 import TypedResponseActivity from "@/components/activities/TypedResponseActivity";
+import SpeedRound from "@/components/activities/SpeedRound";
+import type { SpeedRoundQuestion } from "@/data/activities/year2/lessonEngine";
 import type {
   AdditionStrategyQuestion,
   EqualGroupsQuestion,
