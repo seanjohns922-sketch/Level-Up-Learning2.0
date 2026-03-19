@@ -822,19 +822,18 @@ export const year2NumberRows: ProgramRow[] = [
     activities: [
       makeActivity("division_groups", 2, {
         minTotal: 6,
-        maxTotal: 24,
+        maxTotal: 30,
+        allowedGroupSizes: [2, 3, 5, 10],
         mode: "sharing",
       }),
       makeActivity("arrays", 1, {
-        minRows: 2,
-        maxRows: 4,
-        minColumns: 2,
-        maxColumns: 5,
+        allowedGroupSizes: [2, 3, 5, 10],
         mode: "arrays",
       }),
       makeActivity("multiple_choice", 1, {
         minTotal: 6,
-        maxTotal: 24,
+        maxTotal: 30,
+        allowedGroupSizes: [2, 3, 5, 10],
         mode: "sharing",
         sourceActivityType: "division_groups",
       }),
