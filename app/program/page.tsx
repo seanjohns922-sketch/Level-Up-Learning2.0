@@ -73,7 +73,7 @@ function ProgramPage() {
     const program = getProgramForYear(curriculumYear);
     const weekPlan = program.find((w) => w.week === weekNum);
     const lessons = weekPlan?.lessons ?? [];
-    const base = [
+    const base: ProgramItem[] = [
       { type: "lesson" as const, n: 1, title: lessons[0]?.title ?? "Lesson 1", focus: lessons[0]?.focus ?? "" },
       { type: "lesson" as const, n: 2, title: lessons[1]?.title ?? "Lesson 2", focus: lessons[1]?.focus ?? "" },
       { type: "lesson" as const, n: 3, title: lessons[2]?.title ?? "Lesson 3", focus: lessons[2]?.focus ?? "" },
