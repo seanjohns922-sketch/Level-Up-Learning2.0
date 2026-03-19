@@ -225,7 +225,7 @@ export default function NumberLineActivity({
                 : "bg-destructive/10 text-destructive",
             ].join(" ")}
           >
-            {isCorrect ? "✅ Correct!" : `❌ The answer was ${questionData.expected}`}
+            {isCorrect ? "✅ Correct!" : `❌ The answer was ${fmt(questionData.expected)}`}
           </div>
         )}
       </div>
