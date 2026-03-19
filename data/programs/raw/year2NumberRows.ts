@@ -755,11 +755,11 @@ export const year2NumberRows: ProgramRow[] = [
   },
 
   // ═══════════════════════════════════════════════════════════
-  // WEEK 8 – MULTIPLICATION (GROUPS & ARRAYS)
+  // WEEK 8 – MULTIPLICATION FLUENCY (Skip Counting 2s, 5s, 10s)
   // ═══════════════════════════════════════════════════════════
   {
     week: 8,
-    focus: "Multiplication - Groups & Arrays",
+    focus: "Multiplication - 2s, 5s, 10s",
     lesson: 1,
     topic: "Model multiplication as equal groups",
     activity: "Make groups with counters. Use language: 'equal groups'.",
