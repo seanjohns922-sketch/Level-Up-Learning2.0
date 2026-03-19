@@ -999,19 +999,28 @@ function generateInteractiveQuestion(
   }
 
   if (activityType === "equal_groups") {
-    const minGroups = typeof config.minGroups === "number" ? config.minGroups : 2;
-    const maxGroups =
-      typeof config.maxGroups === "number"
-        ? Math.max(config.maxGroups, Math.min(config.maxGroups + 2, profile.groupsMax))
-        : profile.groupsMax;
-    const minItemsPerGroup =
-      typeof config.minItemsPerGroup === "number" ? config.minItemsPerGroup : 2;
-    const maxItemsPerGroup =
-      typeof config.maxItemsPerGroup === "number"
-        ? Math.max(config.maxItemsPerGroup, Math.min(config.maxItemsPerGroup + 2, profile.itemsMax))
-        : profile.itemsMax;
-    const groups = randInt(minGroups, maxGroups);
-    const itemsPerGroup = randInt(minItemsPerGroup, maxItemsPerGroup);
+    const allowed = config.allowedGroupSizes;
+    let groups: number;
+    let itemsPerGroup: number;
+    if (allowed && allowed.length > 0) {
+      // Both groups count and items-per-group picked from allowed sizes
+      groups = allowed[randInt(0, allowed.length - 1)];
+      itemsPerGroup = allowed[randInt(0, allowed.length - 1)];
+    } else {
+      const minGroups = typeof config.minGroups === "number" ? config.minGroups : 2;
+      const maxGroups =
+        typeof config.maxGroups === "number"
+          ? Math.max(config.maxGroups, Math.min(config.maxGroups + 2, profile.groupsMax))
+          : profile.groupsMax;
+      const minItemsPerGroup =
+        typeof config.minItemsPerGroup === "number" ? config.minItemsPerGroup : 2;
+      const maxItemsPerGroup =
+        typeof config.maxItemsPerGroup === "number"
+          ? Math.max(config.maxItemsPerGroup, Math.min(config.maxItemsPerGroup + 2, profile.itemsMax))
+          : profile.itemsMax;
+      groups = randInt(minGroups, maxGroups);
+      itemsPerGroup = randInt(minItemsPerGroup, maxItemsPerGroup);
+    }
     const answer = groups * itemsPerGroup;
 
     return {
