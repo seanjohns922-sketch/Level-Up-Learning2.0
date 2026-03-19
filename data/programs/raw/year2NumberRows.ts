@@ -33,40 +33,25 @@ function genericActivities(
   ];
 }
 
-/* ─── Fluency helper: adds a rapid-recall typed_response activity ─── */
-function fluencyActivity(
-  sourceActivityType: ActivityType,
-  config: Record<string, unknown>
-): LessonActivity {
-  return makeActivity("typed_response", 1, {
-    ...config,
-    sourceActivityType,
-    fluency: true,
-  });
-}
-
-/* ─── Reasoning helper: adds an MCQ with reasoning prompt ─── */
-function reasoningMCQ(
-  sourceActivityType: ActivityType,
-  config: Record<string, unknown>
-): LessonActivity {
-  return makeActivity("multiple_choice", 1, {
-    ...config,
-    sourceActivityType,
-    reasoning: true,
-  });
+function scopedActivity(
+  core: string,
+  fluency: string,
+  reasoning: string
+) {
+  return `${core} Fluency (2-3 min): ${fluency}. Reasoning prompt: ${reasoning}`;
 }
 
 export const year2NumberRows: ProgramRow[] = [
-  // ═══════════════════════════════════════════════════════════
-  // WEEK 1 – PLACE VALUE TO 1000
-  // ═══════════════════════════════════════════════════════════
   {
     week: 1,
     focus: "Place Value to 1000",
     lesson: 1,
     topic: "Read numbers to 1000",
-    activity: "Create a number with a dice or numbot rolling it, dragging MAB to match.",
+    activity: scopedActivity(
+      "Create, read, and compare 3-digit numbers with MAB visuals.",
+      "Count forwards and backwards from any 3-digit starting number.",
+      "How do you know this number is greater/smaller?"
+    ),
     activities: [
       makeActivity("place_value_builder", 2, {
         min: 100,
@@ -75,22 +60,17 @@ export const year2NumberRows: ProgramRow[] = [
         visualMode: "mab",
         mode: "identify_number",
       }),
-      makeActivity("skip_count", 1, {
-        min: 0,
+      makeActivity("number_order", 1, {
+        min: 100,
         max: 1000,
-        step: 10,
-        mode: "forward",
+        count: 5,
+        ascending: false,
       }),
-      makeActivity("multiple_choice", 1, {
+      makeActivity("typed_response", 1, {
         min: 100,
         max: 1000,
         mode: "identify_number",
         sourceActivityType: "place_value_builder",
-      }),
-      fluencyActivity("addition_strategy", {
-        min: 0,
-        max: 20,
-        mode: "jump",
       }),
     ],
     curriculum: ["AC9M2N01"],
@@ -100,7 +80,11 @@ export const year2NumberRows: ProgramRow[] = [
     focus: "Place Value to 1000",
     lesson: 2,
     topic: "Using MAB identify unknown numbers",
-    activity: "Build numbers using place value blocks. Trading blocks (10 ones = 1 ten, 10 tens = 1 hundred).",
+    activity: scopedActivity(
+      "Build and decode numbers using MAB blocks including missing parts.",
+      "Rapid place-value drills with hundreds/tens/ones.",
+      "If you trade 10 ones for 1 ten, what changes and what stays the same?"
+    ),
     activities: [
       makeActivity("place_value_builder", 2, {
         min: 100,
@@ -108,13 +92,12 @@ export const year2NumberRows: ProgramRow[] = [
         placeValues: ["hundreds", "tens", "ones"],
         visualMode: "mab",
         hideOnePlaceValue: true,
-      }),
-      makeActivity("multiple_choice", 1, {
-        min: 100,
-        max: 1000,
         mode: "missing_mab_part",
-        sourceActivityType: "place_value_builder",
-        hideOnePlaceValue: true,
+      }),
+      makeActivity("partition_expand", 1, {
+        min: 100,
+        max: 999,
+        mode: "flexible_partition",
       }),
       makeActivity("typed_response", 1, {
         min: 100,
@@ -122,12 +105,6 @@ export const year2NumberRows: ProgramRow[] = [
         mode: "missing_mab_part",
         sourceActivityType: "place_value_builder",
         hideOnePlaceValue: true,
-      }),
-      fluencyActivity("skip_count", {
-        min: 0,
-        max: 100,
-        step: 2,
-        mode: "forward",
       }),
     ],
     curriculum: ["AC9M2N01"],
@@ -137,7 +114,11 @@ export const year2NumberRows: ProgramRow[] = [
     focus: "Place Value to 1000",
     lesson: 3,
     topic: "Order numbers up to 1000",
-    activity: "Put 2 numbers together and talk about bigger or smaller, then order 4-5 numbers.",
+    activity: scopedActivity(
+      "Order 3-digit numbers and justify largest/smallest choices.",
+      "Quick compare-and-order sets of numbers.",
+      "Which number is largest and why?"
+    ),
     activities: [
       makeActivity("number_order", 2, {
         min: 100,
@@ -151,30 +132,25 @@ export const year2NumberRows: ProgramRow[] = [
         step: 50,
         mode: "placement",
       }),
-      reasoningMCQ("number_order", {
+      makeActivity("typed_response", 1, {
         min: 100,
         max: 1000,
         count: 4,
-        reasoning: true,
-      }),
-      fluencyActivity("addition_strategy", {
-        min: 0,
-        max: 20,
-        mode: "jump",
+        sourceActivityType: "number_order",
       }),
     ],
     curriculum: ["AC9M2N01"],
   },
-
-  // ═══════════════════════════════════════════════════════════
-  // WEEK 2 – PARTITIONING & EXPANDING
-  // ═══════════════════════════════════════════════════════════
   {
     week: 2,
     focus: "Partitioning & Expanding",
     lesson: 1,
     topic: "Break numbers into hundreds, tens, and ones",
-    activity: "Use place value charts to break numbers.",
+    activity: scopedActivity(
+      "Use place value charts to partition 3-digit numbers.",
+      "Quick partition warm-ups into H/T/O.",
+      "How do you know your partition still equals the original number?"
+    ),
     activities: [
       makeActivity("partition_expand", 2, {
         min: 100,
@@ -195,12 +171,6 @@ export const year2NumberRows: ProgramRow[] = [
         mode: "partition",
         sourceActivityType: "partition_expand",
       }),
-      fluencyActivity("skip_count", {
-        min: 0,
-        max: 100,
-        step: 5,
-        mode: "forward",
-      }),
     ],
     curriculum: ["AC9M2N02"],
   },
@@ -209,27 +179,24 @@ export const year2NumberRows: ProgramRow[] = [
     focus: "Partitioning & Expanding",
     lesson: 2,
     topic: "Expand numbers",
-    activity: "Expand numbers with arrows.",
-    activities: [
-      ...interactiveActivities(
-        "partition_expand",
-        {
-          min: 100,
-          max: 999,
-          mode: "expand",
-        },
-        genericActivities("partition_expand", {
-          min: 100,
-          max: 999,
-          mode: "expand",
-        })
-      ),
-      fluencyActivity("addition_strategy", {
-        min: 0,
-        max: 20,
-        mode: "split",
-      }),
-    ],
+    activity: scopedActivity(
+      "Expand numbers into place-value sums.",
+      "Rapid expanded-form recall.",
+      "Explain why expanded form and standard form are equivalent."
+    ),
+    activities: interactiveActivities(
+      "partition_expand",
+      {
+        min: 100,
+        max: 999,
+        mode: "expand",
+      },
+      genericActivities("partition_expand", {
+        min: 100,
+        max: 999,
+        mode: "expand",
+      })
+    ),
     curriculum: ["AC9M2N02"],
   },
   {
@@ -237,45 +204,43 @@ export const year2NumberRows: ProgramRow[] = [
     focus: "Partitioning & Expanding",
     lesson: 3,
     topic: "Partition numbers in different ways",
-    activity: "Use partitioning mats. Renaming numbers (e.g. 130 = 13 tens).",
+    activity: scopedActivity(
+      "Use flexible partitioning and renaming (e.g. 130 = 13 tens).",
+      "Quick renaming challenges using tens and hundreds.",
+      "Show two different valid partitions and explain both."
+    ),
     activities: [
       makeActivity("partition_expand", 2, {
         min: 100,
         max: 999,
         mode: "flexible_partition",
       }),
-      makeActivity("multiple_choice", 1, {
+      makeActivity("place_value_builder", 1, {
         min: 100,
         max: 999,
-        mode: "flexible_partition",
-        sourceActivityType: "partition_expand",
+        placeValues: ["hundreds", "tens", "ones"],
+        visualMode: "mab",
+        mode: "identify_place",
       }),
       makeActivity("typed_response", 1, {
         min: 100,
         max: 999,
         mode: "flexible_partition",
         sourceActivityType: "partition_expand",
-        reasoning: true,
-      }),
-      fluencyActivity("skip_count", {
-        min: 0,
-        max: 100,
-        step: 10,
-        mode: "forward",
       }),
     ],
     curriculum: ["AC9M2N02"],
   },
-
-  // ═══════════════════════════════════════════════════════════
-  // WEEK 3 – NUMBER LINES & ROUNDING
-  // ═══════════════════════════════════════════════════════════
   {
     week: 3,
     focus: "Number Lines & Rounding",
     lesson: 1,
     topic: "Place numbers on a number line",
-    activity: "Estimate and place numbers on line.",
+    activity: scopedActivity(
+      "Estimate first, then place numbers on number lines.",
+      "Fast placement fluency with benchmark numbers.",
+      "How close was your estimate and why?"
+    ),
     activities: [
       makeActivity("number_line", 2, {
         min: 0,
@@ -286,7 +251,7 @@ export const year2NumberRows: ProgramRow[] = [
       makeActivity("number_line", 1, {
         min: 0,
         max: 1000,
-        step: 50,
+        step: 10,
         mode: "estimate",
       }),
       makeActivity("multiple_choice", 1, {
@@ -295,11 +260,6 @@ export const year2NumberRows: ProgramRow[] = [
         step: 10,
         mode: "placement",
         sourceActivityType: "number_line",
-      }),
-      fluencyActivity("addition_strategy", {
-        min: 0,
-        max: 30,
-        mode: "jump",
       }),
     ],
     curriculum: ["AC9M2N01", "AC9M2N02"],
@@ -309,32 +269,28 @@ export const year2NumberRows: ProgramRow[] = [
     focus: "Number Lines & Rounding",
     lesson: 2,
     topic: "Round to the nearest 10 and 100",
-    activity: "Round numbers with number line support.",
-    activities: [
-      ...interactiveActivities(
-        "number_line",
-        {
-          min: 0,
-          max: 1000,
-          step: 10,
-          mode: "rounding",
-          targets: [10, 100],
-        },
-        genericActivities("number_line", {
-          min: 0,
-          max: 1000,
-          step: 10,
-          mode: "rounding",
-          targets: [10, 100],
-        })
-      ),
-      fluencyActivity("skip_count", {
+    activity: scopedActivity(
+      "Round numbers to nearest 10 and 100 using number-line reasoning.",
+      "Rapid round-to-10 and round-to-100 drills.",
+      "Explain why this rounded value is reasonable."
+    ),
+    activities: interactiveActivities(
+      "number_line",
+      {
         min: 0,
-        max: 100,
-        step: 2,
-        mode: "forward",
-      }),
-    ],
+        max: 1000,
+        step: 10,
+        mode: "rounding",
+        targets: [10, 100],
+      },
+      genericActivities("number_line", {
+        min: 0,
+        max: 1000,
+        step: 10,
+        mode: "rounding",
+        targets: [10, 100],
+      })
+    ),
     curriculum: ["AC9M2N01", "AC9M2N02"],
   },
   {
@@ -342,46 +298,38 @@ export const year2NumberRows: ProgramRow[] = [
     focus: "Number Lines & Rounding",
     lesson: 3,
     topic: "Estimate numbers on number lines",
-    activity: "Play rounding estimation games. Is your answer reasonable?",
-    activities: [
-      makeActivity("number_line", 2, {
+    activity: scopedActivity(
+      "Estimate and justify positions on number lines.",
+      "Quick estimate checks against nearby benchmarks.",
+      "Is your answer reasonable? Explain."
+    ),
+    activities: interactiveActivities(
+      "number_line",
+      {
         min: 0,
         max: 1000,
         step: 50,
         mode: "estimate",
-      }),
-      reasoningMCQ("number_line", {
+      },
+      genericActivities("number_line", {
         min: 0,
         max: 1000,
         step: 50,
         mode: "estimate",
-        reasoning: true,
-      }),
-      makeActivity("typed_response", 1, {
-        min: 0,
-        max: 1000,
-        step: 50,
-        mode: "estimate",
-        sourceActivityType: "number_line",
-      }),
-      fluencyActivity("addition_strategy", {
-        min: 0,
-        max: 30,
-        mode: "friendly_numbers",
-      }),
-    ],
+      })
+    ),
     curriculum: ["AC9M2N01", "AC9M2N02"],
   },
-
-  // ═══════════════════════════════════════════════════════════
-  // WEEK 4 – ODD & EVEN NUMBERS
-  // ═══════════════════════════════════════════════════════════
   {
     week: 4,
     focus: "Odd & Even Numbers",
     lesson: 1,
     topic: "Identify odd and even numbers",
-    activity: "Use counters to sort odd/even",
+    activity: scopedActivity(
+      "Sort and identify odd/even numbers.",
+      "Quick odd/even recall warm-up.",
+      "How do you know this number is odd or even?"
+    ),
     activities: [
       makeActivity("odd_even_sort", 2, {
         min: 0,
@@ -400,12 +348,6 @@ export const year2NumberRows: ProgramRow[] = [
         max: 30,
         mode: "identify",
         sourceActivityType: "odd_even_sort",
-      }),
-      fluencyActivity("skip_count", {
-        min: 0,
-        max: 100,
-        step: 2,
-        mode: "forward",
       }),
     ],
     curriculum: ["AC9M2N03"],
@@ -415,31 +357,29 @@ export const year2NumberRows: ProgramRow[] = [
     focus: "Odd & Even Numbers",
     lesson: 2,
     topic: "Sort and explain odd/even patterns",
-    activity: "Use hundreds charts to find patterns. Predict next numbers.",
+    activity: scopedActivity(
+      "Sort odd/even and identify repeating parity patterns.",
+      "Rapid parity pattern drills.",
+      "Predict the next numbers in an odd/even pattern and explain."
+    ),
     activities: [
       makeActivity("odd_even_sort", 2, {
         min: 0,
         max: 40,
         count: 6,
-        mode: "pattern",
+        mode: "identify",
       }),
       makeActivity("multiple_choice", 1, {
         min: 0,
         max: 40,
         mode: "pattern",
         sourceActivityType: "odd_even_sort",
-        reasoning: true,
       }),
       makeActivity("typed_response", 1, {
         min: 0,
         max: 40,
         mode: "pattern",
         sourceActivityType: "odd_even_sort",
-      }),
-      fluencyActivity("addition_strategy", {
-        min: 0,
-        max: 20,
-        mode: "jump",
       }),
     ],
     curriculum: ["AC9M2N03"],
@@ -449,7 +389,11 @@ export const year2NumberRows: ProgramRow[] = [
     focus: "Odd & Even Numbers",
     lesson: 3,
     topic: "Add odd/even and explore results",
-    activity: "Test sums of odd/even numbers. odd + odd = ? even + even = ? Explain why.",
+    activity: scopedActivity(
+      "Explore odd+odd, even+even, and odd+even sums.",
+      "Fast sum-parity fluency checks.",
+      "Is this always true? Explain why."
+    ),
     activities: [
       makeActivity("odd_even_sort", 2, {
         min: 0,
@@ -457,58 +401,44 @@ export const year2NumberRows: ProgramRow[] = [
         count: 6,
         mode: "odd_even_sums",
       }),
-      reasoningMCQ("odd_even_sort", {
-        min: 0,
-        max: 50,
-        mode: "odd_even_sums",
-        reasoning: true,
-      }),
       makeActivity("typed_response", 1, {
         min: 0,
         max: 50,
         mode: "odd_even_sums",
         sourceActivityType: "odd_even_sort",
       }),
-      fluencyActivity("skip_count", {
+      makeActivity("multiple_choice", 1, {
         min: 0,
-        max: 100,
-        step: 5,
-        mode: "forward",
+        max: 50,
+        mode: "odd_even_sums",
+        sourceActivityType: "odd_even_sort",
       }),
     ],
     curriculum: ["AC9M2N03"],
   },
-
-  // ═══════════════════════════════════════════════════════════
-  // WEEK 5 – ADDITION STRATEGIES
-  // ═══════════════════════════════════════════════════════════
   {
     week: 5,
     focus: "Addition Strategies",
     lesson: 1,
     topic: "Use jump strategy on open number lines",
-    activity: "Draw jumps on number lines",
-    activities: [
-      ...interactiveActivities(
-        "addition_strategy",
-        {
-          min: 0,
-          max: 100,
-          mode: "jump",
-        },
-        genericActivities("addition_strategy", {
-          min: 0,
-          max: 100,
-          mode: "jump",
-        })
-      ),
-      fluencyActivity("skip_count", {
+    activity: scopedActivity(
+      "Use jump strategy on open number lines.",
+      "Quick addition fact fluency and doubles.",
+      "Why does your jump path make sense?"
+    ),
+    activities: interactiveActivities(
+      "addition_strategy",
+      {
         min: 0,
         max: 100,
-        step: 10,
-        mode: "forward",
-      }),
-    ],
+        mode: "jump",
+      },
+      genericActivities("addition_strategy", {
+        min: 0,
+        max: 100,
+        mode: "jump",
+      })
+    ),
     curriculum: ["AC9M2N04"],
   },
   {
@@ -516,27 +446,24 @@ export const year2NumberRows: ProgramRow[] = [
     focus: "Addition Strategies",
     lesson: 2,
     topic: "Use split strategy to add 2-digit numbers",
-    activity: "Split tens and ones to add",
-    activities: [
-      ...interactiveActivities(
-        "addition_strategy",
-        {
-          min: 10,
-          max: 99,
-          mode: "split",
-        },
-        genericActivities("addition_strategy", {
-          min: 10,
-          max: 99,
-          mode: "split",
-        })
-      ),
-      fluencyActivity("addition_strategy", {
-        min: 0,
-        max: 20,
-        mode: "jump",
-      }),
-    ],
+    activity: scopedActivity(
+      "Use split strategy for 2-digit addition.",
+      "Rapid split-and-add fluency.",
+      "Explain how tens and ones were combined."
+    ),
+    activities: interactiveActivities(
+      "addition_strategy",
+      {
+        min: 10,
+        max: 99,
+        mode: "split",
+      },
+      genericActivities("addition_strategy", {
+        min: 10,
+        max: 99,
+        mode: "split",
+      })
+    ),
     curriculum: ["AC9M2N04"],
   },
   {
@@ -544,63 +471,49 @@ export const year2NumberRows: ProgramRow[] = [
     focus: "Addition Strategies",
     lesson: 3,
     topic: "Use friendly numbers for addition",
-    activity: "Add to friendly tens (e.g. 40 + 3). Estimate before solving.",
-    activities: [
-      makeActivity("addition_strategy", 2, {
+    activity: scopedActivity(
+      "Use friendly numbers and estimate before solving.",
+      "Near-doubles and friendly-ten fluency.",
+      "Estimate first, then explain why the final answer is reasonable."
+    ),
+    activities: interactiveActivities(
+      "addition_strategy",
+      {
         min: 10,
         max: 99,
         mode: "friendly_numbers",
-      }),
-      makeActivity("number_line", 1, {
-        min: 0,
-        max: 100,
-        step: 10,
-        mode: "estimate",
-      }),
-      makeActivity("multiple_choice", 1, {
+      },
+      genericActivities("addition_strategy", {
         min: 10,
         max: 99,
         mode: "friendly_numbers",
-        sourceActivityType: "addition_strategy",
-      }),
-      fluencyActivity("addition_strategy", {
-        min: 0,
-        max: 20,
-        mode: "split",
-      }),
-    ],
+      })
+    ),
     curriculum: ["AC9M2N04"],
   },
-
-  // ═══════════════════════════════════════════════════════════
-  // WEEK 6 – SUBTRACTION STRATEGIES
-  // ═══════════════════════════════════════════════════════════
   {
     week: 6,
     focus: "Subtraction Strategies",
     lesson: 1,
     topic: "Use jump strategy for subtraction",
-    activity: "Jump back on number line",
-    activities: [
-      ...interactiveActivities(
-        "subtraction_strategy",
-        {
-          min: 0,
-          max: 100,
-          mode: "jump",
-        },
-        genericActivities("subtraction_strategy", {
-          min: 0,
-          max: 100,
-          mode: "jump",
-        })
-      ),
-      fluencyActivity("addition_strategy", {
+    activity: scopedActivity(
+      "Use jump strategy for subtraction.",
+      "Quick subtraction fact fluency.",
+      "Why are your jumps efficient?"
+    ),
+    activities: interactiveActivities(
+      "subtraction_strategy",
+      {
         min: 0,
-        max: 30,
+        max: 100,
         mode: "jump",
-      }),
-    ],
+      },
+      genericActivities("subtraction_strategy", {
+        min: 0,
+        max: 100,
+        mode: "jump",
+      })
+    ),
     curriculum: ["AC9M2N04"],
   },
   {
@@ -608,27 +521,24 @@ export const year2NumberRows: ProgramRow[] = [
     focus: "Subtraction Strategies",
     lesson: 2,
     topic: "Use split strategy to subtract 2-digit numbers",
-    activity: "Split and subtract each place",
-    activities: [
-      ...interactiveActivities(
-        "subtraction_strategy",
-        {
-          min: 10,
-          max: 99,
-          mode: "split",
-        },
-        genericActivities("subtraction_strategy", {
-          min: 10,
-          max: 99,
-          mode: "split",
-        })
-      ),
-      fluencyActivity("subtraction_strategy", {
-        min: 0,
-        max: 20,
-        mode: "jump",
-      }),
-    ],
+    activity: scopedActivity(
+      "Use split strategy for 2-digit subtraction.",
+      "Rapid split-and-subtract fluency.",
+      "Explain your regrouping/partition decisions."
+    ),
+    activities: interactiveActivities(
+      "subtraction_strategy",
+      {
+        min: 10,
+        max: 99,
+        mode: "split",
+      },
+      genericActivities("subtraction_strategy", {
+        min: 10,
+        max: 99,
+        mode: "split",
+      })
+    ),
     curriculum: ["AC9M2N04"],
   },
   {
@@ -636,7 +546,11 @@ export const year2NumberRows: ProgramRow[] = [
     focus: "Subtraction Strategies",
     lesson: 3,
     topic: "Use fact strategies to subtract",
-    activity: "Subtract using known facts. Connect addition ↔ subtraction (inverse thinking).",
+    activity: scopedActivity(
+      "Use fact strategies and inverse thinking for subtraction.",
+      "Fact recall and related subtraction facts.",
+      "How does addition help check subtraction?"
+    ),
     activities: [
       makeActivity("subtraction_strategy", 2, {
         min: 0,
@@ -644,125 +558,185 @@ export const year2NumberRows: ProgramRow[] = [
         mode: "fact_strategy",
       }),
       makeActivity("fact_family", 1, {
-        min: 4,
+        min: 8,
         max: 30,
         mode: "recognise",
       }),
-      makeActivity("multiple_choice", 1, {
+      makeActivity("typed_response", 1, {
         min: 0,
         max: 100,
         mode: "fact_strategy",
         sourceActivityType: "subtraction_strategy",
       }),
-      fluencyActivity("addition_strategy", {
-        min: 0,
-        max: 20,
-        mode: "friendly_numbers",
-      }),
     ],
     curriculum: ["AC9M2N04"],
   },
-
-  // ═══════════════════════════════════════════════════════════
-  // WEEK 7 – FACT FAMILIES & INVERSE
-  // ═══════════════════════════════════════════════════════════
   {
     week: 7,
-    focus: "Fact Families",
+    focus: "Fact Families & Inverse",
     lesson: 1,
     topic: "Recognise fact families for + and -",
-    activity: "Use triangle cards",
-    activities: [
-      ...interactiveActivities(
-        "fact_family",
-        {
-          min: 8,
-          max: 30,
-          mode: "recognise",
-        },
-        genericActivities("fact_family", {
-          min: 8,
-          max: 30,
-          mode: "recognise",
-        })
-      ),
-      fluencyActivity("addition_strategy", {
-        min: 0,
-        max: 20,
-        mode: "jump",
-      }),
-    ],
+    activity: scopedActivity(
+      "Recognise related fact families.",
+      "Rapid fact-family recall.",
+      "How are these facts connected?"
+    ),
+    activities: interactiveActivities(
+      "fact_family",
+      {
+        min: 8,
+        max: 30,
+        mode: "recognise",
+      },
+      genericActivities("fact_family", {
+        min: 8,
+        max: 30,
+        mode: "recognise",
+      })
+    ),
     curriculum: ["AC9M2N05"],
   },
   {
     week: 7,
-    focus: "Fact Families",
+    focus: "Fact Families & Inverse",
     lesson: 2,
     topic: "Write 4 number sentences from a fact family",
-    activity: "Write related facts from 3 numbers",
-    activities: [
-      ...interactiveActivities(
-        "fact_family",
-        {
-          min: 10,
-          max: 100,
-          mode: "write_sentences",
-        },
-        genericActivities("fact_family", {
-          min: 10,
-          max: 100,
-          mode: "write_sentences",
-        })
-      ),
-      fluencyActivity("subtraction_strategy", {
-        min: 0,
-        max: 20,
-        mode: "fact_strategy",
-      }),
-    ],
+    activity: scopedActivity(
+      "Write complete fact family sets from 3 numbers.",
+      "Quick write-and-check fluency.",
+      "Explain why each equation belongs in the same family."
+    ),
+    activities: interactiveActivities(
+      "fact_family",
+      {
+        min: 10,
+        max: 40,
+        mode: "write_sentences",
+      },
+      genericActivities("fact_family", {
+        min: 10,
+        max: 40,
+        mode: "write_sentences",
+      })
+    ),
     curriculum: ["AC9M2N05"],
   },
   {
     week: 7,
-    focus: "Fact Families",
+    focus: "Fact Families & Inverse",
     lesson: 3,
     topic: "Use fact families to solve word problems",
-    activity: "Match fact families to word problems. Strengthen inverse relationships explicitly.",
-    activities: [
-      makeActivity("fact_family", 2, {
+    activity: scopedActivity(
+      "Apply fact families in word problems with explicit inverse links.",
+      "Rapid inverse fact checks.",
+      "Which inverse fact proves your answer?"
+    ),
+    activities: interactiveActivities(
+      "fact_family",
+      {
         min: 12,
-        max: 100,
+        max: 40,
         mode: "word_problems",
-      }),
-      makeActivity("subtraction_strategy", 1, {
-        min: 0,
-        max: 50,
-        mode: "fact_strategy",
-      }),
-      reasoningMCQ("fact_family", {
+      },
+      genericActivities("fact_family", {
         min: 12,
-        max: 100,
+        max: 40,
         mode: "word_problems",
-        reasoning: true,
-      }),
-      fluencyActivity("addition_strategy", {
-        min: 0,
-        max: 30,
-        mode: "split",
-      }),
-    ],
+      })
+    ),
     curriculum: ["AC9M2N05"],
   },
-
-  // ═══════════════════════════════════════════════════════════
-  // WEEK 8 – MULTIPLICATION (GROUPS & ARRAYS)
-  // ═══════════════════════════════════════════════════════════
   {
     week: 8,
+    focus: "Multiplication Fluency",
+    lesson: 1,
+    topic: "Recall and skip count by 2s",
+    activity: scopedActivity(
+      "Skip count by 2s with fluency and pattern recognition.",
+      "Rapid recall drills by 2s.",
+      "What pattern do you notice in the ones digits?"
+    ),
+    activities: interactiveActivities(
+      "skip_count",
+      {
+        min: 0,
+        max: 100,
+        step: 2,
+        mode: "forward",
+      },
+      genericActivities("skip_count", {
+        min: 0,
+        max: 100,
+        step: 2,
+        mode: "forward",
+      })
+    ),
+    curriculum: ["AC9M2N03"],
+  },
+  {
+    week: 8,
+    focus: "Multiplication Fluency",
+    lesson: 2,
+    topic: "Recall and skip count by 5s",
+    activity: scopedActivity(
+      "Skip count by 5s with fluency and pattern recognition.",
+      "Rapid recall drills by 5s.",
+      "How do number endings help you predict the next term?"
+    ),
+    activities: interactiveActivities(
+      "skip_count",
+      {
+        min: 0,
+        max: 100,
+        step: 5,
+        mode: "forward",
+      },
+      genericActivities("skip_count", {
+        min: 0,
+        max: 100,
+        step: 5,
+        mode: "forward",
+      })
+    ),
+    curriculum: ["AC9M2N03"],
+  },
+  {
+    week: 8,
+    focus: "Multiplication Fluency",
+    lesson: 3,
+    topic: "Recall and skip count by 10s",
+    activity: scopedActivity(
+      "Skip count by 10s with fluency and pattern recognition.",
+      "Rapid recall drills by 10s.",
+      "Explain why this pattern grows predictably."
+    ),
+    activities: interactiveActivities(
+      "skip_count",
+      {
+        min: 0,
+        max: 200,
+        step: 10,
+        mode: "forward",
+      },
+      genericActivities("skip_count", {
+        min: 0,
+        max: 200,
+        step: 10,
+        mode: "forward",
+      })
+    ),
+    curriculum: ["AC9M2N03"],
+  },
+  {
+    week: 9,
     focus: "Multiplication - Groups & Arrays",
     lesson: 1,
     topic: "Model multiplication as equal groups",
-    activity: "Make groups with counters. Use language: 'equal groups'.",
+    activity: scopedActivity(
+      "Model multiplication as equal groups.",
+      "Quick multiplication fact fluency linked to groups.",
+      "Explain what equal groups means in this model."
+    ),
     activities: [
       makeActivity("equal_groups", 2, {
         minGroups: 2,
@@ -786,21 +760,19 @@ export const year2NumberRows: ProgramRow[] = [
         mode: "equal_groups",
         sourceActivityType: "equal_groups",
       }),
-      fluencyActivity("skip_count", {
-        min: 0,
-        max: 100,
-        step: 2,
-        mode: "forward",
-      }),
     ],
     curriculum: ["AC9M2N05"],
   },
   {
-    week: 8,
+    week: 9,
     focus: "Multiplication - Groups & Arrays",
     lesson: 2,
     topic: "Model multiplication as arrays",
-    activity: "Build arrays with rows and columns. Explain what the array shows.",
+    activity: scopedActivity(
+      "Model multiplication as arrays using rows and columns.",
+      "Rapid recall of row/column totals.",
+      "Explain what the array shows and how you know."
+    ),
     activities: [
       makeActivity("arrays", 2, {
         minRows: 2,
@@ -814,31 +786,29 @@ export const year2NumberRows: ProgramRow[] = [
         maxRows: 4,
         minColumns: 2,
         maxColumns: 6,
-        mode: "repeated_addition",
+        mode: "arrays",
       }),
-      reasoningMCQ("arrays", {
+      makeActivity("multiple_choice", 1, {
         minRows: 2,
         maxRows: 5,
         minColumns: 2,
         maxColumns: 5,
         mode: "arrays",
-        reasoning: true,
-      }),
-      fluencyActivity("skip_count", {
-        min: 0,
-        max: 100,
-        step: 5,
-        mode: "forward",
+        sourceActivityType: "arrays",
       }),
     ],
     curriculum: ["AC9M2N05"],
   },
   {
-    week: 8,
+    week: 9,
     focus: "Multiplication - Groups & Arrays",
     lesson: 3,
     topic: "Link multiplication to repeated addition",
-    activity: "Write repeated addition sentences from arrays.",
+    activity: scopedActivity(
+      "Link arrays to repeated addition sentences.",
+      "Quick repeated-addition fluency.",
+      "How does the repeated addition sentence match the array?"
+    ),
     activities: [
       makeActivity("arrays", 2, {
         minRows: 2,
@@ -847,12 +817,10 @@ export const year2NumberRows: ProgramRow[] = [
         maxColumns: 5,
         mode: "repeated_addition",
       }),
-      makeActivity("equal_groups", 1, {
-        minGroups: 2,
-        maxGroups: 5,
-        minItemsPerGroup: 2,
-        maxItemsPerGroup: 5,
-        mode: "equal_groups",
+      makeActivity("fact_family", 1, {
+        min: 0,
+        max: 20,
+        mode: "recognise",
       }),
       makeActivity("typed_response", 1, {
         minRows: 2,
@@ -862,140 +830,19 @@ export const year2NumberRows: ProgramRow[] = [
         mode: "repeated_addition",
         sourceActivityType: "arrays",
       }),
-      fluencyActivity("skip_count", {
-        min: 0,
-        max: 100,
-        step: 10,
-        mode: "forward",
-      }),
     ],
     curriculum: ["AC9M2N05"],
   },
-
-  // ═══════════════════════════════════════════════════════════
-  // WEEK 9 – MULTIPLICATION FLUENCY (Skip Counting 2s, 5s, 10s)
-  // ═══════════════════════════════════════════════════════════
-  {
-    week: 9,
-    focus: "Multiplication - 2s, 5s, 10s",
-    lesson: 1,
-    topic: "Recall and skip count by 2s",
-    activity: "Skip count using number lines. Fluency drills and pattern recognition.",
-    activities: [
-      makeActivity("skip_count", 2, {
-        min: 0,
-        max: 100,
-        step: 2,
-        mode: "forward",
-      }),
-      makeActivity("multiple_choice", 1, {
-        min: 0,
-        max: 100,
-        step: 2,
-        mode: "forward",
-        sourceActivityType: "skip_count",
-      }),
-      makeActivity("typed_response", 1, {
-        min: 0,
-        max: 100,
-        step: 2,
-        mode: "forward",
-        sourceActivityType: "skip_count",
-      }),
-      fluencyActivity("equal_groups", {
-        minGroups: 2,
-        maxGroups: 5,
-        minItemsPerGroup: 2,
-        maxItemsPerGroup: 2,
-        mode: "equal_groups",
-      }),
-    ],
-    curriculum: ["AC9M2N03"],
-  },
-  {
-    week: 9,
-    focus: "Multiplication - 2s, 5s, 10s",
-    lesson: 2,
-    topic: "Recall and skip count by 5s",
-    activity: "Chant and recall facts with music. Fluency drills.",
-    activities: [
-      makeActivity("skip_count", 2, {
-        min: 0,
-        max: 100,
-        step: 5,
-        mode: "forward",
-      }),
-      makeActivity("multiple_choice", 1, {
-        min: 0,
-        max: 100,
-        step: 5,
-        mode: "forward",
-        sourceActivityType: "skip_count",
-      }),
-      makeActivity("typed_response", 1, {
-        min: 0,
-        max: 100,
-        step: 5,
-        mode: "forward",
-        sourceActivityType: "skip_count",
-      }),
-      fluencyActivity("equal_groups", {
-        minGroups: 2,
-        maxGroups: 5,
-        minItemsPerGroup: 5,
-        maxItemsPerGroup: 5,
-        mode: "equal_groups",
-      }),
-    ],
-    curriculum: ["AC9M2N03"],
-  },
-  {
-    week: 9,
-    focus: "Multiplication - 2s, 5s, 10s",
-    lesson: 3,
-    topic: "Recall and skip count by 10s",
-    activity: "Write and recall fact families. Pattern recognition in counting.",
-    activities: [
-      makeActivity("skip_count", 2, {
-        min: 0,
-        max: 1000,
-        step: 10,
-        mode: "forward",
-      }),
-      makeActivity("multiple_choice", 1, {
-        min: 0,
-        max: 1000,
-        step: 10,
-        mode: "forward",
-        sourceActivityType: "skip_count",
-      }),
-      makeActivity("typed_response", 1, {
-        min: 0,
-        max: 1000,
-        step: 10,
-        mode: "forward",
-        sourceActivityType: "skip_count",
-      }),
-      fluencyActivity("arrays", {
-        minRows: 2,
-        maxRows: 5,
-        minColumns: 10,
-        maxColumns: 10,
-        mode: "arrays",
-      }),
-    ],
-    curriculum: ["AC9M2N03"],
-  },
-
-  // ═══════════════════════════════════════════════════════════
-  // WEEK 10 – DIVISION (EQUAL GROUPS)
-  // ═══════════════════════════════════════════════════════════
   {
     week: 10,
     focus: "Division - Equal Groups",
     lesson: 1,
     topic: "Model division as sharing",
-    activity: "Share items equally in groups",
+    activity: scopedActivity(
+      "Model division as sharing into equal groups.",
+      "Quick sharing facts and skip-count checks.",
+      "How is sharing different from grouping?"
+    ),
     activities: [
       makeActivity("division_groups", 2, {
         minTotal: 6,
@@ -1015,12 +862,6 @@ export const year2NumberRows: ProgramRow[] = [
         mode: "sharing",
         sourceActivityType: "division_groups",
       }),
-      fluencyActivity("skip_count", {
-        min: 0,
-        max: 100,
-        step: 2,
-        mode: "forward",
-      }),
     ],
     curriculum: ["AC9M2N06"],
   },
@@ -1029,31 +870,29 @@ export const year2NumberRows: ProgramRow[] = [
     focus: "Division - Equal Groups",
     lesson: 2,
     topic: "Model division as grouping",
-    activity: "Draw groups to match division",
+    activity: scopedActivity(
+      "Model division as grouping and count the number of groups.",
+      "Fast grouping fluency checks.",
+      "Explain why your grouping answer is correct."
+    ),
     activities: [
       makeActivity("division_groups", 2, {
         minTotal: 6,
         maxTotal: 24,
         mode: "grouping",
       }),
-      makeActivity("equal_groups", 1, {
-        minGroups: 2,
-        maxGroups: 5,
-        minItemsPerGroup: 2,
-        maxItemsPerGroup: 5,
-        mode: "equal_groups",
+      makeActivity("arrays", 1, {
+        minRows: 2,
+        maxRows: 4,
+        minColumns: 2,
+        maxColumns: 6,
+        mode: "arrays",
       }),
       makeActivity("typed_response", 1, {
         minTotal: 6,
         maxTotal: 24,
         mode: "grouping",
         sourceActivityType: "division_groups",
-      }),
-      fluencyActivity("skip_count", {
-        min: 0,
-        max: 100,
-        step: 5,
-        mode: "forward",
       }),
     ],
     curriculum: ["AC9M2N06"],
@@ -1063,46 +902,41 @@ export const year2NumberRows: ProgramRow[] = [
     focus: "Division - Equal Groups",
     lesson: 3,
     topic: "Link division to multiplication",
-    activity: "Use inverse to check answers. Explicitly connect division ↔ multiplication.",
+    activity: scopedActivity(
+      "Link division to multiplication using inverse facts.",
+      "Rapid inverse fact recall.",
+      "Which multiplication fact checks this division result?"
+    ),
     activities: [
       makeActivity("division_groups", 2, {
         minTotal: 6,
         maxTotal: 24,
         mode: "inverse_link",
       }),
-      makeActivity("equal_groups", 1, {
-        minGroups: 2,
-        maxGroups: 5,
-        minItemsPerGroup: 2,
-        maxItemsPerGroup: 5,
-        mode: "equal_groups",
+      makeActivity("fact_family", 1, {
+        min: 0,
+        max: 20,
+        mode: "recognise",
       }),
-      reasoningMCQ("division_groups", {
+      makeActivity("multiple_choice", 1, {
         minTotal: 6,
         maxTotal: 24,
         mode: "inverse_link",
-        reasoning: true,
-      }),
-      fluencyActivity("arrays", {
-        minRows: 2,
-        maxRows: 5,
-        minColumns: 2,
-        maxColumns: 5,
-        mode: "arrays",
+        sourceActivityType: "division_groups",
       }),
     ],
     curriculum: ["AC9M2N06"],
   },
-
-  // ═══════════════════════════════════════════════════════════
-  // WEEK 11 – MIXED OPERATIONS
-  // ═══════════════════════════════════════════════════════════
   {
     week: 11,
     focus: "Mixed Operations",
     lesson: 1,
     topic: "Choose operation to solve problem",
-    activity: "Read problem and underline clues. Estimate BEFORE solving.",
+    activity: scopedActivity(
+      "Choose the correct operation for word problems.",
+      "Quick operation-selection fluency.",
+      "Estimate first: does your chosen operation make sense?"
+    ),
     activities: [
       makeActivity("mixed_word_problem", 2, {
         min: 0,
@@ -1122,12 +956,6 @@ export const year2NumberRows: ProgramRow[] = [
         operations: ["+", "-", "x", "/"],
         sourceActivityType: "mixed_word_problem",
       }),
-      fluencyActivity("skip_count", {
-        min: 0,
-        max: 100,
-        step: 5,
-        mode: "forward",
-      }),
     ],
     curriculum: ["AC9M2N06"],
   },
@@ -1136,7 +964,11 @@ export const year2NumberRows: ProgramRow[] = [
     focus: "Mixed Operations",
     lesson: 2,
     topic: "Solve 2-step problems with + and -",
-    activity: "Draw steps in a 2-step problem. Does this make sense?",
+    activity: scopedActivity(
+      "Solve two-step add/subtract problems.",
+      "Rapid two-step structure drills.",
+      "Estimate before solving and check if your answer is reasonable."
+    ),
     activities: [
       makeActivity("mixed_word_problem", 2, {
         min: 0,
@@ -1149,17 +981,12 @@ export const year2NumberRows: ProgramRow[] = [
         max: 100,
         mode: "jump",
       }),
-      reasoningMCQ("mixed_word_problem", {
+      makeActivity("typed_response", 1, {
         min: 0,
         max: 100,
         mode: "two_step_add_sub",
         operations: ["+", "-"],
-        reasoning: true,
-      }),
-      fluencyActivity("addition_strategy", {
-        min: 0,
-        max: 50,
-        mode: "split",
+        sourceActivityType: "mixed_word_problem",
       }),
     ],
     curriculum: ["AC9M2N06"],
@@ -1169,7 +996,11 @@ export const year2NumberRows: ProgramRow[] = [
     focus: "Mixed Operations",
     lesson: 3,
     topic: "Solve problems with x and /",
-    activity: "Use operation mats to solve. Is this always true?",
+    activity: scopedActivity(
+      "Solve mixed multiplication/division problems.",
+      "Fast mult/div recall and inverse checks.",
+      "Does your final answer make sense in the context?"
+    ),
     activities: [
       makeActivity("mixed_word_problem", 2, {
         min: 0,
@@ -1182,33 +1013,26 @@ export const year2NumberRows: ProgramRow[] = [
         maxTotal: 24,
         mode: "inverse_link",
       }),
-      reasoningMCQ("mixed_word_problem", {
+      makeActivity("multiple_choice", 1, {
         min: 0,
         max: 50,
         mode: "mult_div_problems",
         operations: ["x", "/"],
-        reasoning: true,
-      }),
-      fluencyActivity("equal_groups", {
-        minGroups: 2,
-        maxGroups: 5,
-        minItemsPerGroup: 2,
-        maxItemsPerGroup: 5,
-        mode: "equal_groups",
+        sourceActivityType: "mixed_word_problem",
       }),
     ],
     curriculum: ["AC9M2N06"],
   },
-
-  // ═══════════════════════════════════════════════════════════
-  // WEEK 12 – REVIEW & QUIZ
-  // ═══════════════════════════════════════════════════════════
   {
     week: 12,
     focus: "Review & Quiz",
     lesson: 1,
     topic: "Revision stations",
-    activity: "Rotate through revision tasks. Mixed fluency included.",
+    activity: scopedActivity(
+      "Rotate through mixed revision stations.",
+      "Mixed fluency block across core facts.",
+      "Explain one strategy you used successfully."
+    ),
     activities: [
       makeActivity("review_quiz", 2, {
         mode: "revision_stations",
@@ -1217,8 +1041,6 @@ export const year2NumberRows: ProgramRow[] = [
           "arrays",
           "fact_family",
           "number_line",
-          "addition_strategy",
-          "subtraction_strategy",
         ],
       }),
       makeActivity("skip_count", 1, {
@@ -1234,11 +1056,6 @@ export const year2NumberRows: ProgramRow[] = [
         maxColumns: 5,
         mode: "arrays",
       }),
-      fluencyActivity("addition_strategy", {
-        min: 0,
-        max: 30,
-        mode: "jump",
-      }),
     ],
     curriculum: ["AC9M2N06"],
   },
@@ -1247,7 +1064,11 @@ export const year2NumberRows: ProgramRow[] = [
     focus: "Review & Quiz",
     lesson: 2,
     topic: "Math games and group challenges",
-    activity: "Compete in team math games. Include reasoning questions.",
+    activity: scopedActivity(
+      "Collaborative revision through team math challenges.",
+      "Mixed fluency sprint across prior skills.",
+      "How do you know your team strategy works?"
+    ),
     activities: [
       makeActivity("review_quiz", 2, {
         mode: "team_challenges",
@@ -1256,7 +1077,6 @@ export const year2NumberRows: ProgramRow[] = [
           "fact_family",
           "addition_strategy",
           "odd_even_sort",
-          "equal_groups",
         ],
       }),
       makeActivity("division_groups", 1, {
@@ -1264,16 +1084,10 @@ export const year2NumberRows: ProgramRow[] = [
         maxTotal: 24,
         mode: "grouping",
       }),
-      reasoningMCQ("fact_family", {
+      makeActivity("fact_family", 1, {
         min: 0,
         max: 20,
         mode: "recognise",
-        reasoning: true,
-      }),
-      fluencyActivity("subtraction_strategy", {
-        min: 0,
-        max: 30,
-        mode: "fact_strategy",
       }),
     ],
     curriculum: ["AC9M2N06"],
@@ -1283,7 +1097,11 @@ export const year2NumberRows: ProgramRow[] = [
     focus: "Review & Quiz",
     lesson: 3,
     topic: "End-of-unit quiz",
-    activity: "Complete individual review quiz with mixed fluency and reasoning.",
+    activity: scopedActivity(
+      "Complete end-of-unit mixed quiz.",
+      "Short mixed fluency warm-up before final quiz.",
+      "Check: is your answer reasonable and why?"
+    ),
     activities: [
       makeActivity("review_quiz", 2, {
         mode: "final_quiz",
@@ -1294,8 +1112,6 @@ export const year2NumberRows: ProgramRow[] = [
           "mixed_word_problem",
           "addition_strategy",
           "subtraction_strategy",
-          "equal_groups",
-          "fact_family",
         ],
       }),
       makeActivity("mixed_word_problem", 1, {
@@ -1314,15 +1130,7 @@ export const year2NumberRows: ProgramRow[] = [
           "mixed_word_problem",
           "addition_strategy",
           "subtraction_strategy",
-          "equal_groups",
-          "fact_family",
         ],
-      }),
-      fluencyActivity("skip_count", {
-        min: 0,
-        max: 100,
-        step: 10,
-        mode: "forward",
       }),
     ],
     curriculum: ["AC9M2N06"],
