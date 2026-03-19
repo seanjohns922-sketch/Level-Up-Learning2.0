@@ -45,8 +45,13 @@ export default function AdditionStrategy({
             `${questionData.a} + ${Math.floor(questionData.b / 10) * 10} + ${
               questionData.b % 10
             }`}
-          {questionData.mode === "doubles" &&
-            `Double ${questionData.a} → ${questionData.a} + ${questionData.a}`}
+          {questionData.mode === "doubles" && (() => {
+            const n = questionData.a;
+            const tens = Math.floor(n / 10) * 10;
+            const ones = n % 10;
+            if (ones === 0) return `Double ${n} = ${n * 2}`;
+            return `Double ${tens} = ${tens * 2}, double ${ones} = ${ones * 2} → ${tens * 2} + ${ones * 2} = ?`;
+          })()}
           {questionData.mode === "near_doubles" && (() => {
             const smaller = Math.min(questionData.a, questionData.b);
             const difference = Math.abs(questionData.a - questionData.b);
