@@ -344,19 +344,6 @@ function ProgramPage() {
             })}
           </div>
 
-          {weekNum === 12 && weekComplete && (
-            <div className="mt-6 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-3xl border border-emerald-200 p-6 text-center">
-              <div className="text-2xl mb-2">🏆</div>
-              <h3 className="text-xl font-black text-gray-900 mb-1">Program Complete!</h3>
-              <p className="text-sm text-gray-500 mb-4">You've finished all 12 weeks. Unlock your Legend!</p>
-              <button
-                onClick={finishProgram}
-                className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-extrabold shadow-lg shadow-emerald-200 hover:shadow-emerald-300 transition"
-              >
-                Finish Program → Unlock Legend
-              </button>
-            </div>
-          )}
         </div>
       </div>
     </main>
