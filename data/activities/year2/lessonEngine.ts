@@ -231,6 +231,7 @@ type GenericConfig = Record<string, unknown> & {
   minTotal?: number;
   maxTotal?: number;
   allowGenericFallback?: boolean;
+  allowedGroupSizes?: number[];
 };
 
 type ValidationReason = "alignment" | "difficulty" | "visual_missing" | "mode_blocked";
