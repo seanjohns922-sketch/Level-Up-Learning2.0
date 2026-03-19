@@ -68,7 +68,8 @@ function ProgramPage() {
 
   const progress = getWeekProgress(store, year, week);
 
-  const items = useMemo(() => {
+  type ProgramItem = { type: "lesson" | "quiz" | "posttest"; n: number; title: string; focus: string };
+  const items: ProgramItem[] = useMemo(() => {
     const program = getProgramForYear(curriculumYear);
     const weekPlan = program.find((w) => w.week === weekNum);
     const lessons = weekPlan?.lessons ?? [];
