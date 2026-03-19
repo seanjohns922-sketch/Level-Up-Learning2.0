@@ -32,6 +32,7 @@ export type PartitionExpandQuestion = {
   target: number;
   mode: "partition" | "expand" | "flexible_partition";
   standard: {
+    thousands?: number;
     hundreds: number;
     tens: number;
     ones: number;
