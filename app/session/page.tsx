@@ -2215,10 +2215,19 @@ function SessionPage() {
   // ---------------------------
   const [lessonStarted, setLessonStarted] = useState(false);
 
+  const [showPostTestTransition, setShowPostTestTransition] = useState(false);
+
   function completeLesson() {
     const store = readStore();
     setLessonComplete(store, year, week, n);
     writeStore(store);
+
+    // After Week 12 Lesson 3, route to post-test transition
+    if (Number(week) === 12 && n === 3) {
+      setShowPostTestTransition(true);
+      return;
+    }
+
     backToWeek();
   }
 
