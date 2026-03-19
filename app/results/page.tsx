@@ -181,6 +181,13 @@ function ResultsPage() {
     const qs = new URLSearchParams({ year, week: "1" }).toString();
     router.push(`/program?${qs}`);
   }
+  function goReview() {
+    const qs = new URLSearchParams({ year, week: "12" }).toString();
+    router.push(`/program?${qs}`);
+  }
+  function goRetryPostTest() {
+    router.push(`/posttest?year=${encodeURIComponent(year)}`);
+  }
   function goLegends() { router.push("/legends"); }
 
   // Emoji + message based on score
