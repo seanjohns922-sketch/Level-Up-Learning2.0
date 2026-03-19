@@ -178,7 +178,10 @@ export default function PlaceValueBuilder({
       </div>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {questionData.placeValues.map((place) => {
+        {questionData.placeValues.filter((place) => {
+          if (place === "ten_thousands" && (questionData.tenThousands ?? 0) === 0) return false;
+          return true;
+        }).map((place) => {
           const count = placeCount(questionData, place);
 
           return (
