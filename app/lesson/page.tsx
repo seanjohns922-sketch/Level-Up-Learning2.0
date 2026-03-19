@@ -47,11 +47,18 @@ function LessonPage() {
   const lessonChrome = useMemo(() => getLessonChrome(yearNumber), [yearNumber]);
 
   const [started, setStarted] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
   const lessonMeta = useMemo(() => {
     const program = getProgramForYear(year);
     const weekPlan = program.find((w) => w.week === week);
     return weekPlan?.lessons.find((l) => l.id === effectiveLessonId) ?? null;
   }, [year, week, effectiveLessonId]);
+  const safeLessonTitle = isHydrated ? lessonMeta?.title : null;
+  const safeLessonFocus = isHydrated ? lessonMeta?.focus : null;
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   useEffect(() => {
     const p = readProgress();
@@ -102,10 +109,10 @@ function LessonPage() {
                 Level {yearNumber} • Week {week} • Lesson {lessonNumber}
               </div>
               <h1 className="text-3xl md:text-4xl font-extrabold font-display mb-2">
-                {lessonMeta?.title ?? `Week ${week} Lesson ${lessonNumber}`}
+                {safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
               </h1>
               <p className="text-white/80 text-sm">
-                {lessonMeta?.focus ?? "Watch the video and complete activities"}
+                {safeLessonFocus ?? "Watch the video and complete activities"}
               </p>
             </div>
 
@@ -157,11 +164,11 @@ function LessonPage() {
               <h1 className="text-2xl md:text-3xl font-extrabold font-display">
                 Lesson {lessonNumber} Practice
               </h1>
-              {lessonMeta?.title && (
-                <p className="text-white/80 text-sm mt-1">{lessonMeta.title}</p>
+              {safeLessonTitle && (
+                <p className="text-white/80 text-sm mt-1">{safeLessonTitle}</p>
               )}
-              {lessonMeta?.focus && (
-                <p className="text-white/60 text-xs mt-1">Focus: {lessonMeta.focus}</p>
+              {safeLessonFocus && (
+                <p className="text-white/60 text-xs mt-1">Focus: {safeLessonFocus}</p>
               )}
             </div>
             <div className="bg-background px-6 py-8">
@@ -221,11 +228,11 @@ function LessonPage() {
               <h1 className="text-3xl md:text-4xl font-extrabold font-display">
                 Lesson {lessonNumber} Practice
               </h1>
-              {lessonMeta?.title && (
-                <p className="text-white/80 text-sm mt-1">{lessonMeta.title}</p>
+              {safeLessonTitle && (
+                <p className="text-white/80 text-sm mt-1">{safeLessonTitle}</p>
               )}
-              {lessonMeta?.focus && (
-                <p className="text-white/60 text-xs mt-1">Focus: {lessonMeta.focus}</p>
+              {safeLessonFocus && (
+                <p className="text-white/60 text-xs mt-1">Focus: {safeLessonFocus}</p>
               )}
             </div>
 
