@@ -951,7 +951,7 @@ export const year2NumberRows: ProgramRow[] = [
   },
   {
     week: 9,
-    focus: "Multiplication - 2s, 5s, 10s",
+    focus: "Multiplication - Groups & Arrays",
     lesson: 3,
     topic: "Recall and skip count by 10s",
     activity: "Write and recall fact families. Pattern recognition in counting.",
