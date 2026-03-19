@@ -669,7 +669,7 @@ function generateAdditionStrategyQuestion(
 
   let a = randInt(min, Math.max(min, max - 10));
   let b = randInt(2, 18);
-  let prompt = `Solve ${a} + ${b}.`;
+  let prompt = "";
   let hint = `Start at ${a} and jump ${b} more.`;
 
   if (mode === "doubles") {
@@ -678,6 +678,7 @@ function generateAdditionStrategyQuestion(
     const n = randInt(lower, upper);
     a = n;
     b = n;
+    prompt = `Solve ${a} + ${b}.`;
     hint = `Use a doubles fact: double ${a}.`;
   } else if (mode === "near_doubles") {
     const lower = Math.max(20, min, 2);
@@ -696,6 +697,8 @@ function generateAdditionStrategyQuestion(
     if (Math.random() < 0.3) {
       const mistaken = a + a;
       prompt = `A student says "${a} + ${b} = ${mistaken}" because ${a} + ${a} = ${mistaken}. What should the answer be?`;
+    } else {
+      prompt = `Solve ${a} + ${b}.`;
     }
     hint =
       difference === 1
@@ -712,6 +715,7 @@ function generateAdditionStrategyQuestion(
     hint = "Make a friendly ten first, then add the rest.";
   }
 
+  if (!prompt) prompt = `Solve ${a} + ${b}.`;
   const answer = a + b;
   return {
     kind: "addition_strategy",
