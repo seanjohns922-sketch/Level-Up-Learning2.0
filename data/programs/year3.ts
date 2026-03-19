@@ -22,36 +22,36 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
   {
     id: "y3-w1",
     week: 1,
-    topic: "Numbers to 100,000 - Place Value",
+    topic: "Numbers to 10,000 - Place Value",
     curriculum: ["ALL"],
     lessons: [
       {
         id: "y3-w1-l1",
         week: 1,
         lesson: 1,
-        title: "Place Value to 100,000",
-        focus: "Represent 5-digit numbers with place value charts and number lines to 100,000",
+        title: "Place Value to 10,000",
+        focus: "Represent numbers to 10,000 with place value charts and number lines",
         activityIdeas: lessonIdeas(
-          "Represent 5-digit numbers using MAB/place-value chart and place on 0-100,000 number line",
+          "Represent numbers to 10,000 using MAB/place-value chart and place on 0-10,000 number line",
           "Model numbers used in real contexts such as population or distances"
         ),
         activities: [
           makeActivity("place_value_builder", 2, {
-            min: 10000,
-            max: 99999,
+            min: 1000,
+            max: 10000,
             placeValues: ["ten_thousands", "thousands", "hundreds", "tens", "ones"],
             visualMode: "mab",
             mode: "identify_number",
           }),
           makeActivity("number_line", 1, {
             min: 0,
-            max: 100000,
-            step: 5000,
+            max: 10000,
+            step: 500,
             mode: "placement",
           }),
           makeActivity("typed_response", 1, {
-            min: 10000,
-            max: 99999,
+            min: 1000,
+            max: 10000,
             mode: "identify_number",
             sourceActivityType: "place_value_builder",
           }),
@@ -70,18 +70,18 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         ),
         activities: [
           makeActivity("partition_expand", 2, {
-            min: 10000,
-            max: 99999,
+            min: 1000,
+            max: 10000,
             mode: "expand",
           }),
           makeActivity("partition_expand", 1, {
-            min: 10000,
-            max: 99999,
+            min: 1000,
+            max: 10000,
             mode: "flexible_partition",
           }),
           makeActivity("typed_response", 1, {
-            min: 10000,
-            max: 99999,
+            min: 1000,
+            max: 10000,
             mode: "flexible_partition",
             sourceActivityType: "partition_expand",
           }),
@@ -100,20 +100,20 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         ),
         activities: [
           makeActivity("number_order", 2, {
-            min: 10000,
-            max: 99999,
+            min: 1000,
+            max: 10000,
             count: 5,
             ascending: true,
           }),
           makeActivity("number_line", 1, {
             min: 0,
-            max: 100000,
-            step: 5000,
+            max: 10000,
+            step: 500,
             mode: "estimate",
           }),
           makeActivity("typed_response", 1, {
-            min: 10000,
-            max: 99999,
+            min: 1000,
+            max: 10000,
             count: 5,
             sourceActivityType: "number_order",
           }),
@@ -141,20 +141,20 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         activities: [
           makeActivity("number_line", 2, {
             min: 0,
-            max: 100000,
+            max: 10000,
             step: 10,
             mode: "rounding",
             targets: [10],
           }),
           makeActivity("number_line", 1, {
             min: 0,
-            max: 100000,
+            max: 10000,
             step: 10,
             mode: "placement",
           }),
           makeActivity("typed_response", 1, {
             min: 0,
-            max: 100000,
+            max: 10000,
             step: 10,
             mode: "rounding",
             targets: [10],
@@ -176,20 +176,20 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         activities: [
           makeActivity("number_line", 2, {
             min: 0,
-            max: 100000,
+            max: 10000,
             step: 100,
             mode: "rounding",
             targets: [100],
           }),
           makeActivity("number_line", 1, {
             min: 0,
-            max: 100000,
+            max: 10000,
             step: 100,
             mode: "estimate",
           }),
           makeActivity("multiple_choice", 1, {
             min: 0,
-            max: 100000,
+            max: 10000,
             step: 100,
             mode: "rounding",
             targets: [100],
@@ -211,20 +211,20 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         activities: [
           makeActivity("number_line", 2, {
             min: 0,
-            max: 100000,
+            max: 10000,
             step: 100,
             mode: "rounding",
             targets: [10, 100],
           }),
           makeActivity("number_line", 1, {
             min: 0,
-            max: 100000,
+            max: 10000,
             step: 100,
             mode: "estimate",
           }),
           makeActivity("typed_response", 1, {
             min: 0,
-            max: 100000,
+            max: 10000,
             step: 100,
             mode: "rounding",
             targets: [10, 100],
@@ -944,7 +944,7 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         activities: [
           makeActivity("number_line", 2, {
             min: 0,
-            max: 100000,
+            max: 10000,
             step: 1000,
             mode: "rounding",
             targets: [100, 1000],
@@ -957,7 +957,7 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
           }),
           makeActivity("typed_response", 1, {
             min: 0,
-            max: 100000,
+            max: 10000,
             step: 1000,
             mode: "rounding",
             targets: [100, 1000],
@@ -1048,20 +1048,20 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         ),
         activities: [
           makeActivity("number_order", 2, {
-            min: 10000,
-            max: 99999,
+            min: 1000,
+            max: 10000,
             count: 5,
             ascending: true,
           }),
           makeActivity("number_line", 1, {
             min: 0,
-            max: 100000,
-            step: 5000,
+            max: 10000,
+            step: 500,
             mode: "estimate",
           }),
           makeActivity("typed_response", 1, {
-            min: 10000,
-            max: 99999,
+            min: 1000,
+            max: 10000,
             count: 5,
             sourceActivityType: "number_order",
           }),
