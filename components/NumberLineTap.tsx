@@ -15,7 +15,14 @@ function niceStep(span: number): number {
   if (span <= 1000) return 100;
   if (span <= 2000) return 200;
   if (span <= 5000) return 500;
-  return 1000;
+  if (span <= 10000) return 1000;
+  if (span <= 20000) return 2000;
+  if (span <= 50000) return 5000;
+  if (span <= 100000) return 10000;
+  if (span <= 200000) return 20000;
+  if (span <= 500000) return 50000;
+  if (span <= 1000000) return 100000;
+  return Math.pow(10, Math.floor(Math.log10(span)) - 1);
 }
 
 export default function NumberLineTap({
