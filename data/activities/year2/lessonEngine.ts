@@ -669,7 +669,7 @@ function generateAdditionStrategyQuestion(
 
   let a = randInt(min, Math.max(min, max - 10));
   let b = randInt(2, 18);
-  let prompt = `Solve ${a} + ${b}.`;
+  let prompt = "";
   let hint = `Start at ${a} and jump ${b} more.`;
 
   if (mode === "doubles") {
