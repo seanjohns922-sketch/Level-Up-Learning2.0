@@ -2103,7 +2103,14 @@ export function generateYear2Question(
   assertPolicyValidation(preValidation, "pre_generate");
 
   let question: Year2QuestionData;
-  if (
+  if (activity.activityType === "speed_round") {
+    const dur = typeof config.durationSeconds === "number" ? config.durationSeconds : 30;
+    question = {
+      kind: "speed_round",
+      prompt: "Speed Round",
+      durationSeconds: dur,
+    };
+  } else if (
     activity.activityType === "place_value_builder" ||
     activity.activityType === "number_order" ||
     activity.activityType === "partition_expand" ||

@@ -335,6 +335,19 @@ export function LessonRenderer({
         />
       );
     }
+    case "speed_round": {
+      const safeQuestion = getSafeQuestion(activity, questionData, prompt);
+      if (safeQuestion.kind !== "speed_round") {
+        return <ErrorCard message="Speed round failed to load." />;
+      }
+      return (
+        <SpeedRound
+          questionData={safeQuestion as SpeedRoundQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
+        />
+      );
+    }
     default:
       return <ErrorCard message="This activity is not available yet." />;
   }
