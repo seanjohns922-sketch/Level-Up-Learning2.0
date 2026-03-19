@@ -95,6 +95,9 @@ function ProgramPage() {
       if (item.type === "quiz") {
         if (progress.lessonsCompleted.filter(Boolean).length < 3) return;
       }
+      if (item.type === "posttest") {
+        if (progress.lessonsCompleted.filter(Boolean).length < 3) return;
+      }
     }
 
     if (item.type === "lesson") {
@@ -102,6 +105,10 @@ function ProgramPage() {
       router.push(
         `/lesson?year=${encodeURIComponent(curriculumYear)}&week=${week}&lessonId=y${yearNumber}-w${weekNum}-l${item.n}`
       );
+      return;
+    }
+    if (item.type === "posttest") {
+      router.push(`/posttest?year=${encodeURIComponent(curriculumYear)}`);
       return;
     }
     router.push(`/session?year=${encodeURIComponent(curriculumYear)}&week=${week}&type=${item.type}&n=${item.n}`);
