@@ -58,7 +58,7 @@ export type AdditionStrategyQuestion = {
   b: number;
   answer: number;
   options: number[];
-  mode: "jump" | "split" | "friendly_numbers";
+  mode: "jump" | "split" | "friendly_numbers" | "doubles" | "near_doubles";
 };
 
 export type EqualGroupsQuestion = {
