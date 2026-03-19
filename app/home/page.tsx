@@ -119,7 +119,7 @@ export default function StudentHomePage() {
       {/* Immersive realm background */}
       <div className="fixed inset-0 z-0">
         <img
-          src="/images/number-nexus-home-bg.jpg"
+          src={levelNum >= 3 ? "/images/number-nexus-home-bg-y3.jpg" : "/images/number-nexus-home-bg.jpg"}
           alt=""
           className="w-full h-full object-cover"
           style={{ filter: "brightness(1.3) contrast(1.12) saturate(1.15)" }}
