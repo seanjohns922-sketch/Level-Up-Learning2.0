@@ -697,6 +697,8 @@ function generateAdditionStrategyQuestion(
     if (Math.random() < 0.3) {
       const mistaken = a + a;
       prompt = `A student says "${a} + ${b} = ${mistaken}" because ${a} + ${a} = ${mistaken}. What should the answer be?`;
+    } else {
+      prompt = `Solve ${a} + ${b}.`;
     }
     hint =
       difference === 1
