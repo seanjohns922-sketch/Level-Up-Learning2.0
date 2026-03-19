@@ -967,11 +967,13 @@ function generateInteractiveQuestion(
         config.targets?.filter((value): value is number => typeof value === "number") ?? [10];
       const targetUnit = targets[randInt(0, targets.length - 1)];
       const value = randInt(min, max);
+      const rounded = roundToNearest(value, targetUnit);
+      const { prompt, helper } = roundingWordProblem(value, targetUnit, rounded);
       return {
         kind: "number_line",
-        prompt: `Round ${value} to the nearest ${targetUnit}.`,
-        helper: `Use the number line markers to think about the nearest multiple of ${targetUnit}.`,
-        expected: roundToNearest(value, targetUnit),
+        prompt,
+        helper,
+        expected: rounded,
         min,
         max,
         step,
