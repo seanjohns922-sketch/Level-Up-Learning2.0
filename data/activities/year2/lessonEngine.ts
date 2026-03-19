@@ -1830,17 +1830,19 @@ function generateGenericQuestion(
       const targets =
         config.targets?.filter((target): target is number => typeof target === "number") ?? [10];
       const targetUnit = targets[randInt(0, targets.length - 1)];
-      const answer = String(roundToNearest(value, targetUnit));
+      const rounded = roundToNearest(value, targetUnit);
+      const answer = String(rounded);
+      const { prompt } = roundingWordProblem(value, targetUnit, rounded);
       return asMultipleChoice
         ? {
             kind: "multiple_choice",
-            prompt: `Round ${value} to the nearest ${targetUnit}.`,
+            prompt,
             options: uniqueNumberOptions(Number(answer), targetUnit),
             answer,
           }
         : {
             kind: "typed_response",
-            prompt: `Round ${value} to the nearest ${targetUnit}.`,
+            prompt,
             answer,
             placeholder: "Type the rounded number",
           };
