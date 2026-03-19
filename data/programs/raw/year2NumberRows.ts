@@ -793,10 +793,7 @@ export const year2NumberRows: ProgramRow[] = [
     ),
     activities: [
       makeActivity("arrays", 2, {
-        minRows: 2,
-        maxRows: 5,
-        minColumns: 2,
-        maxColumns: 5,
+        allowedGroupSizes: [2, 3, 5, 10],
         mode: "repeated_addition",
       }),
       makeActivity("fact_family", 1, {
@@ -805,10 +802,7 @@ export const year2NumberRows: ProgramRow[] = [
         mode: "recognise",
       }),
       makeActivity("typed_response", 1, {
-        minRows: 2,
-        maxRows: 5,
-        minColumns: 2,
-        maxColumns: 5,
+        allowedGroupSizes: [2, 3, 5, 10],
         mode: "repeated_addition",
         sourceActivityType: "arrays",
       }),
