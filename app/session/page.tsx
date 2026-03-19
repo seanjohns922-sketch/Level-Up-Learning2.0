@@ -6,6 +6,7 @@ import { readProgress, updateProgress } from "@/data/progress";
 import { ACTIVE_STUDENT_KEY } from "@/data/progress";
 import { supabase } from "@/lib/supabase";
 import { getProgramForYear } from "@/data/programs";
+import PostTestTransition from "@/components/PostTestTransition";
 import {
   buildYear2QuizActivityPool,
   generateQuestionForLessonActivity,
