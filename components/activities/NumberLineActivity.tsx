@@ -27,6 +27,138 @@ function niceStep(span: number): number {
   return Math.pow(10, Math.floor(Math.log10(span)) - 1);
 }
 
+/* ── Number line visual (shared between modes) ── */
+function NumberLineVisual({
+  min,
+  max,
+  ticks,
+  minorTicks,
+  placed,
+  checked,
+  isCorrect,
+  expected,
+  onClick,
+  disabled,
+}: {
+  min: number;
+  max: number;
+  ticks: number[];
+  minorTicks: number[];
+  placed: number | null;
+  checked: boolean;
+  isCorrect: boolean;
+  expected: number;
+  onClick: (e: React.MouseEvent<HTMLDivElement>) => void;
+  disabled?: boolean;
+}) {
+  const range = max - min || 1;
+  const markerPct = placed !== null ? ((placed - min) / range) * 100 : null;
+  const correctPct = checked ? ((expected - min) / range) * 100 : null;
+
+  return (
+    <div
+      className={[
+        "rounded-2xl border border-border bg-muted/30 px-8 py-8 select-none",
+        disabled ? "opacity-60 cursor-default" : "cursor-pointer",
+      ].join(" ")}
+      onClick={disabled ? undefined : onClick}
+    >
+      <div className="relative mx-auto max-w-3xl" style={{ height: 80 }}>
+        {/* Base line */}
+        <div
+          className="absolute left-0 right-0 bg-primary/70 rounded-full"
+          style={{ top: 36, height: 3 }}
+        />
+        {/* End caps */}
+        <div
+          className="absolute bg-primary/70 rounded-full"
+          style={{ left: 0, top: 20, width: 3, height: 36 }}
+        />
+        <div
+          className="absolute bg-primary/70 rounded-full"
+          style={{ right: 0, top: 20, width: 3, height: 36 }}
+        />
+
+        {/* Minor tick marks */}
+        {minorTicks.map((tick) => {
+          const left = ((tick - min) / range) * 100;
+          return (
+            <div
+              key={`m-${tick}`}
+              className="absolute pointer-events-none"
+              style={{ left: `${left}%`, transform: "translateX(-50%)", top: 24 }}
+            >
+              <div
+                className="mx-auto bg-primary/30 rounded-full"
+                style={{ width: 2, height: 24 }}
+              />
+            </div>
+          );
+        })}
+
+        {/* Major tick marks */}
+        {ticks.map((tick) => {
+          const left = ((tick - min) / range) * 100;
+          return (
+            <div
+              key={tick}
+              className="absolute text-center pointer-events-none"
+              style={{ left: `${left}%`, transform: "translateX(-50%)", top: 16 }}
+            >
+              <div
+                className="mx-auto bg-primary/60 rounded-full"
+                style={{ width: 3, height: 40 }}
+              />
+              <div className="mt-1.5 text-sm font-bold text-foreground whitespace-nowrap">
+                {fmt(tick)}
+              </div>
+            </div>
+          );
+        })}
+
+        {/* Correct answer marker (shown after wrong check) */}
+        {checked && correctPct !== null && !isCorrect && (
+          <div
+            className="absolute flex flex-col items-center pointer-events-none"
+            style={{ left: `${correctPct}%`, transform: "translateX(-50%)", top: 22 }}
+          >
+            <div className="w-5 h-5 rounded-full bg-primary border-2 border-primary-foreground shadow-md" />
+            <span className="mt-0.5 text-xs font-bold text-primary">{fmt(expected)}</span>
+          </div>
+        )}
+
+        {/* User's placed marker */}
+        {markerPct !== null && (
+          <div
+            className="absolute flex flex-col items-center pointer-events-none"
+            style={{ left: `${markerPct}%`, transform: "translateX(-50%)", top: 22 }}
+          >
+            <div
+              className={[
+                "w-5 h-5 rounded-full border-2 shadow-lg transition-colors",
+                checked
+                  ? isCorrect
+                    ? "bg-primary border-primary-foreground"
+                    : "bg-destructive border-destructive-foreground"
+                  : "bg-accent-foreground border-accent",
+              ].join(" ")}
+            />
+          </div>
+        )}
+      </div>
+
+      <p className="text-center text-xs text-muted-foreground mt-4">
+        {disabled
+          ? ""
+          : placed === null
+            ? "👆 Tap on the number line to place your answer"
+            : "Tap again to adjust"}
+      </p>
+    </div>
+  );
+}
+
+/* ── Main component ── */
 export default function NumberLineActivity({
   questionData,
   onCorrect,
@@ -36,6 +168,14 @@ export default function NumberLineActivity({
   onCorrect?: () => void;
   onWrong?: () => void;
 }) {
+  const isRounding = questionData.mode === "rounding";
+
+  // Step tracking for rounding: "type" → "place" → "done"
+  const [roundingStep, setRoundingStep] = useState<"type" | "place" | "done">("type");
+  const [typedAnswer, setTypedAnswer] = useState("");
+  const [typedCorrect, setTypedCorrect] = useState<boolean | null>(null);
+
+  // Placement state (used for all modes, and step 2 of rounding)
   const [placed, setPlaced] = useState<number | null>(null);
   const [checked, setChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
@@ -53,17 +193,14 @@ export default function NumberLineActivity({
     return values;
   }, [questionData.max, questionData.min]);
 
-  /* Also compute minor ticks (unlabelled) for visual density */
   const minorTicks = useMemo(() => {
     const span = questionData.max - questionData.min;
     const majorStep = niceStep(span);
-    // minor ticks = half of major, only if span allows it and won't be too many
     const minorStep = majorStep / 2;
     if (minorStep < 1 || span / minorStep > 40) return [];
     const values: number[] = [];
     const start = Math.ceil(questionData.min / minorStep) * minorStep;
     for (let v = start; v <= questionData.max; v += minorStep) {
-      // skip if it's already a major tick
       if (v % majorStep === 0 && v >= questionData.min) continue;
       values.push(v);
     }
@@ -83,7 +220,21 @@ export default function NumberLineActivity({
     [checked, questionData.min, questionData.max, range]
   );
 
-  function check() {
+  /* ── Rounding step 1: check typed answer ── */
+  function checkTypedAnswer() {
+    const parsed = parseInt(typedAnswer.replace(/,/g, ""), 10);
+    if (isNaN(parsed)) return;
+    if (parsed === questionData.expected) {
+      setTypedCorrect(true);
+      // Move to step 2 after a brief delay
+      setTimeout(() => setRoundingStep("place"), 800);
+    } else {
+      setTypedCorrect(false);
+    }
+  }
+
+  /* ── Step 2 / non-rounding: check placement ── */
+  function checkPlacement() {
     if (placed === null) return;
     setChecked(true);
 
@@ -95,6 +246,7 @@ export default function NumberLineActivity({
 
     if (difference <= allowed) {
       setIsCorrect(true);
+      if (isRounding) setRoundingStep("done");
       onCorrect?.();
     } else {
       setIsCorrect(false);
@@ -102,8 +254,8 @@ export default function NumberLineActivity({
     }
   }
 
-  const markerPct = placed !== null ? ((placed - questionData.min) / range) * 100 : null;
-  const correctPct = checked ? ((questionData.expected - questionData.min) / range) * 100 : null;
+  // Extract the original value from the prompt for display (e.g. "Round 9976 to...")
+  const originalValue = questionData.prompt.match(/\d[\d,]*/)?.[0] ?? "";
 
   return (
     <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
@@ -118,124 +270,160 @@ export default function NumberLineActivity({
         <p className="mt-2 text-sm text-muted-foreground">{questionData.helper}</p>
       </div>
 
-      {/* Clickable number line */}
-      <div
-        className="mt-8 rounded-2xl border border-border bg-muted/30 px-8 py-8 cursor-pointer select-none"
-        onClick={handleLineClick}
-      >
-        <div className="relative mx-auto max-w-3xl" style={{ height: 80 }}>
-          {/* Base line */}
-          <div
-            className="absolute left-0 right-0 bg-primary/70 rounded-full"
-            style={{ top: 36, height: 3 }}
-          />
-          {/* End caps */}
-          <div
-            className="absolute bg-primary/70 rounded-full"
-            style={{ left: 0, top: 20, width: 3, height: 36 }}
-          />
-          <div
-            className="absolute bg-primary/70 rounded-full"
-            style={{ right: 0, top: 20, width: 3, height: 36 }}
-          />
-
-          {/* Minor tick marks (unlabelled) */}
-          {minorTicks.map((tick) => {
-            const left = ((tick - questionData.min) / range) * 100;
-            return (
-              <div
-                key={`m-${tick}`}
-                className="absolute pointer-events-none"
-                style={{ left: `${left}%`, transform: "translateX(-50%)", top: 24 }}
+      {/* ── Rounding Step 1: Type the rounded number ── */}
+      {isRounding && roundingStep === "type" && (
+        <div className="mt-6">
+          <div className="rounded-2xl border border-border bg-muted/30 p-6">
+            <p className="text-sm font-bold text-foreground mb-1">Step 1: Type your answer</p>
+            <p className="text-xs text-muted-foreground mb-4">
+              What does {originalValue} round to?
+            </p>
+            <div className="flex items-center gap-3 justify-center">
+              <input
+                type="text"
+                inputMode="numeric"
+                value={typedAnswer}
+                onChange={(e) => {
+                  setTypedAnswer(e.target.value);
+                  setTypedCorrect(null);
+                }}
+                onKeyDown={(e) => e.key === "Enter" && checkTypedAnswer()}
+                placeholder="Type the rounded number"
+                className="w-48 rounded-xl border border-border bg-background px-4 py-3 text-center text-xl font-black text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              <button
+                type="button"
+                onClick={checkTypedAnswer}
+                disabled={!typedAnswer.trim()}
+                className="rounded-2xl bg-primary px-6 py-3 font-black text-primary-foreground hover:opacity-90 active:scale-[0.98] transition disabled:opacity-40"
               >
-                <div
-                  className="mx-auto bg-primary/30 rounded-full"
-                  style={{ width: 2, height: 24 }}
-                />
-              </div>
-            );
-          })}
-
-          {/* Major tick marks (labelled) */}
-          {ticks.map((tick) => {
-            const left = ((tick - questionData.min) / range) * 100;
-            return (
-              <div
-                key={tick}
-                className="absolute text-center pointer-events-none"
-                style={{ left: `${left}%`, transform: "translateX(-50%)", top: 16 }}
-              >
-                <div
-                  className="mx-auto bg-primary/60 rounded-full"
-                  style={{ width: 3, height: 40 }}
-                />
-                <div className="mt-1.5 text-sm font-bold text-foreground whitespace-nowrap">
-                  {fmt(tick)}
-                </div>
-              </div>
-            );
-          })}
-
-          {/* Correct answer marker (shown after check) */}
-          {checked && correctPct !== null && !isCorrect && (
-            <div
-              className="absolute flex flex-col items-center pointer-events-none"
-              style={{ left: `${correctPct}%`, transform: "translateX(-50%)", top: 22 }}
-            >
-              <div className="w-5 h-5 rounded-full bg-primary border-2 border-primary-foreground shadow-md" />
-              <span className="mt-0.5 text-xs font-bold text-primary">{fmt(questionData.expected)}</span>
+                Check
+              </button>
             </div>
-          )}
+            {typedCorrect === false && (
+              <p className="mt-3 text-sm font-bold text-destructive text-center">
+                Not quite — try again!
+              </p>
+            )}
+            {typedCorrect === true && (
+              <p className="mt-3 text-sm font-bold text-primary text-center">
+                ✅ Correct! Now place it on the number line…
+              </p>
+            )}
+          </div>
 
-          {/* User's placed marker */}
-          {markerPct !== null && (
-            <div
-              className="absolute flex flex-col items-center pointer-events-none"
-              style={{ left: `${markerPct}%`, transform: "translateX(-50%)", top: 22 }}
-            >
+          {/* Show number line as preview (disabled) */}
+          <div className="mt-6 opacity-50 pointer-events-none">
+            <NumberLineVisual
+              min={questionData.min}
+              max={questionData.max}
+              ticks={ticks}
+              minorTicks={minorTicks}
+              placed={null}
+              checked={false}
+              isCorrect={false}
+              expected={questionData.expected}
+              onClick={() => {}}
+              disabled
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ── Rounding Step 2: Place on number line ── */}
+      {isRounding && (roundingStep === "place" || roundingStep === "done") && (
+        <div className="mt-6">
+          <div className="rounded-2xl border border-primary/30 bg-primary/5 px-4 py-2 mb-4 inline-flex items-center gap-2">
+            <span className="text-sm font-bold text-primary">
+              ✅ {fmt(questionData.expected)}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              — Now place it on the number line
+            </span>
+          </div>
+
+          <NumberLineVisual
+            min={questionData.min}
+            max={questionData.max}
+            ticks={ticks}
+            minorTicks={minorTicks}
+            placed={placed}
+            checked={checked}
+            isCorrect={isCorrect}
+            expected={questionData.expected}
+            onClick={handleLineClick}
+            disabled={checked}
+          />
+
+          <div className="mt-6 flex justify-center">
+            {!checked ? (
+              <button
+                type="button"
+                onClick={checkPlacement}
+                disabled={placed === null}
+                className="rounded-2xl bg-primary px-8 py-3 font-black text-primary-foreground hover:opacity-90 active:scale-[0.98] transition disabled:opacity-40"
+              >
+                Check placement
+              </button>
+            ) : (
               <div
                 className={[
-                  "w-5 h-5 rounded-full border-2 shadow-lg transition-colors",
-                  checked
-                    ? isCorrect
-                      ? "bg-primary border-primary-foreground"
-                      : "bg-destructive border-destructive-foreground"
-                    : "bg-accent-foreground border-accent",
+                  "rounded-2xl px-8 py-3 font-black text-center",
+                  isCorrect
+                    ? "bg-primary/10 text-primary"
+                    : "bg-destructive/10 text-destructive",
                 ].join(" ")}
-              />
-            </div>
-          )}
-        </div>
-
-        <p className="text-center text-xs text-muted-foreground mt-4">
-          {placed === null ? "👆 Tap on the number line to place your answer" : "Tap again to adjust"}
-        </p>
-      </div>
-
-      {/* Check button */}
-      <div className="mt-6 flex justify-center">
-        {!checked ? (
-          <button
-            type="button"
-            onClick={check}
-            disabled={placed === null}
-            className="rounded-2xl bg-primary px-8 py-3 font-black text-primary-foreground hover:opacity-90 active:scale-[0.98] transition disabled:opacity-40"
-          >
-            Check answer
-          </button>
-        ) : (
-          <div
-            className={[
-              "rounded-2xl px-8 py-3 font-black text-center",
-              isCorrect
-                ? "bg-primary/10 text-primary"
-                : "bg-destructive/10 text-destructive",
-            ].join(" ")}
-          >
-            {isCorrect ? "✅ Correct!" : `❌ The answer was ${fmt(questionData.expected)}`}
+              >
+                {isCorrect ? "✅ Well done!" : `❌ Not quite — ${fmt(questionData.expected)} goes here`}
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* ── Non-rounding: standard single-step flow ── */}
+      {!isRounding && (
+        <>
+          <div className="mt-8">
+            <NumberLineVisual
+              min={questionData.min}
+              max={questionData.max}
+              ticks={ticks}
+              minorTicks={minorTicks}
+              placed={placed}
+              checked={checked}
+              isCorrect={isCorrect}
+              expected={questionData.expected}
+              onClick={handleLineClick}
+              disabled={checked}
+            />
+          </div>
+
+          <div className="mt-6 flex justify-center">
+            {!checked ? (
+              <button
+                type="button"
+                onClick={checkPlacement}
+                disabled={placed === null}
+                className="rounded-2xl bg-primary px-8 py-3 font-black text-primary-foreground hover:opacity-90 active:scale-[0.98] transition disabled:opacity-40"
+              >
+                Check answer
+              </button>
+            ) : (
+              <div
+                className={[
+                  "rounded-2xl px-8 py-3 font-black text-center",
+                  isCorrect
+                    ? "bg-primary/10 text-primary"
+                    : "bg-destructive/10 text-destructive",
+                ].join(" ")}
+              >
+                {isCorrect ? "✅ Correct!" : `❌ The answer was ${fmt(questionData.expected)}`}
+              </div>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }
