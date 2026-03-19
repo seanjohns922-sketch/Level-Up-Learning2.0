@@ -8,8 +8,9 @@ import { supabase } from "@/lib/supabase";
 import { getProgramForYear } from "@/data/programs";
 import PostTestTransition from "@/components/PostTestTransition";
 import {
-  buildYear2QuizActivityPool,
-  generateQuestionForLessonActivity,
+  buildQuizActivityPool,
+  generateQuestionForLevelLessonActivity,
+  getLevelForLesson,
   type MultipleChoiceQuestion as Year2MultipleChoiceQuestion,
   type PlaceValueBuilderQuestion as Year2PlaceValueBuilderQuestion,
   type PartitionExpandQuestion as Year2PartitionExpandQuestion,
@@ -260,7 +261,8 @@ function buildAlternativePartition(question: Year2PartitionExpandQuestion) {
 }
 
 function buildYear2QuizSources(lesson: Lesson): LessonActivity[] {
-  const { activities, violations } = buildYear2QuizActivityPool(lesson, {
+  const level = getLevelForLesson(lesson);
+  const { activities, violations } = buildQuizActivityPool(level, lesson, {
     allowGenericFallback: false,
   });
   if (violations.length > 0) {
@@ -588,12 +590,13 @@ function buildYear2WeeklyQuizQuestions(
   const questions: QuizQuestion[] = [];
 
   weekPlan.lessons.slice(0, 3).forEach((lesson, lessonIndex) => {
+    const level = getLevelForLesson(lesson);
     const sourceActivities = buildYear2QuizSources(lesson);
     if (!sourceActivities.length) return;
 
     for (let i = 0; i < questionsPerLesson; i += 1) {
       const sourceActivity = sourceActivities[i % sourceActivities.length];
-      const question = generateQuestionForLessonActivity(lesson, sourceActivity);
+      const question = generateQuestionForLevelLessonActivity(level, lesson, sourceActivity);
       const quizQuestion = toQuizQuestionFromYear2Data(
         question,
         lessonIndex + 1,

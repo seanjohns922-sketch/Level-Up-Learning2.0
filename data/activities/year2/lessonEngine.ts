@@ -259,7 +259,9 @@ export type Year2PolicyValidation = {
   violations: Year2PolicyViolation[];
 };
 
-type Year2DifficultyContract = {
+export type SupportedMathLevel = 2 | 3;
+
+type DifficultyContract = {
   weekMin: number;
   weekMax: number;
   addSubMax: number;
@@ -285,7 +287,7 @@ type ActivityPolicy = {
       | "maxColumns"
       | "maxTotal",
       keyof Omit<
-        Year2DifficultyContract,
+        DifficultyContract,
         "weekMin" | "weekMax" | "skipCountExtraSteps"
       >
     >
@@ -295,7 +297,10 @@ type ActivityPolicy = {
   blockedFocusKeywords?: string[];
 };
 
-const YEAR2_DIFFICULTY_CONTRACTS: Year2DifficultyContract[] = [
+export type DifficultyProfile = Omit<DifficultyContract, "weekMin" | "weekMax">;
+
+const YEAR_LEVEL_DIFFICULTY_CONTRACTS: Record<SupportedMathLevel, DifficultyContract[]> = {
+  2: [
   {
     weekMin: 1,
     weekMax: 2,
@@ -348,9 +353,25 @@ const YEAR2_DIFFICULTY_CONTRACTS: Year2DifficultyContract[] = [
     skipCountExtraSteps: [2, 3, 4, 5, 10, 100, 1000],
     wordProblemMax: 140,
   },
-];
+  ],
+  3: [
+    {
+      weekMin: 1,
+      weekMax: 12,
+      addSubMax: 300,
+      addSubExtensionMax: 500,
+      groupsMax: 12,
+      itemsMax: 12,
+      divisionTotalMax: 144,
+      factFamilyMax: 100,
+      skipCountMax: 100000,
+      skipCountExtraSteps: [2, 3, 4, 5, 10, 100, 1000],
+      wordProblemMax: 500,
+    },
+  ],
+};
 
-const YEAR2_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
+const BASE_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
   place_value_builder: {
     allowedModes: ["identify_number", "identify_place", "missing_mab_part"],
     requiresVisual: true,
@@ -415,6 +436,31 @@ const YEAR2_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
   multiple_choice: {},
   typed_response: {},
   speed_round: {},
+};
+
+const LEVEL2_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
+  ...BASE_ACTIVITY_POLICY,
+  addition_strategy: {
+    ...BASE_ACTIVITY_POLICY.addition_strategy,
+    allowedModes: ["jump", "split", "friendly_numbers"],
+  },
+};
+
+const LEVEL3_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
+  ...BASE_ACTIVITY_POLICY,
+  addition_strategy: {
+    ...BASE_ACTIVITY_POLICY.addition_strategy,
+    allowedModes: ["jump", "split", "friendly_numbers", "doubles", "near_doubles"],
+  },
+  fact_family: {
+    ...BASE_ACTIVITY_POLICY.fact_family,
+    maxFactValue: 50,
+  },
+};
+
+const LEVEL_ACTIVITY_POLICY: Record<SupportedMathLevel, Record<ActivityType, ActivityPolicy>> = {
+  2: LEVEL2_ACTIVITY_POLICY,
+  3: LEVEL3_ACTIVITY_POLICY,
 };
 
 function randInt(min: number, max: number) {
@@ -557,11 +603,11 @@ function supportedPlaces(config: GenericConfig) {
     : (["hundreds", "tens", "ones"] as PlaceValueName[]);
 }
 
-function getYear2DifficultyProfile(week: number) {
+export function getDifficultyProfile(level: SupportedMathLevel, week: number): DifficultyProfile {
   const contract =
-    YEAR2_DIFFICULTY_CONTRACTS.find(
+    YEAR_LEVEL_DIFFICULTY_CONTRACTS[level].find(
       (candidate) => week >= candidate.weekMin && week <= candidate.weekMax
-    ) ?? YEAR2_DIFFICULTY_CONTRACTS[YEAR2_DIFFICULTY_CONTRACTS.length - 1];
+    ) ?? YEAR_LEVEL_DIFFICULTY_CONTRACTS[level][YEAR_LEVEL_DIFFICULTY_CONTRACTS[level].length - 1];
 
   return {
     addSubMax: contract.addSubMax,
@@ -576,25 +622,21 @@ function getYear2DifficultyProfile(week: number) {
   };
 }
 
-function getDifficultyProfileForLesson(lesson: Lesson) {
+export function getLevelForLesson(lesson: Lesson): SupportedMathLevel {
   const yearMatch = lesson.id.match(/^y(\d+)-/);
   const yearNumber = yearMatch ? Number(yearMatch[1]) : 2;
+  return yearNumber >= 3 ? 3 : 2;
+}
 
-  if (yearNumber >= 3) {
-    return {
-      addSubMax: 300,
-      addSubExtensionMax: 500,
-      groupsMax: 12,
-      itemsMax: 12,
-      divisionTotalMax: 144,
-      factFamilyMax: 100,
-      skipCountMax: 100000,
-      skipCountExtraSteps: [2, 3, 4, 5, 10, 100, 1000],
-      wordProblemMax: 500,
-    };
-  }
+export function getAllowedModes(
+  level: SupportedMathLevel,
+  activityType: ActivityType
+): string[] | undefined {
+  return LEVEL_ACTIVITY_POLICY[level][activityType]?.allowedModes;
+}
 
-  return getYear2DifficultyProfile(lesson.week);
+function getActivityPolicy(level: SupportedMathLevel, activityType: ActivityType) {
+  return LEVEL_ACTIVITY_POLICY[level][activityType];
 }
 
 function asNumber(value: unknown): number | null {
@@ -611,9 +653,10 @@ function randomFromList<T>(items: T[]): T {
 
 function generateAdditionStrategyQuestion(
   config: GenericConfig,
+  level: SupportedMathLevel,
   lesson: Lesson
 ): AdditionStrategyQuestion {
-  const profile = getDifficultyProfileForLesson(lesson);
+  const profile = getDifficultyProfile(level, lesson.week);
   const min = typeof config.min === "number" ? config.min : 0;
   const max = typeof config.max === "number" ? config.max : profile.addSubMax;
   const mode =
@@ -711,7 +754,7 @@ function validateConfigAgainstPolicy(
   lesson: Lesson,
   activity: LessonActivity,
   policy: ActivityPolicy,
-  profile: ReturnType<typeof getYear2DifficultyProfile>,
+  profile: DifficultyProfile,
   violations: Year2PolicyViolation[]
 ) {
   const config = (activity.config ?? {}) as GenericConfig;
@@ -810,7 +853,7 @@ function validateQuestionAgainstPolicy(
   activity: LessonActivity,
   policy: ActivityPolicy,
   question: Year2QuestionData,
-  profile: ReturnType<typeof getYear2DifficultyProfile>,
+  profile: DifficultyProfile,
   violations: Year2PolicyViolation[]
 ) {
   if (question.kind !== activity.activityType && activity.activityType !== "review_quiz") {
@@ -896,13 +939,14 @@ function validateQuestionAgainstPolicy(
   }
 }
 
-export function validateLessonActivityIntent(
+export function validateLessonActivityIntentForLevel(
+  level: SupportedMathLevel,
   lesson: Lesson,
   activity: LessonActivity,
   question?: Year2QuestionData
 ): Year2PolicyValidation {
-  const profile = getDifficultyProfileForLesson(lesson);
-  const policy = YEAR2_ACTIVITY_POLICY[activity.activityType];
+  const profile = getDifficultyProfile(level, lesson.week);
+  const policy = getActivityPolicy(level, activity.activityType);
   const violations: Year2PolicyViolation[] = [];
   const focus = normalizeFocus(lesson.focus);
 
@@ -972,6 +1016,14 @@ export function validateLessonActivityIntent(
   };
 }
 
+export function validateLessonActivityIntent(
+  lesson: Lesson,
+  activity: LessonActivity,
+  question?: Year2QuestionData
+): Year2PolicyValidation {
+  return validateLessonActivityIntentForLevel(getLevelForLesson(lesson), lesson, activity, question);
+}
+
 function assertPolicyValidation(
   validation: Year2PolicyValidation,
   context: string
@@ -989,11 +1041,12 @@ function assertPolicyValidation(
 }
 
 function generateInteractiveQuestion(
+  level: SupportedMathLevel,
   activityType: ActivityType,
   config: GenericConfig,
   lesson: Lesson
 ): Year2QuestionData | null {
-  const profile = getDifficultyProfileForLesson(lesson);
+  const profile = getDifficultyProfile(level, lesson.week);
 
   if (activityType === "place_value_builder") {
     const min = typeof config.min === "number" ? config.min : 100;
@@ -1167,7 +1220,7 @@ function generateInteractiveQuestion(
   }
 
   if (activityType === "addition_strategy") {
-    return generateAdditionStrategyQuestion(config, lesson);
+    return generateAdditionStrategyQuestion(config, level, lesson);
   }
 
   if (activityType === "equal_groups") {
@@ -1682,7 +1735,10 @@ function generateInteractiveQuestion(
   return null;
 }
 
-function randomReviewConfig(activityType: ActivityType): GenericConfig {
+function randomReviewConfig(
+  activityType: ActivityType,
+  level: SupportedMathLevel
+): GenericConfig {
   switch (activityType) {
     case "skip_count":
       return {
@@ -1719,9 +1775,12 @@ function randomReviewConfig(activityType: ActivityType): GenericConfig {
       return {
         min: 0,
         max: 100,
-        mode: (["jump", "split", "friendly_numbers", "doubles", "near_doubles"] as const)[
-          randInt(0, 4)
-        ],
+        mode:
+          level >= 3
+            ? (["jump", "split", "friendly_numbers", "doubles", "near_doubles"] as const)[
+                randInt(0, 4)
+              ]
+            : (["jump", "split", "friendly_numbers"] as const)[randInt(0, 2)],
       };
     case "equal_groups":
       return {
@@ -1784,12 +1843,13 @@ function randomReviewConfig(activityType: ActivityType): GenericConfig {
 }
 
 function generateGenericQuestion(
+  level: SupportedMathLevel,
   activityType: "multiple_choice" | "typed_response",
   sourceActivityType: ActivityType,
   config: GenericConfig,
   lesson: Lesson
 ): MultipleChoiceQuestion | TypedResponseQuestion {
-  const profile = getDifficultyProfileForLesson(lesson);
+  const profile = getDifficultyProfile(level, lesson.week);
   const min = typeof config.min === "number" ? config.min : 0;
   const max = typeof config.max === "number" ? config.max : profile.addSubMax;
   const step = typeof config.step === "number" ? config.step : 10;
@@ -2001,7 +2061,7 @@ function generateGenericQuestion(
   }
 
   if (sourceActivityType === "addition_strategy") {
-    const sourceQuestion = generateAdditionStrategyQuestion(config, lesson);
+    const sourceQuestion = generateAdditionStrategyQuestion(config, level, lesson);
     const answer = String(sourceQuestion.answer);
     return asMultipleChoice
       ? {
@@ -2148,7 +2208,7 @@ function generateGenericQuestion(
   }
 
   if (sourceActivityType === "mixed_word_problem") {
-    const sourceQuestion = generateInteractiveQuestion("mixed_word_problem", config, lesson);
+    const sourceQuestion = generateInteractiveQuestion(level, "mixed_word_problem", config, lesson);
     if (!sourceQuestion || sourceQuestion.kind !== "mixed_word_problem") {
       return {
         kind: "typed_response",
@@ -2188,9 +2248,10 @@ function generateGenericQuestion(
       ];
     const selectedType = reviewActivities[randInt(0, reviewActivities.length - 1)] ?? "skip_count";
     return generateGenericQuestion(
+      getLevelForLesson(lesson),
       activityType,
       selectedType,
-      randomReviewConfig(selectedType),
+      randomReviewConfig(selectedType, getLevelForLesson(lesson)),
       lesson
     );
   }
@@ -2221,6 +2282,19 @@ export function buildYear2QuizActivityPool(
   activities: LessonActivity[];
   violations: Year2PolicyViolation[];
 } {
+  return buildQuizActivityPool(getLevelForLesson(lesson), lesson, options);
+}
+
+export function buildQuizActivityPool(
+  level: SupportedMathLevel,
+  lesson: Lesson,
+  options?: {
+    allowGenericFallback?: boolean;
+  }
+): {
+  activities: LessonActivity[];
+  violations: Year2PolicyViolation[];
+} {
   const allowGenericFallback = options?.allowGenericFallback === true;
   const activities = lesson.activities ?? [];
   const pool: LessonActivity[] = [];
@@ -2234,7 +2308,7 @@ export function buildYear2QuizActivityPool(
 
   if (instructional.length > 0) {
     for (const activity of instructional) {
-      const validation = validateLessonActivityIntent(lesson, activity);
+      const validation = validateLessonActivityIntentForLevel(level, lesson, activity);
       if (validation.valid) {
         pool.push(activity);
       } else {
@@ -2256,9 +2330,9 @@ export function buildYear2QuizActivityPool(
       ({
         activityType: type,
         weight: 1,
-        config: randomReviewConfig(type),
+        config: randomReviewConfig(type, level),
       } as LessonActivity);
-    const validation = validateLessonActivityIntent(lesson, candidate);
+    const validation = validateLessonActivityIntentForLevel(level, lesson, candidate);
     if (validation.valid) {
       pool.push(candidate);
     } else {
@@ -2284,12 +2358,21 @@ export function buildYear2LessonActivityPool(
   activities: LessonActivity[];
   violations: Year2PolicyViolation[];
 } {
+  return buildLessonActivityPool(getLevelForLesson(lesson), lesson);
+}
+export function buildLessonActivityPool(
+  level: SupportedMathLevel,
+  lesson: Lesson
+): {
+  activities: LessonActivity[];
+  violations: Year2PolicyViolation[];
+} {
   const activities = lesson.activities ?? [];
   const pool: LessonActivity[] = [];
   const violations: Year2PolicyViolation[] = [];
 
   for (const activity of activities) {
-    const validation = validateLessonActivityIntent(lesson, activity);
+    const validation = validateLessonActivityIntentForLevel(level, lesson, activity);
     if (validation.valid) {
       pool.push(activity);
     } else {
@@ -2304,8 +2387,16 @@ export function generateYear2Question(
   lesson: Lesson,
   activity: LessonActivity
 ): Year2QuestionData {
+  return generateQuestion(getLevelForLesson(lesson), lesson, activity);
+}
+
+export function generateQuestion(
+  level: SupportedMathLevel,
+  lesson: Lesson,
+  activity: LessonActivity
+): Year2QuestionData {
   const config = (activity.config ?? {}) as GenericConfig;
-  const preValidation = validateLessonActivityIntent(lesson, activity);
+  const preValidation = validateLessonActivityIntentForLevel(level, lesson, activity);
   assertPolicyValidation(preValidation, "pre_generate");
 
   let question: Year2QuestionData;
@@ -2331,13 +2422,14 @@ export function generateYear2Question(
     activity.activityType === "odd_even_sort" ||
     activity.activityType === "skip_count"
   ) {
-    question = generateInteractiveQuestion(activity.activityType, config, lesson) as Year2QuestionData;
+    question = generateInteractiveQuestion(level, activity.activityType, config, lesson) as Year2QuestionData;
   } else if (
     activity.activityType === "multiple_choice" ||
     activity.activityType === "typed_response"
   ) {
     const sourceActivityType = config.sourceActivityType ?? "place_value_builder";
     question = generateGenericQuestion(
+      level,
       activity.activityType,
       sourceActivityType,
       config,
@@ -2368,7 +2460,7 @@ export function generateYear2Question(
       {
         activityType: selectedType,
         weight: 1,
-        config: randomReviewConfig(selectedType),
+        config: randomReviewConfig(selectedType, level),
       }
     ) as ReviewQuizInnerQuestion;
 
@@ -2381,6 +2473,7 @@ export function generateYear2Question(
     };
   } else if (config.allowGenericFallback === true) {
     question = generateGenericQuestion(
+      level,
       "multiple_choice",
       activity.activityType,
       config,
@@ -2407,7 +2500,7 @@ export function generateYear2Question(
     };
   }
 
-  const postValidation = validateLessonActivityIntent(lesson, activity, question);
+  const postValidation = validateLessonActivityIntentForLevel(level, lesson, activity, question);
   assertPolicyValidation(postValidation, "post_generate");
   return question;
 }
@@ -2435,7 +2528,15 @@ export function generateQuestionForLessonActivity(
   lesson: Lesson,
   activity: LessonActivity
 ): Year2QuestionData {
-  return generateYear2Question(lesson, activity);
+  return generateQuestionForLevelLessonActivity(getLevelForLesson(lesson), lesson, activity);
+}
+
+export function generateQuestionForLevelLessonActivity(
+  level: SupportedMathLevel,
+  lesson: Lesson,
+  activity: LessonActivity
+): Year2QuestionData {
+  return generateQuestion(level, lesson, activity);
 }
 
 export const generateYear2QuestionFromActivity = generateQuestionForActivity;

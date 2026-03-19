@@ -8,7 +8,8 @@
     "build:dev": "next build",
     "start": "next start",
     "lint": "eslint",
-    "qa:year2-smoke": "node scripts/year2-smoke-qa.mjs"
+    "qa:year2-smoke": "node scripts/year2-smoke-qa.mjs",
+    "qa:level-aware-regression": "node scripts/level-aware-regression.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.98.0",

@@ -31,13 +31,11 @@ import type {
   OddEvenSortQuestion,
   PartitionExpandQuestion,
   PlaceValueBuilderQuestion,
-  ReviewQuizQuestion,
   SkipCountQuestion,
   SubtractionStrategyQuestion,
   TypedResponseQuestion,
   Year2QuestionData,
 } from "@/data/activities/year2/lessonEngine";
-import { generateQuestionForActivity } from "@/data/activities/year2/lessonEngine";
 import type { LessonActivity } from "@/data/programs/types";
 
 type LessonRendererProps = {
@@ -77,12 +75,13 @@ function getSafeQuestion(
   questionData: Year2QuestionData,
   prompt: string
 ) {
+  void prompt;
   if (matchesActivity(activity.activityType, questionData.kind)) {
     return questionData;
   }
 
   logFallback(activity, questionData);
-  return generateQuestionForActivity(activity, prompt);
+  return questionData;
 }
 
 function renderNestedActivity({

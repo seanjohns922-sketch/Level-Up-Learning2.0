@@ -15,6 +15,7 @@ Other useful commands:
 ```bash
 npm run lint
 npm run qa:year2-smoke
+npm run qa:level-aware-regression
 ```
 
 ## Level Design Docs

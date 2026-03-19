@@ -3,8 +3,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { LessonRenderer } from "@/components/lesson/LessonRenderer";
 import {
-  buildYear2LessonActivityPool,
-  generateYear2Question,
+  buildLessonActivityPool,
+  generateQuestion,
+  getLevelForLesson,
   type Year2QuestionData,
 } from "@/data/activities/year2/lessonEngine";
 import { pickWeightedIndex } from "@/lib/weightedRandom";
@@ -15,6 +16,7 @@ function pad2(n: number) {
 }
 
 function buildInitialTurn(lesson: Lesson, activities: Lesson["activities"] = []) {
+  const level = getLevelForLesson(lesson);
   if (!activities || activities.length === 0) {
     return {
       bag: [] as number[],
@@ -29,7 +31,7 @@ function buildInitialTurn(lesson: Lesson, activities: Lesson["activities"] = [])
     bag: picked.bag,
     lastIndex: picked.index,
     activityIndex: picked.index,
-    question: generateYear2Question(lesson, activities[picked.index]),
+    question: generateQuestion(level, lesson, activities[picked.index]),
   };
 }
 
@@ -71,7 +73,8 @@ export function Year2LessonEngine({
   onExit: () => void;
 }) {
   const totalSeconds = 8 * 60;
-  const lessonPool = useMemo(() => buildYear2LessonActivityPool(lesson), [lesson]);
+  const level = useMemo(() => getLevelForLesson(lesson), [lesson]);
+  const lessonPool = useMemo(() => buildLessonActivityPool(level, lesson), [level, lesson]);
   const activities = lessonPool.activities;
   const initialTurn = useMemo(() => buildInitialTurn(lesson, activities), [activities, lesson]);
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
@@ -105,7 +108,7 @@ export function Year2LessonEngine({
     lastIndexRef.current = picked.index;
 
     const nextActivity = activities[picked.index];
-    const nextQuestion = generateYear2Question(lesson, nextActivity);
+    const nextQuestion = generateQuestion(level, lesson, nextActivity);
 
     setCurrentActivityIndex(picked.index);
     setCurrentQuestion(nextQuestion);
