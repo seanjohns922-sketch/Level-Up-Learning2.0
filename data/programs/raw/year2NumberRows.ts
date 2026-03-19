@@ -739,24 +739,15 @@ export const year2NumberRows: ProgramRow[] = [
     ),
     activities: [
       makeActivity("equal_groups", 2, {
-        minGroups: 2,
-        maxGroups: 5,
-        minItemsPerGroup: 2,
-        maxItemsPerGroup: 5,
+        allowedGroupSizes: [2, 3, 5, 10],
         mode: "equal_groups",
       }),
       makeActivity("arrays", 1, {
-        minRows: 2,
-        maxRows: 5,
-        minColumns: 2,
-        maxColumns: 6,
+        allowedGroupSizes: [2, 3, 5, 10],
         mode: "arrays",
       }),
       makeActivity("multiple_choice", 1, {
-        minGroups: 2,
-        maxGroups: 5,
-        minItemsPerGroup: 2,
-        maxItemsPerGroup: 5,
+        allowedGroupSizes: [2, 3, 5, 10],
         mode: "equal_groups",
         sourceActivityType: "equal_groups",
       }),
