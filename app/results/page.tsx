@@ -64,22 +64,33 @@ function ScoreRing({ percent, passed }: { percent: number; passed: boolean }) {
   );
 }
 
-/* ── decorative floating shapes ── */
+/* ── decorative floating shapes (deterministic to avoid hydration mismatch) ── */
+const SHAPES = [
+  { w: 32, h: 28, l: 12, t: 15, dur: 4.2, del: 0.3 },
+  { w: 48, h: 44, l: 78, t: 8, dur: 5.1, del: 1.2 },
+  { w: 24, h: 36, l: 45, t: 62, dur: 3.8, del: 0.7 },
+  { w: 40, h: 30, l: 88, t: 35, dur: 6.0, del: 1.6 },
+  { w: 28, h: 42, l: 22, t: 80, dur: 4.5, del: 0.5 },
+  { w: 52, h: 38, l: 60, t: 50, dur: 5.5, del: 1.0 },
+  { w: 36, h: 46, l: 35, t: 25, dur: 3.5, del: 1.4 },
+  { w: 44, h: 34, l: 70, t: 72, dur: 6.5, del: 0.9 },
+];
+
 function FloatingShapes() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {[...Array(8)].map((_, i) => (
+      {SHAPES.map((s, i) => (
         <div
           key={i}
           className="absolute rounded-full opacity-10"
           style={{
-            width: `${20 + Math.random() * 40}px`,
-            height: `${20 + Math.random() * 40}px`,
+            width: `${s.w}px`,
+            height: `${s.h}px`,
             background: i % 2 === 0 ? "hsl(var(--primary))" : "hsl(var(--accent))",
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            animation: `floatShape ${3 + Math.random() * 4}s ease-in-out infinite alternate`,
-            animationDelay: `${Math.random() * 2}s`,
+            left: `${s.l}%`,
+            top: `${s.t}%`,
+            animation: `floatShape ${s.dur}s ease-in-out infinite alternate`,
+            animationDelay: `${s.del}s`,
           }}
         />
       ))}
