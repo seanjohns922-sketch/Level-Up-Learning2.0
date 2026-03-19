@@ -14,7 +14,8 @@ export type ActivityType =
   | "mixed_word_problem"
   | "review_quiz"
   | "multiple_choice"
-  | "typed_response";
+  | "typed_response"
+  | "speed_round";
 
 export type LessonActivity = {
   activityType: ActivityType;

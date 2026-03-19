@@ -16,6 +16,8 @@ import PlaceValueBuilder from "@/components/activities/PlaceValueBuilder";
 import SkipCount from "@/components/activities/SkipCount";
 import SubtractionStrategy from "@/components/activities/SubtractionStrategy";
 import TypedResponseActivity from "@/components/activities/TypedResponseActivity";
+import SpeedRound from "@/components/activities/SpeedRound";
+import type { SpeedRoundQuestion } from "@/data/activities/year2/lessonEngine";
 import type {
   AdditionStrategyQuestion,
   EqualGroupsQuestion,
@@ -328,6 +330,19 @@ export function LessonRenderer({
       return (
         <TypedResponseActivity
           questionData={safeQuestion as TypedResponseQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
+        />
+      );
+    }
+    case "speed_round": {
+      const safeQuestion = getSafeQuestion(activity, questionData, prompt);
+      if (safeQuestion.kind !== "speed_round") {
+        return <ErrorCard message="Speed round failed to load." />;
+      }
+      return (
+        <SpeedRound
+          questionData={safeQuestion as SpeedRoundQuestion}
           onCorrect={onCorrect}
           onWrong={onWrong}
         />

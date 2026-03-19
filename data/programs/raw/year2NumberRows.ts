@@ -1046,24 +1046,16 @@ export const year2NumberRows: ProgramRow[] = [
       "How do you know your team strategy works?"
     ),
     activities: [
-      makeActivity("review_quiz", 2, {
+      makeActivity("speed_round", 3, {
+        durationSeconds: 30,
+      }),
+      makeActivity("review_quiz", 1, {
         mode: "team_challenges",
         reviewActivities: [
-          "division_groups",
-          "fact_family",
           "addition_strategy",
-          "odd_even_sort",
+          "subtraction_strategy",
+          "fact_family",
         ],
-      }),
-      makeActivity("division_groups", 1, {
-        minTotal: 6,
-        maxTotal: 24,
-        mode: "grouping",
-      }),
-      makeActivity("fact_family", 1, {
-        min: 0,
-        max: 20,
-        mode: "recognise",
       }),
     ],
     curriculum: ["AC9M2N06"],

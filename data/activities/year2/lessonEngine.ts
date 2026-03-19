@@ -187,6 +187,12 @@ export type TypedResponseQuestion = {
   placeholder?: string;
 };
 
+export type SpeedRoundQuestion = {
+  kind: "speed_round";
+  prompt: string;
+  durationSeconds: number;
+};
+
 export type Year2QuestionData =
   | PlaceValueBuilderQuestion
   | NumberOrderQuestion
@@ -203,7 +209,8 @@ export type Year2QuestionData =
   | OddEvenSortQuestion
   | SkipCountQuestion
   | MultipleChoiceQuestion
-  | TypedResponseQuestion;
+  | TypedResponseQuestion
+  | SpeedRoundQuestion;
 
 type GenericConfig = Record<string, unknown> & {
   min?: number;
@@ -404,6 +411,7 @@ const YEAR2_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
   review_quiz: {},
   multiple_choice: {},
   typed_response: {},
+  speed_round: {},
 };
 
 function randInt(min: number, max: number) {
@@ -2095,7 +2103,14 @@ export function generateYear2Question(
   assertPolicyValidation(preValidation, "pre_generate");
 
   let question: Year2QuestionData;
-  if (
+  if (activity.activityType === "speed_round") {
+    const dur = typeof config.durationSeconds === "number" ? config.durationSeconds : 30;
+    question = {
+      kind: "speed_round",
+      prompt: "Speed Round",
+      durationSeconds: dur,
+    };
+  } else if (
     activity.activityType === "place_value_builder" ||
     activity.activityType === "number_order" ||
     activity.activityType === "partition_expand" ||
