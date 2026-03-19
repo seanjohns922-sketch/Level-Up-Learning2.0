@@ -274,9 +274,21 @@ function ResultsPage() {
                   <span className="font-bold text-sm text-foreground">Legend Unlocked!</span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {passedByProgram
+                  {isPostTest
+                    ? "You passed the post-test — your Legend is ready to collect!"
+                    : passedByProgram
                     ? "You completed the 12-week program — your Legend awaits!"
                     : "You aced the pre-test — your Legend is ready to collect!"}
+                </p>
+              </div>
+            ) : isPostTest ? (
+              <div className="rounded-2xl p-4 border border-accent/30" style={{ background: "hsl(42 95% 97%)" }}>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-lg">💪</span>
+                  <span className="font-bold text-sm text-foreground">Almost there!</span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  You need 90% to pass. Review some lessons and try again when you&apos;re ready.
                 </p>
               </div>
             ) : (
@@ -295,11 +307,18 @@ function ResultsPage() {
             <div className="rounded-2xl bg-secondary p-4">
               <div className="font-bold text-sm text-foreground mb-2">What&apos;s next?</div>
               <div className="space-y-2">
-                {[
-                  { icon: "📖", text: "3 lessons every week" },
-                  { icon: "🧪", text: "1 quiz to test your skills" },
-                  { icon: "🏅", text: "Legends unlock with mastery" },
-                ].map((item) => (
+                {(isPostTest && !passed
+                  ? [
+                      { icon: "🔁", text: "Review any week's lessons" },
+                      { icon: "📝", text: "Retry the post-test when ready" },
+                      { icon: "🏅", text: "Score 90%+ to unlock your Legend" },
+                    ]
+                  : [
+                      { icon: "📖", text: "3 lessons every week" },
+                      { icon: "🧪", text: "1 quiz to test your skills" },
+                      { icon: "🏅", text: "Legends unlock with mastery" },
+                    ]
+                ).map((item) => (
                   <div key={item.text} className="flex items-center gap-2 text-xs text-secondary-foreground">
                     <span>{item.icon}</span>
                     <span>{item.text}</span>
@@ -319,6 +338,31 @@ function ResultsPage() {
                   style={{ boxShadow: "0 8px 24px -8px hsl(var(--primary) / 0.4)" }}
                 >
                   🏅 View My Legends
+                </button>
+                <button
+                  onClick={goHome}
+                  className="w-full py-3 rounded-2xl bg-secondary text-secondary-foreground font-semibold text-sm hover:bg-muted transition-all active:scale-[0.98]"
+                >
+                  Back to Home
+                </button>
+              </>
+            ) : isPostTest ? (
+              <>
+                <button
+                  onClick={goRetryPostTest}
+                  className="w-full py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base hover:opacity-90 transition-all active:scale-[0.98] shadow-lg"
+                  style={{ boxShadow: "0 8px 24px -8px hsl(var(--primary) / 0.4)" }}
+                >
+                  🔄 Retry Post-Test
+                </button>
+                <button
+                  onClick={goReview}
+                  className="w-full py-3 rounded-2xl font-bold text-sm hover:opacity-90 transition-all active:scale-[0.98]"
+                  style={{
+                    background: "linear-gradient(135deg, hsl(var(--accent)), hsl(42 95% 60%))",
+                  }}
+                >
+                  📖 Review Lessons
                 </button>
                 <button
                   onClick={goHome}
