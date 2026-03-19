@@ -576,6 +576,27 @@ function getYear2DifficultyProfile(week: number) {
   };
 }
 
+function getDifficultyProfileForLesson(lesson: Lesson) {
+  const yearMatch = lesson.id.match(/^y(\d+)-/);
+  const yearNumber = yearMatch ? Number(yearMatch[1]) : 2;
+
+  if (yearNumber >= 3) {
+    return {
+      addSubMax: 300,
+      addSubExtensionMax: 500,
+      groupsMax: 12,
+      itemsMax: 12,
+      divisionTotalMax: 144,
+      factFamilyMax: 100,
+      skipCountMax: 100000,
+      skipCountExtraSteps: [2, 3, 4, 5, 10, 100, 1000],
+      wordProblemMax: 500,
+    };
+  }
+
+  return getYear2DifficultyProfile(lesson.week);
+}
+
 function asNumber(value: unknown): number | null {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
@@ -803,7 +824,7 @@ export function validateLessonActivityIntent(
   activity: LessonActivity,
   question?: Year2QuestionData
 ): Year2PolicyValidation {
-  const profile = getYear2DifficultyProfile(lesson.week);
+  const profile = getDifficultyProfileForLesson(lesson);
   const policy = YEAR2_ACTIVITY_POLICY[activity.activityType];
   const violations: Year2PolicyViolation[] = [];
   const focus = normalizeFocus(lesson.focus);
