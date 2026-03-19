@@ -835,7 +835,7 @@ export const year2NumberRows: ProgramRow[] = [
   },
   {
     week: 8,
-    focus: "Multiplication - Groups & Arrays",
+    focus: "Multiplication - 2s, 5s, 10s",
     lesson: 3,
     topic: "Link multiplication to repeated addition",
     activity: "Write repeated addition sentences from arrays.",
