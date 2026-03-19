@@ -239,7 +239,7 @@ function ResultsPage() {
             </h1>
             <p className="text-sm text-muted-foreground mb-2">{msg.sub}</p>
             <div className="text-xs font-semibold text-muted-foreground/60 uppercase tracking-wider">
-              {year} • {source === "program_complete" ? "Program" : "Pre-Test"}
+              {year} • {isPostTest ? "Post-Test" : source === "program_complete" ? "Program" : "Pre-Test"}
             </div>
 
             <ScoreRing percent={displayPercent} passed={passed} />
