@@ -873,11 +873,11 @@ export const year2NumberRows: ProgramRow[] = [
   },
 
   // ═══════════════════════════════════════════════════════════
-  // WEEK 9 – MULTIPLICATION FLUENCY (Skip Counting 2s, 5s, 10s)
+  // WEEK 9 – MULTIPLICATION (GROUPS & ARRAYS)
   // ═══════════════════════════════════════════════════════════
   {
     week: 9,
-    focus: "Multiplication - 2s, 5s, 10s",
+    focus: "Multiplication - Groups & Arrays",
     lesson: 1,
     topic: "Recall and skip count by 2s",
     activity: "Skip count using number lines. Fluency drills and pattern recognition.",
