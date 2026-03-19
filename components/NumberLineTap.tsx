@@ -138,7 +138,7 @@ export default function NumberLineTap({
                   style={{ width: 3, height: 40 }}
                 />
                 <div className="mt-1.5 text-sm font-bold text-foreground whitespace-nowrap">
-                  {t}
+                  {fmt(t)}
                 </div>
               </div>
             );
