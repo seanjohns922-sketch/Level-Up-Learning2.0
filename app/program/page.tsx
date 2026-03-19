@@ -68,16 +68,21 @@ function ProgramPage() {
 
   const progress = getWeekProgress(store, year, week);
 
-  const items = useMemo(() => {
+  type ProgramItem = { type: "lesson" | "quiz" | "posttest"; n: number; title: string; focus: string };
+  const items: ProgramItem[] = useMemo(() => {
     const program = getProgramForYear(curriculumYear);
     const weekPlan = program.find((w) => w.week === weekNum);
     const lessons = weekPlan?.lessons ?? [];
-    return [
+    const base: ProgramItem[] = [
       { type: "lesson" as const, n: 1, title: lessons[0]?.title ?? "Lesson 1", focus: lessons[0]?.focus ?? "" },
       { type: "lesson" as const, n: 2, title: lessons[1]?.title ?? "Lesson 2", focus: lessons[1]?.focus ?? "" },
       { type: "lesson" as const, n: 3, title: lessons[2]?.title ?? "Lesson 3", focus: lessons[2]?.focus ?? "" },
       { type: "quiz" as const, n: 1, title: "Weekly Quiz", focus: "15 questions from all 3 lessons" },
     ];
+    if (weekNum === 12) {
+      base.push({ type: "posttest" as const, n: 1, title: "Post-Test", focus: "Score 90%+ to unlock your Legend" });
+    }
+    return base;
   }, [curriculumYear, weekNum]);
 
   function openItem(item: (typeof items)[number]) {
@@ -91,6 +96,9 @@ function ProgramPage() {
       if (item.type === "quiz") {
         if (progress.lessonsCompleted.filter(Boolean).length < 3) return;
       }
+      if (item.type === "posttest") {
+        if (progress.lessonsCompleted.filter(Boolean).length < 3) return;
+      }
     }
 
     if (item.type === "lesson") {
@@ -98,6 +106,10 @@ function ProgramPage() {
       router.push(
         `/lesson?year=${encodeURIComponent(curriculumYear)}&week=${week}&lessonId=y${yearNumber}-w${weekNum}-l${item.n}`
       );
+      return;
+    }
+    if (item.type === "posttest") {
+      router.push(`/posttest?year=${encodeURIComponent(curriculumYear)}`);
       return;
     }
     router.push(`/session?year=${encodeURIComponent(curriculumYear)}&week=${week}&type=${item.type}&n=${item.n}`);
@@ -245,13 +257,21 @@ function ProgramPage() {
           <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/60 border border-gray-100/80 p-5 grid gap-3">
             {items.map((item) => {
               const isLesson = item.type === "lesson";
-              const completed = isLesson ? progress.lessonsCompleted[item.n - 1] : progress.quizCompleted;
+              const isPostTest = item.type === "posttest";
+              const completed = isLesson
+                ? progress.lessonsCompleted[item.n - 1]
+                : isPostTest
+                  ? false // post-test "completed" is tracked via progress store separately
+                  : progress.quizCompleted;
 
               let locked = false;
               if (!DEMO_MODE) {
                 if (isLesson && item.n > 1 && !progress.lessonsCompleted[item.n - 2]) locked = true;
-                if (!isLesson && lessonsDoneCount < 3) locked = true;
+                if (item.type === "quiz" && lessonsDoneCount < 3) locked = true;
+                if (isPostTest && lessonsDoneCount < 3) locked = true;
               }
+
+              const postTestReady = isPostTest && !locked;
 
               return (
                 <button
@@ -262,19 +282,24 @@ function ProgramPage() {
                     "w-full text-left p-4 rounded-2xl border transition-all flex items-center gap-4 group",
                     locked
                       ? "border-gray-100 bg-gray-50/50 opacity-50 cursor-not-allowed"
-                      : completed
-                        ? "border-emerald-100 bg-emerald-50/30 hover:shadow-md"
-                        : "border-gray-100 bg-white hover:shadow-md hover:-translate-y-0.5",
+                      : postTestReady
+                        ? "border-primary/30 bg-primary-light hover:shadow-lg hover:-translate-y-0.5 animate-[postTestGlow_2s_ease-in-out_infinite]"
+                        : completed
+                          ? "border-emerald-100 bg-emerald-50/30 hover:shadow-md"
+                          : "border-gray-100 bg-white hover:shadow-md hover:-translate-y-0.5",
                   ].join(" ")}
                 >
                   <div className={[
-                    "w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-sm font-bold",
+                    "w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-sm font-bold transition-all",
                     locked ? "bg-gray-100 text-gray-400"
-                      : completed ? "bg-emerald-100 text-emerald-600"
-                        : item.type === "quiz" ? "bg-blue-50 text-blue-500" : "bg-gray-100 text-gray-500",
+                      : postTestReady ? "bg-primary/10 text-primary"
+                        : completed ? "bg-emerald-100 text-emerald-600"
+                          : item.type === "quiz" ? "bg-blue-50 text-blue-500" : "bg-gray-100 text-gray-500",
                   ].join(" ")}>
                     {locked ? (
                       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0110 0v4" /></svg>
+                    ) : isPostTest ? (
+                      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
                     ) : item.type === "quiz" ? (
                       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg>
                     ) : (
@@ -283,10 +308,20 @@ function ProgramPage() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs text-gray-400 font-medium">{isLesson ? `Lesson ${item.n}` : "Weekly Quiz"}</div>
+                    <div className="text-xs text-gray-400 font-medium">
+                      {isLesson ? `Lesson ${item.n}` : isPostTest ? "Final Assessment" : "Weekly Quiz"}
+                    </div>
                     <div className="font-extrabold text-gray-900 truncate">{item.title}</div>
-                    <div className="text-xs text-gray-500 mt-0.5 truncate">{item.focus}</div>
-                    <div className="text-xs text-gray-400 mt-0.5">{isLesson ? "10 XP" : "20 XP"}</div>
+                    <div className="text-xs mt-0.5 truncate" style={{ color: locked && isPostTest ? "hsl(var(--muted-foreground))" : undefined }}>
+                      {locked && isPostTest
+                        ? "🔒 Complete all lessons to unlock"
+                        : postTestReady
+                          ? "✨ Ready to start"
+                          : item.focus}
+                    </div>
+                    {!isPostTest && (
+                      <div className="text-xs text-gray-400 mt-0.5">{isLesson ? "10 XP" : "20 XP"}</div>
+                    )}
                   </div>
 
                   <div className="flex-shrink-0">
@@ -296,6 +331,10 @@ function ProgramPage() {
                       <div className="h-8 w-8 rounded-full bg-emerald-500 text-white flex items-center justify-center">
                         <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="3"><path d="M20 6L9 17l-5-5" /></svg>
                       </div>
+                    ) : postTestReady ? (
+                      <span className="text-xs font-extrabold px-4 py-1.5 rounded-full bg-primary text-primary-foreground shadow-sm">
+                        START
+                      </span>
                     ) : (
                       <span className="text-xs font-extrabold px-4 py-1.5 rounded-full border-2 border-gray-900 text-gray-900 group-hover:bg-gray-900 group-hover:text-white transition">START</span>
                     )}
@@ -305,19 +344,6 @@ function ProgramPage() {
             })}
           </div>
 
-          {weekNum === 12 && weekComplete && (
-            <div className="mt-6 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-3xl border border-emerald-200 p-6 text-center">
-              <div className="text-2xl mb-2">🏆</div>
-              <h3 className="text-xl font-black text-gray-900 mb-1">Program Complete!</h3>
-              <p className="text-sm text-gray-500 mb-4">You've finished all 12 weeks. Unlock your Legend!</p>
-              <button
-                onClick={finishProgram}
-                className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-extrabold shadow-lg shadow-emerald-200 hover:shadow-emerald-300 transition"
-              >
-                Finish Program → Unlock Legend
-              </button>
-            </div>
-          )}
         </div>
       </div>
     </main>
