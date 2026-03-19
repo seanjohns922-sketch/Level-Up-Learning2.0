@@ -187,6 +187,12 @@ export type TypedResponseQuestion = {
   placeholder?: string;
 };
 
+export type SpeedRoundQuestion = {
+  kind: "speed_round";
+  prompt: string;
+  durationSeconds: number;
+};
+
 export type Year2QuestionData =
   | PlaceValueBuilderQuestion
   | NumberOrderQuestion
@@ -203,7 +209,8 @@ export type Year2QuestionData =
   | OddEvenSortQuestion
   | SkipCountQuestion
   | MultipleChoiceQuestion
-  | TypedResponseQuestion;
+  | TypedResponseQuestion
+  | SpeedRoundQuestion;
 
 type GenericConfig = Record<string, unknown> & {
   min?: number;
