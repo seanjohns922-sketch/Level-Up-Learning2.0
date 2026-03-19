@@ -679,7 +679,11 @@ function generateAdditionStrategyQuestion(
     a = n;
     b = n;
     prompt = `Solve ${a} + ${b}.`;
-    hint = `Use a doubles fact: double ${a}.`;
+    const tens = Math.floor(a / 10) * 10;
+    const ones = a % 10;
+    hint = ones === 0
+      ? `Use a doubles fact: double ${a}.`
+      : `Split and double: double ${tens} = ${tens * 2}, double ${ones} = ${ones * 2}, then add them.`;
   } else if (mode === "near_doubles") {
     const lower = Math.max(20, min, 2);
     const upper = Math.max(lower + 2, Math.min(100, max, profile.addSubExtensionMax - 1));
