@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 
+const fmt = (n: number) => n.toLocaleString();
+
 /* Pick a clean tick step so we get 5–11 labelled ticks */
 function niceStep(span: number): number {
   if (span <= 10) return 1;
@@ -136,7 +138,7 @@ export default function NumberLineTap({
                   style={{ width: 3, height: 40 }}
                 />
                 <div className="mt-1.5 text-sm font-bold text-foreground whitespace-nowrap">
-                  {t}
+                  {fmt(t)}
                 </div>
               </div>
             );
@@ -164,7 +166,7 @@ export default function NumberLineTap({
                   correct ? "text-primary" : "text-foreground",
                 ].join(" ")}
               >
-                {value}
+                {value !== null ? fmt(value) : value}
               </span>
             </div>
           )}

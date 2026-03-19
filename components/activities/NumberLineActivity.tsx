@@ -4,6 +4,8 @@ import { useMemo, useState, useCallback } from "react";
 import type { NumberLineQuestion } from "@/data/activities/year2/lessonEngine";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 
+const fmt = (n: number) => n.toLocaleString();
+
 /* Pick a clean tick step so we get 5–11 labelled ticks */
 function niceStep(span: number): number {
   if (span <= 10) return 1;
@@ -161,7 +163,7 @@ export default function NumberLineActivity({
                   style={{ width: 3, height: 40 }}
                 />
                 <div className="mt-1.5 text-sm font-bold text-foreground whitespace-nowrap">
-                  {tick}
+                  {fmt(tick)}
                 </div>
               </div>
             );
@@ -174,7 +176,7 @@ export default function NumberLineActivity({
               style={{ left: `${correctPct}%`, transform: "translateX(-50%)", top: 22 }}
             >
               <div className="w-5 h-5 rounded-full bg-primary border-2 border-primary-foreground shadow-md" />
-              <span className="mt-0.5 text-xs font-bold text-primary">{questionData.expected}</span>
+              <span className="mt-0.5 text-xs font-bold text-primary">{fmt(questionData.expected)}</span>
             </div>
           )}
 
@@ -223,7 +225,7 @@ export default function NumberLineActivity({
                 : "bg-destructive/10 text-destructive",
             ].join(" ")}
           >
-            {isCorrect ? "✅ Correct!" : `❌ The answer was ${questionData.expected}`}
+            {isCorrect ? "✅ Correct!" : `❌ The answer was ${fmt(questionData.expected)}`}
           </div>
         )}
       </div>
