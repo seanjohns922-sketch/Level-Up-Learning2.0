@@ -2699,6 +2699,10 @@ function SessionPage() {
   // ---------------------------
   // UI
   // ---------------------------
+  if (showPostTestTransition) {
+    return <PostTestTransition year={year} />;
+  }
+
   return (
     <main className="min-h-screen bg-background flex items-center justify-center px-6 py-10">
       <div className="w-full max-w-5xl">
