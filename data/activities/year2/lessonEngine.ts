@@ -1098,7 +1098,11 @@ function generateInteractiveQuestion(
       config.mode === "grouping" || config.mode === "inverse_link" || config.mode === "sharing"
         ? config.mode
         : "sharing";
-    const candidateGroupSizes = [2, 3, 4, 5, 6, 8, 10].filter((size) => size <= maxTotal);
+    const allowedSizes = config.allowedGroupSizes;
+    const candidateGroupSizes = (allowedSizes && allowedSizes.length > 0
+      ? allowedSizes
+      : [2, 3, 4, 5, 6, 8, 10]
+    ).filter((size) => size <= maxTotal);
     const groupSize =
       candidateGroupSizes[randInt(0, candidateGroupSizes.length - 1)] ?? 2;
     const minMultiplier = Math.max(2, Math.ceil(minTotal / groupSize));
