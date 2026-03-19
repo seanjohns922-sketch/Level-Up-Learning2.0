@@ -166,7 +166,7 @@ export default function NumberLineTap({
                   correct ? "text-primary" : "text-foreground",
                 ].join(" ")}
               >
-                {value}
+                {value !== null ? fmt(value) : value}
               </span>
             </div>
           )}
