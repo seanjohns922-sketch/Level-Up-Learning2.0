@@ -678,6 +678,7 @@ function generateAdditionStrategyQuestion(
     const n = randInt(lower, upper);
     a = n;
     b = n;
+    prompt = `Solve ${a} + ${b}.`;
     hint = `Use a doubles fact: double ${a}.`;
   } else if (mode === "near_doubles") {
     const lower = Math.max(20, min, 2);
