@@ -176,7 +176,7 @@ export default function NumberLineActivity({
               style={{ left: `${correctPct}%`, transform: "translateX(-50%)", top: 22 }}
             >
               <div className="w-5 h-5 rounded-full bg-primary border-2 border-primary-foreground shadow-md" />
-              <span className="mt-0.5 text-xs font-bold text-primary">{questionData.expected}</span>
+              <span className="mt-0.5 text-xs font-bold text-primary">{fmt(questionData.expected)}</span>
             </div>
           )}
 
