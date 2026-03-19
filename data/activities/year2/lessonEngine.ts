@@ -1,11 +1,13 @@
 import type { Lesson } from "@/data/programs/year1";
 import type { ActivityType, LessonActivity } from "@/data/programs/types";
 
-export type PlaceValueName = "hundreds" | "tens" | "ones";
+export type PlaceValueName = "ten_thousands" | "thousands" | "hundreds" | "tens" | "ones";
 
 export type PlaceValueBuilderQuestion = {
   kind: "place_value_builder";
   prompt: string;
+  tenThousands: number | null;
+  thousands: number | null;
   hundreds: number | null;
   tens: number | null;
   ones: number | null;
@@ -303,7 +305,7 @@ const YEAR2_DIFFICULTY_CONTRACTS: Year2DifficultyContract[] = [
     divisionTotalMax: 24,
     factFamilyMax: 20,
     skipCountMax: 1000,
-    skipCountExtraSteps: [2, 5, 10],
+    skipCountExtraSteps: [2, 5, 10, 100, 1000],
     wordProblemMax: 40,
   },
   {
@@ -316,7 +318,7 @@ const YEAR2_DIFFICULTY_CONTRACTS: Year2DifficultyContract[] = [
     divisionTotalMax: 36,
     factFamilyMax: 30,
     skipCountMax: 1000,
-    skipCountExtraSteps: [2, 3, 4, 5, 10],
+    skipCountExtraSteps: [2, 3, 4, 5, 10, 100, 1000],
     wordProblemMax: 70,
   },
   {
@@ -329,7 +331,7 @@ const YEAR2_DIFFICULTY_CONTRACTS: Year2DifficultyContract[] = [
     divisionTotalMax: 48,
     factFamilyMax: 40,
     skipCountMax: 1000,
-    skipCountExtraSteps: [2, 3, 4, 5, 10],
+    skipCountExtraSteps: [2, 3, 4, 5, 10, 100, 1000],
     wordProblemMax: 100,
   },
   {
@@ -342,7 +344,7 @@ const YEAR2_DIFFICULTY_CONTRACTS: Year2DifficultyContract[] = [
     divisionTotalMax: 60,
     factFamilyMax: 50,
     skipCountMax: 1000,
-    skipCountExtraSteps: [2, 3, 4, 5, 10],
+    skipCountExtraSteps: [2, 3, 4, 5, 10, 100, 1000],
     wordProblemMax: 140,
   },
 ];
@@ -444,12 +446,16 @@ function uniqueNumberOptions(answer: number, spread = 12) {
 }
 
 function digitForPlace(value: number, place: PlaceValueName) {
+  if (place === "ten_thousands") return Math.floor(value / 10000) % 10;
+  if (place === "thousands") return Math.floor(value / 1000) % 10;
   if (place === "hundreds") return Math.floor(value / 100) % 10;
   if (place === "tens") return Math.floor(value / 10) % 10;
   return value % 10;
 }
 
 function placeLabel(place: PlaceValueName) {
+  if (place === "ten_thousands") return "ten thousands";
+  if (place === "thousands") return "thousands";
   if (place === "hundreds") return "hundreds";
   if (place === "tens") return "tens";
   return "ones";
@@ -470,7 +476,11 @@ function roundToNearest(value: number, unit: number) {
 function supportedPlaces(config: GenericConfig) {
   const candidates = config.placeValues?.filter(
     (value): value is PlaceValueName =>
-      value === "hundreds" || value === "tens" || value === "ones"
+      value === "ten_thousands" ||
+      value === "thousands" ||
+      value === "hundreds" ||
+      value === "tens" ||
+      value === "ones"
   );
   return candidates && candidates.length > 0
     ? candidates
@@ -822,6 +832,8 @@ function generateInteractiveQuestion(
     const max = typeof config.max === "number" ? config.max : 999;
     const target = randInt(min, max);
     const places = supportedPlaces(config);
+    const tenThousands = digitForPlace(target, "ten_thousands");
+    const thousands = digitForPlace(target, "thousands");
     const hundreds = digitForPlace(target, "hundreds");
     const tens = digitForPlace(target, "tens");
     const ones = digitForPlace(target, "ones");
@@ -838,6 +850,8 @@ function generateInteractiveQuestion(
       return {
         kind: "place_value_builder",
         prompt: `How many ${placeLabel(place)} are shown?`,
+        tenThousands,
+        thousands,
         hundreds,
         tens,
         ones,
@@ -854,12 +868,22 @@ function generateInteractiveQuestion(
       return {
         kind: "place_value_builder",
         prompt: "What is the missing value?",
+        tenThousands: place === "ten_thousands" ? null : tenThousands,
+        thousands: place === "thousands" ? null : thousands,
         hundreds: place === "hundreds" ? null : hundreds,
         tens: place === "tens" ? null : tens,
         ones: place === "ones" ? null : ones,
         targetNumber: target,
         answer:
-          place === "hundreds" ? hundreds * 100 : place === "tens" ? tens * 10 : ones,
+          place === "ten_thousands"
+            ? tenThousands * 10000
+            : place === "thousands"
+            ? thousands * 1000
+            : place === "hundreds"
+            ? hundreds * 100
+            : place === "tens"
+            ? tens * 10
+            : ones,
         mode,
         place,
         visualMode: "mab",
@@ -870,6 +894,8 @@ function generateInteractiveQuestion(
     return {
       kind: "place_value_builder",
       prompt: "What number is shown by the MAB blocks?",
+      tenThousands,
+      thousands,
       hundreds,
       tens,
       ones,
@@ -1632,18 +1658,34 @@ function generateGenericQuestion(
 
   if (sourceActivityType === "place_value_builder") {
     const target = randInt(Math.max(100, min || 100), Math.max(200, max || 999));
-    const place = (["hundreds", "tens", "ones"] as PlaceValueName[])[randInt(0, 2)];
+    const places = supportedPlaces(config);
+    const place = places[randInt(0, places.length - 1)] ?? "ones";
     const partition = partitionNumber(target);
     const mode =
       config.mode === "identify_place" || config.mode === "missing_mab_part"
         ? config.mode
         : "identify_number";
-    const mabSummary = `${partition.hundreds / 100} hundreds, ${partition.tens / 10} tens, ${partition.ones} ones`;
+    const tenThousands = digitForPlace(target, "ten_thousands");
+    const thousands = digitForPlace(target, "thousands");
+    const hundreds = digitForPlace(target, "hundreds");
+    const tens = digitForPlace(target, "tens");
+    const ones = digitForPlace(target, "ones");
+    const mabSummary = `${tenThousands} ten thousands, ${thousands} thousands, ${hundreds} hundreds, ${tens} tens, ${ones} ones`;
 
     if (mode === "missing_mab_part") {
       const hiddenValue =
-        place === "hundreds" ? partition.hundreds : place === "tens" ? partition.tens : partition.ones;
+        place === "ten_thousands"
+          ? tenThousands * 10000
+          : place === "thousands"
+          ? thousands * 1000
+          : place === "hundreds"
+          ? partition.hundreds
+          : place === "tens"
+          ? partition.tens
+          : partition.ones;
       const visibleSummary = [
+        place === "ten_thousands" ? "? ten thousands" : `${tenThousands} ten thousands`,
+        place === "thousands" ? "? thousands" : `${thousands} thousands`,
         place === "hundreds" ? "? hundreds" : `${partition.hundreds / 100} hundreds`,
         place === "tens" ? "? tens" : `${partition.tens / 10} tens`,
         place === "ones" ? "? ones" : `${partition.ones} ones`,

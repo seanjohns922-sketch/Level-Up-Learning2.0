@@ -5,18 +5,24 @@ import type { PlaceValueBuilderQuestion, PlaceValueName } from "@/data/activitie
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 function placeLabel(place: PlaceValueName) {
+  if (place === "ten_thousands") return "Ten Thousands";
+  if (place === "thousands") return "Thousands";
   if (place === "hundreds") return "Hundreds";
   if (place === "tens") return "Tens";
   return "Ones";
 }
 
 function unitValue(place: PlaceValueName) {
+  if (place === "ten_thousands") return 10000;
+  if (place === "thousands") return 1000;
   if (place === "hundreds") return 100;
   if (place === "tens") return 10;
   return 1;
 }
 
 function placeCount(questionData: PlaceValueBuilderQuestion, place: PlaceValueName) {
+  if (place === "ten_thousands") return questionData.tenThousands;
+  if (place === "thousands") return questionData.thousands;
   if (place === "hundreds") return questionData.hundreds;
   if (place === "tens") return questionData.tens;
   return questionData.ones;
@@ -63,6 +69,26 @@ function MABVisual({
     );
   }
 
+  if (place === "ten_thousands" || place === "thousands") {
+    const chipClass =
+      place === "ten_thousands"
+        ? "border-indigo-300 bg-indigo-100 text-indigo-800"
+        : "border-sky-300 bg-sky-100 text-sky-800";
+    const chipLabel = place === "ten_thousands" ? "10k" : "1k";
+    return (
+      <div className="flex flex-wrap gap-2">
+        {Array.from({ length: count }).map((_, index) => (
+          <div
+            key={index}
+            className={`rounded-lg border px-3 py-1.5 text-sm font-black shadow-sm ${chipClass}`}
+          >
+            {chipLabel}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-wrap gap-2">
       {Array.from({ length: count }).map((_, index) => (
@@ -92,11 +118,26 @@ export default function PlaceValueBuilder({
 
   const visibleTotal = useMemo(
     () =>
+      (questionData.tenThousands ?? 0) * 10000 +
+      (questionData.thousands ?? 0) * 1000 +
       (questionData.hundreds ?? 0) * 100 +
       (questionData.tens ?? 0) * 10 +
       (questionData.ones ?? 0),
-    [questionData.hundreds, questionData.ones, questionData.tens]
+    [
+      questionData.tenThousands,
+      questionData.thousands,
+      questionData.hundreds,
+      questionData.ones,
+      questionData.tens,
+    ]
   );
+
+  const knownBreakdown = useMemo(() => {
+    return questionData.placeValues.map((place) => {
+      const count = placeCount(questionData, place) ?? 0;
+      return `${count} ${placeLabel(place).toLowerCase()}`;
+    });
+  }, [questionData]);
 
   const answerLabel =
     questionData.mode === "identify_number"
@@ -136,7 +177,7 @@ export default function PlaceValueBuilder({
         ) : null}
       </div>
 
-      <div className="mt-4 grid gap-3 md:grid-cols-3">
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {questionData.placeValues.map((place) => {
           const count = placeCount(questionData, place);
 
@@ -164,7 +205,7 @@ export default function PlaceValueBuilder({
             Work it out
           </div>
           <div className="mt-1.5 text-base font-bold text-teal-900">
-            Count the hundreds, tens, and ones blocks to find the number.
+            Count each place-value block to find the number.
           </div>
         </div>
       ) : questionData.mode === "missing_mab_part" ? (
@@ -173,8 +214,7 @@ export default function PlaceValueBuilder({
             Known blocks
           </div>
           <div className="mt-1.5 text-2xl font-black text-teal-900">
-            {(questionData.hundreds ?? 0)} hundreds + {(questionData.tens ?? 0)} tens + {(questionData.ones ?? 0)} ones ={" "}
-            {visibleTotal}
+            {knownBreakdown.join(" + ")} = {visibleTotal}
           </div>
           <div className="mt-2 text-sm text-teal-800">
             Use the target number to work out the missing value.
