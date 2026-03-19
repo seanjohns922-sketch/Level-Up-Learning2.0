@@ -1062,43 +1062,52 @@ export const year2NumberRows: ProgramRow[] = [
   },
   {
     week: 12,
-    focus: "Review & Quiz",
+    focus: "Final Practice",
     lesson: 3,
-    topic: "End-of-unit quiz",
+    topic: "Post-test preparation",
     activity: scopedActivity(
-      "Complete end-of-unit mixed quiz.",
-      "Short mixed fluency warm-up before final quiz.",
-      "Check: is your answer reasonable and why?"
+      "Mixed practice across all topics to build confidence before the post-test.",
+      "Quick addition & subtraction facts within 20.",
+      "Explain: how do you know your answer is correct?"
     ),
     activities: [
-      makeActivity("review_quiz", 2, {
-        mode: "final_quiz",
-        reviewActivities: [
-          "skip_count",
-          "arrays",
-          "division_groups",
-          "mixed_word_problem",
-          "addition_strategy",
-          "subtraction_strategy",
-        ],
+      makeActivity("addition_strategy", 2, {
+        min: 2,
+        max: 50,
+        strategies: ["jump", "split", "friendly"],
+      }),
+      makeActivity("subtraction_strategy", 2, {
+        min: 2,
+        max: 50,
+        strategies: ["jump", "split", "friendly"],
+      }),
+      makeActivity("place_value_builder", 1, {
+        min: 10,
+        max: 500,
+      }),
+      makeActivity("number_line", 1, {
+        min: 0,
+        max: 100,
+        step: 5,
+      }),
+      makeActivity("skip_count", 1, {
+        countBy: [2, 3, 5, 10],
+        maxStart: 30,
+      }),
+      makeActivity("equal_groups", 1, {
+        allowedGroupSizes: [2, 3, 5, 10],
+        maxTotal: 30,
       }),
       makeActivity("mixed_word_problem", 1, {
         min: 0,
-        max: 60,
+        max: 50,
         mode: "choose_operation",
-        operations: ["+", "-", "x", "/"],
+        operations: ["+", "-"],
       }),
-      makeActivity("typed_response", 1, {
-        mode: "final_quiz",
-        sourceActivityType: "review_quiz",
-        reviewActivities: [
-          "skip_count",
-          "arrays",
-          "division_groups",
-          "mixed_word_problem",
-          "addition_strategy",
-          "subtraction_strategy",
-        ],
+      makeActivity("multiple_choice", 1, {
+        sourceActivityType: "addition_strategy",
+        min: 2,
+        max: 50,
       }),
     ],
     curriculum: ["AC9M2N06"],
