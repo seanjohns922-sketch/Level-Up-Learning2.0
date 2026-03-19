@@ -369,7 +369,7 @@ const YEAR2_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
     blockedFocusKeywords: ["addition", "subtraction", "division"],
   },
   addition_strategy: {
-    allowedModes: ["jump", "split", "friendly_numbers"],
+    allowedModes: ["jump", "split", "friendly_numbers", "doubles", "near_doubles"],
     maxByContract: { max: "addSubExtensionMax" },
     blockedFocusKeywords: ["odd & even", "division"],
   },
@@ -603,6 +603,83 @@ function asNumber(value: unknown): number | null {
 
 function normalizeFocus(focus: string) {
   return focus.trim().toLowerCase();
+}
+
+function randomFromList<T>(items: T[]): T {
+  return items[randInt(0, items.length - 1)] ?? items[0];
+}
+
+function generateAdditionStrategyQuestion(
+  config: GenericConfig,
+  lesson: Lesson
+): AdditionStrategyQuestion {
+  const profile = getDifficultyProfileForLesson(lesson);
+  const min = typeof config.min === "number" ? config.min : 0;
+  const max = typeof config.max === "number" ? config.max : profile.addSubMax;
+  const mode =
+    config.mode === "split" ||
+    config.mode === "friendly_numbers" ||
+    config.mode === "doubles" ||
+    config.mode === "near_doubles"
+      ? config.mode
+      : "jump";
+
+  let a = randInt(min, Math.max(min, max - 10));
+  let b = randInt(2, 18);
+  let prompt = `Solve ${a} + ${b}.`;
+  let hint = `Start at ${a} and jump ${b} more.`;
+
+  if (mode === "doubles") {
+    const lower = Math.max(10, min, 2);
+    const upper = Math.max(lower, Math.min(100, max, Math.floor(profile.addSubExtensionMax / 2)));
+    const n = randInt(lower, upper);
+    a = n;
+    b = n;
+    hint = `Use a doubles fact: double ${a}.`;
+  } else if (mode === "near_doubles") {
+    const lower = Math.max(20, min, 2);
+    const upper = Math.max(lower + 2, Math.min(100, max, profile.addSubExtensionMax - 1));
+    const difference = Math.random() < 0.7 ? 1 : 2;
+    const nearTenCandidates = Array.from(
+      { length: Math.max(0, upper - lower - difference + 1) },
+      (_, offset) => lower + offset
+    ).filter((value) => value % 10 === 8 || value % 10 === 9);
+    const base =
+      Math.random() < 0.35 && nearTenCandidates.length > 0
+        ? randomFromList(nearTenCandidates)
+        : randInt(lower, upper - difference);
+    a = base;
+    b = base + difference;
+    if (Math.random() < 0.3) {
+      const mistaken = a + a;
+      prompt = `A student says "${a} + ${b} = ${mistaken}" because ${a} + ${a} = ${mistaken}. What should the answer be?`;
+    }
+    hint =
+      difference === 1
+        ? `Use a near double: double ${a}, then add 1.`
+        : `Use a near double: double ${a}, then add 2.`;
+  } else if (mode === "split") {
+    a = randInt(18, Math.max(30, Math.min(99, max)));
+    b = randInt(12, Math.min(39, Math.max(12, profile.addSubMax / 3)));
+    hint = `Split ${b} into tens and ones.`;
+  } else if (mode === "friendly_numbers") {
+    a = randInt(20, Math.max(29, Math.min(profile.addSubExtensionMax, 189)));
+    const bridge = 10 - (a % 10 || 10);
+    b = bridge + randInt(2, 12);
+    hint = "Make a friendly ten first, then add the rest.";
+  }
+
+  const answer = a + b;
+  return {
+    kind: "addition_strategy",
+    prompt,
+    hint,
+    a,
+    b,
+    answer,
+    options: uniqueNumberOptions(answer).map(Number),
+    mode,
+  };
 }
 
 function buildViolation(
@@ -914,9 +991,9 @@ function assertPolicyValidation(
 function generateInteractiveQuestion(
   activityType: ActivityType,
   config: GenericConfig,
-  week: number
+  lesson: Lesson
 ): Year2QuestionData | null {
-  const profile = getYear2DifficultyProfile(week);
+  const profile = getDifficultyProfileForLesson(lesson);
 
   if (activityType === "place_value_builder") {
     const min = typeof config.min === "number" ? config.min : 100;
@@ -1090,59 +1167,7 @@ function generateInteractiveQuestion(
   }
 
   if (activityType === "addition_strategy") {
-    const min = typeof config.min === "number" ? config.min : 0;
-    const max = typeof config.max === "number" ? config.max : profile.addSubMax;
-    const mode =
-      config.mode === "split" || config.mode === "friendly_numbers" || config.mode === "doubles" || config.mode === "near_doubles"
-        ? config.mode
-        : "jump";
-    let a = randInt(min, Math.max(min, max - 10));
-    let b = randInt(2, 18);
-
-    if (mode === "doubles") {
-      const n = randInt(2, Math.min(50, Math.floor(max / 2)));
-      a = n;
-      b = n;
-    }
-
-    if (mode === "near_doubles") {
-      const n = randInt(2, Math.min(50, Math.floor(max / 2)));
-      a = n;
-      b = Math.random() < 0.5 ? n + 1 : n - 1;
-      if (b < 1) b = n + 1;
-    }
-
-    if (mode === "split") {
-      a = randInt(18, Math.max(30, Math.min(99, max)));
-      b = randInt(12, Math.min(39, Math.max(12, profile.addSubMax / 3)));
-    }
-
-    if (mode === "friendly_numbers") {
-      a = randInt(20, Math.max(29, Math.min(profile.addSubExtensionMax, 189)));
-      const bridge = 10 - (a % 10 || 10);
-      b = bridge + randInt(2, 12);
-    }
-
-    const answer = a + b;
-    return {
-      kind: "addition_strategy",
-      prompt: `Solve ${a} + ${b}.`,
-      hint:
-        mode === "jump"
-          ? `Start at ${a} and jump ${b} more.`
-          : mode === "split"
-          ? `Split ${b} into tens and ones.`
-          : mode === "doubles"
-          ? `Double ${a}! What is ${a} + ${a}?`
-          : mode === "near_doubles"
-          ? `Think: double ${Math.min(a, b)}, then adjust by 1.`
-          : "Make a friendly ten first, then add the rest.",
-      a,
-      b,
-      answer,
-      options: uniqueNumberOptions(answer).map(Number),
-      mode,
-    };
+    return generateAdditionStrategyQuestion(config, lesson);
   }
 
   if (activityType === "equal_groups") {
@@ -1694,7 +1719,9 @@ function randomReviewConfig(activityType: ActivityType): GenericConfig {
       return {
         min: 0,
         max: 100,
-        mode: (["jump", "split", "friendly_numbers"] as const)[randInt(0, 2)],
+        mode: (["jump", "split", "friendly_numbers", "doubles", "near_doubles"] as const)[
+          randInt(0, 4)
+        ],
       };
     case "equal_groups":
       return {
@@ -1762,7 +1789,7 @@ function generateGenericQuestion(
   config: GenericConfig,
   lesson: Lesson
 ): MultipleChoiceQuestion | TypedResponseQuestion {
-  const profile = getYear2DifficultyProfile(lesson.week);
+  const profile = getDifficultyProfileForLesson(lesson);
   const min = typeof config.min === "number" ? config.min : 0;
   const max = typeof config.max === "number" ? config.max : profile.addSubMax;
   const step = typeof config.step === "number" ? config.step : 10;
@@ -1974,20 +2001,20 @@ function generateGenericQuestion(
   }
 
   if (sourceActivityType === "addition_strategy") {
-    const a = randInt(Math.max(0, min), Math.max(min + 20, max - 10));
-    const b = randInt(4, Math.min(28, Math.max(8, profile.addSubMax / 4)));
-    const answer = String(a + b);
+    const sourceQuestion = generateAdditionStrategyQuestion(config, lesson);
+    const answer = String(sourceQuestion.answer);
     return asMultipleChoice
       ? {
           kind: "multiple_choice",
-          prompt: `What is ${a} + ${b}?`,
+          prompt: sourceQuestion.prompt,
           options: uniqueNumberOptions(Number(answer), 8),
           answer,
         }
       : {
           kind: "typed_response",
-          prompt: `Solve ${a} + ${b}.`,
+          prompt: sourceQuestion.prompt,
           answer,
+          helper: sourceQuestion.hint,
           placeholder: "Type the sum",
         };
   }
@@ -2121,7 +2148,7 @@ function generateGenericQuestion(
   }
 
   if (sourceActivityType === "mixed_word_problem") {
-    const sourceQuestion = generateInteractiveQuestion("mixed_word_problem", config, lesson.week);
+    const sourceQuestion = generateInteractiveQuestion("mixed_word_problem", config, lesson);
     if (!sourceQuestion || sourceQuestion.kind !== "mixed_word_problem") {
       return {
         kind: "typed_response",
@@ -2304,7 +2331,7 @@ export function generateYear2Question(
     activity.activityType === "odd_even_sort" ||
     activity.activityType === "skip_count"
   ) {
-    question = generateInteractiveQuestion(activity.activityType, config, lesson.week) as Year2QuestionData;
+    question = generateInteractiveQuestion(activity.activityType, config, lesson) as Year2QuestionData;
   } else if (
     activity.activityType === "multiple_choice" ||
     activity.activityType === "typed_response"

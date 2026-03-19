@@ -253,19 +253,19 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         ),
         activities: [
           makeActivity("addition_strategy", 2, {
-            min: 2,
+            min: 20,
             max: 100,
             mode: "doubles",
           }),
           makeActivity("addition_strategy", 2, {
-            min: 2,
+            min: 20,
             max: 100,
             mode: "near_doubles",
           }),
           makeActivity("typed_response", 1, {
-            min: 2,
+            min: 20,
             max: 100,
-            mode: "doubles",
+            mode: "near_doubles",
             sourceActivityType: "addition_strategy",
           }),
         ],
