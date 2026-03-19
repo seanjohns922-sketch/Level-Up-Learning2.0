@@ -475,6 +475,74 @@ function roundToNearest(value: number, unit: number) {
   return Math.round(value / unit) * unit;
 }
 
+/* ── 3 contextual rounding word-problem styles ── */
+function roundingWordProblem(
+  value: number,
+  targetUnit: number,
+  rounded: number
+): { prompt: string; helper: string } {
+  const fmt = (n: number) => n.toLocaleString();
+  const unitLabel =
+    targetUnit >= 1000
+      ? `${fmt(targetUnit)}`
+      : targetUnit.toString();
+
+  // Style pools by context
+  const style1Templates = [
+    {
+      prompt: `A school is ordering pencils. They need ${fmt(value)} pencils. Pencils come in boxes of ${fmt(targetUnit)}. How many pencils should they order (rounded to the nearest ${unitLabel})?`,
+      helper: `Round ${fmt(value)} to the nearest ${unitLabel}.`,
+    },
+    {
+      prompt: `A factory made ${fmt(value)} toys. They pack them in crates of ${fmt(targetUnit)}. How many toys should they report (rounded to the nearest ${unitLabel})?`,
+      helper: `Round ${fmt(value)} to the nearest ${unitLabel}.`,
+    },
+    {
+      prompt: `The school library has ${fmt(value)} books. For the catalogue, they round to the nearest ${unitLabel}. How many books go in the catalogue?`,
+      helper: `Round ${fmt(value)} to the nearest ${unitLabel}.`,
+    },
+    {
+      prompt: `A stadium holds ${fmt(value)} people. The newspaper rounds attendance to the nearest ${unitLabel}. What number do they print?`,
+      helper: `Round ${fmt(value)} to the nearest ${unitLabel}.`,
+    },
+  ];
+
+  const style2Templates = [
+    {
+      prompt: `A school fundraiser raised $${fmt(value)}. The teacher says, "That's about $${fmt(rounded - targetUnit)}." Do you agree? What should it be rounded to the nearest ${unitLabel}?`,
+      helper: `Think carefully — is $${fmt(rounded - targetUnit)} the best estimate?`,
+    },
+    {
+      prompt: `${fmt(value)} students signed up for sports day. The principal says, "That's roughly ${fmt(rounded + targetUnit)}." Is that right? Round to the nearest ${unitLabel}.`,
+      helper: `Check — is ${fmt(rounded + targetUnit)} the closest multiple of ${unitLabel}?`,
+    },
+    {
+      prompt: `A baker made ${fmt(value)} cupcakes. She told her boss, "I made about ${fmt(rounded - targetUnit)}." Is she correct? Round to the nearest ${unitLabel}.`,
+      helper: `Is ${fmt(rounded - targetUnit)} the nearest multiple of ${unitLabel}?`,
+    },
+  ];
+
+  const style3Templates = [
+    {
+      prompt: `You're buying tickets for a school event. ${fmt(value)} tickets have been sold. The organiser says: "We've sold about ${fmt(rounded - targetUnit)} tickets." 🎯 Is that a good estimate? Round to the nearest ${unitLabel}.`,
+      helper: `Think about whether ${fmt(rounded - targetUnit)} or ${fmt(rounded)} is closer.`,
+    },
+    {
+      prompt: `A charity walk had ${fmt(value)} participants. The news report says "about ${fmt(rounded + targetUnit)} people joined." 🎯 Is that the best estimate? Round to the nearest ${unitLabel}.`,
+      helper: `Is ${fmt(rounded + targetUnit)} really the closest?`,
+    },
+    {
+      prompt: `The school tuckshop sold ${fmt(value)} sausage rolls this term. The report says "approximately ${fmt(rounded - targetUnit)}." 🎯 Is that right? What should it say, rounded to the nearest ${unitLabel}?`,
+      helper: `Check which multiple of ${unitLabel} is closest to ${fmt(value)}.`,
+    },
+  ];
+
+  const style = randInt(1, 3);
+  if (style === 1) return style1Templates[randInt(0, style1Templates.length - 1)];
+  if (style === 2) return style2Templates[randInt(0, style2Templates.length - 1)];
+  return style3Templates[randInt(0, style3Templates.length - 1)];
+}
+
 function supportedPlaces(config: GenericConfig) {
   const candidates = config.placeValues?.filter(
     (value): value is PlaceValueName =>
