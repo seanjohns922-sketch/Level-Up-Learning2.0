@@ -4,6 +4,8 @@ import { useState } from "react";
 import type { PartitionExpandQuestion } from "@/data/activities/year2/lessonEngine";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 
+type PlaceKey = "thousands" | "hundreds" | "tens" | "ones";
+
 export default function PartitionExpand({
   questionData,
   onCorrect,
@@ -13,41 +15,61 @@ export default function PartitionExpand({
   onCorrect?: () => void;
   onWrong?: () => void;
 }) {
-  const [values, setValues] = useState({
+  const hasThousands = (questionData.standard.thousands ?? 0) > 0 || questionData.target >= 1000;
+
+  const places: { key: PlaceKey; label: string }[] = [
+    ...(hasThousands ? [{ key: "thousands" as const, label: "Thousands" }] : []),
+    { key: "hundreds", label: "Hundreds" },
+    { key: "tens", label: "Tens" },
+    { key: "ones", label: "Ones" },
+  ];
+
+  const [values, setValues] = useState<Record<PlaceKey, string>>({
+    thousands: questionData.mode === "flexible_partition" ? String(questionData.standard.thousands ?? 0) : "",
     hundreds: questionData.mode === "flexible_partition" ? String(questionData.standard.hundreds) : "",
     tens: "0",
     ones: "0",
   });
 
-  function setValue(key: "hundreds" | "tens" | "ones", next: string) {
+  function setValue(key: PlaceKey, next: string) {
     setValues((current) => ({
       ...current,
       [key]: next.replace(/[^\d]/g, ""),
     }));
   }
 
-  function numericValue(key: "hundreds" | "tens" | "ones") {
+  function numericValue(key: PlaceKey) {
     return Number(values[key] || "0");
   }
 
   function check() {
+    const thousands = numericValue("thousands");
     const hundreds = numericValue("hundreds");
     const tens = numericValue("tens");
     const ones = numericValue("ones");
+    const sum = thousands + hundreds + tens + ones;
+
+    const std = questionData.standard;
+    const stdThousands = std.thousands ?? 0;
 
     const isCorrect =
       questionData.mode === "flexible_partition"
-        ? hundreds + tens + ones === questionData.target &&
-          (hundreds !== questionData.standard.hundreds ||
-            tens !== questionData.standard.tens ||
-            ones !== questionData.standard.ones)
-        : hundreds === questionData.standard.hundreds &&
-          tens === questionData.standard.tens &&
-          ones === questionData.standard.ones;
+        ? sum === questionData.target &&
+          (thousands !== stdThousands ||
+            hundreds !== std.hundreds ||
+            tens !== std.tens ||
+            ones !== std.ones)
+        : thousands === stdThousands &&
+          hundreds === std.hundreds &&
+          tens === std.tens &&
+          ones === std.ones;
 
     if (isCorrect) onCorrect?.();
     else onWrong?.();
   }
+
+  const sum = places.reduce((s, p) => s + numericValue(p.key), 0);
+  const expression = places.map((p) => numericValue(p.key)).join(" + ");
 
   return (
     <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -61,12 +83,8 @@ export default function PartitionExpand({
         </div>
       </div>
 
-      <div className="mt-6 grid gap-4 md:grid-cols-3">
-        {[
-          { key: "hundreds" as const, label: "Hundreds" },
-          { key: "tens" as const, label: "Tens" },
-          { key: "ones" as const, label: "Ones" },
-        ].map((item) => (
+      <div className={`mt-6 grid gap-4 ${hasThousands ? "md:grid-cols-4" : "md:grid-cols-3"}`}>
+        {places.map((item) => (
           <label
             key={item.key}
             className="rounded-2xl border border-gray-200 bg-gray-50 p-4"
@@ -89,16 +107,15 @@ export default function PartitionExpand({
         <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
           Your expression
         </div>
-          <div className="mt-2 text-3xl font-black text-teal-900">
-            {numericValue("hundreds")} + {numericValue("tens")} + {numericValue("ones")} ={" "}
-            {numericValue("hundreds") + numericValue("tens") + numericValue("ones")}
-          </div>
-          {questionData.mode === "flexible_partition" ? (
-            <div className="mt-2 text-sm text-teal-800">
-              Make the same total in a different way from the standard partition.
-            </div>
-          ) : null}
+        <div className="mt-2 text-3xl font-black text-teal-900">
+          {expression} = {sum}
         </div>
+        {questionData.mode === "flexible_partition" ? (
+          <div className="mt-2 text-sm text-teal-800">
+            Make the same total in a different way from the standard partition.
+          </div>
+        ) : null}
+      </div>
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
         <button
