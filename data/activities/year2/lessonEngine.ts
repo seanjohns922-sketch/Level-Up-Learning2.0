@@ -936,14 +936,17 @@ function generateInteractiveQuestion(
       config.mode === "expand" || config.mode === "flexible_partition"
         ? config.mode
         : "partition";
+    const placeLabel = target >= 1000
+      ? "thousands, hundreds, tens, and ones"
+      : "hundreds, tens, and ones";
     return {
       kind: "partition_expand",
       prompt:
         mode === "partition"
-          ? `Partition ${target} into hundreds, tens, and ones.`
+          ? `Partition ${target.toLocaleString()} into ${placeLabel}.`
           : mode === "expand"
-          ? `Write ${target} in expanded form.`
-          : `Partition ${target} in a different valid way.`,
+          ? `Write ${target.toLocaleString()} in expanded form.`
+          : `Partition ${target.toLocaleString()} in a different valid way.`,
       target,
       mode,
       standard: partitionNumber(target),
