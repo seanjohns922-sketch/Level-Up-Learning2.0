@@ -2251,6 +2251,28 @@ export function buildYear2QuizActivityPool(
   return { activities: pool, violations };
 }
 
+export function buildYear2LessonActivityPool(
+  lesson: Lesson
+): {
+  activities: LessonActivity[];
+  violations: Year2PolicyViolation[];
+} {
+  const activities = lesson.activities ?? [];
+  const pool: LessonActivity[] = [];
+  const violations: Year2PolicyViolation[] = [];
+
+  for (const activity of activities) {
+    const validation = validateLessonActivityIntent(lesson, activity);
+    if (validation.valid) {
+      pool.push(activity);
+    } else {
+      violations.push(...validation.violations);
+    }
+  }
+
+  return { activities: pool, violations };
+}
+
 export function generateYear2Question(
   lesson: Lesson,
   activity: LessonActivity

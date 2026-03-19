@@ -239,6 +239,7 @@ function LessonPage() {
             <div className="bg-background px-4 py-5">
               {lessonMeta?.activities?.length ? (
                 <Year2LessonEngine
+                  key={lessonMeta.id}
                   lesson={lessonMeta}
                   onTimedComplete={markLessonDone}
                   onExit={goBackToProgram}

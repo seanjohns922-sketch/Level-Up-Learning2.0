@@ -2,12 +2,35 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { LessonRenderer } from "@/components/lesson/LessonRenderer";
-import { generateYear2Question, type Year2QuestionData } from "@/data/activities/year2/lessonEngine";
+import {
+  buildYear2LessonActivityPool,
+  generateYear2Question,
+  type Year2QuestionData,
+} from "@/data/activities/year2/lessonEngine";
 import { pickWeightedIndex } from "@/lib/weightedRandom";
 import type { Lesson } from "@/data/programs/year1";
 
 function pad2(n: number) {
   return String(n).padStart(2, "0");
+}
+
+function buildInitialTurn(lesson: Lesson, activities: Lesson["activities"] = []) {
+  if (!activities || activities.length === 0) {
+    return {
+      bag: [] as number[],
+      lastIndex: null as number | null,
+      activityIndex: 0,
+      question: null as Year2QuestionData | null,
+    };
+  }
+
+  const picked = pickWeightedIndex(activities, [], null);
+  return {
+    bag: picked.bag,
+    lastIndex: picked.index,
+    activityIndex: picked.index,
+    question: generateYear2Question(lesson, activities[picked.index]),
+  };
 }
 
 function Countdown({ seconds, total }: { seconds: number; total: number }) {
@@ -48,21 +71,22 @@ export function Year2LessonEngine({
   onExit: () => void;
 }) {
   const totalSeconds = 8 * 60;
+  const lessonPool = useMemo(() => buildYear2LessonActivityPool(lesson), [lesson]);
+  const activities = lessonPool.activities;
+  const initialTurn = useMemo(() => buildInitialTurn(lesson, activities), [activities, lesson]);
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
   const [status, setStatus] = useState<"idle" | "correct" | "wrong">("idle");
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
-  const [currentActivityIndex, setCurrentActivityIndex] = useState(0);
-  const [currentQuestion, setCurrentQuestion] = useState<Year2QuestionData | null>(null);
+  const [currentActivityIndex, setCurrentActivityIndex] = useState(initialTurn.activityIndex);
+  const [currentQuestion, setCurrentQuestion] = useState<Year2QuestionData | null>(initialTurn.question);
   const [questionKey, setQuestionKey] = useState(0);
-  const [finished, setFinished] = useState(false);
-  const bagRef = useRef<number[]>([]);
-  const lastIndexRef = useRef<number | null>(null);
+  const bagRef = useRef<number[]>(initialTurn.bag);
+  const lastIndexRef = useRef<number | null>(initialTurn.lastIndex);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const markedCompleteRef = useRef(false);
   const scoredThisTurnRef = useRef(false);
-
-  const activities = lesson.activities ?? [];
+  const finished = secondsLeft <= 0;
   const currentActivity = activities[currentActivityIndex] ?? null;
 
   function clearPendingTimeout() {
@@ -91,17 +115,14 @@ export function Year2LessonEngine({
   }
 
   useEffect(() => {
-    setSecondsLeft(totalSeconds);
-    setStatus("idle");
-    setQuestionsAnswered(0);
-    setCorrectAnswers(0);
-    setFinished(false);
-    bagRef.current = [];
-    lastIndexRef.current = null;
-    markedCompleteRef.current = false;
-    scoredThisTurnRef.current = false;
-    loadNextQuestion();
+    if (lessonPool.violations.length === 0) return;
+    const summary = lessonPool.violations
+      .map((violation) => `${violation.reason}: ${violation.message}`)
+      .join(" | ");
+    console.error(`[Year2LessonPool] ${lesson.title}: ${summary}`);
+  }, [lesson.title, lessonPool.violations]);
 
+  useEffect(() => {
     const interval = setInterval(() => {
       setSecondsLeft((current) => current - 1);
     }, 1000);
@@ -110,16 +131,15 @@ export function Year2LessonEngine({
       clearInterval(interval);
       clearPendingTimeout();
     };
-  }, [lesson.id]);
+  }, []);
 
   useEffect(() => {
-    if (secondsLeft > 0 || finished) return;
-    setFinished(true);
+    if (!finished) return;
     if (!markedCompleteRef.current) {
       markedCompleteRef.current = true;
       onTimedComplete();
     }
-  }, [finished, onTimedComplete, secondsLeft]);
+  }, [finished, onTimedComplete]);
 
   function handleCorrect() {
     if (finished || status !== "idle" || scoredThisTurnRef.current) return;
@@ -250,7 +270,12 @@ export function Year2LessonEngine({
           onCorrect={handleCorrect}
           onWrong={handleWrong}
         />
-      ) : null}
+      ) : (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">
+          This lesson has no valid activities for the current policy. Check the lesson config or
+          source activity pool.
+        </div>
+      )}
     </div>
   );
 }
