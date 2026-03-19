@@ -163,7 +163,7 @@ export default function NumberLineActivity({
                   style={{ width: 3, height: 40 }}
                 />
                 <div className="mt-1.5 text-sm font-bold text-foreground whitespace-nowrap">
-                  {tick}
+                  {fmt(tick)}
                 </div>
               </div>
             );
