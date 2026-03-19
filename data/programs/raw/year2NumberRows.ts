@@ -755,125 +755,10 @@ export const year2NumberRows: ProgramRow[] = [
   },
 
   // ═══════════════════════════════════════════════════════════
-  // WEEK 8 – MULTIPLICATION FLUENCY (Skip Counting 2s, 5s, 10s)
+  // WEEK 8 – MULTIPLICATION (GROUPS & ARRAYS)
   // ═══════════════════════════════════════════════════════════
   {
     week: 8,
-    focus: "Multiplication - 2s, 5s, 10s",
-    lesson: 1,
-    topic: "Recall and skip count by 2s",
-    activity: "Skip count using number lines. Fluency drills and pattern recognition.",
-    activities: [
-      makeActivity("skip_count", 2, {
-        min: 0,
-        max: 100,
-        step: 2,
-        mode: "forward",
-      }),
-      makeActivity("multiple_choice", 1, {
-        min: 0,
-        max: 100,
-        step: 2,
-        mode: "forward",
-        sourceActivityType: "skip_count",
-      }),
-      makeActivity("typed_response", 1, {
-        min: 0,
-        max: 100,
-        step: 2,
-        mode: "forward",
-        sourceActivityType: "skip_count",
-      }),
-      fluencyActivity("equal_groups", {
-        minGroups: 2,
-        maxGroups: 5,
-        minItemsPerGroup: 2,
-        maxItemsPerGroup: 2,
-        mode: "equal_groups",
-      }),
-    ],
-    curriculum: ["AC9M2N03"],
-  },
-  {
-    week: 8,
-    focus: "Multiplication - 2s, 5s, 10s",
-    lesson: 2,
-    topic: "Recall and skip count by 5s",
-    activity: "Chant and recall facts with music. Fluency drills.",
-    activities: [
-      makeActivity("skip_count", 2, {
-        min: 0,
-        max: 100,
-        step: 5,
-        mode: "forward",
-      }),
-      makeActivity("multiple_choice", 1, {
-        min: 0,
-        max: 100,
-        step: 5,
-        mode: "forward",
-        sourceActivityType: "skip_count",
-      }),
-      makeActivity("typed_response", 1, {
-        min: 0,
-        max: 100,
-        step: 5,
-        mode: "forward",
-        sourceActivityType: "skip_count",
-      }),
-      fluencyActivity("equal_groups", {
-        minGroups: 2,
-        maxGroups: 5,
-        minItemsPerGroup: 5,
-        maxItemsPerGroup: 5,
-        mode: "equal_groups",
-      }),
-    ],
-    curriculum: ["AC9M2N03"],
-  },
-  {
-    week: 8,
-    focus: "Multiplication - 2s, 5s, 10s",
-    lesson: 3,
-    topic: "Recall and skip count by 10s",
-    activity: "Write and recall fact families. Pattern recognition in counting.",
-    activities: [
-      makeActivity("skip_count", 2, {
-        min: 0,
-        max: 1000,
-        step: 10,
-        mode: "forward",
-      }),
-      makeActivity("multiple_choice", 1, {
-        min: 0,
-        max: 1000,
-        step: 10,
-        mode: "forward",
-        sourceActivityType: "skip_count",
-      }),
-      makeActivity("typed_response", 1, {
-        min: 0,
-        max: 1000,
-        step: 10,
-        mode: "forward",
-        sourceActivityType: "skip_count",
-      }),
-      fluencyActivity("arrays", {
-        minRows: 2,
-        maxRows: 5,
-        minColumns: 10,
-        maxColumns: 10,
-        mode: "arrays",
-      }),
-    ],
-    curriculum: ["AC9M2N03"],
-  },
-
-  // ═══════════════════════════════════════════════════════════
-  // WEEK 9 – MULTIPLICATION (GROUPS & ARRAYS)
-  // ═══════════════════════════════════════════════════════════
-  {
-    week: 9,
     focus: "Multiplication - Groups & Arrays",
     lesson: 1,
     topic: "Model multiplication as equal groups",
@@ -911,7 +796,7 @@ export const year2NumberRows: ProgramRow[] = [
     curriculum: ["AC9M2N05"],
   },
   {
-    week: 9,
+    week: 8,
     focus: "Multiplication - Groups & Arrays",
     lesson: 2,
     topic: "Model multiplication as arrays",
@@ -949,7 +834,7 @@ export const year2NumberRows: ProgramRow[] = [
     curriculum: ["AC9M2N05"],
   },
   {
-    week: 9,
+    week: 8,
     focus: "Multiplication - Groups & Arrays",
     lesson: 3,
     topic: "Link multiplication to repeated addition",
@@ -985,6 +870,121 @@ export const year2NumberRows: ProgramRow[] = [
       }),
     ],
     curriculum: ["AC9M2N05"],
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // WEEK 9 – MULTIPLICATION FLUENCY (Skip Counting 2s, 5s, 10s)
+  // ═══════════════════════════════════════════════════════════
+  {
+    week: 9,
+    focus: "Multiplication - 2s, 5s, 10s",
+    lesson: 1,
+    topic: "Recall and skip count by 2s",
+    activity: "Skip count using number lines. Fluency drills and pattern recognition.",
+    activities: [
+      makeActivity("skip_count", 2, {
+        min: 0,
+        max: 100,
+        step: 2,
+        mode: "forward",
+      }),
+      makeActivity("multiple_choice", 1, {
+        min: 0,
+        max: 100,
+        step: 2,
+        mode: "forward",
+        sourceActivityType: "skip_count",
+      }),
+      makeActivity("typed_response", 1, {
+        min: 0,
+        max: 100,
+        step: 2,
+        mode: "forward",
+        sourceActivityType: "skip_count",
+      }),
+      fluencyActivity("equal_groups", {
+        minGroups: 2,
+        maxGroups: 5,
+        minItemsPerGroup: 2,
+        maxItemsPerGroup: 2,
+        mode: "equal_groups",
+      }),
+    ],
+    curriculum: ["AC9M2N03"],
+  },
+  {
+    week: 9,
+    focus: "Multiplication - 2s, 5s, 10s",
+    lesson: 2,
+    topic: "Recall and skip count by 5s",
+    activity: "Chant and recall facts with music. Fluency drills.",
+    activities: [
+      makeActivity("skip_count", 2, {
+        min: 0,
+        max: 100,
+        step: 5,
+        mode: "forward",
+      }),
+      makeActivity("multiple_choice", 1, {
+        min: 0,
+        max: 100,
+        step: 5,
+        mode: "forward",
+        sourceActivityType: "skip_count",
+      }),
+      makeActivity("typed_response", 1, {
+        min: 0,
+        max: 100,
+        step: 5,
+        mode: "forward",
+        sourceActivityType: "skip_count",
+      }),
+      fluencyActivity("equal_groups", {
+        minGroups: 2,
+        maxGroups: 5,
+        minItemsPerGroup: 5,
+        maxItemsPerGroup: 5,
+        mode: "equal_groups",
+      }),
+    ],
+    curriculum: ["AC9M2N03"],
+  },
+  {
+    week: 9,
+    focus: "Multiplication - 2s, 5s, 10s",
+    lesson: 3,
+    topic: "Recall and skip count by 10s",
+    activity: "Write and recall fact families. Pattern recognition in counting.",
+    activities: [
+      makeActivity("skip_count", 2, {
+        min: 0,
+        max: 1000,
+        step: 10,
+        mode: "forward",
+      }),
+      makeActivity("multiple_choice", 1, {
+        min: 0,
+        max: 1000,
+        step: 10,
+        mode: "forward",
+        sourceActivityType: "skip_count",
+      }),
+      makeActivity("typed_response", 1, {
+        min: 0,
+        max: 1000,
+        step: 10,
+        mode: "forward",
+        sourceActivityType: "skip_count",
+      }),
+      fluencyActivity("arrays", {
+        minRows: 2,
+        maxRows: 5,
+        minColumns: 10,
+        maxColumns: 10,
+        mode: "arrays",
+      }),
+    ],
+    curriculum: ["AC9M2N03"],
   },
 
   // ═══════════════════════════════════════════════════════════
