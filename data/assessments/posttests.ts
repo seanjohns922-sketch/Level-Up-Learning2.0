@@ -25,12 +25,13 @@ function seededShuffle<T>(arr: T[], seed: number): T[] {
 }
 
 function buildYear2PostTest(): Question[] {
-  const shuffled = seededShuffle(YEAR2_PRETEST, 42);
+  const mcqs = YEAR2_PRETEST.filter((q) => q.options && q.answer);
+  const shuffled = seededShuffle(mcqs, 42);
   return shuffled.map((q, i) => ({
     id: `y2-pt-${String(i + 1).padStart(2, "0")}`,
     prompt: q.prompt,
-    options: q.options,
-    correctAnswer: q.answer,
+    options: q.options as string[],
+    correctAnswer: String(q.answer),
   }));
 }
 
