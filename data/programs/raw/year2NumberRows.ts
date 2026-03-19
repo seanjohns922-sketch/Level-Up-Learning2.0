@@ -884,7 +884,8 @@ export const year2NumberRows: ProgramRow[] = [
     activities: [
       makeActivity("division_groups", 2, {
         minTotal: 6,
-        maxTotal: 24,
+        maxTotal: 30,
+        allowedGroupSizes: [2, 3, 5, 10],
         mode: "inverse_link",
       }),
       makeActivity("fact_family", 1, {
@@ -894,7 +895,8 @@ export const year2NumberRows: ProgramRow[] = [
       }),
       makeActivity("multiple_choice", 1, {
         minTotal: 6,
-        maxTotal: 24,
+        maxTotal: 30,
+        allowedGroupSizes: [2, 3, 5, 10],
         mode: "inverse_link",
         sourceActivityType: "division_groups",
       }),
