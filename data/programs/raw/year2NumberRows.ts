@@ -739,15 +739,15 @@ export const year2NumberRows: ProgramRow[] = [
     ),
     activities: [
       makeActivity("equal_groups", 2, {
-        allowedGroupSizes: [2, 3, 5, 10],
+        allowedGroupSizes: [2, 5, 10],
         mode: "equal_groups",
       }),
       makeActivity("arrays", 1, {
-        allowedGroupSizes: [2, 3, 5, 10],
+        allowedGroupSizes: [2, 5, 10],
         mode: "arrays",
       }),
       makeActivity("multiple_choice", 1, {
-        allowedGroupSizes: [2, 3, 5, 10],
+        allowedGroupSizes: [2, 5, 10],
         mode: "equal_groups",
         sourceActivityType: "equal_groups",
       }),
@@ -766,15 +766,15 @@ export const year2NumberRows: ProgramRow[] = [
     ),
     activities: [
       makeActivity("arrays", 2, {
-        allowedGroupSizes: [2, 3, 5, 10],
+        allowedGroupSizes: [2, 5, 10],
         mode: "arrays",
       }),
       makeActivity("arrays", 1, {
-        allowedGroupSizes: [2, 3, 5, 10],
+        allowedGroupSizes: [2, 5, 10],
         mode: "arrays",
       }),
       makeActivity("multiple_choice", 1, {
-        allowedGroupSizes: [2, 3, 5, 10],
+        allowedGroupSizes: [2, 5, 10],
         mode: "arrays",
         sourceActivityType: "arrays",
       }),
@@ -793,7 +793,7 @@ export const year2NumberRows: ProgramRow[] = [
     ),
     activities: [
       makeActivity("arrays", 2, {
-        allowedGroupSizes: [2, 3, 5, 10],
+        allowedGroupSizes: [2, 5, 10],
         mode: "repeated_addition",
       }),
       makeActivity("fact_family", 1, {
@@ -802,7 +802,7 @@ export const year2NumberRows: ProgramRow[] = [
         mode: "recognise",
       }),
       makeActivity("typed_response", 1, {
-        allowedGroupSizes: [2, 3, 5, 10],
+        allowedGroupSizes: [2, 5, 10],
         mode: "repeated_addition",
         sourceActivityType: "arrays",
       }),
@@ -823,17 +823,17 @@ export const year2NumberRows: ProgramRow[] = [
       makeActivity("division_groups", 2, {
         minTotal: 6,
         maxTotal: 30,
-        allowedGroupSizes: [2, 3, 5, 10],
+        allowedGroupSizes: [2, 5, 10],
         mode: "sharing",
       }),
       makeActivity("arrays", 1, {
-        allowedGroupSizes: [2, 3, 5, 10],
+        allowedGroupSizes: [2, 5, 10],
         mode: "arrays",
       }),
       makeActivity("multiple_choice", 1, {
         minTotal: 6,
         maxTotal: 30,
-        allowedGroupSizes: [2, 3, 5, 10],
+        allowedGroupSizes: [2, 5, 10],
         mode: "sharing",
         sourceActivityType: "division_groups",
       }),
@@ -854,17 +854,17 @@ export const year2NumberRows: ProgramRow[] = [
       makeActivity("division_groups", 2, {
         minTotal: 6,
         maxTotal: 30,
-        allowedGroupSizes: [2, 3, 5, 10],
+        allowedGroupSizes: [2, 5, 10],
         mode: "grouping",
       }),
       makeActivity("arrays", 1, {
-        allowedGroupSizes: [2, 3, 5, 10],
+        allowedGroupSizes: [2, 5, 10],
         mode: "arrays",
       }),
       makeActivity("typed_response", 1, {
         minTotal: 6,
         maxTotal: 30,
-        allowedGroupSizes: [2, 3, 5, 10],
+        allowedGroupSizes: [2, 5, 10],
         mode: "grouping",
         sourceActivityType: "division_groups",
       }),
@@ -885,7 +885,7 @@ export const year2NumberRows: ProgramRow[] = [
       makeActivity("division_groups", 2, {
         minTotal: 6,
         maxTotal: 30,
-        allowedGroupSizes: [2, 3, 5, 10],
+        allowedGroupSizes: [2, 5, 10],
         mode: "inverse_link",
       }),
       makeActivity("fact_family", 1, {
@@ -896,7 +896,7 @@ export const year2NumberRows: ProgramRow[] = [
       makeActivity("multiple_choice", 1, {
         minTotal: 6,
         maxTotal: 30,
-        allowedGroupSizes: [2, 3, 5, 10],
+        allowedGroupSizes: [2, 5, 10],
         mode: "inverse_link",
         sourceActivityType: "division_groups",
       }),
@@ -1095,7 +1095,7 @@ export const year2NumberRows: ProgramRow[] = [
         maxStart: 30,
       }),
       makeActivity("equal_groups", 1, {
-        allowedGroupSizes: [2, 3, 5, 10],
+        allowedGroupSizes: [2, 5, 10],
         maxTotal: 30,
       }),
       makeActivity("mixed_word_problem", 1, {
