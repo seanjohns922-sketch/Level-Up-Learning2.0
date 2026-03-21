@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import type { MultipleChoiceQuestion } from "@/data/activities/year2/lessonEngine";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 
@@ -40,12 +40,6 @@ export default function MultipleChoiceActivity({
 }) {
   const [picked, setPicked] = useState<string | null>(null);
 
-  const arrayDims = useMemo(() => {
-    const match = questionData.prompt.match(/(\d+)\s+groups?\s+of\s+(\d+)/i);
-    if (match) return { rows: Number(match[1]), cols: Number(match[2]) };
-    return null;
-  }, [questionData.prompt]);
-
   function choose(option: string) {
     setPicked(option);
     if (option === questionData.answer) onCorrect?.();
@@ -66,8 +60,8 @@ export default function MultipleChoiceActivity({
       {questionData.helper ? (
         <p className="mt-2 text-sm text-gray-600">{questionData.helper}</p>
       ) : null}
-      {arrayDims ? (
-        <ArrayVisual rows={arrayDims.rows} cols={arrayDims.cols} />
+      {questionData.visual?.type === "array" ? (
+        <ArrayVisual rows={questionData.visual.rows} cols={questionData.visual.columns} />
       ) : null}
 
       <div className="mt-6 grid gap-3">
