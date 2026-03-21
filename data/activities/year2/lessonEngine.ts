@@ -180,6 +180,11 @@ export type MultipleChoiceQuestion = {
   options: string[];
   answer: string;
   helper?: string;
+  visual?: {
+    type: "array";
+    rows: number;
+    columns: number;
+  };
 };
 
 export type TypedResponseQuestion = {
@@ -2165,21 +2170,20 @@ function generateGenericQuestion(
       perGroup = randInt(2, Math.min(10, profile.itemsMax));
     }
     const answer = String(groups * perGroup);
-    const arrayHint = `Think: ${groups} rows of ${perGroup} dots.`;
+    const visual = { type: "array" as const, rows: groups, columns: perGroup };
     return asMultipleChoice
       ? {
           kind: "multiple_choice",
           prompt: `${groups} groups of ${perGroup} makes how many?`,
           options: uniqueNumberOptions(Number(answer), 6),
           answer,
-          helper: arrayHint,
+          visual,
         }
       : {
           kind: "typed_response",
           prompt: `How many objects are in ${groups} groups of ${perGroup}?`,
           answer,
           placeholder: "Type the total",
-          helper: arrayHint,
         };
   }
 
