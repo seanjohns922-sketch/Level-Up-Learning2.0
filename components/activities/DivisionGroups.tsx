@@ -56,6 +56,18 @@ export default function DivisionGroups({
             Use the inverse fact: {questionData.inverseFact}
           </div>
         ) : null}
+        <div className="mt-4 grid gap-3">
+          {Array.from({ length: questionData.groups }).map((_, groupIndex) => (
+            <div key={groupIndex} className="flex flex-wrap items-center gap-2 rounded-2xl bg-white p-3 shadow-sm">
+              <div className="mr-2 text-sm font-bold text-gray-500">
+                Group {groupIndex + 1}
+              </div>
+              {Array.from({ length: questionData.groupSize }).map((__, itemIndex) => (
+                <div key={`${groupIndex}-${itemIndex}`} className="h-5 w-5 rounded-full bg-emerald-500" />
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="mt-6 grid gap-3">

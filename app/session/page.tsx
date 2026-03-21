@@ -496,6 +496,79 @@ function toQuizQuestionFromYear2Data(
       correctValue: useTyped ? String(questionData.answer) : undefined,
       options: useTyped ? undefined : options,
       correctIndex: useTyped ? undefined : options.findIndex((option) => option === String(questionData.answer)),
+      visual: {
+        type: "rows",
+        rows: Array.from({ length: questionData.groups }, () => questionData.groupSize),
+        dotSize: 16,
+        gap: 8,
+        rowGap: 12,
+      },
+    };
+  }
+
+  if (questionData.kind === "fact_family") {
+    if (questionData.mode === "write_sentences") {
+      return {
+        id: `q${index}`,
+        lessonNumber,
+        skill,
+        kind: "typed",
+        prompt: questionData.prompt,
+        correctValue: questionData.answers.join(" | "),
+        visual: questionData.visual
+          ? {
+              type: "dots",
+              count: questionData.visual.rows * questionData.visual.columns,
+              cols: questionData.visual.columns,
+              rows: questionData.visual.rows,
+              dotSize: 16,
+              gap: 8,
+            }
+          : undefined,
+      };
+    }
+
+    return {
+      id: `q${index}`,
+      lessonNumber,
+      skill,
+      kind: "mcq",
+      prompt: questionData.prompt,
+      options: questionData.options,
+      correctIndex: questionData.options.findIndex((option) => option === questionData.answers[0]),
+      visual: questionData.visual
+        ? {
+            type: "dots",
+            count: questionData.visual.rows * questionData.visual.columns,
+            cols: questionData.visual.columns,
+            rows: questionData.visual.rows,
+            dotSize: 16,
+            gap: 8,
+          }
+        : undefined,
+    };
+  }
+
+  if (questionData.kind === "skip_count") {
+    const options = questionData.options.map(String);
+    return {
+      id: `q${index}`,
+      lessonNumber,
+      skill,
+      kind: useTyped ? "typed" : "mcq",
+      prompt: questionData.prompt,
+      correctValue: useTyped ? String(questionData.answer) : undefined,
+      options: useTyped ? undefined : options,
+      correctIndex: useTyped ? undefined : options.findIndex((option) => option === String(questionData.answer)),
+      visual: questionData.visualGroups?.length
+        ? {
+            type: "rows",
+            rows: questionData.visualGroups,
+            dotSize: 16,
+            gap: 8,
+            rowGap: 12,
+          }
+        : undefined,
     };
   }
 

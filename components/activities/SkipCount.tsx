@@ -56,6 +56,22 @@ export default function SkipCount({
             </div>
           )}
         </div>
+        {questionData.visualGroups?.length ? (
+          <div className="mt-4">
+            <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
+              Bundle model
+            </div>
+            <div className="mt-3 grid gap-2">
+              {questionData.visualGroups.map((groupSize, groupIndex) => (
+                <div key={`${groupSize}-${groupIndex}`} className="flex flex-wrap gap-2 rounded-xl bg-white p-3 shadow-sm">
+                  {Array.from({ length: groupSize }).map((_, itemIndex) => (
+                    <div key={`${groupIndex}-${itemIndex}`} className="h-5 w-5 rounded-full bg-emerald-500" />
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
       </div>
 
       <div className="mt-6 grid gap-3">

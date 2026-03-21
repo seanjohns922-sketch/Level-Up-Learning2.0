@@ -148,6 +148,10 @@ export type FactFamilyQuestion = {
   options: string[];
   answers: string[];
   mode: "recognise" | "write_sentences" | "word_problems";
+  visual?: {
+    rows: number;
+    columns: number;
+  };
 };
 
 export type OddEvenSortQuestion = {
@@ -172,6 +176,7 @@ export type SkipCountQuestion = {
   options: number[];
   step: number;
   mode: "forward";
+  visualGroups?: number[];
 };
 
 export type MultipleChoiceQuestion = {
@@ -468,6 +473,8 @@ const LEVEL_ACTIVITY_POLICY: Record<SupportedMathLevel, Record<ActivityType, Act
   3: LEVEL3_ACTIVITY_POLICY,
 };
 
+const LEVEL2_WEEK8_TO_10_FACTORS = [2, 5, 10] as const;
+
 function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -479,6 +486,24 @@ function shuffle<T>(items: T[]) {
     [next[index], next[swapIndex]] = [next[swapIndex], next[index]];
   }
   return next;
+}
+
+function getRestrictedFactors(
+  level: SupportedMathLevel,
+  week: number
+): number[] | null {
+  return level === 2 && week >= 8 && week <= 10
+    ? [...LEVEL2_WEEK8_TO_10_FACTORS]
+    : null;
+}
+
+function restrictFactors(candidates: number[] | undefined, fallback: number[]): number[] {
+  const filtered = (candidates ?? fallback).filter((value) => fallback.includes(value));
+  return filtered.length > 0 ? filtered : fallback;
+}
+
+function requiresVisualMultiplicativeSupport(level: SupportedMathLevel, week: number): boolean {
+  return level === 2 && week >= 8 && week <= 10;
 }
 
 function uniqueNumberOptions(answer: number, spread = 12) {
@@ -772,6 +797,8 @@ function validateConfigAgainstPolicy(
 ) {
   const config = (activity.config ?? {}) as GenericConfig;
   const mode = typeof config.mode === "string" ? config.mode : undefined;
+  const level = getLevelForLesson(lesson);
+  const restrictedFactors = getRestrictedFactors(level, lesson.week);
 
   if (policy.allowedModes && mode && !policy.allowedModes.includes(mode)) {
     addViolation(
@@ -822,6 +849,58 @@ function validateConfigAgainstPolicy(
         `Skip count step ${step} is outside allowed steps for week ${lesson.week}.`
       );
     }
+    if (restrictedFactors && step !== null && !restrictedFactors.includes(step)) {
+      addViolation(
+        violations,
+        "difficulty",
+        lesson,
+        activity.activityType,
+        `Weeks 8-10 only allow skip counting by 2, 5, or 10.`
+      );
+    }
+  }
+
+  if (
+    restrictedFactors &&
+    (activity.activityType === "equal_groups" ||
+      activity.activityType === "arrays" ||
+      activity.activityType === "division_groups")
+  ) {
+    const configuredSizes = Array.isArray(config.allowedGroupSizes)
+      ? config.allowedGroupSizes.filter((value): value is number => typeof value === "number")
+      : [];
+    if (configuredSizes.some((value) => !restrictedFactors.includes(value))) {
+      addViolation(
+        violations,
+        "difficulty",
+        lesson,
+        activity.activityType,
+        `Weeks 8-10 only allow factors/group sizes 2, 5, and 10.`
+      );
+    }
+  }
+
+  if (
+    restrictedFactors &&
+    requiresVisualMultiplicativeSupport(level, lesson.week) &&
+    (activity.activityType === "multiple_choice" || activity.activityType === "typed_response")
+  ) {
+    const sourceType = config.sourceActivityType;
+    if (
+      sourceType === "skip_count" ||
+      sourceType === "equal_groups" ||
+      sourceType === "arrays" ||
+      sourceType === "division_groups" ||
+      sourceType === "fact_family"
+    ) {
+      addViolation(
+        violations,
+        "alignment",
+        lesson,
+        activity.activityType,
+        `Weeks 8-10 require visual-first multiplicative activities, not generic ${activity.activityType} wrappers.`
+      );
+    }
   }
 
   if (activity.activityType === "mixed_word_problem" && Array.isArray(config.operations)) {
@@ -869,6 +948,7 @@ function validateQuestionAgainstPolicy(
   profile: DifficultyProfile,
   violations: Year2PolicyViolation[]
 ) {
+  const level = getLevelForLesson(lesson);
   if (question.kind !== activity.activityType && activity.activityType !== "review_quiz") {
     addViolation(
       violations,
@@ -949,6 +1029,28 @@ function validateQuestionAgainstPolicy(
       activity.activityType,
       `Skip count step ${question.step} is outside allowed steps for week ${lesson.week}.`
     );
+  }
+
+  if (requiresVisualMultiplicativeSupport(level, lesson.week)) {
+    if (question.kind === "skip_count" && (!question.visualGroups || question.visualGroups.length === 0)) {
+      addViolation(
+        violations,
+        "visual_missing",
+        lesson,
+        activity.activityType,
+        "Weeks 8-10 skip counting requires visual bundles."
+      );
+    }
+
+    if (question.kind === "fact_family" && !question.visual) {
+      addViolation(
+        violations,
+        "visual_missing",
+        lesson,
+        activity.activityType,
+        "Weeks 8-10 fact families require a visual array model."
+      );
+    }
   }
 }
 
@@ -1237,7 +1339,10 @@ function generateInteractiveQuestion(
   }
 
   if (activityType === "equal_groups") {
-    const allowed = config.allowedGroupSizes;
+    const restrictedFactors = getRestrictedFactors(level, lesson.week);
+    const allowed = restrictedFactors
+      ? restrictFactors(config.allowedGroupSizes, restrictedFactors)
+      : config.allowedGroupSizes;
     let groups: number;
     let itemsPerGroup: number;
     if (allowed && allowed.length > 0) {
@@ -1273,7 +1378,10 @@ function generateInteractiveQuestion(
   }
 
   if (activityType === "arrays") {
-    const allowed = config.allowedGroupSizes;
+    const restrictedFactors = getRestrictedFactors(level, lesson.week);
+    const allowed = restrictedFactors
+      ? restrictFactors(config.allowedGroupSizes, restrictedFactors)
+      : config.allowedGroupSizes;
     let rows: number;
     let columns: number;
     if (allowed && allowed.length > 0) {
@@ -1336,17 +1444,25 @@ function generateInteractiveQuestion(
       config.mode === "grouping" || config.mode === "inverse_link" || config.mode === "sharing"
         ? config.mode
         : "sharing";
-    const allowedSizes = config.allowedGroupSizes;
-    const candidateGroupSizes = (allowedSizes && allowedSizes.length > 0
-      ? allowedSizes
-      : [2, 3, 4, 5, 6, 8, 10]
-    ).filter((size) => size <= maxTotal);
-    const groupSize =
-      candidateGroupSizes[randInt(0, candidateGroupSizes.length - 1)] ?? 2;
-    const minMultiplier = Math.max(2, Math.ceil(minTotal / groupSize));
-    const maxMultiplier = Math.max(minMultiplier, Math.floor(maxTotal / groupSize));
-    const groups = randInt(minMultiplier, maxMultiplier);
-    const total = groupSize * groups;
+    const restrictedFactors = getRestrictedFactors(level, lesson.week);
+    const allowedSizes = restrictedFactors
+      ? restrictFactors(config.allowedGroupSizes, restrictedFactors)
+      : (config.allowedGroupSizes && config.allowedGroupSizes.length > 0
+          ? config.allowedGroupSizes
+          : [2, 3, 4, 5, 6, 8, 10]);
+    const candidatePairs: Array<{ groups: number; groupSize: number; total: number }> = [];
+    for (const groups of allowedSizes) {
+      for (const groupSize of allowedSizes) {
+        const total = groups * groupSize;
+        if (total >= minTotal && total <= maxTotal) {
+          candidatePairs.push({ groups, groupSize, total });
+        }
+      }
+    }
+    const pair =
+      candidatePairs[randInt(0, candidatePairs.length - 1)] ??
+      { groups: 2, groupSize: 2, total: 4 };
+    const { groups, groupSize, total } = pair;
 
     return {
       kind: "division_groups",
@@ -1392,9 +1508,11 @@ function generateInteractiveQuestion(
     }
 
     if (mode === "mult_div_problems") {
+      const restrictedFactors = getRestrictedFactors(level, lesson.week);
+      const factors = restrictedFactors ?? [3, 4, 5, 6, 8, 10];
       if (randInt(0, 1) === 0) {
-        const groups = randInt(3, Math.min(8, profile.groupsMax));
-        const perGroup = randInt(2, Math.min(10, profile.itemsMax));
+        const groups = factors[randInt(0, factors.length - 1)] ?? 2;
+        const perGroup = factors[randInt(0, factors.length - 1)] ?? 2;
         const answer = groups * perGroup;
         return {
           kind: "mixed_word_problem",
@@ -1408,8 +1526,8 @@ function generateInteractiveQuestion(
         };
       }
 
-      const groups = randInt(3, Math.min(8, profile.groupsMax));
-      const perGroup = randInt(2, Math.min(10, profile.itemsMax));
+      const groups = factors[randInt(0, factors.length - 1)] ?? 2;
+      const perGroup = factors[randInt(0, factors.length - 1)] ?? 2;
       const total = groups * perGroup;
       return {
         kind: "mixed_word_problem",
@@ -1457,8 +1575,10 @@ function generateInteractiveQuestion(
     }
 
     if (operation === "x") {
-      const groups = randInt(3, Math.min(8, profile.groupsMax));
-      const perGroup = randInt(2, Math.min(10, profile.itemsMax));
+      const restrictedFactors = getRestrictedFactors(level, lesson.week);
+      const factors = restrictedFactors ?? [3, 4, 5, 6, 8, 10];
+      const groups = factors[randInt(0, factors.length - 1)] ?? 2;
+      const perGroup = factors[randInt(0, factors.length - 1)] ?? 2;
       const answer = groups * perGroup;
       return {
         kind: "mixed_word_problem",
@@ -1472,8 +1592,10 @@ function generateInteractiveQuestion(
       };
     }
 
-    const groupSize = randInt(2, Math.min(10, profile.itemsMax));
-    const groups = randInt(3, Math.min(8, profile.groupsMax));
+    const restrictedFactors = getRestrictedFactors(level, lesson.week);
+    const factors = restrictedFactors ?? [3, 4, 5, 6, 8, 10];
+    const groupSize = factors[randInt(0, factors.length - 1)] ?? 2;
+    const groups = factors[randInt(0, factors.length - 1)] ?? 2;
     const total = groupSize * groups;
     return {
       kind: "mixed_word_problem",
@@ -1526,6 +1648,7 @@ function generateInteractiveQuestion(
   }
 
   if (activityType === "fact_family") {
+    const restrictedFactors = getRestrictedFactors(level, lesson.week);
     const configuredMin = typeof config.min === "number" ? Math.max(0, config.min) : 0;
     const configuredMax =
       typeof config.max === "number"
@@ -1535,6 +1658,82 @@ function generateInteractiveQuestion(
       config.mode === "write_sentences" || config.mode === "word_problems"
         ? config.mode
         : "recognise";
+
+    if (restrictedFactors) {
+      const a = restrictedFactors[randInt(0, restrictedFactors.length - 1)] ?? 2;
+      const b = restrictedFactors[randInt(0, restrictedFactors.length - 1)] ?? 2;
+      const total = a * b;
+      const family: [number, number, number] = [a, b, total];
+      const allCorrect = [
+        `${a} × ${b} = ${total}`,
+        `${b} × ${a} = ${total}`,
+        `${total} ÷ ${a} = ${b}`,
+        `${total} ÷ ${b} = ${a}`,
+      ];
+      const correctSet = Array.from(new Set(allCorrect));
+
+      if (mode === "write_sentences") {
+        return {
+          kind: "fact_family",
+          prompt: "Write 4 number sentences for this multiplication and division fact family.",
+          family,
+          options: [],
+          answers: correctSet,
+          mode,
+          visual: { rows: a, columns: b },
+        };
+      }
+
+      if (mode === "word_problems") {
+        const prompts = [
+          {
+            story: `There are ${a} rows with ${b} counters in each row. Which fact family sentence matches the array?`,
+            answer: `${a} × ${b} = ${total}`,
+          },
+          {
+            story: `${total} counters are shared into groups of ${a}. Which sentence matches?`,
+            answer: `${total} ÷ ${a} = ${b}`,
+          },
+          {
+            story: `${total} counters are shared into groups of ${b}. Which sentence matches?`,
+            answer: `${total} ÷ ${b} = ${a}`,
+          },
+        ];
+        const chosen = prompts[randInt(0, prompts.length - 1)];
+        const wrongSentences = allCorrect
+          .filter((value) => value !== chosen.answer)
+          .concat([`${total} + ${a} = ${b}`, `${a} + ${b} = ${total}`]);
+        const options = shuffle([chosen.answer, ...shuffle(wrongSentences).slice(0, 3)]);
+        return {
+          kind: "fact_family",
+          prompt: chosen.story,
+          family,
+          options,
+          answers: [chosen.answer],
+          mode,
+          visual: { rows: a, columns: b },
+        };
+      }
+
+      const pickedCorrect = shuffle(correctSet).slice(0, 2);
+      const distractors = [
+        `${total} + ${a} = ${b}`,
+        `${a} + ${b} = ${total}`,
+        `${total} ÷ ${a} = ${a}`,
+        `${b} × ${b} = ${total}`,
+      ].filter((value) => !correctSet.includes(value));
+      const options = shuffle([...pickedCorrect, ...distractors.slice(0, 2)]);
+      return {
+        kind: "fact_family",
+        prompt: "Select all sentences that belong to this multiplication and division fact family.",
+        family,
+        options,
+        answers: pickedCorrect,
+        mode,
+        visual: { rows: a, columns: b },
+      };
+    }
+
     const aMax = Math.max(3, Math.min(50, Math.floor(configuredMax / 2)));
     const aMinBase =
       mode === "recognise"
@@ -1705,8 +1904,13 @@ function generateInteractiveQuestion(
   }
 
   if (activityType === "skip_count") {
+    const restrictedFactors = getRestrictedFactors(level, lesson.week);
     const step =
-      typeof config.step === "number"
+      restrictedFactors
+        ? (typeof config.step === "number" && restrictedFactors.includes(config.step)
+            ? config.step
+            : restrictedFactors[randInt(0, restrictedFactors.length - 1)] ?? 2)
+        : typeof config.step === "number"
         ? config.step
         : profile.skipCountExtraSteps[randInt(0, profile.skipCountExtraSteps.length - 1)] ?? 2;
     const configMax = typeof config.max === "number" ? config.max : 100;
@@ -1731,6 +1935,7 @@ function generateInteractiveQuestion(
         options: uniqueNumberOptions(missingValue, step * 3).map(Number),
         step,
         mode: "forward" as const,
+        visualGroups: restrictedFactors ? [step, step, step, step, step] : undefined,
       };
     }
 
@@ -1742,6 +1947,7 @@ function generateInteractiveQuestion(
       options: uniqueNumberOptions(answer, step * 3).map(Number),
       step,
       mode: "forward",
+      visualGroups: restrictedFactors ? [step, step, step, step, step] : undefined,
     };
   }
 

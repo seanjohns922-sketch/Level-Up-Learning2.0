@@ -157,7 +157,7 @@ function checkQuiz(programLabel, lesson) {
   }
 }
 
-const year2Targets = [1, 6, 12];
+const year2Targets = [1, 6, 8, 9, 10, 12];
 for (const week of year2Targets) {
   const lesson = year2NumberRows
     .filter((row) => row.week === week)
@@ -184,7 +184,14 @@ for (const week of year3Targets) {
 checkQuiz(
   "Year 2",
   year2NumberRows
-    .filter((row) => row.week === 6)
+    .filter((row) => row.week === 9)
+    .sort((a, b) => a.lesson - b.lesson)
+    .map(toLesson)[0]
+);
+checkQuiz(
+  "Year 2",
+  year2NumberRows
+    .filter((row) => row.week === 10)
     .sort((a, b) => a.lesson - b.lesson)
     .map(toLesson)[0]
 );

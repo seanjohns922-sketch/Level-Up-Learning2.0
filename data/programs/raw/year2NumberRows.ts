@@ -664,12 +664,20 @@ export const year2NumberRows: ProgramRow[] = [
         step: 2,
         mode: "forward",
       },
-      genericActivities("skip_count", {
-        min: 0,
-        max: 100,
-        step: 2,
-        mode: "forward",
-      })
+      [
+        makeActivity("skip_count", 1, {
+          min: 0,
+          max: 100,
+          step: 2,
+          mode: "forward",
+        }),
+        makeActivity("skip_count", 1, {
+          min: 0,
+          max: 100,
+          step: 2,
+          mode: "forward",
+        }),
+      ]
     ),
     curriculum: ["AC9M2N03"],
   },
@@ -691,12 +699,20 @@ export const year2NumberRows: ProgramRow[] = [
         step: 5,
         mode: "forward",
       },
-      genericActivities("skip_count", {
-        min: 0,
-        max: 100,
-        step: 5,
-        mode: "forward",
-      })
+      [
+        makeActivity("skip_count", 1, {
+          min: 0,
+          max: 100,
+          step: 5,
+          mode: "forward",
+        }),
+        makeActivity("skip_count", 1, {
+          min: 0,
+          max: 100,
+          step: 5,
+          mode: "forward",
+        }),
+      ]
     ),
     curriculum: ["AC9M2N03"],
   },
@@ -718,12 +734,20 @@ export const year2NumberRows: ProgramRow[] = [
         step: 10,
         mode: "forward",
       },
-      genericActivities("skip_count", {
-        min: 0,
-        max: 200,
-        step: 10,
-        mode: "forward",
-      })
+      [
+        makeActivity("skip_count", 1, {
+          min: 0,
+          max: 200,
+          step: 10,
+          mode: "forward",
+        }),
+        makeActivity("skip_count", 1, {
+          min: 0,
+          max: 200,
+          step: 10,
+          mode: "forward",
+        }),
+      ]
     ),
     curriculum: ["AC9M2N03"],
   },
@@ -746,10 +770,9 @@ export const year2NumberRows: ProgramRow[] = [
         allowedGroupSizes: [2, 5, 10],
         mode: "arrays",
       }),
-      makeActivity("multiple_choice", 1, {
+      makeActivity("equal_groups", 1, {
         allowedGroupSizes: [2, 5, 10],
         mode: "equal_groups",
-        sourceActivityType: "equal_groups",
       }),
     ],
     curriculum: ["AC9M2N05"],
@@ -773,10 +796,9 @@ export const year2NumberRows: ProgramRow[] = [
         allowedGroupSizes: [2, 5, 10],
         mode: "arrays",
       }),
-      makeActivity("multiple_choice", 1, {
+      makeActivity("arrays", 1, {
         allowedGroupSizes: [2, 5, 10],
         mode: "arrays",
-        sourceActivityType: "arrays",
       }),
     ],
     curriculum: ["AC9M2N05"],
@@ -801,10 +823,9 @@ export const year2NumberRows: ProgramRow[] = [
         max: 20,
         mode: "recognise",
       }),
-      makeActivity("typed_response", 1, {
+      makeActivity("arrays", 1, {
         allowedGroupSizes: [2, 5, 10],
         mode: "repeated_addition",
-        sourceActivityType: "arrays",
       }),
     ],
     curriculum: ["AC9M2N05"],
@@ -830,12 +851,11 @@ export const year2NumberRows: ProgramRow[] = [
         allowedGroupSizes: [2, 5, 10],
         mode: "arrays",
       }),
-      makeActivity("multiple_choice", 1, {
+      makeActivity("division_groups", 1, {
         minTotal: 6,
         maxTotal: 30,
         allowedGroupSizes: [2, 5, 10],
         mode: "sharing",
-        sourceActivityType: "division_groups",
       }),
     ],
     curriculum: ["AC9M2N06"],
@@ -861,12 +881,11 @@ export const year2NumberRows: ProgramRow[] = [
         allowedGroupSizes: [2, 5, 10],
         mode: "arrays",
       }),
-      makeActivity("typed_response", 1, {
+      makeActivity("division_groups", 1, {
         minTotal: 6,
         maxTotal: 30,
         allowedGroupSizes: [2, 5, 10],
         mode: "grouping",
-        sourceActivityType: "division_groups",
       }),
     ],
     curriculum: ["AC9M2N06"],
@@ -893,12 +912,11 @@ export const year2NumberRows: ProgramRow[] = [
         max: 20,
         mode: "recognise",
       }),
-      makeActivity("multiple_choice", 1, {
+      makeActivity("division_groups", 1, {
         minTotal: 6,
         maxTotal: 30,
         allowedGroupSizes: [2, 5, 10],
         mode: "inverse_link",
-        sourceActivityType: "division_groups",
       }),
     ],
     curriculum: ["AC9M2N06"],
