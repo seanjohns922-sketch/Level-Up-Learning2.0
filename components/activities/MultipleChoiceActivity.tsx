@@ -1,8 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import type { MultipleChoiceQuestion } from "@/data/activities/year2/lessonEngine";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
+
+function ArrayVisual({ rows, cols }: { rows: number; cols: number }) {
+  return (
+    <div className="mt-4 rounded-2xl border border-teal-100 bg-teal-50 p-4">
+      <div className="text-xs font-bold uppercase tracking-wide text-teal-700 mb-3">
+        Array model
+      </div>
+      <div className="inline-flex flex-col gap-2 rounded-2xl bg-white p-4 shadow-sm">
+        {Array.from({ length: rows }).map((_, r) => (
+          <div key={r} className="flex gap-2">
+            {Array.from({ length: cols }).map((__, c) => (
+              <div
+                key={`${r}-${c}`}
+                className="h-5 w-5 rounded-full bg-teal-600"
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+      <div className="mt-3 text-sm font-bold text-teal-800">
+        {rows} rows × {cols} columns
+      </div>
+    </div>
+  );
+}
 
 export default function MultipleChoiceActivity({
   questionData,
@@ -14,6 +39,12 @@ export default function MultipleChoiceActivity({
   onWrong?: () => void;
 }) {
   const [picked, setPicked] = useState<string | null>(null);
+
+  const arrayDims = useMemo(() => {
+    const match = questionData.prompt.match(/(\d+)\s+groups?\s+of\s+(\d+)/i);
+    if (match) return { rows: Number(match[1]), cols: Number(match[2]) };
+    return null;
+  }, [questionData.prompt]);
 
   function choose(option: string) {
     setPicked(option);
@@ -34,6 +65,9 @@ export default function MultipleChoiceActivity({
       </div>
       {questionData.helper ? (
         <p className="mt-2 text-sm text-gray-600">{questionData.helper}</p>
+      ) : null}
+      {arrayDims ? (
+        <ArrayVisual rows={arrayDims.rows} cols={arrayDims.cols} />
       ) : null}
 
       <div className="mt-6 grid gap-3">

@@ -2154,21 +2154,32 @@ function generateGenericQuestion(
   }
 
   if (sourceActivityType === "equal_groups" || sourceActivityType === "arrays") {
-    const groups = randInt(3, Math.min(8, profile.groupsMax));
-    const perGroup = randInt(2, Math.min(10, profile.itemsMax));
+    const allowed = config.allowedGroupSizes as number[] | undefined;
+    let groups: number;
+    let perGroup: number;
+    if (allowed && allowed.length > 0) {
+      groups = allowed[randInt(0, allowed.length - 1)];
+      perGroup = allowed[randInt(0, allowed.length - 1)];
+    } else {
+      groups = randInt(3, Math.min(8, profile.groupsMax));
+      perGroup = randInt(2, Math.min(10, profile.itemsMax));
+    }
     const answer = String(groups * perGroup);
+    const arrayHint = `Think: ${groups} rows of ${perGroup} dots.`;
     return asMultipleChoice
       ? {
           kind: "multiple_choice",
           prompt: `${groups} groups of ${perGroup} makes how many?`,
           options: uniqueNumberOptions(Number(answer), 6),
           answer,
+          helper: arrayHint,
         }
       : {
           kind: "typed_response",
           prompt: `How many objects are in ${groups} groups of ${perGroup}?`,
           answer,
           placeholder: "Type the total",
+          helper: arrayHint,
         };
   }
 
