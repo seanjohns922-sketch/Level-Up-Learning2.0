@@ -41,6 +41,7 @@ export default function FactFamily({
   }
 
   const [a, b, total] = questionData.family;
+  const visual = questionData.visual;
 
   return (
     <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -73,11 +74,11 @@ export default function FactFamily({
             </div>
           ))}
         </div>
-        {questionData.visual ? (
+        {visual?.type === "array" ? (
           <div className="mt-4 inline-flex flex-col gap-2 rounded-2xl bg-white p-4 shadow-sm">
-            {Array.from({ length: questionData.visual.rows }).map((_, rowIndex) => (
+            {Array.from({ length: visual.rows }).map((_, rowIndex) => (
               <div key={rowIndex} className="flex gap-2">
-                {Array.from({ length: questionData.visual.columns }).map((__, columnIndex) => (
+                {Array.from({ length: visual.columns }).map((__, columnIndex) => (
                   <div key={`${rowIndex}-${columnIndex}`} className="h-5 w-5 rounded-full bg-teal-600" />
                 ))}
               </div>

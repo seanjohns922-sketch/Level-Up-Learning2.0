@@ -149,6 +149,7 @@ export type FactFamilyQuestion = {
   answers: string[];
   mode: "recognise" | "write_sentences" | "word_problems";
   visual?: {
+    type: "array";
     rows: number;
     columns: number;
   };
@@ -1680,7 +1681,7 @@ function generateInteractiveQuestion(
           options: [],
           answers: correctSet,
           mode,
-          visual: { rows: a, columns: b },
+          visual: { type: "array", rows: a, columns: b },
         };
       }
 
@@ -1711,7 +1712,7 @@ function generateInteractiveQuestion(
           options,
           answers: [chosen.answer],
           mode,
-          visual: { rows: a, columns: b },
+          visual: { type: "array", rows: a, columns: b },
         };
       }
 
@@ -1730,7 +1731,7 @@ function generateInteractiveQuestion(
         options,
         answers: pickedCorrect,
         mode,
-        visual: { rows: a, columns: b },
+        visual: { type: "array", rows: a, columns: b },
       };
     }
 
