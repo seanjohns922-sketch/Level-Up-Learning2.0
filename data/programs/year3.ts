@@ -318,11 +318,11 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
             max: 240,
             mode: "friendly_numbers",
           }),
-          makeActivity("mixed_word_problem", 1, {
+          makeActivity("multiple_choice", 1, {
             min: 20,
             max: 240,
-            mode: "choose_operation",
-            operations: ["+"],
+            mode: "friendly_numbers",
+            sourceActivityType: "addition_strategy",
           }),
           makeActivity("typed_response", 1, {
             min: 20,

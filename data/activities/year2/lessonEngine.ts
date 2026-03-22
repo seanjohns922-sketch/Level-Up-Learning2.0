@@ -498,6 +498,13 @@ function getRestrictedFactors(
     : null;
 }
 
+function isYear3Week3Lesson3AdditionOnly(
+  level: SupportedMathLevel,
+  lesson: Lesson
+): boolean {
+  return level === 3 && lesson.week === 3 && lesson.lesson === 3;
+}
+
 function restrictFactors(candidates: number[] | undefined, fallback: number[]): number[] {
   const filtered = (candidates ?? fallback).filter((value) => fallback.includes(value));
   return filtered.length > 0 ? filtered : fallback;
@@ -1065,6 +1072,8 @@ export function validateLessonActivityIntentForLevel(
   const policy = getActivityPolicy(level, activity.activityType);
   const violations: Year2PolicyViolation[] = [];
   const focus = normalizeFocus(lesson.focus);
+  const config = (activity.config ?? {}) as GenericConfig;
+  const sourceActivityType = config.sourceActivityType;
 
   if (!policy) {
     addViolation(
@@ -1120,6 +1129,23 @@ export function validateLessonActivityIntentForLevel(
       activity.activityType,
       `${activity.activityType} is blocked for focus "${lesson.focus}".`
     );
+  }
+
+  if (isYear3Week3Lesson3AdditionOnly(level, lesson)) {
+    const isAlignedAdditionActivity =
+      activity.activityType === "addition_strategy" ||
+      ((activity.activityType === "multiple_choice" || activity.activityType === "typed_response") &&
+        sourceActivityType === "addition_strategy");
+
+    if (!isAlignedAdditionActivity) {
+      addViolation(
+        violations,
+        "alignment",
+        lesson,
+        activity.activityType,
+        "Year 3 Week 3 Lesson 3 must only use addition strategy activities or aligned addition-only wrappers."
+      );
+    }
   }
 
   if (question) {
@@ -1490,6 +1516,12 @@ function generateInteractiveQuestion(
       config.mode === "two_step_add_sub" || config.mode === "mult_div_problems"
         ? config.mode
         : "choose_operation";
+    const configuredOperations = Array.isArray(config.operations)
+      ? config.operations.filter(
+          (value): value is "+" | "-" | "x" | "/" =>
+            value === "+" || value === "-" || value === "x" || value === "/"
+        )
+      : [];
 
     if (mode === "two_step_add_sub") {
       const start = randInt(Math.max(10, min), Math.max(20, max));
@@ -1542,7 +1574,9 @@ function generateInteractiveQuestion(
       };
     }
 
-    const operation = shuffle(["+", "-", "x", "/"])[0];
+    const operationPool =
+      configuredOperations.length > 0 ? configuredOperations : ["+", "-", "x", "/"];
+    const operation = shuffle(operationPool)[0] ?? "+";
     if (operation === "+") {
       const start = randInt(Math.max(5, min), Math.max(12, max - 10));
       const extra = randInt(4, 18);
