@@ -139,6 +139,8 @@ export type SubtractionStrategyQuestion = {
   answer: number;
   options: number[];
   mode: "jump" | "split" | "fact_strategy";
+  strategyLabel?: string;
+  strategySteps?: string[];
 };
 
 export type FactFamilyQuestion = {
@@ -503,6 +505,106 @@ function isYear3Week3Lesson3AdditionOnly(
   lesson: Lesson
 ): boolean {
   return level === 3 && lesson.week === 3 && lesson.lesson === 3;
+}
+
+function isYear3Week4SubtractionLesson(
+  level: SupportedMathLevel,
+  lesson: Lesson
+): boolean {
+  return level === 3 && lesson.week === 4;
+}
+
+function buildYear3Week4SubtractionQuestion(
+  lesson: Lesson,
+  mode: SubtractionStrategyQuestion["mode"]
+): SubtractionStrategyQuestion {
+  if (lesson.lesson === 1) {
+    const useCountUp = randInt(0, 1) === 0;
+    if (useCountUp) {
+      const answer = randInt(3, 18);
+      const remove = randInt(90, 205);
+      const total = remove + answer;
+      const bridgeToTen = Math.ceil(remove / 10) * 10;
+      const steps =
+        bridgeToTen < total
+          ? [`${remove} -> ${bridgeToTen} (+${bridgeToTen - remove})`, `${bridgeToTen} -> ${total} (+${total - bridgeToTen})`]
+          : [`${remove} -> ${total} (+${answer})`];
+      return {
+        kind: "subtraction_strategy",
+        prompt: `Solve ${total} - ${remove}. Which is better here: count back or count up?`,
+        hint: "Count up when the two numbers are close together. Think about the small gap between them.",
+        total,
+        remove,
+        answer,
+        options: uniqueNumberOptions(answer, 10).map(Number),
+        mode,
+        strategyLabel: "Count up strategy",
+        strategySteps: steps,
+      };
+    }
+
+    const total = randInt(130, 220);
+    const remove = randInt(24, Math.min(89, total - 25));
+    const answer = total - remove;
+    const tens = Math.floor(remove / 10) * 10;
+    const ones = remove % 10;
+    const afterTens = total - tens;
+    const steps = tens > 0
+      ? [`${total} -> ${afterTens} (-${tens})`, `${afterTens} -> ${answer} (-${ones})`]
+      : [`${total} -> ${answer} (-${ones})`];
+    return {
+      kind: "subtraction_strategy",
+      prompt: `Solve ${total} - ${remove}. Which is better here: count back or count up?`,
+      hint: "Count back when the number taken away is small enough to jump back in parts.",
+      total,
+      remove,
+      answer,
+      options: uniqueNumberOptions(answer, 14).map(Number),
+      mode,
+      strategyLabel: "Count back strategy",
+      strategySteps: steps,
+    };
+  }
+
+  if (lesson.lesson === 2) {
+    const compareMode = randInt(0, 1) === 0;
+    const remove = randInt(78, 168);
+    const answer = randInt(18, 67);
+    const total = remove + answer;
+    return {
+      kind: "subtraction_strategy",
+      prompt: compareMode
+        ? `Find the difference between ${remove} and ${total}.`
+        : `How much more is ${total} than ${remove}?`,
+      hint: "Think about the gap between the two numbers. Difference tells you how far apart they are.",
+      total,
+      remove,
+      answer,
+      options: uniqueNumberOptions(answer, 12).map(Number),
+      mode,
+      strategyLabel: compareMode ? "Difference strategy" : "Compare the gap",
+      strategySteps: [`Start at ${remove}.`, `Count on to ${total}.`, `The total jump is ${answer}.`],
+    };
+  }
+
+  const answer = randInt(24, 68);
+  const remove = randInt(26, 89);
+  const total = remove + answer;
+  return {
+    kind: "subtraction_strategy",
+    prompt:
+      randInt(0, 1) === 0
+        ? `Use a related fact to solve ${total} - ${remove}.`
+        : `If ${remove} + ${answer} = ${total}, what is ${total} - ${remove}?`,
+    hint: "Use a known fact or inverse fact to help. Addition and subtraction are linked.",
+    total,
+    remove,
+    answer,
+    options: uniqueNumberOptions(answer, 12).map(Number),
+    mode,
+    strategyLabel: "Inverse fact strategy",
+    strategySteps: [`Think of ${remove} + ? = ${total}.`, `The missing part is ${answer}.`, `So ${total} - ${remove} = ${answer}.`],
+  };
 }
 
 function restrictFactors(candidates: number[] | undefined, fallback: number[]): number[] {
@@ -1148,6 +1250,23 @@ export function validateLessonActivityIntentForLevel(
     }
   }
 
+  if (isYear3Week4SubtractionLesson(level, lesson)) {
+    const isAlignedSubtractionActivity =
+      activity.activityType === "subtraction_strategy" ||
+      ((activity.activityType === "multiple_choice" || activity.activityType === "typed_response") &&
+        sourceActivityType === "subtraction_strategy");
+
+    if (!isAlignedSubtractionActivity) {
+      addViolation(
+        violations,
+        "alignment",
+        lesson,
+        activity.activityType,
+        "Year 3 Week 4 lessons must only use subtraction strategy activities or aligned subtraction-only wrappers."
+      );
+    }
+  }
+
   if (question) {
     validateQuestionAgainstPolicy(lesson, activity, policy, question, profile, violations);
   }
@@ -1651,6 +1770,11 @@ function generateInteractiveQuestion(
       config.mode === "split" || config.mode === "fact_strategy"
         ? config.mode
         : "jump";
+
+    if (isYear3Week4SubtractionLesson(level, lesson)) {
+      return buildYear3Week4SubtractionQuestion(lesson, mode);
+    }
+
     let total = randInt(Math.max(12, min), Math.max(20, max));
     let remove = randInt(2, Math.min(18, total - 1));
 
@@ -2352,20 +2476,35 @@ function generateGenericQuestion(
   }
 
   if (sourceActivityType === "subtraction_strategy") {
-    const total = randInt(20, Math.max(40, max));
-    const remove = randInt(3, Math.min(28, total - 1));
-    const answer = String(total - remove);
+    const sourceQuestion = generateInteractiveQuestion(level, "subtraction_strategy", config, lesson);
+    if (!sourceQuestion || sourceQuestion.kind !== "subtraction_strategy") {
+      return asMultipleChoice
+        ? {
+            kind: "multiple_choice",
+            prompt: "Solve the subtraction question.",
+            options: ["0", "1", "2", "3"],
+            answer: "0",
+          }
+        : {
+            kind: "typed_response",
+            prompt: "Solve the subtraction question.",
+            answer: "0",
+            placeholder: "Type the answer",
+          };
+    }
     return asMultipleChoice
       ? {
           kind: "multiple_choice",
-          prompt: `What is ${total} - ${remove}?`,
-          options: uniqueNumberOptions(Number(answer), 8),
-          answer,
+          prompt: sourceQuestion.prompt,
+          options: sourceQuestion.options.map(String),
+          answer: String(sourceQuestion.answer),
+          helper: sourceQuestion.hint,
         }
       : {
           kind: "typed_response",
-          prompt: `Solve ${total} - ${remove}.`,
-          answer,
+          prompt: sourceQuestion.prompt,
+          answer: String(sourceQuestion.answer),
+          helper: sourceQuestion.hint,
           placeholder: "Type the answer",
         };
   }

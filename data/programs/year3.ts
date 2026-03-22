@@ -353,19 +353,19 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         ),
         activities: [
           makeActivity("subtraction_strategy", 2, {
-            min: 20,
-            max: 120,
+            min: 90,
+            max: 220,
             mode: "jump",
           }),
-          makeActivity("number_line", 1, {
-            min: 0,
-            max: 120,
-            step: 10,
-            mode: "placement",
+          makeActivity("multiple_choice", 1, {
+            min: 90,
+            max: 220,
+            mode: "jump",
+            sourceActivityType: "subtraction_strategy",
           }),
           makeActivity("typed_response", 1, {
-            min: 20,
-            max: 120,
+            min: 90,
+            max: 220,
             mode: "jump",
             sourceActivityType: "subtraction_strategy",
           }),
@@ -384,19 +384,19 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         ),
         activities: [
           makeActivity("subtraction_strategy", 2, {
-            min: 30,
-            max: 120,
+            min: 90,
+            max: 220,
             mode: "split",
           }),
-          makeActivity("mixed_word_problem", 1, {
-            min: 20,
-            max: 120,
-            mode: "choose_operation",
-            operations: ["-"],
+          makeActivity("typed_response", 1, {
+            min: 90,
+            max: 220,
+            mode: "split",
+            sourceActivityType: "subtraction_strategy",
           }),
           makeActivity("multiple_choice", 1, {
-            min: 30,
-            max: 120,
+            min: 90,
+            max: 220,
             mode: "split",
             sourceActivityType: "subtraction_strategy",
           }),
@@ -415,18 +415,19 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         ),
         activities: [
           makeActivity("subtraction_strategy", 2, {
-            min: 30,
-            max: 120,
+            min: 90,
+            max: 220,
             mode: "fact_strategy",
           }),
-          makeActivity("fact_family", 1, {
-            min: 10,
-            max: 30,
-            mode: "recognise",
+          makeActivity("multiple_choice", 1, {
+            min: 90,
+            max: 220,
+            mode: "fact_strategy",
+            sourceActivityType: "subtraction_strategy",
           }),
           makeActivity("typed_response", 1, {
-            min: 30,
-            max: 120,
+            min: 90,
+            max: 220,
             mode: "fact_strategy",
             sourceActivityType: "subtraction_strategy",
           }),

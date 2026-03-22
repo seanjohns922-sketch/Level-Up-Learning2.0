@@ -34,7 +34,20 @@ export default function SubtractionStrategy({
         <p className="mt-2 text-sm text-gray-600">{questionData.hint}</p>
       </div>
 
-      {questionData.mode === "jump" && (() => {
+      {questionData.strategySteps && questionData.strategySteps.length > 0 ? (
+        <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">
+          <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
+            {questionData.strategyLabel ?? "Strategy steps"}
+          </div>
+          <div className="mt-2 grid gap-1">
+            {questionData.strategySteps.map((step) => (
+              <div key={step} className="text-sm font-bold text-gray-700">
+                {step}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : questionData.mode === "jump" && (() => {
         const tens = Math.floor(questionData.remove / 10) * 10;
         const ones = questionData.remove % 10;
         const afterTens = questionData.total - tens;
@@ -65,7 +78,7 @@ export default function SubtractionStrategy({
         );
       })()}
 
-      {questionData.mode === "split" && (() => {
+      {!questionData.strategySteps && questionData.mode === "split" && (() => {
         const tens = Math.floor(questionData.remove / 10) * 10;
         const ones = questionData.remove % 10;
         return (
@@ -83,7 +96,7 @@ export default function SubtractionStrategy({
         );
       })()}
 
-      {questionData.mode === "fact_strategy" && (
+      {!questionData.strategySteps && questionData.mode === "fact_strategy" && (
         <div className="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
           <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">
             Think addition

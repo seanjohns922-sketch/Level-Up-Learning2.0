@@ -190,6 +190,15 @@ if (!year3Week3Lesson3) {
   checkLesson("Year 3", year3Week3Lesson3);
 }
 
+const year3Week4 = YEAR3_PROGRAM.find((item) => item.week === 4);
+if (!year3Week4?.lessons?.length) {
+  addFinding("Year 3 W4", "Missing lessons for regression target.");
+} else {
+  for (const lesson of year3Week4.lessons) {
+    checkLesson("Year 3", lesson);
+  }
+}
+
 checkQuiz(
   "Year 2",
   year2NumberRows
