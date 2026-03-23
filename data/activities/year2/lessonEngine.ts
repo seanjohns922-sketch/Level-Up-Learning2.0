@@ -195,12 +195,25 @@ export type MultipleChoiceQuestion = {
   };
 };
 
+export type WrittenMethodLayout = {
+  title: string;
+  operation: "+" | "-";
+  top: string[];
+  bottom: string[];
+  answerLength: number;
+  placeValueLabels: string[];
+  carryRow?: string[];
+  borrowRow?: string[];
+  crossedTop?: boolean[];
+};
+
 export type TypedResponseQuestion = {
   kind: "typed_response";
   prompt: string;
   answer: string;
   helper?: string;
   placeholder?: string;
+  writtenMethod?: WrittenMethodLayout;
 };
 
 export type SpeedRoundQuestion = {
@@ -514,6 +527,200 @@ function isYear3Week4SubtractionLesson(
   return level === 3 && lesson.week === 4;
 }
 
+function isYear3Week5Lesson(
+  level: SupportedMathLevel,
+  lesson: Lesson
+): boolean {
+  return level === 3 && lesson.week === 5;
+}
+
+function toDigitCells(value: number, width: number): string[] {
+  return String(value).padStart(width, " ").split("").map((digit) => (digit === " " ? "" : digit));
+}
+
+function buildAdditionCarryRow(a: number, b: number, width: number): string[] | undefined {
+  const top = toDigitCells(a, width);
+  const bottom = toDigitCells(b, width);
+  const carryRow = Array.from({ length: width }, () => "");
+  let carry = 0;
+  for (let index = width - 1; index >= 0; index -= 1) {
+    const sum = Number(top[index] || 0) + Number(bottom[index] || 0) + carry;
+    carry = sum >= 10 ? 1 : 0;
+    if (carry && index > 0) {
+      carryRow[index - 1] = "1";
+    }
+  }
+  return carryRow.some(Boolean) ? carryRow : undefined;
+}
+
+function placeValueLabelsForWidth(width: number): string[] {
+  if (width <= 1) return ["O"];
+  if (width === 2) return ["T", "O"];
+  if (width === 3) return ["H", "T", "O"];
+  if (width === 4) return ["Th", "H", "T", "O"];
+  const generic = Array.from({ length: width }, () => "");
+  generic[width - 1] = "O";
+  generic[width - 2] = "T";
+  generic[width - 3] = "H";
+  return generic;
+}
+
+function buildSubtractionBorrowData(
+  topValue: number,
+  bottomValue: number,
+  width: number
+): { borrowRow?: string[]; crossedTop?: boolean[] } {
+  const topDigits = String(topValue).padStart(width, "0").split("").map(Number);
+  const bottomDigits = String(bottomValue).padStart(width, "0").split("").map(Number);
+  const working = [...topDigits];
+  const borrowRow = Array.from({ length: width }, () => "");
+  const crossedTop = Array.from({ length: width }, () => false);
+
+  for (let index = width - 1; index >= 0; index -= 1) {
+    if (working[index] >= bottomDigits[index]) continue;
+
+    let lender = index - 1;
+    while (lender >= 0 && working[lender] === 0) {
+      lender -= 1;
+    }
+    if (lender < 0) continue;
+
+    working[lender] -= 1;
+    crossedTop[lender] = true;
+    borrowRow[lender] = String(working[lender]);
+
+    for (let cascade = lender + 1; cascade < index; cascade += 1) {
+      working[cascade] = 9;
+      crossedTop[cascade] = true;
+      borrowRow[cascade] = "9";
+    }
+
+    working[index] += 10;
+    crossedTop[index] = true;
+    borrowRow[index] = String(working[index]);
+  }
+
+  return {
+    borrowRow: borrowRow.some(Boolean) ? borrowRow : undefined,
+    crossedTop: crossedTop.some(Boolean) ? crossedTop : undefined,
+  };
+}
+
+function buildWrittenMethodLayout(
+  title: string,
+  operation: "+" | "-",
+  topValue: number,
+  bottomValue: number,
+  answer: number
+): WrittenMethodLayout {
+  const width = Math.max(String(topValue).length, String(bottomValue).length, String(answer).length);
+  return {
+    title,
+    operation,
+    top: toDigitCells(topValue, width),
+    bottom: toDigitCells(bottomValue, width),
+    answerLength: width,
+    placeValueLabels: placeValueLabelsForWidth(width),
+    carryRow: operation === "+" ? buildAdditionCarryRow(topValue, bottomValue, width) : undefined,
+    ...(operation === "-"
+      ? buildSubtractionBorrowData(topValue, bottomValue, width)
+      : {}),
+  };
+}
+
+function generateRegroupingAdditionOperands(config: GenericConfig): { a: number; b: number } {
+  const configuredMax = typeof config.max === "number" ? config.max : 999;
+  const useThreeDigits = configuredMax >= 100 && randInt(0, 99) < 45;
+
+  if (useThreeDigits) {
+    while (true) {
+      const a = randInt(120, Math.min(699, configuredMax));
+      const b = randInt(110, Math.min(299, configuredMax));
+      const onesCarry = (a % 10) + (b % 10) >= 10;
+      const tensCarry = (Math.floor((a % 100) / 10) + Math.floor((b % 100) / 10)) >= 10;
+      if (onesCarry || tensCarry) {
+        return { a, b };
+      }
+    }
+  }
+
+  while (true) {
+    const a = randInt(24, 78);
+    const b = randInt(16, 69);
+    if ((a % 10) + (b % 10) >= 10) {
+      return { a, b };
+    }
+  }
+}
+
+function generateRegroupingSubtractionOperands(
+  config: GenericConfig,
+  preferHarder: boolean
+): { total: number; remove: number } {
+  const configuredMax = typeof config.max === "number" ? config.max : 999;
+  const useThreeDigits = configuredMax >= 100 && randInt(0, 99) < (preferHarder ? 65 : 45);
+
+  if (useThreeDigits) {
+    while (true) {
+      const total = randInt(preferHarder ? 240 : 140, Math.min(preferHarder ? 899 : 720, configuredMax));
+      const remove = randInt(120, Math.min(399, total - 12));
+      const topOnes = total % 10;
+      const bottomOnes = remove % 10;
+      const topTens = Math.floor((total % 100) / 10);
+      const bottomTens = Math.floor((remove % 100) / 10);
+      if (topOnes < bottomOnes || topTens < bottomTens) {
+        return { total, remove };
+      }
+    }
+  }
+
+  while (true) {
+    const total = randInt(preferHarder ? 62 : 52, 98);
+    const remove = randInt(18, total - 11);
+    if (total % 10 < remove % 10) {
+      return { total, remove };
+    }
+  }
+}
+
+function buildYear3Week5AdditionQuestion(config: GenericConfig): AdditionStrategyQuestion {
+  const { a, b } = generateRegroupingAdditionOperands(config);
+  return {
+    kind: "addition_strategy",
+    prompt: `Complete the long addition for ${a} + ${b}.`,
+    hint: "Use long addition. Add the ones first, carry if needed, then add the tens and hundreds.",
+    a,
+    b,
+    answer: a + b,
+    options: uniqueNumberOptions(a + b, 18).map(Number),
+    mode: "split",
+  };
+}
+
+function buildYear3Week5SubtractionQuestion(
+  lesson: Lesson,
+  config: GenericConfig
+): SubtractionStrategyQuestion {
+  const { total, remove } = generateRegroupingSubtractionOperands(config, lesson.lesson === 3);
+  const answer = total - remove;
+  return {
+    kind: "subtraction_strategy",
+    prompt: `Complete the long subtraction for ${total} - ${remove}.`,
+    hint: "Use long subtraction. Start with the ones column and regroup when the top digit is too small.",
+    total,
+    remove,
+    answer,
+    options: uniqueNumberOptions(answer, 18).map(Number),
+    mode: "split",
+    strategyLabel: "Long subtraction",
+    strategySteps: [
+      "Line up the digits by place value.",
+      "Subtract the ones first and regroup if needed.",
+      "Then subtract the tens and hundreds.",
+    ],
+  };
+}
+
 function buildYear3Week4SubtractionQuestion(
   lesson: Lesson,
   mode: SubtractionStrategyQuestion["mode"]
@@ -796,6 +1003,10 @@ function generateAdditionStrategyQuestion(
   level: SupportedMathLevel,
   lesson: Lesson
 ): AdditionStrategyQuestion {
+  if (isYear3Week5Lesson(level, lesson) && lesson.lesson === 1) {
+    return buildYear3Week5AdditionQuestion(config);
+  }
+
   const profile = getDifficultyProfile(level, lesson.week);
   const min = typeof config.min === "number" ? config.min : 0;
   const max = typeof config.max === "number" ? config.max : profile.addSubMax;
@@ -1111,6 +1322,21 @@ function validateQuestionAgainstPolicy(
     );
   }
 
+  if (
+    level === 3 &&
+    lesson.week === 5 &&
+    question.kind === "typed_response" &&
+    !question.writtenMethod
+  ) {
+    addViolation(
+      violations,
+      "alignment",
+      lesson,
+      activity.activityType,
+      "Year 3 Week 5 typed-response tasks must include an on-screen written method."
+    );
+  }
+
   if (question.kind === "division_groups" && question.total > profile.divisionTotalMax) {
     addViolation(
       violations,
@@ -1264,6 +1490,34 @@ export function validateLessonActivityIntentForLevel(
         activity.activityType,
         "Year 3 Week 4 lessons must only use subtraction strategy activities or aligned subtraction-only wrappers."
       );
+    }
+  }
+
+  if (isYear3Week5Lesson(level, lesson)) {
+    if (lesson.lesson === 1) {
+      const isWrittenAdditionActivity =
+        activity.activityType === "typed_response" && sourceActivityType === "addition_strategy";
+      if (!isWrittenAdditionActivity) {
+        addViolation(
+          violations,
+          "alignment",
+          lesson,
+          activity.activityType,
+          "Year 3 Week 5 Lesson 1 must use long-addition written method activities only."
+        );
+      }
+    } else {
+      const isWrittenSubtractionActivity =
+        activity.activityType === "typed_response" && sourceActivityType === "subtraction_strategy";
+      if (!isWrittenSubtractionActivity) {
+        addViolation(
+          violations,
+          "alignment",
+          lesson,
+          activity.activityType,
+          "Year 3 Week 5 Lessons 2 and 3 must use long-subtraction written method activities only."
+        );
+      }
     }
   }
 
@@ -1773,6 +2027,10 @@ function generateInteractiveQuestion(
 
     if (isYear3Week4SubtractionLesson(level, lesson)) {
       return buildYear3Week4SubtractionQuestion(lesson, mode);
+    }
+
+    if (isYear3Week5Lesson(level, lesson) && lesson.lesson >= 2) {
+      return buildYear3Week5SubtractionQuestion(lesson, config);
     }
 
     let total = randInt(Math.max(12, min), Math.max(20, max));
@@ -2454,6 +2712,10 @@ function generateGenericQuestion(
           answer,
           helper: sourceQuestion.hint,
           placeholder: "Type the sum",
+          writtenMethod:
+            isYear3Week5Lesson(level, lesson) && lesson.lesson === 1
+              ? buildWrittenMethodLayout("Long Addition", "+", sourceQuestion.a, sourceQuestion.b, sourceQuestion.answer)
+              : undefined,
         };
   }
 
@@ -2506,6 +2768,16 @@ function generateGenericQuestion(
           answer: String(sourceQuestion.answer),
           helper: sourceQuestion.hint,
           placeholder: "Type the answer",
+          writtenMethod:
+            isYear3Week5Lesson(level, lesson) && lesson.lesson >= 2
+              ? buildWrittenMethodLayout(
+                  "Long Subtraction",
+                  "-",
+                  sourceQuestion.total,
+                  sourceQuestion.remove,
+                  sourceQuestion.answer
+                )
+              : undefined,
         };
   }
 

@@ -199,6 +199,15 @@ if (!year3Week4?.lessons?.length) {
   }
 }
 
+const year3Week5 = YEAR3_PROGRAM.find((item) => item.week === 5);
+if (!year3Week5?.lessons?.length) {
+  addFinding("Year 3 W5", "Missing lessons for regression target.");
+} else {
+  for (const lesson of year3Week5.lessons) {
+    checkLesson("Year 3", lesson);
+  }
+}
+
 checkQuiz(
   "Year 2",
   year2NumberRows

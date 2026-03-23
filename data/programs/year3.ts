@@ -446,27 +446,28 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         id: "y3-w5-l1",
         week: 5,
         lesson: 1,
-        title: "Column Addition (No Regrouping)",
-        focus: "Estimate then solve using column addition without regrouping",
+        title: "Long Addition (With Regrouping)",
+        focus: "Complete long addition with regrouping using the written method",
         activityIdeas: lessonIdeas(
-          "Column addition without regrouping",
-          "Estimate, solve, and check reasonableness"
+          "Complete vertical long addition with carrying",
+          "Mix 2-digit and selected 3-digit additions that require regrouping"
         ),
         activities: [
-          makeActivity("addition_strategy", 2, {
+          makeActivity("typed_response", 2, {
             min: 20,
-            max: 120,
+            max: 99,
             mode: "split",
+            sourceActivityType: "addition_strategy",
           }),
-          makeActivity("number_line", 1, {
-            min: 0,
-            max: 120,
-            step: 10,
-            mode: "estimate",
+          makeActivity("typed_response", 1, {
+            min: 120,
+            max: 999,
+            mode: "split",
+            sourceActivityType: "addition_strategy",
           }),
           makeActivity("typed_response", 1, {
             min: 20,
-            max: 120,
+            max: 999,
             mode: "split",
             sourceActivityType: "addition_strategy",
           }),
@@ -477,28 +478,30 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         id: "y3-w5-l2",
         week: 5,
         lesson: 2,
-        title: "Column Addition (With Regrouping)",
-        focus: "Use place value and regrouping in written addition",
+        title: "Long Subtraction (With Regrouping)",
+        focus: "Complete long subtraction with regrouping using the written method",
         activityIdeas: lessonIdeas(
-          "Column addition with regrouping",
-          "Apply regrouping in contextual addition tasks"
+          "Complete vertical long subtraction with borrowing",
+          "Mix 2-digit and selected 3-digit subtractions that require regrouping"
         ),
         activities: [
-          makeActivity("addition_strategy", 2, {
-            min: 40,
-            max: 180,
-            mode: "friendly_numbers",
+          makeActivity("typed_response", 2, {
+            min: 20,
+            max: 99,
+            mode: "split",
+            sourceActivityType: "subtraction_strategy",
           }),
-          makeActivity("partition_expand", 1, {
-            min: 100,
+          makeActivity("typed_response", 1, {
+            min: 120,
             max: 999,
-            mode: "expand",
+            mode: "split",
+            sourceActivityType: "subtraction_strategy",
           }),
-          makeActivity("multiple_choice", 1, {
-            min: 40,
-            max: 180,
-            mode: "friendly_numbers",
-            sourceActivityType: "addition_strategy",
+          makeActivity("typed_response", 1, {
+            min: 20,
+            max: 999,
+            mode: "split",
+            sourceActivityType: "subtraction_strategy",
           }),
         ],
         curriculum: ["ALL"],
@@ -507,26 +510,28 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         id: "y3-w5-l3",
         week: 5,
         lesson: 3,
-        title: "Column Subtraction",
-        focus: "Column subtraction with regrouping, estimate and check",
+        title: "Long Subtraction (With Regrouping)",
+        focus: "Continue long subtraction with regrouping using the written method",
         activityIdeas: lessonIdeas(
-          "Column subtraction with regrouping",
-          "Estimate first, solve, and evaluate reasonableness"
+          "Continue vertical subtraction with borrowing",
+          "Mix moderate and harder regrouping examples, including selected 3-digit subtraction"
         ),
         activities: [
-          makeActivity("subtraction_strategy", 2, {
-            min: 40,
-            max: 180,
+          makeActivity("typed_response", 2, {
+            min: 20,
+            max: 99,
             mode: "split",
-          }),
-          makeActivity("subtraction_strategy", 1, {
-            min: 40,
-            max: 180,
-            mode: "fact_strategy",
+            sourceActivityType: "subtraction_strategy",
           }),
           makeActivity("typed_response", 1, {
-            min: 40,
-            max: 180,
+            min: 140,
+            max: 999,
+            mode: "split",
+            sourceActivityType: "subtraction_strategy",
+          }),
+          makeActivity("typed_response", 1, {
+            min: 20,
+            max: 999,
             mode: "split",
             sourceActivityType: "subtraction_strategy",
           }),
