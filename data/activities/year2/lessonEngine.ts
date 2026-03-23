@@ -534,6 +534,13 @@ function isYear3Week5Lesson(
   return level === 3 && lesson.week === 5;
 }
 
+function isYear3Week6Lesson1WordProblems(
+  level: SupportedMathLevel,
+  lesson: Lesson
+): boolean {
+  return level === 3 && lesson.week === 6 && lesson.lesson === 1;
+}
+
 function toDigitCells(value: number, width: number): string[] {
   return String(value).padStart(width, " ").split("").map((digit) => (digit === " " ? "" : digit));
 }
@@ -697,6 +704,151 @@ function buildYear3Week5AdditionQuestion(config: GenericConfig): AdditionStrateg
     answer: a + b,
     options: uniqueNumberOptions(a + b, 18).map(Number),
     mode: "split",
+  };
+}
+
+function buildYear3Week6Lesson1WordProblem(
+  config: GenericConfig
+): MixedWordProblemQuestion {
+  const useStretch = randInt(0, 99) < 45;
+  const operation = randInt(0, 1) === 0 ? "+" : "-";
+
+  if (operation === "+") {
+    const additionPrompts = useStretch
+      ? [
+          () => {
+            const morning = randInt(120, 280);
+            const afternoon = randInt(130, 290);
+            return {
+              prompt: `A shop sold ${morning} apples in the morning and ${afternoon} in the afternoon. How many apples did they sell altogether?`,
+              answer: morning + afternoon,
+            };
+          },
+          () => {
+            const fiction = randInt(130, 260);
+            const nonfiction = randInt(120, 240);
+            return {
+              prompt: `A library counted ${fiction} fiction books and ${nonfiction} nonfiction books on a trolley. How many books were on the trolley altogether?`,
+              answer: fiction + nonfiction,
+            };
+          },
+          () => {
+            const friday = randInt(135, 260);
+            const saturday = randInt(140, 280);
+            return {
+              prompt: `A fundraiser collected ${friday} dollars on Friday and ${saturday} dollars on Saturday. How much money was collected in total?`,
+              answer: friday + saturday,
+            };
+          },
+        ]
+      : [
+          () => {
+            const classA = randInt(34, 68);
+            const classB = randInt(28, 59);
+            return {
+              prompt: `There are ${classA} students in one class and ${classB} in another. How many students are there altogether?`,
+              answer: classA + classB,
+            };
+          },
+          () => {
+            const red = randInt(26, 57);
+            const blue = randInt(24, 52);
+            return {
+              prompt: `A sports store sold ${red} red caps and ${blue} blue caps. How many caps did it sell altogether?`,
+              answer: red + blue,
+            };
+          },
+          () => {
+            const adults = randInt(32, 64);
+            const children = randInt(21, 48);
+            return {
+              prompt: `A museum tour had ${adults} adults and ${children} children. How many people were on the tour?`,
+              answer: adults + children,
+            };
+          },
+        ];
+    const chosen = additionPrompts[randInt(0, additionPrompts.length - 1)]?.() ?? {
+      prompt: "There are 48 students in one class and 36 in another. How many students are there altogether?",
+      answer: 84,
+    };
+    return {
+      kind: "mixed_word_problem",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      options: uniqueNumberOptions(chosen.answer, useStretch ? 24 : 14).map(Number),
+      operationLabel: "Choose the operation",
+      helper: "Read carefully first. Decide whether the quantities are being combined or something is being taken away.",
+      mode: "choose_operation",
+      showStrategyClue: false,
+    };
+  }
+
+  const subtractionPrompts = useStretch
+    ? [
+        () => {
+          const total = randInt(260, 420);
+          const sold = randInt(118, Math.min(238, total - 42));
+          return {
+            prompt: `There were ${total} tickets available. ${sold} were sold. How many tickets are left?`,
+            answer: total - sold,
+          };
+        },
+        () => {
+          const books = randInt(240, 430);
+          const donated = randInt(110, Math.min(215, books - 36));
+          return {
+            prompt: `A school had ${books} books in storage. ${donated} were moved into classrooms. How many books stayed in storage?`,
+            answer: books - donated,
+          };
+        },
+        () => {
+          const seats = randInt(280, 460);
+          const filled = randInt(135, Math.min(245, seats - 41));
+          return {
+            prompt: `A hall had ${seats} seats available. ${filled} were filled before the show started. How many seats were still empty?`,
+            answer: seats - filled,
+          };
+        },
+      ]
+    : [
+        () => {
+          const picked = randInt(58, 94);
+          const sold = randInt(21, Math.min(43, picked - 11));
+          return {
+            prompt: `A farmer picked ${picked} apples and sold ${sold}. How many apples are left?`,
+            answer: picked - sold,
+          };
+        },
+        () => {
+          const stickers = randInt(47, 83);
+          const used = randInt(19, Math.min(37, stickers - 9));
+          return {
+            prompt: `A class made ${stickers} stickers and used ${used} on their posters. How many stickers are left?`,
+            answer: stickers - used,
+          };
+        },
+        () => {
+          const coins = randInt(52, 88);
+          const spent = randInt(24, Math.min(41, coins - 8));
+          return {
+            prompt: `A student saved ${coins} coins and spent ${spent} at the canteen. How many coins are left?`,
+            answer: coins - spent,
+          };
+        },
+      ];
+  const chosen = subtractionPrompts[randInt(0, subtractionPrompts.length - 1)]?.() ?? {
+    prompt: "A farmer picked 73 apples and sold 28. How many apples are left?",
+    answer: 45,
+  };
+  return {
+    kind: "mixed_word_problem",
+    prompt: chosen.prompt,
+    answer: chosen.answer,
+    options: uniqueNumberOptions(chosen.answer, useStretch ? 24 : 14).map(Number),
+    operationLabel: "Choose the operation",
+    helper: "Read carefully first. Decide whether the problem is asking for the total or what remains.",
+    mode: "choose_operation",
+    showStrategyClue: false,
   };
 }
 
@@ -1524,6 +1676,22 @@ export function validateLessonActivityIntentForLevel(
     }
   }
 
+  if (isYear3Week6Lesson1WordProblems(level, lesson)) {
+    const isAlignedWordProblemActivity =
+      activity.activityType === "mixed_word_problem" ||
+      (activity.activityType === "typed_response" && sourceActivityType === "mixed_word_problem");
+
+    if (!isAlignedWordProblemActivity) {
+      addViolation(
+        violations,
+        "alignment",
+        lesson,
+        activity.activityType,
+        "Year 3 Week 6 Lesson 1 must only use medium/stretch word problems or typed-response wrappers sourced from them."
+      );
+    }
+  }
+
   if (question) {
     validateQuestionAgainstPolicy(lesson, activity, policy, question, profile, violations);
   }
@@ -1886,6 +2054,10 @@ function generateInteractiveQuestion(
   }
 
   if (activityType === "mixed_word_problem") {
+    if (isYear3Week6Lesson1WordProblems(level, lesson)) {
+      return buildYear3Week6Lesson1WordProblem(config);
+    }
+
     const min = typeof config.min === "number" ? config.min : 0;
     const max = typeof config.max === "number" ? config.max : profile.wordProblemMax;
     const mode =

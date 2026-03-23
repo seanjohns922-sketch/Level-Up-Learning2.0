@@ -550,27 +550,22 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         id: "y3-w6-l1",
         week: 6,
         lesson: 1,
-        title: "One-Step Problems",
-        focus: "Solve one-step problems with diagrams and equations",
+        title: "Choose the Operation",
+        focus: "Read word problems, decide the operation, then solve",
         activityIdeas: lessonIdeas(
-          "Represent one-step problems using diagrams and number sentences",
-          "Select operations and justify model choice"
+          "Read real-world addition and subtraction problems and choose the operation",
+          "Solve medium and slight-stretch word problems with clear justification"
         ),
         activities: [
           makeActivity("mixed_word_problem", 2, {
-            min: 20,
-            max: 160,
+            min: 40,
+            max: 320,
             mode: "choose_operation",
             operations: ["+", "-"],
           }),
-          makeActivity("addition_strategy", 1, {
-            min: 20,
-            max: 160,
-            mode: "jump",
-          }),
           makeActivity("typed_response", 1, {
-            min: 20,
-            max: 160,
+            min: 40,
+            max: 320,
             mode: "choose_operation",
             operations: ["+", "-"],
             sourceActivityType: "mixed_word_problem",
