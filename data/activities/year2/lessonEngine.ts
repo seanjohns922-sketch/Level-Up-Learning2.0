@@ -100,6 +100,8 @@ export type MixedWordProblemQuestion = {
   answer: number;
   options: number[];
   operationLabel: string;
+  correctOperation?: "+" | "-" | "x" | "/";
+  operationChoices?: Array<"+" | "-" | "x" | "/">;
   helper: string;
   mode: "choose_operation" | "two_step_add_sub" | "mult_div_problems";
   showStrategyClue?: boolean;
@@ -777,6 +779,8 @@ function buildYear3Week6Lesson1WordProblem(
       answer: chosen.answer,
       options: uniqueNumberOptions(chosen.answer, useStretch ? 24 : 14).map(Number),
       operationLabel: "Choose the operation",
+      correctOperation: "+",
+      operationChoices: ["+", "-"],
       helper: "Read carefully first. Decide whether the quantities are being combined or something is being taken away.",
       mode: "choose_operation",
       showStrategyClue: false,
@@ -846,6 +850,8 @@ function buildYear3Week6Lesson1WordProblem(
     answer: chosen.answer,
     options: uniqueNumberOptions(chosen.answer, useStretch ? 24 : 14).map(Number),
     operationLabel: "Choose the operation",
+    correctOperation: "-",
+    operationChoices: ["+", "-"],
     helper: "Read carefully first. Decide whether the problem is asking for the total or what remains.",
     mode: "choose_operation",
     showStrategyClue: false,
@@ -2135,6 +2141,8 @@ function generateInteractiveQuestion(
         answer,
         options: uniqueNumberOptions(answer, 8).map(Number),
         operationLabel: "Addition",
+        correctOperation: "+",
+        operationChoices: configuredOperations.length > 0 ? configuredOperations : ["+", "-", "x", "/"],
         helper: "Read the whole story first. Decide whether the amount is growing, shrinking, grouped, or shared.",
         mode,
         showStrategyClue: false,
@@ -2151,6 +2159,8 @@ function generateInteractiveQuestion(
         answer,
         options: uniqueNumberOptions(answer, 8).map(Number),
         operationLabel: "Subtraction",
+        correctOperation: "-",
+        operationChoices: configuredOperations.length > 0 ? configuredOperations : ["+", "-", "x", "/"],
         helper: "Read the whole story first. Decide whether the amount is growing, shrinking, grouped, or shared.",
         mode,
         showStrategyClue: false,
@@ -2169,6 +2179,8 @@ function generateInteractiveQuestion(
         answer,
         options: uniqueNumberOptions(answer, 8).map(Number),
         operationLabel: "Multiplication",
+        correctOperation: "x",
+        operationChoices: configuredOperations.length > 0 ? configuredOperations : ["+", "-", "x", "/"],
         helper: "Read the whole story first. Decide whether the amount is growing, shrinking, grouped, or shared.",
         mode,
         showStrategyClue: false,
@@ -2186,6 +2198,8 @@ function generateInteractiveQuestion(
       answer: groups,
       options: uniqueNumberOptions(groups, 4).map(Number),
       operationLabel: "Division",
+      correctOperation: "/",
+      operationChoices: configuredOperations.length > 0 ? configuredOperations : ["+", "-", "x", "/"],
       helper: "Read the whole story first. Decide whether the amount is growing, shrinking, grouped, or shared.",
       mode,
       showStrategyClue: false,

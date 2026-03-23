@@ -13,9 +13,29 @@ export default function MixedWordProblem({
   onCorrect?: () => void;
   onWrong?: () => void;
 }) {
+  const needsOperationChoice =
+    questionData.mode === "choose_operation" &&
+    !!questionData.correctOperation &&
+    !!questionData.operationChoices?.length;
   const [picked, setPicked] = useState<number | null>(null);
+  const [pickedOperation, setPickedOperation] = useState<string | null>(null);
+  const [operationReady, setOperationReady] = useState(!needsOperationChoice);
+  const [operationFeedback, setOperationFeedback] = useState("");
+
+  function chooseOperation(operation: string) {
+    setPickedOperation(operation);
+    if (operation === questionData.correctOperation) {
+      setOperationReady(true);
+      setOperationFeedback("");
+      return;
+    }
+
+    setOperationReady(false);
+    setOperationFeedback("Try again. Read the story carefully and decide whether it is combining or taking away.");
+  }
 
   function choose(option: number) {
+    if (!operationReady) return;
     setPicked(option);
     if (option === questionData.answer) onCorrect?.();
     else onWrong?.();
@@ -45,6 +65,47 @@ export default function MixedWordProblem({
         </div>
       ) : null}
 
+      {needsOperationChoice ? (
+        <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">
+          <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
+            Choose the operation
+          </div>
+          <p className="mt-2 text-sm text-slate-600">
+            Decide whether this story needs addition or subtraction before solving.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-3">
+            {questionData.operationChoices?.map((operation) => {
+              const label =
+                operation === "+"
+                  ? "Addition"
+                  : operation === "-"
+                  ? "Subtraction"
+                  : operation === "x"
+                  ? "Multiplication"
+                  : "Division";
+              return (
+                <button
+                  key={operation}
+                  type="button"
+                  onClick={() => chooseOperation(operation)}
+                  className={[
+                    "rounded-2xl border px-5 py-3 text-left text-lg font-black transition",
+                    pickedOperation === operation
+                      ? "border-teal-300 bg-white text-teal-900"
+                      : "border-gray-200 bg-white text-gray-900 hover:bg-gray-50",
+                  ].join(" ")}
+                >
+                  {operation} {label}
+                </button>
+              );
+            })}
+          </div>
+          {operationFeedback ? (
+            <p className="mt-3 text-sm font-bold text-rose-600">{operationFeedback}</p>
+          ) : null}
+        </div>
+      ) : null}
+
       <div className="mt-6 grid gap-3">
         {questionData.options.map((option) => (
           <button
@@ -56,7 +117,9 @@ export default function MixedWordProblem({
               picked === option
                 ? "border-teal-300 bg-teal-50 text-teal-900"
                 : "border-gray-200 bg-white text-gray-900 hover:bg-gray-50",
+              !operationReady ? "cursor-not-allowed opacity-50" : "",
             ].join(" ")}
+            disabled={!operationReady}
           >
             {option}
           </button>
