@@ -26,7 +26,9 @@ export default function TypedResponseActivity({
   onWrong?: () => void;
 }) {
   const writtenMethod = questionData.writtenMethod;
+  const isGuidedAddition = writtenMethod?.operation === "+";
   const isGuidedSubtraction = writtenMethod?.operation === "-";
+  const isGuidedWrittenMethod = isGuidedAddition || isGuidedSubtraction;
   const [typed, setTyped] = useState("");
   const [digitInputs, setDigitInputs] = useState<string[]>(
     writtenMethod
@@ -43,16 +45,26 @@ export default function TypedResponseActivity({
       ? Array.from({ length: writtenMethod.answerLength }, () => "")
       : []
   );
+  const [carryDisplay, setCarryDisplay] = useState<string[]>(
+    isGuidedAddition && writtenMethod
+      ? Array.from({ length: writtenMethod.answerLength }, () => "")
+      : []
+  );
+  const [carryValues, setCarryValues] = useState<number[]>(
+    isGuidedAddition && writtenMethod
+      ? Array.from({ length: writtenMethod.answerLength }, () => 0)
+      : []
+  );
   const [crossedDigits, setCrossedDigits] = useState<boolean[]>(
     isGuidedSubtraction && writtenMethod
       ? Array.from({ length: writtenMethod.answerLength }, () => false)
       : []
   );
   const [currentColumn, setCurrentColumn] = useState(
-    isGuidedSubtraction && writtenMethod ? writtenMethod.answerLength - 1 : -1
+    isGuidedWrittenMethod && writtenMethod ? writtenMethod.answerLength - 1 : -1
   );
   const [guidedPhase, setGuidedPhase] = useState<"decide" | "input" | "done">(
-    isGuidedSubtraction && writtenMethod ? "decide" : "done"
+    isGuidedWrittenMethod && writtenMethod ? "decide" : "done"
   );
   const [guidedFeedback, setGuidedFeedback] = useState("");
 
@@ -73,13 +85,23 @@ export default function TypedResponseActivity({
         ? Array.from({ length: writtenMethod.answerLength }, () => "")
         : []
     );
+    setCarryDisplay(
+      isGuidedAddition && writtenMethod
+        ? Array.from({ length: writtenMethod.answerLength }, () => "")
+        : []
+    );
+    setCarryValues(
+      isGuidedAddition && writtenMethod
+        ? Array.from({ length: writtenMethod.answerLength }, () => 0)
+        : []
+    );
     setCrossedDigits(
       isGuidedSubtraction && writtenMethod
         ? Array.from({ length: writtenMethod.answerLength }, () => false)
         : []
     );
-    setCurrentColumn(isGuidedSubtraction && writtenMethod ? writtenMethod.answerLength - 1 : -1);
-    setGuidedPhase(isGuidedSubtraction && writtenMethod ? "decide" : "done");
+    setCurrentColumn(isGuidedWrittenMethod && writtenMethod ? writtenMethod.answerLength - 1 : -1);
+    setGuidedPhase(isGuidedWrittenMethod && writtenMethod ? "decide" : "done");
     setGuidedFeedback("");
   }, [questionData, writtenMethod]);
 
@@ -159,8 +181,75 @@ export default function TypedResponseActivity({
     setGuidedPhase("input");
   }
 
+  function handleCarryChoice(choice: "carry" | "no_carry") {
+    if (!writtenMethod || currentColumn < 0) return;
+    const topDigits = writtenMethod.top.map((digit) => Number(digit || 0));
+    const bottomDigits = writtenMethod.bottom.map((digit) => Number(digit || 0));
+    const columnSum =
+      topDigits[currentColumn] + bottomDigits[currentColumn] + (carryValues[currentColumn] ?? 0);
+    const needsCarry = columnSum >= 10;
+
+    if ((choice === "carry") !== needsCarry) {
+      const leftExpression = carryValues[currentColumn]
+        ? `${carryValues[currentColumn]} + ${topDigits[currentColumn]} + ${bottomDigits[currentColumn]}`
+        : `${topDigits[currentColumn]} + ${bottomDigits[currentColumn]}`;
+      setGuidedFeedback(
+        needsCarry
+          ? `${leftExpression} makes ${columnSum}, so you need to carry.`
+          : `${leftExpression} makes ${columnSum}, so no carry is needed.`
+      );
+      onWrong?.();
+      return;
+    }
+
+    if (needsCarry) {
+      const nextCarryDisplay = [...carryDisplay];
+      const nextCarryValues = [...carryValues];
+      if (currentColumn > 0) {
+        nextCarryDisplay[currentColumn - 1] = "1";
+        nextCarryValues[currentColumn - 1] = (nextCarryValues[currentColumn - 1] ?? 0) + 1;
+      }
+      setCarryDisplay(nextCarryDisplay);
+      setCarryValues(nextCarryValues);
+      setGuidedFeedback("Good. The carry now appears above the next column.");
+    } else {
+      setGuidedFeedback("Good. No carry is needed for this column.");
+    }
+
+    setGuidedPhase("input");
+  }
+
   function checkGuidedDigit() {
     if (!writtenMethod || currentColumn < 0) return;
+    if (isGuidedAddition) {
+      const topDigits = writtenMethod.top.map((digit) => Number(digit || 0));
+      const bottomDigits = writtenMethod.bottom.map((digit) => Number(digit || 0));
+      const expectedDigit =
+        (topDigits[currentColumn] + bottomDigits[currentColumn] + (carryValues[currentColumn] ?? 0)) % 10;
+      const typedDigit = digitInputs[currentColumn];
+
+      if (typedDigit !== String(expectedDigit)) {
+        setGuidedFeedback(`Try the ${columnLabel(writtenMethod.placeValueLabels[currentColumn] ?? "")} column again.`);
+        onWrong?.();
+        return;
+      }
+
+      const nextInputs = [...digitInputs];
+      nextInputs[currentColumn] = String(expectedDigit);
+      setDigitInputs(nextInputs);
+      setGuidedFeedback("");
+
+      if (currentColumn === 0) {
+        setGuidedPhase("done");
+        onCorrect?.();
+        return;
+      }
+
+      setCurrentColumn(currentColumn - 1);
+      setGuidedPhase("decide");
+      return;
+    }
+
     const bottomDigits = writtenMethod.bottom.map((digit) => Number(digit || 0));
     const expectedDigit = workingTopDigits[currentColumn] - bottomDigits[currentColumn];
     const typedDigit = digitInputs[currentColumn];
@@ -221,7 +310,16 @@ export default function TypedResponseActivity({
                 </div>
               ))}
             </div>
-            {writtenMethod.carryRow ? (
+            {isGuidedAddition && carryDisplay.some(Boolean) ? (
+              <div className="mb-1 grid w-fit grid-flow-col gap-2">
+                <div className="w-8" />
+                {carryDisplay.map((digit, index) => (
+                  <div key={`carry-${index}`} className="flex h-8 w-12 items-center justify-center text-sm font-black text-amber-600">
+                    {digit}
+                  </div>
+                ))}
+              </div>
+            ) : writtenMethod.carryRow ? (
               <div className="mb-1 grid w-fit grid-flow-col gap-2">
                 <div className="w-8" />
                 {writtenMethod.carryRow.map((digit, index) => (
@@ -257,7 +355,7 @@ export default function TypedResponseActivity({
                   key={`top-${index}`}
                   className={[
                     "relative flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100 text-2xl font-black",
-                    currentColumn === index && isGuidedSubtraction
+                    currentColumn === index && isGuidedWrittenMethod
                       ? "ring-2 ring-teal-400"
                       : "",
                     (isGuidedSubtraction ? crossedDigits[index] : writtenMethod.crossedTop?.[index])
@@ -283,7 +381,7 @@ export default function TypedResponseActivity({
                   key={`bottom-${index}`}
                   className={[
                     "flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100 text-2xl font-black text-slate-900",
-                    currentColumn === index && isGuidedSubtraction ? "ring-2 ring-teal-400" : "",
+                    currentColumn === index && isGuidedWrittenMethod ? "ring-2 ring-teal-400" : "",
                   ].join(" ")}
                 >
                   {digit || ""}
@@ -299,7 +397,7 @@ export default function TypedResponseActivity({
                   value={digit}
                   inputMode="numeric"
                   maxLength={1}
-                  disabled={isGuidedSubtraction ? index !== currentColumn || guidedPhase !== "input" : false}
+                  disabled={isGuidedWrittenMethod ? index !== currentColumn || guidedPhase !== "input" : false}
                   onChange={(event) => {
                     const nextValue = event.target.value.replace(/[^0-9]/g, "").slice(-1);
                     setDigitInputs((current) =>
@@ -310,8 +408,8 @@ export default function TypedResponseActivity({
                   }}
                   className={[
                     "h-12 w-12 rounded-lg border border-teal-300 bg-white text-center text-2xl font-black text-slate-900 outline-none focus:border-teal-500",
-                    isGuidedSubtraction && index === currentColumn ? "ring-2 ring-teal-400" : "",
-                    isGuidedSubtraction && (index !== currentColumn || guidedPhase !== "input")
+                    isGuidedWrittenMethod && index === currentColumn ? "ring-2 ring-teal-400" : "",
+                    isGuidedWrittenMethod && (index !== currentColumn || guidedPhase !== "input")
                       ? "bg-slate-50 text-slate-500"
                       : "",
                   ].join(" ")}
@@ -319,7 +417,7 @@ export default function TypedResponseActivity({
               ))}
             </div>
           </div>
-          {isGuidedSubtraction && currentColumn >= 0 ? (
+          {isGuidedWrittenMethod && currentColumn >= 0 ? (
             <div className="mt-4 rounded-xl bg-white p-4 shadow-sm">
               <div className="text-sm font-black text-slate-900">
                 Work on the {columnLabel(writtenMethod.placeValueLabels[currentColumn] ?? "")} column first.
@@ -327,23 +425,50 @@ export default function TypedResponseActivity({
               {guidedPhase === "decide" ? (
                 <>
                   <p className="mt-2 text-sm text-slate-600">
-                    Can you do {workingTopDigits[currentColumn]} - {Number(writtenMethod.bottom[currentColumn] || 0)}?
+                    {isGuidedAddition
+                      ? `Do you need to carry for ${
+                          (carryValues[currentColumn] ?? 0)
+                            ? `${carryValues[currentColumn]} + ${Number(writtenMethod.top[currentColumn] || 0)} + ${Number(writtenMethod.bottom[currentColumn] || 0)}`
+                            : `${Number(writtenMethod.top[currentColumn] || 0)} + ${Number(writtenMethod.bottom[currentColumn] || 0)}`
+                        }?`
+                      : `Can you do ${workingTopDigits[currentColumn]} - ${Number(writtenMethod.bottom[currentColumn] || 0)}?`}
                   </p>
                   <div className="mt-3 flex flex-wrap gap-3">
-                    <button
-                      type="button"
-                      onClick={() => handleRegroupChoice("no_regroup")}
-                      className="rounded-xl border border-slate-300 bg-white px-4 py-2 font-black text-slate-900 hover:bg-slate-50"
-                    >
-                      No regroup needed
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleRegroupChoice("regroup")}
-                      className="rounded-xl bg-amber-500 px-4 py-2 font-black text-white hover:bg-amber-600"
-                    >
-                      Regroup
-                    </button>
+                    {isGuidedAddition ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => handleCarryChoice("no_carry")}
+                          className="rounded-xl border border-slate-300 bg-white px-4 py-2 font-black text-slate-900 hover:bg-slate-50"
+                        >
+                          No carry needed
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleCarryChoice("carry")}
+                          className="rounded-xl bg-amber-500 px-4 py-2 font-black text-white hover:bg-amber-600"
+                        >
+                          Carry
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => handleRegroupChoice("no_regroup")}
+                          className="rounded-xl border border-slate-300 bg-white px-4 py-2 font-black text-slate-900 hover:bg-slate-50"
+                        >
+                          No regroup needed
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleRegroupChoice("regroup")}
+                          className="rounded-xl bg-amber-500 px-4 py-2 font-black text-white hover:bg-amber-600"
+                        >
+                          Regroup
+                        </button>
+                      </>
+                    )}
                   </div>
                 </>
               ) : guidedPhase === "input" ? (
@@ -392,7 +517,7 @@ export default function TypedResponseActivity({
         </div>
       )}
 
-      {writtenMethod && !isGuidedSubtraction ? (
+      {writtenMethod && !isGuidedWrittenMethod ? (
         <button
           type="button"
           onClick={check}

@@ -628,8 +628,9 @@ function buildWrittenMethodLayout(
   };
 }
 
-function generateRegroupingAdditionOperands(config: GenericConfig): { a: number; b: number } {
+function generateLongAdditionOperands(config: GenericConfig): { a: number; b: number } {
   const configuredMax = typeof config.max === "number" ? config.max : 999;
+  const requireCarry = randInt(0, 99) < 55;
   const useThreeDigits = configuredMax >= 100 && randInt(0, 99) < 45;
 
   if (useThreeDigits) {
@@ -638,7 +639,8 @@ function generateRegroupingAdditionOperands(config: GenericConfig): { a: number;
       const b = randInt(110, Math.min(299, configuredMax));
       const onesCarry = (a % 10) + (b % 10) >= 10;
       const tensCarry = (Math.floor((a % 100) / 10) + Math.floor((b % 100) / 10)) >= 10;
-      if (onesCarry || tensCarry) {
+      const hasCarry = onesCarry || tensCarry;
+      if (hasCarry === requireCarry) {
         return { a, b };
       }
     }
@@ -646,8 +648,9 @@ function generateRegroupingAdditionOperands(config: GenericConfig): { a: number;
 
   while (true) {
     const a = randInt(24, 78);
-    const b = randInt(16, 69);
-    if ((a % 10) + (b % 10) >= 10) {
+    const b = randInt(11, 69);
+    const hasCarry = (a % 10) + (b % 10) >= 10;
+    if (hasCarry === requireCarry) {
       return { a, b };
     }
   }
@@ -684,7 +687,7 @@ function generateRegroupingSubtractionOperands(
 }
 
 function buildYear3Week5AdditionQuestion(config: GenericConfig): AdditionStrategyQuestion {
-  const { a, b } = generateRegroupingAdditionOperands(config);
+  const { a, b } = generateLongAdditionOperands(config);
   return {
     kind: "addition_strategy",
     prompt: `Complete the long addition for ${a} + ${b}.`,
