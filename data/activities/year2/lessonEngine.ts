@@ -536,11 +536,11 @@ function isYear3Week5Lesson(
   return level === 3 && lesson.week === 5;
 }
 
-function isYear3Week6Lesson1WordProblems(
+function isYear3Week6TwoStepOnly(
   level: SupportedMathLevel,
   lesson: Lesson
 ): boolean {
-  return level === 3 && lesson.week === 6 && lesson.lesson === 1;
+  return level === 3 && lesson.week === 6;
 }
 
 function toDigitCells(value: number, width: number): string[] {
@@ -709,151 +709,197 @@ function buildYear3Week5AdditionQuestion(config: GenericConfig): AdditionStrateg
   };
 }
 
-function buildYear3Week6Lesson1WordProblem(
-  config: GenericConfig
+function buildYear3Week6TwoStepWordProblem(
+  lesson: Lesson
 ): MixedWordProblemQuestion {
-  const useStretch = randInt(0, 99) < 45;
-  const operation = randInt(0, 1) === 0 ? "+" : "-";
+  if (lesson.lesson === 2) {
+    const addThenSubtract = randInt(0, 1) === 0;
 
-  if (operation === "+") {
-    const additionPrompts = useStretch
+    const structuredPrompts = addThenSubtract
       ? [
           () => {
-            const morning = randInt(120, 280);
-            const afternoon = randInt(130, 290);
+            const start = randInt(180, 360);
+            const add = randInt(36, 78);
+            const remove = randInt(24, 58);
             return {
-              prompt: `A shop sold ${morning} apples in the morning and ${afternoon} in the afternoon. How many apples did they sell altogether?`,
-              answer: morning + afternoon,
+              prompt: `A shop had ${start} apples. They received ${add} more in the morning, then sold ${remove} in the afternoon. How many apples do they have now?`,
+              answer: start + add - remove,
             };
           },
           () => {
-            const fiction = randInt(130, 260);
-            const nonfiction = randInt(120, 240);
+            const start = randInt(210, 390);
+            const add = randInt(42, 84);
+            const remove = randInt(25, 47);
             return {
-              prompt: `A library counted ${fiction} fiction books and ${nonfiction} nonfiction books on a trolley. How many books were on the trolley altogether?`,
-              answer: fiction + nonfiction,
+              prompt: `A school collected ${start} cans for charity. They collected ${add} more the next day, but ${remove} were damaged and thrown away. How many cans are left?`,
+              answer: start + add - remove,
             };
           },
           () => {
-            const friday = randInt(135, 260);
-            const saturday = randInt(140, 280);
+            const start = randInt(260, 540);
+            const add = randInt(34, 76);
+            const remove = randInt(22, 54);
             return {
-              prompt: `A fundraiser collected ${friday} dollars on Friday and ${saturday} dollars on Saturday. How much money was collected in total?`,
-              answer: friday + saturday,
+              prompt: `A library had ${start} books. ${add} new books were added, and then ${remove} old books were removed. How many books are in the library now?`,
+              answer: start + add - remove,
             };
           },
         ]
       : [
           () => {
-            const classA = randInt(34, 68);
-            const classB = randInt(28, 59);
+            const start = randInt(220, 460);
+            const remove = randInt(48, 96);
+            const add = randInt(34, 74);
             return {
-              prompt: `There are ${classA} students in one class and ${classB} in another. How many students are there altogether?`,
-              answer: classA + classB,
+              prompt: `A farmer had ${start} eggs. He sold ${remove} at the market, then collected ${add} more from his chickens. How many eggs does he have now?`,
+              answer: start - remove + add,
             };
           },
           () => {
-            const red = randInt(26, 57);
-            const blue = randInt(24, 52);
+            const start = randInt(240, 520);
+            const remove = randInt(56, 104);
+            const add = randInt(28, 68);
             return {
-              prompt: `A sports store sold ${red} red caps and ${blue} blue caps. How many caps did it sell altogether?`,
-              answer: red + blue,
+              prompt: `A library had ${start} books. ${remove} were borrowed, and then ${add} new books were added. How many books are in the library now?`,
+              answer: start - remove + add,
             };
           },
           () => {
-            const adults = randInt(32, 64);
-            const children = randInt(21, 48);
+            const start = randInt(180, 380);
+            const remove = randInt(39, 82);
+            const add = randInt(24, 63);
             return {
-              prompt: `A museum tour had ${adults} adults and ${children} children. How many people were on the tour?`,
-              answer: adults + children,
+              prompt: `A class had ${start} craft sticks. They used ${remove} for a project, then found ${add} more in a cupboard. How many craft sticks do they have now?`,
+              answer: start - remove + add,
             };
           },
         ];
-    const chosen = additionPrompts[randInt(0, additionPrompts.length - 1)]?.() ?? {
-      prompt: "There are 48 students in one class and 36 in another. How many students are there altogether?",
-      answer: 84,
+
+    const chosen = structuredPrompts[randInt(0, structuredPrompts.length - 1)]?.() ?? {
+      prompt: "A shop had 186 apples. They received 48 more in the morning, then sold 36 in the afternoon. How many apples do they have now?",
+      answer: 198,
     };
+
     return {
       kind: "mixed_word_problem",
       prompt: chosen.prompt,
       answer: chosen.answer,
-      options: uniqueNumberOptions(chosen.answer, useStretch ? 24 : 14).map(Number),
-      operationLabel: "Choose the operation",
-      correctOperation: "+",
-      operationChoices: ["+", "-"],
-      helper: "Read carefully first. Decide whether the quantities are being combined or something is being taken away.",
-      mode: "choose_operation",
+      options: uniqueNumberOptions(chosen.answer, 28).map(Number),
+      operationLabel: "Two-step problem",
+      helper: "Start with the first amount, track the change, then apply the second change in the correct order.",
+      mode: "two_step_add_sub",
       showStrategyClue: false,
     };
   }
 
-  const subtractionPrompts = useStretch
-    ? [
-        () => {
-          const total = randInt(260, 420);
-          const sold = randInt(118, Math.min(238, total - 42));
-          return {
-            prompt: `There were ${total} tickets available. ${sold} were sold. How many tickets are left?`,
-            answer: total - sold,
-          };
-        },
-        () => {
-          const books = randInt(240, 430);
-          const donated = randInt(110, Math.min(215, books - 36));
-          return {
-            prompt: `A school had ${books} books in storage. ${donated} were moved into classrooms. How many books stayed in storage?`,
-            answer: books - donated,
-          };
-        },
-        () => {
-          const seats = randInt(280, 460);
-          const filled = randInt(135, Math.min(245, seats - 41));
-          return {
-            prompt: `A hall had ${seats} seats available. ${filled} were filled before the show started. How many seats were still empty?`,
-            answer: seats - filled,
-          };
-        },
-      ]
-    : [
-        () => {
-          const picked = randInt(58, 94);
-          const sold = randInt(21, Math.min(43, picked - 11));
-          return {
-            prompt: `A farmer picked ${picked} apples and sold ${sold}. How many apples are left?`,
-            answer: picked - sold,
-          };
-        },
-        () => {
-          const stickers = randInt(47, 83);
-          const used = randInt(19, Math.min(37, stickers - 9));
-          return {
-            prompt: `A class made ${stickers} stickers and used ${used} on their posters. How many stickers are left?`,
-            answer: stickers - used,
-          };
-        },
-        () => {
-          const coins = randInt(52, 88);
-          const spent = randInt(24, Math.min(41, coins - 8));
-          return {
-            prompt: `A student saved ${coins} coins and spent ${spent} at the canteen. How many coins are left?`,
-            answer: coins - spent,
-          };
-        },
-      ];
-  const chosen = subtractionPrompts[randInt(0, subtractionPrompts.length - 1)]?.() ?? {
-    prompt: "A farmer picked 73 apples and sold 28. How many apples are left?",
-    answer: 45,
+  const useStretch = randInt(0, 99) < 70;
+  const templateType = randInt(0, 3);
+
+  const addAdd = () => {
+    if (useStretch) {
+      const year3 = randInt(120, 230);
+      const year4 = randInt(135, 240);
+      const newStudents = randInt(24, 58);
+      const answer = year3 + year4 + newStudents;
+      return {
+        prompt: `A school has ${year3} students in Year 3 and ${year4} in Year 4. Then ${newStudents} new students join. How many students are there now?`,
+        answer,
+      };
+    }
+    const classA = randInt(42, 78);
+    const classB = randInt(36, 72);
+    const helpers = randInt(12, 28);
+    const answer = classA + classB + helpers;
+    return {
+      prompt: `A sports day team has ${classA} runners from one class and ${classB} from another. Then ${helpers} helpers join the team. How many people are there altogether?`,
+      answer,
+    };
   };
+
+  const addSub = () => {
+    if (useStretch) {
+      const total = randInt(320, 540);
+      const morning = randInt(118, 210);
+      const afternoon = randInt(62, 145);
+      const answer = total - (morning + afternoon);
+      return {
+        prompt: `There were ${total} tickets available. ${morning} were sold in the morning and ${afternoon} in the afternoon. How many tickets are left?`,
+        answer,
+      };
+    }
+    const total = randInt(120, 210);
+    const red = randInt(26, 58);
+    const blue = randInt(19, 44);
+    const answer = total - (red + blue);
+    return {
+      prompt: `A shop had ${total} balloons. It sold ${red} red balloons and ${blue} blue balloons. How many balloons are left?`,
+      answer,
+    };
+  };
+
+  const subAdd = () => {
+    if (useStretch) {
+      const start = randInt(360, 560);
+      const sold = randInt(128, 235);
+      const picked = randInt(65, 150);
+      const answer = start - sold + picked;
+      return {
+        prompt: `A farmer had ${start} apples. He sold ${sold}, then picked ${picked} more. How many apples does he have now?`,
+        answer,
+      };
+    }
+    const start = randInt(130, 220);
+    const used = randInt(38, 84);
+    const found = randInt(16, 42);
+    const answer = start - used + found;
+    return {
+      prompt: `A class had ${start} pencils. They used ${used}, then found ${found} more in a cupboard. How many pencils do they have now?`,
+      answer,
+    };
+  };
+
+  const subSub = () => {
+    if (useStretch) {
+      const start = randInt(420, 620);
+      const first = randInt(115, 188);
+      const second = randInt(72, 145);
+      const answer = start - first - second;
+      return {
+        prompt: `There were ${start} books in a library. ${first} were borrowed in the morning, and then ${second} more were borrowed later. How many books are left?`,
+        answer,
+      };
+    }
+    const start = randInt(150, 240);
+    const morning = randInt(32, 67);
+    const afternoon = randInt(18, 46);
+    const answer = start - morning - afternoon;
+    return {
+      prompt: `A canteen made ${start} sandwiches. It sold ${morning} at recess and ${afternoon} at lunch. How many sandwiches are left?`,
+      answer,
+    };
+  };
+
+  const chosen =
+    [addAdd, addSub, subAdd, subSub][templateType]?.() ?? {
+      prompt: "There were 320 tickets available. 185 were sold in the morning and 74 in the afternoon. How many tickets are left?",
+      answer: 61,
+    };
+
+  const helper =
+    lesson.lesson === 1
+      ? "Work out what happens first, then decide the second operation before solving."
+      : lesson.lesson === 2
+      ? "This problem takes 2 steps. Plan the order carefully before you calculate."
+      : "Estimate first, then solve both steps and check whether your answer makes sense.";
+
   return {
     kind: "mixed_word_problem",
     prompt: chosen.prompt,
     answer: chosen.answer,
-    options: uniqueNumberOptions(chosen.answer, useStretch ? 24 : 14).map(Number),
-    operationLabel: "Choose the operation",
-    correctOperation: "-",
-    operationChoices: ["+", "-"],
-    helper: "Read carefully first. Decide whether the problem is asking for the total or what remains.",
-    mode: "choose_operation",
+    options: uniqueNumberOptions(chosen.answer, useStretch ? 32 : 18).map(Number),
+    operationLabel: "Two-step problem",
+    helper,
+    mode: "two_step_add_sub",
     showStrategyClue: false,
   };
 }
@@ -1682,10 +1728,8 @@ export function validateLessonActivityIntentForLevel(
     }
   }
 
-  if (isYear3Week6Lesson1WordProblems(level, lesson)) {
-    const isAlignedWordProblemActivity =
-      activity.activityType === "mixed_word_problem" ||
-      (activity.activityType === "typed_response" && sourceActivityType === "mixed_word_problem");
+  if (isYear3Week6TwoStepOnly(level, lesson)) {
+    const isAlignedWordProblemActivity = activity.activityType === "mixed_word_problem";
 
     if (!isAlignedWordProblemActivity) {
       addViolation(
@@ -1693,7 +1737,7 @@ export function validateLessonActivityIntentForLevel(
         "alignment",
         lesson,
         activity.activityType,
-        "Year 3 Week 6 Lesson 1 must only use medium/stretch word problems or typed-response wrappers sourced from them."
+        "Year 3 Week 6 must only use 2-step mixed word problems."
       );
     }
   }
@@ -2060,8 +2104,8 @@ function generateInteractiveQuestion(
   }
 
   if (activityType === "mixed_word_problem") {
-    if (isYear3Week6Lesson1WordProblems(level, lesson)) {
-      return buildYear3Week6Lesson1WordProblem(config);
+    if (isYear3Week6TwoStepOnly(level, lesson)) {
+      return buildYear3Week6TwoStepWordProblem(lesson);
     }
 
     const min = typeof config.min === "number" ? config.min : 0;

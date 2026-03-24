@@ -558,17 +558,22 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         ),
         activities: [
           makeActivity("mixed_word_problem", 2, {
-            min: 40,
-            max: 320,
-            mode: "choose_operation",
+            min: 120,
+            max: 420,
+            mode: "two_step_add_sub",
             operations: ["+", "-"],
           }),
-          makeActivity("typed_response", 1, {
-            min: 40,
-            max: 320,
-            mode: "choose_operation",
+          makeActivity("mixed_word_problem", 1, {
+            min: 60,
+            max: 220,
+            mode: "two_step_add_sub",
             operations: ["+", "-"],
-            sourceActivityType: "mixed_word_problem",
+          }),
+          makeActivity("mixed_word_problem", 1, {
+            min: 120,
+            max: 420,
+            mode: "two_step_add_sub",
+            operations: ["+", "-"],
           }),
         ],
         curriculum: ["ALL"],
@@ -578,29 +583,29 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         week: 6,
         lesson: 2,
         title: "Two-Step Problems",
-        focus: "Solve multi-step problems combining operations",
+        focus: "Plan and solve 2-step word problems in the correct order",
         activityIdeas: lessonIdeas(
-          "Plan and solve two-step problems",
-          "Explain sequence of operations and decisions"
+          "Work out which operation happens first and which happens second",
+          "Solve 2-step addition and subtraction problems with clear planning"
         ),
         activities: [
           makeActivity("mixed_word_problem", 2, {
-            min: 20,
-            max: 170,
+            min: 150,
+            max: 500,
             mode: "two_step_add_sub",
             operations: ["+", "-"],
           }),
-          makeActivity("subtraction_strategy", 1, {
-            min: 20,
-            max: 170,
-            mode: "jump",
-          }),
-          makeActivity("multiple_choice", 1, {
-            min: 20,
-            max: 170,
+          makeActivity("mixed_word_problem", 1, {
+            min: 150,
+            max: 500,
             mode: "two_step_add_sub",
             operations: ["+", "-"],
-            sourceActivityType: "mixed_word_problem",
+          }),
+          makeActivity("mixed_word_problem", 1, {
+            min: 150,
+            max: 500,
+            mode: "two_step_add_sub",
+            operations: ["+", "-"],
           }),
         ],
         curriculum: ["ALL"],
@@ -610,30 +615,29 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         week: 6,
         lesson: 3,
         title: "Estimation & Reasoning",
-        focus: "Estimate before solving and evaluate reasonableness",
+        focus: "Estimate, then solve 2-step word problems and check reasonableness",
         activityIdeas: lessonIdeas(
-          "Estimate outcomes before exact calculation",
-          "Check whether final answers make sense in context"
+          "Estimate the result before solving both steps",
+          "Check whether the final answer makes sense in context"
         ),
         activities: [
           makeActivity("mixed_word_problem", 2, {
-            min: 20,
-            max: 170,
-            mode: "choose_operation",
-            operations: ["+", "-", "x", "/"],
+            min: 120,
+            max: 500,
+            mode: "two_step_add_sub",
+            operations: ["+", "-"],
           }),
-          makeActivity("number_line", 1, {
-            min: 0,
-            max: 1000,
-            step: 100,
-            mode: "estimate",
+          makeActivity("mixed_word_problem", 1, {
+            min: 80,
+            max: 260,
+            mode: "two_step_add_sub",
+            operations: ["+", "-"],
           }),
-          makeActivity("typed_response", 1, {
-            min: 20,
-            max: 170,
-            mode: "choose_operation",
-            operations: ["+", "-", "x", "/"],
-            sourceActivityType: "mixed_word_problem",
+          makeActivity("mixed_word_problem", 1, {
+            min: 120,
+            max: 500,
+            mode: "two_step_add_sub",
+            operations: ["+", "-"],
           }),
         ],
         curriculum: ["ALL"],
