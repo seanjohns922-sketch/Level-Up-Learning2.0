@@ -8,7 +8,7 @@ import { supabase } from "@/lib/supabase";
 import { getProgramForYear } from "@/data/programs";
 import PostTestTransition from "@/components/PostTestTransition";
 import {
-  buildQuizActivityPool,
+  buildLessonActivityPool,
   generateQuestionForLevelLessonActivity,
   getLevelForLesson,
   type MultipleChoiceQuestion as Year2MultipleChoiceQuestion,
@@ -18,6 +18,7 @@ import {
   type Year2PolicyViolation,
   type Year2QuestionData,
 } from "@/data/activities/year2/lessonEngine";
+import { LessonRenderer } from "@/components/lesson/LessonRenderer";
 import NumberLineTap from "@/components/NumberLineTap";
 import NumberLineJump from "@/components/NumberLineJump";
 import NumberChartFill from "@/components/NumberChartFill";
@@ -119,8 +120,11 @@ function setQuizScore(store: ProgramProgressStore, year: string, week: string, s
 type QuizQuestion = {
   id: string;
   lessonNumber?: number;
+  lessonTag?: 1 | 2 | 3;
   skill?: string;
+  activityType?: LessonActivity["activityType"];
   kind:
+    | "lessonActivity"
     | "mcq"
     | "typed"
     | "audio"
@@ -192,6 +196,8 @@ type QuizQuestion = {
     cost: number;
     answer: "YES" | "NO";
   };
+  activity?: LessonActivity;
+  questionData?: Year2QuestionData;
 };
 
 type LessonBreakdown = {
@@ -260,21 +266,98 @@ function buildAlternativePartition(question: Year2PartitionExpandQuestion) {
   };
 }
 
-function buildYear2QuizSources(lesson: Lesson): LessonActivity[] {
+function buildStructuredQuizSources(lesson: Lesson): LessonActivity[] {
   const level = getLevelForLesson(lesson);
-  const { activities, violations } = buildQuizActivityPool(level, lesson, {
-    allowGenericFallback: false,
-  });
+  const { activities, violations } = buildLessonActivityPool(level, lesson);
   if (violations.length > 0) {
     const summary = violations
       .map((violation: Year2PolicyViolation) => `${violation.reason}: ${violation.message}`)
       .join(" | ");
     if (process.env.NODE_ENV !== "production") {
-      throw new Error(`[Year2QuizPolicy] ${lesson.title}: ${summary}`);
+      throw new Error(`[StructuredQuizPolicy] ${lesson.title}: ${summary}`);
     }
-    console.error(`[Year2QuizPolicy] ${lesson.title}: ${summary}`);
+    console.error(`[StructuredQuizPolicy] ${lesson.title}: ${summary}`);
   }
   return activities;
+}
+
+function validateStructuredWeeklyQuizQuestions(
+  weekPlan: WeekPlan,
+  questions: QuizQuestion[],
+  questionsPerLesson: number
+) {
+  const expectedTotal = questionsPerLesson * 3;
+  const counts = new Map<number, number>();
+
+  for (const question of questions) {
+    const lessonNumber = question.lessonNumber ?? 0;
+    counts.set(lessonNumber, (counts.get(lessonNumber) ?? 0) + 1);
+  }
+
+  const issues: string[] = [];
+  if (questions.length !== expectedTotal) {
+    issues.push(`Expected ${expectedTotal} quiz questions, received ${questions.length}.`);
+  }
+
+  for (const lessonNumber of [1, 2, 3] as const) {
+    const count = counts.get(lessonNumber) ?? 0;
+    if (count !== questionsPerLesson) {
+      issues.push(`Lesson ${lessonNumber} expected ${questionsPerLesson} questions, received ${count}.`);
+    }
+  }
+
+  if (questions.some((question) => (question.lessonNumber ?? 0) < 1 || (question.lessonNumber ?? 0) > 3)) {
+    issues.push(`Quiz contains questions outside lessons 1-3 for week ${weekPlan.week}.`);
+  }
+
+  if (issues.length > 0) {
+    const message = `[StructuredWeeklyQuiz] Week ${weekPlan.week}: ${issues.join(" | ")}`;
+    if (process.env.NODE_ENV !== "production") {
+      throw new Error(message);
+    }
+    console.error(message);
+  }
+}
+
+function buildStructuredWeeklyQuizQuestions(
+  weekPlan: WeekPlan,
+  questionsPerLesson: number
+): QuizQuestion[] {
+  const questions: QuizQuestion[] = [];
+
+  weekPlan.lessons.slice(0, 3).forEach((lesson, lessonIndex) => {
+    const lessonNumber = (lessonIndex + 1) as 1 | 2 | 3;
+    const level = getLevelForLesson(lesson);
+    const sourceActivities = buildStructuredQuizSources(lesson);
+
+    if (!sourceActivities.length) {
+      const message = `[StructuredWeeklyQuiz] ${lesson.id}: no validated lesson activities available for quiz generation.`;
+      if (process.env.NODE_ENV !== "production") {
+        throw new Error(message);
+      }
+      console.error(message);
+      return;
+    }
+
+    for (let i = 0; i < questionsPerLesson; i += 1) {
+      const sourceActivity = sourceActivities[i % sourceActivities.length];
+      const questionData = generateQuestionForLevelLessonActivity(level, lesson, sourceActivity);
+      questions.push({
+        id: `q${questions.length + 1}`,
+        lessonNumber,
+        lessonTag: lessonNumber,
+        skill: sourceActivity.activityType,
+        activityType: sourceActivity.activityType,
+        kind: "lessonActivity",
+        prompt: questionData.prompt,
+        activity: sourceActivity,
+        questionData,
+      });
+    }
+  });
+
+  validateStructuredWeeklyQuizQuestions(weekPlan, questions, questionsPerLesson);
+  return questions;
 }
 
 function toQuizQuestionFromYear2Data(
@@ -660,30 +743,7 @@ function buildYear2WeeklyQuizQuestions(
   weekPlan: WeekPlan,
   questionsPerLesson: number
 ): QuizQuestion[] {
-  const questions: QuizQuestion[] = [];
-
-  weekPlan.lessons.slice(0, 3).forEach((lesson, lessonIndex) => {
-    const level = getLevelForLesson(lesson);
-    const sourceActivities = buildYear2QuizSources(lesson);
-    if (!sourceActivities.length) return;
-
-    for (let i = 0; i < questionsPerLesson; i += 1) {
-      const sourceActivity = sourceActivities[i % sourceActivities.length];
-      const question = generateQuestionForLevelLessonActivity(level, lesson, sourceActivity);
-      const quizQuestion = toQuizQuestionFromYear2Data(
-        question,
-        lessonIndex + 1,
-        sourceActivity.activityType,
-        questions.length + 1,
-        i
-      );
-      if (quizQuestion) {
-        questions.push(quizQuestion);
-      }
-    }
-  });
-
-  return questions;
+  return buildStructuredWeeklyQuizQuestions(weekPlan, questionsPerLesson);
 }
 
 function isQuizQuestionCorrect(
@@ -693,8 +753,12 @@ function isQuizQuestionCorrect(
   quizLineAnswers: Record<string, number>,
   quizChartDone: Record<string, boolean>,
   quizMabAnswers: Record<string, { tens: number; ones: number; touched: boolean }>,
-  quizMoneyAnswers: Record<string, { attempted: boolean; correct: boolean }>
+  quizMoneyAnswers: Record<string, { attempted: boolean; correct: boolean }>,
+  quizLessonActivityResults: Record<string, { attempted: boolean; correct: boolean }>
 ) {
+  if (q.kind === "lessonActivity") {
+    return quizLessonActivityResults[q.id]?.correct === true;
+  }
   if (q.kind === "typed") {
     return isTypedAnswerCorrect(quizTyped[q.id] ?? "", q.correctValue);
   }
@@ -726,6 +790,7 @@ function buildLessonBreakdown(
   quizChartDone: Record<string, boolean>,
   quizMabAnswers: Record<string, { tens: number; ones: number; touched: boolean }>,
   quizMoneyAnswers: Record<string, { attempted: boolean; correct: boolean }>,
+  quizLessonActivityResults: Record<string, { attempted: boolean; correct: boolean }>,
   questionsPerLesson: number
 ): LessonBreakdown[] {
   const breakdown = new Map<number, LessonBreakdown>();
@@ -747,7 +812,8 @@ function buildLessonBreakdown(
       quizLineAnswers,
       quizChartDone,
       quizMabAnswers,
-      quizMoneyAnswers
+      quizMoneyAnswers,
+      quizLessonActivityResults
     )) {
       current.correct += 1;
     }
@@ -2315,12 +2381,12 @@ function SessionPage() {
   function buildQuizQuestions() {
     const qConfig = quizConfig;
     const questionsPerLesson = qConfig?.questionsPerLesson ?? 5;
-    if (year === "Year 2") {
+    if (year === "Year 2" || year === "Year 3") {
       const weekPlan = getProgramForYear(year).find(
         (plan) => plan.week === Number(week)
       );
       if (weekPlan) {
-        return buildYear2WeeklyQuizQuestions(weekPlan, questionsPerLesson);
+        return buildStructuredWeeklyQuizQuestions(weekPlan, questionsPerLesson);
       }
     }
 
@@ -2564,6 +2630,9 @@ function SessionPage() {
   const [quizMoneyAnswers, setQuizMoneyAnswers] = useState<
     Record<string, { attempted: boolean; correct: boolean }>
   >({});
+  const [quizLessonActivityResults, setQuizLessonActivityResults] = useState<
+    Record<string, { attempted: boolean; correct: boolean }>
+  >({});
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [finalScore, setFinalScore] = useState(0);
   const [quizIndex, setQuizIndex] = useState(0);
@@ -2580,6 +2649,7 @@ function SessionPage() {
     setQuizChartDone({});
     setQuizMabAnswers({});
     setQuizMoneyAnswers({});
+    setQuizLessonActivityResults({});
     setQuizGroupTaps({});
     setQuizSubmitted(false);
     setFinalScore(0);
@@ -2594,6 +2664,7 @@ function SessionPage() {
   }
 
   const quizComplete = quizQuestions.every((q) => {
+    if (q.kind === "lessonActivity") return quizLessonActivityResults[q.id]?.attempted === true;
     if (q.kind === "typed") return (quizTyped[q.id] ?? "").trim().length > 0;
     if (q.kind === "numberLineTap" || q.kind === "numberLineJump") {
       return typeof quizLineAnswers[q.id] === "number";
@@ -2615,7 +2686,8 @@ function SessionPage() {
         quizLineAnswers,
         quizChartDone,
         quizMabAnswers,
-        quizMoneyAnswers
+        quizMoneyAnswers,
+        quizLessonActivityResults
       ) ? 1 : 0);
     }, 0);
   }, [
@@ -2626,6 +2698,7 @@ function SessionPage() {
     quizChartDone,
     quizMabAnswers,
     quizMoneyAnswers,
+    quizLessonActivityResults,
   ]);
   const lessonBreakdown = useMemo(
     () =>
@@ -2637,6 +2710,7 @@ function SessionPage() {
         quizChartDone,
         quizMabAnswers,
         quizMoneyAnswers,
+        quizLessonActivityResults,
         quizConfig?.questionsPerLesson ?? 5
       ),
     [
@@ -2646,6 +2720,7 @@ function SessionPage() {
       quizLineAnswers,
       quizMabAnswers,
       quizMoneyAnswers,
+      quizLessonActivityResults,
       quizQuestions,
       quizTyped,
     ]
@@ -2757,7 +2832,9 @@ function SessionPage() {
     }
   }, [currentQuiz, isTapSkipQuiz, quizGroupTaps]);
   const currentAnswered =
-    currentQuiz?.kind === "typed"
+    currentQuiz?.kind === "lessonActivity"
+      ? quizLessonActivityResults[currentQuiz.id]?.attempted === true
+      : currentQuiz?.kind === "typed"
       ? (quizTyped[currentQuiz.id] ?? "").trim().length > 0
       : currentQuiz?.kind === "numberLineTap" ||
         currentQuiz?.kind === "numberLineJump"
@@ -2888,7 +2965,12 @@ function SessionPage() {
                   {!isMoneyQuiz ? (
                     <div className="flex items-start justify-between gap-3 mb-2">
                       <div className="font-semibold text-foreground">
-                        {currentQuiz?.prompt}
+                        {process.env.NODE_ENV !== "production" && currentQuiz?.lessonTag ? (
+                          <div className="mb-1 text-xs font-black uppercase tracking-wide text-teal-700">
+                            [L{currentQuiz.lessonTag}]
+                          </div>
+                        ) : null}
+                        {currentQuiz?.kind === "lessonActivity" ? null : currentQuiz?.prompt}
                       </div>
                       <button
                         type="button"
@@ -2977,6 +3059,36 @@ function SessionPage() {
                         }))
                       }
                     />
+                  ) : null}
+
+                  {currentQuiz?.kind === "lessonActivity" && currentQuiz.activity && currentQuiz.questionData ? (
+                    <div className={quizLessonActivityResults[currentQuiz.id]?.attempted ? "pointer-events-none opacity-80" : ""}>
+                      <LessonRenderer
+                        activity={currentQuiz.activity}
+                        prompt={currentQuiz.prompt}
+                        questionData={currentQuiz.questionData}
+                        onCorrect={() =>
+                          setQuizLessonActivityResults((prev) =>
+                            prev[currentQuiz.id]
+                              ? prev
+                              : {
+                                  ...prev,
+                                  [currentQuiz.id]: { attempted: true, correct: true },
+                                }
+                          )
+                        }
+                        onWrong={() =>
+                          setQuizLessonActivityResults((prev) =>
+                            prev[currentQuiz.id]
+                              ? prev
+                              : {
+                                  ...prev,
+                                  [currentQuiz.id]: { attempted: true, correct: false },
+                                }
+                          )
+                        }
+                      />
+                    </div>
                   ) : null}
 
                   {currentQuiz?.visual?.type === "dots" ? (
