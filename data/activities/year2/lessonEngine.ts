@@ -492,6 +492,7 @@ const LEVEL_ACTIVITY_POLICY: Record<SupportedMathLevel, Record<ActivityType, Act
 };
 
 const LEVEL2_WEEK8_TO_10_FACTORS = [2, 5, 10] as const;
+const LEVEL3_MULT_DIV_FACTORS = [2, 3, 4, 5, 10] as const;
 
 function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -510,6 +511,10 @@ function getRestrictedFactors(
   level: SupportedMathLevel,
   week: number
 ): number[] | null {
+  if (level === 3 && (week === 7 || week === 8 || week === 10)) {
+    return [...LEVEL3_MULT_DIV_FACTORS];
+  }
+
   return level === 2 && week >= 8 && week <= 10
     ? [...LEVEL2_WEEK8_TO_10_FACTORS]
     : null;

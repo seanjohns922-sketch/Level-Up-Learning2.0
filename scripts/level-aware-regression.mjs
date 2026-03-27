@@ -86,6 +86,7 @@ const {
 const { getPretestForLevel, getPosttestForLevel } = assessments;
 
 const findings = [];
+const YEAR3_ALLOWED_FACTORS = new Set([2, 3, 4, 5, 10]);
 
 function addFinding(scope, issue) {
   findings.push(`${scope} | ${issue}`);
@@ -123,6 +124,59 @@ function checkLesson(programLabel, lesson) {
       }
     } catch (error) {
       addFinding(`${programLabel} ${lesson.id} generate`, error instanceof Error ? error.message : String(error));
+    }
+  }
+}
+
+function checkYear3MultiplicativeRestriction(lesson) {
+  const level = getLevelForLesson(lesson);
+  const lessonPool = buildLessonActivityPool(level, lesson);
+  for (const activity of lessonPool.activities) {
+    let question;
+    try {
+      question = generateQuestion(level, lesson, activity);
+    } catch (error) {
+      addFinding(`Year 3 ${lesson.id} factor_check`, error instanceof Error ? error.message : String(error));
+      continue;
+    }
+
+    if (question.kind === "equal_groups") {
+      if (!YEAR3_ALLOWED_FACTORS.has(question.groups) || !YEAR3_ALLOWED_FACTORS.has(question.itemsPerGroup)) {
+        addFinding(`Year 3 ${lesson.id} factor_check`, `equal_groups used ${question.groups} groups of ${question.itemsPerGroup}.`);
+      }
+    }
+
+    if (question.kind === "arrays") {
+      if (!YEAR3_ALLOWED_FACTORS.has(question.rows) || !YEAR3_ALLOWED_FACTORS.has(question.columns)) {
+        addFinding(`Year 3 ${lesson.id} factor_check`, `arrays used ${question.rows} x ${question.columns}.`);
+      }
+    }
+
+    if (question.kind === "division_groups") {
+      if (!YEAR3_ALLOWED_FACTORS.has(question.groups) || !YEAR3_ALLOWED_FACTORS.has(question.groupSize)) {
+        addFinding(`Year 3 ${lesson.id} factor_check`, `division_groups used ${question.groups} groups of ${question.groupSize}.`);
+      }
+    }
+
+    if (question.kind === "fact_family") {
+      if (!YEAR3_ALLOWED_FACTORS.has(question.family[0]) || !YEAR3_ALLOWED_FACTORS.has(question.family[1])) {
+        addFinding(`Year 3 ${lesson.id} factor_check`, `fact_family used ${question.family[0]} and ${question.family[1]}.`);
+      }
+    }
+
+    if (question.kind === "skip_count") {
+      if (!YEAR3_ALLOWED_FACTORS.has(question.step)) {
+        addFinding(`Year 3 ${lesson.id} factor_check`, `skip_count used step ${question.step}.`);
+      }
+    }
+
+    if (question.kind === "mixed_word_problem") {
+      const smallNumbers = (question.prompt.match(/\b\d+\b/g) ?? [])
+        .map(Number)
+        .filter((value) => value > 1 && value <= 10);
+      if (smallNumbers.some((value) => !YEAR3_ALLOWED_FACTORS.has(value))) {
+        addFinding(`Year 3 ${lesson.id} factor_check`, `mixed_word_problem prompt used restricted factor outside set: ${question.prompt}`);
+      }
     }
   }
 }
@@ -214,6 +268,18 @@ if (!year3Week6?.lessons?.length) {
 } else {
   for (const lesson of year3Week6.lessons) {
     checkLesson("Year 3", lesson);
+  }
+}
+
+for (const week of [7, 8, 10]) {
+  const weekPlan = YEAR3_PROGRAM.find((item) => item.week === week);
+  if (!weekPlan?.lessons?.length) {
+    addFinding(`Year 3 W${week}`, "Missing multiplicative lessons for regression target.");
+    continue;
+  }
+  for (const lesson of weekPlan.lessons) {
+    checkLesson("Year 3", lesson);
+    checkYear3MultiplicativeRestriction(lesson);
   }
 }
 
