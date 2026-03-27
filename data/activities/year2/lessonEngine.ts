@@ -548,6 +548,13 @@ function isYear3Week6TwoStepOnly(
   return level === 3 && lesson.week === 6;
 }
 
+function isYear3Week8(
+  level: SupportedMathLevel,
+  lesson: Lesson
+): boolean {
+  return level === 3 && lesson.week === 8;
+}
+
 function toDigitCells(value: number, width: number): string[] {
   return String(value).padStart(width, " ").split("").map((digit) => (digit === " " ? "" : digit));
 }
@@ -905,6 +912,79 @@ function buildYear3Week6TwoStepWordProblem(
     operationLabel: "Two-step problem",
     helper,
     mode: "two_step_add_sub",
+    showStrategyClue: false,
+  };
+}
+
+function buildYear3Week8MixedWordProblem(
+  lesson: Lesson
+): MixedWordProblemQuestion {
+  const weightedFactors = [3, 4, 3, 4, 2, 5, 10];
+  const factorA = weightedFactors[randInt(0, weightedFactors.length - 1)] ?? 3;
+  const factorB = weightedFactors[randInt(0, weightedFactors.length - 1)] ?? 4;
+
+  if (lesson.lesson === 3 && randInt(0, 99) < 40) {
+    if (randInt(0, 1) === 0) {
+      const groups = factorA;
+      const inEach = factorB + randInt(1, 3);
+      const extraEach = randInt(1, 3);
+      const answer = groups * inEach + groups * extraEach;
+      return {
+        kind: "mixed_word_problem",
+        prompt: `${groups * inEach} apples are shared into ${groups} groups. Then ${extraEach} more apples are added to each group. How many apples are there altogether now?`,
+        answer,
+        options: uniqueNumberOptions(answer, 12).map(Number),
+        operationLabel: "Two-step multiplication/division",
+        helper: "First work out how many are in each group, then apply the second change.",
+        mode: "mult_div_problems",
+        showStrategyClue: false,
+      };
+    }
+
+    const groups = factorA;
+    const inEach = factorB + randInt(1, 2);
+    const total = groups * inEach;
+    const extraGroups = randInt(1, 3);
+    const answer = total + extraGroups * inEach;
+    return {
+      kind: "mixed_word_problem",
+      prompt: `There are ${groups} bags with ${inEach} apples in each bag. Then ${extraGroups} more bags are added with the same number of apples. How many apples are there altogether?`,
+      answer,
+      options: uniqueNumberOptions(answer, 12).map(Number),
+      operationLabel: "Two-step multiplication/division",
+      helper: "Work out the first total, then add the amount from the extra bags.",
+      mode: "mult_div_problems",
+      showStrategyClue: false,
+    };
+  }
+
+  if (randInt(0, 1) === 0) {
+    const groups = factorA;
+    const perGroup = factorB;
+    const answer = groups * perGroup;
+    return {
+      kind: "mixed_word_problem",
+      prompt: `There are ${groups} bags with ${perGroup} apples in each bag. How many apples are there altogether?`,
+      answer,
+      options: uniqueNumberOptions(answer, 8).map(Number),
+      operationLabel: "Multiply",
+      helper: "Think about equal groups. Which multiplication fact matches the story?",
+      mode: "mult_div_problems",
+      showStrategyClue: false,
+    };
+  }
+
+  const groups = factorA;
+  const perGroup = factorB;
+  const total = groups * perGroup;
+  return {
+    kind: "mixed_word_problem",
+    prompt: `${total} apples are shared into ${groups} equal groups. How many apples are in each group?`,
+    answer: perGroup,
+    options: uniqueNumberOptions(perGroup, 6).map(Number),
+    operationLabel: "Divide",
+    helper: "Use the related multiplication fact to help you divide.",
+    mode: "mult_div_problems",
     showStrategyClue: false,
   };
 }
@@ -2112,6 +2192,9 @@ function generateInteractiveQuestion(
     if (isYear3Week6TwoStepOnly(level, lesson)) {
       return buildYear3Week6TwoStepWordProblem(lesson);
     }
+    if (isYear3Week8(level, lesson) && lesson.lesson === 3) {
+      return buildYear3Week8MixedWordProblem(lesson);
+    }
 
     const min = typeof config.min === "number" ? config.min : 0;
     const max = typeof config.max === "number" ? config.max : profile.wordProblemMax;
@@ -3020,6 +3103,33 @@ function generateGenericQuestion(
   }
 
   if (sourceActivityType === "fact_family") {
+    const restrictedFactors = getRestrictedFactors(level, lesson.week);
+    if (restrictedFactors && isYear3Week8(level, lesson)) {
+      const a = restrictedFactors[randInt(0, restrictedFactors.length - 1)] ?? 2;
+      const b = restrictedFactors[randInt(0, restrictedFactors.length - 1)] ?? 2;
+      const total = a * b;
+      const askDivision = randInt(0, 1) === 0;
+      const answer = askDivision ? String(b) : String(a);
+      return asMultipleChoice
+        ? {
+            kind: "multiple_choice",
+            prompt: askDivision
+              ? `${total} ÷ ${a} = ?`
+              : `${b} × ? = ${total}`,
+            options: shuffle([answer, String(total), String(a + 1), String(Math.max(2, b - 1))]),
+            answer,
+          }
+        : {
+            kind: "typed_response",
+            prompt: askDivision
+              ? `${total} ÷ ${a} = ?`
+              : `${b} × ? = ${total}`,
+            answer,
+            helper: "Use the related multiplication and division facts to find the missing number.",
+            placeholder: "Type the missing number",
+          };
+    }
+
     const configuredMin = typeof config.min === "number" ? Math.max(0, config.min) : 0;
     const configuredMax =
       typeof config.max === "number"

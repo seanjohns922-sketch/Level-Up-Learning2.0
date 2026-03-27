@@ -766,31 +766,27 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         id: "y3-w8-l1",
         week: 8,
         lesson: 1,
-        title: "2s, 5s, 10s Fluency",
-        focus: "Skip count and recall multiplication facts",
+        title: "Division with 2s, 3s, 4s, 5s & 10s",
+        focus: "Use sharing, grouping, and fact families to solve division facts",
         activityIdeas: lessonIdeas(
-          "Fluent recall of 2s, 5s, and 10s",
-          "Apply fact recall in quick-response tasks"
+          "Solve division using sharing and grouping models",
+          "Connect division facts to related multiplication facts and fact families"
         ),
         activities: [
-          makeActivity("skip_count", 2, {
-            min: 0,
-            max: 200,
-            step: 10,
-            mode: "forward",
+          makeActivity("division_groups", 2, {
+            minTotal: 12,
+            maxTotal: 60,
+            mode: "sharing",
           }),
-          makeActivity("skip_count", 1, {
-            min: 0,
-            max: 200,
-            step: 5,
-            mode: "forward",
+          makeActivity("division_groups", 1, {
+            minTotal: 12,
+            maxTotal: 60,
+            mode: "grouping",
           }),
-          makeActivity("typed_response", 1, {
-            min: 0,
-            max: 200,
-            step: 2,
-            mode: "forward",
-            sourceActivityType: "skip_count",
+          makeActivity("fact_family", 1, {
+            min: 12,
+            max: 60,
+            mode: "write_sentences",
           }),
         ],
         curriculum: ["ALL"],
@@ -799,34 +795,28 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         id: "y3-w8-l2",
         week: 8,
         lesson: 2,
-        title: "Apply Facts",
-        focus: "Apply multiplication facts to simple problems",
+        title: "Apply Multiplication & Division Facts (2–5, 10)",
+        focus: "Use inverse relationships and missing numbers to apply multiplication and division facts",
         activityIdeas: lessonIdeas(
-          "Use known facts to solve one-step multiplication problems",
-          "Transfer fact recall into word problems"
+          "Switch between multiplication and division using the same fact set",
+          "Use missing-number and inverse questions to apply 2, 3, 4, 5, and 10 facts"
         ),
         activities: [
-          makeActivity("equal_groups", 2, {
-            minGroups: 2,
-            maxGroups: 9,
-            minItemsPerGroup: 2,
-            maxItemsPerGroup: 10,
-            mode: "equal_groups",
+          makeActivity("fact_family", 2, {
+            min: 12,
+            max: 60,
+            mode: "recognise",
           }),
-          makeActivity("arrays", 1, {
-            minRows: 2,
-            maxRows: 9,
-            minColumns: 2,
-            maxColumns: 10,
-            mode: "arrays",
+          makeActivity("division_groups", 1, {
+            minTotal: 12,
+            maxTotal: 60,
+            mode: "inverse_link",
           }),
-          makeActivity("multiple_choice", 1, {
-            minGroups: 2,
-            maxGroups: 9,
-            minItemsPerGroup: 2,
-            maxItemsPerGroup: 10,
-            mode: "equal_groups",
-            sourceActivityType: "equal_groups",
+          makeActivity("typed_response", 1, {
+            min: 12,
+            max: 60,
+            mode: "recognise",
+            sourceActivityType: "fact_family",
           }),
         ],
         curriculum: ["ALL"],
@@ -838,24 +828,24 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         title: "Mixed Practice",
         focus: "Mixed multiplication and division practice",
         activityIdeas: lessonIdeas(
-          "Mix multiplication and division fact practice",
-          "Select operation and justify answer"
+          "Mix multiplication and division fact practice with strong 3s and 4s coverage",
+          "Use fact knowledge in mixed reasoning and simple 2-step problems"
         ),
         activities: [
           makeActivity("mixed_word_problem", 2, {
             min: 20,
-            max: 180,
+            max: 200,
             mode: "mult_div_problems",
             operations: ["x", "/"],
           }),
-          makeActivity("division_groups", 1, {
-            minTotal: 12,
-            maxTotal: 60,
-            mode: "grouping",
+          makeActivity("fact_family", 1, {
+            min: 12,
+            max: 60,
+            mode: "word_problems",
           }),
-          makeActivity("multiple_choice", 1, {
+          makeActivity("typed_response", 1, {
             min: 20,
-            max: 180,
+            max: 200,
             mode: "mult_div_problems",
             operations: ["x", "/"],
             sourceActivityType: "mixed_word_problem",
