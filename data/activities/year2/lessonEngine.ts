@@ -152,6 +152,7 @@ export type FactFamilyQuestion = {
   options: string[];
   answers: string[];
   mode: "recognise" | "write_sentences" | "word_problems";
+  familyType?: "add_sub" | "mult_div";
   visual?: {
     type: "array";
     rows: number;
@@ -2399,7 +2400,11 @@ function generateInteractiveQuestion(
 
     if (restrictedFactors) {
       const a = restrictedFactors[randInt(0, restrictedFactors.length - 1)] ?? 2;
-      const b = restrictedFactors[randInt(0, restrictedFactors.length - 1)] ?? 2;
+      const distinctFactors = restrictedFactors.filter((factor) => factor !== a);
+      const b =
+        (distinctFactors.length > 0
+          ? distinctFactors[randInt(0, distinctFactors.length - 1)]
+          : restrictedFactors[randInt(0, restrictedFactors.length - 1)]) ?? 2;
       const total = a * b;
       const family: [number, number, number] = [a, b, total];
       const allCorrect = [
@@ -2418,6 +2423,7 @@ function generateInteractiveQuestion(
           options: [],
           answers: correctSet,
           mode,
+          familyType: "mult_div",
           visual: { type: "array", rows: a, columns: b },
         };
       }
@@ -2449,6 +2455,7 @@ function generateInteractiveQuestion(
           options,
           answers: [chosen.answer],
           mode,
+          familyType: "mult_div",
           visual: { type: "array", rows: a, columns: b },
         };
       }
@@ -2468,6 +2475,7 @@ function generateInteractiveQuestion(
         options,
         answers: pickedCorrect,
         mode,
+        familyType: "mult_div",
         visual: { type: "array", rows: a, columns: b },
       };
     }
@@ -2503,6 +2511,7 @@ function generateInteractiveQuestion(
         options: [],
         answers: correctSet,
         mode,
+        familyType: "add_sub",
       };
     }
 
@@ -2546,6 +2555,7 @@ function generateInteractiveQuestion(
         options,
         answers: [chosen.answer],
         mode,
+        familyType: "add_sub",
       };
     }
 
@@ -2568,6 +2578,7 @@ function generateInteractiveQuestion(
       options,
       answers: pickedCorrect,
       mode,
+      familyType: "add_sub",
     };
   }
 

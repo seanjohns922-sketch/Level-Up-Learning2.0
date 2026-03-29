@@ -171,10 +171,26 @@ function checkYear3MultiplicativeRestriction(lesson) {
     }
 
     if (question.kind === "mixed_word_problem") {
-      const smallNumbers = (question.prompt.match(/\b\d+\b/g) ?? [])
-        .map(Number)
-        .filter((value) => value > 1 && value <= 10);
-      if (smallNumbers.some((value) => !YEAR3_ALLOWED_FACTORS.has(value))) {
+      const factorCandidates = new Set();
+      const prompt = question.prompt;
+      const groupedMatches = [
+        ...prompt.matchAll(/\b(\d+)\s+bags\s+with\s+(\d+)\b/gi),
+        ...prompt.matchAll(/\b(\d+)\s+rows\s+with\s+(\d+)\b/gi),
+        ...prompt.matchAll(/\binto\s+(\d+)\s+(?:equal\s+)?groups\b/gi),
+        ...prompt.matchAll(/\bgroups\s+of\s+(\d+)\b/gi),
+      ];
+
+      for (const match of groupedMatches) {
+        for (const value of match.slice(1)) {
+          if (!value) continue;
+          const parsed = Number(value);
+          if (parsed > 1 && parsed <= 10) {
+            factorCandidates.add(parsed);
+          }
+        }
+      }
+
+      if ([...factorCandidates].some((value) => !YEAR3_ALLOWED_FACTORS.has(value))) {
         addFinding(`Year 3 ${lesson.id} factor_check`, `mixed_word_problem prompt used restricted factor outside set: ${question.prompt}`);
       }
     }

@@ -5,7 +5,12 @@ import type { FactFamilyQuestion } from "@/data/activities/year2/lessonEngine";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 function normalize(s: string) {
-  return s.replace(/\s+/g, "").toLowerCase();
+  return s
+    .replace(/\s+/g, "")
+    .replace(/\*/g, "×")
+    .replace(/x/gi, "×")
+    .replace(/\//g, "÷")
+    .toLowerCase();
 }
 
 export default function FactFamilyWrite({
@@ -22,13 +27,13 @@ export default function FactFamilyWrite({
   const [results, setResults] = useState<boolean[]>([]);
 
   const [a, b, total] = questionData.family;
+  const familyType =
+    questionData.familyType ??
+    (questionData.answers.some((answer) => answer.includes("×") || answer.includes("÷"))
+      ? "mult_div"
+      : "add_sub");
 
-  const correctSentences = [
-    `${a}+${b}=${total}`,
-    `${b}+${a}=${total}`,
-    `${total}-${a}=${b}`,
-    `${total}-${b}=${a}`,
-  ];
+  const correctSentences = questionData.answers.map(normalize);
 
   function updateInput(index: number, value: string) {
     if (submitted) return;
@@ -62,8 +67,23 @@ export default function FactFamilyWrite({
     else onWrong?.();
   }
 
-  const labels = ["Addition 1", "Addition 2", "Subtraction 1", "Subtraction 2"];
+  const labels =
+    familyType === "mult_div"
+      ? ["Multiplication 1", "Multiplication 2", "Division 1", "Division 2"]
+      : ["Addition 1", "Addition 2", "Subtraction 1", "Subtraction 2"];
   const allFilled = inputs.every((v) => v.trim().length > 0);
+  const helperText =
+    familyType === "mult_div"
+      ? "Write 2 multiplication and 2 division sentences using these numbers."
+      : "Write 2 addition and 2 subtraction sentences using these numbers.";
+  const readAloudText =
+    familyType === "mult_div"
+      ? "Write 4 number sentences for this multiplication and division fact family"
+      : "Write 4 number sentences for this fact family";
+  const inputPlaceholders =
+    familyType === "mult_div"
+      ? ["e.g. 3 × 4 = 12", "e.g. 4 × 3 = 12", "e.g. 12 ÷ 3 = 4", "e.g. 12 ÷ 4 = 3"]
+      : ["e.g. 5 + 13 = 18", "e.g. 13 + 5 = 18", "e.g. 18 - 5 = 13", "e.g. 18 - 13 = 5"];
 
   return (
     <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -73,12 +93,14 @@ export default function FactFamilyWrite({
         </div>
         <div className="flex items-center gap-2 mt-2">
           <h2 className="text-2xl font-black text-gray-900">
-            Write 4 number sentences for this fact family
+            {familyType === "mult_div"
+              ? "Write 4 number sentences for this multiplication and division fact family"
+              : "Write 4 number sentences for this fact family"}
           </h2>
-          <ReadAloudBtn text="Write 4 number sentences for this fact family" />
+          <ReadAloudBtn text={readAloudText} />
         </div>
         <p className="text-sm text-gray-500 mt-1">
-          Write 2 addition and 2 subtraction sentences using these numbers.
+          {helperText}
         </p>
       </div>
 
@@ -114,13 +136,13 @@ export default function FactFamilyWrite({
               <input
                 value={inputs[i]}
                 onChange={(e) => updateInput(i, e.target.value)}
-                placeholder={i < 2 ? "e.g. 5 + 13 = 18" : "e.g. 18 - 5 = 13"}
+                placeholder={inputPlaceholders[i]}
                 disabled={submitted}
                 className={`mt-1 w-full rounded-xl border px-4 py-3 text-lg font-bold text-gray-900 outline-none focus:border-teal-500 ${borderCls}`}
               />
               {submitted && !isCorrect && (
                 <p className="mt-1 text-sm text-red-600">
-                  Try: {correctSentences[i].replace(/([+\-=])/g, " $1 ")}
+                  Try: {questionData.answers[i]?.replace(/([+\-×÷=])/g, " $1 ")}
                 </p>
               )}
             </div>
