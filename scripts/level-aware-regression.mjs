@@ -276,6 +276,50 @@ function checkYear3Week9SkipCounting(lesson) {
   }
 }
 
+function checkYear3Week9Lesson3Estimation(lesson) {
+  const numberLineActivities = lesson.activities.filter((activity) => activity.activityType === "number_line");
+  const numberLineWrappers = lesson.activities.filter(
+    (activity) => activity.config?.sourceActivityType === "number_line"
+  );
+
+  if (numberLineActivities.length !== 1) {
+    addFinding(`Year 3 ${lesson.id} estimation`, `Expected exactly 1 rounding activity, found ${numberLineActivities.length}.`);
+  }
+  if (numberLineWrappers.length > 0) {
+    addFinding(`Year 3 ${lesson.id} estimation`, "Lesson should not include number_line wrappers beyond the single rounding activity.");
+  }
+
+  const level = getLevelForLesson(lesson);
+  const lessonPool = buildLessonActivityPool(level, lesson);
+  for (const activity of lessonPool.activities) {
+    let question;
+    try {
+      question = generateQuestion(level, lesson, activity);
+    } catch (error) {
+      addFinding(`Year 3 ${lesson.id} estimation`, error instanceof Error ? error.message : String(error));
+      continue;
+    }
+
+    if (activity.activityType === "number_line") {
+      if (question.kind !== "number_line" || question.mode !== "rounding") {
+        addFinding(`Year 3 ${lesson.id} estimation`, "The single number_line activity must stay as a rounding question.");
+      }
+      continue;
+    }
+
+    const isEstimationWrapper =
+      question.kind === "multiple_choice" && activity.config?.sourceActivityType === "mixed_word_problem";
+    if (question.kind !== "mixed_word_problem" && !isEstimationWrapper) {
+      addFinding(`Year 3 ${lesson.id} estimation`, `Expected estimation word problems after rounding, got ${question.kind}.`);
+      continue;
+    }
+
+    if (!/About how many/i.test(question.prompt)) {
+      addFinding(`Year 3 ${lesson.id} estimation`, `Estimation prompt missing 'About how many': ${question.prompt}`);
+    }
+  }
+}
+
 function toLesson(row) {
   return {
     id: `y2-w${row.week}-l${row.lesson}`,
@@ -386,6 +430,16 @@ if (!year3Week9Lesson1) {
 } else {
   checkLesson("Year 3", year3Week9Lesson1);
   checkYear3Week9SkipCounting(year3Week9Lesson1);
+}
+
+const year3Week9Lesson3 = YEAR3_PROGRAM.find((item) => item.week === 9)?.lessons?.find(
+  (lesson) => lesson.lesson === 3
+);
+if (!year3Week9Lesson3) {
+  addFinding("Year 3 W9 L3", "Missing estimation lesson for regression target.");
+} else {
+  checkLesson("Year 3", year3Week9Lesson3);
+  checkYear3Week9Lesson3Estimation(year3Week9Lesson3);
 }
 
 checkQuiz(

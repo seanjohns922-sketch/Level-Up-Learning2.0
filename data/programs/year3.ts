@@ -937,26 +937,25 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
           "Check reasonableness of estimated and exact answers"
         ),
         activities: [
-          makeActivity("number_line", 2, {
+          makeActivity("number_line", 1, {
             min: 0,
             max: 10000,
             step: 1000,
             mode: "rounding",
             targets: [100, 1000],
           }),
-          makeActivity("mixed_word_problem", 1, {
-            min: 40,
-            max: 200,
+          makeActivity("mixed_word_problem", 2, {
+            min: 200,
+            max: 500,
             mode: "choose_operation",
-            operations: ["+", "-"],
+            operations: ["+"],
           }),
-          makeActivity("typed_response", 1, {
-            min: 0,
-            max: 10000,
-            step: 1000,
-            mode: "rounding",
-            targets: [100, 1000],
-            sourceActivityType: "number_line",
+          makeActivity("multiple_choice", 1, {
+            min: 200,
+            max: 500,
+            mode: "choose_operation",
+            operations: ["+"],
+            sourceActivityType: "mixed_word_problem",
           }),
         ],
         curriculum: ["ALL"],

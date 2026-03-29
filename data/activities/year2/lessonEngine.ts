@@ -998,6 +998,13 @@ function isYear3Week9Lesson1SkipCount(
   return level === 3 && lesson.week === 9 && lesson.lesson === 1 && (step === 100 || step === 1000);
 }
 
+function isYear3Week9Lesson3Estimation(
+  level: SupportedMathLevel,
+  lesson: Lesson
+): boolean {
+  return level === 3 && lesson.week === 9 && lesson.lesson === 3;
+}
+
 function buildYear3Week9SkipCountSequence(step: number) {
   const friendly = randInt(0, 9) < 6;
   const useLargeNumber = randInt(0, 9) < 4;
@@ -1071,6 +1078,57 @@ function buildYear3Week9SkipCountWrapper(
     prompt: `${promptPrefix} ${promptText}`,
     answer: String(answer),
     options: uniqueNumberOptions(answer, step * 3),
+  };
+}
+
+function buildYear3Week9EstimationQuestion(): MixedWordProblemQuestion {
+  const fmt = (value: number) => value.toLocaleString();
+  const useThousands = randInt(0, 9) < 6;
+  const contexts = [
+    { noun: "stickers", place: "class" },
+    { noun: "people", place: "stadium" },
+    { noun: "tickets", place: "school fair" },
+    { noun: "books", place: "library" },
+  ];
+  const context = contexts[randInt(0, contexts.length - 1)] ?? contexts[0];
+
+  if (useThousands) {
+    const first = randInt(1800, 4800);
+    const second = randInt(1400, 4200);
+    const roundedFirst = roundToNearest(first, 100);
+    const roundedSecond = roundToNearest(second, 100);
+    const estimatedRaw = roundedFirst + roundedSecond;
+    const answer = roundToNearest(estimatedRaw, 1000);
+    const options = [Math.max(0, answer - 1000), answer, answer + 1000];
+
+    return {
+      kind: "mixed_word_problem",
+      prompt: `A ${context.place} had ${fmt(first)} ${context.noun} on Friday and ${fmt(second)} on Saturday. About how many ${context.noun} was that altogether?`,
+      answer,
+      options,
+      operationLabel: "Estimate by rounding",
+      helper: `${fmt(first)} ≈ ${fmt(roundedFirst)} and ${fmt(second)} ≈ ${fmt(roundedSecond)}. Add the rounded numbers, then choose the closest thousand.`,
+      mode: "choose_operation",
+      showStrategyClue: false,
+    };
+  }
+
+  const first = randInt(140, 480);
+  const second = randInt(120, 390);
+  const roundedFirst = roundToNearest(first, 100);
+  const roundedSecond = roundToNearest(second, 100);
+  const answer = roundedFirst + roundedSecond;
+  const options = [Math.max(0, answer - 100), answer, answer + 100];
+
+  return {
+    kind: "mixed_word_problem",
+    prompt: `A ${context.place} collected ${fmt(first)} ${context.noun} and then ${fmt(second)} more. About how many ${context.noun} is that altogether?`,
+    answer,
+    options,
+    operationLabel: "Estimate by rounding",
+    helper: `${fmt(first)} ≈ ${fmt(roundedFirst)} and ${fmt(second)} ≈ ${fmt(roundedSecond)}. Add the rounded hundreds to estimate the total.`,
+    mode: "choose_operation",
+    showStrategyClue: false,
   };
 }
 
@@ -2276,6 +2334,9 @@ function generateInteractiveQuestion(
   if (activityType === "mixed_word_problem") {
     if (isYear3Week6TwoStepOnly(level, lesson)) {
       return buildYear3Week6TwoStepWordProblem(lesson);
+    }
+    if (isYear3Week9Lesson3Estimation(level, lesson)) {
+      return buildYear3Week9EstimationQuestion();
     }
     if (isYear3Week8(level, lesson) && lesson.lesson === 3) {
       return buildYear3Week8MixedWordProblem(lesson);
