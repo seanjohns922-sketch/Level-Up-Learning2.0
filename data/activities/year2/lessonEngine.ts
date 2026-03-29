@@ -990,6 +990,90 @@ function buildYear3Week8MixedWordProblem(
   };
 }
 
+function isYear3Week9Lesson1SkipCount(
+  level: SupportedMathLevel,
+  lesson: Lesson,
+  step: number
+): boolean {
+  return level === 3 && lesson.week === 9 && lesson.lesson === 1 && (step === 100 || step === 1000);
+}
+
+function buildYear3Week9SkipCountSequence(step: number) {
+  const friendly = randInt(0, 9) < 6;
+  const useLargeNumber = randInt(0, 9) < 4;
+  const baseUnits =
+    step === 1000
+      ? useLargeNumber
+        ? randInt(12, 90)
+        : randInt(3, 35)
+      : useLargeNumber
+      ? randInt(12, 260)
+      : randInt(8, 95);
+  const trailing =
+    friendly
+      ? 0
+      : step === 1000
+      ? ([120, 250, 340, 480, 670][randInt(0, 4)] ?? 250)
+      : ([40, 50, 60, 70, 80][randInt(0, 4)] ?? 50);
+  const start = baseUnits * step + trailing;
+  const sequence = [start, start + step, start + step * 2, start + step * 3];
+  const reverse = randInt(0, 9) === 0;
+  const orderedSequence = reverse ? [...sequence].reverse() : sequence;
+  const gapModeRoll = randInt(0, 9);
+  const gapIndex = gapModeRoll < 3 ? 1 : gapModeRoll < 6 ? 2 : 3;
+  const answer = orderedSequence[gapIndex] ?? orderedSequence[orderedSequence.length - 1] ?? start;
+  const displaySequence = orderedSequence.map((value, index) => (index === gapIndex ? -1 : value));
+  const promptPrefix = reverse
+    ? `Fill in the missing number. Skip count backwards by ${step}.`
+    : `Fill in the missing number. Skip count by ${step}.`;
+  const promptText = displaySequence.map((value) => (value === -1 ? "__" : String(value))).join(", ");
+
+  return {
+    answer,
+    displaySequence,
+    promptPrefix,
+    promptText,
+    step,
+  };
+}
+
+function buildYear3Week9SkipCountQuestion(step: number): SkipCountQuestion {
+  const { answer, displaySequence, promptPrefix } = buildYear3Week9SkipCountSequence(step);
+
+  return {
+    kind: "skip_count",
+    prompt: promptPrefix,
+    sequence: displaySequence,
+    answer,
+    options: uniqueNumberOptions(answer, step * 3).map(Number),
+    step,
+    mode: "forward",
+  };
+}
+
+function buildYear3Week9SkipCountWrapper(
+  step: number,
+  asMultipleChoice: boolean
+): MultipleChoiceQuestion | TypedResponseQuestion {
+  const { answer, promptPrefix, promptText } = buildYear3Week9SkipCountSequence(step);
+
+  if (!asMultipleChoice) {
+    return {
+      kind: "typed_response",
+      prompt: `${promptPrefix} ${promptText}`,
+      answer: String(answer),
+      placeholder: "Type the missing number",
+    };
+  }
+
+  return {
+    kind: "multiple_choice",
+    prompt: `${promptPrefix} ${promptText}`,
+    answer: String(answer),
+    options: uniqueNumberOptions(answer, step * 3),
+  };
+}
+
 function buildYear3Week5SubtractionQuestion(
   lesson: Lesson,
   config: GenericConfig
@@ -2662,6 +2746,11 @@ function generateInteractiveQuestion(
         : typeof config.step === "number"
         ? config.step
         : profile.skipCountExtraSteps[randInt(0, profile.skipCountExtraSteps.length - 1)] ?? 2;
+
+    if (isYear3Week9Lesson1SkipCount(level, lesson, step)) {
+      return buildYear3Week9SkipCountQuestion(step);
+    }
+
     const configMax = typeof config.max === "number" ? config.max : 100;
     const maxStart = Math.max(0, Math.floor(configMax / step) - 6);
     const startMultiplier = randInt(0, maxStart);
@@ -3203,6 +3292,11 @@ function generateGenericQuestion(
       typeof config.step === "number"
         ? config.step
         : profile.skipCountExtraSteps[randInt(0, profile.skipCountExtraSteps.length - 1)] ?? 2;
+
+    if (isYear3Week9Lesson1SkipCount(level, lesson, by)) {
+      return buildYear3Week9SkipCountWrapper(by, asMultipleChoice);
+    }
+
     const start = randInt(0, 5) * by;
     const answer = String(start + by * 3);
     const prompt = `${start}, ${start + by}, ${start + by * 2}, ?`;

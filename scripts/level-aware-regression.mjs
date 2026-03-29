@@ -197,6 +197,85 @@ function checkYear3MultiplicativeRestriction(lesson) {
   }
 }
 
+function checkYear3Week9SkipCounting(lesson) {
+  const level = getLevelForLesson(lesson);
+  const lessonPool = buildLessonActivityPool(level, lesson);
+  const distribution = new Map([
+    [100, { friendly: 0, nonFriendly: 0 }],
+    [1000, { friendly: 0, nonFriendly: 0 }],
+  ]);
+
+  for (const activity of lessonPool.activities) {
+    const activityStep =
+      typeof activity.config?.step === "number" ? activity.config.step : undefined;
+    if (
+      (activity.activityType !== "skip_count" && activity.sourceActivityType !== "skip_count") ||
+      (activityStep !== 100 && activityStep !== 1000)
+    ) {
+      continue;
+    }
+
+    for (let sample = 0; sample < 10; sample += 1) {
+      let question;
+      try {
+        question = generateQuestion(level, lesson, activity);
+      } catch (error) {
+        addFinding(`Year 3 ${lesson.id} skip_hundreds`, error instanceof Error ? error.message : String(error));
+        continue;
+      }
+
+      const prompt = question.prompt;
+      const expectedStep = activityStep;
+      const values =
+        question.kind === "skip_count"
+          ? question.sequence.filter((value) => value !== -1)
+          : ((prompt.split(". ").pop() ?? prompt).match(/\d+/g) ?? []).map(Number);
+      if (values.length < 3) {
+        addFinding(`Year 3 ${lesson.id} skip_hundreds`, `Expected multiple sequence values in prompt: ${prompt}`);
+        continue;
+      }
+
+      for (let index = 1; index < values.length; index += 1) {
+        const difference = Math.abs(values[index] - values[index - 1]);
+        if (difference % expectedStep !== 0 || difference < expectedStep || difference > expectedStep * 2) {
+          addFinding(`Year 3 ${lesson.id} skip_counting`, `Sequence changed by ${difference} instead of ${expectedStep}: ${prompt}`);
+          break;
+        }
+        const placeDelta =
+          Math.floor(values[index] / expectedStep) - Math.floor(values[index - 1] / expectedStep);
+        const expectedDirection = values[index] > values[index - 1] ? 1 : -1;
+        if (placeDelta !== expectedDirection && placeDelta !== expectedDirection * 2) {
+          addFinding(`Year 3 ${lesson.id} skip_counting`, `Sequence changed digits outside the ${expectedStep}s place: ${prompt}`);
+          break;
+        }
+      }
+
+      const constantSuffix = values.every((value) => value % expectedStep === values[0] % expectedStep);
+      if (!constantSuffix) {
+        addFinding(`Year 3 ${lesson.id} skip_counting`, `Digits below the ${expectedStep}s place did not stay constant: ${prompt}`);
+      }
+
+      const counts = distribution.get(expectedStep);
+      if (!counts) continue;
+      if (values[0] % expectedStep === 0) {
+        counts.friendly += 1;
+      } else {
+        counts.nonFriendly += 1;
+      }
+    }
+  }
+
+  for (const [step, counts] of distribution.entries()) {
+    if (counts.friendly === 0 && counts.nonFriendly === 0) {
+      addFinding(`Year 3 ${lesson.id} skip_counting`, `No samples found for step ${step}.`);
+      continue;
+    }
+    if (counts.friendly < counts.nonFriendly) {
+      addFinding(`Year 3 ${lesson.id} skip_counting`, `Expected friendly starts to dominate for step ${step}. Saw ${counts.friendly} friendly and ${counts.nonFriendly} non-friendly.`);
+    }
+  }
+}
+
 function toLesson(row) {
   return {
     id: `y2-w${row.week}-l${row.lesson}`,
@@ -297,6 +376,16 @@ for (const week of [7, 8, 10]) {
     checkLesson("Year 3", lesson);
     checkYear3MultiplicativeRestriction(lesson);
   }
+}
+
+const year3Week9Lesson1 = YEAR3_PROGRAM.find((item) => item.week === 9)?.lessons?.find(
+  (lesson) => lesson.lesson === 1
+);
+if (!year3Week9Lesson1) {
+  addFinding("Year 3 W9 L1", "Missing skip-count lesson for regression target.");
+} else {
+  checkLesson("Year 3", year3Week9Lesson1);
+  checkYear3Week9SkipCounting(year3Week9Lesson1);
 }
 
 checkQuiz(
