@@ -4,6 +4,15 @@ import { useState, useMemo } from "react";
 import type { FactFamilyQuestion } from "@/data/activities/year2/lessonEngine";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 
+function normalizeFactSentence(value: string) {
+  return value
+    .replace(/\s+/g, "")
+    .replace(/\*/g, "×")
+    .replace(/x/gi, "×")
+    .replace(/\//g, "÷")
+    .toLowerCase();
+}
+
 export default function FactFamily({
   questionData,
   onCorrect,
@@ -17,7 +26,7 @@ export default function FactFamily({
   const [submitted, setSubmitted] = useState(false);
 
   const correctSet = useMemo(
-    () => new Set(questionData.answers),
+    () => new Set(questionData.answers.map(normalizeFactSentence)),
     [questionData.answers]
   );
 
@@ -34,8 +43,9 @@ export default function FactFamily({
   function submit() {
     if (submitted) return;
     setSubmitted(true);
-    const allCorrectPicked = [...correctSet].every((a) => selected.has(a));
-    const noWrongPicked = [...selected].every((s) => correctSet.has(s));
+    const normalizedSelected = new Set([...selected].map(normalizeFactSentence));
+    const allCorrectPicked = [...correctSet].every((a) => normalizedSelected.has(a));
+    const noWrongPicked = [...normalizedSelected].every((s) => correctSet.has(s));
     if (allCorrectPicked && noWrongPicked) onCorrect?.();
     else onWrong?.();
   }
@@ -90,7 +100,7 @@ export default function FactFamily({
       <div className="mt-6 grid gap-3">
         {questionData.options.map((option) => {
           const isSelected = selected.has(option);
-          const isCorrect = correctSet.has(option);
+          const isCorrect = correctSet.has(normalizeFactSentence(option));
           let cls =
             "rounded-2xl border px-5 py-4 text-left text-xl font-black transition";
 

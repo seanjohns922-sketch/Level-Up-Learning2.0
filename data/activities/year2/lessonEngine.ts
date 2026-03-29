@@ -160,6 +160,15 @@ export type FactFamilyQuestion = {
   };
 };
 
+function normalizeFactSentence(value: string) {
+  return value
+    .replace(/\s+/g, "")
+    .replace(/\*/g, "×")
+    .replace(/x/gi, "×")
+    .replace(/\//g, "÷")
+    .toLowerCase();
+}
+
 export type OddEvenSortQuestion = {
   kind: "odd_even_sort";
   prompt: string;
@@ -2576,7 +2585,7 @@ function generateInteractiveQuestion(
       if (mode === "word_problems") {
         const prompts = [
           {
-            story: `There are ${a} rows with ${b} counters in each row. Which fact family sentence matches the array?`,
+            story: `There are ${a} rows with ${b} counters in each row. Which multiplication and division sentences match this array?`,
             answer: `${a} × ${b} = ${total}`,
           },
           {
@@ -2605,20 +2614,19 @@ function generateInteractiveQuestion(
         };
       }
 
-      const pickedCorrect = shuffle(correctSet).slice(0, 2);
       const distractors = [
         `${total} + ${a} = ${b}`,
         `${a} + ${b} = ${total}`,
         `${total} ÷ ${a} = ${a}`,
         `${b} × ${b} = ${total}`,
       ].filter((value) => !correctSet.includes(value));
-      const options = shuffle([...pickedCorrect, ...distractors.slice(0, 2)]);
+      const options = shuffle([...correctSet, ...distractors.slice(0, 2)]);
       return {
         kind: "fact_family",
-        prompt: "Select all sentences that belong to this multiplication and division fact family.",
+        prompt: "Which multiplication and division sentences match this array?",
         family,
         options,
-        answers: pickedCorrect,
+        answers: correctSet,
         mode,
         familyType: "mult_div",
         visual: { type: "array", rows: a, columns: b },
