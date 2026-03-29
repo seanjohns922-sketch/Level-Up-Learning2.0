@@ -1107,7 +1107,7 @@ function buildYear3Week9EstimationQuestion(): MixedWordProblemQuestion {
       answer,
       options,
       operationLabel: "Estimate by rounding",
-      helper: `${fmt(first)} ≈ ${fmt(roundedFirst)} and ${fmt(second)} ≈ ${fmt(roundedSecond)}. Add the rounded numbers, then choose the closest thousand.`,
+      helper: `${fmt(first)} ≈ ${fmt(roundedFirst)} and ${fmt(second)} ≈ ${fmt(roundedSecond)}. ${fmt(roundedFirst)} + ${fmt(roundedSecond)} ≈ ${fmt(estimatedRaw)}. Which answer is closest?`,
       mode: "choose_operation",
       showStrategyClue: false,
     };
@@ -1126,7 +1126,7 @@ function buildYear3Week9EstimationQuestion(): MixedWordProblemQuestion {
     answer,
     options,
     operationLabel: "Estimate by rounding",
-    helper: `${fmt(first)} ≈ ${fmt(roundedFirst)} and ${fmt(second)} ≈ ${fmt(roundedSecond)}. Add the rounded hundreds to estimate the total.`,
+    helper: `${fmt(first)} ≈ ${fmt(roundedFirst)} and ${fmt(second)} ≈ ${fmt(roundedSecond)}. ${fmt(roundedFirst)} + ${fmt(roundedSecond)} ≈ ${fmt(answer)}. Which answer is closest?`,
     mode: "choose_operation",
     showStrategyClue: false,
   };
