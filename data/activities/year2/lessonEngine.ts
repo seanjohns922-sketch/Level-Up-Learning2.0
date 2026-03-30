@@ -316,9 +316,23 @@ function pickFractionPair() {
 
 function fractionPartsForNumberLine() {
   return [
+    { label: "1/10", value: 1 / 10 },
     { label: "1/5", value: 1 / 5 },
+    { label: "1/4", value: 1 / 4 },
     { label: "1/2", value: 1 / 2 },
+    { label: "3/5", value: 3 / 5 },
+    { label: "7/10", value: 7 / 10 },
+    { label: "3/4", value: 3 / 4 },
     { label: "4/5", value: 4 / 5 },
+  ];
+}
+
+function year3FractionOrderSets() {
+  return [
+    ["1/5", "1/2", "4/5"],
+    ["1/4", "1/2", "3/4"],
+    ["1/10", "1/2", "7/10"],
+    ["1/5", "3/5", "4/5"],
   ];
 }
 
@@ -2698,16 +2712,22 @@ function generateInteractiveQuestion(
         : "place_fraction";
 
     if (mode === "order_fractions") {
+      const orderedSet =
+        year3FractionOrderSets()[randInt(0, year3FractionOrderSets().length - 1)] ??
+        year3FractionOrderSets()[0] ??
+        ["1/5", "1/2", "4/5"];
       return {
         kind: "number_line_place",
         prompt: "Put the fractions in order from smallest to largest.",
         mode,
-        fractions: shuffle(["1/5", "1/2", "4/5"]),
-        answer: "1/5,1/2,4/5",
+        fractions: shuffle([...orderedSet]),
+        answer: orderedSet.join(","),
       };
     }
 
-    const target = fractionPartsForNumberLine()[randInt(0, 2)] ?? fractionPartsForNumberLine()[0];
+    const availableFractions = fractionPartsForNumberLine();
+    const target =
+      availableFractions[randInt(0, availableFractions.length - 1)] ?? availableFractions[0];
     return {
       kind: "number_line_place",
       prompt:
@@ -2715,9 +2735,9 @@ function generateInteractiveQuestion(
           ? `Place ${target.label} on the number line using the model.`
           : `Place ${target.label} on the number line using the model.`,
       mode,
-      denominator: 5,
+      denominator: Number(target.label.split("/")[1] ?? 2),
       targetFraction: target.label,
-      options: ["1/5", "1/2", "4/5"],
+      options: availableFractions.map((fraction) => fraction.label),
       answer: target.label,
     };
   }

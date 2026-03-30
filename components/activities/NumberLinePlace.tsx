@@ -80,6 +80,14 @@ export default function NumberLinePlace({
     }
   }
 
+  function undoLastChoice() {
+    setOrder((current) => current.slice(0, -1));
+  }
+
+  function clearOrder() {
+    setOrder([]);
+  }
+
   function placeDot(clientX: number) {
     if (!lineRef.current) return;
     const rect = lineRef.current.getBoundingClientRect();
@@ -138,6 +146,24 @@ export default function NumberLinePlace({
           </div>
           <div className="mt-4 rounded-2xl border border-dashed border-violet-300 bg-white p-4 text-lg font-black text-violet-900">
             {order.length > 0 ? order.join(" , ") : "Tap fractions in order here"}
+          </div>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={undoLastChoice}
+              disabled={order.length === 0}
+              className="rounded-2xl border border-violet-300 bg-white px-4 py-2 font-black text-violet-900 hover:bg-violet-50 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Undo last
+            </button>
+            <button
+              type="button"
+              onClick={clearOrder}
+              disabled={order.length === 0}
+              className="rounded-2xl border border-violet-300 bg-white px-4 py-2 font-black text-violet-900 hover:bg-violet-50 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Clear order
+            </button>
           </div>
           <button
             type="button"
