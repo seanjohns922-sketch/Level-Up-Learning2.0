@@ -15,6 +15,7 @@ import SetModelSelect from "@/components/activities/SetModelSelect";
 import BuildTheWhole from "@/components/activities/BuildTheWhole";
 import NumberLinePlace from "@/components/activities/NumberLinePlace";
 import FractionCompare from "@/components/activities/FractionCompare";
+import EquivalentFractionBar from "@/components/activities/EquivalentFractionBar";
 import OddEvenSort from "@/components/activities/OddEvenSort";
 import PartitionExpand from "@/components/activities/PartitionExpand";
 import PlaceValueBuilder from "@/components/activities/PlaceValueBuilder";
@@ -32,6 +33,9 @@ import type {
   BuildTheWholeQuestion,
   NumberLinePlaceQuestion,
   FractionCompareQuestion,
+  EquivalentFractionMatchQuestion,
+  EquivalentFractionBuildQuestion,
+  EquivalentFractionYesNoQuestion,
   DivisionGroupsQuestion,
   FactFamilyQuestion,
   MixedWordProblemQuestion,
@@ -238,6 +242,45 @@ export function LessonRenderer({
       return (
         <FractionCompare
           questionData={safeQuestion as FractionCompareQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
+        />
+      );
+    }
+    case "equivalent_fraction_match": {
+      const safeQuestion = getSafeQuestion(activity, questionData, prompt);
+      if (safeQuestion.kind !== "equivalent_fraction_match") {
+        return <ErrorCard message="Equivalent fraction match failed to load." />;
+      }
+      return (
+        <EquivalentFractionBar
+          questionData={safeQuestion as EquivalentFractionMatchQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
+        />
+      );
+    }
+    case "equivalent_fraction_build": {
+      const safeQuestion = getSafeQuestion(activity, questionData, prompt);
+      if (safeQuestion.kind !== "equivalent_fraction_build") {
+        return <ErrorCard message="Equivalent fraction build failed to load." />;
+      }
+      return (
+        <EquivalentFractionBar
+          questionData={safeQuestion as EquivalentFractionBuildQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
+        />
+      );
+    }
+    case "equivalent_fraction_yes_no": {
+      const safeQuestion = getSafeQuestion(activity, questionData, prompt);
+      if (safeQuestion.kind !== "equivalent_fraction_yes_no") {
+        return <ErrorCard message="Equivalent fraction yes/no failed to load." />;
+      }
+      return (
+        <EquivalentFractionBar
+          questionData={safeQuestion as EquivalentFractionYesNoQuestion}
           onCorrect={onCorrect}
           onWrong={onWrong}
         />

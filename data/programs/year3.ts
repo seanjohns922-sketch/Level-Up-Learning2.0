@@ -1158,14 +1158,11 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
           "Build the same fraction value using more pieces"
         ),
         activities: [
-          makeActivity("area_model_select", 2, {
-            mode: "match_equivalent",
+          makeActivity("equivalent_fraction_match", 2, {
           }),
-          makeActivity("area_model_select", 1, {
-            mode: "pick_model",
+          makeActivity("equivalent_fraction_build", 1, {
           }),
-          makeActivity("area_model_select", 1, {
-            mode: "match_equivalent",
+          makeActivity("equivalent_fraction_yes_no", 1, {
           }),
         ],
         curriculum: ["ALL"],

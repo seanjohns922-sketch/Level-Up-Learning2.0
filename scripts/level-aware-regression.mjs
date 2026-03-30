@@ -328,7 +328,11 @@ function checkYear3FractionLessonAlignment(lesson) {
     "y3-w11-l1": ["area_model_select"],
     "y3-w11-l2": ["set_model_select"],
     "y3-w11-l3": ["build_the_whole"],
-    "y3-w12-l1": ["area_model_select"],
+    "y3-w12-l1": [
+      "equivalent_fraction_match",
+      "equivalent_fraction_build",
+      "equivalent_fraction_yes_no",
+    ],
     "y3-w12-l2": ["number_line_place"],
     "y3-w12-l3": ["fraction_compare"],
   };

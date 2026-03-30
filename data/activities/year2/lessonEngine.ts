@@ -126,6 +126,38 @@ export type FractionCompareQuestion = {
   statement?: string;
 };
 
+export type EquivalentFractionChoice = {
+  id: string;
+  numerator: number;
+  denominator: number;
+};
+
+export type EquivalentFractionMatchQuestion = {
+  kind: "equivalent_fraction_match";
+  prompt: string;
+  targetFraction: string;
+  target: EquivalentFractionChoice;
+  choices: EquivalentFractionChoice[];
+  correctChoiceId: string;
+};
+
+export type EquivalentFractionBuildQuestion = {
+  kind: "equivalent_fraction_build";
+  prompt: string;
+  sourceFraction: string;
+  source: EquivalentFractionChoice;
+  options: EquivalentFractionChoice[];
+  correctOptionId: string;
+};
+
+export type EquivalentFractionYesNoQuestion = {
+  kind: "equivalent_fraction_yes_no";
+  prompt: string;
+  left: EquivalentFractionChoice;
+  right: EquivalentFractionChoice;
+  answer: "yes" | "no";
+};
+
 export type AdditionStrategyQuestion = {
   kind: "addition_strategy";
   prompt: string;
@@ -193,6 +225,9 @@ export type ReviewQuizInnerQuestion =
   | BuildTheWholeQuestion
   | NumberLinePlaceQuestion
   | FractionCompareQuestion
+  | EquivalentFractionMatchQuestion
+  | EquivalentFractionBuildQuestion
+  | EquivalentFractionYesNoQuestion
   | AdditionStrategyQuestion
   | EqualGroupsQuestion
   | ArraysQuestion
@@ -287,6 +322,31 @@ function fractionPartsForNumberLine() {
   ];
 }
 
+function year3EquivalentFractionPairs() {
+  return [
+    {
+      source: { numerator: 1, denominator: 2 },
+      equivalent: { numerator: 2, denominator: 4 },
+    },
+    {
+      source: { numerator: 1, denominator: 2 },
+      equivalent: { numerator: 5, denominator: 10 },
+    },
+    {
+      source: { numerator: 1, denominator: 5 },
+      equivalent: { numerator: 2, denominator: 10 },
+    },
+    {
+      source: { numerator: 2, denominator: 5 },
+      equivalent: { numerator: 4, denominator: 10 },
+    },
+    {
+      source: { numerator: 3, denominator: 5 },
+      equivalent: { numerator: 6, denominator: 10 },
+    },
+  ];
+}
+
 export type OddEvenSortQuestion = {
   kind: "odd_even_sort";
   prompt: string;
@@ -362,6 +422,9 @@ export type Year2QuestionData =
   | BuildTheWholeQuestion
   | NumberLinePlaceQuestion
   | FractionCompareQuestion
+  | EquivalentFractionMatchQuestion
+  | EquivalentFractionBuildQuestion
+  | EquivalentFractionYesNoQuestion
   | AdditionStrategyQuestion
   | EqualGroupsQuestion
   | ArraysQuestion
@@ -564,6 +627,15 @@ const BASE_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
   },
   fraction_compare: {
     allowedModes: ["symbol_compare", "visual_compare", "true_false"],
+    requiresVisual: true,
+  },
+  equivalent_fraction_match: {
+    requiresVisual: true,
+  },
+  equivalent_fraction_build: {
+    requiresVisual: true,
+  },
+  equivalent_fraction_yes_no: {
     requiresVisual: true,
   },
   odd_even_sort: {
@@ -2681,6 +2753,81 @@ function generateInteractiveQuestion(
     };
   }
 
+  if (activityType === "equivalent_fraction_match") {
+    const pairs = year3EquivalentFractionPairs();
+    const chosen = pairs[randInt(0, pairs.length - 1)] ?? pairs[0];
+    const distractors = shuffle(
+      pairs
+        .flatMap((pair) => [pair.source, pair.equivalent])
+        .filter(
+          (option) =>
+            !(option.numerator === chosen.equivalent.numerator && option.denominator === chosen.equivalent.denominator) &&
+            !(option.numerator === chosen.source.numerator && option.denominator === chosen.source.denominator)
+        )
+    ).slice(0, 2);
+    const correctChoice = { id: "correct", ...chosen.equivalent };
+    const choices = shuffle([
+      correctChoice,
+      ...distractors.map((option, index) => ({ id: `wrong-${index}`, ...option })),
+    ]);
+    return {
+      kind: "equivalent_fraction_match",
+      prompt: `Which bar model is equivalent to ${fractionLabel(chosen.source.numerator, chosen.source.denominator)}?`,
+      targetFraction: fractionLabel(chosen.source.numerator, chosen.source.denominator),
+      target: { id: "target", ...chosen.source },
+      choices,
+      correctChoiceId: "correct",
+    };
+  }
+
+  if (activityType === "equivalent_fraction_build") {
+    const pairs = year3EquivalentFractionPairs();
+    const chosen = pairs[randInt(0, pairs.length - 1)] ?? pairs[0];
+    const distractors = shuffle(
+      pairs
+        .map((pair) => pair.equivalent)
+        .filter(
+          (option) =>
+            !(option.numerator === chosen.equivalent.numerator && option.denominator === chosen.equivalent.denominator)
+        )
+    ).slice(0, 2);
+    const options = shuffle([
+      { id: "correct", ...chosen.equivalent },
+      ...distractors.map((option, index) => ({ id: `wrong-${index}`, ...option })),
+    ]);
+    return {
+      kind: "equivalent_fraction_build",
+      prompt: `Make ${fractionLabel(chosen.source.numerator, chosen.source.denominator)} using more equal parts.`,
+      sourceFraction: fractionLabel(chosen.source.numerator, chosen.source.denominator),
+      source: { id: "source", ...chosen.source },
+      options,
+      correctOptionId: "correct",
+    };
+  }
+
+  if (activityType === "equivalent_fraction_yes_no") {
+    const pairs = year3EquivalentFractionPairs();
+    const chosen = pairs[randInt(0, pairs.length - 1)] ?? pairs[0];
+    const askEquivalent = randInt(0, 1) === 0;
+    const right = askEquivalent
+      ? chosen.equivalent
+      : (shuffle(
+          pairs
+            .map((pair) => pair.equivalent)
+            .filter(
+              (option) =>
+                !(option.numerator === chosen.equivalent.numerator && option.denominator === chosen.equivalent.denominator)
+            )
+        )[0] ?? { numerator: 3, denominator: 10 });
+    return {
+      kind: "equivalent_fraction_yes_no",
+      prompt: "Are these bar models equivalent?",
+      left: { id: "left", ...chosen.source },
+      right: { id: "right", ...right },
+      answer: askEquivalent ? "yes" : "no",
+    };
+  }
+
   if (activityType === "addition_strategy") {
     return generateAdditionStrategyQuestion(config, level, lesson);
   }
@@ -4103,6 +4250,9 @@ export function generateQuestion(
     activity.activityType === "build_the_whole" ||
     activity.activityType === "number_line_place" ||
     activity.activityType === "fraction_compare" ||
+    activity.activityType === "equivalent_fraction_match" ||
+    activity.activityType === "equivalent_fraction_build" ||
+    activity.activityType === "equivalent_fraction_yes_no" ||
     activity.activityType === "addition_strategy" ||
     activity.activityType === "equal_groups" ||
     activity.activityType === "arrays" ||
