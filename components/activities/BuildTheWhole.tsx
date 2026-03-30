@@ -20,6 +20,20 @@ function WholeBar({ parts, activeParts }: { parts: number; activeParts: number }
   );
 }
 
+function PartCard({ label }: { label: string }) {
+  return (
+    <div className="rounded-2xl border border-amber-200 bg-white p-4 shadow-sm">
+      <div className="text-xs font-bold uppercase tracking-wide text-amber-700">Given Part</div>
+      <div className="mt-3 grid gap-2">
+        <div className="h-16 rounded-xl border-2 border-amber-500 bg-amber-300" />
+      </div>
+      <div className="mt-3 inline-flex rounded-full bg-amber-100 px-3 py-1 text-sm font-black text-amber-900">
+        {label}
+      </div>
+    </div>
+  );
+}
+
 export default function BuildTheWhole({
   questionData,
   onCorrect,
@@ -98,25 +112,44 @@ export default function BuildTheWhole({
       ) : null}
 
       {questionData.mode === "pick_whole" ? (
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">
-          {questionData.options?.map((option) => (
-            <button
-              key={option.id}
-              type="button"
-              onClick={() => setPickedId(option.id)}
-              className={[
-                "rounded-2xl border p-4 transition",
-                pickedId === option.id ? "border-amber-400 bg-amber-50" : "border-gray-200 bg-slate-50",
-              ].join(" ")}
-            >
-              <WholeBar parts={option.parts} activeParts={option.parts} />
-            </button>
-          ))}
+        <div className="mt-6">
+          <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4">
+            <div className="text-xs font-bold uppercase tracking-wide text-amber-700">Given Part</div>
+            <p className="mt-2 text-sm font-medium text-slate-700">
+              This one part is {questionData.fractionLabel}.
+            </p>
+            <div className="mt-4 max-w-xs">
+              <PartCard label={questionData.fractionLabel} />
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <div className="text-xs font-bold uppercase tracking-wide text-slate-500">Answer Choices</div>
+            <div className="mt-3 grid gap-4 sm:grid-cols-3">
+              {questionData.options?.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => setPickedId(option.id)}
+                  className={[
+                    "rounded-2xl border p-4 text-left transition",
+                    pickedId === option.id ? "border-amber-400 bg-amber-50" : "border-gray-200 bg-slate-50",
+                  ].join(" ")}
+                >
+                  <div className="mb-3 text-sm font-bold text-slate-600">
+                    {option.parts} equal parts
+                  </div>
+                  <WholeBar parts={option.parts} activeParts={option.parts} />
+                </button>
+              ))}
+            </div>
+          </div>
+
           <button
             type="button"
             onClick={() => (pickedId === questionData.correctOptionId ? onCorrect?.() : onWrong?.())}
             disabled={!pickedId}
-            className="sm:col-span-3 rounded-2xl bg-amber-500 px-5 py-3 font-black text-white hover:bg-amber-600 disabled:opacity-40"
+            className="mt-4 w-full rounded-2xl bg-amber-500 px-5 py-3 font-black text-white hover:bg-amber-600 disabled:opacity-40"
           >
             Check whole
           </button>

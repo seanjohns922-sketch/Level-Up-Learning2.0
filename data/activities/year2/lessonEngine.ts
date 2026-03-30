@@ -2598,7 +2598,7 @@ function generateInteractiveQuestion(
       const correctOption = options.find((option) => option.parts === denominator) ?? options[0];
       return {
         kind: "build_the_whole",
-        prompt: `Which shows the whole if this is ${fractionLabel(1, denominator)}?`,
+        prompt: `Which whole is correct if this one part is ${fractionLabel(1, denominator)}?`,
         fractionLabel: fractionLabel(1, denominator),
         denominator,
         unitValue,
