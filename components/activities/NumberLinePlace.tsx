@@ -9,25 +9,36 @@ function parseFraction(label: string) {
   return { numerator, denominator };
 }
 
-function FractionBar({ fraction }: { fraction: string }) {
+function FractionBar({
+  fraction,
+  showLabel = true,
+  large = false,
+}: {
+  fraction: string;
+  showLabel?: boolean;
+  large?: boolean;
+}) {
   const { numerator, denominator } = parseFraction(fraction);
   return (
-    <div className="rounded-2xl border border-violet-200 bg-white p-3 shadow-sm">
+    <div className={large ? "w-full" : "rounded-2xl border border-violet-200 bg-white p-3 shadow-sm"}>
       <div
-        className="grid gap-1 rounded-xl bg-slate-200 p-1"
+        className={[
+          "grid rounded-xl bg-slate-200 p-1",
+          large ? "gap-0.5" : "gap-1",
+        ].join(" ")}
         style={{ gridTemplateColumns: `repeat(${denominator}, minmax(0, 1fr))` }}
       >
         {Array.from({ length: denominator }).map((_, index) => (
           <div
             key={index}
             className={[
-              "h-8 rounded-sm",
+              large ? "h-16 rounded-[4px]" : "h-8 rounded-sm",
               index < numerator ? "bg-violet-500" : "bg-slate-100",
             ].join(" ")}
           />
         ))}
       </div>
-      <div className="mt-2 text-center text-lg font-black text-violet-900">{fraction}</div>
+      {showLabel ? <div className="mt-2 text-center text-lg font-black text-violet-900">{fraction}</div> : null}
     </div>
   );
 }
@@ -110,17 +121,17 @@ export default function NumberLinePlace({
 
       {questionData.mode === "order_fractions" ? (
         <div className="mt-6">
-          <div className="flex flex-wrap gap-3">
+          <div className="grid gap-4 md:grid-cols-3">
             {(questionData.fractions ?? []).map((value) => (
               <button
                 key={value}
                 type="button"
                 onClick={() => choose(value)}
-                className="rounded-2xl border border-violet-300 bg-white p-3 text-left"
+                className="rounded-2xl border border-violet-300 bg-white p-4 text-left shadow-sm transition hover:bg-violet-50"
               >
                 <div className="text-lg font-black text-violet-900">{value}</div>
-                <div className="mt-2">
-                  <FractionBar fraction={value} />
+                <div className="mt-3">
+                  <FractionBar fraction={value} showLabel={false} large />
                 </div>
               </button>
             ))}
