@@ -2712,8 +2712,8 @@ function generateInteractiveQuestion(
       kind: "number_line_place",
       prompt:
         mode === "pick_point"
-          ? `Which point shows ${target.label} on the number line?`
-          : `Place ${target.label} on the number line.`,
+          ? `Place ${target.label} on the number line using the model.`
+          : `Place ${target.label} on the number line using the model.`,
       mode,
       denominator: 5,
       targetFraction: target.label,
