@@ -14,14 +14,14 @@ function FractionBar({ fraction }: { fraction: string }) {
   return (
     <div className="rounded-2xl border border-violet-200 bg-white p-3 shadow-sm">
       <div
-        className="grid gap-1 overflow-hidden rounded-xl border-2 border-slate-300"
+        className="grid gap-1 rounded-xl bg-slate-200 p-1"
         style={{ gridTemplateColumns: `repeat(${denominator}, minmax(0, 1fr))` }}
       >
         {Array.from({ length: denominator }).map((_, index) => (
           <div
             key={index}
             className={[
-              "h-8 border-r border-slate-300 last:border-r-0",
+              "h-8 rounded-sm",
               index < numerator ? "bg-violet-500" : "bg-slate-100",
             ].join(" ")}
           />
