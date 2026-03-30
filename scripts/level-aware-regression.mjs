@@ -87,6 +87,7 @@ const { getPretestForLevel, getPosttestForLevel } = assessments;
 
 const findings = [];
 const YEAR3_ALLOWED_FACTORS = new Set([2, 3, 4, 5, 10]);
+const YEAR3_ALLOWED_FRACTION_DENOMINATORS = new Set([2, 3, 4, 5, 10]);
 
 function addFinding(scope, issue) {
   findings.push(`${scope} | ${issue}`);
@@ -358,6 +359,55 @@ function checkYear3FractionLessonAlignment(lesson) {
   }
 }
 
+function checkYear3FractionDenominators(lesson) {
+  const level = getLevelForLesson(lesson);
+  const lessonPool = buildLessonActivityPool(level, lesson);
+
+  function collectFractions(question) {
+    const labels = [];
+    if ("fractionLabel" in question && typeof question.fractionLabel === "string") {
+      labels.push(question.fractionLabel);
+    }
+    if ("targetFraction" in question && typeof question.targetFraction === "string") {
+      labels.push(question.targetFraction);
+    }
+    if ("fractions" in question && Array.isArray(question.fractions)) {
+      labels.push(...question.fractions.filter((value) => typeof value === "string"));
+    }
+    if ("leftFraction" in question && typeof question.leftFraction === "string") {
+      labels.push(question.leftFraction);
+    }
+    if ("rightFraction" in question && typeof question.rightFraction === "string") {
+      labels.push(question.rightFraction);
+    }
+    if ("options" in question && Array.isArray(question.options)) {
+      labels.push(
+        ...question.options.filter(
+          (value) => typeof value === "string" && /^\d+\/\d+$/.test(value)
+        )
+      );
+    }
+    return labels;
+  }
+
+  for (const activity of lessonPool.activities) {
+    let question;
+    try {
+      question = generateQuestion(level, lesson, activity);
+    } catch (error) {
+      addFinding(`Year 3 ${lesson.id} fraction_denominators`, error instanceof Error ? error.message : String(error));
+      continue;
+    }
+    const labels = collectFractions(question);
+    for (const label of labels) {
+      const denominator = Number(label.split("/")[1]);
+      if (!YEAR3_ALLOWED_FRACTION_DENOMINATORS.has(denominator)) {
+        addFinding(`Year 3 ${lesson.id} fraction_denominators`, `Found disallowed denominator in ${label}.`);
+      }
+    }
+  }
+}
+
 function toLesson(row) {
   return {
     id: `y2-w${row.week}-l${row.lesson}`,
@@ -489,6 +539,7 @@ for (const week of [11, 12]) {
   for (const lesson of weekPlan.lessons) {
     checkLesson("Year 3", lesson);
     checkYear3FractionLessonAlignment(lesson);
+    checkYear3FractionDenominators(lesson);
   }
 }
 

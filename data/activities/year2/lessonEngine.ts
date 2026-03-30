@@ -254,8 +254,12 @@ function buildShadedParts(numerator: number) {
   return Array.from({ length: numerator }, (_, index) => index);
 }
 
+const YEAR3_ALLOWED_FRACTION_DENOMINATORS = [2, 3, 4, 5, 10] as const;
+
 function randomUnitDenominator() {
-  return ([2, 3, 4] as const)[randInt(0, 2)] ?? 2;
+  return YEAR3_ALLOWED_FRACTION_DENOMINATORS[
+    randInt(0, YEAR3_ALLOWED_FRACTION_DENOMINATORS.length - 1)
+  ] ?? 2;
 }
 
 function pickFractionPair() {
@@ -273,9 +277,9 @@ function pickFractionPair() {
 
 function fractionPartsForNumberLine() {
   return [
-    { label: "1/4", value: 1 / 4 },
+    { label: "1/5", value: 1 / 5 },
     { label: "1/2", value: 1 / 2 },
-    { label: "3/4", value: 3 / 4 },
+    { label: "4/5", value: 4 / 5 },
   ];
 }
 
@@ -2342,16 +2346,25 @@ function generateInteractiveQuestion(
           options: [
             { id: "a", numerator: 2, denominator: 4 },
             { id: "b", numerator: 3, denominator: 4 },
-            { id: "c", numerator: 2, denominator: 6 },
+            { id: "c", numerator: 3, denominator: 5 },
           ],
           correctId: "a",
         },
         {
-          target: [1, 3],
+          target: [1, 5],
           options: [
-            { id: "a", numerator: 2, denominator: 6 },
-            { id: "b", numerator: 3, denominator: 6 },
-            { id: "c", numerator: 4, denominator: 6 },
+            { id: "a", numerator: 2, denominator: 10 },
+            { id: "b", numerator: 3, denominator: 10 },
+            { id: "c", numerator: 4, denominator: 10 },
+          ],
+          correctId: "a",
+        },
+        {
+          target: [2, 5],
+          options: [
+            { id: "a", numerator: 4, denominator: 10 },
+            { id: "b", numerator: 3, denominator: 10 },
+            { id: "c", numerator: 1, denominator: 2 },
           ],
           correctId: "a",
         },
@@ -2427,7 +2440,7 @@ function generateInteractiveQuestion(
       config.mode === "pick_set" || config.mode === "complete_sentence"
         ? config.mode
         : "tap_fraction";
-    const denominator = ([2, 3, 4] as const)[randInt(0, 2)] ?? 2;
+    const denominator = randomUnitDenominator();
     const multiplier = randInt(2, 4);
     const totalObjects = denominator * multiplier;
     const answer = totalObjects / denominator;
@@ -2545,8 +2558,8 @@ function generateInteractiveQuestion(
         kind: "number_line_place",
         prompt: "Put the fractions in order from smallest to largest.",
         mode,
-        fractions: shuffle(["1/4", "1/2", "3/4"]),
-        answer: "1/4,1/2,3/4",
+        fractions: shuffle(["1/5", "1/2", "4/5"]),
+        answer: "1/5,1/2,4/5",
       };
     }
 
@@ -2558,9 +2571,9 @@ function generateInteractiveQuestion(
           ? `Which point shows ${target.label} on the number line?`
           : `Place ${target.label} on the number line.`,
       mode,
-      denominator: 4,
+      denominator: 5,
       targetFraction: target.label,
-      options: ["1/4", "1/2", "3/4"],
+      options: ["1/5", "1/2", "4/5"],
       answer: target.label,
     };
   }
@@ -2574,6 +2587,8 @@ function generateInteractiveQuestion(
       ["1/2", "1/4", ">"],
       ["1/3", "1/2", "<"],
       ["2/4", "1/2", "="],
+      ["4/5", "7/10", ">"],
+      ["3/5", "2/5", ">"],
     ] as const;
     const chosen = pairs[randInt(0, pairs.length - 1)] ?? pairs[0];
     const [leftFraction, rightFraction, answer] = chosen;
