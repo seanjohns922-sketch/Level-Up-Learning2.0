@@ -1075,29 +1075,20 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         week: 11,
         lesson: 1,
         title: "Recognising Unit Fractions",
-        focus: "Recognise 1/2, 1/3, 1/4 using models",
+        focus: "Recognise unit fractions as one out of equal parts",
         activityIdeas: lessonIdeas(
-          "Identify and model unit fractions",
-          "Match fraction models to real contexts"
+          "Recognise unit fractions in shaded shapes and equal parts",
+          "Match fraction labels to the correct visual model"
         ),
         activities: [
-          makeActivity("division_groups", 2, {
-            minTotal: 12,
-            maxTotal: 48,
-            mode: "sharing",
+          makeActivity("area_model_select", 2, {
+            mode: "shade_fraction",
           }),
-          makeActivity("equal_groups", 1, {
-            minGroups: 2,
-            maxGroups: 4,
-            minItemsPerGroup: 2,
-            maxItemsPerGroup: 10,
-            mode: "equal_groups",
+          makeActivity("area_model_select", 1, {
+            mode: "pick_model",
           }),
-          makeActivity("multiple_choice", 1, {
-            minTotal: 12,
-            maxTotal: 48,
-            mode: "sharing",
-            sourceActivityType: "division_groups",
+          makeActivity("area_model_select", 1, {
+            mode: "match_model",
           }),
         ],
         curriculum: ["ALL"],
@@ -1106,31 +1097,21 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         id: "y3-w11-l2",
         week: 11,
         lesson: 2,
-        title: "Fractions on Number Lines",
-        focus: "Place fractions correctly on number lines",
+        title: "Fractions of Sets",
+        focus: "Understand a fraction as part of a group",
         activityIdeas: lessonIdeas(
-          "Locate simple fractions on number lines",
-          "Use benchmark fractions to reason about placement"
+          "Find a unit fraction of a set by counting equal groups",
+          "Move from seeing a highlighted fraction to stating the amount"
         ),
         activities: [
-          makeActivity("number_line", 2, {
-            min: 0,
-            max: 100,
-            step: 5,
-            mode: "placement",
+          makeActivity("set_model_select", 2, {
+            mode: "tap_fraction",
           }),
-          makeActivity("number_line", 1, {
-            min: 0,
-            max: 100,
-            step: 5,
-            mode: "estimate",
+          makeActivity("set_model_select", 1, {
+            mode: "pick_set",
           }),
-          makeActivity("typed_response", 1, {
-            min: 0,
-            max: 100,
-            step: 5,
-            mode: "placement",
-            sourceActivityType: "number_line",
+          makeActivity("set_model_select", 1, {
+            mode: "complete_sentence",
           }),
         ],
         curriculum: ["ALL"],
@@ -1139,29 +1120,21 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         id: "y3-w11-l3",
         week: 11,
         lesson: 3,
-        title: "Comparing Fractions",
-        focus: "Compare simple fractions and justify reasoning",
+        title: "Build a Whole",
+        focus: "Use inverse thinking to build the whole from one fractional part",
         activityIdeas: lessonIdeas(
-          "Compare fractions such as 1/2 and 1/4 using models/lines",
-          "Explain comparisons with reference to same whole"
+          "Build a complete whole from one known fraction part",
+          "Work out the whole when one fraction part is given"
         ),
         activities: [
-          makeActivity("division_groups", 2, {
-            minTotal: 12,
-            maxTotal: 48,
-            mode: "grouping",
+          makeActivity("build_the_whole", 2, {
+            mode: "build_whole",
           }),
-          makeActivity("mixed_word_problem", 1, {
-            min: 40,
-            max: 180,
-            mode: "choose_operation",
-            operations: ["/"],
+          makeActivity("build_the_whole", 1, {
+            mode: "fill_total",
           }),
-          makeActivity("multiple_choice", 1, {
-            minTotal: 12,
-            maxTotal: 48,
-            mode: "grouping",
-            sourceActivityType: "division_groups",
+          makeActivity("build_the_whole", 1, {
+            mode: "pick_whole",
           }),
         ],
         curriculum: ["ALL"],
@@ -1179,29 +1152,20 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         week: 12,
         lesson: 1,
         title: "Equivalent Fractions",
-        focus: "Recognise and build simple equivalent fractions",
+        focus: "Recognise and build equivalent fractions visually",
         activityIdeas: lessonIdeas(
-          "Explore simple equivalence (e.g. 1/2 = 2/4)",
-          "Use visual models to justify equivalence"
+          "Match simple equivalent fractions using visual bars and parts",
+          "Build the same fraction value using more pieces"
         ),
         activities: [
-          makeActivity("division_groups", 2, {
-            minTotal: 12,
-            maxTotal: 60,
-            mode: "inverse_link",
+          makeActivity("area_model_select", 2, {
+            mode: "match_equivalent",
           }),
-          makeActivity("equal_groups", 1, {
-            minGroups: 2,
-            maxGroups: 6,
-            minItemsPerGroup: 2,
-            maxItemsPerGroup: 10,
-            mode: "equal_groups",
+          makeActivity("area_model_select", 1, {
+            mode: "pick_model",
           }),
-          makeActivity("typed_response", 1, {
-            minTotal: 12,
-            maxTotal: 60,
-            mode: "inverse_link",
-            sourceActivityType: "division_groups",
+          makeActivity("area_model_select", 1, {
+            mode: "match_equivalent",
           }),
         ],
         curriculum: ["ALL"],
@@ -1210,34 +1174,21 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         id: "y3-w12-l2",
         week: 12,
         lesson: 2,
-        title: "Whole & Fraction Models",
-        focus: "Build one whole from fractional parts",
+        title: "Fractions on Number Lines",
+        focus: "Place and order fractions as positions on a number line",
         activityIdeas: lessonIdeas(
-          "Compose and decompose whole using fraction parts",
-          "Apply part-whole fraction reasoning in practical contexts"
+          "Place simple fractions correctly between 0 and 1",
+          "Order benchmark fractions on a number line"
         ),
         activities: [
-          makeActivity("equal_groups", 2, {
-            minGroups: 2,
-            maxGroups: 8,
-            minItemsPerGroup: 2,
-            maxItemsPerGroup: 10,
-            mode: "equal_groups",
+          makeActivity("number_line_place", 2, {
+            mode: "place_fraction",
           }),
-          makeActivity("arrays", 1, {
-            minRows: 2,
-            maxRows: 6,
-            minColumns: 2,
-            maxColumns: 10,
-            mode: "arrays",
+          makeActivity("number_line_place", 1, {
+            mode: "pick_point",
           }),
-          makeActivity("multiple_choice", 1, {
-            minGroups: 2,
-            maxGroups: 8,
-            minItemsPerGroup: 2,
-            maxItemsPerGroup: 10,
-            mode: "equal_groups",
-            sourceActivityType: "equal_groups",
+          makeActivity("number_line_place", 1, {
+            mode: "order_fractions",
           }),
         ],
         curriculum: ["ALL"],
@@ -1246,30 +1197,21 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         id: "y3-w12-l3",
         week: 12,
         lesson: 3,
-        title: "Fraction Word Problems",
-        focus: "Apply fractions in real-life contexts",
+        title: "Comparing Fractions",
+        focus: "Compare fractions using visuals, symbols, and reasoning",
         activityIdeas: lessonIdeas(
-          "Solve fraction-based word problems",
-          "Explain solutions and check reasonableness"
+          "Compare simple fractions using the same whole",
+          "Explain whether fraction statements are true or false"
         ),
         activities: [
-          makeActivity("mixed_word_problem", 2, {
-            min: 40,
-            max: 220,
-            mode: "choose_operation",
-            operations: ["+", "-", "x", "/"],
+          makeActivity("fraction_compare", 2, {
+            mode: "symbol_compare",
           }),
-          makeActivity("division_groups", 1, {
-            minTotal: 12,
-            maxTotal: 60,
-            mode: "sharing",
+          makeActivity("fraction_compare", 1, {
+            mode: "visual_compare",
           }),
-          makeActivity("typed_response", 1, {
-            min: 40,
-            max: 220,
-            mode: "choose_operation",
-            operations: ["+", "-", "x", "/"],
-            sourceActivityType: "mixed_word_problem",
+          makeActivity("fraction_compare", 1, {
+            mode: "true_false",
           }),
         ],
         curriculum: ["ALL"],

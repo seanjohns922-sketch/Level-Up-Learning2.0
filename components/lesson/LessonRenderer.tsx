@@ -10,6 +10,11 @@ import MixedWordProblem from "@/components/activities/MixedWordProblem";
 import MultipleChoiceActivity from "@/components/activities/MultipleChoiceActivity";
 import NumberOrder from "@/components/activities/NumberOrder";
 import NumberLineActivity from "@/components/activities/NumberLineActivity";
+import AreaModelSelect from "@/components/activities/AreaModelSelect";
+import SetModelSelect from "@/components/activities/SetModelSelect";
+import BuildTheWhole from "@/components/activities/BuildTheWhole";
+import NumberLinePlace from "@/components/activities/NumberLinePlace";
+import FractionCompare from "@/components/activities/FractionCompare";
 import OddEvenSort from "@/components/activities/OddEvenSort";
 import PartitionExpand from "@/components/activities/PartitionExpand";
 import PlaceValueBuilder from "@/components/activities/PlaceValueBuilder";
@@ -22,6 +27,11 @@ import type {
   AdditionStrategyQuestion,
   EqualGroupsQuestion,
   ArraysQuestion,
+  AreaModelSelectQuestion,
+  SetModelSelectQuestion,
+  BuildTheWholeQuestion,
+  NumberLinePlaceQuestion,
+  FractionCompareQuestion,
   DivisionGroupsQuestion,
   FactFamilyQuestion,
   MixedWordProblemQuestion,
@@ -163,6 +173,71 @@ export function LessonRenderer({
       return (
         <NumberLineActivity
           questionData={safeQuestion as NumberLineQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
+        />
+      );
+    }
+    case "area_model_select": {
+      const safeQuestion = getSafeQuestion(activity, questionData, prompt);
+      if (safeQuestion.kind !== "area_model_select") {
+        return <ErrorCard message="Area model question failed to load." />;
+      }
+      return (
+        <AreaModelSelect
+          questionData={safeQuestion as AreaModelSelectQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
+        />
+      );
+    }
+    case "set_model_select": {
+      const safeQuestion = getSafeQuestion(activity, questionData, prompt);
+      if (safeQuestion.kind !== "set_model_select") {
+        return <ErrorCard message="Set model question failed to load." />;
+      }
+      return (
+        <SetModelSelect
+          questionData={safeQuestion as SetModelSelectQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
+        />
+      );
+    }
+    case "build_the_whole": {
+      const safeQuestion = getSafeQuestion(activity, questionData, prompt);
+      if (safeQuestion.kind !== "build_the_whole") {
+        return <ErrorCard message="Build the whole question failed to load." />;
+      }
+      return (
+        <BuildTheWhole
+          questionData={safeQuestion as BuildTheWholeQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
+        />
+      );
+    }
+    case "number_line_place": {
+      const safeQuestion = getSafeQuestion(activity, questionData, prompt);
+      if (safeQuestion.kind !== "number_line_place") {
+        return <ErrorCard message="Fraction number line question failed to load." />;
+      }
+      return (
+        <NumberLinePlace
+          questionData={safeQuestion as NumberLinePlaceQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
+        />
+      );
+    }
+    case "fraction_compare": {
+      const safeQuestion = getSafeQuestion(activity, questionData, prompt);
+      if (safeQuestion.kind !== "fraction_compare") {
+        return <ErrorCard message="Fraction comparison question failed to load." />;
+      }
+      return (
+        <FractionCompare
+          questionData={safeQuestion as FractionCompareQuestion}
           onCorrect={onCorrect}
           onWrong={onWrong}
         />

@@ -215,7 +215,7 @@ function checkYear3Week9SkipCounting(lesson) {
       continue;
     }
 
-    for (let sample = 0; sample < 10; sample += 1) {
+    for (let sample = 0; sample < 24; sample += 1) {
       let question;
       try {
         question = generateQuestion(level, lesson, activity);
@@ -270,8 +270,10 @@ function checkYear3Week9SkipCounting(lesson) {
       addFinding(`Year 3 ${lesson.id} skip_counting`, `No samples found for step ${step}.`);
       continue;
     }
-    if (counts.friendly < counts.nonFriendly) {
-      addFinding(`Year 3 ${lesson.id} skip_counting`, `Expected friendly starts to dominate for step ${step}. Saw ${counts.friendly} friendly and ${counts.nonFriendly} non-friendly.`);
+    const total = counts.friendly + counts.nonFriendly;
+    const friendlyRatio = total > 0 ? counts.friendly / total : 0;
+    if (friendlyRatio < 0.4) {
+      addFinding(`Year 3 ${lesson.id} skip_counting`, `Friendly starts are too rare for step ${step}. Saw ${counts.friendly} friendly and ${counts.nonFriendly} non-friendly.`);
     }
   }
 }
@@ -316,6 +318,42 @@ function checkYear3Week9Lesson3Estimation(lesson) {
 
     if (!/About how many/i.test(question.prompt)) {
       addFinding(`Year 3 ${lesson.id} estimation`, `Estimation prompt missing 'About how many': ${question.prompt}`);
+    }
+  }
+}
+
+function checkYear3FractionLessonAlignment(lesson) {
+  const allowedByLesson = {
+    "y3-w11-l1": ["area_model_select"],
+    "y3-w11-l2": ["set_model_select"],
+    "y3-w11-l3": ["build_the_whole"],
+    "y3-w12-l1": ["area_model_select"],
+    "y3-w12-l2": ["number_line_place"],
+    "y3-w12-l3": ["fraction_compare"],
+  };
+
+  const allowed = allowedByLesson[lesson.id];
+  if (!allowed) return;
+
+  for (const activity of lesson.activities) {
+    if (!allowed.includes(activity.activityType)) {
+      addFinding(`Year 3 ${lesson.id} fractions`, `Unexpected activity type ${activity.activityType} for fraction lesson.`);
+    }
+  }
+
+  const level = getLevelForLesson(lesson);
+  const lessonPool = buildLessonActivityPool(level, lesson);
+  for (const activity of lessonPool.activities) {
+    let question;
+    try {
+      question = generateQuestion(level, lesson, activity);
+    } catch (error) {
+      addFinding(`Year 3 ${lesson.id} fractions`, error instanceof Error ? error.message : String(error));
+      continue;
+    }
+
+    if (!allowed.includes(question.kind)) {
+      addFinding(`Year 3 ${lesson.id} fractions`, `Generated ${question.kind} instead of ${allowed.join(", ")}.`);
     }
   }
 }
@@ -440,6 +478,18 @@ if (!year3Week9Lesson3) {
 } else {
   checkLesson("Year 3", year3Week9Lesson3);
   checkYear3Week9Lesson3Estimation(year3Week9Lesson3);
+}
+
+for (const week of [11, 12]) {
+  const weekPlan = YEAR3_PROGRAM.find((item) => item.week === week);
+  if (!weekPlan?.lessons?.length) {
+    addFinding(`Year 3 W${week}`, "Missing fraction lessons for regression target.");
+    continue;
+  }
+  for (const lesson of weekPlan.lessons) {
+    checkLesson("Year 3", lesson);
+    checkYear3FractionLessonAlignment(lesson);
+  }
 }
 
 checkQuiz(

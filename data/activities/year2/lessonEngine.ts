@@ -50,6 +50,78 @@ export type NumberLineQuestion = {
   mode: "placement" | "rounding" | "estimate";
 };
 
+export type FractionModel = {
+  id: string;
+  numerator: number;
+  denominator: number;
+  shadedParts?: number[];
+};
+
+export type AreaModelSelectQuestion = {
+  kind: "area_model_select";
+  prompt: string;
+  fractionLabel: string;
+  denominator: number;
+  numerator: number;
+  mode: "shade_fraction" | "pick_model" | "match_model" | "match_equivalent";
+  models?: FractionModel[];
+  correctModelId?: string;
+};
+
+export type SetModelSelectQuestion = {
+  kind: "set_model_select";
+  prompt: string;
+  fractionLabel: string;
+  denominator: number;
+  numerator: number;
+  totalObjects: number;
+  mode: "tap_fraction" | "pick_set" | "complete_sentence";
+  highlightedIndices?: number[];
+  options?: Array<{
+    id: string;
+    highlightedCount: number;
+  }>;
+  correctOptionId?: string;
+  answer?: number;
+};
+
+export type BuildTheWholeQuestion = {
+  kind: "build_the_whole";
+  prompt: string;
+  fractionLabel: string;
+  denominator: number;
+  unitValue?: number;
+  mode: "build_whole" | "fill_total" | "pick_whole";
+  options?: Array<{
+    id: string;
+    parts: number;
+    total?: number;
+  }>;
+  correctOptionId?: string;
+  answer?: number;
+};
+
+export type NumberLinePlaceQuestion = {
+  kind: "number_line_place";
+  prompt: string;
+  mode: "place_fraction" | "pick_point" | "order_fractions";
+  denominator?: number;
+  targetFraction?: string;
+  options?: string[];
+  answer?: string;
+  fractions?: string[];
+};
+
+export type FractionCompareQuestion = {
+  kind: "fraction_compare";
+  prompt: string;
+  mode: "symbol_compare" | "visual_compare" | "true_false";
+  leftFraction: string;
+  rightFraction: string;
+  answer: string;
+  statement?: string;
+};
+
 export type AdditionStrategyQuestion = {
   kind: "addition_strategy";
   prompt: string;
@@ -112,6 +184,11 @@ export type ReviewQuizInnerQuestion =
   | NumberOrderQuestion
   | PartitionExpandQuestion
   | NumberLineQuestion
+  | AreaModelSelectQuestion
+  | SetModelSelectQuestion
+  | BuildTheWholeQuestion
+  | NumberLinePlaceQuestion
+  | FractionCompareQuestion
   | AdditionStrategyQuestion
   | EqualGroupsQuestion
   | ArraysQuestion
@@ -167,6 +244,39 @@ function normalizeFactSentence(value: string) {
     .replace(/x/gi, "×")
     .replace(/\//g, "÷")
     .toLowerCase();
+}
+
+function fractionLabel(numerator: number, denominator: number) {
+  return `${numerator}/${denominator}`;
+}
+
+function buildShadedParts(numerator: number) {
+  return Array.from({ length: numerator }, (_, index) => index);
+}
+
+function randomUnitDenominator() {
+  return ([2, 3, 4] as const)[randInt(0, 2)] ?? 2;
+}
+
+function pickFractionPair() {
+  const pairs: Array<[number, number]> = [
+    [1, 2],
+    [1, 3],
+    [1, 4],
+    [2, 4],
+    [2, 6],
+    [3, 6],
+    [3, 4],
+  ];
+  return pairs[randInt(0, pairs.length - 1)] ?? [1, 2];
+}
+
+function fractionPartsForNumberLine() {
+  return [
+    { label: "1/4", value: 1 / 4 },
+    { label: "1/2", value: 1 / 2 },
+    { label: "3/4", value: 3 / 4 },
+  ];
 }
 
 export type OddEvenSortQuestion = {
@@ -239,6 +349,11 @@ export type Year2QuestionData =
   | NumberOrderQuestion
   | PartitionExpandQuestion
   | NumberLineQuestion
+  | AreaModelSelectQuestion
+  | SetModelSelectQuestion
+  | BuildTheWholeQuestion
+  | NumberLinePlaceQuestion
+  | FractionCompareQuestion
   | AdditionStrategyQuestion
   | EqualGroupsQuestion
   | ArraysQuestion
@@ -421,6 +536,26 @@ const BASE_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
   },
   number_line: {
     allowedModes: ["placement", "rounding", "estimate"],
+    requiresVisual: true,
+  },
+  area_model_select: {
+    allowedModes: ["shade_fraction", "pick_model", "match_model", "match_equivalent"],
+    requiresVisual: true,
+  },
+  set_model_select: {
+    allowedModes: ["tap_fraction", "pick_set", "complete_sentence"],
+    requiresVisual: true,
+  },
+  build_the_whole: {
+    allowedModes: ["build_whole", "fill_total", "pick_whole"],
+    requiresVisual: true,
+  },
+  number_line_place: {
+    allowedModes: ["place_fraction", "pick_point", "order_fractions"],
+    requiresVisual: true,
+  },
+  fraction_compare: {
+    allowedModes: ["symbol_compare", "visual_compare", "true_false"],
     requiresVisual: true,
   },
   odd_even_sort: {
@@ -2192,6 +2327,273 @@ function generateInteractiveQuestion(
     };
   }
 
+  if (activityType === "area_model_select") {
+    const mode =
+      config.mode === "pick_model" ||
+      config.mode === "match_model" ||
+      config.mode === "match_equivalent"
+        ? config.mode
+        : "shade_fraction";
+
+    if (mode === "match_equivalent") {
+      const equivalentSets = [
+        {
+          target: [1, 2],
+          options: [
+            { id: "a", numerator: 2, denominator: 4 },
+            { id: "b", numerator: 3, denominator: 4 },
+            { id: "c", numerator: 2, denominator: 6 },
+          ],
+          correctId: "a",
+        },
+        {
+          target: [1, 3],
+          options: [
+            { id: "a", numerator: 2, denominator: 6 },
+            { id: "b", numerator: 3, denominator: 6 },
+            { id: "c", numerator: 4, denominator: 6 },
+          ],
+          correctId: "a",
+        },
+      ];
+      const chosen = equivalentSets[randInt(0, equivalentSets.length - 1)] ?? equivalentSets[0];
+      const [numerator, denominator] = chosen.target;
+      return {
+        kind: "area_model_select",
+        prompt: `Which model is equivalent to ${fractionLabel(numerator, denominator)}?`,
+        fractionLabel: fractionLabel(numerator, denominator),
+        numerator,
+        denominator,
+        mode,
+        models: chosen.options.map((option) => ({
+          ...option,
+          shadedParts: buildShadedParts(option.numerator),
+        })),
+        correctModelId: chosen.correctId,
+      };
+    }
+
+    const denominator = randomUnitDenominator();
+    const numerator = mode === "shade_fraction" || mode === "pick_model" || mode === "match_model" ? 1 : 1;
+
+    if (mode === "pick_model" || mode === "match_model") {
+      const distractors = shuffle(
+        [
+          { id: "a", numerator: 1, denominator, shadedParts: buildShadedParts(1) },
+          {
+            id: "b",
+            numerator: Math.min(denominator - 1, 2),
+            denominator,
+            shadedParts: buildShadedParts(Math.min(denominator - 1, 2)),
+          },
+          {
+            id: "c",
+            numerator: 1,
+            denominator: denominator === 4 ? 3 : 4,
+            shadedParts: buildShadedParts(1),
+          },
+          { id: "d", numerator: 0, denominator, shadedParts: [] },
+        ].slice(0, 4)
+      );
+      const correctModel = distractors.find((model) => model.numerator === 1 && model.denominator === denominator)
+        ?? distractors[0];
+      return {
+        kind: "area_model_select",
+        prompt:
+          mode === "pick_model"
+            ? `Which shows ${fractionLabel(1, denominator)}?`
+            : `Match ${fractionLabel(1, denominator)} to the correct picture.`,
+        fractionLabel: fractionLabel(1, denominator),
+        numerator: 1,
+        denominator,
+        mode,
+        models: distractors,
+        correctModelId: correctModel.id,
+      };
+    }
+
+    return {
+      kind: "area_model_select",
+      prompt: `Shade ${fractionLabel(1, denominator)} of this shape.`,
+      fractionLabel: fractionLabel(1, denominator),
+      numerator: 1,
+      denominator,
+      mode,
+    };
+  }
+
+  if (activityType === "set_model_select") {
+    const mode =
+      config.mode === "pick_set" || config.mode === "complete_sentence"
+        ? config.mode
+        : "tap_fraction";
+    const denominator = ([2, 3, 4] as const)[randInt(0, 2)] ?? 2;
+    const multiplier = randInt(2, 4);
+    const totalObjects = denominator * multiplier;
+    const answer = totalObjects / denominator;
+
+    if (mode === "pick_set") {
+      const options = shuffle([
+        { id: "a", highlightedCount: answer },
+        { id: "b", highlightedCount: Math.max(1, answer - 1) },
+        { id: "c", highlightedCount: answer + 1 },
+      ]);
+      const correctOption = options.find((option) => option.highlightedCount === answer) ?? options[0];
+      return {
+        kind: "set_model_select",
+        prompt: `Which shows ${fractionLabel(1, denominator)} of ${totalObjects}?`,
+        fractionLabel: fractionLabel(1, denominator),
+        numerator: 1,
+        denominator,
+        totalObjects,
+        mode,
+        options,
+        correctOptionId: correctOption.id,
+      };
+    }
+
+    if (mode === "complete_sentence") {
+      return {
+        kind: "set_model_select",
+        prompt: `${fractionLabel(1, denominator)} of ${totalObjects} = ?`,
+        fractionLabel: fractionLabel(1, denominator),
+        numerator: 1,
+        denominator,
+        totalObjects,
+        mode,
+        highlightedIndices: buildShadedParts(answer),
+        answer,
+      };
+    }
+
+    return {
+      kind: "set_model_select",
+      prompt: `Tap ${fractionLabel(1, denominator)} of ${totalObjects} counters.`,
+      fractionLabel: fractionLabel(1, denominator),
+      numerator: 1,
+      denominator,
+      totalObjects,
+      mode,
+      answer,
+    };
+  }
+
+  if (activityType === "build_the_whole") {
+    const mode =
+      config.mode === "fill_total" || config.mode === "pick_whole"
+        ? config.mode
+        : "build_whole";
+    const denominator = randomUnitDenominator();
+    const unitValue = randInt(2, 5);
+    const total = denominator * unitValue;
+
+    if (mode === "fill_total") {
+      return {
+        kind: "build_the_whole",
+        prompt: `If ${fractionLabel(1, denominator)} = ${unitValue}, the whole is ___`,
+        fractionLabel: fractionLabel(1, denominator),
+        denominator,
+        unitValue,
+        mode,
+        answer: total,
+        options: shuffle([
+          { id: "a", parts: denominator, total },
+          { id: "b", parts: denominator - 1, total: Math.max(1, total - unitValue) },
+          { id: "c", parts: denominator + 1, total: total + unitValue },
+        ]),
+      };
+    }
+
+    if (mode === "pick_whole") {
+      const options = shuffle([
+        { id: "a", parts: denominator },
+        { id: "b", parts: denominator - 1 },
+        { id: "c", parts: denominator + 1 },
+      ]);
+      const correctOption = options.find((option) => option.parts === denominator) ?? options[0];
+      return {
+        kind: "build_the_whole",
+        prompt: `Which shows the whole if this is ${fractionLabel(1, denominator)}?`,
+        fractionLabel: fractionLabel(1, denominator),
+        denominator,
+        unitValue,
+        mode,
+        options,
+        correctOptionId: correctOption.id,
+      };
+    }
+
+    return {
+      kind: "build_the_whole",
+      prompt: `This is ${fractionLabel(1, denominator)}. How many make a whole?`,
+      fractionLabel: fractionLabel(1, denominator),
+      denominator,
+      unitValue,
+      mode,
+      answer: denominator,
+    };
+  }
+
+  if (activityType === "number_line_place") {
+    const mode =
+      config.mode === "pick_point" || config.mode === "order_fractions"
+        ? config.mode
+        : "place_fraction";
+
+    if (mode === "order_fractions") {
+      return {
+        kind: "number_line_place",
+        prompt: "Put the fractions in order from smallest to largest.",
+        mode,
+        fractions: shuffle(["1/4", "1/2", "3/4"]),
+        answer: "1/4,1/2,3/4",
+      };
+    }
+
+    const target = fractionPartsForNumberLine()[randInt(0, 2)] ?? fractionPartsForNumberLine()[0];
+    return {
+      kind: "number_line_place",
+      prompt:
+        mode === "pick_point"
+          ? `Which point shows ${target.label} on the number line?`
+          : `Place ${target.label} on the number line.`,
+      mode,
+      denominator: 4,
+      targetFraction: target.label,
+      options: ["1/4", "1/2", "3/4"],
+      answer: target.label,
+    };
+  }
+
+  if (activityType === "fraction_compare") {
+    const mode =
+      config.mode === "visual_compare" || config.mode === "true_false"
+        ? config.mode
+        : "symbol_compare";
+    const pairs = [
+      ["1/2", "1/4", ">"],
+      ["1/3", "1/2", "<"],
+      ["2/4", "1/2", "="],
+    ] as const;
+    const chosen = pairs[randInt(0, pairs.length - 1)] ?? pairs[0];
+    const [leftFraction, rightFraction, answer] = chosen;
+
+    return {
+      kind: "fraction_compare",
+      prompt:
+        mode === "symbol_compare"
+          ? `${leftFraction} ☐ ${rightFraction}`
+          : mode === "visual_compare"
+          ? `Which fraction is bigger?`
+          : `True or false: ${leftFraction} > ${rightFraction}`,
+      mode,
+      leftFraction,
+      rightFraction,
+      answer: mode === "true_false" ? (answer === ">" ? "true" : "false") : answer,
+      statement: mode === "true_false" ? `${leftFraction} > ${rightFraction}` : undefined,
+    };
+  }
+
   if (activityType === "addition_strategy") {
     return generateAdditionStrategyQuestion(config, level, lesson);
   }
@@ -3609,6 +4011,11 @@ export function generateQuestion(
     activity.activityType === "number_order" ||
     activity.activityType === "partition_expand" ||
     activity.activityType === "number_line" ||
+    activity.activityType === "area_model_select" ||
+    activity.activityType === "set_model_select" ||
+    activity.activityType === "build_the_whole" ||
+    activity.activityType === "number_line_place" ||
+    activity.activityType === "fraction_compare" ||
     activity.activityType === "addition_strategy" ||
     activity.activityType === "equal_groups" ||
     activity.activityType === "arrays" ||
