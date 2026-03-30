@@ -75,14 +75,18 @@ export type SetModelSelectQuestion = {
   denominator: number;
   numerator: number;
   totalObjects: number;
-  mode: "tap_fraction" | "pick_set" | "complete_sentence";
+  mode: "tap_fraction" | "pick_set" | "complete_sentence" | "label_shared_group";
   highlightedIndices?: number[];
+  groupCount?: number;
+  groupSize?: number;
   options?: Array<{
     id: string;
     highlightedCount: number;
   }>;
   correctOptionId?: string;
   answer?: number;
+  labelOptions?: string[];
+  correctLabel?: string;
 };
 
 export type BuildTheWholeQuestion = {
@@ -547,7 +551,7 @@ const BASE_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
     requiresVisual: true,
   },
   set_model_select: {
-    allowedModes: ["tap_fraction", "pick_set", "complete_sentence"],
+    allowedModes: ["tap_fraction", "pick_set", "complete_sentence", "label_shared_group"],
     requiresVisual: true,
   },
   build_the_whole: {
@@ -1151,6 +1155,13 @@ function isYear3Week9Lesson3Estimation(
   lesson: Lesson
 ): boolean {
   return level === 3 && lesson.week === 9 && lesson.lesson === 3;
+}
+
+function isYear3Week11Lesson2FractionsOfSets(
+  level: SupportedMathLevel,
+  lesson: Lesson
+): boolean {
+  return level === 3 && lesson.week === 11 && lesson.lesson === 2;
 }
 
 function buildYear3Week9SkipCountSequence(step: number) {
@@ -2437,13 +2448,74 @@ function generateInteractiveQuestion(
 
   if (activityType === "set_model_select") {
     const mode =
-      config.mode === "pick_set" || config.mode === "complete_sentence"
+      config.mode === "pick_set" || config.mode === "complete_sentence" || config.mode === "label_shared_group"
         ? config.mode
         : "tap_fraction";
-    const denominator = randomUnitDenominator();
+    const denominator = isYear3Week11Lesson2FractionsOfSets(level, lesson)
+      ? ([2, 3, 4, 5] as const)[randInt(0, 3)] ?? 2
+      : randomUnitDenominator();
     const multiplier = randInt(2, 4);
     const totalObjects = denominator * multiplier;
     const answer = totalObjects / denominator;
+
+    if (isYear3Week11Lesson2FractionsOfSets(level, lesson)) {
+      if (mode === "label_shared_group") {
+        const labelChoices = shuffle([
+          fractionLabel(1, denominator),
+          fractionLabel(1, Math.max(2, denominator - 1)),
+          fractionLabel(1, denominator + 1),
+        ]).filter((value, index, all) => all.indexOf(value) === index);
+        return {
+          kind: "set_model_select",
+          prompt: `Share ${totalObjects} counters between ${denominator} people. Each person gets one equal group. Which label matches one group?`,
+          fractionLabel: fractionLabel(1, denominator),
+          numerator: 1,
+          denominator,
+          totalObjects,
+          groupCount: denominator,
+          groupSize: answer,
+          mode,
+          highlightedIndices: buildShadedParts(answer),
+          labelOptions: labelChoices,
+          correctLabel: fractionLabel(1, denominator),
+        };
+      }
+
+      if (mode === "pick_set") {
+        const options = shuffle([
+          { id: "a", highlightedCount: answer },
+          { id: "b", highlightedCount: Math.max(1, answer - 1) },
+          { id: "c", highlightedCount: answer + 1 },
+        ]);
+        const correctOption = options.find((option) => option.highlightedCount === answer) ?? options[0];
+        return {
+          kind: "set_model_select",
+          prompt: `Share ${totalObjects} counters between ${denominator} people. Which picture shows one equal group, or ${fractionLabel(1, denominator)}?`,
+          fractionLabel: fractionLabel(1, denominator),
+          numerator: 1,
+          denominator,
+          totalObjects,
+          groupCount: denominator,
+          groupSize: answer,
+          mode,
+          options,
+          correctOptionId: correctOption.id,
+        };
+      }
+
+      return {
+        kind: "set_model_select",
+        prompt: `Share ${totalObjects} counters between ${denominator} people. Tap the counters one person gets.`,
+        fractionLabel: fractionLabel(1, denominator),
+        numerator: 1,
+        denominator,
+        totalObjects,
+        groupCount: denominator,
+        groupSize: answer,
+        mode: "tap_fraction",
+        answer,
+      };
+    }
 
     if (mode === "pick_set") {
       const options = shuffle([

@@ -1098,10 +1098,10 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         week: 11,
         lesson: 2,
         title: "Fractions of Sets",
-        focus: "Understand a fraction as part of a group",
+        focus: "Share collections into equal groups and connect one group to a unit fraction",
         activityIdeas: lessonIdeas(
-          "Find a unit fraction of a set by counting equal groups",
-          "Move from seeing a highlighted fraction to stating the amount"
+          "Share collections into equal groups and identify one group",
+          "Introduce 1/2, 1/3, 1/4, and 1/5 as labels for one equal share"
         ),
         activities: [
           makeActivity("set_model_select", 2, {
@@ -1111,7 +1111,7 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
             mode: "pick_set",
           }),
           makeActivity("set_model_select", 1, {
-            mode: "complete_sentence",
+            mode: "label_shared_group",
           }),
         ],
         curriculum: ["ALL"],
