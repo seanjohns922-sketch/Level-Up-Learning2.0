@@ -99,6 +99,6 @@ export function getVignetteStyle(levelNum: number): string {
     default:
       return levelNum >= 3
         ? "inset 0 0 140px 50px rgba(5,18,35,0.42), inset 0 -60px 80px -20px rgba(5,18,35,0.32)"
-        : "inset 0 0 120px 40px rgba(5,20,35,0.35), inset 0 -60px 80px -20px rgba(5,20,35,0.25)";
+        : "inset 0 0 135px 45px rgba(5,18,35,0.40), inset 0 -60px 80px -20px rgba(5,18,35,0.30)";
   }
 }
