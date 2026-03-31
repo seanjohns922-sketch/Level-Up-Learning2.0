@@ -121,7 +121,7 @@ export default function AssessmentQuestionCard({
               disabled={order.includes(fraction)}
               className="rounded-2xl border border-slate-600 bg-slate-700/50 p-4 text-left shadow-sm transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <div className="text-lg font-black text-violet-900">{fraction}</div>
+              <div className="text-lg font-black text-white">{fraction}</div>
               <div className="mt-3">
                 <FractionBar fraction={fraction} large />
               </div>
