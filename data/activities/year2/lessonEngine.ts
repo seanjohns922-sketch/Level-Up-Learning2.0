@@ -758,6 +758,104 @@ function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+const NUMBER_WORD_ONES = [
+  "zero",
+  "one",
+  "two",
+  "three",
+  "four",
+  "five",
+  "six",
+  "seven",
+  "eight",
+  "nine",
+] as const;
+
+const NUMBER_WORD_TEENS = [
+  "ten",
+  "eleven",
+  "twelve",
+  "thirteen",
+  "fourteen",
+  "fifteen",
+  "sixteen",
+  "seventeen",
+  "eighteen",
+  "nineteen",
+] as const;
+
+const NUMBER_WORD_TENS = [
+  "",
+  "",
+  "twenty",
+  "thirty",
+  "forty",
+  "fifty",
+  "sixty",
+  "seventy",
+  "eighty",
+  "ninety",
+] as const;
+
+function numberToWordsUnder100(n: number): string {
+  if (n < 10) return NUMBER_WORD_ONES[n] ?? "zero";
+  if (n < 20) return NUMBER_WORD_TEENS[n - 10] ?? "ten";
+  const tens = Math.floor(n / 10);
+  const ones = n % 10;
+  return ones === 0
+    ? NUMBER_WORD_TENS[tens] ?? ""
+    : `${NUMBER_WORD_TENS[tens] ?? ""}-${NUMBER_WORD_ONES[ones] ?? ""}`;
+}
+
+function numberToWordsUnder1000(n: number): string {
+  if (n < 100) return numberToWordsUnder100(n);
+  const hundreds = Math.floor(n / 100);
+  const remainder = n % 100;
+  const hundredsText = `${NUMBER_WORD_ONES[hundreds] ?? "zero"} hundred`;
+  return remainder === 0
+    ? hundredsText
+    : `${hundredsText} and ${numberToWordsUnder100(remainder)}`;
+}
+
+function numberToWords(n: number): string {
+  if (n === 0) return "zero";
+  if (n < 1000) return numberToWordsUnder1000(n);
+
+  const thousands = Math.floor(n / 1000);
+  const remainder = n % 1000;
+  const thousandsText = `${numberToWordsUnder1000(thousands)} thousand`;
+  if (remainder === 0) return thousandsText;
+
+  return remainder < 100
+    ? `${thousandsText} and ${numberToWordsUnder1000(remainder)}`
+    : `${thousandsText} ${numberToWordsUnder1000(remainder)}`;
+}
+
+function formatNumeral(value: number): string {
+  return value.toLocaleString();
+}
+
+function buildLargeNumberOptions(target: number, min: number, max: number): string[] {
+  const options = new Set<number>([target]);
+  const steps = [100000, 10000, 1000, 100, 10, 1];
+
+  for (const step of steps) {
+    if (options.size >= 4) break;
+    const lower = target - step;
+    const upper = target + step;
+    if (lower >= min) options.add(lower);
+    if (options.size >= 4) break;
+    if (upper <= max) options.add(upper);
+  }
+
+  while (options.size < 4) {
+    const candidate = randInt(min, max);
+    if (candidate !== target) options.add(candidate);
+  }
+
+  return shuffle(Array.from(options).map(formatNumeral));
+}
+
 function shuffle<T>(items: T[]) {
   const next = [...items];
   for (let index = next.length - 1; index > 0; index -= 1) {
@@ -3667,6 +3765,38 @@ function generateGenericQuestion(
   const step = typeof config.step === "number" ? config.step : 10;
 
   const asMultipleChoice = activityType === "multiple_choice";
+  const explicitMode = typeof config.mode === "string" ? config.mode : undefined;
+
+  if (explicitMode === "word_form_match" || explicitMode === "write_numeral") {
+    const lowerBound = Math.max(10000, min || 10000);
+    const upperBound = Math.max(lowerBound + 1000, max || 999999);
+    const target = randInt(lowerBound, upperBound);
+    const words = numberToWords(target);
+    const numeral = formatNumeral(target);
+
+    if (explicitMode === "word_form_match") {
+      return asMultipleChoice
+        ? {
+            kind: "multiple_choice",
+            prompt: `Which numeral matches ${words}?`,
+            options: buildLargeNumberOptions(target, lowerBound, upperBound),
+            answer: numeral,
+          }
+        : {
+            kind: "typed_response",
+            prompt: `Write this number in numerals: ${words}.`,
+            answer: numeral,
+            placeholder: "Type the numeral",
+          };
+    }
+
+    return {
+      kind: "typed_response",
+      prompt: `Write this number in numerals: ${words}.`,
+      answer: numeral,
+      placeholder: "Type the numeral",
+    };
+  }
 
   if (sourceActivityType === "place_value_builder") {
     const target = randInt(Math.max(100, min || 100), Math.max(200, max || 999));

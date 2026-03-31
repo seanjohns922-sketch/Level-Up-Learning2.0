@@ -6,7 +6,7 @@ import ReadAloudBtn from "@/components/ReadAloudBtn";
 import PlaceValueMABVisual from "@/components/activities/PlaceValueMABVisual";
 
 function normalize(value: string) {
-  return value.trim().toLowerCase().replace(/\s+/g, " ");
+  return value.trim().toLowerCase().replace(/,/g, "").replace(/\s+/g, " ");
 }
 
 function columnLabel(label: string) {

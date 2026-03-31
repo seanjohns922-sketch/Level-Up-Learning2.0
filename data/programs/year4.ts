@@ -12,7 +12,7 @@ function makeActivity(
 const year4Rows: ProgramRow[] = [
   {
     week: 1,
-    focus: "Place Value to 100,000",
+    focus: "Read, build, and identify digit values in large numbers",
     lesson: 1,
     topic: "Place Value Using Larger Numbers",
     activity: "Identify value of digits in 5- and 6-digit numbers using MAB blocks and charts",
@@ -49,7 +49,7 @@ const year4Rows: ProgramRow[] = [
   },
   {
     week: 1,
-    focus: "Place Value to 100,000",
+    focus: "Convert between expanded and standard form with large numbers",
     lesson: 2,
     topic: "Expanded & Standard Form (Larger Numbers)",
     activity: "Convert between standard and expanded form using digit cards",
@@ -70,7 +70,7 @@ const year4Rows: ProgramRow[] = [
   },
   {
     week: 1,
-    focus: "Place Value to 100,000",
+    focus: "Read and write large numbers in words and numerals",
     lesson: 3,
     topic: "Word Form & Numerals (Larger Numbers)",
     activity: "Read and write large numbers in words and match them to numerals, for example one hundred and eighty-six thousand.",
