@@ -6,6 +6,9 @@ import { getPretestForYearLabel } from "@/data/assessments/api";
 import type { Question } from "@/data/assessments/pretests";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCard";
+import AssessmentShell from "@/components/assessment/AssessmentShell";
+
+/* ── Inline visuals (kept from original) ── */
 
 function MabPicker({
   target,
@@ -31,15 +34,15 @@ function MabPicker({
   }
 
   return (
-    <div className="mt-6">
+    <div className="mt-4">
       <div className="flex items-center justify-end gap-4 mb-4">
-        <div className="px-4 py-2 rounded-xl font-bold border bg-gray-50 border-gray-200 text-gray-700">
+        <div className="px-4 py-2 rounded-xl font-bold border bg-slate-700/50 border-slate-600 text-slate-300">
           Target: {target}
         </div>
       </div>
 
       <div className="mb-5">
-        <div className="text-sm font-bold text-gray-700 mb-2">Tens</div>
+        <div className="text-sm font-bold text-slate-400 mb-2">Tens</div>
         <div className="flex flex-wrap gap-2">
           {Array.from({ length: maxTens }).map((_, i) => {
             const selected = i < value.tens;
@@ -50,9 +53,9 @@ function MabPicker({
                 onClick={() => toggleTens(i)}
                 className={[
                   "w-10 h-20 rounded-xl border-2 transition",
-                   selected
-                     ? "border-teal-600 bg-teal-50"
-                     : "border-gray-200 bg-white hover:bg-gray-50",
+                  selected
+                    ? "border-teal-500 bg-teal-500/20"
+                    : "border-slate-600 bg-slate-700/50 hover:bg-slate-700",
                 ].join(" ")}
                 title={selected ? "Tap to remove" : "Tap to add"}
               >
@@ -62,7 +65,7 @@ function MabPicker({
                       key={k}
                       className={[
                         "h-2 rounded",
-                        selected ? "bg-teal-600/60" : "bg-gray-200",
+                        selected ? "bg-teal-500/60" : "bg-slate-600",
                       ].join(" ")}
                     />
                   ))}
@@ -74,7 +77,7 @@ function MabPicker({
       </div>
 
       <div>
-        <div className="text-sm font-bold text-gray-700 mb-2">Ones</div>
+        <div className="text-sm font-bold text-slate-400 mb-2">Ones</div>
         <div className="flex flex-wrap gap-2">
           {Array.from({ length: maxOnes }).map((_, i) => {
             const selected = i < value.ones;
@@ -85,13 +88,13 @@ function MabPicker({
                 onClick={() => toggleOnes(i)}
                 className={[
                   "w-10 h-10 rounded-lg border-2 transition",
-                   selected
-                     ? "border-teal-600 bg-teal-50"
-                     : "border-gray-200 bg-white hover:bg-gray-50",
+                  selected
+                    ? "border-teal-500 bg-teal-500/20"
+                    : "border-slate-600 bg-slate-700/50 hover:bg-slate-700",
                 ].join(" ")}
                 title={selected ? "Tap to remove" : "Tap to add"}
               >
-                <div className="w-6 h-6 rounded-md border border-gray-300 mx-auto my-auto" />
+                <div className="w-6 h-6 rounded-md border border-slate-500 mx-auto my-auto" />
               </button>
             );
           })}
@@ -103,14 +106,14 @@ function MabPicker({
 
 function GroupsVisual({ groups }: { groups: number[] }) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-3">
+    <div className="rounded-xl border border-slate-600 bg-slate-700/50 p-3">
       <div className="grid gap-2">
         {groups.map((count, rowIdx) => (
           <div key={rowIdx} className="flex flex-wrap gap-2">
             {Array.from({ length: count }).map((_, i) => (
               <span
                 key={i}
-                className="inline-block h-4 w-4 rounded-full border border-gray-300"
+                className="inline-block h-4 w-4 rounded-full border border-slate-500 bg-slate-600"
                 aria-hidden
               />
             ))}
@@ -136,10 +139,6 @@ function DotAddVisual({
   const [rightOn, setRightOn] = useState<boolean[]>(
     Array.from({ length: maxDots }, () => false)
   );
-
-  const leftCount = leftOn.filter(Boolean).length;
-  const rightCount = rightOn.filter(Boolean).length;
-  const matches = leftCount === leftTarget && rightCount === rightTarget;
 
   function toggle(side: "left" | "right", idx: number) {
     if (side === "left") {
@@ -170,8 +169,8 @@ function DotAddVisual({
           className={[
             "h-8 w-8 rounded-full border transition",
             on
-               ? "bg-teal-600 border-teal-700"
-              : "bg-white border-gray-300 hover:bg-gray-50",
+              ? "bg-teal-500 border-teal-400"
+              : "bg-slate-700 border-slate-500 hover:bg-slate-600",
           ].join(" ")}
           aria-label={`${side} dot ${i + 1}`}
         />
@@ -180,49 +179,41 @@ function DotAddVisual({
   );
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 mb-4">
-      <div className="text-sm text-gray-600 mb-3">
-        Click dots to show <span className="font-bold">{leftTarget}</span> +{" "}
-        <span className="font-bold">{rightTarget}</span>
+    <div className="rounded-2xl border border-slate-600 bg-slate-700/50 p-5 mb-4">
+      <div className="text-sm text-slate-400 mb-3">
+        Click dots to show <span className="font-bold text-white">{leftTarget}</span> +{" "}
+        <span className="font-bold text-white">{rightTarget}</span>
       </div>
 
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
         <DotRow side="left" onArr={leftOn} />
-        <div className="text-4xl font-extrabold text-gray-700 select-none">
-          +
-        </div>
+        <div className="text-4xl font-extrabold text-slate-400 select-none">+</div>
         <DotRow side="right" onArr={rightOn} />
       </div>
 
-      <div className="mt-4 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={clear}
-            className="px-3 py-2 rounded-xl bg-gray-100 text-gray-800 font-bold hover:bg-gray-200 transition"
-          >
-            Clear
-          </button>
-        </div>
+      <div className="mt-4">
+        <button
+          type="button"
+          onClick={clear}
+          className="px-3 py-2 rounded-xl bg-slate-700 text-slate-300 font-bold hover:bg-slate-600 transition border border-slate-600"
+        >
+          Clear
+        </button>
       </div>
     </div>
   );
 }
 
-function EqualSharingPreview({
-  groups,
-}: {
-  groups: number[];
-}) {
+function EqualSharingPreview({ groups }: { groups: number[] }) {
   return (
     <div className="flex gap-4 mt-3">
       {groups.map((size, i) => (
         <div
           key={i}
-          className="rounded-xl border border-gray-300 bg-gray-50 p-3 flex flex-wrap gap-1 w-24"
+          className="rounded-xl border border-slate-600 bg-slate-700/50 p-3 flex flex-wrap gap-1 w-24"
         >
           {Array.from({ length: size }).map((_, j) => (
-            <div key={j} className="h-4 w-4 rounded-full bg-teal-600" />
+            <div key={j} className="h-4 w-4 rounded-full bg-teal-500" />
           ))}
         </div>
       ))}
@@ -252,10 +243,10 @@ function GroupCountersVisual({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 mb-4">
-      <div className="text-sm text-gray-600 mb-3">
-        Click counters to show <b>{selectTarget}</b> counters grouped in{" "}
-        <b>{groupSize}s</b>
+    <div className="rounded-2xl border border-slate-600 bg-slate-700/50 p-5 mb-4">
+      <div className="text-sm text-slate-400 mb-3">
+        Click counters to show <b className="text-white">{selectTarget}</b> counters grouped in{" "}
+        <b className="text-white">{groupSize}s</b>
       </div>
 
       <div
@@ -270,8 +261,8 @@ function GroupCountersVisual({
             className={[
               "h-10 w-10 rounded-full border transition",
               on
-                ? "bg-teal-600 border-teal-700"
-                : "bg-white border-gray-300 hover:bg-gray-50",
+                ? "bg-teal-500 border-teal-400"
+                : "bg-slate-700 border-slate-500 hover:bg-slate-600",
             ].join(" ")}
             aria-label={`counter ${i + 1}`}
           />
@@ -282,7 +273,7 @@ function GroupCountersVisual({
         <button
           type="button"
           onClick={clear}
-          className="px-3 py-2 rounded-xl bg-gray-100 text-gray-800 font-bold hover:bg-gray-200 transition"
+          className="px-3 py-2 rounded-xl bg-slate-700 text-slate-300 font-bold hover:bg-slate-600 transition border border-slate-600"
         >
           Clear
         </button>
@@ -290,14 +281,26 @@ function GroupCountersVisual({
     </div>
   );
 }
+
+/* ── Page ── */
+
 export default function PretestPageWrapper() {
-  return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><PretestPage /></Suspense>;
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-slate-950">
+          <p className="text-slate-500">Loading…</p>
+        </div>
+      }
+    >
+      <PretestPage />
+    </Suspense>
+  );
 }
 
 function PretestPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-
   const year = searchParams.get("year") ?? "Year 3";
 
   const questions: Question[] = useMemo(
@@ -328,15 +331,11 @@ function PretestPage() {
   }
 
   function nextQuestion() {
-    if (index < questions.length - 1) {
-      setIndex(index + 1);
-    }
+    if (index < questions.length - 1) setIndex(index + 1);
   }
 
   function prevQuestion() {
-    if (index > 0) {
-      setIndex(index - 1);
-    }
+    if (index > 0) setIndex(index - 1);
   }
 
   function finish() {
@@ -371,34 +370,31 @@ function PretestPage() {
     );
   }
 
-  const isLast = index === questions.length - 1;
-  const hasSelection = selected !== null;
   const mabTotal = mab.tens * 10 + mab.ones;
   const mabHasSelection = mab.tens > 0 || mab.ones > 0;
-  const isReady =
-    question.type === "mab" ? mabHasSelection : hasSelection;
+  const isReady = question?.type === "mab" ? mabHasSelection : selected !== null;
 
   useEffect(() => {
-    if (question.type !== "mab") return;
+    if (question?.type !== "mab") return;
     const next = [...answers];
     next[index] = mabHasSelection ? String(mabTotal) : null;
     setAnswers(next);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mabTotal, mabHasSelection, question.type, index]);
+  }, [mabTotal, mabHasSelection, question?.type, index]);
 
   if (!questions.length || !question) {
     return (
-      <main className="min-h-screen bg-[#fbf7f1] flex items-center justify-center p-6">
-        <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-xl text-center">
-          <h2 className="text-xl font-bold text-gray-800 mb-2">
+      <main className="min-h-screen bg-slate-950 flex items-center justify-center p-6">
+        <div className="bg-slate-800 rounded-3xl shadow-xl p-8 w-full max-w-xl text-center border border-slate-700/60">
+          <h2 className="text-xl font-bold text-white mb-2">
             No questions found
           </h2>
-          <p className="text-gray-600 mb-4">
+          <p className="text-slate-400 mb-4">
             We couldn&apos;t find a pre-test for {year}.
           </p>
           <button
             onClick={() => router.push("/levels")}
-            className="px-5 py-3 rounded-2xl font-bold bg-emerald-500 text-white hover:bg-emerald-600 transition"
+            className="px-5 py-3 rounded-2xl font-bold bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:from-teal-400 hover:to-emerald-400 transition"
           >
             Back to Home
           </button>
@@ -407,171 +403,136 @@ function PretestPage() {
     );
   }
 
-  return (
-    <main className="min-h-screen bg-[#fbf7f1] flex items-center justify-center p-6">
-      <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-2xl border border-white/70">
-        <div className="flex items-center justify-between mb-6">
-          <button
-            onClick={() => router.push("/levels")}
-            className="text-sm text-blue-600 hover:underline"
-          >
-            Back
-          </button>
+  /* Build question content based on type */
+  let questionContent: React.ReactNode;
 
-          <div className="text-sm text-gray-500 font-semibold">
-            {year} - Pre-Test - {index + 1}/{questions.length}
+  if (question.type === "mab") {
+    questionContent = (
+      <MabPicker
+        target={question.target ?? 0}
+        maxTens={question.maxTens ?? 10}
+        maxOnes={question.maxOnes ?? 10}
+        value={mab}
+        onChange={setMab}
+      />
+    );
+  } else if (question.type === "numberLine") {
+    questionContent = (
+      <div className="mt-4">
+        <div className="relative w-full h-20">
+          <div className="absolute left-0 right-0 top-1/2 h-1 bg-slate-600 rounded" />
+          <div className="absolute left-0 top-[55%] text-xs text-slate-400">
+            {question.min}
           </div>
+          <div className="absolute right-0 top-[55%] text-xs text-slate-400">
+            {question.max}
+          </div>
+
+          {(question.options ?? []).map((n: any) => {
+            const qMin = question.min ?? 0;
+            const qMax = question.max ?? 100;
+            const pct = ((n - qMin) / (qMax - qMin)) * 100;
+            const isSelected = selected === String(n);
+
+            return (
+              <button
+                key={n}
+                onClick={() => choose(String(n))}
+                className={[
+                  "absolute top-1/2 -translate-y-1/2 -translate-x-1/2",
+                  "w-14 h-14 rounded-full border-2 font-extrabold transition",
+                  isSelected
+                    ? "border-teal-500 bg-teal-500/20 text-teal-300"
+                    : "border-slate-500 bg-slate-700 hover:bg-slate-600 text-slate-300",
+                ].join(" ")}
+                style={{ left: `${pct}%` }}
+              >
+                {n}
+              </button>
+            );
+          })}
         </div>
-
-        <div className="flex items-center gap-2 mb-6">
-          <h2 className="text-2xl md:text-3xl font-extrabold text-gray-800">
-            {question.prompt}
-          </h2>
-          <ReadAloudBtn text={question.prompt} size="md" />
-        </div>
-
-        {question.type === "mab" ? (
-          <MabPicker
-            target={question.target ?? 0}
-            maxTens={question.maxTens ?? 10}
-            maxOnes={question.maxOnes ?? 10}
-            value={mab}
-            onChange={setMab}
-          />
-        ) : question.type === "numberLine" ? (
-          <div className="mt-4">
-            <div className="relative w-full h-20">
-              <div className="absolute left-0 right-0 top-1/2 h-1 bg-gray-300 rounded" />
-              <div className="absolute left-0 top-[55%] text-xs text-gray-600">
-                {question.min}
-              </div>
-              <div className="absolute right-0 top-[55%] text-xs text-gray-600">
-                {question.max}
-              </div>
-
-              {(question.options ?? []).map((n: any) => {
-                const qMin = question.min ?? 0;
-                const qMax = question.max ?? 100;
-                const pct = ((n - qMin) / (qMax - qMin)) * 100;
-                const isSelected = selected === String(n);
-
-                return (
-                  <button
-                    key={n}
-                    onClick={() => choose(String(n))}
-                    className={[
-                      "absolute top-1/2 -translate-y-1/2 -translate-x-1/2",
-                      "w-14 h-14 rounded-full border-2 font-extrabold",
-                      isSelected
-                        ? "border-teal-600 bg-teal-50 text-teal-700"
-                        : "border-gray-300 bg-white hover:bg-gray-50",
-                    ].join(" ")}
-                    style={{ left: `${pct}%` }}
-                  >
-                    {n}
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="mt-3 text-sm text-gray-500">
-              Tap the correct point on the line.
-            </div>
-          </div>
-        ) : question.type === "groups" ? (
-          <div className="grid gap-4">
-            {(question.options ?? []).map((opt: any) => {
-              const isSelected = selected === opt.id;
-              return (
-                <button
-                  key={opt.id}
-                  onClick={() => choose(opt.id)}
-                  className={[
-                    "w-full rounded-2xl border p-5 text-left transition",
-                    isSelected
-                      ? "border-teal-500 bg-teal-50"
-                      : "border-gray-200 bg-white hover:bg-gray-50",
-                  ].join(" ")}
-                >
-                  <div className="text-lg font-extrabold text-gray-900 mb-3">
-                    {opt.label}
-                  </div>
-                  <GroupsVisual groups={opt.groups} />
-                </button>
-              );
-            })}
-          </div>
-        ) : (
-          <>
-            {question.visual?.type === "dot_add" ? (
-              <DotAddVisual
-                leftTarget={question.visual.leftTarget}
-                rightTarget={question.visual.rightTarget}
-                maxDots={question.visual.maxDots ?? 10}
-              />
-            ) : question.visual?.type === "group_counters" &&
-              question.visual.groupSize !== undefined &&
-              question.visual.selectTarget !== undefined &&
-              !(question.options ?? []).some(
-                (opt) => typeof opt !== "string" && opt.groups
-              ) ? (
-              <GroupCountersVisual
-                totalCounters={question.visual.totalCounters}
-                groupSize={question.visual.groupSize}
-                selectTarget={question.visual.selectTarget}
-              />
-            ) : null}
-            <AssessmentQuestionCard
-              question={question}
-              value={selected}
-              onChange={choose}
-            />
-          </>
-        )}
-
-        <div className="flex items-center justify-between mt-8">
-          <button
-            onClick={prevQuestion}
-            disabled={index === 0}
-            className={[
-              "px-5 py-3 rounded-2xl font-semibold transition",
-              index === 0
-                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                : "bg-gray-100 hover:bg-gray-200 text-gray-800",
-            ].join(" ")}
-          >
-            Back
-          </button>
-
-          {isLast ? (
-            <button
-              onClick={finish}
-              disabled={!isReady}
-              className={[
-                "px-6 py-3 rounded-2xl font-bold transition",
-                !isReady
-                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  : "bg-emerald-500 text-white hover:bg-emerald-600",
-              ].join(" ")}
-            >
-              Finish
-            </button>
-          ) : (
-            <button
-              onClick={nextQuestion}
-              disabled={!isReady}
-              className={[
-                "px-6 py-3 rounded-2xl font-bold transition",
-                !isReady
-                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  : "bg-emerald-500 text-white hover:bg-emerald-600",
-              ].join(" ")}
-            >
-              Next
-            </button>
-          )}
+        <div className="mt-3 text-sm text-slate-400">
+          Tap the correct point on the line.
         </div>
       </div>
-    </main>
+    );
+  } else if (question.type === "groups") {
+    questionContent = (
+      <div className="grid gap-4">
+        {(question.options ?? []).map((opt: any) => {
+          const isSelected = selected === opt.id;
+          return (
+            <button
+              key={opt.id}
+              onClick={() => choose(opt.id)}
+              className={[
+                "w-full rounded-2xl border p-5 text-left transition",
+                isSelected
+                  ? "border-teal-500 bg-teal-500/10"
+                  : "border-slate-600 bg-slate-700/50 hover:bg-slate-700",
+              ].join(" ")}
+            >
+              <div className="text-lg font-extrabold text-white mb-3">
+                {opt.label}
+              </div>
+              <GroupsVisual groups={opt.groups} />
+            </button>
+          );
+        })}
+      </div>
+    );
+  } else {
+    questionContent = (
+      <>
+        {question.visual?.type === "dot_add" ? (
+          <DotAddVisual
+            leftTarget={question.visual.leftTarget}
+            rightTarget={question.visual.rightTarget}
+            maxDots={question.visual.maxDots ?? 10}
+          />
+        ) : question.visual?.type === "group_counters" &&
+          question.visual.groupSize !== undefined &&
+          question.visual.selectTarget !== undefined &&
+          !(question.options ?? []).some(
+            (opt) => typeof opt !== "string" && opt.groups
+          ) ? (
+          <GroupCountersVisual
+            totalCounters={question.visual.totalCounters}
+            groupSize={question.visual.groupSize}
+            selectTarget={question.visual.selectTarget}
+          />
+        ) : null}
+        <AssessmentQuestionCard
+          question={question}
+          value={selected}
+          onChange={choose}
+        />
+      </>
+    );
+  }
+
+  return (
+    <AssessmentShell
+      testType="Pre-Test"
+      year={year}
+      currentIndex={index}
+      totalQuestions={questions.length}
+      questionPrompt={question.prompt}
+      questionContent={
+        <div>
+          <div className="flex justify-end mb-3">
+            <ReadAloudBtn text={question.prompt} />
+          </div>
+          {questionContent}
+        </div>
+      }
+      hasAnswer={isReady}
+      isLast={index === questions.length - 1}
+      onBack={prevQuestion}
+      onNext={nextQuestion}
+      onSubmit={finish}
+      onExit={() => router.push("/levels")}
+    />
   );
 }

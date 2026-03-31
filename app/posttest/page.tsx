@@ -8,17 +8,27 @@ import { getLegendForYear } from "@/data/legends";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { readProgress, writeProgress, type StudentProgress } from "@/data/progress";
 import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCard";
+import AssessmentShell from "@/components/assessment/AssessmentShell";
 
 const PASS_THRESHOLD = 90;
 
 export default function PostTestPageWrapper() {
-  return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><PostTestPage /></Suspense>;
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-slate-950">
+          <p className="text-slate-500">Loading…</p>
+        </div>
+      }
+    >
+      <PostTestPage />
+    </Suspense>
+  );
 }
 
 function PostTestPage() {
   const router = useRouter();
   const params = useSearchParams();
-
   const year = params.get("year") ?? "Year 3";
 
   const test = useMemo(() => {
@@ -32,7 +42,6 @@ function PostTestPage() {
   const [submitted, setSubmitted] = useState(false);
 
   const q = questions[idx];
-
   const picked = answers[q?.id ?? ""] ?? "";
 
   function pick(option: string) {
@@ -81,22 +90,25 @@ function PostTestPage() {
     writeProgress(nextProgress);
     setSubmitted(true);
 
-    router.push(`/results?year=${encodeURIComponent(year)}&score=${correct}&total=${questions.length}&posttest=1`);
+    router.push(
+      `/results?year=${encodeURIComponent(year)}&score=${correct}&total=${questions.length}&posttest=1`
+    );
   }
 
   if (!questions.length) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-teal-50 to-emerald-100 flex items-center justify-center p-6">
-        <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-xl text-center">
-          <h1 className="text-2xl font-extrabold text-gray-800 mb-2">
+      <main className="min-h-screen bg-slate-950 flex items-center justify-center p-6">
+        <div className="bg-slate-800 rounded-3xl shadow-xl p-8 w-full max-w-xl text-center border border-slate-700/60">
+          <h1 className="text-2xl font-extrabold text-white mb-2">
             Post-Test not found
           </h1>
-          <p className="text-gray-600 mb-6">
-            No post-test questions exist for <span className="font-bold">{year}</span> yet.
+          <p className="text-slate-400 mb-6">
+            No post-test questions exist for{" "}
+            <span className="font-bold text-white">{year}</span> yet.
           </p>
           <button
             onClick={() => router.push("/")}
-            className="w-full py-3 rounded-xl bg-teal-600 text-white font-bold hover:bg-teal-700 transition"
+            className="w-full py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold hover:from-teal-400 hover:to-emerald-400 transition"
           >
             Back to Home
           </button>
@@ -106,94 +118,28 @@ function PostTestPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-teal-50 to-emerald-100 flex items-center justify-center p-6">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-2xl">
-        <div className="flex items-center justify-between mb-6">
-          <button
-            onClick={() => router.push("/")}
-            className="text-sm text-teal-700 hover:underline"
-          >
-            ← Home
-          </button>
-          <div className="text-sm text-gray-500">
-            Post-Test • {year}
-          </div>
-        </div>
-
-        <h1 className="text-3xl font-extrabold text-gray-800 mb-2">
-          Post-Test
-        </h1>
-        <p className="text-gray-500 mb-6">
-          Answer all questions to unlock your Legend (90%+).
-        </p>
-
-        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-5">
-          <div className="flex items-center justify-between mb-3">
-            <div className="text-sm font-bold text-gray-700">
-              Question {idx + 1} of {questions.length}
-            </div>
-            <div className="text-xs text-gray-500">
-              {Math.round(((idx + 1) / questions.length) * 100)}%
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 mb-4">
-            <div className="text-lg font-extrabold text-gray-800">
-              {q.prompt}
-            </div>
+    <AssessmentShell
+      testType="Post-Test"
+      year={year}
+      currentIndex={idx}
+      totalQuestions={questions.length}
+      subtitle="Complete all questions to unlock your Legend (90%+)"
+      questionPrompt={q.prompt}
+      questionContent={
+        <div>
+          <div className="flex justify-end mb-3">
             <ReadAloudBtn text={q.prompt} />
           </div>
-
           <AssessmentQuestionCard question={q} value={picked} onChange={pick} />
         </div>
-
-        <div className="mt-5 flex items-center justify-between gap-3">
-          <button
-            onClick={back}
-            disabled={idx === 0}
-            className={[
-              "px-4 py-3 rounded-xl font-bold transition",
-              idx === 0
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : "bg-gray-100 text-gray-800 hover:bg-gray-200",
-            ].join(" ")}
-          >
-            Back
-          </button>
-
-          {idx < questions.length - 1 ? (
-            <button
-              onClick={next}
-              disabled={!picked}
-              className={[
-                "px-6 py-3 rounded-xl font-bold transition",
-                picked
-                  ? "bg-teal-600 text-white hover:bg-teal-700"
-                  : "bg-gray-200 text-gray-500 cursor-not-allowed",
-              ].join(" ")}
-            >
-              Next
-            </button>
-          ) : (
-            <button
-              onClick={submit}
-              disabled={!picked || submitted}
-              className={[
-                "px-6 py-3 rounded-xl font-bold transition",
-                picked && !submitted
-                  ? "bg-green-600 text-white hover:bg-green-700"
-                  : "bg-gray-200 text-gray-500 cursor-not-allowed",
-              ].join(" ")}
-            >
-              Submit
-            </button>
-          )}
-        </div>
-
-        <div className="mt-4 text-xs text-gray-500">
-          Progress saved on this device (MVP mode)
-        </div>
-      </div>
-    </main>
+      }
+      hasAnswer={!!picked}
+      isLast={idx === questions.length - 1}
+      submitted={submitted}
+      onBack={back}
+      onNext={next}
+      onSubmit={submit}
+      onExit={() => router.push("/")}
+    />
   );
 }
