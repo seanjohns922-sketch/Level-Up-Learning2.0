@@ -7,6 +7,12 @@ export type Question = {
   answerIndex?: number;
   answerOptionId?: string;
   correctAnswer?: string;
+  skillId?: string;
+  skillLabel?: string;
+  linkedWeeks?: number[];
+  linkedLessons?: number[];
+  strand?: string;
+  difficultyBand?: string;
   visual?: any;
   min?: number;
   max?: number;

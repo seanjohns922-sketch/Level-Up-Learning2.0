@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useAuthGuard } from "@/lib/useAuthGuard";
+import { getLatestPosttestProfile } from "@/data/assessments/analysis";
 
 /* ── types ─────────────────────────────────────────── */
 type ClassRow = { id: string; class_code: string; name: string; year_level: string };
@@ -352,6 +353,7 @@ export default function TeacherDashboardPage() {
     const l3 = lessonsThisWeek >= 3;
     const quizUnlocked = l3;
     const pretestScore = prog?.pretest_score;
+    const posttestProfile = getLatestPosttestProfile(prog?.quiz_scores);
 
     return (
       <div
@@ -422,6 +424,27 @@ export default function TeacherDashboardPage() {
               <span className="text-teal-600 font-bold">🏆 Legend Unlocked</span>
             </div>
           )}
+
+          {posttestProfile ? (
+            <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3">
+              <div className="text-xs font-bold text-amber-900 uppercase tracking-wider mb-2">Post-Test</div>
+              <div className="text-sm font-bold text-gray-900">
+                {posttestProfile.percentage}% ({posttestProfile.score}/{posttestProfile.total}) {posttestProfile.passed ? "• Pass" : "• Needs Review"}
+              </div>
+              {!posttestProfile.passed && (prog?.week ?? posttestProfile.assignedWeek) ? (
+                <div className="mt-2">
+                  <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-1 text-[11px] font-bold text-blue-700">
+                    Assigned: Week {prog?.week ?? posttestProfile.assignedWeek}
+                  </span>
+                </div>
+              ) : null}
+              {posttestProfile.weakAreas.slice(0, 3).map((item) => (
+                <div key={item.skillId} className="mt-2 text-xs text-gray-600">
+                  {item.skillLabel} ({item.incorrectCount}/{item.total} incorrect) → Week{item.linkedWeeks.length > 1 ? "s" : ""} {item.linkedWeeks.join(", ")}
+                </div>
+              ))}
+            </div>
+          ) : null}
         </div>
 
         {/* Login Details - QR + PIN */}
@@ -677,7 +700,7 @@ export default function TeacherDashboardPage() {
             </div>
 
             {/* Summary */}
-            <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-4">
               <StatCard label="Students" value={classStudents.length} />
               <StatCard
                 label="Active This Week"
@@ -711,6 +734,14 @@ export default function TeacherDashboardPage() {
                         )
                       ).toFixed(1)
                     : "—"
+                }
+              />
+              <StatCard
+                label="Post-Tests"
+                value={
+                  progress.filter(
+                    (p) => p.year === activeYear && getLatestPosttestProfile(p.quiz_scores)
+                  ).length
                 }
               />
             </div>

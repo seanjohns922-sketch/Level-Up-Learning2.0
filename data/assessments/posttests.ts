@@ -6,6 +6,12 @@ export type Question = {
   correctAnswer: string;
   answer?: any;
   answerOptionId?: string;
+  skillId?: string;
+  skillLabel?: string;
+  linkedWeeks?: number[];
+  linkedLessons?: number[];
+  strand?: string;
+  difficultyBand?: string;
   visual?: any;
 };
 

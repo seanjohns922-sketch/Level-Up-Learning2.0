@@ -6,7 +6,9 @@ export type AssessmentForm = "A" | "B";
 export type Level3AssessmentBlueprintItem = {
   skillId: string;
   title: string;
+  strand: "number" | "fractions" | "multiplication_division" | "patterns";
   linkedWeeks: number[];
+  linkedLessons?: number[];
   questionTypes: string[];
   difficultyBand: "core" | "mixed" | "stretch";
   targetCountInTest: number;
@@ -31,7 +33,10 @@ type Level3GeneratedQuestion = {
   options: AssessmentQuestionOption[];
   correctAnswer: string;
   skillId: string;
+  skillLabel?: string;
   linkedWeeks: number[];
+  linkedLessons?: number[];
+  strand?: Level3AssessmentBlueprintItem["strand"];
   questionType: string;
   difficultyBand: Level3AssessmentBlueprintItem["difficultyBand"];
   instanceKey: string;
@@ -46,7 +51,9 @@ export const LEVEL3_ASSESSMENT_BLUEPRINT: Level3AssessmentBlueprintItem[] = [
   {
     skillId: "place_value_number_knowledge",
     title: "Place Value and Number Knowledge",
+    strand: "number",
     linkedWeeks: [1, 10],
+    linkedLessons: [1, 2, 3],
     questionTypes: ["mcq_place_value", "number_order"],
     difficultyBand: "core",
     targetCountInTest: 2,
@@ -56,7 +63,9 @@ export const LEVEL3_ASSESSMENT_BLUEPRINT: Level3AssessmentBlueprintItem[] = [
   {
     skillId: "rounding_estimation",
     title: "Rounding and Estimation",
+    strand: "number",
     linkedWeeks: [2, 9],
+    linkedLessons: [1, 2, 3],
     questionTypes: ["mcq_rounding", "mcq_estimation"],
     difficultyBand: "mixed",
     targetCountInTest: 2,
@@ -66,7 +75,9 @@ export const LEVEL3_ASSESSMENT_BLUEPRINT: Level3AssessmentBlueprintItem[] = [
   {
     skillId: "addition_fluency",
     title: "Addition Fluency",
+    strand: "number",
     linkedWeeks: [3],
+    linkedLessons: [1, 2, 3],
     questionTypes: ["mcq_addition"],
     difficultyBand: "mixed",
     targetCountInTest: 2,
@@ -76,7 +87,9 @@ export const LEVEL3_ASSESSMENT_BLUEPRINT: Level3AssessmentBlueprintItem[] = [
   {
     skillId: "subtraction_fluency",
     title: "Subtraction Fluency",
+    strand: "number",
     linkedWeeks: [4],
+    linkedLessons: [1, 2, 3],
     questionTypes: ["mcq_subtraction"],
     difficultyBand: "mixed",
     targetCountInTest: 2,
@@ -86,7 +99,9 @@ export const LEVEL3_ASSESSMENT_BLUEPRINT: Level3AssessmentBlueprintItem[] = [
   {
     skillId: "written_algorithms",
     title: "Written Addition and Subtraction",
+    strand: "number",
     linkedWeeks: [5],
+    linkedLessons: [1, 2, 3],
     questionTypes: ["mcq_written_method"],
     difficultyBand: "stretch",
     targetCountInTest: 2,
@@ -96,7 +111,9 @@ export const LEVEL3_ASSESSMENT_BLUEPRINT: Level3AssessmentBlueprintItem[] = [
   {
     skillId: "two_step_word_problems",
     title: "Two-Step Word Problems",
+    strand: "number",
     linkedWeeks: [6],
+    linkedLessons: [1, 2, 3],
     questionTypes: ["mcq_word_problem"],
     difficultyBand: "stretch",
     targetCountInTest: 2,
@@ -106,7 +123,9 @@ export const LEVEL3_ASSESSMENT_BLUEPRINT: Level3AssessmentBlueprintItem[] = [
   {
     skillId: "multiplication_models",
     title: "Multiplication Models",
+    strand: "multiplication_division",
     linkedWeeks: [7],
+    linkedLessons: [1, 2, 3],
     questionTypes: ["mcq_equal_groups", "mcq_arrays"],
     difficultyBand: "core",
     targetCountInTest: 2,
@@ -116,7 +135,9 @@ export const LEVEL3_ASSESSMENT_BLUEPRINT: Level3AssessmentBlueprintItem[] = [
   {
     skillId: "division_and_fact_families",
     title: "Division and Fact Families",
+    strand: "multiplication_division",
     linkedWeeks: [8, 10],
+    linkedLessons: [1, 2],
     questionTypes: ["mcq_division", "mcq_fact_family"],
     difficultyBand: "mixed",
     targetCountInTest: 1,
@@ -126,7 +147,9 @@ export const LEVEL3_ASSESSMENT_BLUEPRINT: Level3AssessmentBlueprintItem[] = [
   {
     skillId: "patterns_sequences",
     title: "Patterns and Sequences",
+    strand: "patterns",
     linkedWeeks: [9],
+    linkedLessons: [1, 2, 3],
     questionTypes: ["mcq_skip_count", "mcq_pattern"],
     difficultyBand: "core",
     targetCountInTest: 1,
@@ -136,7 +159,9 @@ export const LEVEL3_ASSESSMENT_BLUEPRINT: Level3AssessmentBlueprintItem[] = [
   {
     skillId: "fractions_foundations",
     title: "Fraction Foundations",
+    strand: "fractions",
     linkedWeeks: [11],
+    linkedLessons: [1, 2, 3],
     questionTypes: ["fraction_model_select", "build_whole"],
     difficultyBand: "mixed",
     targetCountInTest: 2,
@@ -146,7 +171,9 @@ export const LEVEL3_ASSESSMENT_BLUEPRINT: Level3AssessmentBlueprintItem[] = [
   {
     skillId: "fractions_reasoning",
     title: "Fraction Reasoning",
+    strand: "fractions",
     linkedWeeks: [12],
+    linkedLessons: [1, 2, 3],
     questionTypes: ["fraction_order", "fraction_number_line", "fraction_model_select"],
     difficultyBand: "mixed",
     targetCountInTest: 2,
@@ -700,8 +727,15 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
 
 function buildGeneratedQuestion(form: AssessmentForm, index: number, factory: QuestionFactory): Level3GeneratedQuestion {
   const question = factory();
+  const blueprintItem = LEVEL3_ASSESSMENT_BLUEPRINT.find((item) => item.skillId === question.skillId);
+  if (!blueprintItem) {
+    throw new Error(`Missing blueprint item for skill ${question.skillId}.`);
+  }
   return {
     ...question,
+    skillLabel: blueprintItem.title,
+    strand: blueprintItem.strand,
+    linkedLessons: question.linkedLessons ?? blueprintItem.linkedLessons,
     id: `y3-${form.toLowerCase()}-${String(index + 1).padStart(2, "0")}-${question.skillId}`,
   };
 }
@@ -731,6 +765,12 @@ export function buildLevel3PretestFormA(): PretestQuestion[] {
     options: question.options,
     answer: question.correctAnswer,
     correctAnswer: question.correctAnswer,
+    skillId: question.skillId,
+    skillLabel: question.skillLabel,
+    linkedWeeks: question.linkedWeeks,
+    linkedLessons: question.linkedLessons,
+    strand: question.strand,
+    difficultyBand: question.difficultyBand,
     visual: question.visual,
   }));
 }
@@ -743,6 +783,12 @@ export function buildLevel3PosttestFormB(): PostTest {
     options: question.options,
     correctAnswer: question.correctAnswer,
     answer: question.correctAnswer,
+    skillId: question.skillId,
+    skillLabel: question.skillLabel,
+    linkedWeeks: question.linkedWeeks,
+    linkedLessons: question.linkedLessons,
+    strand: question.strand,
+    difficultyBand: question.difficultyBand,
     visual: question.visual,
   }));
 

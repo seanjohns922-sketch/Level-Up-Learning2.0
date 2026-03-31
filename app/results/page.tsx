@@ -6,7 +6,43 @@ import { getLegendForYear } from "@/data/legends";
 import { readProgress, StudentProgress, writeProgress, ACTIVE_STUDENT_KEY } from "@/data/progress";
 import { supabase } from "@/lib/supabase";
 import LegendUnlockReveal from "@/components/LegendUnlockReveal";
+import type { AssessmentResultProfile } from "@/data/assessments/analysis";
 const PASS_THRESHOLD = 90;
+
+function getLowestRecommendedWeek(profile: AssessmentResultProfile | null) {
+  if (!profile?.recommendedWeeks?.length) return undefined;
+  return Math.min(...profile.recommendedWeeks);
+}
+
+function getStrandBadgeClass(strand?: string) {
+  switch (strand) {
+    case "fractions":
+      return "bg-violet-100 text-violet-700 border-violet-200";
+    case "patterns":
+      return "bg-sky-100 text-sky-700 border-sky-200";
+    case "multiplication_division":
+      return "bg-emerald-100 text-emerald-700 border-emerald-200";
+    case "addition_subtraction":
+      return "bg-amber-100 text-amber-700 border-amber-200";
+    default:
+      return "bg-teal-100 text-teal-700 border-teal-200";
+  }
+}
+
+function getStrandLabel(strand?: string) {
+  switch (strand) {
+    case "fractions":
+      return "Fractions";
+    case "patterns":
+      return "Patterns";
+    case "multiplication_division":
+      return "Multiplication & Division";
+    case "addition_subtraction":
+      return "Addition & Subtraction";
+    default:
+      return "Number";
+  }
+}
 
 export default function ResultsPageWrapper() {
   return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-muted-foreground">Loading…</p></div>}><ResultsPage /></Suspense>;
@@ -119,6 +155,10 @@ function ResultsPage() {
   const displayPercent = passedByProgram ? 100 : scorePercent;
 
   const legend = useMemo(() => getLegendForYear(year), [year]);
+  const storedPosttestProfile: AssessmentResultProfile | null = useMemo(() => {
+    const progress = readProgress();
+    return isPostTest ? progress?.lastPostTestProfile ?? null : null;
+  }, [isPostTest, year, scorePercent, total]);
 
   const [showUnlock, setShowUnlock] = useState(false);
   const [justUnlocked, setJustUnlocked] = useState(false);
@@ -138,6 +178,7 @@ function ResultsPage() {
     if (passed) {
       const unlocked = alreadyUnlocked ? prevUnlocked : [...prevUnlocked, legend.id];
       next = {
+        ...prev,
         year,
         scorePercent: passedByProgram ? Math.max(prev?.scorePercent ?? 0, 90) : scorePercent,
         status: "PASSED",
@@ -145,10 +186,11 @@ function ResultsPage() {
       };
     } else {
       next = {
+        ...prev,
         year,
         scorePercent,
         status: "ASSIGNED_PROGRAM",
-        assignedWeek: 1,
+        assignedWeek: isPostTest ? getLowestRecommendedWeek(storedPosttestProfile) ?? 1 : 1,
         unlockedLegends: prevUnlocked,
       };
     }
@@ -157,6 +199,7 @@ function ResultsPage() {
 
     (async () => {
       try {
+        if (isPostTest || passedByProgram) return;
         const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY) : null;
         if (!studentId) return;
         const { error } = await supabase
@@ -185,7 +228,7 @@ function ResultsPage() {
       setShowUnlock(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [passed, year, scorePercent, legend.id]);
+  }, [passed, year, scorePercent, legend.id, isPostTest, passedByProgram, storedPosttestProfile]);
 
   function goHome() { router.push("/home"); }
   function goProgram() {
@@ -209,6 +252,8 @@ function ResultsPage() {
     return { emoji: "🚀", title: "Let's Level Up!", sub: "Your adventure is just beginning." };
   };
   const msg = getMessage();
+  const topStrengths = storedPosttestProfile?.strengths?.slice(0, 3) ?? [];
+  const topWeakAreas = storedPosttestProfile?.weakAreas?.slice(0, 3) ?? [];
 
   return (
     <main className="min-h-screen bg-background flex items-center justify-center p-4 relative">
@@ -299,7 +344,7 @@ function ResultsPage() {
                   <span className="font-bold text-sm text-foreground">Almost there!</span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  You need 90% to pass. Review some lessons and try again when you&apos;re ready.
+                  You need 90% to pass. Review the suggested weeks and try again when you&apos;re ready.
                 </p>
               </div>
             ) : (
@@ -313,6 +358,59 @@ function ResultsPage() {
                 </p>
               </div>
             )}
+
+            {isPostTest && storedPosttestProfile ? (
+              <>
+                {topStrengths.length > 0 ? (
+                  <div className="rounded-2xl bg-secondary p-4">
+                    <div className="font-bold text-sm text-foreground mb-2">You did well with</div>
+                    <div className="space-y-2">
+                      {topStrengths.map((item) => (
+                        <div key={item.skillId} className="text-xs text-secondary-foreground">
+                          {item.skillLabel}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+                {topWeakAreas.length > 0 ? (
+                  <div className="rounded-2xl p-4 border border-accent/30" style={{ background: "hsl(42 95% 97%)" }}>
+                    <div className="font-bold text-sm text-foreground mb-2">Focus on these next</div>
+                    <div className="space-y-2">
+                      {topWeakAreas.map((item) => (
+                        <div key={item.skillId} className="rounded-xl bg-background/70 border border-border/60 p-3">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-bold ${getStrandBadgeClass(item.strand)}`}>
+                              {getStrandLabel(item.strand)}
+                            </span>
+                            <span className="text-[11px] font-semibold text-muted-foreground">
+                              Week{item.linkedWeeks.length > 1 ? "s" : ""} {item.linkedWeeks.join(", ")}
+                            </span>
+                          </div>
+                          <div className="text-xs text-foreground">
+                            {item.skillLabel}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+                {!passed && storedPosttestProfile.recommendedWeeks.length > 0 ? (
+                  <div className="rounded-2xl bg-secondary p-4">
+                    <div className="font-bold text-sm text-foreground mb-2">Start here</div>
+                    <div className="space-y-2">
+                      {storedPosttestProfile.recommendedWeeks.slice(0, 3).map((week, index) => (
+                        <div key={week} className="text-xs text-secondary-foreground">
+                          {index === 0 ? `Start with Week ${week}` : `Then revisit Week ${week}`}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+              </>
+            ) : null}
 
             {/* What's next */}
             <div className="rounded-2xl bg-secondary p-4">

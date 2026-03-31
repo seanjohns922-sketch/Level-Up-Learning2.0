@@ -6,9 +6,11 @@ import { getPosttestForYearLabel } from "@/data/assessments/api";
 import type { Question } from "@/data/assessments/posttests";
 import { getLegendForYear } from "@/data/legends";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
-import { readProgress, writeProgress, type StudentProgress } from "@/data/progress";
+import { ACTIVE_STUDENT_KEY, readProgress, writeProgress, type StudentProgress } from "@/data/progress";
 import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCard";
 import AssessmentShell from "@/components/assessment/AssessmentShell";
+import { analyzeAssessmentResult } from "@/data/assessments/analysis";
+import { supabase } from "@/lib/supabase";
 
 const PASS_THRESHOLD = 90;
 
@@ -60,16 +62,19 @@ function PostTestPage() {
   function submit() {
     if (!questions.length) return;
 
-    let correct = 0;
-    for (const qu of questions) {
-      const chosen = answers[qu.id];
-      const expected = qu.answerOptionId ?? qu.correctAnswer ?? qu.answer;
-      if (chosen && expected !== undefined && chosen === expected) correct++;
-    }
-
-    const percent = Math.round((correct / questions.length) * 100);
-
+    const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY) : null;
+    const profile = analyzeAssessmentResult({
+      questions,
+      answers,
+      yearLevel: Number(year.replace(/\D/g, "")) || 3,
+      testType: "post",
+      passThreshold: PASS_THRESHOLD,
+      studentId,
+    });
     const prev = readProgress();
+    const correct = profile.score;
+    const percent = profile.percentage;
+    const assignedWeek = profile.assignedWeek ?? prev?.assignedWeek;
     const unlockedLegends = prev?.unlockedLegends ?? [];
 
     const legend = getLegendForYear(year);
@@ -81,14 +86,58 @@ function PostTestPage() {
     const nextProgress: StudentProgress = {
       year,
       scorePercent: prev?.scorePercent ?? 0,
-      status: prev?.status ?? "ASSIGNED_PROGRAM",
-      assignedWeek: prev?.assignedWeek,
+      status: didPass ? "PASSED" : "ASSIGNED_PROGRAM",
+      assignedWeek: didPass ? prev?.assignedWeek : assignedWeek,
+      assignedWeeksHistory: didPass
+        ? prev?.assignedWeeksHistory ?? []
+        : Array.from(new Set([...(prev?.assignedWeeksHistory ?? []), ...(assignedWeek ? [assignedWeek] : [])])),
       unlockedLegends: nextUnlocked,
       lastPostTestPercent: percent,
+      lastPostTestProfile: { ...profile, assignedWeek },
     };
 
     writeProgress(nextProgress);
     setSubmitted(true);
+
+    (async () => {
+      try {
+        if (!studentId) return;
+
+        const { data: existing } = await supabase
+          .from("progress")
+          .select("quiz_scores")
+          .eq("student_id", studentId)
+          .eq("year", year)
+          .maybeSingle();
+
+        const prevScores: Record<string, any> = (existing?.quiz_scores as any) ?? {};
+        const previousAttempts: any[] = prevScores.posttest?.attempts ?? [];
+        const latest = { ...profile, assignedWeek, at: new Date().toISOString() };
+        const updatedScores = {
+          ...prevScores,
+          posttest: {
+            latest,
+            attempts: [...previousAttempts, latest],
+          },
+        };
+
+        const { error } = await supabase
+          .from("progress")
+          .upsert(
+            {
+              student_id: studentId,
+              year,
+              quiz_scores: updatedScores,
+              status: didPass ? "PASSED" : "ASSIGNED_PROGRAM",
+              week: didPass ? prev?.assignedWeek ?? null : assignedWeek ?? prev?.assignedWeek ?? 1,
+            },
+            { onConflict: "student_id,year" }
+          );
+        if (error) console.warn("[PostTest] DB save error:", error);
+      } catch (error) {
+        console.warn("[PostTest] DB save failed:", error);
+      }
+    })();
 
     router.push(
       `/results?year=${encodeURIComponent(year)}&score=${correct}&total=${questions.length}&posttest=1`

@@ -1,0 +1,137 @@
+export type AssessmentQuestionMetadata = {
+  id: string;
+  skillId?: string;
+  skillLabel?: string;
+  linkedWeeks?: number[];
+  linkedLessons?: number[];
+  strand?: string;
+  difficultyBand?: string;
+};
+
+export type AssessmentSkillSummary = {
+  skillId: string;
+  skillLabel: string;
+  linkedWeeks: number[];
+  linkedLessons?: number[];
+  strand: string;
+  difficultyBand?: string;
+  incorrectCount: number;
+  correctCount: number;
+  total: number;
+};
+
+export type AssessmentResultProfile = {
+  studentId?: string | null;
+  yearLevel: number;
+  testType: "pre" | "post";
+  score: number;
+  total: number;
+  percentage: number;
+  passed: boolean;
+  strengths: AssessmentSkillSummary[];
+  weakAreas: AssessmentSkillSummary[];
+  recommendedWeeks: number[];
+  recommendedLessonTargets: Array<{ week: number; lessons?: number[] }>;
+  assignedWeek?: number;
+  generatedAt: string;
+};
+
+type GenericAssessmentQuestion = AssessmentQuestionMetadata & {
+  correctAnswer?: string;
+  answer?: string;
+  answerOptionId?: string;
+};
+
+export function analyzeAssessmentResult({
+  questions,
+  answers,
+  yearLevel,
+  testType,
+  passThreshold = 90,
+  studentId,
+}: {
+  questions: GenericAssessmentQuestion[];
+  answers: Record<string, string | undefined>;
+  yearLevel: number;
+  testType: "pre" | "post";
+  passThreshold?: number;
+  studentId?: string | null;
+}): AssessmentResultProfile {
+  const groups = new Map<string, AssessmentSkillSummary>();
+  let score = 0;
+
+  for (const question of questions) {
+    const expected = question.answerOptionId ?? question.correctAnswer ?? question.answer;
+    const chosen = answers[question.id];
+    const isCorrect = !!expected && chosen === expected;
+    if (isCorrect) score += 1;
+
+    const skillId = question.skillId ?? "general";
+    const entry = groups.get(skillId) ?? {
+      skillId,
+      skillLabel: question.skillLabel ?? "General Maths",
+      linkedWeeks: question.linkedWeeks ?? [],
+      linkedLessons: question.linkedLessons,
+      strand: question.strand ?? "number",
+      difficultyBand: question.difficultyBand,
+      incorrectCount: 0,
+      correctCount: 0,
+      total: 0,
+    };
+
+    entry.total += 1;
+    if (isCorrect) entry.correctCount += 1;
+    else entry.incorrectCount += 1;
+    groups.set(skillId, entry);
+  }
+
+  const total = questions.length;
+  const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
+  const passed = percentage >= passThreshold;
+  const summaries = [...groups.values()];
+
+  const strengths = summaries
+    .filter((item) => item.correctCount > 0)
+    .sort((a, b) => {
+      const aRate = a.correctCount / Math.max(1, a.total);
+      const bRate = b.correctCount / Math.max(1, b.total);
+      return bRate - aRate || b.correctCount - a.correctCount;
+    })
+    .slice(0, 3);
+
+  const weakAreas = summaries
+    .filter((item) => item.incorrectCount >= 1)
+    .sort((a, b) => b.incorrectCount - a.incorrectCount || a.correctCount - b.correctCount)
+    .slice(0, 3);
+
+  const recommendedWeeks = [...new Set(weakAreas.flatMap((item) => item.linkedWeeks))].sort((a, b) => a - b);
+  const assignedWeek = recommendedWeeks.length > 0 ? Math.min(...recommendedWeeks) : undefined;
+  const recommendedLessonTargets = weakAreas.flatMap((item) =>
+    item.linkedWeeks.map((week) => ({
+      week,
+      lessons: item.linkedLessons,
+    }))
+  );
+
+  return {
+    studentId,
+    yearLevel,
+    testType,
+    score,
+    total,
+    percentage,
+    passed,
+    strengths,
+    weakAreas,
+    recommendedWeeks,
+    recommendedLessonTargets,
+    assignedWeek,
+    generatedAt: new Date().toISOString(),
+  };
+}
+
+export function getLatestPosttestProfile(rawQuizScores: any): AssessmentResultProfile | null {
+  const profile = rawQuizScores?.posttest?.latest;
+  if (!profile || typeof profile !== "object") return null;
+  return profile as AssessmentResultProfile;
+}

@@ -1,10 +1,14 @@
+import type { AssessmentResultProfile } from "@/data/assessments/analysis";
+
 export type StudentProgress = {
   year: string; // "Year 3"
   scorePercent: number;
   status: "PASSED" | "ASSIGNED_PROGRAM";
   assignedWeek?: number; // 1..12 (only for ASSIGNED_PROGRAM)
+  assignedWeeksHistory?: number[];
   unlockedLegends: string[]; // legend ids
   lastPostTestPercent?: number;
+  lastPostTestProfile?: AssessmentResultProfile;
 };
 
 export const STORAGE_KEY = "lul_student_progress_v1";
