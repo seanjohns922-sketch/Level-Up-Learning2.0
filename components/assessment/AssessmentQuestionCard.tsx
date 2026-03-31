@@ -139,7 +139,7 @@ export default function AssessmentQuestionCard({
                   onDragStart={() => setDraggedIndex(index)}
                   onDragOver={(event) => event.preventDefault()}
                   onDrop={() => moveDragged(index)}
-                  className="cursor-move rounded-2xl border border-violet-300 bg-white p-3 shadow-sm"
+                  className="cursor-move rounded-2xl border border-slate-600 bg-slate-700/50 p-3 shadow-sm"
                 >
                   <div className="text-sm font-black text-violet-900">{fraction}</div>
                   <div className="mt-2">
