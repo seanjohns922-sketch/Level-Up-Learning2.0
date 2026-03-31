@@ -119,7 +119,7 @@ export default function AssessmentQuestionCard({
               type="button"
               onClick={() => addFraction(fraction)}
               disabled={order.includes(fraction)}
-              className="rounded-2xl border border-violet-200 bg-white p-4 text-left shadow-sm transition hover:bg-violet-50 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-2xl border border-slate-600 bg-slate-700/50 p-4 text-left shadow-sm transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <div className="text-lg font-black text-violet-900">{fraction}</div>
               <div className="mt-3">
