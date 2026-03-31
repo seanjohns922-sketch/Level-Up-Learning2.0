@@ -30,6 +30,7 @@ export type Lesson = {
   lesson: number;
   title: string;
   focus: string;
+  quizSafe?: boolean;
   activityIdeas: string[];
   curriculum: CurriculumCode[];
   activityType?: string;

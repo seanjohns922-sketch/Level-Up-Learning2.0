@@ -73,6 +73,7 @@ function loadTsModule(relativePath) {
 const engine = loadTsModule("data/activities/year2/lessonEngine.ts");
 const { year2NumberRows } = loadTsModule("data/programs/raw/year2NumberRows.ts");
 const { YEAR3_PROGRAM } = loadTsModule("data/programs/year3.ts");
+const { YEAR4_PROGRAM } = loadTsModule("data/programs/year4.ts");
 const assessments = loadTsModule("data/assessments/api.ts");
 
 const {
@@ -446,6 +447,62 @@ function checkQuiz(programLabel, lesson) {
   }
 }
 
+function checkStructuredWeeklyQuiz(programLabel, weekPlan, expectedFailureSubstring) {
+  if (!weekPlan) {
+    addFinding(`${programLabel} weekly_quiz`, "Missing week plan for regression target.");
+    return;
+  }
+
+  const questionsPerLesson = 5;
+  const counts = new Map([
+    [1, 0],
+    [2, 0],
+    [3, 0],
+  ]);
+
+  try {
+    for (const lesson of weekPlan.lessons.slice(0, 3)) {
+      if (lesson.quizSafe === false) {
+        throw new Error(
+          `Year ${weekPlan.id.match(/^y(\\d+)-/)?.[1] ?? "?"} Week ${weekPlan.week} Lesson ${lesson.lesson} is marked quizSafe=false and cannot be included in the standard weekly quiz.`
+        );
+      }
+
+      const level = getLevelForLesson(lesson);
+      const lessonPool = buildLessonActivityPool(level, lesson);
+      if (lessonPool.activities.length === 0) {
+        throw new Error(`Week ${weekPlan.week} Lesson ${lesson.lesson} has no validated activities.`);
+      }
+
+      for (let i = 0; i < questionsPerLesson; i += 1) {
+        const activity = lessonPool.activities[i % lessonPool.activities.length];
+        generateQuestion(level, lesson, activity);
+        counts.set(lesson.lesson, (counts.get(lesson.lesson) ?? 0) + 1);
+      }
+    }
+
+    if (expectedFailureSubstring) {
+      addFinding(`${programLabel} W${weekPlan.week} weekly_quiz`, `Expected failure containing "${expectedFailureSubstring}" but quiz generation succeeded.`);
+      return;
+    }
+
+    const total = [...counts.values()].reduce((sum, value) => sum + value, 0);
+    if (total !== 15) {
+      addFinding(`${programLabel} W${weekPlan.week} weekly_quiz`, `Expected 15 questions, got ${total}.`);
+    }
+    for (const lessonNumber of [1, 2, 3]) {
+      if ((counts.get(lessonNumber) ?? 0) !== 5) {
+        addFinding(`${programLabel} W${weekPlan.week} weekly_quiz`, `Lesson ${lessonNumber} expected 5 questions, got ${counts.get(lessonNumber) ?? 0}.`);
+      }
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (!expectedFailureSubstring || !message.includes(expectedFailureSubstring)) {
+      addFinding(`${programLabel} W${weekPlan.week} weekly_quiz`, message);
+    }
+  }
+}
+
 const year2Targets = [1, 6, 8, 9, 10, 12];
 for (const week of year2Targets) {
   const lesson = year2NumberRows
@@ -566,6 +623,9 @@ checkQuiz(
     .map(toLesson)[0]
 );
 checkQuiz("Year 3", YEAR3_PROGRAM.find((item) => item.week === 6)?.lessons?.[0]);
+checkStructuredWeeklyQuiz("Year 3", YEAR3_PROGRAM.find((item) => item.week === 1));
+checkStructuredWeeklyQuiz("Year 4", YEAR4_PROGRAM.find((item) => item.week === 1));
+checkStructuredWeeklyQuiz("Year 4", YEAR4_PROGRAM.find((item) => item.week === 8), "quizSafe=false");
 
 const year2Pretest = getPretestForLevel(2);
 const year3Pretest = getPretestForLevel(3);

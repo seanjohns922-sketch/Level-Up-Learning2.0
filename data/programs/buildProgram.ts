@@ -6,6 +6,7 @@ export type ProgramRow = {
   focus: string;
   lesson: number;
   topic: string;
+  quizSafe?: boolean;
   activities: LessonActivity[];
   activity: string;
   curriculum: CurriculumCode[];
@@ -44,6 +45,7 @@ export function buildProgram(
           lesson: row.lesson,
           title: row.topic,
           focus: row.focus,
+          quizSafe: row.quizSafe,
           activityIdeas: [row.activity],
           curriculum: row.curriculum,
           activities: row.activities,

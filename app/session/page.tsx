@@ -323,24 +323,40 @@ function buildStructuredWeeklyQuizQuestions(
   weekPlan: WeekPlan,
   questionsPerLesson: number
 ): QuizQuestion[] {
-  const questions: QuizQuestion[] = [];
+  const yearMatch = weekPlan.id.match(/^y(\d+)-/);
+  const yearNumber = yearMatch ? Number(yearMatch[1]) : 1;
+  const quizLessons = weekPlan.lessons.slice(0, 3);
 
-  weekPlan.lessons.slice(0, 3).forEach((lesson, lessonIndex) => {
+  if (yearNumber === 4 && weekPlan.week === 12) {
+    throw new Error(
+      `[StructuredWeeklyQuiz] Year 4 Week 12 does not use the standard weekly quiz path.`
+    );
+  }
+
+  const questions: QuizQuestion[] = [];
+  const debugCounts: Array<{ lesson: 1 | 2 | 3; availableActivities: number; selectedActivityTypes: string[] }> = [];
+
+  quizLessons.forEach((lesson, lessonIndex) => {
     const lessonNumber = (lessonIndex + 1) as 1 | 2 | 3;
+    if (lesson.quizSafe === false) {
+      throw new Error(
+        `[StructuredWeeklyQuiz] Year ${yearNumber} Week ${weekPlan.week} Lesson ${lessonNumber} is marked quizSafe=false and cannot be included in the standard weekly quiz.`
+      );
+    }
+
     const level = getLevelForLesson(lesson);
     const sourceActivities = buildStructuredQuizSources(lesson);
 
     if (!sourceActivities.length) {
-      const message = `[StructuredWeeklyQuiz] ${lesson.id}: no validated lesson activities available for quiz generation.`;
-      if (process.env.NODE_ENV !== "production") {
-        throw new Error(message);
-      }
-      console.error(message);
-      return;
+      throw new Error(
+        `[StructuredWeeklyQuiz] Year ${yearNumber} Week ${weekPlan.week} Lesson ${lessonNumber} has no validated quiz-safe activities available.`
+      );
     }
 
+    const selectedActivityTypes: string[] = [];
     for (let i = 0; i < questionsPerLesson; i += 1) {
       const sourceActivity = sourceActivities[i % sourceActivities.length];
+      selectedActivityTypes.push(sourceActivity.activityType);
       const questionData = generateQuestionForLevelLessonActivity(level, lesson, sourceActivity);
       questions.push({
         id: `q${questions.length + 1}`,
@@ -354,7 +370,28 @@ function buildStructuredWeeklyQuizQuestions(
         questionData,
       });
     }
+
+    debugCounts.push({
+      lesson: lessonNumber,
+      availableActivities: sourceActivities.length,
+      selectedActivityTypes,
+    });
   });
+
+  if (process.env.NODE_ENV !== "production") {
+    console.info("[StructuredWeeklyQuiz]", {
+      year: yearNumber,
+      week: weekPlan.week,
+      counts: debugCounts.map((item) => ({
+        lesson: item.lesson,
+        availableActivities: item.availableActivities,
+      })),
+      selectedPerLesson: debugCounts.map((item) => ({
+        lesson: item.lesson,
+        selectedActivityTypes: item.selectedActivityTypes,
+      })),
+    });
+  }
 
   validateStructuredWeeklyQuizQuestions(weekPlan, questions, questionsPerLesson);
   return questions;
@@ -2381,7 +2418,7 @@ function SessionPage() {
   function buildQuizQuestions() {
     const qConfig = quizConfig;
     const questionsPerLesson = qConfig?.questionsPerLesson ?? 5;
-    if (year === "Year 2" || year === "Year 3") {
+    if (year === "Year 2" || year === "Year 3" || year === "Year 4") {
       const weekPlan = getProgramForYear(year).find(
         (plan) => plan.week === Number(week)
       );
