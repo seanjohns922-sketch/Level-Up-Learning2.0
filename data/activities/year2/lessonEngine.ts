@@ -1,11 +1,29 @@
 import type { Lesson } from "@/data/programs/year1";
 import type { ActivityType, LessonActivity } from "@/data/programs/types";
 
-export type PlaceValueName = "ten_thousands" | "thousands" | "hundreds" | "tens" | "ones";
+export type PlaceValueName =
+  | "hundred_thousands"
+  | "ten_thousands"
+  | "thousands"
+  | "hundreds"
+  | "tens"
+  | "ones";
+
+export type MABVisualData = {
+  type: "mab";
+  placeValues: PlaceValueName[];
+  hundredThousands: number | null;
+  tenThousands: number | null;
+  thousands: number | null;
+  hundreds: number | null;
+  tens: number | null;
+  ones: number | null;
+};
 
 export type PlaceValueBuilderQuestion = {
   kind: "place_value_builder";
   prompt: string;
+  hundredThousands: number | null;
   tenThousands: number | null;
   thousands: number | null;
   hundreds: number | null;
@@ -392,11 +410,13 @@ export type MultipleChoiceQuestion = {
   options: string[];
   answer: string;
   helper?: string;
-  visual?: {
-    type: "array";
-    rows: number;
-    columns: number;
-  };
+  visual?:
+    | {
+        type: "array";
+        rows: number;
+        columns: number;
+      }
+    | MABVisualData;
 };
 
 export type WrittenMethodLayout = {
@@ -418,6 +438,7 @@ export type TypedResponseQuestion = {
   helper?: string;
   placeholder?: string;
   writtenMethod?: WrittenMethodLayout;
+  visual?: MABVisualData;
 };
 
 export type SpeedRoundQuestion = {
@@ -1520,6 +1541,7 @@ function uniqueNumberOptions(answer: number, spread = 12) {
 }
 
 function digitForPlace(value: number, place: PlaceValueName) {
+  if (place === "hundred_thousands") return Math.floor(value / 100000) % 10;
   if (place === "ten_thousands") return Math.floor(value / 10000) % 10;
   if (place === "thousands") return Math.floor(value / 1000) % 10;
   if (place === "hundreds") return Math.floor(value / 100) % 10;
@@ -1528,6 +1550,7 @@ function digitForPlace(value: number, place: PlaceValueName) {
 }
 
 function placeLabel(place: PlaceValueName) {
+  if (place === "hundred_thousands") return "hundred thousands";
   if (place === "ten_thousands") return "ten thousands";
   if (place === "thousands") return "thousands";
   if (place === "hundreds") return "hundreds";
@@ -1619,6 +1642,7 @@ function roundingWordProblem(
 function supportedPlaces(config: GenericConfig) {
   const candidates = config.placeValues?.filter(
     (value): value is PlaceValueName =>
+      value === "hundred_thousands" ||
       value === "ten_thousands" ||
       value === "thousands" ||
       value === "hundreds" ||
@@ -2262,6 +2286,7 @@ function generateInteractiveQuestion(
     const max = typeof config.max === "number" ? config.max : 999;
     const target = randInt(min, max);
     const places = supportedPlaces(config);
+    const hundredThousands = digitForPlace(target, "hundred_thousands");
     const tenThousands = digitForPlace(target, "ten_thousands");
     const thousands = digitForPlace(target, "thousands");
     const hundreds = digitForPlace(target, "hundreds");
@@ -2280,6 +2305,7 @@ function generateInteractiveQuestion(
       return {
         kind: "place_value_builder",
         prompt: `How many ${placeLabel(place)} are shown?`,
+        hundredThousands,
         tenThousands,
         thousands,
         hundreds,
@@ -2298,6 +2324,7 @@ function generateInteractiveQuestion(
       return {
         kind: "place_value_builder",
         prompt: "What is the missing value?",
+        hundredThousands: place === "hundred_thousands" ? null : hundredThousands,
         tenThousands: place === "ten_thousands" ? null : tenThousands,
         thousands: place === "thousands" ? null : thousands,
         hundreds: place === "hundreds" ? null : hundreds,
@@ -2305,7 +2332,9 @@ function generateInteractiveQuestion(
         ones: place === "ones" ? null : ones,
         targetNumber: target,
         answer:
-          place === "ten_thousands"
+          place === "hundred_thousands"
+            ? hundredThousands * 100000
+            : place === "ten_thousands"
             ? tenThousands * 10000
             : place === "thousands"
             ? thousands * 1000
@@ -2324,6 +2353,7 @@ function generateInteractiveQuestion(
     return {
       kind: "place_value_builder",
       prompt: "What number is shown by the MAB blocks?",
+      hundredThousands,
       tenThousands,
       thousands,
       hundreds,
@@ -3647,16 +3677,41 @@ function generateGenericQuestion(
       config.mode === "identify_place" || config.mode === "missing_mab_part"
         ? config.mode
         : "identify_number";
+    const hundredThousands = digitForPlace(target, "hundred_thousands");
     const tenThousands = digitForPlace(target, "ten_thousands");
     const thousands = digitForPlace(target, "thousands");
     const hundreds = digitForPlace(target, "hundreds");
     const tens = digitForPlace(target, "tens");
     const ones = digitForPlace(target, "ones");
-    const mabSummary = `${tenThousands} ten thousands, ${thousands} thousands, ${hundreds} hundreds, ${tens} tens, ${ones} ones`;
+    const includeHundredThousands = places.includes("hundred_thousands") || hundredThousands > 0;
+    const mabSummary = [
+      includeHundredThousands ? `${hundredThousands} hundred thousands` : null,
+      `${tenThousands} ten thousands`,
+      `${thousands} thousands`,
+      `${hundreds} hundreds`,
+      `${tens} tens`,
+      `${ones} ones`,
+    ]
+      .filter(Boolean)
+      .join(", ");
+    const mabVisual: MABVisualData = {
+      type: "mab",
+      placeValues: includeHundredThousands
+        ? ["hundred_thousands", "ten_thousands", "thousands", "hundreds", "tens", "ones"]
+        : ["ten_thousands", "thousands", "hundreds", "tens", "ones"],
+      hundredThousands: includeHundredThousands ? hundredThousands : 0,
+      tenThousands,
+      thousands,
+      hundreds,
+      tens,
+      ones,
+    };
 
     if (mode === "missing_mab_part") {
       const hiddenValue =
-        place === "ten_thousands"
+        place === "hundred_thousands"
+          ? hundredThousands * 100000
+          : place === "ten_thousands"
           ? tenThousands * 10000
           : place === "thousands"
           ? thousands * 1000
@@ -3666,24 +3721,33 @@ function generateGenericQuestion(
           ? partition.tens
           : partition.ones;
       const visibleSummary = [
+        place === "hundred_thousands"
+          ? "? hundred thousands"
+          : includeHundredThousands
+          ? `${hundredThousands} hundred thousands`
+          : null,
         place === "ten_thousands" ? "? ten thousands" : `${tenThousands} ten thousands`,
         place === "thousands" ? "? thousands" : `${thousands} thousands`,
         place === "hundreds" ? "? hundreds" : `${partition.hundreds / 100} hundreds`,
         place === "tens" ? "? tens" : `${partition.tens / 10} tens`,
         place === "ones" ? "? ones" : `${partition.ones} ones`,
-      ].join(", ");
+      ]
+        .filter(Boolean)
+        .join(", ");
       return asMultipleChoice
         ? {
             kind: "multiple_choice",
             prompt: `The number is ${target}. The MAB shows ${visibleSummary}. What is the missing value?`,
             options: uniqueNumberOptions(hiddenValue, Math.max(4, hiddenValue || 4)),
             answer: String(hiddenValue),
+            visual: mabVisual,
           }
         : {
             kind: "typed_response",
             prompt: `The number is ${target}. The MAB shows ${visibleSummary}. What is the missing value?`,
             answer: String(hiddenValue),
             placeholder: "Type the missing value",
+            visual: mabVisual,
           };
     }
 
@@ -3695,12 +3759,14 @@ function generateGenericQuestion(
             prompt: `The MAB shows ${mabSummary}. How many ${placeLabel(place).toLowerCase()} are shown?`,
             options: uniqueNumberOptions(Number(answer), 4),
             answer,
+            visual: mabVisual,
           }
         : {
             kind: "typed_response",
             prompt: `The MAB shows ${mabSummary}. How many ${placeLabel(place).toLowerCase()} are shown?`,
             answer,
             placeholder: "Type the count",
+            visual: mabVisual,
           };
     }
 
@@ -3710,12 +3776,14 @@ function generateGenericQuestion(
           prompt: `The MAB shows ${mabSummary}. What number is shown?`,
           options: uniqueNumberOptions(target, 80),
           answer: String(target),
+          visual: mabVisual,
         }
       : {
           kind: "typed_response",
           prompt: `The MAB shows ${mabSummary}. What number is shown?`,
           answer: String(target),
           placeholder: "Type the number",
+          visual: mabVisual,
         };
   }
 

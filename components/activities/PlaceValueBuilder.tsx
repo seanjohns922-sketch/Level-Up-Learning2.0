@@ -3,8 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import type { PlaceValueBuilderQuestion, PlaceValueName } from "@/data/activities/year2/lessonEngine";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
+import PlaceValueMABVisual from "@/components/activities/PlaceValueMABVisual";
 
 function placeLabel(place: PlaceValueName) {
+  if (place === "hundred_thousands") return "Hundred Thousands";
   if (place === "ten_thousands") return "Ten Thousands";
   if (place === "thousands") return "Thousands";
   if (place === "hundreds") return "Hundreds";
@@ -13,6 +15,7 @@ function placeLabel(place: PlaceValueName) {
 }
 
 function unitValue(place: PlaceValueName) {
+  if (place === "hundred_thousands") return 100000;
   if (place === "ten_thousands") return 10000;
   if (place === "thousands") return 1000;
   if (place === "hundreds") return 100;
@@ -21,84 +24,12 @@ function unitValue(place: PlaceValueName) {
 }
 
 function placeCount(questionData: PlaceValueBuilderQuestion, place: PlaceValueName) {
+  if (place === "hundred_thousands") return questionData.hundredThousands;
   if (place === "ten_thousands") return questionData.tenThousands;
   if (place === "thousands") return questionData.thousands;
   if (place === "hundreds") return questionData.hundreds;
   if (place === "tens") return questionData.tens;
   return questionData.ones;
-}
-
-function MABVisual({
-  place,
-  count,
-}: {
-  place: PlaceValueName;
-  count: number | null;
-}) {
-  if (count === null) {
-    return (
-      <div className="flex min-h-20 items-center justify-center rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50 text-3xl font-black text-amber-700">
-        ?
-      </div>
-    );
-  }
-
-  if (place === "hundreds") {
-    return (
-      <div className="grid grid-cols-3 gap-1.5">
-        {Array.from({ length: count }).map((_, index) => (
-          <div
-            key={index}
-            className="h-10 w-10 rounded-lg border border-teal-300 bg-teal-100 shadow-sm"
-          />
-        ))}
-      </div>
-    );
-  }
-
-  if (place === "tens") {
-    return (
-      <div className="flex flex-wrap gap-2">
-        {Array.from({ length: count }).map((_, index) => (
-          <div
-            key={index}
-            className="h-3 w-16 rounded-full border border-cyan-300 bg-cyan-100 shadow-sm"
-          />
-        ))}
-      </div>
-    );
-  }
-
-  if (place === "ten_thousands" || place === "thousands") {
-    const chipClass =
-      place === "ten_thousands"
-        ? "border-indigo-300 bg-indigo-100 text-indigo-800"
-        : "border-sky-300 bg-sky-100 text-sky-800";
-    const chipLabel = place === "ten_thousands" ? "10k" : "1k";
-    return (
-      <div className="flex flex-wrap gap-2">
-        {Array.from({ length: count }).map((_, index) => (
-          <div
-            key={index}
-            className={`rounded-lg border px-3 py-1.5 text-sm font-black shadow-sm ${chipClass}`}
-          >
-            {chipLabel}
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex flex-wrap gap-2">
-      {Array.from({ length: count }).map((_, index) => (
-        <div
-          key={index}
-          className="h-4 w-4 rounded-sm border border-emerald-300 bg-emerald-100 shadow-sm"
-        />
-      ))}
-    </div>
-  );
 }
 
 export default function PlaceValueBuilder({
@@ -118,6 +49,7 @@ export default function PlaceValueBuilder({
 
   const visibleTotal = useMemo(
     () =>
+      (questionData.hundredThousands ?? 0) * 100000 +
       (questionData.tenThousands ?? 0) * 10000 +
       (questionData.thousands ?? 0) * 1000 +
       (questionData.hundreds ?? 0) * 100 +
@@ -125,6 +57,7 @@ export default function PlaceValueBuilder({
       (questionData.ones ?? 0),
     [
       questionData.tenThousands,
+      questionData.hundredThousands,
       questionData.thousands,
       questionData.hundreds,
       questionData.ones,
@@ -138,6 +71,19 @@ export default function PlaceValueBuilder({
       return `${count} ${placeLabel(place).toLowerCase()}`;
     });
   }, [questionData]);
+  const mabVisualData = useMemo(
+    () => ({
+      type: "mab" as const,
+      placeValues: questionData.placeValues,
+      hundredThousands: questionData.hundredThousands,
+      tenThousands: questionData.tenThousands,
+      thousands: questionData.thousands,
+      hundreds: questionData.hundreds,
+      tens: questionData.tens,
+      ones: questionData.ones,
+    }),
+    [questionData]
+  );
 
   const answerLabel =
     questionData.mode === "identify_number"
@@ -177,30 +123,7 @@ export default function PlaceValueBuilder({
         ) : null}
       </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {questionData.placeValues.filter((place) => {
-          if (place === "ten_thousands" && (questionData.tenThousands ?? 0) === 0) return false;
-          return true;
-        }).map((place) => {
-          const count = placeCount(questionData, place);
-
-          return (
-            <div key={place} className="rounded-2xl border border-gray-200 bg-gray-50 p-3">
-              <div className="text-xs font-bold uppercase tracking-wide text-gray-500">
-                {placeLabel(place)}
-              </div>
-              <div className="mt-3">
-                <MABVisual place={place} count={count} />
-              </div>
-              <div className="mt-2 text-sm text-gray-600">
-                {count === null
-                  ? "Missing part"
-                  : `${count} × ${unitValue(place)} = ${count * unitValue(place)}`}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <PlaceValueMABVisual questionData={mabVisualData} title="MAB model" />
 
       {questionData.mode === "identify_number" ? (
         <div className="mt-4 rounded-2xl border border-teal-100 bg-teal-50 p-3">

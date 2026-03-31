@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { MultipleChoiceQuestion } from "@/data/activities/year2/lessonEngine";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
+import PlaceValueMABVisual from "@/components/activities/PlaceValueMABVisual";
 
 function ArrayVisual({ rows, cols }: { rows: number; cols: number }) {
   return (
@@ -59,6 +60,9 @@ export default function MultipleChoiceActivity({
       </div>
       {questionData.helper ? (
         <p className="mt-2 text-sm text-gray-600">{questionData.helper}</p>
+      ) : null}
+      {questionData.visual?.type === "mab" ? (
+        <PlaceValueMABVisual questionData={questionData.visual} title="MAB model" />
       ) : null}
       {questionData.visual?.type === "array" ? (
         <ArrayVisual rows={questionData.visual.rows} cols={questionData.visual.columns} />

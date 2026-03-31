@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { TypedResponseQuestion } from "@/data/activities/year2/lessonEngine";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
+import PlaceValueMABVisual from "@/components/activities/PlaceValueMABVisual";
 
 function normalize(value: string) {
   return value.trim().toLowerCase().replace(/\s+/g, " ");
@@ -292,6 +293,9 @@ export default function TypedResponseActivity({
         <h2 className="text-2xl font-black text-gray-900">{questionData.prompt}</h2>
         <ReadAloudBtn text={questionData.prompt} />
       </div>
+      {questionData.visual?.type === "mab" ? (
+        <PlaceValueMABVisual questionData={questionData.visual} title="MAB model" />
+      ) : null}
       {questionData.helper ? (
         <p className="mt-2 text-sm text-gray-600">{questionData.helper}</p>
       ) : null}
