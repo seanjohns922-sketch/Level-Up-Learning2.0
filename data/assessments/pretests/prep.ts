@@ -6,6 +6,7 @@ export type Question = {
   answer?: any;
   answerIndex?: number;
   answerOptionId?: string;
+  correctAnswer?: string;
   visual?: any;
   min?: number;
   max?: number;

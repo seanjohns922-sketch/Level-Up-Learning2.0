@@ -7,6 +7,7 @@ import type { Question } from "@/data/assessments/posttests";
 import { getLegendForYear } from "@/data/legends";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { readProgress, writeProgress, type StudentProgress } from "@/data/progress";
+import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCard";
 
 const PASS_THRESHOLD = 90;
 
@@ -53,7 +54,8 @@ function PostTestPage() {
     let correct = 0;
     for (const qu of questions) {
       const chosen = answers[qu.id];
-      if (chosen && chosen === qu.correctAnswer) correct++;
+      const expected = qu.answerOptionId ?? qu.correctAnswer ?? qu.answer;
+      if (chosen && expected !== undefined && chosen === expected) correct++;
     }
 
     const percent = Math.round((correct / questions.length) * 100);
@@ -142,22 +144,7 @@ function PostTestPage() {
             <ReadAloudBtn text={q.prompt} />
           </div>
 
-          <div className="grid gap-2">
-            {q.options.map((opt) => (
-              <button
-                key={opt}
-                onClick={() => pick(opt)}
-                className={[
-                  "text-left w-full px-4 py-3 rounded-xl border font-semibold transition",
-                  picked === opt
-                    ? "border-teal-500 bg-teal-50 text-gray-900"
-                    : "border-gray-200 bg-white hover:bg-gray-50 text-gray-800",
-                ].join(" ")}
-              >
-                {opt}
-              </button>
-            ))}
-          </div>
+          <AssessmentQuestionCard question={q} value={picked} onChange={pick} />
         </div>
 
         <div className="mt-5 flex items-center justify-between gap-3">

@@ -1,8 +1,12 @@
 export type Question = {
   id: string;
+  type?: string;
   prompt: string;
-  options: string[];
+  options: any[];
   correctAnswer: string;
+  answer?: any;
+  answerOptionId?: string;
+  visual?: any;
 };
 
 export type PostTest = {

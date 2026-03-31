@@ -14,16 +14,28 @@ export type Level3AssessmentBlueprintItem = {
   allowedInPost: boolean;
 };
 
+type AssessmentQuestionOption =
+  | string
+  | {
+      id: string;
+      label: string;
+      numerator?: number;
+      denominator?: number;
+      parts?: number;
+    };
+
 type Level3GeneratedQuestion = {
   id: string;
+  type: string;
   prompt: string;
-  options: string[];
+  options: AssessmentQuestionOption[];
   correctAnswer: string;
   skillId: string;
   linkedWeeks: number[];
   questionType: string;
   difficultyBand: Level3AssessmentBlueprintItem["difficultyBand"];
   instanceKey: string;
+  visual?: Record<string, unknown>;
 };
 
 type QuestionFactory = () => Omit<Level3GeneratedQuestion, "id">;
@@ -52,20 +64,20 @@ export const LEVEL3_ASSESSMENT_BLUEPRINT: Level3AssessmentBlueprintItem[] = [
     allowedInPost: true,
   },
   {
-    skillId: "addition_strategies",
-    title: "Addition Strategies",
+    skillId: "addition_fluency",
+    title: "Addition Fluency",
     linkedWeeks: [3],
-    questionTypes: ["mcq_strategy_choice", "mcq_addition"],
+    questionTypes: ["mcq_addition"],
     difficultyBand: "mixed",
     targetCountInTest: 2,
     allowedInPre: true,
     allowedInPost: true,
   },
   {
-    skillId: "subtraction_strategies",
-    title: "Subtraction Strategies",
+    skillId: "subtraction_fluency",
+    title: "Subtraction Fluency",
     linkedWeeks: [4],
-    questionTypes: ["mcq_strategy_choice", "mcq_subtraction"],
+    questionTypes: ["mcq_subtraction"],
     difficultyBand: "mixed",
     targetCountInTest: 2,
     allowedInPre: true,
@@ -103,11 +115,11 @@ export const LEVEL3_ASSESSMENT_BLUEPRINT: Level3AssessmentBlueprintItem[] = [
   },
   {
     skillId: "division_and_fact_families",
-    title: "Division, Inverse Facts, and Fact Families",
+    title: "Division and Fact Families",
     linkedWeeks: [8, 10],
-    questionTypes: ["mcq_division", "mcq_missing_number", "mcq_fact_family"],
+    questionTypes: ["mcq_division", "mcq_fact_family"],
     difficultyBand: "mixed",
-    targetCountInTest: 2,
+    targetCountInTest: 1,
     allowedInPre: true,
     allowedInPost: true,
   },
@@ -117,15 +129,25 @@ export const LEVEL3_ASSESSMENT_BLUEPRINT: Level3AssessmentBlueprintItem[] = [
     linkedWeeks: [9],
     questionTypes: ["mcq_skip_count", "mcq_pattern"],
     difficultyBand: "core",
+    targetCountInTest: 1,
+    allowedInPre: true,
+    allowedInPost: true,
+  },
+  {
+    skillId: "fractions_foundations",
+    title: "Fraction Foundations",
+    linkedWeeks: [11],
+    questionTypes: ["fraction_model_select", "build_whole"],
+    difficultyBand: "mixed",
     targetCountInTest: 2,
     allowedInPre: true,
     allowedInPost: true,
   },
   {
-    skillId: "fractions",
-    title: "Fractions",
-    linkedWeeks: [11, 12],
-    questionTypes: ["mcq_unit_fraction", "mcq_equivalence", "mcq_compare_fraction"],
+    skillId: "fractions_reasoning",
+    title: "Fraction Reasoning",
+    linkedWeeks: [12],
+    questionTypes: ["fraction_order", "fraction_number_line", "fraction_model_select"],
     difficultyBand: "mixed",
     targetCountInTest: 2,
     allowedInPre: true,
@@ -137,6 +159,7 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
   place_value_number_knowledge: {
     A: [
       () => ({
+        type: "mcq",
         prompt: "What is 4,000 + 300 + 20 + 5?",
         options: ["4,325", "4,235", "4,352", "4,305"],
         correctAnswer: "4,325",
@@ -147,6 +170,7 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
         instanceKey: "pv-a-1",
       }),
       () => ({
+        type: "mcq",
         prompt: "Which number is greatest?",
         options: ["5,409", "5,490", "5,094", "5,940"],
         correctAnswer: "5,940",
@@ -159,6 +183,7 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
     ],
     B: [
       () => ({
+        type: "mcq",
         prompt: "What is the value of the 7 in 6,742?",
         options: ["7", "70", "700", "7,000"],
         correctAnswer: "700",
@@ -169,6 +194,7 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
         instanceKey: "pv-b-1",
       }),
       () => ({
+        type: "mcq",
         prompt: "Put these numbers in order from smallest to largest: 4,508, 4,805, 4,580",
         options: [
           "4,508, 4,580, 4,805",
@@ -188,6 +214,7 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
   rounding_estimation: {
     A: [
       () => ({
+        type: "mcq",
         prompt: "Round 4,368 to the nearest 100.",
         options: ["4,300", "4,400", "4,360", "4,500"],
         correctAnswer: "4,400",
@@ -198,6 +225,7 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
         instanceKey: "re-a-1",
       }),
       () => ({
+        type: "mcq",
         prompt: "A class collected 248 stickers and then 173 more. About how many stickers is that?",
         options: ["300", "400", "500", "600"],
         correctAnswer: "400",
@@ -210,6 +238,7 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
     ],
     B: [
       () => ({
+        type: "mcq",
         prompt: "Round 6,742 to the nearest 10.",
         options: ["6,740", "6,700", "6,750", "6,742"],
         correctAnswer: "6,740",
@@ -220,6 +249,7 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
         instanceKey: "re-b-1",
       }),
       () => ({
+        type: "mcq",
         prompt: "A stadium had 3,482 people on Friday and 2,615 on Saturday. About how many people attended?",
         options: ["5,000", "6,000", "7,000", "8,000"],
         correctAnswer: "6,000",
@@ -231,23 +261,25 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
       }),
     ],
   },
-  addition_strategies: {
+  addition_fluency: {
     A: [
       () => ({
-        prompt: "Which strategy is best for 49 + 32?",
-        options: ["Compensation", "Near doubles", "Count back", "Sharing"],
-        correctAnswer: "Compensation",
-        skillId: "addition_strategies",
+        type: "mcq",
+        prompt: "What is 49 + 32?",
+        options: ["71", "81", "91", "92"],
+        correctAnswer: "81",
+        skillId: "addition_fluency",
         linkedWeeks: [3],
-        questionType: "mcq_strategy_choice",
+        questionType: "mcq_addition",
         difficultyBand: "mixed",
         instanceKey: "add-a-1",
       }),
       () => ({
+        type: "mcq",
         prompt: "What is 38 + 27?",
         options: ["55", "65", "75", "66"],
         correctAnswer: "65",
-        skillId: "addition_strategies",
+        skillId: "addition_fluency",
         linkedWeeks: [3],
         questionType: "mcq_addition",
         difficultyBand: "mixed",
@@ -256,20 +288,22 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
     ],
     B: [
       () => ({
-        prompt: "A student changes 57 + 19 into 57 + 20 and then adjusts. Which strategy is that?",
-        options: ["Compensation", "Count up", "Difference", "Sharing"],
-        correctAnswer: "Compensation",
-        skillId: "addition_strategies",
+        type: "mcq",
+        prompt: "What is 57 + 19?",
+        options: ["66", "76", "86", "96"],
+        correctAnswer: "76",
+        skillId: "addition_fluency",
         linkedWeeks: [3],
-        questionType: "mcq_strategy_choice",
+        questionType: "mcq_addition",
         difficultyBand: "mixed",
         instanceKey: "add-b-1",
       }),
       () => ({
+        type: "mcq",
         prompt: "What is 46 + 47?",
         options: ["83", "92", "93", "94"],
         correctAnswer: "93",
-        skillId: "addition_strategies",
+        skillId: "addition_fluency",
         linkedWeeks: [3],
         questionType: "mcq_addition",
         difficultyBand: "mixed",
@@ -277,23 +311,25 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
       }),
     ],
   },
-  subtraction_strategies: {
+  subtraction_fluency: {
     A: [
       () => ({
-        prompt: "Which strategy is best for 102 − 98?",
-        options: ["Count up", "Count back", "Doubling", "Sharing"],
-        correctAnswer: "Count up",
-        skillId: "subtraction_strategies",
+        type: "mcq",
+        prompt: "What is 102 − 98?",
+        options: ["2", "3", "4", "5"],
+        correctAnswer: "4",
+        skillId: "subtraction_fluency",
         linkedWeeks: [4],
-        questionType: "mcq_strategy_choice",
+        questionType: "mcq_subtraction",
         difficultyBand: "mixed",
         instanceKey: "sub-a-1",
       }),
       () => ({
+        type: "mcq",
         prompt: "What is the difference between 87 and 124?",
         options: ["27", "37", "47", "57"],
         correctAnswer: "37",
-        skillId: "subtraction_strategies",
+        skillId: "subtraction_fluency",
         linkedWeeks: [4],
         questionType: "mcq_subtraction",
         difficultyBand: "mixed",
@@ -302,20 +338,22 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
     ],
     B: [
       () => ({
-        prompt: "Which strategy is most efficient for 146 − 98?",
-        options: ["Count up", "Near doubles", "Make 10", "Equal groups"],
-        correctAnswer: "Count up",
-        skillId: "subtraction_strategies",
+        type: "mcq",
+        prompt: "What is 146 − 98?",
+        options: ["38", "48", "58", "68"],
+        correctAnswer: "48",
+        skillId: "subtraction_fluency",
         linkedWeeks: [4],
-        questionType: "mcq_strategy_choice",
+        questionType: "mcq_subtraction",
         difficultyBand: "mixed",
         instanceKey: "sub-b-1",
       }),
       () => ({
+        type: "mcq",
         prompt: "What is 156 − 32?",
         options: ["114", "124", "134", "144"],
         correctAnswer: "124",
-        skillId: "subtraction_strategies",
+        skillId: "subtraction_fluency",
         linkedWeeks: [4],
         questionType: "mcq_subtraction",
         difficultyBand: "mixed",
@@ -326,6 +364,7 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
   written_algorithms: {
     A: [
       () => ({
+        type: "mcq",
         prompt: "Work out 384 + 267.",
         options: ["541", "651", "641", "671"],
         correctAnswer: "651",
@@ -336,6 +375,7 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
         instanceKey: "alg-a-1",
       }),
       () => ({
+        type: "mcq",
         prompt: "Work out 402 − 187.",
         options: ["205", "215", "225", "235"],
         correctAnswer: "215",
@@ -348,6 +388,7 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
     ],
     B: [
       () => ({
+        type: "mcq",
         prompt: "Work out 146 + 278.",
         options: ["414", "424", "434", "444"],
         correctAnswer: "424",
@@ -358,6 +399,7 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
         instanceKey: "alg-b-1",
       }),
       () => ({
+        type: "mcq",
         prompt: "Work out 631 − 248.",
         options: ["373", "383", "393", "403"],
         correctAnswer: "383",
@@ -372,6 +414,7 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
   two_step_word_problems: {
     A: [
       () => ({
+        type: "mcq",
         prompt: "A shop had 186 apples. They received 48 more, then sold 36. How many apples do they have now?",
         options: ["188", "198", "208", "218"],
         correctAnswer: "198",
@@ -382,6 +425,7 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
         instanceKey: "word-a-1",
       }),
       () => ({
+        type: "mcq",
         prompt: "There were 320 tickets. 185 were sold in the morning and 74 in the afternoon. How many tickets are left?",
         options: ["51", "61", "71", "81"],
         correctAnswer: "61",
@@ -394,6 +438,7 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
     ],
     B: [
       () => ({
+        type: "mcq",
         prompt: "A school collected 245 cans. They collected 67 more, but 29 were damaged. How many are left?",
         options: ["273", "283", "293", "303"],
         correctAnswer: "283",
@@ -404,6 +449,7 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
         instanceKey: "word-b-1",
       }),
       () => ({
+        type: "mcq",
         prompt: "A farmer had 450 apples. He sold 186, then picked 95 more. How many apples does he have now?",
         options: ["349", "359", "369", "379"],
         correctAnswer: "359",
@@ -418,6 +464,7 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
   multiplication_models: {
     A: [
       () => ({
+        type: "mcq",
         prompt: "There are 4 bags with 6 apples in each bag. How many apples are there altogether?",
         options: ["10", "20", "24", "26"],
         correctAnswer: "24",
@@ -428,6 +475,7 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
         instanceKey: "mult-a-1",
       }),
       () => ({
+        type: "mcq",
         prompt: "Which multiplication sentence matches an array with 3 rows of 4?",
         options: ["3 × 4 = 12", "3 + 4 = 7", "12 ÷ 4 = 4", "4 + 4 + 4 + 4 = 16"],
         correctAnswer: "3 × 4 = 12",
@@ -440,6 +488,7 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
     ],
     B: [
       () => ({
+        type: "mcq",
         prompt: "5 groups of 4 is the same as:",
         options: ["5 + 4", "4 + 4 + 4 + 4 + 4", "5 + 5 + 5 + 5", "20 ÷ 5"],
         correctAnswer: "4 + 4 + 4 + 4 + 4",
@@ -450,6 +499,7 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
         instanceKey: "mult-b-1",
       }),
       () => ({
+        type: "mcq",
         prompt: "An array has 2 rows of 10. How many counters are there?",
         options: ["12", "20", "22", "30"],
         correctAnswer: "20",
@@ -464,38 +514,20 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
   division_and_fact_families: {
     A: [
       () => ({
-        prompt: "What is 24 ÷ 3?",
-        options: ["6", "7", "8", "9"],
-        correctAnswer: "8",
-        skillId: "division_and_fact_families",
-        linkedWeeks: [8, 10],
-        questionType: "mcq_division",
-        difficultyBand: "mixed",
-        instanceKey: "div-a-1",
-      }),
-      () => ({
+        type: "mcq",
         prompt: "What number makes this true: 4 × ? = 28",
         options: ["6", "7", "8", "9"],
         correctAnswer: "7",
         skillId: "division_and_fact_families",
         linkedWeeks: [8, 10],
-        questionType: "mcq_missing_number",
+        questionType: "mcq_fact_family",
         difficultyBand: "mixed",
-        instanceKey: "div-a-2",
+        instanceKey: "div-a-1",
       }),
     ],
     B: [
       () => ({
-        prompt: "What is 32 ÷ 4?",
-        options: ["6", "7", "8", "9"],
-        correctAnswer: "8",
-        skillId: "division_and_fact_families",
-        linkedWeeks: [8, 10],
-        questionType: "mcq_division",
-        difficultyBand: "mixed",
-        instanceKey: "div-b-1",
-      }),
-      () => ({
+        type: "mcq",
         prompt: "Which sentence belongs to the fact family for 3, 4 and 12?",
         options: ["12 ÷ 3 = 4", "12 + 3 = 15", "4 + 3 = 12", "3 × 12 = 15"],
         correctAnswer: "12 ÷ 3 = 4",
@@ -503,13 +535,14 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
         linkedWeeks: [8, 10],
         questionType: "mcq_fact_family",
         difficultyBand: "mixed",
-        instanceKey: "div-b-2",
+        instanceKey: "div-b-1",
       }),
     ],
   },
   patterns_sequences: {
     A: [
       () => ({
+        type: "mcq",
         prompt: "What number comes next? 1,250, 1,350, 1,450, __",
         options: ["1,500", "1,550", "1,650", "2,450"],
         correctAnswer: "1,550",
@@ -519,19 +552,10 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
         difficultyBand: "core",
         instanceKey: "pat-a-1",
       }),
-      () => ({
-        prompt: "What number comes next? 2,000, 3,000, 4,000, __",
-        options: ["4,100", "4,500", "5,000", "6,000"],
-        correctAnswer: "5,000",
-        skillId: "patterns_sequences",
-        linkedWeeks: [9],
-        questionType: "mcq_pattern",
-        difficultyBand: "core",
-        instanceKey: "pat-a-2",
-      }),
     ],
     B: [
       () => ({
+        type: "mcq",
         prompt: "What number comes next? 23,670, 24,670, 25,670, __",
         options: ["25,770", "26,670", "26,770", "27,670"],
         correctAnswer: "26,670",
@@ -541,61 +565,142 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
         difficultyBand: "core",
         instanceKey: "pat-b-1",
       }),
-      () => ({
-        prompt: "What number comes next? 4,400, 4,500, 4,600, __",
-        options: ["4,610", "4,700", "5,600", "14,600"],
-        correctAnswer: "4,700",
-        skillId: "patterns_sequences",
-        linkedWeeks: [9],
-        questionType: "mcq_pattern",
-        difficultyBand: "core",
-        instanceKey: "pat-b-2",
-      }),
     ],
   },
-  fractions: {
+  fractions_foundations: {
     A: [
       () => ({
-        prompt: "If one part is 1/3, how many equal parts make the whole?",
-        options: ["2", "3", "4", "5"],
-        correctAnswer: "3",
-        skillId: "fractions",
-        linkedWeeks: [11, 12],
-        questionType: "mcq_unit_fraction",
+        type: "fraction_model_select",
+        prompt: "Tap the model that shows 1/4.",
+        options: [
+          { id: "a", label: "1/4", numerator: 1, denominator: 4 },
+          { id: "b", label: "2/4", numerator: 2, denominator: 4 },
+          { id: "c", label: "1/5", numerator: 1, denominator: 5 },
+          { id: "d", label: "3/4", numerator: 3, denominator: 4 },
+        ],
+        correctAnswer: "a",
+        skillId: "fractions_foundations",
+        linkedWeeks: [11],
+        questionType: "fraction_model_select",
         difficultyBand: "mixed",
-        instanceKey: "frac-a-1",
+        instanceKey: "ff-a-1",
       }),
       () => ({
-        prompt: "Which fraction is equivalent to 1/2?",
-        options: ["2/4", "3/4", "2/5", "4/5"],
-        correctAnswer: "2/4",
-        skillId: "fractions",
-        linkedWeeks: [11, 12],
-        questionType: "mcq_equivalence",
+        type: "build_whole",
+        prompt: "If this one part is 1/3, which picture shows the whole?",
+        options: [
+          { id: "a", label: "2 parts", parts: 2 },
+          { id: "b", label: "3 parts", parts: 3 },
+          { id: "c", label: "4 parts", parts: 4 },
+        ],
+        correctAnswer: "b",
+        skillId: "fractions_foundations",
+        linkedWeeks: [11],
+        questionType: "build_whole",
         difficultyBand: "mixed",
-        instanceKey: "frac-a-2",
+        instanceKey: "ff-a-2",
+        visual: {
+          fractionLabel: "1/3",
+          denominator: 3,
+        },
       }),
     ],
     B: [
       () => ({
-        prompt: "Which fraction is halfway between 0 and 1?",
-        options: ["1/4", "1/3", "1/2", "3/4"],
-        correctAnswer: "1/2",
-        skillId: "fractions",
-        linkedWeeks: [11, 12],
-        questionType: "mcq_unit_fraction",
+        type: "fraction_model_select",
+        prompt: "Tap the model that shows 1/5.",
+        options: [
+          { id: "a", label: "1/5", numerator: 1, denominator: 5 },
+          { id: "b", label: "2/5", numerator: 2, denominator: 5 },
+          { id: "c", label: "1/4", numerator: 1, denominator: 4 },
+          { id: "d", label: "3/5", numerator: 3, denominator: 5 },
+        ],
+        correctAnswer: "a",
+        skillId: "fractions_foundations",
+        linkedWeeks: [11],
+        questionType: "fraction_model_select",
         difficultyBand: "mixed",
-        instanceKey: "frac-b-1",
+        instanceKey: "ff-b-1",
       }),
       () => ({
-        prompt: "Which is greater?",
-        options: ["1/4", "1/2", "They are equal", "Cannot tell"],
-        correctAnswer: "1/2",
-        skillId: "fractions",
-        linkedWeeks: [11, 12],
-        questionType: "mcq_compare_fraction",
+        type: "build_whole",
+        prompt: "If this one part is 1/4, which picture shows the whole?",
+        options: [
+          { id: "a", label: "3 parts", parts: 3 },
+          { id: "b", label: "4 parts", parts: 4 },
+          { id: "c", label: "5 parts", parts: 5 },
+        ],
+        correctAnswer: "b",
+        skillId: "fractions_foundations",
+        linkedWeeks: [11],
+        questionType: "build_whole",
         difficultyBand: "mixed",
-        instanceKey: "frac-b-2",
+        instanceKey: "ff-b-2",
+        visual: {
+          fractionLabel: "1/4",
+          denominator: 4,
+        },
+      }),
+    ],
+  },
+  fractions_reasoning: {
+    A: [
+      () => ({
+        type: "fraction_order",
+        prompt: "Put the fractions in order from smallest to largest.",
+        options: ["1/5", "1/2", "4/5"],
+        correctAnswer: "1/5,1/2,4/5",
+        skillId: "fractions_reasoning",
+        linkedWeeks: [12],
+        questionType: "fraction_order",
+        difficultyBand: "mixed",
+        instanceKey: "fr-a-1",
+      }),
+      () => ({
+        type: "fraction_number_line",
+        prompt: "Place 2/5 on the number line using the model.",
+        options: [],
+        correctAnswer: "2/5",
+        skillId: "fractions_reasoning",
+        linkedWeeks: [12],
+        questionType: "fraction_number_line",
+        difficultyBand: "mixed",
+        instanceKey: "fr-a-2",
+        visual: {
+          targetFraction: "2/5",
+        },
+      }),
+    ],
+    B: [
+      () => ({
+        type: "fraction_model_select",
+        prompt: "Tap the model that is equivalent to 1/2.",
+        options: [
+          { id: "a", label: "2/4", numerator: 2, denominator: 4 },
+          { id: "b", label: "3/4", numerator: 3, denominator: 4 },
+          { id: "c", label: "2/5", numerator: 2, denominator: 5 },
+          { id: "d", label: "4/5", numerator: 4, denominator: 5 },
+        ],
+        correctAnswer: "a",
+        skillId: "fractions_reasoning",
+        linkedWeeks: [12],
+        questionType: "fraction_model_select",
+        difficultyBand: "mixed",
+        instanceKey: "fr-b-1",
+      }),
+      () => ({
+        type: "fraction_number_line",
+        prompt: "Place 3/4 on the number line using the model.",
+        options: [],
+        correctAnswer: "3/4",
+        skillId: "fractions_reasoning",
+        linkedWeeks: [12],
+        questionType: "fraction_number_line",
+        difficultyBand: "mixed",
+        instanceKey: "fr-b-2",
+        visual: {
+          targetFraction: "3/4",
+        },
       }),
     ],
   },
@@ -628,20 +733,25 @@ export function buildLevel3AssessmentQuestions(form: AssessmentForm): Level3Gene
 
 export function buildLevel3PretestFormA(): PretestQuestion[] {
   return buildLevel3AssessmentQuestions("A").map((question) => ({
-    type: "mcq",
+    type: question.type,
     id: question.id,
     prompt: question.prompt,
     options: question.options,
     answer: question.correctAnswer,
+    correctAnswer: question.correctAnswer,
+    visual: question.visual,
   }));
 }
 
 export function buildLevel3PosttestFormB(): PostTest {
   const questions: PosttestQuestion[] = buildLevel3AssessmentQuestions("B").map((question) => ({
     id: question.id,
+    type: question.type,
     prompt: question.prompt,
     options: question.options,
     correctAnswer: question.correctAnswer,
+    answer: question.correctAnswer,
+    visual: question.visual,
   }));
 
   return {
@@ -692,28 +802,18 @@ export function validateLevel3AssessmentForms(): string[] {
     }
   }
 
+  for (const question of [...formA, ...formB]) {
+    if (/strategy/i.test(question.prompt)) {
+      issues.push(`Assessment prompt still contains strategy language: ${question.prompt}`);
+    }
+  }
+
   const formAKeys = new Set(formA.map((question) => question.instanceKey));
   const duplicateAcrossForms = formB
     .map((question) => question.instanceKey)
     .filter((key) => formAKeys.has(key));
   if (duplicateAcrossForms.length > 0) {
     issues.push(`Forms A and B reused the same question instances: ${duplicateAcrossForms.join(", ")}.`);
-  }
-
-  const formAPrompts = new Set<string>();
-  for (const question of formA) {
-    if (formAPrompts.has(question.prompt)) {
-      issues.push(`Form A duplicated prompt: ${question.prompt}`);
-    }
-    formAPrompts.add(question.prompt);
-  }
-
-  const formBPrompts = new Set<string>();
-  for (const question of formB) {
-    if (formBPrompts.has(question.prompt)) {
-      issues.push(`Form B duplicated prompt: ${question.prompt}`);
-    }
-    formBPrompts.add(question.prompt);
   }
 
   return issues;

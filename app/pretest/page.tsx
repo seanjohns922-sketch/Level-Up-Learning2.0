@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { getPretestForYearLabel } from "@/data/assessments/api";
 import type { Question } from "@/data/assessments/pretests";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
+import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCard";
 
 function MabPicker({
   target,
@@ -356,6 +357,12 @@ function PretestPage() {
         const correctLabel = typeof opt === "string" ? opt : opt.label;
         return acc + (answer === correctLabel ? 1 : 0);
       }
+      if (q.answerOptionId !== undefined) {
+        return acc + (answer === q.answerOptionId ? 1 : 0);
+      }
+      if (q.correctAnswer !== undefined) {
+        return acc + (answer === q.correctAnswer ? 1 : 0);
+      }
       return acc + (answer === q.answer ? 1 : 0);
     }, 0);
 
@@ -495,7 +502,7 @@ function PretestPage() {
             })}
           </div>
         ) : (
-          <div className="grid gap-3">
+          <>
             {question.visual?.type === "dot_add" ? (
               <DotAddVisual
                 leftTarget={question.visual.leftTarget}
@@ -514,31 +521,12 @@ function PretestPage() {
                 selectTarget={question.visual.selectTarget}
               />
             ) : null}
-            {(question.options ?? []).map((option: any) => {
-              const label = typeof option === "string" ? option : option.label;
-              const isSelected = selected === label;
-
-              return (
-                <button
-                  key={label}
-                  onClick={() => choose(label)}
-                  className={[
-                    "text-left p-5 rounded-2xl border transition shadow-sm",
-                    isSelected
-                      ? "border-emerald-500 bg-emerald-50"
-                      : "border-gray-200 hover:border-emerald-300 bg-white",
-                  ].join(" ")}
-                >
-                  {label}
-                  {question.visual?.type === "group_counters" &&
-                  typeof option !== "string" &&
-                  option.groups ? (
-                    <EqualSharingPreview groups={option.groups} />
-                  ) : null}
-                </button>
-              );
-            })}
-          </div>
+            <AssessmentQuestionCard
+              question={question}
+              value={selected}
+              onChange={choose}
+            />
+          </>
         )}
 
         <div className="flex items-center justify-between mt-8">
