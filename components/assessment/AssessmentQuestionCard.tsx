@@ -328,10 +328,10 @@ export default function AssessmentQuestionCard({
             type="button"
             onClick={() => onChange(String(option.id ?? label))}
             className={[
-              "text-left rounded-2xl border p-5 shadow-sm transition",
+              "text-left rounded-2xl border p-5 transition font-semibold text-white",
               isSelected
-                ? "border-violet-500 bg-violet-50"
-                : "border-gray-200 bg-white hover:border-violet-300",
+                ? "border-teal-500 bg-teal-500/15 shadow-lg shadow-teal-500/10"
+                : "border-slate-600 bg-slate-700/50 hover:bg-slate-700 hover:border-slate-500",
             ].join(" ")}
           >
             {label}
