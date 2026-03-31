@@ -159,7 +159,7 @@ export default function AssessmentQuestionCard({
             type="button"
             onClick={undoLast}
             disabled={order.length === 0}
-            className="rounded-2xl border border-violet-300 bg-white px-4 py-2 font-black text-violet-900 hover:bg-violet-50 disabled:opacity-40"
+            className="rounded-2xl border border-slate-600 bg-slate-700/50 px-4 py-2 font-black text-slate-300 hover:bg-slate-700 disabled:opacity-40"
           >
             Undo last
           </button>
