@@ -120,17 +120,17 @@ export default function StudentHomePage() {
       {/* Immersive realm background */}
       <div className="fixed inset-0 z-0">
         <img
-          src={levelNum >= 3 ? "/images/number-nexus-home-bg-y3.jpg" : "/images/number-nexus-home-bg.jpg"}
+          src={getHomeBg(levelNum)}
           alt=""
           className="w-full h-full object-cover"
-          style={{ filter: "brightness(1.3) contrast(1.12) saturate(1.15)" }}
+          style={{ filter: getHomeBgFilter(levelNum) }}
         />
-      {/* Subtle vignette — edges only, world stays bright */}
+        {/* Vignette — intensity scales with level band */}
         <div
           className="absolute inset-0 pointer-events-none"
-          style={{ boxShadow: "inset 0 0 120px 40px rgba(5,20,35,0.35), inset 0 -60px 80px -20px rgba(5,20,35,0.25)" }}
+          style={{ boxShadow: getVignetteStyle(levelNum) }}
         />
-        {/* Bright teal glow behind Numbot (right side) */}
+        {/* Numbot glow (right side) */}
         <div
           className="absolute animate-pulse"
           style={{
@@ -139,12 +139,12 @@ export default function StudentHomePage() {
             right: "5%",
             top: "15%",
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(31,209,181,0.45) 0%, rgba(16,185,160,0.15) 40%, transparent 70%)",
+            background: `radial-gradient(circle, ${getGlowColor(levelNum)} 0%, transparent 70%)`,
             filter: "blur(30px)",
             animationDuration: "3s",
           }}
         />
-        {/* Bright circuit glow accents — left side */}
+        {/* Circuit glow — left */}
         <div
           className="absolute"
           style={{
@@ -152,12 +152,12 @@ export default function StudentHomePage() {
             height: "80%",
             left: 0,
             top: "10%",
-            background: "linear-gradient(180deg, transparent, rgba(31,209,181,0.25) 50%, transparent)",
+            background: `linear-gradient(180deg, transparent, ${getGlowColor(levelNum)} 50%, transparent)`,
             filter: "blur(25px)",
             animation: "pulse 4s cubic-bezier(0.4,0,0.6,1) infinite",
           }}
         />
-        {/* Bright circuit glow accents — right side */}
+        {/* Circuit glow — right */}
         <div
           className="absolute"
           style={{
@@ -165,7 +165,7 @@ export default function StudentHomePage() {
             height: "80%",
             right: 0,
             top: "10%",
-            background: "linear-gradient(180deg, transparent, rgba(31,209,181,0.20) 50%, transparent)",
+            background: `linear-gradient(180deg, transparent, ${getGlowColor(levelNum).replace(/[\d.]+\)$/, "0.2)")} 50%, transparent)`,
             filter: "blur(25px)",
             animation: "pulse 5s cubic-bezier(0.4,0,0.6,1) infinite 1s",
           }}
@@ -180,28 +180,40 @@ export default function StudentHomePage() {
             top: "30%",
             transform: "translateX(-50%)",
             borderRadius: "50%",
-            background: "radial-gradient(ellipse, rgba(56,230,200,0.2) 0%, transparent 70%)",
+            background: `radial-gradient(ellipse, ${getGlowColor(levelNum).replace(/[\d.]+\)$/, "0.2)")} 0%, transparent 70%)`,
             filter: "blur(40px)",
             animationDuration: "5s",
           }}
         />
-        {/* Floating particles — dense magical dust */}
-        {[...Array(60)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute rounded-full"
+        {/* Data stream overlay for advanced+ bands */}
+        {getLevelBand(levelNum) !== "foundation" && (
+          <div className="absolute inset-0 pointer-events-none opacity-15"
             style={{
-              width: 2 + (i % 5),
-              height: 2 + (i % 5),
-              left: `${3 + (i * 4.7) % 94}%`,
-              bottom: `${(i * 5.3) % 80}%`,
-              background: i % 4 === 0 ? "rgba(31,209,181,0.7)" : i % 4 === 1 ? "rgba(56,230,200,0.5)" : i % 4 === 2 ? "rgba(255,255,255,0.5)" : "rgba(255,220,100,0.4)",
-              animation: `floatUp ${5 + (i % 6) * 2}s linear infinite`,
-              animationDelay: `${(i * 0.6) % 10}s`,
-              opacity: 0.3 + (i % 4) * 0.15,
+              backgroundImage: `repeating-linear-gradient(90deg, transparent, transparent 60px, ${getGlowColor(levelNum).replace(/[\d.]+\)$/, "0.3)")} 60px, transparent 61px)`,
+              animation: "dataScroll 8s linear infinite",
             }}
           />
-        ))}
+        )}
+        {/* Floating particles — palette from level band */}
+        {[...Array(getLevelBand(levelNum) === "foundation" ? 60 : 80)].map((_, i) => {
+          const colors = getParticleColors(levelNum);
+          return (
+            <div
+              key={i}
+              className="absolute rounded-full"
+              style={{
+                width: 2 + (i % 5),
+                height: 2 + (i % 5),
+                left: `${3 + (i * 4.7) % 94}%`,
+                bottom: `${(i * 5.3) % 80}%`,
+                background: colors[i % 4],
+                animation: `floatUp ${5 + (i % 6) * 2}s linear infinite`,
+                animationDelay: `${(i * 0.6) % 10}s`,
+                opacity: 0.3 + (i % 4) * 0.15,
+              }}
+            />
+          );
+        })}
       </div>
 
       <div className="relative z-10">
