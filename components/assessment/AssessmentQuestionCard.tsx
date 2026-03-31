@@ -215,14 +215,14 @@ export default function AssessmentQuestionCard({
 
     return (
       <div className="mt-6 space-y-5">
-        <div className="rounded-2xl border border-violet-100 bg-violet-50 p-5">
-          <div className="text-xs font-bold uppercase tracking-wide text-violet-700">Given Part</div>
+        <div className="rounded-2xl border border-slate-600 bg-slate-700/50 p-5">
+          <div className="text-xs font-bold uppercase tracking-wide text-teal-400">Given Part</div>
           <div className="mt-3 max-w-sm">
-            <div className="grid rounded-xl bg-slate-200 p-1" style={{ gridTemplateColumns: "repeat(1, minmax(0, 1fr))" }}>
-              <div className="h-14 rounded-[4px] bg-violet-500" />
+            <div className="grid rounded-xl bg-slate-700/50 p-1" style={{ gridTemplateColumns: "repeat(1, minmax(0, 1fr))" }}>
+              <div className="h-14 rounded-[4px] bg-teal-500" />
             </div>
           </div>
-          <div className="mt-3 text-lg font-black text-violet-900">{fractionLabel}</div>
+          <div className="mt-3 text-lg font-black text-white">{fractionLabel}</div>
         </div>
         <div className="grid gap-4 md:grid-cols-3">
           {options.map((option) => (
@@ -230,7 +230,7 @@ export default function AssessmentQuestionCard({
               key={option.id}
               type="button"
               onClick={() => onChange(option.id)}
-              className="rounded-2xl border border-violet-200 bg-white p-4 text-left shadow-sm transition hover:bg-violet-50"
+              className="rounded-2xl border border-slate-600 bg-slate-700/50 p-4 text-left shadow-sm transition hover:bg-slate-700"
             >
               <WholeOption parts={option.parts} selected={value === option.id} />
             </button>
