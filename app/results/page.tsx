@@ -14,6 +14,10 @@ function getLowestRecommendedWeek(profile: AssessmentResultProfile | null) {
   return Math.min(...profile.recommendedWeeks);
 }
 
+function getAssignedReviewWeek(profile: AssessmentResultProfile | null) {
+  return profile?.assignedWeek ?? getLowestRecommendedWeek(profile);
+}
+
 function getStrandBadgeClass(strand?: string) {
   switch (strand) {
     case "fractions":
@@ -235,10 +239,6 @@ function ResultsPage() {
     const qs = new URLSearchParams({ year, week: "1" }).toString();
     router.push(`/program?${qs}`);
   }
-  function goReview() {
-    const qs = new URLSearchParams({ year, week: "12" }).toString();
-    router.push(`/program?${qs}`);
-  }
   function goRetryPostTest() {
     router.push(`/posttest?year=${encodeURIComponent(year)}`);
   }
@@ -254,6 +254,13 @@ function ResultsPage() {
   const msg = getMessage();
   const topStrengths = storedPosttestProfile?.strengths?.slice(0, 3) ?? [];
   const topWeakAreas = storedPosttestProfile?.weakAreas?.slice(0, 3) ?? [];
+  const assignedReviewWeek = getAssignedReviewWeek(storedPosttestProfile);
+
+  function goAssignedWeek() {
+    const week = assignedReviewWeek ?? 1;
+    const qs = new URLSearchParams({ year, week: String(week) }).toString();
+    router.push(`/program?${qs}`);
+  }
 
   return (
     <main className="min-h-screen bg-background flex items-center justify-center p-4 relative">
@@ -465,13 +472,14 @@ function ResultsPage() {
                   🔄 Retry Post-Test
                 </button>
                 <button
-                  onClick={goReview}
-                  className="w-full py-3 rounded-2xl font-bold text-sm hover:opacity-90 transition-all active:scale-[0.98]"
+                  onClick={goAssignedWeek}
+                  className="w-full py-4 rounded-2xl font-bold text-base hover:opacity-90 transition-all active:scale-[0.98]"
                   style={{
                     background: "linear-gradient(135deg, hsl(var(--accent)), hsl(42 95% 60%))",
+                    boxShadow: "0 8px 24px -8px hsl(var(--accent) / 0.4)",
                   }}
                 >
-                  📖 Review Lessons
+                  📖 Start Week {assignedReviewWeek ?? 1}
                 </button>
                 <button
                   onClick={goHome}
