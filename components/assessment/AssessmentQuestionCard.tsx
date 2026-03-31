@@ -260,28 +260,28 @@ export default function AssessmentQuestionCard({
 
     return (
       <div className="mt-6 space-y-5">
-        <div className="rounded-2xl border border-violet-100 bg-violet-50 p-5">
-          <div className="text-xs font-bold uppercase tracking-wide text-violet-700">Model</div>
-          <div className="mt-2 text-lg font-black text-violet-900">{targetFraction}</div>
+        <div className="rounded-2xl border border-slate-600 bg-slate-700/50 p-5">
+          <div className="text-xs font-bold uppercase tracking-wide text-teal-400">Model</div>
+          <div className="mt-2 text-lg font-black text-white">{targetFraction}</div>
           <div className="mt-3 max-w-md">
             <FractionBar fraction={targetFraction} large />
           </div>
         </div>
-        <div className="rounded-2xl border border-violet-100 bg-violet-50 p-5">
-          <div className="mb-3 text-sm font-bold text-violet-700">{denominator} equal jumps from 0 to 1</div>
+        <div className="rounded-2xl border border-slate-600 bg-slate-700/50 p-5">
+          <div className="mb-3 text-sm font-bold text-teal-400">{denominator} equal jumps from 0 to 1</div>
           <div
             ref={lineRef}
             className="relative mx-3 h-16 cursor-pointer"
             onClick={(event) => placeDot(event.clientX)}
           >
-            <div className="absolute top-7 left-0 right-0 h-1 rounded bg-slate-400" />
+            <div className="absolute top-7 left-0 right-0 h-1 rounded bg-slate-500" />
             {lineStops.slice(0, -1).map((stop, index) => {
               const next = lineStops[index + 1];
               if (!next) return null;
               return (
                 <div
                   key={`${stop.label}-${next.label}`}
-                  className="absolute top-[22px] h-3 rounded-full bg-violet-200/70"
+                  className="absolute top-[22px] h-3 rounded-full bg-teal-500/30"
                   style={{
                     left: `${stop.x * 100}%`,
                     width: `${(next.x - stop.x) * 100}%`,
@@ -292,13 +292,13 @@ export default function AssessmentQuestionCard({
             {lineStops.map((stop) => (
               <div
                 key={stop.label}
-                className="absolute top-5 h-5 w-0.5 -translate-x-1/2 rounded bg-slate-400"
+                className="absolute top-5 h-5 w-0.5 -translate-x-1/2 rounded bg-slate-500"
                 style={{ left: `${stop.x * 100}%` }}
               />
             ))}
             {value ? (
               <div
-                className="absolute top-3 flex h-9 w-9 -translate-x-1/2 items-center justify-center rounded-full border-2 border-violet-600 bg-violet-500 text-white shadow-sm"
+                className="absolute top-3 flex h-9 w-9 -translate-x-1/2 items-center justify-center rounded-full border-2 border-teal-400 bg-teal-500 text-white shadow-sm"
                 style={{
                   left: `${((lineStops.find((stop) => stop.label === value)?.x ?? 0) * 100)}%`,
                 }}
@@ -307,7 +307,7 @@ export default function AssessmentQuestionCard({
               </div>
             ) : null}
           </div>
-          <div className="mt-2 flex justify-between text-sm font-bold text-slate-700">
+          <div className="mt-2 flex justify-between text-sm font-bold text-slate-400">
             <span>0</span>
             <span>1</span>
           </div>
