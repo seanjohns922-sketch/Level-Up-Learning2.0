@@ -47,7 +47,7 @@ export const LEVEL3_ASSESSMENT_BLUEPRINT: Level3AssessmentBlueprintItem[] = [
     skillId: "place_value_number_knowledge",
     title: "Place Value and Number Knowledge",
     linkedWeeks: [1, 10],
-    questionTypes: ["mcq_place_value", "number_order"],
+    questionTypes: ["mcq_place_value", "mcq_ordering"],
     difficultyBand: "core",
     targetCountInTest: 2,
     allowedInPre: true,
@@ -170,13 +170,13 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
         instanceKey: "pv-a-1",
       }),
       () => ({
-        type: "number_order",
-        prompt: "Put these numbers in order from smallest to largest.",
+        type: "mcq",
+        prompt: "Which number is greatest?",
         options: ["5,409", "5,490", "5,094", "5,940"],
-        correctAnswer: "5,094,5,409,5,490,5,940",
+        correctAnswer: "5,940",
         skillId: "place_value_number_knowledge",
         linkedWeeks: [1, 10],
-        questionType: "number_order",
+        questionType: "mcq_ordering",
         difficultyBand: "core",
         instanceKey: "pv-a-2",
       }),
@@ -194,13 +194,18 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
         instanceKey: "pv-b-1",
       }),
       () => ({
-        type: "number_order",
+        type: "mcq",
         prompt: "Put these numbers in order from smallest to largest: 4,508, 4,805, 4,580",
-        options: ["4,508", "4,805", "4,580"],
-        correctAnswer: "4,508,4,580,4,805",
+        options: [
+          "4,508, 4,580, 4,805",
+          "4,580, 4,508, 4,805",
+          "4,805, 4,580, 4,508",
+          "4,508, 4,805, 4,580",
+        ],
+        correctAnswer: "4,508, 4,580, 4,805",
         skillId: "place_value_number_knowledge",
         linkedWeeks: [1, 10],
-        questionType: "number_order",
+        questionType: "mcq_ordering",
         difficultyBand: "core",
         instanceKey: "pv-b-2",
       }),
@@ -566,7 +571,7 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
     A: [
       () => ({
         type: "fraction_model_select",
-        prompt: "Tap the model that shows one-quarter.",
+        prompt: "Tap the model that shows 1/4.",
         options: [
           { id: "a", label: "1/4", numerator: 1, denominator: 4 },
           { id: "b", label: "2/4", numerator: 2, denominator: 4 },
@@ -582,7 +587,7 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
       }),
       () => ({
         type: "build_whole",
-        prompt: "If this one part is one-third, which picture shows the whole?",
+        prompt: "If this one part is 1/3, which picture shows the whole?",
         options: [
           { id: "a", label: "2 parts", parts: 2 },
           { id: "b", label: "3 parts", parts: 3 },
@@ -603,7 +608,7 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
     B: [
       () => ({
         type: "fraction_model_select",
-        prompt: "Tap the model that shows one-fifth.",
+        prompt: "Tap the model that shows 1/5.",
         options: [
           { id: "a", label: "1/5", numerator: 1, denominator: 5 },
           { id: "b", label: "2/5", numerator: 2, denominator: 5 },
@@ -619,7 +624,7 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
       }),
       () => ({
         type: "build_whole",
-        prompt: "If this one part is one-quarter, which picture shows the whole?",
+        prompt: "If this one part is 1/4, which picture shows the whole?",
         options: [
           { id: "a", label: "3 parts", parts: 3 },
           { id: "b", label: "4 parts", parts: 4 },
