@@ -2,7 +2,8 @@
 
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { getPretestForYear, type Question } from "@/data/assessments/pretests";
+import { getPretestForYearLabel } from "@/data/assessments/api";
+import type { Question } from "@/data/assessments/pretests";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 function MabPicker({
@@ -299,7 +300,7 @@ function PretestPage() {
   const year = searchParams.get("year") ?? "Year 3";
 
   const questions: Question[] = useMemo(
-    () => getPretestForYear(year),
+    () => getPretestForYearLabel(year),
     [year]
   );
 

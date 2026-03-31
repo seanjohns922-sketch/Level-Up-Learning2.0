@@ -2,7 +2,8 @@
 
 import { Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { POSTTESTS, type Question } from "@/data/assessments/posttests";
+import { getPosttestForYearLabel } from "@/data/assessments/api";
+import type { Question } from "@/data/assessments/posttests";
 import { getLegendForYear } from "@/data/legends";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { readProgress, writeProgress, type StudentProgress } from "@/data/progress";
@@ -20,7 +21,7 @@ function PostTestPage() {
   const year = params.get("year") ?? "Year 3";
 
   const test = useMemo(() => {
-    return POSTTESTS[year] ?? POSTTESTS["Year 3"];
+    return getPosttestForYearLabel(year) ?? getPosttestForYearLabel("Year 3");
   }, [year]);
 
   const questions: Question[] = test?.questions ?? [];

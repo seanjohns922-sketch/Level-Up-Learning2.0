@@ -83,7 +83,11 @@ const {
   validateLessonActivityIntentForLevel,
 } = engine;
 
-const { getPretestForLevel, getPosttestForLevel } = assessments;
+const {
+  getPretestForLevel,
+  getPosttestForLevel,
+  validateAssessmentBlueprintForLevel,
+} = assessments;
 
 const findings = [];
 const YEAR3_ALLOWED_FACTORS = new Set([2, 3, 4, 5, 10]);
@@ -567,11 +571,17 @@ const year2Pretest = getPretestForLevel(2);
 const year3Pretest = getPretestForLevel(3);
 const year2Posttest = getPosttestForLevel(2);
 const year3Posttest = getPosttestForLevel(3);
+const year3AssessmentValidation = validateAssessmentBlueprintForLevel(3);
 
 if (!year2Pretest.length) addFinding("Assessments Year 2 pretest", "No questions returned.");
 if (!year3Pretest.length) addFinding("Assessments Year 3 pretest", "No questions returned.");
 if (!year2Posttest?.questions?.length) addFinding("Assessments Year 2 posttest", "No questions returned.");
 if (!year3Posttest?.questions?.length) addFinding("Assessments Year 3 posttest", "No questions returned.");
+if (year3Pretest.length !== 20) addFinding("Assessments Year 3 pretest", `Expected 20 questions, got ${year3Pretest.length}.`);
+if ((year3Posttest?.questions?.length ?? 0) !== 20) addFinding("Assessments Year 3 posttest", `Expected 20 questions, got ${year3Posttest?.questions?.length ?? 0}.`);
+for (const issue of year3AssessmentValidation) {
+  addFinding("Assessments Year 3 blueprint", issue);
+}
 
 if (findings.length === 0) {
   console.log("Level-aware regression passed for Year 2 and Year 3 lesson, quiz, and assessment targets.");
