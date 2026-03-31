@@ -192,13 +192,13 @@ export default function AssessmentQuestionCard({
             type="button"
             onClick={() => onChange(option.id)}
             className={[
-              "rounded-2xl border bg-white p-4 text-left shadow-sm transition",
+              "rounded-2xl border p-4 text-left shadow-sm transition",
               value === option.id
-                ? "border-violet-500 bg-violet-50"
-                : "border-violet-200 hover:bg-violet-50",
+                ? "border-teal-500 bg-teal-500/10"
+                : "border-slate-600 bg-slate-700/50 hover:bg-slate-700",
             ].join(" ")}
           >
-            <div className="text-sm font-black text-violet-900">{option.label}</div>
+            <div className="text-sm font-black text-white">{option.label}</div>
             <div className="mt-3">
               <FractionBar fraction={`${option.numerator}/${option.denominator}`} large />
             </div>
