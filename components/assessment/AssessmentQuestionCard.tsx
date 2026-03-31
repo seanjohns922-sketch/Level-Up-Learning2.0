@@ -14,6 +14,8 @@ function parseFraction(label: string) {
   return { numerator, denominator };
 }
 
+const ORDER_SEPARATOR = "||";
+
 function FractionBar({
   fraction,
   large = false,
@@ -83,18 +85,21 @@ export default function AssessmentQuestionCard({
   const lineRef = useRef<HTMLDivElement | null>(null);
 
   const type = question.type ?? "mcq";
-  const order = useMemo(() => (value ? value.split(",").filter(Boolean) : []), [value]);
+  const order = useMemo(
+    () => (value ? value.split(type === "number_order" ? ORDER_SEPARATOR : ",").filter(Boolean) : []),
+    [type, value]
+  );
 
   if (type === "number_order") {
     const numbers = ((question.options as string[] | undefined) ?? []).map(String);
 
     function addNumber(num: string) {
       if (order.includes(num)) return;
-      onChange([...order, num].join(","));
+      onChange([...order, num].join(ORDER_SEPARATOR));
     }
 
     function undoLast() {
-      onChange(order.slice(0, -1).join(","));
+      onChange(order.slice(0, -1).join(ORDER_SEPARATOR));
     }
 
     function clear() {
@@ -106,7 +111,7 @@ export default function AssessmentQuestionCard({
       const next = [...order];
       const [moved] = next.splice(draggedIndex, 1);
       next.splice(targetIndex, 0, moved);
-      onChange(next.join(","));
+      onChange(next.join(ORDER_SEPARATOR));
       setDraggedIndex(null);
     }
 
