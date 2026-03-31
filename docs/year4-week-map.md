@@ -14,9 +14,9 @@ Focus: Place Value to 100,000
 
 | Lesson | Topic | Primary Engine | Secondary Engine | Quiz Safe |
 | --- | --- | --- | --- | --- |
-| 1 | Digit Values | `place_value_builder` | `place_value_chart` | `true` |
-| 2 | Expanded Form | `partition_expand` | — | `true` |
-| 3 | Word Form | `number_word_form` | — | `true` |
+| 1 | Place Value Using Larger Numbers | `place_value_builder` | `place_value_chart` | `true` |
+| 2 | Expanded & Standard Form (Larger Numbers) | `partition_expand` | — | `true` |
+| 3 | Word Form & Numerals (Larger Numbers) | `number_word_form` | — | `true` |
 
 Range note:
 - use the full six-digit range up to `999,999`

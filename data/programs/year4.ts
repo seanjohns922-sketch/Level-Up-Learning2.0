@@ -14,7 +14,7 @@ const year4Rows: ProgramRow[] = [
     week: 1,
     focus: "Place Value to 100,000",
     lesson: 1,
-    topic: "Digit Values",
+    topic: "Place Value Using Larger Numbers",
     activity: "Identify value of digits in 5- and 6-digit numbers using MAB blocks and charts",
     curriculum: ["AC9M4N01"],
     activities: [
@@ -51,7 +51,7 @@ const year4Rows: ProgramRow[] = [
     week: 1,
     focus: "Place Value to 100,000",
     lesson: 2,
-    topic: "Expanded & Standard Form",
+    topic: "Expanded & Standard Form (Larger Numbers)",
     activity: "Convert between standard and expanded form using digit cards",
     curriculum: ["AC9M4N01"],
     activities: [
@@ -72,8 +72,8 @@ const year4Rows: ProgramRow[] = [
     week: 1,
     focus: "Place Value to 100,000",
     lesson: 3,
-    topic: "Word Form & Numerals",
-    activity: "Match numbers in word form and numerals; write large numbers",
+    topic: "Word Form & Numerals (Larger Numbers)",
+    activity: "Read and write large numbers in words and match them to numerals, for example one hundred and eighty-six thousand.",
     curriculum: ["AC9M4N01"],
     activities: [
       makeActivity("multiple_choice", 2, {
