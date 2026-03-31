@@ -141,7 +141,7 @@ export default function AssessmentQuestionCard({
                   onDrop={() => moveDragged(index)}
                   className="cursor-move rounded-2xl border border-slate-600 bg-slate-700/50 p-3 shadow-sm"
                 >
-                  <div className="text-sm font-black text-violet-900">{fraction}</div>
+                  <div className="text-sm font-black text-white">{fraction}</div>
                   <div className="mt-2">
                     <FractionBar fraction={fraction} />
                   </div>
