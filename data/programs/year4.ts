@@ -20,28 +20,28 @@ const year4Rows: ProgramRow[] = [
     activities: [
       makeActivity("place_value_builder", 2, {
         min: 10000,
-        max: 100000,
+        max: 999999,
         placeValues: ["hundred_thousands", "ten_thousands", "thousands", "hundreds", "tens", "ones"],
         visualMode: "mab",
         mode: "identify_number",
       }),
       makeActivity("place_value_builder", 2, {
         min: 10000,
-        max: 100000,
+        max: 999999,
         placeValues: ["hundred_thousands", "ten_thousands", "thousands", "hundreds", "tens", "ones"],
         visualMode: "mab",
         mode: "identify_place",
       }),
       makeActivity("place_value_builder", 1, {
         min: 10000,
-        max: 100000,
+        max: 999999,
         placeValues: ["hundred_thousands", "ten_thousands", "thousands", "hundreds", "tens", "ones"],
         visualMode: "mab",
         hideOnePlaceValue: true,
       }),
       makeActivity("multiple_choice", 1, {
         min: 10000,
-        max: 100000,
+        max: 999999,
         mode: "identify_place",
         sourceActivityType: "place_value_builder",
       }),
@@ -57,12 +57,12 @@ const year4Rows: ProgramRow[] = [
     activities: [
       makeActivity("partition_expand", 2, {
         min: 10000,
-        max: 100000,
+        max: 999999,
         mode: "expand",
       }),
       makeActivity("typed_response", 1, {
         min: 10000,
-        max: 100000,
+        max: 999999,
         mode: "expand",
         sourceActivityType: "partition_expand",
       }),
@@ -78,12 +78,12 @@ const year4Rows: ProgramRow[] = [
     activities: [
       makeActivity("multiple_choice", 2, {
         min: 10000,
-        max: 100000,
+        max: 999999,
         mode: "word_form_match",
       }),
       makeActivity("typed_response", 1, {
         min: 10000,
-        max: 100000,
+        max: 999999,
         mode: "write_numeral",
       }),
     ],
@@ -157,13 +157,13 @@ const year4Rows: ProgramRow[] = [
     activities: [
       makeActivity("number_line", 2, {
         min: 1000,
-        max: 100000,
+        max: 999999,
         mode: "rounding",
         targets: [10, 100, 1000],
       }),
       makeActivity("typed_response", 1, {
         min: 1000,
-        max: 100000,
+        max: 999999,
         mode: "rounding",
         targets: [10, 100, 1000],
         sourceActivityType: "number_line",
@@ -217,7 +217,7 @@ const year4Rows: ProgramRow[] = [
       makeActivity("multiple_choice", 2, {
         mode: "compare_symbols",
         min: 0,
-        max: 100000,
+        max: 999999,
       }),
       makeActivity("typed_response", 1, {
         mode: "compare_symbols",
@@ -234,13 +234,13 @@ const year4Rows: ProgramRow[] = [
     activities: [
       makeActivity("number_order", 2, {
         min: 0,
-        max: 100000,
+        max: 999999,
         count: 4,
         ascending: true,
       }),
       makeActivity("number_order", 1, {
         min: 0,
-        max: 100000,
+        max: 999999,
         count: 4,
         ascending: false,
       }),
@@ -256,13 +256,13 @@ const year4Rows: ProgramRow[] = [
     activities: [
       makeActivity("number_line", 2, {
         min: 0,
-        max: 100000,
+        max: 999999,
         step: 1000,
         mode: "placement",
       }),
       makeActivity("number_line", 1, {
         min: 0,
-        max: 100000,
+        max: 999999,
         step: 10000,
         mode: "estimate",
       }),

@@ -18,6 +18,9 @@ Focus: Place Value to 100,000
 | 2 | Expanded Form | `partition_expand` | — | `true` |
 | 3 | Word Form | `number_word_form` | — | `true` |
 
+Range note:
+- use the full six-digit range up to `999,999`
+
 ## Week 2
 
 Focus: Decimals (Tenths and Hundredths)
@@ -38,6 +41,9 @@ Focus: Rounding and Estimating
 | 2 | Estimate Totals | `estimate_sum` | — | `true` |
 | 3 | Real-World Estimation | `mixed_word_problem` | — | `true` |
 
+Range note:
+- use 4-digit, 5-digit, and 6-digit whole numbers heavily
+
 ## Week 4
 
 Focus: Comparing and Ordering
@@ -47,6 +53,10 @@ Focus: Comparing and Ordering
 | 1 | Compare Numbers | `decimal_compare` | — | `true` |
 | 2 | Ordering | `number_order` | — | `true` |
 | 3 | Number Line Placement | `number_line` | — | `true` |
+
+Range note:
+- mix 4-digit, 5-digit, and 6-digit whole numbers
+- decimals should appear only where the lesson engine explicitly targets them
 
 ## Week 5
 
@@ -158,6 +168,11 @@ This map is the schedule-level source of truth for:
 - lesson generation alignment
 - weekly quiz safety
 - future assessment coverage planning
+
+Whole-number range note:
+- Year 4 whole-number cap is `999,999`
+- use six-digit numbers heavily in Weeks `1`, `3`, and `4`
+- use them selectively in Weeks `7`, `11`, and `12`
 
 Known missing engines to build before full Year 4 runtime:
 - `rounding_numbers`
