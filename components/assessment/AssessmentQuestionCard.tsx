@@ -148,7 +148,7 @@ export default function AssessmentQuestionCard({
                 </div>
               ))
             ) : (
-              <div className="col-span-full rounded-2xl border border-dashed border-violet-200 bg-white p-4 text-sm font-semibold text-violet-700">
+              <div className="col-span-full rounded-2xl border border-dashed border-slate-600 bg-slate-700/30 p-4 text-sm font-semibold text-slate-400">
                 Tap the fractions in order, then drag to adjust if needed.
               </div>
             )}
