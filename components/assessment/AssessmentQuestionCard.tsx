@@ -25,7 +25,7 @@ function FractionBar({
   return (
     <div className="w-full">
       <div
-        className={["grid rounded-xl bg-slate-200 p-1", large ? "gap-0.5" : "gap-1"].join(" ")}
+        className={["grid rounded-xl bg-slate-700/50 p-1", large ? "gap-0.5" : "gap-1"].join(" ")}
         style={{ gridTemplateColumns: `repeat(${denominator}, minmax(0, 1fr))` }}
       >
         {Array.from({ length: denominator }).map((_, index) => (
@@ -33,7 +33,7 @@ function FractionBar({
             key={index}
             className={[
               large ? "h-14 rounded-[4px]" : "h-8 rounded-sm",
-              index < numerator ? "bg-violet-500" : "bg-slate-100",
+              index < numerator ? "bg-teal-500" : "bg-slate-600",
             ].join(" ")}
           />
         ))}
