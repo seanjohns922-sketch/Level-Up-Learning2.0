@@ -39,7 +39,9 @@ export function getHomeBgFilter(levelNum: number): string {
     case "advanced":
       return "brightness(1.1) contrast(1.18) saturate(1.2)";
     default:
-      return "brightness(1.3) contrast(1.12) saturate(1.15)";
+      return levelNum >= 3
+        ? "brightness(1.05) contrast(1.18) saturate(1.2)"
+        : "brightness(1.3) contrast(1.12) saturate(1.15)";
   }
 }
 
@@ -95,6 +97,8 @@ export function getVignetteStyle(levelNum: number): string {
     case "advanced":
       return "inset 0 0 140px 50px rgba(5,18,35,0.45), inset 0 -60px 80px -20px rgba(5,18,35,0.35)";
     default:
-      return "inset 0 0 120px 40px rgba(5,20,35,0.35), inset 0 -60px 80px -20px rgba(5,20,35,0.25)";
+      return levelNum >= 3
+        ? "inset 0 0 140px 50px rgba(5,18,35,0.42), inset 0 -60px 80px -20px rgba(5,18,35,0.32)"
+        : "inset 0 0 120px 40px rgba(5,20,35,0.35), inset 0 -60px 80px -20px rgba(5,20,35,0.25)";
   }
 }
