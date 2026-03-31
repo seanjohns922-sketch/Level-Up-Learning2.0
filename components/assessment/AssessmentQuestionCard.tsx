@@ -85,6 +85,91 @@ export default function AssessmentQuestionCard({
   const type = question.type ?? "mcq";
   const order = useMemo(() => (value ? value.split(",").filter(Boolean) : []), [value]);
 
+  if (type === "number_order") {
+    const numbers = ((question.options as string[] | undefined) ?? []).map(String);
+
+    function addNumber(num: string) {
+      if (order.includes(num)) return;
+      onChange([...order, num].join(","));
+    }
+
+    function undoLast() {
+      onChange(order.slice(0, -1).join(","));
+    }
+
+    function clear() {
+      onChange("");
+    }
+
+    function moveDragged(targetIndex: number) {
+      if (draggedIndex === null || draggedIndex === targetIndex) return;
+      const next = [...order];
+      const [moved] = next.splice(draggedIndex, 1);
+      next.splice(targetIndex, 0, moved);
+      onChange(next.join(","));
+      setDraggedIndex(null);
+    }
+
+    return (
+      <div className="mt-6">
+        <div className="grid gap-4 md:grid-cols-3">
+          {numbers.map((num) => (
+            <button
+              key={num}
+              type="button"
+              onClick={() => addNumber(num)}
+              disabled={order.includes(num)}
+              className="rounded-2xl border border-slate-600 bg-slate-700/50 p-5 text-left text-3xl font-black text-white shadow-sm transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {num}
+            </button>
+          ))}
+        </div>
+        <div className="mt-5 rounded-2xl border border-dashed border-slate-600 bg-slate-800/50 p-4">
+          <div className="text-xs font-bold uppercase tracking-wide text-teal-400">Drag To Reorder</div>
+          <div className="mt-3 grid gap-3 md:grid-cols-3">
+            {order.length > 0 ? (
+              order.map((num, index) => (
+                <div
+                  key={`${num}-${index}`}
+                  draggable
+                  onDragStart={() => setDraggedIndex(index)}
+                  onDragOver={(event) => event.preventDefault()}
+                  onDrop={() => moveDragged(index)}
+                  className="cursor-move rounded-2xl border border-slate-600 bg-slate-700/50 p-4 text-2xl font-black text-white shadow-sm"
+                >
+                  {num}
+                </div>
+              ))
+            ) : (
+              <div className="col-span-full rounded-2xl border border-dashed border-slate-600 bg-slate-700/30 p-4 text-sm font-semibold text-slate-400">
+                Tap the numbers in order, then drag to adjust if needed.
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={undoLast}
+            disabled={order.length === 0}
+            className="rounded-2xl border border-slate-600 bg-slate-700/50 px-4 py-2 font-black text-slate-300 hover:bg-slate-700 disabled:opacity-40"
+          >
+            Undo last
+          </button>
+          <button
+            type="button"
+            onClick={clear}
+            disabled={order.length === 0}
+            className="rounded-2xl border border-slate-600 bg-slate-700/50 px-4 py-2 font-black text-slate-300 hover:bg-slate-700 disabled:opacity-40"
+          >
+            Clear order
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (type === "fraction_order") {
     const fractions = (question.options as string[] | undefined) ?? [];
 
@@ -198,8 +283,7 @@ export default function AssessmentQuestionCard({
                 : "border-slate-600 bg-slate-700/50 hover:bg-slate-700",
             ].join(" ")}
           >
-            <div className="text-sm font-black text-white">{option.label}</div>
-            <div className="mt-3">
+            <div className="mt-1">
               <FractionBar fraction={`${option.numerator}/${option.denominator}`} large />
             </div>
           </button>
@@ -217,9 +301,9 @@ export default function AssessmentQuestionCard({
       <div className="mt-6 space-y-5">
         <div className="rounded-2xl border border-slate-600 bg-slate-700/50 p-5">
           <div className="text-xs font-bold uppercase tracking-wide text-teal-400">Given Part</div>
-          <div className="mt-3 max-w-sm">
-            <div className="grid rounded-xl bg-slate-700/50 p-1" style={{ gridTemplateColumns: "repeat(1, minmax(0, 1fr))" }}>
-              <div className="h-14 rounded-[4px] bg-teal-500" />
+          <div className="mt-3">
+            <div className="inline-flex rounded-xl border border-slate-600 bg-slate-800/50 p-3">
+              <div className="h-14 w-12 rounded-[6px] bg-teal-500" />
             </div>
           </div>
           <div className="mt-3 text-lg font-black text-white">{fractionLabel}</div>
