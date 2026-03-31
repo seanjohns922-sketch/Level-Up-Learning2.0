@@ -128,8 +128,8 @@ export default function AssessmentQuestionCard({
             </button>
           ))}
         </div>
-        <div className="mt-5 rounded-2xl border border-dashed border-violet-300 bg-violet-50 p-4">
-          <div className="text-xs font-bold uppercase tracking-wide text-violet-700">Drag To Reorder</div>
+        <div className="mt-5 rounded-2xl border border-dashed border-slate-600 bg-slate-800/50 p-4">
+          <div className="text-xs font-bold uppercase tracking-wide text-teal-400">Drag To Reorder</div>
           <div className="mt-3 grid gap-3 md:grid-cols-3">
             {order.length > 0 ? (
               order.map((fraction, index) => (
