@@ -41,7 +41,7 @@ export function getHomeBgFilter(levelNum: number): string {
     default:
       return levelNum >= 3
         ? "brightness(1.05) contrast(1.18) saturate(1.2)"
-        : "brightness(1.3) contrast(1.12) saturate(1.15)";
+        : "brightness(1.08) contrast(1.16) saturate(1.18)";
   }
 }
 
