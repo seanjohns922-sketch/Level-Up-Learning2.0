@@ -13,6 +13,7 @@ import RealmCard from "@/components/home/RealmCard";
 import TowerProgress from "@/components/home/TowerProgress";
 import WeekCard from "@/components/home/WeekCard";
 import QuickLinks from "@/components/home/QuickLinks";
+import { getHomeBg, getHomeBgFilter, getVignetteStyle, getGlowColor, getParticleColors, getLevelBand } from "@/lib/levelBand";
 
 export default function StudentHomePage() {
   const router = useRouter();
