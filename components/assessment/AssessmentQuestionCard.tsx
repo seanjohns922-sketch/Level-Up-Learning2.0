@@ -52,8 +52,8 @@ function WholeOption({
   return (
     <div
       className={[
-        "grid rounded-xl bg-slate-200 p-1",
-        selected ? "ring-2 ring-violet-500" : "",
+        "grid rounded-xl bg-slate-700/50 p-1",
+        selected ? "ring-2 ring-teal-500" : "",
       ].join(" ")}
       style={{ gridTemplateColumns: `repeat(${parts}, minmax(0, 1fr))` }}
     >
@@ -62,7 +62,7 @@ function WholeOption({
           key={index}
           className={[
             "h-12 rounded-[4px]",
-            index === 0 ? "bg-violet-500" : "bg-slate-100",
+            index === 0 ? "bg-teal-500" : "bg-slate-600",
           ].join(" ")}
         />
       ))}
