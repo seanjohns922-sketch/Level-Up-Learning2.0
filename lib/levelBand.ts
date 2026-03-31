@@ -41,7 +41,7 @@ export function getHomeBgFilter(levelNum: number): string {
     default:
       return levelNum >= 3
         ? "brightness(1.05) contrast(1.18) saturate(1.2)"
-        : "brightness(1.3) contrast(1.12) saturate(1.15)";
+        : "brightness(1.08) contrast(1.16) saturate(1.18)";
   }
 }
 
@@ -99,6 +99,6 @@ export function getVignetteStyle(levelNum: number): string {
     default:
       return levelNum >= 3
         ? "inset 0 0 140px 50px rgba(5,18,35,0.42), inset 0 -60px 80px -20px rgba(5,18,35,0.32)"
-        : "inset 0 0 120px 40px rgba(5,20,35,0.35), inset 0 -60px 80px -20px rgba(5,20,35,0.25)";
+        : "inset 0 0 135px 45px rgba(5,18,35,0.40), inset 0 -60px 80px -20px rgba(5,18,35,0.30)";
   }
 }
