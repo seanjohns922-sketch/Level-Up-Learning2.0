@@ -97,6 +97,8 @@ export function getVignetteStyle(levelNum: number): string {
     case "advanced":
       return "inset 0 0 140px 50px rgba(5,18,35,0.45), inset 0 -60px 80px -20px rgba(5,18,35,0.35)";
     default:
-      return "inset 0 0 120px 40px rgba(5,20,35,0.35), inset 0 -60px 80px -20px rgba(5,20,35,0.25)";
+      return levelNum >= 3
+        ? "inset 0 0 140px 50px rgba(5,18,35,0.42), inset 0 -60px 80px -20px rgba(5,18,35,0.32)"
+        : "inset 0 0 120px 40px rgba(5,20,35,0.35), inset 0 -60px 80px -20px rgba(5,20,35,0.25)";
   }
 }
