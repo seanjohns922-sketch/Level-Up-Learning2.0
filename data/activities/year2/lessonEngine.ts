@@ -89,6 +89,35 @@ export type NumberLineQuestion = {
   mode: "placement" | "rounding" | "estimate";
 };
 
+function decimalPlacesForStep(step: number) {
+  if (step >= 1) return 0;
+  const text = step.toString();
+  if (!text.includes(".")) return 0;
+  return text.split(".")[1]?.length ?? 0;
+}
+
+function randomStepValue(min: number, max: number, step: number) {
+  if (step >= 1) return randInt(min, max);
+
+  const precision = decimalPlacesForStep(step);
+  const factor = 10 ** precision;
+  const scaledStep = Math.round(step * factor);
+  const scaledMin = Math.ceil(min * factor);
+  const scaledMax = Math.floor(max * factor);
+  const first = Math.ceil(scaledMin / scaledStep) * scaledStep;
+  const count = Math.max(0, Math.floor((scaledMax - first) / scaledStep));
+  const chosen = first + randInt(0, count) * scaledStep;
+  return Number((chosen / factor).toFixed(precision));
+}
+
+function formatMathNumber(value: number) {
+  if (Number.isInteger(value)) return value.toLocaleString();
+  return value.toLocaleString(undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  });
+}
+
 export type FractionModel = {
   id: string;
   numerator: number;
@@ -540,7 +569,7 @@ export type Year2PolicyValidation = {
   violations: Year2PolicyViolation[];
 };
 
-export type SupportedMathLevel = 2 | 3;
+export type SupportedMathLevel = 2 | 3 | 4;
 
 type DifficultyContract = {
   weekMin: number;
@@ -648,6 +677,21 @@ const YEAR_LEVEL_DIFFICULTY_CONTRACTS: Record<SupportedMathLevel, DifficultyCont
       skipCountMax: 100000,
       skipCountExtraSteps: [2, 3, 4, 5, 10, 100, 1000],
       wordProblemMax: 500,
+    },
+  ],
+  4: [
+    {
+      weekMin: 1,
+      weekMax: 12,
+      addSubMax: 100000,
+      addSubExtensionMax: 999999,
+      groupsMax: 12,
+      itemsMax: 12,
+      divisionTotalMax: 144,
+      factFamilyMax: 100,
+      skipCountMax: 1000000,
+      skipCountExtraSteps: [2, 3, 4, 5, 10, 100, 1000],
+      wordProblemMax: 999999,
     },
   ],
 };
@@ -768,9 +812,18 @@ const LEVEL3_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
   },
 };
 
+const LEVEL4_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
+  ...BASE_ACTIVITY_POLICY,
+  fact_family: {
+    ...BASE_ACTIVITY_POLICY.fact_family,
+    maxFactValue: 100,
+  },
+};
+
 const LEVEL_ACTIVITY_POLICY: Record<SupportedMathLevel, Record<ActivityType, ActivityPolicy>> = {
   2: LEVEL2_ACTIVITY_POLICY,
   3: LEVEL3_ACTIVITY_POLICY,
+  4: LEVEL4_ACTIVITY_POLICY,
 };
 
 const LEVEL2_WEEK8_TO_10_FACTORS = [2, 5, 10] as const;
@@ -2515,14 +2568,19 @@ function generateInteractiveQuestion(
     const count = typeof config.count === "number" ? config.count : 4;
     const ascending = config.ascending !== false;
     const values = new Set<number>();
+    const mode = typeof config.mode === "string" ? config.mode : undefined;
     while (values.size < count) {
-      values.add(randInt(min, max));
+      values.add(
+        mode === "decimal_order"
+          ? randomStepValue(min, max, typeof config.step === "number" ? config.step : 0.1)
+          : randInt(min, max)
+      );
     }
     return {
       kind: "number_order",
       prompt: ascending
-        ? "Order the numbers from smallest to largest."
-        : "Order the numbers from largest to smallest.",
+        ? `Order the ${mode === "decimal_order" ? "decimals" : "numbers"} from smallest to largest.`
+        : `Order the ${mode === "decimal_order" ? "decimals" : "numbers"} from largest to smallest.`,
       numbers: shuffle(Array.from(values)),
       ascending,
     };
@@ -2581,13 +2639,13 @@ function generateInteractiveQuestion(
       };
     }
 
-    const value = randInt(min, max);
+    const value = randomStepValue(min, max, step);
     return {
       kind: "number_line",
       prompt:
         mode === "estimate"
-          ? `Estimate where ${value} belongs on the number line.`
-          : `Place ${value} on the number line.`,
+          ? `Estimate where ${formatMathNumber(value)} belongs on the number line.`
+          : `Place ${formatMathNumber(value)} on the number line.`,
       helper:
         mode === "estimate"
           ? `Markers show every ${step}. Close estimates count.`
@@ -3932,6 +3990,31 @@ function generateGenericQuestion(
         };
   }
 
+  if (explicitMode === "decimal_compare") {
+    const left = randomStepValue(0.1, 9.99, randInt(0, 1) === 0 ? 0.1 : 0.01);
+    let right = randomStepValue(0.1, 9.99, randInt(0, 1) === 0 ? 0.1 : 0.01);
+    while (right === left) {
+      right = randomStepValue(0.1, 9.99, randInt(0, 1) === 0 ? 0.1 : 0.01);
+    }
+    const answer = left > right ? formatMathNumber(left) : formatMathNumber(right);
+
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: `Which decimal is greater: ${formatMathNumber(left)} or ${formatMathNumber(right)}?`,
+          options: shuffle([formatMathNumber(left), formatMathNumber(right)]),
+          answer,
+          helper: "Compare the ones, then the tenths, then the hundredths.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: `Type the greater decimal: ${formatMathNumber(left)} or ${formatMathNumber(right)}.`,
+          answer,
+          helper: "Compare the ones, then the tenths, then the hundredths.",
+          placeholder: "Type the greater decimal",
+        };
+  }
+
   if (sourceActivityType === "place_value_builder") {
     const target = randInt(Math.max(100, min || 100), Math.max(200, max || 999));
     const places = supportedPlaces(config);
@@ -4052,6 +4135,35 @@ function generateGenericQuestion(
   }
 
   if (sourceActivityType === "number_order") {
+    if (explicitMode === "decimal_order") {
+      const count = typeof config.count === "number" ? config.count : 4;
+      const ascending = config.ascending !== false;
+      const values = new Set<number>();
+      while (values.size < count) {
+        values.add(randomStepValue(0.1, 9.99, randInt(0, 1) === 0 ? 0.1 : 0.01));
+      }
+      const ordered = [...values].sort((a, b) => (ascending ? a - b : b - a));
+      const prompt = ascending
+        ? `Type the smallest decimal from this set: ${[...values].map(formatMathNumber).join(", ")}.`
+        : `Type the largest decimal from this set: ${[...values].map(formatMathNumber).join(", ")}.`;
+      const answer = formatMathNumber(ordered[0]);
+      return asMultipleChoice
+        ? {
+            kind: "multiple_choice",
+            prompt: ascending
+              ? `Which decimal is the smallest: ${[...values].map(formatMathNumber).join(", ")}?`
+              : `Which decimal is the largest: ${[...values].map(formatMathNumber).join(", ")}?`,
+            options: shuffle([...values].map(formatMathNumber)),
+            answer,
+          }
+        : {
+            kind: "typed_response",
+            prompt,
+            answer,
+            placeholder: "Type the decimal",
+          };
+    }
+
     const count = typeof config.count === "number" ? config.count : 4;
     const values = new Set<number>();
     while (values.size < count) {
@@ -4132,7 +4244,7 @@ function generateGenericQuestion(
 
   if (sourceActivityType === "number_line") {
     const mode = config.mode;
-    const value = randInt(min, Math.max(min + step, max));
+    const value = randomStepValue(min, Math.max(min + step, max), step);
     if (mode === "rounding") {
       const targets =
         config.targets?.filter((target): target is number => typeof target === "number") ?? [10];
@@ -4159,18 +4271,27 @@ function generateGenericQuestion(
     return asMultipleChoice
       ? {
           kind: "multiple_choice",
-          prompt: `Which value belongs between ${Math.max(min, value - step)} and ${Math.min(
-            max,
-            value + step
+          prompt: `Which decimal belongs between ${formatMathNumber(Math.max(min, value - step))} and ${formatMathNumber(
+            Math.min(max, value + step)
           )}?`,
-          options: uniqueNumberOptions(value, step),
+          options:
+            step < 1
+              ? shuffle([
+                  formatMathNumber(value),
+                  formatMathNumber(Math.max(min, Number((value - step).toFixed(decimalPlacesForStep(step))))),
+                  formatMathNumber(Math.min(max, Number((value + step).toFixed(decimalPlacesForStep(step))))),
+                  formatMathNumber(
+                    Math.min(max, Number((value + step * 2).toFixed(decimalPlacesForStep(step))))
+                  ),
+                ])
+              : uniqueNumberOptions(value, step),
           answer,
         }
       : {
           kind: "typed_response",
-          prompt: `Type the number that would sit at this point on the line: ${value}.`,
-          answer,
-          placeholder: "Type the number",
+          prompt: `Type the decimal that would sit at this point on the line: ${formatMathNumber(value)}.`,
+          answer: formatMathNumber(value),
+          placeholder: "Type the decimal",
         };
   }
 

@@ -4,10 +4,17 @@ import { useMemo, useState, useCallback } from "react";
 import type { NumberLineQuestion } from "@/data/activities/year2/lessonEngine";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 
-const fmt = (n: number) => n.toLocaleString();
+const fmt = (n: number) =>
+  n.toLocaleString(undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: n % 1 === 0 ? 0 : 2,
+  });
 
 /* Pick a clean tick step so we get 5–11 labelled ticks */
 function niceStep(span: number): number {
+  if (span <= 1) return 0.1;
+  if (span <= 2) return 0.2;
+  if (span <= 5) return 0.5;
   if (span <= 10) return 1;
   if (span <= 20) return 2;
   if (span <= 50) return 5;
@@ -181,8 +188,20 @@ export default function NumberLineActivity({
   const [isCorrect, setIsCorrect] = useState(false);
 
   const range = questionData.max - questionData.min || 1;
+  const stepDecimals = questionData.step < 1 ? String(questionData.step).split(".")[1]?.length ?? 0 : 0;
 
   const ticks = useMemo(() => {
+    if (questionData.step < 1) {
+      const values: number[] = [];
+      for (
+        let value = questionData.min;
+        value <= questionData.max + questionData.step / 2;
+        value = Number((value + questionData.step).toFixed(stepDecimals))
+      ) {
+        values.push(Number(value.toFixed(stepDecimals)));
+      }
+      return values;
+    }
     const span = questionData.max - questionData.min;
     const step = niceStep(span);
     const values: number[] = [];
@@ -194,6 +213,7 @@ export default function NumberLineActivity({
   }, [questionData.max, questionData.min]);
 
   const minorTicks = useMemo(() => {
+    if (questionData.step < 1) return [];
     const span = questionData.max - questionData.min;
     const majorStep = niceStep(span);
     const minorStep = majorStep / 2;
@@ -213,11 +233,19 @@ export default function NumberLineActivity({
       const rect = e.currentTarget.getBoundingClientRect();
       const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
       const raw = questionData.min + pct * range;
-      const snapped = Math.round(raw);
+      const snapped =
+        questionData.step < 1
+          ? Number(
+              (
+                Math.round((raw - questionData.min) / questionData.step) * questionData.step +
+                questionData.min
+              ).toFixed(stepDecimals)
+            )
+          : Math.round(raw);
       const clamped = Math.max(questionData.min, Math.min(questionData.max, snapped));
       setPlaced(clamped);
     },
-    [checked, questionData.min, questionData.max, range]
+    [checked, questionData.min, questionData.max, questionData.step, range, stepDecimals]
   );
 
   /* ── Rounding step 1: check typed answer ── */
@@ -242,6 +270,8 @@ export default function NumberLineActivity({
     const allowed =
       questionData.mode === "estimate"
         ? Math.max(5, Math.floor(questionData.step / 2))
+        : questionData.step < 1
+        ? questionData.step / 4
         : Math.max(1, Math.floor(questionData.step / 4));
 
     if (difference <= allowed) {

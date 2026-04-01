@@ -27,6 +27,14 @@ function buildInitialTurn(lesson: Lesson, activities: Lesson["activities"] = [])
   }
 
   const picked = pickWeightedIndex(activities, [], null);
+  if (level === 4 && lesson.week === 3) {
+    console.debug("[Year4Week3] initial_activity", {
+      lessonId: lesson.id,
+      topic: lesson.title,
+      selectedActivityType: activities[picked.index]?.activityType,
+      selectedMode: activities[picked.index]?.config?.mode,
+    });
+  }
   return {
     bag: picked.bag,
     lastIndex: picked.index,
@@ -109,6 +117,15 @@ export function Year2LessonEngine({
 
     const nextActivity = activities[picked.index];
     const nextQuestion = generateQuestion(level, lesson, nextActivity);
+    if (level === 4 && lesson.week === 3) {
+      console.debug("[Year4Week3] next_activity", {
+        lessonId: lesson.id,
+        topic: lesson.title,
+        selectedActivityType: nextActivity?.activityType,
+        selectedMode: nextActivity?.config?.mode,
+        questionKind: nextQuestion?.kind,
+      });
+    }
 
     setCurrentActivityIndex(picked.index);
     setCurrentQuestion(nextQuestion);

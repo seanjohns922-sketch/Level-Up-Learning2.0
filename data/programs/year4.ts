@@ -144,18 +144,11 @@ const year4Rows: ProgramRow[] = [
     activity: "Compare decimals using place value reasoning and symbols",
     curriculum: ["AC9M4N01"],
     activities: [
-      makeActivity("number_line", 2, {
-        min: 1000,
-        max: 999999,
-        mode: "rounding",
-        targets: [10, 100, 1000],
+      makeActivity("multiple_choice", 2, {
+        mode: "decimal_compare",
       }),
       makeActivity("typed_response", 1, {
-        min: 1000,
-        max: 999999,
-        mode: "rounding",
-        targets: [10, 100, 1000],
-        sourceActivityType: "number_line",
+        mode: "decimal_compare",
       }),
     ],
   },
@@ -167,13 +160,21 @@ const year4Rows: ProgramRow[] = [
     activity: "Order decimals from smallest to largest using place value understanding",
     curriculum: ["AC9M4N01"],
     activities: [
-      makeActivity("mixed_word_problem", 2, {
-        mode: "estimate_total",
-        operations: ["addition"],
+      makeActivity("number_order", 2, {
+        min: 0.1,
+        max: 9.99,
+        count: 4,
+        ascending: true,
+        step: 0.1,
+        mode: "decimal_order",
       }),
-      makeActivity("multiple_choice", 1, {
-        mode: "estimate_total",
-        sourceActivityType: "mixed_word_problem",
+      makeActivity("number_order", 1, {
+        min: 0.1,
+        max: 9.99,
+        count: 4,
+        ascending: false,
+        step: 0.01,
+        mode: "decimal_order",
       }),
     ],
   },
@@ -185,13 +186,17 @@ const year4Rows: ProgramRow[] = [
     activity: "Place tenths and hundredths accurately on number lines after comparing and ordering decimals",
     curriculum: ["AC9M4N01"],
     activities: [
-      makeActivity("mixed_word_problem", 2, {
-        mode: "real_world_estimate",
-        operations: ["addition", "subtraction"],
+      makeActivity("number_line", 2, {
+        min: 0,
+        max: 1,
+        step: 0.1,
+        mode: "placement",
       }),
-      makeActivity("typed_response", 1, {
-        mode: "real_world_estimate",
-        sourceActivityType: "mixed_word_problem",
+      makeActivity("number_line", 1, {
+        min: 0,
+        max: 1,
+        step: 0.01,
+        mode: "placement",
       }),
     ],
   },
