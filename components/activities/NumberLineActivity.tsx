@@ -192,14 +192,17 @@ export default function NumberLineActivity({
 
   const ticks = useMemo(() => {
     if (questionData.step < 1) {
+      const majorStep = niceStep(questionData.max - questionData.min);
       const values: number[] = [];
       for (
         let value = questionData.min;
-        value <= questionData.max + questionData.step / 2;
-        value = Number((value + questionData.step).toFixed(stepDecimals))
+        value <= questionData.max + majorStep / 2;
+        value = Number((value + majorStep).toFixed(stepDecimals))
       ) {
         values.push(Number(value.toFixed(stepDecimals)));
       }
+      if (!values.includes(questionData.min)) values.unshift(questionData.min);
+      if (!values.includes(questionData.max)) values.push(questionData.max);
       return values;
     }
     const span = questionData.max - questionData.min;
@@ -213,7 +216,23 @@ export default function NumberLineActivity({
   }, [questionData.max, questionData.min]);
 
   const minorTicks = useMemo(() => {
-    if (questionData.step < 1) return [];
+    if (questionData.step < 1) {
+      const values: number[] = [];
+      const majorStep = niceStep(questionData.max - questionData.min);
+      const majorSet = new Set(
+        ticks.map((tick) => Number(tick.toFixed(stepDecimals)))
+      );
+      for (
+        let value = questionData.min;
+        value <= questionData.max + questionData.step / 2;
+        value = Number((value + questionData.step).toFixed(stepDecimals))
+      ) {
+        const normalized = Number(value.toFixed(stepDecimals));
+        if (majorSet.has(normalized)) continue;
+        values.push(normalized);
+      }
+      return values;
+    }
     const span = questionData.max - questionData.min;
     const majorStep = niceStep(span);
     const minorStep = majorStep / 2;
@@ -225,7 +244,7 @@ export default function NumberLineActivity({
       values.push(v);
     }
     return values;
-  }, [questionData.max, questionData.min]);
+  }, [questionData.max, questionData.min, questionData.step, stepDecimals, ticks]);
 
   const handleLineClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
