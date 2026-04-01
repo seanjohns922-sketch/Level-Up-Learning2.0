@@ -3012,7 +3012,7 @@ function SessionPage() {
                   className="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-extrabold text-xl hover:opacity-90 transition-all active:scale-[0.98] shadow-lg"
                   style={{ boxShadow: "0 8px 24px -8px hsl(var(--primary) / 0.4)" }}
                 >
-                  Begin Practice
+                  Begin Practise
                 </button>
               </>
             ) : (

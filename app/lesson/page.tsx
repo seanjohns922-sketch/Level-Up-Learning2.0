@@ -151,7 +151,7 @@ function LessonPage() {
                 onClick={() => setStarted(true)}
                 className={lessonChrome.buttonClass}
               >
-                Begin Practice
+                Begin Practise
               </button>
             </div>
           </div>
@@ -162,7 +162,7 @@ function LessonPage() {
                 Level {yearNumber} • Week {week} • Lesson {lessonNumber}
               </div>
               <h1 className="text-2xl md:text-3xl font-extrabold font-display">
-                Lesson {lessonNumber} Practice
+                Lesson {lessonNumber} Practise
               </h1>
               {safeLessonTitle && (
                 <p className="text-white/80 text-sm mt-1">{safeLessonTitle}</p>
@@ -226,7 +226,7 @@ function LessonPage() {
                 Level {yearNumber} • Week {week} • Lesson {lessonNumber}
               </div>
               <h1 className="text-3xl md:text-4xl font-extrabold font-display">
-                Lesson {lessonNumber} Practice
+                Lesson {lessonNumber} Practise
               </h1>
               {safeLessonTitle && (
                 <p className="text-white/80 text-sm mt-1">{safeLessonTitle}</p>

@@ -179,7 +179,7 @@ export function Year2LessonEngine({
       ? "✗ Try again"
       : currentActivity
       ? `${currentActivity.activityType.replace(/_/g, " ")}`
-      : "Practice";
+      : "Practise";
 
   const summary = useMemo(
     () => [

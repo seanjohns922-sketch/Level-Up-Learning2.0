@@ -316,7 +316,7 @@ export default function TargetedRevision({
       {step === "select" && (
         <>
           <div className="text-lg font-extrabold text-gray-900 mb-2">
-            Choose your Practice Area
+            Choose your Practise Area
           </div>
           <div className="grid md:grid-cols-2 gap-3">
             {areas.map((a) => (
@@ -344,7 +344,7 @@ export default function TargetedRevision({
             </div>
             <button
               type="button"
-              onClick={() => speak(`Practice ${area}`)}
+              onClick={() => speak(`Practise ${area}`)}
               className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-50"
             >
               🔊 Read
