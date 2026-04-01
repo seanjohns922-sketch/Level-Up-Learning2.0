@@ -9,7 +9,7 @@ export default function DecimalModelVisual({
   visual: DecimalVisualData;
   title?: string;
 }) {
-  const fullTenthsRows =
+  const fullTenthsColumns =
     visual.model === "hundredths_grid" ? Math.floor(visual.numerator / 10) : 0;
   const extraHundredths =
     visual.model === "hundredths_grid" ? visual.numerator % 10 : 0;
@@ -43,13 +43,6 @@ export default function DecimalModelVisual({
           <div className="rounded-2xl bg-white p-4 shadow-sm">
             <div className="mx-auto w-fit space-y-1.5">
               {Array.from({ length: 10 }).map((_, rowIndex) => {
-                const shadedInRow =
-                  rowIndex < fullTenthsRows
-                    ? 10
-                    : rowIndex === fullTenthsRows
-                    ? extraHundredths
-                    : 0;
-
                 return (
                   <div
                     key={rowIndex}
@@ -64,7 +57,8 @@ export default function DecimalModelVisual({
                           key={`${rowIndex}-${columnIndex}`}
                           className={[
                             "h-7 w-7 rounded-sm border",
-                            columnIndex < shadedInRow
+                            columnIndex < fullTenthsColumns ||
+                            (columnIndex === fullTenthsColumns && rowIndex < extraHundredths)
                               ? "border-teal-300 bg-teal-500"
                               : "border-slate-200 bg-slate-100",
                           ].join(" ")}
@@ -77,10 +71,10 @@ export default function DecimalModelVisual({
             </div>
           </div>
           <div className="mt-3 text-sm font-medium text-teal-800">
-            {fullTenthsRows} tenths and {extraHundredths} hundredths
+            {fullTenthsColumns} tenths and {extraHundredths} hundredths
           </div>
           <div className="mt-1 text-xs text-teal-700">
-            Each full row shows 1 tenth. Each small square shows 1 hundredth.
+            Each full column shows 1 tenth. Each small square shows 1 hundredth.
           </div>
         </div>
       ) : null}
