@@ -127,9 +127,9 @@ function NumberLineVisual({
         {checked && correctPct !== null && !isCorrect && (
           <div
             className="absolute flex flex-col items-center pointer-events-none"
-            style={{ left: `${correctPct}%`, transform: "translateX(-50%)", top: 22 }}
+            style={{ left: `${correctPct}%`, transform: "translateX(-50%)", top: 24 }}
           >
-            <div className="w-5 h-5 rounded-full bg-primary border-2 border-primary-foreground shadow-md" />
+            <div className="h-3.5 w-3.5 rounded-full border-2 border-primary-foreground bg-primary shadow-md" />
             <span className="mt-0.5 text-xs font-bold text-primary">{fmt(expected)}</span>
           </div>
         )}
@@ -138,11 +138,11 @@ function NumberLineVisual({
         {markerPct !== null && (
           <div
             className="absolute flex flex-col items-center pointer-events-none"
-            style={{ left: `${markerPct}%`, transform: "translateX(-50%)", top: 22 }}
+            style={{ left: `${markerPct}%`, transform: "translateX(-50%)", top: 24 }}
           >
             <div
               className={[
-                "w-5 h-5 rounded-full border-2 shadow-lg transition-colors",
+                "h-3.5 w-3.5 rounded-full border-2 shadow-lg transition-colors",
                 checked
                   ? isCorrect
                     ? "bg-primary border-primary-foreground"
