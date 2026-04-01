@@ -143,6 +143,21 @@ export function Year2LessonEngine({
   }, [lesson.title, lessonPool.violations]);
 
   useEffect(() => {
+    if (!(level === 4 && lesson.week === 3 && lesson.lesson === 2)) return;
+    console.debug("[Year4Week3Lesson2] pool", {
+      lessonId: lesson.id,
+      topic: lesson.title,
+      validActivityCount: activities.length,
+      activities: activities.map((activity) => ({
+        activityType: activity.activityType,
+        mode: activity.config?.mode,
+        sourceActivityType: activity.config?.sourceActivityType,
+        weight: activity.weight,
+      })),
+    });
+  }, [activities, lesson.id, lesson.lesson, lesson.title, lesson.week, level]);
+
+  useEffect(() => {
     const interval = setInterval(() => {
       setSecondsLeft((current) => current - 1);
     }, 1000);
