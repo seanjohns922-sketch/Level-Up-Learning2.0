@@ -1871,7 +1871,9 @@ export function getDifficultyProfile(level: SupportedMathLevel, week: number): D
 export function getLevelForLesson(lesson: Lesson): SupportedMathLevel {
   const yearMatch = lesson.id.match(/^y(\d+)-/);
   const yearNumber = yearMatch ? Number(yearMatch[1]) : 2;
-  return yearNumber >= 3 ? 3 : 2;
+  if (yearNumber >= 4) return 4;
+  if (yearNumber >= 3) return 3;
+  return 2;
 }
 
 export function getAllowedModes(
