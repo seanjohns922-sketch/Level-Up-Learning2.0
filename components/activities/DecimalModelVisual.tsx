@@ -9,6 +9,11 @@ export default function DecimalModelVisual({
   visual: DecimalVisualData;
   title?: string;
 }) {
+  const fullTenthsRows =
+    visual.model === "hundredths_grid" ? Math.floor(visual.numerator / 10) : 0;
+  const extraHundredths =
+    visual.model === "hundredths_grid" ? visual.numerator % 10 : 0;
+
   return (
     <div className="mt-4 rounded-2xl border border-teal-100 bg-teal-50 p-4">
       <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
@@ -35,18 +40,47 @@ export default function DecimalModelVisual({
 
       {visual.model === "hundredths_grid" ? (
         <div className="mt-3">
-          <div className="grid gap-1 rounded-2xl bg-white p-3 shadow-sm" style={{ gridTemplateColumns: "repeat(10, minmax(0, 1fr))" }}>
-            {Array.from({ length: 100 }).map((_, index) => (
-              <div
-                key={index}
-                className={[
-                  "h-6 rounded-sm border",
-                  index < visual.numerator
-                    ? "border-teal-300 bg-teal-500"
-                    : "border-slate-200 bg-slate-100",
-                ].join(" ")}
-              />
-            ))}
+          <div className="rounded-2xl bg-white p-3 shadow-sm">
+            <div className="space-y-1.5">
+              {Array.from({ length: 10 }).map((_, rowIndex) => {
+                const shadedInRow =
+                  rowIndex < fullTenthsRows
+                    ? 10
+                    : rowIndex === fullTenthsRows
+                    ? extraHundredths
+                    : 0;
+
+                return (
+                  <div
+                    key={rowIndex}
+                    className="rounded-lg border border-slate-100 bg-slate-50 p-1"
+                  >
+                    <div
+                      className="grid gap-1"
+                      style={{ gridTemplateColumns: "repeat(10, minmax(0, 1fr))" }}
+                    >
+                      {Array.from({ length: 10 }).map((__, columnIndex) => (
+                        <div
+                          key={`${rowIndex}-${columnIndex}`}
+                          className={[
+                            "h-6 rounded-sm border",
+                            columnIndex < shadedInRow
+                              ? "border-teal-300 bg-teal-500"
+                              : "border-slate-200 bg-slate-100",
+                          ].join(" ")}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div className="mt-3 text-sm font-medium text-teal-800">
+            {fullTenthsRows} tenths and {extraHundredths} hundredths
+          </div>
+          <div className="mt-1 text-xs text-teal-700">
+            Each full row shows 1 tenth. Each small square shows 1 hundredth.
           </div>
         </div>
       ) : null}
