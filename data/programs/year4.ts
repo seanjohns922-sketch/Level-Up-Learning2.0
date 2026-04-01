@@ -97,11 +97,10 @@ const year4Rows: ProgramRow[] = [
     curriculum: ["AC9M4N01"],
     activities: [
       makeActivity("multiple_choice", 2, {
-        mode: "decimal_money",
-        decimals: ["0.1", "0.2", "0.5", "0.9"],
+        mode: "tenths_place_value",
       }),
       makeActivity("typed_response", 1, {
-        mode: "decimal_money",
+        mode: "tenths_place_value",
       }),
     ],
   },
@@ -113,15 +112,11 @@ const year4Rows: ProgramRow[] = [
     activity: "Read, represent, and identify hundredths as place value using decimal models and charts",
     curriculum: ["AC9M4N01"],
     activities: [
-      makeActivity("number_line", 2, {
-        min: 0,
-        max: 1,
-        step: 0.01,
-        mode: "decimal_measurement",
+      makeActivity("multiple_choice", 2, {
+        mode: "hundredths_place_value",
       }),
       makeActivity("typed_response", 1, {
-        mode: "decimal_measurement",
-        sourceActivityType: "number_line",
+        mode: "hundredths_place_value",
       }),
     ],
   },
@@ -133,17 +128,11 @@ const year4Rows: ProgramRow[] = [
     activity: "Represent decimals with place value charts, digit cards, and decimal models",
     curriculum: ["AC9M4N01"],
     activities: [
-      makeActivity("number_line", 2, {
-        min: 0,
-        max: 1,
-        step: 0.1,
-        mode: "decimal_placement",
+      makeActivity("multiple_choice", 2, {
+        mode: "represent_decimals",
       }),
-      makeActivity("number_line", 1, {
-        min: 0,
-        max: 1,
-        step: 0.01,
-        mode: "decimal_placement",
+      makeActivity("typed_response", 1, {
+        mode: "represent_decimals",
       }),
     ],
   },

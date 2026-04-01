@@ -20,6 +20,27 @@ export type MABVisualData = {
   ones: number | null;
 };
 
+export type DecimalVisualData =
+  | {
+      type: "decimal_model";
+      model: "tenths_bar";
+      numerator: number;
+      denominator: 10;
+    }
+  | {
+      type: "decimal_model";
+      model: "hundredths_grid";
+      numerator: number;
+      denominator: 100;
+    }
+  | {
+      type: "decimal_model";
+      model: "place_value_chart";
+      ones: number;
+      tenths: number;
+      hundredths: number;
+    };
+
 export type PlaceValueBuilderQuestion = {
   kind: "place_value_builder";
   prompt: string;
@@ -416,7 +437,8 @@ export type MultipleChoiceQuestion = {
         rows: number;
         columns: number;
       }
-    | MABVisualData;
+    | MABVisualData
+    | DecimalVisualData;
 };
 
 export type WrittenMethodLayout = {
@@ -438,7 +460,7 @@ export type TypedResponseQuestion = {
   helper?: string;
   placeholder?: string;
   writtenMethod?: WrittenMethodLayout;
-  visual?: MABVisualData;
+  visual?: MABVisualData | DecimalVisualData;
 };
 
 export type SpeedRoundQuestion = {
@@ -833,6 +855,28 @@ function numberToWords(n: number): string {
 
 function formatNumeral(value: number): string {
   return value.toLocaleString();
+}
+
+function formatDecimal(value: number) {
+  return value.toFixed(2).replace(/\.?0+$/, "");
+}
+
+function decimalTenthsOptions(answer: string) {
+  const answerValue = Number(answer);
+  const values = new Set<number>([answerValue]);
+  while (values.size < 4) {
+    values.add(randInt(1, 9) / 10);
+  }
+  return shuffle(Array.from(values).map((value) => formatDecimal(value)));
+}
+
+function decimalHundredthsOptions(answer: string) {
+  const answerValue = Number(answer);
+  const values = new Set<number>([answerValue]);
+  while (values.size < 4) {
+    values.add(randInt(1, 99) / 100);
+  }
+  return shuffle(Array.from(values).map((value) => formatDecimal(value)));
 }
 
 function buildLargeNumberOptions(target: number, min: number, max: number): string[] {
@@ -3796,6 +3840,96 @@ function generateGenericQuestion(
       answer: numeral,
       placeholder: "Type the numeral",
     };
+  }
+
+  if (explicitMode === "tenths_place_value") {
+    const numerator = randInt(1, 9);
+    const decimal = formatDecimal(numerator / 10);
+    const visual: DecimalVisualData = {
+      type: "decimal_model",
+      model: "tenths_bar",
+      numerator,
+      denominator: 10,
+    };
+
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: "What decimal is shaded?",
+          options: decimalTenthsOptions(decimal),
+          answer: decimal,
+          helper: "Ten equal parts make one whole.",
+          visual,
+        }
+      : {
+          kind: "typed_response",
+          prompt: "How many tenths are shaded?",
+          answer: String(numerator),
+          helper: "Count the shaded tenths.",
+          placeholder: "Type the number of tenths",
+          visual,
+        };
+  }
+
+  if (explicitMode === "hundredths_place_value") {
+    const numerator = randInt(1, 95);
+    const decimal = formatDecimal(numerator / 100);
+    const visual: DecimalVisualData = {
+      type: "decimal_model",
+      model: "hundredths_grid",
+      numerator,
+      denominator: 100,
+    };
+
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: "What decimal is shaded?",
+          options: decimalHundredthsOptions(decimal),
+          answer: decimal,
+          helper: "One whole is split into 100 equal parts.",
+          visual,
+        }
+      : {
+          kind: "typed_response",
+          prompt: "How many hundredths are shaded?",
+          answer: String(numerator),
+          helper: "Count the shaded hundredths squares.",
+          placeholder: "Type the number of hundredths",
+          visual,
+        };
+  }
+
+  if (explicitMode === "represent_decimals") {
+    const ones = randInt(0, 1);
+    const tenths = randInt(0, 9);
+    const hundredths = randInt(0, 9);
+    const decimal = formatDecimal(ones + tenths / 10 + hundredths / 100);
+    const visual: DecimalVisualData = {
+      type: "decimal_model",
+      model: "place_value_chart",
+      ones,
+      tenths,
+      hundredths,
+    };
+
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: "What decimal does this place value chart show?",
+          options: decimalHundredthsOptions(decimal),
+          answer: decimal,
+          helper: "Read the ones, tenths, and hundredths columns.",
+          visual,
+        }
+      : {
+          kind: "typed_response",
+          prompt: "Write the decimal shown by this place value chart.",
+          answer: decimal,
+          helper: "Use the tenths and hundredths columns to build the decimal.",
+          placeholder: "Type the decimal",
+          visual,
+        };
   }
 
   if (sourceActivityType === "place_value_builder") {

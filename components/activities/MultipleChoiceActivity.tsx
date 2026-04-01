@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { MultipleChoiceQuestion } from "@/data/activities/year2/lessonEngine";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import PlaceValueMABVisual from "@/components/activities/PlaceValueMABVisual";
+import DecimalModelVisual from "@/components/activities/DecimalModelVisual";
 
 function ArrayVisual({ rows, cols }: { rows: number; cols: number }) {
   return (
@@ -63,6 +64,9 @@ export default function MultipleChoiceActivity({
       ) : null}
       {questionData.visual?.type === "mab" ? (
         <PlaceValueMABVisual questionData={questionData.visual} title="MAB model" />
+      ) : null}
+      {questionData.visual?.type === "decimal_model" ? (
+        <DecimalModelVisual visual={questionData.visual} title="Decimal model" />
       ) : null}
       {questionData.visual?.type === "array" ? (
         <ArrayVisual rows={questionData.visual.rows} cols={questionData.visual.columns} />

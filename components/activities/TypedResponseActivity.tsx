@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { TypedResponseQuestion } from "@/data/activities/year2/lessonEngine";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import PlaceValueMABVisual from "@/components/activities/PlaceValueMABVisual";
+import DecimalModelVisual from "@/components/activities/DecimalModelVisual";
 
 function normalize(value: string) {
   return value.trim().toLowerCase().replace(/,/g, "").replace(/\s+/g, " ");
@@ -295,6 +296,9 @@ export default function TypedResponseActivity({
       </div>
       {questionData.visual?.type === "mab" ? (
         <PlaceValueMABVisual questionData={questionData.visual} title="MAB model" />
+      ) : null}
+      {questionData.visual?.type === "decimal_model" ? (
+        <DecimalModelVisual visual={questionData.visual} title="Decimal model" />
       ) : null}
       {questionData.helper ? (
         <p className="mt-2 text-sm text-gray-600">{questionData.helper}</p>
