@@ -40,8 +40,8 @@ export default function DecimalModelVisual({
 
       {visual.model === "hundredths_grid" ? (
         <div className="mt-3">
-          <div className="rounded-2xl bg-white p-4 shadow-sm">
-            <div className="mx-auto w-fit space-y-1.5">
+          <div className="rounded-2xl bg-white p-3 shadow-sm">
+            <div className="space-y-1.5">
               {Array.from({ length: 10 }).map((_, rowIndex) => {
                 return (
                   <div
@@ -56,7 +56,7 @@ export default function DecimalModelVisual({
                         <div
                           key={`${rowIndex}-${columnIndex}`}
                           className={[
-                            "h-7 w-7 rounded-sm border",
+                            "h-6 rounded-sm border",
                             columnIndex < fullTenthsColumns ||
                             (columnIndex === fullTenthsColumns && rowIndex < extraHundredths)
                               ? "border-teal-300 bg-teal-500"
