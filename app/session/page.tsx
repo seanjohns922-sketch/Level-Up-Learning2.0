@@ -397,6 +397,28 @@ function buildStructuredWeeklyQuizQuestions(
   return questions;
 }
 
+function buildLessonBucketQuizQuestions(
+  lessonNumber: 1 | 2 | 3,
+  questionsPerLesson: number,
+  generators: Array<() => QuizQuestion>
+) {
+  const questions: QuizQuestion[] = [];
+  const selectedKinds: string[] = [];
+
+  for (let i = 0; i < questionsPerLesson; i += 1) {
+    const generator = generators[randInt(0, generators.length - 1)];
+    const question = generator();
+    selectedKinds.push(question.kind);
+    questions.push({
+      ...question,
+      lessonNumber,
+      lessonTag: lessonNumber,
+    });
+  }
+
+  return { questions, selectedKinds };
+}
+
 function toQuizQuestionFromYear2Data(
   questionData: Year2QuestionData,
   lessonNumber: number,
@@ -2418,10 +2440,11 @@ function SessionPage() {
   function buildQuizQuestions() {
     const qConfig = quizConfig;
     const questionsPerLesson = qConfig?.questionsPerLesson ?? 5;
+    const weekPlan = getProgramForYear(year).find(
+      (plan) => plan.week === Number(week)
+    );
+
     if (year === "Year 2" || year === "Year 3" || year === "Year 4") {
-      const weekPlan = getProgramForYear(year).find(
-        (plan) => plan.week === Number(week)
-      );
       if (weekPlan) {
         return buildStructuredWeeklyQuizQuestions(weekPlan, questionsPerLesson);
       }
@@ -2629,24 +2652,47 @@ function SessionPage() {
           () => makeTypeNumberQuestion(0, rangeMax),
         ];
 
-    for (let i = 0; i < questionsPerLesson; i += 1) {
-      const g = lesson1Generators[randInt(0, lesson1Generators.length - 1)];
-      questions.push(g());
-    }
-    for (let i = 0; i < questionsPerLesson; i += 1) {
-      const g = lesson2Generators[randInt(0, lesson2Generators.length - 1)];
-      questions.push(g());
-    }
-    for (let i = 0; i < questionsPerLesson; i += 1) {
-      const g = lesson3Generators[randInt(0, lesson3Generators.length - 1)];
-      questions.push(g());
-    }
+    const lesson1Bucket = buildLessonBucketQuizQuestions(1, questionsPerLesson, lesson1Generators);
+    const lesson2Bucket = buildLessonBucketQuizQuestions(2, questionsPerLesson, lesson2Generators);
+    const lesson3Bucket = buildLessonBucketQuizQuestions(3, questionsPerLesson, lesson3Generators);
+
+    questions.push(...lesson1Bucket.questions, ...lesson2Bucket.questions, ...lesson3Bucket.questions);
 
     const base = shuffle(questions).map((q, i) => ({ ...q, id: `q${i + 1}` }));
     if (base.length >= 13 && isWeek2) {
-      base[11] = { ...makeAudioPickQuestion(0, rangeMax), id: base[11].id };
-      base[12] = { ...makeAudioPickQuestion(0, rangeMax), id: base[12].id };
+      base[11] = {
+        ...base[11],
+        ...makeAudioPickQuestion(0, rangeMax),
+        id: base[11].id,
+      };
+      base[12] = {
+        ...base[12],
+        ...makeAudioPickQuestion(0, rangeMax),
+        id: base[12].id,
+      };
     }
+
+    if (weekPlan) {
+      validateStructuredWeeklyQuizQuestions(weekPlan, base, questionsPerLesson);
+    }
+
+    if (process.env.NODE_ENV !== "production") {
+      console.info("[StructuredWeeklyQuiz]", {
+        year,
+        week: Number(week),
+        counts: [
+          { lesson: 1, availableActivities: lesson1Generators.length },
+          { lesson: 2, availableActivities: lesson2Generators.length },
+          { lesson: 3, availableActivities: lesson3Generators.length },
+        ],
+        selectedPerLesson: [
+          { lesson: 1, selectedActivityTypes: lesson1Bucket.selectedKinds },
+          { lesson: 2, selectedActivityTypes: lesson2Bucket.selectedKinds },
+          { lesson: 3, selectedActivityTypes: lesson3Bucket.selectedKinds },
+        ],
+      });
+    }
+
     return base;
   }
 

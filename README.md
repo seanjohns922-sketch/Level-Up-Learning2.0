@@ -25,6 +25,7 @@ Use these before building a new maths level:
 - [Level Setup Checklist](/Users/seanjohns/level-up-learning-mvp/docs/level-setup-checklist.md)
 - [Level Setup Template](/Users/seanjohns/level-up-learning-mvp/docs/level-setup-template.md)
 - [Year 4 Engine Bank Spec](/Users/seanjohns/level-up-learning-mvp/docs/year4-engine-bank-spec.md)
+- [Weekly Quiz Contract](/Users/seanjohns/level-up-learning-mvp/docs/weekly-quiz-contract.md)
 
 Working rule:
 - do not write the full level schedule until the checklist steps 1 to 7 are complete
