@@ -20,6 +20,134 @@ export type PostTest = {
   questions: Question[];
 };
 
+const YEAR1_POSTTEST_QUESTIONS: Question[] = [
+  {
+    id: "y1-pt-01",
+    prompt: "Which number is 48?",
+    options: ["38", "48", "58", "84"],
+    correctAnswer: "48",
+  },
+  {
+    id: "y1-pt-02",
+    prompt: "What number comes after 79?",
+    options: ["78", "80", "81", "89"],
+    correctAnswer: "80",
+  },
+  {
+    id: "y1-pt-03",
+    prompt: "Put these numbers in order from smallest to largest: 23, 17, 41",
+    options: ["17, 23, 41", "23, 17, 41", "41, 23, 17", "17, 41, 23"],
+    correctAnswer: "17, 23, 41",
+  },
+  {
+    id: "y1-pt-04",
+    prompt: "Which is the largest number?",
+    options: ["64", "46", "56", "36"],
+    correctAnswer: "64",
+  },
+  {
+    id: "y1-pt-05",
+    prompt: "How many tens and ones are in 73?",
+    options: ["7 tens and 3 ones", "3 tens and 7 ones", "73 tens and 0 ones", "6 tens and 13 ones"],
+    correctAnswer: "7 tens and 3 ones",
+  },
+  {
+    id: "y1-pt-06",
+    prompt: "Which shows 45 in expanded form?",
+    options: ["40 + 5", "4 + 5", "30 + 15", "50 - 10"],
+    correctAnswer: "40 + 5",
+  },
+  {
+    id: "y1-pt-07",
+    prompt: "Skip count by 2s: 2, 4, 6, __, 10",
+    options: ["7", "8", "9", "12"],
+    correctAnswer: "8",
+  },
+  {
+    id: "y1-pt-08",
+    prompt: "Skip count by 5s: 5, 10, 15, __",
+    options: ["18", "20", "25", "30"],
+    correctAnswer: "20",
+  },
+  {
+    id: "y1-pt-09",
+    prompt: "Which number is odd?",
+    options: ["24", "36", "51", "68"],
+    correctAnswer: "51",
+  },
+  {
+    id: "y1-pt-10",
+    prompt: "What is 9 + 6?",
+    options: ["14", "15", "16", "17"],
+    correctAnswer: "15",
+  },
+  {
+    id: "y1-pt-11",
+    prompt: "What is 13 + 5?",
+    options: ["17", "18", "19", "20"],
+    correctAnswer: "18",
+  },
+  {
+    id: "y1-pt-12",
+    prompt: "What is 16 - 7?",
+    options: ["8", "9", "10", "11"],
+    correctAnswer: "9",
+  },
+  {
+    id: "y1-pt-13",
+    prompt: "What number makes this true: 6 + __ = 14?",
+    options: ["6", "7", "8", "9"],
+    correctAnswer: "8",
+  },
+  {
+    id: "y1-pt-14",
+    prompt: "You have $5. You spend $2. How much money is left?",
+    options: ["$1", "$2", "$3", "$7"],
+    correctAnswer: "$3",
+  },
+  {
+    id: "y1-pt-15",
+    prompt: "Which coins make $1.00 exactly?",
+    options: [
+      "50c + 20c + 20c + 10c",
+      "50c + 20c + 20c + 5c",
+      "20c + 20c + 20c + 20c",
+      "50c + 50c + 20c",
+    ],
+    correctAnswer: "50c + 20c + 20c + 10c",
+  },
+  {
+    id: "y1-pt-16",
+    prompt: "What multiplication sentence matches 3 groups of 2?",
+    options: ["3 + 2", "2 + 2 + 2", "3 × 2", "2 × 2"],
+    correctAnswer: "3 × 2",
+  },
+  {
+    id: "y1-pt-17",
+    prompt: "What is 4 × 2?",
+    options: ["6", "8", "10", "12"],
+    correctAnswer: "8",
+  },
+  {
+    id: "y1-pt-18",
+    prompt: "Share 12 counters between 3 friends. How many does each friend get?",
+    options: ["2", "3", "4", "6"],
+    correctAnswer: "4",
+  },
+  {
+    id: "y1-pt-19",
+    prompt: "How many groups of 5 are in 15?",
+    options: ["2", "3", "4", "5"],
+    correctAnswer: "3",
+  },
+  {
+    id: "y1-pt-20",
+    prompt: "Which number sentence matches this story: There are 7 birds in one tree and 5 birds in another tree. How many birds altogether?",
+    options: ["7 - 5", "7 + 5", "5 + 5", "12 - 7"],
+    correctAnswer: "7 + 5",
+  },
+];
+
 const YEAR2_POSTTEST_QUESTIONS: Question[] = [
   { id: "y2-pt-01", prompt: "Write this number in digits: Seven hundred and thirty-two", options: ["723", "732", "372", "237"], correctAnswer: "732" },
   { id: "y2-pt-02", prompt: "What is the value of 4 in 546?", options: ["4", "40", "400", "46"], correctAnswer: "40" },
@@ -44,6 +172,10 @@ const YEAR2_POSTTEST_QUESTIONS: Question[] = [
 ];
 
 export const POSTTESTS: Record<string, PostTest> = {
+  "Year 1": {
+    yearLabel: "Year 1",
+    questions: YEAR1_POSTTEST_QUESTIONS,
+  },
   "Year 2": {
     yearLabel: "Year 2",
     questions: YEAR2_POSTTEST_QUESTIONS,
