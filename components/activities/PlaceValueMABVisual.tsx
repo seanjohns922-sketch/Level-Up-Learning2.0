@@ -136,17 +136,15 @@ export default function PlaceValueMABVisual({
                 <div className="text-xs font-bold uppercase tracking-wide text-gray-500">
                   {placeLabel(place)}
                 </div>
-                <div className="mt-3">
-                  <MABChipVisual place={place} count={count} />
-                </div>
-                <div className="mt-2 text-sm text-gray-600">
-                  {count === null
-                    ? "Missing part"
-                    : `${count} × ${unitValue(place)} = ${count * unitValue(place)}`}
-                </div>
+              <div className="mt-3">
+                <MABChipVisual place={place} count={count} />
               </div>
-            );
-          })}
+              <div className="mt-2 text-sm text-gray-600">
+                {count === null ? "Missing part" : `${count} ${placeLabel(place).toLowerCase()}`}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

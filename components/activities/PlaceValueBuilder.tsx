@@ -14,15 +14,6 @@ function placeLabel(place: PlaceValueName) {
   return "Ones";
 }
 
-function unitValue(place: PlaceValueName) {
-  if (place === "hundred_thousands") return 100000;
-  if (place === "ten_thousands") return 10000;
-  if (place === "thousands") return 1000;
-  if (place === "hundreds") return 100;
-  if (place === "tens") return 10;
-  return 1;
-}
-
 function placeCount(questionData: PlaceValueBuilderQuestion, place: PlaceValueName) {
   if (place === "hundred_thousands") return questionData.hundredThousands;
   if (place === "ten_thousands") return questionData.tenThousands;
@@ -47,30 +38,6 @@ export default function PlaceValueBuilder({
     setResponse("");
   }, [questionData]);
 
-  const visibleTotal = useMemo(
-    () =>
-      (questionData.hundredThousands ?? 0) * 100000 +
-      (questionData.tenThousands ?? 0) * 10000 +
-      (questionData.thousands ?? 0) * 1000 +
-      (questionData.hundreds ?? 0) * 100 +
-      (questionData.tens ?? 0) * 10 +
-      (questionData.ones ?? 0),
-    [
-      questionData.tenThousands,
-      questionData.hundredThousands,
-      questionData.thousands,
-      questionData.hundreds,
-      questionData.ones,
-      questionData.tens,
-    ]
-  );
-
-  const knownBreakdown = useMemo(() => {
-    return questionData.placeValues.map((place) => {
-      const count = placeCount(questionData, place) ?? 0;
-      return `${count} ${placeLabel(place).toLowerCase()}`;
-    });
-  }, [questionData]);
   const mabVisualData = useMemo(
     () => ({
       type: "mab" as const,
@@ -139,23 +106,14 @@ export default function PlaceValueBuilder({
           <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
             Known blocks
           </div>
-          <div className="mt-1.5 text-2xl font-black text-teal-900">
-            {knownBreakdown.join(" + ")} = {visibleTotal}
+          <div className="mt-1.5 text-base font-bold text-teal-900">
+            Count the visible blocks and use the target number to work out the missing value.
           </div>
           <div className="mt-2 text-sm text-teal-800">
             Use the target number to work out the missing value.
           </div>
         </div>
-      ) : (
-        <div className="mt-4 rounded-2xl border border-teal-100 bg-teal-50 p-3">
-          <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
-            Place value clue
-          </div>
-          <div className="mt-1.5 text-2xl font-black text-teal-900">
-            {questionData.targetNumber}
-          </div>
-        </div>
-      )}
+      ) : null}
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <input
