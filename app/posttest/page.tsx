@@ -34,7 +34,7 @@ function PostTestPage() {
   const year = params.get("year") ?? "Year 3";
 
   const test = useMemo(() => {
-    return getPosttestForYearLabel(year) ?? getPosttestForYearLabel("Year 3");
+    return getPosttestForYearLabel(year);
   }, [year]);
 
   const questions: Question[] = test?.questions ?? [];
