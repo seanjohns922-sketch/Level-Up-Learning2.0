@@ -23,26 +23,33 @@ Range note:
 
 ## Week 2
 
-Focus: Decimals (Tenths and Hundredths)
+Focus: Decimal Place Value (Core)
 
 | Lesson | Topic | Primary Engine | Secondary Engine | Quiz Safe |
 | --- | --- | --- | --- | --- |
-| 1 | Tenths (Money) | `decimal_place_value` | `money_visual` | `true` |
-| 2 | Hundredths (Measurement) | `decimal_place_value` | `measurement_visual` | `true` |
-| 3 | Decimal Number Line | `decimal_number_line` | — | `true` |
+| 1 | Tenths as Place Value | `decimal_place_value` | — | `true` |
+| 2 | Hundredths as Place Value | `decimal_place_value` | — | `true` |
+| 3 | Representing Decimals | `decimal_place_value` | `place_value_chart` | `true` |
+
+Notes:
+- keep Week 2 purely conceptual
+- do not introduce money or measurement contexts here
+- do not use number lines before students understand decimal place value
 
 ## Week 3
 
-Focus: Rounding and Estimating
+Focus: Decimal Reasoning
 
 | Lesson | Topic | Primary Engine | Secondary Engine | Quiz Safe |
 | --- | --- | --- | --- | --- |
-| 1 | Rounding | `rounding_numbers` | `number_line` | `true` |
-| 2 | Estimate Totals | `estimate_sum` | — | `true` |
-| 3 | Real-World Estimation | `mixed_word_problem` | — | `true` |
+| 1 | Comparing Decimals | `decimal_compare` | — | `true` |
+| 2 | Ordering Decimals | `decimal_compare` | `number_order` | `true` |
+| 3 | Decimals on Number Lines | `decimal_number_line` | — | `true` |
 
-Range note:
-- use 4-digit, 5-digit, and 6-digit whole numbers heavily
+Notes:
+- Week 3 should extend decimal understanding, not revisit rounding
+- number lines belong here after decimal place value is secure
+- move money and measurement decimal contexts to later applied weeks
 
 ## Week 4
 

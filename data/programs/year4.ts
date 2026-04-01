@@ -90,10 +90,10 @@ const year4Rows: ProgramRow[] = [
   },
   {
     week: 2,
-    focus: "Place Value incl. Tenths & Hundredths",
+    focus: "Decimal Place Value (Core)",
     lesson: 1,
-    topic: "Tenths in Money",
-    activity: "Use coins to represent decimals like 0.1 and 0.2",
+    topic: "Tenths as Place Value",
+    activity: "Read, represent, and identify tenths as place value using decimal models and charts",
     curriculum: ["AC9M4N01"],
     activities: [
       makeActivity("multiple_choice", 2, {
@@ -107,10 +107,10 @@ const year4Rows: ProgramRow[] = [
   },
   {
     week: 2,
-    focus: "Place Value incl. Tenths & Hundredths",
+    focus: "Decimal Place Value (Core)",
     lesson: 2,
-    topic: "Hundredths in Measurement",
-    activity: "Use rulers and measuring tapes to show hundredths of a metre",
+    topic: "Hundredths as Place Value",
+    activity: "Read, represent, and identify hundredths as place value using decimal models and charts",
     curriculum: ["AC9M4N01"],
     activities: [
       makeActivity("number_line", 2, {
@@ -127,10 +127,10 @@ const year4Rows: ProgramRow[] = [
   },
   {
     week: 2,
-    focus: "Place Value incl. Tenths & Hundredths",
+    focus: "Decimal Place Value (Core)",
     lesson: 3,
-    topic: "Decimals on Number Lines",
-    activity: "Place tenths and hundredths accurately on number lines",
+    topic: "Representing Decimals",
+    activity: "Represent decimals with place value charts, digit cards, and decimal models",
     curriculum: ["AC9M4N01"],
     activities: [
       makeActivity("number_line", 2, {
@@ -149,11 +149,11 @@ const year4Rows: ProgramRow[] = [
   },
   {
     week: 3,
-    focus: "Rounding & Estimating",
+    focus: "Decimal Reasoning",
     lesson: 1,
-    topic: "Round to Nearest 10, 100, 1000",
-    activity: "Round large numbers using number lines and charts",
-    curriculum: ["AC9M4N07"],
+    topic: "Comparing Decimals",
+    activity: "Compare decimals using place value reasoning and symbols",
+    curriculum: ["AC9M4N01"],
     activities: [
       makeActivity("number_line", 2, {
         min: 1000,
@@ -172,11 +172,11 @@ const year4Rows: ProgramRow[] = [
   },
   {
     week: 3,
-    focus: "Rounding & Estimating",
+    focus: "Decimal Reasoning",
     lesson: 2,
-    topic: "Estimate Totals",
-    activity: "Estimate sums in real-world problems; justify estimates",
-    curriculum: ["AC9M4N07"],
+    topic: "Ordering Decimals",
+    activity: "Order decimals from smallest to largest using place value understanding",
+    curriculum: ["AC9M4N01"],
     activities: [
       makeActivity("mixed_word_problem", 2, {
         mode: "estimate_total",
@@ -190,11 +190,11 @@ const year4Rows: ProgramRow[] = [
   },
   {
     week: 3,
-    focus: "Rounding & Estimating",
+    focus: "Decimal Reasoning",
     lesson: 3,
-    topic: "Real-World Estimating",
-    activity: "Apply rounding/estimating to shopping list totals and distances",
-    curriculum: ["AC9M4N07"],
+    topic: "Decimals on Number Lines",
+    activity: "Place tenths and hundredths accurately on number lines after comparing and ordering decimals",
+    curriculum: ["AC9M4N01"],
     activities: [
       makeActivity("mixed_word_problem", 2, {
         mode: "real_world_estimate",

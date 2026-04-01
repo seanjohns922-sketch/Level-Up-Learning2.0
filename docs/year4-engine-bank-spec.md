@@ -109,8 +109,9 @@ Unless a specific engine overrides this, Year 4 engines should follow this progr
 ```ts
 const YEAR4_DIFFICULTY_RULES = [
   "Week 1: full six-digit whole-number range up to 999,999",
-  "Week 2: decimals to tenths then hundredths in smaller money and measurement contexts",
-  "Week 3-4: mix 4-digit, 5-digit, and 6-digit whole numbers; include decimals only where the engine requires them",
+  "Week 2: pure decimal place value, moving from tenths to hundredths with no money or measurement contexts",
+  "Week 3: compare, order, and place decimals on number lines after conceptual decimal work in Week 2",
+  "Week 4: mix 4-digit, 5-digit, and 6-digit whole numbers; include decimals only where the engine requires them",
   "Week 5-6: introduce inverse logic and mixed representation formats",
   "Week 7-8: use larger whole numbers selectively inside formal methods and multiplicative contexts",
   "Week 9-10: increase visual-to-symbolic fraction and decimal reasoning",
@@ -123,6 +124,11 @@ Whole-number range rule:
 - use six-digit numbers heavily in Weeks `1`, `3`, and `4`
 - use them selectively in Weeks `7`, `11`, and `12`
 - do not overload decimal, fraction, or fact-fluency weeks with large whole numbers
+
+Decimal sequencing rule:
+- Week 2 is concept-only decimal place value
+- Week 3 is decimal reasoning and application within abstract number work
+- money and measurement decimal contexts should appear later in applied problem-solving weeks, not in the initial decimal introduction
 
 ## Engine Clusters
 
