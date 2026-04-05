@@ -10,6 +10,17 @@ function normalize(value: string) {
   return value.trim().toLowerCase().replace(/,/g, "").replace(/\s+/g, " ");
 }
 
+function normalizeOrderingNumber(value: string) {
+  return value.trim().replace(/,/g, "").replace(/\s+/g, "");
+}
+
+function splitOrderingAnswer(value: string) {
+  return value
+    .split(",")
+    .map((part) => normalizeOrderingNumber(part))
+    .filter(Boolean);
+}
+
 function columnLabel(label: string) {
   if (label === "O") return "ones";
   if (label === "T") return "tens";
@@ -31,7 +42,16 @@ export default function TypedResponseActivity({
   const isGuidedAddition = writtenMethod?.operation === "+";
   const isGuidedSubtraction = writtenMethod?.operation === "-";
   const isGuidedWrittenMethod = isGuidedAddition || isGuidedSubtraction;
+  const orderingAnswerParts = !writtenMethod ? splitOrderingAnswer(questionData.answer) : [];
+  const isOrderingResponse =
+    !writtenMethod &&
+    orderingAnswerParts.length >= 4 &&
+    /Type the numbers from (smallest to largest|largest to smallest)/i.test(questionData.prompt) &&
+    orderingAnswerParts.every((part) => /^\d+$/.test(part));
   const [typed, setTyped] = useState("");
+  const [orderedInputs, setOrderedInputs] = useState<string[]>(
+    isOrderingResponse ? Array.from({ length: orderingAnswerParts.length }, () => "") : []
+  );
   const [digitInputs, setDigitInputs] = useState<string[]>(
     writtenMethod
       ? Array.from({ length: writtenMethod.answerLength }, () => "")
@@ -72,6 +92,9 @@ export default function TypedResponseActivity({
 
   useEffect(() => {
     setTyped("");
+    setOrderedInputs(
+      isOrderingResponse ? Array.from({ length: orderingAnswerParts.length }, () => "") : []
+    );
     setDigitInputs(
       writtenMethod
         ? Array.from({ length: writtenMethod.answerLength }, () => "")
@@ -105,7 +128,7 @@ export default function TypedResponseActivity({
     setCurrentColumn(isGuidedWrittenMethod && writtenMethod ? writtenMethod.answerLength - 1 : -1);
     setGuidedPhase(isGuidedWrittenMethod && writtenMethod ? "decide" : "done");
     setGuidedFeedback("");
-  }, [questionData, writtenMethod]);
+  }, [isGuidedWrittenMethod, isOrderingResponse, orderingAnswerParts.length, questionData, writtenMethod]);
 
   function normalizedDigitAnswer() {
     const joined = digitInputs.join("").replace(/\s+/g, "");
@@ -280,8 +303,13 @@ export default function TypedResponseActivity({
   function check() {
     const value = writtenMethod
       ? normalize(normalizedDigitAnswer())
+      : isOrderingResponse
+      ? orderedInputs.map(normalizeOrderingNumber).join(",")
       : normalize(typed);
-    if (value === normalize(questionData.answer)) onCorrect?.();
+    const expected = isOrderingResponse
+      ? orderingAnswerParts.join(",")
+      : normalize(questionData.answer);
+    if (value === expected) onCorrect?.();
     else onWrong?.();
   }
 
@@ -509,12 +537,34 @@ export default function TypedResponseActivity({
         </div>
       ) : (
         <div className="mt-6 flex flex-wrap items-center gap-3">
-          <input
-            value={typed}
-            onChange={(event) => setTyped(event.target.value)}
-            placeholder={questionData.placeholder ?? "Type your answer"}
-            className="w-full max-w-md rounded-xl border border-gray-300 px-4 py-3 text-lg font-bold text-gray-900 outline-none focus:border-teal-500"
-          />
+          {isOrderingResponse ? (
+            <div className="w-full">
+              <div className="flex flex-wrap gap-3">
+                {orderedInputs.map((value, index) => (
+                  <input
+                    key={`ordered-${index}`}
+                    value={value}
+                    onChange={(event) => {
+                      const nextValue = event.target.value.replace(/[^\d,\s]/g, "");
+                      setOrderedInputs((current) =>
+                        current.map((cell, cellIndex) => (cellIndex === index ? nextValue : cell))
+                      );
+                    }}
+                    inputMode="numeric"
+                    placeholder={`${index + 1}`}
+                    className="min-w-[120px] flex-1 rounded-xl border border-gray-300 px-4 py-3 text-lg font-bold text-gray-900 outline-none focus:border-teal-500"
+                  />
+                ))}
+              </div>
+            </div>
+          ) : (
+            <input
+              value={typed}
+              onChange={(event) => setTyped(event.target.value)}
+              placeholder={questionData.placeholder ?? "Type your answer"}
+              className="w-full max-w-md rounded-xl border border-gray-300 px-4 py-3 text-lg font-bold text-gray-900 outline-none focus:border-teal-500"
+            />
+          )}
           <button
             type="button"
             onClick={check}
