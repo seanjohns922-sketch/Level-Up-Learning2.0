@@ -4017,6 +4017,41 @@ function generateGenericQuestion(
         };
   }
 
+  if (explicitMode === "compare_symbols") {
+    const minValue = typeof config.min === "number" ? config.min : 1000;
+    const maxValue = typeof config.max === "number" ? config.max : 999999;
+    let left = randInt(minValue, maxValue);
+    let right = randInt(minValue, maxValue);
+
+    if (randInt(0, 4) === 0) {
+      right = left;
+    } else {
+      while (right === left) {
+        right = randInt(minValue, maxValue);
+      }
+    }
+
+    const answer = left === right ? "=" : left > right ? ">" : "<";
+    const leftText = formatMathNumber(left);
+    const rightText = formatMathNumber(right);
+
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: `Which symbol makes this true: ${leftText} ___ ${rightText}?`,
+          options: shuffle(["<", ">", "="]),
+          answer,
+          helper: "Compare the digits from left to right.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: `Type <, >, or = between ${leftText} and ${rightText}.`,
+          answer,
+          helper: "Compare the digits from left to right.",
+          placeholder: "Type <, >, or =",
+        };
+  }
+
   if (sourceActivityType === "place_value_builder") {
     const target = randInt(Math.max(100, min || 100), Math.max(200, max || 999));
     const places = supportedPlaces(config);
@@ -4167,6 +4202,7 @@ function generateGenericQuestion(
     }
 
     const count = typeof config.count === "number" ? config.count : 4;
+    const ascending = config.ascending !== false;
     const values = new Set<number>();
     while (values.size < count) {
       values.add(randInt(Math.max(10, min), Math.max(40, max)));
@@ -4174,23 +4210,27 @@ function generateGenericQuestion(
     const numbers = Array.from(values);
     const smallest = Math.min(...numbers);
     const largest = Math.max(...numbers);
-    const prompt =
-      randInt(0, 1) === 0
-        ? `Which number is the smallest: ${numbers.join(", ")}?`
-        : `Which number is the largest: ${numbers.join(", ")}?`;
-    const answer = prompt.includes("smallest") ? String(smallest) : String(largest);
+    const ordered = [...numbers].sort((a, b) => (ascending ? a - b : b - a));
     return asMultipleChoice
       ? {
           kind: "multiple_choice",
-          prompt,
-          options: shuffle(numbers.map(String)),
-          answer,
+          prompt: ascending
+            ? `Which number is the smallest: ${numbers.map(formatMathNumber).join(", ")}?`
+            : `Which number is the largest: ${numbers.map(formatMathNumber).join(", ")}?`,
+          options: shuffle(numbers.map(formatMathNumber)),
+          answer: formatMathNumber(ascending ? smallest : largest),
         }
       : {
           kind: "typed_response",
-          prompt,
-          answer,
-          placeholder: "Type the number",
+          prompt: ascending
+            ? `Type the numbers from smallest to largest: ${numbers
+                .map(formatMathNumber)
+                .join(", ")}.`
+            : `Type the numbers from largest to smallest: ${numbers
+                .map(formatMathNumber)
+                .join(", ")}.`,
+          answer: ordered.map(formatMathNumber).join(", "),
+          placeholder: "Type the ordered numbers",
         };
   }
 
@@ -4273,9 +4313,14 @@ function generateGenericQuestion(
     return asMultipleChoice
       ? {
           kind: "multiple_choice",
-          prompt: `Which decimal belongs between ${formatMathNumber(Math.max(min, value - step))} and ${formatMathNumber(
-            Math.min(max, value + step)
-          )}?`,
+          prompt:
+            step < 1
+              ? `Which decimal belongs between ${formatMathNumber(
+                  Math.max(min, value - step)
+                )} and ${formatMathNumber(Math.min(max, value + step))}?`
+              : `Which number belongs between ${formatMathNumber(
+                  Math.max(min, value - step)
+                )} and ${formatMathNumber(Math.min(max, value + step))}?`,
           options:
             step < 1
               ? shuffle([

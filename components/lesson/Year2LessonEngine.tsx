@@ -126,6 +126,16 @@ export function Year2LessonEngine({
         questionKind: nextQuestion?.kind,
       });
     }
+    if (level === 4 && lesson.week === 4) {
+      console.debug("[Year4Week4] next_activity", {
+        lessonId: lesson.id,
+        topic: lesson.title,
+        lessonNumber: lesson.lesson,
+        selectedActivityType: nextActivity?.activityType,
+        selectedMode: nextActivity?.config?.mode,
+        questionKind: nextQuestion?.kind,
+      });
+    }
 
     setCurrentActivityIndex(picked.index);
     setCurrentQuestion(nextQuestion);
@@ -147,6 +157,22 @@ export function Year2LessonEngine({
     console.debug("[Year4Week3Lesson2] pool", {
       lessonId: lesson.id,
       topic: lesson.title,
+      validActivityCount: activities.length,
+      activities: activities.map((activity) => ({
+        activityType: activity.activityType,
+        mode: activity.config?.mode,
+        sourceActivityType: activity.config?.sourceActivityType,
+        weight: activity.weight,
+      })),
+    });
+  }, [activities, lesson.id, lesson.lesson, lesson.title, lesson.week, level]);
+
+  useEffect(() => {
+    if (!(level === 4 && lesson.week === 4)) return;
+    console.debug("[Year4Week4] pool", {
+      lessonId: lesson.id,
+      topic: lesson.title,
+      lessonNumber: lesson.lesson,
       validActivityCount: activities.length,
       activities: activities.map((activity) => ({
         activityType: activity.activityType,
