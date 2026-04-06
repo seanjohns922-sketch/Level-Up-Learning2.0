@@ -6,36 +6,15 @@ import { getDifficultyFromTime } from "@/data/activities/year1/practice-task";
 import { TaskRenderer } from "@/components/TaskRenderer";
 import { speak } from "@/lib/speak";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
-
-function pad2(n: number) {
-  return String(n).padStart(2, "0");
-}
-
-function Countdown({ seconds, total }: { seconds: number; total: number }) {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  const pct = Math.max(0, Math.min(100, (seconds / total) * 100));
-  return (
-    <div className="flex items-center gap-3 flex-1">
-      <div className="flex-1 h-3 rounded-full bg-gray-100 overflow-hidden">
-        <div
-          className="h-full rounded-full transition-all duration-1000 ease-linear"
-          style={{
-            width: `${pct}%`,
-            background: pct > 50 ? 'hsl(145 65% 42%)' : pct > 20 ? 'hsl(42 95% 55%)' : 'hsl(0 72% 51%)',
-          }}
-        />
-      </div>
-      <span className="text-sm font-bold text-gray-500 tabular-nums whitespace-nowrap">
-        {m}:{pad2(s)}
-      </span>
-    </div>
-  );
-}
+import { LessonXPBar } from "@/components/lesson/LessonXPBar";
+import { LessonTimer } from "@/components/lesson/LessonTimer";
+import { LessonStatStrip } from "@/components/lesson/LessonStatStrip";
+import { LessonSupportPanel } from "@/components/lesson/LessonSupportPanel";
+import { LessonCompleteCard } from "@/components/lesson/LessonCompleteCard";
 
 function Dots({ count }: { count: number }) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-4">
+    <div className="rounded-2xl border border-gray-200 bg-card p-4">
       <div className="flex flex-wrap gap-2 justify-center">
         {Array.from({ length: count }).map((_, i) => (
           <span
@@ -52,6 +31,7 @@ export function PracticeRunner({
   minutes = 8,
   getTask,
   onComplete,
+  lessonTitle,
 }: {
   minutes?: number;
   getTask: (ctx?: {
@@ -61,12 +41,16 @@ export function PracticeRunner({
     difficulty: Difficulty;
   }) => PracticeTask;
   onComplete: () => void;
+  lessonTitle?: string;
 }) {
   const totalSeconds = minutes * 60;
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
   const completedRef = useRef(false);
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
+
+  const [questionsAnswered, setQuestionsAnswered] = useState(0);
+  const [correctAnswers, setCorrectAnswers] = useState(0);
 
   const [startTime] = useState<number>(() => {
     if (typeof window === "undefined") return Date.now();
@@ -99,6 +83,12 @@ export function PracticeRunner({
   const [order, setOrder] = useState<number[]>([]);
   const [hasPlayed, setHasPlayed] = useState(false);
   const [taskNonce, setTaskNonce] = useState(0);
+  const finished = secondsLeft <= 0;
+
+  const accuracy =
+    questionsAnswered > 0
+      ? Math.round((correctAnswers / questionsAnswered) * 100)
+      : 0;
 
   useEffect(() => {
     const t = setInterval(() => setSecondsLeft((s) => s - 1), 1000);
@@ -146,11 +136,14 @@ export function PracticeRunner({
 
   const markWrong = useCallback(() => {
     setStatus("wrong");
+    setQuestionsAnswered((v) => v + 1);
     setTimeout(() => setStatus("idle"), 1200);
   }, []);
 
   const markCorrect = useCallback(() => {
     setStatus("correct");
+    setQuestionsAnswered((v) => v + 1);
+    setCorrectAnswers((v) => v + 1);
     setTimeout(() => nextTask(), 600);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -176,159 +169,209 @@ export function PracticeRunner({
     }
   }
 
-  // Inline renderers for simple built-in kinds (mcq, count, order3, audioPick, numberHunt, groupCountVisual)
-  // These are lightweight and don't warrant separate components
   const isBuiltinKind = ["mcq", "count", "order3", "audioPick", "numberHunt", "groupCountVisual"].includes(task.kind);
 
+  // Derive task description from task prompt
+  const taskDescription =
+    "prompt" in task && (task as any).prompt
+      ? (task as any).prompt
+      : "Complete the activity";
+
+  const hint =
+    "helper" in task && (task as any).helper
+      ? (task as any).helper
+      : null;
+
+  // ── Finished state ──
+  if (finished) {
+    return (
+      <LessonCompleteCard
+        lessonTitle={lessonTitle ?? "Practice Session"}
+        questionsAnswered={questionsAnswered}
+        correctAnswers={correctAnswers}
+        accuracy={accuracy}
+        onExit={onComplete}
+      />
+    );
+  }
+
+  // ── Active state ──
+  const statusBorder =
+    status === "correct"
+      ? "border-emerald-300 shadow-emerald-100/50"
+      : status === "wrong"
+      ? "border-red-300 shadow-red-100/50"
+      : "border-border/50";
+
   return (
-    <div className={[
-      "rounded-3xl border bg-white shadow-sm p-6 transition-all",
-      status === "correct" ? "border-emerald-200 animate-correct" : status === "wrong" ? "border-red-200 animate-wrong" : "border-gray-100",
-    ].join(" ")}>
-      <div className="flex items-center justify-between gap-4 mb-5">
-        <Countdown seconds={Math.max(0, secondsLeft)} total={totalSeconds} />
-        <div
-          className={[
-            "px-3 py-1.5 rounded-full text-xs font-extrabold tracking-wide transition-all",
-            status === "correct"
-              ? "bg-emerald-50 text-emerald-700"
-              : status === "wrong"
-              ? "bg-red-50 text-red-700"
-              : "bg-gray-50 text-gray-400",
-          ].join(" ")}
-        >
-          {status === "correct" ? "✓ Correct!" : status === "wrong" ? "✗ Try again" : "Practice"}
+    <div className="space-y-4">
+      {/* ── Summary strip: XP + Timer ── */}
+      <div className="rounded-2xl border border-border/50 bg-card p-4 shadow-sm space-y-3">
+        <div className="flex items-center gap-3">
+          <div className="flex-1">
+            <LessonXPBar correct={correctAnswers} totalTarget={Math.max(5, questionsAnswered + 2)} />
+          </div>
+          <LessonTimer seconds={Math.max(0, secondsLeft)} total={totalSeconds} />
         </div>
+
+        <LessonStatStrip
+          questionsAnswered={questionsAnswered}
+          correctAnswers={correctAnswers}
+          accuracy={accuracy}
+        />
       </div>
 
-      {isBuiltinKind && (
-        <div className="flex items-center gap-2 mb-5">
-          <div className="text-2xl font-extrabold text-gray-900 leading-tight">
-            {"prompt" in task ? (task as any).prompt : ""}
-          </div>
-          {"prompt" in task && (task as any).prompt && (
+      {/* ── Status feedback pill ── */}
+      {status !== "idle" && (
+        <div
+          className={`rounded-2xl px-4 py-3 text-center font-extrabold text-sm transition-all ${
+            status === "correct"
+              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+              : "bg-red-50 text-red-700 border border-red-200"
+          }`}
+        >
+          {status === "correct" ? "✓ Correct! +10 XP" : "✗ Not quite — keep going!"}
+        </div>
+      )}
+
+      {/* ── Support panel ── */}
+      <LessonSupportPanel taskDescription={taskDescription} hint={hint} />
+
+      {/* ── Main task card ── */}
+      <div
+        className={`rounded-3xl border-2 bg-card shadow-lg p-5 transition-all duration-300 ${statusBorder}`}
+      >
+        {/* Activity type label */}
+        <div className="mb-4">
+          <span className="inline-block rounded-full bg-gray-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-gray-500">
+            {task.kind.replace(/([A-Z])/g, " $1").toUpperCase()}
+          </span>
+        </div>
+
+        {/* Prompt with read-aloud for builtin kinds */}
+        {isBuiltinKind && "prompt" in task && (task as any).prompt && (
+          <div className="flex items-center gap-2 mb-5">
+            <div className="text-2xl font-extrabold text-foreground leading-tight">
+              {(task as any).prompt}
+            </div>
             <ReadAloudBtn text={(task as any).prompt} />
-          )}
-        </div>
-      )}
+          </div>
+        )}
 
-      {task.kind === "mcq" && (
-        <div className="grid gap-3">
-          {(task as any).options.map((opt: string, idx: number) => (
-            <button
-              key={`${opt}-${idx}`}
-              onClick={() => opt === (task as any).answer ? markCorrect() : markWrong()}
-              className="w-full text-left px-5 py-4 rounded-2xl border border-gray-200 hover:bg-gray-50 transition text-xl font-bold"
-            >
-              {opt}
-            </button>
-          ))}
-        </div>
-      )}
+        {/* ── Builtin task renderers ── */}
+        {task.kind === "mcq" && (
+          <div className="grid gap-3">
+            {(task as any).options.map((opt: string, idx: number) => (
+              <button
+                key={`${opt}-${idx}`}
+                onClick={() => opt === (task as any).answer ? markCorrect() : markWrong()}
+                className="w-full text-left px-5 py-4 rounded-2xl border border-border bg-card hover:bg-muted transition text-xl font-bold"
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+        )}
 
-      {task.kind === "groupCountVisual" && (() => {
-        const t = task as any;
-        return (
-          <div className="grid gap-4">
-            <div className="rounded-2xl border border-gray-200 bg-white p-4">
+        {task.kind === "groupCountVisual" && (() => {
+          const t = task as any;
+          return (
+            <div className="grid gap-4">
+              <div className="rounded-2xl border border-border bg-card p-4">
+                <div className="grid gap-3">
+                  {Array.from({ length: t.groups }).map((_: unknown, gi: number) => (
+                    <div key={gi} className="flex items-center gap-2">
+                      {Array.from({ length: t.perGroup }).map((__: unknown, di: number) => (
+                        <span key={di} className="inline-block h-5 w-5 rounded-full bg-teal-600" />
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
               <div className="grid gap-3">
-                {Array.from({ length: t.groups }).map((_: unknown, gi: number) => (
-                  <div key={gi} className="flex items-center gap-2">
-                    {Array.from({ length: t.perGroup }).map((__: unknown, di: number) => (
-                      <span key={di} className="inline-block h-5 w-5 rounded-full bg-teal-600" />
-                    ))}
-                  </div>
+                {t.options.map((opt: string, idx: number) => (
+                  <button key={`${opt}-${idx}`} onClick={() => opt === t.answer ? markCorrect() : markWrong()} className="w-full text-left px-5 py-4 rounded-2xl border border-border bg-card hover:bg-muted transition text-xl font-bold">
+                    {opt}
+                  </button>
                 ))}
               </div>
             </div>
-            <div className="grid gap-3">
-              {t.options.map((opt: string, idx: number) => (
-                <button key={`${opt}-${idx}`} onClick={() => opt === t.answer ? markCorrect() : markWrong()} className="w-full text-left px-5 py-4 rounded-2xl border border-gray-200 hover:bg-gray-50 transition text-xl font-bold">
-                  {opt}
-                </button>
-              ))}
-            </div>
-          </div>
-        );
-      })()}
+          );
+        })()}
 
-      {task.kind === "count" && (
-        <div className="grid gap-4">
-          <Dots count={(task as any).count} />
-          <div className="flex items-center gap-3">
-            <input value={typed} onChange={(e) => setTyped(e.target.value.replace(/[^\d]/g, ""))} inputMode="numeric" placeholder="Type your answer" className="flex-1 px-4 py-3 rounded-2xl border border-gray-200 text-xl font-bold" />
-            <button onClick={check} className="px-5 py-3 rounded-2xl bg-teal-600 text-white font-extrabold text-xl hover:bg-teal-700 transition">Check</button>
-          </div>
-        </div>
-      )}
-
-      {task.kind === "order3" && (() => {
-        const t = task as any;
-        return (
+        {task.kind === "count" && (
           <div className="grid gap-4">
-            <div className="flex gap-3 flex-wrap">
-              {t.numbers.map((n: number) => {
-                const used = order.includes(n);
-                return (
-                  <button key={n} onClick={() => !used && setOrder((prev) => [...prev, n])} className={["px-6 py-4 rounded-2xl border text-xl font-extrabold transition", used ? "border-gray-200 bg-gray-100 text-gray-400" : "border-gray-200 bg-white hover:bg-gray-50"].join(" ")}>{n}</button>
-                );
-              })}
-            </div>
-            <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
-              <div className="text-sm font-bold text-gray-600 mb-2">Your order</div>
-              <div className="text-2xl font-extrabold text-gray-900">{order.length ? order.join(" , ") : "—"}</div>
-            </div>
+            <Dots count={(task as any).count} />
             <div className="flex items-center gap-3">
-              <button onClick={() => setOrder([])} className="px-5 py-3 rounded-2xl bg-gray-100 text-gray-800 font-extrabold text-xl hover:bg-gray-200 transition">Reset</button>
-              <button onClick={check} className="flex-1 px-5 py-3 rounded-2xl bg-teal-600 text-white font-extrabold text-xl hover:bg-teal-700 transition">Check</button>
+              <input value={typed} onChange={(e) => setTyped(e.target.value.replace(/[^\d]/g, ""))} inputMode="numeric" placeholder="Type your answer" className="flex-1 px-4 py-3 rounded-2xl border border-border text-xl font-bold bg-card" />
+              <button onClick={check} className="px-5 py-3 rounded-2xl bg-teal-600 text-white font-extrabold text-xl hover:bg-teal-700 transition">Check</button>
             </div>
           </div>
-        );
-      })()}
+        )}
 
-      {task.kind === "audioPick" && (() => {
-        const t = task as any;
-        return (
-          <div className="grid gap-4">
-            <div className="flex items-center justify-between gap-3">
-              <button type="button" onClick={() => { speak(t.speechText ?? String(t.targetNumber)); setHasPlayed(true); }} className="px-5 py-3 rounded-2xl bg-teal-600 text-white font-extrabold text-xl hover:bg-teal-700 transition">🔊 Listen</button>
-              <div className="text-sm font-bold text-gray-600">{hasPlayed ? "Now tap the number." : "Tap Listen first."}</div>
+        {task.kind === "order3" && (() => {
+          const t = task as any;
+          return (
+            <div className="grid gap-4">
+              <div className="flex gap-3 flex-wrap">
+                {t.numbers.map((n: number) => {
+                  const used = order.includes(n);
+                  return (
+                    <button key={n} onClick={() => !used && setOrder((prev) => [...prev, n])} className={["px-6 py-4 rounded-2xl border text-xl font-extrabold transition", used ? "border-border bg-muted text-muted-foreground" : "border-border bg-card hover:bg-muted"].join(" ")}>{n}</button>
+                  );
+                })}
+              </div>
+              <div className="rounded-2xl border border-border bg-muted p-4">
+                <div className="text-sm font-bold text-muted-foreground mb-2">Your order</div>
+                <div className="text-2xl font-extrabold text-foreground">{order.length ? order.join(" , ") : "—"}</div>
+              </div>
+              <div className="flex items-center gap-3">
+                <button onClick={() => setOrder([])} className="px-5 py-3 rounded-2xl bg-muted text-foreground font-extrabold text-xl hover:bg-muted/80 transition">Reset</button>
+                <button onClick={check} className="flex-1 px-5 py-3 rounded-2xl bg-teal-600 text-white font-extrabold text-xl hover:bg-teal-700 transition">Check</button>
+              </div>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {t.cards.map((n: number) => (
-                <button key={n} type="button" onClick={() => { if (!hasPlayed) return; n === t.targetNumber ? markCorrect() : markWrong(); }} className="px-4 py-6 rounded-2xl border border-gray-200 bg-white hover:bg-gray-50 transition text-3xl font-extrabold">{n}</button>
-              ))}
-            </div>
-            {!hasPlayed && <div className="text-sm text-gray-500">Tip: On iPads, audio will only play after a button tap (that&apos;s normal).</div>}
-          </div>
-        );
-      })()}
+          );
+        })()}
 
-      {task.kind === "numberHunt" && (() => {
-        const t = task as any;
-        return (
-          <div className="grid gap-4">
-            <div className="flex items-center justify-between gap-3">
-              <div className="text-sm text-gray-500">Tap the correct number tile.</div>
-              <button type="button" onClick={() => speak(String(t.targetNumber))} className="px-3 py-2 rounded-xl bg-teal-600 text-white font-bold hover:bg-teal-700 transition">🔊 Hear number</button>
+        {task.kind === "audioPick" && (() => {
+          const t = task as any;
+          return (
+            <div className="grid gap-4">
+              <div className="flex items-center justify-between gap-3">
+                <button type="button" onClick={() => { speak(t.speechText ?? String(t.targetNumber)); setHasPlayed(true); }} className="px-5 py-3 rounded-2xl bg-teal-600 text-white font-extrabold text-xl hover:bg-teal-700 transition">🔊 Listen</button>
+                <div className="text-sm font-bold text-muted-foreground">{hasPlayed ? "Now tap the number." : "Tap Listen first."}</div>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {t.cards.map((n: number) => (
+                  <button key={n} type="button" onClick={() => { if (!hasPlayed) return; n === t.targetNumber ? markCorrect() : markWrong(); }} className="px-4 py-6 rounded-2xl border border-border bg-card hover:bg-muted transition text-3xl font-extrabold">{n}</button>
+                ))}
+              </div>
+              {!hasPlayed && <div className="text-sm text-muted-foreground">Tip: On iPads, audio will only play after a button tap (that&apos;s normal).</div>}
             </div>
-            <div className="grid grid-cols-5 sm:grid-cols-6 gap-2">
-              {t.tiles.map((n: number) => (
-                <button key={n} type="button" onClick={() => n === t.targetNumber ? markCorrect() : markWrong()} className="rounded-2xl border border-gray-200 bg-white hover:bg-gray-50 transition text-lg sm:text-xl font-extrabold py-4 sm:py-5">{n}</button>
-              ))}
+          );
+        })()}
+
+        {task.kind === "numberHunt" && (() => {
+          const t = task as any;
+          return (
+            <div className="grid gap-4">
+              <div className="flex items-center justify-between gap-3">
+                <div className="text-sm text-muted-foreground">Tap the correct number tile.</div>
+                <button type="button" onClick={() => speak(String(t.targetNumber))} className="px-3 py-2 rounded-xl bg-teal-600 text-white font-bold hover:bg-teal-700 transition">🔊 Hear number</button>
+              </div>
+              <div className="grid grid-cols-5 sm:grid-cols-6 gap-2">
+                {t.tiles.map((n: number) => (
+                  <button key={n} type="button" onClick={() => n === t.targetNumber ? markCorrect() : markWrong()} className="rounded-2xl border border-border bg-card hover:bg-muted transition text-lg sm:text-xl font-extrabold py-4 sm:py-5">{n}</button>
+                ))}
+              </div>
             </div>
-          </div>
-        );
-      })()}
+          );
+        })()}
 
-      {/* Delegate to TaskRenderer for all complex component-based task kinds */}
-      {!isBuiltinKind && (
-        <TaskRenderer task={task} taskNonce={taskNonce} callbacks={callbacks} />
-      )}
-
-      <div className="mt-6 flex items-center justify-between">
-        <button onClick={nextTask} className="px-4 py-2 rounded-xl bg-gray-100 text-gray-800 font-bold hover:bg-gray-200 transition" type="button">New task</button>
-        <button onClick={onComplete} className="px-4 py-2 rounded-xl bg-amber-100 text-amber-900 font-bold hover:bg-amber-200 transition" type="button">Finish (dev)</button>
+        {/* Delegate to TaskRenderer for complex component-based task kinds */}
+        {!isBuiltinKind && (
+          <TaskRenderer task={task} taskNonce={taskNonce} callbacks={callbacks} />
+        )}
       </div>
     </div>
   );
