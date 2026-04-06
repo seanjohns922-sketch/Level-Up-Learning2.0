@@ -171,11 +171,6 @@ export function PracticeRunner({
 
   const isBuiltinKind = ["mcq", "count", "order3", "audioPick", "numberHunt", "groupCountVisual"].includes(task.kind);
 
-  // Keep the support panel lesson-level, not question-level.
-  const taskDescription = lessonTitle
-    ? `Complete the ${lessonTitle.toLowerCase()} activity.`
-    : "Complete the activity carefully.";
-
   const hint =
     "helper" in task && (task as any).helper
       ? (task as any).helper
@@ -202,8 +197,32 @@ export function PracticeRunner({
       ? "border-red-300 shadow-red-100/50"
       : "border-border/50";
 
+  const feedbackOverlay =
+    status === "correct"
+      ? "bg-emerald-400/12"
+      : status === "wrong"
+      ? "bg-red-400/12"
+      : "bg-transparent";
+
+  const statusMotion = status === "wrong" ? "animate-[shake_0.35s_ease-in-out]" : "";
+
   return (
-    <div className="space-y-3">
+    <div className="relative space-y-3">
+      <style jsx>{`
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          20% { transform: translateX(-4px); }
+          40% { transform: translateX(4px); }
+          60% { transform: translateX(-3px); }
+          80% { transform: translateX(3px); }
+        }
+      `}</style>
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none fixed inset-0 z-40 transition-all duration-500 ${feedbackOverlay} ${
+          status === "correct" ? "animate-pulse" : ""
+        }`}
+      />
       {/* ── Summary strip: XP + Timer ── */}
       <div className="rounded-3xl border border-border/50 bg-card p-4 shadow-md space-y-3">
         <div className="flex items-center gap-3">
@@ -234,12 +253,12 @@ export function PracticeRunner({
       )}
 
       {/* ── Support panel ── */}
-      <LessonSupportPanel taskDescription={taskDescription} hint={hint} />
+      <LessonSupportPanel hint={hint} />
 
       {/* ── Main task card ── */}
-      <div
-        className={`rounded-[1.75rem] border-2 bg-card p-5 shadow-lg transition-all duration-300 ${statusBorder}`}
-      >
+        <div
+          className={`rounded-[1.75rem] border-2 bg-card p-5 shadow-lg transition-all duration-300 ${statusBorder} ${statusMotion}`}
+        >
         {/* Activity type label */}
         <div className="mb-3">
           <span className="inline-block rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-700">
