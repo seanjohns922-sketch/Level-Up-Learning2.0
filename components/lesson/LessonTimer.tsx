@@ -34,10 +34,10 @@ export function LessonTimer({
 
   return (
     <div
-      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 transition-colors duration-500 ${pillBg}`}
+      className={`inline-flex min-w-[110px] items-center justify-center gap-2 rounded-2xl border px-3 py-2.5 transition-colors duration-500 ${pillBg} shadow-sm`}
     >
-      <Timer className={`h-3.5 w-3.5 ${color}`} />
-      <span className={`text-sm font-extrabold tabular-nums ${color}`}>
+      <Timer className={`h-4 w-4 ${color}`} />
+      <span className={`text-base font-extrabold tabular-nums ${color}`}>
         {minutes}:{pad2(remaining)}
       </span>
     </div>

@@ -21,6 +21,7 @@ import { getProgramForYear } from "@/data/programs";
 import { readProgress, updateProgress } from "@/data/progress";
 import { markLessonComplete } from "@/lib/program-progress";
 import { getLessonChrome } from "@/lib/levelTheme";
+import { LessonPageHero } from "@/components/lesson/LessonPageHero";
 
 export default function LessonPageWrapper() {
   return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><LessonPage /></Suspense>;
@@ -104,17 +105,15 @@ function LessonPage() {
 
         {!started ? (
           <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
-            <div className={`${lessonChrome.heroClass} text-white px-5 py-6`}>
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1 text-sm font-semibold mb-3">
-                Level {yearNumber} • Week {week} • Lesson {lessonNumber}
-              </div>
-              <h1 className="text-3xl md:text-4xl font-extrabold font-display mb-2">
-                {safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
-              </h1>
-              <p className="text-white/80 text-sm">
-                {safeLessonFocus ?? "Watch the video and complete activities"}
-              </p>
-            </div>
+            <LessonPageHero
+              levelNumber={yearNumber}
+              week={week}
+              lessonNumber={lessonNumber}
+              pageTitle={`Lesson ${lessonNumber} Practise`}
+              lessonTitle={safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
+              focus={safeLessonFocus ?? "Watch the video and complete activities"}
+              heroClass={lessonChrome.heroClass}
+            />
 
             <div className="bg-background px-6 py-8">
               <div className="bg-card rounded-3xl border border-border shadow-sm p-6 mb-8">
@@ -157,20 +156,15 @@ function LessonPage() {
           </div>
         ) : year === "Year 1" ? (
           <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
-            <div className={`${lessonChrome.heroClass} text-white px-6 py-8`}>
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1 text-sm font-semibold mb-3">
-                Level {yearNumber} • Week {week} • Lesson {lessonNumber}
-              </div>
-              <h1 className="text-2xl md:text-3xl font-extrabold font-display">
-                Lesson {lessonNumber} Practise
-              </h1>
-              {safeLessonTitle && (
-                <p className="text-white/80 text-sm mt-1">{safeLessonTitle}</p>
-              )}
-              {safeLessonFocus && (
-                <p className="text-white/60 text-xs mt-1">Focus: {safeLessonFocus}</p>
-              )}
-            </div>
+            <LessonPageHero
+              levelNumber={yearNumber}
+              week={week}
+              lessonNumber={lessonNumber}
+              pageTitle={`Lesson ${lessonNumber} Practise`}
+              lessonTitle={safeLessonTitle}
+              focus={safeLessonFocus}
+              heroClass={lessonChrome.heroClass}
+            />
             <div className="bg-background px-6 py-8">
             <PracticeRunner
               key={`${year}-${week}-${lessonId}`}
@@ -222,20 +216,15 @@ function LessonPage() {
           </div>
         ) : (
           <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
-            <div className={`${lessonChrome.heroClass} text-white px-6 py-8`}>
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1 text-sm font-semibold mb-3">
-                Level {yearNumber} • Week {week} • Lesson {lessonNumber}
-              </div>
-              <h1 className="text-3xl md:text-4xl font-extrabold font-display">
-                Lesson {lessonNumber} Practise
-              </h1>
-              {safeLessonTitle && (
-                <p className="text-white/80 text-sm mt-1">{safeLessonTitle}</p>
-              )}
-              {safeLessonFocus && (
-                <p className="text-white/60 text-xs mt-1">Focus: {safeLessonFocus}</p>
-              )}
-            </div>
+            <LessonPageHero
+              levelNumber={yearNumber}
+              week={week}
+              lessonNumber={lessonNumber}
+              pageTitle={`Lesson ${lessonNumber} Practise`}
+              lessonTitle={safeLessonTitle}
+              focus={safeLessonFocus}
+              heroClass={lessonChrome.heroClass}
+            />
 
             <div className="bg-background px-4 py-5">
               {lessonMeta?.activities?.length ? (

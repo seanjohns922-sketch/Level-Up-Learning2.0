@@ -41,6 +41,10 @@ export function LessonCompleteCard({
           <div className="text-4xl font-black text-violet-700">{xp} XP</div>
         </div>
 
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-center text-sm font-extrabold text-emerald-700 shadow-sm">
+          Nice work! Your lesson progress has been updated.
+        </div>
+
         {/* Stats grid */}
         <div className="grid grid-cols-3 gap-3">
           {[

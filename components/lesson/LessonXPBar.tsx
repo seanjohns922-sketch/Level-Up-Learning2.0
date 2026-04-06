@@ -1,5 +1,7 @@
 "use client";
 
+import { Zap } from "lucide-react";
+
 const XP_PER_CORRECT = 10;
 
 export function calcXP(correct: number) {
@@ -18,19 +20,32 @@ export function LessonXPBar({
   const pct = max > 0 ? Math.min(100, (earned / max) * 100) : 0;
 
   return (
-    <div className="flex items-center gap-3">
-      <div className="flex-1 h-3.5 rounded-full bg-gray-100 overflow-hidden shadow-inner">
-        <div
-          className="h-full rounded-full transition-all duration-700 ease-out"
-          style={{
-            width: `${pct}%`,
-            background: "linear-gradient(90deg, hsl(265 70% 58%), hsl(280 75% 62%), hsl(310 70% 60%))",
-          }}
-        />
+    <div className="rounded-2xl border border-emerald-100 bg-gradient-to-r from-emerald-50 via-teal-50 to-white p-3 shadow-sm">
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-yellow-500 text-white shadow-sm">
+          <Zap className="h-5 w-5" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <span className="text-sm font-black uppercase tracking-wide text-emerald-900">
+              {earned} / {max} XP
+            </span>
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-700/80">
+              Lesson progress
+            </span>
+          </div>
+          <div className="h-3.5 overflow-hidden rounded-full bg-emerald-100/80 shadow-inner">
+            <div
+              className="h-full rounded-full transition-all duration-700 ease-out"
+              style={{
+                width: `${pct}%`,
+                background:
+                  "linear-gradient(90deg, hsl(44 96% 58%), hsl(49 95% 64%), hsl(142 66% 48%))",
+              }}
+            />
+          </div>
+        </div>
       </div>
-      <span className="text-sm font-extrabold text-gray-600 tabular-nums whitespace-nowrap">
-        {earned} / {max} XP
-      </span>
     </div>
   );
 }
