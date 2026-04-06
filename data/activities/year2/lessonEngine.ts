@@ -438,7 +438,7 @@ export type OddEvenSortQuestion = {
     odd: number[];
     even: number[];
   };
-  mode: "identify" | "pattern" | "odd_even_sums";
+  mode: "identify" | "pattern" | "odd_even_sums" | "odd_even_products";
   patternOptions?: string[];
   patternAnswer?: string;
 };
@@ -740,7 +740,7 @@ const BASE_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
     requiresVisual: true,
   },
   odd_even_sort: {
-    allowedModes: ["identify", "pattern", "odd_even_sums"],
+    allowedModes: ["identify", "pattern", "odd_even_sums", "odd_even_products"],
     blockedFocusKeywords: ["addition", "subtraction", "division"],
   },
   addition_strategy: {
@@ -3628,7 +3628,9 @@ function generateInteractiveQuestion(
     const max = typeof config.max === "number" ? config.max : Math.min(80, profile.addSubMax);
     const count = typeof config.count === "number" ? config.count : 6;
     const mode =
-      config.mode === "pattern" || config.mode === "odd_even_sums"
+      config.mode === "pattern" ||
+      config.mode === "odd_even_sums" ||
+      config.mode === "odd_even_products"
         ? config.mode
         : "identify";
     const labels: string[] = [];
@@ -3640,6 +3642,16 @@ function generateInteractiveQuestion(
         const a = randInt(1, Math.max(9, Math.floor(max / 2)));
         const b = randInt(1, Math.max(9, Math.floor(max / 2)));
         expressions.set(`${a} + ${b}`, a + b);
+      }
+      const paired = shuffle(Array.from(expressions.entries()));
+      labels.push(...paired.map(([expression]) => expression));
+      numbers = paired.map(([, value]) => value);
+    } else if (mode === "odd_even_products") {
+      const expressions = new Map<string, number>();
+      while (expressions.size < count) {
+        const a = randInt(1, Math.max(3, Math.min(12, max)));
+        const b = randInt(1, Math.max(3, Math.min(12, max)));
+        expressions.set(`${a} × ${b}`, a * b);
       }
       const paired = shuffle(Array.from(expressions.entries()));
       labels.push(...paired.map(([expression]) => expression));
@@ -3668,6 +3680,20 @@ function generateInteractiveQuestion(
             "Odd numbers always end in 0 or 5.",
             "Even numbers cannot be next to each other.",
           ])
+        : mode === "odd_even_sums"
+        ? shuffle([
+            "Even + even = even, odd + odd = even, and odd + even = odd.",
+            "Odd + odd is always odd.",
+            "Even + odd is always even.",
+            "Adding any two odd numbers gives an odd answer.",
+          ])
+        : mode === "odd_even_products"
+        ? shuffle([
+            "Even × any number = even, and odd × odd = odd.",
+            "Odd × odd is always even.",
+            "Even × odd is always odd.",
+            "A product is odd whenever one factor is even.",
+          ])
         : undefined;
 
     return {
@@ -3677,6 +3703,8 @@ function generateInteractiveQuestion(
           ? "Sort the numbers into odd and even, then choose the pattern you notice."
           : mode === "odd_even_sums"
           ? "Work out each sum, then sort the results into odd and even."
+          : mode === "odd_even_products"
+          ? "Work out each product, then sort the results into odd and even."
           : "Sort the numbers into odd and even.",
       numbers,
       labels,
@@ -3689,6 +3717,10 @@ function generateInteractiveQuestion(
       patternAnswer:
         mode === "pattern"
           ? "Odd and even numbers alternate one after the other."
+          : mode === "odd_even_sums"
+          ? "Even + even = even, odd + odd = even, and odd + even = odd."
+          : mode === "odd_even_products"
+          ? "Even × any number = even, and odd × odd = odd."
           : undefined,
     };
   }
@@ -3821,7 +3853,7 @@ function randomReviewConfig(
         min: 0,
         max: 40,
         count: 6,
-        mode: (["identify", "pattern", "odd_even_sums"] as const)[randInt(0, 2)],
+        mode: (["identify", "pattern", "odd_even_sums", "odd_even_products"] as const)[randInt(0, 3)],
       };
     case "mixed_word_problem":
       return {
@@ -4366,6 +4398,74 @@ function generateGenericQuestion(
   }
 
   if (sourceActivityType === "odd_even_sort") {
+    if (config.mode === "sum_rule") {
+      const variants = [
+        {
+          prompt: "True or false: odd + odd is odd.",
+          answer: "false",
+          options: ["true", "false"],
+        },
+        {
+          prompt: "Which sum will be even?",
+          answer: "7 + 5",
+          options: ["7 + 5", "7 + 4", "8 + 5", "9 + 2"],
+        },
+        {
+          prompt: "Is 7 + 5 odd or even?",
+          answer: "even",
+          options: ["odd", "even"],
+        },
+      ];
+      const selected = variants[randInt(0, variants.length - 1)] ?? variants[0];
+      return asMultipleChoice
+        ? {
+            kind: "multiple_choice",
+            prompt: selected.prompt,
+            options: selected.options,
+            answer: selected.answer,
+          }
+        : {
+            kind: "typed_response",
+            prompt: selected.prompt.replace("True or false", "Type true or false"),
+            answer: selected.answer,
+            placeholder: selected.answer === "even" || selected.answer === "odd" ? "odd or even" : "true or false",
+          };
+    }
+
+    if (config.mode === "product_rule") {
+      const variants = [
+        {
+          prompt: "True or false: odd × odd is odd.",
+          answer: "true",
+          options: ["true", "false"],
+        },
+        {
+          prompt: "Which product will be odd?",
+          answer: "3 × 5",
+          options: ["6 × 3", "8 × 7", "3 × 5", "4 × 9"],
+        },
+        {
+          prompt: "Is 8 × 7 odd or even?",
+          answer: "even",
+          options: ["odd", "even"],
+        },
+      ];
+      const selected = variants[randInt(0, variants.length - 1)] ?? variants[0];
+      return asMultipleChoice
+        ? {
+            kind: "multiple_choice",
+            prompt: selected.prompt,
+            options: selected.options,
+            answer: selected.answer,
+          }
+        : {
+            kind: "typed_response",
+            prompt: selected.prompt.replace("True or false", "Type true or false"),
+            answer: selected.answer,
+            placeholder: selected.answer === "even" || selected.answer === "odd" ? "odd or even" : "true or false",
+          };
+    }
+
     const value = randInt(min, Math.max(min + 10, max));
     const answer = value % 2 === 0 ? "even" : "odd";
     return asMultipleChoice

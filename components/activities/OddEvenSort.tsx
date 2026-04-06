@@ -42,7 +42,7 @@ export default function OddEvenSort({
 
   useEffect(() => {
     if (!allPlaced) return;
-    if (questionData.mode === "pattern" && !pickedPattern) return;
+    if (questionData.patternOptions && !pickedPattern) return;
     if (submittedRef.current) return;
 
     const placedCorrectly = questionData.numbers.every((value, index) => {
@@ -50,7 +50,7 @@ export default function OddEvenSort({
       return placements[`${value}-${index}`] === expected;
     });
     const patternCorrect =
-      questionData.mode !== "pattern" || pickedPattern === questionData.patternAnswer;
+      !questionData.patternOptions || pickedPattern === questionData.patternAnswer;
 
     submittedRef.current = true;
     setSubmitted(true);
@@ -148,10 +148,12 @@ export default function OddEvenSort({
         ))}
       </div>
 
-      {questionData.mode === "pattern" && questionData.patternOptions ? (
+      {questionData.patternOptions ? (
         <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">
           <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
-            What pattern do you notice?
+            {questionData.mode === "odd_even_sums" || questionData.mode === "odd_even_products"
+              ? "Choose the rule that matches"
+              : "What pattern do you notice?"}
           </div>
           <div className="mt-3 grid gap-2">
             {questionData.patternOptions.map((option) => (

@@ -312,12 +312,22 @@ const year4Rows: ProgramRow[] = [
     curriculum: ["AC9M4N02"],
     activities: [
       makeActivity("odd_even_sort", 2, {
-        min: 0,
-        max: 1000,
-        mode: "classify",
+        min: 1000,
+        max: 999999,
+        count: 6,
+        mode: "identify",
+      }),
+      makeActivity("odd_even_sort", 1, {
+        min: 1000,
+        max: 999999,
+        count: 6,
+        mode: "pattern",
       }),
       makeActivity("multiple_choice", 1, {
-        mode: "odd_even_reasoning",
+        min: 1000,
+        max: 999999,
+        mode: "identify",
+        sourceActivityType: "odd_even_sort",
       }),
     ],
   },
@@ -329,13 +339,23 @@ const year4Rows: ProgramRow[] = [
     activity: "Investigate patterns in adding odd and even numbers",
     curriculum: ["AC9M4N02"],
     activities: [
-      makeActivity("addition_strategy", 2, {
-        min: 10,
-        max: 1000,
-        mode: "odd_even_patterns",
+      makeActivity("odd_even_sort", 2, {
+        min: 1,
+        max: 50,
+        count: 6,
+        mode: "odd_even_sums",
       }),
       makeActivity("multiple_choice", 1, {
-        mode: "odd_even_patterns",
+        min: 1,
+        max: 50,
+        mode: "sum_rule",
+        sourceActivityType: "odd_even_sort",
+      }),
+      makeActivity("typed_response", 1, {
+        min: 1,
+        max: 50,
+        mode: "sum_rule",
+        sourceActivityType: "odd_even_sort",
       }),
     ],
   },
@@ -347,11 +367,23 @@ const year4Rows: ProgramRow[] = [
     activity: "Explore multiplication of odd/even numbers and outcomes",
     curriculum: ["AC9M4N02"],
     activities: [
-      makeActivity("arrays", 2, {
-        mode: "odd_even_multiplication",
+      makeActivity("odd_even_sort", 2, {
+        min: 1,
+        max: 12,
+        count: 6,
+        mode: "odd_even_products",
       }),
       makeActivity("multiple_choice", 1, {
-        mode: "odd_even_multiplication",
+        min: 1,
+        max: 12,
+        mode: "product_rule",
+        sourceActivityType: "odd_even_sort",
+      }),
+      makeActivity("typed_response", 1, {
+        min: 1,
+        max: 12,
+        mode: "product_rule",
+        sourceActivityType: "odd_even_sort",
       }),
     ],
   },
