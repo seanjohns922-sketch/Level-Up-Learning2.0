@@ -14,11 +14,8 @@ function normalizeOrderingNumber(value: string) {
   return value.trim().replace(/,/g, "").replace(/\s+/g, "");
 }
 
-function splitOrderingAnswer(value: string) {
-  return value
-    .split(",")
-    .map((part) => normalizeOrderingNumber(part))
-    .filter(Boolean);
+function extractOrderingNumbers(value: string) {
+  return (value.match(/\d[\d,]*/g) ?? []).map(normalizeOrderingNumber).filter(Boolean);
 }
 
 function columnLabel(label: string) {
@@ -42,7 +39,7 @@ export default function TypedResponseActivity({
   const isGuidedAddition = writtenMethod?.operation === "+";
   const isGuidedSubtraction = writtenMethod?.operation === "-";
   const isGuidedWrittenMethod = isGuidedAddition || isGuidedSubtraction;
-  const orderingAnswerParts = !writtenMethod ? splitOrderingAnswer(questionData.answer) : [];
+  const orderingAnswerParts = !writtenMethod ? extractOrderingNumbers(questionData.answer) : [];
   const isOrderingResponse =
     !writtenMethod &&
     orderingAnswerParts.length >= 4 &&
