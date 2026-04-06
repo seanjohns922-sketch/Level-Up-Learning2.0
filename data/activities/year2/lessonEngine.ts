@@ -3684,7 +3684,7 @@ function generateInteractiveQuestion(
         ? shuffle([
             "Even + even = even, odd + odd = even, and odd + even = odd.",
             "Odd + odd is always odd.",
-            "Even + odd is always even.",
+            "Even + odd is always odd.",
             "Adding any two odd numbers gives an odd answer.",
           ])
         : mode === "odd_even_products"
