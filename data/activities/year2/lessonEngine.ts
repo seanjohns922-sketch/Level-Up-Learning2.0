@@ -4459,11 +4459,13 @@ function generateGenericQuestion(
             prompt: selected.prompt,
             options: selected.options,
             answer: selected.answer,
+            helper: "Even × any number = even. Odd × odd = odd. Odd × even = even.",
           }
         : {
             kind: "typed_response",
             prompt: selected.prompt.replace("True or false", "Type true or false"),
             answer: selected.answer,
+            helper: "Even × any number = even. Odd × odd = odd. Odd × even = even.",
             placeholder: selected.answer === "even" || selected.answer === "odd" ? "odd or even" : "true or false",
           };
     }

@@ -130,6 +130,17 @@ export default function OddEvenSort({
             <p>Even + odd = odd</p>
           </div>
         </div>
+      ) : questionData.mode === "odd_even_products" ? (
+        <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">
+          <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
+            Multiplication rules
+          </div>
+          <div className="mt-3 space-y-1 text-sm font-medium text-teal-900">
+            <p>Even × any number = even</p>
+            <p>Odd × odd = odd</p>
+            <p>Odd × even = even</p>
+          </div>
+        </div>
       ) : null}
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
