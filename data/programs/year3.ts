@@ -22,7 +22,7 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
   {
     id: "y3-w1",
     week: 1,
-    topic: "Numbers to 10,000 - Place Value",
+    topic: "Place Value, Partitioning & Comparing to 10,000",
     curriculum: ["ALL"],
     lessons: [
       {
@@ -125,7 +125,7 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
   {
     id: "y3-w2",
     week: 2,
-    topic: "Rounding, Ordering & Comparing",
+    topic: "Rounding & Reasoning",
     curriculum: ["ALL"],
     lessons: [
       {
@@ -439,7 +439,7 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
   {
     id: "y3-w5",
     week: 5,
-    topic: "Written Strategies",
+    topic: "Written Addition & Subtraction",
     curriculum: ["ALL"],
     lessons: [
       {
@@ -759,7 +759,7 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
   {
     id: "y3-w8",
     week: 8,
-    topic: "Multiplication Facts",
+    topic: "Multiplication & Division Facts",
     curriculum: ["ALL"],
     lessons: [
       {
@@ -858,7 +858,7 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
   {
     id: "y3-w9",
     week: 9,
-    topic: "Patterns & Skip Counting",
+    topic: "Skip Counting, Patterns & Estimation",
     curriculum: ["ALL"],
     lessons: [
       {
@@ -1067,7 +1067,7 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
   {
     id: "y3-w11",
     week: 11,
-    topic: "Fractions - Part 1",
+    topic: "Fractions Foundations",
     curriculum: ["ALL"],
     lessons: [
       {
@@ -1144,7 +1144,7 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
   {
     id: "y3-w12",
     week: 12,
-    topic: "Fractions - Part 2",
+    topic: "Fraction Reasoning",
     curriculum: ["ALL"],
     lessons: [
       {

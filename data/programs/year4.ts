@@ -12,6 +12,7 @@ function makeActivity(
 const year4Rows: ProgramRow[] = [
   {
     week: 1,
+    weekTopic: "Place Value with Larger Numbers",
     focus: "Read, build, and identify digit values in large numbers",
     lesson: 1,
     topic: "Place Value Using Larger Numbers",
@@ -90,6 +91,7 @@ const year4Rows: ProgramRow[] = [
   },
   {
     week: 2,
+    weekTopic: "Decimal Place Value",
     focus: "Decimal Place Value (Core)",
     lesson: 1,
     topic: "Tenths as Place Value",
@@ -138,6 +140,7 @@ const year4Rows: ProgramRow[] = [
   },
   {
     week: 3,
+    weekTopic: "Decimal Reasoning",
     focus: "Decimal Reasoning",
     lesson: 1,
     topic: "Comparing Decimals",
@@ -220,6 +223,7 @@ const year4Rows: ProgramRow[] = [
   },
   {
     week: 4,
+    weekTopic: "Comparing, Ordering & Number Lines",
     focus: "Comparing & Ordering Numbers",
     lesson: 1,
     topic: "Compare with < > =",
@@ -305,6 +309,7 @@ const year4Rows: ProgramRow[] = [
   },
   {
     week: 5,
+    weekTopic: "Odd & Even Numbers",
     focus: "Odd & Even Numbers",
     lesson: 1,
     topic: "Classifying Odd & Even",
@@ -383,6 +388,7 @@ const year4Rows: ProgramRow[] = [
   },
   {
     week: 6,
+    weekTopic: "Multiplying & Dividing by 10, 100, 1000",
     focus: "Multiplying & Dividing by 10, 100, 1000",
     lesson: 1,
     topic: "Multiplying by 10, 100 & 1000",
@@ -443,6 +449,7 @@ const year4Rows: ProgramRow[] = [
   },
   {
     week: 7,
+    weekTopic: "Multi-Digit Operations & Multiplication",
     focus: "Multi-Digit Operations & Multiplication Strategies",
     lesson: 1,
     topic: "Column Addition & Subtraction",
@@ -503,6 +510,7 @@ const year4Rows: ProgramRow[] = [
   },
   {
     week: 8,
+    weekTopic: "Problem Solving with Money & Multiplication",
     focus: "Problem Solving with Money & Multiplication",
     lesson: 1,
     topic: "Budgeting Problems",
@@ -558,6 +566,7 @@ const year4Rows: ProgramRow[] = [
   },
   {
     week: 9,
+    weekTopic: "Fractions & Decimals",
     focus: "Fractions & Decimals",
     lesson: 1,
     topic: "Fraction Walls",
@@ -613,6 +622,7 @@ const year4Rows: ProgramRow[] = [
   },
   {
     week: 10,
+    weekTopic: "Counting by Fractions & Mixed Numerals",
     focus: "Counting by Fractions & Mixed Numerals",
     lesson: 1,
     topic: "Skip Counting Fractions",
@@ -665,6 +675,7 @@ const year4Rows: ProgramRow[] = [
   },
   {
     week: 11,
+    weekTopic: "Problem Solving",
     focus: "Problem Solving (Core)",
     lesson: 1,
     topic: "Additive vs Multiplicative Problems",
@@ -720,6 +731,7 @@ const year4Rows: ProgramRow[] = [
   },
   {
     week: 12,
+    weekTopic: "Advanced Problem Solving",
     focus: "Problem Solving (Advanced)",
     lesson: 1,
     quizSafe: false,

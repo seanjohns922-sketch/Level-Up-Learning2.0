@@ -4,6 +4,7 @@ import type { ActivityType, LessonActivity } from "./types";
 export type ProgramRow = {
   week: number;
   focus: string;
+  weekTopic?: string;
   lesson: number;
   topic: string;
   quizSafe?: boolean;
@@ -29,7 +30,7 @@ export function buildProgram(
     .sort((a, b) => a[0] - b[0])
     .map(([week, weekRows]) => {
       const sortedRows = [...weekRows].sort((a, b) => a.lesson - b.lesson);
-      const topic = sortedRows[0]?.focus ?? `Week ${week}`;
+      const topic = sortedRows[0]?.weekTopic ?? sortedRows[0]?.focus ?? `Week ${week}`;
       const curriculum = Array.from(
         new Set(sortedRows.flatMap((row) => row.curriculum))
       );

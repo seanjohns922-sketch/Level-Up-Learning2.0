@@ -29,11 +29,16 @@ export default function WeekCard({ week, lessonsDone, topic, lessons, onContinue
         </span>
         <span className="text-xs text-gray-500 font-medium">{lessonsDone}/3 done</span>
       </div>
-      <div className="flex items-center gap-2">
-        <h2 className="text-xl font-black text-gray-800 leading-tight">
-          {topic ?? "Your current focus"}
-        </h2>
-        <ReadAloudBtn text={`Week ${week}. ${topic ?? "Your current focus"}. ${lessonsDone} of 3 lessons done. ${lessons.map(l => `Lesson ${l.lesson}: ${l.title}`).join(". ")}`} />
+      <div className="flex items-start gap-2">
+        <div>
+          <h2 className="text-xl font-black text-gray-800 leading-tight">
+            Week {week}
+          </h2>
+          <p className="mt-1 text-sm font-semibold text-teal-700">
+            Focus: {topic ?? "Your current focus"}
+          </p>
+        </div>
+        <ReadAloudBtn text={`Week ${week}. Focus: ${topic ?? "Your current focus"}. ${lessonsDone} of 3 lessons done. ${lessons.map(l => `Lesson ${l.lesson}: ${l.title}`).join(". ")}`} />
       </div>
 
       <div className="mt-3.5 grid gap-2">

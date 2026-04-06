@@ -86,6 +86,11 @@ function ProgramPage() {
     return base;
   }, [curriculumYear, weekNum]);
 
+  const currentWeekPlan = useMemo(() => {
+    const program = getProgramForYear(curriculumYear);
+    return program.find((w) => w.week === weekNum);
+  }, [curriculumYear, weekNum]);
+
   function openItem(item: (typeof items)[number]) {
     if (!canAccessThisWeek) return;
 
@@ -215,6 +220,9 @@ function ProgramPage() {
               Level {levelNum} – 12-Week Program
             </span>
             <h1 className="text-4xl md:text-5xl font-black text-white mt-3 tracking-tight">Week {weekNum}</h1>
+            <p className="text-base md:text-lg text-white/90 mt-2 font-semibold">
+              Focus: {currentWeekPlan?.topic ?? "Your current focus"}
+            </p>
             <p className="text-teal-100 mt-2 text-sm font-medium">
               {isClient
                 ? weekComplete

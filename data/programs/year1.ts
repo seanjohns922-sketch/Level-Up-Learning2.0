@@ -85,7 +85,7 @@ export const YEAR1_PROGRAM: WeekPlan[] = [
   {
     id: "y1-w2",
     week: 2,
-    topic: "Counting & Recognising Numbers to 120",
+    topic: "Numbers to 120",
     curriculum: ["AC9M1N01"],
     lessons: [
       {
