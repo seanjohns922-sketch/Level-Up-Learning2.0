@@ -41,6 +41,20 @@ export type DecimalVisualData =
       hundredths: number;
     };
 
+export type ColumnMultiplicationVisualData = {
+  type: "column_multiplication";
+  topValue: number;
+  bottomValue: number;
+  showWorkedExample?: boolean;
+};
+
+export type BoxMethodVisualData = {
+  type: "box_method";
+  leftValue: number;
+  topValue: number;
+  showWorkedExample?: boolean;
+};
+
 export type PlaceValueBuilderQuestion = {
   kind: "place_value_builder";
   prompt: string;
@@ -489,7 +503,7 @@ export type TypedResponseQuestion = {
   helper?: string;
   placeholder?: string;
   writtenMethod?: WrittenMethodLayout;
-  visual?: MABVisualData | DecimalVisualData;
+  visual?: MABVisualData | DecimalVisualData | ColumnMultiplicationVisualData | BoxMethodVisualData;
 };
 
 export type SpeedRoundQuestion = {
@@ -4457,6 +4471,56 @@ function generateGenericQuestion(
       helper: "Use column multiplication and keep the place values lined up.",
       placeholder: "Type the answer",
       writtenMethod: buildWrittenMethodLayout("Column Multiplication", "×", picked[0], picked[1], answer),
+      visual: {
+        type: "column_multiplication",
+        topValue: picked[0],
+        bottomValue: picked[1],
+        showWorkedExample: true,
+      },
+    };
+  }
+
+  if (explicitMode === "column_multiplication_partial") {
+    const variants = [
+      {
+        topValue: 23,
+        bottomValue: 14,
+        prompt: "In 23 × 14, what is the ones row partial product?",
+        answer: "92",
+      },
+      {
+        topValue: 23,
+        bottomValue: 14,
+        prompt: "In 23 × 14, what is the tens row value before adding?",
+        answer: "230",
+      },
+      {
+        topValue: 34,
+        bottomValue: 27,
+        prompt: "In 34 × 27, what is the ones row partial product?",
+        answer: "238",
+      },
+    ] as const;
+    const selected = variants[randInt(0, variants.length - 1)] ?? variants[0];
+    return {
+      kind: "typed_response",
+      prompt: selected.prompt,
+      answer: selected.answer,
+      helper: "Work out one row at a time using place value.",
+      placeholder: "Type the row value",
+      writtenMethod: buildWrittenMethodLayout(
+        "Column Multiplication",
+        "×",
+        selected.topValue,
+        selected.bottomValue,
+        selected.topValue * selected.bottomValue
+      ),
+      visual: {
+        type: "column_multiplication",
+        topValue: selected.topValue,
+        bottomValue: selected.bottomValue,
+        showWorkedExample: true,
+      },
     };
   }
 
@@ -4583,6 +4647,49 @@ function generateGenericQuestion(
       answer: formatMathNumber(answer),
       helper: "Find the partial products, then add them together.",
       placeholder: "Type the total",
+      visual: {
+        type: "box_method",
+        leftValue: picked[0],
+        topValue: picked[1],
+        showWorkedExample: true,
+      },
+    };
+  }
+
+  if (explicitMode === "box_method_partial_typed") {
+    const variants = [
+      {
+        leftValue: 23,
+        topValue: 45,
+        prompt: "In the box method for 23 × 45, what is 20 × 40?",
+        answer: "800",
+      },
+      {
+        leftValue: 12,
+        topValue: 13,
+        prompt: "In the box method for 12 × 13, what is 10 × 3?",
+        answer: "30",
+      },
+      {
+        leftValue: 3,
+        topValue: 24,
+        prompt: "In the box method for 3 × 24, what is 3 × 20?",
+        answer: "60",
+      },
+    ] as const;
+    const selected = variants[randInt(0, variants.length - 1)] ?? variants[0];
+    return {
+      kind: "typed_response",
+      prompt: selected.prompt,
+      answer: selected.answer,
+      helper: "Split the numbers into tens and ones, then find one box at a time.",
+      placeholder: "Type the box value",
+      visual: {
+        type: "box_method",
+        leftValue: selected.leftValue,
+        topValue: selected.topValue,
+        showWorkedExample: true,
+      },
     };
   }
 

@@ -26,6 +26,229 @@ function columnLabel(label: string) {
   return "current";
 }
 
+function formatWholeNumber(value: number) {
+  return value.toLocaleString();
+}
+
+function digitCells(value: number, width: number) {
+  return String(value).padStart(width, " ").split("");
+}
+
+function ColumnMultiplicationWorkedExample() {
+  return (
+    <div className="rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm">
+      <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-700">
+        Worked Example
+      </div>
+      <p className="mt-2 text-sm font-semibold text-slate-700">
+        Multiply the ones first, then the tens. Add the rows.
+      </p>
+      <div className="mt-4 w-fit rounded-xl bg-emerald-50/70 p-4">
+        <div className="grid w-fit grid-flow-col gap-2">
+          <div className="w-8" />
+          {digitCells(23, 4).map((digit, index) => (
+            <div key={`example-top-${index}`} className="flex h-10 w-10 items-center justify-center text-2xl font-black text-slate-900">
+              {digit.trim()}
+            </div>
+          ))}
+        </div>
+        <div className="mt-1 grid w-fit grid-flow-col gap-2">
+          <div className="flex h-10 w-8 items-center justify-center text-3xl font-black text-slate-700">×</div>
+          {digitCells(45, 4).map((digit, index) => (
+            <div key={`example-bottom-${index}`} className="flex h-10 w-10 items-center justify-center text-2xl font-black text-slate-900">
+              {digit.trim()}
+            </div>
+          ))}
+        </div>
+        <div className="mt-2 h-1 w-full rounded bg-slate-300" />
+        <div className="mt-2 grid w-fit grid-flow-col gap-2">
+          <div className="w-8" />
+          {digitCells(115, 4).map((digit, index) => (
+            <div key={`example-row1-${index}`} className="flex h-10 w-10 items-center justify-center text-2xl font-black text-slate-900">
+              {digit.trim()}
+            </div>
+          ))}
+          <div className="pl-3 text-sm font-semibold text-slate-600">(23 × 5)</div>
+        </div>
+        <div className="mt-1 grid w-fit grid-flow-col gap-2">
+          <div className="w-8" />
+          {digitCells(920, 4).map((digit, index) => (
+            <div key={`example-row2-${index}`} className="flex h-10 w-10 items-center justify-center text-2xl font-black text-slate-900">
+              {digit.trim()}
+            </div>
+          ))}
+          <div className="pl-3 text-sm font-semibold text-slate-600">(23 × 40)</div>
+        </div>
+        <div className="mt-2 h-1 w-full rounded bg-slate-300" />
+        <div className="mt-2 grid w-fit grid-flow-col gap-2">
+          <div className="w-8" />
+          {digitCells(1035, 4).map((digit, index) => (
+            <div key={`example-total-${index}`} className="flex h-10 w-10 items-center justify-center text-2xl font-black text-slate-900">
+              {digit.trim()}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ColumnMultiplicationWorkspace({
+  topValue,
+  bottomValue,
+}: {
+  topValue: number;
+  bottomValue: number;
+}) {
+  const width = Math.max(String(topValue).length, String(bottomValue).length, String(topValue * bottomValue).length);
+  const topDigits = digitCells(topValue, width);
+  const bottomDigits = digitCells(bottomValue, width);
+  const rowCount = String(bottomValue).length > 1 ? 2 : 1;
+
+  return (
+    <div className="w-fit rounded-xl bg-white p-4 shadow-sm">
+      <div className="grid w-fit grid-flow-col gap-2">
+        <div className="w-8" />
+        {topDigits.map((digit, index) => (
+          <div key={`workspace-top-${index}`} className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100 text-2xl font-black text-slate-900">
+            {digit.trim()}
+          </div>
+        ))}
+      </div>
+      <div className="mt-2 grid w-fit grid-flow-col gap-2">
+        <div className="flex h-12 w-8 items-center justify-center text-3xl font-black text-slate-700">×</div>
+        {bottomDigits.map((digit, index) => (
+          <div key={`workspace-bottom-${index}`} className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100 text-2xl font-black text-slate-900">
+            {digit.trim()}
+          </div>
+        ))}
+      </div>
+      <div className="mt-3 h-1 w-full rounded bg-slate-300" />
+      <div className="mt-3 space-y-2">
+        {Array.from({ length: rowCount }).map((_, rowIndex) => (
+          <div key={`workspace-row-${rowIndex}`} className="grid w-fit grid-flow-col gap-2">
+            <div className="w-8" />
+            {Array.from({ length: width + rowIndex }).map((__, index) => (
+              <div
+                key={`workspace-cell-${rowIndex}-${index}`}
+                className="flex h-12 w-12 items-center justify-center rounded-lg border-2 border-dashed border-teal-200 bg-teal-50/50 text-xl font-black text-teal-400"
+              >
+                _
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+      {rowCount > 1 ? <div className="mt-3 h-1 w-full rounded bg-slate-300" /> : null}
+      <div className="mt-3 grid w-fit grid-flow-col gap-2">
+        <div className="w-8" />
+        {Array.from({ length: width + (rowCount > 1 ? 1 : 0) }).map((_, index) => (
+          <div
+            key={`workspace-total-${index}`}
+            className="flex h-12 w-12 items-center justify-center rounded-lg border-2 border-dashed border-amber-200 bg-amber-50/50 text-xl font-black text-amber-400"
+          >
+            _
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function BoxMethodWorkedExample() {
+  const rowLabels = ["20", "3"];
+  const columnLabels = ["40", "5"];
+  const cells = [
+    ["800", "100"],
+    ["120", "15"],
+  ];
+
+  return (
+    <div className="rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm">
+      <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-700">
+        Worked Example
+      </div>
+      <p className="mt-2 text-sm font-semibold text-slate-700">
+        Split into tens and ones. Find each box. Add the totals.
+      </p>
+      <div className="mt-4 w-fit rounded-xl bg-emerald-50/70 p-4">
+        <div className="mb-2 text-sm font-bold text-slate-700">23 × 45</div>
+        <div className="grid grid-cols-[56px_repeat(2,88px)] gap-2">
+          <div />
+          {columnLabels.map((label) => (
+            <div key={`box-col-${label}`} className="flex h-12 items-center justify-center rounded-lg bg-slate-100 text-xl font-black text-slate-900">
+              {label}
+            </div>
+          ))}
+          {rowLabels.map((label, rowIndex) => (
+            <div key={`row-${label}`} className="contents">
+              <div className="flex h-12 items-center justify-center rounded-lg bg-slate-100 text-xl font-black text-slate-900">
+                {label}
+              </div>
+              {cells[rowIndex].map((cell, cellIndex) => (
+                <div key={`box-cell-${rowIndex}-${cellIndex}`} className="flex h-12 items-center justify-center rounded-lg bg-white text-xl font-black text-slate-900 shadow-sm">
+                  {cell}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+        <div className="mt-3 text-sm font-semibold text-slate-700">800 + 100 + 120 + 15 = 1035</div>
+      </div>
+    </div>
+  );
+}
+
+function BoxMethodWorkspace({
+  leftValue,
+  topValue,
+}: {
+  leftValue: number;
+  topValue: number;
+}) {
+  const splitLeft =
+    leftValue >= 10 ? [Math.floor(leftValue / 10) * 10, leftValue % 10].filter(Boolean) : [leftValue];
+  const splitTop =
+    topValue >= 10 ? [Math.floor(topValue / 10) * 10, topValue % 10].filter(Boolean) : [topValue];
+
+  return (
+    <div className="w-fit rounded-xl bg-white p-4 shadow-sm">
+      <div className="mb-2 text-sm font-bold text-slate-700">
+        {formatWholeNumber(leftValue)} × {formatWholeNumber(topValue)}
+      </div>
+      <div
+        className="grid gap-2"
+        style={{ gridTemplateColumns: `56px repeat(${splitTop.length}, 88px)` }}
+      >
+        <div />
+        {splitTop.map((label, index) => (
+          <div key={`workspace-col-${index}`} className="flex h-12 items-center justify-center rounded-lg bg-slate-100 text-xl font-black text-slate-900">
+            {label}
+          </div>
+        ))}
+        {splitLeft.map((label, rowIndex) => (
+          <div key={`workspace-row-${rowIndex}`} className="contents">
+            <div className="flex h-12 items-center justify-center rounded-lg bg-slate-100 text-xl font-black text-slate-900">
+              {label}
+            </div>
+            {splitTop.map((_, cellIndex) => (
+              <div
+                key={`workspace-box-${rowIndex}-${cellIndex}`}
+                className="flex h-12 items-center justify-center rounded-lg border-2 border-dashed border-teal-200 bg-teal-50/50 text-xl font-black text-teal-400"
+              >
+                _
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+      <div className="mt-3 rounded-lg border-2 border-dashed border-amber-200 bg-amber-50/50 px-4 py-3 text-sm font-semibold text-amber-700">
+        Add the box totals to find the final answer.
+      </div>
+    </div>
+  );
+}
+
 export default function TypedResponseActivity({
   questionData,
   onCorrect,
@@ -313,10 +536,18 @@ export default function TypedResponseActivity({
     else onWrong?.();
   }
 
+  const activityTitle =
+    writtenMethod?.title ??
+    (questionData.visual?.type === "box_method"
+      ? "Box Method"
+      : questionData.visual?.type === "column_multiplication"
+      ? "Column Multiplication"
+      : "Typed Response");
+
   return (
     <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
       <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">
-        {writtenMethod?.title ?? "Typed Response"}
+        {activityTitle}
       </div>
       <div className="flex items-center gap-2 mt-2">
         <h2 className="text-2xl font-black text-gray-900">{questionData.prompt}</h2>
@@ -328,11 +559,39 @@ export default function TypedResponseActivity({
       {questionData.visual?.type === "decimal_model" ? (
         <DecimalModelVisual visual={questionData.visual} title="Decimal model" />
       ) : null}
+      {questionData.visual?.type === "column_multiplication" ? (
+        <div className="mt-4 space-y-4">
+          {questionData.visual.showWorkedExample ? <ColumnMultiplicationWorkedExample /> : null}
+          <div className="rounded-2xl border border-teal-100 bg-teal-50 p-5">
+            <ColumnMultiplicationWorkspace
+              topValue={questionData.visual.topValue}
+              bottomValue={questionData.visual.bottomValue}
+            />
+            <p className="mt-4 text-sm font-medium text-slate-600">
+              Use column multiplication vertically, then type the final answer.
+            </p>
+          </div>
+        </div>
+      ) : null}
+      {questionData.visual?.type === "box_method" ? (
+        <div className="mt-4 space-y-4">
+          {questionData.visual.showWorkedExample ? <BoxMethodWorkedExample /> : null}
+          <div className="rounded-2xl border border-teal-100 bg-teal-50 p-5">
+            <BoxMethodWorkspace
+              leftValue={questionData.visual.leftValue}
+              topValue={questionData.visual.topValue}
+            />
+            <p className="mt-4 text-sm font-medium text-slate-600">
+              Fill each box in your head or on paper, then type the final answer.
+            </p>
+          </div>
+        </div>
+      ) : null}
       {questionData.helper ? (
         <p className="mt-2 text-sm text-gray-600">{questionData.helper}</p>
       ) : null}
 
-      {writtenMethod ? (
+      {writtenMethod && !isColumnMultiplication ? (
         <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-5">
           <div className="w-fit rounded-xl bg-white p-4 shadow-sm">
             <div className="mb-2 grid w-fit grid-flow-col gap-2">
@@ -594,7 +853,7 @@ export default function TypedResponseActivity({
         </div>
       )}
 
-      {writtenMethod && !isGuidedWrittenMethod ? (
+      {writtenMethod && !isGuidedWrittenMethod && !isColumnMultiplication ? (
         <button
           type="button"
           onClick={check}
