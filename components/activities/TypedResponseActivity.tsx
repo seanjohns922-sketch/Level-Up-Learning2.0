@@ -48,6 +48,28 @@ function getColumnMultiplicationRows(topValue: number, bottomValue: number) {
   return { onesRow, tensRow, total };
 }
 
+function getColumnMultiplicationStepData(topValue: number, bottomValue: number) {
+  const topDigits = String(topValue).split("").map(Number);
+  const bottomDigits = String(bottomValue).split("").map(Number);
+  const topOnes = topDigits[topDigits.length - 1] ?? 0;
+  const topTens = topDigits[topDigits.length - 2] ?? 0;
+  const bottomOnes = bottomDigits[bottomDigits.length - 1] ?? 0;
+  const firstProduct = topOnes * bottomOnes;
+  const carry = Math.floor(firstProduct / 10);
+  const onesDigit = firstProduct % 10;
+  const onesRow = topValue * bottomOnes;
+  const onesRowLeading = Math.floor(onesRow / 10);
+  return {
+    topOnes,
+    topTens,
+    bottomOnes,
+    carry,
+    onesDigit,
+    onesRow,
+    onesRowLeading,
+  };
+}
+
 function ColumnMultiplicationWorkedExample() {
   return (
     <div className="rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm">
@@ -110,19 +132,29 @@ function ColumnMultiplicationWorkedExample() {
 function ColumnMultiplicationWorkspace({
   topValue,
   bottomValue,
-  onesRowValue,
+  carryValue,
+  onesDigitValue,
+  onesRowLeadingValue,
   tensRowValue,
   totalValue,
+  currentStep,
   onChange,
 }: {
   topValue: number;
   bottomValue: number;
-  onesRowValue: string;
+  carryValue: string;
+  onesDigitValue: string;
+  onesRowLeadingValue: string;
   tensRowValue: string;
   totalValue: string;
-  onChange: (field: "onesRow" | "tensRow" | "total", value: string) => void;
+  currentStep: "ones_digit" | "carry" | "ones_row" | "tens_row" | "total" | "done";
+  onChange: (
+    field: "carry" | "onesDigit" | "onesRowLeading" | "tensRow" | "total",
+    value: string
+  ) => void;
 }) {
   const { tensRow } = getColumnMultiplicationRows(topValue, bottomValue);
+  const stepData = getColumnMultiplicationStepData(topValue, bottomValue);
   const width = Math.max(
     String(topValue).length,
     String(bottomValue).length,
@@ -134,6 +166,33 @@ function ColumnMultiplicationWorkspace({
 
   return (
     <div className="w-fit rounded-xl bg-white p-4 shadow-sm">
+      <div className="mb-1 grid w-fit grid-flow-col gap-2">
+        <div className="w-8" />
+        {Array.from({ length: width }).map((_, index) => {
+          const carryIndex = width - 2;
+          if (index !== carryIndex) {
+            return <div key={`carry-slot-${index}`} className="h-8 w-12" />;
+          }
+
+          const showCarryValue = currentStep !== "ones_digit";
+          return (
+            <div key={`carry-slot-${index}`} className="flex h-8 w-12 items-center justify-center">
+              <input
+                value={showCarryValue ? carryValue : ""}
+                onChange={(event) => onChange("carry", event.target.value)}
+                inputMode="numeric"
+                maxLength={1}
+                disabled={currentStep !== "carry"}
+                className={[
+                  "h-8 w-8 rounded-md border border-amber-200 bg-amber-50 text-center text-sm font-black text-amber-700 outline-none",
+                  currentStep === "carry" ? "focus:border-amber-500 ring-2 ring-amber-200" : "",
+                  currentStep !== "carry" ? "opacity-90" : "",
+                ].join(" ")}
+              />
+            </div>
+          );
+        })}
+      </div>
       <div className="grid w-fit grid-flow-col gap-2">
         <div className="w-8" />
         {topDigits.map((digit, index) => (
@@ -154,13 +213,31 @@ function ColumnMultiplicationWorkspace({
       <div className="mt-3 space-y-2">
         <div className="grid w-fit grid-flow-col gap-2">
           <div className="w-8" />
+          {width > 1 ? (
+            <input
+              value={currentStep === "ones_digit" ? "" : onesRowLeadingValue}
+              onChange={(event) => onChange("onesRowLeading", event.target.value)}
+              inputMode="numeric"
+              placeholder=""
+              disabled={currentStep !== "ones_row"}
+              className={[
+                "h-12 rounded-lg border-2 border-dashed border-teal-200 bg-teal-50/50 px-3 text-right text-xl font-black text-slate-900 outline-none",
+                currentStep === "ones_row" ? "focus:border-teal-500 ring-2 ring-teal-200" : "",
+              ].join(" ")}
+              style={{ width: `${(width - 1) * 48 + Math.max(0, width - 2) * 8}px` }}
+            />
+          ) : null}
           <input
-            value={onesRowValue}
-            onChange={(event) => onChange("onesRow", event.target.value)}
+            value={onesDigitValue}
+            onChange={(event) => onChange("onesDigit", event.target.value)}
             inputMode="numeric"
-            placeholder="ones row"
-            className="col-span-1 h-12 w-[calc(3rem_*_4+0.5rem_*_3)] max-w-full rounded-lg border-2 border-dashed border-teal-200 bg-teal-50/50 px-3 text-right text-xl font-black text-slate-900 outline-none focus:border-teal-500"
-            style={{ width: `${width * 48 + Math.max(0, width - 1) * 8}px` }}
+            maxLength={1}
+            placeholder=""
+            disabled={currentStep !== "ones_digit"}
+            className={[
+              "h-12 w-12 rounded-lg border-2 border-dashed border-teal-200 bg-teal-50/50 text-center text-xl font-black text-slate-900 outline-none",
+              currentStep === "ones_digit" ? "focus:border-teal-500 ring-2 ring-teal-200" : "",
+            ].join(" ")}
           />
         </div>
         {rowCount > 1 ? (
@@ -170,8 +247,12 @@ function ColumnMultiplicationWorkspace({
               value={tensRowValue}
               onChange={(event) => onChange("tensRow", event.target.value)}
               inputMode="numeric"
-              placeholder="tens row"
-              className="col-span-1 h-12 w-[calc(3rem_*_4+0.5rem_*_3)] max-w-full rounded-lg border-2 border-dashed border-teal-200 bg-teal-50/50 px-3 text-right text-xl font-black text-slate-900 outline-none focus:border-teal-500"
+              placeholder=""
+              disabled={currentStep !== "tens_row"}
+              className={[
+                "col-span-1 h-12 max-w-full rounded-lg border-2 border-dashed border-teal-200 bg-teal-50/50 px-3 text-right text-xl font-black text-slate-900 outline-none",
+                currentStep === "tens_row" ? "focus:border-teal-500 ring-2 ring-teal-200" : "",
+              ].join(" ")}
               style={{ width: `${(width + 1) * 48 + Math.max(0, width) * 8}px` }}
             />
           </div>
@@ -184,10 +265,27 @@ function ColumnMultiplicationWorkspace({
           value={totalValue}
           onChange={(event) => onChange("total", event.target.value)}
           inputMode="numeric"
-          placeholder="final total"
-          className="col-span-1 h-12 w-[calc(3rem_*_4+0.5rem_*_3)] max-w-full rounded-lg border-2 border-dashed border-amber-200 bg-amber-50/50 px-3 text-right text-xl font-black text-slate-900 outline-none focus:border-amber-500"
+          placeholder=""
+          disabled={currentStep !== "total"}
+          className={[
+            "col-span-1 h-12 max-w-full rounded-lg border-2 border-dashed border-amber-200 bg-amber-50/50 px-3 text-right text-xl font-black text-slate-900 outline-none",
+            currentStep === "total" ? "focus:border-amber-500 ring-2 ring-amber-200" : "",
+          ].join(" ")}
           style={{ width: `${(width + (rowCount > 1 ? 1 : 0)) * 48 + Math.max(0, width + (rowCount > 1 ? 1 : 0) - 1) * 8}px` }}
         />
+      </div>
+      <div className="mt-3 text-xs font-medium text-slate-500">
+        {currentStep === "ones_digit"
+          ? `Multiply ${stepData.topOnes} × ${stepData.bottomOnes}. Enter the ones digit.`
+          : currentStep === "carry"
+          ? "Carry the extra above the next column."
+          : currentStep === "ones_row"
+          ? `Multiply ${stepData.topTens} × ${stepData.bottomOnes} and add the carry.`
+          : currentStep === "tens_row"
+          ? "Now complete the tens row, shifted one place left."
+          : currentStep === "total"
+          ? "Add the rows to find the final total."
+          : "Column multiplication complete."}
       </div>
     </div>
   );
@@ -309,14 +407,22 @@ export default function TypedResponseActivity({
     orderingAnswerParts.every((part) => /^\d+$/.test(part));
   const [typed, setTyped] = useState("");
   const [columnChartInputs, setColumnChartInputs] = useState<{
-    onesRow: string;
+    carry: string;
+    onesDigit: string;
+    onesRowLeading: string;
     tensRow: string;
     total: string;
   }>({
-    onesRow: "",
+    carry: "",
+    onesDigit: "",
+    onesRowLeading: "",
     tensRow: "",
     total: "",
   });
+  const [multiplicationStep, setMultiplicationStep] = useState<
+    "ones_digit" | "carry" | "ones_row" | "tens_row" | "total" | "done"
+  >("ones_digit");
+  const [multiplicationFeedback, setMultiplicationFeedback] = useState("");
   const [orderedInputs, setOrderedInputs] = useState<string[]>(
     isOrderingResponse ? Array.from({ length: orderingAnswerParts.length }, () => "") : []
   );
@@ -361,10 +467,14 @@ export default function TypedResponseActivity({
   useEffect(() => {
     setTyped("");
     setColumnChartInputs({
-      onesRow: "",
+      carry: "",
+      onesDigit: "",
+      onesRowLeading: "",
       tensRow: "",
       total: "",
     });
+    setMultiplicationStep("ones_digit");
+    setMultiplicationFeedback("");
     setOrderedInputs(
       isOrderingResponse ? Array.from({ length: orderingAnswerParts.length }, () => "") : []
     );
@@ -579,17 +689,70 @@ export default function TypedResponseActivity({
         questionData.visual.topValue,
         questionData.visual.bottomValue
       );
-      const onesMatches =
-        normalizeNumberInput(columnChartInputs.onesRow) === String(expected.onesRow);
-      const tensMatches =
-        expected.tensRow === null
-          ? true
-          : normalizeNumberInput(columnChartInputs.tensRow) === String(expected.tensRow);
-      const totalMatches =
-        normalizeNumberInput(columnChartInputs.total) === String(expected.total);
+      const stepData = getColumnMultiplicationStepData(
+        questionData.visual.topValue,
+        questionData.visual.bottomValue
+      );
 
-      if (onesMatches && tensMatches && totalMatches) onCorrect?.();
-      else onWrong?.();
+      if (multiplicationStep === "ones_digit") {
+        if (normalizeNumberInput(columnChartInputs.onesDigit) === String(stepData.onesDigit)) {
+          setMultiplicationFeedback("");
+          setMultiplicationStep("carry");
+        } else {
+          setMultiplicationFeedback(
+            `Multiply ${stepData.topOnes} × ${stepData.bottomOnes} and enter only the ones digit.`
+          );
+          onWrong?.();
+        }
+        return;
+      }
+
+      if (multiplicationStep === "carry") {
+        if (normalizeNumberInput(columnChartInputs.carry) === String(stepData.carry)) {
+          setMultiplicationFeedback("");
+          setMultiplicationStep("ones_row");
+        } else {
+          setMultiplicationFeedback("Carry the extra above the next column.");
+          onWrong?.();
+        }
+        return;
+      }
+
+      if (multiplicationStep === "ones_row") {
+        if (normalizeNumberInput(columnChartInputs.onesRowLeading) === String(stepData.onesRowLeading)) {
+          setMultiplicationFeedback("");
+          setMultiplicationStep(expected.tensRow === null ? "total" : "tens_row");
+        } else {
+          setMultiplicationFeedback(
+            `Now multiply ${stepData.topTens} × ${stepData.bottomOnes} and add the carry.`
+          );
+          onWrong?.();
+        }
+        return;
+      }
+
+      if (multiplicationStep === "tens_row") {
+        if (normalizeNumberInput(columnChartInputs.tensRow) === String(expected.tensRow ?? "")) {
+          setMultiplicationFeedback("");
+          setMultiplicationStep("total");
+        } else {
+          setMultiplicationFeedback("Complete the tens row and remember the place-value shift.");
+          onWrong?.();
+        }
+        return;
+      }
+
+      if (multiplicationStep === "total") {
+        if (normalizeNumberInput(columnChartInputs.total) === String(expected.total)) {
+          setMultiplicationFeedback("");
+          setMultiplicationStep("done");
+          onCorrect?.();
+        } else {
+          setMultiplicationFeedback("Add the rows carefully to find the final total.");
+          onWrong?.();
+        }
+        return;
+      }
       return;
     }
 
@@ -637,9 +800,12 @@ export default function TypedResponseActivity({
             <ColumnMultiplicationWorkspace
               topValue={questionData.visual.topValue}
               bottomValue={questionData.visual.bottomValue}
-              onesRowValue={columnChartInputs.onesRow}
+              carryValue={columnChartInputs.carry}
+              onesDigitValue={columnChartInputs.onesDigit}
+              onesRowLeadingValue={columnChartInputs.onesRowLeading}
               tensRowValue={columnChartInputs.tensRow}
               totalValue={columnChartInputs.total}
+              currentStep={multiplicationStep}
               onChange={(field, value) =>
                 setColumnChartInputs((current) => ({
                   ...current,
@@ -648,8 +814,11 @@ export default function TypedResponseActivity({
               }
             />
             <p className="mt-4 text-sm font-medium text-slate-600">
-              Fill in the ones row, the tens row, and the final total inside the chart.
+              Complete the method step by step inside the chart.
             </p>
+            {multiplicationFeedback ? (
+              <p className="mt-3 text-sm font-bold text-rose-600">{multiplicationFeedback}</p>
+            ) : null}
           </div>
         </div>
       ) : null}
