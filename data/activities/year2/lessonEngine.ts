@@ -4309,6 +4309,343 @@ function generateGenericQuestion(
     };
   }
 
+  if (explicitMode === "column_add_sub_solve") {
+    const useAddition = randInt(0, 1) === 0;
+    if (useAddition) {
+      const difficultyRoll = randInt(0, 99);
+      const max = difficultyRoll < 30 ? 999 : 9999;
+      const a = randInt(max >= 9999 ? 1200 : 120, max >= 9999 ? 7999 : 699);
+      const b = randInt(max >= 9999 ? 1100 : 110, max >= 9999 ? 2899 : 299);
+      const answer = a + b;
+      return {
+        kind: "typed_response",
+        prompt: `${formatMathNumber(a)} + ${formatMathNumber(b)} = ?`,
+        answer: formatMathNumber(answer),
+        placeholder: "Type the answer",
+        writtenMethod: buildWrittenMethodLayout("Column Addition", "+", a, b, answer),
+      };
+    }
+
+    const borrowAcrossZero = randInt(0, 99) < 35;
+    let total: number;
+    let remove: number;
+    if (borrowAcrossZero) {
+      const options = [
+        [6203, 1875],
+        [8000, 3468],
+        [7004, 1857],
+        [9002, 4765],
+      ];
+      const picked = options[randInt(0, options.length - 1)] ?? options[0];
+      total = picked[0];
+      remove = picked[1];
+    } else {
+      const max = randInt(0, 99) < 35 ? 999 : 9999;
+      total = randInt(max >= 9999 ? 3000 : 300, max >= 9999 ? 9000 : 900);
+      remove = randInt(max >= 9999 ? 1200 : 120, Math.max(max >= 9999 ? 4500 : 450, total - 100));
+    }
+    const answer = total - remove;
+    return {
+      kind: "typed_response",
+      prompt: `${formatMathNumber(total)} - ${formatMathNumber(remove)} = ?`,
+      answer: formatMathNumber(answer),
+      placeholder: "Type the answer",
+      writtenMethod: buildWrittenMethodLayout("Column Subtraction", "-", total, remove, answer),
+    };
+  }
+
+  if (explicitMode === "column_add_sub_missing") {
+    const useAddition = randInt(0, 1) === 0;
+    if (useAddition) {
+      const a = randInt(120, 4999);
+      const b = randInt(110, 2999);
+      const answer = a + b;
+      const digits = String(answer).split("");
+      const index = randInt(0, digits.length - 1);
+      const missing = digits[index] ?? "0";
+      digits[index] = "?";
+      return {
+        kind: "multiple_choice",
+        prompt: `Fill the missing digit: ${formatMathNumber(a)} + ${formatMathNumber(b)} = ${digits.join("")}`,
+        options: shuffle([missing, String((Number(missing) + 1) % 10), String((Number(missing) + 2) % 10), String((Number(missing) + 9) % 10)]),
+        answer: missing,
+        helper: "Use the column method to work out the missing digit.",
+      };
+    }
+    const total = randInt(3000, 9000);
+    const remove = randInt(1200, Math.max(1500, total - 200));
+    const answer = total - remove;
+    const digits = String(answer).split("");
+    const index = randInt(0, digits.length - 1);
+    const missing = digits[index] ?? "0";
+    digits[index] = "?";
+    return {
+      kind: "multiple_choice",
+      prompt: `Fill the missing digit: ${formatMathNumber(total)} - ${formatMathNumber(remove)} = ${digits.join("")}`,
+      options: shuffle([missing, String((Number(missing) + 1) % 10), String((Number(missing) + 2) % 10), String((Number(missing) + 9) % 10)]),
+      answer: missing,
+      helper: "Use the column method to work out the missing digit.",
+    };
+  }
+
+  if (explicitMode === "column_add_sub_error") {
+    const useAddition = randInt(0, 1) === 0;
+    if (useAddition) {
+      const a = randInt(120, 4999);
+      const b = randInt(110, 2999);
+      const correctAnswer = a + b;
+      const correct = randInt(0, 1) === 0;
+      const shown = correct ? correctAnswer : correctAnswer + (randInt(0, 1) === 0 ? 10 : 100);
+      return {
+        kind: "multiple_choice",
+        prompt: `${formatMathNumber(a)} + ${formatMathNumber(b)} = ${formatMathNumber(shown)}`,
+        options: ["Correct", "Incorrect"],
+        answer: correct ? "Correct" : "Incorrect",
+        helper: "Check the regrouping carefully.",
+      };
+    }
+    const total = randInt(3000, 9000);
+    const remove = randInt(1200, Math.max(1500, total - 200));
+    const correctAnswer = total - remove;
+    const correct = randInt(0, 1) === 0;
+    const shown = correct ? correctAnswer : Math.max(0, correctAnswer + (randInt(0, 1) === 0 ? 10 : -100));
+    return {
+      kind: "multiple_choice",
+      prompt: `${formatMathNumber(total)} - ${formatMathNumber(remove)} = ${formatMathNumber(shown)}`,
+      options: ["Correct", "Incorrect"],
+      answer: correct ? "Correct" : "Incorrect",
+      helper: "Check the regrouping and borrowing carefully.",
+    };
+  }
+
+  if (explicitMode === "column_add_sub_mixed") {
+    const variants = [
+      {
+        prompt: `Which sum needs carrying in more than one column?`,
+        answer: "3,482 + 1,759",
+        options: ["3,482 + 1,759", "4,200 + 1,300", "5,110 + 2,200", "6,400 + 1,500"],
+      },
+      {
+        prompt: `Which subtraction needs borrowing across a zero?`,
+        answer: "8,000 - 3,468",
+        options: ["8,000 - 3,468", "7,654 - 2,111", "6,542 - 1,230", "9,321 - 4,210"],
+      },
+    ];
+    const selected = variants[randInt(0, variants.length - 1)] ?? variants[0];
+    return {
+      kind: "multiple_choice",
+      prompt: selected.prompt,
+      options: selected.options,
+      answer: selected.answer,
+      helper: "Look for carrying or borrowing before you calculate.",
+    };
+  }
+
+  if (explicitMode === "column_multiplication_solve") {
+    const variants = [
+      [23, 4],
+      [23, 14],
+      [34, 27],
+      [18, 16],
+    ] as const;
+    const picked = variants[randInt(0, variants.length - 1)] ?? variants[0];
+    const answer = picked[0] * picked[1];
+    return {
+      kind: "typed_response",
+      prompt: `${formatMathNumber(picked[0])} × ${formatMathNumber(picked[1])} = ?`,
+      answer: formatMathNumber(answer),
+      helper: "Use an efficient written method and keep the place values lined up.",
+      placeholder: "Type the answer",
+    };
+  }
+
+  if (explicitMode === "column_multiplication_missing_row") {
+    const variants = [
+      {
+        prompt: "In 23 × 14, what is the ones row partial product?",
+        answer: "92",
+        options: ["92", "230", "14", "322"],
+      },
+      {
+        prompt: "In 23 × 14, what is the tens row value before adding?",
+        answer: "230",
+        options: ["230", "23", "140", "92"],
+      },
+      {
+        prompt: "In 34 × 27, what is the ones row partial product?",
+        answer: "238",
+        options: ["238", "680", "61", "918"],
+      },
+    ];
+    const selected = variants[randInt(0, variants.length - 1)] ?? variants[0];
+    return {
+      kind: "multiple_choice",
+      prompt: selected.prompt,
+      options: selected.options,
+      answer: selected.answer,
+      helper: "Work out one row at a time using place value.",
+    };
+  }
+
+  if (explicitMode === "column_multiplication_error") {
+    const variants = [
+      {
+        prompt: "A student says 23 × 14 = 322. Is that correct?",
+        answer: "Correct",
+        options: ["Correct", "Incorrect"],
+      },
+      {
+        prompt: "A student says 34 × 27 = 818. Is that correct?",
+        answer: "Incorrect",
+        options: ["Correct", "Incorrect"],
+      },
+      {
+        prompt: "A student says 23 × 4 = 82. Is that correct?",
+        answer: "Incorrect",
+        options: ["Correct", "Incorrect"],
+      },
+    ];
+    const selected = variants[randInt(0, variants.length - 1)] ?? variants[0];
+    return {
+      kind: "multiple_choice",
+      prompt: selected.prompt,
+      options: selected.options,
+      answer: selected.answer,
+      helper: "Check each partial product and the final total.",
+    };
+  }
+
+  if (explicitMode === "column_multiplication_step") {
+    const variants = [
+      {
+        prompt: "What is the first multiplication step in 23 × 4?",
+        answer: "3 × 4 = 12",
+      },
+      {
+        prompt: "What is the first multiplication step in 34 × 27?",
+        answer: "7 × 4 = 28",
+      },
+      {
+        prompt: "What is the tens-row value in 23 × 14?",
+        answer: "230",
+      },
+    ];
+    const selected = variants[randInt(0, variants.length - 1)] ?? variants[0];
+    return {
+      kind: "typed_response",
+      prompt: selected.prompt,
+      answer: selected.answer,
+      helper: "Think about one place-value step at a time.",
+      placeholder: "Type the step",
+    };
+  }
+
+  if (explicitMode === "box_method_partial") {
+    const variants = [
+      {
+        prompt: "Using the box method for 23 × 45, what is 20 × 40?",
+        answer: "800",
+        options: ["800", "80", "200", "900"],
+      },
+      {
+        prompt: "Using the box method for 12 × 13, what is 10 × 3?",
+        answer: "30",
+        options: ["30", "13", "3", "120"],
+      },
+      {
+        prompt: "Using the box method for 3 × 24, what is 3 × 20?",
+        answer: "60",
+        options: ["60", "6", "80", "12"],
+      },
+    ];
+    const selected = variants[randInt(0, variants.length - 1)] ?? variants[0];
+    return {
+      kind: "multiple_choice",
+      prompt: selected.prompt,
+      options: selected.options,
+      answer: selected.answer,
+      helper: "Break each number into tens and ones first.",
+    };
+  }
+
+  if (explicitMode === "box_method_total") {
+    const variants = [
+      [3, 24],
+      [12, 13],
+      [23, 45],
+    ] as const;
+    const picked = variants[randInt(0, variants.length - 1)] ?? variants[0];
+    const answer = picked[0] * picked[1];
+    return {
+      kind: "typed_response",
+      prompt: `Use the box method idea to work out ${picked[0]} × ${picked[1]}.`,
+      answer: formatMathNumber(answer),
+      helper: "Find the partial products, then add them together.",
+      placeholder: "Type the total",
+    };
+  }
+
+  if (explicitMode === "box_method_match") {
+    const variants = [
+      {
+        prompt: "Which expression matches the box method for 12 × 13?",
+        answer: "(10 × 10) + (10 × 3) + (2 × 10) + (2 × 3)",
+        options: [
+          "(10 × 10) + (10 × 3) + (2 × 10) + (2 × 3)",
+          "(12 × 10) + (12 × 3)",
+          "(1 × 10) + (2 × 3)",
+          "(10 × 13) + (2 × 13) + (2 × 3)",
+        ],
+      },
+      {
+        prompt: "Which multiplication could be broken into 20 + 3 and 40 + 5?",
+        answer: "23 × 45",
+        options: ["23 × 45", "24 × 35", "32 × 54", "12 × 13"],
+      },
+    ];
+    const selected = variants[randInt(0, variants.length - 1)] ?? variants[0];
+    return {
+      kind: "multiple_choice",
+      prompt: selected.prompt,
+      options: selected.options,
+      answer: selected.answer,
+      helper: "Match the tens and ones parts to the numbers.",
+    };
+  }
+
+  if (explicitMode === "box_method_compare") {
+    const variants = [
+      {
+        prompt: "Which statement is true?",
+        answer: "The box method and column method give the same answer.",
+        options: [
+          "The box method and column method give the same answer.",
+          "The box method only works for one-digit multiplication.",
+          "The column method always gives a different answer.",
+          "The box method ignores place value.",
+        ],
+      },
+      {
+        prompt: "Why can the box method help with 23 × 45?",
+        answer: "It breaks the numbers into tens and ones.",
+        options: [
+          "It breaks the numbers into tens and ones.",
+          "It removes the need to multiply.",
+          "It changes 23 × 45 into addition only.",
+          "It works without place value.",
+        ],
+      },
+    ];
+    const selected = variants[randInt(0, variants.length - 1)] ?? variants[0];
+    return {
+      kind: "multiple_choice",
+      prompt: selected.prompt,
+      options: selected.options,
+      answer: selected.answer,
+      helper: "Both methods work because they use the same place-value parts.",
+    };
+  }
+
   if (sourceActivityType === "place_value_builder") {
     const target = randInt(Math.max(100, min || 100), Math.max(200, max || 999));
     const places = supportedPlaces(config);

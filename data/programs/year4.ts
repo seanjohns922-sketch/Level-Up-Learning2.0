@@ -443,53 +443,67 @@ const year4Rows: ProgramRow[] = [
   },
   {
     week: 7,
-    focus: "Strategies for Multi-Digit Operations",
+    focus: "Multi-Digit Operations & Multiplication Strategies",
     lesson: 1,
-    topic: "Column Addition",
-    activity: "Add multi-digit numbers using regrouping algorithms",
+    topic: "Column Addition & Subtraction",
+    activity: "Use column methods with larger numbers",
     curriculum: ["AC9M4N06"],
     activities: [
       makeActivity("typed_response", 2, {
-        mode: "written_addition",
-        operation: "addition",
-        regrouping: true,
+        mode: "column_add_sub_solve",
       }),
       makeActivity("multiple_choice", 1, {
-        mode: "written_addition",
+        mode: "column_add_sub_missing",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "column_add_sub_error",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "column_add_sub_mixed",
       }),
     ],
   },
   {
     week: 7,
-    focus: "Strategies for Multi-Digit Operations",
+    focus: "Multi-Digit Operations & Multiplication Strategies",
     lesson: 2,
-    topic: "Column Subtraction",
-    activity: "Subtract using regrouping with vertical format",
+    topic: "Column Multiplication",
+    activity: "Use an efficient written method for multiplication",
     curriculum: ["AC9M4N06"],
     activities: [
       makeActivity("typed_response", 2, {
-        mode: "written_subtraction",
-        operation: "subtraction",
-        regrouping: true,
+        mode: "column_multiplication_solve",
       }),
       makeActivity("multiple_choice", 1, {
-        mode: "written_subtraction",
+        mode: "column_multiplication_missing_row",
       }),
-    ],
-  },
-  {
-    week: 7,
-    focus: "Strategies for Multi-Digit Operations",
-    lesson: 3,
-    topic: "Efficient Multiplication",
-    activity: "Use area models and short multiplication strategies",
-    curriculum: ["AC9M4N06"],
-    activities: [
-      makeActivity("arrays", 2, {
-        mode: "area_model",
+      makeActivity("multiple_choice", 1, {
+        mode: "column_multiplication_error",
       }),
       makeActivity("typed_response", 1, {
-        mode: "short_multiplication",
+        mode: "column_multiplication_step",
+      }),
+    ],
+  },
+  {
+    week: 7,
+    focus: "Multi-Digit Operations & Multiplication Strategies",
+    lesson: 3,
+    topic: "Box Method (Area Model)",
+    activity: "Break numbers into tens and ones to multiply",
+    curriculum: ["AC9M4N06"],
+    activities: [
+      makeActivity("multiple_choice", 2, {
+        mode: "box_method_partial",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "box_method_total",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "box_method_match",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "box_method_compare",
       }),
     ],
   },
