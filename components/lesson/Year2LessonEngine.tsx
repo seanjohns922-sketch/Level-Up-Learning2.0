@@ -28,11 +28,19 @@ function buildInitialTurn(lesson: Lesson, activities: Lesson["activities"] = [])
   }
 
   const picked = pickWeightedIndex(activities, [], null);
+  const boardIndex = level === 4 && lesson.week === 8 ? 0 : null;
+  const selectedActivity =
+    boardIndex === null
+      ? activities[picked.index]
+      : {
+          ...activities[picked.index],
+          config: { ...activities[picked.index].config, boardIndex },
+        };
   return {
     bag: picked.bag,
     lastIndex: picked.index,
     activityIndex: picked.index,
-    question: generateQuestion(level, lesson, activities[picked.index]),
+    question: generateQuestion(level, lesson, selectedActivity),
   };
 }
 
@@ -66,6 +74,7 @@ export function Year2LessonEngine({
   const scoredThisTurnRef = useRef(false);
   const finished = secondsLeft <= 0;
   const currentActivity = activities[currentActivityIndex] ?? null;
+  const questionsAnsweredRef = useRef(0);
 
   const accuracy =
     questionsAnswered > 0
@@ -87,7 +96,17 @@ export function Year2LessonEngine({
     bagRef.current = picked.bag;
     lastIndexRef.current = picked.index;
 
-    const nextActivity = activities[picked.index];
+    const boardIndex =
+      level === 4 && lesson.week === 8
+        ? Math.floor(questionsAnsweredRef.current / 3) % 5
+        : null;
+    const nextActivity =
+      boardIndex === null
+        ? activities[picked.index]
+        : {
+            ...activities[picked.index],
+            config: { ...activities[picked.index].config, boardIndex },
+          };
     const nextQuestion = generateQuestion(level, lesson, nextActivity);
 
     setCurrentActivityIndex(picked.index);
@@ -128,6 +147,7 @@ export function Year2LessonEngine({
     scoredThisTurnRef.current = true;
     clearPendingTimeout();
     setStatus("correct");
+    questionsAnsweredRef.current += 1;
     setQuestionsAnswered((v) => v + 1);
     setCorrectAnswers((v) => v + 1);
     timeoutRef.current = setTimeout(() => loadNextQuestion(), 1000);
@@ -138,6 +158,7 @@ export function Year2LessonEngine({
     scoredThisTurnRef.current = true;
     clearPendingTimeout();
     setStatus("wrong");
+    questionsAnsweredRef.current += 1;
     setQuestionsAnswered((v) => v + 1);
     timeoutRef.current = setTimeout(() => loadNextQuestion(), 1200);
   }

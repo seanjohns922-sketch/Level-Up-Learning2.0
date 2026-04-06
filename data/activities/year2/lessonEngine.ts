@@ -46,8 +46,10 @@ export type MoneyVisualData =
       type: "shopping_list";
       title: string;
       budget?: number;
+      boardLabel?: string;
       items: Array<{
         label: string;
+        detail?: string;
         price: number;
         quantity?: number;
       }>;
@@ -55,7 +57,9 @@ export type MoneyVisualData =
   | {
       type: "australian_money";
       title: string;
+      boardLabel?: string;
       itemLabel?: string;
+      itemDetail?: string;
       itemPrice?: number;
       quantity?: number;
       pieces: Array<{
@@ -67,8 +71,10 @@ export type MoneyVisualData =
   | {
       type: "receipt";
       title: string;
+      boardLabel?: string;
       lines: Array<{
         label: string;
+        detail?: string;
         price: number;
         quantity?: number;
       }>;
@@ -613,6 +619,7 @@ type GenericConfig = Record<string, unknown> & {
   maxTotal?: number;
   allowGenericFallback?: boolean;
   allowedGroupSizes?: number[];
+  boardIndex?: number;
 };
 
 type ValidationReason = "alignment" | "difficulty" | "visual_missing" | "mode_blocked";
@@ -1658,40 +1665,161 @@ function isYear4Week8(level: SupportedMathLevel, lesson: Lesson) {
   return level === 4 && lesson.week === 8;
 }
 
-function buildYear4Week8BudgetingQuestion(): MixedWordProblemQuestion {
+type Week8Board = {
+  id: string;
+  title: string;
+  type: "cinema" | "canteen" | "sports_store" | "book_fair" | "stationery";
+  items: Array<{
+    label: string;
+    detail?: string;
+    price: number;
+  }>;
+};
+
+function year4Week8Boards(): Week8Board[] {
+  return [
+    {
+      id: "cinema",
+      title: "Cinema Menu",
+      type: "cinema",
+      items: [
+        { label: "Child Ticket", detail: "Standard", price: 12 },
+        { label: "Adult Ticket", detail: "Standard", price: 18 },
+        { label: "Popcorn", detail: "Small", price: 6 },
+        { label: "Popcorn", detail: "Large", price: 9 },
+        { label: "Drink", detail: "Small", price: 4 },
+        { label: "Drink", detail: "Large", price: 6 },
+        { label: "Choc Top", detail: "Ice cream", price: 5 },
+        { label: "Combo", detail: "Popcorn + Drink", price: 13 },
+        { label: "Family Pack", detail: "2 adults + 2 children", price: 54 },
+        { label: "Lollies", detail: "Bag", price: 4 },
+      ],
+    },
+    {
+      id: "canteen",
+      title: "School Canteen",
+      type: "canteen",
+      items: [
+        { label: "Sandwich", detail: "Ham", price: 6 },
+        { label: "Wrap", detail: "Chicken", price: 7 },
+        { label: "Fruit Cup", detail: "Fresh", price: 4 },
+        { label: "Muffin", detail: "Chocolate", price: 3 },
+        { label: "Juice", detail: "250 mL", price: 2 },
+        { label: "Water", detail: "Bottle", price: 3 },
+        { label: "Yoghurt", detail: "Tub", price: 4 },
+        { label: "Pizza Slice", detail: "Cheese", price: 5 },
+        { label: "Lunch Combo", detail: "Sandwich + Juice", price: 8 },
+        { label: "Snack Pack", detail: "Fruit + Muffin", price: 6 },
+      ],
+    },
+    {
+      id: "sports",
+      title: "Sports Store",
+      type: "sports_store",
+      items: [
+        { label: "Soccer Ball", detail: "Size 4", price: 24 },
+        { label: "Tennis Ball Pack", detail: "3 pack", price: 8 },
+        { label: "Drink Bottle", detail: "750 mL", price: 12 },
+        { label: "Cap", detail: "Team", price: 15 },
+        { label: "Shin Pads", detail: "Junior", price: 18 },
+        { label: "Sports Socks", detail: "Pair", price: 9 },
+        { label: "Bib Set", detail: "Training", price: 20 },
+        { label: "Cone Set", detail: "10 cones", price: 14 },
+        { label: "Team Pack", detail: "5 bibs", price: 45 },
+        { label: "Whistle", detail: "Coach", price: 7 },
+      ],
+    },
+    {
+      id: "books",
+      title: "Book Fair",
+      type: "book_fair",
+      items: [
+        { label: "Picture Book", detail: "Softcover", price: 10 },
+        { label: "Novel", detail: "Junior fiction", price: 14 },
+        { label: "Puzzle Book", detail: "Activities", price: 8 },
+        { label: "Bookmark", detail: "Magnetic", price: 3 },
+        { label: "Poster", detail: "A2", price: 6 },
+        { label: "Author Pack", detail: "2 books", price: 22 },
+        { label: "Sticker Sheet", detail: "Book themed", price: 4 },
+        { label: "Diary", detail: "Reading log", price: 9 },
+        { label: "Comic", detail: "Issue", price: 7 },
+        { label: "Mystery Bundle", detail: "3 books", price: 30 },
+      ],
+    },
+    {
+      id: "stationery",
+      title: "Stationery Shop",
+      type: "stationery",
+      items: [
+        { label: "Notebook", detail: "A4", price: 5 },
+        { label: "Pencil Case", detail: "Zip", price: 9 },
+        { label: "Marker Pack", detail: "6 pack", price: 7 },
+        { label: "Glue Stick", detail: "Large", price: 3 },
+        { label: "Highlighter", detail: "Single", price: 4 },
+        { label: "Scissors", detail: "Student", price: 8 },
+        { label: "Coloured Pencils", detail: "12 pack", price: 11 },
+        { label: "Eraser", detail: "Soft", price: 2 },
+        { label: "Ruler", detail: "30 cm", price: 3 },
+        { label: "Class Pack", detail: "4 notebooks", price: 18 },
+      ],
+    },
+  ];
+}
+
+function getWeek8Board(config: GenericConfig) {
+  const boards = year4Week8Boards();
+  const boardIndex =
+    typeof config.boardIndex === "number"
+      ? Math.max(0, Math.min(config.boardIndex, boards.length - 1))
+      : randInt(0, boards.length - 1);
+  return boards[boardIndex] ?? boards[0];
+}
+
+function buildYear4Week8BudgetingQuestion(config: GenericConfig): MixedWordProblemQuestion {
+  const board = getWeek8Board(config);
+  const items = board.items;
   const variants = [
-    {
-      prompt:
-        "Use the item list. A student buys 4 notebooks and 3 glue sticks. How much is spent altogether?",
-      items: [
-        { label: "Notebook", price: 6, quantity: 4 },
-        { label: "Glue Stick", price: 3, quantity: 3 },
-      ],
-      answer: 33,
-      helper: "Multiply each price by the quantity, then add the totals.",
-    },
-    {
-      prompt:
-        "Use the item list. Mia buys 5 markers and 2 pencil cases. How much does she spend?",
-      items: [
-        { label: "Marker", price: 4, quantity: 5 },
-        { label: "Pencil Case", price: 9, quantity: 2 },
-      ],
-      answer: 38,
-      helper: "Work out each item total first, then combine them.",
-    },
-    {
-      prompt:
-        "Use the item list. Noah has a $50 budget. He buys 3 lunch boxes and 4 drink bottles. How much money is left?",
-      items: [
-        { label: "Lunch Box", price: 8, quantity: 3 },
-        { label: "Drink Bottle", price: 5, quantity: 4 },
-      ],
-      answer: 6,
-      helper: "Multiply the costs, add the total spent, then compare it with the budget.",
-      budget: 50,
-    },
-  ] as const;
+    (() => {
+      const a = items[0];
+      const b = items[1];
+      const quantityA = 4;
+      const quantityB = 3;
+      const answer = a.price * quantityA + b.price * quantityB;
+      return {
+        prompt: `Use the ${board.title}. What is the total cost of ${quantityA} ${a.label.toLowerCase()}s and ${quantityB} ${b.label.toLowerCase()}s?`,
+        answer,
+        helper: "Multiply each price by the quantity, then add the totals.",
+        budget: undefined,
+      };
+    })(),
+    (() => {
+      const a = items[2];
+      const b = items[3];
+      const quantityA = 5;
+      const quantityB = 2;
+      const answer = a.price * quantityA + b.price * quantityB;
+      return {
+        prompt: `Use the ${board.title}. A student buys ${quantityA} ${a.label.toLowerCase()}s and ${quantityB} ${b.label.toLowerCase()}s. How much is spent?`,
+        answer,
+        helper: "Work out each item total first, then combine them.",
+        budget: undefined,
+      };
+    })(),
+    (() => {
+      const a = items[4];
+      const b = items[5];
+      const quantityA = 3;
+      const quantityB = 4;
+      const spend = a.price * quantityA + b.price * quantityB;
+      const budget = Math.ceil(spend / 10) * 10 + 10;
+      return {
+        prompt: `Use the ${board.title}. A student has $${budget}. They buy ${quantityA} ${a.label.toLowerCase()}s and ${quantityB} ${b.label.toLowerCase()}s. How much money is left?`,
+        answer: budget - spend,
+        helper: "Multiply the costs, add the total spent, then compare it with the budget.",
+        budget,
+      };
+    })(),
+  ];
   const picked = variants[randInt(0, variants.length - 1)] ?? variants[0];
   return {
     kind: "mixed_word_problem",
@@ -1704,63 +1832,91 @@ function buildYear4Week8BudgetingQuestion(): MixedWordProblemQuestion {
     showStrategyClue: false,
     visual: {
       type: "shopping_list",
-      title: "Budgeting Items",
-      budget: "budget" in picked ? picked.budget : undefined,
-      items: picked.items.map((item) => ({ ...item })),
+      title: board.title,
+      boardLabel: board.id,
+      budget: picked.budget,
+      items: board.items.map((item) => ({ ...item })),
     },
   };
 }
 
-function buildYear4Week8ShopQuestion(): MixedWordProblemQuestion {
+function buildYear4Week8ShopQuestion(config: GenericConfig): MixedWordProblemQuestion {
+  const board = getWeek8Board(config);
   const variants = [
-    {
-      prompt:
-        "Use the shop image. 3 sandwiches cost $4 each. A student pays with one $20 note. What change should they get?",
-      answer: 8,
-      helper: "Multiply the item price by the quantity, then subtract from the money shown.",
-      visual: {
-        type: "australian_money" as const,
-        title: "Shop Counter",
-        itemLabel: "Sandwich",
-        itemPrice: 4,
-        quantity: 3,
-        pieces: [{ label: "$20", kind: "note" as const, value: 20 }],
-      },
-    },
-    {
-      prompt:
-        "Use the shop image. 4 muffins cost $3 each. The student pays with one $10 note and one $5 note. What change should they get?",
-      answer: 3,
-      helper: "Find the total cost first, then compare it with the money shown.",
-      visual: {
-        type: "australian_money" as const,
-        title: "Bakery Counter",
-        itemLabel: "Muffin",
-        itemPrice: 3,
-        quantity: 4,
-        pieces: [
-          { label: "$10", kind: "note" as const, value: 10 },
-          { label: "$5", kind: "note" as const, value: 5 },
-        ],
-      },
-    },
-    {
-      prompt:
-        "Use the shop image. Which total matches 5 juices at $2 each paid with two $5 notes?",
-      answer: 10,
-      helper: "Multiply the price by the quantity to find the basket total.",
-      visual: {
-        type: "australian_money" as const,
-        title: "Canteen Counter",
-        itemLabel: "Juice",
-        itemPrice: 2,
-        quantity: 5,
-        pieces: [
-          { label: "$5", kind: "note" as const, value: 5 },
-          { label: "$5", kind: "note" as const, value: 5 },
-        ],
-      },
-    },
+    (() => {
+      const item = board.items[0];
+      const quantity = 3;
+      const total = item.price * quantity;
+      const payment = Math.ceil(total / 10) * 10;
+      return {
+        prompt: `Use the ${board.title}. ${quantity} ${item.label.toLowerCase()}s cost $${item.price} each. What change should you get from $${payment}?`,
+        answer: payment - total,
+        helper: "Multiply the item price by the quantity, then subtract from the money shown.",
+        visual: {
+          type: "australian_money" as const,
+          title: board.title,
+          boardLabel: board.id,
+          itemLabel: item.label,
+          itemDetail: item.detail,
+          itemPrice: item.price,
+          quantity,
+          pieces: [{ label: `$${payment}`, kind: "note" as const, value: payment }],
+        },
+      };
+    })(),
+    (() => {
+      const item = board.items[1];
+      const quantity = 4;
+      const total = item.price * quantity;
+      const payment = total + 5;
+      return {
+        prompt: `Use the ${board.title}. ${quantity} ${item.label.toLowerCase()}s cost $${item.price} each. What change should you get from the money shown?`,
+        answer: payment - total,
+        helper: "Find the total cost first, then compare it with the money shown.",
+        visual: {
+          type: "australian_money" as const,
+          title: board.title,
+          boardLabel: board.id,
+          itemLabel: item.label,
+          itemDetail: item.detail,
+          itemPrice: item.price,
+          quantity,
+          pieces:
+            payment === 15
+              ? [
+                  { label: "$10", kind: "note" as const, value: 10 },
+                  { label: "$5", kind: "note" as const, value: 5 },
+                ]
+              : [
+                  { label: `$${payment}`, kind: "note" as const, value: payment },
+                ],
+        },
+      };
+    })(),
+    (() => {
+      const item = board.items[2];
+      const quantity = 5;
+      const total = item.price * quantity;
+      const payment = total;
+      return {
+        prompt: `Use the ${board.title}. What is the total value of ${quantity} ${item.label.toLowerCase()}s?`,
+        answer: total,
+        helper: "Multiply the price by the quantity to find the basket total.",
+        visual: {
+          type: "australian_money" as const,
+          title: board.title,
+          boardLabel: board.id,
+          itemLabel: item.label,
+          itemDetail: item.detail,
+          itemPrice: item.price,
+          quantity,
+          pieces: [
+            { label: "$5", kind: "note" as const, value: 5 },
+            { label: "$5", kind: "note" as const, value: 5 },
+          ],
+        },
+      };
+    })(),
   ] as const;
   const picked = variants[randInt(0, variants.length - 1)] ?? variants[0];
   return {
@@ -1779,39 +1935,51 @@ function buildYear4Week8ShopQuestion(): MixedWordProblemQuestion {
   };
 }
 
-function buildYear4Week8TwoStepQuestion(): MixedWordProblemQuestion {
+function buildYear4Week8TwoStepQuestion(config: GenericConfig): MixedWordProblemQuestion {
+  const board = getWeek8Board(config);
   const variants = [
-    {
-      prompt:
-        "Use the receipt. 4 tickets cost $7 each and 2 snack packs cost $5 each. What is the total cost?",
-      answer: 38,
-      helper: "Multiply each item cost first, then add the totals.",
-      lines: [
-        { label: "Ticket", price: 7, quantity: 4 },
-        { label: "Snack Pack", price: 5, quantity: 2 },
-      ],
-    },
-    {
-      prompt:
-        "Use the receipt. 3 game passes cost $8 each and 4 drinks cost $3 each. The family pays with $50. How much change should they get?",
-      answer: 14,
-      helper: "Multiply first, add the costs, then subtract from the payment.",
-      lines: [
-        { label: "Game Pass", price: 8, quantity: 3 },
-        { label: "Drink", price: 3, quantity: 4 },
-      ],
-      payment: 50,
-    },
-    {
-      prompt:
-        "Use the receipt. 5 tickets cost $6 each and 2 popcorns cost $4 each. What is the total cost?",
-      answer: 38,
-      helper: "Multiply each line, then combine the totals.",
-      lines: [
-        { label: "Ticket", price: 6, quantity: 5 },
-        { label: "Popcorn", price: 4, quantity: 2 },
-      ],
-    },
+    (() => {
+      const a = board.items[0];
+      const b = board.items[3];
+      return {
+        prompt: `Use the receipt from the ${board.title}. What is the total cost of 4 ${a.label.toLowerCase()}s and 2 ${b.label.toLowerCase()}s?`,
+        answer: a.price * 4 + b.price * 2,
+        helper: "Multiply each item cost first, then add the totals.",
+        lines: [
+          { label: a.label, detail: a.detail, price: a.price, quantity: 4 },
+          { label: b.label, detail: b.detail, price: b.price, quantity: 2 },
+        ],
+      };
+    })(),
+    (() => {
+      const a = board.items[1];
+      const b = board.items[4];
+      const spend = a.price * 3 + b.price * 4;
+      const payment = Math.ceil(spend / 10) * 10 + 10;
+      return {
+        prompt: `Use the receipt from the ${board.title}. A family pays with $${payment}. How much change do they get after buying 3 ${a.label.toLowerCase()}s and 4 ${b.label.toLowerCase()}s?`,
+        answer: payment - spend,
+        helper: "Multiply first, add the costs, then subtract from the payment.",
+        lines: [
+          { label: a.label, detail: a.detail, price: a.price, quantity: 3 },
+          { label: b.label, detail: b.detail, price: b.price, quantity: 4 },
+        ],
+        payment,
+      };
+    })(),
+    (() => {
+      const a = board.items[2];
+      const b = board.items[5];
+      return {
+        prompt: `Use the receipt from the ${board.title}. What is the total cost of 5 ${a.label.toLowerCase()}s and 2 ${b.label.toLowerCase()}s?`,
+        answer: a.price * 5 + b.price * 2,
+        helper: "Multiply each line, then combine the totals.",
+        lines: [
+          { label: a.label, detail: a.detail, price: a.price, quantity: 5 },
+          { label: b.label, detail: b.detail, price: b.price, quantity: 2 },
+        ],
+      };
+    })(),
   ] as const;
   const picked = variants[randInt(0, variants.length - 1)] ?? variants[0];
   return {
@@ -1825,7 +1993,8 @@ function buildYear4Week8TwoStepQuestion(): MixedWordProblemQuestion {
     showStrategyClue: false,
     visual: {
       type: "receipt",
-      title: "Purchase Receipt",
+      title: board.title,
+      boardLabel: board.id,
       lines: picked.lines.map((line) => ({ ...line })),
       payment: "payment" in picked ? picked.payment : undefined,
     },
@@ -3471,13 +3640,13 @@ function generateInteractiveQuestion(
     if (isYear4Week8(level, lesson)) {
       const explicitMode = typeof config.mode === "string" ? config.mode : "";
       if (explicitMode === "budgeting") {
-        return buildYear4Week8BudgetingQuestion();
+        return buildYear4Week8BudgetingQuestion(config);
       }
       if (explicitMode === "shop_transactions") {
-        return buildYear4Week8ShopQuestion();
+        return buildYear4Week8ShopQuestion(config);
       }
       if (explicitMode === "two_step_problem") {
-        return buildYear4Week8TwoStepQuestion();
+        return buildYear4Week8TwoStepQuestion(config);
       }
     }
     if (isYear3Week6TwoStepOnly(level, lesson)) {
