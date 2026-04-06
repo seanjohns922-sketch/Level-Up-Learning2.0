@@ -38,6 +38,7 @@ export default function TypedResponseActivity({
   const writtenMethod = questionData.writtenMethod;
   const isGuidedAddition = writtenMethod?.operation === "+";
   const isGuidedSubtraction = writtenMethod?.operation === "-";
+  const isColumnMultiplication = writtenMethod?.operation === "×";
   const isGuidedWrittenMethod = isGuidedAddition || isGuidedSubtraction;
   const orderingAnswerParts = !writtenMethod ? extractOrderingNumbers(questionData.answer) : [];
   const isOrderingResponse =
@@ -298,7 +299,9 @@ export default function TypedResponseActivity({
   }
 
   function check() {
-    const value = writtenMethod
+    const value = isColumnMultiplication
+      ? normalize(typed)
+      : writtenMethod
       ? normalize(normalizedDigitAnswer())
       : isOrderingResponse
       ? orderedInputs.map(normalizeOrderingNumber).join(",")
@@ -422,33 +425,35 @@ export default function TypedResponseActivity({
               ))}
             </div>
             <div className="mt-3 h-1 w-full rounded bg-slate-300" />
-            <div className="mt-3 grid w-fit grid-flow-col gap-2">
-              <div className="w-8" />
-              {digitInputs.map((digit, index) => (
-                <input
-                  key={`answer-${index}`}
-                  value={digit}
-                  inputMode="numeric"
-                  maxLength={1}
-                  disabled={isGuidedWrittenMethod ? index !== currentColumn || guidedPhase !== "input" : false}
-                  onChange={(event) => {
-                    const nextValue = event.target.value.replace(/[^0-9]/g, "").slice(-1);
-                    setDigitInputs((current) =>
-                      current.map((cell, cellIndex) =>
-                        cellIndex === index ? nextValue : cell
-                      )
-                    );
-                  }}
-                  className={[
-                    "h-12 w-12 rounded-lg border border-teal-300 bg-white text-center text-2xl font-black text-slate-900 outline-none focus:border-teal-500",
-                    isGuidedWrittenMethod && index === currentColumn ? "ring-2 ring-teal-400" : "",
-                    isGuidedWrittenMethod && (index !== currentColumn || guidedPhase !== "input")
-                      ? "bg-slate-50 text-slate-500"
-                      : "",
-                  ].join(" ")}
-                />
-              ))}
-            </div>
+            {isColumnMultiplication ? null : (
+              <div className="mt-3 grid w-fit grid-flow-col gap-2">
+                <div className="w-8" />
+                {digitInputs.map((digit, index) => (
+                  <input
+                    key={`answer-${index}`}
+                    value={digit}
+                    inputMode="numeric"
+                    maxLength={1}
+                    disabled={isGuidedWrittenMethod ? index !== currentColumn || guidedPhase !== "input" : false}
+                    onChange={(event) => {
+                      const nextValue = event.target.value.replace(/[^0-9]/g, "").slice(-1);
+                      setDigitInputs((current) =>
+                        current.map((cell, cellIndex) =>
+                          cellIndex === index ? nextValue : cell
+                        )
+                      );
+                    }}
+                    className={[
+                      "h-12 w-12 rounded-lg border border-teal-300 bg-white text-center text-2xl font-black text-slate-900 outline-none focus:border-teal-500",
+                      isGuidedWrittenMethod && index === currentColumn ? "ring-2 ring-teal-400" : "",
+                      isGuidedWrittenMethod && (index !== currentColumn || guidedPhase !== "input")
+                        ? "bg-slate-50 text-slate-500"
+                        : "",
+                    ].join(" ")}
+                  />
+                ))}
+              </div>
+            )}
           </div>
           {isGuidedWrittenMethod && currentColumn >= 0 ? (
             <div className="mt-4 rounded-xl bg-white p-4 shadow-sm">
@@ -528,9 +533,22 @@ export default function TypedResponseActivity({
             </div>
           ) : (
             <p className="mt-3 text-sm font-medium text-slate-600">
-              Complete the written method vertically, then check your answer.
+              {isColumnMultiplication
+                ? "Use column multiplication vertically, then type the final answer."
+                : "Complete the written method vertically, then check your answer."}
             </p>
           )}
+          {isColumnMultiplication ? (
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <input
+                value={typed}
+                onChange={(event) => setTyped(event.target.value)}
+                inputMode="numeric"
+                placeholder="Type the final answer"
+                className="w-full max-w-md rounded-xl border border-gray-300 px-4 py-3 text-lg font-bold text-gray-900 outline-none focus:border-teal-500"
+              />
+            </div>
+          ) : null}
         </div>
       ) : (
         <div className="mt-6 flex flex-wrap items-center gap-3">
@@ -558,7 +576,11 @@ export default function TypedResponseActivity({
             <input
               value={typed}
               onChange={(event) => setTyped(event.target.value)}
-              placeholder={questionData.placeholder ?? "Type your answer"}
+              placeholder={
+                isColumnMultiplication
+                  ? "Type the final answer"
+                  : questionData.placeholder ?? "Type your answer"
+              }
               className="w-full max-w-md rounded-xl border border-gray-300 px-4 py-3 text-lg font-bold text-gray-900 outline-none focus:border-teal-500"
             />
           )}

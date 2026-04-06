@@ -472,7 +472,7 @@ export type MultipleChoiceQuestion = {
 
 export type WrittenMethodLayout = {
   title: string;
-  operation: "+" | "-";
+  operation: "+" | "-" | "×";
   top: string[];
   bottom: string[];
   answerLength: number;
@@ -1084,7 +1084,7 @@ function buildSubtractionBorrowData(
 
 function buildWrittenMethodLayout(
   title: string,
-  operation: "+" | "-",
+  operation: "+" | "-" | "×",
   topValue: number,
   bottomValue: number,
   answer: number
@@ -4454,8 +4454,9 @@ function generateGenericQuestion(
       kind: "typed_response",
       prompt: `${formatMathNumber(picked[0])} × ${formatMathNumber(picked[1])} = ?`,
       answer: formatMathNumber(answer),
-      helper: "Use an efficient written method and keep the place values lined up.",
+      helper: "Use column multiplication and keep the place values lined up.",
       placeholder: "Type the answer",
+      writtenMethod: buildWrittenMethodLayout("Column Multiplication", "×", picked[0], picked[1], answer),
     };
   }
 

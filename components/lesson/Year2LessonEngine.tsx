@@ -142,12 +142,13 @@ export function Year2LessonEngine({
     timeoutRef.current = setTimeout(() => loadNextQuestion(), 1200);
   }
 
-  // Derive task description + hint from question data
-  const taskDescription = currentQuestion
-    ? (currentQuestion as Record<string, unknown>).prompt as string ??
-      currentActivity?.activityType?.replace(/_/g, " ") ??
-      "Complete the activity"
-    : "Complete the activity";
+  // Keep the support panel lesson-level, not question-level.
+  const taskDescription =
+    lesson.focus ||
+    lesson.title ||
+    (currentActivity
+      ? `Complete the ${currentActivity.activityType.replace(/_/g, " ")} activity.`
+      : "Complete the activity.");
 
   const hint = currentQuestion
     ? (currentQuestion as Record<string, unknown>).helper as string | undefined ?? null

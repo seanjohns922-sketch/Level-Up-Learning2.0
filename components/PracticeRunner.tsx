@@ -171,11 +171,10 @@ export function PracticeRunner({
 
   const isBuiltinKind = ["mcq", "count", "order3", "audioPick", "numberHunt", "groupCountVisual"].includes(task.kind);
 
-  // Derive task description from task prompt
-  const taskDescription =
-    "prompt" in task && (task as any).prompt
-      ? (task as any).prompt
-      : "Complete the activity";
+  // Keep the support panel lesson-level, not question-level.
+  const taskDescription = lessonTitle
+    ? `Complete the ${lessonTitle.toLowerCase()} activity.`
+    : "Complete the activity carefully.";
 
   const hint =
     "helper" in task && (task as any).helper
