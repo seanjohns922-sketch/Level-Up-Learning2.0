@@ -36,19 +36,19 @@ export function LessonStatStrip({
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-3">
+    <div className="grid grid-cols-3 gap-2.5">
       {stats.map((s) => (
         <div
           key={s.label}
-          className={`rounded-2xl border p-4 shadow-sm ${s.bg} transition-all`}
+          className={`rounded-xl border p-3 shadow-sm ${s.bg} transition-all`}
         >
-          <div className="mb-2 flex items-center gap-2">
-            <s.icon className={`h-4 w-4 ${s.color}`} />
-            <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500">
+          <div className="mb-1.5 flex items-center gap-1.5">
+            <s.icon className={`h-3.5 w-3.5 ${s.color}`} />
+            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-500">
               {s.label}
             </span>
           </div>
-          <div className="text-3xl font-black text-gray-900 tabular-nums">
+          <div className="text-2xl font-black text-gray-900 tabular-nums md:text-[1.7rem]">
             {s.value}
           </div>
         </div>

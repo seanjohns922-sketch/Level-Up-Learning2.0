@@ -179,9 +179,9 @@ export function Year2LessonEngine({
       : "border-border/50";
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* ── Summary strip: XP + Timer ── */}
-      <div className="rounded-3xl border border-border/50 bg-card p-5 shadow-md space-y-4">
+      <div className="rounded-3xl border border-border/50 bg-card p-4 shadow-md space-y-3">
         <div className="flex items-center gap-3">
           <div className="flex-1">
             <LessonXPBar correct={correctAnswers} totalTarget={Math.max(XP_TARGET, questionsAnswered + 2)} />
@@ -199,7 +199,7 @@ export function Year2LessonEngine({
       {/* ── Status feedback pill ── */}
       {status !== "idle" && (
         <div
-          className={`rounded-2xl px-4 py-3 text-center font-extrabold text-sm shadow-sm transition-all ${
+          className={`rounded-xl px-4 py-2.5 text-center text-sm font-extrabold shadow-sm transition-all ${
             status === "correct"
               ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
               : "bg-red-50 text-red-700 border border-red-200"
@@ -215,11 +215,11 @@ export function Year2LessonEngine({
       {/* ── Main task card ── */}
       {currentActivity && currentQuestion ? (
         <div
-          className={`rounded-[2rem] border-2 bg-card shadow-lg p-6 transition-all duration-300 ${statusBorder}`}
+          className={`rounded-[1.75rem] border-2 bg-card p-5 shadow-lg transition-all duration-300 ${statusBorder}`}
         >
           {/* Activity type label */}
-          <div className="mb-4">
-            <span className="inline-block rounded-full bg-emerald-50 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.22em] text-emerald-700">
+          <div className="mb-3">
+            <span className="inline-block rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-700">
               {activityLabel}
             </span>
           </div>
