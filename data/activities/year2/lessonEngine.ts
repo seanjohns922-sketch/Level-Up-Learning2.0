@@ -41,6 +41,40 @@ export type DecimalVisualData =
       hundredths: number;
     };
 
+export type MoneyVisualData =
+  | {
+      type: "shopping_list";
+      title: string;
+      budget?: number;
+      items: Array<{
+        label: string;
+        price: number;
+        quantity?: number;
+      }>;
+    }
+  | {
+      type: "australian_money";
+      title: string;
+      itemLabel?: string;
+      itemPrice?: number;
+      quantity?: number;
+      pieces: Array<{
+        label: string;
+        kind: "coin" | "note";
+        value: number;
+      }>;
+    }
+  | {
+      type: "receipt";
+      title: string;
+      lines: Array<{
+        label: string;
+        price: number;
+        quantity?: number;
+      }>;
+      payment?: number;
+    };
+
 export type ColumnMultiplicationVisualData = {
   type: "column_multiplication";
   topValue: number;
@@ -293,8 +327,15 @@ export type MixedWordProblemQuestion = {
   correctOperation?: "+" | "-" | "x" | "/";
   operationChoices?: Array<"+" | "-" | "x" | "/">;
   helper: string;
-  mode: "choose_operation" | "two_step_add_sub" | "mult_div_problems";
+  mode:
+    | "choose_operation"
+    | "two_step_add_sub"
+    | "mult_div_problems"
+    | "budgeting"
+    | "shop_transactions"
+    | "two_step_problem";
   showStrategyClue?: boolean;
+  visual?: MoneyVisualData;
 };
 
 export type ReviewQuizInnerQuestion =
@@ -481,7 +522,8 @@ export type MultipleChoiceQuestion = {
         columns: number;
       }
     | MABVisualData
-    | DecimalVisualData;
+    | DecimalVisualData
+    | MoneyVisualData;
 };
 
 export type WrittenMethodLayout = {
@@ -503,7 +545,12 @@ export type TypedResponseQuestion = {
   helper?: string;
   placeholder?: string;
   writtenMethod?: WrittenMethodLayout;
-  visual?: MABVisualData | DecimalVisualData | ColumnMultiplicationVisualData | BoxMethodVisualData;
+  visual?:
+    | MABVisualData
+    | DecimalVisualData
+    | ColumnMultiplicationVisualData
+    | BoxMethodVisualData
+    | MoneyVisualData;
 };
 
 export type SpeedRoundQuestion = {
@@ -1604,6 +1651,184 @@ function buildYear3Week9EstimationQuestion(): MixedWordProblemQuestion {
     helper: `${fmt(first)} ≈ ${fmt(roundedFirst)} and ${fmt(second)} ≈ ${fmt(roundedSecond)}. ${fmt(roundedFirst)} + ${fmt(roundedSecond)} ≈ ${fmt(answer)}. Which answer is closest?`,
     mode: "choose_operation",
     showStrategyClue: false,
+  };
+}
+
+function isYear4Week8(level: SupportedMathLevel, lesson: Lesson) {
+  return level === 4 && lesson.week === 8;
+}
+
+function buildYear4Week8BudgetingQuestion(): MixedWordProblemQuestion {
+  const variants = [
+    {
+      prompt:
+        "Use the item list. A student buys 4 notebooks and 3 glue sticks. How much is spent altogether?",
+      items: [
+        { label: "Notebook", price: 6, quantity: 4 },
+        { label: "Glue Stick", price: 3, quantity: 3 },
+      ],
+      answer: 33,
+      helper: "Multiply each price by the quantity, then add the totals.",
+    },
+    {
+      prompt:
+        "Use the item list. Mia buys 5 markers and 2 pencil cases. How much does she spend?",
+      items: [
+        { label: "Marker", price: 4, quantity: 5 },
+        { label: "Pencil Case", price: 9, quantity: 2 },
+      ],
+      answer: 38,
+      helper: "Work out each item total first, then combine them.",
+    },
+    {
+      prompt:
+        "Use the item list. Noah has a $50 budget. He buys 3 lunch boxes and 4 drink bottles. How much money is left?",
+      items: [
+        { label: "Lunch Box", price: 8, quantity: 3 },
+        { label: "Drink Bottle", price: 5, quantity: 4 },
+      ],
+      answer: 6,
+      helper: "Multiply the costs, add the total spent, then compare it with the budget.",
+      budget: 50,
+    },
+  ] as const;
+  const picked = variants[randInt(0, variants.length - 1)] ?? variants[0];
+  return {
+    kind: "mixed_word_problem",
+    prompt: picked.prompt,
+    answer: picked.answer,
+    options: uniqueNumberOptions(picked.answer, Math.max(8, picked.answer + 10)).map(Number),
+    operationLabel: "Multiply and add costs",
+    helper: picked.helper,
+    mode: "budgeting",
+    showStrategyClue: false,
+    visual: {
+      type: "shopping_list",
+      title: "Budgeting Items",
+      budget: "budget" in picked ? picked.budget : undefined,
+      items: picked.items.map((item) => ({ ...item })),
+    },
+  };
+}
+
+function buildYear4Week8ShopQuestion(): MixedWordProblemQuestion {
+  const variants = [
+    {
+      prompt:
+        "Use the shop image. 3 sandwiches cost $4 each. A student pays with one $20 note. What change should they get?",
+      answer: 8,
+      helper: "Multiply the item price by the quantity, then subtract from the money shown.",
+      visual: {
+        type: "australian_money" as const,
+        title: "Shop Counter",
+        itemLabel: "Sandwich",
+        itemPrice: 4,
+        quantity: 3,
+        pieces: [{ label: "$20", kind: "note" as const, value: 20 }],
+      },
+    },
+    {
+      prompt:
+        "Use the shop image. 4 muffins cost $3 each. The student pays with one $10 note and one $5 note. What change should they get?",
+      answer: 3,
+      helper: "Find the total cost first, then compare it with the money shown.",
+      visual: {
+        type: "australian_money" as const,
+        title: "Bakery Counter",
+        itemLabel: "Muffin",
+        itemPrice: 3,
+        quantity: 4,
+        pieces: [
+          { label: "$10", kind: "note" as const, value: 10 },
+          { label: "$5", kind: "note" as const, value: 5 },
+        ],
+      },
+    },
+    {
+      prompt:
+        "Use the shop image. Which total matches 5 juices at $2 each paid with two $5 notes?",
+      answer: 10,
+      helper: "Multiply the price by the quantity to find the basket total.",
+      visual: {
+        type: "australian_money" as const,
+        title: "Canteen Counter",
+        itemLabel: "Juice",
+        itemPrice: 2,
+        quantity: 5,
+        pieces: [
+          { label: "$5", kind: "note" as const, value: 5 },
+          { label: "$5", kind: "note" as const, value: 5 },
+        ],
+      },
+    },
+  ] as const;
+  const picked = variants[randInt(0, variants.length - 1)] ?? variants[0];
+  return {
+    kind: "mixed_word_problem",
+    prompt: picked.prompt,
+    answer: picked.answer,
+    options: uniqueNumberOptions(picked.answer, Math.max(8, picked.answer + 10)).map(Number),
+    operationLabel: "Multiply in a shopping context",
+    helper: picked.helper,
+    mode: "shop_transactions",
+    showStrategyClue: false,
+    visual: {
+      ...picked.visual,
+      pieces: picked.visual.pieces.map((piece) => ({ ...piece })),
+    },
+  };
+}
+
+function buildYear4Week8TwoStepQuestion(): MixedWordProblemQuestion {
+  const variants = [
+    {
+      prompt:
+        "Use the receipt. 4 tickets cost $7 each and 2 snack packs cost $5 each. What is the total cost?",
+      answer: 38,
+      helper: "Multiply each item cost first, then add the totals.",
+      lines: [
+        { label: "Ticket", price: 7, quantity: 4 },
+        { label: "Snack Pack", price: 5, quantity: 2 },
+      ],
+    },
+    {
+      prompt:
+        "Use the receipt. 3 game passes cost $8 each and 4 drinks cost $3 each. The family pays with $50. How much change should they get?",
+      answer: 14,
+      helper: "Multiply first, add the costs, then subtract from the payment.",
+      lines: [
+        { label: "Game Pass", price: 8, quantity: 3 },
+        { label: "Drink", price: 3, quantity: 4 },
+      ],
+      payment: 50,
+    },
+    {
+      prompt:
+        "Use the receipt. 5 tickets cost $6 each and 2 popcorns cost $4 each. What is the total cost?",
+      answer: 38,
+      helper: "Multiply each line, then combine the totals.",
+      lines: [
+        { label: "Ticket", price: 6, quantity: 5 },
+        { label: "Popcorn", price: 4, quantity: 2 },
+      ],
+    },
+  ] as const;
+  const picked = variants[randInt(0, variants.length - 1)] ?? variants[0];
+  return {
+    kind: "mixed_word_problem",
+    prompt: picked.prompt,
+    answer: picked.answer,
+    options: uniqueNumberOptions(picked.answer, Math.max(8, picked.answer + 12)).map(Number),
+    operationLabel: "Multiply, then combine totals",
+    helper: picked.helper,
+    mode: "two_step_problem",
+    showStrategyClue: false,
+    visual: {
+      type: "receipt",
+      title: "Purchase Receipt",
+      lines: picked.lines.map((line) => ({ ...line })),
+      payment: "payment" in picked ? picked.payment : undefined,
+    },
   };
 }
 
@@ -3243,6 +3468,18 @@ function generateInteractiveQuestion(
   }
 
   if (activityType === "mixed_word_problem") {
+    if (isYear4Week8(level, lesson)) {
+      const explicitMode = typeof config.mode === "string" ? config.mode : "";
+      if (explicitMode === "budgeting") {
+        return buildYear4Week8BudgetingQuestion();
+      }
+      if (explicitMode === "shop_transactions") {
+        return buildYear4Week8ShopQuestion();
+      }
+      if (explicitMode === "two_step_problem") {
+        return buildYear4Week8TwoStepQuestion();
+      }
+    }
     if (isYear3Week6TwoStepOnly(level, lesson)) {
       return buildYear3Week6TwoStepWordProblem(lesson);
     }
@@ -4466,9 +4703,11 @@ function generateGenericQuestion(
     const answer = picked[0] * picked[1];
     return {
       kind: "typed_response",
-      prompt: `${formatMathNumber(picked[0])} × ${formatMathNumber(picked[1])} = ?`,
+      prompt: `Complete the column multiplication chart for ${formatMathNumber(
+        picked[0]
+      )} × ${formatMathNumber(picked[1])}.`,
       answer: formatMathNumber(answer),
-      helper: "Use column multiplication and keep the place values lined up.",
+      helper: "Use column multiplication.",
       placeholder: "Type the answer",
       writtenMethod: buildWrittenMethodLayout("Column Multiplication", "×", picked[0], picked[1], answer),
       visual: {
@@ -4484,30 +4723,26 @@ function generateGenericQuestion(
     const variants = [
       {
         topValue: 23,
-        bottomValue: 14,
-        prompt: "In 23 × 14, what is the ones row partial product?",
-        answer: "92",
+        bottomValue: 4,
+      },
+      {
+        topValue: 18,
+        bottomValue: 16,
       },
       {
         topValue: 23,
         bottomValue: 14,
-        prompt: "In 23 × 14, what is the tens row value before adding?",
-        answer: "230",
-      },
-      {
-        topValue: 34,
-        bottomValue: 27,
-        prompt: "In 34 × 27, what is the ones row partial product?",
-        answer: "238",
       },
     ] as const;
     const selected = variants[randInt(0, variants.length - 1)] ?? variants[0];
     return {
       kind: "typed_response",
-      prompt: selected.prompt,
-      answer: selected.answer,
-      helper: "Work out one row at a time using place value.",
-      placeholder: "Type the row value",
+      prompt: `Complete the column multiplication chart for ${formatMathNumber(
+        selected.topValue
+      )} × ${formatMathNumber(selected.bottomValue)}.`,
+      answer: formatMathNumber(selected.topValue * selected.bottomValue),
+      helper: "Work out the ones row first, then the tens row.",
+      placeholder: "Complete the chart",
       writtenMethod: buildWrittenMethodLayout(
         "Column Multiplication",
         "×",
@@ -5351,6 +5586,7 @@ function generateGenericQuestion(
           options: sourceQuestion.options.map(String),
           answer: String(sourceQuestion.answer),
           helper: sourceQuestion.showStrategyClue === false ? sourceQuestion.helper : undefined,
+          visual: sourceQuestion.visual,
         }
       : {
           kind: "typed_response",
@@ -5358,6 +5594,7 @@ function generateGenericQuestion(
           answer: String(sourceQuestion.answer),
           helper: sourceQuestion.helper,
           placeholder: "Type the answer",
+          visual: sourceQuestion.visual,
         };
   }
 

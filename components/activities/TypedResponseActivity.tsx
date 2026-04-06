@@ -5,6 +5,7 @@ import type { TypedResponseQuestion } from "@/data/activities/year2/lessonEngine
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import PlaceValueMABVisual from "@/components/activities/PlaceValueMABVisual";
 import DecimalModelVisual from "@/components/activities/DecimalModelVisual";
+import MoneyContextVisual from "@/components/activities/MoneyContextVisual";
 
 function normalize(value: string) {
   return value.trim().toLowerCase().replace(/,/g, "").replace(/\s+/g, " ");
@@ -853,6 +854,11 @@ export default function TypedResponseActivity({
 
   return (
     <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+      {questionData.visual?.type === "shopping_list" ||
+      questionData.visual?.type === "australian_money" ||
+      questionData.visual?.type === "receipt" ? (
+        <MoneyContextVisual visual={questionData.visual} />
+      ) : null}
       <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">
         {activityTitle}
       </div>

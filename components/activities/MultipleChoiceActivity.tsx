@@ -5,6 +5,7 @@ import type { MultipleChoiceQuestion } from "@/data/activities/year2/lessonEngin
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import PlaceValueMABVisual from "@/components/activities/PlaceValueMABVisual";
 import DecimalModelVisual from "@/components/activities/DecimalModelVisual";
+import MoneyContextVisual from "@/components/activities/MoneyContextVisual";
 
 function ArrayVisual({ rows, cols }: { rows: number; cols: number }) {
   return (
@@ -50,6 +51,11 @@ export default function MultipleChoiceActivity({
 
   return (
     <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+      {questionData.visual?.type === "shopping_list" ||
+      questionData.visual?.type === "australian_money" ||
+      questionData.visual?.type === "receipt" ? (
+        <MoneyContextVisual visual={questionData.visual} />
+      ) : null}
       <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">
         Multiple Choice
       </div>

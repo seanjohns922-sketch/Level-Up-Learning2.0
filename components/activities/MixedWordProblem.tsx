@@ -3,6 +3,7 @@
 import { useState } from "react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { MixedWordProblemQuestion } from "@/data/activities/year2/lessonEngine";
+import MoneyContextVisual from "@/components/activities/MoneyContextVisual";
 
 export default function MixedWordProblem({
   questionData,
@@ -43,6 +44,7 @@ export default function MixedWordProblem({
 
   return (
     <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+      {questionData.visual ? <MoneyContextVisual visual={questionData.visual} /> : null}
       <div>
         <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">
           Mixed Word Problem

@@ -508,12 +508,12 @@ const year4Rows: ProgramRow[] = [
     focus: "Problem Solving with Money & Multiplication",
     lesson: 1,
     topic: "Budgeting Problems",
-    activity: "Plan a shopping trip with a set budget",
+    activity: "Use multiplication to calculate total costs and compare spending",
     curriculum: ["AC9M4N06", "AC9M4N08"],
     activities: [
       makeActivity("mixed_word_problem", 2, {
         mode: "budgeting",
-        operations: ["addition", "subtraction"],
+        operations: ["multiplication", "addition", "subtraction"],
       }),
       makeActivity("typed_response", 1, {
         mode: "budgeting",
@@ -526,12 +526,12 @@ const year4Rows: ProgramRow[] = [
     focus: "Problem Solving with Money & Multiplication",
     lesson: 2,
     topic: "Shop Role-Plays",
-    activity: "Simulate purchases with coins and notes; calculate change",
+    activity: "Apply multiplication in shopping scenarios to find totals and make decisions",
     curriculum: ["AC9M4N06", "AC9M4N08"],
     activities: [
       makeActivity("mixed_word_problem", 2, {
         mode: "shop_transactions",
-        operations: ["addition", "subtraction"],
+        operations: ["multiplication", "subtraction"],
       }),
       makeActivity("multiple_choice", 1, {
         mode: "shop_transactions",
@@ -545,7 +545,7 @@ const year4Rows: ProgramRow[] = [
     lesson: 3,
     quizSafe: false,
     topic: "Multi-Step Problems",
-    activity: "Solve word problems with 2+ steps involving multiplication",
+    activity: "Solve problems that require multiplication followed by addition or subtraction",
     curriculum: ["AC9M4N06", "AC9M4N08"],
     activities: [
       makeActivity("mixed_word_problem", 2, {
