@@ -70,6 +70,18 @@ function getColumnMultiplicationStepData(topValue: number, bottomValue: number) 
   };
 }
 
+function splitForBoxMethod(value: number) {
+  return value >= 10 ? [Math.floor(value / 10) * 10, value % 10].filter(Boolean) : [value];
+}
+
+function getBoxMethodCells(leftValue: number, topValue: number) {
+  const splitLeft = splitForBoxMethod(leftValue);
+  const splitTop = splitForBoxMethod(topValue);
+  const cells = splitLeft.flatMap((left) => splitTop.map((top) => left * top));
+  const total = cells.reduce((sum, value) => sum + value, 0);
+  return { splitLeft, splitTop, cells, total };
+}
+
 function ColumnMultiplicationWorkedExample() {
   return (
     <div className="rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm">
@@ -338,14 +350,27 @@ function BoxMethodWorkedExample() {
 function BoxMethodWorkspace({
   leftValue,
   topValue,
+  boxValues,
+  totalValue,
+  currentStep,
+  onChange,
 }: {
   leftValue: number;
   topValue: number;
+  boxValues: string[];
+  totalValue: string;
+  currentStep: number;
+  onChange: (field: "box" | "total", value: string, index?: number) => void;
 }) {
-  const splitLeft =
-    leftValue >= 10 ? [Math.floor(leftValue / 10) * 10, leftValue % 10].filter(Boolean) : [leftValue];
-  const splitTop =
-    topValue >= 10 ? [Math.floor(topValue / 10) * 10, topValue % 10].filter(Boolean) : [topValue];
+  const { splitLeft, splitTop, cells } = getBoxMethodCells(leftValue, topValue);
+  const totalStepIndex = cells.length;
+  const currentCellIndex = currentStep < totalStepIndex ? currentStep : -1;
+  const currentCellPrompt =
+    currentCellIndex >= 0
+      ? `What is ${splitLeft[Math.floor(currentCellIndex / splitTop.length)]} × ${
+          splitTop[currentCellIndex % splitTop.length]
+        }?`
+      : "Add the box totals.";
 
   return (
     <div className="w-fit rounded-xl bg-white p-4 shadow-sm">
@@ -367,19 +392,50 @@ function BoxMethodWorkspace({
             <div className="flex h-12 items-center justify-center rounded-lg bg-slate-100 text-xl font-black text-slate-900">
               {label}
             </div>
-            {splitTop.map((_, cellIndex) => (
-              <div
-                key={`workspace-box-${rowIndex}-${cellIndex}`}
-                className="flex h-12 items-center justify-center rounded-lg border-2 border-dashed border-teal-200 bg-teal-50/50 text-xl font-black text-teal-400"
-              >
-                _
-              </div>
-            ))}
+            {splitTop.map((topLabel, cellIndex) => {
+              const flatIndex = rowIndex * splitTop.length + cellIndex;
+              const isActive = currentCellIndex === flatIndex;
+              return (
+                <div
+                  key={`workspace-box-${rowIndex}-${cellIndex}`}
+                  className="relative flex h-12 items-center justify-center rounded-lg border-2 border-dashed border-teal-200 bg-teal-50/50 px-2"
+                >
+                  {!boxValues[flatIndex] ? (
+                    <span className="pointer-events-none absolute left-2 top-1 text-[10px] font-bold text-slate-400">
+                      {label} × {topLabel}
+                    </span>
+                  ) : null}
+                  <input
+                    value={boxValues[flatIndex] ?? ""}
+                    onChange={(event) => onChange("box", event.target.value, flatIndex)}
+                    inputMode="numeric"
+                    disabled={!isActive}
+                    className={[
+                      "h-10 w-full rounded-md bg-transparent text-center text-xl font-black text-slate-900 outline-none",
+                      isActive ? "ring-2 ring-teal-200" : "",
+                    ].join(" ")}
+                  />
+                </div>
+              );
+            })}
           </div>
         ))}
       </div>
-      <div className="mt-3 rounded-lg border-2 border-dashed border-amber-200 bg-amber-50/50 px-4 py-3 text-sm font-semibold text-amber-700">
-        Add the box totals to find the final answer.
+      <div className="mt-3 rounded-lg border-2 border-dashed border-amber-200 bg-amber-50/50 px-4 py-3">
+        <div className="text-sm font-semibold text-amber-700">Final total</div>
+        <input
+          value={totalValue}
+          onChange={(event) => onChange("total", event.target.value)}
+          inputMode="numeric"
+          disabled={currentStep !== totalStepIndex}
+          className={[
+            "mt-2 h-11 w-full rounded-lg bg-transparent px-2 text-lg font-black text-slate-900 outline-none",
+            currentStep === totalStepIndex ? "ring-2 ring-amber-200" : "",
+          ].join(" ")}
+        />
+      </div>
+      <div className="mt-3 text-xs font-medium text-slate-500">
+        {currentStep < totalStepIndex ? currentCellPrompt : "Add the box totals."}
       </div>
     </div>
   );
@@ -423,6 +479,10 @@ export default function TypedResponseActivity({
     "ones_digit" | "carry" | "ones_row" | "tens_row" | "total" | "done"
   >("ones_digit");
   const [multiplicationFeedback, setMultiplicationFeedback] = useState("");
+  const [boxMethodInputs, setBoxMethodInputs] = useState<string[]>([]);
+  const [boxMethodTotal, setBoxMethodTotal] = useState("");
+  const [boxMethodStep, setBoxMethodStep] = useState(0);
+  const [boxMethodFeedback, setBoxMethodFeedback] = useState("");
   const [orderedInputs, setOrderedInputs] = useState<string[]>(
     isOrderingResponse ? Array.from({ length: orderingAnswerParts.length }, () => "") : []
   );
@@ -475,6 +535,18 @@ export default function TypedResponseActivity({
     });
     setMultiplicationStep("ones_digit");
     setMultiplicationFeedback("");
+    if (questionData.visual?.type === "box_method") {
+      const { cells } = getBoxMethodCells(questionData.visual.leftValue, questionData.visual.topValue);
+      setBoxMethodInputs(Array.from({ length: cells.length }, () => ""));
+      setBoxMethodTotal("");
+      setBoxMethodStep(0);
+      setBoxMethodFeedback("");
+    } else {
+      setBoxMethodInputs([]);
+      setBoxMethodTotal("");
+      setBoxMethodStep(0);
+      setBoxMethodFeedback("");
+    }
     setOrderedInputs(
       isOrderingResponse ? Array.from({ length: orderingAnswerParts.length }, () => "") : []
     );
@@ -756,6 +828,35 @@ export default function TypedResponseActivity({
       return;
     }
 
+    if (questionData.visual?.type === "box_method") {
+      const expected = getBoxMethodCells(questionData.visual.leftValue, questionData.visual.topValue);
+      if (boxMethodStep < expected.cells.length) {
+        const currentExpected = expected.cells[boxMethodStep];
+        if (normalizeNumberInput(boxMethodInputs[boxMethodStep] ?? "") === String(currentExpected)) {
+          setBoxMethodFeedback("");
+          setBoxMethodStep((step) => step + 1);
+        } else {
+          const { splitLeft, splitTop } = expected;
+          const rowIndex = Math.floor(boxMethodStep / splitTop.length);
+          const colIndex = boxMethodStep % splitTop.length;
+          setBoxMethodFeedback(
+            `Work out ${splitLeft[rowIndex]} × ${splitTop[colIndex]} first.`
+          );
+          onWrong?.();
+        }
+        return;
+      }
+
+      if (normalizeNumberInput(boxMethodTotal) === String(expected.total)) {
+        setBoxMethodFeedback("");
+        onCorrect?.();
+      } else {
+        setBoxMethodFeedback("Add the box totals to find the final answer.");
+        onWrong?.();
+      }
+      return;
+    }
+
     const value = isColumnMultiplication
       ? normalize(typed)
       : writtenMethod
@@ -829,10 +930,33 @@ export default function TypedResponseActivity({
             <BoxMethodWorkspace
               leftValue={questionData.visual.leftValue}
               topValue={questionData.visual.topValue}
+              boxValues={boxMethodInputs}
+              totalValue={boxMethodTotal}
+              currentStep={boxMethodStep}
+              onChange={(field, value, index) => {
+                const cleaned = value.replace(/[^\d,\s]/g, "");
+                if (field === "box" && typeof index === "number") {
+                  setBoxMethodInputs((current) =>
+                    current.map((cell, cellIndex) => (cellIndex === index ? cleaned : cell))
+                  );
+                  return;
+                }
+                setBoxMethodTotal(cleaned);
+              }}
             />
             <p className="mt-4 text-sm font-medium text-slate-600">
-              Fill each box in your head or on paper, then type the final answer.
+              Complete each box step-by-step.
             </p>
+            {boxMethodFeedback ? (
+              <p className="mt-3 text-sm font-bold text-rose-600">{boxMethodFeedback}</p>
+            ) : null}
+            <button
+              type="button"
+              onClick={check}
+              className="mt-4 rounded-xl bg-teal-600 px-5 py-3 font-black text-white hover:bg-teal-700"
+            >
+              Check answer
+            </button>
           </div>
         </div>
       ) : null}
@@ -1078,7 +1202,7 @@ export default function TypedResponseActivity({
                 ))}
               </div>
             </div>
-          ) : (
+          ) : questionData.visual?.type === "box_method" ? null : (
             <input
               value={typed}
               onChange={(event) => setTyped(event.target.value)}
