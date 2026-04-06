@@ -175,6 +175,7 @@ function LessonPage() {
             <PracticeRunner
               key={`${year}-${week}-${lessonId}`}
               minutes={8}
+              lessonTitle={safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
               getTask={(ctx) => {
                 const d = ctx?.difficulty ?? "easy";
                 if (effectiveLessonId.startsWith("y1-w2-")) {
