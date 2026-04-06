@@ -2,6 +2,11 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { LessonRenderer } from "@/components/lesson/LessonRenderer";
+import { LessonXPBar } from "@/components/lesson/LessonXPBar";
+import { LessonTimer } from "@/components/lesson/LessonTimer";
+import { LessonStatStrip } from "@/components/lesson/LessonStatStrip";
+import { LessonSupportPanel } from "@/components/lesson/LessonSupportPanel";
+import { LessonCompleteCard } from "@/components/lesson/LessonCompleteCard";
 import {
   buildLessonActivityPool,
   generateQuestion,
@@ -10,10 +15,6 @@ import {
 } from "@/data/activities/year2/lessonEngine";
 import { pickWeightedIndex } from "@/lib/weightedRandom";
 import type { Lesson } from "@/data/programs/year1";
-
-function pad2(n: number) {
-  return String(n).padStart(2, "0");
-}
 
 function buildInitialTurn(lesson: Lesson, activities: Lesson["activities"] = []) {
   const level = getLevelForLesson(lesson);
@@ -27,14 +28,6 @@ function buildInitialTurn(lesson: Lesson, activities: Lesson["activities"] = [])
   }
 
   const picked = pickWeightedIndex(activities, [], null);
-  if (level === 4 && lesson.week === 3) {
-    console.debug("[Year4Week3] initial_activity", {
-      lessonId: lesson.id,
-      topic: lesson.title,
-      selectedActivityType: activities[picked.index]?.activityType,
-      selectedMode: activities[picked.index]?.config?.mode,
-    });
-  }
   return {
     bag: picked.bag,
     lastIndex: picked.index,
@@ -43,33 +36,7 @@ function buildInitialTurn(lesson: Lesson, activities: Lesson["activities"] = [])
   };
 }
 
-function Countdown({ seconds, total }: { seconds: number; total: number }) {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
-  const pct = Math.max(0, Math.min(100, (seconds / total) * 100));
-
-  return (
-    <div className="flex items-center gap-3 flex-1">
-      <div className="flex-1 h-3 rounded-full bg-gray-100 overflow-hidden">
-        <div
-          className="h-full rounded-full transition-all duration-1000 ease-linear"
-          style={{
-            width: `${pct}%`,
-            background:
-              pct > 50
-                ? "hsl(145 65% 42%)"
-                : pct > 20
-                ? "hsl(42 95% 55%)"
-                : "hsl(0 72% 51%)",
-          }}
-        />
-      </div>
-      <span className="text-sm font-bold text-gray-500 tabular-nums whitespace-nowrap">
-        {minutes}:{pad2(remainingSeconds)}
-      </span>
-    </div>
-  );
-}
+const XP_TARGET = 5; // target questions per session for XP bar scaling
 
 export function Year2LessonEngine({
   lesson,
@@ -100,6 +67,11 @@ export function Year2LessonEngine({
   const finished = secondsLeft <= 0;
   const currentActivity = activities[currentActivityIndex] ?? null;
 
+  const accuracy =
+    questionsAnswered > 0
+      ? Math.round((correctAnswers / questionsAnswered) * 100)
+      : 0;
+
   function clearPendingTimeout() {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -117,29 +89,10 @@ export function Year2LessonEngine({
 
     const nextActivity = activities[picked.index];
     const nextQuestion = generateQuestion(level, lesson, nextActivity);
-    if (level === 4 && lesson.week === 3) {
-      console.debug("[Year4Week3] next_activity", {
-        lessonId: lesson.id,
-        topic: lesson.title,
-        selectedActivityType: nextActivity?.activityType,
-        selectedMode: nextActivity?.config?.mode,
-        questionKind: nextQuestion?.kind,
-      });
-    }
-    if (level === 4 && lesson.week === 4) {
-      console.debug("[Year4Week4] next_activity", {
-        lessonId: lesson.id,
-        topic: lesson.title,
-        lessonNumber: lesson.lesson,
-        selectedActivityType: nextActivity?.activityType,
-        selectedMode: nextActivity?.config?.mode,
-        questionKind: nextQuestion?.kind,
-      });
-    }
 
     setCurrentActivityIndex(picked.index);
     setCurrentQuestion(nextQuestion);
-    setQuestionKey((value) => value + 1);
+    setQuestionKey((v) => v + 1);
     setStatus("idle");
     scoredThisTurnRef.current = false;
   }
@@ -147,47 +100,15 @@ export function Year2LessonEngine({
   useEffect(() => {
     if (lessonPool.violations.length === 0) return;
     const summary = lessonPool.violations
-      .map((violation) => `${violation.reason}: ${violation.message}`)
+      .map((v) => `${v.reason}: ${v.message}`)
       .join(" | ");
     console.error(`[Year2LessonPool] ${lesson.title}: ${summary}`);
   }, [lesson.title, lessonPool.violations]);
 
   useEffect(() => {
-    if (!(level === 4 && lesson.week === 3 && lesson.lesson === 2)) return;
-    console.debug("[Year4Week3Lesson2] pool", {
-      lessonId: lesson.id,
-      topic: lesson.title,
-      validActivityCount: activities.length,
-      activities: activities.map((activity) => ({
-        activityType: activity.activityType,
-        mode: activity.config?.mode,
-        sourceActivityType: activity.config?.sourceActivityType,
-        weight: activity.weight,
-      })),
-    });
-  }, [activities, lesson.id, lesson.lesson, lesson.title, lesson.week, level]);
-
-  useEffect(() => {
-    if (!(level === 4 && lesson.week === 4)) return;
-    console.debug("[Year4Week4] pool", {
-      lessonId: lesson.id,
-      topic: lesson.title,
-      lessonNumber: lesson.lesson,
-      validActivityCount: activities.length,
-      activities: activities.map((activity) => ({
-        activityType: activity.activityType,
-        mode: activity.config?.mode,
-        sourceActivityType: activity.config?.sourceActivityType,
-        weight: activity.weight,
-      })),
-    });
-  }, [activities, lesson.id, lesson.lesson, lesson.title, lesson.week, level]);
-
-  useEffect(() => {
     const interval = setInterval(() => {
-      setSecondsLeft((current) => current - 1);
+      setSecondsLeft((c) => c - 1);
     }, 1000);
-
     return () => {
       clearInterval(interval);
       clearPendingTimeout();
@@ -207,11 +128,9 @@ export function Year2LessonEngine({
     scoredThisTurnRef.current = true;
     clearPendingTimeout();
     setStatus("correct");
-    setQuestionsAnswered((value) => value + 1);
-    setCorrectAnswers((value) => value + 1);
-    timeoutRef.current = setTimeout(() => {
-      loadNextQuestion();
-    }, 1000);
+    setQuestionsAnswered((v) => v + 1);
+    setCorrectAnswers((v) => v + 1);
+    timeoutRef.current = setTimeout(() => loadNextQuestion(), 1000);
   }
 
   function handleWrong() {
@@ -219,118 +138,102 @@ export function Year2LessonEngine({
     scoredThisTurnRef.current = true;
     clearPendingTimeout();
     setStatus("wrong");
-    setQuestionsAnswered((value) => value + 1);
-    timeoutRef.current = setTimeout(() => {
-      loadNextQuestion();
-    }, 1200);
+    setQuestionsAnswered((v) => v + 1);
+    timeoutRef.current = setTimeout(() => loadNextQuestion(), 1200);
   }
 
-  const accuracy =
-    questionsAnswered > 0
-      ? Math.round((correctAnswers / questionsAnswered) * 100)
-      : 0;
+  // Derive task description + hint from question data
+  const taskDescription = currentQuestion
+    ? (currentQuestion as Record<string, unknown>).prompt as string ??
+      currentActivity?.activityType?.replace(/_/g, " ") ??
+      "Complete the activity"
+    : "Complete the activity";
 
-  const statusLabel =
-    status === "correct"
-      ? "✓ Correct!"
-      : status === "wrong"
-      ? "✗ Try again"
-      : currentActivity
-      ? `${currentActivity.activityType.replace(/_/g, " ")}`
-      : "Practise";
+  const hint = currentQuestion
+    ? (currentQuestion as Record<string, unknown>).helper as string | undefined ?? null
+    : null;
 
-  const summary = useMemo(
-    () => [
-      { label: "Questions", value: questionsAnswered },
-      { label: "Correct", value: correctAnswers },
-      { label: "Accuracy", value: `${accuracy}%` },
-    ],
-    [accuracy, correctAnswers, questionsAnswered]
-  );
+  const activityLabel = currentActivity
+    ? currentActivity.activityType.replace(/_/g, " ").toUpperCase()
+    : "PRACTISE";
 
+  // ── Finished state ──
   if (finished) {
     return (
-      <div className="rounded-3xl border bg-white shadow-sm p-5 border-gray-100">
-        <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">
-          Lesson Complete
-        </div>
-        <h2 className="mt-2 text-3xl font-black text-gray-900">{lesson.title}</h2>
-        <p className="mt-2 text-sm text-gray-600">
-          Eight minutes are up. Here is the lesson summary.
-        </p>
-
-        <div className="mt-4 grid gap-2 sm:grid-cols-3">
-          {summary.map((item) => (
-            <div key={item.label} className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
-              <div className="text-xs font-bold uppercase tracking-wide text-gray-500">
-                {item.label}
-              </div>
-              <div className="mt-2 text-3xl font-black text-gray-900">{item.value}</div>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-6 flex justify-end">
-          <button
-            type="button"
-            onClick={onExit}
-            className="rounded-2xl bg-gradient-to-r from-primary to-primary/80 px-6 py-3 text-lg font-extrabold text-primary-foreground hover:opacity-90 transition-all active:scale-[0.98] shadow-lg"
-            style={{ boxShadow: "0 8px 24px -8px hsl(var(--primary) / 0.4)" }}
-          >
-            Return to Week
-          </button>
-        </div>
-      </div>
+      <LessonCompleteCard
+        lessonTitle={lesson.title}
+        questionsAnswered={questionsAnswered}
+        correctAnswers={correctAnswers}
+        accuracy={accuracy}
+        onExit={onExit}
+      />
     );
   }
 
+  // ── Active state ──
+  const statusBorder =
+    status === "correct"
+      ? "border-emerald-300 shadow-emerald-100/50"
+      : status === "wrong"
+      ? "border-red-300 shadow-red-100/50"
+      : "border-border/50";
+
   return (
-    <div
-      className={[
-        "rounded-3xl border bg-white shadow-sm p-4 transition-all",
-        status === "correct"
-          ? "border-emerald-200"
-          : status === "wrong"
-          ? "border-red-200"
-          : "border-gray-100",
-      ].join(" ")}
-    >
-      <div className="flex items-center justify-between gap-3 mb-3">
-        <Countdown seconds={Math.max(0, secondsLeft)} total={totalSeconds} />
-        <div
-          className={[
-            "px-3 py-1.5 rounded-full text-xs font-extrabold tracking-wide transition-all capitalize",
-            status === "correct"
-              ? "bg-emerald-50 text-emerald-700"
-              : status === "wrong"
-              ? "bg-red-50 text-red-700"
-              : "bg-gray-50 text-gray-500",
-          ].join(" ")}
-        >
-          {statusLabel}
-        </div>
-      </div>
-
-      <div className="mb-3 grid gap-2 sm:grid-cols-3">
-        {summary.map((item) => (
-          <div key={item.label} className="rounded-2xl border border-gray-200 bg-gray-50 px-3 py-2">
-            <div className="text-xs font-bold uppercase tracking-wide text-gray-500">
-              {item.label}
-            </div>
-            <div className="mt-0.5 text-lg font-black text-gray-900">{item.value}</div>
+    <div className="space-y-4">
+      {/* ── Summary strip: XP + Timer ── */}
+      <div className="rounded-2xl border border-border/50 bg-card p-4 shadow-sm space-y-3">
+        <div className="flex items-center gap-3">
+          <div className="flex-1">
+            <LessonXPBar correct={correctAnswers} totalTarget={Math.max(XP_TARGET, questionsAnswered + 2)} />
           </div>
-        ))}
+          <LessonTimer seconds={Math.max(0, secondsLeft)} total={totalSeconds} />
+        </div>
+
+        <LessonStatStrip
+          questionsAnswered={questionsAnswered}
+          correctAnswers={correctAnswers}
+          accuracy={accuracy}
+        />
       </div>
 
+      {/* ── Status feedback pill ── */}
+      {status !== "idle" && (
+        <div
+          className={`rounded-2xl px-4 py-3 text-center font-extrabold text-sm transition-all ${
+            status === "correct"
+              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+              : "bg-red-50 text-red-700 border border-red-200"
+          }`}
+        >
+          {status === "correct" ? "✓ Correct! +10 XP" : "✗ Not quite — keep going!"}
+        </div>
+      )}
+
+      {/* ── Support panel ── */}
+      <LessonSupportPanel taskDescription={taskDescription} hint={hint} />
+
+      {/* ── Main task card ── */}
       {currentActivity && currentQuestion ? (
-        <LessonRenderer
-          key={questionKey}
-          activity={currentActivity}
-          prompt={lesson.title}
-          questionData={currentQuestion}
-          onCorrect={handleCorrect}
-          onWrong={handleWrong}
-        />
+        <div
+          className={`rounded-3xl border-2 bg-card shadow-lg p-5 transition-all duration-300 ${statusBorder}`}
+        >
+          {/* Activity type label */}
+          <div className="mb-4">
+            <span className="inline-block rounded-full bg-gray-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-gray-500">
+              {activityLabel}
+            </span>
+          </div>
+
+          {/* Actual activity renderer */}
+          <LessonRenderer
+            key={questionKey}
+            activity={currentActivity}
+            prompt={lesson.title}
+            questionData={currentQuestion}
+            onCorrect={handleCorrect}
+            onWrong={handleWrong}
+          />
+        </div>
       ) : (
         <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">
           This lesson has no valid activities for the current policy. Check the lesson config or
