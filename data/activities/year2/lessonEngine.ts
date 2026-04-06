@@ -4084,6 +4084,205 @@ function generateGenericQuestion(
         };
   }
 
+  if (explicitMode === "multiply_by_10_recall") {
+    const base = randInt(2, 999);
+    const answer = String(base * 10);
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: `What is ${formatMathNumber(base)} × 10?`,
+          options: uniqueNumberOptions(base * 10, Math.max(20, base)),
+          answer,
+          helper: "Think about every digit shifting one place left.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: `${formatMathNumber(base)} × 10 = ?`,
+          answer,
+          helper: "Think about every digit shifting one place left.",
+          placeholder: "Type the answer",
+        };
+  }
+
+  if (explicitMode === "multiply_by_10_shift") {
+    const base = randInt(2, 999);
+    const shifted = base * 10;
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: `After multiplying by 10, ${formatMathNumber(base)} becomes which number?`,
+          options: shuffle([
+            formatMathNumber(shifted),
+            formatMathNumber(base * 100),
+            formatMathNumber(base + 10),
+            formatMathNumber(base),
+          ]),
+          answer: formatMathNumber(shifted),
+          helper: "Multiplying by 10 moves every digit one place to the left.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: `${formatMathNumber(base)} → ? after ×10`,
+          answer: formatMathNumber(shifted),
+          helper: "Multiplying by 10 moves every digit one place to the left.",
+          placeholder: "Type the new number",
+        };
+  }
+
+  if (explicitMode === "multiply_by_10_error") {
+    const base = randInt(10, 999);
+    const correct = randInt(0, 1) === 0;
+    const shown = correct ? base * 10 : base * 100;
+    return {
+      kind: "multiple_choice",
+      prompt: `${formatMathNumber(base)} × 10 = ${formatMathNumber(shown)}`,
+      options: ["Correct", "Incorrect"],
+      answer: correct ? "Correct" : "Incorrect",
+      helper: "Check whether the digits have shifted one place, not two.",
+    };
+  }
+
+  if (explicitMode === "divide_by_10_recall") {
+    const answerValue = randInt(2, 999);
+    const dividend = answerValue * 10;
+    const answer = String(answerValue);
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: `What is ${formatMathNumber(dividend)} ÷ 10?`,
+          options: uniqueNumberOptions(answerValue, Math.max(20, Math.floor(dividend / 5))),
+          answer,
+          helper: "Think about every digit shifting one place right.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: `${formatMathNumber(dividend)} ÷ 10 = ?`,
+          answer,
+          helper: "Think about every digit shifting one place right.",
+          placeholder: "Type the answer",
+        };
+  }
+
+  if (explicitMode === "divide_by_10_shift") {
+    const answerValue = randInt(2, 999);
+    const dividend = answerValue * 10;
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: `After dividing by 10, ${formatMathNumber(dividend)} becomes which number?`,
+          options: shuffle([
+            formatMathNumber(answerValue),
+            formatMathNumber(dividend),
+            formatMathNumber(Math.max(1, Math.floor(answerValue / 10))),
+            formatMathNumber(answerValue * 10),
+          ]),
+          answer: formatMathNumber(answerValue),
+          helper: "Dividing by 10 moves every digit one place to the right.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: `${formatMathNumber(dividend)} → ? after ÷10`,
+          answer: formatMathNumber(answerValue),
+          helper: "Dividing by 10 moves every digit one place to the right.",
+          placeholder: "Type the new number",
+        };
+  }
+
+  if (explicitMode === "divide_by_10_missing") {
+    const answerValue = randInt(2, 999);
+    const quotient = randInt(0, 1) === 0 ? answerValue : answerValue * 10;
+    const dividend = quotient * 10;
+    const missingOnLeft = randInt(0, 1) === 0;
+    return {
+      kind: "typed_response",
+      prompt: missingOnLeft
+        ? `___ ÷ 10 = ${formatMathNumber(quotient)}`
+        : `${formatMathNumber(dividend)} ÷ 10 = ___`,
+      answer: formatMathNumber(missingOnLeft ? dividend : quotient),
+      helper: "Use the place value shift to find the missing number.",
+      placeholder: "Type the missing number",
+    };
+  }
+
+  if (explicitMode === "powers_of_ten_mixed") {
+    const factor = ([10, 100, 1000] as const)[randInt(0, 2)] ?? 10;
+    const multiply = randInt(0, 1) === 0;
+    const base = multiply
+      ? randInt(2, factor === 10 ? 999 : factor === 100 ? 99 : 9)
+      : randInt(2, 999);
+    const promptValue = multiply ? base : base * factor;
+    const answerValue = multiply ? base * factor : base;
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: multiply
+            ? `${formatMathNumber(promptValue)} × ${factor} = ?`
+            : `${formatMathNumber(promptValue)} ÷ ${factor} = ?`,
+          options: uniqueNumberOptions(answerValue, Math.max(factor, 20)),
+          answer: String(answerValue),
+        }
+      : {
+          kind: "typed_response",
+          prompt: multiply
+            ? `${formatMathNumber(promptValue)} × ${factor} = ?`
+            : `${formatMathNumber(promptValue)} ÷ ${factor} = ?`,
+          answer: formatMathNumber(answerValue),
+          placeholder: "Type the answer",
+        };
+  }
+
+  if (explicitMode === "powers_of_ten_compare") {
+    const base = randInt(2, 90);
+    const leftFactor = ([10, 100, 1000] as const)[randInt(0, 2)] ?? 10;
+    const rightFactor = ([10, 100, 1000] as const)[randInt(0, 2)] ?? 100;
+    const divide = randInt(0, 1) === 0;
+    const dividendBase = base * 1000;
+    const leftValue = divide ? dividendBase : base;
+    const rightValue = divide ? dividendBase : base;
+    const leftPrompt = divide
+      ? `${formatMathNumber(leftValue)} ÷ ${leftFactor}`
+      : `${formatMathNumber(base)} × ${leftFactor}`;
+    const rightPrompt = divide
+      ? `${formatMathNumber(rightValue)} ÷ ${rightFactor}`
+      : `${formatMathNumber(base)} × ${rightFactor}`;
+    const leftAnswer = divide ? leftValue / leftFactor : base * leftFactor;
+    const rightAnswer = divide ? rightValue / rightFactor : base * rightFactor;
+    const answer = leftAnswer > rightAnswer ? leftPrompt : rightAnswer > leftAnswer ? rightPrompt : "They are equal";
+    return {
+      kind: "multiple_choice",
+      prompt: `Which is greater: ${leftPrompt} or ${rightPrompt}?`,
+      options: shuffle([leftPrompt, rightPrompt, "They are equal"]),
+      answer,
+    };
+  }
+
+  if (explicitMode === "powers_of_ten_word") {
+    const variants = [
+      (() => {
+        const original = randInt(2, 99) * 10;
+        return {
+          prompt: `A number becomes ${formatMathNumber(original)} after ×10. What was the number?`,
+          answer: formatMathNumber(original / 10),
+        };
+      })(),
+      (() => {
+        const total = ([10, 100, 1000] as const)[randInt(0, 2)] ?? 100;
+        const base = randInt(2, 90) * total;
+        return {
+          prompt: `Divide ${formatMathNumber(base)} by ${total}.`,
+          answer: formatMathNumber(base / total),
+        };
+      })(),
+    ];
+    const selected = variants[randInt(0, variants.length - 1)] ?? variants[0];
+    return {
+      kind: "typed_response",
+      prompt: selected.prompt,
+      answer: selected.answer,
+      placeholder: "Type the answer",
+    };
+  }
+
   if (sourceActivityType === "place_value_builder") {
     const target = randInt(Math.max(100, min || 100), Math.max(200, max || 999));
     const places = supportedPlaces(config);

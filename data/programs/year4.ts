@@ -386,15 +386,17 @@ const year4Rows: ProgramRow[] = [
     focus: "Multiplying & Dividing by 10, 100, 1000",
     lesson: 1,
     topic: "Multiplying by 10",
-    activity: "Shift digits using place value sliders and money examples",
+    activity: "Use place value shifts to multiply by 10",
     curriculum: ["AC9M4N05"],
     activities: [
       makeActivity("typed_response", 2, {
-        mode: "multiply_by_powers_of_ten",
-        factors: [10, 100, 1000],
+        mode: "multiply_by_10_recall",
       }),
       makeActivity("multiple_choice", 1, {
-        mode: "multiply_by_powers_of_ten",
+        mode: "multiply_by_10_shift",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "multiply_by_10_error",
       }),
     ],
   },
@@ -403,15 +405,17 @@ const year4Rows: ProgramRow[] = [
     focus: "Multiplying & Dividing by 10, 100, 1000",
     lesson: 2,
     topic: "Dividing by 10",
-    activity: "Use arrays and charts to divide by 10, 100, 1000",
+    activity: "Use place value shifts to divide by 10",
     curriculum: ["AC9M4N05"],
     activities: [
       makeActivity("typed_response", 2, {
-        mode: "divide_by_powers_of_ten",
-        factors: [10, 100, 1000],
+        mode: "divide_by_10_recall",
       }),
       makeActivity("multiple_choice", 1, {
-        mode: "divide_by_powers_of_ten",
+        mode: "divide_by_10_shift",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "divide_by_10_missing",
       }),
     ],
   },
@@ -420,16 +424,17 @@ const year4Rows: ProgramRow[] = [
     focus: "Multiplying & Dividing by 10, 100, 1000",
     lesson: 3,
     topic: "Mixed Operations",
-    activity: "Apply scaling with money and measurement contexts",
+    activity: "Apply multiplying and dividing by 10, 100, and 1000",
     curriculum: ["AC9M4N05"],
     activities: [
-      makeActivity("mixed_word_problem", 2, {
-        mode: "scaling_contexts",
-        operations: ["multiplication", "division"],
+      makeActivity("typed_response", 2, {
+        mode: "powers_of_ten_mixed",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "powers_of_ten_compare",
       }),
       makeActivity("typed_response", 1, {
-        mode: "scaling_contexts",
-        sourceActivityType: "mixed_word_problem",
+        mode: "powers_of_ten_word",
       }),
     ],
   },
