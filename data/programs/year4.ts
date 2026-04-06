@@ -385,18 +385,21 @@ const year4Rows: ProgramRow[] = [
     week: 6,
     focus: "Multiplying & Dividing by 10, 100, 1000",
     lesson: 1,
-    topic: "Multiplying by 10",
-    activity: "Use place value shifts to multiply by 10",
+    topic: "Multiplying by 10, 100 & 1000",
+    activity: "Use place value shifts to multiply by 10, 100, and 1000",
     curriculum: ["AC9M4N05"],
     activities: [
       makeActivity("typed_response", 2, {
-        mode: "multiply_by_10_recall",
+        mode: "multiply_by_powers_recall",
       }),
       makeActivity("multiple_choice", 1, {
-        mode: "multiply_by_10_shift",
+        mode: "multiply_by_powers_shift",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "multiply_by_powers_missing",
       }),
       makeActivity("multiple_choice", 1, {
-        mode: "multiply_by_10_error",
+        mode: "multiply_by_powers_error",
       }),
     ],
   },
@@ -404,18 +407,18 @@ const year4Rows: ProgramRow[] = [
     week: 6,
     focus: "Multiplying & Dividing by 10, 100, 1000",
     lesson: 2,
-    topic: "Dividing by 10",
-    activity: "Use place value shifts to divide by 10",
+    topic: "Dividing by 10, 100 & 1000",
+    activity: "Use place value shifts to divide by 10, 100, and 1000",
     curriculum: ["AC9M4N05"],
     activities: [
       makeActivity("typed_response", 2, {
-        mode: "divide_by_10_recall",
+        mode: "divide_by_powers_recall",
       }),
       makeActivity("multiple_choice", 1, {
-        mode: "divide_by_10_shift",
+        mode: "divide_by_powers_shift",
       }),
       makeActivity("typed_response", 1, {
-        mode: "divide_by_10_missing",
+        mode: "divide_by_powers_missing",
       }),
     ],
   },
