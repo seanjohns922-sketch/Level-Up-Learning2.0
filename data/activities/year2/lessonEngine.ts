@@ -1775,6 +1775,52 @@ function getWeek8Board(config: GenericConfig) {
   return boards[boardIndex] ?? boards[0];
 }
 
+function formatWeek8ItemLabel(
+  item: Week8Board["items"][number],
+  quantity: number,
+) {
+  const label = item.label.toLowerCase();
+  const detail = item.detail?.trim();
+  const plural = quantity === 1 ? "" : "s";
+
+  if (!detail || detail.toLowerCase() === "standard") {
+    return `${quantity} ${label}${plural}`;
+  }
+
+  const detailLower = detail.toLowerCase();
+  const isSimplePrefix =
+    ["small", "large", "junior", "child", "adult"].includes(detailLower);
+
+  if (isSimplePrefix) {
+    return `${quantity} ${detailLower} ${label}${plural}`;
+  }
+
+  return `${quantity} ${label}${plural} (${detailLower})`;
+}
+
+function buildAustralianMoneyPieces(amount: number) {
+  const denominations = [50, 20, 10, 5, 2, 1] as const;
+  const pieces: Array<{
+    label: string;
+    kind: "coin" | "note";
+    value: number;
+  }> = [];
+  let remaining = amount;
+
+  for (const value of denominations) {
+    while (remaining >= value) {
+      pieces.push({
+        label: `$${value}`,
+        kind: value >= 5 ? "note" : "coin",
+        value,
+      });
+      remaining -= value;
+    }
+  }
+
+  return pieces;
+}
+
 function buildYear4Week8BudgetingQuestion(config: GenericConfig): MixedWordProblemQuestion {
   const board = getWeek8Board(config);
   const items = board.items;
@@ -1786,7 +1832,7 @@ function buildYear4Week8BudgetingQuestion(config: GenericConfig): MixedWordProbl
       const quantityB = 3;
       const answer = a.price * quantityA + b.price * quantityB;
       return {
-        prompt: `Use the ${board.title}. What is the total cost of ${quantityA} ${a.label.toLowerCase()}s and ${quantityB} ${b.label.toLowerCase()}s?`,
+        prompt: `Use the ${board.title}. What is the total cost of ${formatWeek8ItemLabel(a, quantityA)} and ${formatWeek8ItemLabel(b, quantityB)}?`,
         answer,
         helper: "Multiply each price by the quantity, then add the totals.",
         budget: undefined,
@@ -1799,7 +1845,7 @@ function buildYear4Week8BudgetingQuestion(config: GenericConfig): MixedWordProbl
       const quantityB = 2;
       const answer = a.price * quantityA + b.price * quantityB;
       return {
-        prompt: `Use the ${board.title}. A student buys ${quantityA} ${a.label.toLowerCase()}s and ${quantityB} ${b.label.toLowerCase()}s. How much is spent?`,
+        prompt: `Use the ${board.title}. A student buys ${formatWeek8ItemLabel(a, quantityA)} and ${formatWeek8ItemLabel(b, quantityB)}. How much is spent?`,
         answer,
         helper: "Work out each item total first, then combine them.",
         budget: undefined,
@@ -1813,7 +1859,7 @@ function buildYear4Week8BudgetingQuestion(config: GenericConfig): MixedWordProbl
       const spend = a.price * quantityA + b.price * quantityB;
       const budget = Math.ceil(spend / 10) * 10 + 10;
       return {
-        prompt: `Use the ${board.title}. A student has $${budget}. They buy ${quantityA} ${a.label.toLowerCase()}s and ${quantityB} ${b.label.toLowerCase()}s. How much money is left?`,
+        prompt: `Use the ${board.title}. A student has $${budget}. They buy ${formatWeek8ItemLabel(a, quantityA)} and ${formatWeek8ItemLabel(b, quantityB)}. How much money is left?`,
         answer: budget - spend,
         helper: "Multiply the costs, add the total spent, then compare it with the budget.",
         budget,
@@ -1849,7 +1895,7 @@ function buildYear4Week8ShopQuestion(config: GenericConfig): MixedWordProblemQue
       const total = item.price * quantity;
       const payment = Math.ceil(total / 10) * 10;
       return {
-        prompt: `Use the ${board.title}. ${quantity} ${item.label.toLowerCase()}s cost $${item.price} each. What change should you get from $${payment}?`,
+        prompt: `Use the ${board.title}. ${formatWeek8ItemLabel(item, quantity)} cost $${item.price} each. What change should you get from $${payment}?`,
         answer: payment - total,
         helper: "Multiply the item price by the quantity, then subtract from the money shown.",
         visual: {
@@ -1860,7 +1906,7 @@ function buildYear4Week8ShopQuestion(config: GenericConfig): MixedWordProblemQue
           itemDetail: item.detail,
           itemPrice: item.price,
           quantity,
-          pieces: [{ label: `$${payment}`, kind: "note" as const, value: payment }],
+          pieces: buildAustralianMoneyPieces(payment),
         },
       };
     })(),
@@ -1870,7 +1916,7 @@ function buildYear4Week8ShopQuestion(config: GenericConfig): MixedWordProblemQue
       const total = item.price * quantity;
       const payment = total + 5;
       return {
-        prompt: `Use the ${board.title}. ${quantity} ${item.label.toLowerCase()}s cost $${item.price} each. What change should you get from the money shown?`,
+        prompt: `Use the ${board.title}. ${formatWeek8ItemLabel(item, quantity)} cost $${item.price} each. What change should you get from the money shown?`,
         answer: payment - total,
         helper: "Find the total cost first, then compare it with the money shown.",
         visual: {
@@ -1881,15 +1927,7 @@ function buildYear4Week8ShopQuestion(config: GenericConfig): MixedWordProblemQue
           itemDetail: item.detail,
           itemPrice: item.price,
           quantity,
-          pieces:
-            payment === 15
-              ? [
-                  { label: "$10", kind: "note" as const, value: 10 },
-                  { label: "$5", kind: "note" as const, value: 5 },
-                ]
-              : [
-                  { label: `$${payment}`, kind: "note" as const, value: payment },
-                ],
+          pieces: buildAustralianMoneyPieces(payment),
         },
       };
     })(),
@@ -1899,7 +1937,7 @@ function buildYear4Week8ShopQuestion(config: GenericConfig): MixedWordProblemQue
       const total = item.price * quantity;
       const payment = total;
       return {
-        prompt: `Use the ${board.title}. What is the total value of ${quantity} ${item.label.toLowerCase()}s?`,
+        prompt: `Use the ${board.title}. What is the total value of ${formatWeek8ItemLabel(item, quantity)}?`,
         answer: total,
         helper: "Multiply the price by the quantity to find the basket total.",
         visual: {
@@ -1910,10 +1948,7 @@ function buildYear4Week8ShopQuestion(config: GenericConfig): MixedWordProblemQue
           itemDetail: item.detail,
           itemPrice: item.price,
           quantity,
-          pieces: [
-            { label: "$5", kind: "note" as const, value: 5 },
-            { label: "$5", kind: "note" as const, value: 5 },
-          ],
+          pieces: buildAustralianMoneyPieces(payment),
         },
       };
     })(),
@@ -1942,7 +1977,7 @@ function buildYear4Week8TwoStepQuestion(config: GenericConfig): MixedWordProblem
       const a = board.items[0];
       const b = board.items[3];
       return {
-        prompt: `Use the receipt from the ${board.title}. What is the total cost of 4 ${a.label.toLowerCase()}s and 2 ${b.label.toLowerCase()}s?`,
+        prompt: `Use the receipt from the ${board.title}. What is the total cost of ${formatWeek8ItemLabel(a, 4)} and ${formatWeek8ItemLabel(b, 2)}?`,
         answer: a.price * 4 + b.price * 2,
         helper: "Multiply each item cost first, then add the totals.",
         lines: [
@@ -1957,7 +1992,7 @@ function buildYear4Week8TwoStepQuestion(config: GenericConfig): MixedWordProblem
       const spend = a.price * 3 + b.price * 4;
       const payment = Math.ceil(spend / 10) * 10 + 10;
       return {
-        prompt: `Use the receipt from the ${board.title}. A family pays with $${payment}. How much change do they get after buying 3 ${a.label.toLowerCase()}s and 4 ${b.label.toLowerCase()}s?`,
+        prompt: `Use the receipt from the ${board.title}. A family pays with $${payment}. How much change do they get after buying ${formatWeek8ItemLabel(a, 3)} and ${formatWeek8ItemLabel(b, 4)}?`,
         answer: payment - spend,
         helper: "Multiply first, add the costs, then subtract from the payment.",
         lines: [
@@ -1971,7 +2006,7 @@ function buildYear4Week8TwoStepQuestion(config: GenericConfig): MixedWordProblem
       const a = board.items[2];
       const b = board.items[5];
       return {
-        prompt: `Use the receipt from the ${board.title}. What is the total cost of 5 ${a.label.toLowerCase()}s and 2 ${b.label.toLowerCase()}s?`,
+        prompt: `Use the receipt from the ${board.title}. What is the total cost of ${formatWeek8ItemLabel(a, 5)} and ${formatWeek8ItemLabel(b, 2)}?`,
         answer: a.price * 5 + b.price * 2,
         helper: "Multiply each line, then combine the totals.",
         lines: [

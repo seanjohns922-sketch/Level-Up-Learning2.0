@@ -6,6 +6,14 @@ function formatDollars(value: number) {
   return `$${value}`;
 }
 
+function sumMoneyPieces(
+  pieces: Array<{
+    value: number;
+  }>,
+) {
+  return pieces.reduce((total, piece) => total + piece.value, 0);
+}
+
 function MoneyPiece({
   label,
   kind,
@@ -90,6 +98,9 @@ export default function MoneyContextVisual({
               {visual.pieces.map((piece, index) => (
                 <MoneyPiece key={`${piece.label}-${index}`} label={piece.label} kind={piece.kind} />
               ))}
+            </div>
+            <div className="mt-3 text-sm font-semibold text-slate-500">
+              Total shown: {formatDollars(sumMoneyPieces(visual.pieces))}
             </div>
           </div>
         </div>
