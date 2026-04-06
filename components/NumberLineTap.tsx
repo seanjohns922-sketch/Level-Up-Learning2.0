@@ -93,9 +93,8 @@ export default function NumberLineTap({
       </div>
 
       <div
-        className="relative cursor-pointer select-none rounded-2xl border border-border bg-muted/30 px-6"
+        className="relative select-none rounded-2xl border border-border bg-muted/30 px-6"
         style={{ height: 100 }}
-        onClick={handleClick}
       >
         {/* Base line */}
         <div
@@ -113,7 +112,10 @@ export default function NumberLineTap({
         />
 
         {/* Inner container for ticks & markers, inset to match line */}
-        <div className="absolute left-6 right-6 top-0 bottom-0">
+        <div
+          className="absolute left-6 right-6 top-0 bottom-0 cursor-pointer"
+          onClick={handleClick}
+        >
           {/* Minor ticks */}
           {minorTicks.map((t) => {
             const pct = ((t - min) / range) * 100;

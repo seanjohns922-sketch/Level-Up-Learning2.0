@@ -66,11 +66,17 @@ function NumberLineVisual({
     <div
       className={[
         "rounded-2xl border border-border bg-muted/30 px-8 py-8 select-none",
-        disabled ? "opacity-60 cursor-default" : "cursor-pointer",
+        disabled ? "opacity-60" : "",
       ].join(" ")}
-      onClick={disabled ? undefined : onClick}
     >
-      <div className="relative mx-auto max-w-3xl" style={{ height: 80 }}>
+      <div
+        className={[
+          "relative mx-auto max-w-3xl",
+          disabled ? "cursor-default" : "cursor-pointer",
+        ].join(" ")}
+        style={{ height: 80 }}
+        onClick={disabled ? undefined : onClick}
+      >
         {/* Base line */}
         <div
           className="absolute left-0 right-0 bg-primary/70 rounded-full"
