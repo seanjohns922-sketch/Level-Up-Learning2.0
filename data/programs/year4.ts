@@ -317,12 +317,6 @@ const year4Rows: ProgramRow[] = [
         count: 6,
         mode: "identify",
       }),
-      makeActivity("odd_even_sort", 1, {
-        min: 1000,
-        max: 999999,
-        count: 6,
-        mode: "pattern",
-      }),
       makeActivity("multiple_choice", 1, {
         min: 1000,
         max: 999999,

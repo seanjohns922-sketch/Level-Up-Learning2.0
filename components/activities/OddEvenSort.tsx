@@ -148,7 +148,18 @@ export default function OddEvenSort({
         ))}
       </div>
 
-      {questionData.patternOptions ? (
+      {questionData.mode === "identify" ? (
+        <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">
+          <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
+            How to work it out
+          </div>
+          <div className="mt-3 space-y-1 text-sm font-medium text-teal-900">
+            <p>Look at the last digit only.</p>
+            <p>Even numbers end in 0, 2, 4, 6, or 8.</p>
+            <p>Odd numbers end in 1, 3, 5, 7, or 9.</p>
+          </div>
+        </div>
+      ) : questionData.patternOptions ? (
         <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">
           <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
             {questionData.mode === "odd_even_sums" || questionData.mode === "odd_even_products"
