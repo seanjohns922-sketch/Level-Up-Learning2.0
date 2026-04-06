@@ -478,14 +478,11 @@ const year4Rows: ProgramRow[] = [
     activity: "Use an efficient written method for multiplication",
     curriculum: ["AC9M4N06"],
     activities: [
-      makeActivity("typed_response", 3, {
+      makeActivity("typed_response", 4, {
         mode: "column_multiplication_solve",
       }),
       makeActivity("typed_response", 2, {
         mode: "column_multiplication_partial",
-      }),
-      makeActivity("typed_response", 1, {
-        mode: "column_multiplication_step",
       }),
     ],
   },
@@ -497,14 +494,11 @@ const year4Rows: ProgramRow[] = [
     activity: "Break numbers into tens and ones to multiply",
     curriculum: ["AC9M4N06"],
     activities: [
-      makeActivity("typed_response", 3, {
+      makeActivity("typed_response", 4, {
         mode: "box_method_total",
       }),
       makeActivity("typed_response", 2, {
         mode: "box_method_partial_typed",
-      }),
-      makeActivity("multiple_choice", 1, {
-        mode: "box_method_compare",
       }),
     ],
   },

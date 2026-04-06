@@ -352,25 +352,15 @@ function BoxMethodWorkspace({
   topValue,
   boxValues,
   totalValue,
-  currentStep,
   onChange,
 }: {
   leftValue: number;
   topValue: number;
   boxValues: string[];
   totalValue: string;
-  currentStep: number;
   onChange: (field: "box" | "total", value: string, index?: number) => void;
 }) {
-  const { splitLeft, splitTop, cells } = getBoxMethodCells(leftValue, topValue);
-  const totalStepIndex = cells.length;
-  const currentCellIndex = currentStep < totalStepIndex ? currentStep : -1;
-  const currentCellPrompt =
-    currentCellIndex >= 0
-      ? `What is ${splitLeft[Math.floor(currentCellIndex / splitTop.length)]} × ${
-          splitTop[currentCellIndex % splitTop.length]
-        }?`
-      : "Add the box totals.";
+  const { splitLeft, splitTop } = getBoxMethodCells(leftValue, topValue);
 
   return (
     <div className="w-fit rounded-xl bg-white p-4 shadow-sm">
@@ -394,7 +384,6 @@ function BoxMethodWorkspace({
             </div>
             {splitTop.map((topLabel, cellIndex) => {
               const flatIndex = rowIndex * splitTop.length + cellIndex;
-              const isActive = currentCellIndex === flatIndex;
               return (
                 <div
                   key={`workspace-box-${rowIndex}-${cellIndex}`}
@@ -409,10 +398,9 @@ function BoxMethodWorkspace({
                     value={boxValues[flatIndex] ?? ""}
                     onChange={(event) => onChange("box", event.target.value, flatIndex)}
                     inputMode="numeric"
-                    disabled={!isActive}
                     className={[
                       "h-10 w-full rounded-md bg-transparent text-center text-xl font-black text-slate-900 outline-none",
-                      isActive ? "ring-2 ring-teal-200" : "",
+                      "focus:ring-2 focus:ring-teal-200",
                     ].join(" ")}
                   />
                 </div>
@@ -427,15 +415,14 @@ function BoxMethodWorkspace({
           value={totalValue}
           onChange={(event) => onChange("total", event.target.value)}
           inputMode="numeric"
-          disabled={currentStep !== totalStepIndex}
           className={[
             "mt-2 h-11 w-full rounded-lg bg-transparent px-2 text-lg font-black text-slate-900 outline-none",
-            currentStep === totalStepIndex ? "ring-2 ring-amber-200" : "",
+            "focus:ring-2 focus:ring-amber-200",
           ].join(" ")}
         />
       </div>
       <div className="mt-3 text-xs font-medium text-slate-500">
-        {currentStep < totalStepIndex ? currentCellPrompt : "Add the box totals."}
+        Complete each box step-by-step, then add the totals.
       </div>
     </div>
   );
@@ -481,7 +468,6 @@ export default function TypedResponseActivity({
   const [multiplicationFeedback, setMultiplicationFeedback] = useState("");
   const [boxMethodInputs, setBoxMethodInputs] = useState<string[]>([]);
   const [boxMethodTotal, setBoxMethodTotal] = useState("");
-  const [boxMethodStep, setBoxMethodStep] = useState(0);
   const [boxMethodFeedback, setBoxMethodFeedback] = useState("");
   const [orderedInputs, setOrderedInputs] = useState<string[]>(
     isOrderingResponse ? Array.from({ length: orderingAnswerParts.length }, () => "") : []
@@ -539,12 +525,10 @@ export default function TypedResponseActivity({
       const { cells } = getBoxMethodCells(questionData.visual.leftValue, questionData.visual.topValue);
       setBoxMethodInputs(Array.from({ length: cells.length }, () => ""));
       setBoxMethodTotal("");
-      setBoxMethodStep(0);
       setBoxMethodFeedback("");
     } else {
       setBoxMethodInputs([]);
       setBoxMethodTotal("");
-      setBoxMethodStep(0);
       setBoxMethodFeedback("");
     }
     setOrderedInputs(
@@ -830,28 +814,16 @@ export default function TypedResponseActivity({
 
     if (questionData.visual?.type === "box_method") {
       const expected = getBoxMethodCells(questionData.visual.leftValue, questionData.visual.topValue);
-      if (boxMethodStep < expected.cells.length) {
-        const currentExpected = expected.cells[boxMethodStep];
-        if (normalizeNumberInput(boxMethodInputs[boxMethodStep] ?? "") === String(currentExpected)) {
-          setBoxMethodFeedback("");
-          setBoxMethodStep((step) => step + 1);
-        } else {
-          const { splitLeft, splitTop } = expected;
-          const rowIndex = Math.floor(boxMethodStep / splitTop.length);
-          const colIndex = boxMethodStep % splitTop.length;
-          setBoxMethodFeedback(
-            `Work out ${splitLeft[rowIndex]} × ${splitTop[colIndex]} first.`
-          );
-          onWrong?.();
-        }
-        return;
-      }
+      const boxesMatch = expected.cells.every(
+        (value, index) => normalizeNumberInput(boxMethodInputs[index] ?? "") === String(value)
+      );
+      const totalMatches = normalizeNumberInput(boxMethodTotal) === String(expected.total);
 
-      if (normalizeNumberInput(boxMethodTotal) === String(expected.total)) {
+      if (boxesMatch && totalMatches) {
         setBoxMethodFeedback("");
         onCorrect?.();
       } else {
-        setBoxMethodFeedback("Add the box totals to find the final answer.");
+        setBoxMethodFeedback("Complete each box correctly, then add the totals for the final answer.");
         onWrong?.();
       }
       return;
@@ -932,7 +904,6 @@ export default function TypedResponseActivity({
               topValue={questionData.visual.topValue}
               boxValues={boxMethodInputs}
               totalValue={boxMethodTotal}
-              currentStep={boxMethodStep}
               onChange={(field, value, index) => {
                 const cleaned = value.replace(/[^\d,\s]/g, "");
                 if (field === "box" && typeof index === "number") {
