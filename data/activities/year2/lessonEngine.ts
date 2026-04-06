@@ -4423,11 +4423,13 @@ function generateGenericQuestion(
             prompt: selected.prompt,
             options: selected.options,
             answer: selected.answer,
+            helper: "Even + even = even. Odd + odd = even. Even + odd = odd.",
           }
         : {
             kind: "typed_response",
             prompt: selected.prompt.replace("True or false", "Type true or false"),
             answer: selected.answer,
+            helper: "Even + even = even. Odd + odd = even. Even + odd = odd.",
             placeholder: selected.answer === "even" || selected.answer === "odd" ? "odd or even" : "true or false",
           };
     }
