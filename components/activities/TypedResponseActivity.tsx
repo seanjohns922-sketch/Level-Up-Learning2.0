@@ -34,6 +34,20 @@ function digitCells(value: number, width: number) {
   return String(value).padStart(width, " ").split("");
 }
 
+function normalizeNumberInput(value: string) {
+  return value.replace(/,/g, "").replace(/\s+/g, "");
+}
+
+function getColumnMultiplicationRows(topValue: number, bottomValue: number) {
+  const digits = String(bottomValue).split("").map(Number);
+  const onesDigit = digits[digits.length - 1] ?? 0;
+  const tensDigit = digits.length > 1 ? digits[digits.length - 2] ?? 0 : null;
+  const onesRow = topValue * onesDigit;
+  const tensRow = tensDigit === null ? null : topValue * tensDigit * 10;
+  const total = topValue * bottomValue;
+  return { onesRow, tensRow, total };
+}
+
 function ColumnMultiplicationWorkedExample() {
   return (
     <div className="rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm">
@@ -96,14 +110,27 @@ function ColumnMultiplicationWorkedExample() {
 function ColumnMultiplicationWorkspace({
   topValue,
   bottomValue,
+  onesRowValue,
+  tensRowValue,
+  totalValue,
+  onChange,
 }: {
   topValue: number;
   bottomValue: number;
+  onesRowValue: string;
+  tensRowValue: string;
+  totalValue: string;
+  onChange: (field: "onesRow" | "tensRow" | "total", value: string) => void;
 }) {
-  const width = Math.max(String(topValue).length, String(bottomValue).length, String(topValue * bottomValue).length);
+  const { tensRow } = getColumnMultiplicationRows(topValue, bottomValue);
+  const width = Math.max(
+    String(topValue).length,
+    String(bottomValue).length,
+    String(topValue * bottomValue).length
+  );
   const topDigits = digitCells(topValue, width);
   const bottomDigits = digitCells(bottomValue, width);
-  const rowCount = String(bottomValue).length > 1 ? 2 : 1;
+  const rowCount = tensRow === null ? 1 : 2;
 
   return (
     <div className="w-fit rounded-xl bg-white p-4 shadow-sm">
@@ -125,31 +152,42 @@ function ColumnMultiplicationWorkspace({
       </div>
       <div className="mt-3 h-1 w-full rounded bg-slate-300" />
       <div className="mt-3 space-y-2">
-        {Array.from({ length: rowCount }).map((_, rowIndex) => (
-          <div key={`workspace-row-${rowIndex}`} className="grid w-fit grid-flow-col gap-2">
+        <div className="grid w-fit grid-flow-col gap-2">
+          <div className="w-8" />
+          <input
+            value={onesRowValue}
+            onChange={(event) => onChange("onesRow", event.target.value)}
+            inputMode="numeric"
+            placeholder="ones row"
+            className="col-span-1 h-12 w-[calc(3rem_*_4+0.5rem_*_3)] max-w-full rounded-lg border-2 border-dashed border-teal-200 bg-teal-50/50 px-3 text-right text-xl font-black text-slate-900 outline-none focus:border-teal-500"
+            style={{ width: `${width * 48 + Math.max(0, width - 1) * 8}px` }}
+          />
+        </div>
+        {rowCount > 1 ? (
+          <div className="grid w-fit grid-flow-col gap-2">
             <div className="w-8" />
-            {Array.from({ length: width + rowIndex }).map((__, index) => (
-              <div
-                key={`workspace-cell-${rowIndex}-${index}`}
-                className="flex h-12 w-12 items-center justify-center rounded-lg border-2 border-dashed border-teal-200 bg-teal-50/50 text-xl font-black text-teal-400"
-              >
-                _
-              </div>
-            ))}
+            <input
+              value={tensRowValue}
+              onChange={(event) => onChange("tensRow", event.target.value)}
+              inputMode="numeric"
+              placeholder="tens row"
+              className="col-span-1 h-12 w-[calc(3rem_*_4+0.5rem_*_3)] max-w-full rounded-lg border-2 border-dashed border-teal-200 bg-teal-50/50 px-3 text-right text-xl font-black text-slate-900 outline-none focus:border-teal-500"
+              style={{ width: `${(width + 1) * 48 + Math.max(0, width) * 8}px` }}
+            />
           </div>
-        ))}
+        ) : null}
       </div>
       {rowCount > 1 ? <div className="mt-3 h-1 w-full rounded bg-slate-300" /> : null}
       <div className="mt-3 grid w-fit grid-flow-col gap-2">
         <div className="w-8" />
-        {Array.from({ length: width + (rowCount > 1 ? 1 : 0) }).map((_, index) => (
-          <div
-            key={`workspace-total-${index}`}
-            className="flex h-12 w-12 items-center justify-center rounded-lg border-2 border-dashed border-amber-200 bg-amber-50/50 text-xl font-black text-amber-400"
-          >
-            _
-          </div>
-        ))}
+        <input
+          value={totalValue}
+          onChange={(event) => onChange("total", event.target.value)}
+          inputMode="numeric"
+          placeholder="final total"
+          className="col-span-1 h-12 w-[calc(3rem_*_4+0.5rem_*_3)] max-w-full rounded-lg border-2 border-dashed border-amber-200 bg-amber-50/50 px-3 text-right text-xl font-black text-slate-900 outline-none focus:border-amber-500"
+          style={{ width: `${(width + (rowCount > 1 ? 1 : 0)) * 48 + Math.max(0, width + (rowCount > 1 ? 1 : 0) - 1) * 8}px` }}
+        />
       </div>
     </div>
   );
@@ -270,6 +308,15 @@ export default function TypedResponseActivity({
     /Type the numbers from (smallest to largest|largest to smallest)/i.test(questionData.prompt) &&
     orderingAnswerParts.every((part) => /^\d+$/.test(part));
   const [typed, setTyped] = useState("");
+  const [columnChartInputs, setColumnChartInputs] = useState<{
+    onesRow: string;
+    tensRow: string;
+    total: string;
+  }>({
+    onesRow: "",
+    tensRow: "",
+    total: "",
+  });
   const [orderedInputs, setOrderedInputs] = useState<string[]>(
     isOrderingResponse ? Array.from({ length: orderingAnswerParts.length }, () => "") : []
   );
@@ -313,6 +360,11 @@ export default function TypedResponseActivity({
 
   useEffect(() => {
     setTyped("");
+    setColumnChartInputs({
+      onesRow: "",
+      tensRow: "",
+      total: "",
+    });
     setOrderedInputs(
       isOrderingResponse ? Array.from({ length: orderingAnswerParts.length }, () => "") : []
     );
@@ -522,6 +574,25 @@ export default function TypedResponseActivity({
   }
 
   function check() {
+    if (questionData.visual?.type === "column_multiplication") {
+      const expected = getColumnMultiplicationRows(
+        questionData.visual.topValue,
+        questionData.visual.bottomValue
+      );
+      const onesMatches =
+        normalizeNumberInput(columnChartInputs.onesRow) === String(expected.onesRow);
+      const tensMatches =
+        expected.tensRow === null
+          ? true
+          : normalizeNumberInput(columnChartInputs.tensRow) === String(expected.tensRow);
+      const totalMatches =
+        normalizeNumberInput(columnChartInputs.total) === String(expected.total);
+
+      if (onesMatches && tensMatches && totalMatches) onCorrect?.();
+      else onWrong?.();
+      return;
+    }
+
     const value = isColumnMultiplication
       ? normalize(typed)
       : writtenMethod
@@ -566,9 +637,18 @@ export default function TypedResponseActivity({
             <ColumnMultiplicationWorkspace
               topValue={questionData.visual.topValue}
               bottomValue={questionData.visual.bottomValue}
+              onesRowValue={columnChartInputs.onesRow}
+              tensRowValue={columnChartInputs.tensRow}
+              totalValue={columnChartInputs.total}
+              onChange={(field, value) =>
+                setColumnChartInputs((current) => ({
+                  ...current,
+                  [field]: value.replace(/[^\d,\s]/g, ""),
+                }))
+              }
             />
             <p className="mt-4 text-sm font-medium text-slate-600">
-              Use column multiplication vertically, then type the final answer.
+              Fill in the ones row, the tens row, and the final total inside the chart.
             </p>
           </div>
         </div>
@@ -793,20 +873,18 @@ export default function TypedResponseActivity({
           ) : (
             <p className="mt-3 text-sm font-medium text-slate-600">
               {isColumnMultiplication
-                ? "Use column multiplication vertically, then type the final answer."
+                ? "Use the column chart to complete each row, then check your method."
                 : "Complete the written method vertically, then check your answer."}
             </p>
           )}
           {isColumnMultiplication ? (
-            <div className="mt-4 flex flex-wrap items-center gap-3">
-              <input
-                value={typed}
-                onChange={(event) => setTyped(event.target.value)}
-                inputMode="numeric"
-                placeholder="Type the final answer"
-                className="w-full max-w-md rounded-xl border border-gray-300 px-4 py-3 text-lg font-bold text-gray-900 outline-none focus:border-teal-500"
-              />
-            </div>
+            <button
+              type="button"
+              onClick={check}
+              className="mt-4 rounded-xl bg-teal-600 px-5 py-3 font-black text-white hover:bg-teal-700"
+            >
+              Check answer
+            </button>
           ) : null}
         </div>
       ) : (
