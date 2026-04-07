@@ -153,14 +153,28 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen relative overflow-hidden flex">
-      {/* ── Full-screen background ── */}
+      {/* ── Layered background ── */}
       <div className="absolute inset-0">
-        <img
-          src="/images/login-bg.jpg"
-          alt=""
-          className="w-full h-full object-cover"
-          style={{ objectPosition: "-10% 65%" }}
-        />
+        <div className="absolute inset-0 overflow-hidden">
+          <img
+            src="/images/login-bg.jpg"
+            alt=""
+            className="w-full h-full object-cover origin-left scale-[2.15] lg:scale-[2.25]"
+            style={{ objectPosition: "0% 65%" }}
+          />
+        </div>
+        <div className="absolute inset-y-0 right-0 hidden overflow-hidden pointer-events-none md:block md:w-[42vw] md:min-w-[400px] md:max-w-[760px]">
+          <img
+            src="/images/login-bg.jpg"
+            alt=""
+            className="w-full h-full object-cover"
+            style={{
+              objectPosition: "72% 65%",
+              WebkitMaskImage: "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.25) 12%, black 28%, black 100%)",
+              maskImage: "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.25) 12%, black 28%, black 100%)",
+            }}
+          />
+        </div>
         {/* Vignette */}
         <div
           className="absolute inset-0 pointer-events-none"
