@@ -42,31 +42,49 @@ function writeClasses(store: ClassesStore) {
   localStorage.setItem(CLASSES_KEY, JSON.stringify(store));
 }
 
-/* ── Floating particles ── */
+/* ── Floating particles (client-only to avoid hydration mismatch) ── */
 function FloatingParticles() {
-  const particles = Array.from({ length: 14 }, (_, i) => {
-    const left = Math.random() * 100;
-    const delay = Math.random() * 8;
-    const duration = 12 + Math.random() * 14;
-    const size = 2 + Math.random() * 3;
-    const drift = -20 + Math.random() * 40;
-    return (
-      <div
-        key={i}
-        className="absolute rounded-full pointer-events-none"
-        style={{
-          left: `${left}%`,
-          bottom: `-${size}px`,
-          width: size,
-          height: size,
-          background: `radial-gradient(circle, rgba(255,215,100,${0.5 + Math.random() * 0.3}), transparent)`,
-          animation: `floatUp ${duration}s ${delay}s linear infinite`,
-          ["--drift" as string]: `${drift}px`,
-        }}
-      />
+  const [particles, setParticles] = useState<Array<{ id: number; left: string; bottom: string; size: number; opacity: number; duration: number; delay: number; drift: string }>>([]);
+
+  useEffect(() => {
+    setParticles(
+      Array.from({ length: 14 }, (_, i) => {
+        const size = 2 + Math.random() * 3;
+        return {
+          id: i,
+          left: `${Math.random() * 100}%`,
+          bottom: `${-size}px`,
+          size,
+          opacity: 0.5 + Math.random() * 0.3,
+          duration: 14 + Math.random() * 12,
+          delay: Math.random() * 8,
+          drift: `${-20 + Math.random() * 40}px`,
+        };
+      })
     );
-  });
-  return <div className="absolute inset-0 overflow-hidden pointer-events-none z-[1]">{particles}</div>;
+  }, []);
+
+  if (particles.length === 0) return null;
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none z-[1]">
+      {particles.map((p) => (
+        <div
+          key={p.id}
+          className="absolute rounded-full pointer-events-none"
+          style={{
+            left: p.left,
+            bottom: p.bottom,
+            width: p.size,
+            height: p.size,
+            background: `radial-gradient(circle, rgba(255,215,100,${p.opacity}), transparent)`,
+            animation: `floatUp ${p.duration}s ${p.delay}s linear infinite`,
+            ["--drift" as string]: p.drift,
+          }}
+        />
+      ))}
+    </div>
+  );
 }
 
 export default function LoginPage() {
