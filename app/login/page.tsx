@@ -41,6 +41,33 @@ function writeClasses(store: ClassesStore) {
   localStorage.setItem(CLASSES_KEY, JSON.stringify(store));
 }
 
+/* ── Floating particle component ── */
+function FloatingParticles() {
+  const particles = Array.from({ length: 18 }, (_, i) => {
+    const left = Math.random() * 100;
+    const delay = Math.random() * 8;
+    const duration = 10 + Math.random() * 12;
+    const size = 2 + Math.random() * 4;
+    const drift = -30 + Math.random() * 60;
+    return (
+      <div
+        key={i}
+        className="absolute rounded-full pointer-events-none"
+        style={{
+          left: `${left}%`,
+          bottom: `-${size}px`,
+          width: size,
+          height: size,
+          background: `radial-gradient(circle, rgba(255,215,100,${0.6 + Math.random() * 0.4}), transparent)`,
+          animation: `floatUp ${duration}s ${delay}s linear infinite`,
+          ["--drift" as string]: `${drift}px`,
+        }}
+      />
+    );
+  });
+  return <div className="absolute inset-0 overflow-hidden pointer-events-none z-[1]">{particles}</div>;
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const [tab, setTab] = useState<"student" | "teacher">("student");
@@ -60,7 +87,6 @@ export default function LoginPage() {
   const [showPin, setShowPin] = useState(false);
 
   const createdClass = createdCode ? classes[createdCode] : null;
-  const classList = useMemo(() => Object.values(classes), [classes]);
   const [teacherError, setTeacherError] = useState<string | null>(null);
   const [teacherLoading, setTeacherLoading] = useState(false);
 
@@ -235,125 +261,148 @@ export default function LoginPage() {
     router.push("/home");
   }
 
+  const inputBase =
+    "w-full pl-11 pr-4 py-3.5 rounded-2xl border border-white/20 text-base bg-white/10 backdrop-blur-sm text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-amber-400/60 focus:border-amber-400/40 transition shadow-[inset_0_2px_4px_rgba(0,0,0,0.15)]";
+
   return (
     <main className="min-h-screen relative overflow-hidden flex flex-col items-center justify-start">
-      {/* Full-bleed fantasy background */}
       <div className="absolute inset-0">
         <img
           src="/images/login-bg.jpg"
           alt=""
           className="w-full h-full object-cover object-[center_65%]"
         />
-        {/* Dark overlay for readability */}
-        <div className="absolute inset-0 bg-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-black/20" />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 w-full max-w-lg mx-auto px-4 pt-6 pb-10 flex flex-col items-center">
-        {/* Skip to Demo */}
-        <div className="w-full flex justify-end mb-2">
+      <FloatingParticles />
+
+      <div className="relative z-10 w-full max-w-md mx-auto px-4 pt-6 pb-10 flex flex-col items-center">
+        <div className="w-full flex justify-end mb-3">
           <button
             onClick={() => {
               supabase.auth.signOut().then(() => router.push("/home"));
             }}
-            className="px-4 py-1.5 rounded-full bg-white/20 backdrop-blur text-white/90 text-sm font-semibold hover:bg-white/30 transition"
+            className="px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/15 text-white/80 text-sm font-semibold hover:bg-white/20 transition"
             type="button"
           >
             Skip to Demo &rarr;
           </button>
         </div>
 
-        {/* Title area */}
-        <div className="text-center mb-6" style={{ animation: "fadeUp 0.6s ease both" }}>
-          <h1
-            className="text-5xl md:text-6xl font-black text-white tracking-tight"
-            style={{ fontFamily: "'Nunito', 'Avenir Next', 'Trebuchet MS', sans-serif", textShadow: "0 2px 12px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.4)" }}
-          >
-            Level Up
-            <span className="block">Learning</span>
-          </h1>
-          <p className="text-base text-white/70 mt-2 italic">
-            Climb the Tower. Master the Worlds.
-            <br />
-            Unlock your Legend.
-          </p>
-        </div>
-
-        {/* Frosted glass card */}
         <div
-          className="w-full bg-white/40 backdrop-blur-xl rounded-[28px] shadow-2xl border border-white/40 p-6 md:p-8"
-          style={{ animation: "fadeUp 0.7s ease both 0.1s" }}
+          className="w-full rounded-[32px] p-6 md:p-8"
+          style={{
+            background: "rgba(255,255,255,0.08)",
+            backdropFilter: "blur(20px) saturate(1.4)",
+            WebkitBackdropFilter: "blur(20px) saturate(1.4)",
+            border: "1px solid rgba(255,255,255,0.18)",
+            boxShadow:
+              "0 8px 40px rgba(0,0,0,0.35), 0 0 60px rgba(255,190,60,0.08), inset 0 1px 0 rgba(255,255,255,0.15)",
+            animation: "fadeUp 0.7s ease both 0.05s",
+          }}
         >
-          {/* Tab toggle */}
+          <div className="text-center mb-5" style={{ animation: "fadeUp 0.6s ease both 0.1s" }}>
+            <h1
+              className="text-4xl md:text-5xl font-black text-white tracking-tight"
+              style={{
+                fontFamily: "'Nunito', 'Avenir Next', 'Trebuchet MS', sans-serif",
+                textShadow:
+                  "0 2px 16px rgba(255,190,60,0.35), 0 1px 3px rgba(0,0,0,0.5)",
+              }}
+            >
+              Enter the Tower
+            </h1>
+            <p
+              className="text-sm text-white/60 mt-1.5 tracking-wide"
+              style={{ fontFamily: "'Quicksand', sans-serif" }}
+            >
+              Begin your journey
+            </p>
+          </div>
+
           <div className="flex items-center justify-center mb-5">
-            <div className="inline-flex rounded-2xl bg-white/40 p-1 w-full">
+            <div
+              className="relative inline-flex rounded-2xl p-1 w-full"
+              style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)" }}
+            >
+              <div
+                className="absolute top-1 bottom-1 rounded-xl transition-all duration-300 ease-out"
+                style={{
+                  width: "calc(50% - 4px)",
+                  left: tab === "student" ? 4 : "calc(50% + 0px)",
+                  background: "rgba(255,255,255,0.15)",
+                  boxShadow: "0 0 12px rgba(255,190,60,0.15), inset 0 1px 0 rgba(255,255,255,0.1)",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                }}
+              />
               <button
                 type="button"
                 onClick={() => setTab("student")}
-                className={[
-                  "flex-1 py-2.5 rounded-xl font-bold text-sm transition",
-                  tab === "student"
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-700",
-                ].join(" ")}
+                className="relative z-10 flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold text-sm transition-colors duration-200"
+                style={{ color: tab === "student" ? "white" : "rgba(255,255,255,0.5)" }}
               >
-                Student
+                <span className="text-base">🎓</span> Student
               </button>
               <button
                 type="button"
                 onClick={() => setTab("teacher")}
-                className={[
-                  "flex-1 py-2.5 rounded-xl font-bold text-sm transition",
-                  tab === "teacher"
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-700",
-                ].join(" ")}
+                className="relative z-10 flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold text-sm transition-colors duration-200"
+                style={{ color: tab === "teacher" ? "white" : "rgba(255,255,255,0.5)" }}
               >
-                Teacher / Parent
+                <span className="text-base">🧑‍🏫</span> Teacher
               </button>
             </div>
           </div>
 
           {tab === "student" ? (
-            <div className="grid gap-3">
-              <p className="text-xs text-gray-600 text-center">
-                Enter your class code, name &amp; PIN
+            <div className="grid gap-3.5">
+              <p className="text-xs text-white/50 text-center tracking-wide">
+                Enter your class code, name & PIN
               </p>
 
-              <label className="grid gap-1">
-                <span className="text-xs font-bold text-gray-700">Class Code</span>
-                <input
-                  value={studentCode}
-                  onChange={(e) => setStudentCode(e.target.value)}
-                  placeholder="E.G. K9F2Q"
-                  className="px-4 py-3 rounded-xl border border-white/60 text-base font-semibold tracking-[0.3em] text-center uppercase bg-white/70 backdrop-blur focus:outline-none focus:ring-2 focus:ring-teal-400/50"
-                />
-              </label>
-
-              <label className="grid gap-1">
-                <span className="text-xs font-bold text-gray-700">Your Name</span>
-                <input
-                  value={studentName}
-                  onChange={(e) => setStudentName(e.target.value)}
-                  placeholder="Enter your first name"
-                  className="px-4 py-3 rounded-xl border border-white/60 text-base bg-white/70 backdrop-blur focus:outline-none focus:ring-2 focus:ring-teal-400/50"
-                />
-              </label>
-
-              <label className="grid gap-1">
-                <span className="text-xs font-bold text-gray-700">4-Digit PIN</span>
+              <label className="grid gap-1.5">
+                <span className="text-xs font-bold text-white/70 pl-1">Class Code</span>
                 <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-lg">🔑</span>
+                  <input
+                    value={studentCode}
+                    onChange={(e) => setStudentCode(e.target.value)}
+                    placeholder="E.G. K9F2Q"
+                    className={`${inputBase} tracking-[0.3em] text-center uppercase font-semibold`}
+                  />
+                </div>
+              </label>
+
+              <label className="grid gap-1.5">
+                <span className="text-xs font-bold text-white/70 pl-1">Your Name</span>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-lg">👤</span>
+                  <input
+                    value={studentName}
+                    onChange={(e) => setStudentName(e.target.value)}
+                    placeholder="Enter your first name"
+                    className={inputBase}
+                  />
+                </div>
+              </label>
+
+              <label className="grid gap-1.5">
+                <span className="text-xs font-bold text-white/70 pl-1">4-Digit PIN</span>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-lg">🔒</span>
                   <input
                     value={studentPin}
                     onChange={(e) => setStudentPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
                     placeholder="····"
-                    className="w-full px-4 py-3 rounded-xl border border-white/60 text-base tracking-[0.5em] text-center bg-white/70 backdrop-blur focus:outline-none focus:ring-2 focus:ring-teal-400/50"
+                    className={`${inputBase} tracking-[0.5em] text-center`}
                     type={showPin ? "text" : "password"}
+                    inputMode="numeric"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPin((prev) => !prev)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition"
                     aria-label={showPin ? "Hide PIN" : "Show PIN"}
                   >
                     <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
@@ -365,111 +414,148 @@ export default function LoginPage() {
               </label>
 
               {studentError && (
-                <div className="text-sm font-bold text-red-600 text-center bg-red-50/80 rounded-lg py-1">{studentError}</div>
+                <div className="text-sm font-bold text-red-300 text-center bg-red-500/15 rounded-xl py-2">{studentError}</div>
               )}
 
               <button
                 onClick={handleStudentLogin}
-                className="mt-1 w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 text-white font-black text-lg hover:opacity-90 transition shadow-lg shadow-amber-900/20 active:scale-[0.98]"
+                className="group mt-1 w-full py-4 rounded-2xl font-black text-lg text-white transition-all duration-200 active:scale-[0.97]"
+                style={{
+                  background: "linear-gradient(135deg, hsl(30 95% 55%), hsl(45 100% 50%), hsl(30 95% 55%))",
+                  backgroundSize: "200% 200%",
+                  boxShadow:
+                    "0 4px 20px rgba(255,160,30,0.35), 0 0 30px rgba(255,190,60,0.15), inset 0 1px 0 rgba(255,255,255,0.25)",
+                }}
                 type="button"
               >
-                Let&apos;s Go!
+                <span className="flex items-center justify-center gap-2">
+                  Enter the Tower <span className="text-xl group-hover:translate-x-0.5 transition-transform">🚀</span>
+                </span>
               </button>
             </div>
           ) : (
-            <div className="grid gap-3">
-              {/* Login / Signup toggle */}
+            <div className="grid gap-3.5">
               <div className="flex items-center justify-center gap-3 mb-1">
                 <button
                   type="button"
                   onClick={() => setTeacherMode("login")}
-                  className={[
-                    "px-5 py-1.5 rounded-full font-bold text-sm transition",
-                    teacherMode === "login"
-                      ? "bg-white/60 text-gray-900"
-                      : "text-gray-600",
-                  ].join(" ")}
+                  className="px-5 py-1.5 rounded-full font-bold text-sm transition"
+                  style={{
+                    background: teacherMode === "login" ? "rgba(255,255,255,0.15)" : "transparent",
+                    color: teacherMode === "login" ? "white" : "rgba(255,255,255,0.5)",
+                    border: teacherMode === "login" ? "1px solid rgba(255,255,255,0.12)" : "1px solid transparent",
+                  }}
                 >
                   Log In
                 </button>
                 <button
                   type="button"
                   onClick={() => setTeacherMode("signup")}
-                  className={[
-                    "px-5 py-1.5 rounded-full font-bold text-sm transition",
-                    teacherMode === "signup"
-                      ? "bg-white/60 text-gray-900"
-                      : "text-gray-600",
-                  ].join(" ")}
+                  className="px-5 py-1.5 rounded-full font-bold text-sm transition"
+                  style={{
+                    background: teacherMode === "signup" ? "rgba(255,255,255,0.15)" : "transparent",
+                    color: teacherMode === "signup" ? "white" : "rgba(255,255,255,0.5)",
+                    border: teacherMode === "signup" ? "1px solid rgba(255,255,255,0.12)" : "1px solid transparent",
+                  }}
                 >
                   Sign Up
                 </button>
               </div>
 
-              <label className="grid gap-1">
-                <span className="text-xs font-bold text-gray-700">Email</span>
-                <input
-                  value={teacherEmail}
-                  onChange={(e) => setTeacherEmail(e.target.value)}
-                  placeholder="teacher@school.edu"
-                  className="px-4 py-3 rounded-xl border border-white/60 bg-white/70 backdrop-blur focus:outline-none focus:ring-2 focus:ring-teal-400/50"
-                />
+              <label className="grid gap-1.5">
+                <span className="text-xs font-bold text-white/70 pl-1">Email</span>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-lg">📧</span>
+                  <input
+                    value={teacherEmail}
+                    onChange={(e) => setTeacherEmail(e.target.value)}
+                    placeholder="teacher@school.edu"
+                    className={inputBase}
+                  />
+                </div>
               </label>
-              <label className="grid gap-1">
-                <span className="text-xs font-bold text-gray-700">Password</span>
-                <input
-                  value={teacherPassword}
-                  onChange={(e) => setTeacherPassword(e.target.value)}
-                  placeholder="********"
-                  type="password"
-                  className="px-4 py-3 rounded-xl border border-white/60 bg-white/70 backdrop-blur focus:outline-none focus:ring-2 focus:ring-teal-400/50"
-                />
+              <label className="grid gap-1.5">
+                <span className="text-xs font-bold text-white/70 pl-1">Password</span>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-lg">🔒</span>
+                  <input
+                    value={teacherPassword}
+                    onChange={(e) => setTeacherPassword(e.target.value)}
+                    placeholder="********"
+                    type="password"
+                    className={inputBase}
+                  />
+                </div>
               </label>
 
               {teacherMode === "signup" && (
                 <>
-                  <label className="grid gap-1">
-                    <span className="text-xs font-bold text-gray-700">Teacher Name (optional)</span>
-                    <input
-                      value={teacherName}
-                      onChange={(e) => setTeacherName(e.target.value)}
-                      placeholder="Ms Johnson"
-                      className="px-4 py-3 rounded-xl border border-white/60 bg-white/70 backdrop-blur focus:outline-none focus:ring-2 focus:ring-teal-400/50"
-                    />
+                  <label className="grid gap-1.5">
+                    <span className="text-xs font-bold text-white/70 pl-1">Teacher Name (optional)</span>
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-lg">👤</span>
+                      <input
+                        value={teacherName}
+                        onChange={(e) => setTeacherName(e.target.value)}
+                        placeholder="Ms Johnson"
+                        className={inputBase}
+                      />
+                    </div>
                   </label>
-                  <label className="grid gap-1">
-                    <span className="text-xs font-bold text-gray-700">Class Name (optional)</span>
-                    <input
-                      value={className}
-                      onChange={(e) => setClassName(e.target.value)}
-                      placeholder="3/4 SJ"
-                      className="px-4 py-3 rounded-xl border border-white/60 bg-white/70 backdrop-blur focus:outline-none focus:ring-2 focus:ring-teal-400/50"
-                    />
+                  <label className="grid gap-1.5">
+                    <span className="text-xs font-bold text-white/70 pl-1">Class Name (optional)</span>
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-lg">🏫</span>
+                      <input
+                        value={className}
+                        onChange={(e) => setClassName(e.target.value)}
+                        placeholder="3/4 SJ"
+                        className={inputBase}
+                      />
+                    </div>
                   </label>
                 </>
               )}
 
               {teacherError && (
-                <p className="text-sm text-red-600 font-bold text-center bg-red-50/80 rounded-lg py-1">{teacherError}</p>
+                <p className="text-sm text-red-300 font-bold text-center bg-red-500/15 rounded-xl py-2">{teacherError}</p>
               )}
 
               <button
                 onClick={teacherMode === "signup" ? handleTeacherSignup : handleTeacherLogin}
                 disabled={teacherLoading}
-                className="mt-1 w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 text-white font-black text-lg hover:opacity-90 transition shadow-lg shadow-amber-900/20 active:scale-[0.98] disabled:opacity-50"
+                className="group mt-1 w-full py-4 rounded-2xl font-black text-lg text-white transition-all duration-200 active:scale-[0.97] disabled:opacity-50"
+                style={{
+                  background: "linear-gradient(135deg, hsl(30 95% 55%), hsl(45 100% 50%), hsl(30 95% 55%))",
+                  backgroundSize: "200% 200%",
+                  boxShadow:
+                    "0 4px 20px rgba(255,160,30,0.35), 0 0 30px rgba(255,190,60,0.15), inset 0 1px 0 rgba(255,255,255,0.25)",
+                }}
                 type="button"
               >
                 {teacherLoading ? "Please wait…" : teacherMode === "signup" ? "Sign Up" : "Log In"}
               </button>
 
               {createdClass && (
-                <div className="rounded-xl border border-teal-200/60 bg-teal-50/80 p-3 text-sm">
-                  <div className="font-bold text-teal-800">Class Created</div>
-                  <div className="text-teal-700">Name: {createdClass.name} · Code: {createdClass.code}</div>
+                <div className="rounded-xl border border-emerald-400/30 bg-emerald-500/15 p-3 text-sm text-emerald-200">
+                  <div className="font-bold">Class Created</div>
+                  <div>Name: {createdClass.name} · Code: {createdClass.code}</div>
                 </div>
               )}
             </div>
           )}
+
+          <div className="mt-5 text-center">
+            <p
+              className="text-[11px] tracking-wider uppercase font-semibold"
+              style={{
+                color: "rgba(255,190,60,0.55)",
+                fontFamily: "'Quicksand', sans-serif",
+              }}
+            >
+              ✦ Unlock your Level Up Legend by mastering your skills ✦
+            </p>
+          </div>
         </div>
       </div>
 
