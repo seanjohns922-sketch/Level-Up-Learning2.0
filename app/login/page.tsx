@@ -204,7 +204,7 @@ export default function LoginPage() {
       {/* Background */}
       <div className="absolute inset-0">
         <img src="/images/login-bg.jpg" alt="" className="w-full h-full object-cover object-[center_65%]" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-black/10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
       </div>
 
       <FloatingParticles />
