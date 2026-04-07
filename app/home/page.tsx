@@ -114,10 +114,18 @@ export default function StudentHomePage() {
 
   return (
     <main className="min-h-screen relative">
-      {/* Clean world background — wide view */}
+      {/* Realm-specific background — unique per level band */}
       <div className="fixed inset-0 z-0">
-        <img src="/images/dashboard-bg.jpg" alt="" className="w-full h-full object-cover" style={{ objectPosition: "center 40%" }} />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/25" />
+        <img
+          src={getHomeBg(levelNum)}
+          alt=""
+          className="w-full h-full object-cover"
+          style={{ filter: getHomeBgFilter(levelNum) }}
+        />
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ boxShadow: getVignetteStyle(levelNum) }}
+        />
       </div>
 
       <div className="relative z-10">
