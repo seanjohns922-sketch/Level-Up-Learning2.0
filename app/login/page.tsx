@@ -194,8 +194,8 @@ export default function LoginPage() {
   }
 
   const inputCls =
-    "w-full pl-11 pr-4 py-3.5 rounded-[14px] text-[15px] text-white placeholder-white/35 bg-[rgba(255,255,255,0.12)] border border-white/[0.12] focus:outline-none focus:border-amber-400/50 focus:bg-[rgba(255,255,255,0.18)] focus:shadow-[0_0_12px_rgba(255,190,60,0.15)] transition-all duration-200";
-  const innerShadow = { boxShadow: "inset 0 2px 4px rgba(0,0,0,0.12)" };
+    "w-full pl-11 pr-4 py-3.5 rounded-[14px] text-[15px] text-white placeholder-white/45 bg-[rgba(0,0,0,0.22)] border border-white/[0.10] focus:outline-none focus:border-amber-400/40 focus:bg-[rgba(0,0,0,0.28)] focus:shadow-[0_0_10px_rgba(255,190,60,0.1)] transition-all duration-200";
+  const innerShadow = { boxShadow: "inset 0 2px 6px rgba(0,0,0,0.2)" };
 
   return (
     <main className="min-h-screen relative overflow-hidden flex flex-col items-center justify-start">
