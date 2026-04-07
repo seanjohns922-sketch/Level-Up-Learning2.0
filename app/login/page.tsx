@@ -194,8 +194,10 @@ export default function LoginPage() {
   }
 
   const inputCls =
-    "w-full pl-11 pr-4 py-3.5 rounded-[14px] text-[15px] text-white placeholder-white/35 bg-[rgba(255,255,255,0.12)] border border-white/[0.12] focus:outline-none focus:border-amber-400/50 focus:bg-[rgba(255,255,255,0.18)] focus:shadow-[0_0_12px_rgba(255,190,60,0.15)] transition-all duration-200";
+    "w-full pl-11 pr-4 py-3.5 rounded-[14px] text-[15px] text-white font-medium placeholder-white/60 bg-[rgba(255,255,255,0.18)] border border-white/[0.14] focus:outline-none focus:border-amber-400/50 focus:bg-[rgba(255,255,255,0.22)] focus:shadow-[0_0_12px_rgba(255,190,60,0.15)] transition-all duration-200";
   const innerShadow = { boxShadow: "inset 0 2px 4px rgba(0,0,0,0.12)" };
+  const labelCls = "text-[12px] font-bold text-white pl-1 uppercase tracking-wider"
+  const labelStyle = { textShadow: "0 1px 4px rgba(0,0,0,0.3)", fontFamily: "'Nunito', sans-serif" };
 
   return (
     <main className="min-h-screen relative overflow-hidden flex flex-col items-center justify-start">
@@ -291,19 +293,19 @@ export default function LoginPage() {
           {tab === "student" ? (
             <div className="grid gap-3">
               <label className="grid gap-1.5">
-                <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Class Code</span>
+                <span className={labelCls} style={labelStyle}>Class Code</span>
                 <InputField icon={<KeyRound size={16} />}>
                   <input value={studentCode} onChange={(e) => setStudentCode(e.target.value)} placeholder="e.g. K9F2Q" className={`${inputCls} tracking-[0.3em] text-center uppercase font-semibold`} style={innerShadow} />
                 </InputField>
               </label>
               <label className="grid gap-1.5">
-                <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Your Name</span>
+                <span className={labelCls} style={labelStyle}>Your Name</span>
                 <InputField icon={<User size={16} />}>
                   <input value={studentName} onChange={(e) => setStudentName(e.target.value)} placeholder="Enter your first name" className={inputCls} style={innerShadow} />
                 </InputField>
               </label>
               <label className="grid gap-1.5">
-                <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">4-Digit PIN</span>
+                <span className={labelCls} style={labelStyle}>4-Digit PIN</span>
                 <InputField icon={<Lock size={16} />}>
                   <input
                     value={studentPin}
@@ -366,13 +368,13 @@ export default function LoginPage() {
               </div>
 
               <label className="grid gap-1.5">
-                <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Email</span>
+                <span className={labelCls} style={labelStyle}>Email</span>
                 <InputField icon={<User size={16} />}>
                   <input value={teacherEmail} onChange={(e) => setTeacherEmail(e.target.value)} placeholder="teacher@school.edu" className={inputCls} style={innerShadow} />
                 </InputField>
               </label>
               <label className="grid gap-1.5">
-                <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Password</span>
+                <span className={labelCls} style={labelStyle}>Password</span>
                 <InputField icon={<Lock size={16} />}>
                   <input value={teacherPassword} onChange={(e) => setTeacherPassword(e.target.value)} placeholder="********" type="password" className={inputCls} style={innerShadow} />
                 </InputField>
@@ -381,13 +383,13 @@ export default function LoginPage() {
               {teacherMode === "signup" && (
                 <>
                   <label className="grid gap-1.5">
-                    <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Teacher Name</span>
+                    <span className={labelCls} style={labelStyle}>Teacher Name</span>
                     <InputField icon={<User size={16} />}>
                       <input value={teacherName} onChange={(e) => setTeacherName(e.target.value)} placeholder="Ms Johnson" className={inputCls} style={innerShadow} />
                     </InputField>
                   </label>
                   <label className="grid gap-1.5">
-                    <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Class Name</span>
+                    <span className={labelCls} style={labelStyle}>Class Name</span>
                     <InputField icon={<Briefcase size={16} />}>
                       <input value={className} onChange={(e) => setClassName(e.target.value)} placeholder="3/4 SJ" className={inputCls} style={innerShadow} />
                     </InputField>
