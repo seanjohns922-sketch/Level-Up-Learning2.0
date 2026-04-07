@@ -263,9 +263,9 @@ export default function LoginPage() {
                 style={{
                   width: "calc(50% - 3px)",
                   left: tab === "student" ? 3 : "calc(50%)",
-                  background: "rgba(255,255,255,0.12)",
-                  border: "1px solid rgba(255,255,255,0.15)",
-                  boxShadow: "0 0 10px rgba(255,190,60,0.12)",
+                  background: "rgba(255,255,255,0.10)",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  boxShadow: "0 0 8px rgba(255,190,60,0.08)",
                 }}
               />
               <button
