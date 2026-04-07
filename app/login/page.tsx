@@ -361,8 +361,8 @@ export default function LoginPage() {
               disabled={teacherLoading}
               className="mt-1 w-full py-4 rounded-2xl font-black text-lg text-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(230,160,40,0.45)] active:scale-[0.97] disabled:opacity-50 cursor-pointer"
               style={{
-                background: "linear-gradient(135deg, hsl(38 85% 58%), hsl(28 90% 50%))",
-                boxShadow: "0 6px 24px rgba(230,160,40,0.35), inset 0 1px 0 rgba(255,255,255,0.2)",
+                background: "linear-gradient(135deg, hsl(220 15% 18%), hsl(220 10% 12%))",
+                boxShadow: "0 6px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)",
               }}
               type="button"
             >
