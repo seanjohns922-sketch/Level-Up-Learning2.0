@@ -242,7 +242,7 @@ export default function LoginPage() {
                 textShadow: "0 2px 20px rgba(255,190,60,0.3), 0 1px 3px rgba(0,0,0,0.4)",
               }}
             >
-              Enter the Tower
+              Level Up Learning
             </h1>
             <p
               className="text-sm text-white/50 mt-1 tracking-wide font-medium"
