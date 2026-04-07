@@ -210,7 +210,7 @@ export default function LoginPage() {
       <FloatingParticles />
 
       {/* Content */}
-      <div className="relative z-10 w-full max-w-[420px] mx-auto px-4 pt-5 pb-10 flex flex-col items-center">
+      <div className="relative z-10 w-full max-w-[480px] mx-auto px-4 pt-8 pb-10 flex flex-col items-center">
         {/* Skip */}
         <div className="w-full flex justify-end mb-3">
           <button
