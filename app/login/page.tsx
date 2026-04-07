@@ -374,7 +374,7 @@ export default function LoginPage() {
                 </InputField>
               </label>
               <label className="grid gap-1.5">
-                <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Password</span>
+                <span className={labelCls} style={labelStyle}>Password</span>
                 <InputField icon={<Lock size={16} />}>
                   <input value={teacherPassword} onChange={(e) => setTeacherPassword(e.target.value)} placeholder="********" type="password" className={inputCls} style={innerShadow} />
                 </InputField>
