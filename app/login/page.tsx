@@ -194,8 +194,8 @@ export default function LoginPage() {
   }
 
   const inputCls =
-    "w-full pl-11 pr-4 py-3.5 rounded-[14px] text-[15px] text-white font-medium placeholder-white/60 bg-[rgba(255,255,255,0.18)] border border-white/[0.14] focus:outline-none focus:border-amber-400/50 focus:bg-[rgba(255,255,255,0.22)] focus:shadow-[0_0_12px_rgba(255,190,60,0.15)] transition-all duration-200";
-  const innerShadow = { boxShadow: "inset 0 2px 4px rgba(0,0,0,0.12)" };
+    "w-full pl-11 pr-4 py-3.5 rounded-[14px] text-[15px] text-white font-medium placeholder-white/50 bg-[rgba(255,255,255,0.08)] border border-white/20 focus:outline-none focus:border-white/40 focus:bg-[rgba(255,255,255,0.12)] transition-all duration-200";
+  const innerShadow = {};
   const labelCls = "text-[12px] font-bold text-white pl-1 uppercase tracking-wider"
   const labelStyle = { textShadow: "0 1px 4px rgba(0,0,0,0.3)", fontFamily: "'Nunito', sans-serif" };
 
@@ -204,13 +204,13 @@ export default function LoginPage() {
       {/* Background */}
       <div className="absolute inset-0">
         <img src="/images/login-bg.jpg" alt="" className="w-full h-full object-cover object-[center_65%]" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-black/10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
       </div>
 
       <FloatingParticles />
 
       {/* Content */}
-      <div className="relative z-10 w-full max-w-[420px] mx-auto px-4 pt-5 pb-10 flex flex-col items-center">
+      <div className="relative z-10 w-full max-w-[480px] mx-auto px-4 pt-8 pb-10 flex flex-col items-center">
         {/* Skip */}
         <div className="w-full flex justify-end mb-3">
           <button
@@ -225,29 +225,29 @@ export default function LoginPage() {
 
         {/* ── Portal Card ── */}
         <div
-          className="w-full rounded-[22px] p-6 md:p-7"
+          className="w-full rounded-[22px] p-7 md:p-9"
           style={{
-            background: "linear-gradient(170deg, rgba(255,240,200,0.10) 0%, rgba(255,255,255,0.08) 40%, rgba(255,255,255,0.06) 100%)",
-            backdropFilter: "blur(16px) saturate(1.3)",
-            WebkitBackdropFilter: "blur(16px) saturate(1.3)",
-            border: "1px solid rgba(255,255,255,0.22)",
-            boxShadow: "0 8px 32px rgba(0,0,0,0.3), 0 0 40px rgba(255,190,60,0.06), inset 0 1px 0 rgba(255,255,255,0.12)",
+            background: "linear-gradient(170deg, rgba(180,200,240,0.18) 0%, rgba(200,210,240,0.12) 40%, rgba(180,190,230,0.08) 100%)",
+            backdropFilter: "blur(14px) saturate(1.2)",
+            WebkitBackdropFilter: "blur(14px) saturate(1.2)",
+            border: "1px solid rgba(255,255,255,0.25)",
+            boxShadow: "0 8px 40px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.15)",
             animation: "fadeUp 0.6s ease both",
           }}
         >
           {/* Header */}
           <div className="text-center mb-5">
             <h1
-              className="text-[2.2rem] font-black text-white tracking-tight leading-tight"
+              className="text-[2.6rem] font-black text-white tracking-tight leading-tight"
               style={{
                 fontFamily: "'Nunito', sans-serif",
-                textShadow: "0 2px 20px rgba(255,190,60,0.3), 0 1px 3px rgba(0,0,0,0.4)",
+                textShadow: "0 2px 20px rgba(255,255,255,0.2), 0 1px 3px rgba(0,0,0,0.3)",
               }}
             >
               Level Up Learning
             </h1>
             <p
-              className="text-sm text-white/50 mt-1 tracking-wide font-medium"
+              className="text-base text-white/60 mt-1.5 tracking-wide font-medium"
               style={{ fontFamily: "'Quicksand', sans-serif" }}
             >
               Begin your journey
@@ -258,16 +258,15 @@ export default function LoginPage() {
           <div className="mb-5">
             <div
               className="relative flex rounded-full p-[3px]"
-              style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.08)" }}
+              style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)" }}
             >
               <div
                 className="absolute top-[3px] bottom-[3px] rounded-full transition-all duration-300 ease-out"
                 style={{
                   width: "calc(50% - 3px)",
                   left: tab === "student" ? 3 : "calc(50%)",
-                  background: "rgba(255,255,255,0.12)",
-                  border: "1px solid rgba(255,255,255,0.15)",
-                  boxShadow: "0 0 10px rgba(255,190,60,0.12)",
+                  background: "rgba(255,255,255,0.10)",
+                  border: "1px solid rgba(255,255,255,0.20)",
                 }}
               />
               <button
@@ -336,10 +335,10 @@ export default function LoginPage() {
 
               <button
                 onClick={handleStudentLogin}
-                className="mt-1 w-full py-3.5 rounded-full font-black text-base text-white transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.97]"
+                className="mt-2 w-full py-4 rounded-full font-black text-lg text-white transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.97]"
                 style={{
-                  background: "linear-gradient(135deg, hsl(220 10% 18%), hsl(220 8% 28%))",
-                  boxShadow: "0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)",
+                  background: "linear-gradient(135deg, hsl(38 85% 60%), hsl(32 90% 55%))",
+                  boxShadow: "0 4px 20px rgba(230,160,40,0.35), inset 0 1px 0 rgba(255,255,255,0.25)",
                 }}
                 type="button"
               >
@@ -404,10 +403,10 @@ export default function LoginPage() {
               <button
                 onClick={teacherMode === "signup" ? handleTeacherSignup : handleTeacherLogin}
                 disabled={teacherLoading}
-                className="mt-1 w-full py-3.5 rounded-full font-black text-base text-white transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.97] disabled:opacity-50"
+                className="mt-2 w-full py-4 rounded-full font-black text-lg text-white transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.97] disabled:opacity-50"
                 style={{
-                  background: "linear-gradient(135deg, hsl(220 10% 18%), hsl(220 8% 28%))",
-                  boxShadow: "0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)",
+                  background: "linear-gradient(135deg, hsl(38 85% 60%), hsl(32 90% 55%))",
+                  boxShadow: "0 4px 20px rgba(230,160,40,0.35), inset 0 1px 0 rgba(255,255,255,0.25)",
                 }}
                 type="button"
               >
