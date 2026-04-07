@@ -258,16 +258,15 @@ export default function LoginPage() {
           <div className="mb-5">
             <div
               className="relative flex rounded-full p-[3px]"
-              style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.08)" }}
+              style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)" }}
             >
               <div
                 className="absolute top-[3px] bottom-[3px] rounded-full transition-all duration-300 ease-out"
                 style={{
                   width: "calc(50% - 3px)",
                   left: tab === "student" ? 3 : "calc(50%)",
-                  background: "rgba(255,255,255,0.12)",
-                  border: "1px solid rgba(255,255,255,0.15)",
-                  boxShadow: "0 0 10px rgba(255,190,60,0.12)",
+                  background: "rgba(255,255,255,0.10)",
+                  border: "1px solid rgba(255,255,255,0.20)",
                 }}
               />
               <button
