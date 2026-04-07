@@ -11,6 +11,13 @@ function normalize(value: string) {
   return value.trim().toLowerCase().replace(/,/g, "").replace(/\s+/g, " ");
 }
 
+function normalizeDecimalEquivalent(value: string) {
+  const normalized = normalize(value);
+  if (/^\.\d+$/.test(normalized)) return `0${normalized}`;
+  if (/^-\.\d+$/.test(normalized)) return normalized.replace("-.", "-0.");
+  return normalized;
+}
+
 function normalizeOrderingNumber(value: string) {
   return value.trim().replace(/,/g, "").replace(/\s+/g, "");
 }
@@ -830,16 +837,21 @@ export default function TypedResponseActivity({
       return;
     }
 
-    const value = isColumnMultiplication
+    const rawValue = isColumnMultiplication
       ? normalize(typed)
       : writtenMethod
       ? normalize(normalizedDigitAnswer())
       : isOrderingResponse
       ? orderedInputs.map(normalizeOrderingNumber).join(",")
       : normalize(typed);
-    const expected = isOrderingResponse
+    const rawExpected = isOrderingResponse
       ? orderingAnswerParts.join(",")
       : normalize(questionData.answer);
+    const value =
+      isColumnMultiplication || writtenMethod || isOrderingResponse
+        ? rawValue
+        : normalizeDecimalEquivalent(rawValue);
+    const expected = isOrderingResponse ? rawExpected : normalizeDecimalEquivalent(rawExpected);
     if (value === expected) onCorrect?.();
     else onWrong?.();
   }
