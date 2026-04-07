@@ -404,11 +404,11 @@ export default function LoginPage() {
               <button
                 onClick={teacherMode === "signup" ? handleTeacherSignup : handleTeacherLogin}
                 disabled={teacherLoading}
-                className="mt-1 w-full py-3.5 rounded-full font-black text-base text-white transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.97] disabled:opacity-50"
+                className="mt-2 w-full py-4 rounded-full font-black text-lg text-white transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.97] disabled:opacity-50"
                 style={{
-                  background: "linear-gradient(135deg, hsl(220 10% 18%), hsl(220 8% 28%))",
-                  boxShadow: "0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)",
-                }}
+                  background: "linear-gradient(135deg, hsl(38 85% 60%), hsl(32 90% 55%))",
+                  boxShadow: "0 4px 20px rgba(230,160,40,0.35), inset 0 1px 0 rgba(255,255,255,0.25)",
+                }
                 type="button"
               >
                 {teacherLoading ? "Please wait..." : teacherMode === "signup" ? "Sign Up" : "Log In"}
