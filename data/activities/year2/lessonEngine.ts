@@ -236,7 +236,6 @@ export type NumberLinePlaceQuestion = {
   options?: string[];
   answer?: string;
   fractions?: string[];
-  maxWhole?: number;
 };
 
 export type FractionCompareQuestion = {
@@ -487,32 +486,6 @@ function year3FractionOrderSets() {
     ["1/10", "3/5", "9/10"],
     ["1/4", "3/4", "9/10"],
   ];
-}
-
-function mixedNumeralLabel(whole: number, numerator: number, denominator: number) {
-  if (numerator === 0) return String(whole);
-  if (whole === 0) return `${numerator}/${denominator}`;
-  return `${whole} ${numerator}/${denominator}`;
-}
-
-function parseFractionLike(label: string) {
-  const trimmed = label.trim();
-  if (!trimmed.includes("/")) {
-    const whole = Number(trimmed);
-    return { whole, numerator: 0, denominator: 1, value: whole };
-  }
-
-  const [wholePart, fractionPart] = trimmed.includes(" ")
-    ? trimmed.split(" ")
-    : ["0", trimmed];
-  const [numerator, denominator] = fractionPart.split("/").map(Number);
-  const whole = Number(wholePart);
-  return {
-    whole,
-    numerator,
-    denominator,
-    value: whole + numerator / denominator,
-  };
 }
 
 function year3EquivalentFractionPairs() {
@@ -3439,55 +3412,15 @@ function generateInteractiveQuestion(
   }
 
   if (activityType === "number_line_place") {
-    const explicitMode = typeof config.mode === "string" ? config.mode : undefined;
     const mode =
-      explicitMode === "pick_point" || explicitMode === "order_fractions"
-        ? explicitMode
+      config.mode === "pick_point" || config.mode === "order_fractions"
+        ? config.mode
         : "place_fraction";
 
     const allowedDenominators =
       Array.isArray(config.denominators) && config.denominators.every((value) => typeof value === "number")
         ? (config.denominators as number[])
         : undefined;
-
-    if (explicitMode === "skip_count_fraction") {
-      const denominators = allowedDenominators?.length ? allowedDenominators : [2, 3, 4, 5, 6, 8];
-      const denominator = denominators[randInt(0, denominators.length - 1)] ?? denominators[0] ?? 4;
-      const numerator = randInt(1, denominator);
-      const targetLabel = numerator === denominator ? "1" : `${numerator}/${denominator}`;
-      const stem = `Count by 1/${denominator}`;
-      return {
-        kind: "number_line_place",
-        prompt: `${stem}. Show where ${targetLabel} belongs on the number line.`,
-        mode: "place_fraction",
-        denominator,
-        targetFraction: targetLabel,
-        options: Array.from({ length: denominator }, (_, index) =>
-          index + 1 === denominator ? "1" : `${index + 1}/${denominator}`
-        ),
-        answer: targetLabel,
-      };
-    }
-
-    if (explicitMode === "mixed_numerals") {
-      const denominators = allowedDenominators?.length ? allowedDenominators : [2, 3, 4, 5, 6, 8];
-      const denominator = denominators[randInt(0, denominators.length - 1)] ?? denominators[0] ?? 2;
-      const whole = 1;
-      const numerator = randInt(1, denominator - 1);
-      const targetLabel = mixedNumeralLabel(whole, numerator, denominator);
-      return {
-        kind: "number_line_place",
-        prompt: `Place ${targetLabel} on the number line.`,
-        mode: "place_fraction",
-        denominator,
-        targetFraction: targetLabel,
-        options: Array.from({ length: denominator * 2 + 1 }, (_, index) =>
-          mixedNumeralLabel(Math.floor(index / denominator), index % denominator, denominator)
-        ).filter((label, index, list) => label !== "0 0/1" && list.indexOf(label) === index),
-        answer: targetLabel,
-        maxWhole: 2,
-      };
-    }
 
     if (mode === "order_fractions") {
       const candidateSets = year3FractionOrderSets().filter((set) =>
@@ -4672,114 +4605,6 @@ function generateGenericQuestion(
           helper: "Use the tenths model to help you connect the fraction to the decimal.",
           placeholder: "Type the decimal",
           visual,
-        };
-  }
-
-  if (explicitMode === "skip_count_fraction") {
-    const denominators =
-      Array.isArray(config.denominators) && config.denominators.every((value) => typeof value === "number")
-        ? (config.denominators as number[])
-        : [2, 3, 4, 5, 6, 8];
-    const denominator = denominators[randInt(0, denominators.length - 1)] ?? denominators[0] ?? 4;
-    const missingIndex = randInt(2, denominator - 1);
-    const answer = missingIndex === denominator ? "1" : `${missingIndex}/${denominator}`;
-    const sequence = Array.from({ length: Math.min(denominator, 5) }, (_, index) => {
-      const value = index + 1;
-      if (value === missingIndex) return "__";
-      return value === denominator ? "1" : `${value}/${denominator}`;
-    });
-    const sequencePrompt = `${sequence.join(", ")}`;
-
-    return asMultipleChoice
-      ? {
-          kind: "multiple_choice",
-          prompt: `Count in 1/${denominator}. What comes next? ${sequencePrompt}`,
-          options: shuffle([
-            answer,
-            `${Math.max(1, missingIndex - 1)}/${denominator}`,
-            `${Math.min(denominator - 1, missingIndex + 1)}/${denominator}`,
-            "1",
-          ]).filter((value, index, list) => list.indexOf(value) === index),
-          answer,
-          helper: `Each jump adds 1/${denominator}.`,
-        }
-      : {
-          kind: "typed_response",
-          prompt: `Count in 1/${denominator}. Fill the missing fraction: ${sequencePrompt}`,
-          answer,
-          helper: `Add another 1/${denominator} each time.`,
-          placeholder: "Type the missing fraction",
-        };
-  }
-
-  if (explicitMode === "mixed_numerals") {
-    const denominators =
-      Array.isArray(config.denominators) && config.denominators.every((value) => typeof value === "number")
-        ? (config.denominators as number[])
-        : [2, 3, 4, 5, 6, 8];
-    const denominator = denominators[randInt(0, denominators.length - 1)] ?? denominators[0] ?? 2;
-    const whole = randInt(1, 2);
-    const numerator = randInt(1, denominator - 1);
-    const mixed = mixedNumeralLabel(whole, numerator, denominator);
-    const improper = `${whole * denominator + numerator}/${denominator}`;
-
-    return asMultipleChoice
-      ? {
-          kind: "multiple_choice",
-          prompt: `Which mixed numeral matches ${improper}?`,
-          options: shuffle([
-            mixed,
-            mixedNumeralLabel(whole, Math.max(1, numerator - 1), denominator),
-            mixedNumeralLabel(whole + 1, numerator, denominator),
-            mixedNumeralLabel(Math.max(0, whole - 1), numerator, denominator),
-          ]).filter((value, index, list) => list.indexOf(value) === index),
-          answer: mixed,
-          helper: "Think about how many whole groups fit, then what fraction is left.",
-        }
-      : {
-          kind: "typed_response",
-          prompt: `Write ${improper} as a mixed numeral.`,
-          answer: mixed,
-          helper: "Work out how many whole parts there are first, then write the extra fraction.",
-          placeholder: "Type the mixed numeral",
-        };
-  }
-
-  if (explicitMode === "same_denominator_combine") {
-    const denominators =
-      Array.isArray(config.denominators) && config.denominators.every((value) => typeof value === "number")
-        ? (config.denominators as number[])
-        : [2, 3, 4, 5, 6, 8];
-    const denominator = denominators[randInt(0, denominators.length - 1)] ?? denominators[0] ?? 4;
-    const addendCount = randInt(2, 3);
-    const totalNumerator = randInt(addendCount, denominator);
-    const expression = Array.from({ length: totalNumerator }, () => `1/${denominator}`).join(" + ");
-    const answer = totalNumerator === denominator ? "1" : `${totalNumerator}/${denominator}`;
-    const promptOptions = [
-      `${expression} = ?`,
-      `Combine the unit fractions: ${expression}`,
-      `Add the fractions with denominator ${denominator}: ${expression}`,
-    ];
-
-    return asMultipleChoice
-      ? {
-          kind: "multiple_choice",
-          prompt: promptOptions[randInt(0, promptOptions.length - 1)] ?? promptOptions[0],
-          options: shuffle([
-            answer,
-            `${Math.max(1, totalNumerator - 1)}/${denominator}`,
-            `${Math.min(denominator - 1, totalNumerator + 1)}/${denominator}`,
-            "1",
-          ]).filter((value, index, list) => list.indexOf(value) === index),
-          answer,
-          helper: "When the denominator stays the same, count how many unit fractions you have.",
-        }
-      : {
-          kind: "typed_response",
-          prompt: promptOptions[randInt(0, promptOptions.length - 1)] ?? promptOptions[0],
-          answer,
-          helper: "Count the unit fractions. The denominator stays the same.",
-          placeholder: "Type the total fraction",
         };
   }
 

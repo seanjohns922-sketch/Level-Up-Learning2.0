@@ -153,24 +153,14 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen relative overflow-hidden flex">
-      {/* ── Layered background ── */}
+      {/* ── Full-screen background ── */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 overflow-hidden">
-          <img
-            src="/images/login-bg.jpg"
-            alt=""
-            className="w-full h-full object-cover origin-left scale-[2.35] lg:scale-[2.45]"
-            style={{ objectPosition: "0% 65%" }}
-          />
-        </div>
-        <div className="absolute inset-y-0 right-0 hidden overflow-hidden pointer-events-none md:block md:w-[40vw] md:min-w-[420px] md:max-w-[720px]">
-          <img
-            src="/images/login-bg.jpg"
-            alt=""
-            className="w-full h-full object-cover"
-            style={{ objectPosition: "72% 65%" }}
-          />
-        </div>
+        <img
+          src="/images/login-bg.jpg"
+          alt=""
+          className="w-full h-full object-cover"
+          style={{ objectPosition: "-10% 65%" }}
+        />
         {/* Vignette */}
         <div
           className="absolute inset-0 pointer-events-none"
@@ -180,11 +170,13 @@ export default function LoginPage() {
         />
         {/* Left darkening for text readability */}
         <div
-          className="absolute inset-y-0 left-0 w-[58%] max-w-[760px] pointer-events-none"
+          className="absolute inset-0 pointer-events-none"
           style={{
-            background: "linear-gradient(to right, rgba(0,0,0,0.56) 0%, rgba(0,0,0,0.32) 58%, transparent 100%)",
+            background: "linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.3) 35%, transparent 55%)",
           }}
         />
+        {/* Bottom gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/15 pointer-events-none" />
       </div>
 
       {/* ── Skip to Demo ── */}
