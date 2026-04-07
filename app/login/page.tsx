@@ -293,7 +293,7 @@ export default function LoginPage() {
           {tab === "student" ? (
             <div className="grid gap-3">
               <label className="grid gap-1.5">
-                <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Class Code</span>
+                <span className={labelCls} style={labelStyle}>Class Code</span>
                 <InputField icon={<KeyRound size={16} />}>
                   <input value={studentCode} onChange={(e) => setStudentCode(e.target.value)} placeholder="e.g. K9F2Q" className={`${inputCls} tracking-[0.3em] text-center uppercase font-semibold`} style={innerShadow} />
                 </InputField>
