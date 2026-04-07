@@ -194,10 +194,10 @@ export default function LoginPage() {
   }
 
   const inputCls =
-    "w-full pl-11 pr-4 py-3.5 rounded-[14px] text-[15px] text-white font-medium placeholder-white/60 bg-[rgba(255,255,255,0.18)] border border-white/[0.14] focus:outline-none focus:border-amber-400/50 focus:bg-[rgba(255,255,255,0.22)] focus:shadow-[0_0_12px_rgba(255,190,60,0.15)] transition-all duration-200";
-  const innerShadow = { boxShadow: "inset 0 2px 4px rgba(0,0,0,0.12)" };
-  const labelCls = "text-[12px] font-bold text-white pl-1 uppercase tracking-wider"
-  const labelStyle = { textShadow: "0 1px 4px rgba(0,0,0,0.3)", fontFamily: "'Nunito', sans-serif" };
+    "w-full pl-11 pr-4 py-3.5 rounded-[14px] text-[15px] text-white font-medium placeholder-white/50 bg-[rgba(255,255,255,0.08)] border border-white/30 focus:outline-none focus:border-white/50 focus:bg-[rgba(255,255,255,0.12)] focus:shadow-[0_0_12px_rgba(255,255,255,0.08)] transition-all duration-200";
+  const innerShadow = { boxShadow: "inset 0 1px 2px rgba(0,0,0,0.06)" };
+  const labelCls = "text-[12px] font-bold text-white/80 pl-1 uppercase tracking-wider"
+  const labelStyle = { textShadow: "0 1px 4px rgba(0,0,0,0.2)", fontFamily: "'Nunito', sans-serif" };
 
   return (
     <main className="min-h-screen relative overflow-hidden flex flex-col items-center justify-start">
@@ -227,11 +227,11 @@ export default function LoginPage() {
         <div
           className="w-full rounded-[22px] p-6 md:p-7"
           style={{
-            background: "linear-gradient(170deg, rgba(255,240,200,0.10) 0%, rgba(255,255,255,0.08) 40%, rgba(255,255,255,0.06) 100%)",
-            backdropFilter: "blur(16px) saturate(1.3)",
-            WebkitBackdropFilter: "blur(16px) saturate(1.3)",
-            border: "1px solid rgba(255,255,255,0.22)",
-            boxShadow: "0 8px 32px rgba(0,0,0,0.3), 0 0 40px rgba(255,190,60,0.06), inset 0 1px 0 rgba(255,255,255,0.12)",
+            background: "linear-gradient(170deg, rgba(200,210,240,0.18) 0%, rgba(255,255,255,0.10) 40%, rgba(255,255,255,0.06) 100%)",
+            backdropFilter: "blur(24px) saturate(1.4)",
+            WebkitBackdropFilter: "blur(24px) saturate(1.4)",
+            border: "1px solid rgba(255,255,255,0.30)",
+            boxShadow: "0 8px 40px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.20)",
             animation: "fadeUp 0.6s ease both",
           }}
         >
@@ -338,8 +338,8 @@ export default function LoginPage() {
                 onClick={handleStudentLogin}
                 className="mt-1 w-full py-3.5 rounded-full font-black text-base text-white transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.97]"
                 style={{
-                  background: "linear-gradient(135deg, hsl(220 10% 18%), hsl(220 8% 28%))",
-                  boxShadow: "0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)",
+                  background: "linear-gradient(135deg, hsl(36 85% 58%), hsl(36 90% 52%))",
+                  boxShadow: "0 4px 16px rgba(220,160,40,0.35), inset 0 1px 0 rgba(255,255,255,0.25)",
                 }}
                 type="button"
               >
@@ -406,8 +406,8 @@ export default function LoginPage() {
                 disabled={teacherLoading}
                 className="mt-1 w-full py-3.5 rounded-full font-black text-base text-white transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.97] disabled:opacity-50"
                 style={{
-                  background: "linear-gradient(135deg, hsl(220 10% 18%), hsl(220 8% 28%))",
-                  boxShadow: "0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)",
+                  background: "linear-gradient(135deg, hsl(36 85% 58%), hsl(36 90% 52%))",
+                  boxShadow: "0 4px 16px rgba(220,160,40,0.35), inset 0 1px 0 rgba(255,255,255,0.25)",
                 }}
                 type="button"
               >
