@@ -225,11 +225,11 @@ export default function LoginPage() {
         <div
           className="w-full rounded-[22px] p-6 md:p-7"
           style={{
-            background: "linear-gradient(170deg, rgba(255,240,200,0.10) 0%, rgba(255,255,255,0.08) 40%, rgba(255,255,255,0.06) 100%)",
-            backdropFilter: "blur(16px) saturate(1.3)",
-            WebkitBackdropFilter: "blur(16px) saturate(1.3)",
-            border: "1px solid rgba(255,255,255,0.22)",
-            boxShadow: "0 8px 32px rgba(0,0,0,0.3), 0 0 40px rgba(255,190,60,0.06), inset 0 1px 0 rgba(255,255,255,0.12)",
+            background: "linear-gradient(175deg, rgba(20,25,40,0.55) 0%, rgba(15,20,35,0.65) 50%, rgba(25,35,55,0.60) 100%)",
+            backdropFilter: "blur(14px) saturate(1.2)",
+            WebkitBackdropFilter: "blur(14px) saturate(1.2)",
+            border: "1px solid rgba(255,255,255,0.12)",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)",
             animation: "fadeUp 0.6s ease both",
           }}
         >
