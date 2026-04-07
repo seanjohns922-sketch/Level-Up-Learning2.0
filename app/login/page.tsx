@@ -194,8 +194,8 @@ export default function LoginPage() {
   }
 
   const inputCls =
-    "w-full pl-11 pr-4 py-3.5 rounded-[14px] text-[15px] text-white placeholder-white/45 bg-[rgba(0,0,0,0.22)] border border-white/[0.10] focus:outline-none focus:border-amber-400/40 focus:bg-[rgba(0,0,0,0.28)] focus:shadow-[0_0_10px_rgba(255,190,60,0.1)] transition-all duration-200";
-  const innerShadow = { boxShadow: "inset 0 2px 6px rgba(0,0,0,0.2)" };
+    "w-full pl-11 pr-4 py-3.5 rounded-[14px] text-[15px] text-white placeholder-white/35 bg-[rgba(255,255,255,0.12)] border border-white/[0.12] focus:outline-none focus:border-amber-400/50 focus:bg-[rgba(255,255,255,0.18)] focus:shadow-[0_0_12px_rgba(255,190,60,0.15)] transition-all duration-200";
+  const innerShadow = { boxShadow: "inset 0 2px 4px rgba(0,0,0,0.12)" };
 
   return (
     <main className="min-h-screen relative overflow-hidden flex flex-col items-center justify-start">
@@ -225,11 +225,11 @@ export default function LoginPage() {
         <div
           className="w-full rounded-[22px] p-6 md:p-7"
           style={{
-            background: "linear-gradient(175deg, rgba(20,25,40,0.55) 0%, rgba(15,20,35,0.65) 50%, rgba(25,35,55,0.60) 100%)",
-            backdropFilter: "blur(14px) saturate(1.2)",
-            WebkitBackdropFilter: "blur(14px) saturate(1.2)",
-            border: "1px solid rgba(255,255,255,0.12)",
-            boxShadow: "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)",
+            background: "linear-gradient(170deg, rgba(255,240,200,0.10) 0%, rgba(255,255,255,0.08) 40%, rgba(255,255,255,0.06) 100%)",
+            backdropFilter: "blur(16px) saturate(1.3)",
+            WebkitBackdropFilter: "blur(16px) saturate(1.3)",
+            border: "1px solid rgba(255,255,255,0.22)",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.3), 0 0 40px rgba(255,190,60,0.06), inset 0 1px 0 rgba(255,255,255,0.12)",
             animation: "fadeUp 0.6s ease both",
           }}
         >
@@ -245,7 +245,7 @@ export default function LoginPage() {
               Level Up Learning
             </h1>
             <p
-              className="text-sm text-white/65 mt-1 tracking-wide font-medium"
+              className="text-sm text-white/50 mt-1 tracking-wide font-medium"
               style={{ fontFamily: "'Quicksand', sans-serif" }}
             >
               Begin your journey
@@ -256,16 +256,16 @@ export default function LoginPage() {
           <div className="mb-5">
             <div
               className="relative flex rounded-full p-[3px]"
-              style={{ background: "rgba(0,0,0,0.2)", border: "1px solid rgba(255,255,255,0.08)" }}
+              style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.08)" }}
             >
               <div
                 className="absolute top-[3px] bottom-[3px] rounded-full transition-all duration-300 ease-out"
                 style={{
                   width: "calc(50% - 3px)",
                   left: tab === "student" ? 3 : "calc(50%)",
-                  background: "rgba(255,255,255,0.10)",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  boxShadow: "0 0 8px rgba(255,190,60,0.08)",
+                  background: "rgba(255,255,255,0.12)",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  boxShadow: "0 0 10px rgba(255,190,60,0.12)",
                 }}
               />
               <button
@@ -291,19 +291,19 @@ export default function LoginPage() {
           {tab === "student" ? (
             <div className="grid gap-3">
               <label className="grid gap-1.5">
-                <span className="text-[11px] font-bold text-white/75 pl-1 uppercase tracking-wider">Class Code</span>
+                <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Class Code</span>
                 <InputField icon={<KeyRound size={16} />}>
                   <input value={studentCode} onChange={(e) => setStudentCode(e.target.value)} placeholder="e.g. K9F2Q" className={`${inputCls} tracking-[0.3em] text-center uppercase font-semibold`} style={innerShadow} />
                 </InputField>
               </label>
               <label className="grid gap-1.5">
-                <span className="text-[11px] font-bold text-white/75 pl-1 uppercase tracking-wider">Your Name</span>
+                <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Your Name</span>
                 <InputField icon={<User size={16} />}>
                   <input value={studentName} onChange={(e) => setStudentName(e.target.value)} placeholder="Enter your first name" className={inputCls} style={innerShadow} />
                 </InputField>
               </label>
               <label className="grid gap-1.5">
-                <span className="text-[11px] font-bold text-white/75 pl-1 uppercase tracking-wider">4-Digit PIN</span>
+                <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">4-Digit PIN</span>
                 <InputField icon={<Lock size={16} />}>
                   <input
                     value={studentPin}
@@ -336,8 +336,8 @@ export default function LoginPage() {
                 onClick={handleStudentLogin}
                 className="mt-1 w-full py-3.5 rounded-full font-black text-base text-white transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.97]"
                 style={{
-                  background: "linear-gradient(135deg, hsl(30 85% 48%), hsl(40 95% 50%))",
-                  boxShadow: "0 4px 16px rgba(255,140,20,0.35), inset 0 1px 0 rgba(255,255,255,0.15)",
+                  background: "linear-gradient(135deg, hsl(220 10% 18%), hsl(220 8% 28%))",
+                  boxShadow: "0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)",
                 }}
                 type="button"
               >
@@ -366,13 +366,13 @@ export default function LoginPage() {
               </div>
 
               <label className="grid gap-1.5">
-                <span className="text-[11px] font-bold text-white/75 pl-1 uppercase tracking-wider">Email</span>
+                <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Email</span>
                 <InputField icon={<User size={16} />}>
                   <input value={teacherEmail} onChange={(e) => setTeacherEmail(e.target.value)} placeholder="teacher@school.edu" className={inputCls} style={innerShadow} />
                 </InputField>
               </label>
               <label className="grid gap-1.5">
-                <span className="text-[11px] font-bold text-white/75 pl-1 uppercase tracking-wider">Password</span>
+                <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Password</span>
                 <InputField icon={<Lock size={16} />}>
                   <input value={teacherPassword} onChange={(e) => setTeacherPassword(e.target.value)} placeholder="********" type="password" className={inputCls} style={innerShadow} />
                 </InputField>
@@ -381,13 +381,13 @@ export default function LoginPage() {
               {teacherMode === "signup" && (
                 <>
                   <label className="grid gap-1.5">
-                    <span className="text-[11px] font-bold text-white/75 pl-1 uppercase tracking-wider">Teacher Name</span>
+                    <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Teacher Name</span>
                     <InputField icon={<User size={16} />}>
                       <input value={teacherName} onChange={(e) => setTeacherName(e.target.value)} placeholder="Ms Johnson" className={inputCls} style={innerShadow} />
                     </InputField>
                   </label>
                   <label className="grid gap-1.5">
-                    <span className="text-[11px] font-bold text-white/75 pl-1 uppercase tracking-wider">Class Name</span>
+                    <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Class Name</span>
                     <InputField icon={<Briefcase size={16} />}>
                       <input value={className} onChange={(e) => setClassName(e.target.value)} placeholder="3/4 SJ" className={inputCls} style={innerShadow} />
                     </InputField>
@@ -404,8 +404,8 @@ export default function LoginPage() {
                 disabled={teacherLoading}
                 className="mt-1 w-full py-3.5 rounded-full font-black text-base text-white transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.97] disabled:opacity-50"
                 style={{
-                  background: "linear-gradient(135deg, hsl(30 85% 48%), hsl(40 95% 50%))",
-                  boxShadow: "0 4px 16px rgba(255,140,20,0.35), inset 0 1px 0 rgba(255,255,255,0.15)",
+                  background: "linear-gradient(135deg, hsl(30 90% 52%), hsl(42 100% 50%))",
+                  boxShadow: "0 4px 16px rgba(255,160,30,0.3), 0 0 24px rgba(255,190,60,0.1), inset 0 1px 0 rgba(255,255,255,0.2)",
                 }}
                 type="button"
               >
