@@ -407,7 +407,7 @@ export default function LoginPage() {
                 style={{
                   background: "linear-gradient(135deg, hsl(38 85% 60%), hsl(32 90% 55%))",
                   boxShadow: "0 4px 20px rgba(230,160,40,0.35), inset 0 1px 0 rgba(255,255,255,0.25)",
-                }
+                }}
                 type="button"
               >
                 {teacherLoading ? "Please wait..." : teacherMode === "signup" ? "Sign Up" : "Log In"}
