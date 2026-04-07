@@ -336,8 +336,8 @@ export default function LoginPage() {
                 onClick={handleStudentLogin}
                 className="mt-1 w-full py-3.5 rounded-full font-black text-base text-white transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.97]"
                 style={{
-                  background: "linear-gradient(135deg, hsl(30 90% 52%), hsl(42 100% 50%))",
-                  boxShadow: "0 4px 16px rgba(255,160,30,0.3), 0 0 24px rgba(255,190,60,0.1), inset 0 1px 0 rgba(255,255,255,0.2)",
+                  background: "linear-gradient(135deg, hsl(220 10% 18%), hsl(220 8% 28%))",
+                  boxShadow: "0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)",
                 }}
                 type="button"
               >
