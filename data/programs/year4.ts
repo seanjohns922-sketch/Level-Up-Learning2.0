@@ -564,15 +564,19 @@ const year4Rows: ProgramRow[] = [
     focus: "Fractions & Decimals",
     lesson: 1,
     topic: "Fraction Walls",
-    activity: "Build fraction walls to explore halves, quarters, eighths",
+    activity: "Explore fraction walls, build fractions, and recognise equivalent fractions visually",
     curriculum: ["AC9M4N03", "AC9M4N04"],
     activities: [
       makeActivity("area_model_select", 2, {
-        mode: "fraction_wall",
+        mode: "pick_model",
         denominators: [2, 4, 8],
       }),
-      makeActivity("equivalent_fraction_match", 1, {
-        denominators: [2, 4, 8],
+      makeActivity("area_model_select", 1, {
+        mode: "match_equivalent",
+        denominators: [2, 4, 8, 10],
+      }),
+      makeActivity("equivalent_fraction_build", 1, {
+        denominators: [2, 4, 8, 10],
       }),
     ],
   },
@@ -581,19 +585,36 @@ const year4Rows: ProgramRow[] = [
     focus: "Fractions & Decimals",
     lesson: 2,
     topic: "Fractions to Decimals",
-    activity: "Link fractions (1/2, 1/4, 3/4) to decimals (0.5, 0.25, 0.75)",
+    activity: "Link tenths fractions to decimals and match fraction, model, and decimal forms",
     curriculum: ["AC9M4N03"],
     activities: [
-      makeActivity("equivalent_fraction_match", 2, {
+      makeActivity("multiple_choice", 2, {
         mode: "fraction_decimal_match",
         allowedPairs: [
-          ["1/2", "0.5"],
-          ["1/4", "0.25"],
-          ["3/4", "0.75"],
+          ["1/10", "0.1"],
+          ["2/10", "0.2"],
+          ["3/10", "0.3"],
+          ["4/10", "0.4"],
+          ["5/10", "0.5"],
+          ["6/10", "0.6"],
+          ["7/10", "0.7"],
+          ["8/10", "0.8"],
+          ["9/10", "0.9"],
         ],
       }),
-      makeActivity("multiple_choice", 1, {
+      makeActivity("typed_response", 1, {
         mode: "fraction_decimal_match",
+        allowedPairs: [
+          ["1/10", "0.1"],
+          ["2/10", "0.2"],
+          ["3/10", "0.3"],
+          ["4/10", "0.4"],
+          ["5/10", "0.5"],
+          ["6/10", "0.6"],
+          ["7/10", "0.7"],
+          ["8/10", "0.8"],
+          ["9/10", "0.9"],
+        ],
       }),
     ],
   },
@@ -602,14 +623,19 @@ const year4Rows: ProgramRow[] = [
     focus: "Fractions & Decimals",
     lesson: 3,
     topic: "Fractions on Number Lines",
-    activity: "Place unit fractions on number lines and count by them",
+    activity: "Place fractions on number lines, compare sizes, and identify missing fraction positions",
     curriculum: ["AC9M4N04"],
     activities: [
       makeActivity("number_line_place", 2, {
+        mode: "place_fraction",
         denominators: [2, 4, 8],
       }),
-      makeActivity("fraction_compare", 1, {
-        mode: "order",
+      makeActivity("number_line_place", 1, {
+        mode: "pick_point",
+        denominators: [2, 4, 8],
+      }),
+      makeActivity("number_line_place", 1, {
+        mode: "order_fractions",
         denominators: [2, 4, 8],
       }),
     ],

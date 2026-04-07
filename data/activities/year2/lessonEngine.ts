@@ -443,8 +443,8 @@ function pickFractionPair() {
   return pairs[randInt(0, pairs.length - 1)] ?? [1, 2];
 }
 
-function fractionPartsForNumberLine() {
-  return [
+function fractionPartsForNumberLine(allowedDenominators?: number[]) {
+  const parts = [
     { label: "1/10", value: 1 / 10 },
     { label: "1/5", value: 1 / 5 },
     { label: "1/4", value: 1 / 4 },
@@ -454,6 +454,15 @@ function fractionPartsForNumberLine() {
     { label: "3/4", value: 3 / 4 },
     { label: "4/5", value: 4 / 5 },
   ];
+
+  if (!allowedDenominators || allowedDenominators.length === 0) {
+    return parts;
+  }
+
+  return parts.filter((part) => {
+    const denominator = Number(part.label.split("/")[1] ?? 0);
+    return allowedDenominators.includes(denominator);
+  });
 }
 
 function year3FractionOrderSets() {
@@ -3111,6 +3120,11 @@ function generateInteractiveQuestion(
         ? config.mode
         : "shade_fraction";
 
+    const allowedDenominators =
+      Array.isArray(config.denominators) && config.denominators.every((value) => typeof value === "number")
+        ? (config.denominators as number[])
+        : undefined;
+
     if (mode === "match_equivalent") {
       const equivalentSets = [
         {
@@ -3158,8 +3172,11 @@ function generateInteractiveQuestion(
       };
     }
 
-    const denominator = randomUnitDenominator();
-    const numerator = mode === "shade_fraction" || mode === "pick_model" || mode === "match_model" ? 1 : 1;
+    const denominator =
+      allowedDenominators && allowedDenominators.length > 0
+        ? allowedDenominators[randInt(0, allowedDenominators.length - 1)] ?? allowedDenominators[0] ?? randomUnitDenominator()
+        : randomUnitDenominator();
+    const numerator = 1;
 
     if (mode === "pick_model" || mode === "match_model") {
       const distractors = shuffle(
@@ -3386,9 +3403,18 @@ function generateInteractiveQuestion(
         ? config.mode
         : "place_fraction";
 
+    const allowedDenominators =
+      Array.isArray(config.denominators) && config.denominators.every((value) => typeof value === "number")
+        ? (config.denominators as number[])
+        : undefined;
+
     if (mode === "order_fractions") {
+      const candidateSets = year3FractionOrderSets().filter((set) =>
+        !allowedDenominators || set.every((value) => allowedDenominators.includes(Number(value.split("/")[1] ?? 0)))
+      );
       const orderedSet =
-        year3FractionOrderSets()[randInt(0, year3FractionOrderSets().length - 1)] ??
+        candidateSets[randInt(0, candidateSets.length - 1)] ??
+        candidateSets[0] ??
         year3FractionOrderSets()[0] ??
         ["1/5", "1/2", "4/5"];
       return {
@@ -3400,7 +3426,7 @@ function generateInteractiveQuestion(
       };
     }
 
-    const availableFractions = fractionPartsForNumberLine();
+    const availableFractions = fractionPartsForNumberLine(allowedDenominators);
     const target =
       availableFractions[randInt(0, availableFractions.length - 1)] ?? availableFractions[0];
     return {
@@ -4501,6 +4527,60 @@ function generateGenericQuestion(
           answer,
           helper: "Compare the ones, then the tenths, then the hundredths.",
           placeholder: "Type the greater decimal",
+        };
+  }
+
+  if (explicitMode === "fraction_decimal_match") {
+    const allowedPairs =
+      Array.isArray(config.allowedPairs) &&
+      config.allowedPairs.every(
+        (pair) => Array.isArray(pair) && pair.length === 2 && pair.every((value) => typeof value === "string")
+      )
+        ? (config.allowedPairs as [string, string][])
+        : ([
+            ["1/10", "0.1"],
+            ["2/10", "0.2"],
+            ["3/10", "0.3"],
+            ["4/10", "0.4"],
+            ["5/10", "0.5"],
+            ["6/10", "0.6"],
+            ["7/10", "0.7"],
+            ["8/10", "0.8"],
+            ["9/10", "0.9"],
+          ] as [string, string][]);
+
+    const chosen = allowedPairs[randInt(0, allowedPairs.length - 1)] ?? allowedPairs[0] ?? ["1/10", "0.1"];
+    const [fraction, decimal] = chosen;
+    const numerator = Number(fraction.split("/")[0] ?? 1);
+    const denominator = Number(fraction.split("/")[1] ?? 10);
+    const visual: DecimalVisualData = {
+      type: "decimal_model",
+      model: "tenths_bar",
+      numerator,
+      denominator: 10,
+    };
+    const distractors = shuffle(
+      allowedPairs
+        .map((pair) => pair[1])
+        .filter((value) => value !== decimal)
+    ).slice(0, 3);
+
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: `Which decimal matches ${fraction}?`,
+          options: shuffle([decimal, ...distractors]),
+          answer: decimal,
+          helper: "Tenths can be written as decimals.",
+          visual,
+        }
+      : {
+          kind: "typed_response",
+          prompt: `Write the decimal that matches ${fraction}.`,
+          answer: decimal,
+          helper: "Use the tenths model to help you connect the fraction to the decimal.",
+          placeholder: "Type the decimal",
+          visual,
         };
   }
 
