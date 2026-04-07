@@ -646,16 +646,20 @@ const year4Rows: ProgramRow[] = [
     focus: "Counting by Fractions & Mixed Numerals",
     lesson: 1,
     topic: "Skip Counting Fractions",
-    activity: "Skip count by halves, quarters; use visual models",
+    activity: "Count in fractions on number lines, complete fraction sequences, and see when fractions make one whole",
     curriculum: ["AC9M4N04"],
     activities: [
       makeActivity("number_line_place", 2, {
         mode: "skip_count_fraction",
-        denominators: [2, 4],
+        denominators: [2, 3, 4, 5, 6, 8],
       }),
-      makeActivity("area_model_select", 1, {
+      makeActivity("typed_response", 1, {
         mode: "skip_count_fraction",
-        denominators: [2, 4],
+        denominators: [2, 3, 4, 5, 6, 8],
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "skip_count_fraction",
+        denominators: [2, 3, 4, 5, 6, 8],
       }),
     ],
   },
@@ -664,12 +668,15 @@ const year4Rows: ProgramRow[] = [
     focus: "Counting by Fractions & Mixed Numerals",
     lesson: 2,
     topic: "Mixed Numerals",
-    activity: "Represent and count using mixed numerals",
+    activity: "Represent mixed numerals, connect them to fractions greater than one, and place them on number lines",
     curriculum: ["AC9M4N04"],
     activities: [
       makeActivity("number_line_place", 2, {
         mode: "mixed_numerals",
-        denominators: [2, 4],
+        denominators: [2, 3, 4, 5, 6, 8],
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "mixed_numerals",
       }),
       makeActivity("multiple_choice", 1, {
         mode: "mixed_numerals",
@@ -681,15 +688,20 @@ const year4Rows: ProgramRow[] = [
     focus: "Counting by Fractions & Mixed Numerals",
     lesson: 3,
     topic: "Combining Unit Fractions",
-    activity: "Add fractions with the same denominator to form a whole",
+    activity: "Combine unit fractions with the same denominator to build totals and simple fraction additions",
     curriculum: ["AC9M4N03", "AC9M4N04"],
     activities: [
-      makeActivity("build_the_whole", 2, {
-        denominators: [2, 4, 8],
-      }),
-      makeActivity("fraction_compare", 1, {
+      makeActivity("typed_response", 2, {
         mode: "same_denominator_combine",
-        denominators: [2, 4, 8],
+        denominators: [2, 3, 4, 5, 6, 8],
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "same_denominator_combine",
+        denominators: [2, 3, 4, 5, 6, 8],
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "same_denominator_combine",
+        denominators: [2, 3, 4, 5, 6, 8],
       }),
     ],
   },
