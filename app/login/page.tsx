@@ -42,13 +42,11 @@ function writeClasses(store: ClassesStore) {
   localStorage.setItem(CLASSES_KEY, JSON.stringify(store));
 }
 
-/* Floating particles removed — clean game UI, no fantasy effects */
-
 /* ── Shared input wrapper (defined outside LoginPage to avoid remounts) ── */
 function InputField({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
   return (
     <div className="relative">
-      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40 z-10">{icon}</span>
+      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/35 z-10">{icon}</span>
       {children}
     </div>
   );
@@ -151,248 +149,243 @@ export default function LoginPage() {
   }
 
   const inputCls =
-    "w-full pl-11 pr-4 py-3.5 rounded-[14px] text-[15px] text-white font-medium placeholder-white/40 bg-[rgba(20,30,40,0.45)] border border-white/15 focus:outline-none focus:border-white/30 focus:bg-[rgba(20,30,40,0.55)] transition-all duration-200";
-  const innerShadow = {};
-  const labelCls = "text-[13px] font-bold text-white pl-1 uppercase tracking-wider";
-  const labelStyle = { textShadow: "0 1px 3px rgba(0,0,0,0.5)", fontFamily: "'Nunito', sans-serif" };
+    "w-full pl-10 pr-4 py-3 rounded-xl text-[15px] text-white font-medium placeholder-white/30 bg-transparent border border-white/15 focus:outline-none focus:border-amber-400/50 focus:bg-white/[0.03] transition-all duration-200";
 
   return (
-    <main className="min-h-screen relative overflow-hidden flex flex-col items-center justify-center">
-      {/* Background */}
+    <main className="min-h-screen relative overflow-hidden flex">
+      {/* ── Full-screen background ── */}
       <div className="absolute inset-0">
-        <img src="/images/login-bg.jpg" alt="" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
+        <img
+          src="/images/login-bg.jpg"
+          alt=""
+          className="w-full h-full object-cover"
+          style={{ objectPosition: "center 65%" }}
+        />
+        {/* Vignette */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            boxShadow: "inset 0 0 200px 80px rgba(0,0,0,0.5)",
+          }}
+        />
+        {/* Left darkening for text readability */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: "linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.3) 35%, transparent 55%)",
+          }}
+        />
+        {/* Bottom gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/15 pointer-events-none" />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 w-full max-w-[480px] mx-auto px-4 pt-8 pb-10 flex flex-col items-center">
-        {/* Skip */}
-        <div className="w-full flex justify-end mb-3">
-          <button
-            onClick={() => { supabase.auth.signOut().then(() => router.push("/home")); }}
-            className="px-4 py-1.5 rounded-full text-white/70 text-xs font-semibold hover:text-white/90 transition"
-            style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)" }}
-            type="button"
-          >
-            Skip to Demo
-          </button>
-        </div>
-
-        {/* ── Portal Card ── */}
-        <div
-          className="w-full rounded-[18px] p-7 md:p-8"
-          style={{
-            background: "rgba(15,20,30,0.55)",
-            backdropFilter: "blur(20px) saturate(1.1)",
-            WebkitBackdropFilter: "blur(20px) saturate(1.1)",
-            border: "1px solid rgba(255,255,255,0.12)",
-            boxShadow: "0 12px 48px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.2)",
-            animation: "fadeUp 0.6s ease both",
-          }}
+      {/* ── Skip to Demo ── */}
+      <div className="absolute top-4 right-5 z-30">
+        <button
+          onClick={() => { supabase.auth.signOut().then(() => router.push("/home")); }}
+          className="px-4 py-1.5 rounded-full text-white/60 text-xs font-semibold hover:text-white/90 transition"
+          style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}
+          type="button"
         >
-          {/* Header */}
-          <div className="text-center mb-5">
-            <h1
-              className="text-[2.4rem] font-black text-white tracking-tight leading-tight"
-              style={{
-                fontFamily: "'Nunito', sans-serif",
-                textShadow: "0 2px 8px rgba(0,0,0,0.4)",
-              }}
-            >
-              Level Up Learning
-            </h1>
-            <p
-              className="text-sm text-white/50 mt-1 tracking-wide font-medium"
-              style={{ fontFamily: "'Quicksand', sans-serif" }}
-            >
-              Begin your journey
-            </p>
-          </div>
+          Skip to Demo
+        </button>
+      </div>
 
-          {/* ── Tab Toggle ── */}
-          <div className="mb-5">
-            <div
-              className="relative flex rounded-full p-[3px]"
-              style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)" }}
-            >
-              <div
-                className="absolute top-[3px] bottom-[3px] rounded-full transition-all duration-300 ease-out"
-                style={{
-                  width: "calc(50% - 3px)",
-                  left: tab === "student" ? 3 : "calc(50%)",
-                  background: "rgba(255,255,255,0.10)",
-                  border: "1px solid rgba(255,255,255,0.20)",
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => setTab("student")}
-                className="relative z-10 flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full font-bold text-sm transition-colors duration-200"
-                style={{ color: tab === "student" ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.4)" }}
-              >
-                <GraduationCap size={16} strokeWidth={2.2} /> Student
-              </button>
-              <button
-                type="button"
-                onClick={() => setTab("teacher")}
-                className="relative z-10 flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full font-bold text-sm transition-colors duration-200"
-                style={{ color: tab === "teacher" ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.4)" }}
-              >
-                <Briefcase size={15} strokeWidth={2.2} /> Teacher
-              </button>
-            </div>
-          </div>
-
-          {/* ── Student Form ── */}
-          {tab === "student" ? (
-            <div className="grid gap-3">
-              <label className="grid gap-1.5">
-                <span className={labelCls} style={labelStyle}>Class Code</span>
-                <InputField icon={<KeyRound size={16} />}>
-                  <input value={studentCode} onChange={(e) => setStudentCode(e.target.value)} placeholder="e.g. K9F2Q" className={`${inputCls} tracking-[0.3em] text-center uppercase font-semibold`} style={innerShadow} />
-                </InputField>
-              </label>
-              <label className="grid gap-1.5">
-                <span className={labelCls} style={labelStyle}>Your Name</span>
-                <InputField icon={<User size={16} />}>
-                  <input value={studentName} onChange={(e) => setStudentName(e.target.value)} placeholder="Enter your first name" className={inputCls} style={innerShadow} />
-                </InputField>
-              </label>
-              <label className="grid gap-1.5">
-                <span className={labelCls} style={labelStyle}>4-Digit PIN</span>
-                <InputField icon={<Lock size={16} />}>
-                  <input
-                    value={studentPin}
-                    onChange={(e) => setStudentPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                    placeholder="----"
-                    className={`${inputCls} tracking-[0.5em] text-center font-semibold`}
-                    type={showPin ? "text" : "password"}
-                    inputMode="numeric"
-                    style={innerShadow}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPin((p) => !p)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition z-10"
-                    aria-label={showPin ? "Hide PIN" : "Show PIN"}
-                  >
-                    <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
-                  </button>
-                </InputField>
-              </label>
-
-              {studentError && (
-                <div className="text-sm font-bold text-red-300 text-center rounded-xl py-2" style={{ background: "rgba(220,50,50,0.12)" }}>{studentError}</div>
-              )}
-
-              <button
-                onClick={handleStudentLogin}
-                className="mt-2 w-full py-4 rounded-full font-black text-lg text-white transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.97]"
-                style={{
-                  background: "linear-gradient(135deg, hsl(38 85% 60%), hsl(32 90% 55%))",
-                  boxShadow: "0 4px 20px rgba(230,160,40,0.35), inset 0 1px 0 rgba(255,255,255,0.25)",
-                }}
-                type="button"
-              >
-                Enter the Tower
-              </button>
-            </div>
-          ) : (
-            /* ── Teacher Form ── */
-            <div className="grid gap-3">
-              <div className="flex items-center justify-center gap-2 mb-1">
-                {(["login", "signup"] as const).map((m) => (
-                  <button
-                    key={m}
-                    type="button"
-                    onClick={() => setTeacherMode(m)}
-                    className="px-5 py-1.5 rounded-full font-bold text-xs uppercase tracking-wider transition-all duration-200"
-                    style={{
-                      background: teacherMode === m ? "rgba(255,255,255,0.12)" : "transparent",
-                      color: teacherMode === m ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.4)",
-                      border: teacherMode === m ? "1px solid rgba(255,255,255,0.15)" : "1px solid transparent",
-                    }}
-                  >
-                    {m === "login" ? "Log In" : "Sign Up"}
-                  </button>
-                ))}
-              </div>
-
-              <label className="grid gap-1.5">
-                <span className={labelCls} style={labelStyle}>Email</span>
-                <InputField icon={<User size={16} />}>
-                  <input value={teacherEmail} onChange={(e) => setTeacherEmail(e.target.value)} placeholder="teacher@school.edu" className={inputCls} style={innerShadow} />
-                </InputField>
-              </label>
-              <label className="grid gap-1.5">
-                <span className={labelCls} style={labelStyle}>Password</span>
-                <InputField icon={<Lock size={16} />}>
-                  <input value={teacherPassword} onChange={(e) => setTeacherPassword(e.target.value)} placeholder="********" type="password" className={inputCls} style={innerShadow} />
-                </InputField>
-              </label>
-
-              {teacherMode === "signup" && (
-                <>
-                  <label className="grid gap-1.5">
-                    <span className={labelCls} style={labelStyle}>Teacher Name</span>
-                    <InputField icon={<User size={16} />}>
-                      <input value={teacherName} onChange={(e) => setTeacherName(e.target.value)} placeholder="Ms Johnson" className={inputCls} style={innerShadow} />
-                    </InputField>
-                  </label>
-                  <label className="grid gap-1.5">
-                    <span className={labelCls} style={labelStyle}>Class Name</span>
-                    <InputField icon={<Briefcase size={16} />}>
-                      <input value={className} onChange={(e) => setClassName(e.target.value)} placeholder="3/4 SJ" className={inputCls} style={innerShadow} />
-                    </InputField>
-                  </label>
-                </>
-              )}
-
-              {teacherError && (
-                <p className="text-sm text-red-300 font-bold text-center rounded-xl py-2" style={{ background: "rgba(220,50,50,0.12)" }}>{teacherError}</p>
-              )}
-
-              <button
-                onClick={teacherMode === "signup" ? handleTeacherSignup : handleTeacherLogin}
-                disabled={teacherLoading}
-                className="mt-2 w-full py-4 rounded-full font-black text-lg text-white transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.97] disabled:opacity-50"
-                style={{
-                  background: "linear-gradient(135deg, hsl(38 85% 60%), hsl(32 90% 55%))",
-                  boxShadow: "0 4px 20px rgba(230,160,40,0.35), inset 0 1px 0 rgba(255,255,255,0.25)",
-                }}
-                type="button"
-              >
-                {teacherLoading ? "Please wait..." : teacherMode === "signup" ? "Sign Up" : "Log In"}
-              </button>
-
-              {createdClass && (
-                <div className="rounded-xl p-3 text-sm text-emerald-200" style={{ background: "rgba(40,180,100,0.12)", border: "1px solid rgba(80,200,120,0.2)" }}>
-                  <div className="font-bold">Class Created</div>
-                  <div>Name: {createdClass.name} · Code: {createdClass.code}</div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Footer legend hint */}
-          <p
-            className="mt-5 text-center text-[10px] tracking-[0.08em] uppercase font-semibold"
-            style={{ color: "rgba(255,200,100,0.4)", fontFamily: "'Quicksand', sans-serif" }}
+      {/* ── Left panel — floating UI ── */}
+      <div
+        className="relative z-10 w-full md:w-[440px] min-h-screen flex flex-col justify-center px-8 md:px-12 py-10"
+        style={{ animation: "fadeUp 0.7s ease both" }}
+      >
+        {/* Title */}
+        <div className="mb-8">
+          <h1
+            className="text-4xl md:text-5xl font-black text-white leading-[1.1] tracking-tight"
+            style={{
+              fontFamily: "'Nunito', sans-serif",
+              textShadow: "0 4px 20px rgba(0,0,0,0.5)",
+            }}
           >
-            Unlock your Level Up Legend by mastering your skills
+            Level Up
+            <br />
+            Learning
+          </h1>
+          <p
+            className="text-white/40 mt-3 text-sm font-medium tracking-wide"
+            style={{ fontFamily: "'Quicksand', sans-serif" }}
+          >
+            Begin your journey to the Tower
           </p>
         </div>
-      </div>
 
-      <style jsx global>{`
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(12px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
+        {/* Tab Toggle */}
+        <div className="mb-5">
+          <div className="flex gap-1 p-1 rounded-full" style={{ background: "rgba(255,255,255,0.05)" }}>
+            <button
+              type="button"
+              onClick={() => setTab("student")}
+              className="flex-1 flex items-center justify-center gap-2 py-2 rounded-full font-bold text-sm transition-all duration-200"
+              style={{
+                background: tab === "student" ? "rgba(255,255,255,0.1)" : "transparent",
+                color: tab === "student" ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.35)",
+              }}
+            >
+              <GraduationCap size={15} strokeWidth={2.2} /> Student
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab("teacher")}
+              className="flex-1 flex items-center justify-center gap-2 py-2 rounded-full font-bold text-sm transition-all duration-200"
+              style={{
+                background: tab === "teacher" ? "rgba(255,255,255,0.1)" : "transparent",
+                color: tab === "teacher" ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.35)",
+              }}
+            >
+              <Briefcase size={14} strokeWidth={2.2} /> Teacher
+            </button>
+          </div>
+        </div>
+
+        {/* ── Student Form ── */}
+        {tab === "student" ? (
+          <div className="grid gap-4">
+            <label className="grid gap-1.5">
+              <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Class Code</span>
+              <InputField icon={<KeyRound size={15} />}>
+                <input value={studentCode} onChange={(e) => setStudentCode(e.target.value)} placeholder="e.g. K9F2Q" className={`${inputCls} tracking-[0.3em] text-center uppercase font-semibold`} />
+              </InputField>
+            </label>
+            <label className="grid gap-1.5">
+              <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Your Name</span>
+              <InputField icon={<User size={15} />}>
+                <input value={studentName} onChange={(e) => setStudentName(e.target.value)} placeholder="Enter your first name" className={inputCls} />
+              </InputField>
+            </label>
+            <label className="grid gap-1.5">
+              <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">4-Digit PIN</span>
+              <InputField icon={<Lock size={15} />}>
+                <input
+                  value={studentPin}
+                  onChange={(e) => setStudentPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                  placeholder="----"
+                  className={`${inputCls} tracking-[0.5em] text-center font-semibold`}
+                  type={showPin ? "text" : "password"}
+                  inputMode="numeric"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPin((p) => !p)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/25 hover:text-white/50 transition z-10"
+                  aria-label={showPin ? "Hide PIN" : "Show PIN"}
+                >
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                </button>
+              </InputField>
+            </label>
+
+            {studentError && (
+              <div className="text-sm font-bold text-red-300 text-center rounded-xl py-2" style={{ background: "rgba(220,50,50,0.12)" }}>{studentError}</div>
+            )}
+
+            <button
+              onClick={handleStudentLogin}
+              className="mt-1 w-full py-4 rounded-2xl font-black text-lg text-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(230,160,40,0.45)] active:scale-[0.97] cursor-pointer"
+              style={{
+                background: "linear-gradient(135deg, hsl(38 85% 58%), hsl(28 90% 50%))",
+                boxShadow: "0 6px 24px rgba(230,160,40,0.35), inset 0 1px 0 rgba(255,255,255,0.2)",
+              }}
+              type="button"
+            >
+              Enter the Tower
+            </button>
+          </div>
+        ) : (
+          /* ── Teacher Form ── */
+          <div className="grid gap-4">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              {(["login", "signup"] as const).map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => setTeacherMode(m)}
+                  className="px-5 py-1.5 rounded-full font-bold text-xs uppercase tracking-wider transition-all duration-200"
+                  style={{
+                    background: teacherMode === m ? "rgba(255,255,255,0.1)" : "transparent",
+                    color: teacherMode === m ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.35)",
+                    border: teacherMode === m ? "1px solid rgba(255,255,255,0.12)" : "1px solid transparent",
+                  }}
+                >
+                  {m === "login" ? "Log In" : "Sign Up"}
+                </button>
+              ))}
+            </div>
+
+            <label className="grid gap-1.5">
+              <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Email</span>
+              <InputField icon={<User size={15} />}>
+                <input value={teacherEmail} onChange={(e) => setTeacherEmail(e.target.value)} placeholder="teacher@school.edu" className={inputCls} />
+              </InputField>
+            </label>
+            <label className="grid gap-1.5">
+              <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Password</span>
+              <InputField icon={<Lock size={15} />}>
+                <input value={teacherPassword} onChange={(e) => setTeacherPassword(e.target.value)} placeholder="********" type="password" className={inputCls} />
+              </InputField>
+            </label>
+
+            {teacherMode === "signup" && (
+              <>
+                <label className="grid gap-1.5">
+                  <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Teacher Name</span>
+                  <InputField icon={<User size={15} />}>
+                    <input value={teacherName} onChange={(e) => setTeacherName(e.target.value)} placeholder="Ms Johnson" className={inputCls} />
+                  </InputField>
+                </label>
+                <label className="grid gap-1.5">
+                  <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Class Name</span>
+                  <InputField icon={<Briefcase size={14} />}>
+                    <input value={className} onChange={(e) => setClassName(e.target.value)} placeholder="3/4 SJ" className={inputCls} />
+                  </InputField>
+                </label>
+              </>
+            )}
+
+            {teacherError && (
+              <p className="text-sm text-red-300 font-bold text-center rounded-xl py-2" style={{ background: "rgba(220,50,50,0.12)" }}>{teacherError}</p>
+            )}
+
+            <button
+              onClick={teacherMode === "signup" ? handleTeacherSignup : handleTeacherLogin}
+              disabled={teacherLoading}
+              className="mt-1 w-full py-4 rounded-2xl font-black text-lg text-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(230,160,40,0.45)] active:scale-[0.97] disabled:opacity-50 cursor-pointer"
+              style={{
+                background: "linear-gradient(135deg, hsl(38 85% 58%), hsl(28 90% 50%))",
+                boxShadow: "0 6px 24px rgba(230,160,40,0.35), inset 0 1px 0 rgba(255,255,255,0.2)",
+              }}
+              type="button"
+            >
+              {teacherLoading ? "Please wait..." : teacherMode === "signup" ? "Sign Up" : "Log In"}
+            </button>
+
+            {createdClass && (
+              <div className="rounded-xl p-3 text-sm text-emerald-200" style={{ background: "rgba(40,180,100,0.12)", border: "1px solid rgba(80,200,120,0.2)" }}>
+                <div className="font-bold">Class Created</div>
+                <div>Name: {createdClass.name} · Code: {createdClass.code}</div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Footer */}
+        <p
+          className="mt-6 text-[10px] tracking-[0.06em] uppercase font-medium"
+          style={{ color: "rgba(255,200,100,0.3)", fontFamily: "'Quicksand', sans-serif" }}
+        >
+          Unlock your Level Up Legend by mastering your skills
+        </p>
+      </div>
     </main>
   );
 }
