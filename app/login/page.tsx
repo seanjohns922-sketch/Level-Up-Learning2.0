@@ -240,7 +240,7 @@ export default function LoginPage() {
                 color: tab === "teacher" ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.35)",
               }}
             >
-              <Briefcase size={14} strokeWidth={2.2} /> Teacher
+              <Briefcase size={14} strokeWidth={2.2} /> Teacher / Parent
             </button>
           </div>
         </div>
