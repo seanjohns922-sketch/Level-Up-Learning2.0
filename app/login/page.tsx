@@ -389,7 +389,7 @@ export default function LoginPage() {
                     </InputField>
                   </label>
                   <label className="grid gap-1.5">
-                    <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Class Name</span>
+                    <span className={labelCls} style={labelStyle}>Class Name</span>
                     <InputField icon={<Briefcase size={16} />}>
                       <input value={className} onChange={(e) => setClassName(e.target.value)} placeholder="3/4 SJ" className={inputCls} style={innerShadow} />
                     </InputField>
