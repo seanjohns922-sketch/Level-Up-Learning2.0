@@ -202,7 +202,7 @@ export default function LoginPage() {
               Level Up Learning
             </h1>
             <p
-              className="text-base text-white/60 mt-1.5 tracking-wide font-medium"
+              className="text-sm text-white/50 mt-1 tracking-wide font-medium"
               style={{ fontFamily: "'Quicksand', sans-serif" }}
             >
               Begin your journey
