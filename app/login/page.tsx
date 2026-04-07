@@ -87,6 +87,16 @@ function FloatingParticles() {
   );
 }
 
+/* ── Shared input wrapper (defined outside LoginPage to avoid remounts) ── */
+function InputField({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div className="relative">
+      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40 z-10">{icon}</span>
+      {children}
+    </div>
+  );
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const [tab, setTab] = useState<"student" | "teacher">("student");
