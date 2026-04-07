@@ -151,10 +151,10 @@ export default function LoginPage() {
   }
 
   const inputCls =
-    "w-full pl-11 pr-4 py-3.5 rounded-[14px] text-[15px] text-white font-medium placeholder-white/50 bg-[rgba(255,255,255,0.08)] border border-white/20 focus:outline-none focus:border-white/40 focus:bg-[rgba(255,255,255,0.12)] transition-all duration-200";
+    "w-full pl-11 pr-4 py-3.5 rounded-[14px] text-[15px] text-white font-medium placeholder-white/40 bg-[rgba(20,30,40,0.45)] border border-white/15 focus:outline-none focus:border-white/30 focus:bg-[rgba(20,30,40,0.55)] transition-all duration-200";
   const innerShadow = {};
-  const labelCls = "text-[12px] font-bold text-white pl-1 uppercase tracking-wider"
-  const labelStyle = { textShadow: "0 1px 4px rgba(0,0,0,0.3)", fontFamily: "'Nunito', sans-serif" };
+  const labelCls = "text-[13px] font-bold text-white pl-1 uppercase tracking-wider";
+  const labelStyle = { textShadow: "0 1px 3px rgba(0,0,0,0.5)", fontFamily: "'Nunito', sans-serif" };
 
   return (
     <main className="min-h-screen relative overflow-hidden flex flex-col items-center justify-start">
