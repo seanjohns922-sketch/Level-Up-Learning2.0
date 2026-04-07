@@ -157,14 +157,12 @@ export default function LoginPage() {
   const labelStyle = { textShadow: "0 1px 3px rgba(0,0,0,0.5)", fontFamily: "'Nunito', sans-serif" };
 
   return (
-    <main className="min-h-screen relative overflow-hidden flex flex-col items-center justify-start">
+    <main className="min-h-screen relative overflow-hidden flex flex-col items-center justify-center">
       {/* Background */}
       <div className="absolute inset-0">
-        <img src="/images/login-bg.jpg" alt="" className="w-full h-full object-cover object-[center_65%]" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+        <img src="/images/login-bg.jpg" alt="" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
       </div>
-
-      <FloatingParticles />
 
       {/* Content */}
       <div className="relative z-10 w-full max-w-[480px] mx-auto px-4 pt-8 pb-10 flex flex-col items-center">
