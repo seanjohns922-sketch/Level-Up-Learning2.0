@@ -183,16 +183,6 @@ export default function LoginPage() {
     router.push("/home");
   }
 
-  /* ── Shared input wrapper ── */
-  function InputField({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
-    return (
-      <div className="relative">
-        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40 z-10">{icon}</span>
-        {children}
-      </div>
-    );
-  }
-
   const inputCls =
     "w-full pl-11 pr-4 py-3.5 rounded-[14px] text-[15px] text-white placeholder-white/35 bg-[rgba(255,255,255,0.12)] border border-white/[0.12] focus:outline-none focus:border-amber-400/50 focus:bg-[rgba(255,255,255,0.18)] focus:shadow-[0_0_12px_rgba(255,190,60,0.15)] transition-all duration-200";
   const innerShadow = { boxShadow: "inset 0 2px 4px rgba(0,0,0,0.12)" };
