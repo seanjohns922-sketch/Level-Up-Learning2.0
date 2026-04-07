@@ -11,7 +11,6 @@ import MultipleChoiceActivity from "@/components/activities/MultipleChoiceActivi
 import NumberOrder from "@/components/activities/NumberOrder";
 import NumberLineActivity from "@/components/activities/NumberLineActivity";
 import AreaModelSelect from "@/components/activities/AreaModelSelect";
-import FractionWall from "@/components/activities/FractionWall";
 import SetModelSelect from "@/components/activities/SetModelSelect";
 import BuildTheWhole from "@/components/activities/BuildTheWhole";
 import NumberLinePlace from "@/components/activities/NumberLinePlace";
@@ -30,7 +29,6 @@ import type {
   EqualGroupsQuestion,
   ArraysQuestion,
   AreaModelSelectQuestion,
-  FractionWallQuestion,
   SetModelSelectQuestion,
   BuildTheWholeQuestion,
   NumberLinePlaceQuestion,
@@ -192,19 +190,6 @@ export function LessonRenderer({
       return (
         <AreaModelSelect
           questionData={safeQuestion as AreaModelSelectQuestion}
-          onCorrect={onCorrect}
-          onWrong={onWrong}
-        />
-      );
-    }
-    case "fraction_wall": {
-      const safeQuestion = getSafeQuestion(activity, questionData, prompt);
-      if (safeQuestion.kind !== "fraction_wall") {
-        return <ErrorCard message="Fraction wall question failed to load." />;
-      }
-      return (
-        <FractionWall
-          questionData={safeQuestion as FractionWallQuestion}
           onCorrect={onCorrect}
           onWrong={onWrong}
         />
