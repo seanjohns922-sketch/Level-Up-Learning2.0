@@ -16,6 +16,15 @@ function sumMoneyPieces(
   return pieces.reduce((total, piece) => total + piece.value, 0);
 }
 
+function sumReceiptLines(
+  lines: Array<{
+    price: number;
+    quantity?: number;
+  }>,
+) {
+  return lines.reduce((total, line) => total + line.price * (line.quantity ?? 1), 0);
+}
+
 function MoneyPiece({
   label,
   kind,
@@ -152,26 +161,40 @@ export default function MoneyContextVisual({
       </div>
       <div className="mt-3 rounded-2xl bg-white p-4 shadow-sm">
         <div className="overflow-hidden rounded-xl border border-slate-100">
-          <div className="grid grid-cols-[1.4fr_1fr_88px] bg-slate-50 px-3 py-2 text-xs font-black uppercase tracking-wide text-slate-500">
+          <div className="grid grid-cols-[1.25fr_52px_72px_88px] bg-slate-50 px-3 py-2 text-xs font-black uppercase tracking-wide text-slate-500">
             <div>Item</div>
             <div>Qty</div>
-            <div className="text-right">Price</div>
+            <div className="text-right">Unit</div>
+            <div className="text-right">Total</div>
           </div>
           {visual.lines.map((line) => (
             <div
               key={`${line.label}-${line.price}-${line.quantity ?? 1}`}
-              className="grid grid-cols-[1.4fr_1fr_88px] items-center border-t border-slate-100 px-3 py-3"
+              className="grid grid-cols-[1.25fr_52px_72px_88px] items-center border-t border-slate-100 px-3 py-3"
             >
               <div>
                 <div className="text-base font-black text-slate-900">{line.label}</div>
                 <div className="text-xs text-slate-500">{line.detail ?? ""}</div>
               </div>
               <div className="text-sm font-bold text-slate-600">{line.quantity ?? 1}</div>
-              <div className="text-right text-sm font-black text-slate-700">
+              <div className="text-right text-sm font-bold text-slate-500">
                 {formatDollars(line.price)}
+              </div>
+              <div className="text-right text-sm font-black text-slate-700">
+                {formatDollars(line.price * (line.quantity ?? 1))}
               </div>
             </div>
           ))}
+          <div className="grid grid-cols-[1.25fr_52px_72px_88px] items-center border-t border-slate-200 bg-slate-50/70 px-3 py-3">
+            <div className="text-sm font-black uppercase tracking-wide text-slate-700">
+              Total Cost
+            </div>
+            <div />
+            <div />
+            <div className="text-right text-base font-black text-slate-900">
+              {formatDollars(sumReceiptLines(visual.lines))}
+            </div>
+          </div>
         </div>
         {visual.payment ? (
           <div className="mt-4 inline-flex rounded-full bg-amber-100 px-3 py-1 text-sm font-black text-amber-900">
