@@ -194,8 +194,8 @@ export default function LoginPage() {
   }
 
   const inputCls =
-    "w-full pl-11 pr-4 py-3.5 rounded-[14px] text-[15px] text-white font-medium placeholder-white/60 bg-[rgba(255,255,255,0.18)] border border-white/[0.14] focus:outline-none focus:border-amber-400/50 focus:bg-[rgba(255,255,255,0.22)] focus:shadow-[0_0_12px_rgba(255,190,60,0.15)] transition-all duration-200";
-  const innerShadow = { boxShadow: "inset 0 2px 4px rgba(0,0,0,0.12)" };
+    "w-full pl-11 pr-4 py-3.5 rounded-[14px] text-[15px] text-white font-medium placeholder-white/50 bg-[rgba(255,255,255,0.08)] border border-white/20 focus:outline-none focus:border-white/40 focus:bg-[rgba(255,255,255,0.12)] transition-all duration-200";
+  const innerShadow = {};
   const labelCls = "text-[12px] font-bold text-white pl-1 uppercase tracking-wider"
   const labelStyle = { textShadow: "0 1px 4px rgba(0,0,0,0.3)", fontFamily: "'Nunito', sans-serif" };
 
