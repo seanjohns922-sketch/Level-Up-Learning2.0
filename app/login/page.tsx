@@ -305,7 +305,7 @@ export default function LoginPage() {
                 </InputField>
               </label>
               <label className="grid gap-1.5">
-                <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">4-Digit PIN</span>
+                <span className={labelCls} style={labelStyle}>4-Digit PIN</span>
                 <InputField icon={<Lock size={16} />}>
                   <input
                     value={studentPin}
