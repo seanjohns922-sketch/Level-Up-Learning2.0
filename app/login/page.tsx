@@ -291,19 +291,19 @@ export default function LoginPage() {
           {tab === "student" ? (
             <div className="grid gap-3">
               <label className="grid gap-1.5">
-                <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Class Code</span>
+                <span className="text-[11px] font-bold text-white/75 pl-1 uppercase tracking-wider">Class Code</span>
                 <InputField icon={<KeyRound size={16} />}>
                   <input value={studentCode} onChange={(e) => setStudentCode(e.target.value)} placeholder="e.g. K9F2Q" className={`${inputCls} tracking-[0.3em] text-center uppercase font-semibold`} style={innerShadow} />
                 </InputField>
               </label>
               <label className="grid gap-1.5">
-                <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Your Name</span>
+                <span className="text-[11px] font-bold text-white/75 pl-1 uppercase tracking-wider">Your Name</span>
                 <InputField icon={<User size={16} />}>
                   <input value={studentName} onChange={(e) => setStudentName(e.target.value)} placeholder="Enter your first name" className={inputCls} style={innerShadow} />
                 </InputField>
               </label>
               <label className="grid gap-1.5">
-                <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">4-Digit PIN</span>
+                <span className="text-[11px] font-bold text-white/75 pl-1 uppercase tracking-wider">4-Digit PIN</span>
                 <InputField icon={<Lock size={16} />}>
                   <input
                     value={studentPin}
@@ -366,13 +366,13 @@ export default function LoginPage() {
               </div>
 
               <label className="grid gap-1.5">
-                <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Email</span>
+                <span className="text-[11px] font-bold text-white/75 pl-1 uppercase tracking-wider">Email</span>
                 <InputField icon={<User size={16} />}>
                   <input value={teacherEmail} onChange={(e) => setTeacherEmail(e.target.value)} placeholder="teacher@school.edu" className={inputCls} style={innerShadow} />
                 </InputField>
               </label>
               <label className="grid gap-1.5">
-                <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Password</span>
+                <span className="text-[11px] font-bold text-white/75 pl-1 uppercase tracking-wider">Password</span>
                 <InputField icon={<Lock size={16} />}>
                   <input value={teacherPassword} onChange={(e) => setTeacherPassword(e.target.value)} placeholder="********" type="password" className={inputCls} style={innerShadow} />
                 </InputField>
@@ -381,13 +381,13 @@ export default function LoginPage() {
               {teacherMode === "signup" && (
                 <>
                   <label className="grid gap-1.5">
-                    <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Teacher Name</span>
+                    <span className="text-[11px] font-bold text-white/75 pl-1 uppercase tracking-wider">Teacher Name</span>
                     <InputField icon={<User size={16} />}>
                       <input value={teacherName} onChange={(e) => setTeacherName(e.target.value)} placeholder="Ms Johnson" className={inputCls} style={innerShadow} />
                     </InputField>
                   </label>
                   <label className="grid gap-1.5">
-                    <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Class Name</span>
+                    <span className="text-[11px] font-bold text-white/75 pl-1 uppercase tracking-wider">Class Name</span>
                     <InputField icon={<Briefcase size={16} />}>
                       <input value={className} onChange={(e) => setClassName(e.target.value)} placeholder="3/4 SJ" className={inputCls} style={innerShadow} />
                     </InputField>
