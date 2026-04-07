@@ -628,15 +628,15 @@ const year4Rows: ProgramRow[] = [
     activities: [
       makeActivity("number_line_place", 2, {
         mode: "place_fraction",
-        denominators: [2, 4, 8],
+        denominators: [2, 4, 8, 10],
       }),
       makeActivity("number_line_place", 1, {
         mode: "pick_point",
-        denominators: [2, 4, 8],
+        denominators: [2, 4, 8, 10],
       }),
       makeActivity("number_line_place", 1, {
         mode: "order_fractions",
-        denominators: [2, 4, 8],
+        denominators: [2, 4, 8, 10],
       }),
     ],
   },

@@ -445,14 +445,19 @@ function pickFractionPair() {
 
 function fractionPartsForNumberLine(allowedDenominators?: number[]) {
   const parts = [
+    { label: "1/8", value: 1 / 8 },
     { label: "1/10", value: 1 / 10 },
     { label: "1/5", value: 1 / 5 },
     { label: "1/4", value: 1 / 4 },
+    { label: "3/8", value: 3 / 8 },
     { label: "1/2", value: 1 / 2 },
+    { label: "5/8", value: 5 / 8 },
     { label: "3/5", value: 3 / 5 },
     { label: "7/10", value: 7 / 10 },
     { label: "3/4", value: 3 / 4 },
+    { label: "7/8", value: 7 / 8 },
     { label: "4/5", value: 4 / 5 },
+    { label: "9/10", value: 9 / 10 },
   ];
 
   if (!allowedDenominators || allowedDenominators.length === 0) {
@@ -471,6 +476,15 @@ function year3FractionOrderSets() {
     ["1/4", "1/2", "3/4"],
     ["1/10", "1/2", "7/10"],
     ["1/5", "3/5", "4/5"],
+    ["1/8", "1/4", "1/2"],
+    ["1/8", "3/8", "5/8"],
+    ["1/4", "3/8", "1/2"],
+    ["3/8", "1/2", "5/8"],
+    ["1/2", "5/8", "3/4"],
+    ["1/4", "3/4", "7/8"],
+    ["1/10", "1/5", "7/10"],
+    ["1/10", "3/5", "9/10"],
+    ["1/4", "3/4", "9/10"],
   ];
 }
 
@@ -3429,12 +3443,22 @@ function generateInteractiveQuestion(
     const availableFractions = fractionPartsForNumberLine(allowedDenominators);
     const target =
       availableFractions[randInt(0, availableFractions.length - 1)] ?? availableFractions[0];
+    const placePrompts = [
+      `Place ${target.label} on the number line.`,
+      `Show where ${target.label} belongs on the number line.`,
+      `Find the position of ${target.label} on the number line.`,
+    ];
+    const pickPrompts = [
+      `Which point shows ${target.label}?`,
+      `Pick the point that matches ${target.label}.`,
+      `Tap the point for ${target.label} on the number line.`,
+    ];
     return {
       kind: "number_line_place",
       prompt:
         mode === "pick_point"
-          ? `Place ${target.label} on the number line using the model.`
-          : `Place ${target.label} on the number line using the model.`,
+          ? pickPrompts[randInt(0, pickPrompts.length - 1)] ?? pickPrompts[0]
+          : placePrompts[randInt(0, placePrompts.length - 1)] ?? placePrompts[0],
       mode,
       denominator: Number(target.label.split("/")[1] ?? 2),
       targetFraction: target.label,
