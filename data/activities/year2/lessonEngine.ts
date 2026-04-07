@@ -1895,7 +1895,7 @@ function buildYear4Week8ShopQuestion(config: GenericConfig): MixedWordProblemQue
       const total = item.price * quantity;
       const payment = Math.ceil(total / 10) * 10;
       return {
-        prompt: `Use the ${board.title}. ${formatWeek8ItemLabel(item, quantity)} cost $${item.price} each. What change should you get from $${payment}?`,
+        prompt: `Use the ${board.title}. A student buys ${formatWeek8ItemLabel(item, quantity)}. How much change do they get from $${payment}?`,
         answer: payment - total,
         helper: "Multiply the item price by the quantity, then subtract from the money shown.",
         visual: {
@@ -1916,7 +1916,7 @@ function buildYear4Week8ShopQuestion(config: GenericConfig): MixedWordProblemQue
       const total = item.price * quantity;
       const payment = total + 5;
       return {
-        prompt: `Use the ${board.title}. ${formatWeek8ItemLabel(item, quantity)} cost $${item.price} each. What change should you get from the money shown?`,
+        prompt: `Use the ${board.title}. A student buys ${formatWeek8ItemLabel(item, quantity)}. How much change do they get from the money shown?`,
         answer: payment - total,
         helper: "Find the total cost first, then compare it with the money shown.",
         visual: {
@@ -1937,7 +1937,7 @@ function buildYear4Week8ShopQuestion(config: GenericConfig): MixedWordProblemQue
       const total = item.price * quantity;
       const payment = total;
       return {
-        prompt: `Use the ${board.title}. What is the total value of ${formatWeek8ItemLabel(item, quantity)}?`,
+        prompt: `Use the ${board.title}. A student buys ${formatWeek8ItemLabel(item, quantity)}. What is the total cost?`,
         answer: total,
         helper: "Multiply the price by the quantity to find the basket total.",
         visual: {
