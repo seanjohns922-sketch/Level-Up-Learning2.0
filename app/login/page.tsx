@@ -180,13 +180,13 @@ export default function LoginPage() {
 
         {/* ── Portal Card ── */}
         <div
-          className="w-full rounded-[22px] p-7 md:p-9"
+          className="w-full rounded-[18px] p-7 md:p-8"
           style={{
-            background: "linear-gradient(170deg, rgba(180,200,240,0.18) 0%, rgba(200,210,240,0.12) 40%, rgba(180,190,230,0.08) 100%)",
-            backdropFilter: "blur(14px) saturate(1.2)",
-            WebkitBackdropFilter: "blur(14px) saturate(1.2)",
-            border: "1px solid rgba(255,255,255,0.25)",
-            boxShadow: "0 8px 40px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.15)",
+            background: "rgba(15,20,30,0.55)",
+            backdropFilter: "blur(20px) saturate(1.1)",
+            WebkitBackdropFilter: "blur(20px) saturate(1.1)",
+            border: "1px solid rgba(255,255,255,0.12)",
+            boxShadow: "0 12px 48px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.2)",
             animation: "fadeUp 0.6s ease both",
           }}
         >
