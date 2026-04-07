@@ -383,7 +383,7 @@ export default function LoginPage() {
               {teacherMode === "signup" && (
                 <>
                   <label className="grid gap-1.5">
-                    <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Teacher Name</span>
+                    <span className={labelCls} style={labelStyle}>Teacher Name</span>
                     <InputField icon={<User size={16} />}>
                       <input value={teacherName} onChange={(e) => setTeacherName(e.target.value)} placeholder="Ms Johnson" className={inputCls} style={innerShadow} />
                     </InputField>
