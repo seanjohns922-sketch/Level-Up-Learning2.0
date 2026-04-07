@@ -159,7 +159,7 @@ export default function LoginPage() {
           src="/images/login-bg.jpg"
           alt=""
           className="w-full h-full object-cover"
-          style={{ objectPosition: "15% 65%" }}
+          style={{ objectPosition: "10% 65%" }}
         />
         {/* Vignette */}
         <div
