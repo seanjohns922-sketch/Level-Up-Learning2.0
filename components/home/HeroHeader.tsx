@@ -15,8 +15,26 @@ type Props = {
 export default function HeroHeader({ levelNum, week, lessonsDone, overallPercent, onBack, onLogout }: Props) {
   return (
     <div className="relative overflow-hidden">
-      {/* Transparent gradient overlay */}
+      {/* Transparent gradient overlay — realm bg shows through */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-black/8 to-transparent" />
+      <div className="absolute inset-0 opacity-20">
+        {[...Array(6)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full bg-white animate-pulse"
+            style={{
+              width: `${4 + i * 2}px`,
+              height: `${4 + i * 2}px`,
+              top: `${15 + i * 12}%`,
+              left: `${10 + i * 15}%`,
+              animationDelay: `${i * 0.5}s`,
+              animationDuration: `${2 + i * 0.3}s`,
+            }}
+          />
+        ))}
+      </div>
+      <div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-white/5" />
+      <div className="absolute bottom-8 -left-16 h-48 w-48 rounded-full bg-white/5" />
 
       <div className="relative max-w-2xl mx-auto px-6 pt-5 pb-24">
         {/* Nav row */}
