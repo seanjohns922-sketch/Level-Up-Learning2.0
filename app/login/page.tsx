@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { GraduationCap, Briefcase, KeyRound, User, Lock } from "lucide-react";
@@ -42,50 +42,7 @@ function writeClasses(store: ClassesStore) {
   localStorage.setItem(CLASSES_KEY, JSON.stringify(store));
 }
 
-/* ── Floating particles (client-only to avoid hydration mismatch) ── */
-function FloatingParticles() {
-  const [particles, setParticles] = useState<Array<{ id: number; left: string; bottom: string; size: number; opacity: number; duration: number; delay: number; drift: string }>>([]);
-
-  useEffect(() => {
-    setParticles(
-      Array.from({ length: 14 }, (_, i) => {
-        const size = 2 + Math.random() * 3;
-        return {
-          id: i,
-          left: `${Math.random() * 100}%`,
-          bottom: `${-size}px`,
-          size,
-          opacity: 0.5 + Math.random() * 0.3,
-          duration: 14 + Math.random() * 12,
-          delay: Math.random() * 8,
-          drift: `${-20 + Math.random() * 40}px`,
-        };
-      })
-    );
-  }, []);
-
-  if (particles.length === 0) return null;
-
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none z-[1]">
-      {particles.map((p) => (
-        <div
-          key={p.id}
-          className="absolute rounded-full pointer-events-none"
-          style={{
-            left: p.left,
-            bottom: p.bottom,
-            width: p.size,
-            height: p.size,
-            background: `radial-gradient(circle, rgba(255,215,100,${p.opacity}), transparent)`,
-            animation: `floatUp ${p.duration}s ${p.delay}s linear infinite`,
-            ["--drift" as string]: p.drift,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
+/* Floating particles removed — clean game UI, no fantasy effects */
 
 /* ── Shared input wrapper (defined outside LoginPage to avoid remounts) ── */
 function InputField({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
@@ -194,20 +151,18 @@ export default function LoginPage() {
   }
 
   const inputCls =
-    "w-full pl-11 pr-4 py-3.5 rounded-[14px] text-[15px] text-white font-medium placeholder-white/50 bg-[rgba(255,255,255,0.08)] border border-white/20 focus:outline-none focus:border-white/40 focus:bg-[rgba(255,255,255,0.12)] transition-all duration-200";
+    "w-full pl-11 pr-4 py-3.5 rounded-[14px] text-[15px] text-white font-medium placeholder-white/40 bg-[rgba(20,30,40,0.45)] border border-white/15 focus:outline-none focus:border-white/30 focus:bg-[rgba(20,30,40,0.55)] transition-all duration-200";
   const innerShadow = {};
-  const labelCls = "text-[12px] font-bold text-white pl-1 uppercase tracking-wider"
-  const labelStyle = { textShadow: "0 1px 4px rgba(0,0,0,0.3)", fontFamily: "'Nunito', sans-serif" };
+  const labelCls = "text-[13px] font-bold text-white pl-1 uppercase tracking-wider";
+  const labelStyle = { textShadow: "0 1px 3px rgba(0,0,0,0.5)", fontFamily: "'Nunito', sans-serif" };
 
   return (
-    <main className="min-h-screen relative overflow-hidden flex flex-col items-center justify-start">
+    <main className="min-h-screen relative overflow-hidden flex flex-col items-center justify-center">
       {/* Background */}
       <div className="absolute inset-0">
-        <img src="/images/login-bg.jpg" alt="" className="w-full h-full object-cover object-[center_65%]" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+        <img src="/images/login-bg.jpg" alt="" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
       </div>
-
-      <FloatingParticles />
 
       {/* Content */}
       <div className="relative z-10 w-full max-w-[480px] mx-auto px-4 pt-8 pb-10 flex flex-col items-center">
@@ -225,29 +180,29 @@ export default function LoginPage() {
 
         {/* ── Portal Card ── */}
         <div
-          className="w-full rounded-[22px] p-7 md:p-9"
+          className="w-full rounded-[18px] p-7 md:p-8"
           style={{
-            background: "linear-gradient(170deg, rgba(180,200,240,0.18) 0%, rgba(200,210,240,0.12) 40%, rgba(180,190,230,0.08) 100%)",
-            backdropFilter: "blur(14px) saturate(1.2)",
-            WebkitBackdropFilter: "blur(14px) saturate(1.2)",
-            border: "1px solid rgba(255,255,255,0.25)",
-            boxShadow: "0 8px 40px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.15)",
+            background: "rgba(15,20,30,0.55)",
+            backdropFilter: "blur(20px) saturate(1.1)",
+            WebkitBackdropFilter: "blur(20px) saturate(1.1)",
+            border: "1px solid rgba(255,255,255,0.12)",
+            boxShadow: "0 12px 48px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.2)",
             animation: "fadeUp 0.6s ease both",
           }}
         >
           {/* Header */}
           <div className="text-center mb-5">
             <h1
-              className="text-[2.6rem] font-black text-white tracking-tight leading-tight"
+              className="text-[2.4rem] font-black text-white tracking-tight leading-tight"
               style={{
                 fontFamily: "'Nunito', sans-serif",
-                textShadow: "0 2px 20px rgba(255,255,255,0.2), 0 1px 3px rgba(0,0,0,0.3)",
+                textShadow: "0 2px 8px rgba(0,0,0,0.4)",
               }}
             >
               Level Up Learning
             </h1>
             <p
-              className="text-base text-white/60 mt-1.5 tracking-wide font-medium"
+              className="text-sm text-white/50 mt-1 tracking-wide font-medium"
               style={{ fontFamily: "'Quicksand', sans-serif" }}
             >
               Begin your journey
