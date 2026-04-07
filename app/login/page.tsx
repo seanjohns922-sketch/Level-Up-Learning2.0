@@ -193,10 +193,10 @@ export default function LoginPage() {
           {/* Header */}
           <div className="text-center mb-5">
             <h1
-              className="text-[2.6rem] font-black text-white tracking-tight leading-tight"
+              className="text-[2.4rem] font-black text-white tracking-tight leading-tight"
               style={{
                 fontFamily: "'Nunito', sans-serif",
-                textShadow: "0 2px 20px rgba(255,255,255,0.2), 0 1px 3px rgba(0,0,0,0.3)",
+                textShadow: "0 2px 8px rgba(0,0,0,0.4)",
               }}
             >
               Level Up Learning
