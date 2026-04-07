@@ -154,12 +154,12 @@ export default function LoginPage() {
   return (
     <main className="min-h-screen relative overflow-hidden flex">
       {/* ── Full-screen background ── */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0" style={{ backgroundColor: "#0b0f1a" }}>
         <img
           src="/images/login-bg.jpg"
           alt=""
-          className="w-full h-full object-cover"
-          style={{ objectPosition: "17.5% 65%" }}
+          className="w-full h-full"
+          style={{ objectFit: "contain", objectPosition: "92% center" }}
         />
         {/* Vignette */}
         <div
