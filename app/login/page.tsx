@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { GraduationCap, Briefcase, KeyRound, User, Lock } from "lucide-react";
 
 type StudentRecord = {
   id: string;
@@ -41,14 +42,14 @@ function writeClasses(store: ClassesStore) {
   localStorage.setItem(CLASSES_KEY, JSON.stringify(store));
 }
 
-/* ── Floating particle component ── */
+/* ── Floating particles ── */
 function FloatingParticles() {
-  const particles = Array.from({ length: 18 }, (_, i) => {
+  const particles = Array.from({ length: 14 }, (_, i) => {
     const left = Math.random() * 100;
     const delay = Math.random() * 8;
-    const duration = 10 + Math.random() * 12;
-    const size = 2 + Math.random() * 4;
-    const drift = -30 + Math.random() * 60;
+    const duration = 12 + Math.random() * 14;
+    const size = 2 + Math.random() * 3;
+    const drift = -20 + Math.random() * 40;
     return (
       <div
         key={i}
@@ -58,7 +59,7 @@ function FloatingParticles() {
           bottom: `-${size}px`,
           width: size,
           height: size,
-          background: `radial-gradient(circle, rgba(255,215,100,${0.6 + Math.random() * 0.4}), transparent)`,
+          background: `radial-gradient(circle, rgba(255,215,100,${0.5 + Math.random() * 0.3}), transparent)`,
           animation: `floatUp ${duration}s ${delay}s linear infinite`,
           ["--drift" as string]: `${drift}px`,
         }}
@@ -87,6 +88,7 @@ export default function LoginPage() {
   const [showPin, setShowPin] = useState(false);
 
   const createdClass = createdCode ? classes[createdCode] : null;
+  const classList = useMemo(() => Object.values(classes), [classes]);
   const [teacherError, setTeacherError] = useState<string | null>(null);
   const [teacherLoading, setTeacherLoading] = useState(false);
 
@@ -99,54 +101,23 @@ export default function LoginPage() {
     if (!teacherEmail || !teacherPassword) return;
     setTeacherError(null);
     setTeacherLoading(true);
-
     const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
       email: teacherEmail,
       password: teacherPassword,
       options: { data: { display_name: teacherName || teacherEmail, role: "teacher" } },
     });
-
-    if (signUpErr) {
-      setTeacherError(signUpErr.message);
-      setTeacherLoading(false);
-      return;
-    }
-
+    if (signUpErr) { setTeacherError(signUpErr.message); setTeacherLoading(false); return; }
     const userId = signUpData.user?.id;
-    if (!userId) {
-      setTeacherError("Sign up failed. Please try again.");
-      setTeacherLoading(false);
-      return;
-    }
-
-    await supabase.from("teachers").upsert({
-      id: userId,
-      email: teacherEmail,
-      display_name: teacherName.trim() || teacherEmail,
-    });
-
+    if (!userId) { setTeacherError("Sign up failed. Please try again."); setTeacherLoading(false); return; }
+    await supabase.from("teachers").upsert({ id: userId, email: teacherEmail, display_name: teacherName.trim() || teacherEmail });
     if (className.trim()) {
       const { data: code } = await supabase.rpc("generate_class_code");
       if (code) {
-        await supabase.from("classes").insert({
-          name: className.trim(),
-          year_level: "1",
-          class_code: code,
-          teacher_id: userId,
-        });
+        await supabase.from("classes").insert({ name: className.trim(), year_level: "1", class_code: code, teacher_id: userId });
         setCreatedCode(code);
-        const record: ClassRecord = {
-          code,
-          name: className.trim(),
-          teacherEmail,
-          teacherName: teacherName.trim() || undefined,
-          students: [],
-          createdAt: new Date().toISOString(),
-        };
-        saveClasses({ ...classes, [code]: record });
+        saveClasses({ ...classes, [code]: { code, name: className.trim(), teacherEmail, teacherName: teacherName.trim() || undefined, students: [], createdAt: new Date().toISOString() } });
       }
     }
-
     setTeacherLoading(false);
     router.push("/teacher/dashboard");
   }
@@ -155,24 +126,9 @@ export default function LoginPage() {
     if (!teacherEmail || !teacherPassword) return;
     setTeacherError(null);
     setTeacherLoading(true);
-
-    const { data, error: signInErr } = await supabase.auth.signInWithPassword({
-      email: teacherEmail,
-      password: teacherPassword,
-    });
-
-    if (signInErr) {
-      setTeacherError(signInErr.message);
-      setTeacherLoading(false);
-      return;
-    }
-
-    if (data?.user) {
-      setTeacherLoading(false);
-      router.push("/teacher/dashboard");
-      return;
-    }
-
+    const { data, error: signInErr } = await supabase.auth.signInWithPassword({ email: teacherEmail, password: teacherPassword });
+    if (signInErr) { setTeacherError(signInErr.message); setTeacherLoading(false); return; }
+    if (data?.user) { setTeacherLoading(false); router.push("/teacher/dashboard"); return; }
     setTeacherError("Login failed.");
     setTeacherLoading(false);
   }
@@ -183,361 +139,263 @@ export default function LoginPage() {
     const displayName = studentName.trim();
     const name = displayName;
     const pin = studentPin.trim();
-    if (!normalizedCode || !name || pin.length !== 4) {
-      setStudentError("Please enter class code, name, and 4-digit PIN.");
-      return;
-    }
-
-    const { data: cls } = await supabase
-      .from("classes")
-      .select("id")
-      .eq("class_code", normalizedCode)
-      .single();
-
-    if (!cls) {
-      setStudentError("Class code not found.");
-      return;
-    }
-
+    if (!normalizedCode || !name || pin.length !== 4) { setStudentError("Please enter class code, name, and 4-digit PIN."); return; }
+    const { data: cls } = await supabase.from("classes").select("id").eq("class_code", normalizedCode).single();
+    if (!cls) { setStudentError("Class code not found."); return; }
     const syntheticEmail = `${name.toLowerCase().replace(/[^a-z0-9]/g, "")}.${normalizedCode.toLowerCase()}@leveluplearning.app`;
     const paddedPin = pin + "xx";
-    const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
-      email: syntheticEmail,
-      password: paddedPin,
-    });
-
+    const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({ email: syntheticEmail, password: paddedPin });
     if (signUpErr) {
       if (signUpErr.message.includes("already")) {
-        const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
-          email: syntheticEmail,
-          password: paddedPin,
-        });
-        if (signInErr) {
-          setStudentError("That name is taken in this class, or your PIN is wrong.");
-          return;
-        }
-        const { data: existing } = await supabase
-          .from("students")
-          .select("id, class_id")
-          .eq("user_id", signInData.user.id)
-          .single();
-        if (existing) {
-          localStorage.setItem("lul_student_id", existing.id);
-          localStorage.setItem("lul_class_id", existing.class_id);
-          router.push("/home");
-          return;
-        }
+        const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({ email: syntheticEmail, password: paddedPin });
+        if (signInErr) { setStudentError("That name is taken in this class, or your PIN is wrong."); return; }
+        const { data: existing } = await supabase.from("students").select("id, class_id").eq("user_id", signInData.user.id).single();
+        if (existing) { localStorage.setItem("lul_student_id", existing.id); localStorage.setItem("lul_class_id", existing.class_id); router.push("/home"); return; }
       }
       setStudentError(signUpErr.message);
       return;
     }
-
     const userId = signUpData.user?.id;
-    if (!userId) {
-      setStudentError("Could not create account.");
-      return;
-    }
-
+    if (!userId) { setStudentError("Could not create account."); return; }
     const studentId = crypto.randomUUID();
-    const { data: student } = await supabase
-      .from("students")
-      .insert({
-        id: studentId,
-        class_id: cls.id,
-        display_name: displayName.trim(),
-        pin,
-        user_id: userId,
-      })
-      .select()
-      .single();
-
-    if (!student) {
-      setStudentError("Could not create student.");
-      return;
-    }
-
+    const { data: student } = await supabase.from("students").insert({ id: studentId, class_id: cls.id, display_name: displayName.trim(), pin, user_id: userId }).select().single();
+    if (!student) { setStudentError("Could not create student."); return; }
     localStorage.setItem("lul_student_id", student.id);
     localStorage.setItem("lul_class_id", cls.id);
     router.push("/home");
   }
 
-  const inputBase =
-    "w-full pl-11 pr-4 py-3.5 rounded-2xl border border-white/20 text-base bg-white/10 backdrop-blur-sm text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-amber-400/60 focus:border-amber-400/40 transition shadow-[inset_0_2px_4px_rgba(0,0,0,0.15)]";
+  /* ── Shared input wrapper ── */
+  function InputField({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
+    return (
+      <div className="relative">
+        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40 z-10">{icon}</span>
+        {children}
+      </div>
+    );
+  }
+
+  const inputCls =
+    "w-full pl-11 pr-4 py-3.5 rounded-[14px] text-[15px] text-white placeholder-white/35 bg-[rgba(255,255,255,0.12)] border border-white/[0.12] focus:outline-none focus:border-amber-400/50 focus:bg-[rgba(255,255,255,0.18)] focus:shadow-[0_0_12px_rgba(255,190,60,0.15)] transition-all duration-200";
+  const innerShadow = { boxShadow: "inset 0 2px 4px rgba(0,0,0,0.12)" };
 
   return (
     <main className="min-h-screen relative overflow-hidden flex flex-col items-center justify-start">
+      {/* Background */}
       <div className="absolute inset-0">
-        <img
-          src="/images/login-bg.jpg"
-          alt=""
-          className="w-full h-full object-cover object-[center_65%]"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-black/20" />
+        <img src="/images/login-bg.jpg" alt="" className="w-full h-full object-cover object-[center_65%]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-black/10" />
       </div>
 
       <FloatingParticles />
 
-      <div className="relative z-10 w-full max-w-md mx-auto px-4 pt-6 pb-10 flex flex-col items-center">
+      {/* Content */}
+      <div className="relative z-10 w-full max-w-[420px] mx-auto px-4 pt-5 pb-10 flex flex-col items-center">
+        {/* Skip */}
         <div className="w-full flex justify-end mb-3">
           <button
-            onClick={() => {
-              supabase.auth.signOut().then(() => router.push("/home"));
-            }}
-            className="px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/15 text-white/80 text-sm font-semibold hover:bg-white/20 transition"
+            onClick={() => { supabase.auth.signOut().then(() => router.push("/home")); }}
+            className="px-4 py-1.5 rounded-full text-white/70 text-xs font-semibold hover:text-white/90 transition"
+            style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)" }}
             type="button"
           >
-            Skip to Demo &rarr;
+            Skip to Demo
           </button>
         </div>
 
+        {/* ── Portal Card ── */}
         <div
-          className="w-full rounded-[32px] p-6 md:p-8"
+          className="w-full rounded-[22px] p-6 md:p-7"
           style={{
-            background: "rgba(255,255,255,0.08)",
-            backdropFilter: "blur(20px) saturate(1.4)",
-            WebkitBackdropFilter: "blur(20px) saturate(1.4)",
-            border: "1px solid rgba(255,255,255,0.18)",
-            boxShadow:
-              "0 8px 40px rgba(0,0,0,0.35), 0 0 60px rgba(255,190,60,0.08), inset 0 1px 0 rgba(255,255,255,0.15)",
-            animation: "fadeUp 0.7s ease both 0.05s",
+            background: "linear-gradient(170deg, rgba(255,240,200,0.10) 0%, rgba(255,255,255,0.08) 40%, rgba(255,255,255,0.06) 100%)",
+            backdropFilter: "blur(16px) saturate(1.3)",
+            WebkitBackdropFilter: "blur(16px) saturate(1.3)",
+            border: "1px solid rgba(255,255,255,0.22)",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.3), 0 0 40px rgba(255,190,60,0.06), inset 0 1px 0 rgba(255,255,255,0.12)",
+            animation: "fadeUp 0.6s ease both",
           }}
         >
-          <div className="text-center mb-5" style={{ animation: "fadeUp 0.6s ease both 0.1s" }}>
+          {/* Header */}
+          <div className="text-center mb-5">
             <h1
-              className="text-4xl md:text-5xl font-black text-white tracking-tight"
+              className="text-[2.2rem] font-black text-white tracking-tight leading-tight"
               style={{
-                fontFamily: "'Nunito', 'Avenir Next', 'Trebuchet MS', sans-serif",
-                textShadow:
-                  "0 2px 16px rgba(255,190,60,0.35), 0 1px 3px rgba(0,0,0,0.5)",
+                fontFamily: "'Nunito', sans-serif",
+                textShadow: "0 2px 20px rgba(255,190,60,0.3), 0 1px 3px rgba(0,0,0,0.4)",
               }}
             >
               Enter the Tower
             </h1>
             <p
-              className="text-sm text-white/60 mt-1.5 tracking-wide"
+              className="text-sm text-white/50 mt-1 tracking-wide font-medium"
               style={{ fontFamily: "'Quicksand', sans-serif" }}
             >
               Begin your journey
             </p>
           </div>
 
-          <div className="flex items-center justify-center mb-5">
+          {/* ── Tab Toggle ── */}
+          <div className="mb-5">
             <div
-              className="relative inline-flex rounded-2xl p-1 w-full"
-              style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)" }}
+              className="relative flex rounded-full p-[3px]"
+              style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.08)" }}
             >
               <div
-                className="absolute top-1 bottom-1 rounded-xl transition-all duration-300 ease-out"
+                className="absolute top-[3px] bottom-[3px] rounded-full transition-all duration-300 ease-out"
                 style={{
-                  width: "calc(50% - 4px)",
-                  left: tab === "student" ? 4 : "calc(50% + 0px)",
-                  background: "rgba(255,255,255,0.15)",
-                  boxShadow: "0 0 12px rgba(255,190,60,0.15), inset 0 1px 0 rgba(255,255,255,0.1)",
-                  border: "1px solid rgba(255,255,255,0.12)",
+                  width: "calc(50% - 3px)",
+                  left: tab === "student" ? 3 : "calc(50%)",
+                  background: "rgba(255,255,255,0.12)",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  boxShadow: "0 0 10px rgba(255,190,60,0.12)",
                 }}
               />
               <button
                 type="button"
                 onClick={() => setTab("student")}
-                className="relative z-10 flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold text-sm transition-colors duration-200"
-                style={{ color: tab === "student" ? "white" : "rgba(255,255,255,0.5)" }}
+                className="relative z-10 flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full font-bold text-sm transition-colors duration-200"
+                style={{ color: tab === "student" ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.4)" }}
               >
-                <span className="text-base">🎓</span> Student
+                <GraduationCap size={16} strokeWidth={2.2} /> Student
               </button>
               <button
                 type="button"
                 onClick={() => setTab("teacher")}
-                className="relative z-10 flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold text-sm transition-colors duration-200"
-                style={{ color: tab === "teacher" ? "white" : "rgba(255,255,255,0.5)" }}
+                className="relative z-10 flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full font-bold text-sm transition-colors duration-200"
+                style={{ color: tab === "teacher" ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.4)" }}
               >
-                <span className="text-base">🧑‍🏫</span> Teacher
+                <Briefcase size={15} strokeWidth={2.2} /> Teacher
               </button>
             </div>
           </div>
 
+          {/* ── Student Form ── */}
           {tab === "student" ? (
-            <div className="grid gap-3.5">
-              <p className="text-xs text-white/50 text-center tracking-wide">
-                Enter your class code, name & PIN
-              </p>
-
+            <div className="grid gap-3">
               <label className="grid gap-1.5">
-                <span className="text-xs font-bold text-white/70 pl-1">Class Code</span>
-                <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-lg">🔑</span>
-                  <input
-                    value={studentCode}
-                    onChange={(e) => setStudentCode(e.target.value)}
-                    placeholder="E.G. K9F2Q"
-                    className={`${inputBase} tracking-[0.3em] text-center uppercase font-semibold`}
-                  />
-                </div>
+                <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Class Code</span>
+                <InputField icon={<KeyRound size={16} />}>
+                  <input value={studentCode} onChange={(e) => setStudentCode(e.target.value)} placeholder="e.g. K9F2Q" className={`${inputCls} tracking-[0.3em] text-center uppercase font-semibold`} style={innerShadow} />
+                </InputField>
               </label>
-
               <label className="grid gap-1.5">
-                <span className="text-xs font-bold text-white/70 pl-1">Your Name</span>
-                <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-lg">👤</span>
-                  <input
-                    value={studentName}
-                    onChange={(e) => setStudentName(e.target.value)}
-                    placeholder="Enter your first name"
-                    className={inputBase}
-                  />
-                </div>
+                <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Your Name</span>
+                <InputField icon={<User size={16} />}>
+                  <input value={studentName} onChange={(e) => setStudentName(e.target.value)} placeholder="Enter your first name" className={inputCls} style={innerShadow} />
+                </InputField>
               </label>
-
               <label className="grid gap-1.5">
-                <span className="text-xs font-bold text-white/70 pl-1">4-Digit PIN</span>
-                <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-lg">🔒</span>
+                <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">4-Digit PIN</span>
+                <InputField icon={<Lock size={16} />}>
                   <input
                     value={studentPin}
                     onChange={(e) => setStudentPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                    placeholder="····"
-                    className={`${inputBase} tracking-[0.5em] text-center`}
+                    placeholder="----"
+                    className={`${inputCls} tracking-[0.5em] text-center font-semibold`}
                     type={showPin ? "text" : "password"}
                     inputMode="numeric"
+                    style={innerShadow}
                   />
                   <button
                     type="button"
-                    onClick={() => setShowPin((prev) => !prev)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition"
+                    onClick={() => setShowPin((p) => !p)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition z-10"
                     aria-label={showPin ? "Hide PIN" : "Show PIN"}
                   >
-                    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+                    <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
                       <circle cx="12" cy="12" r="3" />
                     </svg>
                   </button>
-                </div>
+                </InputField>
               </label>
 
               {studentError && (
-                <div className="text-sm font-bold text-red-300 text-center bg-red-500/15 rounded-xl py-2">{studentError}</div>
+                <div className="text-sm font-bold text-red-300 text-center rounded-xl py-2" style={{ background: "rgba(220,50,50,0.12)" }}>{studentError}</div>
               )}
 
               <button
                 onClick={handleStudentLogin}
-                className="group mt-1 w-full py-4 rounded-2xl font-black text-lg text-white transition-all duration-200 active:scale-[0.97]"
+                className="mt-1 w-full py-3.5 rounded-full font-black text-base text-white transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.97]"
                 style={{
-                  background: "linear-gradient(135deg, hsl(30 95% 55%), hsl(45 100% 50%), hsl(30 95% 55%))",
-                  backgroundSize: "200% 200%",
-                  boxShadow:
-                    "0 4px 20px rgba(255,160,30,0.35), 0 0 30px rgba(255,190,60,0.15), inset 0 1px 0 rgba(255,255,255,0.25)",
+                  background: "linear-gradient(135deg, hsl(30 90% 52%), hsl(42 100% 50%))",
+                  boxShadow: "0 4px 16px rgba(255,160,30,0.3), 0 0 24px rgba(255,190,60,0.1), inset 0 1px 0 rgba(255,255,255,0.2)",
                 }}
                 type="button"
               >
-                <span className="flex items-center justify-center gap-2">
-                  Enter the Tower <span className="text-xl group-hover:translate-x-0.5 transition-transform">🚀</span>
-                </span>
+                Enter the Tower
               </button>
             </div>
           ) : (
-            <div className="grid gap-3.5">
-              <div className="flex items-center justify-center gap-3 mb-1">
-                <button
-                  type="button"
-                  onClick={() => setTeacherMode("login")}
-                  className="px-5 py-1.5 rounded-full font-bold text-sm transition"
-                  style={{
-                    background: teacherMode === "login" ? "rgba(255,255,255,0.15)" : "transparent",
-                    color: teacherMode === "login" ? "white" : "rgba(255,255,255,0.5)",
-                    border: teacherMode === "login" ? "1px solid rgba(255,255,255,0.12)" : "1px solid transparent",
-                  }}
-                >
-                  Log In
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setTeacherMode("signup")}
-                  className="px-5 py-1.5 rounded-full font-bold text-sm transition"
-                  style={{
-                    background: teacherMode === "signup" ? "rgba(255,255,255,0.15)" : "transparent",
-                    color: teacherMode === "signup" ? "white" : "rgba(255,255,255,0.5)",
-                    border: teacherMode === "signup" ? "1px solid rgba(255,255,255,0.12)" : "1px solid transparent",
-                  }}
-                >
-                  Sign Up
-                </button>
+            /* ── Teacher Form ── */
+            <div className="grid gap-3">
+              <div className="flex items-center justify-center gap-2 mb-1">
+                {(["login", "signup"] as const).map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => setTeacherMode(m)}
+                    className="px-5 py-1.5 rounded-full font-bold text-xs uppercase tracking-wider transition-all duration-200"
+                    style={{
+                      background: teacherMode === m ? "rgba(255,255,255,0.12)" : "transparent",
+                      color: teacherMode === m ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.4)",
+                      border: teacherMode === m ? "1px solid rgba(255,255,255,0.15)" : "1px solid transparent",
+                    }}
+                  >
+                    {m === "login" ? "Log In" : "Sign Up"}
+                  </button>
+                ))}
               </div>
 
               <label className="grid gap-1.5">
-                <span className="text-xs font-bold text-white/70 pl-1">Email</span>
-                <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-lg">📧</span>
-                  <input
-                    value={teacherEmail}
-                    onChange={(e) => setTeacherEmail(e.target.value)}
-                    placeholder="teacher@school.edu"
-                    className={inputBase}
-                  />
-                </div>
+                <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Email</span>
+                <InputField icon={<User size={16} />}>
+                  <input value={teacherEmail} onChange={(e) => setTeacherEmail(e.target.value)} placeholder="teacher@school.edu" className={inputCls} style={innerShadow} />
+                </InputField>
               </label>
               <label className="grid gap-1.5">
-                <span className="text-xs font-bold text-white/70 pl-1">Password</span>
-                <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-lg">🔒</span>
-                  <input
-                    value={teacherPassword}
-                    onChange={(e) => setTeacherPassword(e.target.value)}
-                    placeholder="********"
-                    type="password"
-                    className={inputBase}
-                  />
-                </div>
+                <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Password</span>
+                <InputField icon={<Lock size={16} />}>
+                  <input value={teacherPassword} onChange={(e) => setTeacherPassword(e.target.value)} placeholder="********" type="password" className={inputCls} style={innerShadow} />
+                </InputField>
               </label>
 
               {teacherMode === "signup" && (
                 <>
                   <label className="grid gap-1.5">
-                    <span className="text-xs font-bold text-white/70 pl-1">Teacher Name (optional)</span>
-                    <div className="relative">
-                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-lg">👤</span>
-                      <input
-                        value={teacherName}
-                        onChange={(e) => setTeacherName(e.target.value)}
-                        placeholder="Ms Johnson"
-                        className={inputBase}
-                      />
-                    </div>
+                    <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Teacher Name</span>
+                    <InputField icon={<User size={16} />}>
+                      <input value={teacherName} onChange={(e) => setTeacherName(e.target.value)} placeholder="Ms Johnson" className={inputCls} style={innerShadow} />
+                    </InputField>
                   </label>
                   <label className="grid gap-1.5">
-                    <span className="text-xs font-bold text-white/70 pl-1">Class Name (optional)</span>
-                    <div className="relative">
-                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-lg">🏫</span>
-                      <input
-                        value={className}
-                        onChange={(e) => setClassName(e.target.value)}
-                        placeholder="3/4 SJ"
-                        className={inputBase}
-                      />
-                    </div>
+                    <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Class Name</span>
+                    <InputField icon={<Briefcase size={16} />}>
+                      <input value={className} onChange={(e) => setClassName(e.target.value)} placeholder="3/4 SJ" className={inputCls} style={innerShadow} />
+                    </InputField>
                   </label>
                 </>
               )}
 
               {teacherError && (
-                <p className="text-sm text-red-300 font-bold text-center bg-red-500/15 rounded-xl py-2">{teacherError}</p>
+                <p className="text-sm text-red-300 font-bold text-center rounded-xl py-2" style={{ background: "rgba(220,50,50,0.12)" }}>{teacherError}</p>
               )}
 
               <button
                 onClick={teacherMode === "signup" ? handleTeacherSignup : handleTeacherLogin}
                 disabled={teacherLoading}
-                className="group mt-1 w-full py-4 rounded-2xl font-black text-lg text-white transition-all duration-200 active:scale-[0.97] disabled:opacity-50"
+                className="mt-1 w-full py-3.5 rounded-full font-black text-base text-white transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.97] disabled:opacity-50"
                 style={{
-                  background: "linear-gradient(135deg, hsl(30 95% 55%), hsl(45 100% 50%), hsl(30 95% 55%))",
-                  backgroundSize: "200% 200%",
-                  boxShadow:
-                    "0 4px 20px rgba(255,160,30,0.35), 0 0 30px rgba(255,190,60,0.15), inset 0 1px 0 rgba(255,255,255,0.25)",
+                  background: "linear-gradient(135deg, hsl(30 90% 52%), hsl(42 100% 50%))",
+                  boxShadow: "0 4px 16px rgba(255,160,30,0.3), 0 0 24px rgba(255,190,60,0.1), inset 0 1px 0 rgba(255,255,255,0.2)",
                 }}
                 type="button"
               >
-                {teacherLoading ? "Please wait…" : teacherMode === "signup" ? "Sign Up" : "Log In"}
+                {teacherLoading ? "Please wait..." : teacherMode === "signup" ? "Sign Up" : "Log In"}
               </button>
 
               {createdClass && (
-                <div className="rounded-xl border border-emerald-400/30 bg-emerald-500/15 p-3 text-sm text-emerald-200">
+                <div className="rounded-xl p-3 text-sm text-emerald-200" style={{ background: "rgba(40,180,100,0.12)", border: "1px solid rgba(80,200,120,0.2)" }}>
                   <div className="font-bold">Class Created</div>
                   <div>Name: {createdClass.name} · Code: {createdClass.code}</div>
                 </div>
@@ -545,17 +403,13 @@ export default function LoginPage() {
             </div>
           )}
 
-          <div className="mt-5 text-center">
-            <p
-              className="text-[11px] tracking-wider uppercase font-semibold"
-              style={{
-                color: "rgba(255,190,60,0.55)",
-                fontFamily: "'Quicksand', sans-serif",
-              }}
-            >
-              ✦ Unlock your Level Up Legend by mastering your skills ✦
-            </p>
-          </div>
+          {/* Footer legend hint */}
+          <p
+            className="mt-5 text-center text-[10px] tracking-[0.08em] uppercase font-semibold"
+            style={{ color: "rgba(255,200,100,0.4)", fontFamily: "'Quicksand', sans-serif" }}
+          >
+            Unlock your Level Up Legend by mastering your skills
+          </p>
         </div>
       </div>
 
