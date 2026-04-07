@@ -368,7 +368,7 @@ export default function LoginPage() {
               </div>
 
               <label className="grid gap-1.5">
-                <span className="text-[11px] font-bold text-white/55 pl-1 uppercase tracking-wider">Email</span>
+                <span className={labelCls} style={labelStyle}>Email</span>
                 <InputField icon={<User size={16} />}>
                   <input value={teacherEmail} onChange={(e) => setTeacherEmail(e.target.value)} placeholder="teacher@school.edu" className={inputCls} style={innerShadow} />
                 </InputField>
