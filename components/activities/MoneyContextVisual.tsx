@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element */
+
 import type { MoneyVisualData } from "@/data/activities/year2/lessonEngine";
 
 function formatDollars(value: number) {
@@ -17,10 +19,40 @@ function sumMoneyPieces(
 function MoneyPiece({
   label,
   kind,
+  value,
 }: {
   label: string;
   kind: "coin" | "note";
+  value: number;
 }) {
+  const src =
+    kind === "note"
+      ? {
+          5: "/coins/note-5.png",
+          10: "/coins/note-10.png",
+          20: "/coins/note-20.png",
+          50: "/coins/note-50.png",
+          100: "/coins/note-100.png",
+        }[value]
+      : {
+          1: "/coins/coin-1.png",
+          2: "/coins/coin-2.png",
+        }[value];
+
+  if (src) {
+    return (
+      <img
+        src={src}
+        alt={label}
+        className={
+          kind === "note"
+            ? "h-16 w-auto rounded-lg object-contain shadow-sm"
+            : "h-14 w-14 rounded-full object-contain shadow-sm"
+        }
+      />
+    );
+  }
+
   if (kind === "note") {
     return (
       <div className="flex h-16 w-28 items-center justify-center rounded-xl border border-emerald-200 bg-emerald-100 text-lg font-black text-emerald-900 shadow-sm">
@@ -96,7 +128,12 @@ export default function MoneyContextVisual({
             <div className="text-sm font-bold text-slate-600">Money shown</div>
             <div className="mt-3 flex flex-wrap gap-3">
               {visual.pieces.map((piece, index) => (
-                <MoneyPiece key={`${piece.label}-${index}`} label={piece.label} kind={piece.kind} />
+                <MoneyPiece
+                  key={`${piece.label}-${index}`}
+                  label={piece.label}
+                  kind={piece.kind}
+                  value={piece.value}
+                />
               ))}
             </div>
             <div className="mt-3 text-sm font-semibold text-slate-500">

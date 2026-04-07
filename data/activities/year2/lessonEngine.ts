@@ -1799,7 +1799,7 @@ function formatWeek8ItemLabel(
 }
 
 function buildAustralianMoneyPieces(amount: number) {
-  const denominations = [50, 20, 10, 5, 2, 1] as const;
+  const denominations = [100, 50, 20, 10, 5, 2, 1] as const;
   const pieces: Array<{
     label: string;
     kind: "coin" | "note";
