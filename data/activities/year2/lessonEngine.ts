@@ -802,7 +802,7 @@ const BASE_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
     requiresVisual: true,
   },
   area_model_select: {
-    allowedModes: ["shade_fraction", "pick_model", "match_model", "match_equivalent"],
+    allowedModes: ["shade_fraction", "pick_model", "match_model", "match_equivalent", "skip_count_fraction"],
     requiresVisual: true,
   },
   set_model_select: {
@@ -814,11 +814,11 @@ const BASE_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
     requiresVisual: true,
   },
   number_line_place: {
-    allowedModes: ["place_fraction", "pick_point", "order_fractions"],
+    allowedModes: ["place_fraction", "pick_point", "order_fractions", "skip_count_fraction", "mixed_numerals"],
     requiresVisual: true,
   },
   fraction_compare: {
-    allowedModes: ["symbol_compare", "visual_compare", "true_false"],
+    allowedModes: ["symbol_compare", "visual_compare", "true_false", "same_denominator_combine"],
     requiresVisual: true,
   },
   equivalent_fraction_match: {
