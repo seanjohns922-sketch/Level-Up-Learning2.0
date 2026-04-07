@@ -117,103 +117,10 @@ export default function StudentHomePage() {
 
   return (
     <main className="min-h-screen relative">
-      {/* Immersive realm background */}
+      {/* Clean world background — wide view */}
       <div className="fixed inset-0 z-0">
-        <img
-          src={getHomeBg(levelNum)}
-          alt=""
-          className="w-full h-full object-cover"
-          style={{ filter: getHomeBgFilter(levelNum) }}
-        />
-        {/* Vignette — intensity scales with level band */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{ boxShadow: getVignetteStyle(levelNum) }}
-        />
-        {/* Numbot glow (right side) */}
-        <div
-          className="absolute animate-pulse"
-          style={{
-            width: 500,
-            height: 500,
-            right: "5%",
-            top: "15%",
-            borderRadius: "50%",
-            background: `radial-gradient(circle, ${getGlowColor(levelNum)} 0%, transparent 70%)`,
-            filter: "blur(30px)",
-            animationDuration: "3s",
-          }}
-        />
-        {/* Circuit glow — left */}
-        <div
-          className="absolute"
-          style={{
-            width: 350,
-            height: "80%",
-            left: 0,
-            top: "10%",
-            background: `linear-gradient(180deg, transparent, ${getGlowColor(levelNum)} 50%, transparent)`,
-            filter: "blur(25px)",
-            animation: "pulse 4s cubic-bezier(0.4,0,0.6,1) infinite",
-          }}
-        />
-        {/* Circuit glow — right */}
-        <div
-          className="absolute"
-          style={{
-            width: 350,
-            height: "80%",
-            right: 0,
-            top: "10%",
-            background: `linear-gradient(180deg, transparent, ${getGlowColor(levelNum).replace(/[\d.]+\)$/, "0.2)")} 50%, transparent)`,
-            filter: "blur(25px)",
-            animation: "pulse 5s cubic-bezier(0.4,0,0.6,1) infinite 1s",
-          }}
-        />
-        {/* Central energy glow */}
-        <div
-          className="absolute animate-pulse"
-          style={{
-            width: 600,
-            height: 300,
-            left: "50%",
-            top: "30%",
-            transform: "translateX(-50%)",
-            borderRadius: "50%",
-            background: `radial-gradient(ellipse, ${getGlowColor(levelNum).replace(/[\d.]+\)$/, "0.2)")} 0%, transparent 70%)`,
-            filter: "blur(40px)",
-            animationDuration: "5s",
-          }}
-        />
-        {/* Data stream overlay for advanced+ bands */}
-        {getLevelBand(levelNum) !== "foundation" && (
-          <div className="absolute inset-0 pointer-events-none opacity-15"
-            style={{
-              backgroundImage: `repeating-linear-gradient(90deg, transparent, transparent 60px, ${getGlowColor(levelNum).replace(/[\d.]+\)$/, "0.3)")} 60px, transparent 61px)`,
-              animation: "dataScroll 8s linear infinite",
-            }}
-          />
-        )}
-        {/* Floating particles — palette from level band */}
-        {[...Array(getLevelBand(levelNum) === "foundation" ? 60 : 80)].map((_, i) => {
-          const colors = getParticleColors(levelNum);
-          return (
-            <div
-              key={i}
-              className="absolute rounded-full"
-              style={{
-                width: 2 + (i % 5),
-                height: 2 + (i % 5),
-                left: `${3 + (i * 4.7) % 94}%`,
-                bottom: `${(i * 5.3) % 80}%`,
-                background: colors[i % 4],
-                animation: `floatUp ${5 + (i % 6) * 2}s linear infinite`,
-                animationDelay: `${(i * 0.6) % 10}s`,
-                opacity: 0.3 + (i % 4) * 0.15,
-              }}
-            />
-          );
-        })}
+        <img src="/images/dashboard-bg.jpg" alt="" className="w-full h-full object-cover" style={{ objectPosition: "center 40%" }} />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/25" />
       </div>
 
       <div className="relative z-10">
