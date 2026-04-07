@@ -159,7 +159,7 @@ export default function LoginPage() {
           src="/images/login-bg.jpg"
           alt=""
           className="w-full h-full"
-          style={{ objectFit: "contain", objectPosition: "92% center" }}
+          style={{ objectFit: "contain", objectPosition: "right center" }}
         />
         {/* Vignette */}
         <div
