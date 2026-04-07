@@ -567,13 +567,17 @@ const year4Rows: ProgramRow[] = [
     activity: "Explore fraction walls, build fractions, and recognise equivalent fractions visually",
     curriculum: ["AC9M4N03", "AC9M4N04"],
     activities: [
-      makeActivity("area_model_select", 2, {
-        mode: "pick_model",
+      makeActivity("fraction_wall", 2, {
+        mode: "build_fraction",
         denominators: [2, 4, 8],
       }),
-      makeActivity("area_model_select", 1, {
-        mode: "match_equivalent",
-        denominators: [2, 4, 8, 10],
+      makeActivity("fraction_wall", 2, {
+        mode: "find_equivalent",
+        denominators: [2, 4, 5, 8, 10],
+      }),
+      makeActivity("fraction_wall", 1, {
+        mode: "make_whole",
+        denominators: [2, 4, 5, 8, 10],
       }),
       makeActivity("equivalent_fraction_build", 1, {
         denominators: [2, 4, 8, 10],

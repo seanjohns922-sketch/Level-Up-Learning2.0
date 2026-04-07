@@ -1,4 +1,5 @@
 export type ActivityType =
+  | "fraction_wall"
   | "place_value_builder"
   | "number_order"
   | "partition_expand"

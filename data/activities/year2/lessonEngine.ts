@@ -190,6 +190,16 @@ export type AreaModelSelectQuestion = {
   correctModelId?: string;
 };
 
+export type FractionWallQuestion = {
+  kind: "fraction_wall";
+  prompt: string;
+  mode: "build_fraction" | "find_equivalent" | "make_whole";
+  targetFraction: string;
+  rows: number[];
+  answerSets: string[][];
+  helper?: string;
+};
+
 export type SetModelSelectQuestion = {
   kind: "set_model_select";
   prompt: string;
@@ -345,6 +355,7 @@ export type MixedWordProblemQuestion = {
 };
 
 export type ReviewQuizInnerQuestion =
+  | FractionWallQuestion
   | PlaceValueBuilderQuestion
   | NumberOrderQuestion
   | PartitionExpandQuestion
@@ -465,6 +476,10 @@ function fractionPartsForNumberLine(allowedDenominators?: number[]) {
   });
 }
 
+function buildFractionWallSelection(denominator: number, numerator: number) {
+  return Array.from({ length: numerator }, (_, index) => `${denominator}-${index}`);
+}
+
 function year3FractionOrderSets() {
   return [
     ["1/5", "1/2", "4/5"],
@@ -575,6 +590,7 @@ export type SpeedRoundQuestion = {
 };
 
 export type Year2QuestionData =
+  | FractionWallQuestion
   | PlaceValueBuilderQuestion
   | NumberOrderQuestion
   | PartitionExpandQuestion
@@ -785,6 +801,10 @@ const BASE_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
   },
   number_line: {
     allowedModes: ["placement", "rounding", "estimate"],
+    requiresVisual: true,
+  },
+  fraction_wall: {
+    allowedModes: ["build_fraction", "find_equivalent", "make_whole"],
     requiresVisual: true,
   },
   area_model_select: {
@@ -3221,6 +3241,81 @@ function generateInteractiveQuestion(
       numerator: 1,
       denominator,
       mode,
+    };
+  }
+
+  if (activityType === "fraction_wall") {
+    const mode =
+      config.mode === "find_equivalent" || config.mode === "make_whole"
+        ? config.mode
+        : "build_fraction";
+    const configuredRows =
+      Array.isArray(config.denominators) && config.denominators.every((value) => typeof value === "number")
+        ? (config.denominators as number[])
+        : [2, 4, 5, 8, 10];
+    const rows = [1, ...configuredRows].filter((value, index, all) => all.indexOf(value) === index);
+
+    if (mode === "find_equivalent") {
+      const equivalenceSets = [
+        { target: [1, 2], matches: [[2, 4], [4, 8], [5, 10]] },
+        { target: [1, 4], matches: [[2, 8]] },
+        { target: [3, 4], matches: [[6, 8]] },
+        { target: [1, 5], matches: [[2, 10]] },
+        { target: [2, 5], matches: [[4, 10]] },
+      ] as const;
+      const usable = equivalenceSets.filter((set) =>
+        set.matches.some((match) => rows.includes(match[1]))
+      );
+      const chosen = usable[randInt(0, usable.length - 1)] ?? usable[0] ?? equivalenceSets[0];
+      const [numerator, denominator] = chosen.target;
+
+      return {
+        kind: "fraction_wall",
+        prompt: `Tap a different row that shows the same amount as ${fractionLabel(numerator, denominator)}.`,
+        mode,
+        targetFraction: fractionLabel(numerator, denominator),
+        rows,
+        answerSets: chosen.matches
+          .filter((match) => rows.includes(match[1]))
+          .map(([matchNumerator, matchDenominator]) =>
+            buildFractionWallSelection(matchDenominator, matchNumerator)
+          ),
+        helper: "Look across the wall for rows that line up to the same length.",
+      };
+    }
+
+    if (mode === "make_whole") {
+      const denominator =
+        configuredRows[randInt(0, configuredRows.length - 1)] ?? configuredRows[0] ?? 4;
+      return {
+        kind: "fraction_wall",
+        prompt: `Tap all the ${fractionLabel(1, denominator)} pieces to make 1 whole.`,
+        mode,
+        targetFraction: fractionLabel(1, denominator),
+        rows,
+        answerSets: [buildFractionWallSelection(denominator, denominator)],
+        helper: "Use every piece in that row to fill the whole strip.",
+      };
+    }
+
+    const buildOptions = [
+      [1, 2],
+      [3, 4],
+      [2, 5],
+      [4, 8],
+      [5, 10],
+    ].filter((option) => configuredRows.includes(option[1]));
+    const [numerator, denominator] =
+      buildOptions[randInt(0, buildOptions.length - 1)] ?? buildOptions[0] ?? [1, 2];
+
+    return {
+      kind: "fraction_wall",
+      prompt: `Build ${fractionLabel(numerator, denominator)} on the fraction wall.`,
+      mode,
+      targetFraction: fractionLabel(numerator, denominator),
+      rows,
+      answerSets: [buildFractionWallSelection(denominator, numerator)],
+      helper: "Tap the pieces from left to right until you make the target fraction.",
     };
   }
 
@@ -6056,6 +6151,7 @@ export function generateQuestion(
       durationSeconds: dur,
     };
   } else if (
+    activity.activityType === "fraction_wall" ||
     activity.activityType === "place_value_builder" ||
     activity.activityType === "number_order" ||
     activity.activityType === "partition_expand" ||
