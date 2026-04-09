@@ -5,8 +5,24 @@ import type { NumberLinePlaceQuestion } from "@/data/activities/year2/lessonEngi
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 function parseFraction(label: string) {
-  const [numerator, denominator] = label.split("/").map(Number);
-  return { numerator, denominator };
+  const trimmed = label.trim();
+  if (!trimmed.includes("/")) {
+    const whole = Number(trimmed);
+    return { whole, numerator: 0, denominator: 1, value: whole };
+  }
+  const [wholePart, fractionPart] = trimmed.includes(" ") ? trimmed.split(" ") : ["0", trimmed];
+  const [numerator, denominator] = fractionPart.split("/").map(Number);
+  const whole = Number(wholePart);
+  return { whole, numerator, denominator, value: whole + numerator / denominator };
+}
+
+function formatNumberLineLabel(step: number, denominator: number) {
+  if (step === 0) return "0";
+  const whole = Math.floor(step / denominator);
+  const numerator = step % denominator;
+  if (numerator === 0) return String(whole);
+  if (whole === 0) return `${numerator}/${denominator}`;
+  return `${whole} ${numerator}/${denominator}`;
 }
 
 function FractionBar({
@@ -18,7 +34,9 @@ function FractionBar({
   showLabel?: boolean;
   large?: boolean;
 }) {
-  const { numerator, denominator } = parseFraction(fraction);
+  const { whole, numerator, denominator } = parseFraction(fraction);
+  const totalParts = denominator * Math.max(1, whole + (numerator > 0 ? 1 : 0));
+  const shadedParts = whole * denominator + numerator;
   return (
     <div className={large ? "w-full" : "rounded-2xl border border-violet-200 bg-white p-3 shadow-sm"}>
       <div
@@ -26,14 +44,14 @@ function FractionBar({
           "grid rounded-xl bg-slate-200 p-1",
           large ? "gap-0.5" : "gap-1",
         ].join(" ")}
-        style={{ gridTemplateColumns: `repeat(${denominator}, minmax(0, 1fr))` }}
+        style={{ gridTemplateColumns: `repeat(${totalParts}, minmax(0, 1fr))` }}
       >
-        {Array.from({ length: denominator }).map((_, index) => (
+        {Array.from({ length: totalParts }).map((_, index) => (
           <div
             key={index}
             className={[
               large ? "h-16 rounded-[4px]" : "h-8 rounded-sm",
-              index < numerator ? "bg-violet-500" : "bg-slate-100",
+              index < shadedParts ? "bg-violet-500" : "bg-slate-100",
             ].join(" ")}
           />
         ))}
@@ -59,19 +77,16 @@ export default function NumberLinePlace({
 
   const fractionOptions = questionData.options ?? ["1/5", "1/2", "4/5"];
   const targetFraction = questionData.targetFraction ?? fractionOptions[0] ?? "1/2";
-  const denominator = useMemo(() => parseFraction(targetFraction).denominator, [targetFraction]);
+  const parsedTarget = useMemo(() => parseFraction(targetFraction), [targetFraction]);
+  const denominator = parsedTarget.denominator || 1;
+  const maxWhole = questionData.maxWhole ?? Math.max(1, Math.ceil(parsedTarget.value));
   const lineStops = useMemo(
     () =>
-      Array.from({ length: denominator + 1 }, (_, index) => ({
-        x: index / denominator,
-        label:
-          index === 0
-            ? "0"
-            : index === denominator
-            ? "1"
-            : `${index}/${denominator}`,
+      Array.from({ length: denominator * maxWhole + 1 }, (_, index) => ({
+        x: index / (denominator * maxWhole),
+        label: formatNumberLineLabel(index, denominator),
       })),
-    [denominator]
+    [denominator, maxWhole]
   );
 
   function choose(value: string) {
@@ -187,7 +202,7 @@ export default function NumberLinePlace({
 
           <div className="mt-6 rounded-2xl border border-violet-100 bg-violet-50 p-5">
             <div className="mb-3 text-sm font-bold text-violet-700">
-              {denominator} equal jumps from 0 to 1
+              {denominator} equal jumps from 0 to {maxWhole}
             </div>
             <div
               ref={lineRef}
@@ -229,7 +244,7 @@ export default function NumberLinePlace({
             </div>
             <div className="mt-2 flex justify-between text-sm font-bold text-slate-700">
               <span>0</span>
-              <span>1</span>
+              <span>{maxWhole}</span>
             </div>
             {animatedFraction && animatedFraction !== "0" ? (
               <div className="mt-3 text-sm font-bold text-violet-700">
