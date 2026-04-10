@@ -1299,6 +1299,9 @@ export default function TypedResponseActivity({
                   Whole
                 </div>
                 <input
+                  type="text"
+                  autoComplete="off"
+                  spellCheck={false}
                   value={fractionWholeInput}
                   onChange={(event) => {
                     const nextValue = event.target.value.replace(/\D/g, "");
@@ -1309,7 +1312,7 @@ export default function TypedResponseActivity({
                   }}
                   inputMode="numeric"
                   placeholder=""
-                  className="h-16 w-20 rounded-xl border border-gray-300 px-3 text-center text-2xl font-black text-gray-900 outline-none focus:border-teal-500"
+                  className="relative z-10 h-16 w-20 appearance-none rounded-xl border border-gray-300 bg-white px-3 text-center text-2xl font-black leading-none text-gray-900 caret-teal-600 outline-none focus:border-teal-500"
                 />
               </div>
               <div className="flex flex-col items-center">
@@ -1319,6 +1322,9 @@ export default function TypedResponseActivity({
                 <div className="mt-2 flex flex-col items-center">
                   <input
                     ref={numeratorRef}
+                    type="text"
+                    autoComplete="off"
+                    spellCheck={false}
                     value={fractionNumeratorInput}
                     onChange={(event) => {
                       const nextValue = event.target.value.replace(/\D/g, "");
@@ -1329,11 +1335,14 @@ export default function TypedResponseActivity({
                     }}
                     inputMode="numeric"
                     placeholder=""
-                    className="h-12 w-20 rounded-t-xl border border-b-0 border-gray-300 px-3 text-center text-xl font-black text-gray-900 outline-none focus:border-teal-500"
+                    className="relative z-10 h-12 w-20 appearance-none rounded-t-xl border border-b-0 border-gray-300 bg-white px-3 text-center text-xl font-black leading-none text-gray-900 caret-teal-600 outline-none focus:border-teal-500"
                   />
                   <div className="h-1 w-20 rounded-full bg-slate-500" />
                   <input
                     ref={denominatorRef}
+                    type="text"
+                    autoComplete="off"
+                    spellCheck={false}
                     value={fractionDenominatorInput}
                     onChange={(event) => {
                       const nextValue = event.target.value.replace(/\D/g, "");
@@ -1341,7 +1350,7 @@ export default function TypedResponseActivity({
                     }}
                     inputMode="numeric"
                     placeholder=""
-                    className="h-12 w-20 rounded-b-xl border border-t-0 border-gray-300 px-3 text-center text-xl font-black text-gray-900 outline-none focus:border-teal-500"
+                    className="relative z-10 h-12 w-20 appearance-none rounded-b-xl border border-t-0 border-gray-300 bg-white px-3 text-center text-xl font-black leading-none text-gray-900 caret-teal-600 outline-none focus:border-teal-500"
                   />
                 </div>
                 <div className="mt-2 text-xs font-medium text-slate-500">

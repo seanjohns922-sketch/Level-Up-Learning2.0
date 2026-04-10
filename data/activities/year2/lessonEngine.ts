@@ -1060,6 +1060,17 @@ function shuffle<T>(items: T[]) {
   return next;
 }
 
+function uniqueStringOptions(answer: string, distractors: string[]) {
+  const options = [answer, ...distractors].filter((value, index, list) => list.indexOf(value) === index);
+
+  for (const fallback of ["1", "1/2", "2/3", "3/4", "5/5", "2 1/2", "1 1/3", "3/6"]) {
+    if (options.length >= 4) break;
+    if (!options.includes(fallback)) options.push(fallback);
+  }
+
+  return shuffle(options.slice(0, 4));
+}
+
 function getRestrictedFactors(
   level: SupportedMathLevel,
   week: number
@@ -4675,12 +4686,12 @@ function generateGenericQuestion(
       ? {
           kind: "multiple_choice",
           prompt: `Fill the missing fraction when you count by 1/${denominator}: ${sequence.join(", ")}`,
-          options: shuffle([
-            missingLabel,
-            `${Math.max(1, sequenceLength)}/${denominator}`,
-            `${Math.min(denominator - 1, sequenceLength + 2)}/${denominator}`,
+          options: uniqueStringOptions(missingLabel, [
+            `${Math.max(1, missingIndex - 1)}/${denominator}`,
+            `${Math.min(denominator - 1, missingIndex + 1)}/${denominator}`,
             targetLabel,
-          ]).filter((value, index, list) => list.indexOf(value) === index),
+            "1",
+          ]),
           answer: missingLabel,
           helper: `Keep adding another 1/${denominator} each time.`,
         }
@@ -4710,12 +4721,12 @@ function generateGenericQuestion(
       ? {
           kind: "multiple_choice",
           prompt: `Which mixed numeral matches ${improper}?`,
-          options: shuffle([
-            mixed,
+          options: uniqueStringOptions(mixed, [
             mixedNumeralLabel(whole, Math.max(1, numerator - 1), denominator),
             mixedNumeralLabel(whole + 1, numerator, denominator),
             mixedNumeralLabel(Math.max(0, whole - 1), numerator, denominator),
-          ]).filter((value, index, list) => list.indexOf(value) === index),
+            `${whole + numerator}/${denominator}`,
+          ]),
           answer: mixed,
           helper: "Work out the whole number first, then the extra fraction part.",
         }
@@ -4742,12 +4753,12 @@ function generateGenericQuestion(
       ? {
           kind: "multiple_choice",
           prompt: `${expression} = ?`,
-          options: shuffle([
-            answer,
+          options: uniqueStringOptions(answer, [
             `${Math.max(1, count - 1)}/${denominator}`,
             `${Math.min(denominator - 1, count + 1)}/${denominator}`,
+            `${count}/${Math.max(denominator + 1, 2)}`,
             "1",
-          ]).filter((value, index, list) => list.indexOf(value) === index),
+          ]),
           answer,
           helper: "Keep the denominator the same and count the unit fractions.",
         }
