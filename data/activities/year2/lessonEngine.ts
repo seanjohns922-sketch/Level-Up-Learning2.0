@@ -4669,18 +4669,19 @@ function generateGenericQuestion(
     const nextLabel =
       sequenceLength + 1 === denominator ? "1" : `${Math.min(sequenceLength + 1, denominator)}/${denominator}`;
 
+    const missingLabel = missingIndex === denominator ? "1" : `${missingIndex}/${denominator}`;
     const askMissing = randInt(0, 1) === 0;
     return asMultipleChoice
       ? {
           kind: "multiple_choice",
-          prompt: `What comes next when you count by 1/${denominator}? ${sequence.join(", ")}`,
+          prompt: `Fill the missing fraction when you count by 1/${denominator}: ${sequence.join(", ")}`,
           options: shuffle([
-            nextLabel,
+            missingLabel,
             `${Math.max(1, sequenceLength)}/${denominator}`,
             `${Math.min(denominator - 1, sequenceLength + 2)}/${denominator}`,
             targetLabel,
           ]).filter((value, index, list) => list.indexOf(value) === index),
-          answer: nextLabel,
+          answer: missingLabel,
           helper: `Keep adding another 1/${denominator} each time.`,
         }
       : {
@@ -4688,7 +4689,7 @@ function generateGenericQuestion(
           prompt: askMissing
             ? `Fill the missing fraction when counting by 1/${denominator}: ${sequence.join(", ")}`
             : `Count by 1/${denominator}. When do you reach ${targetLabel}?`,
-          answer: askMissing ? (missingIndex === denominator ? "1" : `${missingIndex}/${denominator}`) : targetLabel,
+          answer: askMissing ? missingLabel : targetLabel,
           helper: `Fractions with the same denominator count in equal steps.`,
           placeholder: "Type the fraction",
         };
