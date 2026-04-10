@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { TypedResponseQuestion } from "@/data/activities/year2/lessonEngine";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import PlaceValueMABVisual from "@/components/activities/PlaceValueMABVisual";
@@ -44,6 +44,32 @@ function digitCells(value: number, width: number) {
 
 function normalizeNumberInput(value: string) {
   return value.replace(/,/g, "").replace(/\s+/g, "");
+}
+
+function parseMixedNumeral(value: string) {
+  const match = value.trim().match(/^(\d+)\s+(\d+)\/(\d+)$/);
+  if (!match) return null;
+
+  const whole = Number(match[1]);
+  const numerator = Number(match[2]);
+  const denominator = Number(match[3]);
+
+  if (!Number.isFinite(whole) || !Number.isFinite(numerator) || !Number.isFinite(denominator)) {
+    return null;
+  }
+
+  if (denominator === 0) return null;
+
+  return { whole, numerator, denominator };
+}
+
+function mixedNumeralsEquivalent(
+  left: { whole: number; numerator: number; denominator: number },
+  right: { whole: number; numerator: number; denominator: number }
+) {
+  const leftImproper = left.whole * left.denominator + left.numerator;
+  const rightImproper = right.whole * right.denominator + right.numerator;
+  return leftImproper * right.denominator === rightImproper * left.denominator;
 }
 
 function getColumnMultiplicationRows(topValue: number, bottomValue: number) {
@@ -451,12 +477,21 @@ export default function TypedResponseActivity({
   const isColumnMultiplication = writtenMethod?.operation === "×";
   const isGuidedWrittenMethod = isGuidedAddition || isGuidedSubtraction;
   const orderingAnswerParts = !writtenMethod ? extractOrderingNumbers(questionData.answer) : [];
+  const expectedMixedNumeral = !writtenMethod ? parseMixedNumeral(questionData.answer) : null;
   const isOrderingResponse =
     !writtenMethod &&
     orderingAnswerParts.length >= 4 &&
     /Type the numbers from (smallest to largest|largest to smallest)/i.test(questionData.prompt) &&
     orderingAnswerParts.every((part) => /^\d+$/.test(part));
+  const isMixedNumeralResponse =
+    !writtenMethod &&
+    !isOrderingResponse &&
+    questionData.kind === "typed_response" &&
+    expectedMixedNumeral !== null;
   const [typed, setTyped] = useState("");
+  const [mixedWholeInput, setMixedWholeInput] = useState("");
+  const [mixedNumeratorInput, setMixedNumeratorInput] = useState("");
+  const [mixedDenominatorInput, setMixedDenominatorInput] = useState("");
   const [columnChartInputs, setColumnChartInputs] = useState<{
     carry: string;
     onesDigit: string;
@@ -517,9 +552,14 @@ export default function TypedResponseActivity({
     isGuidedWrittenMethod && writtenMethod ? "decide" : "done"
   );
   const [guidedFeedback, setGuidedFeedback] = useState("");
+  const numeratorRef = useRef<HTMLInputElement | null>(null);
+  const denominatorRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     setTyped("");
+    setMixedWholeInput(expectedMixedNumeral ? String(expectedMixedNumeral.whole) : "");
+    setMixedNumeratorInput("");
+    setMixedDenominatorInput(expectedMixedNumeral ? String(expectedMixedNumeral.denominator) : "");
     setColumnChartInputs({
       carry: "",
       onesDigit: "",
@@ -575,7 +615,14 @@ export default function TypedResponseActivity({
     setCurrentColumn(isGuidedWrittenMethod && writtenMethod ? writtenMethod.answerLength - 1 : -1);
     setGuidedPhase(isGuidedWrittenMethod && writtenMethod ? "decide" : "done");
     setGuidedFeedback("");
-  }, [isGuidedWrittenMethod, isOrderingResponse, orderingAnswerParts.length, questionData, writtenMethod]);
+  }, [
+    expectedMixedNumeral,
+    isGuidedWrittenMethod,
+    isOrderingResponse,
+    orderingAnswerParts.length,
+    questionData,
+    writtenMethod,
+  ]);
 
   function normalizedDigitAnswer() {
     const joined = digitInputs.join("").replace(/\s+/g, "");
@@ -832,6 +879,40 @@ export default function TypedResponseActivity({
         onCorrect?.();
       } else {
         setBoxMethodFeedback("Complete each box correctly, then add the totals for the final answer.");
+        onWrong?.();
+      }
+      return;
+    }
+
+    if (isMixedNumeralResponse && expectedMixedNumeral) {
+      const whole = normalizeNumberInput(mixedWholeInput);
+      const numerator = normalizeNumberInput(mixedNumeratorInput);
+      const denominator = normalizeNumberInput(mixedDenominatorInput);
+
+      if (!numerator || !denominator) {
+        onWrong?.();
+        return;
+      }
+
+      const parsed = {
+        whole: whole ? Number(whole) : 0,
+        numerator: Number(numerator),
+        denominator: Number(denominator),
+      };
+
+      if (
+        !Number.isFinite(parsed.whole) ||
+        !Number.isFinite(parsed.numerator) ||
+        !Number.isFinite(parsed.denominator) ||
+        parsed.denominator === 0
+      ) {
+        onWrong?.();
+        return;
+      }
+
+      if (mixedNumeralsEquivalent(parsed, expectedMixedNumeral)) {
+        onCorrect?.();
+      } else {
         onWrong?.();
       }
       return;
@@ -1189,6 +1270,60 @@ export default function TypedResponseActivity({
                     className="min-w-[120px] flex-1 rounded-xl border border-gray-300 px-4 py-3 text-lg font-bold text-gray-900 outline-none focus:border-teal-500"
                   />
                 ))}
+              </div>
+            </div>
+          ) : isMixedNumeralResponse ? (
+            <div className="flex flex-wrap items-end gap-4">
+              <div className="flex flex-col gap-2">
+                <div className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                  Whole
+                </div>
+                <input
+                  value={mixedWholeInput}
+                  onChange={(event) => {
+                    const nextValue = event.target.value.replace(/\D/g, "");
+                    setMixedWholeInput(nextValue);
+                    if (nextValue.length >= 1) {
+                      numeratorRef.current?.focus();
+                    }
+                  }}
+                  inputMode="numeric"
+                  placeholder="0"
+                  className="h-16 w-20 rounded-xl border border-gray-300 px-3 text-center text-2xl font-black text-gray-900 outline-none focus:border-teal-500"
+                />
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                  Fraction
+                </div>
+                <div className="mt-2 flex flex-col items-center">
+                  <input
+                    ref={numeratorRef}
+                    value={mixedNumeratorInput}
+                    onChange={(event) => {
+                      const nextValue = event.target.value.replace(/\D/g, "");
+                      setMixedNumeratorInput(nextValue);
+                      if (nextValue.length >= 1) {
+                        denominatorRef.current?.focus();
+                      }
+                    }}
+                    inputMode="numeric"
+                    placeholder="0"
+                    className="h-12 w-20 rounded-t-xl border border-b-0 border-gray-300 px-3 text-center text-xl font-black text-gray-900 outline-none focus:border-teal-500"
+                  />
+                  <div className="h-1 w-20 rounded-full bg-slate-500" />
+                  <input
+                    ref={denominatorRef}
+                    value={mixedDenominatorInput}
+                    onChange={(event) => {
+                      const nextValue = event.target.value.replace(/\D/g, "");
+                      setMixedDenominatorInput(nextValue);
+                    }}
+                    inputMode="numeric"
+                    placeholder="1"
+                    className="h-12 w-20 rounded-b-xl border border-t-0 border-gray-300 px-3 text-center text-xl font-black text-gray-900 outline-none focus:border-teal-500"
+                  />
+                </div>
               </div>
             </div>
           ) : questionData.visual?.type === "box_method" ? null : (
