@@ -47,21 +47,36 @@ function normalizeNumberInput(value: string) {
   return value.replace(/,/g, "").replace(/\s+/g, "");
 }
 
-function parseMixedNumeral(value: string) {
-  const match = value.trim().match(/^(\d+)\s+(\d+)\/(\d+)$/);
-  if (!match) return null;
+function parseStructuredFraction(value: string) {
+  const trimmed = value.trim();
+  const mixedMatch = trimmed.match(/^(\d+)\s+(\d+)\/(\d+)$/);
+  if (mixedMatch) {
+    const whole = Number(mixedMatch[1]);
+    const numerator = Number(mixedMatch[2]);
+    const denominator = Number(mixedMatch[3]);
 
-  const whole = Number(match[1]);
-  const numerator = Number(match[2]);
-  const denominator = Number(match[3]);
+    if (!Number.isFinite(whole) || !Number.isFinite(numerator) || !Number.isFinite(denominator)) {
+      return null;
+    }
 
-  if (!Number.isFinite(whole) || !Number.isFinite(numerator) || !Number.isFinite(denominator)) {
-    return null;
+    if (denominator === 0) return null;
+
+    return { whole, numerator, denominator };
   }
 
-  if (denominator === 0) return null;
+  const simpleMatch = trimmed.match(/^(\d+)\/(\d+)$/);
+  if (simpleMatch) {
+    const numerator = Number(simpleMatch[1]);
+    const denominator = Number(simpleMatch[2]);
 
-  return { whole, numerator, denominator };
+    if (!Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator === 0) {
+      return null;
+    }
+
+    return { whole: 0, numerator, denominator };
+  }
+
+  return null;
 }
 
 function mixedNumeralsEquivalent(
@@ -478,21 +493,21 @@ export default function TypedResponseActivity({
   const isColumnMultiplication = writtenMethod?.operation === "×";
   const isGuidedWrittenMethod = isGuidedAddition || isGuidedSubtraction;
   const orderingAnswerParts = !writtenMethod ? extractOrderingNumbers(questionData.answer) : [];
-  const expectedMixedNumeral = !writtenMethod ? parseMixedNumeral(questionData.answer) : null;
+  const expectedStructuredFraction = !writtenMethod ? parseStructuredFraction(questionData.answer) : null;
   const isOrderingResponse =
     !writtenMethod &&
     orderingAnswerParts.length >= 4 &&
     /Type the numbers from (smallest to largest|largest to smallest)/i.test(questionData.prompt) &&
     orderingAnswerParts.every((part) => /^\d+$/.test(part));
-  const isMixedNumeralResponse =
+  const isStructuredFractionResponse =
     !writtenMethod &&
     !isOrderingResponse &&
     questionData.kind === "typed_response" &&
-    expectedMixedNumeral !== null;
+    expectedStructuredFraction !== null;
   const [typed, setTyped] = useState("");
-  const [mixedWholeInput, setMixedWholeInput] = useState("");
-  const [mixedNumeratorInput, setMixedNumeratorInput] = useState("");
-  const [mixedDenominatorInput, setMixedDenominatorInput] = useState("");
+  const [fractionWholeInput, setFractionWholeInput] = useState("");
+  const [fractionNumeratorInput, setFractionNumeratorInput] = useState("");
+  const [fractionDenominatorInput, setFractionDenominatorInput] = useState("");
   const [columnChartInputs, setColumnChartInputs] = useState<{
     carry: string;
     onesDigit: string;
@@ -558,9 +573,9 @@ export default function TypedResponseActivity({
 
   useEffect(() => {
     setTyped("");
-    setMixedWholeInput(expectedMixedNumeral ? String(expectedMixedNumeral.whole) : "");
-    setMixedNumeratorInput("");
-    setMixedDenominatorInput(expectedMixedNumeral ? String(expectedMixedNumeral.denominator) : "");
+    setFractionWholeInput("");
+    setFractionNumeratorInput("");
+    setFractionDenominatorInput("");
     setColumnChartInputs({
       carry: "",
       onesDigit: "",
@@ -617,7 +632,7 @@ export default function TypedResponseActivity({
     setGuidedPhase(isGuidedWrittenMethod && writtenMethod ? "decide" : "done");
     setGuidedFeedback("");
   }, [
-    expectedMixedNumeral,
+    expectedStructuredFraction,
     isGuidedWrittenMethod,
     isOrderingResponse,
     orderingAnswerParts.length,
@@ -885,10 +900,10 @@ export default function TypedResponseActivity({
       return;
     }
 
-    if (isMixedNumeralResponse && expectedMixedNumeral) {
-      const whole = normalizeNumberInput(mixedWholeInput);
-      const numerator = normalizeNumberInput(mixedNumeratorInput);
-      const denominator = normalizeNumberInput(mixedDenominatorInput);
+    if (isStructuredFractionResponse && expectedStructuredFraction) {
+      const whole = normalizeNumberInput(fractionWholeInput);
+      const numerator = normalizeNumberInput(fractionNumeratorInput);
+      const denominator = normalizeNumberInput(fractionDenominatorInput);
 
       if (!numerator || !denominator) {
         onWrong?.();
@@ -911,7 +926,7 @@ export default function TypedResponseActivity({
         return;
       }
 
-      if (mixedNumeralsEquivalent(parsed, expectedMixedNumeral)) {
+      if (mixedNumeralsEquivalent(parsed, expectedStructuredFraction)) {
         onCorrect?.();
       } else {
         onWrong?.();
@@ -1277,23 +1292,23 @@ export default function TypedResponseActivity({
                 ))}
               </div>
             </div>
-          ) : isMixedNumeralResponse ? (
+          ) : isStructuredFractionResponse ? (
             <div className="flex flex-wrap items-end gap-4">
               <div className="flex flex-col gap-2">
                 <div className="text-xs font-bold uppercase tracking-wide text-slate-500">
                   Whole
                 </div>
                 <input
-                  value={mixedWholeInput}
+                  value={fractionWholeInput}
                   onChange={(event) => {
                     const nextValue = event.target.value.replace(/\D/g, "");
-                    setMixedWholeInput(nextValue);
+                    setFractionWholeInput(nextValue);
                     if (nextValue.length >= 1) {
                       numeratorRef.current?.focus();
                     }
                   }}
                   inputMode="numeric"
-                  placeholder="0"
+                  placeholder=""
                   className="h-16 w-20 rounded-xl border border-gray-300 px-3 text-center text-2xl font-black text-gray-900 outline-none focus:border-teal-500"
                 />
               </div>
@@ -1304,30 +1319,33 @@ export default function TypedResponseActivity({
                 <div className="mt-2 flex flex-col items-center">
                   <input
                     ref={numeratorRef}
-                    value={mixedNumeratorInput}
+                    value={fractionNumeratorInput}
                     onChange={(event) => {
                       const nextValue = event.target.value.replace(/\D/g, "");
-                      setMixedNumeratorInput(nextValue);
+                      setFractionNumeratorInput(nextValue);
                       if (nextValue.length >= 1) {
                         denominatorRef.current?.focus();
                       }
                     }}
                     inputMode="numeric"
-                    placeholder="0"
+                    placeholder=""
                     className="h-12 w-20 rounded-t-xl border border-b-0 border-gray-300 px-3 text-center text-xl font-black text-gray-900 outline-none focus:border-teal-500"
                   />
                   <div className="h-1 w-20 rounded-full bg-slate-500" />
                   <input
                     ref={denominatorRef}
-                    value={mixedDenominatorInput}
+                    value={fractionDenominatorInput}
                     onChange={(event) => {
                       const nextValue = event.target.value.replace(/\D/g, "");
-                      setMixedDenominatorInput(nextValue);
+                      setFractionDenominatorInput(nextValue);
                     }}
                     inputMode="numeric"
-                    placeholder="1"
+                    placeholder=""
                     className="h-12 w-20 rounded-b-xl border border-t-0 border-gray-300 px-3 text-center text-xl font-black text-gray-900 outline-none focus:border-teal-500"
                   />
+                </div>
+                <div className="mt-2 text-xs font-medium text-slate-500">
+                  Leave whole blank for fractions less than one.
                 </div>
               </div>
             </div>
