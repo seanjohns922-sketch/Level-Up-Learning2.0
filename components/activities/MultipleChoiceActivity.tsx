@@ -6,6 +6,7 @@ import ReadAloudBtn from "@/components/ReadAloudBtn";
 import PlaceValueMABVisual from "@/components/activities/PlaceValueMABVisual";
 import DecimalModelVisual from "@/components/activities/DecimalModelVisual";
 import MoneyContextVisual from "@/components/activities/MoneyContextVisual";
+import { MathFormattedText } from "@/components/FractionText";
 
 function ArrayVisual({ rows, cols }: { rows: number; cols: number }) {
   return (
@@ -61,12 +62,14 @@ export default function MultipleChoiceActivity({
       </div>
       <div className="flex items-center gap-2 mt-2">
         <h2 className="text-2xl font-black text-gray-900">
-          {questionData.prompt}
+          <MathFormattedText text={questionData.prompt} />
         </h2>
         <ReadAloudBtn text={questionData.prompt} />
       </div>
       {questionData.helper ? (
-        <p className="mt-2 text-sm text-gray-600">{questionData.helper}</p>
+        <p className="mt-2 text-sm text-gray-600">
+          <MathFormattedText text={questionData.helper} />
+        </p>
       ) : null}
       {questionData.visual?.type === "mab" ? (
         <PlaceValueMABVisual questionData={questionData.visual} title="MAB model" />
@@ -91,7 +94,7 @@ export default function MultipleChoiceActivity({
                 : "border-gray-200 bg-white text-gray-900 hover:bg-gray-50",
             ].join(" ")}
           >
-            {option}
+            <MathFormattedText text={option} compactFractions />
           </button>
         ))}
       </div>

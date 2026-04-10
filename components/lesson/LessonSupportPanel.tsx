@@ -1,6 +1,7 @@
 "use client";
 
 import { Lightbulb } from "lucide-react";
+import { MathFormattedText } from "@/components/FractionText";
 
 export function LessonSupportPanel({
   hint,
@@ -19,7 +20,7 @@ export function LessonSupportPanel({
           </span>
         </div>
         <p className="text-sm font-medium text-amber-950 leading-relaxed whitespace-pre-line md:text-[15px]">
-          {hint}
+          <MathFormattedText text={hint} />
         </p>
       </div>
     ) : null

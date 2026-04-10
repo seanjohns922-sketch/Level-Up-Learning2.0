@@ -6,6 +6,7 @@ import ReadAloudBtn from "@/components/ReadAloudBtn";
 import PlaceValueMABVisual from "@/components/activities/PlaceValueMABVisual";
 import DecimalModelVisual from "@/components/activities/DecimalModelVisual";
 import MoneyContextVisual from "@/components/activities/MoneyContextVisual";
+import { MathFormattedText } from "@/components/FractionText";
 
 function normalize(value: string) {
   return value.trim().toLowerCase().replace(/,/g, "").replace(/\s+/g, " ");
@@ -956,7 +957,9 @@ export default function TypedResponseActivity({
         {activityTitle}
       </div>
       <div className="flex items-center gap-2 mt-2">
-        <h2 className="text-2xl font-black text-gray-900">{questionData.prompt}</h2>
+        <h2 className="text-2xl font-black text-gray-900">
+          <MathFormattedText text={questionData.prompt} />
+        </h2>
         <ReadAloudBtn text={questionData.prompt} />
       </div>
       {questionData.visual?.type === "mab" ? (
@@ -1031,7 +1034,9 @@ export default function TypedResponseActivity({
         </div>
       ) : null}
       {questionData.helper ? (
-        <p className="mt-2 text-sm text-gray-600">{questionData.helper}</p>
+        <p className="mt-2 text-sm text-gray-600">
+          <MathFormattedText text={questionData.helper} />
+        </p>
       ) : null}
 
       {writtenMethod && !isColumnMultiplication ? (

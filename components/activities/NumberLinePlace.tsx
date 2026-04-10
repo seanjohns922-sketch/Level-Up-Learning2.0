@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { NumberLinePlaceQuestion } from "@/data/activities/year2/lessonEngine";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
+import { FractionText, MathFormattedText } from "@/components/FractionText";
 
 function parseFraction(label: string) {
   const trimmed = label.trim();
@@ -56,7 +57,11 @@ function FractionBar({
           />
         ))}
       </div>
-      {showLabel ? <div className="mt-2 text-center text-lg font-black text-violet-900">{fraction}</div> : null}
+      {showLabel ? (
+        <div className="mt-2 text-center text-lg font-black text-violet-900">
+          <FractionText value={fraction} />
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -138,7 +143,9 @@ export default function NumberLinePlace({
   return (
     <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
       <div className="flex items-center gap-2">
-        <h2 className="text-2xl font-black text-gray-900">{questionData.prompt}</h2>
+        <h2 className="text-2xl font-black text-gray-900">
+          <MathFormattedText text={questionData.prompt} />
+        </h2>
         <ReadAloudBtn text={questionData.prompt} />
       </div>
 
@@ -152,7 +159,9 @@ export default function NumberLinePlace({
                 onClick={() => choose(value)}
                 className="rounded-2xl border border-violet-300 bg-white p-4 text-left shadow-sm transition hover:bg-violet-50"
               >
-                <div className="text-lg font-black text-violet-900">{value}</div>
+                <div className="text-lg font-black text-violet-900">
+                  <FractionText value={value} />
+                </div>
                 <div className="mt-3">
                   <FractionBar fraction={value} showLabel={false} large />
                 </div>
@@ -160,7 +169,17 @@ export default function NumberLinePlace({
             ))}
           </div>
           <div className="mt-4 rounded-2xl border border-dashed border-violet-300 bg-white p-4 text-lg font-black text-violet-900">
-            {order.length > 0 ? order.join(" , ") : "Tap fractions in order here"}
+            {order.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {order.map((value, index) => (
+                  <span key={`${value}-${index}`} className="rounded-lg bg-violet-100 px-2 py-1">
+                    <FractionText value={value} compact />
+                  </span>
+                ))}
+              </div>
+            ) : (
+              "Tap fractions in order here"
+            )}
           </div>
           <div className="mt-4 flex flex-wrap gap-3">
             <button
@@ -248,7 +267,7 @@ export default function NumberLinePlace({
             </div>
             {animatedFraction && animatedFraction !== "0" ? (
               <div className="mt-3 text-sm font-bold text-violet-700">
-                Jumped to {animatedFraction}
+                Jumped to <FractionText value={animatedFraction} compact />
               </div>
             ) : null}
           </div>
