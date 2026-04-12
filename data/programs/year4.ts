@@ -695,7 +695,7 @@ const year4Rows: ProgramRow[] = [
         mode: "same_denominator_combine",
         denominators: [2, 3, 4, 5, 6, 8],
       }),
-      makeActivity("multiple_choice", 1, {
+      makeActivity("typed_response", 1, {
         mode: "same_denominator_combine",
         denominators: [2, 3, 4, 5, 6, 8],
       }),

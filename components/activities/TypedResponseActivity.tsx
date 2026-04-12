@@ -504,6 +504,7 @@ export default function TypedResponseActivity({
     !isOrderingResponse &&
     questionData.kind === "typed_response" &&
     expectedStructuredFraction !== null;
+  const usesFixedDenominator = isStructuredFractionResponse && typeof questionData.fixedDenominator === "number";
   const [typed, setTyped] = useState("");
   const [fractionWholeInput, setFractionWholeInput] = useState("");
   const [fractionNumeratorInput, setFractionNumeratorInput] = useState("");
@@ -575,7 +576,7 @@ export default function TypedResponseActivity({
     setTyped("");
     setFractionWholeInput("");
     setFractionNumeratorInput("");
-    setFractionDenominatorInput("");
+    setFractionDenominatorInput(questionData.fixedDenominator ? String(questionData.fixedDenominator) : "");
     setColumnChartInputs({
       carry: "",
       onesDigit: "",
@@ -903,7 +904,11 @@ export default function TypedResponseActivity({
     if (isStructuredFractionResponse && expectedStructuredFraction) {
       const whole = normalizeNumberInput(fractionWholeInput);
       const numerator = normalizeNumberInput(fractionNumeratorInput);
-      const denominator = normalizeNumberInput(fractionDenominatorInput);
+      const denominator = normalizeNumberInput(
+        usesFixedDenominator && questionData.fixedDenominator
+          ? String(questionData.fixedDenominator)
+          : fractionDenominatorInput
+      );
 
       if (!numerator || !denominator) {
         onWrong?.();
@@ -1317,7 +1322,7 @@ export default function TypedResponseActivity({
               </div>
               <div className="flex flex-col items-center">
                 <div className="text-xs font-bold uppercase tracking-wide text-slate-500">
-                  Fraction
+                  {usesFixedDenominator ? "Answer fraction" : "Fraction"}
                 </div>
                 <div className="mt-2 flex flex-col items-center">
                   <input
@@ -1338,23 +1343,31 @@ export default function TypedResponseActivity({
                     className="relative z-10 h-12 w-20 appearance-none rounded-t-xl border border-b-0 border-gray-300 bg-white px-3 text-center text-xl font-black leading-none text-gray-900 caret-teal-600 outline-none focus:border-teal-500"
                   />
                   <div className="h-1 w-20 rounded-full bg-slate-500" />
-                  <input
-                    ref={denominatorRef}
-                    type="text"
-                    autoComplete="off"
-                    spellCheck={false}
-                    value={fractionDenominatorInput}
-                    onChange={(event) => {
-                      const nextValue = event.target.value.replace(/\D/g, "");
-                      setFractionDenominatorInput(nextValue);
-                    }}
-                    inputMode="numeric"
-                    placeholder=""
-                    className="relative z-10 h-12 w-20 appearance-none rounded-b-xl border border-t-0 border-gray-300 bg-white px-3 text-center text-xl font-black leading-none text-gray-900 caret-teal-600 outline-none focus:border-teal-500"
-                  />
+                  {usesFixedDenominator && questionData.fixedDenominator ? (
+                    <div className="relative z-10 flex h-12 w-20 items-center justify-center rounded-b-xl border border-t-0 border-gray-300 bg-slate-100 px-3 text-center text-xl font-black leading-none text-slate-700">
+                      {questionData.fixedDenominator}
+                    </div>
+                  ) : (
+                    <input
+                      ref={denominatorRef}
+                      type="text"
+                      autoComplete="off"
+                      spellCheck={false}
+                      value={fractionDenominatorInput}
+                      onChange={(event) => {
+                        const nextValue = event.target.value.replace(/\D/g, "");
+                        setFractionDenominatorInput(nextValue);
+                      }}
+                      inputMode="numeric"
+                      placeholder=""
+                      className="relative z-10 h-12 w-20 appearance-none rounded-b-xl border border-t-0 border-gray-300 bg-white px-3 text-center text-xl font-black leading-none text-gray-900 caret-teal-600 outline-none focus:border-teal-500"
+                    />
+                  )}
                 </div>
                 <div className="mt-2 text-xs font-medium text-slate-500">
-                  Leave whole blank for fractions less than one.
+                  {usesFixedDenominator
+                    ? "The denominator stays the same. Type the numerator."
+                    : "Leave whole blank for fractions less than one."}
                 </div>
               </div>
             </div>

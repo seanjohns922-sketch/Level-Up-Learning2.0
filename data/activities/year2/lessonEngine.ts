@@ -580,6 +580,7 @@ export type TypedResponseQuestion = {
   answer: string;
   helper?: string;
   placeholder?: string;
+  fixedDenominator?: number;
   writtenMethod?: WrittenMethodLayout;
   visual?:
     | MABVisualData
@@ -4768,6 +4769,7 @@ function generateGenericQuestion(
           answer,
           helper: "Count how many equal parts you have altogether.",
           placeholder: "Type the total fraction",
+          fixedDenominator: denominator,
         };
   }
 
