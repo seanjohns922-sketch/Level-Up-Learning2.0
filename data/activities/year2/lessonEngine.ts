@@ -496,6 +496,121 @@ function mixedNumeralLabel(whole: number, numerator: number, denominator: number
   return `${whole} ${numerator}/${denominator}`;
 }
 
+function buildYear4Week11DivisionInverseQuestion(asMultipleChoice: boolean) {
+  const templates = [
+    { prompt: "? × 4 = 24", answer: 6, distractors: [4, 8, 24] },
+    { prompt: "30 ÷ ? = 5", answer: 6, distractors: [5, 10, 30] },
+    { prompt: "6 × ? = 42", answer: 7, distractors: [6, 8, 42] },
+    { prompt: "? groups of 8 make 40", answer: 5, distractors: [4, 8, 40] },
+    { prompt: "24 ÷ 4 = ?", answer: 6, distractors: [4, 8, 24] },
+    { prompt: "18 ÷ 3 = ?", answer: 6, distractors: [3, 9, 18] },
+    { prompt: "32 ÷ 8 = ?", answer: 4, distractors: [8, 6, 32] },
+    { prompt: "35 ÷ 5 = ?", answer: 7, distractors: [5, 6, 35] },
+    { prompt: "42 ÷ 6 = ?", answer: 7, distractors: [6, 8, 42] },
+    { prompt: "56 ÷ 7 = ?", answer: 8, distractors: [7, 6, 56] },
+  ];
+  const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  const answer = String(chosen.answer);
+  return asMultipleChoice
+    ? {
+        kind: "multiple_choice" as const,
+        prompt: chosen.prompt,
+        options: shuffle([answer, ...chosen.distractors.map(String)]),
+        answer,
+      }
+    : {
+        kind: "typed_response" as const,
+        prompt: chosen.prompt,
+        answer,
+        helper: "Use the related multiplication and division fact to find the missing number.",
+        placeholder: "Type the answer",
+      };
+}
+
+function buildYear4Week11FractionOfQuantityQuestion(asMultipleChoice: boolean) {
+  const templates = [
+    { prompt: "What is 1/2 of 20?", answer: 10, denominator: 2, total: 20 },
+    { prompt: "What is 1/4 of 16?", answer: 4, denominator: 4, total: 16 },
+    { prompt: "What is 1/3 of 12?", answer: 4, denominator: 3, total: 12 },
+    { prompt: "What is 1/5 of 25?", answer: 5, denominator: 5, total: 25 },
+    { prompt: "What is 1/6 of 24?", answer: 4, denominator: 6, total: 24 },
+    { prompt: "Sam has 18 stickers. He gives away 1/2. How many is that?", answer: 9, denominator: 2, total: 18 },
+    { prompt: "There are 28 pencils. What is 1/4 of 28?", answer: 7, denominator: 4, total: 28 },
+    { prompt: "There are 24 cupcakes. What is 1/6 of 24?", answer: 4, denominator: 6, total: 24 },
+    { prompt: "A box holds 20 sports balls. What is 1/5 of 20?", answer: 4, denominator: 5, total: 20 },
+    { prompt: "There are 20 books on a shelf. What is 1/4 of 20?", answer: 5, denominator: 4, total: 20 },
+  ];
+  const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  const answer = String(chosen.answer);
+  const distractors = [
+    Math.max(1, chosen.answer - 1),
+    chosen.answer + 1,
+    Math.max(1, chosen.total / chosen.denominator),
+    chosen.denominator,
+  ];
+  return asMultipleChoice
+    ? {
+        kind: "multiple_choice" as const,
+        prompt: chosen.prompt,
+        options: shuffle(
+          Array.from(new Set([answer, ...distractors.map(String)])).slice(0, 4)
+        ),
+        answer,
+        helper: "Split the quantity into equal groups, then count one part.",
+      }
+    : {
+        kind: "typed_response" as const,
+        prompt: chosen.prompt,
+        answer,
+        helper: "Find one equal part of the total first.",
+        placeholder: "Type the number",
+      };
+}
+
+function buildYear4Week11DivisionFractionMultiStepQuestion() {
+  const templates = [
+    {
+      prompt:
+        "24 apples are shared equally between 4 children. Each child eats 1/2 of their apples. How many apples are left altogether?",
+      answer: 12,
+    },
+    {
+      prompt: "20 muffins are packed equally into 5 boxes. What is 1/2 of the muffins in one box?",
+      answer: 2,
+    },
+    {
+      prompt:
+        "18 stickers are shared equally between 3 students. One student gives away 1/3 of their stickers. How many do they have left?",
+      answer: 4,
+    },
+    {
+      prompt: "16 pencils are split equally into 4 groups. What is 1/2 of one group?",
+      answer: 2,
+    },
+    {
+      prompt:
+        "24 lollies are shared equally between 6 children. Each child eats 1/2 of their share. How many lollies are eaten altogether?",
+      answer: 12,
+    },
+    {
+      prompt:
+        "30 cards are shared equally between 5 teams. Each team loses 1/3 of its cards. How many cards remain altogether?",
+      answer: 20,
+    },
+  ];
+  const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  return {
+    kind: "mixed_word_problem" as const,
+    prompt: chosen.prompt,
+    answer: chosen.answer,
+    options: uniqueNumberOptions(chosen.answer, 8).map(Number),
+    operationLabel: "Multi-step",
+    helper: "Work through the steps in order: divide first, then find the fraction.",
+    mode: "two_step_problem" as const,
+    showStrategyClue: false,
+  };
+}
+
 function year3EquivalentFractionPairs() {
   return [
     {
@@ -883,7 +998,7 @@ const BASE_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
     maxByContract: { maxTotal: "divisionTotalMax" },
   },
   mixed_word_problem: {
-    allowedModes: ["choose_operation", "two_step_add_sub", "mult_div_problems"],
+    allowedModes: ["choose_operation", "two_step_add_sub", "mult_div_problems", "division_fraction_multistep"],
     maxByContract: { max: "wordProblemMax" },
   },
   review_quiz: {},
@@ -3793,6 +3908,9 @@ function generateInteractiveQuestion(
         return buildYear4Week8TwoStepQuestion(config);
       }
     }
+    if (typeof config.mode === "string" && config.mode === "division_fraction_multistep") {
+      return buildYear4Week11DivisionFractionMultiStepQuestion();
+    }
     if (isYear3Week6TwoStepOnly(level, lesson)) {
       return buildYear3Week6TwoStepWordProblem(lesson);
     }
@@ -3994,6 +4112,8 @@ function generateInteractiveQuestion(
 
   if (activityType === "fact_family") {
     const restrictedFactors = getRestrictedFactors(level, lesson.week);
+    const configuredFamilyType =
+      config.familyType === "mult_div" || config.familyType === "add_sub" ? config.familyType : undefined;
     const configuredMin = typeof config.min === "number" ? Math.max(0, config.min) : 0;
     const configuredMax =
       typeof config.max === "number"
@@ -4050,6 +4170,78 @@ function generateInteractiveQuestion(
           },
         ];
         const chosen = prompts[randInt(0, prompts.length - 1)];
+        const wrongSentences = allCorrect
+          .filter((value) => value !== chosen.answer)
+          .concat([`${total} + ${a} = ${b}`, `${a} + ${b} = ${total}`]);
+        const options = shuffle([chosen.answer, ...shuffle(wrongSentences).slice(0, 3)]);
+        return {
+          kind: "fact_family",
+          prompt: chosen.story,
+          family,
+          options,
+          answers: [chosen.answer],
+          mode,
+          familyType: "mult_div",
+          visual: { type: "array", rows: a, columns: b },
+        };
+      }
+
+      const distractors = [
+        `${total} + ${a} = ${b}`,
+        `${a} + ${b} = ${total}`,
+        `${total} ÷ ${a} = ${a}`,
+        `${b} × ${b} = ${total}`,
+      ].filter((value) => !correctSet.includes(value));
+      const options = shuffle([...correctSet, ...distractors.slice(0, 2)]);
+      return {
+        kind: "fact_family",
+        prompt: "Which multiplication and division sentences match this array?",
+        family,
+        options,
+        answers: correctSet,
+        mode,
+        familyType: "mult_div",
+        visual: { type: "array", rows: a, columns: b },
+      };
+    }
+
+    if (configuredFamilyType === "mult_div") {
+      const factors =
+        Array.isArray(config.allowedGroupSizes) && config.allowedGroupSizes.every((value) => typeof value === "number")
+          ? (config.allowedGroupSizes as number[])
+          : [3, 4, 5, 6, 7, 8];
+      const a = factors[randInt(0, factors.length - 1)] ?? 3;
+      const distinctFactors = factors.filter((factor) => factor !== a);
+      const b =
+        (distinctFactors.length > 0
+          ? distinctFactors[randInt(0, distinctFactors.length - 1)]
+          : factors[randInt(0, factors.length - 1)]) ?? 4;
+      const total = a * b;
+      const family: [number, number, number] = [a, b, total];
+      const allCorrect = [
+        `${a} × ${b} = ${total}`,
+        `${b} × ${a} = ${total}`,
+        `${total} ÷ ${a} = ${b}`,
+        `${total} ÷ ${b} = ${a}`,
+      ];
+      const correctSet = Array.from(new Set(allCorrect));
+
+      if (mode === "word_problems") {
+        const prompts = [
+          {
+            story: `${total} objects are shared equally into ${a} groups. Which sentence matches?`,
+            answer: `${total} ÷ ${a} = ${b}`,
+          },
+          {
+            story: `${total} objects are put into groups of ${b}. Which sentence matches?`,
+            answer: `${total} ÷ ${b} = ${a}`,
+          },
+          {
+            story: `There are ${a} rows with ${b} counters in each row. Which multiplication sentence matches?`,
+            answer: `${a} × ${b} = ${total}`,
+          },
+        ];
+        const chosen = prompts[randInt(0, prompts.length - 1)] ?? prompts[0]!;
         const wrongSentences = allCorrect
           .filter((value) => value !== chosen.answer)
           .concat([`${total} + ${a} = ${b}`, `${a} + ${b} = ${total}`]);
@@ -4496,6 +4688,14 @@ function generateGenericQuestion(
       answer: numeral,
       placeholder: "Type the numeral",
     };
+  }
+
+  if (explicitMode === "division_inverse") {
+    return buildYear4Week11DivisionInverseQuestion(asMultipleChoice);
+  }
+
+  if (explicitMode === "fraction_of_quantity") {
+    return buildYear4Week11FractionOfQuantityQuestion(asMultipleChoice);
   }
 
   if (explicitMode === "tenths_place_value") {

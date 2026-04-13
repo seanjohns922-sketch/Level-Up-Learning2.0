@@ -715,11 +715,24 @@ const year4Rows: ProgramRow[] = [
     curriculum: ["AC9M4N03", "AC9M4N06"],
     activities: [
       makeActivity("division_groups", 2, {
+        mode: "sharing",
         maxGroups: 12,
         maxItemsPerGroup: 12,
+        allowedGroupSizes: [3, 4, 5, 6, 7, 8],
+      }),
+      makeActivity("division_groups", 1, {
+        mode: "grouping",
+        maxGroups: 12,
+        maxItemsPerGroup: 12,
+        allowedGroupSizes: [3, 4, 5, 6, 7, 8],
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "division_inverse",
+        factors: [3, 4, 5, 6, 7, 8],
       }),
       makeActivity("typed_response", 1, {
-        sourceActivityType: "division_groups",
+        mode: "division_inverse",
+        factors: [3, 4, 5, 6, 7, 8],
       }),
     ],
   },
@@ -731,12 +744,14 @@ const year4Rows: ProgramRow[] = [
     activity: "Find fractions of quantities using grouping, visual models, and number connections in real contexts",
     curriculum: ["AC9M4N05"],
     activities: [
-      makeActivity("equivalent_fraction_match", 2, {
-        mode: "match_equivalent",
+      makeActivity("typed_response", 2, {
+        mode: "fraction_of_quantity",
       }),
-      makeActivity("number_line_place", 1, {
-        mode: "pick_point",
-        denominators: [2, 3, 4, 5, 6, 8],
+      makeActivity("multiple_choice", 1, {
+        mode: "fraction_of_quantity",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "fraction_of_quantity",
       }),
     ],
   },
@@ -750,12 +765,15 @@ const year4Rows: ProgramRow[] = [
     curriculum: ["AC9M4N03", "AC9M4N05", "AC9M4N06"],
     activities: [
       makeActivity("mixed_word_problem", 2, {
-        mode: "core_two_step_problem",
-        operations: ["addition", "subtraction", "multiplication", "division"],
+        mode: "division_fraction_multistep",
       }),
       makeActivity("typed_response", 1, {
-        mode: "same_denominator_combine",
-        denominators: [2, 3, 4, 5, 6, 8],
+        mode: "division_fraction_multistep",
+        sourceActivityType: "mixed_word_problem",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "division_fraction_multistep",
+        sourceActivityType: "mixed_word_problem",
       }),
     ],
   },
