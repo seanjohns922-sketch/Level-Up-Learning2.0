@@ -6,7 +6,7 @@ export const REALM_PORTAL_VIDEOS: Record<string, string | undefined> = {
   "number-nexus": "/videos/realms/number-nexus.mp4",
   measurelands: "/videos/realms/measurelands.mp4",
   "pattern-peaks": "/videos/realms/pattern-peaks.mp4",
-  "starpath-realm": "/videos/realms/Starpath.mp4",
+  "starpath-realm": "/videos/realms/starpath-realm.mp4",
   statistica: "/videos/realms/statistica.mp4",
   "chance-hollow": "/videos/realms/chance-hollow.mp4",
   "reading-ridge": "/videos/realms/reading-ridge.mp4",
