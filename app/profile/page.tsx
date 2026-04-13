@@ -345,11 +345,11 @@ export default function ProfilePage() {
                     }
                   `}
                 >
-                  {isActive ? (
+{isActive ? (
                     <div
-                      className="h-8 w-8 rounded-lg flex-shrink-0 bg-cover bg-center shadow-sm ring-1 ring-white/20"
+                      className="h-10 w-10 rounded-lg flex-shrink-0 bg-cover bg-center shadow-sm ring-1 ring-black/10"
                       style={{
-                        backgroundImage: `linear-gradient(rgba(0,0,0,0.2),rgba(0,0,0,0.25)), url('/images/number-nexus-bg.jpg')`,
+                        backgroundImage: `url('/images/number-nexus-tile.jpg')`,
                       }}
                     />
                   ) : (
