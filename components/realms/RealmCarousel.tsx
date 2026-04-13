@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { DEMO_MODE } from "@/data/config";
+import RealmPortalPreview from "@/components/realms/RealmPortalPreview";
 
 const REALMS = [
-  { id: "number-nexus", name: "Number Nexus", symbol: "⚡", description: "Master numbers, operations & place value", color: "rgb(52,211,153)", colorDim: "rgba(52,211,153,0.25)", active: true, video: "/videos/number-nexus-preview.mp4" },
+  { id: "number-nexus", name: "Number Nexus", symbol: "⚡", description: "Master numbers, operations & place value", color: "rgb(52,211,153)", colorDim: "rgba(52,211,153,0.25)", active: true },
   { id: "pattern-peaks", name: "Pattern Peaks", symbol: "△", description: "Algebra and pattern recognition", color: "rgb(251,191,36)", colorDim: "rgba(251,191,36,0.2)", active: false },
   { id: "measurelands", name: "Measurelands", symbol: "◈", description: "Length, mass, capacity & more", color: "rgb(96,165,250)", colorDim: "rgba(96,165,250,0.2)", active: false },
   { id: "statistica", name: "Statistica", symbol: "▣", description: "Data, graphs & interpretation", color: "rgb(167,139,250)", colorDim: "rgba(167,139,250,0.2)", active: false },
@@ -25,7 +26,6 @@ export default function RealmCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [entered, setEntered] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
-  const portalVideoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setEntered(true), 80);
@@ -72,18 +72,6 @@ export default function RealmCarousel() {
   const prevIdx = (currentIndex - 1 + REALMS.length) % REALMS.length;
   const nextIdx = (currentIndex + 1) % REALMS.length;
   const bgShift = -2 + (currentIndex / REALMS.length) * 4;
-
-  useEffect(() => {
-    if (!isActive || !current.video || !portalVideoRef.current) return;
-    const video = portalVideoRef.current;
-    video.defaultMuted = true;
-    video.muted = true;
-    video.load();
-    const playPromise = video.play();
-    if (playPromise && typeof playPromise.catch === "function") {
-      playPromise.catch(() => {});
-    }
-  }, [current.id, current.video, isActive]);
 
   function enterRealm() {
     if (!isActive) return;
@@ -224,44 +212,13 @@ export default function RealmCarousel() {
                   }}
                 />
 
-                {/* Portal content — video or symbol */}
-                {isActive && current.video ? (
-                  <div className="absolute inset-[12px] overflow-hidden rounded-t-full rounded-b-[28px] border border-white/10 shadow-[inset_0_0_24px_rgba(0,0,0,0.35)]">
-                    <video
-                      ref={portalVideoRef}
-                      key={current.id}
-                      src={current.video}
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      preload="auto"
-                      disablePictureInPicture
-                      disableRemotePlayback
-                      className="h-full w-full object-cover"
-                    />
-                    <div
-                      className="pointer-events-none absolute inset-0"
-                      style={{
-                        background:
-                          "linear-gradient(180deg, rgba(8,10,14,0.12) 0%, rgba(8,10,14,0.02) 35%, rgba(8,10,14,0.28) 100%)",
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span
-                      className="text-5xl md:text-6xl"
-                      style={{
-                        color: isActive ? current.color : "rgba(255,255,255,0.2)",
-                        filter: isActive ? `drop-shadow(0 0 12px ${current.colorDim})` : "none",
-                        transition: "all 0.4s ease",
-                      }}
-                    >
-                      {current.symbol}
-                    </span>
-                  </div>
-                )}
+                <RealmPortalPreview
+                  realmId={current.id}
+                  symbol={current.symbol}
+                  color={isActive ? current.color : "rgba(255,255,255,0.2)"}
+                  colorDim={isActive ? current.colorDim : "rgba(255,255,255,0.08)"}
+                  isSelected
+                />
 
                 {/* Lock overlay */}
                 {!isActive && (
