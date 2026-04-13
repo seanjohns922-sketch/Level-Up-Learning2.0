@@ -151,16 +151,21 @@ export default function LessonPanel({
           {[
             { icon: Map, label: "Tower Map", onClick: onTowerMap },
             { icon: BookOpen, label: "Legends", onClick: onLegends },
+            { icon: BarChart3, label: "Stats", onClick: onStats },
             { icon: LayoutGrid, label: "Levels", onClick: onLevels },
           ].map((item) => (
             <button
               key={item.label}
               onClick={item.onClick}
-              className="h-7 w-7 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white/70 transition"
+              className="relative h-7 w-7 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white/70 transition group"
               type="button"
               aria-label={item.label}
             >
               <item.icon className="h-3.5 w-3.5" />
+              {/* Tooltip */}
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-black/80 text-[10px] font-bold text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                {item.label}
+              </span>
             </button>
           ))}
         </div>
