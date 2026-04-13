@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { DEMO_MODE } from "@/data/config";
 
@@ -25,6 +25,7 @@ export default function RealmCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [entered, setEntered] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
+  const portalVideoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setEntered(true), 80);
@@ -71,6 +72,18 @@ export default function RealmCarousel() {
   const prevIdx = (currentIndex - 1 + REALMS.length) % REALMS.length;
   const nextIdx = (currentIndex + 1) % REALMS.length;
   const bgShift = -2 + (currentIndex / REALMS.length) * 4;
+
+  useEffect(() => {
+    if (!isActive || !current.video || !portalVideoRef.current) return;
+    const video = portalVideoRef.current;
+    video.defaultMuted = true;
+    video.muted = true;
+    video.load();
+    const playPromise = video.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => {});
+    }
+  }, [current.id, current.video, isActive]);
 
   function enterRealm() {
     if (!isActive) return;
@@ -215,6 +228,7 @@ export default function RealmCarousel() {
                 {isActive && current.video ? (
                   <div className="absolute inset-[12px] overflow-hidden rounded-t-full rounded-b-[28px] border border-white/10 shadow-[inset_0_0_24px_rgba(0,0,0,0.35)]">
                     <video
+                      ref={portalVideoRef}
                       key={current.id}
                       src={current.video}
                       autoPlay
@@ -222,6 +236,8 @@ export default function RealmCarousel() {
                       loop
                       playsInline
                       preload="auto"
+                      disablePictureInPicture
+                      disableRemotePlayback
                       className="h-full w-full object-cover"
                     />
                     <div
