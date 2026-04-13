@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, ChevronRight, Lock, Zap, Trophy, Target, Map, BookOpen, LayoutGrid } from "lucide-react";
+import { CheckCircle2, ChevronRight, Lock, Zap, Trophy, Target, Map, BookOpen, LayoutGrid, BarChart3 } from "lucide-react";
 
 type Lesson = { id: string; lesson: number; title: string };
 
@@ -17,6 +17,7 @@ type Props = {
   onLegends: () => void;
   onLevels: () => void;
   onTowerMap: () => void;
+  onStats: () => void;
 };
 
 export default function LessonPanel({
@@ -30,6 +31,7 @@ export default function LessonPanel({
   onLegends,
   onLevels,
   onTowerMap,
+  onStats,
 }: Props) {
   return (
     <div className="rounded-2xl bg-black/30 backdrop-blur-xl border border-white/8 overflow-hidden">
