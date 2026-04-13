@@ -599,6 +599,12 @@ export default function TypedResponseActivity({
   const denominatorRef = useRef<HTMLInputElement | null>(null);
   const questionKey = structuredFractionKey(questionData);
   const currentWrittenMethodKey = getWrittenMethodKey(writtenMethod);
+  const resetKey = [
+    questionKey,
+    currentWrittenMethodKey,
+    isGuidedWrittenMethod ? "guided" : "plain",
+    isOrderingResponse ? `ordering-${orderingAnswerParts.length}` : "not-ordering",
+  ].join("|");
 
   useEffect(() => {
     setTyped("");
@@ -660,13 +666,7 @@ export default function TypedResponseActivity({
     setCurrentColumn(isGuidedWrittenMethod && writtenMethod ? writtenMethod.answerLength - 1 : -1);
     setGuidedPhase(isGuidedWrittenMethod && writtenMethod ? "decide" : "done");
     setGuidedFeedback("");
-  }, [
-    isGuidedWrittenMethod,
-    isOrderingResponse,
-    orderingAnswerParts.length,
-    questionKey,
-    currentWrittenMethodKey,
-  ]);
+  }, [resetKey]);
 
   function normalizedDigitAnswer() {
     const joined = digitInputs.join("").replace(/\s+/g, "");
