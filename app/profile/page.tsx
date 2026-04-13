@@ -12,6 +12,8 @@ const REALMS = [
   { name: "Inkwell Wilds", icon: "✒️", status: "locked" as const },
   { name: "Measurelands", icon: "📐", status: "locked" as const },
   { name: "Statistica", icon: "📊", status: "locked" as const },
+  { name: "Chance Hollow", icon: "🎲", status: "locked" as const },
+  { name: "Pattern Peaks", icon: "🔷", status: "locked" as const },
 ];
 
 const DAYS = ["M", "T", "W", "T", "F", "S", "S"];
@@ -23,8 +25,8 @@ function getMonthGrid() {
   const today = now.getDate();
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const offset = firstDay === 0 ? 6 : firstDay - 1; // Monday start
-  const monthName = now.toLocaleString("default", { month: "short" });
+  const offset = firstDay === 0 ? 6 : firstDay - 1;
+  const monthName = now.toLocaleString("default", { month: "long" });
   return { offset, daysInMonth, today, monthName, year };
 }
 
@@ -46,7 +48,6 @@ export default function ProfilePage() {
         else if (typeof active === "string" && active.length < 40) setStudentName(active);
       }
     } catch { /* ignore */ }
-    // Load active days from localStorage
     try {
       const raw = localStorage.getItem("lul_active_days");
       if (raw) setActiveDays(new Set(JSON.parse(raw)));
@@ -87,69 +88,89 @@ export default function ProfilePage() {
   const { offset, daysInMonth, today, monthName } = useMemo(getMonthGrid, []);
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 flex flex-col">
-      <div className="max-w-lg mx-auto w-full px-4 pt-3 pb-4 flex flex-col flex-1">
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-3">
-          <button
-            onClick={() => router.back()}
-            className="h-7 w-7 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-white/80 hover:bg-white/20 transition"
-            aria-label="Back"
-          >
-            <ChevronLeft className="h-3.5 w-3.5" />
-          </button>
-          <h1 className="text-base font-black text-white tracking-tight">Your Journey</h1>
+    <main className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950">
+      <div className="w-full px-6 md:px-10 lg:px-16 xl:px-24 pt-5 pb-6">
+
+        {/* ── Header ── */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => router.back()}
+              className="h-9 w-9 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-white/80 hover:bg-white/20 transition"
+              aria-label="Back"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <div>
+              <h1 className="text-xl font-black text-white tracking-tight">Your Journey</h1>
+              <p className="text-[10px] font-bold text-emerald-400/70 uppercase tracking-widest">Progress Dashboard</p>
+            </div>
+          </div>
+
+          {/* Identity pill */}
+          <div className="flex items-center gap-3 rounded-2xl bg-gradient-to-r from-emerald-900/30 to-teal-900/20 border border-emerald-500/15 px-5 py-2.5">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-base font-black text-white shadow-md">
+              {initials}
+            </div>
+            <div>
+              <h2 className="text-sm font-black text-white">{studentName}</h2>
+              <p className="text-[9px] font-bold text-emerald-400/80 uppercase tracking-widest">
+                Numbot {levelTitle} · Lvl {levelNum}
+              </p>
+            </div>
+            <div className="ml-2 flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/20 animate-[pulse_3s_ease-in-out_infinite]">
+              <Zap className="h-3 w-3 text-amber-400" />
+              <span className="text-[11px] font-extrabold text-amber-300">{stats.xp.toLocaleString()}</span>
+            </div>
+          </div>
         </div>
 
-        {/* Identity row — compact horizontal */}
-        <div className="flex items-center gap-3 rounded-2xl bg-gradient-to-r from-emerald-900/30 to-teal-900/20 border border-emerald-500/15 px-4 py-3 mb-3">
-          <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-lg font-black text-white shadow-md flex-shrink-0">
-            {initials}
-          </div>
-          <div className="flex-1 min-w-0">
-            <h2 className="text-sm font-black text-white truncate">{studentName}</h2>
-            <p className="text-[10px] font-bold text-emerald-400/80 uppercase tracking-widest">
-              Numbot {levelTitle} · Level {levelNum}
-            </p>
-          </div>
-          <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/20 animate-[pulse_3s_ease-in-out_infinite]">
-            <Zap className="h-3 w-3 text-amber-400" />
-            <span className="text-[11px] font-extrabold text-amber-300">{stats.xp.toLocaleString()}</span>
-          </div>
-        </div>
-
-        {/* Stats row */}
-        <div className="grid grid-cols-4 gap-1.5 mb-3">
+        {/* ── Stats Row (full width) ── */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
           {[
-            { icon: Flame, label: "Streak", value: "0d", color: "text-rose-400", bg: "bg-rose-500/10", border: "border-rose-500/15" },
-            { icon: Calendar, label: "Active", value: "—", color: "text-sky-400", bg: "bg-sky-500/10", border: "border-sky-500/15" },
-            { icon: Clock, label: "Time", value: "—", color: "text-purple-400", bg: "bg-purple-500/10", border: "border-purple-500/15" },
-            { icon: Target, label: "Accuracy", value: `${stats.accuracy}%`, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/15" },
+            { icon: Flame, label: "Current Streak", value: "0 days", color: "text-rose-400", bg: "from-rose-500/15 to-pink-500/10", border: "border-rose-500/15", glow: "shadow-[0_0_20px_rgba(244,63,94,0.08)]" },
+            { icon: Calendar, label: "Days Active", value: "—", color: "text-sky-400", bg: "from-sky-500/15 to-blue-500/10", border: "border-sky-500/15", glow: "shadow-[0_0_20px_rgba(14,165,233,0.08)]" },
+            { icon: Clock, label: "Time This Week", value: "—", color: "text-purple-400", bg: "from-purple-500/15 to-violet-500/10", border: "border-purple-500/15", glow: "shadow-[0_0_20px_rgba(168,85,247,0.08)]" },
+            { icon: Target, label: "Accuracy", value: `${stats.accuracy}%`, color: "text-emerald-400", bg: "from-emerald-500/15 to-teal-500/10", border: "border-emerald-500/15", glow: "shadow-[0_0_20px_rgba(16,185,129,0.08)]" },
           ].map((m) => (
-            <div key={m.label} className={`rounded-xl ${m.bg} border ${m.border} p-2 text-center hover:scale-105 transition-transform duration-200`}>
-              <m.icon className={`h-3.5 w-3.5 ${m.color} mx-auto mb-0.5`} />
-              <div className={`text-xs font-black ${m.color}`}>{m.value}</div>
-              <div className="text-[8px] font-bold text-white/30 uppercase tracking-wider">{m.label}</div>
+            <div
+              key={m.label}
+              className={`rounded-2xl bg-gradient-to-br ${m.bg} border ${m.border} ${m.glow} p-5 hover:scale-[1.02] transition-transform duration-200 cursor-pointer`}
+            >
+              <div className={`h-9 w-9 rounded-xl bg-white/5 flex items-center justify-center mb-3 ${m.color}`}>
+                <m.icon className="h-4.5 w-4.5" />
+              </div>
+              <div className={`text-2xl font-black ${m.color} leading-none`}>{m.value}</div>
+              <div className="text-[10px] font-bold text-white/35 uppercase tracking-wider mt-1">{m.label}</div>
             </div>
           ))}
         </div>
 
-        {/* Two-column: Calendar + Realm progress */}
-        <div className="grid grid-cols-2 gap-2.5 mb-3 flex-1 min-h-0">
-          {/* Monthly Activity Calendar */}
-          <div className="rounded-2xl bg-white/5 border border-white/8 p-3 flex flex-col">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-[10px] font-extrabold text-white/60 uppercase tracking-widest">Activity</h3>
-              <span className="text-[10px] font-bold text-white/40">{monthName}</span>
+        {/* ── Main Grid: Calendar + Realms ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-6">
+
+          {/* Activity Calendar — hero panel */}
+          <div
+            className="lg:col-span-3 rounded-2xl bg-white/[0.04] backdrop-blur-xl border border-white/8 p-6"
+            style={{ boxShadow: "0 4px 30px rgba(0,0,0,0.15)" }}
+          >
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-sm font-extrabold text-white/80 flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-emerald-400" />
+                Monthly Activity
+              </h3>
+              <span className="text-xs font-bold text-white/40">{monthName}</span>
             </div>
+
             {/* Day headers */}
-            <div className="grid grid-cols-7 gap-px mb-1">
+            <div className="grid grid-cols-7 gap-1.5 mb-2">
               {DAYS.map((d, i) => (
-                <div key={i} className="text-center text-[8px] font-bold text-white/25">{d}</div>
+                <div key={i} className="text-center text-[10px] font-bold text-white/30">{d}</div>
               ))}
             </div>
+
             {/* Date grid */}
-            <div className="grid grid-cols-7 gap-px flex-1">
+            <div className="grid grid-cols-7 gap-1.5">
               {Array.from({ length: offset }).map((_, i) => (
                 <div key={`e-${i}`} />
               ))}
@@ -157,13 +178,19 @@ export default function ProfilePage() {
                 const day = i + 1;
                 const isToday = day === today;
                 const isActive = activeDays.has(day);
+                const isPast = day < today;
                 return (
                   <div
                     key={day}
-                    className={`flex items-center justify-center rounded-full text-[9px] font-bold aspect-square transition-colors
-                      ${isToday ? "bg-emerald-500 text-white ring-1 ring-emerald-400/50" : ""}
-                      ${isActive && !isToday ? "bg-emerald-500/30 text-emerald-300" : ""}
-                      ${!isActive && !isToday ? "text-white/20" : ""}
+                    className={`flex items-center justify-center rounded-xl aspect-square text-xs font-bold transition-all duration-200
+                      ${isToday
+                        ? "bg-emerald-500 text-white shadow-[0_0_12px_rgba(16,185,129,0.4)] ring-2 ring-emerald-400/30"
+                        : isActive
+                          ? "bg-emerald-500/25 text-emerald-300 border border-emerald-500/20"
+                          : isPast
+                            ? "text-white/15"
+                            : "text-white/10"
+                      }
                     `}
                   >
                     {day}
@@ -171,53 +198,70 @@ export default function ProfilePage() {
                 );
               })}
             </div>
-            <div className="flex items-center gap-3 mt-1.5 pt-1.5 border-t border-white/5">
-              <div className="flex items-center gap-1">
-                <div className="h-2 w-2 rounded-full bg-emerald-500/30" />
-                <span className="text-[8px] font-bold text-white/30">Active</span>
+
+            {/* Legend */}
+            <div className="flex items-center gap-5 mt-4 pt-3 border-t border-white/5">
+              <div className="flex items-center gap-1.5">
+                <div className="h-2.5 w-2.5 rounded-full bg-emerald-500/25 border border-emerald-500/20" />
+                <span className="text-[10px] font-bold text-white/35">Attempted</span>
               </div>
-              <div className="flex items-center gap-1">
-                <div className="h-2 w-2 rounded-full bg-emerald-500" />
-                <span className="text-[8px] font-bold text-white/30">Today</span>
+              <div className="flex items-center gap-1.5">
+                <div className="h-2.5 w-2.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]" />
+                <span className="text-[10px] font-bold text-white/35">Today</span>
+              </div>
+              <div className="ml-auto text-[10px] font-bold text-white/25">
+                Max streak: 0 days 🔥
               </div>
             </div>
           </div>
 
-          {/* Realm Progress — compact */}
-          <div className="rounded-2xl bg-white/5 border border-white/8 p-3 flex flex-col">
-            <h3 className="text-[10px] font-extrabold text-white/60 uppercase tracking-widest mb-2">Realms</h3>
-            <div className="space-y-1.5 flex-1">
+          {/* Realm Progress — tall panel */}
+          <div
+            className="lg:col-span-2 rounded-2xl bg-white/[0.04] backdrop-blur-xl border border-white/8 p-6 flex flex-col"
+            style={{ boxShadow: "0 4px 30px rgba(0,0,0,0.15)" }}
+          >
+            <h3 className="text-sm font-extrabold text-white/80 mb-4 flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-amber-400" />
+              Realm Progress
+            </h3>
+            <div className="space-y-1 flex-1">
               {REALMS.map((realm) => {
                 const isActive = realm.status === "active";
                 const isComingSoon = realm.status === "coming-soon";
                 return (
-                  <div key={realm.name} className={`flex items-center gap-2 ${!isActive ? "opacity-35" : ""}`}>
-                    <span className="text-sm">{realm.icon}</span>
+                  <div
+                    key={realm.name}
+                    className={`flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors duration-200
+                      ${isActive ? "bg-white/[0.03] hover:bg-white/[0.06] cursor-pointer" : "opacity-35"}
+                    `}
+                  >
+                    <span className="text-base">{realm.icon}</span>
                     <div className="flex-1 min-w-0">
-                      <span className={`text-[11px] font-bold block truncate ${isActive ? "text-white/85" : "text-white/50"}`}>
+                      <span className={`text-xs font-bold block truncate ${isActive ? "text-white/85" : "text-white/50"}`}>
                         {realm.name}
                       </span>
                       {isActive && (
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                          <div className="flex-1 h-1 rounded-full bg-white/8 overflow-hidden">
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className="flex-1 h-1.5 rounded-full bg-white/8 overflow-hidden">
                             <div
                               className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-700"
                               style={{ width: `${stats.realmProgress}%` }}
                             />
                           </div>
-                          <span className="text-[9px] font-extrabold text-emerald-400">{stats.realmProgress}%</span>
+                          <span className="text-[10px] font-extrabold text-emerald-400">{stats.realmProgress}%</span>
                         </div>
                       )}
                     </div>
                     {!isActive && (
                       <div className="flex-shrink-0">
                         {isComingSoon ? (
-                          <Sparkles className="h-3 w-3 text-amber-400/50" />
+                          <Sparkles className="h-3.5 w-3.5 text-amber-400/50" />
                         ) : (
-                          <Lock className="h-3 w-3 text-white/15" />
+                          <Lock className="h-3.5 w-3.5 text-white/15" />
                         )}
                       </div>
                     )}
+                    {isActive && <ChevronRight className="h-4 w-4 text-white/20 flex-shrink-0" />}
                   </div>
                 );
               })}
@@ -225,23 +269,24 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Coming Soon — compact footer */}
-        <div className="rounded-2xl bg-white/[0.03] border border-white/6 px-4 py-2.5 flex items-center gap-4 opacity-50">
-          <Lock className="h-3.5 w-3.5 text-white/25 flex-shrink-0" />
-          <div className="flex items-center gap-3 flex-1">
-            {[
-              { icon: Users, label: "Friends", color: "text-sky-500/40" },
-              { icon: Swords, label: "Battles", color: "text-rose-500/40" },
-              { icon: Medal, label: "Rankings", color: "text-amber-500/40" },
-            ].map((item) => (
-              <div key={item.label} className="flex items-center gap-1.5">
-                <item.icon className={`h-3.5 w-3.5 ${item.color}`} />
-                <span className="text-[9px] font-bold text-white/25 uppercase tracking-wider">{item.label}</span>
-              </div>
-            ))}
+        {/* ── Coming Soon Bar (full width) ── */}
+        <div className="rounded-2xl bg-white/[0.025] border border-white/6 px-6 py-4 flex items-center justify-center gap-8 opacity-50">
+          {[
+            { icon: Users, label: "Friends", color: "text-sky-500/50" },
+            { icon: Swords, label: "Battles", color: "text-rose-500/50" },
+            { icon: Medal, label: "Rankings", color: "text-amber-500/50" },
+          ].map((item) => (
+            <div key={item.label} className="flex items-center gap-2">
+              <item.icon className={`h-4 w-4 ${item.color}`} />
+              <span className="text-[10px] font-bold text-white/30 uppercase tracking-wider">{item.label}</span>
+            </div>
+          ))}
+          <div className="flex items-center gap-1.5 ml-4 pl-4 border-l border-white/8">
+            <Lock className="h-3 w-3 text-white/20" />
+            <span className="text-[9px] font-bold text-white/20 uppercase tracking-widest">Coming Soon</span>
           </div>
-          <span className="text-[8px] font-bold text-white/20 uppercase tracking-wider whitespace-nowrap">Soon</span>
         </div>
+
       </div>
     </main>
   );
