@@ -4,21 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { readProgress } from "@/data/progress";
 import { readProgramStore, getWeekProgress, isWeekComplete } from "@/lib/program-progress";
-import { getLegendForYear } from "@/data/legends";
-import { ChevronLeft, Zap, Flame, Clock, Target, Calendar, Lock, Sparkles, ChevronRight } from "lucide-react";
-
-const REALMS = [
-  { name: "Number Nexus", icon: "🔢", status: "active" as const },
-  { name: "Reading Ridge", icon: "📖", status: "coming-soon" as const },
-  { name: "Inkwell Wilds", icon: "✒️", status: "locked" as const },
-  { name: "Measurelands", icon: "📐", status: "locked" as const },
-  { name: "Statistica", icon: "📊", status: "locked" as const },
-  { name: "Chance Hollow", icon: "🎲", status: "locked" as const },
-  { name: "Pattern Peaks", icon: "🔷", status: "locked" as const },
-  { name: "Chronorok", icon: "⏳", status: "locked" as const },
-  { name: "Starpath Realm", icon: "⭐", status: "locked" as const },
-  { name: "Runehaven Peaks", icon: "📜", status: "locked" as const },
-];
+import { ChevronLeft, Zap, Flame, Clock, Target, Calendar, Lock, Sparkles, ChevronRight, BookOpen, Trophy, Users, Swords, Medal } from "lucide-react";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -40,9 +26,7 @@ export default function ProfilePage() {
   }, []);
 
   const year = progress?.year ?? "Year 1";
-  const week = progress?.assignedWeek ?? 1;
   const levelNum = parseInt(year.replace(/\D/g, ""), 10) || 1;
-  const legend = getLegendForYear(year);
 
   const stats = useMemo(() => {
     let xp = 0;
@@ -50,6 +34,7 @@ export default function ProfilePage() {
     let weeksCompleted = 0;
     let quizCount = 0;
     let quizTotal = 0;
+    let realmsUnlocked = 1; // Number Nexus always unlocked
 
     for (let w = 1; w <= 12; w++) {
       const wp = getWeekProgress(store, year, w);
@@ -67,17 +52,35 @@ export default function ProfilePage() {
     const accuracy = quizCount > 0 ? Math.round(quizTotal / quizCount) : (progress?.scorePercent ?? 0);
     const realmProgress = Math.round((weeksCompleted / 12) * 100);
 
-    return { xp, completedLessons, accuracy, weeksCompleted, realmProgress };
+    return { xp, completedLessons, accuracy, weeksCompleted, realmProgress, realmsUnlocked };
   }, [store, year, progress]);
 
   const levelTitle = levelNum <= 2 ? "Apprentice" : levelNum <= 4 ? "Processor" : "Master";
   const initials = studentName.charAt(0).toUpperCase();
 
-  // Motivation message
-  const lessonsToNextUnlock = Math.max(0, (week * 3) - stats.completedLessons);
-  const motivationMsg = lessonsToNextUnlock > 0
-    ? `${lessonsToNextUnlock} lesson${lessonsToNextUnlock > 1 ? "s" : ""} until your next unlock!`
-    : "Keep going — you're doing amazing!";
+  // Build recent activity
+  const recentActivity = useMemo(() => {
+    const items: { icon: string; text: string; color: string }[] = [];
+    if (stats.completedLessons > 0) items.push({ icon: "✅", text: `Completed ${stats.completedLessons} lesson${stats.completedLessons > 1 ? "s" : ""}`, color: "text-emerald-400" });
+    if (stats.accuracy > 0) items.push({ icon: "⭐", text: `Accuracy at ${stats.accuracy}%`, color: "text-amber-400" });
+    if (stats.weeksCompleted > 0) items.push({ icon: "🏆", text: `${stats.weeksCompleted} week${stats.weeksCompleted > 1 ? "s" : ""} completed`, color: "text-sky-400" });
+    if (stats.xp > 0) items.push({ icon: "⚡", text: `Earned ${stats.xp.toLocaleString()} XP total`, color: "text-amber-300" });
+    if (items.length === 0) items.push({ icon: "🚀", text: "Start your first lesson to begin!", color: "text-white/60" });
+    return items;
+  }, [stats]);
+
+  const REALMS = [
+    { name: "Number Nexus", icon: "🔢", status: "active" as const },
+    { name: "Reading Ridge", icon: "📖", status: "coming-soon" as const },
+    { name: "Inkwell Wilds", icon: "✒️", status: "locked" as const },
+    { name: "Measurelands", icon: "📐", status: "locked" as const },
+    { name: "Statistica", icon: "📊", status: "locked" as const },
+    { name: "Chance Hollow", icon: "🎲", status: "locked" as const },
+    { name: "Pattern Peaks", icon: "🔷", status: "locked" as const },
+    { name: "Chronorok", icon: "⏳", status: "locked" as const },
+    { name: "Starpath Realm", icon: "⭐", status: "locked" as const },
+    { name: "Runehaven Peaks", icon: "📜", status: "locked" as const },
+  ];
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950">
@@ -91,7 +94,7 @@ export default function ProfilePage() {
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
-          <h1 className="text-lg font-black text-white tracking-tight">Player Profile</h1>
+          <h1 className="text-lg font-black text-white tracking-tight">Your Journey</h1>
         </div>
 
         {/* Identity card */}
@@ -106,7 +109,7 @@ export default function ProfilePage() {
           <p className="text-xs font-bold text-emerald-400/80 uppercase tracking-widest mb-2">
             Numbot {levelTitle} · Level {levelNum}
           </p>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/20">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/20 animate-[pulse_3s_ease-in-out_infinite]">
             <Zap className="h-3 w-3 text-amber-400" />
             <span className="text-xs font-extrabold text-amber-300">{stats.xp.toLocaleString()} XP</span>
           </div>
@@ -120,12 +123,36 @@ export default function ProfilePage() {
             { icon: Clock, label: "Time", value: "—", color: "text-purple-400", bg: "bg-purple-500/10", border: "border-purple-500/15" },
             { icon: Target, label: "Accuracy", value: `${stats.accuracy}%`, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/15" },
           ].map((m) => (
-            <div key={m.label} className={`rounded-xl ${m.bg} border ${m.border} p-2.5 text-center`}>
+            <div key={m.label} className={`rounded-xl ${m.bg} border ${m.border} p-2.5 text-center cursor-pointer hover:scale-105 transition-transform duration-200`}>
               <m.icon className={`h-4 w-4 ${m.color} mx-auto mb-1`} />
               <div className={`text-sm font-black ${m.color}`}>{m.value}</div>
               <div className="text-[9px] font-bold text-white/30 uppercase tracking-wider">{m.label}</div>
             </div>
           ))}
+        </div>
+
+        {/* Your Journey stats */}
+        <div className="rounded-2xl bg-white/5 backdrop-blur-xl border border-white/8 p-4 mb-4">
+          <h3 className="text-xs font-extrabold text-white/70 uppercase tracking-widest mb-3 flex items-center gap-2">
+            <Trophy className="h-3.5 w-3.5 text-amber-400" />
+            Your Journey
+          </h3>
+          <div className="grid grid-cols-2 gap-2.5">
+            {[
+              { label: "Total XP", value: stats.xp.toLocaleString(), icon: "⚡" },
+              { label: "Lessons Done", value: `${stats.completedLessons}`, icon: "📖" },
+              { label: "Realms Unlocked", value: `${stats.realmsUnlocked}`, icon: "🌍" },
+              { label: "Weeks Cleared", value: `${stats.weeksCompleted}`, icon: "🏅" },
+            ].map((item) => (
+              <div key={item.label} className="rounded-xl bg-white/5 border border-white/6 p-3 flex items-center gap-3">
+                <span className="text-lg">{item.icon}</span>
+                <div>
+                  <div className="text-sm font-black text-white/90">{item.value}</div>
+                  <div className="text-[9px] font-bold text-white/40 uppercase tracking-wider">{item.label}</div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Realm breakdown */}
@@ -148,7 +175,7 @@ export default function ProfilePage() {
                       <div className="flex items-center gap-2 mt-1">
                         <div className="flex-1 h-1.5 rounded-full bg-white/8 overflow-hidden">
                           <div
-                            className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-400"
+                            className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-700"
                             style={{ width: `${stats.realmProgress}%` }}
                           />
                         </div>
@@ -171,32 +198,41 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Weekly activity */}
+        {/* Recent Activity */}
         <div className="rounded-2xl bg-white/5 backdrop-blur-xl border border-white/8 p-4 mb-4">
-          <h3 className="text-xs font-extrabold text-white/70 uppercase tracking-widest mb-3">This Week</h3>
-          <div className="flex items-end justify-between gap-1.5">
-            {["M", "T", "W", "T", "F", "S", "S"].map((d, i) => {
-              const active = i < 2; // placeholder
-              return (
-                <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
-                  <div
-                    className={`w-full rounded-lg transition-all ${active ? "bg-gradient-to-t from-emerald-500 to-teal-400" : "bg-white/8"}`}
-                    style={{ height: active ? 32 + Math.random() * 16 : 8 }}
-                  />
-                  <span className={`text-[10px] font-bold ${active ? "text-emerald-400" : "text-white/25"}`}>{d}</span>
-                </div>
-              );
-            })}
+          <h3 className="text-xs font-extrabold text-white/70 uppercase tracking-widest mb-3 flex items-center gap-2">
+            <BookOpen className="h-3.5 w-3.5 text-teal-400" />
+            Recent Activity
+          </h3>
+          <div className="space-y-2.5">
+            {recentActivity.map((item, i) => (
+              <div key={i} className="flex items-center gap-3 rounded-xl bg-white/3 border border-white/5 px-3 py-2.5">
+                <span className="text-base">{item.icon}</span>
+                <span className={`text-sm font-semibold ${item.color}`}>{item.text}</span>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Motivation */}
-        <div
-          className="rounded-2xl bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/15 p-4 text-center"
-          style={{ boxShadow: "0 0 20px rgba(245,158,11,0.05)" }}
-        >
-          <Sparkles className="h-5 w-5 text-amber-400 mx-auto mb-1.5" />
-          <p className="text-sm font-bold text-amber-200/80">{motivationMsg}</p>
+        {/* Coming Soon: Social */}
+        <div className="rounded-2xl bg-white/[0.03] backdrop-blur-xl border border-white/6 p-4 opacity-60">
+          <h3 className="text-xs font-extrabold text-white/50 uppercase tracking-widest mb-3 flex items-center gap-2">
+            <Lock className="h-3.5 w-3.5 text-white/30" />
+            Coming Soon
+          </h3>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { icon: Users, label: "Friends", color: "text-sky-500/40" },
+              { icon: Swords, label: "Battles", color: "text-rose-500/40" },
+              { icon: Medal, label: "Rankings", color: "text-amber-500/40" },
+            ].map((item) => (
+              <div key={item.label} className="rounded-xl bg-white/3 border border-white/5 p-3 text-center">
+                <item.icon className={`h-5 w-5 ${item.color} mx-auto mb-1.5`} />
+                <div className="text-[10px] font-bold text-white/25 uppercase tracking-wider">{item.label}</div>
+              </div>
+            ))}
+          </div>
+          <p className="text-[10px] font-medium text-white/25 text-center mt-2.5">Unlock in a future update</p>
         </div>
       </div>
     </main>
