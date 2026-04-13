@@ -129,8 +129,14 @@ export default function ProfilePage() {
 
           {/* Profile pill */}
           <div className={`flex items-center gap-3 rounded-2xl bg-white border border-[#E5E7EB] px-4 py-2 ${cardShadow}`}>
-            <div className="h-9 w-9 rounded-lg bg-[#7C5CFC] flex items-center justify-center text-sm font-black text-white">
-              {initials}
+            <div className="relative group cursor-pointer">
+              <div className="h-9 w-9 rounded-lg bg-[#7C5CFC] flex items-center justify-center text-sm font-black text-white">
+                {initials}
+              </div>
+              {/* Subtle "customise" hint on hover */}
+              <div className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-white border border-[#E5E7EB] flex items-center justify-center opacity-60 group-hover:opacity-100 transition-opacity">
+                <Lock className="h-2 w-2 text-gray-400" />
+              </div>
             </div>
             <div>
               <h2 className="text-sm font-extrabold text-gray-900 leading-tight">{studentName}</h2>
