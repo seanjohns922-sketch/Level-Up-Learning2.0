@@ -213,7 +213,7 @@ export default function RealmCarousel() {
 
                 {/* Portal content — video or symbol */}
                 {isActive && current.video ? (
-                  <>
+                  <div className="absolute inset-[12px] overflow-hidden rounded-t-full rounded-b-[28px] border border-white/10 shadow-[inset_0_0_24px_rgba(0,0,0,0.35)]">
                     <video
                       key={current.id}
                       src={current.video}
@@ -221,10 +221,17 @@ export default function RealmCarousel() {
                       muted
                       loop
                       playsInline
-                      className="absolute inset-0 w-full h-full object-cover"
+                      preload="auto"
+                      className="h-full w-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-black/20" />
-                  </>
+                    <div
+                      className="pointer-events-none absolute inset-0"
+                      style={{
+                        background:
+                          "linear-gradient(180deg, rgba(8,10,14,0.12) 0%, rgba(8,10,14,0.02) 35%, rgba(8,10,14,0.28) 100%)",
+                      }}
+                    />
+                  </div>
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <span
