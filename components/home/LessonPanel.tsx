@@ -5,7 +5,7 @@ import { CheckCircle2, ChevronRight, Lock, Zap, Trophy, Target, Map, BookOpen, L
 type Lesson = { id: string; lesson: number; title: string };
 
 type Props = {
-  week: number;
+  topic?: string;
   lessons: Lesson[];
   lessonsDone: number;
   onContinue: () => void;
