@@ -4,16 +4,12 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { clearScopedProgress, readProgress, StudentProgress } from "@/data/progress";
 import { getProgramForYear } from "@/data/programs";
-import { clearScopedProgramStore, readProgramStore, getWeekProgress, isWeekComplete, type ProgramProgressStore } from "@/lib/program-progress";
+import { clearScopedProgramStore, readProgramStore, getWeekProgress, type ProgramProgressStore } from "@/lib/program-progress";
 import { getLegendForYear } from "@/data/legends";
 import { supabase } from "@/lib/supabase";
 import HeroHeader from "@/components/home/HeroHeader";
-import StatTiles from "@/components/home/StatTiles";
-import MissionCard from "@/components/home/MissionCard";
-import RealmCard from "@/components/home/RealmCard";
-import TowerProgress from "@/components/home/TowerProgress";
-import WeekCard from "@/components/home/WeekCard";
-import QuickLinks from "@/components/home/QuickLinks";
+import MissionStrip from "@/components/home/MissionStrip";
+import LessonPanel from "@/components/home/LessonPanel";
 import { getHomeBg, getHomeBgFilter, getVignetteStyle } from "@/lib/levelBand";
 
 export default function StudentHomePage() {
@@ -25,13 +21,11 @@ export default function StudentHomePage() {
   useEffect(() => {
     setProgress(readProgress());
     setStore(readProgramStore());
-    // Try to get student name from localStorage
     try {
       const active = localStorage.getItem("lul_active_student_v1");
       if (active) {
         const parsed = JSON.parse(active);
         if (parsed?.display_name) setStudentName(parsed.display_name);
-        else if (typeof parsed === "string") setStudentName("");
       }
     } catch { /* ignore */ }
   }, []);
@@ -46,22 +40,11 @@ export default function StudentHomePage() {
   const programWeek = useMemo(() => program.find((w) => w.week === week) ?? null, [program, week]);
   const wp = getWeekProgress(store, year, week);
   const lessonsDone = wp.lessonsCompleted.filter(Boolean).length;
-  const overallPercent = Math.round((week / 12) * 100);
   const levelNum = parseInt(year.replace(/\D/g, ""), 10) || 1;
   const legend = getLegendForYear(year);
+  const totalLessons = programWeek?.lessons?.length ?? 3;
 
-  // Count total completed weeks
-  const completedWeeks = useMemo(() => {
-    let count = 0;
-    for (let w = 1; w <= 12; w++) {
-      if (isWeekComplete(getWeekProgress(store, year, w))) count++;
-    }
-    return count;
-  }, [year, store]);
-
-  const fogCleared = Math.round((completedWeeks / 12) * 100);
-
-  // Basic XP calculation (lessons done * 40 XP + quizzes)
+  // XP calculation
   const totalXP = useMemo(() => {
     let xp = 0;
     for (let w = 1; w <= 12; w++) {
@@ -91,6 +74,7 @@ export default function StudentHomePage() {
     router.push("/login");
   }
 
+  // No progress — welcome screen
   if (!progress) {
     return (
       <main className="min-h-screen relative flex items-end justify-center p-6 pb-10">
@@ -125,7 +109,7 @@ export default function StudentHomePage() {
 
   return (
     <main className="min-h-screen relative">
-      {/* Realm-specific background */}
+      {/* Realm background */}
       <div className="fixed inset-0 z-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -138,63 +122,45 @@ export default function StudentHomePage() {
           className="absolute inset-0 pointer-events-none"
           style={{ boxShadow: getVignetteStyle(levelNum) }}
         />
-        {/* Extra overlay for card readability */}
-        <div className="absolute inset-0 bg-black/15" />
+        <div className="absolute inset-0 bg-black/20" />
       </div>
 
       <div className="relative z-10">
+        {/* Hero */}
         <HeroHeader
           levelNum={levelNum}
           week={week}
           lessonsDone={lessonsDone}
-          overallPercent={overallPercent}
+          totalLessons={totalLessons}
+          topic={programWeek?.topic}
           onBack={() => router.push("/login")}
           onLogout={handleLogout}
           studentName={studentName}
           legendAvatar={legend.images.avatar}
         />
 
-        <div className="-mt-12 relative z-10 pb-12 px-5">
-          <div className="max-w-2xl mx-auto grid gap-3.5">
-            {/* Stat tiles */}
-            <StatTiles
+        {/* Main content */}
+        <div className="-mt-8 relative z-10 pb-12 px-5">
+          <div className="max-w-lg mx-auto grid gap-3">
+            {/* Mission strip */}
+            <MissionStrip
+              legend={legend}
+              lessonsDone={lessonsDone}
+              totalLessons={totalLessons}
+            />
+
+            {/* Lesson panel — the one main container */}
+            <LessonPanel
+              week={week}
+              lessons={programWeek?.lessons ?? []}
+              lessonsDone={lessonsDone}
+              onContinue={continueWeek}
               xp={totalXP}
               levelNum={levelNum}
-              streakDays={0}
               accuracy={progress?.scorePercent ?? 0}
-            />
-
-            {/* Course progress / continue learning */}
-            <WeekCard
-              week={week}
-              lessonsDone={lessonsDone}
-              topic={programWeek?.topic}
-              lessons={programWeek?.lessons ?? []}
-              onContinue={continueWeek}
-            />
-
-            {/* Mission / challenge */}
-            <MissionCard legend={legend} week={week} lessonsDone={lessonsDone} />
-
-            {/* Realm + Tower progress row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <RealmCard />
-              <TowerProgress
-                towerStrength={overallPercent}
-                fogCleared={fogCleared}
-                legendName={legend.name}
-                legendAvatar={legend.images.avatar}
-              />
-            </div>
-
-            {/* Quick links */}
-            <QuickLinks
-              onLessons={continueWeek}
               onLegends={goLegends}
               onLevels={goLevels}
               onTowerMap={() => router.push("/tower-map")}
-              scorePercent={progress?.scorePercent ?? 0}
-              week={week}
             />
           </div>
         </div>
