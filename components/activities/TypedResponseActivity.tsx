@@ -88,6 +88,17 @@ function mixedNumeralsEquivalent(
   return leftImproper * right.denominator === rightImproper * left.denominator;
 }
 
+function structuredFractionKey(questionData: TypedResponseQuestion) {
+  return [
+    questionData.prompt,
+    questionData.answer,
+    questionData.helper ?? "",
+    questionData.placeholder ?? "",
+    questionData.fixedDenominator ?? "",
+    questionData.visual?.type ?? "",
+  ].join("|");
+}
+
 function getColumnMultiplicationRows(topValue: number, bottomValue: number) {
   const digits = String(bottomValue).split("").map(Number);
   const onesDigit = digits[digits.length - 1] ?? 0;
@@ -571,6 +582,7 @@ export default function TypedResponseActivity({
   const [guidedFeedback, setGuidedFeedback] = useState("");
   const numeratorRef = useRef<HTMLInputElement | null>(null);
   const denominatorRef = useRef<HTMLInputElement | null>(null);
+  const questionKey = structuredFractionKey(questionData);
 
   useEffect(() => {
     setTyped("");
@@ -637,7 +649,8 @@ export default function TypedResponseActivity({
     isGuidedWrittenMethod,
     isOrderingResponse,
     orderingAnswerParts.length,
-    questionData,
+    questionKey,
+    questionData.fixedDenominator,
     writtenMethod,
   ]);
 
@@ -1299,27 +1312,30 @@ export default function TypedResponseActivity({
             </div>
           ) : isStructuredFractionResponse ? (
             <div className="flex flex-wrap items-end gap-4">
-              <div className="flex flex-col gap-2">
-                <div className="text-xs font-bold uppercase tracking-wide text-slate-500">
-                  Whole
+              {usesFixedDenominator ? null : (
+                <div className="flex flex-col gap-2">
+                  <div className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                    Whole
+                  </div>
+                  <input
+                    type="text"
+                    autoComplete="off"
+                    spellCheck={false}
+                    value={fractionWholeInput}
+                    onChange={(event) => {
+                      const nextValue = event.target.value.replace(/\D/g, "");
+                      setFractionWholeInput(nextValue);
+                      if (nextValue.length >= 1) {
+                        numeratorRef.current?.focus();
+                      }
+                    }}
+                    inputMode="numeric"
+                    placeholder=""
+                    className="block h-16 w-20 appearance-none rounded-xl border border-gray-300 bg-white px-3 text-center text-2xl font-black leading-none text-slate-900 caret-teal-600 outline-none focus:border-teal-500"
+                    style={{ WebkitTextFillColor: "#0f172a" }}
+                  />
                 </div>
-                <input
-                  type="text"
-                  autoComplete="off"
-                  spellCheck={false}
-                  value={fractionWholeInput}
-                  onChange={(event) => {
-                    const nextValue = event.target.value.replace(/\D/g, "");
-                    setFractionWholeInput(nextValue);
-                    if (nextValue.length >= 1) {
-                      numeratorRef.current?.focus();
-                    }
-                  }}
-                  inputMode="numeric"
-                  placeholder=""
-                  className="relative z-10 h-16 w-20 appearance-none rounded-xl border border-gray-300 bg-white px-3 text-center text-2xl font-black leading-none text-gray-900 caret-teal-600 outline-none focus:border-teal-500"
-                />
-              </div>
+              )}
               <div className="flex flex-col items-center">
                 <div className="text-xs font-bold uppercase tracking-wide text-slate-500">
                   {usesFixedDenominator ? "Answer fraction" : "Fraction"}
@@ -1340,11 +1356,12 @@ export default function TypedResponseActivity({
                     }}
                     inputMode="numeric"
                     placeholder=""
-                    className="relative z-10 h-12 w-20 appearance-none rounded-t-xl border border-b-0 border-gray-300 bg-white px-3 text-center text-xl font-black leading-none text-gray-900 caret-teal-600 outline-none focus:border-teal-500"
+                    className="block h-12 w-20 appearance-none rounded-t-xl border border-b-0 border-gray-300 bg-white px-3 text-center text-2xl font-black leading-none text-slate-900 caret-teal-600 outline-none focus:border-teal-500"
+                    style={{ WebkitTextFillColor: "#0f172a" }}
                   />
                   <div className="h-1 w-20 rounded-full bg-slate-500" />
                   {usesFixedDenominator && questionData.fixedDenominator ? (
-                    <div className="relative z-10 flex h-12 w-20 items-center justify-center rounded-b-xl border border-t-0 border-gray-300 bg-slate-100 px-3 text-center text-xl font-black leading-none text-slate-700">
+                    <div className="flex h-12 w-20 items-center justify-center rounded-b-xl border border-t-0 border-gray-300 bg-slate-100 px-3 text-center text-2xl font-black leading-none text-slate-700">
                       {questionData.fixedDenominator}
                     </div>
                   ) : (
@@ -1360,7 +1377,8 @@ export default function TypedResponseActivity({
                       }}
                       inputMode="numeric"
                       placeholder=""
-                      className="relative z-10 h-12 w-20 appearance-none rounded-b-xl border border-t-0 border-gray-300 bg-white px-3 text-center text-xl font-black leading-none text-gray-900 caret-teal-600 outline-none focus:border-teal-500"
+                      className="block h-12 w-20 appearance-none rounded-b-xl border border-t-0 border-gray-300 bg-white px-3 text-center text-2xl font-black leading-none text-slate-900 caret-teal-600 outline-none focus:border-teal-500"
+                      style={{ WebkitTextFillColor: "#0f172a" }}
                     />
                   )}
                 </div>

@@ -4747,7 +4747,7 @@ function generateGenericQuestion(
         : [2, 3, 4, 5, 6, 8];
     const denominator = denominators[randInt(0, denominators.length - 1)] ?? denominators[0] ?? 4;
     const count = randInt(2, Math.min(denominator, 4));
-    const answer = count === denominator ? "1" : `${count}/${denominator}`;
+    const answer = `${count}/${denominator}`;
     const expression = Array.from({ length: count }, () => `1/${denominator}`).join(" + ");
 
     return asMultipleChoice
