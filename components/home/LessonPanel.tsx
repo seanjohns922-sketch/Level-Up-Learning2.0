@@ -43,7 +43,10 @@ export default function LessonPanel({
           <span className="text-[10px] font-extrabold text-emerald-400 uppercase tracking-widest">
             Week {week}
           </span>
-          <h2 className="text-sm font-bold text-white/90 mt-0.5">Lessons</h2>
+          <h2 className="text-sm font-bold text-white/90 mt-0.5">Weekly Focus</h2>
+          {topic && (
+            <p className="text-xs font-medium text-white/50 mt-0.5">{topic}</p>
+          )}
         </div>
         <button
           onClick={onContinue}
