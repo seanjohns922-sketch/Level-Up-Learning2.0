@@ -45,15 +45,6 @@ export default function HeroHeader({
           </button>
 
           <div className="flex items-center gap-2">
-            {/* Avatar + name */}
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/10">
-              {legendAvatar && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={legendAvatar} alt="" className="h-5 w-5 rounded-full object-cover" />
-              )}
-              <span className="text-xs font-bold text-white/90">{displayName}</span>
-            </div>
-
             <button
               onClick={onLogout}
               className="h-8 w-8 rounded-full bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/80 hover:bg-white/20 transition"
