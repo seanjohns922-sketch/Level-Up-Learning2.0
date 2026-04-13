@@ -6,8 +6,7 @@ type Props = {
   levelNum: number;
   week: number;
   lessonsDone: number;
-  totalLessons: number;
-  topic?: string;
+  overallPercent: number;
   onBack: () => void;
   onLogout: () => void;
   studentName?: string;
@@ -18,90 +17,56 @@ export default function HeroHeader({
   levelNum,
   week,
   lessonsDone,
-  totalLessons,
-  topic,
+  overallPercent,
   onBack,
   onLogout,
   studentName,
   legendAvatar,
 }: Props) {
   const displayName = studentName || "Adventurer";
-  const progressPct = Math.round((lessonsDone / Math.max(totalLessons, 1)) * 100);
 
   return (
     <div className="relative">
-      {/* Gradient overlay for readability */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/15 to-transparent pointer-events-none" />
+      {/* Subtle dark overlay for readability */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-transparent pointer-events-none" />
 
-      <div className="relative max-w-2xl mx-auto px-5 pt-4 pb-14">
-        {/* Utility row */}
-        <div className="flex items-center justify-between mb-6">
+      <div className="relative max-w-2xl mx-auto px-5 pt-4 pb-20">
+        {/* Nav row */}
+        <div className="flex items-center justify-between mb-5">
           <button
             onClick={onBack}
-            className="h-8 w-8 rounded-full bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/80 hover:bg-white/20 transition"
+            className="h-9 w-9 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white/90 hover:bg-white/25 transition"
             aria-label="Back"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-5 w-5" />
           </button>
-
-          <div className="flex items-center gap-2">
-            {/* Avatar + name */}
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/10">
-              {legendAvatar && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={legendAvatar} alt="" className="h-5 w-5 rounded-full object-cover" />
-              )}
-              <span className="text-xs font-bold text-white/90">{displayName}</span>
-            </div>
-
-            <button
-              onClick={onLogout}
-              className="h-8 w-8 rounded-full bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/80 hover:bg-white/20 transition"
-              type="button"
-              aria-label="Log out"
-            >
-              <LogOut className="h-3.5 w-3.5" />
-            </button>
-          </div>
+          <button
+            onClick={onLogout}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/15 backdrop-blur-sm text-white/90 text-xs font-bold hover:bg-white/25 transition"
+            type="button"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            Log Out
+          </button>
         </div>
 
-        {/* Hero content — centered */}
-        <div className="text-center">
-          {/* Level pill */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10 mb-3">
-            <span className="text-[10px] font-extrabold text-emerald-300 uppercase tracking-widest">
-              Level {levelNum}
-            </span>
-            <span className="text-white/30">·</span>
-            <span className="text-[10px] font-extrabold text-teal-200 uppercase tracking-widest">
-              Number Nexus
-            </span>
-          </div>
-
-          {/* Week title */}
-          <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight leading-none mb-1.5"
-              style={{ textShadow: "0 2px 12px rgba(0,0,0,0.4)" }}>
-            Week {week}
-          </h1>
-
-          {/* Topic */}
-          {topic && (
-            <p className="text-sm font-medium text-white/60 mb-3">{topic}</p>
-          )}
-
-          {/* Completion subline */}
-          <p className="text-xs font-bold text-white/50 mb-3">
-            {lessonsDone} of {totalLessons} lessons completed
-          </p>
-
-          {/* Progress bar */}
-          <div className="max-w-xs mx-auto">
-            <div className="h-1.5 rounded-full bg-white/10 overflow-hidden backdrop-blur-sm">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-400 transition-all duration-700"
-                style={{ width: `${progressPct}%` }}
-              />
+        {/* Welcome section */}
+        <div className="flex items-center gap-4">
+          {/* Legend avatar */}
+          {legendAvatar && (
+            <div className="h-16 w-16 rounded-2xl overflow-hidden border-2 border-white/30 shadow-lg bg-white/10 backdrop-blur-sm flex-shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={legendAvatar} alt="" className="h-full w-full object-cover" />
             </div>
+          )}
+          <div>
+            <p className="text-white/70 text-xs font-bold tracking-wider uppercase">Welcome back</p>
+            <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight leading-tight">
+              {displayName}
+            </h1>
+            <p className="text-white/60 text-xs font-medium mt-0.5">
+              Level {levelNum} · Number Nexus · Week {week}
+            </p>
           </div>
         </div>
       </div>
