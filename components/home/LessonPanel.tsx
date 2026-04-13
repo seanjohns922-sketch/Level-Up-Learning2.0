@@ -22,6 +22,7 @@ type Props = {
 };
 
 export default function LessonPanel({
+  topic,
   week,
   lessons,
   lessonsDone,
