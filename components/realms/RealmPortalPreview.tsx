@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 
 export const REALM_PORTAL_VIDEOS: Record<string, string | undefined> = {
-  "number-nexus": "/videos/number-nexus-preview.mp4",
-  measurelands: "/videos/measurelands_.mp4",
+  "number-nexus": "/videos/realms/number-nexus.mp4",
+  measurelands: "/videos/realms/measurelands.mp4",
   "pattern-peaks": "/videos/realms/pattern-peaks.mp4",
   "starpath-realm": "/videos/realms/starpath-realm.mp4",
   statistica: "/videos/realms/statistica.mp4",
