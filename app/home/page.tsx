@@ -151,6 +151,7 @@ export default function StudentHomePage() {
 
             {/* Lesson panel — the one main container */}
             <LessonPanel
+              topic={programWeek?.topic}
               week={week}
               lessons={programWeek?.lessons ?? []}
               lessonsDone={lessonsDone}
