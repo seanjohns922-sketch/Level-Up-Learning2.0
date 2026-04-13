@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { DEMO_MODE } from "@/data/config";
 
 const REALMS = [
-  { id: "number-nexus", name: "Number Nexus", symbol: "⚡", description: "Master numbers, operations & place value", color: "rgb(52,211,153)", colorDim: "rgba(52,211,153,0.25)", active: true },
+  { id: "number-nexus", name: "Number Nexus", symbol: "⚡", description: "Master numbers, operations & place value", color: "rgb(52,211,153)", colorDim: "rgba(52,211,153,0.25)", active: true, video: "/videos/number-nexus-preview.mp4" },
   { id: "pattern-peaks", name: "Pattern Peaks", symbol: "△", description: "Algebra and pattern recognition", color: "rgb(251,191,36)", colorDim: "rgba(251,191,36,0.2)", active: false },
   { id: "measurelands", name: "Measurelands", symbol: "◈", description: "Length, mass, capacity & more", color: "rgb(96,165,250)", colorDim: "rgba(96,165,250,0.2)", active: false },
   { id: "statistica", name: "Statistica", symbol: "▣", description: "Data, graphs & interpretation", color: "rgb(167,139,250)", colorDim: "rgba(167,139,250,0.2)", active: false },
@@ -211,19 +211,34 @@ export default function RealmCarousel() {
                   }}
                 />
 
-                {/* Symbol */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span
-                    className="text-5xl md:text-6xl"
-                    style={{
-                      color: isActive ? current.color : "rgba(255,255,255,0.2)",
-                      filter: isActive ? `drop-shadow(0 0 12px ${current.colorDim})` : "none",
-                      transition: "all 0.4s ease",
-                    }}
-                  >
-                    {current.symbol}
-                  </span>
-                </div>
+                {/* Portal content — video or symbol */}
+                {isActive && current.video ? (
+                  <>
+                    <video
+                      key={current.id}
+                      src={current.video}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/20" />
+                  </>
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span
+                      className="text-5xl md:text-6xl"
+                      style={{
+                        color: isActive ? current.color : "rgba(255,255,255,0.2)",
+                        filter: isActive ? `drop-shadow(0 0 12px ${current.colorDim})` : "none",
+                        transition: "all 0.4s ease",
+                      }}
+                    >
+                      {current.symbol}
+                    </span>
+                  </div>
+                )}
 
                 {/* Lock overlay */}
                 {!isActive && (
