@@ -708,10 +708,10 @@ const year4Rows: ProgramRow[] = [
   {
     week: 11,
     weekTopic: "Division, Fractions & Multi-Step Problem Solving",
-    focus: "Division, Fractions & Problem Solving",
+    focus: "Division Strategies & Fluency",
     lesson: 1,
-    topic: "Division Deep Dive",
-    activity: "Explore grouping and sharing, work with remainders in context, and use inverse relationships to check division",
+    topic: "Division Strategies",
+    activity: "Use sharing and grouping strategies, link division to multiplication, and build fluency with inverse thinking",
     curriculum: ["AC9M4N03", "AC9M4N06"],
     activities: [
       makeActivity("division_groups", 2, {
@@ -725,10 +725,10 @@ const year4Rows: ProgramRow[] = [
   },
   {
     week: 11,
-    focus: "Division, Fractions & Problem Solving",
+    focus: "Fractions of Quantities",
     lesson: 2,
-    topic: "Fractions in Context",
-    activity: "Use visual models and number lines to reason about equivalent fractions and compare simple fractions in context",
+    topic: "Fractions of Quantities",
+    activity: "Find fractions of quantities using grouping, visual models, and number connections in real contexts",
     curriculum: ["AC9M4N05"],
     activities: [
       makeActivity("equivalent_fraction_match", 2, {
@@ -742,11 +742,11 @@ const year4Rows: ProgramRow[] = [
   },
   {
     week: 11,
-    focus: "Division, Fractions & Problem Solving",
+    focus: "Division + Fractions Combined",
     lesson: 3,
     quizSafe: false,
-    topic: "Multi-Step (with Division + Fractions)",
-    activity: "Apply division reasoning and fraction understanding across multi-step problems and supported fraction tasks",
+    topic: "Multi-Step Problem Solving",
+    activity: "Choose operations and combine division and fraction reasoning across multi-step problems",
     curriculum: ["AC9M4N03", "AC9M4N05", "AC9M4N06"],
     activities: [
       makeActivity("mixed_word_problem", 2, {
@@ -761,7 +761,7 @@ const year4Rows: ProgramRow[] = [
   },
   {
     week: 12,
-    weekTopic: "Level 5 Readiness",
+    weekTopic: "Mixed Operations, Fractions & Reasonableness",
     focus: "Mixed Operations, Fractions & Reasonableness",
     lesson: 1,
     quizSafe: false,
