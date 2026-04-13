@@ -345,14 +345,18 @@ export default function ProfilePage() {
                     }
                   `}
                 >
-                  <div className={`h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0
-                    ${isActive
-                      ? "bg-[#7C5CFC] text-white"
-                      : "bg-gray-200 text-gray-400"
-                    }`}
-                  >
-                    <realm.icon className="h-4 w-4" />
-                  </div>
+                  {isActive ? (
+                    <div
+                      className="h-8 w-8 rounded-lg flex-shrink-0 bg-cover bg-center shadow-sm ring-1 ring-white/20"
+                      style={{
+                        backgroundImage: `linear-gradient(rgba(0,0,0,0.2),rgba(0,0,0,0.25)), url('/images/number-nexus-bg.jpg')`,
+                      }}
+                    />
+                  ) : (
+                    <div className="h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-gray-200 text-gray-400">
+                      <realm.icon className="h-4 w-4" />
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
                     <span className={`text-xs font-bold block truncate ${isActive ? "text-gray-800" : "text-gray-400"}`}>
                       {realm.name}
