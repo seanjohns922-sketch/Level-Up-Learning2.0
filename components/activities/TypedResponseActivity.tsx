@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { TypedResponseQuestion } from "@/data/activities/year2/lessonEngine";
+import type { TypedResponseQuestion, WrittenMethodLayout } from "@/data/activities/year2/lessonEngine";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import PlaceValueMABVisual from "@/components/activities/PlaceValueMABVisual";
 import DecimalModelVisual from "@/components/activities/DecimalModelVisual";
@@ -96,6 +96,21 @@ function structuredFractionKey(questionData: TypedResponseQuestion) {
     questionData.placeholder ?? "",
     questionData.fixedDenominator ?? "",
     questionData.visual?.type ?? "",
+  ].join("|");
+}
+
+function getWrittenMethodKey(writtenMethod?: WrittenMethodLayout) {
+  if (!writtenMethod) return "";
+  return [
+    writtenMethod.title,
+    writtenMethod.operation,
+    writtenMethod.answerLength,
+    writtenMethod.top.join(","),
+    writtenMethod.bottom.join(","),
+    writtenMethod.placeValueLabels.join(","),
+    writtenMethod.carryRow?.join(",") ?? "",
+    writtenMethod.borrowRow?.join(",") ?? "",
+    writtenMethod.crossedTop?.join(",") ?? "",
   ].join("|");
 }
 
@@ -583,6 +598,7 @@ export default function TypedResponseActivity({
   const numeratorRef = useRef<HTMLInputElement | null>(null);
   const denominatorRef = useRef<HTMLInputElement | null>(null);
   const questionKey = structuredFractionKey(questionData);
+  const currentWrittenMethodKey = getWrittenMethodKey(writtenMethod);
 
   useEffect(() => {
     setTyped("");
@@ -645,13 +661,11 @@ export default function TypedResponseActivity({
     setGuidedPhase(isGuidedWrittenMethod && writtenMethod ? "decide" : "done");
     setGuidedFeedback("");
   }, [
-    expectedStructuredFraction,
     isGuidedWrittenMethod,
     isOrderingResponse,
     orderingAnswerParts.length,
     questionKey,
-    questionData.fixedDenominator,
-    writtenMethod,
+    currentWrittenMethodKey,
   ]);
 
   function normalizedDigitAnswer() {
