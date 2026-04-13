@@ -232,6 +232,7 @@ export type NumberLinePlaceQuestion = {
   prompt: string;
   mode: "place_fraction" | "pick_point" | "order_fractions";
   denominator?: number;
+  partitionDenominator?: number;
   targetFraction?: string;
   options?: string[];
   answer?: string;
@@ -3447,16 +3448,18 @@ function generateInteractiveQuestion(
       const denominator = denominators[randInt(0, denominators.length - 1)] ?? denominators[0] ?? 4;
       const targetStep = randInt(1, denominator);
       const targetLabel = targetStep === denominator ? "1" : `${targetStep}/${denominator}`;
+      const fractionAnswer = `${targetStep}/${denominator}`;
       return {
         kind: "number_line_place",
         prompt: `Count by 1/${denominator}. Place ${targetLabel} on the number line.`,
         mode: "place_fraction",
         denominator,
+        partitionDenominator: denominator,
         targetFraction: targetLabel,
         options: Array.from({ length: denominator }, (_, index) =>
           index + 1 === denominator ? "1" : `${index + 1}/${denominator}`
         ),
-        answer: targetLabel,
+        answer: fractionAnswer,
       };
     }
 
@@ -3471,6 +3474,7 @@ function generateInteractiveQuestion(
         prompt: `Place ${targetLabel} on the number line.`,
         mode: "place_fraction",
         denominator,
+        partitionDenominator: denominator,
         targetFraction: targetLabel,
         answer: targetLabel,
         maxWhole: 2,
@@ -4669,8 +4673,6 @@ function generateGenericQuestion(
         ? (config.denominators as number[])
         : [2, 3, 4, 5, 6, 8];
     const denominator = denominators[randInt(0, denominators.length - 1)] ?? denominators[0] ?? 4;
-    const targetStep = randInt(1, denominator);
-    const targetLabel = targetStep === denominator ? "1" : `${targetStep}/${denominator}`;
     const missingIndex = Math.max(2, Math.min(denominator - 1, randInt(2, denominator - 1)));
     const sequenceLength = Math.min(5, denominator);
     const sequence = Array.from({ length: sequenceLength }, (_, index) => {
@@ -4678,11 +4680,14 @@ function generateGenericQuestion(
       if (stepIndex === missingIndex) return "__";
       return stepIndex === denominator ? "1" : `${stepIndex}/${denominator}`;
     });
-    const nextLabel =
-      sequenceLength + 1 === denominator ? "1" : `${Math.min(sequenceLength + 1, denominator)}/${denominator}`;
-
     const missingLabel = missingIndex === denominator ? "1" : `${missingIndex}/${denominator}`;
     const askMissing = randInt(0, 1) === 0;
+    const nextStep = randInt(2, denominator);
+    const nextAnswer = `${nextStep}/${denominator}`;
+    const nextSequence = Array.from({ length: nextStep - 1 }, (_, index) => {
+      const stepIndex = index + 1;
+      return stepIndex === denominator ? "1" : `${stepIndex}/${denominator}`;
+    });
     return asMultipleChoice
       ? {
           kind: "multiple_choice",
@@ -4690,7 +4695,7 @@ function generateGenericQuestion(
           options: uniqueStringOptions(missingLabel, [
             `${Math.max(1, missingIndex - 1)}/${denominator}`,
             `${Math.min(denominator - 1, missingIndex + 1)}/${denominator}`,
-            targetLabel,
+            nextAnswer,
             "1",
           ]),
           answer: missingLabel,
@@ -4700,10 +4705,11 @@ function generateGenericQuestion(
           kind: "typed_response",
           prompt: askMissing
             ? `Fill the missing fraction when counting by 1/${denominator}: ${sequence.join(", ")}`
-            : `Count by 1/${denominator}. When do you reach ${targetLabel}?`,
-          answer: askMissing ? missingLabel : targetLabel,
+            : `What comes next when you count by 1/${denominator}? ${nextSequence.join(", ")}, __`,
+          answer: askMissing ? missingLabel : nextAnswer,
           helper: `Fractions with the same denominator count in equal steps.`,
           placeholder: "Type the fraction",
+          fixedDenominator: denominator,
         };
   }
 
