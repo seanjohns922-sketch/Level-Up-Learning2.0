@@ -349,7 +349,7 @@ export default function ProfilePage() {
                     <div
                       className="h-8 w-8 rounded-lg flex-shrink-0 bg-cover bg-center shadow-sm ring-1 ring-white/20"
                       style={{
-                        backgroundImage: `linear-gradient(rgba(0,0,0,0.2),rgba(0,0,0,0.25)), url('/images/number-nexus-bg.jpg')`,
+                        backgroundImage: `linear-gradient(rgba(0,0,0,0.05),rgba(0,0,0,0.1)), url('/images/number-nexus-bg.jpg')`,
                       }}
                     />
                   ) : (
