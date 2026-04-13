@@ -3446,8 +3446,8 @@ function generateInteractiveQuestion(
     if (explicitMode === "skip_count_fraction") {
       const denominators = allowedDenominators?.length ? allowedDenominators : [2, 3, 4, 5, 6, 8];
       const denominator = denominators[randInt(0, denominators.length - 1)] ?? denominators[0] ?? 4;
-      const targetStep = randInt(1, denominator);
-      const targetLabel = targetStep === denominator ? "1" : `${targetStep}/${denominator}`;
+      const targetStep = randInt(1, Math.max(1, denominator - 1));
+      const targetLabel = `${targetStep}/${denominator}`;
       const fractionAnswer = `${targetStep}/${denominator}`;
       return {
         kind: "number_line_place",
