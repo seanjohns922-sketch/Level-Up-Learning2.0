@@ -58,6 +58,7 @@ type LessonRendererProps = {
   questionData: Year2QuestionData;
   onCorrect?: () => void;
   onWrong?: () => void;
+  renderMode?: "lesson" | "quiz";
 };
 
 function ErrorCard({ message }: { message: string }) {
@@ -104,12 +105,14 @@ function renderNestedActivity({
   prompt,
   onCorrect,
   onWrong,
+  renderMode,
 }: {
   activityType: LessonActivity["activityType"];
   questionData: Year2QuestionData;
   prompt: string;
   onCorrect?: () => void;
   onWrong?: () => void;
+  renderMode?: "lesson" | "quiz";
 }) {
   return (
     <LessonRenderer
@@ -118,6 +121,7 @@ function renderNestedActivity({
       questionData={questionData}
       onCorrect={onCorrect}
       onWrong={onWrong}
+      renderMode={renderMode}
     />
   );
 }
@@ -128,6 +132,7 @@ export function LessonRenderer({
   questionData,
   onCorrect,
   onWrong,
+  renderMode = "lesson",
 }: LessonRendererProps) {
   switch (activity.activityType) {
     case "place_value_builder": {
@@ -231,6 +236,7 @@ export function LessonRenderer({
           questionData={safeQuestion as NumberLinePlaceQuestion}
           onCorrect={onCorrect}
           onWrong={onWrong}
+          renderMode={renderMode}
         />
       );
     }
@@ -356,13 +362,14 @@ export function LessonRenderer({
       if (safeQuestion.kind !== "review_quiz") {
         return <ErrorCard message="Review quiz failed to load." />;
       }
-      return renderNestedActivity({
-        activityType: safeQuestion.activityType,
-        questionData: safeQuestion.question,
-        prompt,
-        onCorrect,
-        onWrong,
-      });
+        return renderNestedActivity({
+          activityType: safeQuestion.activityType,
+          questionData: safeQuestion.question,
+          prompt,
+          onCorrect,
+          onWrong,
+          renderMode,
+        });
     }
     case "subtraction_strategy": {
       const safeQuestion = getSafeQuestion(activity, questionData, prompt);
@@ -436,6 +443,7 @@ export function LessonRenderer({
           questionData={safeQuestion as MultipleChoiceQuestion}
           onCorrect={onCorrect}
           onWrong={onWrong}
+          renderMode={renderMode}
         />
       );
     }
@@ -449,6 +457,7 @@ export function LessonRenderer({
           questionData={safeQuestion as TypedResponseQuestion}
           onCorrect={onCorrect}
           onWrong={onWrong}
+          renderMode={renderMode}
         />
       );
     }

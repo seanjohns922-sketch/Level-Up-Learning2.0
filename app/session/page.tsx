@@ -3150,6 +3150,7 @@ function SessionPage() {
                         activity={currentQuiz.activity}
                         prompt={currentQuiz.prompt}
                         questionData={currentQuiz.questionData}
+                        renderMode="quiz"
                         onCorrect={() =>
                           setQuizLessonActivityResults((prev) =>
                             prev[currentQuiz.id]

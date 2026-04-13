@@ -30,14 +30,18 @@ function FractionBar({
   fraction,
   showLabel = true,
   large = false,
+  showFilled = true,
+  totalWholes,
 }: {
   fraction: string;
   showLabel?: boolean;
   large?: boolean;
+  showFilled?: boolean;
+  totalWholes?: number;
 }) {
   const { whole, numerator, denominator } = parseFraction(fraction);
-  const totalParts = denominator * Math.max(1, whole + (numerator > 0 ? 1 : 0));
-  const shadedParts = whole * denominator + numerator;
+  const totalParts = denominator * Math.max(1, totalWholes ?? whole + (numerator > 0 ? 1 : 0));
+  const shadedParts = showFilled ? whole * denominator + numerator : 0;
   return (
     <div className={large ? "w-full" : "rounded-2xl border border-violet-200 bg-white p-3 shadow-sm"}>
       <div
@@ -70,10 +74,12 @@ export default function NumberLinePlace({
   questionData,
   onCorrect,
   onWrong,
+  renderMode = "lesson",
 }: {
   questionData: NumberLinePlaceQuestion;
   onCorrect?: () => void;
   onWrong?: () => void;
+  renderMode?: "lesson" | "quiz";
 }) {
   const [order, setOrder] = useState<string[]>([]);
   const [placedFraction, setPlacedFraction] = useState<string | null>(null);
@@ -83,7 +89,8 @@ export default function NumberLinePlace({
   const fractionOptions = questionData.options ?? ["1/5", "1/2", "4/5"];
   const targetFraction = questionData.targetFraction ?? fractionOptions[0] ?? "1/2";
   const parsedTarget = useMemo(() => parseFraction(targetFraction), [targetFraction]);
-  const denominator = parsedTarget.denominator || 1;
+  const denominator =
+    questionData.partitionDenominator ?? questionData.denominator ?? parsedTarget.denominator ?? 1;
   const maxWhole = questionData.maxWhole ?? Math.max(1, Math.ceil(parsedTarget.value));
   const lineStops = useMemo(
     () =>
@@ -212,17 +219,26 @@ export default function NumberLinePlace({
           <div className="mt-6 rounded-2xl border border-violet-100 bg-violet-50 p-5">
             <div className="text-xs font-bold uppercase tracking-wide text-violet-700">Visual Support</div>
             <div className="mt-3 max-w-sm">
-              <FractionBar fraction={targetFraction} />
+              <FractionBar
+                fraction={targetFraction}
+                showLabel={renderMode === "lesson"}
+                showFilled={renderMode === "lesson"}
+                totalWholes={maxWhole}
+              />
             </div>
-            <p className="mt-3 text-sm text-slate-600">
+            {renderMode === "lesson" ? (
+              <p className="mt-3 text-sm text-slate-600">
               Use the bar model to count equal jumps from 0 to 1.
-            </p>
+              </p>
+            ) : null}
           </div>
 
           <div className="mt-6 rounded-2xl border border-violet-100 bg-violet-50 p-5">
-            <div className="mb-3 text-sm font-bold text-violet-700">
+            {renderMode === "lesson" ? (
+              <div className="mb-3 text-sm font-bold text-violet-700">
               {denominator} equal jumps from 0 to {maxWhole}
-            </div>
+              </div>
+            ) : null}
             <div
               ref={lineRef}
               className="relative mx-4 h-16 cursor-pointer"
@@ -265,7 +281,7 @@ export default function NumberLinePlace({
               <span>0</span>
               <span>{maxWhole}</span>
             </div>
-            {animatedFraction && animatedFraction !== "0" ? (
+            {renderMode === "lesson" && animatedFraction && animatedFraction !== "0" ? (
               <div className="mt-3 text-sm font-bold text-violet-700">
                 Jumped to <FractionText value={animatedFraction} compact />
               </div>
@@ -274,7 +290,15 @@ export default function NumberLinePlace({
 
           <button
             type="button"
-            onClick={() => (placedFraction === questionData.answer ? onCorrect?.() : onWrong?.())}
+            onClick={() => {
+              const placedValue = placedFraction ? parseFraction(placedFraction).value : NaN;
+              const answerValue = questionData.answer ? parseFraction(questionData.answer).value : NaN;
+              if (Number.isFinite(placedValue) && Number.isFinite(answerValue) && placedValue === answerValue) {
+                onCorrect?.();
+                return;
+              }
+              onWrong?.();
+            }}
             disabled={!placedFraction}
             className="mt-6 w-full rounded-2xl bg-violet-600 px-5 py-3 font-black text-white hover:bg-violet-700 disabled:opacity-40"
           >

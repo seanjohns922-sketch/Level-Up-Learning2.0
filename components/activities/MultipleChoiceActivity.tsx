@@ -37,10 +37,12 @@ export default function MultipleChoiceActivity({
   questionData,
   onCorrect,
   onWrong,
+  renderMode = "lesson",
 }: {
   questionData: MultipleChoiceQuestion;
   onCorrect?: () => void;
   onWrong?: () => void;
+  renderMode?: "lesson" | "quiz";
 }) {
   const [picked, setPicked] = useState<string | null>(null);
 
@@ -66,7 +68,7 @@ export default function MultipleChoiceActivity({
         </h2>
         <ReadAloudBtn text={questionData.prompt} />
       </div>
-      {questionData.helper ? (
+      {renderMode === "lesson" && questionData.helper ? (
         <p className="mt-2 text-sm text-gray-600">
           <MathFormattedText text={questionData.helper} />
         </p>

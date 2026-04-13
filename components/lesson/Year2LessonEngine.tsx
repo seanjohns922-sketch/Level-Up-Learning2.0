@@ -268,6 +268,7 @@ export function Year2LessonEngine({
             activity={currentActivity}
             prompt={lesson.title}
             questionData={currentQuestion}
+            renderMode="lesson"
             onCorrect={handleCorrect}
             onWrong={handleWrong}
           />

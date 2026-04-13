@@ -508,10 +508,12 @@ export default function TypedResponseActivity({
   questionData,
   onCorrect,
   onWrong,
+  renderMode = "lesson",
 }: {
   questionData: TypedResponseQuestion;
   onCorrect?: () => void;
   onWrong?: () => void;
+  renderMode?: "lesson" | "quiz";
 }) {
   const writtenMethod = questionData.writtenMethod;
   const isGuidedAddition = writtenMethod?.operation === "+";
@@ -1080,7 +1082,7 @@ export default function TypedResponseActivity({
           </div>
         </div>
       ) : null}
-      {questionData.helper ? (
+      {renderMode === "lesson" && questionData.helper ? (
         <p className="mt-2 text-sm text-gray-600">
           <MathFormattedText text={questionData.helper} />
         </p>
