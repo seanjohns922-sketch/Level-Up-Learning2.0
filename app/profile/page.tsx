@@ -349,8 +349,7 @@ export default function ProfilePage() {
                     <div
                       className="h-10 w-10 rounded-lg flex-shrink-0 bg-cover bg-center shadow-sm ring-1 ring-black/10"
                       style={{
-                        backgroundImage: `url('/images/number-nexus-bg.jpg')`,
-                        backgroundPosition: "center 30%",
+                        backgroundImage: `url('/images/number-nexus-tile.jpg')`,
                       }}
                     />
                   ) : (
