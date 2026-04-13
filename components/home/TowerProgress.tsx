@@ -1,6 +1,6 @@
 "use client";
 
-import ReadAloudBtn from "@/components/ReadAloudBtn";
+import { Zap, CloudOff, Star } from "lucide-react";
 
 type Props = {
   towerStrength: number;
@@ -9,50 +9,54 @@ type Props = {
   legendAvatar: string;
 };
 
-export default function TowerProgress({ towerStrength, fogCleared, legendName }: Props) {
-  const summaryText = `Tower Strength is ${towerStrength} percent. Fog Cleared is ${fogCleared} percent. Your next legend is ${legendName}.`;
+function CircularProgress({ value, size = 56, strokeWidth = 5, color }: { value: number; size?: number; strokeWidth?: number; color: string }) {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (value / 100) * circumference;
 
   return (
-    <div
-      className="rounded-3xl border border-white/40 shadow-xl p-5 flex flex-col"
-      style={{
-        background: "rgba(255,255,255,0.9)",
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.12), 0 0 0 1px rgba(255,255,255,0.3) inset",
-      }}
-    >
-      <div className="flex items-center gap-2 mb-3">
-        <h3 className="text-xs font-extrabold text-gray-500 tracking-wider">TOWER STATUS</h3>
-        <ReadAloudBtn text={summaryText} />
+    <svg width={size} height={size} className="-rotate-90">
+      <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="currentColor" strokeWidth={strokeWidth} className="text-gray-100" />
+      <circle
+        cx={size / 2} cy={size / 2} r={radius}
+        fill="none" stroke={color} strokeWidth={strokeWidth}
+        strokeDasharray={circumference} strokeDashoffset={offset}
+        strokeLinecap="round"
+        className="transition-all duration-700"
+      />
+    </svg>
+  );
+}
+
+export default function TowerProgress({ towerStrength, fogCleared, legendName }: Props) {
+  return (
+    <div className="rounded-2xl border border-gray-200/80 bg-white shadow-sm p-4 flex flex-col">
+      <h3 className="text-xs font-extrabold text-gray-500 tracking-wider uppercase mb-3">Tower Status</h3>
+
+      <div className="flex items-center gap-4 mb-3">
+        {/* Tower strength ring */}
+        <div className="relative">
+          <CircularProgress value={towerStrength} color="hsl(160, 60%, 45%)" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-xs font-black text-gray-800">{towerStrength}%</span>
+          </div>
+        </div>
+        <div>
+          <div className="text-xs font-bold text-gray-800 flex items-center gap-1">
+            <Zap className="h-3 w-3 text-amber-500" /> Tower Strength
+          </div>
+          <div className="text-xs font-bold text-gray-800 flex items-center gap-1 mt-1.5">
+            <CloudOff className="h-3 w-3 text-emerald-500" /> Fog: {fogCleared}% cleared
+          </div>
+        </div>
       </div>
 
-      <div className="grid gap-3 flex-1">
+      {/* Next legend */}
+      <div className="flex items-center gap-2 rounded-xl bg-amber-50 border border-amber-200/40 px-3 py-2 mt-auto">
+        <Star className="h-4 w-4 text-amber-500" />
         <div>
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-bold text-gray-800">⚡ Tower Strength</span>
-            <span className="text-xs font-extrabold text-teal-600">{towerStrength}%</span>
-          </div>
-          <div className="h-2 rounded-full bg-teal-100/60 overflow-hidden">
-            <div className="h-full rounded-full bg-gradient-to-r from-teal-500 to-emerald-500 transition-all duration-500" style={{ width: `${towerStrength}%` }} />
-          </div>
-        </div>
-
-        <div>
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-bold text-gray-800">🌫️ Fog Cleared</span>
-            <span className="text-xs font-extrabold text-emerald-600">{fogCleared}%</span>
-          </div>
-          <div className="h-2 rounded-full bg-emerald-100/60 overflow-hidden">
-            <div className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 transition-all duration-500" style={{ width: `${fogCleared}%` }} />
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2.5 rounded-xl bg-amber-50/80 border border-amber-200/40 px-3 py-2 mt-1">
-          <div>
-            <div className="text-[10px] font-extrabold text-amber-600 tracking-wide">NEXT LEGEND</div>
-            <div className="text-xs font-bold text-gray-800">{legendName}</div>
-          </div>
+          <div className="text-[10px] font-extrabold text-amber-600 tracking-wide uppercase">Next Legend</div>
+          <div className="text-xs font-bold text-gray-800">{legendName}</div>
         </div>
       </div>
     </div>
