@@ -162,7 +162,7 @@ export default function StudentHomePage() {
               onLegends={goLegends}
               onLevels={goLevels}
               onTowerMap={() => router.push("/tower-map")}
-              onStats={() => router.push("/student")}
+              onStats={() => router.push("/realm-stats")}
             />
           </div>
         </div>
