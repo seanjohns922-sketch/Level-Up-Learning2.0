@@ -1,6 +1,7 @@
 "use client";
 
-import { LogOut, ChevronLeft } from "lucide-react";
+import { LogOut, ChevronLeft, User } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 type Props = {
   levelNum: number;
@@ -25,8 +26,10 @@ export default function HeroHeader({
   studentName,
   legendAvatar,
 }: Props) {
+  const router = useRouter();
   const displayName = studentName || "Adventurer";
   const progressPct = Math.round((lessonsDone / Math.max(totalLessons, 1)) * 100);
+  const initials = displayName.charAt(0).toUpperCase();
 
   return (
     <div className="relative">
@@ -45,6 +48,17 @@ export default function HeroHeader({
           </button>
 
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => router.push("/student")}
+              className="h-8 flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10 pl-1 pr-3 text-white/80 hover:bg-white/20 transition"
+              type="button"
+              aria-label="Profile"
+            >
+              <span className="h-6 w-6 rounded-full bg-white/20 flex items-center justify-center text-[10px] font-bold text-white">
+                {initials}
+              </span>
+              <span className="text-xs font-semibold truncate max-w-[80px]">{displayName}</span>
+            </button>
             <button
               onClick={onLogout}
               className="h-8 w-8 rounded-full bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/80 hover:bg-white/20 transition"
