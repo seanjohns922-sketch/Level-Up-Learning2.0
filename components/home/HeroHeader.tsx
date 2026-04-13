@@ -49,7 +49,7 @@ export default function HeroHeader({
 
           <div className="flex items-center gap-2">
             <button
-              onClick={() => router.push("/student")}
+              onClick={() => router.push("/profile")}
               className="h-8 flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10 pl-1 pr-3 text-white/80 hover:bg-white/20 transition"
               type="button"
               aria-label="Profile"

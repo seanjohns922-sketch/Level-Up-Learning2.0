@@ -158,7 +158,7 @@ export default function LessonPanel({
           {[
             { icon: Map, label: "Tower Map", onClick: onTowerMap },
             { icon: BookOpen, label: "Legends", onClick: onLegends },
-            { icon: BarChart3, label: "Stats", onClick: onStats },
+            { icon: BarChart3, label: "Realm Stats", onClick: onStats },
             { icon: LayoutGrid, label: "Levels", onClick: onLevels },
           ].map((item) => (
             <button
