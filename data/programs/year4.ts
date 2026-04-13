@@ -707,69 +707,67 @@ const year4Rows: ProgramRow[] = [
   },
   {
     week: 11,
-    weekTopic: "Problem Solving",
-    focus: "Problem Solving (Core)",
+    weekTopic: "Division, Fractions & Multi-Step Problem Solving",
+    focus: "Division, Fractions & Problem Solving",
     lesson: 1,
-    topic: "Additive vs Multiplicative Problems",
-    activity: "Solve real-world problems by deciding whether the situation is additive or multiplicative",
-    curriculum: ["AC9M4N06", "AC9M4N08"],
+    topic: "Division Deep Dive",
+    activity: "Explore grouping and sharing, work with remainders in context, and use inverse relationships to check division",
+    curriculum: ["AC9M4N03", "AC9M4N06"],
     activities: [
-      makeActivity("mixed_word_problem", 2, {
-        mode: "operation_choice_problem_solving",
-        operations: ["addition", "subtraction", "multiplication"],
-      }),
-      makeActivity("multiple_choice", 1, {
-        mode: "operation_choice_problem_solving",
-        sourceActivityType: "mixed_word_problem",
-      }),
-    ],
-  },
-  {
-    week: 11,
-    focus: "Problem Solving (Core)",
-    lesson: 2,
-    topic: "Financial Transactions",
-    activity: "Use money contexts to calculate totals, change, and simple budgets",
-    curriculum: ["AC9M4N07", "AC9M4N08"],
-    activities: [
-      makeActivity("mixed_word_problem", 2, {
-        mode: "financial_problem_solving",
-        operations: ["addition", "subtraction", "multiplication"],
+      makeActivity("division_groups", 2, {
+        maxGroups: 12,
+        maxItemsPerGroup: 12,
       }),
       makeActivity("typed_response", 1, {
-        mode: "financial_problem_solving",
-        sourceActivityType: "mixed_word_problem",
+        sourceActivityType: "division_groups",
       }),
     ],
   },
   {
     week: 11,
-    focus: "Problem Solving (Core)",
+    focus: "Division, Fractions & Problem Solving",
+    lesson: 2,
+    topic: "Fractions in Context",
+    activity: "Use visual models and number lines to reason about equivalent fractions and compare simple fractions in context",
+    curriculum: ["AC9M4N05"],
+    activities: [
+      makeActivity("equivalent_fraction_match", 2, {
+        mode: "match_equivalent",
+      }),
+      makeActivity("number_line_place", 1, {
+        mode: "pick_point",
+        denominators: [2, 3, 4, 5, 6, 8],
+      }),
+    ],
+  },
+  {
+    week: 11,
+    focus: "Division, Fractions & Problem Solving",
     lesson: 3,
     quizSafe: false,
-    topic: "Multi-Step Problems",
-    activity: "Solve two-step word problems by choosing the order of operations and tracking the steps",
-    curriculum: ["AC9M4N06", "AC9M4N08"],
+    topic: "Multi-Step (with Division + Fractions)",
+    activity: "Apply division reasoning and fraction understanding across multi-step problems and supported fraction tasks",
+    curriculum: ["AC9M4N03", "AC9M4N05", "AC9M4N06"],
     activities: [
       makeActivity("mixed_word_problem", 2, {
         mode: "core_two_step_problem",
         operations: ["addition", "subtraction", "multiplication", "division"],
       }),
       makeActivity("typed_response", 1, {
-        mode: "core_two_step_problem",
-        sourceActivityType: "mixed_word_problem",
+        mode: "same_denominator_combine",
+        denominators: [2, 3, 4, 5, 6, 8],
       }),
     ],
   },
   {
     week: 12,
-    weekTopic: "Advanced Problem Solving",
-    focus: "Problem Solving (Advanced)",
+    weekTopic: "Level 5 Readiness",
+    focus: "Mixed Operations, Fractions & Reasonableness",
     lesson: 1,
     quizSafe: false,
-    topic: "Multi-Step Problems (Harder)",
-    activity: "Solve harder multi-step problems with larger numbers and less obvious solution paths",
-    curriculum: ["AC9M4N06", "AC9M4N08"],
+    topic: "Mixed Operations",
+    activity: "Use all four operations in mixed problems and choose an efficient strategy for each one",
+    curriculum: ["AC9M4N03", "AC9M4N06", "AC9M4N08"],
     activities: [
       makeActivity("mixed_word_problem", 2, {
         mode: "advanced_two_step_problem",
@@ -783,29 +781,27 @@ const year4Rows: ProgramRow[] = [
   },
   {
     week: 12,
-    focus: "Problem Solving (Advanced)",
+    focus: "Mixed Operations, Fractions & Reasonableness",
     lesson: 2,
     quizSafe: false,
-    topic: "Mixed Contexts",
-    activity: "Solve multi-step problems in money, measurement, and time contexts",
-    curriculum: ["AC9M4N07", "AC9M4N08"],
+    topic: "Fractions + Decimals Connection",
+    activity: "Connect simple fractions to decimals and familiar money values using models and matching tasks",
+    curriculum: ["AC9M4N05", "AC9M4N07"],
     activities: [
-      makeActivity("mixed_word_problem", 2, {
-        mode: "mixed_context_problem",
-        operations: ["addition", "subtraction", "multiplication", "division"],
+      makeActivity("multiple_choice", 2, {
+        mode: "fraction_decimal_match",
       }),
       makeActivity("typed_response", 1, {
-        mode: "mixed_context_problem",
-        sourceActivityType: "mixed_word_problem",
+        mode: "fraction_decimal_match",
       }),
     ],
   },
   {
     week: 12,
-    focus: "Problem Solving (Advanced)",
+    focus: "Mixed Operations, Fractions & Reasonableness",
     lesson: 3,
     quizSafe: false,
-    topic: "Strategy Selection & Reasonableness",
+    topic: "Strategy & Reasonableness",
     activity: "Choose a sensible method, solve, and check whether the answer is reasonable",
     curriculum: ["AC9M4N06", "AC9M4N07", "AC9M4N08"],
     activities: [
