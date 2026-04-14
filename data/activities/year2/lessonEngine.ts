@@ -3593,12 +3593,16 @@ function generateInteractiveQuestion(
     if (explicitMode === "skip_count_fraction") {
       const denominators = allowedDenominators?.length ? allowedDenominators : [2, 3, 4, 5, 6, 8];
       const denominator = denominators[randInt(0, denominators.length - 1)] ?? denominators[0] ?? 4;
-      const targetStep = randInt(1, Math.max(1, denominator - 1));
+      const targetStep = randInt(2, Math.max(2, denominator - 1));
       const targetLabel = `${targetStep}/${denominator}`;
       const fractionAnswer = `${targetStep}/${denominator}`;
+      const leadInSequence = Array.from({ length: targetStep - 1 }, (_, index) => `${index + 1}/${denominator}`);
       return {
         kind: "number_line_place",
-        prompt: `Count by 1/${denominator}. Place ${targetLabel} on the number line.`,
+        prompt:
+          targetStep === 2
+            ? `Count by 1/${denominator}: 1/${denominator}, __. Place ${targetLabel} on the number line.`
+            : `Count by 1/${denominator}: ${leadInSequence.join(", ")}, __. Place ${targetLabel} on the number line.`,
         mode: "place_fraction",
         denominator,
         partitionDenominator: denominator,
@@ -4914,7 +4918,7 @@ function generateGenericQuestion(
     });
     const missingLabel = missingIndex === denominator ? "1" : `${missingIndex}/${denominator}`;
     const askMissing = randInt(0, 1) === 0;
-    const nextStep = randInt(2, denominator);
+    const nextStep = randInt(2, Math.max(2, denominator - 1));
     const nextAnswer = `${nextStep}/${denominator}`;
     const nextSequence = Array.from({ length: nextStep - 1 }, (_, index) => {
       const stepIndex = index + 1;
@@ -4937,7 +4941,7 @@ function generateGenericQuestion(
           kind: "typed_response",
           prompt: askMissing
             ? `Fill the missing fraction when counting by 1/${denominator}: ${sequence.join(", ")}`
-            : `What comes next when you count by 1/${denominator}? ${nextSequence.join(", ")}, __`,
+            : `What comes next when counting by 1/${denominator}? ${nextSequence.join(", ")}, __`,
           answer: askMissing ? missingLabel : nextAnswer,
           helper: `Fractions with the same denominator count in equal steps.`,
           placeholder: "Type the fraction",
