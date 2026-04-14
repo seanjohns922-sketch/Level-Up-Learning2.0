@@ -4,6 +4,7 @@ import { useState } from "react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { MixedWordProblemQuestion } from "@/data/activities/year2/lessonEngine";
 import MoneyContextVisual from "@/components/activities/MoneyContextVisual";
+import ArrayVisual from "@/components/activities/ArrayVisual";
 
 export default function MixedWordProblem({
   questionData,
@@ -44,7 +45,9 @@ export default function MixedWordProblem({
 
   return (
     <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-      {questionData.visual ? <MoneyContextVisual visual={questionData.visual} /> : null}
+      {questionData.visual && questionData.visual.type !== "array" ? (
+        <MoneyContextVisual visual={questionData.visual} />
+      ) : null}
       <div>
         <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">
           Mixed Word Problem
@@ -55,6 +58,15 @@ export default function MixedWordProblem({
         </div>
         <p className="mt-2 text-sm text-gray-600">{questionData.helper}</p>
       </div>
+
+      {questionData.visual?.type === "array" ? (
+        <ArrayVisual
+          rows={questionData.visual.rows}
+          cols={questionData.visual.columns}
+          highlightedRows={questionData.visual.highlightedRows}
+          title="Grouped set model"
+        />
+      ) : null}
 
       {questionData.showStrategyClue !== false ? (
         <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">

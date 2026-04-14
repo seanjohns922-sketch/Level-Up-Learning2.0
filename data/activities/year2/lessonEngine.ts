@@ -343,7 +343,14 @@ export type MixedWordProblemQuestion = {
     | "shop_transactions"
     | "two_step_problem";
   showStrategyClue?: boolean;
-  visual?: MoneyVisualData;
+  visual?:
+    | MoneyVisualData
+    | {
+        type: "array";
+        rows: number;
+        columns: number;
+        highlightedRows?: number[];
+      };
 };
 
 export type ReviewQuizInnerQuestion =
@@ -584,29 +591,35 @@ function buildYear4Week11DivisionFractionMultiStepQuestion() {
       prompt:
         "24 apples are shared equally between 4 children. Each child eats 1/2 of their apples. How many apples are left altogether?",
       answer: 12,
+      visual: { type: "array" as const, rows: 4, columns: 6, highlightedRows: [0] },
     },
     {
       prompt: "20 muffins are packed equally into 5 boxes. What is 1/2 of the muffins in one box?",
       answer: 2,
+      visual: { type: "array" as const, rows: 5, columns: 4, highlightedRows: [0] },
     },
     {
       prompt:
         "18 stickers are shared equally between 3 students. One student gives away 1/3 of their stickers. How many do they have left?",
       answer: 4,
+      visual: { type: "array" as const, rows: 3, columns: 6, highlightedRows: [0] },
     },
     {
       prompt: "16 pencils are split equally into 4 groups. What is 1/2 of one group?",
       answer: 2,
+      visual: { type: "array" as const, rows: 4, columns: 4, highlightedRows: [0] },
     },
     {
       prompt:
         "24 lollies are shared equally between 6 children. Each child eats 1/2 of their share. How many lollies are eaten altogether?",
       answer: 12,
+      visual: { type: "array" as const, rows: 6, columns: 4, highlightedRows: [0] },
     },
     {
       prompt:
         "30 cards are shared equally between 5 teams. Each team loses 1/3 of its cards. How many cards remain altogether?",
       answer: 20,
+      visual: { type: "array" as const, rows: 5, columns: 6, highlightedRows: [0] },
     },
   ];
   const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
@@ -619,6 +632,7 @@ function buildYear4Week11DivisionFractionMultiStepQuestion() {
     helper: "Work through the steps in order: divide first, then find the fraction.",
     mode: "two_step_problem" as const,
     showStrategyClue: false,
+    visual: Math.random() < 0.75 ? chosen.visual : undefined,
   };
 }
 
