@@ -1196,6 +1196,28 @@ function decimalHundredthsOptions(answer: string) {
   return shuffle(Array.from(values).map((value) => formatDecimal(value)));
 }
 
+function formatReasoningDecimal(value: number) {
+  return value.toFixed(3).replace(/\.?0+$/, "");
+}
+
+function buildDecimalReasoningSet(count = 4): number[] {
+  const useLessThanOne = randInt(0, 1) === 0;
+  const sharedWhole = useLessThanOne ? 0 : randInt(1, 9);
+  const precision = 0.001;
+  const factor = 1000;
+  const baseFraction = randInt(120, 920);
+  const values = new Set<number>();
+
+  while (values.size < count) {
+    const offset = randInt(-18, 18);
+    const fractionPart = Math.min(999, Math.max(1, baseFraction + offset));
+    const value = Number((sharedWhole + fractionPart / factor).toFixed(3));
+    values.add(value);
+  }
+
+  return Array.from(values);
+}
+
 function buildLargeNumberOptions(target: number, min: number, max: number): string[] {
   const options = new Set<number>([target]);
   const steps = [100000, 10000, 1000, 100, 10, 1];
@@ -4845,32 +4867,37 @@ function generateGenericQuestion(
   }
 
   if (explicitMode === "decimal_compare") {
-    const precision =
-      level >= 5
-        ? (([0.1, 0.01, 0.001] as const)[randInt(0, 2)] ?? 0.001)
-        : randInt(0, 1) === 0
-          ? 0.1
-          : 0.01;
-    const minDecimal = level >= 5 ? 0.001 : 0.1;
-    const maxDecimal = level >= 5 ? 12.999 : 9.99;
-    const left = randomStepValue(minDecimal, maxDecimal, precision);
-    let right = randomStepValue(minDecimal, maxDecimal, precision);
-    while (right === left) {
-      right = randomStepValue(minDecimal, maxDecimal, precision);
+    let left: number;
+    let right: number;
+
+    if (level >= 5) {
+      const pair = shuffle(buildDecimalReasoningSet(2));
+      left = pair[0] ?? 0.321;
+      right = pair[1] ?? 0.329;
+    } else {
+      const precision = randInt(0, 1) === 0 ? 0.1 : 0.01;
+      left = randomStepValue(0.1, 9.99, precision);
+      right = randomStepValue(0.1, 9.99, precision);
+      while (right === left) {
+        right = randomStepValue(0.1, 9.99, precision);
+      }
     }
-    const answer = left > right ? formatMathNumber(left) : formatMathNumber(right);
+
+    const leftText = level >= 5 ? formatReasoningDecimal(left) : formatMathNumber(left);
+    const rightText = level >= 5 ? formatReasoningDecimal(right) : formatMathNumber(right);
+    const answer = left > right ? leftText : rightText;
 
     return asMultipleChoice
       ? {
           kind: "multiple_choice",
-          prompt: `Which decimal is greater: ${formatMathNumber(left)} or ${formatMathNumber(right)}?`,
-          options: shuffle([formatMathNumber(left), formatMathNumber(right)]),
+          prompt: `Which decimal is greater: ${leftText} or ${rightText}?`,
+          options: shuffle([leftText, rightText]),
           answer,
           helper: "Compare the ones, then the tenths, then the hundredths.",
         }
       : {
           kind: "typed_response",
-          prompt: `Type the greater decimal: ${formatMathNumber(left)} or ${formatMathNumber(right)}.`,
+          prompt: `Type the greater decimal: ${leftText} or ${rightText}.`,
           answer,
           helper: "Compare the ones, then the tenths, then the hundredths.",
           placeholder: "Type the greater decimal",
@@ -6679,22 +6706,28 @@ function generateGenericQuestion(
     if (explicitMode === "decimal_order") {
       const count = typeof config.count === "number" ? config.count : 4;
       const ascending = config.ascending !== false;
-      const values = new Set<number>();
+      const values = new Set<number>(
+        level >= 5
+          ? buildDecimalReasoningSet(count)
+          : Array.from({ length: count }, () => randomStepValue(0.1, 9.99, randInt(0, 1) === 0 ? 0.1 : 0.01))
+      );
       while (values.size < count) {
-        values.add(randomStepValue(0.1, 9.99, randInt(0, 1) === 0 ? 0.1 : 0.01));
+        values.add(level >= 5 ? (buildDecimalReasoningSet(1)[0] ?? 0.555) : randomStepValue(0.1, 9.99, 0.01));
       }
-      const ordered = [...values].sort((a, b) => (ascending ? a - b : b - a));
+      const decimals = [...values];
+      const ordered = [...decimals].sort((a, b) => (ascending ? a - b : b - a));
+      const displayValues = level >= 5 ? decimals.map(formatReasoningDecimal) : decimals.map(formatMathNumber);
       const prompt = ascending
-        ? `Type the smallest decimal from this set: ${[...values].map(formatMathNumber).join(", ")}.`
-        : `Type the largest decimal from this set: ${[...values].map(formatMathNumber).join(", ")}.`;
-      const answer = formatMathNumber(ordered[0]);
+        ? `Type the smallest decimal from this set: ${displayValues.join(", ")}.`
+        : `Type the largest decimal from this set: ${displayValues.join(", ")}.`;
+      const answer = level >= 5 ? formatReasoningDecimal(ordered[0] ?? 0) : formatMathNumber(ordered[0] ?? 0);
       return asMultipleChoice
         ? {
             kind: "multiple_choice",
             prompt: ascending
-              ? `Which decimal is the smallest: ${[...values].map(formatMathNumber).join(", ")}?`
-              : `Which decimal is the largest: ${[...values].map(formatMathNumber).join(", ")}?`,
-            options: shuffle([...values].map(formatMathNumber)),
+              ? `Which decimal is the smallest: ${displayValues.join(", ")}?`
+              : `Which decimal is the largest: ${displayValues.join(", ")}?`,
+            options: shuffle(displayValues),
             answer,
           }
         : {
