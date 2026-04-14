@@ -36,8 +36,9 @@ export default function RealmPortalPreview({
   const [hasVideoError, setHasVideoError] = useState(false);
 
   const videoSrc = REALM_PORTAL_VIDEOS[realmId];
+  const requiresLevel3Video = realmId === "pattern-peaks" || realmId === "statistica";
   const isRealmVideoUnlocked =
-    realmId !== "pattern-peaks" || (typeof levelNumber === "number" && levelNumber >= 3);
+    !requiresLevel3Video || (typeof levelNumber === "number" && levelNumber >= 3);
   const shouldShowVideo = isSelected && isRealmVideoUnlocked && Boolean(videoSrc) && !hasVideoError;
 
   useEffect(() => {
