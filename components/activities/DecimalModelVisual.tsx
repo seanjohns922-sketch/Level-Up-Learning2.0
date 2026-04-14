@@ -80,11 +80,12 @@ export default function DecimalModelVisual({
       ) : null}
 
       {visual.model === "place_value_chart" ? (
-        <div className="mt-3 grid gap-3 md:grid-cols-3">
+        <div className="mt-3 grid gap-3 md:grid-cols-4">
           {[
             { label: "Ones", value: visual.ones },
             { label: "Tenths", value: visual.tenths },
             { label: "Hundredths", value: visual.hundredths },
+            { label: "Thousandths", value: visual.thousandths ?? 0 },
           ].map((column) => (
             <div key={column.label} className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
               <div className="text-xs font-bold uppercase tracking-wide text-gray-500">

@@ -39,6 +39,7 @@ export type DecimalVisualData =
       ones: number;
       tenths: number;
       hundredths: number;
+      thousandths?: number;
     };
 
 export type MoneyVisualData =
@@ -5043,94 +5044,108 @@ function generateGenericQuestion(
   }
 
   if (explicitMode === "read_write_rename_decimals") {
-    function buildDecimalRenameDistractors(answer: string): string[] {
-      const numeric = Number(answer);
-      const noDecimal = answer.replace(".", "");
-      const decimals = answer.includes(".") ? answer.split(".")[1]?.length ?? 0 : 0;
-      const shiftedLeft =
-        Number.isFinite(numeric) && numeric !== 0 ? formatMathNumber(numeric / 10) : answer;
-      const shiftedRight =
-        Number.isFinite(numeric) && numeric !== 0 ? formatMathNumber(numeric * 10) : answer;
-      const shortened =
-        answer.includes(".") && decimals > 1 ? answer.replace(/0+$/, "").replace(/\.$/, "") : answer;
-      const wrongPadding =
-        answer.includes(".") && decimals >= 2
-          ? `${answer.replace(".", "").slice(0, Math.max(1, noDecimal.length - 1))}.${noDecimal.slice(-1)}`
-          : `${answer}0`;
+    function decimalFromParts(parts: {
+      ones: number;
+      tenths: number;
+      hundredths: number;
+      thousandths: number;
+    }, decimals?: 0 | 1 | 2 | 3): string {
+      const value =
+        parts.ones +
+        parts.tenths / 10 +
+        parts.hundredths / 100 +
+        parts.thousandths / 1000;
+
+      if (decimals === undefined) {
+        return value.toFixed(3).replace(/\.?0+$/, "");
+      }
+
+      return value.toFixed(decimals);
+    }
+
+    function buildVisualRenameDistractors(answer: string, parts: {
+      ones: number;
+      tenths: number;
+      hundredths: number;
+      thousandths: number;
+    }): string[] {
+      const swapHundredthsThousandths = decimalFromParts({
+        ...parts,
+        hundredths: parts.thousandths,
+        thousandths: parts.hundredths,
+      });
+      const shiftTenths = decimalFromParts({
+        ones: parts.ones,
+        tenths: 0,
+        hundredths: parts.tenths,
+        thousandths: parts.hundredths,
+      });
+      const mergedWhole = `${parts.ones}${parts.tenths}.${parts.hundredths}${parts.thousandths}`.replace(/\.?0+$/, "");
+      const paddedWrong = decimalFromParts(parts, 2);
 
       return Array.from(
-        new Set(
-          [shiftedLeft, shiftedRight, shortened, wrongPadding, noDecimal]
-            .map((value) => String(value))
-            .filter((value) => value !== answer && value.length > 0)
-        )
+        new Set([swapHundredthsThousandths, shiftTenths, mergedWhole, paddedWrong].filter((value) => value !== answer))
       );
     }
 
     const templates = [
-      {
-        prompt: "Which decimal is equal to 0.5?",
-        answer: "0.50",
-        options: ["0.50", "0.05", "5.0", "0.005"],
-      },
-      {
-        prompt: "Which decimal is equal to 2.335?",
-        answer: "2.3350",
-        options: ["2.3350", "2.350", "2.0335", "23.35"],
-      },
-      {
-        prompt: "Which decimal is equal to 0.08?",
-        answer: "0.080",
-        options: ["0.080", "0.8", "0.008", "8.0"],
-      },
-      {
-        prompt: "Which decimal is equal to 2.3?",
-        answer: "2.300",
-        options: ["2.300", "2.03", "23.0", "0.230"],
-      },
-      {
-        prompt: "Write 0.5 as hundredths.",
-        answer: "0.50",
-      },
-      {
-        prompt: "Write 0.08 as thousandths.",
-        answer: "0.080",
-      },
-      {
-        prompt: "Write 2.3 to thousandths.",
-        answer: "2.300",
-      },
-      {
-        prompt: "Rename 0.6 as hundredths.",
-        answer: "0.60",
-      },
-      {
-        prompt: "Rename 0.6 ÷ 10 as hundredths.",
-        answer: "0.06",
-      },
+      { ones: 2, tenths: 3, hundredths: 0, thousandths: 0, renameTo: 3 as const },
+      { ones: 0, tenths: 8, hundredths: 0, thousandths: 0, renameTo: 3 as const },
+      { ones: 2, tenths: 3, hundredths: 5, thousandths: 0, renameTo: 3 as const },
+      { ones: 2, tenths: 3, hundredths: 3, thousandths: 6, renameTo: 3 as const },
+      { ones: 4, tenths: 2, hundredths: 0, thousandths: 4, renameTo: 3 as const },
     ];
+
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    const baseText = decimalFromParts(chosen);
+    const renamedText = decimalFromParts(chosen, chosen.renameTo);
+    const visual: DecimalVisualData = {
+      type: "decimal_model",
+      model: "place_value_chart",
+      ones: chosen.ones,
+      tenths: chosen.tenths,
+      hundredths: chosen.hundredths,
+      thousandths: chosen.thousandths,
+    };
+
     if (asMultipleChoice) {
-      const distractors = chosen.options
-        ? chosen.options.filter((option) => option !== chosen.answer)
-        : buildDecimalRenameDistractors(chosen.answer);
+      const answer = randInt(0, 1) === 0 ? baseText : renamedText;
+      const prompt =
+        answer === baseText
+          ? "What decimal is shown on the place value chart?"
+          : `The chart shows ${baseText}. Which decimal is another way to write the same value?`;
 
       return {
         kind: "multiple_choice",
-        prompt: chosen.prompt,
-        options: uniqueStringOptions(chosen.answer, distractors),
-        answer: chosen.answer,
-        helper: "Adding zeros to the right of a decimal does not change its value.",
+        prompt,
+        options: uniqueStringOptions(answer, buildVisualRenameDistractors(answer, chosen)),
+        answer,
+        helper:
+          answer === baseText
+            ? "Read the ones, tenths, hundredths, and thousandths columns."
+            : "Adding zeros to the right of a decimal does not change its value.",
+        visual,
       };
     }
 
-    return {
-      kind: "typed_response",
-      prompt: chosen.prompt,
-      answer: chosen.answer,
-      helper: "Rename the decimal without changing its value.",
-      placeholder: "Type the decimal",
-    };
+    const renameQuestion = randInt(0, 1) === 0;
+    return renameQuestion
+      ? {
+          kind: "typed_response",
+          prompt: `The place value chart shows ${baseText}. Write the same value to thousandths.`,
+          answer: renamedText,
+          helper: "Rename the decimal without changing its value.",
+          placeholder: "Type the renamed decimal",
+          visual,
+        }
+      : {
+          kind: "typed_response",
+          prompt: "What decimal is shown on the place value chart?",
+          answer: baseText,
+          helper: "Read the ones, tenths, hundredths, and thousandths columns.",
+          placeholder: "Type the decimal shown",
+          visual,
+        };
   }
 
   if (explicitMode === "decimals_between_benchmarks") {
