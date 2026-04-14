@@ -125,18 +125,6 @@ export default function StudentHomePage() {
         <div className="absolute inset-0 bg-black/20" />
       </div>
 
-      {/* Numbot mascot — Level 5+ */}
-      {levelNum >= 5 && (
-        <div className="fixed bottom-6 right-4 z-20 pointer-events-none animate-bounce" style={{ animationDuration: "3s", animationIterationCount: "infinite" }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/numbot-calculator.png"
-            alt="Numbot Calculator"
-            className="h-20 w-auto drop-shadow-lg"
-            style={{ filter: "drop-shadow(0 0 8px rgba(0,230,200,0.4))" }}
-          />
-        </div>
-      )}
 
       <div className="relative z-10">
         {/* Hero */}
