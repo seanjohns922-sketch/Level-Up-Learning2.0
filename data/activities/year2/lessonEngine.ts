@@ -542,6 +542,15 @@ function buildYear4Week11FractionOfQuantityQuestion(asMultipleChoice: boolean) {
   ];
   const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
   const answer = String(chosen.answer);
+  const visual =
+    Math.random() < 0.78
+      ? {
+          type: "array" as const,
+          rows: chosen.denominator,
+          columns: chosen.answer,
+          highlightedRows: [0],
+        }
+      : undefined;
   const distractors = [
     Math.max(1, chosen.answer - 1),
     chosen.answer + 1,
@@ -557,6 +566,7 @@ function buildYear4Week11FractionOfQuantityQuestion(asMultipleChoice: boolean) {
         ),
         answer,
         helper: "Split the quantity into equal groups, then count one part.",
+        visual,
       }
     : {
         kind: "typed_response" as const,
@@ -564,6 +574,7 @@ function buildYear4Week11FractionOfQuantityQuestion(asMultipleChoice: boolean) {
         answer,
         helper: "Find one equal part of the total first.",
         placeholder: "Type the number",
+        visual,
       };
 }
 
@@ -672,6 +683,7 @@ export type MultipleChoiceQuestion = {
         type: "array";
         rows: number;
         columns: number;
+        highlightedRows?: number[];
       }
     | MABVisualData
     | DecimalVisualData
@@ -699,6 +711,12 @@ export type TypedResponseQuestion = {
   fixedDenominator?: number;
   writtenMethod?: WrittenMethodLayout;
   visual?:
+    | {
+        type: "array";
+        rows: number;
+        columns: number;
+        highlightedRows?: number[];
+      }
     | MABVisualData
     | DecimalVisualData
     | ColumnMultiplicationVisualData

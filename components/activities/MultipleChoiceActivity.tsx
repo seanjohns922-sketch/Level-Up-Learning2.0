@@ -6,32 +6,8 @@ import ReadAloudBtn from "@/components/ReadAloudBtn";
 import PlaceValueMABVisual from "@/components/activities/PlaceValueMABVisual";
 import DecimalModelVisual from "@/components/activities/DecimalModelVisual";
 import MoneyContextVisual from "@/components/activities/MoneyContextVisual";
+import ArrayVisual from "@/components/activities/ArrayVisual";
 import { MathFormattedText } from "@/components/FractionText";
-
-function ArrayVisual({ rows, cols }: { rows: number; cols: number }) {
-  return (
-    <div className="mt-4 rounded-2xl border border-teal-100 bg-teal-50 p-4">
-      <div className="text-xs font-bold uppercase tracking-wide text-teal-700 mb-3">
-        Array model
-      </div>
-      <div className="inline-flex flex-col gap-2 rounded-2xl bg-white p-4 shadow-sm">
-        {Array.from({ length: rows }).map((_, r) => (
-          <div key={r} className="flex gap-2">
-            {Array.from({ length: cols }).map((__, c) => (
-              <div
-                key={`${r}-${c}`}
-                className="h-5 w-5 rounded-full bg-teal-600"
-              />
-            ))}
-          </div>
-        ))}
-      </div>
-      <div className="mt-3 text-sm font-bold text-teal-800">
-        {rows} rows × {cols} columns
-      </div>
-    </div>
-  );
-}
 
 export default function MultipleChoiceActivity({
   questionData,
@@ -80,7 +56,12 @@ export default function MultipleChoiceActivity({
         <DecimalModelVisual visual={questionData.visual} title="Decimal model" />
       ) : null}
       {questionData.visual?.type === "array" ? (
-        <ArrayVisual rows={questionData.visual.rows} cols={questionData.visual.columns} />
+        <ArrayVisual
+          rows={questionData.visual.rows}
+          cols={questionData.visual.columns}
+          highlightedRows={questionData.visual.highlightedRows}
+          title="Grouped set model"
+        />
       ) : null}
 
       <div className="mt-6 grid gap-3">

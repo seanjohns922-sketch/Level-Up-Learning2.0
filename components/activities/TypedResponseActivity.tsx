@@ -6,6 +6,7 @@ import ReadAloudBtn from "@/components/ReadAloudBtn";
 import PlaceValueMABVisual from "@/components/activities/PlaceValueMABVisual";
 import DecimalModelVisual from "@/components/activities/DecimalModelVisual";
 import MoneyContextVisual from "@/components/activities/MoneyContextVisual";
+import ArrayVisual from "@/components/activities/ArrayVisual";
 import { MathFormattedText } from "@/components/FractionText";
 
 function normalize(value: string) {
@@ -1016,6 +1017,14 @@ export default function TypedResponseActivity({
       ) : null}
       {questionData.visual?.type === "decimal_model" ? (
         <DecimalModelVisual visual={questionData.visual} title="Decimal model" />
+      ) : null}
+      {questionData.visual?.type === "array" ? (
+        <ArrayVisual
+          rows={questionData.visual.rows}
+          cols={questionData.visual.columns}
+          highlightedRows={questionData.visual.highlightedRows}
+          title="Grouped set model"
+        />
       ) : null}
       {questionData.visual?.type === "column_multiplication" ? (
         <div className="mt-4 space-y-4">
