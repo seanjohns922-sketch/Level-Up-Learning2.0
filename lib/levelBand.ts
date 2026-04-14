@@ -16,18 +16,11 @@ export function getLevelBand(levelNum: number): LevelBand {
 
 /** Background image per band */
 export function getHomeBg(levelNum: number): string {
-  const band = getLevelBand(levelNum);
-  switch (band) {
-    case "apex":
-      // TODO: generate apex bg when Level 6 content is ready
-      return "/images/number-nexus-home-bg-y4.jpg";
-    case "advanced":
-      return "/images/number-nexus-home-bg-y4.jpg";
-    default:
-      return levelNum >= 3
-        ? "/images/number-nexus-home-bg-y3.jpg"
-        : "/images/number-nexus-home-bg.jpg";
-  }
+  if (levelNum >= 6) return "/images/number-nexus-home-bg-y5.jpg"; // apex reuses y5 for now
+  if (levelNum >= 5) return "/images/number-nexus-home-bg-y5.jpg";
+  if (levelNum >= 4) return "/images/number-nexus-home-bg-y4.jpg";
+  if (levelNum >= 3) return "/images/number-nexus-home-bg-y3.jpg";
+  return "/images/number-nexus-home-bg.jpg";
 }
 
 /** Image filter per band */
