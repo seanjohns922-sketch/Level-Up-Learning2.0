@@ -162,7 +162,7 @@ export default function StudentHomePage() {
               accuracy={progress?.scorePercent ?? 0}
               onLegends={goLegends}
               onLevels={goLevels}
-              onTowerMap={() => router.push("/tower-map")}
+              onTowerMap={() => router.push(`/realms?level=${encodeURIComponent(year)}`)}
               onStats={() => router.push("/realm-stats")}
             />
           </div>

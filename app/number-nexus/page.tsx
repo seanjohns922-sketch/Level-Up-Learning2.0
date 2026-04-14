@@ -233,10 +233,10 @@ export default function NumberNexusPage() {
       {/* Header */}
       <div className="relative z-10 px-4 pt-4 pb-2 flex items-center justify-between">
         <button
-          onClick={() => router.push("/tower-map")}
+          onClick={() => router.push(`/realms?level=${encodeURIComponent(year)}`)}
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/80 backdrop-blur-md text-slate-200 text-xs font-bold shadow-lg border border-teal-400/20 hover:bg-slate-800 transition-all active:scale-95"
         >
-          <ArrowLeft className="h-3.5 w-3.5" /> Tower Map
+          <ArrowLeft className="h-3.5 w-3.5" /> Tower
         </button>
         <div className="px-3 py-1.5 rounded-full bg-slate-800/70 backdrop-blur-md border border-teal-400/20 shadow-lg">
           <span className="text-teal-300 text-[10px] font-extrabold tracking-[0.12em]">🔢 REALM</span>

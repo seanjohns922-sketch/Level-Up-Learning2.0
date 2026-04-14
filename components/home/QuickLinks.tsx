@@ -13,7 +13,7 @@ type Props = {
 
 export default function QuickLinks({ onLessons, onLegends, onLevels, onTowerMap, scorePercent, week }: Props) {
   const links = [
-    { label: "Tower Map", icon: Map, onClick: onTowerMap, iconBg: "bg-gradient-to-br from-teal-500 to-emerald-600" },
+    { label: "Tower", icon: Map, onClick: onTowerMap, iconBg: "bg-gradient-to-br from-teal-500 to-emerald-600" },
     { label: "Lessons", icon: BookOpen, onClick: onLessons, iconBg: "bg-gradient-to-br from-amber-400 to-amber-500" },
     { label: "My Legends", icon: Trophy, onClick: onLegends, iconBg: "bg-gradient-to-br from-rose-400 to-pink-500" },
     { label: "Levels", icon: LayoutGrid, onClick: onLevels, iconBg: "bg-gradient-to-br from-sky-400 to-blue-500" },

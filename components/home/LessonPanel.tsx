@@ -156,7 +156,7 @@ export default function LessonPanel({
         {/* Quick nav icons */}
         <div className="flex items-center gap-1">
           {[
-            { icon: Map, label: "Tower Map", onClick: onTowerMap },
+            { icon: Map, label: "Tower", onClick: onTowerMap },
             { icon: BookOpen, label: "Legends", onClick: onLegends },
             { icon: BarChart3, label: "Realm Stats", onClick: onStats },
             { icon: LayoutGrid, label: "Levels", onClick: onLevels },
