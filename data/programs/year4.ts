@@ -759,7 +759,6 @@ const year4Rows: ProgramRow[] = [
     week: 11,
     focus: "Division + Fractions Combined",
     lesson: 3,
-    quizSafe: false,
     topic: "Multi-Step Problem Solving",
     activity: "Choose operations and combine division and fraction reasoning across multi-step problems",
     curriculum: ["AC9M4N03", "AC9M4N05", "AC9M4N06"],
