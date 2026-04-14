@@ -21,6 +21,7 @@ type RealmPortalPreviewProps = {
   color: string;
   colorDim: string;
   isSelected: boolean;
+  levelNumber?: number;
 };
 
 export default function RealmPortalPreview({
@@ -29,12 +30,15 @@ export default function RealmPortalPreview({
   color,
   colorDim,
   isSelected,
+  levelNumber,
 }: RealmPortalPreviewProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [hasVideoError, setHasVideoError] = useState(false);
 
   const videoSrc = REALM_PORTAL_VIDEOS[realmId];
-  const shouldShowVideo = isSelected && Boolean(videoSrc) && !hasVideoError;
+  const isRealmVideoUnlocked =
+    realmId !== "pattern-peaks" || (typeof levelNumber === "number" && levelNumber >= 3);
+  const shouldShowVideo = isSelected && isRealmVideoUnlocked && Boolean(videoSrc) && !hasVideoError;
 
   useEffect(() => {
     setHasVideoError(false);

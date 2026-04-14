@@ -35,6 +35,7 @@ export default function RealmCarousel() {
   const levelLabel = level.startsWith("Year")
     ? `Level ${level.replace("Year ", "")}`
     : level;
+  const levelNumber = Number(levelLabel.replace(/[^0-9]/g, "")) || 1;
 
   const navigate = useCallback((dir: 1 | -1) => {
     if (transitioning) return;
@@ -218,6 +219,7 @@ export default function RealmCarousel() {
                   color={isActive ? current.color : "rgba(255,255,255,0.2)"}
                   colorDim={isActive ? current.colorDim : "rgba(255,255,255,0.08)"}
                   isSelected
+                  levelNumber={levelNumber}
                 />
 
                 {/* Lock overlay */}
