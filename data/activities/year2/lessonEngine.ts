@@ -3221,10 +3221,16 @@ function generateInteractiveQuestion(
     const ascending = config.ascending !== false;
     const values = new Set<number>();
     const mode = typeof config.mode === "string" ? config.mode : undefined;
+    const decimalStep =
+      typeof config.step === "number"
+        ? config.step
+        : level >= 5
+          ? 0.001
+          : 0.1;
     while (values.size < count) {
       values.add(
         mode === "decimal_order"
-          ? randomStepValue(min, max, typeof config.step === "number" ? config.step : 0.1)
+          ? randomStepValue(min, max, decimalStep)
           : randInt(min, max)
       );
     }
@@ -4838,10 +4844,18 @@ function generateGenericQuestion(
   }
 
   if (explicitMode === "decimal_compare") {
-    const left = randomStepValue(0.1, 9.99, randInt(0, 1) === 0 ? 0.1 : 0.01);
-    let right = randomStepValue(0.1, 9.99, randInt(0, 1) === 0 ? 0.1 : 0.01);
+    const precision =
+      level >= 5
+        ? (([0.1, 0.01, 0.001] as const)[randInt(0, 2)] ?? 0.001)
+        : randInt(0, 1) === 0
+          ? 0.1
+          : 0.01;
+    const minDecimal = level >= 5 ? 0.001 : 0.1;
+    const maxDecimal = level >= 5 ? 12.999 : 9.99;
+    const left = randomStepValue(minDecimal, maxDecimal, precision);
+    let right = randomStepValue(minDecimal, maxDecimal, precision);
     while (right === left) {
-      right = randomStepValue(0.1, 9.99, randInt(0, 1) === 0 ? 0.1 : 0.01);
+      right = randomStepValue(minDecimal, maxDecimal, precision);
     }
     const answer = left > right ? formatMathNumber(left) : formatMathNumber(right);
 
@@ -5036,6 +5050,11 @@ function generateGenericQuestion(
         options: ["0.50", "0.05", "5.0", "0.005"],
       },
       {
+        prompt: "Which decimal is equal to 2.335?",
+        answer: "2.3350",
+        options: ["2.3350", "2.350", "2.0335", "23.35"],
+      },
+      {
         prompt: "Which decimal is equal to 0.08?",
         answer: "0.080",
         options: ["0.080", "0.8", "0.008", "8.0"],
@@ -5057,6 +5076,14 @@ function generateGenericQuestion(
         prompt: "Write 2.3 to thousandths.",
         answer: "2.300",
       },
+      {
+        prompt: "Rename 0.6 as hundredths.",
+        answer: "0.60",
+      },
+      {
+        prompt: "Rename 0.6 ÷ 10 as hundredths.",
+        answer: "0.06",
+      },
     ];
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
     return asMultipleChoice && chosen.options
@@ -5077,7 +5104,7 @@ function generateGenericQuestion(
   }
 
   if (explicitMode === "decimals_between_benchmarks") {
-    const value = randomStepValue(0.01, 1.99, 0.01);
+    const value = level >= 5 ? randomStepValue(0.001, 5.999, 0.001) : randomStepValue(0.01, 1.99, 0.01);
     const lower = Math.floor(value * 10) / 10;
     const upper = Number((lower + 0.1).toFixed(1));
     const answer = `${formatMathNumber(lower)} and ${formatMathNumber(upper)}`;
@@ -5264,6 +5291,85 @@ function generateGenericQuestion(
           prompt: chosen.prompt,
           options: shuffle(chosen.options),
           answer: chosen.answer,
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          placeholder: "Type the answer",
+        };
+  }
+
+  if (explicitMode === "factor_multiple_algorithm") {
+    const templates = [
+      {
+        prompt: "A rule says if a number ends in 0, it is divisible by 10. Is 420 divisible by 10?",
+        answer: "Yes",
+        options: ["Yes", "No", "Sometimes", "Not sure"],
+      },
+      {
+        prompt: "A divisibility flowchart checks the last digit. Is 135 divisible by 5?",
+        answer: "Yes",
+        options: ["Yes", "No", "Sometimes", "Not sure"],
+      },
+      {
+        prompt: "Use a factor rule: 6 is a factor of which number?",
+        answer: "24",
+        options: ["22", "23", "24", "25"],
+      },
+      {
+        prompt: "Use the divisibility rule for 3. Is 89472 divisible by 3?",
+        answer: "Yes",
+        options: ["Yes", "No", "Cannot tell", "Only if it is even"],
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: shuffle(chosen.options),
+          answer: chosen.answer,
+          helper: "Follow the factor or divisibility rule step by step.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          helper: "Use a factor, multiple, or divisibility rule.",
+          placeholder: "Type the answer",
+        };
+  }
+
+  if (explicitMode === "factor_multiple_pattern") {
+    const templates = [
+      {
+        prompt: "Look at the multiples of 6: 6, 12, 18, 24, __. What comes next?",
+        answer: "30",
+      },
+      {
+        prompt: "Which number is a common multiple of 3 and 4?",
+        answer: "12",
+        options: ["10", "12", "14", "16"],
+      },
+      {
+        prompt: "Complete the pattern of multiples of 7: 7, 14, 21, __, 35",
+        answer: "28",
+      },
+      {
+        prompt: "Which pair shows one number as a factor of the other?",
+        answer: "5 and 20",
+        options: ["5 and 20", "6 and 25", "7 and 20", "9 and 25"],
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice && chosen.options
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: shuffle(chosen.options),
+          answer: chosen.answer,
+          helper: "Look for the emerging factor or multiple pattern.",
         }
       : {
           kind: "typed_response",
