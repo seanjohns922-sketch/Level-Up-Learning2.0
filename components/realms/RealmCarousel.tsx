@@ -1,9 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { DEMO_MODE } from "@/data/config";
 import RealmPortalPreview from "@/components/realms/RealmPortalPreview";
+import { readProgress } from "@/data/progress";
+import { getWeekProgress, readProgramStore } from "@/lib/program-progress";
 
 const REALMS = [
   { id: "number-nexus", name: "Number Nexus", symbol: "⚡", description: "Master numbers, operations & place value", color: "rgb(52,211,153)", colorDim: "rgba(52,211,153,0.25)", active: true },
@@ -18,6 +20,16 @@ const REALMS = [
   { id: "runehaven-peaks", name: "Runehaven Peaks", symbol: "♦", description: "Advanced literacy & lore", color: "rgb(248,113,113)", colorDim: "rgba(248,113,113,0.2)", active: false },
 ];
 
+const DROPDOWN_REALM_IDS = [
+  "number-nexus",
+  "reading-ridge",
+  "inkwell-wilds",
+  "measurelands",
+  "statistica",
+  "chance-hollow",
+  "pattern-peaks",
+] as const;
+
 export default function RealmCarousel() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -26,16 +38,109 @@ export default function RealmCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [entered, setEntered] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
+  const [isLevelMenuOpen, setIsLevelMenuOpen] = useState(false);
+  const [studentYear, setStudentYear] = useState(level);
+  const [programStore, setProgramStore] = useState<ReturnType<typeof readProgramStore>>({});
+  const levelMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setEntered(true), 80);
     return () => clearTimeout(t);
   }, []);
 
+  useEffect(() => {
+    const progress = readProgress();
+    setStudentYear(progress?.year ?? level);
+    setProgramStore(readProgramStore());
+  }, [level]);
+
   const levelLabel = level.startsWith("Year")
     ? `Level ${level.replace("Year ", "")}`
     : level;
   const levelNumber = Number(levelLabel.replace(/[^0-9]/g, "")) || 1;
+
+  useEffect(() => {
+    function onPointerDown(event: MouseEvent) {
+      if (!levelMenuRef.current) return;
+      if (!levelMenuRef.current.contains(event.target as Node)) {
+        setIsLevelMenuOpen(false);
+      }
+    }
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setIsLevelMenuOpen(false);
+    }
+
+    window.addEventListener("mousedown", onPointerDown);
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("mousedown", onPointerDown);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, []);
+
+  const realmProgressRows = useMemo(() => {
+    const totalLessonSlots = 12 * 3;
+    let completedLessonSlots = 0;
+    let completedQuizSlots = 0;
+
+    for (let week = 1; week <= 12; week += 1) {
+      const weekProgress = getWeekProgress(programStore, studentYear, week);
+      completedLessonSlots += weekProgress.lessonsCompleted.filter(Boolean).length;
+      if (weekProgress.quizCompleted || typeof weekProgress.quizScore === "number") {
+        completedQuizSlots += 1;
+      }
+    }
+
+    const nexusPercent = Math.round(
+      ((completedLessonSlots + completedQuizSlots) / Math.max(totalLessonSlots + 12, 1)) * 100
+    );
+
+    return DROPDOWN_REALM_IDS.map((realmId) => {
+      const realm = REALMS.find((item) => item.id === realmId);
+      if (!realm) return null;
+
+      if (realm.id === "number-nexus") {
+        return {
+          id: realm.id,
+          name: realm.name,
+          percent: Math.max(0, Math.min(100, nexusPercent)),
+          status: nexusPercent >= 100 ? "Complete" : `${Math.max(0, nexusPercent)}%`,
+          barClass:
+            nexusPercent >= 100
+              ? "from-emerald-400 to-teal-300"
+              : "from-emerald-500 to-cyan-400",
+        };
+      }
+
+      if (realm.comingSoon) {
+        return {
+          id: realm.id,
+          name: realm.name,
+          percent: 0,
+          status: "Soon",
+          barClass: "from-white/20 to-white/10",
+        };
+      }
+
+      const levelLocked =
+        (realm.id === "pattern-peaks" || realm.id === "statistica") && levelNumber < 3;
+
+      return {
+        id: realm.id,
+        name: realm.name,
+        percent: 0,
+        status: levelLocked ? "Locked" : "Locked",
+        barClass: "from-white/15 to-white/10",
+      };
+    }).filter(Boolean) as Array<{
+      id: string;
+      name: string;
+      percent: number;
+      status: string;
+      barClass: string;
+    }>;
+  }, [levelNumber, programStore, studentYear]);
 
   const navigate = useCallback((dir: 1 | -1) => {
     if (transitioning) return;
@@ -112,12 +217,65 @@ export default function RealmCarousel() {
           >
             ← Back to Levels
           </button>
-          <span
-            className="text-xs font-bold text-white/80 px-3.5 py-1.5 rounded-full"
-            style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)" }}
-          >
-            {levelLabel}
-          </span>
+          <div ref={levelMenuRef} className="relative flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setIsLevelMenuOpen((currentValue) => !currentValue)}
+              className="text-xs font-bold text-white/90 px-3.5 py-1.5 rounded-full transition hover:scale-[1.02] hover:bg-white/15"
+              style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)" }}
+            >
+              {levelLabel}
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push("/realm-stats")}
+              title="View Progress"
+              aria-label="View Progress"
+              className="h-10 w-10 rounded-full border border-white/20 bg-white/10 text-white/90 backdrop-blur-md transition hover:scale-105 hover:bg-white/15 hover:shadow-[0_0_18px_rgba(255,255,255,0.18)] cursor-pointer"
+            >
+              <svg viewBox="0 0 24 24" className="mx-auto h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21a8 8 0 0 0-16 0" />
+                <circle cx="12" cy="8" r="4" />
+              </svg>
+            </button>
+
+            {isLevelMenuOpen ? (
+              <div
+                className="absolute right-0 top-[calc(100%+10px)] w-[320px] rounded-3xl border border-white/15 bg-[rgba(10,12,18,0.82)] p-4 backdrop-blur-xl shadow-[0_12px_40px_rgba(0,0,0,0.35)]"
+                style={{ zIndex: 40 }}
+              >
+                <div className="mb-3">
+                  <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/45">
+                    Current Level
+                  </div>
+                  <div className="mt-1 text-lg font-black text-white">{levelLabel}</div>
+                </div>
+
+                <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.22em] text-white/45">
+                  Realm Progress
+                </div>
+
+                <div className="space-y-3">
+                  {realmProgressRows.map((realm) => (
+                    <div key={realm.id} className="rounded-2xl border border-white/8 bg-white/[0.04] px-3 py-2.5">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="text-sm font-bold text-white/90">{realm.name}</div>
+                        <div className="text-xs font-extrabold uppercase tracking-wide text-white/55">
+                          {realm.status}
+                        </div>
+                      </div>
+                      <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/8">
+                        <div
+                          className={`h-full rounded-full bg-gradient-to-r ${realm.barClass}`}
+                          style={{ width: `${realm.percent}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </div>
         </div>
 
         {/* Title */}
