@@ -816,7 +816,7 @@ export type Year2PolicyValidation = {
   violations: Year2PolicyViolation[];
 };
 
-export type SupportedMathLevel = 2 | 3 | 4;
+export type SupportedMathLevel = 2 | 3 | 4 | 5;
 
 type DifficultyContract = {
   weekMin: number;
@@ -927,6 +927,21 @@ const YEAR_LEVEL_DIFFICULTY_CONTRACTS: Record<SupportedMathLevel, DifficultyCont
     },
   ],
   4: [
+    {
+      weekMin: 1,
+      weekMax: 12,
+      addSubMax: 100000,
+      addSubExtensionMax: 999999,
+      groupsMax: 12,
+      itemsMax: 12,
+      divisionTotalMax: 144,
+      factFamilyMax: 100,
+      skipCountMax: 1000000,
+      skipCountExtraSteps: [2, 3, 4, 5, 10, 100, 1000],
+      wordProblemMax: 999999,
+    },
+  ],
+  5: [
     {
       weekMin: 1,
       weekMax: 12,
@@ -1071,6 +1086,7 @@ const LEVEL_ACTIVITY_POLICY: Record<SupportedMathLevel, Record<ActivityType, Act
   2: LEVEL2_ACTIVITY_POLICY,
   3: LEVEL3_ACTIVITY_POLICY,
   4: LEVEL4_ACTIVITY_POLICY,
+  5: LEVEL4_ACTIVITY_POLICY,
 };
 
 const LEVEL2_WEEK8_TO_10_FACTORS = [2, 5, 10] as const;
@@ -2504,6 +2520,7 @@ export function getDifficultyProfile(level: SupportedMathLevel, week: number): D
 export function getLevelForLesson(lesson: Lesson): SupportedMathLevel {
   const yearMatch = lesson.id.match(/^y(\d+)-/);
   const yearNumber = yearMatch ? Number(yearMatch[1]) : 2;
+  if (yearNumber >= 5) return 5;
   if (yearNumber >= 4) return 4;
   if (yearNumber >= 3) return 3;
   return 2;
@@ -3593,16 +3610,12 @@ function generateInteractiveQuestion(
     if (explicitMode === "skip_count_fraction") {
       const denominators = allowedDenominators?.length ? allowedDenominators : [2, 3, 4, 5, 6, 8];
       const denominator = denominators[randInt(0, denominators.length - 1)] ?? denominators[0] ?? 4;
-      const targetStep = randInt(2, Math.max(2, denominator - 1));
+      const targetStep = randInt(1, Math.max(1, denominator - 1));
       const targetLabel = `${targetStep}/${denominator}`;
       const fractionAnswer = `${targetStep}/${denominator}`;
-      const leadInSequence = Array.from({ length: targetStep - 1 }, (_, index) => `${index + 1}/${denominator}`);
       return {
         kind: "number_line_place",
-        prompt:
-          targetStep === 2
-            ? `Count by 1/${denominator}: 1/${denominator}, __. Place ${targetLabel} on the number line.`
-            : `Count by 1/${denominator}: ${leadInSequence.join(", ")}, __. Place ${targetLabel} on the number line.`,
+        prompt: `Count by 1/${denominator}. Place ${targetLabel} on the number line.`,
         mode: "place_fraction",
         denominator,
         partitionDenominator: denominator,
@@ -4918,7 +4931,7 @@ function generateGenericQuestion(
     });
     const missingLabel = missingIndex === denominator ? "1" : `${missingIndex}/${denominator}`;
     const askMissing = randInt(0, 1) === 0;
-    const nextStep = randInt(2, Math.max(2, denominator - 1));
+    const nextStep = randInt(2, denominator);
     const nextAnswer = `${nextStep}/${denominator}`;
     const nextSequence = Array.from({ length: nextStep - 1 }, (_, index) => {
       const stepIndex = index + 1;
@@ -4941,7 +4954,7 @@ function generateGenericQuestion(
           kind: "typed_response",
           prompt: askMissing
             ? `Fill the missing fraction when counting by 1/${denominator}: ${sequence.join(", ")}`
-            : `What comes next when counting by 1/${denominator}? ${nextSequence.join(", ")}, __`,
+            : `What comes next when you count by 1/${denominator}? ${nextSequence.join(", ")}, __`,
           answer: askMissing ? missingLabel : nextAnswer,
           helper: `Fractions with the same denominator count in equal steps.`,
           placeholder: "Type the fraction",
@@ -5012,6 +5025,694 @@ function generateGenericQuestion(
           helper: "Count how many equal parts you have altogether.",
           placeholder: "Type the total fraction",
           fixedDenominator: denominator,
+        };
+  }
+
+  if (explicitMode === "read_write_rename_decimals") {
+    const templates = [
+      {
+        prompt: "Which decimal is equal to 0.5?",
+        answer: "0.50",
+        options: ["0.50", "0.05", "5.0", "0.005"],
+      },
+      {
+        prompt: "Which decimal is equal to 0.08?",
+        answer: "0.080",
+        options: ["0.080", "0.8", "0.008", "8.0"],
+      },
+      {
+        prompt: "Which decimal is equal to 2.3?",
+        answer: "2.300",
+        options: ["2.300", "2.03", "23.0", "0.230"],
+      },
+      {
+        prompt: "Write 0.5 as hundredths.",
+        answer: "0.50",
+      },
+      {
+        prompt: "Write 0.08 as thousandths.",
+        answer: "0.080",
+      },
+      {
+        prompt: "Write 2.3 to thousandths.",
+        answer: "2.300",
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice && chosen.options
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: shuffle(chosen.options),
+          answer: chosen.answer,
+          helper: "Adding zeros to the right of a decimal does not change its value.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          helper: "Rename the decimal without changing its value.",
+          placeholder: "Type the decimal",
+        };
+  }
+
+  if (explicitMode === "decimals_between_benchmarks") {
+    const value = randomStepValue(0.01, 1.99, 0.01);
+    const lower = Math.floor(value * 10) / 10;
+    const upper = Number((lower + 0.1).toFixed(1));
+    const answer = `${formatMathNumber(lower)} and ${formatMathNumber(upper)}`;
+    return {
+      kind: "multiple_choice",
+      prompt: `Between which two tenths does ${formatMathNumber(value)} belong?`,
+      options: shuffle(
+        Array.from(
+          new Set([
+            answer,
+            `${formatMathNumber(Math.max(0, lower - 0.1))} and ${formatMathNumber(lower)}`,
+            `${formatMathNumber(upper)} and ${formatMathNumber(Number((upper + 0.1).toFixed(1)))}`,
+            `${formatMathNumber(Math.floor(value))} and ${formatMathNumber(Math.ceil(value))}`,
+          ])
+        ).slice(0, 4)
+      ),
+      answer,
+      helper: "Use the tenths just before and just after the decimal.",
+    };
+  }
+
+  if (explicitMode === "decimal_context") {
+    const templates = [
+      {
+        prompt: "A ribbon is 1.25 m long. Another ribbon is 1.2 m long. Which is longer?",
+        answer: "1.25 m",
+        options: ["1.25 m", "1.2 m", "They are equal", "Not enough information"],
+      },
+      {
+        prompt: "A book costs $4.75 and a pen costs $2.40. What is the total cost?",
+        answer: "7.15",
+      },
+      {
+        prompt: "Which is greater: 2.5 L or 2.45 L?",
+        answer: "2.5 L",
+        options: ["2.5 L", "2.45 L", "They are equal", "Cannot compare"],
+      },
+      {
+        prompt: "A student ran 3.6 km on Monday and 2.4 km on Tuesday. How far did they run altogether?",
+        answer: "6.0",
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice && chosen.options
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: shuffle(chosen.options),
+          answer: chosen.answer,
+          helper: "Compare or combine the decimals carefully.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          helper: "Line up the decimal places.",
+          placeholder: "Type the answer",
+        };
+  }
+
+  if (explicitMode === "decimal_rounding_estimation") {
+    const value = randomStepValue(0.11, 9.99, 0.01);
+    const roundToTenths = randInt(0, 1) === 0;
+    const answerNumber = roundToTenths ? Number(value.toFixed(1)) : Number(value.toFixed(2));
+    const answer = formatMathNumber(answerNumber);
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: `Round ${formatMathNumber(value)} to the nearest ${roundToTenths ? "tenth" : "hundredth"}.`,
+          options: shuffle(
+            Array.from(
+              new Set([
+                answer,
+                formatMathNumber(Number((answerNumber + (roundToTenths ? 0.1 : 0.01)).toFixed(roundToTenths ? 1 : 2))),
+                formatMathNumber(Number((Math.max(0, answerNumber - (roundToTenths ? 0.1 : 0.01))).toFixed(roundToTenths ? 1 : 2))),
+                formatMathNumber(value),
+              ])
+            ).slice(0, 4)
+          ),
+          answer,
+          helper: "Look at the digit to the right of the place you are rounding to.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: `Round ${formatMathNumber(value)} to the nearest ${roundToTenths ? "tenth" : "hundredth"}.`,
+          answer,
+          helper: "Check the next decimal place to decide whether to round up.",
+          placeholder: "Type the rounded decimal",
+        };
+  }
+
+  if (explicitMode === "decimal_reasonableness") {
+    const templates = [
+      {
+        prompt: "Ella says 3.48 rounded to the nearest tenth is 3.4. Is she correct?",
+        answer: "No",
+      },
+      {
+        prompt: "Noah says 5.04 is greater than 5.4 because 04 is bigger than 4. Is he correct?",
+        answer: "No",
+      },
+      {
+        prompt: "A total of 2.6 + 0.4 is 3.0. Does that make sense?",
+        answer: "Yes",
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: ["Yes", "No", "Maybe", "Not sure"],
+          answer: chosen.answer,
+          helper: "Check whether the decimal places and size make sense.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          helper: "Decide whether the statement is reasonable.",
+          placeholder: "Type Yes or No",
+        };
+  }
+
+  if (explicitMode === "factors_multiples") {
+    const templates = [
+      { prompt: "Which number is a factor of 24?", answer: "6", options: ["6", "7", "9", "11"] },
+      { prompt: "Which number is a multiple of 8?", answer: "32", options: ["30", "32", "34", "36"] },
+      { prompt: "Type the next multiple of 7 after 28.", answer: "35" },
+      { prompt: "Type one factor of 36 greater than 5.", answer: "6" },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice && chosen.options
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: shuffle(chosen.options),
+          answer: chosen.answer,
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          placeholder: "Type the number",
+        };
+  }
+
+  if (explicitMode === "divisibility_rules") {
+    const templates = [
+      { prompt: "Is 135 divisible by 5?", answer: "Yes" },
+      { prompt: "Is 246 divisible by 2?", answer: "Yes" },
+      { prompt: "Is 128 divisible by 3?", answer: "No" },
+      { prompt: "Type the divisor that makes this true: 420 is divisible by __ and ends in 0.", answer: "10" },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice && chosen.answer !== "10"
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: ["Yes", "No", "Sometimes", "Not sure"],
+          answer: chosen.answer,
+          helper: "Use the divisibility rule, not long division.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          helper: "Think about the last digit or the digit sum.",
+          placeholder: "Type the answer",
+        };
+  }
+
+  if (explicitMode === "prime_composite_hcf") {
+    const templates = [
+      { prompt: "Is 17 prime or composite?", answer: "Prime", options: ["Prime", "Composite", "Both", "Neither"] },
+      { prompt: "Is 21 prime or composite?", answer: "Composite", options: ["Prime", "Composite", "Both", "Neither"] },
+      { prompt: "What is the highest common factor of 12 and 18?", answer: "6" },
+      { prompt: "What is the highest common factor of 20 and 30?", answer: "10" },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice && chosen.options
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: shuffle(chosen.options),
+          answer: chosen.answer,
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          placeholder: "Type the answer",
+        };
+  }
+
+  if (explicitMode === "pattern_sequence") {
+    const multiplicative = randInt(0, 1) === 0;
+    if (multiplicative) {
+      const start = randInt(2, 6);
+      const factor = [2, 3, 4][randInt(0, 2)] ?? 2;
+      const sequence = [start, start * factor, start * factor * factor];
+      const answer = String(sequence[2]! * factor);
+      return asMultipleChoice
+        ? {
+            kind: "multiple_choice",
+            prompt: `What comes next? ${sequence.join(", ")}, __`,
+            options: uniqueNumberOptions(Number(answer), Number(answer)),
+            answer,
+            helper: "Look for a multiplicative pattern.",
+          }
+        : {
+            kind: "typed_response",
+            prompt: `What comes next? ${sequence.join(", ")}, __`,
+            answer,
+            helper: "Look for the rule between each pair of numbers.",
+            placeholder: "Type the next number",
+          };
+    }
+    const start = randInt(5, 20);
+    const step = [4, 6, 9, 12][randInt(0, 3)] ?? 4;
+    const sequence = [start, start + step, start + step * 2];
+    const answer = String(sequence[2]! + step);
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: `What comes next? ${sequence.join(", ")}, __`,
+          options: uniqueNumberOptions(Number(answer), step * 2),
+          answer,
+          helper: "Look for an additive pattern.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: `What comes next? ${sequence.join(", ")}, __`,
+          answer,
+          helper: "Find the amount added each time.",
+          placeholder: "Type the next number",
+        };
+  }
+
+  if (explicitMode === "input_output_rules") {
+    const ruleType = randInt(0, 1) === 0 ? "add" : "multiply";
+    const input = randInt(2, 12);
+    const ruleValue = ruleType === "add" ? randInt(3, 9) : randInt(2, 5);
+    const output = ruleType === "add" ? input + ruleValue : input * ruleValue;
+    const ruleText = ruleType === "add" ? `add ${ruleValue}` : `multiply by ${ruleValue}`;
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: `Input ${input} becomes output ${output}. Which rule matches?`,
+          options: shuffle([
+            ruleText,
+            ruleType === "add" ? `multiply by ${ruleValue}` : `add ${ruleValue}`,
+            `add ${ruleValue + 1}`,
+            `multiply by ${Math.max(2, ruleValue + 1)}`,
+          ]),
+          answer: ruleText,
+        }
+      : {
+          kind: "typed_response",
+          prompt: `A machine ${ruleText}. What is the output for ${input}?`,
+          answer: String(output),
+          placeholder: "Type the output",
+        };
+  }
+
+  if (explicitMode === "pattern_investigation") {
+    const start = randInt(2, 15);
+    const step = [3, 4, 6, 8][randInt(0, 3)] ?? 3;
+    const sequence = [start, start + step, start + step * 2];
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: `Which rule matches this pattern: ${sequence.join(", ")}, ... ?`,
+          options: shuffle([`add ${step}`, `add ${step + 1}`, `multiply by 2`, `subtract ${step}`]),
+          answer: `add ${step}`,
+        }
+      : {
+          kind: "typed_response",
+          prompt: `The pattern is ${sequence.join(", ")}, ... Type the next term.`,
+          answer: String(sequence[2]! + step),
+          placeholder: "Type the next term",
+        };
+  }
+
+  if (explicitMode === "multiplication_estimation_check") {
+    const a = randInt(18, 89);
+    const b = randInt(3, 28);
+    const estimate = Math.round(a / 10) * 10 * Math.round(b / 10);
+    const reasonable = estimate + randInt(-30, 30);
+    const unreasonable = estimate * 10;
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: `Which answer is most reasonable for ${a} × ${b}?`,
+          options: shuffle([
+            String(Math.max(1, reasonable)),
+            String(Math.max(1, unreasonable)),
+            String(Math.max(1, estimate + 200)),
+            String(Math.max(1, Math.floor(estimate / 10))),
+          ]),
+          answer: String(Math.max(1, reasonable)),
+          helper: "Round first, then decide which option is closest to the estimate.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: `Estimate ${a} × ${b} by rounding first.`,
+          answer: String(Math.max(1, estimate)),
+          helper: "Round the numbers to friendly values first.",
+          placeholder: "Type an estimate",
+        };
+  }
+
+  if (explicitMode === "division_remainders") {
+    const divisor = [3, 4, 5, 6, 7, 8][randInt(0, 5)] ?? 4;
+    const quotient = randInt(3, 12);
+    const remainder = randInt(1, divisor - 1);
+    const dividend = divisor * quotient + remainder;
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: `What is ${dividend} ÷ ${divisor}?`,
+          options: shuffle([
+            `${quotient} r ${remainder}`,
+            `${quotient + 1} r ${remainder}`,
+            `${quotient} r ${Math.max(0, remainder - 1)}`,
+            `${quotient - 1} r ${remainder}`,
+          ]),
+          answer: `${quotient} r ${remainder}`,
+        }
+      : {
+          kind: "typed_response",
+          prompt: `What is the remainder when ${dividend} ÷ ${divisor}?`,
+          answer: String(remainder),
+          helper: "Find what is left after making equal groups.",
+          placeholder: "Type the remainder",
+        };
+  }
+
+  if (explicitMode === "interpreting_remainders") {
+    const templates = [
+      { prompt: "24 students travel in cars that seat 5. How many cars are needed?", answer: "5" },
+      { prompt: "27 cupcakes are packed into boxes of 6. How many full boxes can be packed?", answer: "4" },
+      { prompt: "35 players are put into teams of 8. How many teams are needed?", answer: "5" },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: uniqueNumberOptions(Number(chosen.answer), 3),
+          answer: chosen.answer,
+          helper: "Think about whether the remainder means one more group is needed.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          helper: "Decide whether to round up or use only full groups.",
+          placeholder: "Type the answer",
+        };
+  }
+
+  if (explicitMode === "division_estimate_check") {
+    const divisor = [4, 5, 6, 8, 10][randInt(0, 4)] ?? 5;
+    const quotient = randInt(8, 30);
+    const dividend = quotient * divisor + randInt(0, divisor - 1);
+    const estimate = Math.round(dividend / divisor);
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: `Which answer is most reasonable for ${dividend} ÷ ${divisor}?`,
+          options: shuffle([
+            String(estimate),
+            String(estimate + divisor),
+            String(Math.max(1, estimate - divisor)),
+            String(dividend),
+          ]),
+          answer: String(estimate),
+          helper: "Use compatible numbers to estimate the quotient.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: `Estimate ${dividend} ÷ ${divisor}.`,
+          answer: String(estimate),
+          placeholder: "Type an estimate",
+        };
+  }
+
+  if (explicitMode === "related_denominator_fractions") {
+    const templates = [
+      { prompt: "Add the fractions: 1/2 + 1/4", answer: "3/4", fixedDenominator: 4 },
+      { prompt: "Add the fractions: 1/3 + 1/6", answer: "3/6", fixedDenominator: 6 },
+      { prompt: "Add the fractions: 3/4 + 1/4", answer: "4/4", fixedDenominator: 4 },
+      { prompt: "Subtract the fractions: 3/4 - 1/4", answer: "2/4", fixedDenominator: 4 },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: uniqueStringOptions(chosen.answer, [
+            `1/${chosen.fixedDenominator}`,
+            `${Math.max(1, Number(chosen.answer.split("/")[0]) - 1)}/${chosen.fixedDenominator}`,
+            `${Math.min(chosen.fixedDenominator, Number(chosen.answer.split("/")[0]) + 1)}/${chosen.fixedDenominator}`,
+            "1",
+          ]),
+          answer: chosen.answer,
+          helper: "Rename one fraction so the denominators match first.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          fixedDenominator: chosen.fixedDenominator,
+          helper: "Use a common denominator, then combine the numerators.",
+          placeholder: "Type the fraction",
+        };
+  }
+
+  if (explicitMode === "fraction_word_problems") {
+    const templates = [
+      { prompt: "Lina walked 1/4 km in the morning and 2/4 km in the afternoon. How far did she walk altogether?", answer: "3/4", fixedDenominator: 4 },
+      { prompt: "A pizza had 5/8 left. Then 2/8 was eaten. How much is left now?", answer: "3/8", fixedDenominator: 8 },
+      { prompt: "A tank was filled by 1/3 and then another 1/3. How full is it now?", answer: "2/3", fixedDenominator: 3 },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: uniqueStringOptions(chosen.answer, ["1/2", "1", `1/${chosen.fixedDenominator}`]),
+          answer: chosen.answer,
+          helper: "Only the numerators change when the denominator stays the same.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          fixedDenominator: chosen.fixedDenominator,
+          placeholder: "Type the fraction",
+        };
+  }
+
+  if (explicitMode === "fraction_decimal_percent") {
+    const templates = [
+      { prompt: "What percent matches 1/2?", answer: "50%" },
+      { prompt: "What decimal matches 25%?", answer: "0.25" },
+      { prompt: "What fraction matches 0.75?", answer: "3/4", fixedDenominator: 4 },
+      { prompt: "What percent matches 0.1?", answer: "10%" },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: uniqueStringOptions(chosen.answer, ["25%", "0.5", "1/4", "75%"]),
+          answer: chosen.answer,
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          fixedDenominator: chosen.fixedDenominator,
+          placeholder: "Type the answer",
+        };
+  }
+
+  if (explicitMode === "benchmark_fraction_percent") {
+    const templates = [
+      { prompt: "Which value is the same as one half?", answer: "50%", options: ["50%", "25%", "0.25", "75%"] },
+      { prompt: "Which value is the same as one quarter?", answer: "0.25", options: ["0.25", "0.5", "25", "3/4"] },
+      { prompt: "Which value is the same as three quarters?", answer: "75%", options: ["75%", "50%", "0.25", "25%"] },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: shuffle(chosen.options),
+          answer: chosen.answer,
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          placeholder: "Type the matching value",
+        };
+  }
+
+  if (explicitMode === "compare_fraction_decimal_percent") {
+    const templates = [
+      { prompt: "Which is largest: 1/2, 0.4, or 35%?", answer: "1/2", options: ["1/2", "0.4", "35%", "They are equal"] },
+      { prompt: "Which is smallest: 0.75, 3/4, or 70%?", answer: "70%", options: ["0.75", "3/4", "70%", "They are equal"] },
+      { prompt: "Type the largest value: 25%, 0.3, 1/4.", answer: "0.3" },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice && chosen.options
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: shuffle(chosen.options),
+          answer: chosen.answer,
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          placeholder: "Type the value",
+        };
+  }
+
+  if (explicitMode === "percent_of_amount") {
+    const templates = [
+      { prompt: "What is 10% of 240?", answer: "24" },
+      { prompt: "What is 5% of 60?", answer: "3" },
+      { prompt: "What is 1% of 300?", answer: "3" },
+      { prompt: "What is 10% of 85?", answer: "8.5" },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: uniqueStringOptions(chosen.answer, ["6", "12", "30", "2.4"]),
+          answer: chosen.answer,
+          helper: "Use 10%, 5%, or 1% as a friendly fraction of the whole.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          helper: "Find 10%, 5%, or 1% first if that helps.",
+          placeholder: "Type the answer",
+        };
+  }
+
+  if (explicitMode === "percentage_discount") {
+    const templates = [
+      { prompt: "A $40 item has a 25% discount. What is the sale price?", answer: "30" },
+      { prompt: "A $60 item is reduced by 10%. How much is the discount?", answer: "6" },
+      { prompt: "A $80 item has a 50% discount. What is the sale price?", answer: "40" },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: uniqueStringOptions(chosen.answer, ["4", "8", "20", "50"]),
+          answer: chosen.answer,
+          helper: "Work out the percentage amount first, then subtract if needed.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          placeholder: "Type the answer",
+        };
+  }
+
+  if (explicitMode === "percent_multistep") {
+    const templates = [
+      { prompt: "A $50 jumper has 20% off. Then $5 shipping is added. What is the final cost?", answer: "45" },
+      { prompt: "A class has 40 students. 25% are absent. How many students are at school?", answer: "30" },
+      { prompt: "A $120 bike is reduced by 10%. How much do you pay?", answer: "108" },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: uniqueNumberOptions(Number(chosen.answer), 12),
+          answer: chosen.answer,
+          helper: "Find the percentage first, then complete the second step.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          placeholder: "Type the answer",
+        };
+  }
+
+  if (explicitMode === "strategy_selection") {
+    const templates = [
+      {
+        prompt: "Which strategy is best for 199 + 38?",
+        answer: "Compensation",
+        options: ["Compensation", "Repeated subtraction", "Long division", "Guess and check"],
+      },
+      {
+        prompt: "Which method is most efficient for 48 × 25?",
+        answer: "Use a friendly factor strategy",
+        options: ["Use a friendly factor strategy", "Count by ones", "Repeated subtraction", "Draw a tally"],
+      },
+      {
+        prompt: "Type the best operation to start with: A tray holds 8 muffins. There are 6 trays. How many muffins altogether?",
+        answer: "×",
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice && chosen.options
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: shuffle(chosen.options),
+          answer: chosen.answer,
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          placeholder: "Type the operation",
+        };
+  }
+
+  if (explicitMode === "problem_reasonableness") {
+    const templates = [
+      { prompt: "A student says 398 + 204 = 9,602. Does that make sense?", answer: "No" },
+      { prompt: "A student estimates 51 × 19 is about 1,000. Is that reasonable?", answer: "Yes" },
+      { prompt: "A student says 84 ÷ 4 is about 200. Does that make sense?", answer: "No" },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: ["Yes", "No", "Maybe", "Not sure"],
+          answer: chosen.answer,
+          helper: "Estimate mentally first, then decide whether the result fits.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          placeholder: "Type Yes or No",
         };
   }
 
