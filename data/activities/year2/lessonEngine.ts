@@ -1030,7 +1030,7 @@ const BASE_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
     maxByContract: { maxTotal: "divisionTotalMax" },
   },
   mixed_word_problem: {
-    allowedModes: ["choose_operation", "two_step_add_sub", "mult_div_problems", "division_fraction_multistep"],
+    allowedModes: ["choose_operation", "two_step_add_sub", "two_step_problem", "mult_div_problems", "division_fraction_multistep"],
     maxByContract: { max: "wordProblemMax" },
   },
   review_quiz: {},
