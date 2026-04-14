@@ -5043,6 +5043,30 @@ function generateGenericQuestion(
   }
 
   if (explicitMode === "read_write_rename_decimals") {
+    function buildDecimalRenameDistractors(answer: string): string[] {
+      const numeric = Number(answer);
+      const noDecimal = answer.replace(".", "");
+      const decimals = answer.includes(".") ? answer.split(".")[1]?.length ?? 0 : 0;
+      const shiftedLeft =
+        Number.isFinite(numeric) && numeric !== 0 ? formatMathNumber(numeric / 10) : answer;
+      const shiftedRight =
+        Number.isFinite(numeric) && numeric !== 0 ? formatMathNumber(numeric * 10) : answer;
+      const shortened =
+        answer.includes(".") && decimals > 1 ? answer.replace(/0+$/, "").replace(/\.$/, "") : answer;
+      const wrongPadding =
+        answer.includes(".") && decimals >= 2
+          ? `${answer.replace(".", "").slice(0, Math.max(1, noDecimal.length - 1))}.${noDecimal.slice(-1)}`
+          : `${answer}0`;
+
+      return Array.from(
+        new Set(
+          [shiftedLeft, shiftedRight, shortened, wrongPadding, noDecimal]
+            .map((value) => String(value))
+            .filter((value) => value !== answer && value.length > 0)
+        )
+      );
+    }
+
     const templates = [
       {
         prompt: "Which decimal is equal to 0.5?",
@@ -5086,21 +5110,27 @@ function generateGenericQuestion(
       },
     ];
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
-    return asMultipleChoice && chosen.options
-      ? {
-          kind: "multiple_choice",
-          prompt: chosen.prompt,
-          options: shuffle(chosen.options),
-          answer: chosen.answer,
-          helper: "Adding zeros to the right of a decimal does not change its value.",
-        }
-      : {
-          kind: "typed_response",
-          prompt: chosen.prompt,
-          answer: chosen.answer,
-          helper: "Rename the decimal without changing its value.",
-          placeholder: "Type the decimal",
-        };
+    if (asMultipleChoice) {
+      const distractors = chosen.options
+        ? chosen.options.filter((option) => option !== chosen.answer)
+        : buildDecimalRenameDistractors(chosen.answer);
+
+      return {
+        kind: "multiple_choice",
+        prompt: chosen.prompt,
+        options: uniqueStringOptions(chosen.answer, distractors),
+        answer: chosen.answer,
+        helper: "Adding zeros to the right of a decimal does not change its value.",
+      };
+    }
+
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      helper: "Rename the decimal without changing its value.",
+      placeholder: "Type the decimal",
+    };
   }
 
   if (explicitMode === "decimals_between_benchmarks") {
