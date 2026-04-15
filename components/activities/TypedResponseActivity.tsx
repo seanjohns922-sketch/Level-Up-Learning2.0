@@ -33,6 +33,8 @@ function columnLabel(label: string) {
   if (label === "T") return "tens";
   if (label === "H") return "hundreds";
   if (label === "Th") return "thousands";
+  if (label === "t") return "tenths";
+  if (label === "h") return "hundredths";
   return "current";
 }
 
@@ -159,74 +161,31 @@ function getBoxMethodCells(leftValue: number, topValue: number) {
   return { splitLeft, splitTop, cells, total };
 }
 
-function splitMoney(value: string) {
-  const [whole, decimal = "00"] = value.split(".");
-  return {
-    ones: whole,
-    tenths: decimal[0] ?? "0",
-    hundredths: decimal[1] ?? "0",
-  };
+function isStaticWrittenMethodCell(writtenMethod: WrittenMethodLayout | undefined, index: number) {
+  return Boolean(writtenMethod?.fixedAnswerCells?.[index]);
 }
 
-function DecimalLongAdditionBox({
-  top,
-  bottom,
-}: {
-  top: string;
-  bottom: string;
-}) {
-  const [ones, setOnes] = useState("");
-  const [tenths, setTenths] = useState("");
-  const [hundredths, setHundredths] = useState("");
-  const a = splitMoney(top);
-  const b = splitMoney(bottom);
+function getLastEditableWrittenMethodColumn(writtenMethod: WrittenMethodLayout | undefined) {
+  if (!writtenMethod) return -1;
+  for (let index = writtenMethod.answerLength - 1; index >= 0; index -= 1) {
+    if (!isStaticWrittenMethodCell(writtenMethod, index)) return index;
+  }
+  return -1;
+}
 
-  return (
-    <div className="mt-4 rounded-2xl border border-teal-100 bg-teal-50 p-5">
-      <div className="mb-3 text-sm font-bold text-slate-700">Show your working</div>
-      <div className="grid w-fit grid-cols-[60px_20px_60px_60px] gap-2 items-center text-center">
-        <div className="text-xs font-semibold text-slate-400">Ones</div>
-        <div />
-        <div className="text-xs font-semibold text-slate-400">Tenths</div>
-        <div className="text-xs font-semibold text-slate-400">Hundredths</div>
+function getPreviousEditableWrittenMethodColumn(
+  writtenMethod: WrittenMethodLayout | undefined,
+  fromIndex: number
+) {
+  if (!writtenMethod) return -1;
+  for (let index = fromIndex - 1; index >= 0; index -= 1) {
+    if (!isStaticWrittenMethodCell(writtenMethod, index)) return index;
+  }
+  return -1;
+}
 
-        <div className="rounded-lg bg-white py-2 text-xl font-black text-slate-900 shadow-sm">{a.ones}</div>
-        <div className="text-xl font-black text-slate-700">.</div>
-        <div className="rounded-lg bg-white py-2 text-xl font-black text-slate-900 shadow-sm">{a.tenths}</div>
-        <div className="rounded-lg bg-white py-2 text-xl font-black text-slate-900 shadow-sm">{a.hundredths}</div>
-
-        <div className="rounded-lg bg-white py-2 text-xl font-black text-slate-900 shadow-sm">{b.ones}</div>
-        <div className="text-xl font-black text-slate-700">.</div>
-        <div className="rounded-lg bg-white py-2 text-xl font-black text-slate-900 shadow-sm">{b.tenths}</div>
-        <div className="rounded-lg bg-white py-2 text-xl font-black text-slate-900 shadow-sm">{b.hundredths}</div>
-
-        <div className="col-span-4 my-1 h-px bg-slate-300" />
-
-        <input
-          value={ones}
-          onChange={(e) => setOnes(e.target.value.replace(/\D/g, "").slice(0, 2))}
-          inputMode="numeric"
-          aria-label="Ones answer"
-          className="rounded-lg border border-slate-300 bg-white py-2 text-center text-xl font-black text-slate-900"
-        />
-        <div className="text-xl font-black text-slate-700">.</div>
-        <input
-          value={tenths}
-          onChange={(e) => setTenths(e.target.value.replace(/\D/g, "").slice(0, 1))}
-          inputMode="numeric"
-          aria-label="Tenths answer"
-          className="rounded-lg border border-slate-300 bg-white py-2 text-center text-xl font-black text-slate-900"
-        />
-        <input
-          value={hundredths}
-          onChange={(e) => setHundredths(e.target.value.replace(/\D/g, "").slice(0, 1))}
-          inputMode="numeric"
-          aria-label="Hundredths answer"
-          className="rounded-lg border border-slate-300 bg-white py-2 text-center text-xl font-black text-slate-900"
-        />
-      </div>
-    </div>
-  );
+function numericWrittenMethodDigits(cells: string[]) {
+  return cells.map((digit) => (/^\d$/.test(digit) ? Number(digit) : 0));
 }
 
 function ColumnMultiplicationWorkedExample() {
@@ -662,7 +621,7 @@ export default function TypedResponseActivity({
       : []
   );
   const [currentColumn, setCurrentColumn] = useState(
-    isGuidedWrittenMethod && writtenMethod ? writtenMethod.answerLength - 1 : -1
+    isGuidedWrittenMethod ? getLastEditableWrittenMethodColumn(writtenMethod) : -1
   );
   const [guidedPhase, setGuidedPhase] = useState<"decide" | "input" | "done">(
     isGuidedWrittenMethod && writtenMethod ? "decide" : "done"
@@ -736,7 +695,7 @@ export default function TypedResponseActivity({
         ? Array.from({ length: writtenMethod.answerLength }, () => false)
         : []
     );
-    setCurrentColumn(isGuidedWrittenMethod && writtenMethod ? writtenMethod.answerLength - 1 : -1);
+    setCurrentColumn(isGuidedWrittenMethod ? getLastEditableWrittenMethodColumn(writtenMethod) : -1);
     setGuidedPhase(isGuidedWrittenMethod && writtenMethod ? "decide" : "done");
     setGuidedFeedback("");
   }, [resetKey]);
@@ -819,8 +778,8 @@ export default function TypedResponseActivity({
 
   function handleCarryChoice(choice: "carry" | "no_carry") {
     if (!writtenMethod || currentColumn < 0) return;
-    const topDigits = writtenMethod.top.map((digit) => Number(digit || 0));
-    const bottomDigits = writtenMethod.bottom.map((digit) => Number(digit || 0));
+    const topDigits = numericWrittenMethodDigits(writtenMethod.top);
+    const bottomDigits = numericWrittenMethodDigits(writtenMethod.bottom);
     const columnSum =
       topDigits[currentColumn] + bottomDigits[currentColumn] + (carryValues[currentColumn] ?? 0);
     const needsCarry = columnSum >= 10;
@@ -841,9 +800,10 @@ export default function TypedResponseActivity({
     if (needsCarry) {
       const nextCarryDisplay = [...carryDisplay];
       const nextCarryValues = [...carryValues];
-      if (currentColumn > 0) {
-        nextCarryDisplay[currentColumn - 1] = "1";
-        nextCarryValues[currentColumn - 1] = (nextCarryValues[currentColumn - 1] ?? 0) + 1;
+      const targetColumn = getPreviousEditableWrittenMethodColumn(writtenMethod, currentColumn);
+      if (targetColumn >= 0) {
+        nextCarryDisplay[targetColumn] = "1";
+        nextCarryValues[targetColumn] = (nextCarryValues[targetColumn] ?? 0) + 1;
       }
       setCarryDisplay(nextCarryDisplay);
       setCarryValues(nextCarryValues);
@@ -858,8 +818,8 @@ export default function TypedResponseActivity({
   function checkGuidedDigit() {
     if (!writtenMethod || currentColumn < 0) return;
     if (isGuidedAddition) {
-      const topDigits = writtenMethod.top.map((digit) => Number(digit || 0));
-      const bottomDigits = writtenMethod.bottom.map((digit) => Number(digit || 0));
+      const topDigits = numericWrittenMethodDigits(writtenMethod.top);
+      const bottomDigits = numericWrittenMethodDigits(writtenMethod.bottom);
       const expectedDigit =
         (topDigits[currentColumn] + bottomDigits[currentColumn] + (carryValues[currentColumn] ?? 0)) % 10;
       const typedDigit = digitInputs[currentColumn];
@@ -881,7 +841,14 @@ export default function TypedResponseActivity({
         return;
       }
 
-      setCurrentColumn(currentColumn - 1);
+      const nextColumn = getPreviousEditableWrittenMethodColumn(writtenMethod, currentColumn);
+      if (nextColumn < 0) {
+        setGuidedPhase("done");
+        onCorrect?.();
+        return;
+      }
+
+      setCurrentColumn(nextColumn);
       setGuidedPhase("decide");
       return;
     }
@@ -1073,12 +1040,6 @@ export default function TypedResponseActivity({
       questionData.visual?.type === "receipt" ? (
         <MoneyContextVisual visual={questionData.visual} />
       ) : null}
-      {questionData.visual?.type === "receipt" && questionData.visual.additionWorkspace ? (
-        <DecimalLongAdditionBox
-          top={questionData.visual.additionWorkspace.top}
-          bottom={questionData.visual.additionWorkspace.bottom}
-        />
-      ) : null}
       <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">
         {activityTitle}
       </div>
@@ -1231,7 +1192,9 @@ export default function TypedResponseActivity({
                 <div
                   key={`top-${index}`}
                   className={[
-                    "relative flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100 text-2xl font-black",
+                    digit === "."
+                      ? "relative flex h-12 w-12 items-center justify-center text-2xl font-black"
+                      : "relative flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100 text-2xl font-black",
                     currentColumn === index && isGuidedWrittenMethod
                       ? "ring-2 ring-teal-400"
                       : "",
@@ -1257,7 +1220,9 @@ export default function TypedResponseActivity({
                 <div
                   key={`bottom-${index}`}
                   className={[
-                    "flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100 text-2xl font-black text-slate-900",
+                    digit === "."
+                      ? "flex h-12 w-12 items-center justify-center text-2xl font-black text-slate-900"
+                      : "flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100 text-2xl font-black text-slate-900",
                     currentColumn === index && isGuidedWrittenMethod ? "ring-2 ring-teal-400" : "",
                   ].join(" ")}
                 >
@@ -1270,28 +1235,37 @@ export default function TypedResponseActivity({
               <div className="mt-3 grid w-fit grid-flow-col gap-2">
                 <div className="w-8" />
                 {digitInputs.map((digit, index) => (
-                  <input
-                    key={`answer-${index}`}
-                    value={digit}
-                    inputMode="numeric"
-                    maxLength={1}
-                    disabled={isGuidedWrittenMethod ? index !== currentColumn || guidedPhase !== "input" : false}
-                    onChange={(event) => {
-                      const nextValue = event.target.value.replace(/[^0-9]/g, "").slice(-1);
-                      setDigitInputs((current) =>
-                        current.map((cell, cellIndex) =>
-                          cellIndex === index ? nextValue : cell
-                        )
-                      );
-                    }}
-                    className={[
-                      "h-12 w-12 rounded-lg border border-teal-300 bg-white text-center text-2xl font-black text-slate-900 outline-none focus:border-teal-500",
-                      isGuidedWrittenMethod && index === currentColumn ? "ring-2 ring-teal-400" : "",
-                      isGuidedWrittenMethod && (index !== currentColumn || guidedPhase !== "input")
-                        ? "bg-slate-50 text-slate-500"
-                        : "",
-                    ].join(" ")}
-                  />
+                  isStaticWrittenMethodCell(writtenMethod, index) ? (
+                    <div
+                      key={`answer-static-${index}`}
+                      className="flex h-12 w-12 items-center justify-center text-2xl font-black text-slate-700"
+                    >
+                      {writtenMethod.fixedAnswerCells?.[index] ?? ""}
+                    </div>
+                  ) : (
+                    <input
+                      key={`answer-${index}`}
+                      value={digit}
+                      inputMode="numeric"
+                      maxLength={1}
+                      disabled={isGuidedWrittenMethod ? index !== currentColumn || guidedPhase !== "input" : false}
+                      onChange={(event) => {
+                        const nextValue = event.target.value.replace(/[^0-9]/g, "").slice(-1);
+                        setDigitInputs((current) =>
+                          current.map((cell, cellIndex) =>
+                            cellIndex === index ? nextValue : cell
+                          )
+                        );
+                      }}
+                      className={[
+                        "h-12 w-12 rounded-lg border border-teal-300 bg-white text-center text-2xl font-black text-slate-900 outline-none focus:border-teal-500",
+                        isGuidedWrittenMethod && index === currentColumn ? "ring-2 ring-teal-400" : "",
+                        isGuidedWrittenMethod && (index !== currentColumn || guidedPhase !== "input")
+                          ? "bg-slate-50 text-slate-500"
+                          : "",
+                      ].join(" ")}
+                    />
+                  )
                 ))}
               </div>
             )}
@@ -1307,8 +1281,8 @@ export default function TypedResponseActivity({
                     {isGuidedAddition
                       ? `Do you need to carry for ${
                           (carryValues[currentColumn] ?? 0)
-                            ? `${carryValues[currentColumn]} + ${Number(writtenMethod.top[currentColumn] || 0)} + ${Number(writtenMethod.bottom[currentColumn] || 0)}`
-                            : `${Number(writtenMethod.top[currentColumn] || 0)} + ${Number(writtenMethod.bottom[currentColumn] || 0)}`
+                            ? `${carryValues[currentColumn]} + ${numericWrittenMethodDigits(writtenMethod.top)[currentColumn]} + ${numericWrittenMethodDigits(writtenMethod.bottom)[currentColumn]}`
+                            : `${numericWrittenMethodDigits(writtenMethod.top)[currentColumn]} + ${numericWrittenMethodDigits(writtenMethod.bottom)[currentColumn]}`
                         }?`
                       : `Can you do ${workingTopDigits[currentColumn]} - ${Number(writtenMethod.bottom[currentColumn] || 0)}?`}
                   </p>

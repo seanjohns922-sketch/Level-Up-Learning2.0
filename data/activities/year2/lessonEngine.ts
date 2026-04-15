@@ -718,6 +718,7 @@ export type WrittenMethodLayout = {
   bottom: string[];
   answerLength: number;
   placeValueLabels: string[];
+  fixedAnswerCells?: string[];
   carryRow?: string[];
   borrowRow?: string[];
   crossedTop?: boolean[];
@@ -1317,6 +1318,43 @@ function toDigitCells(value: number, width: number): string[] {
   return String(value).padStart(width, " ").split("").map((digit) => (digit === " " ? "" : digit));
 }
 
+function toMoneyWrittenMethodCells(value: string): string[] {
+  const [wholePart = "0", decimalPart = "00"] = value.split(".");
+  const whole = wholePart.padStart(2, "0").slice(-2);
+  const decimals = decimalPart.padEnd(2, "0").slice(0, 2);
+  return [
+    wholePart.length > 1 ? whole[0] ?? "" : "",
+    whole[1] ?? "0",
+    ".",
+    decimals[0] ?? "0",
+    decimals[1] ?? "0",
+  ];
+}
+
+function buildMoneyAdditionCarryRow(top: string[], bottom: string[]): string[] | undefined {
+  const carryRow = Array.from({ length: top.length }, () => "");
+  let carry = 0;
+
+  for (let index = top.length - 1; index >= 0; index -= 1) {
+    if (top[index] === ".") continue;
+
+    const sum = Number(top[index] || 0) + Number(bottom[index] || 0) + carry;
+    carry = sum >= 10 ? 1 : 0;
+
+    if (!carry) continue;
+
+    let targetIndex = index - 1;
+    while (targetIndex >= 0 && top[targetIndex] === ".") {
+      targetIndex -= 1;
+    }
+    if (targetIndex >= 0) {
+      carryRow[targetIndex] = "1";
+    }
+  }
+
+  return carryRow.some(Boolean) ? carryRow : undefined;
+}
+
 function buildAdditionCarryRow(a: number, b: number, width: number): string[] | undefined {
   const top = toDigitCells(a, width);
   const bottom = toDigitCells(b, width);
@@ -1404,6 +1442,27 @@ function buildWrittenMethodLayout(
     ...(operation === "-"
       ? buildSubtractionBorrowData(topValue, bottomValue, width)
       : {}),
+  };
+}
+
+function buildMoneyAdditionWrittenMethodLayout(
+  title: string,
+  topValue: string,
+  bottomValue: string,
+  answer: string
+): WrittenMethodLayout {
+  const top = toMoneyWrittenMethodCells(topValue);
+  const bottom = toMoneyWrittenMethodCells(bottomValue);
+
+  return {
+    title,
+    operation: "+",
+    top,
+    bottom,
+    answerLength: top.length,
+    placeValueLabels: ["T", "O", ".", "t", "h"],
+    fixedAnswerCells: ["", "", ".", "", ""],
+    carryRow: buildMoneyAdditionCarryRow(top, bottom),
   };
 }
 
@@ -5247,10 +5306,6 @@ function generateGenericQuestion(
           type: "receipt" as const,
           title: "Book Fair",
           hideComputedTotals: true,
-          additionWorkspace: {
-            top: "1.95",
-            bottom: "8.50",
-          },
           lines: [
             { label: "Bookmark", detail: "Foil", price: 1.95, quantity: 1 },
             { label: "Mini Book", detail: "Mystery", price: 4.25, quantity: 2 },
@@ -5320,6 +5375,10 @@ function generateGenericQuestion(
       helper: chosen.helper,
       placeholder: "Type the answer",
       visual: chosen.visual,
+      writtenMethod:
+        chosen.visual.type === "receipt"
+          ? buildMoneyAdditionWrittenMethodLayout("Long Addition", "1.95", "8.50", chosen.answer)
+          : undefined,
     };
   }
 
