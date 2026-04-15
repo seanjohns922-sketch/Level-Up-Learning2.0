@@ -118,8 +118,27 @@ function getDisplayConfig(questionData: NumberLineQuestion): DisplayConfig {
   // raw step metadata. Otherwise a tenths question like 0.7 can be incorrectly
   // forced into a thousandths window such as 0.70 to 0.71.
   const targetPlaces = expectedPlaces > 0 ? expectedPlaces : stepPlaces;
+  const forceFullRange = questionData.displayStyle === "full_range";
 
   if (targetPlaces >= 3) {
+    if (forceFullRange) {
+      const min = originalMin;
+      const max = originalMax;
+      const majorTicks = buildTickRange(min, max, 0.1);
+      const minorTicks = buildTickRange(min, max, 0.001).filter(
+        (tick) => !majorTicks.some((major) => Math.abs(major - tick) < 1e-9)
+      );
+      return {
+        min,
+        max,
+        snapStep: 0.001,
+        majorTicks,
+        minorTicks,
+        labelTicks: majorTicks,
+        helper: "Each small tick shows 0.001.",
+        fractionDigits: 3,
+      };
+    }
     const windowSize = 0.01;
     const snapStep = 0.001;
     const min = roundTo(Math.floor(questionData.expected / windowSize) * windowSize, 3);
@@ -141,11 +160,32 @@ function getDisplayConfig(questionData: NumberLineQuestion): DisplayConfig {
   }
 
   if (targetPlaces === 2) {
-    const windowSize = 0.1;
     const snapStep = 0.01;
-    const min = roundTo(Math.floor(questionData.expected / windowSize) * windowSize, 2);
-    const max = roundTo(min + windowSize, 2);
-    const majorTicks = [min, max];
+    if (forceFullRange) {
+      const min = originalMin;
+      const max = originalMax;
+      const majorTicks = buildTickRange(min, max, 0.1);
+      const minorTicks = buildTickRange(min, max, snapStep).filter(
+        (tick) => !majorTicks.some((major) => Math.abs(major - tick) < 1e-9)
+      );
+      return {
+        min,
+        max,
+        snapStep,
+        majorTicks,
+        minorTicks,
+        labelTicks: majorTicks,
+        helper: "Each small tick shows 0.01.",
+        fractionDigits: 2,
+      };
+    }
+    const wholeMin = Math.floor(questionData.expected);
+    const isLessThanOne = questionData.expected >= 0 && questionData.expected < 1;
+    const min = isLessThanOne
+      ? roundTo(Math.floor(questionData.expected / 0.1) * 0.1, 2)
+      : wholeMin;
+    const max = isLessThanOne ? roundTo(min + 0.1, 2) : wholeMin + 1;
+    const majorTicks = isLessThanOne ? [min, max] : buildTickRange(min, max, 0.1);
     const minorTicks = buildTickRange(min, max, snapStep).filter(
       (tick) => !majorTicks.some((major) => Math.abs(major - tick) < 1e-9)
     );
@@ -155,7 +195,7 @@ function getDisplayConfig(questionData: NumberLineQuestion): DisplayConfig {
       snapStep,
       majorTicks,
       minorTicks,
-      labelTicks: majorTicks,
+      labelTicks: isLessThanOne ? majorTicks : [min, max],
       helper: "Each small tick shows 0.01.",
       fractionDigits: 2,
     };

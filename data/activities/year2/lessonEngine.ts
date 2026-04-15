@@ -142,6 +142,7 @@ export type NumberLineQuestion = {
   max: number;
   step: number;
   mode: "placement" | "rounding" | "estimate";
+  displayStyle?: "auto" | "full_range";
 };
 
 function decimalPlacesForStep(step: number) {
@@ -169,7 +170,7 @@ function formatMathNumber(value: number) {
   if (Number.isInteger(value)) return value.toLocaleString();
   return value.toLocaleString(undefined, {
     minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
+    maximumFractionDigits: 3,
   });
 }
 
@@ -3296,6 +3297,7 @@ function generateInteractiveQuestion(
     const min = typeof config.min === "number" ? config.min : 0;
     const max = typeof config.max === "number" ? config.max : 1000;
     const step = typeof config.step === "number" ? config.step : 10;
+    const displayStyle = config.displayStyle === "full_range" ? "full_range" : "auto";
     const mode =
       config.mode === "rounding" || config.mode === "estimate"
         ? config.mode
@@ -3317,6 +3319,7 @@ function generateInteractiveQuestion(
         max,
         step,
         mode,
+        displayStyle,
       };
     }
 
@@ -3336,6 +3339,7 @@ function generateInteractiveQuestion(
       max,
       step,
       mode,
+      displayStyle,
     };
   }
 

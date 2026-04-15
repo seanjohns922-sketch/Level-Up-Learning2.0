@@ -44,8 +44,9 @@ const year5Rows: ProgramRow[] = [
     activity: "Estimate and place decimals on number lines using 0, 0.5, and 1 as benchmarks.",
     curriculum: ["AC9M5N01"],
     activities: [
-      makeActivity("number_line", 2, { min: 0, max: 1, step: 0.001, mode: "placement" }),
-      makeActivity("number_line", 1, { min: 0, max: 6, step: 0.001, mode: "placement" }),
+      makeActivity("number_line", 1, { min: 0, max: 1, step: 0.01, mode: "placement", displayStyle: "full_range" }),
+      makeActivity("number_line", 1, { min: 0, max: 1, step: 0.001, mode: "placement", displayStyle: "full_range" }),
+      makeActivity("number_line", 2, { min: 0, max: 6, step: 0.01, mode: "placement" }),
       makeActivity("multiple_choice", 1, { mode: "decimals_between_benchmarks" }),
     ],
   },
