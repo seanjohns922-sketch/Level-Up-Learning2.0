@@ -159,6 +159,76 @@ function getBoxMethodCells(leftValue: number, topValue: number) {
   return { splitLeft, splitTop, cells, total };
 }
 
+function splitMoney(value: string) {
+  const [whole, decimal = "00"] = value.split(".");
+  return {
+    ones: whole,
+    tenths: decimal[0] ?? "0",
+    hundredths: decimal[1] ?? "0",
+  };
+}
+
+function DecimalLongAdditionBox({
+  top,
+  bottom,
+}: {
+  top: string;
+  bottom: string;
+}) {
+  const [ones, setOnes] = useState("");
+  const [tenths, setTenths] = useState("");
+  const [hundredths, setHundredths] = useState("");
+  const a = splitMoney(top);
+  const b = splitMoney(bottom);
+
+  return (
+    <div className="mt-4 rounded-2xl border border-teal-100 bg-teal-50 p-5">
+      <div className="mb-3 text-sm font-bold text-slate-700">Show your working</div>
+      <div className="grid w-fit grid-cols-[60px_20px_60px_60px] gap-2 items-center text-center">
+        <div className="text-xs font-semibold text-slate-400">Ones</div>
+        <div />
+        <div className="text-xs font-semibold text-slate-400">Tenths</div>
+        <div className="text-xs font-semibold text-slate-400">Hundredths</div>
+
+        <div className="rounded-lg bg-white py-2 text-xl font-black text-slate-900 shadow-sm">{a.ones}</div>
+        <div className="text-xl font-black text-slate-700">.</div>
+        <div className="rounded-lg bg-white py-2 text-xl font-black text-slate-900 shadow-sm">{a.tenths}</div>
+        <div className="rounded-lg bg-white py-2 text-xl font-black text-slate-900 shadow-sm">{a.hundredths}</div>
+
+        <div className="rounded-lg bg-white py-2 text-xl font-black text-slate-900 shadow-sm">{b.ones}</div>
+        <div className="text-xl font-black text-slate-700">.</div>
+        <div className="rounded-lg bg-white py-2 text-xl font-black text-slate-900 shadow-sm">{b.tenths}</div>
+        <div className="rounded-lg bg-white py-2 text-xl font-black text-slate-900 shadow-sm">{b.hundredths}</div>
+
+        <div className="col-span-4 my-1 h-px bg-slate-300" />
+
+        <input
+          value={ones}
+          onChange={(e) => setOnes(e.target.value.replace(/\D/g, "").slice(0, 2))}
+          inputMode="numeric"
+          aria-label="Ones answer"
+          className="rounded-lg border border-slate-300 bg-white py-2 text-center text-xl font-black text-slate-900"
+        />
+        <div className="text-xl font-black text-slate-700">.</div>
+        <input
+          value={tenths}
+          onChange={(e) => setTenths(e.target.value.replace(/\D/g, "").slice(0, 1))}
+          inputMode="numeric"
+          aria-label="Tenths answer"
+          className="rounded-lg border border-slate-300 bg-white py-2 text-center text-xl font-black text-slate-900"
+        />
+        <input
+          value={hundredths}
+          onChange={(e) => setHundredths(e.target.value.replace(/\D/g, "").slice(0, 1))}
+          inputMode="numeric"
+          aria-label="Hundredths answer"
+          className="rounded-lg border border-slate-300 bg-white py-2 text-center text-xl font-black text-slate-900"
+        />
+      </div>
+    </div>
+  );
+}
+
 function ColumnMultiplicationWorkedExample() {
   return (
     <div className="rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm">
@@ -1002,6 +1072,12 @@ export default function TypedResponseActivity({
       questionData.visual?.type === "australian_money" ||
       questionData.visual?.type === "receipt" ? (
         <MoneyContextVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "receipt" && questionData.visual.additionWorkspace ? (
+        <DecimalLongAdditionBox
+          top={questionData.visual.additionWorkspace.top}
+          bottom={questionData.visual.additionWorkspace.bottom}
+        />
       ) : null}
       <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">
         {activityTitle}

@@ -80,6 +80,11 @@ export type MoneyVisualData =
         quantity?: number;
       }>;
       payment?: number;
+      hideComputedTotals?: boolean;
+      additionWorkspace?: {
+        top: string;
+        bottom: string;
+      };
     };
 
 export type ColumnMultiplicationVisualData = {
@@ -5235,12 +5240,17 @@ function generateGenericQuestion(
         },
       },
       {
-        prompt: "Use the receipt. How much was spent altogether?",
+        prompt: "Use the receipt. Work out the total cost.",
         answer: "10.45",
-        helper: "Line up the decimal places when you add the amounts.",
+        helper: "First work out 2 × $4.25, then line up the decimal places to add the totals.",
         visual: {
           type: "receipt" as const,
           title: "Book Fair",
+          hideComputedTotals: true,
+          additionWorkspace: {
+            top: "1.95",
+            bottom: "8.50",
+          },
           lines: [
             { label: "Bookmark", detail: "Foil", price: 1.95, quantity: 1 },
             { label: "Mini Book", detail: "Mystery", price: 4.25, quantity: 2 },
@@ -5264,7 +5274,13 @@ function generateGenericQuestion(
         },
       },
     ];
-    const chosen = shoppingTemplates[randInt(0, shoppingTemplates.length - 1)] ?? shoppingTemplates[0]!;
+    const availableTemplates = asMultipleChoice
+      ? shoppingTemplates.filter((template) => template.visual.type !== "receipt")
+      : shoppingTemplates;
+    const chosen =
+      availableTemplates[randInt(0, availableTemplates.length - 1)] ??
+      availableTemplates[0] ??
+      shoppingTemplates[0]!;
     if (asMultipleChoice) {
       const decimalAnswer = Number.parseFloat(chosen.answer.replace("$", ""));
       const generatedOptions =

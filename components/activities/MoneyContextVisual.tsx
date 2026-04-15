@@ -5,7 +5,7 @@
 import type { MoneyVisualData } from "@/data/activities/year2/lessonEngine";
 
 function formatDollars(value: number) {
-  return `$${value}`;
+  return `$${value.toFixed(2)}`;
 }
 
 function sumMoneyPieces(
@@ -181,7 +181,7 @@ export default function MoneyContextVisual({
                 {formatDollars(line.price)}
               </div>
               <div className="text-right text-sm font-black text-slate-700">
-                {formatDollars(line.price * (line.quantity ?? 1))}
+                {visual.hideComputedTotals ? "____" : formatDollars(line.price * (line.quantity ?? 1))}
               </div>
             </div>
           ))}
@@ -192,7 +192,7 @@ export default function MoneyContextVisual({
             <div />
             <div />
             <div className="text-right text-base font-black text-slate-900">
-              {formatDollars(sumReceiptLines(visual.lines))}
+              {visual.hideComputedTotals ? "____" : formatDollars(sumReceiptLines(visual.lines))}
             </div>
           </div>
         </div>
