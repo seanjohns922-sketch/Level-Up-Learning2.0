@@ -5265,23 +5265,46 @@ function generateGenericQuestion(
       },
     ];
     const chosen = shoppingTemplates[randInt(0, shoppingTemplates.length - 1)] ?? shoppingTemplates[0]!;
-    return asMultipleChoice && chosen.options
-      ? {
-          kind: "multiple_choice",
-          prompt: chosen.prompt,
-          options: shuffle(chosen.options),
-          answer: chosen.answer,
-          helper: chosen.helper,
-          visual: chosen.visual,
-        }
-      : {
-          kind: "typed_response",
-          prompt: chosen.prompt,
-          answer: chosen.answer,
-          helper: chosen.helper,
-          placeholder: "Type the answer",
-          visual: chosen.visual,
-        };
+    if (asMultipleChoice) {
+      const decimalAnswer = Number.parseFloat(chosen.answer.replace("$", ""));
+      const generatedOptions =
+        Number.isFinite(decimalAnswer)
+          ? shuffle(
+              Array.from(
+                new Set([
+                  chosen.answer,
+                  chosen.answer.startsWith("$")
+                    ? `$${formatDecimal(Math.max(0, decimalAnswer + 0.1))}`
+                    : formatDecimal(Math.max(0, decimalAnswer + 0.1)),
+                  chosen.answer.startsWith("$")
+                    ? `$${formatDecimal(Math.max(0, decimalAnswer - 0.1))}`
+                    : formatDecimal(Math.max(0, decimalAnswer - 0.1)),
+                  chosen.answer.startsWith("$")
+                    ? `$${formatDecimal(Math.max(0, decimalAnswer + 1))}`
+                    : formatDecimal(Math.max(0, decimalAnswer + 1)),
+                ])
+              ).slice(0, 4)
+            )
+          : undefined;
+
+      return {
+        kind: "multiple_choice",
+        prompt: chosen.prompt,
+        options: chosen.options ? shuffle(chosen.options) : generatedOptions ?? [chosen.answer],
+        answer: chosen.answer,
+        helper: chosen.helper,
+        visual: chosen.visual,
+      };
+    }
+
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      helper: chosen.helper,
+      placeholder: "Type the answer",
+      visual: chosen.visual,
+    };
   }
 
   if (explicitMode === "decimal_rounding_estimation") {
