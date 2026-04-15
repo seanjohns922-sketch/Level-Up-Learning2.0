@@ -51,11 +51,11 @@ const year5Rows: ProgramRow[] = [
   },
   {
     week: 2,
-    weekTopic: "Decimals in Context & Estimation",
-    focus: "Use decimals in measurement and practical contexts",
+    weekTopic: "Decimals in Money & Estimation",
+    focus: "Use decimals in money contexts and add prices accurately",
     lesson: 1,
-    topic: "Decimals in Money & Measurement",
-    activity: "Use decimals in shopping and measurement contexts to compare values and totals.",
+    topic: "Decimals in Money",
+    activity: "Use money contexts to add decimal amounts and compare prices accurately.",
     curriculum: ["AC9M5N01"],
     activities: [
       makeActivity("multiple_choice", 2, { mode: "decimal_context" }),

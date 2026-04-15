@@ -5199,41 +5199,84 @@ function generateGenericQuestion(
   }
 
   if (explicitMode === "decimal_context") {
-    const templates = [
+    const shoppingTemplates = [
       {
-        prompt: "A ribbon is 1.25 m long. Another ribbon is 1.2 m long. Which is longer?",
-        answer: "1.25 m",
-        options: ["1.25 m", "1.2 m", "They are equal", "Not enough information"],
-      },
-      {
-        prompt: "A book costs $4.75 and a pen costs $2.40. What is the total cost?",
+        prompt: "Use the price board. What is the total cost of the notebook and marker?",
         answer: "7.15",
+        helper: "Add the dollars first, then add the cents.",
+        visual: {
+          type: "shopping_list" as const,
+          title: "Stationery Shop",
+          items: [
+            { label: "Notebook", detail: "A5", price: 4.75 },
+            { label: "Marker", detail: "Black", price: 2.4 },
+            { label: "Glue Stick", detail: "Small", price: 1.85 },
+            { label: "Pencil Pack", detail: "HB", price: 3.25 },
+          ],
+        },
       },
       {
-        prompt: "Which is greater: 2.5 L or 2.45 L?",
-        answer: "2.5 L",
-        options: ["2.5 L", "2.45 L", "They are equal", "Cannot compare"],
+        prompt: "Use the shop board. A student buys 2 juice bottles. What is the total cost?",
+        answer: "5.60",
+        helper: "Add the same decimal amount twice or use doubling.",
+        visual: {
+          type: "shopping_list" as const,
+          title: "School Canteen",
+          items: [
+            { label: "Juice Bottle", detail: "250 mL", price: 2.8 },
+            { label: "Fruit Cup", detail: "Fresh", price: 3.45 },
+            { label: "Yoghurt", detail: "Vanilla", price: 2.35 },
+            { label: "Muffin", detail: "Blueberry", price: 4.1 },
+          ],
+        },
       },
       {
-        prompt: "A student ran 3.6 km on Monday and 2.4 km on Tuesday. How far did they run altogether?",
-        answer: "6.0",
+        prompt: "Use the receipt. How much was spent altogether?",
+        answer: "10.45",
+        helper: "Line up the decimal places when you add the amounts.",
+        visual: {
+          type: "receipt" as const,
+          title: "Book Fair",
+          lines: [
+            { label: "Bookmark", detail: "Foil", price: 1.95, quantity: 1 },
+            { label: "Mini Book", detail: "Mystery", price: 4.25, quantity: 2 },
+          ],
+        },
+      },
+      {
+        prompt: "Use the price board. Which item costs more: the sketch pad or the pen set?",
+        answer: "$5.40",
+        helper: "Compare the dollars first, then compare the tenths and hundredths.",
+        options: ["$5.40", "$5.04", "They cost the same", "Cannot tell"],
+        visual: {
+          type: "shopping_list" as const,
+          title: "Art Store",
+          items: [
+            { label: "Sketch Pad", detail: "A4", price: 5.4 },
+            { label: "Pen Set", detail: "Fine-tip", price: 5.04 },
+            { label: "Paint Brush", detail: "Round", price: 3.65 },
+            { label: "Tape", detail: "Clear", price: 2.2 },
+          ],
+        },
       },
     ];
-    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    const chosen = shoppingTemplates[randInt(0, shoppingTemplates.length - 1)] ?? shoppingTemplates[0]!;
     return asMultipleChoice && chosen.options
       ? {
           kind: "multiple_choice",
           prompt: chosen.prompt,
           options: shuffle(chosen.options),
           answer: chosen.answer,
-          helper: "Compare or combine the decimals carefully.",
+          helper: chosen.helper,
+          visual: chosen.visual,
         }
       : {
           kind: "typed_response",
           prompt: chosen.prompt,
           answer: chosen.answer,
-          helper: "Line up the decimal places.",
+          helper: chosen.helper,
           placeholder: "Type the answer",
+          visual: chosen.visual,
         };
   }
 
