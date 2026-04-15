@@ -114,7 +114,10 @@ function getDisplayConfig(questionData: NumberLineQuestion): DisplayConfig {
     };
   }
 
-  const targetPlaces = Math.max(expectedPlaces, stepPlaces);
+  // Choose the displayed scale from the target value itself, not the generator's
+  // raw step metadata. Otherwise a tenths question like 0.7 can be incorrectly
+  // forced into a thousandths window such as 0.70 to 0.71.
+  const targetPlaces = expectedPlaces > 0 ? expectedPlaces : stepPlaces;
 
   if (targetPlaces >= 3) {
     const windowSize = 0.01;
