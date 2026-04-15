@@ -61,6 +61,7 @@ function NumberLineVisual({
   const range = max - min || 1;
   const markerPct = placed !== null ? ((placed - min) / range) * 100 : null;
   const correctPct = checked ? ((expected - min) / range) * 100 : null;
+  const isDecimalLine = max - min <= 1.1 && ticks.some((tick) => Math.abs(tick % 1) > 0);
 
   return (
     <div
@@ -79,17 +80,38 @@ function NumberLineVisual({
       >
         {/* Base line */}
         <div
-          className="absolute left-0 right-0 bg-primary/70 rounded-full"
-          style={{ top: 36, height: 3 }}
+          className={[
+            "absolute left-0 right-0 rounded-full",
+            isDecimalLine ? "" : "bg-primary/70",
+          ].join(" ")}
+          style={{
+            top: 36,
+            height: 3,
+            background: isDecimalLine
+              ? "linear-gradient(90deg, rgba(34,197,94,0.75), rgba(74,222,128,0.78))"
+              : undefined,
+          }}
         />
         {/* End caps */}
         <div
-          className="absolute bg-primary/70 rounded-full"
-          style={{ left: 0, top: 20, width: 3, height: 36 }}
+          className="absolute rounded-full"
+          style={{
+            left: 0,
+            top: 20,
+            width: 3,
+            height: 36,
+            background: isDecimalLine ? "rgba(74,222,128,0.95)" : "hsl(var(--primary) / 0.7)",
+          }}
         />
         <div
-          className="absolute bg-primary/70 rounded-full"
-          style={{ right: 0, top: 20, width: 3, height: 36 }}
+          className="absolute rounded-full"
+          style={{
+            right: 0,
+            top: 20,
+            width: 3,
+            height: 36,
+            background: isDecimalLine ? "rgba(74,222,128,0.95)" : "hsl(var(--primary) / 0.7)",
+          }}
         />
 
         {/* Minor tick marks */}
@@ -102,8 +124,13 @@ function NumberLineVisual({
               style={{ left: `${left}%`, transform: "translateX(-50%)", top: 24 }}
             >
               <div
-                className="mx-auto bg-primary/30 rounded-full"
-                style={{ width: 2, height: 24 }}
+                className="mx-auto rounded-full"
+                style={{
+                  width: isDecimalLine ? 1.5 : 2,
+                  height: isDecimalLine ? 22 : 24,
+                  background: isDecimalLine ? "rgba(255,255,255,0.95)" : "hsl(var(--primary) / 0.3)",
+                  boxShadow: isDecimalLine ? "0 0 0.5px rgba(255,255,255,0.8)" : undefined,
+                }}
               />
             </div>
           );
@@ -119,8 +146,13 @@ function NumberLineVisual({
               style={{ left: `${left}%`, transform: "translateX(-50%)", top: 16 }}
             >
               <div
-                className="mx-auto bg-primary/60 rounded-full"
-                style={{ width: 3, height: 40 }}
+                className="mx-auto rounded-full"
+                style={{
+                  width: isDecimalLine ? 4 : 3,
+                  height: isDecimalLine ? 44 : 40,
+                  background: isDecimalLine ? "rgba(74,222,128,0.95)" : "hsl(var(--primary) / 0.6)",
+                  boxShadow: isDecimalLine ? "0 0 6px rgba(74,222,128,0.35)" : undefined,
+                }}
               />
               <div className="mt-1.5 text-sm font-bold text-foreground whitespace-nowrap">
                 {fmt(tick)}
