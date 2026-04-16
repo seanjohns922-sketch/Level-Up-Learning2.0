@@ -68,7 +68,7 @@ const year5Rows: ProgramRow[] = [
     focus: "Round and estimate decimal values",
     lesson: 2,
     topic: "Rounding & Estimation",
-    activity: "Round decimals to the nearest tenth or hundredth and estimate sensible answers.",
+    activity: "Round decimals to the nearest hundredth or thousandth and estimate sensible answers.",
     curriculum: ["AC9M5N08"],
     activities: [
       makeActivity("multiple_choice", 2, { mode: "decimal_rounding_estimation" }),

@@ -5426,21 +5426,26 @@ function generateGenericQuestion(
   }
 
   if (explicitMode === "decimal_rounding_estimation") {
-    const value = randomStepValue(0.11, 9.99, 0.01);
-    const roundToTenths = randInt(0, 1) === 0;
-    const answerNumber = roundToTenths ? Number(value.toFixed(1)) : Number(value.toFixed(2));
-    const answer = formatMathNumber(answerNumber);
+    const roundToThousandth = randInt(0, 1) === 0;
+    const sourcePlaces = roundToThousandth ? 4 : 3;
+    const targetPlaces = roundToThousandth ? 3 : 2;
+    const step = roundToThousandth ? 0.0001 : 0.001;
+    const value = randomStepValue(0.111, 9.9999, step);
+    const promptValue = value.toFixed(sourcePlaces);
+    const answerNumber = Number(value.toFixed(targetPlaces));
+    const answer = answerNumber.toFixed(targetPlaces);
+    const placeName = roundToThousandth ? "thousandth" : "hundredth";
     return asMultipleChoice
       ? {
           kind: "multiple_choice",
-          prompt: `Round ${formatMathNumber(value)} to the nearest ${roundToTenths ? "tenth" : "hundredth"}.`,
+          prompt: `Round ${promptValue} to the nearest ${placeName}.`,
           options: shuffle(
             Array.from(
               new Set([
                 answer,
-                formatMathNumber(Number((answerNumber + (roundToTenths ? 0.1 : 0.01)).toFixed(roundToTenths ? 1 : 2))),
-                formatMathNumber(Number((Math.max(0, answerNumber - (roundToTenths ? 0.1 : 0.01))).toFixed(roundToTenths ? 1 : 2))),
-                formatMathNumber(value),
+                (answerNumber + (roundToThousandth ? 0.001 : 0.01)).toFixed(targetPlaces),
+                Math.max(0, answerNumber - (roundToThousandth ? 0.001 : 0.01)).toFixed(targetPlaces),
+                promptValue,
               ])
             ).slice(0, 4)
           ),
@@ -5449,7 +5454,7 @@ function generateGenericQuestion(
         }
       : {
           kind: "typed_response",
-          prompt: `Round ${formatMathNumber(value)} to the nearest ${roundToTenths ? "tenth" : "hundredth"}.`,
+          prompt: `Round ${promptValue} to the nearest ${placeName}.`,
           answer,
           helper: "Check the next decimal place to decide whether to round up.",
           placeholder: "Type the rounded decimal",
