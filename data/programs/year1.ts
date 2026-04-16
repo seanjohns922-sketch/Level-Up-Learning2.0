@@ -1,4 +1,5 @@
 import type { LessonActivity } from "./types";
+import { normalizeWeekPlans } from "./buildProgram";
 
 export type CurriculumCode =
   | "AC9M1N01"
@@ -56,7 +57,7 @@ export type WeekPlan = {
   curriculum: CurriculumCode[];
 };
 
-export const YEAR1_PROGRAM: WeekPlan[] = [
+const YEAR1_PROGRAM_RAW: WeekPlan[] = [
   {
     id: "y1-w1",
     week: 1,
@@ -478,6 +479,8 @@ export const YEAR1_PROGRAM: WeekPlan[] = [
     ],
   },
 ];
+
+export const YEAR1_PROGRAM: WeekPlan[] = normalizeWeekPlans(1, YEAR1_PROGRAM_RAW);
 
 export function getYear1Week(week: number): WeekPlan | undefined {
   return YEAR1_PROGRAM.find((w) => w.week === week);

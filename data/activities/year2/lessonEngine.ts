@@ -3232,6 +3232,89 @@ export function validateLessonActivityIntentForLevel(
   };
 }
 
+function validateLessonRotationStructure(
+  lesson: Lesson
+): Year2PolicyViolation[] {
+  const activities = lesson.activities ?? [];
+  const violations: Year2PolicyViolation[] = [];
+
+  if (activities.length !== 3) {
+    violations.push(
+      buildViolation(
+        "alignment",
+        lesson,
+        activities[0]?.activityType ?? "multiple_choice",
+        `Every lesson must define exactly 3 rotating activities, but this lesson has ${activities.length}.`
+      )
+    );
+    return violations;
+  }
+
+  const requiredRoles = new Set(["fast_thinking", "reasoning", "apply_create"]);
+  const seenRoles = new Set<string>();
+
+  for (const activity of activities) {
+    const config = (activity.config ?? {}) as GenericConfig & {
+      rotationRole?: unknown;
+      lessonStructure?: unknown;
+    };
+    const rotationRole =
+      typeof config.rotationRole === "string" ? config.rotationRole : undefined;
+    const lessonStructure =
+      typeof config.lessonStructure === "string" ? config.lessonStructure : undefined;
+
+    if (!rotationRole || !requiredRoles.has(rotationRole)) {
+      violations.push(
+        buildViolation(
+          "alignment",
+          lesson,
+          activity.activityType,
+          "Each lesson activity must declare one rotation role: fast_thinking, reasoning, or apply_create."
+        )
+      );
+      continue;
+    }
+
+    if (seenRoles.has(rotationRole)) {
+      violations.push(
+        buildViolation(
+          "alignment",
+          lesson,
+          activity.activityType,
+          `Lesson activities must use distinct rotation roles, but ${rotationRole} appears more than once.`
+        )
+      );
+    }
+    seenRoles.add(rotationRole);
+
+    if (lessonStructure !== "8_minute_rotation") {
+      violations.push(
+        buildViolation(
+          "alignment",
+          lesson,
+          activity.activityType,
+          'Lesson activities must declare lessonStructure: "8_minute_rotation".'
+        )
+      );
+    }
+  }
+
+  for (const role of requiredRoles) {
+    if (!seenRoles.has(role)) {
+      violations.push(
+        buildViolation(
+          "alignment",
+          lesson,
+          activities[0]?.activityType ?? "multiple_choice",
+          `Lesson is missing the required rotation role "${role}".`
+        )
+      );
+    }
+  }
+
+  return violations;
+}
+
 export function validateLessonActivityIntent(
   lesson: Lesson,
   activity: LessonActivity,
@@ -8853,7 +8936,7 @@ export function buildQuizActivityPool(
   const allowGenericFallback = options?.allowGenericFallback === true;
   const activities = lesson.activities ?? [];
   const pool: LessonActivity[] = [];
-  const violations: Year2PolicyViolation[] = [];
+  const violations: Year2PolicyViolation[] = validateLessonRotationStructure(lesson);
   const instructional = activities.filter(
     (activity) =>
       activity.activityType !== "multiple_choice" &&
@@ -8924,7 +9007,7 @@ export function buildLessonActivityPool(
 } {
   const activities = lesson.activities ?? [];
   const pool: LessonActivity[] = [];
-  const violations: Year2PolicyViolation[] = [];
+  const violations: Year2PolicyViolation[] = validateLessonRotationStructure(lesson);
 
   for (const activity of activities) {
     const validation = validateLessonActivityIntentForLevel(level, lesson, activity);
