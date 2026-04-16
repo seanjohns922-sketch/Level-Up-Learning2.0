@@ -29,6 +29,12 @@ function extractOrderingNumbers(value: string) {
   return (value.match(/\d[\d,]*/g) ?? []).map(normalizeOrderingNumber).filter(Boolean);
 }
 
+function extractSequenceNumbers(value: string) {
+  return (value.match(/-?\d[\d,]*(?:\.\d+)?/g) ?? [])
+    .map((part) => part.replace(/,/g, "").trim())
+    .filter(Boolean);
+}
+
 function columnLabel(label: string) {
   if (label === "O") return "ones";
   if (label === "T") return "tens";
@@ -116,6 +122,21 @@ function getWrittenMethodKey(writtenMethod?: WrittenMethodLayout) {
     writtenMethod.borrowRow?.join(",") ?? "",
     writtenMethod.crossedTop?.join(",") ?? "",
   ].join("|");
+}
+
+function isEquivalentNumberSequence(input: string, expected: string) {
+  const inputParts = extractSequenceNumbers(input);
+  const expectedParts = extractSequenceNumbers(expected);
+
+  if (inputParts.length < 2 || expectedParts.length < 2) {
+    return false;
+  }
+
+  if (inputParts.length !== expectedParts.length) {
+    return false;
+  }
+
+  return inputParts.every((part, index) => part === expectedParts[index]);
 }
 
 function getColumnMultiplicationRows(topValue: number, bottomValue: number) {
@@ -1022,8 +1043,11 @@ export default function TypedResponseActivity({
         ? rawValue
         : normalizeDecimalEquivalent(rawValue);
     const expected = isOrderingResponse ? rawExpected : normalizeDecimalEquivalent(rawExpected);
-    if (value === expected) onCorrect?.();
-    else onWrong?.();
+    if (value === expected || isEquivalentNumberSequence(typed, questionData.answer)) {
+      onCorrect?.();
+    } else {
+      onWrong?.();
+    }
   }
 
   const activityTitle =

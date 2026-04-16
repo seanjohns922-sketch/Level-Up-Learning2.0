@@ -154,7 +154,7 @@ const year5Rows: ProgramRow[] = [
     week: 4,
     focus: "Identify patterns in multiples and explain why those patterns happen",
     lesson: 3,
-    topic: "Spot & Explain Patterns",
+    topic: "Explain Patterns and Rules",
     activity: "Move from spotting number patterns quickly to explaining why they work and creating your own clear pattern rules.",
     curriculum: ["AC9M5N10"],
     activities: [
