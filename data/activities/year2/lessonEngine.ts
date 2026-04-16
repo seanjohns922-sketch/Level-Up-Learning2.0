@@ -5858,6 +5858,12 @@ function generateGenericQuestion(
         prompt: "Which number is a multiple of both 3 and 5?",
         answer: "330",
         options: ["320", "330", "340", "350"],
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisible by 3 and 5",
+          steps: ["Add the digits to test divisibility by 3.", "Check whether the last digit is 0 or 5."],
+          decisionLabel: "Pass both tests",
+        },
       },
       {
         prompt: "Which statement is correct?",
@@ -5868,6 +5874,12 @@ function generateGenericQuestion(
           "89,472 is not divisible by 3 because it is even",
           "89,472 is only divisible by 3 if the digits are all odd",
         ],
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisible by 3",
+          steps: ["Add the digits.", "If the total is divisible by 3, the number is divisible by 3."],
+          decisionLabel: "Use the digit sum",
+        },
       },
       {
         prompt: "Which number is divisible by 5 but not by 10?",
@@ -5888,6 +5900,11 @@ function generateGenericQuestion(
           "110, 233, 940",
           "112, 230, 944",
         ],
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisible by 5",
+          steps: ["Check the last digit.", "If it ends in 0 or 5, it divides evenly by 5."],
+        },
       },
       {
         prompt: "A student says 245 is divisible by 10 because it ends in 5. Is that correct?",
@@ -5908,6 +5925,11 @@ function generateGenericQuestion(
           "Check whether it is even",
           "Find a factor pair",
         ],
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisible by 5",
+          steps: ["Look at the last digit.", "If it ends in 0 or 5, the number passes the test."],
+        },
       },
       {
         prompt: "Which number is divisible by 2?",
@@ -5923,6 +5945,11 @@ function generateGenericQuestion(
         prompt: "Which number is divisible by 4?",
         answer: "1,248",
         options: ["1,246", "1,248", "1,250", "1,254"],
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisible by 4",
+          steps: ["Look at the last two digits.", "If that two-digit number is divisible by 4, the whole number passes."],
+        },
       },
       {
         prompt: "Which number is divisible by 6?",
@@ -5938,6 +5965,11 @@ function generateGenericQuestion(
         prompt: "Which number is divisible by 9?",
         answer: "4,347",
         options: ["4,345", "4,347", "4,349", "4,351"],
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisible by 9",
+          steps: ["Add the digits.", "If the total is divisible by 9, the number is divisible by 9."],
+        },
       },
     ];
     const typedTemplates: Array<{
@@ -5989,22 +6021,47 @@ function generateGenericQuestion(
       {
         prompt: "Type Yes or No: Is 89,472 a multiple of 3?",
         answer: "Yes",
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisible by 3",
+          steps: ["Add the digits.", "If the total is divisible by 3, the number is divisible by 3."],
+        },
       },
       {
         prompt: "Type the one-digit number that makes this true: 56 is divisible by __ because 56 is an even number.",
         answer: "2",
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisible by 2",
+          steps: ["Check the last digit.", "If it ends in 0, 2, 4, 6, or 8, the number is divisible by 2."],
+        },
       },
       {
         prompt: "Type Yes or No: Is 3,615 divisible by 5?",
         answer: "Yes",
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisible by 5",
+          steps: ["Check the last digit.", "If it ends in 0 or 5, the number is divisible by 5."],
+        },
       },
       {
         prompt: "Type the digit sum used to test 372 for divisibility by 3.",
         answer: "12",
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisible by 3",
+          steps: ["Add the digits.", "Use the total to test divisibility by 3."],
+        },
       },
       {
         prompt: "Type Yes or No: Is 1,248 divisible by 4?",
         answer: "Yes",
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisible by 4",
+          steps: ["Look at the last two digits.", "If that two-digit number is divisible by 4, the whole number passes."],
+        },
       },
       {
         prompt: "Type Yes or No: Is 534 divisible by 6?",
@@ -6013,6 +6070,11 @@ function generateGenericQuestion(
       {
         prompt: "Type Yes or No: Is 4,347 divisible by 9?",
         answer: "Yes",
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisible by 9",
+          steps: ["Add the digits.", "If the total is divisible by 9, the number is divisible by 9."],
+        },
       },
     ];
     if (asMultipleChoice) {
