@@ -5284,6 +5284,38 @@ function generateGenericQuestion(
         },
       },
       {
+        prompt: "Use the receipt. Work out the total cost.",
+        answer: "37.24",
+        helper: "Line up the decimal places and add the hundredths first.",
+        visual: {
+          type: "receipt" as const,
+          title: "Campus Store",
+          hideComputedTotals: true,
+          lines: [
+            { label: "Notebook Bundle", detail: "Study Pack", price: 12.56, quantity: 1 },
+            { label: "Marker Set", detail: "Assorted", price: 24.68, quantity: 1 },
+          ],
+        },
+        writtenMethodTop: "12.56",
+        writtenMethodBottom: "24.68",
+      },
+      {
+        prompt: "Use the receipt. Work out the total cost.",
+        answer: "46.75",
+        helper: "Add the hundredths, then the tenths, then the whole-number columns.",
+        visual: {
+          type: "receipt" as const,
+          title: "Book Fair",
+          hideComputedTotals: true,
+          lines: [
+            { label: "Hardcover Novel", detail: "Adventure", price: 18.95, quantity: 1 },
+            { label: "Reference Guide", detail: "Study Skills", price: 27.8, quantity: 1 },
+          ],
+        },
+        writtenMethodTop: "18.95",
+        writtenMethodBottom: "27.80",
+      },
+      {
         prompt: "Use the shop board. A student buys 2 juice bottles. What is the total cost?",
         answer: "5.60",
         helper: "Add the same decimal amount twice or use doubling.",
@@ -5311,6 +5343,8 @@ function generateGenericQuestion(
             { label: "Mini Book", detail: "Mystery", price: 4.25, quantity: 2 },
           ],
         },
+        writtenMethodTop: "1.95",
+        writtenMethodBottom: "8.50",
       },
       {
         prompt: "Use the price board. Which item costs more: the sketch pad or the pen set?",
@@ -5376,8 +5410,17 @@ function generateGenericQuestion(
       placeholder: "Type the answer",
       visual: chosen.visual,
       writtenMethod:
-        chosen.visual.type === "receipt"
-          ? buildMoneyAdditionWrittenMethodLayout("Long Addition", "1.95", "8.50", chosen.answer)
+        chosen.visual.type === "receipt" &&
+        "writtenMethodTop" in chosen &&
+        "writtenMethodBottom" in chosen &&
+        typeof chosen.writtenMethodTop === "string" &&
+        typeof chosen.writtenMethodBottom === "string"
+          ? buildMoneyAdditionWrittenMethodLayout(
+              "Long Addition",
+              chosen.writtenMethodTop,
+              chosen.writtenMethodBottom,
+              chosen.answer
+            )
           : undefined,
     };
   }
