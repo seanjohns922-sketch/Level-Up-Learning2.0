@@ -80,8 +80,8 @@ const year5Rows: ProgramRow[] = [
     focus: "Check whether decimal answers are reasonable",
     lesson: 3,
     topic: "Reasonableness",
-    activity: "Decide whether a decimal answer makes sense and fix incorrect reasoning.",
-    curriculum: ["AC9M5N08"],
+    activity: "Estimate, judge whether decimal answers make sense, and check financial totals in context.",
+    curriculum: ["AC9M5N08", "AC9M5N09"],
     activities: [
       makeActivity("multiple_choice", 2, { mode: "decimal_reasonableness" }),
       makeActivity("typed_response", 1, { mode: "decimal_reasonableness" }),

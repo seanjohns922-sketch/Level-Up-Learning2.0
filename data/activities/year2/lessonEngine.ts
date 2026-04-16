@@ -5480,6 +5480,20 @@ function generateGenericQuestion(
         },
       },
       {
+        prompt: "Use the price board. A student says the notebook and marker cost $70. Is this reasonable?",
+        answer: "No",
+        options: ["Yes", "No", "Only if rounded", "Cannot tell"],
+        helper: "Estimate first. A total near $40 makes sense here, not $70.",
+        visual: {
+          type: "shopping_list" as const,
+          title: "Campus Store",
+          items: [
+            { label: "Notebook", detail: "A4", price: 14.56 },
+            { label: "Marker", detail: "Fine-tip", price: 24.68 },
+          ],
+        },
+      },
+      {
         prompt: "Use the prices. Which amount is greater?",
         answer: "$5.40",
         options: ["$5.04", "$5.40", "They are the same", "Cannot tell"],
@@ -5494,21 +5508,24 @@ function generateGenericQuestion(
         },
       },
       {
-        prompt: "Use the price board. A student says the notebook and marker cost $70. Is this reasonable?",
-        answer: "No",
-        helper: "Estimate first. A total near $40 makes sense here, not $70.",
+        prompt: "Use the prices. Which estimate is best for the total of the ruler and calculator?",
+        answer: "$20",
+        options: ["$10", "$20", "$30", "$40"],
+        helper: "Round $8.95 to about $9 and $11.35 to about $11 or $12.",
         visual: {
           type: "shopping_list" as const,
-          title: "Campus Store",
+          title: "Maths Supplies",
           items: [
-            { label: "Notebook", detail: "A4", price: 14.56 },
-            { label: "Marker", detail: "Fine-tip", price: 24.68 },
+            { label: "Ruler Set", detail: "30 cm", price: 8.95 },
+            { label: "Calculator", detail: "Basic", price: 11.35 },
+            { label: "Compass", detail: "Metal", price: 6.75 },
           ],
         },
       },
       {
         prompt: "A student adds these prices and gets $38.124. Is this reasonable?",
         answer: "No",
+        options: ["Yes", "No", "Only if rounded", "Not enough information"],
         helper: "Money totals should line up to dollars and cents only.",
         visual: {
           type: "receipt" as const,
@@ -5521,9 +5538,68 @@ function generateGenericQuestion(
         },
       },
       {
+        prompt: "A student says $18.95 + $7.80 is about $27. Is this a sensible estimate?",
+        answer: "Yes",
+        options: ["Yes", "No", "Only if exact", "Cannot tell"],
+        helper: "Think of $19 + $8.",
+      },
+      {
         prompt: "A total of $2.60 + $0.40 is $3.00. Does that make sense?",
         answer: "Yes",
+        options: ["Yes", "No", "Only if rounded", "Not sure"],
         helper: "Think about what happens when cents make a whole dollar.",
+      },
+      {
+        prompt: "Use the ticket prices. Which cinema total is more reasonable for 2 adult tickets?",
+        answer: "$27.50",
+        options: ["$2.75", "$27.50", "$275.00", "$20.05"],
+        helper: "Two tickets near $14 each should be close to $28.",
+        visual: {
+          type: "shopping_list" as const,
+          title: "Cinema Tickets",
+          items: [
+            { label: "Adult Ticket", detail: "Standard", price: 13.75 },
+            { label: "Child Ticket", detail: "Standard", price: 9.6 },
+          ],
+        },
+      },
+      {
+        prompt: "A student claims $12.56 + $24.68 is about $20. Is that reasonable?",
+        answer: "No",
+        options: ["Yes", "No", "Only if rounded down", "Cannot tell"],
+        helper: "Estimate with $13 + $25.",
+      },
+      {
+        prompt: "Use the prices. Type the better estimate for the total of the diary and folder.",
+        answer: "$17",
+        helper: "Round $9.45 to about $9 or $10 and $7.35 to about $7.",
+        visual: {
+          type: "shopping_list" as const,
+          title: "School Shop",
+          items: [
+            { label: "Diary", detail: "Hardcover", price: 9.45 },
+            { label: "Folder", detail: "Expanding", price: 7.35 },
+          ],
+        },
+      },
+      {
+        prompt: "A student says $6.75 + $3.25 = $10.00. Type Yes or No: is this reasonable?",
+        answer: "Yes",
+        helper: "Quarter-dollar amounts can combine to make whole dollars.",
+      },
+      {
+        prompt: "Use the receipt. A student says the total should be about $50. Type Yes or No: is that reasonable?",
+        answer: "No",
+        helper: "Estimate the two prices before deciding.",
+        visual: {
+          type: "receipt" as const,
+          title: "Museum Shop",
+          hideComputedTotals: true,
+          lines: [
+            { label: "Guide Book", detail: "Pocket", price: 12.45, quantity: 1 },
+            { label: "Postcards", detail: "Pack", price: 6.85, quantity: 1 },
+          ],
+        },
       },
     ];
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
