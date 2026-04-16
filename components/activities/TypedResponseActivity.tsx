@@ -139,6 +139,12 @@ function isEquivalentNumberSequence(input: string, expected: string) {
   return inputParts.every((part, index) => part === expectedParts[index]);
 }
 
+function getColumnMultiplicationButtonLabel(
+  step: "ones_digit" | "carry" | "ones_row" | "tens_row" | "total" | "done"
+) {
+  return step === "total" || step === "done" ? "Check answer" : "Check step";
+}
+
 function getColumnMultiplicationRows(topValue: number, bottomValue: number) {
   const digits = String(bottomValue).split("").map(Number);
   const onesDigit = digits[digits.length - 1] ?? 0;
@@ -1057,6 +1063,7 @@ export default function TypedResponseActivity({
       : questionData.visual?.type === "column_multiplication"
       ? "Column Multiplication"
       : "Typed Response");
+  const columnMultiplicationButtonLabel = getColumnMultiplicationButtonLabel(multiplicationStep);
 
   return (
     <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -1112,11 +1119,18 @@ export default function TypedResponseActivity({
               }
             />
             <p className="mt-4 text-sm font-medium text-slate-600">
-              Complete the method step by step inside the chart.
+              Build the multiplication step by step inside the chart.
             </p>
             {multiplicationFeedback ? (
               <p className="mt-3 text-sm font-bold text-rose-600">{multiplicationFeedback}</p>
             ) : null}
+            <button
+              type="button"
+              onClick={check}
+              className="mt-4 rounded-xl bg-teal-600 px-5 py-3 font-black text-white hover:bg-teal-700"
+            >
+              {columnMultiplicationButtonLabel}
+            </button>
           </div>
         </div>
       ) : null}
@@ -1492,7 +1506,7 @@ export default function TypedResponseActivity({
                 </div>
               </div>
             </div>
-          ) : questionData.visual?.type === "box_method" ? null : (
+          ) : questionData.visual?.type === "box_method" || isColumnMultiplication ? null : (
             <input
               value={typed}
               onChange={(event) => setTyped(event.target.value)}
@@ -1504,13 +1518,15 @@ export default function TypedResponseActivity({
               className="w-full max-w-md rounded-xl border border-gray-300 px-4 py-3 text-lg font-bold text-gray-900 outline-none focus:border-teal-500"
             />
           )}
-          <button
-            type="button"
-            onClick={check}
-            className="rounded-xl bg-teal-600 px-5 py-3 font-black text-white hover:bg-teal-700"
-          >
-            Check answer
-          </button>
+          {isColumnMultiplication ? null : (
+            <button
+              type="button"
+              onClick={check}
+              className="rounded-xl bg-teal-600 px-5 py-3 font-black text-white hover:bg-teal-700"
+            >
+              Check answer
+            </button>
+          )}
         </div>
       )}
 
