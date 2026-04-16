@@ -7,6 +7,7 @@ import PlaceValueMABVisual from "@/components/activities/PlaceValueMABVisual";
 import DecimalModelVisual from "@/components/activities/DecimalModelVisual";
 import MoneyContextVisual from "@/components/activities/MoneyContextVisual";
 import ArrayVisual from "@/components/activities/ArrayVisual";
+import RuleBoxVisual from "@/components/activities/RuleBoxVisual";
 import { MathFormattedText } from "@/components/FractionText";
 
 function normalize(value: string) {
@@ -1062,6 +1063,9 @@ export default function TypedResponseActivity({
           highlightedRows={questionData.visual.highlightedRows}
           title="Grouped set model"
         />
+      ) : null}
+      {questionData.visual?.type === "rule_box" ? (
+        <RuleBoxVisual visual={questionData.visual} title="Step-by-step rule" />
       ) : null}
       {questionData.visual?.type === "column_multiplication" ? (
         <div className="mt-4 space-y-4">

@@ -90,10 +90,10 @@ const year5Rows: ProgramRow[] = [
   {
     week: 3,
     weekTopic: "Factors, Multiples & Divisibility",
-    focus: "Recognise factors, multiples, and divisibility patterns",
+    focus: "Recognise factors, generate multiples, and compare divisibility patterns",
     lesson: 1,
     topic: "Factors & Multiples",
-    activity: "Explore factor pairs, arrays, and multiple patterns.",
+    activity: "Find factor pairs, identify multiples, and compare factor and multiple patterns.",
     curriculum: ["AC9M5N02"],
     activities: [
       makeActivity("multiple_choice", 2, { mode: "factors_multiples" }),
@@ -102,10 +102,10 @@ const year5Rows: ProgramRow[] = [
   },
   {
     week: 3,
-    focus: "Use divisibility rules to reason efficiently",
+    focus: "Use divisibility tests to decide whether numbers are multiples of one-digit numbers",
     lesson: 2,
-    topic: "Divisibility Rules",
-    activity: "Use divisibility rules for 2, 3, 5, and 10 to explain reasoning.",
+    topic: "Divisibility Tests",
+    activity: "Use divisibility tests to decide if larger numbers are divisible by one-digit numbers and identify matching multiples.",
     curriculum: ["AC9M5N02"],
     activities: [
       makeActivity("multiple_choice", 2, { mode: "divisibility_rules" }),
@@ -117,7 +117,7 @@ const year5Rows: ProgramRow[] = [
     focus: "Create and use algorithms for factors, multiples and divisibility",
     lesson: 3,
     topic: "Algorithms with Factors & Multiples",
-    activity: "Use flowchart-style rules and emerging patterns to test factors, multiples and divisibility.",
+    activity: "Follow and use simple step-based rules to test factors, multiples, and divisibility.",
     curriculum: ["AC9M5N10"],
     activities: [
       makeActivity("multiple_choice", 2, { mode: "factor_multiple_algorithm" }),
