@@ -5962,9 +5962,55 @@ function generateGenericQuestion(
         },
       },
       {
+        prompt: "Which number is divisible by 8?",
+        answer: "3,216",
+        options: ["3,214", "3,216", "3,218", "3,222"],
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisible by 8",
+          steps: ["Look at the last three digits.", "If that three-digit number is divisible by 8, the whole number passes."],
+        },
+      },
+      {
         prompt: "Which number is divisible by 9?",
         answer: "4,347",
         options: ["4,345", "4,347", "4,349", "4,351"],
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisible by 9",
+          steps: ["Add the digits.", "If the total is divisible by 9, the number is divisible by 9."],
+        },
+      },
+      {
+        prompt: "Which set shows only numbers divisible by 4?",
+        answer: "124, 248, 316",
+        options: [
+          "124, 248, 316",
+          "124, 250, 316",
+          "126, 248, 318",
+          "122, 246, 314",
+        ],
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisible by 4",
+          steps: ["Look at the last two digits.", "If those digits make a number divisible by 4, the whole number passes."],
+        },
+      },
+      {
+        prompt: "Which number is divisible by both 2 and 3, so it is divisible by 6?",
+        answer: "1,158",
+        options: ["1,152", "1,154", "1,156", "1,158"],
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisible by 6",
+          steps: ["Check if the number is even.", "Add the digits and test divisibility by 3."],
+          decisionLabel: "Pass both tests",
+        },
+      },
+      {
+        prompt: "Which rule helps most to test whether 4,347 is divisible by 9?",
+        answer: "Add the digits",
+        options: ["Add the digits", "Check the last digit", "Look at the last two digits", "Find a factor pair"],
         visual: {
           type: "rule_box" as const,
           title: "Divisible by 9",
@@ -6074,6 +6120,33 @@ function generateGenericQuestion(
           type: "rule_box" as const,
           title: "Divisible by 9",
           steps: ["Add the digits.", "If the total is divisible by 9, the number is divisible by 9."],
+        },
+      },
+      {
+        prompt: "Type Yes or No: Is 3,216 divisible by 8?",
+        answer: "Yes",
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisible by 8",
+          steps: ["Look at the last three digits.", "If those digits make a number divisible by 8, the whole number passes."],
+        },
+      },
+      {
+        prompt: "Type the last two digits you would check to test whether 1,248 is divisible by 4.",
+        answer: "48",
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisible by 4",
+          steps: ["Look at the last two digits.", "Use that two-digit number to test divisibility by 4."],
+        },
+      },
+      {
+        prompt: "Type the digit sum used to test 4,347 for divisibility by 9.",
+        answer: "18",
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisible by 9",
+          steps: ["Add the digits.", "Use the total to test divisibility by 9."],
         },
       },
     ];
@@ -6247,6 +6320,28 @@ function generateGenericQuestion(
         },
       },
       {
+        prompt: "Use the rule box. Which number passes the divisibility-by-2 test?",
+        answer: "5,472",
+        options: ["5,471", "5,472", "5,475", "5,479"],
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisible by 2",
+          steps: ["Look at the last digit.", "If it is 0, 2, 4, 6, or 8, the number passes."],
+          decisionLabel: "Pass or fail",
+        },
+      },
+      {
+        prompt: "Use this two-step rule: first test divisibility by 2, then by 3. Which number passes both steps?",
+        answer: "1,158",
+        options: ["1,152", "1,154", "1,156", "1,158"],
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisible by 6",
+          steps: ["Check if the number is even.", "Add the digits and test divisibility by 3."],
+          decisionLabel: "Passes both steps",
+        },
+      },
+      {
         prompt: "Which missing step completes this rule for divisibility by 5?",
         answer: "Check whether the last digit is 0 or 5",
         options: [
@@ -6325,6 +6420,24 @@ function generateGenericQuestion(
           type: "rule_box" as const,
           title: "Divisibility by 9",
           steps: ["Add 4 + 3 + 4 + 7.", "Use the sum to decide divisibility by 9."],
+        },
+      },
+      {
+        prompt: "Use the rule box. Type Yes or No: Is 5,472 divisible by 2?",
+        answer: "Yes",
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisible by 2",
+          steps: ["Look at the last digit.", "If it is 0, 2, 4, 6, or 8, the number passes."],
+        },
+      },
+      {
+        prompt: "Use the rule box. Type Yes or No: Is 1,158 divisible by 6?",
+        answer: "Yes",
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisible by 6",
+          steps: ["Check if the number is even.", "Add the digits and test divisibility by 3."],
         },
       },
     ];
