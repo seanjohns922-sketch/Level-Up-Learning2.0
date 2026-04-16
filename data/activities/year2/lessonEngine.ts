@@ -6175,6 +6175,355 @@ function generateGenericQuestion(
     };
   }
 
+  if (explicitMode === "divisibility_quick_decision") {
+    const templates: Array<{
+      prompt: string;
+      answer: string;
+      options: string[];
+      visual?: {
+        type: "rule_box";
+        title: string;
+        steps: string[];
+        decisionLabel?: string;
+      };
+    }> = [
+      {
+        prompt: "Which number is divisible by both 3 and 5?",
+        answer: "195",
+        options: ["184", "190", "195", "198"],
+        visual: {
+          type: "rule_box",
+          title: "Divisible by 3 and 5",
+          steps: ["Check whether the digit sum is divisible by 3.", "Check whether the number ends in 0 or 5."],
+          decisionLabel: "Both rules must work",
+        },
+      },
+      {
+        prompt: "Which number is NOT divisible by 6?",
+        answer: "214",
+        options: ["198", "204", "214", "222"],
+        visual: {
+          type: "rule_box",
+          title: "Divisible by 6",
+          steps: ["The number must be even.", "Its digit sum must be divisible by 3."],
+          decisionLabel: "Pass both tests",
+        },
+      },
+      {
+        prompt: "Which group is correct for 'divisible by 4'?",
+        answer: "128, 316, 524",
+        options: [
+          "128, 316, 524",
+          "126, 316, 524",
+          "128, 318, 524",
+          "128, 316, 526",
+        ],
+        visual: {
+          type: "rule_box",
+          title: "Divisible by 4",
+          steps: ["Look at the last two digits.", "Those last two digits must make a multiple of 4."],
+        },
+      },
+      {
+        prompt: "Which number is divisible by both 2 and 3, so it is divisible by 6?",
+        answer: "234",
+        options: ["232", "234", "236", "238"],
+        visual: {
+          type: "rule_box",
+          title: "Divisible by 6",
+          steps: ["Check for an even last digit.", "Check that the digit sum is divisible by 3."],
+          decisionLabel: "Both rules must work",
+        },
+      },
+      {
+        prompt: "Which number is NOT divisible by both 3 and 5?",
+        answer: "245",
+        options: ["135", "180", "225", "245"],
+        visual: {
+          type: "rule_box",
+          title: "Divisible by 3 and 5",
+          steps: ["A number must end in 0 or 5.", "Its digit sum must also be divisible by 3."],
+        },
+      },
+      {
+        prompt: "Which group shows only numbers divisible by 9?",
+        answer: "144, 261, 333",
+        options: [
+          "144, 261, 333",
+          "144, 262, 333",
+          "145, 261, 333",
+          "144, 261, 335",
+        ],
+        visual: {
+          type: "rule_box",
+          title: "Divisible by 9",
+          steps: ["Add the digits.", "The total must be divisible by 9."],
+        },
+      },
+      {
+        prompt: "Which number is divisible by 8?",
+        answer: "1,224",
+        options: ["1,220", "1,222", "1,224", "1,226"],
+        visual: {
+          type: "rule_box",
+          title: "Divisible by 8",
+          steps: ["Look at the last three digits.", "Those last three digits must make a multiple of 8."],
+        },
+      },
+      {
+        prompt: "Which group is correct for 'divisible by both 3 and 4'?",
+        answer: "132, 216, 324",
+        options: [
+          "132, 216, 324",
+          "132, 214, 324",
+          "130, 216, 324",
+          "132, 216, 326",
+        ],
+        visual: {
+          type: "rule_box",
+          title: "Divisible by both 3 and 4",
+          steps: ["Use the digit sum to test divisibility by 3.", "Use the last two digits to test divisibility by 4."],
+          decisionLabel: "Both rules must work",
+        },
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle(chosen.options),
+      answer: chosen.answer,
+      helper: "Make the divisibility decision quickly, then confirm it with the rule.",
+      visual: chosen.visual,
+    };
+  }
+
+  if (explicitMode === "divisibility_whos_right") {
+    const templates: Array<{
+      prompt: string;
+      answer: string;
+      options: string[];
+      visual?: {
+        type: "rule_box";
+        title: string;
+        steps: string[];
+        decisionLabel?: string;
+      };
+    }> = [
+      {
+        prompt: "A student says, '245 is divisible by 3 because it ends in 5.' Who is right?",
+        answer: "The student is incorrect because divisibility by 3 depends on the digit sum, not the last digit",
+        options: [
+          "The student is incorrect because divisibility by 3 depends on the digit sum, not the last digit",
+          "The student is correct because numbers ending in 5 are always divisible by 3",
+          "The student is partly correct because 245 is divisible by both 3 and 5",
+          "The student is incorrect because odd numbers are never divisible by 3",
+        ],
+        visual: {
+          type: "rule_box",
+          title: "Divisible by 3",
+          steps: ["Add the digits.", "Ignore whether the number ends in 5."],
+        },
+      },
+      {
+        prompt: "A student says, '312 is divisible by 4 because it is even.' Who is right?",
+        answer: "The student is partly correct because 312 is divisible by 4, but being even is not enough proof",
+        options: [
+          "The student is partly correct because 312 is divisible by 4, but being even is not enough proof",
+          "The student is correct because every even number is divisible by 4",
+          "The student is incorrect because 312 is odd",
+          "The student is incorrect because divisibility by 4 uses the digit sum",
+        ],
+        visual: {
+          type: "rule_box",
+          title: "Divisible by 4",
+          steps: ["Look at the last two digits.", "Use 12, not just the fact that the number is even."],
+        },
+      },
+      {
+        prompt: "A student says, '450 is divisible by both 3 and 5, so it works for both rules.' Who is right?",
+        answer: "The student is correct because 4 + 5 + 0 = 9 and the number ends in 0",
+        options: [
+          "The student is correct because 4 + 5 + 0 = 9 and the number ends in 0",
+          "The student is incorrect because numbers ending in 0 cannot be divisible by 3",
+          "The student is partly correct because 450 is divisible by 5 but not by 3",
+          "The student is incorrect because only 2-digit numbers can be divisible by both 3 and 5",
+        ],
+        visual: {
+          type: "rule_box",
+          title: "Divisible by 3 and 5",
+          steps: ["Check the digit sum for 3.", "Check the last digit for 5."],
+          decisionLabel: "Both rules must work",
+        },
+      },
+      {
+        prompt: "A student says, '1,218 is not divisible by 6 because it is too big.' Who is right?",
+        answer: "The student is incorrect because size does not matter; 1,218 is even and its digit sum is 12",
+        options: [
+          "The student is incorrect because size does not matter; 1,218 is even and its digit sum is 12",
+          "The student is correct because only 2-digit numbers can be divisible by 6",
+          "The student is partly correct because 1,218 is divisible by 3 but not by 2",
+          "The student is correct because 1,218 ends in 8",
+        ],
+        visual: {
+          type: "rule_box",
+          title: "Divisible by 6",
+          steps: ["Check whether the number is even.", "Check whether the digit sum is divisible by 3."],
+        },
+      },
+      {
+        prompt: "A student says, '372 is divisible by 3 because 3 + 7 + 2 = 12.' Who is right?",
+        answer: "The student is correct because 12 is divisible by 3",
+        options: [
+          "The student is correct because 12 is divisible by 3",
+          "The student is incorrect because 372 is even",
+          "The student is partly correct because 372 is only divisible by 2",
+          "The student is incorrect because the last digit should be checked instead",
+        ],
+        visual: {
+          type: "rule_box",
+          title: "Divisible by 3",
+          steps: ["Add the digits.", "If the total is divisible by 3, the whole number is divisible by 3."],
+        },
+      },
+      {
+        prompt: "A student says, '630 is divisible by 10, so it must also be divisible by 5.' Who is right?",
+        answer: "The student is correct because every number divisible by 10 ends in 0, so it is also divisible by 5",
+        options: [
+          "The student is correct because every number divisible by 10 ends in 0, so it is also divisible by 5",
+          "The student is incorrect because divisibility by 10 and 5 are unrelated",
+          "The student is partly correct because 630 is divisible by 10 but not by 5",
+          "The student is incorrect because numbers divisible by 10 must be even, not multiples of 5",
+        ],
+        visual: {
+          type: "rule_box",
+          title: "Divisible by 10 and 5",
+          steps: ["Numbers divisible by 10 end in 0.", "Numbers ending in 0 also pass the rule for 5."],
+        },
+      },
+      {
+        prompt: "A student says, '248 is divisible by 8 because it ends in 8.' Who is right?",
+        answer: "The student is partly correct because 248 is divisible by 8, but you must check the last three digits, not just the last digit",
+        options: [
+          "The student is partly correct because 248 is divisible by 8, but you must check the last three digits, not just the last digit",
+          "The student is correct because any number ending in 8 is divisible by 8",
+          "The student is incorrect because 248 is odd",
+          "The student is incorrect because divisibility by 8 uses the digit sum",
+        ],
+        visual: {
+          type: "rule_box",
+          title: "Divisible by 8",
+          steps: ["Look at the last three digits.", "Do not use the last digit by itself."],
+        },
+      },
+      {
+        prompt: "A student says, '555 is divisible by both 3 and 5.' Who is right?",
+        answer: "The student is correct because 5 + 5 + 5 = 15 and the number ends in 5",
+        options: [
+          "The student is correct because 5 + 5 + 5 = 15 and the number ends in 5",
+          "The student is incorrect because odd numbers cannot be divisible by 3",
+          "The student is partly correct because 555 is divisible by 5 but not by 3",
+          "The student is incorrect because only numbers ending in 0 can be divisible by 5",
+        ],
+        visual: {
+          type: "rule_box",
+          title: "Divisible by 3 and 5",
+          steps: ["Add the digits to test 3.", "Check whether the number ends in 0 or 5 for 5."],
+        },
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle(chosen.options),
+      answer: chosen.answer,
+      helper: "Decide whether the student's reasoning is correct, partly correct, or incorrect.",
+      visual: chosen.visual,
+    };
+  }
+
+  if (explicitMode === "divisibility_explain_create") {
+    const templates: Array<{
+      prompt: string;
+      answer: string;
+      helper: string;
+      placeholder?: string;
+      visual?: {
+        type: "rule_box";
+        title: string;
+        steps: string[];
+        decisionLabel?: string;
+      };
+    }> = [
+      {
+        prompt: "Type one 3-digit number that is divisible by both 3 and 5.",
+        answer: "135",
+        helper: "A correct answer must end in 0 or 5 and have a digit sum divisible by 3.",
+        placeholder: "Type a 3-digit number",
+        visual: {
+          type: "rule_box",
+          title: "Create a Number",
+          steps: ["Make it end in 0 or 5.", "Make the digit sum divisible by 3."],
+        },
+      },
+      {
+        prompt: "Type one 2-digit number that is divisible by 6 but not by 5.",
+        answer: "42",
+        helper: "A correct answer must be even, have a digit sum divisible by 3, and not end in 0 or 5.",
+        placeholder: "Type a 2-digit number",
+        visual: {
+          type: "rule_box",
+          title: "Create a Number",
+          steps: ["Check divisibility by 6.", "Make sure the number does not also fit the rule for 5."],
+        },
+      },
+      {
+        prompt: "Type the missing word: 324 is divisible by 4 because its last two digits, 24, are divisible by __.",
+        answer: "4",
+        helper: "The last two digits test must match the same divisor.",
+        placeholder: "Type the missing number",
+        visual: {
+          type: "rule_box",
+          title: "Explain Why",
+          steps: ["Look at the last two digits.", "Use the same divisor in the explanation."],
+        },
+      },
+      {
+        prompt: "Type one number greater than 200 that is divisible by 9.",
+        answer: "216",
+        helper: "A correct answer must have a digit sum that is a multiple of 9.",
+        placeholder: "Type a number",
+        visual: {
+          type: "rule_box",
+          title: "Create a Number",
+          steps: ["Choose a number above 200.", "Make the digit sum equal 9, 18, 27, or another multiple of 9."],
+        },
+      },
+      {
+        prompt: "Type Yes or No: Is 1,125 divisible by both 3 and 5?",
+        answer: "Yes",
+        helper: "It ends in 5, and 1 + 1 + 2 + 5 = 9.",
+        placeholder: "Type Yes or No",
+        visual: {
+          type: "rule_box",
+          title: "Justify Divisibility",
+          steps: ["Check the last digit for 5.", "Check the digit sum for 3."],
+          decisionLabel: "Both rules must work",
+        },
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      helper: chosen.helper,
+      placeholder: chosen.placeholder ?? "Type the answer",
+      visual: chosen.visual,
+    };
+  }
+
   if (explicitMode === "prime_composite_hcf") {
     const templates = [
       { prompt: "Is 17 prime or composite?", answer: "Prime", options: ["Prime", "Composite", "Both", "Neither"] },
@@ -7139,7 +7488,7 @@ function generateGenericQuestion(
   if (explicitMode === "compare_symbols") {
     const minValue = typeof config.min === "number" ? config.min : 1000;
     const maxValue = typeof config.max === "number" ? config.max : 999999;
-    let left = randInt(minValue, maxValue);
+    const left = randInt(minValue, maxValue);
     let right = randInt(minValue, maxValue);
 
     if (randInt(0, 4) === 0) {

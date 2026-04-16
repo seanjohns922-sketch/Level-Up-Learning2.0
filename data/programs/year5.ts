@@ -139,14 +139,15 @@ const year5Rows: ProgramRow[] = [
   },
   {
     week: 4,
-    focus: "Use step-by-step decisions to test factors and multiples",
+    focus: "Use divisibility rules to make fast decisions, spot errors, and justify conclusions",
     lesson: 2,
-    topic: "Divisibility Algorithms",
-    activity: "Use and interpret flowchart-style rules to decide if one number is divisible by another.",
+    topic: "Divisibility Decisions",
+    activity: "Move between quick rule checks, student-claim reasoning, and written justifications about divisibility.",
     curriculum: ["AC9M5N10"],
     activities: [
-      makeActivity("multiple_choice", 2, { mode: "factor_multiple_algorithm" }),
-      makeActivity("typed_response", 1, { mode: "factor_multiple_algorithm" }),
+      makeActivity("multiple_choice", 1, { mode: "divisibility_quick_decision" }),
+      makeActivity("multiple_choice", 1, { mode: "divisibility_whos_right" }),
+      makeActivity("typed_response", 1, { mode: "divisibility_explain_create" }),
     ],
   },
   {
