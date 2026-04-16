@@ -5693,22 +5693,32 @@ function generateGenericQuestion(
         options: ["18", "24", "27", "30"],
       },
     ];
+    const multipleChoiceTemplates = templates.filter(
+      (template): template is (typeof templates)[number] & { options: string[] } =>
+        Array.isArray((template as { options?: string[] }).options) &&
+        ((template as { options?: string[] }).options?.length ?? 0) >= 2,
+    );
+    if (asMultipleChoice && multipleChoiceTemplates.length > 0) {
+      const chosen =
+        multipleChoiceTemplates[randInt(0, multipleChoiceTemplates.length - 1)] ??
+        multipleChoiceTemplates[0]!;
+      return {
+        kind: "multiple_choice",
+        prompt: chosen.prompt,
+        options: shuffle(chosen.options),
+        answer: chosen.answer,
+        helper: "Check whether the number divides exactly or keeps appearing in the multiple pattern.",
+      };
+    }
+
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
-    return asMultipleChoice && chosen.options
-      ? {
-          kind: "multiple_choice",
-          prompt: chosen.prompt,
-          options: shuffle(chosen.options),
-          answer: chosen.answer,
-          helper: "Check whether the number divides exactly or keeps appearing in the multiple pattern.",
-        }
-      : {
-          kind: "typed_response",
-          prompt: chosen.prompt,
-          answer: chosen.answer,
-          helper: "Use factor pairs or multiple patterns to work it out.",
-          placeholder: "Type the answer",
-        };
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      helper: "Use factor pairs or multiple patterns to work it out.",
+      placeholder: "Type the answer",
+    };
   }
 
   if (explicitMode === "divisibility_rules") {
