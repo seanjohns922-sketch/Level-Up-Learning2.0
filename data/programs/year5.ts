@@ -166,14 +166,15 @@ const year5Rows: ProgramRow[] = [
   {
     week: 5,
     weekTopic: "Multiplication with Large Numbers",
-    focus: "Use efficient strategies and written methods for multiplication",
+    focus: "Multiply large numbers by 1 digit using place value understanding, scaling, and efficient strategies",
     lesson: 1,
-    topic: "× 1-digit (Fluency + Scaling)",
-    activity: "Multiply larger numbers by 1-digit numbers using efficient written methods.",
+    topic: "Multiply Large Numbers by 1 Digit",
+    activity: "Build confidence with scaled facts, compare multiplication strategies, and solve larger 1-digit multiplication problems accurately.",
     curriculum: ["AC9M5N06"],
     activities: [
-      makeActivity("typed_response", 2, { mode: "column_multiplication_partial" }),
-      makeActivity("typed_response", 2, { mode: "column_multiplication_solve" }),
+      makeActivity("multiple_choice", 1, { mode: "multiplication_1digit_fast" }),
+      makeActivity("multiple_choice", 1, { mode: "multiplication_1digit_reasoning" }),
+      makeActivity("typed_response", 1, { mode: "multiplication_1digit_apply" }),
     ],
   },
   {

@@ -7489,6 +7489,189 @@ function generateGenericQuestion(
         };
   }
 
+  if (explicitMode === "multiplication_1digit_fast") {
+    const templates: Array<{
+      prompt: string;
+      answer: string;
+      options: string[];
+      helper: string;
+      visual?: {
+        type: "rule_box";
+        title: string;
+        steps: string[];
+        decisionLabel?: string;
+      };
+    }> = [
+      {
+        prompt: "What is 300 × 4?",
+        answer: "1,200",
+        options: ["120", "1,200", "12,000", "700"],
+        helper: "Use 3 × 4 = 12, then scale by 100.",
+      },
+      {
+        prompt: "What is 60 × 7?",
+        answer: "420",
+        options: ["42", "420", "4,200", "360"],
+        helper: "Use 6 × 7 = 42, then scale by 10.",
+      },
+      {
+        prompt: "What is 5 × 400?",
+        answer: "2,000",
+        options: ["200", "2,000", "20,000", "450"],
+        helper: "Think of 5 groups of 4 hundreds.",
+      },
+      {
+        prompt: "What is 8 × 90?",
+        answer: "720",
+        options: ["72", "720", "7,200", "810"],
+        helper: "Use 8 × 9 = 72, then scale by 10.",
+      },
+      {
+        prompt: "What is 700 × 3?",
+        answer: "2,100",
+        options: ["210", "2,100", "21,000", "1,000"],
+        helper: "Use 7 × 3 = 21, then scale by 100.",
+      },
+      {
+        prompt: "Which answer matches 40 × 6?",
+        answer: "240",
+        options: ["24", "240", "2,400", "460"],
+        helper: "Use 4 × 6 = 24, then scale by 10.",
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle(chosen.options),
+      answer: chosen.answer,
+      helper: chosen.helper,
+      visual: chosen.visual,
+    };
+  }
+
+  if (explicitMode === "multiplication_1digit_reasoning") {
+    const templates: Array<{
+      prompt: string;
+      answer: string;
+      options: string[];
+      helper: string;
+      visual?: {
+        type: "rule_box";
+        title: string;
+        steps: string[];
+        decisionLabel?: string;
+      };
+    }> = [
+      {
+        prompt: "324 × 3. Noah says: 300 × 3 = 900 and 24 × 3 = 72, so the total is 972. Mia says: 324 × 3 = 972. Who used a helpful strategy?",
+        answer: "Both are correct, but Noah shows a helpful strategy",
+        options: [
+          "Both are correct, but Noah shows a helpful strategy",
+          "Only Noah is correct",
+          "Only Mia is correct",
+          "Neither is correct",
+        ],
+        helper: "A correct answer can still be stronger when it explains the place value thinking.",
+      },
+      {
+        prompt: "40 × 6 = 240. A student says, 'I did 4 × 6 = 24 and added a zero.' Why does this work?",
+        answer: "Because 40 is 4 tens, so the answer is 24 tens",
+        options: [
+          "Because 40 is 4 tens, so the answer is 24 tens",
+          "Because multiplication always means adding a zero",
+          "Because 6 changes into 60 during multiplication",
+          "Because 24 is the same as 240",
+        ],
+        helper: "The zero comes from place value, not from a trick.",
+        visual: {
+          type: "rule_box",
+          title: "Scaling by 10",
+          steps: ["Work out the basic fact first.", "Then decide how many tens or hundreds are in the answer."],
+        },
+      },
+      {
+        prompt: "Which method is most efficient for 600 × 8?",
+        answer: "Use 6 × 8 = 48, then make it 48 hundreds",
+        options: [
+          "Use 6 × 8 = 48, then make it 48 hundreds",
+          "Add 600 eight times with no shortcut",
+          "Use 60 × 8 and ignore the zero",
+          "Multiply 8 by 0 first and stop there",
+        ],
+        helper: "Choose the method that uses a known fact and place value.",
+      },
+      {
+        prompt: "A student says 506 × 3 = 1,518 because 500 × 3 = 1,500, 0 × 3 = 0, and 6 × 3 = 18. Is this correct?",
+        answer: "Yes, because each place-value part was multiplied correctly",
+        options: [
+          "Yes, because each place-value part was multiplied correctly",
+          "No, because the 0 should become 30",
+          "No, because 500 × 3 is 150",
+          "No, because 6 × 3 should be added before 500 × 3",
+        ],
+        helper: "Check each partitioned part, then combine them.",
+      },
+      {
+        prompt: "Why does 5 × 400 = 2,000?",
+        answer: "Because 400 is 4 hundreds, and 5 × 4 hundreds is 20 hundreds",
+        options: [
+          "Because 400 is 4 hundreds, and 5 × 4 hundreds is 20 hundreds",
+          "Because 5 × 4 = 20, then a zero is added at random",
+          "Because 400 becomes 40 during multiplication",
+          "Because all answers with 400 end in 2,000",
+        ],
+        helper: "Explain the hundreds, not just the digits.",
+        visual: {
+          type: "rule_box",
+          title: "Place Value Strategy",
+          steps: ["Name the place value first.", "Multiply the basic fact, then rename the units."],
+        },
+      },
+      {
+        prompt: "Which mistake shows a place value misunderstanding?",
+        answer: "300 × 4 = 120",
+        options: ["300 × 4 = 120", "30 × 4 = 120", "3 × 4 = 12", "600 × 2 = 1,200"],
+        helper: "A correct basic fact can still be scaled wrongly.",
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle(chosen.options),
+      answer: chosen.answer,
+      helper: chosen.helper,
+      visual: chosen.visual,
+    };
+  }
+
+  if (explicitMode === "multiplication_1digit_apply") {
+    const variants = [
+      [243, 4],
+      [506, 3],
+      [1204, 2],
+      [324, 3],
+      [708, 4],
+    ] as const;
+    const picked = variants[randInt(0, variants.length - 1)] ?? variants[0];
+    const answer = picked[0] * picked[1];
+    return {
+      kind: "typed_response",
+      prompt: `Work out ${formatMathNumber(picked[0])} × ${formatMathNumber(picked[1])}.`,
+      answer: formatMathNumber(answer),
+      helper: "Use partitioning or a written method, but keep each digit in the correct place value column.",
+      placeholder: "Type the answer",
+      writtenMethod: buildWrittenMethodLayout("Short Multiplication", "×", picked[0], picked[1], answer),
+      visual: {
+        type: "column_multiplication",
+        topValue: picked[0],
+        bottomValue: picked[1],
+        showWorkedExample: true,
+      },
+    };
+  }
+
   if (explicitMode === "division_remainders") {
     const divisor = [3, 4, 5, 6, 7, 8][randInt(0, 5)] ?? 4;
     const quotient = randInt(3, 12);
