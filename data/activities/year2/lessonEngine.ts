@@ -5635,7 +5635,7 @@ function generateGenericQuestion(
   }
 
   if (explicitMode === "factors_multiples") {
-    const templates = [
+    const multipleChoiceTemplates: Array<{ prompt: string; answer: string; options: string[] }> = [
       {
         prompt: "Which list shows all the factors of 24?",
         answer: "1, 2, 3, 4, 6, 8, 12, 24",
@@ -5667,6 +5667,43 @@ function generateGenericQuestion(
         options: ["3", "4", "5", "6"],
       },
       {
+        prompt: "Which pair are both factors of 30?",
+        answer: "5 and 6",
+        options: ["5 and 6", "4 and 6", "3 and 12", "8 and 10"],
+      },
+      {
+        prompt: "Which number has exactly 3 as a factor and 27 as a multiple?",
+        answer: "27",
+        options: ["18", "24", "27", "30"],
+      },
+      {
+        prompt: "Which set shows all the multiples of 6 below 40?",
+        answer: "6, 12, 18, 24, 30, 36",
+        options: [
+          "6, 12, 18, 24, 30, 36",
+          "6, 12, 18, 24, 30, 35",
+          "3, 6, 12, 18, 24, 30",
+          "6, 18, 24, 30, 36",
+        ],
+      },
+      {
+        prompt: "Which number belongs in the factors of 18 group?",
+        answer: "9",
+        options: ["8", "9", "10", "11"],
+      },
+      {
+        prompt: "Which statement correctly compares factors and multiples?",
+        answer: "4 is a factor of 20, and 20 is a multiple of 4",
+        options: [
+          "4 is a factor of 20, and 20 is a multiple of 4",
+          "20 is a factor of 4, and 4 is a multiple of 20",
+          "4 and 20 are both only factors",
+          "4 and 20 are both only multiples",
+        ],
+      },
+    ];
+    const typedTemplates = [
+      {
         prompt: "Type the missing number in this factor pair: 6 × __ = 48",
         answer: "8",
       },
@@ -5683,22 +5720,15 @@ function generateGenericQuestion(
         answer: "48",
       },
       {
-        prompt: "Which pair are both factors of 30?",
-        answer: "5 and 6",
-        options: ["5 and 6", "4 and 6", "3 and 12", "8 and 10"],
+        prompt: "Type the missing factor in this pair for 42: 3 × __ = 42",
+        answer: "14",
       },
       {
-        prompt: "Which number has exactly 3 as a factor and 27 as a multiple?",
-        answer: "27",
-        options: ["18", "24", "27", "30"],
+        prompt: "Type one common multiple of 3 and 5 that is greater than 10 and less than 20.",
+        answer: "15",
       },
     ];
-    const multipleChoiceTemplates = templates.filter(
-      (template): template is (typeof templates)[number] & { options: string[] } =>
-        Array.isArray((template as { options?: string[] }).options) &&
-        ((template as { options?: string[] }).options?.length ?? 0) >= 2,
-    );
-    if (asMultipleChoice && multipleChoiceTemplates.length > 0) {
+    if (asMultipleChoice) {
       const chosen =
         multipleChoiceTemplates[randInt(0, multipleChoiceTemplates.length - 1)] ??
         multipleChoiceTemplates[0]!;
@@ -5711,7 +5741,7 @@ function generateGenericQuestion(
       };
     }
 
-    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    const chosen = typedTemplates[randInt(0, typedTemplates.length - 1)] ?? typedTemplates[0]!;
     return {
       kind: "typed_response",
       prompt: chosen.prompt,
@@ -5722,9 +5752,9 @@ function generateGenericQuestion(
   }
 
   if (explicitMode === "divisibility_rules") {
-    const templates = [
+    const multipleChoiceTemplates: Array<{ prompt: string; answer: string; options: string[] }> = [
       {
-        prompt: "Which larger number is a multiple of 3?",
+        prompt: "Which larger number is divisible by 3?",
         answer: "372",
         options: ["372", "421", "514", "611"],
       },
@@ -5739,10 +5769,62 @@ function generateGenericQuestion(
         options: ["Yes", "No", "Only sometimes", "Not enough information"],
       },
       {
-        prompt: "Which divisibility test helps most to decide if 1,458 is a multiple of 3?",
+        prompt: "Which divisibility test helps most to decide if 1,458 is divisible by 3?",
         answer: "Add the digits",
         options: ["Add the digits", "Check the last digit only", "Count factor pairs", "Double the number"],
       },
+      {
+        prompt: "Which number is a multiple of 10?",
+        answer: "3,620",
+        options: ["3,625", "3,620", "3,612", "3,618"],
+      },
+      {
+        prompt: "Which number is a multiple of both 3 and 5?",
+        answer: "330",
+        options: ["320", "330", "340", "350"],
+      },
+      {
+        prompt: "Which statement is correct?",
+        answer: "89,472 is divisible by 3 because 8 + 9 + 4 + 7 + 2 = 30",
+        options: [
+          "89,472 is divisible by 3 because 8 + 9 + 4 + 7 + 2 = 30",
+          "89,472 is divisible by 3 because it ends in 2",
+          "89,472 is not divisible by 3 because it is even",
+          "89,472 is only divisible by 3 if the digits are all odd",
+        ],
+      },
+      {
+        prompt: "Which number is divisible by 5 but not by 10?",
+        answer: "1,245",
+        options: ["1,240", "1,242", "1,245", "1,248"],
+      },
+      {
+        prompt: "Which set shows only numbers divisible by 5?",
+        answer: "115, 230, 945",
+        options: [
+          "115, 230, 945",
+          "115, 232, 945",
+          "110, 233, 940",
+          "112, 230, 944",
+        ],
+      },
+      {
+        prompt: "A student says 245 is divisible by 10 because it ends in 5. Is that correct?",
+        answer: "No",
+        options: ["Yes", "No", "Only if 245 is even", "Cannot tell"],
+      },
+      {
+        prompt: "Which rule helps most to test whether 9,315 is divisible by 5?",
+        answer: "Check whether it ends in 0 or 5",
+        options: [
+          "Check whether it ends in 0 or 5",
+          "Add all the digits",
+          "Check whether it is even",
+          "Find a factor pair",
+        ],
+      },
+    ];
+    const typedTemplates = [
       {
         prompt: "Type Yes or No: Is 1,458 divisible by 3?",
         answer: "Yes",
@@ -5760,59 +5842,43 @@ function generateGenericQuestion(
         answer: "Yes",
       },
       {
-        prompt: "Which number is a multiple of 10?",
-        answer: "3,620",
-        options: ["3,625", "3,620", "3,612", "3,618"],
-      },
-      {
-        prompt: "Which number is a multiple of both 3 and 5?",
-        answer: "330",
-        options: ["320", "330", "340", "350"],
-      },
-      {
         prompt: "Type Yes or No: Is 89,472 a multiple of 3?",
         answer: "Yes",
-      },
-      {
-        prompt: "Which statement is correct?",
-        answer: "89472 is divisible by 3 because 8 + 9 + 4 + 7 + 2 = 30",
-        options: [
-          "89472 is divisible by 3 because 8 + 9 + 4 + 7 + 2 = 30",
-          "89472 is divisible by 3 because it ends in 2",
-          "89472 is not divisible by 3 because it is even",
-          "89472 is only divisible by 3 if the digits are all odd",
-        ],
       },
       {
         prompt: "Type the one-digit number that makes this true: 56 is divisible by __ because 56 is an even number.",
         answer: "2",
       },
       {
-        prompt: "Which number is divisible by 5 but not by 10?",
-        answer: "1,245",
-        options: ["1,240", "1,242", "1,245", "1,248"],
-      },
-      {
         prompt: "Type Yes or No: Is 3,615 divisible by 5?",
         answer: "Yes",
       },
+      {
+        prompt: "Type the digit sum used to test 372 for divisibility by 3.",
+        answer: "12",
+      },
     ];
-    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
-    return asMultipleChoice && chosen.options
-      ? {
-          kind: "multiple_choice",
-          prompt: chosen.prompt,
-          options: shuffle(chosen.options),
-          answer: chosen.answer,
-          helper: "Use the divisibility rule, not long division.",
-        }
-      : {
-          kind: "typed_response",
-          prompt: chosen.prompt,
-          answer: chosen.answer,
-          helper: "Think about the last digit or the digit sum.",
-          placeholder: "Type the answer",
-        };
+    if (asMultipleChoice) {
+      const chosen =
+        multipleChoiceTemplates[randInt(0, multipleChoiceTemplates.length - 1)] ??
+        multipleChoiceTemplates[0]!;
+      return {
+        kind: "multiple_choice",
+        prompt: chosen.prompt,
+        options: shuffle(chosen.options),
+        answer: chosen.answer,
+        helper: "Use the divisibility rule, not long division.",
+      };
+    }
+
+    const chosen = typedTemplates[randInt(0, typedTemplates.length - 1)] ?? typedTemplates[0]!;
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      helper: "Think about the last digit or the digit sum.",
+      placeholder: "Type the answer",
+    };
   }
 
   if (explicitMode === "prime_composite_hcf") {
@@ -5839,7 +5905,17 @@ function generateGenericQuestion(
   }
 
   if (explicitMode === "factor_multiple_algorithm") {
-    const templates = [
+    const multipleChoiceTemplates: Array<{
+      prompt: string;
+      answer: string;
+      options: string[];
+      visual: {
+        type: "rule_box";
+        title: string;
+        steps: string[];
+        decisionLabel?: string;
+      };
+    }> = [
       {
         prompt: "Follow the rule: if the last digit is 0, the number is divisible by 10. Which number passes the rule?",
         answer: "460",
@@ -5860,16 +5936,6 @@ function generateGenericQuestion(
           title: "Divisibility by 5",
           steps: ["Look at the last digit.", "If it is 0 or 5, the number passes the test."],
           decisionLabel: "Pass or fail",
-        },
-      },
-      {
-        prompt: "Use this algorithm: Step 1 add the digits. Step 2 if the sum is a multiple of 3, the number is divisible by 3. What is the digit sum of 372?",
-        answer: "12",
-        visual: {
-          type: "rule_box" as const,
-          title: "Divisibility by 3",
-          steps: ["Add the digits.", "Check whether the total is a multiple of 3."],
-          decisionLabel: "If yes, the number is divisible by 3",
         },
       },
       {
@@ -5895,15 +5961,6 @@ function generateGenericQuestion(
         },
       },
       {
-        prompt: "Use this step rule: find two factor pairs. Which number fits 4 × __ = 36?",
-        answer: "9",
-        visual: {
-          type: "rule_box" as const,
-          title: "Factor check",
-          steps: ["Start with 4 × __ = 36.", "Find the missing factor that makes 36 exactly."],
-        },
-      },
-      {
         prompt: "Which instruction belongs in a divisibility-by-3 flowchart?",
         answer: "Add the digits",
         options: ["Add the digits", "Check for a last digit of 0", "Count the decimal places", "Subtract 1"],
@@ -5925,6 +5982,53 @@ function generateGenericQuestion(
         },
       },
       {
+        prompt: "A flowchart says: Step 1 check if the number is even. Step 2 check if the digit sum is divisible by 3. Which number passes both steps?",
+        answer: "72",
+        options: ["70", "72", "74", "75"],
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisibility by 6",
+          steps: ["Check if the number is even.", "Add the digits and test divisibility by 3."],
+          decisionLabel: "Passes both steps",
+        },
+      },
+      {
+        prompt: "Which missing step completes this rule for divisibility by 5?",
+        answer: "Check whether the last digit is 0 or 5",
+        options: [
+          "Check whether the last digit is 0 or 5",
+          "Add all the digits",
+          "Divide by 2",
+          "Round to the nearest 10",
+        ],
+        visual: {
+          type: "rule_box" as const,
+          title: "Complete the algorithm",
+          steps: ["Start with a number.", "____", "Decide whether the number passes the test."],
+        },
+      },
+    ];
+    const typedTemplates = [
+      {
+        prompt: "Use this algorithm: Step 1 add the digits. Step 2 if the sum is a multiple of 3, the number is divisible by 3. What is the digit sum of 372?",
+        answer: "12",
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisibility by 3",
+          steps: ["Add the digits.", "Check whether the total is a multiple of 3."],
+          decisionLabel: "If yes, the number is divisible by 3",
+        },
+      },
+      {
+        prompt: "Use this step rule: find two factor pairs. Which number fits 4 × __ = 36?",
+        answer: "9",
+        visual: {
+          type: "rule_box" as const,
+          title: "Factor check",
+          steps: ["Start with 4 × __ = 36.", "Find the missing factor that makes 36 exactly."],
+        },
+      },
+      {
         prompt: "Type the missing instruction: To test divisibility by 10, check whether the number ends in __.",
         answer: "0",
         visual: {
@@ -5943,24 +6047,29 @@ function generateGenericQuestion(
         },
       },
     ];
-    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
-    return asMultipleChoice && "options" in chosen && Array.isArray(chosen.options)
-      ? {
-          kind: "multiple_choice",
-          prompt: chosen.prompt,
-          options: shuffle(chosen.options),
-          answer: chosen.answer,
-          helper: "Follow the factor or divisibility rule step by step.",
-          visual: chosen.visual,
-        }
-      : {
-          kind: "typed_response",
-          prompt: chosen.prompt,
-          answer: chosen.answer,
-          helper: "Use a factor, multiple, or divisibility rule.",
-          placeholder: "Type the answer",
-          visual: chosen.visual,
-        };
+    if (asMultipleChoice) {
+      const chosen =
+        multipleChoiceTemplates[randInt(0, multipleChoiceTemplates.length - 1)] ??
+        multipleChoiceTemplates[0]!;
+      return {
+        kind: "multiple_choice",
+        prompt: chosen.prompt,
+        options: shuffle(chosen.options),
+        answer: chosen.answer,
+        helper: "Follow the factor or divisibility rule step by step.",
+        visual: chosen.visual,
+      };
+    }
+
+    const chosen = typedTemplates[randInt(0, typedTemplates.length - 1)] ?? typedTemplates[0]!;
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      helper: "Use a factor, multiple, or divisibility rule.",
+      placeholder: "Type the answer",
+      visual: chosen.visual,
+    };
   }
 
   if (explicitMode === "factor_multiple_pattern") {
