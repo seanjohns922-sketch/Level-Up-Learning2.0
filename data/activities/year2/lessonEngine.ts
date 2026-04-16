@@ -1275,6 +1275,45 @@ function uniqueStringOptions(answer: string, distractors: string[]) {
   return shuffle(options.slice(0, 4));
 }
 
+function buildGenericMultipleChoiceOptions(answer: string): string[] {
+  const trimmed = answer.trim();
+
+  if (/^(yes|no)$/i.test(trimmed)) {
+    return shuffle(["Yes", "No", "Maybe", "Not sure"]);
+  }
+
+  if (/^-?\d+$/.test(trimmed)) {
+    const answerValue = Number(trimmed);
+    const step = Math.max(1, Math.abs(answerValue) >= 20 ? Math.round(Math.abs(answerValue) / 10) : 1);
+    const options = new Set<string>([trimmed]);
+    for (const candidate of [answerValue - step, answerValue + step, answerValue - 2 * step, answerValue + 2 * step]) {
+      options.add(String(candidate));
+      if (options.size >= 4) break;
+    }
+    return shuffle(Array.from(options).slice(0, 4));
+  }
+
+  if (/^-?\d+\.\d+$/.test(trimmed)) {
+    const answerValue = Number(trimmed);
+    const decimalPlaces = (trimmed.split(".")[1] ?? "").length;
+    const step = decimalPlaces >= 3 ? 0.001 : decimalPlaces === 2 ? 0.01 : 0.1;
+    const format = (value: number) => value.toFixed(decimalPlaces);
+    const options = new Set<string>([format(answerValue)]);
+    for (const candidate of [
+      answerValue - step,
+      answerValue + step,
+      answerValue - 2 * step,
+      answerValue + 2 * step,
+    ]) {
+      options.add(format(candidate));
+      if (options.size >= 4) break;
+    }
+    return shuffle(Array.from(options).slice(0, 4));
+  }
+
+  return shuffle([trimmed, "Not this option", "Check another rule", "Use the rule box"]);
+}
+
 function getRestrictedFactors(
   level: SupportedMathLevel,
   week: number
@@ -5870,6 +5909,36 @@ function generateGenericQuestion(
           "Find a factor pair",
         ],
       },
+      {
+        prompt: "Which number is divisible by 2?",
+        answer: "4,572",
+        options: ["4,571", "4,572", "4,575", "4,579"],
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisible by 2",
+          steps: ["Check the last digit.", "If it ends in 0, 2, 4, 6, or 8, it divides evenly by 2."],
+        },
+      },
+      {
+        prompt: "Which number is divisible by 4?",
+        answer: "1,248",
+        options: ["1,246", "1,248", "1,250", "1,254"],
+      },
+      {
+        prompt: "Which number is divisible by 6?",
+        answer: "534",
+        options: ["532", "534", "535", "538"],
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisible by 6",
+          steps: ["Check if the number is even.", "Add the digits and test divisibility by 3."],
+        },
+      },
+      {
+        prompt: "Which number is divisible by 9?",
+        answer: "4,347",
+        options: ["4,345", "4,347", "4,349", "4,351"],
+      },
     ];
     const typedTemplates: Array<{
       prompt: string;
@@ -5932,6 +6001,18 @@ function generateGenericQuestion(
       {
         prompt: "Type the digit sum used to test 372 for divisibility by 3.",
         answer: "12",
+      },
+      {
+        prompt: "Type Yes or No: Is 1,248 divisible by 4?",
+        answer: "Yes",
+      },
+      {
+        prompt: "Type Yes or No: Is 534 divisible by 6?",
+        answer: "Yes",
+      },
+      {
+        prompt: "Type Yes or No: Is 4,347 divisible by 9?",
+        answer: "Yes",
       },
     ];
     if (asMultipleChoice) {
@@ -6071,6 +6152,39 @@ function generateGenericQuestion(
         },
       },
       {
+        prompt: "Use the rule box. Which number passes the divisibility-by-4 test?",
+        answer: "1,248",
+        options: ["1,246", "1,248", "1,250", "1,254"],
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisibility by 4",
+          steps: ["Look at the last two digits.", "If that two-digit number is divisible by 4, the whole number passes."],
+          decisionLabel: "Pass or fail",
+        },
+      },
+      {
+        prompt: "Use the rule box. Which number passes the divisibility-by-8 test?",
+        answer: "4,216",
+        options: ["4,214", "4,216", "4,218", "4,222"],
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisibility by 8",
+          steps: ["Look at the last three digits.", "If that three-digit number is divisible by 8, the whole number passes."],
+          decisionLabel: "Pass or fail",
+        },
+      },
+      {
+        prompt: "Use this algorithm: add the digits, then test the sum for divisibility by 9. Is 4,347 divisible by 9?",
+        answer: "Yes",
+        options: ["Yes", "No", "Only if it ends in 0", "Cannot tell"],
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisibility by 9",
+          steps: ["Add 4 + 3 + 4 + 7.", "Test whether the total is divisible by 9."],
+          decisionLabel: "If yes, 4,347 is divisible by 9",
+        },
+      },
+      {
         prompt: "Which missing step completes this rule for divisibility by 5?",
         answer: "Check whether the last digit is 0 or 5",
         options: [
@@ -6122,6 +6236,33 @@ function generateGenericQuestion(
           type: "rule_box" as const,
           title: "Divisibility by 3",
           steps: ["Add 4 + 5 + 7 + 2.", "Use the sum to decide divisibility by 3."],
+        },
+      },
+      {
+        prompt: "Use the rule box. Type Yes or No: Is 1,248 divisible by 4?",
+        answer: "Yes",
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisibility by 4",
+          steps: ["Look at the last two digits.", "If those digits make a number divisible by 4, the whole number passes."],
+        },
+      },
+      {
+        prompt: "Use the rule box. Type Yes or No: Is 4,216 divisible by 8?",
+        answer: "Yes",
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisibility by 8",
+          steps: ["Look at the last three digits.", "If those digits make a number divisible by 8, the whole number passes."],
+        },
+      },
+      {
+        prompt: "Use this algorithm: add the digits of 4,347 to test divisibility by 9. Type the digit sum.",
+        answer: "18",
+        visual: {
+          type: "rule_box" as const,
+          title: "Divisibility by 9",
+          steps: ["Add 4 + 3 + 4 + 7.", "Use the sum to decide divisibility by 9."],
         },
       },
     ];
@@ -8206,6 +8347,34 @@ export function generateQuestion(
       prompt: "This activity configuration is invalid.",
       answer: "0",
       placeholder: "Policy blocked",
+    };
+  }
+
+  if (activity.activityType === "multiple_choice") {
+    if (question.kind !== "multiple_choice") {
+      const answer = question.kind === "typed_response" ? String(question.answer) : "Yes";
+      question = {
+        kind: "multiple_choice",
+        prompt: question.prompt,
+        options: buildGenericMultipleChoiceOptions(answer),
+        answer,
+        helper: "Use the rule or pattern to choose the best answer.",
+      };
+    } else if (!Array.isArray(question.options) || question.options.length < 2) {
+      question = {
+        ...question,
+        options: buildGenericMultipleChoiceOptions(String(question.answer)),
+      };
+    }
+  }
+
+  if (activity.activityType === "typed_response" && question.kind !== "typed_response") {
+    question = {
+      kind: "typed_response",
+      prompt: question.prompt,
+      answer: question.kind === "multiple_choice" ? String(question.answer) : "0",
+      helper: "Work it out using the rule or pattern.",
+      placeholder: "Type the answer",
     };
   }
 
