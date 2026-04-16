@@ -5464,16 +5464,66 @@ function generateGenericQuestion(
   if (explicitMode === "decimal_reasonableness") {
     const templates = [
       {
-        prompt: "Ella says 3.48 rounded to the nearest tenth is 3.4. Is she correct?",
-        answer: "No",
+        prompt: "Use the price board. About how much should the notebook and marker cost altogether?",
+        answer: "$40",
+        options: ["$30", "$40", "$60", "$80"],
+        helper: "Round $14.56 to about $15 and $24.68 to about $25 first.",
+        visual: {
+          type: "shopping_list" as const,
+          title: "Campus Store",
+          items: [
+            { label: "Notebook", detail: "A4", price: 14.56 },
+            { label: "Marker", detail: "Fine-tip", price: 24.68 },
+            { label: "Glue Pen", detail: "Clear", price: 3.45 },
+            { label: "Folder", detail: "Plastic", price: 2.95 },
+          ],
+        },
       },
       {
-        prompt: "Noah says 5.04 is greater than 5.4 because 04 is bigger than 4. Is he correct?",
-        answer: "No",
+        prompt: "Use the prices. Which amount is greater?",
+        answer: "$5.40",
+        options: ["$5.04", "$5.40", "They are the same", "Cannot tell"],
+        helper: "Compare the money amounts as dollars and cents, not just the digits.",
+        visual: {
+          type: "shopping_list" as const,
+          title: "Stationery Prices",
+          items: [
+            { label: "Pen Set", detail: "Colour", price: 5.04 },
+            { label: "Sketch Pad", detail: "A4", price: 5.4 },
+          ],
+        },
       },
       {
-        prompt: "A total of 2.6 + 0.4 is 3.0. Does that make sense?",
+        prompt: "Use the price board. A student says the notebook and marker cost $70. Is this reasonable?",
+        answer: "No",
+        helper: "Estimate first. A total near $40 makes sense here, not $70.",
+        visual: {
+          type: "shopping_list" as const,
+          title: "Campus Store",
+          items: [
+            { label: "Notebook", detail: "A4", price: 14.56 },
+            { label: "Marker", detail: "Fine-tip", price: 24.68 },
+          ],
+        },
+      },
+      {
+        prompt: "A student adds these prices and gets $38.124. Is this reasonable?",
+        answer: "No",
+        helper: "Money totals should line up to dollars and cents only.",
+        visual: {
+          type: "receipt" as const,
+          title: "Book Fair",
+          hideComputedTotals: true,
+          lines: [
+            { label: "Notebook", detail: "A4", price: 14.56, quantity: 1 },
+            { label: "Marker", detail: "Fine-tip", price: 24.68, quantity: 1 },
+          ],
+        },
+      },
+      {
+        prompt: "A total of $2.60 + $0.40 is $3.00. Does that make sense?",
         answer: "Yes",
+        helper: "Think about what happens when cents make a whole dollar.",
       },
     ];
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
@@ -5481,16 +5531,21 @@ function generateGenericQuestion(
       ? {
           kind: "multiple_choice",
           prompt: chosen.prompt,
-          options: ["Yes", "No", "Maybe", "Not sure"],
+          options: chosen.options ?? ["Yes", "No", "Maybe", "Not sure"],
           answer: chosen.answer,
-          helper: "Check whether the decimal places and size make sense.",
+          helper: chosen.helper ?? "Check whether the decimal places and size make sense.",
+          visual: "visual" in chosen ? chosen.visual : undefined,
         }
       : {
           kind: "typed_response",
           prompt: chosen.prompt,
           answer: chosen.answer,
-          helper: "Decide whether the statement is reasonable.",
-          placeholder: "Type Yes or No",
+          helper: chosen.helper ?? "Decide whether the statement is reasonable.",
+          placeholder:
+            chosen.answer === "Yes" || chosen.answer === "No"
+              ? "Type Yes or No"
+              : "Type the answer",
+          visual: "visual" in chosen ? chosen.visual : undefined,
         };
   }
 
