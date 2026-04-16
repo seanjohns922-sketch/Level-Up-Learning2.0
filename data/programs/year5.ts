@@ -127,14 +127,14 @@ const year5Rows: ProgramRow[] = [
   {
     week: 4,
     weekTopic: "Algorithms with Factors, Multiples & Divisibility",
-    focus: "Identify and explain emerging number patterns from factors and multiples",
+    focus: "Identify, explain, and apply patterns using factors, multiples, and divisibility",
     lesson: 1,
-    topic: "Factor & Multiple Patterns",
-    activity: "Generate and explain emerging patterns in factors and multiples.",
+    topic: "Spot the Pattern",
+    activity: "Solve structured pattern puzzles by spotting odd-one-out numbers, explaining divisibility rules, completing missing terms, and sorting numbers by shared properties.",
     curriculum: ["AC9M5N10"],
     activities: [
-      makeActivity("multiple_choice", 2, { mode: "factor_multiple_pattern" }),
-      makeActivity("typed_response", 1, { mode: "factor_multiple_pattern" }),
+      makeActivity("multiple_choice", 3, { mode: "spot_pattern_reasoning" }),
+      makeActivity("multiple_choice", 2, { mode: "spot_pattern_reasoning" }),
     ],
   },
   {

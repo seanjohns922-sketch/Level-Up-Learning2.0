@@ -6504,6 +6504,195 @@ function generateGenericQuestion(
         };
   }
 
+  if (explicitMode === "spot_pattern_reasoning") {
+    const multipleChoiceTemplates: Array<{
+      prompt: string;
+      answer: string;
+      options: string[];
+      helper: string;
+    }> = [
+      {
+        prompt: "Which number does not belong: 18, 24, 30, 35, 42?",
+        answer: "35, because the others are all multiples of 6",
+        options: [
+          "35, because the others are all multiples of 6",
+          "24, because it is the only even number",
+          "30, because it is the only multiple of 5",
+          "42, because it is the largest number",
+        ],
+        helper: "Check which numbers share the same divisibility rule.",
+      },
+      {
+        prompt: "Which number does not belong: 45, 60, 75, 83, 90?",
+        answer: "83, because the others are divisible by both 3 and 5",
+        options: [
+          "83, because the others are divisible by both 3 and 5",
+          "60, because it is the only even number",
+          "75, because it is the only odd multiple of 5",
+          "90, because it has the most factors",
+        ],
+        helper: "Look for a rule that works for four numbers, not just one feature.",
+      },
+      {
+        prompt: "What rule is being used in 24, 36, 48, 60, 72?",
+        answer: "Add 12 each time, so every term stays a multiple of 12",
+        options: [
+          "Add 12 each time, so every term stays a multiple of 12",
+          "Add 10 each time, so every term stays even",
+          "Multiply by 2 each time",
+          "Add 6 each time, so every term is a multiple of 6 only",
+        ],
+        helper: "Check the difference between each pair of numbers.",
+      },
+      {
+        prompt: "What rule best describes 135, 150, 165, 180, 195?",
+        answer: "Add 15 each time, so every term is divisible by both 3 and 5",
+        options: [
+          "Add 15 each time, so every term is divisible by both 3 and 5",
+          "Add 10 each time, so every term ends in 0",
+          "Multiply by 3 each time",
+          "Add 5 each time, so every term is odd",
+        ],
+        helper: "Test both the step size and the divisibility pattern.",
+      },
+      {
+        prompt: "Which statement is true?",
+        answer: "All multiples of 4 are even",
+        options: [
+          "All multiples of 4 are even",
+          "All multiples of 6 are odd",
+          "A number divisible by 5 must also be divisible by 10",
+          "Every even number is a multiple of 4",
+        ],
+        helper: "Use a rule that always works, not one that works only sometimes.",
+      },
+      {
+        prompt: "A student says, 'If a number is divisible by both 3 and 4, it must be divisible by 12.' Which answer is best?",
+        answer: "True, because 12 is made from 3 and 4 with no overlap in factors",
+        options: [
+          "True, because 12 is made from 3 and 4 with no overlap in factors",
+          "False, because every multiple of 3 is odd",
+          "False, because divisibility by 4 cancels divisibility by 3",
+          "True, but only for numbers below 100",
+        ],
+        helper: "Think about what numbers divisible by both 3 and 4 must have in common.",
+      },
+      {
+        prompt: "Which number could go in the blank: __, 48, 60, 72, 84?",
+        answer: "36, because the pattern adds 12 each time",
+        options: [
+          "36, because the pattern adds 12 each time",
+          "40, because it is close to 48",
+          "42, because it is a multiple of 6",
+          "24, because it is half of 48",
+        ],
+        helper: "Work backward using the same step size.",
+      },
+      {
+        prompt: "Which missing number makes the pattern work: 84, 96, __, 120, 132?",
+        answer: "108, because the pattern increases by 12 each time",
+        options: [
+          "108, because the pattern increases by 12 each time",
+          "102, because it is between 96 and 120",
+          "110, because it is close to 108",
+          "112, because it is even",
+        ],
+        helper: "Find the constant increase first, then check the divisibility pattern.",
+      },
+      {
+        prompt: "Which list shows only numbers divisible by 3?",
+        answer: "96, 117, 138",
+        options: [
+          "96, 117, 138",
+          "94, 117, 138",
+          "96, 118, 138",
+          "96, 117, 140",
+        ],
+        helper: "Check the divisibility test on every number in the group.",
+      },
+      {
+        prompt: "Which group correctly sorts the numbers by the rule 'divisible by both 3 and 5'?",
+        answer: "Divisible by both: 45, 90, 135 | Not both: 48, 75, 124",
+        options: [
+          "Divisible by both: 45, 90, 135 | Not both: 48, 75, 124",
+          "Divisible by both: 45, 75, 124 | Not both: 48, 90, 135",
+          "Divisible by both: 48, 90, 124 | Not both: 45, 75, 135",
+          "Divisible by both: 45, 48, 75 | Not both: 90, 124, 135",
+        ],
+        helper: "A number must pass both divisibility tests to belong in the first group.",
+      },
+      {
+        prompt: "Which explanation best fits 128, 136, 144, 152, 160?",
+        answer: "Add 8 each time, so the numbers stay even and every second term is divisible by 16",
+        options: [
+          "Add 8 each time, so the numbers stay even and every second term is divisible by 16",
+          "Add 6 each time, so the numbers stay multiples of 6",
+          "Multiply by 2 each time",
+          "Add 10 each time, so the numbers all end in 0",
+        ],
+        helper: "Use the actual step size, then describe the pattern it creates.",
+      },
+      {
+        prompt: "Which number belongs with 54, 72, and 90 if the rule is 'divisible by 9'?",
+        answer: "108, because 1 + 0 + 8 = 9",
+        options: [
+          "108, because 1 + 0 + 8 = 9",
+          "104, because it is even",
+          "111, because all repeated digits are divisible by 9",
+          "120, because it ends in 0",
+        ],
+        helper: "Use the divisibility test that matches the group rule.",
+      },
+    ];
+
+    const typedTemplates: Array<{
+      prompt: string;
+      answer: string;
+      helper: string;
+      placeholder?: string;
+    }> = [
+      {
+        prompt: "Type the missing number in the pattern 36, 48, __, 72, 84.",
+        answer: "60",
+        helper: "The numbers increase by 12 each time.",
+        placeholder: "Type the missing number",
+      },
+      {
+        prompt: "Type one number greater than 100 that is divisible by both 3 and 5.",
+        answer: "120",
+        helper: "A number divisible by both 3 and 5 must be a multiple of 15.",
+        placeholder: "Type a number",
+      },
+      {
+        prompt: "Type the next number in this pattern: 125, 140, 155, 170, __.",
+        answer: "185",
+        helper: "The pattern increases by 15 each time.",
+        placeholder: "Type the next number",
+      },
+    ];
+
+    if (asMultipleChoice) {
+      const chosen =
+        multipleChoiceTemplates[randInt(0, multipleChoiceTemplates.length - 1)] ?? multipleChoiceTemplates[0]!;
+      return {
+        kind: "multiple_choice",
+        prompt: chosen.prompt,
+        options: shuffle(chosen.options),
+        answer: chosen.answer,
+        helper: chosen.helper,
+      };
+    }
+
+    const chosen = typedTemplates[randInt(0, typedTemplates.length - 1)] ?? typedTemplates[0]!;
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      helper: chosen.helper,
+      placeholder: chosen.placeholder ?? "Type the answer",
+    };
+  }
+
   if (explicitMode === "pattern_sequence") {
     const multiplicative = randInt(0, 1) === 0;
     if (multiplicative) {
