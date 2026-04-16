@@ -2444,7 +2444,7 @@ function SessionPage() {
       (plan) => plan.week === Number(week)
     );
 
-    if (year === "Year 2" || year === "Year 3" || year === "Year 4") {
+    if (year === "Year 2" || year === "Year 3" || year === "Year 4" || year === "Year 5") {
       if (weekPlan) {
         return buildStructuredWeeklyQuizQuestions(weekPlan, questionsPerLesson);
       }
