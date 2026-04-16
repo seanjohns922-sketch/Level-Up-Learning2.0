@@ -152,14 +152,15 @@ const year5Rows: ProgramRow[] = [
   },
   {
     week: 4,
-    focus: "Describe and justify emerging patterns from generated multiples",
+    focus: "Identify patterns in multiples and explain why those patterns happen",
     lesson: 3,
-    topic: "Algorithms & Emerging Patterns",
-    activity: "Generate multiples and describe the patterns that emerge.",
+    topic: "Spot & Explain Patterns",
+    activity: "Move from spotting number patterns quickly to explaining why they work and creating your own clear pattern rules.",
     curriculum: ["AC9M5N10"],
     activities: [
-      makeActivity("multiple_choice", 2, { mode: "factor_multiple_pattern" }),
-      makeActivity("typed_response", 1, { mode: "factor_multiple_pattern" }),
+      makeActivity("multiple_choice", 1, { mode: "pattern_fast_thinking" }),
+      makeActivity("multiple_choice", 1, { mode: "pattern_reasoning" }),
+      makeActivity("typed_response", 1, { mode: "pattern_apply_create" }),
     ],
   },
   {

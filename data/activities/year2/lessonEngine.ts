@@ -6936,6 +6936,253 @@ function generateGenericQuestion(
         };
   }
 
+  if (explicitMode === "pattern_fast_thinking") {
+    const templates: Array<{
+      prompt: string;
+      answer: string;
+      options: string[];
+      helper: string;
+      visual?: {
+        type: "rule_box";
+        title: string;
+        steps: string[];
+        decisionLabel?: string;
+      };
+    }> = [
+      {
+        prompt: "6, 12, 18, 24, __. What comes next?",
+        answer: "30",
+        options: ["28", "30", "32", "36"],
+        helper: "Spot the step size quickly.",
+        visual: {
+          type: "rule_box",
+          title: "Pattern",
+          steps: ["Check how much each term increases.", "Use the same increase again."],
+        },
+      },
+      {
+        prompt: "Which list shows only multiples of 6?",
+        answer: "18, 24, 30, 36",
+        options: [
+          "18, 24, 30, 36",
+          "18, 25, 30, 36",
+          "16, 24, 30, 36",
+          "18, 24, 31, 36",
+        ],
+        helper: "Every number in the list must fit the same rule.",
+      },
+      {
+        prompt: "Which pattern increases by 5 each time?",
+        answer: "35, 40, 45, 50",
+        options: [
+          "35, 40, 45, 50",
+          "35, 41, 47, 53",
+          "35, 45, 55, 65",
+          "35, 39, 43, 47",
+        ],
+        helper: "Look at the difference between terms.",
+      },
+      {
+        prompt: "Which number belongs next: 8, 16, 24, 32, __?",
+        answer: "40",
+        options: ["36", "40", "44", "48"],
+        helper: "This pattern keeps adding the same multiple.",
+      },
+      {
+        prompt: "Which list shows multiples of 8?",
+        answer: "24, 32, 40, 48",
+        options: [
+          "24, 32, 40, 48",
+          "24, 30, 40, 48",
+          "22, 32, 40, 48",
+          "24, 32, 42, 48",
+        ],
+        helper: "Check each number against the same times-table pattern.",
+      },
+      {
+        prompt: "Which rule matches 45, 60, 75, 90?",
+        answer: "Add 15 each time",
+        options: ["Add 15 each time", "Add 10 each time", "Multiply by 2 each time", "Add 5 each time"],
+        helper: "Check the change from one term to the next.",
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle(chosen.options),
+      answer: chosen.answer,
+      helper: chosen.helper,
+      visual: chosen.visual,
+    };
+  }
+
+  if (explicitMode === "pattern_reasoning") {
+    const templates: Array<{
+      prompt: string;
+      answer: string;
+      options: string[];
+      helper: string;
+      visual?: {
+        type: "rule_box";
+        title: string;
+        steps: string[];
+        decisionLabel?: string;
+      };
+    }> = [
+      {
+        prompt: "Multiples of 4: 4, 8, 12, 16, 20. Noah says, 'They always go up by 4.' Mia says, 'They are all even numbers.' Who is correct?",
+        answer: "Both are correct",
+        options: [
+          "Both are correct",
+          "Only Noah is correct",
+          "Only Mia is correct",
+          "Neither is correct",
+        ],
+        helper: "A pattern can have more than one true description.",
+      },
+      {
+        prompt: "Why do multiples of 5 always end in 0 or 5?",
+        answer: "Because they are made by adding 5 each time, so the ones digit repeats in a 0, 5 pattern",
+        options: [
+          "Because they are made by adding 5 each time, so the ones digit repeats in a 0, 5 pattern",
+          "Because every odd number is a multiple of 5",
+          "Because multiplying always makes the last digit 5",
+          "Because only 2-digit numbers can be multiples of 5",
+        ],
+        helper: "Think about what happens to the ones digit when 5 keeps being added.",
+        visual: {
+          type: "rule_box",
+          title: "Multiples of 5",
+          steps: ["Look at the ones digits in the sequence.", "Notice the repeating pattern."],
+        },
+      },
+      {
+        prompt: "A student says, '30, 40, 50, 60 are multiples of 10, so they all end in 0.' Which answer is best?",
+        answer: "The student is correct because adding 10 keeps the ones digit at 0",
+        options: [
+          "The student is correct because adding 10 keeps the ones digit at 0",
+          "The student is incorrect because some multiples of 10 end in 5",
+          "The student is partly correct because only 30 and 40 are multiples of 10",
+          "The student is incorrect because ending in 0 means the number is odd",
+        ],
+        helper: "Use the pattern and the place-value effect of adding 10.",
+      },
+      {
+        prompt: "Which rule best explains 12, 24, 36, 48, 60?",
+        answer: "Add 12 each time, so every term stays a multiple of 12",
+        options: [
+          "Add 12 each time, so every term stays a multiple of 12",
+          "Add 10 each time, so every term stays even",
+          "Multiply by 2 each time",
+          "Add 6 each time, so every term is a multiple of 6 only",
+        ],
+        helper: "Choose the rule that explains both the step and the pattern property.",
+      },
+      {
+        prompt: "Ella says, 'All multiples of 6 are even.' Zane says, 'All multiples of 6 have a digit sum of 6.' Who is correct?",
+        answer: "Only Ella is correct",
+        options: [
+          "Only Ella is correct",
+          "Only Zane is correct",
+          "Both are correct",
+          "Neither is correct",
+        ],
+        helper: "Test which statement always works and which works only sometimes.",
+      },
+      {
+        prompt: "Why do multiples of 10 always end in 0?",
+        answer: "Because multiplying by 10 makes the ones digit 0 in whole numbers",
+        options: [
+          "Because multiplying by 10 makes the ones digit 0 in whole numbers",
+          "Because every even number ends in 0",
+          "Because 10 is an odd number",
+          "Because multiples of 10 only use two digits",
+        ],
+        helper: "Connect the pattern to place value, not just memorising the rule.",
+        visual: {
+          type: "rule_box",
+          title: "Multiples of 10",
+          steps: ["Think about multiplying by 10.", "Notice what happens to the ones place."],
+        },
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle(chosen.options),
+      answer: chosen.answer,
+      helper: chosen.helper,
+      visual: chosen.visual,
+    };
+  }
+
+  if (explicitMode === "pattern_apply_create") {
+    const templates: Array<{
+      prompt: string;
+      answer: string;
+      helper: string;
+      placeholder?: string;
+      visual?: {
+        type: "rule_box";
+        title: string;
+        steps: string[];
+        decisionLabel?: string;
+      };
+    }> = [
+      {
+        prompt: "Type the next 3 numbers in this pattern: 14, 21, 28, __, __, __.",
+        answer: "35, 42, 49",
+        helper: "The pattern adds 7 each time because these are multiples of 7.",
+        placeholder: "Type the next 3 numbers",
+        visual: {
+          type: "rule_box",
+          title: "Create the Pattern",
+          steps: ["Find the constant increase.", "Keep the rule going for 3 more terms."],
+        },
+      },
+      {
+        prompt: "Explain why multiples of 5 always end in 0 or 5.",
+        answer: "Adding 5 each time makes the ones digit alternate between 0 and 5",
+        helper: "A strong answer explains what keeps happening to the ones digit.",
+        placeholder: "Type your explanation",
+      },
+      {
+        prompt: "Write a multiples pattern of 8 using the first 4 terms.",
+        answer: "8, 16, 24, 32",
+        helper: "List 4 numbers that increase by 8 each time.",
+        placeholder: "Type 4 terms",
+        visual: {
+          type: "rule_box",
+          title: "Build a Pattern",
+          steps: ["Start with 8 or another multiple of 8.", "Keep adding 8 each time."],
+        },
+      },
+      {
+        prompt: "Type the rule for this pattern: 30, 40, 50, 60.",
+        answer: "Add 10 each time",
+        helper: "Describe the repeated change clearly.",
+        placeholder: "Type the rule",
+      },
+      {
+        prompt: "Explain why 18, 36, 54, and 72 all belong in the same pattern.",
+        answer: "They are all multiples of 18 and increase by 18 each time",
+        helper: "A strong answer names both the rule and the shared multiple pattern.",
+        placeholder: "Type your explanation",
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      helper: chosen.helper,
+      placeholder: chosen.placeholder ?? "Type the answer",
+      visual: chosen.visual,
+    };
+  }
+
   if (explicitMode === "spot_pattern_reasoning") {
     const multipleChoiceTemplates: Array<{
       prompt: string;
