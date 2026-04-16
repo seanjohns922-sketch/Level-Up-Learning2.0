@@ -202,6 +202,7 @@ type QuizQuestion = {
 
 type LessonBreakdown = {
   lessonNumber: number;
+  lessonTitle?: string;
   correct: number;
   total: number;
   percent: number;
@@ -850,7 +851,8 @@ function buildLessonBreakdown(
   quizMabAnswers: Record<string, { tens: number; ones: number; touched: boolean }>,
   quizMoneyAnswers: Record<string, { attempted: boolean; correct: boolean }>,
   quizLessonActivityResults: Record<string, { attempted: boolean; correct: boolean }>,
-  questionsPerLesson: number
+  questionsPerLesson: number,
+  lessonTitleLookup?: Record<number, string>
 ): LessonBreakdown[] {
   const breakdown = new Map<number, LessonBreakdown>();
 
@@ -858,6 +860,7 @@ function buildLessonBreakdown(
     const lessonNumber = q.lessonNumber ?? Math.floor(index / questionsPerLesson) + 1;
     const current = breakdown.get(lessonNumber) ?? {
       lessonNumber,
+      lessonTitle: lessonTitleLookup?.[lessonNumber],
       correct: 0,
       total: 0,
       percent: 0,
@@ -877,6 +880,9 @@ function buildLessonBreakdown(
       current.correct += 1;
     }
     if (!current.skill && q.skill) current.skill = q.skill;
+    if (!current.lessonTitle && lessonTitleLookup?.[lessonNumber]) {
+      current.lessonTitle = lessonTitleLookup[lessonNumber];
+    }
     breakdown.set(lessonNumber, current);
   });
 
@@ -886,6 +892,15 @@ function buildLessonBreakdown(
       ...item,
       percent: item.total > 0 ? Math.round((item.correct / item.total) * 100) : 0,
     }));
+}
+
+function getWeakestLessonBreakdown(items: LessonBreakdown[]): LessonBreakdown | null {
+  if (items.length === 0) return null;
+  return [...items].sort((a, b) => {
+    if (a.percent !== b.percent) return a.percent - b.percent;
+    if (a.correct !== b.correct) return a.correct - b.correct;
+    return a.lessonNumber - b.lessonNumber;
+  })[0] ?? null;
 }
 
 function randInt(min: number, max: number) {
@@ -2418,6 +2433,17 @@ function SessionPage() {
   const [lessonStarted, setLessonStarted] = useState(false);
 
   const [showPostTestTransition, setShowPostTestTransition] = useState(false);
+  const quizWeekPlan = useMemo(
+    () => getProgramForYear(year).find((plan) => plan.week === Number(week)),
+    [year, week]
+  );
+  const lessonTitleLookup = useMemo<Record<number, string>>(
+    () =>
+      Object.fromEntries(
+        (quizWeekPlan?.lessons ?? []).map((lesson) => [lesson.lesson, lesson.title])
+      ),
+    [quizWeekPlan]
+  );
 
   function completeLesson() {
     const store = readStore();
@@ -2440,9 +2466,7 @@ function SessionPage() {
   function buildQuizQuestions() {
     const qConfig = quizConfig;
     const questionsPerLesson = qConfig?.questionsPerLesson ?? 5;
-    const weekPlan = getProgramForYear(year).find(
-      (plan) => plan.week === Number(week)
-    );
+    const weekPlan = quizWeekPlan;
 
     if (year === "Year 2" || year === "Year 3" || year === "Year 4" || year === "Year 5") {
       if (weekPlan) {
@@ -2699,7 +2723,7 @@ function SessionPage() {
   const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([]);
   useEffect(() => {
     setQuizQuestions(buildQuizQuestions());
-  }, [year, week]);
+  }, [year, week, quizWeekPlan]);
 
   const [quizAnswers, setQuizAnswers] = useState<Record<string, number>>({});
   const [quizTyped, setQuizTyped] = useState<Record<string, string>>({});
@@ -2794,7 +2818,8 @@ function SessionPage() {
         quizMabAnswers,
         quizMoneyAnswers,
         quizLessonActivityResults,
-        quizConfig?.questionsPerLesson ?? 5
+        quizConfig?.questionsPerLesson ?? 5,
+        lessonTitleLookup
       ),
     [
       quizAnswers,
@@ -2806,7 +2831,12 @@ function SessionPage() {
       quizLessonActivityResults,
       quizQuestions,
       quizTyped,
+      lessonTitleLookup,
     ]
+  );
+  const weakestLessonBreakdown = useMemo(
+    () => getWeakestLessonBreakdown(lessonBreakdown),
+    [lessonBreakdown]
   );
 
   function completeWeek(currentWeek: number) {
@@ -3046,11 +3076,11 @@ function SessionPage() {
                   </div>
 
                   {!isMoneyQuiz ? (
-                    <div className="flex items-start justify-between gap-3 mb-2">
+                  <div className="flex items-start justify-between gap-3 mb-2">
                       <div className="font-semibold text-foreground">
-                        {process.env.NODE_ENV !== "production" && currentQuiz?.lessonTag ? (
+                        {currentQuiz?.lessonTag ? (
                           <div className="mb-1 text-xs font-black uppercase tracking-wide text-teal-700">
-                            [L{currentQuiz.lessonTag}]
+                            Lesson {currentQuiz.lessonTag}
                           </div>
                         ) : null}
                         {currentQuiz?.kind === "lessonActivity" ? null : currentQuiz?.prompt}
@@ -3620,6 +3650,11 @@ function SessionPage() {
                       <div className="text-xs font-bold uppercase tracking-wide text-gray-500">
                         Lesson {item.lessonNumber}
                       </div>
+                      {item.lessonTitle ? (
+                        <div className="mt-1 text-sm font-semibold text-gray-700">
+                          {item.lessonTitle}
+                        </div>
+                      ) : null}
                       <div className="mt-1 text-lg font-black text-gray-900">
                         {item.correct}/{item.total}
                       </div>
@@ -3638,19 +3673,23 @@ function SessionPage() {
             {quizSubmitted && finalScore < Math.ceil(quizQuestions.length * ((quizConfig?.passPercent ?? 80) / 100)) ? (
               <div className="mt-4 rounded-2xl border border-accent/30 p-4 text-sm font-bold text-accent-foreground flex items-center justify-between gap-3" style={{ background: "hsl(42 95% 97%)" }}>
                 <div>
-                  You’re close! Let’s try the lessons again to build confidence.
+                  {weakestLessonBreakdown
+                    ? `You’re close. Practise Lesson ${weakestLessonBreakdown.lessonNumber}${weakestLessonBreakdown.lessonTitle ? `: ${weakestLessonBreakdown.lessonTitle}` : ""} next. You scored ${weakestLessonBreakdown.correct}/${weakestLessonBreakdown.total} there.`
+                    : "You’re close! Let’s try the lessons again to build confidence."}
                 </div>
                 <button
                   onClick={() =>
                     router.push(
                       `/lesson?year=${encodeURIComponent(year)}&week=${encodeURIComponent(
                         week
-                      )}&lessonId=y1-w${week}-l1`
+                      )}&lessonId=y${parseInt(year.replace(/\D/g, ""), 10) || 1}-w${week}-l${
+                        weakestLessonBreakdown?.lessonNumber ?? 1
+                      }`
                     )
                   }
                   className="px-4 py-3 rounded-2xl bg-accent text-accent-foreground font-bold hover:opacity-90 transition"
                 >
-                  Back to Lesson 1
+                  Practise Lesson {weakestLessonBreakdown?.lessonNumber ?? 1}
                 </button>
               </div>
             ) : null}
