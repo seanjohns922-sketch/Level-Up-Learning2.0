@@ -564,6 +564,7 @@ function BoxMethodWorkspace({
 
 type MultiplicationStrategy = "box_method" | "long_multiplication" | "split_sum";
 type EstimateReasonableness = "yes" | "no";
+type DivisionReasonableness = "yes" | "no";
 
 function getSplitSumParts(value: number) {
   const tensPart = Math.floor(value / 10) * 10;
@@ -760,6 +761,7 @@ export default function TypedResponseActivity({
   const isColumnMultiplication = writtenMethod?.operation === "×";
   const isStrategyMultiplication = questionData.visual?.type === "multiplication_strategy";
   const isEstimateStrategyMultiplication = questionData.visual?.type === "multiplication_estimate_strategy";
+  const isDivisionRemainderCheck = questionData.visual?.type === "division_remainder_check";
   const strategyVisual =
     questionData.visual?.type === "multiplication_strategy" ||
     questionData.visual?.type === "multiplication_estimate_strategy"
@@ -820,6 +822,13 @@ export default function TypedResponseActivity({
     onesProduct: "",
     total: "",
   });
+  const [divisionCheckInputs, setDivisionCheckInputs] = useState({
+    quotient: "",
+    remainder: "",
+    multiplicationCheck: "",
+    reasonableness: null as DivisionReasonableness | null,
+  });
+  const [divisionCheckFeedback, setDivisionCheckFeedback] = useState("");
   const [orderedInputs, setOrderedInputs] = useState<string[]>(
     isOrderingResponse ? Array.from({ length: orderingAnswerParts.length }, () => "") : []
   );
@@ -917,6 +926,13 @@ export default function TypedResponseActivity({
       onesProduct: "",
       total: "",
     });
+    setDivisionCheckInputs({
+      quotient: "",
+      remainder: "",
+      multiplicationCheck: "",
+      reasonableness: null,
+    });
+    setDivisionCheckFeedback("");
     setOrderedInputs(
       isOrderingResponse ? Array.from({ length: orderingAnswerParts.length }, () => "") : []
     );
@@ -1195,6 +1211,27 @@ export default function TypedResponseActivity({
   }
 
   function check() {
+    if (isDivisionRemainderCheck && questionData.visual?.type === "division_remainder_check") {
+      const { quotient, remainder, divisor, dividend } = questionData.visual;
+      const quotientMatches = normalizeNumberInput(divisionCheckInputs.quotient) === String(quotient);
+      const remainderMatches =
+        normalizeNumberInput(divisionCheckInputs.remainder) === String(remainder);
+      const checkMatches =
+        normalizeNumberInput(divisionCheckInputs.multiplicationCheck) === String(divisor * quotient + remainder);
+      const reasonablenessMatches = divisionCheckInputs.reasonableness === "yes";
+
+      if (quotientMatches && remainderMatches && checkMatches && reasonablenessMatches) {
+        setDivisionCheckFeedback("");
+        onCorrect?.();
+      } else {
+        setDivisionCheckFeedback(
+          `Check the quotient, remainder, and ${divisor} × ${quotient} + ${remainder}. The total should return ${dividend}.`
+        );
+        onWrong?.();
+      }
+      return;
+    }
+
     if ((isStrategyMultiplication || isEstimateStrategyMultiplication) && strategyVisual) {
       if (!selectedStrategy) {
         setStrategyFeedback("Choose one method before you start solving.");
@@ -1434,6 +1471,9 @@ export default function TypedResponseActivity({
 
   const activityTitle =
     writtenMethod?.title ??
+    (questionData.visual?.type === "division_remainder_check"
+      ? "Division Check"
+      :
     ((questionData.visual?.type === "multiplication_strategy" ||
       questionData.visual?.type === "multiplication_estimate_strategy")
       ? "Choose a Method"
@@ -1442,7 +1482,7 @@ export default function TypedResponseActivity({
       ? "Box Method"
       : questionData.visual?.type === "column_multiplication"
       ? "Column Multiplication"
-      : "Typed Response"));
+      : "Typed Response")));
   const columnMultiplicationButtonLabel = getColumnMultiplicationButtonLabel(multiplicationStep);
 
   return (
@@ -1477,6 +1517,112 @@ export default function TypedResponseActivity({
       ) : null}
       {questionData.visual?.type === "rule_box" ? (
         <RuleBoxVisual visual={questionData.visual} title="Step-by-step rule" />
+      ) : null}
+      {questionData.visual?.type === "division_remainder_check" ? (
+        <div className="mt-4 space-y-4">
+          <div className="rounded-2xl border border-teal-100 bg-teal-50 p-5">
+            <div className="text-sm font-bold uppercase tracking-[0.18em] text-teal-700">
+              Step 1: Solve the Division
+            </div>
+            <div className="mt-3 flex flex-wrap items-end gap-4">
+              <div>
+                <div className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">Quotient</div>
+                <input
+                  value={divisionCheckInputs.quotient}
+                  onChange={(event) =>
+                    setDivisionCheckInputs((current) => ({
+                      ...current,
+                      quotient: event.target.value.replace(/[^\d]/g, ""),
+                    }))
+                  }
+                  inputMode="numeric"
+                  className="h-12 w-28 rounded-xl border border-teal-300 bg-white px-4 text-center text-xl font-black text-slate-900 outline-none focus:border-teal-500"
+                />
+              </div>
+              <div>
+                <div className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">Remainder</div>
+                <input
+                  value={divisionCheckInputs.remainder}
+                  onChange={(event) =>
+                    setDivisionCheckInputs((current) => ({
+                      ...current,
+                      remainder: event.target.value.replace(/[^\d]/g, ""),
+                    }))
+                  }
+                  inputMode="numeric"
+                  className="h-12 w-28 rounded-xl border border-teal-300 bg-white px-4 text-center text-xl font-black text-slate-900 outline-none focus:border-teal-500"
+                />
+              </div>
+            </div>
+            <p className="mt-3 text-sm text-slate-600">
+              The remainder must be less than the divisor.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-amber-100 bg-amber-50 p-5">
+            <div className="text-sm font-bold uppercase tracking-[0.18em] text-amber-700">
+              Step 2: Multiply Back and Check
+            </div>
+            <p className="mt-2 text-sm text-slate-700">
+              Work out{" "}
+              {questionData.visual.divisor} × quotient + remainder
+            </p>
+            <input
+              value={divisionCheckInputs.multiplicationCheck}
+              onChange={(event) =>
+                setDivisionCheckInputs((current) => ({
+                  ...current,
+                  multiplicationCheck: event.target.value.replace(/[^\d]/g, ""),
+                }))
+              }
+              inputMode="numeric"
+              className="mt-3 h-12 w-full max-w-xs rounded-xl border border-amber-300 bg-white px-4 text-center text-xl font-black text-slate-900 outline-none focus:border-amber-500"
+            />
+          </div>
+
+          <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
+            <div className="text-sm font-bold uppercase tracking-[0.18em] text-emerald-700">
+              Step 3: Does It Make Sense?
+            </div>
+            <div className="mt-3 flex flex-wrap gap-3">
+              {([
+                ["yes", "Yes"],
+                ["no", "No"],
+              ] as Array<[DivisionReasonableness, string]>).map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() =>
+                    setDivisionCheckInputs((current) => ({
+                      ...current,
+                      reasonableness: value,
+                    }))
+                  }
+                  className={[
+                    "rounded-xl px-4 py-3 font-black transition",
+                    divisionCheckInputs.reasonableness === value
+                      ? "bg-emerald-600 text-white"
+                      : "border border-slate-300 bg-white text-slate-900 hover:bg-slate-50",
+                  ].join(" ")}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {divisionCheckFeedback ? (
+            <p className="text-sm font-bold text-rose-600">{divisionCheckFeedback}</p>
+          ) : null}
+
+          <button
+            type="button"
+            onClick={check}
+            className="rounded-xl bg-teal-600 px-5 py-3 font-black text-white hover:bg-teal-700"
+          >
+            Check answer
+          </button>
+        </div>
       ) : null}
       {strategyVisual ? (
         <div className="mt-4 space-y-4">
@@ -2050,7 +2196,7 @@ export default function TypedResponseActivity({
                 </div>
               </div>
             </div>
-          ) : questionData.visual?.type === "box_method" || isColumnMultiplication || isStrategyMultiplication ? null : (
+          ) : questionData.visual?.type === "box_method" || isColumnMultiplication || isStrategyMultiplication || isEstimateStrategyMultiplication || isDivisionRemainderCheck ? null : (
             <input
               value={typed}
               onChange={(event) => setTyped(event.target.value)}

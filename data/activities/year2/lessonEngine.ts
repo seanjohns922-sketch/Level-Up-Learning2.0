@@ -115,6 +115,14 @@ export type MultiplicationEstimateStrategyVisualData = {
   showWorkedExample?: boolean;
 };
 
+export type DivisionRemainderCheckVisualData = {
+  type: "division_remainder_check";
+  dividend: number;
+  divisor: number;
+  quotient: number;
+  remainder: number;
+};
+
 export type RuleBoxVisualData = {
   type: "rule_box";
   title: string;
@@ -767,6 +775,7 @@ export type TypedResponseQuestion = {
     | BoxMethodVisualData
     | MultiplicationStrategyVisualData
     | MultiplicationEstimateStrategyVisualData
+    | DivisionRemainderCheckVisualData
     | MoneyVisualData
     | RuleBoxVisualData;
 };
@@ -8050,6 +8059,127 @@ function generateGenericQuestion(
           helper: "Find what is left after making equal groups.",
           placeholder: "Type the remainder",
         };
+  }
+
+  if (explicitMode === "division_remainders_fast") {
+    const templates = [
+      {
+        prompt: "Find the correct answer: 47 ÷ 5 = ?",
+        answer: "9 r2",
+        options: ["9 r2", "8 r7", "10 r-3", "9 r5"],
+      },
+      {
+        prompt: "Find the correct answer: 68 ÷ 6 = ?",
+        answer: "11 r2",
+        options: ["11 r2", "10 r8", "12 r-4", "11 r6"],
+      },
+      {
+        prompt: "Find the correct answer: 94 ÷ 8 = ?",
+        answer: "11 r6",
+        options: ["11 r6", "12 r2", "10 r14", "11 r8"],
+      },
+      {
+        prompt: "Find the correct answer: 125 ÷ 9 = ?",
+        answer: "13 r8",
+        options: ["13 r8", "14 r1", "12 r17", "13 r9"],
+      },
+      {
+        prompt: "Find the correct answer: 143 ÷ 7 = ?",
+        answer: "20 r3",
+        options: ["20 r3", "21 r4", "19 r10", "20 r7"],
+      },
+      {
+        prompt: "Find the correct answer: 176 ÷ 8 = ?",
+        answer: "22",
+        options: ["22", "21 r8", "23 r-8", "22 r8"],
+      },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: "The remainder must be 0 or greater, and it must always be less than the divisor.",
+    };
+  }
+
+  if (explicitMode === "division_remainders_reasoning") {
+    const templates = [
+      {
+        prompt: "47 ÷ 5 = 9 r3. Is this correct?",
+        answer: "No, because 5 × 9 + 3 = 48",
+        options: [
+          "Yes, because 5 × 9 + 3 = 47",
+          "No, because 5 × 9 + 3 = 48",
+          "No, because the remainder is too large",
+          "Yes, because 9 remainder 3 always works for dividing by 5",
+        ],
+      },
+      {
+        prompt: "68 ÷ 6 = 11 r2. Is this correct?",
+        answer: "Yes, because 6 × 11 + 2 = 68",
+        options: [
+          "Yes, because 6 × 11 + 2 = 68",
+          "No, because 6 × 11 + 2 = 66",
+          "No, because the remainder is too large",
+          "Yes, because all division answers need a remainder",
+        ],
+      },
+      {
+        prompt: "94 ÷ 8 = 11 r8. Is this correct?",
+        answer: "No, because the remainder is too large",
+        options: [
+          "Yes, because 8 × 11 + 8 = 96",
+          "No, because 8 × 11 + 8 = 94",
+          "No, because the remainder is too large",
+          "Yes, because 11 is the correct quotient",
+        ],
+      },
+      {
+        prompt: "125 ÷ 9 = 13 r8. Is this correct?",
+        answer: "Yes, because 9 × 13 + 8 = 125",
+        options: [
+          "Yes, because 9 × 13 + 8 = 125",
+          "No, because 9 × 13 + 8 = 126",
+          "No, because the remainder is too large",
+          "Yes, because 13 is close to 12",
+        ],
+      },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: "Check by multiplying the divisor and quotient, then add the remainder.",
+    };
+  }
+
+  if (explicitMode === "division_remainders_apply") {
+    const variants = [
+      { dividend: 68, divisor: 6, quotient: 11, remainder: 2, answer: "11 r2" },
+      { dividend: 94, divisor: 8, quotient: 11, remainder: 6, answer: "11 r6" },
+      { dividend: 125, divisor: 9, quotient: 13, remainder: 8, answer: "13 r8" },
+      { dividend: 143, divisor: 7, quotient: 20, remainder: 3, answer: "20 r3" },
+      { dividend: 176, divisor: 8, quotient: 22, remainder: 0, answer: "22" },
+    ] as const;
+    const picked = variants[randInt(0, variants.length - 1)] ?? variants[0]!;
+    return {
+      kind: "typed_response",
+      prompt: `Solve ${picked.dividend} ÷ ${picked.divisor}. Then check using ${picked.divisor} × quotient + remainder.`,
+      answer: picked.answer,
+      helper: "Your remainder must be less than the divisor. Check by multiplying back and adding the remainder.",
+      placeholder: "Type the quotient and remainder",
+      visual: {
+        type: "division_remainder_check",
+        dividend: picked.dividend,
+        divisor: picked.divisor,
+        quotient: picked.quotient,
+        remainder: picked.remainder,
+      },
+    };
   }
 
   if (explicitMode === "interpreting_remainders") {
