@@ -186,41 +186,37 @@ function ProgramPage() {
   }
 
   return (
-    <main
-      className="min-h-screen relative overflow-hidden"
-      style={{
-        background:
-          "linear-gradient(180deg, #0F766E 0%, #0D5F59 60%, #0a4d48 100%)",
-      }}
-    >
-      {/* Soft depth blobs */}
-      <div
-        className="pointer-events-none absolute -top-24 -right-24 h-[420px] w-[420px] rounded-full"
-        style={{ background: "rgba(255,255,255,0.07)", filter: "blur(80px)" }}
-      />
-      <div
-        className="pointer-events-none absolute -bottom-32 -left-24 h-[340px] w-[340px] rounded-full"
-        style={{ background: "rgba(255,255,255,0.05)", filter: "blur(80px)" }}
-      />
-      <div
-        className="pointer-events-none absolute top-1/3 left-1/2 -translate-x-1/2 h-[260px] w-[260px] rounded-full"
-        style={{ background: "rgba(255,255,255,0.04)", filter: "blur(90px)" }}
-      />
-      {/* Top glow */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(circle at top, rgba(255,255,255,0.12), transparent 60%)",
-        }}
-      />
+    <main className="min-h-screen relative">
+      {/* Realm background — same as student dashboard for this level */}
+      <div className="fixed inset-0 z-0">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={getHomeBg(levelNum)}
+          alt=""
+          className="w-full h-full object-cover"
+          style={{ filter: getHomeBgFilter(levelNum) }}
+        />
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ boxShadow: getVignetteStyle(levelNum) }}
+        />
+        <div className="absolute inset-0 bg-black/30" />
+        {/* Soft top glow for premium polish */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(circle at top, rgba(255,255,255,0.10), transparent 60%)",
+          }}
+        />
+      </div>
 
       {DEV_MODE && (
         <div className="fixed bottom-4 right-4 px-4 py-2 bg-red-600 text-white font-extrabold rounded-xl shadow-lg z-50">DEV MODE</div>
       )}
 
       {/* ── Hero header ── */}
-      <div className="relative">
+      <div className="relative z-10">
         <div className="relative max-w-6xl mx-auto px-6 pt-5 pb-10">
           <div className="flex items-center justify-between mb-6">
             <button
