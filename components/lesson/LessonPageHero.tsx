@@ -23,7 +23,7 @@ export function LessonPageHero({
   return (
     <div
       className="relative overflow-hidden text-white"
-      style={{ background: "#042f2e" }}
+      style={{ background: "#021716" }}
     >
       {/* FULL-WIDTH city artwork — no seam */}
       <div className="pointer-events-none absolute inset-0" aria-hidden>
@@ -32,9 +32,9 @@ export function LessonPageHero({
           alt=""
           className="h-full w-full object-cover"
           style={{
-            objectPosition: "75% center",
-            transform: "scale(1.05)",
-            filter: "contrast(1.05) saturate(0.95) brightness(1) hue-rotate(-4deg)",
+            objectPosition: "78% center",
+            transform: "scale(1.02)",
+            filter: "contrast(1.18) saturate(1.08) brightness(1.06) hue-rotate(-4deg)",
           }}
         />
         {/* Long horizontal darken — opaque on left, transparent on right */}
@@ -42,7 +42,7 @@ export function LessonPageHero({
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(90deg, #042f2e 0%, rgba(4,47,46,0.97) 18%, rgba(4,47,46,0.88) 32%, rgba(4,47,46,0.65) 48%, rgba(4,47,46,0.35) 65%, rgba(4,47,46,0.12) 82%, rgba(4,47,46,0) 100%)",
+              "linear-gradient(90deg, #021716 0%, rgba(2,23,22,0.98) 20%, rgba(2,23,22,0.9) 35%, rgba(2,23,22,0.65) 52%, rgba(2,23,22,0.3) 70%, rgba(2,23,22,0.1) 86%, rgba(2,23,22,0) 100%)",
           }}
         />
         {/* Soft top-to-bottom darken for extra text contrast */}
@@ -50,7 +50,7 @@ export function LessonPageHero({
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, transparent 40%, rgba(0,0,0,0.2) 100%)",
+              "linear-gradient(180deg, rgba(0,0,0,0.22) 0%, transparent 40%, rgba(0,0,0,0.3) 100%)",
           }}
         />
         {/* Subtle cyan accent on the far right */}
