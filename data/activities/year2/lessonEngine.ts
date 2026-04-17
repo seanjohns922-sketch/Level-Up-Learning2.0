@@ -8269,6 +8269,26 @@ function generateGenericQuestion(
         answer: "6 groups, 5 left over",
         options: ["6 groups, 5 left over", "7 groups", "6 groups exactly", "5 groups, 6 left over"],
       },
+      {
+        prompt: "68 ÷ 6 = 11 r2. What does this mean?",
+        answer: "11 groups, 2 left over",
+        options: ["11 groups, 2 left over", "12 groups", "11 groups exactly", "2 groups of 11"],
+      },
+      {
+        prompt: "91 ÷ 4 = 22 r3. What does this mean?",
+        answer: "22 groups, 3 left over",
+        options: ["22 groups, 3 left over", "23 groups", "22 groups exactly", "3 groups of 22"],
+      },
+      {
+        prompt: "125 ÷ 8 = 15 r5. What does this mean?",
+        answer: "15 groups, 5 left over",
+        options: ["15 groups, 5 left over", "16 groups", "15 groups exactly", "5 groups of 15"],
+      },
+      {
+        prompt: "72 ÷ 9 = 8. What does this mean?",
+        answer: "8 groups exactly",
+        options: ["8 groups exactly", "8 groups, 1 left over", "9 groups", "7 groups, 9 left over"],
+      },
     ] as const;
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
     return {
@@ -8307,6 +8327,31 @@ function generateGenericQuestion(
         answer: "6 boxes, 4 left over",
         options: ["6 boxes", "7 boxes", "6 boxes, 4 left over", "Ignore the 4 left over"],
       },
+      {
+        prompt: "How many rows are needed for 47 students if each row seats 6?",
+        answer: "8 rows",
+        options: ["7 rows", "7 r5 rows", "8 rows", "6 rows"],
+      },
+      {
+        prompt: "How many crates are filled and how many oranges are left over when 68 oranges are packed into crates of 6?",
+        answer: "11 crates, 2 left over",
+        options: ["11 crates", "12 crates", "11 crates, 2 left over", "Ignore the 2 left over"],
+      },
+      {
+        prompt: "91 stickers are shared equally between 4 children. How many stickers does each child get?",
+        answer: "22 each",
+        options: ["22 each", "22 r3 each", "23 each", "21 each"],
+      },
+      {
+        prompt: "How many teams are needed if 125 players are put into teams of 8?",
+        answer: "16 teams",
+        options: ["15 teams", "15 r5 teams", "16 teams", "14 teams"],
+      },
+      {
+        prompt: "How many boxes are needed for 72 books if each box holds 9 books?",
+        answer: "8 boxes",
+        options: ["8 boxes", "7 boxes", "8 boxes, 0 left over", "9 boxes"],
+      },
     ] as const;
     const practicalTemplates = [
       {
@@ -8317,6 +8362,26 @@ function generateGenericQuestion(
           "7 full teams",
           "6 teams only",
           "5 teams",
+        ],
+      },
+      {
+        prompt: "47 students are seated in rows of 6. What is the most practical seating plan?",
+        answer: "7 full rows and 5 students in a shorter row",
+        options: [
+          "7 full rows and 5 students in a shorter row",
+          "8 full rows",
+          "7 rows only",
+          "6 rows",
+        ],
+      },
+      {
+        prompt: "125 players are organised into teams of 8. What is the most practical solution for a real game day?",
+        answer: "15 teams and 5 players rotate in",
+        options: [
+          "15 teams and 5 players rotate in",
+          "16 full teams",
+          "15 teams only",
+          "14 teams",
         ],
       },
     ] as const;
@@ -8344,8 +8409,52 @@ function generateGenericQuestion(
         incorrectFeedback: "That selection does not fit 34 shared between 5 children.",
         visual: { type: "array" as const, rows: 5, columns: 6 },
       },
+      {
+        prompt: "47 stickers are shared between 6 children. Which answers could make sense?",
+        instruction: "Select all that apply.",
+        options: [
+          "7 each with 5 left over",
+          "8 each (if 1 more sticker is added)",
+          "6 each",
+          "10 each",
+        ],
+        correctAnswers: [
+          "7 each with 5 left over",
+          "8 each (if 1 more sticker is added)",
+        ],
+        selectionFeedback: {
+          "7 each with 5 left over": "This is the exact mathematical answer from 47 ÷ 6.",
+          "8 each (if 1 more sticker is added)": "This would work if there were 48 stickers instead of 47.",
+        },
+        allCorrectFeedback:
+          "Great thinking. One answer is mathematically exact, and the other would work if 1 more sticker was added.",
+        partialFeedback: "Partly right. There is one more answer that could also make sense.",
+        incorrectFeedback: "That selection does not fit 47 shared between 6 children.",
+      },
+      {
+        prompt: "83 pencils are packed into boxes of 7. Which answers could make sense?",
+        instruction: "Select all that apply.",
+        options: [
+          "11 boxes, 6 left over",
+          "12 full boxes (if 1 more pencil is added)",
+          "10 boxes",
+          "7 boxes, 11 left over",
+        ],
+        correctAnswers: [
+          "11 boxes, 6 left over",
+          "12 full boxes (if 1 more pencil is added)",
+        ],
+        selectionFeedback: {
+          "11 boxes, 6 left over": "This is the exact mathematical answer from 83 ÷ 7.",
+          "12 full boxes (if 1 more pencil is added)": "This would work if there were 84 pencils instead of 83.",
+        },
+        allCorrectFeedback:
+          "Great thinking. One answer is mathematically exact, and the other would work if 1 more pencil was added.",
+        partialFeedback: "Partly right. There is one more answer that could also make sense.",
+        incorrectFeedback: "That selection does not fit 83 packed into boxes of 7.",
+      },
     ] as const;
-    const roll = randInt(0, 5);
+    const roll = randInt(0, 6);
     const chosen =
       roll === 0
         ? (multiSelectTemplates[randInt(0, multiSelectTemplates.length - 1)] ?? multiSelectTemplates[0]!)
@@ -8408,6 +8517,57 @@ function generateGenericQuestion(
         ],
         visual: { type: "array" as const, rows: 5, columns: 6 },
       },
+      {
+        prompt: "How many rows are needed if 47 students are seated in rows of 6?",
+        answer: "8 rows",
+        options: [
+          "7 rows",
+          "8 rows",
+          "7 rows, 5 left over",
+          "Ignore the remainder and keep 7 rows",
+        ],
+        visual: { type: "array" as const, rows: 7, columns: 6 },
+      },
+      {
+        prompt: "How many crates are filled and how many oranges are left over when 68 oranges are packed into crates of 6?",
+        answer: "11 crates, 2 left over",
+        options: [
+          "11 crates",
+          "12 crates",
+          "11 crates, 2 left over",
+          "Ignore the 2 left over",
+        ],
+      },
+      {
+        prompt: "How many stickers does each child get when 91 stickers are shared equally between 4 children?",
+        answer: "22 each",
+        options: [
+          "22 each",
+          "22 each, 3 left over",
+          "23 each",
+          "Round up to 23 each",
+        ],
+      },
+      {
+        prompt: "How many teams are needed if 125 players are put into teams of 8?",
+        answer: "16 teams",
+        options: [
+          "15 teams",
+          "15 teams, 5 left over",
+          "16 teams",
+          "Ignore the remainder and keep 15 teams",
+        ],
+      },
+      {
+        prompt: "How many boxes are needed for 72 books if each box holds 9 books?",
+        answer: "8 boxes",
+        options: [
+          "8 boxes",
+          "7 boxes",
+          "8 boxes, 0 left over",
+          "9 boxes",
+        ],
+      },
     ] as const;
     const practicalTemplates = [
       {
@@ -8420,6 +8580,27 @@ function generateGenericQuestion(
           "5 teams",
         ],
         visual: { type: "array" as const, rows: 6, columns: 5 },
+      },
+      {
+        prompt: "47 students are seated in rows of 6. What is the most practical seating plan?",
+        answer: "7 full rows and 5 students in a shorter row",
+        options: [
+          "7 full rows and 5 students in a shorter row",
+          "8 full rows",
+          "7 rows only",
+          "6 rows",
+        ],
+        visual: { type: "array" as const, rows: 7, columns: 6 },
+      },
+      {
+        prompt: "125 players are organised into teams of 8. What is the most practical solution for a real game day?",
+        answer: "15 teams and 5 players rotate in",
+        options: [
+          "15 teams and 5 players rotate in",
+          "16 full teams",
+          "15 teams only",
+          "14 teams",
+        ],
       },
     ] as const;
     const usePractical = randInt(0, 4) === 0;
