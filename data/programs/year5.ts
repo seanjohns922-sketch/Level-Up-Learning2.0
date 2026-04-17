@@ -206,14 +206,15 @@ const year5Rows: ProgramRow[] = [
   {
     week: 6,
     weekTopic: "Division",
-    focus: "Use division with remainders and check reasonableness",
+    focus: "Solve division problems and understand what the remainder means",
     lesson: 1,
-    topic: "÷ with Remainders",
-    activity: "Solve division problems with remainders and explain what the remainder means.",
+    topic: "Division with Remainders",
+    activity: "Find correct quotient-and-remainder answers, test whether remainder answers make sense, and check using multiplication.",
     curriculum: ["AC9M5N07"],
     activities: [
-      makeActivity("multiple_choice", 2, { mode: "division_remainders" }),
-      makeActivity("typed_response", 1, { mode: "division_remainders" }),
+      makeActivity("typed_response", 1, { mode: "division_build_groups" }),
+      makeActivity("multiple_choice", 1, { mode: "division_remainders_reasoning" }),
+      makeActivity("typed_response", 1, { mode: "division_remainders_apply" }),
     ],
   },
   {

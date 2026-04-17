@@ -123,6 +123,14 @@ export type DivisionRemainderCheckVisualData = {
   remainder: number;
 };
 
+export type DivisionBuildGroupsVisualData = {
+  type: "division_build_groups";
+  dividend: number;
+  divisor: number;
+  multiples: number[];
+  remainder: number;
+};
+
 export type RuleBoxVisualData = {
   type: "rule_box";
   title: string;
@@ -776,6 +784,7 @@ export type TypedResponseQuestion = {
     | MultiplicationStrategyVisualData
     | MultiplicationEstimateStrategyVisualData
     | DivisionRemainderCheckVisualData
+    | DivisionBuildGroupsVisualData
     | MoneyVisualData
     | RuleBoxVisualData;
 };
@@ -8101,6 +8110,37 @@ function generateGenericQuestion(
       options: shuffle([...chosen.options]),
       answer: chosen.answer,
       helper: "The remainder must be 0 or greater, and it must always be less than the divisor.",
+    };
+  }
+
+  if (explicitMode === "division_build_groups") {
+    const variants = [
+      { dividend: 68, divisor: 8 },
+      { dividend: 47, divisor: 5 },
+      { dividend: 94, divisor: 8 },
+      { dividend: 125, divisor: 9 },
+    ] as const;
+    const picked = variants[randInt(0, variants.length - 1)] ?? variants[0]!;
+    const multiples: number[] = [];
+    let current = picked.divisor;
+    while (current <= picked.dividend) {
+      multiples.push(current);
+      current += picked.divisor;
+    }
+    const largest = multiples[multiples.length - 1] ?? 0;
+    return {
+      kind: "typed_response",
+      prompt: `Build groups of ${picked.divisor} to solve ${picked.dividend} ÷ ${picked.divisor}. What is left after making equal groups?`,
+      answer: String(picked.dividend - largest),
+      helper: "Reveal the multiples until the next group would be too large, then work out what is left.",
+      placeholder: "Type what is left",
+      visual: {
+        type: "division_build_groups",
+        dividend: picked.dividend,
+        divisor: picked.divisor,
+        multiples,
+        remainder: picked.dividend - largest,
+      },
     };
   }
 

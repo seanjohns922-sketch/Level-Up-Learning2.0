@@ -565,6 +565,7 @@ function BoxMethodWorkspace({
 type MultiplicationStrategy = "box_method" | "long_multiplication" | "split_sum";
 type EstimateReasonableness = "yes" | "no";
 type DivisionReasonableness = "yes" | "no";
+type BuildGroupsReason = "next_too_big" | "largest_multiple" | "doesnt_fit";
 
 function getSplitSumParts(value: number) {
   const tensPart = Math.floor(value / 10) * 10;
@@ -762,6 +763,7 @@ export default function TypedResponseActivity({
   const isStrategyMultiplication = questionData.visual?.type === "multiplication_strategy";
   const isEstimateStrategyMultiplication = questionData.visual?.type === "multiplication_estimate_strategy";
   const isDivisionRemainderCheck = questionData.visual?.type === "division_remainder_check";
+  const isDivisionBuildGroups = questionData.visual?.type === "division_build_groups";
   const strategyVisual =
     questionData.visual?.type === "multiplication_strategy" ||
     questionData.visual?.type === "multiplication_estimate_strategy"
@@ -829,6 +831,10 @@ export default function TypedResponseActivity({
     reasonableness: null as DivisionReasonableness | null,
   });
   const [divisionCheckFeedback, setDivisionCheckFeedback] = useState("");
+  const [revealedGroupCount, setRevealedGroupCount] = useState(0);
+  const [buildGroupsRemainder, setBuildGroupsRemainder] = useState("");
+  const [buildGroupsReason, setBuildGroupsReason] = useState<BuildGroupsReason | null>(null);
+  const [buildGroupsFeedback, setBuildGroupsFeedback] = useState("");
   const [orderedInputs, setOrderedInputs] = useState<string[]>(
     isOrderingResponse ? Array.from({ length: orderingAnswerParts.length }, () => "") : []
   );
@@ -933,6 +939,10 @@ export default function TypedResponseActivity({
       reasonableness: null,
     });
     setDivisionCheckFeedback("");
+    setRevealedGroupCount(0);
+    setBuildGroupsRemainder("");
+    setBuildGroupsReason(null);
+    setBuildGroupsFeedback("");
     setOrderedInputs(
       isOrderingResponse ? Array.from({ length: orderingAnswerParts.length }, () => "") : []
     );
@@ -1211,6 +1221,27 @@ export default function TypedResponseActivity({
   }
 
   function check() {
+    if (isDivisionBuildGroups && questionData.visual?.type === "division_build_groups") {
+      const remainderMatches =
+        normalizeNumberInput(buildGroupsRemainder) === String(questionData.visual.remainder);
+      const reasonMatches =
+        revealedGroupCount < questionData.visual.multiples.length ||
+        buildGroupsReason === "next_too_big" ||
+        buildGroupsReason === "largest_multiple" ||
+        buildGroupsReason === "doesnt_fit";
+
+      if (remainderMatches && reasonMatches) {
+        setBuildGroupsFeedback("");
+        onCorrect?.();
+      } else {
+        setBuildGroupsFeedback(
+          `Reveal the groups until the next multiple is too large, then type what is left.`
+        );
+        onWrong?.();
+      }
+      return;
+    }
+
     if (isDivisionRemainderCheck && questionData.visual?.type === "division_remainder_check") {
       const { quotient, remainder, divisor, dividend } = questionData.visual;
       const quotientMatches = normalizeNumberInput(divisionCheckInputs.quotient) === String(quotient);
@@ -1471,6 +1502,9 @@ export default function TypedResponseActivity({
 
   const activityTitle =
     writtenMethod?.title ??
+    (questionData.visual?.type === "division_build_groups"
+      ? "Build the Groups"
+      :
     (questionData.visual?.type === "division_remainder_check"
       ? "Division Check"
       :
@@ -1482,7 +1516,7 @@ export default function TypedResponseActivity({
       ? "Box Method"
       : questionData.visual?.type === "column_multiplication"
       ? "Column Multiplication"
-      : "Typed Response")));
+      : "Typed Response"))));
   const columnMultiplicationButtonLabel = getColumnMultiplicationButtonLabel(multiplicationStep);
 
   return (
@@ -1517,6 +1551,112 @@ export default function TypedResponseActivity({
       ) : null}
       {questionData.visual?.type === "rule_box" ? (
         <RuleBoxVisual visual={questionData.visual} title="Step-by-step rule" />
+      ) : null}
+      {questionData.visual?.type === "division_build_groups" ? (
+        <div className="mt-4 space-y-4">
+          <div className="rounded-2xl border border-teal-100 bg-teal-50 p-5">
+            <div className="text-sm font-bold uppercase tracking-[0.18em] text-teal-700">
+              Build the Groups
+            </div>
+            <div className="mt-3 flex flex-wrap gap-3">
+              {questionData.visual.multiples.map((multiple, index) => {
+                const visible = index < revealedGroupCount;
+                return (
+                  <div
+                    key={`multiple-${multiple}`}
+                    className={[
+                      "flex h-12 min-w-[88px] items-center justify-center rounded-xl border-2 px-4 text-lg font-black transition",
+                      visible
+                        ? "border-teal-300 bg-white text-slate-900"
+                        : "border-dashed border-teal-200 bg-teal-50/50 text-teal-200",
+                    ].join(" ")}
+                  >
+                    {visible ? multiple : "?"}
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() =>
+                  setRevealedGroupCount((current) =>
+                    Math.min(questionData.visual.multiples.length, current + 1)
+                  )
+                }
+                disabled={revealedGroupCount >= questionData.visual.multiples.length}
+                className="rounded-xl bg-teal-600 px-4 py-3 font-black text-white hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Tap to reveal
+              </button>
+              <button
+                type="button"
+                onClick={() => setRevealedGroupCount(questionData.visual.multiples.length)}
+                className="rounded-xl border border-slate-300 bg-white px-4 py-3 font-black text-slate-900 hover:bg-slate-50"
+              >
+                Skip steps
+              </button>
+            </div>
+          </div>
+
+          {revealedGroupCount > 0 ? (
+            <div className="rounded-2xl border border-amber-100 bg-amber-50 p-5">
+              <div className="text-sm font-bold uppercase tracking-[0.18em] text-amber-700">
+                What is left?
+              </div>
+              <input
+                value={buildGroupsRemainder}
+                onChange={(event) => setBuildGroupsRemainder(event.target.value.replace(/[^\d]/g, ""))}
+                inputMode="numeric"
+                placeholder="Type the remainder"
+                className="mt-3 h-12 w-full max-w-xs rounded-xl border border-amber-300 bg-white px-4 text-center text-xl font-black text-slate-900 outline-none focus:border-amber-500"
+              />
+            </div>
+          ) : null}
+
+          {revealedGroupCount === questionData.visual.multiples.length ? (
+            <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
+              <div className="text-sm font-bold uppercase tracking-[0.18em] text-emerald-700">
+                Why does it stop here?
+              </div>
+              <div className="mt-3 flex flex-col gap-3">
+                {([
+                  ["next_too_big", "Next multiple is too big"],
+                  ["doesnt_fit", `${questionData.visual.divisor} no longer fits into ${questionData.visual.dividend}`],
+                  ["largest_multiple", `${questionData.visual.multiples[questionData.visual.multiples.length - 1]} is the largest multiple under ${questionData.visual.dividend}`],
+                ] as Array<[BuildGroupsReason, string]>).map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setBuildGroupsReason(value)}
+                    className={[
+                      "rounded-xl border px-4 py-3 text-left font-black transition",
+                      buildGroupsReason === value
+                        ? "border-emerald-500 bg-emerald-600 text-white"
+                        : "border-slate-300 bg-white text-slate-900 hover:bg-slate-50",
+                    ].join(" ")}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          {buildGroupsFeedback ? (
+            <p className="text-sm font-bold text-rose-600">{buildGroupsFeedback}</p>
+          ) : null}
+
+          {(revealedGroupCount > 0 && buildGroupsRemainder.trim().length > 0) ? (
+            <button
+              type="button"
+              onClick={check}
+              className="rounded-xl bg-teal-600 px-5 py-3 font-black text-white hover:bg-teal-700"
+            >
+              Check answer
+            </button>
+          ) : null}
+        </div>
       ) : null}
       {questionData.visual?.type === "division_remainder_check" ? (
         <div className="mt-4 space-y-4">
@@ -2196,7 +2336,7 @@ export default function TypedResponseActivity({
                 </div>
               </div>
             </div>
-          ) : questionData.visual?.type === "box_method" || isColumnMultiplication || isStrategyMultiplication || isEstimateStrategyMultiplication || isDivisionRemainderCheck ? null : (
+          ) : questionData.visual?.type === "box_method" || isColumnMultiplication || isStrategyMultiplication || isEstimateStrategyMultiplication || isDivisionRemainderCheck || isDivisionBuildGroups ? null : (
             <input
               value={typed}
               onChange={(event) => setTyped(event.target.value)}
@@ -2208,7 +2348,7 @@ export default function TypedResponseActivity({
               className="w-full max-w-md rounded-xl border border-gray-300 px-4 py-3 text-lg font-bold text-gray-900 outline-none focus:border-teal-500"
             />
           )}
-          {isColumnMultiplication || isStrategyMultiplication ? null : (
+          {isColumnMultiplication || isStrategyMultiplication || isEstimateStrategyMultiplication || isDivisionRemainderCheck || isDivisionBuildGroups ? null : (
             <button
               type="button"
               onClick={check}
