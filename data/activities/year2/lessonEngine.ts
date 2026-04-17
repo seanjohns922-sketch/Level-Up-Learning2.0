@@ -8315,25 +8315,47 @@ function generateGenericQuestion(
   if (explicitMode === "interpreting_remainders_apply") {
     const templates = [
       {
-        prompt: "34 people are put into groups of 5. What should we do with the remainder? Explain.",
+        prompt: "34 people are put into groups of 5. What should we do with the remainder?",
         answer: "Round up to 7 groups",
+        options: [
+          "6 groups, 4 left over",
+          "Round up to 7 groups",
+          "Ignore the remainder and keep 6 groups",
+          "7 groups exactly",
+        ],
+        visual: { type: "array" as const, rows: 6, columns: 5 },
       },
       {
-        prompt: "34 apples are packed into bags of 5. What should we do with the remainder? Explain.",
+        prompt: "34 apples are packed into bags of 5. What should we do with the remainder?",
         answer: "6 bags, 4 left over",
+        options: [
+          "6 bags",
+          "7 bags",
+          "6 bags, 4 left over",
+          "Ignore the 4 left over",
+        ],
+        visual: { type: "array" as const, rows: 6, columns: 5 },
       },
       {
-        prompt: "34 lollies are shared equally between 5 children. What should we do with the remainder? Explain.",
+        prompt: "34 lollies are shared equally between 5 children. What should we do with the remainder?",
         answer: "6 each",
+        options: [
+          "6 each",
+          "6 each, 4 left over",
+          "7 each",
+          "Round up to 7 each",
+        ],
+        visual: { type: "array" as const, rows: 5, columns: 6 },
       },
     ] as const;
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
     return {
-      kind: "typed_response",
+      kind: "multiple_choice",
       prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
       answer: chosen.answer,
-      helper: "Decide whether to keep the remainder, round up, or ignore it so the answer makes sense in the situation.",
-      placeholder: "Type the final answer",
+      helper: "Choose the answer that makes sense in the situation.",
+      visual: chosen.visual,
     };
   }
 

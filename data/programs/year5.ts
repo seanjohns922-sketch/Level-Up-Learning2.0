@@ -227,7 +227,7 @@ const year5Rows: ProgramRow[] = [
     activities: [
       makeActivity("multiple_choice", 1, { mode: "interpreting_remainders_fast" }),
       makeActivity("multiple_choice", 1, { mode: "interpreting_remainders_reasoning" }),
-      makeActivity("typed_response", 1, { mode: "interpreting_remainders_apply" }),
+      makeActivity("multiple_choice", 1, { mode: "interpreting_remainders_apply" }),
     ],
   },
   {
