@@ -7672,6 +7672,224 @@ function generateGenericQuestion(
     };
   }
 
+  if (explicitMode === "multiplication_efficient_fast") {
+    const templates: Array<{
+      prompt: string;
+      answer: string;
+      options: string[];
+      helper: string;
+      visual?: {
+        type: "rule_box";
+        title: string;
+        steps: string[];
+        decisionLabel?: string;
+      };
+    }> = [
+      {
+        prompt: "Which strategy makes 25 × 16 quickest to work out?",
+        answer: "Multiply by 4, then by 4 again",
+        options: [
+          "Multiply by 4, then by 4 again",
+          "Add 25 sixteen times",
+          "Round 25 to 20 and stop there",
+          "Split 16 into 10 and ignore the 6",
+        ],
+        helper: "25 works well with friendly factors because 16 = 4 × 4.",
+        visual: {
+          type: "rule_box",
+          title: "Friendly Factor",
+          steps: ["Notice a helpful number such as 25.", "Rewrite the other factor in an easier way."],
+        },
+      },
+      {
+        prompt: "What is the most efficient first step for 40 × 18?",
+        answer: "Work out 4 × 18, then make the answer 10 times larger",
+        options: [
+          "Work out 4 × 18, then make the answer 10 times larger",
+          "Add 40 eighteen times",
+          "Turn 18 into 1.8",
+          "Ignore the zero in 40 and keep the same answer",
+        ],
+        helper: "Use the known fact and then scale because 40 is 4 tens.",
+      },
+      {
+        prompt: "Which shortcut helps with 19 × 5?",
+        answer: "Find 20 × 5, then subtract 5",
+        options: [
+          "Find 20 × 5, then subtract 5",
+          "Find 10 × 5, then stop",
+          "Double 19 and ignore the 5",
+          "Add a zero to 19",
+        ],
+        helper: "19 is close to 20, so compensation is efficient.",
+      },
+      {
+        prompt: "Why is 32 × 25 a good friendly-number question?",
+        answer: "Because 25 × 4 = 100, so 32 can be split into groups of 4",
+        options: [
+          "Because 25 × 4 = 100, so 32 can be split into groups of 4",
+          "Because all answers with 25 end in 25",
+          "Because 32 should always be rounded to 30",
+          "Because 25 and 32 are both even",
+        ],
+        helper: "Friendly factors can turn the multiplication into hundreds.",
+        visual: {
+          type: "rule_box",
+          title: "Efficient Thinking",
+          steps: ["Look for a number like 25 or 50.", "Ask if the other factor can be regrouped."],
+        },
+      },
+      {
+        prompt: "Which expression is the best rewrite of 48 × 25?",
+        answer: "12 × 100",
+        options: ["12 × 100", "48 × 20", "50 × 25", "24 × 25"],
+        helper: "Regroup 48 as 12 × 4, then use 4 × 25 = 100.",
+      },
+      {
+        prompt: "What is the fastest way to think about 205 × 3?",
+        answer: "200 × 3 and 5 × 3, then combine",
+        options: [
+          "200 × 3 and 5 × 3, then combine",
+          "Change 205 into 25",
+          "Multiply 205 by 30 instead",
+          "Add 200 and 3",
+        ],
+        helper: "Partitioning helps when one factor has simple place-value parts.",
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle(chosen.options),
+      answer: chosen.answer,
+      helper: chosen.helper,
+      visual: chosen.visual,
+    };
+  }
+
+  if (explicitMode === "multiplication_efficient_reasoning") {
+    const templates: Array<{
+      prompt: string;
+      answer: string;
+      options: string[];
+      helper: string;
+      visual?: {
+        type: "rule_box";
+        title: string;
+        steps: string[];
+        decisionLabel?: string;
+      };
+    }> = [
+      {
+        prompt: "Which method is most efficient for 48 × 25?",
+        answer: "Use a friendly factor strategy because 4 × 25 = 100",
+        options: [
+          "Use a friendly factor strategy because 4 × 25 = 100",
+          "Use repeated addition because 25 is large",
+          "Draw an area model every time because it is the only correct method",
+          "Round 48 to 50 and keep that answer",
+        ],
+        helper: "Efficiency means choosing a correct method that reduces the work.",
+      },
+      {
+        prompt: "A student uses the standard algorithm for 20 × 34. Was that efficient?",
+        answer: "No, using 2 × 34 and then scaling by 10 is more efficient",
+        options: [
+          "No, using 2 × 34 and then scaling by 10 is more efficient",
+          "Yes, the standard algorithm is always the most efficient",
+          "No, because 20 × 34 should be solved by subtraction",
+          "Yes, because multiplying by 20 is the same as multiplying by 2",
+        ],
+        helper: "A formal method can be correct without being the quickest choice.",
+        visual: {
+          type: "rule_box",
+          title: "Choose the Method",
+          steps: ["Look for tens, hundreds, or friendly factors first.", "Only use a longer method when it adds value."],
+        },
+      },
+      {
+        prompt: "Why is 25 × 16 easier than it looks?",
+        answer: "Because 16 can be seen as 4 × 4, and 25 × 4 = 100",
+        options: [
+          "Because 16 can be seen as 4 × 4, and 25 × 4 = 100",
+          "Because 25 can be rounded to 30 with no change",
+          "Because any number multiplied by 25 ends in 00",
+          "Because 16 should be changed to 10 first",
+        ],
+        helper: "Friendly factors can turn a tricky fact into a simple chain of facts.",
+      },
+      {
+        prompt: "Noah says 48 × 26 is best solved with a written method. Mia says partitioning into 48 × 20 and 48 × 6 is more efficient. Who is correct?",
+        answer: "Both can work, but Mia's partitioning is more efficient to explain the calculation",
+        options: [
+          "Both can work, but Mia's partitioning is more efficient to explain the calculation",
+          "Only Noah is correct because written methods are always best",
+          "Only Mia is correct because written methods are never allowed",
+          "Neither is correct because 48 × 26 cannot be partitioned",
+        ],
+        helper: "At this level, students should compare valid methods and choose the more efficient one.",
+      },
+      {
+        prompt: "A student says 32 × 25 = 32 × 20 + 32 × 5. Is that correct?",
+        answer: "Yes, because 25 can be partitioned into 20 and 5",
+        options: [
+          "Yes, because 25 can be partitioned into 20 and 5",
+          "No, because only one factor can be split",
+          "No, because 20 and 5 should be multiplied together first",
+          "Yes, but only if 32 is changed to 30",
+        ],
+        helper: "Partitioning keeps the total the same when the place values are handled correctly.",
+      },
+      {
+        prompt: "Which mistake shows a strategy misunderstanding?",
+        answer: "Thinking 23 × 40 should be treated the same as 23 × 4",
+        options: [
+          "Thinking 23 × 40 should be treated the same as 23 × 4",
+          "Using partitioning for 205 × 3",
+          "Using compensation for 19 × 5",
+          "Checking 123 × 4 with estimation",
+        ],
+        helper: "The tens in 40 change the size of the product.",
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle(chosen.options),
+      answer: chosen.answer,
+      helper: chosen.helper,
+      visual: chosen.visual,
+    };
+  }
+
+  if (explicitMode === "multiplication_efficient_apply") {
+    const variants = [
+      [123, 4],
+      [48, 26],
+      [205, 3],
+      [64, 15],
+      [32, 25],
+    ] as const;
+    const picked = variants[randInt(0, variants.length - 1)] ?? variants[0];
+    const answer = picked[0] * picked[1];
+    return {
+      kind: "typed_response",
+      prompt: `Work out ${formatMathNumber(picked[0])} × ${formatMathNumber(picked[1])}. Choose an efficient strategy and solve accurately.`,
+      answer: formatMathNumber(answer),
+      helper: "Use a written method, partitioning, or a friendly-number strategy. Check that your answer is reasonable.",
+      placeholder: "Type the answer",
+      writtenMethod: buildWrittenMethodLayout("Multiplication", "×", picked[0], picked[1], answer),
+      visual: {
+        type: "column_multiplication",
+        topValue: picked[0],
+        bottomValue: picked[1],
+        showWorkedExample: true,
+      },
+    };
+  }
+
   if (explicitMode === "division_remainders") {
     const divisor = [3, 4, 5, 6, 7, 8][randInt(0, 5)] ?? 4;
     const quotient = randInt(3, 12);

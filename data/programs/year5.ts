@@ -179,14 +179,15 @@ const year5Rows: ProgramRow[] = [
   },
   {
     week: 5,
-    focus: "Use area model and standard algorithm for 2-digit multiplication",
+    focus: "Choose efficient strategies to multiply larger numbers accurately",
     lesson: 2,
-    topic: "× 2-digit",
-    activity: "Move from area model thinking to standard 2-digit multiplication.",
+    topic: "Multiply Efficiently",
+    activity: "Choose efficient multiplication strategies, compare methods, and solve larger problems accurately.",
     curriculum: ["AC9M5N06"],
     activities: [
-      makeActivity("typed_response", 2, { mode: "box_method_partial_typed" }),
-      makeActivity("typed_response", 2, { mode: "column_multiplication_solve" }),
+      makeActivity("multiple_choice", 1, { mode: "multiplication_efficient_fast" }),
+      makeActivity("multiple_choice", 1, { mode: "multiplication_efficient_reasoning" }),
+      makeActivity("typed_response", 1, { mode: "multiplication_efficient_apply" }),
     ],
   },
   {
