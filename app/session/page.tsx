@@ -8,7 +8,7 @@ import { supabase } from "@/lib/supabase";
 import { getProgramForYear } from "@/data/programs";
 import PostTestTransition from "@/components/PostTestTransition";
 import {
-  buildLessonActivityPool,
+  buildQuizActivityPool,
   generateQuestionForLevelLessonActivity,
   getLevelForLesson,
   type MultipleChoiceQuestion as Year2MultipleChoiceQuestion,
@@ -269,7 +269,9 @@ function buildAlternativePartition(question: Year2PartitionExpandQuestion) {
 
 function buildStructuredQuizSources(lesson: Lesson): LessonActivity[] {
   const level = getLevelForLesson(lesson);
-  const { activities, violations } = buildLessonActivityPool(level, lesson);
+  const { activities, violations } = buildQuizActivityPool(level, lesson, {
+    allowGenericFallback: true,
+  });
   if (violations.length > 0) {
     const summary = violations
       .map((violation: Year2PolicyViolation) => `${violation.reason}: ${violation.message}`)
@@ -279,7 +281,62 @@ function buildStructuredQuizSources(lesson: Lesson): LessonActivity[] {
     }
     console.error(`[StructuredQuizPolicy] ${lesson.title}: ${summary}`);
   }
-  return activities;
+  return activities.filter((activity) => {
+    const rotationRole =
+      typeof activity.config?.rotationRole === "string" ? String(activity.config.rotationRole) : "";
+    const mode = typeof activity.config?.mode === "string" ? String(activity.config.mode) : "";
+    if (rotationRole === "reasoning" && !mode.includes("reasoning_check")) {
+      return false;
+    }
+    if (mode.includes("whos_right") || mode.includes("spot_pattern_reasoning")) {
+      return false;
+    }
+    return true;
+  });
+}
+
+function isQuizSafeGeneratedQuestion(questionData: Year2QuestionData) {
+  if (questionData.kind === "multiple_choice" || questionData.kind === "typed_response") {
+    const visualType = questionData.visual?.type ?? "";
+    if (visualType === "rule_box") {
+      return false;
+    }
+
+    const prompt = questionData.prompt.toLowerCase();
+    if (
+      prompt.includes("who used a helpful strategy") ||
+      prompt.includes("which method is most efficient") ||
+      prompt.includes("who is correct") ||
+      prompt.includes("good friendly-number question")
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function getStructuredQuestionFingerprint(questionData: Year2QuestionData) {
+  if (questionData.kind === "multiple_choice") {
+    return [
+      questionData.kind,
+      questionData.prompt,
+      questionData.answer,
+      questionData.options.join("|"),
+      questionData.visual?.type ?? "",
+    ].join("::");
+  }
+
+  if (questionData.kind === "typed_response") {
+    return [
+      questionData.kind,
+      questionData.prompt,
+      questionData.answer,
+      questionData.visual?.type ?? "",
+    ].join("::");
+  }
+
+  return JSON.stringify(questionData);
 }
 
 function validateStructuredWeeklyQuizQuestions(
@@ -335,6 +392,7 @@ function buildStructuredWeeklyQuizQuestions(
   }
 
   const questions: QuizQuestion[] = [];
+  const seenFingerprints = new Set<string>();
   const debugCounts: Array<{ lesson: 1 | 2 | 3; availableActivities: number; selectedActivityTypes: string[] }> = [];
 
   quizLessons.forEach((lesson, lessonIndex) => {
@@ -356,9 +414,35 @@ function buildStructuredWeeklyQuizQuestions(
 
     const selectedActivityTypes: string[] = [];
     for (let i = 0; i < questionsPerLesson; i += 1) {
-      const sourceActivity = sourceActivities[i % sourceActivities.length];
+      let sourceActivity = sourceActivities[i % sourceActivities.length];
+      let questionData = generateQuestionForLevelLessonActivity(level, lesson, sourceActivity);
+      let fingerprint = getStructuredQuestionFingerprint(questionData);
+      let attempts = 0;
+
+      while (
+        attempts < 20 &&
+        (!isQuizSafeGeneratedQuestion(questionData) || seenFingerprints.has(fingerprint))
+      ) {
+        sourceActivity = sourceActivities[(i + attempts + 1) % sourceActivities.length];
+        questionData = generateQuestionForLevelLessonActivity(level, lesson, sourceActivity);
+        fingerprint = getStructuredQuestionFingerprint(questionData);
+        attempts += 1;
+      }
+
+      if (!isQuizSafeGeneratedQuestion(questionData)) {
+        throw new Error(
+          `[StructuredWeeklyQuiz] Year ${yearNumber} Week ${weekPlan.week} Lesson ${lessonNumber} could not generate a quiz-safe question.`
+        );
+      }
+
+      if (seenFingerprints.has(fingerprint)) {
+        throw new Error(
+          `[StructuredWeeklyQuiz] Year ${yearNumber} Week ${weekPlan.week} Lesson ${lessonNumber} produced duplicate quiz questions after retries.`
+        );
+      }
+
+      seenFingerprints.add(fingerprint);
       selectedActivityTypes.push(sourceActivity.activityType);
-      const questionData = generateQuestionForLevelLessonActivity(level, lesson, sourceActivity);
       questions.push({
         id: `q${questions.length + 1}`,
         lessonNumber,
