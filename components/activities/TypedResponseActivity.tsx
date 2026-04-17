@@ -573,6 +573,7 @@ function getSplitSumParts(value: number) {
 function LongMultiplicationStrategyWorkspace({
   topValue,
   bottomValue,
+  carryValue,
   onesRowValue,
   tensRowValue,
   totalValue,
@@ -580,10 +581,11 @@ function LongMultiplicationStrategyWorkspace({
 }: {
   topValue: number;
   bottomValue: number;
+  carryValue: string;
   onesRowValue: string;
   tensRowValue: string;
   totalValue: string;
-  onChange: (field: "onesRow" | "tensRow" | "total", value: string) => void;
+  onChange: (field: "carry" | "onesRow" | "tensRow" | "total", value: string) => void;
 }) {
   const width = Math.max(
     String(topValue).length,
@@ -592,9 +594,35 @@ function LongMultiplicationStrategyWorkspace({
   );
   const topDigits = digitCells(topValue, width);
   const bottomDigits = digitCells(bottomValue, width);
+  const topNumberDigits = String(topValue).split("").map(Number);
+  const bottomNumberDigits = String(bottomValue).split("").map(Number);
+  const onesDigit = bottomNumberDigits[bottomNumberDigits.length - 1] ?? 0;
+  const topOnes = topNumberDigits[topNumberDigits.length - 1] ?? 0;
+  const firstCarry = Math.floor((topOnes * onesDigit) / 10);
 
   return (
     <div className="w-fit rounded-xl bg-white p-4 shadow-sm">
+      <div className="mb-1 grid w-fit grid-flow-col gap-2">
+        <div className="w-8" />
+        {Array.from({ length: width }).map((_, index) => {
+          const carryIndex = width - 2;
+          if (index !== carryIndex) {
+            return <div key={`strategy-carry-slot-${index}`} className="h-8 w-12" />;
+          }
+
+          return (
+            <div key={`strategy-carry-slot-${index}`} className="flex h-8 w-12 items-center justify-center">
+              <input
+                value={carryValue}
+                onChange={(event) => onChange("carry", event.target.value)}
+                inputMode="numeric"
+                maxLength={1}
+                className="h-8 w-8 rounded-md border border-amber-200 bg-amber-50 text-center text-sm font-black text-amber-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
+              />
+            </div>
+          );
+        })}
+      </div>
       <div className="grid w-fit grid-flow-col gap-2">
         <div className="w-8" />
         {topDigits.map((digit, index) => (
@@ -644,7 +672,8 @@ function LongMultiplicationStrategyWorkspace({
         />
       </div>
       <div className="mt-3 text-xs font-medium text-slate-500">
-        Complete both partial-product rows, then add them for the total.
+        Enter any carry above the next column, then complete both partial-product rows and the total.
+        {firstCarry > 0 ? ` The first carry is needed after ${topOnes} × ${onesDigit}.` : " No carry is needed in the first step."}
       </div>
     </div>
   );
@@ -771,6 +800,7 @@ export default function TypedResponseActivity({
   const [strategyLocked, setStrategyLocked] = useState(false);
   const [strategyFeedback, setStrategyFeedback] = useState("");
   const [strategyLongInputs, setStrategyLongInputs] = useState({
+    carry: "",
     onesRow: "",
     tensRow: "",
     total: "",
@@ -864,6 +894,7 @@ export default function TypedResponseActivity({
     setStrategyLocked(false);
     setStrategyFeedback("");
     setStrategyLongInputs({
+      carry: "",
       onesRow: "",
       tensRow: "",
       total: "",
@@ -1107,7 +1138,17 @@ export default function TypedResponseActivity({
       return boxMethodInputs.length > 0 && boxMethodInputs.every((value) => value.trim()) && boxMethodTotal.trim().length > 0;
     }
     if (selectedStrategy === "long_multiplication") {
-      return Object.values(strategyLongInputs).every((value) => value.trim().length > 0);
+      if (questionData.visual?.type !== "multiplication_strategy") return false;
+      const { onesPart } = getSplitSumParts(questionData.visual.bottomValue);
+      const topDigits = String(questionData.visual.topValue).split("").map(Number);
+      const topOnes = topDigits[topDigits.length - 1] ?? 0;
+      const expectedCarry = Math.floor((topOnes * onesPart) / 10);
+      const coreComplete =
+        strategyLongInputs.onesRow.trim().length > 0 &&
+        strategyLongInputs.tensRow.trim().length > 0 &&
+        strategyLongInputs.total.trim().length > 0;
+      if (!coreComplete) return false;
+      return expectedCarry === 0 ? true : strategyLongInputs.carry.trim().length > 0;
     }
     return Object.values(strategySplitInputs).every((value) => value.trim().length > 0);
   }
@@ -1142,17 +1183,24 @@ export default function TypedResponseActivity({
       if (selectedStrategy === "long_multiplication") {
         const { bottomValue, topValue } = questionData.visual;
         const { tensPart, onesPart } = getSplitSumParts(bottomValue);
+        const topDigits = String(topValue).split("").map(Number);
+        const topOnes = topDigits[topDigits.length - 1] ?? 0;
+        const expectedCarry = Math.floor((topOnes * onesPart) / 10);
+        const carryMatches =
+          expectedCarry === 0
+            ? strategyLongInputs.carry.trim().length === 0 || normalizeNumberInput(strategyLongInputs.carry) === "0"
+            : normalizeNumberInput(strategyLongInputs.carry) === String(expectedCarry);
         const onesRowExpected = topValue * onesPart;
         const tensRowExpected = topValue * tensPart;
         const onesRowMatches = normalizeNumberInput(strategyLongInputs.onesRow) === String(onesRowExpected);
         const tensRowMatches = normalizeNumberInput(strategyLongInputs.tensRow) === String(tensRowExpected);
         const totalMatches = normalizeNumberInput(strategyLongInputs.total) === finalAnswer;
 
-        if (onesRowMatches && tensRowMatches && totalMatches) {
+        if (carryMatches && onesRowMatches && tensRowMatches && totalMatches) {
           setStrategyFeedback("");
           onCorrect?.();
         } else {
-          setStrategyFeedback("Check both partial-product rows and then add them carefully for the final answer.");
+          setStrategyFeedback("Check the carry, both partial-product rows, and then the final total.");
           onWrong?.();
         }
         return;
@@ -1433,6 +1481,7 @@ export default function TypedResponseActivity({
               <LongMultiplicationStrategyWorkspace
                 topValue={questionData.visual.topValue}
                 bottomValue={questionData.visual.bottomValue}
+                carryValue={strategyLongInputs.carry}
                 onesRowValue={strategyLongInputs.onesRow}
                 tensRowValue={strategyLongInputs.tensRow}
                 totalValue={strategyLongInputs.total}
