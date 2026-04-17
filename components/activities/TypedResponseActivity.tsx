@@ -562,6 +562,157 @@ function BoxMethodWorkspace({
   );
 }
 
+type MultiplicationStrategy = "box_method" | "long_multiplication" | "split_sum";
+
+function getSplitSumParts(value: number) {
+  const tensPart = Math.floor(value / 10) * 10;
+  const onesPart = value % 10;
+  return { tensPart, onesPart };
+}
+
+function LongMultiplicationStrategyWorkspace({
+  topValue,
+  bottomValue,
+  onesRowValue,
+  tensRowValue,
+  totalValue,
+  onChange,
+}: {
+  topValue: number;
+  bottomValue: number;
+  onesRowValue: string;
+  tensRowValue: string;
+  totalValue: string;
+  onChange: (field: "onesRow" | "tensRow" | "total", value: string) => void;
+}) {
+  const width = Math.max(
+    String(topValue).length,
+    String(bottomValue).length,
+    String(topValue * bottomValue).length
+  );
+  const topDigits = digitCells(topValue, width);
+  const bottomDigits = digitCells(bottomValue, width);
+
+  return (
+    <div className="w-fit rounded-xl bg-white p-4 shadow-sm">
+      <div className="grid w-fit grid-flow-col gap-2">
+        <div className="w-8" />
+        {topDigits.map((digit, index) => (
+          <div key={`strategy-top-${index}`} className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100 text-2xl font-black text-slate-900">
+            {digit.trim()}
+          </div>
+        ))}
+      </div>
+      <div className="mt-2 grid w-fit grid-flow-col gap-2">
+        <div className="flex h-12 w-8 items-center justify-center text-3xl font-black text-slate-700">×</div>
+        {bottomDigits.map((digit, index) => (
+          <div key={`strategy-bottom-${index}`} className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100 text-2xl font-black text-slate-900">
+            {digit.trim()}
+          </div>
+        ))}
+      </div>
+      <div className="mt-3 h-1 w-full rounded bg-slate-300" />
+      <div className="mt-3 grid w-fit grid-flow-col gap-2">
+        <div className="w-8" />
+        <input
+          value={onesRowValue}
+          onChange={(event) => onChange("onesRow", event.target.value)}
+          inputMode="numeric"
+          className="h-12 rounded-lg border-2 border-dashed border-teal-200 bg-teal-50/50 px-3 text-right text-xl font-black text-slate-900 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+          style={{ width: `${width * 48 + Math.max(0, width - 1) * 8}px` }}
+        />
+      </div>
+      <div className="mt-2 grid w-fit grid-flow-col gap-2">
+        <div className="w-8" />
+        <input
+          value={tensRowValue}
+          onChange={(event) => onChange("tensRow", event.target.value)}
+          inputMode="numeric"
+          className="h-12 rounded-lg border-2 border-dashed border-teal-200 bg-teal-50/50 px-3 text-right text-xl font-black text-slate-900 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+          style={{ width: `${(width + 1) * 48 + Math.max(0, width) * 8}px` }}
+        />
+      </div>
+      <div className="mt-3 h-1 w-full rounded bg-slate-300" />
+      <div className="mt-3 grid w-fit grid-flow-col gap-2">
+        <div className="w-8" />
+        <input
+          value={totalValue}
+          onChange={(event) => onChange("total", event.target.value)}
+          inputMode="numeric"
+          className="h-12 rounded-lg border-2 border-dashed border-amber-200 bg-amber-50/50 px-3 text-right text-xl font-black text-slate-900 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
+          style={{ width: `${(width + 1) * 48 + Math.max(0, width) * 8}px` }}
+        />
+      </div>
+      <div className="mt-3 text-xs font-medium text-slate-500">
+        Complete both partial-product rows, then add them for the total.
+      </div>
+    </div>
+  );
+}
+
+function SplitSumWorkspace({
+  topValue,
+  bottomValue,
+  tensProductValue,
+  onesProductValue,
+  totalValue,
+  onChange,
+}: {
+  topValue: number;
+  bottomValue: number;
+  tensProductValue: string;
+  onesProductValue: string;
+  totalValue: string;
+  onChange: (field: "tensProduct" | "onesProduct" | "total", value: string) => void;
+}) {
+  const { tensPart, onesPart } = getSplitSumParts(bottomValue);
+
+  return (
+    <div className="rounded-xl bg-white p-4 shadow-sm">
+      <div className="space-y-3">
+        <div className="flex items-center gap-3">
+          <div className="min-w-[110px] text-lg font-black text-slate-900">
+            {formatWholeNumber(topValue)} × {formatWholeNumber(tensPart)}
+          </div>
+          <span className="text-lg font-black text-slate-500">=</span>
+          <input
+            value={tensProductValue}
+            onChange={(event) => onChange("tensProduct", event.target.value)}
+            inputMode="numeric"
+            className="h-12 min-w-[170px] rounded-lg border-2 border-dashed border-teal-200 bg-teal-50/50 px-3 text-right text-xl font-black text-slate-900 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+          />
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="min-w-[110px] text-lg font-black text-slate-900">
+            {formatWholeNumber(topValue)} × {formatWholeNumber(onesPart)}
+          </div>
+          <span className="text-lg font-black text-slate-500">=</span>
+          <input
+            value={onesProductValue}
+            onChange={(event) => onChange("onesProduct", event.target.value)}
+            inputMode="numeric"
+            className="h-12 min-w-[170px] rounded-lg border-2 border-dashed border-teal-200 bg-teal-50/50 px-3 text-right text-xl font-black text-slate-900 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+          />
+        </div>
+        <div className="h-1 w-full rounded bg-slate-300" />
+        <div className="flex items-center gap-3">
+          <div className="min-w-[110px] text-lg font-black text-slate-900">Total</div>
+          <span className="text-lg font-black text-slate-500">=</span>
+          <input
+            value={totalValue}
+            onChange={(event) => onChange("total", event.target.value)}
+            inputMode="numeric"
+            className="h-12 min-w-[170px] rounded-lg border-2 border-dashed border-amber-200 bg-amber-50/50 px-3 text-right text-xl font-black text-slate-900 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
+          />
+        </div>
+      </div>
+      <div className="mt-3 text-xs font-medium text-slate-500">
+        Split the second factor into tens and ones, find each product, then add the total.
+      </div>
+    </div>
+  );
+}
+
 export default function TypedResponseActivity({
   questionData,
   onCorrect,
@@ -577,6 +728,7 @@ export default function TypedResponseActivity({
   const isGuidedAddition = writtenMethod?.operation === "+";
   const isGuidedSubtraction = writtenMethod?.operation === "-";
   const isColumnMultiplication = writtenMethod?.operation === "×";
+  const isStrategyMultiplication = questionData.visual?.type === "multiplication_strategy";
   const isGuidedWrittenMethod = isGuidedAddition || isGuidedSubtraction;
   const orderingAnswerParts = !writtenMethod ? extractOrderingNumbers(questionData.answer) : [];
   const expectedStructuredFraction = !writtenMethod ? parseStructuredFraction(questionData.answer) : null;
@@ -615,6 +767,19 @@ export default function TypedResponseActivity({
   const [boxMethodInputs, setBoxMethodInputs] = useState<string[]>([]);
   const [boxMethodTotal, setBoxMethodTotal] = useState("");
   const [boxMethodFeedback, setBoxMethodFeedback] = useState("");
+  const [selectedStrategy, setSelectedStrategy] = useState<MultiplicationStrategy | null>(null);
+  const [strategyLocked, setStrategyLocked] = useState(false);
+  const [strategyFeedback, setStrategyFeedback] = useState("");
+  const [strategyLongInputs, setStrategyLongInputs] = useState({
+    onesRow: "",
+    tensRow: "",
+    total: "",
+  });
+  const [strategySplitInputs, setStrategySplitInputs] = useState({
+    tensProduct: "",
+    onesProduct: "",
+    total: "",
+  });
   const [orderedInputs, setOrderedInputs] = useState<string[]>(
     isOrderingResponse ? Array.from({ length: orderingAnswerParts.length }, () => "") : []
   );
@@ -685,11 +850,29 @@ export default function TypedResponseActivity({
       setBoxMethodInputs(Array.from({ length: cells.length }, () => ""));
       setBoxMethodTotal("");
       setBoxMethodFeedback("");
+    } else if (questionData.visual?.type === "multiplication_strategy") {
+      const { cells } = getBoxMethodCells(questionData.visual.topValue, questionData.visual.bottomValue);
+      setBoxMethodInputs(Array.from({ length: cells.length }, () => ""));
+      setBoxMethodTotal("");
+      setBoxMethodFeedback("");
     } else {
       setBoxMethodInputs([]);
       setBoxMethodTotal("");
       setBoxMethodFeedback("");
     }
+    setSelectedStrategy(null);
+    setStrategyLocked(false);
+    setStrategyFeedback("");
+    setStrategyLongInputs({
+      onesRow: "",
+      tensRow: "",
+      total: "",
+    });
+    setStrategySplitInputs({
+      tensProduct: "",
+      onesProduct: "",
+      total: "",
+    });
     setOrderedInputs(
       isOrderingResponse ? Array.from({ length: orderingAnswerParts.length }, () => "") : []
     );
@@ -906,7 +1089,91 @@ export default function TypedResponseActivity({
     setGuidedPhase("decide");
   }
 
+  function handleStrategySelect(strategy: MultiplicationStrategy) {
+    if (strategyLocked && selectedStrategy !== strategy) return;
+    setSelectedStrategy(strategy);
+    setStrategyFeedback("");
+  }
+
+  function lockStrategyIfNeeded(value: string) {
+    if (value.trim()) {
+      setStrategyLocked(true);
+    }
+  }
+
+  function strategyIsComplete() {
+    if (!isStrategyMultiplication || !selectedStrategy) return false;
+    if (selectedStrategy === "box_method") {
+      return boxMethodInputs.length > 0 && boxMethodInputs.every((value) => value.trim()) && boxMethodTotal.trim().length > 0;
+    }
+    if (selectedStrategy === "long_multiplication") {
+      return Object.values(strategyLongInputs).every((value) => value.trim().length > 0);
+    }
+    return Object.values(strategySplitInputs).every((value) => value.trim().length > 0);
+  }
+
   function check() {
+    if (isStrategyMultiplication && questionData.visual?.type === "multiplication_strategy") {
+      if (!selectedStrategy) {
+        setStrategyFeedback("Choose one method before you start solving.");
+        onWrong?.();
+        return;
+      }
+
+      const finalAnswer = normalizeNumberInput(questionData.answer);
+
+      if (selectedStrategy === "box_method") {
+        const expected = getBoxMethodCells(questionData.visual.topValue, questionData.visual.bottomValue);
+        const boxesMatch = expected.cells.every(
+          (value, index) => normalizeNumberInput(boxMethodInputs[index] ?? "") === String(value)
+        );
+        const totalMatches = normalizeNumberInput(boxMethodTotal) === finalAnswer;
+
+        if (boxesMatch && totalMatches) {
+          setStrategyFeedback("");
+          onCorrect?.();
+        } else {
+          setStrategyFeedback("Check each box value and make sure the total matches the full product.");
+          onWrong?.();
+        }
+        return;
+      }
+
+      if (selectedStrategy === "long_multiplication") {
+        const { bottomValue, topValue } = questionData.visual;
+        const { tensPart, onesPart } = getSplitSumParts(bottomValue);
+        const onesRowExpected = topValue * onesPart;
+        const tensRowExpected = topValue * tensPart;
+        const onesRowMatches = normalizeNumberInput(strategyLongInputs.onesRow) === String(onesRowExpected);
+        const tensRowMatches = normalizeNumberInput(strategyLongInputs.tensRow) === String(tensRowExpected);
+        const totalMatches = normalizeNumberInput(strategyLongInputs.total) === finalAnswer;
+
+        if (onesRowMatches && tensRowMatches && totalMatches) {
+          setStrategyFeedback("");
+          onCorrect?.();
+        } else {
+          setStrategyFeedback("Check both partial-product rows and then add them carefully for the final answer.");
+          onWrong?.();
+        }
+        return;
+      }
+
+      const { bottomValue, topValue } = questionData.visual;
+      const { tensPart, onesPart } = getSplitSumParts(bottomValue);
+      const tensMatches = normalizeNumberInput(strategySplitInputs.tensProduct) === String(topValue * tensPart);
+      const onesMatches = normalizeNumberInput(strategySplitInputs.onesProduct) === String(topValue * onesPart);
+      const totalMatches = normalizeNumberInput(strategySplitInputs.total) === finalAnswer;
+
+      if (tensMatches && onesMatches && totalMatches) {
+        setStrategyFeedback("");
+        onCorrect?.();
+      } else {
+        setStrategyFeedback("Check the tens product, the ones product, and then the total.");
+        onWrong?.();
+      }
+      return;
+    }
+
     if (questionData.visual?.type === "column_multiplication") {
       const expected = getColumnMultiplicationRows(
         questionData.visual.topValue,
@@ -1058,11 +1325,14 @@ export default function TypedResponseActivity({
 
   const activityTitle =
     writtenMethod?.title ??
+    (questionData.visual?.type === "multiplication_strategy"
+      ? "Choose a Method"
+      : 
     (questionData.visual?.type === "box_method"
       ? "Box Method"
       : questionData.visual?.type === "column_multiplication"
       ? "Column Multiplication"
-      : "Typed Response");
+      : "Typed Response"));
   const columnMultiplicationButtonLabel = getColumnMultiplicationButtonLabel(multiplicationStep);
 
   return (
@@ -1097,6 +1367,115 @@ export default function TypedResponseActivity({
       ) : null}
       {questionData.visual?.type === "rule_box" ? (
         <RuleBoxVisual visual={questionData.visual} title="Step-by-step rule" />
+      ) : null}
+      {questionData.visual?.type === "multiplication_strategy" ? (
+        <div className="mt-4 space-y-4">
+          <div className="rounded-2xl border border-teal-100 bg-teal-50 p-5">
+            <div className="text-sm font-bold uppercase tracking-[0.18em] text-teal-700">
+              Which method would you use?
+            </div>
+            <div className="mt-3 flex flex-wrap gap-3">
+              {([
+                ["box_method", "Box Method"],
+                ["long_multiplication", "Long Multiplication"],
+                ["split_sum", "Split the Sum"],
+              ] as Array<[MultiplicationStrategy, string]>).map(([strategy, label]) => {
+                const active = selectedStrategy === strategy;
+                const disabled = strategyLocked && !active;
+                return (
+                  <button
+                    key={strategy}
+                    type="button"
+                    onClick={() => handleStrategySelect(strategy)}
+                    disabled={disabled}
+                    className={[
+                      "rounded-xl px-4 py-3 font-black transition",
+                      active
+                        ? "bg-teal-600 text-white"
+                        : "border border-slate-300 bg-white text-slate-900 hover:bg-slate-50",
+                      disabled ? "cursor-not-allowed opacity-45" : "",
+                    ].join(" ")}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="mt-3 text-sm text-slate-600">
+              Choose one method first. Once you start solving, that method stays locked for this question.
+            </p>
+          </div>
+
+          {selectedStrategy === "box_method" ? (
+            <div className="rounded-2xl border border-teal-100 bg-teal-50 p-5">
+              <BoxMethodWorkspace
+                leftValue={questionData.visual.topValue}
+                topValue={questionData.visual.bottomValue}
+                boxValues={boxMethodInputs}
+                totalValue={boxMethodTotal}
+                onChange={(field, value, index) => {
+                  const cleaned = value.replace(/[^\d,\s]/g, "");
+                  lockStrategyIfNeeded(cleaned);
+                  if (field === "box" && typeof index === "number") {
+                    setBoxMethodInputs((current) =>
+                      current.map((cell, cellIndex) => (cellIndex === index ? cleaned : cell))
+                    );
+                    return;
+                  }
+                  setBoxMethodTotal(cleaned);
+                }}
+              />
+            </div>
+          ) : null}
+
+          {selectedStrategy === "long_multiplication" ? (
+            <div className="rounded-2xl border border-teal-100 bg-teal-50 p-5">
+              <LongMultiplicationStrategyWorkspace
+                topValue={questionData.visual.topValue}
+                bottomValue={questionData.visual.bottomValue}
+                onesRowValue={strategyLongInputs.onesRow}
+                tensRowValue={strategyLongInputs.tensRow}
+                totalValue={strategyLongInputs.total}
+                onChange={(field, value) => {
+                  const cleaned = value.replace(/[^\d,\s]/g, "");
+                  lockStrategyIfNeeded(cleaned);
+                  setStrategyLongInputs((current) => ({ ...current, [field]: cleaned }));
+                }}
+              />
+            </div>
+          ) : null}
+
+          {selectedStrategy === "split_sum" ? (
+            <div className="rounded-2xl border border-teal-100 bg-teal-50 p-5">
+              <SplitSumWorkspace
+                topValue={questionData.visual.topValue}
+                bottomValue={questionData.visual.bottomValue}
+                tensProductValue={strategySplitInputs.tensProduct}
+                onesProductValue={strategySplitInputs.onesProduct}
+                totalValue={strategySplitInputs.total}
+                onChange={(field, value) => {
+                  const cleaned = value.replace(/[^\d,\s]/g, "");
+                  lockStrategyIfNeeded(cleaned);
+                  setStrategySplitInputs((current) => ({ ...current, [field]: cleaned }));
+                }}
+              />
+            </div>
+          ) : null}
+
+          {strategyFeedback ? (
+            <p className="text-sm font-bold text-rose-600">{strategyFeedback}</p>
+          ) : null}
+
+          {strategyIsComplete() ? (
+            <button
+              type="button"
+              onClick={check}
+              className="rounded-xl bg-teal-600 px-5 py-3 font-black text-white hover:bg-teal-700"
+            >
+              Check answer
+            </button>
+          ) : null}
+        </div>
       ) : null}
       {questionData.visual?.type === "column_multiplication" ? (
         <div className="mt-4 space-y-4">
@@ -1506,7 +1885,7 @@ export default function TypedResponseActivity({
                 </div>
               </div>
             </div>
-          ) : questionData.visual?.type === "box_method" || isColumnMultiplication ? null : (
+          ) : questionData.visual?.type === "box_method" || isColumnMultiplication || isStrategyMultiplication ? null : (
             <input
               value={typed}
               onChange={(event) => setTyped(event.target.value)}
@@ -1518,7 +1897,7 @@ export default function TypedResponseActivity({
               className="w-full max-w-md rounded-xl border border-gray-300 px-4 py-3 text-lg font-bold text-gray-900 outline-none focus:border-teal-500"
             />
           )}
-          {isColumnMultiplication ? null : (
+          {isColumnMultiplication || isStrategyMultiplication ? null : (
             <button
               type="button"
               onClick={check}

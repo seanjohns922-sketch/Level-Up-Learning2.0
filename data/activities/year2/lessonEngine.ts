@@ -101,6 +101,13 @@ export type BoxMethodVisualData = {
   showWorkedExample?: boolean;
 };
 
+export type MultiplicationStrategyVisualData = {
+  type: "multiplication_strategy";
+  topValue: number;
+  bottomValue: number;
+  showWorkedExample?: boolean;
+};
+
 export type RuleBoxVisualData = {
   type: "rule_box";
   title: string;
@@ -751,6 +758,7 @@ export type TypedResponseQuestion = {
     | DecimalVisualData
     | ColumnMultiplicationVisualData
     | BoxMethodVisualData
+    | MultiplicationStrategyVisualData
     | MoneyVisualData
     | RuleBoxVisualData;
 };
@@ -7883,6 +7891,30 @@ function generateGenericQuestion(
       writtenMethod: buildWrittenMethodLayout("Multiplication", "×", picked[0], picked[1], answer),
       visual: {
         type: "column_multiplication",
+        topValue: picked[0],
+        bottomValue: picked[1],
+        showWorkedExample: true,
+      },
+    };
+  }
+
+  if (explicitMode === "multiplication_strategy_apply") {
+    const variants = [
+      [45, 65],
+      [48, 26],
+      [32, 25],
+      [34, 18],
+    ] as const;
+    const picked = variants[randInt(0, variants.length - 1)] ?? variants[0];
+    const answer = picked[0] * picked[1];
+    return {
+      kind: "typed_response",
+      prompt: `${formatMathNumber(picked[0])} × ${formatMathNumber(picked[1])}`,
+      answer: formatMathNumber(answer),
+      helper: "Choose one method, complete the working, and check that all parts lead to the same final answer.",
+      placeholder: "Type the answer",
+      visual: {
+        type: "multiplication_strategy",
         topValue: picked[0],
         bottomValue: picked[1],
         showWorkedExample: true,
