@@ -221,33 +221,33 @@ export default function LevelsPage() {
           </div>
         </div>
 
-        {/* Right column — level menu panel */}
-        <div className="md:w-[62%] flex flex-col justify-center">
-          <div className="relative w-full max-w-sm ml-auto mr-auto md:mr-8">
+        {/* Right column — slim fantasy menu */}
+        <div className="md:w-[62%] flex flex-col justify-end md:justify-center md:items-end">
+          <div className="relative w-full max-w-[280px] md:mr-4 lg:mr-10 md:mt-24">
             <div
-              className="absolute inset-0 -m-6 pointer-events-none"
+              className="absolute inset-0 -m-5 pointer-events-none"
               style={{
-                background: "radial-gradient(circle at center, rgba(120,160,255,0.18), transparent 70%)",
+                background: "radial-gradient(circle at center, rgba(180,140,80,0.10), transparent 75%)",
               }}
             />
             <div
-              className="relative rounded-[20px] p-6"
+              className="relative rounded-[18px] p-4"
               style={{
-                background: "rgba(0,0,0,0.32)",
-                backdropFilter: "blur(18px)",
-                WebkitBackdropFilter: "blur(18px)",
-                border: "1px solid rgba(255,255,255,0.12)",
-                boxShadow: "0 20px 50px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08)",
+                background: "linear-gradient(180deg, rgba(20,18,22,0.42), rgba(15,13,18,0.55))",
+                backdropFilter: "blur(10px) saturate(120%)",
+                WebkitBackdropFilter: "blur(10px) saturate(120%)",
+                border: "1px solid rgba(200,170,110,0.18)",
+                boxShadow: "0 18px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,220,160,0.06)",
               }}
             >
               <h2
-                className="text-white text-xl font-bold tracking-wide mb-4"
-                style={{ fontFamily: "'Quicksand', 'Nunito', sans-serif", textShadow: "0 2px 8px rgba(0,0,0,0.4)" }}
+                className="text-white/90 text-[11px] font-bold tracking-[0.22em] uppercase mb-3 px-1"
+                style={{ fontFamily: "'Quicksand', 'Nunito', sans-serif" }}
               >
                 Choose Level
               </h2>
 
-              <div className="flex flex-col gap-2.5">
+              <div className="flex flex-col gap-1.5">
                 {levels.map((level) => {
                   const isSelected = selectedYear === level.id;
                   const isUnlocked = DEMO_MODE || !hasAssignedProgram || level.id === unlockedYear;
@@ -261,90 +261,98 @@ export default function LevelsPage() {
                       }}
                       className={[
                         "relative w-full text-left flex items-center justify-between",
-                        !isUnlocked ? "opacity-50 cursor-not-allowed" : "cursor-pointer",
+                        !isUnlocked ? "opacity-45 cursor-not-allowed" : "cursor-pointer",
                       ].join(" ")}
                       style={{
-                        borderRadius: "12px",
-                        padding: "14px 18px",
-                        height: "52px",
+                        borderRadius: "10px",
+                        padding: "10px 14px",
+                        height: "42px",
                         transition: "all 0.18s ease",
-                        border: isSelected
-                          ? "1px solid rgba(120,160,255,0.6)"
-                          : "1px solid rgba(255,255,255,0.12)",
                         ...(isSelected
                           ? {
-                              background: "linear-gradient(135deg, #5E8BFF, #4F7DF3)",
-                              boxShadow: "0 0 0 1px rgba(120,160,255,0.4), 0 8px 24px rgba(80,120,255,0.45)",
+                              background: "linear-gradient(180deg, #2a2620, #1a1714)",
+                              border: "1px solid rgba(212,175,110,0.55)",
+                              boxShadow:
+                                "0 0 0 1px rgba(212,175,110,0.18), inset 0 1px 0 rgba(255,220,160,0.08), 0 6px 18px rgba(0,0,0,0.35)",
                             }
                           : {
-                              background: "rgba(255,255,255,0.08)",
-                              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)",
+                              background: "rgba(255,255,255,0.04)",
+                              border: "1px solid rgba(255,255,255,0.08)",
+                              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
                             }),
                       }}
                       onMouseEnter={(e) => {
                         if (!isUnlocked || isSelected) return;
-                        e.currentTarget.style.background = "rgba(255,255,255,0.14)";
-                        e.currentTarget.style.transform = "translateY(-1px)";
+                        e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                        e.currentTarget.style.borderColor = "rgba(212,175,110,0.25)";
                       }}
                       onMouseLeave={(e) => {
                         if (!isUnlocked || isSelected) return;
-                        e.currentTarget.style.background = "rgba(255,255,255,0.08)";
-                        e.currentTarget.style.transform = "translateY(0)";
+                        e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+                        e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
                       }}
                     >
                       <span
-                        className={`text-base font-semibold tracking-wide ${
-                          isSelected ? "text-white" : "text-white/90"
+                        className={`text-sm font-semibold tracking-wide ${
+                          isSelected ? "text-amber-50" : "text-white/75"
                         }`}
                       >
                         {level.label}
                       </span>
                       {!isUnlocked ? (
-                        <svg viewBox="0 0 24 24" className="h-4 w-4 text-white/50" fill="none" stroke="currentColor" strokeWidth="2">
+                        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-white/40" fill="none" stroke="currentColor" strokeWidth="2">
                           <rect x="4" y="11" width="16" height="9" rx="2" />
                           <path d="M8 11V7a4 4 0 018 0v4" />
                         </svg>
                       ) : isSelected ? (
-                        <span className="text-white/90 text-sm font-bold">✓</span>
+                        <span
+                          className="h-1.5 w-1.5 rounded-full"
+                          style={{ background: "#d4af6e", boxShadow: "0 0 6px rgba(212,175,110,0.7)" }}
+                        />
                       ) : null}
                     </button>
                   );
                 })}
               </div>
 
-              <div className="mt-5 pt-5 border-t border-white/10">
+              <div className="mt-4 pt-4 border-t border-white/10">
                 <button
                   onClick={primaryCta.onClick}
                   disabled={primaryCta.disabled}
                   className={[
-                    "w-full font-bold text-base",
-                    primaryCta.disabled ? "cursor-not-allowed" : "text-white cursor-pointer",
+                    "w-full font-bold text-sm tracking-wide",
+                    primaryCta.disabled ? "cursor-not-allowed" : "cursor-pointer",
                   ].join(" ")}
                   style={{
-                    borderRadius: "14px",
-                    padding: "18px",
+                    borderRadius: "12px",
+                    padding: "14px",
                     transition: "all 0.18s ease",
                     ...(primaryCta.disabled
                       ? {
-                          background: "rgba(255,255,255,0.08)",
-                          border: "1px solid rgba(255,255,255,0.1)",
-                          color: "rgba(255,255,255,0.4)",
+                          background: "rgba(255,255,255,0.05)",
+                          border: "1px solid rgba(255,255,255,0.08)",
+                          color: "rgba(255,255,255,0.35)",
                         }
                       : {
-                          background: "linear-gradient(135deg, #6E97FF, #4F7DF3)",
-                          border: "none",
-                          boxShadow: "0 10px 28px rgba(80,120,255,0.5), inset 0 1px 0 rgba(255,255,255,0.25)",
+                          background:
+                            "linear-gradient(180deg, #3a3128 0%, #241e18 100%)",
+                          border: "1px solid rgba(212,175,110,0.5)",
+                          color: "#f5e6c8",
+                          boxShadow:
+                            "0 10px 24px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,220,160,0.18), 0 0 0 1px rgba(212,175,110,0.15)",
                         }),
                   }}
                   onMouseEnter={(e) => {
                     if (primaryCta.disabled) return;
-                    e.currentTarget.style.transform = "translateY(-2px)";
-                    e.currentTarget.style.boxShadow = "0 14px 36px rgba(80,120,255,0.6), inset 0 1px 0 rgba(255,255,255,0.25)";
+                    e.currentTarget.style.transform = "translateY(-1px)";
+                    e.currentTarget.style.boxShadow =
+                      "0 14px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,220,160,0.25), 0 0 0 1px rgba(212,175,110,0.3)";
                   }}
                   onMouseLeave={(e) => {
                     if (primaryCta.disabled) return;
                     e.currentTarget.style.transform = "translateY(0)";
-                    e.currentTarget.style.boxShadow = "0 10px 28px rgba(80,120,255,0.5), inset 0 1px 0 rgba(255,255,255,0.25)";
+                    e.currentTarget.style.boxShadow =
+                      "0 10px 24px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,220,160,0.18), 0 0 0 1px rgba(212,175,110,0.15)";
                   }}
                 >
                   {primaryCta.label}
