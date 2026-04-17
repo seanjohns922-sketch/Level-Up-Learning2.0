@@ -25,7 +25,7 @@ export default function LevelsPage() {
 
   const levels = useMemo(
     () => [
-      { id: "Prep", label: "Prep", icon: "sprout" },
+      { id: "Prep", label: "Ground Level", icon: "sprout" },
       { id: "Year 1", label: "Level 1", icon: "numbers" },
       { id: "Year 2", label: "Level 2", icon: "tiles" },
       { id: "Year 3", label: "Level 3", icon: "bolt" },
@@ -222,8 +222,8 @@ export default function LevelsPage() {
         </div>
 
         {/* Right column — slim fantasy menu */}
-        <div className="md:w-[62%] flex flex-col justify-end md:justify-center md:items-end">
-          <div className="relative w-full max-w-[280px] md:mr-4 lg:mr-10 md:mt-24">
+        <div className="md:w-[62%] flex flex-col justify-start md:items-end">
+          <div className="relative w-full max-w-[280px] md:mr-4 lg:mr-10 mt-4 md:mt-[8vh] lg:mt-[10vh]">
             <div
               className="absolute inset-0 -m-5 pointer-events-none"
               style={{
