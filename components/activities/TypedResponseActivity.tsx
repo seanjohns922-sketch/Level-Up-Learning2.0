@@ -563,6 +563,7 @@ function BoxMethodWorkspace({
 }
 
 type MultiplicationStrategy = "box_method" | "long_multiplication" | "split_sum";
+type EstimateReasonableness = "yes" | "no";
 
 function getSplitSumParts(value: number) {
   const tensPart = Math.floor(value / 10) * 10;
@@ -758,6 +759,12 @@ export default function TypedResponseActivity({
   const isGuidedSubtraction = writtenMethod?.operation === "-";
   const isColumnMultiplication = writtenMethod?.operation === "×";
   const isStrategyMultiplication = questionData.visual?.type === "multiplication_strategy";
+  const isEstimateStrategyMultiplication = questionData.visual?.type === "multiplication_estimate_strategy";
+  const strategyVisual =
+    questionData.visual?.type === "multiplication_strategy" ||
+    questionData.visual?.type === "multiplication_estimate_strategy"
+      ? questionData.visual
+      : null;
   const isGuidedWrittenMethod = isGuidedAddition || isGuidedSubtraction;
   const orderingAnswerParts = !writtenMethod ? extractOrderingNumbers(questionData.answer) : [];
   const expectedStructuredFraction = !writtenMethod ? parseStructuredFraction(questionData.answer) : null;
@@ -799,6 +806,9 @@ export default function TypedResponseActivity({
   const [selectedStrategy, setSelectedStrategy] = useState<MultiplicationStrategy | null>(null);
   const [strategyLocked, setStrategyLocked] = useState(false);
   const [strategyFeedback, setStrategyFeedback] = useState("");
+  const [estimateInput, setEstimateInput] = useState("");
+  const [reasonablenessChoice, setReasonablenessChoice] = useState<EstimateReasonableness | null>(null);
+  const [reasonablenessExplanation, setReasonablenessExplanation] = useState("");
   const [strategyLongInputs, setStrategyLongInputs] = useState({
     carry: "",
     onesRow: "",
@@ -893,6 +903,9 @@ export default function TypedResponseActivity({
     setSelectedStrategy(null);
     setStrategyLocked(false);
     setStrategyFeedback("");
+    setEstimateInput("");
+    setReasonablenessChoice(null);
+    setReasonablenessExplanation("");
     setStrategyLongInputs({
       carry: "",
       onesRow: "",
@@ -1133,14 +1146,24 @@ export default function TypedResponseActivity({
   }
 
   function strategyIsComplete() {
-    if (!isStrategyMultiplication || !selectedStrategy) return false;
+    if (!(isStrategyMultiplication || isEstimateStrategyMultiplication) || !selectedStrategy) return false;
     if (selectedStrategy === "box_method") {
-      return boxMethodInputs.length > 0 && boxMethodInputs.every((value) => value.trim()) && boxMethodTotal.trim().length > 0;
+      const baseReady =
+        boxMethodInputs.length > 0 && boxMethodInputs.every((value) => value.trim()) && boxMethodTotal.trim().length > 0;
+      if (!baseReady) return false;
+      if (isEstimateStrategyMultiplication) {
+        return (
+          estimateInput.trim().length > 0 &&
+          reasonablenessChoice !== null &&
+          reasonablenessExplanation.trim().length > 0
+        );
+      }
+      return true;
     }
     if (selectedStrategy === "long_multiplication") {
-      if (questionData.visual?.type !== "multiplication_strategy") return false;
-      const { onesPart } = getSplitSumParts(questionData.visual.bottomValue);
-      const topDigits = String(questionData.visual.topValue).split("").map(Number);
+      if (!strategyVisual) return false;
+      const { onesPart } = getSplitSumParts(strategyVisual.bottomValue);
+      const topDigits = String(strategyVisual.topValue).split("").map(Number);
       const topOnes = topDigits[topDigits.length - 1] ?? 0;
       const expectedCarry = Math.floor((topOnes * onesPart) / 10);
       const coreComplete =
@@ -1148,13 +1171,31 @@ export default function TypedResponseActivity({
         strategyLongInputs.tensRow.trim().length > 0 &&
         strategyLongInputs.total.trim().length > 0;
       if (!coreComplete) return false;
-      return expectedCarry === 0 ? true : strategyLongInputs.carry.trim().length > 0;
+      const methodReady = expectedCarry === 0 ? true : strategyLongInputs.carry.trim().length > 0;
+      if (!methodReady) return false;
+      if (isEstimateStrategyMultiplication) {
+        return (
+          estimateInput.trim().length > 0 &&
+          reasonablenessChoice !== null &&
+          reasonablenessExplanation.trim().length > 0
+        );
+      }
+      return true;
     }
-    return Object.values(strategySplitInputs).every((value) => value.trim().length > 0);
+    const splitReady = Object.values(strategySplitInputs).every((value) => value.trim().length > 0);
+    if (!splitReady) return false;
+    if (isEstimateStrategyMultiplication) {
+      return (
+        estimateInput.trim().length > 0 &&
+        reasonablenessChoice !== null &&
+        reasonablenessExplanation.trim().length > 0
+      );
+    }
+    return true;
   }
 
   function check() {
-    if (isStrategyMultiplication && questionData.visual?.type === "multiplication_strategy") {
+    if ((isStrategyMultiplication || isEstimateStrategyMultiplication) && strategyVisual) {
       if (!selectedStrategy) {
         setStrategyFeedback("Choose one method before you start solving.");
         onWrong?.();
@@ -1162,26 +1203,33 @@ export default function TypedResponseActivity({
       }
 
       const finalAnswer = normalizeNumberInput(questionData.answer);
+      if (isEstimateStrategyMultiplication) {
+        const roundedTop = Math.round(strategyVisual.topValue / 10) * 10;
+        const roundedBottom = Math.round(strategyVisual.bottomValue / 10) * 10;
+        const expectedEstimate = String(roundedTop * roundedBottom);
+        if (normalizeNumberInput(estimateInput) !== expectedEstimate) {
+          setStrategyFeedback(`Estimate first by rounding to ${roundedTop} × ${roundedBottom}.`);
+          onWrong?.();
+          return;
+        }
+      }
 
       if (selectedStrategy === "box_method") {
-        const expected = getBoxMethodCells(questionData.visual.topValue, questionData.visual.bottomValue);
+        const expected = getBoxMethodCells(strategyVisual.topValue, strategyVisual.bottomValue);
         const boxesMatch = expected.cells.every(
           (value, index) => normalizeNumberInput(boxMethodInputs[index] ?? "") === String(value)
         );
         const totalMatches = normalizeNumberInput(boxMethodTotal) === finalAnswer;
 
-        if (boxesMatch && totalMatches) {
-          setStrategyFeedback("");
-          onCorrect?.();
-        } else {
+        if (!boxesMatch || !totalMatches) {
           setStrategyFeedback("Check each box value and make sure the total matches the full product.");
           onWrong?.();
+          return;
         }
-        return;
       }
 
       if (selectedStrategy === "long_multiplication") {
-        const { bottomValue, topValue } = questionData.visual;
+        const { bottomValue, topValue } = strategyVisual;
         const { tensPart, onesPart } = getSplitSumParts(bottomValue);
         const topDigits = String(topValue).split("").map(Number);
         const topOnes = topDigits[topDigits.length - 1] ?? 0;
@@ -1196,29 +1244,42 @@ export default function TypedResponseActivity({
         const tensRowMatches = normalizeNumberInput(strategyLongInputs.tensRow) === String(tensRowExpected);
         const totalMatches = normalizeNumberInput(strategyLongInputs.total) === finalAnswer;
 
-        if (carryMatches && onesRowMatches && tensRowMatches && totalMatches) {
-          setStrategyFeedback("");
-          onCorrect?.();
-        } else {
+        if (!(carryMatches && onesRowMatches && tensRowMatches && totalMatches)) {
           setStrategyFeedback("Check the carry, both partial-product rows, and then the final total.");
           onWrong?.();
+          return;
         }
-        return;
       }
 
-      const { bottomValue, topValue } = questionData.visual;
-      const { tensPart, onesPart } = getSplitSumParts(bottomValue);
-      const tensMatches = normalizeNumberInput(strategySplitInputs.tensProduct) === String(topValue * tensPart);
-      const onesMatches = normalizeNumberInput(strategySplitInputs.onesProduct) === String(topValue * onesPart);
-      const totalMatches = normalizeNumberInput(strategySplitInputs.total) === finalAnswer;
+      if (selectedStrategy === "split_sum") {
+        const { bottomValue, topValue } = strategyVisual;
+        const { tensPart, onesPart } = getSplitSumParts(bottomValue);
+        const tensMatches = normalizeNumberInput(strategySplitInputs.tensProduct) === String(topValue * tensPart);
+        const onesMatches = normalizeNumberInput(strategySplitInputs.onesProduct) === String(topValue * onesPart);
+        const totalMatches = normalizeNumberInput(strategySplitInputs.total) === finalAnswer;
 
-      if (tensMatches && onesMatches && totalMatches) {
-        setStrategyFeedback("");
-        onCorrect?.();
-      } else {
-        setStrategyFeedback("Check the tens product, the ones product, and then the total.");
-        onWrong?.();
+        if (!(tensMatches && onesMatches && totalMatches)) {
+          setStrategyFeedback("Check the tens product, the ones product, and then the total.");
+          onWrong?.();
+          return;
+        }
       }
+
+      if (isEstimateStrategyMultiplication) {
+        if (reasonablenessChoice !== "yes") {
+          setStrategyFeedback("After estimating and solving, this answer should be marked as reasonable.");
+          onWrong?.();
+          return;
+        }
+        if (reasonablenessExplanation.trim().length < 8) {
+          setStrategyFeedback("Explain why the answer is reasonable by linking it to your estimate.");
+          onWrong?.();
+          return;
+        }
+      }
+
+      setStrategyFeedback("");
+      onCorrect?.();
       return;
     }
 
@@ -1373,7 +1434,8 @@ export default function TypedResponseActivity({
 
   const activityTitle =
     writtenMethod?.title ??
-    (questionData.visual?.type === "multiplication_strategy"
+    ((questionData.visual?.type === "multiplication_strategy" ||
+      questionData.visual?.type === "multiplication_estimate_strategy")
       ? "Choose a Method"
       : 
     (questionData.visual?.type === "box_method"
@@ -1416,17 +1478,36 @@ export default function TypedResponseActivity({
       {questionData.visual?.type === "rule_box" ? (
         <RuleBoxVisual visual={questionData.visual} title="Step-by-step rule" />
       ) : null}
-      {questionData.visual?.type === "multiplication_strategy" ? (
+      {strategyVisual ? (
         <div className="mt-4 space-y-4">
+          {isEstimateStrategyMultiplication ? (
+            <div className="rounded-2xl border border-amber-100 bg-amber-50 p-5">
+              <div className="text-sm font-bold uppercase tracking-[0.18em] text-amber-700">
+                Step 1: Quick Estimate
+              </div>
+              <p className="mt-2 text-sm text-slate-700">
+                Round both numbers to the nearest 10 before you solve.
+              </p>
+              <div className="mt-3 flex items-center gap-3">
+                <input
+                  value={estimateInput}
+                  onChange={(event) => setEstimateInput(event.target.value.replace(/[^\d,\s]/g, ""))}
+                  inputMode="numeric"
+                  placeholder="Type the estimate"
+                  className="h-12 w-full max-w-xs rounded-xl border border-amber-300 bg-white px-4 text-lg font-black text-slate-900 outline-none focus:border-amber-500"
+                />
+              </div>
+            </div>
+          ) : null}
           <div className="rounded-2xl border border-teal-100 bg-teal-50 p-5">
             <div className="text-sm font-bold uppercase tracking-[0.18em] text-teal-700">
-              Which method would you use?
+              {isEstimateStrategyMultiplication ? "Step 2: Choose a Method" : "Which method would you use?"}
             </div>
             <div className="mt-3 flex flex-wrap gap-3">
               {([
                 ["box_method", "Box Method"],
                 ["long_multiplication", "Long Multiplication"],
-                ["split_sum", "Split the Sum"],
+                ...(isEstimateStrategyMultiplication ? [] : ([["split_sum", "Split the Sum"]] as Array<[MultiplicationStrategy, string]>)),
               ] as Array<[MultiplicationStrategy, string]>).map(([strategy, label]) => {
                 const active = selectedStrategy === strategy;
                 const disabled = strategyLocked && !active;
@@ -1457,8 +1538,8 @@ export default function TypedResponseActivity({
           {selectedStrategy === "box_method" ? (
             <div className="rounded-2xl border border-teal-100 bg-teal-50 p-5">
               <BoxMethodWorkspace
-                leftValue={questionData.visual.topValue}
-                topValue={questionData.visual.bottomValue}
+                leftValue={strategyVisual.topValue}
+                topValue={strategyVisual.bottomValue}
                 boxValues={boxMethodInputs}
                 totalValue={boxMethodTotal}
                 onChange={(field, value, index) => {
@@ -1479,8 +1560,8 @@ export default function TypedResponseActivity({
           {selectedStrategy === "long_multiplication" ? (
             <div className="rounded-2xl border border-teal-100 bg-teal-50 p-5">
               <LongMultiplicationStrategyWorkspace
-                topValue={questionData.visual.topValue}
-                bottomValue={questionData.visual.bottomValue}
+                topValue={strategyVisual.topValue}
+                bottomValue={strategyVisual.bottomValue}
                 carryValue={strategyLongInputs.carry}
                 onesRowValue={strategyLongInputs.onesRow}
                 tensRowValue={strategyLongInputs.tensRow}
@@ -1497,8 +1578,8 @@ export default function TypedResponseActivity({
           {selectedStrategy === "split_sum" ? (
             <div className="rounded-2xl border border-teal-100 bg-teal-50 p-5">
               <SplitSumWorkspace
-                topValue={questionData.visual.topValue}
-                bottomValue={questionData.visual.bottomValue}
+                topValue={strategyVisual.topValue}
+                bottomValue={strategyVisual.bottomValue}
                 tensProductValue={strategySplitInputs.tensProduct}
                 onesProductValue={strategySplitInputs.onesProduct}
                 totalValue={strategySplitInputs.total}
@@ -1507,6 +1588,41 @@ export default function TypedResponseActivity({
                   lockStrategyIfNeeded(cleaned);
                   setStrategySplitInputs((current) => ({ ...current, [field]: cleaned }));
                 }}
+              />
+            </div>
+          ) : null}
+
+          {isEstimateStrategyMultiplication ? (
+            <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
+              <div className="text-sm font-bold uppercase tracking-[0.18em] text-emerald-700">
+                Step 3: Check It Makes Sense
+              </div>
+              <p className="mt-2 text-sm text-slate-700">Is your answer reasonable?</p>
+              <div className="mt-3 flex flex-wrap gap-3">
+                {([
+                  ["yes", "Yes"],
+                  ["no", "No"],
+                ] as Array<[EstimateReasonableness, string]>).map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setReasonablenessChoice(value)}
+                    className={[
+                      "rounded-xl px-4 py-3 font-black transition",
+                      reasonablenessChoice === value
+                        ? "bg-emerald-600 text-white"
+                        : "border border-slate-300 bg-white text-slate-900 hover:bg-slate-50",
+                    ].join(" ")}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <textarea
+                value={reasonablenessExplanation}
+                onChange={(event) => setReasonablenessExplanation(event.target.value)}
+                placeholder="Explain why your answer is reasonable compared with your estimate."
+                className="mt-3 min-h-[110px] w-full rounded-xl border border-emerald-200 bg-white px-4 py-3 text-base font-medium text-slate-900 outline-none focus:border-emerald-500"
               />
             </div>
           ) : null}

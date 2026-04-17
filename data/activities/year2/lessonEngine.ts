@@ -108,6 +108,13 @@ export type MultiplicationStrategyVisualData = {
   showWorkedExample?: boolean;
 };
 
+export type MultiplicationEstimateStrategyVisualData = {
+  type: "multiplication_estimate_strategy";
+  topValue: number;
+  bottomValue: number;
+  showWorkedExample?: boolean;
+};
+
 export type RuleBoxVisualData = {
   type: "rule_box";
   title: string;
@@ -759,6 +766,7 @@ export type TypedResponseQuestion = {
     | ColumnMultiplicationVisualData
     | BoxMethodVisualData
     | MultiplicationStrategyVisualData
+    | MultiplicationEstimateStrategyVisualData
     | MoneyVisualData
     | RuleBoxVisualData;
 };
@@ -7497,6 +7505,78 @@ function generateGenericQuestion(
         };
   }
 
+  if (explicitMode === "multiplication_quick_estimate") {
+    const variants = [
+      { a: 48, b: 21 },
+      { a: 63, b: 47 },
+      { a: 72, b: 39 },
+      { a: 84, b: 26 },
+      { a: 57, b: 32 },
+    ] as const;
+    const picked = variants[randInt(0, variants.length - 1)] ?? variants[0];
+    const roundedA = Math.round(picked.a / 10) * 10;
+    const roundedB = Math.round(picked.b / 10) * 10;
+    const estimate = roundedA * roundedB;
+    const options = uniqueStringOptions(String(estimate), [
+      String(Math.max(100, estimate - 200)),
+      String(estimate + 200),
+      String(Math.max(100, estimate - 400)),
+    ]);
+    return {
+      kind: "multiple_choice",
+      prompt: `Which is the best estimate for ${picked.a} × ${picked.b}?`,
+      options: shuffle(options),
+      answer: String(estimate),
+      helper: `Round ${picked.a} to ${roundedA} and ${picked.b} to ${roundedB}, then multiply.`,
+    };
+  }
+
+  if (explicitMode === "multiplication_reasoning_check") {
+    const variants = [
+      {
+        a: 48,
+        b: 21,
+        shown: 808,
+        answer: "No, it is too small",
+        helper: "48 × 21 is about 50 × 20 = 1,000, so 808 is too small.",
+      },
+      {
+        a: 63,
+        b: 47,
+        shown: 2961,
+        answer: "Yes, it is close to the estimate",
+        helper: "63 × 47 is about 60 × 50 = 3,000, so 2,961 is reasonable.",
+      },
+      {
+        a: 57,
+        b: 32,
+        shown: 3824,
+        answer: "No, it is too large",
+        helper: "57 × 32 is about 60 × 30 = 1,800, so 3,824 is too large.",
+      },
+      {
+        a: 84,
+        b: 26,
+        shown: 2184,
+        answer: "Yes, it is close to the estimate",
+        helper: "84 × 26 is about 80 × 30 = 2,400, so 2,184 still makes sense.",
+      },
+    ] as const;
+    const picked = variants[randInt(0, variants.length - 1)] ?? variants[0];
+    return {
+      kind: "multiple_choice",
+      prompt: `${picked.a} × ${picked.b} = ${formatMathNumber(picked.shown)}. Does this answer make sense?`,
+      options: shuffle([
+        "Yes, it is close to the estimate",
+        "No, it is too small",
+        "No, it is too large",
+        "Yes, because multiplication answers can be any size",
+      ]),
+      answer: picked.answer,
+      helper: picked.helper,
+    };
+  }
+
   if (explicitMode === "multiplication_1digit_fast") {
     const templates: Array<{
       prompt: string;
@@ -7915,6 +7995,30 @@ function generateGenericQuestion(
       placeholder: "Type the answer",
       visual: {
         type: "multiplication_strategy",
+        topValue: picked[0],
+        bottomValue: picked[1],
+        showWorkedExample: true,
+      },
+    };
+  }
+
+  if (explicitMode === "multiplication_estimate_apply") {
+    const variants = [
+      [63, 47],
+      [48, 26],
+      [72, 34],
+      [54, 38],
+    ] as const;
+    const picked = variants[randInt(0, variants.length - 1)] ?? variants[0];
+    const answer = picked[0] * picked[1];
+    return {
+      kind: "typed_response",
+      prompt: `${formatMathNumber(picked[0])} × ${formatMathNumber(picked[1])}`,
+      answer: formatMathNumber(answer),
+      helper: "Estimate first by rounding to the nearest 10, then solve and explain why your answer is reasonable.",
+      placeholder: "Type the answer",
+      visual: {
+        type: "multiplication_estimate_strategy",
         topValue: picked[0],
         bottomValue: picked[1],
         showWorkedExample: true,

@@ -192,14 +192,15 @@ const year5Rows: ProgramRow[] = [
   },
   {
     week: 5,
-    focus: "Estimate and check multiplication answers",
+    focus: "Estimate, calculate, and justify multiplication answers",
     lesson: 3,
-    topic: "Estimation & Check",
-    activity: "Estimate first and decide whether multiplication answers are reasonable.",
+    topic: "Check It Makes Sense",
+    activity: "Estimate first, compare answers to the estimate, and justify whether multiplication answers are reasonable.",
     curriculum: ["AC9M5N06", "AC9M5N08"],
     activities: [
-      makeActivity("multiple_choice", 2, { mode: "multiplication_estimation_check" }),
-      makeActivity("typed_response", 1, { mode: "multiplication_estimation_check" }),
+      makeActivity("multiple_choice", 1, { mode: "multiplication_quick_estimate" }),
+      makeActivity("multiple_choice", 1, { mode: "multiplication_reasoning_check" }),
+      makeActivity("typed_response", 1, { mode: "multiplication_estimate_apply" }),
     ],
   },
   {
