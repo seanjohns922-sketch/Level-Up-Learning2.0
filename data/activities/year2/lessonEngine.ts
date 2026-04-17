@@ -8615,7 +8615,7 @@ function generateGenericQuestion(
       helper: usePractical
         ? "This asks for the most practical real-world solution, not the strict maths interpretation."
         : "Choose the answer that matches the mathematical interpretation of the situation.",
-      visual: chosen.visual,
+      visual: "visual" in chosen ? chosen.visual : undefined,
     };
   }
 
