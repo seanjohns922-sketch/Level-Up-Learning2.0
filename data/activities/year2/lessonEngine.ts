@@ -8275,14 +8275,14 @@ function generateGenericQuestion(
   }
 
   if (explicitMode === "interpreting_remainders_reasoning") {
-    const templates = [
+    const standardTemplates = [
       {
-        prompt: "26 students need buses. Each bus holds 4. What should we do with the remainder?",
-        answer: "Round up to 7 buses",
-        options: ["6 buses", "6 r2 buses", "Round up to 7 buses", "Ignore the remainder and keep 6"],
+        prompt: "How many buses are needed for 26 students if each bus holds 4?",
+        answer: "7 buses",
+        options: ["6 buses", "6 r2 buses", "7 buses", "5 buses"],
       },
       {
-        prompt: "26 apples are packed into bags of 4. What should we do with the remainder?",
+        prompt: "How many bags are filled and how many apples are left over when 26 apples are packed into bags of 4?",
         answer: "6 bags, 2 left over",
         options: ["6 bags", "7 bags", "6 bags, 2 left over", "Ignore the 2 left over"],
       },
@@ -8292,41 +8292,58 @@ function generateGenericQuestion(
         options: ["6 each", "6 r2 each", "7 each", "6 each and 2 left in the answer"],
       },
       {
-        prompt: "34 players are put into teams of 5. What should we do with the remainder?",
-        answer: "Round up to 7 teams",
-        options: ["6 teams", "6 r4 teams", "Round up to 7 teams", "Keep 4 as an extra team"],
+        prompt: "How many teams are needed if 34 players are put into teams of 5?",
+        answer: "7 teams",
+        options: ["6 teams", "6 r4 teams", "7 teams", "5 teams"],
       },
       {
-        prompt: "34 cupcakes are packed into boxes of 5. What should we do with the remainder?",
+        prompt: "How many boxes are filled and how many cupcakes are left over when 34 cupcakes are packed into boxes of 5?",
         answer: "6 boxes, 4 left over",
         options: ["6 boxes", "7 boxes", "6 boxes, 4 left over", "Ignore the 4 left over"],
       },
     ] as const;
-    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    const practicalTemplates = [
+      {
+        prompt: "34 players are put into teams of 5. What is the most practical solution for a real game?",
+        answer: "6 teams and 4 players sit out and rotate",
+        options: [
+          "6 teams and 4 players sit out and rotate",
+          "7 full teams",
+          "6 teams only",
+          "5 teams",
+        ],
+      },
+    ] as const;
+    const usePractical = randInt(0, 4) === 0;
+    const chosen = usePractical
+      ? (practicalTemplates[randInt(0, practicalTemplates.length - 1)] ?? practicalTemplates[0]!)
+      : (standardTemplates[randInt(0, standardTemplates.length - 1)] ?? standardTemplates[0]!);
     return {
       kind: "multiple_choice",
       prompt: chosen.prompt,
       options: shuffle([...chosen.options]),
       answer: chosen.answer,
-      helper: "Use the context to decide whether to keep the remainder, round up, or ignore it.",
+      helper: usePractical
+        ? "Read the wording carefully. A practical solution can be different from the strict maths answer."
+        : "Use the question wording to decide the correct mathematical answer.",
     };
   }
 
   if (explicitMode === "interpreting_remainders_apply") {
-    const templates = [
+    const standardTemplates = [
       {
-        prompt: "34 people are put into groups of 5. What should we do with the remainder?",
-        answer: "Round up to 7 groups",
+        prompt: "How many groups are needed if 34 people are put into groups of 5?",
+        answer: "7 groups",
         options: [
           "6 groups, 4 left over",
-          "Round up to 7 groups",
+          "7 groups",
           "Ignore the remainder and keep 6 groups",
-          "7 groups exactly",
+          "6 groups",
         ],
         visual: { type: "array" as const, rows: 6, columns: 5 },
       },
       {
-        prompt: "34 apples are packed into bags of 5. What should we do with the remainder?",
+        prompt: "How many bags are filled and how many apples are left over when 34 apples are packed into bags of 5?",
         answer: "6 bags, 4 left over",
         options: [
           "6 bags",
@@ -8337,7 +8354,7 @@ function generateGenericQuestion(
         visual: { type: "array" as const, rows: 6, columns: 5 },
       },
       {
-        prompt: "34 lollies are shared equally between 5 children. What should we do with the remainder?",
+        prompt: "How many lollies does each child get when 34 lollies are shared equally between 5 children?",
         answer: "6 each",
         options: [
           "6 each",
@@ -8348,13 +8365,31 @@ function generateGenericQuestion(
         visual: { type: "array" as const, rows: 5, columns: 6 },
       },
     ] as const;
-    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    const practicalTemplates = [
+      {
+        prompt: "34 players are put into teams of 5. What is the most practical solution for a real game?",
+        answer: "6 teams and 4 players sit out and rotate",
+        options: [
+          "6 teams and 4 players sit out and rotate",
+          "7 full teams",
+          "6 teams only",
+          "5 teams",
+        ],
+        visual: { type: "array" as const, rows: 6, columns: 5 },
+      },
+    ] as const;
+    const usePractical = randInt(0, 4) === 0;
+    const chosen = usePractical
+      ? (practicalTemplates[randInt(0, practicalTemplates.length - 1)] ?? practicalTemplates[0]!)
+      : (standardTemplates[randInt(0, standardTemplates.length - 1)] ?? standardTemplates[0]!);
     return {
       kind: "multiple_choice",
       prompt: chosen.prompt,
       options: shuffle([...chosen.options]),
       answer: chosen.answer,
-      helper: "Choose the answer that makes sense in the situation.",
+      helper: usePractical
+        ? "This asks for the most practical real-world solution, not the strict maths interpretation."
+        : "Choose the answer that matches the mathematical interpretation of the situation.",
       visual: chosen.visual,
     };
   }
