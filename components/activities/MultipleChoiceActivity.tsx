@@ -22,11 +22,62 @@ export default function MultipleChoiceActivity({
   renderMode?: "lesson" | "quiz";
 }) {
   const [picked, setPicked] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [submitted, setSubmitted] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [feedbackTone, setFeedbackTone] = useState<"correct" | "partial" | "wrong" | null>(null);
+
+  const isMultiSelect =
+    Array.isArray(questionData.correctAnswers) && questionData.correctAnswers.length > 0;
 
   function choose(option: string) {
+    if (isMultiSelect) {
+      if (submitted) return;
+      setSelected((current) =>
+        current.includes(option) ? current.filter((item) => item !== option) : [...current, option]
+      );
+      return;
+    }
     setPicked(option);
     if (option === questionData.answer) onCorrect?.();
     else onWrong?.();
+  }
+
+  function submitMultiSelect() {
+    if (!isMultiSelect || submitted) return;
+    const correctAnswers = new Set(questionData.correctAnswers ?? []);
+    const hasIncorrect = selected.some((option) => !correctAnswers.has(option));
+    const selectedCorrectCount = selected.filter((option) => correctAnswers.has(option)).length;
+    const allCorrectSelected =
+      selected.length === correctAnswers.size && selected.every((option) => correctAnswers.has(option));
+
+    setSubmitted(true);
+
+    if (allCorrectSelected) {
+      setFeedback(
+        questionData.allCorrectFeedback ??
+          "Great thinking. You found all the answers that make sense."
+      );
+      setFeedbackTone("correct");
+      onCorrect?.();
+      return;
+    }
+
+    if (!hasIncorrect && selectedCorrectCount > 0) {
+      setFeedback(
+        questionData.partialFeedback ??
+          "Partly right. You found one correct answer, but there is another one too."
+      );
+      setFeedbackTone("partial");
+      onWrong?.();
+      return;
+    }
+
+    setFeedback(
+      questionData.incorrectFeedback ?? "That selection does not match the question."
+    );
+    setFeedbackTone("wrong");
+    onWrong?.();
   }
 
   return (
@@ -48,6 +99,11 @@ export default function MultipleChoiceActivity({
       {renderMode === "lesson" && questionData.helper ? (
         <p className="mt-2 text-sm text-gray-600">
           <MathFormattedText text={questionData.helper} />
+        </p>
+      ) : null}
+      {isMultiSelect && questionData.instruction ? (
+        <p className="mt-2 text-sm font-bold text-emerald-700">
+          <MathFormattedText text={questionData.instruction} />
         </p>
       ) : null}
       {questionData.visual?.type === "mab" ? (
@@ -76,7 +132,11 @@ export default function MultipleChoiceActivity({
             onClick={() => choose(option)}
             className={[
               "rounded-2xl border px-5 py-4 text-left text-xl font-black transition",
-              picked === option
+              isMultiSelect
+                ? selected.includes(option)
+                  ? "border-teal-300 bg-teal-50 text-teal-900"
+                  : "border-gray-200 bg-white text-gray-900 hover:bg-gray-50"
+                : picked === option
                 ? "border-teal-300 bg-teal-50 text-teal-900"
                 : "border-gray-200 bg-white text-gray-900 hover:bg-gray-50",
             ].join(" ")}
@@ -85,6 +145,43 @@ export default function MultipleChoiceActivity({
           </button>
         ))}
       </div>
+      {isMultiSelect ? (
+        <div className="mt-5">
+          <button
+            type="button"
+            onClick={submitMultiSelect}
+            disabled={selected.length === 0 || submitted}
+            className="rounded-2xl bg-teal-600 px-5 py-3 text-lg font-black text-white transition disabled:cursor-not-allowed disabled:bg-gray-300"
+          >
+            Check answer
+          </button>
+        </div>
+      ) : null}
+      {isMultiSelect && submitted ? (
+        <div
+          className={[
+            "mt-4 rounded-2xl border px-4 py-3 text-sm font-semibold",
+            feedbackTone === "correct"
+              ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+              : feedbackTone === "partial"
+              ? "border-amber-200 bg-amber-50 text-amber-900"
+              : "border-red-200 bg-red-50 text-red-900",
+          ].join(" ")}
+        >
+          {feedback ? <p>{feedback}</p> : null}
+          {selected.length > 0 && questionData.selectionFeedback ? (
+            <div className="mt-2 grid gap-1">
+              {selected
+                .filter((option) => questionData.selectionFeedback?.[option])
+                .map((option) => (
+                  <p key={option}>
+                    <MathFormattedText text={questionData.selectionFeedback?.[option] ?? ""} />
+                  </p>
+                ))}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 }

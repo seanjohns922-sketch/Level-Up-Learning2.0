@@ -736,6 +736,12 @@ export type MultipleChoiceQuestion = {
   options: string[];
   answer: string;
   helper?: string;
+  instruction?: string;
+  correctAnswers?: string[];
+  selectionFeedback?: Record<string, string>;
+  allCorrectFeedback?: string;
+  partialFeedback?: string;
+  incorrectFeedback?: string;
   visual?:
     | {
         type: "array";
@@ -8314,18 +8320,56 @@ function generateGenericQuestion(
         ],
       },
     ] as const;
-    const usePractical = randInt(0, 4) === 0;
-    const chosen = usePractical
+    const multiSelectTemplates = [
+      {
+        prompt: "34 lollies are shared between 5 children. Which answers could make sense?",
+        instruction: "Select all that apply.",
+        options: [
+          "6 each with 4 left over",
+          "7 each (if 1 more lolly is added)",
+          "5 each",
+          "10 each",
+        ],
+        correctAnswers: [
+          "6 each with 4 left over",
+          "7 each (if 1 more lolly is added)",
+        ],
+        selectionFeedback: {
+          "6 each with 4 left over": "This is the exact mathematical answer from 34 ÷ 5.",
+          "7 each (if 1 more lolly is added)": "This would work if there were 35 lollies instead of 34.",
+        },
+        allCorrectFeedback:
+          "Great thinking. One answer is mathematically exact, and the other would work if 1 more lolly was added.",
+        partialFeedback: "Partly right. There is one more answer that could also make sense.",
+        incorrectFeedback: "That selection does not fit 34 shared between 5 children.",
+        visual: { type: "array" as const, rows: 5, columns: 6 },
+      },
+    ] as const;
+    const roll = randInt(0, 5);
+    const chosen =
+      roll === 0
+        ? (multiSelectTemplates[randInt(0, multiSelectTemplates.length - 1)] ?? multiSelectTemplates[0]!)
+        : roll === 1
       ? (practicalTemplates[randInt(0, practicalTemplates.length - 1)] ?? practicalTemplates[0]!)
       : (standardTemplates[randInt(0, standardTemplates.length - 1)] ?? standardTemplates[0]!);
     return {
       kind: "multiple_choice",
       prompt: chosen.prompt,
       options: shuffle([...chosen.options]),
-      answer: chosen.answer,
-      helper: usePractical
+      answer: "answer" in chosen ? chosen.answer : (chosen.correctAnswers?.[0] ?? ""),
+      helper: "correctAnswers" in chosen
+        ? "Select all the answers that could make sense."
+        : roll === 1
         ? "Read the wording carefully. A practical solution can be different from the strict maths answer."
         : "Use the question wording to decide the correct mathematical answer.",
+      instruction: "instruction" in chosen ? chosen.instruction : undefined,
+      correctAnswers: "correctAnswers" in chosen ? [...chosen.correctAnswers] : undefined,
+      selectionFeedback:
+        "selectionFeedback" in chosen ? { ...chosen.selectionFeedback } : undefined,
+      allCorrectFeedback: "allCorrectFeedback" in chosen ? chosen.allCorrectFeedback : undefined,
+      partialFeedback: "partialFeedback" in chosen ? chosen.partialFeedback : undefined,
+      incorrectFeedback: "incorrectFeedback" in chosen ? chosen.incorrectFeedback : undefined,
+      visual: "visual" in chosen ? chosen.visual : undefined,
     };
   }
 
@@ -10318,6 +10362,7 @@ export function generateQuestionForLevelLessonActivity(
 export type LessonQuestionFingerprint = {
   fingerprint: string;
   templateFingerprint: string;
+  numberSetFingerprint: string;
   mode: string;
   contextType: string;
   keyNumbers: string[];
@@ -10377,11 +10422,13 @@ export function getLessonQuestionFingerprint(
   const templatePrompt = "prompt" in question ? normalizeQuestionTemplatePrompt(question.prompt) : activity.activityType;
   const templateFingerprint = [activity.activityType, mode, question.kind, contextType, templatePrompt].join("::");
   const keyNumbers = extractQuestionFingerprintNumbers(question);
+  const numberSetFingerprint = keyNumbers.join(",");
   const fingerprint = [templateFingerprint, keyNumbers.join(",")].join("::");
 
   return {
     fingerprint,
     templateFingerprint,
+    numberSetFingerprint,
     mode,
     contextType,
     keyNumbers,
