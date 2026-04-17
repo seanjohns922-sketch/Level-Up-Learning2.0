@@ -13,6 +13,7 @@ import {
   isWeekComplete,
   type ProgramProgressStore,
 } from "@/lib/program-progress";
+import { getHomeBg, getHomeBgFilter, getVignetteStyle } from "@/lib/levelBand";
 
 
 export default function ProgramPageWrapper() {
