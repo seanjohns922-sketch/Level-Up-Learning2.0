@@ -170,32 +170,40 @@ export default function LevelsPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-transparent to-black/30" />
       </div>
       <div className="relative z-10 min-h-screen flex flex-col md:flex-row items-stretch px-4 md:px-8 py-8 gap-6">
-        {/* Left column — hero text */}
-        <div className="md:w-[38%] flex flex-col justify-center items-start px-4 md:px-8">
-          <button
-            onClick={goHome}
-            className="text-sm text-white/80 hover:text-white hover:underline mb-8"
-            type="button"
-          >
-            ← Back to Dashboard
-          </button>
-          <h1
-            className="text-5xl md:text-6xl lg:text-7xl font-black text-white tracking-wide leading-tight"
-            style={{
-              fontFamily: "'Quicksand', 'Nunito', sans-serif",
-              textShadow: "0 10px 30px rgba(0,0,0,0.35), 0 0 60px rgba(255,210,80,0.25)",
-            }}
-          >
-            Choose Your Path
-          </h1>
-          <p
-            className="text-amber-100/90 mt-4 text-lg font-medium tracking-wide max-w-xs"
-            style={{ textShadow: "0 2px 8px rgba(0,0,0,0.3)" }}
-          >
-            Select a learning level to begin your journey.
-          </p>
+        {/* Left column — anchored to tower (top: peak, middle: body, bottom: base) */}
+        <div className="md:w-[38%] flex flex-col items-start px-4 md:px-8 min-h-[calc(100vh-4rem)]">
+          {/* TOP — aligns with tower peak / panel header */}
+          <div className="w-full pt-4 md:pt-[8vh] lg:pt-[10vh]">
+            <button
+              onClick={goHome}
+              className="text-sm text-white/80 hover:text-white hover:underline"
+              type="button"
+            >
+              ← Back to Dashboard
+            </button>
+          </div>
 
-          <div className="mt-8 flex items-center gap-3">
+          {/* MIDDLE — centered to tower body */}
+          <div className="w-full flex-1 flex flex-col justify-center">
+            <h1
+              className="text-5xl md:text-6xl lg:text-7xl font-black text-white tracking-wide leading-tight"
+              style={{
+                fontFamily: "'Quicksand', 'Nunito', sans-serif",
+                textShadow: "0 10px 30px rgba(0,0,0,0.35), 0 0 60px rgba(255,210,80,0.25)",
+              }}
+            >
+              Choose Your Path
+            </h1>
+            <p
+              className="text-amber-100/90 mt-4 text-lg font-medium tracking-wide max-w-xs"
+              style={{ textShadow: "0 2px 8px rgba(0,0,0,0.3)" }}
+            >
+              Select a learning level to begin your journey.
+            </p>
+          </div>
+
+          {/* BOTTOM — anchored to tower base / bridge */}
+          <div className="w-full pb-4 md:pb-[8vh] lg:pb-[10vh] flex items-center gap-3">
             {showLegendsButton ? (
               <button
                 onClick={goLegends}
