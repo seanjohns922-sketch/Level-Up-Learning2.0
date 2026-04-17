@@ -46,7 +46,7 @@
   --color-trust-blue-light: var(--trust-blue-light);
   --font-sans: "Nunito", "Avenir Next", "Trebuchet MS", sans-serif;
   --font-display: "Quicksand", "Nunito", sans-serif;
-  --font-mono: var(--font-geist-mono);
+  --font-mono: "SFMono-Regular", "Consolas", "Liberation Mono", monospace;
 }
 
 body {
