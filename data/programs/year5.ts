@@ -232,14 +232,15 @@ const year5Rows: ProgramRow[] = [
   },
   {
     week: 6,
-    focus: "Estimate division results and check answers",
+    focus: "Estimate, check, and verify division answers",
     lesson: 3,
-    topic: "Estimate & Check",
-    activity: "Use compatible numbers and reasonableness to check division answers.",
+    topic: "Estimate & Verify Division",
+    activity: "Estimate division, decide if answers are reasonable, then solve and check using multiplication.",
     curriculum: ["AC9M5N08"],
     activities: [
-      makeActivity("multiple_choice", 2, { mode: "division_estimate_check" }),
-      makeActivity("typed_response", 1, { mode: "division_estimate_check" }),
+      makeActivity("multiple_choice", 1, { mode: "estimate_division" }),
+      makeActivity("multiple_choice", 1, { mode: "division_reasonableness" }),
+      makeActivity("typed_response", 1, { mode: "solve_and_check_division" }),
     ],
   },
   {

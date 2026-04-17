@@ -8641,8 +8641,124 @@ function generateGenericQuestion(
           kind: "typed_response",
           prompt: `Estimate ${dividend} ÷ ${divisor}.`,
           answer: String(estimate),
-          placeholder: "Type an estimate",
+        placeholder: "Type an estimate",
         };
+  }
+
+  if (explicitMode === "estimate_division") {
+    const templates = [
+      {
+        prompt: "About how much is 68 ÷ 6?",
+        answer: "about 12",
+        options: ["about 8", "about 10", "about 12", "about 20"],
+      },
+      {
+        prompt: "Which is the best estimate for 91 ÷ 4?",
+        answer: "about 23",
+        options: ["about 12", "about 20", "about 23", "about 40"],
+      },
+      {
+        prompt: "125 ÷ 8 is about...",
+        answer: "about 16",
+        options: ["about 8", "about 12", "about 16", "about 24"],
+      },
+      {
+        prompt: "About how much is 143 ÷ 7?",
+        answer: "about 20",
+        options: ["about 14", "about 18", "about 20", "about 28"],
+      },
+      {
+        prompt: "Which is the best estimate for 176 ÷ 8?",
+        answer: "about 22",
+        options: ["about 16", "about 20", "about 22", "about 30"],
+      },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: "Use nearby facts or compatible numbers to estimate quickly.",
+    };
+  }
+
+  if (explicitMode === "division_reasonableness") {
+    const templates = [
+      {
+        prompt: "A student says 68 ÷ 6 = 15 r2. Does this make sense?",
+        answer: "No, because 6 × 15 + 2 = 92",
+        options: [
+          "Yes, because 15 is close to 12",
+          "No, because 6 × 15 + 2 = 92",
+          "No, because the remainder should be 6",
+          "Yes, because 15 r2 is bigger than 10",
+        ],
+      },
+      {
+        prompt: "Is 84 ÷ 7 = 10 r14 reasonable?",
+        answer: "No, because the remainder is too large",
+        options: [
+          "Yes, because 10 × 7 = 70",
+          "No, because the remainder is too large",
+          "Yes, because 14 is the leftover",
+          "No, because 84 cannot be divided by 7",
+        ],
+      },
+      {
+        prompt: "Which answer is most reasonable for 91 ÷ 4?",
+        answer: "22 r3",
+        options: ["18 r1", "22 r3", "25 r4", "30 r1"],
+      },
+      {
+        prompt: "A student says 125 ÷ 8 = 15 r5. Does this make sense?",
+        answer: "Yes, because 8 × 15 + 5 = 125",
+        options: [
+          "Yes, because 8 × 15 + 5 = 125",
+          "No, because 8 × 15 + 5 = 120",
+          "No, because the remainder is too large",
+          "Yes, because 15 is an even number",
+        ],
+      },
+      {
+        prompt: "Which answer is closest to what you would expect for 143 ÷ 7?",
+        answer: "20 r3",
+        options: ["14 r3", "20 r3", "24 r3", "30 r3"],
+      },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: "Check with multiplication and make sure the remainder is less than the divisor.",
+    };
+  }
+
+  if (explicitMode === "solve_and_check_division") {
+    const variants = [
+      { dividend: 68, divisor: 6, quotient: 11, remainder: 2, answer: "11 r2" },
+      { dividend: 91, divisor: 4, quotient: 22, remainder: 3, answer: "22 r3" },
+      { dividend: 125, divisor: 8, quotient: 15, remainder: 5, answer: "15 r5" },
+      { dividend: 143, divisor: 7, quotient: 20, remainder: 3, answer: "20 r3" },
+      { dividend: 176, divisor: 8, quotient: 22, remainder: 0, answer: "22" },
+    ] as const;
+    const picked = variants[randInt(0, variants.length - 1)] ?? variants[0]!;
+    return {
+      kind: "typed_response",
+      prompt: `Solve ${picked.dividend} ÷ ${picked.divisor}. Then check using ${picked.divisor} × quotient + remainder.`,
+      answer: picked.answer,
+      helper: "Enter the quotient and remainder, then complete the multiplication check.",
+      placeholder: "Type the quotient and remainder",
+      visual: {
+        type: "division_remainder_check",
+        dividend: picked.dividend,
+        divisor: picked.divisor,
+        quotient: picked.quotient,
+        remainder: picked.remainder,
+      },
+    };
   }
 
   if (explicitMode === "related_denominator_fractions") {
