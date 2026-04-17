@@ -192,9 +192,13 @@ function LessonPage() {
                 </div>
                 <button
                   onClick={() => setStarted(true)}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 text-white font-bold tracking-tight px-6 py-2.5 text-sm md:text-base shadow-[0_8px_20px_rgba(16,185,129,0.28)] hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(16,185,129,0.38)] active:scale-[0.98] transition-all duration-200"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-2xl text-white font-bold tracking-tight px-6 py-2.5 text-sm md:text-base shadow-[0_8px_20px_rgba(2,23,22,0.45),inset_0_1px_0_rgba(94,234,212,0.25)] hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(2,23,22,0.55),inset_0_1px_0_rgba(94,234,212,0.35)] active:scale-[0.98] transition-all duration-200 border border-teal-400/20"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #021716 0%, #064e47 50%, #0d9488 100%)",
+                  }}
                 >
-                  Begin Practise <span className="text-base">→</span>
+                  Begin Practise <span className="text-base text-teal-300">→</span>
                 </button>
               </div>
             </div>
