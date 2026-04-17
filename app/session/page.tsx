@@ -2433,6 +2433,8 @@ function SessionPage() {
   const [lessonStarted, setLessonStarted] = useState(false);
 
   const [showPostTestTransition, setShowPostTestTransition] = useState(false);
+  const hasEmbeddedLessonVideo =
+    year === "Year 4" && Number(week) === 2 && n === 1;
   const quizWeekPlan = useMemo(
     () => getProgramForYear(year).find((plan) => plan.week === Number(week)),
     [year, week]
@@ -3019,16 +3021,30 @@ function SessionPage() {
                     </span>
                     Lesson Video
                   </div>
-                  <div className="aspect-video rounded-2xl border-2 border-dashed border-border bg-card flex items-center justify-center text-muted-foreground">
-                    <div className="text-center">
-                      <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-trust-blue-light text-trust-blue">
-                        <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M8 5v14l11-7z" />
-                        </svg>
+                  {hasEmbeddedLessonVideo ? (
+                    <>
+                      <div
+                        className="rounded-2xl overflow-hidden"
+                        style={{ position: "relative", width: "100%", paddingTop: "56.25%" }}
+                      >
+                        <iframe
+                          src="https://player.vimeo.com/video/1183966051?h=ff99ab69f7"
+                          width="100%"
+                          height="100%"
+                          frameBorder="0"
+                          allow="autoplay; fullscreen; picture-in-picture"
+                          allowFullScreen
+                          className="absolute left-0 top-0 h-full w-full"
+                          title="Lesson video"
+                        />
                       </div>
-                      <div>Video coming soon</div>
-                    </div>
-                  </div>
+                      <div className="mt-3 text-sm text-foreground/80">
+                        Watch this first, then start the lesson.
+                      </div>
+                    </>
+                  ) : (
+                    <div className="aspect-video rounded-2xl border-2 border-dashed border-border bg-card flex items-center justify-center text-muted-foreground" />
+                  )}
                 </div>
 
                 {/* Motivation banner */}
