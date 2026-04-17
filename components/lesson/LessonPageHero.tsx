@@ -28,28 +28,42 @@ export function LessonPageHero({
           "linear-gradient(110deg, #042f2e 0%, #0b3f3c 45%, #0f4f4a 60%, #0d9488 100%)",
       }}
     >
-      {/* RIGHT 40%: crisp city artwork */}
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-[42%]" aria-hidden>
+      {/* RIGHT ~55%: crisp city artwork (wider so the long blend can sit on top) */}
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-[55%]" aria-hidden>
         <img
           src={heroNumberNexus.src}
           alt=""
-          className="h-full w-full object-cover object-center"
-          style={{ filter: "contrast(1.08) saturate(1.05) brightness(1.05)" }}
-        />
-        {/* Seam fade — dark to transparent ONLY at the left edge of the city */}
-        <div
-          className="absolute inset-y-0 left-0 w-[55%]"
+          className="h-full w-full object-cover"
           style={{
-            background:
-              "linear-gradient(90deg, #042f2e 0%, rgba(4,47,46,0.85) 25%, rgba(4,47,46,0.4) 60%, rgba(4,47,46,0) 100%)",
+            objectPosition: "60% center",
+            transform: "scale(1.08)",
+            transformOrigin: "right center",
+            filter: "contrast(1.04) saturate(0.92) brightness(1.02) hue-rotate(-4deg)",
           }}
         />
-        {/* Tiny hint of cyan glow on the right edge */}
+        {/* Long edge softener — fades the LEFT 70% of the image into the header */}
+        <div
+          className="absolute inset-y-0 left-0 w-[70%]"
+          style={{
+            background:
+              "linear-gradient(90deg, #042f2e 0%, rgba(11,63,60,0.96) 18%, rgba(13,80,76,0.78) 38%, rgba(15,79,74,0.45) 60%, rgba(15,79,74,0.18) 80%, rgba(15,79,74,0) 100%)",
+          }}
+        />
+        {/* Tiny vertical glow line at the blend point — "portal" feel */}
+        <div
+          className="absolute inset-y-0 left-[28%] w-px"
+          style={{
+            background:
+              "linear-gradient(180deg, transparent 0%, rgba(94,234,212,0.35) 40%, rgba(94,234,212,0.5) 50%, rgba(94,234,212,0.35) 60%, transparent 100%)",
+            boxShadow: "0 0 12px rgba(94,234,212,0.35)",
+          }}
+        />
+        {/* Subtle cyan accent on the far right */}
         <div
           className="absolute inset-y-0 right-0 w-[40%]"
           style={{
             background:
-              "radial-gradient(ellipse at 80% 35%, rgba(94,234,212,0.18), transparent 60%)",
+              "radial-gradient(ellipse at 80% 35%, rgba(94,234,212,0.14), transparent 60%)",
           }}
         />
       </div>
