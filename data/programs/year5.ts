@@ -219,14 +219,15 @@ const year5Rows: ProgramRow[] = [
   },
   {
     week: 6,
-    focus: "Interpret remainders in real contexts",
+    focus: "Decide what to do with the remainder in real-life contexts",
     lesson: 2,
     topic: "Interpreting Remainders",
-    activity: "Decide whether to round up, round down, or keep a remainder in context.",
+    activity: "Choose whether to keep, round up, or ignore the remainder, and explain why that choice makes sense.",
     curriculum: ["AC9M5N07"],
     activities: [
-      makeActivity("multiple_choice", 2, { mode: "interpreting_remainders" }),
-      makeActivity("typed_response", 1, { mode: "interpreting_remainders" }),
+      makeActivity("multiple_choice", 1, { mode: "interpreting_remainders_fast" }),
+      makeActivity("multiple_choice", 1, { mode: "interpreting_remainders_reasoning" }),
+      makeActivity("typed_response", 1, { mode: "interpreting_remainders_apply" }),
     ],
   },
   {

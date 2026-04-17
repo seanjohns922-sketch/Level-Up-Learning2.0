@@ -8246,6 +8246,97 @@ function generateGenericQuestion(
         };
   }
 
+  if (explicitMode === "interpreting_remainders_fast") {
+    const templates = [
+      {
+        prompt: "26 ÷ 4 = 6 r2. What does this mean?",
+        answer: "6 groups, 2 left over",
+        options: ["6 groups, 2 left over", "7 groups", "6 groups exactly", "2 groups left over"],
+      },
+      {
+        prompt: "32 ÷ 5 = 6 r2. What does this mean?",
+        answer: "6 groups, 2 left over",
+        options: ["6 groups, 2 left over", "5 groups, 6 left over", "7 groups exactly", "2 groups of 6"],
+      },
+      {
+        prompt: "41 ÷ 6 = 6 r5. What does this mean?",
+        answer: "6 groups, 5 left over",
+        options: ["6 groups, 5 left over", "7 groups", "6 groups exactly", "5 groups, 6 left over"],
+      },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: "The quotient tells how many full groups there are. The remainder tells what is left over.",
+    };
+  }
+
+  if (explicitMode === "interpreting_remainders_reasoning") {
+    const templates = [
+      {
+        prompt: "26 students need buses. Each bus holds 4. What should we do with the remainder?",
+        answer: "Round up to 7 buses",
+        options: ["6 buses", "6 r2 buses", "Round up to 7 buses", "Ignore the remainder and keep 6"],
+      },
+      {
+        prompt: "26 apples are packed into bags of 4. What should we do with the remainder?",
+        answer: "6 bags, 2 left over",
+        options: ["6 bags", "7 bags", "6 bags, 2 left over", "Ignore the 2 left over"],
+      },
+      {
+        prompt: "26 lollies are shared equally between 4 children. How many does each child get?",
+        answer: "6 each",
+        options: ["6 each", "6 r2 each", "7 each", "6 each and 2 left in the answer"],
+      },
+      {
+        prompt: "34 players are put into teams of 5. What should we do with the remainder?",
+        answer: "Round up to 7 teams",
+        options: ["6 teams", "6 r4 teams", "Round up to 7 teams", "Keep 4 as an extra team"],
+      },
+      {
+        prompt: "34 cupcakes are packed into boxes of 5. What should we do with the remainder?",
+        answer: "6 boxes, 4 left over",
+        options: ["6 boxes", "7 boxes", "6 boxes, 4 left over", "Ignore the 4 left over"],
+      },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: "Use the context to decide whether to keep the remainder, round up, or ignore it.",
+    };
+  }
+
+  if (explicitMode === "interpreting_remainders_apply") {
+    const templates = [
+      {
+        prompt: "34 people are put into groups of 5. What should we do with the remainder? Explain.",
+        answer: "Round up to 7 groups",
+      },
+      {
+        prompt: "34 apples are packed into bags of 5. What should we do with the remainder? Explain.",
+        answer: "6 bags, 4 left over",
+      },
+      {
+        prompt: "34 lollies are shared equally between 5 children. What should we do with the remainder? Explain.",
+        answer: "6 each",
+      },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      helper: "Decide whether to keep the remainder, round up, or ignore it so the answer makes sense in the situation.",
+      placeholder: "Type the final answer",
+    };
+  }
+
   if (explicitMode === "division_estimate_check") {
     const divisor = [4, 5, 6, 8, 10][randInt(0, 4)] ?? 5;
     const quotient = randInt(8, 30);
