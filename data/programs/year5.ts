@@ -166,7 +166,7 @@ const year5Rows: ProgramRow[] = [
   {
     week: 5,
     weekTopic: "Multiplication with Large Numbers",
-    focus: "Multiply large numbers by 1 digit using place value understanding, scaling, and efficient strategies",
+    focus: "Multiply large numbers by 1 digit using place value and efficient strategies",
     lesson: 1,
     topic: "Multiply Large Numbers by 1 Digit",
     activity: "Build confidence with scaled facts, compare multiplication strategies, and solve larger 1-digit multiplication problems accurately.",

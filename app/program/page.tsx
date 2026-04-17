@@ -288,7 +288,7 @@ function ProgramPage() {
                   onClick={() => !locked && openItem(item)}
                   disabled={locked}
                   className={[
-                    "w-full text-left p-4 rounded-2xl border transition-all flex items-center gap-4 group",
+                    "w-full text-left p-4 rounded-2xl border transition-all flex items-stretch gap-4 group",
                     locked
                       ? "border-gray-100 bg-gray-50/50 opacity-50 cursor-not-allowed"
                       : postTestReady
@@ -299,7 +299,7 @@ function ProgramPage() {
                   ].join(" ")}
                 >
                   <div className={[
-                    "w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-sm font-bold transition-all",
+                    "w-14 h-14 self-center rounded-2xl flex items-center justify-center flex-shrink-0 text-sm font-bold transition-all",
                     locked ? "bg-gray-100 text-gray-400"
                       : postTestReady ? "bg-primary/10 text-primary"
                         : completed ? "bg-emerald-100 text-emerald-600"
@@ -316,13 +316,13 @@ function ProgramPage() {
                     )}
                   </div>
 
-                  <div className="flex-1 min-w-0 grid grid-rows-[auto_auto_2rem_auto] gap-y-0.5">
-                    <div className="text-xs text-gray-400 font-medium self-start">
+                  <div className="flex-1 min-w-0 self-stretch grid grid-rows-[18px_32px_44px_20px]">
+                    <div className="text-xs text-gray-400 font-medium leading-[18px] self-start">
                       {isLesson ? `Lesson ${item.n}` : isPostTest ? "Final Assessment" : "Weekly Quiz"}
                     </div>
-                    <div className="font-extrabold text-gray-900 truncate self-start">{item.title}</div>
+                    <div className="font-extrabold text-gray-900 truncate leading-8 self-start">{item.title}</div>
                     <div
-                      className="text-xs leading-4 overflow-hidden self-start"
+                      className="min-h-[44px] max-h-[44px] overflow-hidden text-xs leading-[22px] self-start"
                       style={{
                         color: locked && isPostTest ? "hsl(var(--muted-foreground))" : undefined,
                         display: "-webkit-box",
@@ -337,11 +337,11 @@ function ProgramPage() {
                           : item.focus}
                     </div>
                     {!isPostTest && (
-                      <div className="text-xs text-gray-400 self-end">{isLesson ? "10 XP" : "20 XP"}</div>
+                      <div className="text-xs text-gray-400 leading-5 self-end">{isLesson ? "10 XP" : "20 XP"}</div>
                     )}
                   </div>
 
-                  <div className="flex-shrink-0">
+                  <div className="flex-shrink-0 self-center">
                     {locked ? (
                       <span className="text-xs text-gray-300 font-bold px-3 py-1.5 rounded-full border border-gray-200">LOCKED</span>
                     ) : completed ? (
