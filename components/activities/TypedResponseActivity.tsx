@@ -762,6 +762,8 @@ export default function TypedResponseActivity({
   const isEstimateStrategyMultiplication = questionData.visual?.type === "multiplication_estimate_strategy";
   const isDivisionRemainderCheck = questionData.visual?.type === "division_remainder_check";
   const isDivisionBuildGroups = questionData.visual?.type === "division_build_groups";
+  const buildGroupsVisual =
+    questionData.visual?.type === "division_build_groups" ? questionData.visual : null;
   const strategyVisual =
     questionData.visual?.type === "multiplication_strategy" ||
     questionData.visual?.type === "multiplication_estimate_strategy"
@@ -1545,14 +1547,14 @@ export default function TypedResponseActivity({
       {questionData.visual?.type === "rule_box" ? (
         <RuleBoxVisual visual={questionData.visual} title="Step-by-step rule" />
       ) : null}
-      {questionData.visual?.type === "division_build_groups" ? (
+      {buildGroupsVisual ? (
         <div className="mt-4 space-y-4">
           <div className="rounded-2xl border border-teal-100 bg-teal-50 p-5">
             <div className="text-sm font-bold uppercase tracking-[0.18em] text-teal-700">
               Build the Groups
             </div>
             <div className="mt-3 flex flex-wrap gap-3">
-              {questionData.visual.multiples.map((multiple, index) => {
+              {buildGroupsVisual.multiples.map((multiple, index) => {
                 const visible = index < revealedGroupCount;
                 return (
                   <div
@@ -1574,17 +1576,17 @@ export default function TypedResponseActivity({
                 type="button"
                 onClick={() =>
                   setRevealedGroupCount((current) =>
-                    Math.min(questionData.visual.multiples.length, current + 1)
+                    Math.min(buildGroupsVisual.multiples.length, current + 1)
                   )
                 }
-                disabled={revealedGroupCount >= questionData.visual.multiples.length}
+                disabled={revealedGroupCount >= buildGroupsVisual.multiples.length}
                 className="rounded-xl bg-teal-600 px-4 py-3 font-black text-white hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Tap to reveal
               </button>
               <button
                 type="button"
-                onClick={() => setRevealedGroupCount(questionData.visual.multiples.length)}
+                onClick={() => setRevealedGroupCount(buildGroupsVisual.multiples.length)}
                 className="rounded-xl border border-slate-300 bg-white px-4 py-3 font-black text-slate-900 hover:bg-slate-50"
               >
                 Skip steps
