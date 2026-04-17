@@ -13,7 +13,7 @@ import {
   isWeekComplete,
   type ProgramProgressStore,
 } from "@/lib/program-progress";
-import { LEVEL2_HERO_GRADIENT } from "@/lib/levelTheme";
+
 
 export default function ProgramPageWrapper() {
   return (
