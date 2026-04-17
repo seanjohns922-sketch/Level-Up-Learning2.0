@@ -185,18 +185,42 @@ function ProgramPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f6f2ec]">
+    <main
+      className="min-h-screen relative overflow-hidden"
+      style={{
+        background:
+          "linear-gradient(180deg, #0F766E 0%, #0D5F59 60%, #0a4d48 100%)",
+      }}
+    >
+      {/* Soft depth blobs */}
+      <div
+        className="pointer-events-none absolute -top-24 -right-24 h-[420px] w-[420px] rounded-full"
+        style={{ background: "rgba(255,255,255,0.07)", filter: "blur(80px)" }}
+      />
+      <div
+        className="pointer-events-none absolute -bottom-32 -left-24 h-[340px] w-[340px] rounded-full"
+        style={{ background: "rgba(255,255,255,0.05)", filter: "blur(80px)" }}
+      />
+      <div
+        className="pointer-events-none absolute top-1/3 left-1/2 -translate-x-1/2 h-[260px] w-[260px] rounded-full"
+        style={{ background: "rgba(255,255,255,0.04)", filter: "blur(90px)" }}
+      />
+      {/* Top glow */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(circle at top, rgba(255,255,255,0.12), transparent 60%)",
+        }}
+      />
+
       {DEV_MODE && (
         <div className="fixed bottom-4 right-4 px-4 py-2 bg-red-600 text-white font-extrabold rounded-xl shadow-lg z-50">DEV MODE</div>
       )}
 
-      {/* ── Green hero ── */}
-      <div className="relative overflow-hidden">
-        <div className={`absolute inset-0 ${LEVEL2_HERO_GRADIENT}`} />
-        <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-white/5" />
-        <div className="absolute bottom-0 -left-16 h-48 w-48 rounded-full bg-white/5" />
-
-        <div className="relative max-w-2xl mx-auto px-6 pt-5 pb-24">
+      {/* ── Hero header ── */}
+      <div className="relative">
+        <div className="relative max-w-6xl mx-auto px-6 pt-5 pb-10">
           <div className="flex items-center justify-between mb-6">
             <button
               onClick={() => router.push("/home")}
