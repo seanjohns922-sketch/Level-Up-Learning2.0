@@ -316,20 +316,28 @@ function ProgramPage() {
                     )}
                   </div>
 
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs text-gray-400 font-medium">
+                  <div className="flex-1 min-w-0 grid grid-rows-[auto_auto_2rem_auto] gap-y-0.5">
+                    <div className="text-xs text-gray-400 font-medium self-start">
                       {isLesson ? `Lesson ${item.n}` : isPostTest ? "Final Assessment" : "Weekly Quiz"}
                     </div>
-                    <div className="font-extrabold text-gray-900 truncate">{item.title}</div>
-                    <div className="text-xs mt-0.5 truncate" style={{ color: locked && isPostTest ? "hsl(var(--muted-foreground))" : undefined }}>
+                    <div className="font-extrabold text-gray-900 truncate self-start">{item.title}</div>
+                    <div
+                      className="text-xs leading-4 overflow-hidden self-start"
+                      style={{
+                        color: locked && isPostTest ? "hsl(var(--muted-foreground))" : undefined,
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                      }}
+                    >
                       {locked && isPostTest
-                        ? "🔒 Complete all lessons to unlock"
+                        ? "Complete all lessons to unlock"
                         : postTestReady
-                          ? "✨ Ready to start"
+                          ? "Ready to start"
                           : item.focus}
                     </div>
                     {!isPostTest && (
-                      <div className="text-xs text-gray-400 mt-0.5">{isLesson ? "10 XP" : "20 XP"}</div>
+                      <div className="text-xs text-gray-400 self-end">{isLesson ? "10 XP" : "20 XP"}</div>
                     )}
                   </div>
 
