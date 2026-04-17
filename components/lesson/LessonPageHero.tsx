@@ -23,47 +23,42 @@ export function LessonPageHero({
   return (
     <div
       className="relative overflow-hidden text-white"
-      style={{
-        background:
-          "linear-gradient(110deg, #042f2e 0%, #0b3f3c 45%, #0f4f4a 60%, #0d9488 100%)",
-      }}
+      style={{ background: "#042f2e" }}
     >
-      {/* RIGHT ~55%: crisp city artwork (wider so the long blend can sit on top) */}
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-[55%]" aria-hidden>
+      {/* FULL-WIDTH city artwork — no seam */}
+      <div className="pointer-events-none absolute inset-0" aria-hidden>
         <img
           src={heroNumberNexus.src}
           alt=""
           className="h-full w-full object-cover"
           style={{
-            objectPosition: "60% center",
-            transform: "scale(1.08)",
-            transformOrigin: "right center",
-            filter: "contrast(1.04) saturate(0.92) brightness(1.02) hue-rotate(-4deg)",
+            objectPosition: "75% center",
+            transform: "scale(1.05)",
+            filter: "contrast(1.05) saturate(0.95) brightness(1) hue-rotate(-4deg)",
           }}
         />
-        {/* Long edge softener — fades the LEFT 70% of the image into the header */}
+        {/* Long horizontal darken — opaque on left, transparent on right */}
         <div
-          className="absolute inset-y-0 left-0 w-[70%]"
+          className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(90deg, #042f2e 0%, rgba(11,63,60,0.96) 18%, rgba(13,80,76,0.78) 38%, rgba(15,79,74,0.45) 60%, rgba(15,79,74,0.18) 80%, rgba(15,79,74,0) 100%)",
+              "linear-gradient(90deg, #042f2e 0%, rgba(4,47,46,0.97) 18%, rgba(4,47,46,0.88) 32%, rgba(4,47,46,0.65) 48%, rgba(4,47,46,0.35) 65%, rgba(4,47,46,0.12) 82%, rgba(4,47,46,0) 100%)",
           }}
         />
-        {/* Tiny vertical glow line at the blend point — "portal" feel */}
+        {/* Soft top-to-bottom darken for extra text contrast */}
         <div
-          className="absolute inset-y-0 left-[28%] w-px"
+          className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, transparent 0%, rgba(94,234,212,0.35) 40%, rgba(94,234,212,0.5) 50%, rgba(94,234,212,0.35) 60%, transparent 100%)",
-            boxShadow: "0 0 12px rgba(94,234,212,0.35)",
+              "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, transparent 40%, rgba(0,0,0,0.2) 100%)",
           }}
         />
         {/* Subtle cyan accent on the far right */}
         <div
-          className="absolute inset-y-0 right-0 w-[40%]"
+          className="absolute inset-y-0 right-0 w-[35%]"
           style={{
             background:
-              "radial-gradient(ellipse at 80% 35%, rgba(94,234,212,0.14), transparent 60%)",
+              "radial-gradient(ellipse at 80% 35%, rgba(94,234,212,0.16), transparent 60%)",
           }}
         />
       </div>
