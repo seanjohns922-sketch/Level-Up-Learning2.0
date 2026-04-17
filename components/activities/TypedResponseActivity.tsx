@@ -564,8 +564,6 @@ function BoxMethodWorkspace({
 
 type MultiplicationStrategy = "box_method" | "long_multiplication" | "split_sum";
 type EstimateReasonableness = "yes" | "no";
-type DivisionReasonableness = "yes" | "no";
-type BuildGroupsReason = "next_too_big" | "largest_multiple" | "doesnt_fit";
 
 function getSplitSumParts(value: number) {
   const tensPart = Math.floor(value / 10) * 10;
@@ -827,13 +825,13 @@ export default function TypedResponseActivity({
   const [divisionCheckInputs, setDivisionCheckInputs] = useState({
     quotient: "",
     remainder: "",
-    multiplicationCheck: "",
-    reasonableness: null as DivisionReasonableness | null,
+    checkQuotient: "",
+    checkRemainder: "",
+    checkTotal: "",
   });
   const [divisionCheckFeedback, setDivisionCheckFeedback] = useState("");
   const [revealedGroupCount, setRevealedGroupCount] = useState(0);
   const [buildGroupsRemainder, setBuildGroupsRemainder] = useState("");
-  const [buildGroupsReason, setBuildGroupsReason] = useState<BuildGroupsReason | null>(null);
   const [buildGroupsFeedback, setBuildGroupsFeedback] = useState("");
   const [orderedInputs, setOrderedInputs] = useState<string[]>(
     isOrderingResponse ? Array.from({ length: orderingAnswerParts.length }, () => "") : []
@@ -935,13 +933,13 @@ export default function TypedResponseActivity({
     setDivisionCheckInputs({
       quotient: "",
       remainder: "",
-      multiplicationCheck: "",
-      reasonableness: null,
+      checkQuotient: "",
+      checkRemainder: "",
+      checkTotal: "",
     });
     setDivisionCheckFeedback("");
     setRevealedGroupCount(0);
     setBuildGroupsRemainder("");
-    setBuildGroupsReason(null);
     setBuildGroupsFeedback("");
     setOrderedInputs(
       isOrderingResponse ? Array.from({ length: orderingAnswerParts.length }, () => "") : []
@@ -1224,13 +1222,7 @@ export default function TypedResponseActivity({
     if (isDivisionBuildGroups && questionData.visual?.type === "division_build_groups") {
       const remainderMatches =
         normalizeNumberInput(buildGroupsRemainder) === String(questionData.visual.remainder);
-      const reasonMatches =
-        revealedGroupCount < questionData.visual.multiples.length ||
-        buildGroupsReason === "next_too_big" ||
-        buildGroupsReason === "largest_multiple" ||
-        buildGroupsReason === "doesnt_fit";
-
-      if (remainderMatches && reasonMatches) {
+      if (remainderMatches) {
         setBuildGroupsFeedback("");
         onCorrect?.();
       } else {
@@ -1247,17 +1239,18 @@ export default function TypedResponseActivity({
       const quotientMatches = normalizeNumberInput(divisionCheckInputs.quotient) === String(quotient);
       const remainderMatches =
         normalizeNumberInput(divisionCheckInputs.remainder) === String(remainder);
-      const checkMatches =
-        normalizeNumberInput(divisionCheckInputs.multiplicationCheck) === String(divisor * quotient + remainder);
-      const reasonablenessMatches = divisionCheckInputs.reasonableness === "yes";
+      const checkQuotientMatches =
+        normalizeNumberInput(divisionCheckInputs.checkQuotient) === String(quotient);
+      const checkRemainderMatches =
+        normalizeNumberInput(divisionCheckInputs.checkRemainder) === String(remainder);
+      const checkTotalMatches =
+        normalizeNumberInput(divisionCheckInputs.checkTotal) === String(divisor * quotient + remainder);
 
-      if (quotientMatches && remainderMatches && checkMatches && reasonablenessMatches) {
-        setDivisionCheckFeedback("");
+      if (quotientMatches && remainderMatches && checkQuotientMatches && checkRemainderMatches && checkTotalMatches) {
+        setDivisionCheckFeedback(`Correct! ${dividend} = ${dividend}`);
         onCorrect?.();
       } else {
-        setDivisionCheckFeedback(
-          `Check the quotient, remainder, and ${divisor} × ${quotient} + ${remainder}. The total should return ${dividend}.`
-        );
+        setDivisionCheckFeedback(`That doesn't match ${dividend}. Try again.`);
         onWrong?.();
       }
       return;
@@ -1597,6 +1590,9 @@ export default function TypedResponseActivity({
                 Skip steps
               </button>
             </div>
+            <p className="mt-3 text-sm text-slate-600">
+              Keep counting until the next number is too big.
+            </p>
           </div>
 
           {revealedGroupCount > 0 ? (
@@ -1611,35 +1607,6 @@ export default function TypedResponseActivity({
                 placeholder="Type the remainder"
                 className="mt-3 h-12 w-full max-w-xs rounded-xl border border-amber-300 bg-white px-4 text-center text-xl font-black text-slate-900 outline-none focus:border-amber-500"
               />
-            </div>
-          ) : null}
-
-          {revealedGroupCount === questionData.visual.multiples.length ? (
-            <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
-              <div className="text-sm font-bold uppercase tracking-[0.18em] text-emerald-700">
-                Why does it stop here?
-              </div>
-              <div className="mt-3 flex flex-col gap-3">
-                {([
-                  ["next_too_big", "Next multiple is too big"],
-                  ["doesnt_fit", `${questionData.visual.divisor} no longer fits into ${questionData.visual.dividend}`],
-                  ["largest_multiple", `${questionData.visual.multiples[questionData.visual.multiples.length - 1]} is the largest multiple under ${questionData.visual.dividend}`],
-                ] as Array<[BuildGroupsReason, string]>).map(([value, label]) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => setBuildGroupsReason(value)}
-                    className={[
-                      "rounded-xl border px-4 py-3 text-left font-black transition",
-                      buildGroupsReason === value
-                        ? "border-emerald-500 bg-emerald-600 text-white"
-                        : "border-slate-300 bg-white text-slate-900 hover:bg-slate-50",
-                    ].join(" ")}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
             </div>
           ) : null}
 
@@ -1704,50 +1671,48 @@ export default function TypedResponseActivity({
               Step 2: Multiply Back and Check
             </div>
             <p className="mt-2 text-sm text-slate-700">
-              Work out{" "}
-              {questionData.visual.divisor} × quotient + remainder
+              Write the check:
             </p>
-            <input
-              value={divisionCheckInputs.multiplicationCheck}
-              onChange={(event) =>
-                setDivisionCheckInputs((current) => ({
-                  ...current,
-                  multiplicationCheck: event.target.value.replace(/[^\d]/g, ""),
-                }))
-              }
-              inputMode="numeric"
-              className="mt-3 h-12 w-full max-w-xs rounded-xl border border-amber-300 bg-white px-4 text-center text-xl font-black text-slate-900 outline-none focus:border-amber-500"
-            />
-          </div>
-
-          <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
-            <div className="text-sm font-bold uppercase tracking-[0.18em] text-emerald-700">
-              Step 3: Does It Make Sense?
-            </div>
-            <div className="mt-3 flex flex-wrap gap-3">
-              {([
-                ["yes", "Yes"],
-                ["no", "No"],
-              ] as Array<[DivisionReasonableness, string]>).map(([value, label]) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() =>
-                    setDivisionCheckInputs((current) => ({
-                      ...current,
-                      reasonableness: value,
-                    }))
-                  }
-                  className={[
-                    "rounded-xl px-4 py-3 font-black transition",
-                    divisionCheckInputs.reasonableness === value
-                      ? "bg-emerald-600 text-white"
-                      : "border border-slate-300 bg-white text-slate-900 hover:bg-slate-50",
-                  ].join(" ")}
-                >
-                  {label}
-                </button>
-              ))}
+            <div className="mt-3 flex flex-wrap items-center gap-3 text-xl font-black text-slate-900">
+              <div className="flex h-12 min-w-[64px] items-center justify-center rounded-xl border border-amber-300 bg-white px-4">
+                {questionData.visual.divisor}
+              </div>
+              <span>×</span>
+              <input
+                value={divisionCheckInputs.checkQuotient}
+                onChange={(event) =>
+                  setDivisionCheckInputs((current) => ({
+                    ...current,
+                    checkQuotient: event.target.value.replace(/[^\d]/g, ""),
+                  }))
+                }
+                inputMode="numeric"
+                className="h-12 w-24 rounded-xl border border-amber-300 bg-white px-4 text-center text-xl font-black text-slate-900 outline-none focus:border-amber-500"
+              />
+              <span>+</span>
+              <input
+                value={divisionCheckInputs.checkRemainder}
+                onChange={(event) =>
+                  setDivisionCheckInputs((current) => ({
+                    ...current,
+                    checkRemainder: event.target.value.replace(/[^\d]/g, ""),
+                  }))
+                }
+                inputMode="numeric"
+                className="h-12 w-24 rounded-xl border border-amber-300 bg-white px-4 text-center text-xl font-black text-slate-900 outline-none focus:border-amber-500"
+              />
+              <span>=</span>
+              <input
+                value={divisionCheckInputs.checkTotal}
+                onChange={(event) =>
+                  setDivisionCheckInputs((current) => ({
+                    ...current,
+                    checkTotal: event.target.value.replace(/[^\d]/g, ""),
+                  }))
+                }
+                inputMode="numeric"
+                className="h-12 w-28 rounded-xl border border-amber-300 bg-white px-4 text-center text-xl font-black text-slate-900 outline-none focus:border-amber-500"
+              />
             </div>
           </div>
 
