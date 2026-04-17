@@ -10258,4 +10258,77 @@ export function generateQuestionForLevelLessonActivity(
   return generateQuestion(level, lesson, activity);
 }
 
+export type LessonQuestionFingerprint = {
+  fingerprint: string;
+  templateFingerprint: string;
+  mode: string;
+  contextType: string;
+  keyNumbers: string[];
+};
+
+function normalizeQuestionTemplatePrompt(prompt: string) {
+  return prompt
+    .toLowerCase()
+    .replace(/-?\d[\d,]*(?:\.\d+)?/g, "#")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function extractQuestionFingerprintNumbers(question: Year2QuestionData) {
+  const values = new Set<string>();
+  const capture = (text?: string) => {
+    if (!text) return;
+    for (const match of text.match(/-?\d[\d,]*(?:\.\d+)?/g) ?? []) {
+      values.add(match.replace(/,/g, ""));
+    }
+  };
+
+  capture("prompt" in question ? question.prompt : "");
+  if ("answer" in question && typeof question.answer === "string") capture(question.answer);
+  if ("options" in question && Array.isArray(question.options)) {
+    question.options.forEach((option) => capture(String(option)));
+  }
+
+  const visual = "visual" in question ? question.visual : undefined;
+  if (visual && typeof visual === "object") {
+    Object.values(visual).forEach((value) => {
+      if (typeof value === "number") values.add(String(value));
+      if (Array.isArray(value)) {
+        value.forEach((item) => {
+          if (typeof item === "number") values.add(String(item));
+        });
+      }
+    });
+  }
+
+  return Array.from(values).sort((left, right) => Number(left) - Number(right));
+}
+
+export function getLessonQuestionFingerprint(
+  activity: LessonActivity,
+  question: Year2QuestionData
+): LessonQuestionFingerprint {
+  const config = (activity.config ?? {}) as GenericConfig;
+  const mode =
+    typeof config.mode === "string"
+      ? config.mode
+      : typeof config.sourceActivityType === "string"
+      ? config.sourceActivityType
+      : activity.activityType;
+  const contextType =
+    "visual" in question && question.visual?.type ? String(question.visual.type) : "none";
+  const templatePrompt = "prompt" in question ? normalizeQuestionTemplatePrompt(question.prompt) : activity.activityType;
+  const templateFingerprint = [activity.activityType, mode, question.kind, contextType, templatePrompt].join("::");
+  const keyNumbers = extractQuestionFingerprintNumbers(question);
+  const fingerprint = [templateFingerprint, keyNumbers.join(",")].join("::");
+
+  return {
+    fingerprint,
+    templateFingerprint,
+    mode,
+    contextType,
+    keyNumbers,
+  };
+}
+
 export const generateYear2QuestionFromActivity = generateQuestionForActivity;
