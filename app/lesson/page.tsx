@@ -338,16 +338,45 @@ function LessonPage() {
                     </div>
                   </div>
                 </div>
-                <button
-                  onClick={() => setStarted(true)}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-2xl text-white font-bold tracking-tight px-6 py-2.5 text-sm md:text-base shadow-[0_8px_20px_rgba(2,23,22,0.45),inset_0_1px_0_rgba(94,234,212,0.25)] hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(2,23,22,0.55),inset_0_1px_0_rgba(94,234,212,0.35)] active:scale-[0.98] transition-all duration-200 border border-teal-400/20"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, #021716 0%, #064e47 50%, #0d9488 100%)",
-                  }}
-                >
-                  Begin Practise <span className="text-base text-teal-300">→</span>
-                </button>
+                <div className="relative group">
+                  {/* Outer bracket bezel */}
+                  <div className="absolute -inset-[3px] pointer-events-none transition-opacity duration-200 group-hover:opacity-100" style={{
+                    background: "linear-gradient(135deg, rgba(94,234,212,0.7) 0%, rgba(15,118,110,0.35) 50%, rgba(94,234,212,0.6) 100%)",
+                    clipPath: "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
+                  }} />
+                  <button
+                    onClick={() => setStarted(true)}
+                    className="relative inline-flex items-center justify-center gap-2 text-white font-bold tracking-tight px-7 py-3 text-sm md:text-base overflow-hidden hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200"
+                    style={{
+                      background: "linear-gradient(135deg, #021a18 0%, #064e47 45%, #0d9488 100%)",
+                      clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
+                      boxShadow: "inset 0 1px 0 rgba(94,234,212,0.4), inset 0 -10px 20px rgba(0,0,0,0.45), 0 8px 22px rgba(2,23,22,0.5), 0 0 18px rgba(94,234,212,0.2)",
+                    }}
+                  >
+                    {/* Scanlines */}
+                    <div aria-hidden className="absolute inset-0 opacity-20 pointer-events-none" style={{
+                      backgroundImage: "repeating-linear-gradient(0deg, rgba(94,234,212,0.18) 0px, rgba(94,234,212,0.18) 1px, transparent 1px, transparent 3px)",
+                    }} />
+                    {/* Circuit traces - left */}
+                    <svg aria-hidden className="absolute left-1.5 top-1/2 -translate-y-1/2 h-7 w-10 text-teal-300/40 pointer-events-none" viewBox="0 0 40 28" fill="none">
+                      <path d="M0 14 H14 L18 10 H32" stroke="currentColor" strokeWidth="0.8" />
+                      <path d="M0 20 H10 L14 16 H28" stroke="currentColor" strokeWidth="0.8" />
+                      <circle cx="32" cy="10" r="1.2" fill="currentColor" />
+                    </svg>
+                    {/* Circuit traces - right */}
+                    <svg aria-hidden className="absolute right-1.5 top-1/2 -translate-y-1/2 h-7 w-10 text-teal-300/40 pointer-events-none" viewBox="0 0 40 28" fill="none">
+                      <path d="M40 14 H26 L22 10 H8" stroke="currentColor" strokeWidth="0.8" />
+                      <path d="M40 20 H30 L26 16 H12" stroke="currentColor" strokeWidth="0.8" />
+                      <circle cx="8" cy="10" r="1.2" fill="currentColor" />
+                    </svg>
+                    {/* Energy glow sweep */}
+                    <div aria-hidden className="absolute inset-y-0 left-1/4 right-1/4 pointer-events-none" style={{
+                      background: "radial-gradient(ellipse at center, rgba(94,234,212,0.25), transparent 70%)",
+                    }} />
+                    <span className="relative font-mono uppercase tracking-[0.18em] text-teal-50 drop-shadow-[0_1px_0_rgba(0,0,0,0.6)]">Begin Practise</span>
+                    <span className="relative inline-flex h-5 w-5 items-center justify-center text-teal-200 drop-shadow-[0_0_4px_rgba(94,234,212,0.9)]">→</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
