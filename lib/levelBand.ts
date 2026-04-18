@@ -72,17 +72,12 @@ export function getGlowColor(levelNum: number): string {
   }
 }
 
-/** Vignette intensity per band */
+/** Vignette intensity per band — unified crisp treatment, slightly stronger for apex */
 export function getVignetteStyle(levelNum: number): string {
   const band = getLevelBand(levelNum);
-  switch (band) {
-    case "apex":
-      return "inset 0 0 160px 60px rgba(5,15,30,0.55), inset 0 -60px 80px -20px rgba(5,15,30,0.4)";
-    case "advanced":
-      return "inset 0 0 140px 50px rgba(5,18,35,0.45), inset 0 -60px 80px -20px rgba(5,18,35,0.35)";
-    default:
-      return levelNum >= 3
-        ? "inset 0 0 140px 50px rgba(5,18,35,0.42), inset 0 -60px 80px -20px rgba(5,18,35,0.32)"
-        : "inset 0 0 135px 45px rgba(5,18,35,0.40), inset 0 -60px 80px -20px rgba(5,18,35,0.30)";
+  if (band === "apex") {
+    return "inset 0 0 160px 60px rgba(5,15,30,0.55), inset 0 -60px 80px -20px rgba(5,15,30,0.4)";
   }
+  // Foundation + advanced share the L5-style vignette for visual consistency
+  return "inset 0 0 150px 55px rgba(5,18,35,0.48), inset 0 -60px 80px -20px rgba(5,18,35,0.36)";
 }
