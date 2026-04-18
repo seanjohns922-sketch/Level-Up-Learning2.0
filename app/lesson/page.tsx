@@ -230,58 +230,112 @@ function LessonPage() {
                   maskImage: "linear-gradient(90deg, transparent, black)",
                   WebkitMaskImage: "linear-gradient(90deg, transparent, black)",
                 }} />
-                <div className="relative flex flex-wrap items-center gap-2.5">
-                  {/* HUD Chip: Time */}
-                  <div className="group relative inline-flex items-center gap-2 pl-2 pr-3.5 py-1.5 text-white"
-                    style={{
-                      background: "linear-gradient(135deg, #052e2b 0%, #0a4d47 50%, #064e47 100%)",
-                      clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
-                      boxShadow: "inset 0 1px 0 rgba(94,234,212,0.25), inset 0 0 0 1px rgba(94,234,212,0.18), 0 4px 12px rgba(2,23,22,0.35)",
-                    }}
-                  >
-                    <span className="relative inline-flex h-6 w-6 items-center justify-center rounded-md bg-teal-950/60 ring-1 ring-teal-300/40 shadow-[inset_0_0_8px_rgba(94,234,212,0.35)]">
-                      <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-teal-200" fill="none" stroke="currentColor" strokeWidth="2">
-                        <circle cx="12" cy="13" r="7" />
-                        <path d="M12 9v4l2 2M9 2h6" strokeLinecap="round" />
+                <div className="relative flex flex-wrap items-center gap-3">
+                  {/* Nexus Plate: Time */}
+                  <div className="relative">
+                    <div className="absolute -inset-[3px] pointer-events-none" style={{
+                      background: "linear-gradient(135deg, rgba(94,234,212,0.55) 0%, rgba(15,118,110,0.25) 50%, rgba(94,234,212,0.45) 100%)",
+                      clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
+                    }} />
+                    <div className="relative inline-flex items-center gap-2.5 pl-2 pr-4 py-2 overflow-hidden"
+                      style={{
+                        background: "linear-gradient(135deg, #021a18 0%, #063d38 45%, #0a5048 100%)",
+                        clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
+                        boxShadow: "inset 0 1px 0 rgba(94,234,212,0.35), inset 0 -8px 16px rgba(0,0,0,0.4)",
+                      }}
+                    >
+                      <div aria-hidden className="absolute inset-0 opacity-20 pointer-events-none" style={{
+                        backgroundImage: "repeating-linear-gradient(0deg, rgba(94,234,212,0.15) 0px, rgba(94,234,212,0.15) 1px, transparent 1px, transparent 3px)",
+                      }} />
+                      <svg aria-hidden className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-10 text-teal-300/40 pointer-events-none" viewBox="0 0 40 24" fill="none">
+                        <path d="M0 12 H14 L18 8 H32" stroke="currentColor" strokeWidth="0.8" />
+                        <path d="M0 18 H10 L14 14 H28" stroke="currentColor" strokeWidth="0.8" />
+                        <circle cx="32" cy="8" r="1.2" fill="currentColor" />
+                        <circle cx="28" cy="14" r="1" fill="currentColor" />
                       </svg>
-                    </span>
-                    <span className="text-[11px] font-mono font-bold uppercase tracking-[0.18em] text-teal-100">8 MIN</span>
-                    <span aria-hidden className="absolute right-1.5 top-1/2 -translate-y-1/2 h-1 w-1 rounded-full bg-teal-300 shadow-[0_0_6px_rgba(94,234,212,0.9)]" />
+                      <span className="relative inline-flex h-7 w-7 items-center justify-center" style={{
+                        background: "radial-gradient(circle at 35% 30%, #0d9488 0%, #064e47 60%, #021716 100%)",
+                        clipPath: "polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)",
+                        boxShadow: "inset 0 0 6px rgba(94,234,212,0.6), 0 0 8px rgba(94,234,212,0.3)",
+                      }}>
+                        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-teal-100 drop-shadow-[0_0_3px_rgba(94,234,212,0.9)]" fill="none" stroke="currentColor" strokeWidth="2">
+                          <circle cx="12" cy="13" r="7" />
+                          <path d="M12 9v4l2.5 1.5M9 2h6" strokeLinecap="round" />
+                        </svg>
+                      </span>
+                      <span className="relative text-[11px] font-mono font-bold uppercase tracking-[0.22em] text-teal-50 drop-shadow-[0_1px_0_rgba(0,0,0,0.6)]">8 Min</span>
+                    </div>
                   </div>
 
-                  {/* HUD Chip: XP */}
-                  <div className="group relative inline-flex items-center gap-2 pl-2 pr-3.5 py-1.5 text-white"
-                    style={{
-                      background: "linear-gradient(135deg, #0a3d36 0%, #0d4f3f 50%, #1a5c3a 100%)",
-                      clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
-                      boxShadow: "inset 0 1px 0 rgba(253,224,71,0.18), inset 0 0 0 1px rgba(251,191,36,0.25), 0 4px 12px rgba(2,23,22,0.35), 0 0 16px rgba(251,191,36,0.15)",
-                    }}
-                  >
-                    <span className="relative inline-flex h-6 w-6 items-center justify-center rounded-md bg-amber-950/40 ring-1 ring-amber-300/50 shadow-[inset_0_0_8px_rgba(251,191,36,0.45)]">
-                      <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-amber-300 drop-shadow-[0_0_4px_rgba(251,191,36,0.8)]" fill="currentColor">
-                        <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" />
+                  {/* Nexus Plate: XP */}
+                  <div className="relative">
+                    <div className="absolute -inset-[3px] pointer-events-none" style={{
+                      background: "linear-gradient(135deg, rgba(251,191,36,0.55) 0%, rgba(94,234,212,0.3) 50%, rgba(251,191,36,0.45) 100%)",
+                      clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
+                    }} />
+                    <div className="relative inline-flex items-center gap-2.5 pl-2 pr-4 py-2 overflow-hidden"
+                      style={{
+                        background: "linear-gradient(135deg, #021a18 0%, #0a3d36 45%, #154d3a 100%)",
+                        clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
+                        boxShadow: "inset 0 1px 0 rgba(251,191,36,0.3), inset 0 -8px 16px rgba(0,0,0,0.4), 0 0 18px rgba(251,191,36,0.18)",
+                      }}
+                    >
+                      <div aria-hidden className="absolute inset-0 opacity-20 pointer-events-none" style={{
+                        backgroundImage: "repeating-linear-gradient(0deg, rgba(251,191,36,0.15) 0px, rgba(251,191,36,0.15) 1px, transparent 1px, transparent 3px)",
+                      }} />
+                      <div aria-hidden className="absolute left-0 top-0 h-full w-12 pointer-events-none" style={{
+                        background: "radial-gradient(circle at 30% 50%, rgba(251,191,36,0.45), transparent 70%)",
+                      }} />
+                      <svg aria-hidden className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-10 text-amber-300/40 pointer-events-none" viewBox="0 0 40 24" fill="none">
+                        <path d="M0 12 H14 L18 8 H32" stroke="currentColor" strokeWidth="0.8" />
+                        <circle cx="32" cy="8" r="1.2" fill="currentColor" />
                       </svg>
-                    </span>
-                    <span className="text-[11px] font-mono font-bold uppercase tracking-[0.18em] text-amber-100">50 XP</span>
-                    <span aria-hidden className="absolute right-1.5 top-1/2 -translate-y-1/2 h-1 w-1 rounded-full bg-amber-300 shadow-[0_0_6px_rgba(251,191,36,0.9)]" />
+                      <span className="relative inline-flex h-7 w-7 items-center justify-center" style={{
+                        background: "radial-gradient(circle at 35% 30%, #fbbf24 0%, #92400e 70%, #1c1917 100%)",
+                        clipPath: "polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)",
+                        boxShadow: "inset 0 0 6px rgba(253,224,71,0.7), 0 0 10px rgba(251,191,36,0.5)",
+                      }}>
+                        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-amber-50 drop-shadow-[0_0_4px_rgba(253,224,71,1)]" fill="currentColor">
+                          <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" />
+                        </svg>
+                      </span>
+                      <span className="relative text-[11px] font-mono font-bold uppercase tracking-[0.22em] text-amber-50 drop-shadow-[0_1px_0_rgba(0,0,0,0.6)]">50 XP</span>
+                    </div>
                   </div>
 
-                  {/* HUD Chip: Legend */}
-                  <div className="group relative inline-flex items-center gap-2 pl-2 pr-3.5 py-1.5 text-white"
-                    style={{
-                      background: "linear-gradient(135deg, #052e2b 0%, #0a4d47 50%, #0d6b50 100%)",
-                      clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
-                      boxShadow: "inset 0 1px 0 rgba(110,231,183,0.25), inset 0 0 0 1px rgba(52,211,153,0.25), 0 4px 12px rgba(2,23,22,0.35), 0 0 14px rgba(52,211,153,0.12)",
-                    }}
-                  >
-                    <span className="relative inline-flex h-6 w-6 items-center justify-center rounded-md bg-emerald-950/50 ring-1 ring-emerald-300/45 shadow-[inset_0_0_8px_rgba(52,211,153,0.4)]">
-                      <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-emerald-200" fill="none" stroke="currentColor" strokeWidth="1.8">
-                        <path d="M12 2l9 5v10l-9 5-9-5V7l9-5z" strokeLinejoin="round" />
-                        <path d="M12 7l5 2.8v5.4L12 18l-5-2.8V9.8L12 7z" strokeLinejoin="round" opacity="0.7" />
+                  {/* Nexus Plate: Legend */}
+                  <div className="relative">
+                    <div className="absolute -inset-[3px] pointer-events-none" style={{
+                      background: "linear-gradient(135deg, rgba(110,231,183,0.55) 0%, rgba(15,118,110,0.3) 50%, rgba(110,231,183,0.45) 100%)",
+                      clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
+                    }} />
+                    <div className="relative inline-flex items-center gap-2.5 pl-2 pr-4 py-2 overflow-hidden"
+                      style={{
+                        background: "linear-gradient(135deg, #021a18 0%, #063d38 45%, #0d6b50 100%)",
+                        clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
+                        boxShadow: "inset 0 1px 0 rgba(110,231,183,0.35), inset 0 -8px 16px rgba(0,0,0,0.4), 0 0 14px rgba(52,211,153,0.15)",
+                      }}
+                    >
+                      <div aria-hidden className="absolute inset-0 opacity-20 pointer-events-none" style={{
+                        backgroundImage: "repeating-linear-gradient(0deg, rgba(110,231,183,0.15) 0px, rgba(110,231,183,0.15) 1px, transparent 1px, transparent 3px)",
+                      }} />
+                      <svg aria-hidden className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-10 text-emerald-300/40 pointer-events-none" viewBox="0 0 40 24" fill="none">
+                        <path d="M0 12 H14 L18 8 H32" stroke="currentColor" strokeWidth="0.8" />
+                        <path d="M0 18 H10 L14 14 H28" stroke="currentColor" strokeWidth="0.8" />
+                        <circle cx="32" cy="8" r="1.2" fill="currentColor" />
                       </svg>
-                    </span>
-                    <span className="text-[11px] font-mono font-bold uppercase tracking-[0.18em] text-emerald-100">Unlock Legend</span>
-                    <span aria-hidden className="absolute right-1.5 top-1/2 -translate-y-1/2 h-1 w-1 rounded-full bg-emerald-300 shadow-[0_0_6px_rgba(52,211,153,0.9)] animate-pulse" />
+                      <span className="relative inline-flex h-7 w-7 items-center justify-center" style={{
+                        background: "radial-gradient(circle at 35% 30%, #34d399 0%, #065f46 60%, #021716 100%)",
+                        clipPath: "polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)",
+                        boxShadow: "inset 0 0 6px rgba(110,231,183,0.7), 0 0 10px rgba(52,211,153,0.4)",
+                      }}>
+                        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-emerald-50 drop-shadow-[0_0_3px_rgba(110,231,183,0.9)]" fill="none" stroke="currentColor" strokeWidth="1.8">
+                          <path d="M12 2l9 5v10l-9 5-9-5V7l9-5z" strokeLinejoin="round" />
+                          <path d="M12 7l5 2.8v5.4L12 18l-5-2.8V9.8L12 7z" strokeLinejoin="round" opacity="0.65" />
+                        </svg>
+                      </span>
+                      <span className="relative text-[11px] font-mono font-bold uppercase tracking-[0.22em] text-emerald-50 drop-shadow-[0_1px_0_rgba(0,0,0,0.6)]">Unlock Legend</span>
+                    </div>
                   </div>
                 </div>
                 <button
