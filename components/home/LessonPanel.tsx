@@ -36,21 +36,52 @@ export default function LessonPanel({
   onStats,
 }: Props) {
   return (
-    <div className="rounded-2xl bg-black/30 backdrop-blur-xl border border-white/8 overflow-hidden">
+    <div
+      className="relative overflow-hidden"
+      style={{
+        background: "linear-gradient(135deg, #021a18 0%, #052e2b 50%, #064e47 100%)",
+        clipPath: "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
+        boxShadow: "inset 0 1px 0 rgba(94,234,212,0.18), inset 0 0 24px rgba(0,0,0,0.5), 0 0 24px rgba(20,184,166,0.15)",
+      }}
+    >
+      {/* Scanline texture */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.07]"
+        style={{ backgroundImage: "repeating-linear-gradient(0deg, rgba(94,234,212,0.6) 0 1px, transparent 1px 3px)" }}
+      />
+      {/* Bezel border */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: "linear-gradient(135deg, rgba(94,234,212,0.25), transparent 30%, transparent 70%, rgba(13,148,136,0.25))",
+          clipPath: "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
+          padding: "1px",
+          WebkitMask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
+          WebkitMaskComposite: "xor",
+          maskComposite: "exclude",
+        }}
+      />
+
       {/* Panel header */}
-      <div className="px-5 pt-4 pb-3 border-b border-white/6 flex items-center justify-between">
+      <div className="relative px-5 pt-4 pb-3 border-b border-teal-400/15 flex items-center justify-between">
         <div>
-          <span className="text-[10px] font-extrabold text-emerald-400 uppercase tracking-widest">
+          <span className="inline-flex items-center gap-1.5 text-[10px] font-mono font-extrabold text-teal-300 uppercase tracking-[0.2em]">
+            <span className="h-1 w-1 rounded-full bg-teal-300 shadow-[0_0_6px_rgba(94,234,212,0.9)]" />
             Week {week}
           </span>
-          <h2 className="text-sm font-bold text-white/90 mt-0.5">Weekly Focus</h2>
+          <h2 className="text-sm font-bold text-white/95 mt-1">Weekly Focus</h2>
           {topic && (
-            <p className="text-xs font-medium text-white/50 mt-0.5">{topic}</p>
+            <p className="text-xs font-medium text-teal-100/55 mt-0.5">{topic}</p>
           )}
         </div>
         <button
           onClick={onContinue}
-          className="px-4 py-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs font-extrabold hover:brightness-110 transition active:scale-[0.97]"
+          className="relative px-4 py-1.5 text-white text-[11px] font-mono font-extrabold uppercase tracking-[0.16em] hover:brightness-110 transition active:scale-[0.97]"
+          style={{
+            background: "linear-gradient(135deg, #064e47 0%, #0d9488 50%, #14b8a6 100%)",
+            clipPath: "polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px)",
+            boxShadow: "inset 0 1px 0 rgba(94,234,212,0.45), inset 0 -6px 12px rgba(0,0,0,0.35), 0 0 12px rgba(20,184,166,0.4)",
+          }}
           type="button"
         >
           Continue
