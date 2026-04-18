@@ -387,30 +387,21 @@ function ProgramPage() {
 
                     <div className="relative flex items-center justify-between">
                       <span
-                        className="h-11 w-11 flex items-center justify-center flex-shrink-0"
+                        className="inline-flex items-center px-3 py-1 text-[11px] font-mono font-extrabold uppercase tracking-[0.18em]"
                         style={{
-                          clipPath: "polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)",
+                          clipPath: "polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px)",
                           background: locked
-                            ? "radial-gradient(circle at 30% 30%, #1e293b, #0f172a 70%)"
+                            ? "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)"
                             : postTestReady
-                              ? "radial-gradient(circle at 30% 30%, #fde68a, #f59e0b 50%, #78350f 100%)"
+                              ? "linear-gradient(135deg, #78350f 0%, #f59e0b 100%)"
                               : completed
-                                ? "radial-gradient(circle at 30% 30%, #6ee7b7, #10b981 50%, #064e3b 100%)"
-                                : "radial-gradient(circle at 30% 30%, #5eead4, #14b8a6 50%, #064e47 100%)",
-                          boxShadow: "inset 0 0 8px rgba(0,0,0,0.5), 0 0 10px rgba(94,234,212,0.35)",
+                                ? "linear-gradient(135deg, #064e3b 0%, #10b981 100%)"
+                                : "linear-gradient(135deg, #064e47 0%, #14b8a6 100%)",
+                          color: locked ? "#64748b" : "#ecfeff",
+                          boxShadow: "inset 0 1px 0 rgba(94,234,212,0.35)",
                         }}
                       >
-                        <span className={locked ? "text-slate-500" : "text-teal-50"}>
-                          {locked ? (
-                            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0110 0v4" /></svg>
-                          ) : isPostTest ? (
-                            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
-                          ) : item.type === "quiz" ? (
-                            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg>
-                          ) : (
-                            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" /></svg>
-                          )}
-                        </span>
+                        {isPostTest ? "Post Test" : item.type === "quiz" ? "Weekly Quiz" : `Lesson ${item.n}`}
                       </span>
                       {completed ? (
                         <span
