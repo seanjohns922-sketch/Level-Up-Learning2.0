@@ -23,19 +23,10 @@ export function getHomeBg(levelNum: number): string {
   return "/images/number-nexus-home-bg.jpg";
 }
 
-/** Image filter per band */
-export function getHomeBgFilter(levelNum: number): string {
-  const band = getLevelBand(levelNum);
-  switch (band) {
-    case "apex":
-      return "brightness(1.15) contrast(1.2) saturate(1.25)";
-    case "advanced":
-      return "brightness(1.1) contrast(1.18) saturate(1.2)";
-    default:
-      return levelNum >= 3
-        ? "brightness(1.05) contrast(1.18) saturate(1.2)"
-        : "brightness(1.08) contrast(1.16) saturate(1.18)";
-  }
+/** Image filter per band — unified Level-5 "Clash Royale" crisp treatment across all levels */
+export function getHomeBgFilter(_levelNum: number): string {
+  // Single crisp recipe: punchy contrast, deeper blacks, vivid teals, no haze.
+  return "brightness(1.12) contrast(1.22) saturate(1.28)";
 }
 
 /** Particle palette per band */
