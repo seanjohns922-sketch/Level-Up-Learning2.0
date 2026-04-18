@@ -344,81 +344,147 @@ function ProgramPage() {
 
               return (
                 <div key={`${item.type}-${item.n}`} className="relative flex">
+                  {/* Bezel frame */}
+                  <div
+                    className="absolute -inset-[2px] pointer-events-none"
+                    style={{
+                      clipPath: "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
+                      background: locked
+                        ? "linear-gradient(135deg, rgba(94,234,212,0.12), rgba(13,148,136,0.08))"
+                        : postTestReady
+                          ? "linear-gradient(135deg, rgba(251,191,36,0.6), rgba(245,158,11,0.25) 40%, rgba(251,191,36,0.55))"
+                          : isActive
+                            ? "linear-gradient(135deg, rgba(94,234,212,0.6), rgba(13,148,136,0.2) 40%, rgba(20,184,166,0.55))"
+                            : completed
+                              ? "linear-gradient(135deg, rgba(16,185,129,0.5), rgba(13,148,136,0.2) 40%, rgba(16,185,129,0.45))"
+                              : "linear-gradient(135deg, rgba(94,234,212,0.35), rgba(13,148,136,0.15) 40%, rgba(20,184,166,0.35))",
+                    }}
+                  />
                   <button
                     onClick={() => !locked && openItem(item)}
                     disabled={locked}
                     className={[
-                      "w-full text-left p-5 rounded-2xl border transition-all flex flex-col gap-3 group backdrop-blur-sm",
-                      "shadow-[0_8px_20px_rgba(0,0,0,0.15)]",
+                      "relative w-full text-left p-5 transition-all flex flex-col gap-3 group overflow-hidden",
                       locked
-                        ? "border-white/10 bg-white/40 opacity-70 cursor-not-allowed"
-                        : isActive
-                          ? "border-white/60 bg-white/95 hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(0,0,0,0.22)] ring-2 ring-amber-300/70"
-                          : completed
-                            ? "border-emerald-200/80 bg-white/95 hover:-translate-y-0.5"
-                            : "border-white/40 bg-white/95 hover:-translate-y-0.5 hover:shadow-[0_14px_30px_rgba(0,0,0,0.22)]",
+                        ? "opacity-60 cursor-not-allowed"
+                        : "hover:-translate-y-1",
                     ].join(" ")}
+                    style={{
+                      clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
+                      background: locked
+                        ? "linear-gradient(135deg, #021a18 0%, #052e2b 100%)"
+                        : "linear-gradient(135deg, #021a18 0%, #052e2b 50%, #064e47 100%)",
+                      boxShadow: isActive
+                        ? "inset 0 1px 0 rgba(94,234,212,0.25), inset 0 -10px 24px rgba(0,0,0,0.45), 0 0 22px rgba(20,184,166,0.3)"
+                        : "inset 0 1px 0 rgba(94,234,212,0.18), inset 0 -10px 20px rgba(0,0,0,0.4), 0 0 14px rgba(20,184,166,0.15)",
+                    }}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className={[
-                        "w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0",
-                        locked ? "bg-gray-100 text-gray-400"
-                          : postTestReady ? "bg-amber-100 text-amber-600"
-                            : completed ? "bg-emerald-100 text-emerald-600"
-                              : item.type === "quiz" ? "bg-teal-100 text-teal-700"
-                                : "bg-teal-50 text-teal-700",
-                      ].join(" ")}>
-                        {locked ? (
-                          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0110 0v4" /></svg>
-                        ) : isPostTest ? (
-                          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
-                        ) : item.type === "quiz" ? (
-                          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg>
-                        ) : (
-                          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" /></svg>
-                        )}
-                      </div>
+                    {/* Scanline texture */}
+                    <div
+                      className="absolute inset-0 pointer-events-none opacity-[0.06]"
+                      style={{ backgroundImage: "repeating-linear-gradient(0deg, rgba(94,234,212,0.6) 0 1px, transparent 1px 3px)" }}
+                    />
+
+                    <div className="relative flex items-center justify-between">
+                      <span
+                        className="h-11 w-11 flex items-center justify-center flex-shrink-0"
+                        style={{
+                          clipPath: "polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)",
+                          background: locked
+                            ? "radial-gradient(circle at 30% 30%, #1e293b, #0f172a 70%)"
+                            : postTestReady
+                              ? "radial-gradient(circle at 30% 30%, #fde68a, #f59e0b 50%, #78350f 100%)"
+                              : completed
+                                ? "radial-gradient(circle at 30% 30%, #6ee7b7, #10b981 50%, #064e3b 100%)"
+                                : "radial-gradient(circle at 30% 30%, #5eead4, #14b8a6 50%, #064e47 100%)",
+                          boxShadow: "inset 0 0 8px rgba(0,0,0,0.5), 0 0 10px rgba(94,234,212,0.35)",
+                        }}
+                      >
+                        <span className={locked ? "text-slate-500" : "text-teal-50"}>
+                          {locked ? (
+                            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0110 0v4" /></svg>
+                          ) : isPostTest ? (
+                            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+                          ) : item.type === "quiz" ? (
+                            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg>
+                          ) : (
+                            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" /></svg>
+                          )}
+                        </span>
+                      </span>
                       {completed ? (
-                        <div className="h-7 w-7 rounded-full bg-emerald-500 text-white flex items-center justify-center" aria-label="Completed">
-                          <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="3"><path d="M20 6L9 17l-5-5" /></svg>
-                        </div>
+                        <span
+                          className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-mono font-extrabold tracking-[0.14em] text-emerald-100"
+                          style={{
+                            clipPath: "polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px)",
+                            background: "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
+                            boxShadow: "inset 0 1px 0 rgba(110,231,183,0.4)",
+                          }}
+                        >
+                          <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="3"><path d="M20 6L9 17l-5-5" /></svg>
+                          DONE
+                        </span>
                       ) : locked ? (
-                        <span className="text-[10px] tracking-wide text-gray-400 font-extrabold px-2 py-1 rounded-full border border-gray-200">LOCKED</span>
+                        <span
+                          className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-mono font-extrabold tracking-[0.14em] text-slate-400"
+                          style={{
+                            clipPath: "polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px)",
+                            background: "linear-gradient(135deg, #1e293b 0%, #334155 100%)",
+                          }}
+                        >
+                          LOCKED
+                        </span>
                       ) : (
-                        <span className="text-[10px] tracking-wide text-amber-700 font-extrabold px-2 py-1 rounded-full bg-amber-100/90">ACTIVE</span>
+                        <span
+                          className="inline-flex items-center gap-1.5 px-2 py-1 text-[10px] font-mono font-extrabold tracking-[0.14em] text-teal-100"
+                          style={{
+                            clipPath: "polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px)",
+                            background: postTestReady
+                              ? "linear-gradient(135deg, #78350f 0%, #f59e0b 100%)"
+                              : "linear-gradient(135deg, #064e47 0%, #14b8a6 100%)",
+                            boxShadow: "inset 0 1px 0 rgba(94,234,212,0.4)",
+                          }}
+                        >
+                          <span className="h-1 w-1 rounded-full bg-teal-200 shadow-[0_0_6px_rgba(94,234,212,0.9)] animate-pulse" />
+                          ACTIVE
+                        </span>
                       )}
                     </div>
 
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[11px] uppercase tracking-wide text-gray-400 font-bold">
+                    <div className="relative flex-1 min-w-0">
+                      <div className="text-[10px] font-mono uppercase tracking-[0.18em] text-teal-300/70 font-bold">
                         {labelTop}
                       </div>
-                      <div className="font-extrabold text-gray-900 mt-0.5 leading-tight line-clamp-2">
+                      <div className="font-extrabold text-white mt-1 leading-tight line-clamp-2 drop-shadow-[0_1px_4px_rgba(0,0,0,0.5)]">
                         {item.title}
                       </div>
                       <div
-                        className="mt-1.5 text-xs text-gray-500 leading-snug"
+                        className="mt-1.5 text-xs text-teal-100/60 leading-snug"
                         style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}
                       >
                         {locked && isPostTest ? "Complete all lessons to unlock" : item.focus}
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-                      <span className="text-[11px] text-gray-400 font-bold">
-                        {isPostTest ? "Mastery" : isLesson ? "10 XP" : "20 XP"}
+                    <div className="relative flex items-center justify-between pt-2 border-t border-teal-400/15">
+                      <span className="text-[10px] font-mono font-bold text-teal-200/70 tracking-[0.14em]">
+                        {isPostTest ? "MASTERY" : isLesson ? "10 XP" : "20 XP"}
                       </span>
                       {locked ? (
-                        <span className="text-[11px] text-gray-300 font-extrabold">—</span>
+                        <span className="text-[10px] font-mono font-extrabold text-slate-600">—</span>
                       ) : (
-                        <span className={[
-                          "text-[11px] font-extrabold px-3 py-1 rounded-full transition",
-                          postTestReady
-                            ? "bg-amber-500 text-white shadow-sm"
-                            : completed
-                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                              : "bg-gray-900 text-white group-hover:bg-teal-700",
-                        ].join(" ")}>
+                        <span
+                          className="text-[10px] font-mono font-extrabold tracking-[0.18em] px-3 py-1 text-white"
+                          style={{
+                            clipPath: "polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px)",
+                            background: postTestReady
+                              ? "linear-gradient(135deg, #78350f 0%, #f59e0b 100%)"
+                              : completed
+                                ? "linear-gradient(135deg, #064e3b 0%, #10b981 100%)"
+                                : "linear-gradient(135deg, #064e47 0%, #0d9488 50%, #14b8a6 100%)",
+                            boxShadow: "inset 0 1px 0 rgba(94,234,212,0.4), 0 0 8px rgba(20,184,166,0.35)",
+                          }}
+                        >
                           {completed ? "REPLAY" : "START"}
                         </span>
                       )}
@@ -427,11 +493,17 @@ function ProgramPage() {
 
                   {!isLast && (
                     <div className="hidden lg:flex absolute top-1/2 -right-3 -translate-y-1/2 z-20 pointer-events-none">
-                      <div className={[
-                        "h-7 w-7 rounded-full flex items-center justify-center backdrop-blur-sm",
-                        completed ? "bg-emerald-400/90 text-white" : "bg-white/40 text-white border border-white/40",
-                      ].join(" ")}>
-                        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="3"><path d="M9 6l6 6-6 6" /></svg>
+                      <div
+                        className="h-7 w-7 flex items-center justify-center"
+                        style={{
+                          clipPath: "polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)",
+                          background: completed
+                            ? "radial-gradient(circle, #10b981, #064e3b 70%)"
+                            : "radial-gradient(circle, #14b8a6, #064e47 70%)",
+                          boxShadow: "0 0 10px rgba(94,234,212,0.5)",
+                        }}
+                      >
+                        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-teal-50" fill="none" stroke="currentColor" strokeWidth="3"><path d="M9 6l6 6-6 6" /></svg>
                       </div>
                     </div>
                   )}
