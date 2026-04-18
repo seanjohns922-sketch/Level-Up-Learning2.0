@@ -36,21 +36,52 @@ export default function LessonPanel({
   onStats,
 }: Props) {
   return (
-    <div className="rounded-2xl bg-black/30 backdrop-blur-xl border border-white/8 overflow-hidden">
+    <div
+      className="relative overflow-hidden"
+      style={{
+        background: "linear-gradient(135deg, #021a18 0%, #052e2b 50%, #064e47 100%)",
+        clipPath: "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
+        boxShadow: "inset 0 1px 0 rgba(94,234,212,0.18), inset 0 0 24px rgba(0,0,0,0.5), 0 0 24px rgba(20,184,166,0.15)",
+      }}
+    >
+      {/* Scanline texture */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.07]"
+        style={{ backgroundImage: "repeating-linear-gradient(0deg, rgba(94,234,212,0.6) 0 1px, transparent 1px 3px)" }}
+      />
+      {/* Bezel border */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: "linear-gradient(135deg, rgba(94,234,212,0.25), transparent 30%, transparent 70%, rgba(13,148,136,0.25))",
+          clipPath: "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
+          padding: "1px",
+          WebkitMask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
+          WebkitMaskComposite: "xor",
+          maskComposite: "exclude",
+        }}
+      />
+
       {/* Panel header */}
-      <div className="px-5 pt-4 pb-3 border-b border-white/6 flex items-center justify-between">
+      <div className="relative px-5 pt-4 pb-3 border-b border-teal-400/15 flex items-center justify-between">
         <div>
-          <span className="text-[10px] font-extrabold text-emerald-400 uppercase tracking-widest">
+          <span className="inline-flex items-center gap-1.5 text-[10px] font-mono font-extrabold text-teal-300 uppercase tracking-[0.2em]">
+            <span className="h-1 w-1 rounded-full bg-teal-300 shadow-[0_0_6px_rgba(94,234,212,0.9)]" />
             Week {week}
           </span>
-          <h2 className="text-sm font-bold text-white/90 mt-0.5">Weekly Focus</h2>
+          <h2 className="text-sm font-bold text-white/95 mt-1">Weekly Focus</h2>
           {topic && (
-            <p className="text-xs font-medium text-white/50 mt-0.5">{topic}</p>
+            <p className="text-xs font-medium text-teal-100/55 mt-0.5">{topic}</p>
           )}
         </div>
         <button
           onClick={onContinue}
-          className="px-4 py-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs font-extrabold hover:brightness-110 transition active:scale-[0.97]"
+          className="relative px-4 py-1.5 text-white text-[11px] font-mono font-extrabold uppercase tracking-[0.16em] hover:brightness-110 transition active:scale-[0.97]"
+          style={{
+            background: "linear-gradient(135deg, #064e47 0%, #0d9488 50%, #14b8a6 100%)",
+            clipPath: "polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px)",
+            boxShadow: "inset 0 1px 0 rgba(94,234,212,0.45), inset 0 -6px 12px rgba(0,0,0,0.35), 0 0 12px rgba(20,184,166,0.4)",
+          }}
           type="button"
         >
           Continue
@@ -58,7 +89,7 @@ export default function LessonPanel({
       </div>
 
       {/* Lesson rows */}
-      <div className="divide-y divide-white/5">
+      <div className="relative divide-y divide-teal-400/10">
         {lessons.map((lesson, i) => {
           const done = i < lessonsDone;
           const current = i === lessonsDone;
@@ -140,16 +171,35 @@ export default function LessonPanel({
         </div>
       </div>
 
-      {/* Stats strip at bottom */}
-      <div className="px-5 py-3 border-t border-white/6 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5">
-            <Zap className="h-3.5 w-3.5 text-amber-400" />
-            <span className="text-xs font-extrabold text-white/60">{xp.toLocaleString()} XP</span>
+      {/* Stats strip at bottom — Nexus HUD */}
+      <div
+        className="relative px-5 py-3 flex items-center justify-between border-t border-teal-400/15"
+        style={{
+          background: "linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(2,26,24,0.45) 100%)",
+        }}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className="flex items-center gap-1.5 px-2.5 py-1"
+            style={{
+              background: "linear-gradient(135deg, #052e2b 0%, #064e47 100%)",
+              clipPath: "polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px)",
+              boxShadow: "inset 0 1px 0 rgba(94,234,212,0.2)",
+            }}
+          >
+            <Zap className="h-3 w-3 text-amber-300" />
+            <span className="text-[10px] font-mono font-extrabold text-amber-100 tracking-[0.12em]">{xp.toLocaleString()} XP</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <Target className="h-3.5 w-3.5 text-emerald-400" />
-            <span className="text-xs font-extrabold text-white/60">{accuracy}%</span>
+          <div
+            className="flex items-center gap-1.5 px-2.5 py-1"
+            style={{
+              background: "linear-gradient(135deg, #052e2b 0%, #064e47 100%)",
+              clipPath: "polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px)",
+              boxShadow: "inset 0 1px 0 rgba(94,234,212,0.2)",
+            }}
+          >
+            <Target className="h-3 w-3 text-emerald-300" />
+            <span className="text-[10px] font-mono font-extrabold text-emerald-100 tracking-[0.12em]">{accuracy}%</span>
           </div>
         </div>
 
@@ -164,13 +214,17 @@ export default function LessonPanel({
             <button
               key={item.label}
               onClick={item.onClick}
-              className="relative h-7 w-7 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white/70 transition group"
+              className="relative h-7 w-7 flex items-center justify-center text-teal-200/60 hover:text-teal-100 transition group"
+              style={{
+                background: "linear-gradient(135deg, #052e2b 0%, #064e47 100%)",
+                clipPath: "polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px)",
+                boxShadow: "inset 0 1px 0 rgba(94,234,212,0.2)",
+              }}
               type="button"
               aria-label={item.label}
             >
               <item.icon className="h-3.5 w-3.5" />
-              {/* Tooltip */}
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-black/80 text-[10px] font-bold text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-black/90 text-[10px] font-bold text-teal-100 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                 {item.label}
               </span>
             </button>

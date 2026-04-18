@@ -72,40 +72,63 @@ export default function HeroHeader({
 
         {/* Hero content — centered */}
         <div className="text-center">
-          {/* Level pill */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10 mb-3">
-            <span className="text-[10px] font-extrabold text-emerald-300 uppercase tracking-widest">
-              Level {levelNum}
-            </span>
-            <span className="text-white/30">·</span>
-            <span className="text-[10px] font-extrabold text-teal-200 uppercase tracking-widest">
-              Number Nexus
-            </span>
+          {/* Nexus level pill */}
+          <div
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 mb-3 text-[10px] font-mono font-bold uppercase tracking-[0.18em] text-teal-50"
+            style={{
+              background: "linear-gradient(135deg, #021a18 0%, #064e47 50%, #0a5048 100%)",
+              clipPath: "polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px)",
+              boxShadow: "inset 0 1px 0 rgba(94,234,212,0.35), inset 0 -1px 0 rgba(0,0,0,0.5), 0 0 16px rgba(20,184,166,0.25)",
+            }}
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]" />
+            Level {levelNum}
+            <span className="text-teal-400/50">·</span>
+            <span className="text-teal-200">Number Nexus</span>
           </div>
 
           {/* Week title */}
           <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight leading-none mb-1.5"
-              style={{ textShadow: "0 2px 12px rgba(0,0,0,0.4)" }}>
+              style={{ textShadow: "0 2px 14px rgba(20,184,166,0.4), 0 2px 12px rgba(0,0,0,0.4)" }}>
             Week {week}
           </h1>
 
           {/* Topic */}
           {topic && (
-            <p className="text-sm font-medium text-white/60 mb-3">{topic}</p>
+            <p className="text-sm font-medium text-white/70 mb-3">{topic}</p>
           )}
 
           {/* Completion subline */}
-          <p className="text-xs font-bold text-white/50 mb-3">
-            {lessonsDone} of {totalLessons} lessons completed
+          <p className="text-[10px] font-mono font-bold text-teal-200/70 uppercase tracking-[0.18em] mb-3">
+            {lessonsDone} / {totalLessons} Lessons Completed
           </p>
 
-          {/* Progress bar */}
-          <div className="max-w-xs mx-auto">
-            <div className="h-1.5 rounded-full bg-white/10 overflow-hidden backdrop-blur-sm">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-400 transition-all duration-700"
-                style={{ width: `${progressPct}%` }}
-              />
+          {/* Nexus progress plate */}
+          <div className="max-w-xs mx-auto relative">
+            <div
+              className="absolute -inset-[2px]"
+              style={{
+                clipPath: "polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px)",
+                background: "linear-gradient(135deg, rgba(94,234,212,0.5), rgba(13,148,136,0.4))",
+              }}
+            />
+            <div
+              className="relative px-1 py-[3px]"
+              style={{
+                clipPath: "polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px)",
+                background: "linear-gradient(135deg, #021a18 0%, #052e2b 100%)",
+              }}
+            >
+              <div className="h-1.5 rounded-full overflow-hidden bg-black/50">
+                <div
+                  className="h-full rounded-full transition-all duration-700"
+                  style={{
+                    width: `${progressPct}%`,
+                    background: "linear-gradient(90deg, #5eead4 0%, #14b8a6 60%, #10b981 100%)",
+                    boxShadow: "0 0 10px rgba(94,234,212,0.7)",
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>
