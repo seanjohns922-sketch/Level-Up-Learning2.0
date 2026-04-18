@@ -443,10 +443,7 @@ function ProgramPage() {
                     </div>
 
                     <div className="relative flex-1 min-w-0">
-                      <div className="text-[10px] font-mono uppercase tracking-[0.18em] text-teal-300/70 font-bold">
-                        {labelTop}
-                      </div>
-                      <div className="font-extrabold text-white mt-1 leading-tight line-clamp-2 drop-shadow-[0_1px_4px_rgba(0,0,0,0.5)]">
+                      <div className="font-extrabold text-white leading-tight line-clamp-2 drop-shadow-[0_1px_4px_rgba(0,0,0,0.5)]">
                         {item.title}
                       </div>
                       <div
