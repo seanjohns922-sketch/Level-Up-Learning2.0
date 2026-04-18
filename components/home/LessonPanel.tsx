@@ -171,16 +171,35 @@ export default function LessonPanel({
         </div>
       </div>
 
-      {/* Stats strip at bottom */}
-      <div className="px-5 py-3 border-t border-white/6 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5">
-            <Zap className="h-3.5 w-3.5 text-amber-400" />
-            <span className="text-xs font-extrabold text-white/60">{xp.toLocaleString()} XP</span>
+      {/* Stats strip at bottom — Nexus HUD */}
+      <div
+        className="relative px-5 py-3 flex items-center justify-between border-t border-teal-400/15"
+        style={{
+          background: "linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(2,26,24,0.45) 100%)",
+        }}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className="flex items-center gap-1.5 px-2.5 py-1"
+            style={{
+              background: "linear-gradient(135deg, #052e2b 0%, #064e47 100%)",
+              clipPath: "polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px)",
+              boxShadow: "inset 0 1px 0 rgba(94,234,212,0.2)",
+            }}
+          >
+            <Zap className="h-3 w-3 text-amber-300" />
+            <span className="text-[10px] font-mono font-extrabold text-amber-100 tracking-[0.12em]">{xp.toLocaleString()} XP</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <Target className="h-3.5 w-3.5 text-emerald-400" />
-            <span className="text-xs font-extrabold text-white/60">{accuracy}%</span>
+          <div
+            className="flex items-center gap-1.5 px-2.5 py-1"
+            style={{
+              background: "linear-gradient(135deg, #052e2b 0%, #064e47 100%)",
+              clipPath: "polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px)",
+              boxShadow: "inset 0 1px 0 rgba(94,234,212,0.2)",
+            }}
+          >
+            <Target className="h-3 w-3 text-emerald-300" />
+            <span className="text-[10px] font-mono font-extrabold text-emerald-100 tracking-[0.12em]">{accuracy}%</span>
           </div>
         </div>
 
@@ -195,13 +214,17 @@ export default function LessonPanel({
             <button
               key={item.label}
               onClick={item.onClick}
-              className="relative h-7 w-7 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white/70 transition group"
+              className="relative h-7 w-7 flex items-center justify-center text-teal-200/60 hover:text-teal-100 transition group"
+              style={{
+                background: "linear-gradient(135deg, #052e2b 0%, #064e47 100%)",
+                clipPath: "polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px)",
+                boxShadow: "inset 0 1px 0 rgba(94,234,212,0.2)",
+              }}
               type="button"
               aria-label={item.label}
             >
               <item.icon className="h-3.5 w-3.5" />
-              {/* Tooltip */}
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-black/80 text-[10px] font-bold text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-black/90 text-[10px] font-bold text-teal-100 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                 {item.label}
               </span>
             </button>
