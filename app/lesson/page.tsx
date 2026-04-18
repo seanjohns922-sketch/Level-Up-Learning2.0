@@ -121,36 +121,67 @@ function LessonPage() {
               {/* ROW 1: 2-column landscape — left intro / right video */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 {/* LEFT: Mission briefing */}
-                <div className="bg-card rounded-[20px] border border-border/60 shadow-[0_2px_6px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)] p-5 md:p-6 flex flex-col">
-                  <div className="inline-flex w-fit items-center gap-1.5 rounded-full bg-trust-blue-light/80 border border-trust-blue/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-trust-blue">
+                <div className="relative overflow-hidden bg-card rounded-[20px] border border-teal-200/60 shadow-[0_2px_6px_rgba(2,23,22,0.04),0_8px_24px_rgba(2,23,22,0.06)] p-5 md:p-6 flex flex-col">
+                  {/* Circuit corner accents */}
+                  <svg aria-hidden className="pointer-events-none absolute -top-px -left-px h-16 w-16 text-teal-500/25" viewBox="0 0 64 64" fill="none">
+                    <path d="M0 16 H20 L28 24 H48" stroke="currentColor" strokeWidth="1" />
+                    <path d="M0 28 H10 L16 34" stroke="currentColor" strokeWidth="1" />
+                    <circle cx="48" cy="24" r="1.5" fill="currentColor" />
+                    <circle cx="16" cy="34" r="1.5" fill="currentColor" />
+                  </svg>
+                  <svg aria-hidden className="pointer-events-none absolute -bottom-px -right-px h-20 w-20 text-emerald-500/20" viewBox="0 0 80 80" fill="none">
+                    <path d="M80 50 H60 L52 58 H30" stroke="currentColor" strokeWidth="1" />
+                    <path d="M80 64 H66 L60 70" stroke="currentColor" strokeWidth="1" />
+                    <circle cx="30" cy="58" r="1.5" fill="currentColor" />
+                    <circle cx="60" cy="70" r="1.5" fill="currentColor" />
+                  </svg>
+                  {/* Faint number grid */}
+                  <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[0.04]" style={{
+                    backgroundImage: "linear-gradient(rgba(13,148,136,1) 1px, transparent 1px), linear-gradient(90deg, rgba(13,148,136,1) 1px, transparent 1px)",
+                    backgroundSize: "24px 24px",
+                  }} />
+
+                  <div className="relative inline-flex w-fit items-center gap-2 rounded-full bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-300/40 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-teal-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
+                    <span className="inline-flex h-4 w-4 items-center justify-center rounded-sm bg-teal-600/90 text-white shadow-sm">
+                      <svg viewBox="0 0 16 16" className="h-2.5 w-2.5" fill="currentColor"><path d="M8 1l6 3.5v7L8 15 2 11.5v-7L8 1zm0 2.3L4 5.6v4.8l4 2.3 4-2.3V5.6L8 3.3z"/></svg>
+                    </span>
                     Mission Briefing
                   </div>
-                  <h2 className="mt-3 text-[1.35rem] md:text-2xl font-bold text-foreground leading-[1.15] tracking-[-0.02em]">
+                  <h2 className="relative mt-3 text-[1.35rem] md:text-2xl font-bold text-foreground leading-[1.15] tracking-[-0.02em]">
                     {safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
                   </h2>
                   {safeLessonFocus ? (
-                    <p className="mt-2 text-sm font-medium text-foreground/80 leading-relaxed">
-                      <span className="font-semibold text-foreground">Focus:</span> {safeLessonFocus}
+                    <p className="relative mt-2 text-sm font-medium text-foreground/80 leading-relaxed">
+                      <span className="font-semibold text-teal-800">Focus:</span> {safeLessonFocus}
                     </p>
                   ) : null}
-                  <p className="mt-2.5 text-sm font-normal text-muted-foreground leading-relaxed">
+                  <p className="relative mt-2.5 text-sm font-normal text-muted-foreground leading-relaxed">
                     Watch the short lesson video, then jump into 8 minutes of practice. Earn XP for every correct answer and unlock your Level Up Legend.
                   </p>
                 </div>
 
                 {/* RIGHT: Video card */}
-                <div className="bg-card rounded-[20px] border border-border/60 shadow-[0_2px_6px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)] p-3 md:p-4">
-                  <div className="flex items-center gap-2 text-foreground font-semibold mb-2.5 px-1 tracking-tight">
-                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-trust-blue-light text-trust-blue shadow-sm">
+                <div className="relative overflow-hidden bg-card rounded-[20px] border border-teal-200/60 shadow-[0_2px_6px_rgba(2,23,22,0.04),0_8px_24px_rgba(2,23,22,0.06)] p-3 md:p-4">
+                  <svg aria-hidden className="pointer-events-none absolute -top-px -right-px h-16 w-16 text-teal-500/25" viewBox="0 0 64 64" fill="none">
+                    <path d="M64 16 H44 L36 24 H16" stroke="currentColor" strokeWidth="1" />
+                    <path d="M64 28 H54 L48 34" stroke="currentColor" strokeWidth="1" />
+                    <circle cx="16" cy="24" r="1.5" fill="currentColor" />
+                  </svg>
+                  <div className="relative flex items-center gap-2 text-foreground font-semibold mb-2.5 px-1 tracking-tight">
+                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-teal-600 to-emerald-700 text-white shadow-[0_2px_6px_rgba(13,148,136,0.35),inset_0_1px_0_rgba(255,255,255,0.2)]">
                       <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="currentColor">
                         <path d="M8 5v14l11-7z" />
                       </svg>
                     </span>
                     <span className="text-sm">Lesson Video</span>
+                    <span className="ml-auto inline-flex items-center gap-1 text-[9px] font-mono uppercase tracking-[0.2em] text-teal-700/70">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.7)]" />
+                      Live
+                    </span>
                   </div>
                   {hasEmbeddedLessonVideo ? (
                     <div
-                      className="rounded-xl overflow-hidden bg-black shadow-inner"
+                      className="relative rounded-xl overflow-hidden bg-black shadow-inner ring-1 ring-teal-500/20"
                       style={{ position: "relative", width: "100%", paddingTop: "56.25%" }}
                     >
                       <iframe
@@ -165,28 +196,48 @@ function LessonPage() {
                       />
                     </div>
                   ) : (
-                    <div className="aspect-video rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 flex flex-col items-center justify-center text-white/70 text-xs gap-2 shadow-inner">
-                      <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white/10 backdrop-blur-sm border border-white/15 shadow-lg">
-                        <svg viewBox="0 0 24 24" className="h-5 w-5 ml-0.5" fill="currentColor">
+                    <div className="relative aspect-video rounded-xl overflow-hidden flex flex-col items-center justify-center text-white/80 text-xs gap-2 shadow-inner ring-1 ring-teal-400/30"
+                      style={{ background: "linear-gradient(135deg, #021716 0%, #064e47 60%, #0d9488 100%)" }}
+                    >
+                      {/* Holographic grid */}
+                      <div aria-hidden className="absolute inset-0 opacity-[0.18]" style={{
+                        backgroundImage: "linear-gradient(rgba(94,234,212,1) 1px, transparent 1px), linear-gradient(90deg, rgba(94,234,212,1) 1px, transparent 1px)",
+                        backgroundSize: "28px 28px",
+                        maskImage: "radial-gradient(ellipse at center, black 40%, transparent 80%)",
+                        WebkitMaskImage: "radial-gradient(ellipse at center, black 40%, transparent 80%)",
+                      }} />
+                      {/* Corner brackets */}
+                      <svg aria-hidden className="absolute top-2 left-2 h-5 w-5 text-teal-300/70" viewBox="0 0 20 20" fill="none"><path d="M2 8V2h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                      <svg aria-hidden className="absolute top-2 right-2 h-5 w-5 text-teal-300/70" viewBox="0 0 20 20" fill="none"><path d="M18 8V2h-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                      <svg aria-hidden className="absolute bottom-2 left-2 h-5 w-5 text-teal-300/70" viewBox="0 0 20 20" fill="none"><path d="M2 12v6h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                      <svg aria-hidden className="absolute bottom-2 right-2 h-5 w-5 text-teal-300/70" viewBox="0 0 20 20" fill="none"><path d="M18 12v6h-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                      <span className="relative inline-flex h-12 w-12 items-center justify-center rounded-full bg-teal-500/15 backdrop-blur-sm border border-teal-300/40 shadow-[0_0_24px_rgba(94,234,212,0.35)]">
+                        <svg viewBox="0 0 24 24" className="h-5 w-5 ml-0.5 text-teal-200" fill="currentColor">
                           <path d="M8 5v14l11-7z" />
                         </svg>
                       </span>
-                      <span className="font-medium tracking-wide">Video coming soon</span>
+                      <span className="relative font-mono text-[10px] uppercase tracking-[0.25em] text-teal-200/90">Video coming soon</span>
                     </div>
                   )}
                 </div>
               </div>
 
               {/* ROW 2: Compact action strip */}
-              <div className="mt-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3 rounded-[20px] border border-border/60 bg-card px-4 py-3 md:px-5 md:py-3.5 shadow-[0_2px_6px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)]">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100/80 border border-slate-200/80 px-3 py-1.5 text-xs font-semibold text-slate-700">
-                    <span className="text-slate-500">⏱</span> 8 min
+              <div className="relative overflow-hidden mt-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3 rounded-[20px] border border-teal-200/60 bg-card px-4 py-3 md:px-5 md:py-3.5 shadow-[0_2px_6px_rgba(2,23,22,0.04),0_8px_24px_rgba(2,23,22,0.06)]">
+                <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-1/3 opacity-[0.05]" style={{
+                  backgroundImage: "linear-gradient(rgba(13,148,136,1) 1px, transparent 1px), linear-gradient(90deg, rgba(13,148,136,1) 1px, transparent 1px)",
+                  backgroundSize: "20px 20px",
+                  maskImage: "linear-gradient(90deg, transparent, black)",
+                  WebkitMaskImage: "linear-gradient(90deg, transparent, black)",
+                }} />
+                <div className="relative flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-b from-teal-50 to-teal-100/80 border border-teal-300/50 px-3 py-1.5 text-xs font-semibold text-teal-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
+                    <span className="text-teal-600">⏱</span> 8 min
                   </span>
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200/70 px-3 py-1.5 text-xs font-semibold text-amber-800 shadow-[0_1px_2px_rgba(245,158,11,0.08)]">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-b from-amber-50 to-amber-100/70 border border-amber-300/60 px-3 py-1.5 text-xs font-semibold text-amber-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
                     <span className="text-amber-500">⚡</span> 50 XP
                   </span>
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200/70 px-3 py-1.5 text-xs font-semibold text-emerald-800 shadow-[0_1px_2px_rgba(16,185,129,0.08)]">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-b from-emerald-50 to-emerald-100/70 border border-emerald-300/60 px-3 py-1.5 text-xs font-semibold text-emerald-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
                     <span className="text-emerald-500">✨</span> Unlock Legend
                   </span>
                 </div>
