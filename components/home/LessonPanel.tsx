@@ -89,7 +89,7 @@ export default function LessonPanel({
       </div>
 
       {/* Lesson rows */}
-      <div className="divide-y divide-white/5">
+      <div className="relative divide-y divide-teal-400/10">
         {lessons.map((lesson, i) => {
           const done = i < lessonsDone;
           const current = i === lessonsDone;
