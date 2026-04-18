@@ -373,10 +373,14 @@ function ProgramPage() {
                       clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
                       background: locked
                         ? "linear-gradient(135deg, #021a18 0%, #052e2b 100%)"
-                        : "linear-gradient(135deg, #021a18 0%, #052e2b 50%, #064e47 100%)",
-                      boxShadow: isActive
-                        ? "inset 0 1px 0 rgba(94,234,212,0.25), inset 0 -10px 24px rgba(0,0,0,0.45), 0 0 22px rgba(20,184,166,0.3)"
-                        : "inset 0 1px 0 rgba(94,234,212,0.18), inset 0 -10px 20px rgba(0,0,0,0.4), 0 0 14px rgba(20,184,166,0.15)",
+                        : completed
+                          ? "linear-gradient(135deg, #022c22 0%, #064e3b 50%, #047857 100%)"
+                          : "linear-gradient(135deg, #021a18 0%, #052e2b 50%, #064e47 100%)",
+                      boxShadow: completed
+                        ? "inset 0 1px 0 rgba(110,231,183,0.4), inset 0 -10px 24px rgba(0,0,0,0.4), 0 0 26px rgba(16,185,129,0.45)"
+                        : isActive
+                          ? "inset 0 1px 0 rgba(94,234,212,0.25), inset 0 -10px 24px rgba(0,0,0,0.45), 0 0 22px rgba(20,184,166,0.3)"
+                          : "inset 0 1px 0 rgba(94,234,212,0.18), inset 0 -10px 20px rgba(0,0,0,0.4), 0 0 14px rgba(20,184,166,0.15)",
                     }}
                   >
                     {/* Scanline texture */}
@@ -384,6 +388,28 @@ function ProgramPage() {
                       className="absolute inset-0 pointer-events-none opacity-[0.06]"
                       style={{ backgroundImage: "repeating-linear-gradient(0deg, rgba(94,234,212,0.6) 0 1px, transparent 1px 3px)" }}
                     />
+                    {/* Completed checkmark watermark */}
+                    {completed && (
+                      <svg
+                        className="absolute -right-4 -bottom-4 h-32 w-32 text-emerald-400/10 pointer-events-none"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                      >
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
+                    )}
+                    {/* Completed corner stripe */}
+                    {completed && (
+                      <div
+                        className="absolute top-0 left-0 h-1 w-full pointer-events-none"
+                        style={{
+                          background: "linear-gradient(90deg, #6ee7b7, #10b981 50%, transparent 100%)",
+                          boxShadow: "0 0 12px rgba(110,231,183,0.7)",
+                        }}
+                      />
+                    )}
 
                     <div className="relative flex items-center justify-between">
                       <span
