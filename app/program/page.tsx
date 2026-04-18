@@ -237,26 +237,68 @@ function ProgramPage() {
           </div>
 
           <div className="text-center">
-            <span className="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur px-4 py-1.5 rounded-full text-sm font-bold text-white">
-              Level {levelNum} – 12-Week Program
+            {/* Nexus level pill */}
+            <span
+              className="inline-flex items-center gap-2 px-4 py-1.5 text-[11px] font-mono font-bold uppercase tracking-[0.18em] text-teal-50"
+              style={{
+                background: "linear-gradient(135deg, #021a18 0%, #064e47 50%, #0a5048 100%)",
+                clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
+                boxShadow: "inset 0 1px 0 rgba(94,234,212,0.35), inset 0 -1px 0 rgba(0,0,0,0.5), 0 0 18px rgba(20,184,166,0.25)",
+              }}
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]" />
+              Level {levelNum} · 12-Week Program
             </span>
-            <h1 className="text-4xl md:text-5xl font-black text-white mt-3 tracking-tight">Week {weekNum}</h1>
-            <p className="text-base md:text-lg text-white/90 mt-2 font-semibold">
-              Focus: {currentWeekPlan?.topic ?? "Your current focus"}
+            <h1 className="text-4xl md:text-5xl font-black text-white mt-3 tracking-tight drop-shadow-[0_2px_12px_rgba(20,184,166,0.35)]">Week {weekNum}</h1>
+            <p className="text-base md:text-lg text-teal-50/95 mt-2 font-semibold">
+              <span className="text-teal-300/80 font-mono text-xs uppercase tracking-[0.18em] mr-2">Focus</span>
+              {currentWeekPlan?.topic ?? "Your current focus"}
             </p>
-            <p className="text-teal-100 mt-2 text-sm font-medium">
+            <p className="text-teal-200/80 mt-2 text-xs font-mono uppercase tracking-[0.16em]">
               {isClient
                 ? weekComplete
-                  ? "✅ Completed"
-                  : `${lessonsDoneCount}/3 lessons – ${progress.quizCompleted ? "quiz done" : "quiz pending"}`
-                : "0/3 lessons – quiz pending"}
+                  ? "◆ Completed"
+                  : `${lessonsDoneCount}/3 Lessons · ${progress.quizCompleted ? "Quiz Done" : "Quiz Pending"}`
+                : "0/3 Lessons · Quiz Pending"}
             </p>
 
-            <div className="mt-5 mx-auto max-w-sm bg-white/15 backdrop-blur rounded-full px-5 py-3">
-              <div className="h-2.5 rounded-full bg-white/20 overflow-hidden">
-                <div className="h-full rounded-full bg-white/80 transition-all duration-500" style={{ width: `${percent}%` }} />
+            {/* Nexus XP plate */}
+            <div className="mt-5 mx-auto max-w-sm relative">
+              <div
+                className="absolute -inset-[2px]"
+                style={{
+                  clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
+                  background: "linear-gradient(135deg, rgba(94,234,212,0.55), rgba(20,184,166,0.15) 40%, rgba(13,148,136,0.5))",
+                }}
+              />
+              <div
+                className="relative px-5 py-3"
+                style={{
+                  clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
+                  background: "linear-gradient(135deg, #021a18 0%, #052e2b 50%, #064e47 100%)",
+                  boxShadow: "inset 0 1px 0 rgba(94,234,212,0.25), inset 0 -8px 18px rgba(0,0,0,0.45)",
+                }}
+              >
+                <div
+                  className="absolute inset-0 opacity-15 pointer-events-none"
+                  style={{
+                    backgroundImage: "repeating-linear-gradient(0deg, rgba(94,234,212,0.4) 0 1px, transparent 1px 3px)",
+                  }}
+                />
+                <div className="relative h-2 rounded-full bg-black/50 overflow-hidden ring-1 ring-teal-400/20">
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${percent}%`,
+                      background: "linear-gradient(90deg, #5eead4 0%, #14b8a6 50%, #10b981 100%)",
+                      boxShadow: "0 0 10px rgba(94,234,212,0.7)",
+                    }}
+                  />
+                </div>
+                <p className="relative text-[10px] text-teal-100/90 mt-2 text-center font-mono font-bold tracking-[0.2em]">
+                  {xp} / {totalXp} XP
+                </p>
               </div>
-              <p className="text-xs text-white/70 mt-2 text-center font-medium">{xp} / {totalXp} XP</p>
             </div>
           </div>
         </div>
