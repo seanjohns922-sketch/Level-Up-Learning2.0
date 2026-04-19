@@ -343,7 +343,7 @@ export default function ProfilePage() {
               <div className="rounded-2xl bg-white border border-slate-200/70 p-4 shadow-sm">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-teal-600" />
+                    <Calendar className="h-4 w-4 text-indigo-600" />
                     Activity
                   </h3>
                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{monthName}</span>
@@ -367,9 +367,9 @@ export default function ProfilePage() {
                         key={day}
                         className={`flex items-center justify-center rounded-md aspect-square text-[10px] font-bold transition-all
                           ${isToday
-                            ? "bg-gradient-to-br from-teal-500 to-emerald-600 text-white shadow-sm"
+                            ? "bg-slate-900 text-white shadow-sm"
                             : isActive
-                              ? "bg-emerald-100 text-emerald-700 font-extrabold"
+                              ? "bg-amber-100 text-amber-700 font-extrabold"
                               : isPast
                                 ? "text-slate-300"
                                 : "text-slate-200"
@@ -384,7 +384,7 @@ export default function ProfilePage() {
               </div>
 
               {/* Daily Challenge */}
-              <div className="rounded-2xl bg-gradient-to-br from-teal-600 to-emerald-700 p-5 text-white relative overflow-hidden shadow-md">
+              <div className="rounded-2xl bg-gradient-to-br from-slate-900 to-indigo-900 p-5 text-white relative overflow-hidden shadow-md">
                 <div className="absolute -top-6 -right-6 h-24 w-24 rounded-full bg-white/10 blur-2xl" />
                 <div className="relative">
                   <div className="h-10 w-10 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center mb-3">
@@ -402,7 +402,7 @@ export default function ProfilePage() {
               {/* Level Progress mini */}
               <div className="rounded-2xl bg-white border border-slate-200/70 p-4 shadow-sm">
                 <h4 className="text-sm font-extrabold text-slate-900 mb-3 flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-emerald-600" />
+                  <TrendingUp className="h-4 w-4 text-indigo-600" />
                   Level Progress
                 </h4>
                 <div className="flex items-center gap-3">
@@ -410,11 +410,11 @@ export default function ProfilePage() {
                     <svg viewBox="0 0 36 36" className="h-full w-full -rotate-90">
                       <defs>
                         <linearGradient id="ringGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#14b8a6" />
-                          <stop offset="100%" stopColor="#10b981" />
+                          <stop offset="0%" stopColor="#6366f1" />
+                          <stop offset="100%" stopColor="#4338ca" />
                         </linearGradient>
                       </defs>
-                      <circle cx="18" cy="18" r="15.5" fill="none" stroke="#ECFDF5" strokeWidth="3" />
+                      <circle cx="18" cy="18" r="15.5" fill="none" stroke="#EEF2FF" strokeWidth="3" />
                       <circle
                         cx="18" cy="18" r="15.5" fill="none"
                         stroke="url(#ringGrad2)" strokeWidth="3" strokeLinecap="round"
@@ -437,24 +437,6 @@ export default function ProfilePage() {
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* ─── BOTTOM SOCIAL TEASER ─── */}
-          <div className="rounded-2xl bg-white border border-slate-200/70 px-6 py-3 flex items-center justify-center gap-8 shadow-sm">
-            {[
-              { icon: Users, label: "Friends", color: "text-teal-600" },
-              { icon: Swords, label: "Battles", color: "text-rose-500" },
-              { icon: Medal, label: "Rankings", color: "text-amber-500" },
-            ].map((item) => (
-              <div key={item.label} className="flex items-center gap-1.5 opacity-40">
-                <item.icon className={`h-4 w-4 ${item.color}`} />
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{item.label}</span>
-              </div>
-            ))}
-            <div className="flex items-center gap-1.5 ml-3 pl-3 border-l border-slate-200">
-              <Lock className="h-3 w-3 text-slate-300" />
-              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.15em]">Coming Soon</span>
             </div>
           </div>
 
