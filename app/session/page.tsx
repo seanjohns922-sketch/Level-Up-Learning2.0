@@ -25,6 +25,7 @@ import NumberChartFill from "@/components/NumberChartFill";
 import MoneyMakeAmount from "@/components/week7/MoneyMakeAmount";
 import MoneyChange from "@/components/week7/MoneyChange";
 import MoneyEnough from "@/components/week7/MoneyEnough";
+import { MathFormattedText } from "@/components/FractionText";
 import { ClickableDotGrid, ClickableDotRows } from "@/components/ClickableDots";
 import { StaticDotGrid, StaticDotRow, StaticDotRows } from "@/components/StaticDots";
 import {
@@ -198,6 +199,12 @@ type QuizQuestion = {
   };
   activity?: LessonActivity;
   questionData?: Year2QuestionData;
+  quizMeta?: {
+    type: string;
+    operation?: "add" | "subtract";
+    denominatorPair?: string;
+    difficulty?: "early" | "middle" | "late";
+  };
 };
 
 type LessonBreakdown = {
@@ -359,6 +366,98 @@ function getStructuredQuestionFingerprint(questionData: Year2QuestionData) {
   return JSON.stringify(questionData);
 }
 
+function operationFromSymbol(symbol?: string): "add" | "subtract" | undefined {
+  if (symbol === "+") return "add";
+  if (symbol === "-") return "subtract";
+  return undefined;
+}
+
+function quizMetaFromGeneratedQuestion(
+  questionData: Year2QuestionData,
+  activity: LessonActivity,
+  questionNumber: number,
+  totalQuestions: number
+): NonNullable<QuizQuestion["quizMeta"]> {
+  const mode = typeof activity.config?.mode === "string" ? String(activity.config.mode) : activity.activityType;
+  const text = questionData.kind === "multiple_choice" || questionData.kind === "typed_response"
+    ? `${questionData.prompt} ${questionData.answer ?? ""}`
+    : JSON.stringify(questionData);
+  const visual =
+    (questionData.kind === "multiple_choice" || questionData.kind === "typed_response") &&
+    questionData.visual?.type === "same_denominator_operation"
+      ? questionData.visual
+      : null;
+  const fractionMatches = [...text.matchAll(/(\d+)\/(\d+)/g)];
+  const denominatorsFromText = fractionMatches.map((match) => Number(match[2])).filter(Number.isFinite);
+  const denominators = visual
+    ? [
+        visual.originalDenominatorA ?? visual.denominator,
+        visual.originalDenominatorB ?? visual.denominator,
+      ]
+    : denominatorsFromText.slice(0, 2);
+  const denominatorPair =
+    denominators.length >= 2
+      ? [...denominators.slice(0, 2)].sort((a, b) => a - b).join("-")
+      : undefined;
+  const operation =
+    visual
+      ? operationFromSymbol(visual.operation)
+      : text.includes("+")
+      ? "add"
+      : text.includes("-")
+      ? "subtract"
+      : undefined;
+  const progress = questionNumber / Math.max(1, totalQuestions - 1);
+
+  return {
+    type: mode,
+    operation,
+    denominatorPair,
+    difficulty: progress < 0.34 ? "early" : progress < 0.67 ? "middle" : "late",
+  };
+}
+
+function violatesQuizVarietyRules(
+  metadata: NonNullable<QuizQuestion["quizMeta"]>,
+  selected: QuizQuestion[],
+  totalQuestions: number
+) {
+  if (
+    metadata.denominatorPair &&
+    selected.some((question) => question.quizMeta?.denominatorPair === metadata.denominatorPair)
+  ) {
+    return true;
+  }
+
+  const typeCount = selected.filter((question) => question.quizMeta?.type === metadata.type).length;
+  if (typeCount >= 2) {
+    return true;
+  }
+
+  if (metadata.operation && selected.length >= 2) {
+    const recent = selected.slice(-2);
+    if (recent.every((question) => question.quizMeta?.operation === metadata.operation)) {
+      return true;
+    }
+  }
+
+  const additionCount = selected.filter((question) => question.quizMeta?.operation === "add").length;
+  const subtractionCount = selected.filter((question) => question.quizMeta?.operation === "subtract").length;
+  const nextAdditionCount = additionCount + (metadata.operation === "add" ? 1 : 0);
+  const nextSubtractionCount = subtractionCount + (metadata.operation === "subtract" ? 1 : 0);
+  const remainingAfterThisQuestion = totalQuestions - selected.length - 1;
+
+  if (nextAdditionCount + remainingAfterThisQuestion < 4) {
+    return true;
+  }
+
+  if (nextSubtractionCount + remainingAfterThisQuestion < 4) {
+    return true;
+  }
+
+  return false;
+}
+
 function validateStructuredWeeklyQuizQuestions(
   weekPlan: WeekPlan,
   questions: QuizQuestion[],
@@ -437,15 +536,31 @@ function buildStructuredWeeklyQuizQuestions(
       let sourceActivity = sourceActivities[i % sourceActivities.length];
       let questionData = generateQuestionForLevelLessonActivity(level, lesson, sourceActivity);
       let fingerprint = getStructuredQuestionFingerprint(questionData);
+      let quizMeta = quizMetaFromGeneratedQuestion(
+        questionData,
+        sourceActivity,
+        questions.length,
+        questionsPerLesson * 3
+      );
       let attempts = 0;
 
       while (
-        attempts < 20 &&
-        (!isQuizSafeGeneratedQuestion(questionData) || seenFingerprints.has(fingerprint))
+        attempts < 50 &&
+        (
+          !isQuizSafeGeneratedQuestion(questionData) ||
+          seenFingerprints.has(fingerprint) ||
+          violatesQuizVarietyRules(quizMeta, questions, questionsPerLesson * 3)
+        )
       ) {
         sourceActivity = sourceActivities[(i + attempts + 1) % sourceActivities.length];
         questionData = generateQuestionForLevelLessonActivity(level, lesson, sourceActivity);
         fingerprint = getStructuredQuestionFingerprint(questionData);
+        quizMeta = quizMetaFromGeneratedQuestion(
+          questionData,
+          sourceActivity,
+          questions.length,
+          questionsPerLesson * 3
+        );
         attempts += 1;
       }
 
@@ -473,6 +588,7 @@ function buildStructuredWeeklyQuizQuestions(
         prompt: questionData.prompt,
         activity: sourceActivity,
         questionData,
+        quizMeta,
       });
     }
 
@@ -3269,7 +3385,9 @@ function SessionPage() {
                             Lesson {currentQuiz.lessonTag}
                           </div>
                         ) : null}
-                        {currentQuiz?.kind === "lessonActivity" ? null : currentQuiz?.prompt}
+                        {currentQuiz?.kind === "lessonActivity" ? null : (
+                          <MathFormattedText text={currentQuiz?.prompt ?? ""} compactFractions />
+                        )}
                       </div>
                       <button
                         type="button"
@@ -3361,7 +3479,7 @@ function SessionPage() {
                   ) : null}
 
                   {currentQuiz?.kind === "lessonActivity" && currentQuiz.activity && currentQuiz.questionData ? (
-                    <div className={quizLessonActivityResults[currentQuiz.id]?.attempted ? "pointer-events-none opacity-80" : ""}>
+                    <div>
                       <LessonRenderer
                         activity={currentQuiz.activity}
                         prompt={currentQuiz.prompt}
@@ -3369,22 +3487,18 @@ function SessionPage() {
                         renderMode="quiz"
                         onCorrect={() =>
                           setQuizLessonActivityResults((prev) =>
-                            prev[currentQuiz.id]
-                              ? prev
-                              : {
-                                  ...prev,
-                                  [currentQuiz.id]: { attempted: true, correct: true },
-                                }
+                            ({
+                              ...prev,
+                              [currentQuiz.id]: { attempted: true, correct: true },
+                            })
                           )
                         }
                         onWrong={() =>
                           setQuizLessonActivityResults((prev) =>
-                            prev[currentQuiz.id]
-                              ? prev
-                              : {
-                                  ...prev,
-                                  [currentQuiz.id]: { attempted: true, correct: false },
-                                }
+                            ({
+                              ...prev,
+                              [currentQuiz.id]: { attempted: true, correct: false },
+                            })
                           )
                         }
                       />
@@ -3730,10 +3844,25 @@ function SessionPage() {
                                 : "border-border bg-card hover:border-trust-blue/40 text-foreground",
                             ].join(" ")}
                           >
-                            {opt}
+                            <MathFormattedText text={opt} compactFractions />
                           </button>
                         );
                       })}
+                      {typeof quizAnswers[currentQuiz.id] === "number" ? (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setQuizAnswers((prev) => {
+                              const next = { ...prev };
+                              delete next[currentQuiz.id];
+                              return next;
+                            })
+                          }
+                          className="justify-self-start rounded-xl border border-border bg-card px-3 py-2 text-sm font-bold text-muted-foreground transition hover:border-trust-blue/40 hover:text-foreground"
+                        >
+                          Clear Answer
+                        </button>
+                      ) : null}
                     </div>
                   ) : null}
                 </div>
