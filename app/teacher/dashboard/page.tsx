@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useAuthGuard } from "@/lib/useAuthGuard";
 import { getLatestPosttestProfile } from "@/data/assessments/analysis";
+import CurriculumExplorer from "@/components/teacher/CurriculumExplorer";
 
 /* ── types ─────────────────────────────────────────── */
 type ClassRow = { id: string; class_code: string; name: string; year_level: string };
@@ -149,6 +150,7 @@ export default function TeacherDashboardPage() {
   const [progress, setProgress] = useState<ProgressRow[]>([]);
   const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
   const [activeYear, setActiveYear] = useState("Year 1");
+  const [activeTab, setActiveTab] = useState<"students" | "curriculum">("students");
   const [copiedCode, setCopiedCode] = useState(false);
 
   // Refs to prevent duplicate fetches and stale closures
@@ -657,23 +659,54 @@ export default function TeacherDashboardPage() {
               <KpiTile label="Post-Tests" value={postTests} accent="#6366F1" icon={(<><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></>)} />
             </div>
 
-            {/* Year level tabs */}
-            <div className="flex items-center gap-1 p-1 bg-white rounded-xl border border-[#E6E8EC] w-fit overflow-x-auto">
-              {YEAR_LEVELS.map((yr) => (
-                <button
-                  key={yr}
-                  onClick={() => setActiveYear(yr)}
-                  className={[
-                    "px-3.5 py-1.5 rounded-lg font-bold text-sm whitespace-nowrap transition",
-                    activeYear === yr
-                      ? "bg-[#0F172A] text-white shadow-sm"
-                      : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9]",
-                  ].join(" ")}
-                >
-                  {yr}
-                </button>
-              ))}
+            {/* Year level + view tabs */}
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex items-center gap-1 p-1 bg-white rounded-xl border border-[#E6E8EC] w-fit overflow-x-auto">
+                {YEAR_LEVELS.map((yr) => (
+                  <button
+                    key={yr}
+                    onClick={() => setActiveYear(yr)}
+                    className={[
+                      "px-3.5 py-1.5 rounded-lg font-bold text-sm whitespace-nowrap transition",
+                      activeYear === yr
+                        ? "bg-[#0F172A] text-white shadow-sm"
+                        : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9]",
+                    ].join(" ")}
+                  >
+                    {yr}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-1 p-1 bg-white rounded-xl border border-[#E6E8EC] w-fit">
+                {([
+                  { id: "students",   label: "Students" },
+                  { id: "curriculum", label: "Curriculum" },
+                ] as const).map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => setActiveTab(t.id)}
+                    className={[
+                      "px-3.5 py-1.5 rounded-lg font-bold text-sm whitespace-nowrap transition",
+                      activeTab === t.id
+                        ? "bg-teal-600 text-white shadow-sm"
+                        : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9]",
+                    ].join(" ")}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
             </div>
+
+            {activeTab === "curriculum" ? (
+              <CurriculumExplorer
+                yearLabel={activeYear}
+                studentCount={classStudents.length}
+                progress={progress as any}
+              />
+            ) : (
+            <>
 
             {/* Student table */}
             <div className="bg-white rounded-2xl border border-[#E6E8EC] overflow-hidden">
@@ -766,6 +799,8 @@ export default function TeacherDashboardPage() {
               <span className="inline-flex items-center gap-1.5"><span className="h-2 w-4 rounded-full bg-amber-400" /> In progress</span>
               <span className="inline-flex items-center gap-1.5"><span className="h-2 w-4 rounded-full bg-slate-200" /> Locked</span>
             </div>
+            </>
+            )}
           </>
         )}
       </div>
