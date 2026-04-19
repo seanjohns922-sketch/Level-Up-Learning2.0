@@ -14,13 +14,18 @@ export function getLevelBand(levelNum: number): LevelBand {
   return "foundation";
 }
 
-/** Background image per band */
+/**
+ * Background image per band.
+ * L1 + L2 → Foundation City (shared)
+ * L3 + L4 → Mid-City Data Canyon (shared)
+ * L5     → High Spire (standalone)
+ * L6     → Apex Sky-Vault (final)
+ */
 export function getHomeBg(levelNum: number): string {
-  if (levelNum >= 6) return "/images/number-nexus-home-bg-y5.jpg"; // apex reuses y5 for now
+  if (levelNum >= 6) return "/images/number-nexus-home-bg-y6.jpg";
   if (levelNum >= 5) return "/images/number-nexus-home-bg-y5.jpg";
-  if (levelNum >= 4) return "/images/number-nexus-home-bg-y4.jpg";
-  if (levelNum >= 3) return "/images/number-nexus-home-bg-y3.jpg";
-  return "/images/number-nexus-home-bg.jpg";
+  if (levelNum >= 3) return "/images/number-nexus-home-bg-y3.jpg"; // L3+L4 share
+  return "/images/number-nexus-home-bg.jpg"; // L1+L2 share
 }
 
 /** Image filter per band — unified Level-5 "Clash Royale" crisp treatment across all levels */
