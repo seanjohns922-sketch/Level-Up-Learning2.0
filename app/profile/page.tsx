@@ -15,6 +15,11 @@ const REALMS = [
   { name: "Reading Ridge", icon: BookOpen, status: "coming-soon" as const },
   { name: "Inkwell Wilds", icon: BookOpen, status: "locked" as const },
   { name: "Measurelands", icon: BookOpen, status: "locked" as const },
+  { name: "Runehaven Peaks", icon: BookOpen, status: "locked" as const },
+  { name: "Starpath Realm", icon: BookOpen, status: "locked" as const },
+  { name: "Statistica", icon: BookOpen, status: "locked" as const },
+  { name: "Chance Hollow", icon: BookOpen, status: "locked" as const },
+  { name: "Pattern Peaks", icon: BookOpen, status: "locked" as const },
 ];
 
 const DAYS = ["M", "T", "W", "T", "F", "S", "S"];
@@ -228,7 +233,7 @@ export default function ProfilePage() {
                   <BookOpen className="h-4 w-4 text-[#0EA5A4]" />
                   Enrolled Realms
                 </h3>
-                <button className="text-xs font-semibold text-[#64748B] hover:text-[#0F172A]">See all</button>
+                <button onClick={() => router.push("/realms")} className="text-xs font-semibold text-[#64748B] hover:text-[#0F172A]">See all</button>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
