@@ -311,9 +311,9 @@ export default function ProfilePage() {
         </div>
 
         {/* ── ROW 3: REALM PROGRESS ── */}
-        <div className={`rounded-2xl bg-white border border-[#E5E7EB] p-4 mb-3 ${cardShadow}`}>
-          <h3 className="text-xs font-extrabold text-gray-800 uppercase tracking-wider mb-3 flex items-center gap-2">
-            <BookOpen className="h-3.5 w-3.5 text-[#7C5CFC]" />
+        <div className={`rounded-2xl bg-white/90 backdrop-blur-sm border border-teal-100/70 p-4 mb-3 ${cardShadow}`}>
+          <h3 className="text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+            <BookOpen className="h-3.5 w-3.5 text-teal-600" />
             Realm Progress
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
@@ -325,48 +325,46 @@ export default function ProfilePage() {
                   key={realm.name}
                   className={`flex items-center gap-3 rounded-lg px-3.5 py-2.5 transition-all duration-200 border
                     ${isActive
-                      ? "bg-[#F5F3FF] border-[#DDD6FE] hover:shadow-sm hover:-translate-y-0.5 cursor-pointer"
-                      : "bg-[#F9FAFB] border-[#F3F4F6] opacity-55"
+                      ? "bg-teal-50/60 border-teal-200/70 hover:shadow-sm hover:-translate-y-0.5 hover:border-teal-300 cursor-pointer"
+                      : "bg-slate-50/60 border-slate-100 opacity-55"
                     }
                   `}
                 >
-{isActive ? (
+                  {isActive ? (
                     <div
-                      className="h-10 w-10 rounded-lg flex-shrink-0 bg-cover bg-center shadow-sm ring-1 ring-black/10"
-                      style={{
-                        backgroundImage: `url('/images/number-nexus-tile.jpg')`,
-                      }}
+                      className="h-10 w-10 rounded-lg flex-shrink-0 bg-cover bg-center shadow-sm ring-1 ring-teal-700/10"
+                      style={{ backgroundImage: `url('/images/number-nexus-tile.jpg')` }}
                     />
                   ) : (
-                    <div className="h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-gray-200 text-gray-400">
+                    <div className="h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-slate-200 text-slate-400">
                       <realm.icon className="h-4 w-4" />
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <span className={`text-xs font-bold block truncate ${isActive ? "text-gray-800" : "text-gray-400"}`}>
+                    <span className={`text-xs font-bold block truncate ${isActive ? "text-slate-800" : "text-slate-400"}`}>
                       {realm.name}
                     </span>
                     {isActive && (
                       <div className="flex items-center gap-2 mt-1">
-                        <div className="flex-1 h-1.5 rounded-full bg-[#EDE9FE] overflow-hidden">
+                        <div className="flex-1 h-1.5 rounded-full bg-emerald-100 overflow-hidden">
                           <div
-                            className="h-full rounded-full bg-[#7C5CFC] transition-all duration-700"
+                            className="h-full rounded-full bg-gradient-to-r from-teal-500 to-emerald-600 transition-all duration-700"
                             style={{ width: `${stats.realmProgress}%` }}
                           />
                         </div>
-                        <span className="text-[10px] font-extrabold text-[#7C5CFC]">{stats.realmProgress}%</span>
+                        <span className="text-[10px] font-extrabold text-emerald-700">{stats.realmProgress}%</span>
                       </div>
                     )}
                   </div>
                   {!isActive && (
                     <div className="flex-shrink-0">
                       {isComingSoon
-                        ? <span className="text-[8px] font-bold text-[#D4A017] uppercase tracking-wider">Soon</span>
-                        : <Lock className="h-3.5 w-3.5 text-gray-300" />
+                        ? <span className="text-[8px] font-bold text-amber-600 uppercase tracking-wider">Soon</span>
+                        : <Lock className="h-3.5 w-3.5 text-slate-300" />
                       }
                     </div>
                   )}
-                  {isActive && <ChevronRight className="h-4 w-4 text-[#C4B5FD] flex-shrink-0" />}
+                  {isActive && <ChevronRight className="h-4 w-4 text-teal-400 flex-shrink-0" />}
                 </div>
               );
             })}
@@ -374,20 +372,20 @@ export default function ProfilePage() {
         </div>
 
         {/* ── BOTTOM: SOCIAL TEASER ── */}
-        <div className={`rounded-xl bg-white border border-[#E5E7EB] px-6 py-3 flex items-center justify-center gap-8 ${cardShadow}`}>
+        <div className={`rounded-xl bg-white/90 backdrop-blur-sm border border-teal-100/70 px-6 py-3 flex items-center justify-center gap-8 ${cardShadow}`}>
           {[
-            { icon: Users, label: "Friends", color: "text-[#3B82F6]" },
-            { icon: Swords, label: "Battles", color: "text-[#EF4444]" },
-            { icon: Medal, label: "Rankings", color: "text-[#D4A017]" },
+            { icon: Users, label: "Friends", color: "text-teal-600" },
+            { icon: Swords, label: "Battles", color: "text-rose-500" },
+            { icon: Medal, label: "Rankings", color: "text-amber-500" },
           ].map((item) => (
             <div key={item.label} className="flex items-center gap-1.5 opacity-40">
               <item.icon className={`h-4 w-4 ${item.color}`} />
-              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">{item.label}</span>
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{item.label}</span>
             </div>
           ))}
-          <div className="flex items-center gap-1.5 ml-3 pl-3 border-l border-gray-200">
-            <Lock className="h-3 w-3 text-gray-300" />
-            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-[0.15em]">Coming Soon</span>
+          <div className="flex items-center gap-1.5 ml-3 pl-3 border-l border-teal-100">
+            <Lock className="h-3 w-3 text-slate-300" />
+            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.15em]">Coming Soon</span>
           </div>
         </div>
 
