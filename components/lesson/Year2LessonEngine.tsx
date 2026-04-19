@@ -386,20 +386,42 @@ export function Year2LessonEngine({
           status === "correct" ? "animate-pulse" : ""
         }`}
       />
-      {/* ── Summary strip: XP + Timer ── */}
-      <div className="rounded-3xl border border-border/50 bg-card p-4 shadow-md space-y-3">
-        <div className="flex items-center gap-3">
-          <div className="flex-1">
-            <LessonXPBar correct={correctAnswers} totalTarget={Math.max(XP_TARGET, questionsAnswered + 2)} />
-          </div>
-          <LessonTimer seconds={Math.max(0, secondsLeft)} total={totalSeconds} />
-        </div>
-
-        <LessonStatStrip
-          questionsAnswered={questionsAnswered}
-          correctAnswers={correctAnswers}
-          accuracy={accuracy}
+      {/* ── Summary strip: XP + Timer (Nexus plate) ── */}
+      <div className="relative">
+        <div
+          aria-hidden
+          className="absolute -inset-[2px] pointer-events-none"
+          style={{
+            clipPath:
+              "polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px)",
+            background:
+              "linear-gradient(135deg, rgba(94,234,212,0.4) 0%, rgba(15,118,110,0.2) 50%, rgba(94,234,212,0.3) 100%)",
+          }}
         />
+        <div
+          className="relative p-4 space-y-3 overflow-hidden"
+          style={{
+            clipPath:
+              "polygon(13px 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%, 0 13px)",
+            background:
+              "linear-gradient(135deg, #021716 0%, #042925 50%, #053b35 100%)",
+            boxShadow:
+              "inset 0 1px 0 rgba(94,234,212,0.18), inset 0 -10px 20px rgba(0,0,0,0.45)",
+          }}
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex-1">
+              <LessonXPBar correct={correctAnswers} totalTarget={Math.max(XP_TARGET, questionsAnswered + 2)} />
+            </div>
+            <LessonTimer seconds={Math.max(0, secondsLeft)} total={totalSeconds} />
+          </div>
+
+          <LessonStatStrip
+            questionsAnswered={questionsAnswered}
+            correctAnswers={correctAnswers}
+            accuracy={accuracy}
+          />
+        </div>
       </div>
 
       {/* ── Status feedback pill ── */}
