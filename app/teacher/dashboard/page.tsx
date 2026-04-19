@@ -22,7 +22,7 @@ type ProgressRow = {
 
 type WeekResult = { week: number; score: number; passed: boolean };
 
-const YEAR_LEVELS = ["Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"];
+const YEAR_LEVELS = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"];
 const WEEKS = Array.from({ length: 12 }, (_, i) => i + 1);
 
 /* ── helpers ───────────────────────────────────────── */
