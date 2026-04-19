@@ -2,10 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { LessonRenderer } from "@/components/lesson/LessonRenderer";
-import { LessonXPBar } from "@/components/lesson/LessonXPBar";
-import { LessonTimer } from "@/components/lesson/LessonTimer";
-import { LessonStatStrip } from "@/components/lesson/LessonStatStrip";
-import { LessonSupportPanel } from "@/components/lesson/LessonSupportPanel";
+import { LessonHUDRail } from "@/components/lesson/LessonHUDRail";
 import { LessonCompleteCard } from "@/components/lesson/LessonCompleteCard";
 import {
   buildLessonActivityPool,
@@ -370,7 +367,7 @@ export function Year2LessonEngine({
   const statusMotion = status === "wrong" ? "animate-[shake_0.35s_ease-in-out]" : "";
 
   return (
-    <div className="relative space-y-3">
+    <div className="relative">
       <style jsx>{`
         @keyframes shake {
           0%, 100% { transform: translateX(0); }
@@ -386,89 +383,62 @@ export function Year2LessonEngine({
           status === "correct" ? "animate-pulse" : ""
         }`}
       />
-      {/* ── Summary strip: XP + Timer (Nexus plate) ── */}
-      <div className="relative">
-        <div
-          aria-hidden
-          className="absolute -inset-[2px] pointer-events-none"
-          style={{
-            clipPath:
-              "polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px)",
-            background:
-              "linear-gradient(135deg, rgba(94,234,212,0.4) 0%, rgba(15,118,110,0.2) 50%, rgba(94,234,212,0.3) 100%)",
-          }}
-        />
-        <div
-          className="relative p-4 space-y-3 overflow-hidden"
-          style={{
-            clipPath:
-              "polygon(13px 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%, 0 13px)",
-            background:
-              "linear-gradient(135deg, #021716 0%, #042925 50%, #053b35 100%)",
-            boxShadow:
-              "inset 0 1px 0 rgba(94,234,212,0.18), inset 0 -10px 20px rgba(0,0,0,0.45)",
-          }}
-        >
-          <div className="flex items-center gap-3">
-            <div className="flex-1">
-              <LessonXPBar correct={correctAnswers} totalTarget={Math.max(XP_TARGET, questionsAnswered + 2)} />
-            </div>
-            <LessonTimer seconds={Math.max(0, secondsLeft)} total={totalSeconds} />
-          </div>
 
-          <LessonStatStrip
-            questionsAnswered={questionsAnswered}
+      <div className="grid gap-3 lg:grid-cols-[300px_1fr] lg:items-start lg:gap-5">
+        <aside className="lg:sticky lg:top-4 lg:self-start">
+          <LessonHUDRail
+            lessonTitle={lesson.title}
             correctAnswers={correctAnswers}
+            questionsAnswered={questionsAnswered}
             accuracy={accuracy}
+            secondsLeft={Math.max(0, secondsLeft)}
+            totalSeconds={totalSeconds}
+            xpTarget={Math.max(XP_TARGET, questionsAnswered + 2)}
+            hint={hint}
           />
+        </aside>
+
+        <div className="min-w-0 space-y-3">
+          {status !== "idle" && (
+            <div
+              className={`rounded-xl px-4 py-2.5 text-center text-sm font-extrabold shadow-sm transition-all ${
+                status === "correct"
+                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                  : "bg-red-50 text-red-700 border border-red-200"
+              }`}
+            >
+              {status === "correct" ? "✓ Correct! +10 XP" : "✗ Not quite — keep going!"}
+            </div>
+          )}
+
+          {currentActivity && currentQuestion ? (
+            <div
+              className={`rounded-[1.75rem] border-2 bg-card p-5 shadow-lg transition-all duration-300 ${statusBorder} ${statusMotion}`}
+            >
+              <div className="mb-3">
+                <span className="inline-block rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-700">
+                  {activityLabel}
+                </span>
+              </div>
+
+              <LessonRenderer
+                key={questionKey}
+                activity={currentActivity}
+                prompt={lesson.title}
+                questionData={currentQuestion}
+                renderMode="lesson"
+                onCorrect={handleCorrect}
+                onWrong={handleWrong}
+              />
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">
+              This lesson has no valid activities for the current policy. Check the lesson config or
+              source activity pool.
+            </div>
+          )}
         </div>
       </div>
-
-      {/* ── Status feedback pill ── */}
-      {status !== "idle" && (
-        <div
-          className={`rounded-xl px-4 py-2.5 text-center text-sm font-extrabold shadow-sm transition-all ${
-            status === "correct"
-              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-              : "bg-red-50 text-red-700 border border-red-200"
-          }`}
-        >
-          {status === "correct" ? "✓ Correct! +10 XP" : "✗ Not quite — keep going!"}
-        </div>
-      )}
-
-      {/* ── Support panel ── */}
-      <LessonSupportPanel hint={hint} />
-
-      {/* ── Main task card ── */}
-      {currentActivity && currentQuestion ? (
-        <div
-          className={`rounded-[1.75rem] border-2 bg-card p-5 shadow-lg transition-all duration-300 ${statusBorder} ${statusMotion}`}
-        >
-          {/* Activity type label */}
-          <div className="mb-3">
-            <span className="inline-block rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-700">
-              {activityLabel}
-            </span>
-          </div>
-
-          {/* Actual activity renderer */}
-          <LessonRenderer
-            key={questionKey}
-            activity={currentActivity}
-            prompt={lesson.title}
-            questionData={currentQuestion}
-            renderMode="lesson"
-            onCorrect={handleCorrect}
-            onWrong={handleWrong}
-          />
-        </div>
-      ) : (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">
-          This lesson has no valid activities for the current policy. Check the lesson config or
-          source activity pool.
-        </div>
-      )}
     </div>
   );
 }
