@@ -11507,24 +11507,29 @@ export function generateQuestion(
       lesson
     );
   } else {
-    const unknownValidation: Year2PolicyValidation = {
-      valid: false,
-      violations: [
-        buildViolation(
-          "alignment",
-          lesson,
-          activity.activityType,
-          `No generation path exists for activity type "${activity.activityType}".`
-        ),
-      ],
-    };
-    assertPolicyValidation(unknownValidation, "missing_generator");
-    question = {
-      kind: "typed_response",
-      prompt: "This activity configuration is invalid.",
-      answer: "0",
-      placeholder: "Policy blocked",
-    };
+    const interactiveQuestion = generateInteractiveQuestion(level, activity.activityType, config, lesson);
+    if (interactiveQuestion) {
+      question = interactiveQuestion;
+    } else {
+      const unknownValidation: Year2PolicyValidation = {
+        valid: false,
+        violations: [
+          buildViolation(
+            "alignment",
+            lesson,
+            activity.activityType,
+            `No generation path exists for activity type "${activity.activityType}".`
+          ),
+        ],
+      };
+      assertPolicyValidation(unknownValidation, "missing_generator");
+      question = {
+        kind: "typed_response",
+        prompt: "This activity configuration is invalid.",
+        answer: "0",
+        placeholder: "Policy blocked",
+      };
+    }
   }
 
   if (activity.activityType === "multiple_choice") {
