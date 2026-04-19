@@ -373,12 +373,22 @@ const year5Rows: ProgramRow[] = [
     weekTopic: "Percentages, Fractions & Decimals",
     focus: "Connect fractions, decimals, and percent as equivalent representations",
     lesson: 1,
-    topic: "Convert Between All 3",
-    activity: "Convert between familiar fractions, decimals, and percentages.",
+    topic: "Convert Between Fractions, Decimals & Percentages",
+    activity: "Recognise, convert, and check equivalent fraction, decimal and percentage forms.",
     curriculum: ["AC9M5N04"],
     activities: [
-      makeActivity("multiple_choice", 2, { mode: "fraction_decimal_percent" }),
-      makeActivity("typed_response", 1, { mode: "fraction_decimal_percent" }),
+      makeActivity("fraction_decimal_percent_match", 1, {
+        mode: "fdp_match_representations",
+        rotationRole: "fast_thinking",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "fdp_step_conversion",
+        rotationRole: "apply_create",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "fdp_which_correct",
+        rotationRole: "reasoning",
+      }),
     ],
   },
   {

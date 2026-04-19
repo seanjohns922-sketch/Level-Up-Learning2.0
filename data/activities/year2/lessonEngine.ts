@@ -333,6 +333,20 @@ export type EquivalentFractionYesNoQuestion = {
   answer: "yes" | "no";
 };
 
+export type FractionDecimalPercentSet = {
+  id: string;
+  fraction: string;
+  decimal: string;
+  percent: string;
+};
+
+export type FractionDecimalPercentMatchQuestion = {
+  kind: "fraction_decimal_percent_match";
+  prompt: string;
+  helper: string;
+  sets: FractionDecimalPercentSet[];
+};
+
 export type AdditionStrategyQuestion = {
   kind: "addition_strategy";
   prompt: string;
@@ -840,6 +854,45 @@ function mixedNumeralLabel(whole: number, numerator: number, denominator: number
   return `${whole} ${numerator}/${denominator}`;
 }
 
+function year5FractionDecimalPercentSets(
+  usage?: "match" | "convert" | "reasoning"
+): FractionDecimalPercentSet[] {
+  const sets: Array<FractionDecimalPercentSet & { usage: Array<"match" | "convert" | "reasoning"> }> = [
+    { id: "half", fraction: "1/2", decimal: "0.5", percent: "50%", usage: ["match"] },
+    { id: "quarter", fraction: "1/4", decimal: "0.25", percent: "25%", usage: ["match"] },
+    { id: "three-quarters", fraction: "3/4", decimal: "0.75", percent: "75%", usage: ["match"] },
+    { id: "fifth", fraction: "1/5", decimal: "0.2", percent: "20%", usage: ["match"] },
+    { id: "three-fifths", fraction: "3/5", decimal: "0.6", percent: "60%", usage: ["match"] },
+    { id: "tenth", fraction: "1/10", decimal: "0.1", percent: "10%", usage: ["match"] },
+    { id: "two-fifths", fraction: "2/5", decimal: "0.4", percent: "40%", usage: ["convert"] },
+    { id: "eighth", fraction: "1/8", decimal: "0.125", percent: "12.5%", usage: ["convert"] },
+    { id: "three-tenths", fraction: "3/10", decimal: "0.3", percent: "30%", usage: ["convert"] },
+    { id: "four-fifths", fraction: "4/5", decimal: "0.8", percent: "80%", usage: ["convert"] },
+    { id: "three-eighths", fraction: "3/8", decimal: "0.375", percent: "37.5%", usage: ["convert"] },
+    { id: "five-eighths", fraction: "5/8", decimal: "0.625", percent: "62.5%", usage: ["convert"] },
+    { id: "seven-tenths", fraction: "7/10", decimal: "0.7", percent: "70%", usage: ["reasoning"] },
+    { id: "nine-tenths", fraction: "9/10", decimal: "0.9", percent: "90%", usage: ["reasoning"] },
+    { id: "twentieth", fraction: "1/20", decimal: "0.05", percent: "5%", usage: ["reasoning"] },
+    { id: "three-twentieths", fraction: "3/20", decimal: "0.15", percent: "15%", usage: ["reasoning"] },
+    { id: "hundredth", fraction: "1/100", decimal: "0.01", percent: "1%", usage: ["reasoning"] },
+    { id: "fiftieth", fraction: "1/50", decimal: "0.02", percent: "2%", usage: ["reasoning"] },
+  ];
+
+  return sets
+    .filter((set) => (usage ? set.usage.includes(usage) : true))
+    .map((set) => ({
+      id: set.id,
+      fraction: set.fraction,
+      decimal: set.decimal,
+      percent: set.percent,
+    }));
+}
+
+function parseFractionParts(fraction: string) {
+  const [numerator, denominator] = fraction.split("/").map(Number);
+  return { numerator, denominator };
+}
+
 function buildYear4Week11DivisionInverseQuestion(asMultipleChoice: boolean) {
   const templates = [
     { prompt: "? × 4 = 24", answer: 6, distractors: [4, 8, 24] },
@@ -1058,6 +1111,15 @@ export type SameDenominatorOperationVisualData = {
   conversionLabel?: string;
 };
 
+export type FractionDecimalPercentConversionVisualData = {
+  type: "fraction_decimal_percent_conversion";
+  fraction: string;
+  numerator: number;
+  denominator: number;
+  decimalAnswer: string;
+  percentAnswer: string;
+};
+
 export type MultipleChoiceQuestion = {
   kind: "multiple_choice";
   prompt: string;
@@ -1121,6 +1183,7 @@ export type TypedResponseQuestion = {
     | DivisionRemainderCheckVisualData
     | DivisionBuildGroupsVisualData
     | SameDenominatorOperationVisualData
+    | FractionDecimalPercentConversionVisualData
     | {
         type: "equivalent_fraction_input";
         leftNumerator: number;
@@ -1150,6 +1213,7 @@ export type Year2QuestionData =
   | NumberLinePlaceQuestion
   | FractionCompareQuestion
   | EquivalentFractionMatchQuestion
+  | FractionDecimalPercentMatchQuestion
   | EquivalentFractionBuildQuestion
   | EquivalentFractionYesNoQuestion
   | AdditionStrategyQuestion
@@ -1405,6 +1469,9 @@ const BASE_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
     requiresVisual: true,
   },
   equivalent_fraction_match: {
+    requiresVisual: true,
+  },
+  fraction_decimal_percent_match: {
     requiresVisual: true,
   },
   equivalent_fraction_build: {
@@ -4548,6 +4615,16 @@ function generateInteractiveQuestion(
       target: { id: "target", ...chosen.source },
       choices,
       correctChoiceId: "correct",
+    };
+  }
+
+  if (activityType === "fraction_decimal_percent_match") {
+    const sets = shuffle(year5FractionDecimalPercentSets("match")).slice(0, 3);
+    return {
+      kind: "fraction_decimal_percent_match",
+      prompt: "Match each fraction, decimal and percentage.",
+      helper: "Tap one fraction, one decimal and one percentage with the same value.",
+      sets,
     };
   }
 
@@ -9649,6 +9726,57 @@ function generateGenericQuestion(
         };
   }
 
+  if (explicitMode === "fdp_step_conversion") {
+    const templates = year5FractionDecimalPercentSets("convert");
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    const { numerator, denominator } = parseFractionParts(chosen.fraction);
+
+    return {
+      kind: "typed_response",
+      prompt: `Convert ${chosen.fraction}`,
+      answer: `${chosen.decimal},${chosen.percent}`,
+      helper: "Step 1: divide numerator by denominator. Step 2: multiply the decimal by 100.",
+      placeholder: "Type the decimal and percent",
+      visual: {
+        type: "fraction_decimal_percent_conversion",
+        fraction: chosen.fraction,
+        numerator,
+        denominator,
+        decimalAnswer: chosen.decimal,
+        percentAnswer: chosen.percent,
+      },
+    };
+  }
+
+  if (explicitMode === "fdp_which_correct") {
+    const sets = year5FractionDecimalPercentSets("reasoning");
+    const chosen = sets[randInt(0, sets.length - 1)] ?? sets[0]!;
+    const targetKind = randInt(0, 2);
+    const target =
+      targetKind === 0 ? chosen.fraction : targetKind === 1 ? chosen.decimal : chosen.percent;
+    const correctAnswers = [chosen.fraction, chosen.decimal, chosen.percent].filter(
+      (value) => value !== target
+    ).slice(0, 2);
+    const distractors = shuffle(
+      sets
+        .filter((item) => item.id !== chosen.id)
+        .flatMap((item) => [item.fraction, item.decimal, item.percent])
+    ).slice(0, 2);
+
+    return {
+      kind: "multiple_choice",
+      prompt: `Which are equal to ${target}?`,
+      instruction: "Select all that apply.",
+      options: shuffle([...correctAnswers, ...distractors]),
+      answer: correctAnswers[0] ?? chosen.decimal,
+      correctAnswers,
+      helper: "Same value, different form.",
+      allCorrectFeedback: "Correct — those representations show the same amount.",
+      partialFeedback: "One is correct, but there is another matching form too.",
+      incorrectFeedback: "Check the value, not just the digits.",
+    };
+  }
+
   if (explicitMode === "benchmark_fraction_percent") {
     const templates = [
       { prompt: "Which value is the same as one half?", answer: "50%", options: ["50%", "25%", "0.25", "75%"] },
@@ -11495,6 +11623,16 @@ function extractQuestionFingerprintNumbers(question: Year2QuestionData) {
   if ("answer" in question && typeof question.answer === "string") capture(question.answer);
   if ("options" in question && Array.isArray(question.options)) {
     question.options.forEach((option) => capture(String(option)));
+  }
+  if ("correctAnswers" in question && Array.isArray(question.correctAnswers)) {
+    question.correctAnswers.forEach((option) => capture(String(option)));
+  }
+  if (question.kind === "fraction_decimal_percent_match") {
+    question.sets.forEach((set) => {
+      capture(set.fraction);
+      capture(set.decimal);
+      capture(set.percent);
+    });
   }
 
   const visual = "visual" in question ? question.visual : undefined;

@@ -16,6 +16,7 @@ import BuildTheWhole from "@/components/activities/BuildTheWhole";
 import NumberLinePlace from "@/components/activities/NumberLinePlace";
 import FractionCompare from "@/components/activities/FractionCompare";
 import EquivalentFractionBar from "@/components/activities/EquivalentFractionBar";
+import FractionDecimalPercentMatch from "@/components/activities/FractionDecimalPercentMatch";
 import OddEvenSort from "@/components/activities/OddEvenSort";
 import PartitionExpand from "@/components/activities/PartitionExpand";
 import PlaceValueBuilder from "@/components/activities/PlaceValueBuilder";
@@ -34,6 +35,7 @@ import type {
   NumberLinePlaceQuestion,
   FractionCompareQuestion,
   EquivalentFractionMatchQuestion,
+  FractionDecimalPercentMatchQuestion,
   EquivalentFractionBuildQuestion,
   EquivalentFractionYesNoQuestion,
   DivisionGroupsQuestion,
@@ -261,6 +263,19 @@ export function LessonRenderer({
       return (
         <EquivalentFractionBar
           questionData={safeQuestion as EquivalentFractionMatchQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
+        />
+      );
+    }
+    case "fraction_decimal_percent_match": {
+      const safeQuestion = getSafeQuestion(activity, questionData, prompt);
+      if (safeQuestion.kind !== "fraction_decimal_percent_match") {
+        return <ErrorCard message="Fraction, decimal and percentage match failed to load." />;
+      }
+      return (
+        <FractionDecimalPercentMatch
+          questionData={safeQuestion as FractionDecimalPercentMatchQuestion}
           onCorrect={onCorrect}
           onWrong={onWrong}
         />

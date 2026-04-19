@@ -300,6 +300,7 @@ function buildStructuredQuizSources(lesson: Lesson): LessonActivity[] {
     "same_denominator_true_false",
     "related_denominator_quick_apply",
     "real_world_fraction_decision",
+    "fdp_which_correct",
   ]);
 
   const filtered = activities.filter((activity) => {

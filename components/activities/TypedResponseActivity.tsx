@@ -114,6 +114,71 @@ function SameDenominatorEquationInput({
   );
 }
 
+function FractionDecimalPercentConversionInput({
+  visual,
+  decimalValue,
+  percentValue,
+  onDecimalChange,
+  onPercentChange,
+}: {
+  visual: Extract<NonNullable<TypedResponseQuestion["visual"]>, { type: "fraction_decimal_percent_conversion" }>;
+  decimalValue: string;
+  percentValue: string;
+  onDecimalChange: (value: string) => void;
+  onPercentChange: (value: string) => void;
+}) {
+  return (
+    <div className="w-full rounded-2xl border border-sky-100 bg-sky-50 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.18em] text-sky-700">
+        Convert Step-by-Step
+      </div>
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <span className="text-lg font-black text-slate-700">Convert:</span>
+        <StackedFraction numerator={visual.numerator} denominator={visual.denominator} />
+        <span className="text-3xl font-black text-sky-700">=</span>
+        <input
+          type="text"
+          value={decimalValue}
+          onChange={(event) => onDecimalChange(event.target.value.replace(/[^\d.]/g, ""))}
+          inputMode="decimal"
+          placeholder="decimal"
+          className="h-14 w-32 rounded-xl border border-sky-300 bg-white px-3 text-center text-xl font-black text-slate-900 outline-none focus:border-teal-500"
+          style={{ WebkitTextFillColor: "#0f172a" }}
+        />
+        <span className="text-lg font-black text-slate-700">decimal</span>
+        <span className="text-3xl font-black text-sky-700">=</span>
+        <input
+          type="text"
+          value={percentValue}
+          onChange={(event) => onPercentChange(event.target.value.replace(/[^\d.%]/g, ""))}
+          inputMode="decimal"
+          placeholder="%"
+          className="h-14 w-32 rounded-xl border border-sky-300 bg-white px-3 text-center text-xl font-black text-slate-900 outline-none focus:border-teal-500"
+          style={{ WebkitTextFillColor: "#0f172a" }}
+        />
+      </div>
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
+        <div className="rounded-2xl bg-white p-4 shadow-sm">
+          <div className="text-xs font-black uppercase tracking-[0.14em] text-sky-700">
+            Step 1
+          </div>
+          <p className="mt-2 text-sm font-semibold text-slate-600">
+            Fraction to decimal: divide {visual.numerator} by {visual.denominator}.
+          </p>
+        </div>
+        <div className="rounded-2xl bg-white p-4 shadow-sm">
+          <div className="text-xs font-black uppercase tracking-[0.14em] text-sky-700">
+            Step 2
+          </div>
+          <p className="mt-2 text-sm font-semibold text-slate-600">
+            Decimal to percentage: multiply the decimal by 100.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 type RelatedDenominatorStep = "multiplier" | "numerator" | "solve" | "done";
 
 function getRelatedDenominatorWorking(
@@ -1094,6 +1159,9 @@ export default function TypedResponseActivity({
   const isEstimateStrategyMultiplication = questionData.visual?.type === "multiplication_estimate_strategy";
   const isDivisionRemainderCheck = questionData.visual?.type === "division_remainder_check";
   const isDivisionBuildGroups = questionData.visual?.type === "division_build_groups";
+  const fractionDecimalPercentConversionVisual =
+    questionData.visual?.type === "fraction_decimal_percent_conversion" ? questionData.visual : null;
+  const isFractionDecimalPercentConversion = fractionDecimalPercentConversionVisual !== null;
   const equivalentFractionInputVisual =
     questionData.visual?.type === "equivalent_fraction_input" ? questionData.visual : null;
   const isEquivalentFractionInput = equivalentFractionInputVisual !== null;
@@ -1128,6 +1196,8 @@ export default function TypedResponseActivity({
   const [fractionWholeInput, setFractionWholeInput] = useState("");
   const [fractionNumeratorInput, setFractionNumeratorInput] = useState("");
   const [fractionDenominatorInput, setFractionDenominatorInput] = useState("");
+  const [conversionDecimalInput, setConversionDecimalInput] = useState("");
+  const [conversionPercentInput, setConversionPercentInput] = useState("");
   const [relatedDenominatorStep, setRelatedDenominatorStep] =
     useState<RelatedDenominatorStep>("multiplier");
   const [relatedDenominatorInputs, setRelatedDenominatorInputs] = useState({
@@ -1241,6 +1311,8 @@ export default function TypedResponseActivity({
       setFractionWholeInput("");
       setFractionNumeratorInput("");
       setFractionDenominatorInput(questionData.fixedDenominator ? String(questionData.fixedDenominator) : "");
+      setConversionDecimalInput("");
+      setConversionPercentInput("");
       setRelatedDenominatorStep("multiplier");
       setRelatedDenominatorInputs({
         multiplier: "",
@@ -1592,6 +1664,24 @@ export default function TypedResponseActivity({
   }
 
   function check() {
+    if (isFractionDecimalPercentConversion && fractionDecimalPercentConversionVisual) {
+      const decimalMatches =
+        normalizeDecimalEquivalent(conversionDecimalInput) ===
+        normalizeDecimalEquivalent(fractionDecimalPercentConversionVisual.decimalAnswer);
+      const normalizedPercent = conversionPercentInput.trim().replace(/\s+/g, "");
+      const expectedPercent = fractionDecimalPercentConversionVisual.percentAnswer;
+      const percentMatches =
+        normalizedPercent === expectedPercent ||
+        normalizedPercent === expectedPercent.replace("%", "");
+
+      if (decimalMatches && percentMatches) {
+        onCorrect?.();
+      } else {
+        onWrong?.();
+      }
+      return;
+    }
+
     if (isDivisionBuildGroups && questionData.visual?.type === "division_build_groups") {
       const remainderMatches =
         normalizeNumberInput(buildGroupsRemainder) === String(questionData.visual.remainder);
@@ -2775,6 +2865,14 @@ export default function TypedResponseActivity({
                 />
               </div>
             </div>
+          ) : isFractionDecimalPercentConversion && fractionDecimalPercentConversionVisual ? (
+            <FractionDecimalPercentConversionInput
+              visual={fractionDecimalPercentConversionVisual}
+              decimalValue={conversionDecimalInput}
+              percentValue={conversionPercentInput}
+              onDecimalChange={setConversionDecimalInput}
+              onPercentChange={setConversionPercentInput}
+            />
           ) : questionData.visual?.type === "box_method" || isColumnMultiplication || isStrategyMultiplication || isEstimateStrategyMultiplication || isDivisionRemainderCheck || isDivisionBuildGroups ? null : (
             <input
               value={typed}

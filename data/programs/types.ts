@@ -9,6 +9,7 @@ export type ActivityType =
   | "number_line_place"
   | "fraction_compare"
   | "equivalent_fraction_match"
+  | "fraction_decimal_percent_match"
   | "equivalent_fraction_build"
   | "equivalent_fraction_yes_no"
   | "odd_even_sort"
