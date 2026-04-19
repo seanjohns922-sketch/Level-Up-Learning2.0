@@ -237,10 +237,10 @@ export default function ProfilePage() {
               <div className="rounded-2xl bg-white border border-slate-200/70 p-5 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                    <BookOpen className="h-4 w-4 text-teal-600" />
+                    <BookOpen className="h-4 w-4 text-indigo-600" />
                     Enrolled Realms
                   </h3>
-                  <button className="text-xs font-bold text-teal-600 hover:text-teal-700">See all</button>
+                  <button className="text-xs font-bold text-indigo-600 hover:text-indigo-700">See all</button>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
