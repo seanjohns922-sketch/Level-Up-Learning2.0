@@ -170,29 +170,29 @@ export default function ProfilePage() {
           </div>
 
           {/* ─── HERO WELCOME BANNER ─── */}
-          <div className="relative rounded-3xl bg-gradient-to-br from-teal-500 via-teal-600 to-emerald-700 p-6 md:p-8 overflow-hidden shadow-[0_10px_40px_rgba(13,148,136,0.2)]">
-            <div className="absolute -top-10 -right-10 h-48 w-48 rounded-full bg-white/10 blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 right-0 h-32 w-32 rounded-full bg-emerald-300/20 blur-2xl pointer-events-none" />
+          <div className="relative rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-900 to-indigo-800 p-6 md:p-8 overflow-hidden shadow-[0_10px_40px_rgba(30,27,75,0.25)]">
+            <div className="absolute -top-10 -right-10 h-48 w-48 rounded-full bg-amber-400/15 blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 right-0 h-32 w-32 rounded-full bg-indigo-400/20 blur-2xl pointer-events-none" />
             <div className="relative flex items-center justify-between gap-4">
               <div className="flex-1 min-w-0">
-                <p className="text-[11px] font-bold text-white/70 uppercase tracking-[0.18em] mb-2">
+                <p className="text-[11px] font-bold text-amber-300/90 uppercase tracking-[0.18em] mb-2">
                   {new Date().toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long" })}
                 </p>
                 <h1 className="text-2xl md:text-3xl font-black text-white leading-tight">
                   Welcome back, {studentName}!
                 </h1>
-                <p className="text-sm text-white/80 mt-1.5 max-w-md">
+                <p className="text-sm text-white/70 mt-1.5 max-w-md">
                   Your Number Nexus journey continues. {stats.realmProgress}% through Level {levelNum}.
                 </p>
                 <button
                   onClick={() => router.push("/home")}
-                  className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-teal-700 text-sm font-extrabold hover:bg-teal-50 transition-all active:scale-95 shadow-md"
+                  className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-400 text-slate-900 text-sm font-extrabold hover:bg-amber-300 transition-all active:scale-95 shadow-md shadow-amber-500/20"
                 >
                   Continue Lessons <ChevronRight className="h-4 w-4" />
                 </button>
               </div>
               {/* Decorative big number */}
-              <div className="hidden md:flex items-center justify-center h-28 w-28 rounded-3xl bg-white/15 backdrop-blur-sm border border-white/20 flex-shrink-0">
+              <div className="hidden md:flex items-center justify-center h-28 w-28 rounded-3xl bg-white/10 backdrop-blur-sm border border-white/15 flex-shrink-0">
                 <Trophy className="h-12 w-12 text-amber-300" />
               </div>
             </div>
