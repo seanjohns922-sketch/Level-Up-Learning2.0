@@ -105,66 +105,86 @@ export default function ProfilePage() {
   const { offset, daysInMonth, today, monthName } = useMemo(getMonthGrid, []);
 
   return (
-    <main className="min-h-screen bg-[#FAF8F4] p-4 md:p-6">
-      <div className="max-w-[1400px] mx-auto flex gap-5">
-
-        {/* ─── LEFT SIDEBAR (minimal: logo + settings + logout) ─── */}
-        <aside className="hidden lg:flex flex-col items-center w-[76px] flex-shrink-0 rounded-3xl bg-white border border-slate-200/70 py-5 shadow-sm sticky top-6 h-[calc(100vh-3rem)]">
-          {/* Logo tile */}
-          <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center mb-8 shadow-md shadow-indigo-500/20">
-            <Sparkles className="h-5 w-5 text-white" />
-          </div>
-
-          <div className="flex-1" />
-
-          <button
-            onClick={() => router.push("/profile")}
-            className="h-11 w-11 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-indigo-600 transition-all mb-2"
-            aria-label="Settings"
-            title="Settings"
-          >
-            <Settings className="h-[18px] w-[18px]" />
-          </button>
-          <button
-            onClick={() => router.push("/login")}
-            className="h-11 w-11 rounded-xl flex items-center justify-center text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-all"
-            aria-label="Logout"
-            title="Logout"
-          >
-            <LogOut className="h-[18px] w-[18px]" />
-          </button>
-        </aside>
+    <main className="min-h-screen bg-[#F5EFE0] p-4 md:p-6">
+      <div className="max-w-[1400px] mx-auto">
 
         {/* ─── MAIN CONTENT ─── */}
-        <div className="flex-1 min-w-0 space-y-5">
+        <div className="space-y-5">
 
           {/* ─── TOP BAR ─── */}
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => router.back()}
-                className="lg:hidden h-10 w-10 rounded-xl bg-white border border-teal-100 flex items-center justify-center text-teal-700 hover:bg-teal-50 transition-all shadow-sm"
+                className="lg:hidden h-10 w-10 rounded-xl bg-[#FBF7EC] border border-[#E8DEC4] flex items-center justify-center text-[#1C2541] hover:bg-[#F1E8D0] transition-all shadow-sm"
                 aria-label="Back"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
-              <div className="hidden md:flex items-center gap-2 bg-white rounded-2xl px-4 py-2.5 border border-slate-200/70 shadow-sm w-full max-w-md">
-                <span className="text-sm text-slate-400">Search your journey…</span>
+              <div className="hidden md:flex items-center gap-2 bg-[#FBF7EC] rounded-2xl px-4 py-2.5 border border-[#E8DEC4] shadow-sm w-full max-w-md">
+                <span className="text-sm text-[#1C2541]/40">Search your journey…</span>
               </div>
             </div>
 
-            {/* Profile pill */}
-            <div className="flex items-center gap-3 rounded-2xl bg-white border border-slate-200/70 px-3 py-2 shadow-sm">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-sm font-black text-white shadow-sm">
-                {initials}
+            {/* Profile pill + Settings + Logout */}
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3 rounded-2xl bg-[#FBF7EC] border border-[#E8DEC4] px-3 py-2 shadow-sm">
+                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#1C2541] to-[#2A3A6B] flex items-center justify-center text-sm font-black text-[#F5EFE0] shadow-sm ring-1 ring-[#C9A24B]/30">
+                  {initials}
+                </div>
+                <div className="hidden sm:block pr-1">
+                  <h2 className="text-sm font-extrabold text-[#1C2541] leading-tight">{studentName}</h2>
+                  <p className="text-[10px] font-bold text-[#1C2541]/60">Numbot {levelTitle} · Lvl {levelNum}</p>
+                </div>
+                <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#C9A24B]/15 border border-[#C9A24B]/40">
+                  <Zap className="h-3 w-3 text-[#8A6D2A]" />
+                  <span className="text-xs font-extrabold text-[#8A6D2A]">{stats.xp.toLocaleString()}</span>
+                </div>
               </div>
-              <div className="hidden sm:block pr-1">
-                <h2 className="text-sm font-extrabold text-slate-900 leading-tight">{studentName}</h2>
-                <p className="text-[10px] font-bold text-slate-500">Numbot {levelTitle} · Lvl {levelNum}</p>
+
+              <button
+                onClick={() => router.push("/profile")}
+                className="h-11 w-11 rounded-2xl bg-[#FBF7EC] border border-[#E8DEC4] flex items-center justify-center text-[#1C2541]/70 hover:text-[#1C2541] hover:bg-[#F1E8D0] transition-all shadow-sm"
+                aria-label="Settings"
+                title="Settings"
+              >
+                <Settings className="h-[18px] w-[18px]" />
+              </button>
+              <button
+                onClick={() => router.push("/login")}
+                className="h-11 w-11 rounded-2xl bg-[#FBF7EC] border border-[#E8DEC4] flex items-center justify-center text-[#1C2541]/70 hover:text-[#8B2E2E] hover:bg-[#F8E8E0] transition-all shadow-sm"
+                aria-label="Logout"
+                title="Logout"
+              >
+                <LogOut className="h-[18px] w-[18px]" />
+              </button>
+            </div>
+          </div>
+
+          {/* ─── HERO WELCOME BANNER ─── */}
+          <div className="relative rounded-3xl bg-gradient-to-br from-[#0F1830] via-[#1C2541] to-[#2A3A6B] p-6 md:p-8 overflow-hidden shadow-[0_10px_40px_rgba(28,37,65,0.3)] border border-[#C9A24B]/20">
+            <div className="absolute -top-10 -right-10 h-48 w-48 rounded-full bg-[#C9A24B]/20 blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 right-0 h-32 w-32 rounded-full bg-[#C9A24B]/10 blur-2xl pointer-events-none" />
+            <div className="relative flex items-center justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] font-bold text-[#C9A24B] uppercase tracking-[0.18em] mb-2">
+                  {new Date().toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long" })}
+                </p>
+                <h1 className="text-2xl md:text-3xl font-black text-[#F5EFE0] leading-tight">
+                  Welcome back, {studentName}!
+                </h1>
+                <p className="text-sm text-[#F5EFE0]/70 mt-1.5 max-w-md">
+                  Your Number Nexus journey continues. {stats.realmProgress}% through Level {levelNum}.
+                </p>
+                <button
+                  onClick={() => router.push("/home")}
+                  className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#C9A24B] text-[#1C2541] text-sm font-extrabold hover:bg-[#D4B05A] transition-all active:scale-95 shadow-md shadow-[#C9A24B]/30"
+                >
+                  Continue Lessons <ChevronRight className="h-4 w-4" />
+                </button>
               </div>
-              <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200">
-                <Zap className="h-3 w-3 text-amber-600" />
-                <span className="text-xs font-extrabold text-amber-700">{stats.xp.toLocaleString()}</span>
+              <div className="hidden md:flex items-center justify-center h-28 w-28 rounded-3xl bg-[#C9A24B]/10 backdrop-blur-sm border border-[#C9A24B]/30 flex-shrink-0">
+                <Trophy className="h-12 w-12 text-[#C9A24B]" />
               </div>
             </div>
           </div>
