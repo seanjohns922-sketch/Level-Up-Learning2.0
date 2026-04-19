@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useAuthGuard } from "@/lib/useAuthGuard";
 import { getLatestPosttestProfile } from "@/data/assessments/analysis";
+import CurriculumExplorer from "@/components/teacher/CurriculumExplorer";
 
 /* ── types ─────────────────────────────────────────── */
 type ClassRow = { id: string; class_code: string; name: string; year_level: string };
@@ -149,6 +150,7 @@ export default function TeacherDashboardPage() {
   const [progress, setProgress] = useState<ProgressRow[]>([]);
   const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
   const [activeYear, setActiveYear] = useState("Year 1");
+  const [activeTab, setActiveTab] = useState<"students" | "curriculum">("students");
   const [copiedCode, setCopiedCode] = useState(false);
 
   // Refs to prevent duplicate fetches and stale closures
