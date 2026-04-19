@@ -3078,7 +3078,12 @@ function SessionPage() {
         <div className="mb-4">
           <button
             onClick={backToWeek}
-            className="text-sm text-primary hover:underline font-bold"
+            className={[
+              "text-sm font-bold transition",
+              isLesson
+                ? "text-primary hover:underline"
+                : "text-teal-300 hover:text-teal-200",
+            ].join(" ")}
           >
             ← Back to Week {week}
           </button>
@@ -3087,24 +3092,85 @@ function SessionPage() {
         {/* Wrapper card */}
         <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
           {/* Hero gradient header */}
-          <div className={[
-            "text-white px-6 py-8",
-            isLesson
-              ? "bg-gradient-to-br from-primary to-primary/80"
-              : "bg-gradient-to-br from-trust-blue to-trust-blue/80",
-          ].join(" ")}>
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1 text-sm font-semibold mb-3">
-              {year} • Week {week}
-            </div>
-            <h1 className="text-3xl md:text-4xl font-extrabold font-display">{title}</h1>
-            {isLesson && (
+          {isLesson ? (
+            <div className="bg-gradient-to-br from-primary to-primary/80 text-white px-6 py-8">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1 text-sm font-semibold mb-3">
+                {year} • Week {week}
+              </div>
+              <h1 className="text-3xl md:text-4xl font-extrabold font-display">{title}</h1>
               <p className="text-white/80 text-sm mt-1">
-                {isLesson
-                  ? (lessonStarted ? "Complete the timed practice" : "Watch the video and begin practice")
-                  : "Answer all questions, then submit"}
+                {lessonStarted ? "Complete the timed practice" : "Watch the video and begin practice"}
               </p>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="relative overflow-hidden text-white" style={{ background: "#021716" }}>
+              {/* Number Nexus city artwork */}
+              <div className="pointer-events-none absolute inset-0" aria-hidden>
+                <img
+                  src="/images/lesson-hero-number-nexus.jpg"
+                  alt=""
+                  className="h-full w-full object-cover"
+                  style={{
+                    objectPosition: "78% center",
+                    transform: "scale(1.02)",
+                    filter: "contrast(1.18) saturate(1.08) brightness(1.06) hue-rotate(-4deg)",
+                  }}
+                />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      "linear-gradient(90deg, #021716 0%, rgba(2,23,22,0.98) 20%, rgba(2,23,22,0.9) 35%, rgba(2,23,22,0.65) 52%, rgba(2,23,22,0.3) 70%, rgba(2,23,22,0.1) 86%, rgba(2,23,22,0) 100%)",
+                  }}
+                />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      "linear-gradient(180deg, rgba(0,0,0,0.22) 0%, transparent 40%, rgba(0,0,0,0.3) 100%)",
+                  }}
+                />
+                <div
+                  className="absolute inset-y-0 right-0 w-[35%]"
+                  style={{
+                    background:
+                      "radial-gradient(ellipse at 80% 35%, rgba(94,234,212,0.16), transparent 60%)",
+                  }}
+                />
+              </div>
+
+              {/* Floating numbers overlay */}
+              <div
+                className="pointer-events-none absolute inset-y-0 right-0 w-[30%] select-none font-mono text-[10px] leading-[16px] tracking-widest text-cyan-200/[0.18] mix-blend-screen"
+                style={{
+                  maskImage:
+                    "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.9) 30%, rgba(0,0,0,0.9) 80%, transparent 100%)",
+                  WebkitMaskImage:
+                    "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.9) 30%, rgba(0,0,0,0.9) 80%, transparent 100%)",
+                }}
+                aria-hidden
+              >
+                <div className="flex flex-wrap gap-x-3 p-3">
+                  {Array.from({ length: 40 }).map((_, i) => (
+                    <span key={i}>{(i * 53 + 7) % 1000}</span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="relative z-10 px-5 py-4 md:px-7 md:py-5 max-w-[58%]">
+                <div className="inline-flex items-center gap-2 rounded-full bg-white/10 border border-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] backdrop-blur-sm md:text-xs">
+                  {year} • Week {week}
+                </div>
+                <h1 className="mt-2 text-2xl font-bold tracking-[-0.02em] drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)] md:text-3xl">
+                  {title}
+                </h1>
+                <p className="mt-1 text-sm font-medium text-white/85 md:text-base">
+                  15 questions · Show what you know
+                </p>
+              </div>
+            </div>
+          )}
 
           <div className="bg-background px-6 py-8">
 
