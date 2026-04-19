@@ -287,11 +287,12 @@ export type NumberLinePlaceQuestion = {
 export type FractionCompareQuestion = {
   kind: "fraction_compare";
   prompt: string;
-  mode: "symbol_compare" | "visual_compare" | "true_false";
+  mode: "symbol_compare" | "visual_compare" | "true_false" | "greater_less_visual" | "equivalent_to_compare";
   leftFraction: string;
   rightFraction: string;
   answer: string;
   statement?: string;
+  helper?: string;
 };
 
 export type EquivalentFractionChoice = {
@@ -521,6 +522,12 @@ function fractionPartsForNumberLine(allowedDenominators?: number[]) {
     const denominator = Number(part.label.split("/")[1] ?? 0);
     return allowedDenominators.includes(denominator);
   });
+}
+
+function fractionNumericValue(label: string) {
+  const [numerator, denominator] = label.split("/").map(Number);
+  if (!denominator) return 0;
+  return (numerator ?? 0) / denominator;
 }
 
 function year3FractionOrderSets() {
@@ -1071,11 +1078,25 @@ const BASE_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
     requiresVisual: true,
   },
   number_line_place: {
-    allowedModes: ["place_fraction", "pick_point", "order_fractions", "skip_count_fraction", "mixed_numerals"],
+    allowedModes: [
+      "place_fraction",
+      "pick_point",
+      "order_fractions",
+      "order_compare_fractions",
+      "skip_count_fraction",
+      "mixed_numerals",
+    ],
     requiresVisual: true,
   },
   fraction_compare: {
-    allowedModes: ["symbol_compare", "visual_compare", "true_false", "same_denominator_combine"],
+    allowedModes: [
+      "symbol_compare",
+      "visual_compare",
+      "true_false",
+      "same_denominator_combine",
+      "greater_less_visual",
+      "equivalent_to_compare",
+    ],
     requiresVisual: true,
   },
   equivalent_fraction_match: {
@@ -3895,8 +3916,10 @@ function generateInteractiveQuestion(
   if (activityType === "number_line_place") {
     const explicitMode = typeof config.mode === "string" ? config.mode : undefined;
     const mode =
-      explicitMode === "pick_point" || explicitMode === "order_fractions"
+      explicitMode === "pick_point"
         ? explicitMode
+        : explicitMode === "order_fractions" || explicitMode === "order_compare_fractions"
+        ? "order_fractions"
         : "place_fraction";
 
     const allowedDenominators =
@@ -3943,14 +3966,30 @@ function generateInteractiveQuestion(
     }
 
     if (mode === "order_fractions") {
-      const candidateSets = year3FractionOrderSets().filter((set) =>
+      const candidateSets = (
+        explicitMode === "order_compare_fractions"
+          ? [
+              ["1/8", "3/8", "6/8"],
+              ["2/8", "5/8", "7/8"],
+              ["1/3", "1/2", "1/4"],
+              ["2/3", "3/5", "4/6"],
+              ["1/6", "1/3", "1/2"],
+              ["2/5", "3/5", "4/10"],
+              ["3/8", "1/2", "5/8"],
+              ["3/4", "5/8", "6/10"],
+              ["2/6", "1/2", "5/6"],
+              ["1/4", "3/8", "2/3"],
+            ]
+          : year3FractionOrderSets()
+      ).filter((set) =>
         !allowedDenominators || set.every((value) => allowedDenominators.includes(Number(value.split("/")[1] ?? 0)))
       );
-      const orderedSet =
+      const chosenSet =
         candidateSets[randInt(0, candidateSets.length - 1)] ??
         candidateSets[0] ??
         year3FractionOrderSets()[0] ??
         ["1/5", "1/2", "4/5"];
+      const orderedSet = [...chosenSet].sort((a, b) => fractionNumericValue(a) - fractionNumericValue(b));
       return {
         kind: "number_line_place",
         prompt: "Put the fractions in order from smallest to largest.",
@@ -3989,9 +4028,56 @@ function generateInteractiveQuestion(
 
   if (activityType === "fraction_compare") {
     const mode =
-      config.mode === "visual_compare" || config.mode === "true_false"
+      config.mode === "visual_compare" ||
+      config.mode === "true_false" ||
+      config.mode === "greater_less_visual" ||
+      config.mode === "equivalent_to_compare"
         ? config.mode
         : "symbol_compare";
+    if (mode === "greater_less_visual" || mode === "equivalent_to_compare") {
+      const visualPairs = [
+        ["2/6", "4/6"],
+        ["3/8", "5/8"],
+        ["2/8", "6/8"],
+        ["3/5", "3/7"],
+        ["2/3", "2/5"],
+        ["4/9", "4/7"],
+        ["2/3", "3/5"],
+        ["4/6", "5/8"],
+        ["3/4", "6/10"],
+        ["5/8", "2/3"],
+        ["6/9", "2/3"],
+        ["4/10", "2/5"],
+      ] as const;
+      const eligiblePairs =
+        mode === "greater_less_visual"
+          ? visualPairs.filter(([left, right]) => fractionNumericValue(left) !== fractionNumericValue(right))
+          : visualPairs;
+      const chosen = eligiblePairs[randInt(0, eligiblePairs.length - 1)] ?? eligiblePairs[0] ?? visualPairs[0]!;
+      const [leftFraction, rightFraction] = chosen;
+      const leftValue = fractionNumericValue(leftFraction);
+      const rightValue = fractionNumericValue(rightFraction);
+      const greaterAnswer =
+        leftValue === rightValue ? "They are equal" : leftValue > rightValue ? leftFraction : rightFraction;
+
+      return {
+        kind: "fraction_compare",
+        prompt: mode === "greater_less_visual" ? "Tap the greater fraction." : "Which fraction is greater?",
+        mode,
+        leftFraction,
+        rightFraction,
+        answer:
+          mode === "greater_less_visual"
+            ? leftValue > rightValue
+              ? "left"
+              : "right"
+            : greaterAnswer,
+        helper:
+          mode === "greater_less_visual"
+            ? "Look at the shaded amount."
+            : "Use the bars or equivalent fractions.",
+      };
+    }
     const pairs = [
       ["1/2", "1/4", ">"],
       ["1/3", "1/2", "<"],

@@ -259,15 +259,24 @@ const year5Rows: ProgramRow[] = [
   },
   {
     week: 7,
-    focus: "Compare and order fractions using benchmarks",
+    focus: "Compare and order fractions using benchmarks and equivalence",
     lesson: 2,
-    topic: "Compare & Order",
-    activity: "Compare and order fractions using 1/2 and 1/4 as helpful benchmarks.",
+    topic: "Compare & Order Fractions",
+    activity: "Compare fractions with visual bars, use equivalent fractions, and order small sets.",
     curriculum: ["AC9M5N03"],
     activities: [
-      makeActivity("fraction_compare", 2, { mode: "symbol_compare" }),
-      makeActivity("number_line_place", 1, { mode: "order_fractions" }),
-      makeActivity("fraction_compare", 1, { mode: "visual_compare" }),
+      makeActivity("fraction_compare", 1, {
+        mode: "greater_less_visual",
+        rotationRole: "fast_thinking",
+      }),
+      makeActivity("fraction_compare", 1, {
+        mode: "equivalent_to_compare",
+        rotationRole: "reasoning",
+      }),
+      makeActivity("number_line_place", 1, {
+        mode: "order_compare_fractions",
+        rotationRole: "apply_create",
+      }),
     ],
   },
   {

@@ -32,21 +32,33 @@ function FractionBar({
   large = false,
   showFilled = true,
   totalWholes,
+  tone = "violet",
 }: {
   fraction: string;
   showLabel?: boolean;
   large?: boolean;
   showFilled?: boolean;
   totalWholes?: number;
+  tone?: "violet" | "emerald";
 }) {
   const { whole, numerator, denominator } = parseFraction(fraction);
   const totalParts = denominator * Math.max(1, totalWholes ?? whole + (numerator > 0 ? 1 : 0));
   const shadedParts = showFilled ? whole * denominator + numerator : 0;
+  const fillClass = tone === "emerald" ? "bg-emerald-400" : "bg-violet-500";
+  const labelClass = tone === "emerald" ? "text-slate-900" : "text-violet-900";
   return (
-    <div className={large ? "w-full" : "rounded-2xl border border-violet-200 bg-white p-3 shadow-sm"}>
+    <div
+      className={
+        large
+          ? "w-full"
+          : tone === "emerald"
+          ? "rounded-2xl border border-emerald-100 bg-white p-3 shadow-sm"
+          : "rounded-2xl border border-violet-200 bg-white p-3 shadow-sm"
+      }
+    >
       <div
         className={[
-          "grid rounded-xl bg-slate-200 p-1",
+          "grid overflow-hidden rounded-xl border-2 border-slate-300 bg-slate-100 p-1",
           large ? "gap-0.5" : "gap-1",
         ].join(" ")}
         style={{ gridTemplateColumns: `repeat(${totalParts}, minmax(0, 1fr))` }}
@@ -56,13 +68,13 @@ function FractionBar({
             key={index}
             className={[
               large ? "h-16 rounded-[4px]" : "h-8 rounded-sm",
-              index < shadedParts ? "bg-violet-500" : "bg-slate-100",
+              index < shadedParts ? fillClass : "bg-white",
             ].join(" ")}
           />
         ))}
       </div>
       {showLabel ? (
-        <div className="mt-2 text-center text-lg font-black text-violet-900">
+        <div className={`mt-2 text-center text-lg font-black ${labelClass}`}>
           <FractionText value={fraction} />
         </div>
       ) : null}
@@ -130,8 +142,12 @@ export default function NumberLinePlace({
     const placedIndex = lineStops.findIndex((stop) => stop.label === placedFraction);
     if (placedIndex < 0) return;
 
-    setAnimatedFraction("0");
     const timers: Array<ReturnType<typeof setTimeout>> = [];
+    timers.push(
+      setTimeout(() => {
+        setAnimatedFraction("0");
+      }, 0)
+    );
     for (let index = 1; index <= placedIndex; index += 1) {
       const stop = lineStops[index];
       if (!stop) continue;
@@ -164,22 +180,22 @@ export default function NumberLinePlace({
                 key={value}
                 type="button"
                 onClick={() => choose(value)}
-                className="rounded-2xl border border-violet-300 bg-white p-4 text-left shadow-sm transition hover:bg-violet-50"
+                className="rounded-2xl border border-emerald-200 bg-white p-4 text-left shadow-sm transition hover:bg-emerald-50"
               >
-                <div className="text-lg font-black text-violet-900">
+                <div className="text-lg font-black text-slate-900">
                   <FractionText value={value} />
                 </div>
                 <div className="mt-3">
-                  <FractionBar fraction={value} showLabel={false} large />
+                  <FractionBar fraction={value} showLabel={false} large tone="emerald" />
                 </div>
               </button>
             ))}
           </div>
-          <div className="mt-4 rounded-2xl border border-dashed border-violet-300 bg-white p-4 text-lg font-black text-violet-900">
+          <div className="mt-4 rounded-2xl border border-dashed border-emerald-300 bg-white p-4 text-lg font-black text-emerald-900">
             {order.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {order.map((value, index) => (
-                  <span key={`${value}-${index}`} className="rounded-lg bg-violet-100 px-2 py-1">
+                  <span key={`${value}-${index}`} className="rounded-lg bg-emerald-100 px-2 py-1">
                     <FractionText value={value} compact />
                   </span>
                 ))}
@@ -193,7 +209,7 @@ export default function NumberLinePlace({
               type="button"
               onClick={undoLastChoice}
               disabled={order.length === 0}
-              className="rounded-2xl border border-violet-300 bg-white px-4 py-2 font-black text-violet-900 hover:bg-violet-50 disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded-2xl border border-emerald-300 bg-white px-4 py-2 font-black text-emerald-900 hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-40"
             >
               Undo last
             </button>
@@ -201,7 +217,7 @@ export default function NumberLinePlace({
               type="button"
               onClick={clearOrder}
               disabled={order.length === 0}
-              className="rounded-2xl border border-violet-300 bg-white px-4 py-2 font-black text-violet-900 hover:bg-violet-50 disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded-2xl border border-emerald-300 bg-white px-4 py-2 font-black text-emerald-900 hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-40"
             >
               Clear order
             </button>
@@ -209,7 +225,8 @@ export default function NumberLinePlace({
           <button
             type="button"
             onClick={() => (order.join(",") === questionData.answer ? onCorrect?.() : onWrong?.())}
-            className="mt-4 w-full rounded-2xl bg-violet-600 px-5 py-3 font-black text-white hover:bg-violet-700"
+            disabled={order.length !== (questionData.fractions ?? []).length}
+            className="mt-4 w-full rounded-2xl bg-emerald-600 px-5 py-3 font-black text-white hover:bg-emerald-700 disabled:opacity-40"
           >
             Check order
           </button>

@@ -83,8 +83,13 @@ function scoreActivityForRole(activity: LessonActivity, role: RotationRole): num
   const mode = typeof config.mode === "string" ? config.mode : "";
   const sourceActivityType =
     typeof config.sourceActivityType === "string" ? config.sourceActivityType : "";
+  const explicitRole = typeof config.rotationRole === "string" ? config.rotationRole : "";
 
   let score = 0;
+
+  if (explicitRole) {
+    score += explicitRole === role ? 100 : -100;
+  }
 
   if (FAST_ACTIVITY_TYPES.has(activity.activityType)) score += role === "fast_thinking" ? 5 : 0;
   if (REASONING_ACTIVITY_TYPES.has(activity.activityType)) score += role === "reasoning" ? 5 : 0;
