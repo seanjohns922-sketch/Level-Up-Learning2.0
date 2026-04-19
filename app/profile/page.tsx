@@ -7,7 +7,7 @@ import { readProgramStore, getWeekProgress, isWeekComplete } from "@/lib/program
 import {
   ChevronLeft, Zap, Flame, Clock, Target, Calendar,
   Lock, ChevronRight, Users, Swords, Medal,
-  TrendingUp, BookOpen, Trophy, Star, Home, Map, BarChart3, Settings, LogOut,
+  TrendingUp, BookOpen, Trophy, Star, Settings, LogOut, Sparkles,
 } from "lucide-react";
 
 const REALMS = [
@@ -33,15 +33,6 @@ function getMonthGrid() {
   return { offset, daysInMonth, today, monthName, year };
 }
 
-const NAV_ITEMS = [
-  { icon: Home, label: "Dashboard", route: "/profile", active: true },
-  { icon: Map, label: "Tower Map", route: "/tower-map" },
-  { icon: BookOpen, label: "Lessons", route: "/home" },
-  { icon: BarChart3, label: "Stats", route: "/realm-stats" },
-  { icon: Trophy, label: "Legends", route: "/legends" },
-  { icon: Star, label: "Realms", route: "/realms" },
-  { icon: Settings, label: "Settings", route: "/profile" },
-];
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -114,41 +105,33 @@ export default function ProfilePage() {
   const { offset, daysInMonth, today, monthName } = useMemo(getMonthGrid, []);
 
   return (
-    <main className="min-h-screen bg-[#F4F7F6] p-4 md:p-6">
+    <main className="min-h-screen bg-[#FAF8F4] p-4 md:p-6">
       <div className="max-w-[1400px] mx-auto flex gap-5">
 
-        {/* ─── LEFT SIDEBAR ─── */}
-        <aside className="hidden lg:flex flex-col w-[200px] flex-shrink-0 rounded-3xl bg-gradient-to-b from-teal-600 to-emerald-700 p-5 shadow-[0_8px_30px_rgba(13,148,136,0.18)] sticky top-6 h-[calc(100vh-3rem)]">
+        {/* ─── LEFT SIDEBAR (minimal: logo + settings + logout) ─── */}
+        <aside className="hidden lg:flex flex-col items-center w-[76px] flex-shrink-0 rounded-3xl bg-white border border-slate-200/70 py-5 shadow-sm sticky top-6 h-[calc(100vh-3rem)]">
           {/* Logo tile */}
-          <div className="h-16 w-16 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center mb-8 mx-auto shadow-inner">
-            <BookOpen className="h-7 w-7 text-white" />
+          <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center mb-8 shadow-md shadow-indigo-500/20">
+            <Sparkles className="h-5 w-5 text-white" />
           </div>
 
-          {/* Nav items */}
-          <nav className="flex flex-col gap-1 flex-1">
-            {NAV_ITEMS.map((item) => (
-              <button
-                key={item.label}
-                onClick={() => router.push(item.route)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all
-                  ${item.active
-                    ? "bg-white/20 text-white shadow-sm"
-                    : "text-white/70 hover:bg-white/10 hover:text-white"
-                  }`}
-              >
-                <item.icon className="h-4 w-4 flex-shrink-0" />
-                <span className="truncate">{item.label}</span>
-              </button>
-            ))}
-          </nav>
+          <div className="flex-1" />
 
-          {/* Logout */}
+          <button
+            onClick={() => router.push("/profile")}
+            className="h-11 w-11 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-indigo-600 transition-all mb-2"
+            aria-label="Settings"
+            title="Settings"
+          >
+            <Settings className="h-[18px] w-[18px]" />
+          </button>
           <button
             onClick={() => router.push("/login")}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-white/70 hover:bg-white/10 hover:text-white transition-all mt-2"
+            className="h-11 w-11 rounded-xl flex items-center justify-center text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-all"
+            aria-label="Logout"
+            title="Logout"
           >
-            <LogOut className="h-4 w-4" />
-            <span>Logout</span>
+            <LogOut className="h-[18px] w-[18px]" />
           </button>
         </aside>
 
@@ -172,44 +155,44 @@ export default function ProfilePage() {
 
             {/* Profile pill */}
             <div className="flex items-center gap-3 rounded-2xl bg-white border border-slate-200/70 px-3 py-2 shadow-sm">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center text-sm font-black text-white shadow-sm">
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-sm font-black text-white shadow-sm">
                 {initials}
               </div>
               <div className="hidden sm:block pr-1">
                 <h2 className="text-sm font-extrabold text-slate-900 leading-tight">{studentName}</h2>
                 <p className="text-[10px] font-bold text-slate-500">Numbot {levelTitle} · Lvl {levelNum}</p>
               </div>
-              <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200">
-                <Zap className="h-3 w-3 text-emerald-600" />
-                <span className="text-xs font-extrabold text-emerald-700">{stats.xp.toLocaleString()}</span>
+              <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200">
+                <Zap className="h-3 w-3 text-amber-600" />
+                <span className="text-xs font-extrabold text-amber-700">{stats.xp.toLocaleString()}</span>
               </div>
             </div>
           </div>
 
           {/* ─── HERO WELCOME BANNER ─── */}
-          <div className="relative rounded-3xl bg-gradient-to-br from-teal-500 via-teal-600 to-emerald-700 p-6 md:p-8 overflow-hidden shadow-[0_10px_40px_rgba(13,148,136,0.2)]">
-            <div className="absolute -top-10 -right-10 h-48 w-48 rounded-full bg-white/10 blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 right-0 h-32 w-32 rounded-full bg-emerald-300/20 blur-2xl pointer-events-none" />
+          <div className="relative rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-900 to-indigo-800 p-6 md:p-8 overflow-hidden shadow-[0_10px_40px_rgba(30,27,75,0.25)]">
+            <div className="absolute -top-10 -right-10 h-48 w-48 rounded-full bg-amber-400/15 blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 right-0 h-32 w-32 rounded-full bg-indigo-400/20 blur-2xl pointer-events-none" />
             <div className="relative flex items-center justify-between gap-4">
               <div className="flex-1 min-w-0">
-                <p className="text-[11px] font-bold text-white/70 uppercase tracking-[0.18em] mb-2">
+                <p className="text-[11px] font-bold text-amber-300/90 uppercase tracking-[0.18em] mb-2">
                   {new Date().toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long" })}
                 </p>
                 <h1 className="text-2xl md:text-3xl font-black text-white leading-tight">
                   Welcome back, {studentName}!
                 </h1>
-                <p className="text-sm text-white/80 mt-1.5 max-w-md">
+                <p className="text-sm text-white/70 mt-1.5 max-w-md">
                   Your Number Nexus journey continues. {stats.realmProgress}% through Level {levelNum}.
                 </p>
                 <button
                   onClick={() => router.push("/home")}
-                  className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-teal-700 text-sm font-extrabold hover:bg-teal-50 transition-all active:scale-95 shadow-md"
+                  className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-400 text-slate-900 text-sm font-extrabold hover:bg-amber-300 transition-all active:scale-95 shadow-md shadow-amber-500/20"
                 >
                   Continue Lessons <ChevronRight className="h-4 w-4" />
                 </button>
               </div>
               {/* Decorative big number */}
-              <div className="hidden md:flex items-center justify-center h-28 w-28 rounded-3xl bg-white/15 backdrop-blur-sm border border-white/20 flex-shrink-0">
+              <div className="hidden md:flex items-center justify-center h-28 w-28 rounded-3xl bg-white/10 backdrop-blur-sm border border-white/15 flex-shrink-0">
                 <Trophy className="h-12 w-12 text-amber-300" />
               </div>
             </div>
@@ -219,19 +202,19 @@ export default function ProfilePage() {
           <section>
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-base font-extrabold text-slate-900">Your Stats</h3>
-              <button className="text-xs font-bold text-teal-600 hover:text-teal-700">See all</button>
+              <button className="text-xs font-bold text-indigo-600 hover:text-indigo-700">See all</button>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {[
                 { icon: Flame, value: "0", label: "Day Streak", iconBg: "bg-rose-100", iconColor: "text-rose-500" },
-                { icon: Calendar, value: activeDays.size.toString(), label: "Days Active", iconBg: "bg-teal-100", iconColor: "text-teal-600" },
-                { icon: Clock, value: "--", label: "Time", iconBg: "bg-emerald-100", iconColor: "text-emerald-600" },
+                { icon: Calendar, value: activeDays.size.toString(), label: "Days Active", iconBg: "bg-indigo-100", iconColor: "text-indigo-600" },
+                { icon: Clock, value: "--", label: "Time", iconBg: "bg-sky-100", iconColor: "text-sky-600" },
                 { icon: Target, value: `${stats.accuracy}%`, label: "Accuracy", iconBg: "bg-amber-100", iconColor: "text-amber-600" },
               ].map((c) => (
                 <div
                   key={c.label}
-                  className="rounded-2xl bg-white border border-slate-200/70 p-4 hover:border-teal-300 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer shadow-sm"
+                  className="rounded-2xl bg-white border border-slate-200/70 p-4 hover:border-indigo-300 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer shadow-sm"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className={`h-10 w-10 rounded-xl ${c.iconBg} flex items-center justify-center`}>
@@ -254,10 +237,10 @@ export default function ProfilePage() {
               <div className="rounded-2xl bg-white border border-slate-200/70 p-5 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                    <BookOpen className="h-4 w-4 text-teal-600" />
+                    <BookOpen className="h-4 w-4 text-indigo-600" />
                     Enrolled Realms
                   </h3>
-                  <button className="text-xs font-bold text-teal-600 hover:text-teal-700">See all</button>
+                  <button className="text-xs font-bold text-indigo-600 hover:text-indigo-700">See all</button>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -270,13 +253,13 @@ export default function ProfilePage() {
                         onClick={() => isActive && router.push("/realms")}
                         className={`relative rounded-2xl p-4 transition-all duration-200 border overflow-hidden
                           ${isActive
-                            ? "bg-gradient-to-br from-teal-50 to-emerald-50 border-teal-200 hover:border-teal-400 hover:shadow-md hover:-translate-y-0.5 cursor-pointer"
+                            ? "bg-gradient-to-br from-indigo-50 to-amber-50/40 border-indigo-200 hover:border-indigo-400 hover:shadow-md hover:-translate-y-0.5 cursor-pointer"
                             : "bg-slate-50 border-slate-200/70 opacity-60"
                           }`}
                       >
                         {isActive ? (
                           <div
-                            className="h-12 w-12 rounded-xl mb-3 bg-cover bg-center shadow-sm ring-1 ring-teal-700/10"
+                            className="h-12 w-12 rounded-xl mb-3 bg-cover bg-center shadow-sm ring-1 ring-indigo-700/10"
                             style={{ backgroundImage: `url('/images/number-nexus-tile.jpg')` }}
                           />
                         ) : (
@@ -290,17 +273,17 @@ export default function ProfilePage() {
                         {isActive ? (
                           <>
                             <div className="flex items-center gap-2 mt-2">
-                              <div className="flex-1 h-1.5 rounded-full bg-emerald-100 overflow-hidden">
+                              <div className="flex-1 h-1.5 rounded-full bg-indigo-100 overflow-hidden">
                                 <div
-                                  className="h-full rounded-full bg-gradient-to-r from-teal-500 to-emerald-600 transition-all duration-700"
+                                  className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-indigo-700 transition-all duration-700"
                                   style={{ width: `${stats.realmProgress}%` }}
                                 />
                               </div>
-                              <span className="text-[10px] font-extrabold text-emerald-700">{stats.realmProgress}%</span>
+                              <span className="text-[10px] font-extrabold text-indigo-700">{stats.realmProgress}%</span>
                             </div>
                             <button
                               onClick={(e) => { e.stopPropagation(); router.push("/home"); }}
-                              className="mt-3 inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gradient-to-br from-teal-600 to-emerald-700 text-white text-[11px] font-extrabold hover:shadow-md transition-all active:scale-95"
+                              className="mt-3 inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-900 text-white text-[11px] font-extrabold hover:bg-slate-800 transition-all active:scale-95"
                             >
                               View
                             </button>
@@ -319,15 +302,33 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {/* Your Wins */}
+              {/* Your Wins + inline Social teaser */}
               <div className="rounded-2xl bg-white border border-slate-200/70 p-5 shadow-sm">
-                <h3 className="text-base font-extrabold text-slate-900 mb-3 flex items-center gap-2">
-                  <Star className="h-4 w-4 text-amber-500" />
-                  Your Wins
-                </h3>
+                <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+                  <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                    <Star className="h-4 w-4 text-amber-500" />
+                    Your Wins
+                  </h3>
+                  <div className="flex items-center gap-4">
+                    {[
+                      { icon: Users, label: "Friends", color: "text-indigo-500" },
+                      { icon: Swords, label: "Battles", color: "text-rose-400" },
+                      { icon: Medal, label: "Rankings", color: "text-amber-500" },
+                    ].map((item) => (
+                      <div key={item.label} className="flex items-center gap-1.5 opacity-50">
+                        <item.icon className={`h-3.5 w-3.5 ${item.color}`} />
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{item.label}</span>
+                      </div>
+                    ))}
+                    <div className="flex items-center gap-1.5 pl-3 border-l border-slate-200">
+                      <Lock className="h-3 w-3 text-slate-300" />
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.15em]">Coming Soon</span>
+                    </div>
+                  </div>
+                </div>
                 <div className="flex flex-wrap gap-2">
                   {recentActivity.map((item, i) => (
-                    <div key={i} className="flex items-center gap-2 bg-teal-50/60 rounded-xl px-3 py-2 border border-teal-100">
+                    <div key={i} className="flex items-center gap-2 bg-slate-50 rounded-xl px-3 py-2 border border-slate-200/70">
                       <item.icon className={`h-4 w-4 ${item.color}`} />
                       <span className="text-xs font-semibold text-slate-700">{item.text}</span>
                     </div>
@@ -342,7 +343,7 @@ export default function ProfilePage() {
               <div className="rounded-2xl bg-white border border-slate-200/70 p-4 shadow-sm">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-teal-600" />
+                    <Calendar className="h-4 w-4 text-indigo-600" />
                     Activity
                   </h3>
                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{monthName}</span>
@@ -366,9 +367,9 @@ export default function ProfilePage() {
                         key={day}
                         className={`flex items-center justify-center rounded-md aspect-square text-[10px] font-bold transition-all
                           ${isToday
-                            ? "bg-gradient-to-br from-teal-500 to-emerald-600 text-white shadow-sm"
+                            ? "bg-slate-900 text-white shadow-sm"
                             : isActive
-                              ? "bg-emerald-100 text-emerald-700 font-extrabold"
+                              ? "bg-amber-100 text-amber-700 font-extrabold"
                               : isPast
                                 ? "text-slate-300"
                                 : "text-slate-200"
@@ -383,7 +384,7 @@ export default function ProfilePage() {
               </div>
 
               {/* Daily Challenge */}
-              <div className="rounded-2xl bg-gradient-to-br from-teal-600 to-emerald-700 p-5 text-white relative overflow-hidden shadow-md">
+              <div className="rounded-2xl bg-gradient-to-br from-slate-900 to-indigo-900 p-5 text-white relative overflow-hidden shadow-md">
                 <div className="absolute -top-6 -right-6 h-24 w-24 rounded-full bg-white/10 blur-2xl" />
                 <div className="relative">
                   <div className="h-10 w-10 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center mb-3">
@@ -401,7 +402,7 @@ export default function ProfilePage() {
               {/* Level Progress mini */}
               <div className="rounded-2xl bg-white border border-slate-200/70 p-4 shadow-sm">
                 <h4 className="text-sm font-extrabold text-slate-900 mb-3 flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-emerald-600" />
+                  <TrendingUp className="h-4 w-4 text-indigo-600" />
                   Level Progress
                 </h4>
                 <div className="flex items-center gap-3">
@@ -409,11 +410,11 @@ export default function ProfilePage() {
                     <svg viewBox="0 0 36 36" className="h-full w-full -rotate-90">
                       <defs>
                         <linearGradient id="ringGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#14b8a6" />
-                          <stop offset="100%" stopColor="#10b981" />
+                          <stop offset="0%" stopColor="#6366f1" />
+                          <stop offset="100%" stopColor="#4338ca" />
                         </linearGradient>
                       </defs>
-                      <circle cx="18" cy="18" r="15.5" fill="none" stroke="#ECFDF5" strokeWidth="3" />
+                      <circle cx="18" cy="18" r="15.5" fill="none" stroke="#EEF2FF" strokeWidth="3" />
                       <circle
                         cx="18" cy="18" r="15.5" fill="none"
                         stroke="url(#ringGrad2)" strokeWidth="3" strokeLinecap="round"
@@ -436,24 +437,6 @@ export default function ProfilePage() {
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* ─── BOTTOM SOCIAL TEASER ─── */}
-          <div className="rounded-2xl bg-white border border-slate-200/70 px-6 py-3 flex items-center justify-center gap-8 shadow-sm">
-            {[
-              { icon: Users, label: "Friends", color: "text-teal-600" },
-              { icon: Swords, label: "Battles", color: "text-rose-500" },
-              { icon: Medal, label: "Rankings", color: "text-amber-500" },
-            ].map((item) => (
-              <div key={item.label} className="flex items-center gap-1.5 opacity-40">
-                <item.icon className={`h-4 w-4 ${item.color}`} />
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{item.label}</span>
-              </div>
-            ))}
-            <div className="flex items-center gap-1.5 ml-3 pl-3 border-l border-slate-200">
-              <Lock className="h-3 w-3 text-slate-300" />
-              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.15em]">Coming Soon</span>
             </div>
           </div>
 
