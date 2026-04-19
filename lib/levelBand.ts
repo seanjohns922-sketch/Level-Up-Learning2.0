@@ -24,8 +24,8 @@ export function getLevelBand(levelNum: number): LevelBand {
 export function getHomeBg(levelNum: number): string {
   if (levelNum >= 6) return "/images/number-nexus-home-bg-y6.jpg";
   if (levelNum >= 5) return "/images/number-nexus-home-bg-y5.jpg";
-  if (levelNum >= 3) return "/images/number-nexus-home-bg-y3.jpg"; // L3+L4 share
-  return "/images/number-nexus-home-bg.jpg"; // L1+L2 share
+  // L3 + L4 now share the L1/L2 Number Nexus look for visual continuity
+  return "/images/number-nexus-home-bg.jpg";
 }
 
 /** Image filter per band — unified Level-5 "Clash Royale" crisp treatment across all levels */
