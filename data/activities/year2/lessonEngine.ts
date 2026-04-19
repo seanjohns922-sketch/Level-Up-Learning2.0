@@ -11436,6 +11436,7 @@ export function generateQuestion(
     activity.activityType === "number_line_place" ||
     activity.activityType === "fraction_compare" ||
     activity.activityType === "equivalent_fraction_match" ||
+    activity.activityType === "fraction_decimal_percent_match" ||
     activity.activityType === "equivalent_fraction_build" ||
     activity.activityType === "equivalent_fraction_yes_no" ||
     activity.activityType === "addition_strategy" ||
