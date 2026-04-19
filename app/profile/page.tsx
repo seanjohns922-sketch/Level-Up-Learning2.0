@@ -155,16 +155,16 @@ export default function ProfilePage() {
 
             {/* Profile pill */}
             <div className="flex items-center gap-3 rounded-2xl bg-white border border-slate-200/70 px-3 py-2 shadow-sm">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center text-sm font-black text-white shadow-sm">
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-sm font-black text-white shadow-sm">
                 {initials}
               </div>
               <div className="hidden sm:block pr-1">
                 <h2 className="text-sm font-extrabold text-slate-900 leading-tight">{studentName}</h2>
                 <p className="text-[10px] font-bold text-slate-500">Numbot {levelTitle} · Lvl {levelNum}</p>
               </div>
-              <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200">
-                <Zap className="h-3 w-3 text-emerald-600" />
-                <span className="text-xs font-extrabold text-emerald-700">{stats.xp.toLocaleString()}</span>
+              <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200">
+                <Zap className="h-3 w-3 text-amber-600" />
+                <span className="text-xs font-extrabold text-amber-700">{stats.xp.toLocaleString()}</span>
               </div>
             </div>
           </div>
