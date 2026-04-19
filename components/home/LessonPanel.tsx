@@ -214,6 +214,7 @@ export default function LessonPanel({
             <button
               key={item.label}
               onClick={item.onClick}
+              title={item.label}
               className="relative h-7 w-7 flex items-center justify-center text-teal-200/60 hover:text-teal-100 transition group"
               style={{
                 background: "linear-gradient(135deg, #052e2b 0%, #064e47 100%)",
@@ -224,9 +225,6 @@ export default function LessonPanel({
               aria-label={item.label}
             >
               <item.icon className="h-3.5 w-3.5" />
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-black/90 text-[10px] font-bold text-teal-100 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                {item.label}
-              </span>
             </button>
           ))}
         </div>
