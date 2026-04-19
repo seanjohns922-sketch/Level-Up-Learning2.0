@@ -302,40 +302,46 @@ export default function TeacherDashboardPage() {
     const currentWeek = prog?.week ?? 1;
     const legends = prog ? parseUnlockedLegends(prog.unlocked_legends) : [];
     const hasLegend = legends.length > 0;
+    const totalLessons = WEEKS.reduce((s, w) => s + Math.min(3, weekCompletionCount(completedIds, w)), 0);
+    const overallPct = Math.round((totalLessons / (12 * 3)) * 100);
 
     return (
-      <div className="flex items-center gap-1">
-        {WEEKS.map((w) => {
-          const lessonsCompleted = weekCompletionCount(completedIds, w);
-          const isComplete = lessonsCompleted >= 3;
-          const isCurrent = w === currentWeek && !isComplete;
-          const isLocked = w > currentWeek;
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-[3px] flex-1">
+          {WEEKS.map((w) => {
+            const lessonsCompleted = weekCompletionCount(completedIds, w);
+            const isComplete = lessonsCompleted >= 3;
+            const isCurrent = w === currentWeek && !isComplete;
 
-          let bg = "bg-gray-200"; // locked
-          if (isComplete) bg = "bg-emerald-400";
-          else if (isCurrent) {
-            if (lessonsCompleted === 0) bg = "bg-amber-200";
-            else if (lessonsCompleted === 1) bg = "bg-amber-300";
-            else bg = "bg-amber-400";
-          }
+            let bg = "bg-slate-200/70"; // locked
+            if (isComplete) bg = "bg-teal-500";
+            else if (isCurrent) {
+              if (lessonsCompleted === 0) bg = "bg-amber-300";
+              else if (lessonsCompleted === 1) bg = "bg-amber-400";
+              else bg = "bg-amber-500";
+            }
 
-          return (
-            <div
-              key={w}
-              className={`h-5 flex-1 rounded-sm ${bg} transition-colors relative group`}
-              title={`Week ${w}: ${isComplete ? "Complete" : isCurrent ? `${lessonsCompleted}/3 lessons` : "Locked"}`}
-            >
-              {isCurrent && (
-                <div className="absolute inset-0 rounded-sm ring-2 ring-amber-500 ring-offset-1" />
-              )}
-            </div>
-          );
-        })}
-        {hasLegend && (
-          <span className="ml-2 text-xs font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full whitespace-nowrap">
-            🏆 Legend
-          </span>
-        )}
+            return (
+              <div
+                key={w}
+                className={`h-2 flex-1 rounded-full ${bg} transition-colors relative`}
+                title={`Week ${w}: ${isComplete ? "Complete" : isCurrent ? `${lessonsCompleted}/3 lessons` : "Locked"}`}
+              >
+                {isCurrent && (
+                  <div className="absolute -inset-y-1 inset-x-0 rounded-full ring-2 ring-amber-500/60" />
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <div className="flex items-center gap-2 min-w-[88px] justify-end">
+          <span className="tabular-nums text-xs font-bold text-slate-700">{overallPct}%</span>
+          {hasLegend && (
+            <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-teal-700 bg-teal-50 border border-teal-100 px-1.5 py-0.5 rounded-md whitespace-nowrap">
+              ★ Legend
+            </span>
+          )}
+        </div>
       </div>
     );
   }
@@ -535,47 +541,67 @@ export default function TeacherDashboardPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#fbf7f1] flex items-center justify-center">
-        <p className="text-gray-400 text-lg">Loading dashboard…</p>
+      <main className="min-h-screen bg-[#F7F8FA] flex items-center justify-center">
+        <div className="flex items-center gap-3 text-slate-500">
+          <div className="h-2 w-2 rounded-full bg-teal-500 animate-pulse" />
+          <p className="text-sm font-semibold">Loading dashboard…</p>
+        </div>
       </main>
     );
   }
 
+  // Stats (precomputed for header KPI strip + summary tiles)
+  const yearProg = progress.filter((p) => p.year === activeYear);
+  const activeThisWeek = yearProg.filter((p) => (p.week ?? 0) > 0).length;
+  const legendsUnlocked = yearProg.filter((p) => parseUnlockedLegends(p.unlocked_legends).length > 0).length;
+  const avgWeek = classStudents.length > 0 && yearProg.length > 0
+    ? (yearProg.reduce((s, p) => s + (p.week ?? 0), 0) / yearProg.length).toFixed(1)
+    : "—";
+  const postTests = yearProg.filter((p) => getLatestPosttestProfile(p.quiz_scores)).length;
+  const isDev = process.env.NODE_ENV !== "production";
+
   return (
-    <main className="min-h-screen bg-[#fbf7f1]">
+    <main className="min-h-screen bg-[#F7F8FA]">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur border-b border-gray-100 px-6 py-4 sticky top-0 z-20">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-black text-gray-900">Teacher Dashboard</h1>
+      <header className="bg-white border-b border-[#E6E8EC] px-6 py-4 sticky top-0 z-20">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 flex-wrap">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center">
+                <svg viewBox="0 0 24 24" className="h-4 w-4 text-white" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M3 12l9-9 9 9M5 10v10h14V10" />
+                </svg>
+              </div>
+              <h1 className="text-xl font-black text-[#0F172A] tracking-tight">Teacher Dashboard</h1>
+            </div>
             {selectedClass && (
-              <>
-                <div className="flex items-center gap-3 mt-1">
-                  <span className="text-sm text-gray-500">{selectedClass.name}</span>
-                  <button
-                    onClick={copyCode}
-                    className="inline-flex items-center gap-1 text-xs font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full hover:bg-blue-100 transition"
-                  >
-                    {copiedCode ? "Copied!" : selectedClass.class_code}
-                    <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <rect x="9" y="9" width="13" height="13" rx="2" />
-                      <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
-                    </svg>
-                  </button>
-                </div>
-                <div className="text-[11px] text-gray-400 mt-1">
-                  Debug — Class ID: {selectedClass.id} • Students loaded: {classStudents.length}
-                </div>
-              </>
+              <div className="flex items-center gap-2 mt-1.5 ml-9">
+                <span className="text-sm font-semibold text-[#475569]">{selectedClass.name}</span>
+                <span className="h-1 w-1 rounded-full bg-[#CBD5E1]" />
+                <button
+                  onClick={copyCode}
+                  className="inline-flex items-center gap-1.5 text-[11px] font-mono font-extrabold text-teal-700 bg-teal-50 border border-teal-100 px-2 py-0.5 rounded-md hover:bg-teal-100 transition"
+                >
+                  {copiedCode ? "Copied!" : selectedClass.class_code}
+                  <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" />
+                    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                  </svg>
+                </button>
+                <span className="text-[11px] font-semibold text-[#94A3B8]">· {classStudents.length} student{classStudents.length === 1 ? "" : "s"}</span>
+                {isDev && (
+                  <span className="ml-2 text-[10px] font-mono text-[#94A3B8]">id:{selectedClass.id.slice(0, 8)}</span>
+                )}
+              </div>
             )}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {classes.length > 1 && (
               <select
                 value={selectedClassId ?? ""}
                 onChange={(e) => selectClass(e.target.value)}
-                className="text-sm px-3 py-2 rounded-xl border border-gray-200 bg-white"
+                className="text-sm font-semibold px-3 py-2 rounded-lg border border-[#E6E8EC] bg-white text-[#0F172A] hover:border-[#CBD5E1] transition"
               >
                 {classes.map((c) => (
                   <option key={c.id} value={c.id}>{c.name}</option>
@@ -584,49 +610,64 @@ export default function TeacherDashboardPage() {
             )}
             <button
               onClick={() => router.push("/teacher/classes/new")}
-              className="px-4 py-2 rounded-xl bg-[#9fd7b1] text-[#1f3b2a] font-bold text-sm hover:bg-[#8fcea4] transition"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#0F172A] text-white font-bold text-sm hover:bg-[#1E293B] transition active:scale-[0.98]"
             >
-              + New Class
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14" /></svg>
+              New Class
             </button>
             <button
               onClick={async () => {
                 await supabase.auth.signOut();
                 router.push("/login");
               }}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-gray-500 hover:text-gray-700 hover:bg-gray-100 text-sm font-bold transition"
+              className="h-9 w-9 rounded-lg border border-[#E6E8EC] text-[#64748B] hover:text-[#DC2626] hover:bg-[#FEF2F2] hover:border-[#FECACA] transition flex items-center justify-center"
               type="button"
+              aria-label="Log out"
+              title="Log out"
             >
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" /></svg>
-              Log Out
             </button>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-6 py-6">
+      <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
         {classes.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-gray-400 text-lg mb-4">No classes yet.</p>
+          <div className="text-center py-20 bg-white rounded-2xl border border-[#E6E8EC]">
+            <div className="mx-auto h-12 w-12 rounded-xl bg-teal-50 flex items-center justify-center mb-3">
+              <svg viewBox="0 0 24 24" className="h-6 w-6 text-teal-600" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m3-5.13a4 4 0 100-8 4 4 0 000 8zm6-2a3 3 0 100-6 3 3 0 000 6z" /></svg>
+            </div>
+            <p className="text-[#0F172A] font-bold mb-1">No classes yet</p>
+            <p className="text-sm text-[#64748B] mb-5">Create your first class to start tracking students.</p>
             <button
               onClick={() => router.push("/teacher/classes/new")}
-              className="px-6 py-3 rounded-2xl bg-[#9fd7b1] text-[#1f3b2a] font-bold"
+              className="px-5 py-2.5 rounded-lg bg-[#0F172A] text-white font-bold text-sm hover:bg-[#1E293B] transition"
             >
               Create Your First Class
             </button>
           </div>
         ) : (
           <>
+            {/* KPI strip */}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+              <KpiTile label="Students" value={classStudents.length} accent="#0EA5A4" icon={(<path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m3-5.13a4 4 0 100-8 4 4 0 000 8zm6-2a3 3 0 100-6 3 3 0 000 6z" />)} />
+              <KpiTile label="Active This Week" value={activeThisWeek} accent="#0EA5A4" icon={(<><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>)} />
+              <KpiTile label="Legends Unlocked" value={legendsUnlocked} accent="#F59E0B" icon={(<path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z" />)} />
+              <KpiTile label="Avg Week" value={avgWeek} accent="#0EA5A4" icon={(<><path d="M3 3v18h18" /><path d="M7 14l3-3 3 3 5-5" /></>)} />
+              <KpiTile label="Post-Tests" value={postTests} accent="#6366F1" icon={(<><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></>)} />
+            </div>
+
             {/* Year level tabs */}
-            <div className="flex gap-1 mb-6 overflow-x-auto pb-1">
+            <div className="flex items-center gap-1 p-1 bg-white rounded-xl border border-[#E6E8EC] w-fit overflow-x-auto">
               {YEAR_LEVELS.map((yr) => (
                 <button
                   key={yr}
                   onClick={() => setActiveYear(yr)}
                   className={[
-                    "px-4 py-2 rounded-xl font-bold text-sm whitespace-nowrap transition",
+                    "px-3.5 py-1.5 rounded-lg font-bold text-sm whitespace-nowrap transition",
                     activeYear === yr
-                      ? "bg-white text-gray-900 shadow-sm border border-gray-200"
-                      : "text-gray-400 hover:text-gray-600",
+                      ? "bg-[#0F172A] text-white shadow-sm"
+                      : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9]",
                   ].join(" ")}
                 >
                   {yr}
@@ -635,55 +676,75 @@ export default function TeacherDashboardPage() {
             </div>
 
             {/* Student table */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div className="bg-white rounded-2xl border border-[#E6E8EC] overflow-hidden">
               {/* Table header */}
-              <div className="grid grid-cols-[200px_1fr] md:grid-cols-[240px_1fr] border-b border-gray-100 px-6 py-3 bg-gray-50/50">
-                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Student</span>
-                <div className="flex items-center gap-1">
-                  {WEEKS.map((w) => (
-                    <span
-                      key={w}
-                      className="flex-1 text-center text-[10px] font-bold text-gray-300"
-                    >
-                      W{w}
-                    </span>
-                  ))}
+              <div className="grid grid-cols-[220px_1fr] md:grid-cols-[260px_1fr] border-b border-[#E6E8EC] px-6 py-3 bg-[#FAFBFC]">
+                <span className="text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.12em]">Student</span>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-[3px] flex-1">
+                    {WEEKS.map((w) => (
+                      <span
+                        key={w}
+                        className="flex-1 text-center text-[9px] font-extrabold text-[#94A3B8] tracking-wider"
+                      >
+                        W{w}
+                      </span>
+                    ))}
+                  </div>
+                  <span className="min-w-[88px] text-right text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.12em]">Progress</span>
                 </div>
               </div>
 
               {classStudents.length === 0 ? (
-                <div className="px-6 py-12 text-center text-gray-400">
-                  No students enrolled yet. Share the class code to get started.
+                <div className="px-6 py-16 text-center">
+                  <div className="mx-auto h-10 w-10 rounded-lg bg-[#F1F5F9] flex items-center justify-center mb-2">
+                    <svg viewBox="0 0 24 24" className="h-5 w-5 text-[#94A3B8]" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8z" /></svg>
+                  </div>
+                  <p className="text-sm font-semibold text-[#0F172A]">No students enrolled yet</p>
+                  <p className="text-xs text-[#64748B] mt-1">Share the class code to get started.</p>
                 </div>
               ) : (
                 classStudents.map((student) => {
                   const isExpanded = expandedStudent === student.id;
                   const prog = getStudentProgress(student.id, activeYear);
+                  const initial = student.display_name.charAt(0).toUpperCase();
+                  // Stable per-student avatar tint (teal/indigo/amber rotation)
+                  const tints = [
+                    "from-teal-400 to-emerald-500",
+                    "from-indigo-400 to-violet-500",
+                    "from-amber-400 to-orange-500",
+                    "from-sky-400 to-cyan-500",
+                    "from-rose-400 to-pink-500",
+                  ];
+                  const tint = tints[student.id.charCodeAt(0) % tints.length];
 
                   return (
-                    <div key={student.id}>
+                    <div key={student.id} className="border-b border-[#F1F5F9] last:border-0">
                       <div
                         className={[
-                          "grid grid-cols-[200px_1fr] md:grid-cols-[240px_1fr] px-6 py-3 cursor-pointer hover:bg-gray-50/50 transition items-center",
-                          isExpanded ? "bg-gray-50/80" : "",
+                          "grid grid-cols-[220px_1fr] md:grid-cols-[260px_1fr] px-6 py-3.5 cursor-pointer transition items-center",
+                          isExpanded ? "bg-[#FAFBFC]" : "hover:bg-[#FAFBFC]",
                         ].join(" ")}
                         onClick={() =>
                           setExpandedStudent(isExpanded ? null : student.id)
                         }
                       >
-                        <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-emerald-200 to-emerald-400 flex items-center justify-center text-xs font-bold text-white">
-                            {student.display_name.charAt(0).toUpperCase()}
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className={`h-9 w-9 rounded-full bg-gradient-to-br ${tint} flex items-center justify-center text-sm font-black text-white shadow-sm ring-1 ring-black/5`}>
+                            {initial}
                           </div>
-                          <span className="text-sm font-semibold text-gray-800 truncate">
-                            {student.display_name}
-                          </span>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-bold text-[#0F172A] truncate">{student.display_name}</div>
+                            <div className="text-[10px] font-semibold text-[#94A3B8] uppercase tracking-wider">
+                              {prog ? `Week ${prog.week ?? 1}` : "Not started"}
+                            </div>
+                          </div>
                           <svg
-                            className={`h-4 w-4 text-gray-300 transition-transform ${isExpanded ? "rotate-180" : ""}`}
+                            className={`h-4 w-4 text-[#CBD5E1] transition-transform ${isExpanded ? "rotate-180" : ""}`}
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
-                            strokeWidth="2"
+                            strokeWidth="2.5"
                           >
                             <path d="M6 9l6 6 6-6" />
                           </svg>
@@ -699,51 +760,11 @@ export default function TeacherDashboardPage() {
               )}
             </div>
 
-            {/* Summary */}
-            <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-4">
-              <StatCard label="Students" value={classStudents.length} />
-              <StatCard
-                label="Active This Week"
-                value={
-                  progress.filter(
-                    (p) => p.year === activeYear && (p.week ?? 0) > 0
-                  ).length
-                }
-              />
-              <StatCard
-                label="Legends Unlocked"
-                value={
-                  progress.filter(
-                    (p) =>
-                      p.year === activeYear &&
-                      parseUnlockedLegends(p.unlocked_legends).length > 0
-                  ).length
-                }
-              />
-              <StatCard
-                label="Avg Week"
-                value={
-                  classStudents.length > 0
-                    ? (
-                        progress
-                          .filter((p) => p.year === activeYear)
-                          .reduce((sum, p) => sum + (p.week ?? 0), 0) /
-                        Math.max(
-                          1,
-                          progress.filter((p) => p.year === activeYear).length
-                        )
-                      ).toFixed(1)
-                    : "—"
-                }
-              />
-              <StatCard
-                label="Post-Tests"
-                value={
-                  progress.filter(
-                    (p) => p.year === activeYear && getLatestPosttestProfile(p.quiz_scores)
-                  ).length
-                }
-              />
+            {/* Legend */}
+            <div className="flex flex-wrap items-center gap-4 text-[11px] font-semibold text-[#64748B] px-1">
+              <span className="inline-flex items-center gap-1.5"><span className="h-2 w-4 rounded-full bg-teal-500" /> Complete</span>
+              <span className="inline-flex items-center gap-1.5"><span className="h-2 w-4 rounded-full bg-amber-400" /> In progress</span>
+              <span className="inline-flex items-center gap-1.5"><span className="h-2 w-4 rounded-full bg-slate-200" /> Locked</span>
             </div>
           </>
         )}
@@ -759,11 +780,25 @@ export default function TeacherDashboardPage() {
   );
 }
 
-function StatCard({ label, value }: { label: string; value: string | number }) {
+function KpiTile({
+  label, value, accent, icon,
+}: {
+  label: string; value: string | number; accent: string; icon: React.ReactNode;
+}) {
   return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-3">
-      <div className="text-xs font-bold text-gray-400 uppercase tracking-wider">{label}</div>
-      <div className="text-2xl font-black text-gray-900 mt-1">{value}</div>
+    <div className="bg-white rounded-xl border border-[#E6E8EC] px-4 py-3.5 hover:border-[#CBD5E1] transition">
+      <div className="flex items-start justify-between mb-2">
+        <div className="h-8 w-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center">
+          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke={accent} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            {icon}
+          </svg>
+        </div>
+      </div>
+      <div className="text-2xl font-black text-[#0F172A] leading-none tabular-nums">{value}</div>
+      <div className="flex items-center gap-2 mt-1.5">
+        <div className="h-0.5 w-4 rounded-full" style={{ backgroundColor: accent }} />
+        <div className="text-[10px] font-extrabold text-[#64748B] uppercase tracking-wider">{label}</div>
+      </div>
     </div>
   );
 }
