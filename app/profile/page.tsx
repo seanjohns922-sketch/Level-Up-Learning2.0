@@ -202,19 +202,19 @@ export default function ProfilePage() {
           <section>
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-base font-extrabold text-slate-900">Your Stats</h3>
-              <button className="text-xs font-bold text-teal-600 hover:text-teal-700">See all</button>
+              <button className="text-xs font-bold text-indigo-600 hover:text-indigo-700">See all</button>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {[
                 { icon: Flame, value: "0", label: "Day Streak", iconBg: "bg-rose-100", iconColor: "text-rose-500" },
-                { icon: Calendar, value: activeDays.size.toString(), label: "Days Active", iconBg: "bg-teal-100", iconColor: "text-teal-600" },
-                { icon: Clock, value: "--", label: "Time", iconBg: "bg-emerald-100", iconColor: "text-emerald-600" },
+                { icon: Calendar, value: activeDays.size.toString(), label: "Days Active", iconBg: "bg-indigo-100", iconColor: "text-indigo-600" },
+                { icon: Clock, value: "--", label: "Time", iconBg: "bg-sky-100", iconColor: "text-sky-600" },
                 { icon: Target, value: `${stats.accuracy}%`, label: "Accuracy", iconBg: "bg-amber-100", iconColor: "text-amber-600" },
               ].map((c) => (
                 <div
                   key={c.label}
-                  className="rounded-2xl bg-white border border-slate-200/70 p-4 hover:border-teal-300 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer shadow-sm"
+                  className="rounded-2xl bg-white border border-slate-200/70 p-4 hover:border-indigo-300 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer shadow-sm"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className={`h-10 w-10 rounded-xl ${c.iconBg} flex items-center justify-center`}>
