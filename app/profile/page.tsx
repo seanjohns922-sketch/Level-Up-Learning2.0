@@ -231,7 +231,7 @@ export default function ProfilePage() {
                 <button className="text-xs font-semibold text-[#64748B] hover:text-[#0F172A]">See all</button>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {REALMS.map((realm) => {
                   const isActive = realm.status === "active";
                   const isComingSoon = realm.status === "coming-soon";
@@ -239,51 +239,45 @@ export default function ProfilePage() {
                     <div
                       key={realm.name}
                       onClick={() => isActive && router.push("/realms")}
-                      className={`relative rounded-xl p-4 transition-all duration-200 border overflow-hidden
+                      className={`relative flex items-center gap-3 rounded-lg p-2.5 transition-all duration-200 border
                         ${isActive
-                          ? "bg-white border-[#E6E8EC] hover:border-[#0EA5A4] hover:-translate-y-0.5 cursor-pointer"
+                          ? "bg-white border-[#E6E8EC] hover:border-[#0EA5A4] cursor-pointer"
                           : "bg-[#F7F8FA] border-[#E6E8EC] opacity-70"
                         }`}
                     >
                       {isActive ? (
                         <div
-                          className="h-12 w-12 rounded-lg mb-3 bg-cover bg-center border border-[#E6E8EC]"
+                          className="h-9 w-9 rounded-md bg-cover bg-center border border-[#E6E8EC] flex-shrink-0"
                           style={{ backgroundImage: `url('/images/number-nexus-tile.jpg')` }}
                         />
                       ) : (
-                        <div className="h-12 w-12 rounded-lg mb-3 bg-[#F1F5F9] border border-[#E6E8EC] flex items-center justify-center">
-                          <realm.icon className="h-5 w-5 text-[#94A3B8]" />
+                        <div className="h-9 w-9 rounded-md bg-[#F1F5F9] border border-[#E6E8EC] flex items-center justify-center flex-shrink-0">
+                          <realm.icon className="h-4 w-4 text-[#94A3B8]" />
                         </div>
                       )}
-                      <div className={`text-sm font-bold ${isActive ? "text-[#0F172A]" : "text-[#94A3B8]"}`}>
-                        {realm.name}
-                      </div>
-                      {isActive ? (
-                        <>
-                          <div className="flex items-center gap-2 mt-2">
-                            <div className="flex-1 h-1.5 rounded-full bg-[#E5E7EB] overflow-hidden">
+                      <div className="flex-1 min-w-0">
+                        <div className={`text-xs font-bold truncate ${isActive ? "text-[#0F172A]" : "text-[#94A3B8]"}`}>
+                          {realm.name}
+                        </div>
+                        {isActive ? (
+                          <div className="flex items-center gap-1.5 mt-1">
+                            <div className="flex-1 h-1 rounded-full bg-[#E5E7EB] overflow-hidden">
                               <div
                                 className="h-full rounded-full bg-[#0EA5A4] transition-all duration-700"
                                 style={{ width: `${stats.realmProgress}%` }}
                               />
                             </div>
-                            <span className="text-[10px] font-extrabold text-[#0EA5A4]">{stats.realmProgress}%</span>
+                            <span className="text-[9px] font-extrabold text-[#0EA5A4]">{stats.realmProgress}%</span>
                           </div>
-                          <button
-                            onClick={(e) => { e.stopPropagation(); router.push("/home"); }}
-                            className="mt-3 inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-[#0F172A] text-white text-[11px] font-bold hover:bg-[#1E293B] transition-all active:scale-95"
-                          >
-                            View
-                          </button>
-                        </>
-                      ) : (
-                        <div className="mt-2 inline-flex items-center gap-1.5">
-                          {isComingSoon
-                            ? <span className="text-[9px] font-bold text-[#64748B] uppercase tracking-wider">Coming Soon</span>
-                            : <><Lock className="h-3 w-3 text-[#94A3B8]" /><span className="text-[9px] font-bold text-[#94A3B8] uppercase tracking-wider">Locked</span></>
-                          }
-                        </div>
-                      )}
+                        ) : (
+                          <div className="inline-flex items-center gap-1 mt-0.5">
+                            {isComingSoon
+                              ? <span className="text-[9px] font-bold text-[#64748B] uppercase tracking-wider">Coming Soon</span>
+                              : <><Lock className="h-2.5 w-2.5 text-[#94A3B8]" /><span className="text-[9px] font-bold text-[#94A3B8] uppercase tracking-wider">Locked</span></>
+                            }
+                          </div>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
