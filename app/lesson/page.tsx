@@ -92,21 +92,14 @@ function LessonPage() {
   }
 
   return (
-    <main
-      className="min-h-screen flex items-start justify-center px-4 py-6"
-      style={{
-        background:
-          "radial-gradient(ellipse at top, #052e2b 0%, #021716 45%, #010c0b 100%)",
-      }}
-    >
+    <main className="min-h-screen flex items-start justify-center px-4 py-6 bg-background">
       <div className="w-full max-w-6xl">
         <div className="mb-4">
           <button
             onClick={() =>
               router.push(`/program?year=${encodeURIComponent(year)}&week=${week}`)
             }
-            className="text-sm font-mono font-bold uppercase tracking-[0.18em] text-teal-300 hover:text-teal-200 transition-colors"
-            style={{ textShadow: "0 0 8px rgba(94,234,212,0.4)" }}
+            className="text-sm font-mono font-bold uppercase tracking-[0.18em] text-teal-700 hover:text-teal-600 transition-colors"
           >
             ← Back to Week {week}
           </button>
