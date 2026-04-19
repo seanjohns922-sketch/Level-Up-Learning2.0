@@ -33,15 +33,6 @@ function getMonthGrid() {
   return { offset, daysInMonth, today, monthName, year };
 }
 
-const NAV_ITEMS = [
-  { icon: Home, label: "Dashboard", route: "/profile", active: true },
-  { icon: Map, label: "Tower Map", route: "/tower-map" },
-  { icon: BookOpen, label: "Lessons", route: "/home" },
-  { icon: BarChart3, label: "Stats", route: "/realm-stats" },
-  { icon: Trophy, label: "Legends", route: "/legends" },
-  { icon: Star, label: "Realms", route: "/realms" },
-  { icon: Settings, label: "Settings", route: "/profile" },
-];
 
 export default function ProfilePage() {
   const router = useRouter();
