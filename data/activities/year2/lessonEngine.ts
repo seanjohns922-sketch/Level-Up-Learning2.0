@@ -816,58 +816,6 @@ function fractionOperationDecisionOptions(template: RelatedDenominatorTemplate) 
   return uniqueStringOptions(answer, candidates);
 }
 
-function relatedDenominatorEquivalentChoice(template: RelatedDenominatorTemplate): MultipleChoiceQuestion {
-  const result = relatedDenominatorResult(template);
-  const firstNeedsConversion = template.denominatorA !== result.denominator;
-  const originalNumerator = firstNeedsConversion ? template.numeratorA : template.numeratorB;
-  const originalDenominator = firstNeedsConversion ? template.denominatorA : template.denominatorB;
-  const convertedNumerator = firstNeedsConversion ? result.numeratorA : result.numeratorB;
-  const original = `${originalNumerator}/${originalDenominator}`;
-  const converted = `${convertedNumerator}/${result.denominator}`;
-  const setup = `${result.numeratorA}/${result.denominator} ${template.operation} ${result.numeratorB}/${result.denominator}`;
-  const wrongEquivalentOptions = uniqueStringOptions(converted, [
-    `${originalNumerator}/${result.denominator}`,
-    `${Math.min(result.denominator, convertedNumerator + 1)}/${result.denominator}`,
-    `${convertedNumerator}/${originalDenominator}`,
-    `${originalNumerator + convertedNumerator}/${result.denominator}`,
-  ]);
-  const wrongSetupOptions = uniqueStringOptions(setup, [
-    `${template.numeratorA}/${template.denominatorA} ${template.operation} ${template.numeratorB}/${template.denominatorB}`,
-    `${template.numeratorA}/${result.denominator} ${template.operation} ${template.numeratorB}/${result.denominator}`,
-    `${convertedNumerator}/${result.denominator} ${template.operation} ${convertedNumerator}/${result.denominator}`,
-    `${result.numeratorA}/${result.denominator + template.denominatorA} ${template.operation} ${result.numeratorB}/${result.denominator + template.denominatorB}`,
-  ]);
-  const style = randInt(0, 2);
-
-  if (style === 0) {
-    return {
-      kind: "multiple_choice",
-      prompt: `${original} = ?`,
-      options: wrongEquivalentOptions,
-      answer: converted,
-      helper: "Match the denominator.",
-    };
-  }
-
-  if (style === 1) {
-    return {
-      kind: "multiple_choice",
-      prompt: `What should ${original} become?`,
-      options: wrongEquivalentOptions,
-      answer: converted,
-      helper: "Make the pieces the same size.",
-    };
-  }
-
-  return {
-    kind: "multiple_choice",
-    prompt: `Which setup matches ${relatedDenominatorExpression(template)}?`,
-    options: wrongSetupOptions,
-    answer: setup,
-    helper: "Convert one fraction first.",
-  };
-}
-
 function year3FractionOrderSets() {
   return [
     ["1/5", "1/2", "4/5"],
@@ -5780,15 +5728,11 @@ function generateGenericQuestion(
 
   if (
     explicitMode === "related_denominator_visual" ||
-    explicitMode === "related_denominator_equivalent_choice" ||
+    explicitMode === "related_denominator_quick_apply" ||
     explicitMode === "related_denominator_build"
   ) {
     const templates = year5RelatedDenominatorTemplates();
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
-
-    if (explicitMode === "related_denominator_equivalent_choice") {
-      return relatedDenominatorEquivalentChoice(chosen);
-    }
 
     const result = relatedDenominatorResult(chosen);
     const answer = relatedDenominatorAnswer(chosen);
@@ -5805,9 +5749,19 @@ function generateGenericQuestion(
       };
     }
 
+    if (explicitMode === "related_denominator_quick_apply") {
+      return {
+        kind: "multiple_choice",
+        prompt: `${relatedDenominatorExpression(chosen)} = ?`,
+        options: relatedDenominatorOptions(chosen),
+        answer,
+        helper: "Convert one fraction, then solve.",
+      };
+    }
+
     return {
       kind: "typed_response",
-      prompt: "Fill in the missing numerator",
+      prompt: "Complete the working",
       answer,
       helper: "Match the denominators, then combine.",
       placeholder: "Type numerator",

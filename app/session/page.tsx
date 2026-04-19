@@ -291,7 +291,7 @@ function buildStructuredQuizSources(lesson: Lesson): LessonActivity[] {
     "equivalent_to_compare",
     "identify_fraction_point",
     "same_denominator_true_false",
-    "related_denominator_equivalent_choice",
+    "related_denominator_quick_apply",
     "real_world_fraction_decision",
   ]);
 

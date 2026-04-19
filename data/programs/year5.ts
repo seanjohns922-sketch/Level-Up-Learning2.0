@@ -337,10 +337,10 @@ const year5Rows: ProgramRow[] = [
         rotationRole: "fast_thinking",
       }),
       makeActivity("multiple_choice", 1, {
-        mode: "related_denominator_equivalent_choice",
+        mode: "related_denominator_quick_apply",
         rotationRole: "reasoning",
       }),
-      makeActivity("typed_response", 1, {
+      makeActivity("typed_response", 2, {
         mode: "related_denominator_build",
         rotationRole: "apply_create",
       }),
