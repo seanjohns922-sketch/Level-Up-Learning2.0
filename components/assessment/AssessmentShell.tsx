@@ -2,6 +2,7 @@
 
 import { ReactNode } from "react";
 import { ChevronLeft, Trophy, Zap } from "lucide-react";
+import { MathFormattedText } from "@/components/FractionText";
 
 interface AssessmentShellProps {
   /** "Pre-Test" or "Post-Test" */
@@ -119,7 +120,7 @@ export default function AssessmentShell({
           {/* Prompt zone */}
           <div className="mb-6">
             <h2 className="text-lg md:text-xl font-extrabold text-white leading-snug">
-              {questionPrompt}
+              <MathFormattedText text={questionPrompt} />
             </h2>
           </div>
 

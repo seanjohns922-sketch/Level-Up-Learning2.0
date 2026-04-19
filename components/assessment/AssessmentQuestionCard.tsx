@@ -1,12 +1,13 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import { FractionText, MathFormattedText } from "@/components/FractionText";
 
 type GenericQuestion = {
   type?: string;
   prompt: string;
-  options?: any[];
-  visual?: any;
+  options?: unknown[];
+  visual?: Record<string, unknown>;
 };
 
 function parseFraction(label: string) {
@@ -211,7 +212,9 @@ export default function AssessmentQuestionCard({
               disabled={order.includes(fraction)}
               className="rounded-2xl border border-slate-600 bg-slate-700/50 p-4 text-left shadow-sm transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <div className="text-lg font-black text-white">{fraction}</div>
+              <div className="text-lg font-black text-white">
+                <FractionText value={fraction} />
+              </div>
               <div className="mt-3">
                 <FractionBar fraction={fraction} large />
               </div>
@@ -231,7 +234,9 @@ export default function AssessmentQuestionCard({
                   onDrop={() => moveDragged(index)}
                   className="cursor-move rounded-2xl border border-slate-600 bg-slate-700/50 p-3 shadow-sm"
                 >
-                  <div className="text-sm font-black text-white">{fraction}</div>
+                  <div className="text-sm font-black text-white">
+                    <FractionText value={fraction} compact />
+                  </div>
                   <div className="mt-2">
                     <FractionBar fraction={fraction} />
                   </div>
@@ -299,7 +304,7 @@ export default function AssessmentQuestionCard({
 
   if (type === "build_whole") {
     const denominator = Number(question.visual?.denominator ?? 2);
-    const fractionLabel = question.visual?.fractionLabel ?? `1/${denominator}`;
+    const fractionLabel = String(question.visual?.fractionLabel ?? `1/${denominator}`);
     const options = (question.options as Array<{ id: string; parts: number }> | undefined) ?? [];
 
     return (
@@ -311,7 +316,9 @@ export default function AssessmentQuestionCard({
               <div className="h-14 w-12 rounded-[6px] bg-teal-500" />
             </div>
           </div>
-          <div className="mt-3 text-lg font-black text-white">{fractionLabel}</div>
+          <div className="mt-3 text-lg font-black text-white">
+            <FractionText value={fractionLabel} />
+          </div>
         </div>
         <div className="grid gap-4 md:grid-cols-3">
           {options.map((option) => (
@@ -330,7 +337,7 @@ export default function AssessmentQuestionCard({
   }
 
   if (type === "fraction_number_line") {
-    const targetFraction = question.visual?.targetFraction ?? "1/2";
+    const targetFraction = String(question.visual?.targetFraction ?? "1/2");
     const denominator = parseFraction(targetFraction).denominator;
     const lineStops = Array.from({ length: denominator + 1 }, (_, index) => ({
       x: index / denominator,
@@ -351,7 +358,9 @@ export default function AssessmentQuestionCard({
       <div className="mt-6 space-y-5">
         <div className="rounded-2xl border border-slate-600 bg-slate-700/50 p-5">
           <div className="text-xs font-bold uppercase tracking-wide text-teal-400">Model</div>
-          <div className="mt-2 text-lg font-black text-white">{targetFraction}</div>
+          <div className="mt-2 text-lg font-black text-white">
+            <FractionText value={targetFraction} />
+          </div>
           <div className="mt-3 max-w-md">
             <FractionBar fraction={targetFraction} large />
           </div>
@@ -405,17 +414,18 @@ export default function AssessmentQuestionCard({
     );
   }
 
-  const options = (question.options ?? []) as any[];
+  const options = (question.options ?? []) as Array<string | { id?: string; label?: string }>;
   return (
     <div className="mt-6 grid gap-3">
       {options.map((option) => {
         const label = typeof option === "string" ? option : option.label ?? option.id;
-        const isSelected = value === label || value === option.id;
+        const optionId = typeof option === "string" ? undefined : option.id;
+        const isSelected = value === label || value === optionId;
         return (
           <button
             key={label}
             type="button"
-            onClick={() => onChange(String(option.id ?? label))}
+            onClick={() => onChange(String(optionId ?? label))}
             className={[
               "text-left rounded-2xl border p-5 transition font-semibold text-white",
               isSelected
@@ -423,7 +433,7 @@ export default function AssessmentQuestionCard({
                 : "border-slate-600 bg-slate-700/50 hover:bg-slate-700 hover:border-slate-500",
             ].join(" ")}
           >
-            {label}
+            <MathFormattedText text={String(label)} compactFractions />
           </button>
         );
       })}

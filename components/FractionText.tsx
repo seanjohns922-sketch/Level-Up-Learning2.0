@@ -3,9 +3,10 @@
 import { Fragment } from "react";
 
 const FRACTION_TOKEN_PATTERN = /(\d+\s+\d+\/\d+|\d+\/\d+)/g;
+const FRACTION_TOKEN_EXACT_PATTERN = /^(\d+\s+\d+\/\d+|\d+\/\d+)$/;
 
 function isFractionToken(value: string) {
-  return FRACTION_TOKEN_PATTERN.test(value);
+  return FRACTION_TOKEN_EXACT_PATTERN.test(value);
 }
 
 function FractionToken({

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FractionText } from "@/components/FractionText";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type {
   EquivalentFractionBuildQuestion,
@@ -31,7 +32,7 @@ function BarModel({ numerator, denominator }: { numerator: number; denominator: 
         ))}
       </div>
       <div className="mt-3 text-center text-xl font-black text-slate-900">
-        {numerator}/{denominator}
+        <FractionText value={`${numerator}/${denominator}`} />
       </div>
     </div>
   );
