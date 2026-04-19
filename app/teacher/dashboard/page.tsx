@@ -22,7 +22,17 @@ type ProgressRow = {
 
 type WeekResult = { week: number; score: number; passed: boolean };
 
-const YEAR_LEVELS = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"];
+const YEAR_LEVELS: { value: string; label: string }[] = [
+  { value: "Prep", label: "Prep (Ground Floor)" },
+  { value: "Year 1", label: "Level 1" },
+  { value: "Year 2", label: "Level 2" },
+  { value: "Year 3", label: "Level 3" },
+  { value: "Year 4", label: "Level 4" },
+  { value: "Year 5", label: "Level 5" },
+  { value: "Year 6", label: "Level 6" },
+];
+const yearLabel = (value: string) =>
+  YEAR_LEVELS.find((y) => y.value === value)?.label ?? value;
 const WEEKS = Array.from({ length: 12 }, (_, i) => i + 1);
 
 /* ── helpers ───────────────────────────────────────── */
@@ -372,7 +382,7 @@ export default function TeacherDashboardPage() {
           <div className="grid gap-2 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-500">Level</span>
-              <span className="font-bold text-gray-900">{activeYear}</span>
+              <span className="font-bold text-gray-900">{yearLabel(activeYear)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-500">Week</span>
@@ -661,16 +671,16 @@ export default function TeacherDashboardPage() {
             <div className="flex items-center gap-1 p-1 bg-white rounded-xl border border-[#E6E8EC] w-fit overflow-x-auto">
               {YEAR_LEVELS.map((yr) => (
                 <button
-                  key={yr}
-                  onClick={() => setActiveYear(yr)}
+                  key={yr.value}
+                  onClick={() => setActiveYear(yr.value)}
                   className={[
                     "px-3.5 py-1.5 rounded-lg font-bold text-sm whitespace-nowrap transition",
-                    activeYear === yr
+                    activeYear === yr.value
                       ? "bg-[#0F172A] text-white shadow-sm"
                       : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9]",
                   ].join(" ")}
                 >
-                  {yr}
+                  {yr.label}
                 </button>
               ))}
             </div>
