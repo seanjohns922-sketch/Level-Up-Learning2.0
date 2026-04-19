@@ -221,9 +221,249 @@ export default function ProfilePage() {
           {/* ─── STATS SECTION ─── */}
           <section>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-base font-extrabold text-slate-900">Your Stats</h3>
-              <button className="text-xs font-bold text-indigo-600 hover:text-indigo-700">See all</button>
+              <h3 className="text-base font-extrabold text-[#1C2541]">Your Stats</h3>
+              <button className="text-xs font-bold text-[#8A6D2A] hover:text-[#1C2541]">See all</button>
             </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {[
+                { icon: Flame, value: "0", label: "Day Streak", iconBg: "bg-[#8B2E2E]/10", iconColor: "text-[#8B2E2E]" },
+                { icon: Calendar, value: activeDays.size.toString(), label: "Days Active", iconBg: "bg-[#1C2541]/10", iconColor: "text-[#1C2541]" },
+                { icon: Clock, value: "--", label: "Time", iconBg: "bg-[#C9A24B]/15", iconColor: "text-[#8A6D2A]" },
+                { icon: Target, value: `${stats.accuracy}%`, label: "Accuracy", iconBg: "bg-[#2A5A3E]/10", iconColor: "text-[#2A5A3E]" },
+              ].map((c) => (
+                <div
+                  key={c.label}
+                  className="rounded-2xl bg-[#FBF7EC] border border-[#E8DEC4] p-4 hover:border-[#C9A24B] hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer shadow-sm"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className={`h-10 w-10 rounded-xl ${c.iconBg} flex items-center justify-center`}>
+                      <c.icon className={`h-5 w-5 ${c.iconColor}`} />
+                    </div>
+                  </div>
+                  <div className="text-2xl font-black text-[#1C2541] leading-none">{c.value}</div>
+                  <div className="text-[11px] font-bold text-[#1C2541]/55 uppercase tracking-wider mt-1.5">{c.label}</div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* ─── BOTTOM ROW: REALMS + WINS (left) + RIGHT RAIL ─── */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+            <div className="lg:col-span-2 space-y-5">
+              {/* Enrolled Realms */}
+              <div className="rounded-2xl bg-[#FBF7EC] border border-[#E8DEC4] p-5 shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-base font-extrabold text-[#1C2541] flex items-center gap-2">
+                    <BookOpen className="h-4 w-4 text-[#8A6D2A]" />
+                    Enrolled Realms
+                  </h3>
+                  <button className="text-xs font-bold text-[#8A6D2A] hover:text-[#1C2541]">See all</button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {REALMS.slice(0, 4).map((realm) => {
+                    const isActive = realm.status === "active";
+                    const isComingSoon = realm.status === "coming-soon";
+                    return (
+                      <div
+                        key={realm.name}
+                        onClick={() => isActive && router.push("/realms")}
+                        className={`relative rounded-2xl p-4 transition-all duration-200 border overflow-hidden
+                          ${isActive
+                            ? "bg-gradient-to-br from-[#F5EFE0] to-[#FBF7EC] border-[#C9A24B]/40 hover:border-[#C9A24B] hover:shadow-md hover:-translate-y-0.5 cursor-pointer"
+                            : "bg-[#F5EFE0]/50 border-[#E8DEC4] opacity-60"
+                          }`}
+                      >
+                        {isActive ? (
+                          <div
+                            className="h-12 w-12 rounded-xl mb-3 bg-cover bg-center shadow-sm ring-1 ring-[#1C2541]/10"
+                            style={{ backgroundImage: `url('/images/number-nexus-tile.jpg')` }}
+                          />
+                        ) : (
+                          <div className="h-12 w-12 rounded-xl mb-3 bg-[#E8DEC4] flex items-center justify-center">
+                            <realm.icon className="h-5 w-5 text-[#1C2541]/40" />
+                          </div>
+                        )}
+                        <div className={`text-sm font-extrabold ${isActive ? "text-[#1C2541]" : "text-[#1C2541]/40"}`}>
+                          {realm.name}
+                        </div>
+                        {isActive ? (
+                          <>
+                            <div className="flex items-center gap-2 mt-2">
+                              <div className="flex-1 h-1.5 rounded-full bg-[#E8DEC4] overflow-hidden">
+                                <div
+                                  className="h-full rounded-full bg-gradient-to-r from-[#C9A24B] to-[#8A6D2A] transition-all duration-700"
+                                  style={{ width: `${stats.realmProgress}%` }}
+                                />
+                              </div>
+                              <span className="text-[10px] font-extrabold text-[#8A6D2A]">{stats.realmProgress}%</span>
+                            </div>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); router.push("/home"); }}
+                              className="mt-3 inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#1C2541] text-[#F5EFE0] text-[11px] font-extrabold hover:bg-[#2A3A6B] transition-all active:scale-95"
+                            >
+                              View
+                            </button>
+                          </>
+                        ) : (
+                          <div className="mt-2 inline-flex items-center gap-1.5">
+                            {isComingSoon
+                              ? <span className="text-[9px] font-bold text-[#8A6D2A] uppercase tracking-wider">Coming Soon</span>
+                              : <><Lock className="h-3 w-3 text-[#1C2541]/40" /><span className="text-[9px] font-bold text-[#1C2541]/40 uppercase tracking-wider">Locked</span></>
+                            }
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Your Wins */}
+              <div className="rounded-2xl bg-[#FBF7EC] border border-[#E8DEC4] p-5 shadow-sm">
+                <h3 className="text-base font-extrabold text-[#1C2541] mb-3 flex items-center gap-2">
+                  <Star className="h-4 w-4 text-[#C9A24B]" />
+                  Your Wins
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {recentActivity.map((item, i) => (
+                    <div key={i} className="flex items-center gap-2 bg-[#F5EFE0] rounded-xl px-3 py-2 border border-[#E8DEC4]">
+                      <item.icon className={`h-4 w-4 ${item.color}`} />
+                      <span className="text-xs font-semibold text-[#1C2541]/80">{item.text}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT RAIL */}
+            <div className="space-y-5">
+              {/* Calendar */}
+              <div className="rounded-2xl bg-[#FBF7EC] border border-[#E8DEC4] p-4 shadow-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-extrabold text-[#1C2541] flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-[#8A6D2A]" />
+                    Activity
+                  </h3>
+                  <span className="text-[10px] font-bold text-[#1C2541]/55 uppercase tracking-wider">{monthName}</span>
+                </div>
+
+                <div className="grid grid-cols-7 gap-1 mb-1">
+                  {DAYS.map((d, i) => (
+                    <div key={i} className="text-center text-[9px] font-bold text-[#1C2541]/40">{d}</div>
+                  ))}
+                </div>
+
+                <div className="grid grid-cols-7 gap-1">
+                  {Array.from({ length: offset }).map((_, i) => <div key={`e-${i}`} className="aspect-square" />)}
+                  {Array.from({ length: daysInMonth }).map((_, i) => {
+                    const day = i + 1;
+                    const isToday = day === today;
+                    const isActive = activeDays.has(day);
+                    const isPast = day < today;
+                    return (
+                      <div
+                        key={day}
+                        className={`flex items-center justify-center rounded-md aspect-square text-[10px] font-bold transition-all
+                          ${isToday
+                            ? "bg-[#1C2541] text-[#C9A24B] shadow-sm ring-1 ring-[#C9A24B]/40"
+                            : isActive
+                              ? "bg-[#C9A24B]/25 text-[#8A6D2A] font-extrabold"
+                              : isPast
+                                ? "text-[#1C2541]/25"
+                                : "text-[#1C2541]/15"
+                          }
+                        `}
+                      >
+                        {day}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Daily Challenge */}
+              <div className="rounded-2xl bg-gradient-to-br from-[#0F1830] via-[#1C2541] to-[#2A3A6B] p-5 text-[#F5EFE0] relative overflow-hidden shadow-md border border-[#C9A24B]/20">
+                <div className="absolute -top-6 -right-6 h-24 w-24 rounded-full bg-[#C9A24B]/20 blur-2xl" />
+                <div className="relative">
+                  <div className="h-10 w-10 rounded-xl bg-[#C9A24B]/15 backdrop-blur-sm flex items-center justify-center mb-3 ring-1 ring-[#C9A24B]/30">
+                    <Zap className="h-5 w-5 text-[#C9A24B]" />
+                  </div>
+                  <h4 className="text-base font-extrabold mb-1">Daily Challenge</h4>
+                  <p className="text-xs text-[#F5EFE0]/70 mb-4 leading-snug">A quick sprint for bonus XP</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-base font-extrabold text-[#C9A24B]">+50 XP</span>
+                    <span className="text-[9px] font-bold text-[#F5EFE0]/60 uppercase tracking-wider px-2 py-1 rounded-full bg-[#F5EFE0]/10">Soon</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Level Progress mini */}
+              <div className="rounded-2xl bg-[#FBF7EC] border border-[#E8DEC4] p-4 shadow-sm">
+                <h4 className="text-sm font-extrabold text-[#1C2541] mb-3 flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-[#8A6D2A]" />
+                  Level Progress
+                </h4>
+                <div className="flex items-center gap-3">
+                  <div className="relative h-[68px] w-[68px] flex-shrink-0">
+                    <svg viewBox="0 0 36 36" className="h-full w-full -rotate-90">
+                      <defs>
+                        <linearGradient id="ringGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor="#C9A24B" />
+                          <stop offset="100%" stopColor="#8A6D2A" />
+                        </linearGradient>
+                      </defs>
+                      <circle cx="18" cy="18" r="15.5" fill="none" stroke="#E8DEC4" strokeWidth="3" />
+                      <circle
+                        cx="18" cy="18" r="15.5" fill="none"
+                        stroke="url(#ringGrad2)" strokeWidth="3" strokeLinecap="round"
+                        strokeDasharray={`${stats.accuracy} ${100 - stats.accuracy}`}
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-sm font-black text-[#1C2541] leading-none">{stats.accuracy}%</span>
+                    </div>
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <div className="flex justify-between text-xs">
+                      <span className="font-semibold text-[#1C2541]/55">Lessons</span>
+                      <span className="font-extrabold text-[#1C2541]">{stats.completedLessons}</span>
+                    </div>
+                    <div className="flex justify-between text-xs">
+                      <span className="font-semibold text-[#1C2541]/55">Weeks</span>
+                      <span className="font-extrabold text-[#1C2541]">{stats.weeksCompleted}/12</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ─── BOTTOM SOCIAL TEASER ─── */}
+          <div className="rounded-2xl bg-[#FBF7EC] border border-[#E8DEC4] px-6 py-3 flex flex-wrap items-center justify-center gap-6 shadow-sm">
+            {[
+              { icon: Users, label: "Friends", color: "text-[#1C2541]" },
+              { icon: Swords, label: "Battles", color: "text-[#8B2E2E]" },
+              { icon: Medal, label: "Rankings", color: "text-[#C9A24B]" },
+            ].map((item) => (
+              <div key={item.label} className="flex items-center gap-1.5 opacity-50">
+                <item.icon className={`h-4 w-4 ${item.color}`} />
+                <span className="text-[10px] font-bold text-[#1C2541]/60 uppercase tracking-wider">{item.label}</span>
+              </div>
+            ))}
+            <div className="flex items-center gap-1.5 pl-3 border-l border-[#E8DEC4]">
+              <Lock className="h-3 w-3 text-[#1C2541]/30" />
+              <span className="text-[9px] font-bold text-[#1C2541]/45 uppercase tracking-[0.15em]">Coming Soon</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </main>
+  );
+}
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {[
