@@ -385,6 +385,8 @@ export function PracticeRunner({
         {!isBuiltinKind && (
           <TaskRenderer task={task} taskNonce={taskNonce} callbacks={callbacks} />
         )}
+          </div>
+        </div>
       </div>
     </div>
   );
