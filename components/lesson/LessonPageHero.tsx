@@ -1,6 +1,6 @@
 "use client";
 
-import heroNumberNexus from "@/src/assets/lesson-hero-number-nexus.jpg";
+const heroNumberNexus = { src: "/images/lesson-hero-number-nexus.jpg" };
 
 type LessonPageHeroProps = {
   levelNumber: number;
