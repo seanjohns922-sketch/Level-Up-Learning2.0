@@ -19,64 +19,106 @@ export function LessonCompleteCard({
   const xp = calcXP(correctAnswers);
 
   return (
-    <div className="rounded-2xl border border-[#E6E8EC] bg-white shadow-sm overflow-hidden">
-      {/* Hero — deep slate to match dashboard */}
+    <div className="relative">
+      {/* Bezel — matches LessonHUDRail */}
       <div
-        className="relative px-6 py-8 text-center text-white"
-        style={{ background: "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)" }}
+        aria-hidden
+        className="absolute -inset-[2px] pointer-events-none"
+        style={{
+          clipPath:
+            "polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px)",
+          background:
+            "linear-gradient(135deg, rgba(94,234,212,0.4) 0%, rgba(15,118,110,0.2) 50%, rgba(94,234,212,0.3) 100%)",
+        }}
+      />
+      <div
+        className="relative overflow-hidden"
+        style={{
+          clipPath:
+            "polygon(13px 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%, 0 13px)",
+          background:
+            "linear-gradient(135deg, #021716 0%, #042925 50%, #053b35 100%)",
+          boxShadow:
+            "inset 0 1px 0 rgba(94,234,212,0.18), inset 0 -10px 20px rgba(0,0,0,0.45)",
+        }}
       >
-        <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#0EA5A4]/15 border border-[#0EA5A4]/30">
-          <Trophy className="h-7 w-7 text-[#F59E0B]" />
-        </div>
-        <h2 className="text-2xl font-bold tracking-[-0.01em]">Lesson Complete</h2>
-        <p className="mt-1 text-sm font-medium text-white/70">{lessonTitle}</p>
-      </div>
-
-      <div className="px-6 py-6 space-y-5 bg-[#F7F8FA]">
-        {/* XP earned — gold reward accent */}
-        <div className="rounded-xl border border-[#E6E8EC] bg-white p-5 text-center">
-          <div className="flex items-center justify-center gap-2 mb-1">
-            <Star className="h-4 w-4 text-[#F59E0B]" />
-            <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#64748B]">
-              XP Earned
-            </span>
+        {/* Hero */}
+        <div className="px-6 py-7 text-center border-b border-teal-300/15">
+          <div
+            className="mx-auto mb-3 flex h-14 w-14 items-center justify-center"
+            style={{
+              clipPath:
+                "polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)",
+              background:
+                "radial-gradient(circle at 35% 30%, #5eead4 0%, #0f766e 65%, #042925 100%)",
+              boxShadow: "inset 0 0 8px rgba(204,251,241,0.5)",
+            }}
+          >
+            <Trophy className="h-6 w-6 text-teal-50" />
           </div>
-          <div className="text-4xl font-bold text-[#F59E0B]">{xp} XP</div>
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-teal-300/30 bg-teal-500/10 px-2.5 py-1 text-[9px] font-mono font-bold uppercase tracking-[0.2em] text-teal-200/90">
+            Lesson Complete
+          </div>
+          <h2 className="mt-2 text-2xl font-bold tracking-[-0.01em] text-white">
+            {lessonTitle}
+          </h2>
         </div>
 
-        <div className="rounded-xl border border-[#E6E8EC] bg-white px-4 py-3 text-center text-sm font-semibold text-[#0F172A]">
-          Nice work — your lesson progress has been updated.
-        </div>
-
-        {/* Stats grid */}
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { label: "Questions", value: questionsAnswered, icon: CheckCircle },
-            { label: "Correct", value: correctAnswers, icon: CheckCircle },
-            { label: "Accuracy", value: `${accuracy}%`, icon: Target },
-          ].map((s) => (
-            <div
-              key={s.label}
-              className="rounded-xl border border-[#E6E8EC] bg-white p-4 text-center"
-            >
-              <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-[#F1F5F9]">
-                <s.icon className="h-4 w-4 text-[#0EA5A4]" />
-              </div>
-              <div className="text-2xl font-bold text-[#0F172A]">{s.value}</div>
-              <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#64748B] mt-0.5">
-                {s.label}
-              </div>
+        <div className="p-4 space-y-3">
+          {/* XP earned */}
+          <div
+            className="rounded-lg border border-amber-400/30 bg-amber-500/10 px-4 py-4 text-center"
+            style={{ boxShadow: "inset 0 1px 0 rgba(251,191,36,0.18)" }}
+          >
+            <div className="flex items-center justify-center gap-1.5 mb-1">
+              <Star className="h-3.5 w-3.5 text-amber-200" />
+              <span className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-amber-200">
+                XP Earned
+              </span>
             </div>
-          ))}
-        </div>
+            <div className="text-3xl font-bold text-amber-100">{xp} XP</div>
+          </div>
 
-        <button
-          type="button"
-          onClick={onExit}
-          className="w-full rounded-xl bg-[#0EA5A4] px-6 py-3.5 text-base font-bold text-white hover:bg-[#0d9594] transition-all active:scale-[0.99] shadow-sm"
-        >
-          Return to Week →
-        </button>
+          {/* Stats — 3 col, matches HUD aesthetic */}
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { label: "Questions", value: questionsAnswered, icon: CheckCircle },
+              { label: "Correct", value: correctAnswers, icon: CheckCircle },
+              { label: "Accuracy", value: `${accuracy}%`, icon: Target },
+            ].map((s) => (
+              <div
+                key={s.label}
+                className="rounded-lg border border-teal-300/20 bg-teal-500/5 px-2 py-3 text-center"
+                style={{ boxShadow: "inset 0 1px 0 rgba(94,234,212,0.12)" }}
+              >
+                <s.icon className="h-3.5 w-3.5 mx-auto mb-1 text-teal-300" />
+                <div className="text-xl font-bold text-white">{s.value}</div>
+                <div className="text-[9px] font-mono font-bold uppercase tracking-[0.18em] text-teal-200/70 mt-0.5">
+                  {s.label}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Status note */}
+          <div className="rounded-lg border border-teal-300/20 bg-teal-500/5 px-3 py-2 text-center text-[12px] font-semibold text-teal-100">
+            Nice work — your progress has been updated.
+          </div>
+
+          <button
+            type="button"
+            onClick={onExit}
+            className="w-full rounded-lg px-6 py-3 text-sm font-bold text-white transition active:scale-[0.99]"
+            style={{
+              background:
+                "linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #2dd4bf 100%)",
+              boxShadow:
+                "inset 0 1px 0 rgba(204,251,241,0.3), 0 0 18px rgba(45,212,191,0.25)",
+            }}
+          >
+            Return to Week →
+          </button>
+        </div>
       </div>
     </div>
   );
