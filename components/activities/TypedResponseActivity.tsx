@@ -114,6 +114,179 @@ function SameDenominatorEquationInput({
   );
 }
 
+type RelatedDenominatorStep = "multiplier" | "numerator" | "solve" | "done";
+
+function getRelatedDenominatorWorking(
+  visual: Extract<NonNullable<TypedResponseQuestion["visual"]>, { type: "same_denominator_operation" }>
+) {
+  if (
+    typeof visual.originalNumeratorA !== "number" ||
+    typeof visual.originalDenominatorA !== "number" ||
+    typeof visual.originalNumeratorB !== "number" ||
+    typeof visual.originalDenominatorB !== "number"
+  ) {
+    return null;
+  }
+
+  const convertsLeft = visual.originalDenominatorA !== visual.denominator;
+  const denominatorToChange = convertsLeft ? visual.originalDenominatorA : visual.originalDenominatorB;
+  const numeratorToChange = convertsLeft ? visual.originalNumeratorA : visual.originalNumeratorB;
+  const convertedNumerator = convertsLeft ? visual.numeratorA : visual.numeratorB;
+  const multiplier = visual.denominator / denominatorToChange;
+
+  if (!Number.isInteger(multiplier) || multiplier <= 1) {
+    return null;
+  }
+
+  return {
+    convertsLeft,
+    denominatorToChange,
+    numeratorToChange,
+    convertedNumerator,
+    multiplier,
+  };
+}
+
+function RelatedDenominatorWorkingInput({
+  visual,
+  working,
+  step,
+  inputs,
+  feedback,
+  onInputChange,
+  inputRef,
+}: {
+  visual: Extract<NonNullable<TypedResponseQuestion["visual"]>, { type: "same_denominator_operation" }>;
+  working: NonNullable<ReturnType<typeof getRelatedDenominatorWorking>>;
+  step: RelatedDenominatorStep;
+  inputs: {
+    multiplier: string;
+    scaledNumerator: string;
+    resultNumerator: string;
+  };
+  feedback: string;
+  onInputChange: (field: "multiplier" | "scaledNumerator" | "resultNumerator", value: string) => void;
+  inputRef: RefObject<HTMLInputElement | null>;
+}) {
+  const originalLeftNumerator = visual.originalNumeratorA ?? visual.numeratorA;
+  const originalLeftDenominator = visual.originalDenominatorA ?? visual.denominator;
+  const originalRightNumerator = visual.originalNumeratorB ?? visual.numeratorB;
+  const originalRightDenominator = visual.originalDenominatorB ?? visual.denominator;
+  const conversionLeft = working.convertsLeft ? visual.numeratorA : originalLeftNumerator;
+  const conversionRight = working.convertsLeft ? originalRightNumerator : visual.numeratorB;
+  const showNumeratorStep = step === "numerator" || step === "solve" || step === "done";
+  const showSolveStep = step === "solve" || step === "done";
+
+  return (
+    <div className="w-full rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">
+        Match, Rewrite, Solve
+      </div>
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <StackedFraction numerator={originalLeftNumerator} denominator={originalLeftDenominator} />
+        <span className="text-3xl font-black text-emerald-700">{visual.operation}</span>
+        <StackedFraction numerator={originalRightNumerator} denominator={originalRightDenominator} />
+      </div>
+
+      <div className="mt-5 grid gap-3">
+        <div className="rounded-2xl bg-white p-4 shadow-sm">
+          <div className="text-xs font-black uppercase tracking-[0.16em] text-emerald-700">
+            Step 1: Find the multiplier
+          </div>
+          <div className="mt-3 flex flex-wrap items-center gap-3 text-2xl font-black text-slate-900">
+            <span>{working.denominatorToChange}</span>
+            <span className="text-emerald-700">×</span>
+            <input
+              type="text"
+              autoComplete="off"
+              spellCheck={false}
+              value={inputs.multiplier}
+              onChange={(event) => onInputChange("multiplier", event.target.value.replace(/\D/g, ""))}
+              disabled={step !== "multiplier"}
+              inputMode="numeric"
+              aria-label="Denominator multiplier"
+              className="h-14 w-20 rounded-xl border border-emerald-300 bg-white px-3 text-center text-2xl font-black text-slate-900 outline-none focus:border-teal-500 disabled:bg-emerald-50"
+              style={{ WebkitTextFillColor: "#0f172a" }}
+            />
+            <span>=</span>
+            <span>{visual.denominator}</span>
+          </div>
+        </div>
+
+        {showNumeratorStep ? (
+          <div className="rounded-2xl bg-white p-4 shadow-sm">
+            <div className="text-xs font-black uppercase tracking-[0.16em] text-emerald-700">
+              Step 2: Apply it to the numerator
+            </div>
+            <div className="mt-3 flex flex-wrap items-center gap-3 text-2xl font-black text-slate-900">
+              <span>{working.numeratorToChange}</span>
+              <span className="text-emerald-700">×</span>
+              <span>{working.multiplier}</span>
+              <span>=</span>
+              <input
+                type="text"
+                autoComplete="off"
+                spellCheck={false}
+                value={inputs.scaledNumerator}
+                onChange={(event) => onInputChange("scaledNumerator", event.target.value.replace(/\D/g, ""))}
+                disabled={step !== "numerator"}
+                inputMode="numeric"
+                aria-label="Converted numerator"
+                className="h-14 w-20 rounded-xl border border-emerald-300 bg-white px-3 text-center text-2xl font-black text-slate-900 outline-none focus:border-teal-500 disabled:bg-emerald-50"
+                style={{ WebkitTextFillColor: "#0f172a" }}
+              />
+            </div>
+          </div>
+        ) : null}
+
+        {showSolveStep ? (
+          <div className="rounded-2xl bg-white p-4 shadow-sm">
+            <div className="text-xs font-black uppercase tracking-[0.16em] text-emerald-700">
+              Step 3: Rewrite and solve
+            </div>
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <StackedFraction numerator={working.numeratorToChange} denominator={working.denominatorToChange} />
+              <span className="text-3xl font-black text-slate-400">=</span>
+              <StackedFraction numerator={working.convertedNumerator} denominator={visual.denominator} />
+            </div>
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <StackedFraction numerator={conversionLeft} denominator={visual.denominator} />
+              <span className="text-3xl font-black text-emerald-700">{visual.operation}</span>
+              <StackedFraction numerator={conversionRight} denominator={visual.denominator} />
+              <span className="text-3xl font-black text-emerald-700">=</span>
+              <div className="inline-flex flex-col items-center rounded-xl bg-white px-4 py-3 shadow-sm">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  autoComplete="off"
+                  spellCheck={false}
+                  value={inputs.resultNumerator}
+                  onChange={(event) => onInputChange("resultNumerator", event.target.value.replace(/\D/g, ""))}
+                  disabled={step !== "solve"}
+                  inputMode="numeric"
+                  aria-label="Final numerator"
+                  className="block h-12 w-20 appearance-none rounded-t-xl border border-b-0 border-emerald-300 bg-white px-3 text-center text-2xl font-black leading-none text-slate-900 caret-teal-600 outline-none focus:border-teal-500 disabled:bg-emerald-50"
+                  style={{ WebkitTextFillColor: "#0f172a" }}
+                />
+                <span className="h-1 w-20 rounded-full bg-slate-500" />
+                <span className="flex h-12 w-20 items-center justify-center rounded-b-xl border border-t-0 border-emerald-300 bg-emerald-50 text-center text-2xl font-black leading-none text-slate-800">
+                  {visual.denominator}
+                </span>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </div>
+
+      {feedback ? (
+        <div className="mt-3 rounded-xl bg-amber-50 px-4 py-3 text-sm font-bold text-amber-900">
+          {feedback}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function columnLabel(label: string) {
   if (label === "O") return "ones";
   if (label === "T") return "tens";
@@ -185,6 +358,18 @@ function structuredFractionKey(questionData: TypedResponseQuestion) {
     questionData.placeholder ?? "",
     questionData.fixedDenominator ?? "",
     questionData.visual?.type ?? "",
+    questionData.visual?.type === "same_denominator_operation"
+      ? [
+          questionData.visual.numeratorA,
+          questionData.visual.numeratorB,
+          questionData.visual.denominator,
+          questionData.visual.operation,
+          questionData.visual.originalNumeratorA ?? "",
+          questionData.visual.originalDenominatorA ?? "",
+          questionData.visual.originalNumeratorB ?? "",
+          questionData.visual.originalDenominatorB ?? "",
+        ].join(",")
+      : "",
   ].join("|");
 }
 
@@ -914,6 +1099,10 @@ export default function TypedResponseActivity({
   const isEquivalentFractionInput = equivalentFractionInputVisual !== null;
   const sameDenominatorOperationVisual =
     questionData.visual?.type === "same_denominator_operation" ? questionData.visual : null;
+  const relatedDenominatorWorking = sameDenominatorOperationVisual
+    ? getRelatedDenominatorWorking(sameDenominatorOperationVisual)
+    : null;
+  const isRelatedDenominatorWorking = relatedDenominatorWorking !== null;
   const buildGroupsVisual =
     questionData.visual?.type === "division_build_groups" ? questionData.visual : null;
   const strategyVisual =
@@ -939,6 +1128,14 @@ export default function TypedResponseActivity({
   const [fractionWholeInput, setFractionWholeInput] = useState("");
   const [fractionNumeratorInput, setFractionNumeratorInput] = useState("");
   const [fractionDenominatorInput, setFractionDenominatorInput] = useState("");
+  const [relatedDenominatorStep, setRelatedDenominatorStep] =
+    useState<RelatedDenominatorStep>("multiplier");
+  const [relatedDenominatorInputs, setRelatedDenominatorInputs] = useState({
+    multiplier: "",
+    scaledNumerator: "",
+    resultNumerator: "",
+  });
+  const [relatedDenominatorFeedback, setRelatedDenominatorFeedback] = useState("");
   const [columnChartInputs, setColumnChartInputs] = useState<{
     carry: string;
     onesDigit: string;
@@ -1044,6 +1241,13 @@ export default function TypedResponseActivity({
       setFractionWholeInput("");
       setFractionNumeratorInput("");
       setFractionDenominatorInput(questionData.fixedDenominator ? String(questionData.fixedDenominator) : "");
+      setRelatedDenominatorStep("multiplier");
+      setRelatedDenominatorInputs({
+        multiplier: "",
+        scaledNumerator: "",
+        resultNumerator: "",
+      });
+      setRelatedDenominatorFeedback("");
       setColumnChartInputs({
         carry: "",
         onesDigit: "",
@@ -1140,6 +1344,17 @@ export default function TypedResponseActivity({
   function normalizedDigitAnswer() {
     const joined = digitInputs.join("").replace(/\s+/g, "");
     return joined.replace(/^0+(?=\d)/, "");
+  }
+
+  function updateRelatedDenominatorInput(
+    field: "multiplier" | "scaledNumerator" | "resultNumerator",
+    value: string
+  ) {
+    setRelatedDenominatorInputs((current) => ({
+      ...current,
+      [field]: value,
+    }));
+    setRelatedDenominatorFeedback("");
   }
 
   function displayTopDigit(index: number) {
@@ -1591,6 +1806,56 @@ export default function TypedResponseActivity({
       return;
     }
 
+    if (isRelatedDenominatorWorking && relatedDenominatorWorking && sameDenominatorOperationVisual) {
+      if (relatedDenominatorStep === "multiplier") {
+        if (normalizeNumberInput(relatedDenominatorInputs.multiplier) === String(relatedDenominatorWorking.multiplier)) {
+          setRelatedDenominatorFeedback("");
+          setRelatedDenominatorStep("numerator");
+        } else {
+          setRelatedDenominatorFeedback(
+            `Check what multiplies ${relatedDenominatorWorking.denominatorToChange} to make ${sameDenominatorOperationVisual.denominator}.`
+          );
+          onWrong?.();
+        }
+        return;
+      }
+
+      if (relatedDenominatorStep === "numerator") {
+        if (
+          normalizeNumberInput(relatedDenominatorInputs.scaledNumerator) ===
+          String(relatedDenominatorWorking.convertedNumerator)
+        ) {
+          setRelatedDenominatorFeedback("");
+          setRelatedDenominatorStep("solve");
+        } else {
+          setRelatedDenominatorFeedback("Use the same multiplier on the numerator.");
+          onWrong?.();
+        }
+        return;
+      }
+
+      if (relatedDenominatorStep === "solve") {
+        if (
+          normalizeNumberInput(relatedDenominatorInputs.resultNumerator) ===
+          String(sameDenominatorOperationVisual.resultNumerator)
+        ) {
+          setRelatedDenominatorFeedback("");
+          setRelatedDenominatorStep("done");
+          onCorrect?.();
+        } else {
+          setRelatedDenominatorFeedback(
+            sameDenominatorOperationVisual.operation === "+"
+              ? "Now add the numerators."
+              : "Now subtract the numerators."
+          );
+          onWrong?.();
+        }
+        return;
+      }
+
+      return;
+    }
+
     if (isStructuredFractionResponse && expectedStructuredFraction) {
       const whole = normalizeNumberInput(fractionWholeInput);
       const numerator = normalizeNumberInput(fractionNumeratorInput);
@@ -1677,6 +1942,10 @@ export default function TypedResponseActivity({
       : questionData.visual?.type === "column_multiplication"
       ? "Column Multiplication"
       : "Typed Response"))));
+  const typedResponseButtonLabel =
+    isRelatedDenominatorWorking && relatedDenominatorStep !== "solve" && relatedDenominatorStep !== "done"
+      ? "Check step"
+      : "Check answer";
   const columnMultiplicationButtonLabel = getColumnMultiplicationButtonLabel(multiplicationStep);
 
   return (
@@ -2389,6 +2658,20 @@ export default function TypedResponseActivity({
                 ))}
               </div>
             </div>
+          ) : isStructuredFractionResponse &&
+            sameDenominatorOperationVisual &&
+            usesFixedDenominator &&
+            isRelatedDenominatorWorking &&
+            relatedDenominatorWorking ? (
+            <RelatedDenominatorWorkingInput
+              visual={sameDenominatorOperationVisual}
+              working={relatedDenominatorWorking}
+              step={relatedDenominatorStep}
+              inputs={relatedDenominatorInputs}
+              feedback={relatedDenominatorFeedback}
+              onInputChange={updateRelatedDenominatorInput}
+              inputRef={numeratorRef}
+            />
           ) : isStructuredFractionResponse && sameDenominatorOperationVisual && usesFixedDenominator ? (
             <SameDenominatorEquationInput
               visual={sameDenominatorOperationVisual}
@@ -2510,7 +2793,7 @@ export default function TypedResponseActivity({
               onClick={check}
               className="rounded-xl bg-teal-600 px-5 py-3 font-black text-white hover:bg-teal-700"
             >
-              Check answer
+              {typedResponseButtonLabel}
             </button>
           )}
         </div>
