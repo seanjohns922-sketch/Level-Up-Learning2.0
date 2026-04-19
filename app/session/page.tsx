@@ -292,6 +292,7 @@ function buildStructuredQuizSources(lesson: Lesson): LessonActivity[] {
     "identify_fraction_point",
     "same_denominator_true_false",
     "related_denominator_equivalent_choice",
+    "real_world_fraction_decision",
   ]);
 
   const filtered = activities.filter((activity) => {

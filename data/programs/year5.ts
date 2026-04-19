@@ -348,14 +348,24 @@ const year5Rows: ProgramRow[] = [
   },
   {
     week: 8,
-    focus: "Apply fraction operations in short word problems",
+    focus: "Solve real-world fraction problems by matching denominators first",
     lesson: 3,
-    topic: "Word Problems",
-    activity: "Solve and interpret short fraction word problems.",
+    topic: "Real-World Fractions",
+    activity: "Choose the operation, match denominators, and solve.",
     curriculum: ["AC9M5N05"],
     activities: [
-      makeActivity("multiple_choice", 2, { mode: "fraction_word_problems" }),
-      makeActivity("typed_response", 1, { mode: "fraction_word_problems" }),
+      makeActivity("multiple_choice", 1, {
+        mode: "real_world_fraction_context",
+        rotationRole: "fast_thinking",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "real_world_fraction_structured_apply",
+        rotationRole: "apply_create",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "real_world_fraction_decision",
+        rotationRole: "reasoning",
+      }),
     ],
   },
   {

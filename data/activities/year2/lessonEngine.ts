@@ -601,8 +601,38 @@ type RelatedDenominatorTemplate = {
   operation: "+" | "-";
 };
 
+type RealWorldFractionTemplate = RelatedDenominatorTemplate & {
+  context: string;
+};
+
+function greatestCommonFactor(left: number, right: number): number {
+  let a = Math.abs(left);
+  let b = Math.abs(right);
+  while (b !== 0) {
+    const next = a % b;
+    a = b;
+    b = next;
+  }
+  return a || 1;
+}
+
+function lowestCommonMultiple(left: number, right: number): number {
+  return Math.abs(left * right) / greatestCommonFactor(left, right);
+}
+
+function simplifyFractionString(numerator: number, denominator: number) {
+  const divisor = greatestCommonFactor(numerator, denominator);
+  return `${numerator / divisor}/${denominator / divisor}`;
+}
+
+function simplifyFractionCandidate(value: string) {
+  const [numerator, denominator] = value.split("/").map(Number);
+  if (!Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator === 0) return value;
+  return simplifyFractionString(numerator, denominator);
+}
+
 function commonRelatedDenominator(template: RelatedDenominatorTemplate) {
-  return Math.max(template.denominatorA, template.denominatorB);
+  return lowestCommonMultiple(template.denominatorA, template.denominatorB);
 }
 
 function scaleToDenominator(numerator: number, denominator: number, targetDenominator: number) {
@@ -649,6 +679,91 @@ function year5RelatedDenominatorTemplates(): RelatedDenominatorTemplate[] {
   ];
 }
 
+function year5RealWorldFractionTemplates(): RealWorldFractionTemplate[] {
+  return [
+    {
+      context: "The pool was 2/3 full. 1/6 drained away. How full is it now?",
+      numeratorA: 2,
+      denominatorA: 3,
+      numeratorB: 1,
+      denominatorB: 6,
+      operation: "-",
+    },
+    {
+      context: "Mia ate 3/5 of a chocolate bar. Sam ate another 1/10. How much was eaten altogether?",
+      numeratorA: 3,
+      denominatorA: 5,
+      numeratorB: 1,
+      denominatorB: 10,
+      operation: "+",
+    },
+    {
+      context: "A tank was 3/4 full. 1/8 leaked out. How full is it now?",
+      numeratorA: 3,
+      denominatorA: 4,
+      numeratorB: 1,
+      denominatorB: 8,
+      operation: "-",
+    },
+    {
+      context: "A ribbon was 3/4 m long. 1/3 m was cut off. How much is left?",
+      numeratorA: 3,
+      denominatorA: 4,
+      numeratorB: 1,
+      denominatorB: 3,
+      operation: "-",
+    },
+    {
+      context: "A jug had 2/5 L of juice. 1/2 L was added. How much juice is there now?",
+      numeratorA: 2,
+      denominatorA: 5,
+      numeratorB: 1,
+      denominatorB: 2,
+      operation: "+",
+    },
+    {
+      context: "Mia read 5/6 of a chapter. Noah read 1/4 of a chapter. How much more did Mia read?",
+      numeratorA: 5,
+      denominatorA: 6,
+      numeratorB: 1,
+      denominatorB: 4,
+      operation: "-",
+    },
+    {
+      context: "A recipe uses 1/2 cup of oats and 1/6 cup of seeds. How much is that altogether?",
+      numeratorA: 1,
+      denominatorA: 2,
+      numeratorB: 1,
+      denominatorB: 6,
+      operation: "+",
+    },
+    {
+      context: "A path is 7/8 km. 1/4 km has been painted. How much is not painted?",
+      numeratorA: 7,
+      denominatorA: 8,
+      numeratorB: 1,
+      denominatorB: 4,
+      operation: "-",
+    },
+    {
+      context: "A container is 2/3 full. Another 1/4 is added. How full is it now?",
+      numeratorA: 2,
+      denominatorA: 3,
+      numeratorB: 1,
+      denominatorB: 4,
+      operation: "+",
+    },
+    {
+      context: "A cake had 4/5 left. 3/10 was eaten. How much is left?",
+      numeratorA: 4,
+      denominatorA: 5,
+      numeratorB: 3,
+      denominatorB: 10,
+      operation: "-",
+    },
+  ];
+}
+
 function relatedDenominatorVisual(template: RelatedDenominatorTemplate): SameDenominatorOperationVisualData {
   const result = relatedDenominatorResult(template);
   const conversionLabel =
@@ -681,6 +796,24 @@ function relatedDenominatorOptions(template: RelatedDenominatorTemplate) {
   const tooLarge = `${Math.min(result.denominator, result.resultNumerator + 2)}/${result.denominator}`;
   const splitAgain = `${result.resultNumerator}/${result.denominator * 2}`;
   return shuffle(uniqueStringOptions(answer, [unchanged, wrongDenominator, offByOne, noConvertSecond, tooSmall, tooLarge, splitAgain]));
+}
+
+function fractionOperationDecisionOptions(template: RelatedDenominatorTemplate) {
+  const result = relatedDenominatorResult(template);
+  const answer = simplifyFractionString(result.resultNumerator, result.denominator);
+  const candidates = [
+    `${Math.max(0, template.operation === "+" ? template.numeratorA + template.numeratorB : template.numeratorA - template.numeratorB)}/${template.denominatorA + template.denominatorB}`,
+    `${Math.max(0, template.operation === "+" ? template.numeratorA + template.numeratorB : template.numeratorA - template.numeratorB)}/${Math.max(template.denominatorA, template.denominatorB)}`,
+    `${Math.max(0, result.resultNumerator - 1)}/${result.denominator}`,
+    template.operation === "+"
+      ? simplifyFractionString(Math.abs(result.numeratorA - result.numeratorB), result.denominator)
+      : simplifyFractionString(result.numeratorA + result.numeratorB, result.denominator),
+    `${Math.min(result.denominator, result.resultNumerator + 1)}/${result.denominator}`,
+    "1",
+    "1/2",
+  ].filter((candidate) => simplifyFractionCandidate(candidate) !== answer);
+
+  return uniqueStringOptions(answer, candidates);
 }
 
 function relatedDenominatorEquivalentChoice(template: RelatedDenominatorTemplate): MultipleChoiceQuestion {
@@ -9486,6 +9619,56 @@ function generateGenericQuestion(
           fixedDenominator: chosen.fixedDenominator,
           placeholder: "Type the fraction",
         };
+  }
+
+  if (
+    explicitMode === "real_world_fraction_context" ||
+    explicitMode === "real_world_fraction_structured_apply" ||
+    explicitMode === "real_world_fraction_decision"
+  ) {
+    const realWorldTemplates = year5RealWorldFractionTemplates();
+    const oneChangeTemplates = realWorldTemplates.filter((template) => {
+      const result = relatedDenominatorResult(template);
+      const changes =
+        (template.denominatorA === result.denominator ? 0 : 1) +
+        (template.denominatorB === result.denominator ? 0 : 1);
+      return changes === 1;
+    });
+    const templates =
+      explicitMode === "real_world_fraction_structured_apply" ? oneChangeTemplates : realWorldTemplates;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    const result = relatedDenominatorResult(chosen);
+    const simplifiedAnswer = simplifyFractionString(result.resultNumerator, result.denominator);
+
+    if (explicitMode === "real_world_fraction_context") {
+      return {
+        kind: "multiple_choice",
+        prompt: chosen.context,
+        options: fractionOperationDecisionOptions(chosen),
+        answer: simplifiedAnswer,
+        helper: "Choose the operation, match denominators, then solve.",
+      };
+    }
+
+    if (explicitMode === "real_world_fraction_decision") {
+      return {
+        kind: "multiple_choice",
+        prompt: `${relatedDenominatorExpression(chosen)} = ?`,
+        options: fractionOperationDecisionOptions(chosen),
+        answer: simplifiedAnswer,
+        helper: "Watch for denominator and numerator mistakes.",
+      };
+    }
+
+    return {
+      kind: "typed_response",
+      prompt: "Complete the working",
+      answer: relatedDenominatorAnswer(chosen),
+      helper: "Match the denominators, rewrite, then solve.",
+      placeholder: "Type numerator",
+      fixedDenominator: result.denominator,
+      visual: relatedDenominatorVisual(chosen),
+    };
   }
 
   if (explicitMode === "fraction_decimal_percent") {
