@@ -74,13 +74,13 @@ export default function RealmStatsPage() {
           </div>
         </div>
 
-        {/* 2×2 stat cards */}
+        {/* 2×2 stat cards — Number Nexus teal/emerald palette */}
         <div className="grid grid-cols-2 gap-3 mb-4">
           {[
-            { icon: Zap, label: "XP Earned", value: stats.xp.toLocaleString(), gradient: "from-amber-500/20 to-yellow-500/20", iconColor: "text-amber-400", borderColor: "border-amber-500/20", valueColor: "text-amber-300" },
-            { icon: Target, label: "Accuracy", value: `${stats.accuracy}%`, gradient: "from-emerald-500/20 to-teal-500/20", iconColor: "text-emerald-400", borderColor: "border-emerald-500/20", valueColor: "text-emerald-300" },
-            { icon: Flame, label: "Current Streak", value: "0d", gradient: "from-rose-500/20 to-pink-500/20", iconColor: "text-rose-400", borderColor: "border-rose-500/20", valueColor: "text-rose-300" },
-            { icon: Clock, label: "Time This Week", value: "—", gradient: "from-sky-500/20 to-blue-500/20", iconColor: "text-sky-400", borderColor: "border-sky-500/20", valueColor: "text-sky-300" },
+            { icon: Zap, label: "XP Earned", value: stats.xp.toLocaleString(), gradient: "from-emerald-500/15 to-teal-500/10", iconColor: "text-emerald-300", borderColor: "border-emerald-400/20", valueColor: "text-emerald-200" },
+            { icon: Target, label: "Accuracy", value: `${stats.accuracy}%`, gradient: "from-teal-500/15 to-cyan-500/10", iconColor: "text-teal-300", borderColor: "border-teal-400/20", valueColor: "text-teal-200" },
+            { icon: Flame, label: "Current Streak", value: "0d", gradient: "from-emerald-600/15 to-emerald-500/10", iconColor: "text-emerald-300", borderColor: "border-emerald-400/20", valueColor: "text-emerald-200" },
+            { icon: Clock, label: "Time This Week", value: "—", gradient: "from-cyan-500/15 to-teal-600/10", iconColor: "text-cyan-300", borderColor: "border-cyan-400/20", valueColor: "text-cyan-200" },
           ].map((card) => (
             <div
               key={card.label}
