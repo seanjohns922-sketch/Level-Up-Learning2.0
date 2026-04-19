@@ -593,6 +593,148 @@ function sameDenominatorOptions(template: SameDenominatorTemplate) {
   return shuffle(uniqueStringOptions(answer, [changedDenominator, firstNumerator, offByOne, wrongOperation]));
 }
 
+type RelatedDenominatorTemplate = {
+  numeratorA: number;
+  denominatorA: number;
+  numeratorB: number;
+  denominatorB: number;
+  operation: "+" | "-";
+};
+
+function commonRelatedDenominator(template: RelatedDenominatorTemplate) {
+  return Math.max(template.denominatorA, template.denominatorB);
+}
+
+function scaleToDenominator(numerator: number, denominator: number, targetDenominator: number) {
+  return numerator * (targetDenominator / denominator);
+}
+
+function relatedDenominatorResult(template: RelatedDenominatorTemplate) {
+  const denominator = commonRelatedDenominator(template);
+  const numeratorA = scaleToDenominator(template.numeratorA, template.denominatorA, denominator);
+  const numeratorB = scaleToDenominator(template.numeratorB, template.denominatorB, denominator);
+  return {
+    denominator,
+    numeratorA,
+    numeratorB,
+    resultNumerator: template.operation === "+" ? numeratorA + numeratorB : numeratorA - numeratorB,
+  };
+}
+
+function relatedDenominatorExpression(template: RelatedDenominatorTemplate) {
+  return `${template.numeratorA}/${template.denominatorA} ${template.operation} ${template.numeratorB}/${template.denominatorB}`;
+}
+
+function relatedDenominatorAnswer(template: RelatedDenominatorTemplate) {
+  const result = relatedDenominatorResult(template);
+  return `${result.resultNumerator}/${result.denominator}`;
+}
+
+function year5RelatedDenominatorTemplates(): RelatedDenominatorTemplate[] {
+  return [
+    { numeratorA: 1, denominatorA: 2, numeratorB: 1, denominatorB: 4, operation: "+" },
+    { numeratorA: 1, denominatorA: 3, numeratorB: 1, denominatorB: 6, operation: "+" },
+    { numeratorA: 1, denominatorA: 2, numeratorB: 1, denominatorB: 4, operation: "-" },
+    { numeratorA: 2, denominatorA: 3, numeratorB: 1, denominatorB: 6, operation: "+" },
+    { numeratorA: 3, denominatorA: 4, numeratorB: 1, denominatorB: 8, operation: "+" },
+    { numeratorA: 3, denominatorA: 4, numeratorB: 1, denominatorB: 8, operation: "-" },
+    { numeratorA: 5, denominatorA: 6, numeratorB: 1, denominatorB: 3, operation: "-" },
+    { numeratorA: 3, denominatorA: 5, numeratorB: 2, denominatorB: 10, operation: "+" },
+    { numeratorA: 7, denominatorA: 8, numeratorB: 1, denominatorB: 4, operation: "-" },
+    { numeratorA: 4, denominatorA: 6, numeratorB: 1, denominatorB: 3, operation: "+" },
+    { numeratorA: 5, denominatorA: 10, numeratorB: 1, denominatorB: 5, operation: "+" },
+    { numeratorA: 7, denominatorA: 10, numeratorB: 2, denominatorB: 5, operation: "-" },
+    { numeratorA: 5, denominatorA: 6, numeratorB: 1, denominatorB: 12, operation: "+" },
+    { numeratorA: 7, denominatorA: 12, numeratorB: 1, denominatorB: 6, operation: "-" },
+  ];
+}
+
+function relatedDenominatorVisual(template: RelatedDenominatorTemplate): SameDenominatorOperationVisualData {
+  const result = relatedDenominatorResult(template);
+  const conversionLabel =
+    template.denominatorA === result.denominator
+      ? `${template.numeratorB}/${template.denominatorB} = ${result.numeratorB}/${result.denominator}`
+      : `${template.numeratorA}/${template.denominatorA} = ${result.numeratorA}/${result.denominator}`;
+  return {
+    type: "same_denominator_operation",
+    numeratorA: result.numeratorA,
+    numeratorB: result.numeratorB,
+    denominator: result.denominator,
+    operation: template.operation,
+    resultNumerator: result.resultNumerator,
+    originalNumeratorA: template.numeratorA,
+    originalDenominatorA: template.denominatorA,
+    originalNumeratorB: template.numeratorB,
+    originalDenominatorB: template.denominatorB,
+    conversionLabel,
+  };
+}
+
+function relatedDenominatorOptions(template: RelatedDenominatorTemplate) {
+  const result = relatedDenominatorResult(template);
+  const answer = `${result.resultNumerator}/${result.denominator}`;
+  const unchanged = `${Math.max(0, template.operation === "+" ? template.numeratorA + template.numeratorB : template.numeratorA - template.numeratorB)}/${template.denominatorA}`;
+  const wrongDenominator = `${result.resultNumerator}/${template.denominatorA + template.denominatorB}`;
+  const offByOne = `${Math.max(0, result.resultNumerator + (template.operation === "+" ? -1 : 1))}/${result.denominator}`;
+  const noConvertSecond = `${Math.max(0, template.operation === "+" ? result.numeratorA + template.numeratorB : result.numeratorA - template.numeratorB)}/${result.denominator}`;
+  const tooSmall = `${Math.max(0, result.resultNumerator - 2)}/${result.denominator}`;
+  const tooLarge = `${Math.min(result.denominator, result.resultNumerator + 2)}/${result.denominator}`;
+  const splitAgain = `${result.resultNumerator}/${result.denominator * 2}`;
+  return shuffle(uniqueStringOptions(answer, [unchanged, wrongDenominator, offByOne, noConvertSecond, tooSmall, tooLarge, splitAgain]));
+}
+
+function relatedDenominatorEquivalentChoice(template: RelatedDenominatorTemplate): MultipleChoiceQuestion {
+  const result = relatedDenominatorResult(template);
+  const firstNeedsConversion = template.denominatorA !== result.denominator;
+  const originalNumerator = firstNeedsConversion ? template.numeratorA : template.numeratorB;
+  const originalDenominator = firstNeedsConversion ? template.denominatorA : template.denominatorB;
+  const convertedNumerator = firstNeedsConversion ? result.numeratorA : result.numeratorB;
+  const original = `${originalNumerator}/${originalDenominator}`;
+  const converted = `${convertedNumerator}/${result.denominator}`;
+  const setup = `${result.numeratorA}/${result.denominator} ${template.operation} ${result.numeratorB}/${result.denominator}`;
+  const wrongEquivalentOptions = uniqueStringOptions(converted, [
+    `${originalNumerator}/${result.denominator}`,
+    `${Math.min(result.denominator, convertedNumerator + 1)}/${result.denominator}`,
+    `${convertedNumerator}/${originalDenominator}`,
+    `${originalNumerator + convertedNumerator}/${result.denominator}`,
+  ]);
+  const wrongSetupOptions = uniqueStringOptions(setup, [
+    `${template.numeratorA}/${template.denominatorA} ${template.operation} ${template.numeratorB}/${template.denominatorB}`,
+    `${template.numeratorA}/${result.denominator} ${template.operation} ${template.numeratorB}/${result.denominator}`,
+    `${convertedNumerator}/${result.denominator} ${template.operation} ${convertedNumerator}/${result.denominator}`,
+    `${result.numeratorA}/${result.denominator + template.denominatorA} ${template.operation} ${result.numeratorB}/${result.denominator + template.denominatorB}`,
+  ]);
+  const style = randInt(0, 2);
+
+  if (style === 0) {
+    return {
+      kind: "multiple_choice",
+      prompt: `${original} = ?`,
+      options: wrongEquivalentOptions,
+      answer: converted,
+      helper: "Match the denominator.",
+    };
+  }
+
+  if (style === 1) {
+    return {
+      kind: "multiple_choice",
+      prompt: `What should ${original} become?`,
+      options: wrongEquivalentOptions,
+      answer: converted,
+      helper: "Make the pieces the same size.",
+    };
+  }
+
+  return {
+    kind: "multiple_choice",
+    prompt: `Which setup matches ${relatedDenominatorExpression(template)}?`,
+    options: wrongSetupOptions,
+    answer: setup,
+    helper: "Convert one fraction first.",
+  };
+}
+
 function year3FractionOrderSets() {
   return [
     ["1/5", "1/2", "4/5"],
@@ -828,6 +970,11 @@ export type SameDenominatorOperationVisualData = {
   denominator: number;
   operation: "+" | "-";
   resultNumerator: number;
+  originalNumeratorA?: number;
+  originalDenominatorA?: number;
+  originalNumeratorB?: number;
+  originalDenominatorB?: number;
+  conversionLabel?: string;
 };
 
 export type MultipleChoiceQuestion = {
@@ -5494,6 +5641,44 @@ function generateGenericQuestion(
           : "Subtract the top numbers.",
       placeholder: "Type numerator",
       fixedDenominator: chosen.denominator,
+      visual,
+    };
+  }
+
+  if (
+    explicitMode === "related_denominator_visual" ||
+    explicitMode === "related_denominator_equivalent_choice" ||
+    explicitMode === "related_denominator_build"
+  ) {
+    const templates = year5RelatedDenominatorTemplates();
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+
+    if (explicitMode === "related_denominator_equivalent_choice") {
+      return relatedDenominatorEquivalentChoice(chosen);
+    }
+
+    const result = relatedDenominatorResult(chosen);
+    const answer = relatedDenominatorAnswer(chosen);
+    const visual = relatedDenominatorVisual(chosen);
+
+    if (explicitMode === "related_denominator_visual") {
+      return {
+        kind: "multiple_choice",
+        prompt: `What is ${relatedDenominatorExpression(chosen)}?`,
+        options: relatedDenominatorOptions(chosen),
+        answer,
+        helper: "Make the pieces the same size.",
+        visual,
+      };
+    }
+
+    return {
+      kind: "typed_response",
+      prompt: "Fill in the missing numerator",
+      answer,
+      helper: "Match the denominators, then combine.",
+      placeholder: "Type numerator",
+      fixedDenominator: result.denominator,
       visual,
     };
   }

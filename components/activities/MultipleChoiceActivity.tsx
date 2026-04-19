@@ -46,11 +46,32 @@ function SameDenominatorOperationVisual({
 }: {
   visual: Extract<NonNullable<MultipleChoiceQuestion["visual"]>, { type: "same_denominator_operation" }>;
 }) {
+  const hasConversion =
+    typeof visual.originalNumeratorA === "number" &&
+    typeof visual.originalDenominatorA === "number" &&
+    typeof visual.originalNumeratorB === "number" &&
+    typeof visual.originalDenominatorB === "number";
+  const leftLabel = hasConversion
+    ? `${visual.originalNumeratorA}/${visual.originalDenominatorA}`
+    : `${visual.numeratorA}/${visual.denominator}`;
+  const rightLabel = hasConversion
+    ? `${visual.originalNumeratorB}/${visual.originalDenominatorB}`
+    : `${visual.numeratorB}/${visual.denominator}`;
+
   return (
     <div className="mt-5 rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
       <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">
-        Matching Fraction Pieces
+        {hasConversion ? "Make the Pieces Match" : "Matching Fraction Pieces"}
       </div>
+      {hasConversion ? (
+        <div className="mt-3 flex flex-wrap items-center gap-3 rounded-2xl bg-white px-4 py-3 text-lg font-black text-slate-900 shadow-sm">
+          <FractionText value={leftLabel} />
+          <span className="text-emerald-700">{visual.operation}</span>
+          <FractionText value={rightLabel} />
+          <span className="text-slate-400">→</span>
+          <MathFormattedText text={visual.conversionLabel ?? ""} />
+        </div>
+      ) : null}
       <div className="mt-4 grid gap-3 md:grid-cols-[1fr_auto_1fr_auto_1fr] md:items-center">
         <div className="rounded-2xl bg-white p-3 shadow-sm">
           <div className="mb-2 text-center text-lg font-black text-slate-900">

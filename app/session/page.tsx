@@ -290,6 +290,8 @@ function buildStructuredQuizSources(lesson: Lesson): LessonActivity[] {
     "equivalent_fraction_reasoning",
     "equivalent_to_compare",
     "identify_fraction_point",
+    "same_denominator_true_false",
+    "related_denominator_equivalent_choice",
   ]);
 
   const filtered = activities.filter((activity) => {

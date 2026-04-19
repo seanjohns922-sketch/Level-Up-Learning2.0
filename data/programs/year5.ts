@@ -326,14 +326,24 @@ const year5Rows: ProgramRow[] = [
   },
   {
     week: 8,
-    focus: "Use related denominators to combine fractions",
+    focus: "Turn fractions into the same-sized parts to add or subtract them",
     lesson: 2,
     topic: "Related Denominators",
-    activity: "Add fractions with related denominators using simple equivalence.",
+    activity: "Match the pieces, then combine.",
     curriculum: ["AC9M5N05"],
     activities: [
-      makeActivity("multiple_choice", 2, { mode: "related_denominator_fractions" }),
-      makeActivity("typed_response", 1, { mode: "related_denominator_fractions" }),
+      makeActivity("multiple_choice", 1, {
+        mode: "related_denominator_visual",
+        rotationRole: "fast_thinking",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "related_denominator_equivalent_choice",
+        rotationRole: "reasoning",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "related_denominator_build",
+        rotationRole: "apply_create",
+      }),
     ],
   },
   {

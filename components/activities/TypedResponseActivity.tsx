@@ -63,15 +63,30 @@ function SameDenominatorEquationInput({
   onChange: (value: string) => void;
   inputRef: RefObject<HTMLInputElement | null>;
 }) {
+  const hasConversion =
+    typeof visual.originalNumeratorA === "number" &&
+    typeof visual.originalDenominatorA === "number" &&
+    typeof visual.originalNumeratorB === "number" &&
+    typeof visual.originalDenominatorB === "number";
+  const leftNumerator = visual.originalNumeratorA ?? visual.numeratorA;
+  const leftDenominator = visual.originalDenominatorA ?? visual.denominator;
+  const rightNumerator = visual.originalNumeratorB ?? visual.numeratorB;
+  const rightDenominator = visual.originalDenominatorB ?? visual.denominator;
+
   return (
     <div className="w-full rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
       <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">
         Complete the Fraction
       </div>
+      {hasConversion && visual.conversionLabel ? (
+        <div className="mt-3 rounded-2xl bg-white px-4 py-3 text-sm font-black text-slate-700 shadow-sm">
+          Make pieces match: <MathFormattedText text={visual.conversionLabel} />
+        </div>
+      ) : null}
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <StackedFraction numerator={visual.numeratorA} denominator={visual.denominator} />
+        <StackedFraction numerator={leftNumerator} denominator={leftDenominator} />
         <span className="text-3xl font-black text-emerald-700">{visual.operation}</span>
-        <StackedFraction numerator={visual.numeratorB} denominator={visual.denominator} />
+        <StackedFraction numerator={rightNumerator} denominator={rightDenominator} />
         <span className="text-3xl font-black text-emerald-700">=</span>
         <div className="inline-flex flex-col items-center rounded-xl bg-white px-4 py-3 shadow-sm">
           <input
