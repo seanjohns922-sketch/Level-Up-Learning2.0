@@ -105,41 +105,33 @@ export default function ProfilePage() {
   const { offset, daysInMonth, today, monthName } = useMemo(getMonthGrid, []);
 
   return (
-    <main className="min-h-screen bg-[#F4F7F6] p-4 md:p-6">
+    <main className="min-h-screen bg-[#FAF8F4] p-4 md:p-6">
       <div className="max-w-[1400px] mx-auto flex gap-5">
 
-        {/* ─── LEFT SIDEBAR ─── */}
-        <aside className="hidden lg:flex flex-col w-[200px] flex-shrink-0 rounded-3xl bg-gradient-to-b from-teal-600 to-emerald-700 p-5 shadow-[0_8px_30px_rgba(13,148,136,0.18)] sticky top-6 h-[calc(100vh-3rem)]">
+        {/* ─── LEFT SIDEBAR (minimal: logo + settings + logout) ─── */}
+        <aside className="hidden lg:flex flex-col items-center w-[76px] flex-shrink-0 rounded-3xl bg-white border border-slate-200/70 py-5 shadow-sm sticky top-6 h-[calc(100vh-3rem)]">
           {/* Logo tile */}
-          <div className="h-16 w-16 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center mb-8 mx-auto shadow-inner">
-            <BookOpen className="h-7 w-7 text-white" />
+          <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center mb-8 shadow-md shadow-indigo-500/20">
+            <Sparkles className="h-5 w-5 text-white" />
           </div>
 
-          {/* Nav items */}
-          <nav className="flex flex-col gap-1 flex-1">
-            {NAV_ITEMS.map((item) => (
-              <button
-                key={item.label}
-                onClick={() => router.push(item.route)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all
-                  ${item.active
-                    ? "bg-white/20 text-white shadow-sm"
-                    : "text-white/70 hover:bg-white/10 hover:text-white"
-                  }`}
-              >
-                <item.icon className="h-4 w-4 flex-shrink-0" />
-                <span className="truncate">{item.label}</span>
-              </button>
-            ))}
-          </nav>
+          <div className="flex-1" />
 
-          {/* Logout */}
+          <button
+            onClick={() => router.push("/profile")}
+            className="h-11 w-11 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-indigo-600 transition-all mb-2"
+            aria-label="Settings"
+            title="Settings"
+          >
+            <Settings className="h-[18px] w-[18px]" />
+          </button>
           <button
             onClick={() => router.push("/login")}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-white/70 hover:bg-white/10 hover:text-white transition-all mt-2"
+            className="h-11 w-11 rounded-xl flex items-center justify-center text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-all"
+            aria-label="Logout"
+            title="Logout"
           >
-            <LogOut className="h-4 w-4" />
-            <span>Logout</span>
+            <LogOut className="h-[18px] w-[18px]" />
           </button>
         </aside>
 
