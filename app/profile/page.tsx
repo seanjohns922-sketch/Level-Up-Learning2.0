@@ -374,9 +374,6 @@ export default function ProfilePage() {
             <div className="rounded-xl bg-gradient-to-br from-[#0F172A] to-[#1E293B] p-5 text-white relative overflow-hidden border border-[#1E293B]">
               <div className="absolute -top-6 -right-6 h-24 w-24 rounded-full bg-[#0EA5A4]/15 blur-2xl" />
               <div className="relative">
-                <div className="h-10 w-10 rounded-lg bg-[#F59E0B]/15 border border-[#F59E0B]/30 flex items-center justify-center mb-3">
-                  <Zap className="h-5 w-5 text-[#F59E0B]" />
-                </div>
                 <h4 className="text-base font-bold mb-1">Daily Challenge</h4>
                 <p className="text-xs text-[#CBD5E1] mb-4 leading-snug">A quick sprint for bonus XP</p>
                 <div className="flex items-center justify-between">
