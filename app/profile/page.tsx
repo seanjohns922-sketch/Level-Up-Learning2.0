@@ -15,6 +15,11 @@ const REALMS = [
   { name: "Reading Ridge", icon: BookOpen, status: "coming-soon" as const },
   { name: "Inkwell Wilds", icon: BookOpen, status: "locked" as const },
   { name: "Measurelands", icon: BookOpen, status: "locked" as const },
+  { name: "Runehaven Peaks", icon: BookOpen, status: "locked" as const },
+  { name: "Starpath Realm", icon: BookOpen, status: "locked" as const },
+  { name: "Statistica", icon: BookOpen, status: "locked" as const },
+  { name: "Chance Hollow", icon: BookOpen, status: "locked" as const },
+  { name: "Pattern Peaks", icon: BookOpen, status: "locked" as const },
 ];
 
 const DAYS = ["M", "T", "W", "T", "F", "S", "S"];
