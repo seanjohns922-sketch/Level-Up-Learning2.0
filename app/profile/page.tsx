@@ -108,117 +108,98 @@ export default function ProfilePage() {
   const cardShadow = "shadow-[0_4px_12px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.04)]";
 
   return (
-    <main className="min-h-screen bg-[#F7F8FA]">
-      <div className="w-full px-6 md:px-10 lg:px-16 xl:px-24 py-6">
+    <main className="min-h-screen bg-gradient-to-br from-[#F4FBF9] via-[#EEF7F4] to-[#E8F4EF] relative">
+      {/* Soft ambient teal blooms */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute -top-40 -left-32 h-[420px] w-[420px] rounded-full bg-teal-300/15 blur-3xl" />
+        <div className="absolute top-1/3 -right-40 h-[480px] w-[480px] rounded-full bg-emerald-300/12 blur-3xl" />
+      </div>
+
+      <div className="relative w-full px-6 md:px-10 lg:px-16 xl:px-24 py-6">
 
         {/* ── HEADER ── */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.back()}
-              className={`h-9 w-9 rounded-lg bg-white border border-[#E5E7EB] flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:border-gray-300 transition-all ${cardShadow}`}
+              className={`h-9 w-9 rounded-lg bg-white/80 backdrop-blur-sm border border-teal-100 flex items-center justify-center text-teal-700 hover:bg-white hover:border-teal-200 transition-all ${cardShadow}`}
               aria-label="Back"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
             <div>
-              <h1 className="text-lg font-black text-gray-900 tracking-tight leading-tight">Your Journey</h1>
-              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-[0.18em]">Progress Dashboard</p>
+              <h1 className="text-lg font-black text-slate-900 tracking-tight leading-tight">Your Journey</h1>
+              <p className="text-[9px] font-bold text-teal-600/70 uppercase tracking-[0.18em]">Number Nexus · Progress</p>
             </div>
           </div>
 
           {/* Profile pill */}
-          <div className={`flex items-center gap-3 rounded-2xl bg-white border border-[#E5E7EB] px-4 py-2 ${cardShadow}`}>
+          <div className={`flex items-center gap-3 rounded-2xl bg-white/85 backdrop-blur-sm border border-teal-100 px-4 py-2 ${cardShadow}`}>
             <div className="relative group cursor-pointer">
-              <div className="h-9 w-9 rounded-lg bg-[#7C5CFC] flex items-center justify-center text-sm font-black text-white">
+              <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center text-sm font-black text-white shadow-sm">
                 {initials}
               </div>
-              {/* Subtle "customise" hint on hover */}
-              <div className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-white border border-[#E5E7EB] flex items-center justify-center opacity-60 group-hover:opacity-100 transition-opacity">
+              <div className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-white border border-teal-100 flex items-center justify-center opacity-60 group-hover:opacity-100 transition-opacity">
                 <Lock className="h-2 w-2 text-gray-400" />
               </div>
             </div>
             <div>
-              <h2 className="text-sm font-extrabold text-gray-900 leading-tight">{studentName}</h2>
-              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-[0.12em]">
+              <h2 className="text-sm font-extrabold text-slate-900 leading-tight">{studentName}</h2>
+              <p className="text-[9px] font-bold text-teal-600/70 uppercase tracking-[0.12em]">
                 Numbot {levelTitle} · Lvl {levelNum}
               </p>
             </div>
-            <div className="ml-1.5 flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#FFF8ED] border border-[#F5DEB3]">
-              <Zap className="h-3 w-3 text-[#D4A017]" />
-              <span className="text-xs font-extrabold text-[#B8860B]">{stats.xp.toLocaleString()}</span>
+            <div className="ml-1.5 flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200">
+              <Zap className="h-3 w-3 text-emerald-600" />
+              <span className="text-xs font-extrabold text-emerald-700">{stats.xp.toLocaleString()}</span>
             </div>
           </div>
         </div>
 
-        {/* ── ROW 1: STAT CARDS ── */}
+        {/* ── ROW 1: STAT CARDS — refined glass/mint with accent stripe ── */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-          {/* Streak — the HERO card, only one with gradient */}
-          <div
-            className="rounded-2xl bg-gradient-to-br from-[#FF6A5A] to-[#E84D3D] p-4 cursor-pointer text-white
-              hover:scale-[1.02] hover:-translate-y-0.5 transition-all duration-200
-              shadow-[0_6px_20px_rgba(232,77,61,0.25)]"
-          >
-            <Flame className="h-6 w-6 mb-2" />
-            <div className="text-3xl font-black leading-none">0</div>
-            <div className="text-[10px] font-bold uppercase tracking-wider mt-1 opacity-80">Day Streak</div>
-          </div>
-
-          {/* Days Active — solid calm blue */}
-          <div
-            className={`rounded-xl bg-[#3B82F6] p-4 cursor-pointer text-white
-              hover:scale-[1.02] hover:-translate-y-0.5 transition-all duration-200
-              shadow-[0_4px_14px_rgba(59,130,246,0.2)]`}
-          >
-            <Calendar className="h-6 w-6 mb-2 opacity-90" />
-            <div className="text-3xl font-black leading-none">{activeDays.size}</div>
-            <div className="text-[10px] font-bold uppercase tracking-wider mt-1 opacity-75">Days Active</div>
-          </div>
-
-          {/* Time — solid muted purple */}
-          <div
-            className={`rounded-xl bg-[#7C5CFC] p-4 cursor-pointer text-white
-              hover:scale-[1.02] hover:-translate-y-0.5 transition-all duration-200
-              shadow-[0_4px_14px_rgba(124,92,252,0.2)]`}
-          >
-            <Clock className="h-6 w-6 mb-2 opacity-90" />
-            <div className="text-3xl font-black leading-none">--</div>
-            <div className="text-[10px] font-bold uppercase tracking-wider mt-1 opacity-75">Time</div>
-          </div>
-
-          {/* Accuracy — solid green */}
-          <div
-            className={`rounded-xl bg-[#22C55E] p-4 cursor-pointer text-white
-              hover:scale-[1.02] hover:-translate-y-0.5 transition-all duration-200
-              shadow-[0_4px_14px_rgba(34,197,94,0.2)]`}
-          >
-            <Target className="h-6 w-6 mb-2 opacity-90" />
-            <div className="text-3xl font-black leading-none">{stats.accuracy}%</div>
-            <div className="text-[10px] font-bold uppercase tracking-wider mt-1 opacity-75">Accuracy</div>
-          </div>
+          {[
+            { icon: Flame, value: "0", label: "Day Streak", accent: "from-rose-400 to-orange-400", iconColor: "text-rose-500", iconBg: "bg-rose-50" },
+            { icon: Calendar, value: activeDays.size.toString(), label: "Days Active", accent: "from-teal-400 to-cyan-400", iconColor: "text-teal-600", iconBg: "bg-teal-50" },
+            { icon: Clock, value: "--", label: "Time", accent: "from-emerald-400 to-teal-500", iconColor: "text-emerald-600", iconBg: "bg-emerald-50" },
+            { icon: Target, value: `${stats.accuracy}%`, label: "Accuracy", accent: "from-emerald-500 to-green-500", iconColor: "text-emerald-700", iconBg: "bg-emerald-50" },
+          ].map((c) => (
+            <div
+              key={c.label}
+              className={`group relative rounded-2xl bg-white/90 backdrop-blur-sm border border-teal-100/70 p-4 cursor-pointer
+                hover:-translate-y-0.5 hover:border-teal-200 transition-all duration-200 overflow-hidden ${cardShadow}`}
+            >
+              <div className={`absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r ${c.accent}`} />
+              <div className={`h-9 w-9 rounded-lg ${c.iconBg} flex items-center justify-center mb-2.5`}>
+                <c.icon className={`h-4 w-4 ${c.iconColor}`} />
+              </div>
+              <div className="text-2xl font-black text-slate-900 leading-none">{c.value}</div>
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1.5">{c.label}</div>
+            </div>
+          ))}
         </div>
 
-        {/* ── ROW 2: Activity Calendar + Widgets ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-4">
+        {/* ── ROW 2: Calendar (compact) + Level Progress + Daily Challenge ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 mb-4">
 
-          {/* Calendar widget */}
-          <div className={`lg:col-span-1 rounded-2xl bg-white border border-[#E5E7EB] p-4 ${cardShadow}`}>
+          {/* Calendar — 4/12 */}
+          <div className={`lg:col-span-4 rounded-2xl bg-white/90 backdrop-blur-sm border border-teal-100/70 p-4 ${cardShadow}`}>
             <div className="flex items-center justify-between mb-2.5">
-              <h3 className="text-sm font-extrabold text-gray-800 flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-[#3B82F6]" />
+              <h3 className="text-xs font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                <Calendar className="h-3.5 w-3.5 text-teal-600" />
                 Activity
               </h3>
-              <span className="text-[10px] font-bold text-gray-400">{monthName}</span>
+              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{monthName}</span>
             </div>
 
-            <div className="grid grid-cols-7 gap-0.5 mb-0.5">
+            <div className="grid grid-cols-7 gap-1 mb-1">
               {DAYS.map((d, i) => (
-                <div key={i} className="text-center text-[8px] font-bold text-gray-300">{d}</div>
+                <div key={i} className="text-center text-[8px] font-bold text-slate-300">{d}</div>
               ))}
             </div>
 
-            <div className="grid grid-cols-7 gap-0.5">
-              {Array.from({ length: offset }).map((_, i) => <div key={`e-${i}`} />)}
+            <div className="grid grid-cols-7 gap-1">
+              {Array.from({ length: offset }).map((_, i) => <div key={`e-${i}`} className="aspect-square" />)}
               {Array.from({ length: daysInMonth }).map((_, i) => {
                 const day = i + 1;
                 const isToday = day === today;
@@ -229,12 +210,12 @@ export default function ProfilePage() {
                     key={day}
                     className={`flex items-center justify-center rounded-md aspect-square text-[9px] font-bold transition-all
                       ${isToday
-                        ? "bg-[#3B82F6] text-white shadow-sm"
+                        ? "bg-gradient-to-br from-teal-500 to-emerald-600 text-white shadow-sm shadow-teal-500/30"
                         : isActive
-                          ? "bg-[#DCFCE7] text-[#16A34A] font-extrabold"
+                          ? "bg-emerald-100 text-emerald-700 font-extrabold"
                           : isPast
-                            ? "text-gray-300"
-                            : "text-gray-200"
+                            ? "text-slate-300"
+                            : "text-slate-200"
                       }
                     `}
                   >
@@ -244,91 +225,95 @@ export default function ProfilePage() {
               })}
             </div>
 
-            <div className="flex items-center gap-4 mt-2.5 pt-2 border-t border-gray-100">
+            <div className="flex items-center gap-3 mt-3 pt-2.5 border-t border-teal-50">
               <div className="flex items-center gap-1.5">
-                <div className="h-2 w-2 rounded-full bg-[#DCFCE7] border border-[#86EFAC]" />
-                <span className="text-[8px] font-bold text-gray-400">Active</span>
+                <div className="h-2 w-2 rounded-full bg-emerald-100 border border-emerald-300" />
+                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider">Active</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="h-2 w-2 rounded-full bg-[#3B82F6]" />
-                <span className="text-[8px] font-bold text-gray-400">Today</span>
+                <div className="h-2 w-2 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600" />
+                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider">Today</span>
               </div>
             </div>
           </div>
 
-          {/* Right: stacked widgets */}
-          <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-3">
-
-            {/* Daily Challenge */}
-            <div className={`rounded-xl bg-white border border-[#E5E7EB] p-4 cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 ${cardShadow}`}>
-              <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-[#F59E0B] to-[#EF8E00] text-white flex items-center justify-center mb-2.5 shadow-sm">
-                <Zap className="h-4.5 w-4.5" />
+          {/* Level Progress — 5/12 */}
+          <div className={`lg:col-span-5 rounded-2xl bg-white/90 backdrop-blur-sm border border-teal-100/70 p-4 ${cardShadow}`}>
+            <h4 className="text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+              <TrendingUp className="h-3.5 w-3.5 text-emerald-600" />
+              Level Progress
+            </h4>
+            <div className="flex items-center gap-5">
+              <div className="relative h-[88px] w-[88px] flex-shrink-0">
+                <svg viewBox="0 0 36 36" className="h-full w-full -rotate-90">
+                  <defs>
+                    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#14b8a6" />
+                      <stop offset="100%" stopColor="#10b981" />
+                    </linearGradient>
+                  </defs>
+                  <circle cx="18" cy="18" r="15.5" fill="none" stroke="#ECFDF5" strokeWidth="3" />
+                  <circle
+                    cx="18" cy="18" r="15.5" fill="none"
+                    stroke="url(#ringGrad)" strokeWidth="3" strokeLinecap="round"
+                    strokeDasharray={`${stats.accuracy} ${100 - stats.accuracy}`}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-lg font-black text-slate-900 leading-none">{stats.accuracy}%</span>
+                  <span className="text-[7px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Accuracy</span>
+                </div>
               </div>
-              <h4 className="text-sm font-extrabold text-gray-800 mb-0.5">Daily Challenge</h4>
-              <p className="text-xs text-gray-400 mb-2.5">Quick challenge for bonus XP</p>
+              <div className="grid grid-cols-2 gap-3 flex-1 min-w-0">
+                <div className="rounded-lg bg-teal-50/60 border border-teal-100 px-3 py-2">
+                  <div className="text-xl font-black text-slate-900 leading-none">{stats.completedLessons}</div>
+                  <div className="text-[9px] font-bold text-teal-700/70 uppercase tracking-wider mt-1">Lessons</div>
+                </div>
+                <div className="rounded-lg bg-emerald-50/60 border border-emerald-100 px-3 py-2">
+                  <div className="text-xl font-black text-slate-900 leading-none">{stats.weeksCompleted}<span className="text-sm text-slate-400">/12</span></div>
+                  <div className="text-[9px] font-bold text-emerald-700/70 uppercase tracking-wider mt-1">Weeks</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Daily Challenge — 3/12 */}
+          <div className={`lg:col-span-3 rounded-2xl bg-gradient-to-br from-teal-600 to-emerald-700 p-4 text-white relative overflow-hidden ${cardShadow}`}>
+            <div className="absolute -top-6 -right-6 h-24 w-24 rounded-full bg-white/10 blur-2xl" />
+            <div className="relative">
+              <div className="h-9 w-9 rounded-lg bg-white/15 backdrop-blur-sm flex items-center justify-center mb-2.5">
+                <Zap className="h-4 w-4 text-amber-300" />
+              </div>
+              <h4 className="text-sm font-extrabold mb-0.5">Daily Challenge</h4>
+              <p className="text-[11px] text-white/70 mb-3 leading-snug">Quick sprint for bonus XP</p>
               <div className="flex items-center justify-between">
-                <span className="text-sm font-extrabold text-[#D4A017]">+50 XP</span>
-                <span className="text-[9px] font-bold text-gray-300 uppercase tracking-wider">Coming Soon</span>
-              </div>
-            </div>
-
-            {/* Level Progress */}
-            <div className={`rounded-2xl bg-white border border-[#E5E7EB] p-4 ${cardShadow}`}>
-              <h4 className="text-xs font-extrabold text-gray-800 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <TrendingUp className="h-3.5 w-3.5 text-[#22C55E]" />
-                Level Progress
-              </h4>
-              <div className="flex items-center gap-4">
-                {/* Accuracy ring */}
-                <div className="relative h-[72px] w-[72px] flex-shrink-0">
-                  <svg viewBox="0 0 36 36" className="h-full w-full -rotate-90">
-                    <circle cx="18" cy="18" r="15.5" fill="none" stroke="#F3F4F6" strokeWidth="3" />
-                    <circle
-                      cx="18" cy="18" r="15.5" fill="none"
-                      stroke="#22C55E" strokeWidth="3" strokeLinecap="round"
-                      strokeDasharray={`${stats.accuracy} ${100 - stats.accuracy}`}
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-base font-black text-gray-800 leading-none">{stats.accuracy}%</span>
-                    <span className="text-[7px] font-bold text-gray-400 uppercase">Accuracy</span>
-                  </div>
-                </div>
-                <div className="space-y-2.5 flex-1 min-w-0">
-                  <div>
-                    <div className="text-lg font-black text-gray-800 leading-none">{stats.completedLessons}</div>
-                    <div className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Lessons Done</div>
-                  </div>
-                  <div>
-                    <div className="text-lg font-black text-gray-800 leading-none">{stats.weeksCompleted}/12</div>
-                    <div className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Weeks Cleared</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Your Wins — spans both columns on md */}
-            <div className={`md:col-span-2 rounded-xl bg-white border border-[#E5E7EB] p-4 ${cardShadow}`}>
-              <h4 className="text-xs font-extrabold text-gray-800 uppercase tracking-wider mb-2.5 flex items-center gap-2">
-                <Star className="h-3.5 w-3.5 text-[#D4A017]" />
-                Your Wins
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {recentActivity.map((item, i) => (
-                  <div key={i} className="flex items-center gap-2 bg-[#F9FAFB] rounded-lg px-3 py-2 border border-[#F3F4F6]">
-                    <item.icon className={`h-3.5 w-3.5 ${item.color}`} />
-                    <span className="text-xs font-semibold text-gray-600">{item.text}</span>
-                  </div>
-                ))}
+                <span className="text-sm font-extrabold text-amber-300">+50 XP</span>
+                <span className="text-[8px] font-bold text-white/50 uppercase tracking-wider">Soon</span>
               </div>
             </div>
           </div>
         </div>
 
+        {/* ── ROW: Your Wins (full width, slim) ── */}
+        <div className={`rounded-2xl bg-white/90 backdrop-blur-sm border border-teal-100/70 p-4 mb-4 ${cardShadow}`}>
+          <h4 className="text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-2.5 flex items-center gap-2">
+            <Star className="h-3.5 w-3.5 text-amber-500" />
+            Your Wins
+          </h4>
+          <div className="flex flex-wrap gap-2">
+            {recentActivity.map((item, i) => (
+              <div key={i} className="flex items-center gap-2 bg-teal-50/50 rounded-lg px-3 py-2 border border-teal-100/60">
+                <item.icon className={`h-3.5 w-3.5 ${item.color}`} />
+                <span className="text-xs font-semibold text-slate-700">{item.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* ── ROW 3: REALM PROGRESS ── */}
-        <div className={`rounded-2xl bg-white border border-[#E5E7EB] p-4 mb-3 ${cardShadow}`}>
-          <h3 className="text-xs font-extrabold text-gray-800 uppercase tracking-wider mb-3 flex items-center gap-2">
-            <BookOpen className="h-3.5 w-3.5 text-[#7C5CFC]" />
+        <div className={`rounded-2xl bg-white/90 backdrop-blur-sm border border-teal-100/70 p-4 mb-3 ${cardShadow}`}>
+          <h3 className="text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+            <BookOpen className="h-3.5 w-3.5 text-teal-600" />
             Realm Progress
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
@@ -340,48 +325,46 @@ export default function ProfilePage() {
                   key={realm.name}
                   className={`flex items-center gap-3 rounded-lg px-3.5 py-2.5 transition-all duration-200 border
                     ${isActive
-                      ? "bg-[#F5F3FF] border-[#DDD6FE] hover:shadow-sm hover:-translate-y-0.5 cursor-pointer"
-                      : "bg-[#F9FAFB] border-[#F3F4F6] opacity-55"
+                      ? "bg-teal-50/60 border-teal-200/70 hover:shadow-sm hover:-translate-y-0.5 hover:border-teal-300 cursor-pointer"
+                      : "bg-slate-50/60 border-slate-100 opacity-55"
                     }
                   `}
                 >
-{isActive ? (
+                  {isActive ? (
                     <div
-                      className="h-10 w-10 rounded-lg flex-shrink-0 bg-cover bg-center shadow-sm ring-1 ring-black/10"
-                      style={{
-                        backgroundImage: `url('/images/number-nexus-tile.jpg')`,
-                      }}
+                      className="h-10 w-10 rounded-lg flex-shrink-0 bg-cover bg-center shadow-sm ring-1 ring-teal-700/10"
+                      style={{ backgroundImage: `url('/images/number-nexus-tile.jpg')` }}
                     />
                   ) : (
-                    <div className="h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-gray-200 text-gray-400">
+                    <div className="h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-slate-200 text-slate-400">
                       <realm.icon className="h-4 w-4" />
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <span className={`text-xs font-bold block truncate ${isActive ? "text-gray-800" : "text-gray-400"}`}>
+                    <span className={`text-xs font-bold block truncate ${isActive ? "text-slate-800" : "text-slate-400"}`}>
                       {realm.name}
                     </span>
                     {isActive && (
                       <div className="flex items-center gap-2 mt-1">
-                        <div className="flex-1 h-1.5 rounded-full bg-[#EDE9FE] overflow-hidden">
+                        <div className="flex-1 h-1.5 rounded-full bg-emerald-100 overflow-hidden">
                           <div
-                            className="h-full rounded-full bg-[#7C5CFC] transition-all duration-700"
+                            className="h-full rounded-full bg-gradient-to-r from-teal-500 to-emerald-600 transition-all duration-700"
                             style={{ width: `${stats.realmProgress}%` }}
                           />
                         </div>
-                        <span className="text-[10px] font-extrabold text-[#7C5CFC]">{stats.realmProgress}%</span>
+                        <span className="text-[10px] font-extrabold text-emerald-700">{stats.realmProgress}%</span>
                       </div>
                     )}
                   </div>
                   {!isActive && (
                     <div className="flex-shrink-0">
                       {isComingSoon
-                        ? <span className="text-[8px] font-bold text-[#D4A017] uppercase tracking-wider">Soon</span>
-                        : <Lock className="h-3.5 w-3.5 text-gray-300" />
+                        ? <span className="text-[8px] font-bold text-amber-600 uppercase tracking-wider">Soon</span>
+                        : <Lock className="h-3.5 w-3.5 text-slate-300" />
                       }
                     </div>
                   )}
-                  {isActive && <ChevronRight className="h-4 w-4 text-[#C4B5FD] flex-shrink-0" />}
+                  {isActive && <ChevronRight className="h-4 w-4 text-teal-400 flex-shrink-0" />}
                 </div>
               );
             })}
@@ -389,20 +372,20 @@ export default function ProfilePage() {
         </div>
 
         {/* ── BOTTOM: SOCIAL TEASER ── */}
-        <div className={`rounded-xl bg-white border border-[#E5E7EB] px-6 py-3 flex items-center justify-center gap-8 ${cardShadow}`}>
+        <div className={`rounded-xl bg-white/90 backdrop-blur-sm border border-teal-100/70 px-6 py-3 flex items-center justify-center gap-8 ${cardShadow}`}>
           {[
-            { icon: Users, label: "Friends", color: "text-[#3B82F6]" },
-            { icon: Swords, label: "Battles", color: "text-[#EF4444]" },
-            { icon: Medal, label: "Rankings", color: "text-[#D4A017]" },
+            { icon: Users, label: "Friends", color: "text-teal-600" },
+            { icon: Swords, label: "Battles", color: "text-rose-500" },
+            { icon: Medal, label: "Rankings", color: "text-amber-500" },
           ].map((item) => (
             <div key={item.label} className="flex items-center gap-1.5 opacity-40">
               <item.icon className={`h-4 w-4 ${item.color}`} />
-              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">{item.label}</span>
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{item.label}</span>
             </div>
           ))}
-          <div className="flex items-center gap-1.5 ml-3 pl-3 border-l border-gray-200">
-            <Lock className="h-3 w-3 text-gray-300" />
-            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-[0.15em]">Coming Soon</span>
+          <div className="flex items-center gap-1.5 ml-3 pl-3 border-l border-teal-100">
+            <Lock className="h-3 w-3 text-slate-300" />
+            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.15em]">Coming Soon</span>
           </div>
         </div>
 
