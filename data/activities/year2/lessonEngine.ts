@@ -282,6 +282,12 @@ export type NumberLinePlaceQuestion = {
   answer?: string;
   fractions?: string[];
   maxWhole?: number;
+  pointOptions?: Array<{
+    id: "A" | "B" | "C";
+    fraction: string;
+  }>;
+  showPartitions?: boolean;
+  showSupportModel?: boolean;
 };
 
 export type FractionCompareQuestion = {
@@ -1083,6 +1089,9 @@ const BASE_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
       "pick_point",
       "order_fractions",
       "order_compare_fractions",
+      "place_fraction_number_line",
+      "identify_fraction_point",
+      "order_number_line_fractions",
       "skip_count_fraction",
       "mixed_numerals",
     ],
@@ -3916,9 +3925,10 @@ function generateInteractiveQuestion(
   if (activityType === "number_line_place") {
     const explicitMode = typeof config.mode === "string" ? config.mode : undefined;
     const mode =
-      explicitMode === "pick_point"
-        ? explicitMode
+      explicitMode === "pick_point" || explicitMode === "identify_fraction_point"
+        ? "pick_point"
         : explicitMode === "order_fractions" || explicitMode === "order_compare_fractions"
+        || explicitMode === "order_number_line_fractions"
         ? "order_fractions"
         : "place_fraction";
 
@@ -3965,9 +3975,78 @@ function generateInteractiveQuestion(
       };
     }
 
+    if (explicitMode === "place_fraction_number_line") {
+      const placementBank = [
+        { target: "1/4", denominator: 4, maxWhole: 1, showPartitions: true },
+        { target: "2/5", denominator: 5, maxWhole: 1, showPartitions: true },
+        { target: "3/6", denominator: 6, maxWhole: 1, showPartitions: true },
+        { target: "2/3", denominator: 3, maxWhole: 1, showPartitions: true },
+        { target: "3/4", denominator: 4, maxWhole: 1, showPartitions: true },
+        { target: "5/8", denominator: 8, maxWhole: 1, showPartitions: true },
+        { target: "3/5", denominator: 5, maxWhole: 1, showPartitions: false },
+        { target: "7/10", denominator: 10, maxWhole: 1, showPartitions: false },
+        { target: "5/4", denominator: 4, maxWhole: 2, showPartitions: true },
+      ] as const;
+      const chosen = placementBank[randInt(0, placementBank.length - 1)] ?? placementBank[0]!;
+      return {
+        kind: "number_line_place",
+        prompt: `Place ${chosen.target} on the number line.`,
+        mode: "place_fraction",
+        denominator: chosen.denominator,
+        partitionDenominator: chosen.denominator,
+        targetFraction: chosen.target,
+        answer: chosen.target,
+        maxWhole: chosen.maxWhole,
+        showPartitions: chosen.showPartitions,
+        showSupportModel: false,
+      };
+    }
+
+    if (explicitMode === "identify_fraction_point") {
+      const pointBank = [
+        { target: "1/2", denominator: 2, points: ["1/4", "1/2", "3/4"] },
+        { target: "3/4", denominator: 4, points: ["1/4", "1/2", "3/4"] },
+        { target: "2/3", denominator: 3, points: ["1/3", "2/3", "1"] },
+        { target: "3/5", denominator: 5, points: ["2/5", "3/5", "4/5"] },
+        { target: "5/8", denominator: 8, points: ["3/8", "5/8", "7/8"] },
+        { target: "7/10", denominator: 10, points: ["3/10", "7/10", "9/10"] },
+        { target: "2/3", denominator: 15, points: ["3/5", "2/3", "4/6"] },
+      ] as const;
+      const chosen = pointBank[randInt(0, pointBank.length - 1)] ?? pointBank[0]!;
+      const ids = ["A", "B", "C"] as const;
+      const answerIndex = chosen.points.findIndex((fraction) => fraction === chosen.target);
+      return {
+        kind: "number_line_place",
+        prompt: `Which point shows ${chosen.target}?`,
+        mode: "pick_point",
+        denominator: chosen.denominator,
+        partitionDenominator: chosen.denominator,
+        targetFraction: chosen.target,
+        pointOptions: chosen.points.map((fraction, index) => ({
+          id: ids[index] ?? "A",
+          fraction,
+        })),
+        answer: ids[answerIndex] ?? "A",
+        maxWhole: 1,
+        showPartitions: chosen.denominator <= 8,
+        showSupportModel: false,
+      };
+    }
+
     if (mode === "order_fractions") {
       const candidateSets = (
-        explicitMode === "order_compare_fractions"
+        explicitMode === "order_number_line_fractions"
+          ? [
+              ["1/4", "2/4", "3/4"],
+              ["2/6", "4/6", "5/6"],
+              ["1/3", "1/2", "2/3"],
+              ["1/3", "1/2", "1/4"],
+              ["2/3", "3/5", "4/6"],
+              ["3/10", "1/2", "7/10"],
+              ["3/8", "5/8", "7/8"],
+              ["1/4", "3/5", "2/3"],
+            ]
+          : explicitMode === "order_compare_fractions"
           ? [
               ["1/8", "3/8", "6/8"],
               ["2/8", "5/8", "7/8"],

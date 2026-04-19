@@ -284,11 +284,21 @@ const year5Rows: ProgramRow[] = [
     focus: "Place fractions accurately on number lines",
     lesson: 3,
     topic: "Fractions on Number Lines",
-    activity: "Place and identify fractions on number lines.",
+    activity: "Place fractions, identify marked points, and order fractions from left to right.",
     curriculum: ["AC9M5N03"],
     activities: [
-      makeActivity("number_line_place", 2, { mode: "place_fraction" }),
-      makeActivity("number_line_place", 1, { mode: "pick_point" }),
+      makeActivity("number_line_place", 1, {
+        mode: "place_fraction_number_line",
+        rotationRole: "fast_thinking",
+      }),
+      makeActivity("number_line_place", 1, {
+        mode: "identify_fraction_point",
+        rotationRole: "reasoning",
+      }),
+      makeActivity("number_line_place", 1, {
+        mode: "order_number_line_fractions",
+        rotationRole: "apply_create",
+      }),
     ],
   },
   {

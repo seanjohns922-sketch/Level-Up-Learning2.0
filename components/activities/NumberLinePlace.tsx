@@ -95,6 +95,7 @@ export default function NumberLinePlace({
 }) {
   const [order, setOrder] = useState<string[]>([]);
   const [placedFraction, setPlacedFraction] = useState<string | null>(null);
+  const [selectedPoint, setSelectedPoint] = useState<string | null>(null);
   const [animatedFraction, setAnimatedFraction] = useState<string | null>(null);
   const lineRef = useRef<HTMLDivElement | null>(null);
 
@@ -104,6 +105,8 @@ export default function NumberLinePlace({
   const denominator =
     questionData.partitionDenominator ?? questionData.denominator ?? parsedTarget.denominator ?? 1;
   const maxWhole = questionData.maxWhole ?? Math.max(1, Math.ceil(parsedTarget.value));
+  const showPartitions = questionData.showPartitions ?? true;
+  const isPointPick = questionData.mode === "pick_point" && Boolean(questionData.pointOptions?.length);
   const lineStops = useMemo(
     () =>
       Array.from({ length: denominator * maxWhole + 1 }, (_, index) => ({
@@ -127,6 +130,10 @@ export default function NumberLinePlace({
     setOrder([]);
   }
 
+  function choosePoint(pointId: string) {
+    setSelectedPoint(pointId);
+  }
+
   function placeDot(clientX: number) {
     if (!lineRef.current) return;
     const rect = lineRef.current.getBoundingClientRect();
@@ -138,7 +145,7 @@ export default function NumberLinePlace({
   }
 
   useEffect(() => {
-    if (!placedFraction || questionData.mode === "order_fractions") return;
+    if (!placedFraction || questionData.mode === "order_fractions" || isPointPick) return;
     const placedIndex = lineStops.findIndex((stop) => stop.label === placedFraction);
     if (placedIndex < 0) return;
 
@@ -161,7 +168,7 @@ export default function NumberLinePlace({
     return () => {
       timers.forEach((timer) => clearTimeout(timer));
     };
-  }, [lineStops, placedFraction, questionData.mode]);
+  }, [isPointPick, lineStops, placedFraction, questionData.mode]);
 
   return (
     <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -233,42 +240,52 @@ export default function NumberLinePlace({
         </div>
       ) : (
         <>
-          <div className="mt-6 rounded-2xl border border-violet-100 bg-violet-50 p-5">
-            <div className="text-xs font-bold uppercase tracking-wide text-violet-700">Visual Support</div>
-            <div className="mt-3 max-w-sm">
-              <FractionBar
-                fraction={targetFraction}
-                showLabel={renderMode === "lesson"}
-                showFilled={renderMode === "lesson"}
-                totalWholes={maxWhole}
-              />
-            </div>
-            {renderMode === "lesson" ? (
+          {renderMode === "lesson" && questionData.showSupportModel !== false && !isPointPick ? (
+            <div className="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
+              <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">Visual Support</div>
+              <div className="mt-3 max-w-sm">
+                <FractionBar
+                  fraction={targetFraction}
+                  showLabel
+                  showFilled
+                  totalWholes={maxWhole}
+                  tone="emerald"
+                />
+              </div>
               <p className="mt-3 text-sm text-slate-600">
-              Use the bar model to count equal jumps from 0 to 1.
+                Count equal jumps from 0 to {maxWhole}.
               </p>
-            ) : null}
-          </div>
+            </div>
+          ) : null}
 
-          <div className="mt-6 rounded-2xl border border-violet-100 bg-violet-50 p-5">
+          <div className="mt-6 rounded-3xl border border-emerald-100 bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.13),transparent_38%),linear-gradient(135deg,#ecfdf5,#f8fafc)] p-5 shadow-inner">
             {renderMode === "lesson" ? (
-              <div className="mb-3 text-sm font-bold text-violet-700">
-              {denominator} equal jumps from 0 to {maxWhole}
+              <div className="mb-3 text-sm font-bold text-emerald-700">
+                {isPointPick
+                  ? `Find ${targetFraction} on the data rail.`
+                  : showPartitions
+                  ? `${denominator} equal jumps from 0 to ${maxWhole}`
+                  : `Estimate where ${targetFraction} belongs between 0 and ${maxWhole}`}
               </div>
             ) : null}
             <div
               ref={lineRef}
-              className="relative mx-4 h-16 cursor-pointer"
-              onClick={(event) => placeDot(event.clientX)}
+              className={[
+                "relative mx-4 h-24",
+                isPointPick ? "" : "cursor-pointer",
+              ].join(" ")}
+              onClick={(event) => {
+                if (!isPointPick) placeDot(event.clientX);
+              }}
             >
-              <div className="absolute top-7 left-0 right-0 h-1 rounded bg-slate-400" />
-              {lineStops.slice(0, -1).map((stop, index) => {
+              <div className="absolute top-11 left-0 right-0 h-1.5 rounded-full bg-slate-300 shadow-[0_0_18px_rgba(20,184,166,0.25)]" />
+              {showPartitions && lineStops.slice(0, -1).map((stop, index) => {
                 const next = lineStops[index + 1];
                 if (!next) return null;
                 return (
                   <div
                     key={`${stop.label}-${next.label}`}
-                    className="absolute top-[22px] h-3 rounded-full bg-violet-200/70"
+                    className="absolute top-[38px] h-4 rounded-full bg-emerald-200/70"
                     style={{
                       left: `${stop.x * 100}%`,
                       width: `${(next.x - stop.x) * 100}%`,
@@ -276,18 +293,46 @@ export default function NumberLinePlace({
                   />
                 );
               })}
-              {lineStops.map((stop) => (
+              {(showPartitions ? lineStops : [lineStops[0], lineStops[lineStops.length - 1]]).filter(Boolean).map((stop) => (
                 <div
-                  key={stop.label}
-                  className="absolute top-5 h-5 w-0.5 -translate-x-1/2 rounded bg-slate-400"
-                  style={{ left: `${stop.x * 100}%` }}
-                />
+                  key={stop!.label}
+                  className="absolute top-8 h-7 w-0.5 -translate-x-1/2 rounded bg-slate-500"
+                  style={{ left: `${stop!.x * 100}%` }}
+                >
+                  {renderMode === "lesson" && (stop!.label === "0" || stop!.label === String(maxWhole)) ? (
+                    <span className="absolute top-8 -translate-x-1/2 text-sm font-black text-slate-700">
+                      {stop!.label}
+                    </span>
+                  ) : null}
+                </div>
               ))}
-              {animatedFraction ? (
+              {isPointPick
+                ? (questionData.pointOptions ?? []).map((point) => {
+                    const pointValue = parseFraction(point.fraction).value / maxWhole;
+                    const isSelected = selectedPoint === point.id;
+                    return (
+                      <button
+                        key={point.id}
+                        type="button"
+                        onClick={() => choosePoint(point.id)}
+                        className={[
+                          "absolute top-[25px] flex h-10 w-10 -translate-x-1/2 items-center justify-center rounded-full border-2 text-sm font-black shadow-sm transition",
+                          isSelected
+                            ? "border-teal-500 bg-teal-500 text-white shadow-[0_0_18px_rgba(20,184,166,0.45)]"
+                            : "border-emerald-300 bg-white text-emerald-900 hover:bg-emerald-50",
+                        ].join(" ")}
+                        style={{ left: `${pointValue * 100}%` }}
+                      >
+                        {point.id}
+                      </button>
+                    );
+                  })
+                : null}
+              {!isPointPick && animatedFraction ? (
                 <div
-                  className="absolute top-3 flex h-9 w-9 -translate-x-1/2 items-center justify-center rounded-full border-2 border-violet-600 bg-violet-500 text-white shadow-sm transition-all duration-150"
+                  className="absolute top-6 flex h-10 w-10 -translate-x-1/2 items-center justify-center rounded-full border-2 border-teal-600 bg-teal-500 text-white shadow-[0_0_18px_rgba(20,184,166,0.45)] transition-all duration-150"
                   style={{
-                    left: `${((lineStops.find((stop) => stop.label === animatedFraction)?.x ?? 0) * 100)}%`,
+                    left: `${(parseFraction(animatedFraction).value / maxWhole) * 100}%`,
                   }}
                 >
                   •
@@ -299,15 +344,40 @@ export default function NumberLinePlace({
               <span>{maxWhole}</span>
             </div>
             {renderMode === "lesson" && animatedFraction && animatedFraction !== "0" ? (
-              <div className="mt-3 text-sm font-bold text-violet-700">
+              <div className="mt-3 text-sm font-bold text-emerald-700">
                 Jumped to <FractionText value={animatedFraction} compact />
               </div>
             ) : null}
           </div>
 
+          {isPointPick ? (
+            <div className="mt-5 grid gap-3 sm:grid-cols-3">
+              {(questionData.pointOptions ?? []).map((point) => (
+                <button
+                  key={point.id}
+                  type="button"
+                  onClick={() => choosePoint(point.id)}
+                  className={[
+                    "rounded-2xl border px-5 py-4 text-xl font-black transition",
+                    selectedPoint === point.id
+                      ? "border-teal-400 bg-teal-50 text-teal-900"
+                      : "border-slate-200 bg-white text-slate-900 hover:bg-emerald-50",
+                  ].join(" ")}
+                >
+                  Point {point.id}
+                </button>
+              ))}
+            </div>
+          ) : null}
+
           <button
             type="button"
             onClick={() => {
+              if (isPointPick) {
+                if (selectedPoint === questionData.answer) onCorrect?.();
+                else onWrong?.();
+                return;
+              }
               const placedValue = placedFraction ? parseFraction(placedFraction).value : NaN;
               const answerValue = questionData.answer ? parseFraction(questionData.answer).value : NaN;
               if (Number.isFinite(placedValue) && Number.isFinite(answerValue) && placedValue === answerValue) {
@@ -316,10 +386,10 @@ export default function NumberLinePlace({
               }
               onWrong?.();
             }}
-            disabled={!placedFraction}
-            className="mt-6 w-full rounded-2xl bg-violet-600 px-5 py-3 font-black text-white hover:bg-violet-700 disabled:opacity-40"
+            disabled={isPointPick ? !selectedPoint : !placedFraction}
+            className="mt-6 w-full rounded-2xl bg-emerald-600 px-5 py-3 font-black text-white hover:bg-emerald-700 disabled:opacity-40"
           >
-            Check position
+            {isPointPick ? "Check point" : "Check position"}
           </button>
         </>
       )}
