@@ -81,23 +81,26 @@ export default function MultipleChoiceActivity({
   }
 
   return (
-    <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+    <div className="rounded-3xl border border-gray-200/80 bg-white p-6 shadow-[0_1px_2px_rgba(2,23,22,0.04),0_8px_24px_rgba(2,23,22,0.05)]">
       {questionData.visual?.type === "shopping_list" ||
       questionData.visual?.type === "australian_money" ||
       questionData.visual?.type === "receipt" ? (
         <MoneyContextVisual visual={questionData.visual} />
       ) : null}
-      <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">
+      <div className="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-[0.22em] text-teal-700/90">
+        <span className="h-1.5 w-1.5 rounded-full bg-teal-500 shadow-[0_0_6px_rgba(20,184,166,0.6)]" />
         Multiple Choice
       </div>
-      <div className="flex items-center gap-2 mt-2">
-        <h2 className="text-2xl font-black text-gray-900">
+      <div className="flex items-start gap-2.5 mt-2">
+        <h2 className="text-[1.65rem] md:text-[1.85rem] font-bold text-slate-900 leading-[1.15] tracking-[-0.02em]">
           <MathFormattedText text={questionData.prompt} />
         </h2>
-        <ReadAloudBtn text={questionData.prompt} />
+        <div className="mt-1.5">
+          <ReadAloudBtn text={questionData.prompt} />
+        </div>
       </div>
       {renderMode === "lesson" && questionData.helper ? (
-        <p className="mt-2 text-sm text-gray-600">
+        <p className="mt-2 text-[15px] text-slate-500 leading-relaxed">
           <MathFormattedText text={questionData.helper} />
         </p>
       ) : null}
@@ -124,26 +127,38 @@ export default function MultipleChoiceActivity({
         <RuleBoxVisual visual={questionData.visual} title="Step-by-step rule" />
       ) : null}
 
-      <div className="mt-6 grid gap-3">
-        {questionData.options.map((option, index) => (
-          <button
-            key={`${option}-${index}`}
-            type="button"
-            onClick={() => choose(option)}
-            className={[
-              "rounded-2xl border px-5 py-4 text-left text-xl font-black transition",
-              isMultiSelect
-                ? selected.includes(option)
-                  ? "border-teal-300 bg-teal-50 text-teal-900"
-                  : "border-gray-200 bg-white text-gray-900 hover:bg-gray-50"
-                : picked === option
-                ? "border-teal-300 bg-teal-50 text-teal-900"
-                : "border-gray-200 bg-white text-gray-900 hover:bg-gray-50",
-            ].join(" ")}
-          >
-            <MathFormattedText text={option} compactFractions />
-          </button>
-        ))}
+      <div className="mt-6 grid gap-2.5">
+        {questionData.options.map((option, index) => {
+          const isPicked = isMultiSelect
+            ? selected.includes(option)
+            : picked === option;
+          return (
+            <button
+              key={`${option}-${index}`}
+              type="button"
+              onClick={() => choose(option)}
+              className={[
+                "group relative w-full rounded-2xl border px-5 py-4 text-left text-xl md:text-[1.4rem] font-extrabold tracking-tight transition-all duration-150",
+                "active:translate-y-[1px] active:shadow-none",
+                isPicked
+                  ? "border-teal-400 bg-gradient-to-br from-teal-50 to-emerald-50 text-teal-900 shadow-[0_2px_0_rgba(13,148,136,0.25),inset_0_1px_0_rgba(255,255,255,0.8)] ring-1 ring-teal-300/60"
+                  : "border-slate-200 bg-white text-slate-800 hover:-translate-y-[1px] hover:border-teal-300 hover:bg-teal-50/30 hover:shadow-[0_4px_12px_rgba(13,148,136,0.08)]",
+              ].join(" ")}
+            >
+              {/* Left accent bar (appears on hover/picked) */}
+              <span
+                aria-hidden
+                className={[
+                  "absolute left-0 top-2 bottom-2 w-[3px] rounded-full transition-opacity",
+                  isPicked
+                    ? "bg-gradient-to-b from-teal-400 to-emerald-500 opacity-100"
+                    : "bg-teal-400 opacity-0 group-hover:opacity-60",
+                ].join(" ")}
+              />
+              <MathFormattedText text={option} compactFractions />
+            </button>
+          );
+        })}
       </div>
       {isMultiSelect ? (
         <div className="mt-5">
