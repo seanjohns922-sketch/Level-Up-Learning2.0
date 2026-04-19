@@ -142,6 +142,9 @@ const CANDIDATES_PER_ACTIVITY = 4;
 type QuestionHistoryEntry = {
   fingerprint: string;
   templateFingerprint: string;
+  numberSetFingerprint: string;
+  mode: string;
+  contextType: string;
   order: number;
 };
 
@@ -152,14 +155,31 @@ function scoreQuestionCandidate(
 ) {
   const exactSeen = history.find((entry) => entry.fingerprint === fingerprint.fingerprint);
   const templateSeen = history.find((entry) => entry.templateFingerprint === fingerprint.templateFingerprint);
+  const numberSetSeen = history.find(
+    (entry) => entry.numberSetFingerprint !== "" && entry.numberSetFingerprint === fingerprint.numberSetFingerprint
+  );
+  const contextSeen = history.find(
+    (entry) => entry.contextType !== "none" && entry.contextType === fingerprint.contextType
+  );
   const recentExact = history.find(
     (entry) => entry.fingerprint === fingerprint.fingerprint && order - entry.order <= QUESTION_COOLDOWN
   );
   const recentTemplate = history.find(
     (entry) => entry.templateFingerprint === fingerprint.templateFingerprint && order - entry.order <= QUESTION_COOLDOWN
   );
+  const recentNumberSet = history.find(
+    (entry) =>
+      entry.numberSetFingerprint !== "" &&
+      entry.numberSetFingerprint === fingerprint.numberSetFingerprint &&
+      order - entry.order <= QUESTION_COOLDOWN
+  );
+  const recentContext = history.find(
+    (entry) => entry.contextType !== "none" && entry.contextType === fingerprint.contextType && order - entry.order <= 3
+  );
   const lastExactOrder = exactSeen?.order ?? -1;
   const lastTemplateOrder = templateSeen?.order ?? -1;
+  const lastNumberSetOrder = numberSetSeen?.order ?? -1;
+  const lastContextOrder = contextSeen?.order ?? -1;
 
   let score = 0;
   let reused = false;
@@ -171,10 +191,36 @@ function scoreQuestionCandidate(
     fallbackReason = "exact_fingerprint_seen";
   }
   if (recentExact) score += 50000;
+  if (numberSetSeen) score += 2000;
+  if (recentNumberSet) {
+    reused = true;
+    score += 75000;
+    if (!fallbackReason) fallbackReason = "number_set_on_cooldown";
+  }
   if (templateSeen) score += 500;
   if (recentTemplate) score += 200;
+  if (contextSeen) score += 120;
+  if (recentContext) score += 600;
+  if (fingerprint.contextType !== "none") {
+    const recentModeForNumberSet = history.find(
+      (entry) =>
+        entry.numberSetFingerprint !== "" &&
+        entry.numberSetFingerprint === fingerprint.numberSetFingerprint &&
+        entry.mode !== fingerprint.mode
+    );
+    if (recentModeForNumberSet) {
+      score += 2500;
+      if (!fallbackReason) fallbackReason = "number_set_used_in_other_mode";
+    }
+  }
   if (lastExactOrder >= 0) score += Math.max(0, QUESTION_COOLDOWN - (order - lastExactOrder));
   if (lastTemplateOrder >= 0) score += Math.max(0, QUESTION_COOLDOWN - (order - lastTemplateOrder));
+  if (lastNumberSetOrder >= 0) {
+    score += Math.max(0, QUESTION_COOLDOWN - (order - lastNumberSetOrder)) * 25;
+  }
+  if (lastContextOrder >= 0) {
+    score += Math.max(0, 3 - (order - lastContextOrder)) * 15;
+  }
 
   return {
     score,
@@ -209,12 +255,15 @@ export function Year2LessonEngine({
   const questionHistoryRef = useRef<QuestionHistoryEntry[]>(
     initialTurn.fingerprint
       ? [
-          {
-            fingerprint: initialTurn.fingerprint.fingerprint,
-            templateFingerprint: initialTurn.fingerprint.templateFingerprint,
-            order: 0,
-          },
-        ]
+        {
+          fingerprint: initialTurn.fingerprint.fingerprint,
+          templateFingerprint: initialTurn.fingerprint.templateFingerprint,
+          numberSetFingerprint: initialTurn.fingerprint.numberSetFingerprint,
+          mode: initialTurn.fingerprint.mode,
+          contextType: initialTurn.fingerprint.contextType,
+          order: 0,
+        },
+      ]
       : []
   );
   const questionOrderRef = useRef(initialTurn.question ? 1 : 0);
@@ -259,6 +308,9 @@ export function Year2LessonEngine({
         {
           fingerprint: nextTurn.fingerprint.fingerprint,
           templateFingerprint: nextTurn.fingerprint.templateFingerprint,
+          numberSetFingerprint: nextTurn.fingerprint.numberSetFingerprint,
+          mode: nextTurn.fingerprint.mode,
+          contextType: nextTurn.fingerprint.contextType,
           order: questionOrderRef.current,
         },
       ];
@@ -268,6 +320,9 @@ export function Year2LessonEngine({
           lessonId: lesson.id,
           fingerprint: nextTurn.fingerprint.fingerprint,
           templateFingerprint: nextTurn.fingerprint.templateFingerprint,
+          numberSetFingerprint: nextTurn.fingerprint.numberSetFingerprint,
+          mode: nextTurn.fingerprint.mode,
+          contextType: nextTurn.fingerprint.contextType,
           reused: nextTurn.reused,
           fallbackReason: nextTurn.fallbackReason || null,
         });

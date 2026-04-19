@@ -705,6 +705,27 @@ function year3EquivalentFractionPairs() {
   ];
 }
 
+function year5EquivalentFractionPairs() {
+  return [
+    { source: { numerator: 1, denominator: 2 }, equivalent: { numerator: 2, denominator: 4 } },
+    { source: { numerator: 1, denominator: 2 }, equivalent: { numerator: 3, denominator: 6 } },
+    { source: { numerator: 1, denominator: 2 }, equivalent: { numerator: 4, denominator: 8 } },
+    { source: { numerator: 1, denominator: 3 }, equivalent: { numerator: 2, denominator: 6 } },
+    { source: { numerator: 1, denominator: 3 }, equivalent: { numerator: 3, denominator: 9 } },
+    { source: { numerator: 2, denominator: 3 }, equivalent: { numerator: 4, denominator: 6 } },
+    { source: { numerator: 2, denominator: 3 }, equivalent: { numerator: 6, denominator: 9 } },
+    { source: { numerator: 1, denominator: 4 }, equivalent: { numerator: 2, denominator: 8 } },
+    { source: { numerator: 1, denominator: 4 }, equivalent: { numerator: 3, denominator: 12 } },
+    { source: { numerator: 3, denominator: 4 }, equivalent: { numerator: 6, denominator: 8 } },
+    { source: { numerator: 3, denominator: 4 }, equivalent: { numerator: 9, denominator: 12 } },
+    { source: { numerator: 2, denominator: 5 }, equivalent: { numerator: 4, denominator: 10 } },
+    { source: { numerator: 2, denominator: 5 }, equivalent: { numerator: 6, denominator: 15 } },
+    { source: { numerator: 3, denominator: 5 }, equivalent: { numerator: 6, denominator: 10 } },
+    { source: { numerator: 3, denominator: 5 }, equivalent: { numerator: 9, denominator: 15 } },
+    { source: { numerator: 3, denominator: 8 }, equivalent: { numerator: 6, denominator: 16 } },
+  ];
+}
+
 export type OddEvenSortQuestion = {
   kind: "odd_even_sort";
   prompt: string;
@@ -3990,26 +4011,71 @@ function generateInteractiveQuestion(
   }
 
   if (activityType === "equivalent_fraction_match") {
-    const pairs = year3EquivalentFractionPairs();
+    const mode = typeof config.mode === "string" ? config.mode : undefined;
+    const pairs =
+      mode === "equivalent_fraction_visual"
+        ? year5EquivalentFractionPairs().filter((pair) => pair.equivalent.denominator <= 15)
+        : year3EquivalentFractionPairs();
     const chosen = pairs[randInt(0, pairs.length - 1)] ?? pairs[0];
+    const closeDistractors =
+      mode === "equivalent_fraction_visual"
+        ? [
+            {
+              numerator: Math.min(chosen.equivalent.denominator - 1, chosen.equivalent.numerator + 1),
+              denominator: chosen.equivalent.denominator,
+            },
+            {
+              numerator: chosen.source.numerator,
+              denominator: chosen.equivalent.denominator,
+            },
+            {
+              numerator: Math.min(chosen.equivalent.denominator - 1, chosen.equivalent.numerator),
+              denominator: Math.max(chosen.source.denominator + 1, chosen.equivalent.denominator - 1),
+            },
+          ].filter(
+            (option) =>
+              option.numerator > 0 &&
+              option.numerator < option.denominator &&
+              !(option.numerator === chosen.equivalent.numerator && option.denominator === chosen.equivalent.denominator) &&
+              !(option.numerator === chosen.source.numerator && option.denominator === chosen.source.denominator)
+          )
+        : [];
     const distractors = shuffle(
-      pairs
-        .flatMap((pair) => [pair.source, pair.equivalent])
-        .filter(
-          (option) =>
-            !(option.numerator === chosen.equivalent.numerator && option.denominator === chosen.equivalent.denominator) &&
-            !(option.numerator === chosen.source.numerator && option.denominator === chosen.source.denominator)
-        )
+      [
+        ...closeDistractors,
+        ...pairs
+          .flatMap((pair) => [pair.source, pair.equivalent])
+          .filter(
+            (option) =>
+              !(option.numerator === chosen.equivalent.numerator && option.denominator === chosen.equivalent.denominator) &&
+              !(option.numerator === chosen.source.numerator && option.denominator === chosen.source.denominator)
+          ),
+      ].filter(
+        (option, index, all) =>
+          all.findIndex(
+            (candidate) =>
+              candidate.numerator === option.numerator && candidate.denominator === option.denominator
+          ) === index
+      )
     ).slice(0, 2);
     const correctChoice = { id: "correct", ...chosen.equivalent };
     const choices = shuffle([
       correctChoice,
       ...distractors.map((option, index) => ({ id: `wrong-${index}`, ...option })),
     ]);
+    const targetLabel = fractionLabel(chosen.source.numerator, chosen.source.denominator);
+    const prompts =
+      mode === "equivalent_fraction_visual"
+        ? [
+            `Which fraction is equal to ${targetLabel}?`,
+            `Which bar model matches ${targetLabel}?`,
+            `Which pair is equivalent to ${targetLabel}?`,
+          ]
+        : [`Which bar model is equivalent to ${targetLabel}?`];
     return {
       kind: "equivalent_fraction_match",
-      prompt: `Which bar model is equivalent to ${fractionLabel(chosen.source.numerator, chosen.source.denominator)}?`,
-      targetFraction: fractionLabel(chosen.source.numerator, chosen.source.denominator),
+      prompt: prompts[randInt(0, prompts.length - 1)] ?? prompts[0],
+      targetFraction: targetLabel,
       target: { id: "target", ...chosen.source },
       choices,
       correctChoiceId: "correct",
@@ -5009,6 +5075,139 @@ function generateGenericQuestion(
 
   if (explicitMode === "division_inverse") {
     return buildYear4Week11DivisionInverseQuestion(asMultipleChoice);
+  }
+
+  if (explicitMode === "equivalent_fraction_reasoning") {
+    const templates = [
+      {
+        prompt: "Why is 2/4 equal to 1/2?",
+        answer: "The same amount is shaded",
+        options: [
+          "The same amount is shaded",
+          "The denominator is bigger",
+          "The numerator changed",
+          "Both fractions are even",
+        ],
+      },
+      {
+        prompt: "Which statement best explains why 3/4 = 6/8?",
+        answer: "Both numerator and denominator were multiplied by 2",
+        options: [
+          "Both numerator and denominator were multiplied by 2",
+          "Only the denominator doubled",
+          "8 is bigger than 4",
+          "Both fractions have the same numerator",
+        ],
+      },
+      {
+        prompt: "Which pair is NOT equivalent?",
+        answer: "3/5 and 5/10",
+        options: ["1/2 and 2/4", "2/3 and 4/6", "3/5 and 5/10", "1/4 and 2/8"],
+      },
+      {
+        prompt: "Ava says 3/4 = 6/8 because both numbers doubled. Ben says they are not equal because 8 is bigger than 4. Who is correct?",
+        answer: "Ava is correct",
+        options: ["Ava is correct", "Ben is correct", "Both are correct", "Neither is correct"],
+      },
+      {
+        prompt: "Which statement best explains why 2/6 = 1/3?",
+        answer: "Both numerator and denominator were divided by 2",
+        options: [
+          "Both numerator and denominator were divided by 2",
+          "The denominator got bigger",
+          "Both fractions have even numbers",
+          "Only the numerator changed",
+        ],
+      },
+      {
+        prompt: "Which pair is equivalent?",
+        answer: "2/5 and 4/10",
+        options: ["2/5 and 4/10", "2/5 and 5/10", "3/5 and 3/10", "1/5 and 3/10"],
+      },
+      {
+        prompt: "What happened from 2/3 to 6/9?",
+        answer: "Top and bottom were multiplied by 3",
+        options: [
+          "Top and bottom were multiplied by 3",
+          "Only the bottom was multiplied by 3",
+          "The fraction became larger",
+          "The numerator stayed the same",
+        ],
+      },
+      {
+        prompt: "Which statement is true?",
+        answer: "4/8 and 1/2 show the same value",
+        options: [
+          "4/8 and 1/2 show the same value",
+          "4/8 is bigger because 8 is bigger",
+          "1/2 is bigger because 1 is smaller",
+          "Different numbers can never be equivalent",
+        ],
+      },
+      {
+        prompt: "Which fraction does not belong with 3/4?",
+        answer: "7/8",
+        options: ["6/8", "9/12", "12/16", "7/8"],
+      },
+      {
+        prompt: "Noah says 1/3 = 3/9 because both parts were scaled by 3. Mia says they are different because the numbers changed. Who is correct?",
+        answer: "Noah is correct",
+        options: ["Noah is correct", "Mia is correct", "Both are correct", "Neither is correct"],
+      },
+      {
+        prompt: "Why can 2/5 and 6/15 be equivalent?",
+        answer: "They show the same part of the whole",
+        options: [
+          "They show the same part of the whole",
+          "They have the same denominator",
+          "They have the same numerator",
+          "15 pieces always means a bigger fraction",
+        ],
+      },
+      {
+        prompt: "Which explanation is best for 1/4 = 3/12?",
+        answer: "Each fourth was split into 3 equal parts",
+        options: [
+          "Each fourth was split into 3 equal parts",
+          "The numerator was doubled",
+          "The denominator stayed the same",
+          "12 is bigger than 4",
+        ],
+      },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: "Look for the same value, not just matching numbers.",
+    };
+  }
+
+  if (explicitMode === "equivalent_fraction_build") {
+    const templates = [
+      { prompt: "1/2 = __ / 6", answer: "3", placeholder: "Type the missing numerator" },
+      { prompt: "3/4 = __ / 8", answer: "6", placeholder: "Type the missing numerator" },
+      { prompt: "2/5 = __ / 10", answer: "4", placeholder: "Type the missing numerator" },
+      { prompt: "4/6 = 2 / __", answer: "3", placeholder: "Type the missing denominator" },
+      { prompt: "3/8 = __ / 16", answer: "6", placeholder: "Type the missing numerator" },
+      { prompt: "1/3 = __ / 9", answer: "3", placeholder: "Type the missing numerator" },
+      { prompt: "2/3 = __ / 6", answer: "4", placeholder: "Type the missing numerator" },
+      { prompt: "6/10 = 3 / __", answer: "5", placeholder: "Type the missing denominator" },
+      { prompt: "1/4 = __ / 12", answer: "3", placeholder: "Type the missing numerator" },
+      { prompt: "3/5 = __ / 15", answer: "9", placeholder: "Type the missing numerator" },
+      { prompt: "6/8 = 3 / __", answer: "4", placeholder: "Type the missing denominator" },
+      { prompt: "2/6 = 1 / __", answer: "3", placeholder: "Type the missing denominator" },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      helper: "Multiply or divide top and bottom by the same number.",
+      placeholder: chosen.placeholder,
+    };
   }
 
   if (explicitMode === "fraction_of_quantity") {

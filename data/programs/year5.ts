@@ -246,15 +246,15 @@ const year5Rows: ProgramRow[] = [
   {
     week: 7,
     weekTopic: "Fractions",
-    focus: "Develop strong fraction understanding through models and number lines",
+    focus: "Develop strong fraction understanding by recognising, building, and matching equivalent fractions",
     lesson: 1,
     topic: "Equivalent Fractions",
-    activity: "Build, match, and justify equivalent fractions.",
+    activity: "See how different fractions can show the same amount.",
     curriculum: ["AC9M5N03"],
     activities: [
-      makeActivity("equivalent_fraction_match", 2, {}),
-      makeActivity("equivalent_fraction_build", 2, {}),
-      makeActivity("equivalent_fraction_yes_no", 1, {}),
+      makeActivity("equivalent_fraction_match", 1, { mode: "equivalent_fraction_visual" }),
+      makeActivity("multiple_choice", 1, { mode: "equivalent_fraction_reasoning" }),
+      makeActivity("typed_response", 1, { mode: "equivalent_fraction_build" }),
     ],
   },
   {
