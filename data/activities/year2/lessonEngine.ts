@@ -812,6 +812,14 @@ export type TypedResponseQuestion = {
     | MultiplicationEstimateStrategyVisualData
     | DivisionRemainderCheckVisualData
     | DivisionBuildGroupsVisualData
+    | {
+        type: "equivalent_fraction_input";
+        leftNumerator: number;
+        leftDenominator: number;
+        rightNumerator?: number;
+        rightDenominator?: number;
+        missing: "numerator" | "denominator";
+      }
     | MoneyVisualData
     | RuleBoxVisualData;
 };
@@ -5080,24 +5088,14 @@ function generateGenericQuestion(
   if (explicitMode === "equivalent_fraction_reasoning") {
     const templates = [
       {
-        prompt: "Why is 2/4 equal to 1/2?",
-        answer: "The same amount is shaded",
-        options: [
-          "The same amount is shaded",
-          "The denominator is bigger",
-          "The numerator changed",
-          "Both fractions are even",
-        ],
+        prompt: "Which pair is equivalent?",
+        answer: "1/2 and 3/6",
+        options: ["1/2 and 3/6", "1/2 and 3/8", "1/2 and 2/6", "1/2 and 4/6"],
       },
       {
-        prompt: "Which statement best explains why 3/4 = 6/8?",
-        answer: "Both numerator and denominator were multiplied by 2",
-        options: [
-          "Both numerator and denominator were multiplied by 2",
-          "Only the denominator doubled",
-          "8 is bigger than 4",
-          "Both fractions have the same numerator",
-        ],
+        prompt: "Which one does not match 3/4?",
+        answer: "7/8",
+        options: ["6/8", "9/12", "12/16", "7/8"],
       },
       {
         prompt: "Which pair is NOT equivalent?",
@@ -5105,19 +5103,14 @@ function generateGenericQuestion(
         options: ["1/2 and 2/4", "2/3 and 4/6", "3/5 and 5/10", "1/4 and 2/8"],
       },
       {
-        prompt: "Ava says 3/4 = 6/8 because both numbers doubled. Ben says they are not equal because 8 is bigger than 4. Who is correct?",
-        answer: "Ava is correct",
-        options: ["Ava is correct", "Ben is correct", "Both are correct", "Neither is correct"],
+        prompt: "Choose the equivalent fraction for 2/5.",
+        answer: "4/10",
+        options: ["4/10", "5/10", "2/10", "3/5"],
       },
       {
-        prompt: "Which statement best explains why 2/6 = 1/3?",
-        answer: "Both numerator and denominator were divided by 2",
-        options: [
-          "Both numerator and denominator were divided by 2",
-          "The denominator got bigger",
-          "Both fractions have even numbers",
-          "Only the numerator changed",
-        ],
+        prompt: "Which fraction shows the same value as 2/3?",
+        answer: "6/9",
+        options: ["6/9", "2/9", "3/6", "5/9"],
       },
       {
         prompt: "Which pair is equivalent?",
@@ -5125,24 +5118,14 @@ function generateGenericQuestion(
         options: ["2/5 and 4/10", "2/5 and 5/10", "3/5 and 3/10", "1/5 and 3/10"],
       },
       {
-        prompt: "What happened from 2/3 to 6/9?",
-        answer: "Top and bottom were multiplied by 3",
-        options: [
-          "Top and bottom were multiplied by 3",
-          "Only the bottom was multiplied by 3",
-          "The fraction became larger",
-          "The numerator stayed the same",
-        ],
+        prompt: "Which fraction is equivalent to 1/4?",
+        answer: "3/12",
+        options: ["3/12", "3/8", "1/12", "4/12"],
       },
       {
-        prompt: "Which statement is true?",
-        answer: "4/8 and 1/2 show the same value",
-        options: [
-          "4/8 and 1/2 show the same value",
-          "4/8 is bigger because 8 is bigger",
-          "1/2 is bigger because 1 is smaller",
-          "Different numbers can never be equivalent",
-        ],
+        prompt: "Which pair shows the same value?",
+        answer: "3/5 and 9/15",
+        options: ["3/5 and 9/15", "3/5 and 3/15", "3/5 and 6/15", "3/5 and 5/15"],
       },
       {
         prompt: "Which fraction does not belong with 3/4?",
@@ -5150,29 +5133,24 @@ function generateGenericQuestion(
         options: ["6/8", "9/12", "12/16", "7/8"],
       },
       {
-        prompt: "Noah says 1/3 = 3/9 because both parts were scaled by 3. Mia says they are different because the numbers changed. Who is correct?",
-        answer: "Noah is correct",
-        options: ["Noah is correct", "Mia is correct", "Both are correct", "Neither is correct"],
+        prompt: "Which fraction matches 4/8?",
+        answer: "1/2",
+        options: ["1/2", "1/4", "4/6", "2/8"],
       },
       {
-        prompt: "Why can 2/5 and 6/15 be equivalent?",
-        answer: "They show the same part of the whole",
-        options: [
-          "They show the same part of the whole",
-          "They have the same denominator",
-          "They have the same numerator",
-          "15 pieces always means a bigger fraction",
-        ],
+        prompt: "Which pair is NOT equivalent?",
+        answer: "2/3 and 4/9",
+        options: ["2/3 and 4/6", "2/3 and 6/9", "1/3 and 3/9", "2/3 and 4/9"],
       },
       {
-        prompt: "Which explanation is best for 1/4 = 3/12?",
-        answer: "Each fourth was split into 3 equal parts",
-        options: [
-          "Each fourth was split into 3 equal parts",
-          "The numerator was doubled",
-          "The denominator stayed the same",
-          "12 is bigger than 4",
-        ],
+        prompt: "Choose the equivalent fraction for 3/8.",
+        answer: "6/16",
+        options: ["6/16", "3/16", "6/8", "4/16"],
+      },
+      {
+        prompt: "Which pair shows the same value?",
+        answer: "1/3 and 3/9",
+        options: ["1/3 and 3/9", "1/3 and 2/9", "2/3 and 3/9", "1/3 and 4/9"],
       },
     ] as const;
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
@@ -5187,26 +5165,34 @@ function generateGenericQuestion(
 
   if (explicitMode === "equivalent_fraction_build") {
     const templates = [
-      { prompt: "1/2 = __ / 6", answer: "3", placeholder: "Type the missing numerator" },
-      { prompt: "3/4 = __ / 8", answer: "6", placeholder: "Type the missing numerator" },
-      { prompt: "2/5 = __ / 10", answer: "4", placeholder: "Type the missing numerator" },
-      { prompt: "4/6 = 2 / __", answer: "3", placeholder: "Type the missing denominator" },
-      { prompt: "3/8 = __ / 16", answer: "6", placeholder: "Type the missing numerator" },
-      { prompt: "1/3 = __ / 9", answer: "3", placeholder: "Type the missing numerator" },
-      { prompt: "2/3 = __ / 6", answer: "4", placeholder: "Type the missing numerator" },
-      { prompt: "6/10 = 3 / __", answer: "5", placeholder: "Type the missing denominator" },
-      { prompt: "1/4 = __ / 12", answer: "3", placeholder: "Type the missing numerator" },
-      { prompt: "3/5 = __ / 15", answer: "9", placeholder: "Type the missing numerator" },
-      { prompt: "6/8 = 3 / __", answer: "4", placeholder: "Type the missing denominator" },
-      { prompt: "2/6 = 1 / __", answer: "3", placeholder: "Type the missing denominator" },
+      { left: [1, 2], right: [undefined, 6], answer: "3", missing: "numerator", prompt: "Fill in the missing numerator" },
+      { left: [3, 4], right: [undefined, 8], answer: "6", missing: "numerator", prompt: "Fill in the missing numerator" },
+      { left: [2, 5], right: [undefined, 10], answer: "4", missing: "numerator", prompt: "Fill in the missing numerator" },
+      { left: [4, 6], right: [2, undefined], answer: "3", missing: "denominator", prompt: "Fill in the missing denominator" },
+      { left: [3, 8], right: [undefined, 16], answer: "6", missing: "numerator", prompt: "Fill in the missing numerator" },
+      { left: [1, 3], right: [undefined, 9], answer: "3", missing: "numerator", prompt: "Complete the equivalent fraction" },
+      { left: [2, 3], right: [undefined, 6], answer: "4", missing: "numerator", prompt: "Complete the equivalent fraction" },
+      { left: [6, 10], right: [3, undefined], answer: "5", missing: "denominator", prompt: "Fill in the missing denominator" },
+      { left: [1, 4], right: [undefined, 12], answer: "3", missing: "numerator", prompt: "Complete the equivalent fraction" },
+      { left: [3, 5], right: [undefined, 15], answer: "9", missing: "numerator", prompt: "Fill in the missing numerator" },
+      { left: [6, 8], right: [3, undefined], answer: "4", missing: "denominator", prompt: "Fill in the missing denominator" },
+      { left: [2, 6], right: [1, undefined], answer: "3", missing: "denominator", prompt: "Complete the equivalent fraction" },
     ] as const;
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
     return {
       kind: "typed_response",
       prompt: chosen.prompt,
       answer: chosen.answer,
-      helper: "Multiply or divide top and bottom by the same number.",
-      placeholder: chosen.placeholder,
+      helper: "Same value, different name.",
+      placeholder: chosen.missing === "numerator" ? "Type numerator" : "Type denominator",
+      visual: {
+        type: "equivalent_fraction_input",
+        leftNumerator: chosen.left[0],
+        leftDenominator: chosen.left[1],
+        rightNumerator: chosen.right[0],
+        rightDenominator: chosen.right[1],
+        missing: chosen.missing,
+      },
     };
   }
 

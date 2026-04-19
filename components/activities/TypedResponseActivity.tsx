@@ -275,6 +275,74 @@ function ColumnMultiplicationWorkedExample() {
   );
 }
 
+function FixedFractionValue({
+  numerator,
+  denominator,
+}: {
+  numerator: number | undefined;
+  denominator: number | undefined;
+}) {
+  return (
+    <div className="flex flex-col items-center">
+      <div className="flex h-14 w-24 items-center justify-center rounded-t-xl border border-b-0 border-slate-300 bg-white text-3xl font-black text-slate-900">
+        {numerator}
+      </div>
+      <div className="h-1 w-24 rounded-full bg-slate-600" />
+      <div className="flex h-14 w-24 items-center justify-center rounded-b-xl border border-t-0 border-slate-300 bg-white text-3xl font-black text-slate-900">
+        {denominator}
+      </div>
+    </div>
+  );
+}
+
+function MissingFractionValue({
+  numerator,
+  denominator,
+  missing,
+  value,
+  onChange,
+}: {
+  numerator: number | undefined;
+  denominator: number | undefined;
+  missing: "numerator" | "denominator";
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const input = (
+    <input
+      type="text"
+      autoComplete="off"
+      spellCheck={false}
+      value={value}
+      onChange={(event) => onChange(event.target.value.replace(/\D/g, ""))}
+      inputMode="numeric"
+      placeholder=""
+      className="block h-14 w-24 appearance-none border border-slate-300 bg-white px-3 text-center text-3xl font-black leading-none text-slate-900 caret-teal-600 outline-none focus:border-teal-500"
+      style={{ WebkitTextFillColor: "#0f172a" }}
+    />
+  );
+
+  return (
+    <div className="flex flex-col items-center">
+      {missing === "numerator" ? (
+        <div className="overflow-hidden rounded-t-xl">{input}</div>
+      ) : (
+        <div className="flex h-14 w-24 items-center justify-center rounded-t-xl border border-b-0 border-slate-300 bg-white text-3xl font-black text-slate-900">
+          {numerator}
+        </div>
+      )}
+      <div className="h-1 w-24 rounded-full bg-slate-600" />
+      {missing === "denominator" ? (
+        <div className="overflow-hidden rounded-b-xl">{input}</div>
+      ) : (
+        <div className="flex h-14 w-24 items-center justify-center rounded-b-xl border border-t-0 border-slate-300 bg-white text-3xl font-black text-slate-900">
+          {denominator}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ColumnMultiplicationWorkspace({
   topValue,
   bottomValue,
@@ -762,6 +830,9 @@ export default function TypedResponseActivity({
   const isEstimateStrategyMultiplication = questionData.visual?.type === "multiplication_estimate_strategy";
   const isDivisionRemainderCheck = questionData.visual?.type === "division_remainder_check";
   const isDivisionBuildGroups = questionData.visual?.type === "division_build_groups";
+  const equivalentFractionInputVisual =
+    questionData.visual?.type === "equivalent_fraction_input" ? questionData.visual : null;
+  const isEquivalentFractionInput = equivalentFractionInputVisual !== null;
   const buildGroupsVisual =
     questionData.visual?.type === "division_build_groups" ? questionData.visual : null;
   const strategyVisual =
@@ -1466,6 +1537,15 @@ export default function TypedResponseActivity({
       }
 
       if (mixedNumeralsEquivalent(parsed, expectedStructuredFraction)) {
+        onCorrect?.();
+      } else {
+        onWrong?.();
+      }
+      return;
+    }
+
+    if (isEquivalentFractionInput && equivalentFractionInputVisual) {
+      if (normalizeNumberInput(typed) === String(questionData.answer)) {
         onCorrect?.();
       } else {
         onWrong?.();
@@ -2301,6 +2381,23 @@ export default function TypedResponseActivity({
                     ? "The denominator stays the same. Type the numerator."
                     : "Leave whole blank for fractions less than one."}
                 </div>
+              </div>
+            </div>
+          ) : isEquivalentFractionInput && equivalentFractionInputVisual ? (
+            <div className="w-full">
+              <div className="flex flex-wrap items-center gap-5 rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
+                <FixedFractionValue
+                  numerator={equivalentFractionInputVisual.leftNumerator}
+                  denominator={equivalentFractionInputVisual.leftDenominator}
+                />
+                <div className="text-4xl font-black text-slate-700">=</div>
+                <MissingFractionValue
+                  numerator={equivalentFractionInputVisual.rightNumerator}
+                  denominator={equivalentFractionInputVisual.rightDenominator}
+                  missing={equivalentFractionInputVisual.missing}
+                  value={typed}
+                  onChange={setTyped}
+                />
               </div>
             </div>
           ) : questionData.visual?.type === "box_method" || isColumnMultiplication || isStrategyMultiplication || isEstimateStrategyMultiplication || isDivisionRemainderCheck || isDivisionBuildGroups ? null : (
