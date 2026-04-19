@@ -15,8 +15,6 @@ const REALMS = [
   { name: "Reading Ridge", icon: BookOpen, status: "coming-soon" as const },
   { name: "Inkwell Wilds", icon: BookOpen, status: "locked" as const },
   { name: "Measurelands", icon: BookOpen, status: "locked" as const },
-  { name: "Statistica", icon: BookOpen, status: "locked" as const },
-  { name: "Chance Hollow", icon: BookOpen, status: "locked" as const },
 ];
 
 const DAYS = ["M", "T", "W", "T", "F", "S", "S"];
@@ -32,6 +30,9 @@ function getMonthGrid() {
   const monthName = now.toLocaleString("default", { month: "long" });
   return { offset, daysInMonth, today, monthName, year };
 }
+
+// ─── Tower of Knowledge palette ───
+// parchment #F5EFE0 / cream #FBF7EC / ink-navy #1C2541 / antique gold #C9A24B / burgundy #8B2E2E
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -107,7 +108,7 @@ export default function ProfilePage() {
     <main className="min-h-screen bg-[#F5EFE0] p-4 md:p-6">
       <div className="max-w-[1400px] mx-auto space-y-5">
 
-        {/* ─── TOP BAR ─── */}
+        {/* ─── TOP BAR: search left, profile + settings + logout right ─── */}
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <button
@@ -122,7 +123,6 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Profile pill + Settings + Logout */}
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-3 rounded-2xl bg-[#FBF7EC] border border-[#E8DEC4] px-3 py-2 shadow-sm">
               <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#1C2541] to-[#2A3A6B] flex items-center justify-center text-sm font-black text-[#F5EFE0] shadow-sm ring-1 ring-[#C9A24B]/30">
@@ -157,7 +157,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* ─── HERO WELCOME BANNER ─── */}
+        {/* ─── HERO BANNER ─── */}
         <div className="relative rounded-3xl bg-gradient-to-br from-[#0F1830] via-[#1C2541] to-[#2A3A6B] p-6 md:p-8 overflow-hidden shadow-[0_10px_40px_rgba(28,37,65,0.3)] border border-[#C9A24B]/20">
           <div className="absolute -top-10 -right-10 h-48 w-48 rounded-full bg-[#C9A24B]/20 blur-3xl pointer-events-none" />
           <div className="absolute bottom-0 right-0 h-32 w-32 rounded-full bg-[#C9A24B]/10 blur-2xl pointer-events-none" />
@@ -230,7 +230,7 @@ export default function ProfilePage() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {REALMS.slice(0, 4).map((realm) => {
+                {REALMS.map((realm) => {
                   const isActive = realm.status === "active";
                   const isComingSoon = realm.status === "coming-soon";
                   return (
