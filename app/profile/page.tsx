@@ -253,13 +253,13 @@ export default function ProfilePage() {
                         onClick={() => isActive && router.push("/realms")}
                         className={`relative rounded-2xl p-4 transition-all duration-200 border overflow-hidden
                           ${isActive
-                            ? "bg-gradient-to-br from-teal-50 to-emerald-50 border-teal-200 hover:border-teal-400 hover:shadow-md hover:-translate-y-0.5 cursor-pointer"
+                            ? "bg-gradient-to-br from-indigo-50 to-amber-50/40 border-indigo-200 hover:border-indigo-400 hover:shadow-md hover:-translate-y-0.5 cursor-pointer"
                             : "bg-slate-50 border-slate-200/70 opacity-60"
                           }`}
                       >
                         {isActive ? (
                           <div
-                            className="h-12 w-12 rounded-xl mb-3 bg-cover bg-center shadow-sm ring-1 ring-teal-700/10"
+                            className="h-12 w-12 rounded-xl mb-3 bg-cover bg-center shadow-sm ring-1 ring-indigo-700/10"
                             style={{ backgroundImage: `url('/images/number-nexus-tile.jpg')` }}
                           />
                         ) : (
@@ -273,17 +273,17 @@ export default function ProfilePage() {
                         {isActive ? (
                           <>
                             <div className="flex items-center gap-2 mt-2">
-                              <div className="flex-1 h-1.5 rounded-full bg-emerald-100 overflow-hidden">
+                              <div className="flex-1 h-1.5 rounded-full bg-indigo-100 overflow-hidden">
                                 <div
-                                  className="h-full rounded-full bg-gradient-to-r from-teal-500 to-emerald-600 transition-all duration-700"
+                                  className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-indigo-700 transition-all duration-700"
                                   style={{ width: `${stats.realmProgress}%` }}
                                 />
                               </div>
-                              <span className="text-[10px] font-extrabold text-emerald-700">{stats.realmProgress}%</span>
+                              <span className="text-[10px] font-extrabold text-indigo-700">{stats.realmProgress}%</span>
                             </div>
                             <button
                               onClick={(e) => { e.stopPropagation(); router.push("/home"); }}
-                              className="mt-3 inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gradient-to-br from-teal-600 to-emerald-700 text-white text-[11px] font-extrabold hover:shadow-md transition-all active:scale-95"
+                              className="mt-3 inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-900 text-white text-[11px] font-extrabold hover:bg-slate-800 transition-all active:scale-95"
                             >
                               View
                             </button>
