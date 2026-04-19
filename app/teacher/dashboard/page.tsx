@@ -799,6 +799,8 @@ export default function TeacherDashboardPage() {
               <span className="inline-flex items-center gap-1.5"><span className="h-2 w-4 rounded-full bg-amber-400" /> In progress</span>
               <span className="inline-flex items-center gap-1.5"><span className="h-2 w-4 rounded-full bg-slate-200" /> Locked</span>
             </div>
+            </>
+            )}
           </>
         )}
       </div>
