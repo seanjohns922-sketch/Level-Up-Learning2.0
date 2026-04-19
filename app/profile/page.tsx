@@ -7,7 +7,7 @@ import { readProgramStore, getWeekProgress, isWeekComplete } from "@/lib/program
 import {
   ChevronLeft, Zap, Flame, Clock, Target, Calendar,
   Lock, ChevronRight, Users, Swords, Medal,
-  TrendingUp, BookOpen, Trophy, Star, Home, Map, BarChart3, Settings, LogOut,
+  TrendingUp, BookOpen, Trophy, Star, Settings, LogOut, Sparkles,
 } from "lucide-react";
 
 const REALMS = [
