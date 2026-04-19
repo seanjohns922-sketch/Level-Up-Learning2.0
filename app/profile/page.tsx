@@ -233,7 +233,7 @@ export default function ProfilePage() {
                   <BookOpen className="h-4 w-4 text-[#0EA5A4]" />
                   Enrolled Realms
                 </h3>
-                <button className="text-xs font-semibold text-[#64748B] hover:text-[#0F172A]">See all</button>
+                <button onClick={() => router.push("/realms")} className="text-xs font-semibold text-[#64748B] hover:text-[#0F172A]">See all</button>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
