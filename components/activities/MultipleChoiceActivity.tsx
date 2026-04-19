@@ -8,7 +8,76 @@ import DecimalModelVisual from "@/components/activities/DecimalModelVisual";
 import MoneyContextVisual from "@/components/activities/MoneyContextVisual";
 import ArrayVisual from "@/components/activities/ArrayVisual";
 import RuleBoxVisual from "@/components/activities/RuleBoxVisual";
-import { MathFormattedText } from "@/components/FractionText";
+import { FractionText, MathFormattedText } from "@/components/FractionText";
+
+function FractionBar({
+  numerator,
+  denominator,
+  tone = "emerald",
+}: {
+  numerator: number;
+  denominator: number;
+  tone?: "emerald" | "amber" | "slate";
+}) {
+  const fill =
+    tone === "amber" ? "bg-amber-300" : tone === "slate" ? "bg-slate-300" : "bg-emerald-400";
+  return (
+    <div className="w-full">
+      <div
+        className="grid overflow-hidden rounded-xl border-2 border-slate-300 bg-slate-100 p-1"
+        style={{ gridTemplateColumns: `repeat(${denominator}, minmax(0, 1fr))` }}
+      >
+        {Array.from({ length: denominator }).map((_, index) => (
+          <div
+            key={index}
+            className={[
+              "h-9 rounded-[4px]",
+              index < numerator ? fill : "bg-white",
+            ].join(" ")}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SameDenominatorOperationVisual({
+  visual,
+}: {
+  visual: Extract<NonNullable<MultipleChoiceQuestion["visual"]>, { type: "same_denominator_operation" }>;
+}) {
+  return (
+    <div className="mt-5 rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
+      <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">
+        Matching Fraction Pieces
+      </div>
+      <div className="mt-4 grid gap-3 md:grid-cols-[1fr_auto_1fr_auto_1fr] md:items-center">
+        <div className="rounded-2xl bg-white p-3 shadow-sm">
+          <div className="mb-2 text-center text-lg font-black text-slate-900">
+            <FractionText value={`${visual.numeratorA}/${visual.denominator}`} />
+          </div>
+          <FractionBar numerator={visual.numeratorA} denominator={visual.denominator} />
+        </div>
+        <div className="text-center text-2xl font-black text-emerald-700">{visual.operation}</div>
+        <div className="rounded-2xl bg-white p-3 shadow-sm">
+          <div className="mb-2 text-center text-lg font-black text-slate-900">
+            <FractionText value={`${visual.numeratorB}/${visual.denominator}`} />
+          </div>
+          <FractionBar
+            numerator={visual.numeratorB}
+            denominator={visual.denominator}
+            tone={visual.operation === "+" ? "emerald" : "amber"}
+          />
+        </div>
+        <div className="text-center text-2xl font-black text-emerald-700">=</div>
+        <div className="rounded-2xl bg-white p-3 shadow-sm">
+          <div className="mb-2 text-center text-lg font-black text-slate-900">Result</div>
+          <FractionBar numerator={visual.resultNumerator} denominator={visual.denominator} />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function MultipleChoiceActivity({
   questionData,
@@ -125,6 +194,9 @@ export default function MultipleChoiceActivity({
       ) : null}
       {questionData.visual?.type === "rule_box" ? (
         <RuleBoxVisual visual={questionData.visual} title="Step-by-step rule" />
+      ) : null}
+      {questionData.visual?.type === "same_denominator_operation" ? (
+        <SameDenominatorOperationVisual visual={questionData.visual} />
       ) : null}
 
       <div className="mt-6 grid gap-2.5">

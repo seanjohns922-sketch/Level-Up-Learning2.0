@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import type { RefObject } from "react";
 import type { TypedResponseQuestion, WrittenMethodLayout } from "@/data/activities/year2/lessonEngine";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import PlaceValueMABVisual from "@/components/activities/PlaceValueMABVisual";
@@ -33,6 +34,69 @@ function extractSequenceNumbers(value: string) {
   return (value.match(/-?\d[\d,]*(?:\.\d+)?/g) ?? [])
     .map((part) => part.replace(/,/g, "").trim())
     .filter(Boolean);
+}
+
+function StackedFraction({
+  numerator,
+  denominator,
+}: {
+  numerator: number;
+  denominator: number;
+}) {
+  return (
+    <div className="inline-flex flex-col items-center rounded-xl bg-white px-4 py-3 shadow-sm">
+      <span className="text-2xl font-black leading-none text-slate-900">{numerator}</span>
+      <span className="my-1 h-1 w-12 rounded-full bg-slate-500" />
+      <span className="text-2xl font-black leading-none text-slate-900">{denominator}</span>
+    </div>
+  );
+}
+
+function SameDenominatorEquationInput({
+  visual,
+  value,
+  onChange,
+  inputRef,
+}: {
+  visual: Extract<NonNullable<TypedResponseQuestion["visual"]>, { type: "same_denominator_operation" }>;
+  value: string;
+  onChange: (value: string) => void;
+  inputRef: RefObject<HTMLInputElement | null>;
+}) {
+  return (
+    <div className="w-full rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">
+        Complete the Fraction
+      </div>
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <StackedFraction numerator={visual.numeratorA} denominator={visual.denominator} />
+        <span className="text-3xl font-black text-emerald-700">{visual.operation}</span>
+        <StackedFraction numerator={visual.numeratorB} denominator={visual.denominator} />
+        <span className="text-3xl font-black text-emerald-700">=</span>
+        <div className="inline-flex flex-col items-center rounded-xl bg-white px-4 py-3 shadow-sm">
+          <input
+            ref={inputRef}
+            type="text"
+            autoComplete="off"
+            spellCheck={false}
+            value={value}
+            onChange={(event) => onChange(event.target.value.replace(/\D/g, ""))}
+            inputMode="numeric"
+            aria-label="Missing numerator"
+            className="block h-12 w-20 appearance-none rounded-t-xl border border-b-0 border-emerald-300 bg-white px-3 text-center text-2xl font-black leading-none text-slate-900 caret-teal-600 outline-none focus:border-teal-500"
+            style={{ WebkitTextFillColor: "#0f172a" }}
+          />
+          <span className="h-1 w-20 rounded-full bg-slate-500" />
+          <span className="flex h-12 w-20 items-center justify-center rounded-b-xl border border-t-0 border-emerald-300 bg-emerald-50 text-center text-2xl font-black leading-none text-slate-800">
+            {visual.denominator}
+          </span>
+        </div>
+      </div>
+      <div className="mt-3 text-sm font-semibold text-slate-600">
+        Denominator stays fixed. Type the numerator only.
+      </div>
+    </div>
+  );
 }
 
 function columnLabel(label: string) {
@@ -833,6 +897,8 @@ export default function TypedResponseActivity({
   const equivalentFractionInputVisual =
     questionData.visual?.type === "equivalent_fraction_input" ? questionData.visual : null;
   const isEquivalentFractionInput = equivalentFractionInputVisual !== null;
+  const sameDenominatorOperationVisual =
+    questionData.visual?.type === "same_denominator_operation" ? questionData.visual : null;
   const buildGroupsVisual =
     questionData.visual?.type === "division_build_groups" ? questionData.visual : null;
   const strategyVisual =
@@ -958,98 +1024,102 @@ export default function TypedResponseActivity({
   ].join("|");
 
   useEffect(() => {
-    setTyped("");
-    setFractionWholeInput("");
-    setFractionNumeratorInput("");
-    setFractionDenominatorInput(questionData.fixedDenominator ? String(questionData.fixedDenominator) : "");
-    setColumnChartInputs({
-      carry: "",
-      onesDigit: "",
-      onesRowLeading: "",
-      tensRow: "",
-      total: "",
-    });
-    setMultiplicationStep("ones_digit");
-    setMultiplicationFeedback("");
-    if (questionData.visual?.type === "box_method") {
-      const { cells } = getBoxMethodCells(questionData.visual.leftValue, questionData.visual.topValue);
-      setBoxMethodInputs(Array.from({ length: cells.length }, () => ""));
-      setBoxMethodTotal("");
-      setBoxMethodFeedback("");
-    } else if (questionData.visual?.type === "multiplication_strategy") {
-      const { cells } = getBoxMethodCells(questionData.visual.topValue, questionData.visual.bottomValue);
-      setBoxMethodInputs(Array.from({ length: cells.length }, () => ""));
-      setBoxMethodTotal("");
-      setBoxMethodFeedback("");
-    } else {
-      setBoxMethodInputs([]);
-      setBoxMethodTotal("");
-      setBoxMethodFeedback("");
-    }
-    setSelectedStrategy(null);
-    setStrategyLocked(false);
-    setStrategyFeedback("");
-    setEstimateInput("");
-    setReasonablenessChoice(null);
-    setReasonablenessExplanation("");
-    setStrategyLongInputs({
-      carry: "",
-      onesRow: "",
-      tensRow: "",
-      total: "",
-    });
-    setStrategySplitInputs({
-      tensProduct: "",
-      onesProduct: "",
-      total: "",
-    });
-    setDivisionCheckInputs({
-      quotient: "",
-      remainder: "",
-      checkQuotient: "",
-      checkRemainder: "",
-      checkTotal: "",
-    });
-    setDivisionCheckFeedback("");
-    setRevealedGroupCount(0);
-    setBuildGroupsRemainder("");
-    setBuildGroupsFeedback("");
-    setOrderedInputs(
-      isOrderingResponse ? Array.from({ length: orderingAnswerParts.length }, () => "") : []
-    );
-    setDigitInputs(
-      writtenMethod
-        ? Array.from({ length: writtenMethod.answerLength }, () => "")
-        : []
-    );
-    setWorkingTopDigits(
-      isGuidedSubtraction && writtenMethod
-        ? writtenMethod.top.map((digit) => Number(digit || 0))
-        : []
-    );
-    setBorrowDisplay(
-      isGuidedSubtraction && writtenMethod
-        ? Array.from({ length: writtenMethod.answerLength }, () => "")
-        : []
-    );
-    setCarryDisplay(
-      isGuidedAddition && writtenMethod
-        ? Array.from({ length: writtenMethod.answerLength }, () => "")
-        : []
-    );
-    setCarryValues(
-      isGuidedAddition && writtenMethod
-        ? Array.from({ length: writtenMethod.answerLength }, () => 0)
-        : []
-    );
-    setCrossedDigits(
-      isGuidedSubtraction && writtenMethod
-        ? Array.from({ length: writtenMethod.answerLength }, () => false)
-        : []
-    );
-    setCurrentColumn(isGuidedWrittenMethod ? getLastEditableWrittenMethodColumn(writtenMethod) : -1);
-    setGuidedPhase(isGuidedWrittenMethod && writtenMethod ? "decide" : "done");
-    setGuidedFeedback("");
+    const resetTimer = setTimeout(() => {
+      setTyped("");
+      setFractionWholeInput("");
+      setFractionNumeratorInput("");
+      setFractionDenominatorInput(questionData.fixedDenominator ? String(questionData.fixedDenominator) : "");
+      setColumnChartInputs({
+        carry: "",
+        onesDigit: "",
+        onesRowLeading: "",
+        tensRow: "",
+        total: "",
+      });
+      setMultiplicationStep("ones_digit");
+      setMultiplicationFeedback("");
+      if (questionData.visual?.type === "box_method") {
+        const { cells } = getBoxMethodCells(questionData.visual.leftValue, questionData.visual.topValue);
+        setBoxMethodInputs(Array.from({ length: cells.length }, () => ""));
+        setBoxMethodTotal("");
+        setBoxMethodFeedback("");
+      } else if (questionData.visual?.type === "multiplication_strategy") {
+        const { cells } = getBoxMethodCells(questionData.visual.topValue, questionData.visual.bottomValue);
+        setBoxMethodInputs(Array.from({ length: cells.length }, () => ""));
+        setBoxMethodTotal("");
+        setBoxMethodFeedback("");
+      } else {
+        setBoxMethodInputs([]);
+        setBoxMethodTotal("");
+        setBoxMethodFeedback("");
+      }
+      setSelectedStrategy(null);
+      setStrategyLocked(false);
+      setStrategyFeedback("");
+      setEstimateInput("");
+      setReasonablenessChoice(null);
+      setReasonablenessExplanation("");
+      setStrategyLongInputs({
+        carry: "",
+        onesRow: "",
+        tensRow: "",
+        total: "",
+      });
+      setStrategySplitInputs({
+        tensProduct: "",
+        onesProduct: "",
+        total: "",
+      });
+      setDivisionCheckInputs({
+        quotient: "",
+        remainder: "",
+        checkQuotient: "",
+        checkRemainder: "",
+        checkTotal: "",
+      });
+      setDivisionCheckFeedback("");
+      setRevealedGroupCount(0);
+      setBuildGroupsRemainder("");
+      setBuildGroupsFeedback("");
+      setOrderedInputs(
+        isOrderingResponse ? Array.from({ length: orderingAnswerParts.length }, () => "") : []
+      );
+      setDigitInputs(
+        writtenMethod
+          ? Array.from({ length: writtenMethod.answerLength }, () => "")
+          : []
+      );
+      setWorkingTopDigits(
+        isGuidedSubtraction && writtenMethod
+          ? writtenMethod.top.map((digit) => Number(digit || 0))
+          : []
+      );
+      setBorrowDisplay(
+        isGuidedSubtraction && writtenMethod
+          ? Array.from({ length: writtenMethod.answerLength }, () => "")
+          : []
+      );
+      setCarryDisplay(
+        isGuidedAddition && writtenMethod
+          ? Array.from({ length: writtenMethod.answerLength }, () => "")
+          : []
+      );
+      setCarryValues(
+        isGuidedAddition && writtenMethod
+          ? Array.from({ length: writtenMethod.answerLength }, () => 0)
+          : []
+      );
+      setCrossedDigits(
+        isGuidedSubtraction && writtenMethod
+          ? Array.from({ length: writtenMethod.answerLength }, () => false)
+          : []
+      );
+      setCurrentColumn(isGuidedWrittenMethod ? getLastEditableWrittenMethodColumn(writtenMethod) : -1);
+      setGuidedPhase(isGuidedWrittenMethod && writtenMethod ? "decide" : "done");
+      setGuidedFeedback("");
+    }, 0);
+
+    return () => clearTimeout(resetTimer);
   }, [resetKey]);
 
   function normalizedDigitAnswer() {
@@ -2304,6 +2374,13 @@ export default function TypedResponseActivity({
                 ))}
               </div>
             </div>
+          ) : isStructuredFractionResponse && sameDenominatorOperationVisual && usesFixedDenominator ? (
+            <SameDenominatorEquationInput
+              visual={sameDenominatorOperationVisual}
+              value={fractionNumeratorInput}
+              onChange={setFractionNumeratorInput}
+              inputRef={numeratorRef}
+            />
           ) : isStructuredFractionResponse ? (
             <div className="flex flex-wrap items-end gap-4">
               {usesFixedDenominator ? null : (

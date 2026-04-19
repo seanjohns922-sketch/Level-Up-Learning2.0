@@ -304,14 +304,24 @@ const year5Rows: ProgramRow[] = [
   {
     week: 8,
     weekTopic: "Fraction Operations",
-    focus: "Add and subtract fractions, then apply them in context",
+    focus: "Add and subtract fractions with the same denominator",
     lesson: 1,
     topic: "Add/Subtract (same denom)",
-    activity: "Combine and subtract fractions with the same denominator.",
+    activity: "Use matching fraction pieces to add and subtract quickly.",
     curriculum: ["AC9M5N05"],
     activities: [
-      makeActivity("typed_response", 2, { mode: "same_denominator_combine" }),
-      makeActivity("multiple_choice", 1, { mode: "same_denominator_combine" }),
+      makeActivity("multiple_choice", 1, {
+        mode: "same_denominator_visual",
+        rotationRole: "fast_thinking",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "same_denominator_true_false",
+        rotationRole: "reasoning",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "same_denominator_build",
+        rotationRole: "apply_create",
+      }),
     ],
   },
   {

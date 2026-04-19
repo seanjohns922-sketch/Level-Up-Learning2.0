@@ -536,6 +536,63 @@ function fractionNumericValue(label: string) {
   return (numerator ?? 0) / denominator;
 }
 
+type SameDenominatorTemplate = {
+  numeratorA: number;
+  numeratorB: number;
+  denominator: number;
+  operation: "+" | "-";
+};
+
+function sameDenominatorResult(template: SameDenominatorTemplate) {
+  return template.operation === "+"
+    ? template.numeratorA + template.numeratorB
+    : template.numeratorA - template.numeratorB;
+}
+
+function sameDenominatorExpression(template: SameDenominatorTemplate) {
+  return `${template.numeratorA}/${template.denominator} ${template.operation} ${template.numeratorB}/${template.denominator}`;
+}
+
+function sameDenominatorAnswer(template: SameDenominatorTemplate) {
+  return `${sameDenominatorResult(template)}/${template.denominator}`;
+}
+
+function year5SameDenominatorTemplates(): SameDenominatorTemplate[] {
+  return [
+    { numeratorA: 1, numeratorB: 2, denominator: 5, operation: "+" },
+    { numeratorA: 3, numeratorB: 1, denominator: 5, operation: "+" },
+    { numeratorA: 4, numeratorB: 2, denominator: 5, operation: "-" },
+    { numeratorA: 2, numeratorB: 3, denominator: 6, operation: "+" },
+    { numeratorA: 5, numeratorB: 1, denominator: 6, operation: "-" },
+    { numeratorA: 4, numeratorB: 2, denominator: 7, operation: "+" },
+    { numeratorA: 6, numeratorB: 3, denominator: 7, operation: "-" },
+    { numeratorA: 3, numeratorB: 2, denominator: 8, operation: "+" },
+    { numeratorA: 7, numeratorB: 4, denominator: 8, operation: "-" },
+    { numeratorA: 4, numeratorB: 3, denominator: 9, operation: "+" },
+    { numeratorA: 8, numeratorB: 2, denominator: 9, operation: "-" },
+    { numeratorA: 5, numeratorB: 3, denominator: 10, operation: "+" },
+    { numeratorA: 7, numeratorB: 4, denominator: 10, operation: "-" },
+    { numeratorA: 6, numeratorB: 1, denominator: 8, operation: "-" },
+    { numeratorA: 3, numeratorB: 3, denominator: 5, operation: "+" },
+    { numeratorA: 4, numeratorB: 3, denominator: 6, operation: "+" },
+    { numeratorA: 5, numeratorB: 4, denominator: 8, operation: "+" },
+  ];
+}
+
+function sameDenominatorOptions(template: SameDenominatorTemplate) {
+  const result = sameDenominatorResult(template);
+  const denominator = template.denominator;
+  const answer = `${result}/${denominator}`;
+  const changedDenominator = `${result}/${Math.max(2, denominator + denominator)}`;
+  const firstNumerator = `${template.numeratorA}/${denominator}`;
+  const offByOne = `${Math.max(0, result + (template.operation === "+" ? -1 : 1))}/${denominator}`;
+  const wrongOperation =
+    template.operation === "+"
+      ? `${Math.max(0, template.numeratorA - template.numeratorB)}/${denominator}`
+      : `${template.numeratorA + template.numeratorB}/${denominator}`;
+  return shuffle(uniqueStringOptions(answer, [changedDenominator, firstNumerator, offByOne, wrongOperation]));
+}
+
 function year3FractionOrderSets() {
   return [
     ["1/5", "1/2", "4/5"],
@@ -764,6 +821,15 @@ export type SkipCountQuestion = {
   visualGroups?: number[];
 };
 
+export type SameDenominatorOperationVisualData = {
+  type: "same_denominator_operation";
+  numeratorA: number;
+  numeratorB: number;
+  denominator: number;
+  operation: "+" | "-";
+  resultNumerator: number;
+};
+
 export type MultipleChoiceQuestion = {
   kind: "multiple_choice";
   prompt: string;
@@ -786,6 +852,7 @@ export type MultipleChoiceQuestion = {
     | MABVisualData
     | DecimalVisualData
     | MoneyVisualData
+    | SameDenominatorOperationVisualData
     | RuleBoxVisualData;
 };
 
@@ -825,6 +892,7 @@ export type TypedResponseQuestion = {
     | MultiplicationEstimateStrategyVisualData
     | DivisionRemainderCheckVisualData
     | DivisionBuildGroupsVisualData
+    | SameDenominatorOperationVisualData
     | {
         type: "equivalent_fraction_input";
         leftNumerator: number;
@@ -5358,6 +5426,75 @@ function generateGenericQuestion(
         rightDenominator: chosen.right[1],
         missing: chosen.missing,
       },
+    };
+  }
+
+  if (
+    explicitMode === "same_denominator_visual" ||
+    explicitMode === "same_denominator_true_false" ||
+    explicitMode === "same_denominator_build"
+  ) {
+    const templates =
+      explicitMode === "same_denominator_visual"
+        ? year5SameDenominatorTemplates().filter((template) => sameDenominatorResult(template) <= template.denominator)
+        : year5SameDenominatorTemplates();
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    const expression = sameDenominatorExpression(chosen);
+    const answer = sameDenominatorAnswer(chosen);
+    const resultNumerator = sameDenominatorResult(chosen);
+    const visual: SameDenominatorOperationVisualData = {
+      type: "same_denominator_operation",
+      numeratorA: chosen.numeratorA,
+      numeratorB: chosen.numeratorB,
+      denominator: chosen.denominator,
+      operation: chosen.operation,
+      resultNumerator,
+    };
+
+    if (explicitMode === "same_denominator_true_false") {
+      const makeTrue = randInt(0, 1) === 0;
+      const wrongNumerator =
+        chosen.operation === "+"
+          ? resultNumerator + (randInt(0, 1) === 0 ? -1 : 1)
+          : resultNumerator + (randInt(0, 1) === 0 ? 1 : chosen.numeratorB);
+      const wrongDenominator = randInt(0, 2) === 0 ? chosen.denominator + chosen.denominator : chosen.denominator;
+      const displayedAnswer = makeTrue
+        ? answer
+        : `${Math.max(0, wrongNumerator)}/${wrongDenominator}`;
+      return {
+        kind: "multiple_choice",
+        prompt: `${expression} = ${displayedAnswer}`,
+        options: ["True", "False"],
+        answer: makeTrue ? "True" : "False",
+        helper: "Keep the denominator the same.",
+      };
+    }
+
+    if (explicitMode === "same_denominator_visual") {
+      return {
+        kind: "multiple_choice",
+        prompt: `What is ${expression}?`,
+        options: sameDenominatorOptions(chosen),
+        answer,
+        helper:
+          chosen.operation === "+"
+            ? "Add the shaded parts."
+            : "Remove the shaded parts.",
+        visual,
+      };
+    }
+
+    return {
+      kind: "typed_response",
+      prompt: "Fill in the missing numerator",
+      answer,
+      helper:
+        chosen.operation === "+"
+          ? "Add the top numbers."
+          : "Subtract the top numbers.",
+      placeholder: "Type numerator",
+      fixedDenominator: chosen.denominator,
+      visual,
     };
   }
 
