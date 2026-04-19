@@ -281,18 +281,35 @@ function buildStructuredQuizSources(lesson: Lesson): LessonActivity[] {
     }
     console.error(`[StructuredQuizPolicy] ${lesson.title}: ${summary}`);
   }
-  return activities.filter((activity) => {
+  const isClearlyPracticeOnly = (activity: LessonActivity) => {
+    const mode = typeof activity.config?.mode === "string" ? String(activity.config.mode) : "";
+    return mode.includes("whos_right") || mode.includes("spot_pattern_reasoning");
+  };
+
+  const quizSafeReasoningModes = new Set([
+    "equivalent_fraction_reasoning",
+    "equivalent_to_compare",
+    "identify_fraction_point",
+  ]);
+
+  const filtered = activities.filter((activity) => {
     const rotationRole =
       typeof activity.config?.rotationRole === "string" ? String(activity.config.rotationRole) : "";
     const mode = typeof activity.config?.mode === "string" ? String(activity.config.mode) : "";
-    if (rotationRole === "reasoning" && !mode.includes("reasoning_check")) {
+    if (
+      rotationRole === "reasoning" &&
+      !mode.includes("reasoning_check") &&
+      !quizSafeReasoningModes.has(mode)
+    ) {
       return false;
     }
-    if (mode.includes("whos_right") || mode.includes("spot_pattern_reasoning")) {
+    if (isClearlyPracticeOnly(activity)) {
       return false;
     }
     return true;
   });
+
+  return filtered.length > 0 ? filtered : activities.filter((activity) => !isClearlyPracticeOnly(activity));
 }
 
 function isQuizSafeGeneratedQuestion(questionData: Year2QuestionData) {
