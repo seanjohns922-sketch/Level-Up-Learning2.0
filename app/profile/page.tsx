@@ -181,9 +181,6 @@ export default function ProfilePage() {
                 Continue Lessons <ChevronRight className="h-4 w-4" />
               </button>
             </div>
-            <div className="hidden md:flex items-center justify-center h-24 w-24 rounded-2xl bg-white/[0.03] border border-[#F59E0B]/30 flex-shrink-0">
-              <Trophy className="h-10 w-10 text-[#F59E0B]" strokeWidth={1.5} />
-            </div>
           </div>
         </div>
 
