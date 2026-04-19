@@ -303,6 +303,24 @@ export default function ProfilePage() {
                 ))}
               </div>
             </div>
+
+            {/* Coming Soon — social teaser, sits below Your Wins, aligned with Level Progress */}
+            <div className="rounded-2xl bg-[#FBF7EC] border border-[#E8DEC4] px-6 py-4 flex flex-wrap items-center justify-center gap-6 shadow-sm">
+              {[
+                { icon: Users, label: "Friends", color: "text-[#1C2541]" },
+                { icon: Swords, label: "Battles", color: "text-[#8B2E2E]" },
+                { icon: Medal, label: "Rankings", color: "text-[#C9A24B]" },
+              ].map((item) => (
+                <div key={item.label} className="flex items-center gap-1.5 opacity-50">
+                  <item.icon className={`h-4 w-4 ${item.color}`} />
+                  <span className="text-[10px] font-bold text-[#1C2541]/60 uppercase tracking-wider">{item.label}</span>
+                </div>
+              ))}
+              <div className="flex items-center gap-1.5 pl-3 border-l border-[#E8DEC4]">
+                <Lock className="h-3 w-3 text-[#1C2541]/30" />
+                <span className="text-[9px] font-bold text-[#1C2541]/45 uppercase tracking-[0.15em]">Coming Soon</span>
+              </div>
+            </div>
           </div>
 
           {/* RIGHT RAIL */}
