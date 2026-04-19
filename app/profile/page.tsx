@@ -115,7 +115,7 @@ export default function ProfilePage() {
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <button
               onClick={() => router.back()}
-              className="lg:hidden h-10 w-10 rounded-xl bg-white border border-[#E6E8EC] flex items-center justify-center text-[#0F172A] hover:bg-[#F1F5F9] transition-all"
+              className="h-10 w-10 rounded-xl bg-white border border-[#E6E8EC] flex items-center justify-center text-[#0F172A] hover:bg-[#F1F5F9] transition-all flex-shrink-0"
               aria-label="Back"
             >
               <ChevronLeft className="h-4 w-4" />
