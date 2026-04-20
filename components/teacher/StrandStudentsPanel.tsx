@@ -126,11 +126,6 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
   const prefix = lessonIdPrefix(yearLabel);
   const plan = useMemo(() => getCurriculumPlan(yearLabel, genreId), [yearLabel, genreId]);
 
-  const yearProg = useMemo(
-    () => progress.filter((p) => p.year === yearLabel),
-    [progress, yearLabel]
-  );
-
   function getProg(studentId: string, year: string) {
     return progress.find((p) => p.student_id === studentId && p.year === year);
   }
