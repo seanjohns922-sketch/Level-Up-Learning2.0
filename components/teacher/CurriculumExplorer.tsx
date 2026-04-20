@@ -78,6 +78,51 @@ export default function CurriculumExplorer({
     return total === 0 ? 0 : Math.round((done / total) * 100);
   }
 
+  function parseQuiz(raw: any): Record<string, any> {
+    return raw && typeof raw === "object" ? raw : {};
+  }
+
+  /** Class average quiz accuracy % for a week (across all students who attempted). */
+  function weekAvgAccuracy(w: number): { avg: number; attempts: number } {
+    let sum = 0;
+    let n = 0;
+    for (const p of yearProgress) {
+      const qs = parseQuiz(p.quiz_scores);
+      const wq = qs[String(w)];
+      if (wq && typeof wq.percent === "number") {
+        sum += wq.percent;
+        n += 1;
+      }
+    }
+    return { avg: n === 0 ? 0 : Math.round(sum / n), attempts: n };
+  }
+
+  /** Class average per-lesson accuracy from weekly quiz lessonBreakdown. */
+  function lessonAvgAccuracy(w: number, lessonNumber: number): { avg: number; attempts: number } {
+    let sumCorrect = 0;
+    let sumTotal = 0;
+    let n = 0;
+    for (const p of yearProgress) {
+      const qs = parseQuiz(p.quiz_scores);
+      const wq = qs[String(w)];
+      const lb = Array.isArray(wq?.lessonBreakdown) ? wq.lessonBreakdown : [];
+      const item = lb.find((x: any) => Number(x?.lessonNumber) === lessonNumber);
+      if (item && typeof item.correct === "number" && typeof item.total === "number" && item.total > 0) {
+        sumCorrect += item.correct;
+        sumTotal += item.total;
+        n += 1;
+      }
+    }
+    return { avg: sumTotal === 0 ? 0 : Math.round((sumCorrect / sumTotal) * 100), attempts: n };
+  }
+
+  function accTone(avg: number, attempts: number) {
+    if (attempts === 0) return "bg-slate-50 text-slate-400 border-slate-200";
+    if (avg >= 80) return "bg-emerald-50 text-emerald-700 border-emerald-200";
+    if (avg >= 60) return "bg-amber-50 text-amber-700 border-amber-200";
+    return "bg-rose-50 text-rose-700 border-rose-200";
+  }
+
   return (
     <div className="space-y-5">
       {/* Genre row */}
