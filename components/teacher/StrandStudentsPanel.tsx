@@ -88,6 +88,25 @@ function timeAgo(iso?: string): string {
   return `${Math.floor(d / 30)}mo ago`;
 }
 
+const YEAR_ORDER = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"];
+function yearOrdinal(label: string): number {
+  const i = YEAR_ORDER.indexOf(label);
+  return i === -1 ? 0 : i;
+}
+
+/** Pick the most relevant year for a student from their progress rows. */
+function pickStudentYear(rows: ProgressRow[], fallback: string): string {
+  if (rows.length === 0) return fallback;
+  // Prefer the most recently updated row; otherwise highest year ordinal.
+  const sorted = [...rows].sort((a, b) => {
+    const tA = a.updated_at ? new Date(a.updated_at).getTime() : 0;
+    const tB = b.updated_at ? new Date(b.updated_at).getTime() : 0;
+    if (tA !== tB) return tB - tA;
+    return yearOrdinal(b.year) - yearOrdinal(a.year);
+  });
+  return sorted[0].year;
+}
+
 export default function StrandStudentsPanel({ yearLabel, students, progress }: Props) {
   const genres = getGenresForYear(yearLabel);
   const firstAvail = genres.find((g) => g.available) ?? genres[0];
