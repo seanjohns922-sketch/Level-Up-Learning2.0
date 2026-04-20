@@ -8,6 +8,8 @@ import {
   DEFAULT_LESSON_XP,
   type Genre,
 } from "@/data/programs/genres";
+import type { Lesson } from "@/data/programs/year1";
+import LessonPreviewDrawer from "./LessonPreviewDrawer";
 
 type ProgressLike = {
   student_id: string;
