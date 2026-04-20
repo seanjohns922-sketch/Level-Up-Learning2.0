@@ -226,8 +226,21 @@ export default function CurriculumExplorer({
                 <h2 className="text-xl font-black text-[#0F172A] mt-0.5 tracking-tight">
                   Week {week?.week} — {week?.topic}
                 </h2>
-                <div className="text-xs font-semibold text-[#64748B] mt-1">
-                  {yearLabel} · {studentCount} student{studentCount === 1 ? "" : "s"} · class avg {weekAvgPct(week?.week ?? 1)}%
+                <div className="text-xs font-semibold text-[#64748B] mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <span>{yearLabel} · {studentCount} student{studentCount === 1 ? "" : "s"}</span>
+                  <span>· class avg <b className="text-[#0F172A]">{weekAvgPct(week?.week ?? 1)}%</b> done</span>
+                  {(() => {
+                    const acc = weekAvgAccuracy(week?.week ?? 1);
+                    return (
+                      <span>
+                        · quiz avg{" "}
+                        <b className={acc.attempts === 0 ? "text-[#94A3B8]" : acc.avg >= 80 ? "text-emerald-700" : acc.avg >= 60 ? "text-amber-700" : "text-rose-700"}>
+                          {acc.attempts === 0 ? "—" : `${acc.avg}%`}
+                        </b>
+                        <span className="text-[#94A3B8]"> ({acc.attempts} attempt{acc.attempts === 1 ? "" : "s"})</span>
+                      </span>
+                    );
+                  })()}
                 </div>
               </div>
               <button
