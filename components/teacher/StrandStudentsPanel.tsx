@@ -8,7 +8,9 @@ import {
   DEFAULT_LESSON_XP,
   type Genre,
 } from "@/data/programs/genres";
+import type { Lesson } from "@/data/programs/year1";
 import { getLatestPosttestProfile } from "@/data/assessments/analysis";
+import LessonPreviewDrawer from "./LessonPreviewDrawer";
 
 type StudentRow = {
   id: string;
