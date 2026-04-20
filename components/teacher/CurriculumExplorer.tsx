@@ -14,6 +14,7 @@ type ProgressLike = {
   year: string;
   week: number | null;
   completed_lesson_ids: any;
+  quiz_scores?: any;
 };
 
 type Props = {
@@ -78,6 +79,51 @@ export default function CurriculumExplorer({
     return total === 0 ? 0 : Math.round((done / total) * 100);
   }
 
+  function parseQuiz(raw: any): Record<string, any> {
+    return raw && typeof raw === "object" ? raw : {};
+  }
+
+  /** Class average quiz accuracy % for a week (across all students who attempted). */
+  function weekAvgAccuracy(w: number): { avg: number; attempts: number } {
+    let sum = 0;
+    let n = 0;
+    for (const p of yearProgress) {
+      const qs = parseQuiz(p.quiz_scores);
+      const wq = qs[String(w)];
+      if (wq && typeof wq.percent === "number") {
+        sum += wq.percent;
+        n += 1;
+      }
+    }
+    return { avg: n === 0 ? 0 : Math.round(sum / n), attempts: n };
+  }
+
+  /** Class average per-lesson accuracy from weekly quiz lessonBreakdown. */
+  function lessonAvgAccuracy(w: number, lessonNumber: number): { avg: number; attempts: number } {
+    let sumCorrect = 0;
+    let sumTotal = 0;
+    let n = 0;
+    for (const p of yearProgress) {
+      const qs = parseQuiz(p.quiz_scores);
+      const wq = qs[String(w)];
+      const lb = Array.isArray(wq?.lessonBreakdown) ? wq.lessonBreakdown : [];
+      const item = lb.find((x: any) => Number(x?.lessonNumber) === lessonNumber);
+      if (item && typeof item.correct === "number" && typeof item.total === "number" && item.total > 0) {
+        sumCorrect += item.correct;
+        sumTotal += item.total;
+        n += 1;
+      }
+    }
+    return { avg: sumTotal === 0 ? 0 : Math.round((sumCorrect / sumTotal) * 100), attempts: n };
+  }
+
+  function accTone(avg: number, attempts: number) {
+    if (attempts === 0) return "bg-slate-50 text-slate-400 border-slate-200";
+    if (avg >= 80) return "bg-emerald-50 text-emerald-700 border-emerald-200";
+    if (avg >= 60) return "bg-amber-50 text-amber-700 border-amber-200";
+    return "bg-rose-50 text-rose-700 border-rose-200";
+  }
+
   return (
     <div className="space-y-5">
       {/* Genre row */}
@@ -127,6 +173,7 @@ export default function CurriculumExplorer({
             {plan.map((w) => {
               const active = w.week === weekNum;
               const pct = weekAvgPct(w.week);
+              const acc = weekAvgAccuracy(w.week);
               return (
                 <button
                   key={w.week}
@@ -150,8 +197,16 @@ export default function CurriculumExplorer({
                       style={{ width: `${pct}%` }}
                     />
                   </div>
-                  <div className="mt-1 text-[10px] font-bold text-[#64748B] tabular-nums">
-                    {pct}% class avg
+                  <div className="mt-1 flex items-center justify-between gap-1">
+                    <span className="text-[10px] font-bold text-[#64748B] tabular-nums">
+                      {pct}% done
+                    </span>
+                    <span
+                      title={acc.attempts === 0 ? "No quiz attempts yet" : `Quiz accuracy avg across ${acc.attempts} student${acc.attempts === 1 ? "" : "s"}`}
+                      className={`text-[9px] font-extrabold tabular-nums px-1.5 py-0.5 rounded border ${accTone(acc.avg, acc.attempts)}`}
+                    >
+                      {acc.attempts === 0 ? "—" : `${acc.avg}%`}
+                    </span>
                   </div>
                 </button>
               );
@@ -171,8 +226,21 @@ export default function CurriculumExplorer({
                 <h2 className="text-xl font-black text-[#0F172A] mt-0.5 tracking-tight">
                   Week {week?.week} — {week?.topic}
                 </h2>
-                <div className="text-xs font-semibold text-[#64748B] mt-1">
-                  {yearLabel} · {studentCount} student{studentCount === 1 ? "" : "s"} · class avg {weekAvgPct(week?.week ?? 1)}%
+                <div className="text-xs font-semibold text-[#64748B] mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <span>{yearLabel} · {studentCount} student{studentCount === 1 ? "" : "s"}</span>
+                  <span>· class avg <b className="text-[#0F172A]">{weekAvgPct(week?.week ?? 1)}%</b> done</span>
+                  {(() => {
+                    const acc = weekAvgAccuracy(week?.week ?? 1);
+                    return (
+                      <span>
+                        · quiz avg{" "}
+                        <b className={acc.attempts === 0 ? "text-[#94A3B8]" : acc.avg >= 80 ? "text-emerald-700" : acc.avg >= 60 ? "text-amber-700" : "text-rose-700"}>
+                          {acc.attempts === 0 ? "—" : `${acc.avg}%`}
+                        </b>
+                        <span className="text-[#94A3B8]"> ({acc.attempts} attempt{acc.attempts === 1 ? "" : "s"})</span>
+                      </span>
+                    );
+                  })()}
                 </div>
               </div>
               <button
@@ -194,6 +262,7 @@ export default function CurriculumExplorer({
           <div className="grid md:grid-cols-3 gap-3">
             {(week?.lessons ?? []).map((lsn) => {
               const counts = lessonStatusCounts(lsn.id);
+              const lacc = lessonAvgAccuracy(week?.week ?? 1, lsn.lesson);
               return (
                 <div
                   key={lsn.id}
@@ -214,6 +283,24 @@ export default function CurriculumExplorer({
                     <div className="text-xs text-[#64748B] mt-1 leading-relaxed line-clamp-3">
                       {lsn.focus}
                     </div>
+                  </div>
+
+                  {/* Class avg accuracy on this lesson's quiz questions */}
+                  <div
+                    className={`rounded-lg border px-2.5 py-1.5 flex items-center justify-between ${accTone(lacc.avg, lacc.attempts)}`}
+                    title={lacc.attempts === 0
+                      ? "No students have attempted this week's quiz yet"
+                      : `Average % correct on Lesson ${lsn.lesson} quiz questions across ${lacc.attempts} student${lacc.attempts === 1 ? "" : "s"}`}
+                  >
+                    <span className="text-[9px] font-extrabold uppercase tracking-wider opacity-80">
+                      Quiz Accuracy
+                    </span>
+                    <span className="text-[12px] font-black tabular-nums">
+                      {lacc.attempts === 0 ? "—" : `${lacc.avg}%`}
+                      <span className="text-[9px] font-bold opacity-70 ml-1">
+                        ({lacc.attempts})
+                      </span>
+                    </span>
                   </div>
 
                   {/* Status counts */}
