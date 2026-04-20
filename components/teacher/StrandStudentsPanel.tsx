@@ -91,6 +91,14 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
   const firstAvail = genres.find((g) => g.available) ?? genres[0];
   const [genreId, setGenreId] = useState<string>(firstAvail.id);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  type SortKey = "name" | "level" | "week" | "status" | "tower";
+  const [sortKey, setSortKey] = useState<SortKey>("name");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+
+  function toggleSort(k: SortKey) {
+    if (sortKey === k) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else { setSortKey(k); setSortDir(k === "name" ? "asc" : "desc"); }
+  }
 
   const genre = genres.find((g) => g.id === genreId)!;
   const isPlaceholder = !genre.available;
