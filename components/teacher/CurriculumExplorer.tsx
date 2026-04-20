@@ -42,6 +42,7 @@ export default function CurriculumExplorer({
   const firstAvailable = genres.find((g) => g.available) ?? genres[0];
   const [genreId, setGenreId] = useState<string>(firstAvailable.id);
   const [weekNum, setWeekNum] = useState<number>(1);
+  const [previewLesson, setPreviewLesson] = useState<Lesson | null>(null);
 
   const genre: Genre | undefined = genres.find((g) => g.id === genreId);
   const plan = useMemo(
