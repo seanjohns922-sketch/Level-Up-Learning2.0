@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { Lesson } from "@/data/programs/year1";
 import { DEFAULT_LESSON_XP } from "@/data/programs/genres";
 
