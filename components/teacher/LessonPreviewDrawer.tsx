@@ -339,19 +339,57 @@ export default function LessonPreviewDrawer({
           {/* Activity breakdown */}
           <Section title="Activity breakdown (3 rotations)">
             <div className="space-y-2">
-              {ideas.map((idea, i) => (
-                <div key={i} className="rounded-xl border border-[#E6E8EC] bg-[#FAFBFC] p-3">
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center justify-center h-6 w-6 rounded-md bg-teal-50 text-teal-700 text-[11px] font-black">
-                      {i + 1}
-                    </span>
-                    <span className="text-sm font-bold text-[#0F172A]">{idea}</span>
+              {ideas.map((idea, i) => {
+                const isOpen = openIdx === i;
+                const ex = exampleForActivity(idea);
+                return (
+                  <div key={i} className="rounded-xl border border-[#E6E8EC] bg-[#FAFBFC] overflow-hidden">
+                    <button
+                      onClick={() => setOpenIdx(isOpen ? null : i)}
+                      className="w-full text-left p-3 hover:bg-white transition-colors"
+                      aria-expanded={isOpen}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex items-center justify-center h-6 w-6 rounded-md bg-teal-50 text-teal-700 text-[11px] font-black">
+                          {i + 1}
+                        </span>
+                        <span className="text-sm font-bold text-[#0F172A] flex-1">{idea}</span>
+                        <span className="text-[11px] font-bold text-teal-700">{isOpen ? "Hide example ▴" : "See example ▾"}</span>
+                      </div>
+                      <div className="text-[11px] text-[#64748B] mt-1 leading-relaxed pl-8">
+                        {describeActivity(idea)}
+                      </div>
+                    </button>
+                    {isOpen && (
+                      <div className="border-t border-[#E6E8EC] bg-white px-3 py-3 space-y-2.5">
+                        <div className="text-[10px] font-extrabold text-teal-700 uppercase tracking-wider">Example question</div>
+                        <div className="text-sm font-semibold text-[#0F172A]">{ex.prompt}</div>
+                        {ex.visual && <div>{ex.visual}</div>}
+                        {ex.options && (
+                          <div className="grid grid-cols-2 gap-1.5">
+                            {ex.options.map((opt) => {
+                              const isCorrect = opt === ex.correct;
+                              return (
+                                <div
+                                  key={opt}
+                                  className={`rounded-lg border px-2.5 py-2 text-xs font-bold ${
+                                    isCorrect
+                                      ? "bg-emerald-50 border-emerald-300 text-emerald-800"
+                                      : "bg-white border-[#E6E8EC] text-[#0F172A]"
+                                  }`}
+                                >
+                                  {opt}{isCorrect ? " ✓" : ""}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                        <div className="text-[11px] text-[#64748B] italic leading-relaxed">{ex.note}</div>
+                      </div>
+                    )}
                   </div>
-                  <div className="text-[11px] text-[#64748B] mt-1 leading-relaxed pl-8">
-                    {describeActivity(idea)}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </Section>
 
