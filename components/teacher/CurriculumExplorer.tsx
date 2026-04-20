@@ -347,6 +347,30 @@ export default function CurriculumExplorer({
           </div>
         </div>
       </div>
+
+      <LessonPreviewDrawer
+        open={!!previewLesson}
+        onClose={() => setPreviewLesson(null)}
+        lesson={previewLesson}
+        weekNumber={week?.week}
+        weekTopic={week?.topic}
+        strand={genre?.strand}
+        realm={genre?.realm}
+        yearLabel={yearLabel}
+        isPlaceholder={isPlaceholder}
+        classStats={previewLesson ? (() => {
+          const c = lessonStatusCounts(previewLesson.id);
+          const a = lessonAvgAccuracy(week?.week ?? 1, previewLesson.lesson);
+          return {
+            studentCount,
+            completed: c.completed,
+            inProgress: c.inProgress,
+            notStarted: c.notStarted,
+            quizAvg: a.avg,
+            quizAttempts: a.attempts,
+          };
+        })() : null}
+      />
     </div>
   );
 }
