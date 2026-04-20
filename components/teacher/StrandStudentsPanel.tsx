@@ -8,7 +8,9 @@ import {
   DEFAULT_LESSON_XP,
   type Genre,
 } from "@/data/programs/genres";
+import type { Lesson } from "@/data/programs/year1";
 import { getLatestPosttestProfile } from "@/data/assessments/analysis";
+import LessonPreviewDrawer from "./LessonPreviewDrawer";
 
 type StudentRow = {
   id: string;
@@ -290,6 +292,7 @@ function StudentStrandDetail({
   const ids = prog ? parseCompleted(prog.completed_lesson_ids) : [];
   const currentWeek = prog?.week ?? 1;
   const [selectedWeek, setSelectedWeek] = useState<number>(currentWeek);
+  const [previewLesson, setPreviewLesson] = useState<Lesson | null>(null);
 
   const quizScores: Record<string, any> =
     prog?.quiz_scores && typeof prog.quiz_scores === "object" ? (prog.quiz_scores as any) : {};
@@ -409,10 +412,13 @@ function StudentStrandDetail({
             {week.lessons.map((lsn) => {
               const done = !isPlaceholder && ids.includes(lsn.id);
               return (
-                <div
+                <button
                   key={lsn.id}
+                  type="button"
+                  onClick={() => setPreviewLesson(lsn)}
+                  title="Click to preview lesson content"
                   className={[
-                    "rounded-xl border p-3 flex flex-col gap-2",
+                    "text-left rounded-xl border p-3 flex flex-col gap-2 transition hover:border-teal-300 hover:shadow-sm cursor-pointer",
                     done ? "border-emerald-200 bg-emerald-50/40" : "border-[#E6E8EC] bg-white",
                   ].join(" ")}
                 >
@@ -437,15 +443,11 @@ function StudentStrandDetail({
                     <span className="text-[10px] font-extrabold text-amber-700 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-md">
                       {DEFAULT_LESSON_XP} XP
                     </span>
-                    <button
-                      disabled
-                      title="Coming soon"
-                      className="text-[10px] font-bold text-[#64748B] bg-[#F1F5F9] px-2 py-1 rounded cursor-not-allowed"
-                    >
-                      Assign
-                    </button>
+                    <span className="text-[10px] font-extrabold text-teal-700">
+                      Preview →
+                    </span>
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
@@ -498,6 +500,32 @@ function StudentStrandDetail({
           ))}
         </ul>
       </div>
+
+      <LessonPreviewDrawer
+        open={!!previewLesson}
+        onClose={() => setPreviewLesson(null)}
+        lesson={previewLesson}
+        weekNumber={previewLesson?.week}
+        weekTopic={plan.find((p) => p.week === previewLesson?.week)?.topic}
+        strand={genre.strand}
+        realm={genre.realm}
+        yearLabel={yearLabel}
+        isPlaceholder={isPlaceholder}
+        student={previewLesson ? {
+          id: student.id,
+          display_name: student.display_name,
+          status: ids.includes(previewLesson.id) ? "Completed" : (previewLesson.week === currentWeek ? "In Progress" : "Not Started"),
+          attempts: ids.includes(previewLesson.id) ? 1 : 0,
+          quizPercent: (() => {
+            const q = quizScores[String(previewLesson.week)];
+            return q?.percent ?? null;
+          })(),
+          quizPassed: (() => {
+            const q = quizScores[String(previewLesson.week)];
+            return q?.passed ?? null;
+          })(),
+        } : null}
+      />
     </div>
   );
 }

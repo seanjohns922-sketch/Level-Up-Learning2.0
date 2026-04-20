@@ -8,6 +8,8 @@ import {
   DEFAULT_LESSON_XP,
   type Genre,
 } from "@/data/programs/genres";
+import type { Lesson } from "@/data/programs/year1";
+import LessonPreviewDrawer from "./LessonPreviewDrawer";
 
 type ProgressLike = {
   student_id: string;
@@ -40,6 +42,7 @@ export default function CurriculumExplorer({
   const firstAvailable = genres.find((g) => g.available) ?? genres[0];
   const [genreId, setGenreId] = useState<string>(firstAvailable.id);
   const [weekNum, setWeekNum] = useState<number>(1);
+  const [previewLesson, setPreviewLesson] = useState<Lesson | null>(null);
 
   const genre: Genre | undefined = genres.find((g) => g.id === genreId);
   const plan = useMemo(
@@ -264,9 +267,12 @@ export default function CurriculumExplorer({
               const counts = lessonStatusCounts(lsn.id);
               const lacc = lessonAvgAccuracy(week?.week ?? 1, lsn.lesson);
               return (
-                <div
+                <button
                   key={lsn.id}
-                  className="bg-white rounded-2xl border border-[#E6E8EC] p-4 flex flex-col gap-3"
+                  type="button"
+                  onClick={() => setPreviewLesson(lsn)}
+                  className="text-left bg-white rounded-2xl border border-[#E6E8EC] p-4 flex flex-col gap-3 hover:border-teal-300 hover:shadow-sm transition cursor-pointer"
+                  title="Click to preview lesson content"
                 >
                   <div className="flex items-center justify-between">
                     <span className="inline-flex items-center justify-center h-7 w-7 rounded-lg bg-teal-50 text-teal-700 text-xs font-black">
@@ -311,14 +317,10 @@ export default function CurriculumExplorer({
                     <StatusPill label="Help" value={counts.struggling} tone="rose" />
                   </div>
 
-                  <button
-                    disabled
-                    title="Coming soon: assign this lesson to the whole class, a small group, or individual students"
-                    className="mt-auto w-full px-3 py-2 rounded-lg bg-[#F1F5F9] text-[#64748B] text-xs font-bold cursor-not-allowed"
-                  >
-                    Assign Lesson
-                  </button>
-                </div>
+                  <span className="mt-auto w-full px-3 py-2 rounded-lg bg-teal-50 text-teal-700 text-xs font-extrabold text-center border border-teal-100">
+                    Preview lesson →
+                  </span>
+                </button>
               );
             })}
           </div>
@@ -345,6 +347,30 @@ export default function CurriculumExplorer({
           </div>
         </div>
       </div>
+
+      <LessonPreviewDrawer
+        open={!!previewLesson}
+        onClose={() => setPreviewLesson(null)}
+        lesson={previewLesson}
+        weekNumber={week?.week}
+        weekTopic={week?.topic}
+        strand={genre?.strand}
+        realm={genre?.realm}
+        yearLabel={yearLabel}
+        isPlaceholder={isPlaceholder}
+        classStats={previewLesson ? (() => {
+          const c = lessonStatusCounts(previewLesson.id);
+          const a = lessonAvgAccuracy(week?.week ?? 1, previewLesson.lesson);
+          return {
+            studentCount,
+            completed: c.completed,
+            inProgress: c.inProgress,
+            notStarted: c.notStarted,
+            quizAvg: a.avg,
+            quizAttempts: a.attempts,
+          };
+        })() : null}
+      />
     </div>
   );
 }
