@@ -225,13 +225,15 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
         ) : (
           students
             .map((s) => {
-              const prog = getProg(s.id);
+              const studentYear = getStudentYear(s.id);
+              const prog = getProg(s.id, studentYear);
               const ids = prog ? parseCompleted(prog.completed_lesson_ids) : [];
-              const strandIds = isPlaceholder ? [] : ids.filter((id) => id.startsWith(prefix));
-              const pct = isPlaceholder ? 0 : pctComplete(ids, prefix);
+              const sPrefix = lessonIdPrefix(studentYear);
+              const strandIds = isPlaceholder ? [] : ids.filter((id) => id.startsWith(sPrefix));
+              const pct = isPlaceholder ? 0 : pctComplete(ids, sPrefix);
               const status = isPlaceholder ? "Not Started" : computeStatus(prog, strandIds.length, pct);
               const week = isPlaceholder ? null : (prog?.week ?? null);
-              return { s, prog, pct, status, week };
+              return { s, prog, pct, status, week, studentYear };
             })
             .sort((a, b) => {
               const dir = sortDir === "asc" ? 1 : -1;
@@ -239,13 +241,13 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
               const nameCmp = a.s.display_name.localeCompare(b.s.display_name);
               switch (sortKey) {
                 case "name":   return dir * nameCmp;
-                case "level":  return dir * nameCmp;
+                case "level":  return dir * (yearOrdinal(a.studentYear) - yearOrdinal(b.studentYear)) || nameCmp;
                 case "week":   return dir * ((a.week ?? -1) - (b.week ?? -1)) || nameCmp;
                 case "status": return dir * (rank[a.status] - rank[b.status]) || nameCmp;
                 case "tower":  return dir * (a.pct - b.pct) || nameCmp;
               }
             })
-            .map(({ s, prog, pct, status, week }) => {
+            .map(({ s, prog, pct, status, week, studentYear }) => {
               const isOpen = expandedId === s.id;
 
             return (
@@ -263,7 +265,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
                     </div>
                     <span className="text-sm font-bold text-[#0F172A] truncate">{s.display_name}</span>
                   </div>
-                  <span className="text-xs font-bold text-[#475569]">{yearLabel}</span>
+                  <span className="text-xs font-bold text-[#475569]">{studentYear}</span>
                   <span className="text-xs font-bold text-[#475569] tabular-nums">
                     {week ? `W${week}` : "—"}
                   </span>
@@ -283,12 +285,12 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
                 {isOpen && (
                   <StudentStrandDetail
                     student={s}
-                    yearLabel={yearLabel}
+                    yearLabel={studentYear}
                     genre={genre}
                     plan={plan}
                     prog={prog}
                     isPlaceholder={isPlaceholder}
-                    prefix={prefix}
+                    prefix={lessonIdPrefix(studentYear)}
                   />
                 )}
               </div>
