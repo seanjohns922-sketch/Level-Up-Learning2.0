@@ -131,8 +131,13 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
     [progress, yearLabel]
   );
 
-  function getProg(studentId: string) {
-    return yearProg.find((p) => p.student_id === studentId);
+  function getProg(studentId: string, year: string) {
+    return progress.find((p) => p.student_id === studentId && p.year === year);
+  }
+
+  function getStudentYear(studentId: string): string {
+    const rows = progress.filter((p) => p.student_id === studentId);
+    return pickStudentYear(rows, yearLabel);
   }
 
   return (
