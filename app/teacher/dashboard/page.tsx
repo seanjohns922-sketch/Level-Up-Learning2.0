@@ -662,22 +662,28 @@ export default function TeacherDashboardPage() {
 
             {/* Year level + view tabs */}
             <div className="flex items-center justify-between gap-3 flex-wrap">
-              <div className="flex items-center gap-1 p-1 bg-white rounded-xl border border-[#E6E8EC] w-fit overflow-x-auto">
-                {YEAR_LEVELS.map((yr) => (
-                  <button
-                    key={yr}
-                    onClick={() => setActiveYear(yr)}
-                    className={[
-                      "px-3.5 py-1.5 rounded-lg font-bold text-sm whitespace-nowrap transition",
-                      activeYear === yr
-                        ? "bg-[#0F172A] text-white shadow-sm"
-                        : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9]",
-                    ].join(" ")}
-                  >
-                    {yr}
-                  </button>
-                ))}
-              </div>
+              {activeTab === "curriculum" ? (
+                <div className="flex items-center gap-1 p-1 bg-white rounded-xl border border-[#E6E8EC] w-fit overflow-x-auto">
+                  {YEAR_LEVELS.map((yr) => (
+                    <button
+                      key={yr}
+                      onClick={() => setActiveYear(yr)}
+                      className={[
+                        "px-3.5 py-1.5 rounded-lg font-bold text-sm whitespace-nowrap transition",
+                        activeYear === yr
+                          ? "bg-[#0F172A] text-white shadow-sm"
+                          : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9]",
+                      ].join(" ")}
+                    >
+                      {yr}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-xs font-semibold text-[#64748B]">
+                  Showing all <b className="text-[#0F172A]">{classStudents.length}</b> student{classStudents.length === 1 ? "" : "s"} in this class — sort by Level to find who's behind.
+                </div>
+              )}
 
               <div className="flex items-center gap-1 p-1 bg-white rounded-xl border border-[#E6E8EC] w-fit">
                 {([
