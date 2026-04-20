@@ -173,6 +173,7 @@ export default function CurriculumExplorer({
             {plan.map((w) => {
               const active = w.week === weekNum;
               const pct = weekAvgPct(w.week);
+              const acc = weekAvgAccuracy(w.week);
               return (
                 <button
                   key={w.week}
@@ -196,8 +197,16 @@ export default function CurriculumExplorer({
                       style={{ width: `${pct}%` }}
                     />
                   </div>
-                  <div className="mt-1 text-[10px] font-bold text-[#64748B] tabular-nums">
-                    {pct}% class avg
+                  <div className="mt-1 flex items-center justify-between gap-1">
+                    <span className="text-[10px] font-bold text-[#64748B] tabular-nums">
+                      {pct}% done
+                    </span>
+                    <span
+                      title={acc.attempts === 0 ? "No quiz attempts yet" : `Quiz accuracy avg across ${acc.attempts} student${acc.attempts === 1 ? "" : "s"}`}
+                      className={`text-[9px] font-extrabold tabular-nums px-1.5 py-0.5 rounded border ${accTone(acc.avg, acc.attempts)}`}
+                    >
+                      {acc.attempts === 0 ? "—" : `${acc.avg}%`}
+                    </span>
                   </div>
                 </button>
               );
