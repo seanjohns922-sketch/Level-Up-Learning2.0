@@ -251,6 +251,8 @@ export default function LessonPreviewDrawer({
   open, onClose, lesson, weekTopic, weekNumber, strand, realm, yearLabel,
   isPlaceholder, student, classStats,
 }: Props) {
+  const [openIdx, setOpenIdx] = useState<number | null>(null);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
