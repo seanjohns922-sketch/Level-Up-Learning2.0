@@ -500,6 +500,32 @@ function StudentStrandDetail({
           ))}
         </ul>
       </div>
+
+      <LessonPreviewDrawer
+        open={!!previewLesson}
+        onClose={() => setPreviewLesson(null)}
+        lesson={previewLesson}
+        weekNumber={previewLesson?.week}
+        weekTopic={plan.find((p) => p.week === previewLesson?.week)?.topic}
+        strand={genre.strand}
+        realm={genre.realm}
+        yearLabel={yearLabel}
+        isPlaceholder={isPlaceholder}
+        student={previewLesson ? {
+          id: student.id,
+          display_name: student.display_name,
+          status: ids.includes(previewLesson.id) ? "Completed" : (previewLesson.week === currentWeek ? "In Progress" : "Not Started"),
+          attempts: ids.includes(previewLesson.id) ? 1 : 0,
+          quizPercent: (() => {
+            const q = quizScores[String(previewLesson.week)];
+            return q?.percent ?? null;
+          })(),
+          quizPassed: (() => {
+            const q = quizScores[String(previewLesson.week)];
+            return q?.passed ?? null;
+          })(),
+        } : null}
+      />
     </div>
   );
 }
