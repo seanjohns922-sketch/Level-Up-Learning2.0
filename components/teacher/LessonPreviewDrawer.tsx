@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { Lesson } from "@/data/programs/year1";
 import { DEFAULT_LESSON_XP } from "@/data/programs/genres";
 
@@ -61,6 +61,184 @@ function describeActivity(idea: string): string {
   return "Interactive practice activity tied to the lesson focus.";
 }
 
+type ActivityExample = {
+  prompt: string;
+  visual?: React.ReactNode;
+  options?: string[];
+  correct?: string;
+  note: string;
+};
+
+function exampleForActivity(idea: string): ActivityExample {
+  const i = idea.toLowerCase();
+  if (i.includes("flash") || i.includes("flip")) {
+    return {
+      prompt: "What number is this?",
+      visual: (
+        <div className="flex items-center justify-center h-24 rounded-lg bg-white border border-[#E6E8EC] text-5xl font-black text-[#0F172A]">27</div>
+      ),
+      options: ["17", "27", "72", "20"],
+      correct: "27",
+      note: "Card flashes for ~2 seconds. Student taps the matching number.",
+    };
+  }
+  if (i.includes("hunt") || i.includes("walk")) {
+    return {
+      prompt: "Find the number 34 in the grid below.",
+      visual: (
+        <div className="grid grid-cols-5 gap-1 p-2 rounded-lg bg-white border border-[#E6E8EC]">
+          {[12, 47, 34, 8, 21, 19, 50, 6, 33, 41].map((n) => (
+            <div key={n} className={`h-9 rounded-md border text-sm font-bold flex items-center justify-center ${n === 34 ? "bg-emerald-50 border-emerald-300 text-emerald-700" : "bg-[#FAFBFC] border-[#E6E8EC] text-[#0F172A]"}`}>{n}</div>
+          ))}
+        </div>
+      ),
+      note: "Student taps the correct tile. Wrong taps shake; correct tiles glow.",
+    };
+  }
+  if (i.includes("group") || i.includes("set") || i.includes("equal")) {
+    return {
+      prompt: "Make 3 equal groups of 4 counters.",
+      visual: (
+        <div className="flex gap-2 p-3 rounded-lg bg-white border border-[#E6E8EC]">
+          {[0,1,2].map((g)=>(
+            <div key={g} className="flex-1 rounded-md border border-dashed border-[#CBD5E1] p-2 grid grid-cols-2 gap-1">
+              {[0,1,2,3].map((c)=><div key={c} className="h-4 w-4 rounded-full bg-teal-500"/>)}
+            </div>
+          ))}
+        </div>
+      ),
+      note: "Drag counters into group boxes. Total: 3 × 4 = 12.",
+    };
+  }
+  if (i.includes("skip")) {
+    return {
+      prompt: "Fill in the missing numbers: 10, 20, __, 40, __, 60",
+      options: ["30 and 50", "25 and 45", "35 and 55", "30 and 55"],
+      correct: "30 and 50",
+      note: "Skip-counting in 10s. Difficulty ramps to 2s and 5s.",
+    };
+  }
+  if (i.includes("ladder") || i.includes("line")) {
+    return {
+      prompt: "Place 47 on the number line.",
+      visual: (
+        <div className="p-3 rounded-lg bg-white border border-[#E6E8EC]">
+          <div className="relative h-2 bg-[#E6E8EC] rounded-full">
+            <div className="absolute -top-1 h-4 w-4 rounded-full bg-teal-500 border-2 border-white shadow" style={{ left: "47%" }} />
+          </div>
+          <div className="flex justify-between text-[10px] font-bold text-[#64748B] mt-2"><span>0</span><span>50</span><span>100</span></div>
+        </div>
+      ),
+      note: "Drag the marker to the correct position on the line.",
+    };
+  }
+  if (i.includes("part") || i.includes("ppp")) {
+    return {
+      prompt: "Whole = 15. One part is 9. What's the other part?",
+      visual: (
+        <div className="p-2 rounded-lg bg-white border border-[#E6E8EC]">
+          <div className="h-8 rounded-md bg-teal-100 border border-teal-300 flex items-center justify-center text-sm font-black text-teal-800">15</div>
+          <div className="grid grid-cols-[3fr_2fr] gap-1 mt-1">
+            <div className="h-8 rounded-md bg-emerald-100 border border-emerald-300 flex items-center justify-center text-sm font-black text-emerald-800">9</div>
+            <div className="h-8 rounded-md bg-amber-100 border border-amber-300 flex items-center justify-center text-sm font-black text-amber-800">?</div>
+          </div>
+        </div>
+      ),
+      options: ["4", "5", "6", "7"],
+      correct: "6",
+      note: "Bar model shows part–part–whole relationship.",
+    };
+  }
+  if (i.includes("dice") || i.includes("place")) {
+    return {
+      prompt: "Build the number 36 using tens and ones.",
+      visual: (
+        <div className="grid grid-cols-2 gap-2 p-2 rounded-lg bg-white border border-[#E6E8EC]">
+          <div className="rounded-md border border-[#E6E8EC] p-2"><div className="text-[10px] font-bold text-[#64748B]">TENS</div><div className="flex gap-0.5 mt-1">{[0,1,2].map(i=><div key={i} className="h-6 w-2 bg-teal-500 rounded-sm"/>)}</div></div>
+          <div className="rounded-md border border-[#E6E8EC] p-2"><div className="text-[10px] font-bold text-[#64748B]">ONES</div><div className="grid grid-cols-3 gap-0.5 mt-1">{Array.from({length:6}).map((_,i)=><div key={i} className="h-2 w-2 bg-emerald-500 rounded-sm"/>)}</div></div>
+        </div>
+      ),
+      note: "3 tens + 6 ones = 36. Student drags blocks onto the mat.",
+    };
+  }
+  if (i.includes("array")) {
+    return {
+      prompt: "How many dots are in this array?",
+      visual: (
+        <div className="p-3 rounded-lg bg-white border border-[#E6E8EC]">
+          <div className="grid grid-cols-4 gap-1.5 w-fit">
+            {Array.from({length:12}).map((_,i)=><div key={i} className="h-4 w-4 rounded-full bg-teal-500"/>)}
+          </div>
+        </div>
+      ),
+      options: ["10", "12", "14", "16"],
+      correct: "12",
+      note: "3 rows × 4 columns = 12.",
+    };
+  }
+  if (i.includes("story") || i.includes("word")) {
+    return {
+      prompt: "Sam has 8 marbles. He gives 3 to his friend. How many does he have left?",
+      options: ["3", "5", "8", "11"],
+      correct: "5",
+      note: "Student picks the operation (subtraction) and the answer.",
+    };
+  }
+  if (i.includes("fact")) {
+    return {
+      prompt: "Numbers: 4, 6, 10. Write the fact family.",
+      visual: (
+        <div className="grid grid-cols-2 gap-1 p-2 rounded-lg bg-white border border-[#E6E8EC] text-xs font-bold text-[#0F172A]">
+          <div>4 + 6 = 10</div><div>6 + 4 = 10</div>
+          <div>10 − 4 = 6</div><div>10 − 6 = 4</div>
+        </div>
+      ),
+      note: "Four related addition/subtraction facts from one trio.",
+    };
+  }
+  if (i.includes("match") || i.includes("pair")) {
+    return {
+      prompt: "Match each number to its word form.",
+      visual: (
+        <div className="grid grid-cols-2 gap-2 p-2 rounded-lg bg-white border border-[#E6E8EC] text-xs font-bold text-[#0F172A]">
+          <div className="rounded-md bg-teal-50 px-2 py-1.5 border border-teal-200">23</div><div className="rounded-md bg-emerald-50 px-2 py-1.5 border border-emerald-200">twenty-three</div>
+          <div className="rounded-md bg-teal-50 px-2 py-1.5 border border-teal-200">40</div><div className="rounded-md bg-emerald-50 px-2 py-1.5 border border-emerald-200">forty</div>
+        </div>
+      ),
+      note: "Drag lines between matching pairs.",
+    };
+  }
+  if (i.includes("share") || i.includes("deal")) {
+    return {
+      prompt: "Share 12 cookies fairly between 3 children. How many each?",
+      options: ["3", "4", "5", "6"],
+      correct: "4",
+      note: "Visual sharing animation — one to each, then repeat.",
+    };
+  }
+  if (i.includes("count")) {
+    return {
+      prompt: "How many stars are there?",
+      visual: (
+        <div className="p-3 rounded-lg bg-white border border-[#E6E8EC]">
+          <div className="flex flex-wrap gap-1 max-w-[200px]">
+            {Array.from({length:14}).map((_,i)=><span key={i} className="text-amber-500 text-lg">★</span>)}
+          </div>
+        </div>
+      ),
+      options: ["12", "13", "14", "15"],
+      correct: "14",
+      note: "Touch-count or type the total.",
+    };
+  }
+  return {
+    prompt: "Sample question tied to the lesson focus.",
+    options: ["Option A", "Option B", "Option C", "Option D"],
+    correct: "Option B",
+    note: "Multiple choice with instant feedback.",
+  };
+}
+
 function statusTone(s: LessonPreviewStudent["status"]) {
   switch (s) {
     case "Completed":   return "bg-emerald-50 text-emerald-700 border-emerald-200";
@@ -73,6 +251,8 @@ export default function LessonPreviewDrawer({
   open, onClose, lesson, weekTopic, weekNumber, strand, realm, yearLabel,
   isPlaceholder, student, classStats,
 }: Props) {
+  const [openIdx, setOpenIdx] = useState<number | null>(null);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -159,19 +339,57 @@ export default function LessonPreviewDrawer({
           {/* Activity breakdown */}
           <Section title="Activity breakdown (3 rotations)">
             <div className="space-y-2">
-              {ideas.map((idea, i) => (
-                <div key={i} className="rounded-xl border border-[#E6E8EC] bg-[#FAFBFC] p-3">
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center justify-center h-6 w-6 rounded-md bg-teal-50 text-teal-700 text-[11px] font-black">
-                      {i + 1}
-                    </span>
-                    <span className="text-sm font-bold text-[#0F172A]">{idea}</span>
+              {ideas.map((idea, i) => {
+                const isOpen = openIdx === i;
+                const ex = exampleForActivity(idea);
+                return (
+                  <div key={i} className="rounded-xl border border-[#E6E8EC] bg-[#FAFBFC] overflow-hidden">
+                    <button
+                      onClick={() => setOpenIdx(isOpen ? null : i)}
+                      className="w-full text-left p-3 hover:bg-white transition-colors"
+                      aria-expanded={isOpen}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex items-center justify-center h-6 w-6 rounded-md bg-teal-50 text-teal-700 text-[11px] font-black">
+                          {i + 1}
+                        </span>
+                        <span className="text-sm font-bold text-[#0F172A] flex-1">{idea}</span>
+                        <span className="text-[11px] font-bold text-teal-700">{isOpen ? "Hide example ▴" : "See example ▾"}</span>
+                      </div>
+                      <div className="text-[11px] text-[#64748B] mt-1 leading-relaxed pl-8">
+                        {describeActivity(idea)}
+                      </div>
+                    </button>
+                    {isOpen && (
+                      <div className="border-t border-[#E6E8EC] bg-white px-3 py-3 space-y-2.5">
+                        <div className="text-[10px] font-extrabold text-teal-700 uppercase tracking-wider">Example question</div>
+                        <div className="text-sm font-semibold text-[#0F172A]">{ex.prompt}</div>
+                        {ex.visual && <div>{ex.visual}</div>}
+                        {ex.options && (
+                          <div className="grid grid-cols-2 gap-1.5">
+                            {ex.options.map((opt) => {
+                              const isCorrect = opt === ex.correct;
+                              return (
+                                <div
+                                  key={opt}
+                                  className={`rounded-lg border px-2.5 py-2 text-xs font-bold ${
+                                    isCorrect
+                                      ? "bg-emerald-50 border-emerald-300 text-emerald-800"
+                                      : "bg-white border-[#E6E8EC] text-[#0F172A]"
+                                  }`}
+                                >
+                                  {opt}{isCorrect ? " ✓" : ""}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                        <div className="text-[11px] text-[#64748B] italic leading-relaxed">{ex.note}</div>
+                      </div>
+                    )}
                   </div>
-                  <div className="text-[11px] text-[#64748B] mt-1 leading-relaxed pl-8">
-                    {describeActivity(idea)}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </Section>
 
