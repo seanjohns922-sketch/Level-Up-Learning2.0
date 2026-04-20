@@ -262,6 +262,7 @@ export default function CurriculumExplorer({
           <div className="grid md:grid-cols-3 gap-3">
             {(week?.lessons ?? []).map((lsn) => {
               const counts = lessonStatusCounts(lsn.id);
+              const lacc = lessonAvgAccuracy(week?.week ?? 1, lsn.lesson);
               return (
                 <div
                   key={lsn.id}
@@ -282,6 +283,24 @@ export default function CurriculumExplorer({
                     <div className="text-xs text-[#64748B] mt-1 leading-relaxed line-clamp-3">
                       {lsn.focus}
                     </div>
+                  </div>
+
+                  {/* Class avg accuracy on this lesson's quiz questions */}
+                  <div
+                    className={`rounded-lg border px-2.5 py-1.5 flex items-center justify-between ${accTone(lacc.avg, lacc.attempts)}`}
+                    title={lacc.attempts === 0
+                      ? "No students have attempted this week's quiz yet"
+                      : `Average % correct on Lesson ${lsn.lesson} quiz questions across ${lacc.attempts} student${lacc.attempts === 1 ? "" : "s"}`}
+                  >
+                    <span className="text-[9px] font-extrabold uppercase tracking-wider opacity-80">
+                      Quiz Accuracy
+                    </span>
+                    <span className="text-[12px] font-black tabular-nums">
+                      {lacc.attempts === 0 ? "—" : `${lacc.avg}%`}
+                      <span className="text-[9px] font-bold opacity-70 ml-1">
+                        ({lacc.attempts})
+                      </span>
+                    </span>
                   </div>
 
                   {/* Status counts */}
