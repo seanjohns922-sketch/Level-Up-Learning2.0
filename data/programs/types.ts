@@ -10,6 +10,7 @@ export type ActivityType =
   | "fraction_compare"
   | "equivalent_fraction_match"
   | "fraction_decimal_percent_match"
+  | "benchmark_sort"
   | "equivalent_fraction_build"
   | "equivalent_fraction_yes_no"
   | "odd_even_sort"

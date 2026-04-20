@@ -393,14 +393,25 @@ const year5Rows: ProgramRow[] = [
   },
   {
     week: 9,
-    focus: "Use benchmark fractions, decimals, and percent values",
+    weekTopic: "Percentages, Fractions & Decimals",
+    focus: "Use benchmark values to estimate and compare fractions, decimals, and percentages",
     lesson: 2,
     topic: "Benchmark Fractions",
-    activity: "Use 1/2, 1/4, and 3/4 with 0.5, 0.25, 0.75 and 50%, 25%, 75%.",
+    activity: "Judge values against 0, 1/2, and 1 without unnecessary conversion.",
     curriculum: ["AC9M5N04"],
     activities: [
-      makeActivity("multiple_choice", 2, { mode: "benchmark_fraction_percent" }),
-      makeActivity("typed_response", 1, { mode: "benchmark_fraction_percent" }),
+      makeActivity("benchmark_sort", 1, {
+        mode: "benchmark_where_belongs",
+        rotationRole: "fast_thinking",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "benchmark_closest",
+        rotationRole: "reasoning",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "benchmark_compare_larger",
+        rotationRole: "apply_create",
+      }),
     ],
   },
   {

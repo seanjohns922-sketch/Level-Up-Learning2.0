@@ -17,6 +17,7 @@ import NumberLinePlace from "@/components/activities/NumberLinePlace";
 import FractionCompare from "@/components/activities/FractionCompare";
 import EquivalentFractionBar from "@/components/activities/EquivalentFractionBar";
 import FractionDecimalPercentMatch from "@/components/activities/FractionDecimalPercentMatch";
+import BenchmarkSort from "@/components/activities/BenchmarkSort";
 import OddEvenSort from "@/components/activities/OddEvenSort";
 import PartitionExpand from "@/components/activities/PartitionExpand";
 import PlaceValueBuilder from "@/components/activities/PlaceValueBuilder";
@@ -36,6 +37,7 @@ import type {
   FractionCompareQuestion,
   EquivalentFractionMatchQuestion,
   FractionDecimalPercentMatchQuestion,
+  BenchmarkSortQuestion,
   EquivalentFractionBuildQuestion,
   EquivalentFractionYesNoQuestion,
   DivisionGroupsQuestion,
@@ -276,6 +278,19 @@ export function LessonRenderer({
       return (
         <FractionDecimalPercentMatch
           questionData={safeQuestion as FractionDecimalPercentMatchQuestion}
+          onCorrect={onCorrect}
+          onWrong={onWrong}
+        />
+      );
+    }
+    case "benchmark_sort": {
+      const safeQuestion = getSafeQuestion(activity, questionData, prompt);
+      if (safeQuestion.kind !== "benchmark_sort") {
+        return <ErrorCard message="Benchmark sort question failed to load." />;
+      }
+      return (
+        <BenchmarkSort
+          questionData={safeQuestion as BenchmarkSortQuestion}
           onCorrect={onCorrect}
           onWrong={onWrong}
         />

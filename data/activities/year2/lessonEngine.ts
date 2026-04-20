@@ -347,6 +347,17 @@ export type FractionDecimalPercentMatchQuestion = {
   sets: FractionDecimalPercentSet[];
 };
 
+export type BenchmarkSortQuestion = {
+  kind: "benchmark_sort";
+  prompt: string;
+  helper: string;
+  values: Array<{
+    id: string;
+    label: string;
+    category: "less" | "equal" | "greater";
+  }>;
+};
+
 export type AdditionStrategyQuestion = {
   kind: "addition_strategy";
   prompt: string;
@@ -893,6 +904,24 @@ function parseFractionParts(fraction: string) {
   return { numerator, denominator };
 }
 
+function year5BenchmarkValues() {
+  return [
+    { id: "quarter", label: "1/4", category: "less" as const },
+    { id: "three-eighths", label: "3/8", category: "less" as const },
+    { id: "forty-percent", label: "40%", category: "less" as const },
+    { id: "zero-point-four-five", label: "0.45", category: "less" as const },
+    { id: "two-quarters", label: "2/4", category: "equal" as const },
+    { id: "five-tenths", label: "5/10", category: "equal" as const },
+    { id: "zero-point-five", label: "0.5", category: "equal" as const },
+    { id: "fifty-percent", label: "50%", category: "equal" as const },
+    { id: "three-quarters", label: "3/4", category: "greater" as const },
+    { id: "seven-eighths", label: "7/8", category: "greater" as const },
+    { id: "three-fifths", label: "3/5", category: "greater" as const },
+    { id: "zero-point-six", label: "0.6", category: "greater" as const },
+    { id: "sixty-five-percent", label: "65%", category: "greater" as const },
+  ];
+}
+
 function buildYear4Week11DivisionInverseQuestion(asMultipleChoice: boolean) {
   const templates = [
     { prompt: "? × 4 = 24", answer: 6, distractors: [4, 8, 24] },
@@ -1214,6 +1243,7 @@ export type Year2QuestionData =
   | FractionCompareQuestion
   | EquivalentFractionMatchQuestion
   | FractionDecimalPercentMatchQuestion
+  | BenchmarkSortQuestion
   | EquivalentFractionBuildQuestion
   | EquivalentFractionYesNoQuestion
   | AdditionStrategyQuestion
@@ -1472,6 +1502,9 @@ const BASE_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
     requiresVisual: true,
   },
   fraction_decimal_percent_match: {
+    requiresVisual: true,
+  },
+  benchmark_sort: {
     requiresVisual: true,
   },
   equivalent_fraction_build: {
@@ -4625,6 +4658,20 @@ function generateInteractiveQuestion(
       prompt: "Match each fraction, decimal and percentage.",
       helper: "Tap one fraction, one decimal and one percentage with the same value.",
       sets,
+    };
+  }
+
+  if (activityType === "benchmark_sort") {
+    const pool = year5BenchmarkValues();
+    const less = shuffle(pool.filter((value) => value.category === "less")).slice(0, 2);
+    const equal = shuffle(pool.filter((value) => value.category === "equal")).slice(0, 2);
+    const greater = shuffle(pool.filter((value) => value.category === "greater")).slice(0, 2);
+
+    return {
+      kind: "benchmark_sort",
+      prompt: "Where does each value belong?",
+      helper: "Use 1/2 as your benchmark. Sort each card into the correct zone.",
+      values: shuffle([...less, ...equal, ...greater]),
     };
   }
 
@@ -9777,26 +9824,40 @@ function generateGenericQuestion(
     };
   }
 
-  if (explicitMode === "benchmark_fraction_percent") {
-    const templates = [
-      { prompt: "Which value is the same as one half?", answer: "50%", options: ["50%", "25%", "0.25", "75%"] },
-      { prompt: "Which value is the same as one quarter?", answer: "0.25", options: ["0.25", "0.5", "25", "3/4"] },
-      { prompt: "Which value is the same as three quarters?", answer: "75%", options: ["75%", "50%", "0.25", "25%"] },
-    ];
+  if (
+    explicitMode === "benchmark_fraction_percent" ||
+    explicitMode === "benchmark_closest" ||
+    explicitMode === "benchmark_compare_larger"
+  ) {
+    const templates =
+      explicitMode === "benchmark_compare_larger"
+        ? [
+            { prompt: "Which is larger?", answer: "3/5", options: ["3/5", "1/2", "They are equal", "0"] },
+            { prompt: "Which is larger?", answer: "1/2", options: ["0.45", "1/2", "They are equal", "0.4"] },
+            { prompt: "Which is larger?", answer: "65%", options: ["65%", "3/5", "They are equal", "50%"] },
+            { prompt: "Which is larger?", answer: "1/2", options: ["4/10", "1/2", "They are equal", "40%"] },
+            { prompt: "Which is larger?", answer: "0.55", options: ["0.55", "1/2", "They are equal", "45%"] },
+            { prompt: "Which is larger?", answer: "7/10", options: ["7/10", "60%", "They are equal", "1/2"] },
+          ]
+        : [
+            { prompt: "Which benchmark is 7/10 closest to?", answer: "1", options: ["0", "1/2", "1", "It is equal to 1/2"] },
+            { prompt: "Which benchmark is 0.48 closest to?", answer: "1/2", options: ["0", "1/2", "1", "It is equal to 1"] },
+            { prompt: "Which benchmark is 0.2 closest to?", answer: "0", options: ["0", "1/2", "1", "It is equal to 1/2"] },
+            { prompt: "Which benchmark is 80% closest to?", answer: "1", options: ["0", "1/2", "1", "It is equal to 1/2"] },
+            { prompt: "Which benchmark is 3/8 closest to?", answer: "1/2", options: ["0", "1/2", "1", "It is equal to 1"] },
+            { prompt: "Which benchmark is 12% closest to?", answer: "0", options: ["0", "1/2", "1", "It is equal to 1/2"] },
+          ];
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
-    return asMultipleChoice
-      ? {
-          kind: "multiple_choice",
-          prompt: chosen.prompt,
-          options: shuffle(chosen.options),
-          answer: chosen.answer,
-        }
-      : {
-          kind: "typed_response",
-          prompt: chosen.prompt,
-          answer: chosen.answer,
-          placeholder: "Type the matching value",
-        };
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle(chosen.options),
+      answer: chosen.answer,
+      helper:
+        explicitMode === "benchmark_compare_larger"
+          ? "Think about whether each value is below, equal to, or above 1/2."
+          : "Estimate the position. You do not need exact conversion.",
+    };
   }
 
   if (explicitMode === "compare_fraction_decimal_percent") {
@@ -11437,6 +11498,7 @@ export function generateQuestion(
     activity.activityType === "fraction_compare" ||
     activity.activityType === "equivalent_fraction_match" ||
     activity.activityType === "fraction_decimal_percent_match" ||
+    activity.activityType === "benchmark_sort" ||
     activity.activityType === "equivalent_fraction_build" ||
     activity.activityType === "equivalent_fraction_yes_no" ||
     activity.activityType === "addition_strategy" ||
@@ -11639,6 +11701,9 @@ function extractQuestionFingerprintNumbers(question: Year2QuestionData) {
       capture(set.decimal);
       capture(set.percent);
     });
+  }
+  if (question.kind === "benchmark_sort") {
+    question.values.forEach((value) => capture(value.label));
   }
 
   const visual = "visual" in question ? question.visual : undefined;
