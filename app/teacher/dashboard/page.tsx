@@ -680,9 +680,7 @@ export default function TeacherDashboardPage() {
                   ))}
                 </div>
               ) : (
-                <div className="text-xs font-semibold text-[#64748B]">
-                  Showing all <b className="text-[#0F172A]">{classStudents.length}</b> student{classStudents.length === 1 ? "" : "s"} in this class — sort by Level to find who's behind.
-                </div>
+                <div />
               )}
 
               <div className="flex items-center gap-1 p-1 bg-white rounded-xl border border-[#E6E8EC] w-fit">
