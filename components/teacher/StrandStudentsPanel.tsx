@@ -412,10 +412,13 @@ function StudentStrandDetail({
             {week.lessons.map((lsn) => {
               const done = !isPlaceholder && ids.includes(lsn.id);
               return (
-                <div
+                <button
                   key={lsn.id}
+                  type="button"
+                  onClick={() => setPreviewLesson(lsn)}
+                  title="Click to preview lesson content"
                   className={[
-                    "rounded-xl border p-3 flex flex-col gap-2",
+                    "text-left rounded-xl border p-3 flex flex-col gap-2 transition hover:border-teal-300 hover:shadow-sm cursor-pointer",
                     done ? "border-emerald-200 bg-emerald-50/40" : "border-[#E6E8EC] bg-white",
                   ].join(" ")}
                 >
@@ -440,15 +443,11 @@ function StudentStrandDetail({
                     <span className="text-[10px] font-extrabold text-amber-700 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-md">
                       {DEFAULT_LESSON_XP} XP
                     </span>
-                    <button
-                      disabled
-                      title="Coming soon"
-                      className="text-[10px] font-bold text-[#64748B] bg-[#F1F5F9] px-2 py-1 rounded cursor-not-allowed"
-                    >
-                      Assign
-                    </button>
+                    <span className="text-[10px] font-extrabold text-teal-700">
+                      Preview →
+                    </span>
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
