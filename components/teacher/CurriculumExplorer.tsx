@@ -14,6 +14,7 @@ type ProgressLike = {
   year: string;
   week: number | null;
   completed_lesson_ids: any;
+  quiz_scores?: any;
 };
 
 type Props = {
