@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuthGuard } from "@/lib/useAuthGuard";
 import { getLatestPosttestProfile } from "@/data/assessments/analysis";
 import CurriculumExplorer from "@/components/teacher/CurriculumExplorer";
+import StrandStudentsPanel from "@/components/teacher/StrandStudentsPanel";
 
 /* ── types ─────────────────────────────────────────── */
 type ClassRow = { id: string; class_code: string; name: string; year_level: string };
@@ -706,100 +707,11 @@ export default function TeacherDashboardPage() {
                 progress={progress as any}
               />
             ) : (
-            <>
-
-            {/* Student table */}
-            <div className="bg-white rounded-2xl border border-[#E6E8EC] overflow-hidden">
-              {/* Table header */}
-              <div className="grid grid-cols-[220px_1fr] md:grid-cols-[260px_1fr] border-b border-[#E6E8EC] px-6 py-3 bg-[#FAFBFC]">
-                <span className="text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.12em]">Student</span>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-[3px] flex-1">
-                    {WEEKS.map((w) => (
-                      <span
-                        key={w}
-                        className="flex-1 text-center text-[9px] font-extrabold text-[#94A3B8] tracking-wider"
-                      >
-                        W{w}
-                      </span>
-                    ))}
-                  </div>
-                  <span className="min-w-[88px] text-right text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.12em]">Progress</span>
-                </div>
-              </div>
-
-              {classStudents.length === 0 ? (
-                <div className="px-6 py-16 text-center">
-                  <div className="mx-auto h-10 w-10 rounded-lg bg-[#F1F5F9] flex items-center justify-center mb-2">
-                    <svg viewBox="0 0 24 24" className="h-5 w-5 text-[#94A3B8]" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8z" /></svg>
-                  </div>
-                  <p className="text-sm font-semibold text-[#0F172A]">No students enrolled yet</p>
-                  <p className="text-xs text-[#64748B] mt-1">Share the class code to get started.</p>
-                </div>
-              ) : (
-                classStudents.map((student) => {
-                  const isExpanded = expandedStudent === student.id;
-                  const prog = getStudentProgress(student.id, activeYear);
-                  const initial = student.display_name.charAt(0).toUpperCase();
-                  // Stable per-student avatar tint (teal/indigo/amber rotation)
-                  const tints = [
-                    "from-teal-400 to-emerald-500",
-                    "from-indigo-400 to-violet-500",
-                    "from-amber-400 to-orange-500",
-                    "from-sky-400 to-cyan-500",
-                    "from-rose-400 to-pink-500",
-                  ];
-                  const tint = tints[student.id.charCodeAt(0) % tints.length];
-
-                  return (
-                    <div key={student.id} className="border-b border-[#F1F5F9] last:border-0">
-                      <div
-                        className={[
-                          "grid grid-cols-[220px_1fr] md:grid-cols-[260px_1fr] px-6 py-3.5 cursor-pointer transition items-center",
-                          isExpanded ? "bg-[#FAFBFC]" : "hover:bg-[#FAFBFC]",
-                        ].join(" ")}
-                        onClick={() =>
-                          setExpandedStudent(isExpanded ? null : student.id)
-                        }
-                      >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className={`h-9 w-9 rounded-full bg-gradient-to-br ${tint} flex items-center justify-center text-sm font-black text-white shadow-sm ring-1 ring-black/5`}>
-                            {initial}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="text-sm font-bold text-[#0F172A] truncate">{student.display_name}</div>
-                            <div className="text-[10px] font-semibold text-[#94A3B8] uppercase tracking-wider">
-                              {prog ? `Week ${prog.week ?? 1}` : "Not started"}
-                            </div>
-                          </div>
-                          <svg
-                            className={`h-4 w-4 text-[#CBD5E1] transition-transform ${isExpanded ? "rotate-180" : ""}`}
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2.5"
-                          >
-                            <path d="M6 9l6 6 6-6" />
-                          </svg>
-                        </div>
-
-                        <div>{renderWeekBar(prog)}</div>
-                      </div>
-
-                      {isExpanded && renderExpandedPanel(student)}
-                    </div>
-                  );
-                })
-              )}
-            </div>
-
-            {/* Legend */}
-            <div className="flex flex-wrap items-center gap-4 text-[11px] font-semibold text-[#64748B] px-1">
-              <span className="inline-flex items-center gap-1.5"><span className="h-2 w-4 rounded-full bg-teal-500" /> Complete</span>
-              <span className="inline-flex items-center gap-1.5"><span className="h-2 w-4 rounded-full bg-amber-400" /> In progress</span>
-              <span className="inline-flex items-center gap-1.5"><span className="h-2 w-4 rounded-full bg-slate-200" /> Locked</span>
-            </div>
-            </>
+              <StrandStudentsPanel
+                yearLabel={activeYear}
+                students={classStudents as any}
+                progress={progress as any}
+              />
             )}
           </>
         )}
