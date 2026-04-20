@@ -166,11 +166,30 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
       {/* Student table */}
       <div className="bg-white rounded-2xl border border-[#E6E8EC] overflow-hidden">
         <div className="grid grid-cols-[1.6fr_0.9fr_0.7fr_1.1fr_0.9fr] px-5 py-3 bg-[#FAFBFC] border-b border-[#E6E8EC]">
-          {["Student", "Level", "Week", "Status", "Tower"].map((h) => (
-            <span key={h} className="text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.12em]">
-              {h}
-            </span>
-          ))}
+          {([
+            ["name",   "Student"],
+            ["level",  "Level"],
+            ["week",   "Week"],
+            ["status", "Status"],
+            ["tower",  "Tower"],
+          ] as [SortKey, string][]).map(([key, label]) => {
+            const active = sortKey === key;
+            return (
+              <button
+                key={key}
+                onClick={() => toggleSort(key)}
+                className={[
+                  "text-left text-[10px] font-extrabold uppercase tracking-[0.12em] transition flex items-center gap-1",
+                  active ? "text-teal-700" : "text-[#94A3B8] hover:text-[#475569]",
+                ].join(" ")}
+              >
+                {label}
+                <span className="text-[9px] opacity-70">
+                  {active ? (sortDir === "asc" ? "▲" : "▼") : "↕"}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         {students.length === 0 ? (
@@ -178,14 +197,30 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
             No students enrolled yet.
           </div>
         ) : (
-          students.map((s) => {
-            const prog = getProg(s.id);
-            const ids = prog ? parseCompleted(prog.completed_lesson_ids) : [];
-            const strandIds = isPlaceholder ? [] : ids.filter((id) => id.startsWith(prefix));
-            const pct = isPlaceholder ? 0 : pctComplete(ids, prefix);
-            const status = isPlaceholder ? "Not Started" : computeStatus(prog, strandIds.length, pct);
-            const week = isPlaceholder ? null : (prog?.week ?? null);
-            const isOpen = expandedId === s.id;
+          students
+            .map((s) => {
+              const prog = getProg(s.id);
+              const ids = prog ? parseCompleted(prog.completed_lesson_ids) : [];
+              const strandIds = isPlaceholder ? [] : ids.filter((id) => id.startsWith(prefix));
+              const pct = isPlaceholder ? 0 : pctComplete(ids, prefix);
+              const status = isPlaceholder ? "Not Started" : computeStatus(prog, strandIds.length, pct);
+              const week = isPlaceholder ? null : (prog?.week ?? null);
+              return { s, prog, pct, status, week };
+            })
+            .sort((a, b) => {
+              const dir = sortDir === "asc" ? 1 : -1;
+              const rank: Record<string, number> = { "Not Started": 0, "In Progress": 1, "Needs Support": 2, "Completed": 3 };
+              const nameCmp = a.s.display_name.localeCompare(b.s.display_name);
+              switch (sortKey) {
+                case "name":   return dir * nameCmp;
+                case "level":  return dir * nameCmp;
+                case "week":   return dir * ((a.week ?? -1) - (b.week ?? -1)) || nameCmp;
+                case "status": return dir * (rank[a.status] - rank[b.status]) || nameCmp;
+                case "tower":  return dir * (a.pct - b.pct) || nameCmp;
+              }
+            })
+            .map(({ s, prog, pct, status, week }) => {
+              const isOpen = expandedId === s.id;
 
             return (
               <div key={s.id} className="border-b border-[#F1F5F9] last:border-0">
