@@ -416,14 +416,31 @@ const year5Rows: ProgramRow[] = [
   },
   {
     week: 9,
-    focus: "Order and compare fractions, decimals, and percentages",
+    weekTopic: "Percentages, Fractions & Decimals",
+    focus: "Apply fractions, decimals, and percentages to solve real-life maths problems",
     lesson: 3,
-    topic: "Order & Compare",
-    activity: "Compare and order mixed fraction, decimal, and percent values.",
+    topic: "Real-World Problem Solving",
+    activity: "Use what you know to solve real-world problems with confidence.",
     curriculum: ["AC9M5N04"],
     activities: [
-      makeActivity("multiple_choice", 2, { mode: "compare_fraction_decimal_percent" }),
-      makeActivity("typed_response", 1, { mode: "compare_fraction_decimal_percent" }),
+      makeActivity("multiple_choice", 1, {
+        mode: "real_world_quick_apply",
+        rotationRole: "fast_thinking",
+        rotationLabel: "Quick Apply",
+        rotationPurpose: "Use short real-world contexts to combine fractions, decimals, and percentages quickly.",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "real_world_structured_solve",
+        rotationRole: "reasoning",
+        rotationLabel: "Structured Solve",
+        rotationPurpose: "Convert values, match denominators, and complete the working step by step.",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "real_world_challenge",
+        rotationRole: "apply_create",
+        rotationLabel: "Challenge",
+        rotationPurpose: "Solve harder real-world problems with less scaffolding.",
+      }),
     ],
   },
   {

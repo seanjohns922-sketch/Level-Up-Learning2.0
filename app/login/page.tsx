@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { setActiveStudentProfile } from "@/lib/studentIdentity";
 import { GraduationCap, Briefcase, KeyRound, User, Lock } from "lucide-react";
 
 type StudentRecord = {
@@ -133,7 +134,7 @@ export default function LoginPage() {
         const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({ email: syntheticEmail, password: paddedPin });
         if (signInErr) { setStudentError("That name is taken in this class, or your PIN is wrong."); return; }
         const { data: existing } = await supabase.from("students").select("id, class_id").eq("user_id", signInData.user.id).single();
-        if (existing) { localStorage.setItem("lul_student_id", existing.id); localStorage.setItem("lul_class_id", existing.class_id); router.push("/home"); return; }
+        if (existing) { setActiveStudentProfile(existing.id, existing.class_id); router.push("/home"); return; }
       }
       setStudentError(signUpErr.message);
       return;
@@ -143,8 +144,7 @@ export default function LoginPage() {
     const studentId = crypto.randomUUID();
     const { data: student } = await supabase.from("students").insert({ id: studentId, class_id: cls.id, display_name: displayName.trim(), pin, user_id: userId }).select().single();
     if (!student) { setStudentError("Could not create student."); return; }
-    localStorage.setItem("lul_student_id", student.id);
-    localStorage.setItem("lul_class_id", cls.id);
+    setActiveStudentProfile(student.id, cls.id);
     router.push("/home");
   }
 

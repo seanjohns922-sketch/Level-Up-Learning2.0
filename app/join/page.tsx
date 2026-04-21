@@ -1,9 +1,10 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import QRCode from "qrcode";
 import { supabase } from "@/lib/supabase";
+import { setActiveStudentProfile } from "@/lib/studentIdentity";
 
 export default function JoinPageWrapper() {
   return <Suspense fallback={<div className="min-h-screen bg-[#fbf7f1] flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><JoinPage /></Suspense>;
@@ -25,31 +26,7 @@ function JoinPage() {
   const [step, setStep] = useState<"code" | "signup">(codeFromUrl ? "code" : "code");
   const [loading, setLoading] = useState(!!codeFromUrl);
 
-  useEffect(() => {
-    if (codeFromUrl) lookupCode(codeFromUrl);
-  }, [codeFromUrl]);
-
-  useEffect(() => {
-    let mounted = true;
-    if (!qrValue) {
-      setQrDataUrl("");
-      return () => {
-        mounted = false;
-      };
-    }
-    QRCode.toDataURL(qrValue, { width: 220, margin: 1 })
-      .then((url) => {
-        if (mounted) setQrDataUrl(url);
-      })
-      .catch(() => {
-        if (mounted) setQrDataUrl("");
-      });
-    return () => {
-      mounted = false;
-    };
-  }, [qrValue]);
-
-  async function lookupCode(code: string) {
+  const lookupCode = useCallback(async (code: string) => {
     setLoading(true);
     setError(null);
     const upper = code.trim().toUpperCase();
@@ -67,7 +44,30 @@ function JoinPage() {
     setClassCode(data.class_code);
     setStep("signup");
     setLoading(false);
-  }
+  }, []);
+
+  useEffect(() => {
+    if (codeFromUrl) void Promise.resolve().then(() => lookupCode(codeFromUrl));
+  }, [codeFromUrl, lookupCode]);
+
+  useEffect(() => {
+    let mounted = true;
+    if (!qrValue) {
+      return () => {
+        mounted = false;
+      };
+    }
+    QRCode.toDataURL(qrValue, { width: 220, margin: 1 })
+      .then((url) => {
+        if (mounted) setQrDataUrl(url);
+      })
+      .catch(() => {
+        if (mounted) setQrDataUrl("");
+      });
+    return () => {
+      mounted = false;
+    };
+  }, [qrValue]);
 
   async function handleJoin() {
     setError("");
@@ -143,8 +143,7 @@ function JoinPage() {
     }
 
     // 3) Persist session locally
-    localStorage.setItem("lul_student_id", student.id);
-    localStorage.setItem("lul_class_id", student.class_id);
+    setActiveStudentProfile(student.id, student.class_id);
 
     // 4) Create QR payload for next time
     const qrPayload = student.id;

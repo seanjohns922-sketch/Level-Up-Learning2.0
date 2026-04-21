@@ -630,6 +630,14 @@ type RealWorldFractionTemplate = RelatedDenominatorTemplate & {
   context: string;
 };
 
+type RealWorldFdpChoiceTemplate = {
+  id: string;
+  prompt: string;
+  answer: string;
+  options: string[];
+  helper: string;
+};
+
 function greatestCommonFactor(left: number, right: number): number {
   let a = Math.abs(left);
   let b = Math.abs(right);
@@ -839,6 +847,249 @@ function fractionOperationDecisionOptions(template: RelatedDenominatorTemplate) 
   ].filter((candidate) => simplifyFractionCandidate(candidate) !== answer);
 
   return uniqueStringOptions(answer, candidates);
+}
+
+function year5RealWorldFdpQuickApplyTemplates(): RealWorldFdpChoiceTemplate[] {
+  return [
+    {
+      id: "tank-75-minus-quarter",
+      prompt: "A tank is 75% full. It loses 1/4 of its full capacity. How much is left?",
+      answer: "1/2",
+      options: ["1/2", "3/4", "1/4", "100%"],
+      helper: "Convert 75% to 3/4, then subtract 1/4.",
+    },
+    {
+      id: "task-06-plus-fifth",
+      prompt: "A student completes 0.6 of a task, then 1/5 more. Do they finish?",
+      answer: "No, 4/5",
+      options: ["No, 4/5", "Yes, exactly 1", "Yes, 6/5", "No, 3/5"],
+      helper: "0.6 is 3/5. Add 1/5 and compare with 1 whole.",
+    },
+    {
+      id: "game-two-thirds-plus-25",
+      prompt: "A game is 2/3 complete. You gain 25% more. What fraction is complete now?",
+      answer: "11/12",
+      options: ["11/12", "3/8", "5/6", "1"],
+      helper: "25% is 1/4. Use twelfths to combine the parts.",
+    },
+    {
+      id: "race-three-quarters-minus-02",
+      prompt: "A runner has 3/4 of a race completed. A 0.2 penalty is removed. How much still counts?",
+      answer: "11/20",
+      options: ["11/20", "1/2", "7/10", "3/5"],
+      helper: "0.2 is 1/5. Convert to twentieths before subtracting.",
+    },
+    {
+      id: "badge-50-plus-quarter",
+      prompt: "A badge is 50% coloured. Another 1/4 is coloured. How much is coloured now?",
+      answer: "3/4",
+      options: ["3/4", "1/4", "1/2", "25%"],
+      helper: "50% is 1/2. Then add 1/4.",
+    },
+    {
+      id: "battery-08-minus-fifth",
+      prompt: "A battery is at 0.8. It drops by 1/5. What level is left?",
+      answer: "3/5",
+      options: ["3/5", "0.7", "1", "4/10"],
+      helper: "0.8 is 4/5. Subtract one fifth.",
+    },
+    {
+      id: "goal-40-plus-half",
+      prompt: "A team reaches 40% of a goal, then completes 1/2 more. What total is reached?",
+      answer: "9/10",
+      options: ["9/10", "4/5", "3/5", "1/10"],
+      helper: "40% is 2/5. Add 1/2 using tenths.",
+    },
+    {
+      id: "garden-third-plus-025",
+      prompt: "A garden has 1/3 planted. Another 0.25 is planted. What total is planted?",
+      answer: "7/12",
+      options: ["7/12", "1/4", "4/8", "1/2"],
+      helper: "0.25 is 1/4. Use twelfths to add.",
+    },
+    {
+      id: "bottle-90-minus-two-fifths",
+      prompt: "A bottle is 90% full. 2/5 is poured out. How much is left?",
+      answer: "1/2",
+      options: ["1/2", "3/10", "7/10", "2/5"],
+      helper: "90% is 9/10 and 2/5 is 4/10.",
+    },
+    {
+      id: "playlist-quarter-plus-two-fifths",
+      prompt: "A playlist is 0.25 finished. You complete another 2/5. How much is done?",
+      answer: "13/20",
+      options: ["13/20", "0.45", "3/10", "7/20"],
+      helper: "0.25 is 1/4. Convert to twentieths.",
+    },
+  ];
+}
+
+function year5RealWorldFdpStructuredTemplates(): RealWorldFractionTemplate[] {
+  return [
+    {
+      context: "Convert and solve: 75% + 1/8",
+      numeratorA: 3,
+      denominatorA: 4,
+      numeratorB: 1,
+      denominatorB: 8,
+      operation: "+",
+    },
+    {
+      context: "Convert and solve: 0.75 - 1/2",
+      numeratorA: 3,
+      denominatorA: 4,
+      numeratorB: 1,
+      denominatorB: 2,
+      operation: "-",
+    },
+    {
+      context: "Convert and solve: 7/8 - 0.5",
+      numeratorA: 7,
+      denominatorA: 8,
+      numeratorB: 1,
+      denominatorB: 2,
+      operation: "-",
+    },
+    {
+      context: "Convert and solve: 30% + 1/2",
+      numeratorA: 3,
+      denominatorA: 10,
+      numeratorB: 1,
+      denominatorB: 2,
+      operation: "+",
+    },
+    {
+      context: "Convert and solve: 60% + 1/10",
+      numeratorA: 3,
+      denominatorA: 5,
+      numeratorB: 1,
+      denominatorB: 10,
+      operation: "+",
+    },
+    {
+      context: "Convert and solve: 80% - 1/10",
+      numeratorA: 4,
+      denominatorA: 5,
+      numeratorB: 1,
+      denominatorB: 10,
+      operation: "-",
+    },
+    {
+      context: "Convert and solve: 25% + 1/2",
+      numeratorA: 1,
+      denominatorA: 4,
+      numeratorB: 1,
+      denominatorB: 2,
+      operation: "+",
+    },
+    {
+      context: "Convert and solve: 50% + 1/8",
+      numeratorA: 1,
+      denominatorA: 2,
+      numeratorB: 1,
+      denominatorB: 8,
+      operation: "+",
+    },
+    {
+      context: "Convert and solve: 0.2 + 3/10",
+      numeratorA: 1,
+      denominatorA: 5,
+      numeratorB: 3,
+      denominatorB: 10,
+      operation: "+",
+    },
+    {
+      context: "Convert and solve: 90% - 1/5",
+      numeratorA: 9,
+      denominatorA: 10,
+      numeratorB: 1,
+      denominatorB: 5,
+      operation: "-",
+    },
+    {
+      context: "Convert and solve: 0.4 + 1/10",
+      numeratorA: 2,
+      denominatorA: 5,
+      numeratorB: 1,
+      denominatorB: 10,
+      operation: "+",
+    },
+  ];
+}
+
+function year5RealWorldFdpChallengeTemplates(): RealWorldFdpChoiceTemplate[] {
+  return [
+    {
+      id: "pool-three-fifths-plus-quarter",
+      prompt: "A full pool loses 3/5 of its water. Heavy rain adds 1/4 of full capacity. How much is full?",
+      answer: "13/20",
+      options: ["13/20", "4/9", "7/20", "17/20"],
+      helper: "Start from the amount left after the loss, then add 1/4.",
+    },
+    {
+      id: "fundraiser-60-plus-35",
+      prompt: "A fundraiser reaches 60% of its goal. On the final day, it raises 35% more. Does it reach the goal?",
+      answer: "No, 95%",
+      options: ["No, 95%", "Yes, 105%", "Yes, exactly 100%", "No, 25%"],
+      helper: "Add the percentages and compare with 100%.",
+    },
+    {
+      id: "container-seven-eighths-minus-quarter-plus-half",
+      prompt: "A container is 7/8 full. Then 1/4 is removed and 0.5 is added. What is the final amount?",
+      answer: "9/8",
+      options: ["9/8", "5/8", "1", "6/8"],
+      helper: "Convert 1/4 and 0.5 into eighths.",
+    },
+    {
+      id: "homework-45-plus-third",
+      prompt: "A student completes 45% of homework, then 1/3 more. About how much is complete?",
+      answer: "47/60",
+      options: ["47/60", "46/100", "4/5", "2/3"],
+      helper: "45% is 9/20. Use sixtieths to add 1/3.",
+    },
+    {
+      id: "water-08-minus-quarter",
+      prompt: "A bottle is 0.8 full. You drink 1/4 of full capacity. How much is left?",
+      answer: "11/20",
+      options: ["11/20", "3/5", "0.75", "1/4"],
+      helper: "0.8 is 4/5. Convert to twentieths before subtracting.",
+    },
+    {
+      id: "project-two-thirds-plus-30",
+      prompt: "A project is 2/3 complete. You finish another 30%. Is the project complete?",
+      answer: "No, 29/30",
+      options: ["No, 29/30", "Yes, 1", "Yes, 19/15", "No, 3/10"],
+      helper: "30% is 3/10. Compare the total with 1 whole.",
+    },
+    {
+      id: "tank-70-minus-fifth",
+      prompt: "A tank is 70% full. It loses 1/5 of full capacity. What percent is left?",
+      answer: "50%",
+      options: ["50%", "60%", "90%", "1/5"],
+      helper: "1/5 is 20%. Subtract from 70%.",
+    },
+    {
+      id: "race-half-plus-40",
+      prompt: "A race tracker shows 1/2 complete. Another 40% is completed. How much is complete?",
+      answer: "9/10",
+      options: ["9/10", "45%", "1/10", "5/6"],
+      helper: "1/2 is 50%. Add 40%.",
+    },
+    {
+      id: "recipe-three-quarters-minus-02",
+      prompt: "A recipe uses 3/4 cup. You reduce it by 0.2 cup. How much is used now?",
+      answer: "11/20",
+      options: ["11/20", "1/2", "3/5", "7/10"],
+      helper: "0.2 is 1/5. Convert to twentieths.",
+    },
+    {
+      id: "map-two-fifths-plus-35",
+      prompt: "A map route is 2/5 marked. Another 35% is marked. How much is marked now?",
+      answer: "3/4",
+      options: ["3/4", "37/100", "7/10", "1/4"],
+      helper: "2/5 is 40%. Add 35%.",
+    },
+  ];
 }
 
 function year3FractionOrderSets() {
@@ -9857,6 +10108,42 @@ function generateGenericQuestion(
         explicitMode === "benchmark_compare_larger"
           ? "Think about whether each value is below, equal to, or above 1/2."
           : "Estimate the position. You do not need exact conversion.",
+    };
+  }
+
+  if (
+    explicitMode === "real_world_quick_apply" ||
+    explicitMode === "real_world_structured_solve" ||
+    explicitMode === "real_world_challenge"
+  ) {
+    if (explicitMode === "real_world_structured_solve") {
+      const templates = year5RealWorldFdpStructuredTemplates();
+      const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+      const result = relatedDenominatorResult(chosen);
+
+      return {
+        kind: "typed_response",
+        prompt: chosen.context,
+        answer: relatedDenominatorAnswer(chosen),
+        helper: "Convert first, match denominators, then solve.",
+        placeholder: "Type numerator",
+        fixedDenominator: result.denominator,
+        visual: relatedDenominatorVisual(chosen),
+      };
+    }
+
+    const templates =
+      explicitMode === "real_world_challenge"
+        ? year5RealWorldFdpChallengeTemplates()
+        : year5RealWorldFdpQuickApplyTemplates();
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle(chosen.options),
+      answer: chosen.answer,
+      helper: chosen.helper,
     };
   }
 

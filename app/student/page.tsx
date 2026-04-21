@@ -1,10 +1,9 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ACTIVE_STUDENT_KEY, clearScopedProgress } from "@/data/progress";
-import { clearScopedProgramStore } from "@/lib/program-progress";
 import { supabase } from "@/lib/supabase";
+import { switchActiveStudentProfile } from "@/lib/studentIdentity";
 
 export default function StudentQRPageWrapper() {
   return (
@@ -36,18 +35,9 @@ function StudentQRPage() {
   const [loggingIn, setLoggingIn] = useState(false);
   const [welcomeName, setWelcomeName] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!token) {
-      setLoading(false);
-      setError("No QR token found. Please scan your card again.");
-      return;
-    }
-    lookupStudent();
-  }, [token]);
-
-  async function lookupStudent() {
+  const lookupStudent = useCallback(async () => {
     setLoading(true);
-    const { data, error: lookupErr } = await supabase.rpc("lookup_student_by_qr", { token });
+    const { data } = await supabase.rpc("lookup_student_by_qr", { token });
     if (!data || (Array.isArray(data) && data.length === 0)) {
       setError("We couldn't find your account. Please ask your teacher for a new card.");
       setLoading(false);
@@ -57,7 +47,18 @@ function StudentQRPage() {
     setStudentName(row.display_name);
     setClassName(row.class_name);
     setLoading(false);
-  }
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) {
+      queueMicrotask(() => {
+        setLoading(false);
+        setError("No QR token found. Please scan your card again.");
+      });
+      return;
+    }
+    void Promise.resolve().then(() => lookupStudent());
+  }, [lookupStudent, token]);
 
   async function handlePinSubmit() {
     if (locked) return;
@@ -76,7 +77,7 @@ function StudentQRPage() {
     });
 
     const row = Array.isArray(verifyData) ? verifyData[0] : verifyData;
-    if (!row?.user_id) {
+    if (!row?.student_id) {
       const newAttempts = attempts + 1;
       setAttempts(newAttempts);
       if (newAttempts >= 5) {
@@ -94,25 +95,14 @@ function StudentQRPage() {
       return;
     }
 
-    // Construct synthetic email and sign in
-    const syntheticEmail = `${row.display_name.toLowerCase().replace(/\s+/g, "")}.${row.class_code.toLowerCase()}@leveluplearning.local`;
-    const paddedPin = pin + "xx";
-
-    const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
-      email: syntheticEmail,
-      password: paddedPin,
-    });
-
-    if (signInErr || !signInData?.user) {
-      setError("Login failed. Please ask your teacher for help.");
-      setLoggingIn(false);
-      return;
+    if (row.user_id && row.class_code) {
+      const syntheticEmail = `${row.display_name.toLowerCase().replace(/\s+/g, "")}.${row.class_code.toLowerCase()}@leveluplearning.local`;
+      const paddedPin = pin + "xx";
+      await supabase.auth.signInWithPassword({ email: syntheticEmail, password: paddedPin });
     }
 
-    // Clear old progress, set active student
-    localStorage.setItem(ACTIVE_STUDENT_KEY, signInData.user.id);
-    clearScopedProgress();
-    clearScopedProgramStore();
+    // Clear old progress, set active student profile id.
+    switchActiveStudentProfile(row.student_id);
 
     // Show welcome message
     setWelcomeName(row.display_name);
