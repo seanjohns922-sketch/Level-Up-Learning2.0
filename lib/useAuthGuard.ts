@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { recoverInvalidRefreshToken, supabase } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 
 /**
@@ -24,14 +24,24 @@ export function useAuthGuard() {
     let cancelled = false;
 
     // 1. Read cached session first (synchronous-ish, from localStorage)
-    supabase.auth.getSession().then(({ data }) => {
-      if (cancelled) return;
-      if (data.session?.user) {
-        setUser(data.session.user);
+    supabase.auth
+      .getSession()
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (error) throw error;
+        if (data.session?.user) {
+          setUser(data.session.user);
+          setLoading(false);
+        }
+        // If no cached session, don't redirect yet — wait for onAuthStateChange
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        recoverInvalidRefreshToken(error);
+        setUser(null);
         setLoading(false);
-      }
-      // If no cached session, don't redirect yet — wait for onAuthStateChange
-    });
+        router.push("/login");
+      });
 
     // 2. Listen for the definitive auth event
     const { data: { subscription } } = supabase.auth.onAuthStateChange(

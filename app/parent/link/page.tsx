@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { recoverInvalidRefreshToken, supabase } from "@/lib/supabase";
 import { setActiveStudentProfile } from "@/lib/studentIdentity";
 
 type ClaimedStudent = {
@@ -26,10 +26,18 @@ export default function ParentLinkPage() {
   const [claimed, setClaimed] = useState<ClaimedStudent | null>(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setHasSession(Boolean(data.user));
-      setLoading(false);
-    });
+    supabase.auth
+      .getUser()
+      .then(({ data, error: authError }) => {
+        if (authError) throw authError;
+        setHasSession(Boolean(data.user));
+        setLoading(false);
+      })
+      .catch((authError) => {
+        recoverInvalidRefreshToken(authError);
+        setHasSession(false);
+        setLoading(false);
+      });
   }, []);
 
   async function authenticate() {

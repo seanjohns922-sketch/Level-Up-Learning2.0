@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { recoverInvalidRefreshToken, supabase } from "@/lib/supabase";
 import { useAuthGuard } from "@/lib/useAuthGuard";
 import QRCode from "qrcode";
 
 export default function NewClassPage() {
   const router = useRouter();
-  const { loading: authLoading } = useAuthGuard();
+  useAuthGuard();
   const [className, setClassName] = useState("");
   const [yearLevel, setYearLevel] = useState("1");
   const [creating, setCreating] = useState(false);
@@ -42,6 +42,7 @@ export default function NewClassPage() {
     try {
       const { data: auth, error: userErr } = await supabase.auth.getUser();
       if (userErr || !auth?.user) {
+        if (userErr) recoverInvalidRefreshToken(userErr);
         setError("Please log in again.");
         return;
       }
