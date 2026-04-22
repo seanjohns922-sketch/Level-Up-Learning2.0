@@ -244,6 +244,33 @@ function toYear2QuizQuestion(
   };
 }
 
+function toAssessmentTypedQuizQuestion(
+  questionData: Year2QuestionData,
+  lessonNumber: 1 | 2 | 3,
+  skill: string,
+  index: number,
+  quizMeta: NonNullable<QuizQuestion["quizMeta"]>
+): QuizQuestion | null {
+  if (
+    (questionData.kind === "multiple_choice" || questionData.kind === "typed_response") &&
+    typeof questionData.answer === "string"
+  ) {
+    return {
+      id: `q${index}`,
+      lessonNumber,
+      lessonTag: lessonNumber,
+      skill,
+      activityType: "typed_response",
+      kind: "typed",
+      prompt: questionData.prompt,
+      correctValue: questionData.answer,
+      quizMeta,
+    };
+  }
+
+  return null;
+}
+
 function numericOptionStrings(answer: number, spread: number, min = 0) {
   const lower = Math.max(min, answer - spread);
   const upper = Math.max(lower + 6, answer + spread);
@@ -579,18 +606,27 @@ function buildStructuredWeeklyQuizQuestions(
 
       seenFingerprints.add(fingerprint);
       selectedActivityTypes.push(sourceActivity.activityType);
-      questions.push({
-        id: `q${questions.length + 1}`,
-        lessonNumber,
-        lessonTag: lessonNumber,
-        skill: sourceActivity.activityType,
-        activityType: sourceActivity.activityType,
-        kind: "lessonActivity",
-        prompt: questionData.prompt,
-        activity: sourceActivity,
+      const assessmentQuestion = toAssessmentTypedQuizQuestion(
         questionData,
-        quizMeta,
-      });
+        lessonNumber,
+        sourceActivity.activityType,
+        questions.length + 1,
+        quizMeta
+      );
+      questions.push(
+        assessmentQuestion ?? {
+          id: `q${questions.length + 1}`,
+          lessonNumber,
+          lessonTag: lessonNumber,
+          skill: sourceActivity.activityType,
+          activityType: sourceActivity.activityType,
+          kind: "lessonActivity",
+          prompt: questionData.prompt,
+          activity: sourceActivity,
+          questionData,
+          quizMeta,
+        }
+      );
     }
 
     debugCounts.push({
