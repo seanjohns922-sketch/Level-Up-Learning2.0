@@ -2030,6 +2030,7 @@ export default function TypedResponseActivity({
       if (numericInputsMatch(percentMethodInputs[percentMethodStep] ?? "", step.answer)) {
         setPercentMethodFeedback("");
         if (percentMethodStep >= stepVisual.steps.length - 1) {
+          setPercentMethodStep(stepVisual.steps.length);
           onCorrect?.();
         } else {
           setPercentMethodStep((current) => current + 1);
@@ -2229,7 +2230,11 @@ export default function TypedResponseActivity({
         <RuleBoxVisual visual={questionData.visual} title="Step-by-step rule" />
       ) : null}
       {discountStepMethodVisual ? (
-        <DiscountVisual visual={discountStepMethodVisual} />
+        <DiscountVisual
+          visual={discountStepMethodVisual}
+          revealDiscount={percentMethodStep > 0}
+          revealFinal={percentMethodStep >= discountStepMethodVisual.steps.length}
+        />
       ) : null}
       {buildGroupsVisual ? (
         <div className="mt-4 space-y-4">

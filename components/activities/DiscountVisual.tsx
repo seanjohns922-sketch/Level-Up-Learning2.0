@@ -11,11 +11,18 @@ function formatMoney(value: number) {
 
 export default function DiscountVisual({
   visual,
+  revealDiscount = true,
+  revealFinal = true,
 }: {
   visual: DiscountPriceVisualData | DiscountStepMethodVisualData;
+  revealDiscount?: boolean;
+  revealFinal?: boolean;
 }) {
   const mode = visual.visualMode ?? "price_tag";
   const discountPercent = Math.max(0, Math.min(100, visual.percent));
+  const showFinalCard = mode === "before_after";
+  const canRevealValue = showFinalCard ? revealFinal : revealDiscount;
+  const label = showFinalCard ? "After Discount" : "Discount Amount";
 
   return (
     <div className="mt-5 rounded-2xl border border-amber-100 bg-amber-50 p-4">
@@ -45,16 +52,25 @@ export default function DiscountVisual({
 
         <div className="rounded-2xl bg-white p-4 shadow-sm">
           <div className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">
-            {mode === "before_after" ? "After Discount" : "Discount Amount"}
+            {label}
           </div>
           <div
             className={[
               "mt-2 text-4xl font-black",
-              mode === "before_after" ? "text-emerald-700" : "text-rose-700",
+              showFinalCard ? "text-emerald-700" : "text-rose-700",
             ].join(" ")}
           >
-            {mode === "before_after" ? formatMoney(visual.finalPrice) : formatMoney(visual.discount)}
+            {canRevealValue
+              ? showFinalCard
+                ? formatMoney(visual.finalPrice)
+                : formatMoney(visual.discount)
+              : "?"}
           </div>
+          {!canRevealValue ? (
+            <div className="mt-2 text-sm font-bold text-slate-500">
+              Complete the steps to reveal this.
+            </div>
+          ) : null}
         </div>
       </div>
 
