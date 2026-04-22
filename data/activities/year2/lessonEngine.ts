@@ -649,6 +649,7 @@ type PercentStructuredTemplate = {
   percent: number;
   amount: number;
   steps: PercentStructuredMethodVisualData["steps"];
+  method?: PercentStructuredMethodVisualData["method"];
 };
 
 function greatestCommonFactor(left: number, right: number): number {
@@ -1278,6 +1279,56 @@ function year5PercentStructuredTemplates(): PercentStructuredTemplate[] {
   ];
 }
 
+function year5PercentDecimalMethodTemplates(): PercentStructuredTemplate[] {
+  return [
+    {
+      percent: 30,
+      amount: 60,
+      method: "decimal",
+      steps: [
+        { prompt: "Convert 30% to a decimal", answer: "0.3" },
+        { prompt: "0.3 × 60 =", answer: "18" },
+      ],
+    },
+    {
+      percent: 15,
+      amount: 200,
+      method: "decimal",
+      steps: [
+        { prompt: "Convert 15% to a decimal", answer: "0.15" },
+        { prompt: "0.15 × 200 =", answer: "30" },
+      ],
+    },
+    {
+      percent: 12,
+      amount: 50,
+      method: "decimal",
+      steps: [
+        { prompt: "Convert 12% to a decimal", answer: "0.12" },
+        { prompt: "0.12 × 50 =", answer: "6" },
+      ],
+    },
+    {
+      percent: 35,
+      amount: 80,
+      method: "decimal",
+      steps: [
+        { prompt: "Convert 35% to a decimal", answer: "0.35" },
+        { prompt: "0.35 × 80 =", answer: "28" },
+      ],
+    },
+    {
+      percent: 25,
+      amount: 120,
+      method: "decimal",
+      steps: [
+        { prompt: "Convert 25% to a decimal", answer: "0.25" },
+        { prompt: "0.25 × 120 =", answer: "30" },
+      ],
+    },
+  ];
+}
+
 function year5PercentRealWorldTemplates(): PercentAmountChoiceTemplate[] {
   return [
     {
@@ -1655,6 +1706,7 @@ export type PercentStructuredMethodVisualData = {
   type: "percent_structured_method";
   percent: number;
   amount: number;
+  method?: "strategy" | "decimal";
   steps: Array<{
     prompt: string;
     answer: string;
@@ -10436,10 +10488,14 @@ function generateGenericQuestion(
     explicitMode === "percent_of_amount" ||
     explicitMode === "percent_quick_find" ||
     explicitMode === "percent_structured_method" ||
+    explicitMode === "percent_decimal_method" ||
     explicitMode === "percent_real_world"
   ) {
-    if (explicitMode === "percent_structured_method") {
-      const templates = year5PercentStructuredTemplates();
+    if (explicitMode === "percent_structured_method" || explicitMode === "percent_decimal_method") {
+      const useDecimalMethod = explicitMode === "percent_decimal_method" || randInt(1, 10) <= 3;
+      const templates = useDecimalMethod
+        ? year5PercentDecimalMethodTemplates()
+        : year5PercentStructuredTemplates();
       const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
       const finalStep = chosen.steps[chosen.steps.length - 1] ?? chosen.steps[0]!;
 
@@ -10447,12 +10503,16 @@ function generateGenericQuestion(
         kind: "typed_response",
         prompt: `Find ${chosen.percent}% of ${chosen.amount}`,
         answer: finalStep.answer,
-        helper: "Break the percentage into easier benchmark parts.",
+        helper:
+          chosen.method === "decimal"
+            ? "Divide by 100 to make a decimal, then multiply by the amount."
+            : "Break the percentage into easier benchmark parts.",
         placeholder: "Type the answer",
         visual: {
           type: "percent_structured_method",
           percent: chosen.percent,
           amount: chosen.amount,
+          method: chosen.method ?? "strategy",
           steps: chosen.steps,
         },
       };

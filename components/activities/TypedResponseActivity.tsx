@@ -197,10 +197,12 @@ function PercentStructuredMethodInput({
   return (
     <div className="w-full rounded-2xl border border-amber-100 bg-amber-50 p-5">
       <div className="text-xs font-black uppercase tracking-[0.18em] text-amber-700">
-        Percentage Method
+        {visual.method === "decimal" ? "Decimal Method" : "Percentage Method"}
       </div>
       <div className="mt-2 text-sm font-bold text-slate-600">
-        Break {visual.percent}% of {visual.amount} into easier parts.
+        {visual.method === "decimal"
+          ? `Convert ${visual.percent}% to a decimal, then multiply by ${visual.amount}.`
+          : `Break ${visual.percent}% of ${visual.amount} into easier parts.`}
       </div>
       <div className="mt-5 grid gap-3">
         {visual.steps.map((step, index) => {
@@ -442,6 +444,20 @@ function digitCells(value: number, width: number) {
 
 function normalizeNumberInput(value: string) {
   return value.replace(/,/g, "").replace(/\s+/g, "");
+}
+
+function numericInputsMatch(actual: string, expected: string) {
+  const normalizedActual = normalizeDecimalEquivalent(normalizeNumberInput(actual));
+  const normalizedExpected = normalizeDecimalEquivalent(normalizeNumberInput(expected));
+  if (normalizedActual === normalizedExpected) return true;
+
+  const actualNumber = Number(normalizedActual);
+  const expectedNumber = Number(normalizedExpected);
+  return (
+    Number.isFinite(actualNumber) &&
+    Number.isFinite(expectedNumber) &&
+    Math.abs(actualNumber - expectedNumber) < 0.000001
+  );
 }
 
 function parseStructuredFraction(value: string) {
@@ -1994,7 +2010,7 @@ export default function TypedResponseActivity({
       const step = percentStructuredMethodVisual.steps[percentMethodStep];
       if (!step) return;
 
-      if (normalizeNumberInput(percentMethodInputs[percentMethodStep] ?? "") === step.answer) {
+      if (numericInputsMatch(percentMethodInputs[percentMethodStep] ?? "", step.answer)) {
         setPercentMethodFeedback("");
         if (percentMethodStep >= percentStructuredMethodVisual.steps.length - 1) {
           onCorrect?.();
@@ -2002,7 +2018,11 @@ export default function TypedResponseActivity({
           setPercentMethodStep((current) => current + 1);
         }
       } else {
-        setPercentMethodFeedback("Break the percentage into easier parts and try this step again.");
+        setPercentMethodFeedback(
+          percentStructuredMethodVisual.method === "decimal"
+            ? "Divide by 100 first, then multiply by the amount."
+            : "Break the percentage into easier parts and try this step again."
+        );
         onWrong?.();
       }
       return;
