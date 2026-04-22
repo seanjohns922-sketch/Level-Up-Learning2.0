@@ -20,6 +20,10 @@ function buildInitialTurn(lesson: Lesson, activities: Lesson["activities"] = [])
   return chooseNextLessonTurn(level, lesson, activities, [], null, [], 0);
 }
 
+function isOrderedStrategyFluencyLesson(level: SupportedMathLevel, lesson: Lesson) {
+  return level === 5 && lesson.week === 11 && lesson.lesson === 2;
+}
+
 function chooseNextLessonTurn(
   level: SupportedMathLevel,
   lesson: Lesson,
@@ -41,10 +45,19 @@ function chooseNextLessonTurn(
     };
   }
 
-  const weighted = pickWeightedIndex(activities, currentBag, lastIndex);
-  const candidateIndexes = Array.from(
-    new Set([weighted.index, ...activities.map((_, index) => index)].filter((index) => index >= 0))
-  );
+  const orderedActivityIndex = isOrderedStrategyFluencyLesson(level, lesson)
+    ? questionOrder % activities.length
+    : null;
+  const weighted =
+    orderedActivityIndex === null
+      ? pickWeightedIndex(activities, currentBag, lastIndex)
+      : { index: orderedActivityIndex, bag: currentBag };
+  const candidateIndexes =
+    orderedActivityIndex === null
+      ? Array.from(
+          new Set([weighted.index, ...activities.map((_, index) => index)].filter((index) => index >= 0))
+        )
+      : [orderedActivityIndex];
 
   let best:
     | {
@@ -390,6 +403,8 @@ export function Year2LessonEngine({
   const activityLabel = currentActivity
     ? currentActivity.activityType.replace(/_/g, " ").toUpperCase()
     : "PRACTISE";
+  const showStrategySwitchPrompt =
+    isOrderedStrategyFluencyLesson(level, lesson) && questionsAnswered === 4 && status === "idle";
 
   // ── Finished state ──
   if (finished) {
@@ -454,6 +469,12 @@ export function Year2LessonEngine({
         </aside>
 
         <div className="min-w-0 space-y-3">
+          {showStrategySwitchPrompt ? (
+            <div className="rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm font-black text-sky-800 shadow-sm">
+              Try a different strategy for the next question.
+            </div>
+          ) : null}
+
           {status !== "idle" && (
             <div
               className={`rounded-xl px-4 py-2.5 text-center text-sm font-extrabold shadow-sm transition-all ${

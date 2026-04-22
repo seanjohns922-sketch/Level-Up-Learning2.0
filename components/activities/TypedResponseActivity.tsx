@@ -450,7 +450,11 @@ function StrategyOwnershipInput({
         </div>
       ) : null}
 
-      {feedback ? <p className="text-sm font-bold text-rose-600">{feedback}</p> : null}
+      {feedback ? (
+        <p className={["text-sm font-bold", solved ? "text-emerald-700" : "text-rose-600"].join(" ")}>
+          {feedback}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -2058,7 +2062,6 @@ export default function TypedResponseActivity({
     if (isStrategyOwnership && strategyOwnershipVisual) {
       if (!ownershipStrategy) {
         setOwnershipFeedback("Choose a strategy first. There is no single correct strategy here.");
-        onWrong?.();
         return;
       }
 
@@ -2082,7 +2085,6 @@ export default function TypedResponseActivity({
             ? `Your strategy could still work. ${selectedStrategyData.feedback} Check your calculation and try again.`
             : "Your strategy could still work. Check your calculation and try again."
         );
-        onWrong?.();
         return;
       }
 

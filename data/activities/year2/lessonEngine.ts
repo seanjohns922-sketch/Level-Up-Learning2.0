@@ -2219,6 +2219,70 @@ function year5ChooseYourStrategyTemplates(mode: string | undefined): StrategyOwn
   return quick;
 }
 
+function year5StrategyFluencyTemplates(mode: string | undefined): StrategyOwnershipTemplate[] {
+  const strategies: StrategyOwnershipTemplate["strategies"] = [
+    strategyChoice("Mental maths", "FAST", "Nice if you can hold the parts in your head. Check the calculation carefully."),
+    strategyChoice("Split numbers", "CLEAR", "That works well. Breaking the numbers into parts can make the thinking clear."),
+    strategyChoice("Round & adjust", "SMART CHOICE", "Useful when a number is close to a benchmark. Remember to adjust back."),
+    strategyChoice("Column method", "CLEAR", "That strategy is valid and reliable. It may be slower, but it keeps the work organised."),
+  ];
+  const reflectionPrompt = "Was your method fast, clear, or worth trying another way?";
+  const reflectionOptions = ["Fast", "Clear", "Both", "Try another way"];
+
+  const byMode: Record<string, StrategyOwnershipTemplate[]> = {
+    strategy_fluency_addition: [
+      { prompt: "398 + 47", answer: "445", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "999 + 246", answer: "1245", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "1,250 + 375", answer: "1625", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "2,499 + 518", answer: "3017", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "3,750 + 1,250", answer: "5000", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "1,998 + 307", answer: "2305", strategies, reflectionPrompt, reflectionOptions },
+    ],
+    strategy_fluency_subtraction: [
+      { prompt: "602 - 198", answer: "404", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "1,000 - 376", answer: "624", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "1,204 - 399", answer: "805", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "3,005 - 998", answer: "2007", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "2,500 - 1,245", answer: "1255", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "4,010 - 1,999", answer: "2011", strategies, reflectionPrompt, reflectionOptions },
+    ],
+    strategy_fluency_decimal_addition: [
+      { prompt: "5.98 + 2.4", answer: "8.38", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "3.75 + 1.25", answer: "5", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "12.5 + 0.75", answer: "13.25", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "4.099 + 0.901", answer: "5", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "7.6 + 2.45", answer: "10.05", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "18.375 + 1.625", answer: "20", strategies, reflectionPrompt, reflectionOptions },
+    ],
+    strategy_fluency_decimal_subtraction: [
+      { prompt: "6.02 - 1.98", answer: "4.04", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "10.5 - 2.75", answer: "7.75", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "8.000 - 3.125", answer: "4.875", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "12.4 - 0.99", answer: "11.41", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "5.75 - 1.25", answer: "4.5", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "20.05 - 4.5", answer: "15.55", strategies, reflectionPrompt, reflectionOptions },
+    ],
+    strategy_fluency_multiplication: [
+      { prompt: "49 × 6", answer: "294", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "25 × 16", answer: "400", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "50 × 18", answer: "900", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "125 × 8", answer: "1000", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "99 × 11", answer: "1089", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "24 × 15", answer: "360", strategies, reflectionPrompt, reflectionOptions },
+    ],
+    strategy_fluency_division: [
+      { prompt: "450 ÷ 6", answer: "75", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "1,000 ÷ 8", answer: "125", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "900 ÷ 12", answer: "75", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "1,250 ÷ 5", answer: "250", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "864 ÷ 9", answer: "96", strategies, reflectionPrompt, reflectionOptions },
+      { prompt: "2,400 ÷ 50", answer: "48", strategies, reflectionPrompt, reflectionOptions },
+    ],
+  };
+
+  return byMode[mode ?? ""] ?? byMode.strategy_fluency_addition;
+}
+
 function discountStepVisual(template: DiscountStepTemplate): DiscountStepMethodVisualData {
   const discount = discountAmount(template.price, template.percent);
   const finalPrice = template.price - discount;
@@ -11592,9 +11656,18 @@ function generateGenericQuestion(
   if (
     explicitMode === "choose_strategy_quick" ||
     explicitMode === "choose_strategy_reflect" ||
-    explicitMode === "choose_strategy_apply"
+    explicitMode === "choose_strategy_apply" ||
+    explicitMode === "strategy_fluency_addition" ||
+    explicitMode === "strategy_fluency_subtraction" ||
+    explicitMode === "strategy_fluency_decimal_addition" ||
+    explicitMode === "strategy_fluency_decimal_subtraction" ||
+    explicitMode === "strategy_fluency_multiplication" ||
+    explicitMode === "strategy_fluency_division"
   ) {
-    const templates = year5ChooseYourStrategyTemplates(explicitMode);
+    const isFluencyMode = explicitMode.startsWith("strategy_fluency_");
+    const templates = isFluencyMode
+      ? year5StrategyFluencyTemplates(explicitMode)
+      : year5ChooseYourStrategyTemplates(explicitMode);
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
 
     return {
@@ -11605,8 +11678,10 @@ function generateGenericQuestion(
       placeholder: "Type your answer",
       visual: {
         type: "strategy_ownership",
-        missionTitle: "Choose Your Strategy",
-        missionDescription: "Pick a strategy that works for you, solve the problem, and reflect on your thinking.",
+        missionTitle: isFluencyMode ? "Strategy Sprint" : "Choose Your Strategy",
+        missionDescription: isFluencyMode
+          ? "Pick a strategy, solve the problem, and notice whether your method was fast or clear."
+          : "Pick a strategy that works for you, solve the problem, and reflect on your thinking.",
         supportText:
           "In maths, there is often more than one way to solve a problem. Good mathematicians choose a strategy that makes sense to them.",
         problemLabel: chosen.prompt,
