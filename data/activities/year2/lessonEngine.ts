@@ -687,6 +687,14 @@ type MultiStepMethodTemplate = {
   visual?: DiscountPriceVisualData;
 };
 
+type StrategyOwnershipTemplate = {
+  prompt: string;
+  answer: string;
+  strategies: StrategyOwnershipVisualData["strategies"];
+  reflectionPrompt: string;
+  reflectionOptions: string[];
+};
+
 function greatestCommonFactor(left: number, right: number): number {
   let a = Math.abs(left);
   let b = Math.abs(right);
@@ -2068,6 +2076,149 @@ function year5MultiStepSolveTemplates(): MultiStepChoiceTemplate[] {
   ];
 }
 
+function strategyChoice(
+  label: string,
+  tag: StrategyOwnershipVisualData["strategies"][number]["tag"],
+  feedback: string
+): StrategyOwnershipVisualData["strategies"][number] {
+  return { label, tag, feedback };
+}
+
+function year5ChooseYourStrategyTemplates(mode: string | undefined): StrategyOwnershipTemplate[] {
+  const quick: StrategyOwnershipTemplate[] = [
+    {
+      prompt: "398 + 47",
+      answer: "445",
+      strategies: [
+        strategyChoice("Round and adjust", "FAST", "Nice choice. Rounding 398 to 400 makes this quick, then adjust back."),
+        strategyChoice("Split the number", "CLEAR", "That strategy works well. Split 47 into 40 and 7, then add in parts."),
+        strategyChoice("Column method", "CLEAR", "That method is valid and clear, though another strategy may be faster here."),
+        strategyChoice("Another way / my own method", "SMART CHOICE", "Good ownership. Your own method is valid if your working stays accurate."),
+      ],
+      reflectionPrompt: "Was your method fast, clear, or both?",
+      reflectionOptions: ["Fast", "Clear", "Both", "I want to try another way"],
+    },
+    {
+      prompt: "602 - 198",
+      answer: "404",
+      strategies: [
+        strategyChoice("Compensation", "FAST", "Smart choice. 602 - 200 + 2 is efficient for this problem."),
+        strategyChoice("Round and adjust", "FAST", "That strategy matches the numbers well. Adjust carefully after rounding 198."),
+        strategyChoice("Column method", "CLEAR", "That strategy can work. It is clear, but compensation may be quicker here."),
+        strategyChoice("Another way / my own method", "SMART CHOICE", "Your strategy can work. Check each adjustment carefully."),
+      ],
+      reflectionPrompt: "Would you use the same strategy next time?",
+      reflectionOptions: ["Yes", "Maybe", "I would compare methods", "I would try another way"],
+    },
+    {
+      prompt: "3.75 + 1.25",
+      answer: "5",
+      strategies: [
+        strategyChoice("Mental maths", "FAST", "Nice choice. These decimals combine neatly to make a whole number."),
+        strategyChoice("Use place value knowledge", "SMART CHOICE", "Good thinking. Hundredths and tenths line up cleanly here."),
+        strategyChoice("Column method", "CLEAR", "That method is valid and clear. Make sure the decimal points line up."),
+        strategyChoice("Another way / my own method", "SMART CHOICE", "That can work. Keep the decimal places accurate."),
+      ],
+      reflectionPrompt: "Which strategy felt easiest for you?",
+      reflectionOptions: ["Mental maths", "Place value", "Column method", "My own method"],
+    },
+  ];
+
+  const build: StrategyOwnershipTemplate[] = [
+    {
+      prompt: "5.98 + 2.4",
+      answer: "8.38",
+      strategies: [
+        strategyChoice("Round and adjust", "FAST", "Efficient choice. 5.98 is close to 6, then adjust by 0.02."),
+        strategyChoice("Column method", "CLEAR", "Clear strategy. Line up the decimal points and include the zero in 2.40."),
+        strategyChoice("Use place value knowledge", "SMART CHOICE", "Good choice. Think in tenths and hundredths to keep the decimal accurate."),
+        strategyChoice("Another way / my own method", "SMART CHOICE", "Your own strategy is valid if it keeps the decimal places clear."),
+      ],
+      reflectionPrompt: "Did your method keep the decimal places clear?",
+      reflectionOptions: ["Yes", "Mostly", "I checked it another way", "I want to try another way"],
+    },
+    {
+      prompt: "999 + 246",
+      answer: "1245",
+      strategies: [
+        strategyChoice("Compensation", "FAST", "Smart choice. Add 1000, then subtract 1."),
+        strategyChoice("Split the number", "CLEAR", "That works well. Split 246 into hundreds, tens, and ones."),
+        strategyChoice("Column method", "CLEAR", "Valid and reliable. Another method may be faster because 999 is close to 1000."),
+        strategyChoice("Another way / my own method", "SMART CHOICE", "Good ownership. Check your adjustment so the final answer stays accurate."),
+      ],
+      reflectionPrompt: "Could another strategy also work?",
+      reflectionOptions: ["Yes", "No", "I want to compare", "I used my own method"],
+    },
+    {
+      prompt: "1200 - 375",
+      answer: "825",
+      strategies: [
+        strategyChoice("Split the number", "CLEAR", "That strategy works. Subtract 300, then 75."),
+        strategyChoice("Round and adjust", "SMART CHOICE", "Useful choice. Subtract 400, then add 25 back."),
+        strategyChoice("Column method", "CLEAR", "That method is valid and careful. Watch the regrouping."),
+        strategyChoice("Another way / my own method", "SMART CHOICE", "Your method can work. Check the subtraction in parts."),
+      ],
+      reflectionPrompt: "Was your method clear enough to check?",
+      reflectionOptions: ["Yes", "Mostly", "Not yet", "I would try another way"],
+    },
+    {
+      prompt: "49 × 6",
+      answer: "294",
+      strategies: [
+        strategyChoice("Round and adjust", "FAST", "Efficient choice. 50 × 6, then subtract one group of 6."),
+        strategyChoice("Split the number", "CLEAR", "That works. Use 40 × 6 and 9 × 6, then combine."),
+        strategyChoice("Use place value knowledge", "SMART CHOICE", "Good choice. Multiplying tens and ones separately keeps it organised."),
+        strategyChoice("Another way / my own method", "SMART CHOICE", "That can work. Check the final product carefully."),
+      ],
+      reflectionPrompt: "Was your strategy fast, clear, or both?",
+      reflectionOptions: ["Fast", "Clear", "Both", "I want another method"],
+    },
+  ];
+
+  const challenge: StrategyOwnershipTemplate[] = [
+    {
+      prompt: "24 × 15",
+      answer: "360",
+      strategies: [
+        strategyChoice("Split the number", "CLEAR", "Good choice. 24 × 10 and 24 × 5 are useful parts."),
+        strategyChoice("Mental maths", "FAST", "That can be efficient if you see 15 as 10 + 5."),
+        strategyChoice("Column method", "CLEAR", "Valid and reliable. Make sure both partial products are included."),
+        strategyChoice("Another way / my own method", "SMART CHOICE", "Your method is valid if it accounts for all 15 groups."),
+      ],
+      reflectionPrompt: "Would you solve this the same way next time?",
+      reflectionOptions: ["Yes", "Maybe", "I would compare methods", "No"],
+    },
+    {
+      prompt: "7.5 + 2.75",
+      answer: "10.25",
+      strategies: [
+        strategyChoice("Use place value knowledge", "SMART CHOICE", "Good thinking. Keep tenths and hundredths lined up."),
+        strategyChoice("Column method", "CLEAR", "Clear strategy. Write 7.50 so both numbers have hundredths."),
+        strategyChoice("Mental maths", "FAST", "This can work if you combine 7.5 + 2.5, then add 0.25."),
+        strategyChoice("Another way / my own method", "SMART CHOICE", "Your strategy can work. Check the decimal places."),
+      ],
+      reflectionPrompt: "Which part needed the most care?",
+      reflectionOptions: ["Decimal places", "Adding parts", "Checking", "Choosing a method"],
+    },
+    {
+      prompt: "450 ÷ 6 + 28",
+      answer: "103",
+      strategies: [
+        strategyChoice("Use place value knowledge", "SMART CHOICE", "Good choice. Divide 450 by 6 first, then add 28."),
+        strategyChoice("Split the number", "CLEAR", "That can work. Split 450 into parts that divide cleanly by 6."),
+        strategyChoice("Mental maths", "FAST", "Efficient if you know 45 ÷ 6 = 7.5, so 450 ÷ 6 = 75."),
+        strategyChoice("Another way / my own method", "SMART CHOICE", "Your method is valid if you do the division before adding."),
+      ],
+      reflectionPrompt: "Did the order of steps matter?",
+      reflectionOptions: ["Yes", "No", "I checked it", "I want to compare"],
+    },
+  ];
+
+  if (mode === "choose_strategy_apply") return challenge;
+  if (mode === "choose_strategy_reflect") return build;
+  return quick;
+}
+
 function discountStepVisual(template: DiscountStepTemplate): DiscountStepMethodVisualData {
   const discount = discountAmount(template.price, template.percent);
   const finalPrice = template.price - discount;
@@ -2451,6 +2602,21 @@ export type MultiStepMethodVisualData = {
   supportVisual?: DiscountPriceVisualData;
 };
 
+export type StrategyOwnershipVisualData = {
+  type: "strategy_ownership";
+  missionTitle: string;
+  missionDescription: string;
+  supportText: string;
+  problemLabel: string;
+  strategies: Array<{
+    label: string;
+    tag: "FAST" | "CLEAR" | "SMART CHOICE" | "TRY ANOTHER WAY";
+    feedback: string;
+  }>;
+  reflectionPrompt: string;
+  reflectionOptions: string[];
+};
+
 export type MultipleChoiceQuestion = {
   kind: "multiple_choice";
   prompt: string;
@@ -2519,6 +2685,7 @@ export type TypedResponseQuestion = {
     | PercentStructuredMethodVisualData
     | DiscountStepMethodVisualData
     | MultiStepMethodVisualData
+    | StrategyOwnershipVisualData
     | {
         type: "equivalent_fraction_input";
         leftNumerator: number;
@@ -11419,6 +11586,34 @@ function generateGenericQuestion(
       answer: chosen.answer,
       helper: chosen.helper,
       visual: chosen.visual,
+    };
+  }
+
+  if (
+    explicitMode === "choose_strategy_quick" ||
+    explicitMode === "choose_strategy_reflect" ||
+    explicitMode === "choose_strategy_apply"
+  ) {
+    const templates = year5ChooseYourStrategyTemplates(explicitMode);
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      helper: "Choose a strategy first. Then solve and reflect on how well it worked.",
+      placeholder: "Type your answer",
+      visual: {
+        type: "strategy_ownership",
+        missionTitle: "Choose Your Strategy",
+        missionDescription: "Pick a strategy that works for you, solve the problem, and reflect on your thinking.",
+        supportText:
+          "In maths, there is often more than one way to solve a problem. Good mathematicians choose a strategy that makes sense to them.",
+        problemLabel: chosen.prompt,
+        strategies: chosen.strategies,
+        reflectionPrompt: chosen.reflectionPrompt,
+        reflectionOptions: chosen.reflectionOptions,
+      },
     };
   }
 

@@ -328,6 +328,133 @@ function MultiStepMethodInput({
   );
 }
 
+function StrategyOwnershipInput({
+  visual,
+  selectedStrategy,
+  answerValue,
+  reflectionValue,
+  feedback,
+  solved,
+  onStrategySelect,
+  onAnswerChange,
+  onReflectionSelect,
+}: {
+  visual: Extract<NonNullable<TypedResponseQuestion["visual"]>, { type: "strategy_ownership" }>;
+  selectedStrategy: string | null;
+  answerValue: string;
+  reflectionValue: string | null;
+  feedback: string;
+  solved: boolean;
+  onStrategySelect: (strategy: string) => void;
+  onAnswerChange: (value: string) => void;
+  onReflectionSelect: (value: string) => void;
+}) {
+  const selectedStrategyData = visual.strategies.find((strategy) => strategy.label === selectedStrategy);
+
+  return (
+    <div className="w-full space-y-4">
+      <div className="rounded-2xl border border-teal-100 bg-gradient-to-br from-teal-50 to-sky-50 p-5">
+        <div className="text-xs font-black uppercase tracking-[0.18em] text-teal-700">
+          Mission Briefing
+        </div>
+        <div className="mt-2 text-xl font-black text-slate-900">{visual.missionTitle}</div>
+        <p className="mt-2 text-sm font-bold text-slate-700">{visual.missionDescription}</p>
+        <p className="mt-2 text-sm text-slate-600">{visual.supportText}</p>
+      </div>
+
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">
+          Step A: Problem
+        </div>
+        <div className="mt-2 text-4xl font-black text-slate-950">
+          <MathFormattedText text={visual.problemLabel} />
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-amber-100 bg-amber-50 p-5">
+        <div className="text-xs font-black uppercase tracking-[0.18em] text-amber-700">
+          Step B: Choose a Strategy
+        </div>
+        <div className="mt-3 grid gap-3 md:grid-cols-2">
+          {visual.strategies.map((strategy) => {
+            const active = selectedStrategy === strategy.label;
+            return (
+              <button
+                key={strategy.label}
+                type="button"
+                onClick={() => onStrategySelect(strategy.label)}
+                disabled={solved}
+                className={[
+                  "rounded-2xl border p-4 text-left transition",
+                  active
+                    ? "border-teal-500 bg-white shadow-sm ring-2 ring-teal-200"
+                    : "border-amber-200 bg-white/80 hover:bg-white",
+                  solved && !active ? "opacity-50" : "",
+                ].join(" ")}
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-base font-black text-slate-900">{strategy.label}</span>
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-slate-600">
+                    {strategy.tag}
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+        {selectedStrategyData ? (
+          <p className="mt-3 text-sm font-bold text-slate-700">{selectedStrategyData.feedback}</p>
+        ) : null}
+      </div>
+
+      <div className="rounded-2xl border border-teal-100 bg-teal-50 p-5">
+        <div className="text-xs font-black uppercase tracking-[0.18em] text-teal-700">
+          Step C: Solve
+        </div>
+        <input
+          value={answerValue}
+          onChange={(event) => onAnswerChange(event.target.value)}
+          disabled={solved}
+          placeholder="Type your answer"
+          className="mt-3 w-full max-w-md rounded-xl border border-teal-300 bg-white px-4 py-3 text-lg font-black text-slate-900 outline-none focus:border-teal-500 disabled:bg-emerald-50"
+          style={{ WebkitTextFillColor: "#0f172a" }}
+        />
+      </div>
+
+      {solved ? (
+        <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
+          <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">
+            Step D: Reflect
+          </div>
+          <p className="mt-2 text-base font-black text-slate-900">{visual.reflectionPrompt}</p>
+          <div className="mt-3 flex flex-wrap gap-3">
+            {visual.reflectionOptions.map((option) => {
+              const active = reflectionValue === option;
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => onReflectionSelect(option)}
+                  className={[
+                    "rounded-xl px-4 py-3 font-black transition",
+                    active
+                      ? "bg-emerald-600 text-white"
+                      : "border border-emerald-200 bg-white text-slate-900 hover:bg-emerald-50",
+                  ].join(" ")}
+                >
+                  {option}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+
+      {feedback ? <p className="text-sm font-bold text-rose-600">{feedback}</p> : null}
+    </div>
+  );
+}
+
 type RelatedDenominatorStep = "multiplier" | "numerator" | "solve" | "done";
 
 function getRelatedDenominatorWorking(
@@ -1334,6 +1461,9 @@ export default function TypedResponseActivity({
   const multiStepMethodVisual =
     questionData.visual?.type === "multi_step_method" ? questionData.visual : null;
   const isMultiStepMethod = multiStepMethodVisual !== null;
+  const strategyOwnershipVisual =
+    questionData.visual?.type === "strategy_ownership" ? questionData.visual : null;
+  const isStrategyOwnership = strategyOwnershipVisual !== null;
   const equivalentFractionInputVisual =
     questionData.visual?.type === "equivalent_fraction_input" ? questionData.visual : null;
   const isEquivalentFractionInput = equivalentFractionInputVisual !== null;
@@ -1411,6 +1541,10 @@ export default function TypedResponseActivity({
   const [selectedStrategy, setSelectedStrategy] = useState<MultiplicationStrategy | null>(null);
   const [strategyLocked, setStrategyLocked] = useState(false);
   const [strategyFeedback, setStrategyFeedback] = useState("");
+  const [ownershipStrategy, setOwnershipStrategy] = useState<string | null>(null);
+  const [ownershipReflection, setOwnershipReflection] = useState<string | null>(null);
+  const [ownershipFeedback, setOwnershipFeedback] = useState("");
+  const [ownershipSolved, setOwnershipSolved] = useState(false);
   const [estimateInput, setEstimateInput] = useState("");
   const [reasonablenessChoice, setReasonablenessChoice] = useState<EstimateReasonableness | null>(null);
   const [reasonablenessExplanation, setReasonablenessExplanation] = useState("");
@@ -1538,6 +1672,10 @@ export default function TypedResponseActivity({
       setSelectedStrategy(null);
       setStrategyLocked(false);
       setStrategyFeedback("");
+      setOwnershipStrategy(null);
+      setOwnershipReflection(null);
+      setOwnershipFeedback("");
+      setOwnershipSolved(false);
       setEstimateInput("");
       setReasonablenessChoice(null);
       setReasonablenessExplanation("");
@@ -1917,6 +2055,47 @@ export default function TypedResponseActivity({
       return;
     }
 
+    if (isStrategyOwnership && strategyOwnershipVisual) {
+      if (!ownershipStrategy) {
+        setOwnershipFeedback("Choose a strategy first. There is no single correct strategy here.");
+        onWrong?.();
+        return;
+      }
+
+      const selectedStrategyData = strategyOwnershipVisual.strategies.find(
+        (strategy) => strategy.label === ownershipStrategy
+      );
+
+      if (!ownershipSolved) {
+        if (numericInputsMatch(typed, questionData.answer)) {
+          setOwnershipSolved(true);
+          setOwnershipFeedback(
+            selectedStrategyData
+              ? `Correct answer. ${selectedStrategyData.feedback} Now reflect on how it worked for you.`
+              : "Correct answer. Now reflect on how your strategy worked for you."
+          );
+          return;
+        }
+
+        setOwnershipFeedback(
+          selectedStrategyData
+            ? `Your strategy could still work. ${selectedStrategyData.feedback} Check your calculation and try again.`
+            : "Your strategy could still work. Check your calculation and try again."
+        );
+        onWrong?.();
+        return;
+      }
+
+      if (!ownershipReflection) {
+        setOwnershipFeedback("Choose one reflection before moving on.");
+        return;
+      }
+
+      setOwnershipFeedback("");
+      onCorrect?.();
+      return;
+    }
+
     if ((isStrategyMultiplication || isEstimateStrategyMultiplication) && strategyVisual) {
       if (!selectedStrategy) {
         setStrategyFeedback("Choose one method before you start solving.");
@@ -2248,7 +2427,9 @@ export default function TypedResponseActivity({
   const visualType = questionData.visual?.type;
   const activityTitle =
     writtenMethod?.title ??
-    (visualType === "multi_step_method"
+    (visualType === "strategy_ownership"
+      ? "Choose Your Strategy"
+      : visualType === "multi_step_method"
       ? "Build the Solution"
       : visualType === "discount_step_method"
       ? "Discount Method"
@@ -2266,7 +2447,9 @@ export default function TypedResponseActivity({
       ? "Column Multiplication"
       : "Typed Response");
   const typedResponseButtonLabel =
-    ((isPercentStructuredMethod && percentStructuredMethodVisual) ||
+    isStrategyOwnership && ownershipSolved
+      ? "Finish reflection"
+      : ((isPercentStructuredMethod && percentStructuredMethodVisual) ||
       (isDiscountStepMethod && discountStepMethodVisual) ||
       (isMultiStepMethod && multiStepMethodVisual)) &&
     percentMethodStep <
@@ -2997,6 +3180,24 @@ export default function TypedResponseActivity({
                 ))}
               </div>
             </div>
+          ) : isStrategyOwnership && strategyOwnershipVisual ? (
+            <StrategyOwnershipInput
+              visual={strategyOwnershipVisual}
+              selectedStrategy={ownershipStrategy}
+              answerValue={typed}
+              reflectionValue={ownershipReflection}
+              feedback={ownershipFeedback}
+              solved={ownershipSolved}
+              onStrategySelect={(strategy) => {
+                setOwnershipStrategy(strategy);
+                setOwnershipFeedback("");
+              }}
+              onAnswerChange={(value) => setTyped(value)}
+              onReflectionSelect={(value) => {
+                setOwnershipReflection(value);
+                setOwnershipFeedback("");
+              }}
+            />
           ) : isMultiStepMethod && multiStepMethodVisual ? (
             <MultiStepMethodInput
               visual={multiStepMethodVisual}

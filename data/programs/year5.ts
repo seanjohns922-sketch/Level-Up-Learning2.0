@@ -25,15 +25,30 @@ const year5Rows: ProgramRow[] = [
   },
   {
     week: 1,
-    focus: "Compare and order decimals using place value reasoning",
+    focus: "Choose a strategy, solve accurately, and reflect on efficiency",
     lesson: 2,
-    topic: "Compare & Order Decimals",
-    activity: "Compare, order, and spot common decimal errors such as 0.5 vs 0.05.",
-    curriculum: ["AC9M5N01"],
+    topic: "Choose Your Strategy",
+    activity: "Pick a strategy that works for you, solve the problem, and reflect on your thinking.",
+    curriculum: ["AC9M5N08", "AC9M5N09"],
     activities: [
-      makeActivity("multiple_choice", 2, { mode: "decimal_compare" }),
-      makeActivity("number_order", 2, { mode: "decimal_order", count: 4, ascending: true, min: 0.001, max: 12.999, step: 0.001 }),
-      makeActivity("typed_response", 1, { mode: "decimal_compare" }),
+      makeActivity("typed_response", 1, {
+        mode: "choose_strategy_quick",
+        rotationRole: "fast_thinking",
+        rotationLabel: "Pick a Strategy",
+        rotationPurpose: "Choose a useful strategy and solve a number-sense problem.",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "choose_strategy_reflect",
+        rotationRole: "reasoning",
+        rotationLabel: "Solve and Reflect",
+        rotationPurpose: "Use a chosen strategy, then reflect on whether it was fast, clear, or worth comparing.",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "choose_strategy_apply",
+        rotationRole: "apply_create",
+        rotationLabel: "Strategy Challenge",
+        rotationPurpose: "Apply strategy ownership to richer Level 5 problems.",
+      }),
     ],
   },
   {
