@@ -671,6 +671,22 @@ type PercentStepSelectionTemplate = {
   visual: DiscountPriceVisualData;
 };
 
+type MultiStepChoiceTemplate = {
+  prompt: string;
+  answer: string;
+  options: string[];
+  helper: string;
+  visual?: DiscountPriceVisualData;
+};
+
+type MultiStepMethodTemplate = {
+  title: string;
+  prompt: string;
+  contextLabel: string;
+  steps: MultiStepMethodVisualData["steps"];
+  visual?: DiscountPriceVisualData;
+};
+
 function greatestCommonFactor(left: number, right: number): number {
   let a = Math.abs(left);
   let b = Math.abs(right);
@@ -1805,6 +1821,253 @@ function year5PercentRealWorldMultiTemplates(): PercentAmountChoiceTemplate[] {
   ];
 }
 
+function year5MultiStepDecideTemplates(): MultiStepChoiceTemplate[] {
+  return [
+    {
+      prompt: "A jacket costs $200. It is 15% off, then a $10 fee is added. Which quantity is needed before the fee?",
+      answer: "$170 sale price",
+      options: ["$170 sale price", "$30 final fee", "$210 starting cost", "$15 final price"],
+      helper: "Find the discount and sale price before adding the fee.",
+      visual: discountVisual({ item: "jacket", price: 200, percent: 15, ask: "discount" }, "price_tag", true),
+    },
+    {
+      prompt: "A game costs $60. It is 20% off. You buy 3 games. What single-game price do you use?",
+      answer: "$48",
+      options: ["$48", "$12", "$180", "$36"],
+      helper: "Find the discounted cost of one game before multiplying by 3.",
+      visual: discountVisual({ item: "game", price: 60, percent: 20, ask: "discount" }, "shop_item", true),
+    },
+    {
+      prompt: "Shop A gives 20% off $100. Shop B gives $25 off $100. Which final prices should be compared?",
+      answer: "$80 and $75",
+      options: ["$80 and $75", "$20 and $25", "$100 and $100", "$120 and $125"],
+      helper: "Compare final prices, not discount amounts.",
+      visual: discountVisual({ item: "shop offer", price: 100, percent: 20, ask: "discount" }, "percent_bar", true),
+    },
+    {
+      prompt: "A $120 item is 25% off. You have a $100 budget. What final price decides affordability?",
+      answer: "$90",
+      options: ["$90", "$30", "$100", "$145"],
+      helper: "Find the sale price before comparing with the budget.",
+      visual: discountVisual({ item: "budget item", price: 120, percent: 25, ask: "discount" }, "price_tag", true),
+    },
+    {
+      prompt: "A box holds 40 items. 25% are damaged, then 6 more are removed. How many good items remain?",
+      answer: "24",
+      options: ["24", "30", "10", "34"],
+      helper: "Find the damaged amount, then remove 6 more.",
+    },
+    {
+      prompt: "A recipe serves 4 people. You triple it, then remove 2 portions. How many portions are left?",
+      answer: "10",
+      options: ["10", "12", "6", "14"],
+      helper: "Scale first, then subtract.",
+    },
+    {
+      prompt: "A ticket costs $30. A family buys 4 tickets, then uses a $20 voucher. What is the amount paid?",
+      answer: "$100",
+      options: ["$100", "$120", "$50", "$80"],
+      helper: "Multiply the ticket cost first, then subtract the voucher.",
+    },
+    {
+      prompt: "A class has 32 students. They form groups of 4, then 2 groups leave. How many groups remain?",
+      answer: "6",
+      options: ["6", "8", "30", "4"],
+      helper: "Divide into groups first, then subtract groups.",
+    },
+    {
+      prompt: "A $75 bundle has $15 off, then 10% off the new price. What is the final price?",
+      answer: "$54",
+      options: ["$54", "$60", "$52.50", "$67.50"],
+      helper: "Subtract the fixed discount before applying 10%.",
+      visual: discountVisual({ item: "bundle", price: 75, percent: 10, ask: "discount" }, "price_tag", true),
+    },
+    {
+      prompt: "After a 25% discount, an item costs $75. What was the original price?",
+      answer: "$100",
+      options: ["$100", "$75", "$25", "$93.75"],
+      helper: "After 25% off, the final price is 75% of the original.",
+    },
+  ];
+}
+
+function year5MultiStepBuildTemplates(): MultiStepMethodTemplate[] {
+  return [
+    {
+      title: "Bike final cost",
+      prompt: "A bike costs $300. It is reduced by 20%, then a $15 service fee is added.",
+      contextLabel: "Find the discount, subtract it, then add the fee.",
+      visual: discountVisual({ item: "bike", price: 300, percent: 20, ask: "discount" }, "price_tag", true),
+      steps: [
+        { prompt: "Find 20% of 300", answer: "60" },
+        { prompt: "300 - 60 =", answer: "240" },
+        { prompt: "240 + 15 =", answer: "255" },
+      ],
+    },
+    {
+      title: "Three sale items",
+      prompt: "A $50 item is 20% off. You buy 3 items.",
+      contextLabel: "Find the sale price of one item, then multiply by 3.",
+      visual: discountVisual({ item: "sale item", price: 50, percent: 20, ask: "discount" }, "shop_item", true),
+      steps: [
+        { prompt: "Find 20% of 50", answer: "10" },
+        { prompt: "50 - 10 =", answer: "40" },
+        { prompt: "40 × 3 =", answer: "120" },
+      ],
+    },
+    {
+      title: "Budget shortfall",
+      prompt: "A game costs $80. It is 25% off. You have a $50 budget.",
+      contextLabel: "Find the sale price, then compare with the budget.",
+      visual: discountVisual({ item: "game", price: 80, percent: 25, ask: "discount" }, "price_tag", true),
+      steps: [
+        { prompt: "Find 25% of 80", answer: "20" },
+        { prompt: "80 - 20 =", answer: "60" },
+        { prompt: "60 - 50 =", answer: "10" },
+      ],
+    },
+    {
+      title: "Good items remain",
+      prompt: "A box holds 40 items. 25% are damaged. Then 6 more are removed.",
+      contextLabel: "Find damaged items, then remove 6 more from the good items.",
+      steps: [
+        { prompt: "Find 25% of 40", answer: "10" },
+        { prompt: "40 - 10 =", answer: "30" },
+        { prompt: "30 - 6 =", answer: "24" },
+      ],
+    },
+    {
+      title: "Shop comparison",
+      prompt: "Shop A gives 20% off $100. Shop B gives $25 off $100.",
+      contextLabel: "Calculate both final prices, then choose the cheaper one.",
+      visual: discountVisual({ item: "shop comparison", price: 100, percent: 20, ask: "discount" }, "percent_bar", true),
+      steps: [
+        { prompt: "Shop A discount: 20% of 100", answer: "20" },
+        { prompt: "Shop A final: 100 - 20", answer: "80" },
+        { prompt: "Shop B final: 100 - 25", answer: "75" },
+      ],
+    },
+    {
+      title: "Ticket voucher",
+      prompt: "A ticket costs $30. A family buys 4 tickets, then uses a $20 voucher.",
+      contextLabel: "Find the total ticket cost, then subtract the voucher.",
+      steps: [
+        { prompt: "30 × 4 =", answer: "120" },
+        { prompt: "120 - 20 =", answer: "100" },
+      ],
+    },
+    {
+      title: "Reverse price",
+      prompt: "After a 25% discount, an item costs $75.",
+      contextLabel: "The final price is 75% of the original.",
+      steps: [
+        { prompt: "75% of the original is 75. What is 25%?", answer: "25" },
+        { prompt: "75 + 25 =", answer: "100" },
+      ],
+    },
+    {
+      title: "Groups remaining",
+      prompt: "A class has 32 students. They form groups of 4, then 2 groups leave.",
+      contextLabel: "Find the number of groups first, then subtract groups.",
+      steps: [
+        { prompt: "32 ÷ 4 =", answer: "8" },
+        { prompt: "8 - 2 =", answer: "6" },
+      ],
+    },
+    {
+      title: "Fixed then percent discount",
+      prompt: "A $75 bundle has $15 off, then 10% off the new price.",
+      contextLabel: "Apply the fixed discount before the percentage discount.",
+      visual: discountVisual({ item: "bundle", price: 75, percent: 10, ask: "discount" }, "price_tag", true),
+      steps: [
+        { prompt: "75 - 15 =", answer: "60" },
+        { prompt: "Find 10% of 60", answer: "6" },
+        { prompt: "60 - 6 =", answer: "54" },
+      ],
+    },
+    {
+      title: "Scale and subtract",
+      prompt: "A recipe serves 4 people. You triple it, then remove 2 portions.",
+      contextLabel: "Scale the amount, then subtract the removed portions.",
+      steps: [
+        { prompt: "4 × 3 =", answer: "12" },
+        { prompt: "12 - 2 =", answer: "10" },
+      ],
+    },
+  ];
+}
+
+function year5MultiStepSolveTemplates(): MultiStepChoiceTemplate[] {
+  return [
+    {
+      prompt: "A $200 item has $30 taken off, then 20% off the new price. What is the final price?",
+      answer: "$136",
+      options: ["$136", "$130", "$160", "$150"],
+      helper: "Subtract $30 first, then apply 20% to the new price.",
+      visual: discountVisual({ item: "order matters", price: 200, percent: 20, ask: "discount" }, "price_tag", true),
+    },
+    {
+      prompt: "A $50 item is 20% off. You buy 3 items. What is the total cost?",
+      answer: "$120",
+      options: ["$120", "$150", "$90", "$40"],
+      helper: "Find one sale price, then multiply by 3.",
+      visual: discountVisual({ item: "3 items", price: 50, percent: 20, ask: "discount" }, "shop_item", true),
+    },
+    {
+      prompt: "Shop A gives 20% off $100. Shop B gives $25 off $100. Which is cheaper?",
+      answer: "Shop B",
+      options: ["Shop B", "Shop A", "They are equal", "Cannot tell"],
+      helper: "Compare the final prices.",
+      visual: discountVisual({ item: "shop offers", price: 100, percent: 20, ask: "discount" }, "percent_bar", true),
+    },
+    {
+      prompt: "After a 25% discount, an item costs $75. What was the original price?",
+      answer: "$100",
+      options: ["$100", "$75", "$25", "$93.75"],
+      helper: "75 is 75% of the original.",
+    },
+    {
+      prompt: "A $120 item is 25% off. You have a $100 budget. Can you afford it?",
+      answer: "Yes, $10 left",
+      options: ["Yes, $10 left", "No, $10 short", "Yes, $30 left", "No, $20 short"],
+      helper: "Find the final price, then compare with $100.",
+      visual: discountVisual({ item: "budget check", price: 120, percent: 25, ask: "discount" }, "price_tag", true),
+    },
+    {
+      prompt: "A box has 40 items. 25% are damaged, then 6 more are removed. How many good items remain?",
+      answer: "24",
+      options: ["24", "30", "34", "10"],
+      helper: "Find damaged items, then subtract the extra removed items.",
+    },
+    {
+      prompt: "A ticket costs $30. A family buys 4 tickets, then uses a $20 voucher. How much do they pay?",
+      answer: "$100",
+      options: ["$100", "$120", "$80", "$50"],
+      helper: "Multiply first, then subtract the voucher.",
+    },
+    {
+      prompt: "A $300 bike is 20% off, then a $15 fee is added. What is the final cost?",
+      answer: "$255",
+      options: ["$255", "$240", "$275", "$225"],
+      helper: "Find the sale price, then add the fee.",
+      visual: discountVisual({ item: "bike", price: 300, percent: 20, ask: "discount" }, "shop_item", true),
+    },
+    {
+      prompt: "A class has 32 students. They form groups of 4, then 2 groups leave. How many groups remain?",
+      answer: "6",
+      options: ["6", "8", "4", "30"],
+      helper: "Divide into groups, then subtract groups.",
+    },
+    {
+      prompt: "A $75 bundle has $15 off, then 10% off the new price. What is the final price?",
+      answer: "$54",
+      options: ["$54", "$60", "$52.50", "$67.50"],
+      helper: "The percent discount applies after the fixed discount.",
+      visual: discountVisual({ item: "bundle", price: 75, percent: 10, ask: "discount" }, "price_tag", true),
+    },
+  ];
+}
+
 function discountStepVisual(template: DiscountStepTemplate): DiscountStepMethodVisualData {
   const discount = discountAmount(template.price, template.percent);
   const finalPrice = template.price - discount;
@@ -2176,6 +2439,18 @@ export type DiscountStepMethodVisualData = Omit<DiscountPriceVisualData, "type">
   }>;
 };
 
+export type MultiStepMethodVisualData = {
+  type: "multi_step_method";
+  title: string;
+  contextLabel: string;
+  steps: Array<{
+    prompt: string;
+    answer: string;
+    suffix?: string;
+  }>;
+  supportVisual?: DiscountPriceVisualData;
+};
+
 export type MultipleChoiceQuestion = {
   kind: "multiple_choice";
   prompt: string;
@@ -2243,6 +2518,7 @@ export type TypedResponseQuestion = {
     | FractionDecimalPercentConversionVisualData
     | PercentStructuredMethodVisualData
     | DiscountStepMethodVisualData
+    | MultiStepMethodVisualData
     | {
         type: "equivalent_fraction_input";
         leftNumerator: number;
@@ -11101,6 +11377,48 @@ function generateGenericQuestion(
         "shop_item",
         true
       ),
+    };
+  }
+
+  if (
+    explicitMode === "multi_step_decide" ||
+    explicitMode === "multi_step_build" ||
+    explicitMode === "multi_step_solve"
+  ) {
+    if (explicitMode === "multi_step_build") {
+      const templates = year5MultiStepBuildTemplates();
+      const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+      const finalStep = chosen.steps[chosen.steps.length - 1] ?? chosen.steps[0]!;
+
+      return {
+        kind: "typed_response",
+        prompt: chosen.prompt,
+        answer: finalStep.answer,
+        helper: "Complete each step in order. Do not skip ahead.",
+        placeholder: "Type the answer",
+        visual: {
+          type: "multi_step_method",
+          title: chosen.title,
+          contextLabel: chosen.contextLabel,
+          steps: chosen.steps,
+          supportVisual: chosen.visual,
+        },
+      };
+    }
+
+    const templates =
+      explicitMode === "multi_step_solve"
+        ? year5MultiStepSolveTemplates()
+        : year5MultiStepDecideTemplates();
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle(chosen.options),
+      answer: chosen.answer,
+      helper: chosen.helper,
+      visual: chosen.visual,
     };
   }
 

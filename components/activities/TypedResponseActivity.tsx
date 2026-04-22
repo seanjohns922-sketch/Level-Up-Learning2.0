@@ -258,6 +258,76 @@ function PercentStructuredMethodInput({
   );
 }
 
+function MultiStepMethodInput({
+  visual,
+  currentStep,
+  inputs,
+  feedback,
+  onInputChange,
+  inputRef,
+}: {
+  visual: Extract<NonNullable<TypedResponseQuestion["visual"]>, { type: "multi_step_method" }>;
+  currentStep: number;
+  inputs: string[];
+  feedback: string;
+  onInputChange: (index: number, value: string) => void;
+  inputRef: RefObject<HTMLInputElement | null>;
+}) {
+  return (
+    <div className="w-full rounded-2xl border border-sky-100 bg-sky-50 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.18em] text-sky-700">
+        Build the Solution
+      </div>
+      <div className="mt-2 text-sm font-bold text-slate-600">
+        {visual.contextLabel}
+      </div>
+      <div className="mt-5 grid gap-3">
+        {visual.steps.map((step, index) => {
+          const isUnlocked = index <= currentStep;
+          const isActive = index === currentStep;
+          const isDone = index < currentStep;
+          return (
+            <div
+              key={`${step.prompt}-${index}`}
+              className={[
+                "rounded-2xl border p-4 shadow-sm transition",
+                isActive
+                  ? "border-sky-300 bg-white"
+                  : isDone
+                    ? "border-emerald-200 bg-emerald-50"
+                    : "border-sky-100 bg-white/60 opacity-60",
+              ].join(" ")}
+            >
+              <div className="text-xs font-black uppercase tracking-[0.14em] text-sky-700">
+                Step {index + 1}
+              </div>
+              <div className="mt-2 flex flex-wrap items-center gap-3">
+                <span className="text-lg font-black text-slate-900">{step.prompt}</span>
+                <input
+                  ref={isActive ? inputRef : undefined}
+                  value={inputs[index] ?? ""}
+                  onChange={(event) =>
+                    onInputChange(index, event.target.value.replace(/[^\d.-]/g, ""))
+                  }
+                  disabled={!isUnlocked || isDone}
+                  inputMode="decimal"
+                  className="h-12 w-28 rounded-xl border border-sky-300 bg-white px-3 text-center text-xl font-black text-slate-900 outline-none focus:border-teal-500 disabled:bg-emerald-50"
+                  style={{ WebkitTextFillColor: "#0f172a" }}
+                  aria-label={`Multi-step method step ${index + 1}`}
+                />
+                {step.suffix ? (
+                  <span className="text-lg font-black text-slate-600">{step.suffix}</span>
+                ) : null}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {feedback ? <p className="mt-3 text-sm font-bold text-rose-600">{feedback}</p> : null}
+    </div>
+  );
+}
+
 type RelatedDenominatorStep = "multiplier" | "numerator" | "solve" | "done";
 
 function getRelatedDenominatorWorking(
@@ -1261,6 +1331,9 @@ export default function TypedResponseActivity({
   const discountStepMethodVisual =
     questionData.visual?.type === "discount_step_method" ? questionData.visual : null;
   const isDiscountStepMethod = discountStepMethodVisual !== null;
+  const multiStepMethodVisual =
+    questionData.visual?.type === "multi_step_method" ? questionData.visual : null;
+  const isMultiStepMethod = multiStepMethodVisual !== null;
   const equivalentFractionInputVisual =
     questionData.visual?.type === "equivalent_fraction_input" ? questionData.visual : null;
   const isEquivalentFractionInput = equivalentFractionInputVisual !== null;
@@ -1299,9 +1372,10 @@ export default function TypedResponseActivity({
   const [conversionPercentInput, setConversionPercentInput] = useState("");
   const [percentMethodStep, setPercentMethodStep] = useState(0);
   const [percentMethodInputs, setPercentMethodInputs] = useState<string[]>(
-    percentStructuredMethodVisual || discountStepMethodVisual
+    percentStructuredMethodVisual || discountStepMethodVisual || multiStepMethodVisual
       ? Array.from({
-          length: (percentStructuredMethodVisual ?? discountStepMethodVisual)?.steps.length ?? 0,
+          length:
+            (percentStructuredMethodVisual ?? discountStepMethodVisual ?? multiStepMethodVisual)?.steps.length ?? 0,
         }, () => "")
       : []
   );
@@ -1424,7 +1498,8 @@ export default function TypedResponseActivity({
       setPercentMethodStep(0);
       setPercentMethodInputs(
         questionData.visual?.type === "percent_structured_method" ||
-          questionData.visual?.type === "discount_step_method"
+          questionData.visual?.type === "discount_step_method" ||
+          questionData.visual?.type === "multi_step_method"
           ? Array.from({ length: questionData.visual.steps.length }, () => "")
           : []
       );
@@ -2021,9 +2096,10 @@ export default function TypedResponseActivity({
 
     if (
       (isPercentStructuredMethod && percentStructuredMethodVisual) ||
-      (isDiscountStepMethod && discountStepMethodVisual)
+      (isDiscountStepMethod && discountStepMethodVisual) ||
+      (isMultiStepMethod && multiStepMethodVisual)
     ) {
-      const stepVisual = percentStructuredMethodVisual ?? discountStepMethodVisual;
+      const stepVisual = percentStructuredMethodVisual ?? discountStepMethodVisual ?? multiStepMethodVisual;
       const step = stepVisual?.steps[percentMethodStep];
       if (!step) return;
 
@@ -2039,6 +2115,8 @@ export default function TypedResponseActivity({
         setPercentMethodFeedback(
           isDiscountStepMethod
             ? "Find the discount first, then subtract it from the original price."
+            : isMultiStepMethod
+            ? "Check what the situation needs before the next step."
             : percentStructuredMethodVisual?.method === "decimal"
             ? "Divide by 100 first, then multiply by the amount."
             : "Break the percentage into easier parts and try this step again."
@@ -2170,7 +2248,9 @@ export default function TypedResponseActivity({
   const visualType = questionData.visual?.type;
   const activityTitle =
     writtenMethod?.title ??
-    (visualType === "discount_step_method"
+    (visualType === "multi_step_method"
+      ? "Build the Solution"
+      : visualType === "discount_step_method"
       ? "Discount Method"
       : visualType === "percent_structured_method"
       ? "Percentage Method"
@@ -2187,9 +2267,10 @@ export default function TypedResponseActivity({
       : "Typed Response");
   const typedResponseButtonLabel =
     ((isPercentStructuredMethod && percentStructuredMethodVisual) ||
-      (isDiscountStepMethod && discountStepMethodVisual)) &&
+      (isDiscountStepMethod && discountStepMethodVisual) ||
+      (isMultiStepMethod && multiStepMethodVisual)) &&
     percentMethodStep <
-      ((percentStructuredMethodVisual ?? discountStepMethodVisual)?.steps.length ?? 1) - 1
+      ((percentStructuredMethodVisual ?? discountStepMethodVisual ?? multiStepMethodVisual)?.steps.length ?? 1) - 1
       ? "Check step"
       : isRelatedDenominatorWorking && relatedDenominatorStep !== "solve" && relatedDenominatorStep !== "done"
       ? "Check step"
@@ -2235,6 +2316,9 @@ export default function TypedResponseActivity({
           revealDiscount={percentMethodStep > 0}
           revealFinal={percentMethodStep >= discountStepMethodVisual.steps.length}
         />
+      ) : null}
+      {multiStepMethodVisual?.supportVisual ? (
+        <DiscountVisual visual={multiStepMethodVisual.supportVisual} />
       ) : null}
       {buildGroupsVisual ? (
         <div className="mt-4 space-y-4">
@@ -2913,6 +2997,15 @@ export default function TypedResponseActivity({
                 ))}
               </div>
             </div>
+          ) : isMultiStepMethod && multiStepMethodVisual ? (
+            <MultiStepMethodInput
+              visual={multiStepMethodVisual}
+              currentStep={percentMethodStep}
+              inputs={percentMethodInputs}
+              feedback={percentMethodFeedback}
+              onInputChange={updatePercentMethodInput}
+              inputRef={numeratorRef}
+            />
           ) : isDiscountStepMethod && discountStepMethodVisual ? (
             <PercentStructuredMethodInput
               visual={discountStepMethodVisual}

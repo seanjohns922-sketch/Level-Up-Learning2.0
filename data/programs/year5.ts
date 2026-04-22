@@ -533,14 +533,30 @@ const year5Rows: ProgramRow[] = [
   {
     week: 11,
     weekTopic: "Mathematical Modelling & Reasonableness",
-    focus: "Model practical additive and multiplicative situations",
+    focus: "Solve real-world problems by choosing and combining the right steps",
     lesson: 1,
     topic: "Multi-step Problems",
-    activity: "Use all four operations to solve short multi-step problems.",
+    activity: "Use percentages, multiplication, addition and subtraction together to solve practical problems.",
     curriculum: ["AC9M5N09"],
     activities: [
-      makeActivity("mixed_word_problem", 2, { mode: "two_step_problem" }),
-      makeActivity("multiple_choice", 1, { mode: "two_step_problem", sourceActivityType: "mixed_word_problem" }),
+      makeActivity("multiple_choice", 1, {
+        mode: "multi_step_decide",
+        rotationRole: "fast_thinking",
+        rotationLabel: "Decide the Step",
+        rotationPurpose: "Identify the useful quantity or operation in a practical multi-step situation.",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "multi_step_build",
+        rotationRole: "reasoning",
+        rotationLabel: "Build the Solution",
+        rotationPurpose: "Complete multiplicative and additive steps in the right order.",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "multi_step_solve",
+        rotationRole: "apply_create",
+        rotationLabel: "Solve It",
+        rotationPurpose: "Solve varied real-world multi-step problems independently.",
+      }),
     ],
   },
   {
