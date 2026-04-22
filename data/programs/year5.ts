@@ -446,14 +446,30 @@ const year5Rows: ProgramRow[] = [
   {
     week: 10,
     weekTopic: "Financial Contexts & Percentage Reasoning",
-    focus: "Use percentages and estimation in financial and practical contexts",
+    focus: "Find percentages of amounts using efficient strategies",
     lesson: 1,
     topic: "% of Amounts",
-    activity: "Use 10%, 5%, and 1% strategies to find percentages of amounts.",
+    activity: "Work out percentages quickly in real-life situations like money, discounts, and quantities.",
     curriculum: ["AC9M5N04", "AC9M5N09"],
     activities: [
-      makeActivity("multiple_choice", 2, { mode: "percent_of_amount" }),
-      makeActivity("typed_response", 1, { mode: "percent_of_amount" }),
+      makeActivity("multiple_choice", 1, {
+        mode: "percent_quick_find",
+        rotationRole: "fast_thinking",
+        rotationLabel: "Quick Find",
+        rotationPurpose: "Build speed and confidence finding benchmark percentages mentally.",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "percent_structured_method",
+        rotationRole: "reasoning",
+        rotationLabel: "Step-by-Step Method",
+        rotationPurpose: "Break percentages into benchmark parts and combine them.",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "percent_real_world",
+        rotationRole: "apply_create",
+        rotationLabel: "Real World",
+        rotationPurpose: "Apply percentage-of-amount skills to money, scores, and quantities.",
+      }),
     ],
   },
   {

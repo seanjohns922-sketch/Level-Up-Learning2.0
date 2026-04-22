@@ -179,6 +179,76 @@ function FractionDecimalPercentConversionInput({
   );
 }
 
+function PercentStructuredMethodInput({
+  visual,
+  currentStep,
+  inputs,
+  feedback,
+  onInputChange,
+  inputRef,
+}: {
+  visual: Extract<NonNullable<TypedResponseQuestion["visual"]>, { type: "percent_structured_method" }>;
+  currentStep: number;
+  inputs: string[];
+  feedback: string;
+  onInputChange: (index: number, value: string) => void;
+  inputRef: RefObject<HTMLInputElement | null>;
+}) {
+  return (
+    <div className="w-full rounded-2xl border border-amber-100 bg-amber-50 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.18em] text-amber-700">
+        Percentage Method
+      </div>
+      <div className="mt-2 text-sm font-bold text-slate-600">
+        Break {visual.percent}% of {visual.amount} into easier parts.
+      </div>
+      <div className="mt-5 grid gap-3">
+        {visual.steps.map((step, index) => {
+          const isUnlocked = index <= currentStep;
+          const isActive = index === currentStep;
+          const isDone = index < currentStep;
+          return (
+            <div
+              key={`${step.prompt}-${index}`}
+              className={[
+                "rounded-2xl border p-4 shadow-sm transition",
+                isActive
+                  ? "border-amber-300 bg-white"
+                  : isDone
+                    ? "border-emerald-200 bg-emerald-50"
+                    : "border-amber-100 bg-white/60 opacity-60",
+              ].join(" ")}
+            >
+              <div className="text-xs font-black uppercase tracking-[0.14em] text-amber-700">
+                Step {index + 1}
+              </div>
+              <div className="mt-2 flex flex-wrap items-center gap-3">
+                <span className="text-lg font-black text-slate-900">{step.prompt}</span>
+                <input
+                  ref={isActive ? inputRef : undefined}
+                  value={inputs[index] ?? ""}
+                  onChange={(event) =>
+                    onInputChange(index, event.target.value.replace(/[^\d.]/g, ""))
+                  }
+                  disabled={!isUnlocked || isDone}
+                  inputMode="decimal"
+                  className="h-12 w-28 rounded-xl border border-amber-300 bg-white px-3 text-center text-xl font-black text-slate-900 outline-none focus:border-teal-500 disabled:bg-emerald-50"
+                  style={{ WebkitTextFillColor: "#0f172a" }}
+                  aria-label={`Percentage method step ${index + 1}`}
+                />
+                {step.suffix ? (
+                  <span className="text-lg font-black text-slate-600">{step.suffix}</span>
+                ) : null}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {feedback ? <p className="mt-3 text-sm font-bold text-rose-600">{feedback}</p> : null}
+    </div>
+  );
+}
+
 type RelatedDenominatorStep = "multiplier" | "numerator" | "solve" | "done";
 
 function getRelatedDenominatorWorking(
@@ -1162,6 +1232,9 @@ export default function TypedResponseActivity({
   const fractionDecimalPercentConversionVisual =
     questionData.visual?.type === "fraction_decimal_percent_conversion" ? questionData.visual : null;
   const isFractionDecimalPercentConversion = fractionDecimalPercentConversionVisual !== null;
+  const percentStructuredMethodVisual =
+    questionData.visual?.type === "percent_structured_method" ? questionData.visual : null;
+  const isPercentStructuredMethod = percentStructuredMethodVisual !== null;
   const equivalentFractionInputVisual =
     questionData.visual?.type === "equivalent_fraction_input" ? questionData.visual : null;
   const isEquivalentFractionInput = equivalentFractionInputVisual !== null;
@@ -1198,6 +1271,13 @@ export default function TypedResponseActivity({
   const [fractionDenominatorInput, setFractionDenominatorInput] = useState("");
   const [conversionDecimalInput, setConversionDecimalInput] = useState("");
   const [conversionPercentInput, setConversionPercentInput] = useState("");
+  const [percentMethodStep, setPercentMethodStep] = useState(0);
+  const [percentMethodInputs, setPercentMethodInputs] = useState<string[]>(
+    percentStructuredMethodVisual
+      ? Array.from({ length: percentStructuredMethodVisual.steps.length }, () => "")
+      : []
+  );
+  const [percentMethodFeedback, setPercentMethodFeedback] = useState("");
   const [relatedDenominatorStep, setRelatedDenominatorStep] =
     useState<RelatedDenominatorStep>("multiplier");
   const [relatedDenominatorInputs, setRelatedDenominatorInputs] = useState({
@@ -1313,6 +1393,13 @@ export default function TypedResponseActivity({
       setFractionDenominatorInput(questionData.fixedDenominator ? String(questionData.fixedDenominator) : "");
       setConversionDecimalInput("");
       setConversionPercentInput("");
+      setPercentMethodStep(0);
+      setPercentMethodInputs(
+        questionData.visual?.type === "percent_structured_method"
+          ? Array.from({ length: questionData.visual.steps.length }, () => "")
+          : []
+      );
+      setPercentMethodFeedback("");
       setRelatedDenominatorStep("multiplier");
       setRelatedDenominatorInputs({
         multiplier: "",
@@ -1427,6 +1514,13 @@ export default function TypedResponseActivity({
       [field]: value,
     }));
     setRelatedDenominatorFeedback("");
+  }
+
+  function updatePercentMethodInput(index: number, value: string) {
+    setPercentMethodInputs((current) =>
+      current.map((entry, entryIndex) => (entryIndex === index ? value : entry))
+    );
+    setPercentMethodFeedback("");
   }
 
   function displayTopDigit(index: number) {
@@ -1896,6 +1990,24 @@ export default function TypedResponseActivity({
       return;
     }
 
+    if (isPercentStructuredMethod && percentStructuredMethodVisual) {
+      const step = percentStructuredMethodVisual.steps[percentMethodStep];
+      if (!step) return;
+
+      if (normalizeNumberInput(percentMethodInputs[percentMethodStep] ?? "") === step.answer) {
+        setPercentMethodFeedback("");
+        if (percentMethodStep >= percentStructuredMethodVisual.steps.length - 1) {
+          onCorrect?.();
+        } else {
+          setPercentMethodStep((current) => current + 1);
+        }
+      } else {
+        setPercentMethodFeedback("Break the percentage into easier parts and try this step again.");
+        onWrong?.();
+      }
+      return;
+    }
+
     if (isRelatedDenominatorWorking && relatedDenominatorWorking && sameDenominatorOperationVisual) {
       if (relatedDenominatorStep === "multiplier") {
         if (normalizeNumberInput(relatedDenominatorInputs.multiplier) === String(relatedDenominatorWorking.multiplier)) {
@@ -2015,25 +2127,28 @@ export default function TypedResponseActivity({
     }
   }
 
+  const visualType = questionData.visual?.type;
   const activityTitle =
     writtenMethod?.title ??
-    (questionData.visual?.type === "division_build_groups"
+    (visualType === "percent_structured_method"
+      ? "Percentage Method"
+      : visualType === "division_build_groups"
       ? "Build the Groups"
-      :
-    (questionData.visual?.type === "division_remainder_check"
+      : visualType === "division_remainder_check"
       ? "Division Check"
-      :
-    ((questionData.visual?.type === "multiplication_strategy" ||
-      questionData.visual?.type === "multiplication_estimate_strategy")
+      : visualType === "multiplication_strategy" || visualType === "multiplication_estimate_strategy"
       ? "Choose a Method"
-      : 
-    (questionData.visual?.type === "box_method"
+      : visualType === "box_method"
       ? "Box Method"
-      : questionData.visual?.type === "column_multiplication"
+      : visualType === "column_multiplication"
       ? "Column Multiplication"
-      : "Typed Response"))));
+      : "Typed Response");
   const typedResponseButtonLabel =
-    isRelatedDenominatorWorking && relatedDenominatorStep !== "solve" && relatedDenominatorStep !== "done"
+    isPercentStructuredMethod &&
+    percentStructuredMethodVisual &&
+    percentMethodStep < percentStructuredMethodVisual.steps.length - 1
+      ? "Check step"
+      : isRelatedDenominatorWorking && relatedDenominatorStep !== "solve" && relatedDenominatorStep !== "done"
       ? "Check step"
       : "Check answer";
   const columnMultiplicationButtonLabel = getColumnMultiplicationButtonLabel(multiplicationStep);
@@ -2748,6 +2863,15 @@ export default function TypedResponseActivity({
                 ))}
               </div>
             </div>
+          ) : isPercentStructuredMethod && percentStructuredMethodVisual ? (
+            <PercentStructuredMethodInput
+              visual={percentStructuredMethodVisual}
+              currentStep={percentMethodStep}
+              inputs={percentMethodInputs}
+              feedback={percentMethodFeedback}
+              onInputChange={updatePercentMethodInput}
+              inputRef={numeratorRef}
+            />
           ) : isStructuredFractionResponse &&
             sameDenominatorOperationVisual &&
             usesFixedDenominator &&

@@ -638,6 +638,19 @@ type RealWorldFdpChoiceTemplate = {
   helper: string;
 };
 
+type PercentAmountChoiceTemplate = {
+  prompt: string;
+  answer: string;
+  options: string[];
+  helper: string;
+};
+
+type PercentStructuredTemplate = {
+  percent: number;
+  amount: number;
+  steps: PercentStructuredMethodVisualData["steps"];
+};
+
 function greatestCommonFactor(left: number, right: number): number {
   let a = Math.abs(left);
   let b = Math.abs(right);
@@ -1092,6 +1105,244 @@ function year5RealWorldFdpChallengeTemplates(): RealWorldFdpChoiceTemplate[] {
   ];
 }
 
+function year5PercentQuickFindTemplates(): PercentAmountChoiceTemplate[] {
+  return [
+    {
+      prompt: "What is 10% of 80?",
+      answer: "8",
+      options: ["8", "80", "10", "18"],
+      helper: "10% means one tenth.",
+    },
+    {
+      prompt: "What is 50% of 36?",
+      answer: "18",
+      options: ["18", "12", "36", "16"],
+      helper: "50% is half.",
+    },
+    {
+      prompt: "What is 25% of 200?",
+      answer: "50",
+      options: ["50", "25", "100", "75"],
+      helper: "25% is one quarter.",
+    },
+    {
+      prompt: "What is 20% of 90?",
+      answer: "18",
+      options: ["18", "9", "20", "45"],
+      helper: "20% is two lots of 10%.",
+    },
+    {
+      prompt: "What is 5% of 60?",
+      answer: "3",
+      options: ["3", "6", "5", "30"],
+      helper: "5% is half of 10%.",
+    },
+    {
+      prompt: "What is 75% of 80?",
+      answer: "60",
+      options: ["60", "40", "75", "20"],
+      helper: "75% is 50% plus 25%.",
+    },
+    {
+      prompt: "What is 15% of 80?",
+      answer: "12",
+      options: ["12", "8", "15", "20"],
+      helper: "15% is 10% plus 5%.",
+    },
+    {
+      prompt: "What is 30% of 150?",
+      answer: "45",
+      options: ["45", "30", "15", "50"],
+      helper: "30% is three lots of 10%.",
+    },
+    {
+      prompt: "What is 12.5% of 64?",
+      answer: "8",
+      options: ["8", "6.4", "12.5", "16"],
+      helper: "12.5% is one eighth.",
+    },
+    {
+      prompt: "What is 40% of 120?",
+      answer: "48",
+      options: ["48", "40", "12", "60"],
+      helper: "40% is four lots of 10%.",
+    },
+    {
+      prompt: "What is 25% of 64?",
+      answer: "16",
+      options: ["16", "32", "25", "8"],
+      helper: "25% is half, then half again.",
+    },
+    {
+      prompt: "What is 5% of 200?",
+      answer: "10",
+      options: ["10", "20", "5", "100"],
+      helper: "Find 10%, then halve it.",
+    },
+  ];
+}
+
+function year5PercentStructuredTemplates(): PercentStructuredTemplate[] {
+  return [
+    {
+      percent: 30,
+      amount: 70,
+      steps: [
+        { prompt: "What is 10% of 70?", answer: "7" },
+        { prompt: "30% is how many groups of 10%?", answer: "3" },
+        { prompt: "So what is 30% of 70?", answer: "21" },
+      ],
+    },
+    {
+      percent: 15,
+      amount: 60,
+      steps: [
+        { prompt: "What is 10% of 60?", answer: "6" },
+        { prompt: "What is 5% of 60?", answer: "3" },
+        { prompt: "Add them. What is 15% of 60?", answer: "9" },
+      ],
+    },
+    {
+      percent: 25,
+      amount: 120,
+      steps: [
+        { prompt: "What is 50% of 120?", answer: "60" },
+        { prompt: "What is half of 60?", answer: "30" },
+        { prompt: "So what is 25% of 120?", answer: "30" },
+      ],
+    },
+    {
+      percent: 35,
+      amount: 80,
+      steps: [
+        { prompt: "What is 10% of 80?", answer: "8" },
+        { prompt: "What is 30% of 80?", answer: "24" },
+        { prompt: "What is 5% of 80?", answer: "4" },
+        { prompt: "Add 30% and 5%. What is 35% of 80?", answer: "28" },
+      ],
+    },
+    {
+      percent: 75,
+      amount: 200,
+      steps: [
+        { prompt: "What is 50% of 200?", answer: "100" },
+        { prompt: "What is 25% of 200?", answer: "50" },
+        { prompt: "Add them. What is 75% of 200?", answer: "150" },
+      ],
+    },
+    {
+      percent: 40,
+      amount: 90,
+      steps: [
+        { prompt: "What is 10% of 90?", answer: "9" },
+        { prompt: "40% is how many groups of 10%?", answer: "4" },
+        { prompt: "So what is 40% of 90?", answer: "36" },
+      ],
+    },
+    {
+      percent: 20,
+      amount: 150,
+      steps: [
+        { prompt: "What is 10% of 150?", answer: "15" },
+        { prompt: "20% is how many groups of 10%?", answer: "2" },
+        { prompt: "So what is 20% of 150?", answer: "30" },
+      ],
+    },
+    {
+      percent: 5,
+      amount: 140,
+      steps: [
+        { prompt: "What is 10% of 140?", answer: "14" },
+        { prompt: "What is half of 14?", answer: "7" },
+        { prompt: "So what is 5% of 140?", answer: "7" },
+      ],
+    },
+    {
+      percent: 15,
+      amount: 120,
+      steps: [
+        { prompt: "What is 10% of 120?", answer: "12" },
+        { prompt: "What is 5% of 120?", answer: "6" },
+        { prompt: "Add them. What is 15% of 120?", answer: "18" },
+      ],
+    },
+    {
+      percent: 30,
+      amount: 240,
+      steps: [
+        { prompt: "What is 10% of 240?", answer: "24" },
+        { prompt: "30% is how many groups of 10%?", answer: "3" },
+        { prompt: "So what is 30% of 240?", answer: "72" },
+      ],
+    },
+  ];
+}
+
+function year5PercentRealWorldTemplates(): PercentAmountChoiceTemplate[] {
+  return [
+    {
+      prompt: "A $50 item has 20% off. How much is the discount?",
+      answer: "$10",
+      options: ["$10", "$20", "$40", "$5"],
+      helper: "Find 20% of 50. That is the discount amount.",
+    },
+    {
+      prompt: "A student scores 80% on a test with 50 questions. How many are correct?",
+      answer: "40",
+      options: ["40", "30", "45", "80"],
+      helper: "Find 80% of 50.",
+    },
+    {
+      prompt: "A tank holds 200L. It is 25% full. How much water is inside?",
+      answer: "50L",
+      options: ["50L", "25L", "100L", "75L"],
+      helper: "25% is one quarter of the total.",
+    },
+    {
+      prompt: "A shop has 60 items. 30% are sold. How many are sold?",
+      answer: "18",
+      options: ["18", "30", "42", "6"],
+      helper: "Find 30% of 60.",
+    },
+    {
+      prompt: "A $120 bike has a 10% discount. How much is the discount?",
+      answer: "$12",
+      options: ["$12", "$10", "$108", "$24"],
+      helper: "10% is one tenth.",
+    },
+    {
+      prompt: "A class has 32 students. 50% bring lunch. How many bring lunch?",
+      answer: "16",
+      options: ["16", "32", "8", "50"],
+      helper: "50% is half.",
+    },
+    {
+      prompt: "A 80-page book is 75% finished. How many pages are finished?",
+      answer: "60",
+      options: ["60", "40", "20", "75"],
+      helper: "75% is 50% plus 25%.",
+    },
+    {
+      prompt: "A $90 jacket has 40% off. What is the discount?",
+      answer: "$36",
+      options: ["$36", "$40", "$54", "$9"],
+      helper: "Find 10%, then multiply by 4.",
+    },
+    {
+      prompt: "A box has 140 pencils. 5% are red. How many are red?",
+      answer: "7",
+      options: ["7", "14", "5", "70"],
+      helper: "Find 10%, then halve it.",
+    },
+    {
+      prompt: "A game has 150 points. Mia scores 20%. How many points is that?",
+      answer: "30",
+      options: ["30", "15", "20", "120"],
+      helper: "20% is two lots of 10%.",
+    },
+  ];
+}
+
 function year3FractionOrderSets() {
   return [
     ["1/5", "1/2", "4/5"],
@@ -1400,6 +1651,17 @@ export type FractionDecimalPercentConversionVisualData = {
   percentAnswer: string;
 };
 
+export type PercentStructuredMethodVisualData = {
+  type: "percent_structured_method";
+  percent: number;
+  amount: number;
+  steps: Array<{
+    prompt: string;
+    answer: string;
+    suffix?: string;
+  }>;
+};
+
 export type MultipleChoiceQuestion = {
   kind: "multiple_choice";
   prompt: string;
@@ -1464,6 +1726,7 @@ export type TypedResponseQuestion = {
     | DivisionBuildGroupsVisualData
     | SameDenominatorOperationVisualData
     | FractionDecimalPercentConversionVisualData
+    | PercentStructuredMethodVisualData
     | {
         type: "equivalent_fraction_input";
         leftNumerator: number;
@@ -10169,29 +10432,45 @@ function generateGenericQuestion(
         };
   }
 
-  if (explicitMode === "percent_of_amount") {
-    const templates = [
-      { prompt: "What is 10% of 240?", answer: "24" },
-      { prompt: "What is 5% of 60?", answer: "3" },
-      { prompt: "What is 1% of 300?", answer: "3" },
-      { prompt: "What is 10% of 85?", answer: "8.5" },
-    ];
+  if (
+    explicitMode === "percent_of_amount" ||
+    explicitMode === "percent_quick_find" ||
+    explicitMode === "percent_structured_method" ||
+    explicitMode === "percent_real_world"
+  ) {
+    if (explicitMode === "percent_structured_method") {
+      const templates = year5PercentStructuredTemplates();
+      const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+      const finalStep = chosen.steps[chosen.steps.length - 1] ?? chosen.steps[0]!;
+
+      return {
+        kind: "typed_response",
+        prompt: `Find ${chosen.percent}% of ${chosen.amount}`,
+        answer: finalStep.answer,
+        helper: "Break the percentage into easier benchmark parts.",
+        placeholder: "Type the answer",
+        visual: {
+          type: "percent_structured_method",
+          percent: chosen.percent,
+          amount: chosen.amount,
+          steps: chosen.steps,
+        },
+      };
+    }
+
+    const templates =
+      explicitMode === "percent_real_world"
+        ? year5PercentRealWorldTemplates()
+        : year5PercentQuickFindTemplates();
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
-    return asMultipleChoice
-      ? {
-          kind: "multiple_choice",
-          prompt: chosen.prompt,
-          options: uniqueStringOptions(chosen.answer, ["6", "12", "30", "2.4"]),
-          answer: chosen.answer,
-          helper: "Use 10%, 5%, or 1% as a friendly fraction of the whole.",
-        }
-      : {
-          kind: "typed_response",
-          prompt: chosen.prompt,
-          answer: chosen.answer,
-          helper: "Find 10%, 5%, or 1% first if that helps.",
-          placeholder: "Type the answer",
-        };
+
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle(chosen.options),
+      answer: chosen.answer,
+      helper: chosen.helper,
+    };
   }
 
   if (explicitMode === "percentage_discount") {
