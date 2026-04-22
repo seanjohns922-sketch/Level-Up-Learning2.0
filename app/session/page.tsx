@@ -394,6 +394,39 @@ function getStructuredQuestionFingerprint(questionData: Year2QuestionData) {
   return JSON.stringify(questionData);
 }
 
+function getStructuredQuizQuestionId(
+  questionData: Year2QuestionData,
+  activity: LessonActivity,
+  fallbackFingerprint: string
+) {
+  const mode = typeof activity.config?.mode === "string" ? String(activity.config.mode) : activity.activityType;
+  const text =
+    questionData.kind === "multiple_choice" || questionData.kind === "typed_response"
+      ? `${questionData.prompt} ${questionData.answer ?? ""}`
+      : JSON.stringify(questionData);
+  const normalizedText = text.toLowerCase().replace(/\s+/g, " ").trim();
+  const symbolMatch = normalizedText.match(/[+×÷-]/);
+  const operation =
+    symbolMatch?.[0] === "+"
+      ? "add"
+      : symbolMatch?.[0] === "-"
+      ? "subtract"
+      : symbolMatch?.[0] === "×"
+      ? "multiply"
+      : symbolMatch?.[0] === "÷"
+      ? "divide"
+      : mode;
+  const numbers = [...normalizedText.matchAll(/-?\d[\d,]*(?:\.\d+)?(?:\/\d+)?/g)]
+    .map((match) => match[0].replace(/,/g, ""))
+    .slice(0, 2);
+
+  if (numbers.length >= 2) {
+    return `${operation}-${numbers[0]}-${numbers[1]}`;
+  }
+
+  return `${operation}-${fallbackFingerprint}`;
+}
+
 function operationFromSymbol(symbol?: string): "add" | "subtract" | undefined {
   if (symbol === "+") return "add";
   if (symbol === "-") return "subtract";
@@ -539,7 +572,7 @@ function buildStructuredWeeklyQuizQuestions(
   }
 
   const questions: QuizQuestion[] = [];
-  const seenFingerprints = new Set<string>();
+  const seenQuestions = new Set<string>();
   const debugCounts: Array<{ lesson: 1 | 2 | 3; availableActivities: number; selectedActivityTypes: string[] }> = [];
 
   quizLessons.forEach((lesson, lessonIndex) => {
@@ -560,71 +593,94 @@ function buildStructuredWeeklyQuizQuestions(
     }
 
     const selectedActivityTypes: string[] = [];
-    for (let i = 0; i < questionsPerLesson; i += 1) {
-      let sourceActivity = sourceActivities[i % sourceActivities.length];
-      let questionData = generateQuestionForLevelLessonActivity(level, lesson, sourceActivity);
-      let fingerprint = getStructuredQuestionFingerprint(questionData);
-      let quizMeta = quizMetaFromGeneratedQuestion(
+    const candidatePool: Array<{
+      questionId: string;
+      sourceActivity: LessonActivity;
+      questionData: Year2QuestionData;
+      quizMeta: NonNullable<QuizQuestion["quizMeta"]>;
+    }> = [];
+    const candidateIds = new Set<string>();
+    const maxAttempts = 50;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+      const sourceActivity = sourceActivities[attempt % sourceActivities.length];
+      const questionData = generateQuestionForLevelLessonActivity(level, lesson, sourceActivity);
+      if (!isQuizSafeGeneratedQuestion(questionData)) continue;
+
+      const fingerprint = getStructuredQuestionFingerprint(questionData);
+      const questionId = getStructuredQuizQuestionId(questionData, sourceActivity, fingerprint);
+      if (seenQuestions.has(questionId) || candidateIds.has(questionId)) continue;
+
+      const quizMeta = quizMetaFromGeneratedQuestion(
         questionData,
         sourceActivity,
-        questions.length,
+        questions.length + candidatePool.length,
         questionsPerLesson * 3
       );
-      let attempts = 0;
 
-      while (
-        attempts < 50 &&
-        (
-          !isQuizSafeGeneratedQuestion(questionData) ||
-          seenFingerprints.has(fingerprint) ||
-          violatesQuizVarietyRules(quizMeta, questions, questionsPerLesson * 3)
-        )
-      ) {
-        sourceActivity = sourceActivities[(i + attempts + 1) % sourceActivities.length];
-        questionData = generateQuestionForLevelLessonActivity(level, lesson, sourceActivity);
-        fingerprint = getStructuredQuestionFingerprint(questionData);
-        quizMeta = quizMetaFromGeneratedQuestion(
-          questionData,
-          sourceActivity,
-          questions.length,
-          questionsPerLesson * 3
-        );
-        attempts += 1;
-      }
-
-      if (!isQuizSafeGeneratedQuestion(questionData)) {
-        throw new Error(
-          `[StructuredWeeklyQuiz] Year ${yearNumber} Week ${weekPlan.week} Lesson ${lessonNumber} could not generate a quiz-safe question.`
-        );
-      }
-
-      if (seenFingerprints.has(fingerprint)) {
-        throw new Error(
-          `[StructuredWeeklyQuiz] Year ${yearNumber} Week ${weekPlan.week} Lesson ${lessonNumber} produced duplicate quiz questions after retries.`
-        );
-      }
-
-      seenFingerprints.add(fingerprint);
-      selectedActivityTypes.push(sourceActivity.activityType);
-      const assessmentQuestion = toAssessmentTypedQuizQuestion(
+      candidateIds.add(questionId);
+      candidatePool.push({
+        questionId,
+        sourceActivity,
         questionData,
+        quizMeta,
+      });
+
+      if (candidatePool.length >= Math.max(questionsPerLesson * 6, 30)) break;
+    }
+
+    const selectedCandidates: typeof candidatePool = [];
+    const shuffledCandidates = shuffle(candidatePool);
+    for (const candidate of shuffledCandidates) {
+      if (selectedCandidates.length >= questionsPerLesson) break;
+      if (violatesQuizVarietyRules(candidate.quizMeta, [...questions, ...selectedCandidates.map((item, offset) => ({
+        id: `candidate-${offset}`,
         lessonNumber,
-        sourceActivity.activityType,
+        skill: item.sourceActivity.activityType,
+        kind: "typed" as const,
+        prompt: item.questionData.kind === "multiple_choice" || item.questionData.kind === "typed_response" ? item.questionData.prompt : "",
+        correctValue: item.questionData.kind === "multiple_choice" || item.questionData.kind === "typed_response" ? item.questionData.answer : undefined,
+        quizMeta: item.quizMeta,
+      }))], questionsPerLesson * 3)) {
+        continue;
+      }
+      selectedCandidates.push(candidate);
+    }
+
+    for (const candidate of shuffledCandidates) {
+      if (selectedCandidates.length >= questionsPerLesson) break;
+      if (selectedCandidates.some((item) => item.questionId === candidate.questionId)) continue;
+      selectedCandidates.push(candidate);
+    }
+
+    if (selectedCandidates.length < questionsPerLesson) {
+      throw new Error(
+        `[StructuredWeeklyQuiz] Year ${yearNumber} Week ${weekPlan.week} Lesson ${lessonNumber} could not generate ${questionsPerLesson} unique quiz questions after ${maxAttempts} attempts.`
+      );
+    }
+
+    for (const candidate of selectedCandidates) {
+      seenQuestions.add(candidate.questionId);
+      selectedActivityTypes.push(candidate.sourceActivity.activityType);
+      const assessmentQuestion = toAssessmentTypedQuizQuestion(
+        candidate.questionData,
+        lessonNumber,
+        candidate.sourceActivity.activityType,
         questions.length + 1,
-        quizMeta
+        candidate.quizMeta
       );
       questions.push(
         assessmentQuestion ?? {
           id: `q${questions.length + 1}`,
           lessonNumber,
           lessonTag: lessonNumber,
-          skill: sourceActivity.activityType,
-          activityType: sourceActivity.activityType,
+          skill: candidate.sourceActivity.activityType,
+          activityType: candidate.sourceActivity.activityType,
           kind: "lessonActivity",
-          prompt: questionData.prompt,
-          activity: sourceActivity,
-          questionData,
-          quizMeta,
+          prompt: candidate.questionData.prompt,
+          activity: candidate.sourceActivity,
+          questionData: candidate.questionData,
+          quizMeta: candidate.quizMeta,
         }
       );
     }
