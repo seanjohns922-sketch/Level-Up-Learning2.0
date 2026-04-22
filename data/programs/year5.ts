@@ -474,14 +474,31 @@ const year5Rows: ProgramRow[] = [
   },
   {
     week: 10,
+    weekTopic: "Financial Contexts & Percentage Reasoning",
     focus: "Use percentages with discounts and money",
     lesson: 2,
     topic: "Discounts & Money",
-    activity: "Work out discount amounts and sale prices in money contexts.",
+    activity: "Use percentages to work out discounts and final prices.",
     curriculum: ["AC9M5N04", "AC9M5N09"],
     activities: [
-      makeActivity("multiple_choice", 2, { mode: "percentage_discount" }),
-      makeActivity("typed_response", 1, { mode: "percentage_discount" }),
+      makeActivity("multiple_choice", 1, {
+        mode: "discount_quick_find",
+        rotationRole: "fast_thinking",
+        rotationLabel: "Quick Discount",
+        rotationPurpose: "Use price tags and sale badges to quickly find discounts or final prices.",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "discount_step_method",
+        rotationRole: "reasoning",
+        rotationLabel: "Step Method",
+        rotationPurpose: "Find the discount, then subtract it from the original price.",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "discount_real_world",
+        rotationRole: "apply_create",
+        rotationLabel: "Shopping Decisions",
+        rotationPurpose: "Apply discount strategies to real shopping items and money contexts.",
+      }),
     ],
   },
   {

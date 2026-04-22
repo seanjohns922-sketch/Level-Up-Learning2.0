@@ -652,6 +652,17 @@ type PercentStructuredTemplate = {
   method?: PercentStructuredMethodVisualData["method"];
 };
 
+type DiscountQuestionTemplate = {
+  item: string;
+  price: number;
+  percent: number;
+  ask: "discount" | "final";
+};
+
+type DiscountStepTemplate = DiscountQuestionTemplate & {
+  method: "strategy" | "decimal";
+};
+
 function greatestCommonFactor(left: number, right: number): number {
   let a = Math.abs(left);
   let b = Math.abs(right);
@@ -1394,6 +1405,132 @@ function year5PercentRealWorldTemplates(): PercentAmountChoiceTemplate[] {
   ];
 }
 
+function discountAmount(price: number, percent: number) {
+  return (price * percent) / 100;
+}
+
+function discountFinalPrice(price: number, percent: number) {
+  return price - discountAmount(price, percent);
+}
+
+function moneyAnswer(value: number) {
+  return `$${Number.isInteger(value) ? value : value.toFixed(2)}`;
+}
+
+function discountVisual(
+  template: DiscountQuestionTemplate,
+  visualMode: DiscountPriceVisualData["visualMode"] = "price_tag"
+): DiscountPriceVisualData {
+  const discount = discountAmount(template.price, template.percent);
+  return {
+    type: "discount_price_tag",
+    item: template.item,
+    price: template.price,
+    percent: template.percent,
+    discount,
+    finalPrice: template.price - discount,
+    visualMode,
+  };
+}
+
+function discountOptions(template: DiscountQuestionTemplate) {
+  const discount = discountAmount(template.price, template.percent);
+  const finalPrice = template.price - discount;
+  const answer = moneyAnswer(template.ask === "discount" ? discount : finalPrice);
+  const candidates =
+    template.ask === "discount"
+      ? [
+          moneyAnswer(finalPrice),
+          moneyAnswer(template.price),
+          moneyAnswer(template.percent),
+          moneyAnswer(Math.max(1, discount / 2)),
+          moneyAnswer(Math.min(template.price, discount * 2)),
+        ]
+      : [
+          moneyAnswer(discount),
+          moneyAnswer(template.price + discount),
+          moneyAnswer(template.price),
+          moneyAnswer(Math.max(0, finalPrice - discount)),
+          moneyAnswer(template.price - template.percent),
+        ];
+  return uniqueStringOptions(answer, candidates);
+}
+
+function year5DiscountQuickFindTemplates(): DiscountQuestionTemplate[] {
+  return [
+    { item: "shirt", price: 50, percent: 10, ask: "discount" },
+    { item: "game", price: 80, percent: 25, ask: "discount" },
+    { item: "bag", price: 60, percent: 20, ask: "final" },
+    { item: "book set", price: 40, percent: 50, ask: "final" },
+    { item: "jacket", price: 90, percent: 10, ask: "discount" },
+    { item: "headphones", price: 120, percent: 25, ask: "final" },
+    { item: "trainers", price: 100, percent: 30, ask: "discount" },
+    { item: "hoodie", price: 70, percent: 20, ask: "final" },
+    { item: "backpack", price: 80, percent: 50, ask: "discount" },
+    { item: "poster", price: 30, percent: 10, ask: "final" },
+  ];
+}
+
+function year5DiscountStepTemplates(): DiscountStepTemplate[] {
+  return [
+    { item: "jacket", price: 80, percent: 25, ask: "final", method: "strategy" },
+    { item: "game", price: 60, percent: 30, ask: "final", method: "decimal" },
+    { item: "shoes", price: 120, percent: 20, ask: "final", method: "strategy" },
+    { item: "headphones", price: 200, percent: 15, ask: "final", method: "decimal" },
+    { item: "shirt", price: 50, percent: 10, ask: "final", method: "strategy" },
+    { item: "watch", price: 160, percent: 25, ask: "final", method: "strategy" },
+    { item: "bike helmet", price: 90, percent: 40, ask: "final", method: "strategy" },
+    { item: "keyboard", price: 150, percent: 12, ask: "final", method: "decimal" },
+    { item: "school bag", price: 70, percent: 30, ask: "final", method: "strategy" },
+    { item: "lamp", price: 100, percent: 35, ask: "final", method: "decimal" },
+  ];
+}
+
+function year5DiscountRealWorldTemplates(): DiscountQuestionTemplate[] {
+  return [
+    { item: "shoes", price: 120, percent: 20, ask: "final" },
+    { item: "game", price: 60, percent: 25, ask: "final" },
+    { item: "TV", price: 200, percent: 15, ask: "discount" },
+    { item: "jacket", price: 80, percent: 30, ask: "final" },
+    { item: "book bundle", price: 40, percent: 10, ask: "discount" },
+    { item: "skateboard", price: 150, percent: 20, ask: "discount" },
+    { item: "desk", price: 180, percent: 25, ask: "final" },
+    { item: "football boots", price: 110, percent: 10, ask: "final" },
+    { item: "tablet case", price: 50, percent: 40, ask: "discount" },
+    { item: "speaker", price: 90, percent: 30, ask: "final" },
+  ];
+}
+
+function discountStepVisual(template: DiscountStepTemplate): DiscountStepMethodVisualData {
+  const discount = discountAmount(template.price, template.percent);
+  const finalPrice = template.price - discount;
+  const decimal = template.percent / 100;
+  const decimalText = Number.isInteger(decimal) ? String(decimal) : String(decimal).replace(/0+$/, "");
+  const steps =
+    template.method === "decimal"
+      ? [
+          { prompt: `Convert ${template.percent}% to a decimal`, answer: decimalText },
+          { prompt: `${decimalText} × ${template.price} =`, answer: String(discount) },
+          { prompt: `${template.price} - ${discount} =`, answer: String(finalPrice) },
+        ]
+      : [
+          { prompt: `What is ${template.percent}% of ${template.price}?`, answer: String(discount) },
+          { prompt: `${template.price} - ${discount} =`, answer: String(finalPrice) },
+        ];
+
+  return {
+    type: "discount_step_method",
+    item: template.item,
+    price: template.price,
+    percent: template.percent,
+    discount,
+    finalPrice,
+    visualMode: template.method === "decimal" ? "percent_bar" : "before_after",
+    method: template.method,
+    steps,
+  };
+}
+
 function year3FractionOrderSets() {
   return [
     ["1/5", "1/2", "4/5"],
@@ -1714,6 +1851,26 @@ export type PercentStructuredMethodVisualData = {
   }>;
 };
 
+export type DiscountPriceVisualData = {
+  type: "discount_price_tag";
+  item: string;
+  price: number;
+  percent: number;
+  discount: number;
+  finalPrice: number;
+  visualMode?: "price_tag" | "before_after" | "percent_bar" | "shop_item";
+};
+
+export type DiscountStepMethodVisualData = Omit<DiscountPriceVisualData, "type"> & {
+  type: "discount_step_method";
+  method: "strategy" | "decimal";
+  steps: Array<{
+    prompt: string;
+    answer: string;
+    suffix?: string;
+  }>;
+};
+
 export type MultipleChoiceQuestion = {
   kind: "multiple_choice";
   prompt: string;
@@ -1737,6 +1894,7 @@ export type MultipleChoiceQuestion = {
     | DecimalVisualData
     | MoneyVisualData
     | SameDenominatorOperationVisualData
+    | DiscountPriceVisualData
     | RuleBoxVisualData;
 };
 
@@ -1779,6 +1937,7 @@ export type TypedResponseQuestion = {
     | SameDenominatorOperationVisualData
     | FractionDecimalPercentConversionVisualData
     | PercentStructuredMethodVisualData
+    | DiscountStepMethodVisualData
     | {
         type: "equivalent_fraction_input";
         leftNumerator: number;
@@ -10533,27 +10692,58 @@ function generateGenericQuestion(
     };
   }
 
-  if (explicitMode === "percentage_discount") {
-    const templates = [
-      { prompt: "A $40 item has a 25% discount. What is the sale price?", answer: "30" },
-      { prompt: "A $60 item is reduced by 10%. How much is the discount?", answer: "6" },
-      { prompt: "A $80 item has a 50% discount. What is the sale price?", answer: "40" },
-    ];
+  if (
+    explicitMode === "percentage_discount" ||
+    explicitMode === "discount_quick_find" ||
+    explicitMode === "discount_step_method" ||
+    explicitMode === "discount_real_world"
+  ) {
+    if (explicitMode === "discount_step_method" || (!asMultipleChoice && explicitMode === "percentage_discount")) {
+      const templates = year5DiscountStepTemplates();
+      const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+      const visual = discountStepVisual(chosen);
+      const finalStep = visual.steps[visual.steps.length - 1] ?? visual.steps[0]!;
+
+      return {
+        kind: "typed_response",
+        prompt: `${chosen.item}: ${moneyAnswer(chosen.price)} with ${chosen.percent}% off`,
+        answer: finalStep.answer,
+        helper:
+          chosen.method === "decimal"
+            ? "Convert the percent to a decimal, multiply, then subtract."
+            : "Find the discount first, then subtract from the original price.",
+        placeholder: "Type the answer",
+        visual,
+      };
+    }
+
+    const templates =
+      explicitMode === "discount_real_world"
+        ? year5DiscountRealWorldTemplates()
+        : year5DiscountQuickFindTemplates();
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
-    return asMultipleChoice
-      ? {
-          kind: "multiple_choice",
-          prompt: chosen.prompt,
-          options: uniqueStringOptions(chosen.answer, ["4", "8", "20", "50"]),
-          answer: chosen.answer,
-          helper: "Work out the percentage amount first, then subtract if needed.",
-        }
-      : {
-          kind: "typed_response",
-          prompt: chosen.prompt,
-          answer: chosen.answer,
-          placeholder: "Type the answer",
-        };
+    const answerValue =
+      chosen.ask === "discount"
+        ? discountAmount(chosen.price, chosen.percent)
+        : discountFinalPrice(chosen.price, chosen.percent);
+
+    return {
+      kind: "multiple_choice",
+      prompt:
+        chosen.ask === "discount"
+          ? `How much do you save on the ${chosen.item}?`
+          : `What is the final price of the ${chosen.item}?`,
+      options: shuffle(discountOptions(chosen)),
+      answer: moneyAnswer(answerValue),
+      helper:
+        chosen.ask === "discount"
+          ? "Find the percentage of the original price."
+          : "Find the discount first, then subtract it from the price.",
+      visual: discountVisual(
+        chosen,
+        explicitMode === "discount_real_world" ? "shop_item" : "price_tag"
+      ),
+    };
   }
 
   if (explicitMode === "percent_multistep") {

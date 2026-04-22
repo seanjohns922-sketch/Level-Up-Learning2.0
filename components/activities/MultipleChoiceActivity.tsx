@@ -8,6 +8,7 @@ import DecimalModelVisual from "@/components/activities/DecimalModelVisual";
 import MoneyContextVisual from "@/components/activities/MoneyContextVisual";
 import ArrayVisual from "@/components/activities/ArrayVisual";
 import RuleBoxVisual from "@/components/activities/RuleBoxVisual";
+import DiscountVisual from "@/components/activities/DiscountVisual";
 import { FractionText, MathFormattedText } from "@/components/FractionText";
 
 function FractionBar({
@@ -218,6 +219,9 @@ export default function MultipleChoiceActivity({
       ) : null}
       {questionData.visual?.type === "same_denominator_operation" ? (
         <SameDenominatorOperationVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "discount_price_tag" ? (
+        <DiscountVisual visual={questionData.visual} />
       ) : null}
 
       <div className="mt-6 grid gap-2.5">

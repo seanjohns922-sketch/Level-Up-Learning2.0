@@ -9,6 +9,7 @@ import DecimalModelVisual from "@/components/activities/DecimalModelVisual";
 import MoneyContextVisual from "@/components/activities/MoneyContextVisual";
 import ArrayVisual from "@/components/activities/ArrayVisual";
 import RuleBoxVisual from "@/components/activities/RuleBoxVisual";
+import DiscountVisual from "@/components/activities/DiscountVisual";
 import { MathFormattedText } from "@/components/FractionText";
 
 function normalize(value: string) {
@@ -187,13 +188,17 @@ function PercentStructuredMethodInput({
   onInputChange,
   inputRef,
 }: {
-  visual: Extract<NonNullable<TypedResponseQuestion["visual"]>, { type: "percent_structured_method" }>;
+  visual: Extract<
+    NonNullable<TypedResponseQuestion["visual"]>,
+    { type: "percent_structured_method" } | { type: "discount_step_method" }
+  >;
   currentStep: number;
   inputs: string[];
   feedback: string;
   onInputChange: (index: number, value: string) => void;
   inputRef: RefObject<HTMLInputElement | null>;
 }) {
+  const amount = visual.type === "discount_step_method" ? visual.price : visual.amount;
   return (
     <div className="w-full rounded-2xl border border-amber-100 bg-amber-50 p-5">
       <div className="text-xs font-black uppercase tracking-[0.18em] text-amber-700">
@@ -201,8 +206,10 @@ function PercentStructuredMethodInput({
       </div>
       <div className="mt-2 text-sm font-bold text-slate-600">
         {visual.method === "decimal"
-          ? `Convert ${visual.percent}% to a decimal, then multiply by ${visual.amount}.`
-          : `Break ${visual.percent}% of ${visual.amount} into easier parts.`}
+          ? `Convert ${visual.percent}% to a decimal, then multiply by ${amount}.`
+          : visual.type === "discount_step_method"
+            ? `Find the discount, then subtract it from ${visual.price}.`
+            : `Break ${visual.percent}% of ${amount} into easier parts.`}
       </div>
       <div className="mt-5 grid gap-3">
         {visual.steps.map((step, index) => {
@@ -1251,6 +1258,9 @@ export default function TypedResponseActivity({
   const percentStructuredMethodVisual =
     questionData.visual?.type === "percent_structured_method" ? questionData.visual : null;
   const isPercentStructuredMethod = percentStructuredMethodVisual !== null;
+  const discountStepMethodVisual =
+    questionData.visual?.type === "discount_step_method" ? questionData.visual : null;
+  const isDiscountStepMethod = discountStepMethodVisual !== null;
   const equivalentFractionInputVisual =
     questionData.visual?.type === "equivalent_fraction_input" ? questionData.visual : null;
   const isEquivalentFractionInput = equivalentFractionInputVisual !== null;
@@ -1289,8 +1299,10 @@ export default function TypedResponseActivity({
   const [conversionPercentInput, setConversionPercentInput] = useState("");
   const [percentMethodStep, setPercentMethodStep] = useState(0);
   const [percentMethodInputs, setPercentMethodInputs] = useState<string[]>(
-    percentStructuredMethodVisual
-      ? Array.from({ length: percentStructuredMethodVisual.steps.length }, () => "")
+    percentStructuredMethodVisual || discountStepMethodVisual
+      ? Array.from({
+          length: (percentStructuredMethodVisual ?? discountStepMethodVisual)?.steps.length ?? 0,
+        }, () => "")
       : []
   );
   const [percentMethodFeedback, setPercentMethodFeedback] = useState("");
@@ -1411,7 +1423,8 @@ export default function TypedResponseActivity({
       setConversionPercentInput("");
       setPercentMethodStep(0);
       setPercentMethodInputs(
-        questionData.visual?.type === "percent_structured_method"
+        questionData.visual?.type === "percent_structured_method" ||
+          questionData.visual?.type === "discount_step_method"
           ? Array.from({ length: questionData.visual.steps.length }, () => "")
           : []
       );
@@ -2006,20 +2019,26 @@ export default function TypedResponseActivity({
       return;
     }
 
-    if (isPercentStructuredMethod && percentStructuredMethodVisual) {
-      const step = percentStructuredMethodVisual.steps[percentMethodStep];
+    if (
+      (isPercentStructuredMethod && percentStructuredMethodVisual) ||
+      (isDiscountStepMethod && discountStepMethodVisual)
+    ) {
+      const stepVisual = percentStructuredMethodVisual ?? discountStepMethodVisual;
+      const step = stepVisual?.steps[percentMethodStep];
       if (!step) return;
 
       if (numericInputsMatch(percentMethodInputs[percentMethodStep] ?? "", step.answer)) {
         setPercentMethodFeedback("");
-        if (percentMethodStep >= percentStructuredMethodVisual.steps.length - 1) {
+        if (percentMethodStep >= stepVisual.steps.length - 1) {
           onCorrect?.();
         } else {
           setPercentMethodStep((current) => current + 1);
         }
       } else {
         setPercentMethodFeedback(
-          percentStructuredMethodVisual.method === "decimal"
+          isDiscountStepMethod
+            ? "Find the discount first, then subtract it from the original price."
+            : percentStructuredMethodVisual?.method === "decimal"
             ? "Divide by 100 first, then multiply by the amount."
             : "Break the percentage into easier parts and try this step again."
         );
@@ -2150,7 +2169,9 @@ export default function TypedResponseActivity({
   const visualType = questionData.visual?.type;
   const activityTitle =
     writtenMethod?.title ??
-    (visualType === "percent_structured_method"
+    (visualType === "discount_step_method"
+      ? "Discount Method"
+      : visualType === "percent_structured_method"
       ? "Percentage Method"
       : visualType === "division_build_groups"
       ? "Build the Groups"
@@ -2164,9 +2185,10 @@ export default function TypedResponseActivity({
       ? "Column Multiplication"
       : "Typed Response");
   const typedResponseButtonLabel =
-    isPercentStructuredMethod &&
-    percentStructuredMethodVisual &&
-    percentMethodStep < percentStructuredMethodVisual.steps.length - 1
+    ((isPercentStructuredMethod && percentStructuredMethodVisual) ||
+      (isDiscountStepMethod && discountStepMethodVisual)) &&
+    percentMethodStep <
+      ((percentStructuredMethodVisual ?? discountStepMethodVisual)?.steps.length ?? 1) - 1
       ? "Check step"
       : isRelatedDenominatorWorking && relatedDenominatorStep !== "solve" && relatedDenominatorStep !== "done"
       ? "Check step"
@@ -2205,6 +2227,9 @@ export default function TypedResponseActivity({
       ) : null}
       {questionData.visual?.type === "rule_box" ? (
         <RuleBoxVisual visual={questionData.visual} title="Step-by-step rule" />
+      ) : null}
+      {discountStepMethodVisual ? (
+        <DiscountVisual visual={discountStepMethodVisual} />
       ) : null}
       {buildGroupsVisual ? (
         <div className="mt-4 space-y-4">
@@ -2883,6 +2908,15 @@ export default function TypedResponseActivity({
                 ))}
               </div>
             </div>
+          ) : isDiscountStepMethod && discountStepMethodVisual ? (
+            <PercentStructuredMethodInput
+              visual={discountStepMethodVisual}
+              currentStep={percentMethodStep}
+              inputs={percentMethodInputs}
+              feedback={percentMethodFeedback}
+              onInputChange={updatePercentMethodInput}
+              inputRef={numeratorRef}
+            />
           ) : isPercentStructuredMethod && percentStructuredMethodVisual ? (
             <PercentStructuredMethodInput
               visual={percentStructuredMethodVisual}
