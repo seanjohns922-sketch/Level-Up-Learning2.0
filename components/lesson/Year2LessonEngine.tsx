@@ -24,6 +24,10 @@ function isOrderedStrategyFluencyLesson(level: SupportedMathLevel, lesson: Lesso
   return level === 5 && lesson.week === 11 && lesson.lesson === 2;
 }
 
+function isEstimateReasoningLesson(level: SupportedMathLevel, lesson: Lesson) {
+  return level === 5 && lesson.week === 11 && lesson.lesson === 3;
+}
+
 function chooseNextLessonTurn(
   level: SupportedMathLevel,
   lesson: Lesson,
@@ -405,6 +409,8 @@ export function Year2LessonEngine({
     : "PRACTISE";
   const showStrategySwitchPrompt =
     isOrderedStrategyFluencyLesson(level, lesson) && questionsAnswered === 4 && status === "idle";
+  const showEstimatePrompt =
+    isEstimateReasoningLesson(level, lesson) && questionsAnswered === 4 && status === "idle";
 
   // ── Finished state ──
   if (finished) {
@@ -472,6 +478,11 @@ export function Year2LessonEngine({
           {showStrategySwitchPrompt ? (
             <div className="rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm font-black text-sky-800 shadow-sm">
               Try a different strategy for the next question.
+            </div>
+          ) : null}
+          {showEstimatePrompt ? (
+            <div className="rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm font-black text-sky-800 shadow-sm">
+              Estimate first — then decide.
             </div>
           ) : null}
 

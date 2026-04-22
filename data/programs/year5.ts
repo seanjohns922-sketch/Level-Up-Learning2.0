@@ -622,14 +622,30 @@ const year5Rows: ProgramRow[] = [
   },
   {
     week: 11,
-    focus: "Check and explain reasonableness in practical and financial problems",
+    focus: "Estimate quickly and decide whether answers are reasonable",
     lesson: 3,
-    topic: "Reasonableness",
-    activity: "Estimate first, then decide whether an answer makes sense.",
+    topic: "Estimate & Check",
+    activity: "Use fast estimates to decide whether answers make sense.",
     curriculum: ["AC9M5N08"],
     activities: [
-      makeActivity("multiple_choice", 2, { mode: "problem_reasonableness" }),
-      makeActivity("typed_response", 1, { mode: "problem_reasonableness" }),
+      makeActivity("multiple_choice", 1, {
+        mode: "reasonableness_yes_no",
+        rotationRole: "fast_thinking",
+        rotationLabel: "Does It Make Sense?",
+        rotationPurpose: "Estimate first, then decide if the shown answer is reasonable.",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "estimate_closer",
+        rotationRole: "reasoning",
+        rotationLabel: "Which Is Closer?",
+        rotationPurpose: "Choose the estimate that is closest to the actual answer.",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "quick_estimate",
+        rotationRole: "apply_create",
+        rotationLabel: "Quick Estimate",
+        rotationPurpose: "Pick the closest rough answer without full written working.",
+      }),
     ],
   },
   {

@@ -695,6 +695,13 @@ type StrategyOwnershipTemplate = {
   reflectionOptions: string[];
 };
 
+type ReasonablenessChoiceTemplate = {
+  prompt: string;
+  answer: string;
+  options: string[];
+  helper: string;
+};
+
 function greatestCommonFactor(left: number, right: number): number {
   let a = Math.abs(left);
   let b = Math.abs(right);
@@ -2281,6 +2288,51 @@ function year5StrategyFluencyTemplates(mode: string | undefined): StrategyOwners
   };
 
   return byMode[mode ?? ""] ?? byMode.strategy_fluency_addition;
+}
+
+function year5EstimateReasonablenessTemplates(mode: string | undefined): ReasonablenessChoiceTemplate[] {
+  const yesNo: ReasonablenessChoiceTemplate[] = [
+    { prompt: "398 + 204 = 602. Does it make sense?", answer: "Yes", options: ["Yes", "No"], helper: "Nice — that makes sense." },
+    { prompt: "999 + 246 = 1,145. Does it make sense?", answer: "No", options: ["Yes", "No"], helper: "Check your estimate — is that too big or too small?" },
+    { prompt: "602 - 198 = 404. Does it make sense?", answer: "Yes", options: ["Yes", "No"], helper: "Nice — that makes sense." },
+    { prompt: "6.02 - 1.98 = 5.04. Does it make sense?", answer: "No", options: ["Yes", "No"], helper: "Check your estimate — is that too big or too small?" },
+    { prompt: "49 × 6 = 294. Does it make sense?", answer: "Yes", options: ["Yes", "No"], helper: "Nice — that makes sense." },
+    { prompt: "25 × 48 = 2,400. Does it make sense?", answer: "No", options: ["Yes", "No"], helper: "Check your estimate — is that too big or too small?" },
+    { prompt: "450 ÷ 6 = 75. Does it make sense?", answer: "Yes", options: ["Yes", "No"], helper: "Nice — that makes sense." },
+    { prompt: "1,000 ÷ 8 = 80. Does it make sense?", answer: "No", options: ["Yes", "No"], helper: "Check your estimate — is that too big or too small?" },
+    { prompt: "5.98 + 2.4 = 8.38. Does it make sense?", answer: "Yes", options: ["Yes", "No"], helper: "Nice — that makes sense." },
+    { prompt: "12.4 - 0.99 = 10.41. Does it make sense?", answer: "No", options: ["Yes", "No"], helper: "Check your estimate — is that too big or too small?" },
+  ];
+
+  const closer: ReasonablenessChoiceTemplate[] = [
+    { prompt: "Which estimate is closer for 398 + 47?", answer: "450", options: ["400", "450", "500"], helper: "Round 398 to 400, then add about 50." },
+    { prompt: "Which estimate is closer for 602 - 198?", answer: "400", options: ["300", "400", "500"], helper: "Think 600 - 200." },
+    { prompt: "Which estimate is closer for 5.98 + 2.4?", answer: "8.4", options: ["7.4", "8.4", "9.4"], helper: "Think 6 + 2.4." },
+    { prompt: "Which estimate is closer for 10.5 - 2.75?", answer: "8", options: ["6", "8", "10"], helper: "Think about 10.5 - 3." },
+    { prompt: "Which estimate is closer for 49 × 6?", answer: "300", options: ["200", "300", "400"], helper: "Think 50 × 6." },
+    { prompt: "Which estimate is closer for 25 × 16?", answer: "400", options: ["250", "400", "800"], helper: "Think 25 × 4 × 4." },
+    { prompt: "Which estimate is closer for 450 ÷ 6?", answer: "75", options: ["45", "75", "90"], helper: "Use 6 × 75 = 450." },
+    { prompt: "Which estimate is closer for 1,000 ÷ 8?", answer: "125", options: ["80", "125", "180"], helper: "Think half, half, half." },
+    { prompt: "Which estimate is closer for 999 + 246?", answer: "1,250", options: ["1,000", "1,250", "1,500"], helper: "Think 1,000 + 250." },
+    { prompt: "Which estimate is closer for 6.02 - 1.98?", answer: "4", options: ["3", "4", "5"], helper: "Think 6 - 2." },
+  ];
+
+  const quick: ReasonablenessChoiceTemplate[] = [
+    { prompt: "Quick estimate: 199 + 398", answer: "600", options: ["400", "600", "800"], helper: "Round to 200 + 400." },
+    { prompt: "Quick estimate: 999 + 246", answer: "1,250", options: ["1,000", "1,250", "1,750"], helper: "Round to 1,000 + 250." },
+    { prompt: "Quick estimate: 602 - 198", answer: "400", options: ["200", "400", "600"], helper: "Round to 600 - 200." },
+    { prompt: "Quick estimate: 12.5 + 0.75", answer: "13", options: ["12", "13", "15"], helper: "Think about 12.5 + 0.5." },
+    { prompt: "Quick estimate: 8.000 - 3.125", answer: "5", options: ["3", "5", "8"], helper: "Think 8 - 3." },
+    { prompt: "Quick estimate: 50 × 18", answer: "900", options: ["500", "900", "1,800"], helper: "Think half of 100 × 18." },
+    { prompt: "Quick estimate: 25 × 48", answer: "1,200", options: ["600", "1,200", "2,400"], helper: "25 is one quarter of 100." },
+    { prompt: "Quick estimate: 864 ÷ 9", answer: "100", options: ["50", "100", "200"], helper: "9 × 100 is 900." },
+    { prompt: "Quick estimate: 2,400 ÷ 50", answer: "50", options: ["25", "50", "100"], helper: "50 × 50 is 2,500." },
+    { prompt: "Quick estimate: 7.6 + 2.45", answer: "10", options: ["8", "10", "12"], helper: "Think 7.5 + 2.5." },
+  ];
+
+  if (mode === "estimate_closer") return closer;
+  if (mode === "quick_estimate") return quick;
+  return yesNo;
 }
 
 function discountStepVisual(template: DiscountStepTemplate): DiscountStepMethodVisualData {
@@ -11746,6 +11798,22 @@ function generateGenericQuestion(
           answer: chosen.answer,
           placeholder: "Type Yes or No",
         };
+  }
+
+  if (
+    explicitMode === "reasonableness_yes_no" ||
+    explicitMode === "estimate_closer" ||
+    explicitMode === "quick_estimate"
+  ) {
+    const templates = year5EstimateReasonablenessTemplates(explicitMode);
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: chosen.options,
+      answer: chosen.answer,
+      helper: chosen.helper,
+    };
   }
 
   if (explicitMode === "compare_symbols") {
