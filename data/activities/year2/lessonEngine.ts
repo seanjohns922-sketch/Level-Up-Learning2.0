@@ -1427,7 +1427,8 @@ function moneyAnswer(value: number) {
 
 function discountVisual(
   template: DiscountQuestionTemplate,
-  visualMode: DiscountPriceVisualData["visualMode"] = "price_tag"
+  visualMode: DiscountPriceVisualData["visualMode"] = "price_tag",
+  hideValues = false
 ): DiscountPriceVisualData {
   const discount = discountAmount(template.price, template.percent);
   return {
@@ -1438,6 +1439,7 @@ function discountVisual(
     discount,
     finalPrice: template.price - discount,
     visualMode,
+    hideValues,
   };
 }
 
@@ -1512,79 +1514,74 @@ function year5DiscountRealWorldTemplates(): DiscountQuestionTemplate[] {
 function year5PercentStepSelectionTemplates(): PercentStepSelectionTemplate[] {
   return [
     {
-      prompt: "A $100 item has 20% off. What do you find first?",
-      answer: "Discount amount",
-      options: ["Final price", "Discount amount", "Add 20%", "Multiply by 100"],
-      helper: "Find the percentage amount before subtracting.",
-      visual: discountVisual({ item: "item", price: 100, percent: 20, ask: "discount" }, "price_tag"),
+      prompt: "A $100 item has 20% off, then $5 shipping. What is the final cost?",
+      answer: "$85",
+      options: ["$85", "$80", "$75", "$125"],
+      helper: "Find the discount, subtract it, then add shipping.",
+      visual: discountVisual({ item: "item", price: 100, percent: 20, ask: "discount" }, "price_tag", true),
     },
     {
-      prompt: "A $80 jacket has 25% off, then $10 more off. What is Step 1?",
-      answer: "Find 25% of $80",
-      options: ["Find 25% of $80", "Subtract $10 first", "Add 25%", "Use $10 as the discount"],
-      helper: "Start with the percentage discount.",
-      visual: discountVisual({ item: "jacket", price: 80, percent: 25, ask: "discount" }, "price_tag"),
+      prompt: "A $80 jacket has 25% off, then $10 more off. What is the final price?",
+      answer: "$50",
+      options: ["$50", "$60", "$70", "$45"],
+      helper: "Calculate 25% of $80, then apply both discounts.",
+      visual: discountVisual({ item: "jacket", price: 80, percent: 25, ask: "discount" }, "price_tag", true),
     },
     {
-      prompt: "A $60 game has 50% off, then 10% tax is added. What do you find first?",
-      answer: "50% discount",
-      options: ["50% discount", "10% tax", "Final price", "Original price"],
-      helper: "Follow the order of the situation.",
-      visual: discountVisual({ item: "game", price: 60, percent: 50, ask: "discount" }, "price_tag"),
+      prompt: "A $60 game has 50% off, then 10% tax is added. What is the final price?",
+      answer: "$33",
+      options: ["$33", "$30", "$36", "$27"],
+      helper: "Find the sale price, then add 10% of that new price.",
+      visual: discountVisual({ item: "game", price: 60, percent: 50, ask: "discount" }, "price_tag", true),
     },
     {
-      prompt: "A $200 TV has 10% off, then another 10% off the new price. What matters most?",
-      answer: "Use the new price for the second discount",
-      options: [
-        "Use the new price for the second discount",
-        "Use $200 for both discounts",
-        "Add both discounts first",
-        "Ignore the first discount",
-      ],
-      helper: "The second percentage applies after the first price changes.",
-      visual: discountVisual({ item: "TV", price: 200, percent: 10, ask: "discount" }, "percent_bar"),
+      prompt: "A $200 TV has 10% off, then another 10% off the new price. What is the final price?",
+      answer: "$162",
+      options: ["$162", "$160", "$180", "$170"],
+      helper: "Apply the second discount to the new price.",
+      visual: discountVisual({ item: "TV", price: 200, percent: 10, ask: "discount" }, "percent_bar", true),
     },
     {
-      prompt: "25% of a number is needed. What is the easiest first step?",
-      answer: "Find 50%",
-      options: ["Find 10%", "Find 50%", "Divide by 3", "Guess"],
-      helper: "25% is half of 50%.",
-      visual: discountVisual({ item: "amount", price: 120, percent: 25, ask: "discount" }, "percent_bar"),
+      prompt: "A $120 item has 25% off, then $15 off. What is the final price?",
+      answer: "$75",
+      options: ["$75", "$90", "$105", "$65"],
+      helper: "Find 25% of 120, subtract it, then subtract 15.",
+      visual: discountVisual({ item: "item", price: 120, percent: 25, ask: "discount" }, "percent_bar", true),
     },
     {
-      prompt: "A score is 80% of 50 questions, then 5 are removed. What do you find first?",
-      answer: "80% of 50",
-      options: ["80% of 50", "50 - 5", "80 + 5", "5% of 50"],
-      helper: "Find the percentage score before changing it.",
-      visual: discountVisual({ item: "test score", price: 50, percent: 80, ask: "discount" }, "percent_bar"),
+      prompt: "A score is 80% of 50 questions, then 5 are removed. How many correct answers remain?",
+      answer: "35",
+      options: ["35", "40", "45", "30"],
+      helper: "Find 80% of 50 first, then subtract 5.",
+      visual: discountVisual({ item: "test score", price: 50, percent: 80, ask: "discount" }, "percent_bar", true),
     },
     {
-      prompt: "A $120 item has 20% off, then $10 off. What do you do after finding 20%?",
-      answer: "Subtract it from $120",
-      options: ["Subtract it from $120", "Add it to $120", "Stop there", "Multiply by 10"],
-      helper: "Use the discount amount to get the new price.",
-      visual: discountVisual({ item: "item", price: 120, percent: 20, ask: "discount" }, "price_tag"),
+      prompt: "A $120 item has 20% off, then $10 off. What is the final price?",
+      answer: "$86",
+      options: ["$86", "$96", "$90", "$110"],
+      helper: "Find the percent discount, subtract it, then subtract $10.",
+      visual: discountVisual({ item: "item", price: 120, percent: 20, ask: "discount" }, "price_tag", true),
     },
     {
-      prompt: "A price is reduced by 15%, then compared with a budget. What comes first?",
-      answer: "Find 15% of the price",
-      options: ["Find 15% of the price", "Compare before discount", "Add 15%", "Divide the budget"],
-      helper: "Work out the discount before comparing.",
-      visual: discountVisual({ item: "shopping", price: 200, percent: 15, ask: "discount" }, "price_tag"),
+      prompt: "A $200 item is reduced by 15%. Is it under a $175 budget?",
+      answer: "Yes, by $5",
+      options: ["Yes, by $5", "No, over by $5", "Yes, by $15", "No, over by $25"],
+      helper: "Find the sale price, then compare it with the budget.",
+      visual: discountVisual({ item: "shopping", price: 200, percent: 15, ask: "discount" }, "price_tag", true),
     },
     {
-      prompt: "A $90 speaker has 30% off, then $5 shipping. What should happen before adding shipping?",
-      answer: "Subtract the discount",
-      options: ["Subtract the discount", "Add shipping to $90", "Add 30%", "Use $5 as 30%"],
-      helper: "Discount changes the price before shipping is added.",
-      visual: discountVisual({ item: "speaker", price: 90, percent: 30, ask: "discount" }, "shop_item"),
+      prompt: "A $90 speaker has 30% off, then $5 shipping. What is the final cost?",
+      answer: "$68",
+      options: ["$68", "$63", "$72", "$58"],
+      helper: "Discount first, then add shipping.",
+      visual: discountVisual({ item: "speaker", price: 90, percent: 30, ask: "discount" }, "shop_item", true),
     },
     {
-      prompt: "A student improves from 60% to 80%. What do you compare?",
-      answer: "The two percentages",
-      options: ["The two percentages", "The original total only", "The discount", "The price tag"],
-      helper: "Look at the change from the first percent to the second.",
-      visual: discountVisual({ item: "progress", price: 100, percent: 20, ask: "discount" }, "percent_bar"),
+      prompt: "A student improves from 60% to 80%. What is the increase?",
+      answer: "20%",
+      options: ["20%", "40%", "80%", "140%"],
+      helper: "Compare the two percentages.",
+      visual: discountVisual({ item: "progress", price: 100, percent: 20, ask: "discount" }, "percent_bar", true),
     },
   ];
 }
@@ -2166,6 +2163,7 @@ export type DiscountPriceVisualData = {
   discount: number;
   finalPrice: number;
   visualMode?: "price_tag" | "before_after" | "percent_bar" | "shop_item";
+  hideValues?: boolean;
 };
 
 export type DiscountStepMethodVisualData = Omit<DiscountPriceVisualData, "type"> & {
@@ -11100,7 +11098,8 @@ function generateGenericQuestion(
       helper: chosen.helper,
       visual: discountVisual(
         { item: "multi-step deal", price: extractedPrice, percent: extractedPercent, ask: "discount" },
-        "shop_item"
+        "shop_item",
+        true
       ),
     };
   }

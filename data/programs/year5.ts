@@ -513,8 +513,8 @@ const year5Rows: ProgramRow[] = [
       makeActivity("multiple_choice", 1, {
         mode: "percent_step_selection",
         rotationRole: "fast_thinking",
-        rotationLabel: "First Step",
-        rotationPurpose: "Choose the correct first move before calculating.",
+        rotationLabel: "Quick Multi-Step",
+        rotationPurpose: "Solve short numerical percentage problems with more than one step.",
       }),
       makeActivity("typed_response", 1, {
         mode: "percent_multi_step_method",

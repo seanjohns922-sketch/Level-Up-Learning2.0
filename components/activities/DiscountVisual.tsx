@@ -19,9 +19,12 @@ export default function DiscountVisual({
   revealFinal?: boolean;
 }) {
   const mode = visual.visualMode ?? "price_tag";
+  const shouldHideValues = visual.hideValues === true;
+  const discountRevealed = shouldHideValues ? false : revealDiscount;
+  const finalRevealed = shouldHideValues ? false : revealFinal;
   const discountPercent = Math.max(0, Math.min(100, visual.percent));
   const showFinalCard = mode === "before_after";
-  const canRevealValue = showFinalCard ? revealFinal : revealDiscount;
+  const canRevealValue = showFinalCard ? finalRevealed : discountRevealed;
   const label = showFinalCard ? "After Discount" : "Discount Amount";
 
   return (
