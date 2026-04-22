@@ -663,6 +663,14 @@ type DiscountStepTemplate = DiscountQuestionTemplate & {
   method: "strategy" | "decimal";
 };
 
+type PercentStepSelectionTemplate = {
+  prompt: string;
+  answer: string;
+  options: string[];
+  helper: string;
+  visual: DiscountPriceVisualData;
+};
+
 function greatestCommonFactor(left: number, right: number): number {
   let a = Math.abs(left);
   let b = Math.abs(right);
@@ -1498,6 +1506,305 @@ function year5DiscountRealWorldTemplates(): DiscountQuestionTemplate[] {
     { item: "football boots", price: 110, percent: 10, ask: "final" },
     { item: "tablet case", price: 50, percent: 40, ask: "discount" },
     { item: "speaker", price: 90, percent: 30, ask: "final" },
+  ];
+}
+
+function year5PercentStepSelectionTemplates(): PercentStepSelectionTemplate[] {
+  return [
+    {
+      prompt: "A $100 item has 20% off. What do you find first?",
+      answer: "Discount amount",
+      options: ["Final price", "Discount amount", "Add 20%", "Multiply by 100"],
+      helper: "Find the percentage amount before subtracting.",
+      visual: discountVisual({ item: "item", price: 100, percent: 20, ask: "discount" }, "price_tag"),
+    },
+    {
+      prompt: "A $80 jacket has 25% off, then $10 more off. What is Step 1?",
+      answer: "Find 25% of $80",
+      options: ["Find 25% of $80", "Subtract $10 first", "Add 25%", "Use $10 as the discount"],
+      helper: "Start with the percentage discount.",
+      visual: discountVisual({ item: "jacket", price: 80, percent: 25, ask: "discount" }, "price_tag"),
+    },
+    {
+      prompt: "A $60 game has 50% off, then 10% tax is added. What do you find first?",
+      answer: "50% discount",
+      options: ["50% discount", "10% tax", "Final price", "Original price"],
+      helper: "Follow the order of the situation.",
+      visual: discountVisual({ item: "game", price: 60, percent: 50, ask: "discount" }, "price_tag"),
+    },
+    {
+      prompt: "A $200 TV has 10% off, then another 10% off the new price. What matters most?",
+      answer: "Use the new price for the second discount",
+      options: [
+        "Use the new price for the second discount",
+        "Use $200 for both discounts",
+        "Add both discounts first",
+        "Ignore the first discount",
+      ],
+      helper: "The second percentage applies after the first price changes.",
+      visual: discountVisual({ item: "TV", price: 200, percent: 10, ask: "discount" }, "percent_bar"),
+    },
+    {
+      prompt: "25% of a number is needed. What is the easiest first step?",
+      answer: "Find 50%",
+      options: ["Find 10%", "Find 50%", "Divide by 3", "Guess"],
+      helper: "25% is half of 50%.",
+      visual: discountVisual({ item: "amount", price: 120, percent: 25, ask: "discount" }, "percent_bar"),
+    },
+    {
+      prompt: "A score is 80% of 50 questions, then 5 are removed. What do you find first?",
+      answer: "80% of 50",
+      options: ["80% of 50", "50 - 5", "80 + 5", "5% of 50"],
+      helper: "Find the percentage score before changing it.",
+      visual: discountVisual({ item: "test score", price: 50, percent: 80, ask: "discount" }, "percent_bar"),
+    },
+    {
+      prompt: "A $120 item has 20% off, then $10 off. What do you do after finding 20%?",
+      answer: "Subtract it from $120",
+      options: ["Subtract it from $120", "Add it to $120", "Stop there", "Multiply by 10"],
+      helper: "Use the discount amount to get the new price.",
+      visual: discountVisual({ item: "item", price: 120, percent: 20, ask: "discount" }, "price_tag"),
+    },
+    {
+      prompt: "A price is reduced by 15%, then compared with a budget. What comes first?",
+      answer: "Find 15% of the price",
+      options: ["Find 15% of the price", "Compare before discount", "Add 15%", "Divide the budget"],
+      helper: "Work out the discount before comparing.",
+      visual: discountVisual({ item: "shopping", price: 200, percent: 15, ask: "discount" }, "price_tag"),
+    },
+    {
+      prompt: "A $90 speaker has 30% off, then $5 shipping. What should happen before adding shipping?",
+      answer: "Subtract the discount",
+      options: ["Subtract the discount", "Add shipping to $90", "Add 30%", "Use $5 as 30%"],
+      helper: "Discount changes the price before shipping is added.",
+      visual: discountVisual({ item: "speaker", price: 90, percent: 30, ask: "discount" }, "shop_item"),
+    },
+    {
+      prompt: "A student improves from 60% to 80%. What do you compare?",
+      answer: "The two percentages",
+      options: ["The two percentages", "The original total only", "The discount", "The price tag"],
+      helper: "Look at the change from the first percent to the second.",
+      visual: discountVisual({ item: "progress", price: 100, percent: 20, ask: "discount" }, "percent_bar"),
+    },
+  ];
+}
+
+function year5PercentMultiStepTemplates(): DiscountStepMethodVisualData[] {
+  return [
+    {
+      type: "discount_step_method",
+      item: "jacket",
+      price: 80,
+      percent: 25,
+      discount: 20,
+      finalPrice: 50,
+      visualMode: "before_after",
+      method: "strategy",
+      steps: [
+        { prompt: "Find 25% of 80", answer: "20" },
+        { prompt: "80 - 20 =", answer: "60" },
+        { prompt: "60 - 10 =", answer: "50" },
+      ],
+    },
+    {
+      type: "discount_step_method",
+      item: "game",
+      price: 60,
+      percent: 30,
+      discount: 18,
+      finalPrice: 42,
+      visualMode: "percent_bar",
+      method: "decimal",
+      steps: [
+        { prompt: "Convert 30% to a decimal", answer: "0.3" },
+        { prompt: "0.3 × 60 =", answer: "18" },
+        { prompt: "60 - 18 =", answer: "42" },
+      ],
+    },
+    {
+      type: "discount_step_method",
+      item: "test score",
+      price: 50,
+      percent: 80,
+      discount: 40,
+      finalPrice: 35,
+      visualMode: "percent_bar",
+      method: "strategy",
+      steps: [
+        { prompt: "Find 80% of 50", answer: "40" },
+        { prompt: "40 - 5 =", answer: "35" },
+      ],
+    },
+    {
+      type: "discount_step_method",
+      item: "TV",
+      price: 200,
+      percent: 10,
+      discount: 20,
+      finalPrice: 162,
+      visualMode: "before_after",
+      method: "strategy",
+      steps: [
+        { prompt: "Find 10% of 200", answer: "20" },
+        { prompt: "200 - 20 =", answer: "180" },
+        { prompt: "Find 10% of 180", answer: "18" },
+        { prompt: "180 - 18 =", answer: "162" },
+      ],
+    },
+    {
+      type: "discount_step_method",
+      item: "shoes",
+      price: 120,
+      percent: 20,
+      discount: 24,
+      finalPrice: 86,
+      visualMode: "shop_item",
+      method: "strategy",
+      steps: [
+        { prompt: "Find 20% of 120", answer: "24" },
+        { prompt: "120 - 24 =", answer: "96" },
+        { prompt: "96 - 10 =", answer: "86" },
+      ],
+    },
+    {
+      type: "discount_step_method",
+      item: "keyboard",
+      price: 150,
+      percent: 12,
+      discount: 18,
+      finalPrice: 132,
+      visualMode: "percent_bar",
+      method: "decimal",
+      steps: [
+        { prompt: "Convert 12% to a decimal", answer: "0.12" },
+        { prompt: "0.12 × 150 =", answer: "18" },
+        { prompt: "150 - 18 =", answer: "132" },
+      ],
+    },
+    {
+      type: "discount_step_method",
+      item: "speaker",
+      price: 90,
+      percent: 30,
+      discount: 27,
+      finalPrice: 68,
+      visualMode: "shop_item",
+      method: "strategy",
+      steps: [
+        { prompt: "Find 30% of 90", answer: "27" },
+        { prompt: "90 - 27 =", answer: "63" },
+        { prompt: "63 + 5 =", answer: "68" },
+      ],
+    },
+    {
+      type: "discount_step_method",
+      item: "course progress",
+      price: 100,
+      percent: 60,
+      discount: 60,
+      finalPrice: 20,
+      visualMode: "percent_bar",
+      method: "strategy",
+      steps: [
+        { prompt: "Start at 60%. Target is 80%.", answer: "60" },
+        { prompt: "80 - 60 =", answer: "20" },
+      ],
+    },
+    {
+      type: "discount_step_method",
+      item: "lamp",
+      price: 100,
+      percent: 35,
+      discount: 35,
+      finalPrice: 65,
+      visualMode: "percent_bar",
+      method: "decimal",
+      steps: [
+        { prompt: "Convert 35% to a decimal", answer: "0.35" },
+        { prompt: "0.35 × 100 =", answer: "35" },
+        { prompt: "100 - 35 =", answer: "65" },
+      ],
+    },
+    {
+      type: "discount_step_method",
+      item: "book bundle",
+      price: 75,
+      percent: 20,
+      discount: 15,
+      finalPrice: 65,
+      visualMode: "before_after",
+      method: "strategy",
+      steps: [
+        { prompt: "Find 20% of 75", answer: "15" },
+        { prompt: "75 - 15 =", answer: "60" },
+        { prompt: "60 + 5 =", answer: "65" },
+      ],
+    },
+  ];
+}
+
+function year5PercentRealWorldMultiTemplates(): PercentAmountChoiceTemplate[] {
+  return [
+    {
+      prompt: "A $120 item has 20% off, then $10 off. What is the final price?",
+      answer: "$86",
+      options: ["$86", "$96", "$90", "$110"],
+      helper: "Find the percent discount, subtract it, then subtract $10.",
+    },
+    {
+      prompt: "A $60 game has 50% off, then 10% tax added. What is the final price?",
+      answer: "$33",
+      options: ["$33", "$30", "$36", "$27"],
+      helper: "Find the sale price first, then add 10% of that new price.",
+    },
+    {
+      prompt: "A student improves from 60% to 80%. How much is the increase?",
+      answer: "20%",
+      options: ["20%", "40%", "80%", "140%"],
+      helper: "Compare the two percentages.",
+    },
+    {
+      prompt: "A $90 speaker has 30% off, then $5 shipping. What is the final cost?",
+      answer: "$68",
+      options: ["$68", "$63", "$72", "$58"],
+      helper: "Discount first, then add shipping.",
+    },
+    {
+      prompt: "A $200 TV has 10% off, then another 10% off the new price. What is the final price?",
+      answer: "$162",
+      options: ["$162", "$160", "$180", "$170"],
+      helper: "Apply the second discount to the new price.",
+    },
+    {
+      prompt: "A $150 keyboard has 12% off. What is the final price?",
+      answer: "$132",
+      options: ["$132", "$138", "$18", "$162"],
+      helper: "Use the decimal method if needed, then subtract.",
+    },
+    {
+      prompt: "A $80 jacket has 25% off, then $10 more off. What is the final price?",
+      answer: "$50",
+      options: ["$50", "$60", "$70", "$45"],
+      helper: "Find 25% first, then use both discounts.",
+    },
+    {
+      prompt: "A test has 50 questions. 80% are correct, then 5 answers are removed. How many remain correct?",
+      answer: "35",
+      options: ["35", "40", "45", "30"],
+      helper: "Find 80% of 50 first.",
+    },
+    {
+      prompt: "A $75 bundle has 20% off, then $5 shipping. What is the final cost?",
+      answer: "$65",
+      options: ["$65", "$60", "$70", "$55"],
+      helper: "Subtract the discount, then add shipping.",
+    },
+    {
+      prompt: "A $100 lamp has 35% off. What is the final price?",
+      answer: "$65",
+      options: ["$65", "$35", "$75", "$135"],
+      helper: "Find the discount, then subtract.",
+    },
   ];
 }
 
@@ -10746,27 +11053,56 @@ function generateGenericQuestion(
     };
   }
 
-  if (explicitMode === "percent_multistep") {
-    const templates = [
-      { prompt: "A $50 jumper has 20% off. Then $5 shipping is added. What is the final cost?", answer: "45" },
-      { prompt: "A class has 40 students. 25% are absent. How many students are at school?", answer: "30" },
-      { prompt: "A $120 bike is reduced by 10%. How much do you pay?", answer: "108" },
-    ];
+  if (
+    explicitMode === "percent_multistep" ||
+    explicitMode === "percent_step_selection" ||
+    explicitMode === "percent_multi_step_method" ||
+    explicitMode === "percent_real_world_multi"
+  ) {
+    if (explicitMode === "percent_multi_step_method" || (!asMultipleChoice && explicitMode === "percent_multistep")) {
+      const templates = year5PercentMultiStepTemplates();
+      const visual = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+      const finalStep = visual.steps[visual.steps.length - 1] ?? visual.steps[0]!;
+
+      return {
+        kind: "typed_response",
+        prompt: `${visual.item}: follow each percentage step`,
+        answer: finalStep.answer,
+        helper: "Complete each step in order. Do not skip ahead.",
+        placeholder: "Type the answer",
+        visual,
+      };
+    }
+
+    if (explicitMode === "percent_step_selection") {
+      const templates = year5PercentStepSelectionTemplates();
+      const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+      return {
+        kind: "multiple_choice",
+        prompt: chosen.prompt,
+        options: shuffle(chosen.options),
+        answer: chosen.answer,
+        helper: chosen.helper,
+        visual: chosen.visual,
+      };
+    }
+
+    const templates = year5PercentRealWorldMultiTemplates();
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
-    return asMultipleChoice
-      ? {
-          kind: "multiple_choice",
-          prompt: chosen.prompt,
-          options: uniqueNumberOptions(Number(chosen.answer), 12),
-          answer: chosen.answer,
-          helper: "Find the percentage first, then complete the second step.",
-        }
-      : {
-          kind: "typed_response",
-          prompt: chosen.prompt,
-          answer: chosen.answer,
-          placeholder: "Type the answer",
-        };
+    const extractedPrice = Number((chosen.prompt.match(/\$(\d+)/) ?? [])[1] ?? 100);
+    const extractedPercent = Number((chosen.prompt.match(/(\d+)%/) ?? [])[1] ?? 20);
+
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle(chosen.options),
+      answer: chosen.answer,
+      helper: chosen.helper,
+      visual: discountVisual(
+        { item: "multi-step deal", price: extractedPrice, percent: extractedPercent, ask: "discount" },
+        "shop_item"
+      ),
+    };
   }
 
   if (explicitMode === "strategy_selection") {

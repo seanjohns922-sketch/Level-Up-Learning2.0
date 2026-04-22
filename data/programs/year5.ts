@@ -503,14 +503,31 @@ const year5Rows: ProgramRow[] = [
   },
   {
     week: 10,
-    focus: "Solve short multi-step percentage problems",
+    weekTopic: "Financial Contexts & Percentage Reasoning",
+    focus: "Solve percentage problems that require more than one step",
     lesson: 3,
     topic: "Multi-step % Problems",
-    activity: "Solve short percentage problems involving totals, discounts, and checking.",
+    activity: "Break percentage problems into clear steps and carry results forward.",
     curriculum: ["AC9M5N08", "AC9M5N09"],
     activities: [
-      makeActivity("multiple_choice", 2, { mode: "percent_multistep" }),
-      makeActivity("typed_response", 1, { mode: "percent_multistep" }),
+      makeActivity("multiple_choice", 1, {
+        mode: "percent_step_selection",
+        rotationRole: "fast_thinking",
+        rotationLabel: "First Step",
+        rotationPurpose: "Choose the correct first move before calculating.",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "percent_multi_step_method",
+        rotationRole: "reasoning",
+        rotationLabel: "Step Method",
+        rotationPurpose: "Complete one percentage step at a time and carry the result forward.",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "percent_real_world_multi",
+        rotationRole: "apply_create",
+        rotationLabel: "Real Problems",
+        rotationPurpose: "Solve short real-world percentage problems with two or more steps.",
+      }),
     ],
   },
   {
