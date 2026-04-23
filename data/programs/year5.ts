@@ -654,13 +654,33 @@ const year5Rows: ProgramRow[] = [
     focus: "Review Year 5 Number concepts through mixed challenge",
     lesson: 1,
     topic: "Mixed Operations Challenge",
-    activity: "Review mixed operations with quick challenge questions.",
+    activity: "Build fast, accurate fluency with mixed upper Level 5 operations.",
     curriculum: ["AC9M5N06", "AC9M5N07", "AC9M5N08", "AC9M5N09"],
     activities: [
-      makeActivity("review_quiz", 2, {
-        reviewActivities: ["addition_strategy", "subtraction_strategy", "arrays", "division_groups", "number_line"],
+      makeActivity("typed_response", 1, {
+        mode: "mixed_ops_addition",
+        rotationRole: "fast_thinking",
+        rotationLabel: "Addition",
+        rotationPurpose: "Solve multi-digit and decimal addition accurately.",
       }),
-      makeActivity("speed_round", 1, {}),
+      makeActivity("typed_response", 1, {
+        mode: "mixed_ops_subtraction",
+        rotationRole: "fast_thinking",
+        rotationLabel: "Subtraction",
+        rotationPurpose: "Solve multi-digit and decimal subtraction accurately.",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "mixed_ops_multiplication",
+        rotationRole: "fast_thinking",
+        rotationLabel: "Multiplication",
+        rotationPurpose: "Solve strategy-friendly whole-number multiplication.",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "mixed_ops_division",
+        rotationRole: "fast_thinking",
+        rotationLabel: "Division",
+        rotationPurpose: "Solve clean whole-number division accurately.",
+      }),
     ],
   },
   {

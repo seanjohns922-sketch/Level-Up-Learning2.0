@@ -1453,6 +1453,7 @@ export default function TypedResponseActivity({
   const isEstimateStrategyMultiplication = questionData.visual?.type === "multiplication_estimate_strategy";
   const isDivisionRemainderCheck = questionData.visual?.type === "division_remainder_check";
   const isDivisionBuildGroups = questionData.visual?.type === "division_build_groups";
+  const isNumericInputOnly = questionData.visual?.type === "numeric_input_only";
   const fractionDecimalPercentConversionVisual =
     questionData.visual?.type === "fraction_decimal_percent_conversion" ? questionData.visual : null;
   const isFractionDecimalPercentConversion = fractionDecimalPercentConversionVisual !== null;
@@ -2404,6 +2405,15 @@ export default function TypedResponseActivity({
       return;
     }
 
+    if (isNumericInputOnly) {
+      if (numericInputsMatch(typed, questionData.answer)) {
+        onCorrect?.();
+      } else {
+        onWrong?.();
+      }
+      return;
+    }
+
     const rawValue = isColumnMultiplication
       ? normalize(typed)
       : writtenMethod
@@ -2431,6 +2441,8 @@ export default function TypedResponseActivity({
     writtenMethod?.title ??
     (visualType === "strategy_ownership"
       ? "Choose Your Strategy"
+      : visualType === "numeric_input_only"
+      ? "Mixed Operations"
       : visualType === "multi_step_method"
       ? "Build the Solution"
       : visualType === "discount_step_method"
@@ -3355,11 +3367,14 @@ export default function TypedResponseActivity({
           ) : questionData.visual?.type === "box_method" || isColumnMultiplication || isStrategyMultiplication || isEstimateStrategyMultiplication || isDivisionRemainderCheck || isDivisionBuildGroups ? null : (
             <input
               value={typed}
-              onChange={(event) => setTyped(event.target.value)}
+              onChange={(event) =>
+                setTyped(isNumericInputOnly ? event.target.value.replace(/[^\d.,-]/g, "") : event.target.value)
+              }
+              inputMode={isNumericInputOnly ? "decimal" : undefined}
               placeholder={
                 isColumnMultiplication
                   ? "Type the final answer"
-                  : questionData.placeholder ?? "Type your answer"
+                  : questionData.placeholder ?? (isNumericInputOnly ? "Enter your answer" : "Type your answer")
               }
               className="w-full max-w-md rounded-xl border border-gray-300 px-4 py-3 text-lg font-bold text-gray-900 outline-none focus:border-teal-500"
             />

@@ -2290,6 +2290,92 @@ function year5StrategyFluencyTemplates(mode: string | undefined): StrategyOwners
   return byMode[mode ?? ""] ?? byMode.strategy_fluency_addition;
 }
 
+type MixedOperationsChallengeTemplate = {
+  prompt: string;
+  answer: string;
+  operation: "addition" | "subtraction" | "multiplication" | "division";
+};
+
+function mixedOperationTemplate(
+  operation: MixedOperationsChallengeTemplate["operation"],
+  prompt: string,
+  answer: string
+): MixedOperationsChallengeTemplate {
+  return { operation, prompt, answer };
+}
+
+function year5MixedOperationsChallengeTemplates(mode: string | undefined): MixedOperationsChallengeTemplate[] {
+  const byMode: Record<string, MixedOperationsChallengeTemplate[]> = {
+    mixed_ops_addition: [
+      mixedOperationTemplate("addition", "398 + 47", "445"),
+      mixedOperationTemplate("addition", "999 + 246", "1245"),
+      mixedOperationTemplate("addition", "1,250 + 375", "1625"),
+      mixedOperationTemplate("addition", "2,499 + 518", "3017"),
+      mixedOperationTemplate("addition", "3,750 + 1,250", "5000"),
+      mixedOperationTemplate("addition", "1,998 + 307", "2305"),
+      mixedOperationTemplate("addition", "5.98 + 2.4", "8.38"),
+      mixedOperationTemplate("addition", "3.75 + 1.25", "5"),
+      mixedOperationTemplate("addition", "12.5 + 0.75", "13.25"),
+      mixedOperationTemplate("addition", "4.099 + 0.901", "5"),
+      mixedOperationTemplate("addition", "7.6 + 2.45", "10.05"),
+      mixedOperationTemplate("addition", "18.375 + 1.625", "20"),
+      mixedOperationTemplate("addition", "48.75 + 6.25", "55"),
+    ],
+    mixed_ops_subtraction: [
+      mixedOperationTemplate("subtraction", "602 - 198", "404"),
+      mixedOperationTemplate("subtraction", "1,000 - 376", "624"),
+      mixedOperationTemplate("subtraction", "1,204 - 399", "805"),
+      mixedOperationTemplate("subtraction", "3,005 - 998", "2007"),
+      mixedOperationTemplate("subtraction", "2,500 - 1,245", "1255"),
+      mixedOperationTemplate("subtraction", "4,010 - 1,999", "2011"),
+      mixedOperationTemplate("subtraction", "6.02 - 1.98", "4.04"),
+      mixedOperationTemplate("subtraction", "10.5 - 2.75", "7.75"),
+      mixedOperationTemplate("subtraction", "8.000 - 3.125", "4.875"),
+      mixedOperationTemplate("subtraction", "12.4 - 0.99", "11.41"),
+      mixedOperationTemplate("subtraction", "20.05 - 4.5", "15.55"),
+      mixedOperationTemplate("subtraction", "5.75 - 1.25", "4.5"),
+      mixedOperationTemplate("subtraction", "18.375 - 0.875", "17.5"),
+    ],
+    mixed_ops_multiplication: [
+      mixedOperationTemplate("multiplication", "49 × 6", "294"),
+      mixedOperationTemplate("multiplication", "25 × 16", "400"),
+      mixedOperationTemplate("multiplication", "50 × 18", "900"),
+      mixedOperationTemplate("multiplication", "125 × 8", "1000"),
+      mixedOperationTemplate("multiplication", "99 × 11", "1089"),
+      mixedOperationTemplate("multiplication", "24 × 15", "360"),
+      mixedOperationTemplate("multiplication", "48 × 25", "1200"),
+      mixedOperationTemplate("multiplication", "32 × 125", "4000"),
+      mixedOperationTemplate("multiplication", "75 × 12", "900"),
+      mixedOperationTemplate("multiplication", "250 × 16", "4000"),
+      mixedOperationTemplate("multiplication", "36 × 24", "864"),
+      mixedOperationTemplate("multiplication", "84 × 11", "924"),
+      mixedOperationTemplate("multiplication", "125 × 24", "3000"),
+    ],
+    mixed_ops_division: [
+      mixedOperationTemplate("division", "1,200 ÷ 6", "200"),
+      mixedOperationTemplate("division", "450 ÷ 6", "75"),
+      mixedOperationTemplate("division", "1,000 ÷ 8", "125"),
+      mixedOperationTemplate("division", "900 ÷ 12", "75"),
+      mixedOperationTemplate("division", "1,250 ÷ 5", "250"),
+      mixedOperationTemplate("division", "864 ÷ 9", "96"),
+      mixedOperationTemplate("division", "2,400 ÷ 50", "48"),
+      mixedOperationTemplate("division", "1,440 ÷ 12", "120"),
+      mixedOperationTemplate("division", "3,600 ÷ 24", "150"),
+      mixedOperationTemplate("division", "2,500 ÷ 25", "100"),
+      mixedOperationTemplate("division", "4,096 ÷ 8", "512"),
+      mixedOperationTemplate("division", "750 ÷ 15", "50"),
+      mixedOperationTemplate("division", "1,728 ÷ 12", "144"),
+    ],
+  };
+
+  return byMode[mode ?? ""] ?? [
+    ...byMode.mixed_ops_addition,
+    ...byMode.mixed_ops_subtraction,
+    ...byMode.mixed_ops_multiplication,
+    ...byMode.mixed_ops_division,
+  ];
+}
+
 function year5EstimateReasonablenessTemplates(mode: string | undefined): ReasonablenessChoiceTemplate[] {
   const yesNo: ReasonablenessChoiceTemplate[] = [
     { prompt: "398 + 204 = 602. Does it make sense?", answer: "Yes", options: ["Yes", "No"], helper: "Nice — that makes sense." },
@@ -2802,6 +2888,9 @@ export type TypedResponseQuestion = {
     | DiscountStepMethodVisualData
     | MultiStepMethodVisualData
     | StrategyOwnershipVisualData
+    | {
+        type: "numeric_input_only";
+      }
     | {
         type: "equivalent_fraction_input";
         leftNumerator: number;
@@ -11740,6 +11829,26 @@ function generateGenericQuestion(
         strategies: chosen.strategies,
         reflectionPrompt: chosen.reflectionPrompt,
         reflectionOptions: chosen.reflectionOptions,
+      },
+    };
+  }
+
+  if (
+    explicitMode === "mixed_ops_addition" ||
+    explicitMode === "mixed_ops_subtraction" ||
+    explicitMode === "mixed_ops_multiplication" ||
+    explicitMode === "mixed_ops_division"
+  ) {
+    const templates = year5MixedOperationsChallengeTemplates(explicitMode);
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      placeholder: "Enter your answer",
+      visual: {
+        type: "numeric_input_only",
       },
     };
   }
