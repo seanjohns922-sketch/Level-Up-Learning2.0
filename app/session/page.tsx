@@ -140,6 +140,7 @@ type QuizQuestion = {
   options?: string[];
   correctIndex?: number;
   correctValue?: string;
+  responseType?: "number";
   audioText?: string;
   visual?: {
     type: "dots";
@@ -427,6 +428,119 @@ function getStructuredQuizQuestionId(
   return `${operation}-${fallbackFingerprint}`;
 }
 
+type NumericQuizCandidate = {
+  id: string;
+  operation: "add" | "subtract" | "multiply" | "divide";
+  prompt: string;
+  answer: string;
+  type: string;
+};
+
+function formatQuizNumber(value: number) {
+  return Number.isInteger(value)
+    ? value.toLocaleString()
+    : String(Number(value.toFixed(3))).replace(/\.0+$/, "");
+}
+
+function numericQuizCandidate(
+  operation: NumericQuizCandidate["operation"],
+  left: number,
+  right: number
+): NumericQuizCandidate {
+  const symbol =
+    operation === "add" ? "+" : operation === "subtract" ? "-" : operation === "multiply" ? "×" : "÷";
+  const answer =
+    operation === "add"
+      ? left + right
+      : operation === "subtract"
+      ? left - right
+      : operation === "multiply"
+      ? left * right
+      : left / right;
+  return {
+    id: `${operation}-${left}-${right}`,
+    operation,
+    prompt: `${formatQuizNumber(left)} ${symbol} ${formatQuizNumber(right)}`,
+    answer: formatQuizNumber(answer),
+    type: `numeric_${operation}`,
+  };
+}
+
+function buildNumericOnlyWeeklyQuizQuestions(
+  weekPlan: WeekPlan,
+  questionsPerLesson: number
+): QuizQuestion[] {
+  const candidates = shuffle([
+    numericQuizCandidate("add", 199, 38),
+    numericQuizCandidate("add", 398, 47),
+    numericQuizCandidate("add", 999, 246),
+    numericQuizCandidate("add", 1250, 375),
+    numericQuizCandidate("add", 2499, 518),
+    numericQuizCandidate("add", 3.75, 1.2),
+    numericQuizCandidate("add", 5.98, 2.4),
+    numericQuizCandidate("add", 12.5, 0.75),
+    numericQuizCandidate("add", 4.099, 0.901),
+    numericQuizCandidate("subtract", 602, 198),
+    numericQuizCandidate("subtract", 1000, 376),
+    numericQuizCandidate("subtract", 1204, 399),
+    numericQuizCandidate("subtract", 3005, 998),
+    numericQuizCandidate("subtract", 6.02, 1.98),
+    numericQuizCandidate("subtract", 10.5, 2.75),
+    numericQuizCandidate("subtract", 8, 3.125),
+    numericQuizCandidate("subtract", 12.4, 0.99),
+    numericQuizCandidate("multiply", 49, 6),
+    numericQuizCandidate("multiply", 25, 16),
+    numericQuizCandidate("multiply", 50, 18),
+    numericQuizCandidate("multiply", 125, 8),
+    numericQuizCandidate("multiply", 99, 11),
+    numericQuizCandidate("multiply", 24, 15),
+    numericQuizCandidate("multiply", 48, 25),
+    numericQuizCandidate("divide", 1200, 6),
+    numericQuizCandidate("divide", 450, 6),
+    numericQuizCandidate("divide", 1000, 8),
+    numericQuizCandidate("divide", 900, 12),
+    numericQuizCandidate("divide", 1250, 5),
+    numericQuizCandidate("divide", 864, 9),
+    numericQuizCandidate("divide", 2400, 50),
+  ]);
+  const total = questionsPerLesson * 3;
+  const seenQuestions = new Set<string>();
+  const selected: NumericQuizCandidate[] = [];
+
+  for (const candidate of candidates) {
+    if (selected.length >= total) break;
+    if (seenQuestions.has(candidate.id)) continue;
+    seenQuestions.add(candidate.id);
+    selected.push(candidate);
+  }
+
+  if (selected.length < total) {
+    throw new Error(
+      `[StructuredWeeklyQuiz] Year ${weekPlan.id} Week ${weekPlan.week} could not build ${total} unique numeric questions.`
+    );
+  }
+
+  return selected.map((candidate, index) => {
+    const lessonNumber = ((index % 3) + 1) as 1 | 2 | 3;
+    return {
+      id: `q${index + 1}`,
+      lessonNumber,
+      lessonTag: lessonNumber,
+      skill: candidate.type,
+      activityType: "typed_response",
+      kind: "typed",
+      prompt: candidate.prompt,
+      correctValue: candidate.answer,
+      responseType: "number",
+      quizMeta: {
+        type: candidate.type,
+        operation: candidate.operation === "add" || candidate.operation === "subtract" ? candidate.operation : undefined,
+        difficulty: index < total / 3 ? "early" : index < (total * 2) / 3 ? "middle" : "late",
+      },
+    };
+  });
+}
+
 function operationFromSymbol(symbol?: string): "add" | "subtract" | undefined {
   if (symbol === "+") return "add";
   if (symbol === "-") return "subtract";
@@ -564,6 +678,10 @@ function buildStructuredWeeklyQuizQuestions(
   const yearMatch = weekPlan.id.match(/^y(\d+)-/);
   const yearNumber = yearMatch ? Number(yearMatch[1]) : 1;
   const quizLessons = weekPlan.lessons.slice(0, 3);
+
+  if (yearNumber === 5 && weekPlan.week === 11) {
+    return buildNumericOnlyWeeklyQuizQuestions(weekPlan, questionsPerLesson);
+  }
 
   if (yearNumber === 4 && weekPlan.week === 12) {
     throw new Error(
@@ -1365,6 +1483,16 @@ function isTypedAnswerCorrect(rawTyped: string, rawCorrect: string | undefined) 
 
   const correctText = String(rawCorrect ?? "");
   if (typed === normalizeAnswerText(correctText)) return true;
+
+  const typedNumber = Number(String(rawTyped).replace(/,/g, "").trim());
+  const correctNumber = Number(correctText.replace(/,/g, "").trim());
+  if (
+    Number.isFinite(typedNumber) &&
+    Number.isFinite(correctNumber) &&
+    Math.abs(typedNumber - correctNumber) < 0.000001
+  ) {
+    return true;
+  }
 
   const numericCorrect = Number(correctText);
   if (!Number.isNaN(numericCorrect)) {
@@ -3901,15 +4029,15 @@ function SessionPage() {
                       onChange={(e) =>
                         setQuizTyped((prev) => ({
                           ...prev,
-                          [currentQuiz.id]: e.target.value.replace(
-                            /[^a-zA-Z- ]/g,
-                            ""
-                          ),
+                          [currentQuiz.id]:
+                            currentQuiz.responseType === "number"
+                              ? e.target.value.replace(/[^\d.,-]/g, "")
+                              : e.target.value.replace(/[^a-zA-Z- ]/g, ""),
                         }))
                       }
-                      inputMode="text"
+                      inputMode={currentQuiz.responseType === "number" ? "decimal" : "text"}
                       className="w-full px-4 py-4 rounded-xl border text-xl font-bold"
-                      placeholder="Type the word"
+                      placeholder={currentQuiz.responseType === "number" ? "Type the answer" : "Type the word"}
                     />
                   ) : currentQuiz?.kind === "audio" ||
                     currentQuiz?.kind === "mcq" ? (
