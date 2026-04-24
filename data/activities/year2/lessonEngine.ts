@@ -2376,6 +2376,74 @@ function year5MixedOperationsChallengeTemplates(mode: string | undefined): Mixed
   ];
 }
 
+function year5TargetChallengeTemplates(mode: string | undefined): MixedOperationsChallengeTemplate[] {
+  const byMode: Record<string, MixedOperationsChallengeTemplate[]> = {
+    target_ops_addition: [
+      mixedOperationTemplate("addition", "4,398 + 587", "4985"),
+      mixedOperationTemplate("addition", "6,975 + 1,248", "8223"),
+      mixedOperationTemplate("addition", "9,996 + 1,275", "11271"),
+      mixedOperationTemplate("addition", "7,480 + 2,965", "10445"),
+      mixedOperationTemplate("addition", "3,875 + 4,260", "8135"),
+      mixedOperationTemplate("addition", "8,999 + 2,408", "11407"),
+      mixedOperationTemplate("addition", "19.75 + 8.26", "28.01"),
+      mixedOperationTemplate("addition", "48.125 + 7.875", "56"),
+      mixedOperationTemplate("addition", "125.6 + 38.45", "164.05"),
+      mixedOperationTemplate("addition", "9.875 + 4.625", "14.5"),
+      mixedOperationTemplate("addition", "63.09 + 17.91", "81"),
+      mixedOperationTemplate("addition", "250.75 + 49.26", "300.01"),
+    ],
+    target_ops_subtraction: [
+      mixedOperationTemplate("subtraction", "8,402 - 1,998", "6404"),
+      mixedOperationTemplate("subtraction", "10,000 - 3,875", "6125"),
+      mixedOperationTemplate("subtraction", "7,204 - 2,999", "4205"),
+      mixedOperationTemplate("subtraction", "9,500 - 4,286", "5214"),
+      mixedOperationTemplate("subtraction", "12,005 - 5,998", "6007"),
+      mixedOperationTemplate("subtraction", "6,700 - 2,485", "4215"),
+      mixedOperationTemplate("subtraction", "18.04 - 7.99", "10.05"),
+      mixedOperationTemplate("subtraction", "50.5 - 18.75", "31.75"),
+      mixedOperationTemplate("subtraction", "100.000 - 36.125", "63.875"),
+      mixedOperationTemplate("subtraction", "42.6 - 19.95", "22.65"),
+      mixedOperationTemplate("subtraction", "81.01 - 24.89", "56.12"),
+      mixedOperationTemplate("subtraction", "15.375 - 8.625", "6.75"),
+    ],
+    target_ops_multiplication: [
+      mixedOperationTemplate("multiplication", "48 × 25", "1200"),
+      mixedOperationTemplate("multiplication", "125 × 24", "3000"),
+      mixedOperationTemplate("multiplication", "64 × 125", "8000"),
+      mixedOperationTemplate("multiplication", "75 × 16", "1200"),
+      mixedOperationTemplate("multiplication", "88 × 15", "1320"),
+      mixedOperationTemplate("multiplication", "27 × 36", "972"),
+      mixedOperationTemplate("multiplication", "96 × 25", "2400"),
+      mixedOperationTemplate("multiplication", "112 × 25", "2800"),
+      mixedOperationTemplate("multiplication", "144 × 12", "1728"),
+      mixedOperationTemplate("multiplication", "84 × 18", "1512"),
+      mixedOperationTemplate("multiplication", "125 × 32", "4000"),
+      mixedOperationTemplate("multiplication", "99 × 24", "2376"),
+    ],
+    target_ops_division: [
+      mixedOperationTemplate("division", "4,320 ÷ 12", "360"),
+      mixedOperationTemplate("division", "3,600 ÷ 24", "150"),
+      mixedOperationTemplate("division", "8,000 ÷ 125", "64"),
+      mixedOperationTemplate("division", "2,400 ÷ 25", "96"),
+      mixedOperationTemplate("division", "2,520 ÷ 18", "140"),
+      mixedOperationTemplate("division", "1,728 ÷ 12", "144"),
+      mixedOperationTemplate("division", "9,600 ÷ 75", "128"),
+      mixedOperationTemplate("division", "4,950 ÷ 45", "110"),
+      mixedOperationTemplate("division", "8,064 ÷ 32", "252"),
+      mixedOperationTemplate("division", "7,200 ÷ 48", "150"),
+      mixedOperationTemplate("division", "5,184 ÷ 24", "216"),
+      mixedOperationTemplate("division", "3,136 ÷ 16", "196"),
+    ],
+  };
+
+  return byMode[mode ?? ""] ?? [
+    ...byMode.target_ops_addition,
+    ...byMode.target_ops_subtraction,
+    ...byMode.target_ops_multiplication,
+    ...byMode.target_ops_division,
+  ];
+}
+
 function year5EstimateReasonablenessTemplates(mode: string | undefined): ReasonablenessChoiceTemplate[] {
   const yesNo: ReasonablenessChoiceTemplate[] = [
     { prompt: "398 + 204 = 602. Does it make sense?", answer: "Yes", options: ["Yes", "No"], helper: "Nice — that makes sense." },
@@ -11840,6 +11908,26 @@ function generateGenericQuestion(
     explicitMode === "mixed_ops_division"
   ) {
     const templates = year5MixedOperationsChallengeTemplates(explicitMode);
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      placeholder: "Enter your answer",
+      visual: {
+        type: "numeric_input_only",
+      },
+    };
+  }
+
+  if (
+    explicitMode === "target_ops_addition" ||
+    explicitMode === "target_ops_subtraction" ||
+    explicitMode === "target_ops_multiplication" ||
+    explicitMode === "target_ops_division"
+  ) {
+    const templates = year5TargetChallengeTemplates(explicitMode);
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
 
     return {

@@ -28,6 +28,10 @@ function isEstimateReasoningLesson(level: SupportedMathLevel, lesson: Lesson) {
   return level === 5 && lesson.week === 11 && lesson.lesson === 3;
 }
 
+function isTargetChallengeLesson(level: SupportedMathLevel, lesson: Lesson) {
+  return level === 5 && lesson.week === 12 && lesson.lesson === 2;
+}
+
 function chooseNextLessonTurn(
   level: SupportedMathLevel,
   lesson: Lesson,
@@ -290,6 +294,7 @@ export function Year2LessonEngine({
   const finished = secondsLeft <= 0;
   const currentActivity = activities[currentActivityIndex] ?? null;
   const questionsAnsweredRef = useRef(0);
+  const showTargetChallenge = isTargetChallengeLesson(level, lesson);
 
   const accuracy =
     questionsAnswered > 0
@@ -464,12 +469,13 @@ export function Year2LessonEngine({
         <aside className="lg:sticky lg:top-4 lg:self-start">
           <LessonHUDRail
             lessonTitle={lesson.title}
+            targetLabel={showTargetChallenge ? "Target: 10 correct answers" : null}
             correctAnswers={correctAnswers}
             questionsAnswered={questionsAnswered}
             accuracy={accuracy}
             secondsLeft={Math.max(0, secondsLeft)}
             totalSeconds={totalSeconds}
-            xpTarget={Math.max(XP_TARGET, questionsAnswered + 2)}
+            xpTarget={showTargetChallenge ? 10 : Math.max(XP_TARGET, questionsAnswered + 2)}
             hint={hint}
           />
         </aside>

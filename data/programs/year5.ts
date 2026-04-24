@@ -685,14 +685,37 @@ const year5Rows: ProgramRow[] = [
   },
   {
     week: 12,
-    focus: "Review algorithms with factors, multiples and divisibility",
+    weekTopic: "Year 5 Number Review",
+    focus: "Push mixed-operation fluency with a clear performance target",
     lesson: 2,
-    topic: "Algorithm / Pattern Project",
-    activity: "Create, test, and explain a pattern rule or simple algorithm.",
-    curriculum: ["AC9M5N10"],
+    topic: "Target Challenge",
+    activity: "Race toward a 10-correct target with harder mixed-operation questions.",
+    curriculum: ["AC9M5N06", "AC9M5N07", "AC9M5N08", "AC9M5N09"],
     activities: [
-      makeActivity("multiple_choice", 2, { mode: "factor_multiple_pattern" }),
-      makeActivity("typed_response", 1, { mode: "factor_multiple_algorithm" }),
+      makeActivity("typed_response", 1, {
+        mode: "target_ops_addition",
+        rotationRole: "fast_thinking",
+        rotationLabel: "Addition",
+        rotationPurpose: "Solve harder whole-number and decimal addition accurately.",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "target_ops_subtraction",
+        rotationRole: "fast_thinking",
+        rotationLabel: "Subtraction",
+        rotationPurpose: "Solve harder whole-number and decimal subtraction accurately.",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "target_ops_multiplication",
+        rotationRole: "fast_thinking",
+        rotationLabel: "Multiplication",
+        rotationPurpose: "Solve harder whole-number multiplication efficiently.",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "target_ops_division",
+        rotationRole: "fast_thinking",
+        rotationLabel: "Division",
+        rotationPurpose: "Solve harder clean whole-number division accurately.",
+      }),
     ],
   },
   {

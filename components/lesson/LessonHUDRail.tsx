@@ -18,6 +18,7 @@ export function LessonHUDRail({
   week,
   lessonNumber,
   lessonTitle,
+  targetLabel,
   correctAnswers,
   questionsAnswered,
   accuracy,
@@ -30,6 +31,7 @@ export function LessonHUDRail({
   week?: number;
   lessonNumber?: number;
   lessonTitle?: string | null;
+  targetLabel?: string | null;
   correctAnswers: number;
   questionsAnswered: number;
   accuracy: number;
@@ -78,6 +80,11 @@ export function LessonHUDRail({
             {lessonTitle ? (
               <div className="mt-1.5 text-[13px] font-bold leading-snug text-white/95 line-clamp-2">
                 {lessonTitle}
+              </div>
+            ) : null}
+            {targetLabel ? (
+              <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-emerald-300/30 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-[0.16em] text-emerald-100">
+                {targetLabel}
               </div>
             ) : null}
           </div>
