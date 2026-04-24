@@ -28,7 +28,7 @@ function isEstimateReasoningLesson(level: SupportedMathLevel, lesson: Lesson) {
   return level === 5 && lesson.week === 11 && lesson.lesson === 3;
 }
 
-function isTargetChallengeLesson(level: SupportedMathLevel, lesson: Lesson) {
+function isMultiStepCalculationLesson(level: SupportedMathLevel, lesson: Lesson) {
   return level === 5 && lesson.week === 12 && lesson.lesson === 2;
 }
 
@@ -294,7 +294,7 @@ export function Year2LessonEngine({
   const finished = secondsLeft <= 0;
   const currentActivity = activities[currentActivityIndex] ?? null;
   const questionsAnsweredRef = useRef(0);
-  const showTargetChallenge = isTargetChallengeLesson(level, lesson);
+  const showMultiStepCalculationFeedback = isMultiStepCalculationLesson(level, lesson);
 
   const accuracy =
     questionsAnswered > 0
@@ -469,13 +469,12 @@ export function Year2LessonEngine({
         <aside className="lg:sticky lg:top-4 lg:self-start">
           <LessonHUDRail
             lessonTitle={lesson.title}
-            targetLabel={showTargetChallenge ? "Target: 10 correct answers" : null}
             correctAnswers={correctAnswers}
             questionsAnswered={questionsAnswered}
             accuracy={accuracy}
             secondsLeft={Math.max(0, secondsLeft)}
             totalSeconds={totalSeconds}
-            xpTarget={showTargetChallenge ? 10 : Math.max(XP_TARGET, questionsAnswered + 2)}
+            xpTarget={Math.max(XP_TARGET, questionsAnswered + 2)}
             hint={hint}
           />
         </aside>
@@ -500,7 +499,13 @@ export function Year2LessonEngine({
                   : "bg-red-50 text-red-700 border border-red-200"
               }`}
             >
-              {status === "correct" ? "✓ Correct! +10 XP" : "✗ Not quite — keep going!"}
+              {status === "correct"
+                ? showMultiStepCalculationFeedback
+                  ? "Nice — well worked."
+                  : "✓ Correct! +10 XP"
+                : showMultiStepCalculationFeedback
+                ? "Check each step carefully."
+                : "✗ Not quite — keep going!"}
             </div>
           )}
 

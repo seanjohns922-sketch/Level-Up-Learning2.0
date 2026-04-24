@@ -2376,71 +2376,62 @@ function year5MixedOperationsChallengeTemplates(mode: string | undefined): Mixed
   ];
 }
 
-function year5TargetChallengeTemplates(mode: string | undefined): MixedOperationsChallengeTemplate[] {
+function year5MultiStepCalculationTemplates(mode: string | undefined): MixedOperationsChallengeTemplate[] {
   const byMode: Record<string, MixedOperationsChallengeTemplate[]> = {
-    target_ops_addition: [
-      mixedOperationTemplate("addition", "4,398 + 587", "4985"),
-      mixedOperationTemplate("addition", "6,975 + 1,248", "8223"),
-      mixedOperationTemplate("addition", "9,996 + 1,275", "11271"),
-      mixedOperationTemplate("addition", "7,480 + 2,965", "10445"),
-      mixedOperationTemplate("addition", "3,875 + 4,260", "8135"),
-      mixedOperationTemplate("addition", "8,999 + 2,408", "11407"),
-      mixedOperationTemplate("addition", "19.75 + 8.26", "28.01"),
-      mixedOperationTemplate("addition", "48.125 + 7.875", "56"),
-      mixedOperationTemplate("addition", "125.6 + 38.45", "164.05"),
-      mixedOperationTemplate("addition", "9.875 + 4.625", "14.5"),
-      mixedOperationTemplate("addition", "63.09 + 17.91", "81"),
-      mixedOperationTemplate("addition", "250.75 + 49.26", "300.01"),
+    multi_step_calc_add_sub: [
+      mixedOperationTemplate("addition", "250 + 375 - 125", "500"),
+      mixedOperationTemplate("addition", "600 - 198 + 45", "447"),
+      mixedOperationTemplate("addition", "900 + 246 - 100", "1046"),
+      mixedOperationTemplate("addition", "1,250 + 480 - 275", "1455"),
+      mixedOperationTemplate("addition", "999 + 367 - 200", "1166"),
+      mixedOperationTemplate("addition", "602 - 398 + 75", "279"),
+      mixedOperationTemplate("addition", "1,800 - 975 + 240", "1065"),
+      mixedOperationTemplate("addition", "4,250 + 680 - 999", "3931"),
+      mixedOperationTemplate("addition", "3.75 + 1.25 - 2.5", "2.5"),
+      mixedOperationTemplate("addition", "5.98 - 2.49 + 1.2", "4.69"),
+      mixedOperationTemplate("addition", "12.4 + 3.65 - 4.2", "11.85"),
+      mixedOperationTemplate("addition", "18.75 - 9.5 + 2.25", "11.5"),
+      mixedOperationTemplate("addition", "7.8 + 4.35 - 1.9", "10.25"),
+      mixedOperationTemplate("addition", "20.05 - 8.75 + 1.2", "12.5"),
     ],
-    target_ops_subtraction: [
-      mixedOperationTemplate("subtraction", "8,402 - 1,998", "6404"),
-      mixedOperationTemplate("subtraction", "10,000 - 3,875", "6125"),
-      mixedOperationTemplate("subtraction", "7,204 - 2,999", "4205"),
-      mixedOperationTemplate("subtraction", "9,500 - 4,286", "5214"),
-      mixedOperationTemplate("subtraction", "12,005 - 5,998", "6007"),
-      mixedOperationTemplate("subtraction", "6,700 - 2,485", "4215"),
-      mixedOperationTemplate("subtraction", "18.04 - 7.99", "10.05"),
-      mixedOperationTemplate("subtraction", "50.5 - 18.75", "31.75"),
-      mixedOperationTemplate("subtraction", "100.000 - 36.125", "63.875"),
-      mixedOperationTemplate("subtraction", "42.6 - 19.95", "22.65"),
-      mixedOperationTemplate("subtraction", "81.01 - 24.89", "56.12"),
-      mixedOperationTemplate("subtraction", "15.375 - 8.625", "6.75"),
+    multi_step_calc_mult_div: [
+      mixedOperationTemplate("multiplication", "48 × 25 ÷ 5", "240"),
+      mixedOperationTemplate("multiplication", "125 × 8 ÷ 4", "250"),
+      mixedOperationTemplate("multiplication", "360 ÷ 9 × 5", "200"),
+      mixedOperationTemplate("multiplication", "84 × 6 ÷ 7", "72"),
+      mixedOperationTemplate("multiplication", "96 ÷ 12 × 25", "200"),
+      mixedOperationTemplate("multiplication", "144 ÷ 8 × 15", "270"),
+      mixedOperationTemplate("multiplication", "72 × 25 ÷ 6", "300"),
+      mixedOperationTemplate("multiplication", "450 ÷ 15 × 8", "240"),
+      mixedOperationTemplate("multiplication", "64 × 125 ÷ 8", "1000"),
+      mixedOperationTemplate("multiplication", "240 ÷ 6 × 18", "720"),
+      mixedOperationTemplate("multiplication", "1,200 ÷ 24 × 9", "450"),
+      mixedOperationTemplate("multiplication", "225 × 12 ÷ 9", "300"),
+      mixedOperationTemplate("multiplication", "560 ÷ 14 × 11", "440"),
+      mixedOperationTemplate("multiplication", "1,500 ÷ 25 × 16", "960"),
     ],
-    target_ops_multiplication: [
-      mixedOperationTemplate("multiplication", "48 × 25", "1200"),
-      mixedOperationTemplate("multiplication", "125 × 24", "3000"),
-      mixedOperationTemplate("multiplication", "64 × 125", "8000"),
-      mixedOperationTemplate("multiplication", "75 × 16", "1200"),
-      mixedOperationTemplate("multiplication", "88 × 15", "1320"),
-      mixedOperationTemplate("multiplication", "27 × 36", "972"),
-      mixedOperationTemplate("multiplication", "96 × 25", "2400"),
-      mixedOperationTemplate("multiplication", "112 × 25", "2800"),
-      mixedOperationTemplate("multiplication", "144 × 12", "1728"),
-      mixedOperationTemplate("multiplication", "84 × 18", "1512"),
-      mixedOperationTemplate("multiplication", "125 × 32", "4000"),
-      mixedOperationTemplate("multiplication", "99 × 24", "2376"),
-    ],
-    target_ops_division: [
-      mixedOperationTemplate("division", "4,320 ÷ 12", "360"),
-      mixedOperationTemplate("division", "3,600 ÷ 24", "150"),
-      mixedOperationTemplate("division", "8,000 ÷ 125", "64"),
-      mixedOperationTemplate("division", "2,400 ÷ 25", "96"),
-      mixedOperationTemplate("division", "2,520 ÷ 18", "140"),
-      mixedOperationTemplate("division", "1,728 ÷ 12", "144"),
-      mixedOperationTemplate("division", "9,600 ÷ 75", "128"),
-      mixedOperationTemplate("division", "4,950 ÷ 45", "110"),
-      mixedOperationTemplate("division", "8,064 ÷ 32", "252"),
-      mixedOperationTemplate("division", "7,200 ÷ 48", "150"),
-      mixedOperationTemplate("division", "5,184 ÷ 24", "216"),
-      mixedOperationTemplate("division", "3,136 ÷ 16", "196"),
+    multi_step_calc_mixed: [
+      mixedOperationTemplate("multiplication", "12 + 6 × 4", "36"),
+      mixedOperationTemplate("multiplication", "20 - 4 × 3", "8"),
+      mixedOperationTemplate("multiplication", "18 + 7 × 5", "53"),
+      mixedOperationTemplate("multiplication", "90 - 8 × 9", "18"),
+      mixedOperationTemplate("multiplication", "35 + 12 × 6", "107"),
+      mixedOperationTemplate("multiplication", "150 - 11 × 12", "18"),
+      mixedOperationTemplate("multiplication", "48 + 25 × 8", "248"),
+      mixedOperationTemplate("multiplication", "400 - 24 × 15", "40"),
+      mixedOperationTemplate("division", "144 ÷ 12 + 38", "50"),
+      mixedOperationTemplate("division", "250 - 96 ÷ 8", "238"),
+      mixedOperationTemplate("division", "1,200 ÷ 6 + 175", "375"),
+      mixedOperationTemplate("division", "999 - 360 ÷ 9", "959"),
+      mixedOperationTemplate("division", "84 + 540 ÷ 6", "174"),
+      mixedOperationTemplate("division", "602 - 144 ÷ 12", "590"),
     ],
   };
 
   return byMode[mode ?? ""] ?? [
-    ...byMode.target_ops_addition,
-    ...byMode.target_ops_subtraction,
-    ...byMode.target_ops_multiplication,
-    ...byMode.target_ops_division,
+    ...byMode.multi_step_calc_add_sub,
+    ...byMode.multi_step_calc_mult_div,
+    ...byMode.multi_step_calc_mixed,
   ];
 }
 
@@ -11922,12 +11913,11 @@ function generateGenericQuestion(
   }
 
   if (
-    explicitMode === "target_ops_addition" ||
-    explicitMode === "target_ops_subtraction" ||
-    explicitMode === "target_ops_multiplication" ||
-    explicitMode === "target_ops_division"
+    explicitMode === "multi_step_calc_add_sub" ||
+    explicitMode === "multi_step_calc_mult_div" ||
+    explicitMode === "multi_step_calc_mixed"
   ) {
-    const templates = year5TargetChallengeTemplates(explicitMode);
+    const templates = year5MultiStepCalculationTemplates(explicitMode);
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
 
     return {
