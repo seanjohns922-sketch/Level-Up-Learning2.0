@@ -714,22 +714,29 @@ const year5Rows: ProgramRow[] = [
   },
   {
     week: 12,
-    focus: "Review Year 5 Number content for final consolidation",
+    focus: "Tune up fluency, estimation, and mixed calculations before the final post-test",
     lesson: 3,
-    topic: "Final Review & Quiz",
-    activity: "Review key skills from across the year in a mixed final challenge.",
+    topic: "Final Tune-Up",
+    activity: "Warm up core Year 5 number skills with a final mixed challenge before the post-test.",
     curriculum: ["AC9M5N01", "AC9M5N03", "AC9M5N04", "AC9M5N05", "AC9M5N06", "AC9M5N07", "AC9M5N08", "AC9M5N09", "AC9M5N10"],
     activities: [
-      makeActivity("review_quiz", 2, {
-        reviewActivities: [
-          "number_line",
-          "number_line",
-          "arrays",
-          "division_groups",
-          "fact_family",
-          "addition_strategy",
-          "subtraction_strategy",
-        ],
+      makeActivity("typed_response", 1, {
+        mode: "final_tuneup_fluency",
+        rotationRole: "fast_thinking",
+        rotationLabel: "Fluency",
+        rotationPurpose: "Solve strong Year 5 whole-number and decimal calculations accurately.",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "final_tuneup_reasoning",
+        rotationRole: "reasoning",
+        rotationLabel: "Reasoning",
+        rotationPurpose: "Use estimates and reasonableness checks to judge whether answers fit.",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "final_tuneup_challenge",
+        rotationRole: "apply_create",
+        rotationLabel: "Challenge",
+        rotationPurpose: "Complete harder mixed calculations before the final post-test.",
       }),
     ],
   },

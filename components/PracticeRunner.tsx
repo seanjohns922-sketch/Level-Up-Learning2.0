@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { PracticeTask, Difficulty } from "@/data/activities/year1/practice-task";
 import { getDifficultyFromTime } from "@/data/activities/year1/practice-task";
 import { TaskRenderer } from "@/components/TaskRenderer";
@@ -8,6 +9,24 @@ import { speak } from "@/lib/speak";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { LessonHUDRail } from "@/components/lesson/LessonHUDRail";
 import { LessonCompleteCard } from "@/components/lesson/LessonCompleteCard";
+import type { LessonPerformanceSummary } from "@/components/lesson/Year2LessonEngine";
+
+type McqTask = Extract<PracticeTask, { kind: "mcq" }>;
+type CountTask = Extract<PracticeTask, { kind: "count" }>;
+type OrderTask = Extract<PracticeTask, { kind: "order3" }>;
+type AudioPickTask = Extract<PracticeTask, { kind: "audioPick" }>;
+type NumberHuntTask = Extract<PracticeTask, { kind: "numberHunt" }>;
+type GroupCountVisualTask = Extract<PracticeTask, { kind: "groupCountVisual" }>;
+
+function formatPracticeTopicLabel(kind: PracticeTask["kind"]) {
+  if (kind === "mcq") return "Multiple Choice";
+  if (kind === "count") return "Number Input";
+  if (kind === "order3") return "Ordering";
+  if (kind === "audioPick") return "Audio Pick";
+  if (kind === "numberHunt") return "Number Hunt";
+  if (kind === "groupCountVisual") return "Visual Counting";
+  return kind.replace(/([A-Z])/g, " $1").replace(/^./, (v) => v.toUpperCase());
+}
 
 function Dots({ count }: { count: number }) {
   return (
@@ -29,6 +48,7 @@ export function PracticeRunner({
   getTask,
   onComplete,
   lessonTitle,
+  renderCompletionCard,
 }: {
   minutes?: number;
   getTask: (ctx?: {
@@ -39,32 +59,21 @@ export function PracticeRunner({
   }) => PracticeTask;
   onComplete: () => void;
   lessonTitle?: string;
+  renderCompletionCard?: (summary: LessonPerformanceSummary) => ReactNode;
 }) {
   const totalSeconds = minutes * 60;
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
   const completedRef = useRef(false);
-  const onCompleteRef = useRef(onComplete);
-  onCompleteRef.current = onComplete;
 
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
-
-  const [startTime] = useState<number>(() => {
-    if (typeof window === "undefined") return Date.now();
-    const key = "lul_lesson_start_time";
-    const stored = sessionStorage.getItem(key);
-    if (stored) return Number(stored);
-    const now = Date.now();
-    sessionStorage.setItem(key, String(now));
-    return now;
-  });
-
-  function getElapsedSeconds() {
-    return Math.floor((Date.now() - startTime) / 1000);
-  }
+  const [attemptLog, setAttemptLog] = useState<
+    Array<{ topicLabel: string; correct: boolean; timeSpentSeconds: number }>
+  >([]);
+  const questionStartedAtElapsedRef = useRef(0);
 
   function makeCtx() {
-    const elapsed = getElapsedSeconds();
+    const elapsed = totalSeconds - secondsLeft;
     const difficulty = getDifficultyFromTime(elapsed);
     return { secondsLeft, totalSeconds, elapsedSeconds: elapsed, difficulty };
   }
@@ -95,72 +104,85 @@ export function PracticeRunner({
   useEffect(() => {
     if (secondsLeft <= 0 && !completedRef.current) {
       completedRef.current = true;
-      onCompleteRef.current();
+      onComplete();
     }
-  }, [secondsLeft]);
-
-  useEffect(() => {
-    setStatus("idle");
-    setTyped("");
-    setOrder([]);
-    setHasPlayed(false);
-  }, [task]);
+  }, [onComplete, secondsLeft]);
 
   useEffect(() => {
     if (task.kind !== "numberHunt") return;
-    speak(String((task as any).targetNumber));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    speak(String(task.targetNumber));
   }, [task]);
 
   const correctOrder = useMemo(() => {
     if (task.kind !== "order3") return [];
-    const t = task as any;
-    const sorted = [...t.numbers].sort((a: number, b: number) => a - b);
-    return t.direction === "ASC" ? sorted : sorted.reverse();
+    const sorted = [...task.numbers].sort((a: number, b: number) => a - b);
+    return task.direction === "ASC" ? sorted : sorted.reverse();
   }, [task]);
 
   function nextTask() {
     const ctx = makeCtx();
     const requiredDifficulty = ctx.difficulty;
-    let generated = getTask(ctx);
+    const generated = getTask(ctx);
     generated.difficulty = requiredDifficulty;
     if (requiredDifficulty === "easy" && generated.difficulty !== "easy") {
       generated.difficulty = "easy";
     }
+    setStatus("idle");
+    setTyped("");
+    setOrder([]);
+    setHasPlayed(false);
     setTask(generated);
     setTaskNonce((n) => n + 1);
+    questionStartedAtElapsedRef.current = totalSeconds - secondsLeft;
   }
 
-  const markWrong = useCallback(() => {
+  function markWrong() {
+    const topicLabel = formatPracticeTopicLabel(task.kind);
+    setAttemptLog((current) => [
+      ...current,
+      {
+        topicLabel,
+        correct: false,
+        timeSpentSeconds: Math.max(1, totalSeconds - secondsLeft - questionStartedAtElapsedRef.current),
+      },
+    ]);
     setStatus("wrong");
     setQuestionsAnswered((v) => v + 1);
     setTimeout(() => setStatus("idle"), 1200);
-  }, []);
+  }
 
-  const markCorrect = useCallback(() => {
+  function markCorrect() {
+    const topicLabel = formatPracticeTopicLabel(task.kind);
+    setAttemptLog((current) => [
+      ...current,
+      {
+        topicLabel,
+        correct: true,
+        timeSpentSeconds: Math.max(1, totalSeconds - secondsLeft - questionStartedAtElapsedRef.current),
+      },
+    ]);
     setStatus("correct");
     setQuestionsAnswered((v) => v + 1);
     setCorrectAnswers((v) => v + 1);
     setTimeout(() => nextTask(), 600);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }
 
-  const markCorrectSoft = useCallback(() => {
+  function markCorrectSoft() {
     setStatus("correct");
     setTimeout(() => setStatus("idle"), 500);
-  }, []);
+  }
 
-  const callbacks = useMemo(() => ({ markCorrect, markCorrectSoft, markWrong }), [markCorrect, markCorrectSoft, markWrong]);
+  const callbacks = { markCorrect, markCorrectSoft, markWrong };
 
   function check() {
     if (task.kind === "mcq") return;
     if (task.kind === "count") {
       const n = Number(typed);
       if (!Number.isFinite(n)) return markWrong();
-      return n === (task as any).count ? markCorrect() : markWrong();
+      return n === task.count ? markCorrect() : markWrong();
     }
     if (task.kind === "order3") {
-      if (order.length !== (task as any).numbers.length) return markWrong();
+      if (order.length !== task.numbers.length) return markWrong();
       const ok = order.every((v, i) => v === correctOrder[i]);
       return ok ? markCorrect() : markWrong();
     }
@@ -168,13 +190,51 @@ export function PracticeRunner({
 
   const isBuiltinKind = ["mcq", "count", "order3", "audioPick", "numberHunt", "groupCountVisual"].includes(task.kind);
 
-  const hint =
-    "helper" in task && (task as any).helper
-      ? (task as any).helper
-      : null;
+  const hint = null;
 
   // ── Finished state ──
   if (finished) {
+    const topicMap = new Map<string, { label: string; correct: number; total: number; accuracy: number; timeSpentSeconds: number }>();
+    for (const attempt of attemptLog) {
+      const current = topicMap.get(attempt.topicLabel) ?? {
+        label: attempt.topicLabel,
+        correct: 0,
+        total: 0,
+        accuracy: 0,
+        timeSpentSeconds: 0,
+      };
+      current.total += 1;
+      current.timeSpentSeconds += attempt.timeSpentSeconds;
+      if (attempt.correct) current.correct += 1;
+      current.accuracy = current.total > 0 ? Math.round((current.correct / current.total) * 100) : 0;
+      topicMap.set(attempt.topicLabel, current);
+    }
+    const topicSummaries = Array.from(topicMap.values()).sort((left, right) => right.total - left.total);
+    const strengths = [...topicSummaries].filter((item) => item.accuracy >= 75).slice(0, 3);
+    const areasToImprove = [...topicSummaries]
+      .filter((item) => item.accuracy < 75)
+      .sort((left, right) => left.accuracy - right.accuracy)
+      .slice(0, 3);
+    const struggledQuestionTypes = [...topicSummaries]
+      .filter((item) => item.accuracy < 75)
+      .map((item) => item.label)
+      .slice(0, 4);
+    const summary: LessonPerformanceSummary = {
+      lessonTitle: lessonTitle ?? "Practice Session",
+      questionsAnswered,
+      correctAnswers,
+      accuracy,
+      timeSpentSeconds: Math.max(0, totalSeconds - Math.max(0, secondsLeft)),
+      topicSummaries,
+      strengths,
+      areasToImprove,
+      struggledQuestionTypes,
+    };
+
+    if (renderCompletionCard) {
+      return <>{renderCompletionCard(summary)}</>;
+    }
+
     return (
       <LessonCompleteCard
         lessonTitle={lessonTitle ?? "Practice Session"}
@@ -262,22 +322,22 @@ export function PracticeRunner({
         </div>
 
         {/* Prompt with read-aloud for builtin kinds */}
-        {isBuiltinKind && "prompt" in task && (task as any).prompt && (
+        {isBuiltinKind && "prompt" in task && task.prompt && (
           <div className="mb-4 flex items-center gap-2">
             <div className="text-xl font-extrabold leading-tight text-foreground md:text-2xl">
-              {(task as any).prompt}
+              {task.prompt}
             </div>
-            <ReadAloudBtn text={(task as any).prompt} />
+            <ReadAloudBtn text={task.prompt} />
           </div>
         )}
 
         {/* ── Builtin task renderers ── */}
         {task.kind === "mcq" && (
           <div className="grid gap-3">
-            {(task as any).options.map((opt: string, idx: number) => (
+            {(task as McqTask).options.map((opt: string, idx: number) => (
               <button
                 key={`${opt}-${idx}`}
-                onClick={() => opt === (task as any).answer ? markCorrect() : markWrong()}
+                onClick={() => opt === (task as McqTask).answer ? markCorrect() : markWrong()}
                 className="w-full text-left px-5 py-4 rounded-2xl border border-border bg-card hover:bg-muted transition text-xl font-bold"
               >
                 {opt}
@@ -287,7 +347,7 @@ export function PracticeRunner({
         )}
 
         {task.kind === "groupCountVisual" && (() => {
-          const t = task as any;
+          const t = task as GroupCountVisualTask;
           return (
             <div className="grid gap-4">
               <div className="rounded-2xl border border-border bg-card p-4">
@@ -314,7 +374,7 @@ export function PracticeRunner({
 
         {task.kind === "count" && (
           <div className="grid gap-4">
-            <Dots count={(task as any).count} />
+            <Dots count={(task as CountTask).count} />
             <div className="flex items-center gap-3">
               <input value={typed} onChange={(e) => setTyped(e.target.value.replace(/[^\d]/g, ""))} inputMode="numeric" placeholder="Type your answer" className="flex-1 px-4 py-3 rounded-2xl border border-border text-xl font-bold bg-card" />
               <button onClick={check} className="px-5 py-3 rounded-2xl bg-teal-600 text-white font-extrabold text-xl hover:bg-teal-700 transition">Check</button>
@@ -323,7 +383,7 @@ export function PracticeRunner({
         )}
 
         {task.kind === "order3" && (() => {
-          const t = task as any;
+          const t = task as OrderTask;
           return (
             <div className="grid gap-4">
               <div className="flex gap-3 flex-wrap">
@@ -347,7 +407,7 @@ export function PracticeRunner({
         })()}
 
         {task.kind === "audioPick" && (() => {
-          const t = task as any;
+          const t = task as AudioPickTask;
           return (
             <div className="grid gap-4">
               <div className="flex items-center justify-between gap-3">
@@ -356,7 +416,7 @@ export function PracticeRunner({
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {t.cards.map((n: number) => (
-                  <button key={n} type="button" onClick={() => { if (!hasPlayed) return; n === t.targetNumber ? markCorrect() : markWrong(); }} className="px-4 py-6 rounded-2xl border border-border bg-card hover:bg-muted transition text-3xl font-extrabold">{n}</button>
+                  <button key={n} type="button" onClick={() => { if (!hasPlayed) return; if (n === t.targetNumber) { markCorrect(); } else { markWrong(); } }} className="px-4 py-6 rounded-2xl border border-border bg-card hover:bg-muted transition text-3xl font-extrabold">{n}</button>
                 ))}
               </div>
               {!hasPlayed && <div className="text-sm text-muted-foreground">Tip: On iPads, audio will only play after a button tap (that&apos;s normal).</div>}
@@ -365,7 +425,7 @@ export function PracticeRunner({
         })()}
 
         {task.kind === "numberHunt" && (() => {
-          const t = task as any;
+          const t = task as NumberHuntTask;
           return (
             <div className="grid gap-4">
               <div className="flex items-center justify-between gap-3">

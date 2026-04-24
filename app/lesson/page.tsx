@@ -4,7 +4,8 @@ import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { PracticeRunner } from "@/components/PracticeRunner";
-import { Year2LessonEngine } from "@/components/lesson/Year2LessonEngine";
+import { PerformanceSummaryCard } from "@/components/lesson/PerformanceSummaryCard";
+import { Year2LessonEngine, type LessonPerformanceSummary } from "@/components/lesson/Year2LessonEngine";
 import { generateWeek1Task } from "@/data/activities/year1/week1";
 import { generateWeek2Task } from "@/data/activities/year1/week2";
 import { generateWeek3Task } from "@/data/activities/year1/week3";
@@ -47,21 +48,17 @@ function LessonPage() {
   }, [effectiveLessonId]);
   const lessonChrome = useMemo(() => getLessonChrome(yearNumber), [yearNumber]);
 
-  const [started, setStarted] = useState(false);
-  const [isHydrated, setIsHydrated] = useState(false);
+  const [startedLessonId, setStartedLessonId] = useState<string | null>(null);
   const lessonMeta = useMemo(() => {
     const program = getProgramForYear(year);
     const weekPlan = program.find((w) => w.week === week);
     return weekPlan?.lessons.find((l) => l.id === effectiveLessonId) ?? null;
   }, [year, week, effectiveLessonId]);
-  const safeLessonTitle = isHydrated ? lessonMeta?.title : null;
-  const safeLessonFocus = isHydrated ? lessonMeta?.focus : null;
+  const started = startedLessonId === effectiveLessonId;
+  const safeLessonTitle = lessonMeta?.title ?? null;
+  const safeLessonFocus = lessonMeta?.focus ?? null;
   const hasEmbeddedLessonVideo =
     year === "Year 4" && week === 2 && lessonNumber === 1;
-
-  useEffect(() => {
-    setIsHydrated(true);
-  }, []);
 
   useEffect(() => {
     const p = readProgress();
@@ -71,8 +68,6 @@ function LessonPage() {
   }, [week]);
 
   useEffect(() => {
-    setStarted(false);
-    // Clear session start time so PracticeRunner gets a fresh timer
     if (typeof window !== "undefined") {
       sessionStorage.removeItem("lul_lesson_start_time");
     }
@@ -89,6 +84,18 @@ function LessonPage() {
 
   function goBackToProgram() {
     router.push(`/program?year=${encodeURIComponent(year)}&week=${week}`);
+  }
+
+  const showWeek12Lesson3Summary = week === 12 && lessonNumber === 3;
+
+  function startPostTest() {
+    router.push(`/posttest?year=${encodeURIComponent(year)}`);
+  }
+
+  function practiseWeakAreas() {
+    router.push(
+      `/lesson?year=${encodeURIComponent(year)}&week=${week}&lessonId=y${yearNumber}-w${week}-l3`
+    );
   }
 
   return (
@@ -345,7 +352,7 @@ function LessonPage() {
                     clipPath: "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
                   }} />
                   <button
-                    onClick={() => setStarted(true)}
+                    onClick={() => setStartedLessonId(effectiveLessonId)}
                     className="relative inline-flex items-center justify-center gap-2 text-white font-bold tracking-tight px-7 py-3 text-sm md:text-base overflow-hidden hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200"
                     style={{
                       background: "linear-gradient(135deg, #021a18 0%, #064e47 45%, #0d9488 100%)",
@@ -396,6 +403,17 @@ function LessonPage() {
               key={`${year}-${week}-${lessonId}`}
               minutes={8}
               lessonTitle={safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
+              renderCompletionCard={
+                showWeek12Lesson3Summary
+                  ? (summary: LessonPerformanceSummary) => (
+                      <PerformanceSummaryCard
+                        summary={summary}
+                        onStartPostTest={startPostTest}
+                        onPractiseWeakAreas={practiseWeakAreas}
+                      />
+                    )
+                  : undefined
+              }
               getTask={(ctx) => {
                 const d = ctx?.difficulty ?? "easy";
                 if (effectiveLessonId.startsWith("y1-w2-")) {
@@ -459,6 +477,17 @@ function LessonPage() {
                   lesson={lessonMeta}
                   onTimedComplete={markLessonDone}
                   onExit={goBackToProgram}
+                  renderCompletionCard={
+                    showWeek12Lesson3Summary
+                      ? (summary: LessonPerformanceSummary) => (
+                          <PerformanceSummaryCard
+                            summary={summary}
+                            onStartPostTest={startPostTest}
+                            onPractiseWeakAreas={practiseWeakAreas}
+                          />
+                        )
+                      : undefined
+                  }
                 />
               ) : (
                 <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">

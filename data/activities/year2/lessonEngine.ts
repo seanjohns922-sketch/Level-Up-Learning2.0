@@ -2480,6 +2480,40 @@ function year5EstimateReasonablenessTemplates(mode: string | undefined): Reasona
   return yesNo;
 }
 
+function year5FinalTuneUpFluencyTemplates(): MixedOperationsChallengeTemplate[] {
+  return [
+    mixedOperationTemplate("addition", "4,398 + 587", "4985"),
+    mixedOperationTemplate("addition", "6,975 + 1,248", "8223"),
+    mixedOperationTemplate("addition", "9,996 + 1,275", "11271"),
+    mixedOperationTemplate("subtraction", "8,402 - 1,998", "6404"),
+    mixedOperationTemplate("subtraction", "12,005 - 5,998", "6007"),
+    mixedOperationTemplate("subtraction", "6,700 - 2,485", "4215"),
+    mixedOperationTemplate("addition", "19.75 + 8.26", "28.01"),
+    mixedOperationTemplate("subtraction", "18.04 - 7.99", "10.05"),
+    mixedOperationTemplate("multiplication", "96 × 25", "2400"),
+    mixedOperationTemplate("multiplication", "125 × 24", "3000"),
+    mixedOperationTemplate("division", "4,320 ÷ 12", "360"),
+    mixedOperationTemplate("division", "8,064 ÷ 32", "252"),
+  ];
+}
+
+function year5FinalTuneUpChallengeTemplates(): MixedOperationsChallengeTemplate[] {
+  return [
+    mixedOperationTemplate("addition", "250 + 375 - 125", "500"),
+    mixedOperationTemplate("addition", "600 - 198 + 45", "447"),
+    mixedOperationTemplate("addition", "4,250 + 680 - 999", "3931"),
+    mixedOperationTemplate("addition", "3.75 + 1.25 - 2.5", "2.5"),
+    mixedOperationTemplate("addition", "5.98 - 2.49 + 1.2", "4.69"),
+    mixedOperationTemplate("addition", "20.05 - 8.75 + 1.2", "12.5"),
+    mixedOperationTemplate("multiplication", "48 × 25 ÷ 5", "240"),
+    mixedOperationTemplate("multiplication", "125 × 8 ÷ 4", "250"),
+    mixedOperationTemplate("multiplication", "360 ÷ 9 × 5", "200"),
+    mixedOperationTemplate("multiplication", "12 + 6 × 4", "36"),
+    mixedOperationTemplate("division", "1,200 ÷ 6 + 175", "375"),
+    mixedOperationTemplate("division", "999 - 360 ÷ 9", "959"),
+  ];
+}
+
 function discountStepVisual(template: DiscountStepTemplate): DiscountStepMethodVisualData {
   const discount = discountAmount(template.price, template.percent);
   const finalPrice = template.price - discount;
@@ -11928,6 +11962,40 @@ function generateGenericQuestion(
       visual: {
         type: "numeric_input_only",
       },
+    };
+  }
+
+  if (explicitMode === "final_tuneup_fluency" || explicitMode === "final_tuneup_challenge") {
+    const templates =
+      explicitMode === "final_tuneup_challenge"
+        ? year5FinalTuneUpChallengeTemplates()
+        : year5FinalTuneUpFluencyTemplates();
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      placeholder: "Enter your answer",
+      visual: {
+        type: "numeric_input_only",
+      },
+    };
+  }
+
+  if (explicitMode === "final_tuneup_reasoning") {
+    const templates = [
+      ...year5EstimateReasonablenessTemplates("reasonableness_yes_no"),
+      ...year5EstimateReasonablenessTemplates("estimate_closer"),
+      ...year5EstimateReasonablenessTemplates("quick_estimate"),
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: chosen.options,
+      answer: chosen.answer,
+      helper: chosen.helper,
     };
   }
 

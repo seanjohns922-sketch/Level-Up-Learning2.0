@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { LessonRenderer } from "@/components/lesson/LessonRenderer";
 import { LessonHUDRail } from "@/components/lesson/LessonHUDRail";
@@ -169,6 +170,128 @@ type QuestionHistoryEntry = {
   order: number;
 };
 
+type LessonAttemptEntry = {
+  mode: string;
+  topicLabel: string;
+  questionType: string;
+  correct: boolean;
+  timeSpentSeconds: number;
+};
+
+export type LessonPerformanceTopicSummary = {
+  label: string;
+  correct: number;
+  total: number;
+  accuracy: number;
+  timeSpentSeconds: number;
+};
+
+export type LessonPerformanceSummary = {
+  lessonTitle: string;
+  questionsAnswered: number;
+  correctAnswers: number;
+  accuracy: number;
+  timeSpentSeconds: number;
+  topicSummaries: LessonPerformanceTopicSummary[];
+  strengths: LessonPerformanceTopicSummary[];
+  areasToImprove: LessonPerformanceTopicSummary[];
+  struggledQuestionTypes: string[];
+};
+
+function titleCaseWords(value: string) {
+  return value
+    .split(/[\s_]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function formatLessonTopicLabel(mode: string) {
+  const byMode: Record<string, string> = {
+    number_line: "Number Line",
+    arrays: "Arrays",
+    division_groups: "Division Groups",
+    fact_family: "Fact Families",
+    addition_strategy: "Addition",
+    subtraction_strategy: "Subtraction",
+    mixed_ops_addition: "Addition",
+    mixed_ops_subtraction: "Subtraction",
+    mixed_ops_multiplication: "Multiplication",
+    mixed_ops_division: "Division",
+    multi_step_calc_add_sub: "Add & Subtract",
+    multi_step_calc_mult_div: "Multiply & Divide",
+    multi_step_calc_mixed: "Mixed Steps",
+  };
+
+  return byMode[mode] ?? titleCaseWords(mode);
+}
+
+function buildLessonPerformanceSummary({
+  lessonTitle,
+  attempts,
+  questionsAnswered,
+  correctAnswers,
+  accuracy,
+  timeSpentSeconds,
+}: {
+  lessonTitle: string;
+  attempts: LessonAttemptEntry[];
+  questionsAnswered: number;
+  correctAnswers: number;
+  accuracy: number;
+  timeSpentSeconds: number;
+}): LessonPerformanceSummary {
+  const topicMap = new Map<string, LessonPerformanceTopicSummary>();
+  const struggleMap = new Map<string, number>();
+
+  for (const attempt of attempts) {
+    const current = topicMap.get(attempt.topicLabel) ?? {
+      label: attempt.topicLabel,
+      correct: 0,
+      total: 0,
+      accuracy: 0,
+      timeSpentSeconds: 0,
+    };
+
+    current.total += 1;
+    current.timeSpentSeconds += attempt.timeSpentSeconds;
+    if (attempt.correct) {
+      current.correct += 1;
+    } else {
+      struggleMap.set(attempt.topicLabel, (struggleMap.get(attempt.topicLabel) ?? 0) + 1);
+    }
+
+    current.accuracy = current.total > 0 ? Math.round((current.correct / current.total) * 100) : 0;
+    topicMap.set(attempt.topicLabel, current);
+  }
+
+  const topicSummaries = Array.from(topicMap.values()).sort((left, right) => right.total - left.total);
+  const strengths = [...topicSummaries]
+    .filter((item) => item.total > 0 && item.accuracy >= 75)
+    .sort((left, right) => right.accuracy - left.accuracy || right.total - left.total)
+    .slice(0, 3);
+  const areasToImprove = [...topicSummaries]
+    .filter((item) => item.total > 0 && item.accuracy < 75)
+    .sort((left, right) => left.accuracy - right.accuracy || right.total - left.total)
+    .slice(0, 3);
+  const struggledQuestionTypes = Array.from(struggleMap.entries())
+    .sort((left, right) => right[1] - left[1])
+    .map(([label]) => label)
+    .slice(0, 4);
+
+  return {
+    lessonTitle,
+    questionsAnswered,
+    correctAnswers,
+    accuracy,
+    timeSpentSeconds,
+    topicSummaries,
+    strengths,
+    areasToImprove,
+    struggledQuestionTypes,
+  };
+}
+
 function scoreQuestionCandidate(
   fingerprint: ReturnType<typeof getLessonQuestionFingerprint>,
   history: QuestionHistoryEntry[],
@@ -254,10 +377,12 @@ export function Year2LessonEngine({
   lesson,
   onTimedComplete,
   onExit,
+  renderCompletionCard,
 }: {
   lesson: Lesson;
   onTimedComplete: () => void;
   onExit: () => void;
+  renderCompletionCard?: (summary: LessonPerformanceSummary) => ReactNode;
 }) {
   const totalSeconds = 8 * 60;
   const level = useMemo(() => getLevelForLesson(lesson), [lesson]);
@@ -291,6 +416,8 @@ export function Year2LessonEngine({
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const markedCompleteRef = useRef(false);
   const scoredThisTurnRef = useRef(false);
+  const [attemptLog, setAttemptLog] = useState<LessonAttemptEntry[]>([]);
+  const questionStartedAtElapsedRef = useRef(0);
   const finished = secondsLeft <= 0;
   const currentActivity = activities[currentActivityIndex] ?? null;
   const questionsAnsweredRef = useRef(0);
@@ -356,6 +483,7 @@ export function Year2LessonEngine({
     setQuestionKey((v) => v + 1);
     setStatus("idle");
     scoredThisTurnRef.current = false;
+    questionStartedAtElapsedRef.current = totalSeconds - secondsLeft;
   }
 
   useEffect(() => {
@@ -387,6 +515,18 @@ export function Year2LessonEngine({
   function handleCorrect() {
     if (finished || status !== "idle" || scoredThisTurnRef.current) return;
     scoredThisTurnRef.current = true;
+    const mode =
+      questionHistoryRef.current[questionHistoryRef.current.length - 1]?.mode ??
+      ((currentActivity?.config ?? {}) as { mode?: string }).mode ??
+      currentActivity?.activityType ??
+      "practice";
+    setAttemptLog((current) => [...current, {
+      mode,
+      topicLabel: formatLessonTopicLabel(mode),
+      questionType: currentQuestion?.kind ?? currentActivity?.activityType ?? "unknown",
+      correct: true,
+      timeSpentSeconds: Math.max(1, totalSeconds - secondsLeft - questionStartedAtElapsedRef.current),
+    }]);
     clearPendingTimeout();
     setStatus("correct");
     questionsAnsweredRef.current += 1;
@@ -398,6 +538,18 @@ export function Year2LessonEngine({
   function handleWrong() {
     if (finished || status !== "idle" || scoredThisTurnRef.current) return;
     scoredThisTurnRef.current = true;
+    const mode =
+      questionHistoryRef.current[questionHistoryRef.current.length - 1]?.mode ??
+      ((currentActivity?.config ?? {}) as { mode?: string }).mode ??
+      currentActivity?.activityType ??
+      "practice";
+    setAttemptLog((current) => [...current, {
+      mode,
+      topicLabel: formatLessonTopicLabel(mode),
+      questionType: currentQuestion?.kind ?? currentActivity?.activityType ?? "unknown",
+      correct: false,
+      timeSpentSeconds: Math.max(1, totalSeconds - secondsLeft - questionStartedAtElapsedRef.current),
+    }]);
     clearPendingTimeout();
     setStatus("wrong");
     questionsAnsweredRef.current += 1;
@@ -419,6 +571,19 @@ export function Year2LessonEngine({
 
   // ── Finished state ──
   if (finished) {
+    const summary = buildLessonPerformanceSummary({
+      lessonTitle: lesson.title,
+      attempts: attemptLog,
+      questionsAnswered,
+      correctAnswers,
+      accuracy,
+      timeSpentSeconds: Math.max(0, totalSeconds - Math.max(0, secondsLeft)),
+    });
+
+    if (renderCompletionCard) {
+      return <>{renderCompletionCard(summary)}</>;
+    }
+
     return (
       <LessonCompleteCard
         lessonTitle={lesson.title}
