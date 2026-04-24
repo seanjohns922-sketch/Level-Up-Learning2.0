@@ -110,8 +110,15 @@ function PostTestPage() {
           .eq("year", year)
           .maybeSingle();
 
-        const prevScores: Record<string, any> = (existing?.quiz_scores as any) ?? {};
-        const previousAttempts: any[] = prevScores.posttest?.attempts ?? [];
+        const prevScores = ((existing?.quiz_scores as Record<string, unknown> | null) ?? {}) as Record<
+          string,
+          unknown
+        >;
+        const existingPosttest =
+          typeof prevScores.posttest === "object" && prevScores.posttest !== null
+            ? (prevScores.posttest as { attempts?: unknown[] })
+            : undefined;
+        const previousAttempts = existingPosttest?.attempts ?? [];
         const latest = { ...profile, assignedWeek, at: new Date().toISOString() };
         const updatedScores = {
           ...prevScores,
@@ -149,11 +156,11 @@ function PostTestPage() {
       <main className="min-h-screen bg-slate-950 flex items-center justify-center p-6">
         <div className="bg-slate-800 rounded-3xl shadow-xl p-8 w-full max-w-xl text-center border border-slate-700/60">
           <h1 className="text-2xl font-extrabold text-white mb-2">
-            Post-Test not found
+            Post-Test coming soon
           </h1>
           <p className="text-slate-400 mb-6">
-            No post-test questions exist for{" "}
-            <span className="font-bold text-white">{year}</span> yet.
+            A post-test for <span className="font-bold text-white">{year}</span>{" "}
+            is not available yet.
           </p>
           <button
             onClick={() => router.push("/")}

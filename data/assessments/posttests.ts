@@ -2,9 +2,9 @@ export type Question = {
   id: string;
   type?: string;
   prompt: string;
-  options: any[];
+  options: unknown[];
   correctAnswer: string;
-  answer?: any;
+  answer?: unknown;
   answerOptionId?: string;
   skillId?: string;
   skillLabel?: string;
@@ -12,7 +12,7 @@ export type Question = {
   linkedLessons?: number[];
   strand?: string;
   difficultyBand?: string;
-  visual?: any;
+  visual?: unknown;
 };
 
 export type PostTest = {
@@ -171,6 +171,36 @@ const YEAR2_POSTTEST_QUESTIONS: Question[] = [
   { id: "y2-pt-20", prompt: "Solve: 10 ÷ 2", options: ["2", "3", "5", "8"], correctAnswer: "5" },
 ];
 
+const YEAR4_POSTTEST_QUESTIONS: Question[] = [
+  {
+    id: "y4-pt-01",
+    type: "mcq",
+    prompt: "What is 8 × 6?",
+    options: ["42", "46", "48", "54"],
+    correctAnswer: "48",
+    answer: "48",
+    skillId: "multiplication_facts",
+    skillLabel: "Multiplication Facts",
+    strand: "Number",
+    difficultyBand: "year4",
+  },
+];
+
+const YEAR5_POSTTEST_QUESTIONS: Question[] = [
+  {
+    id: "y5-pt-01",
+    type: "mcq",
+    prompt: "What is 144 ÷ 6?",
+    options: ["18", "24", "26", "36"],
+    correctAnswer: "24",
+    answer: "24",
+    skillId: "division_fluency",
+    skillLabel: "Division Fluency",
+    strand: "Number",
+    difficultyBand: "year5",
+  },
+];
+
 export const POSTTESTS: Record<string, PostTest> = {
   "Year 1": {
     yearLabel: "Year 1",
@@ -196,5 +226,13 @@ export const POSTTESTS: Record<string, PostTest> = {
         correctAnswer: "36",
       },
     ],
+  },
+  "Year 4": {
+    yearLabel: "Year 4",
+    questions: YEAR4_POSTTEST_QUESTIONS,
+  },
+  "Year 5": {
+    yearLabel: "Year 5",
+    questions: YEAR5_POSTTEST_QUESTIONS,
   },
 };
