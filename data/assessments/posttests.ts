@@ -2,7 +2,7 @@ export type Question = {
   id: string;
   type?: string;
   prompt: string;
-  options: unknown[];
+  options?: unknown[];
   correctAnswer: string;
   answer?: unknown;
   answerOptionId?: string;
@@ -171,34 +171,490 @@ const YEAR2_POSTTEST_QUESTIONS: Question[] = [
   { id: "y2-pt-20", prompt: "Solve: 10 ÷ 2", options: ["2", "3", "5", "8"], correctAnswer: "5" },
 ];
 
-const YEAR4_POSTTEST_QUESTIONS: Question[] = [
-  {
-    id: "y4-pt-01",
+const strandYear4 = "Number";
+const difficultyYear4 = "year4";
+const strandYear5 = "Number";
+const difficultyYear5 = "year5";
+
+function buildPostMcqQuestion(
+  id: string,
+  prompt: string,
+  options: string[],
+  correctAnswer: string,
+  skillId: string,
+  skillLabel: string,
+  linkedWeeks: number[],
+  strand: string,
+  difficultyBand: string,
+  linkedLessons: number[] = [1, 2, 3]
+): Question {
+  return {
+    id,
     type: "mcq",
-    prompt: "What is 8 × 6?",
-    options: ["42", "46", "48", "54"],
-    correctAnswer: "48",
-    answer: "48",
-    skillId: "multiplication_facts",
-    skillLabel: "Multiplication Facts",
-    strand: "Number",
-    difficultyBand: "year4",
-  },
+    prompt,
+    options,
+    correctAnswer,
+    answer: correctAnswer,
+    skillId,
+    skillLabel,
+    linkedWeeks,
+    linkedLessons,
+    strand,
+    difficultyBand,
+  };
+}
+
+function buildPostNumericQuestion(
+  id: string,
+  prompt: string,
+  correctAnswer: string,
+  skillId: string,
+  skillLabel: string,
+  linkedWeeks: number[],
+  strand: string,
+  difficultyBand: string,
+  linkedLessons: number[] = [1, 2, 3]
+): Question {
+  return {
+    id,
+    type: "numeric",
+    prompt,
+    correctAnswer,
+    answer: correctAnswer,
+    skillId,
+    skillLabel,
+    linkedWeeks,
+    linkedLessons,
+    strand,
+    difficultyBand,
+  };
+}
+
+const YEAR4_POSTTEST_QUESTIONS: Question[] = [
+  buildPostMcqQuestion(
+    "y4-pt-01",
+    "What is the value of 8 in 28,431?",
+    ["8", "80", "800", "8,000"],
+    "8,000",
+    "place_value_rounding",
+    "Place Value & Rounding",
+    [1, 2],
+    strandYear4,
+    difficultyYear4
+  ),
+  buildPostNumericQuestion(
+    "y4-pt-02",
+    "What is 1,000 more than 6,725?",
+    "7725",
+    "place_value_rounding",
+    "Place Value & Rounding",
+    [1, 2],
+    strandYear4,
+    difficultyYear4
+  ),
+  buildPostMcqQuestion(
+    "y4-pt-03",
+    "Round 52,481 to the nearest 1,000.",
+    ["52,000", "52,400", "52,500", "53,000"],
+    "52,000",
+    "place_value_rounding",
+    "Place Value & Rounding",
+    [1, 3],
+    strandYear4,
+    difficultyYear4
+  ),
+  buildPostNumericQuestion(
+    "y4-pt-04",
+    "What is 100 less than 9,002?",
+    "8902",
+    "place_value_rounding",
+    "Place Value & Rounding",
+    [1, 3],
+    strandYear4,
+    difficultyYear4
+  ),
+  buildPostNumericQuestion(
+    "y4-pt-05",
+    "4,587 + 368 =",
+    "4955",
+    "addition_subtraction",
+    "Addition & Subtraction",
+    [2, 3, 12],
+    strandYear4,
+    difficultyYear4
+  ),
+  buildPostNumericQuestion(
+    "y4-pt-06",
+    "8,401 - 299 =",
+    "8102",
+    "addition_subtraction",
+    "Addition & Subtraction",
+    [2, 3, 12],
+    strandYear4,
+    difficultyYear4
+  ),
+  buildPostMcqQuestion(
+    "y4-pt-07",
+    "What is 6,000 - 2,998?",
+    ["2,998", "3,002", "3,102", "4,002"],
+    "3,002",
+    "addition_subtraction",
+    "Addition & Subtraction",
+    [2, 3, 12],
+    strandYear4,
+    difficultyYear4
+  ),
+  buildPostNumericQuestion(
+    "y4-pt-08",
+    "7,250 - 475 =",
+    "6775",
+    "addition_subtraction",
+    "Addition & Subtraction",
+    [2, 3, 12],
+    strandYear4,
+    difficultyYear4
+  ),
+  buildPostNumericQuestion(
+    "y4-pt-09",
+    "36 × 7 =",
+    "252",
+    "multiplication_division",
+    "Multiplication & Division",
+    [5, 6, 12],
+    strandYear4,
+    difficultyYear4
+  ),
+  buildPostNumericQuestion(
+    "y4-pt-10",
+    "945 ÷ 9 =",
+    "105",
+    "multiplication_division",
+    "Multiplication & Division",
+    [5, 6, 12],
+    strandYear4,
+    difficultyYear4
+  ),
+  buildPostMcqQuestion(
+    "y4-pt-11",
+    "What is 125 × 4?",
+    ["250", "375", "500", "625"],
+    "500",
+    "multiplication_division",
+    "Multiplication & Division",
+    [5, 6, 12],
+    strandYear4,
+    difficultyYear4
+  ),
+  buildPostNumericQuestion(
+    "y4-pt-12",
+    "924 ÷ 7 =",
+    "132",
+    "multiplication_division",
+    "Multiplication & Division",
+    [5, 6, 12],
+    strandYear4,
+    difficultyYear4
+  ),
+  buildPostMcqQuestion(
+    "y4-pt-13",
+    "Which number is a multiple of 8?",
+    ["42", "48", "54", "58"],
+    "48",
+    "factors_multiples",
+    "Factors, Multiples & Divisibility",
+    [4],
+    strandYear4,
+    difficultyYear4
+  ),
+  buildPostMcqQuestion(
+    "y4-pt-14",
+    "Which number is NOT divisible by 3?",
+    ["33", "45", "52", "81"],
+    "52",
+    "factors_multiples",
+    "Factors, Multiples & Divisibility",
+    [4],
+    strandYear4,
+    difficultyYear4
+  ),
+  buildPostMcqQuestion(
+    "y4-pt-15",
+    "Which pair are both factors of 36?",
+    ["4 and 9", "5 and 7", "6 and 7", "8 and 9"],
+    "4 and 9",
+    "factors_multiples",
+    "Factors, Multiples & Divisibility",
+    [4],
+    strandYear4,
+    difficultyYear4
+  ),
+  buildPostMcqQuestion(
+    "y4-pt-16",
+    "Which number does NOT belong?",
+    ["16", "24", "31", "40"],
+    "31",
+    "factors_multiples",
+    "Factors, Multiples & Divisibility",
+    [4],
+    strandYear4,
+    difficultyYear4
+  ),
+  buildPostMcqQuestion(
+    "y4-pt-17",
+    "Which fraction is equivalent to 2/3?",
+    ["3/6", "4/6", "5/8", "6/10"],
+    "4/6",
+    "fractions_decimals_percent",
+    "Fractions, Decimals & Percentages",
+    [7, 8, 9, 10],
+    strandYear4,
+    difficultyYear4
+  ),
+  buildPostMcqQuestion(
+    "y4-pt-18",
+    "Which decimal is equal to 3/5?",
+    ["0.3", "0.5", "0.6", "0.8"],
+    "0.6",
+    "fractions_decimals_percent",
+    "Fractions, Decimals & Percentages",
+    [7, 8, 9],
+    strandYear4,
+    difficultyYear4
+  ),
+  buildPostMcqQuestion(
+    "y4-pt-19",
+    "Which fraction is greater than 3/4?",
+    ["5/8", "6/8", "7/8", "2/3"],
+    "7/8",
+    "fractions_decimals_percent",
+    "Fractions, Decimals & Percentages",
+    [7, 8, 9],
+    strandYear4,
+    difficultyYear4
+  ),
+  buildPostNumericQuestion(
+    "y4-pt-20",
+    "What is 50% of 18?",
+    "9",
+    "fractions_decimals_percent",
+    "Fractions, Decimals & Percentages",
+    [9, 10],
+    strandYear4,
+    difficultyYear4
+  ),
 ];
 
 const YEAR5_POSTTEST_QUESTIONS: Question[] = [
-  {
-    id: "y5-pt-01",
-    type: "mcq",
-    prompt: "What is 144 ÷ 6?",
-    options: ["18", "24", "26", "36"],
-    correctAnswer: "24",
-    answer: "24",
-    skillId: "division_fluency",
-    skillLabel: "Division Fluency",
-    strand: "Number",
-    difficultyBand: "year5",
-  },
+  buildPostMcqQuestion(
+    "y5-pt-01",
+    "Round 367,812 to the nearest 10,000.",
+    ["360,000", "368,000", "370,000", "400,000"],
+    "370,000",
+    "place_value_decimals",
+    "Place Value & Decimals",
+    [1, 2],
+    strandYear5,
+    difficultyYear5
+  ),
+  buildPostNumericQuestion(
+    "y5-pt-02",
+    "What is 1,000 less than 402,030?",
+    "401030",
+    "place_value_decimals",
+    "Place Value & Decimals",
+    [1, 2],
+    strandYear5,
+    difficultyYear5
+  ),
+  buildPostMcqQuestion(
+    "y5-pt-03",
+    "Round 7.361 to the nearest tenth.",
+    ["7.3", "7.4", "7.36", "7.6"],
+    "7.4",
+    "place_value_decimals",
+    "Place Value & Decimals",
+    [1, 2],
+    strandYear5,
+    difficultyYear5
+  ),
+  buildPostNumericQuestion(
+    "y5-pt-04",
+    "4.8 + 2.35 =",
+    "7.15",
+    "place_value_decimals",
+    "Place Value & Decimals",
+    [1, 2, 11],
+    strandYear5,
+    difficultyYear5
+  ),
+  buildPostMcqQuestion(
+    "y5-pt-05",
+    "Which number is divisible by both 3 and 5?",
+    ["95", "120", "124", "142"],
+    "120",
+    "factors_multiples_divisibility",
+    "Factors, Multiples & Divisibility",
+    [4],
+    strandYear5,
+    difficultyYear5
+  ),
+  buildPostMcqQuestion(
+    "y5-pt-06",
+    "Which number is NOT a factor of 60?",
+    ["5", "6", "10", "14"],
+    "14",
+    "factors_multiples_divisibility",
+    "Factors, Multiples & Divisibility",
+    [4],
+    strandYear5,
+    difficultyYear5
+  ),
+  buildPostMcqQuestion(
+    "y5-pt-07",
+    "Which number is a common multiple of 3 and 8?",
+    ["12", "18", "24", "30"],
+    "24",
+    "factors_multiples_divisibility",
+    "Factors, Multiples & Divisibility",
+    [4],
+    strandYear5,
+    difficultyYear5
+  ),
+  buildPostMcqQuestion(
+    "y5-pt-08",
+    "Which number does NOT belong?",
+    ["15", "30", "45", "52"],
+    "52",
+    "factors_multiples_divisibility",
+    "Factors, Multiples & Divisibility",
+    [4],
+    strandYear5,
+    difficultyYear5
+  ),
+  buildPostNumericQuestion(
+    "y5-pt-09",
+    "324 × 3 =",
+    "972",
+    "multiplication_division",
+    "Multiplication & Division",
+    [5, 6, 12],
+    strandYear5,
+    difficultyYear5
+  ),
+  buildPostNumericQuestion(
+    "y5-pt-10",
+    "1,125 × 4 =",
+    "4500",
+    "multiplication_division",
+    "Multiplication & Division",
+    [5, 6, 12],
+    strandYear5,
+    difficultyYear5
+  ),
+  buildPostNumericQuestion(
+    "y5-pt-11",
+    "36 × 28 =",
+    "1008",
+    "multiplication_division",
+    "Multiplication & Division",
+    [5, 6, 12],
+    strandYear5,
+    difficultyYear5
+  ),
+  buildPostNumericQuestion(
+    "y5-pt-12",
+    "1,248 ÷ 8 =",
+    "156",
+    "multiplication_division",
+    "Multiplication & Division",
+    [5, 6, 12],
+    strandYear5,
+    difficultyYear5
+  ),
+  buildPostMcqQuestion(
+    "y5-pt-13",
+    "Which pair is NOT equivalent?",
+    ["1/2 and 4/8", "3/4 and 6/8", "2/5 and 5/10", "1/3 and 2/6"],
+    "2/5 and 5/10",
+    "fractions_decimal_percent",
+    "Fractions, Decimals & Percentages",
+    [7, 8, 9],
+    strandYear5,
+    difficultyYear5
+  ),
+  buildPostMcqQuestion(
+    "y5-pt-14",
+    "Which is larger?",
+    ["3/4", "7/10", "They are equal", "Not enough information"],
+    "3/4",
+    "fractions_decimal_percent",
+    "Fractions, Decimals & Percentages",
+    [7, 8, 9],
+    strandYear5,
+    difficultyYear5
+  ),
+  buildPostNumericQuestion(
+    "y5-pt-15",
+    "Write 40% as a decimal.",
+    "0.4",
+    "fractions_decimal_percent",
+    "Fractions, Decimals & Percentages",
+    [9],
+    strandYear5,
+    difficultyYear5
+  ),
+  buildPostNumericQuestion(
+    "y5-pt-16",
+    "What is 2/5 of 30?",
+    "12",
+    "fractions_decimal_percent",
+    "Fractions, Decimals & Percentages",
+    [8, 9],
+    strandYear5,
+    difficultyYear5
+  ),
+  buildPostNumericQuestion(
+    "y5-pt-17",
+    "What is 35% of 80?",
+    "28",
+    "percentages_problem_solving",
+    "Percentages & Multi-Step Problems",
+    [10],
+    strandYear5,
+    difficultyYear5
+  ),
+  buildPostNumericQuestion(
+    "y5-pt-18",
+    "A $60 item is 15% off. How much is the discount?",
+    "9",
+    "percentages_problem_solving",
+    "Percentages & Multi-Step Problems",
+    [10],
+    strandYear5,
+    difficultyYear5
+  ),
+  buildPostMcqQuestion(
+    "y5-pt-19",
+    "A test has 40 questions. 75% are correct. How many are correct?",
+    ["25", "28", "30", "35"],
+    "30",
+    "percentages_problem_solving",
+    "Percentages & Multi-Step Problems",
+    [10, 11],
+    strandYear5,
+    difficultyYear5
+  ),
+  buildPostMcqQuestion(
+    "y5-pt-20",
+    "A $150 item is reduced by 20%. What is the final price?",
+    ["$110", "$115", "$120", "$130"],
+    "$120",
+    "percentages_problem_solving",
+    "Percentages & Multi-Step Problems",
+    [10, 11],
+    strandYear5,
+    difficultyYear5
+  ),
 ];
 
 export const POSTTESTS: Record<string, PostTest> = {

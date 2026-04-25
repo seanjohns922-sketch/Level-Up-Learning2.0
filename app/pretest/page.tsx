@@ -7,6 +7,7 @@ import type { Question } from "@/data/assessments/pretests";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCard";
 import AssessmentShell from "@/components/assessment/AssessmentShell";
+import { isAssessmentAnswerCorrect } from "@/data/assessments/analysis";
 
 /* ── Inline visuals (kept from original) ── */
 
@@ -153,31 +154,6 @@ function DotAddVisual({
     setRightOn(Array.from({ length: maxDots }, () => false));
   }
 
-  const DotRow = ({
-    side,
-    onArr,
-  }: {
-    side: "left" | "right";
-    onArr: boolean[];
-  }) => (
-    <div className="flex flex-wrap gap-2 justify-center">
-      {onArr.map((on, i) => (
-        <button
-          key={i}
-          type="button"
-          onClick={() => toggle(side, i)}
-          className={[
-            "h-8 w-8 rounded-full border transition",
-            on
-              ? "bg-teal-500 border-teal-400"
-              : "bg-slate-700 border-slate-500 hover:bg-slate-600",
-          ].join(" ")}
-          aria-label={`${side} dot ${i + 1}`}
-        />
-      ))}
-    </div>
-  );
-
   return (
     <div className="rounded-2xl border border-slate-600 bg-slate-700/50 p-5 mb-4">
       <div className="text-sm text-slate-400 mb-3">
@@ -186,9 +162,39 @@ function DotAddVisual({
       </div>
 
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
-        <DotRow side="left" onArr={leftOn} />
+        <div className="flex flex-wrap gap-2 justify-center">
+          {leftOn.map((on, i) => (
+            <button
+              key={`left-${i}`}
+              type="button"
+              onClick={() => toggle("left", i)}
+              className={[
+                "h-8 w-8 rounded-full border transition",
+                on
+                  ? "bg-teal-500 border-teal-400"
+                  : "bg-slate-700 border-slate-500 hover:bg-slate-600",
+              ].join(" ")}
+              aria-label={`left dot ${i + 1}`}
+            />
+          ))}
+        </div>
         <div className="text-4xl font-extrabold text-slate-400 select-none">+</div>
-        <DotRow side="right" onArr={rightOn} />
+        <div className="flex flex-wrap gap-2 justify-center">
+          {rightOn.map((on, i) => (
+            <button
+              key={`right-${i}`}
+              type="button"
+              onClick={() => toggle("right", i)}
+              className={[
+                "h-8 w-8 rounded-full border transition",
+                on
+                  ? "bg-teal-500 border-teal-400"
+                  : "bg-slate-700 border-slate-500 hover:bg-slate-600",
+              ].join(" ")}
+              aria-label={`right dot ${i + 1}`}
+            />
+          ))}
+        </div>
       </div>
 
       <div className="mt-4">
@@ -200,23 +206,6 @@ function DotAddVisual({
           Clear
         </button>
       </div>
-    </div>
-  );
-}
-
-function EqualSharingPreview({ groups }: { groups: number[] }) {
-  return (
-    <div className="flex gap-4 mt-3">
-      {groups.map((size, i) => (
-        <div
-          key={i}
-          className="rounded-xl border border-slate-600 bg-slate-700/50 p-3 flex flex-wrap gap-1 w-24"
-        >
-          {Array.from({ length: size }).map((_, j) => (
-            <div key={j} className="h-4 w-4 rounded-full bg-teal-500" />
-          ))}
-        </div>
-      ))}
     </div>
   );
 }
@@ -342,27 +331,12 @@ function PretestPage() {
     const score = answers.reduce((acc, answer, i) => {
       const q = questions[i];
       if (!answer) return acc;
-      if (q.type === "mab") {
-        return acc + (Number(answer) === q.target ? 1 : 0);
-      }
-      if (q.type === "numberLine") {
-        return acc + (Number(answer) === q.answer ? 1 : 0);
-      }
-      if (q.type === "groups") {
-        return acc + (answer === q.answerOptionId ? 1 : 0);
-      }
-      if (q.answerIndex !== undefined) {
+      if (q.answerIndex !== undefined && q.answer == null && q.correctAnswer == null) {
         const opt = (q.options ?? [])[q.answerIndex ?? 0];
         const correctLabel = typeof opt === "string" ? opt : opt.label;
         return acc + (answer === correctLabel ? 1 : 0);
       }
-      if (q.answerOptionId !== undefined) {
-        return acc + (answer === q.answerOptionId ? 1 : 0);
-      }
-      if (q.correctAnswer !== undefined) {
-        return acc + (answer === q.correctAnswer ? 1 : 0);
-      }
-      return acc + (answer === q.answer ? 1 : 0);
+      return acc + (isAssessmentAnswerCorrect(q, answer) ? 1 : 0);
     }, 0);
 
     router.push(
@@ -372,7 +346,12 @@ function PretestPage() {
 
   const mabTotal = mab.tens * 10 + mab.ones;
   const mabHasSelection = mab.tens > 0 || mab.ones > 0;
-  const isReady = question?.type === "mab" ? mabHasSelection : selected !== null;
+  const isReady =
+    question?.type === "mab"
+      ? mabHasSelection
+      : question?.type === "numeric"
+        ? (selected ?? "").trim().length > 0
+        : selected !== null;
 
   useEffect(() => {
     if (question?.type !== "mab") return;
@@ -428,7 +407,7 @@ function PretestPage() {
             {question.max}
           </div>
 
-          {(question.options ?? []).map((n: any) => {
+          {((question.options ?? []) as number[]).map((n) => {
             const qMin = question.min ?? 0;
             const qMax = question.max ?? 100;
             const pct = ((n - qMin) / (qMax - qMin)) * 100;
@@ -460,7 +439,7 @@ function PretestPage() {
   } else if (question.type === "groups") {
     questionContent = (
       <div className="grid gap-4">
-        {(question.options ?? []).map((opt: any) => {
+        {((question.options ?? []) as Array<{ id: string; label: string; groups: number[] }>).map((opt) => {
           const isSelected = selected === opt.id;
           return (
             <button

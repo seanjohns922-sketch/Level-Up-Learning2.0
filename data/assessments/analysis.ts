@@ -37,10 +37,37 @@ export type AssessmentResultProfile = {
 };
 
 type GenericAssessmentQuestion = AssessmentQuestionMetadata & {
-  correctAnswer?: string;
-  answer?: string;
+  type?: string;
+  correctAnswer?: string | number;
+  answer?: unknown;
   answerOptionId?: string;
 };
+
+function parseNumericAssessmentValue(value: unknown): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value !== "string") return null;
+  const cleaned = value.replace(/,/g, "").trim();
+  if (!cleaned.length) return null;
+  const parsed = Number(cleaned);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+export function isAssessmentAnswerCorrect(
+  question: GenericAssessmentQuestion,
+  chosen: string | undefined
+): boolean {
+  const expected = question.answerOptionId ?? question.correctAnswer ?? question.answer;
+  if (expected == null || chosen == null) return false;
+
+  if (question.type === "numeric" || question.type === "numberLine" || question.type === "mab") {
+    const expectedValue = parseNumericAssessmentValue(expected);
+    const chosenValue = parseNumericAssessmentValue(chosen);
+    if (expectedValue == null || chosenValue == null) return false;
+    return Math.abs(expectedValue - chosenValue) < 1e-9;
+  }
+
+  return chosen === String(expected);
+}
 
 export function analyzeAssessmentResult({
   questions,
@@ -61,9 +88,8 @@ export function analyzeAssessmentResult({
   let score = 0;
 
   for (const question of questions) {
-    const expected = question.answerOptionId ?? question.correctAnswer ?? question.answer;
     const chosen = answers[question.id];
-    const isCorrect = !!expected && chosen === expected;
+    const isCorrect = isAssessmentAnswerCorrect(question, chosen);
     if (isCorrect) score += 1;
 
     const skillId = question.skillId ?? "general";
@@ -130,8 +156,11 @@ export function analyzeAssessmentResult({
   };
 }
 
-export function getLatestPosttestProfile(rawQuizScores: any): AssessmentResultProfile | null {
-  const profile = rawQuizScores?.posttest?.latest;
+export function getLatestPosttestProfile(rawQuizScores: unknown): AssessmentResultProfile | null {
+  if (!rawQuizScores || typeof rawQuizScores !== "object") return null;
+  const posttest = "posttest" in rawQuizScores ? rawQuizScores.posttest : undefined;
+  if (!posttest || typeof posttest !== "object") return null;
+  const profile = "latest" in posttest ? posttest.latest : undefined;
   if (!profile || typeof profile !== "object") return null;
   return profile as AssessmentResultProfile;
 }

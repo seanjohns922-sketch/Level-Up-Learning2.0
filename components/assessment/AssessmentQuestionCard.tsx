@@ -7,7 +7,7 @@ type GenericQuestion = {
   type?: string;
   prompt: string;
   options?: unknown[];
-  visual?: Record<string, unknown>;
+  visual?: unknown;
 };
 
 function parseFraction(label: string) {
@@ -86,6 +86,10 @@ export default function AssessmentQuestionCard({
   const lineRef = useRef<HTMLDivElement | null>(null);
 
   const type = question.type ?? "mcq";
+  const visual =
+    typeof question.visual === "object" && question.visual !== null
+      ? (question.visual as Record<string, unknown>)
+      : undefined;
   const order = useMemo(
     () => (value ? value.split(type === "number_order" ? ORDER_SEPARATOR : ",").filter(Boolean) : []),
     [type, value]
@@ -303,8 +307,8 @@ export default function AssessmentQuestionCard({
   }
 
   if (type === "build_whole") {
-    const denominator = Number(question.visual?.denominator ?? 2);
-    const fractionLabel = String(question.visual?.fractionLabel ?? `1/${denominator}`);
+    const denominator = Number(visual?.denominator ?? 2);
+    const fractionLabel = String(visual?.fractionLabel ?? `1/${denominator}`);
     const options = (question.options as Array<{ id: string; parts: number }> | undefined) ?? [];
 
     return (
@@ -337,7 +341,7 @@ export default function AssessmentQuestionCard({
   }
 
   if (type === "fraction_number_line") {
-    const targetFraction = String(question.visual?.targetFraction ?? "1/2");
+    const targetFraction = String(visual?.targetFraction ?? "1/2");
     const denominator = parseFraction(targetFraction).denominator;
     const lineStops = Array.from({ length: denominator + 1 }, (_, index) => ({
       x: index / denominator,
@@ -410,6 +414,21 @@ export default function AssessmentQuestionCard({
             <span>1</span>
           </div>
         </div>
+      </div>
+    );
+  }
+
+  if (type === "numeric") {
+    return (
+      <div className="mt-6">
+        <input
+          type="text"
+          inputMode="decimal"
+          value={value ?? ""}
+          onChange={(event) => onChange(event.target.value)}
+          placeholder="Enter your answer"
+          className="w-full rounded-2xl border border-slate-600 bg-slate-700/50 px-5 py-4 text-2xl font-black text-white outline-none transition placeholder:text-slate-400 focus:border-teal-500 focus:bg-slate-700"
+        />
       </div>
     );
   }
