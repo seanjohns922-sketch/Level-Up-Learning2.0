@@ -20,13 +20,7 @@ export type GroupCountersVisual = {
 
 export type Visual = DotAddVisual | GroupCountersVisual;
 
-export const YEAR3_PRETEST: Question[] = [
-  // Paste your real Qs here
-  {
-    type: "mcq",
-    id: "y3-q1",
-    prompt: "What is 3,000 + 400 + 20 + 5?",
-    options: ["3,425", "3,452", "3,245", "3,405"],
-    answer: "3,425",
-  },
-];
+// Year 3 assessments are generated exclusively from `level3Blueprint.ts`.
+// This export is intentionally unused placeholder data so the file can still
+// satisfy type imports without competing with the runtime blueprint path.
+export const YEAR3_PRETEST: Question[] = [];
