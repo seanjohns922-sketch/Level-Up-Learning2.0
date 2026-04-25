@@ -7,6 +7,8 @@ export type StudentProgress = {
   assignedWeek?: number; // 1..12 (only for ASSIGNED_PROGRAM)
   assignedWeeksHistory?: number[];
   unlockedLegends: string[]; // legend ids
+  lastPreTestPercent?: number;
+  lastPreTestProfile?: AssessmentResultProfile;
   lastPostTestPercent?: number;
   lastPostTestProfile?: AssessmentResultProfile;
 };

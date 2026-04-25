@@ -7,7 +7,8 @@ import type { Question } from "@/data/assessments/pretests";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCard";
 import AssessmentShell from "@/components/assessment/AssessmentShell";
-import { isAssessmentAnswerCorrect } from "@/data/assessments/analysis";
+import { analyzeAssessmentResult, isAssessmentAnswerCorrect } from "@/data/assessments/analysis";
+import { ACTIVE_STUDENT_KEY, readProgress, type StudentProgress, writeProgress } from "@/data/progress";
 
 /* ── Inline visuals (kept from original) ── */
 
@@ -338,6 +339,36 @@ function PretestPage() {
       }
       return acc + (isAssessmentAnswerCorrect(q, answer) ? 1 : 0);
     }, 0);
+
+    const answerMap = questions.reduce<Record<string, string | undefined>>((acc, q, i) => {
+      const answer = answers[i];
+      if (answer != null) acc[q.id] = answer;
+      return acc;
+    }, {});
+
+    const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY) : null;
+    const profile = analyzeAssessmentResult({
+      questions,
+      answers: answerMap,
+      yearLevel: Number(year.replace(/\D/g, "")) || 3,
+      testType: "pre",
+      studentId,
+    });
+    const prev = readProgress();
+    const nextProgress: StudentProgress = {
+      ...(prev ?? {
+        year,
+        scorePercent: 0,
+        status: "ASSIGNED_PROGRAM" as const,
+        unlockedLegends: [],
+      }),
+      year,
+      scorePercent: profile.percentage,
+      lastPreTestPercent: profile.percentage,
+      lastPreTestProfile: profile,
+      unlockedLegends: prev?.unlockedLegends ?? [],
+    };
+    writeProgress(nextProgress);
 
     router.push(
       `/results?year=${encodeURIComponent(year)}&score=${score}&total=${questions.length}`

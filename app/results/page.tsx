@@ -9,6 +9,17 @@ import LegendUnlockReveal from "@/components/LegendUnlockReveal";
 import type { AssessmentResultProfile } from "@/data/assessments/analysis";
 const PASS_THRESHOLD = 90;
 
+type SkillGrowthRow = {
+  skillId: string;
+  skillLabel: string;
+  strand: string;
+  difficultyBand: string | undefined;
+  preAccuracy: number;
+  postAccuracy: number;
+  improvement: number;
+  incorrectCount: number;
+};
+
 function getLowestRecommendedWeek(profile: AssessmentResultProfile | null) {
   if (!profile?.recommendedWeeks?.length) return undefined;
   return Math.min(...profile.recommendedWeeks);
@@ -46,6 +57,48 @@ function getStrandLabel(strand?: string) {
     default:
       return "Number";
   }
+}
+
+function accuracyForSkill(item: { correctCount: number; total: number }) {
+  if (!item.total) return 0;
+  return Math.round((item.correctCount / item.total) * 100);
+}
+
+function buildSkillGrowth(
+  preProfile: AssessmentResultProfile | null,
+  postProfile: AssessmentResultProfile | null
+): SkillGrowthRow[] {
+  if (!preProfile || !postProfile) return [];
+
+  const preMap = new Map(
+    [...preProfile.strengths, ...preProfile.weakAreas].map((item) => [item.skillId, item])
+  );
+  const postItems = [...postProfile.strengths, ...postProfile.weakAreas];
+  const postMap = new Map(postItems.map((item) => [item.skillId, item]));
+  const skillIds = new Set([...preMap.keys(), ...postMap.keys()]);
+
+  const rows = [...skillIds]
+    .map((skillId) => {
+      const pre = preMap.get(skillId);
+      const post = postMap.get(skillId);
+      const base = post ?? pre;
+      if (!base) return null;
+      const preAccuracy = pre ? accuracyForSkill(pre) : 0;
+      const postAccuracy = post ? accuracyForSkill(post) : 0;
+      return {
+        skillId,
+        skillLabel: base.skillLabel,
+        strand: base.strand,
+        difficultyBand: base.difficultyBand,
+        preAccuracy,
+        postAccuracy,
+        improvement: postAccuracy - preAccuracy,
+        incorrectCount: post?.incorrectCount ?? 0,
+      };
+    })
+    .filter((item): item is SkillGrowthRow => item !== null);
+
+  return rows.sort((a, b) => b.improvement - a.improvement || a.incorrectCount - b.incorrectCount);
 }
 
 export default function ResultsPageWrapper() {
@@ -162,15 +215,33 @@ function ResultsPage() {
   const storedPosttestProfile: AssessmentResultProfile | null = useMemo(() => {
     const progress = readProgress();
     return isPostTest ? progress?.lastPostTestProfile ?? null : null;
-  }, [isPostTest, year, scorePercent, total]);
+  }, [isPostTest]);
+  const storedPretestProfile: AssessmentResultProfile | null = useMemo(() => {
+    const progress = readProgress();
+    return isPostTest ? progress?.lastPreTestProfile ?? null : null;
+  }, [isPostTest]);
+  const skillGrowth = useMemo(
+    () => buildSkillGrowth(storedPretestProfile, storedPosttestProfile),
+    [storedPretestProfile, storedPosttestProfile]
+  );
+  const strongestGrowth = skillGrowth.find((item) => item.improvement > 0) ?? null;
+  const keepPractising =
+    [...skillGrowth]
+      .sort((a, b) => a.postAccuracy - b.postAccuracy || a.improvement - b.improvement)
+      .find((item) => item.postAccuracy < 100) ?? null;
+  const growthPercentagePoints =
+    storedPretestProfile && storedPosttestProfile
+      ? storedPosttestProfile.percentage - storedPretestProfile.percentage
+      : null;
+  const growthCorrectCount =
+    storedPretestProfile && storedPosttestProfile
+      ? storedPosttestProfile.score - storedPretestProfile.score
+      : null;
 
-  const [showUnlock, setShowUnlock] = useState(false);
-  const [justUnlocked, setJustUnlocked] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const initialProgress = useMemo(() => readProgress(), []);
+  const [unlockDismissed, setUnlockDismissed] = useState(false);
+  const shouldShowUnlock =
+    passed && !(initialProgress?.unlockedLegends ?? []).includes(legend.id) && !unlockDismissed;
 
   useEffect(() => {
     const prev = readProgress();
@@ -221,17 +292,8 @@ function ResultsPage() {
         if (error) console.warn("[Results] DB pretest save error:", error);
       } catch (e) {
         console.warn("[Results] DB pretest save failed:", e);
-      }
+        }
     })();
-
-    if (passed && !alreadyUnlocked) {
-      setJustUnlocked(true);
-      setShowUnlock(true);
-    } else {
-      setJustUnlocked(false);
-      setShowUnlock(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [passed, year, scorePercent, legend.id, isPostTest, passedByProgram, storedPosttestProfile]);
 
   function goHome() { router.push("/home"); }
@@ -261,16 +323,19 @@ function ResultsPage() {
     const qs = new URLSearchParams({ year, week: String(week) }).toString();
     router.push(`/program?${qs}`);
   }
+  function goContinue() {
+    router.push("/home");
+  }
 
   return (
     <main className="min-h-screen bg-background flex items-center justify-center p-4 relative">
       <FloatingShapes />
 
-      <div
+        <div
         className="relative z-10 w-full max-w-lg"
         style={{
-          opacity: mounted ? 1 : 0,
-          transform: mounted ? "translateY(0)" : "translateY(24px)",
+          opacity: 1,
+          transform: "translateY(0)",
           transition: "all 0.6s cubic-bezier(0.4,0,0.2,1)",
         }}
       >
@@ -368,6 +433,86 @@ function ResultsPage() {
 
             {isPostTest && storedPosttestProfile ? (
               <>
+                <div className="rounded-2xl bg-secondary p-4">
+                  <div className="font-bold text-sm text-foreground mb-2">Your Growth</div>
+                  {storedPretestProfile ? (
+                    <div className="space-y-3">
+                      <p className="text-sm text-secondary-foreground">
+                        You improved from {storedPretestProfile.percentage}% to {storedPosttestProfile.percentage}%.
+                      </p>
+                      <div className="grid grid-cols-3 gap-3 text-center">
+                        <div className="rounded-xl bg-background/80 border border-border/60 p-3">
+                          <div className="text-xs text-muted-foreground">Pre-Test</div>
+                          <div className="text-xl font-extrabold text-foreground">{storedPretestProfile.percentage}%</div>
+                        </div>
+                        <div className="rounded-xl bg-background/80 border border-border/60 p-3">
+                          <div className="text-xs text-muted-foreground">Post-Test</div>
+                          <div className="text-xl font-extrabold text-foreground">{storedPosttestProfile.percentage}%</div>
+                        </div>
+                        <div className="rounded-xl bg-background/80 border border-border/60 p-3">
+                          <div className="text-xs text-muted-foreground">Growth</div>
+                          <div className={`text-xl font-extrabold ${growthPercentagePoints && growthPercentagePoints >= 0 ? "text-emerald-600" : "text-amber-600"}`}>
+                            {growthPercentagePoints && growthPercentagePoints > 0 ? "+" : ""}
+                            {growthPercentagePoints ?? 0}%
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap gap-3 text-xs text-secondary-foreground">
+                        <span>
+                          Pre correct: {storedPretestProfile.score}/{storedPretestProfile.total}
+                        </span>
+                        <span>
+                          Post correct: {storedPosttestProfile.score}/{storedPosttestProfile.total}
+                        </span>
+                        <span>
+                          Improvement: {growthCorrectCount && growthCorrectCount > 0 ? "+" : ""}
+                          {growthCorrectCount ?? 0} questions
+                        </span>
+                      </div>
+                      {strongestGrowth ? (
+                        <div className="text-xs text-secondary-foreground">
+                          Strongest growth: <span className="font-bold text-foreground">{strongestGrowth.skillLabel}</span>
+                        </div>
+                      ) : null}
+                      {keepPractising ? (
+                        <div className="text-xs text-secondary-foreground">
+                          Keep practising: <span className="font-bold text-foreground">{keepPractising.skillLabel}</span>
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-secondary-foreground">
+                      Pre-test result not found. Complete the pre-test to compare growth.
+                    </p>
+                  )}
+                </div>
+
+                {storedPretestProfile && skillGrowth.length > 0 ? (
+                  <div className="rounded-2xl p-4 border border-border/60 bg-card/80">
+                    <div className="font-bold text-sm text-foreground mb-3">Skill Growth</div>
+                    <div className="space-y-2">
+                      {skillGrowth.slice(0, 5).map((item) => (
+                        <div key={item.skillId} className="rounded-xl border border-border/60 bg-background/70 p-3">
+                          <div className="flex items-center justify-between gap-2 mb-1">
+                            <div className="text-xs font-bold text-foreground">{item.skillLabel}</div>
+                            <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-bold ${getStrandBadgeClass(item.strand)}`}>
+                              {getStrandLabel(item.strand)}
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-3 text-[11px] text-muted-foreground">
+                            <span>Pre: {item.preAccuracy}%</span>
+                            <span>Post: {item.postAccuracy}%</span>
+                            <span className={item.improvement >= 0 ? "text-emerald-600 font-bold" : "text-amber-600 font-bold"}>
+                              {item.improvement > 0 ? "+" : ""}
+                              {item.improvement}%
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
                 {topStrengths.length > 0 ? (
                   <div className="rounded-2xl bg-secondary p-4">
                     <div className="font-bold text-sm text-foreground mb-2">You did well with</div>
@@ -465,11 +610,11 @@ function ResultsPage() {
             ) : isPostTest ? (
               <>
                 <button
-                  onClick={goRetryPostTest}
+                  onClick={goContinue}
                   className="w-full py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base hover:opacity-90 transition-all active:scale-[0.98] shadow-lg"
                   style={{ boxShadow: "0 8px 24px -8px hsl(var(--primary) / 0.4)" }}
                 >
-                  🔄 Retry Post-Test
+                  Continue
                 </button>
                 <button
                   onClick={goAssignedWeek}
@@ -479,13 +624,13 @@ function ResultsPage() {
                     boxShadow: "0 8px 24px -8px hsl(var(--accent) / 0.4)",
                   }}
                 >
-                  📖 Start Week {assignedReviewWeek ?? 1}
+                  Practise weak areas
                 </button>
                 <button
-                  onClick={goHome}
+                  onClick={goRetryPostTest}
                   className="w-full py-3 rounded-2xl bg-secondary text-secondary-foreground font-semibold text-sm hover:bg-muted transition-all active:scale-[0.98]"
                 >
-                  Back to Home
+                  Retry Post-Test
                 </button>
               </>
             ) : (
@@ -513,12 +658,12 @@ function ResultsPage() {
       </div>
 
       {/* Legend Unlock overlay */}
-      {showUnlock && justUnlocked && (
+      {shouldShowUnlock && (
         <LegendUnlockReveal
           legend={legend}
           scorePercent={displayPercent}
-          onContinue={() => setShowUnlock(false)}
-          onViewLegends={() => { setShowUnlock(false); goLegends(); }}
+          onContinue={() => setUnlockDismissed(true)}
+          onViewLegends={goLegends}
         />
       )}
 
