@@ -2908,8 +2908,8 @@ export type StrategyOwnershipVisualData = {
     tag: "FAST" | "CLEAR" | "SMART CHOICE" | "TRY ANOTHER WAY";
     feedback: string;
   }>;
-  reflectionPrompt: string;
-  reflectionOptions: string[];
+  reflectionPrompt?: string;
+  reflectionOptions?: string[];
 };
 
 export type MultipleChoiceQuestion = {
@@ -8470,13 +8470,6 @@ function generateGenericQuestion(
         supportText: "Good mathematicians choose a strategy that matches the numbers.",
         problemLabel: chosen.prompt,
         strategies: [...chosen.strategies],
-        reflectionPrompt: chosen.reflectionPrompt,
-        reflectionOptions: [
-          "FAST",
-          "CLEAR",
-          "SMART CHOICE",
-          "TRY ANOTHER WAY",
-        ],
       },
     };
   }

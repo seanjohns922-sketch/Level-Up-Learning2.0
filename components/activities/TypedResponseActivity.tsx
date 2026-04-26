@@ -421,7 +421,7 @@ function StrategyOwnershipInput({
         />
       </div>
 
-      {solved ? (
+      {solved && visual.reflectionPrompt && visual.reflectionOptions?.length ? (
         <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
           <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">
             Step D: Reflect
