@@ -49,83 +49,6 @@ export type Database = {
           },
         ]
       }
-      class_enrollments: {
-        Row: {
-          class_id: string
-          ended_at: string | null
-          enrolled_at: string
-          id: string
-          status: string
-          student_id: string
-        }
-        Insert: {
-          class_id: string
-          ended_at?: string | null
-          enrolled_at?: string
-          id?: string
-          status?: string
-          student_id: string
-        }
-        Update: {
-          class_id?: string
-          ended_at?: string | null
-          enrolled_at?: string
-          id?: string
-          status?: string
-          student_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "class_enrollments_class_id_fkey"
-            columns: ["class_id"]
-            isOneToOne: false
-            referencedRelation: "classes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "class_enrollments_student_id_fkey"
-            columns: ["student_id"]
-            isOneToOne: false
-            referencedRelation: "students"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      parent_student_links: {
-        Row: {
-          id: string
-          linked_at: string
-          parent_user_id: string
-          relationship: string
-          status: string
-          student_id: string
-        }
-        Insert: {
-          id?: string
-          linked_at?: string
-          parent_user_id: string
-          relationship?: string
-          status?: string
-          student_id: string
-        }
-        Update: {
-          id?: string
-          linked_at?: string
-          parent_user_id?: string
-          relationship?: string
-          status?: string
-          student_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "parent_student_links_student_id_fkey"
-            columns: ["student_id"]
-            isOneToOne: false
-            referencedRelation: "students"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       progress: {
         Row: {
           completed_lesson_ids: Json
@@ -178,31 +101,31 @@ export type Database = {
       }
       students: {
         Row: {
-          class_id: string | null
+          class_id: string
           created_at: string
           display_name: string
           id: string
           pin: string | null
           qr_token: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
-          class_id?: string | null
+          class_id: string
           created_at?: string
           display_name: string
           id?: string
           pin?: string | null
           qr_token?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
-          class_id?: string | null
+          class_id?: string
           created_at?: string
           display_name?: string
           id?: string
           pin?: string | null
           qr_token?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: [
           {
@@ -210,50 +133,6 @@ export type Database = {
             columns: ["class_id"]
             isOneToOne: false
             referencedRelation: "classes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      student_access_credentials: {
-        Row: {
-          created_at: string
-          created_by: string | null
-          credential_secret: string
-          credential_type: string
-          expires_at: string | null
-          id: string
-          revoked_at: string | null
-          student_id: string
-          used_at: string | null
-        }
-        Insert: {
-          created_at?: string
-          created_by?: string | null
-          credential_secret: string
-          credential_type: string
-          expires_at?: string | null
-          id?: string
-          revoked_at?: string | null
-          student_id: string
-          used_at?: string | null
-        }
-        Update: {
-          created_at?: string
-          created_by?: string | null
-          credential_secret?: string
-          credential_type?: string
-          expires_at?: string | null
-          id?: string
-          revoked_at?: string | null
-          student_id?: string
-          used_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "student_access_credentials_student_id_fkey"
-            columns: ["student_id"]
-            isOneToOne: false
-            referencedRelation: "students"
             referencedColumns: ["id"]
           },
         ]
@@ -305,31 +184,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      claim_student_profile: {
-        Args: { claim_code_input: string }
-        Returns: {
-          class_id: string | null
-          class_name: string | null
-          display_name: string
-          link_status: string
-          student_id: string
-        }[]
-      }
-      create_student_for_class: {
-        Args: {
-          class_uuid: string
-          display_name_input: string
-          pin_input?: string | null
-        }
-        Returns: {
-          claim_code: string
-          pin: string
-          qr_token: string
-          student_id: string
-        }[]
-      }
       generate_class_code: { Args: never; Returns: string }
-      generate_student_claim_code: { Args: never; Returns: string }
       generate_qr_token: { Args: never; Returns: string }
       get_student_id: { Args: never; Returns: string }
       get_teacher_id: { Args: never; Returns: string }
@@ -355,8 +210,7 @@ export type Database = {
         Returns: {
           class_code: string
           display_name: string
-          student_id: string
-          user_id: string | null
+          user_id: string
         }[]
       }
     }
