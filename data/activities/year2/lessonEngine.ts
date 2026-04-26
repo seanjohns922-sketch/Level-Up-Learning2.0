@@ -11667,6 +11667,159 @@ function generateGenericQuestion(
     };
   }
 
+  if (
+    explicitMode === "decimal_scale_multiply" ||
+    explicitMode === "decimal_scale_divide" ||
+    explicitMode === "decimal_scale_mixed"
+  ) {
+    const templateMap = {
+      decimal_scale_multiply: [
+        { prompt: "3.47 × 10 =", answer: "34.7", options: ["0.347", "3.47", "34.7", "347"] },
+        { prompt: "0.608 × 100 =", answer: "60.8", options: ["6.08", "60.8", "608", "0.0608"] },
+        { prompt: "4.205 × 1000 =", answer: "4205", options: ["420.5", "4205", "42.05", "4.205"] },
+        { prompt: "0.93 × 100 =", answer: "93", options: ["9.3", "93", "930", "0.093"] },
+        { prompt: "12.6 × 10 =", answer: "126", options: ["1.26", "12.6", "126", "1,260"] },
+      ],
+      decimal_scale_divide: [
+        { prompt: "34.7 ÷ 10 =", answer: "3.47", options: ["0.347", "3.47", "34.7", "347"] },
+        { prompt: "60.8 ÷ 100 =", answer: "0.608", options: ["6.08", "0.608", "0.0608", "608"] },
+        { prompt: "4205 ÷ 1000 =", answer: "4.205", options: ["42.05", "4.205", "0.4205", "420.5"] },
+        { prompt: "93 ÷ 100 =", answer: "0.93", options: ["0.093", "0.93", "9.3", "93"] },
+        { prompt: "126 ÷ 10 =", answer: "12.6", options: ["1.26", "12.6", "126", "0.126"] },
+      ],
+      decimal_scale_mixed: [
+        { prompt: "Which answer is correct for 0.84 × 100?", answer: "84", options: ["8.4", "84", "0.084", "840"] },
+        { prompt: "Which answer is correct for 5.2 ÷ 100?", answer: "0.052", options: ["0.52", "0.052", "5.2", "52"] },
+        { prompt: "2.305 × 10 =", answer: "23.05", options: ["2.305", "23.05", "230.5", "0.2305"] },
+        { prompt: "480 ÷ 1000 =", answer: "0.48", options: ["4.8", "0.48", "48", "0.048"] },
+        { prompt: "9.07 × 100 =", answer: "907", options: ["90.7", "907", "9.07", "0.907"] },
+      ],
+    } as const;
+    const templates = templateMap[explicitMode];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: shuffle([...chosen.options]),
+          answer: chosen.answer,
+          helper: "When multiplying or dividing by powers of 10, digits shift by place value.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          helper: "Track how many places the digits move.",
+          placeholder: "Type the answer",
+        };
+  }
+
+  if (explicitMode === "square_numbers_patterns") {
+    const templates = [
+      { prompt: "Which number is a square number?", answer: "49", options: ["42", "45", "49", "54"] },
+      { prompt: "Complete the pattern: 1, 4, 9, 16, __", answer: "25", options: ["20", "24", "25", "36"] },
+      { prompt: "What is 12 squared?", answer: "144", options: ["24", "122", "144", "1,244"] },
+      { prompt: "Which pair shows consecutive square numbers?", answer: "25 and 36", options: ["24 and 35", "25 and 36", "30 and 40", "36 and 49"] },
+      { prompt: "Type the next square number after 64.", answer: "81" },
+      { prompt: "Type the square root of 100.", answer: "10" },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice && "options" in chosen
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: shuffle([...chosen.options]),
+          answer: chosen.answer,
+          helper: "Square numbers are made by multiplying a number by itself.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          helper: "Think about which whole number times itself gives the square.",
+          placeholder: "Type the answer",
+        };
+  }
+
+  if (explicitMode === "integer_number_line") {
+    const templates = [
+      { prompt: "Which integer is greatest?", answer: "-2", options: ["-9", "-5", "-2", "-11"] },
+      { prompt: "Which integer is between -4 and 0?", answer: "-2", options: ["-6", "-5", "-2", "2"] },
+      { prompt: "Order these from least to greatest: -3, 4, -1", answer: "-3, -1, 4", options: ["-3, -1, 4", "-1, -3, 4", "4, -1, -3", "-3, 4, -1"] },
+      { prompt: "Type the integer that is 3 units to the right of -5.", answer: "-2" },
+      { prompt: "Type the integer that is 4 units to the left of 2.", answer: "-2" },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice && "options" in chosen
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: shuffle([...chosen.options]),
+          answer: chosen.answer,
+          helper: "On a number line, numbers further right are greater.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          helper: "Count the moves on the number line carefully.",
+          placeholder: "Type the integer",
+        };
+  }
+
+  if (explicitMode === "integer_operations") {
+    const templates = [
+      { prompt: "-3 + 8 =", answer: "5", options: ["-11", "-5", "5", "11"] },
+      { prompt: "6 - 9 =", answer: "-3", options: ["-3", "3", "-15", "15"] },
+      { prompt: "-7 + 2 =", answer: "-5", options: ["5", "-5", "-9", "9"] },
+      { prompt: "-4 - 3 =", answer: "-7", options: ["7", "-7", "-1", "1"] },
+      { prompt: "Type the answer: -6 + 11", answer: "5" },
+      { prompt: "Type the answer: 3 - 10", answer: "-7" },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice && "options" in chosen
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: shuffle([...chosen.options]),
+          answer: chosen.answer,
+          helper: "Use the sign and direction of each move.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          helper: "Think about whether the result ends up above or below zero.",
+          placeholder: "Type the integer",
+        };
+  }
+
+  if (explicitMode === "integer_real_world") {
+    const templates = [
+      { prompt: "The temperature is -2°C and rises 5°C. What is the new temperature?", answer: "3", options: ["-7", "-3", "3", "7"] },
+      { prompt: "A diver is at -12 m and rises 7 m. What is the new depth?", answer: "-5", options: ["5", "-5", "-19", "19"] },
+      { prompt: "A business has a loss of $8, then gains $13. What is the result?", answer: "5", options: ["-21", "-5", "5", "21"] },
+      { prompt: "Type the new elevation: -40 m then 18 m higher.", answer: "-22" },
+      { prompt: "Type the final result: a loss of 15, then a gain of 9.", answer: "-6" },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice && "options" in chosen
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: shuffle([...chosen.options]),
+          answer: chosen.answer,
+          helper: "Negative values can represent below zero, below sea level, or a loss.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          helper: "Use the context to decide whether the amount increases or decreases.",
+          placeholder: "Type the answer",
+        };
+  }
+
   if (explicitMode === "compare_fraction_decimal_percent") {
     const templates = [
       { prompt: "Which is largest: 1/2, 0.4, or 35%?", answer: "1/2", options: ["1/2", "0.4", "35%", "They are equal"] },
@@ -11885,6 +12038,188 @@ function generateGenericQuestion(
       helper: chosen.helper,
       visual: chosen.visual,
     };
+  }
+
+  if (explicitMode === "best_buy_unit_rate") {
+    const templates = [
+      { prompt: "Which is the better buy: 6 pens for $12 or 10 pens for $18?", answer: "10 pens for $18", options: ["6 pens for $12", "10 pens for $18", "They cost the same", "Cannot tell"] },
+      { prompt: "Which is the better buy: 8 yoghurts for $9.60 or 6 yoghurts for $7.80?", answer: "8 yoghurts for $9.60", options: ["8 yoghurts for $9.60", "6 yoghurts for $7.80", "They cost the same", "Cannot tell"] },
+      { prompt: "Which is the cheaper price per item: 4 drinks for $10 or 6 drinks for $18?", answer: "4 drinks for $10", options: ["4 drinks for $10", "6 drinks for $18", "They cost the same", "Cannot tell"] },
+      { prompt: "Type the unit price: 5 apples for $7.50.", answer: "1.50" },
+      { prompt: "Type the cost per ticket: 8 tickets for $36.", answer: "4.50" },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice && "options" in chosen
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: shuffle([...chosen.options]),
+          answer: chosen.answer,
+          helper: "Compare the cost for one item or one unit.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          helper: "Divide the total cost by the number of items.",
+          placeholder: "Type the unit price",
+        };
+  }
+
+  if (explicitMode === "function_machine_rules") {
+    const templates = [
+      { prompt: "A function machine adds 6. What is the output for 14?", answer: "20", options: ["8", "20", "24", "84"] },
+      { prompt: "A rule doubles then adds 1. What is the output for 7?", answer: "15", options: ["8", "14", "15", "21"] },
+      { prompt: "The rule is subtract 4. If the input is 19, what is the output?", answer: "15", options: ["15", "23", "76", "4"] },
+      { prompt: "Type the missing output: input 9, rule ×3.", answer: "27" },
+      { prompt: "Type the missing input if the rule is +5 and the output is 18.", answer: "13" },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice && "options" in chosen
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: shuffle([...chosen.options]),
+          answer: chosen.answer,
+          helper: "Follow the same rule from input to output.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          helper: "Work forward or backward using the rule.",
+          placeholder: "Type the answer",
+        };
+  }
+
+  if (explicitMode === "build_explain_rules") {
+    const templates = [
+      { prompt: "What rule matches 4 → 13, 6 → 17, 9 → 23?", answer: "×2 + 5", options: ["×2 + 5", "+9", "×3 + 1", "×2 + 1"] },
+      { prompt: "Which rule matches 5 → 16, 8 → 25, 10 → 31?", answer: "×3 + 1", options: ["×2 + 6", "×3 + 1", "×3 - 1", "+11"] },
+      { prompt: "Type the output if the rule is ×2 + 3 and the input is 12.", answer: "27" },
+      { prompt: "Type the missing input if the rule is ×4 and the output is 36.", answer: "9" },
+      { prompt: "Which rule best fits 2 → 9, 3 → 12, 5 → 18?", answer: "×3 + 3", options: ["×3 + 3", "×2 + 5", "×4 + 1", "+7"] },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice && "options" in chosen
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: shuffle([...chosen.options]),
+          answer: chosen.answer,
+          helper: "Look for the same relationship each time.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          helper: "Use the same rule for every value.",
+          placeholder: "Type the answer",
+        };
+  }
+
+  if (explicitMode === "rules_tables_spreadsheets") {
+    const templates = [
+      { prompt: "Complete the table for rule ×3: 2 → 6, 4 → 12, 7 → __", answer: "21", options: ["18", "20", "21", "24"] },
+      { prompt: "Rule: +8. Complete the table: 5 → 13, 9 → 17, 12 → __", answer: "20", options: ["18", "19", "20", "21"] },
+      { prompt: "Rule: ×5 - 2. What is the output for 6?", answer: "28", options: ["26", "28", "30", "32"] },
+      { prompt: "Type the missing output: rule ×4 + 1, input 8.", answer: "33" },
+      { prompt: "Type the missing input: rule +12, output 35.", answer: "23" },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice && "options" in chosen
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: shuffle([...chosen.options]),
+          answer: chosen.answer,
+          helper: "Use the rule consistently down the table.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          helper: "Treat each row like the same machine or spreadsheet formula.",
+          placeholder: "Type the answer",
+        };
+  }
+
+  if (explicitMode === "bidmas_evaluate") {
+    const templates = [
+      { prompt: "Evaluate 6 + 4 × 5", answer: "26", options: ["50", "46", "26", "34"] },
+      { prompt: "Evaluate (18 - 6) ÷ 3", answer: "4", options: ["2", "4", "6", "12"] },
+      { prompt: "Evaluate 7 + (3 × 8)", answer: "31", options: ["24", "31", "56", "80"] },
+      { prompt: "Type the value of 20 - 3 × 4.", answer: "8" },
+      { prompt: "Type the value of (5 + 7) × 2.", answer: "24" },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice && "options" in chosen
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: shuffle([...chosen.options]),
+          answer: chosen.answer,
+          helper: "Work through brackets first, then multiply or divide, then add or subtract.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          helper: "Keep the operation order clear.",
+          placeholder: "Type the answer",
+        };
+  }
+
+  if (explicitMode === "simple_equations") {
+    const templates = [
+      { prompt: "Solve x + 8 = 23", answer: "15", options: ["11", "15", "31", "184"] },
+      { prompt: "Solve 5x = 35", answer: "7", options: ["5", "6", "7", "8"] },
+      { prompt: "Solve y - 12 = 9", answer: "21", options: ["3", "21", "-21", "108"] },
+      { prompt: "Type the value of n if 4n = 28.", answer: "7" },
+      { prompt: "Type the value of p if p + 19 = 54.", answer: "35" },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice && "options" in chosen
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: shuffle([...chosen.options]),
+          answer: chosen.answer,
+          helper: "Use the inverse operation to undo the equation.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          helper: "Ask what operation reverses the one shown.",
+          placeholder: "Type the answer",
+        };
+  }
+
+  if (explicitMode === "equations_real_context") {
+    const templates = [
+      { prompt: "A concert ticket costs $12. Three friends spend $36 altogether. How many tickets did they buy each? Solve 12n = 36.", answer: "3", options: ["2", "3", "4", "12"] },
+      { prompt: "A bus has some passengers. 18 get on and there are now 47. Solve p + 18 = 47.", answer: "29", options: ["18", "29", "47", "65"] },
+      { prompt: "A container holds equal packs of 6 muffins. There are 42 muffins. Solve 6m = 42.", answer: "7", options: ["6", "7", "8", "42"] },
+      { prompt: "Type the missing number: A game score was 15, then 9 points were added to make 24. s + 9 = 24.", answer: "15" },
+      { prompt: "Type the missing number: 8 boxes hold 64 pencils. 8b = 64.", answer: "8" },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice && "options" in chosen
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: shuffle([...chosen.options]),
+          answer: chosen.answer,
+          helper: "Translate the context into the equation, then solve it.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          helper: "Use the equation to find the unknown amount.",
+          placeholder: "Type the answer",
+        };
   }
 
   if (

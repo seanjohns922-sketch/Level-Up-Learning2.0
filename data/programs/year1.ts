@@ -33,6 +33,16 @@ export type CurriculumCode =
   | "AC9M5N08"
   | "AC9M5N09"
   | "AC9M5N10"
+  | "AC9M6N01"
+  | "AC9M6N02"
+  | "AC9M6N03"
+  | "AC9M6N04"
+  | "AC9M6N05"
+  | "AC9M6N06"
+  | "AC9M6N07"
+  | "AC9M6N08"
+  | "AC9M6N09"
+  | "AC9M6N10"
   | "ALL";
 
 export type Lesson = {
