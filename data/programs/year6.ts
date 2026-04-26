@@ -13,15 +13,24 @@ const year6Rows: ProgramRow[] = [
   {
     week: 1,
     weekTopic: "Decimal Foundations",
-    focus: "Read, compare, and rename decimals to thousandths",
+    focus: "Read, break, build, and compare decimals to thousandths",
     lesson: 1,
     topic: "Decimal Place Value to Thousandths",
-    activity: "Use place value understanding to read, write, and rename decimals to thousandths.",
+    activity: "Decimals are precise numbers. Read, build, and compare decimals to thousandths.",
     curriculum: ["AC9M6N01"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "read_write_rename_decimals" }),
-      makeActivity("multiple_choice", 1, { mode: "read_write_rename_decimals" }),
-      makeActivity("typed_response", 1, { mode: "read_write_rename_decimals" }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_decimal_place_value_fluency",
+        rotationRole: "fast_thinking",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_decimal_flexibility",
+        rotationRole: "reasoning",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_decimal_reasoning_check",
+        rotationRole: "apply_create",
+      }),
     ],
   },
   {

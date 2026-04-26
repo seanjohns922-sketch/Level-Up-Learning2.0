@@ -8068,6 +8068,252 @@ function generateGenericQuestion(
         };
   }
 
+  if (explicitMode === "y6_decimal_place_value_fluency") {
+    const templates = [
+      {
+        prompt: "What is the value of the 6 in 3.264?",
+        answer: "0.06",
+        options: ["6", "0.6", "0.06", "0.006"],
+      },
+      {
+        prompt: "Which digit is in the hundredths place in 7.483?",
+        answer: "8",
+        options: ["4", "8", "3", "7"],
+      },
+      {
+        prompt: "Expand 4.506.",
+        answer: "4 + 0.5 + 0.006",
+        options: ["4 + 0.5 + 0.006", "4 + 0.05 + 0.006", "4 + 0.5 + 0.06", "4 + 5 + 0.006"],
+      },
+      {
+        prompt: "0.05 = 5 tenths",
+        answer: "False",
+        options: ["True", "False"],
+      },
+      {
+        prompt: "Write 0.809 in words.",
+        answer: "eight hundred and nine thousandths",
+        options: [
+          "eight hundred and nine thousandths",
+          "eight tenths and nine thousandths",
+          "eight hundred and nine hundredths",
+          "zero point eight zero nine tenths",
+        ],
+      },
+      {
+        prompt: "What is the value of the 2 in 5.207?",
+        answer: "0.2",
+        options: ["2", "0.2", "0.02", "0.002"],
+      },
+      {
+        prompt: "Which digit is in the thousandths place in 9.046?",
+        answer: "6",
+        options: ["0", "4", "6", "9"],
+      },
+      {
+        prompt: "Expand 2.034.",
+        answer: "2 + 0.03 + 0.004",
+        options: ["2 + 0.03 + 0.004", "2 + 0.3 + 0.04", "2 + 0.03 + 0.04", "2 + 3 + 0.004"],
+      },
+      {
+        prompt: "3.020 has 2 hundredths.",
+        answer: "True",
+        options: ["True", "False"],
+      },
+      {
+        prompt: "Write 5.007 in words.",
+        answer: "five and seven thousandths",
+        options: [
+          "five and seven thousandths",
+          "five and seven hundredths",
+          "five and seventy thousandths",
+          "five point zero zero seven tenths",
+        ],
+      },
+      {
+        prompt: "Which digit is in the tenths place in 6.314?",
+        answer: "3",
+        options: ["6", "3", "1", "4"],
+      },
+      {
+        prompt: "What is the value of the 4 in 0.406?",
+        answer: "0.4",
+        options: ["4", "0.4", "0.04", "0.004"],
+      },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: "Track tenths, hundredths, and thousandths carefully.",
+    };
+  }
+
+  if (explicitMode === "y6_decimal_flexibility") {
+    const templates = [
+      {
+        prompt: "3 ones, 4 tenths, 2 thousandths =",
+        answer: "3.402",
+        options: ["3.42", "3.402", "3.042", "34.002"],
+      },
+      {
+        prompt: "7.08 = 7 + ___",
+        answer: "0.08",
+        options: ["0.8", "0.08", "0.008", "8"],
+      },
+      {
+        prompt: "Which is equal to 0.7?",
+        answer: "7/10",
+        options: ["7/10", "7/100", "70/1000", "1/7"],
+      },
+      {
+        prompt: "Which is the better way to think about 3.99?",
+        answer: "4.00 - 0.01",
+        options: ["4.00 - 0.01", "3 + 0.09", "3 + 0.9 + 0.09", "39/10"],
+      },
+      {
+        prompt: "5.36 =",
+        answer: "5 + 0.3 + 0.06",
+        options: ["5 + 0.3 + 0.06", "5 + 0.03 + 0.6", "5 + 3 + 0.06", "5 + 0.36 + 0.6"],
+      },
+      {
+        prompt: "4 ones, 6 hundredths, 5 thousandths =",
+        answer: "4.065",
+        options: ["4.65", "4.065", "4.605", "4.0065"],
+      },
+      {
+        prompt: "6.304 = 6 + ___ + 0.004",
+        answer: "0.3",
+        options: ["0.03", "0.3", "3", "0.34"],
+      },
+      {
+        prompt: "Which decimal is equal to 406 thousandths?",
+        answer: "0.406",
+        options: ["4.06", "0.46", "0.406", "0.0406"],
+      },
+      {
+        prompt: "Which partition is correct for 8.125?",
+        answer: "8 + 0.1 + 0.02 + 0.005",
+        options: [
+          "8 + 0.1 + 0.02 + 0.005",
+          "8 + 0.12 + 0.5",
+          "8 + 0.1 + 0.2 + 0.005",
+          "8 + 1.25",
+        ],
+      },
+      {
+        prompt: "0.450 =",
+        answer: "45 hundredths",
+        options: ["45 tenths", "45 hundredths", "45 thousandths", "4.5 hundredths"],
+      },
+      {
+        prompt: "2.507 = 2 + 0.5 + ___",
+        answer: "0.007",
+        options: ["0.07", "0.007", "0.0007", "0.7"],
+      },
+      {
+        prompt: "Which is equal to 3.020?",
+        answer: "3 + 0.02",
+        options: ["3 + 0.2", "3 + 0.02", "3 + 0.002", "30 + 0.02"],
+      },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: "Break the decimal into place-value parts.",
+    };
+  }
+
+  if (explicitMode === "y6_decimal_reasoning_check") {
+    const templates = [
+      {
+        prompt: "Which is greater?",
+        answer: "0.5",
+        options: ["0.5", "0.45", "They are equal", "Cannot tell"],
+        helper: "Compare tenths before hundredths.",
+      },
+      {
+        prompt: "0.307 > 0.35",
+        answer: "False",
+        options: ["True", "False"],
+        helper: "Line up the decimal places before comparing.",
+      },
+      {
+        prompt: "4.50 > 4.5",
+        answer: "False",
+        options: ["True", "False"],
+        helper: "Trailing zeros do not change value.",
+      },
+      {
+        prompt: "Which decimal is closest to 1?",
+        answer: "0.99",
+        options: ["0.9", "0.99", "0.909", "0.89"],
+        helper: "Think about the smallest gap to 1.",
+      },
+      {
+        prompt: "3.78 + 2.21 is about",
+        answer: "6",
+        options: ["5", "6", "7", "8"],
+        helper: "Round each decimal and estimate quickly.",
+      },
+      {
+        prompt: "2.506 = 2 + 0.5 + 0.06",
+        answer: "Incorrect",
+        options: ["Correct", "Incorrect"],
+        helper: "Check the hundredths and thousandths places carefully.",
+      },
+      {
+        prompt: "Which is smaller?",
+        answer: "1.203",
+        options: ["1.23", "1.203", "They are equal", "Cannot tell"],
+        helper: "Use zero placeholders when comparing.",
+      },
+      {
+        prompt: "0.406 < 0.46",
+        answer: "True",
+        options: ["True", "False"],
+        helper: "Rewrite 0.46 as 0.460 to compare.",
+      },
+      {
+        prompt: "Which decimal is closest to 0.5?",
+        answer: "0.498",
+        options: ["0.45", "0.498", "0.57", "0.401"],
+        helper: "Look for the smallest difference.",
+      },
+      {
+        prompt: "6.32 + 1.71 is about",
+        answer: "8",
+        options: ["7", "8", "9", "10"],
+        helper: "Use whole-number estimates to judge the sum.",
+      },
+      {
+        prompt: "3.020 and 3.02 have the same value.",
+        answer: "True",
+        options: ["True", "False"],
+        helper: "Extra zeros at the end do not change the decimal.",
+      },
+      {
+        prompt: "Which statement is correct?",
+        answer: "0.125 < 0.205",
+        options: ["0.125 > 0.205", "0.125 < 0.205", "0.125 = 0.205", "Cannot tell"],
+        helper: "Compare tenths first, then hundredths.",
+      },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: chosen.helper,
+    };
+  }
+
   if (explicitMode === "decimals_between_benchmarks") {
     const value = level >= 5 ? randomStepValue(0.001, 5.999, 0.001) : randomStepValue(0.01, 1.99, 0.01);
     const lower = Math.floor(value * 10) / 10;
