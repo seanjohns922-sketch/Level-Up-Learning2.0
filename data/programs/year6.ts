@@ -35,15 +35,24 @@ const year6Rows: ProgramRow[] = [
   },
   {
     week: 1,
-    focus: "Add and subtract decimals accurately using place value alignment",
+    focus: "Solve decimal problems using efficient strategies",
     lesson: 2,
     topic: "Add & Subtract Decimals",
-    activity: "Solve decimal calculations by lining up place value and checking sensible totals.",
+    activity: "Not all decimals should be solved the same way. Add and subtract decimals accurately while choosing efficient strategies.",
     curriculum: ["AC9M6N01", "AC9M6N02"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "decimal_context" }),
-      makeActivity("multiple_choice", 1, { mode: "decimal_reasonableness" }),
-      makeActivity("typed_response", 1, { mode: "decimal_context" }),
+      makeActivity("typed_response", 1, {
+        mode: "y6_decimal_direct_calculation",
+        rotationRole: "fast_thinking",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "y6_decimal_strategy_selection",
+        rotationRole: "reasoning",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "y6_decimal_precision_under_pressure",
+        rotationRole: "apply_create",
+      }),
     ],
   },
   {

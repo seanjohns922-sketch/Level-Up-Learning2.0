@@ -8314,6 +8314,201 @@ function generateGenericQuestion(
     };
   }
 
+  if (explicitMode === "y6_decimal_direct_calculation") {
+    const templates = [
+      { prompt: "3.456 + 5.678 =", answer: "9.134" },
+      { prompt: "7.82 - 3.47 =", answer: "4.35" },
+      { prompt: "6.305 + 2.19 =", answer: "8.495" },
+      { prompt: "9.5 - 4.275 =", answer: "5.225" },
+      { prompt: "8.04 + 1.6 =", answer: "9.64" },
+      { prompt: "5.000 - 2.386 =", answer: "2.614" },
+      { prompt: "10 - 3.456 =", answer: "6.544" },
+      { prompt: "7.005 + 6.78 =", answer: "13.785" },
+      { prompt: "4.09 + 2.807 =", answer: "6.897" },
+      { prompt: "12.4 - 7.056 =", answer: "5.344" },
+      { prompt: "0.875 + 3.4 =", answer: "4.275" },
+      { prompt: "15 - 8.945 =", answer: "6.055" },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      helper: "Line up the place values carefully.",
+      placeholder: "Enter your answer",
+      visual: {
+        type: "numeric_input_only",
+      },
+    };
+  }
+
+  if (explicitMode === "y6_decimal_strategy_selection") {
+    const strategyBank = [
+      {
+        prompt: "3.99 + 2.75",
+        answer: "6.74",
+        strategies: [
+          strategyChoice("Round & adjust", "SMART CHOICE", "Nice strategy choice. Adjusting from 4 keeps the calculation clean."),
+          strategyChoice("Split the decimals", "CLEAR", "That works well. Keep tenths, hundredths, and thousandths aligned."),
+          strategyChoice("Column method", "CLEAR", "Valid method. Keep each decimal place in its column."),
+          strategyChoice("Mental maths", "FAST", "Fast if you track the small adjustment accurately."),
+        ],
+        reflectionPrompt: "Did your strategy keep the decimal places clear?",
+      },
+      {
+        prompt: "5.98 + 3.47",
+        answer: "9.45",
+        strategies: [
+          strategyChoice("Round & adjust", "SMART CHOICE", "A near-whole adjustment works well here."),
+          strategyChoice("Split the decimals", "CLEAR", "Good if you recombine each place value accurately."),
+          strategyChoice("Column method", "CLEAR", "Reliable choice. Align the decimals first."),
+          strategyChoice("Mental maths", "FAST", "Fast if you can hold the adjustment accurately."),
+        ],
+        reflectionPrompt: "Was your method fast, clear, or both?",
+      },
+      {
+        prompt: "7.5 + 2.25",
+        answer: "9.75",
+        strategies: [
+          strategyChoice("Split the decimals", "SMART CHOICE", "Nice choice. The decimal parts combine neatly here."),
+          strategyChoice("Mental maths", "FAST", "Fast if you can combine the tenths and hundredths cleanly."),
+          strategyChoice("Column method", "CLEAR", "Clear method. Add a zero placeholder if you need one."),
+          strategyChoice("Round & adjust", "TRY ANOTHER WAY", "That can work, but another method may feel cleaner."),
+        ],
+        reflectionPrompt: "Would you use the same strategy next time?",
+      },
+      {
+        prompt: "6.7 + 3.3",
+        answer: "10",
+        strategies: [
+          strategyChoice("Make a whole number", "FAST", "Great spotting. These decimals complete a whole exactly."),
+          strategyChoice("Mental maths", "FAST", "Quick and clean if you see the decimal complement."),
+          strategyChoice("Column method", "CLEAR", "Still works well if you align the tenths."),
+          strategyChoice("Split the decimals", "SMART CHOICE", "A good way to see the whole-number total."),
+        ],
+        reflectionPrompt: "Did your strategy help you see the whole number quickly?",
+      },
+      {
+        prompt: "9.99 + 4.2",
+        answer: "14.19",
+        strategies: [
+          strategyChoice("Round & adjust", "SMART CHOICE", "Strong choice. Thinking 10 + 4.2 - 0.01 is efficient."),
+          strategyChoice("Column method", "CLEAR", "Reliable if you place the decimal points carefully."),
+          strategyChoice("Split the decimals", "CLEAR", "Works well if you keep the place values separate."),
+          strategyChoice("Mental maths", "FAST", "Fast if you keep track of the hundredth adjustment."),
+        ],
+        reflectionPrompt: "Could another strategy also work here?",
+      },
+      {
+        prompt: "12.5 - 4.75",
+        answer: "7.75",
+        strategies: [
+          strategyChoice("Column method", "CLEAR", "Good choice. This subtraction needs careful regrouping."),
+          strategyChoice("Split the decimals", "SMART CHOICE", "Valid if you separate whole and decimal parts carefully."),
+          strategyChoice("Round & adjust", "TRY ANOTHER WAY", "Possible, but another strategy may be cleaner."),
+          strategyChoice("Mental maths", "TRY ANOTHER WAY", "Valid, but accuracy matters with mixed decimal lengths."),
+        ],
+        reflectionPrompt: "Was your strategy accurate under pressure?",
+      },
+      {
+        prompt: "8.25 + 1.75",
+        answer: "10",
+        strategies: [
+          strategyChoice("Make a whole number", "FAST", "Nice choice. These decimals complete a whole exactly."),
+          strategyChoice("Mental maths", "FAST", "Quick if you spot the complement to 10."),
+          strategyChoice("Column method", "CLEAR", "Still valid and accurate."),
+          strategyChoice("Split the decimals", "SMART CHOICE", "Works well because the parts balance neatly."),
+        ],
+        reflectionPrompt: "Did your strategy make the total obvious?",
+      },
+      {
+        prompt: "6.01 + 2.99",
+        answer: "9",
+        strategies: [
+          strategyChoice("Make a whole number", "SMART CHOICE", "Strong choice. The decimal parts balance perfectly."),
+          strategyChoice("Mental maths", "FAST", "Fast if you notice the complement."),
+          strategyChoice("Column method", "CLEAR", "Reliable if you align hundredths."),
+          strategyChoice("Round & adjust", "SMART CHOICE", "Also efficient because the numbers are close to easy totals."),
+        ],
+        reflectionPrompt: "Would you solve a similar decimal pair the same way?",
+      },
+      {
+        prompt: "4.995 + 2.105",
+        answer: "7.1",
+        strategies: [
+          strategyChoice("Round & adjust", "SMART CHOICE", "A neat strategy. The thousandths make a tidy adjustment."),
+          strategyChoice("Column method", "CLEAR", "Reliable if you keep all three decimal places aligned."),
+          strategyChoice("Split the decimals", "CLEAR", "Works if you combine each place carefully."),
+          strategyChoice("Mental maths", "TRY ANOTHER WAY", "Possible, but another strategy may feel safer."),
+        ],
+        reflectionPrompt: "Did your method handle thousandths clearly?",
+      },
+      {
+        prompt: "15 - 8.875",
+        answer: "6.125",
+        strategies: [
+          strategyChoice("Column method", "CLEAR", "Good choice. Zero placeholders make this subtraction easier."),
+          strategyChoice("Round & adjust", "SMART CHOICE", "This can work if you track the decimal adjustment carefully."),
+          strategyChoice("Split the decimals", "CLEAR", "Works well if you subtract the whole and decimal parts accurately."),
+          strategyChoice("Mental maths", "TRY ANOTHER WAY", "Possible, but precision matters here."),
+        ],
+        reflectionPrompt: "Did your strategy keep the zero placeholders clear?",
+      },
+    ] as const;
+    const chosen = strategyBank[randInt(0, strategyBank.length - 1)] ?? strategyBank[0]!;
+
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      helper: "Choose a useful strategy, then solve exactly.",
+      placeholder: "Enter your answer",
+      visual: {
+        type: "strategy_ownership",
+        missionTitle: "Choose Your Strategy",
+        missionDescription: "Pick a strategy that works for you, then solve.",
+        supportText: "Good mathematicians choose a strategy that matches the numbers.",
+        problemLabel: chosen.prompt,
+        strategies: [...chosen.strategies],
+        reflectionPrompt: chosen.reflectionPrompt,
+        reflectionOptions: [
+          "FAST",
+          "CLEAR",
+          "SMART CHOICE",
+          "TRY ANOTHER WAY",
+        ],
+      },
+    };
+  }
+
+  if (explicitMode === "y6_decimal_precision_under_pressure") {
+    const templates = [
+      { prompt: "4.567 + 3.289 =", answer: "7.856" },
+      { prompt: "8.904 - 2.678 =", answer: "6.226" },
+      { prompt: "7.005 + 6.78 =", answer: "13.785" },
+      { prompt: "10 - 3.456 =", answer: "6.544" },
+      { prompt: "12.6 - 7.89 =", answer: "4.71" },
+      { prompt: "15.004 - 8.276 =", answer: "6.728" },
+      { prompt: "6.809 + 2.395 =", answer: "9.204" },
+      { prompt: "20 - 11.875 =", answer: "8.125" },
+      { prompt: "9.08 - 3.456 =", answer: "5.624" },
+      { prompt: "13.75 + 6.089 =", answer: "19.839" },
+      { prompt: "18.003 - 9.998 =", answer: "8.005" },
+      { prompt: "5.607 + 8.908 =", answer: "14.515" },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      helper: "Check tenths, hundredths, and thousandths carefully.",
+      placeholder: "Enter your answer",
+      visual: {
+        type: "numeric_input_only",
+      },
+    };
+  }
+
   if (explicitMode === "decimals_between_benchmarks") {
     const value = level >= 5 ? randomStepValue(0.001, 5.999, 0.001) : randomStepValue(0.01, 1.99, 0.01);
     const lower = Math.floor(value * 10) / 10;
