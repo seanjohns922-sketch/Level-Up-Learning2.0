@@ -138,6 +138,14 @@ export type RuleBoxVisualData = {
   decisionLabel?: string;
 };
 
+export type DecimalShiftVisualData = {
+  type: "decimal_shift";
+  original: string;
+  factor: 10 | 100 | 1000;
+  result?: string;
+  hideResult?: boolean;
+};
+
 export type PlaceValueBuilderQuestion = {
   kind: "place_value_builder";
   prompt: string;
@@ -2933,6 +2941,7 @@ export type MultipleChoiceQuestion = {
       }
     | MABVisualData
     | DecimalVisualData
+    | DecimalShiftVisualData
     | MoneyVisualData
     | SameDenominatorOperationVisualData
     | DiscountPriceVisualData
@@ -2969,6 +2978,7 @@ export type TypedResponseQuestion = {
       }
     | MABVisualData
     | DecimalVisualData
+    | DecimalShiftVisualData
     | ColumnMultiplicationVisualData
     | BoxMethodVisualData
     | MultiplicationStrategyVisualData
@@ -10279,20 +10289,17 @@ function generateGenericQuestion(
       prompt: string;
       answer: string;
       options: string[];
-      visual?: {
-        type: "rule_box";
-        title: string;
-        steps: string[];
-      };
+      visual?: DecimalShiftVisualData;
     }> = [
       {
         prompt: "0.4 × 10 = ?",
         answer: "4",
         options: ["0.04", "4", "40"],
         visual: {
-          type: "rule_box",
-          title: "Scale by 10",
-          steps: ["0.4 × 10", "4"],
+          type: "decimal_shift" as const,
+          original: "0.4",
+          factor: 10,
+          result: "4",
         },
       },
       {
@@ -10300,9 +10307,10 @@ function generateGenericQuestion(
         answer: "32",
         options: ["3.2", "32", "320"],
         visual: {
-          type: "rule_box",
-          title: "Scale by 100",
-          steps: ["0.32 × 100", "32"],
+          type: "decimal_shift" as const,
+          original: "0.32",
+          factor: 100,
+          result: "32",
         },
       },
       { prompt: "3.4 × 10 = ?", answer: "34", options: ["3.04", "34", "340"] },
@@ -10389,26 +10397,54 @@ function generateGenericQuestion(
   }
 
   if (explicitMode === "y6_decimal_scale_apply") {
-    const templates = [
+    const templates: Array<{
+      prompt: string;
+      answer: string;
+      visual?: DecimalShiftVisualData;
+    }> = [
       { prompt: "A number is multiplied by 100. It becomes 450. What was the original number?", answer: "4.5" },
       { prompt: "Fill in the blank: __ × 100 = 320", answer: "3.2" },
-      { prompt: "0.078 × 1000 = ?", answer: "78" },
+      {
+        prompt: "0.078 × 1000 = ?",
+        answer: "78",
+        visual: { type: "decimal_shift", original: "0.078", factor: 1000, result: "78", hideResult: true },
+      },
       { prompt: "A number is multiplied by 10. It becomes 56. What was the original number?", answer: "5.6" },
       { prompt: "__ × 1000 = 7", answer: "0.007" },
-      { prompt: "If 0.49 × 100 = ?, type the answer.", answer: "49" },
+      {
+        prompt: "If 0.49 × 100 = ?, type the answer.",
+        answer: "49",
+        visual: { type: "decimal_shift", original: "0.49", factor: 100, result: "49", hideResult: true },
+      },
       { prompt: "A value is multiplied by 1000 and becomes 630. What was the original number?", answer: "0.63" },
       { prompt: "Fill in the blank: __ × 10 = 80.4", answer: "8.04" },
-      { prompt: "6.7 × 100 = ?", answer: "670" },
+      {
+        prompt: "6.7 × 100 = ?",
+        answer: "670",
+        visual: { type: "decimal_shift", original: "6.7", factor: 100, result: "670", hideResult: true },
+      },
       { prompt: "A number is multiplied by 100 and becomes 900.6. What was the original number?", answer: "9.006" },
       { prompt: "__ × 10 = 25.8", answer: "2.58" },
-      { prompt: "0.004 × 1000 = ?", answer: "4" },
+      {
+        prompt: "0.004 × 1000 = ?",
+        answer: "4",
+        visual: { type: "decimal_shift", original: "0.004", factor: 1000, result: "4", hideResult: true },
+      },
       { prompt: "A number is multiplied by 1000 and becomes 8. What was the original number?", answer: "0.008" },
       { prompt: "Fill in the blank: __ × 100 = 78", answer: "0.78" },
-      { prompt: "7.21 × 100 = ?", answer: "721" },
+      {
+        prompt: "7.21 × 100 = ?",
+        answer: "721",
+        visual: { type: "decimal_shift", original: "7.21", factor: 100, result: "721", hideResult: true },
+      },
       { prompt: "A number is multiplied by 10 and becomes 50.2. What was the original number?", answer: "5.02" },
       { prompt: "__ × 100 = 47", answer: "0.47" },
-      { prompt: "4.305 × 10 = ?", answer: "43.05" },
-    ] as const;
+      {
+        prompt: "4.305 × 10 = ?",
+        answer: "43.05",
+        visual: { type: "decimal_shift", original: "4.305", factor: 10, result: "43.05", hideResult: true },
+      },
+    ];
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
     return {
       kind: "typed_response",
@@ -10416,6 +10452,7 @@ function generateGenericQuestion(
       answer: chosen.answer,
       helper: "Use place value to scale or reverse the scaling.",
       placeholder: "Type the answer",
+      visual: chosen.visual,
     };
   }
 

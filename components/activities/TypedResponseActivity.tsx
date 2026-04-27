@@ -6,6 +6,7 @@ import type { TypedResponseQuestion, WrittenMethodLayout } from "@/data/activiti
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import PlaceValueMABVisual from "@/components/activities/PlaceValueMABVisual";
 import DecimalModelVisual from "@/components/activities/DecimalModelVisual";
+import DecimalShiftVisual from "@/components/activities/DecimalShiftVisual";
 import MoneyContextVisual from "@/components/activities/MoneyContextVisual";
 import ArrayVisual from "@/components/activities/ArrayVisual";
 import RuleBoxVisual from "@/components/activities/RuleBoxVisual";
@@ -2495,6 +2496,9 @@ export default function TypedResponseActivity({
       ) : null}
       {questionData.visual?.type === "decimal_model" ? (
         <DecimalModelVisual visual={questionData.visual} title="Decimal model" />
+      ) : null}
+      {questionData.visual?.type === "decimal_shift" ? (
+        <DecimalShiftVisual visual={questionData.visual} />
       ) : null}
       {questionData.visual?.type === "array" ? (
         <ArrayVisual
