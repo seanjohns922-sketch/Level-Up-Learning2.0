@@ -3003,7 +3003,13 @@ function SessionPage() {
     const questionsPerLesson = qConfig?.questionsPerLesson ?? 5;
     const weekPlan = quizWeekPlan;
 
-    if (year === "Year 2" || year === "Year 3" || year === "Year 4" || year === "Year 5") {
+    if (
+      year === "Year 2" ||
+      year === "Year 3" ||
+      year === "Year 4" ||
+      year === "Year 5" ||
+      year === "Year 6"
+    ) {
       if (weekPlan) {
         return buildStructuredWeeklyQuizQuestions(weekPlan, questionsPerLesson);
       }
