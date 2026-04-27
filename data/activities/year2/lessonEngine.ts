@@ -10456,6 +10456,168 @@ function generateGenericQuestion(
     };
   }
 
+  if (explicitMode === "y6_decimal_divide_quick") {
+    const templates: Array<{
+      prompt: string;
+      answer: string;
+      options: string[];
+      visual?: DecimalShiftVisualData;
+    }> = [
+      {
+        prompt: "6 ÷ 10 = ?",
+        answer: "0.6",
+        options: ["0.6", "6", "60"],
+        visual: { type: "decimal_shift", original: "6", factor: 10, result: "0.6" },
+      },
+      {
+        prompt: "32 ÷ 100 = ?",
+        answer: "0.32",
+        options: ["3.2", "0.32", "0.032"],
+        visual: { type: "decimal_shift", original: "32", factor: 100, result: "0.32" },
+      },
+      { prompt: "34 ÷ 10 = ?", answer: "3.4", options: ["3.4", "0.34", "34"] },
+      { prompt: "5.6 ÷ 10 = ?", answer: "0.56", options: ["5.6", "0.56", "0.056"] },
+      { prompt: "721 ÷ 100 = ?", answer: "7.21", options: ["7.21", "72.1", "0.721"] },
+      { prompt: "9 ÷ 100 = ?", answer: "0.09", options: ["0.9", "0.09", "0.009"] },
+      { prompt: "43.05 ÷ 10 = ?", answer: "4.305", options: ["43.05", "4.305", "0.4305"] },
+      { prompt: "6700 ÷ 1000 = ?", answer: "6.7", options: ["67", "6.7", "0.67"] },
+      { prompt: "4 ÷ 1000 = ?", answer: "0.004", options: ["0.4", "0.04", "0.004"] },
+      { prompt: "25.8 ÷ 10 = ?", answer: "2.58", options: ["2.58", "0.258", "25.8"] },
+      { prompt: "70.5 ÷ 100 = ?", answer: "0.705", options: ["7.05", "0.705", "0.0705"] },
+      { prompt: "80.4 ÷ 10 = ?", answer: "8.04", options: ["8.04", "0.804", "80.4"] },
+      { prompt: "630 ÷ 1000 = ?", answer: "0.63", options: ["6.3", "0.63", "0.063"] },
+      { prompt: "109 ÷ 100 = ?", answer: "1.09", options: ["10.9", "1.09", "0.109"] },
+      { prompt: "8 ÷ 1000 = ?", answer: "0.008", options: ["0.8", "0.08", "0.008"] },
+      { prompt: "50.2 ÷ 10 = ?", answer: "5.02", options: ["5.02", "0.502", "50.2"] },
+      { prompt: "47 ÷ 100 = ?", answer: "0.47", options: ["4.7", "0.47", "0.047"] },
+      { prompt: "900.6 ÷ 100 = ?", answer: "9.006", options: ["90.06", "9.006", "0.9006"] },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: "Check how the value scales down.",
+      visual: chosen.visual,
+    };
+  }
+
+  if (explicitMode === "y6_decimal_divide_thinking") {
+    const templates = [
+      { prompt: "Which is correct? 5.6 ÷ 10 =", answer: "0.56", options: ["0.56", "56", "5.06"] },
+      {
+        prompt: "What happens when dividing by 100?",
+        answer: "digits shift right 2 places",
+        options: ["digits shift right 2 places", "digits shift left 2 places", "number gets bigger"],
+      },
+      { prompt: "Which is smaller?", answer: "0.45 ÷ 10", options: ["0.45 ÷ 10", "0.45"] },
+      { prompt: "78 ÷ 100 = ___", answer: "0.78", options: ["7.8", "0.78", "0.078"] },
+      { prompt: "Which is correct? 56 ÷ 100 =", answer: "0.56", options: ["0.56", "5.6", "56"] },
+      {
+        prompt: "Spot the error: 3.4 ÷ 10 = 34",
+        answer: "Decimal moved wrong way",
+        options: ["Decimal moved wrong way", "Calculation correct", "Multiplied instead"],
+      },
+      { prompt: "Which is correct? 6700 ÷ 1000 =", answer: "6.7", options: ["6.7", "67", "0.67"] },
+      {
+        prompt: "What happens when dividing by 1000?",
+        answer: "digits shift right 3 places",
+        options: ["digits shift right 3 places", "digits shift left 3 places", "the value stays the same"],
+      },
+      { prompt: "Which is smaller?", answer: "7.21 ÷ 100", options: ["7.21", "7.21 ÷ 100"] },
+      { prompt: "43.05 ÷ 10 = ___", answer: "4.305", options: ["4.305", "43.05", "0.4305"] },
+      { prompt: "Which is correct? 4 ÷ 1000 =", answer: "0.004", options: ["0.4", "0.04", "0.004"] },
+      {
+        prompt: "Spot the error: 721 ÷ 100 = 72.1",
+        answer: "Not enough place-value shift",
+        options: ["Not enough place-value shift", "Calculation correct", "Number should get bigger"],
+      },
+      { prompt: "Which equals 6.7?", answer: "670 ÷ 100", options: ["670 ÷ 100", "67 ÷ 10", "6700 ÷ 100"] },
+      { prompt: "Which is correct? 109 ÷ 100 =", answer: "1.09", options: ["10.9", "1.09", "0.109"] },
+      {
+        prompt: "What is true when dividing a decimal by 10?",
+        answer: "the value gets 10 times smaller",
+        options: ["the value gets 10 times smaller", "the value gets bigger", "the digits stay in the same place"],
+      },
+      { prompt: "Which is correct? 70.5 ÷ 100 =", answer: "0.705", options: ["7.05", "0.705", "0.0705"] },
+      { prompt: "Which is smaller?", answer: "78 ÷ 1000", options: ["78", "78 ÷ 1000"] },
+      {
+        prompt: "Spot the error: 5.02 ÷ 10 = 50.2",
+        answer: "Decimal moved wrong way",
+        options: ["Decimal moved wrong way", "Calculation correct", "Divided incorrectly"],
+      },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: "Think about whether the number should get smaller.",
+    };
+  }
+
+  if (explicitMode === "y6_decimal_divide_apply") {
+    const templates: Array<{
+      prompt: string;
+      answer: string;
+      visual?: DecimalShiftVisualData;
+    }> = [
+      { prompt: "A number is divided by 100. It becomes 4.5. What was the original number?", answer: "450" },
+      { prompt: "Fill in the blank: __ ÷ 100 = 3.2", answer: "320" },
+      {
+        prompt: "78 ÷ 1000 = ?",
+        answer: "0.078",
+        visual: { type: "decimal_shift", original: "78", factor: 1000, result: "0.078", hideResult: true },
+      },
+      { prompt: "A number is divided by 10. It becomes 5.6. What was the original number?", answer: "56" },
+      { prompt: "__ ÷ 1000 = 0.007", answer: "7" },
+      {
+        prompt: "49 ÷ 100 = ?",
+        answer: "0.49",
+        visual: { type: "decimal_shift", original: "49", factor: 100, result: "0.49", hideResult: true },
+      },
+      { prompt: "A value is divided by 1000 and becomes 0.63. What was the original number?", answer: "630" },
+      { prompt: "Fill in the blank: __ ÷ 10 = 8.04", answer: "80.4" },
+      {
+        prompt: "670 ÷ 100 = ?",
+        answer: "6.7",
+        visual: { type: "decimal_shift", original: "670", factor: 100, result: "6.7", hideResult: true },
+      },
+      { prompt: "A number is divided by 100 and becomes 9.006. What was the original number?", answer: "900.6" },
+      { prompt: "__ ÷ 10 = 2.58", answer: "25.8" },
+      {
+        prompt: "8 ÷ 1000 = ?",
+        answer: "0.008",
+        visual: { type: "decimal_shift", original: "8", factor: 1000, result: "0.008", hideResult: true },
+      },
+      { prompt: "A number is divided by 1000 and becomes 0.008. What was the original number?", answer: "8" },
+      { prompt: "Fill in the blank: __ ÷ 100 = 0.78", answer: "78" },
+      {
+        prompt: "721 ÷ 100 = ?",
+        answer: "7.21",
+        visual: { type: "decimal_shift", original: "721", factor: 100, result: "7.21", hideResult: true },
+      },
+      { prompt: "A number is divided by 10 and becomes 5.02. What was the original number?", answer: "50.2" },
+      { prompt: "__ ÷ 100 = 0.47", answer: "47" },
+      {
+        prompt: "43.05 ÷ 10 = ?",
+        answer: "4.305",
+        visual: { type: "decimal_shift", original: "43.05", factor: 10, result: "4.305", hideResult: true },
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      helper: "Use place value to scale down or reverse the division.",
+      placeholder: "Type the answer",
+      visual: chosen.visual,
+    };
+  }
+
   if (explicitMode === "factor_multiple_algorithm") {
     const multipleChoiceTemplates: Array<{
       prompt: string;

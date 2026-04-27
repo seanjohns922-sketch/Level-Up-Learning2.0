@@ -172,12 +172,21 @@ const year6Rows: ProgramRow[] = [
     focus: "Scale decimals back efficiently by powers of 10",
     lesson: 2,
     topic: "Divide Decimals by 10, 100, 1000",
-    activity: "Use place value to divide decimals by powers of 10 and explain how digits shift.",
+    activity: "Dividing by 10, 100, and 1000 scales numbers down. Watch what happens to the digits.",
     curriculum: ["AC9M6N01", "AC9M6N02"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "decimal_scale_divide" }),
-      makeActivity("multiple_choice", 1, { mode: "decimal_scale_divide" }),
-      makeActivity("typed_response", 1, { mode: "decimal_scale_divide" }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_decimal_divide_quick",
+        rotationRole: "fast_thinking",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_decimal_divide_thinking",
+        rotationRole: "reasoning",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "y6_decimal_divide_apply",
+        rotationRole: "apply_create",
+      }),
     ],
   },
   {
