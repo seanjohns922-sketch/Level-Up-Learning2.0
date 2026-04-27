@@ -9923,6 +9923,171 @@ function generateGenericQuestion(
         };
   }
 
+  if (explicitMode === "y6_prime_quick_classify") {
+    const templates = [
+      { prompt: "Is 7 prime, composite, or neither?", answer: "Prime", options: ["Prime", "Composite", "Neither"] },
+      { prompt: "Is 12 prime, composite, or neither?", answer: "Composite", options: ["Prime", "Composite", "Neither"] },
+      { prompt: "Is 1 prime, composite, or neither?", answer: "Neither", options: ["Prime", "Composite", "Neither"] },
+      { prompt: "Is 29 prime, composite, or neither?", answer: "Prime", options: ["Prime", "Composite", "Neither"] },
+      { prompt: "Is 45 prime, composite, or neither?", answer: "Composite", options: ["Prime", "Composite", "Neither"] },
+      { prompt: "Is 37 prime, composite, or neither?", answer: "Prime", options: ["Prime", "Composite", "Neither"] },
+      { prompt: "Is 51 prime, composite, or neither?", answer: "Composite", options: ["Prime", "Composite", "Neither"] },
+      { prompt: "Is 2 prime, composite, or neither?", answer: "Prime", options: ["Prime", "Composite", "Neither"] },
+      { prompt: "Is 57 prime, composite, or neither?", answer: "Composite", options: ["Prime", "Composite", "Neither"] },
+      { prompt: "Is 97 prime, composite, or neither?", answer: "Prime", options: ["Prime", "Composite", "Neither"] },
+      { prompt: "Is 49 prime, composite, or neither?", answer: "Composite", options: ["Prime", "Composite", "Neither"] },
+      { prompt: "Is 83 prime, composite, or neither?", answer: "Prime", options: ["Prime", "Composite", "Neither"] },
+      { prompt: "Is 25 prime, composite, or neither?", answer: "Composite", options: ["Prime", "Composite", "Neither"] },
+      { prompt: "Is 73 prime, composite, or neither?", answer: "Prime", options: ["Prime", "Composite", "Neither"] },
+      { prompt: "Is 91 prime, composite, or neither?", answer: "Composite", options: ["Prime", "Composite", "Neither"] },
+      { prompt: "Is 41 prime, composite, or neither?", answer: "Prime", options: ["Prime", "Composite", "Neither"] },
+      { prompt: "Is 64 prime, composite, or neither?", answer: "Composite", options: ["Prime", "Composite", "Neither"] },
+      { prompt: "Is 89 prime, composite, or neither?", answer: "Prime", options: ["Prime", "Composite", "Neither"] },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: "Use quick checks. Do not overthink it.",
+    };
+  }
+
+  if (explicitMode === "y6_prime_structure_check") {
+    const templates = [
+      {
+        prompt: "15\n1 × 15\n3 × 5\n\nWhat does this tell you?",
+        answer: "Composite",
+        options: ["Prime", "Composite"],
+      },
+      {
+        prompt: "21 ÷ 2 ✗\n21 ÷ 3 ✓\n\nWhat does this tell you?",
+        answer: "Composite",
+        options: ["Prime", "Composite"],
+      },
+      {
+        prompt: "Why is 17 prime?",
+        answer: "Only divisible by 1 and 17",
+        options: ["Only divisible by 1 and 17", "It is odd", "It ends in 7"],
+      },
+      {
+        prompt: "How many factors does 13 have?",
+        answer: "2",
+        options: ["2", "3", "4"],
+      },
+      {
+        prompt: "Which is prime?",
+        answer: "31",
+        options: ["27", "31", "39"],
+      },
+      {
+        prompt: "9\n1 × 9\n3 × 3\n\nWhat does this tell you?",
+        answer: "Composite",
+        options: ["Prime", "Composite"],
+      },
+      {
+        prompt: "Why is 23 prime?",
+        answer: "Only divisible by 1 and 23",
+        options: ["Only divisible by 1 and 23", "It is odd", "It is greater than 20"],
+      },
+      {
+        prompt: "How many factors does 29 have?",
+        answer: "2",
+        options: ["2", "3", "5"],
+      },
+      {
+        prompt: "27 ÷ 2 ✗\n27 ÷ 3 ✓\n\nWhat does this tell you?",
+        answer: "Composite",
+        options: ["Prime", "Composite"],
+      },
+      {
+        prompt: "Which number has exactly two factors?",
+        answer: "19",
+        options: ["19", "21", "27"],
+      },
+      {
+        prompt: "Why is 35 composite?",
+        answer: "It has a factor pair other than 1 and 35",
+        options: ["It has a factor pair other than 1 and 35", "It is odd", "It ends in 5"],
+      },
+      {
+        prompt: "How many factors does 1 have?",
+        answer: "1",
+        options: ["0", "1", "2"],
+      },
+      {
+        prompt: "Which is composite?",
+        answer: "51",
+        options: ["43", "47", "51"],
+      },
+      {
+        prompt: "49\n1 × 49\n7 × 7\n\nWhat does this tell you?",
+        answer: "Composite",
+        options: ["Prime", "Composite"],
+      },
+      {
+        prompt: "Why is 2 prime?",
+        answer: "Only divisible by 1 and 2",
+        options: ["Only divisible by 1 and 2", "It is even", "It is the smallest prime"],
+      },
+      {
+        prompt: "Which quick check proves 39 is composite?",
+        answer: "39 is divisible by 3",
+        options: ["39 is divisible by 3", "39 is odd", "39 is greater than 30"],
+      },
+      {
+        prompt: "How many factors does a prime number always have?",
+        answer: "2",
+        options: ["1", "2", "More than 2"],
+      },
+      {
+        prompt: "Which number is prime?",
+        answer: "59",
+        options: ["55", "57", "59"],
+      },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: "Look for a factor pair or a quick divisibility clue.",
+    };
+  }
+
+  if (explicitMode === "y6_prime_eliminate_fast") {
+    const templates = [
+      { prompt: "Which cannot be prime?", answer: "21", options: ["21", "23", "29"] },
+      { prompt: "All even numbers greater than 2 are:", answer: "Composite", options: ["Prime", "Composite", "Sometimes prime"] },
+      { prompt: "Which number is NOT composite?", answer: "17", options: ["25", "17", "21"] },
+      { prompt: "Which is prime?", answer: "53", options: ["49", "51", "53"] },
+      { prompt: "Which number is neither prime nor composite?", answer: "1", options: ["1", "2", "3"] },
+      { prompt: "Which cannot be prime?", answer: "33", options: ["31", "33", "37"] },
+      { prompt: "Which is prime?", answer: "61", options: ["57", "61", "63"] },
+      { prompt: "Which number is NOT composite?", answer: "71", options: ["71", "77", "81"] },
+      { prompt: "Which cannot be prime?", answer: "55", options: ["53", "55", "59"] },
+      { prompt: "True or false: Every prime number greater than 2 is odd.", answer: "True", options: ["True", "False"] },
+      { prompt: "Which is prime?", answer: "67", options: ["65", "67", "69"] },
+      { prompt: "Which number is composite?", answer: "87", options: ["83", "87", "89"] },
+      { prompt: "Which cannot be prime?", answer: "91", options: ["79", "83", "91"] },
+      { prompt: "Which is NOT composite?", answer: "43", options: ["39", "43", "45"] },
+      { prompt: "True or false: 2 is the only even prime number.", answer: "True", options: ["True", "False"] },
+      { prompt: "Which is prime?", answer: "79", options: ["77", "79", "81"] },
+      { prompt: "Which number is neither prime nor composite?", answer: "1", options: ["0", "1", "2"] },
+      { prompt: "Which cannot be prime?", answer: "39", options: ["37", "39", "41"] },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: "Eliminate fast. Look for obvious factors first.",
+    };
+  }
+
   if (explicitMode === "factor_multiple_algorithm") {
     const multipleChoiceTemplates: Array<{
       prompt: string;

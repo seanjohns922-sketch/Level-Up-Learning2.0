@@ -83,12 +83,21 @@ const year6Rows: ProgramRow[] = [
     focus: "Classify numbers as prime or composite and connect this to factor structure",
     lesson: 1,
     topic: "Prime vs Composite Numbers",
-    activity: "Identify whether numbers are prime or composite and use factor logic to justify decisions.",
+    activity: "Some numbers break down easily. Others do not. Identify prime and composite numbers using smart checks.",
     curriculum: ["AC9M6N03"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "prime_composite_hcf" }),
-      makeActivity("multiple_choice", 1, { mode: "prime_composite_hcf" }),
-      makeActivity("typed_response", 1, { mode: "prime_composite_hcf" }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_prime_quick_classify",
+        rotationRole: "fast_thinking",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_prime_structure_check",
+        rotationRole: "reasoning",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_prime_eliminate_fast",
+        rotationRole: "apply_create",
+      }),
     ],
   },
   {
