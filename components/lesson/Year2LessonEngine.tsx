@@ -384,7 +384,7 @@ export function Year2LessonEngine({
   onExit: () => void;
   renderCompletionCard?: (summary: LessonPerformanceSummary) => ReactNode;
 }) {
-  const totalSeconds = 8 * 60;
+  const totalSeconds = 9 * 60;
   const level = useMemo(() => getLevelForLesson(lesson), [lesson]);
   const lessonPool = useMemo(() => buildLessonActivityPool(level, lesson), [level, lesson]);
   const activities = lessonPool.activities;

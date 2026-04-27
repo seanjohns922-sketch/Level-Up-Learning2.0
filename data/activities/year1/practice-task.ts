@@ -2,9 +2,9 @@ export type Difficulty = "easy" | "medium" | "hard";
 
 /** Time-based difficulty gates (strict) */
 export function getDifficultyFromTime(elapsedSeconds: number): Difficulty {
-  if (elapsedSeconds < 240) return "easy";   // 0:00–4:00
-  if (elapsedSeconds < 390) return "medium"; // 4:00–6:30
-  return "hard";                              // 6:30–8:00
+  if (elapsedSeconds < 270) return "easy";   // 0:00–4:30
+  if (elapsedSeconds < 440) return "medium"; // 4:30–7:20
+  return "hard";                              // 7:20–9:00
 }
 
 /** Scale a numeric range by difficulty */

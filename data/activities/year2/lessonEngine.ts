@@ -8502,6 +8502,171 @@ function generateGenericQuestion(
     };
   }
 
+  if (explicitMode === "y6_decimal_quick_estimate") {
+    const templates = [
+      { prompt: "3.456 + 5.678 ≈ ?", answer: "9", options: ["8", "9", "10"] },
+      { prompt: "7.82 - 3.47 ≈ ?", answer: "4", options: ["3", "4", "5"] },
+      { prompt: "6.3 + 2.9 ≈ ?", answer: "9", options: ["8", "9", "10"] },
+      { prompt: "12.6 - 7.89 ≈ ?", answer: "5", options: ["4", "5", "6"] },
+      { prompt: "8.904 - 2.678 ≈ ?", answer: "6", options: ["5", "6", "7"] },
+      { prompt: "4.567 + 3.289 ≈ ?", answer: "8", options: ["7", "8", "9"] },
+      { prompt: "10 - 3.456 ≈ ?", answer: "7", options: ["5", "6", "7"] },
+      { prompt: "13.75 + 6.089 ≈ ?", answer: "20", options: ["19", "20", "21"] },
+      { prompt: "5.004 + 2.991 ≈ ?", answer: "8", options: ["7", "8", "9"] },
+      { prompt: "9.08 - 3.456 ≈ ?", answer: "6", options: ["5", "6", "7"] },
+      { prompt: "15.004 - 8.276 ≈ ?", answer: "7", options: ["6", "7", "8"] },
+      { prompt: "7.005 + 6.78 ≈ ?", answer: "14", options: ["13", "14", "15"] },
+      { prompt: "18.3 - 9.7 ≈ ?", answer: "9", options: ["8", "9", "10"] },
+      { prompt: "2.48 + 6.52 ≈ ?", answer: "9", options: ["8", "9", "10"] },
+      { prompt: "11.09 - 4.88 ≈ ?", answer: "6", options: ["5", "6", "7"] },
+      { prompt: "0.498 + 0.503 ≈ ?", answer: "1", options: ["0", "1", "2"] },
+      { prompt: "19.95 + 4.08 ≈ ?", answer: "24", options: ["23", "24", "25"] },
+      { prompt: "6.809 - 2.395 ≈ ?", answer: "4", options: ["3", "4", "5"] },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: "Round quickly, then judge the size of the answer.",
+    };
+  }
+
+  if (explicitMode === "y6_decimal_is_it_right") {
+    const templates = [
+      { prompt: "3.456 + 5.678 = 9.134", answer: "Correct", options: ["Correct", "Incorrect"] },
+      { prompt: "7.2 + 3.8 = 10.9", answer: "Incorrect", options: ["Correct", "Incorrect"] },
+      { prompt: "6.78 - 2.91 = 3.87", answer: "Correct", options: ["Correct", "Incorrect"] },
+      { prompt: "4.5 + 2.3 = 9.8", answer: "Too big", options: ["Too big", "Too small", "Correct"] },
+      { prompt: "8.04 + 1.6 = 9.64", answer: "Correct", options: ["Correct", "Incorrect"] },
+      { prompt: "5.000 - 2.386 = 2.614", answer: "Correct", options: ["Correct", "Incorrect"] },
+      { prompt: "9.5 - 4.275 = 5.775", answer: "Incorrect", options: ["Correct", "Incorrect"] },
+      { prompt: "6.305 + 2.19 = 8.495", answer: "Correct", options: ["Correct", "Incorrect"] },
+      { prompt: "10 - 3.456 = 7.544", answer: "Too big", options: ["Too big", "Too small", "Correct"] },
+      { prompt: "7.005 + 6.78 = 13.785", answer: "Correct", options: ["Correct", "Incorrect"] },
+      { prompt: "12.6 - 7.89 = 3.71", answer: "Too small", options: ["Too big", "Too small", "Correct"] },
+      { prompt: "4.567 + 3.289 = 7.856", answer: "Correct", options: ["Correct", "Incorrect"] },
+      { prompt: "13.75 + 6.089 = 18.839", answer: "Too small", options: ["Too big", "Too small", "Correct"] },
+      { prompt: "8.904 - 2.678 = 6.226", answer: "Correct", options: ["Correct", "Incorrect"] },
+      { prompt: "3.09 + 0.91 = 4.1", answer: "Too big", options: ["Too big", "Too small", "Correct"] },
+      { prompt: "15.004 - 8.276 = 6.728", answer: "Correct", options: ["Correct", "Incorrect"] },
+      { prompt: "0.406 + 0.54 = 0.946", answer: "Correct", options: ["Correct", "Incorrect"] },
+      { prompt: "11.09 - 4.88 = 7.21", answer: "Too big", options: ["Too big", "Too small", "Correct"] },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: "Check the size of the result before trusting it.",
+    };
+  }
+
+  if (explicitMode === "y6_decimal_spot_error") {
+    const templates = [
+      {
+        prompt: "4.56 + 2.3 = 6.86",
+        answer: "Decimal places not aligned",
+        options: ["Decimal places not aligned", "Multiplied", "Nothing wrong"],
+      },
+      {
+        prompt: "2.506 = 2 + 0.5 + 0.06",
+        answer: "Thousandths misread",
+        options: ["Thousandths misread", "Ones incorrect", "Nothing wrong"],
+      },
+      {
+        prompt: "7.2 - 3.85 = 4.65",
+        answer: "Regrouping error",
+        options: ["Regrouping error", "Decimal ignored", "Nothing wrong"],
+      },
+      {
+        prompt: "3.78 + 2.25 = 5.93",
+        answer: "Addition error",
+        options: ["Addition error", "Decimal missing", "Nothing wrong"],
+      },
+      {
+        prompt: "8.04 + 1.6 = 8.20",
+        answer: "Ones incorrect",
+        options: ["Ones incorrect", "Hundredths ignored", "Nothing wrong"],
+      },
+      {
+        prompt: "10 - 3.456 = 7.456",
+        answer: "Subtraction error",
+        options: ["Subtraction error", "Decimal moved", "Nothing wrong"],
+      },
+      {
+        prompt: "5.007 = 5 + 0.07",
+        answer: "Thousandths misread",
+        options: ["Thousandths misread", "Tenths doubled", "Nothing wrong"],
+      },
+      {
+        prompt: "6.305 + 2.19 = 8.305",
+        answer: "Hundredths ignored",
+        options: ["Hundredths ignored", "Subtraction error", "Nothing wrong"],
+      },
+      {
+        prompt: "9.5 - 4.275 = 5.225",
+        answer: "Nothing wrong",
+        options: ["Regrouping error", "Decimal places not aligned", "Nothing wrong"],
+      },
+      {
+        prompt: "13.75 + 6.089 = 19.839",
+        answer: "Nothing wrong",
+        options: ["Addition error", "Decimal missing", "Nothing wrong"],
+      },
+      {
+        prompt: "0.406 = 4 tenths and 6 thousandths",
+        answer: "Zero placeholder mistake",
+        options: ["Zero placeholder mistake", "Ones incorrect", "Nothing wrong"],
+      },
+      {
+        prompt: "4.90 and 4.9 are different values",
+        answer: "Zero placeholder mistake",
+        options: ["Zero placeholder mistake", "Decimal moved", "Nothing wrong"],
+      },
+      {
+        prompt: "12.6 - 7.89 = 4.81",
+        answer: "Regrouping error",
+        options: ["Regrouping error", "Decimal ignored", "Nothing wrong"],
+      },
+      {
+        prompt: "7.005 + 6.78 = 13.685",
+        answer: "Place value addition error",
+        options: ["Place value addition error", "Multiplied", "Nothing wrong"],
+      },
+      {
+        prompt: "8.904 - 2.678 = 6.226",
+        answer: "Nothing wrong",
+        options: ["Regrouping error", "Ones incorrect", "Nothing wrong"],
+      },
+      {
+        prompt: "3.020 = 3 + 0.2",
+        answer: "Hundredths misread",
+        options: ["Hundredths misread", "Tenths misread", "Nothing wrong"],
+      },
+      {
+        prompt: "11.09 - 4.88 = 6.11",
+        answer: "Subtraction error",
+        options: ["Subtraction error", "Decimal moved", "Nothing wrong"],
+      },
+      {
+        prompt: "0.498 is closer to 0.4 than 0.5",
+        answer: "Benchmark judgement error",
+        options: ["Benchmark judgement error", "Thousandths misread", "Nothing wrong"],
+      },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: "Look at the decimal places before choosing.",
+    };
+  }
+
   if (explicitMode === "decimals_between_benchmarks") {
     const value = level >= 5 ? randomStepValue(0.001, 5.999, 0.001) : randomStepValue(0.01, 1.99, 0.01);
     const lower = Math.floor(value * 10) / 10;

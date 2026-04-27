@@ -57,15 +57,24 @@ const year6Rows: ProgramRow[] = [
   },
   {
     week: 1,
-    focus: "Estimate decimal answers and judge whether calculations are reasonable",
+    focus: "Quickly estimate decimal answers, judge correctness, and catch decimal mistakes",
     lesson: 3,
     topic: "Estimate & Check with Decimals",
-    activity: "Round decimals, estimate answers, and decide whether results make sense.",
+    activity: "You do not need to redo every calculation. Estimate quickly, check answers, and catch decimal mistakes fast.",
     curriculum: ["AC9M6N01", "AC9M6N02"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "decimal_rounding_estimation" }),
-      makeActivity("multiple_choice", 1, { mode: "decimal_reasonableness" }),
-      makeActivity("typed_response", 1, { mode: "decimal_rounding_estimation" }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_decimal_quick_estimate",
+        rotationRole: "fast_thinking",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_decimal_is_it_right",
+        rotationRole: "reasoning",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_decimal_spot_error",
+        rotationRole: "apply_create",
+      }),
     ],
   },
   {
