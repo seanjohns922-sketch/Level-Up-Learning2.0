@@ -148,8 +148,13 @@ export type DecimalShiftVisualData = {
 
 export type IntegerNumberLineVisualData = {
   type: "integer_number_line";
-  min: number;
-  max: number;
+  min?: number;
+  max?: number;
+  markerValue?: number;
+  highlightedValues?: readonly number[];
+  startValue?: number;
+  movement?: number;
+  interactive?: boolean;
   target?: number;
   highlights?: readonly number[];
   start?: number;
