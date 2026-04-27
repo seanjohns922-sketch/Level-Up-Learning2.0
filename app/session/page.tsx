@@ -1571,14 +1571,17 @@ function numberToWords(n: number): string {
   return String(n);
 }
 
-function normalizeAnswerText(input: string) {
-  return input
+function normalizeAnswerText(input?: string | number | null) {
+  return String(input ?? "")
     .toLowerCase()
     .trim()
     .replace(/[^a-z0-9]/g, "");
 }
 
-function isTypedAnswerCorrect(rawTyped: string, rawCorrect: string | undefined) {
+function isTypedAnswerCorrect(
+  rawTyped?: string | number | null,
+  rawCorrect?: string | number | null
+) {
   const typed = normalizeAnswerText(rawTyped);
   if (typed === "") return false;
 
