@@ -21,6 +21,73 @@ export type Year6WeeklyQuizWeek = {
   questions: Year6WeeklyQuizQuestion[];
 };
 
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function validateYear6WeeklyQuizQuestion(
+  question: Year6WeeklyQuizQuestion,
+  weekNumber: number,
+  index: number
+) {
+  const label = `Year 6 Week ${weekNumber} quiz question ${index + 1}`;
+
+  if (!isNonEmptyString(question.id)) {
+    throw new Error(`[Year6WeeklyQuiz] ${label} is missing a valid id.`);
+  }
+  if (![1, 2, 3].includes(question.lessonTag)) {
+    throw new Error(`[Year6WeeklyQuiz] ${label} has an invalid lessonTag.`);
+  }
+  if (!isNonEmptyString(question.questionText)) {
+    throw new Error(`[Year6WeeklyQuiz] ${label} is missing questionText.`);
+  }
+  if (question.answerType !== "numeric" && question.answerType !== "multipleChoice") {
+    throw new Error(`[Year6WeeklyQuiz] ${label} has an invalid answerType.`);
+  }
+  if (!isNonEmptyString(question.correctAnswer)) {
+    throw new Error(`[Year6WeeklyQuiz] ${label} is missing correctAnswer.`);
+  }
+  if (!isNonEmptyString(question.feedbackCorrect)) {
+    throw new Error(`[Year6WeeklyQuiz] ${label} is missing feedbackCorrect.`);
+  }
+  if (!isNonEmptyString(question.feedbackIncorrect)) {
+    throw new Error(`[Year6WeeklyQuiz] ${label} is missing feedbackIncorrect.`);
+  }
+
+  if (question.answerType === "multipleChoice") {
+    if (!Array.isArray(question.options) || question.options.length < 2) {
+      throw new Error(`[Year6WeeklyQuiz] ${label} must have a valid options array.`);
+    }
+    if (!question.options.every((option) => isNonEmptyString(option))) {
+      throw new Error(`[Year6WeeklyQuiz] ${label} has an empty option value.`);
+    }
+    if (!question.options.includes(question.correctAnswer)) {
+      throw new Error(
+        `[Year6WeeklyQuiz] ${label} correctAnswer must exactly match one of the option strings.`
+      );
+    }
+  }
+}
+
+function validateYear6WeeklyQuizWeek(week: Year6WeeklyQuizWeek) {
+  if (!isNonEmptyString(week.quizTitle) || !isNonEmptyString(week.weeklyFocus)) {
+    throw new Error(`[Year6WeeklyQuiz] Week ${week.weekNumber} is missing quiz metadata.`);
+  }
+  if (
+    !isNonEmptyString(week.lesson1Title) ||
+    !isNonEmptyString(week.lesson2Title) ||
+    !isNonEmptyString(week.lesson3Title)
+  ) {
+    throw new Error(`[Year6WeeklyQuiz] Week ${week.weekNumber} is missing lesson titles.`);
+  }
+  if (!Array.isArray(week.questions) || week.questions.length === 0) {
+    throw new Error(`[Year6WeeklyQuiz] Week ${week.weekNumber} has no questions.`);
+  }
+  week.questions.forEach((question, index) =>
+    validateYear6WeeklyQuizQuestion(question, week.weekNumber, index)
+  );
+}
+
 const year6WeeklyQuizWeeks: Record<number, Year6WeeklyQuizWeek> = {
   1: {
     weekNumber: 1,
@@ -186,5 +253,7 @@ const year6WeeklyQuizWeeks: Record<number, Year6WeeklyQuizWeek> = {
 };
 
 export function getYear6WeeklyQuiz(weekNumber: number): Year6WeeklyQuizWeek | null {
-  return year6WeeklyQuizWeeks[weekNumber] ?? null;
+  const quiz = year6WeeklyQuizWeeks[weekNumber] ?? null;
+  if (quiz) validateYear6WeeklyQuizWeek(quiz);
+  return quiz;
 }

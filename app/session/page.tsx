@@ -141,6 +141,8 @@ type QuizQuestion = {
   options?: string[];
   correctIndex?: number;
   correctValue?: string;
+  feedbackCorrect?: string;
+  feedbackIncorrect?: string;
   responseType?: "number";
   audioText?: string;
   visual?: {
@@ -284,6 +286,9 @@ function toExplicitWeeklyQuizQuestion(
   question: Year6WeeklyQuizQuestion,
   index: number
 ): QuizQuestion {
+  const prompt = String(question.questionText ?? "").trim();
+  const correctAnswer = String(question.correctAnswer ?? "").trim();
+
   if (question.answerType === "numeric") {
     return {
       id: question.id || `q${index}`,
@@ -292,8 +297,10 @@ function toExplicitWeeklyQuizQuestion(
       skill: `lesson${question.lessonTag}`,
       activityType: "typed_response",
       kind: "typed",
-      prompt: question.questionText,
-      correctValue: question.correctAnswer,
+      prompt,
+      correctValue: correctAnswer,
+      feedbackCorrect: question.feedbackCorrect,
+      feedbackIncorrect: question.feedbackIncorrect,
       responseType: "number",
       quizMeta: {
         type: "explicit_year6_quiz",
@@ -302,7 +309,7 @@ function toExplicitWeeklyQuizQuestion(
     };
   }
 
-  const options = question.options ?? [];
+  const options = (question.options ?? []).map((option) => String(option ?? "").trim());
   return {
     id: question.id || `q${index}`,
     lessonNumber: question.lessonTag,
@@ -310,9 +317,11 @@ function toExplicitWeeklyQuizQuestion(
     skill: `lesson${question.lessonTag}`,
     activityType: "multiple_choice",
     kind: "mcq",
-    prompt: question.questionText,
+    prompt,
     options,
-    correctIndex: options.findIndex((option) => option === question.correctAnswer),
+    correctIndex: options.findIndex((option) => option === correctAnswer),
+    feedbackCorrect: question.feedbackCorrect,
+    feedbackIncorrect: question.feedbackIncorrect,
     quizMeta: {
       type: "explicit_year6_quiz",
       difficulty: "middle",
