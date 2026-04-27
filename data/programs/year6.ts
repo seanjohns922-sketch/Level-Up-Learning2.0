@@ -150,12 +150,21 @@ const year6Rows: ProgramRow[] = [
     focus: "Scale decimals efficiently by powers of 10",
     lesson: 1,
     topic: "Multiply Decimals by 10, 100, 1000",
-    activity: "Shift decimal values using place value patterns when multiplying by powers of 10.",
+    activity: "Multiplying by 10, 100, and 1000 scales numbers. Watch what happens to the digits.",
     curriculum: ["AC9M6N01", "AC9M6N02"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "decimal_scale_multiply" }),
-      makeActivity("multiple_choice", 1, { mode: "decimal_scale_multiply" }),
-      makeActivity("typed_response", 1, { mode: "decimal_scale_multiply" }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_decimal_scale_quick",
+        rotationRole: "fast_thinking",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_decimal_scale_thinking",
+        rotationRole: "reasoning",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "y6_decimal_scale_apply",
+        rotationRole: "apply_create",
+      }),
     ],
   },
   {

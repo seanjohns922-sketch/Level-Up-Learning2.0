@@ -10274,6 +10274,151 @@ function generateGenericQuestion(
     };
   }
 
+  if (explicitMode === "y6_decimal_scale_quick") {
+    const templates: Array<{
+      prompt: string;
+      answer: string;
+      options: string[];
+      visual?: {
+        type: "rule_box";
+        title: string;
+        steps: string[];
+      };
+    }> = [
+      {
+        prompt: "0.4 × 10 = ?",
+        answer: "4",
+        options: ["0.04", "4", "40"],
+        visual: {
+          type: "rule_box",
+          title: "Scale by 10",
+          steps: ["0.4 × 10", "4"],
+        },
+      },
+      {
+        prompt: "0.32 × 100 = ?",
+        answer: "32",
+        options: ["3.2", "32", "320"],
+        visual: {
+          type: "rule_box",
+          title: "Scale by 100",
+          steps: ["0.32 × 100", "32"],
+        },
+      },
+      { prompt: "3.4 × 10 = ?", answer: "34", options: ["3.04", "34", "340"] },
+      { prompt: "0.56 × 10 = ?", answer: "5.6", options: ["0.056", "5.6", "56"] },
+      { prompt: "7.21 × 100 = ?", answer: "721", options: ["72.1", "721", "7210"] },
+      { prompt: "0.09 × 100 = ?", answer: "9", options: ["0.9", "9", "90"] },
+      { prompt: "4.305 × 10 = ?", answer: "43.05", options: ["4.305", "43.05", "430.5"] },
+      { prompt: "6.7 × 1000 = ?", answer: "6700", options: ["67", "670", "6700"] },
+      { prompt: "0.004 × 1000 = ?", answer: "4", options: ["0.4", "4", "40"] },
+      { prompt: "2.58 × 10 = ?", answer: "25.8", options: ["2.58", "25.8", "258"] },
+      { prompt: "0.705 × 100 = ?", answer: "70.5", options: ["7.05", "70.5", "705"] },
+      { prompt: "8.04 × 10 = ?", answer: "80.4", options: ["8.4", "80.4", "804"] },
+      { prompt: "0.63 × 1000 = ?", answer: "630", options: ["63", "630", "6300"] },
+      { prompt: "1.09 × 100 = ?", answer: "109", options: ["10.9", "109", "1090"] },
+      { prompt: "0.008 × 1000 = ?", answer: "8", options: ["0.8", "8", "80"] },
+      { prompt: "5.02 × 10 = ?", answer: "50.2", options: ["5.2", "50.2", "502"] },
+      { prompt: "0.47 × 100 = ?", answer: "47", options: ["4.7", "47", "470"] },
+      { prompt: "9.006 × 100 = ?", answer: "900.6", options: ["90.06", "900.6", "9006"] },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: "Check how the value scales.",
+      visual: chosen.visual,
+    };
+  }
+
+  if (explicitMode === "y6_decimal_scale_thinking") {
+    const templates = [
+      { prompt: "Which is correct? 3.4 × 10 =", answer: "34", options: ["34", "3.04", "340"] },
+      {
+        prompt: "What happens when multiplying by 100?",
+        answer: "digits shift left 2 places",
+        options: ["digits shift left 2 places", "digits shift right 2 places", "number gets smaller"],
+      },
+      { prompt: "Which is greater?", answer: "0.45 × 10", options: ["0.45 × 10", "0.45"] },
+      { prompt: "0.78 × 100 = ___", answer: "78", options: ["7.8", "78", "780"] },
+      { prompt: "Which is correct? 5.6 × 100 =", answer: "560", options: ["560", "56", "5.6"] },
+      {
+        prompt: "Spot the error: 0.34 × 10 = 0.034",
+        answer: "Decimal moved wrong way",
+        options: ["Decimal moved wrong way", "Calculation correct", "Multiplied incorrectly"],
+      },
+      { prompt: "Which is correct? 0.09 × 100 =", answer: "9", options: ["0.9", "9", "90"] },
+      {
+        prompt: "What happens when multiplying by 1000?",
+        answer: "digits shift left 3 places",
+        options: ["digits shift left 3 places", "digits shift right 3 places", "number stays the same"],
+      },
+      { prompt: "Which is greater?", answer: "6.3 × 100", options: ["6.3", "6.3 × 100"] },
+      { prompt: "4.305 × 10 = ___", answer: "43.05", options: ["4.305", "43.05", "430.5"] },
+      { prompt: "Which is correct? 0.004 × 1000 =", answer: "4", options: ["0.4", "4", "40"] },
+      {
+        prompt: "Spot the error: 7.21 × 100 = 72.1",
+        answer: "Not enough place-value shift",
+        options: ["Not enough place-value shift", "Calculation correct", "Number should get smaller"],
+      },
+      { prompt: "Which equals 670?", answer: "6.7 × 100", options: ["6.7 × 100", "6.7 × 10", "6.7 × 1000"] },
+      { prompt: "Which is correct? 1.09 × 100 =", answer: "109", options: ["10.9", "109", "1090"] },
+      {
+        prompt: "What is true when multiplying a decimal by 10?",
+        answer: "the value gets 10 times larger",
+        options: ["the value gets 10 times larger", "the value gets smaller", "the digits stay in the same place"],
+      },
+      { prompt: "Which is correct? 0.705 × 100 =", answer: "70.5", options: ["7.05", "70.5", "705"] },
+      { prompt: "Which is greater?", answer: "0.078 × 1000", options: ["0.078", "0.078 × 1000"] },
+      {
+        prompt: "Spot the error: 8.04 × 10 = 804",
+        answer: "Shifted too many places",
+        options: ["Shifted too many places", "Calculation correct", "Number should be smaller"],
+      },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: "Think about size and place value.",
+    };
+  }
+
+  if (explicitMode === "y6_decimal_scale_apply") {
+    const templates = [
+      { prompt: "A number is multiplied by 100. It becomes 450. What was the original number?", answer: "4.5" },
+      { prompt: "Fill in the blank: __ × 100 = 320", answer: "3.2" },
+      { prompt: "0.078 × 1000 = ?", answer: "78" },
+      { prompt: "A number is multiplied by 10. It becomes 56. What was the original number?", answer: "5.6" },
+      { prompt: "__ × 1000 = 7", answer: "0.007" },
+      { prompt: "If 0.49 × 100 = ?, type the answer.", answer: "49" },
+      { prompt: "A value is multiplied by 1000 and becomes 630. What was the original number?", answer: "0.63" },
+      { prompt: "Fill in the blank: __ × 10 = 80.4", answer: "8.04" },
+      { prompt: "6.7 × 100 = ?", answer: "670" },
+      { prompt: "A number is multiplied by 100 and becomes 900.6. What was the original number?", answer: "9.006" },
+      { prompt: "__ × 10 = 25.8", answer: "2.58" },
+      { prompt: "0.004 × 1000 = ?", answer: "4" },
+      { prompt: "A number is multiplied by 1000 and becomes 8. What was the original number?", answer: "0.008" },
+      { prompt: "Fill in the blank: __ × 100 = 78", answer: "0.78" },
+      { prompt: "7.21 × 100 = ?", answer: "721" },
+      { prompt: "A number is multiplied by 10 and becomes 50.2. What was the original number?", answer: "5.02" },
+      { prompt: "__ × 100 = 47", answer: "0.47" },
+      { prompt: "4.305 × 10 = ?", answer: "43.05" },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      helper: "Use place value to scale or reverse the scaling.",
+      placeholder: "Type the answer",
+    };
+  }
+
   if (explicitMode === "factor_multiple_algorithm") {
     const multipleChoiceTemplates: Array<{
       prompt: string;
