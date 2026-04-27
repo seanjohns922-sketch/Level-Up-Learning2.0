@@ -214,15 +214,15 @@ const year6Rows: ProgramRow[] = [
   {
     week: 4,
     weekTopic: "Integers & Number Lines",
-    focus: "Compare and order integers using number lines and benchmark positions",
+    focus: "Compare and order integers using position and direction",
     lesson: 1,
     topic: "Integers on Number Lines",
-    activity: "Place, compare, and order positive and negative integers on number lines.",
+    activity: "Compare and order integers using position and direction.",
     curriculum: ["AC9M6N01"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "integer_number_line" }),
-      makeActivity("multiple_choice", 1, { mode: "integer_number_line" }),
-      makeActivity("typed_response", 1, { mode: "integer_number_line" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_integer_position_order" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_integer_compare" }),
+      makeActivity("typed_response", 1, { mode: "y6_integer_apply_think" }),
     ],
   },
   {
