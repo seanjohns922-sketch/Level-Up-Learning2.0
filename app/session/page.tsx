@@ -6,6 +6,7 @@ import { readProgress, updateProgress } from "@/data/progress";
 import { ACTIVE_STUDENT_KEY } from "@/data/progress";
 import { supabase } from "@/lib/supabase";
 import { getProgramForYear } from "@/data/programs";
+import { getYear6WeeklyQuiz, type Year6WeeklyQuizQuestion } from "@/data/quizzes/year6";
 import PostTestTransition from "@/components/PostTestTransition";
 import {
   buildQuizActivityPool,
@@ -217,6 +218,13 @@ type LessonBreakdown = {
   skill?: string;
 };
 
+function getLessonFeedback(correct: number, total: number) {
+  if (total <= 0) return "Needs more practice.";
+  if (correct === total) return "Skill mastered.";
+  if (correct >= Math.ceil(total * 0.6)) return "Good progress.";
+  return "Needs more practice.";
+}
+
 function toYear2QuizQuestion(
   question: Year2MultipleChoiceQuestion | Year2TypedResponseQuestion,
   lessonNumber: number,
@@ -270,6 +278,72 @@ function toAssessmentTypedQuizQuestion(
   }
 
   return null;
+}
+
+function toExplicitWeeklyQuizQuestion(
+  question: Year6WeeklyQuizQuestion,
+  index: number
+): QuizQuestion {
+  if (question.answerType === "numeric") {
+    return {
+      id: question.id || `q${index}`,
+      lessonNumber: question.lessonTag,
+      lessonTag: question.lessonTag,
+      skill: `lesson${question.lessonTag}`,
+      activityType: "typed_response",
+      kind: "typed",
+      prompt: question.questionText,
+      correctValue: question.correctAnswer,
+      responseType: "number",
+      quizMeta: {
+        type: "explicit_year6_quiz",
+        difficulty: "middle",
+      },
+    };
+  }
+
+  const options = question.options ?? [];
+  return {
+    id: question.id || `q${index}`,
+    lessonNumber: question.lessonTag,
+    lessonTag: question.lessonTag,
+    skill: `lesson${question.lessonTag}`,
+    activityType: "multiple_choice",
+    kind: "mcq",
+    prompt: question.questionText,
+    options,
+    correctIndex: options.findIndex((option) => option === question.correctAnswer),
+    quizMeta: {
+      type: "explicit_year6_quiz",
+      difficulty: "middle",
+    },
+  };
+}
+
+function buildYear6ExplicitWeeklyQuizQuestions(
+  weekNumber: number,
+  questionsPerLesson: number
+): QuizQuestion[] | null {
+  const quiz = getYear6WeeklyQuiz(weekNumber);
+  if (!quiz) return null;
+
+  const expectedTotal = questionsPerLesson * 3;
+  if (quiz.questions.length !== expectedTotal) {
+    throw new Error(
+      `[Year6WeeklyQuiz] Week ${weekNumber} expected ${expectedTotal} questions, received ${quiz.questions.length}.`
+    );
+  }
+
+  ([1, 2, 3] as const).forEach((lessonTag) => {
+    const count = quiz.questions.filter((question) => question.lessonTag === lessonTag).length;
+    if (count !== questionsPerLesson) {
+      throw new Error(
+        `[Year6WeeklyQuiz] Week ${weekNumber} Lesson ${lessonTag} expected ${questionsPerLesson} questions, received ${count}.`
+      );
+    }
+  });
+
+  return quiz.questions.map((question, index) => toExplicitWeeklyQuizQuestion(question, index + 1));
 }
 
 function numericOptionStrings(answer: number, spread: number, min = 0) {
@@ -677,6 +751,10 @@ function buildStructuredWeeklyQuizQuestions(
 ): QuizQuestion[] {
   const yearMatch = weekPlan.id.match(/^y(\d+)-/);
   const yearNumber = yearMatch ? Number(yearMatch[1]) : 1;
+  if (yearNumber === 6) {
+    const explicitQuestions = buildYear6ExplicitWeeklyQuizQuestions(weekPlan.week, questionsPerLesson);
+    if (explicitQuestions) return explicitQuestions;
+  }
   const quizLessons = weekPlan.lessons.slice(0, 3);
 
   if (yearNumber === 5 && weekPlan.week === 11) {
@@ -1332,6 +1410,20 @@ function getWeakestLessonBreakdown(items: LessonBreakdown[]): LessonBreakdown | 
     if (a.correct !== b.correct) return a.correct - b.correct;
     return a.lessonNumber - b.lessonNumber;
   })[0] ?? null;
+}
+
+function getLowestLessonBreakdowns(items: LessonBreakdown[]): LessonBreakdown[] {
+  if (items.length === 0) return [];
+  const sorted = [...items].sort((a, b) => {
+    if (a.percent !== b.percent) return a.percent - b.percent;
+    if (a.correct !== b.correct) return a.correct - b.correct;
+    return a.lessonNumber - b.lessonNumber;
+  });
+  const lowest = sorted[0];
+  if (!lowest) return [];
+  return sorted.filter(
+    (item) => item.percent === lowest.percent && item.correct === lowest.correct
+  );
 }
 
 function randInt(min: number, max: number) {
@@ -3281,6 +3373,10 @@ function SessionPage() {
     () => getWeakestLessonBreakdown(lessonBreakdown),
     [lessonBreakdown]
   );
+  const weakestLessonBreakdowns = useMemo(
+    () => getLowestLessonBreakdowns(lessonBreakdown),
+    [lessonBreakdown]
+  );
 
   function completeWeek(currentWeek: number) {
     const p = readProgress();
@@ -4178,6 +4274,9 @@ function SessionPage() {
             {quizSubmitted ? (
               <div className="mt-4 rounded-2xl border border-gray-200 bg-white p-4">
                 <div className="text-sm font-bold text-gray-900">
+                  Score: {finalScore}/{quizQuestions.length}
+                </div>
+                <div className="mt-1 text-sm text-gray-600">
                   Pass Rate: {Math.round((finalScore / Math.max(1, quizQuestions.length)) * 100)}%
                 </div>
                 <div className="mt-3 grid gap-2 sm:grid-cols-3">
@@ -4195,6 +4294,9 @@ function SessionPage() {
                         {item.correct}/{item.total}
                       </div>
                       <div className="text-sm text-gray-600">{item.percent}%</div>
+                      <div className="mt-1 text-sm font-semibold text-gray-700">
+                        {getLessonFeedback(item.correct, item.total)}
+                      </div>
                       {item.skill ? (
                         <div className="mt-1 text-xs text-gray-500">
                           {item.skill.replace(/_/g, " ")}
@@ -4202,6 +4304,18 @@ function SessionPage() {
                       ) : null}
                     </div>
                   ))}
+                </div>
+                <div className="mt-4 rounded-xl border border-teal-100 bg-teal-50 p-3 text-sm text-slate-800">
+                  <div className="font-bold text-teal-800">Recommended Practice</div>
+                  <div className="mt-1">
+                    {weakestLessonBreakdowns.length > 1
+                      ? `Go back and practise ${weakestLessonBreakdowns
+                          .map((item) => `Lesson ${item.lessonNumber}${item.lessonTitle ? `: ${item.lessonTitle}` : ""}`)
+                          .join(" and ")}.`
+                      : weakestLessonBreakdown
+                        ? `Go back and practise Lesson ${weakestLessonBreakdown.lessonNumber}${weakestLessonBreakdown.lessonTitle ? `: ${weakestLessonBreakdown.lessonTitle}` : ""}.`
+                        : "Keep building across all three lessons."}
+                  </div>
                 </div>
               </div>
             ) : null}
