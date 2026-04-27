@@ -10215,7 +10215,7 @@ function generateGenericQuestion(
   if (explicitMode === "y6_square_pattern_building") {
     const templates = [
       { prompt: "1, 4, 9, 16, ___", answer: "25", options: ["20", "25", "27"] },
-      { prompt: "What is the pattern? 1 → 4 → 9 → 16", answer: "+3, +5, +7", options: ["+3, +5, +7", "+2 each time", "×2 each time"] },
+      { prompt: "Square numbers: 1, 4, 9, 16. How do they increase?", answer: "+3, +5, +7, +9", options: ["+3, +5, +7, +9", "+2 each time", "×2 each time"] },
       { prompt: "What is the next square after 121?", answer: "144", options: ["132", "144", "169"] },
       { prompt: "__² = 81", answer: "9", options: ["8", "9", "10"] },
       { prompt: "Which number is between 7² and 8²?", answer: "55", options: ["50", "55", "60"] },
