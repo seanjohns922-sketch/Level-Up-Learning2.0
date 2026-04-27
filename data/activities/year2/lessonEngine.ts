@@ -10618,6 +10618,120 @@ function generateGenericQuestion(
     };
   }
 
+  if (explicitMode === "y6_decimal_mixed_choose") {
+    const templates = [
+      { prompt: "What operation? 3.4 → 34", answer: "×10", options: ["×10", "÷10", "×100"] },
+      { prompt: "What operation? 5.6 → 0.56", answer: "÷10", options: ["×10", "÷10", "×100"] },
+      { prompt: "What operation? 7.21 → 721", answer: "×100", options: ["×10", "×100", "÷100"] },
+      { prompt: "What operation? 450 → 4.5", answer: "÷100", options: ["×100", "÷100", "×10"] },
+      { prompt: "What operation? 0.078 → 78", answer: "×1000", options: ["×1000", "÷1000", "×100"] },
+      { prompt: "What operation? 6.7 → 6700", answer: "×1000", options: ["×100", "×1000", "÷1000"] },
+      { prompt: "What operation? 78 → 0.78", answer: "÷100", options: ["÷10", "÷100", "×100"] },
+      { prompt: "What operation? 0.45 → 45", answer: "×100", options: ["×10", "×100", "÷100"] },
+      { prompt: "What operation? 32 → 0.32", answer: "÷100", options: ["×100", "÷100", "÷10"] },
+      { prompt: "What operation? 4 → 0.004", answer: "÷1000", options: ["÷10", "÷100", "÷1000"] },
+      { prompt: "What operation? 0.63 → 630", answer: "×1000", options: ["×100", "×1000", "÷1000"] },
+      { prompt: "What operation? 900.6 → 9.006", answer: "÷100", options: ["÷10", "÷100", "÷1000"] },
+      { prompt: "What operation? 0.09 → 9", answer: "×100", options: ["×10", "×100", "÷100"] },
+      { prompt: "What operation? 721 → 7.21", answer: "÷100", options: ["×100", "÷100", "÷10"] },
+      { prompt: "What operation? 5.02 → 50.2", answer: "×10", options: ["×10", "÷10", "×100"] },
+      { prompt: "What operation? 109 → 1.09", answer: "÷100", options: ["÷10", "÷100", "×100"] },
+      { prompt: "What operation? 0.004 → 4", answer: "×1000", options: ["×100", "×1000", "÷1000"] },
+      { prompt: "What operation? 43.05 → 4.305", answer: "÷10", options: ["×10", "÷10", "÷100"] },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: "Decide whether the number should scale up or down.",
+    };
+  }
+
+  if (explicitMode === "y6_decimal_mixed_calculate") {
+    const templates: Array<{
+      prompt: string;
+      answer: string;
+      visual?: DecimalShiftVisualData;
+    }> = [
+      { prompt: "0.45 × 100 = ?", answer: "45", visual: { type: "decimal_shift", original: "0.45", factor: 100, result: "45", hideResult: true } },
+      { prompt: "6.7 ÷ 10 = ?", answer: "0.67", visual: { type: "decimal_shift", original: "6.7", factor: 10, result: "0.67", hideResult: true } },
+      { prompt: "0.49 × 100 = ?", answer: "49", visual: { type: "decimal_shift", original: "0.49", factor: 100, result: "49", hideResult: true } },
+      { prompt: "78 ÷ 100 = ?", answer: "0.78", visual: { type: "decimal_shift", original: "78", factor: 100, result: "0.78", hideResult: true } },
+      { prompt: "5.6 × 10 = ?", answer: "56", visual: { type: "decimal_shift", original: "5.6", factor: 10, result: "56", hideResult: true } },
+      { prompt: "4 ÷ 1000 = ?", answer: "0.004", visual: { type: "decimal_shift", original: "4", factor: 1000, result: "0.004", hideResult: true } },
+      { prompt: "7.21 × 100 = ?", answer: "721", visual: { type: "decimal_shift", original: "7.21", factor: 100, result: "721", hideResult: true } },
+      { prompt: "450 ÷ 100 = ?", answer: "4.5", visual: { type: "decimal_shift", original: "450", factor: 100, result: "4.5", hideResult: true } },
+      { prompt: "0.078 × 1000 = ?", answer: "78", visual: { type: "decimal_shift", original: "0.078", factor: 1000, result: "78", hideResult: true } },
+      { prompt: "6700 ÷ 1000 = ?", answer: "6.7", visual: { type: "decimal_shift", original: "6700", factor: 1000, result: "6.7", hideResult: true } },
+      { prompt: "0.56 × 10 = ?", answer: "5.6", visual: { type: "decimal_shift", original: "0.56", factor: 10, result: "5.6", hideResult: true } },
+      { prompt: "56 ÷ 100 = ?", answer: "0.56", visual: { type: "decimal_shift", original: "56", factor: 100, result: "0.56", hideResult: true } },
+      { prompt: "3.2 × 100 = ?", answer: "320", visual: { type: "decimal_shift", original: "3.2", factor: 100, result: "320", hideResult: true } },
+      { prompt: "320 ÷ 100 = ?", answer: "3.2", visual: { type: "decimal_shift", original: "320", factor: 100, result: "3.2", hideResult: true } },
+      { prompt: "6.7 × 100 = ?", answer: "670", visual: { type: "decimal_shift", original: "6.7", factor: 100, result: "670", hideResult: true } },
+      { prompt: "49 ÷ 100 = ?", answer: "0.49", visual: { type: "decimal_shift", original: "49", factor: 100, result: "0.49", hideResult: true } },
+      { prompt: "5.02 ÷ 10 = ?", answer: "0.502", visual: { type: "decimal_shift", original: "5.02", factor: 10, result: "0.502", hideResult: true } },
+      { prompt: "0.63 × 1000 = ?", answer: "630", visual: { type: "decimal_shift", original: "0.63", factor: 1000, result: "630", hideResult: true } },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      helper: "Calculate, then check whether the size makes sense.",
+      placeholder: "Type the answer",
+      visual: chosen.visual,
+    };
+  }
+
+  if (explicitMode === "y6_decimal_mixed_reason") {
+    const templates = [
+      { prompt: "Is this reasonable? 0.56 × 10 = 0.056", answer: "No", options: ["Yes", "No"] },
+      { prompt: "Is this reasonable? 6.7 ÷ 10 = 67", answer: "No", options: ["Yes", "No"] },
+      { prompt: "Which is wrong?", answer: "4.5 × 10 = 0.45", options: ["4.5 × 100 = 450", "4.5 ÷ 10 = 0.45", "4.5 × 10 = 0.45"] },
+      {
+        prompt: "What went wrong? 3.4 × 10 = 3.04",
+        answer: "Decimal moved wrong way",
+        options: ["Decimal moved wrong way", "Multiplied incorrectly", "Correct"],
+      },
+      { prompt: "Which makes sense?", answer: "0.078 × 1000 = 78", options: ["0.078 × 1000 = 78", "0.078 × 1000 = 0.078", "0.078 × 1000 = 0.78"] },
+      { prompt: "Is this reasonable? 78 ÷ 100 = 7.8", answer: "No", options: ["Yes", "No"] },
+      { prompt: "Which is wrong?", answer: "0.45 ÷ 10 = 4.5", options: ["0.45 × 100 = 45", "0.45 ÷ 10 = 4.5", "450 ÷ 100 = 4.5"] },
+      {
+        prompt: "What went wrong? 721 ÷ 100 = 72.1",
+        answer: "Not enough place-value shift",
+        options: ["Not enough place-value shift", "Too many zeros", "Correct"],
+      },
+      { prompt: "Which makes sense?", answer: "49 ÷ 100 = 0.49", options: ["49 ÷ 100 = 4.9", "49 ÷ 100 = 0.49", "49 ÷ 100 = 49"] },
+      { prompt: "Is this reasonable? 0.004 × 1000 = 4", answer: "Yes", options: ["Yes", "No"] },
+      { prompt: "Which is wrong?", answer: "7.21 × 100 = 72.1", options: ["7.21 × 100 = 72.1", "7.21 × 10 = 72.1", "721 ÷ 100 = 7.21"] },
+      {
+        prompt: "What went wrong? 5.6 ÷ 10 = 56",
+        answer: "Decimal moved wrong way",
+        options: ["Decimal moved wrong way", "Divided correctly", "Number should get bigger"],
+      },
+      { prompt: "Which makes sense?", answer: "6700 ÷ 1000 = 6.7", options: ["6700 ÷ 1000 = 670", "6700 ÷ 1000 = 6.7", "6700 ÷ 1000 = 0.67"] },
+      { prompt: "Is this reasonable? 3.2 × 100 = 320", answer: "Yes", options: ["Yes", "No"] },
+      { prompt: "Which is wrong?", answer: "320 ÷ 100 = 32", options: ["320 ÷ 100 = 32", "3.2 × 100 = 320", "32 ÷ 10 = 3.2"] },
+      {
+        prompt: "What went wrong? 0.63 × 1000 = 63",
+        answer: "Not enough place-value shift",
+        options: ["Not enough place-value shift", "Correct", "Number should get smaller"],
+      },
+      { prompt: "Which makes sense?", answer: "56 ÷ 100 = 0.56", options: ["56 ÷ 100 = 5.6", "56 ÷ 100 = 0.56", "56 ÷ 100 = 56"] },
+      { prompt: "Is this reasonable? 0.49 × 100 = 49", answer: "Yes", options: ["Yes", "No"] },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: "Check whether the answer got bigger or smaller in the right way.",
+    };
+  }
+
   if (explicitMode === "factor_multiple_algorithm") {
     const multipleChoiceTemplates: Array<{
       prompt: string;

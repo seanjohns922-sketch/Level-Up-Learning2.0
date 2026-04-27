@@ -194,12 +194,21 @@ const year6Rows: ProgramRow[] = [
     focus: "Apply decimal scaling in mixed problems and estimate whether answers fit",
     lesson: 3,
     topic: "Mixed Decimal Scaling Problems",
-    activity: "Choose the correct decimal scaling move and check answers using estimation.",
+    activity: "Sometimes numbers scale up. Sometimes they scale down. Decide what to do and check if it makes sense.",
     curriculum: ["AC9M6N01", "AC9M6N02"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "decimal_scale_mixed" }),
-      makeActivity("multiple_choice", 1, { mode: "decimal_scale_mixed" }),
-      makeActivity("typed_response", 1, { mode: "decimal_scale_mixed" }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_decimal_mixed_choose",
+        rotationRole: "fast_thinking",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "y6_decimal_mixed_calculate",
+        rotationRole: "reasoning",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_decimal_mixed_reason",
+        rotationRole: "apply_create",
+      }),
     ],
   },
   {
