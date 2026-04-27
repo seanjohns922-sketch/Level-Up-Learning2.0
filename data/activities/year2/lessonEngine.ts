@@ -150,7 +150,13 @@ export type IntegerNumberLineVisualData = {
   type: "integer_number_line";
   min: number;
   max: number;
-  target: number;
+  target?: number;
+  highlights?: readonly number[];
+  start?: number;
+  end?: number;
+  jump?: number;
+  showArrow?: boolean;
+  emphasis?: "position" | "compare" | "movement" | "distance";
 };
 
 export type PlaceValueBuilderQuestion = {
@@ -10205,45 +10211,177 @@ function generateGenericQuestion(
       prompt: string;
       answer: string;
       options: string[];
-      visual?: IntegerNumberLineVisualData;
+      visual: IntegerNumberLineVisualData;
       helper: string;
     }> = [
       {
         prompt: "Which integer is marked on the number line?",
         answer: "-3",
         options: ["-5", "-3", "3", "5"],
-        visual: { type: "integer_number_line", min: -6, max: 6, target: -3 },
-        helper: "Look left of zero and count the spaces.",
+        visual: { type: "integer_number_line", min: -6, max: 6, target: -3, emphasis: "position" },
+        helper: "Check the tick mark.",
       },
       {
         prompt: "Which integer is marked on the number line?",
+        answer: "3",
+        options: ["-3", "2", "3", "4"],
+        visual: { type: "integer_number_line", min: -6, max: 6, target: 3, emphasis: "position" },
+        helper: "Count from zero carefully.",
+      },
+      {
+        prompt: "Which integer is marked on the number line?",
+        answer: "0",
+        options: ["-1", "0", "1", "10"],
+        visual: { type: "integer_number_line", min: -6, max: 6, target: 0, emphasis: "position" },
+        helper: "Zero sits in the centre.",
+      },
+      {
+        prompt: "Which integer is marked on the number line?",
+        answer: "-6",
+        options: ["-6", "-5", "5", "6"],
+        visual: { type: "integer_number_line", min: -6, max: 6, target: -6, emphasis: "position" },
+        helper: "Count from zero carefully.",
+      },
+      {
+        prompt: "Which integer is marked on the number line?",
+        answer: "5",
+        options: ["-5", "4", "5", "6"],
+        visual: { type: "integer_number_line", min: -6, max: 6, target: 5, emphasis: "position" },
+        helper: "Check the tick mark.",
+      },
+      {
+        prompt: "Which number is smallest?",
+        answer: "-4",
+        options: ["-4", "2", "-1"],
+        visual: { type: "integer_number_line", min: -6, max: 6, highlights: [-4, 2, -1], emphasis: "compare" },
+        helper: "Left is smaller, right is greater.",
+      },
+      {
+        prompt: "Which number is greatest?",
         answer: "2",
-        options: ["-2", "1", "2", "4"],
-        visual: { type: "integer_number_line", min: -6, max: 6, target: 2 },
-        helper: "Numbers to the right of zero are positive.",
+        options: ["-3", "-1", "2"],
+        visual: { type: "integer_number_line", min: -6, max: 6, highlights: [-3, -1, 2], emphasis: "compare" },
+        helper: "Right is greater.",
       },
       {
-        prompt: "Which integer is marked on the number line?",
-        answer: "-5",
-        options: ["-5", "-4", "4", "5"],
-        visual: { type: "integer_number_line", min: -6, max: 6, target: -5 },
+        prompt: "Which comes between -4 and -2?",
+        answer: "-3",
+        options: ["-3", "3", "-1"],
+        visual: { type: "integer_number_line", min: -6, max: 6, highlights: [-4, -2, -3], emphasis: "compare" },
+        helper: "Count one space between the two ticks.",
+      },
+      {
+        prompt: "Which is to the right of 0?",
+        answer: "3",
+        options: ["-2", "3", "-5"],
+        visual: { type: "integer_number_line", min: -6, max: 6, highlights: [0, -2, 3, -5], emphasis: "compare" },
+        helper: "Positives are to the right of zero.",
+      },
+      {
+        prompt: "Which integer is furthest left?",
+        answer: "-7",
+        options: ["-7", "-2", "4"],
+        visual: { type: "integer_number_line", min: -10, max: 10, highlights: [-7, -2, 4], emphasis: "compare" },
         helper: "Further left means smaller.",
       },
-      { prompt: "Which number is smallest?", answer: "-4", options: ["-4", "2", "-1"], helper: "The smallest integer sits furthest left." },
-      { prompt: "Which number is greatest?", answer: "2", options: ["-3", "-1", "2"], helper: "The greatest integer sits furthest right." },
-      { prompt: "Which comes between -4 and -2?", answer: "-3", options: ["-3", "3", "-1"], helper: "Count one step at a time." },
-      { prompt: "Which is to the right of 0?", answer: "3", options: ["-2", "3", "-5"], helper: "Numbers to the right of zero are positive." },
-      { prompt: "Which integer is furthest left?", answer: "-7", options: ["-7", "-2", "4"], helper: "Further left means smaller." },
-      { prompt: "Which integer is between -1 and 1?", answer: "0", options: ["-2", "0", "2"], helper: "Zero sits in the middle." },
-      { prompt: "Which number is greatest?", answer: "5", options: ["-6", "0", "5"], helper: "Look for the position furthest right." },
-      { prompt: "Which number is smallest?", answer: "-9", options: ["-9", "-3", "6"], helper: "Negative numbers can still be compared by position." },
-      { prompt: "Which integer is between 2 and 4?", answer: "3", options: ["2", "3", "5"], helper: "Count one more than 2." },
-      { prompt: "Which number is to the left of -2?", answer: "-3", options: ["-3", "-1", "1"], helper: "Left means a smaller value." },
-      { prompt: "Which number is to the right of -1?", answer: "0", options: ["-2", "0", "-3"], helper: "One step right from -1 lands on zero." },
-      { prompt: "Which is greatest?", answer: "0", options: ["-8", "-1", "0"], helper: "Zero is greater than any negative integer." },
-      { prompt: "Which number belongs between -6 and -4?", answer: "-5", options: ["-7", "-5", "-3"], helper: "Use the order of negatives carefully." },
-      { prompt: "Which integer is smallest?", answer: "-12", options: ["-12", "-2", "10"], helper: "The most negative value is the smallest." },
-      { prompt: "Which number is greatest?", answer: "7", options: ["-7", "4", "7"], helper: "Positive numbers to the right are greater." },
+      {
+        prompt: "Which integer is between -1 and 1?",
+        answer: "0",
+        options: ["-2", "0", "2"],
+        visual: { type: "integer_number_line", min: -6, max: 6, highlights: [-1, 0, 1], emphasis: "compare" },
+        helper: "Zero sits in the middle.",
+      },
+      {
+        prompt: "Which number is greatest?",
+        answer: "5",
+        options: ["-6", "0", "5"],
+        visual: { type: "integer_number_line", min: -6, max: 6, highlights: [-6, 0, 5], emphasis: "compare" },
+        helper: "Choose the point furthest right.",
+      },
+      {
+        prompt: "Which number is smallest?",
+        answer: "-9",
+        options: ["-9", "-3", "6"],
+        visual: { type: "integer_number_line", min: -10, max: 10, highlights: [-9, -3, 6], emphasis: "compare" },
+        helper: "The most negative number sits furthest left.",
+      },
+      {
+        prompt: "Which integer is between 2 and 4?",
+        answer: "3",
+        options: ["2", "3", "5"],
+        visual: { type: "integer_number_line", min: -2, max: 6, highlights: [2, 3, 4], emphasis: "compare" },
+        helper: "Find the tick in the middle.",
+      },
+      {
+        prompt: "Which number is to the left of -2?",
+        answer: "-3",
+        options: ["-3", "-1", "1"],
+        visual: { type: "integer_number_line", min: -6, max: 4, highlights: [-3, -2, -1, 1], emphasis: "compare" },
+        helper: "One space left is smaller.",
+      },
+      {
+        prompt: "Which number is to the right of -1?",
+        answer: "0",
+        options: ["-2", "0", "-3"],
+        visual: { type: "integer_number_line", min: -6, max: 4, highlights: [-3, -2, -1, 0], emphasis: "compare" },
+        helper: "One space right is greater.",
+      },
+      {
+        prompt: "Which is greatest?",
+        answer: "0",
+        options: ["-8", "-1", "0"],
+        visual: { type: "integer_number_line", min: -10, max: 2, highlights: [-8, -1, 0], emphasis: "compare" },
+        helper: "Zero is to the right of negatives.",
+      },
+      {
+        prompt: "Which number belongs between -6 and -4?",
+        answer: "-5",
+        options: ["-7", "-5", "-3"],
+        visual: { type: "integer_number_line", min: -8, max: 2, highlights: [-6, -5, -4], emphasis: "compare" },
+        helper: "Find the tick directly between them.",
+      },
+      {
+        prompt: "Which integer is smallest?",
+        answer: "-12",
+        options: ["-12", "-2", "10"],
+        visual: { type: "integer_number_line", min: -12, max: 10, highlights: [-12, -2, 10], emphasis: "compare" },
+        helper: "Check the point furthest left.",
+      },
+      {
+        prompt: "Which number is greatest?",
+        answer: "7",
+        options: ["-7", "4", "7"],
+        visual: { type: "integer_number_line", min: -8, max: 8, highlights: [-7, 4, 7], emphasis: "compare" },
+        helper: "Right is greater.",
+      },
+      {
+        prompt: "Where is the marked point?",
+        answer: "-1",
+        options: ["-2", "-1", "1", "2"],
+        visual: { type: "integer_number_line", min: -6, max: 6, target: -1, emphasis: "position" },
+        helper: "Use the tick, not the gap.",
+      },
+      {
+        prompt: "Where is the marked point?",
+        answer: "4",
+        options: ["3", "4", "-4", "5"],
+        visual: { type: "integer_number_line", min: -6, max: 6, target: 4, emphasis: "position" },
+        helper: "Check the tick mark.",
+      },
+      {
+        prompt: "Which integer is marked on the number line?",
+        answer: "-8",
+        options: ["-8", "-6", "6", "8"],
+        visual: { type: "integer_number_line", min: -10, max: 10, target: -8, emphasis: "position" },
+        helper: "Count left from zero carefully.",
+      },
+      {
+        prompt: "Which integer is marked on the number line?",
+        answer: "9",
+        options: ["-9", "8", "9", "10"],
+        visual: { type: "integer_number_line", min: -10, max: 10, target: 9, emphasis: "position" },
+        helper: "Count right from zero carefully.",
+      },
     ];
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
     return {
@@ -10258,24 +10396,29 @@ function generateGenericQuestion(
 
   if (explicitMode === "y6_integer_compare") {
     const templates = [
-      { prompt: "Which is greater?", answer: "-2", options: ["-6", "-2"], helper: "Among negatives, the number closer to zero is greater." },
-      { prompt: "Which is smaller?", answer: "-1", options: ["3", "-1"], helper: "Numbers left of zero are smaller than positive numbers." },
-      { prompt: "-8 is greater than -3.", answer: "False", options: ["True", "False"], helper: "Check which number is further right." },
-      { prompt: "Which is greater?", answer: "0", options: ["-1", "0"], helper: "Zero is to the right of -1." },
-      { prompt: "Which is greater?", answer: "-7", options: ["-10", "-7"], helper: "The negative number closer to zero is greater." },
-      { prompt: "Which statement is correct?", answer: "-2 > -5", options: ["-2 > -5", "-5 > -2", "They are equal"], helper: "Use position, not the size of the digits." },
-      { prompt: "Which is smaller?", answer: "-9", options: ["-9", "-4"], helper: "The number further left is smaller." },
-      { prompt: "Which is greater?", answer: "4", options: ["-4", "4"], helper: "Any positive integer is greater than any negative integer." },
-      { prompt: "-3 is less than 2.", answer: "True", options: ["True", "False"], helper: "Compare the sides of zero." },
-      { prompt: "Which is greater?", answer: "-1", options: ["-1", "-6"], helper: "Closer to zero means greater here." },
-      { prompt: "Which number is smallest?", answer: "-11", options: ["-11", "-8", "-3"], helper: "The most negative value is smallest." },
-      { prompt: "Which statement is correct?", answer: "5 > -2", options: ["-2 > 5", "5 > -2", "They are equal"], helper: "Positive numbers sit to the right of zero." },
-      { prompt: "-4 is greater than -9.", answer: "True", options: ["True", "False"], helper: "Numbers closer to zero are greater." },
-      { prompt: "Which is smaller?", answer: "0", options: ["3", "0"], helper: "Zero is smaller than 3." },
-      { prompt: "Which is greater?", answer: "-3", options: ["-7", "-3"], helper: "Think about which is further right." },
-      { prompt: "Which statement is correct?", answer: "-6 < -1", options: ["-6 < -1", "-1 < -6", "They are equal"], helper: "Less means further left." },
-      { prompt: "Which number is greatest?", answer: "6", options: ["-2", "0", "6"], helper: "Greatest means furthest right." },
-      { prompt: "-12 is less than -5.", answer: "True", options: ["True", "False"], helper: "The more negative value is smaller." },
+      { prompt: "Which is greater?", answer: "-2", options: ["-5", "-2"], helper: "Further right means greater.", visual: { type: "integer_number_line", min: -6, max: 2, highlights: [-5, -2], emphasis: "compare" } },
+      { prompt: "Which is smaller?", answer: "-8", options: ["-8", "-3"], helper: "Further left means smaller.", visual: { type: "integer_number_line", min: -10, max: 2, highlights: [-8, -3], emphasis: "compare" } },
+      { prompt: "Order from smallest to largest.", answer: "-4, 0, 3", options: ["-4, 0, 3", "3, 0, -4", "0, -4, 3"], helper: "Read from left to right.", visual: { type: "integer_number_line", min: -6, max: 6, highlights: [-4, 0, 3], emphasis: "compare" } },
+      { prompt: "Which number is further right?", answer: "2", options: ["-1", "2"], helper: "Further right means greater.", visual: { type: "integer_number_line", min: -4, max: 4, highlights: [-1, 2], emphasis: "compare" } },
+      { prompt: "Which is closer to zero?", answer: "-2", options: ["-7", "-2"], helper: "Closer to zero means less distance.", visual: { type: "integer_number_line", min: -8, max: 2, highlights: [-7, -2, 0], emphasis: "distance" } },
+      { prompt: "-8 is greater than -3.", answer: "False", options: ["True", "False"], helper: "Check which point is further right.", visual: { type: "integer_number_line", min: -10, max: 2, highlights: [-8, -3], emphasis: "compare" } },
+      { prompt: "Which is greater?", answer: "0", options: ["-1", "0"], helper: "Zero is to the right of -1.", visual: { type: "integer_number_line", min: -4, max: 2, highlights: [-1, 0], emphasis: "compare" } },
+      { prompt: "Which is greater?", answer: "-7", options: ["-10", "-7"], helper: "Among negatives, closer to zero is greater.", visual: { type: "integer_number_line", min: -10, max: 2, highlights: [-10, -7], emphasis: "compare" } },
+      { prompt: "Which statement is correct?", answer: "-2 > -5", options: ["-2 > -5", "-5 > -2", "They are equal"], helper: "Use position, not the size of the digits.", visual: { type: "integer_number_line", min: -6, max: 2, highlights: [-5, -2], emphasis: "compare" } },
+      { prompt: "Which is smaller?", answer: "-9", options: ["-9", "-4"], helper: "The number further left is smaller.", visual: { type: "integer_number_line", min: -10, max: 2, highlights: [-9, -4], emphasis: "compare" } },
+      { prompt: "Which is greater?", answer: "4", options: ["-4", "4"], helper: "Positive numbers sit to the right of negatives.", visual: { type: "integer_number_line", min: -6, max: 6, highlights: [-4, 4], emphasis: "compare" } },
+      { prompt: "-3 is less than 2.", answer: "True", options: ["True", "False"], helper: "Compare both positions to zero.", visual: { type: "integer_number_line", min: -4, max: 4, highlights: [-3, 2], emphasis: "compare" } },
+      { prompt: "Which is greater?", answer: "-1", options: ["-1", "-6"], helper: "Closer to zero means greater here.", visual: { type: "integer_number_line", min: -6, max: 2, highlights: [-6, -1], emphasis: "compare" } },
+      { prompt: "Which number is smallest?", answer: "-11", options: ["-11", "-8", "-3"], helper: "Read from left to right.", visual: { type: "integer_number_line", min: -12, max: 2, highlights: [-11, -8, -3], emphasis: "compare" } },
+      { prompt: "Which statement is correct?", answer: "5 > -2", options: ["-2 > 5", "5 > -2", "They are equal"], helper: "Positive numbers are to the right of negatives.", visual: { type: "integer_number_line", min: -4, max: 6, highlights: [-2, 5], emphasis: "compare" } },
+      { prompt: "-4 is greater than -9.", answer: "True", options: ["True", "False"], helper: "Numbers closer to zero are greater.", visual: { type: "integer_number_line", min: -10, max: 2, highlights: [-9, -4], emphasis: "compare" } },
+      { prompt: "Which is smaller?", answer: "0", options: ["3", "0"], helper: "Zero is left of 3.", visual: { type: "integer_number_line", min: -2, max: 4, highlights: [0, 3], emphasis: "compare" } },
+      { prompt: "Which is greater?", answer: "-3", options: ["-7", "-3"], helper: "Choose the point further right.", visual: { type: "integer_number_line", min: -8, max: 2, highlights: [-7, -3], emphasis: "compare" } },
+      { prompt: "Which statement is correct?", answer: "-6 < -1", options: ["-6 < -1", "-1 < -6", "They are equal"], helper: "Less means further left.", visual: { type: "integer_number_line", min: -6, max: 2, highlights: [-6, -1], emphasis: "compare" } },
+      { prompt: "Which number is greatest?", answer: "6", options: ["-2", "0", "6"], helper: "Greatest means furthest right.", visual: { type: "integer_number_line", min: -4, max: 6, highlights: [-2, 0, 6], emphasis: "compare" } },
+      { prompt: "-12 is less than -5.", answer: "True", options: ["True", "False"], helper: "The more negative value is smaller.", visual: { type: "integer_number_line", min: -12, max: 2, highlights: [-12, -5], emphasis: "compare" } },
+      { prompt: "Which is closer to zero?", answer: "1", options: ["1", "-4"], helper: "Compare the distance to zero.", visual: { type: "integer_number_line", min: -6, max: 4, highlights: [1, -4, 0], emphasis: "distance" } },
+      { prompt: "Which number is further right?", answer: "5", options: ["-2", "5"], helper: "Right is greater.", visual: { type: "integer_number_line", min: -4, max: 6, highlights: [-2, 5], emphasis: "compare" } },
     ] as const;
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
     return {
@@ -10284,29 +10427,34 @@ function generateGenericQuestion(
       options: shuffle([...chosen.options]),
       answer: chosen.answer,
       helper: chosen.helper,
+      visual: chosen.visual,
     };
   }
 
   if (explicitMode === "y6_integer_apply_think") {
     const templates = [
-      { prompt: "You start at 0 and move 4 spaces left. Where are you?", answer: "-4" },
-      { prompt: "You start at -3 and move 5 spaces right. Where are you?", answer: "2" },
-      { prompt: "Which integer is further from zero: -7 or 4? Type the integer.", answer: "-7" },
-      { prompt: "Which integer is closer to zero: -2 or -8? Type the integer.", answer: "-2" },
-      { prompt: "Complete the pattern: -5, -4, __, -2, -1", answer: "-3" },
-      { prompt: "You start at 2 and move 6 spaces left. Where are you?", answer: "-4" },
-      { prompt: "You start at -6 and move 3 spaces right. Where are you?", answer: "-3" },
-      { prompt: "How far is -9 from zero?", answer: "9" },
-      { prompt: "Which integer is 5 spaces to the right of -2?", answer: "3" },
-      { prompt: "Which integer is 4 spaces to the left of 1?", answer: "-3" },
-      { prompt: "Complete the sequence: -1, 0, 1, __, 3", answer: "2" },
-      { prompt: "How far is 7 from zero?", answer: "7" },
-      { prompt: "You start at -1 and move 4 spaces left. Where are you?", answer: "-5" },
-      { prompt: "You start at 5 and move 8 spaces left. Where are you?", answer: "-3" },
-      { prompt: "Which integer is greater, -3 or 1? Type the greater integer.", answer: "1" },
-      { prompt: "Which integer is smaller, -6 or -2? Type the smaller integer.", answer: "-6" },
-      { prompt: "What number is 3 spaces from zero on the left?", answer: "-3" },
-      { prompt: "Complete the pattern: 2, 1, 0, __, -2", answer: "-1" },
+      { prompt: "You start at 0 and move 4 spaces left. Where are you?", answer: "-4", visual: { type: "integer_number_line", min: -6, max: 6, start: 0, end: -4, jump: -4, showArrow: true, emphasis: "movement" } },
+      { prompt: "You start at -2 and move 5 spaces right. Where are you?", answer: "3", visual: { type: "integer_number_line", min: -6, max: 6, start: -2, end: 3, jump: 5, showArrow: true, emphasis: "movement" } },
+      { prompt: "You start at 4 and move 6 spaces left. Where are you?", answer: "-2", visual: { type: "integer_number_line", min: -6, max: 6, start: 4, end: -2, jump: -6, showArrow: true, emphasis: "movement" } },
+      { prompt: "You start at -5 and move 3 spaces right. Where are you?", answer: "-2", visual: { type: "integer_number_line", min: -6, max: 6, start: -5, end: -2, jump: 3, showArrow: true, emphasis: "movement" } },
+      { prompt: "You start at 1 and move 4 spaces left. Where are you?", answer: "-3", visual: { type: "integer_number_line", min: -6, max: 6, start: 1, end: -3, jump: -4, showArrow: true, emphasis: "movement" } },
+      { prompt: "You start at -1 and move 7 spaces right. Where are you?", answer: "6", visual: { type: "integer_number_line", min: -6, max: 6, start: -1, end: 6, jump: 7, showArrow: true, emphasis: "movement" } },
+      { prompt: "Which integer is further from zero: -7 or 4? Type the integer.", answer: "-7", visual: { type: "integer_number_line", min: -8, max: 6, highlights: [-7, 0, 4], emphasis: "distance" } },
+      { prompt: "Which integer is closer to zero: -2 or -8? Type the integer.", answer: "-2", visual: { type: "integer_number_line", min: -8, max: 2, highlights: [-8, -2, 0], emphasis: "distance" } },
+      { prompt: "Complete the pattern: -5, -4, __, -2, -1", answer: "-3", visual: { type: "integer_number_line", min: -6, max: 1, highlights: [-5, -4, -3, -2, -1], emphasis: "position" } },
+      { prompt: "You start at 2 and move 6 spaces left. Where are you?", answer: "-4", visual: { type: "integer_number_line", min: -6, max: 6, start: 2, end: -4, jump: -6, showArrow: true, emphasis: "movement" } },
+      { prompt: "You start at -6 and move 3 spaces right. Where are you?", answer: "-3", visual: { type: "integer_number_line", min: -6, max: 6, start: -6, end: -3, jump: 3, showArrow: true, emphasis: "movement" } },
+      { prompt: "How far is -9 from zero?", answer: "9", visual: { type: "integer_number_line", min: -10, max: 2, highlights: [-9, 0], emphasis: "distance" } },
+      { prompt: "Which integer is 5 spaces to the right of -2?", answer: "3", visual: { type: "integer_number_line", min: -6, max: 6, start: -2, end: 3, jump: 5, showArrow: true, emphasis: "movement" } },
+      { prompt: "Which integer is 4 spaces to the left of 1?", answer: "-3", visual: { type: "integer_number_line", min: -6, max: 6, start: 1, end: -3, jump: -4, showArrow: true, emphasis: "movement" } },
+      { prompt: "Complete the sequence: -1, 0, 1, __, 3", answer: "2", visual: { type: "integer_number_line", min: -2, max: 4, highlights: [-1, 0, 1, 2, 3], emphasis: "position" } },
+      { prompt: "How far is 7 from zero?", answer: "7", visual: { type: "integer_number_line", min: -2, max: 8, highlights: [0, 7], emphasis: "distance" } },
+      { prompt: "You start at -1 and move 4 spaces left. Where are you?", answer: "-5", visual: { type: "integer_number_line", min: -6, max: 4, start: -1, end: -5, jump: -4, showArrow: true, emphasis: "movement" } },
+      { prompt: "You start at 5 and move 8 spaces left. Where are you?", answer: "-3", visual: { type: "integer_number_line", min: -6, max: 6, start: 5, end: -3, jump: -8, showArrow: true, emphasis: "movement" } },
+      { prompt: "Which integer is greater, -3 or 1? Type the greater integer.", answer: "1", visual: { type: "integer_number_line", min: -4, max: 2, highlights: [-3, 1], emphasis: "compare" } },
+      { prompt: "Which integer is smaller, -6 or -2? Type the smaller integer.", answer: "-6", visual: { type: "integer_number_line", min: -6, max: 2, highlights: [-6, -2], emphasis: "compare" } },
+      { prompt: "What number is 3 spaces from zero on the left?", answer: "-3", visual: { type: "integer_number_line", min: -6, max: 6, start: 0, end: -3, jump: -3, showArrow: true, emphasis: "movement" } },
+      { prompt: "Complete the pattern: 2, 1, 0, __, -2", answer: "-1", visual: { type: "integer_number_line", min: -3, max: 3, highlights: [2, 1, 0, -1, -2], emphasis: "position" } },
     ] as const;
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
     return {
@@ -10315,9 +10463,7 @@ function generateGenericQuestion(
       answer: chosen.answer,
       helper: "Think about left, right, and distance from zero.",
       placeholder: "Type the integer",
-      visual: {
-        type: "numeric_input_only",
-      },
+      visual: chosen.visual,
     };
   }
 
