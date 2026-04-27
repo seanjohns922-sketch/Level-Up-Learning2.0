@@ -81,6 +81,68 @@ function logFallback(activity: LessonActivity, questionData: Year2QuestionData) 
   });
 }
 
+function toSafeMultipleChoiceQuestion(
+  activity: LessonActivity,
+  questionData: Year2QuestionData,
+  prompt: string
+): MultipleChoiceQuestion {
+  const fallbackPrompt =
+    typeof questionData?.prompt === "string" && questionData.prompt.trim().length > 0
+      ? questionData.prompt
+      : prompt || "Choose the best answer.";
+  const fallbackAnswer =
+    "answer" in questionData && questionData.answer !== undefined && questionData.answer !== null
+      ? String(questionData.answer)
+      : "Yes";
+
+  if (questionData.kind === "multiple_choice") {
+    const safeOptions = Array.isArray(questionData.options)
+      ? questionData.options.filter(
+          (option): option is string => typeof option === "string" && option.trim().length > 0
+        )
+      : [];
+    const answerInOptions = safeOptions.includes(questionData.answer);
+    if (safeOptions.length >= 2 && answerInOptions) {
+      return questionData;
+    }
+
+    console.warn("Invalid MC Question:", {
+      activityType: activity.activityType,
+      questionData,
+    });
+
+    const repairedOptions = answerInOptions
+      ? safeOptions
+      : Array.from(new Set([questionData.answer, ...safeOptions].filter(Boolean)));
+
+    return {
+      ...questionData,
+      prompt: fallbackPrompt,
+      options:
+        repairedOptions.length >= 2
+          ? repairedOptions
+          : [fallbackAnswer, "No", "Maybe"].slice(0, 3),
+      answer:
+        repairedOptions.length >= 2 && repairedOptions.includes(questionData.answer)
+          ? questionData.answer
+          : fallbackAnswer,
+    };
+  }
+
+  console.warn("Invalid MC Question:", {
+    activityType: activity.activityType,
+    questionData,
+  });
+
+  return {
+    kind: "multiple_choice",
+    prompt: fallbackPrompt,
+    options: [fallbackAnswer, "No", "Maybe"].slice(0, 3),
+    answer: fallbackAnswer,
+    helper: "Choose the best answer.",
+  };
+}
+
 function matchesActivity(activityType: LessonActivity["activityType"], questionKind: Year2QuestionData["kind"]) {
   if (activityType === "multiple_choice" || activityType === "typed_response") {
     return activityType === questionKind;
@@ -465,12 +527,9 @@ export function LessonRenderer({
     }
     case "multiple_choice": {
       const safeQuestion = getSafeQuestion(activity, questionData, prompt);
-      if (safeQuestion.kind !== "multiple_choice") {
-        return <ErrorCard message="Multiple choice question failed to load." />;
-      }
       return (
         <MultipleChoiceActivity
-          questionData={safeQuestion as MultipleChoiceQuestion}
+          questionData={toSafeMultipleChoiceQuestion(activity, safeQuestion, prompt)}
           onCorrect={onCorrect}
           onWrong={onWrong}
           renderMode={renderMode}

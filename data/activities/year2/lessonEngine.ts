@@ -14758,6 +14758,12 @@ export function generateQuestion(
   if (activity.activityType === "multiple_choice") {
     if (question.kind !== "multiple_choice") {
       const answer = question.kind === "typed_response" ? String(question.answer) : "Yes";
+      console.warn("Invalid MC Question:", {
+        reason: "kind_mismatch",
+        activityType: activity.activityType,
+        mode: typeof config.mode === "string" ? config.mode : undefined,
+        question,
+      });
       question = {
         kind: "multiple_choice",
         prompt: question.prompt,
@@ -14765,10 +14771,33 @@ export function generateQuestion(
         answer,
         helper: "Use the rule or pattern to choose the best answer.",
       };
-    } else if (!Array.isArray(question.options) || question.options.length < 2) {
+    } else if (
+      !Array.isArray(question.options) ||
+      question.options.length < 2 ||
+      question.options.some((option) => typeof option !== "string" || option.trim().length === 0) ||
+      typeof question.answer !== "string" ||
+      !question.options.includes(question.answer)
+    ) {
+      console.warn("Invalid MC Question:", {
+        reason: "invalid_shape",
+        activityType: activity.activityType,
+        mode: typeof config.mode === "string" ? config.mode : undefined,
+        question,
+      });
+      const answer = typeof question.answer === "string" && question.answer.trim().length > 0
+        ? question.answer
+        : "Yes";
       question = {
         ...question,
-        options: buildGenericMultipleChoiceOptions(String(question.answer)),
+        prompt:
+          typeof question.prompt === "string" && question.prompt.trim().length > 0
+            ? question.prompt
+            : "Choose the best answer.",
+        answer,
+        options: Array.isArray(question.options) &&
+          question.options.every((option) => typeof option === "string" && option.trim().length > 0)
+          ? Array.from(new Set([answer, ...question.options]))
+          : buildGenericMultipleChoiceOptions(answer),
       };
     }
   }
