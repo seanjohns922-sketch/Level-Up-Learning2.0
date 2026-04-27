@@ -163,7 +163,7 @@ function LessonPage() {
                     </p>
                   ) : null}
                   <p className="relative mt-2.5 text-sm font-normal text-muted-foreground leading-relaxed">
-                    Watch the short lesson video, then jump into 8 minutes of practice. Earn XP for every correct answer and unlock your Level Up Legend.
+                    Watch the short lesson video, then jump into 9 minutes of practice. Earn XP for every correct answer and unlock your Level Up Legend.
                   </p>
                 </div>
 
@@ -401,7 +401,7 @@ function LessonPage() {
             <div className="bg-background px-6 py-8">
             <PracticeRunner
               key={`${year}-${week}-${lessonId}`}
-              minutes={8}
+              minutes={9}
               lessonTitle={safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
               renderCompletionCard={
                 showWeek12Lesson3Summary

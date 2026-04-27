@@ -44,7 +44,7 @@ function Dots({ count }: { count: number }) {
 }
 
 export function PracticeRunner({
-  minutes = 8,
+  minutes = 9,
   getTask,
   onComplete,
   lessonTitle,

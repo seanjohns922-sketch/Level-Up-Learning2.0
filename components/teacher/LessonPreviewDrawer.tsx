@@ -330,7 +330,7 @@ export default function LessonPreviewDrawer({
             <ul className="space-y-1.5 text-xs text-[#0F172A]">
               <Bullet>Lesson intro screen with the title <b>“{lesson.title}”</b> and a short motivation.</Bullet>
               <Bullet>An optional intro video/animation introducing the concept.</Bullet>
-              <Bullet>An <b>8-minute timed practice</b> rotating through 3 activity types.</Bullet>
+              <Bullet>An <b>9-minute timed practice</b> rotating through 3 activity types.</Bullet>
               <Bullet>Difficulty ramps over the session: Easy → Medium → Hard.</Bullet>
               <Bullet>Instant feedback after every answer with XP and progress updates.</Bullet>
             </ul>

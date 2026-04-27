@@ -2852,7 +2852,7 @@ function SessionPage() {
     if (!isLesson) return;
     const timer = setInterval(() => {
       const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
-      setElapsedSeconds(Math.min(elapsed, 480)); // cap at 8 mins
+      setElapsedSeconds(Math.min(elapsed, 540)); // cap at 9 mins
     }, 1000);
     return () => clearInterval(timer);
   }, [isLesson, sessionStartTime]);
