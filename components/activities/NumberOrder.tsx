@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { NumberOrderQuestion } from "@/data/activities/year2/lessonEngine";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
+import IntegerNumberLineVisual from "@/components/activities/IntegerNumberLineVisual";
 
 export default function NumberOrder({
   questionData,
@@ -43,21 +44,37 @@ export default function NumberOrder({
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">
-            Number Order
+            Number Line Position
           </div>
           <div className="flex items-center gap-2 mt-2">
             <h2 className="text-2xl font-black text-gray-900">{questionData.prompt}</h2>
             <ReadAloudBtn text={questionData.prompt} />
           </div>
+          {questionData.helper ? (
+            <p className="mt-2 text-[15px] text-slate-500 leading-relaxed">{questionData.helper}</p>
+          ) : null}
         </div>
-        <button
-          type="button"
-          onClick={removeLast}
-          className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50"
-        >
-          Undo
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={removeLast}
+            className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50"
+          >
+            Undo
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelected([])}
+            className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50"
+          >
+            Reset
+          </button>
+        </div>
       </div>
+
+      {questionData.visual?.type === "integer_number_line" ? (
+        <IntegerNumberLineVisual visual={questionData.visual} title="Number line" />
+      ) : null}
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {questionData.numbers.map((n, idx) => (

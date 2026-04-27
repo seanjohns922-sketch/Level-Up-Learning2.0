@@ -186,6 +186,8 @@ export type NumberOrderQuestion = {
   prompt: string;
   numbers: number[];
   ascending: boolean;
+  helper?: string;
+  visual?: IntegerNumberLineVisualData;
 };
 
 export type PartitionExpandQuestion = {
@@ -5730,6 +5732,116 @@ function generateInteractiveQuestion(
   }
 
   if (activityType === "number_order") {
+    if (config.mode === "y6_integer_order_compare") {
+      const templates = [
+        {
+          prompt: "Order from smallest to largest.",
+          numbers: [0, -4, 3],
+          helper: "Read the number line from left to right.",
+          visual: {
+            type: "integer_number_line" as const,
+            min: -6,
+            max: 6,
+            highlightedValues: [-4, 0, 3],
+            emphasis: "compare" as const,
+          },
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          numbers: [-2, 4, -5, 0],
+          helper: "Read the number line from left to right.",
+          visual: {
+            type: "integer_number_line" as const,
+            min: -6,
+            max: 6,
+            highlightedValues: [-5, -2, 0, 4],
+            emphasis: "compare" as const,
+          },
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          numbers: [3, -1, -4, 2],
+          helper: "Read the number line from left to right.",
+          visual: {
+            type: "integer_number_line" as const,
+            min: -6,
+            max: 6,
+            highlightedValues: [-4, -1, 2, 3],
+            emphasis: "compare" as const,
+          },
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          numbers: [-6, -2, -5, 1],
+          helper: "Read the number line from left to right.",
+          visual: {
+            type: "integer_number_line" as const,
+            min: -6,
+            max: 6,
+            highlightedValues: [-6, -5, -2, 1],
+            emphasis: "compare" as const,
+          },
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          numbers: [0, -3, 5, -1],
+          helper: "Read the number line from left to right.",
+          visual: {
+            type: "integer_number_line" as const,
+            min: -6,
+            max: 6,
+            highlightedValues: [-3, -1, 0, 5],
+            emphasis: "compare" as const,
+          },
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          numbers: [-7, 2, -1, 4],
+          helper: "Read the number line from left to right.",
+          visual: {
+            type: "integer_number_line" as const,
+            min: -8,
+            max: 6,
+            highlightedValues: [-7, -1, 2, 4],
+            emphasis: "compare" as const,
+          },
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          numbers: [6, -2, 1, -5],
+          helper: "Read the number line from left to right.",
+          visual: {
+            type: "integer_number_line" as const,
+            min: -6,
+            max: 6,
+            highlightedValues: [-5, -2, 1, 6],
+            emphasis: "compare" as const,
+          },
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          numbers: [-8, -3, 0, 5],
+          helper: "Read the number line from left to right.",
+          visual: {
+            type: "integer_number_line" as const,
+            min: -10,
+            max: 6,
+            highlightedValues: [-8, -3, 0, 5],
+            emphasis: "compare" as const,
+          },
+        },
+      ] as const;
+      const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+      return {
+        kind: "number_order",
+        prompt: chosen.prompt,
+        numbers: shuffle([...chosen.numbers]),
+        ascending: true,
+        helper: chosen.helper,
+        visual: chosen.visual,
+      };
+    }
+
     const min = typeof config.min === "number" ? config.min : 100;
     const max = typeof config.max === "number" ? config.max : 1000;
     const count = typeof config.count === "number" ? config.count : 4;
@@ -10403,7 +10515,6 @@ function generateGenericQuestion(
     const templates = [
       { prompt: "Which is greater?", answer: "-2", options: ["-5", "-2"], helper: "Further right means greater.", visual: { type: "integer_number_line", min: -6, max: 2, highlights: [-5, -2], emphasis: "compare" } },
       { prompt: "Which is smaller?", answer: "-8", options: ["-8", "-3"], helper: "Further left means smaller.", visual: { type: "integer_number_line", min: -10, max: 2, highlights: [-8, -3], emphasis: "compare" } },
-      { prompt: "Order from smallest to largest.", answer: "-4, 0, 3", options: ["-4, 0, 3", "3, 0, -4", "0, -4, 3"], helper: "Read from left to right.", visual: { type: "integer_number_line", min: -6, max: 6, highlights: [-4, 0, 3], emphasis: "compare" } },
       { prompt: "Which number is further right?", answer: "2", options: ["-1", "2"], helper: "Further right means greater.", visual: { type: "integer_number_line", min: -4, max: 4, highlights: [-1, 2], emphasis: "compare" } },
       { prompt: "Which is closer to zero?", answer: "-2", options: ["-7", "-2"], helper: "Closer to zero means less distance.", visual: { type: "integer_number_line", min: -8, max: 2, highlights: [-7, -2, 0], emphasis: "distance" } },
       { prompt: "-8 is greater than -3.", answer: "False", options: ["True", "False"], helper: "Check which point is further right.", visual: { type: "integer_number_line", min: -10, max: 2, highlights: [-8, -3], emphasis: "compare" } },
@@ -10414,13 +10525,11 @@ function generateGenericQuestion(
       { prompt: "Which is greater?", answer: "4", options: ["-4", "4"], helper: "Positive numbers sit to the right of negatives.", visual: { type: "integer_number_line", min: -6, max: 6, highlights: [-4, 4], emphasis: "compare" } },
       { prompt: "-3 is less than 2.", answer: "True", options: ["True", "False"], helper: "Compare both positions to zero.", visual: { type: "integer_number_line", min: -4, max: 4, highlights: [-3, 2], emphasis: "compare" } },
       { prompt: "Which is greater?", answer: "-1", options: ["-1", "-6"], helper: "Closer to zero means greater here.", visual: { type: "integer_number_line", min: -6, max: 2, highlights: [-6, -1], emphasis: "compare" } },
-      { prompt: "Which number is smallest?", answer: "-11", options: ["-11", "-8", "-3"], helper: "Read from left to right.", visual: { type: "integer_number_line", min: -12, max: 2, highlights: [-11, -8, -3], emphasis: "compare" } },
       { prompt: "Which statement is correct?", answer: "5 > -2", options: ["-2 > 5", "5 > -2", "They are equal"], helper: "Positive numbers are to the right of negatives.", visual: { type: "integer_number_line", min: -4, max: 6, highlights: [-2, 5], emphasis: "compare" } },
       { prompt: "-4 is greater than -9.", answer: "True", options: ["True", "False"], helper: "Numbers closer to zero are greater.", visual: { type: "integer_number_line", min: -10, max: 2, highlights: [-9, -4], emphasis: "compare" } },
       { prompt: "Which is smaller?", answer: "0", options: ["3", "0"], helper: "Zero is left of 3.", visual: { type: "integer_number_line", min: -2, max: 4, highlights: [0, 3], emphasis: "compare" } },
       { prompt: "Which is greater?", answer: "-3", options: ["-7", "-3"], helper: "Choose the point further right.", visual: { type: "integer_number_line", min: -8, max: 2, highlights: [-7, -3], emphasis: "compare" } },
       { prompt: "Which statement is correct?", answer: "-6 < -1", options: ["-6 < -1", "-1 < -6", "They are equal"], helper: "Less means further left.", visual: { type: "integer_number_line", min: -6, max: 2, highlights: [-6, -1], emphasis: "compare" } },
-      { prompt: "Which number is greatest?", answer: "6", options: ["-2", "0", "6"], helper: "Greatest means furthest right.", visual: { type: "integer_number_line", min: -4, max: 6, highlights: [-2, 0, 6], emphasis: "compare" } },
       { prompt: "-12 is less than -5.", answer: "True", options: ["True", "False"], helper: "The more negative value is smaller.", visual: { type: "integer_number_line", min: -12, max: 2, highlights: [-12, -5], emphasis: "compare" } },
       { prompt: "Which is closer to zero?", answer: "1", options: ["1", "-4"], helper: "Compare the distance to zero.", visual: { type: "integer_number_line", min: -6, max: 4, highlights: [1, -4, 0], emphasis: "distance" } },
       { prompt: "Which number is further right?", answer: "5", options: ["-2", "5"], helper: "Right is greater.", visual: { type: "integer_number_line", min: -4, max: 6, highlights: [-2, 5], emphasis: "compare" } },
@@ -10469,6 +10578,141 @@ function generateGenericQuestion(
       helper: "Think about left, right, and distance from zero.",
       placeholder: "Type the integer",
       visual: chosen.visual,
+    };
+  }
+
+  if (explicitMode === "y6_integer_follow_movement") {
+    const templates = [
+      { prompt: "Start at -3 and move 8 spaces right. Where do you land?", answer: "5", start: -3, movement: 8, min: -12, max: 12 },
+      { prompt: "Start at 7 and move 12 spaces left. Where do you land?", answer: "-5", start: 7, movement: -12, min: -12, max: 12 },
+      { prompt: "Start at -6 and move 9 spaces right. Where do you land?", answer: "3", start: -6, movement: 9, min: -12, max: 12 },
+      { prompt: "Start at 4 and move 11 spaces left. Where do you land?", answer: "-7", start: 4, movement: -11, min: -12, max: 12 },
+      { prompt: "Start at -8 and move 5 spaces right. Where do you land?", answer: "-3", start: -8, movement: 5, min: -12, max: 12 },
+      { prompt: "Start at -2 and move 10 spaces left. Where do you land?", answer: "-12", start: -2, movement: -10, min: -12, max: 12 },
+      { prompt: "Start at 9 and move 13 spaces left. Where do you land?", answer: "-4", start: 9, movement: -13, min: -15, max: 15 },
+      { prompt: "Start at -10 and move 6 spaces right. Where do you land?", answer: "-4", start: -10, movement: 6, min: -12, max: 12 },
+      { prompt: "Start at 2 and move 9 spaces left. Where do you land?", answer: "-7", start: 2, movement: -9, min: -12, max: 12 },
+      { prompt: "Start at -7 and move 14 spaces right. Where do you land?", answer: "7", start: -7, movement: 14, min: -15, max: 15 },
+      { prompt: "Start at 5 and move 8 spaces left. Where do you land?", answer: "-3", start: 5, movement: -8, min: -12, max: 12 },
+      { prompt: "Start at -4 and move 12 spaces right. Where do you land?", answer: "8", start: -4, movement: 12, min: -12, max: 12 },
+      { prompt: "Start at 1 and move 10 spaces left. Where do you land?", answer: "-9", start: 1, movement: -10, min: -12, max: 12 },
+      { prompt: "Start at -9 and move 15 spaces right. Where do you land?", answer: "6", start: -9, movement: 15, min: -15, max: 15 },
+      { prompt: "Start at 6 and move 14 spaces left. Where do you land?", answer: "-8", start: 6, movement: -14, min: -15, max: 15 },
+      { prompt: "Start at -11 and move 4 spaces right. Where do you land?", answer: "-7", start: -11, movement: 4, min: -12, max: 12 },
+      { prompt: "Start at 8 and move 6 spaces left. Where do you land?", answer: "2", start: 8, movement: -6, min: -12, max: 12 },
+      { prompt: "Start at -5 and move 13 spaces right. Where do you land?", answer: "8", start: -5, movement: 13, min: -15, max: 15 },
+      { prompt: "Start at 0 and move 11 spaces left. Where do you land?", answer: "-11", start: 0, movement: -11, min: -12, max: 12 },
+      { prompt: "Start at -12 and move 12 spaces right. Where do you land?", answer: "0", start: -12, movement: 12, min: -12, max: 12 },
+      { prompt: "Start at 10 and move 15 spaces left. Where do you land?", answer: "-5", start: 10, movement: -15, min: -15, max: 15 },
+      { prompt: "Start at -1 and move 12 spaces right. Where do you land?", answer: "11", start: -1, movement: 12, min: -12, max: 12 },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      helper: "Start at the first number, then count the movement.",
+      placeholder: "Type the integer",
+      visual: {
+        type: "integer_number_line",
+        min: chosen.min,
+        max: chosen.max,
+        startValue: chosen.start,
+        movement: chosen.movement,
+        interactive: false,
+        showArrow: true,
+        emphasis: "movement",
+      },
+    };
+  }
+
+  if (explicitMode === "y6_integer_equations_movement") {
+    const templates = [
+      { prompt: "-3 + 8 = ?", answer: "5", start: -3, movement: 8, min: -12, max: 12 },
+      { prompt: "7 - 12 = ?", answer: "-5", start: 7, movement: -12, min: -12, max: 12 },
+      { prompt: "-6 + 9 = ?", answer: "3", start: -6, movement: 9, min: -12, max: 12 },
+      { prompt: "4 - 11 = ?", answer: "-7", start: 4, movement: -11, min: -12, max: 12 },
+      { prompt: "-8 + 5 = ?", answer: "-3", start: -8, movement: 5, min: -12, max: 12 },
+      { prompt: "-2 - 10 = ?", answer: "-12", start: -2, movement: -10, min: -12, max: 12 },
+      { prompt: "9 - 13 = ?", answer: "-4", start: 9, movement: -13, min: -15, max: 15 },
+      { prompt: "-10 + 6 = ?", answer: "-4", start: -10, movement: 6, min: -12, max: 12 },
+      { prompt: "2 - 9 = ?", answer: "-7", start: 2, movement: -9, min: -12, max: 12 },
+      { prompt: "-7 + 14 = ?", answer: "7", start: -7, movement: 14, min: -15, max: 15 },
+      { prompt: "5 - 8 = ?", answer: "-3", start: 5, movement: -8, min: -12, max: 12 },
+      { prompt: "-4 + 12 = ?", answer: "8", start: -4, movement: 12, min: -12, max: 12 },
+      { prompt: "1 - 10 = ?", answer: "-9", start: 1, movement: -10, min: -12, max: 12 },
+      { prompt: "-9 + 15 = ?", answer: "6", start: -9, movement: 15, min: -15, max: 15 },
+      { prompt: "6 - 14 = ?", answer: "-8", start: 6, movement: -14, min: -15, max: 15 },
+      { prompt: "-11 + 4 = ?", answer: "-7", start: -11, movement: 4, min: -12, max: 12 },
+      { prompt: "8 - 6 = ?", answer: "2", start: 8, movement: -6, min: -12, max: 12 },
+      { prompt: "-5 + 13 = ?", answer: "8", start: -5, movement: 13, min: -15, max: 15 },
+      { prompt: "0 - 11 = ?", answer: "-11", start: 0, movement: -11, min: -12, max: 12 },
+      { prompt: "-12 + 12 = ?", answer: "0", start: -12, movement: 12, min: -12, max: 12 },
+      { prompt: "10 - 15 = ?", answer: "-5", start: 10, movement: -15, min: -15, max: 15 },
+      { prompt: "-1 + 12 = ?", answer: "11", start: -1, movement: 12, min: -12, max: 12 },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      helper: "Use the equation as movement on the number line.",
+      placeholder: "Type the integer",
+      visual: {
+        type: "integer_number_line",
+        min: chosen.min,
+        max: chosen.max,
+        startValue: chosen.start,
+        movement: chosen.movement,
+        interactive: false,
+        showArrow: true,
+        emphasis: "movement",
+      },
+    };
+  }
+
+  if (explicitMode === "y6_integer_contexts_apply") {
+    const templates = [
+      { prompt: "The temperature is -2°C. It rises by 7°C. What is the new temperature?", answer: "5", options: ["-9", "-5", "5", "9"], helper: "Start at -2 and move 7 right.", start: -2, movement: 7, min: -12, max: 12 },
+      { prompt: "The temperature is 4°C. It drops by 9°C. What is the new temperature?", answer: "-5", options: ["-5", "-13", "5", "13"], helper: "A drop means move left.", start: 4, movement: -9, min: -12, max: 12 },
+      { prompt: "You are on floor -3. You go up 8 floors. Where are you?", answer: "5", options: ["-11", "-5", "5", "11"], helper: "Up means move right.", start: -3, movement: 8, min: -12, max: 12 },
+      { prompt: "You are on floor 6. You go down 11 floors. Where are you?", answer: "-5", options: ["-5", "-17", "5", "17"], helper: "Down means move left.", start: 6, movement: -11, min: -12, max: 12 },
+      { prompt: "A player has -4 points and gains 10. New score?", answer: "6", options: ["-14", "-6", "6", "14"], helper: "A gain means move right.", start: -4, movement: 10, min: -12, max: 12 },
+      { prompt: "A player has 3 points and loses 8. New score?", answer: "-5", options: ["-5", "-11", "5", "11"], helper: "A loss means move left.", start: 3, movement: -8, min: -12, max: 12 },
+      { prompt: "A diver is at -7 m and rises 4 m. New position?", answer: "-3", options: ["-11", "-3", "3", "11"], helper: "Rising means move right.", start: -7, movement: 4, min: -12, max: 12 },
+      { prompt: "A drone is at 5 m and drops 12 m. New position?", answer: "-7", options: ["-7", "-17", "7", "17"], helper: "Dropping means move left.", start: 5, movement: -12, min: -12, max: 12 },
+      { prompt: "Bank balance is -$6. You deposit $10. New balance?", answer: "4", options: ["-16", "-4", "4", "16"], helper: "Depositing means move right.", start: -6, movement: 10, min: -12, max: 12 },
+      { prompt: "Bank balance is $2. You spend $9. New balance?", answer: "-7", options: ["-7", "-11", "7", "11"], helper: "Spending means move left.", start: 2, movement: -9, min: -12, max: 12 },
+      { prompt: "Temperature is -8°C and rises by 13°C. New temperature?", answer: "5", options: ["-5", "5", "13", "21"], helper: "Cross zero carefully.", start: -8, movement: 13, min: -15, max: 15 },
+      { prompt: "Elevator starts at -2 and goes down 6 floors. Where are you?", answer: "-8", options: ["-8", "-4", "4", "8"], helper: "Down means move left.", start: -2, movement: -6, min: -12, max: 12 },
+      { prompt: "Team score is -5 and they gain 12 points. New score?", answer: "7", options: ["-17", "-7", "7", "17"], helper: "A gain means move right.", start: -5, movement: 12, min: -15, max: 15 },
+      { prompt: "Elevation is 3 m and drops 10 m. New elevation?", answer: "-7", options: ["-7", "-13", "7", "13"], helper: "A drop means move left.", start: 3, movement: -10, min: -12, max: 12 },
+      { prompt: "Submarine is at -9 m and rises 9 m. New position?", answer: "0", options: ["-18", "-9", "0", "9"], helper: "Rise back to zero.", start: -9, movement: 9, min: -12, max: 12 },
+      { prompt: "You owe $12 and pay back $5. Balance?", answer: "-7", options: ["-17", "-7", "7", "17"], helper: "Paying back reduces the debt but stays negative.", start: -12, movement: 5, min: -15, max: 15 },
+      { prompt: "Start at 8 m above sea level and descend 14 m. New position?", answer: "-6", options: ["-6", "-14", "6", "14"], helper: "Descend means move left.", start: 8, movement: -14, min: -15, max: 15 },
+      { prompt: "Temperature is 1°C and drops by 8°C. New temperature?", answer: "-7", options: ["-7", "-9", "7", "9"], helper: "A drop moves left past zero.", start: 1, movement: -8, min: -12, max: 12 },
+      { prompt: "Floor -6, go up 6 floors. Where are you?", answer: "0", options: ["-12", "-6", "0", "6"], helper: "Up means move right.", start: -6, movement: 6, min: -12, max: 12 },
+      { prompt: "Score is -10 and you gain 15 points. New score?", answer: "5", options: ["-5", "5", "10", "15"], helper: "Count across zero carefully.", start: -10, movement: 15, min: -15, max: 15 },
+      { prompt: "Which movement matches -4 + 9?", answer: "Start at -4 and move 9 right", options: ["Start at -4 and move 9 right", "Start at -4 and move 9 left", "Start at 9 and move 4 left"], helper: "Adding a positive means move right.", start: -4, movement: 9, min: -12, max: 12 },
+      { prompt: "Which movement matches 3 - 8?", answer: "Start at 3 and move 8 left", options: ["Start at 3 and move 8 left", "Start at 3 and move 8 right", "Start at -8 and move 3 right"], helper: "Subtracting a positive means move left.", start: 3, movement: -8, min: -12, max: 12 },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: chosen.helper,
+      visual: {
+        type: "integer_number_line",
+        min: chosen.min,
+        max: chosen.max,
+        startValue: chosen.start,
+        movement: chosen.movement,
+        interactive: false,
+        showArrow: true,
+        emphasis: "movement",
+      },
     };
   }
 

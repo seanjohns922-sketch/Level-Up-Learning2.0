@@ -221,7 +221,7 @@ const year6Rows: ProgramRow[] = [
     curriculum: ["AC9M6N01"],
     activities: [
       makeActivity("multiple_choice", 1, { mode: "y6_integer_position_order" }),
-      makeActivity("multiple_choice", 1, { mode: "y6_integer_compare" }),
+      makeActivity("number_order", 1, { mode: "y6_integer_order_compare" }),
       makeActivity("typed_response", 1, { mode: "y6_integer_apply_think" }),
     ],
   },
@@ -230,12 +230,12 @@ const year6Rows: ProgramRow[] = [
     focus: "Add and subtract integers by reasoning about movement on the number line",
     lesson: 2,
     topic: "Operations with Integers",
-    activity: "Solve integer addition and subtraction using direction, distance, and benchmark thinking.",
+    activity: "Start at the first number, move right to increase, and move left to decrease.",
     curriculum: ["AC9M6N01"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "integer_operations" }),
-      makeActivity("multiple_choice", 1, { mode: "integer_operations" }),
-      makeActivity("typed_response", 1, { mode: "integer_operations" }),
+      makeActivity("typed_response", 1, { mode: "y6_integer_follow_movement" }),
+      makeActivity("typed_response", 1, { mode: "y6_integer_equations_movement" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_integer_contexts_apply" }),
     ],
   },
   {
