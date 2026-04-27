@@ -127,12 +127,21 @@ const year6Rows: ProgramRow[] = [
     focus: "Build square-number fluency and recognise numeric patterns",
     lesson: 3,
     topic: "Square Numbers & Patterns",
-    activity: "Explore square numbers, match their values, and extend square-based patterns.",
+    activity: "Square numbers follow patterns. Spot them instantly and predict what comes next.",
     curriculum: ["AC9M6N03"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "square_numbers_patterns" }),
-      makeActivity("multiple_choice", 1, { mode: "square_numbers_patterns" }),
-      makeActivity("typed_response", 1, { mode: "square_numbers_patterns" }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_square_recognition",
+        rotationRole: "fast_thinking",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_square_pattern_building",
+        rotationRole: "reasoning",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "y6_square_apply_fast",
+        rotationRole: "apply_create",
+      }),
     ],
   },
   {

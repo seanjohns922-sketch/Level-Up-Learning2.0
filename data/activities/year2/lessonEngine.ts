@@ -10181,6 +10181,99 @@ function generateGenericQuestion(
     };
   }
 
+  if (explicitMode === "y6_square_recognition") {
+    const templates = [
+      { prompt: "Which is a square number?", answer: "36", options: ["36", "35", "38"] },
+      { prompt: "Is 49 a square number?", answer: "Yes", options: ["Yes", "No"] },
+      { prompt: "Which is NOT a square number?", answer: "30", options: ["25", "30", "64"] },
+      { prompt: "What is 9²?", answer: "81", options: ["72", "81", "90"] },
+      { prompt: "What is √64?", answer: "8", options: ["6", "8", "10"] },
+      { prompt: "Which is a square number?", answer: "121", options: ["118", "121", "124"] },
+      { prompt: "Is 72 a square number?", answer: "No", options: ["Yes", "No"] },
+      { prompt: "What is 12²?", answer: "144", options: ["124", "142", "144"] },
+      { prompt: "Which is NOT a square number?", answer: "50", options: ["49", "50", "64"] },
+      { prompt: "What is √81?", answer: "9", options: ["8", "9", "10"] },
+      { prompt: "Which is a square number?", answer: "100", options: ["96", "100", "104"] },
+      { prompt: "Is 1 a square number?", answer: "Yes", options: ["Yes", "No"] },
+      { prompt: "What is 6²?", answer: "36", options: ["30", "36", "42"] },
+      { prompt: "Which is NOT a square number?", answer: "63", options: ["49", "63", "81"] },
+      { prompt: "What is √121?", answer: "11", options: ["10", "11", "12"] },
+      { prompt: "Which is a square number?", answer: "16", options: ["14", "15", "16"] },
+      { prompt: "Is 144 a square number?", answer: "Yes", options: ["Yes", "No"] },
+      { prompt: "What is 5²?", answer: "25", options: ["20", "25", "30"] },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: "Recognise the square number pattern quickly.",
+    };
+  }
+
+  if (explicitMode === "y6_square_pattern_building") {
+    const templates = [
+      { prompt: "1, 4, 9, 16, ___", answer: "25", options: ["20", "25", "27"] },
+      { prompt: "What is the pattern? 1 → 4 → 9 → 16", answer: "+3, +5, +7", options: ["+3, +5, +7", "+2 each time", "×2 each time"] },
+      { prompt: "What is the next square after 121?", answer: "144", options: ["132", "144", "169"] },
+      { prompt: "__² = 81", answer: "9", options: ["8", "9", "10"] },
+      { prompt: "Which number is between 7² and 8²?", answer: "55", options: ["50", "55", "60"] },
+      { prompt: "Which number comes next? 16, 25, 36, ___", answer: "49", options: ["45", "48", "49"] },
+      { prompt: "How do the differences change in 25, 36, 49, 64?", answer: "+11, +13, +15", options: ["+10, +12, +14", "+11, +13, +15", "+9, +11, +13"] },
+      { prompt: "What is the next square after 64?", answer: "81", options: ["72", "81", "100"] },
+      { prompt: "__² = 100", answer: "10", options: ["9", "10", "11"] },
+      { prompt: "Which number is between 10² and 11²?", answer: "110", options: ["105", "110", "121"] },
+      { prompt: "1, 4, 9, 16, 25, ___", answer: "36", options: ["30", "35", "36"] },
+      { prompt: "What is the next square after 36?", answer: "49", options: ["42", "48", "49"] },
+      { prompt: "__² = 49", answer: "7", options: ["6", "7", "8"] },
+      { prompt: "Which number is between 5² and 6²?", answer: "30", options: ["28", "30", "32"] },
+      { prompt: "The square numbers increase by odd numbers.", answer: "True", options: ["True", "False"] },
+      { prompt: "What is the next difference after +7 in the square pattern?", answer: "+9", options: ["+8", "+9", "+10"] },
+      { prompt: "Which statement is true?", answer: "The next square after 81 is 100", options: ["The next square after 81 is 90", "The next square after 81 is 100", "The next square after 81 is 99"] },
+      { prompt: "What is the next square after 9²?", answer: "100", options: ["90", "99", "100"] },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: "Look for how square numbers grow from one to the next.",
+    };
+  }
+
+  if (explicitMode === "y6_square_apply_fast") {
+    const templates = [
+      { prompt: "Which square number is closest to 50?", answer: "49" },
+      { prompt: "√70 is closest to which whole number?", answer: "8" },
+      { prompt: "Which is larger: 9² or 10²? Type the larger value.", answer: "100" },
+      { prompt: "If n² = 49, what is (n+1)²?", answer: "64" },
+      { prompt: "A square garden has an area of 81m². What is the side length?", answer: "9" },
+      { prompt: "Which square number is closest to 90?", answer: "81" },
+      { prompt: "√130 is closest to which whole number?", answer: "11" },
+      { prompt: "If n² = 64, what is (n+1)²?", answer: "81" },
+      { prompt: "A square patio has an area of 49m². What is the side length?", answer: "7" },
+      { prompt: "Which square number is closest to 110?", answer: "121" },
+      { prompt: "√50 is closest to which whole number?", answer: "7" },
+      { prompt: "If n² = 25, what is (n+1)²?", answer: "36" },
+      { prompt: "A square room has an area of 144m². What is the side length?", answer: "12" },
+      { prompt: "Which square number is closest to 30?", answer: "25" },
+      { prompt: "√95 is closest to which whole number?", answer: "10" },
+      { prompt: "If n² = 100, what is (n-1)²?", answer: "81" },
+      { prompt: "A square tile has an area of 36cm². What is the side length?", answer: "6" },
+      { prompt: "Which square number is closest to 140?", answer: "144" },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      helper: "Use nearby square numbers to think fast.",
+      placeholder: "Type the answer",
+    };
+  }
+
   if (explicitMode === "factor_multiple_algorithm") {
     const multipleChoiceTemplates: Array<{
       prompt: string;
