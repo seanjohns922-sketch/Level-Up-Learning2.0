@@ -25,29 +25,31 @@ export default function IntegerNumberLineVisual({
     startPosition !== null && endPosition !== null ? Math.abs(endPosition - startPosition) : null;
   const arrowPointsRight =
     startPosition !== null && endPosition !== null ? endPosition >= startPosition : true;
+  const leftStyle = (value: number) => `calc(20px + ${positionPercent(value)}% * (100% - 40px) / 100)`;
 
   const markerClass = (value: number) => {
     if (value === visual.start) {
-      return "border-amber-700 bg-amber-400 shadow-[0_0_0_4px_rgba(251,191,36,0.18)]";
+      return "border-amber-700 bg-amber-400 shadow-[0_0_0_6px_rgba(251,191,36,0.14)]";
     }
     if (value === visual.end || value === visual.target) {
-      return "border-sky-700 bg-sky-500 shadow-[0_0_0_4px_rgba(14,165,233,0.14)]";
+      return "border-sky-700 bg-sky-500 shadow-[0_0_0_8px_rgba(14,165,233,0.12)]";
     }
-    return "border-emerald-700 bg-emerald-400 shadow-[0_0_0_4px_rgba(16,185,129,0.14)]";
+    return "border-slate-500 bg-white shadow-[0_0_0_6px_rgba(148,163,184,0.12)]";
   };
 
   return (
-    <div className="mt-5 rounded-2xl border border-sky-100 bg-gradient-to-r from-slate-100 via-white to-sky-50 p-4">
+    <div className="mt-5 rounded-[28px] border border-sky-100 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.95),_rgba(239,246,255,0.92)_55%,_rgba(224,242,254,0.9))] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
       <div className="text-xs font-black uppercase tracking-[0.18em] text-sky-700">{title}</div>
-      <div className="mt-4 rounded-2xl bg-white p-4 shadow-sm">
-        <div className="relative px-5 pt-12 pb-10">
-          <div className="absolute left-5 right-5 top-[3.15rem] h-1 rounded-full bg-gradient-to-r from-slate-500 via-slate-400 to-sky-400" />
-          <div className="absolute left-5 top-[2.75rem] h-8 w-[1px] bg-slate-500/30" />
-          <div className="absolute right-5 top-[2.75rem] h-8 w-[1px] bg-sky-400/30" />
+      <div className="mt-4 rounded-[30px] bg-white px-6 py-7 shadow-[0_12px_28px_rgba(15,23,42,0.08)]">
+        <div className="relative px-5 pt-7 pb-10">
+          <div className="absolute left-5 top-[2.5rem] h-6 w-[calc(50%-20px)] rounded-l-full bg-gradient-to-r from-slate-200/80 via-slate-200/55 to-slate-300/15" />
+          <div className="absolute right-5 top-[2.5rem] h-6 w-[calc(50%-20px)] rounded-r-full bg-gradient-to-r from-sky-200/15 via-sky-200/45 to-sky-200/75" />
+          <div className="absolute left-5 right-5 top-[3.15rem] h-[3px] rounded-full bg-gradient-to-r from-slate-700 via-slate-500 to-sky-500" />
+          <div className="absolute left-5 right-5 top-[3.15rem] h-[3px] rounded-full bg-white/20 blur-[1px]" />
 
           {arrowLeft !== null && arrowWidth !== null && visual.showArrow ? (
             <div
-              className="absolute top-5 h-1.5 rounded-full bg-amber-400"
+              className="absolute top-[1.45rem] h-1.5 rounded-full bg-amber-400/90 shadow-[0_0_14px_rgba(251,191,36,0.45)]"
               style={{
                 left: `calc(20px + ${arrowLeft}% * (100% - 40px) / 100)`,
                 width: `calc(${arrowWidth}% * (100% - 40px) / 100)`,
@@ -64,74 +66,105 @@ export default function IntegerNumberLineVisual({
             </div>
           ) : null}
 
-          {targetPosition !== null ? (
-            <div
-              className="absolute top-2 flex -translate-x-1/2 flex-col items-center"
-              style={{ left: `calc(20px + ${targetPosition}% * (100% - 40px) / 100)` }}
-            >
-              <div className={["h-4 w-4 rounded-full border-2", markerClass(visual.target!)].join(" ")} />
-              <div className="mt-1 text-[10px] font-black uppercase tracking-[0.18em] text-sky-700">
-                point
-              </div>
-            </div>
-          ) : null}
-
-          {highlights
-            .filter((value) => value !== visual.target)
-            .map((value) => (
-              <div
-                key={`highlight-${value}`}
-                className="absolute top-2 flex -translate-x-1/2 flex-col items-center"
-                style={{ left: `calc(20px + ${positionPercent(value)}% * (100% - 40px) / 100)` }}
-              >
-                <div className={["h-4 w-4 rounded-full border-2", markerClass(value)].join(" ")} />
-              </div>
-            ))}
-
-          {visual.start !== undefined && visual.end !== undefined && visual.start !== visual.end ? (
-            <>
-              <div
-                className="absolute top-2 flex -translate-x-1/2 flex-col items-center"
-                style={{ left: `calc(20px + ${startPosition}% * (100% - 40px) / 100)` }}
-              >
-                <div className={["h-4 w-4 rounded-full border-2", markerClass(visual.start)].join(" ")} />
-              </div>
-              <div
-                className="absolute top-2 flex -translate-x-1/2 flex-col items-center"
-                style={{ left: `calc(20px + ${endPosition}% * (100% - 40px) / 100)` }}
-              >
-                <div className={["h-4 w-4 rounded-full border-2", markerClass(visual.end)].join(" ")} />
-              </div>
-            </>
-          ) : null}
-
           <div className="relative h-16">
             {ticks.map((tick) => (
               <div
                 key={tick}
-                className="absolute top-6 -translate-x-1/2"
-                style={{ left: `calc(20px + ${positionPercent(tick)}% * (100% - 40px) / 100)` }}
+                className="absolute top-4 -translate-x-1/2"
+                style={{ left: leftStyle(tick) }}
               >
                 <div className="flex flex-col items-center">
                   <div
                     className={[
-                      "w-0.5 rounded-full",
-                      tick === 0 ? "h-8 bg-slate-900 shadow-[0_0_10px_rgba(15,23,42,0.18)]" : "h-5 bg-slate-400",
+                      "rounded-full",
+                      tick === 0
+                        ? "h-10 w-[3px] bg-slate-950 shadow-[0_0_14px_rgba(15,23,42,0.18)]"
+                        : tick % 5 === 0
+                          ? "h-7 w-[2px] bg-slate-500"
+                          : "h-6 w-[2px] bg-slate-400",
                     ].join(" ")}
                   />
                   <div
                     className={[
-                      "mt-2 min-w-[1.2rem] text-center text-sm font-black",
+                      "mt-2 min-w-[1.4rem] text-center text-sm font-black tabular-nums",
                       tick === 0
-                        ? "text-slate-900"
+                        ? "text-slate-950"
                         : tick < 0
                           ? "text-slate-600"
-                          : "text-sky-700",
+                          : "text-sky-700/95",
                     ].join(" ")}
                   >
                     {tick}
                   </div>
                 </div>
+              </div>
+            ))}
+
+            {highlights
+              .filter((value) => value !== visual.target && value !== visual.start && value !== visual.end)
+              .map((value) => (
+                <div
+                  key={`highlight-${value}`}
+                  className="absolute top-[1.05rem] z-10 -translate-x-1/2"
+                  style={{ left: leftStyle(value) }}
+                >
+                  <div className="h-5 w-5 rounded-full border-2 border-slate-400/55 bg-white/75 backdrop-blur-[1px]" />
+                </div>
+              ))}
+
+            {visual.start !== undefined ? (
+              <div
+                className="absolute top-[1.05rem] z-10 -translate-x-1/2"
+                style={{ left: leftStyle(visual.start) }}
+              >
+                <div className={["h-5 w-5 rounded-full border-2", markerClass(visual.start)].join(" ")} />
+              </div>
+            ) : null}
+
+            {visual.end !== undefined ? (
+              <div
+                className="absolute top-[1.05rem] z-10 -translate-x-1/2"
+                style={{ left: leftStyle(visual.end) }}
+              >
+                <div
+                  className={[
+                    "h-5 w-5 rounded-full border-2 animate-pulse",
+                    markerClass(visual.end),
+                  ].join(" ")}
+                />
+              </div>
+            ) : null}
+
+            {targetPosition !== null ? (
+              <div
+                className="absolute top-[1.05rem] z-10 -translate-x-1/2"
+                style={{ left: leftStyle(visual.target!) }}
+              >
+                <div
+                  className={[
+                    "h-5 w-5 rounded-full border-2 animate-pulse",
+                    markerClass(visual.target!),
+                  ].join(" ")}
+                />
+              </div>
+            ) : null}
+
+            {ticks.map((tick) => (
+              <div
+                key={`overlay-${tick}`}
+                className="absolute top-4 z-20 -translate-x-1/2"
+                style={{ left: leftStyle(tick) }}
+              >
+                <div
+                  className={[
+                    "rounded-full",
+                    tick === 0
+                      ? "h-10 w-[3px] bg-slate-950"
+                      : tick % 5 === 0
+                        ? "h-7 w-[2px] bg-slate-500"
+                        : "h-6 w-[2px] bg-slate-400",
+                  ].join(" ")}
+                />
               </div>
             ))}
           </div>
