@@ -105,12 +105,21 @@ const year6Rows: ProgramRow[] = [
     focus: "Use factor lists and multiples to compare number relationships",
     lesson: 2,
     topic: "Factors & Multiples",
-    activity: "Generate factors, recognise common multiples, and spot divisibility relationships quickly.",
+    activity: "Factors and multiples reveal patterns. Use them to solve problems faster, not list them out.",
     curriculum: ["AC9M6N03"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "factor_multiple_pattern" }),
-      makeActivity("multiple_choice", 1, { mode: "factor_multiple_algorithm" }),
-      makeActivity("typed_response", 1, { mode: "factor_multiple_algorithm" }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_factor_quick_recognition",
+        rotationRole: "fast_thinking",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_factor_relationship_thinking",
+        rotationRole: "reasoning",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "y6_factor_fast_application",
+        rotationRole: "apply_create",
+      }),
     ],
   },
   {

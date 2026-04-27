@@ -10088,6 +10088,99 @@ function generateGenericQuestion(
     };
   }
 
+  if (explicitMode === "y6_factor_quick_recognition") {
+    const templates = [
+      { prompt: "Is 6 a factor of 42?", answer: "Yes", options: ["Yes", "No"] },
+      { prompt: "Is 7 a factor of 45?", answer: "No", options: ["Yes", "No"] },
+      { prompt: "Which is a multiple of 8?", answer: "32", options: ["32", "30", "34"] },
+      { prompt: "Which is NOT a multiple of 5?", answer: "42", options: ["25", "40", "42"] },
+      { prompt: "Is 24 a multiple of 6?", answer: "Yes", options: ["Yes", "No"] },
+      { prompt: "Is 9 a factor of 54?", answer: "Yes", options: ["Yes", "No"] },
+      { prompt: "Which is a multiple of 9?", answer: "63", options: ["61", "63", "67"] },
+      { prompt: "Is 11 a factor of 88?", answer: "Yes", options: ["Yes", "No"] },
+      { prompt: "Which is NOT a multiple of 4?", answer: "26", options: ["20", "24", "26"] },
+      { prompt: "Is 8 a factor of 54?", answer: "No", options: ["Yes", "No"] },
+      { prompt: "Which is a multiple of 12?", answer: "84", options: ["82", "84", "86"] },
+      { prompt: "Is 15 a factor of 90?", answer: "Yes", options: ["Yes", "No"] },
+      { prompt: "Which is NOT a multiple of 3?", answer: "44", options: ["39", "42", "44"] },
+      { prompt: "Is 14 a factor of 98?", answer: "Yes", options: ["Yes", "No"] },
+      { prompt: "Which is a multiple of 7?", answer: "56", options: ["54", "56", "58"] },
+      { prompt: "Is 5 a factor of 62?", answer: "No", options: ["Yes", "No"] },
+      { prompt: "Which is NOT a multiple of 6?", answer: "50", options: ["42", "48", "50"] },
+      { prompt: "Is 13 a factor of 91?", answer: "Yes", options: ["Yes", "No"] },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: "Use a quick factor or multiple check.",
+    };
+  }
+
+  if (explicitMode === "y6_factor_relationship_thinking") {
+    const templates = [
+      { prompt: "Which is a common multiple of 4 and 6?", answer: "12", options: ["12", "16", "18"] },
+      { prompt: "Which is a common factor of 18 and 24?", answer: "3", options: ["3", "5", "7"] },
+      { prompt: "___ is a multiple of both 3 and 5.", answer: "15", options: ["10", "15", "18"] },
+      { prompt: "If 8 is a factor of a number, which could it be?", answer: "24", options: ["24", "26", "30"] },
+      { prompt: "If a number is a multiple of 4, it is always even.", answer: "True", options: ["True", "False"] },
+      { prompt: "Multiples of 7: 7, 14, 21, ___", answer: "28", options: ["27", "28", "29"] },
+      { prompt: "Which is a common multiple of 5 and 6?", answer: "30", options: ["20", "25", "30"] },
+      { prompt: "Which is a common factor of 20 and 30?", answer: "10", options: ["6", "10", "12"] },
+      { prompt: "Which number has both 3 and 4 as factors?", answer: "24", options: ["18", "24", "28"] },
+      { prompt: "If a number is divisible by 10, it must also be divisible by 5.", answer: "True", options: ["True", "False"] },
+      { prompt: "Which is a common multiple of 8 and 3?", answer: "24", options: ["16", "18", "24"] },
+      { prompt: "Which is a common factor of 27 and 36?", answer: "9", options: ["4", "9", "12"] },
+      { prompt: "___ is a multiple of both 4 and 9.", answer: "36", options: ["28", "32", "36"] },
+      { prompt: "If 6 is a factor of a number, that number must be even.", answer: "True", options: ["True", "False"] },
+      { prompt: "Multiples of 9: 9, 18, 27, ___", answer: "36", options: ["35", "36", "37"] },
+      { prompt: "Which number shares a common factor with both 14 and 21?", answer: "7", options: ["5", "6", "7"] },
+      { prompt: "Which number is a multiple of both 2 and 7?", answer: "42", options: ["28", "35", "42"] },
+      { prompt: "If a number is a multiple of 3 and 4, it must be a multiple of 12.", answer: "True", options: ["True", "False"] },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: "Look for the relationship between the numbers, not a long list.",
+    };
+  }
+
+  if (explicitMode === "y6_factor_fast_application") {
+    const templates = [
+      { prompt: "24 students are put into equal groups of 6. How many groups?", answer: "4" },
+      { prompt: "30 players are split into equal teams of 5. How many teams?", answer: "6" },
+      { prompt: "Two lights flash every 4 seconds and 6 seconds. When will they flash together?", answer: "12" },
+      { prompt: "48 counters are shared into equal groups of 8. How many groups?", answer: "6" },
+      { prompt: "A class lines up in rows of 7. If there are 42 students, how many rows are there?", answer: "6" },
+      { prompt: "60 stickers are packed in groups of 12. How many packs are made?", answer: "5" },
+      { prompt: "Two alarms ring every 5 minutes and 10 minutes. After how many minutes will they ring together?", answer: "10" },
+      { prompt: "36 marbles are split into equal groups of 9. How many groups?", answer: "4" },
+      { prompt: "A number has both 3 and 5 as factors and is less than 20. Type one possible number.", answer: "15" },
+      { prompt: "A number can be split into equal groups of 4 and 5. Type the smallest possible number greater than 10.", answer: "20" },
+      { prompt: "54 books are arranged in equal stacks of 6. How many stacks?", answer: "9" },
+      { prompt: "Two taps drip every 3 seconds and 8 seconds. When will they drip together?", answer: "24" },
+      { prompt: "72 beads are sorted into equal groups of 9. How many groups?", answer: "8" },
+      { prompt: "A number has both 2 and 7 as factors and is less than 30. Type one possible number.", answer: "14" },
+      { prompt: "45 counters are shared into equal groups of 5. How many groups?", answer: "9" },
+      { prompt: "Two timers beep every 4 minutes and 10 minutes. When will they beep together?", answer: "20" },
+      { prompt: "63 pencils are packed into equal boxes of 7. How many boxes?", answer: "9" },
+      { prompt: "A number has both 4 and 6 as factors and is less than 30. Type one possible number.", answer: "12" },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      helper: "Use factor and multiple relationships to solve it quickly.",
+      placeholder: "Type the answer",
+    };
+  }
+
   if (explicitMode === "factor_multiple_algorithm") {
     const multipleChoiceTemplates: Array<{
       prompt: string;
