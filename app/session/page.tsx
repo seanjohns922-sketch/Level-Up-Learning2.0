@@ -432,7 +432,7 @@ function isQuizSafeGeneratedQuestion(questionData: Year2QuestionData) {
       return false;
     }
 
-    const prompt = questionData.prompt.toLowerCase();
+    const prompt = typeof questionData.prompt === "string" ? questionData.prompt.toLowerCase() : "";
     if (
       prompt.includes("who used a helpful strategy") ||
       prompt.includes("which method is most efficient") ||
@@ -479,7 +479,7 @@ function getStructuredQuizQuestionId(
     questionData.kind === "multiple_choice" || questionData.kind === "typed_response"
       ? `${questionData.prompt} ${questionData.answer ?? ""}`
       : JSON.stringify(questionData);
-  const normalizedText = text.toLowerCase().replace(/\s+/g, " ").trim();
+  const normalizedText = String(text ?? "").toLowerCase().replace(/\s+/g, " ").trim();
   const symbolMatch = normalizedText.match(/[+×÷-]/);
   const operation =
     symbolMatch?.[0] === "+"
