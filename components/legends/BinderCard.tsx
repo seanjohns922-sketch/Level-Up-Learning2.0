@@ -16,7 +16,7 @@ export default function BinderCard({
     <button
       onClick={isUnlocked ? onClick : undefined}
       disabled={!isUnlocked}
-      className="group relative w-full"
+      className="group relative w-full focus:outline-none"
       title={
         isUnlocked
           ? `View ${legend.name}`
@@ -24,31 +24,32 @@ export default function BinderCard({
       }
     >
       <div
-        className="relative rounded-2xl overflow-hidden transition-all duration-300 aspect-[2/3]"
+        className="relative overflow-hidden transition-all duration-300 aspect-[2/3] rounded-[18px]"
         style={{
           border: isUnlocked
-            ? "2px solid hsla(160, 50%, 55%, 0.5)"
-            : "2px solid hsla(160, 20%, 42%, 0.28)",
+            ? "1.5px solid hsla(160, 50%, 64%, 0.48)"
+            : "1.5px solid hsla(160, 22%, 52%, 0.3)",
           boxShadow: isUnlocked
-            ? "0 4px 20px hsla(160, 50%, 45%, 0.2), 0 0 0 1px hsla(160, 50%, 60%, 0.1)"
-            : "0 8px 22px hsla(170, 60%, 2%, 0.24)",
+            ? "0 10px 28px hsla(160, 50%, 24%, 0.26), 0 0 0 1px hsla(160, 50%, 68%, 0.08)"
+            : "0 14px 34px hsla(170, 70%, 2%, 0.34)",
           transform: "translateY(0)",
           cursor: isUnlocked ? "pointer" : "default",
+          background: "hsla(166, 34%, 8%, 0.72)",
         }}
         onMouseEnter={(e) => {
           if (isUnlocked) {
             e.currentTarget.style.transform = "translateY(-4px) scale(1.02)";
             e.currentTarget.style.boxShadow =
-              "0 8px 28px hsla(160, 50%, 45%, 0.3), 0 0 16px hsla(160, 50%, 55%, 0.15), 0 0 0 1px hsla(160, 50%, 60%, 0.2)";
+              "0 18px 44px hsla(160, 50%, 28%, 0.34), 0 0 18px hsla(160, 50%, 55%, 0.14), 0 0 0 1px hsla(160, 50%, 66%, 0.18)";
           }
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.transform = "translateY(0) scale(1)";
           if (isUnlocked) {
             e.currentTarget.style.boxShadow =
-              "0 4px 20px hsla(160, 50%, 45%, 0.2), 0 0 0 1px hsla(160, 50%, 60%, 0.1)";
+              "0 10px 28px hsla(160, 50%, 24%, 0.26), 0 0 0 1px hsla(160, 50%, 68%, 0.08)";
           } else {
-            e.currentTarget.style.boxShadow = "0 8px 22px hsla(170, 60%, 2%, 0.24)";
+            e.currentTarget.style.boxShadow = "0 14px 34px hsla(170, 70%, 2%, 0.34)";
           }
         }}
       >
