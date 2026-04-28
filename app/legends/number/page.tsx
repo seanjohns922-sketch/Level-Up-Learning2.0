@@ -125,8 +125,8 @@ export default function NumbotCollectionPage() {
             }}
           />
 
-          <div className="relative max-w-2xl mx-auto px-6 pt-6 pb-10">
-            <div className="flex items-center justify-between mb-8">
+          <div className="relative max-w-6xl mx-auto px-6 pt-6 pb-7">
+            <div className="flex items-center justify-between mb-7">
               <button
                 onClick={() => router.push("/legends")}
                 className="text-sm font-bold transition flex items-center gap-1"
@@ -148,16 +148,16 @@ export default function NumbotCollectionPage() {
             </div>
 
             <h1
-              className="text-4xl md:text-5xl font-black tracking-wide uppercase"
+              className="text-3xl md:text-5xl font-black tracking-[0.08em] uppercase"
               style={{
                 color: "hsl(160, 38%, 92%)",
-                fontFamily: "'Orbitron', 'Rajdhani', 'Exo 2', 'Quicksand', sans-serif",
-                textShadow: "0 2px 20px hsla(160, 55%, 45%, 0.16)",
+                fontFamily: "'Rajdhani', 'Exo 2', 'Orbitron', 'Quicksand', sans-serif",
+                textShadow: "0 2px 18px hsla(160, 55%, 45%, 0.14)",
               }}
             >
               Numbot Collection
             </h1>
-            <p className="mt-2 text-lg max-w-lg" style={{ color: "hsl(166, 18%, 72%)" }}>
+            <p className="mt-2 text-base md:text-lg max-w-xl" style={{ color: "hsl(166, 18%, 76%)" }}>
               Collect powerful Numbots by mastering your number skills.
             </p>
 
@@ -193,7 +193,7 @@ export default function NumbotCollectionPage() {
         </div>
 
         {/* Card Binder Grid */}
-        <div className="max-w-2xl mx-auto px-6 py-8">
+        <div className="max-w-6xl mx-auto px-6 pb-12 pt-3">
           <h2
             className="text-xs font-extrabold tracking-[0.22em] mb-5"
             style={{ color: "hsl(160, 24%, 66%)", fontFamily: "'Orbitron', 'Rajdhani', 'Exo 2', sans-serif" }}
@@ -201,19 +201,36 @@ export default function NumbotCollectionPage() {
             CARD BINDER
           </h2>
 
-          <div className="grid grid-cols-3 gap-3 sm:gap-4">
-            {sortedLegends.map((legend) => {
-              const isUnlocked = unlockedIds.includes(legend.id);
-              return (
-                <BinderCard
-                  key={legend.id}
-                  legend={legend}
-                  isUnlocked={isUnlocked}
-                  onClick={() => setSelectedLegend(legend)}
-                />
-              );
-            })}
-          </div>
+          <section
+            className="relative overflow-hidden rounded-[28px] p-4 sm:p-5 md:p-6"
+            style={{
+              background: "linear-gradient(180deg, hsla(166, 46%, 8%, 0.72), hsla(170, 52%, 5%, 0.62))",
+              border: "1px solid hsla(160, 42%, 58%, 0.18)",
+              backdropFilter: "blur(16px)",
+              boxShadow: "0 26px 80px hsla(170, 70%, 2%, 0.42), inset 0 1px 0 hsla(160, 55%, 75%, 0.08)",
+            }}
+          >
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background:
+                  "radial-gradient(circle at 50% 0%, hsla(160, 58%, 48%, 0.12), transparent 42%), linear-gradient(90deg, hsla(160, 55%, 45%, 0.08), transparent 18%, transparent 82%, hsla(160, 55%, 45%, 0.08))",
+              }}
+            />
+            <div className="relative grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
+              {sortedLegends.map((legend) => {
+                const isUnlocked = unlockedIds.includes(legend.id);
+                return (
+                  <BinderCard
+                    key={legend.id}
+                    legend={legend}
+                    isUnlocked={isUnlocked}
+                    onClick={() => setSelectedLegend(legend)}
+                  />
+                );
+              })}
+            </div>
+          </section>
 
           {/* Tip */}
           <div
