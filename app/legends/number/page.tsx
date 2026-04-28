@@ -147,10 +147,10 @@ export default function NumbotCollectionPage() {
             </div>
 
             <h1
-              className="text-4xl md:text-5xl font-black tracking-tight"
+              className="text-4xl md:text-5xl font-black tracking-wide uppercase"
               style={{
                 color: "hsl(160, 38%, 92%)",
-                fontFamily: "'Quicksand', 'Nunito', sans-serif",
+                fontFamily: "'Orbitron', 'Rajdhani', 'Exo 2', 'Quicksand', sans-serif",
                 textShadow: "0 2px 20px hsla(160, 55%, 45%, 0.16)",
               }}
             >
@@ -193,7 +193,10 @@ export default function NumbotCollectionPage() {
 
         {/* Card Binder Grid */}
         <div className="max-w-2xl mx-auto px-6 py-8">
-          <h2 className="text-xs font-extrabold tracking-[0.15em] mb-5" style={{ color: "hsl(160, 24%, 66%)" }}>
+          <h2
+            className="text-xs font-extrabold tracking-[0.22em] mb-5"
+            style={{ color: "hsl(160, 24%, 66%)", fontFamily: "'Orbitron', 'Rajdhani', 'Exo 2', sans-serif" }}
+          >
             CARD BINDER
           </h2>
 
