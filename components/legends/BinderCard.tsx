@@ -128,20 +128,20 @@ export default function BinderCard({
 
         {/* Bottom label */}
         <div
-          className="absolute bottom-0 inset-x-0 p-2.5"
+          className="absolute bottom-0 inset-x-0 p-3"
           style={{
-            background: "linear-gradient(to top, hsla(0, 0%, 0%, 0.6), hsla(0, 0%, 0%, 0.3) 60%, transparent)",
+            background: "linear-gradient(to top, hsla(170, 52%, 3%, 0.84), hsla(170, 44%, 4%, 0.42) 62%, transparent)",
           }}
         >
           <p
-            className="text-[9px] font-bold tracking-wider"
-            style={{ color: "hsla(0, 0%, 100%, 0.7)", fontFamily: "'Orbitron', 'Rajdhani', 'Exo 2', sans-serif" }}
+            className="text-[9px] font-extrabold tracking-[0.18em]"
+            style={{ color: "hsla(160, 32%, 86%, 0.76)", fontFamily: "'Rajdhani', 'Orbitron', 'Exo 2', sans-serif" }}
           >
             {legend.yearLabel.toUpperCase()}
           </p>
           <p
-            className="text-xs font-extrabold leading-tight"
-            style={{ color: isUnlocked ? "white" : "hsla(0, 0%, 100%, 0.55)" }}
+            className="text-sm font-extrabold leading-tight"
+            style={{ color: isUnlocked ? "hsl(160, 30%, 96%)" : "hsla(160, 22%, 90%, 0.62)" }}
           >
             {legend.name}
           </p>
