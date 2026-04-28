@@ -1,4 +1,19 @@
-export type Year6WeeklyQuizAnswerType = "numeric" | "multipleChoice";
+import type {
+  IntegerContextVisualData,
+  IntegerNumberLineVisualData,
+} from "@/data/activities/year2/lessonEngine";
+
+export type Year6WeeklyQuizAnswerType = "numeric" | "multipleChoice" | "ordering";
+
+export type Year6WeeklyQuizVisual =
+  | {
+      kind: "numberLine";
+      numberLine: IntegerNumberLineVisualData;
+    }
+  | {
+      kind: "integerContext";
+      contextVisual: IntegerContextVisualData;
+    };
 
 export type Year6WeeklyQuizQuestion = {
   id: string;
@@ -6,7 +21,13 @@ export type Year6WeeklyQuizQuestion = {
   questionText: string;
   answerType: Year6WeeklyQuizAnswerType;
   options?: string[];
+  values?: string[];
+  correctOrder?: string[];
+  instructionText?: string;
   correctAnswer: string;
+  acceptedAnswers?: string[];
+  placeholder?: string;
+  visual?: Year6WeeklyQuizVisual;
   feedbackCorrect: string;
   feedbackIncorrect: string;
 };
@@ -41,7 +62,11 @@ function validateYear6WeeklyQuizQuestion(
   if (!isNonEmptyString(question.questionText)) {
     throw new Error(`[Year6WeeklyQuiz] ${label} is missing questionText.`);
   }
-  if (question.answerType !== "numeric" && question.answerType !== "multipleChoice") {
+  if (
+    question.answerType !== "numeric" &&
+    question.answerType !== "multipleChoice" &&
+    question.answerType !== "ordering"
+  ) {
     throw new Error(`[Year6WeeklyQuiz] ${label} has an invalid answerType.`);
   }
   if (!isNonEmptyString(question.correctAnswer)) {
@@ -65,6 +90,15 @@ function validateYear6WeeklyQuizQuestion(
       throw new Error(
         `[Year6WeeklyQuiz] ${label} correctAnswer must exactly match one of the option strings.`
       );
+    }
+  }
+
+  if (question.answerType === "ordering") {
+    if (!Array.isArray(question.values) || question.values.length < 2) {
+      throw new Error(`[Year6WeeklyQuiz] ${label} must have values for ordering.`);
+    }
+    if (!Array.isArray(question.correctOrder) || question.correctOrder.length !== question.values.length) {
+      throw new Error(`[Year6WeeklyQuiz] ${label} must have a valid correctOrder.`);
     }
   }
 }
@@ -565,6 +599,384 @@ const year6WeeklyQuizWeeks: Record<number, Year6WeeklyQuizWeek> = {
         correctAnswer: "0.078 × 1000",
         feedbackCorrect: "Correct — strong place value thinking.",
         feedbackIncorrect: "Check which option scales 0.078 up to 78.",
+      },
+    ],
+  },
+  4: {
+    weekNumber: 4,
+    quizTitle: "Week 4 Quiz — Integers & Number Lines",
+    weeklyFocus: "Integers & Number Lines",
+    lesson1Title: "Integers on Number Lines",
+    lesson2Title: "Operations with Integers",
+    lesson3Title: "Integer Contexts",
+    questions: [
+      {
+        id: "y6w4q1",
+        lessonTag: 1,
+        questionText: "Which integer is marked on the number line?",
+        answerType: "multipleChoice",
+        options: ["-6", "6", "-4", "4"],
+        correctAnswer: "-6",
+        feedbackCorrect: "Strong positioning.",
+        feedbackIncorrect: "Check the tick mark carefully.",
+        visual: {
+          kind: "numberLine",
+          numberLine: {
+            type: "integer_number_line",
+            min: -10,
+            max: 10,
+            markerValue: -6,
+            emphasis: "position",
+          },
+        },
+      },
+      {
+        id: "y6w4q2",
+        lessonTag: 1,
+        questionText: "Which integer is greater?",
+        answerType: "multipleChoice",
+        options: ["-8", "-3"],
+        correctAnswer: "-3",
+        feedbackCorrect: "Correct — it sits further right.",
+        feedbackIncorrect: "Further right means greater.",
+        visual: {
+          kind: "numberLine",
+          numberLine: {
+            type: "integer_number_line",
+            min: -10,
+            max: 10,
+            highlightedValues: [-8, -3],
+            emphasis: "compare",
+          },
+        },
+      },
+      {
+        id: "y6w4q3",
+        lessonTag: 1,
+        questionText: "Order from smallest to largest.",
+        answerType: "ordering",
+        values: ["0", "-4", "3"],
+        correctOrder: ["-4", "0", "3"],
+        instructionText: "Read the number line from left to right.",
+        correctAnswer: "-4,0,3",
+        feedbackCorrect: "Locked in from left to right.",
+        feedbackIncorrect: "Use the number line and read from left to right.",
+        visual: {
+          kind: "numberLine",
+          numberLine: {
+            type: "integer_number_line",
+            min: -6,
+            max: 6,
+            highlightedValues: [-4, 0, 3],
+            emphasis: "compare",
+          },
+        },
+      },
+      {
+        id: "y6w4q4",
+        lessonTag: 1,
+        questionText: "Which integer is closer to zero?",
+        answerType: "multipleChoice",
+        options: ["-2", "-8"],
+        correctAnswer: "-2",
+        feedbackCorrect: "Nice distance thinking.",
+        feedbackIncorrect: "Closer to zero means fewer spaces away.",
+        visual: {
+          kind: "numberLine",
+          numberLine: {
+            type: "integer_number_line",
+            min: -10,
+            max: 10,
+            highlightedValues: [-2, -8],
+            emphasis: "distance",
+          },
+        },
+      },
+      {
+        id: "y6w4q5",
+        lessonTag: 1,
+        questionText: "You start at 5 and move 8 spaces left. Where are you?",
+        answerType: "numeric",
+        correctAnswer: "-3",
+        placeholder: "Type the integer",
+        feedbackCorrect: "Nice integer movement.",
+        feedbackIncorrect: "Start at 5 and move 8 spaces left.",
+        visual: {
+          kind: "numberLine",
+          numberLine: {
+            type: "integer_number_line",
+            min: -10,
+            max: 10,
+            startValue: 5,
+            movement: -8,
+            showArrow: true,
+            emphasis: "movement",
+          },
+        },
+      },
+      {
+        id: "y6w4q6",
+        lessonTag: 2,
+        questionText: "-3 + 8 = ?",
+        answerType: "numeric",
+        correctAnswer: "5",
+        placeholder: "Type the integer",
+        feedbackCorrect: "Clean movement across zero.",
+        feedbackIncorrect: "Start at -3 and move 8 spaces right.",
+        visual: {
+          kind: "numberLine",
+          numberLine: {
+            type: "integer_number_line",
+            min: -12,
+            max: 12,
+            startValue: -3,
+            movement: 8,
+            showArrow: true,
+            emphasis: "movement",
+          },
+        },
+      },
+      {
+        id: "y6w4q7",
+        lessonTag: 2,
+        questionText: "7 - 12 = ?",
+        answerType: "numeric",
+        correctAnswer: "-5",
+        placeholder: "Type the integer",
+        feedbackCorrect: "Strong number line thinking.",
+        feedbackIncorrect: "Subtracting 12 means move 12 spaces left.",
+        visual: {
+          kind: "numberLine",
+          numberLine: {
+            type: "integer_number_line",
+            min: -12,
+            max: 12,
+            startValue: 7,
+            movement: -12,
+            showArrow: true,
+            emphasis: "movement",
+          },
+        },
+      },
+      {
+        id: "y6w4q8",
+        lessonTag: 2,
+        questionText: "Which movement matches -4 + 9?",
+        answerType: "multipleChoice",
+        options: [
+          "Start at -4 and move 9 right",
+          "Start at -4 and move 9 left",
+          "Start at 9 and move 4 left",
+        ],
+        correctAnswer: "Start at -4 and move 9 right",
+        feedbackCorrect: "Good direction control.",
+        feedbackIncorrect: "Adding a positive moves right.",
+      },
+      {
+        id: "y6w4q9",
+        lessonTag: 2,
+        questionText: "-6 + 9 = ?",
+        answerType: "numeric",
+        correctAnswer: "3",
+        placeholder: "Type the integer",
+        feedbackCorrect: "Nice work crossing zero.",
+        feedbackIncorrect: "Start at -6 and move 9 spaces right.",
+        visual: {
+          kind: "numberLine",
+          numberLine: {
+            type: "integer_number_line",
+            min: -12,
+            max: 12,
+            startValue: -6,
+            movement: 9,
+            showArrow: true,
+            emphasis: "movement",
+          },
+        },
+      },
+      {
+        id: "y6w4q10",
+        lessonTag: 2,
+        questionText: "4 - 11 = ?",
+        answerType: "numeric",
+        correctAnswer: "-7",
+        placeholder: "Type the integer",
+        feedbackCorrect: "Locked in.",
+        feedbackIncorrect: "Moving left makes the value smaller.",
+        visual: {
+          kind: "numberLine",
+          numberLine: {
+            type: "integer_number_line",
+            min: -12,
+            max: 12,
+            startValue: 4,
+            movement: -11,
+            showArrow: true,
+            emphasis: "movement",
+          },
+        },
+      },
+      {
+        id: "y6w4q11",
+        lessonTag: 3,
+        questionText: "A temperature changes from -4°C to 3°C. What happened?",
+        answerType: "multipleChoice",
+        options: ["It rose 7°C", "It dropped 7°C", "It rose 1°C", "It dropped 1°C"],
+        correctAnswer: "It rose 7°C",
+        feedbackCorrect: "Strong interpretation.",
+        feedbackIncorrect: "Track the movement from -4 to 3.",
+        visual: {
+          kind: "integerContext",
+          contextVisual: {
+            type: "integer_context",
+            context: "temperature",
+            title: "Temperature change",
+            currentValue: -4,
+            change: 7,
+            endValue: 3,
+            currentLabel: "Start",
+            endLabel: "End",
+            hidePrimaryChange: true,
+            unitSuffix: "°C",
+            noteText: "Read the start and end, then decide what changed.",
+            numberLine: {
+              type: "integer_number_line",
+              min: -10,
+              max: 10,
+              highlightedValues: [-4, 3],
+              emphasis: "compare",
+            },
+          },
+        },
+      },
+      {
+        id: "y6w4q12",
+        lessonTag: 3,
+        questionText: "A player's score goes from -11 to -1. What is the change?",
+        answerType: "numeric",
+        correctAnswer: "10",
+        acceptedAnswers: ["+10"],
+        placeholder: "Type the integer",
+        feedbackCorrect: "Nice reasoning.",
+        feedbackIncorrect: "Find how far the score moved from -11 to -1.",
+        visual: {
+          kind: "integerContext",
+          contextVisual: {
+            type: "integer_context",
+            context: "score",
+            title: "Score change",
+            currentValue: -11,
+            change: 10,
+            endValue: -1,
+            currentLabel: "From",
+            endLabel: "To",
+            hidePrimaryChange: true,
+            noteText: "Interpret the score change before you calculate it.",
+            numberLine: {
+              type: "integer_number_line",
+              min: -15,
+              max: 5,
+              highlightedValues: [-11, -1],
+              emphasis: "distance",
+            },
+          },
+        },
+      },
+      {
+        id: "y6w4q13",
+        lessonTag: 3,
+        questionText: "A temperature ends at 3°C after rising 8°C. What was the starting temperature?",
+        answerType: "numeric",
+        correctAnswer: "-5",
+        placeholder: "Type the integer",
+        feedbackCorrect: "Strong inverse thinking.",
+        feedbackIncorrect: "Work backwards from 3°C.",
+        visual: {
+          kind: "integerContext",
+          contextVisual: {
+            type: "integer_context",
+            context: "temperature",
+            title: "Temperature reverse",
+            currentValue: 3,
+            change: 8,
+            currentLabel: "End",
+            changeLabel: "Rise",
+            unitSuffix: "°C",
+            noteText: "Use the ending temperature, then reverse the rise.",
+            numberLine: {
+              type: "integer_number_line",
+              min: -10,
+              max: 10,
+              markerValue: 3,
+              emphasis: "position",
+            },
+          },
+        },
+      },
+      {
+        id: "y6w4q14",
+        lessonTag: 3,
+        questionText: "You start on floor -5. You go up 12 floors, then down 9 floors. Where are you now?",
+        answerType: "numeric",
+        correctAnswer: "-2",
+        placeholder: "Type the integer",
+        feedbackCorrect: "You tracked both steps well.",
+        feedbackIncorrect: "Track each movement in order.",
+        visual: {
+          kind: "integerContext",
+          contextVisual: {
+            type: "integer_context",
+            context: "elevator",
+            title: "Lift journey",
+            currentValue: -5,
+            change: 12,
+            secondaryChange: -9,
+            currentLabel: "Start",
+            changeLabel: "Up",
+            secondaryChangeLabel: "Then down",
+            noteText: "Track each movement in order.",
+            numberLine: {
+              type: "integer_number_line",
+              min: -12,
+              max: 12,
+              markerValue: -5,
+              emphasis: "movement",
+            },
+          },
+        },
+      },
+      {
+        id: "y6w4q15",
+        lessonTag: 3,
+        questionText: "A bank balance is -$20. You deposit $15, then spend $12. What is the final balance?",
+        answerType: "numeric",
+        correctAnswer: "-17",
+        placeholder: "Type the integer",
+        feedbackCorrect: "Good multi-step thinking.",
+        feedbackIncorrect: "Deposit moves up; spending moves down.",
+        visual: {
+          kind: "integerContext",
+          contextVisual: {
+            type: "integer_context",
+            context: "balance",
+            title: "Balance tracker",
+            currentValue: -20,
+            change: 15,
+            secondaryChange: -12,
+            currentLabel: "Start",
+            changeLabel: "Deposit",
+            secondaryChangeLabel: "Then spend",
+            unitPrefix: "$",
+            noteText: "Apply both money changes in order.",
+            numberLine: {
+              type: "integer_number_line",
+              min: -25,
+              max: 25,
+              markerValue: -20,
+              emphasis: "movement",
+            },
+          },
+        },
       },
     ],
   },

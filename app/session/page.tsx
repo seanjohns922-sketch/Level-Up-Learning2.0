@@ -13,6 +13,8 @@ import {
   generateQuestionForLevelLessonActivity,
   getLevelForLesson,
   type MultipleChoiceQuestion as Year2MultipleChoiceQuestion,
+  type IntegerContextVisualData,
+  type IntegerNumberLineVisualData,
   type PlaceValueBuilderQuestion as Year2PlaceValueBuilderQuestion,
   type PartitionExpandQuestion as Year2PartitionExpandQuestion,
   type TypedResponseQuestion as Year2TypedResponseQuestion,
@@ -127,6 +129,7 @@ type QuizQuestion = {
   activityType?: LessonActivity["activityType"];
   kind:
     | "lessonActivity"
+    | "ordering"
     | "mcq"
     | "typed"
     | "audio"
@@ -144,6 +147,8 @@ type QuizQuestion = {
   feedbackCorrect?: string;
   feedbackIncorrect?: string;
   responseType?: "number";
+  acceptedValues?: string[];
+  placeholder?: string;
   audioText?: string;
   visual?: {
     type: "dots";
@@ -289,32 +294,117 @@ function toExplicitWeeklyQuizQuestion(
   const prompt = String(question.questionText ?? "").trim();
   const correctAnswer = String(question.correctAnswer ?? "").trim();
 
+  const lessonMeta = {
+    id: question.id || `q${index}`,
+    lessonNumber: question.lessonTag,
+    lessonTag: question.lessonTag,
+    skill: `lesson${question.lessonTag}`,
+    quizMeta: {
+      type: "explicit_year6_quiz",
+      difficulty: "middle" as const,
+    },
+  };
+
+  if (question.answerType === "ordering") {
+    const numbers = (question.values ?? []).map((value) => Number(String(value).trim()));
+    const visual =
+      question.visual?.kind === "numberLine" ? question.visual.numberLine : undefined;
+    return {
+      ...lessonMeta,
+      activityType: "number_order",
+      kind: "lessonActivity",
+      prompt,
+      questionData: {
+        kind: "number_order",
+        prompt,
+        numbers,
+        ascending: true,
+        helper: question.instructionText,
+        visual,
+      },
+      activity: {
+        activityType: "number_order",
+        weight: 1,
+        config: {},
+      },
+      feedbackCorrect: question.feedbackCorrect,
+      feedbackIncorrect: question.feedbackIncorrect,
+    };
+  }
+
+  const mappedVisual =
+    question.visual?.kind === "numberLine"
+      ? question.visual.numberLine
+      : question.visual?.kind === "integerContext"
+        ? question.visual.contextVisual
+        : undefined;
+
+  if (mappedVisual) {
+    if (question.answerType === "numeric") {
+      return {
+        ...lessonMeta,
+        activityType: "typed_response",
+        kind: "lessonActivity",
+        prompt,
+        questionData: {
+          kind: "typed_response",
+          prompt,
+          answer: correctAnswer,
+          helper: question.feedbackIncorrect,
+          placeholder: question.placeholder ?? "Type the integer",
+          visual: mappedVisual,
+        },
+        activity: {
+          activityType: "typed_response",
+          weight: 1,
+          config: {},
+        },
+        feedbackCorrect: question.feedbackCorrect,
+        feedbackIncorrect: question.feedbackIncorrect,
+      };
+    }
+
+    return {
+      ...lessonMeta,
+      activityType: "multiple_choice",
+      kind: "lessonActivity",
+      prompt,
+      questionData: {
+        kind: "multiple_choice",
+        prompt,
+        options: (question.options ?? []).map((option) => String(option ?? "").trim()),
+        answer: correctAnswer,
+        helper: question.feedbackIncorrect,
+        visual: mappedVisual,
+      },
+      activity: {
+        activityType: "multiple_choice",
+        weight: 1,
+        config: {},
+      },
+      feedbackCorrect: question.feedbackCorrect,
+      feedbackIncorrect: question.feedbackIncorrect,
+    };
+  }
+
   if (question.answerType === "numeric") {
     return {
-      id: question.id || `q${index}`,
-      lessonNumber: question.lessonTag,
-      lessonTag: question.lessonTag,
-      skill: `lesson${question.lessonTag}`,
+      ...lessonMeta,
       activityType: "typed_response",
       kind: "typed",
       prompt,
       correctValue: correctAnswer,
+      acceptedValues: question.acceptedAnswers,
       feedbackCorrect: question.feedbackCorrect,
       feedbackIncorrect: question.feedbackIncorrect,
       responseType: "number",
-      quizMeta: {
-        type: "explicit_year6_quiz",
-        difficulty: "middle",
-      },
+      placeholder: question.placeholder ?? "Type the integer",
     };
   }
 
   const options = (question.options ?? []).map((option) => String(option ?? "").trim());
   return {
-    id: question.id || `q${index}`,
-    lessonNumber: question.lessonTag,
-    lessonTag: question.lessonTag,
-    skill: `lesson${question.lessonTag}`,
+    ...lessonMeta,
     activityType: "multiple_choice",
     kind: "mcq",
     prompt,
@@ -322,10 +412,6 @@ function toExplicitWeeklyQuizQuestion(
     correctIndex: options.findIndex((option) => option === correctAnswer),
     feedbackCorrect: question.feedbackCorrect,
     feedbackIncorrect: question.feedbackIncorrect,
-    quizMeta: {
-      type: "explicit_year6_quiz",
-      difficulty: "middle",
-    },
   };
 }
 
@@ -1338,7 +1424,11 @@ function isQuizQuestionCorrect(
     return quizLessonActivityResults[q.id]?.correct === true;
   }
   if (q.kind === "typed") {
-    return isTypedAnswerCorrect(quizTyped[q.id] ?? "", q.correctValue);
+    return isTypedAnswerCorrectAgainstAccepted(
+      quizTyped[q.id] ?? "",
+      q.correctValue,
+      q.acceptedValues
+    );
   }
   if (q.kind === "numberLineTap" || q.kind === "numberLineJump") {
     const picked = quizLineAnswers[q.id];
@@ -1604,6 +1694,16 @@ function isTypedAnswerCorrect(
   }
 
   return false;
+}
+
+function isTypedAnswerCorrectAgainstAccepted(
+  rawTyped: string | number | null | undefined,
+  rawCorrect: string | number | null | undefined,
+  acceptedValues?: string[]
+) {
+  if (isTypedAnswerCorrect(rawTyped, rawCorrect)) return true;
+  if (!acceptedValues || acceptedValues.length === 0) return false;
+  return acceptedValues.some((value) => isTypedAnswerCorrect(rawTyped, value));
 }
 
 function makeFindNumberQuestion(min: number, max: number): QuizQuestion {
@@ -4151,7 +4251,10 @@ function SessionPage() {
                       }
                       inputMode={currentQuiz.responseType === "number" ? "decimal" : "text"}
                       className="w-full px-4 py-4 rounded-xl border text-xl font-bold"
-                      placeholder={currentQuiz.responseType === "number" ? "Type the answer" : "Type the word"}
+                      placeholder={
+                        currentQuiz.placeholder ??
+                        (currentQuiz.responseType === "number" ? "Type the answer" : "Type the word")
+                      }
                     />
                   ) : currentQuiz?.kind === "audio" ||
                     currentQuiz?.kind === "mcq" ? (
