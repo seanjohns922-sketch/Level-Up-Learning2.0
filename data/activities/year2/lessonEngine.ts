@@ -164,6 +164,19 @@ export type IntegerNumberLineVisualData = {
   emphasis?: "position" | "compare" | "movement" | "distance";
 };
 
+export type IntegerContextVisualData = {
+  type: "integer_context";
+  context: "temperature" | "elevator" | "balance" | "score" | "elevation";
+  title: string;
+  currentValue: number;
+  change: number;
+  currentLabel?: string;
+  changeLabel?: string;
+  unitPrefix?: string;
+  unitSuffix?: string;
+  numberLine: IntegerNumberLineVisualData;
+};
+
 export type PlaceValueBuilderQuestion = {
   kind: "place_value_builder";
   prompt: string;
@@ -2963,6 +2976,7 @@ export type MultipleChoiceQuestion = {
     | DecimalVisualData
     | DecimalShiftVisualData
     | IntegerNumberLineVisualData
+    | IntegerContextVisualData
     | MoneyVisualData
     | SameDenominatorOperationVisualData
     | DiscountPriceVisualData
@@ -3001,6 +3015,7 @@ export type TypedResponseQuestion = {
     | DecimalVisualData
     | DecimalShiftVisualData
     | IntegerNumberLineVisualData
+    | IntegerContextVisualData
     | ColumnMultiplicationVisualData
     | BoxMethodVisualData
     | MultiplicationStrategyVisualData
@@ -10672,47 +10687,78 @@ function generateGenericQuestion(
   }
 
   if (explicitMode === "y6_integer_contexts_apply") {
-    const templates = [
-      { prompt: "The temperature is -2°C. It rises by 7°C. What is the new temperature?", answer: "5", options: ["-9", "-5", "5", "9"], helper: "Start at -2 and move 7 right.", start: -2, movement: 7, min: -12, max: 12 },
-      { prompt: "The temperature is 4°C. It drops by 9°C. What is the new temperature?", answer: "-5", options: ["-5", "-13", "5", "13"], helper: "A drop means move left.", start: 4, movement: -9, min: -12, max: 12 },
-      { prompt: "You are on floor -3. You go up 8 floors. Where are you?", answer: "5", options: ["-11", "-5", "5", "11"], helper: "Up means move right.", start: -3, movement: 8, min: -12, max: 12 },
-      { prompt: "You are on floor 6. You go down 11 floors. Where are you?", answer: "-5", options: ["-5", "-17", "5", "17"], helper: "Down means move left.", start: 6, movement: -11, min: -12, max: 12 },
-      { prompt: "A player has -4 points and gains 10. New score?", answer: "6", options: ["-14", "-6", "6", "14"], helper: "A gain means move right.", start: -4, movement: 10, min: -12, max: 12 },
-      { prompt: "A player has 3 points and loses 8. New score?", answer: "-5", options: ["-5", "-11", "5", "11"], helper: "A loss means move left.", start: 3, movement: -8, min: -12, max: 12 },
-      { prompt: "A diver is at -7 m and rises 4 m. New position?", answer: "-3", options: ["-11", "-3", "3", "11"], helper: "Rising means move right.", start: -7, movement: 4, min: -12, max: 12 },
-      { prompt: "A drone is at 5 m and drops 12 m. New position?", answer: "-7", options: ["-7", "-17", "7", "17"], helper: "Dropping means move left.", start: 5, movement: -12, min: -12, max: 12 },
-      { prompt: "Bank balance is -$6. You deposit $10. New balance?", answer: "4", options: ["-16", "-4", "4", "16"], helper: "Depositing means move right.", start: -6, movement: 10, min: -12, max: 12 },
-      { prompt: "Bank balance is $2. You spend $9. New balance?", answer: "-7", options: ["-7", "-11", "7", "11"], helper: "Spending means move left.", start: 2, movement: -9, min: -12, max: 12 },
-      { prompt: "Temperature is -8°C and rises by 13°C. New temperature?", answer: "5", options: ["-5", "5", "13", "21"], helper: "Cross zero carefully.", start: -8, movement: 13, min: -15, max: 15 },
-      { prompt: "Elevator starts at -2 and goes down 6 floors. Where are you?", answer: "-8", options: ["-8", "-4", "4", "8"], helper: "Down means move left.", start: -2, movement: -6, min: -12, max: 12 },
-      { prompt: "Team score is -5 and they gain 12 points. New score?", answer: "7", options: ["-17", "-7", "7", "17"], helper: "A gain means move right.", start: -5, movement: 12, min: -15, max: 15 },
-      { prompt: "Elevation is 3 m and drops 10 m. New elevation?", answer: "-7", options: ["-7", "-13", "7", "13"], helper: "A drop means move left.", start: 3, movement: -10, min: -12, max: 12 },
-      { prompt: "Submarine is at -9 m and rises 9 m. New position?", answer: "0", options: ["-18", "-9", "0", "9"], helper: "Rise back to zero.", start: -9, movement: 9, min: -12, max: 12 },
-      { prompt: "You owe $12 and pay back $5. Balance?", answer: "-7", options: ["-17", "-7", "7", "17"], helper: "Paying back reduces the debt but stays negative.", start: -12, movement: 5, min: -15, max: 15 },
-      { prompt: "Start at 8 m above sea level and descend 14 m. New position?", answer: "-6", options: ["-6", "-14", "6", "14"], helper: "Descend means move left.", start: 8, movement: -14, min: -15, max: 15 },
-      { prompt: "Temperature is 1°C and drops by 8°C. New temperature?", answer: "-7", options: ["-7", "-9", "7", "9"], helper: "A drop moves left past zero.", start: 1, movement: -8, min: -12, max: 12 },
-      { prompt: "Floor -6, go up 6 floors. Where are you?", answer: "0", options: ["-12", "-6", "0", "6"], helper: "Up means move right.", start: -6, movement: 6, min: -12, max: 12 },
-      { prompt: "Score is -10 and you gain 15 points. New score?", answer: "5", options: ["-5", "5", "10", "15"], helper: "Count across zero carefully.", start: -10, movement: 15, min: -15, max: 15 },
+    const templates: ReadonlyArray<{
+      prompt: string;
+      answer: string;
+      options: string[];
+      helper: string;
+      start: number;
+      movement: number;
+      min: number;
+      max: number;
+      context?: "temperature" | "elevator" | "balance" | "score" | "elevation";
+      title?: string;
+      currentLabel?: string;
+      changeLabel?: string;
+      unitPrefix?: string;
+      unitSuffix?: string;
+    }> = [
+      { prompt: "The temperature is -2°C. It rises by 7°C. What is the new temperature?", answer: "5", options: ["-9", "-5", "5", "9"], helper: "Start at -2 and move 7 right.", start: -2, movement: 7, min: -12, max: 12, context: "temperature", title: "Temperature change", currentLabel: "Current temperature", changeLabel: "Rise", unitSuffix: "°C" },
+      { prompt: "The temperature is 4°C. It drops by 9°C. What is the new temperature?", answer: "-5", options: ["-5", "-13", "5", "13"], helper: "A drop means move left.", start: 4, movement: -9, min: -12, max: 12, context: "temperature", title: "Temperature change", currentLabel: "Current temperature", changeLabel: "Drop", unitSuffix: "°C" },
+      { prompt: "You are on floor -3. You go up 8 floors. Where are you?", answer: "5", options: ["-11", "-5", "5", "11"], helper: "Up means move right.", start: -3, movement: 8, min: -12, max: 12, context: "elevator", title: "Elevator movement", currentLabel: "Current floor", changeLabel: "Floors up" },
+      { prompt: "You are on floor 6. You go down 11 floors. Where are you?", answer: "-5", options: ["-5", "-17", "5", "17"], helper: "Down means move left.", start: 6, movement: -11, min: -12, max: 12, context: "elevator", title: "Elevator movement", currentLabel: "Current floor", changeLabel: "Floors down" },
+      { prompt: "A player has -4 points and gains 10. New score?", answer: "6", options: ["-14", "-6", "6", "14"], helper: "A gain means move right.", start: -4, movement: 10, min: -12, max: 12, context: "score", title: "Score change", currentLabel: "Current score", changeLabel: "Points gained" },
+      { prompt: "A player has 3 points and loses 8. New score?", answer: "-5", options: ["-5", "-11", "5", "11"], helper: "A loss means move left.", start: 3, movement: -8, min: -12, max: 12, context: "score", title: "Score change", currentLabel: "Current score", changeLabel: "Points lost" },
+      { prompt: "A diver is at -7 m and rises 4 m. New position?", answer: "-3", options: ["-11", "-3", "3", "11"], helper: "Rising means move right.", start: -7, movement: 4, min: -12, max: 12, context: "elevation", title: "Depth change", currentLabel: "Current depth", changeLabel: "Rise", unitSuffix: " m" },
+      { prompt: "A drone is at 5 m and drops 12 m. New position?", answer: "-7", options: ["-7", "-17", "7", "17"], helper: "Dropping means move left.", start: 5, movement: -12, min: -12, max: 12, context: "elevation", title: "Height change", currentLabel: "Current height", changeLabel: "Drop", unitSuffix: " m" },
+      { prompt: "Bank balance is -$6. You deposit $10. New balance?", answer: "4", options: ["-16", "-4", "4", "16"], helper: "Depositing means move right.", start: -6, movement: 10, min: -12, max: 12, context: "balance", title: "Bank balance", currentLabel: "Current balance", changeLabel: "Deposit", unitPrefix: "$" },
+      { prompt: "Bank balance is $2. You spend $9. New balance?", answer: "-7", options: ["-7", "-11", "7", "11"], helper: "Spending means move left.", start: 2, movement: -9, min: -12, max: 12, context: "balance", title: "Bank balance", currentLabel: "Current balance", changeLabel: "Spending", unitPrefix: "$" },
+      { prompt: "Temperature is -8°C and rises by 13°C. New temperature?", answer: "5", options: ["-5", "5", "13", "21"], helper: "Cross zero carefully.", start: -8, movement: 13, min: -15, max: 15, context: "temperature", title: "Temperature change", currentLabel: "Current temperature", changeLabel: "Rise", unitSuffix: "°C" },
+      { prompt: "Elevator starts at -2 and goes down 6 floors. Where are you?", answer: "-8", options: ["-8", "-4", "4", "8"], helper: "Down means move left.", start: -2, movement: -6, min: -12, max: 12, context: "elevator", title: "Elevator movement", currentLabel: "Current floor", changeLabel: "Floors down" },
+      { prompt: "Team score is -5 and they gain 12 points. New score?", answer: "7", options: ["-17", "-7", "7", "17"], helper: "A gain means move right.", start: -5, movement: 12, min: -15, max: 15, context: "score", title: "Score change", currentLabel: "Current score", changeLabel: "Points gained" },
+      { prompt: "Elevation is 3 m and drops 10 m. New elevation?", answer: "-7", options: ["-7", "-13", "7", "13"], helper: "A drop means move left.", start: 3, movement: -10, min: -12, max: 12, context: "elevation", title: "Elevation change", currentLabel: "Current elevation", changeLabel: "Drop", unitSuffix: " m" },
+      { prompt: "Submarine is at -9 m and rises 9 m. New position?", answer: "0", options: ["-18", "-9", "0", "9"], helper: "Rise back to zero.", start: -9, movement: 9, min: -12, max: 12, context: "elevation", title: "Depth change", currentLabel: "Current depth", changeLabel: "Rise", unitSuffix: " m" },
+      { prompt: "You owe $12 and pay back $5. Balance?", answer: "-7", options: ["-17", "-7", "7", "17"], helper: "Paying back reduces the debt but stays negative.", start: -12, movement: 5, min: -15, max: 15, context: "balance", title: "Debt and balance", currentLabel: "Current balance", changeLabel: "Paid back", unitPrefix: "$" },
+      { prompt: "Start at 8 m above sea level and descend 14 m. New position?", answer: "-6", options: ["-6", "-14", "6", "14"], helper: "Descend means move left.", start: 8, movement: -14, min: -15, max: 15, context: "elevation", title: "Sea level change", currentLabel: "Current elevation", changeLabel: "Descent", unitSuffix: " m" },
+      { prompt: "Temperature is 1°C and drops by 8°C. New temperature?", answer: "-7", options: ["-7", "-9", "7", "9"], helper: "A drop moves left past zero.", start: 1, movement: -8, min: -12, max: 12, context: "temperature", title: "Temperature change", currentLabel: "Current temperature", changeLabel: "Drop", unitSuffix: "°C" },
+      { prompt: "Floor -6, go up 6 floors. Where are you?", answer: "0", options: ["-12", "-6", "0", "6"], helper: "Up means move right.", start: -6, movement: 6, min: -12, max: 12, context: "elevator", title: "Elevator movement", currentLabel: "Current floor", changeLabel: "Floors up" },
+      { prompt: "Score is -10 and you gain 15 points. New score?", answer: "5", options: ["-5", "5", "10", "15"], helper: "Count across zero carefully.", start: -10, movement: 15, min: -15, max: 15, context: "score", title: "Score change", currentLabel: "Current score", changeLabel: "Points gained" },
       { prompt: "Which movement matches -4 + 9?", answer: "Start at -4 and move 9 right", options: ["Start at -4 and move 9 right", "Start at -4 and move 9 left", "Start at 9 and move 4 left"], helper: "Adding a positive means move right.", start: -4, movement: 9, min: -12, max: 12 },
       { prompt: "Which movement matches 3 - 8?", answer: "Start at 3 and move 8 left", options: ["Start at 3 and move 8 left", "Start at 3 and move 8 right", "Start at -8 and move 3 right"], helper: "Subtracting a positive means move left.", start: 3, movement: -8, min: -12, max: 12 },
-    ] as const;
+    ];
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+
+    const numberLineVisual: IntegerNumberLineVisualData = {
+      type: "integer_number_line",
+      min: chosen.min,
+      max: chosen.max,
+      startValue: chosen.start,
+      movement: chosen.movement,
+      interactive: false,
+      showArrow: true,
+      emphasis: "movement",
+    };
+
     return {
       kind: "multiple_choice",
       prompt: chosen.prompt,
       options: shuffle([...chosen.options]),
       answer: chosen.answer,
       helper: chosen.helper,
-      visual: {
-        type: "integer_number_line",
-        min: chosen.min,
-        max: chosen.max,
-        startValue: chosen.start,
-        movement: chosen.movement,
-        interactive: false,
-        showArrow: true,
-        emphasis: "movement",
-      },
+      visual: chosen.context
+        ? {
+            type: "integer_context",
+            context: chosen.context as IntegerContextVisualData["context"],
+            title: chosen.title ?? "Integer context",
+            currentValue: chosen.start,
+            change: chosen.movement,
+            currentLabel: chosen.currentLabel,
+            changeLabel: chosen.changeLabel,
+            unitPrefix: chosen.unitPrefix,
+            unitSuffix: chosen.unitSuffix,
+            numberLine: numberLineVisual,
+          }
+        : numberLineVisual,
     };
   }
 
