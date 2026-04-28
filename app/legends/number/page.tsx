@@ -49,23 +49,24 @@ export default function NumbotCollectionPage() {
       {/* Layer 2: visible Number Nexus city environment */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <img
-          src="/images/number-nexus-home-bg-y6.jpg"
+          src="/images/number-nexus-home-bg-y5.jpg"
           alt=""
           aria-hidden="true"
           width={1920}
           height={1080}
-          className="absolute inset-0 h-full w-full object-cover object-center"
+          className="absolute inset-0 h-full w-full object-cover"
           style={{
-            filter: "blur(4px) saturate(0.95)",
-            opacity: 0.82,
-            transform: "scale(1.025)",
+            filter: "blur(1px) saturate(1.08) contrast(1.08)",
+            opacity: 0.96,
+            objectPosition: "center 32%",
+            transform: "scale(1.01)",
           }}
         />
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, hsla(176, 58%, 5%, 0.48), hsla(170, 54%, 4%, 0.58)), radial-gradient(circle at 50% 48%, hsla(160, 58%, 8%, 0.1), hsla(170, 62%, 3%, 0.58) 78%)",
+              "linear-gradient(180deg, hsla(176, 58%, 5%, 0.22), hsla(170, 54%, 4%, 0.34)), radial-gradient(circle at 50% 48%, hsla(160, 58%, 8%, 0), hsla(170, 62%, 3%, 0.34) 84%)",
           }}
         />
       </div>
@@ -75,10 +76,10 @@ export default function NumbotCollectionPage() {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(circle at 50% 18%, hsla(160, 68%, 42%, 0.12), transparent 34%), radial-gradient(circle at 78% 34%, hsla(176, 65%, 38%, 0.06), transparent 30%), linear-gradient(90deg, hsla(170, 60%, 8%, 0.6), transparent 34%, transparent 66%, hsla(170, 60%, 8%, 0.6))",
+            "radial-gradient(circle at 50% 22%, hsla(160, 68%, 42%, 0.08), transparent 34%), radial-gradient(circle at 78% 34%, hsla(176, 65%, 38%, 0.04), transparent 30%), linear-gradient(90deg, hsla(170, 60%, 8%, 0.34), transparent 28%, transparent 72%, hsla(170, 60%, 8%, 0.34))",
         }}
       />
-      <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ opacity: 0.075, filter: "blur(0.2px)" }}>
+      <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ opacity: 0.035, filter: "blur(0.2px)" }}>
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="math-grid" x="0" y="0" width="88" height="88" patternUnits="userSpaceOnUse">
