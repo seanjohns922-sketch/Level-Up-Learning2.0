@@ -148,10 +148,20 @@ export default function LegendsPage() {
       <img
         src="/images/legends-bg.jpg"
         alt=""
-        className="absolute inset-0 w-full h-full object-cover object-[center_35%]"
+        className="absolute inset-0 w-full h-full object-cover object-[center_40%]"
       />
-      {/* Very light scrim for text readability only */}
-      <div className="absolute inset-0 bg-black/10" />
+      {/* World-integrated readability layers */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(circle at 54% 38%, rgba(255,190,90,0.08), transparent 28%), linear-gradient(90deg, rgba(8,10,12,0.62) 0%, rgba(8,10,12,0.42) 45%, rgba(8,10,12,0.12) 78%, rgba(8,10,12,0.04) 100%)",
+        }}
+      />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ boxShadow: "inset 0 0 180px 70px rgba(0,0,0,0.46)" }}
+      />
 
       {/* Content */}
       <div className="relative z-10 min-h-screen flex flex-col">
