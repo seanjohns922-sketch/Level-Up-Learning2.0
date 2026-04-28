@@ -100,6 +100,13 @@ export default function NumbotCollectionPage() {
             "linear-gradient(180deg, hsla(168, 58%, 8%, 0) 0%, hsla(168, 58%, 5%, 0.36) 60%, hsla(168, 58%, 3%, 0.72) 100%), radial-gradient(ellipse at center, transparent 42%, hsla(170, 62%, 3%, 0.62) 100%)",
         }}
       />
+      <div
+        className="absolute inset-x-0 top-[250px] bottom-20 max-w-3xl mx-auto pointer-events-none"
+        style={{
+          background: "radial-gradient(ellipse at center, hsla(160, 56%, 42%, 0.14), transparent 68%)",
+          filter: "blur(24px)",
+        }}
+      />
 
       {/* Content */}
       <div className="relative z-10">
