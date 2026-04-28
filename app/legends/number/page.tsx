@@ -62,11 +62,28 @@ export default function NumbotCollectionPage() {
             transform: "scale(1.01)",
           }}
         />
+        <div className="absolute inset-x-0 top-0 h-[340px] sm:h-[390px] md:h-[430px] overflow-hidden">
+          <img
+            src="/images/lesson-hero-number-nexus.jpg"
+            alt=""
+            aria-hidden="true"
+            width={1920}
+            height={1080}
+            className="h-full w-full object-cover"
+            style={{
+              filter: "saturate(1.12) contrast(1.1)",
+              opacity: 0.9,
+              objectPosition: "center 38%",
+              maskImage: "linear-gradient(180deg, black 0%, black 64%, transparent 100%)",
+              WebkitMaskImage: "linear-gradient(180deg, black 0%, black 64%, transparent 100%)",
+            }}
+          />
+        </div>
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, hsla(176, 58%, 5%, 0.22), hsla(170, 54%, 4%, 0.34)), radial-gradient(circle at 50% 48%, hsla(160, 58%, 8%, 0), hsla(170, 62%, 3%, 0.34) 84%)",
+              "linear-gradient(180deg, hsla(176, 58%, 5%, 0.12), hsla(170, 54%, 4%, 0.32)), radial-gradient(circle at 50% 48%, hsla(160, 58%, 8%, 0), hsla(170, 62%, 3%, 0.34) 84%)",
           }}
         />
       </div>
@@ -112,19 +129,6 @@ export default function NumbotCollectionPage() {
           filter: "blur(34px)",
         }}
       />
-      <div
-        className="absolute inset-x-0 top-[112px] pointer-events-none text-center"
-        style={{
-          color: "hsla(160, 42%, 82%, 0.46)",
-          fontFamily: "'Rajdhani', 'Exo 2', sans-serif",
-          fontSize: "clamp(1.5rem, 4vw, 3.15rem)",
-          fontWeight: 800,
-          letterSpacing: "0.18em",
-          textShadow: "0 0 18px hsla(160, 52%, 45%, 0.18)",
-        }}
-      >
-        NUMBER NEXUS
-      </div>
 
       {/* Content */}
       <div className="relative z-10">
