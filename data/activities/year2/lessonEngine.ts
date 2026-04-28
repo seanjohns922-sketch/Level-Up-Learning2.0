@@ -153,6 +153,7 @@ export type FractionNumberLineVisualData = {
   rightLabel: string;
   leftPosition: number;
   rightPosition: number;
+  maxValue?: number;
   markers?: Array<{
     label: string;
     position: number;
@@ -619,6 +620,13 @@ function fractionPartsForNumberLine(allowedDenominators?: number[]) {
 }
 
 function fractionNumericValue(label: string) {
+  const mixedMatch = label.trim().match(/^(\d+)\s+(\d+)\/(\d+)$/);
+  if (mixedMatch) {
+    const [, whole, numerator, denominator] = mixedMatch.map(Number);
+    if (!denominator) return 0;
+    return whole + numerator / denominator;
+  }
+
   const [numerator, denominator] = label.split("/").map(Number);
   if (!denominator) return 0;
   return (numerator ?? 0) / denominator;
@@ -626,8 +634,12 @@ function fractionNumericValue(label: string) {
 
 function makeFractionNumberLineVisual(
   labels: string[],
-  title = "Fraction number line"
+  title = "Fraction number line",
+  maxValue?: number
 ): FractionNumberLineVisualData {
+  const resolvedMax =
+    maxValue ??
+    Math.max(1, ...labels.map((label) => Math.ceil(fractionNumericValue(label))));
   const tones: Array<"sky" | "emerald" | "violet"> = ["sky", "emerald", "violet"];
   const markers = labels.map((label, index) => ({
     label,
@@ -638,6 +650,7 @@ function makeFractionNumberLineVisual(
   return {
     type: "fraction_number_line",
     title,
+    maxValue: resolvedMax,
     leftLabel: markers[0]?.label ?? "0",
     rightLabel: markers[1]?.label ?? "1",
     leftPosition: markers[0]?.position ?? 0,
@@ -5793,6 +5806,126 @@ function generateInteractiveQuestion(
   }
 
   if (activityType === "number_order") {
+    if (config.mode === "y6_mixed_improper_compare") {
+      const templates = [
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["5/4", "3/2", "7/4"],
+          helper: "Compare the whole number first, then the fraction part.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["7/4", "3/2", "9/5"],
+          helper: "Two fractions are between 1 and 2, but they are not equally close to 2.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["1 1/2", "5/3", "7/4"],
+          helper: "Mixed and improper fractions can be compared on the same line.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["1 3/4", "9/5", "11/6"],
+          helper: "All three are close. Use the line or compare the fractional parts.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["2 1/6", "13/6", "9/4"],
+          helper: "Notice when two fractions may represent the same size.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["1 1/4", "4/3", "7/5"],
+          helper: "Convert only if you need to.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["1 5/6", "11/6", "9/5"],
+          helper: "One value may match another exactly.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["3/2", "8/5", "1 3/4"],
+          helper: "Think about each position between 1 and 2.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["7/3", "2 1/4", "9/4"],
+          helper: "These are all above 2, so compare the extra fraction part carefully.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["11/4", "13/5", "14/5"],
+          helper: "All three sit between 2 and 3.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["1 1/3", "7/5", "3/2"],
+          helper: "Compare the sizes, not just the numerators.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["1 2/3", "5/3", "7/4"],
+          helper: "One fraction may be exactly equal to a mixed number.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["2 1/4", "9/4", "7/3"],
+          helper: "Use the number line to separate equal and larger values.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["1 7/8", "9/4", "11/6"],
+          helper: "Which fraction is closest to 2? That helps the order.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["5/4", "1 1/2", "8/5"],
+          helper: "All three fit on the same 0 to 3 line.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["13/6", "2 1/6", "11/5"],
+          helper: "Compare the whole numbers, then the leftover parts.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["1 3/4", "7/4", "9/5"],
+          helper: "A mixed number and an improper fraction can still be equal.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["4/3", "1 1/2", "5/3"],
+          helper: "Place each fraction between 1 and 2.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["2 2/5", "12/5", "5/2"],
+          helper: "All are above 2, so compare how much is beyond 2.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["7/2", "11/4", "13/6"],
+          helper: "Only one is above 3. Start there.",
+        },
+      ] as const;
+      const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+      const correctOrder = [...chosen.fractions].sort(
+        (a, b) => fractionNumericValue(a) - fractionNumericValue(b)
+      );
+
+      return {
+        kind: "number_order",
+        prompt: chosen.prompt,
+        numbers: [],
+        fractions: shuffle([...chosen.fractions]),
+        ascending: true,
+        helper: chosen.helper,
+        correctOrder,
+        visual: makeFractionNumberLineVisual(correctOrder, "Mixed and improper fractions"),
+      };
+    }
+
     if (config.mode === "y6_fraction_order_reasoning") {
       const templates = [
         {
@@ -6904,6 +7037,79 @@ function generateInteractiveQuestion(
   }
 
   if (activityType === "equivalent_fraction_yes_no") {
+    if (config.mode === "y6_equivalent_visual_strict") {
+      const templates = [
+        {
+          prompt: "Are these fraction bars equal?",
+          left: { numerator: 3, denominator: 4 },
+          right: { numerator: 6, denominator: 8 },
+          answer: "yes" as const,
+        },
+        {
+          prompt: "Do these shaded bars represent the same amount?",
+          left: { numerator: 2, denominator: 3 },
+          right: { numerator: 4, denominator: 6 },
+          answer: "yes" as const,
+        },
+        {
+          prompt: "True or false: 6/9 = 2/3.",
+          left: { numerator: 6, denominator: 9 },
+          right: { numerator: 2, denominator: 3 },
+          answer: "yes" as const,
+        },
+        {
+          prompt: "A student says, “3/4 and 6/8 are different because the numbers are bigger.” Is this correct?",
+          left: { numerator: 3, denominator: 4 },
+          right: { numerator: 6, denominator: 8 },
+          answer: "no" as const,
+        },
+        {
+          prompt: "Are these equivalent?",
+          left: { numerator: 5, denominator: 8 },
+          right: { numerator: 10, denominator: 16 },
+          answer: "yes" as const,
+        },
+        {
+          prompt: "Do these bars show the same value?",
+          left: { numerator: 2, denominator: 5 },
+          right: { numerator: 10, denominator: 20 },
+          answer: "yes" as const,
+        },
+        {
+          prompt: "Are these equivalent?",
+          left: { numerator: 3, denominator: 5 },
+          right: { numerator: 8, denominator: 15 },
+          answer: "no" as const,
+        },
+        {
+          prompt: "True or false: 4/6 and 2/3 represent the same amount.",
+          left: { numerator: 4, denominator: 6 },
+          right: { numerator: 2, denominator: 3 },
+          answer: "yes" as const,
+        },
+        {
+          prompt: "A student says, “4/6 and 2/3 are equal because both can be scaled by 2.” Is this correct?",
+          left: { numerator: 4, denominator: 6 },
+          right: { numerator: 2, denominator: 3 },
+          answer: "yes" as const,
+        },
+        {
+          prompt: "Are these equivalent?",
+          left: { numerator: 3, denominator: 4 },
+          right: { numerator: 8, denominator: 16 },
+          answer: "no" as const,
+        },
+      ] as const;
+      const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+      return {
+        kind: "equivalent_fraction_yes_no",
+        prompt: chosen.prompt,
+        left: { id: "left", ...chosen.left },
+        right: { id: "right", ...chosen.right },
+        answer: chosen.answer,
+      };
+    }
+
     const pairs = year3EquivalentFractionPairs();
     const chosen = pairs[randInt(0, pairs.length - 1)] ?? pairs[0];
     const askEquivalent = randInt(0, 1) === 0;
@@ -8421,6 +8627,259 @@ function generateGenericQuestion(
     };
   }
 
+  if (explicitMode === "y6_equivalent_identify_strict") {
+    const templates: Array<MultipleChoiceQuestion> = [
+      {
+        kind: "multiple_choice",
+        prompt: "Which pair is equivalent?",
+        options: ["2/3 and 4/6", "2/3 and 3/5", "2/3 and 5/6"],
+        answer: "2/3 and 4/6",
+        helper: "Look for the same scale factor on top and bottom.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which fraction is equivalent to 5/8?",
+        options: ["10/16", "15/16", "5/16"],
+        answer: "10/16",
+        helper: "Scale both parts by the same number.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Select ALL fractions equivalent to 3/4.",
+        options: ["6/8", "9/12", "12/16", "8/16"],
+        answer: "6/8",
+        correctAnswers: ["6/8", "9/12", "12/16"],
+        instruction: "Select every fraction with the same value.",
+        helper: "Equivalent fractions keep the same value even when the numbers change.",
+        selectionFeedback: {
+          "6/8": "Yes — both parts were scaled by 2.",
+          "9/12": "Yes — both parts were scaled by 3.",
+          "12/16": "Yes — both parts were scaled by 4.",
+          "8/16": "No — that simplifies to 1/2, not 3/4.",
+        },
+        allCorrectFeedback: "Correct — all three show the same amount as 3/4.",
+        partialFeedback: "Partly right. There is at least one more equivalent fraction to select.",
+        incorrectFeedback: "Check which fractions keep the same value as 3/4.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which fraction is NOT equivalent to 2/5?",
+        options: ["4/10", "6/15", "8/20", "10/20"],
+        answer: "10/20",
+        helper: "Three options scale 2/5 correctly. One does not.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which fraction is equivalent to 4/5?",
+        options: ["8/10", "6/10", "9/10"],
+        answer: "8/10",
+        helper: "Multiply both numerator and denominator by the same number.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which fraction is equivalent to 7/8?",
+        options: ["14/16", "13/16", "15/16"],
+        answer: "14/16",
+        helper: "Use one clean scale factor.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which pair shows the same value?",
+        options: ["3/5 and 12/20", "3/5 and 9/20", "3/5 and 12/25"],
+        answer: "3/5 and 12/20",
+        helper: "Equivalent fractions scale top and bottom together.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which fraction matches 2/3?",
+        options: ["8/12", "7/12", "6/12"],
+        answer: "8/12",
+        helper: "If the denominator is multiplied by 4, do the same to the numerator.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which pair is equivalent?",
+        options: ["5/6 and 15/18", "5/6 and 14/18", "5/6 and 16/18"],
+        answer: "5/6 and 15/18",
+        helper: "Use the same scale factor for both numbers.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which fraction is equivalent to 3/5?",
+        options: ["12/20", "11/20", "13/20"],
+        answer: "12/20",
+        helper: "Check the scale factor carefully.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which fraction simplifies to 2/3?",
+        options: ["8/12", "8/15", "6/12"],
+        answer: "8/12",
+        helper: "Simplify each option to test the value.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which pair is NOT equivalent?",
+        options: ["3/4 and 6/8", "3/4 and 9/12", "3/4 and 8/12"],
+        answer: "3/4 and 8/12",
+        helper: "Only one pair does not keep the same value.",
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return { ...chosen, options: shuffle([...chosen.options]) };
+  }
+
+  if (explicitMode === "y6_mixed_improper_apply") {
+    const templates: Array<{
+      prompt: string;
+      answer: string;
+      options: string[];
+      helper: string;
+      visual?: FractionNumberLineVisualData;
+    }> = [
+      {
+        prompt: "Who ran further: 1 3/4 km or 9/5 km?",
+        answer: "9/5 km",
+        options: ["1 3/4 km", "9/5 km", "They are equal"],
+        helper: "Compare the sizes, not how they are written.",
+      },
+      {
+        prompt: "Which uses more: 7/4 cups or 1 2/3 cups?",
+        answer: "7/4 cups",
+        options: ["7/4 cups", "1 2/3 cups", "They are equal"],
+        helper: "Both are between 1 and 2, so compare the fraction part carefully.",
+      },
+      {
+        prompt: "Which is largest?",
+        answer: "7/3",
+        options: ["2 1/4", "9/4", "7/3"],
+        helper: "All three are above 2, but one is furthest right on the line.",
+        visual: makeFractionNumberLineVisual(["2 1/4", "9/4", "7/3"], "Which is largest?", 3),
+      },
+      {
+        prompt: "A student says, “9/5 is smaller than 1 3/4 because 9 < 3.” What is the mistake?",
+        answer: "They compared the numbers instead of the fraction values",
+        options: [
+          "They compared the numbers instead of the fraction values",
+          "They should always choose the mixed number",
+          "They forgot to add the denominators",
+        ],
+        helper: "A fraction must be compared by value, not by isolated digits.",
+      },
+      {
+        prompt: "Always, sometimes or never true: Improper fractions are greater than 1.",
+        answer: "Sometimes",
+        options: ["Always", "Sometimes", "Never"],
+        helper: "Some improper fractions equal whole numbers such as 4/4 or 6/3.",
+      },
+      {
+        prompt: "Which is closest to 3?",
+        answer: "14/5",
+        options: ["11/4", "13/5", "14/5"],
+        helper: "Compare how far each fraction is from 3.",
+      },
+      {
+        prompt: "Which is between 2 and 3?",
+        answer: "13/6",
+        options: ["7/2", "11/4", "13/6"],
+        helper: "Only one fraction lies after 2 but before 3.",
+        visual: makeFractionNumberLineVisual(["13/6", "11/4", "7/2"], "Fractions between 2 and 4", 4),
+      },
+      {
+        prompt: "Which is larger: 13/6 or 2 1/6?",
+        answer: "They are equal",
+        options: ["13/6", "2 1/6", "They are equal"],
+        helper: "Convert one form if you are unsure.",
+      },
+      {
+        prompt: "Which is between 1 and 2?",
+        answer: "5/4",
+        options: ["5/4", "9/3", "7/2"],
+        helper: "One fraction sits just a little past 1.",
+      },
+      {
+        prompt: "Which is larger: 11/6 or 1 5/6?",
+        answer: "They are equal",
+        options: ["11/6", "1 5/6", "11/6 is smaller"],
+        helper: "Improper and mixed forms can name the same value.",
+      },
+      {
+        prompt: "Which mixed or improper fraction is closest to 2?",
+        answer: "11/6",
+        options: ["1 7/8", "9/4", "11/6"],
+        helper: "Think about the distance from 2.",
+      },
+      {
+        prompt: "Which statement is correct?",
+        answer: "7/4 = 1 3/4",
+        options: ["7/4 = 1 3/4", "7/4 = 1 4/7", "7/4 = 2 3/4"],
+        helper: "An improper fraction can be renamed as a mixed number.",
+      },
+      {
+        prompt: "A battery meter shows 2 1/4 bars. Another shows 9/4 bars. Which has more charge?",
+        answer: "They are equal",
+        options: ["2 1/4 bars", "9/4 bars", "They are equal"],
+        helper: "These two forms can represent the same amount.",
+      },
+      {
+        prompt: "Which is largest?",
+        answer: "2 2/5",
+        options: ["2 2/5", "12/5", "5/2"],
+        helper: "Two fractions may be above 2, but one is closer to 2 1/2.",
+      },
+      {
+        prompt: "Which fraction is closest to 2?",
+        answer: "9/5",
+        options: ["9/5", "7/4", "5/3"],
+        helper: "Find the smallest distance to 2.",
+      },
+      {
+        prompt: "Which is between 1 and 2?",
+        answer: "7/4",
+        options: ["7/4", "9/4", "5/6"],
+        helper: "Check whether the fraction is greater than 1 and less than 2.",
+      },
+      {
+        prompt: "A recipe needs 2 1/6 cups. Another needs 13/6 cups. Which uses more?",
+        answer: "They are equal",
+        options: ["2 1/6 cups", "13/6 cups", "They are equal"],
+        helper: "Rename one amount if needed.",
+      },
+      {
+        prompt: "Which is closest to 3?",
+        answer: "11/4",
+        options: ["11/4", "13/5", "5/2"],
+        helper: "One fraction is only 1/4 away from 3.",
+      },
+      {
+        prompt: "Which statement is correct?",
+        answer: "A mixed number can be greater than an improper fraction",
+        options: [
+          "A mixed number can be greater than an improper fraction",
+          "An improper fraction is always greater than a mixed number",
+          "Mixed numbers and improper fractions can never be equal",
+        ],
+        helper: "The form does not decide the size. The value does.",
+      },
+      {
+        prompt: "Which is larger: 1 3/4 or 9/5?",
+        answer: "9/5",
+        options: ["1 3/4", "9/5", "They are equal"],
+        helper: "Compare the positions between 1 and 2.",
+        visual: makeFractionNumberLineVisual(["1 3/4", "9/5"], "Compare the two fractions", 3),
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: chosen.helper,
+      visual: chosen.visual,
+    };
+  }
+
   if (explicitMode === "equivalent_fraction_build") {
     const templates = [
       { left: [1, 2], right: [undefined, 6], answer: "3", missing: "numerator", prompt: "Fill in the missing numerator" },
@@ -8830,6 +9289,307 @@ function generateGenericQuestion(
           helper: "Think about how many whole groups fit, then what fraction is left.",
           placeholder: "Type the mixed numeral",
         };
+  }
+
+  if (explicitMode === "y6_mixed_improper_convert") {
+    const templates: Array<{
+      prompt: string;
+      answer: string;
+      helper: string;
+      placeholder: string;
+      visual?: FractionNumberLineVisualData;
+    }> = [
+      {
+        prompt: "Write 7/4 as a mixed numeral.",
+        answer: "1 3/4",
+        helper: "Find the whole number first, then the fraction left over.",
+        placeholder: "Type the mixed numeral",
+        visual: makeFractionNumberLineVisual(["1 3/4"], "Where 7/4 sits", 3),
+      },
+      {
+        prompt: "Write 11/3 as a mixed numeral.",
+        answer: "3 2/3",
+        helper: "How many whole groups of 3 fit into 11?",
+        placeholder: "Type the mixed numeral",
+        visual: makeFractionNumberLineVisual(["3 2/3"], "Improper fraction to mixed number", 4),
+      },
+      {
+        prompt: "Write 13/5 as a mixed numeral.",
+        answer: "2 3/5",
+        helper: "Count whole groups first, then the remainder.",
+        placeholder: "Type the mixed numeral",
+        visual: makeFractionNumberLineVisual(["2 3/5"], "Between 2 and 3", 3),
+      },
+      {
+        prompt: "Write 2 3/4 as an improper fraction.",
+        answer: "11/4",
+        helper: "Two wholes are 8/4, then add 3/4 more.",
+        placeholder: "Type the fraction",
+      },
+      {
+        prompt: "Write 3 2/5 as an improper fraction.",
+        answer: "17/5",
+        helper: "Turn the wholes into fifths first.",
+        placeholder: "Type the fraction",
+      },
+      {
+        prompt: "Write 1 4/5 as an improper fraction.",
+        answer: "9/5",
+        helper: "One whole is 5/5, then add 4/5.",
+        placeholder: "Type the fraction",
+      },
+      {
+        prompt: "Write 5/4 as a mixed numeral.",
+        answer: "1 1/4",
+        helper: "This is only a little more than 1 whole.",
+        placeholder: "Type the mixed numeral",
+        visual: makeFractionNumberLineVisual(["1 1/4"], "Just past 1", 3),
+      },
+      {
+        prompt: "Write 8/5 as a mixed numeral.",
+        answer: "1 3/5",
+        helper: "Split the improper fraction into a whole and a part.",
+        placeholder: "Type the mixed numeral",
+      },
+      {
+        prompt: "Write 9/4 as a mixed numeral.",
+        answer: "2 1/4",
+        helper: "Find the whole number, then the extra quarter.",
+        placeholder: "Type the mixed numeral",
+        visual: makeFractionNumberLineVisual(["2 1/4"], "Past 2 on the line", 3),
+      },
+      {
+        prompt: "Write 7/3 as a mixed numeral.",
+        answer: "2 1/3",
+        helper: "Two whole groups leave one third left over.",
+        placeholder: "Type the mixed numeral",
+      },
+      {
+        prompt: "Write 11/6 as a mixed numeral.",
+        answer: "1 5/6",
+        helper: "This fraction is very close to 2.",
+        placeholder: "Type the mixed numeral",
+      },
+      {
+        prompt: "Write 2 1/6 as an improper fraction.",
+        answer: "13/6",
+        helper: "Two wholes make 12/6, then add one more sixth.",
+        placeholder: "Type the fraction",
+      },
+      {
+        prompt: "Write 2 2/5 as an improper fraction.",
+        answer: "12/5",
+        helper: "Convert the wholes to fifths before adding the extra part.",
+        placeholder: "Type the fraction",
+      },
+      {
+        prompt: "Write 1 1/2 as an improper fraction.",
+        answer: "3/2",
+        helper: "One whole is 2/2.",
+        placeholder: "Type the fraction",
+      },
+      {
+        prompt: "Write 1 2/3 as an improper fraction.",
+        answer: "5/3",
+        helper: "Combine the whole and the fraction in thirds.",
+        placeholder: "Type the fraction",
+      },
+      {
+        prompt: "Which mixed numeral matches 9/5?",
+        answer: "1 4/5",
+        helper: "Turn the improper fraction into wholes and fifths.",
+        placeholder: "Type the mixed numeral",
+      },
+      {
+        prompt: "Which improper fraction matches 1 3/4?",
+        answer: "7/4",
+        helper: "Rename the whole number in quarters first.",
+        placeholder: "Type the fraction",
+      },
+      {
+        prompt: "Write 13/6 as a mixed numeral.",
+        answer: "2 1/6",
+        helper: "How many groups of 6 fit into 13?",
+        placeholder: "Type the mixed numeral",
+        visual: makeFractionNumberLineVisual(["2 1/6"], "Improper to mixed", 3),
+      },
+      {
+        prompt: "Write 2 1/4 as an improper fraction.",
+        answer: "9/4",
+        helper: "Turn the whole number into fourths first.",
+        placeholder: "Type the fraction",
+      },
+      {
+        prompt: "Write 1 7/8 as an improper fraction.",
+        answer: "15/8",
+        helper: "One whole is 8/8.",
+        placeholder: "Type the fraction",
+      },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      helper: chosen.helper,
+      placeholder: chosen.placeholder,
+      visual: chosen.visual,
+    };
+  }
+
+  if (explicitMode === "y6_equivalent_build_strict") {
+    const templates: Array<{
+      prompt: string;
+      answer: string;
+      helper: string;
+      placeholder: string;
+      visual?: TypedResponseQuestion["visual"];
+    }> = [
+      {
+        prompt: "Complete the equivalent fraction: 5/6 = ? / 18",
+        answer: "15",
+        helper: "Multiply both parts by the same number.",
+        placeholder: "Type the numerator",
+        visual: {
+          type: "equivalent_fraction_input",
+          leftNumerator: 5,
+          leftDenominator: 6,
+          rightDenominator: 18,
+          missing: "numerator",
+        },
+      },
+      {
+        prompt: "Complete the equivalent fraction: 7/8 = ? / 16",
+        answer: "14",
+        helper: "Keep the value the same by scaling both parts together.",
+        placeholder: "Type the numerator",
+        visual: {
+          type: "equivalent_fraction_input",
+          leftNumerator: 7,
+          leftDenominator: 8,
+          rightDenominator: 16,
+          missing: "numerator",
+        },
+      },
+      {
+        prompt: "Complete the equivalent fraction: 3/5 = ? / 20",
+        answer: "12",
+        helper: "What factor turns 5 into 20?",
+        placeholder: "Type the numerator",
+        visual: {
+          type: "equivalent_fraction_input",
+          leftNumerator: 3,
+          leftDenominator: 5,
+          rightDenominator: 20,
+          missing: "numerator",
+        },
+      },
+      {
+        prompt: "Complete the equivalent fraction: 3/4 = ? / 28",
+        answer: "21",
+        helper: "Scale the numerator by the same factor as the denominator.",
+        placeholder: "Type the numerator",
+        visual: {
+          type: "equivalent_fraction_input",
+          leftNumerator: 3,
+          leftDenominator: 4,
+          rightDenominator: 28,
+          missing: "numerator",
+        },
+      },
+      {
+        prompt: "Complete the equivalent fraction: 2/3 = ? / 30",
+        answer: "20",
+        helper: "This is a larger scale-up, but the rule stays the same.",
+        placeholder: "Type the numerator",
+        visual: {
+          type: "equivalent_fraction_input",
+          leftNumerator: 2,
+          leftDenominator: 3,
+          rightDenominator: 30,
+          missing: "numerator",
+        },
+      },
+      {
+        prompt: "Complete the equivalent fraction: ? / 24 = 3/4",
+        answer: "18",
+        helper: "Work backwards from the denominator scale factor.",
+        placeholder: "Type the numerator",
+        visual: {
+          type: "equivalent_fraction_input",
+          leftNumerator: 3,
+          leftDenominator: 4,
+          rightDenominator: 24,
+          missing: "numerator",
+        },
+      },
+      {
+        prompt: "Simplify 8/12.",
+        answer: "2/3",
+        helper: "Divide numerator and denominator by the same number.",
+        placeholder: "Type the fraction",
+      },
+      {
+        prompt: "Simplify 15/20.",
+        answer: "3/4",
+        helper: "Find a common factor that works for both numbers.",
+        placeholder: "Type the fraction",
+      },
+      {
+        prompt: "Complete the equivalent fraction: 4/7 = ? / 21",
+        answer: "12",
+        helper: "Use the same factor on top and bottom.",
+        placeholder: "Type the numerator",
+        visual: {
+          type: "equivalent_fraction_input",
+          leftNumerator: 4,
+          leftDenominator: 7,
+          rightDenominator: 21,
+          missing: "numerator",
+        },
+      },
+      {
+        prompt: "Complete the equivalent fraction: 5/8 = ? / 40",
+        answer: "25",
+        helper: "The value stays the same when both parts scale equally.",
+        placeholder: "Type the numerator",
+        visual: {
+          type: "equivalent_fraction_input",
+          leftNumerator: 5,
+          leftDenominator: 8,
+          rightDenominator: 40,
+          missing: "numerator",
+        },
+      },
+      {
+        prompt: "Simplify 18/24.",
+        answer: "3/4",
+        helper: "Reduce both numbers by the greatest common factor.",
+        placeholder: "Type the fraction",
+      },
+      {
+        prompt: "Complete the equivalent fraction: ? / 35 = 4/5",
+        answer: "28",
+        helper: "Think about how the denominator changed first.",
+        placeholder: "Type the numerator",
+        visual: {
+          type: "equivalent_fraction_input",
+          leftNumerator: 4,
+          leftDenominator: 5,
+          rightDenominator: 35,
+          missing: "numerator",
+        },
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      helper: chosen.helper,
+      placeholder: chosen.placeholder,
+      visual: chosen.visual,
+    };
   }
 
   if (explicitMode === "same_denominator_combine") {

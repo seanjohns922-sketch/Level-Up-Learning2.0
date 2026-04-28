@@ -254,15 +254,15 @@ const year6Rows: ProgramRow[] = [
   {
     week: 5,
     weekTopic: "Fractions – Understanding & Comparison",
-    focus: "Use equivalent fractions to compare, justify, and solve efficiently",
+    focus: "Recognise, build, simplify, and justify equivalent fractions",
     lesson: 1,
     topic: "Equivalent Fractions",
-    activity: "Use equivalent fractions to compare, justify, and solve with efficient strategies.",
+    activity: "Build, identify, and justify equivalent fractions without comparing their size.",
     curriculum: ["AC9M6N04"],
     activities: [
-      makeActivity("equivalent_fraction_match", 1, { mode: "y6_equivalent_smart_visual" }),
-      makeActivity("multiple_choice", 1, { mode: "y6_equivalent_compare_use" }),
-      makeActivity("multiple_choice", 1, { mode: "y6_equivalent_justify_apply" }),
+      makeActivity("typed_response", 1, { mode: "y6_equivalent_build_strict" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_equivalent_identify_strict" }),
+      makeActivity("equivalent_fraction_yes_no", 1, { mode: "y6_equivalent_visual_strict" }),
     ],
   },
   {
@@ -286,9 +286,9 @@ const year6Rows: ProgramRow[] = [
     activity: "Convert between mixed numbers and improper fractions and compare their size.",
     curriculum: ["AC9M6N04"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "mixed_numerals" }),
-      makeActivity("typed_response", 1, { mode: "mixed_numerals" }),
-      makeActivity("multiple_choice", 1, { mode: "order_compare_fractions" }),
+      makeActivity("typed_response", 1, { mode: "y6_mixed_improper_convert" }),
+      makeActivity("number_order", 1, { mode: "y6_mixed_improper_compare" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_mixed_improper_apply" }),
     ],
   },
   {

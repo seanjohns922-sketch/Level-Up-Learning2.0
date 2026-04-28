@@ -7,6 +7,7 @@ import ReadAloudBtn from "@/components/ReadAloudBtn";
 import PlaceValueMABVisual from "@/components/activities/PlaceValueMABVisual";
 import DecimalModelVisual from "@/components/activities/DecimalModelVisual";
 import DecimalShiftVisual from "@/components/activities/DecimalShiftVisual";
+import FractionNumberLineVisual from "@/components/activities/FractionNumberLineVisual";
 import IntegerContextVisual from "@/components/activities/IntegerContextVisual";
 import IntegerNumberLineVisual from "@/components/activities/IntegerNumberLineVisual";
 import MoneyContextVisual from "@/components/activities/MoneyContextVisual";
@@ -2499,6 +2500,9 @@ export default function TypedResponseActivity({
       ) : null}
       {questionData.visual?.type === "decimal_shift" ? (
         <DecimalShiftVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "fraction_number_line" ? (
+        <FractionNumberLineVisual visual={questionData.visual} />
       ) : null}
       {questionData.visual?.type === "integer_context" ? (
         <IntegerContextVisual visual={questionData.visual} />

@@ -12,22 +12,23 @@ export default function FractionNumberLineVisual({
 }: {
   visual: FractionNumberLineVisualData;
 }) {
+  const maxValue = Math.max(1, visual.maxValue ?? 1);
   const markers =
     Array.isArray(visual.markers) && visual.markers.length > 0
       ? visual.markers.map((marker) => ({
           ...marker,
-          left: clampUnit(marker.position) * 100,
+          left: clampUnit(marker.position / maxValue) * 100,
           tone: marker.tone ?? "sky",
         }))
       : [
           {
             label: visual.leftLabel,
-            left: clampUnit(visual.leftPosition) * 100,
+            left: clampUnit(visual.leftPosition / maxValue) * 100,
             tone: "sky" as const,
           },
           {
             label: visual.rightLabel,
-            left: clampUnit(visual.rightPosition) * 100,
+            left: clampUnit(visual.rightPosition / maxValue) * 100,
             tone: "emerald" as const,
           },
         ];
@@ -43,27 +44,27 @@ export default function FractionNumberLineVisual({
           <div className="absolute left-[-1px] top-[66px] h-0 w-0 border-y-[7px] border-y-transparent border-r-[11px] border-r-slate-800" />
           <div className="absolute right-[-1px] top-[66px] h-0 w-0 border-y-[7px] border-y-transparent border-l-[11px] border-l-slate-800" />
 
-          {[0, 0.25, 0.5, 0.75, 1].map((value) => (
+          {Array.from({ length: maxValue + 1 }, (_, index) => index).map((value) => (
             <div
               key={value}
               className="absolute top-[58px] z-10 w-px text-center"
-              style={{ left: `${value * 100}%`, transform: "translateX(-50%)" }}
+              style={{ left: `${(value / maxValue) * 100}%`, transform: "translateX(-50%)" }}
             >
               <div
                 className={[
                   "mx-auto rounded-full",
-                  value === 0.5 ? "h-8 w-[3px] bg-slate-950" : "h-5 w-[2px] bg-slate-400",
+                  value === 0 ? "h-8 w-[3px] bg-slate-950" : "h-5 w-[2px] bg-slate-400",
                 ].join(" ")}
               />
               <div
                 className={[
                   "mt-2 -translate-x-1/2 whitespace-nowrap text-center",
-                  value === 0.5
+                  value === 0
                     ? "text-[18px] font-extrabold text-slate-950"
                     : "text-[14px] font-bold text-slate-600",
                 ].join(" ")}
               >
-                {value === 0 ? "0" : value === 0.5 ? "1/2" : value === 1 ? "1" : ""}
+                {value}
               </div>
             </div>
           ))}
