@@ -273,9 +273,9 @@ const year6Rows: ProgramRow[] = [
     activity: "Compare and order fractions using visual models, equivalence, and benchmark values.",
     curriculum: ["AC9M6N04"],
     activities: [
-      makeActivity("fraction_compare", 1, { mode: "equivalent_to_compare" }),
-      makeActivity("number_line_place", 1, { mode: "order_compare_fractions" }),
-      makeActivity("multiple_choice", 1, { mode: "benchmark_compare_larger" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_fraction_order_fluency" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_fraction_order_strategy" }),
+      makeActivity("number_order", 1, { mode: "y6_fraction_order_reasoning" }),
     ],
   },
   {

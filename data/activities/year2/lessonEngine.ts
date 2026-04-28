@@ -153,6 +153,11 @@ export type FractionNumberLineVisualData = {
   rightLabel: string;
   leftPosition: number;
   rightPosition: number;
+  markers?: Array<{
+    label: string;
+    position: number;
+    tone?: "sky" | "emerald" | "violet";
+  }>;
 };
 
 export type IntegerNumberLineVisualData = {
@@ -213,9 +218,11 @@ export type NumberOrderQuestion = {
   kind: "number_order";
   prompt: string;
   numbers: number[];
+  fractions?: string[];
   ascending: boolean;
   helper?: string;
-  visual?: IntegerNumberLineVisualData;
+  correctOrder?: string[];
+  visual?: IntegerNumberLineVisualData | FractionNumberLineVisualData;
 };
 
 export type PartitionExpandQuestion = {
@@ -615,6 +622,28 @@ function fractionNumericValue(label: string) {
   const [numerator, denominator] = label.split("/").map(Number);
   if (!denominator) return 0;
   return (numerator ?? 0) / denominator;
+}
+
+function makeFractionNumberLineVisual(
+  labels: string[],
+  title = "Fraction number line"
+): FractionNumberLineVisualData {
+  const tones: Array<"sky" | "emerald" | "violet"> = ["sky", "emerald", "violet"];
+  const markers = labels.map((label, index) => ({
+    label,
+    position: fractionNumericValue(label),
+    tone: tones[index % tones.length] ?? "sky",
+  }));
+
+  return {
+    type: "fraction_number_line",
+    title,
+    leftLabel: markers[0]?.label ?? "0",
+    rightLabel: markers[1]?.label ?? "1",
+    leftPosition: markers[0]?.position ?? 0,
+    rightPosition: markers[1]?.position ?? 1,
+    markers,
+  };
 }
 
 type SameDenominatorTemplate = {
@@ -5764,6 +5793,126 @@ function generateInteractiveQuestion(
   }
 
   if (activityType === "number_order") {
+    if (config.mode === "y6_fraction_order_reasoning") {
+      const templates = [
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["2/3", "3/5", "4/7"],
+          helper: "Look for the structure first, then order left to right.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["5/6", "7/10", "3/4"],
+          helper: "Use a benchmark near 1 or rewrite one fraction.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["4/5", "9/11", "7/8"],
+          helper: "All three are near 1. Compare how far each is from a whole.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["7/12", "2/3", "3/4"],
+          helper: "Scale one fraction or compare their positions on the line.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["1/2", "5/8", "7/10"],
+          helper: "Start with the benchmark 1/2.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["5/8", "2/3", "3/4"],
+          helper: "These are all above 1/2. Order them by size, not by denominator.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["3/4", "4/5", "5/6"],
+          helper: "All three sit close to 1. Smaller gap to 1 means larger fraction.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["7/9", "5/6", "11/12"],
+          helper: "Think about distance from 1.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["5/6", "7/8", "9/10"],
+          helper: "Use the line to compare how close each is to 1.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["3/4", "7/10", "4/5"],
+          helper: "One fraction is below 3/4 and one is above it.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["7/12", "3/5", "2/3"],
+          helper: "Compare them around the benchmark 1/2.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["4/7", "3/5", "2/3"],
+          helper: "All are just above 1/2, so small differences matter.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["2/3", "5/7", "3/4"],
+          helper: "Use related denominators or compare the gaps to 1.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["9/10", "11/12", "13/15"],
+          helper: "Which one is furthest from 1? That one is smallest.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["8/9", "11/12", "10/11"],
+          helper: "Distance from 1 is the quickest strategy here.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["13/15", "17/20", "11/12"],
+          helper: "These are all close to a whole. Order by the missing part.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["5/9", "3/5", "7/10"],
+          helper: "Use 1/2 first, then compare the two larger fractions.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["11/16", "3/4", "4/5"],
+          helper: "Scale one fraction when that is enough.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["6/8", "3/4", "5/6"],
+          helper: "Notice any equivalent fractions before you order.",
+        },
+        {
+          prompt: "Order from smallest to largest.",
+          fractions: ["5/7", "7/10", "3/4"],
+          helper: "Use the number line positions to justify the order.",
+        },
+      ] as const;
+      const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+      const correctOrder = [...chosen.fractions].sort(
+        (a, b) => fractionNumericValue(a) - fractionNumericValue(b)
+      );
+
+      return {
+        kind: "number_order",
+        prompt: chosen.prompt,
+        numbers: [],
+        fractions: shuffle([...chosen.fractions]),
+        ascending: true,
+        helper: chosen.helper,
+        correctOrder,
+        visual: makeFractionNumberLineVisual(correctOrder, "Order the fractions on the line"),
+      };
+    }
+
     if (config.mode === "y6_integer_order_compare") {
       const templates = [
         {
@@ -7966,6 +8115,299 @@ function generateGenericQuestion(
         answer: "No",
         options: ["Yes", "No"],
         helper: "Compare the values, not just the numerators.",
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: chosen.helper,
+      visual: chosen.visual,
+    };
+  }
+
+  if (explicitMode === "y6_fraction_order_fluency") {
+    const templates: Array<{
+      prompt: string;
+      answer: string;
+      options: string[];
+      helper: string;
+      visual?: FractionNumberLineVisualData;
+    }> = [
+      {
+        prompt: "Which is greater: 5/6 or 7/8?",
+        answer: "7/8",
+        options: ["5/6", "7/8", "They are equal"],
+        helper: "Compare how far each fraction is from 1.",
+      },
+      {
+        prompt: "Which is greater: 3/4 or 5/6?",
+        answer: "5/6",
+        options: ["3/4", "5/6", "They are equal"],
+        helper: "Rewrite one fraction or compare the gaps to 1.",
+      },
+      {
+        prompt: "Which is larger: 7/9 or 4/5?",
+        answer: "4/5",
+        options: ["7/9", "4/5", "They are equal"],
+        helper: "Scale one fraction instead of converting both fully.",
+      },
+      {
+        prompt: "Which is greater: 6/7 or 8/9?",
+        answer: "8/9",
+        options: ["6/7", "8/9", "They are equal"],
+        helper: "Both are close to 1, so compare the missing part.",
+      },
+      {
+        prompt: "Which is larger: 9/10 or 11/12?",
+        answer: "11/12",
+        options: ["9/10", "11/12", "They are equal"],
+        helper: "Use distance from 1.",
+      },
+      {
+        prompt: "Which fraction is closest to 1?",
+        answer: "9/10",
+        options: ["5/6", "7/8", "9/10"],
+        helper: "The smallest gap to 1 wins.",
+      },
+      {
+        prompt: "Which fraction is closest to 1?",
+        answer: "11/12",
+        options: ["11/12", "5/6", "13/15"],
+        helper: "Compare the missing parts.",
+      },
+      {
+        prompt: "Which is furthest right on the number line?",
+        answer: "7/8",
+        options: ["3/4", "5/6", "7/8"],
+        helper: "Fractions further right are greater.",
+        visual: makeFractionNumberLineVisual(["3/4", "5/6", "7/8"], "Compare their positions"),
+      },
+      {
+        prompt: "Which fraction is closest to 1/2?",
+        answer: "4/7",
+        options: ["2/3", "3/5", "4/7"],
+        helper: "Check which fraction sits nearest the halfway mark.",
+        visual: makeFractionNumberLineVisual(["4/7", "3/5", "2/3"], "Fractions near 1/2"),
+      },
+      {
+        prompt: "Which is greater: 8/9 or 11/12?",
+        answer: "11/12",
+        options: ["8/9", "11/12", "They are equal"],
+        helper: "The smaller gap to 1 gives the larger fraction.",
+      },
+      {
+        prompt: "Which is smaller: 5/8 or 2/3?",
+        answer: "5/8",
+        options: ["5/8", "2/3", "They are equal"],
+        helper: "Compare the actual fraction values, not just numerators.",
+      },
+      {
+        prompt: "Which fraction is closest to 1?",
+        answer: "14/15",
+        options: ["14/15", "9/10", "5/6"],
+        helper: "A denominator can help you compare the distance from 1.",
+      },
+      {
+        prompt: "Which is greater: 10/11 or 11/12?",
+        answer: "11/12",
+        options: ["10/11", "11/12", "They are equal"],
+        helper: "Both are near 1. Check the missing piece.",
+      },
+      {
+        prompt: "Which is smaller: 3/5 or 5/8?",
+        answer: "3/5",
+        options: ["3/5", "5/8", "They are equal"],
+        helper: "Scale one fraction or use benchmark thinking.",
+      },
+      {
+        prompt: "Which fraction is furthest from 1?",
+        answer: "3/4",
+        options: ["7/8", "5/6", "3/4"],
+        helper: "The largest gap to 1 is furthest away.",
+      },
+      {
+        prompt: "Which is greater: 13/15 or 17/20?",
+        answer: "13/15",
+        options: ["13/15", "17/20", "They are equal"],
+        helper: "Compare the missing parts: 2/15 and 3/20.",
+      },
+      {
+        prompt: "Which is greater: 3/4 or 11/16?",
+        answer: "3/4",
+        options: ["3/4", "11/16", "They are equal"],
+        helper: "Scale one fraction to sixteenths.",
+      },
+      {
+        prompt: "Which is greater: 7/10 or 2/3?",
+        answer: "7/10",
+        options: ["7/10", "2/3", "They are equal"],
+        helper: "Use a common denominator or compare on the line.",
+      },
+      {
+        prompt: "Which fraction is larger?",
+        answer: "5/6",
+        options: ["5/6", "7/9", "They are equal"],
+        helper: "One fraction is closer to 1.",
+      },
+      {
+        prompt: "Which fraction sits closest to 3/4?",
+        answer: "7/10",
+        options: ["5/8", "7/10", "4/5"],
+        helper: "Compare each fraction's distance from 3/4.",
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: chosen.helper,
+      visual: chosen.visual,
+    };
+  }
+
+  if (explicitMode === "y6_fraction_order_strategy") {
+    const templates: Array<{
+      prompt: string;
+      answer: string;
+      options: string[];
+      helper: string;
+      visual?: FractionNumberLineVisualData;
+    }> = [
+      {
+        prompt: "What is the fastest way to compare 4/5 and 9/10?",
+        answer: "Change 4/5 into tenths",
+        options: ["Change 4/5 into tenths", "Change both into hundredths", "Guess from the numerators"],
+        helper: "Scale one fraction when that is enough.",
+      },
+      {
+        prompt: "Which comparison is easiest using distance from 1?",
+        answer: "5/6 vs 7/8",
+        options: ["5/6 vs 7/8", "1/3 vs 2/9", "2/5 vs 3/10"],
+        helper: "Fractions close to 1 are quickest to compare that way.",
+      },
+      {
+        prompt: "Which is greater: 4/5 or 9/10?",
+        answer: "9/10",
+        options: ["4/5", "9/10", "They are equal"],
+        helper: "4/5 becomes 8/10.",
+      },
+      {
+        prompt: "Which is greater: 5/6 or 7/9?",
+        answer: "5/6",
+        options: ["5/6", "7/9", "They are equal"],
+        helper: "Compare using equivalent fractions or distance from 1.",
+      },
+      {
+        prompt: "Which is larger: 11/12 or 13/15?",
+        answer: "11/12",
+        options: ["11/12", "13/15", "They are equal"],
+        helper: "The smaller missing part gives the larger fraction.",
+      },
+      {
+        prompt: "Which fraction is closest to 1?",
+        answer: "11/12",
+        options: ["5/6", "7/8", "11/12"],
+        helper: "Use the smallest gap to 1.",
+      },
+      {
+        prompt: "Which is greater: 3/4 or 11/16?",
+        answer: "3/4",
+        options: ["3/4", "11/16", "They are equal"],
+        helper: "3/4 is 12/16.",
+      },
+      {
+        prompt: "Which is greater: 7/10 or 2/3?",
+        answer: "7/10",
+        options: ["7/10", "2/3", "They are equal"],
+        helper: "Scale one fraction just enough to compare.",
+      },
+      {
+        prompt: "Which statement is true?",
+        answer: "7/8 is greater than 5/6 because it is closer to 1",
+        options: [
+          "5/6 is greater than 7/8 because 5 is greater than 7",
+          "7/8 is greater than 5/6 because it is closer to 1",
+          "5/6 and 7/8 are equal",
+        ],
+        helper: "Use fraction value, not numerator size.",
+      },
+      {
+        prompt: "Which is the best benchmark for comparing 3/5 and 7/12?",
+        answer: "1/2",
+        options: ["0", "1/2", "1"],
+        helper: "Both fractions sit near the halfway point.",
+        visual: makeFractionNumberLineVisual(["1/2", "7/12", "3/5"], "Benchmark around 1/2"),
+      },
+      {
+        prompt: "Which is greater: 3/5 or 7/12?",
+        answer: "3/5",
+        options: ["3/5", "7/12", "They are equal"],
+        helper: "The number line can help when both are close together.",
+        visual: makeFractionNumberLineVisual(["7/12", "3/5"], "Compare the positions"),
+      },
+      {
+        prompt: "Which is greater: 4/7 or 5/9?",
+        answer: "4/7",
+        options: ["4/7", "5/9", "They are equal"],
+        helper: "Compare the fraction values, not the denominator alone.",
+      },
+      {
+        prompt: "Which method is efficient for comparing 6/8 and 3/4?",
+        answer: "Recognise they are equivalent",
+        options: ["Recognise they are equivalent", "Convert both to hundredths", "Compare numerators only"],
+        helper: "Spotting equivalence is faster than over-converting.",
+      },
+      {
+        prompt: "Which is closest to 1?",
+        answer: "10/11",
+        options: ["8/9", "9/10", "10/11"],
+        helper: "Which fraction has the smallest missing part?",
+      },
+      {
+        prompt: "Which is greater: 13/15 or 17/20?",
+        answer: "13/15",
+        options: ["13/15", "17/20", "They are equal"],
+        helper: "Distance from 1 is efficient here.",
+      },
+      {
+        prompt: "Which strategy helps compare 13/15 and 17/20?",
+        answer: "Compare distance from 1",
+        options: ["Compare distance from 1", "Compare numerators only", "Choose the smaller denominator"],
+        helper: "Both fractions are close to one whole.",
+      },
+      {
+        prompt: "A student says, “Bigger denominator means bigger fraction.” Is this always true?",
+        answer: "No",
+        options: ["Yes", "No"],
+        helper: "A denominator only matters with the numerator and the whole fraction value.",
+      },
+      {
+        prompt: "Which comparison is easiest by scaling one fraction?",
+        answer: "3/4 vs 9/10",
+        options: ["3/4 vs 9/10", "5/6 vs 7/8", "8/9 vs 10/11"],
+        helper: "One fraction can be quickly renamed to tenths.",
+      },
+      {
+        prompt: "Which fraction is larger?",
+        answer: "11/12",
+        options: ["9/10", "11/12", "They are equal"],
+        helper: "Think about each fraction's distance from 1.",
+        visual: makeFractionNumberLineVisual(["9/10", "11/12"], "Which is furthest right?"),
+      },
+      {
+        prompt: "Which is the best reason 17/18 is greater than 11/12?",
+        answer: "17/18 is only 1/18 away from 1",
+        options: [
+          "17/18 is only 1/18 away from 1",
+          "17 is bigger than 11",
+          "18 is bigger than 12",
+        ],
+        helper: "The reason must compare fraction values, not just whole numbers.",
       },
     ];
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;

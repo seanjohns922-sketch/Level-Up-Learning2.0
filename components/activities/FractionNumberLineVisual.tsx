@@ -12,8 +12,25 @@ export default function FractionNumberLineVisual({
 }: {
   visual: FractionNumberLineVisualData;
 }) {
-  const left = clampUnit(visual.leftPosition) * 100;
-  const right = clampUnit(visual.rightPosition) * 100;
+  const markers =
+    Array.isArray(visual.markers) && visual.markers.length > 0
+      ? visual.markers.map((marker) => ({
+          ...marker,
+          left: clampUnit(marker.position) * 100,
+          tone: marker.tone ?? "sky",
+        }))
+      : [
+          {
+            label: visual.leftLabel,
+            left: clampUnit(visual.leftPosition) * 100,
+            tone: "sky" as const,
+          },
+          {
+            label: visual.rightLabel,
+            left: clampUnit(visual.rightPosition) * 100,
+            tone: "emerald" as const,
+          },
+        ];
 
   return (
     <div className="mt-5 rounded-[28px] border border-sky-100 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.96),_rgba(239,246,255,0.92)_55%,_rgba(224,242,254,0.92))] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
@@ -51,10 +68,7 @@ export default function FractionNumberLineVisual({
             </div>
           ))}
 
-          {[
-            { label: visual.leftLabel, left, tone: "sky" },
-            { label: visual.rightLabel, left: right, tone: "emerald" },
-          ].map((marker, index) => (
+          {markers.map((marker, index) => (
             <div
               key={`${marker.label}-${index}`}
               className="absolute z-20"
@@ -65,6 +79,8 @@ export default function FractionNumberLineVisual({
                   "mx-auto h-5 w-5 rounded-full border-2 shadow-[0_0_0_8px_rgba(148,163,184,0.12)]",
                   marker.tone === "sky"
                     ? "border-sky-700 bg-sky-500"
+                    : marker.tone === "violet"
+                      ? "border-violet-700 bg-violet-500"
                     : "border-emerald-700 bg-emerald-500",
                 ].join(" ")}
               />
