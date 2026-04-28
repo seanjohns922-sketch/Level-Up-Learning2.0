@@ -28,10 +28,10 @@ export default function BinderCard({
         style={{
           border: isUnlocked
             ? "2px solid hsla(160, 50%, 55%, 0.5)"
-            : "2px solid hsla(220, 10%, 80%, 0.4)",
+            : "2px solid hsla(160, 20%, 42%, 0.28)",
           boxShadow: isUnlocked
             ? "0 4px 20px hsla(160, 50%, 45%, 0.2), 0 0 0 1px hsla(160, 50%, 60%, 0.1)"
-            : "0 2px 8px rgba(0,0,0,0.06)",
+            : "0 8px 22px hsla(170, 60%, 2%, 0.24)",
           transform: "translateY(0)",
           cursor: isUnlocked ? "pointer" : "default",
         }}
@@ -48,7 +48,7 @@ export default function BinderCard({
             e.currentTarget.style.boxShadow =
               "0 4px 20px hsla(160, 50%, 45%, 0.2), 0 0 0 1px hsla(160, 50%, 60%, 0.1)";
           } else {
-            e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)";
+            e.currentTarget.style.boxShadow = "0 8px 22px hsla(170, 60%, 2%, 0.24)";
           }
         }}
       >
@@ -79,18 +79,18 @@ export default function BinderCard({
         {!isUnlocked && (
           <div
             className="absolute inset-0 flex items-center justify-center"
-            style={{ background: "hsla(220, 15%, 95%, 0.25)" }}
+            style={{ background: "hsla(170, 32%, 5%, 0.42)" }}
           >
             <div
               className="p-2.5 rounded-full"
               style={{
-                background: "hsla(0, 0%, 100%, 0.6)",
+                background: "hsla(166, 36%, 10%, 0.78)",
                 backdropFilter: "blur(4px)",
-                border: "1px solid hsla(220, 10%, 85%, 0.5)",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                border: "1px solid hsla(160, 42%, 54%, 0.22)",
+                boxShadow: "0 2px 10px hsla(170, 60%, 2%, 0.28)",
               }}
             >
-              <Lock className="h-4 w-4" style={{ color: "hsl(220, 10%, 55%)" }} />
+              <Lock className="h-4 w-4" style={{ color: "hsl(160, 26%, 64%)" }} />
             </div>
           </div>
         )}
