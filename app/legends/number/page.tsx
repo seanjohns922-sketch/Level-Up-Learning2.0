@@ -131,7 +131,7 @@ export default function NumbotCollectionPage() {
             {/* Premium progress bar */}
             <div className="mt-6 max-w-sm">
               <div className="flex items-center justify-between text-sm mb-2">
-                <span className="font-bold" style={{ color: "hsl(220, 15%, 15%)" }}>
+                <span className="font-bold" style={{ color: "hsl(160, 30%, 86%)" }}>
                   {collectedCount} / {totalCount} collected
                 </span>
                 <span className="font-bold" style={{ color: "hsl(160, 58%, 66%)" }}>
@@ -161,10 +161,7 @@ export default function NumbotCollectionPage() {
 
         {/* Card Binder Grid */}
         <div className="max-w-2xl mx-auto px-6 py-8">
-          <h2
-            className="text-xs font-extrabold tracking-[0.15em] mb-5"
-            style={{ color: "hsl(220, 10%, 55%)" }}
-          >
+          <h2 className="text-xs font-extrabold tracking-[0.15em] mb-5" style={{ color: "hsl(160, 24%, 66%)" }}>
             CARD BINDER
           </h2>
 
@@ -186,17 +183,18 @@ export default function NumbotCollectionPage() {
           <div
             className="mt-10 rounded-2xl p-5 flex items-start gap-3"
             style={{
-              background: "hsla(160, 30%, 95%, 0.8)",
-              border: "1.5px solid hsla(160, 30%, 80%, 0.5)",
-              backdropFilter: "blur(8px)",
+              background: "hsla(166, 44%, 9%, 0.72)",
+              border: "1.5px solid hsla(160, 42%, 48%, 0.18)",
+              backdropFilter: "blur(12px)",
+              boxShadow: "0 18px 50px hsla(170, 60%, 2%, 0.22)",
             }}
           >
-            <span className="text-2xl flex-shrink-0">💡</span>
+            <Sparkles className="h-5 w-5 flex-shrink-0 mt-0.5" style={{ color: "hsl(160, 58%, 64%)" }} />
             <div>
-              <div className="font-bold mb-0.5" style={{ color: "hsl(220, 15%, 15%)" }}>
+              <div className="font-bold mb-0.5" style={{ color: "hsl(160, 34%, 90%)" }}>
                 How to collect Numbots
               </div>
-              <div className="text-sm" style={{ color: "hsl(220, 10%, 50%)" }}>
+              <div className="text-sm" style={{ color: "hsl(166, 16%, 68%)" }}>
                 Pass a pre-test or complete the full 12-week number program to unlock each Numbot legend for that year level.
               </div>
             </div>
