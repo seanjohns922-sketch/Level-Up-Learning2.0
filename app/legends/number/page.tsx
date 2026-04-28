@@ -38,32 +38,47 @@ export default function NumbotCollectionPage() {
   const pct = totalCount > 0 ? Math.round((collectedCount / totalCount) * 100) : 0;
 
   return (
-    <main className="relative min-h-screen overflow-hidden" style={{ background: "hsl(160, 15%, 96%)" }}>
-      {/* Subtle math-themed background texture */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ opacity: 0.035 }}>
+    <main
+      className="relative min-h-screen overflow-hidden"
+      style={{
+        background:
+          "linear-gradient(180deg, hsl(176, 58%, 8%) 0%, hsl(170, 54%, 6%) 48%, hsl(164, 48%, 5%) 100%)",
+      }}
+    >
+      {/* Calm Number Nexus archive atmosphere */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(circle at 50% 18%, hsla(160, 68%, 42%, 0.16), transparent 34%), radial-gradient(circle at 78% 34%, hsla(176, 65%, 38%, 0.08), transparent 30%), linear-gradient(90deg, hsla(170, 60%, 8%, 0.68), transparent 34%, transparent 66%, hsla(170, 60%, 8%, 0.68))",
+        }}
+      />
+      <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ opacity: 0.1, filter: "blur(0.2px)" }}>
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <pattern id="math-grid" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
-              <line x1="0" y1="0" x2="80" y2="0" stroke="hsl(160, 40%, 40%)" strokeWidth="0.5" />
-              <line x1="0" y1="0" x2="0" y2="80" stroke="hsl(160, 40%, 40%)" strokeWidth="0.5" />
+            <pattern id="math-grid" x="0" y="0" width="88" height="88" patternUnits="userSpaceOnUse">
+              <line x1="0" y1="0" x2="88" y2="0" stroke="hsl(160, 54%, 54%)" strokeWidth="0.45" />
+              <line x1="0" y1="0" x2="0" y2="88" stroke="hsl(160, 54%, 54%)" strokeWidth="0.45" />
+              <path d="M18 44H44V18M44 70V44H70" fill="none" stroke="hsl(160, 54%, 54%)" strokeWidth="0.45" />
             </pattern>
-            <pattern id="math-symbols" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse">
-              <text x="20" y="30" fontSize="14" fill="hsl(160, 40%, 40%)" fontFamily="monospace">1</text>
-              <text x="70" y="60" fontSize="12" fill="hsl(160, 40%, 40%)" fontFamily="monospace">+</text>
-              <text x="130" y="40" fontSize="14" fill="hsl(160, 40%, 40%)" fontFamily="monospace">7</text>
-              <text x="170" y="80" fontSize="12" fill="hsl(160, 40%, 40%)" fontFamily="monospace">×</text>
-              <text x="40" y="100" fontSize="14" fill="hsl(160, 40%, 40%)" fontFamily="monospace">3</text>
-              <text x="100" y="120" fontSize="12" fill="hsl(160, 40%, 40%)" fontFamily="monospace">=</text>
-              <text x="160" y="140" fontSize="14" fill="hsl(160, 40%, 40%)" fontFamily="monospace">9</text>
-              <text x="20" y="160" fontSize="12" fill="hsl(160, 40%, 40%)" fontFamily="monospace">÷</text>
-              <text x="80" y="180" fontSize="14" fill="hsl(160, 40%, 40%)" fontFamily="monospace">5</text>
-              <text x="140" y="190" fontSize="12" fill="hsl(160, 40%, 40%)" fontFamily="monospace">−</text>
+            <pattern id="math-symbols" x="0" y="0" width="260" height="220" patternUnits="userSpaceOnUse">
+              <text x="28" y="38" fontSize="13" fill="hsl(160, 54%, 58%)" fontFamily="monospace">01</text>
+              <text x="132" y="64" fontSize="11" fill="hsl(160, 54%, 58%)" fontFamily="monospace">+7</text>
+              <text x="204" y="118" fontSize="12" fill="hsl(160, 54%, 58%)" fontFamily="monospace">×3</text>
+              <text x="64" y="168" fontSize="12" fill="hsl(160, 54%, 58%)" fontFamily="monospace">=12</text>
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#math-grid)" />
           <rect width="100%" height="100%" fill="url(#math-symbols)" />
         </svg>
       </div>
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(180deg, hsla(168, 58%, 8%, 0) 0%, hsla(168, 58%, 5%, 0.36) 60%, hsla(168, 58%, 3%, 0.72) 100%), radial-gradient(ellipse at center, transparent 42%, hsla(170, 62%, 3%, 0.62) 100%)",
+        }}
+      />
 
       {/* Content */}
       <div className="relative z-10">
