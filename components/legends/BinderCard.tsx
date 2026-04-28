@@ -112,10 +112,10 @@ export default function BinderCard({
             <span
               className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[8px] font-extrabold shadow"
               style={{
-                background: "hsla(0, 0%, 100%, 0.65)",
+                background: "hsla(166, 38%, 10%, 0.72)",
                 backdropFilter: "blur(4px)",
-                color: "hsl(220, 10%, 50%)",
-                border: "1px solid hsla(220, 10%, 85%, 0.4)",
+                color: "hsl(160, 20%, 66%)",
+                border: "1px solid hsla(160, 32%, 48%, 0.18)",
               }}
             >
               <Lock className="h-2 w-2" /> LOCKED
