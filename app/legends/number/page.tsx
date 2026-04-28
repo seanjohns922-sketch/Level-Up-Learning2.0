@@ -46,22 +46,26 @@ export default function NumbotCollectionPage() {
           "linear-gradient(180deg, hsl(176, 58%, 8%) 0%, hsl(170, 54%, 6%) 48%, hsl(164, 48%, 5%) 100%)",
       }}
     >
-      {/* Blurred Number Nexus environment */}
+      {/* Layer 2: blurred Number Nexus city/archive environment */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div
-          className="absolute -inset-8 bg-cover bg-center bg-no-repeat"
+        <img
+          src="/images/numbot-collection-environment.jpg"
+          alt=""
+          aria-hidden="true"
+          width={1536}
+          height={1024}
+          className="absolute -inset-8 h-[calc(100%+4rem)] w-[calc(100%+4rem)] object-cover object-center"
           style={{
-            backgroundImage: "url('/images/number-nexus-bg.jpg')",
-            filter: "blur(18px) saturate(0.86)",
-            opacity: 0.5,
-            transform: "scale(1.06)",
+            filter: "blur(14px) saturate(0.9)",
+            opacity: 0.72,
+            transform: "scale(1.08)",
           }}
         />
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, hsla(176, 58%, 6%, 0.68), hsla(170, 54%, 4%, 0.72)), radial-gradient(circle at 50% 38%, hsla(160, 58%, 16%, 0.2), hsla(170, 62%, 3%, 0.68) 72%)",
+              "linear-gradient(180deg, hsla(176, 58%, 5%, 0.66), hsla(170, 54%, 4%, 0.72)), radial-gradient(circle at 50% 42%, hsla(160, 58%, 12%, 0.2), hsla(170, 62%, 3%, 0.7) 74%)",
           }}
         />
       </div>
@@ -103,8 +107,8 @@ export default function NumbotCollectionPage() {
       <div
         className="absolute inset-x-0 top-[250px] bottom-20 max-w-3xl mx-auto pointer-events-none"
         style={{
-          background: "radial-gradient(ellipse at center, hsla(160, 56%, 42%, 0.14), transparent 68%)",
-          filter: "blur(24px)",
+          background: "radial-gradient(ellipse at center, hsla(160, 56%, 42%, 0.18), transparent 70%)",
+          filter: "blur(28px)",
         }}
       />
 
