@@ -102,14 +102,14 @@ export default function NumbotCollectionPage() {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "linear-gradient(180deg, hsla(168, 58%, 8%, 0) 0%, hsla(168, 58%, 5%, 0.18) 60%, hsla(168, 58%, 3%, 0.5) 100%), radial-gradient(ellipse at center, transparent 46%, hsla(170, 62%, 3%, 0.58) 100%)",
+            "linear-gradient(180deg, hsla(168, 58%, 8%, 0) 0%, hsla(168, 58%, 5%, 0.08) 60%, hsla(168, 58%, 3%, 0.28) 100%), radial-gradient(ellipse at center, transparent 56%, hsla(170, 62%, 3%, 0.48) 100%)",
         }}
       />
       <div
         className="absolute inset-x-0 top-[250px] bottom-20 max-w-3xl mx-auto pointer-events-none"
         style={{
-          background: "radial-gradient(ellipse at center, hsla(160, 56%, 42%, 0.18), transparent 70%)",
-          filter: "blur(28px)",
+          background: "radial-gradient(ellipse at center, hsla(160, 56%, 42%, 0.11), transparent 72%)",
+          filter: "blur(34px)",
         }}
       />
 
