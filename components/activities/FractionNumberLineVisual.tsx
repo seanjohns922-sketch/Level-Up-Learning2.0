@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { FractionText } from "@/components/FractionText";
 import type { FractionNumberLineVisualData } from "@/data/activities/year2/lessonEngine";
 
@@ -9,29 +10,65 @@ function clampUnit(value: number) {
 
 export default function FractionNumberLineVisual({
   visual,
+  interactive = false,
+  previewLabel,
+  lockedLabels = [],
+  successLabel,
+  wrongLabel,
 }: {
   visual: FractionNumberLineVisualData;
+  interactive?: boolean;
+  previewLabel?: string | null;
+  lockedLabels?: string[];
+  successLabel?: string | null;
+  wrongLabel?: string | null;
 }) {
   const maxValue = Math.max(1, visual.maxValue ?? 1);
-  const markers =
-    Array.isArray(visual.markers) && visual.markers.length > 0
-      ? visual.markers.map((marker) => ({
-          ...marker,
-          left: clampUnit(marker.position / maxValue) * 100,
-          tone: marker.tone ?? "sky",
-        }))
-      : [
-          {
-            label: visual.leftLabel,
-            left: clampUnit(visual.leftPosition / maxValue) * 100,
-            tone: "sky" as const,
-          },
-          {
-            label: visual.rightLabel,
-            left: clampUnit(visual.rightPosition / maxValue) * 100,
-            tone: "emerald" as const,
-          },
-        ];
+  const [hoveredLabel, setHoveredLabel] = useState<string | null>(null);
+  const markers = useMemo(
+    () =>
+      Array.isArray(visual.markers) && visual.markers.length > 0
+        ? visual.markers.map((marker) => ({
+            ...marker,
+            left: clampUnit(marker.position / maxValue) * 100,
+            tone: marker.tone ?? "sky",
+          }))
+        : [
+            {
+              label: visual.leftLabel,
+              left: clampUnit(visual.leftPosition / maxValue) * 100,
+              tone: "sky" as const,
+            },
+            {
+              label: visual.rightLabel,
+              left: clampUnit(visual.rightPosition / maxValue) * 100,
+              tone: "emerald" as const,
+            },
+          ],
+    [maxValue, visual.leftLabel, visual.leftPosition, visual.markers, visual.rightLabel, visual.rightPosition]
+  );
+  const previewMarker = useMemo(
+    () => markers.find((marker) => marker.label === previewLabel) ?? null,
+    [markers, previewLabel]
+  );
+  const positionedMarkers = useMemo(() => {
+    const sorted = [...markers].sort((left, right) => left.left - right.left);
+    return sorted.reduce<Array<(typeof markers)[number] & { lane: number }>>((acc, marker) => {
+      const previous = acc[acc.length - 1];
+      const tooClose = previous ? marker.left - previous.left < 11 : false;
+      const lane = tooClose ? (previous.lane + 1) % 3 : 0;
+      acc.push({
+        ...marker,
+        lane,
+      });
+      return acc;
+    }, []);
+  }, [markers]);
+  const activeLabel = hoveredLabel ?? previewLabel ?? successLabel ?? wrongLabel ?? null;
+  const benchmarkTicks =
+    maxValue === 1
+      ? [0.25, 1 / 3, 0.5, 2 / 3, 0.75]
+      : [];
 
   return (
     <div className="mt-5 rounded-[28px] border border-sky-100 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.96),_rgba(239,246,255,0.92)_55%,_rgba(224,242,254,0.92))] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
@@ -43,6 +80,15 @@ export default function FractionNumberLineVisual({
           <div className="absolute left-0 right-0 top-[72px] h-[3px] bg-slate-800" />
           <div className="absolute left-[-1px] top-[66px] h-0 w-0 border-y-[7px] border-y-transparent border-r-[11px] border-r-slate-800" />
           <div className="absolute right-[-1px] top-[66px] h-0 w-0 border-y-[7px] border-y-transparent border-l-[11px] border-l-slate-800" />
+          {benchmarkTicks.map((value) => (
+            <div
+              key={`benchmark-${value}`}
+              className="absolute top-[63px] z-[5] w-px text-center"
+              style={{ left: `${value * 100}%`, transform: "translateX(-50%)" }}
+            >
+              <div className="mx-auto h-4 w-px rounded-full bg-sky-300/80" />
+            </div>
+          ))}
 
           {Array.from({ length: maxValue + 1 }, (_, index) => index).map((value) => (
             <div
@@ -69,29 +115,73 @@ export default function FractionNumberLineVisual({
             </div>
           ))}
 
-          {markers.map((marker, index) => (
+          {previewMarker ? (
+            <div
+              className="absolute z-[15] transition-all duration-150"
+              style={{ left: `${previewMarker.left}%`, transform: "translateX(-50%)", top: "26px" }}
+            >
+              <div className="mx-auto h-8 w-8 rounded-full border-2 border-dashed border-sky-400 bg-sky-200/30 shadow-[0_0_0_10px_rgba(56,189,248,0.08)]" />
+              <div className="mx-auto mt-2 h-[42px] w-px bg-gradient-to-b from-sky-300/80 to-transparent" />
+            </div>
+          ) : null}
+
+          {positionedMarkers.map((marker, index) => {
+            const isActive = activeLabel === marker.label;
+            const isLocked = lockedLabels.includes(marker.label);
+            const isSuccess = successLabel === marker.label;
+            const isWrong = wrongLabel === marker.label;
+            const showLabel = !interactive || isActive || isLocked;
+            return (
             <div
               key={`${marker.label}-${index}`}
-              className="absolute z-20"
-              style={{ left: `${marker.left}%`, transform: "translateX(-50%)", top: "18px" }}
+              className={[
+                "absolute z-20 transition-all duration-200",
+                isWrong ? "animate-pulse" : "",
+              ].join(" ")}
+              style={{
+                left: `${marker.left}%`,
+                transform: "translateX(-50%)",
+                top: `${18 + marker.lane * 16}px`,
+              }}
             >
-              <div
-                className={[
-                  "mx-auto h-5 w-5 rounded-full border-2 shadow-[0_0_0_8px_rgba(148,163,184,0.12)]",
-                  marker.tone === "sky"
-                    ? "border-sky-700 bg-sky-500"
-                    : marker.tone === "violet"
-                      ? "border-violet-700 bg-violet-500"
-                    : "border-emerald-700 bg-emerald-500",
-                ].join(" ")}
-              />
-              <div className="mt-3 flex justify-center">
-                <div className="rounded-xl bg-white px-3 py-2 text-slate-950 shadow-sm ring-1 ring-slate-200">
+              <button
+                type="button"
+                onMouseEnter={() => interactive && setHoveredLabel(marker.label)}
+                onMouseLeave={() => interactive && setHoveredLabel((current) => (current === marker.label ? null : current))}
+                onFocus={() => interactive && setHoveredLabel(marker.label)}
+                onBlur={() => interactive && setHoveredLabel((current) => (current === marker.label ? null : current))}
+                className="group flex flex-col items-center outline-none"
+                aria-label={marker.label}
+              >
+                <div
+                  className={[
+                    "mx-auto h-5 w-5 rounded-full border-2 transition-all duration-200",
+                    isActive || isLocked
+                      ? "shadow-[0_0_0_10px_rgba(56,189,248,0.14)] scale-110"
+                      : "shadow-[0_0_0_8px_rgba(148,163,184,0.12)]",
+                    isSuccess ? "shadow-[0_0_0_12px_rgba(34,197,94,0.18)] border-emerald-700 bg-emerald-500" : "",
+                    isWrong ? "shadow-[0_0_0_12px_rgba(248,113,113,0.14)] border-rose-600 bg-rose-400" : "",
+                    marker.tone === "sky"
+                      ? "border-sky-700 bg-sky-500"
+                      : marker.tone === "violet"
+                        ? "border-violet-700 bg-violet-500"
+                      : "border-emerald-700 bg-emerald-500",
+                  ].join(" ")}
+                />
+                <div className="mt-2 h-[34px] w-px bg-gradient-to-b from-slate-300/80 to-transparent" />
+                <div
+                  className={[
+                    "mt-1 rounded-xl bg-white px-3 py-2 text-slate-950 shadow-sm ring-1 ring-slate-200 transition-all duration-150",
+                    showLabel ? "translate-y-0 opacity-100" : "-translate-y-1 opacity-0 pointer-events-none",
+                    isActive ? "ring-sky-300 shadow-[0_8px_24px_rgba(56,189,248,0.16)]" : "",
+                  ].join(" ")}
+                >
                   <FractionText value={marker.label} size="sm" />
                 </div>
-              </div>
+              </button>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
