@@ -46,12 +46,32 @@ export default function NumbotCollectionPage() {
           "linear-gradient(180deg, hsl(176, 58%, 8%) 0%, hsl(170, 54%, 6%) 48%, hsl(164, 48%, 5%) 100%)",
       }}
     >
+      {/* Blurred Number Nexus environment */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div
+          className="absolute -inset-8 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: "url('/images/number-nexus-bg.jpg')",
+            filter: "blur(18px) saturate(0.86)",
+            opacity: 0.5,
+            transform: "scale(1.06)",
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, hsla(176, 58%, 6%, 0.68), hsla(170, 54%, 4%, 0.72)), radial-gradient(circle at 50% 38%, hsla(160, 58%, 16%, 0.2), hsla(170, 62%, 3%, 0.68) 72%)",
+          }}
+        />
+      </div>
+
       {/* Calm Number Nexus archive atmosphere */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(circle at 50% 18%, hsla(160, 68%, 42%, 0.16), transparent 34%), radial-gradient(circle at 78% 34%, hsla(176, 65%, 38%, 0.08), transparent 30%), linear-gradient(90deg, hsla(170, 60%, 8%, 0.68), transparent 34%, transparent 66%, hsla(170, 60%, 8%, 0.68))",
+            "radial-gradient(circle at 50% 18%, hsla(160, 68%, 42%, 0.12), transparent 34%), radial-gradient(circle at 78% 34%, hsla(176, 65%, 38%, 0.06), transparent 30%), linear-gradient(90deg, hsla(170, 60%, 8%, 0.6), transparent 34%, transparent 66%, hsla(170, 60%, 8%, 0.6))",
         }}
       />
       <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ opacity: 0.1, filter: "blur(0.2px)" }}>
