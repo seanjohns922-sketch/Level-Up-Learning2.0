@@ -88,7 +88,7 @@ export default function NumbotCollectionPage() {
           <div
             className="absolute inset-0"
             style={{
-              background: "linear-gradient(180deg, hsla(160, 30%, 88%, 0.8) 0%, hsla(160, 15%, 96%, 0) 100%)",
+              background: "linear-gradient(180deg, hsla(160, 58%, 16%, 0.42) 0%, hsla(160, 58%, 8%, 0) 100%)",
             }}
           />
 
@@ -97,33 +97,34 @@ export default function NumbotCollectionPage() {
               <button
                 onClick={() => router.push("/legends")}
                 className="text-sm font-bold transition flex items-center gap-1"
-                style={{ color: "hsl(160, 50%, 35%)" }}
+                style={{ color: "hsl(160, 62%, 72%)" }}
               >
                 <ArrowLeft className="h-3.5 w-3.5" /> My Legends
               </button>
               <div
                 className="inline-flex items-center gap-1.5 text-sm font-bold px-4 py-1.5 rounded-full shadow-sm"
                 style={{
-                  background: "hsla(160, 40%, 94%, 0.9)",
-                  color: "hsl(160, 50%, 30%)",
-                  border: "1px solid hsla(160, 40%, 80%, 0.6)",
+                  background: "hsla(166, 45%, 12%, 0.74)",
+                  color: "hsl(160, 62%, 75%)",
+                  border: "1px solid hsla(160, 50%, 58%, 0.22)",
                   backdropFilter: "blur(8px)",
                 }}
               >
-                <Sparkles className="h-3.5 w-3.5" style={{ color: "hsl(160, 50%, 45%)" }} /> Number Nexus
+                <Sparkles className="h-3.5 w-3.5" style={{ color: "hsl(160, 58%, 62%)" }} /> Number Nexus
               </div>
             </div>
 
             <h1
               className="text-4xl md:text-5xl font-black tracking-tight"
               style={{
-                color: "hsl(220, 15%, 15%)",
+                color: "hsl(160, 38%, 92%)",
                 fontFamily: "'Quicksand', 'Nunito', sans-serif",
+                textShadow: "0 2px 20px hsla(160, 55%, 45%, 0.16)",
               }}
             >
               Numbot Collection
             </h1>
-            <p className="mt-2 text-lg max-w-lg" style={{ color: "hsl(220, 10%, 50%)" }}>
+            <p className="mt-2 text-lg max-w-lg" style={{ color: "hsl(166, 18%, 72%)" }}>
               Collect powerful Numbots by mastering your number skills.
             </p>
 
@@ -133,16 +134,16 @@ export default function NumbotCollectionPage() {
                 <span className="font-bold" style={{ color: "hsl(220, 15%, 15%)" }}>
                   {collectedCount} / {totalCount} collected
                 </span>
-                <span className="font-bold" style={{ color: "hsl(160, 50%, 35%)" }}>
+                <span className="font-bold" style={{ color: "hsl(160, 58%, 66%)" }}>
                   {pct}%
                 </span>
               </div>
               <div
                 className="h-4 rounded-full overflow-hidden"
                 style={{
-                  background: "hsla(160, 20%, 90%, 0.8)",
-                  border: "1px solid hsla(160, 30%, 82%, 0.6)",
-                  boxShadow: "inset 0 1px 3px rgba(0,0,0,0.06)",
+                  background: "hsla(166, 42%, 4%, 0.6)",
+                  border: "1px solid hsla(160, 38%, 42%, 0.28)",
+                  boxShadow: "inset 0 1px 4px hsla(170, 60%, 2%, 0.7)",
                 }}
               >
                 <div
