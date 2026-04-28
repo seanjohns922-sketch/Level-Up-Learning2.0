@@ -46,26 +46,26 @@ export default function NumbotCollectionPage() {
           "linear-gradient(180deg, hsl(176, 58%, 8%) 0%, hsl(170, 54%, 6%) 48%, hsl(164, 48%, 5%) 100%)",
       }}
     >
-      {/* Layer 2: blurred Number Nexus city/archive environment */}
+      {/* Layer 2: visible Number Nexus city environment */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <img
-          src="/images/numbot-collection-environment.jpg"
+          src="/images/number-nexus-home-bg-y6.jpg"
           alt=""
           aria-hidden="true"
-          width={1536}
-          height={1024}
-          className="absolute -inset-8 h-[calc(100%+4rem)] w-[calc(100%+4rem)] object-cover object-center"
+          width={1920}
+          height={1080}
+          className="absolute inset-0 h-full w-full object-cover object-center"
           style={{
-            filter: "blur(14px) saturate(0.9)",
-            opacity: 0.72,
-            transform: "scale(1.08)",
+            filter: "blur(4px) saturate(0.95)",
+            opacity: 0.82,
+            transform: "scale(1.025)",
           }}
         />
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, hsla(176, 58%, 5%, 0.66), hsla(170, 54%, 4%, 0.72)), radial-gradient(circle at 50% 42%, hsla(160, 58%, 12%, 0.2), hsla(170, 62%, 3%, 0.7) 74%)",
+              "linear-gradient(180deg, hsla(176, 58%, 5%, 0.48), hsla(170, 54%, 4%, 0.58)), radial-gradient(circle at 50% 48%, hsla(160, 58%, 8%, 0.1), hsla(170, 62%, 3%, 0.58) 78%)",
           }}
         />
       </div>
