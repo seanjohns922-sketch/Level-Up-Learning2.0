@@ -254,15 +254,15 @@ const year6Rows: ProgramRow[] = [
   {
     week: 5,
     weekTopic: "Fractions – Understanding & Comparison",
-    focus: "Recognise equivalent fractions and see them as the same amount",
+    focus: "Use equivalent fractions to compare, justify, and solve efficiently",
     lesson: 1,
     topic: "Equivalent Fractions",
-    activity: "Match, reason about, and build equivalent fractions using clean visual and symbolic models.",
+    activity: "Use equivalent fractions to compare, justify, and solve with efficient strategies.",
     curriculum: ["AC9M6N04"],
     activities: [
-      makeActivity("equivalent_fraction_match", 1, { mode: "equivalent_fraction_visual" }),
-      makeActivity("multiple_choice", 1, { mode: "equivalent_fraction_reasoning" }),
-      makeActivity("typed_response", 1, { mode: "equivalent_fraction_build" }),
+      makeActivity("equivalent_fraction_match", 1, { mode: "y6_equivalent_smart_visual" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_equivalent_compare_use" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_equivalent_justify_apply" }),
     ],
   },
   {

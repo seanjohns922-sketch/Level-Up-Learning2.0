@@ -146,6 +146,15 @@ export type DecimalShiftVisualData = {
   hideResult?: boolean;
 };
 
+export type FractionNumberLineVisualData = {
+  type: "fraction_number_line";
+  title?: string;
+  leftLabel: string;
+  rightLabel: string;
+  leftPosition: number;
+  rightPosition: number;
+};
+
 export type IntegerNumberLineVisualData = {
   type: "integer_number_line";
   min?: number;
@@ -2981,6 +2990,7 @@ export type MultipleChoiceQuestion = {
     | MABVisualData
     | DecimalVisualData
     | DecimalShiftVisualData
+    | FractionNumberLineVisualData
     | IntegerNumberLineVisualData
     | IntegerContextVisualData
     | MoneyVisualData
@@ -3020,6 +3030,7 @@ export type TypedResponseQuestion = {
     | MABVisualData
     | DecimalVisualData
     | DecimalShiftVisualData
+    | FractionNumberLineVisualData
     | IntegerNumberLineVisualData
     | IntegerContextVisualData
     | ColumnMultiplicationVisualData
@@ -6515,6 +6526,115 @@ function generateInteractiveQuestion(
 
   if (activityType === "equivalent_fraction_match") {
     const mode = typeof config.mode === "string" ? config.mode : undefined;
+    if (mode === "y6_equivalent_smart_visual") {
+      const templates = [
+        {
+          prompt: "Which fraction is equivalent to 4/5?",
+          source: { numerator: 4, denominator: 5 },
+          correct: { numerator: 8, denominator: 10 },
+          distractors: [
+            { numerator: 6, denominator: 10 },
+            { numerator: 9, denominator: 10 },
+          ],
+        },
+        {
+          prompt: "Which fraction is equivalent to 3/4?",
+          source: { numerator: 3, denominator: 4 },
+          correct: { numerator: 6, denominator: 8 },
+          distractors: [
+            { numerator: 5, denominator: 8 },
+            { numerator: 7, denominator: 8 },
+          ],
+        },
+        {
+          prompt: "Which fraction is equivalent to 2/3?",
+          source: { numerator: 2, denominator: 3 },
+          correct: { numerator: 4, denominator: 6 },
+          distractors: [
+            { numerator: 3, denominator: 6 },
+            { numerator: 5, denominator: 6 },
+          ],
+        },
+        {
+          prompt: "Which fraction is equivalent to 5/6?",
+          source: { numerator: 5, denominator: 6 },
+          correct: { numerator: 15, denominator: 18 },
+          distractors: [
+            { numerator: 12, denominator: 18 },
+            { numerator: 16, denominator: 18 },
+          ],
+        },
+        {
+          prompt: "Which fraction is equivalent to 7/8?",
+          source: { numerator: 7, denominator: 8 },
+          correct: { numerator: 14, denominator: 16 },
+          distractors: [
+            { numerator: 12, denominator: 16 },
+            { numerator: 15, denominator: 16 },
+          ],
+        },
+        {
+          prompt: "Which fraction is equivalent to 2/5?",
+          source: { numerator: 2, denominator: 5 },
+          correct: { numerator: 4, denominator: 10 },
+          distractors: [
+            { numerator: 5, denominator: 10 },
+            { numerator: 3, denominator: 10 },
+          ],
+        },
+        {
+          prompt: "Which fraction is equivalent to 1/4?",
+          source: { numerator: 1, denominator: 4 },
+          correct: { numerator: 3, denominator: 12 },
+          distractors: [
+            { numerator: 2, denominator: 12 },
+            { numerator: 4, denominator: 12 },
+          ],
+        },
+        {
+          prompt: "Which fraction is equivalent to 3/5?",
+          source: { numerator: 3, denominator: 5 },
+          correct: { numerator: 9, denominator: 15 },
+          distractors: [
+            { numerator: 6, denominator: 15 },
+            { numerator: 10, denominator: 15 },
+          ],
+        },
+        {
+          prompt: "Which fraction is equivalent to 4/7?",
+          source: { numerator: 4, denominator: 7 },
+          correct: { numerator: 8, denominator: 14 },
+          distractors: [
+            { numerator: 7, denominator: 14 },
+            { numerator: 9, denominator: 14 },
+          ],
+        },
+        {
+          prompt: "Which fraction is equivalent to 5/9?",
+          source: { numerator: 5, denominator: 9 },
+          correct: { numerator: 10, denominator: 18 },
+          distractors: [
+            { numerator: 9, denominator: 18 },
+            { numerator: 11, denominator: 18 },
+          ],
+        },
+      ] as const;
+      const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+      const choices = shuffle([
+        { id: "correct", ...chosen.correct },
+        ...chosen.distractors.map((option, index) => ({ id: `wrong-${index}`, ...option })),
+      ]);
+
+      return {
+        kind: "equivalent_fraction_match",
+        prompt: chosen.prompt,
+        targetFraction: fractionLabel(chosen.source.numerator, chosen.source.denominator),
+        target: { id: "target", ...chosen.source },
+        choices,
+        correctChoiceId: "correct",
+      };
+    }
+
     const pairs =
       mode === "equivalent_fraction_visual"
         ? year5EquivalentFractionPairs().filter((pair) => pair.equivalent.denominator <= 15)
@@ -7679,6 +7799,183 @@ function generateGenericQuestion(
       options: shuffle([...chosen.options]),
       answer: chosen.answer,
       helper: "Look for the same value, not just matching numbers.",
+    };
+  }
+
+  if (explicitMode === "y6_equivalent_compare_use") {
+    const templates = [
+      {
+        prompt: "Which is greater: 3/4 or 5/8?",
+        answer: "3/4",
+        options: ["3/4", "5/8", "They are equal"],
+        helper: "Use equivalence: 3/4 = 6/8.",
+      },
+      {
+        prompt: "Which is greater: 2/3 or 3/5?",
+        answer: "2/3",
+        options: ["2/3", "3/5", "They are equal"],
+        helper: "Use a common denominator.",
+      },
+      {
+        prompt: "Which fraction is closest to 1?",
+        answer: "7/8",
+        options: ["7/8", "5/8", "3/8"],
+        helper: "Think about how much is missing from 1 whole.",
+      },
+      {
+        prompt: "Which is larger: 4/5 or 9/10?",
+        answer: "9/10",
+        options: ["4/5", "9/10", "They are equal"],
+        helper: "Rewrite 4/5 with denominator 10.",
+      },
+      {
+        prompt: "Without converting to decimals, which is larger: 5/6 or 7/9?",
+        answer: "5/6",
+        options: ["5/6", "7/9", "They are equal"],
+        helper: "Use denominator 18.",
+      },
+      {
+        prompt: "Which is greater: 3/5 or 5/8?",
+        answer: "5/8",
+        options: ["3/5", "5/8", "They are equal"],
+        helper: "Use denominator 40.",
+      },
+      {
+        prompt: "Which is larger: 4/7 or 5/8?",
+        answer: "5/8",
+        options: ["4/7", "5/8", "They are equal"],
+        helper: "Compare using denominator 56.",
+      },
+      {
+        prompt: "Which is greater: 7/10 or 5/8?",
+        answer: "7/10",
+        options: ["7/10", "5/8", "They are equal"],
+        helper: "Use denominator 40 or benchmark 1.",
+      },
+      {
+        prompt: "Which fraction is closest to 1?",
+        answer: "11/12",
+        options: ["11/12", "7/12", "5/12"],
+        helper: "The closest to 1 has the smallest gap.",
+      },
+      {
+        prompt: "Which is larger: 5/9 or 2/3?",
+        answer: "2/3",
+        options: ["5/9", "2/3", "They are equal"],
+        helper: "Rewrite 2/3 in ninths.",
+      },
+      {
+        prompt: "Which is greater: 7/8 or 4/5?",
+        answer: "7/8",
+        options: ["7/8", "4/5", "They are equal"],
+        helper: "Use denominator 40.",
+      },
+      {
+        prompt: "Which is larger: 5/6 or 8/9?",
+        answer: "8/9",
+        options: ["5/6", "8/9", "They are equal"],
+        helper: "Use denominator 18.",
+      },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: chosen.helper,
+    };
+  }
+
+  if (explicitMode === "y6_equivalent_justify_apply") {
+    const templates: Array<{
+      prompt: string;
+      answer: string;
+      options: string[];
+      helper: string;
+      visual?: FractionNumberLineVisualData;
+    }> = [
+      {
+        prompt: "True or false: 6/9 = 2/3.",
+        answer: "True",
+        options: ["True", "False"],
+        helper: "Both fractions can be renamed to the same value.",
+      },
+      {
+        prompt: "Which statement is correct?",
+        answer: "3/4 = 9/12",
+        options: ["3/4 = 9/12", "3/4 = 6/12", "3/4 = 8/16"],
+        helper: "Only one option matches exactly.",
+      },
+      {
+        prompt: "Why are 4/6 and 2/3 equal?",
+        answer: "Divide 4/6 by 2/2",
+        options: ["Divide 4/6 by 2/2", "Add 2 to both numbers", "Make the denominator larger"],
+        helper: "Equivalent fractions can be simplified by the same factor.",
+      },
+      {
+        prompt: "Do 1/2 and 3/6 land at the same point?",
+        answer: "Yes",
+        options: ["Yes", "No"],
+        helper: "Check whether the markers sit at the same position.",
+        visual: {
+          type: "fraction_number_line",
+          title: "Equivalent fractions on a number line",
+          leftLabel: "1/2",
+          rightLabel: "3/6",
+          leftPosition: 0.5,
+          rightPosition: 0.5,
+        },
+      },
+      {
+        prompt: "A student says: 5/8 is bigger than 3/4 because 5 > 3. Is this correct?",
+        answer: "No",
+        options: ["Yes", "No"],
+        helper: "Numerators alone do not decide which fraction is greater.",
+      },
+      {
+        prompt: "Which statement is correct?",
+        answer: "2/3 = 10/15",
+        options: ["2/3 = 10/15", "2/3 = 9/15", "2/3 = 8/15"],
+        helper: "Use the same scale factor on top and bottom.",
+      },
+      {
+        prompt: "Which explanation is best?",
+        answer: "3/4 and 6/8 are equal because both show the same part of the whole",
+        options: [
+          "3/4 and 6/8 are equal because both show the same part of the whole",
+          "3/4 is larger because 6 is larger than 3",
+          "6/8 is larger because 8 is larger than 4",
+        ],
+        helper: "Equivalent fractions name the same amount.",
+      },
+      {
+        prompt: "True or false: 8/12 = 2/3.",
+        answer: "True",
+        options: ["True", "False"],
+        helper: "Simplify or build an equivalent fraction.",
+      },
+      {
+        prompt: "Which statement is correct?",
+        answer: "5/6 = 15/18",
+        options: ["5/6 = 15/18", "5/6 = 14/18", "5/6 = 16/18"],
+        helper: "Match the scale factor carefully.",
+      },
+      {
+        prompt: "A student says: 4/5 is smaller than 7/10 because 4 < 7. Is this correct?",
+        answer: "No",
+        options: ["Yes", "No"],
+        helper: "Compare the values, not just the numerators.",
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: chosen.helper,
+      visual: chosen.visual,
     };
   }
 

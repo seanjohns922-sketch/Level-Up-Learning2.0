@@ -13,7 +13,7 @@ import MoneyContextVisual from "@/components/activities/MoneyContextVisual";
 import ArrayVisual from "@/components/activities/ArrayVisual";
 import RuleBoxVisual from "@/components/activities/RuleBoxVisual";
 import DiscountVisual from "@/components/activities/DiscountVisual";
-import { MathFormattedText } from "@/components/FractionText";
+import { Fraction, MathFormattedText } from "@/components/FractionText";
 
 function normalize(value: string) {
   return value.trim().toLowerCase().replace(/,/g, "").replace(/\s+/g, " ");
@@ -48,10 +48,8 @@ function StackedFraction({
   denominator: number;
 }) {
   return (
-    <div className="inline-flex flex-col items-center rounded-xl bg-white px-4 py-3 shadow-sm">
-      <span className="text-2xl font-black leading-none text-slate-900">{numerator}</span>
-      <span className="my-1 h-1 w-12 rounded-full bg-slate-500" />
-      <span className="text-2xl font-black leading-none text-slate-900">{denominator}</span>
+    <div className="inline-flex items-center rounded-xl bg-white px-4 py-3 shadow-sm">
+      <Fraction numerator={numerator} denominator={denominator} size="lg" />
     </div>
   );
 }

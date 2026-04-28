@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FractionText } from "@/components/FractionText";
+import { FractionText, MathFormattedText } from "@/components/FractionText";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type {
   EquivalentFractionBuildQuestion,
@@ -32,7 +32,7 @@ function BarModel({ numerator, denominator }: { numerator: number; denominator: 
         ))}
       </div>
       <div className="mt-3 text-center text-xl font-black text-slate-900">
-        <FractionText value={`${numerator}/${denominator}`} />
+        <FractionText value={`${numerator}/${denominator}`} size="sm" />
       </div>
     </div>
   );
@@ -57,7 +57,9 @@ export default function EquivalentFractionBar({
   return (
     <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
       <div className="flex items-center gap-2">
-        <h2 className="text-2xl font-black text-gray-900">{questionData.prompt}</h2>
+        <h2 className="text-2xl font-black text-gray-900">
+          <MathFormattedText text={questionData.prompt} fractionSize="md" />
+        </h2>
         <ReadAloudBtn text={questionData.prompt} />
       </div>
       <p className="mt-2 text-sm text-slate-600">
