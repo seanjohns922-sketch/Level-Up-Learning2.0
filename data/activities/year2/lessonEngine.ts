@@ -153,9 +153,13 @@ export type FractionNumberLineVisualData = {
   rightLabel: string;
   leftPosition: number;
   rightPosition: number;
+  min?: number;
+  max?: number;
   maxValue?: number;
+  subdivisions?: number;
   markers?: Array<{
     label: string;
+    value?: number;
     position: number;
     tone?: "sky" | "emerald" | "violet";
   }>;
@@ -641,8 +645,25 @@ function makeFractionNumberLineVisual(
     maxValue ??
     Math.max(1, ...labels.map((label) => Math.ceil(fractionNumericValue(label))));
   const tones: Array<"sky" | "emerald" | "violet"> = ["sky", "emerald", "violet"];
+  const denominators = labels
+    .map((label) => {
+      const trimmed = label.trim();
+      const mixedMatch = trimmed.match(/^(\d+)\s+(\d+)\/(\d+)$/);
+      if (mixedMatch) {
+        return Number(mixedMatch[3]);
+      }
+      const simpleMatch = trimmed.match(/^(\d+)\/(\d+)$/);
+      if (simpleMatch) {
+        return Number(simpleMatch[2]);
+      }
+      return null;
+    })
+    .filter((value): value is number => value !== null && Number.isFinite(value) && value > 1);
+  const subdivisions =
+    resolvedMax > 1 ? Math.min(6, Math.max(4, ...denominators, 4)) : undefined;
   const markers = labels.map((label, index) => ({
     label,
+    value: fractionNumericValue(label),
     position: fractionNumericValue(label),
     tone: tones[index % tones.length] ?? "sky",
   }));
@@ -650,7 +671,10 @@ function makeFractionNumberLineVisual(
   return {
     type: "fraction_number_line",
     title,
+    min: 0,
+    max: resolvedMax,
     maxValue: resolvedMax,
+    subdivisions,
     leftLabel: markers[0]?.label ?? "0",
     rightLabel: markers[1]?.label ?? "1",
     leftPosition: markers[0]?.position ?? 0,

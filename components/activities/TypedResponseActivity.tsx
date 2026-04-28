@@ -1617,6 +1617,7 @@ export default function TypedResponseActivity({
     isGuidedWrittenMethod && writtenMethod ? "decide" : "done"
   );
   const [guidedFeedback, setGuidedFeedback] = useState("");
+  const wholeRef = useRef<HTMLInputElement | null>(null);
   const numeratorRef = useRef<HTMLInputElement | null>(null);
   const denominatorRef = useRef<HTMLInputElement | null>(null);
   const questionKey = structuredFractionKey(questionData);
@@ -3275,13 +3276,14 @@ export default function TypedResponseActivity({
               inputRef={numeratorRef}
             />
           ) : isStructuredFractionResponse ? (
-            <div className="flex flex-wrap items-end gap-4">
-              {usesFixedDenominator ? null : (
-                <div className="flex flex-col gap-2">
-                  <div className="text-xs font-bold uppercase tracking-wide text-slate-500">
-                    Whole
-                  </div>
+            <div className="w-full max-w-[420px]">
+              <div className="rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm transition focus-within:border-teal-400 focus-within:shadow-[0_0_0_4px_rgba(45,212,191,0.12)]">
+                <div className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                  {usesFixedDenominator ? "Mixed number answer" : "Mixed number"}
+                </div>
+                <div className="mt-3 flex items-center gap-2">
                   <input
+                    ref={wholeRef}
                     type="text"
                     autoComplete="off"
                     spellCheck={false}
@@ -3293,64 +3295,95 @@ export default function TypedResponseActivity({
                         numeratorRef.current?.focus();
                       }
                     }}
-                    inputMode="numeric"
-                    placeholder=""
-                    className="block h-16 w-20 appearance-none rounded-xl border border-gray-300 bg-white px-3 text-center text-2xl font-black leading-none text-slate-900 caret-teal-600 outline-none focus:border-teal-500"
-                    style={{ WebkitTextFillColor: "#0f172a" }}
-                  />
-                </div>
-              )}
-              <div className="flex flex-col items-center">
-                <div className="text-xs font-bold uppercase tracking-wide text-slate-500">
-                  {usesFixedDenominator ? "Answer fraction" : "Fraction"}
-                </div>
-                <div className="mt-2 flex flex-col items-center">
-                  <input
-                    ref={numeratorRef}
-                    type="text"
-                    autoComplete="off"
-                    spellCheck={false}
-                    value={fractionNumeratorInput}
-                    onChange={(event) => {
-                      const nextValue = event.target.value.replace(/\D/g, "");
-                      setFractionNumeratorInput(nextValue);
-                      if (nextValue.length >= 1) {
-                        denominatorRef.current?.focus();
+                    onKeyDown={(event) => {
+                      if (event.key === "ArrowRight" && !fractionWholeInput) {
+                        numeratorRef.current?.focus();
                       }
                     }}
                     inputMode="numeric"
                     placeholder=""
-                    className="block h-12 w-20 appearance-none rounded-t-xl border border-b-0 border-gray-300 bg-white px-3 text-center text-2xl font-black leading-none text-slate-900 caret-teal-600 outline-none focus:border-teal-500"
+                    className="h-16 w-16 appearance-none border-0 bg-transparent px-1 text-center text-[2rem] font-black leading-none text-slate-900 caret-teal-600 outline-none"
                     style={{ WebkitTextFillColor: "#0f172a" }}
+                    aria-label="Whole number"
                   />
-                  <div className="h-1 w-20 rounded-full bg-slate-500" />
-                  {usesFixedDenominator && questionData.fixedDenominator ? (
-                    <div className="flex h-12 w-20 items-center justify-center rounded-b-xl border border-t-0 border-gray-300 bg-slate-100 px-3 text-center text-2xl font-black leading-none text-slate-700">
-                      {questionData.fixedDenominator}
-                    </div>
-                  ) : (
+                  <div className="flex flex-col items-center">
                     <input
-                      ref={denominatorRef}
+                      ref={numeratorRef}
                       type="text"
                       autoComplete="off"
                       spellCheck={false}
-                      value={fractionDenominatorInput}
+                      value={fractionNumeratorInput}
                       onChange={(event) => {
                         const nextValue = event.target.value.replace(/\D/g, "");
-                        setFractionDenominatorInput(nextValue);
+                        setFractionNumeratorInput(nextValue);
+                        if (nextValue.length >= 1) {
+                          denominatorRef.current?.focus();
+                        }
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === "Backspace" && !fractionNumeratorInput) {
+                          wholeRef.current?.focus();
+                        }
                       }}
                       inputMode="numeric"
                       placeholder=""
-                      className="block h-12 w-20 appearance-none rounded-b-xl border border-t-0 border-gray-300 bg-white px-3 text-center text-2xl font-black leading-none text-slate-900 caret-teal-600 outline-none focus:border-teal-500"
+                      className="block h-11 w-16 appearance-none border-0 bg-transparent px-1 text-center text-[1.65rem] font-black leading-none text-slate-900 caret-teal-600 outline-none"
                       style={{ WebkitTextFillColor: "#0f172a" }}
+                      aria-label="Fraction numerator"
                     />
-                  )}
+                    <div className="h-[3px] w-16 rounded-full bg-slate-500" />
+                    {usesFixedDenominator && questionData.fixedDenominator ? (
+                      <div
+                        className="flex h-11 w-16 items-center justify-center px-1 text-center text-[1.65rem] font-black leading-none text-slate-700"
+                        aria-label="Fixed denominator"
+                      >
+                        {questionData.fixedDenominator}
+                      </div>
+                    ) : (
+                      <input
+                        ref={denominatorRef}
+                        type="text"
+                        autoComplete="off"
+                        spellCheck={false}
+                        value={fractionDenominatorInput}
+                        onChange={(event) => {
+                          const nextValue = event.target.value.replace(/\D/g, "");
+                          setFractionDenominatorInput(nextValue);
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === "Backspace" && !fractionDenominatorInput) {
+                            numeratorRef.current?.focus();
+                          }
+                        }}
+                        inputMode="numeric"
+                        placeholder=""
+                        className="block h-11 w-16 appearance-none border-0 bg-transparent px-1 text-center text-[1.65rem] font-black leading-none text-slate-900 caret-teal-600 outline-none"
+                        style={{ WebkitTextFillColor: "#0f172a" }}
+                        aria-label="Fraction denominator"
+                      />
+                    )}
+                  </div>
                 </div>
-                <div className="mt-2 text-xs font-medium text-slate-500">
+                <div className="mt-3 text-xs font-medium text-slate-500">
                   {usesFixedDenominator
-                    ? "The denominator stays the same. Type the numerator."
-                    : "Leave whole blank for fractions less than one."}
+                    ? "Type the whole number and numerator. The denominator stays fixed."
+                    : "Type one mixed number. Leave the whole number blank if it is less than one."}
                 </div>
+                {fractionWholeInput || fractionNumeratorInput || fractionDenominatorInput || (usesFixedDenominator && questionData.fixedDenominator) ? (
+                  <div className="mt-3 rounded-2xl bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700">
+                    Your number:{" "}
+                    {fractionNumeratorInput && (fractionDenominatorInput || questionData.fixedDenominator) ? (
+                      <Fraction
+                        whole={fractionWholeInput || undefined}
+                        numerator={fractionNumeratorInput}
+                        denominator={fractionDenominatorInput || String(questionData.fixedDenominator)}
+                        size="md"
+                      />
+                    ) : (
+                      <span className="text-slate-400">complete the fraction</span>
+                    )}
+                  </div>
+                ) : null}
               </div>
             </div>
           ) : isEquivalentFractionInput && equivalentFractionInputVisual ? (
