@@ -65,9 +65,15 @@ export default function IntegerNumberLineVisual({
     return null;
   }
 
-  const labelEveryTick = ticks.length <= 13;
-  const shouldLabel = (tick: number) =>
-    tick === 0 || labelEveryTick || tick === safeMin || tick === safeMax || tick % 2 === 0;
+  const labelStep = ticks.length <= 13 ? 1 : ticks.length <= 25 ? 2 : 2;
+  const showDenseEndpoints = ticks.length <= 25;
+  const shouldLabel = (tick: number) => {
+    if (tick === 0) return true;
+    if (labelStep === 1) return true;
+    if ((tick - safeMin) % labelStep === 0) return true;
+    if (showDenseEndpoints && (tick === safeMin || tick === safeMax)) return true;
+    return false;
+  };
 
   const arrowLeft =
     startValue !== undefined && endValue !== undefined
