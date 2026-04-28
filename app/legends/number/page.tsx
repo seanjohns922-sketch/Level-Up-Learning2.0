@@ -78,7 +78,7 @@ export default function NumbotCollectionPage() {
             "radial-gradient(circle at 50% 18%, hsla(160, 68%, 42%, 0.12), transparent 34%), radial-gradient(circle at 78% 34%, hsla(176, 65%, 38%, 0.06), transparent 30%), linear-gradient(90deg, hsla(170, 60%, 8%, 0.6), transparent 34%, transparent 66%, hsla(170, 60%, 8%, 0.6))",
         }}
       />
-      <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ opacity: 0.1, filter: "blur(0.2px)" }}>
+      <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ opacity: 0.075, filter: "blur(0.2px)" }}>
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="math-grid" x="0" y="0" width="88" height="88" patternUnits="userSpaceOnUse">
@@ -101,7 +101,7 @@ export default function NumbotCollectionPage() {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "linear-gradient(180deg, hsla(168, 58%, 8%, 0) 0%, hsla(168, 58%, 5%, 0.36) 60%, hsla(168, 58%, 3%, 0.72) 100%), radial-gradient(ellipse at center, transparent 42%, hsla(170, 62%, 3%, 0.62) 100%)",
+            "linear-gradient(180deg, hsla(168, 58%, 8%, 0) 0%, hsla(168, 58%, 5%, 0.18) 60%, hsla(168, 58%, 3%, 0.5) 100%), radial-gradient(ellipse at center, transparent 46%, hsla(170, 62%, 3%, 0.58) 100%)",
         }}
       />
       <div
