@@ -1,4 +1,5 @@
 import type {
+  FractionNumberLineVisualData,
   IntegerContextVisualData,
   IntegerNumberLineVisualData,
 } from "@/data/activities/year2/lessonEngine";
@@ -9,6 +10,21 @@ export type Year6WeeklyQuizVisual =
   | {
       kind: "numberLine";
       numberLine: IntegerNumberLineVisualData;
+    }
+  | {
+      kind: "fractionNumberLine";
+      fractionNumberLine: FractionNumberLineVisualData;
+    }
+  | {
+      kind: "equivalentFractionYesNo";
+      left: {
+        numerator: number;
+        denominator: number;
+      };
+      right: {
+        numerator: number;
+        denominator: number;
+      };
     }
   | {
       kind: "integerContext";
@@ -977,6 +993,213 @@ const year6WeeklyQuizWeeks: Record<number, Year6WeeklyQuizWeek> = {
             },
           },
         },
+      },
+    ],
+  },
+  5: {
+    weekNumber: 5,
+    quizTitle: "Week 5 Quiz — Fractions & Equivalence",
+    weeklyFocus: "Fractions & Equivalence",
+    lesson1Title: "Using Equivalent Fractions",
+    lesson2Title: "Ordering Fractions",
+    lesson3Title: "Mixed & Improper Fractions",
+    questions: [
+      {
+        id: "y6w5q1",
+        lessonTag: 1,
+        questionText: "Which is equivalent to 3/4?",
+        answerType: "multipleChoice",
+        options: ["6/8", "9/16", "3/8"],
+        correctAnswer: "6/8",
+        feedbackCorrect: "Nice equivalence check.",
+        feedbackIncorrect: "Scale both parts by the same number.",
+      },
+      {
+        id: "y6w5q2",
+        lessonTag: 1,
+        questionText: "5/6 = ? / 18",
+        answerType: "numeric",
+        correctAnswer: "15",
+        placeholder: "Type the integer",
+        feedbackCorrect: "Strong scaling.",
+        feedbackIncorrect: "Multiply both parts by the same number.",
+      },
+      {
+        id: "y6w5q3",
+        lessonTag: 1,
+        questionText: "Simplify 12/18.",
+        answerType: "numeric",
+        correctAnswer: "2/3",
+        placeholder: "Type the fraction",
+        feedbackCorrect: "Clean simplification.",
+        feedbackIncorrect: "Divide numerator and denominator by the same number.",
+      },
+      {
+        id: "y6w5q4",
+        lessonTag: 1,
+        questionText: "Which is equivalent to 5/8?",
+        answerType: "multipleChoice",
+        options: ["10/16", "15/16", "5/16"],
+        correctAnswer: "10/16",
+        feedbackCorrect: "Good equivalence thinking.",
+        feedbackIncorrect: "Scale both parts equally.",
+      },
+      {
+        id: "y6w5q5",
+        lessonTag: 1,
+        questionText: "Do these represent the same value?",
+        answerType: "multipleChoice",
+        options: ["Yes", "No"],
+        correctAnswer: "Yes",
+        feedbackCorrect: "Matched perfectly.",
+        feedbackIncorrect: "Look at how much of each bar is shaded.",
+        visual: {
+          kind: "equivalentFractionYesNo",
+          left: { numerator: 1, denominator: 2 },
+          right: { numerator: 3, denominator: 6 },
+        },
+      },
+      {
+        id: "y6w5q6",
+        lessonTag: 2,
+        questionText: "Which is larger?",
+        answerType: "multipleChoice",
+        options: ["4/5", "9/10", "Equal"],
+        correctAnswer: "9/10",
+        feedbackCorrect: "Smart strategy.",
+        feedbackIncorrect: "Try scaling one fraction.",
+      },
+      {
+        id: "y6w5q7",
+        lessonTag: 2,
+        questionText: "Which is greater: 5/6 or 7/9?",
+        answerType: "numeric",
+        correctAnswer: "5/6",
+        placeholder: "Type the fraction",
+        feedbackCorrect: "Strong comparison.",
+        feedbackIncorrect: "Think about distance from 1.",
+      },
+      {
+        id: "y6w5q8",
+        lessonTag: 2,
+        questionText: "Which fraction is closest to 1?",
+        answerType: "multipleChoice",
+        options: ["7/8", "5/8", "3/8"],
+        correctAnswer: "7/8",
+        feedbackCorrect: "Good benchmark thinking.",
+        feedbackIncorrect: "Check which fraction is nearest to a whole.",
+      },
+      {
+        id: "y6w5q9",
+        lessonTag: 2,
+        questionText: "Order from smallest to largest.",
+        answerType: "ordering",
+        values: ["9/10", "13/15", "11/12"],
+        correctOrder: ["13/15", "9/10", "11/12"],
+        instructionText: "Place them from left to right on the number line.",
+        correctAnswer: "13/15,9/10,11/12",
+        feedbackCorrect: "Nice reasoning.",
+        feedbackIncorrect: "Use the number line position.",
+        visual: {
+          kind: "fractionNumberLine",
+          fractionNumberLine: {
+            type: "fraction_number_line",
+            title: "Fractions near 1",
+            min: 0,
+            max: 1,
+            subdivisions: 12,
+            leftLabel: "13/15",
+            rightLabel: "11/12",
+            leftPosition: 13 / 15,
+            rightPosition: 11 / 12,
+            markers: [
+              { label: "9/10", value: 9 / 10, position: 9 / 10, tone: "sky" },
+              { label: "13/15", value: 13 / 15, position: 13 / 15, tone: "emerald" },
+              { label: "11/12", value: 11 / 12, position: 11 / 12, tone: "violet" },
+            ],
+          },
+        },
+      },
+      {
+        id: "y6w5q10",
+        lessonTag: 2,
+        questionText: "Order from smallest to largest.",
+        answerType: "ordering",
+        values: ["3/5", "7/10", "2/3"],
+        correctOrder: ["3/5", "2/3", "7/10"],
+        instructionText: "Use the line to compare their positions.",
+        correctAnswer: "3/5,2/3,7/10",
+        feedbackCorrect: "Efficient choice.",
+        feedbackIncorrect: "Check the benchmark positions carefully.",
+        visual: {
+          kind: "fractionNumberLine",
+          fractionNumberLine: {
+            type: "fraction_number_line",
+            title: "Fractions between 1/2 and 1",
+            min: 0,
+            max: 1,
+            subdivisions: 10,
+            leftLabel: "3/5",
+            rightLabel: "7/10",
+            leftPosition: 3 / 5,
+            rightPosition: 7 / 10,
+            markers: [
+              { label: "3/5", value: 3 / 5, position: 3 / 5, tone: "sky" },
+              { label: "7/10", value: 7 / 10, position: 7 / 10, tone: "emerald" },
+              { label: "2/3", value: 2 / 3, position: 2 / 3, tone: "violet" },
+            ],
+          },
+        },
+      },
+      {
+        id: "y6w5q11",
+        lessonTag: 3,
+        questionText: "Write 11/4 as a mixed number.",
+        answerType: "numeric",
+        correctAnswer: "2 3/4",
+        placeholder: "Type the mixed number",
+        feedbackCorrect: "Good use of mixed numbers.",
+        feedbackIncorrect: "How many wholes and what fraction remain?",
+      },
+      {
+        id: "y6w5q12",
+        lessonTag: 3,
+        questionText: "Convert 1 2/3 to an improper fraction.",
+        answerType: "numeric",
+        correctAnswer: "5/3",
+        placeholder: "Type the fraction",
+        feedbackCorrect: "Nice conversion.",
+        feedbackIncorrect: "Convert the whole to thirds, then add the extra part.",
+      },
+      {
+        id: "y6w5q13",
+        lessonTag: 3,
+        questionText: "Which value is closest to 2?",
+        answerType: "multipleChoice",
+        options: ["7/3", "9/5", "11/6"],
+        correctAnswer: "11/6",
+        feedbackCorrect: "Strong number sense.",
+        feedbackIncorrect: "Think about the distance from 2.",
+      },
+      {
+        id: "y6w5q14",
+        lessonTag: 3,
+        questionText: "A student says: “5/8 is bigger than 3/4 because 5 > 3”. Is this correct?",
+        answerType: "multipleChoice",
+        options: ["Yes", "No"],
+        correctAnswer: "No",
+        feedbackCorrect: "Nice reasoning.",
+        feedbackIncorrect: "Compare the fraction values, not just the numbers.",
+      },
+      {
+        id: "y6w5q15",
+        lessonTag: 3,
+        questionText: "A tank is 3/4 full. Another tank is 5/6 full. Which tank has more water?",
+        answerType: "numeric",
+        correctAnswer: "5/6",
+        placeholder: "Type the fraction",
+        feedbackCorrect: "Strong comparison.",
+        feedbackIncorrect: "Compare the sizes of the two fractions.",
       },
     ],
   },

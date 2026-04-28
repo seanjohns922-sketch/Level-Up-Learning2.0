@@ -306,9 +306,14 @@ function toExplicitWeeklyQuizQuestion(
   };
 
   if (question.answerType === "ordering") {
-    const numbers = (question.values ?? []).map((value) => Number(String(value).trim()));
+    const values = (question.values ?? []).map((value) => String(value).trim());
+    const isFractionOrdering = values.some((value) => value.includes("/"));
     const visual =
-      question.visual?.kind === "numberLine" ? question.visual.numberLine : undefined;
+      question.visual?.kind === "numberLine"
+        ? question.visual.numberLine
+        : question.visual?.kind === "fractionNumberLine"
+          ? question.visual.fractionNumberLine
+          : undefined;
     return {
       ...lessonMeta,
       activityType: "number_order",
@@ -317,10 +322,12 @@ function toExplicitWeeklyQuizQuestion(
       questionData: {
         kind: "number_order",
         prompt,
-        numbers,
+        numbers: isFractionOrdering ? [] : values.map((value) => Number(value)),
+        fractions: isFractionOrdering ? values : undefined,
         ascending: true,
         helper: question.instructionText,
         visual,
+        correctOrder: question.correctOrder,
       },
       activity: {
         activityType: "number_order",
@@ -335,9 +342,36 @@ function toExplicitWeeklyQuizQuestion(
   const mappedVisual =
     question.visual?.kind === "numberLine"
       ? question.visual.numberLine
+      : question.visual?.kind === "fractionNumberLine"
+        ? question.visual.fractionNumberLine
       : question.visual?.kind === "integerContext"
         ? question.visual.contextVisual
         : undefined;
+
+  const isFractionTypedAnswer = /\/|\d+\s+\d+\/\d+/.test(correctAnswer);
+
+  if (question.visual?.kind === "equivalentFractionYesNo") {
+    return {
+      ...lessonMeta,
+      activityType: "equivalent_fraction_yes_no",
+      kind: "lessonActivity",
+      prompt,
+      questionData: {
+        kind: "equivalent_fraction_yes_no",
+        prompt,
+        left: { id: "left", ...question.visual.left },
+        right: { id: "right", ...question.visual.right },
+        answer: correctAnswer.toLowerCase() === "yes" ? "yes" : "no",
+      },
+      activity: {
+        activityType: "equivalent_fraction_yes_no",
+        weight: 1,
+        config: {},
+      },
+      feedbackCorrect: question.feedbackCorrect,
+      feedbackIncorrect: question.feedbackIncorrect,
+    };
+  }
 
   if (mappedVisual) {
     if (question.answerType === "numeric") {
@@ -388,6 +422,28 @@ function toExplicitWeeklyQuizQuestion(
   }
 
   if (question.answerType === "numeric") {
+    if (isFractionTypedAnswer) {
+      return {
+        ...lessonMeta,
+        activityType: "typed_response",
+        kind: "lessonActivity",
+        prompt,
+        questionData: {
+          kind: "typed_response",
+          prompt,
+          answer: correctAnswer,
+          helper: question.feedbackIncorrect,
+          placeholder: question.placeholder ?? "Type the fraction",
+        },
+        activity: {
+          activityType: "typed_response",
+          weight: 1,
+          config: {},
+        },
+        feedbackCorrect: question.feedbackCorrect,
+        feedbackIncorrect: question.feedbackIncorrect,
+      };
+    }
     return {
       ...lessonMeta,
       activityType: "typed_response",
