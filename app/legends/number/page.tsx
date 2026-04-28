@@ -16,9 +16,10 @@ export default function NumbotCollectionPage() {
   const [barAnimated, setBarAnimated] = useState(false);
 
   useEffect(() => {
-    setProgress(readProgress());
-    // Trigger bar animation after mount
-    const t = setTimeout(() => setBarAnimated(true), 100);
+    const t = setTimeout(() => {
+      setProgress(readProgress());
+      setBarAnimated(true);
+    }, 100);
     return () => clearTimeout(t);
   }, []);
 
