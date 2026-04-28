@@ -112,6 +112,19 @@ export default function NumbotCollectionPage() {
           filter: "blur(34px)",
         }}
       />
+      <div
+        className="absolute inset-x-0 top-[112px] pointer-events-none text-center"
+        style={{
+          color: "hsla(160, 42%, 82%, 0.46)",
+          fontFamily: "'Rajdhani', 'Exo 2', sans-serif",
+          fontSize: "clamp(1.5rem, 4vw, 3.15rem)",
+          fontWeight: 800,
+          letterSpacing: "0.18em",
+          textShadow: "0 0 18px hsla(160, 52%, 45%, 0.18)",
+        }}
+      >
+        NUMBER NEXUS
+      </div>
 
       {/* Content */}
       <div className="relative z-10">
@@ -143,16 +156,16 @@ export default function NumbotCollectionPage() {
                   backdropFilter: "blur(8px)",
                 }}
               >
-                <Sparkles className="h-3.5 w-3.5" style={{ color: "hsl(160, 58%, 62%)" }} /> Number Nexus
+                <Sparkles className="h-3.5 w-3.5" style={{ color: "hsl(160, 58%, 62%)" }} /> Card Archive
               </div>
             </div>
 
             <h1
-              className="text-3xl md:text-5xl font-black tracking-[0.08em] uppercase"
+              className="text-4xl md:text-6xl font-black tracking-normal"
               style={{
                 color: "hsl(160, 38%, 92%)",
-                fontFamily: "'Rajdhani', 'Exo 2', 'Orbitron', 'Quicksand', sans-serif",
-                textShadow: "0 2px 18px hsla(160, 55%, 45%, 0.14)",
+                fontFamily: "'Quicksand', 'Inter', system-ui, sans-serif",
+                textShadow: "0 2px 18px hsla(160, 55%, 45%, 0.12)",
               }}
             >
               Numbot Collection
