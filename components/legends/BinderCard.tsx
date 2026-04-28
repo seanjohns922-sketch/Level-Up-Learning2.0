@@ -99,23 +99,25 @@ export default function BinderCard({
         <div className="absolute top-2 right-2">
           {isUnlocked ? (
             <span
-              className="inline-flex items-center px-2 py-0.5 rounded-full text-[8px] font-extrabold text-white shadow"
+              className="inline-flex items-center px-2 py-0.5 rounded-full text-[8px] font-extrabold tracking-wide text-white shadow"
               style={{
                 background: "hsla(155, 60%, 42%, 0.9)",
                 backdropFilter: "blur(4px)",
                 boxShadow: "0 0 8px hsla(155, 60%, 45%, 0.3)",
+                fontFamily: "'Orbitron', 'Rajdhani', 'Exo 2', sans-serif",
               }}
             >
               ✦ UNLOCKED
             </span>
           ) : (
             <span
-              className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[8px] font-extrabold shadow"
+              className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[8px] font-extrabold tracking-wide shadow"
               style={{
                 background: "hsla(166, 38%, 10%, 0.72)",
                 backdropFilter: "blur(4px)",
                 color: "hsl(160, 20%, 66%)",
                 border: "1px solid hsla(160, 32%, 48%, 0.18)",
+                fontFamily: "'Orbitron', 'Rajdhani', 'Exo 2', sans-serif",
               }}
             >
               <Lock className="h-2 w-2" /> LOCKED
@@ -130,7 +132,10 @@ export default function BinderCard({
             background: "linear-gradient(to top, hsla(0, 0%, 0%, 0.6), hsla(0, 0%, 0%, 0.3) 60%, transparent)",
           }}
         >
-          <p className="text-[9px] font-bold tracking-wider" style={{ color: "hsla(0, 0%, 100%, 0.7)" }}>
+          <p
+            className="text-[9px] font-bold tracking-wider"
+            style={{ color: "hsla(0, 0%, 100%, 0.7)", fontFamily: "'Orbitron', 'Rajdhani', 'Exo 2', sans-serif" }}
+          >
             {legend.yearLabel.toUpperCase()}
           </p>
           <p
