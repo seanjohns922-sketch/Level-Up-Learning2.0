@@ -240,15 +240,15 @@ const year6Rows: ProgramRow[] = [
   },
   {
     week: 4,
-    focus: "Interpret integers in real-world contexts",
+    focus: "Interpret, compare, and solve multi-step integer changes in real-world contexts",
     lesson: 3,
     topic: "Integer Contexts",
-    activity: "Apply integer thinking to temperature, elevation, and profit-loss contexts.",
+    activity: "Interpret changes first, then solve harder integer contexts with movement, reversals, and multi-step thinking.",
     curriculum: ["AC9M6N01"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "integer_real_world" }),
-      makeActivity("multiple_choice", 1, { mode: "integer_real_world" }),
-      makeActivity("typed_response", 1, { mode: "integer_real_world" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_integer_context_interpret" }),
+      makeActivity("typed_response", 1, { mode: "y6_integer_context_change" }),
+      makeActivity("typed_response", 1, { mode: "y6_integer_context_multistep" }),
     ],
   },
   {

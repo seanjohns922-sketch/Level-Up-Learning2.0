@@ -172,6 +172,12 @@ export type IntegerContextVisualData = {
   change: number;
   currentLabel?: string;
   changeLabel?: string;
+  endValue?: number;
+  endLabel?: string;
+  secondaryChange?: number;
+  secondaryChangeLabel?: string;
+  noteText?: string;
+  hidePrimaryChange?: boolean;
   unitPrefix?: string;
   unitSuffix?: string;
   numberLine: IntegerNumberLineVisualData;
@@ -10759,6 +10765,209 @@ function generateGenericQuestion(
             numberLine: numberLineVisual,
           }
         : numberLineVisual,
+    };
+  }
+
+  if (explicitMode === "y6_integer_context_interpret") {
+    const templates: ReadonlyArray<{
+      prompt: string;
+      answer: string;
+      options: string[];
+      helper: string;
+      context: IntegerContextVisualData["context"];
+      title: string;
+      start: number;
+      end: number;
+      min: number;
+      max: number;
+      unitPrefix?: string;
+      unitSuffix?: string;
+    }> = [
+      { prompt: "A temperature changes from -4°C to 3°C. What happened?", answer: "It rose 7°C", options: ["It rose 7°C", "It dropped 7°C", "It rose 1°C", "It dropped 1°C"], helper: "Compare the start and end temperatures.", context: "temperature", title: "Temperature change", start: -4, end: 3, min: -12, max: 12, unitSuffix: "°C" },
+      { prompt: "A bank balance goes from $6 to -$2. What happened?", answer: "Spent $8", options: ["Spent $8", "Deposited $8", "Spent $4", "Deposited $4"], helper: "The balance finishes below zero.", context: "balance", title: "Bank balance", start: 6, end: -2, min: -12, max: 12, unitPrefix: "$" },
+      { prompt: "A diver moves from -3 m to -9 m. What happened?", answer: "Moved deeper by 6 m", options: ["Moved deeper by 6 m", "Rose by 6 m", "Moved deeper by 3 m", "Rose by 3 m"], helper: "More negative means deeper.", context: "elevation", title: "Depth change", start: -3, end: -9, min: -12, max: 12, unitSuffix: " m" },
+      { prompt: "A player goes from -5 points to 4 points. What best describes this?", answer: "Gained 9 points", options: ["Lost 9 points", "Gained 9 points", "Lost 1 point", "Gained 1 point"], helper: "The score finishes on the positive side.", context: "score", title: "Score change", start: -5, end: 4, min: -12, max: 12 },
+      { prompt: "A lift moves from floor -1 to floor -8. What happened?", answer: "Went down 7 floors", options: ["Went up 7 floors", "Went down 7 floors", "Went down 9 floors", "Went up 9 floors"], helper: "Left on the number line means down.", context: "elevator", title: "Elevator movement", start: -1, end: -8, min: -12, max: 12 },
+      { prompt: "An elevation changes from 5 m to -4 m. What happened?", answer: "Dropped 9 m", options: ["Dropped 9 m", "Rose 9 m", "Dropped 1 m", "Rose 1 m"], helper: "The end value is below sea level.", context: "elevation", title: "Elevation change", start: 5, end: -4, min: -12, max: 12, unitSuffix: " m" },
+      { prompt: "A bank balance goes from -$10 to -$3. What happened?", answer: "Increased by $7", options: ["Decreased by $7", "Increased by $7", "Increased by $13", "Stayed the same"], helper: "The debt became smaller.", context: "balance", title: "Bank balance", start: -10, end: -3, min: -15, max: 15, unitPrefix: "$" },
+      { prompt: "A temperature changes from 3°C to -2°C. What happened?", answer: "It dropped 5°C", options: ["It rose 5°C", "It dropped 5°C", "It dropped 1°C", "It rose 1°C"], helper: "The temperature crosses below zero.", context: "temperature", title: "Temperature change", start: 3, end: -2, min: -12, max: 12, unitSuffix: "°C" },
+      { prompt: "A player's score goes from 7 to -1. What happened?", answer: "Lost 8 points", options: ["Lost 8 points", "Gained 8 points", "Lost 6 points", "Gained 6 points"], helper: "Compare how far the score moved.", context: "score", title: "Score change", start: 7, end: -1, min: -12, max: 12 },
+      { prompt: "A diver moves from -12 m to -6 m. What happened?", answer: "Rose by 6 m", options: ["Moved deeper by 6 m", "Rose by 6 m", "Rose by 12 m", "Moved deeper by 12 m"], helper: "Closer to zero means rising.", context: "elevation", title: "Depth change", start: -12, end: -6, min: -15, max: 15, unitSuffix: " m" },
+      { prompt: "A bank balance changes from -$4 to $9. What happened?", answer: "Increased by $13", options: ["Decreased by $13", "Increased by $13", "Increased by $5", "Decreased by $5"], helper: "The balance crossed from negative to positive.", context: "balance", title: "Bank balance", start: -4, end: 9, min: -15, max: 15, unitPrefix: "$" },
+      { prompt: "A lift moves from floor 8 to floor 2. What happened?", answer: "Went down 6 floors", options: ["Went down 6 floors", "Went up 6 floors", "Went down 10 floors", "Went up 10 floors"], helper: "The end floor is lower.", context: "elevator", title: "Elevator movement", start: 8, end: 2, min: -12, max: 12 },
+      { prompt: "A temperature changes from -9°C to -1°C. What happened?", answer: "It rose 8°C", options: ["It rose 8°C", "It dropped 8°C", "It rose 10°C", "It dropped 10°C"], helper: "The end temperature is warmer.", context: "temperature", title: "Temperature change", start: -9, end: -1, min: -12, max: 12, unitSuffix: "°C" },
+      { prompt: "A drone moves from 4 m to -5 m. What happened?", answer: "Dropped 9 m", options: ["Dropped 9 m", "Rose 9 m", "Dropped 1 m", "Rose 1 m"], helper: "The movement crosses below zero.", context: "elevation", title: "Height change", start: 4, end: -5, min: -12, max: 12, unitSuffix: " m" },
+      { prompt: "A player goes from -2 points to -11 points. What happened?", answer: "Lost 9 points", options: ["Lost 9 points", "Gained 9 points", "Lost 13 points", "Gained 13 points"], helper: "More negative means the score dropped.", context: "score", title: "Score change", start: -2, end: -11, min: -12, max: 12 },
+      { prompt: "A bank balance changes from $5 to -$7. What happened?", answer: "Spent $12", options: ["Spent $12", "Deposited $12", "Spent $2", "Deposited $2"], helper: "The end balance is below zero.", context: "balance", title: "Bank balance", start: 5, end: -7, min: -15, max: 15, unitPrefix: "$" },
+      { prompt: "A lift moves from floor -6 to 0. What happened?", answer: "Went up 6 floors", options: ["Went up 6 floors", "Went down 6 floors", "Went up 3 floors", "Went down 3 floors"], helper: "Zero is higher than negative floors.", context: "elevator", title: "Elevator movement", start: -6, end: 0, min: -12, max: 12 },
+      { prompt: "A temperature changes from 6°C to 1°C. What happened?", answer: "It dropped 5°C", options: ["It rose 5°C", "It dropped 5°C", "It dropped 7°C", "It rose 7°C"], helper: "The temperature ends lower.", context: "temperature", title: "Temperature change", start: 6, end: 1, min: -12, max: 12, unitSuffix: "°C" },
+      { prompt: "An elevation changes from -1 m to 7 m. What happened?", answer: "Rose 8 m", options: ["Rose 8 m", "Dropped 8 m", "Rose 6 m", "Dropped 6 m"], helper: "The end value is higher than the start.", context: "elevation", title: "Elevation change", start: -1, end: 7, min: -12, max: 12, unitSuffix: " m" },
+      { prompt: "A bank balance goes from -$3 to $2. What happened?", answer: "Increased by $5", options: ["Decreased by $5", "Increased by $5", "Increased by $1", "Spent $5"], helper: "The balance crosses zero.", context: "balance", title: "Bank balance", start: -3, end: 2, min: -12, max: 12, unitPrefix: "$" },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    const delta = chosen.end - chosen.start;
+    return {
+      kind: "multiple_choice",
+      prompt: chosen.prompt,
+      options: shuffle([...chosen.options]),
+      answer: chosen.answer,
+      helper: chosen.helper,
+      visual: {
+        type: "integer_context",
+        context: chosen.context,
+        title: chosen.title,
+        currentValue: chosen.start,
+        change: delta,
+        endValue: chosen.end,
+        currentLabel: "Start",
+        endLabel: "End",
+        hidePrimaryChange: true,
+        unitPrefix: chosen.unitPrefix,
+        unitSuffix: chosen.unitSuffix,
+        noteText: "Read the start and end first, then decide what changed.",
+        numberLine: {
+          type: "integer_number_line",
+          min: chosen.min,
+          max: chosen.max,
+          highlightedValues: [chosen.start, chosen.end],
+          emphasis: "compare",
+        },
+      },
+    };
+  }
+
+  if (explicitMode === "y6_integer_context_change") {
+    const templates: ReadonlyArray<{
+      prompt: string;
+      answer: string;
+      helper: string;
+      context: IntegerContextVisualData["context"];
+      title: string;
+      start: number;
+      end: number;
+      min: number;
+      max: number;
+      unitPrefix?: string;
+      unitSuffix?: string;
+    }> = [
+      { prompt: "A temperature moves from 2°C to -6°C. What is the change?", answer: "-8", helper: "Ending lower means a negative change.", context: "temperature", title: "Temperature change", start: 2, end: -6, min: -12, max: 12, unitSuffix: "°C" },
+      { prompt: "A lift moves from floor 7 to floor -3. How many floors did it move?", answer: "10", helper: "Count the distance between the floors.", context: "elevator", title: "Lift movement", start: 7, end: -3, min: -12, max: 12 },
+      { prompt: "A bank balance goes from -$8 to $5. What is the total change?", answer: "13", helper: "The balance crosses zero into positive.", context: "balance", title: "Bank balance", start: -8, end: 5, min: -15, max: 15, unitPrefix: "$" },
+      { prompt: "A diver moves from -12 m to -4 m. What is the change?", answer: "8", helper: "Closer to zero means a positive change.", context: "elevation", title: "Depth change", start: -12, end: -4, min: -15, max: 15, unitSuffix: " m" },
+      { prompt: "A player's score goes from 5 to -4. What is the change?", answer: "-9", helper: "Finishing lower means a negative change.", context: "score", title: "Score change", start: 5, end: -4, min: -12, max: 12 },
+      { prompt: "A temperature changes from -7°C to 1°C. What is the change?", answer: "8", helper: "The temperature ends 8 higher.", context: "temperature", title: "Temperature change", start: -7, end: 1, min: -12, max: 12, unitSuffix: "°C" },
+      { prompt: "A bank balance goes from $9 to -$6. What is the total change?", answer: "-15", helper: "It drops past zero.", context: "balance", title: "Bank balance", start: 9, end: -6, min: -15, max: 15, unitPrefix: "$" },
+      { prompt: "A lift moves from floor -10 to floor -2. What is the change?", answer: "8", helper: "Less negative means the lift went up.", context: "elevator", title: "Lift movement", start: -10, end: -2, min: -15, max: 15 },
+      { prompt: "An elevation changes from 6 m to -5 m. What is the change?", answer: "-11", helper: "The final position is 11 lower.", context: "elevation", title: "Elevation change", start: 6, end: -5, min: -12, max: 12, unitSuffix: " m" },
+      { prompt: "A player's score goes from -9 to 2. What is the change?", answer: "11", helper: "The score improves across zero.", context: "score", title: "Score change", start: -9, end: 2, min: -12, max: 12 },
+      { prompt: "A temperature changes from 8°C to -3°C. What is the change?", answer: "-11", helper: "Finishing 11 lower means a negative change.", context: "temperature", title: "Temperature change", start: 8, end: -3, min: -12, max: 12, unitSuffix: "°C" },
+      { prompt: "A diver moves from -5 m to -14 m. What is the change?", answer: "-9", helper: "More negative means moving deeper.", context: "elevation", title: "Depth change", start: -5, end: -14, min: -15, max: 15, unitSuffix: " m" },
+      { prompt: "A bank balance goes from -$2 to -$11. What is the total change?", answer: "-9", helper: "The debt becomes 9 larger.", context: "balance", title: "Bank balance", start: -2, end: -11, min: -15, max: 15, unitPrefix: "$" },
+      { prompt: "A lift moves from floor -4 to floor 6. How many floors did it move?", answer: "10", helper: "Find the distance across zero.", context: "elevator", title: "Lift movement", start: -4, end: 6, min: -12, max: 12 },
+      { prompt: "A player's score goes from 12 to 3. What is the change?", answer: "-9", helper: "The score finishes 9 lower.", context: "score", title: "Score change", start: 12, end: 3, min: -15, max: 15 },
+      { prompt: "A temperature changes from -1°C to -10°C. What is the change?", answer: "-9", helper: "Colder means a negative change.", context: "temperature", title: "Temperature change", start: -1, end: -10, min: -12, max: 12, unitSuffix: "°C" },
+      { prompt: "An elevation changes from -6 m to 5 m. What is the change?", answer: "11", helper: "The position rises across sea level.", context: "elevation", title: "Elevation change", start: -6, end: 5, min: -12, max: 12, unitSuffix: " m" },
+      { prompt: "A bank balance goes from $4 to $14. What is the total change?", answer: "10", helper: "The balance increases by 10.", context: "balance", title: "Bank balance", start: 4, end: 14, min: -15, max: 15, unitPrefix: "$" },
+      { prompt: "A lift moves from floor 3 to floor -9. What is the change?", answer: "-12", helper: "The lift ends 12 floors lower.", context: "elevator", title: "Lift movement", start: 3, end: -9, min: -12, max: 12 },
+      { prompt: "A player's score goes from -11 to -1. What is the change?", answer: "10", helper: "Less negative means a positive change.", context: "score", title: "Score change", start: -11, end: -1, min: -15, max: 15 },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      helper: chosen.helper,
+      placeholder: "Type the integer",
+      visual: {
+        type: "integer_context",
+        context: chosen.context,
+        title: chosen.title,
+        currentValue: chosen.start,
+        change: chosen.end - chosen.start,
+        endValue: chosen.end,
+        currentLabel: "From",
+        endLabel: "To",
+        hidePrimaryChange: true,
+        unitPrefix: chosen.unitPrefix,
+        unitSuffix: chosen.unitSuffix,
+        noteText: "Interpret the change before you calculate it.",
+        numberLine: {
+          type: "integer_number_line",
+          min: chosen.min,
+          max: chosen.max,
+          highlightedValues: [chosen.start, chosen.end],
+          emphasis: "distance",
+        },
+      },
+    };
+  }
+
+  if (explicitMode === "y6_integer_context_multistep") {
+    const templates: ReadonlyArray<{
+      prompt: string;
+      answer: string;
+      helper: string;
+      context: IntegerContextVisualData["context"];
+      title: string;
+      start?: number;
+      end?: number;
+      change: number;
+      secondaryChange?: number;
+      min: number;
+      max: number;
+      currentLabel?: string;
+      changeLabel?: string;
+      secondaryChangeLabel?: string;
+      unitPrefix?: string;
+      unitSuffix?: string;
+      noteText?: string;
+      numberLine: IntegerNumberLineVisualData;
+    }> = [
+      { prompt: "Temperature starts at -6°C. It rises 9°C, then drops 7°C. What is the final temperature?", answer: "-4", helper: "Track both changes in order.", context: "temperature", title: "Temperature path", start: -6, change: 9, secondaryChange: -7, min: -15, max: 15, changeLabel: "Rise", secondaryChangeLabel: "Then drop", unitSuffix: "°C", noteText: "Work through both changes before deciding the end.", numberLine: { type: "integer_number_line", min: -15, max: 15, markerValue: -6, emphasis: "movement" } },
+      { prompt: "You start on floor -5. You go up 12 floors, then down 9 floors. Where are you now?", answer: "-2", helper: "Up first, then back down.", context: "elevator", title: "Lift journey", start: -5, change: 12, secondaryChange: -9, min: -15, max: 15, changeLabel: "Up", secondaryChangeLabel: "Then down", noteText: "Hold the starting floor and apply both moves.", numberLine: { type: "integer_number_line", min: -15, max: 15, markerValue: -5, emphasis: "movement" } },
+      { prompt: "A player starts at 4 points. They lose 9 points, then gain 6 points. What is the final score?", answer: "1", helper: "The score changes twice.", context: "score", title: "Score tracker", start: 4, change: -9, secondaryChange: 6, min: -12, max: 12, changeLabel: "Lose", secondaryChangeLabel: "Then gain", noteText: "Follow each score change in order.", numberLine: { type: "integer_number_line", min: -12, max: 12, markerValue: 4, emphasis: "movement" } },
+      { prompt: "Bank balance is -$20. You deposit $15, then spend $12. What is the final balance?", answer: "-17", helper: "A deposit helps, then spending lowers the balance again.", context: "balance", title: "Balance tracker", start: -20, change: 15, secondaryChange: -12, min: -25, max: 25, changeLabel: "Deposit", secondaryChangeLabel: "Then spend", unitPrefix: "$", noteText: "Combine both balance changes carefully.", numberLine: { type: "integer_number_line", min: -25, max: 25, markerValue: -20, emphasis: "movement" } },
+      { prompt: "A temperature ends at 3°C after rising 8°C. What was the starting temperature?", answer: "-5", helper: "Work backwards from the end value.", context: "temperature", title: "Temperature reverse", end: 3, change: 8, min: -12, max: 12, currentLabel: "End", changeLabel: "Rise", unitSuffix: "°C", noteText: "Use the ending temperature, then reverse the rise.", numberLine: { type: "integer_number_line", min: -12, max: 12, markerValue: 3, emphasis: "position" } },
+      { prompt: "A diver ends at -2 m after rising 6 m. Where did they start?", answer: "-8", helper: "Rising means the start was lower.", context: "elevation", title: "Depth reverse", end: -2, change: 6, min: -12, max: 12, currentLabel: "End", changeLabel: "Rise", unitSuffix: " m", noteText: "Reverse the movement to find the start.", numberLine: { type: "integer_number_line", min: -12, max: 12, markerValue: -2, emphasis: "position" } },
+      { prompt: "A team starts at -7 points. They gain 11 points, then lose 5 points. What is the final score?", answer: "-1", helper: "Gain first, then subtract the loss.", context: "score", title: "Score tracker", start: -7, change: 11, secondaryChange: -5, min: -15, max: 15, changeLabel: "Gain", secondaryChangeLabel: "Then lose", noteText: "Track the score across both moves.", numberLine: { type: "integer_number_line", min: -15, max: 15, markerValue: -7, emphasis: "movement" } },
+      { prompt: "A lift starts at floor 9. It goes down 14 floors, then up 3 floors. Where is it now?", answer: "-2", helper: "The second move only partly reverses the first.", context: "elevator", title: "Lift journey", start: 9, change: -14, secondaryChange: 3, min: -15, max: 15, changeLabel: "Down", secondaryChangeLabel: "Then up", noteText: "Keep the order of moves clear.", numberLine: { type: "integer_number_line", min: -15, max: 15, markerValue: 9, emphasis: "movement" } },
+      { prompt: "A bank balance ends at -$4 after a deposit of $9. What was the starting balance?", answer: "-13", helper: "Reverse the deposit to find the start.", context: "balance", title: "Balance reverse", end: -4, change: 9, min: -20, max: 20, currentLabel: "End", changeLabel: "Deposit", unitPrefix: "$", noteText: "Think backwards from the final balance.", numberLine: { type: "integer_number_line", min: -20, max: 20, markerValue: -4, emphasis: "position" } },
+      { prompt: "A temperature starts at 5°C. It drops 12°C, then rises 4°C. What is the final temperature?", answer: "-3", helper: "A big drop comes first.", context: "temperature", title: "Temperature path", start: 5, change: -12, secondaryChange: 4, min: -15, max: 15, changeLabel: "Drop", secondaryChangeLabel: "Then rise", unitSuffix: "°C", noteText: "Follow both temperature changes.", numberLine: { type: "integer_number_line", min: -15, max: 15, markerValue: 5, emphasis: "movement" } },
+      { prompt: "A diver starts at -4 m. They move 7 m deeper, then rise 10 m. Where do they finish?", answer: "-1", helper: "Deeper first, then back up.", context: "elevation", title: "Depth tracker", start: -4, change: -7, secondaryChange: 10, min: -15, max: 15, changeLabel: "Deeper", secondaryChangeLabel: "Then rise", unitSuffix: " m", noteText: "Track each move from the start depth.", numberLine: { type: "integer_number_line", min: -15, max: 15, markerValue: -4, emphasis: "movement" } },
+      { prompt: "A score ends at 6 after gaining 8 points. What was the starting score?", answer: "-2", helper: "Undo the gain.", context: "score", title: "Score reverse", end: 6, change: 8, min: -12, max: 12, currentLabel: "End", changeLabel: "Gain", noteText: "Work backwards from the final score.", numberLine: { type: "integer_number_line", min: -12, max: 12, markerValue: 6, emphasis: "position" } },
+      { prompt: "A lift starts at floor -8. It goes up 15 floors, then down 4 floors. Where is it now?", answer: "3", helper: "The lift crosses zero before the second move.", context: "elevator", title: "Lift journey", start: -8, change: 15, secondaryChange: -4, min: -15, max: 15, changeLabel: "Up", secondaryChangeLabel: "Then down", noteText: "Cross zero carefully, then apply the second move.", numberLine: { type: "integer_number_line", min: -15, max: 15, markerValue: -8, emphasis: "movement" } },
+      { prompt: "A bank balance starts at -$6. You spend $5, then deposit $14. What is the final balance?", answer: "3", helper: "The deposit comes after the extra spending.", context: "balance", title: "Balance tracker", start: -6, change: -5, secondaryChange: 14, min: -20, max: 20, changeLabel: "Spend", secondaryChangeLabel: "Then deposit", unitPrefix: "$", noteText: "Apply both money changes in order.", numberLine: { type: "integer_number_line", min: -20, max: 20, markerValue: -6, emphasis: "movement" } },
+      { prompt: "An elevation ends at -7 m after dropping 10 m. What was the starting elevation?", answer: "3", helper: "Reverse the drop to find the earlier position.", context: "elevation", title: "Elevation reverse", end: -7, change: -10, min: -15, max: 15, currentLabel: "End", changeLabel: "Drop", unitSuffix: " m", noteText: "Undo the drop to find the start.", numberLine: { type: "integer_number_line", min: -15, max: 15, markerValue: -7, emphasis: "position" } },
+      { prompt: "A temperature starts at -1°C. It rises 5°C, then rises 4°C more. What is the final temperature?", answer: "8", helper: "Two rises both move right.", context: "temperature", title: "Temperature path", start: -1, change: 5, secondaryChange: 4, min: -12, max: 12, changeLabel: "Rise", secondaryChangeLabel: "Then rise", unitSuffix: "°C", noteText: "Combine the two positive changes.", numberLine: { type: "integer_number_line", min: -12, max: 12, markerValue: -1, emphasis: "movement" } },
+      { prompt: "A player starts at -3 points. They gain 4 points, then lose 9 points. What is the final score?", answer: "-8", helper: "The second move is larger than the first.", context: "score", title: "Score tracker", start: -3, change: 4, secondaryChange: -9, min: -12, max: 12, changeLabel: "Gain", secondaryChangeLabel: "Then lose", noteText: "Track both score changes carefully.", numberLine: { type: "integer_number_line", min: -12, max: 12, markerValue: -3, emphasis: "movement" } },
+      { prompt: "A bank balance ends at $2 after spending $11. What was the starting balance?", answer: "13", helper: "If you spent 11 and still have 2, you started higher.", context: "balance", title: "Balance reverse", end: 2, change: -11, min: -20, max: 20, currentLabel: "End", changeLabel: "Spend", unitPrefix: "$", noteText: "Reverse the spending to find the start.", numberLine: { type: "integer_number_line", min: -20, max: 20, markerValue: 2, emphasis: "position" } },
+      { prompt: "A lift starts at floor 2. It goes down 7 floors, then down 5 more. Where is it now?", answer: "-10", helper: "Both moves go left on the number line.", context: "elevator", title: "Lift journey", start: 2, change: -7, secondaryChange: -5, min: -15, max: 15, changeLabel: "Down", secondaryChangeLabel: "Then down", noteText: "Combine both downward moves.", numberLine: { type: "integer_number_line", min: -15, max: 15, markerValue: 2, emphasis: "movement" } },
+      { prompt: "A diver ends at -5 m after moving 9 m deeper. Where did they start?", answer: "4", helper: "Reverse the movement to find the earlier depth.", context: "elevation", title: "Depth reverse", end: -5, change: -9, min: -15, max: 15, currentLabel: "End", changeLabel: "Deeper", unitSuffix: " m", noteText: "Work backwards from the final depth.", numberLine: { type: "integer_number_line", min: -15, max: 15, markerValue: -5, emphasis: "position" } },
+      { prompt: "A temperature starts at 7°C. It drops 9°C, then drops 3°C more. What is the final temperature?", answer: "-5", helper: "Both changes are drops.", context: "temperature", title: "Temperature path", start: 7, change: -9, secondaryChange: -3, min: -15, max: 15, changeLabel: "Drop", secondaryChangeLabel: "Then drop", unitSuffix: "°C", noteText: "Track both drops in sequence.", numberLine: { type: "integer_number_line", min: -15, max: 15, markerValue: 7, emphasis: "movement" } },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      kind: "typed_response",
+      prompt: chosen.prompt,
+      answer: chosen.answer,
+      helper: chosen.helper,
+      placeholder: "Type the integer",
+      visual: {
+        type: "integer_context",
+        context: chosen.context,
+        title: chosen.title,
+        currentValue: chosen.start ?? chosen.end ?? 0,
+        change: chosen.change,
+        endValue: chosen.end,
+        secondaryChange: chosen.secondaryChange,
+        currentLabel: chosen.currentLabel ?? "Start",
+        changeLabel: chosen.changeLabel ?? "Step 1",
+        secondaryChangeLabel: chosen.secondaryChangeLabel,
+        unitPrefix: chosen.unitPrefix,
+        unitSuffix: chosen.unitSuffix,
+        noteText: chosen.noteText,
+        numberLine: chosen.numberLine,
+      },
     };
   }
 

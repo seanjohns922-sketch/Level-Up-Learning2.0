@@ -86,6 +86,14 @@ function ContextScene({
 }) {
   const current = formatCurrentValue(visual.currentValue, visual);
   const change = formatSignedValue(visual.change, visual);
+  const secondaryChange =
+    typeof visual.secondaryChange === "number"
+      ? formatSignedValue(visual.secondaryChange, visual)
+      : null;
+  const endValue =
+    typeof visual.endValue === "number"
+      ? formatCurrentValue(visual.endValue, visual)
+      : null;
 
   if (visual.context === "temperature") {
     return (
@@ -102,9 +110,21 @@ function ContextScene({
           <div className="flex-1">
             <div className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Now</div>
             <div className="mt-1 text-3xl font-black text-slate-950">{current}</div>
-            <div className="mt-3 inline-flex rounded-full bg-slate-950 px-3 py-1 text-sm font-black text-white">
-              {change}
+            <div className="mt-3 flex flex-wrap gap-2">
+              {!visual.hidePrimaryChange ? (
+                <div className="inline-flex rounded-full bg-slate-950 px-3 py-1 text-sm font-black text-white">
+                  {change}
+                </div>
+              ) : null}
+              {secondaryChange ? (
+                <div className="inline-flex rounded-full bg-white px-3 py-1 text-sm font-black text-slate-950 shadow-sm">
+                  {secondaryChange}
+                </div>
+              ) : null}
             </div>
+            {endValue ? (
+              <div className="mt-3 text-sm font-black text-cyan-900">Ends at {endValue}</div>
+            ) : null}
           </div>
         </div>
       </div>
@@ -125,9 +145,19 @@ function ContextScene({
               <div className="mt-1 text-2xl font-black text-slate-950">{current}</div>
             </div>
             <div className="rounded-2xl bg-slate-100 px-4 py-3">
-              <div className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Movement</div>
-              <div className="mt-1 text-2xl font-black text-slate-950">{change}</div>
+              <div className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">
+                {visual.hidePrimaryChange ? visual.endLabel ?? "End" : "Movement"}
+              </div>
+              <div className="mt-1 text-2xl font-black text-slate-950">
+                {visual.hidePrimaryChange && endValue ? endValue : change}
+              </div>
             </div>
+            {secondaryChange ? (
+              <div className="rounded-2xl bg-sky-50 px-4 py-3 md:col-span-2">
+                <div className="text-xs font-black uppercase tracking-[0.18em] text-sky-700">Next move</div>
+                <div className="mt-1 text-2xl font-black text-slate-950">{secondaryChange}</div>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
@@ -141,9 +171,19 @@ function ContextScene({
         <div className="relative rounded-[22px] bg-slate-950 p-5 text-white">
           <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-200">Account</div>
           <div className="mt-3 text-3xl font-black">{current}</div>
-          <div className="mt-4 inline-flex rounded-full bg-white/10 px-3 py-1 text-sm font-black">
-            Change {change}
+          <div className="mt-4 flex flex-wrap gap-2">
+            {!visual.hidePrimaryChange ? (
+              <div className="inline-flex rounded-full bg-white/10 px-3 py-1 text-sm font-black">
+                Change {change}
+              </div>
+            ) : null}
+            {secondaryChange ? (
+              <div className="inline-flex rounded-full bg-emerald-400/15 px-3 py-1 text-sm font-black text-emerald-100">
+                Then {secondaryChange}
+              </div>
+            ) : null}
           </div>
+          {endValue ? <div className="mt-3 text-sm font-black text-emerald-100">Ends at {endValue}</div> : null}
         </div>
       </div>
     );
@@ -161,6 +201,12 @@ function ContextScene({
             <div className="text-[10px] font-black uppercase tracking-[0.18em] text-violet-700">Change</div>
             <div className="mt-2 text-3xl font-black text-slate-950">{change}</div>
           </div>
+          {secondaryChange ? (
+            <div className="rounded-[22px] bg-white px-4 py-5 text-center shadow-sm col-span-2">
+              <div className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">Next change</div>
+              <div className="mt-2 text-3xl font-black text-slate-950">{secondaryChange}</div>
+            </div>
+          ) : null}
         </div>
       </div>
     );
@@ -187,9 +233,19 @@ function ContextScene({
             <div className="mt-1 text-2xl font-black text-slate-950">{current}</div>
           </div>
           <div className="rounded-2xl bg-sky-50 px-4 py-3">
-            <div className="text-xs font-black uppercase tracking-[0.18em] text-sky-700">Change</div>
-            <div className="mt-1 text-2xl font-black text-slate-950">{change}</div>
+            <div className="text-xs font-black uppercase tracking-[0.18em] text-sky-700">
+              {visual.hidePrimaryChange ? visual.endLabel ?? "End" : "Change"}
+            </div>
+            <div className="mt-1 text-2xl font-black text-slate-950">
+              {visual.hidePrimaryChange && endValue ? endValue : change}
+            </div>
           </div>
+          {secondaryChange ? (
+            <div className="rounded-2xl bg-white px-4 py-3 shadow-sm col-span-2">
+              <div className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Next move</div>
+              <div className="mt-1 text-2xl font-black text-slate-950">{secondaryChange}</div>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>
@@ -220,7 +276,14 @@ export default function IntegerContextVisual({
       <div className="mt-4 grid gap-4 lg:grid-cols-[320px_1fr]">
         <ContextScene visual={visual} accent={theme.accent} />
         <div className={`rounded-[24px] border border-white/70 p-4 ${theme.panel}`}>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div
+            className={[
+              "grid gap-3",
+              visual.endValue !== undefined || visual.secondaryChange !== undefined
+                ? "sm:grid-cols-3"
+                : "sm:grid-cols-2",
+            ].join(" ")}
+          >
             <div className="rounded-2xl bg-white/80 px-4 py-3">
               <div className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">
                 {visual.currentLabel ?? "Start"}
@@ -231,15 +294,36 @@ export default function IntegerContextVisual({
             </div>
             <div className="rounded-2xl bg-white/80 px-4 py-3">
               <div className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">
-                {visual.changeLabel ?? "Change"}
+                {visual.hidePrimaryChange ? visual.endLabel ?? "End" : visual.changeLabel ?? "Change"}
               </div>
               <div className="mt-1 text-2xl font-black text-slate-950">
-                {formatSignedValue(visual.change, visual)}
+                {visual.hidePrimaryChange && visual.endValue !== undefined
+                  ? formatCurrentValue(visual.endValue, visual)
+                  : formatSignedValue(visual.change, visual)}
               </div>
             </div>
+            {visual.endValue !== undefined && !visual.hidePrimaryChange ? (
+              <div className="rounded-2xl bg-white/80 px-4 py-3">
+                <div className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">
+                  {visual.endLabel ?? "End"}
+                </div>
+                <div className="mt-1 text-2xl font-black text-slate-950">
+                  {formatCurrentValue(visual.endValue, visual)}
+                </div>
+              </div>
+            ) : visual.secondaryChange !== undefined ? (
+              <div className="rounded-2xl bg-white/80 px-4 py-3">
+                <div className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">
+                  {visual.secondaryChangeLabel ?? "Step 2"}
+                </div>
+                <div className="mt-1 text-2xl font-black text-slate-950">
+                  {formatSignedValue(visual.secondaryChange, visual)}
+                </div>
+              </div>
+            ) : null}
           </div>
           <div className="mt-4 text-sm font-semibold text-slate-600">
-            Use the context card, then track the movement on the number line.
+            {visual.noteText ?? "Use the context card, then track the movement on the number line."}
           </div>
         </div>
       </div>
