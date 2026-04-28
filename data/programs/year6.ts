@@ -294,15 +294,15 @@ const year6Rows: ProgramRow[] = [
   {
     week: 6,
     weekTopic: "Fraction Operations",
-    focus: "Use factors and multiples to build common denominators",
+    focus: "Choose efficient common denominators using multiples and factor reasoning",
     lesson: 1,
-    topic: "Common Denominators",
-    activity: "Choose useful common denominators by using factors, multiples, and equivalence.",
+    topic: "Common Denominators (Efficient Strategies)",
+    activity: "A common denominator is any shared multiple, but the smartest choice is usually the lowest common multiple.",
     curriculum: ["AC9M6N04"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "related_denominator_visual" }),
-      makeActivity("multiple_choice", 1, { mode: "related_denominator_quick_apply" }),
-      makeActivity("typed_response", 1, { mode: "related_denominator_build" }),
+      makeActivity("typed_response", 1, { mode: "y6_common_denominator_find_smart" }),
+      makeActivity("typed_response", 1, { mode: "y6_common_denominator_build_equivalents" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_common_denominator_choose_strategy" }),
     ],
   },
   {
