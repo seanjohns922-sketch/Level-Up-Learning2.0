@@ -194,56 +194,71 @@ export default function RealmCarousel() {
       <div className="fixed inset-0 z-0">
         {isTopChamber ? (
           <>
+            <img
+              src="/images/realm-select-bg.jpg"
+              alt=""
+              className="h-full w-full object-cover"
+              style={{
+                objectPosition: `${50 + bgShift}% 18%`,
+                transform: "scale(1.08)",
+                filter: "brightness(1.18) saturate(0.9) contrast(1.08)",
+                transition: "object-position 0.5s cubic-bezier(0.4,0,0.2,1)",
+              }}
+            />
             <div
               className="absolute inset-0"
               style={{
                 background:
-                  "linear-gradient(180deg, hsl(190 72% 78%) 0%, hsl(184 58% 64%) 22%, hsl(186 34% 25%) 54%, hsl(188 44% 9%) 100%)",
+                  "linear-gradient(180deg, hsl(46 92% 88% / 0.18) 0%, transparent 30%, hsl(190 58% 8% / 0.3) 100%), radial-gradient(ellipse at center 62%, transparent 18%, hsl(18 26% 8% / 0.34) 80%)",
               }}
             />
             <div
-              className="absolute inset-x-[-8%] top-[-22%] h-[56vh] rounded-b-full"
+              className="absolute left-1/2 top-[-24vh] h-[54vh] w-[72vw] -translate-x-1/2 rounded-b-full"
               style={{
                 background:
-                  "radial-gradient(ellipse at center top, hsl(48 100% 96% / 0.92) 0%, hsl(173 80% 82% / 0.48) 32%, hsl(184 70% 68% / 0.2) 58%, transparent 76%)",
-                borderBottom: "1px solid hsl(170 80% 82% / 0.24)",
-                boxShadow: "inset 0 -24px 80px hsl(175 90% 70% / 0.22)",
+                  "radial-gradient(ellipse at center top, hsl(48 100% 96% / 0.82) 0%, hsl(190 82% 86% / 0.36) 34%, transparent 68%)",
+                border: "18px solid hsl(32 22% 18% / 0.72)",
+                borderTop: 0,
+                boxShadow: "0 18px 70px hsl(0 0% 0% / 0.36), inset 0 -24px 80px hsl(178 82% 70% / 0.14)",
               }}
             />
             <div
-              className="absolute inset-x-0 top-0 h-[62vh] opacity-85"
+              className="absolute inset-x-0 top-0 h-[68vh] opacity-90"
               style={{
                 background:
-                  "linear-gradient(104deg, transparent 7%, hsl(50 100% 96% / 0.26) 16%, transparent 27%), linear-gradient(76deg, transparent 45%, hsl(172 84% 78% / 0.2) 56%, transparent 68%), linear-gradient(180deg, hsl(0 0% 100% / 0.24), transparent 68%)",
+                  "linear-gradient(102deg, transparent 10%, hsl(46 100% 92% / 0.32) 20%, transparent 33%), linear-gradient(77deg, transparent 42%, hsl(178 80% 78% / 0.22) 55%, transparent 69%), linear-gradient(180deg, hsl(48 100% 95% / 0.2), transparent 62%)",
               }}
             />
             <div
-              className="absolute inset-x-0 top-[10vh] h-[36vh] opacity-55"
+              className="absolute inset-y-0 left-0 w-[24vw]"
               style={{
                 background:
-                  "radial-gradient(ellipse at 24% 42%, hsl(0 0% 100% / 0.34) 0%, transparent 28%), radial-gradient(ellipse at 76% 36%, hsl(0 0% 100% / 0.24) 0%, transparent 24%), radial-gradient(ellipse at 50% 64%, hsl(174 78% 76% / 0.18) 0%, transparent 42%)",
-                filter: "blur(10px)",
+                  "linear-gradient(90deg, hsl(26 24% 8% / 0.78), hsl(28 18% 14% / 0.42) 58%, transparent), repeating-linear-gradient(180deg, hsl(36 22% 52% / 0.12) 0 2px, transparent 2px 86px)",
               }}
             />
             <div
-              className="absolute inset-x-[-12%] bottom-[-18vh] h-[46vh]"
+              className="absolute inset-y-0 right-0 w-[24vw]"
               style={{
                 background:
-                  "radial-gradient(ellipse at center, hsl(174 84% 56% / 0.24) 0%, hsl(185 68% 18% / 0.44) 38%, hsl(190 55% 7% / 0.9) 76%)",
+                  "linear-gradient(270deg, hsl(26 24% 8% / 0.78), hsl(28 18% 14% / 0.42) 58%, transparent), repeating-linear-gradient(180deg, hsl(36 22% 52% / 0.12) 0 2px, transparent 2px 86px)",
               }}
             />
             <div
-              className="absolute inset-0 opacity-45"
+              className="pointer-events-none absolute inset-x-[7%] top-[18vh] h-[42vh] opacity-55"
               style={{
-                backgroundImage:
-                  "linear-gradient(hsl(173 80% 70% / 0.11) 1px, transparent 1px), linear-gradient(90deg, hsl(173 80% 70% / 0.1) 1px, transparent 1px)",
-                backgroundSize: "64px 64px",
-                maskImage: "linear-gradient(180deg, transparent 0%, black 34%, black 82%, transparent 100%)",
-                WebkitMaskImage: "linear-gradient(180deg, transparent 0%, black 34%, black 82%, transparent 100%)",
+                background:
+                  "radial-gradient(ellipse at center, transparent 30%, hsl(32 20% 12% / 0.76) 31%, hsl(30 16% 10% / 0.68) 36%, transparent 37%), radial-gradient(ellipse at 16% 68%, transparent 24%, hsl(32 20% 12% / 0.72) 25%, hsl(30 16% 10% / 0.62) 31%, transparent 32%), radial-gradient(ellipse at 84% 68%, transparent 24%, hsl(32 20% 12% / 0.72) 25%, hsl(30 16% 10% / 0.62) 31%, transparent 32%)",
+              }}
+            />
+            <div
+              className="absolute inset-x-[-12%] bottom-[-18vh] h-[48vh]"
+              style={{
+                background:
+                  "radial-gradient(ellipse at center, hsl(174 84% 56% / 0.22) 0%, hsl(32 28% 14% / 0.58) 46%, hsl(20 22% 6% / 0.92) 78%)",
               }}
             />
             <div className="top-chamber-particles absolute inset-0" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/8 to-white/10" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
           </>
         ) : (
           <>
