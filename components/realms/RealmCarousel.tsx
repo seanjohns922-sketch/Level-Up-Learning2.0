@@ -371,15 +371,19 @@ export default function RealmCarousel() {
                   zIndex: 1,
                 }}
               >
-                {/* Stone doorway arch shape */}
+                {/* Portal arch shape */}
                 <div
                   className="relative mx-auto rounded-t-full overflow-hidden"
                   style={{
                     width: "110px",
                     height: "160px",
-                    background: "linear-gradient(180deg, rgba(30,25,20,0.9) 0%, rgba(15,12,10,0.95) 100%)",
-                    border: "3px solid rgba(180,160,120,0.3)",
-                    boxShadow: "inset 0 0 30px rgba(0,0,0,0.5)",
+                    background: isTopChamber
+                      ? "linear-gradient(180deg, hsl(184 44% 20% / 0.82) 0%, hsl(188 62% 8% / 0.94) 100%)"
+                      : "linear-gradient(180deg, rgba(30,25,20,0.9) 0%, rgba(15,12,10,0.95) 100%)",
+                    border: isTopChamber ? `2px solid ${realm.colorDim}` : "3px solid rgba(180,160,120,0.3)",
+                    boxShadow: isTopChamber
+                      ? `0 0 22px ${realm.colorDim}, inset 0 0 28px hsl(178 78% 62% / 0.12)`
+                      : "inset 0 0 30px rgba(0,0,0,0.5)",
                   }}
                 >
                   {/* Inner glow */}
@@ -404,17 +408,34 @@ export default function RealmCarousel() {
                 zIndex: 10,
               }}
             >
-              {/* Stone doorway arch */}
+              {isTopChamber ? (
+                <div
+                  className="absolute left-1/2 top-[92%] -translate-x-1/2 -z-10 h-24 w-[320px] rounded-full"
+                  style={{
+                    background:
+                      "radial-gradient(ellipse at center, hsl(172 90% 68% / 0.28) 0%, hsl(184 70% 18% / 0.38) 42%, transparent 72%)",
+                    border: "1px solid hsl(172 78% 74% / 0.24)",
+                    boxShadow: "0 12px 48px hsl(174 80% 42% / 0.18), inset 0 0 28px hsl(178 88% 70% / 0.12)",
+                  }}
+                />
+              ) : null}
+              {/* Portal arch */}
               <div
                 className="relative mx-auto rounded-t-full overflow-hidden"
                 style={{
                   width: "180px",
                   height: "260px",
-                  background: "linear-gradient(180deg, rgba(25,20,15,0.85) 0%, rgba(10,8,5,0.95) 100%)",
-                  border: `3px solid ${isActive ? current.color : "rgba(180,160,120,0.3)"}`,
+                  background: isTopChamber
+                    ? "linear-gradient(180deg, hsl(185 38% 24% / 0.84) 0%, hsl(188 68% 8% / 0.98) 100%)"
+                    : "linear-gradient(180deg, rgba(25,20,15,0.85) 0%, rgba(10,8,5,0.95) 100%)",
+                  border: `3px solid ${isActive ? current.color : isTopChamber ? "hsl(174 40% 72% / 0.28)" : "rgba(180,160,120,0.3)"}`,
                   boxShadow: isActive
-                    ? `0 0 40px ${current.colorDim}, inset 0 0 40px ${current.colorDim}`
-                    : "inset 0 0 30px rgba(0,0,0,0.5)",
+                    ? isTopChamber
+                      ? `0 0 54px ${current.colorDim}, 0 0 110px hsl(180 82% 70% / 0.16), inset 0 0 42px ${current.colorDim}`
+                      : `0 0 40px ${current.colorDim}, inset 0 0 40px ${current.colorDim}`
+                    : isTopChamber
+                      ? "0 0 34px hsl(180 60% 70% / 0.1), inset 0 0 30px rgba(0,0,0,0.5)"
+                      : "inset 0 0 30px rgba(0,0,0,0.5)",
                   transition: "all 0.4s ease",
                 }}
               >
@@ -449,13 +470,15 @@ export default function RealmCarousel() {
                 )}
               </div>
 
-              {/* Stone base / threshold */}
+              {/* Base / threshold */}
               <div
                 className="mx-auto"
                 style={{
                   width: "186px",
-                  height: "8px",
-                  background: "linear-gradient(180deg, rgba(140,120,80,0.5), rgba(100,85,55,0.3))",
+                  height: isTopChamber ? "10px" : "8px",
+                  background: isTopChamber
+                    ? "linear-gradient(180deg, hsl(174 70% 66% / 0.48), hsl(188 62% 18% / 0.45))"
+                    : "linear-gradient(180deg, rgba(140,120,80,0.5), rgba(100,85,55,0.3))",
                   borderRadius: "0 0 4px 4px",
                 }}
               />
