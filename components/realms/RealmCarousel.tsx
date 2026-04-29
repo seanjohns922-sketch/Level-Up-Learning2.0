@@ -209,7 +209,7 @@ export default function RealmCarousel() {
               className="absolute inset-0"
               style={{
                 background:
-                  "linear-gradient(180deg, hsl(46 92% 88% / 0.18) 0%, transparent 30%, hsl(190 58% 8% / 0.3) 100%), radial-gradient(ellipse at center 62%, transparent 18%, hsl(18 26% 8% / 0.34) 80%)",
+                  "linear-gradient(180deg, hsl(46 92% 88% / 0.14) 0%, transparent 36%, transparent 70%, hsl(20 24% 6% / 0.48) 100%)",
               }}
             />
             <div
@@ -233,14 +233,16 @@ export default function RealmCarousel() {
               className="absolute inset-y-0 left-0 w-[24vw]"
               style={{
                 background:
-                  "linear-gradient(90deg, hsl(26 24% 8% / 0.78), hsl(28 18% 14% / 0.42) 58%, transparent), repeating-linear-gradient(180deg, hsl(36 22% 52% / 0.12) 0 2px, transparent 2px 86px)",
+                  "linear-gradient(90deg, hsl(24 24% 6% / 0.92), hsl(28 22% 12% / 0.62) 58%, transparent), repeating-linear-gradient(180deg, hsl(36 22% 52% / 0.18) 0 3px, transparent 3px 78px)",
+                boxShadow: "inset -34px 0 52px hsl(0 0% 0% / 0.28)",
               }}
             />
             <div
               className="absolute inset-y-0 right-0 w-[24vw]"
               style={{
                 background:
-                  "linear-gradient(270deg, hsl(26 24% 8% / 0.78), hsl(28 18% 14% / 0.42) 58%, transparent), repeating-linear-gradient(180deg, hsl(36 22% 52% / 0.12) 0 2px, transparent 2px 86px)",
+                  "linear-gradient(270deg, hsl(24 24% 6% / 0.92), hsl(28 22% 12% / 0.62) 58%, transparent), repeating-linear-gradient(180deg, hsl(36 22% 52% / 0.18) 0 3px, transparent 3px 78px)",
+                boxShadow: "inset 34px 0 52px hsl(0 0% 0% / 0.28)",
               }}
             />
             <div
@@ -258,7 +260,7 @@ export default function RealmCarousel() {
               }}
             />
             <div className="top-chamber-particles absolute inset-0" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 h-[30vh] bg-gradient-to-t from-black/65 to-transparent" />
           </>
         ) : (
           <>
@@ -429,19 +431,31 @@ export default function RealmCarousel() {
               {isTopChamber ? (
                 <>
                   <div
-                    className="absolute left-1/2 top-[92%] -translate-x-1/2 -z-10 h-28 w-[360px] rounded-full"
+                    className="absolute left-1/2 top-[84%] -translate-x-1/2 -z-20 h-40 w-[520px] rounded-full"
                     style={{
                       background:
-                        "radial-gradient(ellipse at center, hsl(172 90% 68% / 0.24) 0%, hsl(34 24% 22% / 0.72) 36%, hsl(24 22% 8% / 0.72) 70%)",
-                      border: "2px solid hsl(38 26% 54% / 0.28)",
-                      boxShadow: "0 18px 54px hsl(0 0% 0% / 0.32), inset 0 0 30px hsl(178 88% 70% / 0.14)",
+                        "linear-gradient(90deg, transparent 0%, hsl(36 20% 30% / 0.3) 18%, hsl(172 74% 58% / 0.16) 50%, hsl(36 20% 30% / 0.3) 82%, transparent 100%)",
+                      transform: "translateX(-50%) perspective(420px) rotateX(64deg)",
+                      transformOrigin: "center top",
+                      borderTop: "2px solid hsl(38 24% 54% / 0.24)",
+                      boxShadow: "0 -18px 45px hsl(0 0% 0% / 0.24)",
                     }}
                   />
                   <div
-                    className="absolute left-1/2 top-[103%] -translate-x-1/2 -z-10 h-10 w-[250px] rounded-full"
+                    className="absolute left-1/2 top-[82%] -translate-x-1/2 -z-10 h-24 w-[330px] rounded-full"
+                    style={{
+                      background:
+                        "radial-gradient(ellipse at center, hsl(172 90% 68% / 0.28) 0%, hsl(34 24% 22% / 0.86) 38%, hsl(24 22% 8% / 0.86) 72%)",
+                      border: "2px solid hsl(38 26% 54% / 0.28)",
+                      boxShadow: "0 18px 54px hsl(0 0% 0% / 0.42), inset 0 0 30px hsl(178 88% 70% / 0.16)",
+                    }}
+                  />
+                  <div
+                    className="absolute left-1/2 top-[94%] -translate-x-1/2 -z-10 h-14 w-[280px] rounded-full"
                     style={{
                       background:
                         "repeating-radial-gradient(ellipse at center, hsl(174 80% 70% / 0.28) 0 2px, transparent 2px 18px)",
+                      transform: "translateX(-50%) perspective(360px) rotateX(58deg)",
                     }}
                   />
                 </>
@@ -545,7 +559,19 @@ export default function RealmCarousel() {
           {/* Info Panel */}
           <div
             className="w-full max-w-sm mx-auto text-center mt-2"
-            style={{ transition: "opacity 0.3s ease", opacity: transitioning ? 0.3 : 1 }}
+            style={{
+              transition: "opacity 0.3s ease",
+              opacity: transitioning ? 0.3 : 1,
+              ...(isTopChamber
+                ? {
+                    padding: "10px 16px 12px",
+                    borderRadius: "22px",
+                    background: "hsl(188 46% 8% / 0.26)",
+                    border: "1px solid hsl(174 70% 74% / 0.16)",
+                    backdropFilter: "blur(8px)",
+                  }
+                : {}),
+            }}
           >
             <h2
               className="text-2xl md:text-3xl font-black text-white mb-1"
