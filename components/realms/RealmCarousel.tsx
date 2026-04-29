@@ -583,6 +583,23 @@ export default function RealmCarousel() {
           </div>
         </div>
       </div>
+      <style jsx>{`
+        .top-chamber-particles {
+          background-image:
+            radial-gradient(circle at 18% 24%, hsl(172 90% 82% / 0.5) 0 1px, transparent 2px),
+            radial-gradient(circle at 72% 18%, hsl(48 100% 92% / 0.42) 0 1px, transparent 2px),
+            radial-gradient(circle at 43% 46%, hsl(178 84% 76% / 0.38) 0 1px, transparent 2px),
+            radial-gradient(circle at 86% 58%, hsl(0 0% 100% / 0.34) 0 1px, transparent 2px);
+          background-size: 210px 190px, 260px 220px, 180px 210px, 230px 180px;
+          animation: topChamberDrift 16s ease-in-out infinite alternate;
+          opacity: 0.7;
+        }
+
+        @keyframes topChamberDrift {
+          from { transform: translate3d(0, 8px, 0); }
+          to { transform: translate3d(0, -16px, 0); }
+        }
+      `}</style>
     </main>
   );
 }
