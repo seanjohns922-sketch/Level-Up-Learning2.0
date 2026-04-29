@@ -320,15 +320,15 @@ const year6Rows: ProgramRow[] = [
   },
   {
     week: 6,
-    focus: "Apply fraction operations in short real-world contexts",
+    focus: "Apply fraction addition and subtraction in multi-step real-world contexts",
     lesson: 3,
     topic: "Fraction Word Problems",
-    activity: "Interpret fraction contexts, choose the operation, and solve with matching denominators.",
+    activity: "Read the context, choose the operation, solve efficiently, and check whether the result makes sense.",
     curriculum: ["AC9M6N04"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "real_world_fraction_context" }),
-      makeActivity("typed_response", 1, { mode: "real_world_fraction_structured_apply" }),
-      makeActivity("multiple_choice", 1, { mode: "real_world_fraction_decision" }),
+      makeActivity("typed_response", 1, { mode: "y6_fraction_word_problem_single" }),
+      makeActivity("typed_response", 1, { mode: "y6_fraction_word_problem_multi" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_fraction_word_problem_reason" }),
     ],
   },
   {

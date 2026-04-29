@@ -715,6 +715,12 @@ function parseFlexibleFraction(value: string) {
   const trimmed = value.trim();
   if (!trimmed) return null;
 
+  if (/^\d+$/.test(trimmed)) {
+    const whole = Number(trimmed);
+    if (!Number.isFinite(whole)) return null;
+    return { whole, numerator: 0, denominator: 1 };
+  }
+
   const mixedMatch = trimmed.match(/^(\d+)\s+(\d+)\/(\d+)$/);
   if (mixedMatch) {
     const whole = Number(mixedMatch[1]);

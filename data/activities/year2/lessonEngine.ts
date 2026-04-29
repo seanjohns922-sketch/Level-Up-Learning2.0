@@ -15877,6 +15877,488 @@ function generateGenericQuestion(
         };
   }
 
+  if (explicitMode === "y6_fraction_word_problem_single") {
+    const templates: Array<TypedResponseQuestion> = [
+      {
+        kind: "typed_response",
+        prompt: "A runner completes 3/4 km in the morning and 5/6 km in the afternoon. How far do they run in total?",
+        answer: "19/12",
+        helper: "This context combines two amounts.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A tank is filled to 7/8 capacity. After use, 1/4 is emptied. How much remains?",
+        answer: "5/8",
+        helper: "Something is being removed from the amount.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A student reads 2/3 of a book on Monday and 1/6 on Tuesday. How much of the book has been read?",
+        answer: "5/6",
+        helper: "This question asks for the total read altogether.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A rope is 5/6 m long. 1/3 m is cut off. How much is left?",
+        answer: "1/2",
+        helper: "Cut off tells you to remove part of the length.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A container holds 7/5 litres of liquid. 2/5 litres are used. How much remains?",
+        answer: "1",
+        helper: "Subtract the amount used, then simplify the result.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A cyclist rides 5/6 km before lunch and 7/10 km after lunch. How far do they ride in total?",
+        answer: "23/15",
+        helper: "You are combining two distances.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A machine contains 11/12 litre of oil. 1/3 litre is drained out. How much is left?",
+        answer: "7/12",
+        helper: "Drained out means subtract.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A hiker walks 7/8 km in the first section and 5/12 km in the second section. How far is that altogether?",
+        answer: "31/24",
+        helper: "Add the two sections to find the full distance.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A ribbon is 13/10 m long. 2/5 m is trimmed away. How much ribbon remains?",
+        answer: "9/10",
+        helper: "Trimmed away means the amount gets smaller.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A reader finishes 3/5 of a report in the morning and 1/4 in the afternoon. How much is completed in total?",
+        answer: "17/20",
+        helper: "The work from both times is combined.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A storage tank is 9/10 full. 1/6 of the tank is emptied. How full is it now?",
+        answer: "11/15",
+        helper: "The level decreases after something is emptied.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A swimmer completes 11/12 km in training and 1/8 km in recovery. What total distance is that?",
+        answer: "25/24",
+        helper: "Total distance means add the parts together.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A cable is 17/12 m long. 3/4 m is removed. How much remains?",
+        answer: "2/3",
+        helper: "Removed means you need subtraction.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A lab uses 4/9 litre of solution in one test and 5/6 litre in another. How much solution is used altogether?",
+        answer: "23/18",
+        helper: "Add the two uses to find the combined amount.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A tank contains 5/4 litres. 1/2 litre is poured out. How much remains?",
+        answer: "3/4",
+        helper: "Poured out tells you to subtract from the starting amount.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A trail has 2/3 km already completed and another 7/8 km is finished later. How much of the trail is completed in all?",
+        answer: "37/24",
+        helper: "Completed in all means add the amounts.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A fuel gauge shows 7/6 litres. 1/3 litre is used. How much fuel remains?",
+        answer: "5/6",
+        helper: "Used means subtract the amount consumed.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A researcher records 5/8 hour of observations and then 2/3 hour more. What is the total time?",
+        answer: "31/24",
+        helper: "Total time means combine the observation periods.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A metal rod is 19/15 m long. 2/5 m is cut away. How much rod is left?",
+        answer: "13/15",
+        helper: "Cut away means remove part of the original length.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A project is 3/4 complete before lunch and another 5/8 complete after lunch. What total amount is completed?",
+        answer: "11/8",
+        helper: "Find the total completed by adding both parts.",
+        placeholder: "Type a fraction or mixed number",
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      ...chosen,
+      inputType: "flexible_fraction",
+    };
+  }
+
+  if (explicitMode === "y6_fraction_word_problem_multi") {
+    const templates: Array<TypedResponseQuestion> = [
+      {
+        kind: "typed_response",
+        prompt: "A student completes 2/3 of a task in the morning and 3/8 in the afternoon. How much of the task is completed in total?",
+        answer: "25/24",
+        helper: "Two completed parts are being combined.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A water tank is filled to 5/6 capacity. 1/3 is used, then another 1/6 is used. How much remains?",
+        answer: "1/3",
+        helper: "Track both amounts removed from the starting level.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A runner plans to run 2 km. They run 3/4 km in the morning and 5/8 km in the evening. How much further do they need to run?",
+        answer: "5/8",
+        helper: "First find what has been run, then compare to the 2 km goal.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A recipe needs 3/5 cup of sugar. You already added 1/4 cup. How much more do you need?",
+        answer: "7/20",
+        helper: "Subtract what is already added from what is needed.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A tank holds 9/4 litres. 2/3 litre is used, then 3/4 litre is added. How much is in the tank now?",
+        answer: "7/3",
+        helper: "Follow the two changes in order.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A hiker plans to cover 5/2 km. They walk 7/8 km, then 2/3 km. How much further do they need to go?",
+        answer: "23/24",
+        helper: "Add the distance covered, then compare with the plan.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A storage tank is 11/10 full. 1/5 is drained, then 1/4 is added back. How full is it now?",
+        answer: "23/20",
+        helper: "Track the subtraction and addition carefully.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A project target is 7/4 units of work. 5/6 unit is finished in one session and 3/8 unit in another. How much is still left?",
+        answer: "13/24",
+        helper: "Work out the total completed, then subtract from the target.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A recipe starts with 13/6 cups of stock. 3/4 cup is used, then 1/3 cup is added. How much stock is there now?",
+        answer: "7/4",
+        helper: "Use one efficient denominator across both changes.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A cyclist aims to ride 9/4 km. They finish 5/8 km before lunch and 11/12 km after lunch. How much remains?",
+        answer: "17/24",
+        helper: "Combine the distance ridden, then compare it with the target.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A container has 7/5 litres. 1/2 litre is poured out, then 2/3 litre is added. How much liquid is there now?",
+        answer: "47/30",
+        helper: "Follow the changes one by one.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A student needs to read 11/6 chapters. They read 2/3 chapter in one session and 3/4 chapter in another. How much is left to read?",
+        answer: "5/12",
+        helper: "Add what is read, then subtract from the total needed.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A tank is 4/3 full. 1/6 is used, then 5/12 is added. How full is the tank now?",
+        answer: "19/12",
+        helper: "A multi-step context needs each change tracked in order.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A rope measures 17/12 m. 1/4 m is cut off and then 1/6 m is tied back on. What is the new length?",
+        answer: "4/3",
+        helper: "Subtract first, then add the amount tied back.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A runner plans 3 km. They complete 5/6 km, then 7/8 km, then 1/4 km. How much further must they run?",
+        answer: "25/24",
+        helper: "Find the total run so far before comparing to 3 km.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A mixture has 19/12 litres. 2/3 litre is removed, then 5/8 litre is added. How much mixture is there now?",
+        answer: "37/24",
+        helper: "Use one denominator that works for all three fractions.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A task needs 5/4 hours in total. 3/8 hour is completed in one block and 7/12 hour in another. How much longer is needed?",
+        answer: "7/24",
+        helper: "Compare the target time with the amount already completed.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A container starts with 8/5 litres. 1/3 litre is used, then another 1/6 litre is used. How much remains?",
+        answer: "11/10",
+        helper: "Two amounts are taken away from the start.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A project is 9/8 complete after one day. Another 5/12 is completed the next day. What is the total completed amount?",
+        answer: "37/24",
+        helper: "This context asks for the combined completed amount.",
+        placeholder: "Type a fraction or mixed number",
+      },
+      {
+        kind: "typed_response",
+        prompt: "A storage tank holds 7/3 litres. 5/6 litre is drained and 1/4 litre is added. How much remains in the tank?",
+        answer: "7/4",
+        helper: "Track both changes in sequence and simplify at the end if needed.",
+        placeholder: "Type a fraction or mixed number",
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      ...chosen,
+      inputType: "flexible_fraction",
+    };
+  }
+
+  if (explicitMode === "y6_fraction_word_problem_reason") {
+    const templates: Array<MultipleChoiceQuestion> = [
+      {
+        kind: "multiple_choice",
+        prompt: "A student says 3/4 + 1/2 = 4/6. Is this correct?",
+        options: ["Yes", "No"],
+        answer: "No",
+        helper: "Check whether the fractions were renamed before adding.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which situation requires subtraction?",
+        options: ["Combining distances", "Removing part of a quantity", "Finding a total"],
+        answer: "Removing part of a quantity",
+        helper: "Think about whether the amount is being joined or taken away.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "How do you decide whether to add or subtract in a word problem?",
+        options: [
+          "Look at whether amounts are being combined or taken away",
+          "Always add first",
+          "Choose the largest denominator",
+        ],
+        answer: "Look at whether amounts are being combined or taken away",
+        helper: "The context tells you what operation makes sense.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "A tank is almost full. You remove 1/3. Which answer makes sense?",
+        options: ["The amount increases", "The amount decreases", "It stays the same"],
+        answer: "The amount decreases",
+        helper: "Removing part should make the amount smaller.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "A student solves 2/3 + 3/5 - 1/2 and gets 5/8. Is this reasonable?",
+        options: ["Yes", "No"],
+        answer: "No",
+        helper: "Estimate the size before trusting the exact answer.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which problem needs addition first, then subtraction?",
+        options: [
+          "A runner plans 2 km and has already run 3/4 km and 5/8 km",
+          "A tank has 7/8 full and 1/4 is emptied",
+          "A rope is 5/6 m and 1/3 m is cut off",
+        ],
+        answer: "A runner plans 2 km and has already run 3/4 km and 5/8 km",
+        helper: "Work out what has happened so far before comparing to the target.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which answer is reasonable for 7/8 - 1/4?",
+        options: ["5/8", "9/8", "1/8"],
+        answer: "5/8",
+        helper: "Subtracting a smaller amount from 7/8 should stay below 1.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "A student adds 2/3 and 1/6 by writing 3/9. What did they do wrong?",
+        options: [
+          "They added denominators instead of renaming the fractions",
+          "They should have multiplied the numerators",
+          "They forgot to convert to decimals",
+        ],
+        answer: "They added denominators instead of renaming the fractions",
+        helper: "The parts must be equal-sized before the numerators can combine.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which situation would most likely give an answer greater than 1?",
+        options: [
+          "Adding 3/4 km and 5/6 km",
+          "Removing 1/4 from 7/8",
+          "Finding what remains from 3/5 after 1/4 is used",
+        ],
+        answer: "Adding 3/4 km and 5/6 km",
+        helper: "Estimate each situation before choosing.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which operation fits this situation best: “You already added 1/4 cup, but the recipe needs 3/5 cup”?",
+        options: ["Addition", "Subtraction", "Multiplication"],
+        answer: "Subtraction",
+        helper: "You are finding how much more is needed.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "A student claims 5/6 + 1/3 = 6/9. Is this correct?",
+        options: ["Yes", "No"],
+        answer: "No",
+        helper: "Check whether the common denominator step was done properly.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which expression best matches “How much remains?”",
+        options: ["Start amount minus amount used", "Part plus part", "Target plus amount used"],
+        answer: "Start amount minus amount used",
+        helper: "Remaining means something has been taken away from a starting amount.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which answer makes sense for 3/4 + 5/6?",
+        options: ["19/12", "8/10", "2/10"],
+        answer: "19/12",
+        helper: "Two large fractions added together should be more than 1.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "A runner plans 3 km and has already run 5/6 km and 7/8 km. To find what is left, what should they do after adding the distances run?",
+        options: ["Subtract from 3 km", "Add 3 km", "Multiply by 3"],
+        answer: "Subtract from 3 km",
+        helper: "You compare the amount done to the total target.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which situation shows subtraction followed by addition?",
+        options: [
+          "A tank loses 2/3 litre, then gains 3/4 litre",
+          "A student reads 2/3 then 1/6 of a book",
+          "A runner completes 3/4 km and 5/6 km",
+        ],
+        answer: "A tank loses 2/3 litre, then gains 3/4 litre",
+        helper: "Track the order of changes in the context.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Why should you check whether a fraction answer makes sense in a word problem?",
+        options: [
+          "Because the context tells you whether the amount should increase or decrease",
+          "Because fractions always need decimals",
+          "Because denominators should be large",
+        ],
+        answer: "Because the context tells you whether the amount should increase or decrease",
+        helper: "The story helps you judge whether the result is reasonable.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which situation is most likely to end with exactly 1?",
+        options: [
+          "A container has 7/5 litres and 2/5 litres are used",
+          "A rope is 5/6 m and 1/3 m is cut off",
+          "A runner adds 3/4 km and 5/6 km",
+        ],
+        answer: "A container has 7/5 litres and 2/5 litres are used",
+        helper: "Estimate each result before choosing.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "A student gets 3/2 for a problem about removing part of 7/8. Is this likely correct?",
+        options: ["Yes", "No"],
+        answer: "No",
+        helper: "Removing part from less than 1 should not make the answer larger than 1.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which is the best first step in a multi-step fraction word problem?",
+        options: [
+          "Decide what each change means",
+          "Add every number you see",
+          "Pick the largest denominator",
+        ],
+        answer: "Decide what each change means",
+        helper: "Interpretation comes before calculation.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which answer is most reasonable for 5/6 capacity, then 1/3 used, then another 1/6 used?",
+        options: ["1/3 remains", "7/6 remains", "5/6 remains"],
+        answer: "1/3 remains",
+        helper: "Two amounts are being removed from the starting level.",
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      ...chosen,
+      options: shuffle([...chosen.options]),
+    };
+  }
+
   if (
     explicitMode === "real_world_fraction_context" ||
     explicitMode === "real_world_fraction_structured_apply" ||
