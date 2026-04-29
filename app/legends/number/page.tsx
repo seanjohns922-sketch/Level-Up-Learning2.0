@@ -49,7 +49,7 @@ export default function NumbotCollectionPage() {
       {/* Layer 2: distant Number Nexus horizon environment */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, hsl(176, 58%, 8%) 0%, hsl(170, 58%, 6%) 46%, hsl(164, 52%, 4%) 100%)" }} />
-        <div className="absolute inset-x-0 top-[24vh] h-[38vh] min-h-[255px] max-h-[350px] overflow-hidden">
+        <div className="absolute inset-x-0 top-[92px] h-[390px] overflow-hidden">
           <img
             src="/images/lesson-hero-number-nexus.jpg"
             alt=""
@@ -58,29 +58,29 @@ export default function NumbotCollectionPage() {
             height={1080}
             className="h-full w-full object-cover"
             style={{
-              filter: "blur(1.2px) contrast(1.12) saturate(1.08) brightness(0.98) hue-rotate(-4deg)",
-              opacity: 0.82,
+              filter: "contrast(1.2) saturate(1.12) brightness(1.08) hue-rotate(-4deg)",
+              opacity: 1,
               objectPosition: "78% center",
-              transform: "scale(0.88)",
+              transform: "scale(0.92)",
               transformOrigin: "center center",
-              maskImage: "linear-gradient(180deg, transparent 0%, black 18%, black 66%, transparent 100%)",
-              WebkitMaskImage: "linear-gradient(180deg, transparent 0%, black 18%, black 66%, transparent 100%)",
+              maskImage: "linear-gradient(180deg, transparent 0%, black 8%, black 78%, transparent 100%)",
+              WebkitMaskImage: "linear-gradient(180deg, transparent 0%, black 8%, black 78%, transparent 100%)",
             }}
           />
         </div>
         <div
-          className="absolute inset-x-0 top-[32vh] h-[28vh]"
+          className="absolute inset-x-0 top-[300px] h-[230px]"
           style={{
             background:
-              "linear-gradient(180deg, transparent 0%, hsla(170, 42%, 78%, 0.08) 38%, hsla(170, 58%, 5%, 0.2) 100%)",
-            filter: "blur(18px)",
+              "linear-gradient(180deg, transparent 0%, hsla(170, 42%, 78%, 0.04) 36%, hsla(170, 58%, 5%, 0.16) 100%)",
+            filter: "blur(14px)",
           }}
         />
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, hsla(176, 58%, 5%, 0.1) 0%, hsla(170, 54%, 4%, 0.04) 42%, hsla(170, 58%, 3%, 0.42) 100%), radial-gradient(ellipse at 50% 48%, transparent 0%, hsla(170, 62%, 3%, 0.34) 88%)",
+              "linear-gradient(180deg, hsla(176, 58%, 5%, 0.04) 0%, hsla(170, 54%, 4%, 0.02) 42%, hsla(170, 58%, 3%, 0.32) 100%), radial-gradient(ellipse at 50% 48%, transparent 0%, hsla(170, 62%, 3%, 0.24) 88%)",
           }}
         />
       </div>
