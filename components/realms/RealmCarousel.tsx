@@ -209,7 +209,7 @@ export default function RealmCarousel() {
               className="absolute inset-0"
               style={{
                 background:
-                  "linear-gradient(180deg, hsl(46 92% 88% / 0.18) 0%, transparent 30%, hsl(190 58% 8% / 0.3) 100%), radial-gradient(ellipse at center 62%, transparent 18%, hsl(18 26% 8% / 0.34) 80%)",
+                  "linear-gradient(180deg, hsl(46 92% 88% / 0.14) 0%, transparent 36%, transparent 70%, hsl(20 24% 6% / 0.48) 100%)",
               }}
             />
             <div
@@ -233,14 +233,16 @@ export default function RealmCarousel() {
               className="absolute inset-y-0 left-0 w-[24vw]"
               style={{
                 background:
-                  "linear-gradient(90deg, hsl(26 24% 8% / 0.78), hsl(28 18% 14% / 0.42) 58%, transparent), repeating-linear-gradient(180deg, hsl(36 22% 52% / 0.12) 0 2px, transparent 2px 86px)",
+                  "linear-gradient(90deg, hsl(24 24% 6% / 0.92), hsl(28 22% 12% / 0.62) 58%, transparent), repeating-linear-gradient(180deg, hsl(36 22% 52% / 0.18) 0 3px, transparent 3px 78px)",
+                boxShadow: "inset -34px 0 52px hsl(0 0% 0% / 0.28)",
               }}
             />
             <div
               className="absolute inset-y-0 right-0 w-[24vw]"
               style={{
                 background:
-                  "linear-gradient(270deg, hsl(26 24% 8% / 0.78), hsl(28 18% 14% / 0.42) 58%, transparent), repeating-linear-gradient(180deg, hsl(36 22% 52% / 0.12) 0 2px, transparent 2px 86px)",
+                  "linear-gradient(270deg, hsl(24 24% 6% / 0.92), hsl(28 22% 12% / 0.62) 58%, transparent), repeating-linear-gradient(180deg, hsl(36 22% 52% / 0.18) 0 3px, transparent 3px 78px)",
+                boxShadow: "inset 34px 0 52px hsl(0 0% 0% / 0.28)",
               }}
             />
             <div
@@ -258,7 +260,7 @@ export default function RealmCarousel() {
               }}
             />
             <div className="top-chamber-particles absolute inset-0" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 h-[30vh] bg-gradient-to-t from-black/65 to-transparent" />
           </>
         ) : (
           <>
