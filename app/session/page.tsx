@@ -267,19 +267,40 @@ function toAssessmentTypedQuizQuestion(
   index: number,
   quizMeta: NonNullable<QuizQuestion["quizMeta"]>
 ): QuizQuestion | null {
-  if (
-    (questionData.kind === "multiple_choice" || questionData.kind === "typed_response") &&
-    typeof questionData.answer === "string"
-  ) {
+  if (questionData.kind === "multiple_choice") {
+    return {
+      id: `q${index}`,
+      lessonNumber,
+      lessonTag: lessonNumber,
+      skill,
+      activityType: "multiple_choice",
+      kind: "lessonActivity",
+      prompt: questionData.prompt,
+      activity: {
+        activityType: "multiple_choice",
+        weight: 1,
+        config: {},
+      },
+      questionData,
+      quizMeta,
+    };
+  }
+
+  if (questionData.kind === "typed_response" && typeof questionData.answer === "string") {
     return {
       id: `q${index}`,
       lessonNumber,
       lessonTag: lessonNumber,
       skill,
       activityType: "typed_response",
-      kind: "typed",
+      kind: "lessonActivity",
       prompt: questionData.prompt,
-      correctValue: questionData.answer,
+      activity: {
+        activityType: "typed_response",
+        weight: 1,
+        config: {},
+      },
+      questionData,
       quizMeta,
     };
   }
@@ -433,7 +454,7 @@ function toExplicitWeeklyQuizQuestion(
   }
 
   if (question.answerType === "numeric") {
-    if (isFractionTypedAnswer) {
+    if (typedInputType || isFractionTypedAnswer) {
       return {
         ...lessonMeta,
         activityType: "typed_response",
@@ -444,7 +465,13 @@ function toExplicitWeeklyQuizQuestion(
           prompt,
           answer: correctAnswer,
           helper: question.feedbackIncorrect,
-          placeholder: question.placeholder ?? "Type the fraction",
+          placeholder:
+            question.placeholder ??
+            (typedInputType === "integer"
+              ? "Type the integer"
+              : typedInputType === "mixed"
+                ? "Type the mixed number"
+                : "Type the fraction"),
           inputType: typedInputType ?? (isFractionTypedAnswer ? "fraction" : undefined),
         },
         activity: {
