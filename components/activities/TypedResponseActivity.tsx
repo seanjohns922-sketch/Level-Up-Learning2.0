@@ -1538,10 +1538,11 @@ export default function TypedResponseActivity({
     !writtenMethod &&
     !isOrderingResponse &&
     questionData.kind === "typed_response" &&
-    (isFractionInput || isMixedNumberInput || (!!expectedStructuredFraction && !isFlexibleFractionInput));
+    (isFractionInput || isMixedNumberInput || isFlexibleFractionInput || !!expectedStructuredFraction);
   const isMixedNumberResponse =
     (isStructuredFractionResponse && isMixedNumberInput) ||
     (!declaredInputType && isStructuredFractionResponse && (expectedStructuredFraction?.whole ?? 0) > 0);
+  const showsWholeNumberField = isMixedNumberResponse || isFlexibleFractionInput;
   const usesFixedDenominator =
     (isStructuredFractionResponse || isFractionInput) && typeof questionData.fixedDenominator === "number";
   const isIntegerInput = declaredInputType === "integer";
@@ -2421,16 +2422,25 @@ export default function TypedResponseActivity({
           : fractionDenominatorInput
       );
 
-      if (!numerator || !denominator) {
+      const parsed =
+        isFlexibleFractionInput && whole && !numerator && !denominator
+          ? {
+              whole: Number(whole),
+              numerator: 0,
+              denominator: 1,
+            }
+          : !numerator || !denominator
+            ? null
+            : {
+                whole: whole ? Number(whole) : 0,
+                numerator: Number(numerator),
+                denominator: Number(denominator),
+              };
+
+      if (!parsed) {
         onWrong?.();
         return;
       }
-
-      const parsed = {
-        whole: whole ? Number(whole) : 0,
-        numerator: Number(numerator),
-        denominator: Number(denominator),
-      };
 
       if (
         !Number.isFinite(parsed.whole) ||
@@ -3348,7 +3358,9 @@ export default function TypedResponseActivity({
             <div className="w-full max-w-[420px]">
               <div className="rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm transition focus-within:border-teal-400 focus-within:shadow-[0_0_0_4px_rgba(45,212,191,0.12)]">
                 <div className="text-xs font-bold uppercase tracking-wide text-slate-500">
-                  {isMixedNumberResponse
+                  {isFlexibleFractionInput
+                    ? "Fraction or mixed number"
+                    : isMixedNumberResponse
                     ? usesFixedDenominator
                       ? "Mixed number answer"
                       : "Mixed number"
@@ -3361,7 +3373,7 @@ export default function TypedResponseActivity({
                       : "Fraction answer"}
                 </div>
                 <div className="mt-3 flex items-center gap-2">
-                  {isMixedNumberResponse ? (
+                  {showsWholeNumberField ? (
                     <input
                       ref={wholeRef}
                       type="text"
@@ -3402,7 +3414,7 @@ export default function TypedResponseActivity({
                         }
                       }}
                       onKeyDown={(event) => {
-                        if (event.key === "Backspace" && !fractionNumeratorInput && isMixedNumberResponse) {
+                        if (event.key === "Backspace" && !fractionNumeratorInput && showsWholeNumberField) {
                           wholeRef.current?.focus();
                         }
                       }}
@@ -3446,7 +3458,9 @@ export default function TypedResponseActivity({
                   </div>
                 </div>
                 <div className="mt-3 text-xs font-medium text-slate-500">
-                  {isMixedNumberResponse
+                  {isFlexibleFractionInput
+                    ? "Type a fraction or mixed number. Leave the fraction part blank if the answer is a whole number."
+                    : isMixedNumberResponse
                     ? usesFixedDenominator
                       ? "Type the whole number and numerator. The denominator stays fixed."
                       : "Type one mixed number. Leave the whole number blank if it is less than one."
@@ -3465,7 +3479,9 @@ export default function TypedResponseActivity({
                 {fractionWholeInput || fractionNumeratorInput || fractionDenominatorInput || (usesFixedDenominator && questionData.fixedDenominator) ? (
                   <div className="mt-3 rounded-2xl bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700">
                     Your number:{" "}
-                    {fractionNumeratorInput && (fractionDenominatorInput || questionData.fixedDenominator) ? (
+                    {isFlexibleFractionInput && fractionWholeInput && !fractionNumeratorInput && !fractionDenominatorInput ? (
+                      <span>{fractionWholeInput}</span>
+                    ) : fractionNumeratorInput && (fractionDenominatorInput || questionData.fixedDenominator) ? (
                       <Fraction
                         whole={fractionWholeInput || undefined}
                         numerator={fractionNumeratorInput}
