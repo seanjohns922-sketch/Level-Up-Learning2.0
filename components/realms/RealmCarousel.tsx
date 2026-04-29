@@ -46,16 +46,16 @@ function ApexTowerScene({
   levelNumber: number;
 }) {
   const portalPositions = [
-    { left: "50%", top: "17%", scale: 0.88 },
-    { left: "31%", top: "25%", scale: 0.78 },
-    { left: "69%", top: "25%", scale: 0.78 },
-    { left: "17%", top: "43%", scale: 0.66 },
-    { left: "83%", top: "43%", scale: 0.66 },
-    { left: "40%", top: "50%", scale: 0.62 },
-    { left: "60%", top: "50%", scale: 0.62 },
-    { left: "25%", top: "65%", scale: 0.56 },
-    { left: "75%", top: "65%", scale: 0.56 },
-    { left: "50%", top: "72%", scale: 0.55 },
+    { left: "50%", top: "30%", scale: 0.8 },
+    { left: "32%", top: "37%", scale: 0.7 },
+    { left: "68%", top: "37%", scale: 0.7 },
+    { left: "18%", top: "53%", scale: 0.58 },
+    { left: "82%", top: "53%", scale: 0.58 },
+    { left: "41%", top: "59%", scale: 0.54 },
+    { left: "59%", top: "59%", scale: 0.54 },
+    { left: "27%", top: "72%", scale: 0.48 },
+    { left: "73%", top: "72%", scale: 0.48 },
+    { left: "50%", top: "78%", scale: 0.47 },
   ];
 
   return (
@@ -100,7 +100,7 @@ function ApexTowerScene({
             style={{
               left: position.left,
               top: position.top,
-              transform: `translate(-50%, -50%) scale(${isSelected ? position.scale * 1.14 : position.scale})`,
+              transform: `translate(-50%, -50%) scale(${isSelected ? position.scale * 1.08 : position.scale})`,
               opacity: transitioning ? 0.55 : isSelected ? 1 : 0.78,
             }}
           >
