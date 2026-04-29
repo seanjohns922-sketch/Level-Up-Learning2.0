@@ -49,7 +49,7 @@ export default function NumbotCollectionPage() {
       {/* Layer 2: distant Number Nexus horizon environment */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, hsl(176, 58%, 8%) 0%, hsl(170, 58%, 6%) 46%, hsl(164, 52%, 4%) 100%)" }} />
-        <div className="absolute inset-x-0 top-[92px] h-[390px] overflow-hidden">
+        <div className="absolute inset-x-0 top-0 h-[500px] overflow-hidden">
           <img
             src="/images/lesson-hero-number-nexus.jpg"
             alt=""
@@ -63,8 +63,8 @@ export default function NumbotCollectionPage() {
               objectPosition: "78% center",
               transform: "scale(0.92)",
               transformOrigin: "center center",
-              maskImage: "linear-gradient(180deg, transparent 0%, black 8%, black 78%, transparent 100%)",
-              WebkitMaskImage: "linear-gradient(180deg, transparent 0%, black 8%, black 78%, transparent 100%)",
+              maskImage: "linear-gradient(180deg, black 0%, black 76%, transparent 100%)",
+              WebkitMaskImage: "linear-gradient(180deg, black 0%, black 76%, transparent 100%)",
             }}
           />
         </div>
