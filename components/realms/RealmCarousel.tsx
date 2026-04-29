@@ -292,6 +292,14 @@ export default function RealmCarousel() {
   const prevIdx = (currentIndex - 1 + REALMS.length) % REALMS.length;
   const nextIdx = (currentIndex + 1) % REALMS.length;
   const bgShift = -2 + (currentIndex / REALMS.length) * 4;
+  const isApexLevel = levelNumber >= 6;
+
+  function selectRealm(index: number) {
+    if (transitioning || index === currentIndex) return;
+    setTransitioning(true);
+    setCurrentIndex(index);
+    setTimeout(() => setTransitioning(false), 400);
+  }
 
   function enterRealm() {
     if (!isActive) return;
@@ -303,18 +311,30 @@ export default function RealmCarousel() {
       {/* Interior background */}
       <div className="fixed inset-0 z-0">
         <img
-          src="/images/realm-select-bg.jpg"
+          src={isApexLevel ? "/images/tower-hub-bg.jpg" : "/images/realm-select-bg.jpg"}
           alt=""
           className="w-full h-full object-cover"
           style={{
-            objectPosition: `${50 + bgShift}% 35%`,
+            objectPosition: isApexLevel ? "center 18%" : `${50 + bgShift}% 35%`,
             transition: "object-position 0.5s cubic-bezier(0.4,0,0.2,1)",
-            transform: "scale(1.05)",
+            transform: isApexLevel ? "scale(1.02)" : "scale(1.05)",
           }}
         />
-        {/* Warm vignette overlay */}
-        <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at center 60%, transparent 30%, rgba(0,0,0,0.5) 100%)" }} />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
+        {isApexLevel ? (
+          <>
+            <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at center 0%, rgba(255,245,190,0.34), transparent 34%), radial-gradient(ellipse at center 46%, transparent 28%, rgba(0,0,0,0.5) 100%)" }} />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-white/10" />
+            <div
+              className="absolute left-1/2 top-0 h-[58vh] w-[62vw] -translate-x-1/2"
+              style={{ background: "radial-gradient(ellipse at top, rgba(255,250,220,0.36), transparent 68%)", filter: "blur(10px)" }}
+            />
+          </>
+        ) : (
+          <>
+            <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at center 60%, transparent 30%, rgba(0,0,0,0.5) 100%)" }} />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
+          </>
+        )}
       </div>
 
       {/* Content */}
@@ -401,7 +421,7 @@ export default function RealmCarousel() {
               textShadow: "0 4px 20px rgba(0,0,0,0.6)",
             }}
           >
-            Choose Your Realm
+            {isApexLevel ? "Tower Apex" : "Choose Your Realm"}
           </h1>
         </div>
 
