@@ -352,9 +352,11 @@ function toExplicitWeeklyQuizQuestion(
       ? question.visual.numberLine
       : question.visual?.kind === "fractionNumberLine"
         ? question.visual.fractionNumberLine
+      : question.visual?.kind === "fractionContext"
+        ? question.visual.fractionContext
       : question.visual?.kind === "integerContext"
         ? question.visual.contextVisual
-        : undefined;
+      : undefined;
 
   const isFractionTypedAnswer = /\/|\d+\s+\d+\/\d+/.test(correctAnswer);
 
