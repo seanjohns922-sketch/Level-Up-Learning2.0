@@ -30,6 +30,120 @@ const DROPDOWN_REALM_IDS = [
   "pattern-peaks",
 ] as const;
 
+type RealmItem = (typeof REALMS)[number];
+
+function ApexTowerScene({
+  realms,
+  currentIndex,
+  transitioning,
+  onSelect,
+  levelNumber,
+}: {
+  realms: RealmItem[];
+  currentIndex: number;
+  transitioning: boolean;
+  onSelect: (index: number) => void;
+  levelNumber: number;
+}) {
+  const portalPositions = [
+    { left: "50%", top: "30%", scale: 0.8 },
+    { left: "32%", top: "37%", scale: 0.7 },
+    { left: "68%", top: "37%", scale: 0.7 },
+    { left: "18%", top: "53%", scale: 0.58 },
+    { left: "82%", top: "53%", scale: 0.58 },
+    { left: "41%", top: "59%", scale: 0.54 },
+    { left: "59%", top: "59%", scale: 0.54 },
+    { left: "27%", top: "72%", scale: 0.48 },
+    { left: "73%", top: "72%", scale: 0.48 },
+    { left: "50%", top: "78%", scale: 0.47 },
+  ];
+
+  return (
+    <div className="relative w-full max-w-5xl mx-auto" style={{ height: "420px" }}>
+      <div
+        className="absolute left-1/2 bottom-0 h-[118px] w-[360px] -translate-x-1/2 rounded-t-full"
+        style={{
+          background: "linear-gradient(180deg, rgba(230,250,255,0.16), rgba(32,42,38,0.68) 45%, rgba(8,10,12,0.9))",
+          border: "1px solid rgba(255,255,255,0.16)",
+          boxShadow: "0 -12px 42px rgba(255,244,190,0.16), inset 0 1px 0 rgba(255,255,255,0.22)",
+        }}
+      />
+      <div
+        className="absolute left-1/2 bottom-[46px] h-[74px] w-[210px] -translate-x-1/2 rounded-full"
+        style={{
+          background: "radial-gradient(ellipse at center, rgba(255,248,205,0.42), rgba(52,211,153,0.13) 42%, transparent 72%)",
+          filter: "blur(1px)",
+        }}
+      />
+
+      {/* child/avatar at the tower apex */}
+      <div className="absolute left-1/2 bottom-[102px] z-20 -translate-x-1/2">
+        <div className="relative mx-auto h-14 w-10">
+          <div className="absolute left-1/2 top-0 h-5 w-5 -translate-x-1/2 rounded-full bg-white/90 shadow-[0_0_16px_rgba(255,248,210,0.35)]" />
+          <div className="absolute left-1/2 top-[18px] h-8 w-7 -translate-x-1/2 rounded-t-2xl bg-emerald-300/90 shadow-[0_0_14px_rgba(52,211,153,0.35)]" />
+          <div className="absolute left-[8px] top-[43px] h-4 w-2 rounded-full bg-white/75" />
+          <div className="absolute right-[8px] top-[43px] h-4 w-2 rounded-full bg-white/75" />
+        </div>
+      </div>
+
+      {realms.map((realm, index) => {
+        const isSelected = index === currentIndex;
+        const position = portalPositions[index] ?? portalPositions[portalPositions.length - 1];
+        const isActive = realm.active || DEMO_MODE;
+
+        return (
+          <button
+            key={realm.id}
+            type="button"
+            onClick={() => onSelect(index)}
+            className="absolute z-10 -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-all duration-300"
+            style={{
+              left: position.left,
+              top: position.top,
+              transform: `translate(-50%, -50%) scale(${isSelected ? position.scale * 1.08 : position.scale})`,
+              opacity: transitioning ? 0.55 : isSelected ? 1 : 0.78,
+            }}
+          >
+            <div
+              className="relative mx-auto overflow-hidden rounded-t-full"
+              style={{
+                width: "130px",
+                height: "188px",
+                background: "linear-gradient(180deg, rgba(42,38,34,0.88), rgba(10,11,12,0.96))",
+                border: `3px solid ${isSelected ? realm.color : "rgba(255,245,205,0.2)"}`,
+                boxShadow: isSelected
+                  ? `0 0 32px ${realm.colorDim}, inset 0 0 30px ${realm.colorDim}, 0 16px 30px rgba(0,0,0,0.28)`
+                  : "inset 0 0 24px rgba(0,0,0,0.45), 0 10px 22px rgba(0,0,0,0.22)",
+              }}
+            >
+              <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at center 58%, ${realm.colorDim}, transparent 68%)` }} />
+              {isSelected ? (
+                <RealmPortalPreview
+                  realmId={realm.id}
+                  symbol={realm.symbol}
+                  color={isActive ? realm.color : "rgba(255,255,255,0.35)"}
+                  colorDim={isActive ? realm.colorDim : "rgba(255,255,255,0.1)"}
+                  isSelected
+                  levelNumber={levelNumber}
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-4xl" style={{ color: realm.color, filter: `drop-shadow(0 0 10px ${realm.colorDim})` }}>
+                    {realm.symbol}
+                  </span>
+                </div>
+              )}
+            </div>
+            <p className="mt-2 max-w-[150px] truncate text-center text-[11px] font-black text-white/70 drop-shadow-lg">
+              {realm.name}
+            </p>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function RealmCarousel() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -178,6 +292,14 @@ export default function RealmCarousel() {
   const prevIdx = (currentIndex - 1 + REALMS.length) % REALMS.length;
   const nextIdx = (currentIndex + 1) % REALMS.length;
   const bgShift = -2 + (currentIndex / REALMS.length) * 4;
+  const isApexLevel = levelNumber >= 6;
+
+  function selectRealm(index: number) {
+    if (transitioning || index === currentIndex) return;
+    setTransitioning(true);
+    setCurrentIndex(index);
+    setTimeout(() => setTransitioning(false), 400);
+  }
 
   function enterRealm() {
     if (!isActive) return;
@@ -189,18 +311,30 @@ export default function RealmCarousel() {
       {/* Interior background */}
       <div className="fixed inset-0 z-0">
         <img
-          src="/images/realm-select-bg.jpg"
+          src={isApexLevel ? "/images/tower-hub-bg.jpg" : "/images/realm-select-bg.jpg"}
           alt=""
           className="w-full h-full object-cover"
           style={{
-            objectPosition: `${50 + bgShift}% 35%`,
+            objectPosition: isApexLevel ? "center 18%" : `${50 + bgShift}% 35%`,
             transition: "object-position 0.5s cubic-bezier(0.4,0,0.2,1)",
-            transform: "scale(1.05)",
+            transform: isApexLevel ? "scale(1.02)" : "scale(1.05)",
           }}
         />
-        {/* Warm vignette overlay */}
-        <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at center 60%, transparent 30%, rgba(0,0,0,0.5) 100%)" }} />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
+        {isApexLevel ? (
+          <>
+            <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at center 0%, rgba(255,245,190,0.34), transparent 34%), radial-gradient(ellipse at center 46%, transparent 28%, rgba(0,0,0,0.5) 100%)" }} />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-white/10" />
+            <div
+              className="absolute left-1/2 top-0 h-[58vh] w-[62vw] -translate-x-1/2"
+              style={{ background: "radial-gradient(ellipse at top, rgba(255,250,220,0.36), transparent 68%)", filter: "blur(10px)" }}
+            />
+          </>
+        ) : (
+          <>
+            <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at center 60%, transparent 30%, rgba(0,0,0,0.5) 100%)" }} />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
+          </>
+        )}
       </div>
 
       {/* Content */}
@@ -279,20 +413,29 @@ export default function RealmCarousel() {
         </div>
 
         {/* Title */}
-        <div className="text-center mt-2 mb-4">
+        <div className="relative z-20 text-center mt-2 mb-0">
           <h1
             className="text-3xl md:text-4xl font-black text-white tracking-wide"
             style={{
               fontFamily: "'Quicksand', 'Nunito', sans-serif",
-              textShadow: "0 4px 20px rgba(0,0,0,0.6)",
+              textShadow: "0 4px 20px rgba(0,0,0,0.75), 0 0 20px rgba(255,245,190,0.25)",
             }}
           >
-            Choose Your Realm
+            {isApexLevel ? "Tower Apex" : "Choose Your Realm"}
           </h1>
         </div>
 
         {/* Portal Carousel */}
         <div className="flex-1 flex flex-col items-center justify-center relative px-4">
+          {isApexLevel ? (
+            <ApexTowerScene
+              realms={REALMS}
+              currentIndex={currentIndex}
+              transitioning={transitioning}
+              onSelect={selectRealm}
+              levelNumber={levelNumber}
+            />
+          ) : (
           <div className="relative w-full max-w-3xl mx-auto" style={{ height: "340px" }}>
 
             {/* Side doorways (prev & next) */}
@@ -433,6 +576,7 @@ export default function RealmCarousel() {
               </svg>
             </button>
           </div>
+          )}
 
           {/* Info Panel */}
           <div
