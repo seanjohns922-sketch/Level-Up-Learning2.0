@@ -39,8 +39,8 @@ export default function RealmCarousel() {
   const [entered, setEntered] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
   const [isLevelMenuOpen, setIsLevelMenuOpen] = useState(false);
-  const [studentYear, setStudentYear] = useState(level);
-  const [programStore, setProgramStore] = useState<ReturnType<typeof readProgramStore>>({});
+  const [studentYear, setStudentYear] = useState(() => readProgress()?.year ?? level);
+  const [programStore, setProgramStore] = useState<ReturnType<typeof readProgramStore>>(() => readProgramStore());
   const levelMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -49,9 +49,12 @@ export default function RealmCarousel() {
   }, []);
 
   useEffect(() => {
-    const progress = readProgress();
-    setStudentYear(progress?.year ?? level);
-    setProgramStore(readProgramStore());
+    const t = window.setTimeout(() => {
+      const progress = readProgress();
+      setStudentYear(progress?.year ?? level);
+      setProgramStore(readProgramStore());
+    }, 0);
+    return () => window.clearTimeout(t);
   }, [level]);
 
   const levelLabel = level.startsWith("Year")
