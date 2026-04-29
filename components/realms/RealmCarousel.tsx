@@ -427,6 +427,15 @@ export default function RealmCarousel() {
 
         {/* Portal Carousel */}
         <div className="flex-1 flex flex-col items-center justify-center relative px-4">
+          {isApexLevel ? (
+            <ApexTowerScene
+              realms={REALMS}
+              currentIndex={currentIndex}
+              transitioning={transitioning}
+              onSelect={selectRealm}
+              levelNumber={levelNumber}
+            />
+          ) : (
           <div className="relative w-full max-w-3xl mx-auto" style={{ height: "340px" }}>
 
             {/* Side doorways (prev & next) */}
@@ -567,6 +576,7 @@ export default function RealmCarousel() {
               </svg>
             </button>
           </div>
+          )}
 
           {/* Info Panel */}
           <div
