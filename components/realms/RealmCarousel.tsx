@@ -427,15 +427,24 @@ export default function RealmCarousel() {
               }}
             >
               {isTopChamber ? (
-                <div
-                  className="absolute left-1/2 top-[92%] -translate-x-1/2 -z-10 h-24 w-[320px] rounded-full"
-                  style={{
-                    background:
-                      "radial-gradient(ellipse at center, hsl(172 90% 68% / 0.28) 0%, hsl(184 70% 18% / 0.38) 42%, transparent 72%)",
-                    border: "1px solid hsl(172 78% 74% / 0.24)",
-                    boxShadow: "0 12px 48px hsl(174 80% 42% / 0.18), inset 0 0 28px hsl(178 88% 70% / 0.12)",
-                  }}
-                />
+                <>
+                  <div
+                    className="absolute left-1/2 top-[92%] -translate-x-1/2 -z-10 h-28 w-[360px] rounded-full"
+                    style={{
+                      background:
+                        "radial-gradient(ellipse at center, hsl(172 90% 68% / 0.24) 0%, hsl(34 24% 22% / 0.72) 36%, hsl(24 22% 8% / 0.72) 70%)",
+                      border: "2px solid hsl(38 26% 54% / 0.28)",
+                      boxShadow: "0 18px 54px hsl(0 0% 0% / 0.32), inset 0 0 30px hsl(178 88% 70% / 0.14)",
+                    }}
+                  />
+                  <div
+                    className="absolute left-1/2 top-[103%] -translate-x-1/2 -z-10 h-10 w-[250px] rounded-full"
+                    style={{
+                      background:
+                        "repeating-radial-gradient(ellipse at center, hsl(174 80% 70% / 0.28) 0 2px, transparent 2px 18px)",
+                    }}
+                  />
+                </>
               ) : null}
               {/* Portal arch */}
               <div
