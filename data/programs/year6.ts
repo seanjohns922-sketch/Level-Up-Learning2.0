@@ -307,15 +307,15 @@ const year6Rows: ProgramRow[] = [
   },
   {
     week: 6,
-    focus: "Add and subtract fractions accurately once denominators are matched",
+    focus: "Add and subtract fractions by choosing efficient denominators and simplifying results",
     lesson: 2,
     topic: "Add & Subtract Fractions",
-    activity: "Rewrite related fractions, solve, and check results using common denominators.",
+    activity: "Choose efficient denominators, solve accurately, and decide which fraction strategies are worth using.",
     curriculum: ["AC9M6N04"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "related_denominator_visual" }),
-      makeActivity("multiple_choice", 1, { mode: "related_denominator_quick_apply" }),
-      makeActivity("typed_response", 1, { mode: "related_denominator_build" }),
+      makeActivity("typed_response", 1, { mode: "y6_fraction_add_subtract_core" }),
+      makeActivity("typed_response", 1, { mode: "y6_fraction_add_subtract_mixed" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_fraction_add_subtract_reason" }),
     ],
   },
   {

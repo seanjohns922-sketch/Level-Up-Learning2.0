@@ -9371,6 +9371,232 @@ function generateGenericQuestion(
     };
   }
 
+  if (explicitMode === "y6_fraction_add_subtract_core") {
+    const templates: Array<TypedResponseQuestion> = [
+      { kind: "typed_response", prompt: "Solve 3/4 + 5/6.", answer: "19/12", helper: "Choose an efficient common denominator first.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 7/8 - 1/6.", answer: "17/24", helper: "Match the parts before subtracting.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 2/3 + 5/12.", answer: "13/12", helper: "Use one denominator that fits both fractions.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 5/9 + 7/12.", answer: "41/36", helper: "Pick the lowest useful denominator.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 11/10 - 3/5.", answer: "1/2", helper: "Simplify the result if you can.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 4/7 + 5/14.", answer: "13/14", helper: "Only one fraction needs renaming here.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 9/10 - 1/4.", answer: "13/20", helper: "Choose the common denominator efficiently.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 7/12 + 5/18.", answer: "31/36", helper: "Think in sixths of a denominator if that helps.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 13/15 - 2/9.", answer: "29/45", helper: "Use the smallest denominator that works for both.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 5/8 + 3/10.", answer: "37/40", helper: "Build matching parts before you add.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 11/12 - 5/18.", answer: "23/36", helper: "Subtract once the fractions name equal-sized parts.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 7/9 + 5/12.", answer: "43/36", helper: "A useful denominator can still lead to an improper answer.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 15/16 - 3/8.", answer: "9/16", helper: "Keep the denominator efficient and simplify if needed.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 5/6 + 7/20.", answer: "71/60", helper: "The denominator choice matters here.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 17/18 - 1/3.", answer: "11/18", helper: "Rename the third first, then subtract.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 11/14 + 3/7.", answer: "17/14", helper: "One denominator already suggests the efficient choice.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 19/20 - 5/12.", answer: "8/15", helper: "Simplify after subtracting if you can.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 7/10 + 11/15.", answer: "43/30", helper: "Keep the denominator manageable.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 13/18 - 1/4.", answer: "17/36", helper: "A quarter can be renamed efficiently here.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 5/12 + 7/8.", answer: "31/24", helper: "Choose one denominator, then combine.", placeholder: "Type a fraction or mixed number" },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      ...chosen,
+      inputType: "flexible_fraction",
+    };
+  }
+
+  if (explicitMode === "y6_fraction_add_subtract_mixed") {
+    const templates: Array<TypedResponseQuestion> = [
+      { kind: "typed_response", prompt: "Solve 1 3/4 + 2/3.", answer: "29/12", helper: "Convert if needed, then choose a smart denominator.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 3 1/5 - 1 2/5.", answer: "9/5", helper: "Keep the answer in any equivalent mixed or improper form.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 2 1/2 + 3/4.", answer: "13/4", helper: "Use one denominator and combine carefully.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 4 2/3 - 1 5/6.", answer: "17/6", helper: "Rename the mixed numbers efficiently before subtracting.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 5/6 + 7/3.", answer: "19/6", helper: "An improper total is fine if it is correct.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 1 1/2 + 5/8.", answer: "17/8", helper: "Convert to matching parts, then add.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 2 3/4 - 5/6.", answer: "23/12", helper: "Use a common denominator before subtracting.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 7/4 + 1 1/2.", answer: "13/4", helper: "Work with quarters if that is the efficient choice.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 3 2/3 + 5/9.", answer: "38/9", helper: "Choose the denominator that already fits one fraction.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 11/6 - 3/4.", answer: "13/12", helper: "Convert, match parts, then simplify if possible.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 2 5/6 - 7/10.", answer: "32/15", helper: "A mixed number can become an improper fraction first.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 9/5 + 1 3/10.", answer: "31/10", helper: "Use tenths to keep the working efficient.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 4 1/4 - 2/3.", answer: "43/12", helper: "Keep the denominator efficient and subtract carefully.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 13/8 + 3/4.", answer: "19/8", helper: "An improper result can still be the cleanest form.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 3 3/5 - 1 7/10.", answer: "19/10", helper: "Convert the mixed numbers to a common denominator first.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 2 2/3 + 11/12.", answer: "43/12", helper: "Use twelfths if that helps you combine quickly.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 17/6 - 1 1/3.", answer: "3/2", helper: "The final answer may simplify to a mixed number or improper fraction.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 1 7/8 + 5/12.", answer: "55/24", helper: "Choose the denominator before you add the numerators.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 3 1/4 - 7/8.", answer: "19/8", helper: "Use eighths to keep the subtraction efficient.", placeholder: "Type a fraction or mixed number" },
+      { kind: "typed_response", prompt: "Solve 5/3 + 2 1/6.", answer: "23/6", helper: "Convert both numbers into sixths if that is the cleanest route.", placeholder: "Type a fraction or mixed number" },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      ...chosen,
+      inputType: "flexible_fraction",
+    };
+  }
+
+  if (explicitMode === "y6_fraction_add_subtract_reason") {
+    const templates: Array<MultipleChoiceQuestion> = [
+      {
+        kind: "multiple_choice",
+        prompt: "A student says 3/4 + 2/5 = 5/9. Is this correct?",
+        options: ["Yes", "No"],
+        answer: "No",
+        helper: "You cannot add denominators like whole numbers.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which total is larger?",
+        options: ["5/6 + 1/3", "3/4 + 2/5", "They are equal"],
+        answer: "5/6 + 1/3",
+        helper: "Find efficient common denominators for both totals.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Why must denominators match before adding fractions?",
+        options: [
+          "They must represent equal-sized parts",
+          "The numerators need to be the same",
+          "It makes the denominator smaller",
+        ],
+        answer: "They must represent equal-sized parts",
+        helper: "Fractions can only combine directly when the parts are the same size.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which is more efficient for 5/6 + 1/4?",
+        options: ["Use 12", "Use 24", "Use 48"],
+        answer: "Use 12",
+        helper: "Choose the smallest useful denominator.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which is correct for 7/8 + 5/12 - 1/6?",
+        options: ["9/8", "7/8", "11/12"],
+        answer: "9/8",
+        helper: "Match the denominators before working across the whole expression.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "A student says 2/3 + 1/6 = 3/9. What is the mistake?",
+        options: [
+          "They added the denominators instead of renaming the fractions",
+          "They should have multiplied the numerators first",
+          "They should have simplified before adding",
+        ],
+        answer: "They added the denominators instead of renaming the fractions",
+        helper: "The denominator does not combine that way.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which is greater?",
+        options: ["7/8 - 1/4", "2/3 + 1/6", "They are equal"],
+        answer: "2/3 + 1/6",
+        helper: "Compare the two totals after rewriting efficiently.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which denominator is best for 7/10 + 5/6?",
+        options: ["30", "60", "120"],
+        answer: "30",
+        helper: "Pick the lowest denominator that works for both fractions.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "A student writes 1 1/2 + 3/4 = 4 1/4. Is this correct?",
+        options: ["Yes", "No"],
+        answer: "No",
+        helper: "Check the total size after converting or matching denominators.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which result is already simplified?",
+        options: ["17/24", "18/24", "15/20"],
+        answer: "17/24",
+        helper: "Look for any common factor left in the fraction.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "What is the best first step for 3/4 + 5/8?",
+        options: [
+          "Change 3/4 into eighths",
+          "Change 5/8 into sixteenths",
+          "Add the numerators first",
+        ],
+        answer: "Change 3/4 into eighths",
+        helper: "One fraction already gives you the efficient denominator.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "How do these compare: 1 3/4 - 2/3 and 5/6 + 1/4?",
+        options: ["The first is larger", "The second is larger", "They are equal"],
+        answer: "They are equal",
+        helper: "Work both totals out carefully before comparing them.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "A student says 11/10 - 3/5 = 8/5. Is this correct?",
+        options: ["Yes", "No"],
+        answer: "No",
+        helper: "Rename 3/5 before subtracting.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which expression is most efficiently solved with denominator 18?",
+        options: ["5/6 + 7/9", "3/4 + 5/8", "7/10 - 1/6"],
+        answer: "5/6 + 7/9",
+        helper: "Look for the pair whose denominators share 18 as the lowest common multiple.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which answer matches 4 2/3 - 1 5/6?",
+        options: ["2 5/6", "3 1/6", "1 5/6"],
+        answer: "2 5/6",
+        helper: "Convert to a common denominator before subtracting.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "To subtract 7/8 - 1/6, which denominator works efficiently?",
+        options: ["24", "48", "56"],
+        answer: "24",
+        helper: "Choose the smallest denominator that fits both fractions.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which total is closer to 2?",
+        options: ["5/6 + 7/8", "3/4 + 11/12", "They are equally close"],
+        answer: "5/6 + 7/8",
+        helper: "Find both totals, then compare their distance from 2.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "A student says, “Use 60 for 5/6 + 1/4 because big denominators are safer.” What is the best response?",
+        options: [
+          "Use 12 instead because it is the lowest efficient denominator",
+          "Use 60 because larger denominators are always better",
+          "Skip common denominators and add the numerators",
+        ],
+        answer: "Use 12 instead because it is the lowest efficient denominator",
+        helper: "Efficiency matters when more than one denominator works.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which expression equals 1 1/2?",
+        options: ["5/6 + 2/3", "7/8 + 1/3", "3/4 + 1/2"],
+        answer: "5/6 + 2/3",
+        helper: "Find the exact total for each expression.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which calculation is impossible as written?",
+        options: ["3/4 + 5/6 = 19/12", "7/8 - 1/6 = 17/24", "2/3 + 5/12 = 7/15"],
+        answer: "2/3 + 5/12 = 7/15",
+        helper: "Check which result comes from combining fractions incorrectly.",
+      },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      ...chosen,
+      options: shuffle([...chosen.options]),
+    };
+  }
+
   if (explicitMode === "equivalent_fraction_build") {
     const templates = [
       { left: [1, 2], right: [undefined, 6], answer: "3", missing: "numerator", prompt: "Fill in the missing numerator" },
