@@ -202,6 +202,22 @@ export type IntegerContextVisualData = {
   numberLine: IntegerNumberLineVisualData;
 };
 
+export type FractionContextVisualData = {
+  type: "fraction_context";
+  context: "tank" | "runner" | "recipe" | "rope" | "task" | "container" | "book" | "trail" | "fuel" | "project";
+  title: string;
+  denominator: number;
+  totalUnits: number;
+  startUnits: number;
+  startLabel: string;
+  steps: Array<{
+    kind: "add" | "remove";
+    units: number;
+    label: string;
+    stageLabel: string;
+  }>;
+};
+
 export type PlaceValueBuilderQuestion = {
   kind: "place_value_builder";
   prompt: string;
@@ -848,6 +864,109 @@ function simplifyFractionCandidate(value: string) {
   const [numerator, denominator] = value.split("/").map(Number);
   if (!Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator === 0) return value;
   return simplifyFractionString(numerator, denominator);
+}
+
+function parseFlexibleFractionParts(value: string) {
+  const trimmed = value.trim();
+  const mixedMatch = trimmed.match(/^(\d+)\s+(\d+)\/(\d+)$/);
+  if (mixedMatch) {
+    const whole = Number(mixedMatch[1]);
+    const numerator = Number(mixedMatch[2]);
+    const denominator = Number(mixedMatch[3]);
+    if (!Number.isFinite(whole) || !Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator === 0) {
+      return null;
+    }
+    return { whole, numerator, denominator };
+  }
+
+  const simpleMatch = trimmed.match(/^(\d+)\/(\d+)$/);
+  if (simpleMatch) {
+    const numerator = Number(simpleMatch[1]);
+    const denominator = Number(simpleMatch[2]);
+    if (!Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator === 0) {
+      return null;
+    }
+    return { whole: 0, numerator, denominator };
+  }
+
+  const wholeMatch = trimmed.match(/^(\d+)$/);
+  if (wholeMatch) {
+    const whole = Number(wholeMatch[1]);
+    if (!Number.isFinite(whole)) return null;
+    return { whole, numerator: 0, denominator: 1 };
+  }
+
+  return null;
+}
+
+function fractionPartsToImproper({
+  whole,
+  numerator,
+  denominator,
+}: {
+  whole: number;
+  numerator: number;
+  denominator: number;
+}) {
+  return whole * denominator + numerator;
+}
+
+function makeFractionContextVisual({
+  context,
+  title,
+  start,
+  steps,
+}: {
+  context: FractionContextVisualData["context"];
+  title: string;
+  start: string;
+  steps: Array<{ kind: "add" | "remove"; fraction: string; stageLabel: string }>;
+}): FractionContextVisualData {
+  const startParts = parseFlexibleFractionParts(start);
+  if (!startParts) {
+    throw new Error(`Invalid start fraction for context visual: ${start}`);
+  }
+
+  const stepParts = steps.map((step) => {
+    const parsed = parseFlexibleFractionParts(step.fraction);
+    if (!parsed) {
+      throw new Error(`Invalid step fraction for context visual: ${step.fraction}`);
+    }
+    return { ...step, parsed };
+  });
+
+  let denominator = startParts.denominator;
+  for (const step of stepParts) {
+    denominator = lowestCommonMultiple(denominator, step.parsed.denominator);
+  }
+
+  const startUnits = fractionPartsToImproper(startParts) * (denominator / startParts.denominator);
+  let runningUnits = startUnits;
+  let maxUnits = startUnits;
+
+  for (const step of stepParts) {
+    const units = fractionPartsToImproper(step.parsed) * (denominator / step.parsed.denominator);
+    runningUnits += step.kind === "add" ? units : -units;
+    maxUnits = Math.max(maxUnits, runningUnits);
+  }
+
+  const totalWholes = Math.max(1, Math.ceil(maxUnits / denominator));
+
+  return {
+    type: "fraction_context",
+    context,
+    title,
+    denominator,
+    totalUnits: totalWholes * denominator,
+    startUnits,
+    startLabel: start,
+    steps: stepParts.map((step) => ({
+      kind: step.kind,
+      units: fractionPartsToImproper(step.parsed) * (denominator / step.parsed.denominator),
+      label: step.fraction,
+      stageLabel: step.stageLabel,
+    })),
+  };
 }
 
 function commonRelatedDenominator(template: RelatedDenominatorTemplate) {
@@ -3057,6 +3176,7 @@ export type MultipleChoiceQuestion = {
     | DecimalVisualData
     | DecimalShiftVisualData
     | FractionNumberLineVisualData
+    | FractionContextVisualData
     | IntegerNumberLineVisualData
     | IntegerContextVisualData
     | MoneyVisualData
@@ -3098,6 +3218,7 @@ export type TypedResponseQuestion = {
     | DecimalVisualData
     | DecimalShiftVisualData
     | FractionNumberLineVisualData
+    | FractionContextVisualData
     | IntegerNumberLineVisualData
     | IntegerContextVisualData
     | ColumnMultiplicationVisualData
@@ -16035,6 +16156,15 @@ function generateGenericQuestion(
         answer: "25/24",
         helper: "Two completed parts are being combined.",
         placeholder: "Type a fraction or mixed number",
+        visual: makeFractionContextVisual({
+          context: "task",
+          title: "Task progress",
+          start: "0",
+          steps: [
+            { kind: "add", fraction: "2/3", stageLabel: "Morning completed" },
+            { kind: "add", fraction: "3/8", stageLabel: "Afternoon completed" },
+          ],
+        }),
       },
       {
         kind: "typed_response",
@@ -16042,6 +16172,15 @@ function generateGenericQuestion(
         answer: "1/3",
         helper: "Track both amounts removed from the starting level.",
         placeholder: "Type a fraction or mixed number",
+        visual: makeFractionContextVisual({
+          context: "tank",
+          title: "Tank capacity",
+          start: "5/6",
+          steps: [
+            { kind: "remove", fraction: "1/3", stageLabel: "Used first" },
+            { kind: "remove", fraction: "1/6", stageLabel: "Used again" },
+          ],
+        }),
       },
       {
         kind: "typed_response",
@@ -16049,6 +16188,15 @@ function generateGenericQuestion(
         answer: "5/8",
         helper: "First find what has been run, then compare to the 2 km goal.",
         placeholder: "Type a fraction or mixed number",
+        visual: makeFractionContextVisual({
+          context: "runner",
+          title: "Run target",
+          start: "0",
+          steps: [
+            { kind: "add", fraction: "3/4", stageLabel: "Morning run" },
+            { kind: "add", fraction: "5/8", stageLabel: "Evening run" },
+          ],
+        }),
       },
       {
         kind: "typed_response",
@@ -16056,13 +16204,28 @@ function generateGenericQuestion(
         answer: "7/20",
         helper: "Subtract what is already added from what is needed.",
         placeholder: "Type a fraction or mixed number",
+        visual: makeFractionContextVisual({
+          context: "recipe",
+          title: "Sugar needed",
+          start: "0",
+          steps: [{ kind: "add", fraction: "1/4", stageLabel: "Already added" }],
+        }),
       },
       {
         kind: "typed_response",
-        prompt: "A tank holds 9/4 litres. 2/3 litre is used, then 3/4 litre is added. How much is in the tank now?",
-        answer: "7/3",
+        prompt: "A tank is 4/3 full. 1/6 is used, then 5/12 is added. How full is the tank now?",
+        answer: "19/12",
         helper: "Follow the two changes in order.",
         placeholder: "Type a fraction or mixed number",
+        visual: makeFractionContextVisual({
+          context: "tank",
+          title: "Tank level",
+          start: "4/3",
+          steps: [
+            { kind: "remove", fraction: "1/6", stageLabel: "Used" },
+            { kind: "add", fraction: "5/12", stageLabel: "Added back" },
+          ],
+        }),
       },
       {
         kind: "typed_response",
@@ -16070,6 +16233,15 @@ function generateGenericQuestion(
         answer: "23/24",
         helper: "Add the distance covered, then compare with the plan.",
         placeholder: "Type a fraction or mixed number",
+        visual: makeFractionContextVisual({
+          context: "trail",
+          title: "Hike progress",
+          start: "0",
+          steps: [
+            { kind: "add", fraction: "7/8", stageLabel: "First walk" },
+            { kind: "add", fraction: "2/3", stageLabel: "Second walk" },
+          ],
+        }),
       },
       {
         kind: "typed_response",
@@ -16077,6 +16249,15 @@ function generateGenericQuestion(
         answer: "23/20",
         helper: "Track the subtraction and addition carefully.",
         placeholder: "Type a fraction or mixed number",
+        visual: makeFractionContextVisual({
+          context: "tank",
+          title: "Storage tank",
+          start: "11/10",
+          steps: [
+            { kind: "remove", fraction: "1/5", stageLabel: "Drained" },
+            { kind: "add", fraction: "1/4", stageLabel: "Added back" },
+          ],
+        }),
       },
       {
         kind: "typed_response",
@@ -16084,6 +16265,15 @@ function generateGenericQuestion(
         answer: "13/24",
         helper: "Work out the total completed, then subtract from the target.",
         placeholder: "Type a fraction or mixed number",
+        visual: makeFractionContextVisual({
+          context: "project",
+          title: "Project target",
+          start: "0",
+          steps: [
+            { kind: "add", fraction: "5/6", stageLabel: "Session one" },
+            { kind: "add", fraction: "3/8", stageLabel: "Session two" },
+          ],
+        }),
       },
       {
         kind: "typed_response",
@@ -16091,6 +16281,15 @@ function generateGenericQuestion(
         answer: "7/4",
         helper: "Use one efficient denominator across both changes.",
         placeholder: "Type a fraction or mixed number",
+        visual: makeFractionContextVisual({
+          context: "recipe",
+          title: "Stock amount",
+          start: "13/6",
+          steps: [
+            { kind: "remove", fraction: "3/4", stageLabel: "Used" },
+            { kind: "add", fraction: "1/3", stageLabel: "Added" },
+          ],
+        }),
       },
       {
         kind: "typed_response",
@@ -16098,6 +16297,15 @@ function generateGenericQuestion(
         answer: "17/24",
         helper: "Combine the distance ridden, then compare it with the target.",
         placeholder: "Type a fraction or mixed number",
+        visual: makeFractionContextVisual({
+          context: "runner",
+          title: "Ride progress",
+          start: "0",
+          steps: [
+            { kind: "add", fraction: "5/8", stageLabel: "Before lunch" },
+            { kind: "add", fraction: "11/12", stageLabel: "After lunch" },
+          ],
+        }),
       },
       {
         kind: "typed_response",
@@ -16105,6 +16313,15 @@ function generateGenericQuestion(
         answer: "47/30",
         helper: "Follow the changes one by one.",
         placeholder: "Type a fraction or mixed number",
+        visual: makeFractionContextVisual({
+          context: "container",
+          title: "Container amount",
+          start: "7/5",
+          steps: [
+            { kind: "remove", fraction: "1/2", stageLabel: "Poured out" },
+            { kind: "add", fraction: "2/3", stageLabel: "Added" },
+          ],
+        }),
       },
       {
         kind: "typed_response",
@@ -16112,13 +16329,31 @@ function generateGenericQuestion(
         answer: "5/12",
         helper: "Add what is read, then subtract from the total needed.",
         placeholder: "Type a fraction or mixed number",
+        visual: makeFractionContextVisual({
+          context: "book",
+          title: "Reading progress",
+          start: "0",
+          steps: [
+            { kind: "add", fraction: "2/3", stageLabel: "Session one" },
+            { kind: "add", fraction: "3/4", stageLabel: "Session two" },
+          ],
+        }),
       },
       {
         kind: "typed_response",
-        prompt: "A tank is 4/3 full. 1/6 is used, then 5/12 is added. How full is the tank now?",
-        answer: "19/12",
+        prompt: "A tank holds 9/4 litres. 2/3 litre is used, then 3/4 litre is added. How much is in the tank now?",
+        answer: "7/3",
         helper: "A multi-step context needs each change tracked in order.",
         placeholder: "Type a fraction or mixed number",
+        visual: makeFractionContextVisual({
+          context: "tank",
+          title: "Tank litres",
+          start: "9/4",
+          steps: [
+            { kind: "remove", fraction: "2/3", stageLabel: "Used" },
+            { kind: "add", fraction: "3/4", stageLabel: "Added" },
+          ],
+        }),
       },
       {
         kind: "typed_response",
@@ -16126,6 +16361,15 @@ function generateGenericQuestion(
         answer: "4/3",
         helper: "Subtract first, then add the amount tied back.",
         placeholder: "Type a fraction or mixed number",
+        visual: makeFractionContextVisual({
+          context: "rope",
+          title: "Rope length",
+          start: "17/12",
+          steps: [
+            { kind: "remove", fraction: "1/4", stageLabel: "Cut off" },
+            { kind: "add", fraction: "1/6", stageLabel: "Tied back on" },
+          ],
+        }),
       },
       {
         kind: "typed_response",
@@ -16133,6 +16377,16 @@ function generateGenericQuestion(
         answer: "25/24",
         helper: "Find the total run so far before comparing to 3 km.",
         placeholder: "Type a fraction or mixed number",
+        visual: makeFractionContextVisual({
+          context: "runner",
+          title: "Race plan",
+          start: "0",
+          steps: [
+            { kind: "add", fraction: "5/6", stageLabel: "First run" },
+            { kind: "add", fraction: "7/8", stageLabel: "Second run" },
+            { kind: "add", fraction: "1/4", stageLabel: "Third run" },
+          ],
+        }),
       },
       {
         kind: "typed_response",
@@ -16140,6 +16394,15 @@ function generateGenericQuestion(
         answer: "37/24",
         helper: "Use one denominator that works for all three fractions.",
         placeholder: "Type a fraction or mixed number",
+        visual: makeFractionContextVisual({
+          context: "container",
+          title: "Mixture amount",
+          start: "19/12",
+          steps: [
+            { kind: "remove", fraction: "2/3", stageLabel: "Removed" },
+            { kind: "add", fraction: "5/8", stageLabel: "Added" },
+          ],
+        }),
       },
       {
         kind: "typed_response",
@@ -16147,6 +16410,15 @@ function generateGenericQuestion(
         answer: "7/24",
         helper: "Compare the target time with the amount already completed.",
         placeholder: "Type a fraction or mixed number",
+        visual: makeFractionContextVisual({
+          context: "task",
+          title: "Task time",
+          start: "0",
+          steps: [
+            { kind: "add", fraction: "3/8", stageLabel: "Block one" },
+            { kind: "add", fraction: "7/12", stageLabel: "Block two" },
+          ],
+        }),
       },
       {
         kind: "typed_response",
@@ -16154,6 +16426,15 @@ function generateGenericQuestion(
         answer: "11/10",
         helper: "Two amounts are taken away from the start.",
         placeholder: "Type a fraction or mixed number",
+        visual: makeFractionContextVisual({
+          context: "container",
+          title: "Starting amount",
+          start: "8/5",
+          steps: [
+            { kind: "remove", fraction: "1/3", stageLabel: "Used first" },
+            { kind: "remove", fraction: "1/6", stageLabel: "Used again" },
+          ],
+        }),
       },
       {
         kind: "typed_response",
@@ -16161,6 +16442,12 @@ function generateGenericQuestion(
         answer: "37/24",
         helper: "This context asks for the combined completed amount.",
         placeholder: "Type a fraction or mixed number",
+        visual: makeFractionContextVisual({
+          context: "project",
+          title: "Project completion",
+          start: "9/8",
+          steps: [{ kind: "add", fraction: "5/12", stageLabel: "Next day" }],
+        }),
       },
       {
         kind: "typed_response",
@@ -16168,6 +16455,15 @@ function generateGenericQuestion(
         answer: "7/4",
         helper: "Track both changes in sequence and simplify at the end if needed.",
         placeholder: "Type a fraction or mixed number",
+        visual: makeFractionContextVisual({
+          context: "tank",
+          title: "Storage tank",
+          start: "7/3",
+          steps: [
+            { kind: "remove", fraction: "5/6", stageLabel: "Drained" },
+            { kind: "add", fraction: "1/4", stageLabel: "Added" },
+          ],
+        }),
       },
     ];
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
@@ -16181,10 +16477,19 @@ function generateGenericQuestion(
     const templates: Array<MultipleChoiceQuestion> = [
       {
         kind: "multiple_choice",
-        prompt: "A student says 3/4 + 1/2 = 4/6. Is this correct?",
-        options: ["Yes", "No"],
-        answer: "No",
-        helper: "Check whether the fractions were renamed before adding.",
+        prompt: "A tank is 5/6 full. 1/3 of the tank is used, then another 1/6 is used. What fraction of the tank remains?",
+        options: ["1/3", "5/6", "7/6"],
+        answer: "1/3",
+        helper: "Two amounts are being removed from the starting level.",
+        visual: makeFractionContextVisual({
+          context: "tank",
+          title: "Tank remains",
+          start: "5/6",
+          steps: [
+            { kind: "remove", fraction: "1/3", stageLabel: "Used first" },
+            { kind: "remove", fraction: "1/6", stageLabel: "Used again" },
+          ],
+        }),
       },
       {
         kind: "multiple_choice",
