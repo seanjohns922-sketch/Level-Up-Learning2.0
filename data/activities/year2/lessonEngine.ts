@@ -3084,6 +3084,7 @@ export type TypedResponseQuestion = {
   answer: string;
   helper?: string;
   placeholder?: string;
+  inputType?: "integer" | "fraction" | "mixed" | "flexible_fraction";
   fixedDenominator?: number;
   writtenMethod?: WrittenMethodLayout;
   visual?:
@@ -9047,79 +9048,83 @@ function generateGenericQuestion(
         placeholder: "Type the denominator",
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      ...chosen,
+      inputType: "integer",
+    };
   }
 
   if (explicitMode === "y6_common_denominator_build_equivalents") {
     const templates: Array<TypedResponseQuestion> = [
       {
         kind: "typed_response",
-        prompt: "Rewrite 5/8 with denominator 24.",
+        prompt: "Write an equivalent fraction to 5/8 with denominator 24.",
         answer: "15/24",
-        helper: "Scale numerator and denominator by the same factor.",
+        helper: "Use an equivalent fraction with the target denominator.",
         placeholder: "Type the fraction",
       },
       {
         kind: "typed_response",
-        prompt: "Rewrite 7/10 with denominator 30.",
+        prompt: "Write an equivalent fraction to 7/10 with denominator 30.",
         answer: "21/30",
-        helper: "Use one efficient scale factor.",
+        helper: "Use an equivalent fraction with the target denominator.",
         placeholder: "Type the fraction",
       },
       {
         kind: "typed_response",
-        prompt: "Rewrite 3/4 with denominator 20.",
+        prompt: "Write an equivalent fraction to 3/4 with denominator 20.",
         answer: "15/20",
-        helper: "Multiply both parts by the same number.",
+        helper: "Use an equivalent fraction with the target denominator.",
         placeholder: "Type the fraction",
       },
       {
         kind: "typed_response",
-        prompt: "Rewrite 5/12 with denominator 36.",
+        prompt: "Write an equivalent fraction to 5/12 with denominator 36.",
         answer: "15/36",
-        helper: "Build the equivalent fraction using the LCD.",
+        helper: "Use an equivalent fraction with the target denominator.",
         placeholder: "Type the fraction",
       },
       {
         kind: "typed_response",
-        prompt: "Rewrite 7/18 with denominator 36.",
+        prompt: "Write an equivalent fraction to 7/18 with denominator 36.",
         answer: "14/36",
-        helper: "Only one part needs to double.",
+        helper: "Use an equivalent fraction with the target denominator.",
         placeholder: "Type the fraction",
       },
       {
         kind: "typed_response",
-        prompt: "Rewrite 4/9 with denominator 18.",
+        prompt: "Write an equivalent fraction to 4/9 with denominator 18.",
         answer: "8/18",
-        helper: "Scale just enough to match the denominator.",
+        helper: "Use an equivalent fraction with the target denominator.",
         placeholder: "Type the fraction",
       },
       {
         kind: "typed_response",
-        prompt: "Rewrite 2/15 with denominator 60.",
+        prompt: "Write an equivalent fraction to 2/15 with denominator 60.",
         answer: "8/60",
-        helper: "Use the denominator you chose efficiently.",
+        helper: "Use an equivalent fraction with the target denominator.",
         placeholder: "Type the fraction",
       },
       {
         kind: "typed_response",
-        prompt: "Rewrite 11/16 with denominator 80.",
+        prompt: "Write an equivalent fraction to 11/16 with denominator 80.",
         answer: "55/80",
-        helper: "The value stays the same when both parts scale together.",
+        helper: "Use an equivalent fraction with the target denominator.",
         placeholder: "Type the fraction",
       },
       {
         kind: "typed_response",
-        prompt: "Rewrite 3/8 with denominator 24.",
+        prompt: "Write an equivalent fraction to 3/8 with denominator 24.",
         answer: "9/24",
-        helper: "Choose the matching scale factor.",
+        helper: "Use an equivalent fraction with the target denominator.",
         placeholder: "Type the fraction",
       },
       {
         kind: "typed_response",
-        prompt: "Rewrite 7/15 with denominator 45.",
+        prompt: "Write an equivalent fraction to 7/15 with denominator 45.",
         answer: "21/45",
-        helper: "Three equal groups makes the denominator match.",
+        helper: "Use an equivalent fraction with the target denominator.",
         placeholder: "Type the fraction",
       },
       {
@@ -9145,44 +9150,44 @@ function generateGenericQuestion(
       },
       {
         kind: "typed_response",
-        prompt: "Rewrite 13/18 with denominator 54.",
+        prompt: "Write an equivalent fraction to 13/18 with denominator 54.",
         answer: "39/54",
-        helper: "Use a common denominator that keeps the work clean.",
+        helper: "Use an equivalent fraction with the target denominator.",
         placeholder: "Type the fraction",
       },
       {
         kind: "typed_response",
-        prompt: "Rewrite 9/20 with denominator 140.",
+        prompt: "Write an equivalent fraction to 9/20 with denominator 140.",
         answer: "63/140",
-        helper: "Scale the numerator by the same factor as the denominator.",
+        helper: "Use an equivalent fraction with the target denominator.",
         placeholder: "Type the fraction",
       },
       {
         kind: "typed_response",
-        prompt: "Rewrite 3/25 with denominator 75.",
+        prompt: "Write an equivalent fraction to 3/25 with denominator 75.",
         answer: "9/75",
-        helper: "The denominator tells you the scale factor.",
+        helper: "Use an equivalent fraction with the target denominator.",
         placeholder: "Type the fraction",
       },
       {
         kind: "typed_response",
-        prompt: "Rewrite 5/18 with denominator 72.",
+        prompt: "Write an equivalent fraction to 5/18 with denominator 72.",
         answer: "20/72",
-        helper: "Scale up without changing the value.",
+        helper: "Use an equivalent fraction with the target denominator.",
         placeholder: "Type the fraction",
       },
       {
         kind: "typed_response",
-        prompt: "Rewrite 4/7 with denominator 56.",
+        prompt: "Write an equivalent fraction to 4/7 with denominator 56.",
         answer: "32/56",
-        helper: "Use the denominator as a clue to the multiplier.",
+        helper: "Use an equivalent fraction with the target denominator.",
         placeholder: "Type the fraction",
       },
       {
         kind: "typed_response",
-        prompt: "Rewrite 11/12 with denominator 36.",
+        prompt: "Write an equivalent fraction to 11/12 with denominator 36.",
         answer: "33/36",
-        helper: "A larger denominator can still be efficient if it is the LCD.",
+        helper: "Use an equivalent fraction with the target denominator.",
         placeholder: "Type the fraction",
       },
       {
@@ -9193,7 +9198,11 @@ function generateGenericQuestion(
         placeholder: "Type both fractions",
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return {
+      ...chosen,
+      inputType: "fraction",
+    };
   }
 
   if (explicitMode === "y6_common_denominator_choose_strategy") {
@@ -9502,6 +9511,7 @@ function generateGenericQuestion(
       prompt: "Complete the working",
       answer,
       helper: "Match the denominators, then combine.",
+      inputType: "fraction",
       placeholder: "Type numerator",
       fixedDenominator: result.denominator,
       visual,
@@ -9914,6 +9924,7 @@ function generateGenericQuestion(
       prompt: chosen.prompt,
       answer: chosen.answer,
       helper: chosen.helper,
+      inputType: chosen.answer.includes(" ") ? "mixed" : "fraction",
       placeholder: chosen.placeholder,
       visual: chosen.visual,
     };
@@ -10069,6 +10080,7 @@ function generateGenericQuestion(
       prompt: chosen.prompt,
       answer: chosen.answer,
       helper: chosen.helper,
+      inputType: "fraction",
       placeholder: chosen.placeholder,
       visual: chosen.visual,
     };

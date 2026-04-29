@@ -711,6 +711,34 @@ function mixedNumeralsEquivalent(
   return leftImproper * right.denominator === rightImproper * left.denominator;
 }
 
+function parseFlexibleFraction(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  const mixedMatch = trimmed.match(/^(\d+)\s+(\d+)\/(\d+)$/);
+  if (mixedMatch) {
+    const whole = Number(mixedMatch[1]);
+    const numerator = Number(mixedMatch[2]);
+    const denominator = Number(mixedMatch[3]);
+    if (!Number.isFinite(whole) || !Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator === 0) {
+      return null;
+    }
+    return { whole, numerator, denominator };
+  }
+
+  const simpleMatch = trimmed.match(/^(\d+)\/(\d+)$/);
+  if (simpleMatch) {
+    const numerator = Number(simpleMatch[1]);
+    const denominator = Number(simpleMatch[2]);
+    if (!Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator === 0) {
+      return null;
+    }
+    return { whole: 0, numerator, denominator };
+  }
+
+  return null;
+}
+
 function structuredFractionKey(questionData: TypedResponseQuestion) {
   return [
     questionData.prompt,
@@ -1490,17 +1518,26 @@ export default function TypedResponseActivity({
   const isGuidedWrittenMethod = isGuidedAddition || isGuidedSubtraction;
   const orderingAnswerParts = !writtenMethod ? extractOrderingNumbers(questionData.answer) : [];
   const expectedStructuredFraction = !writtenMethod ? parseStructuredFraction(questionData.answer) : null;
+  const declaredInputType = questionData.inputType;
   const isOrderingResponse =
     !writtenMethod &&
     orderingAnswerParts.length >= 4 &&
     /Type the numbers from (smallest to largest|largest to smallest)/i.test(questionData.prompt) &&
     orderingAnswerParts.every((part) => /^\d+$/.test(part));
+  const isFractionInput = declaredInputType === "fraction";
+  const isMixedNumberInput = declaredInputType === "mixed";
+  const isFlexibleFractionInput = declaredInputType === "flexible_fraction";
   const isStructuredFractionResponse =
     !writtenMethod &&
     !isOrderingResponse &&
     questionData.kind === "typed_response" &&
-    expectedStructuredFraction !== null;
-  const usesFixedDenominator = isStructuredFractionResponse && typeof questionData.fixedDenominator === "number";
+    (isFractionInput || isMixedNumberInput || (!!expectedStructuredFraction && !isFlexibleFractionInput));
+  const isMixedNumberResponse =
+    (isStructuredFractionResponse && isMixedNumberInput) ||
+    (!declaredInputType && isStructuredFractionResponse && (expectedStructuredFraction?.whole ?? 0) > 0);
+  const usesFixedDenominator =
+    (isStructuredFractionResponse || isFractionInput) && typeof questionData.fixedDenominator === "number";
+  const isIntegerInput = declaredInputType === "integer";
   const [typed, setTyped] = useState("");
   const [fractionWholeInput, setFractionWholeInput] = useState("");
   const [fractionNumeratorInput, setFractionNumeratorInput] = useState("");
@@ -2361,7 +2398,14 @@ export default function TypedResponseActivity({
       return;
     }
 
-    if (isStructuredFractionResponse && expectedStructuredFraction) {
+    if (isStructuredFractionResponse) {
+      const expectedFraction =
+        expectedStructuredFraction ??
+        (questionData.answer ? parseFlexibleFraction(questionData.answer) : null);
+      if (!expectedFraction) {
+        onWrong?.();
+        return;
+      }
       const whole = normalizeNumberInput(fractionWholeInput);
       const numerator = normalizeNumberInput(fractionNumeratorInput);
       const denominator = normalizeNumberInput(
@@ -2391,7 +2435,22 @@ export default function TypedResponseActivity({
         return;
       }
 
-      if (mixedNumeralsEquivalent(parsed, expectedStructuredFraction)) {
+      if (mixedNumeralsEquivalent(parsed, expectedFraction)) {
+        onCorrect?.();
+      } else {
+        onWrong?.();
+      }
+      return;
+    }
+
+    if (isFlexibleFractionInput) {
+      const parsedInput = parseFlexibleFraction(typed);
+      const expected = parseFlexibleFraction(questionData.answer);
+      if (!parsedInput || !expected) {
+        onWrong?.();
+        return;
+      }
+      if (mixedNumeralsEquivalent(parsedInput, expected)) {
         onCorrect?.();
       } else {
         onWrong?.();
@@ -3279,33 +3338,45 @@ export default function TypedResponseActivity({
             <div className="w-full max-w-[420px]">
               <div className="rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm transition focus-within:border-teal-400 focus-within:shadow-[0_0_0_4px_rgba(45,212,191,0.12)]">
                 <div className="text-xs font-bold uppercase tracking-wide text-slate-500">
-                  {usesFixedDenominator ? "Mixed number answer" : "Mixed number"}
+                  {isMixedNumberResponse
+                    ? usesFixedDenominator
+                      ? "Mixed number answer"
+                      : "Mixed number"
+                    : isFractionInput
+                      ? usesFixedDenominator
+                        ? "Equivalent fraction answer"
+                        : "Fraction answer"
+                      : usesFixedDenominator
+                      ? "Equivalent fraction answer"
+                      : "Fraction answer"}
                 </div>
                 <div className="mt-3 flex items-center gap-2">
-                  <input
-                    ref={wholeRef}
-                    type="text"
-                    autoComplete="off"
-                    spellCheck={false}
-                    value={fractionWholeInput}
-                    onChange={(event) => {
-                      const nextValue = event.target.value.replace(/\D/g, "");
-                      setFractionWholeInput(nextValue);
-                      if (nextValue.length >= 1) {
-                        numeratorRef.current?.focus();
-                      }
-                    }}
-                    onKeyDown={(event) => {
-                      if (event.key === "ArrowRight" && !fractionWholeInput) {
-                        numeratorRef.current?.focus();
-                      }
-                    }}
-                    inputMode="numeric"
-                    placeholder=""
-                    className="h-16 w-16 appearance-none border-0 bg-transparent px-1 text-center text-[2rem] font-black leading-none text-slate-900 caret-teal-600 outline-none"
-                    style={{ WebkitTextFillColor: "#0f172a" }}
-                    aria-label="Whole number"
-                  />
+                  {isMixedNumberResponse ? (
+                    <input
+                      ref={wholeRef}
+                      type="text"
+                      autoComplete="off"
+                      spellCheck={false}
+                      value={fractionWholeInput}
+                      onChange={(event) => {
+                        const nextValue = event.target.value.replace(/\D/g, "");
+                        setFractionWholeInput(nextValue);
+                        if (nextValue.length >= 1) {
+                          numeratorRef.current?.focus();
+                        }
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === "ArrowRight" && !fractionWholeInput) {
+                          numeratorRef.current?.focus();
+                        }
+                      }}
+                      inputMode="numeric"
+                      placeholder=""
+                      className="h-16 w-16 appearance-none border-0 bg-transparent px-1 text-center text-[2rem] font-black leading-none text-slate-900 caret-teal-600 outline-none"
+                      style={{ WebkitTextFillColor: "#0f172a" }}
+                      aria-label="Whole number"
+                    />
+                  ) : null}
                   <div className="flex flex-col items-center">
                     <input
                       ref={numeratorRef}
@@ -3321,7 +3392,7 @@ export default function TypedResponseActivity({
                         }
                       }}
                       onKeyDown={(event) => {
-                        if (event.key === "Backspace" && !fractionNumeratorInput) {
+                        if (event.key === "Backspace" && !fractionNumeratorInput && isMixedNumberResponse) {
                           wholeRef.current?.focus();
                         }
                       }}
@@ -3365,9 +3436,21 @@ export default function TypedResponseActivity({
                   </div>
                 </div>
                 <div className="mt-3 text-xs font-medium text-slate-500">
-                  {usesFixedDenominator
-                    ? "Type the whole number and numerator. The denominator stays fixed."
-                    : "Type one mixed number. Leave the whole number blank if it is less than one."}
+                  {isMixedNumberResponse
+                    ? usesFixedDenominator
+                      ? "Type the whole number and numerator. The denominator stays fixed."
+                      : "Type one mixed number. Leave the whole number blank if it is less than one."
+                    : isFractionInput
+                      ? usesFixedDenominator
+                        ? "Type the numerator for the equivalent fraction. The denominator stays fixed."
+                        : "Type the fraction."
+                      : isIntegerInput
+                        ? "Type the whole number only."
+                        : isFlexibleFractionInput
+                          ? "Type a fraction or mixed number."
+                          : usesFixedDenominator
+                            ? "Type the numerator for the equivalent fraction. The denominator stays fixed."
+                            : "Type one fraction."}
                 </div>
                 {fractionWholeInput || fractionNumeratorInput || fractionDenominatorInput || (usesFixedDenominator && questionData.fixedDenominator) ? (
                   <div className="mt-3 rounded-2xl bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700">
@@ -3415,13 +3498,24 @@ export default function TypedResponseActivity({
             <input
               value={typed}
               onChange={(event) =>
-                setTyped(isNumericInputOnly ? event.target.value.replace(/[^\d.,-]/g, "") : event.target.value)
+                setTyped(
+                  isIntegerInput || isNumericInputOnly
+                    ? event.target.value.replace(/[^\d.,-]/g, "")
+                    : event.target.value
+                )
               }
-              inputMode={isNumericInputOnly ? "decimal" : undefined}
+              inputMode={isIntegerInput ? "numeric" : isNumericInputOnly ? "decimal" : undefined}
               placeholder={
                 isColumnMultiplication
                   ? "Type the final answer"
-                  : questionData.placeholder ?? (isNumericInputOnly ? "Enter your answer" : "Type your answer")
+                  : questionData.placeholder ??
+                    (isIntegerInput
+                      ? "Type the integer"
+                      : isFlexibleFractionInput
+                        ? "Type a fraction or mixed number"
+                        : isNumericInputOnly
+                          ? "Enter your answer"
+                          : "Type your answer")
               }
               className="w-full max-w-md rounded-xl border border-gray-300 px-4 py-3 text-lg font-bold text-gray-900 outline-none focus:border-teal-500"
             />

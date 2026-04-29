@@ -293,6 +293,14 @@ function toExplicitWeeklyQuizQuestion(
 ): QuizQuestion {
   const prompt = String(question.questionText ?? "").trim();
   const correctAnswer = String(question.correctAnswer ?? "").trim();
+  const inputType = question.inputType;
+  const typedInputType =
+    inputType === "integer" ||
+    inputType === "fraction" ||
+    inputType === "mixed" ||
+    inputType === "flexible_fraction"
+      ? inputType
+      : undefined;
 
   const lessonMeta = {
     id: question.id || `q${index}`,
@@ -386,6 +394,7 @@ function toExplicitWeeklyQuizQuestion(
           answer: correctAnswer,
           helper: question.feedbackIncorrect,
           placeholder: question.placeholder ?? "Type the integer",
+          inputType: typedInputType,
           visual: mappedVisual,
         },
         activity: {
@@ -434,6 +443,7 @@ function toExplicitWeeklyQuizQuestion(
           answer: correctAnswer,
           helper: question.feedbackIncorrect,
           placeholder: question.placeholder ?? "Type the fraction",
+          inputType: typedInputType ?? (isFractionTypedAnswer ? "fraction" : undefined),
         },
         activity: {
           activityType: "typed_response",
@@ -453,7 +463,8 @@ function toExplicitWeeklyQuizQuestion(
       acceptedValues: question.acceptedAnswers,
       feedbackCorrect: question.feedbackCorrect,
       feedbackIncorrect: question.feedbackIncorrect,
-      responseType: "number",
+      responseType:
+        typedInputType === "integer" || (!typedInputType && !isFractionTypedAnswer) ? "number" : undefined,
       placeholder: question.placeholder ?? "Type the integer",
     };
   }

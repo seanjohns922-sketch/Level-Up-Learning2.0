@@ -36,6 +36,7 @@ export type Year6WeeklyQuizQuestion = {
   lessonTag: 1 | 2 | 3;
   questionText: string;
   answerType: Year6WeeklyQuizAnswerType;
+  inputType?: "integer" | "fraction" | "mixed" | "flexible_fraction" | "drag" | "mc";
   options?: string[];
   values?: string[];
   correctOrder?: string[];
