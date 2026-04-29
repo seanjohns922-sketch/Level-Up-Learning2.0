@@ -178,6 +178,7 @@ export default function RealmCarousel() {
   const prevIdx = (currentIndex - 1 + REALMS.length) % REALMS.length;
   const nextIdx = (currentIndex + 1) % REALMS.length;
   const bgShift = -2 + (currentIndex / REALMS.length) * 4;
+  const isTopChamber = levelNumber >= 6;
 
   function enterRealm() {
     if (!isActive) return;
@@ -188,19 +189,76 @@ export default function RealmCarousel() {
     <main className="min-h-screen relative overflow-hidden select-none">
       {/* Interior background */}
       <div className="fixed inset-0 z-0">
-        <img
-          src="/images/realm-select-bg.jpg"
-          alt=""
-          className="w-full h-full object-cover"
-          style={{
-            objectPosition: `${50 + bgShift}% 35%`,
-            transition: "object-position 0.5s cubic-bezier(0.4,0,0.2,1)",
-            transform: "scale(1.05)",
-          }}
-        />
-        {/* Warm vignette overlay */}
-        <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at center 60%, transparent 30%, rgba(0,0,0,0.5) 100%)" }} />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
+        {isTopChamber ? (
+          <>
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(180deg, hsl(190 72% 78%) 0%, hsl(184 58% 64%) 22%, hsl(186 34% 25%) 54%, hsl(188 44% 9%) 100%)",
+              }}
+            />
+            <div
+              className="absolute inset-x-[-8%] top-[-22%] h-[56vh] rounded-b-full"
+              style={{
+                background:
+                  "radial-gradient(ellipse at center top, hsl(48 100% 96% / 0.92) 0%, hsl(173 80% 82% / 0.48) 32%, hsl(184 70% 68% / 0.2) 58%, transparent 76%)",
+                borderBottom: "1px solid hsl(170 80% 82% / 0.24)",
+                boxShadow: "inset 0 -24px 80px hsl(175 90% 70% / 0.22)",
+              }}
+            />
+            <div
+              className="absolute inset-x-0 top-0 h-[62vh] opacity-85"
+              style={{
+                background:
+                  "linear-gradient(104deg, transparent 7%, hsl(50 100% 96% / 0.26) 16%, transparent 27%), linear-gradient(76deg, transparent 45%, hsl(172 84% 78% / 0.2) 56%, transparent 68%), linear-gradient(180deg, hsl(0 0% 100% / 0.24), transparent 68%)",
+              }}
+            />
+            <div
+              className="absolute inset-x-0 top-[10vh] h-[36vh] opacity-55"
+              style={{
+                background:
+                  "radial-gradient(ellipse at 24% 42%, hsl(0 0% 100% / 0.34) 0%, transparent 28%), radial-gradient(ellipse at 76% 36%, hsl(0 0% 100% / 0.24) 0%, transparent 24%), radial-gradient(ellipse at 50% 64%, hsl(174 78% 76% / 0.18) 0%, transparent 42%)",
+                filter: "blur(10px)",
+              }}
+            />
+            <div
+              className="absolute inset-x-[-12%] bottom-[-18vh] h-[46vh]"
+              style={{
+                background:
+                  "radial-gradient(ellipse at center, hsl(174 84% 56% / 0.24) 0%, hsl(185 68% 18% / 0.44) 38%, hsl(190 55% 7% / 0.9) 76%)",
+              }}
+            />
+            <div
+              className="absolute inset-0 opacity-45"
+              style={{
+                backgroundImage:
+                  "linear-gradient(hsl(173 80% 70% / 0.11) 1px, transparent 1px), linear-gradient(90deg, hsl(173 80% 70% / 0.1) 1px, transparent 1px)",
+                backgroundSize: "64px 64px",
+                maskImage: "linear-gradient(180deg, transparent 0%, black 34%, black 82%, transparent 100%)",
+                WebkitMaskImage: "linear-gradient(180deg, transparent 0%, black 34%, black 82%, transparent 100%)",
+              }}
+            />
+            <div className="top-chamber-particles absolute inset-0" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/8 to-white/10" />
+          </>
+        ) : (
+          <>
+            <img
+              src="/images/realm-select-bg.jpg"
+              alt=""
+              className="w-full h-full object-cover"
+              style={{
+                objectPosition: `${50 + bgShift}% 35%`,
+                transition: "object-position 0.5s cubic-bezier(0.4,0,0.2,1)",
+                transform: "scale(1.05)",
+              }}
+            />
+            {/* Warm vignette overlay */}
+            <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at center 60%, transparent 30%, rgba(0,0,0,0.5) 100%)" }} />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
+          </>
+        )}
       </div>
 
       {/* Content */}
