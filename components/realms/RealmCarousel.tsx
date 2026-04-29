@@ -413,12 +413,12 @@ export default function RealmCarousel() {
         </div>
 
         {/* Title */}
-        <div className="text-center mt-2 mb-4">
+        <div className="relative z-20 text-center mt-2 mb-0">
           <h1
             className="text-3xl md:text-4xl font-black text-white tracking-wide"
             style={{
               fontFamily: "'Quicksand', 'Nunito', sans-serif",
-              textShadow: "0 4px 20px rgba(0,0,0,0.6)",
+              textShadow: "0 4px 20px rgba(0,0,0,0.75), 0 0 20px rgba(255,245,190,0.25)",
             }}
           >
             {isApexLevel ? "Tower Apex" : "Choose Your Realm"}
