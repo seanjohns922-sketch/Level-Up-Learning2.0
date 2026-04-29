@@ -559,7 +559,19 @@ export default function RealmCarousel() {
           {/* Info Panel */}
           <div
             className="w-full max-w-sm mx-auto text-center mt-2"
-            style={{ transition: "opacity 0.3s ease", opacity: transitioning ? 0.3 : 1 }}
+            style={{
+              transition: "opacity 0.3s ease",
+              opacity: transitioning ? 0.3 : 1,
+              ...(isTopChamber
+                ? {
+                    padding: "10px 16px 12px",
+                    borderRadius: "22px",
+                    background: "hsl(188 46% 8% / 0.26)",
+                    border: "1px solid hsl(174 70% 74% / 0.16)",
+                    backdropFilter: "blur(8px)",
+                  }
+                : {}),
+            }}
           >
             <h2
               className="text-2xl md:text-3xl font-black text-white mb-1"
