@@ -181,8 +181,8 @@ export default function RealmCarousel() {
   const prevIdx = (currentIndex - 1 + REALMS.length) % REALMS.length;
   const nextIdx = (currentIndex + 1) % REALMS.length;
   const bgShift = -2 + (currentIndex / REALMS.length) * 4;
-  // Use the same tower-hub aesthetic across all levels (including Year 6).
-  const isTopChamber = false;
+  // Use the cathedral/tower-interior aesthetic across all levels.
+  const isTopChamber = true;
 
   function enterRealm() {
     if (!isActive) return;
@@ -191,23 +191,27 @@ export default function RealmCarousel() {
 
   return (
     <main className="min-h-screen relative overflow-hidden select-none">
-      {/* Interior background */}
+      {/* Interior background — cathedral / tower interior */}
       <div className="fixed inset-0 z-0">
-        <>
-          <img
-            src="/images/tower-hub-bg.jpg"
-            alt=""
-            className="w-full h-full object-cover"
-            style={{
-              objectPosition: `${50 + bgShift}% 35%`,
-              transition: "object-position 0.5s cubic-bezier(0.4,0,0.2,1)",
-              transform: "scale(1.05)",
-            }}
-          />
-          {/* Warm vignette overlay */}
-          <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at center 60%, transparent 30%, rgba(0,0,0,0.5) 100%)" }} />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
-        </>
+        <img
+          src="/images/realm-select-bg.jpg"
+          alt=""
+          className="w-full h-full object-cover"
+          style={{
+            objectPosition: `${50 + bgShift}% 40%`,
+            transition: "object-position 0.5s cubic-bezier(0.4,0,0.2,1)",
+            transform: "scale(1.04)",
+          }}
+        />
+        {/* Warm vignette + readability overlays */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse at center 55%, transparent 35%, rgba(0,0,0,0.55) 100%)",
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/25" />
       </div>
 
       {/* Content */}
