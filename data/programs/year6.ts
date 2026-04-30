@@ -350,12 +350,12 @@ const year6Rows: ProgramRow[] = [
     focus: "Find percentages of quantities using efficient benchmark methods",
     lesson: 2,
     topic: "Find a Percentage of a Quantity",
-    activity: "Break percentages into easier parts or convert to decimals to find percentages of amounts.",
+    activity: "Use benchmark fractions, 10% thinking, and efficient part-building to calculate percentages of quantities.",
     curriculum: ["AC9M6N05"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "percent_quick_find" }),
-      makeActivity("typed_response", 1, { mode: "percent_structured_method" }),
-      makeActivity("typed_response", 1, { mode: "percent_decimal_method" }),
+      makeActivity("typed_response", 1, { mode: "y6_percent_benchmark" }),
+      makeActivity("typed_response", 1, { mode: "y6_percent_break_apart" }),
+      makeActivity("typed_response", 1, { mode: "y6_percent_real_multistep" }),
     ],
   },
   {
