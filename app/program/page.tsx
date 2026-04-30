@@ -228,32 +228,84 @@ function ProgramPage() {
               >
                 ← Back
               </button>
-              <div className="relative overflow-hidden border border-teal-300/25 bg-black/25 backdrop-blur-md shadow-[0_10px_28px_rgba(0,0,0,0.2)]"
-                style={{
-                  clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
-                  boxShadow: "inset 0 1px 0 rgba(94,234,212,0.2), 0 0 18px rgba(20,184,166,0.12)",
-                }}
-              >
-                <label className="sr-only" htmlFor="week-selector">Choose week</label>
-                <select
-                  id="week-selector"
-                  value={weekNum}
-                  onChange={(event) => goToWeek(Number(event.target.value))}
-                  className="min-w-[154px] appearance-none rounded-none border-0 bg-transparent px-4 py-2 pr-10 text-xs font-mono font-black uppercase tracking-[0.14em] text-teal-50 outline-none transition focus:ring-2 focus:ring-teal-300/25"
+              <div ref={weekMenuRef} className="relative">
+                <button
+                  type="button"
+                  onClick={() => setWeekMenuOpen((v) => !v)}
+                  aria-haspopup="listbox"
+                  aria-expanded={weekMenuOpen}
+                  className="relative flex min-w-[170px] items-center justify-between gap-3 border border-teal-300/25 bg-black/25 px-4 py-2 text-xs font-mono font-black uppercase tracking-[0.14em] text-teal-50 backdrop-blur-md transition hover:border-teal-200/45 hover:bg-teal-950/45 focus:outline-none focus:ring-2 focus:ring-teal-300/25"
+                  style={{
+                    clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
+                    boxShadow: "inset 0 1px 0 rgba(94,234,212,0.2), 0 0 18px rgba(20,184,166,0.12)",
+                  }}
                 >
-                  {Array.from({ length: 12 }).map((_, index) => {
-                    const targetWeek = index + 1;
-                    const isUnlocked = DEMO_MODE || teacherMode || targetWeek <= lastAllowedWeek;
-                    return (
-                      <option key={targetWeek} value={targetWeek}>
-                        Week {targetWeek} · {targetWeek === weekNum ? "Current" : isUnlocked ? "Open" : "Locked"}
-                      </option>
-                    );
-                  })}
-                </select>
-                <svg viewBox="0 0 24 24" className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-teal-100/80" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M6 9l6 6 6-6" />
-                </svg>
+                  <span className="flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]" />
+                    Week {weekNum}
+                  </span>
+                  <svg viewBox="0 0 24 24" className={`h-3.5 w-3.5 text-teal-100/80 transition-transform ${weekMenuOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </button>
+                {weekMenuOpen && (
+                  <div
+                    role="listbox"
+                    className="absolute left-0 top-[calc(100%+8px)] z-50 max-h-[360px] w-[230px] overflow-y-auto border border-teal-300/30 bg-[rgba(2,18,18,0.92)] backdrop-blur-xl"
+                    style={{
+                      clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
+                      boxShadow: "inset 0 1px 0 rgba(94,234,212,0.25), 0 14px 40px rgba(0,0,0,0.55), 0 0 28px rgba(20,184,166,0.18)",
+                    }}
+                  >
+                    <div className="px-3 py-2 border-b border-teal-300/15 text-[10px] font-mono font-bold uppercase tracking-[0.22em] text-teal-300/80">
+                      Select Week
+                    </div>
+                    <ul className="py-1">
+                      {Array.from({ length: 12 }).map((_, index) => {
+                        const targetWeek = index + 1;
+                        const isUnlocked = DEMO_MODE || teacherMode || targetWeek <= lastAllowedWeek;
+                        const isCurrent = targetWeek === weekNum;
+                        const status = isCurrent ? "Current" : isUnlocked ? "Open" : "Locked";
+                        return (
+                          <li key={targetWeek}>
+                            <button
+                              type="button"
+                              role="option"
+                              aria-selected={isCurrent}
+                              onClick={() => {
+                                setWeekMenuOpen(false);
+                                goToWeek(targetWeek);
+                              }}
+                              className={`group flex w-full items-center justify-between gap-3 px-4 py-2 text-left text-xs font-mono font-bold uppercase tracking-[0.14em] transition ${
+                                isCurrent
+                                  ? "bg-teal-400/15 text-teal-100"
+                                  : isUnlocked
+                                  ? "text-teal-50/85 hover:bg-teal-400/10 hover:text-teal-50"
+                                  : "text-teal-50/30 hover:bg-white/5"
+                              }`}
+                            >
+                              <span className="flex items-center gap-2">
+                                {isCurrent ? (
+                                  <svg viewBox="0 0 24 24" className="h-3 w-3 text-teal-300" fill="none" stroke="currentColor" strokeWidth="3">
+                                    <path d="M5 12l5 5L20 7" />
+                                  </svg>
+                                ) : (
+                                  <span className={`h-1.5 w-1.5 rounded-full ${isUnlocked ? "bg-teal-400/70" : "bg-white/20"}`} />
+                                )}
+                                Week {targetWeek}
+                              </span>
+                              <span className={`text-[10px] tracking-[0.18em] ${
+                                isCurrent ? "text-teal-300" : isUnlocked ? "text-teal-200/60" : "text-white/30"
+                              }`}>
+                                {status}
+                              </span>
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
               </div>
             </div>
             <span className="text-sm text-white/80 font-medium ml-1">Level {levelNum}</span>
