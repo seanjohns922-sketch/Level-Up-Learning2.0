@@ -337,12 +337,12 @@ const year6Rows: ProgramRow[] = [
     focus: "Find a fraction of a quantity and connect it to multiplicative thinking",
     lesson: 1,
     topic: "Find a Fraction of a Quantity",
-    activity: "Use partitioning and scaling to find fractional parts of quantities.",
+    activity: "Scale quantities forward, backward, and across multi-step situations using fractions.",
     curriculum: ["AC9M6N05"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "fraction_of_quantity" }),
-      makeActivity("multiple_choice", 1, { mode: "fraction_of_quantity" }),
-      makeActivity("typed_response", 1, { mode: "fraction_of_quantity" }),
+      makeActivity("typed_response", 1, { mode: "y6_fraction_quantity_structure" }),
+      makeActivity("typed_response", 1, { mode: "y6_fraction_quantity_nonclean" }),
+      makeActivity("typed_response", 1, { mode: "y6_fraction_quantity_multistep" }),
     ],
   },
   {
