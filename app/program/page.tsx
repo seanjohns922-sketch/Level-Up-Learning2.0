@@ -251,16 +251,16 @@ function ProgramPage() {
                 {weekMenuOpen && (
                   <div
                     role="listbox"
-                    className="absolute left-0 top-[calc(100%+8px)] z-50 max-h-[360px] w-[230px] overflow-y-auto border border-teal-300/30 bg-[rgba(2,18,18,0.92)] backdrop-blur-xl"
+                    className="absolute left-0 top-[calc(100%+6px)] z-50 max-h-[260px] w-[170px] overflow-y-auto border border-teal-300/30 bg-[rgba(2,18,18,0.92)] backdrop-blur-xl"
                     style={{
-                      clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
+                      clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
                       boxShadow: "inset 0 1px 0 rgba(94,234,212,0.25), 0 14px 40px rgba(0,0,0,0.55), 0 0 28px rgba(20,184,166,0.18)",
                     }}
                   >
-                    <div className="px-3 py-2 border-b border-teal-300/15 text-[10px] font-mono font-bold uppercase tracking-[0.22em] text-teal-300/80">
+                    <div className="px-3 py-1.5 border-b border-teal-300/15 text-[9px] font-mono font-bold uppercase tracking-[0.2em] text-teal-300/80">
                       Select Week
                     </div>
-                    <ul className="py-1">
+                    <ul className="py-0.5">
                       {Array.from({ length: 12 }).map((_, index) => {
                         const targetWeek = index + 1;
                         const isUnlocked = DEMO_MODE || teacherMode || targetWeek <= lastAllowedWeek;
@@ -276,7 +276,7 @@ function ProgramPage() {
                                 setWeekMenuOpen(false);
                                 goToWeek(targetWeek);
                               }}
-                              className={`group flex w-full items-center justify-between gap-3 px-4 py-2 text-left text-xs font-mono font-bold uppercase tracking-[0.14em] transition ${
+                              className={`group flex w-full items-center justify-between gap-2 px-3 py-1 text-left text-[10px] font-mono font-bold uppercase tracking-[0.12em] transition ${
                                 isCurrent
                                   ? "bg-teal-400/15 text-teal-100"
                                   : isUnlocked
@@ -284,17 +284,17 @@ function ProgramPage() {
                                   : "text-teal-50/30 hover:bg-white/5"
                               }`}
                             >
-                              <span className="flex items-center gap-2">
+                              <span className="flex items-center gap-1.5">
                                 {isCurrent ? (
-                                  <svg viewBox="0 0 24 24" className="h-3 w-3 text-teal-300" fill="none" stroke="currentColor" strokeWidth="3">
+                                  <svg viewBox="0 0 24 24" className="h-2.5 w-2.5 text-teal-300" fill="none" stroke="currentColor" strokeWidth="3">
                                     <path d="M5 12l5 5L20 7" />
                                   </svg>
                                 ) : (
-                                  <span className={`h-1.5 w-1.5 rounded-full ${isUnlocked ? "bg-teal-400/70" : "bg-white/20"}`} />
+                                  <span className={`h-1 w-1 rounded-full ${isUnlocked ? "bg-teal-400/70" : "bg-white/20"}`} />
                                 )}
                                 Week {targetWeek}
                               </span>
-                              <span className={`text-[10px] tracking-[0.18em] ${
+                              <span className={`text-[8px] tracking-[0.16em] ${
                                 isCurrent ? "text-teal-300" : isUnlocked ? "text-teal-200/60" : "text-white/30"
                               }`}>
                                 {status}
