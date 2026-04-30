@@ -44,6 +44,26 @@ function ProgramPage() {
   );
   const [teacherToast, setTeacherToast] = useState("");
   const secretTapCountRef = useRef(0);
+  const [weekMenuOpen, setWeekMenuOpen] = useState(false);
+  const weekMenuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!weekMenuOpen) return;
+    function onDown(e: MouseEvent) {
+      if (weekMenuRef.current && !weekMenuRef.current.contains(e.target as Node)) {
+        setWeekMenuOpen(false);
+      }
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setWeekMenuOpen(false);
+    }
+    window.addEventListener("mousedown", onDown);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("mousedown", onDown);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [weekMenuOpen]);
 
   // Re-read store on window focus (in case lesson page updated it)
   useEffect(() => {
