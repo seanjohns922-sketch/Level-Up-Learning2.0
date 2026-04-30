@@ -361,38 +361,7 @@ export default function RealmCarousel() {
                 zIndex: 10,
               }}
             >
-              {isTopChamber ? (
-                <>
-                  <div
-                    className="absolute left-1/2 top-[84%] -translate-x-1/2 -z-20 h-40 w-[520px] rounded-full"
-                    style={{
-                      background:
-                        "linear-gradient(90deg, transparent 0%, hsl(36 20% 30% / 0.3) 18%, hsl(172 74% 58% / 0.16) 50%, hsl(36 20% 30% / 0.3) 82%, transparent 100%)",
-                      transform: "translateX(-50%) perspective(420px) rotateX(64deg)",
-                      transformOrigin: "center top",
-                      borderTop: "2px solid hsl(38 24% 54% / 0.24)",
-                      boxShadow: "0 -18px 45px hsl(0 0% 0% / 0.24)",
-                    }}
-                  />
-                  <div
-                    className="absolute left-1/2 top-[82%] -translate-x-1/2 -z-10 h-24 w-[330px] rounded-full"
-                    style={{
-                      background:
-                        "radial-gradient(ellipse at center, hsl(172 90% 68% / 0.28) 0%, hsl(34 24% 22% / 0.86) 38%, hsl(24 22% 8% / 0.86) 72%)",
-                      border: "2px solid hsl(38 26% 54% / 0.28)",
-                      boxShadow: "0 18px 54px hsl(0 0% 0% / 0.42), inset 0 0 30px hsl(178 88% 70% / 0.16)",
-                    }}
-                  />
-                  <div
-                    className="absolute left-1/2 top-[94%] -translate-x-1/2 -z-10 h-14 w-[280px] rounded-full"
-                    style={{
-                      background:
-                        "repeating-radial-gradient(ellipse at center, hsl(174 80% 70% / 0.28) 0 2px, transparent 2px 18px)",
-                      transform: "translateX(-50%) perspective(360px) rotateX(58deg)",
-                    }}
-                  />
-                </>
-              ) : null}
+              {/* (Removed decorative platform/ripple disc beneath the portal.) */}
               {/* Portal arch */}
               <div
                 className="relative mx-auto rounded-t-full overflow-hidden"
