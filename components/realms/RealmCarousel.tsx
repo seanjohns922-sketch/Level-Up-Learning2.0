@@ -192,93 +192,21 @@ export default function RealmCarousel() {
     <main className="min-h-screen relative overflow-hidden select-none">
       {/* Interior background */}
       <div className="fixed inset-0 z-0">
-        {isTopChamber ? (
-          <>
-            <img
-              src="/images/realm-select-bg.jpg"
-              alt=""
-              className="h-full w-full object-cover"
-              style={{
-                objectPosition: `${50 + bgShift}% 18%`,
-                transform: "scale(1.08)",
-                filter: "brightness(1.18) saturate(0.9) contrast(1.08)",
-                transition: "object-position 0.5s cubic-bezier(0.4,0,0.2,1)",
-              }}
-            />
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(180deg, hsl(46 92% 88% / 0.14) 0%, transparent 36%, transparent 70%, hsl(20 24% 6% / 0.48) 100%)",
-              }}
-            />
-            <div
-              className="absolute left-1/2 top-[-24vh] h-[54vh] w-[72vw] -translate-x-1/2 rounded-b-full"
-              style={{
-                background:
-                  "radial-gradient(ellipse at center top, hsl(48 100% 96% / 0.82) 0%, hsl(190 82% 86% / 0.36) 34%, transparent 68%)",
-                border: "18px solid hsl(32 22% 18% / 0.72)",
-                borderTop: 0,
-                boxShadow: "0 18px 70px hsl(0 0% 0% / 0.36), inset 0 -24px 80px hsl(178 82% 70% / 0.14)",
-              }}
-            />
-            <div
-              className="absolute inset-x-0 top-0 h-[68vh] opacity-90"
-              style={{
-                background:
-                  "linear-gradient(102deg, transparent 10%, hsl(46 100% 92% / 0.32) 20%, transparent 33%), linear-gradient(77deg, transparent 42%, hsl(178 80% 78% / 0.22) 55%, transparent 69%), linear-gradient(180deg, hsl(48 100% 95% / 0.2), transparent 62%)",
-              }}
-            />
-            <div
-              className="absolute inset-y-0 left-0 w-[24vw]"
-              style={{
-                background:
-                  "linear-gradient(90deg, hsl(24 24% 6% / 0.92), hsl(28 22% 12% / 0.62) 58%, transparent), repeating-linear-gradient(180deg, hsl(36 22% 52% / 0.18) 0 3px, transparent 3px 78px)",
-                boxShadow: "inset -34px 0 52px hsl(0 0% 0% / 0.28)",
-              }}
-            />
-            <div
-              className="absolute inset-y-0 right-0 w-[24vw]"
-              style={{
-                background:
-                  "linear-gradient(270deg, hsl(24 24% 6% / 0.92), hsl(28 22% 12% / 0.62) 58%, transparent), repeating-linear-gradient(180deg, hsl(36 22% 52% / 0.18) 0 3px, transparent 3px 78px)",
-                boxShadow: "inset 34px 0 52px hsl(0 0% 0% / 0.28)",
-              }}
-            />
-            <div
-              className="pointer-events-none absolute inset-x-[7%] top-[18vh] h-[42vh] opacity-55"
-              style={{
-                background:
-                  "radial-gradient(ellipse at center, transparent 30%, hsl(32 20% 12% / 0.76) 31%, hsl(30 16% 10% / 0.68) 36%, transparent 37%), radial-gradient(ellipse at 16% 68%, transparent 24%, hsl(32 20% 12% / 0.72) 25%, hsl(30 16% 10% / 0.62) 31%, transparent 32%), radial-gradient(ellipse at 84% 68%, transparent 24%, hsl(32 20% 12% / 0.72) 25%, hsl(30 16% 10% / 0.62) 31%, transparent 32%)",
-              }}
-            />
-            <div
-              className="absolute inset-x-[-12%] bottom-[-18vh] h-[48vh]"
-              style={{
-                background:
-                  "radial-gradient(ellipse at center, hsl(174 84% 56% / 0.22) 0%, hsl(32 28% 14% / 0.58) 46%, hsl(20 22% 6% / 0.92) 78%)",
-              }}
-            />
-            <div className="top-chamber-particles absolute inset-0" />
-            <div className="absolute inset-x-0 bottom-0 h-[30vh] bg-gradient-to-t from-black/65 to-transparent" />
-          </>
-        ) : (
-          <>
-            <img
-              src="/images/realm-select-bg.jpg"
-              alt=""
-              className="w-full h-full object-cover"
-              style={{
-                objectPosition: `${50 + bgShift}% 35%`,
-                transition: "object-position 0.5s cubic-bezier(0.4,0,0.2,1)",
-                transform: "scale(1.05)",
-              }}
-            />
-            {/* Warm vignette overlay */}
-            <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at center 60%, transparent 30%, rgba(0,0,0,0.5) 100%)" }} />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
-          </>
-        )}
+        <>
+          <img
+            src="/images/tower-hub-bg.jpg"
+            alt=""
+            className="w-full h-full object-cover"
+            style={{
+              objectPosition: `${50 + bgShift}% 35%`,
+              transition: "object-position 0.5s cubic-bezier(0.4,0,0.2,1)",
+              transform: "scale(1.05)",
+            }}
+          />
+          {/* Warm vignette overlay */}
+          <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at center 60%, transparent 30%, rgba(0,0,0,0.5) 100%)" }} />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
+        </>
       </div>
 
       {/* Content */}
