@@ -181,7 +181,8 @@ export default function RealmCarousel() {
   const prevIdx = (currentIndex - 1 + REALMS.length) % REALMS.length;
   const nextIdx = (currentIndex + 1) % REALMS.length;
   const bgShift = -2 + (currentIndex / REALMS.length) * 4;
-  const isTopChamber = levelNumber >= 6;
+  // Use the same tower-hub aesthetic across all levels (including Year 6).
+  const isTopChamber = false;
 
   function enterRealm() {
     if (!isActive) return;
