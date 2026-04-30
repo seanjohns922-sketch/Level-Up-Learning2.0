@@ -316,7 +316,7 @@ function ProgramPage() {
       </div>
 
       {/* ── Horizontal lesson dashboard ── */}
-      <div className="relative z-10 pb-16 px-4 md:px-6">
+      <div className="relative z-10 px-4 pb-16 pt-10 md:px-6 md:pt-16">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 items-stretch relative">
             {items.map((item, idx) => {
