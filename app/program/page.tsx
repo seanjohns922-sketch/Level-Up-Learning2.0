@@ -240,54 +240,47 @@ function ProgramPage() {
               </div>
             ) : null}
 
-            <div className="mt-6 mx-auto max-w-5xl">
-              <div className="rounded-[24px] border border-teal-300/15 bg-black/20 p-3 backdrop-blur-md shadow-[0_12px_40px_rgba(0,0,0,0.22)]">
-                <div className="flex gap-2 overflow-x-auto pb-1">
-                  {Array.from({ length: 12 }).map((_, index) => {
-                    const targetWeek = index + 1;
-                    const isCurrent = targetWeek === weekNum;
-                    const isUnlocked = DEMO_MODE || teacherMode || targetWeek <= lastAllowedWeek;
-                    return (
-                      <button
-                        key={targetWeek}
-                        type="button"
-                        onClick={() => goToWeek(targetWeek)}
-                        className={[
-                          "group min-w-[88px] rounded-2xl border px-4 py-3 text-left transition-all",
-                          isUnlocked ? "hover:-translate-y-0.5" : "opacity-75",
-                        ].join(" ")}
-                        style={{
-                          background: isCurrent
-                            ? "linear-gradient(135deg, rgba(20,184,166,0.38), rgba(13,148,136,0.16))"
-                            : "linear-gradient(135deg, rgba(2,26,24,0.88), rgba(6,78,71,0.42))",
-                          borderColor: isCurrent
-                            ? "rgba(94,234,212,0.55)"
-                            : isUnlocked
-                              ? "rgba(94,234,212,0.2)"
-                              : "rgba(148,163,184,0.2)",
-                          boxShadow: isCurrent
-                            ? "0 0 20px rgba(20,184,166,0.28), inset 0 1px 0 rgba(94,234,212,0.35)"
-                            : "inset 0 1px 0 rgba(94,234,212,0.12)",
-                        }}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-mono font-black uppercase tracking-[0.18em] text-teal-100/70">
-                            Week
-                          </span>
-                          {!isUnlocked ? (
-                            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-slate-300/80" fill="none" stroke="currentColor" strokeWidth="2">
-                              <rect x="4" y="11" width="16" height="9" rx="2" />
-                              <path d="M8 11V8a4 4 0 018 0v3" />
-                            </svg>
-                          ) : null}
-                        </div>
-                        <div className="mt-2 text-2xl font-black text-white">{targetWeek}</div>
-                        <div className="mt-1 text-[10px] font-mono font-bold uppercase tracking-[0.14em] text-teal-100/60">
-                          {isCurrent ? "Current" : isUnlocked ? "Open" : "Locked"}
-                        </div>
-                      </button>
-                    );
-                  })}
+            <div className="mt-6 mx-auto max-w-md">
+              <label className="sr-only" htmlFor="week-selector">Choose week</label>
+              <div
+                className="relative overflow-hidden border border-teal-300/25 bg-black/25 backdrop-blur-md shadow-[0_12px_40px_rgba(0,0,0,0.22)]"
+                style={{
+                  clipPath: "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
+                  boxShadow: "inset 0 1px 0 rgba(94,234,212,0.2), 0 0 24px rgba(20,184,166,0.16)",
+                }}
+              >
+                <div
+                  className="absolute inset-0 pointer-events-none opacity-[0.08]"
+                  style={{ backgroundImage: "repeating-linear-gradient(0deg, rgba(94,234,212,0.65) 0 1px, transparent 1px 3px)" }}
+                />
+                <div className="relative flex items-center gap-4 px-5 py-3">
+                  <div className="text-left">
+                    <p className="text-[10px] font-mono font-black uppercase tracking-[0.2em] text-teal-200/70">Select Week</p>
+                    <p className="mt-0.5 text-sm font-bold text-white">Week {weekNum}</p>
+                  </div>
+                  <select
+                    id="week-selector"
+                    value={weekNum}
+                    onChange={(event) => goToWeek(Number(event.target.value))}
+                    className="ml-auto min-w-[180px] appearance-none rounded-none border border-teal-300/30 bg-teal-950/70 px-4 py-2.5 pr-10 text-sm font-mono font-black uppercase tracking-[0.14em] text-teal-50 outline-none transition focus:border-teal-200/70 focus:ring-2 focus:ring-teal-300/25"
+                    style={{
+                      clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
+                      boxShadow: "inset 0 1px 0 rgba(94,234,212,0.26)",
+                    }}
+                  >
+                    {Array.from({ length: 12 }).map((_, index) => {
+                      const targetWeek = index + 1;
+                      const isUnlocked = DEMO_MODE || teacherMode || targetWeek <= lastAllowedWeek;
+                      return (
+                        <option key={targetWeek} value={targetWeek}>
+                          Week {targetWeek} · {targetWeek === weekNum ? "Current" : isUnlocked ? "Open" : "Locked"}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <svg viewBox="0 0 24 24" className="pointer-events-none absolute right-8 h-4 w-4 text-teal-100/80" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
                 </div>
               </div>
             </div>
