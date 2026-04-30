@@ -267,40 +267,19 @@ function toAssessmentTypedQuizQuestion(
   index: number,
   quizMeta: NonNullable<QuizQuestion["quizMeta"]>
 ): QuizQuestion | null {
-  if (questionData.kind === "multiple_choice") {
-    return {
-      id: `q${index}`,
-      lessonNumber,
-      lessonTag: lessonNumber,
-      skill,
-      activityType: "multiple_choice",
-      kind: "lessonActivity",
-      prompt: questionData.prompt,
-      activity: {
-        activityType: "multiple_choice",
-        weight: 1,
-        config: {},
-      },
-      questionData,
-      quizMeta,
-    };
-  }
-
-  if (questionData.kind === "typed_response" && typeof questionData.answer === "string") {
+  if (
+    (questionData.kind === "multiple_choice" || questionData.kind === "typed_response") &&
+    typeof questionData.answer === "string"
+  ) {
     return {
       id: `q${index}`,
       lessonNumber,
       lessonTag: lessonNumber,
       skill,
       activityType: "typed_response",
-      kind: "lessonActivity",
+      kind: "typed",
       prompt: questionData.prompt,
-      activity: {
-        activityType: "typed_response",
-        weight: 1,
-        config: {},
-      },
-      questionData,
+      correctValue: questionData.answer,
       quizMeta,
     };
   }
@@ -373,11 +352,9 @@ function toExplicitWeeklyQuizQuestion(
       ? question.visual.numberLine
       : question.visual?.kind === "fractionNumberLine"
         ? question.visual.fractionNumberLine
-      : question.visual?.kind === "fractionContext"
-        ? question.visual.fractionContext
       : question.visual?.kind === "integerContext"
         ? question.visual.contextVisual
-      : undefined;
+        : undefined;
 
   const isFractionTypedAnswer = /\/|\d+\s+\d+\/\d+/.test(correctAnswer);
 
@@ -454,7 +431,7 @@ function toExplicitWeeklyQuizQuestion(
   }
 
   if (question.answerType === "numeric") {
-    if (typedInputType || isFractionTypedAnswer) {
+    if (isFractionTypedAnswer) {
       return {
         ...lessonMeta,
         activityType: "typed_response",
@@ -465,13 +442,7 @@ function toExplicitWeeklyQuizQuestion(
           prompt,
           answer: correctAnswer,
           helper: question.feedbackIncorrect,
-          placeholder:
-            question.placeholder ??
-            (typedInputType === "integer"
-              ? "Type the integer"
-              : typedInputType === "mixed"
-                ? "Type the mixed number"
-                : "Type the fraction"),
+          placeholder: question.placeholder ?? "Type the fraction",
           inputType: typedInputType ?? (isFractionTypedAnswer ? "fraction" : undefined),
         },
         activity: {

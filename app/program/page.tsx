@@ -1,10 +1,12 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { getLegendForYear } from "@/data/legends";
 import { getProgramForYear } from "@/data/programs";
-import { DEMO_MODE } from "@/data/config";
-import { readProgress, updateProgress } from "@/data/progress";
+import { DEV_MODE, DEMO_MODE } from "@/data/config";
+import { readProgress, updateProgress, writeProgress } from "@/data/progress";
+import type { StudentProgress } from "@/data/progress";
 import {
   readProgramStore,
   getWeekProgress,
@@ -13,7 +15,6 @@ import {
 } from "@/lib/program-progress";
 import { getHomeBg, getHomeBgFilter, getVignetteStyle } from "@/lib/levelBand";
 
-const TEACHER_MODE_KEY = "lul:hidden_teacher_mode";
 
 export default function ProgramPageWrapper() {
   return (
@@ -36,34 +37,10 @@ function ProgramPage() {
     return selected.length > 0 ? year : "Year 1";
   }, [year]);
 
-  const [store, setStore] = useState<ProgramProgressStore>(() =>
-    typeof window !== "undefined" ? readProgramStore() : {}
-  );
-  const [teacherMode, setTeacherMode] = useState(() =>
-    typeof window !== "undefined" ? window.localStorage.getItem(TEACHER_MODE_KEY) === "true" : false
-  );
-  const [teacherToast, setTeacherToast] = useState("");
-  const secretTapCountRef = useRef(0);
-  const [weekMenuOpen, setWeekMenuOpen] = useState(false);
-  const weekMenuRef = useRef<HTMLDivElement | null>(null);
+  const [store, setStore] = useState<ProgramProgressStore>({});
+  const [isClient, setIsClient] = useState(false);
 
-  useEffect(() => {
-    if (!weekMenuOpen) return;
-    function onDown(e: MouseEvent) {
-      if (weekMenuRef.current && !weekMenuRef.current.contains(e.target as Node)) {
-        setWeekMenuOpen(false);
-      }
-    }
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setWeekMenuOpen(false);
-    }
-    window.addEventListener("mousedown", onDown);
-    window.addEventListener("keydown", onKey);
-    return () => {
-      window.removeEventListener("mousedown", onDown);
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [weekMenuOpen]);
+  useEffect(() => { setStore(readProgramStore()); setIsClient(true); }, []);
 
   // Re-read store on window focus (in case lesson page updated it)
   useEffect(() => {
@@ -72,19 +49,23 @@ function ProgramPage() {
     return () => window.removeEventListener("focus", onFocus);
   }, []);
 
+  // Also re-read when route params change (navigating back from lesson)
+  useEffect(() => {
+    setStore(readProgramStore());
+  }, [weekNum, year]);
+
   const prevProgress = getWeekProgress(store, year, Math.max(1, weekNum - 1));
-  const weekUnlocked =
-    DEMO_MODE || teacherMode ? true : weekNum === 1 ? true : isWeekComplete(prevProgress);
+  const canAccessThisWeek = DEMO_MODE ? true : weekNum === 1 ? true : isWeekComplete(prevProgress);
 
   const lastAllowedWeek = useMemo(() => {
-    if (DEMO_MODE || teacherMode) return 12;
+    if (DEMO_MODE) return 12;
     let allowed = 1;
     for (let w = 2; w <= 12; w++) {
       if (isWeekComplete(getWeekProgress(store, year, w - 1))) allowed = w;
       else break;
     }
     return allowed;
-  }, [teacherMode, year, store]);
+  }, [year, store]);
 
   const progress = getWeekProgress(store, year, week);
 
@@ -112,9 +93,9 @@ function ProgramPage() {
   }, [curriculumYear, weekNum]);
 
   function openItem(item: (typeof items)[number]) {
-    if (!weekUnlocked && !teacherMode && !DEMO_MODE) return;
+    if (!canAccessThisWeek) return;
 
-    if (!DEMO_MODE && !teacherMode) {
+    if (!DEMO_MODE) {
       if (item.type === "lesson") {
         const lessonIdx = item.n - 1;
         if (lessonIdx > 0 && !progress.lessonsCompleted[lessonIdx - 1]) return;
@@ -143,31 +124,11 @@ function ProgramPage() {
 
   function goToWeek(targetWeek: number) {
     const clamped = Math.max(1, Math.min(12, targetWeek));
-    router.push(`/program?year=${encodeURIComponent(year)}&week=${clamped}`);
-  }
-
-  function setTeacherModeState(next: boolean) {
-    setTeacherMode(next);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(TEACHER_MODE_KEY, next ? "true" : "false");
-    }
-    setTeacherToast(next ? "Teacher mode enabled" : "Teacher mode disabled");
-    window.setTimeout(() => setTeacherToast(""), 1800);
-  }
-
-  function handleSecretTeacherToggle() {
-    secretTapCountRef.current += 1;
-    const next = secretTapCountRef.current;
-    if (next >= 6) {
-      secretTapCountRef.current = 0;
-      setTeacherModeState(!teacherMode);
+    if (!DEMO_MODE && clamped > lastAllowedWeek) {
+      router.push(`/program?year=${encodeURIComponent(year)}&week=${lastAllowedWeek}`);
       return;
     }
-    window.setTimeout(() => {
-      if (secretTapCountRef.current === next) {
-        secretTapCountRef.current = 0;
-      }
-    }, 1500);
+    router.push(`/program?year=${encodeURIComponent(year)}&week=${clamped}`);
   }
 
   const lessonsDoneCount = progress.lessonsCompleted.filter(Boolean).length;
@@ -183,9 +144,46 @@ function ProgramPage() {
     if (nextWeek !== savedWeek) updateProgress({ assignedWeek: nextWeek });
   }, [weekComplete, weekNum]);
 
+  function finishProgram() {
+    const legend = getLegendForYear(year);
+    const student = readProgress();
+    const unlocked = student?.unlockedLegends ?? [];
+    const nextUnlocked = unlocked.includes(legend.id) ? unlocked : [...unlocked, legend.id];
+    const nextStudent: StudentProgress = {
+      year,
+      scorePercent: Math.max(student?.scorePercent ?? 0, 90),
+      status: "PASSED",
+      unlockedLegends: nextUnlocked,
+    };
+    writeProgress(nextStudent);
+    router.push(`/results?year=${encodeURIComponent(year)}&score=90&total=100&source=program_complete`);
+  }
+
   const xp = lessonsDoneCount * 10 + (progress.quizCompleted ? 20 : 0);
   const totalXp = 50;
   const percent = Math.round((xp / totalXp) * 100);
+
+  if (!canAccessThisWeek) {
+    return (
+      <main className="min-h-screen bg-[#f6f2ec] flex items-center justify-center p-6">
+        <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-md text-center">
+          <div className="h-16 w-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
+            <svg viewBox="0 0 24 24" className="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0110 0v4" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-black text-gray-900 mb-2">Week {weekNum} Locked</h1>
+          <p className="text-gray-500 mb-6 text-sm">Complete Week {weekNum - 1} first (3 lessons + quiz ≥ 80%) to unlock.</p>
+          <button onClick={() => goToWeek(lastAllowedWeek)} className="w-full py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold shadow-lg shadow-emerald-200 hover:shadow-emerald-300 transition">
+            Go to Week {lastAllowedWeek}
+          </button>
+          <button onClick={() => router.push("/home")} className="w-full mt-3 py-3 rounded-2xl bg-gray-100 text-gray-700 font-bold hover:bg-gray-200 transition">
+            Back to Home
+          </button>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen relative">
@@ -213,109 +211,34 @@ function ProgramPage() {
         />
       </div>
 
+      {DEV_MODE && (
+        <div className="fixed bottom-4 right-4 px-4 py-2 bg-red-600 text-white font-extrabold rounded-xl shadow-lg z-50">DEV MODE</div>
+      )}
+
       {/* ── Hero header ── */}
       <div className="relative z-10">
         <div className="relative max-w-6xl mx-auto px-6 pt-5 pb-10">
-          <div className="flex items-start justify-between gap-3 mb-6">
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => router.push("/home")}
-                className="border border-teal-300/25 bg-black/25 px-4 py-2 text-xs font-mono font-black uppercase tracking-[0.14em] text-teal-50 backdrop-blur-md transition hover:border-teal-200/45 hover:bg-teal-950/45 focus:outline-none focus:ring-2 focus:ring-teal-300/25"
-                style={{
-                  clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
-                  boxShadow: "inset 0 1px 0 rgba(94,234,212,0.2), 0 0 18px rgba(20,184,166,0.12)",
-                }}
-              >
-                ← Back
+          <div className="flex items-center justify-between mb-6">
+            <button
+              onClick={() => router.push("/home")}
+              className="px-4 py-2 rounded-full bg-white/15 backdrop-blur text-white text-sm font-semibold hover:bg-white/25 transition"
+            >
+              ← Back
+            </button>
+            <div className="flex items-center gap-2">
+              <button onClick={() => goToWeek(weekNum - 1)} className="h-10 w-10 rounded-full bg-white/15 backdrop-blur flex items-center justify-center text-white hover:bg-white/25 transition" aria-label="Previous week">
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M15 18l-6-6 6-6" /></svg>
               </button>
-              <div ref={weekMenuRef} className="relative">
-                <button
-                  type="button"
-                  onClick={() => setWeekMenuOpen((v) => !v)}
-                  aria-haspopup="listbox"
-                  aria-expanded={weekMenuOpen}
-                  className="relative flex min-w-[170px] items-center justify-between gap-3 border border-teal-300/25 bg-black/25 px-4 py-2 text-xs font-mono font-black uppercase tracking-[0.14em] text-teal-50 backdrop-blur-md transition hover:border-teal-200/45 hover:bg-teal-950/45 focus:outline-none focus:ring-2 focus:ring-teal-300/25"
-                  style={{
-                    clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
-                    boxShadow: "inset 0 1px 0 rgba(94,234,212,0.2), 0 0 18px rgba(20,184,166,0.12)",
-                  }}
-                >
-                  <span className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]" />
-                    Week {weekNum}
-                  </span>
-                  <svg viewBox="0 0 24 24" className={`h-3.5 w-3.5 text-teal-100/80 transition-transform ${weekMenuOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M6 9l6 6 6-6" />
-                  </svg>
-                </button>
-                {weekMenuOpen && (
-                  <div
-                    role="listbox"
-                    className="absolute left-0 top-[calc(100%+6px)] z-50 max-h-[260px] w-[170px] overflow-y-auto border border-teal-300/30 bg-[rgba(2,18,18,0.92)] backdrop-blur-xl"
-                    style={{
-                      clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
-                      boxShadow: "inset 0 1px 0 rgba(94,234,212,0.25), 0 14px 40px rgba(0,0,0,0.55), 0 0 28px rgba(20,184,166,0.18)",
-                    }}
-                  >
-                    <div className="px-3 py-1.5 border-b border-teal-300/15 text-[9px] font-mono font-bold uppercase tracking-[0.2em] text-teal-300/80">
-                      Select Week
-                    </div>
-                    <ul className="py-0.5">
-                      {Array.from({ length: 12 }).map((_, index) => {
-                        const targetWeek = index + 1;
-                        const isUnlocked = DEMO_MODE || teacherMode || targetWeek <= lastAllowedWeek;
-                        const isCurrent = targetWeek === weekNum;
-                        const status = isCurrent ? "Current" : isUnlocked ? "Open" : "Locked";
-                        return (
-                          <li key={targetWeek}>
-                            <button
-                              type="button"
-                              role="option"
-                              aria-selected={isCurrent}
-                              onClick={() => {
-                                setWeekMenuOpen(false);
-                                goToWeek(targetWeek);
-                              }}
-                              className={`group flex w-full items-center justify-between gap-2 px-3 py-1 text-left text-[10px] font-mono font-bold uppercase tracking-[0.12em] transition ${
-                                isCurrent
-                                  ? "bg-teal-400/15 text-teal-100"
-                                  : isUnlocked
-                                  ? "text-teal-50/85 hover:bg-teal-400/10 hover:text-teal-50"
-                                  : "text-teal-50/30 hover:bg-white/5"
-                              }`}
-                            >
-                              <span className="flex items-center gap-1.5">
-                                {isCurrent ? (
-                                  <svg viewBox="0 0 24 24" className="h-2.5 w-2.5 text-teal-300" fill="none" stroke="currentColor" strokeWidth="3">
-                                    <path d="M5 12l5 5L20 7" />
-                                  </svg>
-                                ) : (
-                                  <span className={`h-1 w-1 rounded-full ${isUnlocked ? "bg-teal-400/70" : "bg-white/20"}`} />
-                                )}
-                                Week {targetWeek}
-                              </span>
-                              <span className={`text-[8px] tracking-[0.16em] ${
-                                isCurrent ? "text-teal-300" : isUnlocked ? "text-teal-200/60" : "text-white/30"
-                              }`}>
-                                {status}
-                              </span>
-                            </button>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
-                )}
-              </div>
+              <button onClick={() => goToWeek(weekNum + 1)} className="h-10 w-10 rounded-full bg-white/15 backdrop-blur flex items-center justify-center text-white hover:bg-white/25 transition" aria-label="Next week">
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 6l6 6-6 6" /></svg>
+              </button>
+              <span className="text-sm text-white/80 font-medium ml-1">Level {levelNum}</span>
             </div>
-            <span className="text-sm text-white/80 font-medium ml-1">Level {levelNum}</span>
           </div>
 
           <div className="text-center">
             {/* Nexus level pill */}
-            <button
-              type="button"
-              onClick={handleSecretTeacherToggle}
+            <span
               className="inline-flex items-center gap-2 px-4 py-1.5 text-[11px] font-mono font-bold uppercase tracking-[0.18em] text-teal-50"
               style={{
                 background: "linear-gradient(135deg, #021a18 0%, #064e47 50%, #0a5048 100%)",
@@ -325,25 +248,19 @@ function ProgramPage() {
             >
               <span className="h-1.5 w-1.5 rounded-full bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]" />
               Level {levelNum} · 12-Week Program
-            </button>
+            </span>
             <h1 className="text-4xl md:text-5xl font-black text-white mt-3 tracking-tight drop-shadow-[0_2px_12px_rgba(20,184,166,0.35)]">Week {weekNum}</h1>
             <p className="text-base md:text-lg text-teal-50/95 mt-2 font-semibold">
               <span className="text-teal-300/80 font-mono text-xs uppercase tracking-[0.18em] mr-2">Focus</span>
               {currentWeekPlan?.topic ?? "Your current focus"}
             </p>
             <p className="text-teal-200/80 mt-2 text-xs font-mono uppercase tracking-[0.16em]">
-              {weekUnlocked
+              {isClient
                 ? weekComplete
                   ? "◆ Completed"
                   : `${lessonsDoneCount}/3 Lessons · ${progress.quizCompleted ? "Quiz Done" : "Quiz Pending"}`
-                : "◆ Preview Locked"}
+                : "0/3 Lessons · Quiz Pending"}
             </p>
-
-            {teacherToast ? (
-              <div className="mt-3 inline-flex items-center rounded-full border border-teal-300/35 bg-black/30 px-3 py-1 text-[11px] font-mono font-bold uppercase tracking-[0.16em] text-teal-100">
-                {teacherToast}
-              </div>
-            ) : null}
 
             {/* Nexus XP plate */}
             <div className="mt-5 mx-auto max-w-sm relative">
@@ -388,8 +305,21 @@ function ProgramPage() {
       </div>
 
       {/* ── Horizontal lesson dashboard ── */}
-      <div className="relative z-10 px-4 pb-16 pt-10 md:px-6 md:pt-16">
+      <div className="relative z-10 pb-16 px-4 md:px-6">
         <div className="max-w-6xl mx-auto">
+          {DEV_MODE && (
+            <div className="mb-6 rounded-2xl border border-amber-200/40 bg-amber-50/95 backdrop-blur p-4">
+              <div className="font-bold text-amber-800 mb-2 text-sm">DEV – Jump to any week</div>
+              <div className="flex flex-wrap gap-2">
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <button key={i} onClick={() => goToWeek(i + 1)} className="px-3 py-1.5 rounded-lg bg-white border border-amber-300 text-xs font-bold hover:bg-amber-100 transition">
+                    W{i + 1}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 items-stretch relative">
             {items.map((item, idx) => {
               const isLesson = item.type === "lesson";
@@ -401,10 +331,7 @@ function ProgramPage() {
                   : progress.quizCompleted;
 
               let locked = false;
-              if (!DEMO_MODE && !teacherMode) {
-                if (!weekUnlocked) {
-                  locked = true;
-                }
+              if (!DEMO_MODE) {
                 if (isLesson && item.n > 1 && !progress.lessonsCompleted[item.n - 2]) locked = true;
                 if (item.type === "quiz" && lessonsDoneCount < 3) locked = true;
                 if (isPostTest && lessonsDoneCount < 3) locked = true;
@@ -413,6 +340,8 @@ function ProgramPage() {
               const isActive = !locked && !completed;
               const postTestReady = isPostTest && !locked;
               const isLast = idx === items.length - 1;
+              const labelTop = isLesson ? `Lesson ${item.n}` : isPostTest ? "Final Assessment" : "Weekly Quiz";
+
               return (
                 <div key={`${item.type}-${item.n}`} className="relative flex">
                   {/* Bezel frame */}
@@ -547,11 +476,7 @@ function ProgramPage() {
                         className="mt-1.5 text-xs text-teal-100/60 leading-snug"
                         style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}
                       >
-                        {!weekUnlocked
-                          ? "Complete previous weeks to unlock"
-                          : locked && isPostTest
-                            ? "Complete all lessons to unlock"
-                            : item.focus}
+                        {locked && isPostTest ? "Complete all lessons to unlock" : item.focus}
                       </div>
                     </div>
 
@@ -560,9 +485,7 @@ function ProgramPage() {
                         {isPostTest ? "MASTERY" : isLesson ? "10 XP" : "20 XP"}
                       </span>
                       {locked ? (
-                        <span className="text-[10px] font-mono font-extrabold text-slate-400">
-                          {weekUnlocked ? "—" : "LOCKED"}
-                        </span>
+                        <span className="text-[10px] font-mono font-extrabold text-slate-600">—</span>
                       ) : (
                         <span
                           className="text-[10px] font-mono font-extrabold tracking-[0.18em] px-3 py-1 text-white"
@@ -602,35 +525,6 @@ function ProgramPage() {
               );
             })}
           </div>
-
-          {!weekUnlocked ? (
-            <div className="mt-6 rounded-[28px] border border-white/10 bg-black/25 p-6 text-center backdrop-blur-md shadow-[0_16px_48px_rgba(0,0,0,0.24)]">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/8 text-teal-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
-                <svg viewBox="0 0 24 24" className="h-8 w-8" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="4" y="11" width="16" height="9" rx="2" />
-                  <path d="M8 11V8a4 4 0 018 0v3" />
-                </svg>
-              </div>
-              <h2 className="mt-4 text-2xl font-black text-white">Week {weekNum} Preview</h2>
-              <p className="mt-2 text-sm font-semibold text-teal-100/75">
-                Complete previous weeks to unlock
-              </p>
-              <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
-                <button
-                  onClick={() => goToWeek(lastAllowedWeek)}
-                  className="rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-emerald-950/30 transition hover:-translate-y-0.5"
-                >
-                  Go to Week {lastAllowedWeek}
-                </button>
-                <button
-                  onClick={() => router.push("/home")}
-                  className="rounded-2xl bg-white/10 px-5 py-3 text-sm font-black text-white transition hover:bg-white/15"
-                >
-                  Back to Home
-                </button>
-              </div>
-            </div>
-          ) : null}
         </div>
       </div>
     </main>

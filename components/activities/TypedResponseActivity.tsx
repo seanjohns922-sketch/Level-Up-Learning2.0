@@ -1525,7 +1525,6 @@ export default function TypedResponseActivity({
   const isGuidedWrittenMethod = isGuidedAddition || isGuidedSubtraction;
   const orderingAnswerParts = !writtenMethod ? extractOrderingNumbers(questionData.answer) : [];
   const expectedStructuredFraction = !writtenMethod ? parseStructuredFraction(questionData.answer) : null;
-  const acceptedAnswerList = [questionData.answer, ...(questionData.acceptedAnswers ?? [])].filter(Boolean);
   const declaredInputType = questionData.inputType;
   const isOrderingResponse =
     !writtenMethod &&
@@ -2408,6 +2407,13 @@ export default function TypedResponseActivity({
     }
 
     if (isStructuredFractionResponse) {
+      const expectedFraction =
+        expectedStructuredFraction ??
+        (questionData.answer ? parseFlexibleFraction(questionData.answer) : null);
+      if (!expectedFraction) {
+        onWrong?.();
+        return;
+      }
       const whole = normalizeNumberInput(fractionWholeInput);
       const numerator = normalizeNumberInput(fractionNumeratorInput);
       const denominator = normalizeNumberInput(
@@ -2446,13 +2452,7 @@ export default function TypedResponseActivity({
         return;
       }
 
-      const matchesAcceptedFraction = acceptedAnswerList.some((answerOption) => {
-        const expectedFraction =
-          parseStructuredFraction(answerOption) ?? parseFlexibleFraction(answerOption);
-        return expectedFraction ? mixedNumeralsEquivalent(parsed, expectedFraction) : false;
-      });
-
-      if (matchesAcceptedFraction) {
+      if (mixedNumeralsEquivalent(parsed, expectedFraction)) {
         onCorrect?.();
       } else {
         onWrong?.();
@@ -2462,17 +2462,12 @@ export default function TypedResponseActivity({
 
     if (isFlexibleFractionInput) {
       const parsedInput = parseFlexibleFraction(typed);
-      if (!parsedInput) {
+      const expected = parseFlexibleFraction(questionData.answer);
+      if (!parsedInput || !expected) {
         onWrong?.();
         return;
       }
-
-      const matchesAcceptedFraction = acceptedAnswerList.some((answerOption) => {
-        const expected = parseFlexibleFraction(answerOption);
-        return expected ? mixedNumeralsEquivalent(parsedInput, expected) : false;
-      });
-
-      if (matchesAcceptedFraction) {
+      if (mixedNumeralsEquivalent(parsedInput, expected)) {
         onCorrect?.();
       } else {
         onWrong?.();
@@ -2481,8 +2476,7 @@ export default function TypedResponseActivity({
     }
 
     if (isEquivalentFractionInput && equivalentFractionInputVisual) {
-      const normalizedTyped = normalizeNumberInput(typed);
-      if (acceptedAnswerList.some((answerOption) => normalizedTyped === String(answerOption))) {
+      if (normalizeNumberInput(typed) === String(questionData.answer)) {
         onCorrect?.();
       } else {
         onWrong?.();
@@ -2491,7 +2485,7 @@ export default function TypedResponseActivity({
     }
 
     if (isNumericInputOnly) {
-      if (acceptedAnswerList.some((answerOption) => numericInputsMatch(typed, answerOption))) {
+      if (numericInputsMatch(typed, questionData.answer)) {
         onCorrect?.();
       } else {
         onWrong?.();
@@ -2514,14 +2508,7 @@ export default function TypedResponseActivity({
         ? rawValue
         : normalizeDecimalEquivalent(rawValue);
     const expected = isOrderingResponse ? rawExpected : normalizeDecimalEquivalent(rawExpected);
-    const matchesAcceptedAnswer =
-      value === expected ||
-      isEquivalentNumberSequence(typed, questionData.answer) ||
-      acceptedAnswerList.slice(1).some((answerOption) => {
-        const normalizedOption = normalizeDecimalEquivalent(normalize(answerOption));
-        return value === normalizedOption || isEquivalentNumberSequence(typed, answerOption);
-      });
-    if (matchesAcceptedAnswer) {
+    if (value === expected || isEquivalentNumberSequence(typed, questionData.answer)) {
       onCorrect?.();
     } else {
       onWrong?.();

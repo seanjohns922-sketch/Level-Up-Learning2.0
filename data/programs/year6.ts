@@ -337,12 +337,12 @@ const year6Rows: ProgramRow[] = [
     focus: "Find a fraction of a quantity and connect it to multiplicative thinking",
     lesson: 1,
     topic: "Find a Fraction of a Quantity",
-    activity: "Scale quantities forward, backward, and across multi-step situations using fractions.",
+    activity: "Use partitioning and scaling to find fractional parts of quantities.",
     curriculum: ["AC9M6N05"],
     activities: [
-      makeActivity("typed_response", 1, { mode: "y6_fraction_quantity_structure" }),
-      makeActivity("typed_response", 1, { mode: "y6_fraction_quantity_nonclean" }),
-      makeActivity("typed_response", 1, { mode: "y6_fraction_quantity_multistep" }),
+      makeActivity("multiple_choice", 1, { mode: "fraction_of_quantity" }),
+      makeActivity("multiple_choice", 1, { mode: "fraction_of_quantity" }),
+      makeActivity("typed_response", 1, { mode: "fraction_of_quantity" }),
     ],
   },
   {
@@ -350,12 +350,12 @@ const year6Rows: ProgramRow[] = [
     focus: "Find percentages of quantities using efficient benchmark methods",
     lesson: 2,
     topic: "Find a Percentage of a Quantity",
-    activity: "Use benchmark fractions, 10% thinking, and efficient part-building to calculate percentages of quantities.",
+    activity: "Break percentages into easier parts or convert to decimals to find percentages of amounts.",
     curriculum: ["AC9M6N05"],
     activities: [
-      makeActivity("typed_response", 1, { mode: "y6_percent_benchmark" }),
-      makeActivity("typed_response", 1, { mode: "y6_percent_break_apart" }),
-      makeActivity("typed_response", 1, { mode: "y6_percent_real_multistep" }),
+      makeActivity("multiple_choice", 1, { mode: "percent_quick_find" }),
+      makeActivity("typed_response", 1, { mode: "percent_structured_method" }),
+      makeActivity("typed_response", 1, { mode: "percent_decimal_method" }),
     ],
   },
   {
