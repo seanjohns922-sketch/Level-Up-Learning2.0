@@ -6,11 +6,16 @@ import type { TypedResponseQuestion, WrittenMethodLayout } from "@/data/activiti
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import PlaceValueMABVisual from "@/components/activities/PlaceValueMABVisual";
 import DecimalModelVisual from "@/components/activities/DecimalModelVisual";
+import DecimalShiftVisual from "@/components/activities/DecimalShiftVisual";
+import FractionContextVisual from "@/components/activities/FractionContextVisual";
+import FractionNumberLineVisual from "@/components/activities/FractionNumberLineVisual";
+import IntegerContextVisual from "@/components/activities/IntegerContextVisual";
+import IntegerNumberLineVisual from "@/components/activities/IntegerNumberLineVisual";
 import MoneyContextVisual from "@/components/activities/MoneyContextVisual";
 import ArrayVisual from "@/components/activities/ArrayVisual";
 import RuleBoxVisual from "@/components/activities/RuleBoxVisual";
 import DiscountVisual from "@/components/activities/DiscountVisual";
-import { MathFormattedText } from "@/components/FractionText";
+import { Fraction, MathFormattedText } from "@/components/FractionText";
 
 function normalize(value: string) {
   return value.trim().toLowerCase().replace(/,/g, "").replace(/\s+/g, " ");
@@ -45,10 +50,8 @@ function StackedFraction({
   denominator: number;
 }) {
   return (
-    <div className="inline-flex flex-col items-center rounded-xl bg-white px-4 py-3 shadow-sm">
-      <span className="text-2xl font-black leading-none text-slate-900">{numerator}</span>
-      <span className="my-1 h-1 w-12 rounded-full bg-slate-500" />
-      <span className="text-2xl font-black leading-none text-slate-900">{denominator}</span>
+    <div className="inline-flex items-center rounded-xl bg-white px-4 py-3 shadow-sm">
+      <Fraction numerator={numerator} denominator={denominator} size="lg" />
     </div>
   );
 }
@@ -707,6 +710,40 @@ function mixedNumeralsEquivalent(
   const leftImproper = left.whole * left.denominator + left.numerator;
   const rightImproper = right.whole * right.denominator + right.numerator;
   return leftImproper * right.denominator === rightImproper * left.denominator;
+}
+
+function parseFlexibleFraction(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  if (/^\d+$/.test(trimmed)) {
+    const whole = Number(trimmed);
+    if (!Number.isFinite(whole)) return null;
+    return { whole, numerator: 0, denominator: 1 };
+  }
+
+  const mixedMatch = trimmed.match(/^(\d+)\s+(\d+)\/(\d+)$/);
+  if (mixedMatch) {
+    const whole = Number(mixedMatch[1]);
+    const numerator = Number(mixedMatch[2]);
+    const denominator = Number(mixedMatch[3]);
+    if (!Number.isFinite(whole) || !Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator === 0) {
+      return null;
+    }
+    return { whole, numerator, denominator };
+  }
+
+  const simpleMatch = trimmed.match(/^(\d+)\/(\d+)$/);
+  if (simpleMatch) {
+    const numerator = Number(simpleMatch[1]);
+    const denominator = Number(simpleMatch[2]);
+    if (!Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator === 0) {
+      return null;
+    }
+    return { whole: 0, numerator, denominator };
+  }
+
+  return null;
 }
 
 function structuredFractionKey(questionData: TypedResponseQuestion) {
@@ -1488,17 +1525,28 @@ export default function TypedResponseActivity({
   const isGuidedWrittenMethod = isGuidedAddition || isGuidedSubtraction;
   const orderingAnswerParts = !writtenMethod ? extractOrderingNumbers(questionData.answer) : [];
   const expectedStructuredFraction = !writtenMethod ? parseStructuredFraction(questionData.answer) : null;
+  const acceptedAnswerList = [questionData.answer, ...(questionData.acceptedAnswers ?? [])].filter(Boolean);
+  const declaredInputType = questionData.inputType;
   const isOrderingResponse =
     !writtenMethod &&
     orderingAnswerParts.length >= 4 &&
     /Type the numbers from (smallest to largest|largest to smallest)/i.test(questionData.prompt) &&
     orderingAnswerParts.every((part) => /^\d+$/.test(part));
+  const isFractionInput = declaredInputType === "fraction";
+  const isMixedNumberInput = declaredInputType === "mixed";
+  const isFlexibleFractionInput = declaredInputType === "flexible_fraction";
   const isStructuredFractionResponse =
     !writtenMethod &&
     !isOrderingResponse &&
     questionData.kind === "typed_response" &&
-    expectedStructuredFraction !== null;
-  const usesFixedDenominator = isStructuredFractionResponse && typeof questionData.fixedDenominator === "number";
+    (isFractionInput || isMixedNumberInput || isFlexibleFractionInput || !!expectedStructuredFraction);
+  const isMixedNumberResponse =
+    (isStructuredFractionResponse && isMixedNumberInput) ||
+    (!declaredInputType && isStructuredFractionResponse && (expectedStructuredFraction?.whole ?? 0) > 0);
+  const showsWholeNumberField = isMixedNumberResponse || isFlexibleFractionInput;
+  const usesFixedDenominator =
+    (isStructuredFractionResponse || isFractionInput) && typeof questionData.fixedDenominator === "number";
+  const isIntegerInput = declaredInputType === "integer";
   const [typed, setTyped] = useState("");
   const [fractionWholeInput, setFractionWholeInput] = useState("");
   const [fractionNumeratorInput, setFractionNumeratorInput] = useState("");
@@ -1615,6 +1663,7 @@ export default function TypedResponseActivity({
     isGuidedWrittenMethod && writtenMethod ? "decide" : "done"
   );
   const [guidedFeedback, setGuidedFeedback] = useState("");
+  const wholeRef = useRef<HTMLInputElement | null>(null);
   const numeratorRef = useRef<HTMLInputElement | null>(null);
   const denominatorRef = useRef<HTMLInputElement | null>(null);
   const questionKey = structuredFractionKey(questionData);
@@ -2358,7 +2407,7 @@ export default function TypedResponseActivity({
       return;
     }
 
-    if (isStructuredFractionResponse && expectedStructuredFraction) {
+    if (isStructuredFractionResponse) {
       const whole = normalizeNumberInput(fractionWholeInput);
       const numerator = normalizeNumberInput(fractionNumeratorInput);
       const denominator = normalizeNumberInput(
@@ -2367,16 +2416,25 @@ export default function TypedResponseActivity({
           : fractionDenominatorInput
       );
 
-      if (!numerator || !denominator) {
+      const parsed =
+        isFlexibleFractionInput && whole && !numerator && !denominator
+          ? {
+              whole: Number(whole),
+              numerator: 0,
+              denominator: 1,
+            }
+          : !numerator || !denominator
+            ? null
+            : {
+                whole: whole ? Number(whole) : 0,
+                numerator: Number(numerator),
+                denominator: Number(denominator),
+              };
+
+      if (!parsed) {
         onWrong?.();
         return;
       }
-
-      const parsed = {
-        whole: whole ? Number(whole) : 0,
-        numerator: Number(numerator),
-        denominator: Number(denominator),
-      };
 
       if (
         !Number.isFinite(parsed.whole) ||
@@ -2388,7 +2446,33 @@ export default function TypedResponseActivity({
         return;
       }
 
-      if (mixedNumeralsEquivalent(parsed, expectedStructuredFraction)) {
+      const matchesAcceptedFraction = acceptedAnswerList.some((answerOption) => {
+        const expectedFraction =
+          parseStructuredFraction(answerOption) ?? parseFlexibleFraction(answerOption);
+        return expectedFraction ? mixedNumeralsEquivalent(parsed, expectedFraction) : false;
+      });
+
+      if (matchesAcceptedFraction) {
+        onCorrect?.();
+      } else {
+        onWrong?.();
+      }
+      return;
+    }
+
+    if (isFlexibleFractionInput) {
+      const parsedInput = parseFlexibleFraction(typed);
+      if (!parsedInput) {
+        onWrong?.();
+        return;
+      }
+
+      const matchesAcceptedFraction = acceptedAnswerList.some((answerOption) => {
+        const expected = parseFlexibleFraction(answerOption);
+        return expected ? mixedNumeralsEquivalent(parsedInput, expected) : false;
+      });
+
+      if (matchesAcceptedFraction) {
         onCorrect?.();
       } else {
         onWrong?.();
@@ -2397,7 +2481,8 @@ export default function TypedResponseActivity({
     }
 
     if (isEquivalentFractionInput && equivalentFractionInputVisual) {
-      if (normalizeNumberInput(typed) === String(questionData.answer)) {
+      const normalizedTyped = normalizeNumberInput(typed);
+      if (acceptedAnswerList.some((answerOption) => normalizedTyped === String(answerOption))) {
         onCorrect?.();
       } else {
         onWrong?.();
@@ -2406,7 +2491,7 @@ export default function TypedResponseActivity({
     }
 
     if (isNumericInputOnly) {
-      if (numericInputsMatch(typed, questionData.answer)) {
+      if (acceptedAnswerList.some((answerOption) => numericInputsMatch(typed, answerOption))) {
         onCorrect?.();
       } else {
         onWrong?.();
@@ -2429,7 +2514,14 @@ export default function TypedResponseActivity({
         ? rawValue
         : normalizeDecimalEquivalent(rawValue);
     const expected = isOrderingResponse ? rawExpected : normalizeDecimalEquivalent(rawExpected);
-    if (value === expected || isEquivalentNumberSequence(typed, questionData.answer)) {
+    const matchesAcceptedAnswer =
+      value === expected ||
+      isEquivalentNumberSequence(typed, questionData.answer) ||
+      acceptedAnswerList.slice(1).some((answerOption) => {
+        const normalizedOption = normalizeDecimalEquivalent(normalize(answerOption));
+        return value === normalizedOption || isEquivalentNumberSequence(typed, answerOption);
+      });
+    if (matchesAcceptedAnswer) {
       onCorrect?.();
     } else {
       onWrong?.();
@@ -2495,6 +2587,21 @@ export default function TypedResponseActivity({
       ) : null}
       {questionData.visual?.type === "decimal_model" ? (
         <DecimalModelVisual visual={questionData.visual} title="Decimal model" />
+      ) : null}
+      {questionData.visual?.type === "decimal_shift" ? (
+        <DecimalShiftVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "fraction_number_line" ? (
+        <FractionNumberLineVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "fraction_context" ? (
+        <FractionContextVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "integer_context" ? (
+        <IntegerContextVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "integer_number_line" ? (
+        <IntegerNumberLineVisual visual={questionData.visual} />
       ) : null}
       {questionData.visual?.type === "array" ? (
         <ArrayVisual
@@ -3261,82 +3368,144 @@ export default function TypedResponseActivity({
               inputRef={numeratorRef}
             />
           ) : isStructuredFractionResponse ? (
-            <div className="flex flex-wrap items-end gap-4">
-              {usesFixedDenominator ? null : (
-                <div className="flex flex-col gap-2">
-                  <div className="text-xs font-bold uppercase tracking-wide text-slate-500">
-                    Whole
-                  </div>
-                  <input
-                    type="text"
-                    autoComplete="off"
-                    spellCheck={false}
-                    value={fractionWholeInput}
-                    onChange={(event) => {
-                      const nextValue = event.target.value.replace(/\D/g, "");
-                      setFractionWholeInput(nextValue);
-                      if (nextValue.length >= 1) {
-                        numeratorRef.current?.focus();
-                      }
-                    }}
-                    inputMode="numeric"
-                    placeholder=""
-                    className="block h-16 w-20 appearance-none rounded-xl border border-gray-300 bg-white px-3 text-center text-2xl font-black leading-none text-slate-900 caret-teal-600 outline-none focus:border-teal-500"
-                    style={{ WebkitTextFillColor: "#0f172a" }}
-                  />
-                </div>
-              )}
-              <div className="flex flex-col items-center">
+            <div className="w-full max-w-[420px]">
+              <div className="rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm transition focus-within:border-teal-400 focus-within:shadow-[0_0_0_4px_rgba(45,212,191,0.12)]">
                 <div className="text-xs font-bold uppercase tracking-wide text-slate-500">
-                  {usesFixedDenominator ? "Answer fraction" : "Fraction"}
+                  {isFlexibleFractionInput
+                    ? "Fraction or mixed number"
+                    : isMixedNumberResponse
+                    ? usesFixedDenominator
+                      ? "Mixed number answer"
+                      : "Mixed number"
+                    : isFractionInput
+                      ? usesFixedDenominator
+                        ? "Equivalent fraction answer"
+                        : "Fraction answer"
+                      : usesFixedDenominator
+                      ? "Equivalent fraction answer"
+                      : "Fraction answer"}
                 </div>
-                <div className="mt-2 flex flex-col items-center">
-                  <input
-                    ref={numeratorRef}
-                    type="text"
-                    autoComplete="off"
-                    spellCheck={false}
-                    value={fractionNumeratorInput}
-                    onChange={(event) => {
-                      const nextValue = event.target.value.replace(/\D/g, "");
-                      setFractionNumeratorInput(nextValue);
-                      if (nextValue.length >= 1) {
-                        denominatorRef.current?.focus();
-                      }
-                    }}
-                    inputMode="numeric"
-                    placeholder=""
-                    className="block h-12 w-20 appearance-none rounded-t-xl border border-b-0 border-gray-300 bg-white px-3 text-center text-2xl font-black leading-none text-slate-900 caret-teal-600 outline-none focus:border-teal-500"
-                    style={{ WebkitTextFillColor: "#0f172a" }}
-                  />
-                  <div className="h-1 w-20 rounded-full bg-slate-500" />
-                  {usesFixedDenominator && questionData.fixedDenominator ? (
-                    <div className="flex h-12 w-20 items-center justify-center rounded-b-xl border border-t-0 border-gray-300 bg-slate-100 px-3 text-center text-2xl font-black leading-none text-slate-700">
-                      {questionData.fixedDenominator}
-                    </div>
-                  ) : (
+                <div className="mt-3 flex items-center gap-2">
+                  {showsWholeNumberField ? (
                     <input
-                      ref={denominatorRef}
+                      ref={wholeRef}
                       type="text"
                       autoComplete="off"
                       spellCheck={false}
-                      value={fractionDenominatorInput}
+                      value={fractionWholeInput}
                       onChange={(event) => {
                         const nextValue = event.target.value.replace(/\D/g, "");
-                        setFractionDenominatorInput(nextValue);
+                        setFractionWholeInput(nextValue);
+                        if (nextValue.length >= 1) {
+                          numeratorRef.current?.focus();
+                        }
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === "ArrowRight" && !fractionWholeInput) {
+                          numeratorRef.current?.focus();
+                        }
                       }}
                       inputMode="numeric"
                       placeholder=""
-                      className="block h-12 w-20 appearance-none rounded-b-xl border border-t-0 border-gray-300 bg-white px-3 text-center text-2xl font-black leading-none text-slate-900 caret-teal-600 outline-none focus:border-teal-500"
+                      className="h-16 w-16 appearance-none border-0 bg-transparent px-1 text-center text-[2rem] font-black leading-none text-slate-900 caret-teal-600 outline-none"
                       style={{ WebkitTextFillColor: "#0f172a" }}
+                      aria-label="Whole number"
                     />
-                  )}
+                  ) : null}
+                  <div className="flex flex-col items-center">
+                    <input
+                      ref={numeratorRef}
+                      type="text"
+                      autoComplete="off"
+                      spellCheck={false}
+                      value={fractionNumeratorInput}
+                      onChange={(event) => {
+                        const nextValue = event.target.value.replace(/\D/g, "");
+                        setFractionNumeratorInput(nextValue);
+                        if (nextValue.length >= 1) {
+                          denominatorRef.current?.focus();
+                        }
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === "Backspace" && !fractionNumeratorInput && showsWholeNumberField) {
+                          wholeRef.current?.focus();
+                        }
+                      }}
+                      inputMode="numeric"
+                      placeholder=""
+                      className="block h-11 w-16 appearance-none border-0 bg-transparent px-1 text-center text-[1.65rem] font-black leading-none text-slate-900 caret-teal-600 outline-none"
+                      style={{ WebkitTextFillColor: "#0f172a" }}
+                      aria-label="Fraction numerator"
+                    />
+                    <div className="h-[3px] w-16 rounded-full bg-slate-500" />
+                    {usesFixedDenominator && questionData.fixedDenominator ? (
+                      <div
+                        className="flex h-11 w-16 items-center justify-center px-1 text-center text-[1.65rem] font-black leading-none text-slate-700"
+                        aria-label="Fixed denominator"
+                      >
+                        {questionData.fixedDenominator}
+                      </div>
+                    ) : (
+                      <input
+                        ref={denominatorRef}
+                        type="text"
+                        autoComplete="off"
+                        spellCheck={false}
+                        value={fractionDenominatorInput}
+                        onChange={(event) => {
+                          const nextValue = event.target.value.replace(/\D/g, "");
+                          setFractionDenominatorInput(nextValue);
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === "Backspace" && !fractionDenominatorInput) {
+                            numeratorRef.current?.focus();
+                          }
+                        }}
+                        inputMode="numeric"
+                        placeholder=""
+                        className="block h-11 w-16 appearance-none border-0 bg-transparent px-1 text-center text-[1.65rem] font-black leading-none text-slate-900 caret-teal-600 outline-none"
+                        style={{ WebkitTextFillColor: "#0f172a" }}
+                        aria-label="Fraction denominator"
+                      />
+                    )}
+                  </div>
                 </div>
-                <div className="mt-2 text-xs font-medium text-slate-500">
-                  {usesFixedDenominator
-                    ? "The denominator stays the same. Type the numerator."
-                    : "Leave whole blank for fractions less than one."}
+                <div className="mt-3 text-xs font-medium text-slate-500">
+                  {isFlexibleFractionInput
+                    ? "Type a fraction or mixed number. Leave the fraction part blank if the answer is a whole number."
+                    : isMixedNumberResponse
+                    ? usesFixedDenominator
+                      ? "Type the whole number and numerator. The denominator stays fixed."
+                      : "Type one mixed number. Leave the whole number blank if it is less than one."
+                    : isFractionInput
+                      ? usesFixedDenominator
+                        ? "Type the numerator for the equivalent fraction. The denominator stays fixed."
+                        : "Type the fraction."
+                      : isIntegerInput
+                        ? "Type the whole number only."
+                        : isFlexibleFractionInput
+                          ? "Type a fraction or mixed number."
+                          : usesFixedDenominator
+                            ? "Type the numerator for the equivalent fraction. The denominator stays fixed."
+                            : "Type one fraction."}
                 </div>
+                {fractionWholeInput || fractionNumeratorInput || fractionDenominatorInput || (usesFixedDenominator && questionData.fixedDenominator) ? (
+                  <div className="mt-3 rounded-2xl bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700">
+                    Your number:{" "}
+                    {isFlexibleFractionInput && fractionWholeInput && !fractionNumeratorInput && !fractionDenominatorInput ? (
+                      <span>{fractionWholeInput}</span>
+                    ) : fractionNumeratorInput && (fractionDenominatorInput || questionData.fixedDenominator) ? (
+                      <Fraction
+                        whole={fractionWholeInput || undefined}
+                        numerator={fractionNumeratorInput}
+                        denominator={fractionDenominatorInput || String(questionData.fixedDenominator)}
+                        size="md"
+                      />
+                    ) : (
+                      <span className="text-slate-400">complete the fraction</span>
+                    )}
+                  </div>
+                ) : null}
               </div>
             </div>
           ) : isEquivalentFractionInput && equivalentFractionInputVisual ? (
@@ -3368,13 +3537,24 @@ export default function TypedResponseActivity({
             <input
               value={typed}
               onChange={(event) =>
-                setTyped(isNumericInputOnly ? event.target.value.replace(/[^\d.,-]/g, "") : event.target.value)
+                setTyped(
+                  isIntegerInput || isNumericInputOnly
+                    ? event.target.value.replace(/[^\d.,-]/g, "")
+                    : event.target.value
+                )
               }
-              inputMode={isNumericInputOnly ? "decimal" : undefined}
+              inputMode={isIntegerInput ? "numeric" : isNumericInputOnly ? "decimal" : undefined}
               placeholder={
                 isColumnMultiplication
                   ? "Type the final answer"
-                  : questionData.placeholder ?? (isNumericInputOnly ? "Enter your answer" : "Type your answer")
+                  : questionData.placeholder ??
+                    (isIntegerInput
+                      ? "Type the integer"
+                      : isFlexibleFractionInput
+                        ? "Type a fraction or mixed number"
+                        : isNumericInputOnly
+                          ? "Enter your answer"
+                          : "Type your answer")
               }
               className="w-full max-w-md rounded-xl border border-gray-300 px-4 py-3 text-lg font-bold text-gray-900 outline-none focus:border-teal-500"
             />

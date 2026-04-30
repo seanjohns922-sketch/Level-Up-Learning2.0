@@ -13,6 +13,8 @@ import {
   generateQuestionForLevelLessonActivity,
   getLevelForLesson,
   type MultipleChoiceQuestion as Year2MultipleChoiceQuestion,
+  type IntegerContextVisualData,
+  type IntegerNumberLineVisualData,
   type PlaceValueBuilderQuestion as Year2PlaceValueBuilderQuestion,
   type PartitionExpandQuestion as Year2PartitionExpandQuestion,
   type TypedResponseQuestion as Year2TypedResponseQuestion,
@@ -127,6 +129,7 @@ type QuizQuestion = {
   activityType?: LessonActivity["activityType"];
   kind:
     | "lessonActivity"
+    | "ordering"
     | "mcq"
     | "typed"
     | "audio"
@@ -144,6 +147,8 @@ type QuizQuestion = {
   feedbackCorrect?: string;
   feedbackIncorrect?: string;
   responseType?: "number";
+  acceptedValues?: string[];
+  placeholder?: string;
   audioText?: string;
   visual?: {
     type: "dots";
@@ -262,19 +267,40 @@ function toAssessmentTypedQuizQuestion(
   index: number,
   quizMeta: NonNullable<QuizQuestion["quizMeta"]>
 ): QuizQuestion | null {
-  if (
-    (questionData.kind === "multiple_choice" || questionData.kind === "typed_response") &&
-    typeof questionData.answer === "string"
-  ) {
+  if (questionData.kind === "multiple_choice") {
+    return {
+      id: `q${index}`,
+      lessonNumber,
+      lessonTag: lessonNumber,
+      skill,
+      activityType: "multiple_choice",
+      kind: "lessonActivity",
+      prompt: questionData.prompt,
+      activity: {
+        activityType: "multiple_choice",
+        weight: 1,
+        config: {},
+      },
+      questionData,
+      quizMeta,
+    };
+  }
+
+  if (questionData.kind === "typed_response" && typeof questionData.answer === "string") {
     return {
       id: `q${index}`,
       lessonNumber,
       lessonTag: lessonNumber,
       skill,
       activityType: "typed_response",
-      kind: "typed",
+      kind: "lessonActivity",
       prompt: questionData.prompt,
-      correctValue: questionData.answer,
+      activity: {
+        activityType: "typed_response",
+        weight: 1,
+        config: {},
+      },
+      questionData,
       quizMeta,
     };
   }
@@ -288,33 +314,193 @@ function toExplicitWeeklyQuizQuestion(
 ): QuizQuestion {
   const prompt = String(question.questionText ?? "").trim();
   const correctAnswer = String(question.correctAnswer ?? "").trim();
+  const inputType = question.inputType;
+  const typedInputType =
+    inputType === "integer" ||
+    inputType === "fraction" ||
+    inputType === "mixed" ||
+    inputType === "flexible_fraction"
+      ? inputType
+      : undefined;
+
+  const lessonMeta = {
+    id: question.id || `q${index}`,
+    lessonNumber: question.lessonTag,
+    lessonTag: question.lessonTag,
+    skill: `lesson${question.lessonTag}`,
+    quizMeta: {
+      type: "explicit_year6_quiz",
+      difficulty: "middle" as const,
+    },
+  };
+
+  if (question.answerType === "ordering") {
+    const values = (question.values ?? []).map((value) => String(value).trim());
+    const isFractionOrdering = values.some((value) => value.includes("/"));
+    const visual =
+      question.visual?.kind === "numberLine"
+        ? question.visual.numberLine
+        : question.visual?.kind === "fractionNumberLine"
+          ? question.visual.fractionNumberLine
+          : undefined;
+    return {
+      ...lessonMeta,
+      activityType: "number_order",
+      kind: "lessonActivity",
+      prompt,
+      questionData: {
+        kind: "number_order",
+        prompt,
+        numbers: isFractionOrdering ? [] : values.map((value) => Number(value)),
+        fractions: isFractionOrdering ? values : undefined,
+        ascending: true,
+        helper: question.instructionText,
+        visual,
+        correctOrder: question.correctOrder,
+      },
+      activity: {
+        activityType: "number_order",
+        weight: 1,
+        config: {},
+      },
+      feedbackCorrect: question.feedbackCorrect,
+      feedbackIncorrect: question.feedbackIncorrect,
+    };
+  }
+
+  const mappedVisual =
+    question.visual?.kind === "numberLine"
+      ? question.visual.numberLine
+      : question.visual?.kind === "fractionNumberLine"
+        ? question.visual.fractionNumberLine
+      : question.visual?.kind === "fractionContext"
+        ? question.visual.fractionContext
+      : question.visual?.kind === "integerContext"
+        ? question.visual.contextVisual
+      : undefined;
+
+  const isFractionTypedAnswer = /\/|\d+\s+\d+\/\d+/.test(correctAnswer);
+
+  if (question.visual?.kind === "equivalentFractionYesNo") {
+    return {
+      ...lessonMeta,
+      activityType: "equivalent_fraction_yes_no",
+      kind: "lessonActivity",
+      prompt,
+      questionData: {
+        kind: "equivalent_fraction_yes_no",
+        prompt,
+        left: { id: "left", ...question.visual.left },
+        right: { id: "right", ...question.visual.right },
+        answer: correctAnswer.toLowerCase() === "yes" ? "yes" : "no",
+      },
+      activity: {
+        activityType: "equivalent_fraction_yes_no",
+        weight: 1,
+        config: {},
+      },
+      feedbackCorrect: question.feedbackCorrect,
+      feedbackIncorrect: question.feedbackIncorrect,
+    };
+  }
+
+  if (mappedVisual) {
+    if (question.answerType === "numeric") {
+      return {
+        ...lessonMeta,
+        activityType: "typed_response",
+        kind: "lessonActivity",
+        prompt,
+        questionData: {
+          kind: "typed_response",
+          prompt,
+          answer: correctAnswer,
+          helper: question.feedbackIncorrect,
+          placeholder: question.placeholder ?? "Type the integer",
+          inputType: typedInputType,
+          visual: mappedVisual,
+        },
+        activity: {
+          activityType: "typed_response",
+          weight: 1,
+          config: {},
+        },
+        feedbackCorrect: question.feedbackCorrect,
+        feedbackIncorrect: question.feedbackIncorrect,
+      };
+    }
+
+    return {
+      ...lessonMeta,
+      activityType: "multiple_choice",
+      kind: "lessonActivity",
+      prompt,
+      questionData: {
+        kind: "multiple_choice",
+        prompt,
+        options: (question.options ?? []).map((option) => String(option ?? "").trim()),
+        answer: correctAnswer,
+        helper: question.feedbackIncorrect,
+        visual: mappedVisual,
+      },
+      activity: {
+        activityType: "multiple_choice",
+        weight: 1,
+        config: {},
+      },
+      feedbackCorrect: question.feedbackCorrect,
+      feedbackIncorrect: question.feedbackIncorrect,
+    };
+  }
 
   if (question.answerType === "numeric") {
+    if (typedInputType || isFractionTypedAnswer) {
+      return {
+        ...lessonMeta,
+        activityType: "typed_response",
+        kind: "lessonActivity",
+        prompt,
+        questionData: {
+          kind: "typed_response",
+          prompt,
+          answer: correctAnswer,
+          helper: question.feedbackIncorrect,
+          placeholder:
+            question.placeholder ??
+            (typedInputType === "integer"
+              ? "Type the integer"
+              : typedInputType === "mixed"
+                ? "Type the mixed number"
+                : "Type the fraction"),
+          inputType: typedInputType ?? (isFractionTypedAnswer ? "fraction" : undefined),
+        },
+        activity: {
+          activityType: "typed_response",
+          weight: 1,
+          config: {},
+        },
+        feedbackCorrect: question.feedbackCorrect,
+        feedbackIncorrect: question.feedbackIncorrect,
+      };
+    }
     return {
-      id: question.id || `q${index}`,
-      lessonNumber: question.lessonTag,
-      lessonTag: question.lessonTag,
-      skill: `lesson${question.lessonTag}`,
+      ...lessonMeta,
       activityType: "typed_response",
       kind: "typed",
       prompt,
       correctValue: correctAnswer,
+      acceptedValues: question.acceptedAnswers,
       feedbackCorrect: question.feedbackCorrect,
       feedbackIncorrect: question.feedbackIncorrect,
-      responseType: "number",
-      quizMeta: {
-        type: "explicit_year6_quiz",
-        difficulty: "middle",
-      },
+      responseType:
+        typedInputType === "integer" || (!typedInputType && !isFractionTypedAnswer) ? "number" : undefined,
+      placeholder: question.placeholder ?? "Type the integer",
     };
   }
 
   const options = (question.options ?? []).map((option) => String(option ?? "").trim());
   return {
-    id: question.id || `q${index}`,
-    lessonNumber: question.lessonTag,
-    lessonTag: question.lessonTag,
-    skill: `lesson${question.lessonTag}`,
+    ...lessonMeta,
     activityType: "multiple_choice",
     kind: "mcq",
     prompt,
@@ -322,10 +508,6 @@ function toExplicitWeeklyQuizQuestion(
     correctIndex: options.findIndex((option) => option === correctAnswer),
     feedbackCorrect: question.feedbackCorrect,
     feedbackIncorrect: question.feedbackIncorrect,
-    quizMeta: {
-      type: "explicit_year6_quiz",
-      difficulty: "middle",
-    },
   };
 }
 
@@ -1338,7 +1520,11 @@ function isQuizQuestionCorrect(
     return quizLessonActivityResults[q.id]?.correct === true;
   }
   if (q.kind === "typed") {
-    return isTypedAnswerCorrect(quizTyped[q.id] ?? "", q.correctValue);
+    return isTypedAnswerCorrectAgainstAccepted(
+      quizTyped[q.id] ?? "",
+      q.correctValue,
+      q.acceptedValues
+    );
   }
   if (q.kind === "numberLineTap" || q.kind === "numberLineJump") {
     const picked = quizLineAnswers[q.id];
@@ -1604,6 +1790,16 @@ function isTypedAnswerCorrect(
   }
 
   return false;
+}
+
+function isTypedAnswerCorrectAgainstAccepted(
+  rawTyped: string | number | null | undefined,
+  rawCorrect: string | number | null | undefined,
+  acceptedValues?: string[]
+) {
+  if (isTypedAnswerCorrect(rawTyped, rawCorrect)) return true;
+  if (!acceptedValues || acceptedValues.length === 0) return false;
+  return acceptedValues.some((value) => isTypedAnswerCorrect(rawTyped, value));
 }
 
 function makeFindNumberQuestion(min: number, max: number): QuizQuestion {
@@ -4151,7 +4347,10 @@ function SessionPage() {
                       }
                       inputMode={currentQuiz.responseType === "number" ? "decimal" : "text"}
                       className="w-full px-4 py-4 rounded-xl border text-xl font-bold"
-                      placeholder={currentQuiz.responseType === "number" ? "Type the answer" : "Type the word"}
+                      placeholder={
+                        currentQuiz.placeholder ??
+                        (currentQuiz.responseType === "number" ? "Type the answer" : "Type the word")
+                      }
                     />
                   ) : currentQuiz?.kind === "audio" ||
                     currentQuiz?.kind === "mcq" ? (
