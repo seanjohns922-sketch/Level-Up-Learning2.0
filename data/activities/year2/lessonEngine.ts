@@ -10664,7 +10664,7 @@ function generateGenericQuestion(
         kind: "typed_response",
         prompt: "45% of 60 = ?",
         answer: "27",
-        helper: "Use 40% and 5%.",
+        helper: "How can 10% help you find 5%?",
         placeholder: "Type the answer",
         inputType: "integer",
       },
@@ -10747,7 +10747,7 @@ function generateGenericQuestion(
         kind: "typed_response",
         prompt: "45% of 84 = ?",
         answer: "37.8",
-        helper: "Build from 40% and 5%.",
+        helper: "Find 10% first, then halve it to get 5%.",
         placeholder: "Type the answer",
       },
       {
