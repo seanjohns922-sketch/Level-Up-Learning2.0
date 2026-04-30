@@ -196,13 +196,42 @@ function ProgramPage() {
       {/* ── Hero header ── */}
       <div className="relative z-10">
         <div className="relative max-w-6xl mx-auto px-6 pt-5 pb-10">
-          <div className="flex items-center justify-between mb-6">
-            <button
-              onClick={() => router.push("/home")}
-              className="px-4 py-2 rounded-full bg-white/15 backdrop-blur text-white text-sm font-semibold hover:bg-white/25 transition"
-            >
-              ← Back
-            </button>
+          <div className="flex items-start justify-between gap-3 mb-6">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => router.push("/home")}
+                className="px-4 py-2 rounded-full bg-white/15 backdrop-blur text-white text-sm font-semibold hover:bg-white/25 transition"
+              >
+                ← Back
+              </button>
+              <div className="relative overflow-hidden border border-teal-300/25 bg-black/25 backdrop-blur-md shadow-[0_10px_28px_rgba(0,0,0,0.2)]"
+                style={{
+                  clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
+                  boxShadow: "inset 0 1px 0 rgba(94,234,212,0.2), 0 0 18px rgba(20,184,166,0.12)",
+                }}
+              >
+                <label className="sr-only" htmlFor="week-selector">Choose week</label>
+                <select
+                  id="week-selector"
+                  value={weekNum}
+                  onChange={(event) => goToWeek(Number(event.target.value))}
+                  className="min-w-[154px] appearance-none rounded-none border-0 bg-transparent px-4 py-2 pr-10 text-xs font-mono font-black uppercase tracking-[0.14em] text-teal-50 outline-none transition focus:ring-2 focus:ring-teal-300/25"
+                >
+                  {Array.from({ length: 12 }).map((_, index) => {
+                    const targetWeek = index + 1;
+                    const isUnlocked = DEMO_MODE || teacherMode || targetWeek <= lastAllowedWeek;
+                    return (
+                      <option key={targetWeek} value={targetWeek}>
+                        Week {targetWeek} · {targetWeek === weekNum ? "Current" : isUnlocked ? "Open" : "Locked"}
+                      </option>
+                    );
+                  })}
+                </select>
+                <svg viewBox="0 0 24 24" className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-teal-100/80" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </div>
+            </div>
             <span className="text-sm text-white/80 font-medium ml-1">Level {levelNum}</span>
           </div>
 
@@ -239,59 +268,6 @@ function ProgramPage() {
                 {teacherToast}
               </div>
             ) : null}
-
-            <div className="mt-6 mx-auto max-w-md">
-              <label className="sr-only" htmlFor="week-selector">Choose week</label>
-              <div
-                className="relative overflow-hidden border border-teal-300/25 bg-black/25 backdrop-blur-md shadow-[0_12px_40px_rgba(0,0,0,0.22)]"
-                style={{
-                  clipPath: "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
-                  boxShadow: "inset 0 1px 0 rgba(94,234,212,0.2), 0 0 24px rgba(20,184,166,0.16)",
-                }}
-              >
-                <div
-                  className="absolute inset-0 pointer-events-none opacity-[0.08]"
-                  style={{ backgroundImage: "repeating-linear-gradient(0deg, rgba(94,234,212,0.65) 0 1px, transparent 1px 3px)" }}
-                />
-                <div className="relative flex items-center gap-4 px-5 py-3">
-                  <div className="text-left">
-                    <p className="text-[10px] font-mono font-black uppercase tracking-[0.2em] text-teal-200/70">Select Week</p>
-                    <p className="mt-0.5 text-sm font-bold text-white">Week {weekNum}</p>
-                  </div>
-                  <select
-                    id="week-selector"
-                    value={weekNum}
-                    onChange={(event) => goToWeek(Number(event.target.value))}
-                    className="ml-auto min-w-[180px] appearance-none rounded-none border border-teal-300/30 bg-teal-950/70 px-4 py-2.5 pr-10 text-sm font-mono font-black uppercase tracking-[0.14em] text-teal-50 outline-none transition focus:border-teal-200/70 focus:ring-2 focus:ring-teal-300/25"
-                    style={{
-                      clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
-                      boxShadow: "inset 0 1px 0 rgba(94,234,212,0.26)",
-                    }}
-                  >
-                    {Array.from({ length: 12 }).map((_, index) => {
-                      const targetWeek = index + 1;
-                      const isUnlocked = DEMO_MODE || teacherMode || targetWeek <= lastAllowedWeek;
-                      return (
-                        <option key={targetWeek} value={targetWeek}>
-                          Week {targetWeek} · {targetWeek === weekNum ? "Current" : isUnlocked ? "Open" : "Locked"}
-                        </option>
-                      );
-                    })}
-                  </select>
-                  <svg viewBox="0 0 24 24" className="pointer-events-none absolute right-8 h-4 w-4 text-teal-100/80" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M6 9l6 6 6-6" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            <p className="text-teal-200/80 mt-3 text-xs font-mono uppercase tracking-[0.16em]">
-              {weekUnlocked
-                ? weekComplete
-                  ? "◆ Completed"
-                  : `${lessonsDoneCount}/3 Lessons · ${progress.quizCompleted ? "Quiz Done" : "Quiz Pending"}`
-                : "Complete previous weeks to unlock"}
-            </p>
 
             {/* Nexus XP plate */}
             <div className="mt-5 mx-auto max-w-sm relative">
