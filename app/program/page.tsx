@@ -269,14 +269,6 @@ function ProgramPage() {
               </div>
             ) : null}
 
-            <p className="text-teal-200/80 mt-5 text-xs font-mono uppercase tracking-[0.16em]">
-              {weekUnlocked
-                ? weekComplete
-                  ? "◆ Completed"
-                  : `${lessonsDoneCount}/3 Lessons · ${progress.quizCompleted ? "Quiz Done" : "Quiz Pending"}`
-                : "Complete previous weeks to unlock"}
-            </p>
-
             {/* Nexus XP plate */}
             <div className="mt-5 mx-auto max-w-sm relative">
               <div
