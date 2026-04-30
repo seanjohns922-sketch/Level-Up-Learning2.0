@@ -16,7 +16,7 @@ export default function BinderCard({
     <button
       onClick={isUnlocked ? onClick : undefined}
       disabled={!isUnlocked}
-      className="group relative w-full focus:outline-none"
+      className="group relative w-full"
       title={
         isUnlocked
           ? `View ${legend.name}`
@@ -24,32 +24,31 @@ export default function BinderCard({
       }
     >
       <div
-        className="relative overflow-hidden transition-all duration-300 aspect-[2/3] rounded-[18px]"
+        className="relative rounded-2xl overflow-hidden transition-all duration-300 aspect-[2/3]"
         style={{
           border: isUnlocked
-            ? "1.5px solid hsla(160, 50%, 64%, 0.48)"
-            : "1.5px solid hsla(160, 22%, 52%, 0.3)",
+            ? "2px solid hsla(160, 50%, 55%, 0.5)"
+            : "2px solid hsla(220, 10%, 80%, 0.4)",
           boxShadow: isUnlocked
-            ? "0 10px 28px hsla(160, 50%, 24%, 0.26), 0 0 0 1px hsla(160, 50%, 68%, 0.08)"
-            : "0 14px 34px hsla(170, 70%, 2%, 0.34)",
+            ? "0 4px 20px hsla(160, 50%, 45%, 0.2), 0 0 0 1px hsla(160, 50%, 60%, 0.1)"
+            : "0 2px 8px rgba(0,0,0,0.06)",
           transform: "translateY(0)",
           cursor: isUnlocked ? "pointer" : "default",
-          background: "hsla(166, 34%, 8%, 0.72)",
         }}
         onMouseEnter={(e) => {
           if (isUnlocked) {
             e.currentTarget.style.transform = "translateY(-4px) scale(1.02)";
             e.currentTarget.style.boxShadow =
-              "0 18px 44px hsla(160, 50%, 28%, 0.34), 0 0 18px hsla(160, 50%, 55%, 0.14), 0 0 0 1px hsla(160, 50%, 66%, 0.18)";
+              "0 8px 28px hsla(160, 50%, 45%, 0.3), 0 0 16px hsla(160, 50%, 55%, 0.15), 0 0 0 1px hsla(160, 50%, 60%, 0.2)";
           }
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.transform = "translateY(0) scale(1)";
           if (isUnlocked) {
             e.currentTarget.style.boxShadow =
-              "0 10px 28px hsla(160, 50%, 24%, 0.26), 0 0 0 1px hsla(160, 50%, 68%, 0.08)";
+              "0 4px 20px hsla(160, 50%, 45%, 0.2), 0 0 0 1px hsla(160, 50%, 60%, 0.1)";
           } else {
-            e.currentTarget.style.boxShadow = "0 14px 34px hsla(170, 70%, 2%, 0.34)";
+            e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)";
           }
         }}
       >
@@ -80,18 +79,18 @@ export default function BinderCard({
         {!isUnlocked && (
           <div
             className="absolute inset-0 flex items-center justify-center"
-            style={{ background: "hsla(170, 32%, 5%, 0.42)" }}
+            style={{ background: "hsla(220, 15%, 95%, 0.25)" }}
           >
             <div
               className="p-2.5 rounded-full"
               style={{
-                background: "hsla(166, 36%, 10%, 0.78)",
+                background: "hsla(0, 0%, 100%, 0.6)",
                 backdropFilter: "blur(4px)",
-                border: "1px solid hsla(160, 42%, 54%, 0.22)",
-                boxShadow: "0 2px 10px hsla(170, 60%, 2%, 0.28)",
+                border: "1px solid hsla(220, 10%, 85%, 0.5)",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
               }}
             >
-              <Lock className="h-4 w-4" style={{ color: "hsl(160, 26%, 64%)" }} />
+              <Lock className="h-4 w-4" style={{ color: "hsl(220, 10%, 55%)" }} />
             </div>
           </div>
         )}
@@ -100,25 +99,23 @@ export default function BinderCard({
         <div className="absolute top-2 right-2">
           {isUnlocked ? (
             <span
-              className="inline-flex items-center px-2 py-0.5 rounded-full text-[8px] font-extrabold tracking-wide text-white shadow"
+              className="inline-flex items-center px-2 py-0.5 rounded-full text-[8px] font-extrabold text-white shadow"
               style={{
                 background: "hsla(155, 60%, 42%, 0.9)",
                 backdropFilter: "blur(4px)",
                 boxShadow: "0 0 8px hsla(155, 60%, 45%, 0.3)",
-                fontFamily: "'Orbitron', 'Rajdhani', 'Exo 2', sans-serif",
               }}
             >
               ✦ UNLOCKED
             </span>
           ) : (
             <span
-              className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[8px] font-extrabold tracking-wide shadow"
+              className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[8px] font-extrabold shadow"
               style={{
-                background: "hsla(166, 38%, 10%, 0.72)",
+                background: "hsla(0, 0%, 100%, 0.65)",
                 backdropFilter: "blur(4px)",
-                color: "hsl(160, 20%, 66%)",
-                border: "1px solid hsla(160, 32%, 48%, 0.18)",
-                fontFamily: "'Orbitron', 'Rajdhani', 'Exo 2', sans-serif",
+                color: "hsl(220, 10%, 50%)",
+                border: "1px solid hsla(220, 10%, 85%, 0.4)",
               }}
             >
               <Lock className="h-2 w-2" /> LOCKED
@@ -128,20 +125,17 @@ export default function BinderCard({
 
         {/* Bottom label */}
         <div
-          className="absolute bottom-0 inset-x-0 p-3"
+          className="absolute bottom-0 inset-x-0 p-2.5"
           style={{
-            background: "linear-gradient(to top, hsla(170, 52%, 3%, 0.84), hsla(170, 44%, 4%, 0.42) 62%, transparent)",
+            background: "linear-gradient(to top, hsla(0, 0%, 0%, 0.6), hsla(0, 0%, 0%, 0.3) 60%, transparent)",
           }}
         >
-          <p
-            className="text-[9px] font-extrabold tracking-[0.18em]"
-            style={{ color: "hsla(160, 32%, 86%, 0.76)", fontFamily: "'Rajdhani', 'Orbitron', 'Exo 2', sans-serif" }}
-          >
+          <p className="text-[9px] font-bold tracking-wider" style={{ color: "hsla(0, 0%, 100%, 0.7)" }}>
             {legend.yearLabel.toUpperCase()}
           </p>
           <p
-            className="text-sm font-extrabold leading-tight"
-            style={{ color: isUnlocked ? "hsl(160, 30%, 96%)" : "hsla(160, 22%, 90%, 0.62)" }}
+            className="text-xs font-extrabold leading-tight"
+            style={{ color: isUnlocked ? "white" : "hsla(0, 0%, 100%, 0.55)" }}
           >
             {legend.name}
           </p>

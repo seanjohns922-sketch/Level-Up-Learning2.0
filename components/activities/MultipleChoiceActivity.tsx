@@ -5,11 +5,6 @@ import type { MultipleChoiceQuestion } from "@/data/activities/year2/lessonEngin
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import PlaceValueMABVisual from "@/components/activities/PlaceValueMABVisual";
 import DecimalModelVisual from "@/components/activities/DecimalModelVisual";
-import DecimalShiftVisual from "@/components/activities/DecimalShiftVisual";
-import FractionContextVisual from "@/components/activities/FractionContextVisual";
-import FractionNumberLineVisual from "@/components/activities/FractionNumberLineVisual";
-import IntegerContextVisual from "@/components/activities/IntegerContextVisual";
-import IntegerNumberLineVisual from "@/components/activities/IntegerNumberLineVisual";
 import MoneyContextVisual from "@/components/activities/MoneyContextVisual";
 import ArrayVisual from "@/components/activities/ArrayVisual";
 import RuleBoxVisual from "@/components/activities/RuleBoxVisual";
@@ -71,9 +66,9 @@ function SameDenominatorOperationVisual({
       </div>
       {hasConversion ? (
         <div className="mt-3 flex flex-wrap items-center gap-3 rounded-2xl bg-white px-4 py-3 text-lg font-black text-slate-900 shadow-sm">
-          <FractionText value={leftLabel} size="sm" />
+          <FractionText value={leftLabel} />
           <span className="text-emerald-700">{visual.operation}</span>
-          <FractionText value={rightLabel} size="sm" />
+          <FractionText value={rightLabel} />
           <span className="text-slate-400">→</span>
           <MathFormattedText text={visual.conversionLabel ?? ""} />
         </div>
@@ -81,14 +76,14 @@ function SameDenominatorOperationVisual({
       <div className="mt-4 grid gap-3 md:grid-cols-[1fr_auto_1fr_auto_1fr] md:items-center">
         <div className="rounded-2xl bg-white p-3 shadow-sm">
           <div className="mb-2 text-center text-lg font-black text-slate-900">
-            <FractionText value={`${visual.numeratorA}/${visual.denominator}`} size="sm" />
+            <FractionText value={`${visual.numeratorA}/${visual.denominator}`} />
           </div>
           <FractionBar numerator={visual.numeratorA} denominator={visual.denominator} />
         </div>
         <div className="text-center text-2xl font-black text-emerald-700">{visual.operation}</div>
         <div className="rounded-2xl bg-white p-3 shadow-sm">
           <div className="mb-2 text-center text-lg font-black text-slate-900">
-            <FractionText value={`${visual.numeratorB}/${visual.denominator}`} size="sm" />
+            <FractionText value={`${visual.numeratorB}/${visual.denominator}`} />
           </div>
           <FractionBar
             numerator={visual.numeratorB}
@@ -211,21 +206,6 @@ export default function MultipleChoiceActivity({
       {questionData.visual?.type === "decimal_model" ? (
         <DecimalModelVisual visual={questionData.visual} title="Decimal model" />
       ) : null}
-      {questionData.visual?.type === "decimal_shift" ? (
-        <DecimalShiftVisual visual={questionData.visual} />
-      ) : null}
-      {questionData.visual?.type === "fraction_number_line" ? (
-        <FractionNumberLineVisual visual={questionData.visual} />
-      ) : null}
-      {questionData.visual?.type === "fraction_context" ? (
-        <FractionContextVisual visual={questionData.visual} />
-      ) : null}
-      {questionData.visual?.type === "integer_context" ? (
-        <IntegerContextVisual visual={questionData.visual} />
-      ) : null}
-      {questionData.visual?.type === "integer_number_line" ? (
-        <IntegerNumberLineVisual visual={questionData.visual} />
-      ) : null}
       {questionData.visual?.type === "array" ? (
         <ArrayVisual
           rows={questionData.visual.rows}
@@ -272,7 +252,7 @@ export default function MultipleChoiceActivity({
                     : "bg-teal-400 opacity-0 group-hover:opacity-60",
                 ].join(" ")}
               />
-              <MathFormattedText text={option} fractionSize="md" />
+              <MathFormattedText text={option} compactFractions />
             </button>
           );
         })}

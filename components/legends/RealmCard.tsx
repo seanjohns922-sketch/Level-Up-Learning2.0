@@ -25,18 +25,18 @@ export default function RealmCard({
       }`}
       style={{
         background: isLocked
-          ? "rgba(18,16,14,0.36)"
+          ? "rgba(255,255,255,0.08)"
           : isComingSoon
-          ? "rgba(30,24,18,0.42)"
-          : "rgba(28,24,18,0.46)",
-        backdropFilter: "blur(16px) saturate(1.05)",
-        WebkitBackdropFilter: "blur(16px) saturate(1.05)",
+          ? "rgba(255,255,255,0.12)"
+          : "rgba(255,255,255,0.15)",
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
         border: `1.5px solid ${realm.borderGlow}`,
         boxShadow: isOpen
-          ? `0 0 16px ${realm.glowColor}, 0 10px 28px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.16)`
+          ? `0 0 20px ${realm.glowColor}, 0 4px 16px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15)`
           : isComingSoon
-          ? `0 0 12px ${realm.glowColor}, 0 8px 22px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.12)`
-          : "0 6px 18px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)",
+          ? `0 0 16px ${realm.glowColor}, 0 4px 12px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.1)`
+          : "0 2px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.05)",
         opacity: isLocked ? 0.7 : 1,
       }}
     >
