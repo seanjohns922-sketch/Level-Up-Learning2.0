@@ -200,7 +200,11 @@ function ProgramPage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => router.push("/home")}
-                className="px-4 py-2 rounded-full bg-white/15 backdrop-blur text-white text-sm font-semibold hover:bg-white/25 transition"
+                className="border border-teal-300/25 bg-black/25 px-4 py-2 text-xs font-mono font-black uppercase tracking-[0.14em] text-teal-50 backdrop-blur-md transition hover:border-teal-200/45 hover:bg-teal-950/45 focus:outline-none focus:ring-2 focus:ring-teal-300/25"
+                style={{
+                  clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
+                  boxShadow: "inset 0 1px 0 rgba(94,234,212,0.2), 0 0 18px rgba(20,184,166,0.12)",
+                }}
               >
                 ← Back
               </button>
