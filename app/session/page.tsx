@@ -4483,81 +4483,171 @@ function SessionPage() {
             
 
             {quizSubmitted && finalScore >= Math.ceil(quizQuestions.length * ((quizConfig?.passPercent ?? 80) / 100)) ? (
-              <div className="mt-4 rounded-2xl border border-primary/20 bg-primary-light p-4 text-sm font-bold text-primary">
-                🎉 Congratulations — you’re one step closer to unlocking your Level Up Legend!
+              <div className="relative mt-4">
+                <div
+                  aria-hidden
+                  className="absolute -inset-[2px] pointer-events-none"
+                  style={{
+                    clipPath:
+                      "polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px)",
+                    background:
+                      "linear-gradient(135deg, rgba(251,191,36,0.45) 0%, rgba(94,234,212,0.25) 50%, rgba(251,191,36,0.4) 100%)",
+                  }}
+                />
+                <div
+                  className="relative px-4 py-3 text-sm font-bold text-amber-100"
+                  style={{
+                    clipPath:
+                      "polygon(13px 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%, 0 13px)",
+                    background:
+                      "linear-gradient(135deg, #021716 0%, #042925 50%, #053b35 100%)",
+                    boxShadow:
+                      "inset 0 1px 0 rgba(251,191,36,0.2), inset 0 -10px 20px rgba(0,0,0,0.45)",
+                  }}
+                >
+                  🎉 Congratulations — you’re one step closer to unlocking your Level Up Legend!
+                </div>
               </div>
             ) : null}
 
             {quizSubmitted ? (
-              <div className="mt-4 rounded-2xl border border-gray-200 bg-white p-4">
-                <div className="text-sm font-bold text-gray-900">
-                  Score: {finalScore}/{quizQuestions.length}
-                </div>
-                <div className="mt-1 text-sm text-gray-600">
-                  Pass Rate: {Math.round((finalScore / Math.max(1, quizQuestions.length)) * 100)}%
-                </div>
-                <div className="mt-3 grid gap-2 sm:grid-cols-3">
-                  {lessonBreakdown.map((item) => (
-                    <div key={item.lessonNumber} className="rounded-xl bg-gray-50 p-3">
-                      <div className="text-xs font-bold uppercase tracking-wide text-gray-500">
-                        Lesson {item.lessonNumber}
-                      </div>
-                      {item.lessonTitle ? (
-                        <div className="mt-1 text-sm font-semibold text-gray-700">
-                          {item.lessonTitle}
-                        </div>
-                      ) : null}
-                      <div className="mt-1 text-lg font-black text-gray-900">
-                        {item.correct}/{item.total}
-                      </div>
-                      <div className="text-sm text-gray-600">{item.percent}%</div>
-                      <div className="mt-1 text-sm font-semibold text-gray-700">
-                        {getLessonFeedback(item.correct, item.total)}
-                      </div>
-                      {item.skill ? (
-                        <div className="mt-1 text-xs text-gray-500">
-                          {item.skill.replace(/_/g, " ")}
-                        </div>
-                      ) : null}
+              <div className="relative mt-4">
+                <div
+                  aria-hidden
+                  className="absolute -inset-[2px] pointer-events-none"
+                  style={{
+                    clipPath:
+                      "polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px)",
+                    background:
+                      "linear-gradient(135deg, rgba(94,234,212,0.4) 0%, rgba(15,118,110,0.2) 50%, rgba(94,234,212,0.3) 100%)",
+                  }}
+                />
+                <div
+                  className="relative overflow-hidden"
+                  style={{
+                    clipPath:
+                      "polygon(13px 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%, 0 13px)",
+                    background:
+                      "linear-gradient(135deg, #021716 0%, #042925 50%, #053b35 100%)",
+                    boxShadow:
+                      "inset 0 1px 0 rgba(94,234,212,0.18), inset 0 -10px 20px rgba(0,0,0,0.45)",
+                  }}
+                >
+                  {/* Hero */}
+                  <div className="px-6 py-6 text-center border-b border-teal-300/15">
+                    <div className="inline-flex items-center gap-1.5 rounded-full border border-teal-300/30 bg-teal-500/10 px-2.5 py-1 text-[9px] font-mono font-bold uppercase tracking-[0.2em] text-teal-200/90">
+                      Quiz Results
                     </div>
-                  ))}
-                </div>
-                <div className="mt-4 rounded-xl border border-teal-100 bg-teal-50 p-3 text-sm text-slate-800">
-                  <div className="font-bold text-teal-800">Recommended Practice</div>
-                  <div className="mt-1">
-                    {weakestLessonBreakdowns.length > 1
-                      ? `Go back and practise ${weakestLessonBreakdowns
-                          .map((item) => `Lesson ${item.lessonNumber}${item.lessonTitle ? `: ${item.lessonTitle}` : ""}`)
-                          .join(" and ")}.`
-                      : weakestLessonBreakdown
-                        ? `Go back and practise Lesson ${weakestLessonBreakdown.lessonNumber}${weakestLessonBreakdown.lessonTitle ? `: ${weakestLessonBreakdown.lessonTitle}` : ""}.`
-                        : "Keep building across all three lessons."}
+                    <div className="mt-2 text-4xl font-black tracking-[-0.01em] text-white">
+                      {finalScore}<span className="text-teal-300/70">/{quizQuestions.length}</span>
+                    </div>
+                    <div className="mt-1 text-sm font-semibold text-teal-100/80">
+                      Pass Rate · {Math.round((finalScore / Math.max(1, quizQuestions.length)) * 100)}%
+                    </div>
+                  </div>
+
+                  <div className="p-4 space-y-3">
+                    {/* Lesson breakdown */}
+                    <div className="grid gap-2 sm:grid-cols-3">
+                      {lessonBreakdown.map((item) => (
+                        <div
+                          key={item.lessonNumber}
+                          className="rounded-lg border border-teal-300/20 bg-teal-500/5 px-3 py-3"
+                          style={{ boxShadow: "inset 0 1px 0 rgba(94,234,212,0.12)" }}
+                        >
+                          <div className="text-[9px] font-mono font-bold uppercase tracking-[0.2em] text-teal-200/70">
+                            Lesson {item.lessonNumber}
+                          </div>
+                          {item.lessonTitle ? (
+                            <div className="mt-1 text-sm font-bold text-white leading-tight">
+                              {item.lessonTitle}
+                            </div>
+                          ) : null}
+                          <div className="mt-2 text-2xl font-black text-teal-100">
+                            {item.correct}/{item.total}
+                          </div>
+                          <div className="text-xs font-semibold text-teal-200/80">{item.percent}%</div>
+                          <div className="mt-1 text-xs font-semibold text-teal-50/85">
+                            {getLessonFeedback(item.correct, item.total)}
+                          </div>
+                          {item.skill ? (
+                            <div className="mt-1 text-[10px] font-mono uppercase tracking-[0.15em] text-teal-200/55">
+                              {item.skill.replace(/_/g, " ")}
+                            </div>
+                          ) : null}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Recommended Practice */}
+                    <div className="rounded-lg border border-emerald-300/25 bg-emerald-500/10 px-3 py-3">
+                      <div className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-emerald-200/85">
+                        Recommended Practice
+                      </div>
+                      <div className="mt-1 text-sm font-semibold text-emerald-50">
+                        {weakestLessonBreakdowns.length > 1
+                          ? `Go back and practise ${weakestLessonBreakdowns
+                              .map((item) => `Lesson ${item.lessonNumber}${item.lessonTitle ? `: ${item.lessonTitle}` : ""}`)
+                              .join(" and ")}.`
+                          : weakestLessonBreakdown
+                            ? `Go back and practise Lesson ${weakestLessonBreakdown.lessonNumber}${weakestLessonBreakdown.lessonTitle ? `: ${weakestLessonBreakdown.lessonTitle}` : ""}.`
+                            : "Keep building across all three lessons."}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             ) : null}
 
             {quizSubmitted && finalScore < Math.ceil(quizQuestions.length * ((quizConfig?.passPercent ?? 80) / 100)) ? (
-              <div className="mt-4 rounded-2xl border border-accent/30 p-4 text-sm font-bold text-accent-foreground flex items-center justify-between gap-3" style={{ background: "hsl(42 95% 97%)" }}>
-                <div>
-                  {weakestLessonBreakdown
-                    ? `You’re close. Practise Lesson ${weakestLessonBreakdown.lessonNumber}${weakestLessonBreakdown.lessonTitle ? `: ${weakestLessonBreakdown.lessonTitle}` : ""} next. You scored ${weakestLessonBreakdown.correct}/${weakestLessonBreakdown.total} there.`
-                    : "You’re close! Let’s try the lessons again to build confidence."}
-                </div>
-                <button
-                  onClick={() =>
-                    router.push(
-                      `/lesson?year=${encodeURIComponent(year)}&week=${encodeURIComponent(
-                        week
-                      )}&lessonId=y${parseInt(year.replace(/\D/g, ""), 10) || 1}-w${week}-l${
-                        weakestLessonBreakdown?.lessonNumber ?? 1
-                      }`
-                    )
-                  }
-                  className="px-4 py-3 rounded-2xl bg-accent text-accent-foreground font-bold hover:opacity-90 transition"
+              <div className="relative mt-4">
+                <div
+                  aria-hidden
+                  className="absolute -inset-[2px] pointer-events-none"
+                  style={{
+                    clipPath:
+                      "polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px)",
+                    background:
+                      "linear-gradient(135deg, rgba(251,191,36,0.45) 0%, rgba(94,234,212,0.2) 50%, rgba(251,191,36,0.4) 100%)",
+                  }}
+                />
+                <div
+                  className="relative flex items-center justify-between gap-3 px-4 py-3"
+                  style={{
+                    clipPath:
+                      "polygon(13px 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%, 0 13px)",
+                    background:
+                      "linear-gradient(135deg, #021716 0%, #042925 50%, #053b35 100%)",
+                    boxShadow:
+                      "inset 0 1px 0 rgba(251,191,36,0.2), inset 0 -10px 20px rgba(0,0,0,0.45)",
+                  }}
                 >
-                  Practise Lesson {weakestLessonBreakdown?.lessonNumber ?? 1}
-                </button>
+                  <div className="text-sm font-semibold text-amber-50">
+                    {weakestLessonBreakdown
+                      ? `You’re close. Practise Lesson ${weakestLessonBreakdown.lessonNumber}${weakestLessonBreakdown.lessonTitle ? `: ${weakestLessonBreakdown.lessonTitle}` : ""} next. You scored ${weakestLessonBreakdown.correct}/${weakestLessonBreakdown.total} there.`
+                      : "You’re close! Let’s try the lessons again to build confidence."}
+                  </div>
+                  <button
+                    onClick={() =>
+                      router.push(
+                        `/lesson?year=${encodeURIComponent(year)}&week=${encodeURIComponent(
+                          week
+                        )}&lessonId=y${parseInt(year.replace(/\D/g, ""), 10) || 1}-w${week}-l${
+                          weakestLessonBreakdown?.lessonNumber ?? 1
+                        }`
+                      )
+                    }
+                    className="shrink-0 rounded-lg px-4 py-2.5 text-sm font-bold text-white transition active:scale-[0.99]"
+                    style={{
+                      background:
+                        "linear-gradient(135deg, #b45309 0%, #f59e0b 50%, #fbbf24 100%)",
+                      boxShadow:
+                        "inset 0 1px 0 rgba(254,243,199,0.35), 0 0 18px rgba(251,191,36,0.25)",
+                    }}
+                  >
+                    Practise Lesson {weakestLessonBreakdown?.lessonNumber ?? 1}
+                  </button>
+                </div>
               </div>
             ) : null}
           </>
