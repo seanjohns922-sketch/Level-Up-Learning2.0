@@ -363,12 +363,12 @@ const year6Rows: ProgramRow[] = [
     focus: "Connect fractions, decimals, and percentages and choose efficient representations",
     lesson: 3,
     topic: "Choose Efficient Forms",
-    activity: "Move between fractions, decimals, and percentages and choose the form that helps most.",
+    activity: "Choose the most efficient form before solving, then convert only if it helps.",
     curriculum: ["AC9M6N05"],
     activities: [
-      makeActivity("fraction_decimal_percent_match", 1, {}),
-      makeActivity("typed_response", 1, { mode: "fdp_step_conversion" }),
-      makeActivity("multiple_choice", 1, { mode: "fdp_which_correct" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_fdp_choose_form" }),
+      makeActivity("typed_response", 1, { mode: "y6_fdp_use_form" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_fdp_justify_decide" }),
     ],
   },
   {
