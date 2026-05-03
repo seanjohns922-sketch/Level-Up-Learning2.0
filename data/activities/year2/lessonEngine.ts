@@ -19429,7 +19429,15 @@ function generateGenericQuestion(
         prompt: "You need 15 bottles. Which option is cheaper?",
         options: ["Option A", "Option B", "They cost the same"],
         answer: "Option B",
-        helper: "Compare the total cost for the amount you actually need.",
+        helper: "Option A costs $33. Option B costs $30, so Option B is cheaper for 15 bottles.",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Buy What You Need",
+          cards: [
+            { label: "Option A", productName: "Water Bottles", price: 33, quantityLabel: "3 packs of 5", unitRateLabel: "Total for 15 bottles", unitRate: 33, hideUnitRateUntilReveal: true },
+            { label: "Option B", productName: "Water Bottles", price: 30, quantityLabel: "5 packs of 3", unitRateLabel: "Total for 15 bottles", unitRate: 30, hideUnitRateUntilReveal: true },
+          ],
+        },
       },
       {
         kind: "multiple_choice",
@@ -19480,7 +19488,15 @@ function generateGenericQuestion(
         prompt: "You need 20 cans. Which option is cheaper?",
         options: ["Option A", "Option B", "They cost the same"],
         answer: "Option B",
-        helper: "Compare the total cost for the same number of cans.",
+        helper: "Option A costs $36. Option B costs $34, so Option B is cheaper for 20 cans.",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Buy What You Need",
+          cards: [
+            { label: "Option A", productName: "Sparkling Water", price: 36, quantityLabel: "4 packs of 5", unitRateLabel: "Total for 20 cans", unitRate: 36, hideUnitRateUntilReveal: true },
+            { label: "Option B", productName: "Sparkling Water", price: 34, quantityLabel: "5 packs of 4", unitRateLabel: "Total for 20 cans", unitRate: 34, hideUnitRateUntilReveal: true },
+          ],
+        },
       },
       {
         kind: "multiple_choice",
@@ -19524,7 +19540,15 @@ function generateGenericQuestion(
         prompt: "You need 8 items. Which option is cheaper?",
         options: ["Option A", "Option B", "They cost the same"],
         answer: "Option A",
-        helper: "Compare total cost for the quantity you need.",
+        helper: "Option A costs $18. Option B costs $19.20, so Option A is cheaper for 8 items.",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Buy What You Need",
+          cards: [
+            { label: "Option A", productName: "Highlighter Set", price: 18, quantityLabel: "2 packs of 4", unitRateLabel: "Total for 8 items", unitRate: 18, hideUnitRateUntilReveal: true },
+            { label: "Option B", productName: "Highlighter Set", price: 19.2, quantityLabel: "1 pack of 8", unitRateLabel: "Total for 8 items", unitRate: 19.2, hideUnitRateUntilReveal: true },
+          ],
+        },
       },
       {
         kind: "multiple_choice",
