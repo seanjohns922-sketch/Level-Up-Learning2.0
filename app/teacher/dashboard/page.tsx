@@ -121,7 +121,7 @@ function StudentQRSection({ student, classCode, className2, onRegenerate }: {
         <button
           onClick={handleRegenerate}
           disabled={regenerating}
-          className="text-xs px-3 py-1.5 rounded-full bg-blue-50 text-blue-700 font-bold hover:bg-blue-100 transition disabled:opacity-50"
+          className="text-xs px-3 py-1.5 rounded-full bg-lime-50 text-lime-700 font-bold hover:bg-lime-100 transition disabled:opacity-50"
         >
           {regenerating ? "Regenerating…" : "Regenerate QR"}
         </button>
@@ -317,7 +317,7 @@ export default function TeacherDashboardPage() {
             const isCurrent = w === currentWeek && !isComplete;
 
             let bg = "bg-slate-200/70"; // locked
-            if (isComplete) bg = "bg-blue-500";
+            if (isComplete) bg = "bg-lime-500";
             else if (isCurrent) {
               if (lessonsCompleted === 0) bg = "bg-amber-300";
               else if (lessonsCompleted === 1) bg = "bg-amber-400";
@@ -340,7 +340,7 @@ export default function TeacherDashboardPage() {
         <div className="flex items-center gap-2 min-w-[88px] justify-end">
           <span className="tabular-nums text-xs font-bold text-slate-700">{overallPct}%</span>
           {hasLegend && (
-            <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-blue-700 bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded-md whitespace-nowrap">
+            <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-lime-700 bg-lime-50 border border-lime-100 px-1.5 py-0.5 rounded-md whitespace-nowrap">
               ★ Legend
             </span>
           )}
@@ -421,7 +421,7 @@ export default function TeacherDashboardPage() {
             <span
               className={[
                 "px-3 py-1 rounded-full text-xs font-bold",
-                quizUnlocked ? "bg-blue-100 text-blue-700" : "bg-gray-200 text-gray-400",
+                quizUnlocked ? "bg-lime-100 text-lime-700" : "bg-gray-200 text-gray-400",
               ].join(" ")}
             >
               Quiz {quizUnlocked ? "🔓" : "🔒"}
@@ -430,7 +430,7 @@ export default function TeacherDashboardPage() {
 
           {legends.length > 0 && (
             <div className="mt-4 flex items-center gap-2 text-sm">
-              <span className="text-blue-600 font-bold">🏆 Legend Unlocked</span>
+              <span className="text-lime-600 font-bold">🏆 Legend Unlocked</span>
             </div>
           )}
 
@@ -442,7 +442,7 @@ export default function TeacherDashboardPage() {
               </div>
               {!posttestProfile.passed && (prog?.week ?? posttestProfile.assignedWeek) ? (
                 <div className="mt-2">
-                  <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-1 text-[11px] font-bold text-blue-700">
+                  <span className="inline-flex items-center rounded-full bg-lime-100 px-2.5 py-1 text-[11px] font-bold text-lime-700">
                     Assigned: Week {prog?.week ?? posttestProfile.assignedWeek}
                   </span>
                 </div>
@@ -546,7 +546,7 @@ export default function TeacherDashboardPage() {
     return (
       <main className="min-h-screen bg-[#F7F8FA] flex items-center justify-center">
         <div className="flex items-center gap-3 text-slate-500">
-          <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+          <div className="h-2 w-2 rounded-full bg-lime-500 animate-pulse" />
           <p className="text-sm font-semibold">Loading dashboard…</p>
         </div>
       </main>
@@ -570,7 +570,7 @@ export default function TeacherDashboardPage() {
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 flex-wrap">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center">
+              <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-lime-500 to-lime-400 flex items-center justify-center">
                 <svg viewBox="0 0 24 24" className="h-4 w-4 text-white" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M3 12l9-9 9 9M5 10v10h14V10" />
                 </svg>
@@ -583,7 +583,7 @@ export default function TeacherDashboardPage() {
                 <span className="h-1 w-1 rounded-full bg-[#CBD5E1]" />
                 <button
                   onClick={copyCode}
-                  className="inline-flex items-center gap-1.5 text-[11px] font-mono font-extrabold text-blue-700 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-md hover:bg-blue-100 transition"
+                  className="inline-flex items-center gap-1.5 text-[11px] font-mono font-extrabold text-lime-700 bg-lime-50 border border-lime-100 px-2 py-0.5 rounded-md hover:bg-lime-100 transition"
                 >
                   {copiedCode ? "Copied!" : selectedClass.class_code}
                   <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -637,8 +637,8 @@ export default function TeacherDashboardPage() {
       <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
         {classes.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-2xl border border-[#E6E8EC]">
-            <div className="mx-auto h-12 w-12 rounded-xl bg-blue-50 flex items-center justify-center mb-3">
-              <svg viewBox="0 0 24 24" className="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m3-5.13a4 4 0 100-8 4 4 0 000 8zm6-2a3 3 0 100-6 3 3 0 000 6z" /></svg>
+            <div className="mx-auto h-12 w-12 rounded-xl bg-lime-50 flex items-center justify-center mb-3">
+              <svg viewBox="0 0 24 24" className="h-6 w-6 text-lime-600" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m3-5.13a4 4 0 100-8 4 4 0 000 8zm6-2a3 3 0 100-6 3 3 0 000 6z" /></svg>
             </div>
             <p className="text-[#0F172A] font-bold mb-1">No classes yet</p>
             <p className="text-sm text-[#64748B] mb-5">Create your first class to start tracking students.</p>
@@ -694,7 +694,7 @@ export default function TeacherDashboardPage() {
                     className={[
                       "px-3.5 py-1.5 rounded-lg font-bold text-sm whitespace-nowrap transition",
                       activeTab === t.id
-                        ? "bg-gradient-to-b from-blue-500 to-blue-600 text-white shadow-[0_4px_14px_-4px_rgba(37,99,235,0.55)]"
+                        ? "bg-gradient-to-b from-lime-500 to-lime-600 text-white shadow-[0_4px_14px_-4px_rgba(132,204,22,0.55)]"
                         : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9]",
                     ].join(" ")}
                   >
@@ -739,12 +739,12 @@ function KpiTile({
   if (primary) {
     return (
       <div
-        className="relative overflow-hidden rounded-2xl px-5 py-4 border border-blue-200/70 bg-gradient-to-br from-white via-blue-50/40 to-indigo-50/60 shadow-[0_8px_24px_-12px_rgba(37,99,235,0.35)]"
+        className="relative overflow-hidden rounded-2xl px-5 py-4 border border-lime-200/70 bg-gradient-to-br from-white via-lime-50/40 to-lime-50/60 shadow-[0_8px_24px_-12px_rgba(132,204,22,0.35)]"
       >
-        <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-blue-400 to-indigo-500" />
+        <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-lime-400 to-lime-400" />
         <div className="flex items-start justify-between">
           <div>
-            <div className="text-[10px] font-extrabold text-blue-700 uppercase tracking-[0.18em]">{label}</div>
+            <div className="text-[10px] font-extrabold text-lime-700 uppercase tracking-[0.18em]">{label}</div>
             <div className="mt-1 text-[44px] leading-none font-black text-[#0F172A] tabular-nums tracking-tight">
               {value}
             </div>
@@ -752,7 +752,7 @@ function KpiTile({
               enrolled in this class
             </div>
           </div>
-          <div className="h-9 w-9 rounded-xl bg-white shadow-sm border border-blue-100 flex items-center justify-center">
+          <div className="h-9 w-9 rounded-xl bg-white shadow-sm border border-lime-100 flex items-center justify-center">
             <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke={accent} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               {icon}
             </svg>
