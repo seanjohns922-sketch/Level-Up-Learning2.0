@@ -419,12 +419,11 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
 
       {/* Student table */}
       <div className="bg-white rounded-2xl border border-[#E6E8EC] overflow-hidden">
-        <div className="grid grid-cols-[1.6fr_0.9fr_0.7fr_1.1fr_0.9fr] px-5 py-3 bg-[#FAFBFC] border-b border-[#E6E8EC]">
+        <div className="grid grid-cols-[2fr_0.9fr_0.7fr_1.1fr] px-5 py-3 bg-[#FAFBFC] border-b border-[#E6E8EC]">
           {([
             ["name",   "Student"],
             ["level",  "Level"],
             ["week",   "Week"],
-            ["status", "Status"],
             ["tower",  "Tower"],
           ] as [SortKey, string][]).map(([key, label]) => {
             const active = sortKey === key;
@@ -459,7 +458,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
                 <button
                   onClick={() => setExpandedId(isOpen ? null : s.id)}
                   className={[
-                    "w-full grid grid-cols-[1.6fr_0.9fr_0.7fr_1.1fr_0.9fr] items-center px-5 py-3.5 text-left transition",
+                    "w-full grid grid-cols-[2fr_0.9fr_0.7fr_1.1fr] items-center px-5 py-3.5 text-left transition",
                     isOpen ? "bg-[#FAFBFC]" : "hover:bg-[#FAFBFC]",
                   ].join(" ")}
                 >
@@ -467,9 +466,9 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
                     <div className="h-8 w-8 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 text-white flex items-center justify-center text-xs font-black shrink-0">
                       {s.display_name.charAt(0).toUpperCase()}
                     </div>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex items-center gap-2.5 flex-wrap">
                       <div className="text-sm font-bold text-[#0F172A] truncate">{s.display_name}</div>
-                      <div className={`mt-0.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-[10px] font-extrabold uppercase tracking-wider ${flagTone(flag.tone)}`}>
+                      <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-[10px] font-extrabold uppercase tracking-wider ${flagTone(flag.tone)}`}>
                         <span>{flag.emoji}</span>
                         <span>{flag.label}</span>
                       </div>
@@ -478,11 +477,6 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
                   <span className="text-xs font-bold text-[#475569]">{studentYear}</span>
                   <span className="text-xs font-bold text-[#475569] tabular-nums">
                     {week ? `W${week}` : "—"}
-                  </span>
-                  <span>
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-md border text-[10px] font-extrabold uppercase tracking-wider ${statusTone(status)}`}>
-                      {status}
-                    </span>
                   </span>
                   <div className="flex items-center gap-2">
                     <div className="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
