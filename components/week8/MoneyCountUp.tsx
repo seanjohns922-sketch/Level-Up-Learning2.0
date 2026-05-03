@@ -1,6 +1,7 @@
 "use client";
 
 import { renderCoins } from "@/components/week7/moneyAssets";
+import { speak } from "@/lib/speak";
 
 function JumpRow({ from, jump, to }: { from: number; jump: number; to: number }) {
   return (
@@ -12,18 +13,6 @@ function JumpRow({ from, jump, to }: { from: number; jump: number; to: number })
       <div className="px-3 py-1 rounded-lg bg-gray-100">${to}</div>
     </div>
   );
-}
-
-function speak(text: string) {
-  if (typeof window === "undefined") return;
-  const synth = window.speechSynthesis;
-  if (!synth) return;
-  synth.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.rate = 0.9;
-  u.pitch = 1.0;
-  u.volume = 1.0;
-  synth.speak(u);
 }
 
 export default function MoneyCountUp({

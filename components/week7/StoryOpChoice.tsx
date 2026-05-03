@@ -1,18 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
-function speak(text: string) {
-  if (typeof window === "undefined") return;
-  const synth = window.speechSynthesis;
-  if (!synth) return;
-  synth.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.rate = 0.9;
-  u.pitch = 1.0;
-  u.volume = 1.0;
-  synth.speak(u);
-}
+import { speak } from "@/lib/speak";
 
 export default function StoryOpChoice({
   story,

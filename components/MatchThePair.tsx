@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { speak } from "@/lib/speak";
 
 type Pair = { a: number; b: number };
 
@@ -23,18 +24,6 @@ type Card = {
 
 function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function speak(text: string) {
-  if (typeof window === "undefined") return;
-  const synth = window.speechSynthesis;
-  if (!synth) return;
-  synth.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.rate = 0.9;
-  u.pitch = 1.0;
-  u.volume = 1.0;
-  synth.speak(u);
 }
 
 function shuffle<T>(arr: T[]) {

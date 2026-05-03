@@ -1,7 +1,15 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
+
 type SpeakRequestPayload = {
   text: string;
+};
+
+type SpeakState = {
+  currentText: string | null;
+  isSpeaking: boolean;
+  autoReadEnabled: boolean;
 };
 
 const audioCache = new Map<string, string>();
@@ -9,6 +17,12 @@ const audioCache = new Map<string, string>();
 let currentAudio: HTMLAudioElement | null = null;
 let currentRequest: AbortController | null = null;
 let activeSpeakToken: symbol | null = null;
+const speakListeners = new Set<() => void>();
+let speakState: SpeakState = {
+  currentText: null,
+  isSpeaking: false,
+  autoReadEnabled: false,
+};
 
 const CARDINALS_UNDER_TWENTY = [
   "zero",
@@ -135,6 +149,49 @@ function normalizeText(text: string) {
   return normalizeMathText(text.replace(/\s+/g, " ").trim());
 }
 
+function emitSpeakState() {
+  speakListeners.forEach((listener) => listener());
+}
+
+function setSpeakState(next: Partial<SpeakState>) {
+  speakState = { ...speakState, ...next };
+  emitSpeakState();
+}
+
+function readAutoReadPreference() {
+  if (typeof window === "undefined") return false;
+  return window.localStorage.getItem("lul:auto_read_questions") === "1";
+}
+
+function getSpeakStateSnapshot() {
+  if (typeof window !== "undefined" && speakState.autoReadEnabled !== readAutoReadPreference()) {
+    speakState = { ...speakState, autoReadEnabled: readAutoReadPreference() };
+  }
+  return speakState;
+}
+
+export function subscribeSpeakState(listener: () => void) {
+  speakListeners.add(listener);
+  return () => {
+    speakListeners.delete(listener);
+  };
+}
+
+export function useSpeakState() {
+  return useSyncExternalStore(subscribeSpeakState, getSpeakStateSnapshot, getSpeakStateSnapshot);
+}
+
+export function setAutoReadEnabled(enabled: boolean) {
+  if (typeof window !== "undefined") {
+    window.localStorage.setItem("lul:auto_read_questions", enabled ? "1" : "0");
+  }
+  setSpeakState({ autoReadEnabled: enabled });
+}
+
+export function prepareSpeechText(text: string) {
+  return normalizeText(text);
+}
+
 function selectBrowserVoice(synth: SpeechSynthesis) {
   const voices = synth.getVoices();
   if (!voices.length) return null;
@@ -163,6 +220,7 @@ function fallbackSpeak(text: string) {
   if (!synth) return;
 
   synth.cancel();
+  setSpeakState({ currentText: text, isSpeaking: true });
 
   const utterance = new SpeechSynthesisUtterance(text);
   const voice = selectBrowserVoice(synth);
@@ -172,6 +230,12 @@ function fallbackSpeak(text: string) {
   utterance.rate = 0.9;
   utterance.pitch = 1.0;
   utterance.volume = 1.0;
+  utterance.onend = () => {
+    setSpeakState({ currentText: null, isSpeaking: false });
+  };
+  utterance.onerror = () => {
+    setSpeakState({ currentText: null, isSpeaking: false });
+  };
 
   synth.speak(utterance);
 }
@@ -212,6 +276,7 @@ export async function speak(text: string) {
   stopSpeaking();
   const speakToken = Symbol("speak");
   activeSpeakToken = speakToken;
+  setSpeakState({ currentText: normalized, isSpeaking: true });
 
   try {
     const audioUrl = await fetchTtsAudio(normalized);
@@ -220,7 +285,16 @@ export async function speak(text: string) {
     const audio = new Audio(audioUrl);
     currentAudio = audio;
     audio.onended = () => {
-      if (currentAudio === audio) currentAudio = null;
+      if (currentAudio === audio) {
+        currentAudio = null;
+        setSpeakState({ currentText: null, isSpeaking: false });
+      }
+    };
+    audio.onerror = () => {
+      if (currentAudio === audio) {
+        currentAudio = null;
+        setSpeakState({ currentText: null, isSpeaking: false });
+      }
     };
     await audio.play();
   } catch (error) {
@@ -245,4 +319,5 @@ export function stopSpeaking() {
   if (typeof window !== "undefined") {
     window.speechSynthesis?.cancel();
   }
+  setSpeakState({ currentText: null, isSpeaking: false });
 }

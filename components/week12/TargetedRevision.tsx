@@ -16,18 +16,7 @@ import ShareFair from "@/components/week9/ShareFair";
 import TapGroupsSkipCount from "@/components/week10/TapGroupsSkipCount";
 import BuildGroupsSkipCount from "@/components/week10/BuildGroupsSkipCount";
 import ChooseSkipCount from "@/components/week10/ChooseSkipCount";
-
-function speak(text: string) {
-  if (typeof window === "undefined") return;
-  const synth = window.speechSynthesis;
-  if (!synth) return;
-  synth.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.rate = 0.9;
-  u.pitch = 1.0;
-  u.volume = 1.0;
-  synth.speak(u);
-}
+import { speak } from "@/lib/speak";
 
 function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;

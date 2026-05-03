@@ -29,7 +29,7 @@ import MoneyMakeAmount from "@/components/week7/MoneyMakeAmount";
 import MoneyChange from "@/components/week7/MoneyChange";
 import MoneyEnough from "@/components/week7/MoneyEnough";
 import { MathFormattedText } from "@/components/FractionText";
-import { speak } from "@/lib/speak";
+import { prepareSpeechText, setAutoReadEnabled, speak, useSpeakState } from "@/lib/speak";
 import { ClickableDotGrid, ClickableDotRows } from "@/components/ClickableDots";
 import { StaticDotGrid, StaticDotRow, StaticDotRows } from "@/components/StaticDots";
 import {
@@ -3484,6 +3484,7 @@ function SessionPage() {
   const [quizGroupTaps, setQuizGroupTaps] = useState<Record<string, boolean[]>>(
     {}
   );
+  const speakState = useSpeakState();
   const isWeek9 = Number(week) === 9;
   const isWeek10 = Number(week) === 10;
 
@@ -3666,6 +3667,18 @@ function SessionPage() {
   }
 
   const currentQuiz = quizQuestions[quizIndex];
+  const currentQuizPrompt = currentQuiz?.prompt ?? "";
+  const isCurrentQuizReading =
+    speakState.isSpeaking &&
+    speakState.currentText !== null &&
+    currentQuizPrompt.length > 0 &&
+    speakState.currentText === prepareSpeechText(currentQuizPrompt);
+
+  useEffect(() => {
+    if (!speakState.autoReadEnabled) return;
+    if (!currentQuizPrompt) return;
+    void speak(currentQuizPrompt);
+  }, [currentQuizPrompt, speakState.autoReadEnabled]);
   const isMoneyQuiz =
     currentQuiz?.kind === "moneyMake" ||
     currentQuiz?.kind === "moneyChange" ||
@@ -3898,7 +3911,12 @@ function SessionPage() {
                   </div>
 
                   {!isMoneyQuiz ? (
-                  <div className="flex items-start justify-between gap-3 mb-2">
+                  <div
+                    className={[
+                      "flex items-start justify-between gap-3 mb-2 rounded-2xl px-2 py-2 transition-all",
+                      isCurrentQuizReading ? "bg-primary/5 ring-2 ring-primary/20 shadow-[0_0_0_1px_rgba(13,148,136,0.08)]" : "",
+                    ].join(" ")}
+                  >
                       <div className="font-semibold text-foreground">
                         {currentQuiz?.lessonTag ? (
                           <div className="mb-1 text-xs font-black uppercase tracking-wide text-teal-700">
@@ -3909,23 +3927,61 @@ function SessionPage() {
                           <MathFormattedText text={currentQuiz?.prompt ?? ""} compactFractions />
                         )}
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => speak(currentQuiz?.prompt ?? "")}
-                         className="px-3 py-2 rounded-xl border border-border text-sm font-bold text-foreground hover:bg-secondary transition"
-                      >
-                        🔊 AI Read
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setAutoReadEnabled(!speakState.autoReadEnabled)}
+                          className={[
+                            "px-3 py-2 rounded-xl border text-xs font-bold transition",
+                            speakState.autoReadEnabled
+                              ? "border-primary/40 bg-primary/10 text-primary"
+                              : "border-border text-muted-foreground hover:bg-secondary",
+                          ].join(" ")}
+                        >
+                          {speakState.autoReadEnabled ? "Auto-read on" : "Auto-read off"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => speak(currentQuiz?.prompt ?? "")}
+                           className={[
+                            "px-3 py-2 rounded-xl border text-sm font-bold transition",
+                            isCurrentQuizReading
+                              ? "border-primary/40 bg-primary/10 text-primary"
+                              : "border-border text-foreground hover:bg-secondary",
+                          ].join(" ")}
+                        >
+                          🔊 AI Read
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     <div className="flex items-start justify-end mb-2">
-                      <button
-                        type="button"
-                        onClick={() => speak(currentQuiz?.prompt ?? "")}
-                        className="px-3 py-2 rounded-xl border border-border text-sm font-bold text-foreground hover:bg-secondary transition"
-                      >
-                        🔊 AI Read
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setAutoReadEnabled(!speakState.autoReadEnabled)}
+                          className={[
+                            "px-3 py-2 rounded-xl border text-xs font-bold transition",
+                            speakState.autoReadEnabled
+                              ? "border-primary/40 bg-primary/10 text-primary"
+                              : "border-border text-muted-foreground hover:bg-secondary",
+                          ].join(" ")}
+                        >
+                          {speakState.autoReadEnabled ? "Auto-read on" : "Auto-read off"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => speak(currentQuiz?.prompt ?? "")}
+                          className={[
+                            "px-3 py-2 rounded-xl border text-sm font-bold transition",
+                            isCurrentQuizReading
+                              ? "border-primary/40 bg-primary/10 text-primary"
+                              : "border-border text-foreground hover:bg-secondary",
+                          ].join(" ")}
+                        >
+                          🔊 AI Read
+                        </button>
+                      </div>
                     </div>
                   )}
 
