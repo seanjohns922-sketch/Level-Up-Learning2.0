@@ -40,6 +40,12 @@ type Props = {
 };
 
 type StrandStatus = "Not Started" | "In Progress" | "Needs Support" | "Completed";
+
+function yearToLevelLabel(year: string): string {
+  if (year === "Prep") return "Ground";
+  const m = year.match(/Year\s*(\d+)/i);
+  return m ? `Level ${m[1]}` : year;
+}
 type StudentFlagTone = "neutral" | "red" | "yellow" | "green";
 type StudentFlag = {
   label: string;
@@ -411,17 +417,18 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
 
       {/* Student table */}
       <div className="bg-white rounded-2xl border border-[#E6E8EC] overflow-hidden shadow-[0_4px_16px_-12px_rgba(15,23,42,0.18)]">
-        <div className="grid grid-cols-[2fr_0.9fr_0.7fr_1.1fr] px-5 py-3 bg-gradient-to-b from-[#F8FAFC] to-[#F1F5F9] border-b border-[#E6E8EC]">
+        <div className="grid grid-cols-[2fr_0.7fr_0.7fr_0.7fr_1.1fr] px-5 py-3 bg-gradient-to-b from-[#F8FAFC] to-[#F1F5F9] border-b border-[#E6E8EC]">
           {([
             ["name",   "Student"],
+            ["level",  "Year"],
             ["level",  "Level"],
             ["week",   "Week"],
             ["tower",  "Tower"],
-          ] as [SortKey, string][]).map(([key, label]) => {
+          ] as [SortKey, string][]).map(([key, label], idx) => {
             const active = sortKey === key;
             return (
               <button
-                key={key}
+                key={`${key}-${idx}`}
                 onClick={() => toggleSort(key)}
                 className={[
                   "text-left text-[10px] font-extrabold uppercase tracking-[0.12em] transition flex items-center gap-1",
@@ -450,7 +457,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
                 <button
                   onClick={() => setExpandedId(isOpen ? null : s.id)}
                   className={[
-                    "w-full grid grid-cols-[2fr_0.9fr_0.7fr_1.1fr] items-center px-5 py-3.5 text-left transition",
+                    "w-full grid grid-cols-[2fr_0.7fr_0.7fr_0.7fr_1.1fr] items-center px-5 py-3.5 text-left transition",
                     isOpen ? "bg-[#FAFBFC]" : "hover:bg-[#FAFBFC]",
                   ].join(" ")}
                 >
@@ -467,6 +474,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
                     </div>
                   </div>
                   <span className="text-xs font-bold text-[#475569]">{studentYear}</span>
+                  <span className="text-xs font-bold text-[#475569]">{yearToLevelLabel(studentYear)}</span>
                   <span className="text-xs font-bold text-[#475569] tabular-nums">
                     {week ? `W${week}` : "—"}
                   </span>
