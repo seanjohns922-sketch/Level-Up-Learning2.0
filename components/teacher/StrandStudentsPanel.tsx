@@ -387,7 +387,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
         </div>
       )}
 
-      <div className="grid lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         <div className="bg-white rounded-2xl border border-[#E6E8EC] p-4">
           <div className="text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.12em] mb-2">
             Class Insight
@@ -400,19 +400,6 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
           </div>
           <div className="mt-3 text-sm font-semibold text-[#475569]">
             {classInsight.action}
-          </div>
-        </div>
-        <div className="bg-white rounded-2xl border border-[#E6E8EC] p-4">
-          <div className="text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.12em] mb-2">
-            Student Flags
-          </div>
-          <div className="grid grid-cols-3 gap-2 text-xs">
-            <FlagLegend label="Needs support" emoji="🔴" tone="red" />
-            <FlagLegend label="Check-in" emoji="🟡" tone="yellow" />
-            <FlagLegend label="On track" emoji="🟢" tone="green" />
-          </div>
-          <div className="mt-3 text-sm font-semibold text-[#475569]">
-            Flags update automatically from weekly lesson and quiz insight data.
           </div>
         </div>
       </div>
