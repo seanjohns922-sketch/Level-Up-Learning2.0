@@ -407,8 +407,8 @@ const year6Rows: ProgramRow[] = [
     curriculum: ["AC9M6N06"],
     activities: [
       makeActivity("multiple_choice", 1, { mode: "y6_interpret_spot" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_interpret_decide" }),
       makeActivity("typed_response", 1, { mode: "y6_interpret_explain" }),
-      makeActivity("multiple_choice", 1, { mode: "y6_interpret_communicate" }),
     ],
   },
   {
