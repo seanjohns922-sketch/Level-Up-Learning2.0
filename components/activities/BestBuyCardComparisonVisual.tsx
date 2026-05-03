@@ -43,9 +43,11 @@ export default function BestBuyCardComparisonVisual({
                     {card.productName}
                   </div>
                 </div>
-                <div className="rounded-full bg-amber-100 px-3 py-1 text-xs font-extrabold uppercase tracking-[0.12em] text-amber-800">
-                  Best Buy
-                </div>
+                {visual.cards.length > 1 ? (
+                  <div className="rounded-full bg-amber-100 px-3 py-1 text-xs font-extrabold uppercase tracking-[0.12em] text-amber-800">
+                    Compare
+                  </div>
+                ) : null}
               </div>
 
               <div className="mt-4 grid grid-cols-2 gap-3">

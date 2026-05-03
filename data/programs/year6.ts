@@ -406,9 +406,9 @@ const year6Rows: ProgramRow[] = [
     activity: "Work through short modelling tasks and explain which result or option makes most sense.",
     curriculum: ["AC9M6N06"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "multi_step_decide" }),
-      makeActivity("typed_response", 1, { mode: "multi_step_build" }),
-      makeActivity("multiple_choice", 1, { mode: "multi_step_solve" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_interpret_spot" }),
+      makeActivity("typed_response", 1, { mode: "y6_interpret_explain" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_interpret_communicate" }),
     ],
   },
   {
