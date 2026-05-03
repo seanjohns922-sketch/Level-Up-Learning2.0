@@ -2,7 +2,7 @@
 
 import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { PracticeRunner } from "@/components/PracticeRunner";
 import { PerformanceSummaryCard } from "@/components/lesson/PerformanceSummaryCard";
 import { Year2LessonEngine, type LessonPerformanceSummary } from "@/components/lesson/Year2LessonEngine";
@@ -19,10 +19,12 @@ import { generateWeek10Task } from "@/data/activities/year1/week10";
 import { generateWeek12Task } from "@/data/activities/year1/week12";
 import { generateWeek11Task } from "@/data/activities/year1/week11";
 import { getProgramForYear } from "@/data/programs";
-import { readProgress, updateProgress } from "@/data/progress";
+import { ACTIVE_STUDENT_KEY, readProgress, updateProgress } from "@/data/progress";
 import { markLessonComplete } from "@/lib/program-progress";
 import { getLessonChrome } from "@/lib/levelTheme";
 import { LessonPageHero } from "@/components/lesson/LessonPageHero";
+import { supabase } from "@/lib/supabase";
+import type { TeacherInsight, TeacherInsightInput } from "@/lib/teacher-insights";
 
 export default function LessonPageWrapper() {
   return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><LessonPage /></Suspense>;
@@ -87,6 +89,100 @@ function LessonPage() {
   }
 
   const showWeek12Lesson3Summary = week === 12 && lessonNumber === 3;
+  const savedLessonSummaryKeysRef = useRef<Set<string>>(new Set());
+
+  async function persistLessonPerformanceSummary(summary: LessonPerformanceSummary) {
+    const summaryKey = `${effectiveLessonId}:${summary.questionsAnswered}:${summary.correctAnswers}:${summary.timeSpentSeconds}`;
+    if (savedLessonSummaryKeysRef.current.has(summaryKey)) return;
+    savedLessonSummaryKeysRef.current.add(summaryKey);
+
+    try {
+      const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY) : null;
+      if (!studentId) return;
+
+      const input: TeacherInsightInput = {
+        studentId,
+        level: year,
+        strand: "Number",
+        week,
+        lessonId: effectiveLessonId,
+        title: summary.lessonTitle,
+        score: summary.correctAnswers,
+        accuracy: summary.accuracy,
+        timeSpent: summary.timeSpentSeconds,
+        questionsAnswered: summary.questionsAnswered,
+        topicSummaries: summary.topicSummaries,
+      };
+
+      let insight: TeacherInsight | null = null;
+      try {
+        const insightResponse = await fetch("/api/teacher-insight", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(input),
+        });
+        if (insightResponse.ok) {
+          const payload = (await insightResponse.json()) as { insight?: TeacherInsight };
+          insight = payload.insight ?? null;
+        }
+      } catch (error) {
+        console.warn("[Lesson] Insight generation failed:", error);
+      }
+
+      const { data: existing } = await supabase
+        .from("progress_snapshot")
+        .select("lesson_attempts")
+        .eq("student_id", studentId)
+        .eq("year", year)
+        .maybeSingle();
+
+      const previousLessonAttempts = ((existing?.lesson_attempts as Record<string, unknown> | null) ?? {}) as Record<
+        string,
+        { attempts?: unknown[] }
+      >;
+      const previousLessonEntry = previousLessonAttempts[effectiveLessonId] ?? {};
+      const previousAttempts = Array.isArray(previousLessonEntry.attempts) ? previousLessonEntry.attempts : [];
+
+      const attempt = {
+        at: new Date().toISOString(),
+        lessonId: effectiveLessonId,
+        title: summary.lessonTitle,
+        questionsAnswered: summary.questionsAnswered,
+        correctAnswers: summary.correctAnswers,
+        accuracy: summary.accuracy,
+        timeSpentSeconds: summary.timeSpentSeconds,
+        topicSummaries: summary.topicSummaries,
+        strengths: summary.strengths,
+        areasToImprove: summary.areasToImprove,
+        struggledQuestionTypes: summary.struggledQuestionTypes,
+        insight,
+      };
+
+      const updatedLessonAttempts = {
+        ...previousLessonAttempts,
+        [effectiveLessonId]: {
+          latestSummary: attempt,
+          latestInsight: insight,
+          attempts: [...previousAttempts, attempt],
+        },
+      };
+
+      const { error } = await supabase.from("progress_snapshot").upsert(
+        {
+          student_id: studentId,
+          year,
+          lesson_attempts: updatedLessonAttempts,
+        },
+        { onConflict: "student_id,year" }
+      );
+
+      if (error) {
+        console.warn("[Lesson] DB save error:", error);
+      }
+    } catch (error) {
+      console.warn("[Lesson] Persist summary failed:", error);
+    }
+  }
 
   function startPostTest() {
     router.push(`/posttest?year=${encodeURIComponent(year)}`);
@@ -455,6 +551,7 @@ function LessonPage() {
                 return generateWeek1Task(effectiveLessonId, d);
               }}
               onComplete={completeLesson}
+              onPerformanceSummary={persistLessonPerformanceSummary}
             />
             </div>
           </div>
@@ -488,6 +585,7 @@ function LessonPage() {
                         )
                       : undefined
                   }
+                  onPerformanceSummary={persistLessonPerformanceSummary}
                 />
               ) : (
                 <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">

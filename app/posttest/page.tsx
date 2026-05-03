@@ -381,7 +381,7 @@ function PostTestPage() {
         if (!studentId) return;
 
         const { data: existing } = await supabase
-          .from("progress")
+          .from("progress_snapshot")
           .select("quiz_scores")
           .eq("student_id", studentId)
           .eq("year", year)
@@ -406,7 +406,7 @@ function PostTestPage() {
         };
 
         const { error } = await supabase
-          .from("progress")
+          .from("progress_snapshot")
           .upsert(
             {
               student_id: studentId,

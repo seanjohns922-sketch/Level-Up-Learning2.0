@@ -378,11 +378,13 @@ export function Year2LessonEngine({
   onTimedComplete,
   onExit,
   renderCompletionCard,
+  onPerformanceSummary,
 }: {
   lesson: Lesson;
   onTimedComplete: () => void;
   onExit: () => void;
   renderCompletionCard?: (summary: LessonPerformanceSummary) => ReactNode;
+  onPerformanceSummary?: (summary: LessonPerformanceSummary) => void;
 }) {
   const totalSeconds = 9 * 60;
   const level = useMemo(() => getLevelForLesson(lesson), [lesson]);
@@ -427,6 +429,19 @@ export function Year2LessonEngine({
     questionsAnswered > 0
       ? Math.round((correctAnswers / questionsAnswered) * 100)
       : 0;
+  const summary = useMemo(
+    () =>
+      buildLessonPerformanceSummary({
+        lessonTitle: lesson.title,
+        attempts: attemptLog,
+        questionsAnswered,
+        correctAnswers,
+        accuracy,
+        timeSpentSeconds: Math.max(0, totalSeconds - Math.max(0, secondsLeft)),
+      }),
+    [accuracy, attemptLog, correctAnswers, lesson.title, questionsAnswered, secondsLeft, totalSeconds]
+  );
+  const emittedSummaryRef = useRef(false);
 
   function clearPendingTimeout() {
     if (timeoutRef.current) {
@@ -512,6 +527,12 @@ export function Year2LessonEngine({
     }
   }, [finished, onTimedComplete]);
 
+  useEffect(() => {
+    if (!finished || emittedSummaryRef.current) return;
+    emittedSummaryRef.current = true;
+    onPerformanceSummary?.(summary);
+  }, [finished, onPerformanceSummary, summary]);
+
   function handleCorrect() {
     if (finished || status !== "idle" || scoredThisTurnRef.current) return;
     scoredThisTurnRef.current = true;
@@ -571,15 +592,6 @@ export function Year2LessonEngine({
 
   // ── Finished state ──
   if (finished) {
-    const summary = buildLessonPerformanceSummary({
-      lessonTitle: lesson.title,
-      attempts: attemptLog,
-      questionsAnswered,
-      correctAnswers,
-      accuracy,
-      timeSpentSeconds: Math.max(0, totalSeconds - Math.max(0, secondsLeft)),
-    });
-
     if (renderCompletionCard) {
       return <>{renderCompletionCard(summary)}</>;
     }

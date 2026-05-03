@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { Lesson } from "@/data/programs/year1";
 import { DEFAULT_LESSON_XP } from "@/data/programs/genres";
+import type { TeacherInsight } from "@/lib/teacher-insights";
 
 export type LessonPreviewStudent = {
   id: string;
@@ -13,6 +14,7 @@ export type LessonPreviewStudent = {
   quizPercent?: number | null;
   quizPassed?: boolean | null;
   accuracy?: number | null;
+  aiInsight?: TeacherInsight | null;
 };
 
 export type LessonPreviewClassStats = {
@@ -395,7 +397,7 @@ export default function LessonPreviewDrawer({
 
           {/* Student-specific progress */}
           {student && (
-            <Section title={`${student.display_name}'s progress`}>
+            <Section title={`${student.display_name}\u2019s progress`}>
               <div className="flex items-center gap-2 mb-2">
                 <span className={`inline-flex items-center px-2 py-0.5 rounded-md border text-[10px] font-extrabold uppercase tracking-wider ${statusTone(student.status)}`}>
                   {student.status}
@@ -413,6 +415,19 @@ export default function LessonPreviewDrawer({
                 <Meta label="Time spent" value={student.timeSpent ?? "n/a"} />
                 <Meta label="Accuracy" value={student.accuracy != null ? `${student.accuracy}%` : "n/a"} />
               </div>
+              {student.aiInsight ? (
+                <div className="mt-3 rounded-xl border border-[#E6E8EC] bg-[#F8FAFC] p-3">
+                  <div className="text-[10px] font-extrabold text-teal-700 uppercase tracking-[0.14em] mb-2">
+                    AI Lesson Insight
+                  </div>
+                  <InsightRow label="Status" value={student.aiInsight.status} />
+                  <InsightRow label="Strength" value={student.aiInsight.strength} />
+                  <InsightRow label="Gap" value={student.aiInsight.gap} />
+                  <InsightRow label="Likely misconception" value={student.aiInsight.likelyMisconception} />
+                  <InsightRow label="Teacher action" value={student.aiInsight.teacherAction} />
+                  <InsightRow label="Recommended revisit" value={student.aiInsight.recommendedRevisit} />
+                </div>
+              ) : null}
             </Section>
           )}
 
@@ -494,5 +509,14 @@ function Bullet({ children }: { children: React.ReactNode }) {
       <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-teal-500 shrink-0" />
       <span className="leading-relaxed">{children}</span>
     </li>
+  );
+}
+
+function InsightRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="mb-2 last:mb-0">
+      <div className="text-[10px] font-extrabold uppercase tracking-wider text-[#94A3B8]">{label}</div>
+      <div className="text-xs font-semibold text-[#0F172A] leading-relaxed">{value}</div>
+    </div>
   );
 }

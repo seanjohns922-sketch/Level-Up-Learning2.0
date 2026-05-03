@@ -246,7 +246,7 @@ export default function TeacherDashboardPage() {
     if (newStuds.length > 0) {
       const ids = newStuds.map((s) => s.id);
       const { data: prog } = await supabase
-        .from("progress")
+        .from("progress_snapshot")
         .select("*")
         .in("student_id", ids);
       newProg = prog ?? [];

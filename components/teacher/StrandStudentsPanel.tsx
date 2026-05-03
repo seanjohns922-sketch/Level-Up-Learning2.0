@@ -11,6 +11,7 @@ import {
 import type { Lesson } from "@/data/programs/year1";
 import { getLatestPosttestProfile } from "@/data/assessments/analysis";
 import LessonPreviewDrawer from "./LessonPreviewDrawer";
+import type { TeacherInsight } from "@/lib/teacher-insights";
 
 type StudentRow = {
   id: string;
@@ -28,6 +29,7 @@ type ProgressRow = {
   completed_lesson_ids: any;
   unlocked_legends: any;
   quiz_scores: any;
+  lesson_attempts?: any;
   updated_at?: string;
 };
 
@@ -86,6 +88,14 @@ function timeAgo(iso?: string): string {
   if (d < 7) return `${d}d ago`;
   if (d < 30) return `${Math.floor(d / 7)}w ago`;
   return `${Math.floor(d / 30)}mo ago`;
+}
+
+function formatDuration(seconds?: number | null) {
+  if (!seconds || seconds <= 0) return "n/a";
+  const minutes = Math.floor(seconds / 60);
+  const remaining = seconds % 60;
+  if (minutes <= 0) return `${remaining}s`;
+  return `${minutes}m ${remaining}s`;
 }
 
 const YEAR_ORDER = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"];
@@ -317,6 +327,8 @@ function StudentStrandDetail({
 
   const quizScores: Record<string, any> =
     prog?.quiz_scores && typeof prog.quiz_scores === "object" ? (prog.quiz_scores as any) : {};
+  const lessonAttempts: Record<string, any> =
+    prog?.lesson_attempts && typeof prog.lesson_attempts === "object" ? (prog.lesson_attempts as any) : {};
   const latestPost = getLatestPosttestProfile(prog?.quiz_scores);
 
   function weekStatus(w: number): "Complete" | "In Progress" | "Not Started" | "Struggled" {
@@ -504,6 +516,20 @@ function StudentStrandDetail({
               </button>
             </div>
           </div>
+          {weekQuiz?.latestInsight ? (
+            <div className="rounded-xl border border-[#E6E8EC] bg-[#F8FAFC] px-3 py-3">
+              <div className="text-[10px] font-extrabold text-indigo-700 uppercase tracking-[0.14em] mb-2">
+                AI Quiz Insight
+              </div>
+              <div className="grid md:grid-cols-2 gap-2 text-xs">
+                <div><b className="text-[#64748B]">Status:</b> <span className="font-semibold text-[#0F172A]">{weekQuiz.latestInsight.status}</span></div>
+                <div><b className="text-[#64748B]">Strength:</b> <span className="font-semibold text-[#0F172A]">{weekQuiz.latestInsight.strength}</span></div>
+                <div><b className="text-[#64748B]">Gap:</b> <span className="font-semibold text-[#0F172A]">{weekQuiz.latestInsight.gap}</span></div>
+                <div><b className="text-[#64748B]">Teacher action:</b> <span className="font-semibold text-[#0F172A]">{weekQuiz.latestInsight.teacherAction}</span></div>
+                <div className="md:col-span-2"><b className="text-[#64748B]">Recommended revisit:</b> <span className="font-semibold text-[#0F172A]">{weekQuiz.latestInsight.recommendedRevisit}</span></div>
+              </div>
+            </div>
+          ) : null}
         </div>
       )}
 
@@ -532,20 +558,28 @@ function StudentStrandDetail({
         realm={genre.realm}
         yearLabel={yearLabel}
         isPlaceholder={isPlaceholder}
-        student={previewLesson ? {
-          id: student.id,
-          display_name: student.display_name,
-          status: ids.includes(previewLesson.id) ? "Completed" : (previewLesson.week === currentWeek ? "In Progress" : "Not Started"),
-          attempts: ids.includes(previewLesson.id) ? 1 : 0,
-          quizPercent: (() => {
-            const q = quizScores[String(previewLesson.week)];
-            return q?.percent ?? null;
-          })(),
-          quizPassed: (() => {
-            const q = quizScores[String(previewLesson.week)];
-            return q?.passed ?? null;
-          })(),
-        } : null}
+        student={previewLesson ? (() => {
+          const lessonAttempt = lessonAttempts[previewLesson.id];
+          const latestSummary = lessonAttempt?.latestSummary;
+          const latestInsight = lessonAttempt?.latestInsight as TeacherInsight | null | undefined;
+          return {
+            id: student.id,
+            display_name: student.display_name,
+            status: ids.includes(previewLesson.id) ? "Completed" : (previewLesson.week === currentWeek ? "In Progress" : "Not Started"),
+            attempts: lessonAttempt?.attempts?.length ?? (ids.includes(previewLesson.id) ? 1 : 0),
+            timeSpent: formatDuration(latestSummary?.timeSpentSeconds),
+            accuracy: latestSummary?.accuracy ?? null,
+            aiInsight: latestInsight ?? null,
+            quizPercent: (() => {
+              const q = quizScores[String(previewLesson.week)];
+              return q?.percent ?? null;
+            })(),
+            quizPassed: (() => {
+              const q = quizScores[String(previewLesson.week)];
+              return q?.passed ?? null;
+            })(),
+          };
+        })() : null}
       />
     </div>
   );

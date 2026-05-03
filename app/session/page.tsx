@@ -30,6 +30,7 @@ import MoneyChange from "@/components/week7/MoneyChange";
 import MoneyEnough from "@/components/week7/MoneyEnough";
 import { MathFormattedText } from "@/components/FractionText";
 import { prepareSpeechText, speak, useAutoReadSetting, useSpeakState } from "@/lib/speak";
+import type { TeacherAttemptQuestion, TeacherInsight, TeacherInsightInput } from "@/lib/teacher-insights";
 import { ClickableDotGrid, ClickableDotRows } from "@/components/ClickableDots";
 import { StaticDotGrid, StaticDotRow, StaticDotRows } from "@/components/StaticDots";
 import {
@@ -1597,6 +1598,78 @@ function buildLessonBreakdown(
       ...item,
       percent: item.total > 0 ? Math.round((item.correct / item.total) * 100) : 0,
     }));
+}
+
+function buildQuizQuestionResults(
+  questions: QuizQuestion[],
+  quizAnswers: Record<string, number>,
+  quizTyped: Record<string, string>,
+  quizLineAnswers: Record<string, number>,
+  quizChartDone: Record<string, boolean>,
+  quizMabAnswers: Record<string, { tens: number; ones: number; touched: boolean }>,
+  quizMoneyAnswers: Record<string, { attempted: boolean; correct: boolean }>,
+  quizLessonActivityResults: Record<string, { attempted: boolean; correct: boolean }>
+): TeacherAttemptQuestion[] {
+  return questions.map((q) => {
+    let selectedAnswer: string | null = null;
+    let correctAnswer: string | null = null;
+
+    if (q.kind === "typed") {
+      selectedAnswer = (quizTyped[q.id] ?? "").trim() || null;
+      correctAnswer = q.correctValue ?? q.acceptedValues?.[0] ?? null;
+    } else if (q.kind === "mcq" || q.kind === "ordering" || q.kind === "audio") {
+      const selectedIndex = quizAnswers[q.id];
+      selectedAnswer =
+        typeof selectedIndex === "number" && Array.isArray(q.options) ? q.options[selectedIndex] ?? null : null;
+      correctAnswer =
+        typeof q.correctIndex === "number" && Array.isArray(q.options) ? q.options[q.correctIndex] ?? null : null;
+    } else if (q.kind === "numberLineTap" || q.kind === "numberLineJump") {
+      selectedAnswer = typeof quizLineAnswers[q.id] === "number" ? String(quizLineAnswers[q.id]) : null;
+      correctAnswer = typeof q.line?.target === "number" ? String(q.line.target) : null;
+    } else if (q.kind === "chartFill") {
+      selectedAnswer = quizChartDone[q.id] ? "completed" : null;
+      correctAnswer = "completed";
+    } else if (q.kind === "mab") {
+      const answer = quizMabAnswers[q.id];
+      selectedAnswer = answer ? String(answer.tens * 10 + answer.ones) : null;
+      correctAnswer = typeof q.mab?.target === "number" ? String(q.mab.target) : null;
+    } else if (q.kind === "moneyMake") {
+      const result = quizMoneyAnswers[q.id];
+      selectedAnswer = result?.attempted ? (result.correct ? "correct" : "incorrect") : null;
+      correctAnswer = "correct";
+    } else if (q.kind === "moneyChange") {
+      const result = quizMoneyAnswers[q.id];
+      selectedAnswer = result?.attempted ? (result.correct ? "correct" : "incorrect") : null;
+      correctAnswer = typeof q.moneyChange?.answer === "number" ? String(q.moneyChange.answer) : "correct";
+    } else if (q.kind === "moneyEnough") {
+      const result = quizMoneyAnswers[q.id];
+      selectedAnswer = result?.attempted ? (result.correct ? "correct" : "incorrect") : null;
+      correctAnswer = q.moneyEnough?.answer ?? "correct";
+    } else if (q.kind === "lessonActivity") {
+      const result = quizLessonActivityResults[q.id];
+      selectedAnswer = result?.attempted ? (result.correct ? "correct" : "incorrect") : null;
+      correctAnswer = "correct";
+    }
+
+    return {
+      questionId: q.id,
+      prompt: q.prompt,
+      lessonTag: q.lessonTag != null ? String(q.lessonTag) : null,
+      skillTag: q.skill ?? q.quizMeta?.type ?? null,
+      selectedAnswer,
+      correctAnswer,
+      correct: isQuizQuestionCorrect(
+        q,
+        quizAnswers,
+        quizTyped,
+        quizLineAnswers,
+        quizChartDone,
+        quizMabAnswers,
+        quizMoneyAnswers,
+        quizLessonActivityResults
+      ),
+    };
+  });
 }
 
 function getWeakestLessonBreakdown(items: LessonBreakdown[]): LessonBreakdown | null {
@@ -3600,6 +3673,17 @@ function SessionPage() {
     setFinalScore(score);
     setQuizSubmitted(true);
 
+    const questionResults = buildQuizQuestionResults(
+      quizQuestions,
+      quizAnswers,
+      quizTyped,
+      quizLineAnswers,
+      quizChartDone,
+      quizMabAnswers,
+      quizMoneyAnswers,
+      quizLessonActivityResults
+    );
+
     const store = readStore();
     setQuizScore(store, year, week, score);
     writeStore(store);
@@ -3616,9 +3700,9 @@ function SessionPage() {
         const yearLabel = year; // e.g. "Year 1"
         const weekNum = week; // e.g. "1"
 
-        // Read existing quiz_scores for this progress row
+        // Read existing quiz_scores for this progress snapshot row
         const { data: existing } = await supabase
-          .from("progress")
+          .from("progress_snapshot")
           .select("quiz_scores")
           .eq("student_id", studentId)
           .eq("year", yearLabel)
@@ -3627,6 +3711,50 @@ function SessionPage() {
         const prevScores: Record<string, any> = (existing?.quiz_scores as any) ?? {};
         const weekKey = String(weekNum);
         const prevAttempts: any[] = prevScores[weekKey]?.attempts ?? [];
+        let insight: TeacherInsight | null = null;
+
+        try {
+          const insightInput: TeacherInsightInput = {
+            studentId,
+            level: yearLabel,
+            strand: "Number",
+            week: Number(weekNum),
+            quizId: `${yearLabel}-w${weekNum}-weekly-quiz`,
+            title: "Weekly Quiz",
+            score,
+            accuracy: percent,
+            timeSpent: null,
+            attempts: prevAttempts.length + 1,
+            questionsAnswered: total,
+            questionResults,
+            lessonBreakdown: lessonBreakdown.map((item) => ({
+              lessonNumber: item.lessonNumber,
+              title: item.lessonTitle,
+              correct: item.correct,
+              total: item.total,
+              percent: item.percent,
+            })),
+            topicSummaries: lessonBreakdown.map((item) => ({
+              label: item.lessonTitle ?? `Lesson ${item.lessonNumber}`,
+              correct: item.correct,
+              total: item.total,
+              accuracy: item.percent,
+            })),
+          };
+
+          const insightResponse = await fetch("/api/teacher-insight", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(insightInput),
+          });
+          if (insightResponse.ok) {
+            const payload = (await insightResponse.json()) as { insight?: TeacherInsight };
+            insight = payload.insight ?? null;
+          }
+        } catch (error) {
+          console.warn("[Quiz] Insight generation failed:", error);
+        }
+
         const attempt = {
           score,
           total,
@@ -3634,6 +3762,8 @@ function SessionPage() {
           passRate,
           passed,
           lessonBreakdown,
+          questionResults,
+          insight,
           at: new Date().toISOString(),
         };
         const updatedWeek = {
@@ -3643,12 +3773,13 @@ function SessionPage() {
           passRate,
           passed,
           lessonBreakdown,
+          latestInsight: insight,
           attempts: [...prevAttempts, attempt],
         };
         const updatedScores = { ...prevScores, [weekKey]: updatedWeek };
 
         const { error } = await supabase
-          .from("progress")
+          .from("progress_snapshot")
           .upsert(
             {
               student_id: studentId,

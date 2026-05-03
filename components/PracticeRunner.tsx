@@ -49,6 +49,7 @@ export function PracticeRunner({
   onComplete,
   lessonTitle,
   renderCompletionCard,
+  onPerformanceSummary,
 }: {
   minutes?: number;
   getTask: (ctx?: {
@@ -60,6 +61,7 @@ export function PracticeRunner({
   onComplete: () => void;
   lessonTitle?: string;
   renderCompletionCard?: (summary: LessonPerformanceSummary) => ReactNode;
+  onPerformanceSummary?: (summary: LessonPerformanceSummary) => void;
 }) {
   const totalSeconds = minutes * 60;
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
@@ -98,6 +100,46 @@ export function PracticeRunner({
     questionsAnswered > 0
       ? Math.round((correctAnswers / questionsAnswered) * 100)
       : 0;
+  const summary = useMemo<LessonPerformanceSummary>(() => {
+    const topicMap = new Map<string, { label: string; correct: number; total: number; accuracy: number; timeSpentSeconds: number }>();
+    for (const attempt of attemptLog) {
+      const current = topicMap.get(attempt.topicLabel) ?? {
+        label: attempt.topicLabel,
+        correct: 0,
+        total: 0,
+        accuracy: 0,
+        timeSpentSeconds: 0,
+      };
+      current.total += 1;
+      current.timeSpentSeconds += attempt.timeSpentSeconds;
+      if (attempt.correct) current.correct += 1;
+      current.accuracy = current.total > 0 ? Math.round((current.correct / current.total) * 100) : 0;
+      topicMap.set(attempt.topicLabel, current);
+    }
+    const topicSummaries = Array.from(topicMap.values()).sort((left, right) => right.total - left.total);
+    const strengths = [...topicSummaries].filter((item) => item.accuracy >= 75).slice(0, 3);
+    const areasToImprove = [...topicSummaries]
+      .filter((item) => item.accuracy < 75)
+      .sort((left, right) => left.accuracy - right.accuracy)
+      .slice(0, 3);
+    const struggledQuestionTypes = [...topicSummaries]
+      .filter((item) => item.accuracy < 75)
+      .map((item) => item.label)
+      .slice(0, 4);
+
+    return {
+      lessonTitle: lessonTitle ?? "Practice Session",
+      questionsAnswered,
+      correctAnswers,
+      accuracy,
+      timeSpentSeconds: Math.max(0, totalSeconds - Math.max(0, secondsLeft)),
+      topicSummaries,
+      strengths,
+      areasToImprove,
+      struggledQuestionTypes,
+    };
+  }, [accuracy, attemptLog, correctAnswers, lessonTitle, questionsAnswered, secondsLeft, totalSeconds]);
+  const emittedSummaryRef = useRef(false);
 
   useEffect(() => {
     const t = setInterval(() => setSecondsLeft((s) => s - 1), 1000);
@@ -110,6 +152,12 @@ export function PracticeRunner({
       onComplete();
     }
   }, [onComplete, secondsLeft]);
+
+  useEffect(() => {
+    if (!finished || emittedSummaryRef.current) return;
+    emittedSummaryRef.current = true;
+    onPerformanceSummary?.(summary);
+  }, [finished, onPerformanceSummary, summary]);
 
   useEffect(() => {
     if (task.kind !== "numberHunt") return;
@@ -208,43 +256,6 @@ export function PracticeRunner({
 
   // ── Finished state ──
   if (finished) {
-    const topicMap = new Map<string, { label: string; correct: number; total: number; accuracy: number; timeSpentSeconds: number }>();
-    for (const attempt of attemptLog) {
-      const current = topicMap.get(attempt.topicLabel) ?? {
-        label: attempt.topicLabel,
-        correct: 0,
-        total: 0,
-        accuracy: 0,
-        timeSpentSeconds: 0,
-      };
-      current.total += 1;
-      current.timeSpentSeconds += attempt.timeSpentSeconds;
-      if (attempt.correct) current.correct += 1;
-      current.accuracy = current.total > 0 ? Math.round((current.correct / current.total) * 100) : 0;
-      topicMap.set(attempt.topicLabel, current);
-    }
-    const topicSummaries = Array.from(topicMap.values()).sort((left, right) => right.total - left.total);
-    const strengths = [...topicSummaries].filter((item) => item.accuracy >= 75).slice(0, 3);
-    const areasToImprove = [...topicSummaries]
-      .filter((item) => item.accuracy < 75)
-      .sort((left, right) => left.accuracy - right.accuracy)
-      .slice(0, 3);
-    const struggledQuestionTypes = [...topicSummaries]
-      .filter((item) => item.accuracy < 75)
-      .map((item) => item.label)
-      .slice(0, 4);
-    const summary: LessonPerformanceSummary = {
-      lessonTitle: lessonTitle ?? "Practice Session",
-      questionsAnswered,
-      correctAnswers,
-      accuracy,
-      timeSpentSeconds: Math.max(0, totalSeconds - Math.max(0, secondsLeft)),
-      topicSummaries,
-      strengths,
-      areasToImprove,
-      struggledQuestionTypes,
-    };
-
     if (renderCompletionCard) {
       return <>{renderCompletionCard(summary)}</>;
     }
