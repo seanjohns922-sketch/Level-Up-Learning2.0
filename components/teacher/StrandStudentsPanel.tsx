@@ -341,8 +341,8 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
   return (
     <div className="space-y-5">
       {/* Strand tab strip */}
-      <div className="bg-white rounded-2xl border border-[#E6E8EC] p-3">
-        <div className="px-1 pb-2 text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.12em]">
+      <div className="bg-white rounded-2xl border border-[#E6E8EC] p-3 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
+        <div className="px-1 pb-2 text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.16em]">
           Strand · Realm
         </div>
         <div className="flex flex-wrap gap-2">
@@ -358,15 +358,15 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
                 className={[
                   "px-3.5 py-2 rounded-xl border text-left transition",
                   active
-                    ? "border-teal-300 bg-teal-50 ring-2 ring-teal-200"
-                    : "border-[#E6E8EC] bg-white hover:border-[#CBD5E1]",
+                    ? "border-teal-400 bg-gradient-to-b from-teal-50 to-emerald-50/60 ring-2 ring-teal-300/60 shadow-[0_6px_18px_-8px_rgba(13,148,136,0.45)]"
+                    : "border-[#E6E8EC] bg-white hover:border-teal-200 hover:bg-teal-50/30",
                   locked && "opacity-50 cursor-not-allowed",
                 ].filter(Boolean).join(" ")}
               >
                 <div className={`text-sm font-bold ${active ? "text-teal-800" : "text-[#0F172A]"}`}>
                   {g.strand}
                 </div>
-                <div className="text-[11px] font-semibold text-[#64748B] flex items-center gap-1.5">
+                <div className="text-[11px] font-semibold text-[#64748B] flex items-center gap-1.5 tracking-wide">
                   {g.realm}
                   {placeholder && (
                     <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-wider bg-slate-100 text-slate-500">
@@ -388,25 +388,30 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
       )}
 
       <div className="grid grid-cols-1 gap-4">
-        <div className="bg-white rounded-2xl border border-[#E6E8EC] p-4">
-          <div className="text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.12em] mb-2">
-            Class Insight
+        <div className="relative overflow-hidden rounded-2xl p-5 bg-gradient-to-br from-white via-teal-50/30 to-emerald-50/50 border border-teal-200/70 shadow-[0_10px_30px_-18px_rgba(13,148,136,0.45)]">
+          <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-teal-400 to-emerald-500" />
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-[10px] font-extrabold text-teal-700 uppercase tracking-[0.18em]">
+              Class Insight
+            </span>
+            <span className="h-1 w-1 rounded-full bg-teal-300" />
+            <span className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider">live</span>
           </div>
-          <div className="text-lg font-black text-[#0F172A]">
+          <div className="text-2xl font-black text-[#0F172A] tracking-tight leading-snug">
             {classInsight.percent > 0 ? `${classInsight.percent}% of students struggled with:` : "Class insight pending"}
           </div>
-          <div className="mt-2 text-sm font-bold text-[#0F172A]">
+          <div className="mt-2 text-base font-bold text-teal-800">
             → {classInsight.gap}
           </div>
-          <div className="mt-3 text-sm font-semibold text-[#475569]">
+          <div className="mt-3 text-sm font-medium text-[#475569] tracking-wide">
             {classInsight.action}
           </div>
         </div>
       </div>
 
       {/* Student table */}
-      <div className="bg-white rounded-2xl border border-[#E6E8EC] overflow-hidden">
-        <div className="grid grid-cols-[2fr_0.9fr_0.7fr_1.1fr] px-5 py-3 bg-[#FAFBFC] border-b border-[#E6E8EC]">
+      <div className="bg-white rounded-2xl border border-[#E6E8EC] overflow-hidden shadow-[0_4px_16px_-12px_rgba(15,23,42,0.18)]">
+        <div className="grid grid-cols-[2fr_0.9fr_0.7fr_1.1fr] px-5 py-3 bg-gradient-to-b from-[#F8FAFC] to-[#F1F5F9] border-b border-[#E6E8EC]">
           {([
             ["name",   "Student"],
             ["level",  "Level"],

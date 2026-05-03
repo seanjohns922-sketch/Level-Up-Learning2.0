@@ -564,7 +564,7 @@ export default function TeacherDashboardPage() {
   const isDev = process.env.NODE_ENV !== "production";
 
   return (
-    <main className="min-h-screen bg-[#F7F8FA]">
+    <main className="min-h-screen bg-gradient-to-b from-[#EEF2F6] via-[#F1F4F8] to-[#E9EEF3]">
       {/* Header */}
       <header className="bg-white border-b border-[#E6E8EC] px-6 py-4 sticky top-0 z-20">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 flex-wrap">
@@ -651,9 +651,9 @@ export default function TeacherDashboardPage() {
           </div>
         ) : (
           <>
-            {/* KPI strip */}
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-              <KpiTile label="Students" value={classStudents.length} accent="#0EA5A4" icon={(<path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m3-5.13a4 4 0 100-8 4 4 0 000 8zm6-2a3 3 0 100-6 3 3 0 000 6z" />)} />
+            {/* KPI strip — primary stat dominates, secondary stats supporting */}
+            <div className="grid grid-cols-1 md:grid-cols-[1.6fr_1fr_1fr_1fr_1fr] gap-3">
+              <KpiTile primary label="Students" value={classStudents.length} accent="#0EA5A4" icon={(<path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m3-5.13a4 4 0 100-8 4 4 0 000 8zm6-2a3 3 0 100-6 3 3 0 000 6z" />)} />
               <KpiTile label="Active This Week" value={activeThisWeek} accent="#0EA5A4" icon={(<><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>)} />
               <KpiTile label="Legends Unlocked" value={legendsUnlocked} accent="#F59E0B" icon={(<path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z" />)} />
               <KpiTile label="Avg Week" value={avgWeek} accent="#0EA5A4" icon={(<><path d="M3 3v18h18" /><path d="M7 14l3-3 3 3 5-5" /></>)} />
@@ -683,7 +683,7 @@ export default function TeacherDashboardPage() {
                 <div />
               )}
 
-              <div className="flex items-center gap-1 p-1 bg-white rounded-xl border border-[#E6E8EC] w-fit">
+              <div className="flex items-center gap-1 p-1 bg-white rounded-xl border border-[#E6E8EC] w-fit shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
                 {([
                   { id: "students",   label: "Students" },
                   { id: "curriculum", label: "Curriculum" },
@@ -694,7 +694,7 @@ export default function TeacherDashboardPage() {
                     className={[
                       "px-3.5 py-1.5 rounded-lg font-bold text-sm whitespace-nowrap transition",
                       activeTab === t.id
-                        ? "bg-teal-600 text-white shadow-sm"
+                        ? "bg-gradient-to-b from-teal-500 to-teal-600 text-white shadow-[0_4px_14px_-4px_rgba(13,148,136,0.55)]"
                         : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9]",
                     ].join(" ")}
                   >
@@ -732,12 +732,37 @@ export default function TeacherDashboardPage() {
 }
 
 function KpiTile({
-  label, value, accent, icon,
+  label, value, accent, icon, primary,
 }: {
-  label: string; value: string | number; accent: string; icon: React.ReactNode;
+  label: string; value: string | number; accent: string; icon: React.ReactNode; primary?: boolean;
 }) {
+  if (primary) {
+    return (
+      <div
+        className="relative overflow-hidden rounded-2xl px-5 py-4 border border-teal-200/70 bg-gradient-to-br from-white via-teal-50/40 to-emerald-50/60 shadow-[0_8px_24px_-12px_rgba(13,148,136,0.35)]"
+      >
+        <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-teal-400 to-emerald-500" />
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="text-[10px] font-extrabold text-teal-700 uppercase tracking-[0.18em]">{label}</div>
+            <div className="mt-1 text-[44px] leading-none font-black text-[#0F172A] tabular-nums tracking-tight">
+              {value}
+            </div>
+            <div className="mt-1.5 text-[11px] font-semibold text-[#475569] tracking-wide">
+              enrolled in this class
+            </div>
+          </div>
+          <div className="h-9 w-9 rounded-xl bg-white shadow-sm border border-teal-100 flex items-center justify-center">
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke={accent} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              {icon}
+            </svg>
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
-    <div className="bg-white rounded-xl border border-[#E6E8EC] px-4 py-3.5 hover:border-[#CBD5E1] transition">
+    <div className="bg-white rounded-xl border border-[#E6E8EC] px-4 py-3.5 hover:border-[#CBD5E1] transition shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
       <div className="flex items-start justify-between mb-2">
         <div className="h-8 w-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center">
           <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke={accent} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -745,10 +770,10 @@ function KpiTile({
           </svg>
         </div>
       </div>
-      <div className="text-2xl font-black text-[#0F172A] leading-none tabular-nums">{value}</div>
+      <div className="text-xl font-black text-[#0F172A] leading-none tabular-nums opacity-80">{value}</div>
       <div className="flex items-center gap-2 mt-1.5">
         <div className="h-0.5 w-4 rounded-full" style={{ backgroundColor: accent }} />
-        <div className="text-[10px] font-extrabold text-[#64748B] uppercase tracking-wider">{label}</div>
+        <div className="text-[10px] font-extrabold text-[#64748B] uppercase tracking-[0.14em]">{label}</div>
       </div>
     </div>
   );
