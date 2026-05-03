@@ -564,13 +564,13 @@ export default function TeacherDashboardPage() {
   const isDev = process.env.NODE_ENV !== "production";
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-[#EEF2F6] via-[#F1F4F8] to-[#E9EEF3]">
+    <main className="min-h-screen bg-gradient-to-b from-[#E2E8F0] via-[#DEE5EC] to-[#D6DEE6]">
       {/* Header */}
       <header className="bg-white border-b border-[#E6E8EC] px-6 py-4 sticky top-0 z-20">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 flex-wrap">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center">
+              <div className="h-7 w-7 rounded-lg bg-[#0A2F2A] ring-1 ring-[#00C2A8]/40 shadow-[0_0_12px_-2px_rgba(0,229,195,0.55)] flex items-center justify-center">
                 <svg viewBox="0 0 24 24" className="h-4 w-4 text-white" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M3 12l9-9 9 9M5 10v10h14V10" />
                 </svg>
@@ -583,7 +583,7 @@ export default function TeacherDashboardPage() {
                 <span className="h-1 w-1 rounded-full bg-[#CBD5E1]" />
                 <button
                   onClick={copyCode}
-                  className="inline-flex items-center gap-1.5 text-[11px] font-mono font-extrabold text-teal-700 bg-teal-50 border border-teal-100 px-2 py-0.5 rounded-md hover:bg-teal-100 transition"
+                  className="inline-flex items-center gap-1.5 text-[11px] font-mono font-extrabold text-[#0A2F2A] bg-white border border-[#00C2A8]/40 px-2 py-0.5 rounded-md hover:border-[#00C2A8] hover:shadow-[0_0_0_3px_rgba(0,194,168,0.12)] transition"
                 >
                   {copiedCode ? "Copied!" : selectedClass.class_code}
                   <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -694,7 +694,7 @@ export default function TeacherDashboardPage() {
                     className={[
                       "px-3.5 py-1.5 rounded-lg font-bold text-sm whitespace-nowrap transition",
                       activeTab === t.id
-                        ? "bg-gradient-to-b from-teal-500 to-teal-600 text-white shadow-[0_4px_14px_-4px_rgba(13,148,136,0.55)]"
+                        ? "bg-[#0A2F2A] text-[#00E5C3] ring-1 ring-[#00C2A8]/50 shadow-[0_0_14px_-2px_rgba(0,229,195,0.45)]"
                         : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9]",
                     ].join(" ")}
                   >
@@ -739,21 +739,22 @@ function KpiTile({
   if (primary) {
     return (
       <div
-        className="relative overflow-hidden rounded-2xl px-5 py-4 border border-teal-200/70 bg-gradient-to-br from-white via-teal-50/40 to-emerald-50/60 shadow-[0_8px_24px_-12px_rgba(13,148,136,0.35)]"
+        className="relative overflow-hidden rounded-2xl px-5 py-4 border border-white/5 bg-[linear-gradient(135deg,#0A2F2A_0%,#0F3A34_60%,#0A2F2A_100%)] shadow-[0_10px_30px_-14px_rgba(0,0,0,0.55)]"
       >
-        <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-teal-400 to-emerald-500" />
-        <div className="flex items-start justify-between">
+        <div className="absolute inset-y-0 left-0 w-[3px] bg-[#00E5C3] shadow-[0_0_18px_2px_rgba(0,229,195,0.55)]" />
+        <div className="absolute -top-12 -right-12 h-32 w-32 rounded-full bg-[#00C2A8]/10 blur-2xl pointer-events-none" />
+        <div className="relative flex items-start justify-between">
           <div>
-            <div className="text-[10px] font-extrabold text-teal-700 uppercase tracking-[0.18em]">{label}</div>
-            <div className="mt-1 text-[44px] leading-none font-black text-[#0F172A] tabular-nums tracking-tight">
+            <div className="text-[10px] font-extrabold text-[#00E5C3] uppercase tracking-[0.18em]">{label}</div>
+            <div className="mt-1 text-[44px] leading-none font-black text-white tabular-nums tracking-tight">
               {value}
             </div>
-            <div className="mt-1.5 text-[11px] font-semibold text-[#475569] tracking-wide">
+            <div className="mt-1.5 text-[11px] font-semibold text-slate-300/80 tracking-wide">
               enrolled in this class
             </div>
           </div>
-          <div className="h-9 w-9 rounded-xl bg-white shadow-sm border border-teal-100 flex items-center justify-center">
-            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke={accent} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <div className="h-9 w-9 rounded-xl bg-[#062521] border border-[#00C2A8]/30 shadow-[inset_0_0_8px_rgba(0,229,195,0.18)] flex items-center justify-center">
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="#00E5C3" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               {icon}
             </svg>
           </div>
