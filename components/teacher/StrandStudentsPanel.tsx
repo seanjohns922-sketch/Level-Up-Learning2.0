@@ -11,7 +11,7 @@ import {
 import type { Lesson } from "@/data/programs/year1";
 import { getLatestPosttestProfile } from "@/data/assessments/analysis";
 import LessonPreviewDrawer from "./LessonPreviewDrawer";
-import type { TeacherInsight } from "@/lib/teacher-insights";
+import type { TeacherInsight, TeacherInsightStatus } from "@/lib/teacher-insights";
 
 type StudentRow = {
   id: string;
@@ -40,6 +40,12 @@ type Props = {
 };
 
 type StrandStatus = "Not Started" | "In Progress" | "Needs Support" | "Completed";
+type StudentFlagTone = "neutral" | "red" | "yellow" | "green";
+type StudentFlag = {
+  label: string;
+  emoji: string;
+  tone: StudentFlagTone;
+};
 
 function parseCompleted(raw: any): string[] {
   if (Array.isArray(raw)) return raw as string[];
@@ -76,6 +82,159 @@ function statusTone(s: StrandStatus) {
     case "Needs Support": return "bg-rose-50 text-rose-700 border-rose-200";
     default:              return "bg-slate-50 text-slate-500 border-slate-200";
   }
+}
+
+const INSIGHT_SEVERITY: Record<TeacherInsightStatus, number> = {
+  "Needs Support": 3,
+  "Quick Check-in Recommended": 2,
+  "On Track": 1,
+  "Ready to Move On": 0,
+};
+
+function getWeekInsightList(
+  prog: ProgressRow | undefined,
+  weekNumber: number,
+  lessonIds: string[],
+): TeacherInsight[] {
+  if (!prog) return [];
+  const quizScores: Record<string, any> =
+    prog.quiz_scores && typeof prog.quiz_scores === "object" ? (prog.quiz_scores as Record<string, any>) : {};
+  const lessonAttempts: Record<string, any> =
+    prog.lesson_attempts && typeof prog.lesson_attempts === "object" ? (prog.lesson_attempts as Record<string, any>) : {};
+
+  const lessonInsights = lessonIds
+    .map((lessonId) => lessonAttempts[lessonId]?.latestInsight as TeacherInsight | null | undefined)
+    .filter((insight): insight is TeacherInsight => Boolean(insight));
+
+  const quizInsight = quizScores[String(weekNumber)]?.latestInsight as TeacherInsight | null | undefined;
+  return quizInsight ? [...lessonInsights, quizInsight] : lessonInsights;
+}
+
+function pickPrimaryInsight(insights: TeacherInsight[]): TeacherInsight | null {
+  if (insights.length === 0) return null;
+  return [...insights].sort((left, right) => {
+    const severityGap = INSIGHT_SEVERITY[right.status] - INSIGHT_SEVERITY[left.status];
+    if (severityGap !== 0) return severityGap;
+    return left.gap.localeCompare(right.gap);
+  })[0] ?? null;
+}
+
+function deriveStudentFlag(
+  insight: TeacherInsight | null,
+  fallbackStatus: StrandStatus,
+): StudentFlag {
+  if (insight?.status === "Needs Support" || fallbackStatus === "Needs Support") {
+    return { label: "Needs support", emoji: "🔴", tone: "red" };
+  }
+  if (insight?.status === "Quick Check-in Recommended" || fallbackStatus === "In Progress") {
+    return { label: "Check-in", emoji: "🟡", tone: "yellow" };
+  }
+  if (insight?.status === "On Track" || insight?.status === "Ready to Move On" || fallbackStatus === "Completed") {
+    return { label: "On track", emoji: "🟢", tone: "green" };
+  }
+  return { label: "Not started", emoji: "⚪", tone: "neutral" };
+}
+
+function flagTone(flag: StudentFlagTone) {
+  switch (flag) {
+    case "red":
+      return "bg-rose-50 text-rose-700 border-rose-200";
+    case "yellow":
+      return "bg-amber-50 text-amber-700 border-amber-200";
+    case "green":
+      return "bg-emerald-50 text-emerald-700 border-emerald-200";
+    default:
+      return "bg-slate-50 text-slate-500 border-slate-200";
+  }
+}
+
+function simplifyGapLabel(gap: string) {
+  return gap
+    .replace(/^They were least secure in\s+/i, "")
+    .replace(/, where accuracy dropped\.$/i, "")
+    .replace(/\.$/, "")
+    .trim();
+}
+
+function buildWeekSummary(
+  insights: TeacherInsight[],
+  fallbackStatus: StrandStatus,
+): {
+  status: string;
+  mainGap: string;
+  suggestedAction: string;
+} {
+  const primary = pickPrimaryInsight(insights);
+  if (primary) {
+    return {
+      status: primary.status,
+      mainGap: simplifyGapLabel(primary.gap),
+      suggestedAction: primary.teacherAction,
+    };
+  }
+
+  if (fallbackStatus === "Needs Support") {
+    return {
+      status: "Needs Support",
+      mainGap: "Foundational confidence is not secure yet",
+      suggestedAction: "Run a quick teacher check-in before moving on.",
+    };
+  }
+
+  if (fallbackStatus === "In Progress") {
+    return {
+      status: "Quick Check-in Recommended",
+      mainGap: "This week is still in progress",
+      suggestedAction: "Use a short verbal check before the next lesson.",
+    };
+  }
+
+  if (fallbackStatus === "Completed") {
+    return {
+      status: "On Track",
+      mainGap: "No clear gap recorded this week",
+      suggestedAction: "Continue to the next lesson or weekly quiz.",
+    };
+  }
+
+  return {
+    status: "On Track",
+    mainGap: "No attempt data yet",
+    suggestedAction: "Wait for a completed lesson or quiz to generate insight.",
+  };
+}
+
+function buildClassInsight(
+  rows: Array<{ flag: StudentFlag; summary: ReturnType<typeof buildWeekSummary> }>,
+) {
+  const activeRows = rows.filter((row) => row.summary.mainGap !== "No attempt data yet");
+  if (activeRows.length === 0) {
+    return {
+      percent: 0,
+      gap: "No class insight yet",
+      action: "Complete a lesson or weekly quiz to generate class-level insight.",
+    };
+  }
+
+  const gapCounts = new Map<string, number>();
+  for (const row of activeRows) {
+    const key = row.summary.mainGap;
+    gapCounts.set(key, (gapCounts.get(key) ?? 0) + 1);
+  }
+
+  const [topGap, topCount] =
+    [...gapCounts.entries()].sort((left, right) => right[1] - left[1])[0] ?? ["No clear shared gap", 0];
+  const percent = Math.round((topCount / activeRows.length) * 100);
+  const supportCount = activeRows.filter((row) => row.flag.tone === "red" || row.flag.tone === "yellow").length;
+
+  return {
+    percent,
+    gap: topGap,
+    action:
+      supportCount >= Math.ceil(activeRows.length / 2)
+        ? "Suggested whole-class reteach recommended."
+        : "Target a small group before reteaching the whole class.",
+  };
 }
 
 function timeAgo(iso?: string): string {
@@ -133,7 +292,6 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
 
   const genre = genres.find((g) => g.id === genreId)!;
   const isPlaceholder = !genre.available;
-  const prefix = lessonIdPrefix(yearLabel);
   const plan = useMemo(() => getCurriculumPlan(yearLabel, genreId), [yearLabel, genreId]);
 
   function getProg(studentId: string, year: string) {
@@ -144,6 +302,41 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
     const rows = progress.filter((p) => p.student_id === studentId);
     return pickStudentYear(rows, yearLabel);
   }
+
+  const studentRows = students
+    .map((s) => {
+      const studentYear = getStudentYear(s.id);
+      const prog = getProg(s.id, studentYear);
+      const ids = prog ? parseCompleted(prog.completed_lesson_ids) : [];
+      const sPrefix = lessonIdPrefix(studentYear);
+      const strandIds = isPlaceholder ? [] : ids.filter((id) => id.startsWith(sPrefix));
+      const pct = isPlaceholder ? 0 : pctComplete(ids, sPrefix);
+      const status = isPlaceholder ? "Not Started" : computeStatus(prog, strandIds.length, pct);
+      const week = isPlaceholder ? null : (prog?.week ?? null);
+      const planForStudentYear = getCurriculumPlan(studentYear, genreId);
+      const activeWeek = week ?? 1;
+      const activeWeekPlan = planForStudentYear.find((entry) => entry.week === activeWeek);
+      const activeLessonIds = activeWeekPlan?.lessons.map((lesson) => lesson.id) ?? [];
+      const weekInsights = getWeekInsightList(prog, activeWeek, activeLessonIds);
+      const summary = buildWeekSummary(weekInsights, status);
+      const flag = deriveStudentFlag(pickPrimaryInsight(weekInsights), status);
+
+      return { s, prog, pct, status, week, studentYear, summary, flag };
+    })
+    .sort((a, b) => {
+      const dir = sortDir === "asc" ? 1 : -1;
+      const rank: Record<string, number> = { "Not Started": 0, "In Progress": 1, "Needs Support": 2, "Completed": 3 };
+      const nameCmp = a.s.display_name.localeCompare(b.s.display_name);
+      switch (sortKey) {
+        case "name":   return dir * nameCmp;
+        case "level":  return dir * (yearOrdinal(a.studentYear) - yearOrdinal(b.studentYear)) || nameCmp;
+        case "week":   return dir * ((a.week ?? -1) - (b.week ?? -1)) || nameCmp;
+        case "status": return dir * (rank[a.status] - rank[b.status]) || nameCmp;
+        case "tower":  return dir * (a.pct - b.pct) || nameCmp;
+      }
+    });
+
+  const classInsight = buildClassInsight(studentRows.map((row) => ({ flag: row.flag, summary: row.summary })));
 
   return (
     <div className="space-y-5">
@@ -194,6 +387,36 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
         </div>
       )}
 
+      <div className="grid lg:grid-cols-2 gap-4">
+        <div className="bg-white rounded-2xl border border-[#E6E8EC] p-4">
+          <div className="text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.12em] mb-2">
+            Class Insight
+          </div>
+          <div className="text-lg font-black text-[#0F172A]">
+            {classInsight.percent > 0 ? `${classInsight.percent}% of students struggled with:` : "Class insight pending"}
+          </div>
+          <div className="mt-2 text-sm font-bold text-[#0F172A]">
+            → {classInsight.gap}
+          </div>
+          <div className="mt-3 text-sm font-semibold text-[#475569]">
+            {classInsight.action}
+          </div>
+        </div>
+        <div className="bg-white rounded-2xl border border-[#E6E8EC] p-4">
+          <div className="text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.12em] mb-2">
+            Student Flags
+          </div>
+          <div className="grid grid-cols-3 gap-2 text-xs">
+            <FlagLegend label="Needs support" emoji="🔴" tone="red" />
+            <FlagLegend label="Check-in" emoji="🟡" tone="yellow" />
+            <FlagLegend label="On track" emoji="🟢" tone="green" />
+          </div>
+          <div className="mt-3 text-sm font-semibold text-[#475569]">
+            Flags update automatically from weekly lesson and quiz insight data.
+          </div>
+        </div>
+      </div>
+
       {/* Student table */}
       <div className="bg-white rounded-2xl border border-[#E6E8EC] overflow-hidden">
         <div className="grid grid-cols-[1.6fr_0.9fr_0.7fr_1.1fr_0.9fr] px-5 py-3 bg-[#FAFBFC] border-b border-[#E6E8EC]">
@@ -228,31 +451,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
             No students enrolled yet.
           </div>
         ) : (
-          students
-            .map((s) => {
-              const studentYear = getStudentYear(s.id);
-              const prog = getProg(s.id, studentYear);
-              const ids = prog ? parseCompleted(prog.completed_lesson_ids) : [];
-              const sPrefix = lessonIdPrefix(studentYear);
-              const strandIds = isPlaceholder ? [] : ids.filter((id) => id.startsWith(sPrefix));
-              const pct = isPlaceholder ? 0 : pctComplete(ids, sPrefix);
-              const status = isPlaceholder ? "Not Started" : computeStatus(prog, strandIds.length, pct);
-              const week = isPlaceholder ? null : (prog?.week ?? null);
-              return { s, prog, pct, status, week, studentYear };
-            })
-            .sort((a, b) => {
-              const dir = sortDir === "asc" ? 1 : -1;
-              const rank: Record<string, number> = { "Not Started": 0, "In Progress": 1, "Needs Support": 2, "Completed": 3 };
-              const nameCmp = a.s.display_name.localeCompare(b.s.display_name);
-              switch (sortKey) {
-                case "name":   return dir * nameCmp;
-                case "level":  return dir * (yearOrdinal(a.studentYear) - yearOrdinal(b.studentYear)) || nameCmp;
-                case "week":   return dir * ((a.week ?? -1) - (b.week ?? -1)) || nameCmp;
-                case "status": return dir * (rank[a.status] - rank[b.status]) || nameCmp;
-                case "tower":  return dir * (a.pct - b.pct) || nameCmp;
-              }
-            })
-            .map(({ s, prog, pct, status, week, studentYear }) => {
+          studentRows.map(({ s, prog, pct, status, week, studentYear, flag }) => {
               const isOpen = expandedId === s.id;
 
             return (
@@ -268,7 +467,13 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
                     <div className="h-8 w-8 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 text-white flex items-center justify-center text-xs font-black shrink-0">
                       {s.display_name.charAt(0).toUpperCase()}
                     </div>
-                    <span className="text-sm font-bold text-[#0F172A] truncate">{s.display_name}</span>
+                    <div className="min-w-0">
+                      <div className="text-sm font-bold text-[#0F172A] truncate">{s.display_name}</div>
+                      <div className={`mt-0.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-[10px] font-extrabold uppercase tracking-wider ${flagTone(flag.tone)}`}>
+                        <span>{flag.emoji}</span>
+                        <span>{flag.label}</span>
+                      </div>
+                    </div>
                   </div>
                   <span className="text-xs font-bold text-[#475569]">{studentYear}</span>
                   <span className="text-xs font-bold text-[#475569] tabular-nums">
@@ -344,6 +549,10 @@ function StudentStrandDetail({
   const week = plan.find((p) => p.week === selectedWeek) ?? plan[0];
   const weekDone = weekLessonsDone(ids, week?.week ?? 1);
   const weekQuiz = quizScores[String(week?.week ?? 1)];
+  const weekLessonIds = week?.lessons.map((lesson) => lesson.id) ?? [];
+  const weekInsights = getWeekInsightList(prog, week?.week ?? 1, weekLessonIds);
+  const summaryStatus = computeStatus(prog, ids.filter((id) => id.startsWith(prefix)).length, pctTotal(ids, prefix));
+  const weekSummary = buildWeekSummary(weekInsights, summaryStatus);
 
   // Teacher insights
   const insights: string[] = [];
@@ -387,6 +596,17 @@ function StudentStrandDetail({
           value={latestPost ? `${latestPost.percentage}%` : "—"}
           sub={latestPost ? (latestPost.passed ? "Pass" : "Needs review") : `Last active ${timeAgo(prog?.updated_at)}`}
         />
+      </div>
+
+      <div className="bg-white rounded-2xl border border-[#E6E8EC] p-4">
+        <div className="text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.12em] mb-2">
+          This Week Summary
+        </div>
+        <div className="grid md:grid-cols-3 gap-3">
+          <SummaryMetric label="Status" value={weekSummary.status} />
+          <SummaryMetric label="Main Gap" value={weekSummary.mainGap} />
+          <SummaryMetric label="Suggested Action" value={weekSummary.suggestedAction} />
+        </div>
       </div>
 
       {/* Week strip */}
@@ -602,6 +822,24 @@ function SnapshotTile({ label, value, sub }: { label: string; value: string; sub
       <div className="text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.12em]">{label}</div>
       <div className="text-sm font-black text-[#0F172A] mt-1">{value}</div>
       {sub && <div className="text-[11px] font-semibold text-[#64748B] mt-0.5">{sub}</div>}
+    </div>
+  );
+}
+
+function SummaryMetric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-[#E6E8EC] bg-[#F8FAFC] px-3 py-3">
+      <div className="text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.12em]">{label}</div>
+      <div className="mt-1 text-sm font-bold text-[#0F172A]">{value}</div>
+    </div>
+  );
+}
+
+function FlagLegend({ label, emoji, tone }: { label: string; emoji: string; tone: StudentFlagTone }) {
+  return (
+    <div className={`inline-flex items-center gap-1.5 px-2.5 py-2 rounded-lg border text-[11px] font-extrabold uppercase tracking-wider ${flagTone(tone)}`}>
+      <span>{emoji}</span>
+      <span>{label}</span>
     </div>
   );
 }
