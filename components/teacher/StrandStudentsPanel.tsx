@@ -358,12 +358,12 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
                 className={[
                   "px-3.5 py-2 rounded-xl border text-left transition",
                   active
-                    ? "border-teal-400 bg-gradient-to-b from-teal-50 to-emerald-50/60 ring-2 ring-teal-300/60 shadow-[0_6px_18px_-8px_rgba(13,148,136,0.45)]"
-                    : "border-[#E6E8EC] bg-white hover:border-teal-200 hover:bg-teal-50/30",
+                    ? "border-[#00C2A8] bg-white shadow-[0_0_0_3px_rgba(0,194,168,0.12),0_8px_22px_-12px_rgba(0,194,168,0.55)]"
+                    : "border-[#E6E8EC] bg-white hover:border-[#00C2A8]/50",
                   locked && "opacity-50 cursor-not-allowed",
                 ].filter(Boolean).join(" ")}
               >
-                <div className={`text-sm font-bold ${active ? "text-teal-800" : "text-[#0F172A]"}`}>
+                <div className={`text-sm font-bold ${active ? "text-[#0A2F2A]" : "text-[#0F172A]"}`}>
                   {g.strand}
                 </div>
                 <div className="text-[11px] font-semibold text-[#64748B] flex items-center gap-1.5 tracking-wide">
@@ -388,19 +388,19 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
       )}
 
       <div className="grid grid-cols-1 gap-4">
-        <div className="relative overflow-hidden rounded-2xl p-5 bg-gradient-to-br from-white via-teal-50/30 to-emerald-50/50 border border-teal-200/70 shadow-[0_10px_30px_-18px_rgba(13,148,136,0.45)]">
-          <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-teal-400 to-emerald-500" />
+        <div className="relative overflow-hidden rounded-2xl p-5 bg-white border border-[#E6E8EC] shadow-[0_4px_18px_-12px_rgba(15,23,42,0.18)]">
+          <div className="absolute inset-y-0 left-0 w-[3px] bg-[#00C2A8] shadow-[0_0_14px_1px_rgba(0,229,195,0.45)]" />
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-[10px] font-extrabold text-teal-700 uppercase tracking-[0.18em]">
+            <span className="text-[10px] font-extrabold text-[#0A2F2A] uppercase tracking-[0.18em]">
               Class Insight
             </span>
-            <span className="h-1 w-1 rounded-full bg-teal-300" />
+            <span className="h-1.5 w-1.5 rounded-full bg-[#00E5C3] shadow-[0_0_6px_rgba(0,229,195,0.8)]" />
             <span className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider">live</span>
           </div>
           <div className="text-2xl font-black text-[#0F172A] tracking-tight leading-snug">
             {classInsight.percent > 0 ? `${classInsight.percent}% of students struggled with:` : "Class insight pending"}
           </div>
-          <div className="mt-2 text-base font-bold text-teal-800">
+          <div className="mt-2 text-base font-bold text-[#0A2F2A]">
             → {classInsight.gap}
           </div>
           <div className="mt-3 text-sm font-medium text-[#475569] tracking-wide">
@@ -425,7 +425,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
                 onClick={() => toggleSort(key)}
                 className={[
                   "text-left text-[10px] font-extrabold uppercase tracking-[0.12em] transition flex items-center gap-1",
-                  active ? "text-teal-700" : "text-[#94A3B8] hover:text-[#475569]",
+                  active ? "text-[#0A2F2A]" : "text-[#94A3B8] hover:text-[#475569]",
                 ].join(" ")}
               >
                 {label}
@@ -455,7 +455,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
                   ].join(" ")}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 text-white flex items-center justify-center text-xs font-black shrink-0">
+                    <div className="h-8 w-8 rounded-full bg-[#0A2F2A] text-[#00E5C3] ring-1 ring-[#00C2A8]/40 shadow-[0_0_10px_-2px_rgba(0,229,195,0.55)] flex items-center justify-center text-xs font-black shrink-0">
                       {s.display_name.charAt(0).toUpperCase()}
                     </div>
                     <div className="min-w-0 flex items-center gap-2.5 flex-wrap">
@@ -472,7 +472,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
                   </span>
                   <div className="flex items-center gap-2">
                     <div className="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                      <div className="h-full bg-teal-500 transition-all" style={{ width: `${pct}%` }} />
+                      <div className="h-full bg-[#00C2A8] shadow-[0_0_8px_rgba(0,229,195,0.55)] transition-all" style={{ width: `${pct}%` }} />
                     </div>
                     <span className="text-[11px] font-bold text-[#475569] tabular-nums w-9 text-right">{pct}%</span>
                   </div>
