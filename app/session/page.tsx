@@ -29,6 +29,7 @@ import MoneyMakeAmount from "@/components/week7/MoneyMakeAmount";
 import MoneyChange from "@/components/week7/MoneyChange";
 import MoneyEnough from "@/components/week7/MoneyEnough";
 import { MathFormattedText } from "@/components/FractionText";
+import { speak } from "@/lib/speak";
 import { ClickableDotGrid, ClickableDotRows } from "@/components/ClickableDots";
 import { StaticDotGrid, StaticDotRow, StaticDotRows } from "@/components/StaticDots";
 import {
@@ -1642,18 +1643,6 @@ function uniqueInts(n: number, min: number, max: number, avoid: number[] = []) {
     if (!avoidSet.has(x)) set.add(x);
   }
   return Array.from(set);
-}
-
-function speak(text: string) {
-  if (typeof window === "undefined") return;
-  const synth = window.speechSynthesis;
-  if (!synth) return;
-  synth.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.rate = 0.8;
-  u.pitch = 1.0;
-  u.volume = 1.0;
-  synth.speak(u);
 }
 
 const WORDS_0_20 = [
@@ -3925,7 +3914,7 @@ function SessionPage() {
                         onClick={() => speak(currentQuiz?.prompt ?? "")}
                          className="px-3 py-2 rounded-xl border border-border text-sm font-bold text-foreground hover:bg-secondary transition"
                       >
-                        🔊 Read
+                        🔊 AI Read
                       </button>
                     </div>
                   ) : (
@@ -3935,7 +3924,7 @@ function SessionPage() {
                         onClick={() => speak(currentQuiz?.prompt ?? "")}
                         className="px-3 py-2 rounded-xl border border-border text-sm font-bold text-foreground hover:bg-secondary transition"
                       >
-                        🔊 Read
+                        🔊 AI Read
                       </button>
                     </div>
                   )}

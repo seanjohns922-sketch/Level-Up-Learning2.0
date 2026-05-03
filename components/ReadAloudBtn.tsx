@@ -26,7 +26,8 @@ export default function ReadAloudBtn({
         e.stopPropagation();
         speak(text);
       }}
-      aria-label="Read aloud"
+      aria-label="Read aloud with AI voice"
+      title="AI-generated voice"
       className={`inline-flex items-center justify-center rounded-full border border-border bg-card text-muted-foreground hover:text-primary hover:border-primary/40 transition ${px} ${className}`}
     >
       <Volume2 className={icon} />
