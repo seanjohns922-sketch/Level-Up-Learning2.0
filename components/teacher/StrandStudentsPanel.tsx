@@ -514,7 +514,7 @@ function StudentStrandDetail({
   const ids = prog ? parseCompleted(prog.completed_lesson_ids) : [];
   const currentWeek = prog?.week ?? 1;
   const [selectedWeek, setSelectedWeek] = useState<number>(currentWeek);
-  const [expandedWeek, setExpandedWeek] = useState<number | null>(currentWeek);
+  const [expandedWeek, setExpandedWeek] = useState<number | null>(null);
   const [previewLesson, setPreviewLesson] = useState<Lesson | null>(null);
 
   const quizScores: Record<string, any> =
