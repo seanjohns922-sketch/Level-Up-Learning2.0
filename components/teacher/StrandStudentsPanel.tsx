@@ -451,7 +451,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
                 <button
                   onClick={() => setExpandedId(isOpen ? null : s.id)}
                   className={[
-                    "w-full grid grid-cols-[2fr_0.9fr_0.7fr_1.1fr] items-center px-5 py-3.5 text-left transition",
+                    "w-full grid grid-cols-[2fr_0.7fr_0.7fr_0.7fr_1.1fr] items-center px-5 py-3.5 text-left transition",
                     isOpen ? "bg-[#FAFBFC]" : "hover:bg-[#FAFBFC]",
                   ].join(" ")}
                 >
@@ -468,6 +468,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
                     </div>
                   </div>
                   <span className="text-xs font-bold text-[#475569]">{studentYear}</span>
+                  <span className="text-xs font-bold text-[#475569]">{yearToLevelLabel(studentYear)}</span>
                   <span className="text-xs font-bold text-[#475569] tabular-nums">
                     {week ? `W${week}` : "—"}
                   </span>
