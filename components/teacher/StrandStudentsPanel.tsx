@@ -528,6 +528,7 @@ function StudentStrandDetail({
   const ids = prog ? parseCompleted(prog.completed_lesson_ids) : [];
   const currentWeek = prog?.week ?? 1;
   const [selectedWeek, setSelectedWeek] = useState<number>(currentWeek);
+  const [expandedWeek, setExpandedWeek] = useState<number | null>(currentWeek);
   const [previewLesson, setPreviewLesson] = useState<Lesson | null>(null);
 
   const quizScores: Record<string, any> =
@@ -618,6 +619,7 @@ function StudentStrandDetail({
           {plan.map((w) => {
             const st = weekStatus(w.week);
             const active = w.week === selectedWeek;
+            const isExpanded = w.week === expandedWeek;
             const tone =
               st === "Complete"   ? "bg-emerald-500 text-white border-emerald-500" :
               st === "In Progress"? "bg-amber-100 text-amber-800 border-amber-300" :
@@ -626,12 +628,16 @@ function StudentStrandDetail({
             return (
               <button
                 key={w.week}
-                onClick={() => setSelectedWeek(w.week)}
-                title={`Week ${w.week}: ${st}`}
+                onClick={() => {
+                  setSelectedWeek(w.week);
+                  setExpandedWeek((prev) => (prev === w.week ? null : w.week));
+                }}
+                title={`Week ${w.week}: ${st} — click to ${isExpanded ? "collapse" : "expand"}`}
                 className={[
                   "rounded-lg border py-2 text-center transition",
                   tone,
                   active && "ring-2 ring-teal-400 ring-offset-1",
+                  isExpanded && "shadow-md",
                 ].filter(Boolean).join(" ")}
               >
                 <div className="text-[10px] font-extrabold uppercase tracking-wider opacity-80">W{w.week}</div>
@@ -643,7 +649,7 @@ function StudentStrandDetail({
       </div>
 
       {/* Selected week detail */}
-      {week && (
+      {week && expandedWeek === week.week && (
         <div className="bg-white rounded-2xl border border-[#E6E8EC] p-4 space-y-3">
           <div className="flex items-start justify-between gap-3 flex-wrap">
             <div>
