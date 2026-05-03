@@ -18986,14 +18986,14 @@ function generateGenericQuestion(
       {
         kind: "typed_response",
         prompt: "What is the cost per item?",
-        answer: "1.5",
-        acceptedAnswers: ["1.50"],
+        answer: "9.5",
+        acceptedAnswers: ["9.50"],
         helper: "Divide the total cost by the number of items.",
         placeholder: "Type the answer",
         visual: {
           type: "best_buy_card_comparison",
           title: "Unit Pricing",
-          cards: [{ label: "Card A", productName: "Sports Bottle Set", price: 12, quantityLabel: "8 bottles", unitRateLabel: "Per bottle" }],
+          cards: [{ label: "Card A", productName: "Sports Bottle Set", price: 76, quantityLabel: "8 bottles", unitRateLabel: "Per bottle" }],
         },
       },
       {
