@@ -20029,10 +20029,14 @@ function generateGenericQuestion(
     const templates: MultipleChoiceQuestion[] = [
       {
         kind: "multiple_choice",
-        prompt: "You say, “Pack B is better value.” What must you include?",
+        prompt: "Which answer proves Pack B is better?",
         options: ["Total price", "Unit price comparison", "Bigger number"],
         answer: "Unit price comparison",
         helper: "A clear explanation says why the value is better.",
+        visual: bestBuyVisual("Communicate Clearly", [
+          { label: "First", productName: "Juice Boxes A", price: 84, quantityLabel: "12 boxes", unitRateLabel: "Per box", unitRate: 7, hideUnitRateUntilReveal: true },
+          { label: "Second", productName: "Juice Boxes B", price: 96, quantityLabel: "16 boxes", unitRateLabel: "Per box", unitRate: 6, hideUnitRateUntilReveal: true },
+        ]),
       },
       {
         kind: "multiple_choice",
@@ -20058,10 +20062,14 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "Which explanation is weakest?",
+        prompt: "Which answer is too weak?",
         options: ["It costs less per item", "The total is smaller", "The unit price is lower"],
         answer: "The total is smaller",
         helper: "Totals alone do not explain value well.",
+        visual: bestBuyVisual("Communicate Clearly", [
+          { label: "First", productName: "Sports Drink A", price: 64, quantityLabel: "8 bottles", unitRateLabel: "Per bottle", unitRate: 8, hideUnitRateUntilReveal: true },
+          { label: "Second", productName: "Sports Drink B", price: 81, quantityLabel: "9 bottles", unitRateLabel: "Per bottle", unitRate: 9, hideUnitRateUntilReveal: true },
+        ]),
       },
       {
         kind: "multiple_choice",
@@ -20076,10 +20084,14 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "What should a teacher hear in a strong explanation?",
+        prompt: "Which kind of answer is strongest?",
         options: ["A same-unit comparison", "Only the bigger quantity", "Only the smaller total"],
         answer: "A same-unit comparison",
         helper: "Strong explanations compare like with like.",
+        visual: bestBuyVisual("Communicate Clearly", [
+          { label: "First", productName: "Protein Bars A", price: 54, quantityLabel: "9 bars", unitRateLabel: "Per bar", unitRate: 6, hideUnitRateUntilReveal: true },
+          { label: "Second", productName: "Protein Bars B", price: 72, quantityLabel: "12 bars", unitRateLabel: "Per bar", unitRate: 6, hideUnitRateUntilReveal: true },
+        ]),
       },
       {
         kind: "multiple_choice",
@@ -20138,10 +20150,14 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "Why is unit pricing useful in real life?",
+        prompt: "Which answer would convince a shopper?",
         options: ["It compares different sizes fairly", "It changes the price", "It removes decimals"],
         answer: "It compares different sizes fairly",
-        helper: "It helps shoppers make fair decisions.",
+        helper: "The best answer explains the real decision.",
+        visual: bestBuyVisual("Communicate Clearly", [
+          { label: "First", productName: "Granola A", price: 45, quantityLabel: "500 g", unitRateLabel: "Per 100 g", unitRate: 9, hideUnitRateUntilReveal: true, chunkCount: 5, chunkLabel: "100 g" },
+          { label: "Second", productName: "Granola B", price: 82, quantityLabel: "1 kg", unitRateLabel: "Per 100 g", unitRate: 8.2, hideUnitRateUntilReveal: true, chunkCount: 10, chunkLabel: "100 g" },
+        ]),
       },
       {
         kind: "multiple_choice",
@@ -20156,10 +20172,14 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "What must a strong solution include?",
+        prompt: "What must the answer include?",
         options: ["A fair unit comparison", "Only the total", "Only the bigger quantity"],
         answer: "A fair unit comparison",
         helper: "The same unit is the key evidence.",
+        visual: bestBuyVisual("Communicate Clearly", [
+          { label: "First", productName: "Rice A", price: 45, quantityLabel: "500 g", unitRateLabel: "Per 100 g", unitRate: 9, hideUnitRateUntilReveal: true, chunkCount: 5, chunkLabel: "100 g" },
+          { label: "Second", productName: "Rice B", price: 82, quantityLabel: "1 kg", unitRateLabel: "Per 100 g", unitRate: 8.2, hideUnitRateUntilReveal: true, chunkCount: 10, chunkLabel: "100 g" },
+        ]),
       },
       {
         kind: "multiple_choice",
@@ -20174,10 +20194,14 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "Which sentence gives the clearest justification?",
+        prompt: "Which reason is best?",
         options: ["Pack B is bigger", "Pack B costs less per item", "Pack B has a bigger number"],
         answer: "Pack B costs less per item",
         helper: "Use the value per one unit.",
+        visual: bestBuyVisual("Communicate Clearly", [
+          { label: "First", productName: "Juice Boxes A", price: 84, quantityLabel: "12 boxes", unitRateLabel: "Per box", unitRate: 7, hideUnitRateUntilReveal: true },
+          { label: "Second", productName: "Juice Boxes B", price: 96, quantityLabel: "16 boxes", unitRateLabel: "Per box", unitRate: 6, hideUnitRateUntilReveal: true },
+        ]),
       },
       {
         kind: "multiple_choice",
@@ -20196,20 +20220,32 @@ function generateGenericQuestion(
         options: ["The unit comparison", "The product name", "The quantity digit"],
         answer: "The unit comparison",
         helper: "A strong explanation says what was compared fairly.",
+        visual: bestBuyVisual("Communicate Clearly", [
+          { label: "First", productName: "Sports Drink A", price: 64, quantityLabel: "8 bottles", unitRateLabel: "Per bottle", unitRate: 8, hideUnitRateUntilReveal: true },
+          { label: "Second", productName: "Sports Drink B", price: 81, quantityLabel: "9 bottles", unitRateLabel: "Per bottle", unitRate: 9, hideUnitRateUntilReveal: true },
+        ]),
       },
       {
         kind: "multiple_choice",
-        prompt: "Which explanation shows the clearest communication?",
+        prompt: "Which answer is clearest?",
         options: ["It costs less per 100 g", "It is lower", "I just know"],
         answer: "It costs less per 100 g",
         helper: "The clearest communication names the unit.",
+        visual: bestBuyVisual("Communicate Clearly", [
+          { label: "First", productName: "Granola A", price: 45, quantityLabel: "500 g", unitRateLabel: "Per 100 g", unitRate: 9, hideUnitRateUntilReveal: true, chunkCount: 5, chunkLabel: "100 g" },
+          { label: "Second", productName: "Granola B", price: 82, quantityLabel: "1 kg", unitRateLabel: "Per 100 g", unitRate: 8.2, hideUnitRateUntilReveal: true, chunkCount: 10, chunkLabel: "100 g" },
+        ]),
       },
       {
         kind: "multiple_choice",
-        prompt: "Which reasoning is strongest for a final answer?",
+        prompt: "Which method gives the strongest answer?",
         options: ["Use the same unit and compare the rates", "Use the lower total", "Use the larger quantity"],
         answer: "Use the same unit and compare the rates",
         helper: "That is what communicates value most clearly.",
+        visual: bestBuyVisual("Communicate Clearly", [
+          { label: "First", productName: "Protein Bars A", price: 54, quantityLabel: "9 bars", unitRateLabel: "Per bar", unitRate: 6, hideUnitRateUntilReveal: true },
+          { label: "Second", productName: "Protein Bars B", price: 72, quantityLabel: "12 bars", unitRateLabel: "Per bar", unitRate: 6, hideUnitRateUntilReveal: true },
+        ]),
       },
     ];
     return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
