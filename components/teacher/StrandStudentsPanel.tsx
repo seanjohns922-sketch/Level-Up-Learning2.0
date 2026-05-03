@@ -78,7 +78,7 @@ function computeStatus(prog: ProgressRow | undefined, completedCount: number, pc
 function statusTone(s: StrandStatus) {
   switch (s) {
     case "Completed":     return "bg-emerald-50 text-emerald-700 border-emerald-200";
-    case "In Progress":   return "bg-amber-50 text-amber-700 border-amber-200";
+    case "In Progress":   return "bg-[#F1F8F7] text-[#468880] border-[#C4E1DC]";
     case "Needs Support": return "bg-rose-50 text-rose-700 border-rose-200";
     default:              return "bg-slate-50 text-slate-500 border-slate-200";
   }
@@ -140,7 +140,7 @@ function flagTone(flag: StudentFlagTone) {
     case "red":
       return "bg-rose-50 text-rose-700 border-rose-200";
     case "yellow":
-      return "bg-amber-50 text-amber-700 border-amber-200";
+      return "bg-[#F1F8F7] text-[#468880] border-[#C4E1DC]";
     case "green":
       return "bg-emerald-50 text-emerald-700 border-emerald-200";
     default:
@@ -358,12 +358,12 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
                 className={[
                   "px-3.5 py-2 rounded-xl border text-left transition",
                   active
-                    ? "border-amber-700 bg-gradient-to-b from-amber-50 to-amber-50/60 ring-2 ring-amber-300/60 shadow-[0_6px_18px_-8px_rgba(146,109,57,0.45)]"
-                    : "border-[#E6E8EC] bg-white hover:border-amber-200 hover:bg-amber-50/30",
+                    ? "border-[#468880] bg-gradient-to-b from-[#F1F8F7] to-[#F1F8F7]/60 ring-2 ring-[#A3D3CC]/60 shadow-[0_6px_18px_-8px_rgba(163,211,204,0.45)]"
+                    : "border-[#E6E8EC] bg-white hover:border-[#C4E1DC] hover:bg-[#F1F8F7]/30",
                   locked && "opacity-50 cursor-not-allowed",
                 ].filter(Boolean).join(" ")}
               >
-                <div className={`text-sm font-bold ${active ? "text-amber-950" : "text-[#0F172A]"}`}>
+                <div className={`text-sm font-bold ${active ? "text-[#244742]" : "text-[#0F172A]"}`}>
                   {g.strand}
                 </div>
                 <div className="text-[11px] font-semibold text-[#64748B] flex items-center gap-1.5 tracking-wide">
@@ -382,25 +382,25 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
 
       {/* Strand context banner */}
       {isPlaceholder && (
-        <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-2.5 text-xs font-semibold text-amber-800">
+        <div className="rounded-xl bg-[#F1F8F7] border border-[#C4E1DC] px-4 py-2.5 text-xs font-semibold text-[#386F69]">
           {genre.strand} · {genre.realm} curriculum is coming soon. Student data shown is placeholder.
         </div>
       )}
 
       <div className="grid grid-cols-1 gap-4">
-        <div className="relative overflow-hidden rounded-2xl p-5 bg-gradient-to-br from-white via-amber-50/30 to-amber-50/50 border border-amber-200/70 shadow-[0_10px_30px_-18px_rgba(146,109,57,0.45)]">
-          <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-amber-700 to-amber-700" />
+        <div className="relative overflow-hidden rounded-2xl p-5 bg-gradient-to-br from-white via-[#F1F8F7]/30 to-[#F1F8F7]/50 border border-[#C4E1DC]/70 shadow-[0_10px_30px_-18px_rgba(163,211,204,0.45)]">
+          <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-[#468880] to-[#468880]" />
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-[10px] font-extrabold text-amber-900 uppercase tracking-[0.18em]">
+            <span className="text-[10px] font-extrabold text-[#2D5853] uppercase tracking-[0.18em]">
               Class Insight
             </span>
-            <span className="h-1 w-1 rounded-full bg-amber-300" />
+            <span className="h-1 w-1 rounded-full bg-[#A3D3CC]" />
             <span className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider">live</span>
           </div>
           <div className="text-2xl font-black text-[#0F172A] tracking-tight leading-snug">
             {classInsight.percent > 0 ? `${classInsight.percent}% of students struggled with:` : "Class insight pending"}
           </div>
-          <div className="mt-2 text-base font-bold text-amber-950">
+          <div className="mt-2 text-base font-bold text-[#244742]">
             → {classInsight.gap}
           </div>
           <div className="mt-3 text-sm font-medium text-[#475569] tracking-wide">
@@ -425,7 +425,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
                 onClick={() => toggleSort(key)}
                 className={[
                   "text-left text-[10px] font-extrabold uppercase tracking-[0.12em] transition flex items-center gap-1",
-                  active ? "text-amber-900" : "text-[#94A3B8] hover:text-[#475569]",
+                  active ? "text-[#2D5853]" : "text-[#94A3B8] hover:text-[#475569]",
                 ].join(" ")}
               >
                 {label}
@@ -455,7 +455,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
                   ].join(" ")}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-amber-700 to-amber-700 text-white flex items-center justify-center text-xs font-black shrink-0">
+                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#468880] to-[#468880] text-white flex items-center justify-center text-xs font-black shrink-0">
                       {s.display_name.charAt(0).toUpperCase()}
                     </div>
                     <div className="min-w-0 flex items-center gap-2.5 flex-wrap">
@@ -472,7 +472,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
                   </span>
                   <div className="flex items-center gap-2">
                     <div className="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                      <div className="h-full bg-amber-500 transition-all" style={{ width: `${pct}%` }} />
+                      <div className="h-full bg-[#F1F8F7]0 transition-all" style={{ width: `${pct}%` }} />
                     </div>
                     <span className="text-[11px] font-bold text-[#475569] tabular-nums w-9 text-right">{pct}%</span>
                   </div>
@@ -608,7 +608,7 @@ function StudentStrandDetail({
             const isExpanded = w.week === expandedWeek;
             const tone =
               st === "Complete"   ? "bg-emerald-500 text-white border-emerald-500" :
-              st === "In Progress"? "bg-amber-100 text-amber-800 border-amber-300" :
+              st === "In Progress"? "bg-[#DEEDEA] text-[#386F69] border-[#A3D3CC]" :
               st === "Struggled"  ? "bg-rose-100 text-rose-800 border-rose-300" :
                                     "bg-slate-50 text-slate-500 border-slate-200";
             return (
@@ -622,7 +622,7 @@ function StudentStrandDetail({
                 className={[
                   "rounded-lg border py-2 text-center transition",
                   tone,
-                  active && "ring-2 ring-amber-700 ring-offset-1",
+                  active && "ring-2 ring-[#468880] ring-offset-1",
                   isExpanded && "shadow-md",
                 ].filter(Boolean).join(" ")}
               >
@@ -639,7 +639,7 @@ function StudentStrandDetail({
         <div className="bg-white rounded-2xl border border-[#E6E8EC] p-4 space-y-3">
           <div className="flex items-start justify-between gap-3 flex-wrap">
             <div>
-              <div className="text-[10px] font-extrabold text-amber-900 uppercase tracking-[0.14em]">
+              <div className="text-[10px] font-extrabold text-[#2D5853] uppercase tracking-[0.14em]">
                 Week {week.week} Focus
               </div>
               <div className="text-base font-black text-[#0F172A] mt-0.5">{week.topic}</div>
@@ -663,12 +663,12 @@ function StudentStrandDetail({
                   onClick={() => setPreviewLesson(lsn)}
                   title="Click to preview lesson content"
                   className={[
-                    "text-left rounded-xl border p-3 flex flex-col gap-2 transition hover:border-amber-300 hover:shadow-sm cursor-pointer",
+                    "text-left rounded-xl border p-3 flex flex-col gap-2 transition hover:border-[#A3D3CC] hover:shadow-sm cursor-pointer",
                     done ? "border-emerald-200 bg-emerald-50/40" : "border-[#E6E8EC] bg-white",
                   ].join(" ")}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="inline-flex items-center justify-center h-6 w-6 rounded-md bg-amber-50 text-amber-900 text-[11px] font-black">
+                    <span className="inline-flex items-center justify-center h-6 w-6 rounded-md bg-[#F1F8F7] text-[#2D5853] text-[11px] font-black">
                       L{lsn.lesson}
                     </span>
                     <span className={[
@@ -685,10 +685,10 @@ function StudentStrandDetail({
                     </div>
                   </div>
                   <div className="flex items-center justify-between mt-auto pt-1">
-                    <span className="text-[10px] font-extrabold text-amber-700 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-md">
+                    <span className="text-[10px] font-extrabold text-[#468880] bg-[#F1F8F7] border border-[#DEEDEA] px-1.5 py-0.5 rounded-md">
                       {DEFAULT_LESSON_XP} XP
                     </span>
-                    <span className="text-[10px] font-extrabold text-amber-900">
+                    <span className="text-[10px] font-extrabold text-[#2D5853]">
                       Preview →
                     </span>
                   </div>
@@ -753,7 +753,7 @@ function StudentStrandDetail({
         <ul className="grid sm:grid-cols-2 gap-2">
           {insights.map((tip, i) => (
             <li key={i} className="flex items-start gap-2 text-xs text-[#0F172A] bg-[#F8FAFC] border border-[#E6E8EC] rounded-lg px-3 py-2">
-              <span className="mt-0.5 h-1.5 w-1.5 rounded-full bg-amber-500 shrink-0" />
+              <span className="mt-0.5 h-1.5 w-1.5 rounded-full bg-[#F1F8F7]0 shrink-0" />
               <span className="font-semibold">{tip}</span>
             </li>
           ))}
