@@ -29,7 +29,7 @@ import MoneyMakeAmount from "@/components/week7/MoneyMakeAmount";
 import MoneyChange from "@/components/week7/MoneyChange";
 import MoneyEnough from "@/components/week7/MoneyEnough";
 import { MathFormattedText } from "@/components/FractionText";
-import { prepareSpeechText, setAutoReadEnabled, speak, useSpeakState } from "@/lib/speak";
+import { prepareSpeechText, speak, useAutoReadSetting, useSpeakState } from "@/lib/speak";
 import { ClickableDotGrid, ClickableDotRows } from "@/components/ClickableDots";
 import { StaticDotGrid, StaticDotRow, StaticDotRows } from "@/components/StaticDots";
 import {
@@ -3668,17 +3668,24 @@ function SessionPage() {
 
   const currentQuiz = quizQuestions[quizIndex];
   const currentQuizPrompt = currentQuiz?.prompt ?? "";
+  const currentQuizId = currentQuiz?.id ?? null;
+  const { autoReadEnabled } = useAutoReadSetting();
   const isCurrentQuizReading =
     speakState.isSpeaking &&
     speakState.currentText !== null &&
     currentQuizPrompt.length > 0 &&
     speakState.currentText === prepareSpeechText(currentQuizPrompt);
 
+  const lastAutoReadQuizIdRef = useRef<string | null>(null);
+
   useEffect(() => {
-    if (!speakState.autoReadEnabled) return;
-    if (!currentQuizPrompt) return;
+    if (!autoReadEnabled) return;
+    if (!currentQuizId || !currentQuizPrompt) return;
+    if (lastAutoReadQuizIdRef.current === currentQuizId) return;
+
+    lastAutoReadQuizIdRef.current = currentQuizId;
     void speak(currentQuizPrompt);
-  }, [currentQuizPrompt, speakState.autoReadEnabled]);
+  }, [autoReadEnabled, currentQuizId, currentQuizPrompt]);
   const isMoneyQuiz =
     currentQuiz?.kind === "moneyMake" ||
     currentQuiz?.kind === "moneyChange" ||
@@ -3930,19 +3937,8 @@ function SessionPage() {
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
-                          onClick={() => setAutoReadEnabled(!speakState.autoReadEnabled)}
-                          className={[
-                            "px-3 py-2 rounded-xl border text-xs font-bold transition",
-                            speakState.autoReadEnabled
-                              ? "border-primary/40 bg-primary/10 text-primary"
-                              : "border-border text-muted-foreground hover:bg-secondary",
-                          ].join(" ")}
-                        >
-                          {speakState.autoReadEnabled ? "Auto-read on" : "Auto-read off"}
-                        </button>
-                        <button
-                          type="button"
                           onClick={() => speak(currentQuiz?.prompt ?? "")}
+                          aria-label="Read question aloud"
                            className={[
                             "px-3 py-2 rounded-xl border text-sm font-bold transition",
                             isCurrentQuizReading
@@ -3959,19 +3955,8 @@ function SessionPage() {
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
-                          onClick={() => setAutoReadEnabled(!speakState.autoReadEnabled)}
-                          className={[
-                            "px-3 py-2 rounded-xl border text-xs font-bold transition",
-                            speakState.autoReadEnabled
-                              ? "border-primary/40 bg-primary/10 text-primary"
-                              : "border-border text-muted-foreground hover:bg-secondary",
-                          ].join(" ")}
-                        >
-                          {speakState.autoReadEnabled ? "Auto-read on" : "Auto-read off"}
-                        </button>
-                        <button
-                          type="button"
                           onClick={() => speak(currentQuiz?.prompt ?? "")}
+                          aria-label="Read question aloud"
                           className={[
                             "px-3 py-2 rounded-xl border text-sm font-bold transition",
                             isCurrentQuizReading

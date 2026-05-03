@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { readProgress } from "@/data/progress";
 import { readProgramStore, getWeekProgress, isWeekComplete } from "@/lib/program-progress";
+import { useAutoReadSetting } from "@/lib/speak";
 import {
   ChevronLeft, Zap, Flame, Clock, Target, Calendar,
   Lock, ChevronRight, Users, Swords, Medal,
@@ -43,6 +44,7 @@ function getMonthGrid() {
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { autoReadEnabled, setAutoReadEnabled } = useAutoReadSetting();
   const [progress, setProgress] = useState<ReturnType<typeof readProgress>>(null);
   const [store, setStore] = useState<ReturnType<typeof readProgramStore>>({});
   const [studentName, setStudentName] = useState("Adventurer");
@@ -109,7 +111,7 @@ export default function ProfilePage() {
 
   const levelTitle = levelNum <= 2 ? "Apprentice" : levelNum <= 4 ? "Processor" : "Master";
   const initials = studentName.charAt(0).toUpperCase();
-  const { offset, daysInMonth, today, monthName } = useMemo(getMonthGrid, []);
+  const { offset, daysInMonth, today, monthName } = useMemo(() => getMonthGrid(), []);
 
   return (
     <main className="min-h-screen bg-[#F7F8FA] p-4 md:p-6">
@@ -219,6 +221,37 @@ export default function ProfilePage() {
                 </div>
               </div>
             ))}
+          </div>
+        </section>
+
+        <section>
+          <div className="rounded-xl bg-white border border-[#E6E8EC] p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h3 className="text-base font-bold text-[#0F172A]">Auto Read</h3>
+                <p className="mt-1 text-sm text-[#64748B]">
+                  Automatically read new questions aloud
+                </p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={autoReadEnabled}
+                aria-label="Auto Read"
+                onClick={() => setAutoReadEnabled(!autoReadEnabled)}
+                className={[
+                  "relative inline-flex h-7 w-12 items-center rounded-full transition-colors",
+                  autoReadEnabled ? "bg-[#0EA5A4]" : "bg-[#CBD5E1]",
+                ].join(" ")}
+              >
+                <span
+                  className={[
+                    "inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform",
+                    autoReadEnabled ? "translate-x-6" : "translate-x-1",
+                  ].join(" ")}
+                />
+              </button>
+            </div>
           </div>
         </section>
 

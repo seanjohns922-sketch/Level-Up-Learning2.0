@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { PracticeTask, Difficulty } from "@/data/activities/year1/practice-task";
 import { getDifficultyFromTime } from "@/data/activities/year1/practice-task";
 import { TaskRenderer } from "@/components/TaskRenderer";
-import { speak } from "@/lib/speak";
+import { speak, useAutoReadSetting } from "@/lib/speak";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { LessonHUDRail } from "@/components/lesson/LessonHUDRail";
 import { LessonCompleteCard } from "@/components/lesson/LessonCompleteCard";
@@ -90,6 +90,9 @@ export function PracticeRunner({
   const [hasPlayed, setHasPlayed] = useState(false);
   const [taskNonce, setTaskNonce] = useState(0);
   const finished = secondsLeft <= 0;
+  const { autoReadEnabled } = useAutoReadSetting();
+  const lastAutoReadTaskKeyRef = useRef<string | null>(null);
+  const autoReadPrompt = "prompt" in task && typeof task.prompt === "string" ? task.prompt : "";
 
   const accuracy =
     questionsAnswered > 0
@@ -112,6 +115,17 @@ export function PracticeRunner({
     if (task.kind !== "numberHunt") return;
     speak(String(task.targetNumber));
   }, [task]);
+
+  useEffect(() => {
+    if (!autoReadEnabled) return;
+    if (!autoReadPrompt) return;
+
+    const currentTaskKey = `${task.kind}:${taskNonce}:${autoReadPrompt}`;
+    if (lastAutoReadTaskKeyRef.current === currentTaskKey) return;
+
+    lastAutoReadTaskKeyRef.current = currentTaskKey;
+    void speak(autoReadPrompt);
+  }, [autoReadEnabled, autoReadPrompt, task.kind, taskNonce]);
 
   const correctOrder = useMemo(() => {
     if (task.kind !== "order3") return [];

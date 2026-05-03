@@ -12,6 +12,8 @@ type SpeakState = {
   autoReadEnabled: boolean;
 };
 
+const AUTO_READ_STORAGE_KEY = "levelup:autoReadEnabled";
+const LEGACY_AUTO_READ_STORAGE_KEY = "lul:auto_read_questions";
 const audioCache = new Map<string, string>();
 
 let currentAudio: HTMLAudioElement | null = null;
@@ -160,7 +162,16 @@ function setSpeakState(next: Partial<SpeakState>) {
 
 function readAutoReadPreference() {
   if (typeof window === "undefined") return false;
-  return window.localStorage.getItem("lul:auto_read_questions") === "1";
+  const current = window.localStorage.getItem(AUTO_READ_STORAGE_KEY);
+  if (current !== null) return current === "1";
+
+  const legacy = window.localStorage.getItem(LEGACY_AUTO_READ_STORAGE_KEY);
+  if (legacy !== null) {
+    window.localStorage.setItem(AUTO_READ_STORAGE_KEY, legacy === "1" ? "1" : "0");
+    return legacy === "1";
+  }
+
+  return false;
 }
 
 function getSpeakStateSnapshot() {
@@ -181,9 +192,18 @@ export function useSpeakState() {
   return useSyncExternalStore(subscribeSpeakState, getSpeakStateSnapshot, getSpeakStateSnapshot);
 }
 
+export function useAutoReadSetting() {
+  const state = useSpeakState();
+  return {
+    autoReadEnabled: state.autoReadEnabled,
+    setAutoReadEnabled,
+  };
+}
+
 export function setAutoReadEnabled(enabled: boolean) {
   if (typeof window !== "undefined") {
-    window.localStorage.setItem("lul:auto_read_questions", enabled ? "1" : "0");
+    window.localStorage.setItem(AUTO_READ_STORAGE_KEY, enabled ? "1" : "0");
+    window.localStorage.removeItem(LEGACY_AUTO_READ_STORAGE_KEY);
   }
   setSpeakState({ autoReadEnabled: enabled });
 }
