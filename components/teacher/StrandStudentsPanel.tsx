@@ -40,6 +40,12 @@ type Props = {
 };
 
 type StrandStatus = "Not Started" | "In Progress" | "Needs Support" | "Completed";
+
+function yearToLevelLabel(year: string): string {
+  if (year === "Prep") return "Ground";
+  const m = year.match(/Year\s*(\d+)/i);
+  return m ? `Level ${m[1]}` : year;
+}
 type StudentFlagTone = "neutral" | "red" | "yellow" | "green";
 type StudentFlag = {
   label: string;
