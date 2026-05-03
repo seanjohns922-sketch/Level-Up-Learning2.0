@@ -15,6 +15,7 @@ import MoneyContextVisual from "@/components/activities/MoneyContextVisual";
 import ArrayVisual from "@/components/activities/ArrayVisual";
 import RuleBoxVisual from "@/components/activities/RuleBoxVisual";
 import DiscountVisual from "@/components/activities/DiscountVisual";
+import BestBuyCardComparisonVisual from "@/components/activities/BestBuyCardComparisonVisual";
 import { Fraction, MathFormattedText } from "@/components/FractionText";
 
 function normalize(value: string) {
@@ -2613,6 +2614,9 @@ export default function TypedResponseActivity({
       ) : null}
       {questionData.visual?.type === "rule_box" ? (
         <RuleBoxVisual visual={questionData.visual} title="Step-by-step rule" />
+      ) : null}
+      {questionData.visual?.type === "best_buy_card_comparison" ? (
+        <BestBuyCardComparisonVisual visual={questionData.visual} />
       ) : null}
       {discountStepMethodVisual ? (
         <DiscountVisual

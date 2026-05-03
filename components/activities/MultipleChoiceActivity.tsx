@@ -14,6 +14,7 @@ import MoneyContextVisual from "@/components/activities/MoneyContextVisual";
 import ArrayVisual from "@/components/activities/ArrayVisual";
 import RuleBoxVisual from "@/components/activities/RuleBoxVisual";
 import DiscountVisual from "@/components/activities/DiscountVisual";
+import BestBuyCardComparisonVisual from "@/components/activities/BestBuyCardComparisonVisual";
 import { FractionText, MathFormattedText } from "@/components/FractionText";
 
 function FractionBar({
@@ -242,6 +243,9 @@ export default function MultipleChoiceActivity({
       ) : null}
       {questionData.visual?.type === "discount_price_tag" ? (
         <DiscountVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "best_buy_card_comparison" ? (
+        <BestBuyCardComparisonVisual visual={questionData.visual} revealUnitRates={picked !== null} />
       ) : null}
 
       <div className="mt-6 grid gap-2.5">

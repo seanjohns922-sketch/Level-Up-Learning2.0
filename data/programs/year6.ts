@@ -394,7 +394,7 @@ const year6Rows: ProgramRow[] = [
     curriculum: ["AC9M6N06"],
     activities: [
       makeActivity("typed_response", 1, { mode: "y6_unit_rate_build" }),
-      makeActivity("typed_response", 1, { mode: "y6_unit_rate_compare" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_unit_rate_compare" }),
       makeActivity("multiple_choice", 1, { mode: "y6_unit_rate_decide" }),
     ],
   },

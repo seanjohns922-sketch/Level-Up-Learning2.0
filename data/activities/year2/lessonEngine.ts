@@ -3126,6 +3126,22 @@ export type DiscountStepMethodVisualData = Omit<DiscountPriceVisualData, "type">
   }>;
 };
 
+export type BestBuyCardVisualData = {
+  type: "best_buy_card_comparison";
+  title: string;
+  cards: Array<{
+    label: string;
+    productName: string;
+    price: number;
+    quantityLabel: string;
+    unitRateLabel: string;
+    unitRate?: number;
+    chunkCount?: number;
+    chunkLabel?: string;
+    hideUnitRateUntilReveal?: boolean;
+  }>;
+};
+
 export type MultiStepMethodVisualData = {
   type: "multi_step_method";
   title: string;
@@ -3182,6 +3198,7 @@ export type MultipleChoiceQuestion = {
     | MoneyVisualData
     | SameDenominatorOperationVisualData
     | DiscountPriceVisualData
+    | BestBuyCardVisualData
     | RuleBoxVisualData;
 };
 
@@ -3234,6 +3251,7 @@ export type TypedResponseQuestion = {
     | DiscountStepMethodVisualData
     | MultiStepMethodVisualData
     | StrategyOwnershipVisualData
+    | BestBuyCardVisualData
     | {
         type: "numeric_input_only";
       }
@@ -18833,52 +18851,477 @@ function generateGenericQuestion(
 
   if (explicitMode === "y6_unit_rate_build") {
     const templates: TypedResponseQuestion[] = [
-      { kind: "typed_response", prompt: "$15 for 4 items. Find the cost per item.", answer: "3.75", helper: "Convert to the same unit by dividing.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "$13 for 5 items. Find the cost per item.", answer: "2.6", helper: "Find the cost for 1 item first.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "For $24 for 8 items, type the most efficient method: Divide by 8, Multiply by 2, or Guess.", answer: "Divide by 8", helper: "Choose the method that finds the unit rate directly.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "$9 for 750 g. Find the cost per 100 g.", answer: "1.2", helper: "Scale the quantity to 100 g before comparing.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "$14 for 5 L. Find the cost per L.", answer: "2.8", helper: "Compare using the same unit.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "$18 for 6 items. Find the cost per item.", answer: "3", helper: "Divide to find the cost for 1 item.", placeholder: "Type the answer", inputType: "integer" },
-      { kind: "typed_response", prompt: "$22.50 for 9 bottles. Find the cost per bottle.", answer: "2.5", helper: "A unit rate compares value using the same unit.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "$11 for 550 g. Find the cost per 100 g.", answer: "2", helper: "Scale to a common unit before comparing.", placeholder: "Type the answer", inputType: "integer" },
-      { kind: "typed_response", prompt: "$16 for 4. Find the cost per item.", answer: "4", helper: "Find the price for 1 item.", placeholder: "Type the answer", inputType: "integer" },
-      { kind: "typed_response", prompt: "$21 for 7 L. Find the cost per L.", answer: "3", helper: "Use the per-1 unit rate.", placeholder: "Type the answer", inputType: "integer" },
-      { kind: "typed_response", prompt: "$12 for 8 items. Find the cost per item.", answer: "1.5", helper: "Divide the total cost by the number of items.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "$8.40 for 3 kg. Find the cost per kg.", answer: "2.8", helper: "Compare using the same unit.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "$7.50 for 600 g. Find the cost per 100 g.", answer: "1.25", helper: "Find the price of each 100 g chunk.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "$27 for 12 cans. Find the cost per can.", answer: "2.25", helper: "A unit rate compares cost for one unit.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "$19.20 for 8 notebooks. Find the cost per notebook.", answer: "2.4", helper: "Divide to get the per-item cost.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "$5 for 400 g. Find the cost per 100 g.", answer: "1.25", helper: "Scale to 100 g for a fair comparison.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "$32 for 10 L. Find the cost per L.", answer: "3.2", helper: "Use the same unit for a fair rate.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "$14.40 for 6 jars. Find the cost per jar.", answer: "2.4", helper: "Divide the total by the number of units.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "$10.50 for 700 g. Find the cost per 100 g.", answer: "1.5", helper: "Find the cost of 100 g first.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "$28 for 8 tickets. Find the cost per ticket.", answer: "3.5", helper: "Use the per-1 unit rate.", placeholder: "Type the answer" },
+      {
+        kind: "typed_response",
+        prompt: "What is the cost per bar?",
+        answer: "3.75",
+        helper: "Convert to the same unit by dividing.",
+        placeholder: "Type the answer",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Unit Pricing",
+          cards: [{ label: "Card A", productName: "Snack Pack A", price: 15, quantityLabel: "4 bars", unitRateLabel: "Per bar" }],
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the cost per battery?",
+        answer: "2.6",
+        acceptedAnswers: ["2.60"],
+        helper: "Find the cost for 1 item first.",
+        placeholder: "Type the answer",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Unit Pricing",
+          cards: [{ label: "Card A", productName: "Battery Pack", price: 13, quantityLabel: "5 batteries", unitRateLabel: "Per battery" }],
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the cost per 100 g?",
+        answer: "1.2",
+        acceptedAnswers: ["1.20"],
+        helper: "Scale the quantity to 100 g before comparing.",
+        placeholder: "Type the answer",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Unit Pricing",
+          cards: [{
+            label: "Card A",
+            productName: "Trail Mix",
+            price: 7.2,
+            quantityLabel: "600 g",
+            unitRateLabel: "Per 100 g",
+            chunkCount: 6,
+            chunkLabel: "100 g",
+          }],
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the cost per L?",
+        answer: "2.8",
+        acceptedAnswers: ["2.80"],
+        helper: "Compare using the same unit.",
+        placeholder: "Type the answer",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Unit Pricing",
+          cards: [{ label: "Card A", productName: "Sports Drink", price: 14, quantityLabel: "5 L", unitRateLabel: "Per L" }],
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the cost per item?",
+        answer: "3",
+        helper: "Divide to find the cost for 1 item.",
+        placeholder: "Type the answer",
+        inputType: "integer",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Unit Pricing",
+          cards: [{ label: "Card A", productName: "Lunchbox Set", price: 18, quantityLabel: "6 sets", unitRateLabel: "Per set" }],
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the cost per bottle?",
+        answer: "2.5",
+        acceptedAnswers: ["2.50"],
+        helper: "A unit rate compares value using the same unit.",
+        placeholder: "Type the answer",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Unit Pricing",
+          cards: [{ label: "Card A", productName: "Juice Crate", price: 22.5, quantityLabel: "9 bottles", unitRateLabel: "Per bottle" }],
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the cost per 100 g?",
+        answer: "2",
+        helper: "Scale to a common unit before comparing.",
+        placeholder: "Type the answer",
+        inputType: "integer",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Unit Pricing",
+          cards: [{
+            label: "Card A",
+            productName: "Granola A",
+            price: 10,
+            quantityLabel: "500 g",
+            unitRateLabel: "Per 100 g",
+            chunkCount: 5,
+            chunkLabel: "100 g",
+          }],
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the cost per item?",
+        answer: "4",
+        helper: "Find the price for 1 item.",
+        placeholder: "Type the answer",
+        inputType: "integer",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Unit Pricing",
+          cards: [{ label: "Card A", productName: "Notebook Pack", price: 16, quantityLabel: "4 notebooks", unitRateLabel: "Per notebook" }],
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the cost per L?",
+        answer: "3",
+        helper: "Use the per-1 unit rate.",
+        placeholder: "Type the answer",
+        inputType: "integer",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Unit Pricing",
+          cards: [{ label: "Card A", productName: "Tomato Sauce Tub", price: 21, quantityLabel: "7 L", unitRateLabel: "Per L" }],
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the cost per item?",
+        answer: "1.5",
+        acceptedAnswers: ["1.50"],
+        helper: "Divide the total cost by the number of items.",
+        placeholder: "Type the answer",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Unit Pricing",
+          cards: [{ label: "Card A", productName: "Sports Bottle Set", price: 12, quantityLabel: "8 bottles", unitRateLabel: "Per bottle" }],
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the cost per kg?",
+        answer: "2.8",
+        acceptedAnswers: ["2.80"],
+        helper: "Compare using the same unit.",
+        placeholder: "Type the answer",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Unit Pricing",
+          cards: [{ label: "Card A", productName: "Rice Bag", price: 8.4, quantityLabel: "3 kg", unitRateLabel: "Per kg" }],
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the cost per 100 g?",
+        answer: "1.25",
+        acceptedAnswers: ["1.250", "1.25"],
+        helper: "Find the price of each 100 g chunk.",
+        placeholder: "Type the answer",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Unit Pricing",
+          cards: [{
+            label: "Card A",
+            productName: "Granola Bag",
+            price: 7.5,
+            quantityLabel: "600 g",
+            unitRateLabel: "Per 100 g",
+            chunkCount: 6,
+            chunkLabel: "100 g",
+          }],
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the cost per can?",
+        answer: "2.25",
+        helper: "A unit rate compares cost for one unit.",
+        placeholder: "Type the answer",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Unit Pricing",
+          cards: [{ label: "Card A", productName: "Sparkling Water", price: 27, quantityLabel: "12 cans", unitRateLabel: "Per can" }],
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the cost per notebook?",
+        answer: "2.4",
+        acceptedAnswers: ["2.40"],
+        helper: "Divide to get the per-item cost.",
+        placeholder: "Type the answer",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Unit Pricing",
+          cards: [{ label: "Card A", productName: "Study Notes Pack", price: 19.2, quantityLabel: "8 notebooks", unitRateLabel: "Per notebook" }],
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the cost per 100 g?",
+        answer: "1.25",
+        acceptedAnswers: ["1.250", "1.25"],
+        helper: "Scale to 100 g for a fair comparison.",
+        placeholder: "Type the answer",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Unit Pricing",
+          cards: [{
+            label: "Card A",
+            productName: "Pasta Spirals",
+            price: 5,
+            quantityLabel: "400 g",
+            unitRateLabel: "Per 100 g",
+            chunkCount: 4,
+            chunkLabel: "100 g",
+          }],
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the cost per L?",
+        answer: "3.2",
+        acceptedAnswers: ["3.20"],
+        helper: "Use the same unit for a fair rate.",
+        placeholder: "Type the answer",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Unit Pricing",
+          cards: [{ label: "Card A", productName: "Juice Cask", price: 32, quantityLabel: "10 L", unitRateLabel: "Per L" }],
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the cost per jar?",
+        answer: "2.4",
+        acceptedAnswers: ["2.40"],
+        helper: "Divide the total by the number of units.",
+        placeholder: "Type the answer",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Unit Pricing",
+          cards: [{ label: "Card A", productName: "Sauce Jar Pack", price: 14.4, quantityLabel: "6 jars", unitRateLabel: "Per jar" }],
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the cost per 100 g?",
+        answer: "1.5",
+        acceptedAnswers: ["1.50"],
+        helper: "Find the cost of 100 g first.",
+        placeholder: "Type the answer",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Unit Pricing",
+          cards: [{
+            label: "Card A",
+            productName: "Brown Rice",
+            price: 10.5,
+            quantityLabel: "700 g",
+            unitRateLabel: "Per 100 g",
+            chunkCount: 7,
+            chunkLabel: "100 g",
+          }],
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the cost per ticket?",
+        answer: "3.5",
+        acceptedAnswers: ["3.50"],
+        helper: "Use the per-1 unit rate.",
+        placeholder: "Type the answer",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Unit Pricing",
+          cards: [{ label: "Card A", productName: "Movie Ticket Bundle", price: 28, quantityLabel: "8 tickets", unitRateLabel: "Per ticket" }],
+        },
+      },
     ];
     return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
   }
 
   if (explicitMode === "y6_unit_rate_compare") {
-    const templates: TypedResponseQuestion[] = [
-      { kind: "typed_response", prompt: "Which is better value? First: $14 for 4. Second: $20 for 6. Type First, Second, or Same.", answer: "Second", helper: "Convert both to the same unit before deciding.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "Which is better value? First: $10 for 3. Second: $16 for 5. Type First, Second, or Same.", answer: "Second", helper: "Compare the unit rates, not the totals.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "Which is better value? First: $24 for 8. Second: $36 for 12. Type First, Second, or Same.", answer: "Same", helper: "Fair comparisons use the same unit.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "Explain how you know which is better value. Type: Compared per unit or Same value per item.", answer: "Compared per unit", acceptedAnswers: ["Same value per item"], helper: "Do not compare totals directly.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "Which is better value? First: $9 for 3 L. Second: $14 for 5 L. Type First, Second, or Same.", answer: "Second", helper: "Compare the cost per litre.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "Which is better value? First: $18 for 5. Second: $25 for 8. Type First, Second, or Same.", answer: "Second", helper: "Divide to find a unit rate for both deals.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "Which is better value? First: $15 for 6. Second: $21 for 8. Type First, Second, or Same.", answer: "First", helper: "Compare the per-item cost.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "Which is better value? First: $12 for 750 g. Second: $15 for 1 kg. Type First, Second, or Same.", answer: "Second", helper: "Per 100 g can make the comparison easier.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "Which is better value? First: $8 for 4 cans. Second: $11 for 5 cans. Type First, Second, or Same.", answer: "First", helper: "Convert both offers to cost per can.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "Which is better value? First: $14 for 500 g. Second: $25 for 1 kg. Type First, Second, or Same.", answer: "First", helper: "Use cost per 100 g or per kg.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "Which is better value? First: $30 for 12. Second: $18 for 7. Type First, Second, or Same.", answer: "First", helper: "Do not compare totals directly.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "Which is better value? First: $16.50 for 6 bottles. Second: $22 for 8 bottles. Type First, Second, or Same.", answer: "Second", helper: "The lower unit rate is the better buy.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "Which is better value? First: $7.20 for 400 g. Second: $18 for 1 kg. Type First, Second, or Same.", answer: "First", helper: "Scale to the same unit before comparing.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "Which is better value? First: $9 for 2 L. Second: $19 for 5 L. Type First, Second, or Same.", answer: "Second", helper: "Compare cost per litre.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "Which is better value? First: $20 for 9 items. Second: $15 for 7 items. Type First, Second, or Same.", answer: "First", helper: "Compare the unit rates to justify the decision.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "Which is better value? First: $24 for 600 g. Second: $36 for 1 kg. Type First, Second, or Same.", answer: "Second", helper: "Use a common amount such as 100 g.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "Which is better value? First: $13.50 for 6. Second: $17.60 for 8. Type First, Second, or Same.", answer: "Second", helper: "Compare per 1 item.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "Why do we compare per 100 g instead of totals? Type: Fair comparison or Same unit.", answer: "Fair comparison", acceptedAnswers: ["Same unit"], helper: "Different total amounts can hide the better deal.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "Which is better value? First: $27 for 9. Second: $35 for 12. Type First, Second, or Same.", answer: "Second", helper: "Use proportional reasoning or divide.", placeholder: "Type the answer" },
-      { kind: "typed_response", prompt: "Which is better value? First: $6 for 300 g. Second: $11 for 600 g. Type First, Second, or Same.", answer: "Second", helper: "Same-unit comparisons lead to fair decisions.", placeholder: "Type the answer" },
+    const templates: MultipleChoiceQuestion[] = [
+      {
+        kind: "multiple_choice",
+        prompt: "Which snack pack is better value?",
+        options: ["First", "Second", "Same"],
+        answer: "Second",
+        helper: "First is $3 per bar. Second is about $2.92 per bar.",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Supermarket Compare",
+          cards: [
+            { label: "Card A", productName: "Snack Pack A", price: 27, quantityLabel: "9 bars", unitRateLabel: "Per bar", unitRate: 3, hideUnitRateUntilReveal: true },
+            { label: "Card B", productName: "Snack Pack B", price: 35, quantityLabel: "12 bars", unitRateLabel: "Per bar", unitRate: 35 / 12, hideUnitRateUntilReveal: true },
+          ],
+        },
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which battery pack is better value?",
+        options: ["First", "Second", "Same"],
+        answer: "Second",
+        helper: "First is about $3.33 per battery. Second is $3.20 per battery.",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Supermarket Compare",
+          cards: [
+            { label: "Card A", productName: "Battery Pack A", price: 10, quantityLabel: "3 batteries", unitRateLabel: "Per battery", unitRate: 10 / 3, hideUnitRateUntilReveal: true },
+            { label: "Card B", productName: "Battery Pack B", price: 16, quantityLabel: "5 batteries", unitRateLabel: "Per battery", unitRate: 3.2, hideUnitRateUntilReveal: true },
+          ],
+        },
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which juice pack is better value?",
+        options: ["First", "Second", "Same"],
+        answer: "Same",
+        helper: "Both offers are $3 per bottle.",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Supermarket Compare",
+          cards: [
+            { label: "Card A", productName: "Juice Pack A", price: 24, quantityLabel: "8 bottles", unitRateLabel: "Per bottle", unitRate: 3, hideUnitRateUntilReveal: true },
+            { label: "Card B", productName: "Juice Pack B", price: 36, quantityLabel: "12 bottles", unitRateLabel: "Per bottle", unitRate: 3, hideUnitRateUntilReveal: true },
+          ],
+        },
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which sports drink is better value?",
+        options: ["First", "Second", "Same"],
+        answer: "Second",
+        helper: "First is $3 per litre. Second is $2.80 per litre.",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Supermarket Compare",
+          cards: [
+            { label: "Card A", productName: "Sports Drink A", price: 9, quantityLabel: "3 L", unitRateLabel: "Per L", unitRate: 3, hideUnitRateUntilReveal: true },
+            { label: "Card B", productName: "Sports Drink B", price: 14, quantityLabel: "5 L", unitRateLabel: "Per L", unitRate: 2.8, hideUnitRateUntilReveal: true },
+          ],
+        },
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which cereal box is better value?",
+        options: ["First", "Second", "Same"],
+        answer: "Second",
+        helper: "First is $1.60 per 100 g. Second is $1.50 per 100 g.",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Supermarket Compare",
+          cards: [
+            { label: "Card A", productName: "Cereal Box A", price: 9.6, quantityLabel: "600 g", unitRateLabel: "Per 100 g", unitRate: 1.6, hideUnitRateUntilReveal: true, chunkCount: 6, chunkLabel: "100 g" },
+            { label: "Card B", productName: "Cereal Box B", price: 15, quantityLabel: "1 kg", unitRateLabel: "Per 100 g", unitRate: 1.5, hideUnitRateUntilReveal: true, chunkCount: 10, chunkLabel: "100 g" },
+          ],
+        },
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which can pack is better value?",
+        options: ["First", "Second", "Same"],
+        answer: "First",
+        helper: "First is $2 per can. Second is $2.20 per can.",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Supermarket Compare",
+          cards: [
+            { label: "Card A", productName: "Can Pack A", price: 8, quantityLabel: "4 cans", unitRateLabel: "Per can", unitRate: 2, hideUnitRateUntilReveal: true },
+            { label: "Card B", productName: "Can Pack B", price: 11, quantityLabel: "5 cans", unitRateLabel: "Per can", unitRate: 2.2, hideUnitRateUntilReveal: true },
+          ],
+        },
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which rice bag is better value?",
+        options: ["First", "Second", "Same"],
+        answer: "Second",
+        helper: "First is $2.80 per 100 g. Second is $2.50 per 100 g.",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Supermarket Compare",
+          cards: [
+            { label: "Card A", productName: "Rice Bag A", price: 14, quantityLabel: "500 g", unitRateLabel: "Per 100 g", unitRate: 2.8, hideUnitRateUntilReveal: true, chunkCount: 5, chunkLabel: "100 g" },
+            { label: "Card B", productName: "Rice Bag B", price: 25, quantityLabel: "1 kg", unitRateLabel: "Per 100 g", unitRate: 2.5, hideUnitRateUntilReveal: true, chunkCount: 10, chunkLabel: "100 g" },
+          ],
+        },
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which notebook pack is better value?",
+        options: ["First", "Second", "Same"],
+        answer: "First",
+        helper: "First is $2.50 per notebook. Second is $2.625 per notebook.",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Supermarket Compare",
+          cards: [
+            { label: "Card A", productName: "Notebook Pack A", price: 15, quantityLabel: "6 notebooks", unitRateLabel: "Per notebook", unitRate: 2.5, hideUnitRateUntilReveal: true },
+            { label: "Card B", productName: "Notebook Pack B", price: 21, quantityLabel: "8 notebooks", unitRateLabel: "Per notebook", unitRate: 2.625, hideUnitRateUntilReveal: true },
+          ],
+        },
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which pasta bag is better value?",
+        options: ["First", "Second", "Same"],
+        answer: "Same",
+        helper: "Both offers work out to $1.80 per 100 g.",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Supermarket Compare",
+          cards: [
+            { label: "Card A", productName: "Pasta Bag A", price: 7.2, quantityLabel: "400 g", unitRateLabel: "Per 100 g", unitRate: 1.8, hideUnitRateUntilReveal: true, chunkCount: 4, chunkLabel: "100 g" },
+            { label: "Card B", productName: "Pasta Bag B", price: 18, quantityLabel: "1 kg", unitRateLabel: "Per 100 g", unitRate: 1.8, hideUnitRateUntilReveal: true, chunkCount: 10, chunkLabel: "100 g" },
+          ],
+        },
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which drink bottle deal is better value?",
+        options: ["First", "Second", "Same"],
+        answer: "Second",
+        helper: "First is $4.50 per litre. Second is $3.80 per litre.",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Supermarket Compare",
+          cards: [
+            { label: "Card A", productName: "Drink Bottle A", price: 9, quantityLabel: "2 L", unitRateLabel: "Per L", unitRate: 4.5, hideUnitRateUntilReveal: true },
+            { label: "Card B", productName: "Drink Bottle B", price: 19, quantityLabel: "5 L", unitRateLabel: "Per L", unitRate: 3.8, hideUnitRateUntilReveal: true },
+          ],
+        },
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which snack bar deal is better value?",
+        options: ["First", "Second", "Same"],
+        answer: "Second",
+        helper: "First is about $2.22 per bar. Second is about $2.14 per bar.",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Supermarket Compare",
+          cards: [
+            { label: "Card A", productName: "Snack Bars A", price: 20, quantityLabel: "9 bars", unitRateLabel: "Per bar", unitRate: 20 / 9, hideUnitRateUntilReveal: true },
+            { label: "Card B", productName: "Snack Bars B", price: 15, quantityLabel: "7 bars", unitRateLabel: "Per bar", unitRate: 15 / 7, hideUnitRateUntilReveal: true },
+          ],
+        },
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which pasta deal is better value?",
+        options: ["First", "Second", "Same"],
+        answer: "Second",
+        helper: "First is $4 per 100 g. Second is $3.60 per 100 g.",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Supermarket Compare",
+          cards: [
+            { label: "Card A", productName: "Pasta A", price: 24, quantityLabel: "600 g", unitRateLabel: "Per 100 g", unitRate: 4, hideUnitRateUntilReveal: true, chunkCount: 6, chunkLabel: "100 g" },
+            { label: "Card B", productName: "Pasta B", price: 36, quantityLabel: "1 kg", unitRateLabel: "Per 100 g", unitRate: 3.6, hideUnitRateUntilReveal: true, chunkCount: 10, chunkLabel: "100 g" },
+          ],
+        },
+      },
     ];
     return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
   }
@@ -18887,10 +19330,18 @@ function generateGenericQuestion(
     const templates: MultipleChoiceQuestion[] = [
       {
         kind: "multiple_choice",
-        prompt: "You want the best value. Pack A: $24 for 6. Pack B: $30 for 10. Which is better value?",
+        prompt: "You want the best value. Which pack should you choose?",
         options: ["Pack A", "Pack B", "They are the same"],
         answer: "Pack B",
-        helper: "Compare the cost per item.",
+        helper: "Pack A is $4 per item. Pack B is $3 per item.",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Best-Buy Decision",
+          cards: [
+            { label: "Pack A", productName: "Marker Set", price: 24, quantityLabel: "6 markers", unitRateLabel: "Per marker", unitRate: 4, hideUnitRateUntilReveal: true },
+            { label: "Pack B", productName: "Marker Set", price: 30, quantityLabel: "10 markers", unitRateLabel: "Per marker", unitRate: 3, hideUnitRateUntilReveal: true },
+          ],
+        },
       },
       {
         kind: "multiple_choice",
@@ -18901,10 +19352,18 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "Which is better value? $15 for 500 g or $24 for 1 kg?",
-        options: ["$15 for 500 g", "$24 for 1 kg", "They are the same"],
-        answer: "$24 for 1 kg",
-        helper: "Per 100 g makes this a fair comparison.",
+        prompt: "Which rice option is better value?",
+        options: ["First", "Second", "They are the same"],
+        answer: "Second",
+        helper: "First is $3 per 100 g. Second is $2.40 per 100 g.",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Best-Buy Decision",
+          cards: [
+            { label: "First", productName: "Rice Bag A", price: 15, quantityLabel: "500 g", unitRateLabel: "Per 100 g", unitRate: 3, hideUnitRateUntilReveal: true, chunkCount: 5, chunkLabel: "100 g" },
+            { label: "Second", productName: "Rice Bag B", price: 24, quantityLabel: "1 kg", unitRateLabel: "Per 100 g", unitRate: 2.4, hideUnitRateUntilReveal: true, chunkCount: 10, chunkLabel: "100 g" },
+          ],
+        },
       },
       {
         kind: "multiple_choice",
@@ -18915,17 +19374,33 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "You need 12 items. Which is cheaper? Option A: 3 packs of 4 for $24. Option B: 2 packs of 6 for $30.",
+        prompt: "You need 12 items. Which option is cheaper?",
         options: ["Option A", "Option B", "They cost the same"],
-        answer: "Option B",
-        helper: "Compare the total cost for the amount you actually need.",
+        answer: "Option A",
+        helper: "Option A costs $24. Option B costs $30, so Option A is cheaper for 12 items.",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Buy What You Need",
+          cards: [
+            { label: "Option A", productName: "Snack Pack", price: 24, quantityLabel: "3 packs of 4", unitRateLabel: "Total for 12 items", unitRate: 24, hideUnitRateUntilReveal: true },
+            { label: "Option B", productName: "Snack Pack", price: 30, quantityLabel: "2 packs of 6", unitRateLabel: "Total for 12 items", unitRate: 30, hideUnitRateUntilReveal: true },
+          ],
+        },
       },
       {
         kind: "multiple_choice",
-        prompt: "Which is the best buy? Pack A: $18 for 4. Pack B: $20 for 5.",
+        prompt: "Which juice deal is the best buy?",
         options: ["Pack A", "Pack B", "They are the same"],
         answer: "Pack B",
-        helper: "The lower unit rate gives the better value.",
+        helper: "Pack A is $4.50 per litre. Pack B is $4 per litre.",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Best-Buy Decision",
+          cards: [
+            { label: "Pack A", productName: "Juice Cask", price: 18, quantityLabel: "4 L", unitRateLabel: "Per L", unitRate: 4.5, hideUnitRateUntilReveal: true },
+            { label: "Pack B", productName: "Juice Cask", price: 20, quantityLabel: "5 L", unitRateLabel: "Per L", unitRate: 4, hideUnitRateUntilReveal: true },
+          ],
+        },
       },
       {
         kind: "multiple_choice",
@@ -18936,17 +19411,25 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "Which is better value? $9 for 750 g or $13 for 1 kg?",
-        options: ["$9 for 750 g", "$13 for 1 kg", "They are the same"],
-        answer: "$9 for 750 g",
-        helper: "Compare per 100 g or scale to 1 kg.",
+        prompt: "Which cereal bag gives better value?",
+        options: ["First", "Second", "They are the same"],
+        answer: "First",
+        helper: "First is $1.20 per 100 g. Second is $1.30 per 100 g.",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Best-Buy Decision",
+          cards: [
+            { label: "First", productName: "Granola Bag", price: 6, quantityLabel: "500 g", unitRateLabel: "Per 100 g", unitRate: 1.2, hideUnitRateUntilReveal: true, chunkCount: 5, chunkLabel: "100 g" },
+            { label: "Second", productName: "Granola Bag", price: 13, quantityLabel: "1 kg", unitRateLabel: "Per 100 g", unitRate: 1.3, hideUnitRateUntilReveal: true, chunkCount: 10, chunkLabel: "100 g" },
+          ],
+        },
       },
       {
         kind: "multiple_choice",
-        prompt: "You need 15 bottles. Which option is cheaper? A: 3 packs of 5 for $33. B: 5 packs of 3 for $30.",
+        prompt: "You need 15 bottles. Which option is cheaper?",
         options: ["Option A", "Option B", "They cost the same"],
         answer: "Option B",
-        helper: "Use the quantity you actually need, then compare totals.",
+        helper: "Compare the total cost for the amount you actually need.",
       },
       {
         kind: "multiple_choice",
@@ -18957,10 +19440,18 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "Which is better value? $21 for 7 L or $32 for 10 L?",
-        options: ["$21 for 7 L", "$32 for 10 L", "They are the same"],
-        answer: "$21 for 7 L",
-        helper: "Compare the cost per litre.",
+        prompt: "Which sauce bottle is better value?",
+        options: ["First", "Second", "They are the same"],
+        answer: "First",
+        helper: "First is $3 per litre. Second is $3.20 per litre.",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Best-Buy Decision",
+          cards: [
+            { label: "First", productName: "Sauce Bottle A", price: 21, quantityLabel: "7 L", unitRateLabel: "Per L", unitRate: 3, hideUnitRateUntilReveal: true },
+            { label: "Second", productName: "Sauce Bottle B", price: 32, quantityLabel: "10 L", unitRateLabel: "Per L", unitRate: 3.2, hideUnitRateUntilReveal: true },
+          ],
+        },
       },
       {
         kind: "multiple_choice",
@@ -18971,24 +19462,40 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "Which option gives the better value for 1 kg equivalent? A: $8 for 400 g. B: $18 for 1 kg.",
+        prompt: "Which option gives the better value for 1 kg equivalent?",
         options: ["Option A", "Option B", "They are the same"],
         answer: "Option B",
         helper: "Convert to the same amount before comparing.",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Best-Buy Decision",
+          cards: [
+            { label: "Option A", productName: "Pasta Bag", price: 8, quantityLabel: "400 g", unitRateLabel: "Per 100 g", unitRate: 2, hideUnitRateUntilReveal: true, chunkCount: 4, chunkLabel: "100 g" },
+            { label: "Option B", productName: "Pasta Bag", price: 18, quantityLabel: "1 kg", unitRateLabel: "Per 100 g", unitRate: 1.8, hideUnitRateUntilReveal: true, chunkCount: 10, chunkLabel: "100 g" },
+          ],
+        },
       },
       {
         kind: "multiple_choice",
-        prompt: "You need 20 cans. Which option is cheaper? A: 4 packs of 5 for $36. B: 5 packs of 4 for $34.",
+        prompt: "You need 20 cans. Which option is cheaper?",
         options: ["Option A", "Option B", "They cost the same"],
         answer: "Option B",
         helper: "Compare the total cost for the same number of cans.",
       },
       {
         kind: "multiple_choice",
-        prompt: "Which is better value? $16 for 8 or $27 for 12?",
-        options: ["$16 for 8", "$27 for 12", "They are the same"],
-        answer: "$16 for 8",
-        helper: "Use cost per item to compare fairly.",
+        prompt: "Which pack gives the better value?",
+        options: ["First", "Second", "They are the same"],
+        answer: "First",
+        helper: "First is $2 per item. Second is $2.25 per item.",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Best-Buy Decision",
+          cards: [
+            { label: "First", productName: "Stapler Pack", price: 16, quantityLabel: "8 staplers", unitRateLabel: "Per stapler", unitRate: 2, hideUnitRateUntilReveal: true },
+            { label: "Second", productName: "Stapler Pack", price: 27, quantityLabel: "12 staplers", unitRateLabel: "Per stapler", unitRate: 2.25, hideUnitRateUntilReveal: true },
+          ],
+        },
       },
       {
         kind: "multiple_choice",
@@ -18999,24 +19506,40 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "Which is better value? $14 for 5 L or $20 for 8 L?",
-        options: ["$14 for 5 L", "$20 for 8 L", "They are the same"],
-        answer: "$20 for 8 L",
-        helper: "Compare the cost per litre.",
+        prompt: "Which drink refill is better value?",
+        options: ["First", "Second", "They are the same"],
+        answer: "Second",
+        helper: "First is $2.80 per litre. Second is $2.50 per litre.",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Best-Buy Decision",
+          cards: [
+            { label: "First", productName: "Drink Refill A", price: 14, quantityLabel: "5 L", unitRateLabel: "Per L", unitRate: 2.8, hideUnitRateUntilReveal: true },
+            { label: "Second", productName: "Drink Refill B", price: 20, quantityLabel: "8 L", unitRateLabel: "Per L", unitRate: 2.5, hideUnitRateUntilReveal: true },
+          ],
+        },
       },
       {
         kind: "multiple_choice",
-        prompt: "You need 8 items. Which option is cheaper? A: 2 packs of 4 for $18. B: 1 pack of 8 for $19.20.",
+        prompt: "You need 8 items. Which option is cheaper?",
         options: ["Option A", "Option B", "They cost the same"],
         answer: "Option A",
         helper: "Compare total cost for the quantity you need.",
       },
       {
         kind: "multiple_choice",
-        prompt: "Which is better value? $11 for 550 g or $20 for 1 kg?",
-        options: ["$11 for 550 g", "$20 for 1 kg", "They are the same"],
-        answer: "$20 for 1 kg",
-        helper: "Per 100 g or per kg both work if the units match.",
+        prompt: "Which granola bag is better value?",
+        options: ["First", "Second", "They are the same"],
+        answer: "Second",
+        helper: "First is $2 per 100 g. Second is about $1.82 per 100 g.",
+        visual: {
+          type: "best_buy_card_comparison",
+          title: "Best-Buy Decision",
+          cards: [
+            { label: "First", productName: "Granola Bag A", price: 10, quantityLabel: "500 g", unitRateLabel: "Per 100 g", unitRate: 2, hideUnitRateUntilReveal: true, chunkCount: 5, chunkLabel: "100 g" },
+            { label: "Second", productName: "Granola Bag B", price: 18, quantityLabel: "1 kg", unitRateLabel: "Per 100 g", unitRate: 1.8, hideUnitRateUntilReveal: true, chunkCount: 10, chunkLabel: "100 g" },
+          ],
+        },
       },
       {
         kind: "multiple_choice",
