@@ -374,15 +374,15 @@ const year6Rows: ProgramRow[] = [
   {
     week: 8,
     weekTopic: "Mathematical Modelling",
-    focus: "Model sales, discounts, and budgets using percentage thinking",
+    focus: "Use percentage reasoning to compare deals, combine discounts, and justify smart decisions",
     lesson: 1,
-    topic: "Sales, Discounts & Budgets",
-    activity: "Work out discounts, final prices, and affordability in shopping contexts.",
+    topic: "Sales & Discounts — Making Smart Decisions",
+    activity: "Compare real discounts, handle stacked percentage deals, and decide which option is actually better value.",
     curriculum: ["AC9M6N05", "AC9M6N06"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "discount_quick_find" }),
-      makeActivity("typed_response", 1, { mode: "discount_step_method" }),
-      makeActivity("multiple_choice", 1, { mode: "discount_real_world" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_discount_compare_deals" }),
+      makeActivity("typed_response", 1, { mode: "y6_discount_stacked" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_discount_budget_decide" }),
     ],
   },
   {
