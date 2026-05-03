@@ -123,7 +123,7 @@ export default function CurriculumExplorer({
   function accTone(avg: number, attempts: number) {
     if (attempts === 0) return "bg-slate-50 text-slate-400 border-slate-200";
     if (avg >= 80) return "bg-emerald-50 text-emerald-700 border-emerald-200";
-    if (avg >= 60) return "bg-[#F1F8F7] text-[#468880] border-[#C4E1DC]";
+    if (avg >= 60) return "bg-amber-50 text-amber-700 border-amber-200";
     return "bg-rose-50 text-rose-700 border-rose-200";
   }
 
@@ -144,11 +144,11 @@ export default function CurriculumExplorer({
                 className={[
                   "group relative px-3.5 py-2 rounded-xl border text-left transition",
                   active
-                    ? "border-[#A3D3CC] bg-[#F1F8F7] ring-2 ring-[#C4E1DC]"
+                    ? "border-teal-300 bg-teal-50 ring-2 ring-teal-200"
                     : "border-[#E6E8EC] bg-white hover:border-[#CBD5E1]",
                 ].join(" ")}
               >
-                <div className={`text-sm font-bold ${active ? "text-[#244742]" : "text-[#0F172A]"}`}>
+                <div className={`text-sm font-bold ${active ? "text-teal-800" : "text-[#0F172A]"}`}>
                   {g.strand}
                 </div>
                 <div className="text-[11px] font-semibold text-[#64748B] flex items-center gap-1.5">
@@ -184,11 +184,11 @@ export default function CurriculumExplorer({
                   className={[
                     "rounded-xl border px-3 py-2.5 text-left transition",
                     active
-                      ? "border-[#A3D3CC] bg-[#F1F8F7] ring-2 ring-[#C4E1DC]"
+                      ? "border-teal-300 bg-teal-50 ring-2 ring-teal-200"
                       : "border-[#E6E8EC] bg-white hover:border-[#CBD5E1]",
                   ].join(" ")}
                 >
-                  <div className={`text-[11px] font-extrabold uppercase tracking-wider ${active ? "text-[#2D5853]" : "text-[#94A3B8]"}`}>
+                  <div className={`text-[11px] font-extrabold uppercase tracking-wider ${active ? "text-teal-700" : "text-[#94A3B8]"}`}>
                     Week {w.week}
                   </div>
                   <div className="text-[12px] font-bold text-[#0F172A] line-clamp-2 leading-snug mt-0.5">
@@ -196,7 +196,7 @@ export default function CurriculumExplorer({
                   </div>
                   <div className="mt-2 h-1.5 rounded-full bg-slate-100 overflow-hidden">
                     <div
-                      className="h-full rounded-full bg-[#F1F8F7]0 transition-all"
+                      className="h-full rounded-full bg-teal-500 transition-all"
                       style={{ width: `${pct}%` }}
                     />
                   </div>
@@ -223,7 +223,7 @@ export default function CurriculumExplorer({
           <div className="bg-white rounded-2xl border border-[#E6E8EC] px-5 py-4">
             <div className="flex items-start justify-between gap-3 flex-wrap">
               <div className="min-w-0">
-                <div className="text-[10px] font-extrabold text-[#2D5853] uppercase tracking-[0.14em]">
+                <div className="text-[10px] font-extrabold text-teal-700 uppercase tracking-[0.14em]">
                   {genre?.strand} · {genre?.realm}
                 </div>
                 <h2 className="text-xl font-black text-[#0F172A] mt-0.5 tracking-tight">
@@ -237,7 +237,7 @@ export default function CurriculumExplorer({
                     return (
                       <span>
                         · quiz avg{" "}
-                        <b className={acc.attempts === 0 ? "text-[#94A3B8]" : acc.avg >= 80 ? "text-emerald-700" : acc.avg >= 60 ? "text-[#468880]" : "text-rose-700"}>
+                        <b className={acc.attempts === 0 ? "text-[#94A3B8]" : acc.avg >= 80 ? "text-emerald-700" : acc.avg >= 60 ? "text-amber-700" : "text-rose-700"}>
                           {acc.attempts === 0 ? "—" : `${acc.avg}%`}
                         </b>
                         <span className="text-[#94A3B8]"> ({acc.attempts} attempt{acc.attempts === 1 ? "" : "s"})</span>
@@ -255,7 +255,7 @@ export default function CurriculumExplorer({
               </button>
             </div>
             {isPlaceholder && (
-              <div className="mt-3 rounded-lg bg-[#F1F8F7] border border-[#C4E1DC] px-3 py-2 text-xs font-semibold text-[#386F69]">
+              <div className="mt-3 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 text-xs font-semibold text-amber-800">
                 Curriculum content for this strand is coming soon. Lesson titles and focus descriptions are placeholders.
               </div>
             )}
@@ -271,14 +271,14 @@ export default function CurriculumExplorer({
                   key={lsn.id}
                   type="button"
                   onClick={() => setPreviewLesson(lsn)}
-                  className="text-left bg-white rounded-2xl border border-[#E6E8EC] p-4 flex flex-col gap-3 hover:border-[#A3D3CC] hover:shadow-sm transition cursor-pointer"
+                  className="text-left bg-white rounded-2xl border border-[#E6E8EC] p-4 flex flex-col gap-3 hover:border-teal-300 hover:shadow-sm transition cursor-pointer"
                   title="Click to preview lesson content"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="inline-flex items-center justify-center h-7 w-7 rounded-lg bg-[#F1F8F7] text-[#2D5853] text-xs font-black">
+                    <span className="inline-flex items-center justify-center h-7 w-7 rounded-lg bg-teal-50 text-teal-700 text-xs font-black">
                       L{lsn.lesson}
                     </span>
-                    <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-[#468880] bg-[#F1F8F7] border border-[#DEEDEA] px-1.5 py-0.5 rounded-md">
+                    <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-amber-700 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-md">
                       {DEFAULT_LESSON_XP} XP
                     </span>
                   </div>
@@ -317,7 +317,7 @@ export default function CurriculumExplorer({
                     <StatusPill label="Help" value={counts.struggling} tone="rose" />
                   </div>
 
-                  <span className="mt-auto w-full px-3 py-2 rounded-lg bg-[#F1F8F7] text-[#2D5853] text-xs font-extrabold text-center border border-[#DEEDEA]">
+                  <span className="mt-auto w-full px-3 py-2 rounded-lg bg-teal-50 text-teal-700 text-xs font-extrabold text-center border border-teal-100">
                     Preview lesson →
                   </span>
                 </button>
@@ -383,8 +383,8 @@ function StatusPill({
   tone: "teal" | "amber" | "slate" | "rose";
 }) {
   const map = {
-    teal:  "bg-[#F1F8F7] text-[#2D5853] border-[#DEEDEA]",
-    amber: "bg-[#F1F8F7] text-[#468880] border-[#DEEDEA]",
+    teal:  "bg-teal-50 text-teal-700 border-teal-100",
+    amber: "bg-amber-50 text-amber-700 border-amber-100",
     slate: "bg-slate-50 text-slate-600 border-slate-100",
     rose:  "bg-rose-50 text-rose-700 border-rose-100",
   } as const;
