@@ -18831,6 +18831,204 @@ function generateGenericQuestion(
     return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
   }
 
+  if (explicitMode === "y6_unit_rate_build") {
+    const templates: TypedResponseQuestion[] = [
+      { kind: "typed_response", prompt: "$15 for 4 items. Find the cost per item.", answer: "3.75", helper: "Convert to the same unit by dividing.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "$13 for 5 items. Find the cost per item.", answer: "2.6", helper: "Find the cost for 1 item first.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "For $24 for 8 items, type the most efficient method: Divide by 8, Multiply by 2, or Guess.", answer: "Divide by 8", helper: "Choose the method that finds the unit rate directly.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "$9 for 750 g. Find the cost per 100 g.", answer: "1.2", helper: "Scale the quantity to 100 g before comparing.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "$14 for 5 L. Find the cost per L.", answer: "2.8", helper: "Compare using the same unit.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "$18 for 6 items. Find the cost per item.", answer: "3", helper: "Divide to find the cost for 1 item.", placeholder: "Type the answer", inputType: "integer" },
+      { kind: "typed_response", prompt: "$22.50 for 9 bottles. Find the cost per bottle.", answer: "2.5", helper: "A unit rate compares value using the same unit.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "$11 for 550 g. Find the cost per 100 g.", answer: "2", helper: "Scale to a common unit before comparing.", placeholder: "Type the answer", inputType: "integer" },
+      { kind: "typed_response", prompt: "$16 for 4. Find the cost per item.", answer: "4", helper: "Find the price for 1 item.", placeholder: "Type the answer", inputType: "integer" },
+      { kind: "typed_response", prompt: "$21 for 7 L. Find the cost per L.", answer: "3", helper: "Use the per-1 unit rate.", placeholder: "Type the answer", inputType: "integer" },
+      { kind: "typed_response", prompt: "$12 for 8 items. Find the cost per item.", answer: "1.5", helper: "Divide the total cost by the number of items.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "$8.40 for 3 kg. Find the cost per kg.", answer: "2.8", helper: "Compare using the same unit.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "$7.50 for 600 g. Find the cost per 100 g.", answer: "1.25", helper: "Find the price of each 100 g chunk.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "$27 for 12 cans. Find the cost per can.", answer: "2.25", helper: "A unit rate compares cost for one unit.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "$19.20 for 8 notebooks. Find the cost per notebook.", answer: "2.4", helper: "Divide to get the per-item cost.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "$5 for 400 g. Find the cost per 100 g.", answer: "1.25", helper: "Scale to 100 g for a fair comparison.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "$32 for 10 L. Find the cost per L.", answer: "3.2", helper: "Use the same unit for a fair rate.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "$14.40 for 6 jars. Find the cost per jar.", answer: "2.4", helper: "Divide the total by the number of units.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "$10.50 for 700 g. Find the cost per 100 g.", answer: "1.5", helper: "Find the cost of 100 g first.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "$28 for 8 tickets. Find the cost per ticket.", answer: "3.5", helper: "Use the per-1 unit rate.", placeholder: "Type the answer" },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_unit_rate_compare") {
+    const templates: TypedResponseQuestion[] = [
+      { kind: "typed_response", prompt: "Which is better value? First: $14 for 4. Second: $20 for 6. Type First, Second, or Same.", answer: "Second", helper: "Convert both to the same unit before deciding.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "Which is better value? First: $10 for 3. Second: $16 for 5. Type First, Second, or Same.", answer: "Second", helper: "Compare the unit rates, not the totals.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "Which is better value? First: $24 for 8. Second: $36 for 12. Type First, Second, or Same.", answer: "Same", helper: "Fair comparisons use the same unit.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "Explain how you know which is better value. Type: Compared per unit or Same value per item.", answer: "Compared per unit", acceptedAnswers: ["Same value per item"], helper: "Do not compare totals directly.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "Which is better value? First: $9 for 3 L. Second: $14 for 5 L. Type First, Second, or Same.", answer: "Second", helper: "Compare the cost per litre.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "Which is better value? First: $18 for 5. Second: $25 for 8. Type First, Second, or Same.", answer: "Second", helper: "Divide to find a unit rate for both deals.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "Which is better value? First: $15 for 6. Second: $21 for 8. Type First, Second, or Same.", answer: "First", helper: "Compare the per-item cost.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "Which is better value? First: $12 for 750 g. Second: $15 for 1 kg. Type First, Second, or Same.", answer: "Second", helper: "Per 100 g can make the comparison easier.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "Which is better value? First: $8 for 4 cans. Second: $11 for 5 cans. Type First, Second, or Same.", answer: "First", helper: "Convert both offers to cost per can.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "Which is better value? First: $14 for 500 g. Second: $25 for 1 kg. Type First, Second, or Same.", answer: "First", helper: "Use cost per 100 g or per kg.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "Which is better value? First: $30 for 12. Second: $18 for 7. Type First, Second, or Same.", answer: "First", helper: "Do not compare totals directly.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "Which is better value? First: $16.50 for 6 bottles. Second: $22 for 8 bottles. Type First, Second, or Same.", answer: "Second", helper: "The lower unit rate is the better buy.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "Which is better value? First: $7.20 for 400 g. Second: $18 for 1 kg. Type First, Second, or Same.", answer: "First", helper: "Scale to the same unit before comparing.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "Which is better value? First: $9 for 2 L. Second: $19 for 5 L. Type First, Second, or Same.", answer: "Second", helper: "Compare cost per litre.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "Which is better value? First: $20 for 9 items. Second: $15 for 7 items. Type First, Second, or Same.", answer: "First", helper: "Compare the unit rates to justify the decision.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "Which is better value? First: $24 for 600 g. Second: $36 for 1 kg. Type First, Second, or Same.", answer: "Second", helper: "Use a common amount such as 100 g.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "Which is better value? First: $13.50 for 6. Second: $17.60 for 8. Type First, Second, or Same.", answer: "Second", helper: "Compare per 1 item.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "Why do we compare per 100 g instead of totals? Type: Fair comparison or Same unit.", answer: "Fair comparison", acceptedAnswers: ["Same unit"], helper: "Different total amounts can hide the better deal.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "Which is better value? First: $27 for 9. Second: $35 for 12. Type First, Second, or Same.", answer: "Second", helper: "Use proportional reasoning or divide.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "Which is better value? First: $6 for 300 g. Second: $11 for 600 g. Type First, Second, or Same.", answer: "Second", helper: "Same-unit comparisons lead to fair decisions.", placeholder: "Type the answer" },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_unit_rate_decide") {
+    const templates: MultipleChoiceQuestion[] = [
+      {
+        kind: "multiple_choice",
+        prompt: "You want the best value. Pack A: $24 for 6. Pack B: $30 for 10. Which is better value?",
+        options: ["Pack A", "Pack B", "They are the same"],
+        answer: "Pack B",
+        helper: "Compare the cost per item.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "A student says, “The cheaper total price is always the best deal.” Is this correct?",
+        options: ["Yes", "No"],
+        answer: "No",
+        helper: "Compare per unit, not just totals.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which is better value? $15 for 500 g or $24 for 1 kg?",
+        options: ["$15 for 500 g", "$24 for 1 kg", "They are the same"],
+        answer: "$24 for 1 kg",
+        helper: "Per 100 g makes this a fair comparison.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Why do we compare per 100 g instead of totals?",
+        options: ["For a fair comparison", "Because totals are always wrong", "Because 100 g is always cheaper"],
+        answer: "For a fair comparison",
+        helper: "The same unit makes the comparison fair.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "You need 12 items. Which is cheaper? Option A: 3 packs of 4 for $24. Option B: 2 packs of 6 for $30.",
+        options: ["Option A", "Option B", "They cost the same"],
+        answer: "Option B",
+        helper: "Compare the total cost for the amount you actually need.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which is the best buy? Pack A: $18 for 4. Pack B: $20 for 5.",
+        options: ["Pack A", "Pack B", "They are the same"],
+        answer: "Pack B",
+        helper: "The lower unit rate gives the better value.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Why might a larger pack not always be the better deal?",
+        options: ["Because the unit rate might still be higher", "Because larger packs are always lower quality", "Because totals do not matter"],
+        answer: "Because the unit rate might still be higher",
+        helper: "A bigger pack is only better if the value per unit is better.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which is better value? $9 for 750 g or $13 for 1 kg?",
+        options: ["$9 for 750 g", "$13 for 1 kg", "They are the same"],
+        answer: "$9 for 750 g",
+        helper: "Compare per 100 g or scale to 1 kg.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "You need 15 bottles. Which option is cheaper? A: 3 packs of 5 for $33. B: 5 packs of 3 for $30.",
+        options: ["Option A", "Option B", "They cost the same"],
+        answer: "Option B",
+        helper: "Use the quantity you actually need, then compare totals.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which statement is true?",
+        options: ["Fair comparisons use the same unit", "The lower total cost is always the better value", "The biggest pack is always best"],
+        answer: "Fair comparisons use the same unit",
+        helper: "Unit rate reasoning creates fair comparisons.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which is better value? $21 for 7 L or $32 for 10 L?",
+        options: ["$21 for 7 L", "$32 for 10 L", "They are the same"],
+        answer: "$21 for 7 L",
+        helper: "Compare the cost per litre.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "A student compares only the total prices and ignores the amounts. What have they missed?",
+        options: ["The unit rate", "The packaging color", "The number of decimals"],
+        answer: "The unit rate",
+        helper: "A good decision compares value using the same unit.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which option gives the better value for 1 kg equivalent? A: $8 for 400 g. B: $18 for 1 kg.",
+        options: ["Option A", "Option B", "They are the same"],
+        answer: "Option B",
+        helper: "Convert to the same amount before comparing.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "You need 20 cans. Which option is cheaper? A: 4 packs of 5 for $36. B: 5 packs of 4 for $34.",
+        options: ["Option A", "Option B", "They cost the same"],
+        answer: "Option B",
+        helper: "Compare the total cost for the same number of cans.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which is better value? $16 for 8 or $27 for 12?",
+        options: ["$16 for 8", "$27 for 12", "They are the same"],
+        answer: "$16 for 8",
+        helper: "Use cost per item to compare fairly.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Why is cost per 1 useful?",
+        options: ["It lets you compare offers fairly", "It makes every item free", "It changes the total price"],
+        answer: "It lets you compare offers fairly",
+        helper: "Same-unit comparisons make decisions clearer.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which is better value? $14 for 5 L or $20 for 8 L?",
+        options: ["$14 for 5 L", "$20 for 8 L", "They are the same"],
+        answer: "$20 for 8 L",
+        helper: "Compare the cost per litre.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "You need 8 items. Which option is cheaper? A: 2 packs of 4 for $18. B: 1 pack of 8 for $19.20.",
+        options: ["Option A", "Option B", "They cost the same"],
+        answer: "Option A",
+        helper: "Compare total cost for the quantity you need.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which is better value? $11 for 550 g or $20 for 1 kg?",
+        options: ["$11 for 550 g", "$20 for 1 kg", "They are the same"],
+        answer: "$20 for 1 kg",
+        helper: "Per 100 g or per kg both work if the units match.",
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "What is the key idea in a best-buy problem?",
+        options: ["Compare using the same unit", "Pick the cheaper total", "Pick the bigger pack"],
+        answer: "Compare using the same unit",
+        helper: "Unit rates make value comparisons fair.",
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
   if (
     explicitMode === "benchmark_fraction_percent" ||
     explicitMode === "benchmark_closest" ||

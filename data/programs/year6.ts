@@ -393,9 +393,9 @@ const year6Rows: ProgramRow[] = [
     activity: "Compare packs, rates, and offers to decide which option gives better value.",
     curriculum: ["AC9M6N06"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "best_buy_unit_rate" }),
-      makeActivity("multiple_choice", 1, { mode: "best_buy_unit_rate" }),
-      makeActivity("typed_response", 1, { mode: "best_buy_unit_rate" }),
+      makeActivity("typed_response", 1, { mode: "y6_unit_rate_build" }),
+      makeActivity("typed_response", 1, { mode: "y6_unit_rate_compare" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_unit_rate_decide" }),
     ],
   },
   {
