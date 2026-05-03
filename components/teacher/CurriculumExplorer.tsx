@@ -144,11 +144,11 @@ export default function CurriculumExplorer({
                 className={[
                   "group relative px-3.5 py-2 rounded-xl border text-left transition",
                   active
-                    ? "border-teal-300 bg-teal-50 ring-2 ring-teal-200"
+                    ? "border-blue-300 bg-blue-50 ring-2 ring-blue-200"
                     : "border-[#E6E8EC] bg-white hover:border-[#CBD5E1]",
                 ].join(" ")}
               >
-                <div className={`text-sm font-bold ${active ? "text-teal-800" : "text-[#0F172A]"}`}>
+                <div className={`text-sm font-bold ${active ? "text-blue-800" : "text-[#0F172A]"}`}>
                   {g.strand}
                 </div>
                 <div className="text-[11px] font-semibold text-[#64748B] flex items-center gap-1.5">
@@ -184,11 +184,11 @@ export default function CurriculumExplorer({
                   className={[
                     "rounded-xl border px-3 py-2.5 text-left transition",
                     active
-                      ? "border-teal-300 bg-teal-50 ring-2 ring-teal-200"
+                      ? "border-blue-300 bg-blue-50 ring-2 ring-blue-200"
                       : "border-[#E6E8EC] bg-white hover:border-[#CBD5E1]",
                   ].join(" ")}
                 >
-                  <div className={`text-[11px] font-extrabold uppercase tracking-wider ${active ? "text-teal-700" : "text-[#94A3B8]"}`}>
+                  <div className={`text-[11px] font-extrabold uppercase tracking-wider ${active ? "text-blue-700" : "text-[#94A3B8]"}`}>
                     Week {w.week}
                   </div>
                   <div className="text-[12px] font-bold text-[#0F172A] line-clamp-2 leading-snug mt-0.5">
@@ -196,7 +196,7 @@ export default function CurriculumExplorer({
                   </div>
                   <div className="mt-2 h-1.5 rounded-full bg-slate-100 overflow-hidden">
                     <div
-                      className="h-full rounded-full bg-teal-500 transition-all"
+                      className="h-full rounded-full bg-blue-500 transition-all"
                       style={{ width: `${pct}%` }}
                     />
                   </div>
@@ -223,7 +223,7 @@ export default function CurriculumExplorer({
           <div className="bg-white rounded-2xl border border-[#E6E8EC] px-5 py-4">
             <div className="flex items-start justify-between gap-3 flex-wrap">
               <div className="min-w-0">
-                <div className="text-[10px] font-extrabold text-teal-700 uppercase tracking-[0.14em]">
+                <div className="text-[10px] font-extrabold text-blue-700 uppercase tracking-[0.14em]">
                   {genre?.strand} · {genre?.realm}
                 </div>
                 <h2 className="text-xl font-black text-[#0F172A] mt-0.5 tracking-tight">
@@ -271,11 +271,11 @@ export default function CurriculumExplorer({
                   key={lsn.id}
                   type="button"
                   onClick={() => setPreviewLesson(lsn)}
-                  className="text-left bg-white rounded-2xl border border-[#E6E8EC] p-4 flex flex-col gap-3 hover:border-teal-300 hover:shadow-sm transition cursor-pointer"
+                  className="text-left bg-white rounded-2xl border border-[#E6E8EC] p-4 flex flex-col gap-3 hover:border-blue-300 hover:shadow-sm transition cursor-pointer"
                   title="Click to preview lesson content"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="inline-flex items-center justify-center h-7 w-7 rounded-lg bg-teal-50 text-teal-700 text-xs font-black">
+                    <span className="inline-flex items-center justify-center h-7 w-7 rounded-lg bg-blue-50 text-blue-700 text-xs font-black">
                       L{lsn.lesson}
                     </span>
                     <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-amber-700 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-md">
@@ -317,7 +317,7 @@ export default function CurriculumExplorer({
                     <StatusPill label="Help" value={counts.struggling} tone="rose" />
                   </div>
 
-                  <span className="mt-auto w-full px-3 py-2 rounded-lg bg-teal-50 text-teal-700 text-xs font-extrabold text-center border border-teal-100">
+                  <span className="mt-auto w-full px-3 py-2 rounded-lg bg-blue-50 text-blue-700 text-xs font-extrabold text-center border border-blue-100">
                     Preview lesson →
                   </span>
                 </button>
@@ -383,7 +383,7 @@ function StatusPill({
   tone: "teal" | "amber" | "slate" | "rose";
 }) {
   const map = {
-    teal:  "bg-teal-50 text-teal-700 border-teal-100",
+    teal:  "bg-blue-50 text-blue-700 border-blue-100",
     amber: "bg-amber-50 text-amber-700 border-amber-100",
     slate: "bg-slate-50 text-slate-600 border-slate-100",
     rose:  "bg-rose-50 text-rose-700 border-rose-100",
