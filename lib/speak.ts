@@ -10,8 +10,129 @@ let currentAudio: HTMLAudioElement | null = null;
 let currentRequest: AbortController | null = null;
 let activeSpeakToken: symbol | null = null;
 
+const CARDINALS_UNDER_TWENTY = [
+  "zero",
+  "one",
+  "two",
+  "three",
+  "four",
+  "five",
+  "six",
+  "seven",
+  "eight",
+  "nine",
+  "ten",
+  "eleven",
+  "twelve",
+  "thirteen",
+  "fourteen",
+  "fifteen",
+  "sixteen",
+  "seventeen",
+  "eighteen",
+  "nineteen",
+] as const;
+
+const TENS_WORDS = [
+  "",
+  "",
+  "twenty",
+  "thirty",
+  "forty",
+  "fifty",
+  "sixty",
+  "seventy",
+  "eighty",
+  "ninety",
+] as const;
+
+function numberToWords(value: number): string {
+  if (!Number.isFinite(value)) return String(value);
+  if (value < 0) return `negative ${numberToWords(Math.abs(value))}`;
+  if (value < 20) return CARDINALS_UNDER_TWENTY[value] ?? String(value);
+  if (value < 100) {
+    const tens = Math.floor(value / 10);
+    const ones = value % 10;
+    return ones === 0 ? TENS_WORDS[tens] ?? String(value) : `${TENS_WORDS[tens]} ${numberToWords(ones)}`;
+  }
+  if (value < 1000) {
+    const hundreds = Math.floor(value / 100);
+    const remainder = value % 100;
+    return remainder === 0
+      ? `${numberToWords(hundreds)} hundred`
+      : `${numberToWords(hundreds)} hundred and ${numberToWords(remainder)}`;
+  }
+  if (value < 10000) {
+    const thousands = Math.floor(value / 1000);
+    const remainder = value % 1000;
+    return remainder === 0
+      ? `${numberToWords(thousands)} thousand`
+      : `${numberToWords(thousands)} thousand ${numberToWords(remainder)}`;
+  }
+  return String(value);
+}
+
+function ordinalDenominatorWord(denominator: number, plural: boolean) {
+  const map: Record<number, { singular: string; plural: string }> = {
+    2: { singular: "half", plural: "halves" },
+    3: { singular: "third", plural: "thirds" },
+    4: { singular: "quarter", plural: "quarters" },
+    5: { singular: "fifth", plural: "fifths" },
+    6: { singular: "sixth", plural: "sixths" },
+    7: { singular: "seventh", plural: "sevenths" },
+    8: { singular: "eighth", plural: "eighths" },
+    9: { singular: "ninth", plural: "ninths" },
+    10: { singular: "tenth", plural: "tenths" },
+    11: { singular: "eleventh", plural: "elevenths" },
+    12: { singular: "twelfth", plural: "twelfths" },
+    20: { singular: "twentieth", plural: "twentieths" },
+    100: { singular: "hundredth", plural: "hundredths" },
+  };
+
+  const known = map[denominator];
+  if (known) return plural ? known.plural : known.singular;
+
+  const base = numberToWords(denominator);
+  if (base.endsWith("y")) {
+    return `${base.slice(0, -1)}ieth${plural ? "s" : ""}`;
+  }
+  return `${base}${base.endsWith("th") ? "" : "th"}${plural ? "s" : ""}`;
+}
+
+function fractionToSpeech(numeratorText: string, denominatorText: string) {
+  const numerator = Number(numeratorText);
+  const denominator = Number(denominatorText);
+  if (!Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator === 0) {
+    return `${numeratorText} over ${denominatorText}`;
+  }
+
+  const numeratorWords = numberToWords(numerator);
+  const denominatorWords = ordinalDenominatorWord(denominator, Math.abs(numerator) !== 1);
+  return `${numeratorWords} ${denominatorWords}`;
+}
+
+function normalizeMathText(text: string) {
+  let normalized = text;
+
+  normalized = normalized.replace(/(\d+)\s*\/\s*(\d+)/g, (_, numerator, denominator) =>
+    fractionToSpeech(numerator, denominator)
+  );
+
+  normalized = normalized.replace(/(\d+(?:\.\d+)?)%/g, (_, value) => `${numberToWords(Number(value))} percent`);
+
+  normalized = normalized.replace(
+    /([.?!])\s+/g,
+    (_match, punctuation: string) => `${punctuation} ... `
+  );
+
+  normalized = normalized.replace(/ of /gi, " ... of ");
+  normalized = normalized.replace(/\s+/g, " ").trim();
+
+  return normalized;
+}
+
 function normalizeText(text: string) {
-  return text.replace(/\s+/g, " ").trim();
+  return normalizeMathText(text.replace(/\s+/g, " ").trim());
 }
 
 function selectBrowserVoice(synth: SpeechSynthesis) {

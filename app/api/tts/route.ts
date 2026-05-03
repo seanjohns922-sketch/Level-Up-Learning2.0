@@ -6,7 +6,7 @@ const DEFAULT_VOICE = process.env.OPENAI_TTS_VOICE ?? "cedar";
 const DEFAULT_FORMAT = process.env.OPENAI_TTS_FORMAT ?? "wav";
 const DEFAULT_INSTRUCTIONS =
   process.env.OPENAI_TTS_INSTRUCTIONS ??
-  "Speak clearly, warmly, and naturally for an Australian primary school maths lesson. Keep a calm teacher tone and pronounce numbers, fractions, decimals, and percentages carefully.";
+  "Speak clearly, slightly slower than normal, with a warm and encouraging teacher tone. Emphasise key numbers and mathematical words.";
 
 type TtsRequestBody = {
   text?: string;
