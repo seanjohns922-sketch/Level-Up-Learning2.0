@@ -381,6 +381,12 @@ function toExplicitWeeklyQuizQuestion(
         ? question.visual.contextVisual
       : question.visual?.kind === "bestBuyCardComparison"
         ? question.visual.bestBuy
+      : question.visual?.kind === "patternSequenceStrip"
+        ? question.visual.patternSequence
+      : question.visual?.kind === "termPredictorCard"
+        ? question.visual.termPredictor
+      : question.visual?.kind === "reversePatternCard"
+        ? question.visual.reversePattern
       : undefined;
 
   const isFractionTypedAnswer = /\/|\d+\s+\d+\/\d+/.test(correctAnswer);

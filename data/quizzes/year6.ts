@@ -2,6 +2,9 @@ import type {
   BestBuyCardVisualData,
   FractionContextVisualData,
   FractionNumberLineVisualData,
+  PatternSequenceStripVisualData,
+  ReversePatternCardVisualData,
+  TermPredictorCardVisualData,
   IntegerContextVisualData,
   IntegerNumberLineVisualData,
 } from "@/data/activities/year2/lessonEngine";
@@ -39,6 +42,18 @@ export type Year6WeeklyQuizVisual =
   | {
       kind: "bestBuyCardComparison";
       bestBuy: BestBuyCardVisualData;
+    }
+  | {
+      kind: "patternSequenceStrip";
+      patternSequence: PatternSequenceStripVisualData;
+    }
+  | {
+      kind: "termPredictorCard";
+      termPredictor: TermPredictorCardVisualData;
+    }
+  | {
+      kind: "reversePatternCard";
+      reversePattern: ReversePatternCardVisualData;
     };
 
 export type Year6WeeklyQuizQuestion = {
@@ -1894,6 +1909,311 @@ const year6WeeklyQuizWeeks: Record<number, Year6WeeklyQuizWeek> = {
         },
         feedbackCorrect: "Correct — Option A costs $144, Option B costs $108.",
         feedbackIncorrect: "Work out the total cost needed for 12 items before comparing.",
+      },
+    ],
+  },
+  9: {
+    weekNumber: 9,
+    quizTitle: "Week 9 Quiz",
+    weeklyFocus: "Patterns, rules, and sequence prediction",
+    lesson1Title: "Explore Number Patterns",
+    lesson2Title: "Describe Patterns & Relationships",
+    lesson3Title: "Extend & Predict Sequences",
+    questions: [
+      {
+        id: "y6w9q1",
+        lessonTag: 1,
+        questionText: "What is the next number?",
+        answerType: "numeric",
+        correctAnswer: "20",
+        acceptedAnswers: ["20.0"],
+        placeholder: "Type the answer",
+        visual: {
+          kind: "patternSequenceStrip",
+          patternSequence: {
+            type: "pattern_sequence_strip",
+            title: "Explore the Pattern",
+            terms: ["4", "8", "12", "16", "?"],
+            arrowLabels: ["+4", "+4", "+4", null],
+          },
+        },
+        feedbackCorrect: "Correct — the pattern adds 4 each time.",
+        feedbackIncorrect: "Look at the difference between each pair of numbers.",
+      },
+      {
+        id: "y6w9q2",
+        lessonTag: 1,
+        questionText: "What is the next number?",
+        answerType: "numeric",
+        correctAnswer: "19",
+        acceptedAnswers: ["19.0"],
+        placeholder: "Type the answer",
+        visual: {
+          kind: "patternSequenceStrip",
+          patternSequence: {
+            type: "pattern_sequence_strip",
+            title: "Explore the Pattern",
+            terms: ["7", "10", "13", "16", "?"],
+            arrowLabels: ["+3", "+3", "+3", null],
+          },
+        },
+        feedbackCorrect: "Correct — the pattern adds 3 each time.",
+        feedbackIncorrect: "Look at the difference between each pair of numbers.",
+      },
+      {
+        id: "y6w9q3",
+        lessonTag: 1,
+        questionText: "What is happening?",
+        answerType: "multipleChoice",
+        options: ["Add 5", "Double each time", "Add 10"],
+        correctAnswer: "Double each time",
+        visual: {
+          kind: "patternSequenceStrip",
+          patternSequence: {
+            type: "pattern_sequence_strip",
+            title: "Explore the Pattern",
+            terms: ["5", "10", "20", "40"],
+            arrowLabels: [null, null, null],
+          },
+        },
+        feedbackCorrect: "Correct — each term doubles.",
+        feedbackIncorrect: "Try multiplying instead of adding.",
+      },
+      {
+        id: "y6w9q4",
+        lessonTag: 1,
+        questionText: "What is the next number?",
+        answerType: "numeric",
+        correctAnswer: "15",
+        acceptedAnswers: ["15.0"],
+        placeholder: "Type the answer",
+        visual: {
+          kind: "patternSequenceStrip",
+          patternSequence: {
+            type: "pattern_sequence_strip",
+            title: "Explore the Pattern",
+            terms: ["3", "6", "9", "12", "?"],
+            arrowLabels: ["+3", "+3", "+3", null],
+          },
+        },
+        feedbackCorrect: "Correct — the pattern adds 3 each time.",
+        feedbackIncorrect: "Look at the difference between each pair of numbers.",
+      },
+      {
+        id: "y6w9q5",
+        lessonTag: 1,
+        questionText: "What pattern is this?",
+        answerType: "multipleChoice",
+        options: ["Square numbers", "Add 3", "Double"],
+        correctAnswer: "Square numbers",
+        visual: {
+          kind: "patternSequenceStrip",
+          patternSequence: {
+            type: "pattern_sequence_strip",
+            title: "Explore the Pattern",
+            terms: ["1", "4", "9", "16"],
+            arrowLabels: [null, null, null],
+          },
+        },
+        feedbackCorrect: "Correct — these are square numbers.",
+        feedbackIncorrect: "Think 1×1, 2×2, 3×3, 4×4.",
+      },
+      {
+        id: "y6w9q6",
+        lessonTag: 2,
+        questionText: "What is the rule?",
+        answerType: "multipleChoice",
+        options: ["+4 each time", "+5 each time", "×2"],
+        correctAnswer: "+4 each time",
+        visual: {
+          kind: "patternSequenceStrip",
+          patternSequence: {
+            type: "pattern_sequence_strip",
+            title: "Describe the Rule",
+            terms: ["3", "7", "11", "15"],
+            arrowLabels: [null, null, null],
+          },
+        },
+        feedbackCorrect: "Correct — each term increases by 4.",
+        feedbackIncorrect: "Check the difference from one term to the next.",
+      },
+      {
+        id: "y6w9q7",
+        lessonTag: 2,
+        questionText: "What is the next number?",
+        answerType: "numeric",
+        correctAnswer: "48",
+        acceptedAnswers: ["48.0"],
+        placeholder: "Type the answer",
+        visual: {
+          kind: "patternSequenceStrip",
+          patternSequence: {
+            type: "pattern_sequence_strip",
+            title: "Describe the Rule",
+            terms: ["6", "12", "24", "?"],
+            arrowLabels: ["×2", "×2", null],
+          },
+        },
+        feedbackCorrect: "Correct — the pattern doubles each time.",
+        feedbackIncorrect: "Try multiplying rather than adding.",
+      },
+      {
+        id: "y6w9q8",
+        lessonTag: 2,
+        questionText: "Which rule works?",
+        answerType: "multipleChoice",
+        options: ["+6", "×2 + 1", "×3"],
+        correctAnswer: "×2 + 1",
+        visual: {
+          kind: "patternSequenceStrip",
+          patternSequence: {
+            type: "pattern_sequence_strip",
+            title: "Describe the Rule",
+            terms: ["5", "11", "23", "47"],
+            arrowLabels: [null, null, null],
+          },
+        },
+        feedbackCorrect: "Correct — double the term, then add 1.",
+        feedbackIncorrect: "Test the rule on more than one step.",
+      },
+      {
+        id: "y6w9q9",
+        lessonTag: 2,
+        questionText: "What is the next number?",
+        answerType: "numeric",
+        correctAnswer: "-2",
+        acceptedAnswers: ["-2.0"],
+        placeholder: "Type the answer",
+        visual: {
+          kind: "patternSequenceStrip",
+          patternSequence: {
+            type: "pattern_sequence_strip",
+            title: "Describe the Rule",
+            terms: ["10", "7", "4", "1", "?"],
+            arrowLabels: ["−3", "−3", "−3", null],
+          },
+        },
+        feedbackCorrect: "Correct — the pattern subtracts 3 each time.",
+        feedbackIncorrect: "Look at how the sequence changes each step.",
+      },
+      {
+        id: "y6w9q10",
+        lessonTag: 2,
+        questionText: "Which rule describes this?",
+        answerType: "multipleChoice",
+        options: ["×2 + 1", "+3", "×3"],
+        correctAnswer: "×2 + 1",
+        visual: {
+          kind: "patternSequenceStrip",
+          patternSequence: {
+            type: "pattern_sequence_strip",
+            title: "Describe the Rule",
+            terms: ["2", "5", "11", "23"],
+            arrowLabels: [null, null, null],
+          },
+        },
+        feedbackCorrect: "Correct — each term is doubled, then 1 is added.",
+        feedbackIncorrect: "Test the rule on more than one step.",
+      },
+      {
+        id: "y6w9q11",
+        lessonTag: 3,
+        questionText: "Find the next two numbers.",
+        answerType: "numeric",
+        correctAnswer: "17, 20",
+        acceptedAnswers: ["17,20", "17 20", "17 and 20"],
+        placeholder: "Type both numbers",
+        visual: {
+          kind: "patternSequenceStrip",
+          patternSequence: {
+            type: "pattern_sequence_strip",
+            title: "Extend and Predict",
+            terms: ["8", "11", "14", "?", "?"],
+            arrowLabels: ["+3", "+3", "+3", null],
+          },
+        },
+        feedbackCorrect: "Correct — add 3 each time.",
+        feedbackIncorrect: "Look at the difference, then extend it twice.",
+      },
+      {
+        id: "y6w9q12",
+        lessonTag: 3,
+        questionText: "What is the next number?",
+        answerType: "numeric",
+        correctAnswer: "21",
+        acceptedAnswers: ["21.0"],
+        placeholder: "Type the answer",
+        visual: {
+          kind: "patternSequenceStrip",
+          patternSequence: {
+            type: "pattern_sequence_strip",
+            title: "Extend and Predict",
+            terms: ["1", "3", "6", "10", "15", "?"],
+            arrowLabels: ["+2", "+3", "+4", "+5", null],
+          },
+        },
+        feedbackCorrect: "Correct — the jumps increase by 1 each time.",
+        feedbackIncorrect: "Check if the pattern changes.",
+      },
+      {
+        id: "y6w9q13",
+        lessonTag: 3,
+        questionText: "What is the missing first number?",
+        answerType: "numeric",
+        correctAnswer: "35",
+        acceptedAnswers: ["35.0"],
+        placeholder: "Type the answer",
+        visual: {
+          kind: "reversePatternCard",
+          reversePattern: {
+            type: "reverse_pattern_card",
+            title: "Work Backwards",
+            terms: ["?", "30", "25", "20", "15"],
+          },
+        },
+        feedbackCorrect: "Correct — work backwards by adding 5.",
+        feedbackIncorrect: "Work backwards.",
+      },
+      {
+        id: "y6w9q14",
+        lessonTag: 3,
+        questionText: "What is the 8th term?",
+        answerType: "numeric",
+        correctAnswer: "33",
+        acceptedAnswers: ["33.0"],
+        placeholder: "Type the answer",
+        visual: {
+          kind: "termPredictorCard",
+          termPredictor: {
+            type: "term_predictor_card",
+            title: "Term Predictor",
+            start: "5",
+            rule: "Add 4 each time",
+            target: "8th term",
+          },
+        },
+        feedbackCorrect: "Correct — the first term is 5, so there are 7 jumps of +4.",
+        feedbackIncorrect: "The first term already counts as term 1.",
+      },
+      {
+        id: "y6w9q15",
+        lessonTag: 3,
+        questionText: "What is the next number?",
+        answerType: "numeric",
+        correctAnswer: "162",
+        acceptedAnswers: ["162.0"],
+        placeholder: "Type the answer",
+        visual: {
+          kind: "patternSequenceStrip",
+          patternSequence: {
+            type: "pattern_sequence_strip",
+            title: "Extend and Predict",
+            terms: ["2", "6", "18", "54", "?"],
+            arrowLabels: ["×3", "×3", "×3", null],
+          },
+        },
+        feedbackCorrect: "Correct — multiply by 3 each time.",
+        feedbackIncorrect: "Try multiplying.",
       },
     ],
   },
