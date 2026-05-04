@@ -4626,26 +4626,26 @@ function SessionPage() {
               ) : null}
             </div>
 
-            <div className="flex items-center justify-between mb-4 gap-3">
+            <div className="flex items-center justify-between mb-4 gap-3 sticky bottom-2 z-10">
               <button
                 onClick={() => setQuizIndex((i) => Math.max(0, i - 1))}
                 disabled={quizIndex === 0}
                  className={[
-                  "px-4 py-3 rounded-2xl font-bold transition",
+                  "px-4 py-3 rounded-2xl font-bold transition backdrop-blur",
                   quizIndex === 0
                     ? "bg-muted text-muted-foreground cursor-not-allowed"
-                    : "bg-secondary text-secondary-foreground hover:bg-muted",
+                    : "bg-white/80 text-foreground border border-border hover:bg-white",
                 ].join(" ")}
               >
-                Back
+                ← Back
               </button>
 
-              <div className="text-sm text-muted-foreground">
+              <div className="text-xs font-mono uppercase tracking-[0.18em] text-muted-foreground">
               {quizSubmitted
-                  ? `Final Score: ${finalScore}/${quizQuestions.length} (${Math.round(
+                  ? `Score · ${finalScore}/${quizQuestions.length} (${Math.round(
                       (finalScore / Math.max(1, quizQuestions.length)) * 100
                     )}%)`
-                  : "Answer all questions, then submit."}
+                  : `${liveCorrectCount} ✦ collected`}
               </div>
 
               {quizSubmitted ? (
@@ -4681,24 +4681,26 @@ function SessionPage() {
                   }
                   disabled={!currentAnswered}
                    className={[
-                    "px-6 py-3 rounded-2xl font-bold transition",
+                    "px-6 py-3 rounded-2xl font-extrabold transition active:scale-[0.97]",
                     currentAnswered
-                      ? "bg-trust-blue text-white hover:opacity-90"
+                      ? "bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-[0_8px_24px_-10px_rgba(0,229,195,0.7)] hover:brightness-110"
                       : "bg-muted text-muted-foreground cursor-not-allowed",
                   ].join(" ")}
                 >
-                  Next
+                  Next →
                 </button>
               ) : (
                 <button
                   onClick={submitQuiz}
                   disabled={!quizComplete}
                    className={[
-                    "px-6 py-3 rounded-2xl font-bold transition",
-                    quizComplete ? "bg-primary text-primary-foreground hover:opacity-90" : "bg-muted text-muted-foreground cursor-not-allowed",
+                    "px-6 py-3 rounded-2xl font-extrabold transition active:scale-[0.97]",
+                    quizComplete
+                      ? "bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 shadow-[0_8px_24px_-10px_rgba(251,191,36,0.7)] hover:brightness-110"
+                      : "bg-muted text-muted-foreground cursor-not-allowed",
                   ].join(" ")}
                 >
-                  Submit Quiz
+                  Submit ✓
                 </button>
               )}
             </div>
