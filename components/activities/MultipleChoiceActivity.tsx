@@ -19,6 +19,9 @@ import PatternSequenceStripVisual from "@/components/activities/PatternSequenceS
 import GrowingPatternVisual from "@/components/activities/GrowingPatternVisual";
 import ErrorPatternVisual from "@/components/activities/ErrorPatternVisual";
 import FunctionMachineCardVisual from "@/components/activities/FunctionMachineCardVisual";
+import InputOutputTableVisual from "@/components/activities/InputOutputTableVisual";
+import MissingRuleMachineVisual from "@/components/activities/MissingRuleMachineVisual";
+import ReverseMachineCardVisual from "@/components/activities/ReverseMachineCardVisual";
 import RuleBuilderCardVisual from "@/components/activities/RuleBuilderCardVisual";
 import TermPositionCardVisual from "@/components/activities/TermPositionCardVisual";
 import TermPredictorCardVisual from "@/components/activities/TermPredictorCardVisual";
@@ -266,6 +269,15 @@ export default function MultipleChoiceActivity({
       ) : null}
       {questionData.visual?.type === "function_machine_card" ? (
         <FunctionMachineCardVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "input_output_table" ? (
+        <InputOutputTableVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "missing_rule_machine" ? (
+        <MissingRuleMachineVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "reverse_machine_card" ? (
+        <ReverseMachineCardVisual visual={questionData.visual} />
       ) : null}
       {questionData.visual?.type === "rule_builder_card" ? (
         <RuleBuilderCardVisual visual={questionData.visual} />

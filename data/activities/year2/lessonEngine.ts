@@ -3174,6 +3174,29 @@ export type FunctionMachineCardVisualData = {
   output: string;
 };
 
+export type InputOutputTableVisualData = {
+  type: "input_output_table";
+  title: string;
+  pairs: Array<{
+    input: string;
+    output: string;
+  }>;
+};
+
+export type MissingRuleMachineVisualData = {
+  type: "missing_rule_machine";
+  title: string;
+  input: string;
+  output: string;
+};
+
+export type ReverseMachineCardVisualData = {
+  type: "reverse_machine_card";
+  title: string;
+  rule: string;
+  output: string;
+};
+
 export type RuleBuilderCardVisualData = {
   type: "rule_builder_card";
   title: string;
@@ -3265,6 +3288,9 @@ export type MultipleChoiceQuestion = {
     | GrowingPatternVisualData
     | ErrorPatternVisualData
     | FunctionMachineCardVisualData
+    | InputOutputTableVisualData
+    | MissingRuleMachineVisualData
+    | ReverseMachineCardVisualData
     | RuleBuilderCardVisualData
     | TermPositionCardVisualData
     | TermPredictorCardVisualData
@@ -3326,6 +3352,9 @@ export type TypedResponseQuestion = {
     | GrowingPatternVisualData
     | ErrorPatternVisualData
     | FunctionMachineCardVisualData
+    | InputOutputTableVisualData
+    | MissingRuleMachineVisualData
+    | ReverseMachineCardVisualData
     | RuleBuilderCardVisualData
     | TermPositionCardVisualData
     | TermPredictorCardVisualData
@@ -15844,6 +15873,40 @@ function generateGenericQuestion(
     output: String(output),
   });
 
+  const inputOutputTableVisual = (
+    title: string,
+    pairs: Array<{ input: number | string; output: number | string }>
+  ): InputOutputTableVisualData => ({
+    type: "input_output_table",
+    title,
+    pairs: pairs.map((pair) => ({
+      input: String(pair.input),
+      output: String(pair.output),
+    })),
+  });
+
+  const missingRuleMachineVisual = (
+    title: string,
+    input: number | string,
+    output: number | string
+  ): MissingRuleMachineVisualData => ({
+    type: "missing_rule_machine",
+    title,
+    input: String(input),
+    output: String(output),
+  });
+
+  const reverseMachineVisual = (
+    title: string,
+    rule: string,
+    output: number | string
+  ): ReverseMachineCardVisualData => ({
+    type: "reverse_machine_card",
+    title,
+    rule,
+    output: String(output),
+  });
+
   if (explicitMode === "y6_pattern_find_rule") {
     const templates: MultipleChoiceQuestion[] = [
       {
@@ -16558,6 +16621,184 @@ function generateGenericQuestion(
         answer: "202",
         helper: "Use the rule from the sequence one more time.",
         visual: functionMachineVisual("Function Machine", 67, "×3 + 1", "?"),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_function_apply_rule") {
+    const templates: TypedResponseQuestion[] = [
+      {
+        kind: "typed_response",
+        prompt: "What is the output?",
+        answer: "10",
+        acceptedAnswers: ["10.0"],
+        helper: "Apply the rule to the input.",
+        placeholder: "Type the output",
+        inputType: "integer",
+        visual: functionMachineVisual("Function Machine", 6, "+4", "?"),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the output?",
+        answer: "15",
+        acceptedAnswers: ["15.0"],
+        helper: "Try multiplication first.",
+        placeholder: "Type the output",
+        inputType: "integer",
+        visual: functionMachineVisual("Function Machine", 5, "×3", "?"),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the output?",
+        answer: "15",
+        acceptedAnswers: ["15.0"],
+        helper: "Use both steps in order.",
+        placeholder: "Type the output",
+        inputType: "integer",
+        visual: functionMachineVisual("Function Machine", 7, "×2 + 1", "?"),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the output?",
+        answer: "15",
+        acceptedAnswers: ["15.0"],
+        helper: "Multiply first, then subtract.",
+        placeholder: "Type the output",
+        inputType: "integer",
+        visual: functionMachineVisual("Function Machine", 9, "×2 − 3", "?"),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the output?",
+        answer: "14",
+        acceptedAnswers: ["14.0"],
+        helper: "This machine has two steps.",
+        placeholder: "Type the output",
+        inputType: "integer",
+        visual: functionMachineVisual("Function Machine", 4, "×3 + 2", "?"),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_function_find_rule") {
+    const templates: MultipleChoiceQuestion[] = [
+      {
+        kind: "multiple_choice",
+        prompt: "What is the rule?",
+        options: ["+5", "×2 + 3", "×3"],
+        answer: "×2 + 3",
+        helper: "What happens from input to output?",
+        visual: inputOutputTableVisual("Input-Output Table", [
+          { input: 2, output: 7 },
+          { input: 4, output: 11 },
+          { input: 6, output: 15 },
+        ]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "What is the rule?",
+        options: ["×3", "+6", "×2"],
+        answer: "×3",
+        helper: "Check each row with the same rule.",
+        visual: inputOutputTableVisual("Input-Output Table", [
+          { input: 3, output: 9 },
+          { input: 5, output: 15 },
+          { input: 7, output: 21 },
+        ]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which rule works?",
+        options: ["+12", "×3 + 2", "×2 + 7"],
+        answer: "×3 + 2",
+        helper: "Try multiplication first, then addition.",
+        visual: missingRuleMachineVisual("Missing Rule Machine", 5, 17),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Using the same rule, what is the output for input 10?",
+        options: ["30", "32", "34"],
+        answer: "32",
+        helper: "Find the rule first, then apply it to 10.",
+        visual: inputOutputTableVisual("Input-Output Table", [
+          { input: 2, output: 8 },
+          { input: 4, output: 14 },
+          { input: 6, output: 20 },
+        ]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which rule works?",
+        options: ["×2 + 1", "+3", "×3"],
+        answer: "×2 + 1",
+        helper: "Use the same relationship every time.",
+        visual: inputOutputTableVisual("Input-Output Table", [
+          { input: 2, output: 5 },
+          { input: 3, output: 7 },
+          { input: 4, output: 9 },
+        ]),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_function_reverse_generalise") {
+    const templates: TypedResponseQuestion[] = [
+      {
+        kind: "typed_response",
+        prompt: "What was the input?",
+        answer: "14",
+        acceptedAnswers: ["14.0"],
+        helper: "Work backwards.",
+        placeholder: "Type the input",
+        inputType: "integer",
+        visual: reverseMachineVisual("Reverse Machine", "+6", 20),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What was the input?",
+        answer: "9",
+        acceptedAnswers: ["9.0"],
+        helper: "Undo the multiplication.",
+        placeholder: "Type the input",
+        inputType: "integer",
+        visual: reverseMachineVisual("Reverse Machine", "×3", 27),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What was the input?",
+        answer: "10",
+        acceptedAnswers: ["10.0"],
+        helper: "Undo +1, then undo ×2.",
+        placeholder: "Type the input",
+        inputType: "integer",
+        visual: reverseMachineVisual("Reverse Machine", "×2 + 1", 21),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the output for input 8?",
+        answer: "33",
+        acceptedAnswers: ["33.0"],
+        helper: "Find the rule in the table, then use it again.",
+        placeholder: "Type the output",
+        inputType: "integer",
+        visual: inputOutputTableVisual("Input-Output Table", [
+          { input: 1, output: 5 },
+          { input: 2, output: 9 },
+          { input: 3, output: 13 },
+        ]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the output after applying the machine twice?",
+        answer: "25",
+        acceptedAnswers: ["25.0"],
+        helper: "Run the machine, then run it again.",
+        placeholder: "Type the output",
+        inputType: "integer",
+        visual: functionMachineVisual("Repeat the Machine", 4, "×2 + 3", "?"),
       },
     ];
     return templates[randInt(0, templates.length - 1)] ?? templates[0]!;

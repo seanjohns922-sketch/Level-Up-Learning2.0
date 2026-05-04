@@ -460,9 +460,9 @@ const year6Rows: ProgramRow[] = [
     activity: "Apply rules to inputs, outputs, and missing values in function-machine style tasks.",
     curriculum: ["AC9M6N07", "AC9M6N08"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "function_machine_rules" }),
-      makeActivity("multiple_choice", 1, { mode: "function_machine_rules" }),
-      makeActivity("typed_response", 1, { mode: "function_machine_rules" }),
+      makeActivity("typed_response", 1, { mode: "y6_function_apply_rule" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_function_find_rule" }),
+      makeActivity("typed_response", 1, { mode: "y6_function_reverse_generalise" }),
     ],
   },
   {
