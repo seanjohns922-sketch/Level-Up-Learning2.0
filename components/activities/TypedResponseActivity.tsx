@@ -29,6 +29,7 @@ import MissingTableValueCardVisual from "@/components/activities/MissingTableVal
 import OrderedPairBuilderVisual from "@/components/activities/OrderedPairBuilderVisual";
 import TableToPairCardsVisual from "@/components/activities/TableToPairCardsVisual";
 import MiniCoordinatePreviewVisual from "@/components/activities/MiniCoordinatePreviewVisual";
+import CartesianGridVisual from "@/components/activities/CartesianGridVisual";
 import RuleBuilderCardVisual from "@/components/activities/RuleBuilderCardVisual";
 import TermPositionCardVisual from "@/components/activities/TermPositionCardVisual";
 import TermPredictorCardVisual from "@/components/activities/TermPredictorCardVisual";
@@ -2673,6 +2674,9 @@ export default function TypedResponseActivity({
       ) : null}
       {questionData.visual?.type === "mini_coordinate_preview" ? (
         <MiniCoordinatePreviewVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "cartesian_grid" ? (
+        <CartesianGridVisual visual={questionData.visual} />
       ) : null}
       {questionData.visual?.type === "rule_builder_card" ? (
         <RuleBuilderCardVisual visual={questionData.visual} />

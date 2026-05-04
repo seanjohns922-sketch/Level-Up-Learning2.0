@@ -3258,6 +3258,24 @@ export type MiniCoordinatePreviewVisualData = {
   rule?: string;
 };
 
+export type CartesianGridVisualData = {
+  type: "cartesian_grid";
+  title: string;
+  xMin: number;
+  xMax: number;
+  yMin: number;
+  yMax: number;
+  points: Array<{
+    x: number;
+    y: number;
+    label?: string;
+  }>;
+  connectPoints?: boolean;
+  closePath?: boolean;
+  targetCoordinate?: string;
+  subtitle?: string;
+};
+
 export type RuleBuilderCardVisualData = {
   type: "rule_builder_card";
   title: string;
@@ -3358,6 +3376,7 @@ export type MultipleChoiceQuestion = {
     | OrderedPairBuilderVisualData
     | TableToPairCardsVisualData
     | MiniCoordinatePreviewVisualData
+    | CartesianGridVisualData
     | RuleBuilderCardVisualData
     | TermPositionCardVisualData
     | TermPredictorCardVisualData
@@ -3428,6 +3447,7 @@ export type TypedResponseQuestion = {
     | OrderedPairBuilderVisualData
     | TableToPairCardsVisualData
     | MiniCoordinatePreviewVisualData
+    | CartesianGridVisualData
     | RuleBuilderCardVisualData
     | TermPositionCardVisualData
     | TermPredictorCardVisualData
@@ -16068,6 +16088,33 @@ function generateGenericQuestion(
     rule,
   });
 
+  const cartesianGridVisual = (
+    title: string,
+    points: Array<{ x: number; y: number; label?: string }>,
+    options?: {
+      connectPoints?: boolean;
+      closePath?: boolean;
+      targetCoordinate?: string;
+      subtitle?: string;
+      xMin?: number;
+      xMax?: number;
+      yMin?: number;
+      yMax?: number;
+    }
+  ): CartesianGridVisualData => ({
+    type: "cartesian_grid",
+    title,
+    xMin: options?.xMin ?? -5,
+    xMax: options?.xMax ?? 5,
+    yMin: options?.yMin ?? -5,
+    yMax: options?.yMax ?? 5,
+    points,
+    connectPoints: options?.connectPoints,
+    closePath: options?.closePath,
+    targetCoordinate: options?.targetCoordinate,
+    subtitle: options?.subtitle,
+  });
+
   if (explicitMode === "y6_pattern_find_rule") {
     const templates: MultipleChoiceQuestion[] = [
       {
@@ -17386,6 +17433,253 @@ function generateGenericQuestion(
         helper: "Use the rule to find y.",
         placeholder: "Type (x, y)",
         visual: miniCoordinatePreviewVisual("Mini Coordinate Preview", 3, 7, "y = 2x + 1"),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_cartesian_read_plot") {
+    const templates: MultipleChoiceQuestion[] = [
+      {
+        kind: "multiple_choice",
+        prompt: "Which coordinate matches the plotted point?",
+        options: ["(3, 2)", "(2, 3)", "(3, -2)"],
+        answer: "(3, 2)",
+        helper: "Move across first, then up.",
+        visual: cartesianGridVisual("Read & Plot", [{ x: 3, y: 2 }], {
+          subtitle: "One point is shown on the grid.",
+        }),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which coordinate matches the plotted point?",
+        options: ["(-4, 3)", "(4, -3)", "(-3, 4)"],
+        answer: "(-4, 3)",
+        helper: "Left is negative x.",
+        visual: cartesianGridVisual("Read & Plot", [{ x: -4, y: 3 }], {
+          subtitle: "One point is shown on the grid.",
+        }),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "What are the coordinates of the point?",
+        options: ["(5, -2)", "(-5, 2)", "(2, -5)"],
+        answer: "(5, -2)",
+        helper: "Read x first, then y.",
+        visual: cartesianGridVisual("Read & Plot", [{ x: 5, y: -2 }], {
+          subtitle: "One point is shown on the grid.",
+        }),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which coordinate matches this point?",
+        options: ["(-3, -4)", "(-4, -3)", "(3, -4)"],
+        answer: "(-3, -4)",
+        helper: "Check both direction and order.",
+        visual: cartesianGridVisual("Read & Plot", [{ x: -3, y: -4 }], {
+          subtitle: "One point is shown on the grid.",
+        }),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which statement is true?",
+        options: [
+          "x is vertical, y is horizontal",
+          "x is horizontal, y is vertical",
+          "order does not matter",
+        ],
+        answer: "x is horizontal, y is vertical",
+        helper: "x goes across, y goes up and down.",
+        visual: cartesianGridVisual("Axes & Origin", [], {
+          subtitle: "Use the axes to think about direction.",
+        }),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_cartesian_shape_build") {
+    const templates: MultipleChoiceQuestion[] = [
+      {
+        kind: "multiple_choice",
+        prompt: "What shape is formed?",
+        options: ["Square", "Rectangle", "Triangle"],
+        answer: "Square",
+        helper: "Look at the equal side lengths.",
+        visual: cartesianGridVisual(
+          "Coordinate Path Builder",
+          [
+            { x: 1, y: 1 },
+            { x: 4, y: 1 },
+            { x: 4, y: 4 },
+            { x: 1, y: 4 },
+          ],
+          {
+            connectPoints: true,
+            closePath: true,
+            subtitle: "Points connect in order.",
+          }
+        ),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "What shape appears?",
+        options: ["Square", "Rectangle", "Triangle"],
+        answer: "Rectangle",
+        helper: "Check the side lengths.",
+        visual: cartesianGridVisual(
+          "Coordinate Path Builder",
+          [
+            { x: -3, y: 2 },
+            { x: -1, y: 2 },
+            { x: -1, y: 5 },
+            { x: -3, y: 5 },
+          ],
+          {
+            connectPoints: true,
+            closePath: true,
+            subtitle: "Points connect in order.",
+          }
+        ),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "What shape appears?",
+        options: ["Triangle", "Rectangle", "Line"],
+        answer: "Triangle",
+        helper: "Three connected points make the shape.",
+        visual: cartesianGridVisual(
+          "Coordinate Path Builder",
+          [
+            { x: 0, y: 1 },
+            { x: 2, y: 4 },
+            { x: 4, y: 1 },
+          ],
+          {
+            connectPoints: true,
+            closePath: true,
+            subtitle: "Points connect in order.",
+          }
+        ),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Why do we plot points in order?",
+        options: [
+          "To make shapes connect correctly",
+          "It does not matter",
+          "Just for drawing",
+        ],
+        answer: "To make shapes connect correctly",
+        helper: "The order changes the path.",
+        visual: cartesianGridVisual(
+          "Coordinate Path Builder",
+          [
+            { x: -2, y: -1, label: "1" },
+            { x: 2, y: -1, label: "2" },
+            { x: 2, y: 3, label: "3" },
+          ],
+          {
+            connectPoints: true,
+            subtitle: "The path follows the numbered points.",
+          }
+        ),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "What pattern do you see?",
+        options: ["Diagonal line", "Square", "Random"],
+        answer: "Diagonal line",
+        helper: "Notice how x and y increase together.",
+        visual: cartesianGridVisual(
+          "Mystery Picture Grid",
+          [
+            { x: 1, y: 1 },
+            { x: 2, y: 2 },
+            { x: 3, y: 3 },
+            { x: 4, y: 4 },
+          ],
+          {
+            connectPoints: true,
+            subtitle: "Points reveal a visual pattern.",
+          }
+        ),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_cartesian_move_interpret") {
+    const templates: TypedResponseQuestion[] = [
+      {
+        kind: "typed_response",
+        prompt: "Start at (2, 3). Move right 4. Where are you now?",
+        answer: "(6,3)",
+        acceptedAnswers: ["(6, 3)", "6,3", "6 3"],
+        helper: "Only x changes when you move right.",
+        placeholder: "Type (x, y)",
+        visual: cartesianGridVisual("Move on the Grid", [{ x: 2, y: 3 }, { x: 6, y: 3 }], {
+          connectPoints: true,
+          subtitle: "Start point and movement are shown.",
+        }),
+      },
+      {
+        kind: "typed_response",
+        prompt: "Start at (-1, 2). Move down 5. Where are you now?",
+        answer: "(-1,-3)",
+        acceptedAnswers: ["(-1, -3)", "-1,-3", "-1 -3"],
+        helper: "Only y changes when you move down.",
+        placeholder: "Type (x, y)",
+        visual: cartesianGridVisual("Move on the Grid", [{ x: -1, y: 2 }, { x: -1, y: -3 }], {
+          connectPoints: true,
+          subtitle: "Start point and movement are shown.",
+        }),
+      },
+      {
+        kind: "typed_response",
+        prompt: "Start at (4, -2). Move left 8. Where are you now?",
+        answer: "(-4,-2)",
+        acceptedAnswers: ["(-4, -2)", "-4,-2", "-4 -2"],
+        helper: "Moving left changes x into the negatives.",
+        placeholder: "Type (x, y)",
+        visual: cartesianGridVisual("Move on the Grid", [{ x: 4, y: -2 }, { x: -4, y: -2 }], {
+          connectPoints: true,
+          subtitle: "Start point and movement are shown.",
+        }),
+      },
+      {
+        kind: "typed_response",
+        prompt: "A shape has points (1,1), (3,1), (3,3), (1,3). Move it 2 units right. What is the new point for (1,1)?",
+        answer: "(3,1)",
+        acceptedAnswers: ["(3, 1)", "3,1", "3 1"],
+        helper: "Add 2 to the x-value.",
+        placeholder: "Type (x, y)",
+        visual: cartesianGridVisual(
+          "Shift the Shape",
+          [
+            { x: 1, y: 1 },
+            { x: 3, y: 1 },
+            { x: 3, y: 3 },
+            { x: 1, y: 3 },
+          ],
+          {
+            connectPoints: true,
+            closePath: true,
+            subtitle: "Think about how every x-value changes.",
+          }
+        ),
+      },
+      {
+        kind: "typed_response",
+        prompt: "Point (3, 2) moves to (3, 5). Which coordinate changed?",
+        answer: "y",
+        acceptedAnswers: ["y-value", "y value"],
+        helper: "The x-value stayed the same.",
+        placeholder: "Type x or y",
+        visual: cartesianGridVisual("Interpret the Move", [{ x: 3, y: 2 }, { x: 3, y: 5 }], {
+          connectPoints: true,
+          subtitle: "Compare the start and end point.",
+        }),
       },
     ];
     return templates[randInt(0, templates.length - 1)] ?? templates[0]!;

@@ -486,9 +486,9 @@ const year6Rows: ProgramRow[] = [
     activity: "Represent patterns through tables, coordinates, and early graph-style visual relationships.",
     curriculum: ["AC9M6N07", "AC9M6N08"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "rules_tables_spreadsheets" }),
-      makeActivity("multiple_choice", 1, { mode: "rules_tables_spreadsheets" }),
-      makeActivity("typed_response", 1, { mode: "rules_tables_spreadsheets" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_cartesian_read_plot" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_cartesian_shape_build" }),
+      makeActivity("typed_response", 1, { mode: "y6_cartesian_move_interpret" }),
     ],
   },
   {
