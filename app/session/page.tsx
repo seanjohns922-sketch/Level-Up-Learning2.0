@@ -3882,6 +3882,28 @@ function SessionPage() {
       ? quizMoneyAnswers[currentQuiz.id]?.attempted === true
       : typeof quizAnswers[currentQuiz?.id ?? ""] === "number";
 
+  // Live XP / correct counter for the quiz HUD
+  const liveCorrectCount = quizQuestions.reduce(
+    (acc, q) =>
+      acc +
+      (isQuizQuestionCorrect(
+        q,
+        quizAnswers,
+        quizTyped,
+        quizLineAnswers,
+        quizChartDone,
+        quizMabAnswers,
+        quizMoneyAnswers,
+        quizLessonActivityResults
+      )
+        ? 1
+        : 0),
+    0
+  );
+  const progressPct = quizQuestions.length
+    ? Math.round(((quizIndex + 1) / quizQuestions.length) * 100)
+    : 0;
+
   // ---------------------------
   // UI
   // ---------------------------
