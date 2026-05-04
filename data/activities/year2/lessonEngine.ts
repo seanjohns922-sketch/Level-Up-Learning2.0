@@ -3197,6 +3197,28 @@ export type ReverseMachineCardVisualData = {
   output: string;
 };
 
+export type RuleMatchCardsVisualData = {
+  type: "rule_match_cards";
+  title: string;
+  rule: string;
+  tables: Array<{
+    label: string;
+    pairs: Array<{
+      input: string;
+      output: string;
+    }>;
+  }>;
+};
+
+export type ExplainCardVisualData = {
+  type: "explain_card";
+  title: string;
+  pairs: Array<{
+    input: string;
+    output: string;
+  }>;
+};
+
 export type RuleBuilderCardVisualData = {
   type: "rule_builder_card";
   title: string;
@@ -3291,6 +3313,8 @@ export type MultipleChoiceQuestion = {
     | InputOutputTableVisualData
     | MissingRuleMachineVisualData
     | ReverseMachineCardVisualData
+    | RuleMatchCardsVisualData
+    | ExplainCardVisualData
     | RuleBuilderCardVisualData
     | TermPositionCardVisualData
     | TermPredictorCardVisualData
@@ -3355,6 +3379,8 @@ export type TypedResponseQuestion = {
     | InputOutputTableVisualData
     | MissingRuleMachineVisualData
     | ReverseMachineCardVisualData
+    | RuleMatchCardsVisualData
+    | ExplainCardVisualData
     | RuleBuilderCardVisualData
     | TermPositionCardVisualData
     | TermPredictorCardVisualData
@@ -15907,6 +15933,38 @@ function generateGenericQuestion(
     output: String(output),
   });
 
+  const ruleMatchCardsVisual = (
+    title: string,
+    rule: string,
+    tables: Array<{
+      label: string;
+      pairs: Array<{ input: number | string; output: number | string }>;
+    }>
+  ): RuleMatchCardsVisualData => ({
+    type: "rule_match_cards",
+    title,
+    rule,
+    tables: tables.map((table) => ({
+      label: table.label,
+      pairs: table.pairs.map((pair) => ({
+        input: String(pair.input),
+        output: String(pair.output),
+      })),
+    })),
+  });
+
+  const explainCardVisual = (
+    title: string,
+    pairs: Array<{ input: number | string; output: number | string }>
+  ): ExplainCardVisualData => ({
+    type: "explain_card",
+    title,
+    pairs: pairs.map((pair) => ({
+      input: String(pair.input),
+      output: String(pair.output),
+    })),
+  });
+
   if (explicitMode === "y6_pattern_find_rule") {
     const templates: MultipleChoiceQuestion[] = [
       {
@@ -16799,6 +16857,230 @@ function generateGenericQuestion(
         placeholder: "Type the output",
         inputType: "integer",
         visual: functionMachineVisual("Repeat the Machine", 4, "×2 + 3", "?"),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_rule_build") {
+    const templates: MultipleChoiceQuestion[] = [
+      {
+        kind: "multiple_choice",
+        prompt: "Which rule works?",
+        options: ["+4", "×2 + 2", "×3"],
+        answer: "×2 + 2",
+        helper: "Does your rule work for all rows?",
+        visual: inputOutputTableVisual("Build the Rule", [
+          { input: 2, output: 6 },
+          { input: 4, output: 10 },
+          { input: 6, output: 14 },
+        ]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which rule works?",
+        options: ["×3", "+6", "×2"],
+        answer: "×3",
+        helper: "Test the same rule on every row.",
+        visual: inputOutputTableVisual("Build the Rule", [
+          { input: 3, output: 9 },
+          { input: 5, output: 15 },
+          { input: 7, output: 21 },
+        ]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which rule works?",
+        options: ["×2 + 3", "+4", "×3"],
+        answer: "×2 + 3",
+        helper: "Try multiply first, then adjust.",
+        visual: inputOutputTableVisual("Build the Rule", [
+          { input: 1, output: 5 },
+          { input: 2, output: 7 },
+          { input: 3, output: 9 },
+        ]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Check your rule — what is the output?",
+        options: ["17", "18", "19"],
+        answer: "19",
+        helper: "Use the rule on the new input.",
+        visual: functionMachineVisual("Check the Rule", 8, "×2 + 3", "?"),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which rule works?",
+        options: ["×2 + 3", "×4 − 1", "+5"],
+        answer: "×4 − 1",
+        helper: "Try a multi-step rule and test it on more than one row.",
+        visual: inputOutputTableVisual("Build the Rule", [
+          { input: 2, output: 7 },
+          { input: 4, output: 15 },
+          { input: 6, output: 23 },
+        ]),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_rule_match_test") {
+    const templates: MultipleChoiceQuestion[] = [
+      {
+        kind: "multiple_choice",
+        prompt: "Which table matches?",
+        options: ["A", "B", "C"],
+        answer: "A",
+        helper: "Test the rule on each table.",
+        visual: ruleMatchCardsVisual("Match the Rule", "×2 + 1", [
+          {
+            label: "A",
+            pairs: [
+              { input: 2, output: 5 },
+              { input: 4, output: 9 },
+              { input: 6, output: 13 },
+            ],
+          },
+          {
+            label: "B",
+            pairs: [
+              { input: 2, output: 6 },
+              { input: 4, output: 10 },
+            ],
+          },
+          {
+            label: "C",
+            pairs: [
+              { input: 2, output: 4 },
+              { input: 4, output: 8 },
+            ],
+          },
+        ]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which table matches?",
+        options: ["A", "B", "C"],
+        answer: "A",
+        helper: "Which table shows tripling every input?",
+        visual: ruleMatchCardsVisual("Match the Rule", "×3", [
+          {
+            label: "A",
+            pairs: [
+              { input: 3, output: 9 },
+              { input: 5, output: 15 },
+              { input: 7, output: 21 },
+            ],
+          },
+          {
+            label: "B",
+            pairs: [
+              { input: 3, output: 6 },
+              { input: 5, output: 10 },
+            ],
+          },
+          {
+            label: "C",
+            pairs: [
+              { input: 3, output: 12 },
+              { input: 5, output: 20 },
+            ],
+          },
+        ]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which rule works?",
+        options: ["×2 + 3", "+9", "×3 − 3"],
+        answer: "×2 + 3",
+        helper: "What happens from input to output?",
+        visual: functionMachineVisual("Test the Rule", 6, "?", 15),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which statement is true?",
+        options: ["The rule is +3", "The rule is ×2 + 1", "There is no single rule that works for all values"],
+        answer: "There is no single rule that works for all values",
+        helper: "Does one rule fit every row?",
+        visual: inputOutputTableVisual("Test the Rule", [
+          { input: 2, output: 5 },
+          { input: 3, output: 7 },
+          { input: 4, output: 10 },
+        ]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which rule works?",
+        options: ["×4 − 2", "×3 + 2", "+10"],
+        answer: "×4 − 2",
+        helper: "Try multiply first, then adjust.",
+        visual: inputOutputTableVisual("Test the Rule", [
+          { input: 3, output: 10 },
+          { input: 5, output: 18 },
+          { input: 7, output: 26 },
+        ]),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_rule_explain_generalise") {
+    const templates: TypedResponseQuestion[] = [
+      {
+        kind: "typed_response",
+        prompt: "Explain the rule.",
+        answer: "multiply by 2 then add 2",
+        acceptedAnswers: ["times 2 add 2", "x2 + 2", "double then add 2", "multiply by 2 add 2"],
+        helper: "Explain what happens from input to output.",
+        placeholder: "Type a short rule",
+        visual: explainCardVisual("Explain the Rule", [
+          { input: 2, output: 6 },
+          { input: 4, output: 10 },
+          { input: 6, output: 14 },
+        ]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "Explain the rule.",
+        answer: "multiply by 3",
+        acceptedAnswers: ["times 3", "x3", "multiply by 3", "triple"],
+        helper: "Keep the rule short and clear.",
+        placeholder: "Type a short rule",
+        visual: explainCardVisual("Explain the Rule", [
+          { input: 3, output: 9 },
+          { input: 5, output: 15 },
+          { input: 7, output: 21 },
+        ]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "Use the rule.",
+        answer: "23",
+        acceptedAnswers: ["23.0"],
+        helper: "Apply both steps in order.",
+        placeholder: "Type the output",
+        inputType: "integer",
+        visual: functionMachineVisual("Use the Rule", 10, "×2 + 3", "?"),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the output?",
+        answer: "19",
+        acceptedAnswers: ["19.0"],
+        helper: "Multiply first, then subtract.",
+        placeholder: "Type the output",
+        inputType: "integer",
+        visual: functionMachineVisual("Use the Rule", 7, "×3 − 2", "?"),
+      },
+      {
+        kind: "typed_response",
+        prompt: "If the output is 41, what was the input?",
+        answer: "20",
+        acceptedAnswers: ["20.0"],
+        helper: "Work backwards if needed.",
+        placeholder: "Type the input",
+        inputType: "integer",
+        visual: reverseMachineVisual("Reverse the Rule", "×2 + 1", 41),
       },
     ];
     return templates[randInt(0, templates.length - 1)] ?? templates[0]!;

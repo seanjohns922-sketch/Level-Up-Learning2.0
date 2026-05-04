@@ -23,6 +23,8 @@ import FunctionMachineCardVisual from "@/components/activities/FunctionMachineCa
 import InputOutputTableVisual from "@/components/activities/InputOutputTableVisual";
 import MissingRuleMachineVisual from "@/components/activities/MissingRuleMachineVisual";
 import ReverseMachineCardVisual from "@/components/activities/ReverseMachineCardVisual";
+import RuleMatchCardsVisual from "@/components/activities/RuleMatchCardsVisual";
+import ExplainCardVisual from "@/components/activities/ExplainCardVisual";
 import RuleBuilderCardVisual from "@/components/activities/RuleBuilderCardVisual";
 import TermPositionCardVisual from "@/components/activities/TermPositionCardVisual";
 import TermPredictorCardVisual from "@/components/activities/TermPredictorCardVisual";
@@ -2649,6 +2651,12 @@ export default function TypedResponseActivity({
       ) : null}
       {questionData.visual?.type === "reverse_machine_card" ? (
         <ReverseMachineCardVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "rule_match_cards" ? (
+        <RuleMatchCardsVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "explain_card" ? (
+        <ExplainCardVisual visual={questionData.visual} />
       ) : null}
       {questionData.visual?.type === "rule_builder_card" ? (
         <RuleBuilderCardVisual visual={questionData.visual} />

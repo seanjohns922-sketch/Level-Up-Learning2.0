@@ -473,9 +473,9 @@ const year6Rows: ProgramRow[] = [
     activity: "Work backwards and forwards to identify, test, and explain rules.",
     curriculum: ["AC9M6N07", "AC9M6N08"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "build_explain_rules" }),
-      makeActivity("multiple_choice", 1, { mode: "build_explain_rules" }),
-      makeActivity("typed_response", 1, { mode: "build_explain_rules" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_rule_build" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_rule_match_test" }),
+      makeActivity("typed_response", 1, { mode: "y6_rule_explain_generalise" }),
     ],
   },
   {
