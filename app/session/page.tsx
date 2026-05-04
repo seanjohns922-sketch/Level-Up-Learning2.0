@@ -4093,13 +4093,12 @@ function SessionPage() {
             {/* Game-style HUD */}
             {quizQuestions.length ? (
               <div
-                className="mb-4 rounded-2xl border p-4"
+                className="-mx-6 -mt-8 mb-6 border-t border-teal-300/15 px-6 pt-3 pb-4"
                 style={{
                   background:
                     "linear-gradient(135deg, #021716 0%, #042925 55%, #053b35 100%)",
-                  borderColor: "rgba(94,234,212,0.25)",
                   boxShadow:
-                    "inset 0 1px 0 rgba(94,234,212,0.18), 0 6px 18px -10px rgba(0,0,0,0.5)",
+                    "inset 0 1px 0 rgba(94,234,212,0.12), 0 8px 20px -12px rgba(0,0,0,0.55)",
                 }}
               >
                 <div className="flex items-center justify-between gap-3">
