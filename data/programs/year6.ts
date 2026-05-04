@@ -454,7 +454,7 @@ const year6Rows: ProgramRow[] = [
   {
     week: 10,
     weekTopic: "Rules & Function Thinking",
-    focus: "Use input-output rules to see how values change",
+    focus: "Understand input-output relationships",
     lesson: 1,
     topic: "Function Machines",
     activity: "Apply rules to inputs, outputs, and missing values in function-machine style tasks.",
@@ -467,7 +467,7 @@ const year6Rows: ProgramRow[] = [
   },
   {
     week: 10,
-    focus: "Build and explain rules clearly",
+    focus: "Create and describe rules using numbers",
     lesson: 2,
     topic: "Build & Explain Rules",
     activity: "Work backwards and forwards to identify, test, and explain rules.",
@@ -480,10 +480,10 @@ const year6Rows: ProgramRow[] = [
   },
   {
     week: 10,
-    focus: "Generate values in tables and spreadsheet-style rule patterns",
+    focus: "Represent patterns on a coordinate grid",
     lesson: 3,
-    topic: "Generate Patterns Using Rules",
-    activity: "Complete tables, continue rule patterns, and connect rules to organised value sets.",
+    topic: "Tables to Graphs (Cartesian Plane Intro)",
+    activity: "Represent patterns through tables, coordinates, and early graph-style visual relationships.",
     curriculum: ["AC9M6N07", "AC9M6N08"],
     activities: [
       makeActivity("multiple_choice", 1, { mode: "rules_tables_spreadsheets" }),
@@ -494,7 +494,7 @@ const year6Rows: ProgramRow[] = [
   {
     week: 11,
     weekTopic: "Equations & Order of Operations",
-    focus: "Evaluate expressions accurately using operation order",
+    focus: "Apply order of operations correctly",
     lesson: 1,
     topic: "Evaluate Expressions",
     activity: "Use operation order and brackets correctly to evaluate expressions.",
@@ -507,7 +507,7 @@ const year6Rows: ProgramRow[] = [
   },
   {
     week: 11,
-    focus: "Solve simple equations by finding unknown values",
+    focus: "Find unknown values in equations",
     lesson: 2,
     topic: "Solve Simple Equations",
     activity: "Balance inverse operations to solve simple one-step and two-step unknowns.",
@@ -520,10 +520,10 @@ const year6Rows: ProgramRow[] = [
   },
   {
     week: 11,
-    focus: "Use equations in short real contexts",
+    focus: "Read, plot and interpret coordinates across all quadrants",
     lesson: 3,
-    topic: "Equations in Real Contexts",
-    activity: "Interpret short contexts, write or complete equations, and solve for unknown values.",
+    topic: "Coordinates & Movement (4 Quadrants)",
+    activity: "Read, plot, and interpret coordinate positions and movements across the Cartesian plane.",
     curriculum: ["AC9M6N08"],
     activities: [
       makeActivity("multiple_choice", 1, { mode: "equations_real_context" }),
@@ -534,7 +534,7 @@ const year6Rows: ProgramRow[] = [
   {
     week: 12,
     weekTopic: "Mixed Application & Review",
-    focus: "Review the full number program through mixed operations and connected concepts",
+    focus: "Apply all number skills fluently",
     lesson: 1,
     topic: "Mixed Operations Challenge",
     activity: "Build fast accurate fluency across decimals, fractions, percentages, and whole-number operations.",
@@ -548,7 +548,7 @@ const year6Rows: ProgramRow[] = [
   },
   {
     week: 12,
-    focus: "Use number knowledge to complete short real-world modelling tasks",
+    focus: "Apply maths to real-life contexts",
     lesson: 2,
     topic: "Real-World Modelling Project",
     activity: "Combine percentage, rate, and multi-step reasoning in short realistic modelling problems.",
@@ -561,7 +561,7 @@ const year6Rows: ProgramRow[] = [
   },
   {
     week: 12,
-    focus: "Review readiness across the year before the post-test",
+    focus: "Consolidate all learning before assessment",
     lesson: 3,
     topic: "Final Review & Readiness",
     activity: "Tune up fluency, estimation, and mixed calculations before the post-test.",
