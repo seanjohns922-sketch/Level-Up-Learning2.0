@@ -1,11 +1,12 @@
 import type {
+  BestBuyCardVisualData,
   FractionContextVisualData,
   FractionNumberLineVisualData,
   IntegerContextVisualData,
   IntegerNumberLineVisualData,
 } from "@/data/activities/year2/lessonEngine";
 
-export type Year6WeeklyQuizAnswerType = "numeric" | "multipleChoice" | "ordering";
+export type Year6WeeklyQuizAnswerType = "numeric" | "multipleChoice" | "ordering" | "typedShort";
 
 export type Year6WeeklyQuizVisual =
   | {
@@ -34,6 +35,10 @@ export type Year6WeeklyQuizVisual =
   | {
       kind: "integerContext";
       contextVisual: IntegerContextVisualData;
+    }
+  | {
+      kind: "bestBuyCardComparison";
+      bestBuy: BestBuyCardVisualData;
     };
 
 export type Year6WeeklyQuizQuestion = {
@@ -87,7 +92,8 @@ function validateYear6WeeklyQuizQuestion(
   if (
     question.answerType !== "numeric" &&
     question.answerType !== "multipleChoice" &&
-    question.answerType !== "ordering"
+    question.answerType !== "ordering" &&
+    question.answerType !== "typedShort"
   ) {
     throw new Error(`[Year6WeeklyQuiz] ${label} has an invalid answerType.`);
   }
@@ -121,6 +127,12 @@ function validateYear6WeeklyQuizQuestion(
     }
     if (!Array.isArray(question.correctOrder) || question.correctOrder.length !== question.values.length) {
       throw new Error(`[Year6WeeklyQuiz] ${label} must have a valid correctOrder.`);
+    }
+  }
+
+  if (question.answerType === "typedShort") {
+    if (!Array.isArray(question.acceptedAnswers) || question.acceptedAnswers.length === 0) {
+      throw new Error(`[Year6WeeklyQuiz] ${label} typedShort questions must provide acceptedAnswers.`);
     }
   }
 }
@@ -1538,6 +1550,350 @@ const year6WeeklyQuizWeeks: Record<number, Year6WeeklyQuizWeek> = {
         placeholder: "Type a number, fraction, or decimal",
         feedbackCorrect: "Accurate and efficient.",
         feedbackIncorrect: "Use 10% to help.",
+      },
+    ],
+  },
+  8: {
+    weekNumber: 8,
+    quizTitle: "Weekly Quiz",
+    weeklyFocus: "Mathematical Modelling",
+    lesson1Title: "Sales, Discounts & Budgets",
+    lesson2Title: "Best-Buy & Unit Rate Decisions",
+    lesson3Title: "Interpret & Communicate Solutions",
+    questions: [
+      {
+        id: "y6w8q1",
+        lessonTag: 1,
+        questionText: "A jacket costs $80. It is 25% off. What is the sale price?",
+        answerType: "numeric",
+        correctAnswer: "60",
+        acceptedAnswers: ["60.0", "60.00"],
+        placeholder: "Type the answer",
+        feedbackCorrect: "Correct — 25% off means 75% of the price remains.",
+        feedbackIncorrect: "Find 25% of $80, then subtract it from the original price.",
+      },
+      {
+        id: "y6w8q2",
+        lessonTag: 1,
+        questionText: "You have $150. You spend 40%. How much money is left?",
+        answerType: "numeric",
+        correctAnswer: "90",
+        acceptedAnswers: ["90.0", "90.00"],
+        placeholder: "Type the answer",
+        feedbackCorrect: "Correct — 60% of the money remains.",
+        feedbackIncorrect: "If 40% is spent, 60% is left.",
+      },
+      {
+        id: "y6w8q3",
+        lessonTag: 1,
+        questionText: "A student says: “50% off and then another 50% off means the item is free.” Is this correct?",
+        answerType: "multipleChoice",
+        options: ["Yes", "No"],
+        correctAnswer: "No",
+        feedbackCorrect: "Correct — the second 50% is taken from the reduced price, not the original price.",
+        feedbackIncorrect: "Stacked discounts are applied one after the other.",
+      },
+      {
+        id: "y6w8q4",
+        lessonTag: 1,
+        questionText: "A $120 item is discounted by 10%, then another 10%. What is the final price?",
+        answerType: "numeric",
+        correctAnswer: "97.2",
+        acceptedAnswers: ["97.20"],
+        placeholder: "Type the answer",
+        feedbackCorrect: "Correct — $120 becomes $108, then $97.20.",
+        feedbackIncorrect: "Apply the first 10% discount, then apply the second 10% to the new price.",
+      },
+      {
+        id: "y6w8q5",
+        lessonTag: 1,
+        questionText: "Which deal gives the cheaper final price?",
+        answerType: "multipleChoice",
+        options: ["First", "Second", "Same"],
+        correctAnswer: "First",
+        visual: {
+          kind: "bestBuyCardComparison",
+          bestBuy: {
+            type: "best_buy_card_comparison",
+            title: "Deal Comparison",
+            cards: [
+              {
+                label: "First",
+                productName: "Deal A",
+                price: 90,
+                quantityLabel: "30% off",
+                unitRateLabel: "Final price",
+                unitRate: 63,
+                hideUnitRateUntilReveal: true,
+              },
+              {
+                label: "Second",
+                productName: "Deal B",
+                price: 120,
+                quantityLabel: "20% off",
+                unitRateLabel: "Final price",
+                unitRate: 96,
+                hideUnitRateUntilReveal: true,
+              },
+            ],
+          },
+        },
+        feedbackCorrect: "Correct — First becomes $63, Second becomes $96.",
+        feedbackIncorrect: "Compare the final prices, not just the discount percentages.",
+      },
+      {
+        id: "y6w8q6",
+        lessonTag: 2,
+        questionText: "$24 for 6 items. What is the cost per item?",
+        answerType: "numeric",
+        correctAnswer: "4",
+        acceptedAnswers: ["4.0", "4.00"],
+        placeholder: "Type the answer",
+        feedbackCorrect: "Correct — $24 divided by 6 items is $4 each.",
+        feedbackIncorrect: "Find the cost for 1 item.",
+      },
+      {
+        id: "y6w8q7",
+        lessonTag: 2,
+        questionText: "Which pack is better value?",
+        answerType: "multipleChoice",
+        options: ["Pack A", "Pack B", "Same"],
+        correctAnswer: "Pack B",
+        visual: {
+          kind: "bestBuyCardComparison",
+          bestBuy: {
+            type: "best_buy_card_comparison",
+            title: "Best Buy",
+            cards: [
+              {
+                label: "Pack A",
+                productName: "Snack Pack A",
+                price: 45,
+                quantityLabel: "9 bars",
+                unitRateLabel: "Per bar",
+                unitRate: 5,
+                hideUnitRateUntilReveal: true,
+              },
+              {
+                label: "Pack B",
+                productName: "Snack Pack B",
+                price: 64,
+                quantityLabel: "16 bars",
+                unitRateLabel: "Per bar",
+                unitRate: 4,
+                hideUnitRateUntilReveal: true,
+              },
+            ],
+          },
+        },
+        feedbackCorrect: "Correct — Pack A is $5 per bar, Pack B is $4 per bar.",
+        feedbackIncorrect: "Find the cost per bar for each pack.",
+      },
+      {
+        id: "y6w8q8",
+        lessonTag: 2,
+        questionText: "Which method is best for comparing $36 for 12 items and $48 for 16 items?",
+        answerType: "multipleChoice",
+        options: ["Divide to find cost per item", "Compare total prices only", "Choose the larger pack"],
+        correctAnswer: "Divide to find cost per item",
+        feedbackCorrect: "Correct — unit price makes the comparison fair.",
+        feedbackIncorrect: "Different quantities must be compared using the same unit.",
+      },
+      {
+        id: "y6w8q9",
+        lessonTag: 2,
+        questionText: "What is the cost per 100g?",
+        answerType: "numeric",
+        correctAnswer: "1.2",
+        acceptedAnswers: ["1.20"],
+        placeholder: "Type the answer",
+        visual: {
+          kind: "bestBuyCardComparison",
+          bestBuy: {
+            type: "best_buy_card_comparison",
+            title: "Unit Pricing",
+            cards: [
+              {
+                label: "Product",
+                productName: "Granola",
+                price: 9,
+                quantityLabel: "750g",
+                unitRateLabel: "Per 100g",
+                unitRate: 1.2,
+                hideUnitRateUntilReveal: true,
+              },
+            ],
+          },
+        },
+        feedbackCorrect: "Correct — 750g has 7.5 groups of 100g, and $9 ÷ 7.5 = $1.20.",
+        feedbackIncorrect: "Work out how many 100g groups are in 750g, then divide the price by that number.",
+      },
+      {
+        id: "y6w8q10",
+        lessonTag: 2,
+        questionText: "You need 12 drinks. Which option is cheapest?",
+        answerType: "multipleChoice",
+        options: ["Pack A", "Pack B", "Same"],
+        correctAnswer: "Pack A",
+        visual: {
+          kind: "bestBuyCardComparison",
+          bestBuy: {
+            type: "best_buy_card_comparison",
+            title: "Best Buy",
+            cards: [
+              {
+                label: "Pack A",
+                productName: "Sports Drinks A",
+                price: 18,
+                quantityLabel: "6 drinks",
+                unitRateLabel: "Per drink",
+                hideUnitRateUntilReveal: true,
+              },
+              {
+                label: "Pack B",
+                productName: "Sports Drinks B",
+                price: 14,
+                quantityLabel: "4 drinks",
+                unitRateLabel: "Per drink",
+                hideUnitRateUntilReveal: true,
+              },
+            ],
+          },
+        },
+        feedbackCorrect: "Correct — two Pack A packs cost $36. Three Pack B packs cost $42.",
+        feedbackIncorrect: "Work out how many packs are needed to make 12 drinks, then compare total cost.",
+      },
+      {
+        id: "y6w8q11",
+        lessonTag: 3,
+        questionText: "What conclusion should you make?",
+        answerType: "multipleChoice",
+        options: ["First is better", "Second is better", "Same value"],
+        correctAnswer: "Same value",
+        visual: {
+          kind: "bestBuyCardComparison",
+          bestBuy: {
+            type: "best_buy_card_comparison",
+            title: "Interpret the Cards",
+            cards: [
+              {
+                label: "First",
+                productName: "Battery Pack A",
+                price: 48,
+                quantityLabel: "8 batteries",
+                unitRateLabel: "Per battery",
+                unitRate: 6,
+                hideUnitRateUntilReveal: true,
+              },
+              {
+                label: "Second",
+                productName: "Battery Pack B",
+                price: 72,
+                quantityLabel: "12 batteries",
+                unitRateLabel: "Per battery",
+                unitRate: 6,
+                hideUnitRateUntilReveal: true,
+              },
+            ],
+          },
+        },
+        feedbackCorrect: "Correct — both packs cost $6 per battery.",
+        feedbackIncorrect: "Compare cost per battery, not total price.",
+      },
+      {
+        id: "y6w8q12",
+        lessonTag: 3,
+        questionText: "Why do we compare “per item” when packs have different quantities?",
+        answerType: "multipleChoice",
+        options: ["It makes the numbers bigger", "It makes the comparison fair", "It avoids division"],
+        correctAnswer: "It makes the comparison fair",
+        feedbackCorrect: "Correct — unit rates compare the same amount.",
+        feedbackIncorrect: "Unit rates help compare different quantities fairly.",
+      },
+      {
+        id: "y6w8q13",
+        lessonTag: 3,
+        questionText: "Why can total price alone be misleading?",
+        answerType: "typedShort",
+        correctAnswer: "different quantities",
+        acceptedAnswers: ["different quantities", "not fair", "per item", "same unit", "unit price"],
+        placeholder: "Type a short explanation",
+        feedbackCorrect: "Correct — total price alone ignores quantity.",
+        feedbackIncorrect: "Think about why a larger pack might cost more but still be better value.",
+      },
+      {
+        id: "y6w8q14",
+        lessonTag: 3,
+        questionText: "Which is better value?",
+        answerType: "multipleChoice",
+        options: ["First", "Second", "Same"],
+        correctAnswer: "First",
+        visual: {
+          kind: "bestBuyCardComparison",
+          bestBuy: {
+            type: "best_buy_card_comparison",
+            title: "Best Buy",
+            cards: [
+              {
+                label: "First",
+                productName: "Snack Pack A",
+                price: 20,
+                quantityLabel: "5 snacks",
+                unitRateLabel: "Per snack",
+                unitRate: 4,
+                hideUnitRateUntilReveal: true,
+              },
+              {
+                label: "Second",
+                productName: "Snack Pack B",
+                price: 36,
+                quantityLabel: "8 snacks",
+                unitRateLabel: "Per snack",
+                unitRate: 4.5,
+                hideUnitRateUntilReveal: true,
+              },
+            ],
+          },
+        },
+        feedbackCorrect: "Correct — First is $4 per snack. Second is $4.50 per snack.",
+        feedbackIncorrect: "Find the cost per snack for both options.",
+      },
+      {
+        id: "y6w8q15",
+        lessonTag: 3,
+        questionText: "Which option is better value?",
+        answerType: "multipleChoice",
+        options: ["Option A", "Option B", "Same"],
+        correctAnswer: "Option B",
+        visual: {
+          kind: "bestBuyCardComparison",
+          bestBuy: {
+            type: "best_buy_card_comparison",
+            title: "Class Pack Decision",
+            cards: [
+              {
+                label: "Option A",
+                productName: "Class Pack A",
+                price: 48,
+                quantityLabel: "4 items per pack",
+                unitRateLabel: "Total for 12 items",
+                unitRate: 144,
+                hideUnitRateUntilReveal: true,
+              },
+              {
+                label: "Option B",
+                productName: "Class Pack B",
+                price: 54,
+                quantityLabel: "6 items per pack",
+                unitRateLabel: "Total for 12 items",
+                unitRate: 108,
+                hideUnitRateUntilReveal: true,
+              },
+            ],
+          },
+        },
+        feedbackCorrect: "Correct — Option A costs $144, Option B costs $108.",
+        feedbackIncorrect: "Work out the total cost needed for 12 items before comparing.",
       },
     ],
   },

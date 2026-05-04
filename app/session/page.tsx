@@ -379,6 +379,8 @@ function toExplicitWeeklyQuizQuestion(
         ? question.visual.fractionContext
       : question.visual?.kind === "integerContext"
         ? question.visual.contextVisual
+      : question.visual?.kind === "bestBuyCardComparison"
+        ? question.visual.bestBuy
       : undefined;
 
   const isFractionTypedAnswer = /\/|\d+\s+\d+\/\d+/.test(correctAnswer);
@@ -407,7 +409,7 @@ function toExplicitWeeklyQuizQuestion(
   }
 
   if (mappedVisual) {
-    if (question.answerType === "numeric") {
+    if (question.answerType === "numeric" || question.answerType === "typedShort") {
       return {
         ...lessonMeta,
         activityType: "typed_response",
@@ -417,8 +419,9 @@ function toExplicitWeeklyQuizQuestion(
           kind: "typed_response",
           prompt,
           answer: correctAnswer,
+          acceptedAnswers: question.acceptedAnswers,
           helper: question.feedbackIncorrect,
-          placeholder: question.placeholder ?? "Type the integer",
+          placeholder: question.placeholder ?? "Type the answer",
           inputType: typedInputType,
           visual: mappedVisual,
         },
@@ -497,6 +500,30 @@ function toExplicitWeeklyQuizQuestion(
       responseType:
         typedInputType === "integer" || (!typedInputType && !isFractionTypedAnswer) ? "number" : undefined,
       placeholder: question.placeholder ?? "Type the integer",
+    };
+  }
+
+  if (question.answerType === "typedShort") {
+    return {
+      ...lessonMeta,
+      activityType: "typed_response",
+      kind: "lessonActivity",
+      prompt,
+      questionData: {
+        kind: "typed_response",
+        prompt,
+        answer: correctAnswer,
+        acceptedAnswers: question.acceptedAnswers,
+        helper: question.feedbackIncorrect,
+        placeholder: question.placeholder ?? "Type a short explanation",
+      },
+      activity: {
+        activityType: "typed_response",
+        weight: 1,
+        config: {},
+      },
+      feedbackCorrect: question.feedbackCorrect,
+      feedbackIncorrect: question.feedbackIncorrect,
     };
   }
 
