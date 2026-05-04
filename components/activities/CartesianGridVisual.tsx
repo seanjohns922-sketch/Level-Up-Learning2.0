@@ -58,14 +58,14 @@ export default function CartesianGridVisual({
           <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="h-[320px] w-[320px]">
             <defs>
               <pattern id="gridPattern" width={(SIZE - PADDING * 2) / (visual.xMax - visual.xMin)} height={(SIZE - PADDING * 2) / (visual.yMax - visual.yMin)} patternUnits="userSpaceOnUse">
-                <path d={`M ${(SIZE - PADDING * 2) / (visual.xMax - visual.xMin)} 0 L 0 0 0 ${(SIZE - PADDING * 2) / (visual.yMax - visual.yMin)}`} fill="none" stroke="rgba(148,163,184,0.22)" strokeWidth="1" />
+                <path d={`M ${(SIZE - PADDING * 2) / (visual.xMax - visual.xMin)} 0 L 0 0 0 ${(SIZE - PADDING * 2) / (visual.yMax - visual.yMin)}`} fill="none" stroke="rgba(186,230,253,0.45)" strokeWidth="1.2" />
               </pattern>
             </defs>
 
             <rect x={PADDING} y={PADDING} width={SIZE - PADDING * 2} height={SIZE - PADDING * 2} fill="url(#gridPattern)" rx="18" />
 
-            <line x1={PADDING} y1={zeroY} x2={SIZE - PADDING} y2={zeroY} stroke="rgba(34,211,238,0.8)" strokeWidth="2.5" />
-            <line x1={zeroX} y1={PADDING} x2={zeroX} y2={SIZE - PADDING} stroke="rgba(34,211,238,0.8)" strokeWidth="2.5" />
+            <line x1={PADDING} y1={zeroY} x2={SIZE - PADDING} y2={zeroY} stroke="rgba(103,232,249,1)" strokeWidth="3" />
+            <line x1={zeroX} y1={PADDING} x2={zeroX} y2={SIZE - PADDING} stroke="rgba(103,232,249,1)" strokeWidth="3" />
 
             {xTicks.map((tick) => {
               const x = toSvgX(tick, visual.xMin, visual.xMax);
