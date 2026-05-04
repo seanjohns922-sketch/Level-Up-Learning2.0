@@ -24,6 +24,10 @@ import MissingRuleMachineVisual from "@/components/activities/MissingRuleMachine
 import ReverseMachineCardVisual from "@/components/activities/ReverseMachineCardVisual";
 import RuleMatchCardsVisual from "@/components/activities/RuleMatchCardsVisual";
 import ExplainCardVisual from "@/components/activities/ExplainCardVisual";
+import MissingTableValueCardVisual from "@/components/activities/MissingTableValueCardVisual";
+import OrderedPairBuilderVisual from "@/components/activities/OrderedPairBuilderVisual";
+import TableToPairCardsVisual from "@/components/activities/TableToPairCardsVisual";
+import MiniCoordinatePreviewVisual from "@/components/activities/MiniCoordinatePreviewVisual";
 import RuleBuilderCardVisual from "@/components/activities/RuleBuilderCardVisual";
 import TermPositionCardVisual from "@/components/activities/TermPositionCardVisual";
 import TermPredictorCardVisual from "@/components/activities/TermPredictorCardVisual";
@@ -286,6 +290,18 @@ export default function MultipleChoiceActivity({
       ) : null}
       {questionData.visual?.type === "explain_card" ? (
         <ExplainCardVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "missing_table_value_card" ? (
+        <MissingTableValueCardVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "ordered_pair_builder" ? (
+        <OrderedPairBuilderVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "table_to_pair_cards" ? (
+        <TableToPairCardsVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "mini_coordinate_preview" ? (
+        <MiniCoordinatePreviewVisual visual={questionData.visual} />
       ) : null}
       {questionData.visual?.type === "rule_builder_card" ? (
         <RuleBuilderCardVisual visual={questionData.visual} />

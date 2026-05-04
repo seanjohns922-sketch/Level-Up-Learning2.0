@@ -3219,6 +3219,45 @@ export type ExplainCardVisualData = {
   }>;
 };
 
+export type MissingTableValueCardVisualData = {
+  type: "missing_table_value_card";
+  title: string;
+  rule: string;
+  pairs: Array<{
+    input: string;
+    output: string;
+    isMissing?: boolean;
+  }>;
+};
+
+export type OrderedPairBuilderVisualData = {
+  type: "ordered_pair_builder";
+  title: string;
+  xValue: string;
+  yValue: string;
+};
+
+export type TableToPairCardsVisualData = {
+  type: "table_to_pair_cards";
+  title: string;
+  pairs?: Array<{
+    input: string;
+    output: string;
+  }>;
+  highlighted: {
+    input: string;
+    output: string;
+  };
+};
+
+export type MiniCoordinatePreviewVisualData = {
+  type: "mini_coordinate_preview";
+  title: string;
+  xValue: string;
+  yValue: string;
+  rule?: string;
+};
+
 export type RuleBuilderCardVisualData = {
   type: "rule_builder_card";
   title: string;
@@ -3315,6 +3354,10 @@ export type MultipleChoiceQuestion = {
     | ReverseMachineCardVisualData
     | RuleMatchCardsVisualData
     | ExplainCardVisualData
+    | MissingTableValueCardVisualData
+    | OrderedPairBuilderVisualData
+    | TableToPairCardsVisualData
+    | MiniCoordinatePreviewVisualData
     | RuleBuilderCardVisualData
     | TermPositionCardVisualData
     | TermPredictorCardVisualData
@@ -3381,6 +3424,10 @@ export type TypedResponseQuestion = {
     | ReverseMachineCardVisualData
     | RuleMatchCardsVisualData
     | ExplainCardVisualData
+    | MissingTableValueCardVisualData
+    | OrderedPairBuilderVisualData
+    | TableToPairCardsVisualData
+    | MiniCoordinatePreviewVisualData
     | RuleBuilderCardVisualData
     | TermPositionCardVisualData
     | TermPredictorCardVisualData
@@ -15965,6 +16012,62 @@ function generateGenericQuestion(
     })),
   });
 
+  const missingTableValueVisual = (
+    title: string,
+    rule: string,
+    pairs: Array<{ input: number | string; output: number | string; isMissing?: boolean }>
+  ): MissingTableValueCardVisualData => ({
+    type: "missing_table_value_card",
+    title,
+    rule,
+    pairs: pairs.map((pair) => ({
+      input: String(pair.input),
+      output: String(pair.output),
+      isMissing: pair.isMissing,
+    })),
+  });
+
+  const orderedPairBuilderVisual = (
+    title: string,
+    xValue: number | string,
+    yValue: number | string
+  ): OrderedPairBuilderVisualData => ({
+    type: "ordered_pair_builder",
+    title,
+    xValue: String(xValue),
+    yValue: String(yValue),
+  });
+
+  const tableToPairCardsVisual = (
+    title: string,
+    highlighted: { input: number | string; output: number | string },
+    pairs?: Array<{ input: number | string; output: number | string }>
+  ): TableToPairCardsVisualData => ({
+    type: "table_to_pair_cards",
+    title,
+    highlighted: {
+      input: String(highlighted.input),
+      output: String(highlighted.output),
+    },
+    pairs: pairs?.map((pair) => ({
+      input: String(pair.input),
+      output: String(pair.output),
+    })),
+  });
+
+  const miniCoordinatePreviewVisual = (
+    title: string,
+    xValue: number | string,
+    yValue: number | string,
+    rule?: string
+  ): MiniCoordinatePreviewVisualData => ({
+    type: "mini_coordinate_preview",
+    title,
+    xValue: String(xValue),
+    yValue: String(yValue),
+    rule,
+  });
+
   if (explicitMode === "y6_pattern_find_rule") {
     const templates: MultipleChoiceQuestion[] = [
       {
@@ -17081,6 +17184,208 @@ function generateGenericQuestion(
         placeholder: "Type the input",
         inputType: "integer",
         visual: reverseMachineVisual("Reverse the Rule", "×2 + 1", 41),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_tables_read_complete") {
+    const templates: TypedResponseQuestion[] = [
+      {
+        kind: "typed_response",
+        prompt: "What is the missing output?",
+        answer: "8",
+        acceptedAnswers: ["8.0"],
+        helper: "Use the rule to find y.",
+        placeholder: "Type the answer",
+        inputType: "integer",
+        visual: missingTableValueVisual("Complete the Table", "y = x + 5", [
+          { input: 1, output: 6 },
+          { input: 2, output: 7 },
+          { input: 3, output: "?", isMissing: true },
+          { input: 4, output: 9 },
+        ]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the missing output?",
+        answer: "12",
+        acceptedAnswers: ["12.0"],
+        helper: "The output is double the input.",
+        placeholder: "Type the answer",
+        inputType: "integer",
+        visual: missingTableValueVisual("Complete the Table", "y = 2x", [
+          { input: 2, output: 4 },
+          { input: 4, output: 8 },
+          { input: 6, output: "?", isMissing: true },
+          { input: 8, output: 16 },
+        ]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the missing output?",
+        answer: "10",
+        acceptedAnswers: ["10.0"],
+        helper: "Multiply x by 3, then add 1.",
+        placeholder: "Type the answer",
+        inputType: "integer",
+        visual: missingTableValueVisual("Complete the Table", "y = 3x + 1", [
+          { input: 1, output: 4 },
+          { input: 2, output: 7 },
+          { input: 3, output: "?", isMissing: true },
+          { input: 4, output: 13 },
+        ]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the missing output?",
+        answer: "18",
+        acceptedAnswers: ["18.0"],
+        helper: "Use the rule y = 4x − 2.",
+        placeholder: "Type the answer",
+        inputType: "integer",
+        visual: missingTableValueVisual("Complete the Table", "y = 4x − 2", [
+          { input: 1, output: 2 },
+          { input: 2, output: 6 },
+          { input: 3, output: 10 },
+          { input: 5, output: "?", isMissing: true },
+        ]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "Use the rule to find the missing output.",
+        answer: "16",
+        acceptedAnswers: ["16.0"],
+        helper: "Use the rule y = 3x − 2.",
+        placeholder: "Type the answer",
+        inputType: "integer",
+        visual: missingTableValueVisual("Complete the Table", "y = 3x − 2", [
+          { input: 1, output: 1 },
+          { input: 2, output: 4 },
+          { input: 3, output: 7 },
+          { input: 6, output: "?", isMissing: true },
+        ]),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_tables_build_pairs") {
+    const templates: MultipleChoiceQuestion[] = [
+      {
+        kind: "multiple_choice",
+        prompt: "Which ordered pair matches the row?",
+        options: ["(2, 7)", "(7, 2)", "(2, 5)"],
+        answer: "(2, 7)",
+        helper: "Ordered pairs are written as (x, y).",
+        visual: tableToPairCardsVisual("Table to Ordered Pair", { input: 2, output: 7 }),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which ordered pair matches the row?",
+        options: ["(13, 4)", "(4, 13)", "(4, 9)"],
+        answer: "(4, 13)",
+        helper: "Do not swap x and y.",
+        visual: tableToPairCardsVisual("Table to Ordered Pair", { input: 4, output: 13 }),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which point would this become?",
+        options: ["(3, 9)", "(9, 3)", "(4, 12)"],
+        answer: "(3, 9)",
+        helper: "Use x first, then y.",
+        visual: tableToPairCardsVisual(
+          "Table to Ordered Pair",
+          { input: 3, output: 9 },
+          [
+            { input: 1, output: 3 },
+            { input: 2, output: 6 },
+            { input: 3, output: 9 },
+            { input: 4, output: 12 },
+          ]
+        ),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which statement is true?",
+        options: [
+          "(2, 8) means x = 2 and y = 8",
+          "(2, 8) means x = 8 and y = 2",
+          "The order does not matter",
+        ],
+        answer: "(2, 8) means x = 2 and y = 8",
+        helper: "The order matters: (x, y).",
+        visual: tableToPairCardsVisual("Ordered Pair Meaning", { input: 2, output: 8 }),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which rule matches the table?",
+        options: ["y = 5x + 1", "y = x + 5", "y = 4x + 2"],
+        answer: "y = 5x + 1",
+        helper: "Test the rule on more than one row.",
+        visual: inputOutputTableVisual("Match the Rule", [
+          { input: 1, output: 6 },
+          { input: 2, output: 11 },
+          { input: 3, output: 16 },
+          { input: 4, output: 21 },
+        ]),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_tables_points_preview") {
+    const templates: TypedResponseQuestion[] = [
+      {
+        kind: "typed_response",
+        prompt: "Write the ordered pair.",
+        answer: "(5, 17)",
+        acceptedAnswers: ["(5,17)", "5,17", "5 17"],
+        helper: "Ordered pairs are written as (x, y).",
+        placeholder: "Type (x, y)",
+        visual: orderedPairBuilderVisual("Build the Ordered Pair", 5, 17),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the output when x = 6?",
+        answer: "16",
+        acceptedAnswers: ["16.0"],
+        helper: "Use the rule to find y.",
+        placeholder: "Type the answer",
+        inputType: "integer",
+        visual: missingTableValueVisual("Table to Point", "y = 3x − 2", [
+          { input: 1, output: 1 },
+          { input: 2, output: 4 },
+          { input: 3, output: 7 },
+          { input: 6, output: "?", isMissing: true },
+        ]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "Find y and write the ordered pair.",
+        answer: "(5, 19)",
+        acceptedAnswers: ["(5,19)", "5,19", "5 19"],
+        helper: "Find y first, then write (x, y).",
+        placeholder: "Type (x, y)",
+        visual: orderedPairBuilderVisual("Build the Ordered Pair", 5, 19),
+      },
+      {
+        kind: "typed_response",
+        prompt: "Write the point.",
+        answer: "(1, 4)",
+        acceptedAnswers: ["(1,4)", "1,4", "1 4"],
+        helper: "x comes first.",
+        placeholder: "Type (x, y)",
+        visual: miniCoordinatePreviewVisual("Mini Coordinate Preview", 1, 4),
+      },
+      {
+        kind: "typed_response",
+        prompt: "First find y. Then write the point.",
+        answer: "(3, 7)",
+        acceptedAnswers: ["(3,7)", "3,7", "3 7"],
+        helper: "Use the rule to find y.",
+        placeholder: "Type (x, y)",
+        visual: miniCoordinatePreviewVisual("Mini Coordinate Preview", 3, 7, "y = 2x + 1"),
       },
     ];
     return templates[randInt(0, templates.length - 1)] ?? templates[0]!;

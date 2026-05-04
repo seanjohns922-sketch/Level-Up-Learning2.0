@@ -467,15 +467,15 @@ const year6Rows: ProgramRow[] = [
   },
   {
     week: 10,
-    focus: "Create and describe rules using numbers",
+    focus: "Represent input-output rules in tables and ordered pairs",
     lesson: 2,
-    topic: "Build & Explain Rules",
-    activity: "Work backwards and forwards to identify, test, and explain rules.",
+    topic: "Tables & Ordered Pairs",
+    activity: "Read tables, complete outputs, and turn rows into ordered pairs that prepare for graphing.",
     curriculum: ["AC9M6N07", "AC9M6N08"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "y6_rule_build" }),
-      makeActivity("multiple_choice", 1, { mode: "y6_rule_match_test" }),
-      makeActivity("typed_response", 1, { mode: "y6_rule_explain_generalise" }),
+      makeActivity("typed_response", 1, { mode: "y6_tables_read_complete" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_tables_build_pairs" }),
+      makeActivity("typed_response", 1, { mode: "y6_tables_points_preview" }),
     ],
   },
   {
