@@ -3174,6 +3174,22 @@ export type FunctionMachineCardVisualData = {
   output: string;
 };
 
+export type RuleBuilderCardVisualData = {
+  type: "rule_builder_card";
+  title: string;
+  terms: string[];
+  promptLabel?: string;
+};
+
+export type TermPositionCardVisualData = {
+  type: "term_position_card";
+  title: string;
+  pairs: Array<{
+    term: string;
+    value: string;
+  }>;
+};
+
 export type MultiStepMethodVisualData = {
   type: "multi_step_method";
   title: string;
@@ -3235,6 +3251,8 @@ export type MultipleChoiceQuestion = {
     | GrowingPatternVisualData
     | ErrorPatternVisualData
     | FunctionMachineCardVisualData
+    | RuleBuilderCardVisualData
+    | TermPositionCardVisualData
     | RuleBoxVisualData;
 };
 
@@ -3292,6 +3310,8 @@ export type TypedResponseQuestion = {
     | GrowingPatternVisualData
     | ErrorPatternVisualData
     | FunctionMachineCardVisualData
+    | RuleBuilderCardVisualData
+    | TermPositionCardVisualData
     | {
         type: "numeric_input_only";
       }
@@ -16129,6 +16149,397 @@ function generateGenericQuestion(
         answer: "Each term is a square number",
         helper: "Think about how each term can be built.",
         visual: patternSequenceStrip("Square Pattern", [1, 4, 9, 16, "..."], [null, null, null, null]),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  const ruleBuilderVisual = (
+    title: string,
+    terms: Array<number | string>,
+    promptLabel?: string
+  ): RuleBuilderCardVisualData => ({
+    type: "rule_builder_card",
+    title,
+    terms: terms.map((term) => String(term)),
+    promptLabel,
+  });
+
+  const termPositionVisual = (
+    title: string,
+    pairs: Array<{ term: number | string; value: number | string }>
+  ): TermPositionCardVisualData => ({
+    type: "term_position_card",
+    title,
+    pairs: pairs.map((pair) => ({
+      term: String(pair.term),
+      value: String(pair.value),
+    })),
+  });
+
+  if (explicitMode === "y6_pattern_describe_rule") {
+    const templates: MultipleChoiceQuestion[] = [
+      {
+        kind: "multiple_choice",
+        prompt: "Build the rule.",
+        options: ["+5", "+4", "×2"],
+        answer: "+5",
+        helper: "Check the difference between terms.",
+        visual: ruleBuilderVisual("Rule Builder", [4, 9, 14, 19, "?"], "Rule"),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which rule describes this pattern?",
+        options: ["×3 + 1", "×2 + 4", "+7 each time"],
+        answer: "×3 + 1",
+        helper: "Test the jump from 10 to 31.",
+        visual: patternSequenceStrip("Describe the Rule", [3, 10, 31, 94, "?"], [null, null, null, null]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Build the rule.",
+        options: ["×3", "+12", "×2"],
+        answer: "×3",
+        helper: "Check whether each term is scaled.",
+        visual: ruleBuilderVisual("Rule Builder", [2, 6, 18, 54, "?"], "Rule"),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which rule is correct?",
+        options: ["×2 + 1", "+6 each time", "×3"],
+        answer: "×2 + 1",
+        helper: "Use more than one step to test it.",
+        visual: patternSequenceStrip("Describe the Rule", [5, 11, 23, 47, "?"], [null, null, null, null]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "How would you describe this pattern?",
+        options: ["Square numbers", "Add 3 each time", "Double each time"],
+        answer: "Square numbers",
+        helper: "Think about how each term is built.",
+        visual: patternSequenceStrip("Describe the Rule", [1, 4, 9, 16, 25, "?"], [null, null, null, null, null]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Build the rule.",
+        options: ["−8", "÷2", "+8"],
+        answer: "−8",
+        helper: "Watch the direction and size of change.",
+        visual: ruleBuilderVisual("Rule Builder", [50, 42, 34, 26, "?"], "Rule"),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which rule describes this pattern?",
+        options: ["×4 − 1", "×3 + 2", "+15 each time"],
+        answer: "×4 − 1",
+        helper: "Check the jump from 11 to 43.",
+        visual: patternSequenceStrip("Describe the Rule", [3, 11, 43, 171, "?"], [null, null, null, null]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Build the rule.",
+        options: ["+0.5", "×0.5", "+5"],
+        answer: "+0.5",
+        helper: "Look at the exact difference each time.",
+        visual: ruleBuilderVisual("Rule Builder", [1.5, 2.0, 2.5, 3.0, "?"], "Rule"),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which rule is correct?",
+        options: ["Add increasing numbers", "Add 4 each time", "Double each time"],
+        answer: "Add increasing numbers",
+        helper: "Look at the gaps between terms.",
+        visual: patternSequenceStrip("Describe the Rule", [2, 5, 9, 14, 20, "?"], ["+3", "+4", "+5", "+6", null]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Build the rule.",
+        options: ["×5", "+5", "×2 + 1"],
+        answer: "×5",
+        helper: "See whether the pattern grows by scaling.",
+        visual: ruleBuilderVisual("Rule Builder", [1, 5, 25, 125, "?"], "Rule"),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which rule describes this pattern?",
+        options: ["Alternate +2, ×2", "Add 4 each time", "×2 each time"],
+        answer: "Alternate +2, ×2",
+        helper: "Look for two moves repeating.",
+        visual: patternSequenceStrip("Describe the Rule", [4, 6, 12, 14, 28, "?"], ["+2", "×2", "+2", "×2", null]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Build the rule.",
+        options: ["÷2 + 1", "÷2", "−2"],
+        answer: "÷2 + 1",
+        helper: "Check the move from 18 to 10.",
+        visual: ruleBuilderVisual("Rule Builder", [34, 18, 10, 6, "?"], "Rule"),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_pattern_position_generalise") {
+    const templates: TypedResponseQuestion[] = [
+      {
+        kind: "typed_response",
+        prompt: "What is the 10th number?",
+        answer: "50",
+        acceptedAnswers: ["50.0"],
+        helper: "Use term number thinking.",
+        placeholder: "Type the number",
+        inputType: "integer",
+        visual: termPositionVisual("Term Positions", [
+          { term: 1, value: 5 },
+          { term: 2, value: 10 },
+          { term: 3, value: 15 },
+        ]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the 20th number?",
+        answer: "59",
+        acceptedAnswers: ["59.0"],
+        helper: "Start at 2 and count the equal jumps.",
+        placeholder: "Type the number",
+        inputType: "integer",
+        visual: patternSequenceStrip("Position Thinking", [2, 5, 8, 11, "..."], ["+3", "+3", "+3", null]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the 15th number?",
+        answer: "90",
+        acceptedAnswers: ["90.0"],
+        helper: "Link the step size to the term number.",
+        placeholder: "Type the number",
+        inputType: "integer",
+        visual: patternSequenceStrip("Multiples Pattern", [6, 12, 18, 24, "..."], ["+6", "+6", "+6", null]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the 12th number?",
+        answer: "47",
+        acceptedAnswers: ["47.0"],
+        helper: "Start value plus equal steps.",
+        placeholder: "Type the number",
+        inputType: "integer",
+        visual: termPositionVisual("Term Positions", [
+          { term: 1, value: 3 },
+          { term: 2, value: 7 },
+          { term: 3, value: 11 },
+        ]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the input?",
+        answer: "7",
+        acceptedAnswers: ["7.0"],
+        helper: "Reverse the rule in the opposite order.",
+        placeholder: "Type the input",
+        inputType: "integer",
+        visual: functionMachineVisual("Reverse Function Machine", "?", "×2 + 1", 15),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the input?",
+        answer: "8",
+        acceptedAnswers: ["8.0"],
+        helper: "Undo the rule carefully.",
+        placeholder: "Type the input",
+        inputType: "integer",
+        visual: functionMachineVisual("Reverse Function Machine", "?", "×4 − 3", 29),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the 9th number?",
+        answer: "81",
+        acceptedAnswers: ["81.0"],
+        helper: "Each term equals 9 times the term number.",
+        placeholder: "Type the number",
+        inputType: "integer",
+        visual: termPositionVisual("Term Positions", [
+          { term: 1, value: 9 },
+          { term: 2, value: 18 },
+          { term: 3, value: 27 },
+        ]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the 8th number?",
+        answer: "57",
+        acceptedAnswers: ["57.0"],
+        helper: "Keep the same additive rule going.",
+        placeholder: "Type the number",
+        inputType: "integer",
+        visual: patternSequenceStrip("Position Thinking", [8, 15, 22, 29, "..."], ["+7", "+7", "+7", null]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the 6th number?",
+        answer: "36",
+        acceptedAnswers: ["36.0"],
+        helper: "This pattern is built from square numbers.",
+        placeholder: "Type the number",
+        inputType: "integer",
+        visual: patternSequenceStrip("Square Numbers", [1, 4, 9, 16, 25, "..."], [null, null, null, null, null]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the output?",
+        answer: "53",
+        acceptedAnswers: ["53.0"],
+        helper: "Run the full rule once.",
+        placeholder: "Type the output",
+        inputType: "integer",
+        visual: functionMachineVisual("Function Machine", 13, "×4 + 1", "?"),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the 25th number?",
+        answer: "124",
+        acceptedAnswers: ["124.0"],
+        helper: "Start at 4 and add 5 for each new term.",
+        placeholder: "Type the number",
+        inputType: "integer",
+        visual: termPositionVisual("Term Positions", [
+          { term: 1, value: 4 },
+          { term: 2, value: 9 },
+          { term: 3, value: 14 },
+        ]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the input?",
+        answer: "12",
+        acceptedAnswers: ["12.0"],
+        helper: "Undo +5 first, then undo ×3.",
+        placeholder: "Type the input",
+        inputType: "integer",
+        visual: functionMachineVisual("Reverse Function Machine", "?", "×3 + 5", 41),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_pattern_function_machine") {
+    const templates: MultipleChoiceQuestion[] = [
+      {
+        kind: "multiple_choice",
+        prompt: "Which statement is true?",
+        options: [
+          "Each term = 4 × term number − 1",
+          "Each term = 3 × term number",
+          "Each term = term number + 4",
+        ],
+        answer: "Each term = 4 × term number − 1",
+        helper: "Test the statement with more than one term.",
+        visual: termPositionVisual("Term Positions", [
+          { term: 1, value: 3 },
+          { term: 2, value: 7 },
+          { term: 3, value: 11 },
+          { term: 4, value: 15 },
+        ]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which rule turns 5 into 17?",
+        options: ["×3 + 2", "×2 + 7", "+12"],
+        answer: "×3 + 2",
+        helper: "Check the full operation, not just part of it.",
+        visual: functionMachineVisual("Function Machine", 5, "?", 17),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which rule matches this sequence?",
+        options: ["×3 + 1", "×2 + 5", "+15 each time"],
+        answer: "×3 + 1",
+        helper: "Find the multi-step rule, then test it.",
+        visual: patternSequenceStrip("Multi-step Pattern", [2, 7, 22, 67, "?"], [null, null, null, null]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which rule card is correct?",
+        options: ["+8", "×2 + 2", "×2"],
+        answer: "×2",
+        helper: "Check the change between every pair of terms.",
+        visual: ruleBuilderVisual("Rule Builder", [6, 12, 24, 48, "?"], "Rule"),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which output is correct?",
+        options: ["14", "12", "18"],
+        answer: "14",
+        helper: "Use the order of operations in the machine.",
+        visual: functionMachineVisual("Function Machine", 4, "×3 + 2", "?"),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which statement best describes the pattern?",
+        options: ["Add 5 each time", "Double, then add 1", "Square numbers"],
+        answer: "Double, then add 1",
+        helper: "Choose the rule that fits every jump.",
+        visual: patternSequenceStrip("Describe the Relationship", [5, 11, 23, 47, "..."], [null, null, null, null]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which rule matches the cards?",
+        options: ["5 × term number", "5 + term number", "2 × term number + 5"],
+        answer: "5 × term number",
+        helper: "Connect the term number to the value.",
+        visual: termPositionVisual("Term Positions", [
+          { term: 1, value: 5 },
+          { term: 2, value: 10 },
+          { term: 3, value: 15 },
+          { term: 4, value: 20 },
+        ]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which rule turns 8 into 29?",
+        options: ["×4 − 3", "×3 + 5", "×2 + 13"],
+        answer: "×4 − 3",
+        helper: "Test the whole rule once.",
+        visual: functionMachineVisual("Function Machine", 8, "?", 29),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which rule is correct for the challenge pattern?",
+        options: ["×3 + 1", "×2 + 3", "+15 each time"],
+        answer: "×3 + 1",
+        helper: "This is a multi-step growth pattern.",
+        visual: patternSequenceStrip("Challenge Pattern", [2, 7, 22, 67, "?"], [null, null, null, null]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which rule card is correct?",
+        options: ["+0.5", "×0.5", "+5"],
+        answer: "+0.5",
+        helper: "Look at the exact increase.",
+        visual: ruleBuilderVisual("Rule Builder", [2.5, 3.0, 3.5, 4.0, "?"], "Rule"),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which statement is always true?",
+        options: [
+          "The 10th term is 7 × 10",
+          "The 10th term is 7 + 10",
+          "The 10th term is always odd",
+        ],
+        answer: "The 10th term is 7 × 10",
+        helper: "Match the statement to the pattern structure.",
+        visual: termPositionVisual("Term Positions", [
+          { term: 1, value: 7 },
+          { term: 2, value: 14 },
+          { term: 3, value: 21 },
+        ]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which output fits the rule?",
+        options: ["202", "201", "203"],
+        answer: "202",
+        helper: "Use the rule from the sequence one more time.",
+        visual: functionMachineVisual("Function Machine", 67, "×3 + 1", "?"),
       },
     ];
     return templates[randInt(0, templates.length - 1)] ?? templates[0]!;

@@ -433,9 +433,9 @@ const year6Rows: ProgramRow[] = [
     activity: "Explain what stays the same, what changes, and how each pattern grows.",
     curriculum: ["AC9M6N07"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "pattern_reasoning" }),
-      makeActivity("multiple_choice", 1, { mode: "spot_pattern_reasoning" }),
-      makeActivity("typed_response", 1, { mode: "pattern_apply_create" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_pattern_describe_rule" }),
+      makeActivity("typed_response", 1, { mode: "y6_pattern_position_generalise" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_pattern_function_machine" }),
     ],
   },
   {

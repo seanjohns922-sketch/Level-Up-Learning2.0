@@ -20,6 +20,8 @@ import PatternSequenceStripVisual from "@/components/activities/PatternSequenceS
 import GrowingPatternVisual from "@/components/activities/GrowingPatternVisual";
 import ErrorPatternVisual from "@/components/activities/ErrorPatternVisual";
 import FunctionMachineCardVisual from "@/components/activities/FunctionMachineCardVisual";
+import RuleBuilderCardVisual from "@/components/activities/RuleBuilderCardVisual";
+import TermPositionCardVisual from "@/components/activities/TermPositionCardVisual";
 import { Fraction, MathFormattedText } from "@/components/FractionText";
 
 function normalize(value: string) {
@@ -2633,6 +2635,12 @@ export default function TypedResponseActivity({
       ) : null}
       {questionData.visual?.type === "function_machine_card" ? (
         <FunctionMachineCardVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "rule_builder_card" ? (
+        <RuleBuilderCardVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "term_position_card" ? (
+        <TermPositionCardVisual visual={questionData.visual} />
       ) : null}
       {discountStepMethodVisual ? (
         <DiscountVisual
