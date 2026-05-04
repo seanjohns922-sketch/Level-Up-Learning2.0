@@ -15,6 +15,10 @@ import ArrayVisual from "@/components/activities/ArrayVisual";
 import RuleBoxVisual from "@/components/activities/RuleBoxVisual";
 import DiscountVisual from "@/components/activities/DiscountVisual";
 import BestBuyCardComparisonVisual from "@/components/activities/BestBuyCardComparisonVisual";
+import PatternSequenceStripVisual from "@/components/activities/PatternSequenceStripVisual";
+import GrowingPatternVisual from "@/components/activities/GrowingPatternVisual";
+import ErrorPatternVisual from "@/components/activities/ErrorPatternVisual";
+import FunctionMachineCardVisual from "@/components/activities/FunctionMachineCardVisual";
 import { FractionText, MathFormattedText } from "@/components/FractionText";
 
 function FractionBar({
@@ -246,6 +250,18 @@ export default function MultipleChoiceActivity({
       ) : null}
       {questionData.visual?.type === "best_buy_card_comparison" ? (
         <BestBuyCardComparisonVisual visual={questionData.visual} revealUnitRates={picked !== null} />
+      ) : null}
+      {questionData.visual?.type === "pattern_sequence_strip" ? (
+        <PatternSequenceStripVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "growing_pattern" ? (
+        <GrowingPatternVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "error_pattern" ? (
+        <ErrorPatternVisual visual={questionData.visual} revealIncorrect={picked !== null} />
+      ) : null}
+      {questionData.visual?.type === "function_machine_card" ? (
+        <FunctionMachineCardVisual visual={questionData.visual} />
       ) : null}
 
       <div className="mt-6 grid gap-2.5">

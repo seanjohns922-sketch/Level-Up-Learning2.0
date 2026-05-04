@@ -420,9 +420,9 @@ const year6Rows: ProgramRow[] = [
     activity: "Spot structure quickly in visual and numeric patterns.",
     curriculum: ["AC9M6N07"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "pattern_fast_thinking" }),
-      makeActivity("multiple_choice", 1, { mode: "pattern_fast_thinking" }),
-      makeActivity("typed_response", 1, { mode: "pattern_apply_create" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_pattern_find_rule" }),
+      makeActivity("typed_response", 1, { mode: "y6_pattern_visual_numeric" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_pattern_generalise" }),
     ],
   },
   {
