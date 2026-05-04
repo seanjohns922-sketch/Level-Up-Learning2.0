@@ -446,9 +446,9 @@ const year6Rows: ProgramRow[] = [
     activity: "Continue, predict, and justify visual and numeric sequences.",
     curriculum: ["AC9M6N07"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "pattern_fast_thinking" }),
-      makeActivity("multiple_choice", 1, { mode: "pattern_reasoning" }),
-      makeActivity("typed_response", 1, { mode: "pattern_apply_create" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_sequence_find_apply" }),
+      makeActivity("typed_response", 1, { mode: "y6_sequence_extend_reverse" }),
+      makeActivity("multiple_choice", 1, { mode: "y6_sequence_generalise_predict" }),
     ],
   },
   {

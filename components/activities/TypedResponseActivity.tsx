@@ -22,6 +22,8 @@ import ErrorPatternVisual from "@/components/activities/ErrorPatternVisual";
 import FunctionMachineCardVisual from "@/components/activities/FunctionMachineCardVisual";
 import RuleBuilderCardVisual from "@/components/activities/RuleBuilderCardVisual";
 import TermPositionCardVisual from "@/components/activities/TermPositionCardVisual";
+import TermPredictorCardVisual from "@/components/activities/TermPredictorCardVisual";
+import ReversePatternCardVisual from "@/components/activities/ReversePatternCardVisual";
 import { Fraction, MathFormattedText } from "@/components/FractionText";
 
 function normalize(value: string) {
@@ -2641,6 +2643,12 @@ export default function TypedResponseActivity({
       ) : null}
       {questionData.visual?.type === "term_position_card" ? (
         <TermPositionCardVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "term_predictor_card" ? (
+        <TermPredictorCardVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "reverse_pattern_card" ? (
+        <ReversePatternCardVisual visual={questionData.visual} />
       ) : null}
       {discountStepMethodVisual ? (
         <DiscountVisual

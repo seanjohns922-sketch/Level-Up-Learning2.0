@@ -21,6 +21,8 @@ import ErrorPatternVisual from "@/components/activities/ErrorPatternVisual";
 import FunctionMachineCardVisual from "@/components/activities/FunctionMachineCardVisual";
 import RuleBuilderCardVisual from "@/components/activities/RuleBuilderCardVisual";
 import TermPositionCardVisual from "@/components/activities/TermPositionCardVisual";
+import TermPredictorCardVisual from "@/components/activities/TermPredictorCardVisual";
+import ReversePatternCardVisual from "@/components/activities/ReversePatternCardVisual";
 import { FractionText, MathFormattedText } from "@/components/FractionText";
 
 function FractionBar({
@@ -270,6 +272,12 @@ export default function MultipleChoiceActivity({
       ) : null}
       {questionData.visual?.type === "term_position_card" ? (
         <TermPositionCardVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "term_predictor_card" ? (
+        <TermPredictorCardVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "reverse_pattern_card" ? (
+        <ReversePatternCardVisual visual={questionData.visual} />
       ) : null}
 
       <div className="mt-6 grid gap-2.5">

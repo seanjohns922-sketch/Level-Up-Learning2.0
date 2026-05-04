@@ -3190,6 +3190,20 @@ export type TermPositionCardVisualData = {
   }>;
 };
 
+export type TermPredictorCardVisualData = {
+  type: "term_predictor_card";
+  title: string;
+  start: string;
+  rule: string;
+  target: string;
+};
+
+export type ReversePatternCardVisualData = {
+  type: "reverse_pattern_card";
+  title: string;
+  terms: string[];
+};
+
 export type MultiStepMethodVisualData = {
   type: "multi_step_method";
   title: string;
@@ -3253,6 +3267,8 @@ export type MultipleChoiceQuestion = {
     | FunctionMachineCardVisualData
     | RuleBuilderCardVisualData
     | TermPositionCardVisualData
+    | TermPredictorCardVisualData
+    | ReversePatternCardVisualData
     | RuleBoxVisualData;
 };
 
@@ -3312,6 +3328,8 @@ export type TypedResponseQuestion = {
     | FunctionMachineCardVisualData
     | RuleBuilderCardVisualData
     | TermPositionCardVisualData
+    | TermPredictorCardVisualData
+    | ReversePatternCardVisualData
     | {
         type: "numeric_input_only";
       }
@@ -16540,6 +16558,174 @@ function generateGenericQuestion(
         answer: "202",
         helper: "Use the rule from the sequence one more time.",
         visual: functionMachineVisual("Function Machine", 67, "×3 + 1", "?"),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  const termPredictorVisual = (
+    title: string,
+    start: number | string,
+    rule: string,
+    target: string
+  ): TermPredictorCardVisualData => ({
+    type: "term_predictor_card",
+    title,
+    start: String(start),
+    rule,
+    target,
+  });
+
+  const reversePatternVisual = (
+    title: string,
+    terms: Array<number | string>
+  ): ReversePatternCardVisualData => ({
+    type: "reverse_pattern_card",
+    title,
+    terms: terms.map((term) => String(term)),
+  });
+
+  if (explicitMode === "y6_sequence_find_apply") {
+    const templates: MultipleChoiceQuestion[] = [
+      {
+        kind: "multiple_choice",
+        prompt: "What is the next number?",
+        options: ["29", "27", "31"],
+        answer: "29",
+        helper: "Compare the differences.",
+        visual: patternSequenceStrip("Find and Apply", [5, 11, 17, 23, "?"], ["+6", "+6", "+6", null]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which rule describes this sequence?",
+        options: ["+5 each time", "+4 each time", "×2 each time"],
+        answer: "+5 each time",
+        helper: "Check the jump from one term to the next.",
+        visual: patternSequenceStrip("Find and Apply", [4, 9, 14, 19, "?"], [null, null, null, null]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "What is the next number?",
+        options: ["32", "24", "30"],
+        answer: "32",
+        helper: "This is a multiplicative pattern.",
+        visual: patternSequenceStrip("Find and Apply", [2, 4, 8, 16, "?"], ["×2", "×2", "×2", null]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which rule works for every step?",
+        options: ["×2 + 1", "+4 each time", "×3 − 2"],
+        answer: "×2 + 1",
+        helper: "Test the rule on more than one step.",
+        visual: patternSequenceStrip("Find and Apply", [3, 7, 15, 31, "?"], [null, null, null, null]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Use the rule to find the next number.",
+        options: ["111", "109", "113"],
+        answer: "111",
+        helper: "Use the same two-step rule again.",
+        visual: patternSequenceStrip("Find and Apply", [6, 13, 27, 55, "?"], [null, null, null, null]),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_sequence_extend_reverse") {
+    const templates: TypedResponseQuestion[] = [
+      {
+        kind: "typed_response",
+        prompt: "Find the next two numbers.",
+        answer: "16, 19",
+        acceptedAnswers: ["16,19", "16 19", "16 and 19"],
+        helper: "Use the same rule twice.",
+        placeholder: "Type both numbers",
+        visual: patternSequenceStrip("Extend the Sequence", [7, 10, 13, "?", "?"], ["+3", "+3", "+3", null]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "Find the next two numbers.",
+        answer: "48, 96",
+        acceptedAnswers: ["48,96", "48 96", "48 and 96"],
+        helper: "This sequence doubles each time.",
+        placeholder: "Type both numbers",
+        visual: patternSequenceStrip("Extend the Sequence", [6, 12, 24, "?", "?"], ["×2", "×2", "×2", null]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the next number?",
+        answer: "36",
+        acceptedAnswers: ["36.0"],
+        helper: "The next square after 25 is 36.",
+        placeholder: "Type the next number",
+        inputType: "integer",
+        visual: patternSequenceStrip("Square Numbers", [1, 4, 9, 16, 25, "?"], [null, null, null, null, null]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the missing first number?",
+        answer: "21",
+        acceptedAnswers: ["21.0"],
+        helper: "Work backwards from 18.",
+        placeholder: "Type the number",
+        inputType: "integer",
+        visual: reversePatternVisual("Work Backwards", ["?", 18, 15, 12, 9]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the next number?",
+        answer: "202",
+        acceptedAnswers: ["202.0"],
+        helper: "Use the rule ×3 + 1.",
+        placeholder: "Type the next number",
+        inputType: "integer",
+        visual: patternSequenceStrip("Challenge Pattern", [2, 7, 22, 67, "?"], [null, null, null, null]),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_sequence_generalise_predict") {
+    const templates: MultipleChoiceQuestion[] = [
+      {
+        kind: "multiple_choice",
+        prompt: "Which rule describes the sequence?",
+        options: ["Add 8 each time", "Double each time", "Add increasing numbers"],
+        answer: "Add 8 each time",
+        helper: "Check the differences between terms.",
+        visual: patternSequenceStrip("Generalise and Predict", [8, 16, 24, 32, "..."], ["+8", "+8", "+8", null]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "What is the 10th term?",
+        options: ["28", "31", "34"],
+        answer: "31",
+        helper: "The first term already counts as term 1.",
+        visual: termPredictorVisual("Term Predictor", 4, "Add 3 each time", "10th term"),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "What is the 6th term?",
+        options: ["48", "64", "128"],
+        answer: "64",
+        helper: "List the terms carefully from the start.",
+        visual: termPredictorVisual("Term Predictor", 2, "Multiply by 2 each time", "6th term"),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "What is the 5th term?",
+        options: ["81", "83", "85"],
+        answer: "81",
+        helper: "Follow the two-step rule carefully from the start.",
+        visual: termPredictorVisual("Term Predictor", 6, "×2 − 1", "5th term"),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "What is happening?",
+        options: ["Add increasing numbers", "Double each time", "Add 3 each time"],
+        answer: "Add increasing numbers",
+        helper: "Look at how the jumps change.",
+        visual: patternSequenceStrip("Generalise and Predict", [1, 3, 6, 10, 15, "?"], ["+2", "+3", "+4", "+5", null]),
       },
     ];
     return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
