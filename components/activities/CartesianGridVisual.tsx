@@ -118,7 +118,6 @@ export default function CartesianGridVisual({
             {xTicks.map((tick) => {
               const x = toSvgX(tick, visual.xMin, visual.xMax);
               const isMajor = tick !== 0 && tick % 5 === 0;
-              const isEdge = tick === visual.xMin || tick === visual.xMax;
               return (
                 <g key={`x-${tick}`} className="group">
                   <line
@@ -141,11 +140,9 @@ export default function CartesianGridVisual({
                   />
                   <text
                     x={x}
-                    y={SIZE - 1}
+                    y={zeroY + (tick === 0 ? 24 : 18)}
                     textAnchor="middle"
-                    className={`fill-slate-200 text-[10px] font-semibold transition-all duration-150 group-hover:fill-cyan-200 group-hover:[filter:drop-shadow(0_0_6px_rgba(34,211,238,0.55))] ${
-                      isEdge ? "opacity-70" : ""
-                    }`}
+                    className="fill-slate-200 text-[10px] font-semibold transition-all duration-150 group-hover:fill-cyan-200 group-hover:[filter:drop-shadow(0_0_6px_rgba(34,211,238,0.55))]"
                   >
                     {tick}
                   </text>
@@ -166,7 +163,12 @@ export default function CartesianGridVisual({
                     stroke={isMajor ? "rgba(226,232,240,0.96)" : "rgba(226,232,240,0.88)"}
                     strokeWidth={isMajor ? "2" : "1.6"}
                   />
-                  <text x={8} y={y + 4} textAnchor="start" className="fill-slate-300 text-[10px] font-bold">
+                  <text
+                    x={zeroX - 10}
+                    y={y + 4}
+                    textAnchor="end"
+                    className="fill-slate-200 text-[10px] font-semibold"
+                  >
                     {tick}
                   </text>
                 </g>
@@ -223,15 +225,6 @@ export default function CartesianGridVisual({
                 ) : null}
               </g>
             ))}
-
-            <line
-              x1={PADDING + 10}
-              y1={SIZE - 12}
-              x2={SIZE - PADDING - 10}
-              y2={SIZE - 12}
-              stroke="rgba(148,163,184,0.2)"
-              strokeWidth="1"
-            />
 
             <text
               x={SIZE - PADDING + 8}
