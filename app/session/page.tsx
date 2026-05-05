@@ -4636,13 +4636,13 @@ function SessionPage() {
                 onClick={() => setQuizIndex((i) => Math.max(0, i - 1))}
                 disabled={quizIndex === 0}
                  className={[
-                  "px-4 py-3 rounded-2xl font-bold transition backdrop-blur",
+                  "px-5 py-2.5 rounded-md font-extrabold tracking-[0.22em] text-sm transition active:scale-[0.97]",
                   quizIndex === 0
-                    ? "bg-muted text-muted-foreground cursor-not-allowed"
-                    : "bg-white/80 text-foreground border border-border hover:bg-white",
+                    ? "text-white/30 border border-white/10 bg-[#0b1220]/60 cursor-not-allowed"
+                    : "text-white border border-teal-300/40 bg-[#0b1220]/80 hover:border-teal-200/70 hover:bg-[#0e1830]/80 shadow-[inset_0_0_0_1px_rgba(94,234,212,0.08)]",
                 ].join(" ")}
               >
-                ← Back
+                ← BACK
               </button>
 
               <div className="text-xs font-mono uppercase tracking-[0.18em] text-muted-foreground">
