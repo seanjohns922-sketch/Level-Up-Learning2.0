@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, ChevronLeft, User } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 type Props = {
