@@ -483,12 +483,12 @@ const year6Rows: ProgramRow[] = [
     focus: "Represent patterns on a coordinate grid",
     lesson: 3,
     topic: "Tables to Graphs (Cartesian Plane Intro)",
-    activity: "Represent patterns through tables, coordinates, and early graph-style visual relationships.",
+    activity: "Plot points, read coordinates, and follow simple directions from the origin on a 4-quadrant grid.",
     curriculum: ["AC9M6N07", "AC9M6N08"],
     activities: [
       makeActivity("typed_response", 1, { mode: "y6_cartesian_find_plot" }),
       makeActivity("multiple_choice", 1, { mode: "y6_cartesian_read_match" }),
-      makeActivity("typed_response", 1, { mode: "y6_cartesian_move_interpret" }),
+      makeActivity("typed_response", 1, { mode: "y6_cartesian_follow_origin" }),
     ],
   },
   {

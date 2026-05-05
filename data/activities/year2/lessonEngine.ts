@@ -17571,6 +17571,67 @@ function generateGenericQuestion(
     return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
   }
 
+  if (explicitMode === "y6_cartesian_follow_origin") {
+    const templates: TypedResponseQuestion[] = [
+      {
+        kind: "typed_response",
+        prompt: "Start at (0,0). Move 3 right and 2 up. Where are you now?",
+        answer: "(3,2)",
+        acceptedAnswers: ["(3, 2)", "3,2", "3 2"],
+        helper: "Move across first, then up.",
+        placeholder: "Type (x, y)",
+        visual: cartesianGridVisual("Follow the Directions", [], {
+          subtitle: "Start at the origin. Follow the directions carefully.",
+        }),
+      },
+      {
+        kind: "typed_response",
+        prompt: "Start at (0,0). Move 4 right and 1 up. Where are you now?",
+        answer: "(4,1)",
+        acceptedAnswers: ["(4, 1)", "4,1", "4 1"],
+        helper: "Right changes x. Up changes y.",
+        placeholder: "Type (x, y)",
+        visual: cartesianGridVisual("Follow the Directions", [], {
+          subtitle: "Start at the origin. Follow the directions carefully.",
+        }),
+      },
+      {
+        kind: "typed_response",
+        prompt: "Start at (0,0). Move 3 left and 2 up. Where are you now?",
+        answer: "(-3,2)",
+        acceptedAnswers: ["(-3, 2)", "-3,2", "-3 2"],
+        helper: "Left makes x negative.",
+        placeholder: "Type (x, y)",
+        visual: cartesianGridVisual("Follow the Directions", [], {
+          subtitle: "Start at the origin. Follow the directions carefully.",
+        }),
+      },
+      {
+        kind: "typed_response",
+        prompt: "Start at (0,0). Move 2 right and 4 down. Where are you now?",
+        answer: "(2,-4)",
+        acceptedAnswers: ["(2, -4)", "2,-4", "2 -4"],
+        helper: "Down makes y negative.",
+        placeholder: "Type (x, y)",
+        visual: cartesianGridVisual("Follow the Directions", [], {
+          subtitle: "Start at the origin. Follow the directions carefully.",
+        }),
+      },
+      {
+        kind: "typed_response",
+        prompt: "Start at (0,0). Move 5 left and 3 down. Where are you now?",
+        answer: "(-5,-3)",
+        acceptedAnswers: ["(-5, -3)", "-5,-3", "-5 -3"],
+        helper: "Left is negative x. Down is negative y.",
+        placeholder: "Type (x, y)",
+        visual: cartesianGridVisual("Follow the Directions", [], {
+          subtitle: "Start at the origin. Follow the directions carefully.",
+        }),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
   if (explicitMode === "y6_cartesian_move_interpret") {
     const templates: TypedResponseQuestion[] = [
       {
