@@ -57,21 +57,77 @@ export default function CartesianGridVisual({
         <div className="rounded-[28px] border border-cyan-300 bg-slate-950 p-3 shadow-[0_0_30px_rgba(34,211,238,0.12)]">
           <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="h-[320px] w-[320px]">
             <defs>
-              <pattern id="gridPattern" width={(SIZE - PADDING * 2) / (visual.xMax - visual.xMin)} height={(SIZE - PADDING * 2) / (visual.yMax - visual.yMin)} patternUnits="userSpaceOnUse">
-                <path d={`M ${(SIZE - PADDING * 2) / (visual.xMax - visual.xMin)} 0 L 0 0 0 ${(SIZE - PADDING * 2) / (visual.yMax - visual.yMin)}`} fill="none" stroke="rgba(186,230,253,0.45)" strokeWidth="1.2" />
+              <pattern
+                id="gridPattern"
+                width={(SIZE - PADDING * 2) / (visual.xMax - visual.xMin)}
+                height={(SIZE - PADDING * 2) / (visual.yMax - visual.yMin)}
+                patternUnits="userSpaceOnUse"
+              >
+                <path
+                  d={`M ${(SIZE - PADDING * 2) / (visual.xMax - visual.xMin)} 0 L 0 0 0 ${(SIZE - PADDING * 2) / (visual.yMax - visual.yMin)}`}
+                  fill="none"
+                  stroke="rgba(186,230,253,0.36)"
+                  strokeWidth="1.05"
+                />
               </pattern>
+              <marker
+                id="axisArrow"
+                markerWidth="8"
+                markerHeight="8"
+                refX="6"
+                refY="3"
+                orient="auto"
+                markerUnits="strokeWidth"
+              >
+                <path d="M0,0 L0,6 L6,3 z" fill="rgba(103,232,249,0.58)" />
+              </marker>
+              <marker
+                id="movementArrow"
+                markerWidth="10"
+                markerHeight="10"
+                refX="8"
+                refY="3"
+                orient="auto"
+                markerUnits="strokeWidth"
+              >
+                <path d="M0,0 L0,6 L9,3 z" fill="rgba(34,211,238,0.95)" />
+              </marker>
             </defs>
 
             <rect x={PADDING} y={PADDING} width={SIZE - PADDING * 2} height={SIZE - PADDING * 2} fill="url(#gridPattern)" rx="18" />
 
-            <line x1={PADDING} y1={zeroY} x2={SIZE - PADDING} y2={zeroY} stroke="rgba(103,232,249,1)" strokeWidth="3" />
-            <line x1={zeroX} y1={PADDING} x2={zeroX} y2={SIZE - PADDING} stroke="rgba(103,232,249,1)" strokeWidth="3" />
+            <line
+              x1={PADDING}
+              y1={zeroY}
+              x2={SIZE - PADDING}
+              y2={zeroY}
+              stroke="rgba(103,232,249,0.96)"
+              strokeWidth="3"
+              markerEnd="url(#axisArrow)"
+            />
+            <line
+              x1={zeroX}
+              y1={SIZE - PADDING}
+              x2={zeroX}
+              y2={PADDING}
+              stroke="rgba(103,232,249,0.96)"
+              strokeWidth="3"
+              markerEnd="url(#axisArrow)"
+            />
 
             {xTicks.map((tick) => {
               const x = toSvgX(tick, visual.xMin, visual.xMax);
+              const isMajor = tick !== 0 && tick % 5 === 0;
               return (
                 <g key={`x-${tick}`}>
-                  <line x1={x} y1={zeroY - 5} x2={x} y2={zeroY + 5} stroke="rgba(203,213,225,0.9)" strokeWidth="1.5" />
+                  <line
+                    x1={x}
+                    y1={zeroY - (isMajor ? 7 : 5)}
+                    x2={x}
+                    y2={zeroY + (isMajor ? 7 : 5)}
+                    stroke={isMajor ? "rgba(226,232,240,0.96)" : "rgba(226,232,240,0.88)"}
+                    strokeWidth={isMajor ? "2" : "1.6"}
+                  />
                   <text x={x} y={SIZE - 4} textAnchor="middle" className="fill-slate-300 text-[10px] font-bold">
                     {tick}
                   </text>
@@ -81,9 +137,17 @@ export default function CartesianGridVisual({
 
             {yTicks.map((tick) => {
               const y = toSvgY(tick, visual.yMin, visual.yMax);
+              const isMajor = tick !== 0 && tick % 5 === 0;
               return (
                 <g key={`y-${tick}`}>
-                  <line x1={zeroX - 5} y1={y} x2={zeroX + 5} y2={y} stroke="rgba(203,213,225,0.9)" strokeWidth="1.5" />
+                  <line
+                    x1={zeroX - (isMajor ? 7 : 5)}
+                    y1={y}
+                    x2={zeroX + (isMajor ? 7 : 5)}
+                    y2={y}
+                    stroke={isMajor ? "rgba(226,232,240,0.96)" : "rgba(226,232,240,0.88)"}
+                    strokeWidth={isMajor ? "2" : "1.6"}
+                  />
                   <text x={8} y={y + 4} textAnchor="start" className="fill-slate-300 text-[10px] font-bold">
                     {tick}
                   </text>
@@ -91,26 +155,30 @@ export default function CartesianGridVisual({
               );
             })}
 
-            <circle cx={zeroX} cy={zeroY} r="5" fill="rgba(34,211,238,0.95)" />
-            <text x={zeroX + 8} y={zeroY - 8} className="fill-cyan-200 text-[10px] font-black">
+            <circle cx={zeroX} cy={zeroY} r="12" fill="rgba(34,211,238,0.08)">
+              <animate
+                attributeName="r"
+                values="8;14;12"
+                dur="0.5s"
+                begin="0s"
+                fill="freeze"
+              />
+              <animate
+                attributeName="opacity"
+                values="0.2;0.45;0.18"
+                dur="0.5s"
+                begin="0s"
+                fill="freeze"
+              />
+            </circle>
+            <circle cx={zeroX} cy={zeroY} r="7" fill="none" stroke="rgba(103,232,249,0.72)" strokeWidth="1.8" />
+            <circle cx={zeroX} cy={zeroY} r="6" fill="rgba(34,211,238,0.98)" />
+            <text x={zeroX + 10} y={zeroY - 10} className="fill-cyan-100 text-[10px] font-semibold">
               (0,0)
             </text>
 
             {visual.connectPoints && pathPoints.length > 1 ? (
               <>
-                <defs>
-                  <marker
-                    id="movementArrow"
-                    markerWidth="10"
-                    markerHeight="10"
-                    refX="8"
-                    refY="3"
-                    orient="auto"
-                    markerUnits="strokeWidth"
-                  >
-                    <path d="M0,0 L0,6 L9,3 z" fill="rgba(34,211,238,0.95)" />
-                  </marker>
-                </defs>
                 <polyline
                   points={closedPolylinePoints}
                   fill="none"
@@ -138,10 +206,19 @@ export default function CartesianGridVisual({
               </g>
             ))}
 
-            <text x={SIZE - 18} y={zeroY - 10} textAnchor="end" className="fill-cyan-200 text-[11px] font-black">
+            <text
+              x={SIZE - PADDING + 8}
+              y={zeroY - 8}
+              textAnchor="start"
+              className="fill-cyan-200/80 text-[11px] font-medium"
+            >
               x
             </text>
-            <text x={zeroX + 10} y={18} className="fill-cyan-200 text-[11px] font-black">
+            <text
+              x={zeroX + 8}
+              y={PADDING - 6}
+              className="fill-cyan-200/80 text-[11px] font-medium"
+            >
               y
             </text>
           </svg>
