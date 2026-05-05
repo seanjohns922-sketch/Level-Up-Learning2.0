@@ -500,9 +500,18 @@ const year6Rows: ProgramRow[] = [
     activity: "Use operation order and brackets correctly to evaluate expressions.",
     curriculum: ["AC9M6N08"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "bidmas_evaluate" }),
-      makeActivity("multiple_choice", 1, { mode: "bidmas_evaluate" }),
-      makeActivity("typed_response", 1, { mode: "bidmas_evaluate" }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_order_ops_spot",
+        rotationRole: "fast_thinking",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_order_ops_brackets",
+        rotationRole: "reasoning",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "y6_order_ops_apply",
+        rotationRole: "apply_create",
+      }),
     ],
   },
   {

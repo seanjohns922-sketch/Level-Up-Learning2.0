@@ -30,6 +30,7 @@ import OrderedPairBuilderVisual from "@/components/activities/OrderedPairBuilder
 import TableToPairCardsVisual from "@/components/activities/TableToPairCardsVisual";
 import MiniCoordinatePreviewVisual from "@/components/activities/MiniCoordinatePreviewVisual";
 import CartesianGridVisual from "@/components/activities/CartesianGridVisual";
+import ExpressionFlowVisual from "@/components/activities/ExpressionFlowVisual";
 import RuleBuilderCardVisual from "@/components/activities/RuleBuilderCardVisual";
 import TermPositionCardVisual from "@/components/activities/TermPositionCardVisual";
 import TermPredictorCardVisual from "@/components/activities/TermPredictorCardVisual";
@@ -2702,6 +2703,9 @@ export default function TypedResponseActivity({
               : undefined
           }
         />
+      ) : null}
+      {questionData.visual?.type === "expression_flow" ? (
+        <ExpressionFlowVisual visual={questionData.visual} />
       ) : null}
       {questionData.visual?.type === "rule_builder_card" ? (
         <RuleBuilderCardVisual visual={questionData.visual} />

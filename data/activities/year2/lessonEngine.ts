@@ -3277,6 +3277,22 @@ export type CartesianGridVisualData = {
   subtitle?: string;
 };
 
+export type ExpressionFlowVisualData = {
+  type: "expression_flow";
+  title: string;
+  priorityChips?: Array<{
+    label: string;
+    tone: "gold" | "blue" | "green";
+  }>;
+  cards: Array<{
+    label?: string;
+    tokens: string[];
+    result?: string;
+    highlightRange?: [number, number];
+    note?: string;
+  }>;
+};
+
 export type RuleBuilderCardVisualData = {
   type: "rule_builder_card";
   title: string;
@@ -3378,6 +3394,7 @@ export type MultipleChoiceQuestion = {
     | TableToPairCardsVisualData
     | MiniCoordinatePreviewVisualData
     | CartesianGridVisualData
+    | ExpressionFlowVisualData
     | RuleBuilderCardVisualData
     | TermPositionCardVisualData
     | TermPredictorCardVisualData
@@ -3449,6 +3466,7 @@ export type TypedResponseQuestion = {
     | TableToPairCardsVisualData
     | MiniCoordinatePreviewVisualData
     | CartesianGridVisualData
+    | ExpressionFlowVisualData
     | RuleBuilderCardVisualData
     | TermPositionCardVisualData
     | TermPredictorCardVisualData
@@ -16118,6 +16136,17 @@ function generateGenericQuestion(
     subtitle: options?.subtitle,
   });
 
+  const expressionFlowVisual = (
+    title: string,
+    cards: ExpressionFlowVisualData["cards"],
+    priorityChips?: ExpressionFlowVisualData["priorityChips"]
+  ): ExpressionFlowVisualData => ({
+    type: "expression_flow",
+    title,
+    cards,
+    priorityChips,
+  });
+
   if (explicitMode === "y6_pattern_find_rule") {
     const templates: MultipleChoiceQuestion[] = [
       {
@@ -22507,6 +22536,275 @@ function generateGenericQuestion(
           helper: "Keep the operation order clear.",
           placeholder: "Type the answer",
         };
+  }
+
+  if (explicitMode === "y6_order_ops_spot") {
+    const templates: MultipleChoiceQuestion[] = [
+      {
+        kind: "multiple_choice",
+        prompt: "6 + 2 × 5 = ?",
+        options: ["40", "16", "(6 + 2) × 5"],
+        answer: "16",
+        helper: "Multiplication happens before addition.",
+        visual: expressionFlowVisual(
+          "Spot the Priority",
+          [
+            {
+              tokens: ["6", "+", "2", "×", "5"],
+              highlightRange: [2, 4],
+              result: "6 + 10",
+              note: "Do the multiplication first.",
+            },
+          ],
+          [
+            { label: "Brackets", tone: "gold" },
+            { label: "× ÷", tone: "blue" },
+            { label: "+ −", tone: "green" },
+          ]
+        ),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which do you do first?",
+        options: ["Add", "Multiply", "Both together"],
+        answer: "Multiply",
+        helper: "Check which operation has priority.",
+        visual: expressionFlowVisual("First Step", [
+          {
+            tokens: ["8", "+", "4", "×", "3"],
+            highlightRange: [2, 4],
+          },
+        ]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "10 − 6 ÷ 2 = ?",
+        options: ["2", "7", "4"],
+        answer: "7",
+        helper: "Division happens before subtraction.",
+        visual: expressionFlowVisual("Spot the Priority", [
+          {
+            tokens: ["10", "−", "6", "÷", "2"],
+            highlightRange: [2, 4],
+            result: "10 − 3",
+          },
+        ]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which part is Step 1?",
+        options: ["12 + 3", "3 × 2", "12 × 2"],
+        answer: "3 × 2",
+        helper: "Find the multiplication first.",
+        visual: expressionFlowVisual("Step Reveal", [
+          {
+            tokens: ["12", "+", "3", "×", "2"],
+            highlightRange: [2, 4],
+          },
+        ]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "15 − 5 × 2 = ?",
+        options: ["20", "5", "10"],
+        answer: "5",
+        helper: "Multiply first, then subtract.",
+        visual: expressionFlowVisual("Mental Check", [
+          {
+            tokens: ["15", "−", "5", "×", "2"],
+            highlightRange: [2, 4],
+            result: "15 − 10",
+          },
+        ]),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_order_ops_brackets") {
+    const templates: MultipleChoiceQuestion[] = [
+      {
+        kind: "multiple_choice",
+        prompt: "6 + 2 × 3 = ?",
+        options: ["12", "18", "24"],
+        answer: "12",
+        helper: "Without brackets, multiply first.",
+        visual: expressionFlowVisual("No Brackets", [
+          {
+            label: "Card A",
+            tokens: ["6", "+", "2", "×", "3"],
+            highlightRange: [2, 4],
+            result: "12",
+          },
+        ]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "(6 + 2) × 3 = ?",
+        options: ["12", "18", "24"],
+        answer: "24",
+        helper: "Brackets change the order.",
+        visual: expressionFlowVisual("Brackets First", [
+          {
+            label: "Card B",
+            tokens: ["(", "6", "+", "2", ")", "×", "3"],
+            highlightRange: [0, 4],
+            result: "24",
+          },
+        ]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "What do brackets do?",
+        options: ["Make it bigger", "Change the order", "Do nothing"],
+        answer: "Change the order",
+        helper: "Brackets tell you what must happen first.",
+        visual: expressionFlowVisual(
+          "Bracket Priority",
+          [
+            {
+              tokens: ["(", "6", "+", "2", ")", "×", "3"],
+              highlightRange: [0, 4],
+              note: "Solve inside the brackets first.",
+            },
+          ],
+          [{ label: "Brackets First", tone: "gold" }]
+        ),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which is larger?",
+        options: ["Card A", "Card B", "Same value"],
+        answer: "Card B",
+        helper: "Compare the two final values.",
+        visual: expressionFlowVisual("Side-by-Side Compare", [
+          {
+            label: "Card A",
+            tokens: ["6", "+", "2", "×", "3"],
+            highlightRange: [2, 4],
+            result: "12",
+          },
+          {
+            label: "Card B",
+            tokens: ["(", "6", "+", "2", ")", "×", "3"],
+            highlightRange: [0, 4],
+            result: "24",
+          },
+        ]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "20 − (4 × 3) = ?",
+        options: ["32", "8", "48"],
+        answer: "8",
+        helper: "Use the brackets first.",
+        visual: expressionFlowVisual("Bracket Challenge", [
+          {
+            tokens: ["20", "−", "(", "4", "×", "3", ")"],
+            highlightRange: [2, 6],
+            result: "20 − 12",
+          },
+        ]),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_order_ops_apply") {
+    const templates: TypedResponseQuestion[] = [
+      {
+        kind: "typed_response",
+        prompt: "18 ÷ 3 × 2 = ?",
+        answer: "12",
+        acceptedAnswers: ["12.0"],
+        helper: "For × and ÷, work left to right.",
+        placeholder: "Type the answer",
+        inputType: "integer",
+        visual: expressionFlowVisual("Apply the Rule", [
+          {
+            tokens: ["18", "÷", "3", "×", "2"],
+            highlightRange: [0, 2],
+            result: "6 × 2",
+          },
+        ]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "24 ÷ 6 + 2 × 3 = ?",
+        answer: "10",
+        acceptedAnswers: ["10.0"],
+        helper: "Complete × and ÷ before +.",
+        placeholder: "Type the answer",
+        inputType: "integer",
+        visual: expressionFlowVisual("Apply the Rule", [
+          {
+            tokens: ["24", "÷", "6", "+", "2", "×", "3"],
+            highlightRange: [0, 2],
+            result: "4 + 2 × 3",
+          },
+        ]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "Which part is Step 1?",
+        answer: "4 × 2",
+        acceptedAnswers: ["4 × 2", "4x2", "4 x 2", "4*2"],
+        helper: "Find the multiplication first.",
+        placeholder: "Type the first step",
+        visual: expressionFlowVisual("Visual Breakdown", [
+          {
+            tokens: ["16", "−", "4", "×", "2", "+", "6"],
+            highlightRange: [2, 4],
+            note: "Highlight the first operation to complete.",
+          },
+        ]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "Why do we multiply before adding?",
+        answer: "because of order rules",
+        acceptedAnswers: [
+          "because of order rules",
+          "order rules",
+          "priority rules",
+          "multiplication has priority",
+          "because multiplication comes first",
+        ],
+        helper: "Think about the operation priority.",
+        placeholder: "Type a short reason",
+        visual: expressionFlowVisual(
+          "Operation Priority",
+          [
+            {
+              tokens: ["6", "+", "3", "×", "4"],
+              highlightRange: [2, 4],
+            },
+          ],
+          [
+            { label: "Brackets", tone: "gold" },
+            { label: "× ÷", tone: "blue" },
+            { label: "+ −", tone: "green" },
+          ]
+        ),
+      },
+      {
+        kind: "typed_response",
+        prompt: "30 − 6 × 3 + 4 = ?",
+        answer: "16",
+        acceptedAnswers: ["16.0"],
+        helper: "Multiply first, then work left to right.",
+        placeholder: "Type the answer",
+        inputType: "integer",
+        visual: expressionFlowVisual("Multi-step Challenge", [
+          {
+            tokens: ["30", "−", "6", "×", "3", "+", "4"],
+            highlightRange: [2, 4],
+            result: "30 − 18 + 4",
+          },
+        ]),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
   }
 
   if (explicitMode === "simple_equations") {
