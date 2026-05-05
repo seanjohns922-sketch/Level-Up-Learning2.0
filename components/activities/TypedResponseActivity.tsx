@@ -61,6 +61,15 @@ function extractSequenceNumbers(value: string) {
     .filter(Boolean);
 }
 
+function parseCoordinatePoint(value: string) {
+  const parts = extractSequenceNumbers(value);
+  if (parts.length < 2) return null;
+  const x = Number(parts[0]);
+  const y = Number(parts[1]);
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+  return { x, y };
+}
+
 function StackedFraction({
   numerator,
   denominator,
@@ -1566,6 +1575,10 @@ export default function TypedResponseActivity({
   const usesFixedDenominator =
     (isStructuredFractionResponse || isFractionInput) && typeof questionData.fixedDenominator === "number";
   const isIntegerInput = declaredInputType === "integer";
+  const isCartesianPlotTask =
+    questionData.visual?.type === "cartesian_grid" &&
+    Boolean(questionData.visual.targetCoordinate) &&
+    /plot the point/i.test(questionData.prompt);
   const [typed, setTyped] = useState("");
   const [fractionWholeInput, setFractionWholeInput] = useState("");
   const [fractionNumeratorInput, setFractionNumeratorInput] = useState("");
@@ -1814,6 +1827,7 @@ export default function TypedResponseActivity({
 
     return () => clearTimeout(resetTimer);
   }, [resetKey]);
+  const selectedCartesianPoint = isCartesianPlotTask ? parseCoordinatePoint(typed) : null;
 
   function normalizedDigitAnswer() {
     const joined = digitInputs.join("").replace(/\s+/g, "");
@@ -2676,7 +2690,18 @@ export default function TypedResponseActivity({
         <MiniCoordinatePreviewVisual visual={questionData.visual} />
       ) : null}
       {questionData.visual?.type === "cartesian_grid" ? (
-        <CartesianGridVisual visual={questionData.visual} />
+        <CartesianGridVisual
+          visual={questionData.visual}
+          interactive={isCartesianPlotTask}
+          selectedPoint={selectedCartesianPoint}
+          onPointSelect={
+            isCartesianPlotTask
+              ? (point) => {
+                  setTyped(`(${point.x},${point.y})`);
+                }
+              : undefined
+          }
+        />
       ) : null}
       {questionData.visual?.type === "rule_builder_card" ? (
         <RuleBuilderCardVisual visual={questionData.visual} />
@@ -3609,6 +3634,16 @@ export default function TypedResponseActivity({
               onDecimalChange={setConversionDecimalInput}
               onPercentChange={setConversionPercentInput}
             />
+          ) : isCartesianPlotTask ? (
+            <div className="w-full max-w-md rounded-xl border border-cyan-200 bg-cyan-50 px-4 py-3 text-base font-bold text-slate-700">
+              {selectedCartesianPoint ? (
+                <span>
+                  Selected point: ({selectedCartesianPoint.x}, {selectedCartesianPoint.y})
+                </span>
+              ) : (
+                <span>Tap a grid point to place the dot.</span>
+              )}
+            </div>
           ) : questionData.visual?.type === "box_method" || isColumnMultiplication || isStrategyMultiplication || isEstimateStrategyMultiplication || isDivisionRemainderCheck || isDivisionBuildGroups ? null : (
             <input
               value={typed}

@@ -15,8 +15,14 @@ function toSvgY(value: number, min: number, max: number) {
 
 export default function CartesianGridVisual({
   visual,
+  interactive = false,
+  selectedPoint = null,
+  onPointSelect,
 }: {
   visual: CartesianGridVisualData;
+  interactive?: boolean;
+  selectedPoint?: { x: number; y: number } | null;
+  onPointSelect?: (point: { x: number; y: number }) => void;
 }) {
   const xTicks = Array.from({ length: visual.xMax - visual.xMin + 1 }, (_, i) => visual.xMin + i);
   const yTicks = Array.from({ length: visual.yMax - visual.yMin + 1 }, (_, i) => visual.yMin + i);
@@ -28,6 +34,13 @@ export default function CartesianGridVisual({
     px: toSvgX(point.x, visual.xMin, visual.xMax),
     py: toSvgY(point.y, visual.yMin, visual.yMax),
   }));
+  const selectedPointPosition = selectedPoint
+    ? {
+        ...selectedPoint,
+        px: toSvgX(selectedPoint.x, visual.xMin, visual.xMax),
+        py: toSvgY(selectedPoint.y, visual.yMin, visual.yMax),
+      }
+    : null;
 
   const polylinePoints = pathPoints.map((point) => `${point.px},${point.py}`).join(" ");
   const closedPolylinePoints =
@@ -225,6 +238,48 @@ export default function CartesianGridVisual({
                 ) : null}
               </g>
             ))}
+
+            {interactive
+              ? xTicks.flatMap((xTick) =>
+                  yTicks.map((yTick) => {
+                    const px = toSvgX(xTick, visual.xMin, visual.xMax);
+                    const py = toSvgY(yTick, visual.yMin, visual.yMax);
+                    return (
+                      <g key={`pick-${xTick}-${yTick}`} className="group">
+                        <circle
+                          cx={px}
+                          cy={py}
+                          r="12"
+                          fill="transparent"
+                          className="cursor-pointer"
+                          onClick={() => onPointSelect?.({ x: xTick, y: yTick })}
+                        />
+                        <circle
+                          cx={px}
+                          cy={py}
+                          r="4"
+                          fill="rgba(148,163,184,0.14)"
+                          className="pointer-events-none transition-all duration-150 group-hover:fill-[rgba(103,232,249,0.38)] group-hover:r-[5]"
+                        />
+                      </g>
+                    );
+                  })
+                )
+              : null}
+
+            {selectedPointPosition ? (
+              <g>
+                <circle cx={selectedPointPosition.px} cy={selectedPointPosition.py} r="18" fill="rgba(34,211,238,0.16)" />
+                <circle
+                  cx={selectedPointPosition.px}
+                  cy={selectedPointPosition.py}
+                  r="9"
+                  fill="rgba(34,211,238,0.98)"
+                  stroke="rgba(207,250,254,0.95)"
+                  strokeWidth="2"
+                />
+              </g>
+            ) : null}
 
             <text
               x={SIZE - PADDING + 8}
