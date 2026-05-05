@@ -30,6 +30,13 @@ import TableToPairCardsVisual from "@/components/activities/TableToPairCardsVisu
 import MiniCoordinatePreviewVisual from "@/components/activities/MiniCoordinatePreviewVisual";
 import CartesianGridVisual from "@/components/activities/CartesianGridVisual";
 import ExpressionFlowVisual from "@/components/activities/ExpressionFlowVisual";
+import {
+  BalanceEquationCardVisual,
+  BracketEquationCardVisual,
+  CheckBySubstitutionCardVisual,
+  InverseStepCardVisual,
+  UnknownTileEquationVisual,
+} from "@/components/activities/EquationVisualCards";
 import RuleBuilderCardVisual from "@/components/activities/RuleBuilderCardVisual";
 import TermPositionCardVisual from "@/components/activities/TermPositionCardVisual";
 import TermPredictorCardVisual from "@/components/activities/TermPredictorCardVisual";
@@ -310,6 +317,21 @@ export default function MultipleChoiceActivity({
       ) : null}
       {questionData.visual?.type === "expression_flow" ? (
         <ExpressionFlowVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "balance_equation_card" ? (
+        <BalanceEquationCardVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "inverse_step_card" ? (
+        <InverseStepCardVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "unknown_tile_equation" ? (
+        <UnknownTileEquationVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "bracket_equation_card" ? (
+        <BracketEquationCardVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "check_substitution_card" ? (
+        <CheckBySubstitutionCardVisual visual={questionData.visual} />
       ) : null}
       {questionData.visual?.type === "rule_builder_card" ? (
         <RuleBuilderCardVisual visual={questionData.visual} />

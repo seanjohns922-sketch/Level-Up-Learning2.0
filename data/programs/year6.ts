@@ -522,9 +522,18 @@ const year6Rows: ProgramRow[] = [
     activity: "Balance inverse operations to solve simple one-step and two-step unknowns.",
     curriculum: ["AC9M6N08"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "simple_equations" }),
-      makeActivity("multiple_choice", 1, { mode: "simple_equations" }),
-      makeActivity("typed_response", 1, { mode: "simple_equations" }),
+      makeActivity("typed_response", 1, {
+        mode: "y6_equation_one_step",
+        rotationRole: "fast_thinking",
+      }),
+      makeActivity("typed_response", 1, {
+        mode: "y6_equation_two_step",
+        rotationRole: "reasoning",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_equation_brackets_check",
+        rotationRole: "apply_create",
+      }),
     ],
   },
   {

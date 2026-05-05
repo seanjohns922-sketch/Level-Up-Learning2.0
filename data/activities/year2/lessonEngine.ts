@@ -3295,6 +3295,46 @@ export type ExpressionFlowVisualData = {
   }>;
 };
 
+export type BalanceEquationCardVisualData = {
+  type: "balance_equation_card";
+  title: string;
+  left: string;
+  right: string;
+  unknownSymbol?: string;
+};
+
+export type InverseStepCardVisualData = {
+  type: "inverse_step_card";
+  title: string;
+  equation: string;
+  inverseOperation: string;
+  focusLabel?: string;
+};
+
+export type UnknownTileEquationVisualData = {
+  type: "unknown_tile_equation";
+  title: string;
+  left: string;
+  right: string;
+  unknownSymbol?: string;
+};
+
+export type BracketEquationCardVisualData = {
+  type: "bracket_equation_card";
+  title: string;
+  left: string;
+  right: string;
+  bracketGroup?: string;
+  outsideFactor?: string;
+};
+
+export type CheckBySubstitutionCardVisualData = {
+  type: "check_substitution_card";
+  title: string;
+  equation: string;
+  candidateValues: string[];
+};
+
 export type RuleBuilderCardVisualData = {
   type: "rule_builder_card";
   title: string;
@@ -3397,6 +3437,11 @@ export type MultipleChoiceQuestion = {
     | MiniCoordinatePreviewVisualData
     | CartesianGridVisualData
     | ExpressionFlowVisualData
+    | BalanceEquationCardVisualData
+    | InverseStepCardVisualData
+    | UnknownTileEquationVisualData
+    | BracketEquationCardVisualData
+    | CheckBySubstitutionCardVisualData
     | RuleBuilderCardVisualData
     | TermPositionCardVisualData
     | TermPredictorCardVisualData
@@ -3469,6 +3514,11 @@ export type TypedResponseQuestion = {
     | MiniCoordinatePreviewVisualData
     | CartesianGridVisualData
     | ExpressionFlowVisualData
+    | BalanceEquationCardVisualData
+    | InverseStepCardVisualData
+    | UnknownTileEquationVisualData
+    | BracketEquationCardVisualData
+    | CheckBySubstitutionCardVisualData
     | RuleBuilderCardVisualData
     | TermPositionCardVisualData
     | TermPredictorCardVisualData
@@ -16149,6 +16199,71 @@ function generateGenericQuestion(
     priorityChips,
   });
 
+  const balanceEquationVisual = (
+    title: string,
+    left: string,
+    right: string,
+    unknownSymbol = "x"
+  ): BalanceEquationCardVisualData => ({
+    type: "balance_equation_card",
+    title,
+    left,
+    right,
+    unknownSymbol,
+  });
+
+  const inverseStepVisual = (
+    title: string,
+    equation: string,
+    inverseOperation: string,
+    focusLabel?: string
+  ): InverseStepCardVisualData => ({
+    type: "inverse_step_card",
+    title,
+    equation,
+    inverseOperation,
+    focusLabel,
+  });
+
+  const unknownTileEquationVisual = (
+    title: string,
+    left: string,
+    right: string,
+    unknownSymbol = "□"
+  ): UnknownTileEquationVisualData => ({
+    type: "unknown_tile_equation",
+    title,
+    left,
+    right,
+    unknownSymbol,
+  });
+
+  const bracketEquationVisual = (
+    title: string,
+    left: string,
+    right: string,
+    bracketGroup?: string,
+    outsideFactor?: string
+  ): BracketEquationCardVisualData => ({
+    type: "bracket_equation_card",
+    title,
+    left,
+    right,
+    bracketGroup,
+    outsideFactor,
+  });
+
+  const checkSubstitutionVisual = (
+    title: string,
+    equation: string,
+    candidateValues: Array<number | string>
+  ): CheckBySubstitutionCardVisualData => ({
+    type: "check_substitution_card",
+    title,
+    equation,
+    candidateValues: candidateValues.map(String),
+  });
+
   if (explicitMode === "y6_pattern_find_rule") {
     const templates: MultipleChoiceQuestion[] = [
       {
@@ -22851,6 +22966,164 @@ function generateGenericQuestion(
           helper: "Ask what operation reverses the one shown.",
           placeholder: "Type the answer",
         };
+  }
+
+  if (explicitMode === "y6_equation_one_step") {
+    const templates: TypedResponseQuestion[] = [
+      {
+        kind: "typed_response",
+        prompt: "What is x?",
+        answer: "12",
+        acceptedAnswers: ["12.0"],
+        helper: "Undo +7 by subtracting 7.",
+        placeholder: "Type x",
+        inputType: "integer",
+        visual: unknownTileEquationVisual("Balance the Equation", "x + 7", "19", "x"),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is x?",
+        answer: "23",
+        acceptedAnswers: ["23.0"],
+        helper: "Undo -9 by adding 9.",
+        placeholder: "Type x",
+        inputType: "integer",
+        visual: balanceEquationVisual("Balance the Equation", "x − 9", "14"),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is x?",
+        answer: "9",
+        acceptedAnswers: ["9.0"],
+        helper: "4x means 4 × x.",
+        placeholder: "Type x",
+        inputType: "integer",
+        visual: balanceEquationVisual("Balance the Equation", "4x", "36"),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is x?",
+        answer: "40",
+        acceptedAnswers: ["40.0"],
+        helper: "Undo ÷5 by multiplying by 5.",
+        placeholder: "Type x",
+        inputType: "integer",
+        visual: balanceEquationVisual("Balance the Equation", "x ÷ 5", "8"),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is x?",
+        answer: "15",
+        acceptedAnswers: ["15.0"],
+        helper: "Undo +8 by subtracting 8.",
+        placeholder: "Type x",
+        inputType: "integer",
+        visual: unknownTileEquationVisual("Mystery Tile Equation", "□ + 8", "23"),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_equation_two_step") {
+    const templates: TypedResponseQuestion[] = [
+      {
+        kind: "typed_response",
+        prompt: "What is x?",
+        answer: "8",
+        acceptedAnswers: ["8.0"],
+        helper: "Undo the +5 first, then undo ×2.",
+        placeholder: "Type x",
+        inputType: "integer",
+        visual: balanceEquationVisual("Two-step Equation", "2x + 5", "21"),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is x?",
+        answer: "8",
+        acceptedAnswers: ["8.0"],
+        helper: "Undo -4 first, then divide by 3.",
+        placeholder: "Type x",
+        inputType: "integer",
+        visual: balanceEquationVisual("Two-step Equation", "3x − 4", "20"),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is x?",
+        answer: "36",
+        acceptedAnswers: ["36.0"],
+        helper: "Undo +6 first, then undo ÷4.",
+        placeholder: "Type x",
+        inputType: "integer",
+        visual: balanceEquationVisual("Two-step Equation", "x ÷ 4 + 6", "15"),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is x?",
+        answer: "9",
+        acceptedAnswers: ["9.0"],
+        helper: "Undo -7 first, then undo ×4.",
+        placeholder: "Type x",
+        inputType: "integer",
+        visual: balanceEquationVisual("Two-step Equation", "4x − 7", "29"),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is x?",
+        answer: "7",
+        acceptedAnswers: ["7.0"],
+        helper: "Undo +9 first, then divide by 5.",
+        placeholder: "Type x",
+        inputType: "integer",
+        visual: balanceEquationVisual("Two-step Equation", "5x + 9", "44"),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_equation_brackets_check") {
+    const templates: MultipleChoiceQuestion[] = [
+      {
+        kind: "multiple_choice",
+        prompt: "What is x?",
+        options: ["4", "6", "8"],
+        answer: "6",
+        helper: "Undo ×3 first, then solve inside the brackets.",
+        visual: bracketEquationVisual("Bracket Equation", "3 × (x + 2)", "24", "x + 2", "×3"),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "What is x?",
+        options: ["12", "14", "16"],
+        answer: "14",
+        helper: "Undo ×2 first, then undo -5.",
+        visual: bracketEquationVisual("Bracket Equation", "2 × (x − 5)", "18", "x − 5", "×2"),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which value makes the equation true?",
+        options: ["5", "6", "7"],
+        answer: "6",
+        helper: "Substitute each value and check both sides.",
+        visual: checkSubstitutionVisual("Check by Substitution", "4x + 3 = 27", [5, 6, 7]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "What is x?",
+        options: ["5", "6", "7"],
+        answer: "6",
+        helper: "Work backwards: undo -4, then ×5, then +1.",
+        visual: bracketEquationVisual("Bracket Equation", "5 × (x + 1) − 4", "31", "x + 1", "×5"),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which inverse operation solves this first?",
+        options: ["Add 12", "Subtract 12", "Multiply by 12"],
+        answer: "Subtract 12",
+        helper: "Use the opposite operation.",
+        visual: inverseStepVisual("Inverse Step", "x + 12 = 31", "Undo +12 with −12", "First step"),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
   }
 
   if (explicitMode === "equations_real_context") {
