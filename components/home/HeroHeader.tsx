@@ -54,7 +54,7 @@ export default function HeroHeader({
               aria-label="Profile"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]" />
-              <span className="truncate max-w-[100px]">{displayName.toUpperCase()}</span>
+              <span className="text-[10px] tracking-[0.18em] truncate max-w-[160px]">{displayName.toUpperCase()}</span>
             </button>
             <button
               onClick={onLogout}
