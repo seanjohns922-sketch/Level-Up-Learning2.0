@@ -59,7 +59,7 @@ export default function CartesianGridVisual({
             <div className="mt-1 text-sm font-semibold text-slate-600">{visual.subtitle}</div>
           ) : null}
         </div>
-        {visual.targetCoordinate ? (
+        {visual.targetCoordinate && !interactive ? (
           <div className="rounded-full border border-cyan-300 bg-slate-900 px-3 py-1 text-xs font-black tracking-[0.14em] text-cyan-200">
             {visual.targetCoordinate}
           </div>
@@ -250,9 +250,10 @@ export default function CartesianGridVisual({
                           cx={px}
                           cy={py}
                           r="12"
-                          fill="transparent"
+                          fill="rgba(34,211,238,0.001)"
+                          pointerEvents="all"
                           className="cursor-pointer"
-                          onClick={() => onPointSelect?.({ x: xTick, y: yTick })}
+                          onPointerDown={() => onPointSelect?.({ x: xTick, y: yTick })}
                         />
                         <circle
                           cx={px}

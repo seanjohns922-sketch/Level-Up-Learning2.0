@@ -17451,7 +17451,6 @@ function generateGenericQuestion(
         helper: "Start at (0,0). Move across first, then up.",
         placeholder: "Type (x, y)",
         visual: cartesianGridVisual("Find the Dot", [], {
-          targetCoordinate: "(3, 2)",
           subtitle: "Move 3 right, then 2 up.",
         }),
       },
@@ -17463,7 +17462,6 @@ function generateGenericQuestion(
         helper: "The first number is x. The second number is y.",
         placeholder: "Type (x, y)",
         visual: cartesianGridVisual("Find the Dot", [], {
-          targetCoordinate: "(4, 1)",
           subtitle: "Move 4 right, then 1 up.",
         }),
       },
@@ -17475,7 +17473,6 @@ function generateGenericQuestion(
         helper: "Negative x means move left.",
         placeholder: "Type (x, y)",
         visual: cartesianGridVisual("Find the Dot", [], {
-          targetCoordinate: "(-3, 2)",
           subtitle: "Move 3 left, then 2 up.",
         }),
       },
@@ -17487,7 +17484,6 @@ function generateGenericQuestion(
         helper: "Negative y means move down.",
         placeholder: "Type (x, y)",
         visual: cartesianGridVisual("Find the Dot", [], {
-          targetCoordinate: "(2, -4)",
           subtitle: "Move 2 right, then 4 down.",
         }),
       },
@@ -17499,7 +17495,6 @@ function generateGenericQuestion(
         helper: "Left is negative x. Down is negative y.",
         placeholder: "Type (x, y)",
         visual: cartesianGridVisual("Find the Dot", [], {
-          targetCoordinate: "(-4, -3)",
           subtitle: "Move 4 left, then 3 down.",
         }),
       },
