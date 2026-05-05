@@ -3289,6 +3289,8 @@ export type ExpressionFlowVisualData = {
     tokens: string[];
     result?: string;
     highlightRange?: [number, number];
+    highlightRanges?: Array<[number, number]>;
+    directionCue?: string;
     note?: string;
   }>;
 };
@@ -22714,48 +22716,60 @@ function generateGenericQuestion(
     const templates: TypedResponseQuestion[] = [
       {
         kind: "typed_response",
-        prompt: "18 ÷ 3 × 2 = ?",
-        answer: "12",
-        acceptedAnswers: ["12.0"],
-        helper: "For × and ÷, work left to right.",
+        prompt: "10 − 6 ÷ 2 = ?",
+        answer: "7",
+        acceptedAnswers: ["7.0"],
+        helper: "Do the division before subtracting.",
         placeholder: "Type the answer",
         inputType: "integer",
         visual: expressionFlowVisual("Apply the Rule", [
           {
-            tokens: ["18", "÷", "3", "×", "2"],
-            highlightRange: [0, 2],
-            result: "6 × 2",
+            tokens: ["10", "−", "6", "÷", "2"],
+            highlightRange: [2, 4],
+            result: "10 − 3",
           },
         ]),
       },
       {
         kind: "typed_response",
-        prompt: "24 ÷ 6 + 2 × 3 = ?",
-        answer: "10",
-        acceptedAnswers: ["10.0"],
-        helper: "Complete × and ÷ before +.",
+        prompt: "18 − 6 ÷ 2 × 3 = ?",
+        answer: "9",
+        acceptedAnswers: ["9.0"],
+        helper: "For ÷ and ×, work left to right before subtracting.",
         placeholder: "Type the answer",
         inputType: "integer",
         visual: expressionFlowVisual("Apply the Rule", [
           {
-            tokens: ["24", "÷", "6", "+", "2", "×", "3"],
-            highlightRange: [0, 2],
-            result: "4 + 2 × 3",
+            tokens: ["18", "−", "6", "÷", "2", "×", "3"],
+            highlightRanges: [
+              [2, 4],
+              [2, 6],
+            ],
+            directionCue: "left-to-right",
+            result: "18 − 3 × 3",
+            note: "Divide first, then multiply.",
           },
         ]),
       },
       {
         kind: "typed_response",
-        prompt: "Which part is Step 1?",
-        answer: "4 × 2",
-        acceptedAnswers: ["4 × 2", "4x2", "4 x 2", "4*2"],
-        helper: "Find the multiplication first.",
-        placeholder: "Type the first step",
+        prompt: "18 − (6 ÷ 2 × 3) = ?",
+        answer: "9",
+        acceptedAnswers: ["9.0"],
+        helper: "Do the bracket first, then follow left to right inside it.",
+        placeholder: "Type the answer",
+        inputType: "integer",
         visual: expressionFlowVisual("Visual Breakdown", [
           {
-            tokens: ["16", "−", "4", "×", "2", "+", "6"],
-            highlightRange: [2, 4],
-            note: "Highlight the first operation to complete.",
+            tokens: ["18", "−", "(", "6", "÷", "2", "×", "3", ")"],
+            highlightRanges: [
+              [2, 8],
+              [3, 5],
+              [3, 7],
+            ],
+            directionCue: "left-to-right",
+            result: "18 − (3 × 3)",
+            note: "Respect the brackets first, then work left to right inside them.",
           },
         ]),
       },
@@ -22789,17 +22803,23 @@ function generateGenericQuestion(
       },
       {
         kind: "typed_response",
-        prompt: "30 − 6 × 3 + 4 = ?",
-        answer: "16",
-        acceptedAnswers: ["16.0"],
-        helper: "Multiply first, then work left to right.",
+        prompt: "36 ÷ 6 × (5 − 2) + 3 = ?",
+        answer: "21",
+        acceptedAnswers: ["21.0"],
+        helper: "Brackets first, then ÷ and × left to right, then add.",
         placeholder: "Type the answer",
         inputType: "integer",
         visual: expressionFlowVisual("Multi-step Challenge", [
           {
-            tokens: ["30", "−", "6", "×", "3", "+", "4"],
-            highlightRange: [2, 4],
-            result: "30 − 18 + 4",
+            tokens: ["36", "÷", "6", "×", "(", "5", "−", "2", ")", "+", "3"],
+            highlightRanges: [
+              [4, 8],
+              [0, 2],
+              [0, 8],
+            ],
+            directionCue: "left-to-right",
+            result: "36 ÷ 6 × 3 + 3",
+            note: "Finish the brackets, then apply ÷ and × from left to right.",
           },
         ]),
       },

@@ -62,10 +62,15 @@ export default function ExpressionFlowVisual({
 
             <div className="flex flex-wrap items-center gap-2 text-[1.4rem] font-black md:text-[1.6rem]">
               {card.tokens.map((token, tokenIndex) => {
+                const highlightedByRanges =
+                  card.highlightRanges?.some(
+                    ([start, end]) => tokenIndex >= start && tokenIndex <= end
+                  ) ?? false;
                 const isHighlighted =
-                  card.highlightRange &&
-                  tokenIndex >= card.highlightRange[0] &&
-                  tokenIndex <= card.highlightRange[1];
+                  highlightedByRanges ||
+                  (card.highlightRange &&
+                    tokenIndex >= card.highlightRange[0] &&
+                    tokenIndex <= card.highlightRange[1]);
 
                 return (
                   <div
@@ -81,6 +86,13 @@ export default function ExpressionFlowVisual({
                 );
               })}
             </div>
+
+            {card.directionCue ? (
+              <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-cyan-200">
+                <span>Left to right</span>
+                <span className="text-cyan-300">→</span>
+              </div>
+            ) : null}
 
             {card.result ? (
               <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-xl font-black text-cyan-100">
