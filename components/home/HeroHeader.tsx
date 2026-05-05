@@ -41,7 +41,8 @@ export default function HeroHeader({
         <div className="flex items-center justify-between mb-6">
           <button
             onClick={onBack}
-            className="h-8 w-8 rounded-full bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/80 hover:bg-white/20 transition"
+            className="h-9 w-9 rounded-full bg-[#021a18]/80 backdrop-blur-md border border-teal-300/40 flex items-center justify-center text-teal-100 hover:border-teal-200/70 hover:text-teal-50 transition active:scale-[0.97]"
+            style={{ boxShadow: "inset 0 0 0 1px rgba(94,234,212,0.08), 0 0 12px rgba(20,184,166,0.2)" }}
             aria-label="Back"
           >
             <ChevronLeft className="h-4 w-4" />
@@ -50,18 +51,20 @@ export default function HeroHeader({
           <div className="flex items-center gap-2">
             <button
               onClick={() => router.push("/profile")}
-              className="h-8 flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10 pl-1 pr-3 text-white/80 hover:bg-white/20 transition"
+              className="h-9 flex items-center gap-2 rounded-full bg-[#021a18]/80 backdrop-blur-md border border-teal-300/40 pl-1 pr-3 text-teal-100 hover:border-teal-200/70 hover:text-teal-50 transition active:scale-[0.97]"
+              style={{ boxShadow: "inset 0 0 0 1px rgba(94,234,212,0.08), 0 0 12px rgba(20,184,166,0.2)" }}
               type="button"
               aria-label="Profile"
             >
-              <span className="h-6 w-6 rounded-full bg-white/20 flex items-center justify-center text-[10px] font-bold text-white">
+              <span className="h-7 w-7 rounded-full bg-gradient-to-br from-teal-400/30 to-teal-600/30 border border-teal-300/40 flex items-center justify-center text-[11px] font-extrabold text-teal-50">
                 {initials}
               </span>
-              <span className="text-xs font-semibold truncate max-w-[80px]">{displayName}</span>
+              <span className="text-xs font-bold tracking-wide truncate max-w-[80px]">{displayName}</span>
             </button>
             <button
               onClick={onLogout}
-              className="h-8 w-8 rounded-full bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/80 hover:bg-white/20 transition"
+              className="h-9 w-9 rounded-full bg-[#021a18]/80 backdrop-blur-md border border-teal-300/40 flex items-center justify-center text-teal-100 hover:border-teal-200/70 hover:text-teal-50 transition active:scale-[0.97]"
+              style={{ boxShadow: "inset 0 0 0 1px rgba(94,234,212,0.08), 0 0 12px rgba(20,184,166,0.2)" }}
               type="button"
               aria-label="Log out"
             >
