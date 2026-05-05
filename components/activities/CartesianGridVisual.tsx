@@ -97,14 +97,30 @@ export default function CartesianGridVisual({
             </text>
 
             {visual.connectPoints && pathPoints.length > 1 ? (
-              <polyline
-                points={closedPolylinePoints}
-                fill="none"
-                stroke="rgba(34,211,238,0.95)"
-                strokeWidth="4"
-                strokeLinejoin="round"
-                strokeLinecap="round"
-              />
+              <>
+                <defs>
+                  <marker
+                    id="movementArrow"
+                    markerWidth="10"
+                    markerHeight="10"
+                    refX="8"
+                    refY="3"
+                    orient="auto"
+                    markerUnits="strokeWidth"
+                  >
+                    <path d="M0,0 L0,6 L9,3 z" fill="rgba(34,211,238,0.95)" />
+                  </marker>
+                </defs>
+                <polyline
+                  points={closedPolylinePoints}
+                  fill="none"
+                  stroke="rgba(34,211,238,0.95)"
+                  strokeWidth="4"
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                  markerEnd={visual.movementArrow ? "url(#movementArrow)" : undefined}
+                />
+              </>
             ) : null}
 
             {pathPoints.map((point, index) => (
