@@ -41,30 +41,25 @@ export default function HeroHeader({
         <div className="flex items-center justify-between mb-6">
           <button
             onClick={onBack}
-            className="h-9 w-9 rounded-full bg-[#021a18]/80 backdrop-blur-md border border-teal-300/40 flex items-center justify-center text-teal-100 hover:border-teal-200/70 hover:text-teal-50 transition active:scale-[0.97]"
-            style={{ boxShadow: "inset 0 0 0 1px rgba(94,234,212,0.08), 0 0 12px rgba(20,184,166,0.2)" }}
+            className="px-4 py-2 rounded-md font-extrabold tracking-[0.22em] text-xs text-white border border-teal-300/40 bg-[#0b1220]/80 hover:border-teal-200/70 hover:bg-[#0e1830]/80 transition active:scale-[0.97] shadow-[inset_0_0_0_1px_rgba(94,234,212,0.08)]"
             aria-label="Back"
           >
-            <ChevronLeft className="h-4 w-4" />
+            ← BACK
           </button>
 
           <div className="flex items-center gap-2">
             <button
               onClick={() => router.push("/profile")}
-              className="h-9 flex items-center gap-2 rounded-full bg-[#021a18]/80 backdrop-blur-md border border-teal-300/40 pl-1 pr-3 text-teal-100 hover:border-teal-200/70 hover:text-teal-50 transition active:scale-[0.97]"
-              style={{ boxShadow: "inset 0 0 0 1px rgba(94,234,212,0.08), 0 0 12px rgba(20,184,166,0.2)" }}
+              className="flex items-center gap-2 px-3 py-2 rounded-md text-xs font-extrabold tracking-[0.22em] text-white border border-teal-300/40 bg-[#0b1220]/80 hover:border-teal-200/70 hover:bg-[#0e1830]/80 transition active:scale-[0.97] shadow-[inset_0_0_0_1px_rgba(94,234,212,0.08)]"
               type="button"
               aria-label="Profile"
             >
-              <span className="h-7 w-7 rounded-full bg-gradient-to-br from-teal-400/30 to-teal-600/30 border border-teal-300/40 flex items-center justify-center text-[11px] font-extrabold text-teal-50">
-                {initials}
-              </span>
-              <span className="text-xs font-bold tracking-wide truncate max-w-[80px]">{displayName}</span>
+              <span className="h-1.5 w-1.5 rounded-full bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]" />
+              <span className="truncate max-w-[100px]">{displayName.toUpperCase()}</span>
             </button>
             <button
               onClick={onLogout}
-              className="h-9 w-9 rounded-full bg-[#021a18]/80 backdrop-blur-md border border-teal-300/40 flex items-center justify-center text-teal-100 hover:border-teal-200/70 hover:text-teal-50 transition active:scale-[0.97]"
-              style={{ boxShadow: "inset 0 0 0 1px rgba(94,234,212,0.08), 0 0 12px rgba(20,184,166,0.2)" }}
+              className="p-2 rounded-md text-white border border-teal-300/40 bg-[#0b1220]/80 hover:border-teal-200/70 hover:bg-[#0e1830]/80 transition active:scale-[0.97] shadow-[inset_0_0_0_1px_rgba(94,234,212,0.08)]"
               type="button"
               aria-label="Log out"
             >
