@@ -29,7 +29,6 @@ export default function HeroHeader({
   const router = useRouter();
   const displayName = studentName || "Adventurer";
   const progressPct = Math.round((lessonsDone / Math.max(totalLessons, 1)) * 100);
-  const initials = displayName.charAt(0).toUpperCase();
 
   return (
     <div className="relative">
