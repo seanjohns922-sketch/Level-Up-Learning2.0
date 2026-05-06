@@ -23152,6 +23152,212 @@ function generateGenericQuestion(
         };
   }
 
+  if (explicitMode === "y6_coord4q_find_plot") {
+    const templates: TypedResponseQuestion[] = [
+      {
+        kind: "typed_response",
+        prompt: "Tap the point (3, 2).",
+        answer: "(3,2)",
+        acceptedAnswers: ["(3, 2)", "3,2", "3 2"],
+        helper: "Across first, then up/down.",
+        placeholder: "Tap a point",
+        visual: cartesianGridVisual("Find & Plot", [], {
+          targetCoordinate: "(3, 2)",
+          subtitle: "Tap the correct point on the grid.",
+        }),
+      },
+      {
+        kind: "typed_response",
+        prompt: "Find and plot the coordinate (-2, 1).",
+        answer: "(-2,1)",
+        acceptedAnswers: ["(-2, 1)", "-2,1", "-2 1"],
+        helper: "Negative x means left.",
+        placeholder: "Tap a point",
+        visual: cartesianGridVisual("Find & Plot", [], {
+          targetCoordinate: "(-2, 1)",
+          subtitle: "Tap the correct point on the grid.",
+        }),
+      },
+      {
+        kind: "typed_response",
+        prompt: "Tap the point (-3, -2).",
+        answer: "(-3,-2)",
+        acceptedAnswers: ["(-3, -2)", "-3,-2", "-3 -2"],
+        helper: "Both values are negative here.",
+        placeholder: "Tap a point",
+        visual: cartesianGridVisual("Find & Plot", [], {
+          targetCoordinate: "(-3, -2)",
+          subtitle: "Tap the correct point on the grid.",
+        }),
+      },
+      {
+        kind: "typed_response",
+        prompt: "Tap the point (4, 1).",
+        answer: "(4,1)",
+        acceptedAnswers: ["(4, 1)", "4,1", "4 1"],
+        helper: "x is horizontal.",
+        placeholder: "Tap a point",
+        visual: cartesianGridVisual("Find & Plot", [], {
+          targetCoordinate: "(4, 1)",
+          subtitle: "Tap the correct point on the grid.",
+        }),
+      },
+      {
+        kind: "typed_response",
+        prompt: "Where is (2, -4)? Tap the point.",
+        answer: "(2,-4)",
+        acceptedAnswers: ["(2, -4)", "2,-4", "2 -4"],
+        helper: "Negative y means down.",
+        placeholder: "Tap a point",
+        visual: cartesianGridVisual("Find & Plot", [], {
+          targetCoordinate: "(2, -4)",
+          subtitle: "Tap the correct point on the grid.",
+        }),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_coord4q_read_quadrants") {
+    const templates: MultipleChoiceQuestion[] = [
+      {
+        kind: "multiple_choice",
+        prompt: "Which coordinate is shown?",
+        options: ["(3, 4)", "(4, 3)", "(4, -3)"],
+        answer: "(4, 3)",
+        helper: "Read x first, then y.",
+        visual: cartesianGridVisual("Read the Point", [{ x: 4, y: 3 }], {
+          subtitle: "One point is shown on the grid.",
+        }),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which point is in Quadrant II?",
+        options: ["(3, 4)", "(-2, 3)", "(-3, -2)"],
+        answer: "(-2, 3)",
+        helper: "Quadrant II is left and up.",
+        visual: cartesianGridVisual(
+          "Quadrant Check",
+          [
+            { x: 3, y: 4, label: "A" },
+            { x: -2, y: 3, label: "B" },
+            { x: -3, y: -2, label: "C" },
+          ],
+          {
+            subtitle: "Use the signs of x and y.",
+          }
+        ),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which quadrant is (4, 3)?",
+        options: ["Quadrant I", "Quadrant II", "Quadrant III"],
+        answer: "Quadrant I",
+        helper: "Positive x and positive y place the point top-right.",
+        visual: cartesianGridVisual("Quadrant Check", [{ x: 4, y: 3 }], {
+          subtitle: "Top-right is Quadrant I.",
+        }),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which coordinate lies on the x-axis?",
+        options: ["(3, 0)", "(0, 3)", "(2, 2)"],
+        answer: "(3, 0)",
+        helper: "Points on the x-axis have y = 0.",
+        visual: cartesianGridVisual(
+          "Axis Check",
+          [
+            { x: 3, y: 0, label: "A" },
+            { x: 0, y: 3, label: "B" },
+            { x: 2, y: 2, label: "C" },
+          ],
+          {
+            subtitle: "Look for the point on the horizontal axis.",
+          }
+        ),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which coordinate lies on the y-axis?",
+        options: ["(0, 4)", "(4, 0)", "(3, 3)"],
+        answer: "(0, 4)",
+        helper: "Points on the y-axis have x = 0.",
+        visual: cartesianGridVisual(
+          "Axis Check",
+          [
+            { x: 0, y: 4, label: "A" },
+            { x: 4, y: 0, label: "B" },
+            { x: 3, y: 3, label: "C" },
+          ],
+          {
+            subtitle: "Look for the point on the vertical axis.",
+          }
+        ),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_coord4q_movement") {
+    const templates: MultipleChoiceQuestion[] = [
+      {
+        kind: "multiple_choice",
+        prompt: "Point (2, 3) moves to (5, 3). What changed?",
+        options: ["x changed", "y changed", "both changed"],
+        answer: "x changed",
+        helper: "The y-value stayed the same.",
+        visual: cartesianGridVisual("Movement", [{ x: 2, y: 3 }, { x: 5, y: 3 }], {
+          connectPoints: true,
+          movementArrow: true,
+          subtitle: "Same y means horizontal movement.",
+        }),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Point (4, -2) moves to (4, 3). What changed?",
+        options: ["x changed", "y changed", "both changed"],
+        answer: "y changed",
+        helper: "The x-value stayed the same.",
+        visual: cartesianGridVisual("Movement", [{ x: 4, y: -2 }, { x: 4, y: 3 }], {
+          connectPoints: true,
+          movementArrow: true,
+          subtitle: "Same x means vertical movement.",
+        }),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Point (1, 2) moves right 3. New coordinate?",
+        options: ["(4, 2)", "(1, 5)", "(3, 2)"],
+        answer: "(4, 2)",
+        helper: "Moving right changes x only.",
+        visual: cartesianGridVisual("Movement", [{ x: 1, y: 2 }], {
+          subtitle: "Start at the shown point and move right 3.",
+        }),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Point (-2, 1) moves down 4. New coordinate?",
+        options: ["(-2, -3)", "(-6, 1)", "(-2, 5)"],
+        answer: "(-2, -3)",
+        helper: "Moving down changes y only.",
+        visual: cartesianGridVisual("Movement", [{ x: -2, y: 1 }], {
+          subtitle: "Start at the shown point and move down 4.",
+        }),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Point (3, -2) moves left 5 and up 3. New coordinate?",
+        options: ["(-2, 1)", "(8, 1)", "(-2, -5)"],
+        answer: "(-2, 1)",
+        helper: "Left changes x. Up changes y.",
+        visual: cartesianGridVisual("Movement", [{ x: 3, y: -2 }], {
+          subtitle: "Move left 5, then up 3.",
+        }),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
   if (
     explicitMode === "choose_strategy_quick" ||
     explicitMode === "choose_strategy_reflect" ||

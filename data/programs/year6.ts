@@ -544,9 +544,18 @@ const year6Rows: ProgramRow[] = [
     activity: "Read, plot, and interpret coordinate positions and movements across the Cartesian plane.",
     curriculum: ["AC9M6N08"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "equations_real_context" }),
-      makeActivity("multiple_choice", 1, { mode: "equations_real_context" }),
-      makeActivity("typed_response", 1, { mode: "equations_real_context" }),
+      makeActivity("typed_response", 1, {
+        mode: "y6_coord4q_find_plot",
+        rotationRole: "fast_thinking",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_coord4q_read_quadrants",
+        rotationRole: "reasoning",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_coord4q_movement",
+        rotationRole: "apply_create",
+      }),
     ],
   },
   {

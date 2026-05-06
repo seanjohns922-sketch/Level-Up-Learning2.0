@@ -1586,7 +1586,7 @@ export default function TypedResponseActivity({
   const isCartesianPlotTask =
     questionData.visual?.type === "cartesian_grid" &&
     Boolean(questionData.visual.targetCoordinate) &&
-    /plot the point/i.test(questionData.prompt);
+    /(plot the point|tap the point|find and plot|where is .*tap the point)/i.test(questionData.prompt);
   const [typed, setTyped] = useState("");
   const [fractionWholeInput, setFractionWholeInput] = useState("");
   const [fractionNumeratorInput, setFractionNumeratorInput] = useState("");
