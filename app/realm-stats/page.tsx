@@ -110,7 +110,7 @@ export default function RealmStatsPage() {
           <div className="mb-4">
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-xs font-bold text-white/50">Week Progress</span>
-              <span className="text-xs font-extrabold text-emerald-400">{week} / 12</span>
+              <span className="text-xs font-extrabold text-emerald-400">Week {week}</span>
             </div>
             <div className="h-2 rounded-full bg-white/8 overflow-hidden">
               <div
