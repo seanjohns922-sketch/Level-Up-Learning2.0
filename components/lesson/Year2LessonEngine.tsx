@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { LessonRenderer } from "@/components/lesson/LessonRenderer";
 import { LessonHUDRail } from "@/components/lesson/LessonHUDRail";
 import { LessonCompleteCard } from "@/components/lesson/LessonCompleteCard";
+import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent } from "@/lib/live-class-client";
 import {
   buildLessonActivityPool,
   generateQuestion,
@@ -198,6 +199,14 @@ export type LessonPerformanceSummary = {
   struggledQuestionTypes: string[];
 };
 
+type LiveLessonContext = {
+  level: string;
+  strand: string;
+  week: number;
+  lessonId: string;
+  lessonTitle: string;
+};
+
 function titleCaseWords(value: string) {
   return value
     .split(/[\s_]+/)
@@ -224,6 +233,24 @@ function formatLessonTopicLabel(mode: string) {
   };
 
   return byMode[mode] ?? titleCaseWords(mode);
+}
+
+function getQuestionCorrectAnswer(question: Year2QuestionData | null) {
+  if (!question) return null;
+  if ("answer" in question && question.answer !== undefined && question.answer !== null) {
+    return String(question.answer);
+  }
+  if ("answers" in question && Array.isArray(question.answers)) {
+    return question.answers.join(" | ");
+  }
+  return null;
+}
+
+function getQuestionOptions(question: Year2QuestionData | null) {
+  if (!question || !("options" in question) || !Array.isArray(question.options)) return [];
+  return question.options
+    .map((option) => String(option ?? "").trim())
+    .filter((option) => option.length > 0);
 }
 
 function buildLessonPerformanceSummary({
@@ -379,12 +406,14 @@ export function Year2LessonEngine({
   onExit,
   renderCompletionCard,
   onPerformanceSummary,
+  liveContext,
 }: {
   lesson: Lesson;
   onTimedComplete: () => void;
   onExit: () => void;
   renderCompletionCard?: (summary: LessonPerformanceSummary) => ReactNode;
   onPerformanceSummary?: (summary: LessonPerformanceSummary) => void;
+  liveContext?: LiveLessonContext;
 }) {
   const totalSeconds = 9 * 60;
   const level = useMemo(() => getLevelForLesson(lesson), [lesson]);
@@ -398,6 +427,7 @@ export function Year2LessonEngine({
   const [currentActivityIndex, setCurrentActivityIndex] = useState(initialTurn.activityIndex);
   const [currentQuestion, setCurrentQuestion] = useState<Year2QuestionData | null>(initialTurn.question);
   const [questionKey, setQuestionKey] = useState(0);
+  const [currentQuestionSequence, setCurrentQuestionSequence] = useState(initialTurn.question ? 1 : 0);
   const bagRef = useRef<number[]>(initialTurn.bag);
   const lastIndexRef = useRef<number | null>(initialTurn.lastIndex);
   const questionHistoryRef = useRef<QuestionHistoryEntry[]>(
@@ -424,6 +454,7 @@ export function Year2LessonEngine({
   const currentActivity = activities[currentActivityIndex] ?? null;
   const questionsAnsweredRef = useRef(0);
   const showMultiStepCalculationFeedback = isMultiStepCalculationLesson(level, lesson);
+  const lastLoggedActivityIdRef = useRef<string | null>(null);
 
   const accuracy =
     questionsAnswered > 0
@@ -495,6 +526,7 @@ export function Year2LessonEngine({
 
     setCurrentActivityIndex(nextTurn.activityIndex);
     setCurrentQuestion(nextTurn.question);
+    setCurrentQuestionSequence(questionOrderRef.current);
     setQuestionKey((v) => v + 1);
     setStatus("idle");
     scoredThisTurnRef.current = false;
@@ -533,6 +565,77 @@ export function Year2LessonEngine({
     onPerformanceSummary?.(summary);
   }, [finished, onPerformanceSummary, summary]);
 
+  useEffect(() => {
+    if (!liveContext || !currentActivity || !currentQuestion) return;
+
+    const mode =
+      questionHistoryRef.current[questionHistoryRef.current.length - 1]?.mode ??
+      ((currentActivity.config ?? {}) as { mode?: string }).mode ??
+      currentActivity.activityType ??
+      "practice";
+    const activityLabel = formatLessonTopicLabel(mode);
+    const activityId = `${liveContext.lessonId}:${currentActivity.activityType}:${currentActivityIndex}`;
+    const questionId = `${liveContext.lessonId}-q${currentQuestionSequence}`;
+    const progressPercent = Math.max(0, Math.min(100, Math.round((questionsAnsweredRef.current / 10) * 100)));
+    if (lastLoggedActivityIdRef.current !== activityId) {
+      lastLoggedActivityIdRef.current = activityId;
+      void trackLiveLearningEvent({
+        eventType: "activity_started",
+        level: liveContext.level,
+        strand: liveContext.strand,
+        week: liveContext.week,
+        lessonId: liveContext.lessonId,
+        lessonTitle: liveContext.lessonTitle,
+        activityId,
+        activityLabel,
+        questionId,
+        questionText: currentQuestion.prompt,
+        questionType: currentQuestion.kind,
+        questionOptions: getQuestionOptions(currentQuestion),
+        correctAnswer: getQuestionCorrectAnswer(currentQuestion),
+        progressPercent,
+        progressLabel: `Question ${currentQuestionSequence}`,
+        skillTag: mode,
+      });
+    }
+    void trackLiveLearningEvent({
+      eventType: "question_loaded",
+      level: liveContext.level,
+      strand: liveContext.strand,
+      week: liveContext.week,
+      lessonId: liveContext.lessonId,
+      lessonTitle: liveContext.lessonTitle,
+      activityId,
+      activityLabel,
+      questionId,
+      questionText: currentQuestion.prompt,
+      questionType: currentQuestion.kind,
+      questionOptions: getQuestionOptions(currentQuestion),
+      correctAnswer: getQuestionCorrectAnswer(currentQuestion),
+      progressPercent,
+      progressLabel: `Question ${currentQuestionSequence}`,
+      skillTag: mode,
+    });
+    scheduleIdleLiveEvent({
+      level: liveContext.level,
+      strand: liveContext.strand,
+      week: liveContext.week,
+      lessonId: liveContext.lessonId,
+      lessonTitle: liveContext.lessonTitle,
+      activityId,
+      activityLabel,
+      questionId,
+      questionText: currentQuestion.prompt,
+      questionType: currentQuestion.kind,
+      progressPercent,
+      progressLabel: `Question ${currentQuestionSequence}`,
+      skillTag: mode,
+    });
+    return () => {
+      clearIdleLiveEventTimer();
+    };
+  }, [currentActivity, currentActivityIndex, currentQuestion, currentQuestionSequence, liveContext]);
+
   function handleCorrect() {
     if (finished || status !== "idle" || scoredThisTurnRef.current) return;
     scoredThisTurnRef.current = true;
@@ -550,6 +653,30 @@ export function Year2LessonEngine({
     }]);
     clearPendingTimeout();
     setStatus("correct");
+    if (liveContext) {
+      const activityId = `${liveContext.lessonId}:${currentActivity?.activityType ?? "activity"}:${currentActivityIndex}`;
+      void trackLiveLearningEvent({
+        eventType: "answer_correct",
+        level: liveContext.level,
+        strand: liveContext.strand,
+        week: liveContext.week,
+        lessonId: liveContext.lessonId,
+        lessonTitle: liveContext.lessonTitle,
+        activityId,
+        activityLabel: formatLessonTopicLabel(mode),
+        questionId: `${liveContext.lessonId}-q${currentQuestionSequence}`,
+        questionText: currentQuestion?.prompt,
+        questionType: currentQuestion?.kind,
+        questionOptions: getQuestionOptions(currentQuestion),
+        correctAnswer: getQuestionCorrectAnswer(currentQuestion),
+        isCorrect: true,
+        timeOnQuestion: Math.max(1, totalSeconds - secondsLeft - questionStartedAtElapsedRef.current),
+        attemptNumber: (questionsAnsweredRef.current ?? 0) + 1,
+        progressPercent: Math.max(0, Math.min(100, Math.round((questionsAnsweredRef.current / 10) * 100))),
+        progressLabel: `Question ${currentQuestionSequence}`,
+        skillTag: mode,
+      });
+    }
     questionsAnsweredRef.current += 1;
     setQuestionsAnswered((v) => v + 1);
     setCorrectAnswers((v) => v + 1);
@@ -573,6 +700,30 @@ export function Year2LessonEngine({
     }]);
     clearPendingTimeout();
     setStatus("wrong");
+    if (liveContext) {
+      const activityId = `${liveContext.lessonId}:${currentActivity?.activityType ?? "activity"}:${currentActivityIndex}`;
+      void trackLiveLearningEvent({
+        eventType: "answer_incorrect",
+        level: liveContext.level,
+        strand: liveContext.strand,
+        week: liveContext.week,
+        lessonId: liveContext.lessonId,
+        lessonTitle: liveContext.lessonTitle,
+        activityId,
+        activityLabel: formatLessonTopicLabel(mode),
+        questionId: `${liveContext.lessonId}-q${currentQuestionSequence}`,
+        questionText: currentQuestion?.prompt,
+        questionType: currentQuestion?.kind,
+        questionOptions: getQuestionOptions(currentQuestion),
+        correctAnswer: getQuestionCorrectAnswer(currentQuestion),
+        isCorrect: false,
+        timeOnQuestion: Math.max(1, totalSeconds - secondsLeft - questionStartedAtElapsedRef.current),
+        attemptNumber: (questionsAnsweredRef.current ?? 0) + 1,
+        progressPercent: Math.max(0, Math.min(100, Math.round((questionsAnsweredRef.current / 10) * 100))),
+        progressLabel: `Question ${currentQuestionSequence}`,
+        skillTag: mode,
+      });
+    }
     questionsAnsweredRef.current += 1;
     setQuestionsAnswered((v) => v + 1);
     timeoutRef.current = setTimeout(() => loadNextQuestion(), 1200);
@@ -589,6 +740,20 @@ export function Year2LessonEngine({
     isOrderedStrategyFluencyLesson(level, lesson) && questionsAnswered === 4 && status === "idle";
   const showEstimatePrompt =
     isEstimateReasoningLesson(level, lesson) && questionsAnswered === 4 && status === "idle";
+
+  useEffect(() => {
+    if (!finished || !liveContext) return;
+    void trackLiveLearningEvent({
+      eventType: "lesson_completed",
+      level: liveContext.level,
+      strand: liveContext.strand,
+      week: liveContext.week,
+      lessonId: liveContext.lessonId,
+      lessonTitle: liveContext.lessonTitle,
+      progressPercent: 100,
+      progressLabel: `Completed ${questionsAnswered} questions`,
+    });
+  }, [finished, liveContext, questionsAnswered]);
 
   // ── Finished state ──
   if (finished) {

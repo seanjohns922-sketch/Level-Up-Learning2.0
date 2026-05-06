@@ -29,6 +29,7 @@ import MoneyMakeAmount from "@/components/week7/MoneyMakeAmount";
 import MoneyChange from "@/components/week7/MoneyChange";
 import MoneyEnough from "@/components/week7/MoneyEnough";
 import { MathFormattedText } from "@/components/FractionText";
+import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent } from "@/lib/live-class-client";
 import { prepareSpeechText, speak, useAutoReadSetting, useSpeakState } from "@/lib/speak";
 import type { TeacherAttemptQuestion, TeacherInsight, TeacherInsightInput } from "@/lib/teacher-insights";
 import { ClickableDotGrid, ClickableDotRows } from "@/components/ClickableDots";
@@ -217,6 +218,39 @@ type QuizQuestion = {
     difficulty?: "early" | "middle" | "late";
   };
 };
+
+function getQuizQuestionOptions(question: QuizQuestion | undefined | null) {
+  if (!question) return [];
+  if (Array.isArray(question.options) && question.options.length > 0) return question.options;
+  if (question.kind === "lessonActivity" && question.questionData?.kind === "multiple_choice") {
+    return question.questionData.options;
+  }
+  return [];
+}
+
+function getQuizCorrectAnswer(question: QuizQuestion | undefined | null) {
+  if (!question) return null;
+  if (typeof question.correctValue === "string" && question.correctValue.trim().length > 0) {
+    return question.correctValue;
+  }
+  if (
+    typeof question.correctIndex === "number" &&
+    Array.isArray(question.options) &&
+    question.options[question.correctIndex]
+  ) {
+    return question.options[question.correctIndex];
+  }
+  if (
+    question.kind === "lessonActivity" &&
+    question.questionData &&
+    "answer" in question.questionData &&
+    question.questionData.answer !== undefined &&
+    question.questionData.answer !== null
+  ) {
+    return String(question.questionData.answer);
+  }
+  return null;
+}
 
 type LessonBreakdown = {
   lessonNumber: number;
@@ -3603,6 +3637,8 @@ function SessionPage() {
   const speakState = useSpeakState();
   const isWeek9 = Number(week) === 9;
   const isWeek10 = Number(week) === 10;
+  const liveQuizStartedRef = useRef<string | null>(null);
+  const liveAnsweredQuestionIdsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     setQuizAnswers({});
@@ -3616,6 +3652,7 @@ function SessionPage() {
     setQuizSubmitted(false);
     setFinalScore(0);
     setQuizIndex(0);
+    liveAnsweredQuestionIdsRef.current = new Set();
   }, [quizQuestions]);
 
   function chooseQuiz(qIndex: number, optIndex: number) {
@@ -3734,6 +3771,25 @@ function SessionPage() {
     if (passed) {
       completeWeek(Number(week));
     }
+
+    void trackLiveLearningEvent({
+      eventType: "quiz_completed",
+      level: year,
+      strand: "Number",
+      week: Number(week),
+      lessonId: `${year}-w${week}-weekly-quiz`,
+      lessonTitle: "Weekly Quiz",
+      progressPercent: 100,
+      progressLabel: `Completed weekly quiz · ${score}/${total}`,
+      selectedAnswer: null,
+      correctAnswer: null,
+      isCorrect: passed,
+      attemptNumber: 1,
+      skillTag: weakestLessonBreakdown?.lessonTitle ?? "weekly_quiz",
+      misconceptionTag: !passed && weakestLessonBreakdown
+        ? `Low accuracy in ${weakestLessonBreakdown.lessonTitle ?? `Lesson ${weakestLessonBreakdown.lessonNumber}`}`
+        : null,
+    });
 
     // Persist quiz score to DB
     (async () => {
@@ -3897,6 +3953,132 @@ function SessionPage() {
         currentQuiz?.kind === "moneyEnough"
       ? quizMoneyAnswers[currentQuiz.id]?.attempted === true
       : typeof quizAnswers[currentQuiz?.id ?? ""] === "number";
+
+  useEffect(() => {
+    if (!year || !week || quizQuestions.length === 0 || quizSubmitted) return;
+    const quizKey = `${year}-w${week}`;
+    if (liveQuizStartedRef.current === quizKey) return;
+    liveQuizStartedRef.current = quizKey;
+    void trackLiveLearningEvent({
+      eventType: "quiz_started",
+      level: year,
+      strand: "Number",
+      week: Number(week),
+      lessonId: `${year}-w${week}-weekly-quiz`,
+      lessonTitle: "Weekly Quiz",
+      progressPercent: 0,
+      progressLabel: "Quiz started",
+    });
+  }, [quizQuestions.length, quizSubmitted, week, year]);
+
+  useEffect(() => {
+    if (!currentQuiz || quizSubmitted) return;
+    const progressPercent = quizQuestions.length
+      ? Math.round((quizIndex / quizQuestions.length) * 100)
+      : 0;
+    void trackLiveLearningEvent({
+      eventType: "question_loaded",
+      level: year,
+      strand: "Number",
+      week: Number(week),
+      lessonId: `${year}-w${week}-weekly-quiz`,
+      lessonTitle: "Weekly Quiz",
+      activityId: currentQuiz.lessonTag ? `lesson-${currentQuiz.lessonTag}` : currentQuiz.kind,
+      activityLabel: currentQuiz.skill ?? currentQuiz.kind,
+      questionId: currentQuiz.id,
+      questionText: currentQuiz.prompt,
+      questionType: currentQuiz.kind,
+      questionOptions: getQuizQuestionOptions(currentQuiz),
+      correctAnswer: getQuizCorrectAnswer(currentQuiz),
+      progressPercent,
+      progressLabel: `Quiz question ${quizIndex + 1} of ${quizQuestions.length}`,
+      skillTag: currentQuiz.skill ?? currentQuiz.quizMeta?.type ?? currentQuiz.kind,
+    });
+    scheduleIdleLiveEvent({
+      level: year,
+      strand: "Number",
+      week: Number(week),
+      lessonId: `${year}-w${week}-weekly-quiz`,
+      lessonTitle: "Weekly Quiz",
+      activityId: currentQuiz.lessonTag ? `lesson-${currentQuiz.lessonTag}` : currentQuiz.kind,
+      activityLabel: currentQuiz.skill ?? currentQuiz.kind,
+      questionId: currentQuiz.id,
+      questionText: currentQuiz.prompt,
+      questionType: currentQuiz.kind,
+      progressPercent,
+      progressLabel: `Quiz question ${quizIndex + 1} of ${quizQuestions.length}`,
+      skillTag: currentQuiz.skill ?? currentQuiz.quizMeta?.type ?? currentQuiz.kind,
+    });
+    return () => {
+      clearIdleLiveEventTimer();
+    };
+  }, [currentQuiz, quizIndex, quizQuestions.length, quizSubmitted, week, year]);
+
+  useEffect(() => {
+    if (!currentQuiz || !currentAnswered || quizSubmitted) return;
+    if (liveAnsweredQuestionIdsRef.current.has(currentQuiz.id)) return;
+    liveAnsweredQuestionIdsRef.current.add(currentQuiz.id);
+    void trackLiveLearningEvent({
+      eventType: isQuizQuestionCorrect(
+        currentQuiz,
+        quizAnswers,
+        quizTyped,
+        quizLineAnswers,
+        quizChartDone,
+        quizMabAnswers,
+        quizMoneyAnswers,
+        quizLessonActivityResults
+      )
+        ? "answer_correct"
+        : "answer_incorrect",
+      level: year,
+      strand: "Number",
+      week: Number(week),
+      lessonId: `${year}-w${week}-weekly-quiz`,
+      lessonTitle: "Weekly Quiz",
+      activityId: currentQuiz.lessonTag ? `lesson-${currentQuiz.lessonTag}` : currentQuiz.kind,
+      activityLabel: currentQuiz.skill ?? currentQuiz.kind,
+      questionId: currentQuiz.id,
+      questionText: currentQuiz.prompt,
+      questionType: currentQuiz.kind,
+      questionOptions: getQuizQuestionOptions(currentQuiz),
+      selectedAnswer:
+        typeof quizAnswers[currentQuiz.id] === "number" && currentQuiz.options?.[quizAnswers[currentQuiz.id]]
+          ? currentQuiz.options[quizAnswers[currentQuiz.id]]
+          : (quizTyped[currentQuiz.id] ?? "").trim() || null,
+      correctAnswer: getQuizCorrectAnswer(currentQuiz),
+      isCorrect: isQuizQuestionCorrect(
+        currentQuiz,
+        quizAnswers,
+        quizTyped,
+        quizLineAnswers,
+        quizChartDone,
+        quizMabAnswers,
+        quizMoneyAnswers,
+        quizLessonActivityResults
+      ),
+      progressPercent: quizQuestions.length
+        ? Math.round(((quizIndex + 1) / quizQuestions.length) * 100)
+        : 0,
+      progressLabel: `Quiz question ${quizIndex + 1} of ${quizQuestions.length}`,
+      skillTag: currentQuiz.skill ?? currentQuiz.quizMeta?.type ?? currentQuiz.kind,
+    });
+  }, [
+    currentAnswered,
+    currentQuiz,
+    quizAnswers,
+    quizChartDone,
+    quizIndex,
+    quizLessonActivityResults,
+    quizLineAnswers,
+    quizMabAnswers,
+    quizMoneyAnswers,
+    quizQuestions.length,
+    quizSubmitted,
+    quizTyped,
+    week,
+    year,
+  ]);
 
   // Live XP / correct counter for the quiz HUD
   const liveCorrectCount = quizQuestions.reduce(

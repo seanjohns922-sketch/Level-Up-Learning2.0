@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuthGuard } from "@/lib/useAuthGuard";
 import { getLatestPosttestProfile } from "@/data/assessments/analysis";
 import CurriculumExplorer from "@/components/teacher/CurriculumExplorer";
+import LiveClassPanel from "@/components/teacher/LiveClassPanel";
 import StrandStudentsPanel from "@/components/teacher/StrandStudentsPanel";
 
 /* ── types ─────────────────────────────────────────── */
@@ -151,7 +152,7 @@ export default function TeacherDashboardPage() {
   const [progress, setProgress] = useState<ProgressRow[]>([]);
   const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
   const [activeYear, setActiveYear] = useState("Year 1");
-  const [activeTab, setActiveTab] = useState<"students" | "curriculum">("students");
+  const [activeTab, setActiveTab] = useState<"live" | "students" | "curriculum">("live");
   const [copiedCode, setCopiedCode] = useState(false);
 
   // Refs to prevent duplicate fetches and stale closures
@@ -685,6 +686,7 @@ export default function TeacherDashboardPage() {
 
               <div className="flex items-center gap-1 p-1 bg-white rounded-xl border border-[#E6E8EC] w-fit shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
                 {([
+                  { id: "live",       label: "Live Class" },
                   { id: "students",   label: "Students" },
                   { id: "curriculum", label: "Curriculum" },
                 ] as const).map((t) => (
@@ -704,7 +706,12 @@ export default function TeacherDashboardPage() {
               </div>
             </div>
 
-            {activeTab === "curriculum" ? (
+            {activeTab === "live" ? (
+              <LiveClassPanel
+                selectedClass={selectedClass ?? null}
+                students={classStudents as any}
+              />
+            ) : activeTab === "curriculum" ? (
               <CurriculumExplorer
                 yearLabel={activeYear}
                 studentCount={classStudents.length}

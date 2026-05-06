@@ -24,6 +24,7 @@ import { resetWeek3TaskSessionState } from "@/data/activities/year1/week3";
 import { resetWeek4TaskSessionState } from "@/data/activities/year1/week4";
 import { getProgramForYear } from "@/data/programs";
 import { ACTIVE_STUDENT_KEY, readProgress, updateProgress } from "@/data/progress";
+import { trackLiveLearningEvent } from "@/lib/live-class-client";
 import { markLessonComplete } from "@/lib/program-progress";
 import { getLessonChrome } from "@/lib/levelTheme";
 import { LessonPageHero } from "@/components/lesson/LessonPageHero";
@@ -97,6 +98,16 @@ function LessonPage() {
 
   const showWeek12Lesson3Summary = week === 12 && lessonNumber === 3;
   const savedLessonSummaryKeysRef = useRef<Set<string>>(new Set());
+  const liveLessonContext = useMemo(
+    () => ({
+      level: year,
+      strand: "Number",
+      week,
+      lessonId: effectiveLessonId,
+      lessonTitle: safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`,
+    }),
+    [effectiveLessonId, lessonNumber, safeLessonTitle, week, year]
+  );
 
   async function persistLessonPerformanceSummary(summary: LessonPerformanceSummary) {
     const summaryKey = `${effectiveLessonId}:${summary.questionsAnswered}:${summary.correctAnswers}:${summary.timeSpentSeconds}`;
@@ -456,6 +467,16 @@ function LessonPage() {
                   }} />
                   <button
                     onClick={() => {
+                      void trackLiveLearningEvent({
+                        eventType: "lesson_started",
+                        level: liveLessonContext.level,
+                        strand: liveLessonContext.strand,
+                        week: liveLessonContext.week,
+                        lessonId: liveLessonContext.lessonId,
+                        lessonTitle: liveLessonContext.lessonTitle,
+                        progressPercent: 0,
+                        progressLabel: "Lesson started",
+                      });
                       if (year === "Year 1") {
                         resetYear1SessionTaskState();
                       }
@@ -511,6 +532,7 @@ function LessonPage() {
               key={`${year}-${week}-${effectiveLessonId}`}
               minutes={9}
               lessonTitle={safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
+              liveContext={liveLessonContext}
               renderCompletionCard={
                 showWeek12Lesson3Summary
                   ? (summary: LessonPerformanceSummary) => (
@@ -586,6 +608,7 @@ function LessonPage() {
                   lesson={lessonMeta}
                   onTimedComplete={markLessonDone}
                   onExit={goBackToProgram}
+                  liveContext={liveLessonContext}
                   renderCompletionCard={
                     showWeek12Lesson3Summary
                       ? (summary: LessonPerformanceSummary) => (

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { PracticeTask, Difficulty } from "@/data/activities/year1/practice-task";
 import { getDifficultyFromTime } from "@/data/activities/year1/practice-task";
 import { TaskRenderer } from "@/components/TaskRenderer";
+import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent } from "@/lib/live-class-client";
 import { speak, useAutoReadSetting } from "@/lib/speak";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { LessonHUDRail } from "@/components/lesson/LessonHUDRail";
@@ -34,6 +35,30 @@ function formatPracticeTopicLabel(kind: PracticeTask["kind"]) {
   return kind.replace(/([A-Z])/g, " $1").replace(/^./, (v) => v.toUpperCase());
 }
 
+function getPracticeTaskPrompt(task: PracticeTask) {
+  return "prompt" in task && typeof task.prompt === "string" ? task.prompt : "";
+}
+
+function getPracticeTaskCorrectAnswer(task: PracticeTask) {
+  if (task.kind === "mcq") return task.answer ?? null;
+  if (task.kind === "count") return String(task.count);
+  if (task.kind === "order3") return task.direction === "ASC"
+    ? [...task.numbers].sort((a, b) => a - b).join(", ")
+    : [...task.numbers].sort((a, b) => b - a).join(", ");
+  if (task.kind === "audioPick") return String(task.targetNumber);
+  if (task.kind === "numberHunt") return String(task.targetNumber);
+  if (task.kind === "groupCountVisual") return String(task.answer);
+  return null;
+}
+
+type LiveLessonContext = {
+  level: string;
+  strand: string;
+  week: number;
+  lessonId: string;
+  lessonTitle: string;
+};
+
 function Dots({ count }: { count: number }) {
   return (
     <div className="rounded-2xl border border-gray-200 bg-card p-4">
@@ -56,6 +81,7 @@ export function PracticeRunner({
   lessonTitle,
   renderCompletionCard,
   onPerformanceSummary,
+  liveContext,
 }: {
   minutes?: number;
   getTask: (ctx?: {
@@ -68,6 +94,7 @@ export function PracticeRunner({
   lessonTitle?: string;
   renderCompletionCard?: (summary: LessonPerformanceSummary) => ReactNode;
   onPerformanceSummary?: (summary: LessonPerformanceSummary) => void;
+  liveContext?: LiveLessonContext;
 }) {
   const totalSeconds = minutes * 60;
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
@@ -203,6 +230,64 @@ export function PracticeRunner({
     return task.direction === "ASC" ? sorted : sorted.reverse();
   }, [task]);
 
+  useEffect(() => {
+    if (!liveContext) return;
+    const prompt = getPracticeTaskPrompt(task);
+    const questionNumber = questionsAnsweredRef.current + 1;
+    if (questionNumber === 1) {
+      void trackLiveLearningEvent({
+        eventType: "activity_started",
+        level: liveContext.level,
+        strand: liveContext.strand,
+        week: liveContext.week,
+        lessonId: liveContext.lessonId,
+        lessonTitle: liveContext.lessonTitle,
+        activityId: task.kind,
+        activityLabel: formatPracticeTopicLabel(task.kind),
+        questionId: `${liveContext.lessonId}-q${questionNumber}`,
+        questionText: prompt,
+        questionType: task.kind,
+        progressPercent: 0,
+        progressLabel: `Question ${questionNumber} of ${MAX_LESSON_QUESTIONS}`,
+        skillTag: task.kind,
+      });
+    }
+    void trackLiveLearningEvent({
+      eventType: "question_loaded",
+      level: liveContext.level,
+      strand: liveContext.strand,
+      week: liveContext.week,
+      lessonId: liveContext.lessonId,
+      lessonTitle: liveContext.lessonTitle,
+      activityId: task.kind,
+      activityLabel: formatPracticeTopicLabel(task.kind),
+      questionId: `${liveContext.lessonId}-q${questionNumber}`,
+      questionText: prompt,
+      questionType: task.kind,
+      progressPercent: Math.round((questionsAnsweredRef.current / MAX_LESSON_QUESTIONS) * 100),
+      progressLabel: `Question ${questionNumber} of ${MAX_LESSON_QUESTIONS}`,
+      skillTag: task.kind,
+    });
+    scheduleIdleLiveEvent({
+      level: liveContext.level,
+      strand: liveContext.strand,
+      week: liveContext.week,
+      lessonId: liveContext.lessonId,
+      lessonTitle: liveContext.lessonTitle,
+      activityId: task.kind,
+      activityLabel: formatPracticeTopicLabel(task.kind),
+      questionId: `${liveContext.lessonId}-q${questionNumber}`,
+      questionText: prompt,
+      questionType: task.kind,
+      progressPercent: Math.round((questionsAnsweredRef.current / MAX_LESSON_QUESTIONS) * 100),
+      progressLabel: `Question ${questionNumber} of ${MAX_LESSON_QUESTIONS}`,
+      skillTag: task.kind,
+    });
+    return () => {
+      clearIdleLiveEventTimer();
+    };
+  }, [liveContext, task, taskNonce]);
+
   function nextTask() {
     if (finished) return;
     const ctx = makeCtx();
@@ -249,6 +334,29 @@ export function PracticeRunner({
       },
     ]);
     setStatus("wrong");
+    if (liveContext) {
+      const questionNumber = questionsAnsweredRef.current + 1;
+      void trackLiveLearningEvent({
+        eventType: "answer_incorrect",
+        level: liveContext.level,
+        strand: liveContext.strand,
+        week: liveContext.week,
+        lessonId: liveContext.lessonId,
+        lessonTitle: liveContext.lessonTitle,
+        activityId: task.kind,
+        activityLabel: formatPracticeTopicLabel(task.kind),
+        questionId: `${liveContext.lessonId}-q${questionNumber}`,
+        questionText: getPracticeTaskPrompt(task),
+        questionType: task.kind,
+        correctAnswer: getPracticeTaskCorrectAnswer(task),
+        isCorrect: false,
+        timeOnQuestion: Math.max(1, totalSeconds - secondsLeft - questionStartedAtElapsedRef.current),
+        attemptNumber: 1,
+        progressPercent: Math.round((questionsAnsweredRef.current / MAX_LESSON_QUESTIONS) * 100),
+        progressLabel: `Question ${questionNumber} of ${MAX_LESSON_QUESTIONS}`,
+        skillTag: task.kind,
+      });
+    }
     const nextQuestionsAnswered = bumpSessionCounters(false);
     clearPendingTimeout();
     if (nextQuestionsAnswered >= MAX_LESSON_QUESTIONS) {
@@ -270,6 +378,29 @@ export function PracticeRunner({
       },
     ]);
     setStatus("correct");
+    if (liveContext) {
+      const questionNumber = questionsAnsweredRef.current + 1;
+      void trackLiveLearningEvent({
+        eventType: "answer_correct",
+        level: liveContext.level,
+        strand: liveContext.strand,
+        week: liveContext.week,
+        lessonId: liveContext.lessonId,
+        lessonTitle: liveContext.lessonTitle,
+        activityId: task.kind,
+        activityLabel: formatPracticeTopicLabel(task.kind),
+        questionId: `${liveContext.lessonId}-q${questionNumber}`,
+        questionText: getPracticeTaskPrompt(task),
+        questionType: task.kind,
+        correctAnswer: getPracticeTaskCorrectAnswer(task),
+        isCorrect: true,
+        timeOnQuestion: Math.max(1, totalSeconds - secondsLeft - questionStartedAtElapsedRef.current),
+        attemptNumber: 1,
+        progressPercent: Math.round((questionsAnsweredRef.current / MAX_LESSON_QUESTIONS) * 100),
+        progressLabel: `Question ${questionNumber} of ${MAX_LESSON_QUESTIONS}`,
+        skillTag: task.kind,
+      });
+    }
     const nextQuestionsAnswered = bumpSessionCounters(true);
     clearPendingTimeout();
     if (nextQuestionsAnswered >= MAX_LESSON_QUESTIONS) {
@@ -322,6 +453,20 @@ export function PracticeRunner({
       });
     }
   }, [correctAnswers, lessonTitle, questionsAnswered]);
+
+  useEffect(() => {
+    if (!finished || !liveContext) return;
+    void trackLiveLearningEvent({
+      eventType: "lesson_completed",
+      level: liveContext.level,
+      strand: liveContext.strand,
+      week: liveContext.week,
+      lessonId: liveContext.lessonId,
+      lessonTitle: liveContext.lessonTitle,
+      progressPercent: 100,
+      progressLabel: `Completed ${safeQuestionsAnswered} of ${MAX_LESSON_QUESTIONS} questions`,
+    });
+  }, [finished, liveContext, safeQuestionsAnswered]);
 
   // ── Finished state ──
   if (finished) {
