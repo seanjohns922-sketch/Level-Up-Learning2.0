@@ -324,7 +324,7 @@ function ProgramPage() {
               }}
             >
               <span className="h-1.5 w-1.5 rounded-full bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]" />
-              Level {levelNum} · 12-Week Program
+              Level {levelNum} · Program
             </button>
             <h1 className="text-4xl md:text-5xl font-black text-white mt-3 tracking-tight drop-shadow-[0_2px_12px_rgba(20,184,166,0.35)]">Week {weekNum}</h1>
             <p className="text-base md:text-lg text-teal-50/95 mt-2 font-semibold">
