@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useMemo } from "react";
+import { memo } from "react";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import MatchThePair from "@/components/MatchThePair";
 import CountObjects from "@/components/CountObjects";
@@ -102,6 +102,9 @@ function TaskRendererInner({
   const onC = () => setTimeout(() => markCorrect(), 0);
   const onCS = () => setTimeout(() => markCorrectSoft(), 0);
   const onW = () => markWrong();
+  // This renderer fans out across many legacy task variants with different payload shapes.
+  // Keep the cast local so the switch stays compact without changing runtime behavior.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const t = task as any;
   const k = `${task.kind}-${taskNonce}`;
 
@@ -131,7 +134,7 @@ function TaskRendererInner({
     case "splitStepper":
       return <SplitStepper key={k} target={t.target} max={t.max ?? t.target} onCorrect={onC} />;
     case "mabBuild":
-      return <MabBuild key={k} target={t.target} maxTens={t.maxTens ?? 10} maxOnes={t.maxOnes ?? 10} onCorrect={onC} />;
+      return <MabBuild key={k} target={t.target} maxTens={Math.min(t.maxTens ?? 9, 9)} maxOnes={Math.min(t.maxOnes ?? 9, 9)} onCorrect={onC} />;
     case "placeValueDice":
       return <PlaceValueDiceMat key={k} onCorrect={onC} />;
     case "equalGroups":

@@ -16,6 +16,10 @@ function shuffle<T>(arr: T[]) {
 
 const lessonBags = new Map<string, number[]>();
 
+export function resetWeek2TaskSessionState() {
+  lessonBags.clear();
+}
+
 function pickFromBag(lessonId: string, count: number) {
   let bag = lessonBags.get(lessonId);
   if (!bag || bag.length === 0) {

@@ -16,6 +16,10 @@ function shuffle<T>(arr: T[]) {
 
 const lessonBags = new Map<string, number[]>();
 
+export function resetWeek3TaskSessionState() {
+  lessonBags.clear();
+}
+
 function pickFromBag(lessonId: string, count: number) {
   let bag = lessonBags.get(lessonId);
   if (!bag || bag.length === 0) {
@@ -43,7 +47,7 @@ function genTensOnesMcq(d: Difficulty): PracticeTask {
 function genMabBuild(d: Difficulty, min = 10, max = 99): PracticeTask {
   const [lo, hi] = diffRange(d, [10, 49], [min, 69], [min, max]);
   const target = randInt(lo, hi);
-  return { kind: "mabBuild", prompt: "Build it with tens and ones.", target, maxTens: 10, maxOnes: 10, difficulty: d };
+  return { kind: "mabBuild", prompt: "Build it with tens and ones.", target, maxTens: 9, maxOnes: 9, difficulty: d };
 }
 
 function genPartitionTwoWays(d: Difficulty): PracticeTask {

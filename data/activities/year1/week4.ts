@@ -18,7 +18,7 @@ function pickStartForStep(step: number, min: number, max: number) {
     return first + 10 * randInt(0, count - 1);
   }
   if (step === 10) {
-    let first = min + ((10 - (min % 10)) % 10);
+    const first = min + ((10 - (min % 10)) % 10);
     const count = Math.max(1, Math.floor((max - first) / 10) + 1);
     return first + 10 * randInt(0, count - 1);
   }
@@ -35,6 +35,10 @@ function shuffle<T>(arr: T[]) {
 }
 
 const lessonBags = new Map<string, number[]>();
+
+export function resetWeek4TaskSessionState() {
+  lessonBags.clear();
+}
 
 function pickFromBag(lessonId: string, count: number) {
   let bag = lessonBags.get(lessonId);

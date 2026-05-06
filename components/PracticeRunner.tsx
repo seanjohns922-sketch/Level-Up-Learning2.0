@@ -18,6 +18,12 @@ type AudioPickTask = Extract<PracticeTask, { kind: "audioPick" }>;
 type NumberHuntTask = Extract<PracticeTask, { kind: "numberHunt" }>;
 type GroupCountVisualTask = Extract<PracticeTask, { kind: "groupCountVisual" }>;
 
+const MAX_LESSON_QUESTIONS = 10;
+
+function clampNumber(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
+
 function formatPracticeTopicLabel(kind: PracticeTask["kind"]) {
   if (kind === "mcq") return "Multiple Choice";
   if (kind === "count") return "Number Input";
@@ -66,6 +72,8 @@ export function PracticeRunner({
   const totalSeconds = minutes * 60;
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
   const completedRef = useRef(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const scoredThisTurnRef = useRef(false);
 
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
@@ -73,6 +81,8 @@ export function PracticeRunner({
     Array<{ topicLabel: string; correct: boolean; timeSpentSeconds: number }>
   >([]);
   const questionStartedAtElapsedRef = useRef(0);
+  const questionsAnsweredRef = useRef(0);
+  const correctAnswersRef = useRef(0);
 
   function makeCtx() {
     const elapsed = totalSeconds - secondsLeft;
@@ -91,14 +101,16 @@ export function PracticeRunner({
   const [order, setOrder] = useState<number[]>([]);
   const [hasPlayed, setHasPlayed] = useState(false);
   const [taskNonce, setTaskNonce] = useState(0);
-  const finished = secondsLeft <= 0;
+  const finished = secondsLeft <= 0 || questionsAnswered >= MAX_LESSON_QUESTIONS;
   const { autoReadEnabled } = useAutoReadSetting();
   const lastAutoReadTaskKeyRef = useRef<string | null>(null);
   const autoReadPrompt = "prompt" in task && typeof task.prompt === "string" ? task.prompt : "";
 
+  const safeQuestionsAnswered = clampNumber(questionsAnswered, 0, MAX_LESSON_QUESTIONS);
+  const safeCorrectAnswers = clampNumber(correctAnswers, 0, Math.min(MAX_LESSON_QUESTIONS, safeQuestionsAnswered));
   const accuracy =
-    questionsAnswered > 0
-      ? Math.round((correctAnswers / questionsAnswered) * 100)
+    safeQuestionsAnswered > 0
+      ? Math.round((safeCorrectAnswers / safeQuestionsAnswered) * 100)
       : 0;
   const summary = useMemo<LessonPerformanceSummary>(() => {
     const topicMap = new Map<string, { label: string; correct: number; total: number; accuracy: number; timeSpentSeconds: number }>();
@@ -129,8 +141,8 @@ export function PracticeRunner({
 
     return {
       lessonTitle: lessonTitle ?? "Practice Session",
-      questionsAnswered,
-      correctAnswers,
+      questionsAnswered: safeQuestionsAnswered,
+      correctAnswers: safeCorrectAnswers,
       accuracy,
       timeSpentSeconds: Math.max(0, totalSeconds - Math.max(0, secondsLeft)),
       topicSummaries,
@@ -138,20 +150,30 @@ export function PracticeRunner({
       areasToImprove,
       struggledQuestionTypes,
     };
-  }, [accuracy, attemptLog, correctAnswers, lessonTitle, questionsAnswered, secondsLeft, totalSeconds]);
+  }, [accuracy, attemptLog, lessonTitle, safeCorrectAnswers, safeQuestionsAnswered, secondsLeft, totalSeconds]);
   const emittedSummaryRef = useRef(false);
+
+  function clearPendingTimeout() {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  }
 
   useEffect(() => {
     const t = setInterval(() => setSecondsLeft((s) => s - 1), 1000);
-    return () => clearInterval(t);
+    return () => {
+      clearInterval(t);
+      clearPendingTimeout();
+    };
   }, []);
 
   useEffect(() => {
-    if (secondsLeft <= 0 && !completedRef.current) {
+    if (finished && !completedRef.current) {
       completedRef.current = true;
       onComplete();
     }
-  }, [onComplete, secondsLeft]);
+  }, [finished, onComplete]);
 
   useEffect(() => {
     if (!finished || emittedSummaryRef.current) return;
@@ -182,6 +204,7 @@ export function PracticeRunner({
   }, [task]);
 
   function nextTask() {
+    if (finished) return;
     const ctx = makeCtx();
     const requiredDifficulty = ctx.difficulty;
     const generated = getTask(ctx);
@@ -195,10 +218,27 @@ export function PracticeRunner({
     setHasPlayed(false);
     setTask(generated);
     setTaskNonce((n) => n + 1);
+    scoredThisTurnRef.current = false;
     questionStartedAtElapsedRef.current = totalSeconds - secondsLeft;
   }
 
+  function bumpSessionCounters(wasCorrect: boolean) {
+    const nextQuestionsAnswered = clampNumber(questionsAnsweredRef.current + 1, 0, MAX_LESSON_QUESTIONS);
+    questionsAnsweredRef.current = nextQuestionsAnswered;
+    setQuestionsAnswered(nextQuestionsAnswered);
+
+    if (wasCorrect) {
+      const nextCorrectAnswers = clampNumber(correctAnswersRef.current + 1, 0, MAX_LESSON_QUESTIONS);
+      correctAnswersRef.current = nextCorrectAnswers;
+      setCorrectAnswers(nextCorrectAnswers);
+    }
+
+    return nextQuestionsAnswered;
+  }
+
   function markWrong() {
+    if (finished || status !== "idle" || scoredThisTurnRef.current) return;
+    scoredThisTurnRef.current = true;
     const topicLabel = formatPracticeTopicLabel(task.kind);
     setAttemptLog((current) => [
       ...current,
@@ -209,11 +249,17 @@ export function PracticeRunner({
       },
     ]);
     setStatus("wrong");
-    setQuestionsAnswered((v) => v + 1);
-    setTimeout(() => setStatus("idle"), 1200);
+    const nextQuestionsAnswered = bumpSessionCounters(false);
+    clearPendingTimeout();
+    if (nextQuestionsAnswered >= MAX_LESSON_QUESTIONS) {
+      return;
+    }
+    timeoutRef.current = setTimeout(() => nextTask(), 1200);
   }
 
   function markCorrect() {
+    if (finished || status !== "idle" || scoredThisTurnRef.current) return;
+    scoredThisTurnRef.current = true;
     const topicLabel = formatPracticeTopicLabel(task.kind);
     setAttemptLog((current) => [
       ...current,
@@ -224,14 +270,19 @@ export function PracticeRunner({
       },
     ]);
     setStatus("correct");
-    setQuestionsAnswered((v) => v + 1);
-    setCorrectAnswers((v) => v + 1);
-    setTimeout(() => nextTask(), 600);
+    const nextQuestionsAnswered = bumpSessionCounters(true);
+    clearPendingTimeout();
+    if (nextQuestionsAnswered >= MAX_LESSON_QUESTIONS) {
+      return;
+    }
+    timeoutRef.current = setTimeout(() => nextTask(), 600);
   }
 
   function markCorrectSoft() {
+    if (finished || status !== "idle" || scoredThisTurnRef.current) return;
     setStatus("correct");
-    setTimeout(() => setStatus("idle"), 500);
+    clearPendingTimeout();
+    timeoutRef.current = setTimeout(() => setStatus("idle"), 500);
   }
 
   const callbacks = { markCorrect, markCorrectSoft, markWrong };
@@ -254,6 +305,24 @@ export function PracticeRunner({
 
   const hint = null;
 
+  useEffect(() => {
+    if (questionsAnswered > MAX_LESSON_QUESTIONS || correctAnswers > MAX_LESSON_QUESTIONS) {
+      console.warn("[Level1LessonGuard] Session counters exceeded expected lesson limits.", {
+        lessonTitle,
+        questionsAnswered,
+        correctAnswers,
+        maxQuestions: MAX_LESSON_QUESTIONS,
+      });
+    }
+    if (questionsAnswered > 100 || correctAnswers > 100) {
+      console.warn("[Level1LessonGuard] Counter exceeded safety threshold.", {
+        lessonTitle,
+        questionsAnswered,
+        correctAnswers,
+      });
+    }
+  }, [correctAnswers, lessonTitle, questionsAnswered]);
+
   // ── Finished state ──
   if (finished) {
     if (renderCompletionCard) {
@@ -263,8 +332,8 @@ export function PracticeRunner({
     return (
       <LessonCompleteCard
         lessonTitle={lessonTitle ?? "Practice Session"}
-        questionsAnswered={questionsAnswered}
-        correctAnswers={correctAnswers}
+        questionsAnswered={safeQuestionsAnswered}
+        correctAnswers={safeCorrectAnswers}
         accuracy={accuracy}
         onExit={onComplete}
       />
@@ -311,12 +380,12 @@ export function PracticeRunner({
         <aside className="lg:sticky lg:top-4 lg:self-start">
           <LessonHUDRail
             lessonTitle={lessonTitle ?? null}
-            correctAnswers={correctAnswers}
-            questionsAnswered={questionsAnswered}
+            correctAnswers={safeCorrectAnswers}
+            questionsAnswered={safeQuestionsAnswered}
             accuracy={accuracy}
             secondsLeft={Math.max(0, secondsLeft)}
             totalSeconds={totalSeconds}
-            xpTarget={Math.max(5, questionsAnswered + 2)}
+            xpTarget={MAX_LESSON_QUESTIONS}
             hint={hint}
           />
         </aside>

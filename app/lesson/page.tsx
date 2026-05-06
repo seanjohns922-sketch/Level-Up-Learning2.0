@@ -18,6 +18,10 @@ import { generateWeek9Task } from "@/data/activities/year1/week9";
 import { generateWeek10Task } from "@/data/activities/year1/week10";
 import { generateWeek12Task } from "@/data/activities/year1/week12";
 import { generateWeek11Task } from "@/data/activities/year1/week11";
+import { resetWeek1TaskSessionState } from "@/data/activities/year1/week1";
+import { resetWeek2TaskSessionState } from "@/data/activities/year1/week2";
+import { resetWeek3TaskSessionState } from "@/data/activities/year1/week3";
+import { resetWeek4TaskSessionState } from "@/data/activities/year1/week4";
 import { getProgramForYear } from "@/data/programs";
 import { ACTIVE_STUDENT_KEY, readProgress, updateProgress } from "@/data/progress";
 import { markLessonComplete } from "@/lib/program-progress";
@@ -72,6 +76,9 @@ function LessonPage() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       sessionStorage.removeItem("lul_lesson_start_time");
+    }
+    if (year === "Year 1") {
+      resetYear1SessionTaskState();
     }
   }, [effectiveLessonId, week, year]);
 
@@ -448,7 +455,12 @@ function LessonPage() {
                     clipPath: "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
                   }} />
                   <button
-                    onClick={() => setStartedLessonId(effectiveLessonId)}
+                    onClick={() => {
+                      if (year === "Year 1") {
+                        resetYear1SessionTaskState();
+                      }
+                      setStartedLessonId(effectiveLessonId);
+                    }}
                     className="relative inline-flex items-center justify-center gap-2 text-white font-bold tracking-tight px-7 py-3 text-sm md:text-base overflow-hidden hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200"
                     style={{
                       background: "linear-gradient(135deg, #021a18 0%, #064e47 45%, #0d9488 100%)",
@@ -496,7 +508,7 @@ function LessonPage() {
             />
             <div className="bg-background px-6 py-8">
             <PracticeRunner
-              key={`${year}-${week}-${lessonId}`}
+              key={`${year}-${week}-${effectiveLessonId}`}
               minutes={9}
               lessonTitle={safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
               renderCompletionCard={
@@ -601,3 +613,9 @@ function LessonPage() {
     </main>
   );
 }
+  function resetYear1SessionTaskState() {
+    resetWeek1TaskSessionState();
+    resetWeek2TaskSessionState();
+    resetWeek3TaskSessionState();
+    resetWeek4TaskSessionState();
+  }

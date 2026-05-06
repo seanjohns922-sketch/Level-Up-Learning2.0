@@ -2024,8 +2024,8 @@ function makeMabBuildQuestion(min: number, max: number): QuizQuestion {
     prompt: "Build the number.",
     mab: {
       target,
-      maxTens: 10,
-      maxOnes: 10,
+      maxTens: 9,
+      maxOnes: 9,
     },
   };
 }
@@ -4495,7 +4495,7 @@ function SessionPage() {
                                     [currentQuiz.id]: {
                                       ...cur,
                                       tens: Math.min(
-                                        currentQuiz.mab?.maxTens ?? 10,
+                                        Math.min(currentQuiz.mab?.maxTens ?? 9, 9),
                                         cur.tens + 1
                                       ),
                                       touched: true,
@@ -4553,7 +4553,7 @@ function SessionPage() {
                                     [currentQuiz.id]: {
                                       ...cur,
                                       ones: Math.min(
-                                        currentQuiz.mab?.maxOnes ?? 10,
+                                        Math.min(currentQuiz.mab?.maxOnes ?? 9, 9),
                                         cur.ones + 1
                                       ),
                                       touched: true,

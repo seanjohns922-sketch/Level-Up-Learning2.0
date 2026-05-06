@@ -1,6 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+const MAX_MAB_TENS = 9;
+const MAX_MAB_ONES = 9;
 
 export default function MabBuild({
   target,
@@ -13,25 +16,49 @@ export default function MabBuild({
   maxOnes?: number;
   onCorrect?: () => void;
 }) {
+  const safeMaxTens = Math.min(MAX_MAB_TENS, Math.max(0, maxTens));
+  const safeMaxOnes = Math.min(MAX_MAB_ONES, Math.max(0, maxOnes));
   const [value, setValue] = useState<{ tens: number; ones: number }>({
     tens: 0,
     ones: 0,
   });
+  const hasScoredRef = useRef(false);
 
   const total = value.tens * 10 + value.ones;
 
   useEffect(() => {
-    if (total === target) onCorrect?.();
-  }, [total, target, onCorrect]);
+    if (total === target && !hasScoredRef.current) {
+      hasScoredRef.current = true;
+      onCorrect?.();
+    }
+  }, [onCorrect, target, total]);
+
+  useEffect(() => {
+    if (maxTens > MAX_MAB_TENS || maxOnes > MAX_MAB_ONES) {
+      console.warn("[Level1LessonGuard] MAB builder limits exceeded; clamping applied.", {
+        target,
+        maxTens,
+        maxOnes,
+        safeMaxTens,
+        safeMaxOnes,
+      });
+    }
+  }, [maxOnes, maxTens, safeMaxOnes, safeMaxTens, target]);
 
   function toggleTens(idx: number) {
-    const next = idx < value.tens ? idx : idx + 1;
+    const next = clampValue(idx < value.tens ? idx : idx + 1, safeMaxTens);
     setValue({ tens: next, ones: value.ones });
+    hasScoredRef.current = false;
   }
 
   function toggleOnes(idx: number) {
-    const next = idx < value.ones ? idx : idx + 1;
+    const next = clampValue(idx < value.ones ? idx : idx + 1, safeMaxOnes);
     setValue({ tens: value.tens, ones: next });
+    hasScoredRef.current = false;
+  }
+
+  function clampValue(next: number, max: number) {
+    return Math.min(max, Math.max(0, next));
   }
 
   return (
@@ -44,7 +71,7 @@ export default function MabBuild({
       <div className="mb-5">
         <div className="text-sm font-bold text-gray-700 mb-2">Tens</div>
         <div className="flex flex-wrap gap-2">
-          {Array.from({ length: maxTens }).map((_, i) => {
+          {Array.from({ length: safeMaxTens }).map((_, i) => {
             const selected = i < value.tens;
             return (
               <button
@@ -78,7 +105,7 @@ export default function MabBuild({
       <div>
         <div className="text-sm font-bold text-gray-700 mb-2">Ones</div>
         <div className="flex flex-wrap gap-2">
-          {Array.from({ length: maxOnes }).map((_, i) => {
+          {Array.from({ length: safeMaxOnes }).map((_, i) => {
             const selected = i < value.ones;
             return (
               <button
