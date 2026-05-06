@@ -4656,11 +4656,11 @@ function SessionPage() {
               </button>
 
               <div className="text-xs font-mono uppercase tracking-[0.18em] text-muted-foreground">
-              {quizSubmitted
+                {quizSubmitted
                   ? `Score · ${finalScore}/${quizQuestions.length} (${Math.round(
                       (finalScore / Math.max(1, quizQuestions.length)) * 100
                     )}%)`
-                  : `${liveCorrectCount} ✦ collected`}
+                  : ""}
               </div>
 
               {quizSubmitted ? (
