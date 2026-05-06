@@ -23358,6 +23358,263 @@ function generateGenericQuestion(
     return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
   }
 
+  if (explicitMode === "y6_mixed_ops_fluency_mix") {
+    const templates: Array<MultipleChoiceQuestion | TypedResponseQuestion> = [
+      {
+        kind: "multiple_choice",
+        prompt: "24 − 6 × 3 = ?",
+        options: ["54", "6", "18"],
+        answer: "6",
+        helper: "Brackets first, then × ÷, then + −.",
+        visual: expressionFlowVisual("Mixed Fluency", [
+          {
+            tokens: ["24", "−", "6", "×", "3"],
+            highlightRange: [2, 4],
+            result: "24 − 18",
+            note: "Multiply before subtracting.",
+          },
+        ]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "25% of 96 = ?",
+        answer: "24",
+        acceptedAnswers: ["24.0", "24.00"],
+        helper: "25% is one quarter.",
+        placeholder: "Type the answer",
+        inputType: "integer",
+        visual: {
+          type: "rule_box",
+          title: "Fraction • Decimal • Percent",
+          steps: ["25% = 1/4", "96 ÷ 4 = ?"],
+          decisionLabel: "Use the quarter shortcut",
+        },
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which is equal to 0.75?",
+        options: ["75%", "0.075", "7.5%"],
+        answer: "75%",
+        helper: "Decimals convert to percentages by multiplying by 100.",
+        visual: {
+          type: "rule_box",
+          title: "Decimal to Percent",
+          steps: ["0.75 × 100", "Move two places"],
+          decisionLabel: "Think in hundredths",
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is x?",
+        answer: "5",
+        acceptedAnswers: ["5.0"],
+        helper: "Undo +5 first, then divide by 3.",
+        placeholder: "Type x",
+        inputType: "integer",
+        visual: balanceEquationVisual("Solve the Equation", "3x + 5", "20"),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which coordinate is in Quadrant IV?",
+        options: ["(3, -2)", "(-3, 2)", "(-3, -2)"],
+        answer: "(3, -2)",
+        helper: "Quadrant IV is right and down.",
+        visual: cartesianGridVisual(
+          "Quadrant Check",
+          [
+            { x: 3, y: -2, label: "A" },
+            { x: -3, y: 2, label: "B" },
+            { x: -3, y: -2, label: "C" },
+          ],
+          {
+            subtitle: "Look for positive x and negative y.",
+            xMin: -4,
+            xMax: 4,
+            yMin: -4,
+            yMax: 4,
+          }
+        ),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_mixed_ops_strategy_choice") {
+    const templates: Array<MultipleChoiceQuestion | TypedResponseQuestion> = [
+      {
+        kind: "multiple_choice",
+        prompt: "A $120 jacket is 30% off. What strategy helps most?",
+        options: ["Find 30% then subtract", "Add 30%", "Divide by 30"],
+        answer: "Find 30% then subtract",
+        helper: "A discount subtracts from the original price.",
+        visual: {
+          type: "rule_box",
+          title: "Choose the Strategy",
+          steps: ["Original price: $120", "Discount: 30% off"],
+          decisionLabel: "Find the saving first",
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "A $120 jacket is 30% off. What is the sale price?",
+        answer: "84",
+        acceptedAnswers: ["84.0", "84.00"],
+        helper: "Find the discount amount, then subtract it from the original price.",
+        placeholder: "Type the sale price",
+        inputType: "integer",
+        visual: {
+          type: "rule_box",
+          title: "Money Decision",
+          steps: ["30% of $120", "Subtract the saving from $120"],
+          decisionLabel: "Discount means take away",
+        },
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which is the most efficient way to find 12.5% of 80?",
+        options: ["Find one eighth", "Multiply by 125", "Add 12 and 5"],
+        answer: "Find one eighth",
+        helper: "Use a benchmark percentage.",
+        visual: {
+          type: "rule_box",
+          title: "Choose the Strategy",
+          steps: ["12.5% = 1/8", "Use the fraction shortcut"],
+          decisionLabel: "Benchmark percentage",
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "12.5% of 80 = ?",
+        answer: "10",
+        acceptedAnswers: ["10.0", "10.00"],
+        helper: "12.5% is one eighth.",
+        placeholder: "Type the answer",
+        inputType: "integer",
+        visual: {
+          type: "rule_box",
+          title: "Fraction • Decimal • Percent",
+          steps: ["80 ÷ 8 = ?", "12.5% = 1/8"],
+          decisionLabel: "Use the benchmark form",
+        },
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which should be solved first?",
+        options: ["6 − 2", "18 + 4", "4 × 6"],
+        answer: "6 − 2",
+        helper: "Always start with brackets.",
+        visual: expressionFlowVisual(
+          "Strategy First",
+          [
+            {
+              tokens: ["18", "+", "4", "×", "(", "6", "−", "2", ")"],
+              highlightRange: [4, 8],
+              note: "Brackets come first.",
+            },
+          ],
+          [
+            { label: "Brackets", tone: "gold" },
+            { label: "× ÷", tone: "blue" },
+            { label: "+ −", tone: "green" },
+          ]
+        ),
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_mixed_ops_application_mix") {
+    const templates: Array<MultipleChoiceQuestion | TypedResponseQuestion> = [
+      {
+        kind: "multiple_choice",
+        prompt: "Which is cheaper?",
+        options: ["Option A", "Option B", "Same"],
+        answer: "Option B",
+        helper: "Compare final prices, not discount percentages.",
+        visual: bestBuyVisual("Money Decision", [
+          {
+            label: "Option A",
+            productName: "25% off Jacket",
+            price: 80,
+            quantityLabel: "25% off",
+            unitRateLabel: "Final price",
+            unitRate: 60,
+            hideUnitRateUntilReveal: true,
+          },
+          {
+            label: "Option B",
+            productName: "10% off Jacket",
+            price: 65,
+            quantityLabel: "10% off",
+            unitRateLabel: "Final price",
+            unitRate: 58.5,
+            hideUnitRateUntilReveal: true,
+          },
+        ]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is x?",
+        answer: "6",
+        acceptedAnswers: ["6.0"],
+        helper: "Undo ×4 first, then solve inside the brackets.",
+        placeholder: "Type x",
+        inputType: "integer",
+        visual: bracketEquationVisual("Bracket Equation", "4 × (x + 2)", "32", "x + 2", "×4"),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Point (-2, 3) moves right 5. What is the new coordinate?",
+        options: ["(3, 3)", "(-2, 8)", "(-7, 3)"],
+        answer: "(3, 3)",
+        helper: "Right movement increases x. y stays the same.",
+        visual: cartesianGridVisual("Coordinate Move", [{ x: -2, y: 3 }], {
+          subtitle: "Start at the shown point and move right 5.",
+          xMin: -5,
+          xMax: 5,
+          yMin: -1,
+          yMax: 5,
+        }),
+      },
+      {
+        kind: "typed_response",
+        prompt: "36 ÷ 6 × (5 − 2) = ?",
+        answer: "18",
+        acceptedAnswers: ["18.0"],
+        helper: "Solve brackets first, then divide and multiply left to right.",
+        placeholder: "Type the answer",
+        inputType: "integer",
+        visual: expressionFlowVisual("Mixed Application", [
+          {
+            tokens: ["36", "÷", "6", "×", "(", "5", "−", "2", ")"],
+            highlightRanges: [
+              [4, 8],
+              [0, 2],
+              [0, 8],
+            ],
+            directionCue: "left-to-right",
+            result: "36 ÷ 6 × 3",
+            note: "Finish the brackets, then go left to right.",
+          },
+        ]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "A student gets 18 out of 24. Which percentage is closest?",
+        options: ["50%", "75%", "90%"],
+        answer: "75%",
+        helper: "Simplify 18/24 to 3/4.",
+        visual: {
+          type: "rule_box",
+          title: "Choose the Strategy",
+          steps: ["18/24 simplifies to 3/4", "3/4 = 75%"],
+          decisionLabel: "Use the fraction equivalent",
+        },
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
   if (
     explicitMode === "choose_strategy_quick" ||
     explicitMode === "choose_strategy_reflect" ||

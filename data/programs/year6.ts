@@ -564,13 +564,21 @@ const year6Rows: ProgramRow[] = [
     focus: "Apply all number skills fluently",
     lesson: 1,
     topic: "Mixed Operations Challenge",
-    activity: "Build fast accurate fluency across decimals, fractions, percentages, and whole-number operations.",
+    activity: "Apply mixed Level 6 number strategies across operations, percentages, equations, money, and coordinates.",
     curriculum: ["AC9M6N01", "AC9M6N04", "AC9M6N05", "AC9M6N06", "AC9M6N08"],
     activities: [
-      makeActivity("typed_response", 1, { mode: "mixed_ops_addition" }),
-      makeActivity("typed_response", 1, { mode: "mixed_ops_subtraction" }),
-      makeActivity("typed_response", 1, { mode: "mixed_ops_multiplication" }),
-      makeActivity("typed_response", 1, { mode: "mixed_ops_division" }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_mixed_ops_fluency_mix",
+        rotationRole: "fast_thinking",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_mixed_ops_strategy_choice",
+        rotationRole: "reasoning",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_mixed_ops_application_mix",
+        rotationRole: "apply_create",
+      }),
     ],
   },
   {
