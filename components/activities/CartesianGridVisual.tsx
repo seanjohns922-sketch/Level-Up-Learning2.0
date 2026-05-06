@@ -62,10 +62,11 @@ export default function CartesianGridVisual({
     if (!interactive || !onPointSelect) return;
 
     const bounds = event.currentTarget.getBoundingClientRect();
-    const scaleX = SIZE / bounds.width;
-    const scaleY = SIZE / bounds.height;
-    const localX = (event.clientX - bounds.left) * scaleX;
-    const localY = (event.clientY - bounds.top) * scaleY;
+    const plotSize = SIZE - PADDING * 2;
+    const localPlotX = ((event.clientX - bounds.left) / bounds.width) * plotSize;
+    const localPlotY = ((event.clientY - bounds.top) / bounds.height) * plotSize;
+    const localX = PADDING + localPlotX;
+    const localY = PADDING + localPlotY;
 
     const snappedX = Math.max(
       visual.xMin,
