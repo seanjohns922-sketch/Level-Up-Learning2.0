@@ -387,6 +387,16 @@ function toExplicitWeeklyQuizQuestion(
         ? question.visual.termPredictor
       : question.visual?.kind === "reversePatternCard"
         ? question.visual.reversePattern
+      : question.visual?.kind === "expressionFlow"
+        ? question.visual.expressionFlow
+      : question.visual?.kind === "balanceEquationCard"
+        ? question.visual.balanceEquation
+      : question.visual?.kind === "bracketEquationCard"
+        ? question.visual.bracketEquation
+      : question.visual?.kind === "checkSubstitutionCard"
+        ? question.visual.checkSubstitution
+      : question.visual?.kind === "cartesianGrid"
+        ? question.visual.cartesianGrid
       : undefined;
 
   const isFractionTypedAnswer = /\/|\d+\s+\d+\/\d+/.test(correctAnswer);

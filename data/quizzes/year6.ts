@@ -1,5 +1,10 @@
 import type {
   BestBuyCardVisualData,
+  BalanceEquationCardVisualData,
+  BracketEquationCardVisualData,
+  CartesianGridVisualData,
+  CheckBySubstitutionCardVisualData,
+  ExpressionFlowVisualData,
   FractionContextVisualData,
   FractionNumberLineVisualData,
   PatternSequenceStripVisualData,
@@ -54,6 +59,26 @@ export type Year6WeeklyQuizVisual =
   | {
       kind: "reversePatternCard";
       reversePattern: ReversePatternCardVisualData;
+    }
+  | {
+      kind: "expressionFlow";
+      expressionFlow: ExpressionFlowVisualData;
+    }
+  | {
+      kind: "balanceEquationCard";
+      balanceEquation: BalanceEquationCardVisualData;
+    }
+  | {
+      kind: "bracketEquationCard";
+      bracketEquation: BracketEquationCardVisualData;
+    }
+  | {
+      kind: "checkSubstitutionCard";
+      checkSubstitution: CheckBySubstitutionCardVisualData;
+    }
+  | {
+      kind: "cartesianGrid";
+      cartesianGrid: CartesianGridVisualData;
     };
 
 export type Year6WeeklyQuizQuestion = {
@@ -2214,6 +2239,376 @@ const year6WeeklyQuizWeeks: Record<number, Year6WeeklyQuizWeek> = {
         },
         feedbackCorrect: "Correct — multiply by 3 each time.",
         feedbackIncorrect: "Try multiplying.",
+      },
+    ],
+  },
+  11: {
+    weekNumber: 11,
+    quizTitle: "Weekly Quiz",
+    weeklyFocus: "Apply order of operations, solve equations, and interpret coordinates across all four quadrants.",
+    lesson1Title: "Evaluate Expressions",
+    lesson2Title: "Solve Simple Equations",
+    lesson3Title: "Coordinates & Movement (4 Quadrants)",
+    questions: [
+      {
+        id: "y6w11q1",
+        lessonTag: 1,
+        questionText: "18 − 6 ÷ 2 = ?",
+        answerType: "multipleChoice",
+        options: ["6", "15", "12"],
+        correctAnswer: "15",
+        visual: {
+          kind: "expressionFlow",
+          expressionFlow: {
+            type: "expression_flow",
+            title: "Order of Operations",
+            cards: [
+              {
+                tokens: ["18", "−", "6", "÷", "2"],
+                highlightRange: [2, 4],
+                result: "18 − 3",
+              },
+            ],
+            priorityChips: [
+              { label: "Brackets", tone: "gold" },
+              { label: "× ÷", tone: "blue" },
+              { label: "+ −", tone: "green" },
+            ],
+          },
+        },
+        feedbackCorrect: "Correct — divide first, then subtract.",
+        feedbackIncorrect: "Follow the order: brackets, × ÷, + −",
+      },
+      {
+        id: "y6w11q2",
+        lessonTag: 1,
+        questionText: "Which do you solve first?",
+        answerType: "multipleChoice",
+        options: ["Addition", "Multiplication", "Both"],
+        correctAnswer: "Multiplication",
+        visual: {
+          kind: "expressionFlow",
+          expressionFlow: {
+            type: "expression_flow",
+            title: "First Step",
+            cards: [
+              {
+                tokens: ["24", "+", "4", "×", "3"],
+                highlightRange: [2, 4],
+              },
+            ],
+          },
+        },
+        feedbackCorrect: "Correct — multiplication has priority.",
+        feedbackIncorrect: "Look for the operation with higher priority.",
+      },
+      {
+        id: "y6w11q3",
+        lessonTag: 1,
+        questionText: "20 − (4 × 3) = ?",
+        answerType: "multipleChoice",
+        options: ["8", "12", "16"],
+        correctAnswer: "8",
+        visual: {
+          kind: "expressionFlow",
+          expressionFlow: {
+            type: "expression_flow",
+            title: "Brackets First",
+            cards: [
+              {
+                tokens: ["20", "−", "(", "4", "×", "3", ")"],
+                highlightRange: [2, 6],
+                result: "20 − 12",
+              },
+            ],
+          },
+        },
+        feedbackCorrect: "Correct — solve inside the brackets first.",
+        feedbackIncorrect: "Brackets come before every other operation.",
+      },
+      {
+        id: "y6w11q4",
+        lessonTag: 1,
+        questionText: "18 ÷ 3 × 2 = ?",
+        answerType: "numeric",
+        correctAnswer: "12",
+        acceptedAnswers: ["12.0"],
+        placeholder: "Type the answer",
+        visual: {
+          kind: "expressionFlow",
+          expressionFlow: {
+            type: "expression_flow",
+            title: "Left to Right",
+            cards: [
+              {
+                tokens: ["18", "÷", "3", "×", "2"],
+                highlightRanges: [
+                  [0, 2],
+                  [0, 4],
+                ],
+                directionCue: "left-to-right",
+                result: "6 × 2",
+              },
+            ],
+          },
+        },
+        feedbackCorrect: "Correct — for ÷ and ×, work left to right.",
+        feedbackIncorrect: "Same-priority operations go left to right.",
+      },
+      {
+        id: "y6w11q5",
+        lessonTag: 1,
+        questionText: "30 − 6 × 3 + 4 = ?",
+        answerType: "multipleChoice",
+        options: ["12", "16", "18"],
+        correctAnswer: "16",
+        visual: {
+          kind: "expressionFlow",
+          expressionFlow: {
+            type: "expression_flow",
+            title: "Multi-step",
+            cards: [
+              {
+                tokens: ["30", "−", "6", "×", "3", "+", "4"],
+                highlightRange: [2, 4],
+                result: "30 − 18 + 4",
+              },
+            ],
+          },
+        },
+        feedbackCorrect: "Correct — multiply first, then work left to right.",
+        feedbackIncorrect: "Do the multiplication before adding or subtracting.",
+      },
+      {
+        id: "y6w11q6",
+        lessonTag: 2,
+        questionText: "x + 7 = 19. What is x?",
+        answerType: "numeric",
+        correctAnswer: "12",
+        acceptedAnswers: ["12.0"],
+        placeholder: "Type x",
+        visual: {
+          kind: "balanceEquationCard",
+          balanceEquation: {
+            type: "balance_equation_card",
+            title: "Balance the Equation",
+            left: "x + 7",
+            right: "19",
+            unknownSymbol: "x",
+          },
+        },
+        feedbackCorrect: "Correct — subtract 7 from 19.",
+        feedbackIncorrect: "Undo the operation to find x.",
+      },
+      {
+        id: "y6w11q7",
+        lessonTag: 2,
+        questionText: "4x = 32. What is x?",
+        answerType: "multipleChoice",
+        options: ["6", "8", "12"],
+        correctAnswer: "8",
+        visual: {
+          kind: "balanceEquationCard",
+          balanceEquation: {
+            type: "balance_equation_card",
+            title: "Balance the Equation",
+            left: "4x",
+            right: "32",
+            unknownSymbol: "x",
+          },
+        },
+        feedbackCorrect: "Correct — divide 32 by 4.",
+        feedbackIncorrect: "4x means 4 × x.",
+      },
+      {
+        id: "y6w11q8",
+        lessonTag: 2,
+        questionText: "x ÷ 5 = 6. What is x?",
+        answerType: "multipleChoice",
+        options: ["11", "30", "25"],
+        correctAnswer: "30",
+        visual: {
+          kind: "balanceEquationCard",
+          balanceEquation: {
+            type: "balance_equation_card",
+            title: "Balance the Equation",
+            left: "x ÷ 5",
+            right: "6",
+            unknownSymbol: "x",
+          },
+        },
+        feedbackCorrect: "Correct — undo ÷5 by multiplying by 5.",
+        feedbackIncorrect: "Use the inverse operation.",
+      },
+      {
+        id: "y6w11q9",
+        lessonTag: 2,
+        questionText: "2x + 4 = 18. What is x?",
+        answerType: "numeric",
+        correctAnswer: "7",
+        acceptedAnswers: ["7.0"],
+        placeholder: "Type x",
+        visual: {
+          kind: "balanceEquationCard",
+          balanceEquation: {
+            type: "balance_equation_card",
+            title: "Two-step Equation",
+            left: "2x + 4",
+            right: "18",
+            unknownSymbol: "x",
+          },
+        },
+        feedbackCorrect: "Correct — subtract 4, then divide by 2.",
+        feedbackIncorrect: "Undo the outside operation first.",
+      },
+      {
+        id: "y6w11q10",
+        lessonTag: 2,
+        questionText: "3 × (x + 2) = 21. What is x?",
+        answerType: "multipleChoice",
+        options: ["5", "6", "7"],
+        correctAnswer: "5",
+        visual: {
+          kind: "bracketEquationCard",
+          bracketEquation: {
+            type: "bracket_equation_card",
+            title: "Bracket Equation",
+            left: "3 × (x + 2)",
+            right: "21",
+            bracketGroup: "x + 2",
+            outsideFactor: "×3",
+          },
+        },
+        feedbackCorrect: "Correct — undo ×3 first, then solve inside the brackets.",
+        feedbackIncorrect: "Work backwards from the outside operation.",
+      },
+      {
+        id: "y6w11q11",
+        lessonTag: 3,
+        questionText: "Which coordinate is in Quadrant III?",
+        answerType: "multipleChoice",
+        options: ["(3, 2)", "(-4, -1)", "(2, -3)"],
+        correctAnswer: "(-4, -1)",
+        visual: {
+          kind: "cartesianGrid",
+          cartesianGrid: {
+            type: "cartesian_grid",
+            title: "Quadrant Check",
+            xMin: -5,
+            xMax: 5,
+            yMin: -5,
+            yMax: 5,
+            points: [
+              { x: 3, y: 2, label: "A" },
+              { x: -4, y: -1, label: "B" },
+              { x: 2, y: -3, label: "C" },
+            ],
+            subtitle: "Quadrant III is left and down.",
+          },
+        },
+        feedbackCorrect: "Correct — both values are negative in Quadrant III.",
+        feedbackIncorrect: "Look for negative x and negative y.",
+      },
+      {
+        id: "y6w11q12",
+        lessonTag: 3,
+        questionText: "Which coordinate lies on the x-axis?",
+        answerType: "multipleChoice",
+        options: ["(0, 5)", "(3, 0)", "(2, 2)"],
+        correctAnswer: "(3, 0)",
+        visual: {
+          kind: "cartesianGrid",
+          cartesianGrid: {
+            type: "cartesian_grid",
+            title: "Axis Check",
+            xMin: -5,
+            xMax: 5,
+            yMin: -5,
+            yMax: 5,
+            points: [
+              { x: 0, y: 5, label: "A" },
+              { x: 3, y: 0, label: "B" },
+              { x: 2, y: 2, label: "C" },
+            ],
+            subtitle: "Points on the x-axis have y = 0.",
+          },
+        },
+        feedbackCorrect: "Correct — points on the x-axis have y = 0.",
+        feedbackIncorrect: "Check which point sits on the horizontal axis.",
+      },
+      {
+        id: "y6w11q13",
+        lessonTag: 3,
+        questionText: "Point (2, 3) moves to (5, 3). What changed?",
+        answerType: "multipleChoice",
+        options: ["x changed", "y changed", "both changed"],
+        correctAnswer: "x changed",
+        visual: {
+          kind: "cartesianGrid",
+          cartesianGrid: {
+            type: "cartesian_grid",
+            title: "Movement",
+            xMin: -5,
+            xMax: 5,
+            yMin: -5,
+            yMax: 5,
+            points: [
+              { x: 2, y: 3, label: "A" },
+              { x: 5, y: 3, label: "B" },
+            ],
+            connectPoints: true,
+            movementArrow: true,
+            subtitle: "Same y means horizontal movement.",
+          },
+        },
+        feedbackCorrect: "Correct — the y-value stayed the same.",
+        feedbackIncorrect: "Same y means only x changed.",
+      },
+      {
+        id: "y6w11q14",
+        lessonTag: 3,
+        questionText: "Point (-2, 1) moves down 4. New coordinate?",
+        answerType: "multipleChoice",
+        options: ["(-2, -3)", "(-6, 1)", "(-2, 5)"],
+        correctAnswer: "(-2, -3)",
+        visual: {
+          kind: "cartesianGrid",
+          cartesianGrid: {
+            type: "cartesian_grid",
+            title: "Movement",
+            xMin: -5,
+            xMax: 5,
+            yMin: -5,
+            yMax: 5,
+            points: [{ x: -2, y: 1, label: "A" }],
+            subtitle: "Moving down changes y only.",
+          },
+        },
+        feedbackCorrect: "Correct — down 4 means subtract 4 from y.",
+        feedbackIncorrect: "x stays the same for a vertical move.",
+      },
+      {
+        id: "y6w11q15",
+        lessonTag: 3,
+        questionText: "Point (3, -2) moves left 5 and up 3. New coordinate?",
+        answerType: "multipleChoice",
+        options: ["(-2, 1)", "(8, 1)", "(-2, -5)"],
+        correctAnswer: "(-2, 1)",
+        visual: {
+          kind: "cartesianGrid",
+          cartesianGrid: {
+            type: "cartesian_grid",
+            title: "Movement Challenge",
+            xMin: -5,
+            xMax: 5,
+            yMin: -5,
+            yMax: 5,
+            points: [{ x: 3, y: -2, label: "A" }],
+            subtitle: "Left changes x. Up changes y.",
+          },
+        },
+        feedbackCorrect: "Correct — left 5 changes x, then up 3 changes y.",
+        feedbackIncorrect: "Apply each movement one step at a time.",
       },
     ],
   },
