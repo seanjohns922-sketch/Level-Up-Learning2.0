@@ -113,6 +113,47 @@ function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
 
+function needsRelationshipVisual(question: Year6WeeklyQuizQuestion) {
+  const text = `${question.questionText} ${question.correctAnswer}`.toLowerCase();
+  return (
+    text.includes("what is x") ||
+    text.includes("solve the equation") ||
+    text.includes("bracket equation") ||
+    text.includes("find the rule") ||
+    text.includes("which rule") ||
+    text.includes("what is the rule") ||
+    text.includes("find the output") ||
+    text.includes("what is the output") ||
+    text.includes("find the input") ||
+    text.includes("what is the input") ||
+    text.includes("which coordinate") ||
+    text.includes("new coordinate") ||
+    text.includes("quadrant") ||
+    text.includes("moves to") ||
+    text.includes("moves right") ||
+    text.includes("moves left") ||
+    text.includes("moves up") ||
+    text.includes("moves down") ||
+    text.includes("pattern") ||
+    text.includes("sequence") ||
+    /\b[xy]\b/.test(text)
+  );
+}
+
+function hasRelationshipVisual(question: Year6WeeklyQuizQuestion) {
+  const kind = question.visual?.kind;
+  return (
+    kind === "patternSequenceStrip" ||
+    kind === "termPredictorCard" ||
+    kind === "reversePatternCard" ||
+    kind === "expressionFlow" ||
+    kind === "balanceEquationCard" ||
+    kind === "bracketEquationCard" ||
+    kind === "checkSubstitutionCard" ||
+    kind === "cartesianGrid"
+  );
+}
+
 function validateYear6WeeklyQuizQuestion(
   question: Year6WeeklyQuizQuestion,
   weekNumber: number,
@@ -174,6 +215,12 @@ function validateYear6WeeklyQuizQuestion(
     if (!Array.isArray(question.acceptedAnswers) || question.acceptedAnswers.length === 0) {
       throw new Error(`[Year6WeeklyQuiz] ${label} typedShort questions must provide acceptedAnswers.`);
     }
+  }
+
+  if (needsRelationshipVisual(question) && !hasRelationshipVisual(question)) {
+    throw new Error(
+      `[Year6WeeklyQuiz] ${label} needs a visible equation, rule, pattern, table, or coordinate visual.`
+    );
   }
 }
 
@@ -2382,7 +2429,7 @@ const year6WeeklyQuizWeeks: Record<number, Year6WeeklyQuizWeek> = {
       {
         id: "y6w11q6",
         lessonTag: 2,
-        questionText: "x + 7 = 19. What is x?",
+        questionText: "Solve the equation. What is x?",
         answerType: "numeric",
         correctAnswer: "12",
         acceptedAnswers: ["12.0"],
@@ -2403,7 +2450,7 @@ const year6WeeklyQuizWeeks: Record<number, Year6WeeklyQuizWeek> = {
       {
         id: "y6w11q7",
         lessonTag: 2,
-        questionText: "4x = 32. What is x?",
+        questionText: "Solve the equation. What is x?",
         answerType: "multipleChoice",
         options: ["6", "8", "12"],
         correctAnswer: "8",
@@ -2423,7 +2470,7 @@ const year6WeeklyQuizWeeks: Record<number, Year6WeeklyQuizWeek> = {
       {
         id: "y6w11q8",
         lessonTag: 2,
-        questionText: "x ÷ 5 = 6. What is x?",
+        questionText: "Solve the equation. What is x?",
         answerType: "multipleChoice",
         options: ["11", "30", "25"],
         correctAnswer: "30",
@@ -2443,7 +2490,7 @@ const year6WeeklyQuizWeeks: Record<number, Year6WeeklyQuizWeek> = {
       {
         id: "y6w11q9",
         lessonTag: 2,
-        questionText: "2x + 4 = 18. What is x?",
+        questionText: "Solve the equation. What is x?",
         answerType: "numeric",
         correctAnswer: "7",
         acceptedAnswers: ["7.0"],
@@ -2464,7 +2511,7 @@ const year6WeeklyQuizWeeks: Record<number, Year6WeeklyQuizWeek> = {
       {
         id: "y6w11q10",
         lessonTag: 2,
-        questionText: "3 × (x + 2) = 21. What is x?",
+        questionText: "Solve the bracket equation. What is x?",
         answerType: "multipleChoice",
         options: ["5", "6", "7"],
         correctAnswer: "5",

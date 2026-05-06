@@ -16987,7 +16987,7 @@ function generateGenericQuestion(
     const templates: TypedResponseQuestion[] = [
       {
         kind: "typed_response",
-        prompt: "What is the output?",
+        prompt: "Find the output.",
         answer: "10",
         acceptedAnswers: ["10.0"],
         helper: "Apply the rule to the input.",
@@ -16997,7 +16997,7 @@ function generateGenericQuestion(
       },
       {
         kind: "typed_response",
-        prompt: "What is the output?",
+        prompt: "Find the output.",
         answer: "15",
         acceptedAnswers: ["15.0"],
         helper: "Try multiplication first.",
@@ -17007,7 +17007,7 @@ function generateGenericQuestion(
       },
       {
         kind: "typed_response",
-        prompt: "What is the output?",
+        prompt: "Find the output.",
         answer: "15",
         acceptedAnswers: ["15.0"],
         helper: "Use both steps in order.",
@@ -17017,7 +17017,7 @@ function generateGenericQuestion(
       },
       {
         kind: "typed_response",
-        prompt: "What is the output?",
+        prompt: "Find the output.",
         answer: "15",
         acceptedAnswers: ["15.0"],
         helper: "Multiply first, then subtract.",
@@ -17027,7 +17027,7 @@ function generateGenericQuestion(
       },
       {
         kind: "typed_response",
-        prompt: "What is the output?",
+        prompt: "Find the output.",
         answer: "14",
         acceptedAnswers: ["14.0"],
         helper: "This machine has two steps.",
@@ -17043,7 +17043,7 @@ function generateGenericQuestion(
     const templates: MultipleChoiceQuestion[] = [
       {
         kind: "multiple_choice",
-        prompt: "What is the rule?",
+        prompt: "Find the rule.",
         options: ["+5", "×2 + 3", "×3"],
         answer: "×2 + 3",
         helper: "What happens from input to output?",
@@ -17055,7 +17055,7 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "What is the rule?",
+        prompt: "Find the rule.",
         options: ["×3", "+6", "×2"],
         answer: "×3",
         helper: "Check each row with the same rule.",
@@ -17105,7 +17105,7 @@ function generateGenericQuestion(
     const templates: TypedResponseQuestion[] = [
       {
         kind: "typed_response",
-        prompt: "What was the input?",
+        prompt: "Find the input.",
         answer: "14",
         acceptedAnswers: ["14.0"],
         helper: "Work backwards.",
@@ -17115,7 +17115,7 @@ function generateGenericQuestion(
       },
       {
         kind: "typed_response",
-        prompt: "What was the input?",
+        prompt: "Find the input.",
         answer: "9",
         acceptedAnswers: ["9.0"],
         helper: "Undo the multiplication.",
@@ -17125,7 +17125,7 @@ function generateGenericQuestion(
       },
       {
         kind: "typed_response",
-        prompt: "What was the input?",
+        prompt: "Find the input.",
         answer: "10",
         acceptedAnswers: ["10.0"],
         helper: "Undo +1, then undo ×2.",
@@ -22972,7 +22972,7 @@ function generateGenericQuestion(
     const templates: TypedResponseQuestion[] = [
       {
         kind: "typed_response",
-        prompt: "What is x?",
+        prompt: "Solve the equation. What is x?",
         answer: "12",
         acceptedAnswers: ["12.0"],
         helper: "Undo +7 by subtracting 7.",
@@ -22982,7 +22982,7 @@ function generateGenericQuestion(
       },
       {
         kind: "typed_response",
-        prompt: "What is x?",
+        prompt: "Solve the equation. What is x?",
         answer: "23",
         acceptedAnswers: ["23.0"],
         helper: "Undo -9 by adding 9.",
@@ -22992,7 +22992,7 @@ function generateGenericQuestion(
       },
       {
         kind: "typed_response",
-        prompt: "What is x?",
+        prompt: "Solve the equation. What is x?",
         answer: "9",
         acceptedAnswers: ["9.0"],
         helper: "4x means 4 × x.",
@@ -23002,7 +23002,7 @@ function generateGenericQuestion(
       },
       {
         kind: "typed_response",
-        prompt: "What is x?",
+        prompt: "Solve the equation. What is x?",
         answer: "40",
         acceptedAnswers: ["40.0"],
         helper: "Undo ÷5 by multiplying by 5.",
@@ -23012,7 +23012,7 @@ function generateGenericQuestion(
       },
       {
         kind: "typed_response",
-        prompt: "What is x?",
+        prompt: "Find the missing value.",
         answer: "15",
         acceptedAnswers: ["15.0"],
         helper: "Undo +8 by subtracting 8.",
@@ -23028,7 +23028,7 @@ function generateGenericQuestion(
     const templates: TypedResponseQuestion[] = [
       {
         kind: "typed_response",
-        prompt: "What is x?",
+        prompt: "Solve the equation. What is x?",
         answer: "8",
         acceptedAnswers: ["8.0"],
         helper: "Undo the +5 first, then undo ×2.",
@@ -23038,7 +23038,7 @@ function generateGenericQuestion(
       },
       {
         kind: "typed_response",
-        prompt: "What is x?",
+        prompt: "Solve the equation. What is x?",
         answer: "8",
         acceptedAnswers: ["8.0"],
         helper: "Undo -4 first, then divide by 3.",
@@ -23048,7 +23048,7 @@ function generateGenericQuestion(
       },
       {
         kind: "typed_response",
-        prompt: "What is x?",
+        prompt: "Solve the equation. What is x?",
         answer: "36",
         acceptedAnswers: ["36.0"],
         helper: "Undo +6 first, then undo ÷4.",
@@ -23058,7 +23058,7 @@ function generateGenericQuestion(
       },
       {
         kind: "typed_response",
-        prompt: "What is x?",
+        prompt: "Solve the equation. What is x?",
         answer: "9",
         acceptedAnswers: ["9.0"],
         helper: "Undo -7 first, then undo ×4.",
@@ -23068,7 +23068,7 @@ function generateGenericQuestion(
       },
       {
         kind: "typed_response",
-        prompt: "What is x?",
+        prompt: "Solve the equation. What is x?",
         answer: "7",
         acceptedAnswers: ["7.0"],
         helper: "Undo +9 first, then divide by 5.",
@@ -23084,7 +23084,7 @@ function generateGenericQuestion(
     const templates: MultipleChoiceQuestion[] = [
       {
         kind: "multiple_choice",
-        prompt: "What is x?",
+        prompt: "Solve the bracket equation. What is x?",
         options: ["4", "6", "8"],
         answer: "6",
         helper: "Undo ×3 first, then solve inside the brackets.",
@@ -23092,7 +23092,7 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "What is x?",
+        prompt: "Solve the bracket equation. What is x?",
         options: ["12", "14", "16"],
         answer: "14",
         helper: "Undo ×2 first, then undo -5.",
@@ -23108,7 +23108,7 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "What is x?",
+        prompt: "Solve the bracket equation. What is x?",
         options: ["5", "6", "7"],
         answer: "6",
         helper: "Work backwards: undo -4, then ×5, then +1.",
@@ -23405,7 +23405,7 @@ function generateGenericQuestion(
       },
       {
         kind: "typed_response",
-        prompt: "What is x?",
+        prompt: "Solve the equation. What is x?",
         answer: "5",
         acceptedAnswers: ["5.0"],
         helper: "Undo +5 first, then divide by 3.",
@@ -23554,7 +23554,7 @@ function generateGenericQuestion(
       },
       {
         kind: "typed_response",
-        prompt: "What is x?",
+        prompt: "Solve the bracket equation. What is x?",
         answer: "6",
         acceptedAnswers: ["6.0"],
         helper: "Undo ×4 first, then solve inside the brackets.",

@@ -347,7 +347,7 @@ function toAssessmentTypedQuizQuestion(
 function toExplicitWeeklyQuizQuestion(
   question: Year6WeeklyQuizQuestion,
   index: number
-): QuizQuestion {
+): QuizQuestion | null {
   const prompt = String(question.questionText ?? "").trim();
   const correctAnswer = String(question.correctAnswer ?? "").trim();
   const inputType = question.inputType;
@@ -432,6 +432,42 @@ function toExplicitWeeklyQuizQuestion(
       : question.visual?.kind === "cartesianGrid"
         ? question.visual.cartesianGrid
       : undefined;
+
+  const promptNeedsRelationshipContext = (text: string) => {
+    const lower = text.toLowerCase();
+    return (
+      lower.includes("what is x") ||
+      lower.includes("solve the equation") ||
+      lower.includes("bracket equation") ||
+      lower.includes("find the rule") ||
+      lower.includes("which rule") ||
+      lower.includes("what is the rule") ||
+      lower.includes("find the output") ||
+      lower.includes("what is the output") ||
+      lower.includes("find the input") ||
+      lower.includes("what is the input") ||
+      lower.includes("which coordinate") ||
+      lower.includes("new coordinate") ||
+      lower.includes("quadrant") ||
+      lower.includes("moves to") ||
+      lower.includes("moves right") ||
+      lower.includes("moves left") ||
+      lower.includes("moves up") ||
+      lower.includes("moves down") ||
+      lower.includes("pattern") ||
+      lower.includes("sequence")
+    );
+  };
+
+  if (promptNeedsRelationshipContext(prompt) && !mappedVisual && question.visual?.kind !== "equivalentFractionYesNo") {
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("[Year6WeeklyQuiz] Missing visible context for algebra/rule question", {
+        id: question.id,
+        prompt,
+      });
+    }
+    return null;
+  }
 
   const isFractionTypedAnswer = /\/|\d+\s+\d+\/\d+/.test(correctAnswer);
 
@@ -613,7 +649,17 @@ function buildYear6ExplicitWeeklyQuizQuestions(
     }
   });
 
-  return quiz.questions.map((question, index) => toExplicitWeeklyQuizQuestion(question, index + 1));
+  const mappedQuestions = quiz.questions
+    .map((question, index) => toExplicitWeeklyQuizQuestion(question, index + 1))
+    .filter((question): question is QuizQuestion => question !== null);
+
+  if (mappedQuestions.length !== expectedTotal) {
+    throw new Error(
+      `[Year6WeeklyQuiz] Week ${weekNumber} lost one or more questions because required algebra/rule visuals were missing.`
+    );
+  }
+
+  return mappedQuestions;
 }
 
 function numericOptionStrings(answer: number, spread: number, min = 0) {

@@ -3,7 +3,7 @@
 import type { CartesianGridVisualData } from "@/data/activities/year2/lessonEngine";
 
 const SIZE = 320;
-const PADDING = 24;
+const PADDING = 28;
 
 function toSvgX(value: number, min: number, max: number) {
   return PADDING + ((value - min) / (max - min)) * (SIZE - PADDING * 2);
@@ -81,26 +81,34 @@ export default function CartesianGridVisual({
   }
 
   return (
-    <div className="mt-5 rounded-2xl border border-cyan-100 bg-cyan-50 p-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
+    <div className="mt-5 rounded-2xl border border-cyan-100 bg-cyan-50 px-4 py-5 sm:px-5 sm:py-6">
+      <div className="flex min-h-[3.75rem] flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
           <div className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">
             {visual.title}
           </div>
           {visual.subtitle ? (
-            <div className="mt-1 text-sm font-semibold text-slate-600">{visual.subtitle}</div>
+            <div className="mt-1 pr-2 text-sm font-semibold leading-relaxed text-slate-600">
+              {visual.subtitle}
+            </div>
           ) : null}
         </div>
         {visual.targetCoordinate && !interactive ? (
-          <div className="rounded-full border border-cyan-300 bg-slate-900 px-3 py-1 text-xs font-black tracking-[0.14em] text-cyan-200">
+          <div className="shrink-0 rounded-full border border-cyan-300 bg-slate-900 px-3 py-1 text-xs font-black tracking-[0.14em] text-cyan-200">
             {visual.targetCoordinate}
           </div>
         ) : null}
       </div>
 
-      <div className="mt-4 flex justify-center">
-        <div className="rounded-[28px] border border-cyan-300 bg-slate-950 p-3 shadow-[0_0_30px_rgba(34,211,238,0.12)]">
-          <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="h-[320px] w-[320px]">
+      <div className="mt-5 flex justify-center">
+        <div className="w-full max-w-[25rem] min-w-0">
+          <div className="rounded-[28px] border border-cyan-300 bg-slate-950 p-3 sm:p-4 shadow-[0_0_30px_rgba(34,211,238,0.12)]">
+            <div className="aspect-square w-full">
+              <svg
+                viewBox={`0 0 ${SIZE} ${SIZE}`}
+                className="block h-auto w-full overflow-visible"
+                preserveAspectRatio="xMidYMid meet"
+              >
             <defs>
               <pattern
                 id="gridPattern"
@@ -330,22 +338,24 @@ export default function CartesianGridVisual({
               </g>
             ) : null}
 
-            <text
-              x={SIZE - PADDING + 8}
-              y={zeroY - 8}
-              textAnchor="start"
-              className="fill-cyan-200/80 text-[11px] font-medium"
-            >
-              x
-            </text>
-            <text
-              x={zeroX + 8}
-              y={PADDING - 6}
-              className="fill-cyan-200/80 text-[11px] font-medium"
-            >
-              y
-            </text>
-          </svg>
+                <text
+                  x={SIZE - PADDING - 4}
+                  y={zeroY - 10}
+                  textAnchor="start"
+                  className="fill-cyan-200/80 text-[11px] font-medium"
+                >
+                  x
+                </text>
+                <text
+                  x={zeroX + 8}
+                  y={PADDING - 10}
+                  className="fill-cyan-200/80 text-[11px] font-medium"
+                >
+                  y
+                </text>
+              </svg>
+            </div>
+          </div>
         </div>
       </div>
     </div>
