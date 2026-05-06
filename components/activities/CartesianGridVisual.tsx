@@ -13,6 +13,16 @@ function toSvgY(value: number, min: number, max: number) {
   return SIZE - PADDING - ((value - min) / (max - min)) * (SIZE - PADDING * 2);
 }
 
+function fromSvgX(svgX: number, min: number, max: number) {
+  const ratio = (svgX - PADDING) / (SIZE - PADDING * 2);
+  return min + ratio * (max - min);
+}
+
+function fromSvgY(svgY: number, min: number, max: number) {
+  const ratio = (SIZE - PADDING - svgY) / (SIZE - PADDING * 2);
+  return min + ratio * (max - min);
+}
+
 export default function CartesianGridVisual({
   visual,
   interactive = false,
@@ -47,6 +57,27 @@ export default function CartesianGridVisual({
     visual.closePath && pathPoints.length > 1
       ? `${polylinePoints} ${pathPoints[0]?.px},${pathPoints[0]?.py}`
       : polylinePoints;
+
+  function handleGridPointerDown(event: React.PointerEvent<SVGRectElement>) {
+    if (!interactive || !onPointSelect) return;
+
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const scaleX = SIZE / bounds.width;
+    const scaleY = SIZE / bounds.height;
+    const localX = (event.clientX - bounds.left) * scaleX;
+    const localY = (event.clientY - bounds.top) * scaleY;
+
+    const snappedX = Math.max(
+      visual.xMin,
+      Math.min(visual.xMax, Math.round(fromSvgX(localX, visual.xMin, visual.xMax)))
+    );
+    const snappedY = Math.max(
+      visual.yMin,
+      Math.min(visual.yMax, Math.round(fromSvgY(localY, visual.yMin, visual.yMax)))
+    );
+
+    onPointSelect({ x: snappedX, y: snappedY });
+  }
 
   return (
     <div className="mt-5 rounded-2xl border border-cyan-100 bg-cyan-50 p-4">
@@ -108,6 +139,19 @@ export default function CartesianGridVisual({
             </defs>
 
             <rect x={PADDING} y={PADDING} width={SIZE - PADDING * 2} height={SIZE - PADDING * 2} fill="url(#gridPattern)" rx="18" />
+            {interactive ? (
+              <rect
+                x={PADDING}
+                y={PADDING}
+                width={SIZE - PADDING * 2}
+                height={SIZE - PADDING * 2}
+                fill="transparent"
+                rx="18"
+                className="cursor-pointer"
+                pointerEvents="all"
+                onPointerDown={handleGridPointerDown}
+              />
+            ) : null}
 
             <line
               x1={PADDING}
@@ -253,7 +297,10 @@ export default function CartesianGridVisual({
                           fill="rgba(34,211,238,0.001)"
                           pointerEvents="all"
                           className="cursor-pointer"
-                          onPointerDown={() => onPointSelect?.({ x: xTick, y: yTick })}
+                          onPointerDown={(event) => {
+                            event.stopPropagation();
+                            onPointSelect?.({ x: xTick, y: yTick });
+                          }}
                         />
                         <circle
                           cx={px}
