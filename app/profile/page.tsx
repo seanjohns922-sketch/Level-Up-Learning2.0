@@ -443,7 +443,7 @@ export default function ProfilePage() {
                   </div>
                   <div className="flex justify-between text-xs">
                     <span className="font-semibold text-[#64748B]">Weeks</span>
-                    <span className="font-extrabold text-[#0F172A]">{stats.weeksCompleted}/12</span>
+                    <span className="font-extrabold text-[#0F172A]">{stats.weeksCompleted}</span>
                   </div>
                 </div>
               </div>
