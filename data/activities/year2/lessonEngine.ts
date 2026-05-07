@@ -23615,6 +23615,259 @@ function generateGenericQuestion(
     return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
   }
 
+  if (explicitMode === "y6_modelling_choose_strategy") {
+    const templates: Array<MultipleChoiceQuestion | TypedResponseQuestion> = [
+      {
+        kind: "multiple_choice",
+        prompt: "Which strategy should you use first?",
+        options: ["Multiply 20 × 12", "Add 300 + 12", "Divide 12 by 20"],
+        answer: "Multiply 20 × 12",
+        helper: "Find the total ticket cost first.",
+        visual: {
+          type: "rule_box",
+          title: "Modelling Scenario",
+          steps: ["Budget: $300", "Tickets: 20 students at $12"],
+          decisionLabel: "Find the total ticket cost first",
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "How much money is left after buying tickets?",
+        answer: "60",
+        acceptedAnswers: ["60.0", "60.00"],
+        helper: "Find total cost first, then subtract from the budget.",
+        placeholder: "Type the money left",
+        inputType: "integer",
+        visual: {
+          type: "rule_box",
+          title: "Budget Card",
+          steps: ["Budget: $300", "Tickets cost: 20 × $12", "Money left: 300 − 240"],
+          decisionLabel: "Subtract total cost from the budget",
+        },
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "What should you calculate first?",
+        options: ["25% of $160", "$160 + 25", "160 ÷ 25"],
+        answer: "25% of $160",
+        helper: "A discount is a percentage of the original price.",
+        visual: {
+          type: "rule_box",
+          title: "Money Decision",
+          steps: ["Bus booking: $160", "Discount: 25% off"],
+          decisionLabel: "Find the discount amount first",
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the final price?",
+        answer: "120",
+        acceptedAnswers: ["120.0", "120.00"],
+        helper: "Find one quarter of $160, then subtract it.",
+        placeholder: "Type the final price",
+        inputType: "integer",
+        visual: {
+          type: "rule_box",
+          title: "Discount Final Price",
+          steps: ["Original price: $160", "25% = 1/4", "Final price = 160 − 40"],
+          decisionLabel: "Discount means subtract",
+        },
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Is this reasonable?",
+        options: ["Yes", "No"],
+        answer: "No",
+        helper: "The discount amount and final price are different.",
+        visual: {
+          type: "rule_box",
+          title: "Check Reasonableness",
+          steps: ["Claim: 25% off $160 leaves $40 to pay", "$40 is only the discount"],
+          decisionLabel: "Check if the final price makes sense",
+        },
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_modelling_best_value") {
+    const templates: Array<MultipleChoiceQuestion | TypedResponseQuestion> = [
+      {
+        kind: "multiple_choice",
+        prompt: "Which is better value?",
+        options: ["Pack A", "Pack B", "Same"],
+        answer: "Pack B",
+        helper: "Compare the cost per snack.",
+        visual: bestBuyVisual("Deal Comparison", [
+          {
+            label: "Pack A",
+            productName: "Snack Pack A",
+            price: 48,
+            quantityLabel: "12 snacks",
+            unitRateLabel: "Cost each",
+            unitRate: 4,
+            hideUnitRateUntilReveal: true,
+          },
+          {
+            label: "Pack B",
+            productName: "Snack Pack B",
+            price: 60,
+            quantityLabel: "20 snacks",
+            unitRateLabel: "Cost each",
+            unitRate: 3,
+            hideUnitRateUntilReveal: true,
+          },
+        ]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "What makes the comparison fair?",
+        options: ["Compare cost per item", "Compare total price only", "Choose the bigger pack"],
+        answer: "Compare cost per item",
+        helper: "Different quantities need the same unit.",
+        visual: {
+          type: "rule_box",
+          title: "Strategy Choice",
+          steps: ["Two packs", "Different prices", "Different quantities"],
+          decisionLabel: "Use a unit price",
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "How many packs are needed?",
+        answer: "4",
+        acceptedAnswers: ["4.0"],
+        helper: "Divide the number of students by the number of drinks per pack.",
+        placeholder: "Type the number of packs",
+        inputType: "integer",
+        visual: {
+          type: "rule_box",
+          title: "Quantity Planner",
+          steps: ["Students: 32", "Drinks per pack: 8"],
+          decisionLabel: "Divide total people by pack size",
+        },
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which is better value?",
+        options: ["Pack A", "Pack B", "Same"],
+        answer: "Pack A",
+        helper: "Find the cost per drink for each pack.",
+        visual: bestBuyVisual("Deal Comparison", [
+          {
+            label: "Pack A",
+            productName: "Drink Pack A",
+            price: 18,
+            quantityLabel: "6 drinks",
+            unitRateLabel: "Cost each",
+            unitRate: 3,
+            hideUnitRateUntilReveal: true,
+          },
+          {
+            label: "Pack B",
+            productName: "Drink Pack B",
+            price: 28,
+            quantityLabel: "8 drinks",
+            unitRateLabel: "Cost each",
+            unitRate: 3.5,
+            hideUnitRateUntilReveal: true,
+          },
+        ]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Is that enough reasoning?",
+        options: ["Yes", "No"],
+        answer: "No",
+        helper: "Bigger packs are not always better value.",
+        visual: {
+          type: "rule_box",
+          title: "Check Reasonableness",
+          steps: ["Claim: Pack B is better because it has more drinks", "Check cost per drink, not just size"],
+          decisionLabel: "Bigger is not always better value",
+        },
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_modelling_mini_project") {
+    const templates: Array<MultipleChoiceQuestion | TypedResponseQuestion> = [
+      {
+        kind: "typed_response",
+        prompt: "What is the total ticket cost?",
+        answer: "288",
+        acceptedAnswers: ["288.0", "288.00"],
+        helper: "Multiply the number of students by the ticket price.",
+        placeholder: "Type the ticket cost",
+        inputType: "integer",
+        visual: {
+          type: "rule_box",
+          title: "Level Up Expo Planning",
+          steps: ["Tickets: 24 students at $12 each", "Total ticket cost = 24 × 12"],
+          decisionLabel: "Find the ticket total first",
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the total cost including bus, tickets and snacks?",
+        answer: "468",
+        acceptedAnswers: ["468.0", "468.00"],
+        helper: "Add all three costs.",
+        placeholder: "Type the total cost",
+        inputType: "integer",
+        visual: {
+          type: "rule_box",
+          title: "Budget Card",
+          steps: ["Bus: $120", "Tickets: $288", "Snacks: $60"],
+          decisionLabel: "Add every known cost",
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "How much money is left from the $500 budget?",
+        answer: "32",
+        acceptedAnswers: ["32.0", "32.00"],
+        helper: "Subtract the total cost from the budget.",
+        placeholder: "Type the money left",
+        inputType: "integer",
+        visual: {
+          type: "rule_box",
+          title: "Budget Card",
+          steps: ["Budget: $500", "Total cost: $468", "Money left = 500 − 468"],
+          decisionLabel: "Compare budget and total cost",
+        },
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Is the activity affordable?",
+        options: ["Yes", "No"],
+        answer: "No",
+        helper: "Compare the remaining money with the extra cost.",
+        visual: {
+          type: "rule_box",
+          title: "Check Reasonableness",
+          steps: ["Money left: $32", "Extra activity: $40"],
+          decisionLabel: "Check if the remaining money covers the cost",
+        },
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which statement best explains the final decision?",
+        options: ["The plan works, but only $32 remains", "The plan does not work", "The tickets cost $500"],
+        answer: "The plan works, but only $32 remains",
+        helper: "Use the total cost and remaining budget to justify the decision.",
+        visual: {
+          type: "rule_box",
+          title: "Final Decision",
+          steps: ["Budget: $500", "Total cost: $468", "Money left: $32"],
+          decisionLabel: "Interpret the result, not just the calculation",
+        },
+      },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
   if (
     explicitMode === "choose_strategy_quick" ||
     explicitMode === "choose_strategy_reflect" ||

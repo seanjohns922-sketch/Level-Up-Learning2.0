@@ -589,9 +589,18 @@ const year6Rows: ProgramRow[] = [
     activity: "Combine percentage, rate, and multi-step reasoning in short realistic modelling problems.",
     curriculum: ["AC9M6N05", "AC9M6N06", "AC9M6N08"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "multi_step_decide" }),
-      makeActivity("typed_response", 1, { mode: "multi_step_build" }),
-      makeActivity("multiple_choice", 1, { mode: "multi_step_solve" }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_modelling_choose_strategy",
+        rotationRole: "fast_thinking",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_modelling_best_value",
+        rotationRole: "reasoning",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_modelling_mini_project",
+        rotationRole: "apply_create",
+      }),
     ],
   },
   {
