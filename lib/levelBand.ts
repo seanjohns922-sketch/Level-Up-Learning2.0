@@ -21,7 +21,8 @@ export function getLevelBand(levelNum: number): LevelBand {
  * L5     → High Spire (standalone)
  * L6     → Apex Sky-Vault (final)
  */
-export function getHomeBg(levelNum: number): string {
+export function getHomeBg(levelNum: number, isPrep?: boolean): string {
+  if (isPrep) return "/images/number-nexus-home-bg-prep.jpg";
   if (levelNum >= 6) return "/images/number-nexus-home-bg-y6.jpg";
   if (levelNum >= 5) return "/images/number-nexus-home-bg-y5.jpg";
   if (levelNum >= 3) return "/images/number-nexus-home-bg-y3.jpg"; // L3+L4 mid-city data canyon
