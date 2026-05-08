@@ -42,7 +42,9 @@ function LessonPage() {
 
   const year = params.get("year") ?? "Year 1";
   const week = Number(params.get("week") ?? "1");
-  const yearNumber = parseInt(year.replace(/\D/g, ""), 10) || 1;
+  const yearNumber = year === "Prep" ? 0 : parseInt(year.replace(/\D/g, ""), 10) || 1;
+  const levelNumber = year === "Prep" ? 1 : yearNumber;
+  const levelLabel = year === "Prep" ? "Ground Level" : `Level ${levelNumber}`;
   const lessonId = params.get("lessonId") ?? `y${yearNumber}-w1-l1`;
   const expectedPrefix = `y${yearNumber}-w${week}-`;
   const effectiveLessonId = lessonId.startsWith(expectedPrefix)
@@ -54,7 +56,7 @@ function LessonPage() {
     const match = effectiveLessonId.match(/l(\d+)$/);
     return match ? Number(match[1]) : 1;
   }, [effectiveLessonId]);
-  const lessonChrome = useMemo(() => getLessonChrome(yearNumber), [yearNumber]);
+  const lessonChrome = useMemo(() => getLessonChrome(levelNumber), [levelNumber]);
 
   const [startedLessonId, setStartedLessonId] = useState<string | null>(null);
   const lessonMeta = useMemo(() => {
@@ -261,7 +263,8 @@ function LessonPage() {
         {!started ? (
           <div className="rounded-[24px] overflow-hidden shadow-[0_2px_6px_rgba(0,0,0,0.04),0_16px_40px_rgba(0,0,0,0.08)] border border-border/40 bg-card">
             <LessonPageHero
-              levelNumber={yearNumber}
+              levelNumber={levelNumber}
+              levelLabel={levelLabel}
               week={week}
               lessonNumber={lessonNumber}
               pageTitle={`Lesson ${lessonNumber} Practise`}
@@ -551,9 +554,10 @@ function LessonPage() {
         ) : year === "Year 1" ? (
           <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
             <LessonPageHero
-              levelNumber={yearNumber}
-              week={week}
-              lessonNumber={lessonNumber}
+                    levelNumber={levelNumber}
+                    levelLabel={levelLabel}
+                    week={week}
+                    lessonNumber={lessonNumber}
               pageTitle={`Lesson ${lessonNumber} Practise`}
               lessonTitle={safeLessonTitle}
               focus={safeLessonFocus}
@@ -624,7 +628,8 @@ function LessonPage() {
         ) : (
           <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
             <LessonPageHero
-              levelNumber={yearNumber}
+              levelNumber={levelNumber}
+              levelLabel={levelLabel}
               week={week}
               lessonNumber={lessonNumber}
               pageTitle={`Lesson ${lessonNumber} Practise`}

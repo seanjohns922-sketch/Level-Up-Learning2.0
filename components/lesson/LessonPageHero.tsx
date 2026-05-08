@@ -4,6 +4,7 @@ const heroNumberNexus = { src: "/images/lesson-hero-number-nexus.jpg" };
 
 type LessonPageHeroProps = {
   levelNumber: number;
+  levelLabel?: string;
   week: number;
   lessonNumber: number;
   pageTitle: string;
@@ -14,6 +15,7 @@ type LessonPageHeroProps = {
 
 export function LessonPageHero({
   levelNumber,
+  levelLabel,
   week,
   lessonNumber,
   pageTitle,
@@ -84,7 +86,7 @@ export function LessonPageHero({
       {/* Content — confined to left ~58% */}
       <div className="relative z-10 px-5 py-4 md:px-7 md:py-5 max-w-[58%]">
         <div className="inline-flex items-center gap-2 rounded-full bg-white/10 border border-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] backdrop-blur-sm md:text-xs">
-          Level {levelNumber} • Week {week} • Lesson {lessonNumber}
+          {(levelLabel ?? `Level ${levelNumber}`)} • Week {week} • Lesson {lessonNumber}
         </div>
         <h1 className="mt-2 text-2xl font-bold tracking-[-0.02em] drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)] md:text-3xl">
           {pageTitle}

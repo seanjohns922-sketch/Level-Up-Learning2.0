@@ -37,11 +37,14 @@ function ProgramPage() {
   const year = sp.get("year") ?? "Year 1";
   const weekNum = Number(sp.get("week") ?? "1");
   const week = String(weekNum);
-  const levelNum = parseInt(year.replace(/\D/g, ""), 10) || 1;
   const curriculumYear = useMemo(() => {
     const selected = getProgramForYear(year);
     return selected.length > 0 ? year : "Year 1";
   }, [year]);
+  const programYearIndex =
+    curriculumYear === "Prep" ? 0 : parseInt(curriculumYear.replace(/\D/g, ""), 10) || 1;
+  const levelNum = year === "Prep" ? 1 : parseInt(year.replace(/\D/g, ""), 10) || 1;
+  const levelLabel = curriculumYear === "Prep" ? "Ground Level" : `Level ${programYearIndex}`;
 
   const [store, setStore] = useState<ProgramProgressStore>(() =>
     typeof window !== "undefined" ? readProgramStore() : {}
@@ -177,9 +180,8 @@ function ProgramPage() {
     }
 
     if (item.type === "lesson") {
-      const yearNumber = parseInt(curriculumYear.replace(/\D/g, ""), 10) || 1;
       router.push(
-        `/lesson?year=${encodeURIComponent(curriculumYear)}&week=${week}&lessonId=y${yearNumber}-w${weekNum}-l${item.n}`
+        `/lesson?year=${encodeURIComponent(curriculumYear)}&week=${week}&lessonId=y${programYearIndex}-w${weekNum}-l${item.n}`
       );
       return;
     }
@@ -380,7 +382,7 @@ function ProgramPage() {
                 )}
               </div>
             </div>
-            <span className="text-sm text-white/80 font-medium ml-1">Level {levelNum}</span>
+            <span className="text-sm text-white/80 font-medium ml-1">{levelLabel}</span>
           </div>
 
           <div className="text-center">
@@ -396,7 +398,7 @@ function ProgramPage() {
               }}
             >
               <span className="h-1.5 w-1.5 rounded-full bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]" />
-              Level {levelNum} · Program
+              {levelLabel} · Program
             </button>
             <h1 className="text-4xl md:text-5xl font-black text-white mt-3 tracking-tight drop-shadow-[0_2px_12px_rgba(20,184,166,0.35)]">Week {weekNum}</h1>
             <p className="text-base md:text-lg text-teal-50/95 mt-2 font-semibold">

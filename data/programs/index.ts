@@ -1,3 +1,4 @@
+import { PREP_PROGRAM } from "./prep";
 import { YEAR1_PROGRAM, type WeekPlan } from "./year1";
 import { year2Number } from "./year2Number";
 import { YEAR3_PROGRAM } from "./year3";
@@ -6,6 +7,7 @@ import { YEAR5_PROGRAM } from "./year5";
 import { YEAR6_PROGRAM } from "./year6";
 
 export const programs = {
+  0: PREP_PROGRAM,
   1: YEAR1_PROGRAM,
   2: year2Number,
   3: YEAR3_PROGRAM,
@@ -15,6 +17,7 @@ export const programs = {
 };
 
 export const PROGRAMS_BY_YEAR: Record<string, WeekPlan[]> = {
+  Prep: PREP_PROGRAM,
   "Year 1": YEAR1_PROGRAM,
   "Year 2": year2Number,
   "Year 3": YEAR3_PROGRAM,

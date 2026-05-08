@@ -30,21 +30,18 @@ const ALL_GENRES: Genre[] = [
   { id: "probability", strand: "Probability", realm: "Chanzia",         available: false, unlocksFromLevel: 3 },
 ];
 
-/** Genres visible for a given year. Number is only "available" for Year 1–6 (not Prep). */
+/** Genres visible for a given year. Number has real curriculum from Prep upward. */
 export function getGenresForYear(yearLabel: string): Genre[] {
   const ord = yearOrdinal(yearLabel);
   return ALL_GENRES
     .filter((g) => ord >= g.unlocksFromLevel)
-    .map((g) => {
-      // Number has real curriculum for Year 1–6, placeholder for Prep.
-      if (g.id === "number") return { ...g, available: ord >= 1 };
-      return g;
-    });
+    .map((g) => g);
 }
 
-/** Year label → numeric key for the `programs` map (1..6). */
-function yearKey(yearLabel: string): 1 | 2 | 3 | 4 | 5 | 6 | null {
-  const map: Record<string, 1 | 2 | 3 | 4 | 5 | 6> = {
+/** Year label → numeric key for the `programs` map (Prep = 0, Year 1..6 = 1..6). */
+function yearKey(yearLabel: string): 0 | 1 | 2 | 3 | 4 | 5 | 6 | null {
+  const map: Record<string, 0 | 1 | 2 | 3 | 4 | 5 | 6> = {
+    Prep: 0,
     "Year 1": 1, "Year 2": 2, "Year 3": 3,
     "Year 4": 4, "Year 5": 5, "Year 6": 6,
   };
@@ -54,7 +51,7 @@ function yearKey(yearLabel: string): 1 | 2 | 3 | 4 | 5 | 6 | null {
 /** Year label → lesson-id prefix used in `progress.completed_lesson_ids`. */
 export function lessonIdPrefix(yearLabel: string): string {
   const k = yearKey(yearLabel);
-  return k ? `y${k}-` : "y0-";
+  return k !== null ? `y${k}-` : "y0-";
 }
 
 /** Build a 12-week placeholder scaffold (used when no real program exists). */
@@ -92,8 +89,11 @@ export function getCurriculumPlan(yearLabel: string, genreId: string): WeekPlan[
   const genre = getGenresForYear(yearLabel).find((g) => g.id === genreId);
   if (!genre) return [];
 
-  if (genre.available && genreId === "number" && k && (programs as any)[k]) {
-    return (programs as any)[k] as WeekPlan[];
+  if (genre.available && genreId === "number" && k !== null) {
+    const program = programs[k];
+    if (program) {
+      return program;
+    }
   }
 
   return placeholderWeeks(yearLabel, genre);
