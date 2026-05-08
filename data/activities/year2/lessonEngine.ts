@@ -23616,6 +23616,10 @@ function generateGenericQuestion(
   }
 
   if (explicitMode === "y6_modelling_choose_strategy") {
+    const templateIndex =
+      typeof config.templateIndex === "number" && Number.isFinite(config.templateIndex)
+        ? Math.max(0, Math.floor(config.templateIndex))
+        : randInt(0, 4);
     const templates: Array<MultipleChoiceQuestion | TypedResponseQuestion> = [
       {
         kind: "multiple_choice",
@@ -23687,10 +23691,14 @@ function generateGenericQuestion(
         },
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return templates[templateIndex % templates.length] ?? templates[0]!;
   }
 
   if (explicitMode === "y6_modelling_best_value") {
+    const templateIndex =
+      typeof config.templateIndex === "number" && Number.isFinite(config.templateIndex)
+        ? Math.max(0, Math.floor(config.templateIndex))
+        : randInt(0, 4);
     const templates: Array<MultipleChoiceQuestion | TypedResponseQuestion> = [
       {
         kind: "multiple_choice",
@@ -23788,10 +23796,14 @@ function generateGenericQuestion(
         },
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return templates[templateIndex % templates.length] ?? templates[0]!;
   }
 
   if (explicitMode === "y6_modelling_mini_project") {
+    const templateIndex =
+      typeof config.templateIndex === "number" && Number.isFinite(config.templateIndex)
+        ? Math.max(0, Math.floor(config.templateIndex))
+        : randInt(0, 4);
     const templates: Array<MultipleChoiceQuestion | TypedResponseQuestion> = [
       {
         kind: "typed_response",
@@ -23865,7 +23877,7 @@ function generateGenericQuestion(
         },
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return templates[templateIndex % templates.length] ?? templates[0]!;
   }
 
   if (
@@ -25518,6 +25530,8 @@ export function generateQuestion(
   activity: LessonActivity
 ): Year2QuestionData {
   const config = (activity.config ?? {}) as GenericConfig;
+  const explicitMode = typeof config.mode === "string" ? config.mode : undefined;
+  const allowExplicitKindOverride = explicitMode?.startsWith("y6_") === true;
   const preValidation = validateLessonActivityIntentForLevel(level, lesson, activity);
   assertPolicyValidation(preValidation, "pre_generate");
 
@@ -25638,12 +25652,12 @@ export function generateQuestion(
   }
 
   if (activity.activityType === "multiple_choice") {
-    if (question.kind !== "multiple_choice") {
+    if (question.kind !== "multiple_choice" && !allowExplicitKindOverride) {
       const answer = question.kind === "typed_response" ? String(question.answer) : "Yes";
       console.warn("Invalid MC Question:", {
         reason: "kind_mismatch",
         activityType: activity.activityType,
-        mode: typeof config.mode === "string" ? config.mode : undefined,
+        mode: explicitMode,
         question,
       });
       question = {
@@ -25654,16 +25668,17 @@ export function generateQuestion(
         helper: "Use the rule or pattern to choose the best answer.",
       };
     } else if (
-      !Array.isArray(question.options) ||
-      question.options.length < 2 ||
-      question.options.some((option) => typeof option !== "string" || option.trim().length === 0) ||
-      typeof question.answer !== "string" ||
-      !question.options.includes(question.answer)
+      question.kind === "multiple_choice" &&
+      (!Array.isArray(question.options) ||
+        question.options.length < 2 ||
+        question.options.some((option) => typeof option !== "string" || option.trim().length === 0) ||
+        typeof question.answer !== "string" ||
+        !question.options.includes(question.answer))
     ) {
       console.warn("Invalid MC Question:", {
         reason: "invalid_shape",
         activityType: activity.activityType,
-        mode: typeof config.mode === "string" ? config.mode : undefined,
+        mode: explicitMode,
         question,
       });
       const answer = typeof question.answer === "string" && question.answer.trim().length > 0
@@ -25684,7 +25699,11 @@ export function generateQuestion(
     }
   }
 
-  if (activity.activityType === "typed_response" && question.kind !== "typed_response") {
+  if (
+    activity.activityType === "typed_response" &&
+    question.kind !== "typed_response" &&
+    !allowExplicitKindOverride
+  ) {
     question = {
       kind: "typed_response",
       prompt: question.prompt,

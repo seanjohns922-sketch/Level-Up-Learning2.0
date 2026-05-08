@@ -34,6 +34,11 @@ function isMultiStepCalculationLesson(level: SupportedMathLevel, lesson: Lesson)
   return level === 5 && lesson.week === 12 && lesson.lesson === 2;
 }
 
+function isYear6RealWorldModellingLesson(level: SupportedMathLevel, lesson: Lesson) {
+  void level;
+  return lesson.week === 12 && lesson.lesson === 2;
+}
+
 function chooseNextLessonTurn(
   level: SupportedMathLevel,
   lesson: Lesson,
@@ -56,6 +61,8 @@ function chooseNextLessonTurn(
   }
 
   const orderedActivityIndex = isOrderedStrategyFluencyLesson(level, lesson)
+    ? questionOrder % activities.length
+    : isYear6RealWorldModellingLesson(level, lesson)
     ? questionOrder % activities.length
     : null;
   const weighted =
@@ -92,9 +99,23 @@ function chooseNextLessonTurn(
             ...baseActivity,
             config: { ...baseActivity.config, boardIndex },
           };
+    const activityMode =
+      typeof activity.config?.mode === "string" ? activity.config.mode : undefined;
+    const activityUseCount = activityMode
+      ? history.filter((entry) => entry.mode === activityMode).length
+      : 0;
+    const activityWithTemplateIndex = isYear6RealWorldModellingLesson(level, lesson)
+      ? {
+          ...activity,
+          config: {
+            ...activity.config,
+            templateIndex: activityUseCount,
+          },
+        }
+      : activity;
 
     for (let attempt = 0; attempt < CANDIDATES_PER_ACTIVITY; attempt += 1) {
-      const question = generateQuestion(level, lesson, activity);
+      const question = generateQuestion(level, lesson, activityWithTemplateIndex);
       const fingerprint = getLessonQuestionFingerprint(activity, question);
       const candidateScore = scoreQuestionCandidate(fingerprint, history, questionOrder);
       const candidate = {
@@ -148,6 +169,19 @@ function chooseNextLessonTurn(
               config: {
                 ...activities[chosenActivityIndex]!.config,
                 boardIndex: Math.floor(questionOrder / 3) % 5,
+              },
+            }
+          : isYear6RealWorldModellingLesson(level, lesson)
+          ? {
+              ...activities[chosenActivityIndex]!,
+              config: {
+                ...activities[chosenActivityIndex]!.config,
+                templateIndex:
+                  typeof activities[chosenActivityIndex]!.config?.mode === "string"
+                    ? history.filter(
+                        (entry) => entry.mode === activities[chosenActivityIndex]!.config.mode
+                      ).length
+                    : 0,
               },
             }
           : activities[chosenActivityIndex]!
