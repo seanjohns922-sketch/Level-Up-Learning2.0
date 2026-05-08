@@ -79,6 +79,8 @@ const strandYear4 = "Number";
 const difficultyYear4 = "year4";
 const strandYear5 = "Number";
 const difficultyYear5 = "year5";
+const strandYear6 = "Number";
+const difficultyYear6 = "year6";
 
 function buildPostMcqQuestion(
   id: string,
@@ -90,7 +92,8 @@ function buildPostMcqQuestion(
   linkedWeeks: number[],
   strand: string,
   difficultyBand: string,
-  linkedLessons: number[] = [1, 2, 3]
+  linkedLessons: number[] = [1, 2, 3],
+  extras: Partial<Question> = {}
 ): Question {
   return {
     id,
@@ -105,6 +108,7 @@ function buildPostMcqQuestion(
     linkedLessons,
     strand,
     difficultyBand,
+    ...extras,
   };
 }
 
@@ -117,7 +121,8 @@ function buildPostNumericQuestion(
   linkedWeeks: number[],
   strand: string,
   difficultyBand: string,
-  linkedLessons: number[] = [1, 2, 3]
+  linkedLessons: number[] = [1, 2, 3],
+  extras: Partial<Question> = {}
 ): Question {
   return {
     id,
@@ -131,6 +136,7 @@ function buildPostNumericQuestion(
     linkedLessons,
     strand,
     difficultyBand,
+    ...extras,
   };
 }
 
@@ -561,6 +567,455 @@ const YEAR5_POSTTEST_QUESTIONS: Question[] = [
   ),
 ];
 
+const YEAR6_POSTTEST_QUESTIONS: Question[] = [
+  buildPostMcqQuestion(
+    "y6-pt-01",
+    "Evaluate: 24 ÷ 6 + 5",
+    ["9", "4", "14", "1"],
+    "9",
+    "order_of_operations",
+    "Order of Operations",
+    [11, 12],
+    strandYear6,
+    difficultyYear6,
+    [1, 3],
+    {
+      visual: {
+        type: "expression_flow",
+        title: "Order of Operations",
+        cards: [
+          {
+            tokens: ["24", "÷", "6", "+", "5"],
+            highlightRange: [0, 2],
+            result: "4 + 5",
+            note: "Divide first, then add.",
+          },
+        ],
+      },
+    }
+  ),
+  buildPostNumericQuestion(
+    "y6-pt-02",
+    "Write 45% as a decimal.",
+    "0.45",
+    "fractions_decimals_percentages",
+    "Fractions, Decimals & Percentages",
+    [1, 6, 12],
+    strandYear6,
+    difficultyYear6,
+    [1, 3],
+    {
+      visual: {
+        type: "decimal_model",
+        model: "place_value_chart",
+        ones: 0,
+        tenths: 4,
+        hundredths: 5,
+      },
+    }
+  ),
+  buildPostMcqQuestion(
+    "y6-pt-03",
+    "Which number is prime?",
+    ["21", "29", "35", "39"],
+    "29",
+    "prime_composite",
+    "Prime & Composite Numbers",
+    [2],
+    strandYear6,
+    difficultyYear6,
+    [1, 2],
+    {
+      visual: {
+        type: "rule_box",
+        title: "Strategy Selection",
+        steps: ["Prime numbers have exactly 2 factors", "Test small factor pairs"],
+        decisionLabel: "Look for a number with no other factor pairs",
+      },
+    }
+  ),
+  buildPostMcqQuestion(
+    "y6-pt-04",
+    "Which fraction is equal to 0.5?",
+    ["1/2", "1/5", "5/10", "Both 1/2 and 5/10"],
+    "Both 1/2 and 5/10",
+    "fractions_decimals_percentages",
+    "Fractions, Decimals & Percentages",
+    [5, 6],
+    strandYear6,
+    difficultyYear6,
+    [1, 2],
+    {
+      visual: {
+        type: "decimal_model",
+        model: "tenths_bar",
+        numerator: 5,
+        denominator: 10,
+      },
+    }
+  ),
+  buildPostNumericQuestion(
+    "y6-pt-05",
+    "A pack has 8 items. How many items are in 6 packs?",
+    "48",
+    "multiplicative_reasoning",
+    "Multiplication & Equal Groups",
+    [10, 12],
+    strandYear6,
+    difficultyYear6,
+    [1, 2],
+    {
+      visual: {
+        type: "rule_box",
+        title: "Quantity Comparison",
+        steps: ["6 equal packs", "8 items in each pack"],
+        decisionLabel: "Use multiplication for equal groups",
+      },
+    }
+  ),
+  buildPostMcqQuestion(
+    "y6-pt-06",
+    "A game costs $120. It has a 25% discount. What is the final price?",
+    ["$30", "$90", "$100", "$95"],
+    "$90",
+    "financial_maths",
+    "Financial Maths",
+    [7, 12],
+    strandYear6,
+    difficultyYear6,
+    [1, 2],
+    {
+      visual: {
+        type: "rule_box",
+        title: "Budget Decision",
+        steps: ["Original price: $120", "Discount: 25% off", "25% of 120 = 30"],
+        decisionLabel: "Subtract the discount from the original price",
+      },
+    }
+  ),
+  buildPostNumericQuestion(
+    "y6-pt-07",
+    "Budget: $500. Spent: $175 on transport and $125 on tickets. How much money remains?",
+    "200",
+    "financial_maths",
+    "Financial Maths",
+    [7, 12],
+    strandYear6,
+    difficultyYear6,
+    [1, 2],
+    {
+      visual: {
+        type: "rule_box",
+        title: "Budget Decision",
+        steps: ["Budget: $500", "Transport: $175", "Tickets: $125"],
+        decisionLabel: "Subtract the total spending from the budget",
+      },
+    }
+  ),
+  buildPostMcqQuestion(
+    "y6-pt-08",
+    "Pack A: $18 for 6 drinks. Pack B: $28 for 8 drinks. Which pack is better value?",
+    ["Pack A", "Pack B", "Same value", "Cannot tell"],
+    "Pack A",
+    "unit_rate_best_buy",
+    "Best Value & Unit Rates",
+    [12],
+    strandYear6,
+    difficultyYear6,
+    [1, 2],
+    {
+      visual: {
+        type: "best_buy_card_comparison",
+        title: "Quantity Comparison",
+        cards: [
+          {
+            label: "Pack A",
+            productName: "Drink Pack A",
+            price: 18,
+            quantityLabel: "6 drinks",
+            unitRateLabel: "Cost each",
+            unitRate: 3,
+          },
+          {
+            label: "Pack B",
+            productName: "Drink Pack B",
+            price: 28,
+            quantityLabel: "8 drinks",
+            unitRateLabel: "Cost each",
+            unitRate: 3.5,
+          },
+        ],
+      },
+    }
+  ),
+  buildPostMcqQuestion(
+    "y6-pt-09",
+    "Which operation should be used first? 18 − 3 × 4",
+    ["subtraction", "multiplication", "addition", "estimation"],
+    "multiplication",
+    "order_of_operations",
+    "Order of Operations",
+    [11, 12],
+    strandYear6,
+    difficultyYear6,
+    [1, 3],
+    {
+      visual: {
+        type: "expression_flow",
+        title: "Choose the First Step",
+        cards: [
+          {
+            tokens: ["18", "−", "3", "×", "4"],
+            highlightRange: [2, 4],
+            note: "Multiplication happens before subtraction.",
+          },
+        ],
+      },
+    }
+  ),
+  buildPostNumericQuestion(
+    "y6-pt-10",
+    "What is 50% of 240?",
+    "120",
+    "fractions_decimals_percentages",
+    "Fractions, Decimals & Percentages",
+    [6, 12],
+    strandYear6,
+    difficultyYear6,
+    [1, 3],
+    {
+      visual: {
+        type: "decimal_model",
+        model: "tenths_bar",
+        numerator: 5,
+        denominator: 10,
+      },
+    }
+  ),
+  buildPostNumericQuestion(
+    "y6-pt-11",
+    "Solve: x + 14 = 39",
+    "25",
+    "equations_unknowns",
+    "Equations & Unknown Values",
+    [11, 12],
+    strandYear6,
+    difficultyYear6,
+    [1, 2],
+    {
+      visual: {
+        type: "balance_equation_card",
+        title: "Equation Balance",
+        left: "x + 14",
+        right: "39",
+        unknownSymbol: "x",
+      },
+    }
+  ),
+  buildPostMcqQuestion(
+    "y6-pt-12",
+    "Solve: 5 × y = 45",
+    ["5", "8", "9", "40"],
+    "9",
+    "equations_unknowns",
+    "Equations & Unknown Values",
+    [11, 12],
+    strandYear6,
+    difficultyYear6,
+    [1, 2],
+    {
+      visual: {
+        type: "balance_equation_card",
+        title: "Equation Balance",
+        left: "5 × y",
+        right: "45",
+        unknownSymbol: "y",
+      },
+    }
+  ),
+  buildPostMcqQuestion(
+    "y6-pt-13",
+    "Input → Output: 2 → 10, 4 → 20, 6 → 30. What is the rule?",
+    ["×5", "+5", "×10", "+10"],
+    "×5",
+    "patterns_rules",
+    "Patterns & Rules",
+    [9, 10, 12],
+    strandYear6,
+    difficultyYear6,
+    [1, 2, 3],
+    {
+      visual: {
+        type: "input_output_table",
+        title: "Pattern Rule",
+        pairs: [
+          { input: "2", output: "10" },
+          { input: "4", output: "20" },
+          { input: "6", output: "30" },
+        ],
+      },
+    }
+  ),
+  buildPostNumericQuestion(
+    "y6-pt-14",
+    "Rule: multiply by 6. What is the output for input 7?",
+    "42",
+    "patterns_rules",
+    "Patterns & Rules",
+    [9, 10, 12],
+    strandYear6,
+    difficultyYear6,
+    [1, 2, 3],
+    {
+      visual: {
+        type: "function_machine_card",
+        title: "Pattern Rule",
+        input: "7",
+        rule: "×6",
+        output: "?",
+      },
+    }
+  ),
+  buildPostMcqQuestion(
+    "y6-pt-15",
+    "Which statement is true?",
+    [
+      "Equations must stay balanced",
+      "The equal sign means write the answer",
+      "Patterns never repeat",
+      "Multiplication always comes last",
+    ],
+    "Equations must stay balanced",
+    "equations_unknowns",
+    "Equations & Unknown Values",
+    [11, 12],
+    strandYear6,
+    difficultyYear6,
+    [1, 2],
+    {
+      visual: {
+        type: "rule_box",
+        title: "Strategy Selection",
+        steps: ["The equal sign shows both sides are the same", "Solve by keeping the balance true"],
+        decisionLabel: "Balanced equations stay equal",
+      },
+    }
+  ),
+  buildPostMcqQuestion(
+    "y6-pt-16",
+    "Which coordinate is shown?",
+    ["(3, -2)", "(-3, 2)", "(2, -3)", "(-2, 3)"],
+    "(3, -2)",
+    "coordinates_movement",
+    "Coordinates & Movement",
+    [10, 11, 12],
+    strandYear6,
+    difficultyYear6,
+    [2, 3],
+    {
+      visual: {
+        type: "cartesian_grid",
+        title: "Coordinate Plane",
+        xMin: -5,
+        xMax: 5,
+        yMin: -5,
+        yMax: 5,
+        points: [{ x: 3, y: -2, label: "P" }],
+      },
+    }
+  ),
+  buildPostNumericQuestion(
+    "y6-pt-17",
+    "Start at (-1, 4). Move right 3. What is the new coordinate?",
+    "(2,4)",
+    "coordinates_movement",
+    "Coordinates & Movement",
+    [10, 11, 12],
+    strandYear6,
+    difficultyYear6,
+    [2, 3],
+    {
+      visual: {
+        type: "cartesian_grid",
+        title: "Coordinate Movement",
+        xMin: -5,
+        xMax: 5,
+        yMin: -5,
+        yMax: 5,
+        points: [{ x: -1, y: 4, label: "Start" }],
+        subtitle: "Move right 3. Right changes x only.",
+      },
+    }
+  ),
+  buildPostMcqQuestion(
+    "y6-pt-18",
+    "Which quadrant contains (-4, 3)?",
+    ["Quadrant I", "Quadrant II", "Quadrant III", "Quadrant IV"],
+    "Quadrant II",
+    "coordinates_movement",
+    "Coordinates & Movement",
+    [10, 11, 12],
+    strandYear6,
+    difficultyYear6,
+    [2, 3],
+    {
+      visual: {
+        type: "cartesian_grid",
+        title: "Quadrant Check",
+        xMin: -5,
+        xMax: 5,
+        yMin: -5,
+        yMax: 5,
+        points: [{ x: -4, y: 3, label: "Q" }],
+      },
+    }
+  ),
+  buildPostNumericQuestion(
+    "y6-pt-19",
+    "A class has $600. They spend $220 on tickets, $150 on food, and $80 on transport. How much money remains?",
+    "150",
+    "financial_maths",
+    "Financial Maths",
+    [7, 12],
+    strandYear6,
+    difficultyYear6,
+    [1, 2],
+    {
+      visual: {
+        type: "rule_box",
+        title: "Budget Decision",
+        steps: ["Budget: $600", "Tickets: $220", "Food: $150", "Transport: $80"],
+        decisionLabel: "Add the costs, then subtract from the budget",
+      },
+    }
+  ),
+  buildPostMcqQuestion(
+    "y6-pt-20",
+    "Which skill is MOST important when solving multi-step problems?",
+    [
+      "Following steps carefully",
+      "Guessing quickly",
+      "Ignoring operation order",
+      "Using the biggest numbers first",
+    ],
+    "Following steps carefully",
+    "problem_solving_reasoning",
+    "Problem Solving & Reasoning",
+    [11, 12],
+    strandYear6,
+    difficultyYear6,
+    [1, 2, 3],
+    {
+      visual: {
+        type: "rule_box",
+        title: "Readiness Check",
+        steps: ["Read the whole problem", "Choose a strategy", "Follow the steps in order"],
+        decisionLabel: "Careful strategy beats quick guessing",
+      },
+    }
+  ),
+];
+
 export const POSTTESTS: Record<string, PostTest> = {
   "Year 1": {
     yearLabel: "Year 1",
@@ -577,5 +1032,9 @@ export const POSTTESTS: Record<string, PostTest> = {
   "Year 5": {
     yearLabel: "Year 5",
     questions: YEAR5_POSTTEST_QUESTIONS,
+  },
+  "Year 6": {
+    yearLabel: "Year 6",
+    questions: YEAR6_POSTTEST_QUESTIONS,
   },
 };

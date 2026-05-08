@@ -2,6 +2,14 @@
 
 import { useMemo, useRef, useState } from "react";
 import { FractionText, MathFormattedText } from "@/components/FractionText";
+import DecimalModelVisual from "@/components/activities/DecimalModelVisual";
+import RuleBoxVisual from "@/components/activities/RuleBoxVisual";
+import BestBuyCardComparisonVisual from "@/components/activities/BestBuyCardComparisonVisual";
+import CartesianGridVisual from "@/components/activities/CartesianGridVisual";
+import ExpressionFlowVisual from "@/components/activities/ExpressionFlowVisual";
+import InputOutputTableVisual from "@/components/activities/InputOutputTableVisual";
+import FunctionMachineCardVisual from "@/components/activities/FunctionMachineCardVisual";
+import { BalanceEquationCardVisual } from "@/components/activities/EquationVisualCards";
 
 type GenericQuestion = {
   type?: string;
@@ -95,6 +103,21 @@ export default function AssessmentQuestionCard({
     [type, value]
   );
 
+  const renderedVisual = visual ? (
+    <>
+      {visual.type === "decimal_model" ? <DecimalModelVisual visual={visual as never} title="Decimal model" /> : null}
+      {visual.type === "rule_box" ? <RuleBoxVisual visual={visual as never} title="Strategy card" /> : null}
+      {visual.type === "best_buy_card_comparison" ? (
+        <BestBuyCardComparisonVisual visual={visual as never} revealUnitRates />
+      ) : null}
+      {visual.type === "cartesian_grid" ? <CartesianGridVisual visual={visual as never} /> : null}
+      {visual.type === "expression_flow" ? <ExpressionFlowVisual visual={visual as never} /> : null}
+      {visual.type === "input_output_table" ? <InputOutputTableVisual visual={visual as never} /> : null}
+      {visual.type === "function_machine_card" ? <FunctionMachineCardVisual visual={visual as never} /> : null}
+      {visual.type === "balance_equation_card" ? <BalanceEquationCardVisual visual={visual as never} /> : null}
+    </>
+  ) : null;
+
   if (type === "number_order") {
     const numbers = ((question.options as string[] | undefined) ?? []).map(String);
 
@@ -122,6 +145,7 @@ export default function AssessmentQuestionCard({
 
     return (
       <div className="mt-6">
+        {renderedVisual}
         <div className="grid gap-4 md:grid-cols-3">
           {numbers.map((num) => (
             <button
@@ -207,6 +231,7 @@ export default function AssessmentQuestionCard({
 
     return (
       <div className="mt-6">
+        {renderedVisual}
         <div className="grid gap-4 md:grid-cols-3">
           {fractions.map((fraction) => (
             <button
@@ -285,6 +310,7 @@ export default function AssessmentQuestionCard({
 
     return (
       <div className="mt-6 grid gap-4 md:grid-cols-2">
+        {renderedVisual ? <div className="md:col-span-2">{renderedVisual}</div> : null}
         {options.map((option) => (
           <button
             key={option.id}
@@ -313,6 +339,7 @@ export default function AssessmentQuestionCard({
 
     return (
       <div className="mt-6 space-y-5">
+        {renderedVisual}
         <div className="rounded-2xl border border-slate-600 bg-slate-700/50 p-5">
           <div className="text-xs font-bold uppercase tracking-wide text-teal-400">Given Part</div>
           <div className="mt-3">
@@ -360,6 +387,7 @@ export default function AssessmentQuestionCard({
 
     return (
       <div className="mt-6 space-y-5">
+        {renderedVisual}
         <div className="rounded-2xl border border-slate-600 bg-slate-700/50 p-5">
           <div className="text-xs font-bold uppercase tracking-wide text-teal-400">Model</div>
           <div className="mt-2 text-lg font-black text-white">
@@ -421,6 +449,7 @@ export default function AssessmentQuestionCard({
   if (type === "numeric") {
     return (
       <div className="mt-6">
+        {renderedVisual}
         <input
           type="text"
           inputMode="decimal"
@@ -436,6 +465,7 @@ export default function AssessmentQuestionCard({
   const options = (question.options ?? []) as Array<string | { id?: string; label?: string }>;
   return (
     <div className="mt-6 grid gap-3">
+      {renderedVisual ? <div className="mb-1">{renderedVisual}</div> : null}
       {options.map((option) => {
         const label = typeof option === "string" ? option : option.label ?? option.id;
         const optionId = typeof option === "string" ? undefined : option.id;

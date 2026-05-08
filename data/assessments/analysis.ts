@@ -52,6 +52,19 @@ function parseNumericAssessmentValue(value: unknown): number | null {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+function parseCoordinateAssessmentValue(
+  value: unknown
+): { x: number; y: number } | null {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  const match = trimmed.match(/^\(?\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*\)?$/);
+  if (!match) return null;
+  const x = Number(match[1]);
+  const y = Number(match[2]);
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+  return { x, y };
+}
+
 export function isAssessmentAnswerCorrect(
   question: GenericAssessmentQuestion,
   chosen: string | undefined
@@ -62,8 +75,20 @@ export function isAssessmentAnswerCorrect(
   if (question.type === "numeric" || question.type === "numberLine" || question.type === "mab") {
     const expectedValue = parseNumericAssessmentValue(expected);
     const chosenValue = parseNumericAssessmentValue(chosen);
-    if (expectedValue == null || chosenValue == null) return false;
-    return Math.abs(expectedValue - chosenValue) < 1e-9;
+    if (expectedValue != null && chosenValue != null) {
+      return Math.abs(expectedValue - chosenValue) < 1e-9;
+    }
+
+    const expectedCoordinate = parseCoordinateAssessmentValue(expected);
+    const chosenCoordinate = parseCoordinateAssessmentValue(chosen);
+    if (expectedCoordinate && chosenCoordinate) {
+      return (
+        Math.abs(expectedCoordinate.x - chosenCoordinate.x) < 1e-9 &&
+        Math.abs(expectedCoordinate.y - chosenCoordinate.y) < 1e-9
+      );
+    }
+
+    return false;
   }
 
   return chosen === String(expected);
