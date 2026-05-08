@@ -13,6 +13,7 @@ type Props = {
   onLogout: () => void;
   studentName?: string;
   legendAvatar?: string;
+  isPrep?: boolean;
 };
 
 export default function HeroHeader({
@@ -25,9 +26,10 @@ export default function HeroHeader({
   onLogout,
   studentName,
   legendAvatar,
+  isPrep,
 }: Props) {
   const router = useRouter();
-  const displayName = studentName || "Adventurer";
+  const displayName = studentName || (isPrep ? "Ground Explorer" : "Adventurer");
   const progressPct = Math.round((lessonsDone / Math.max(totalLessons, 1)) * 100);
 
   return (
@@ -79,7 +81,7 @@ export default function HeroHeader({
             }}
           >
             <span className="h-1.5 w-1.5 rounded-full bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]" />
-            Level {levelNum}
+            {isPrep ? "Ground Level" : `Level ${levelNum}`}
             <span className="text-teal-400/50">·</span>
             <span className="text-teal-200">Number Nexus</span>
           </div>

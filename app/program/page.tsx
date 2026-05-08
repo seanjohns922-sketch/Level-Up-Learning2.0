@@ -45,6 +45,7 @@ function ProgramPage() {
     curriculumYear === "Prep" ? 0 : parseInt(curriculumYear.replace(/\D/g, ""), 10) || 1;
   const levelNum = year === "Prep" ? 1 : parseInt(year.replace(/\D/g, ""), 10) || 1;
   const levelLabel = curriculumYear === "Prep" ? "Ground Level" : `Level ${programYearIndex}`;
+  const isPrep = curriculumYear === "Prep";
 
   const [store, setStore] = useState<ProgramProgressStore>(() =>
     typeof window !== "undefined" ? readProgramStore() : {}
@@ -252,13 +253,22 @@ function ProgramPage() {
           src={getHomeBg(levelNum)}
           alt=""
           className="w-full h-full object-cover"
-          style={{ filter: getHomeBgFilter(levelNum) }}
+          style={{ filter: isPrep ? "brightness(1.22) contrast(1.05) saturate(1.18)" : getHomeBgFilter(levelNum) }}
         />
         <div
           className="absolute inset-0 pointer-events-none"
           style={{ boxShadow: getVignetteStyle(levelNum) }}
         />
-        <div className="absolute inset-0 bg-black/30" />
+        <div className={`absolute inset-0 ${isPrep ? "bg-black/10" : "bg-black/30"}`} />
+        {isPrep && (
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(ellipse at 50% 70%, rgba(94,234,212,0.22), transparent 65%), linear-gradient(180deg, rgba(186,230,253,0.10) 0%, transparent 40%)",
+            }}
+          />
+        )}
         {/* Soft top glow for premium polish */}
         <div
           className="absolute inset-0 pointer-events-none"

@@ -31,6 +31,7 @@ export default function StudentHomePage() {
   }, []);
 
   const year = progress?.year ?? "Year 1";
+  const isPrep = year === "Prep";
   const week = useMemo(
     () => getRecommendedAssignedWeek(store, year, progress?.assignedWeek, progress?.requiredWeeks),
     [store, year, progress?.assignedWeek, progress?.requiredWeeks]
@@ -119,13 +120,22 @@ export default function StudentHomePage() {
           src={getHomeBg(levelNum)}
           alt=""
           className="w-full h-full object-cover"
-          style={{ filter: getHomeBgFilter(levelNum) }}
+          style={{ filter: isPrep ? "brightness(1.22) contrast(1.05) saturate(1.18) hue-rotate(-2deg)" : getHomeBgFilter(levelNum) }}
         />
         <div
           className="absolute inset-0 pointer-events-none"
           style={{ boxShadow: getVignetteStyle(levelNum) }}
         />
-        <div className="absolute inset-0 bg-black/20" />
+        <div className={`absolute inset-0 ${isPrep ? "bg-black/5" : "bg-black/20"}`} />
+        {isPrep && (
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(ellipse at 50% 65%, rgba(94,234,212,0.22), transparent 65%), linear-gradient(180deg, rgba(186,230,253,0.10) 0%, transparent 40%)",
+            }}
+          />
+        )}
       </div>
 
 
@@ -141,6 +151,7 @@ export default function StudentHomePage() {
           onLogout={handleLogout}
           studentName={studentName}
           legendAvatar={legend.images.avatar}
+          isPrep={isPrep}
         />
 
         {/* Main content */}
@@ -151,6 +162,7 @@ export default function StudentHomePage() {
               legend={legend}
               lessonsDone={lessonsDone}
               totalLessons={totalLessons}
+              isPrep={isPrep}
             />
 
             {/* Lesson panel — the one main container */}
@@ -167,6 +179,7 @@ export default function StudentHomePage() {
               onLevels={goLevels}
               onTowerMap={() => router.push(`/realms?level=${encodeURIComponent(year)}`)}
               onStats={() => router.push("/realm-stats")}
+              isPrep={isPrep}
             />
           </div>
         </div>

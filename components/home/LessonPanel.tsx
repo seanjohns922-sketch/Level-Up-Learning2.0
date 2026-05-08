@@ -19,6 +19,7 @@ type Props = {
   onLevels: () => void;
   onTowerMap: () => void;
   onStats: () => void;
+  isPrep?: boolean;
 };
 
 export default function LessonPanel({
@@ -34,6 +35,7 @@ export default function LessonPanel({
   onLevels,
   onTowerMap,
   onStats,
+  isPrep,
 }: Props) {
   return (
     <div
@@ -69,7 +71,7 @@ export default function LessonPanel({
             <span className="h-1 w-1 rounded-full bg-teal-300 shadow-[0_0_6px_rgba(94,234,212,0.9)]" />
             Week {week}
           </span>
-          <h2 className="text-sm font-bold text-white/95 mt-1">Weekly Focus</h2>
+          <h2 className="text-sm font-bold text-white/95 mt-1">{isPrep ? "This Week" : "Weekly Focus"}</h2>
           {topic && (
             <p className="text-xs font-medium text-teal-100/55 mt-0.5">{topic}</p>
           )}
@@ -140,7 +142,10 @@ export default function LessonPanel({
                   {lesson.title}
                 </span>
                 {current && (
-                  <span className="text-[10px] font-bold text-teal-400 mt-0.5 block">Up next</span>
+                  <span className="text-[10px] font-bold text-teal-400 mt-0.5 block">{isPrep ? "Start here" : "Up next"}</span>
+                )}
+                {isPrep && locked && (
+                  <span className="text-[10px] font-bold text-white/40 mt-0.5 block">Finish Lesson {i} to unlock</span>
                 )}
               </div>
 
@@ -165,7 +170,7 @@ export default function LessonPanel({
           </div>
           <div className="flex-1 min-w-0">
             <span className="text-sm font-bold text-white/30 block">Weekly Quiz</span>
-            <span className="text-[10px] font-bold text-white/20 block">Complete all lessons first</span>
+            <span className="text-[10px] font-bold text-white/20 block">{isPrep ? "Finish all lessons to unlock the quiz" : "Complete all lessons first"}</span>
           </div>
           <Lock className="h-3.5 w-3.5 text-white/20 flex-shrink-0" />
         </div>
