@@ -4083,12 +4083,8 @@ function uniqueStringOptions(answer: string, distractors: string[]) {
   return shuffle(options.slice(0, 4));
 }
 
-function buildGenericMultipleChoiceOptions(answer: string): string[] {
+function buildNumericDistractorsFromAnswer(answer: string): string[] {
   const trimmed = answer.trim();
-
-  if (/^(yes|no)$/i.test(trimmed)) {
-    return shuffle(["Yes", "No", "Maybe", "Not sure"]);
-  }
 
   if (/^-?\d+$/.test(trimmed)) {
     const answerValue = Number(trimmed);
@@ -4117,6 +4113,20 @@ function buildGenericMultipleChoiceOptions(answer: string): string[] {
       if (options.size >= 4) break;
     }
     return shuffle(Array.from(options).slice(0, 4));
+  }
+
+  return shuffle([trimmed, "1", "2", "3"]).slice(0, 4);
+}
+
+function buildGenericMultipleChoiceOptions(answer: string): string[] {
+  const trimmed = answer.trim();
+
+  if (/^(yes|no)$/i.test(trimmed)) {
+    return shuffle(["Yes", "No"]);
+  }
+
+  if (/^-?\d+$/.test(trimmed) || /^-?\d+\.\d+$/.test(trimmed)) {
+    return buildNumericDistractorsFromAnswer(trimmed);
   }
 
   return shuffle([trimmed, "Not this option", "Check another rule", "Use the rule box"]);

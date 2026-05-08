@@ -86,6 +86,45 @@ function toSafeMultipleChoiceQuestion(
   questionData: Year2QuestionData,
   prompt: string
 ): MultipleChoiceQuestion {
+  function promptAsksForNumericValue(value: string) {
+    const lower = value.toLowerCase();
+    return (
+      lower.includes("what is the value") ||
+      lower.includes("what is the total") ||
+      lower.includes("what is the output") ||
+      lower.includes("what is the input") ||
+      lower.includes("what is the final price") ||
+      lower.includes("how much") ||
+      lower.includes("money is left") ||
+      lower.includes("remaining") ||
+      lower.includes("sale price") ||
+      lower.includes("coordinate") ||
+      lower.includes("amount") ||
+      lower.includes("measurement") ||
+      lower.includes("calculate") ||
+      lower.includes("cost") ||
+      lower.includes("price") ||
+      lower.includes("distance")
+    );
+  }
+
+  function buildNumericFallbackOptions(answer: string) {
+    const trimmed = answer.trim();
+    if (/^-?\d+$/.test(trimmed)) {
+      const value = Number(trimmed);
+      const step = Math.max(1, Math.abs(value) >= 20 ? Math.round(Math.abs(value) / 10) : 1);
+      return Array.from(new Set([trimmed, String(value - step), String(value + step), String(value + 2 * step)])).slice(0, 4);
+    }
+    if (/^-?\d+\.\d+$/.test(trimmed)) {
+      const value = Number(trimmed);
+      const decimals = (trimmed.split(".")[1] ?? "").length;
+      const step = decimals >= 3 ? 0.001 : decimals === 2 ? 0.01 : 0.1;
+      const format = (n: number) => n.toFixed(decimals);
+      return Array.from(new Set([format(value), format(value - step), format(value + step), format(value + 2 * step)])).slice(0, 4);
+    }
+    return [trimmed, "1", "2", "3"].slice(0, 4);
+  }
+
   const fallbackPrompt =
     typeof questionData?.prompt === "string" && questionData.prompt.trim().length > 0
       ? questionData.prompt
@@ -121,7 +160,11 @@ function toSafeMultipleChoiceQuestion(
       options:
         repairedOptions.length >= 2
           ? repairedOptions
-          : [fallbackAnswer, "No", "Maybe"].slice(0, 3),
+          : promptAsksForNumericValue(fallbackPrompt)
+          ? buildNumericFallbackOptions(fallbackAnswer)
+          : /^(yes|no)$/i.test(fallbackAnswer)
+          ? ["Yes", "No"]
+          : [fallbackAnswer, "Not this option", "Check another rule"].slice(0, 3),
       answer:
         repairedOptions.length >= 2 && repairedOptions.includes(questionData.answer)
           ? questionData.answer
@@ -137,7 +180,11 @@ function toSafeMultipleChoiceQuestion(
   return {
     kind: "multiple_choice",
     prompt: fallbackPrompt,
-    options: [fallbackAnswer, "No", "Maybe"].slice(0, 3),
+    options: promptAsksForNumericValue(fallbackPrompt)
+      ? buildNumericFallbackOptions(fallbackAnswer)
+      : /^(yes|no)$/i.test(fallbackAnswer)
+      ? ["Yes", "No"]
+      : [fallbackAnswer, "Not this option", "Check another rule"].slice(0, 3),
     answer: fallbackAnswer,
     helper: "Choose the best answer.",
   };
