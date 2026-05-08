@@ -7,13 +7,18 @@ type Props = {
   legend: Legend;
   lessonsDone: number;
   totalLessons: number;
+  isPrep?: boolean;
 };
 
-export default function MissionStrip({ legend, lessonsDone, totalLessons }: Props) {
+export default function MissionStrip({ legend, lessonsDone, totalLessons, isPrep }: Props) {
   const allDone = lessonsDone >= totalLessons;
-  const missionText = allDone
-    ? "Complete the weekly quiz to power up the Tower!"
-    : `Complete your lessons to strengthen the Tower and unlock ${legend.name}!`;
+  const missionText = isPrep
+    ? allDone
+      ? `Complete the weekly quiz to unlock ${legend.name}!`
+      : `Complete your lessons to unlock ${legend.name}!`
+    : allDone
+      ? "Complete the weekly quiz to power up the Tower!"
+      : `Complete your lessons to strengthen the Tower and unlock ${legend.name}!`;
 
   return (
     <div className="relative">
