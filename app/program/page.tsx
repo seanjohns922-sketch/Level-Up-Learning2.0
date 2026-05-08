@@ -19,7 +19,6 @@ import {
   type ProgramProgressStore,
 } from "@/lib/program-progress";
 import { getHomeBg, getHomeBgFilter, getVignetteStyle } from "@/lib/levelBand";
-import GroundLevelProgram from "@/components/program/GroundLevelProgram";
 
 const TEACHER_MODE_KEY = "lul:hidden_teacher_mode";
 
@@ -243,25 +242,6 @@ function ProgramPage() {
   const xp = lessonsDoneCount * 10 + (progress.quizCompleted ? 20 : 0);
   const totalXp = 50;
   const percent = Math.round((xp / totalXp) * 100);
-
-  const isGroundLevel = curriculumYear === "Prep" || year === "Prep";
-
-  if (isGroundLevel) {
-    return (
-      <GroundLevelProgram
-        weekNum={weekNum}
-        topic={currentWeekPlan?.topic}
-        items={items}
-        lessonsCompleted={progress.lessonsCompleted}
-        quizCompleted={progress.quizCompleted}
-        weekUnlocked={weekUnlocked}
-        lastAllowedWeek={lastAllowedWeek}
-        onBack={() => router.push("/home")}
-        onOpenItem={openItem}
-        onGoToWeek={goToWeek}
-      />
-    );
-  }
 
   return (
     <main className="min-h-screen relative">
