@@ -250,7 +250,7 @@ function ProgramPage() {
       <div className="fixed inset-0 z-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={getHomeBg(levelNum)}
+          src={getHomeBg(levelNum, isPrep)}
           alt=""
           className="w-full h-full object-cover"
           style={{ filter: isPrep ? "brightness(1.22) contrast(1.05) saturate(1.18)" : getHomeBgFilter(levelNum) }}
