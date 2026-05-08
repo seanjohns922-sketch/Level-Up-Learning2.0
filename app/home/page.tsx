@@ -10,6 +10,7 @@ import { supabase } from "@/lib/supabase";
 import HeroHeader from "@/components/home/HeroHeader";
 import MissionStrip from "@/components/home/MissionStrip";
 import LessonPanel from "@/components/home/LessonPanel";
+import GroundLevelHome from "@/components/home/GroundLevelHome";
 import { getHomeBg, getHomeBgFilter, getVignetteStyle } from "@/lib/levelBand";
 
 export default function StudentHomePage() {
@@ -46,6 +47,7 @@ export default function StudentHomePage() {
   const levelNum = parseInt(year.replace(/\D/g, ""), 10) || 1;
   const legend = getLegendForYear(year);
   const totalLessons = programWeek?.lessons?.length ?? 3;
+  const isGroundLevel = year === "Prep" || curriculumYear === "Prep";
 
   // XP calculation
   const totalXP = useMemo(() => {
@@ -107,6 +109,22 @@ export default function StudentHomePage() {
           </button>
         </div>
       </main>
+    );
+  }
+
+  // Ground Level (Prep / y0) — friendly Number Grove identity
+  if (isGroundLevel) {
+    return (
+      <GroundLevelHome
+        week={week}
+        topic={programWeek?.topic}
+        lessons={programWeek?.lessons ?? []}
+        lessonsDone={lessonsDone}
+        studentName={studentName}
+        onBack={() => router.push("/login")}
+        onLogout={handleLogout}
+        onContinue={continueWeek}
+      />
     );
   }
 
