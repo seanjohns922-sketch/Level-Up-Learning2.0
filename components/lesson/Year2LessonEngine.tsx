@@ -36,7 +36,7 @@ function isMultiStepCalculationLesson(level: SupportedMathLevel, lesson: Lesson)
 
 function isYear6RealWorldModellingLesson(level: SupportedMathLevel, lesson: Lesson) {
   void level;
-  return lesson.week === 12 && lesson.lesson === 2;
+  return lesson.week === 12 && (lesson.lesson === 2 || lesson.lesson === 3);
 }
 
 function chooseNextLessonTurn(

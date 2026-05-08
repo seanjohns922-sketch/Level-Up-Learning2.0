@@ -23890,6 +23890,237 @@ function generateGenericQuestion(
     return templates[templateIndex % templates.length] ?? templates[0]!;
   }
 
+  if (explicitMode === "y6_final_review_core") {
+    const templateIndex =
+      typeof config.templateIndex === "number" && Number.isFinite(config.templateIndex)
+        ? Math.max(0, Math.floor(config.templateIndex))
+        : randInt(0, 4);
+    const templates: Array<MultipleChoiceQuestion | TypedResponseQuestion> = [
+      {
+        kind: "multiple_choice",
+        prompt: "Evaluate: 18 − 4 × 3",
+        options: ["42", "6", "30", "14"],
+        answer: "6",
+        helper: "Multiply first, then subtract.",
+        visual: expressionFlowVisual("Order of Operations", [
+          {
+            tokens: ["18", "−", "4", "×", "3"],
+            highlightRange: [2, 4],
+            result: "18 − 12",
+            note: "Multiplication happens before subtraction.",
+          },
+        ]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "Evaluate: 36 ÷ 6 + 9",
+        answer: "15",
+        acceptedAnswers: ["15.0"],
+        helper: "Follow the order of operations carefully.",
+        placeholder: "Type the answer",
+        inputType: "integer",
+        visual: expressionFlowVisual("Order of Operations", [
+          {
+            tokens: ["36", "÷", "6", "+", "9"],
+            highlightRange: [0, 2],
+            result: "6 + 9",
+            note: "Divide first, then add.",
+          },
+        ]),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which decimal is equal to 75%?",
+        options: ["0.75", "7.5", "0.075", "75.0"],
+        answer: "0.75",
+        helper: "Convert percent into a decimal by dividing by 100.",
+        visual: {
+          type: "decimal_model",
+          model: "hundredths_grid",
+          numerator: 75,
+          denominator: 100,
+        },
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the final price?",
+        answer: "60",
+        acceptedAnswers: ["60.0", "60.00"],
+        helper: "Find the discount amount first, then subtract it.",
+        placeholder: "Type the final price",
+        inputType: "integer",
+        visual: {
+          type: "rule_box",
+          title: "Budget Decision",
+          steps: ["Game price: $80", "Discount: 25% off", "25% of 80 = 20"],
+          decisionLabel: "Subtract the discount from the original price",
+        },
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which strategy best solves: Find the total cost of 8 tickets at $14 each.",
+        options: ["Multiplication", "Division", "Subtraction", "Estimation only"],
+        answer: "Multiplication",
+        helper: "Think about what operation finds the total of equal groups.",
+        visual: {
+          type: "rule_box",
+          title: "Readiness Check",
+          steps: ["8 equal ticket prices", "$14 each"],
+          decisionLabel: "Use the operation for equal groups",
+        },
+      },
+    ];
+    return templates[templateIndex % templates.length] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_final_review_equations_patterns") {
+    const templateIndex =
+      typeof config.templateIndex === "number" && Number.isFinite(config.templateIndex)
+        ? Math.max(0, Math.floor(config.templateIndex))
+        : randInt(0, 4);
+    const templates: Array<MultipleChoiceQuestion | TypedResponseQuestion> = [
+      {
+        kind: "typed_response",
+        prompt: "Solve: x + 9 = 21",
+        answer: "12",
+        acceptedAnswers: ["12.0"],
+        helper: "Undo the addition to isolate x.",
+        placeholder: "Type x",
+        inputType: "integer",
+        visual: balanceEquationVisual("Equation Balance", "x + 9", "21"),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Solve: 4 × y = 28",
+        options: ["6", "7", "8", "24"],
+        answer: "7",
+        helper: "Undo multiplication using division.",
+        visual: balanceEquationVisual("Equation Balance", "4 × y", "28", "y"),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "What is the rule?",
+        options: ["×4", "+4", "×2", "+8"],
+        answer: "×4",
+        helper: "Compare how each input changes to the output.",
+        visual: inputOutputTableVisual("Pattern Rule", [
+          { input: "2", output: "8" },
+          { input: "4", output: "16" },
+          { input: "6", output: "24" },
+        ]),
+      },
+      {
+        kind: "typed_response",
+        prompt: "What is the output for input 9?",
+        answer: "45",
+        acceptedAnswers: ["45.0"],
+        helper: "Apply the rule to the input value.",
+        placeholder: "Type the output",
+        inputType: "integer",
+        visual: functionMachineVisual("Pattern Rule", 9, "×5", "?"),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which statement is true?",
+        options: [
+          "Equations must stay balanced",
+          "The equal sign means the answer comes next",
+          "You solve equations by guessing only",
+          "Patterns never use multiplication",
+        ],
+        answer: "Equations must stay balanced",
+        helper: "Think about what the equal sign represents.",
+        visual: {
+          type: "rule_box",
+          title: "Readiness Check",
+          steps: ["Both sides of an equation must match", "Rules can use more than one operation"],
+          decisionLabel: "Balance matters",
+        },
+      },
+    ];
+    return templates[templateIndex % templates.length] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_final_review_coordinates_application") {
+    const templateIndex =
+      typeof config.templateIndex === "number" && Number.isFinite(config.templateIndex)
+        ? Math.max(0, Math.floor(config.templateIndex))
+        : randInt(0, 4);
+    const templates: Array<MultipleChoiceQuestion | TypedResponseQuestion> = [
+      {
+        kind: "multiple_choice",
+        prompt: "Which coordinate is shown?",
+        options: ["(-3, 2)", "(3, -2)", "(-2, 3)", "(2, -3)"],
+        answer: "(-3, 2)",
+        helper: "Read x first, then y.",
+        visual: cartesianGridVisual(
+          "Coordinate Plane",
+          [{ x: -3, y: 2, label: "P" }],
+          { subtitle: "Move left 3 and up 2.", xMin: -5, xMax: 5, yMin: -5, yMax: 5 }
+        ),
+      },
+      {
+        kind: "typed_response",
+        prompt: "Start at (2, -1). Move left 4. What is the new coordinate?",
+        answer: "(-2,-1)",
+        acceptedAnswers: ["(-2, -1)", "-2,-1", "-2 -1"],
+        helper: "Moving left decreases x while y stays the same.",
+        placeholder: "Type the new coordinate",
+        visual: cartesianGridVisual(
+          "Coordinate Movement",
+          [{ x: 2, y: -1, label: "Start" }],
+          { subtitle: "Left changes x only.", xMin: -5, xMax: 5, yMin: -5, yMax: 5 }
+        ),
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which quadrant contains the point (-4, -2)?",
+        options: ["Quadrant I", "Quadrant II", "Quadrant III", "Quadrant IV"],
+        answer: "Quadrant III",
+        helper: "Look at the signs of x and y.",
+        visual: cartesianGridVisual(
+          "Quadrant Check",
+          [{ x: -4, y: -2, label: "Q" }],
+          { subtitle: "Both coordinates are negative.", xMin: -5, xMax: 5, yMin: -5, yMax: 5 }
+        ),
+      },
+      {
+        kind: "typed_response",
+        prompt: "How much money is left?",
+        answer: "80",
+        acceptedAnswers: ["80.0", "80.00"],
+        helper: "Add the costs first, then subtract from the budget.",
+        placeholder: "Type the money left",
+        inputType: "integer",
+        visual: {
+          type: "rule_box",
+          title: "Budget Decision",
+          steps: ["Budget: $500", "Tickets: $240", "Transport: $120", "Food: $60"],
+          decisionLabel: "Add costs, then subtract from the budget",
+        },
+      },
+      {
+        kind: "multiple_choice",
+        prompt: "Which statement best describes this lesson?",
+        options: [
+          "Level 6 maths connects multiple skills together",
+          "Maths only uses one strategy at a time",
+          "Coordinates are unrelated to patterns",
+          "Percentages are never used in real life",
+        ],
+        answer: "Level 6 maths connects multiple skills together",
+        helper: "Think about how different skills were used together throughout the lesson.",
+        visual: {
+          type: "rule_box",
+          title: "Readiness Check",
+          steps: ["Operations", "Equations", "Patterns", "Coordinates", "Money"],
+          decisionLabel: "Level 6 maths connects strategies",
+        },
+      },
+    ];
+    return templates[templateIndex % templates.length] ?? templates[0]!;
+  }
+
   if (
     explicitMode === "choose_strategy_quick" ||
     explicitMode === "choose_strategy_reflect" ||

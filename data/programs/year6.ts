@@ -611,9 +611,18 @@ const year6Rows: ProgramRow[] = [
     activity: "Tune up fluency, estimation, and mixed calculations before the post-test.",
     curriculum: ["AC9M6N01", "AC9M6N03", "AC9M6N04", "AC9M6N05", "AC9M6N06", "AC9M6N08"],
     activities: [
-      makeActivity("typed_response", 1, { mode: "final_tuneup_fluency" }),
-      makeActivity("multiple_choice", 1, { mode: "final_tuneup_reasoning" }),
-      makeActivity("typed_response", 1, { mode: "final_tuneup_challenge" }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_final_review_core",
+        rotationRole: "fast_thinking",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_final_review_equations_patterns",
+        rotationRole: "reasoning",
+      }),
+      makeActivity("multiple_choice", 1, {
+        mode: "y6_final_review_coordinates_application",
+        rotationRole: "apply_create",
+      }),
     ],
   },
 ];
