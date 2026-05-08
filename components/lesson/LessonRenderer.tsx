@@ -212,6 +212,11 @@ function getSafeQuestion(
   return questionData;
 }
 
+function canRenderByGeneratedKind(activity: LessonActivity) {
+  const mode = typeof activity.config?.mode === "string" ? activity.config.mode : "";
+  return mode.startsWith("y6_");
+}
+
 function renderNestedActivity({
   activityType,
   questionData,
@@ -574,6 +579,16 @@ export function LessonRenderer({
     }
     case "multiple_choice": {
       const safeQuestion = getSafeQuestion(activity, questionData, prompt);
+      if (canRenderByGeneratedKind(activity) && safeQuestion.kind === "typed_response") {
+        return (
+          <TypedResponseActivity
+            questionData={safeQuestion as TypedResponseQuestion}
+            onCorrect={onCorrect}
+            onWrong={onWrong}
+            renderMode={renderMode}
+          />
+        );
+      }
       return (
         <MultipleChoiceActivity
           questionData={toSafeMultipleChoiceQuestion(activity, safeQuestion, prompt)}
@@ -585,6 +600,16 @@ export function LessonRenderer({
     }
     case "typed_response": {
       const safeQuestion = getSafeQuestion(activity, questionData, prompt);
+      if (canRenderByGeneratedKind(activity) && safeQuestion.kind === "multiple_choice") {
+        return (
+          <MultipleChoiceActivity
+            questionData={toSafeMultipleChoiceQuestion(activity, safeQuestion, prompt)}
+            onCorrect={onCorrect}
+            onWrong={onWrong}
+            renderMode={renderMode}
+          />
+        );
+      }
       if (safeQuestion.kind !== "typed_response") {
         return <ErrorCard message="Typed response question failed to load." />;
       }
