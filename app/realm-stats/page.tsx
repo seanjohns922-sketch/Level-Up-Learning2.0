@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { readProgress } from "@/data/progress";
-import { readProgramStore, getWeekProgress } from "@/lib/program-progress";
+import { readProgramStore, getRecommendedAssignedWeek, getWeekProgress } from "@/lib/program-progress";
 import { ChevronLeft, Zap, Target, Flame, Clock, BookOpen, TrendingUp } from "lucide-react";
 import { getHomeBg, getHomeBgFilter, getVignetteStyle } from "@/lib/levelBand";
 
@@ -18,7 +18,10 @@ export default function RealmStatsPage() {
   }, []);
 
   const year = progress?.year ?? "Year 1";
-  const week = progress?.assignedWeek ?? 1;
+  const week = useMemo(
+    () => getRecommendedAssignedWeek(store, year, progress?.assignedWeek, progress?.requiredWeeks),
+    [store, year, progress?.assignedWeek, progress?.requiredWeeks]
+  );
   const levelNum = parseInt(year.replace(/\D/g, ""), 10) || 1;
 
   const stats = useMemo(() => {

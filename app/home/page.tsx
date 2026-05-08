@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { clearScopedProgress, readProgress, StudentProgress } from "@/data/progress";
 import { getProgramForYear } from "@/data/programs";
-import { clearScopedProgramStore, readProgramStore, getWeekProgress, type ProgramProgressStore } from "@/lib/program-progress";
+import { clearScopedProgramStore, readProgramStore, getRecommendedAssignedWeek, getWeekProgress, type ProgramProgressStore } from "@/lib/program-progress";
 import { getLegendForYear } from "@/data/legends";
 import { supabase } from "@/lib/supabase";
 import HeroHeader from "@/components/home/HeroHeader";
@@ -31,7 +31,10 @@ export default function StudentHomePage() {
   }, []);
 
   const year = progress?.year ?? "Year 1";
-  const week = progress?.assignedWeek ?? 1;
+  const week = useMemo(
+    () => getRecommendedAssignedWeek(store, year, progress?.assignedWeek, progress?.requiredWeeks),
+    [store, year, progress?.assignedWeek, progress?.requiredWeeks]
+  );
   const curriculumYear = useMemo(() => {
     const selected = getProgramForYear(year);
     return selected.length > 0 ? year : "Year 1";

@@ -150,14 +150,15 @@ export function analyzeAssessmentResult({
     })
     .slice(0, 3);
 
-  const weakAreas = summaries
+  const allWeakAreas = summaries
     .filter((item) => item.incorrectCount >= 1)
-    .sort((a, b) => b.incorrectCount - a.incorrectCount || a.correctCount - b.correctCount)
-    .slice(0, 3);
+    .sort((a, b) => b.incorrectCount - a.incorrectCount || a.correctCount - b.correctCount);
 
-  const recommendedWeeks = [...new Set(weakAreas.flatMap((item) => item.linkedWeeks))].sort((a, b) => a - b);
+  const weakAreas = allWeakAreas.slice(0, 3);
+
+  const recommendedWeeks = [...new Set(allWeakAreas.flatMap((item) => item.linkedWeeks))].sort((a, b) => a - b);
   const assignedWeek = recommendedWeeks.length > 0 ? Math.min(...recommendedWeeks) : undefined;
-  const recommendedLessonTargets = weakAreas.flatMap((item) =>
+  const recommendedLessonTargets = allWeakAreas.flatMap((item) =>
     item.linkedWeeks.map((week) => ({
       week,
       lessons: item.linkedLessons,

@@ -7,7 +7,11 @@ import { readProgress, StudentProgress, writeProgress, ACTIVE_STUDENT_KEY } from
 import { supabase } from "@/lib/supabase";
 import LegendUnlockReveal from "@/components/LegendUnlockReveal";
 import type { AssessmentResultProfile } from "@/data/assessments/analysis";
-const PASS_THRESHOLD = 90;
+import { ALL_PROGRAM_WEEKS, getOptionalWeeks, normalizeWeekList } from "@/lib/program-progress";
+const POSTTEST_PASS_THRESHOLD = 85;
+const PRETEST_PASS_THRESHOLD = 85;
+
+const YEAR_SEQUENCE = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"] as const;
 
 type SkillGrowthRow = {
   skillId: string;
@@ -27,6 +31,18 @@ function getLowestRecommendedWeek(profile: AssessmentResultProfile | null) {
 
 function getAssignedReviewWeek(profile: AssessmentResultProfile | null) {
   return profile?.assignedWeek ?? getLowestRecommendedWeek(profile);
+}
+
+function getNextYearLabel(year: string) {
+  const index = YEAR_SEQUENCE.indexOf(year as (typeof YEAR_SEQUENCE)[number]);
+  if (index === -1) return null;
+  return YEAR_SEQUENCE[index + 1] ?? null;
+}
+
+function getLegendIdsUpToYear(year: string) {
+  const yearIndex = YEAR_SEQUENCE.indexOf(year as (typeof YEAR_SEQUENCE)[number]);
+  if (yearIndex === -1) return [getLegendForYear(year).id];
+  return YEAR_SEQUENCE.slice(0, yearIndex + 1).map((label) => getLegendForYear(label).id);
 }
 
 function getStrandBadgeClass(strand?: string) {
@@ -206,10 +222,12 @@ function ResultsPage() {
     return Math.round((score / total) * 100);
   }, [score, total]);
 
-  const passedByPretest = scorePercent >= PASS_THRESHOLD;
+  const passedByPretest = !isPostTest && scorePercent >= PRETEST_PASS_THRESHOLD;
+  const passedByPosttest = isPostTest && scorePercent >= POSTTEST_PASS_THRESHOLD;
   const passedByProgram = source === "program_complete";
-  const passed = passedByPretest || passedByProgram;
+  const passed = passedByPretest || passedByPosttest || passedByProgram;
   const displayPercent = passedByProgram ? 100 : scorePercent;
+  const nextYear = getNextYearLabel(year);
 
   const legend = useMemo(() => getLegendForYear(year), [year]);
   const storedPosttestProfile: AssessmentResultProfile | null = useMemo(() => {
@@ -218,8 +236,8 @@ function ResultsPage() {
   }, [isPostTest]);
   const storedPretestProfile: AssessmentResultProfile | null = useMemo(() => {
     const progress = readProgress();
-    return isPostTest ? progress?.lastPreTestProfile ?? null : null;
-  }, [isPostTest]);
+    return progress?.lastPreTestProfile ?? null;
+  }, []);
   const skillGrowth = useMemo(
     () => buildSkillGrowth(storedPretestProfile, storedPosttestProfile),
     [storedPretestProfile, storedPosttestProfile]
@@ -240,32 +258,64 @@ function ResultsPage() {
 
   const initialProgress = useMemo(() => readProgress(), []);
   const [unlockDismissed, setUnlockDismissed] = useState(false);
+  const unlockTargets = useMemo(
+    () => (passedByPretest ? getLegendIdsUpToYear(year) : [legend.id]),
+    [passedByPretest, year, legend.id]
+  );
   const shouldShowUnlock =
-    passed && !(initialProgress?.unlockedLegends ?? []).includes(legend.id) && !unlockDismissed;
+    passed && unlockTargets.some((id) => !(initialProgress?.unlockedLegends ?? []).includes(id)) && !unlockDismissed;
+  const isFailedPretest = !isPostTest && !passedByPretest;
+  const requiresFullPathway = isFailedPretest && scorePercent < 50;
+  const diagnosticRequiredWeeks = useMemo(
+    () => (!isPostTest ? normalizeWeekList(storedPretestProfile?.recommendedWeeks) : []),
+    [isPostTest, storedPretestProfile]
+  );
+  const requiredWeeks = useMemo(() => {
+    if (isPostTest) return [];
+    if (!isFailedPretest) return [];
+    if (requiresFullPathway || diagnosticRequiredWeeks.length === 0) return ALL_PROGRAM_WEEKS;
+    return diagnosticRequiredWeeks;
+  }, [diagnosticRequiredWeeks, isFailedPretest, isPostTest, requiresFullPathway]);
+  const optionalWeeks = useMemo(() => {
+    if (isPostTest) return ALL_PROGRAM_WEEKS;
+    if (!isFailedPretest) return ALL_PROGRAM_WEEKS;
+    return requiresFullPathway ? [] : getOptionalWeeks(requiredWeeks);
+  }, [isFailedPretest, isPostTest, requiredWeeks, requiresFullPathway]);
 
   useEffect(() => {
     const prev = readProgress();
     const prevUnlocked = prev?.unlockedLegends ?? [];
-    const alreadyUnlocked = prevUnlocked.includes(legend.id);
+    const alreadyUnlocked = unlockTargets.every((id) => prevUnlocked.includes(id));
 
     let next: StudentProgress;
 
     if (passed) {
-      const unlocked = alreadyUnlocked ? prevUnlocked : [...prevUnlocked, legend.id];
+      const unlocked = alreadyUnlocked
+        ? prevUnlocked
+        : Array.from(new Set([...prevUnlocked, ...unlockTargets]));
       next = {
         ...prev,
         year,
-        scorePercent: passedByProgram ? Math.max(prev?.scorePercent ?? 0, 90) : scorePercent,
+        scorePercent: passedByProgram ? Math.max(prev?.scorePercent ?? 0, POSTTEST_PASS_THRESHOLD) : scorePercent,
         status: "PASSED",
+        assignedWeek: prev?.assignedWeek,
+        assignedWeeksHistory: prev?.assignedWeeksHistory,
+        requiredWeeks: [],
+        optionalWeeks: ALL_PROGRAM_WEEKS,
         unlockedLegends: unlocked,
       };
     } else {
+      const assignedWeek = isPostTest
+        ? getLowestRecommendedWeek(storedPosttestProfile) ?? 1
+        : requiredWeeks[0] ?? getLowestRecommendedWeek(storedPretestProfile) ?? 1;
       next = {
         ...prev,
         year,
         scorePercent,
         status: "ASSIGNED_PROGRAM",
-        assignedWeek: isPostTest ? getLowestRecommendedWeek(storedPosttestProfile) ?? 1 : 1,
+        assignedWeek,
+        requiredWeeks: isPostTest ? prev?.requiredWeeks ?? [] : requiredWeeks,
+        optionalWeeks: isPostTest ? prev?.optionalWeeks ?? ALL_PROGRAM_WEEKS : optionalWeeks,
         unlockedLegends: prevUnlocked,
       };
     }
@@ -294,12 +344,23 @@ function ResultsPage() {
         console.warn("[Results] DB pretest save failed:", e);
         }
     })();
-  }, [passed, year, scorePercent, legend.id, isPostTest, passedByProgram, storedPosttestProfile]);
+  }, [passed, year, scorePercent, isPostTest, passedByProgram, storedPosttestProfile, storedPretestProfile, unlockTargets, requiredWeeks, optionalWeeks]);
 
   function goHome() { router.push("/home"); }
+  const assignedStartWeek = isPostTest
+    ? getAssignedReviewWeek(storedPosttestProfile) ?? 1
+    : getAssignedReviewWeek(storedPretestProfile) ?? 1;
+
   function goProgram() {
-    const qs = new URLSearchParams({ year, week: "1" }).toString();
+    const qs = new URLSearchParams({ year, week: String(assignedStartWeek) }).toString();
     router.push(`/program?${qs}`);
+  }
+  function goNextPretest() {
+    if (!nextYear) {
+      router.push("/legends");
+      return;
+    }
+    router.push(`/pretest?year=${encodeURIComponent(nextYear)}`);
   }
   function goRetryPostTest() {
     router.push(`/posttest?year=${encodeURIComponent(year)}`);
@@ -406,7 +467,9 @@ function ResultsPage() {
                     ? "You passed the post-test — your Legend is ready to collect!"
                     : passedByProgram
                     ? "You completed the 12-week program — your Legend awaits!"
-                    : "You aced the pre-test — your Legend is ready to collect!"}
+                    : nextYear
+                    ? `You passed this pre-test. Next stop: ${nextYear}.`
+                    : "You passed the final pre-test — your Legends are ready to collect!"}
                 </p>
               </div>
             ) : isPostTest ? (
@@ -416,7 +479,7 @@ function ResultsPage() {
                   <span className="font-bold text-sm text-foreground">Almost there!</span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  You need 90% to pass. Review the suggested weeks and try again when you&apos;re ready.
+                  You need {POSTTEST_PASS_THRESHOLD}% to pass. Review the suggested weeks and try again when you&apos;re ready.
                 </p>
               </div>
             ) : (
@@ -426,8 +489,17 @@ function ResultsPage() {
                   <span className="font-bold text-sm text-foreground">Learning Path Ready</span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  We&apos;ve crafted a personalised 12-week program just for you.
+                  {requiresFullPathway
+                    ? "You need the full 12-week pathway for this level."
+                    : "We&apos;ve crafted a personalised required pathway for this level."}
                 </p>
+                {requiredWeeks.length > 0 ? (
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {requiresFullPathway
+                      ? "Complete the full 12-week pathway in order to be ready to pass this level."
+                      : `You need to complete Weeks ${requiredWeeks.join(", ")} to be ready to pass this level. Other weeks can be completed later for extra practice and XP.`}
+                  </p>
+                ) : null}
               </div>
             )}
 
@@ -572,7 +644,7 @@ function ResultsPage() {
                   ? [
                       { icon: "🔁", text: "Review any week's lessons" },
                       { icon: "📝", text: "Retry the post-test when ready" },
-                      { icon: "🏅", text: "Score 90%+ to unlock your Legend" },
+                      { icon: "🏅", text: `Score ${POSTTEST_PASS_THRESHOLD}%+ to unlock your Legend` },
                     ]
                   : [
                       { icon: "📖", text: "3 lessons every week" },
@@ -593,13 +665,23 @@ function ResultsPage() {
           <div className="px-8 pb-8 space-y-3">
             {passed ? (
               <>
-                <button
-                  onClick={goLegends}
-                  className="w-full py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base hover:opacity-90 transition-all active:scale-[0.98] shadow-lg"
-                  style={{ boxShadow: "0 8px 24px -8px hsl(var(--primary) / 0.4)" }}
-                >
-                  🏅 View My Legends
-                </button>
+                {isPostTest || passedByProgram ? (
+                  <button
+                    onClick={goLegends}
+                    className="w-full py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base hover:opacity-90 transition-all active:scale-[0.98] shadow-lg"
+                    style={{ boxShadow: "0 8px 24px -8px hsl(var(--primary) / 0.4)" }}
+                  >
+                    🏅 View My Legends
+                  </button>
+                ) : (
+                  <button
+                    onClick={nextYear ? goNextPretest : goLegends}
+                    className="w-full py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base hover:opacity-90 transition-all active:scale-[0.98] shadow-lg"
+                    style={{ boxShadow: "0 8px 24px -8px hsl(var(--primary) / 0.4)" }}
+                  >
+                    {nextYear ? `Start ${nextYear} Pre-Test` : "🏅 View My Legends"}
+                  </button>
+                )}
                 <button
                   onClick={goHome}
                   className="w-full py-3 rounded-2xl bg-secondary text-secondary-foreground font-semibold text-sm hover:bg-muted transition-all active:scale-[0.98]"
@@ -643,7 +725,7 @@ function ResultsPage() {
                     boxShadow: "0 8px 24px -8px hsl(var(--accent) / 0.4)",
                   }}
                 >
-                  🚀 Start Week 1
+                  {requiresFullPathway ? "🚀 Start Full Pathway" : `🚀 Start Required Pathway (Week ${assignedStartWeek})`}
                 </button>
                 <button
                   onClick={goHome}

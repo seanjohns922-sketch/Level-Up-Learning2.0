@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { clearScopedProgress, readProgress, writeProgress, StudentProgress } from "@/data/progress";
-import { clearScopedProgramStore } from "@/lib/program-progress";
+import { clearScopedProgramStore, getRecommendedAssignedWeek, readProgramStore } from "@/lib/program-progress";
 import { getProgramForYear } from "@/data/programs";
 import { DEMO_MODE } from "@/data/config";
 
@@ -52,7 +52,12 @@ export default function LevelsPage() {
 
   const savedWeek =
     progress?.status === "ASSIGNED_PROGRAM"
-      ? Math.max(1, Math.min(12, progress.assignedWeek ?? 1))
+      ? getRecommendedAssignedWeek(
+          readProgramStore(),
+          progress.year,
+          progress.assignedWeek,
+          progress.requiredWeeks
+        )
       : null;
 
   const programWeek = useMemo(() => {
@@ -72,7 +77,7 @@ export default function LevelsPage() {
     if (!progress) return;
     if (progress.status === "ASSIGNED_PROGRAM") {
       const year = encodeURIComponent(progress.year);
-      const week = progress.assignedWeek ?? 1;
+      const week = savedWeek ?? progress.assignedWeek ?? 1;
       router.push(`/program?year=${year}&week=${week}`);
       return;
     }

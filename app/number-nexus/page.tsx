@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Lock, Sparkles, Star, Zap, Target, Shield } from "lucide-react";
 import { readProgress, type StudentProgress } from "@/data/progress";
-import { readProgramStore, getWeekProgress, isWeekComplete } from "@/lib/program-progress";
+import { readProgramStore, getRecommendedAssignedWeek, getWeekProgress, isWeekComplete } from "@/lib/program-progress";
 import { getAllLegends, getLegendForYear, type Legend } from "@/data/legends";
 import { YEAR_ORDER } from "@/data/yearOrder";
 
@@ -133,7 +133,8 @@ export default function NumberNexusPage() {
   }, []);
 
   const year = progress?.year ?? "Year 1";
-  const week = progress?.assignedWeek ?? 1;
+  const store = readProgramStore();
+  const week = getRecommendedAssignedWeek(store, year, progress?.assignedWeek, progress?.requiredWeeks);
   const unlockedIds = progress?.unlockedLegends ?? [];
 
   const allLegends = useMemo(() => getAllLegends(), []);
@@ -146,7 +147,6 @@ export default function NumberNexusPage() {
   );
 
   const currentLegend = getLegendForYear(year);
-  const store = readProgramStore();
   const completedWeeks = Array.from({ length: 12 }, (_, i) => {
     const wp = getWeekProgress(store, year, i + 1);
     return isWeekComplete(wp);

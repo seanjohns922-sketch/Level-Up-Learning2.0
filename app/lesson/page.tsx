@@ -26,6 +26,7 @@ import { getProgramForYear } from "@/data/programs";
 import { ACTIVE_STUDENT_KEY, readProgress, updateProgress } from "@/data/progress";
 import { trackLiveLearningEvent } from "@/lib/live-class-client";
 import { markLessonComplete } from "@/lib/program-progress";
+import { getRecommendedAssignedWeek, isWeekPlayable, readProgramStore, getWeekProgress } from "@/lib/program-progress";
 import { getLessonChrome } from "@/lib/levelTheme";
 import { LessonPageHero } from "@/components/lesson/LessonPageHero";
 import { supabase } from "@/lib/supabase";
@@ -70,9 +71,28 @@ function LessonPage() {
   useEffect(() => {
     const p = readProgress();
     if (!p || p.status !== "ASSIGNED_PROGRAM") return;
+    if (p.requiredWeeks?.length) return;
     const nextWeek = Math.max(p.assignedWeek ?? 1, week);
     if (nextWeek !== p.assignedWeek) updateProgress({ assignedWeek: nextWeek });
   }, [week]);
+
+  useEffect(() => {
+    const p = readProgress();
+    if (!p || p.status !== "ASSIGNED_PROGRAM" || p.year !== year) return;
+
+    const store = readProgramStore();
+    const weekPlayable = isWeekPlayable(store, year, week, p.requiredWeeks, p.optionalWeeks);
+    if (!weekPlayable) {
+      const fallbackWeek = getRecommendedAssignedWeek(store, year, p.assignedWeek, p.requiredWeeks);
+      router.replace(`/program?year=${encodeURIComponent(year)}&week=${fallbackWeek}`);
+      return;
+    }
+
+    const weekProgress = getWeekProgress(store, year, week);
+    if (lessonNumber > 1 && !weekProgress.lessonsCompleted[lessonNumber - 2]) {
+      router.replace(`/program?year=${encodeURIComponent(year)}&week=${week}`);
+    }
+  }, [lessonNumber, router, week, year]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -85,6 +105,18 @@ function LessonPage() {
 
   function completeLesson() {
     markLessonComplete(year, week, lessonNumber);
+    const progress = readProgress();
+    if (progress?.status === "ASSIGNED_PROGRAM" && progress.requiredWeeks?.length) {
+      const nextAssignedWeek = getRecommendedAssignedWeek(
+        readProgramStore(),
+        year,
+        progress.assignedWeek,
+        progress.requiredWeeks
+      );
+      if (nextAssignedWeek !== progress.assignedWeek) {
+        updateProgress({ assignedWeek: nextAssignedWeek });
+      }
+    }
     router.push(`/program?year=${encodeURIComponent(year)}&week=${week}`);
   }
 

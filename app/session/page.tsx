@@ -35,6 +35,13 @@ import type { TeacherAttemptQuestion, TeacherInsight, TeacherInsightInput } from
 import { ClickableDotGrid, ClickableDotRows } from "@/components/ClickableDots";
 import { StaticDotGrid, StaticDotRow, StaticDotRows } from "@/components/StaticDots";
 import {
+  getWeekProgress as getPersistedWeekProgress,
+  getRecommendedAssignedWeek,
+  isWeekPlayable,
+  markQuizComplete as persistProgramQuizComplete,
+  readProgramStore as readPersistedProgramStore,
+} from "@/lib/program-progress";
+import {
   YEAR1_LESSON_CONFIG,
   YEAR1_WEEKLY_QUIZZES,
   getLessonConfig,
@@ -3300,6 +3307,24 @@ function SessionPage() {
   const isLesson = type === "lesson";
   const title = isLesson ? `Lesson ${n}` : "Weekly Quiz";
 
+  useEffect(() => {
+    const progress = readProgress();
+    if (!progress || progress.status !== "ASSIGNED_PROGRAM" || progress.year !== year) return;
+
+    const store = readPersistedProgramStore();
+    const numericWeek = Number(week);
+    if (!isWeekPlayable(store, year, numericWeek, progress.requiredWeeks, progress.optionalWeeks)) {
+      const fallbackWeek = getRecommendedAssignedWeek(store, year, progress.assignedWeek, progress.requiredWeeks);
+      router.replace(`/program?year=${encodeURIComponent(year)}&week=${fallbackWeek}`);
+      return;
+    }
+
+    const weekProgress = getPersistedWeekProgress(store, year, numericWeek);
+    if (type === "quiz" && weekProgress.lessonsCompleted.filter(Boolean).length < 3) {
+      router.replace(`/program?year=${encodeURIComponent(year)}&week=${week}`);
+    }
+  }, [router, type, week, year]);
+
   function backToWeek() {
     router.push(
       `/program?year=${encodeURIComponent(year)}&week=${encodeURIComponent(week)}`
@@ -3784,7 +3809,12 @@ function SessionPage() {
   function completeWeek(currentWeek: number) {
     const p = readProgress();
     if (!p || p.status !== "ASSIGNED_PROGRAM") return;
-    const nextWeek = Math.min(12, currentWeek + 1);
+    const nextWeek = getRecommendedAssignedWeek(
+      readPersistedProgramStore(),
+      p.year,
+      Math.min(12, currentWeek + 1),
+      p.requiredWeeks
+    );
     updateProgress({ assignedWeek: nextWeek });
   }
 
@@ -3813,6 +3843,7 @@ function SessionPage() {
     const store = readStore();
     setQuizScore(store, year, week, score);
     writeStore(store);
+    persistProgramQuizComplete(year, Number(week), score);
 
     if (passed) {
       completeWeek(Number(week));

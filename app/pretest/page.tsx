@@ -9,6 +9,7 @@ import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCa
 import AssessmentShell from "@/components/assessment/AssessmentShell";
 import { analyzeAssessmentResult, isAssessmentAnswerCorrect } from "@/data/assessments/analysis";
 import { ACTIVE_STUDENT_KEY, readProgress, type StudentProgress, writeProgress } from "@/data/progress";
+import { clearYearProgress } from "@/lib/program-progress";
 
 /* ── Inline visuals (kept from original) ── */
 
@@ -354,6 +355,7 @@ function PretestPage() {
       testType: "pre",
       studentId,
     });
+    clearYearProgress(year);
     const prev = readProgress();
     const nextProgress: StudentProgress = {
       ...(prev ?? {

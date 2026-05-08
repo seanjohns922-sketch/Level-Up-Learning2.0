@@ -6,6 +6,8 @@ export type StudentProgress = {
   status: "PASSED" | "ASSIGNED_PROGRAM";
   assignedWeek?: number; // 1..12 (only for ASSIGNED_PROGRAM)
   assignedWeeksHistory?: number[];
+  requiredWeeks?: number[];
+  optionalWeeks?: number[];
   unlockedLegends: string[]; // legend ids
   lastPreTestPercent?: number;
   lastPreTestProfile?: AssessmentResultProfile;
