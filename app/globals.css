@@ -165,3 +165,12 @@ body {
   0%, 100% { box-shadow: 0 0 0 0 hsl(145 65% 42% / 0); }
   50% { box-shadow: 0 0 16px 4px hsl(145 65% 42% / 0.15); }
 }
+
+@keyframes nb-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes nb-pulse {
+  0%, 100% { opacity: 0.85; transform: translateX(-50%) scaleX(1); }
+  50% { opacity: 1; transform: translateX(-50%) scaleX(1.08); }
+}
