@@ -71,7 +71,8 @@ function LessonPage() {
   const hasEmbeddedLessonVideo =
     year === "Year 4" && week === 2 && lessonNumber === 1;
   const isGroundWeek1CustomLesson =
-    year === "Prep" && (effectiveLessonId === "y0-w1-l1" || effectiveLessonId === "y0-w1-l2");
+    year === "Prep" &&
+    (effectiveLessonId === "y0-w1-l1" || effectiveLessonId === "y0-w1-l2" || effectiveLessonId === "y0-w1-l3");
 
   useEffect(() => {
     const p = readProgress();
@@ -253,6 +254,15 @@ function LessonPage() {
   }
 
   function renderPrepCompletionCard(summary: LessonPerformanceSummary) {
+    const prepSuccessTitle =
+      effectiveLessonId === "y0-w1-l3"
+        ? "You matched number names and numerals!"
+        : effectiveLessonId === "y0-w1-l2"
+          ? "You counted collections to 5!"
+          : "You recognised numbers 1 to 5!";
+    const prepUnlockText =
+      effectiveLessonId === "y0-w1-l3" ? "Weekly Quiz unlocked." : `Lesson ${lessonNumber + 1} unlocked.`;
+
     return (
       <div className="rounded-[28px] border border-cyan-200 bg-gradient-to-br from-cyan-50 via-white to-teal-50 p-6 shadow-[0_12px_30px_rgba(13,148,136,0.08)]">
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-cyan-200 to-teal-300 text-3xl shadow-[0_0_20px_rgba(45,212,191,0.25)]">
@@ -262,8 +272,8 @@ function LessonPage() {
           <div className="inline-flex items-center rounded-full bg-teal-100 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-teal-800">
             Numbot Bouncer
           </div>
-          <h2 className="mt-3 text-3xl font-black text-slate-900">You recognised numbers 1 to 5!</h2>
-          <p className="mt-2 text-lg font-semibold text-teal-800">Lesson 2 unlocked.</p>
+          <h2 className="mt-3 text-3xl font-black text-slate-900">{prepSuccessTitle}</h2>
+          <p className="mt-2 text-lg font-semibold text-teal-800">{prepUnlockText}</p>
           <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-center">
             <div className="text-[11px] font-black uppercase tracking-[0.18em] text-amber-700">XP Reward</div>
             <div className="mt-1 text-3xl font-black text-amber-900">10 XP</div>

@@ -159,6 +159,7 @@ export type PracticeTask = (
       targetNumber: number;
       visualType: "ground-number-card" | "ground-quantity-card" | "ground-flash-match-card";
       promptType: "number_to_numeral" | "numeral_to_group" | "group_to_numeral" | "number_to_objects" | "match_pair";
+      helperVariant?: "numbot" | "speech_bubble" | "memory";
       objectType?: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs";
       shownNumeral?: number;
       shownQuantity?: number;

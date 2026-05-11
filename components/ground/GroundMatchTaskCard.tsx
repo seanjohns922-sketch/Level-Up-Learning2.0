@@ -96,6 +96,38 @@ function renderQuestionVisual(task: GroundMatchTask) {
   return null;
 }
 
+function renderHelperVisual(task: GroundMatchTask) {
+  if (task.helperVariant === "numbot") {
+    return (
+      <div className="mt-4 flex items-center justify-center gap-3 rounded-[22px] border border-cyan-200 bg-white/90 px-4 py-3 shadow-sm">
+        <div className="text-5xl">🤖</div>
+        <div className="rounded-full bg-cyan-50 px-4 py-2 text-sm font-black uppercase tracking-[0.16em] text-teal-800">
+          Numbot says
+        </div>
+      </div>
+    );
+  }
+  if (task.helperVariant === "speech_bubble") {
+    return (
+      <div className="mt-4 flex justify-center">
+        <div className="rounded-[22px] border border-cyan-200 bg-white/90 px-5 py-3 text-sm font-black uppercase tracking-[0.16em] text-teal-800 shadow-sm">
+          🔊 Number bubble
+        </div>
+      </div>
+    );
+  }
+  if (task.helperVariant === "memory") {
+    return (
+      <div className="mt-4 flex justify-center">
+        <div className="rounded-[22px] border border-cyan-200 bg-white/90 px-5 py-3 text-sm font-black uppercase tracking-[0.16em] text-teal-800 shadow-sm">
+          Listen, then remember
+        </div>
+      </div>
+    );
+  }
+  return null;
+}
+
 function renderOption(option: GroundMatchTask["options"][number]) {
   if (option.kind === "numeral" && typeof option.numeral === "number") {
     return <GroundNumberCard value={option.numeral} />;
@@ -140,6 +172,7 @@ export default function GroundMatchTaskCard({
           </div>
           <ReadAloudBtn text={task.speakText ?? task.prompt} size="md" className="shrink-0" />
         </div>
+        {renderHelperVisual(task)}
         {renderQuestionVisual(task) ? (
           <div className="mt-4 flex justify-center">{renderQuestionVisual(task)}</div>
         ) : null}
