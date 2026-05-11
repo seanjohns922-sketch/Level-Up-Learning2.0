@@ -215,10 +215,10 @@ export function createGroundNumberRecognitionTask(lessonId: string): GroundMatch
   const target = pickTarget(memory);
   const promptType = pickPromptType(memory, ["number_to_numeral"]);
   const promptTemplates = [
-    `Tap number ${target}.`,
-    `Find number ${target}.`,
-    `Which one is ${target}?`,
-    `Tap the numeral ${target}.`,
+    "Find the number.",
+    "Tap the number.",
+    "Listen and tap.",
+    "Hear the number. Then tap.",
   ];
   const prompt = promptTemplates[randInt(0, promptTemplates.length - 1)]!;
   const options = buildNumeralOptions(target, memory);
@@ -239,7 +239,7 @@ export function createGroundNumberRecognitionTask(lessonId: string): GroundMatch
     correctOptionId: options.find((option) => option.numeral === target)!.id,
     feedback: {
       correct: `Yes — that is ${target}.`,
-      wrong: `Look for the number ${target}.`,
+      wrong: "Listen, then try again.",
     },
   };
 }
