@@ -70,7 +70,8 @@ function LessonPage() {
   const safeLessonFocus = lessonMeta?.focus ?? null;
   const hasEmbeddedLessonVideo =
     year === "Year 4" && week === 2 && lessonNumber === 1;
-  const isGroundWeek1Lesson1 = year === "Prep" && effectiveLessonId === "y0-w1-l1";
+  const isGroundWeek1CustomLesson =
+    year === "Prep" && (effectiveLessonId === "y0-w1-l1" || effectiveLessonId === "y0-w1-l2");
 
   useEffect(() => {
     const p = readProgress();
@@ -105,10 +106,10 @@ function LessonPage() {
     if (year === "Year 1") {
       resetYear1SessionTaskState();
     }
-    if (isGroundWeek1Lesson1) {
+    if (isGroundWeek1CustomLesson) {
       resetPrepSessionTaskState();
     }
-  }, [effectiveLessonId, isGroundWeek1Lesson1, week, year]);
+  }, [effectiveLessonId, isGroundWeek1CustomLesson, week, year]);
 
   function completeLesson() {
     markLessonComplete(year, week, lessonNumber);
@@ -564,7 +565,7 @@ function LessonPage() {
                       if (year === "Year 1") {
                         resetYear1SessionTaskState();
                       }
-                      if (isGroundWeek1Lesson1) {
+                      if (isGroundWeek1CustomLesson) {
                         resetPrepSessionTaskState();
                       }
                       setStartedLessonId(effectiveLessonId);
@@ -603,7 +604,7 @@ function LessonPage() {
               </div>
             </div>
           </div>
-        ) : year === "Year 1" || isGroundWeek1Lesson1 ? (
+        ) : year === "Year 1" || isGroundWeek1CustomLesson ? (
           <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
             <LessonPageHero
                     levelNumber={levelNumber}
@@ -620,11 +621,11 @@ function LessonPage() {
               key={`${year}-${week}-${effectiveLessonId}`}
               minutes={9}
               lessonTitle={safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
-              completionMode={isGroundWeek1Lesson1 ? "time_only" : "question_or_time"}
+              completionMode={isGroundWeek1CustomLesson ? "time_only" : "question_or_time"}
               scoreCap={10}
               liveContext={liveLessonContext}
               renderCompletionCard={
-                isGroundWeek1Lesson1
+                isGroundWeek1CustomLesson
                   ? renderPrepCompletionCard
                   : showWeek12Lesson3Summary
                   ? (summary: LessonPerformanceSummary) => (
@@ -638,7 +639,7 @@ function LessonPage() {
               }
               getTask={(ctx) => {
                 const d = ctx?.difficulty ?? "easy";
-                if (isGroundWeek1Lesson1) {
+                if (isGroundWeek1CustomLesson) {
                   return generatePrepWeek1Task(effectiveLessonId, d);
                 }
                 if (effectiveLessonId.startsWith("y1-w2-")) {

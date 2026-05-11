@@ -82,7 +82,11 @@ import GroundMatchTaskCard from "@/components/ground/GroundMatchTaskCard";
 import {
   GroundBuildTaskCard,
   GroundCollectTaskCard,
+  GroundFeedTaskCard,
   GroundFlashTaskCard,
+  GroundMoveCountTaskCard,
+  GroundSoundCountTaskCard,
+  GroundTapCountTaskCard,
 } from "@/components/ground/GroundMiniGameTask";
 
 type Callbacks = {
@@ -275,6 +279,14 @@ function TaskRendererInner({
       return <GroundBuildTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundFlash":
       return <GroundFlashTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "groundTapCount":
+      return <GroundTapCountTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "groundMoveCount":
+      return <GroundMoveCountTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "groundFeed":
+      return <GroundFeedTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "groundSoundCount":
+      return <GroundSoundCountTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     default:
       return null;
   }

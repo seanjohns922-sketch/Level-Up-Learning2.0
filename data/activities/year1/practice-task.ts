@@ -206,6 +206,53 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      kind: "groundTapCount";
+      prompt: string;
+      speakText?: string;
+      targetNumber: number;
+      objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs";
+      options: Array<{
+        id: string;
+        numeral: number;
+      }>;
+      correctOptionId: string;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
+      kind: "groundMoveCount";
+      prompt: string;
+      speakText?: string;
+      targetNumber: number;
+      objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs";
+      options: Array<{
+        id: string;
+        numeral: number;
+      }>;
+      correctOptionId: string;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
+      kind: "groundFeed";
+      prompt: string;
+      speakText?: string;
+      targetNumber: number;
+      objectType: "energy_orbs" | "robot_tokens";
+      totalObjects: number;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
+      kind: "groundSoundCount";
+      prompt: string;
+      speakText?: string;
+      targetNumber: number;
+      options: Array<{
+        id: string;
+        numeral: number;
+      }>;
+      correctOptionId: string;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       kind: "tensOnesMcq";
       prompt: string;
       min: number;

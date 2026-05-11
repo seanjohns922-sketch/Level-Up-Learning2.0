@@ -30,6 +30,10 @@ function formatPracticeTopicLabel(kind: PracticeTask["kind"]) {
   if (kind === "groundCollect") return "Ground Collect";
   if (kind === "groundBuild") return "Ground Build";
   if (kind === "groundFlash") return "Ground Flash";
+  if (kind === "groundTapCount") return "Tap Count";
+  if (kind === "groundMoveCount") return "Move To Count";
+  if (kind === "groundFeed") return "Feed Numbot";
+  if (kind === "groundSoundCount") return "Sound Count";
   if (kind === "mcq") return "Multiple Choice";
   if (kind === "count") return "Number Input";
   if (kind === "order3") return "Ordering";
@@ -63,6 +67,10 @@ function getPracticeTaskCorrectAnswer(task: PracticeTask) {
   if (task.kind === "groundCollect") return String(task.targetNumber);
   if (task.kind === "groundBuild") return String(task.targetNumber);
   if (task.kind === "groundFlash") return String(task.targetNumber);
+  if (task.kind === "groundTapCount") return String(task.targetNumber);
+  if (task.kind === "groundMoveCount") return String(task.targetNumber);
+  if (task.kind === "groundFeed") return String(task.targetNumber);
+  if (task.kind === "groundSoundCount") return String(task.targetNumber);
   return null;
 }
 
@@ -482,7 +490,11 @@ export function PracticeRunner({
     task.kind === "groundMatch" ||
     task.kind === "groundCollect" ||
     task.kind === "groundBuild" ||
-    task.kind === "groundFlash";
+    task.kind === "groundFlash" ||
+    task.kind === "groundTapCount" ||
+    task.kind === "groundMoveCount" ||
+    task.kind === "groundFeed" ||
+    task.kind === "groundSoundCount";
   const hint =
     hasGroundFeedback
       ? status === "wrong"

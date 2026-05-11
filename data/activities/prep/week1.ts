@@ -12,6 +12,10 @@ type GroundMatchTask = Extract<PracticeTask, { kind: "groundMatch" }>;
 type GroundCollectTask = Extract<PracticeTask, { kind: "groundCollect" }>;
 type GroundBuildTask = Extract<PracticeTask, { kind: "groundBuild" }>;
 type GroundFlashTask = Extract<PracticeTask, { kind: "groundFlash" }>;
+type GroundTapCountTask = Extract<PracticeTask, { kind: "groundTapCount" }>;
+type GroundMoveCountTask = Extract<PracticeTask, { kind: "groundMoveCount" }>;
+type GroundFeedTask = Extract<PracticeTask, { kind: "groundFeed" }>;
+type GroundSoundCountTask = Extract<PracticeTask, { kind: "groundSoundCount" }>;
 
 const OBJECT_TYPES: GroundObjectType[] = [
   "dots",
@@ -39,6 +43,7 @@ type GroundLessonMemory = {
 
 const lessonMemory = new Map<string, GroundLessonMemory>();
 const poolPattern = ["A", "B", "A", "C", "B", "C", "A"] as const;
+const lesson2PoolPattern = ["A", "B", "D", "C", "E", "F", "A", "G", "B"] as const;
 
 function getMemory(lessonId: string): GroundLessonMemory {
   const existing = lessonMemory.get(lessonId);
@@ -183,6 +188,22 @@ function buildQuantityOptions(target: number, objectType: GroundObjectType, memo
     kind: "quantity" as const,
     quantity,
     objectType,
+  }));
+}
+
+function buildNumeralChoiceOptions(target: number, memory: GroundLessonMemory) {
+  const distractors = sampleDistinct([1, 2, 3, 4, 5], 2, [target]);
+  const correctPosition = chooseCorrectPosition(memory);
+  const ordered = new Array<number>(3);
+  ordered[correctPosition] = target;
+  const remainingPositions = [0, 1, 2].filter((position) => position !== correctPosition);
+  remainingPositions.forEach((position, index) => {
+    ordered[position] = distractors[index]!;
+  });
+  pushRecent(memory.recentAnswerPositions, correctPosition, RECENT_POSITIONS_LIMIT);
+  return ordered.map((numeral, index) => ({
+    id: `choice-${target}-${index}-${numeral}`,
+    numeral,
   }));
 }
 
@@ -456,13 +477,175 @@ export function createGroundFlashRecognitionTask(lessonId: string): GroundFlashT
   };
 }
 
+export function createGroundTapCountTask(lessonId: string): GroundTapCountTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory);
+  const objectType = pickObjectType(memory);
+  const options = buildNumeralChoiceOptions(target, memory);
+  pushRecent(memory.recentTargets, target, RECENT_TARGETS_LIMIT);
+  pushRecent(memory.recentObjects, objectType, RECENT_OBJECTS_LIMIT);
+  memory.taskCounter += 1;
+  recordGameKind(memory, "groundTapCount");
+
+  const prompts = [
+    `Tap and count the ${objectLabel(objectType)}.`,
+    `Count each ${objectLabel(objectType)}.`,
+    `Tap each ${objectLabel(objectType)} once.`,
+  ];
+
+  return {
+    kind: "groundTapCount",
+    prompt: prompts[randInt(0, prompts.length - 1)]!,
+    speakText: `Tap and count the ${objectLabel(objectType)}.`,
+    targetNumber: target,
+    objectType,
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: {
+      correct: `Correct — you counted ${target}.`,
+      wrong: "Tap each object once, then choose.",
+    },
+  };
+}
+
+export function createGroundMoveToCountTask(lessonId: string): GroundMoveCountTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory);
+  const objectType = pickObjectType(memory);
+  const options = buildNumeralChoiceOptions(target, memory);
+  pushRecent(memory.recentTargets, target, RECENT_TARGETS_LIMIT);
+  pushRecent(memory.recentObjects, objectType, RECENT_OBJECTS_LIMIT);
+  memory.taskCounter += 1;
+  recordGameKind(memory, "groundMoveCount");
+
+  return {
+    kind: "groundMoveCount",
+    prompt: "Move each object into the counting zone.",
+    speakText: `Move each ${objectLabel(objectType)} into the counting zone.`,
+    targetNumber: target,
+    objectType,
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: {
+      correct: `Great — you moved and counted ${target}.`,
+      wrong: "Move each one, then count.",
+    },
+  };
+}
+
+export function createGroundFeedNumbotTask(lessonId: string): GroundFeedTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory);
+  const objectType = randInt(0, 1) === 0 ? "energy_orbs" : "robot_tokens";
+  const totalObjects = target < 5 && randInt(0, 1) === 0 ? 5 : target;
+  pushRecent(memory.recentTargets, target, RECENT_TARGETS_LIMIT);
+  pushRecent(memory.recentObjects, objectType, RECENT_OBJECTS_LIMIT);
+  memory.taskCounter += 1;
+  recordGameKind(memory, "groundFeed");
+
+  return {
+    kind: "groundFeed",
+    prompt: `Feed Numbot ${target} ${collectLabel(objectType)}.`,
+    speakText: `Feed Numbot ${numberWord(target)} ${collectLabel(objectType)}.`,
+    targetNumber: target,
+    objectType,
+    totalObjects,
+    feedback: {
+      correct: `Correct — Numbot got ${target} ${collectLabel(objectType)}.`,
+      wrong: "Count carefully, then feed Numbot.",
+    },
+  };
+}
+
+export function createGroundCountAndChooseTask(lessonId: string): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory);
+  const objectType = pickObjectType(memory);
+  const options = buildNumeralOptions(target, memory);
+  pushRecent(memory.recentTargets, target, RECENT_TARGETS_LIMIT);
+  pushRecent(memory.recentObjects, objectType, RECENT_OBJECTS_LIMIT);
+  pushRecent(memory.recentPrompts, "group_to_numeral", RECENT_PROMPTS_LIMIT);
+  memory.taskCounter += 1;
+  recordGameKind(memory, "groundMatch:countChoose");
+
+  return {
+    kind: "groundMatch",
+    prompt: `How many ${objectLabel(objectType)}?`,
+    speakText: `How many ${objectLabel(objectType)} are there?`,
+    targetNumber: target,
+    visualType: "ground-quantity-card",
+    promptType: "group_to_numeral",
+    objectType,
+    shownQuantity: target,
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: {
+      correct: `Yes — there are ${target}.`,
+      wrong: "Count slowly.",
+    },
+  };
+}
+
+export function createGroundSoundCountTask(lessonId: string): GroundSoundCountTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory);
+  const options = buildNumeralChoiceOptions(target, memory);
+  pushRecent(memory.recentTargets, target, RECENT_TARGETS_LIMIT);
+  memory.taskCounter += 1;
+  recordGameKind(memory, "groundSoundCount");
+
+  return {
+    kind: "groundSoundCount",
+    prompt: "Listen and choose the number.",
+    speakText: "Listen and choose the number.",
+    targetNumber: target,
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: {
+      correct: "Great listening!",
+      wrong: "Listen again and count.",
+    },
+  };
+}
+
+export function createGroundBuildCollectionTask(lessonId: string): GroundBuildTask {
+  const task = createGroundBuildTask(lessonId);
+  return {
+    ...task,
+    prompt: `Build ${task.targetNumber}.`,
+    speakText: `Build ${numberWord(task.targetNumber)}.`,
+    feedback: {
+      correct: `Yes — you built ${task.targetNumber}.`,
+      wrong: "Try building the collection again.",
+    },
+  };
+}
+
+export function createGroundQuickRecountTask(lessonId: string): GroundFlashTask {
+  const task = createGroundFlashRecognitionTask(lessonId);
+  return {
+    ...task,
+    prompt: "Count them. How many?",
+    speakText: "Count them. How many?",
+    revealMs: 1600,
+    feedback: {
+      correct: "Nice quick count!",
+      wrong: "Try the count again.",
+    },
+  };
+}
+
 export function generatePrepWeek1Task(
   lessonId: string,
   difficulty: Difficulty = "easy"
 ): PracticeTask {
   void difficulty;
-  if (lessonId !== "y0-w1-l1") {
+  if (lessonId !== "y0-w1-l1" && lessonId !== "y0-w1-l2") {
     return createGroundNumberRecognitionTask("y0-w1-l1");
+  }
+
+  if (lessonId === "y0-w1-l2") {
+    return generatePrepWeek1Lesson2Task(lessonId);
   }
 
   const memory = getMemory(lessonId);
@@ -487,4 +670,29 @@ export function generatePrepWeek1Task(
   return mode === "groundFlash"
     ? createGroundFlashRecognitionTask(lessonId)
     : createGroundFluencyMatchTask(lessonId);
+}
+
+export function generatePrepWeek1Lesson2Task(lessonId: string): PracticeTask {
+  const memory = getMemory(lessonId);
+  const pool = lesson2PoolPattern[memory.poolCursor % lesson2PoolPattern.length]!;
+  memory.poolCursor += 1;
+
+  switch (pool) {
+    case "A":
+      return createGroundTapCountTask(lessonId);
+    case "B":
+      return createGroundMoveToCountTask(lessonId);
+    case "C":
+      return createGroundFeedNumbotTask(lessonId);
+    case "D":
+      return createGroundCountAndChooseTask(lessonId);
+    case "E":
+      return createGroundSoundCountTask(lessonId);
+    case "F":
+      return createGroundBuildCollectionTask(lessonId);
+    case "G":
+      return createGroundQuickRecountTask(lessonId);
+    default:
+      return createGroundTapCountTask(lessonId);
+  }
 }

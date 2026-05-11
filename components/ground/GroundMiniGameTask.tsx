@@ -7,6 +7,10 @@ import type { PracticeTask } from "@/data/activities/year1/practice-task";
 type GroundCollectTask = Extract<PracticeTask, { kind: "groundCollect" }>;
 type GroundBuildTask = Extract<PracticeTask, { kind: "groundBuild" }>;
 type GroundFlashTask = Extract<PracticeTask, { kind: "groundFlash" }>;
+type GroundTapCountTask = Extract<PracticeTask, { kind: "groundTapCount" }>;
+type GroundMoveCountTask = Extract<PracticeTask, { kind: "groundMoveCount" }>;
+type GroundFeedTask = Extract<PracticeTask, { kind: "groundFeed" }>;
+type GroundSoundCountTask = Extract<PracticeTask, { kind: "groundSoundCount" }>;
 
 const OBJECT_META = {
   dots: { label: "dots", emoji: "●" },
@@ -69,6 +73,36 @@ function GroundToken({
     >
       {meta.emoji}
     </button>
+  );
+}
+
+function GroundNumeralOption({
+  numeral,
+  onClick,
+}: {
+  numeral: number;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex min-h-[112px] items-center justify-center rounded-[24px] border-2 border-cyan-200 bg-white text-5xl font-black text-teal-900 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-[0_0_18px_rgba(34,211,238,0.14)] active:scale-[0.98]"
+    >
+      {numeral}
+    </button>
+  );
+}
+
+function GroundCountBadge({ count, target }: { count: number; target?: number }) {
+  return (
+    <div className="mb-3 flex items-center justify-between rounded-2xl bg-cyan-50 px-4 py-2">
+      <div className="text-sm font-black uppercase tracking-[0.16em] text-teal-800">Count</div>
+      <div className="text-2xl font-black text-teal-900">
+        {count}
+        {typeof target === "number" ? ` / ${target}` : ""}
+      </div>
+    </div>
   );
 }
 
@@ -249,6 +283,274 @@ export function GroundFlashTaskCard({
           >
             {option.numeral}
           </button>
+        ))}
+      </div>
+    </GroundMiniShell>
+  );
+}
+
+export function GroundTapCountTaskCard({
+  task,
+  onCorrect,
+  onWrong,
+}: {
+  task: GroundTapCountTask;
+  onCorrect: () => void;
+  onWrong: () => void;
+}) {
+  const [tappedIds, setTappedIds] = useState<number[]>([]);
+
+  function tapObject(id: number) {
+    setTappedIds((current) => (current.includes(id) ? current : [...current, id]));
+  }
+
+  const allTapped = tappedIds.length === task.targetNumber;
+
+  return (
+    <GroundMiniShell badge="Tap Count" prompt={task.prompt} speakText={task.speakText}>
+      <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
+        <GroundCountBadge count={tappedIds.length} target={task.targetNumber} />
+        <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
+          {Array.from({ length: task.targetNumber }).map((_, index) => (
+            <GroundToken
+              key={`${task.objectType}-${index}`}
+              objectType={task.objectType}
+              selected={tappedIds.includes(index)}
+              onClick={() => tapObject(index)}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
+        <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
+          {allTapped ? "How many?" : "Tap each one first"}
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          {task.options.map((option) => (
+            <GroundNumeralOption
+              key={option.id}
+              numeral={option.numeral}
+              onClick={() => {
+                if (!allTapped) {
+                  onWrong();
+                  return;
+                }
+                if (option.id === task.correctOptionId) onCorrect();
+                else onWrong();
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    </GroundMiniShell>
+  );
+}
+
+export function GroundMoveCountTaskCard({
+  task,
+  onCorrect,
+  onWrong,
+}: {
+  task: GroundMoveCountTask;
+  onCorrect: () => void;
+  onWrong: () => void;
+}) {
+  const [movedIds, setMovedIds] = useState<number[]>([]);
+
+  function moveObject(id: number) {
+    setMovedIds((current) => (current.includes(id) ? current : [...current, id]));
+  }
+
+  const allMoved = movedIds.length === task.targetNumber;
+
+  return (
+    <GroundMiniShell badge="Move To Count" prompt={task.prompt} speakText={task.speakText}>
+      <div className="grid gap-4 lg:grid-cols-[1fr_220px]">
+        <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
+          <GroundCountBadge count={movedIds.length} target={task.targetNumber} />
+          <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
+            {Array.from({ length: task.targetNumber }).map((_, index) => (
+              <GroundToken
+                key={`${task.objectType}-${index}`}
+                objectType={task.objectType}
+                selected={movedIds.includes(index)}
+                onClick={() => moveObject(index)}
+              />
+            ))}
+          </div>
+        </div>
+        <div className="rounded-[24px] border-2 border-dashed border-cyan-300 bg-cyan-50/70 p-4 shadow-sm">
+          <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
+            Counting Zone
+          </div>
+          <div className="grid min-h-[140px] grid-cols-2 gap-2">
+            {Array.from({ length: movedIds.length }).map((_, index) => (
+              <span
+                key={`moved-${index}`}
+                className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white text-2xl text-teal-700 shadow-sm"
+              >
+                {OBJECT_META[task.objectType].emoji}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
+        <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
+          {allMoved ? "How many?" : "Move each one first"}
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          {task.options.map((option) => (
+            <GroundNumeralOption
+              key={option.id}
+              numeral={option.numeral}
+              onClick={() => {
+                if (!allMoved) {
+                  onWrong();
+                  return;
+                }
+                if (option.id === task.correctOptionId) onCorrect();
+                else onWrong();
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    </GroundMiniShell>
+  );
+}
+
+export function GroundFeedTaskCard({
+  task,
+  onCorrect,
+  onWrong,
+}: {
+  task: GroundFeedTask;
+  onCorrect: () => void;
+  onWrong: () => void;
+}) {
+  const [fedIds, setFedIds] = useState<number[]>([]);
+
+  function feedObject(id: number) {
+    setFedIds((current) => (current.includes(id) ? current : [...current, id]));
+  }
+
+  function check() {
+    if (fedIds.length === task.targetNumber) onCorrect();
+    else onWrong();
+  }
+
+  return (
+    <GroundMiniShell badge="Feed Numbot" prompt={task.prompt} speakText={task.speakText}>
+      <div className="grid gap-4 lg:grid-cols-[1fr_240px]">
+        <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
+          <GroundCountBadge count={fedIds.length} target={task.targetNumber} />
+          <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
+            {Array.from({ length: task.totalObjects }).map((_, index) => (
+              <GroundToken
+                key={`${task.objectType}-${index}`}
+                objectType={task.objectType}
+                selected={fedIds.includes(index)}
+                onClick={() => feedObject(index)}
+              />
+            ))}
+          </div>
+        </div>
+        <div className="rounded-[24px] border border-cyan-200 bg-gradient-to-br from-teal-100 via-cyan-50 to-white p-4 shadow-sm">
+          <div className="mb-2 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
+            Numbot Bouncer
+          </div>
+          <div className="mb-3 flex justify-center text-6xl">🤖</div>
+          <div className="rounded-full bg-white px-4 py-2 text-center text-xl font-black text-teal-900 shadow-sm">
+            {fedIds.length} / {task.targetNumber}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <button
+          type="button"
+          onClick={() => setFedIds([])}
+          className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-4 text-base font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
+        >
+          Reset
+        </button>
+        <button
+          type="button"
+          onClick={check}
+          className="rounded-[22px] bg-gradient-to-r from-teal-600 to-cyan-500 px-4 py-4 text-base font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.18)] transition hover:brightness-110"
+        >
+          Feed
+        </button>
+      </div>
+    </GroundMiniShell>
+  );
+}
+
+export function GroundSoundCountTaskCard({
+  task,
+  onCorrect,
+  onWrong,
+}: {
+  task: GroundSoundCountTask;
+  onCorrect: () => void;
+  onWrong: () => void;
+}) {
+  const [activePulse, setActivePulse] = useState(-1);
+
+  function replayPulses() {
+    setActivePulse(-1);
+    for (let index = 0; index < task.targetNumber; index += 1) {
+      window.setTimeout(() => setActivePulse(index), index * 500);
+    }
+    window.setTimeout(() => setActivePulse(-1), task.targetNumber * 500);
+  }
+
+  useEffect(() => {
+    replayPulses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [task]);
+
+  return (
+    <GroundMiniShell badge="Sound Count" prompt={task.prompt} speakText={task.speakText}>
+      <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
+        <div className="mb-4 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
+          Listen and watch
+        </div>
+        <div className="mb-4 flex justify-center gap-3">
+          {Array.from({ length: task.targetNumber }).map((_, index) => (
+            <span
+              key={`pulse-${index}`}
+              className={`inline-flex h-14 w-14 items-center justify-center rounded-full border-2 text-2xl transition ${
+                activePulse === index
+                  ? "border-teal-400 bg-teal-100 text-teal-800 shadow-[0_0_18px_rgba(45,212,191,0.25)]"
+                  : "border-cyan-200 bg-cyan-50 text-cyan-500"
+              }`}
+            >
+              〰
+            </span>
+          ))}
+        </div>
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={replayPulses}
+            className="rounded-[20px] border-2 border-cyan-200 bg-white px-5 py-3 text-base font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
+          >
+            Replay
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3">
+        {task.options.map((option) => (
+          <GroundNumeralOption
+            key={option.id}
+            numeral={option.numeral}
+            onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
+          />
         ))}
       </div>
     </GroundMiniShell>
