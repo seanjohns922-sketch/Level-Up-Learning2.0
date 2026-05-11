@@ -24,6 +24,7 @@ import { resetWeek3TaskSessionState } from "@/data/activities/year1/week3";
 import { resetWeek4TaskSessionState } from "@/data/activities/year1/week4";
 import { generatePrepWeek1Task, resetPrepWeek1TaskSessionState } from "@/data/activities/prep/week1";
 import { getProgramForYear } from "@/data/programs";
+import { DEMO_MODE } from "@/data/config";
 import { ACTIVE_STUDENT_KEY, readProgress, updateProgress } from "@/data/progress";
 import { trackLiveLearningEvent } from "@/lib/live-class-client";
 import { markLessonComplete } from "@/lib/program-progress";
@@ -96,9 +97,22 @@ function LessonPage() {
 
     const weekProgress = getWeekProgress(store, year, week);
     if (lessonNumber > 1 && !weekProgress.lessonsCompleted[lessonNumber - 2]) {
-      router.replace(`/program?year=${encodeURIComponent(year)}&week=${week}`);
+      return;
     }
   }, [lessonNumber, router, week, year]);
+
+  const blockedPreviousLesson = useMemo(() => {
+    if (DEMO_MODE) return null;
+    const p = readProgress();
+    if (!p || p.status !== "ASSIGNED_PROGRAM" || p.year !== year) return null;
+    const store = readProgramStore();
+    if (!isWeekPlayable(store, year, week, p.requiredWeeks, p.optionalWeeks)) return null;
+    const weekProgress = getWeekProgress(store, year, week);
+    if (lessonNumber > 1 && !weekProgress.lessonsCompleted[lessonNumber - 2]) {
+      return lessonNumber - 1;
+    }
+    return null;
+  }, [lessonNumber, week, year]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -318,7 +332,55 @@ function LessonPage() {
           </button>
         </div>
 
-        {!started ? (
+        {blockedPreviousLesson ? (
+          <div className="rounded-[24px] overflow-hidden shadow-[0_2px_6px_rgba(0,0,0,0.04),0_16px_40px_rgba(0,0,0,0.08)] border border-border/40 bg-card">
+            <LessonPageHero
+              levelNumber={levelNumber}
+              levelLabel={levelLabel}
+              week={week}
+              lessonNumber={lessonNumber}
+              pageTitle="Lesson Locked"
+              lessonTitle={safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
+              focus={`Complete Lesson ${blockedPreviousLesson} first to unlock this lesson.`}
+              heroClass={lessonChrome.heroClass}
+            />
+            <div className="bg-background px-6 py-8">
+              <div className="mx-auto max-w-2xl rounded-[28px] border border-cyan-200 bg-gradient-to-br from-cyan-50 via-white to-teal-50 p-6 shadow-[0_12px_30px_rgba(13,148,136,0.08)]">
+                <div className="text-center">
+                  <div className="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-amber-800">
+                    Lesson Locked
+                  </div>
+                  <h2 className="mt-3 text-3xl font-black text-slate-900">
+                    Finish Lesson {blockedPreviousLesson} first
+                  </h2>
+                  <p className="mt-2 text-lg font-semibold text-teal-800">
+                    Complete your current lesson to unlock this one.
+                  </p>
+                  <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        router.push(
+                          `/lesson?year=${encodeURIComponent(year)}&week=${week}&lessonId=y${yearNumber}-w${week}-l${blockedPreviousLesson}`
+                        )
+                      }
+                      className="rounded-[22px] bg-gradient-to-r from-teal-600 to-cyan-500 px-6 py-4 text-lg font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.22)] transition hover:brightness-110"
+                    >
+                      Go to Lesson {blockedPreviousLesson}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => router.push(`/program?year=${encodeURIComponent(year)}&week=${week}`)}
+                      className="rounded-[22px] border-2 border-cyan-200 bg-white px-6 py-4 text-lg font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
+                    >
+                      Back to Week
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : !started ? (
           <div className="rounded-[24px] overflow-hidden shadow-[0_2px_6px_rgba(0,0,0,0.04),0_16px_40px_rgba(0,0,0,0.08)] border border-border/40 bg-card">
             <LessonPageHero
               levelNumber={levelNumber}
