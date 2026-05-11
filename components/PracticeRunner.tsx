@@ -99,6 +99,8 @@ export function PracticeRunner({
   getTask,
   onComplete,
   lessonTitle,
+  completionMode = "question_or_time",
+  scoreCap = MAX_LESSON_QUESTIONS,
   renderCompletionCard,
   onPerformanceSummary,
   liveContext,
@@ -112,11 +114,15 @@ export function PracticeRunner({
   }) => PracticeTask;
   onComplete: () => void;
   lessonTitle?: string;
+  completionMode?: "question_or_time" | "time_only";
+  scoreCap?: number;
   renderCompletionCard?: (summary: LessonPerformanceSummary) => ReactNode;
   onPerformanceSummary?: (summary: LessonPerformanceSummary) => void;
   liveContext?: LiveLessonContext;
 }) {
   const totalSeconds = minutes * 60;
+  const questionLimit =
+    completionMode === "question_or_time" ? MAX_LESSON_QUESTIONS : Number.POSITIVE_INFINITY;
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
   const completedRef = useRef(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -148,13 +154,15 @@ export function PracticeRunner({
   const [order, setOrder] = useState<number[]>([]);
   const [hasPlayed, setHasPlayed] = useState(false);
   const [taskNonce, setTaskNonce] = useState(0);
-  const finished = secondsLeft <= 0 || questionsAnswered >= MAX_LESSON_QUESTIONS;
+  const elapsedSeconds = totalSeconds - secondsLeft;
+  const finished = secondsLeft <= 0 || questionsAnswered >= questionLimit;
   const { autoReadEnabled } = useAutoReadSetting();
   const lastAutoReadTaskKeyRef = useRef<string | null>(null);
   const autoReadPrompt = getPracticeTaskSpeechText(task);
 
-  const safeQuestionsAnswered = clampNumber(questionsAnswered, 0, MAX_LESSON_QUESTIONS);
-  const safeCorrectAnswers = clampNumber(correctAnswers, 0, Math.min(MAX_LESSON_QUESTIONS, safeQuestionsAnswered));
+  const safeQuestionsAnswered = Math.max(0, questionsAnswered);
+  const safeCorrectAnswers = Math.max(0, correctAnswers);
+  const cappedCorrectAnswers = clampNumber(correctAnswers, 0, scoreCap);
   const accuracy =
     safeQuestionsAnswered > 0
       ? Math.round((safeCorrectAnswers / safeQuestionsAnswered) * 100)
@@ -233,6 +241,19 @@ export function PracticeRunner({
     speak(String(task.targetNumber));
   }, [task]);
 
+  function buildProgressMeta(questionNumber: number) {
+    if (completionMode === "time_only") {
+      return {
+        progressPercent: Math.round((elapsedSeconds / totalSeconds) * 100),
+        progressLabel: `Mini-game ${questionNumber}`,
+      };
+    }
+    return {
+      progressPercent: Math.round((questionsAnsweredRef.current / MAX_LESSON_QUESTIONS) * 100),
+      progressLabel: `Question ${questionNumber} of ${MAX_LESSON_QUESTIONS}`,
+    };
+  }
+
   useEffect(() => {
     if (!autoReadEnabled) return;
     if (!autoReadPrompt) return;
@@ -254,6 +275,7 @@ export function PracticeRunner({
     if (!liveContext) return;
     const prompt = getPracticeTaskPrompt(task);
     const questionNumber = questionsAnsweredRef.current + 1;
+    const progressMeta = buildProgressMeta(questionNumber);
     if (questionNumber === 1) {
       void trackLiveLearningEvent({
         eventType: "activity_started",
@@ -267,8 +289,8 @@ export function PracticeRunner({
         questionId: `${liveContext.lessonId}-q${questionNumber}`,
         questionText: prompt,
         questionType: task.kind,
-        progressPercent: 0,
-        progressLabel: `Question ${questionNumber} of ${MAX_LESSON_QUESTIONS}`,
+        progressPercent: progressMeta.progressPercent,
+        progressLabel: progressMeta.progressLabel,
         skillTag: task.kind,
       });
     }
@@ -284,8 +306,8 @@ export function PracticeRunner({
       questionId: `${liveContext.lessonId}-q${questionNumber}`,
       questionText: prompt,
       questionType: task.kind,
-      progressPercent: Math.round((questionsAnsweredRef.current / MAX_LESSON_QUESTIONS) * 100),
-      progressLabel: `Question ${questionNumber} of ${MAX_LESSON_QUESTIONS}`,
+      progressPercent: progressMeta.progressPercent,
+      progressLabel: progressMeta.progressLabel,
       skillTag: task.kind,
     });
     scheduleIdleLiveEvent({
@@ -299,14 +321,14 @@ export function PracticeRunner({
       questionId: `${liveContext.lessonId}-q${questionNumber}`,
       questionText: prompt,
       questionType: task.kind,
-      progressPercent: Math.round((questionsAnsweredRef.current / MAX_LESSON_QUESTIONS) * 100),
-      progressLabel: `Question ${questionNumber} of ${MAX_LESSON_QUESTIONS}`,
+      progressPercent: progressMeta.progressPercent,
+      progressLabel: progressMeta.progressLabel,
       skillTag: task.kind,
     });
     return () => {
       clearIdleLiveEventTimer();
     };
-  }, [liveContext, task, taskNonce]);
+  }, [completionMode, elapsedSeconds, liveContext, task, taskNonce, totalSeconds]);
 
   function nextTask() {
     if (finished) return;
@@ -328,12 +350,12 @@ export function PracticeRunner({
   }
 
   function bumpSessionCounters(wasCorrect: boolean) {
-    const nextQuestionsAnswered = clampNumber(questionsAnsweredRef.current + 1, 0, MAX_LESSON_QUESTIONS);
+    const nextQuestionsAnswered = questionsAnsweredRef.current + 1;
     questionsAnsweredRef.current = nextQuestionsAnswered;
     setQuestionsAnswered(nextQuestionsAnswered);
 
     if (wasCorrect) {
-      const nextCorrectAnswers = clampNumber(correctAnswersRef.current + 1, 0, MAX_LESSON_QUESTIONS);
+      const nextCorrectAnswers = correctAnswersRef.current + 1;
       correctAnswersRef.current = nextCorrectAnswers;
       setCorrectAnswers(nextCorrectAnswers);
     }
@@ -356,6 +378,7 @@ export function PracticeRunner({
     setStatus("wrong");
     if (liveContext) {
       const questionNumber = questionsAnsweredRef.current + 1;
+      const progressMeta = buildProgressMeta(questionNumber);
       void trackLiveLearningEvent({
         eventType: "answer_incorrect",
         level: liveContext.level,
@@ -372,14 +395,14 @@ export function PracticeRunner({
         isCorrect: false,
         timeOnQuestion: Math.max(1, totalSeconds - secondsLeft - questionStartedAtElapsedRef.current),
         attemptNumber: 1,
-        progressPercent: Math.round((questionsAnsweredRef.current / MAX_LESSON_QUESTIONS) * 100),
-        progressLabel: `Question ${questionNumber} of ${MAX_LESSON_QUESTIONS}`,
+        progressPercent: progressMeta.progressPercent,
+        progressLabel: progressMeta.progressLabel,
         skillTag: task.kind,
       });
     }
     const nextQuestionsAnswered = bumpSessionCounters(false);
     clearPendingTimeout();
-    if (nextQuestionsAnswered >= MAX_LESSON_QUESTIONS) {
+    if (nextQuestionsAnswered >= questionLimit) {
       return;
     }
     timeoutRef.current = setTimeout(() => nextTask(), 1200);
@@ -400,6 +423,7 @@ export function PracticeRunner({
     setStatus("correct");
     if (liveContext) {
       const questionNumber = questionsAnsweredRef.current + 1;
+      const progressMeta = buildProgressMeta(questionNumber);
       void trackLiveLearningEvent({
         eventType: "answer_correct",
         level: liveContext.level,
@@ -416,14 +440,14 @@ export function PracticeRunner({
         isCorrect: true,
         timeOnQuestion: Math.max(1, totalSeconds - secondsLeft - questionStartedAtElapsedRef.current),
         attemptNumber: 1,
-        progressPercent: Math.round((questionsAnsweredRef.current / MAX_LESSON_QUESTIONS) * 100),
-        progressLabel: `Question ${questionNumber} of ${MAX_LESSON_QUESTIONS}`,
+        progressPercent: progressMeta.progressPercent,
+        progressLabel: progressMeta.progressLabel,
         skillTag: task.kind,
       });
     }
     const nextQuestionsAnswered = bumpSessionCounters(true);
     clearPendingTimeout();
-    if (nextQuestionsAnswered >= MAX_LESSON_QUESTIONS) {
+    if (nextQuestionsAnswered >= questionLimit) {
       return;
     }
     timeoutRef.current = setTimeout(() => nextTask(), 600);
@@ -477,7 +501,10 @@ export function PracticeRunner({
         : null;
 
   useEffect(() => {
-    if (questionsAnswered > MAX_LESSON_QUESTIONS || correctAnswers > MAX_LESSON_QUESTIONS) {
+    if (
+      completionMode === "question_or_time" &&
+      (questionsAnswered > MAX_LESSON_QUESTIONS || correctAnswers > MAX_LESSON_QUESTIONS)
+    ) {
       console.warn("[Level1LessonGuard] Session counters exceeded expected lesson limits.", {
         lessonTitle,
         questionsAnswered,
@@ -492,7 +519,7 @@ export function PracticeRunner({
         correctAnswers,
       });
     }
-  }, [correctAnswers, lessonTitle, questionsAnswered]);
+  }, [completionMode, correctAnswers, lessonTitle, questionsAnswered]);
 
   useEffect(() => {
     if (!finished || !liveContext) return;
@@ -504,9 +531,12 @@ export function PracticeRunner({
       lessonId: liveContext.lessonId,
       lessonTitle: liveContext.lessonTitle,
       progressPercent: 100,
-      progressLabel: `Completed ${safeQuestionsAnswered} of ${MAX_LESSON_QUESTIONS} questions`,
+      progressLabel:
+        completionMode === "time_only"
+          ? `Completed ${minutes}-minute Ground session`
+          : `Completed ${safeQuestionsAnswered} of ${MAX_LESSON_QUESTIONS} questions`,
     });
-  }, [finished, liveContext, safeQuestionsAnswered]);
+  }, [completionMode, finished, liveContext, minutes, safeQuestionsAnswered]);
 
   // ── Finished state ──
   if (finished) {
@@ -520,6 +550,7 @@ export function PracticeRunner({
         questionsAnswered={safeQuestionsAnswered}
         correctAnswers={safeCorrectAnswers}
         accuracy={accuracy}
+        xpCorrectAnswers={cappedCorrectAnswers}
         onExit={onComplete}
       />
     );
@@ -566,11 +597,12 @@ export function PracticeRunner({
           <LessonHUDRail
             lessonTitle={lessonTitle ?? null}
             correctAnswers={safeCorrectAnswers}
+            xpCorrectAnswers={cappedCorrectAnswers}
             questionsAnswered={safeQuestionsAnswered}
             accuracy={accuracy}
             secondsLeft={Math.max(0, secondsLeft)}
             totalSeconds={totalSeconds}
-            xpTarget={MAX_LESSON_QUESTIONS}
+            xpTarget={scoreCap}
             hint={hint}
           />
         </aside>

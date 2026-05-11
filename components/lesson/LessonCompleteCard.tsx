@@ -7,16 +7,18 @@ export function LessonCompleteCard({
   lessonTitle,
   questionsAnswered,
   correctAnswers,
+  xpCorrectAnswers,
   accuracy,
   onExit,
 }: {
   lessonTitle: string;
   questionsAnswered: number;
   correctAnswers: number;
+  xpCorrectAnswers?: number;
   accuracy: number;
   onExit: () => void;
 }) {
-  const xp = calcXP(correctAnswers);
+  const xp = calcXP(xpCorrectAnswers ?? correctAnswers);
 
   return (
     <div className="relative">

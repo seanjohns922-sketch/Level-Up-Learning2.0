@@ -620,6 +620,8 @@ function LessonPage() {
               key={`${year}-${week}-${effectiveLessonId}`}
               minutes={9}
               lessonTitle={safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
+              completionMode={isGroundWeek1Lesson1 ? "time_only" : "question_or_time"}
+              scoreCap={10}
               liveContext={liveLessonContext}
               renderCompletionCard={
                 isGroundWeek1Lesson1

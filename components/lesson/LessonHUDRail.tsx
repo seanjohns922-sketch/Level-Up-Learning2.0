@@ -20,6 +20,7 @@ export function LessonHUDRail({
   lessonTitle,
   targetLabel,
   correctAnswers,
+  xpCorrectAnswers,
   questionsAnswered,
   accuracy,
   secondsLeft,
@@ -33,6 +34,7 @@ export function LessonHUDRail({
   lessonTitle?: string | null;
   targetLabel?: string | null;
   correctAnswers: number;
+  xpCorrectAnswers?: number;
   questionsAnswered: number;
   accuracy: number;
   secondsLeft: number;
@@ -93,7 +95,7 @@ export function LessonHUDRail({
         {/* XP + Timer */}
         <div className="flex items-stretch gap-2 lg:flex-col lg:items-stretch">
           <div className="flex-1 min-w-0">
-            <LessonXPBar correct={correctAnswers} totalTarget={xpTarget} />
+            <LessonXPBar correct={xpCorrectAnswers ?? correctAnswers} totalTarget={xpTarget} />
           </div>
           <div className="flex-shrink-0 lg:self-end">
             <LessonTimer seconds={Math.max(0, secondsLeft)} total={totalSeconds} />
