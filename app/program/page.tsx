@@ -278,9 +278,9 @@ function ProgramPage() {
           }}
         />
         {isPrep && (
-          <div className="absolute bottom-0 right-2 sm:right-6 md:right-10 pointer-events-none select-none hidden sm:block">
+          <div className="absolute right-3 sm:right-6 md:right-10 top-[32%] pointer-events-none select-none hidden md:block">
             <div
-              className="absolute left-1/2 -translate-x-1/2 bottom-2 w-[20vh] md:w-[24vh] h-[5vh] md:h-[7vh] rounded-[50%]"
+              className="absolute left-1/2 -translate-x-1/2 -bottom-2 w-[18vh] h-[4vh] rounded-[50%]"
               style={{
                 background:
                   "radial-gradient(ellipse at center, rgba(94,234,212,0.55) 0%, rgba(45,212,191,0.25) 40%, transparent 75%)",
@@ -289,7 +289,7 @@ function ProgramPage() {
               }}
             />
             <div
-              className="absolute left-1/2 -translate-x-1/2 bottom-[10%] w-[30vh] md:w-[36vh] h-[30vh] md:h-[36vh] rounded-full"
+              className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-[34vh] h-[34vh] rounded-full"
               style={{
                 background:
                   "radial-gradient(circle at center, rgba(45,212,191,0.18) 0%, transparent 60%)",
@@ -300,7 +300,7 @@ function ProgramPage() {
             <img
               src="/images/numbot-bouncer-overlay.png"
               alt=""
-              className="relative h-[36vh] md:h-[46vh] w-auto"
+              className="relative h-[28vh] lg:h-[32vh] w-auto"
               style={{
                 filter:
                   "drop-shadow(0 18px 22px rgba(0,0,0,0.55)) drop-shadow(0 0 28px rgba(94,234,212,0.35))",
