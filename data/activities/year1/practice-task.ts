@@ -175,6 +175,37 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      kind: "groundCollect";
+      prompt: string;
+      speakText?: string;
+      targetNumber: number;
+      objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs";
+      totalObjects: number;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
+      kind: "groundBuild";
+      prompt: string;
+      speakText?: string;
+      targetNumber: number;
+      objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs";
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
+      kind: "groundFlash";
+      prompt: string;
+      speakText?: string;
+      targetNumber: number;
+      objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs";
+      revealMs?: number;
+      options: Array<{
+        id: string;
+        numeral: number;
+      }>;
+      correctOptionId: string;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       kind: "tensOnesMcq";
       prompt: string;
       min: number;

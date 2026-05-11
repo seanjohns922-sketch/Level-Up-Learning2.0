@@ -16,7 +16,7 @@ const OBJECT_META = {
 
 function GroundNumberCard({ value }: { value: number }) {
   return (
-    <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-[28px] border-2 border-cyan-300/70 bg-gradient-to-br from-cyan-100 via-white to-teal-100 text-6xl font-black text-teal-900 shadow-[0_0_24px_rgba(45,212,191,0.18)]">
+    <div className="mx-auto flex h-24 w-full max-w-[168px] items-center justify-center rounded-[24px] border-2 border-cyan-300/70 bg-gradient-to-br from-cyan-100 via-white to-teal-100 text-5xl font-black text-teal-900 shadow-[0_0_18px_rgba(45,212,191,0.18)] sm:h-28 sm:text-6xl">
       {value}
     </div>
   );
@@ -32,16 +32,17 @@ function GroundQuantityCard({
   compact?: boolean;
 }) {
   const meta = OBJECT_META[objectType ?? "dots"];
-  const baseSize = compact ? "text-2xl" : "text-4xl";
-  const minHeight = compact ? "min-h-[72px]" : "min-h-[112px]";
+  const baseSize = compact ? "text-xl sm:text-2xl" : "text-2xl sm:text-3xl";
+  const bubbleSize = compact ? "h-8 w-8 sm:h-9 sm:w-9" : "h-9 w-9 sm:h-10 sm:w-10";
+  const minHeight = compact ? "min-h-[64px]" : "min-h-[92px] sm:min-h-[104px]";
 
   return (
-    <div className={`rounded-[24px] border-2 border-cyan-200 bg-white/95 px-4 py-4 shadow-[0_0_18px_rgba(45,212,191,0.12)] ${minHeight}`}>
-      <div className="flex flex-wrap justify-center gap-3">
+    <div className={`rounded-[20px] border-2 border-cyan-200 bg-white/95 px-3 py-3 shadow-[0_0_14px_rgba(45,212,191,0.12)] ${minHeight}`}>
+      <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
         {Array.from({ length: quantity }).map((_, index) => (
           <span
             key={`${meta.label}-${index}`}
-            className={`${baseSize} inline-flex h-10 w-10 items-center justify-center rounded-full bg-cyan-50 text-teal-700 shadow-sm`}
+            className={`${baseSize} ${bubbleSize} inline-flex items-center justify-center rounded-full bg-cyan-50 text-teal-700 shadow-sm`}
           >
             {meta.emoji}
           </span>
@@ -61,8 +62,8 @@ function GroundPairCard({
   objectType?: GroundMatchTask["objectType"];
 }) {
   return (
-    <div className="flex items-center justify-center gap-4 rounded-[24px] border-2 border-cyan-200 bg-white/95 px-4 py-4">
-      <div className="flex h-16 w-16 items-center justify-center rounded-[20px] bg-gradient-to-br from-cyan-100 to-teal-100 text-4xl font-black text-teal-900">
+    <div className="flex items-center justify-center gap-3 rounded-[20px] border-2 border-cyan-200 bg-white/95 px-3 py-3">
+      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[18px] bg-gradient-to-br from-cyan-100 to-teal-100 text-3xl font-black text-teal-900 sm:h-16 sm:w-16 sm:text-4xl">
         {numeral}
       </div>
       <GroundQuantityCard quantity={quantity} objectType={objectType} compact />
@@ -71,11 +72,9 @@ function GroundPairCard({
 }
 
 function GroundOptionButton({
-  selected,
   onClick,
   children,
 }: {
-  selected?: boolean;
   onClick: () => void;
   children: React.ReactNode;
 }) {
@@ -83,11 +82,7 @@ function GroundOptionButton({
     <button
       type="button"
       onClick={onClick}
-      className={`w-full rounded-[28px] border-2 px-4 py-4 text-left transition hover:-translate-y-0.5 active:scale-[0.98] ${
-        selected
-          ? "border-cyan-400 bg-cyan-50 shadow-[0_0_18px_rgba(34,211,238,0.22)]"
-          : "border-cyan-200 bg-white shadow-sm hover:border-cyan-300"
-      }`}
+      className="flex min-h-[132px] w-full items-center justify-center rounded-[24px] border-2 border-cyan-200 bg-white px-3 py-3 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-[0_0_18px_rgba(34,211,238,0.14)] active:scale-[0.98] sm:min-h-[148px] sm:px-4 sm:py-4"
     >
       {children}
     </button>
@@ -97,9 +92,6 @@ function GroundOptionButton({
 function renderQuestionVisual(task: GroundMatchTask) {
   if (task.promptType === "group_to_numeral" && task.shownQuantity) {
     return <GroundQuantityCard quantity={task.shownQuantity} objectType={task.objectType} />;
-  }
-  if (task.shownNumeral) {
-    return <GroundNumberCard value={task.shownNumeral} />;
   }
   return null;
 }
@@ -143,17 +135,17 @@ export default function GroundMatchTaskCard({
           Ground Explorer
         </div>
         <div className="flex items-start gap-3">
-          <div className="flex-1 text-3xl font-black leading-tight text-slate-900">
+          <div className="flex-1 text-2xl font-black leading-tight text-slate-900 sm:text-3xl">
             {task.prompt}
           </div>
           <ReadAloudBtn text={task.speakText ?? task.prompt} size="md" className="shrink-0" />
         </div>
         {renderQuestionVisual(task) ? (
-          <div className="mt-5 flex justify-center">{renderQuestionVisual(task)}</div>
+          <div className="mt-4 flex justify-center">{renderQuestionVisual(task)}</div>
         ) : null}
       </div>
 
-      <div className="grid gap-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
         {task.options.map((option) => (
           <GroundOptionButton
             key={option.id}

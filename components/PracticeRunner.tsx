@@ -27,6 +27,9 @@ function clampNumber(value: number, min: number, max: number) {
 
 function formatPracticeTopicLabel(kind: PracticeTask["kind"]) {
   if (kind === "groundMatch") return "Ground Match";
+  if (kind === "groundCollect") return "Ground Collect";
+  if (kind === "groundBuild") return "Ground Build";
+  if (kind === "groundFlash") return "Ground Flash";
   if (kind === "mcq") return "Multiple Choice";
   if (kind === "count") return "Number Input";
   if (kind === "order3") return "Ordering";
@@ -57,6 +60,9 @@ function getPracticeTaskCorrectAnswer(task: PracticeTask) {
   if (task.kind === "numberHunt") return String(task.targetNumber);
   if (task.kind === "groupCountVisual") return String(task.answer);
   if (task.kind === "groundMatch") return String(task.targetNumber);
+  if (task.kind === "groundCollect") return String(task.targetNumber);
+  if (task.kind === "groundBuild") return String(task.targetNumber);
+  if (task.kind === "groundFlash") return String(task.targetNumber);
   return null;
 }
 
@@ -68,7 +74,10 @@ type LiveLessonContext = {
   lessonTitle: string;
 };
 
-type GroundMatchTask = Extract<PracticeTask, { kind: "groundMatch" }>;
+type GroundFeedbackTask = Extract<
+  PracticeTask,
+  { feedback?: { correct: string; wrong: string } }
+>;
 
 function Dots({ count }: { count: number }) {
   return (
@@ -445,11 +454,16 @@ export function PracticeRunner({
 
   const isBuiltinKind = ["mcq", "count", "order3", "audioPick", "numberHunt", "groupCountVisual"].includes(task.kind);
 
+  const hasGroundFeedback =
+    task.kind === "groundMatch" ||
+    task.kind === "groundCollect" ||
+    task.kind === "groundBuild" ||
+    task.kind === "groundFlash";
   const hint =
-    task.kind === "groundMatch"
+    hasGroundFeedback
       ? status === "wrong"
-        ? ((task as GroundMatchTask).feedback?.wrong ?? null)
-        : ((task as GroundMatchTask).feedback?.correct ?? null)
+        ? ((task as GroundFeedbackTask).feedback?.wrong ?? null)
+        : ((task as GroundFeedbackTask).feedback?.correct ?? null)
       : task.kind === "mcq"
         ? status === "wrong"
           ? ((task as McqTask).feedback?.wrong ?? null)
