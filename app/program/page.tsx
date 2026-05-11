@@ -277,6 +277,39 @@ function ProgramPage() {
               "radial-gradient(circle at top, rgba(255,255,255,0.10), transparent 60%)",
           }}
         />
+        {isPrep && (
+          <div className="absolute bottom-0 right-2 sm:right-6 md:right-10 pointer-events-none select-none hidden sm:block">
+            <div
+              className="absolute left-1/2 -translate-x-1/2 bottom-2 w-[20vh] md:w-[24vh] h-[5vh] md:h-[7vh] rounded-[50%]"
+              style={{
+                background:
+                  "radial-gradient(ellipse at center, rgba(94,234,212,0.55) 0%, rgba(45,212,191,0.25) 40%, transparent 75%)",
+                filter: "blur(8px)",
+                animation: "nb-pulse 3.4s ease-in-out infinite",
+              }}
+            />
+            <div
+              className="absolute left-1/2 -translate-x-1/2 bottom-[10%] w-[30vh] md:w-[36vh] h-[30vh] md:h-[36vh] rounded-full"
+              style={{
+                background:
+                  "radial-gradient(circle at center, rgba(45,212,191,0.18) 0%, transparent 60%)",
+                filter: "blur(20px)",
+              }}
+            />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/numbot-bouncer-overlay.png"
+              alt=""
+              className="relative h-[36vh] md:h-[46vh] w-auto"
+              style={{
+                filter:
+                  "drop-shadow(0 18px 22px rgba(0,0,0,0.55)) drop-shadow(0 0 28px rgba(94,234,212,0.35))",
+                animation: "nb-float 5.2s ease-in-out infinite",
+                transform: "scaleX(-1)",
+              }}
+            />
+          </div>
+        )}
       </div>
 
       {/* ── Hero header ── */}
