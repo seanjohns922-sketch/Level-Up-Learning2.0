@@ -136,6 +136,15 @@ export default function StudentHomePage() {
             }}
           />
         )}
+        {isPrep && (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            src="/images/numbot-bouncer-overlay.png"
+            alt=""
+            className="absolute bottom-0 left-4 md:left-10 h-[42vh] md:h-[55vh] w-auto pointer-events-none select-none"
+            style={{ filter: "drop-shadow(0 10px 30px rgba(0,0,0,0.5)) drop-shadow(0 0 24px rgba(94,234,212,0.35))" }}
+          />
+        )}
       </div>
 
 
