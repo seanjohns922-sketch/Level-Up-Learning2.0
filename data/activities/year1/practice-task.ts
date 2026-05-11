@@ -153,6 +153,28 @@ export type PracticeTask = (
       missing: number[];
     }
   | {
+      kind: "groundMatch";
+      prompt: string;
+      speakText?: string;
+      targetNumber: number;
+      visualType: "ground-number-card" | "ground-quantity-card" | "ground-flash-match-card";
+      promptType: "number_to_numeral" | "numeral_to_group" | "group_to_numeral" | "number_to_objects" | "match_pair";
+      objectType?: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs";
+      shownNumeral?: number;
+      shownQuantity?: number;
+      options: Array<{
+        id: string;
+        kind: "numeral" | "quantity" | "pair";
+        numeral?: number;
+        quantity?: number;
+        objectType?: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs";
+        pairNumeral?: number;
+        pairQuantity?: number;
+      }>;
+      correctOptionId: string;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       kind: "tensOnesMcq";
       prompt: string;
       min: number;

@@ -26,6 +26,7 @@ function clampNumber(value: number, min: number, max: number) {
 }
 
 function formatPracticeTopicLabel(kind: PracticeTask["kind"]) {
+  if (kind === "groundMatch") return "Ground Match";
   if (kind === "mcq") return "Multiple Choice";
   if (kind === "count") return "Number Input";
   if (kind === "order3") return "Ordering";
@@ -39,6 +40,13 @@ function getPracticeTaskPrompt(task: PracticeTask) {
   return "prompt" in task && typeof task.prompt === "string" ? task.prompt : "";
 }
 
+function getPracticeTaskSpeechText(task: PracticeTask) {
+  if ("speakText" in task && typeof task.speakText === "string" && task.speakText.trim()) {
+    return task.speakText;
+  }
+  return getPracticeTaskPrompt(task);
+}
+
 function getPracticeTaskCorrectAnswer(task: PracticeTask) {
   if (task.kind === "mcq") return task.answer ?? null;
   if (task.kind === "count") return String(task.count);
@@ -48,6 +56,7 @@ function getPracticeTaskCorrectAnswer(task: PracticeTask) {
   if (task.kind === "audioPick") return String(task.targetNumber);
   if (task.kind === "numberHunt") return String(task.targetNumber);
   if (task.kind === "groupCountVisual") return String(task.answer);
+  if (task.kind === "groundMatch") return String(task.targetNumber);
   return null;
 }
 
@@ -58,6 +67,8 @@ type LiveLessonContext = {
   lessonId: string;
   lessonTitle: string;
 };
+
+type GroundMatchTask = Extract<PracticeTask, { kind: "groundMatch" }>;
 
 function Dots({ count }: { count: number }) {
   return (
@@ -131,7 +142,7 @@ export function PracticeRunner({
   const finished = secondsLeft <= 0 || questionsAnswered >= MAX_LESSON_QUESTIONS;
   const { autoReadEnabled } = useAutoReadSetting();
   const lastAutoReadTaskKeyRef = useRef<string | null>(null);
-  const autoReadPrompt = "prompt" in task && typeof task.prompt === "string" ? task.prompt : "";
+  const autoReadPrompt = getPracticeTaskSpeechText(task);
 
   const safeQuestionsAnswered = clampNumber(questionsAnswered, 0, MAX_LESSON_QUESTIONS);
   const safeCorrectAnswers = clampNumber(correctAnswers, 0, Math.min(MAX_LESSON_QUESTIONS, safeQuestionsAnswered));
@@ -434,7 +445,22 @@ export function PracticeRunner({
 
   const isBuiltinKind = ["mcq", "count", "order3", "audioPick", "numberHunt", "groupCountVisual"].includes(task.kind);
 
-  const hint = null;
+  const hint =
+    task.kind === "groundMatch"
+      ? status === "wrong"
+        ? ((task as GroundMatchTask).feedback?.wrong ?? null)
+        : ((task as GroundMatchTask).feedback?.correct ?? null)
+      : task.kind === "mcq"
+        ? status === "wrong"
+          ? ((task as McqTask).feedback?.wrong ?? null)
+          : ((task as McqTask).feedback?.correct ?? null)
+        : null;
+  const statusMessage =
+    status === "correct"
+      ? hint ?? "✓ Correct! +10 XP"
+      : status === "wrong"
+        ? hint ?? "✗ Not quite — keep going!"
+        : null;
 
   useEffect(() => {
     if (questionsAnswered > MAX_LESSON_QUESTIONS || correctAnswers > MAX_LESSON_QUESTIONS) {
@@ -545,7 +571,7 @@ export function PracticeRunner({
                   : "bg-red-50 text-red-700 border border-red-200"
               }`}
             >
-              {status === "correct" ? "✓ Correct! +10 XP" : "✗ Not quite — keep going!"}
+              {statusMessage}
             </div>
           )}
 

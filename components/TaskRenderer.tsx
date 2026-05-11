@@ -78,6 +78,7 @@ import MixedReviewSprint from "@/components/week12/MixedReviewSprint";
 import StrategyChoice from "@/components/week12/StrategyChoice";
 import TargetedRevision from "@/components/week12/TargetedRevision";
 import FunGames from "@/components/week12/FunGames";
+import GroundMatchTaskCard from "@/components/ground/GroundMatchTaskCard";
 
 type Callbacks = {
   markCorrect: () => void;
@@ -261,6 +262,8 @@ function TaskRendererInner({
       return <TargetedRevision key={k} onCorrect={onC} onWrong={onW} />;
     case "funGames":
       return <FunGames key={k} onCorrect={onC} onWrong={onW} />;
+    case "groundMatch":
+      return <GroundMatchTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     default:
       return null;
   }

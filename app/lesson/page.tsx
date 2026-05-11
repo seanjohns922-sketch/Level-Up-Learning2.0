@@ -22,6 +22,7 @@ import { resetWeek1TaskSessionState } from "@/data/activities/year1/week1";
 import { resetWeek2TaskSessionState } from "@/data/activities/year1/week2";
 import { resetWeek3TaskSessionState } from "@/data/activities/year1/week3";
 import { resetWeek4TaskSessionState } from "@/data/activities/year1/week4";
+import { generatePrepWeek1Task, resetPrepWeek1TaskSessionState } from "@/data/activities/prep/week1";
 import { getProgramForYear } from "@/data/programs";
 import { ACTIVE_STUDENT_KEY, readProgress, updateProgress } from "@/data/progress";
 import { trackLiveLearningEvent } from "@/lib/live-class-client";
@@ -69,6 +70,7 @@ function LessonPage() {
   const safeLessonFocus = lessonMeta?.focus ?? null;
   const hasEmbeddedLessonVideo =
     year === "Year 4" && week === 2 && lessonNumber === 1;
+  const isGroundWeek1Lesson1 = year === "Prep" && effectiveLessonId === "y0-w1-l1";
 
   useEffect(() => {
     const p = readProgress();
@@ -103,7 +105,10 @@ function LessonPage() {
     if (year === "Year 1") {
       resetYear1SessionTaskState();
     }
-  }, [effectiveLessonId, week, year]);
+    if (isGroundWeek1Lesson1) {
+      resetPrepSessionTaskState();
+    }
+  }, [effectiveLessonId, isGroundWeek1Lesson1, week, year]);
 
   function completeLesson() {
     markLessonComplete(year, week, lessonNumber);
@@ -246,6 +251,48 @@ function LessonPage() {
     );
   }
 
+  function renderPrepCompletionCard(summary: LessonPerformanceSummary) {
+    return (
+      <div className="rounded-[28px] border border-cyan-200 bg-gradient-to-br from-cyan-50 via-white to-teal-50 p-6 shadow-[0_12px_30px_rgba(13,148,136,0.08)]">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-cyan-200 to-teal-300 text-3xl shadow-[0_0_20px_rgba(45,212,191,0.25)]">
+          ☆
+        </div>
+        <div className="text-center">
+          <div className="inline-flex items-center rounded-full bg-teal-100 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-teal-800">
+            Numbot Bouncer
+          </div>
+          <h2 className="mt-3 text-3xl font-black text-slate-900">You recognised numbers 1 to 5!</h2>
+          <p className="mt-2 text-lg font-semibold text-teal-800">Lesson 2 unlocked.</p>
+          <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-center">
+            <div className="text-[11px] font-black uppercase tracking-[0.18em] text-amber-700">XP Reward</div>
+            <div className="mt-1 text-3xl font-black text-amber-900">10 XP</div>
+          </div>
+          <div className="mt-5 grid grid-cols-3 gap-3 text-center">
+            <div className="rounded-2xl border border-cyan-100 bg-white px-3 py-3">
+              <div className="text-2xl font-black text-slate-900">{summary.questionsAnswered}</div>
+              <div className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">Questions</div>
+            </div>
+            <div className="rounded-2xl border border-cyan-100 bg-white px-3 py-3">
+              <div className="text-2xl font-black text-slate-900">{summary.correctAnswers}</div>
+              <div className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">Correct</div>
+            </div>
+            <div className="rounded-2xl border border-cyan-100 bg-white px-3 py-3">
+              <div className="text-2xl font-black text-slate-900">{summary.accuracy}%</div>
+              <div className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">Accuracy</div>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={completeLesson}
+            className="mt-6 w-full rounded-[22px] bg-gradient-to-r from-teal-600 to-cyan-500 px-6 py-4 text-lg font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.22)] transition hover:brightness-110"
+          >
+            Back to Week →
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <main className="min-h-screen flex items-start justify-center px-4 py-6 bg-background">
       <div className="w-full max-w-6xl">
@@ -312,7 +359,9 @@ function LessonPage() {
                     </p>
                   ) : null}
                   <p className="relative mt-2.5 text-sm font-normal text-muted-foreground leading-relaxed">
-                    Watch the short lesson video, then jump into 9 minutes of practice. Earn XP for every correct answer and unlock your Level Up Legend.
+                    {year === "Prep"
+                      ? "Meet the Ground Explorer, watch the short example, then jump into 9 minutes of easy number practice."
+                      : "Watch the short lesson video, then jump into 9 minutes of practice. Earn XP for every correct answer and unlock your Level Up Legend."}
                   </p>
                 </div>
 
@@ -515,6 +564,9 @@ function LessonPage() {
                       if (year === "Year 1") {
                         resetYear1SessionTaskState();
                       }
+                      if (isGroundWeek1Lesson1) {
+                        resetPrepSessionTaskState();
+                      }
                       setStartedLessonId(effectiveLessonId);
                     }}
                     className="relative inline-flex items-center justify-center gap-2 text-white font-bold tracking-tight px-7 py-3 text-sm md:text-base overflow-hidden hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200"
@@ -551,7 +603,7 @@ function LessonPage() {
               </div>
             </div>
           </div>
-        ) : year === "Year 1" ? (
+        ) : year === "Year 1" || isGroundWeek1Lesson1 ? (
           <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
             <LessonPageHero
                     levelNumber={levelNumber}
@@ -570,7 +622,9 @@ function LessonPage() {
               lessonTitle={safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
               liveContext={liveLessonContext}
               renderCompletionCard={
-                showWeek12Lesson3Summary
+                isGroundWeek1Lesson1
+                  ? renderPrepCompletionCard
+                  : showWeek12Lesson3Summary
                   ? (summary: LessonPerformanceSummary) => (
                       <PerformanceSummaryCard
                         summary={summary}
@@ -582,6 +636,9 @@ function LessonPage() {
               }
               getTask={(ctx) => {
                 const d = ctx?.difficulty ?? "easy";
+                if (isGroundWeek1Lesson1) {
+                  return generatePrepWeek1Task(effectiveLessonId, d);
+                }
                 if (effectiveLessonId.startsWith("y1-w2-")) {
                   return generateWeek2Task(effectiveLessonId, d);
                 }
@@ -678,4 +735,8 @@ function LessonPage() {
     resetWeek2TaskSessionState();
     resetWeek3TaskSessionState();
     resetWeek4TaskSessionState();
+  }
+
+  function resetPrepSessionTaskState() {
+    resetPrepWeek1TaskSessionState();
   }
