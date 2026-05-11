@@ -137,13 +137,39 @@ export default function StudentHomePage() {
           />
         )}
         {isPrep && (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img
-            src="/images/numbot-bouncer-overlay.png"
-            alt=""
-            className="absolute bottom-0 left-4 md:left-10 h-[42vh] md:h-[55vh] w-auto pointer-events-none select-none"
-            style={{ filter: "drop-shadow(0 10px 30px rgba(0,0,0,0.5)) drop-shadow(0 0 24px rgba(94,234,212,0.35))" }}
-          />
+          <div className="absolute bottom-0 left-2 sm:left-6 md:left-10 pointer-events-none select-none hidden sm:block">
+            {/* Ground glow / floor reflection pad */}
+            <div
+              className="absolute left-1/2 -translate-x-1/2 bottom-2 w-[22vh] md:w-[28vh] h-[6vh] md:h-[8vh] rounded-[50%]"
+              style={{
+                background:
+                  "radial-gradient(ellipse at center, rgba(94,234,212,0.55) 0%, rgba(45,212,191,0.25) 40%, transparent 75%)",
+                filter: "blur(8px)",
+                animation: "nb-pulse 3.4s ease-in-out infinite",
+              }}
+            />
+            {/* Faint atmospheric haze behind robot */}
+            <div
+              className="absolute left-1/2 -translate-x-1/2 bottom-[10%] w-[34vh] md:w-[42vh] h-[34vh] md:h-[42vh] rounded-full"
+              style={{
+                background:
+                  "radial-gradient(circle at center, rgba(45,212,191,0.18) 0%, transparent 60%)",
+                filter: "blur(20px)",
+              }}
+            />
+            {/* Robot */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/numbot-bouncer-overlay.png"
+              alt=""
+              className="relative h-[42vh] md:h-[55vh] w-auto"
+              style={{
+                filter:
+                  "drop-shadow(0 18px 22px rgba(0,0,0,0.55)) drop-shadow(0 0 28px rgba(94,234,212,0.35)) drop-shadow(0 -2px 0 rgba(94,234,212,0.18))",
+                animation: "nb-float 5.2s ease-in-out infinite",
+              }}
+            />
+          </div>
         )}
       </div>
 
