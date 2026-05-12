@@ -110,9 +110,9 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
       buildLesson(
         3,
         3,
-        "Match Number Names to Numerals",
-        "Match number words, numerals, and quantities while sequencing.",
-        ["Hear the number", "Drag to match", "Sequence builder"],
+        "Number Match Mission",
+        "Connect spoken number names, numerals, quantities, and counting order to 10.",
+        ["Listen and tap", "Match the group", "Sequence builder"],
         ["AC9MFN01", "AC9MFN03"]
       ),
     ],
