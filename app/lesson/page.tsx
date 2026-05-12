@@ -723,7 +723,10 @@ function LessonPage() {
               getTask={(ctx) => {
                 const d = ctx?.difficulty ?? "easy";
                 if (isGroundCustomLesson) {
-                  if (effectiveLessonId === "y0-w2-l1") {
+                  if (
+                    effectiveLessonId === "y0-w2-l1" ||
+                    effectiveLessonId === "y0-w2-l2"
+                  ) {
                     return generatePrepWeek2Task(effectiveLessonId, d);
                   }
                   return generatePrepWeek1Task(effectiveLessonId, d);
