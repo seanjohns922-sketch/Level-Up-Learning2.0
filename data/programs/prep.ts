@@ -70,7 +70,7 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
       buildLesson(
         2,
         2,
-        "Count Collections to 10",
+        "Count the Groups",
         "Count collections to 10 accurately and trust the count.",
         ["Count objects", "One-to-one counting", "Trust the count"],
         ["AC9MFN01", "AC9MFN03"]

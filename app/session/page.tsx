@@ -1258,7 +1258,7 @@ function buildLessonBucketQuizQuestions(
 }
 
 type GroundWord = NonNullable<Extract<PracticeTask, { kind: "groundMatch" }>["targetNumberName"]>;
-type GroundObjectType = NonNullable<Extract<PracticeTask, { kind: "groundMatch" }>["objectType"]>;
+type GroundObjectType = Extract<PracticeTask, { kind: "groundTapCount" }>["objectType"];
 type GroundMatchOption = Extract<PracticeTask, { kind: "groundMatch" }>["options"][number];
 type GroundQuizPracticeTask = Extract<
   PracticeTask,
@@ -1284,6 +1284,9 @@ const GROUND_OBJECT_TYPES: GroundObjectType[] = [
   "blocks",
   "robot_tokens",
   "energy_orbs",
+  "crystals",
+  "bolts",
+  "futuristic_coins",
 ];
 
 const GROUND_OBJECT_LABELS: Record<GroundObjectType, string> = {
@@ -1293,6 +1296,9 @@ const GROUND_OBJECT_LABELS: Record<GroundObjectType, string> = {
   blocks: "blocks",
   robot_tokens: "robot tokens",
   energy_orbs: "energy orbs",
+  crystals: "crystals",
+  bolts: "bolts",
+  futuristic_coins: "coins",
 };
 
 function numberToGroundWord(value: number): GroundWord {

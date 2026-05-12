@@ -12,6 +12,9 @@ const OBJECT_META = {
   blocks: { label: "blocks", emoji: "■" },
   robot_tokens: { label: "robot tokens", emoji: "⬢" },
   energy_orbs: { label: "energy orbs", emoji: "⬤" },
+  crystals: { label: "crystals", emoji: "✦" },
+  bolts: { label: "bolts", emoji: "⚡" },
+  futuristic_coins: { label: "coins", emoji: "◉" },
 } as const;
 
 function GroundNumberCard({ value }: { value: number }) {

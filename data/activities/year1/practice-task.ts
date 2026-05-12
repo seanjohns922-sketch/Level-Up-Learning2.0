@@ -170,7 +170,7 @@ export type PracticeTask = (
         | "word_to_numeral"
         | "word_pair_match";
       helperVariant?: "numbot" | "speech_bubble" | "memory";
-      objectType?: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs";
+      objectType?: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins";
       shownNumeral?: number;
       shownQuantity?: number;
       shownWord?: "one" | "two" | "three" | "four" | "five";
@@ -181,7 +181,7 @@ export type PracticeTask = (
         numeral?: number;
         word?: "one" | "two" | "three" | "four" | "five";
         quantity?: number;
-        objectType?: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs";
+        objectType?: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins";
         pairNumeral?: number;
         pairQuantity?: number;
         pairWord?: "one" | "two" | "three" | "four" | "five";
@@ -194,7 +194,7 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       targetNumber: number;
-      objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs";
+      objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins";
       totalObjects: number;
       feedback?: { correct: string; wrong: string };
     }
@@ -203,7 +203,7 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       targetNumber: number;
-      objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs";
+      objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins";
       feedback?: { correct: string; wrong: string };
     }
   | {
@@ -211,7 +211,7 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       targetNumber: number;
-      objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs";
+      objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins";
       revealType?: "objects" | "numeral";
       revealMs?: number;
       options: Array<{
@@ -251,7 +251,7 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       targetNumber: number;
-      objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs";
+      objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins";
       options: Array<{
         id: string;
         numeral: number;
@@ -264,7 +264,7 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       targetNumber: number;
-      objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs";
+      objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins";
       options: Array<{
         id: string;
         numeral: number;

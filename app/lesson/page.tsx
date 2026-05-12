@@ -78,7 +78,8 @@ function LessonPage() {
       effectiveLessonId === "y0-w1-l1" ||
       effectiveLessonId === "y0-w1-l2" ||
       effectiveLessonId === "y0-w1-l3" ||
-      effectiveLessonId === "y0-w2-l1"
+      effectiveLessonId === "y0-w2-l1" ||
+      effectiveLessonId === "y0-w2-l2"
     );
 
   useEffect(() => {
@@ -279,6 +280,8 @@ function LessonPage() {
         ? "You matched number names and numerals!"
         : effectiveLessonId === "y0-w2-l1"
           ? "You found numbers 6 to 10!"
+          : effectiveLessonId === "y0-w2-l2"
+            ? "You counted groups to 10!"
         : effectiveLessonId === "y0-w1-l2"
           ? "You counted collections to 5!"
           : "You recognised numbers 1 to 5!";

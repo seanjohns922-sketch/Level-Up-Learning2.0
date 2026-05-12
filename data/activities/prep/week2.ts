@@ -1,11 +1,22 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
 
-type GroundObjectType = "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs";
+type GroundObjectType =
+  | "dots"
+  | "gems"
+  | "stars"
+  | "blocks"
+  | "robot_tokens"
+  | "energy_orbs"
+  | "crystals"
+  | "bolts"
+  | "futuristic_coins";
 type GroundMatchTask = Extract<PracticeTask, { kind: "groundMatch" }>;
 type GroundFlashTask = Extract<PracticeTask, { kind: "groundFlash" }>;
 type GroundHuntTask = Extract<PracticeTask, { kind: "groundHunt" }>;
 type GroundSequenceTask = Extract<PracticeTask, { kind: "groundSequence" }>;
 type GroundTapCountTask = Extract<PracticeTask, { kind: "groundTapCount" }>;
+type GroundFeedTask = Extract<PracticeTask, { kind: "groundFeed" }>;
+type GroundBuildTask = Extract<PracticeTask, { kind: "groundBuild" }>;
 
 const TARGETS = [6, 7, 8, 9, 10] as const;
 const OBJECT_TYPES: GroundObjectType[] = [
@@ -15,6 +26,9 @@ const OBJECT_TYPES: GroundObjectType[] = [
   "blocks",
   "robot_tokens",
   "energy_orbs",
+  "crystals",
+  "bolts",
+  "futuristic_coins",
 ];
 
 type Week2Memory = {
@@ -83,7 +97,16 @@ function objectLabel(objectType: GroundObjectType) {
   if (objectType === "blocks") return "blocks";
   if (objectType === "robot_tokens") return "robot tokens";
   if (objectType === "energy_orbs") return "energy cells";
+  if (objectType === "crystals") return "crystals";
+  if (objectType === "bolts") return "bolts";
+  if (objectType === "futuristic_coins") return "coins";
   return "dots";
+}
+
+function collectLabel(objectType: GroundObjectType) {
+  if (objectType === "energy_orbs") return "energy cells";
+  if (objectType === "robot_tokens") return "robot tokens";
+  return objectLabel(objectType);
 }
 
 function chooseRecentSafe<T>(pool: readonly T[] | T[], recent: T[]) {
@@ -289,6 +312,50 @@ function createMatchQuantityTask(lessonId: string): GroundMatchTask {
   };
 }
 
+function createWhichGroupHasTask(lessonId: string): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory);
+  const correctObjectType = pickObject(memory);
+  const distractorObjects = shuffle(OBJECT_TYPES.filter((value) => value !== correctObjectType)).slice(0, 2);
+  const correctPosition = chooseAnswerPosition(memory, 3);
+  const quantities = shuffle(TARGETS.filter((value) => value !== target)).slice(0, 2);
+  const values = Array.from({ length: 3 }, (_, index) => {
+    if (index === correctPosition) {
+      return {
+        id: `group-${target}-${index}`,
+        kind: "quantity" as const,
+        quantity: target,
+        objectType: correctObjectType,
+      };
+    }
+    const distractorIndex = index > correctPosition ? index - 1 : index;
+    return {
+      id: `group-${target}-${index}-${quantities[distractorIndex]}`,
+      kind: "quantity" as const,
+      quantity: quantities[distractorIndex]!,
+      objectType: distractorObjects[distractorIndex]!,
+    };
+  });
+  pushRecent(memory.recentKinds, "which_group_has", 4);
+  memory.taskCounter += 1;
+
+  return {
+    kind: "groundMatch",
+    prompt: `Which group has ${target}?`,
+    speakText: `Which group has ${numberWord(target)}?`,
+    targetNumber: target,
+    visualType: "ground-quantity-card",
+    promptType: "numeral_to_group",
+    shownNumeral: target,
+    options: values,
+    correctOptionId: values[correctPosition]!.id,
+    feedback: {
+      correct: "Great spotting!",
+      wrong: "Count the groups carefully.",
+    },
+  };
+}
+
 function createWhichNumberTask(lessonId: string): GroundFlashTask {
   const memory = getMemory(lessonId);
   const target = pickTarget(memory);
@@ -386,6 +453,150 @@ function createCountAndMatchTask(lessonId: string): GroundTapCountTask {
   };
 }
 
+function createHowManyTask(lessonId: string): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory);
+  const objectType = pickObject(memory);
+  const options = buildNumeralChoiceOptions(target, memory, 3);
+  pushRecent(memory.recentKinds, "how_many", 4);
+  memory.taskCounter += 1;
+
+  return {
+    kind: "groundMatch",
+    prompt: `How many ${objectLabel(objectType)}?`,
+    speakText: `How many ${objectLabel(objectType)} are there?`,
+    targetNumber: target,
+    visualType: "ground-quantity-card",
+    promptType: "group_to_numeral",
+    objectType,
+    shownQuantity: target,
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: {
+      correct: `Yes — there are ${target}.`,
+      wrong: "Count each object once.",
+    },
+  };
+}
+
+function createQuickCountTask(lessonId: string): GroundFlashTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory);
+  const objectType = pickObject(memory);
+  const options = buildNumeralTapOptions(target, memory, 3);
+  pushRecent(memory.recentKinds, "quick_count", 4);
+  memory.taskCounter += 1;
+
+  return {
+    kind: "groundFlash",
+    prompt: "How many before it disappears?",
+    speakText: "How many before it disappears?",
+    targetNumber: target,
+    objectType,
+    revealType: "objects",
+    revealMs: 1100,
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: {
+      correct: "Quick counting!",
+      wrong: "Try the quick count again.",
+    },
+  };
+}
+
+function createFindMatchingNumberTask(lessonId: string): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory);
+  const objectType = pickObject(memory);
+  const options = buildNumeralChoiceOptions(target, memory, 4);
+  pushRecent(memory.recentKinds, "find_matching_number", 4);
+  memory.taskCounter += 1;
+
+  return {
+    kind: "groundMatch",
+    prompt: "Find the matching number.",
+    speakText: "Find the matching number.",
+    targetNumber: target,
+    visualType: "ground-quantity-card",
+    promptType: "group_to_numeral",
+    objectType,
+    shownQuantity: target,
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: {
+      correct: "Nice matching!",
+      wrong: "Count and match again.",
+    },
+  };
+}
+
+function createNumbotCountTask(lessonId: string): GroundFeedTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory);
+  const objectType = randInt(0, 1) === 0 ? "energy_orbs" : "robot_tokens";
+  const totalObjects = randInt(0, 1) === 0 ? target : 10;
+  pushRecent(memory.recentKinds, "numbot_count", 4);
+  memory.taskCounter += 1;
+
+  return {
+    kind: "groundFeed",
+    prompt: `Feed Numbot ${target} ${collectLabel(objectType)}.`,
+    speakText: `Feed Numbot ${numberWord(target)} ${collectLabel(objectType)}.`,
+    targetNumber: target,
+    objectType,
+    totalObjects,
+    feedback: {
+      correct: "Numbot counted them!",
+      wrong: "Count carefully for Numbot.",
+    },
+  };
+}
+
+function createCountAndBuildTask(lessonId: string): GroundBuildTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory);
+  const objectType = pickObject(memory);
+  pushRecent(memory.recentKinds, "count_build", 4);
+  memory.taskCounter += 1;
+
+  return {
+    kind: "groundBuild",
+    prompt: `Build ${target}.`,
+    speakText: `Build ${numberWord(target)}.`,
+    targetNumber: target,
+    objectType,
+    feedback: {
+      correct: `Yes — you built ${target}.`,
+      wrong: "Try building it again.",
+    },
+  };
+}
+
+function createFlashQuantityTask(lessonId: string): GroundFlashTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory);
+  const objectType = pickObject(memory);
+  const options = buildNumeralTapOptions(target, memory, 3);
+  pushRecent(memory.recentKinds, "flash_quantity", 4);
+  memory.taskCounter += 1;
+
+  return {
+    kind: "groundFlash",
+    prompt: "Flash quantity!",
+    speakText: "Watch the quantity, then tap the number.",
+    targetNumber: target,
+    objectType,
+    revealType: "objects",
+    revealMs: 900,
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: {
+      correct: "Great spotting!",
+      wrong: "Watch the quantity again.",
+    },
+  };
+}
+
 function createMissingNumberTask(lessonId: string): GroundSequenceTask {
   const memory = getMemory(lessonId);
   const start = randInt(6, 8);
@@ -423,7 +634,22 @@ export function generatePrepWeek2Task(
 ): PracticeTask {
   void difficulty;
   const memory = getMemory(lessonId);
-  const gameKind = rotationPattern[memory.cursor % rotationPattern.length]!;
+  const lesson2RotationPattern = [
+    "count_tap",
+    "how_many",
+    "match_group",
+    "quick_count",
+    "tap_each",
+    "find_matching_number",
+    "which_group_has",
+    "numbot_count",
+    "count_build",
+    "flash_quantity",
+  ] as const;
+  const gameKind =
+    lessonId === "y0-w2-l2"
+      ? lesson2RotationPattern[memory.cursor % lesson2RotationPattern.length]!
+      : rotationPattern[memory.cursor % rotationPattern.length]!;
   memory.cursor += 1;
 
   switch (gameKind) {
@@ -447,6 +673,26 @@ export function generatePrepWeek2Task(
       return createCountAndMatchTask(lessonId);
     case "missing_number":
       return createMissingNumberTask(lessonId);
+    case "count_tap":
+      return createCountAndMatchTask(lessonId);
+    case "how_many":
+      return createHowManyTask(lessonId);
+    case "match_group":
+      return createMatchQuantityTask(lessonId);
+    case "quick_count":
+      return createQuickCountTask(lessonId);
+    case "tap_each":
+      return createCountAndMatchTask(lessonId);
+    case "find_matching_number":
+      return createFindMatchingNumberTask(lessonId);
+    case "which_group_has":
+      return createWhichGroupHasTask(lessonId);
+    case "numbot_count":
+      return createNumbotCountTask(lessonId);
+    case "count_build":
+      return createCountAndBuildTask(lessonId);
+    case "flash_quantity":
+      return createFlashQuantityTask(lessonId);
     default:
       return createTapTheNumberTask(lessonId);
   }

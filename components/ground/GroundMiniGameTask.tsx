@@ -21,6 +21,9 @@ const OBJECT_META = {
   blocks: { label: "blocks", emoji: "■" },
   robot_tokens: { label: "robot tokens", emoji: "⬢" },
   energy_orbs: { label: "energy orbs", emoji: "⬤" },
+  crystals: { label: "crystals", emoji: "✦" },
+  bolts: { label: "bolts", emoji: "⚡" },
+  futuristic_coins: { label: "coins", emoji: "◉" },
 } as const;
 
 function GroundMiniShell({
@@ -182,7 +185,7 @@ export function GroundBuildTaskCard({
 }) {
   const [built, setBuilt] = useState(0);
 
-  const tray = useMemo(() => Array.from({ length: 5 }), []);
+  const tray = useMemo(() => Array.from({ length: Math.max(5, Math.min(10, task.targetNumber)) }), [task.targetNumber]);
 
   function check() {
     if (built === task.targetNumber) onCorrect();
@@ -212,13 +215,13 @@ export function GroundBuildTaskCard({
         <button
           type="button"
           onClick={() => setBuilt((current) => Math.max(0, current - 1))}
-          className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-4 text-2xl font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
+            className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-4 text-2xl font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
         >
           −
         </button>
         <button
           type="button"
-          onClick={() => setBuilt((current) => Math.min(5, current + 1))}
+          onClick={() => setBuilt((current) => Math.min(Math.max(5, Math.min(10, task.targetNumber)), current + 1))}
           className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-4 text-2xl font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
         >
           +
