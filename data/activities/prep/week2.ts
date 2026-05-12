@@ -160,6 +160,26 @@ function buildNumeralChoiceOptions(
   }));
 }
 
+function buildWordChoiceOptions(
+  target: number,
+  memory: Week2Memory,
+  optionCount = 3
+) {
+  const distractors = shuffle(TARGETS.filter((value) => value !== target)).slice(0, optionCount - 1);
+  const correctPosition = chooseAnswerPosition(memory, optionCount);
+  const ordered = new Array<number>(optionCount);
+  ordered[correctPosition] = target;
+  const positions = Array.from({ length: optionCount }, (_, index) => index).filter((index) => index !== correctPosition);
+  positions.forEach((position, index) => {
+    ordered[position] = distractors[index]!;
+  });
+  return ordered.map((value, index) => ({
+    id: `word-${target}-${index}-${value}`,
+    kind: "word" as const,
+    word: numberWord(value),
+  }));
+}
+
 function buildNumeralTapOptions(
   target: number,
   memory: Week2Memory,
@@ -184,6 +204,49 @@ function buildSequenceOptions(target: number, memory: Week2Memory) {
   return {
     options,
     correctOptionId: options.find((option) => option.numeral === target)!.id,
+  };
+}
+
+function buildThreeWayMatchOptions(target: number, memory: Week2Memory) {
+  const correctPosition = chooseAnswerPosition(memory, 3);
+  const distractors = shuffle(TARGETS.filter((value) => value !== target)).slice(0, 2);
+  const distractorObjects = shuffle(OBJECT_TYPES).slice(0, 2);
+  const options = Array.from({ length: 3 }, (_, index) => {
+    if (index === correctPosition) {
+      return {
+        id: `three-way-${target}-${index}`,
+        kind: "pair" as const,
+        pairNumeral: target,
+        pairWord: numberWord(target),
+        pairQuantity: target,
+        objectType: pickObject(memory),
+      };
+    }
+
+    const distractorIndex = index > correctPosition ? index - 1 : index;
+    const numeral = distractors[distractorIndex]!;
+    const quantity =
+      distractorIndex % 2 === 0
+        ? numeral
+        : shuffle(TARGETS.filter((value) => value !== numeral))[0]!;
+
+    return {
+      id: `three-way-${target}-${index}-${numeral}`,
+      kind: "pair" as const,
+      pairNumeral: numeral,
+      pairWord: numberWord(
+        distractorIndex % 2 === 0
+          ? shuffle(TARGETS.filter((value) => value !== numeral))[0]!
+          : numeral
+      ),
+      pairQuantity: quantity,
+      objectType: distractorObjects[distractorIndex]!,
+    };
+  });
+
+  return {
+    options,
+    correctOptionId: options[correctPosition]!.id,
   };
 }
 
@@ -597,6 +660,424 @@ function createFlashQuantityTask(lessonId: string): GroundFlashTask {
   };
 }
 
+function createLesson3ListenAndTapTask(lessonId: string): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory);
+  const options = buildNumeralChoiceOptions(target, memory, 3);
+  pushRecent(memory.recentKinds, "listen_tap_l3", 4);
+  memory.taskCounter += 1;
+
+  return {
+    kind: "groundMatch",
+    prompt: "Listen and tap.",
+    speakText: `Tap number ${numberWord(target)}.`,
+    targetNumber: target,
+    targetNumberName: numberWord(target),
+    visualType: "ground-number-card",
+    promptType: "number_to_numeral",
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: {
+      correct: `Yes — that is ${numberWord(target)}.`,
+      wrong: "Listen again.",
+    },
+  };
+}
+
+function createLesson3WordNumberMatchTask(lessonId: string): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory);
+  const useWordToNumeral = memory.taskCounter % 2 === 0;
+  pushRecent(memory.recentKinds, "word_number_match", 4);
+  memory.taskCounter += 1;
+
+  if (useWordToNumeral) {
+    const options = buildNumeralChoiceOptions(target, memory, 3);
+    return {
+      kind: "groundMatch",
+      prompt: "Find the number.",
+      speakText: `This word is ${numberWord(target)}. Find number ${numberWord(target)}.`,
+      targetNumber: target,
+      targetNumberName: numberWord(target),
+      visualType: "ground-number-card",
+      promptType: "word_to_numeral",
+      shownWord: numberWord(target),
+      options,
+      correctOptionId: options.find((option) => option.numeral === target)!.id,
+      feedback: {
+        correct: `Correct — ${numberWord(target)} matches ${target}.`,
+        wrong: `Look for number ${numberWord(target)}.`,
+      },
+    };
+  }
+
+  const options = buildWordChoiceOptions(target, memory, 3);
+  return {
+    kind: "groundMatch",
+    prompt: "Match the number.",
+    speakText: `${numberWord(target)} matches number ${numberWord(target)}.`,
+    targetNumber: target,
+    targetNumberName: numberWord(target),
+    visualType: "ground-flash-match-card",
+    promptType: "numeral_to_word",
+    shownNumeral: target,
+    options,
+    correctOptionId: options.find((option) => option.word === numberWord(target))!.id,
+    feedback: {
+      correct: `Yes — that word says ${numberWord(target)}.`,
+      wrong: "Listen again.",
+    },
+  };
+}
+
+function createLesson3MatchGroupTask(lessonId: string): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory);
+  const correctObjectType = pickObject(memory);
+  const distractorObjects = shuffle(OBJECT_TYPES.filter((value) => value !== correctObjectType)).slice(0, 2);
+  const correctPosition = chooseAnswerPosition(memory, 3);
+  const distractorQuantities = shuffle(TARGETS.filter((value) => value !== target)).slice(0, 2);
+  const options = Array.from({ length: 3 }, (_, index) => {
+    if (index === correctPosition) {
+      return {
+        id: `lesson3-group-${target}-${index}`,
+        kind: "quantity" as const,
+        quantity: target,
+        objectType: correctObjectType,
+      };
+    }
+    const distractorIndex = index > correctPosition ? index - 1 : index;
+    return {
+      id: `lesson3-group-${target}-${index}-${distractorQuantities[distractorIndex]}`,
+      kind: "quantity" as const,
+      quantity: distractorQuantities[distractorIndex]!,
+      objectType: distractorObjects[distractorIndex]!,
+    };
+  });
+  pushRecent(memory.recentKinds, "match_group_l3", 4);
+  memory.taskCounter += 1;
+
+  return {
+    kind: "groundMatch",
+    prompt: `Which group shows ${target}?`,
+    speakText: `Which group shows ${numberWord(target)}?`,
+    targetNumber: target,
+    targetNumberName: numberWord(target),
+    visualType: "ground-quantity-card",
+    promptType: "numeral_to_group",
+    shownNumeral: target,
+    options,
+    correctOptionId: options[correctPosition]!.id,
+    feedback: {
+      correct: "Nice match!",
+      wrong: "Count the groups carefully.",
+    },
+  };
+}
+
+function createLesson3NumbotSaysTask(lessonId: string): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory);
+  const useGroup = memory.taskCounter % 3 === 0;
+  pushRecent(memory.recentKinds, "numbot_says_l3", 4);
+  memory.taskCounter += 1;
+
+  if (useGroup) {
+    const objectType = pickObject(memory);
+    const correctPosition = chooseAnswerPosition(memory, 3);
+    const distractorObjects = shuffle(OBJECT_TYPES.filter((value) => value !== objectType)).slice(0, 2);
+    const distractorQuantities = shuffle(TARGETS.filter((value) => value !== target)).slice(0, 2);
+    const options = Array.from({ length: 3 }, (_, index) => {
+      if (index === correctPosition) {
+        return {
+          id: `numbot-group-${target}-${index}`,
+          kind: "quantity" as const,
+          quantity: target,
+          objectType,
+        };
+      }
+      const distractorIndex = index > correctPosition ? index - 1 : index;
+      return {
+        id: `numbot-group-${target}-${index}-${distractorQuantities[distractorIndex]}`,
+        kind: "quantity" as const,
+        quantity: distractorQuantities[distractorIndex]!,
+        objectType: distractorObjects[distractorIndex]!,
+      };
+    });
+
+    return {
+      kind: "groundMatch",
+      prompt: "Numbot says match the group.",
+      speakText: `Numbot says find ${numberWord(target)}.`,
+      targetNumber: target,
+      targetNumberName: numberWord(target),
+      visualType: "ground-quantity-card",
+      promptType: "numeral_to_group",
+      helperVariant: "numbot",
+      shownNumeral: target,
+      options,
+      correctOptionId: options[correctPosition]!.id,
+      feedback: {
+        correct: "Numbot powered up!",
+        wrong: "Listen to Numbot again.",
+      },
+    };
+  }
+
+  const options = buildNumeralChoiceOptions(target, memory, 3);
+  return {
+    kind: "groundMatch",
+    prompt: "Numbot says tap the number.",
+    speakText: `Numbot says tap ${numberWord(target)}.`,
+    targetNumber: target,
+    targetNumberName: numberWord(target),
+    visualType: "ground-number-card",
+    promptType: "number_to_numeral",
+    helperVariant: "numbot",
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: {
+      correct: "Numbot is happy!",
+      wrong: "Listen to Numbot again.",
+    },
+  };
+}
+
+function createLesson3HearAndFindTask(lessonId: string): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory);
+  const mode = memory.taskCounter % 2 === 0 ? "numeral" : "group";
+  pushRecent(memory.recentKinds, "hear_find", 4);
+  memory.taskCounter += 1;
+
+  if (mode === "group") {
+    const objectType = pickObject(memory);
+    const correctPosition = chooseAnswerPosition(memory, 3);
+    const distractorObjects = shuffle(OBJECT_TYPES.filter((value) => value !== objectType)).slice(0, 2);
+    const distractorQuantities = shuffle(TARGETS.filter((value) => value !== target)).slice(0, 2);
+    const options = Array.from({ length: 3 }, (_, index) => {
+      if (index === correctPosition) {
+        return {
+          id: `hear-find-group-${target}-${index}`,
+          kind: "quantity" as const,
+          quantity: target,
+          objectType,
+        };
+      }
+      const distractorIndex = index > correctPosition ? index - 1 : index;
+      return {
+        id: `hear-find-group-${target}-${index}-${distractorQuantities[distractorIndex]}`,
+        kind: "quantity" as const,
+        quantity: distractorQuantities[distractorIndex]!,
+        objectType: distractorObjects[distractorIndex]!,
+      };
+    });
+
+    return {
+      kind: "groundMatch",
+      prompt: "Hear and find.",
+      speakText: `Find ${numberWord(target)}.`,
+      targetNumber: target,
+      targetNumberName: numberWord(target),
+      visualType: "ground-quantity-card",
+      promptType: "numeral_to_group",
+      helperVariant: "speech_bubble",
+      options,
+      correctOptionId: options[correctPosition]!.id,
+      feedback: {
+        correct: "Great listening!",
+        wrong: "Listen again and count carefully.",
+      },
+    };
+  }
+
+  const options = buildNumeralChoiceOptions(target, memory, 3);
+  return {
+    kind: "groundMatch",
+    prompt: "Hear and find.",
+    speakText: `Find ${numberWord(target)}.`,
+    targetNumber: target,
+    targetNumberName: numberWord(target),
+    visualType: "ground-number-card",
+    promptType: "number_to_numeral",
+    helperVariant: "speech_bubble",
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: {
+      correct: "You found it!",
+      wrong: "Listen again.",
+    },
+  };
+}
+
+function createLesson3QuickMatchTask(lessonId: string): GroundFlashTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory);
+  const objectType = pickObject(memory);
+  const options = buildNumeralTapOptions(target, memory, 3);
+  pushRecent(memory.recentKinds, "quick_match_l3", 4);
+  memory.taskCounter += 1;
+
+  return {
+    kind: "groundFlash",
+    prompt: "Match before it fades.",
+    speakText: `Watch quickly, then find ${numberWord(target)}.`,
+    targetNumber: target,
+    objectType,
+    revealType: "numeral",
+    revealMs: 900,
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: {
+      correct: "Quick match!",
+      wrong: "Try the flash again.",
+    },
+  };
+}
+
+function createLesson3SpeechBubbleTask(lessonId: string): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory);
+  const useGroup = memory.taskCounter % 2 === 1;
+  pushRecent(memory.recentKinds, "speech_bubble_match", 4);
+  memory.taskCounter += 1;
+
+  if (useGroup) {
+    const objectType = pickObject(memory);
+    const correctPosition = chooseAnswerPosition(memory, 3);
+    const distractorObjects = shuffle(OBJECT_TYPES.filter((value) => value !== objectType)).slice(0, 2);
+    const distractorQuantities = shuffle(TARGETS.filter((value) => value !== target)).slice(0, 2);
+    const options = Array.from({ length: 3 }, (_, index) => {
+      if (index === correctPosition) {
+        return {
+          id: `speech-bubble-group-${target}-${index}`,
+          kind: "quantity" as const,
+          quantity: target,
+          objectType,
+        };
+      }
+      const distractorIndex = index > correctPosition ? index - 1 : index;
+      return {
+        id: `speech-bubble-group-${target}-${index}-${distractorQuantities[distractorIndex]}`,
+        kind: "quantity" as const,
+        quantity: distractorQuantities[distractorIndex]!,
+        objectType: distractorObjects[distractorIndex]!,
+      };
+    });
+
+    return {
+      kind: "groundMatch",
+      prompt: "Match the number bubble.",
+      speakText: `${numberWord(target)}.`,
+      targetNumber: target,
+      targetNumberName: numberWord(target),
+      visualType: "ground-quantity-card",
+      promptType: "numeral_to_group",
+      helperVariant: "speech_bubble",
+      options,
+      correctOptionId: options[correctPosition]!.id,
+      feedback: {
+        correct: "Nice match!",
+        wrong: "Listen again.",
+      },
+    };
+  }
+
+  const options = buildNumeralChoiceOptions(target, memory, 3);
+  return {
+    kind: "groundMatch",
+    prompt: "Match the number bubble.",
+    speakText: `${numberWord(target)}.`,
+    targetNumber: target,
+    targetNumberName: numberWord(target),
+    visualType: "ground-number-card",
+    promptType: "number_to_numeral",
+    helperVariant: "speech_bubble",
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: {
+      correct: "Nice match!",
+      wrong: "Listen again.",
+    },
+  };
+}
+
+function createLesson3ThreeWayMatchTask(lessonId: string): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory);
+  const { options, correctOptionId } = buildThreeWayMatchOptions(target, memory);
+  pushRecent(memory.recentKinds, "three_way_match", 4);
+  memory.taskCounter += 1;
+
+  return {
+    kind: "groundMatch",
+    prompt: "Which pair matches?",
+    speakText: `Find ${numberWord(target)}.`,
+    targetNumber: target,
+    targetNumberName: numberWord(target),
+    visualType: "ground-flash-match-card",
+    promptType: "word_pair_match",
+    options,
+    correctOptionId,
+    feedback: {
+      correct: `Correct — ${numberWord(target)} all match.`,
+      wrong: "Find the one that matches.",
+    },
+  };
+}
+
+function createLesson3FlashNumberTask(lessonId: string): GroundFlashTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory);
+  const objectType = pickObject(memory);
+  const options = buildNumeralTapOptions(target, memory, 3);
+  pushRecent(memory.recentKinds, "flash_number_l3", 4);
+  memory.taskCounter += 1;
+
+  return {
+    kind: "groundFlash",
+    prompt: "Which number did you see?",
+    speakText: "Which number did you see?",
+    targetNumber: target,
+    objectType,
+    revealType: "numeral",
+    revealMs: 1100,
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: {
+      correct: "You found it!",
+      wrong: "Watch carefully and try again.",
+    },
+  };
+}
+
+function createLesson3CountAndMatchTask(lessonId: string): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory);
+  const objectType = pickObject(memory);
+  pushRecent(memory.recentKinds, "count_match_l3", 4);
+  memory.taskCounter += 1;
+
+  const options = buildNumeralChoiceOptions(target, memory, 3);
+  return {
+    kind: "groundMatch",
+    prompt: "Count and match.",
+    speakText: `Count the ${objectLabel(objectType)}, then tap ${numberWord(target)}.`,
+    targetNumber: target,
+    targetNumberName: numberWord(target),
+    visualType: "ground-quantity-card",
+    promptType: "group_to_numeral",
+    objectType,
+    shownQuantity: target,
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: {
+      correct: "Great counting!",
+      wrong: "Count the group carefully.",
+    },
+  };
+}
+
 function createMissingNumberTask(lessonId: string): GroundSequenceTask {
   const memory = getMemory(lessonId);
   const start = randInt(6, 8);
@@ -634,6 +1115,22 @@ export function generatePrepWeek2Task(
 ): PracticeTask {
   void difficulty;
   const memory = getMemory(lessonId);
+  const lesson3RotationPattern = [
+    "listen_tap_l3",
+    "match_group_l3",
+    "hear_find",
+    "numbot_says_l3",
+    "flash_number_l3",
+    "count_match_l3",
+    "quick_match_l3",
+    "speech_bubble_match",
+    "listen_tap_l3",
+    "match_group_l3",
+    "hear_find",
+    "flash_number_l3",
+    "word_number_match",
+    "three_way_match",
+  ] as const;
   const lesson2RotationPattern = [
     "count_tap",
     "how_many",
@@ -647,12 +1144,34 @@ export function generatePrepWeek2Task(
     "flash_quantity",
   ] as const;
   const gameKind =
-    lessonId === "y0-w2-l2"
+    lessonId === "y0-w2-l3"
+      ? lesson3RotationPattern[memory.cursor % lesson3RotationPattern.length]!
+      : lessonId === "y0-w2-l2"
       ? lesson2RotationPattern[memory.cursor % lesson2RotationPattern.length]!
       : rotationPattern[memory.cursor % rotationPattern.length]!;
   memory.cursor += 1;
 
   switch (gameKind) {
+    case "listen_tap_l3":
+      return createLesson3ListenAndTapTask(lessonId);
+    case "word_number_match":
+      return createLesson3WordNumberMatchTask(lessonId);
+    case "match_group_l3":
+      return createLesson3MatchGroupTask(lessonId);
+    case "numbot_says_l3":
+      return createLesson3NumbotSaysTask(lessonId);
+    case "hear_find":
+      return createLesson3HearAndFindTask(lessonId);
+    case "quick_match_l3":
+      return createLesson3QuickMatchTask(lessonId);
+    case "speech_bubble_match":
+      return createLesson3SpeechBubbleTask(lessonId);
+    case "three_way_match":
+      return createLesson3ThreeWayMatchTask(lessonId);
+    case "flash_number_l3":
+      return createLesson3FlashNumberTask(lessonId);
+    case "count_match_l3":
+      return createLesson3CountAndMatchTask(lessonId);
     case "tap_number":
       return createTapTheNumberTask(lessonId);
     case "listen_tap":

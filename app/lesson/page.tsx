@@ -79,7 +79,8 @@ function LessonPage() {
       effectiveLessonId === "y0-w1-l2" ||
       effectiveLessonId === "y0-w1-l3" ||
       effectiveLessonId === "y0-w2-l1" ||
-      effectiveLessonId === "y0-w2-l2"
+      effectiveLessonId === "y0-w2-l2" ||
+      effectiveLessonId === "y0-w2-l3"
     );
 
   useEffect(() => {
@@ -282,11 +283,15 @@ function LessonPage() {
           ? "You found numbers 6 to 10!"
           : effectiveLessonId === "y0-w2-l2"
             ? "You counted groups to 10!"
+          : effectiveLessonId === "y0-w2-l3"
+            ? "You matched numbers, words, and groups!"
         : effectiveLessonId === "y0-w1-l2"
           ? "You counted collections to 5!"
           : "You recognised numbers 1 to 5!";
     const prepUnlockText =
-      effectiveLessonId === "y0-w1-l3" ? "Weekly Quiz unlocked." : `Lesson ${lessonNumber + 1} unlocked.`;
+      effectiveLessonId === "y0-w1-l3" || effectiveLessonId === "y0-w2-l3"
+        ? "Weekly Quiz unlocked."
+        : `Lesson ${lessonNumber + 1} unlocked.`;
 
     return (
       <div className="rounded-[28px] border border-cyan-200 bg-gradient-to-br from-cyan-50 via-white to-teal-50 p-6 shadow-[0_12px_30px_rgba(13,148,136,0.08)]">
@@ -725,7 +730,8 @@ function LessonPage() {
                 if (isGroundCustomLesson) {
                   if (
                     effectiveLessonId === "y0-w2-l1" ||
-                    effectiveLessonId === "y0-w2-l2"
+                    effectiveLessonId === "y0-w2-l2" ||
+                    effectiveLessonId === "y0-w2-l3"
                   ) {
                     return generatePrepWeek2Task(effectiveLessonId, d);
                   }

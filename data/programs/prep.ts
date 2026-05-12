@@ -78,9 +78,9 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
       buildLesson(
         2,
         3,
-        "Number Names to 10",
-        "Connect spoken number names, numerals, and counting order to 10.",
-        ["Audio match", "Counting song", "Number order"],
+        "Match the Numbers",
+        "Connect spoken number names, numerals, quantities, and written number words to 10.",
+        ["Listen and tap", "Match the word", "Three-way number match"],
         ["AC9MFN01", "AC9MFN03"]
       ),
     ],

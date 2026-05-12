@@ -75,7 +75,7 @@ function GroundPairCard({
   objectType?: GroundMatchTask["objectType"];
 }) {
   return (
-    <div className="flex items-center justify-center gap-3 rounded-[20px] border-2 border-cyan-200 bg-white/95 px-3 py-3">
+    <div className="flex flex-wrap items-center justify-center gap-3 rounded-[20px] border-2 border-cyan-200 bg-white/95 px-3 py-3">
       <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[18px] bg-gradient-to-br from-cyan-100 to-teal-100 text-3xl font-black text-teal-900 sm:h-16 sm:w-16 sm:text-4xl">
         {numeral}
       </div>
@@ -83,9 +83,10 @@ function GroundPairCard({
         <div className="rounded-[18px] border-2 border-cyan-200 bg-cyan-50 px-4 py-3 text-2xl font-black lowercase text-teal-900 sm:text-3xl">
           {word}
         </div>
-      ) : (
+      ) : null}
+      {typeof quantity === "number" ? (
         <GroundQuantityCard quantity={quantity} objectType={objectType} compact />
-      )}
+      ) : null}
     </div>
   );
 }

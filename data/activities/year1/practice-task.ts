@@ -157,7 +157,7 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       targetNumber: number;
-      targetNumberName?: "one" | "two" | "three" | "four" | "five";
+      targetNumberName?: string;
       visualType: "ground-number-card" | "ground-quantity-card" | "ground-flash-match-card";
       promptType:
         | "number_to_numeral"
@@ -173,18 +173,18 @@ export type PracticeTask = (
       objectType?: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins";
       shownNumeral?: number;
       shownQuantity?: number;
-      shownWord?: "one" | "two" | "three" | "four" | "five";
+      shownWord?: string;
       shownSequence?: Array<number | "__">;
       options: Array<{
         id: string;
         kind: "numeral" | "quantity" | "pair" | "word";
         numeral?: number;
-        word?: "one" | "two" | "three" | "four" | "five";
+        word?: string;
         quantity?: number;
         objectType?: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins";
         pairNumeral?: number;
         pairQuantity?: number;
-        pairWord?: "one" | "two" | "three" | "four" | "five";
+        pairWord?: string;
       }>;
       correctOptionId: string;
       feedback?: { correct: string; wrong: string };
