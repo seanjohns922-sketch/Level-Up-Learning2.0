@@ -4207,7 +4207,9 @@ function SessionPage() {
   }
 
   const quizComplete = quizQuestions.every((q) => {
-    if (q.kind === "lessonActivity") return quizLessonActivityResults[q.id]?.attempted === true;
+    if (q.kind === "lessonActivity" || q.kind === "practiceTask") {
+      return quizLessonActivityResults[q.id]?.attempted === true;
+    }
     if (q.kind === "typed") return (quizTyped[q.id] ?? "").trim().length > 0;
     if (q.kind === "numberLineTap" || q.kind === "numberLineJump") {
       return typeof quizLineAnswers[q.id] === "number";
