@@ -7,6 +7,7 @@ import { ACTIVE_STUDENT_KEY } from "@/data/progress";
 import { supabase } from "@/lib/supabase";
 import { getProgramForYear } from "@/data/programs";
 import { getYear6WeeklyQuiz, type Year6WeeklyQuizQuestion } from "@/data/quizzes/year6";
+import { DEMO_MODE } from "@/data/config";
 import PostTestTransition from "@/components/PostTestTransition";
 import {
   buildQuizActivityPool,
@@ -22,6 +23,7 @@ import {
   type Year2QuestionData,
 } from "@/data/activities/year2/lessonEngine";
 import { LessonRenderer } from "@/components/lesson/LessonRenderer";
+import { TaskRenderer } from "@/components/TaskRenderer";
 import NumberLineTap from "@/components/NumberLineTap";
 import NumberLineJump from "@/components/NumberLineJump";
 import NumberChartFill from "@/components/NumberChartFill";
@@ -52,6 +54,7 @@ import {
 } from "@/app/config/lesson-config";
 import type { Lesson, WeekPlan } from "@/data/programs/year1";
 import type { LessonActivity } from "@/data/programs/types";
+import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type WeekProgress = {
   lessonsCompleted: boolean[]; // [L1, L2, L3]
@@ -139,6 +142,7 @@ type QuizQuestion = {
   activityType?: LessonActivity["activityType"];
   kind:
     | "lessonActivity"
+    | "practiceTask"
     | "ordering"
     | "mcq"
     | "typed"
@@ -218,6 +222,7 @@ type QuizQuestion = {
   };
   activity?: LessonActivity;
   questionData?: Year2QuestionData;
+  practiceTask?: PracticeTask;
   quizMeta?: {
     type: string;
     operation?: "add" | "subtract";
@@ -1252,6 +1257,470 @@ function buildLessonBucketQuizQuestions(
   return { questions, selectedKinds };
 }
 
+type GroundWord = NonNullable<Extract<PracticeTask, { kind: "groundMatch" }>["targetNumberName"]>;
+type GroundObjectType = NonNullable<Extract<PracticeTask, { kind: "groundMatch" }>["objectType"]>;
+type GroundMatchOption = Extract<PracticeTask, { kind: "groundMatch" }>["options"][number];
+type GroundQuizPracticeTask = Extract<
+  PracticeTask,
+  | { kind: "groundMatch" }
+  | { kind: "groundTapCount" }
+  | { kind: "groundMoveCount" }
+  | { kind: "groundFeed" }
+  | { kind: "groundSoundCount" }
+>;
+
+const GROUND_WORDS_BY_NUMBER: Record<1 | 2 | 3 | 4 | 5, GroundWord> = {
+  1: "one",
+  2: "two",
+  3: "three",
+  4: "four",
+  5: "five",
+};
+
+const GROUND_OBJECT_TYPES: GroundObjectType[] = [
+  "dots",
+  "gems",
+  "stars",
+  "blocks",
+  "robot_tokens",
+  "energy_orbs",
+];
+
+const GROUND_OBJECT_LABELS: Record<GroundObjectType, string> = {
+  dots: "dots",
+  gems: "gems",
+  stars: "stars",
+  blocks: "blocks",
+  robot_tokens: "robot tokens",
+  energy_orbs: "energy orbs",
+};
+
+function numberToGroundWord(value: number): GroundWord {
+  return GROUND_WORDS_BY_NUMBER[value as 1 | 2 | 3 | 4 | 5] ?? "one";
+}
+
+function chooseGroundRecentSafe<T>(pool: T[], recent: T[]): T {
+  let candidate = pool[randInt(0, pool.length - 1)];
+  for (let attempts = 0; attempts < 2; attempts += 1) {
+    if (recent.length >= 2 && recent[recent.length - 1] === candidate && recent[recent.length - 2] === candidate) {
+      candidate = pool[randInt(0, pool.length - 1)];
+      continue;
+    }
+    break;
+  }
+  return candidate;
+}
+
+function makeGroundNumeralChoiceOptions(
+  correctNumber: number,
+  recentPositions: number[]
+): {
+  options: Array<{ id: string; numeral: number }>;
+  correctOptionId: string;
+  correctPosition: number;
+} {
+  const distractors = shuffle([1, 2, 3, 4, 5].filter((value) => value !== correctNumber)).slice(0, 2);
+  const chosenPosition = chooseGroundRecentSafe([0, 1, 2], recentPositions);
+  const values = Array.from({ length: 3 }, (_, index) =>
+    index === chosenPosition ? correctNumber : distractors[index > chosenPosition ? index - 1 : index]
+  );
+  return {
+    options: values.map((value, index) => ({ id: `num-${index}-${value}`, numeral: value })),
+    correctOptionId: `num-${chosenPosition}-${correctNumber}`,
+    correctPosition: chosenPosition,
+  };
+}
+
+function makeGroundQuantityOptions(
+  correctNumber: number,
+  objectType: GroundObjectType,
+  recentPositions: number[]
+): {
+  options: GroundMatchOption[];
+  correctOptionId: string;
+  correctPosition: number;
+} {
+  const distractors = shuffle([1, 2, 3, 4, 5].filter((value) => value !== correctNumber)).slice(0, 2);
+  const chosenPosition = chooseGroundRecentSafe([0, 1, 2], recentPositions);
+  const values = Array.from({ length: 3 }, (_, index) =>
+    index === chosenPosition ? correctNumber : distractors[index > chosenPosition ? index - 1 : index]
+  );
+  return {
+    options: values.map((value, index) => ({
+      id: `qty-${index}-${value}`,
+      kind: "quantity",
+      quantity: value,
+      objectType,
+    })),
+    correctOptionId: `qty-${chosenPosition}-${correctNumber}`,
+    correctPosition: chosenPosition,
+  };
+}
+
+function makeGroundWordOptions(
+  correctNumber: number,
+  recentPositions: number[]
+): {
+  options: GroundMatchOption[];
+  correctOptionId: string;
+  correctPosition: number;
+} {
+  const correctWord = numberToGroundWord(correctNumber);
+  const distractors = shuffle(
+    ([1, 2, 3, 4, 5] as const)
+      .filter((value) => value !== correctNumber)
+      .map((value) => GROUND_WORDS_BY_NUMBER[value])
+  ).slice(0, 2);
+  const chosenPosition = chooseGroundRecentSafe([0, 1, 2], recentPositions);
+  const values = Array.from({ length: 3 }, (_, index) =>
+    index === chosenPosition ? correctWord : distractors[index > chosenPosition ? index - 1 : index]
+  );
+  return {
+    options: values.map((word, index) => ({
+      id: `word-${index}-${word}`,
+      kind: "word",
+      word,
+    })),
+    correctOptionId: `word-${chosenPosition}-${correctWord}`,
+    correctPosition: chosenPosition,
+  };
+}
+
+function makeGroundPairWordOptions(
+  correctNumber: number,
+  recentPositions: number[]
+): {
+  options: GroundMatchOption[];
+  correctOptionId: string;
+  correctPosition: number;
+} {
+  const incorrectPairs = shuffle(
+    ([1, 2, 3, 4, 5] as const)
+      .filter((value) => value !== correctNumber)
+      .map((value) => ({
+        pairNumeral: value,
+        pairWord: numberToGroundWord(
+          shuffle(([1, 2, 3, 4, 5] as const).filter((wordValue) => wordValue !== value))[0] ?? correctNumber
+        ),
+      }))
+      .filter((pair) => pair.pairWord !== numberToGroundWord(pair.pairNumeral))
+  ).slice(0, 2);
+  const chosenPosition = chooseGroundRecentSafe([0, 1, 2], recentPositions);
+  const values = Array.from({ length: 3 }, (_, index) =>
+    index === chosenPosition
+      ? { pairNumeral: correctNumber, pairWord: numberToGroundWord(correctNumber) }
+      : incorrectPairs[index > chosenPosition ? index - 1 : index]
+  );
+  return {
+    options: values.map((value, index) => ({
+      id: `pair-word-${index}-${value.pairNumeral}-${value.pairWord}`,
+      kind: "pair",
+      pairNumeral: value.pairNumeral,
+      pairWord: value.pairWord,
+    })),
+    correctOptionId: `pair-word-${chosenPosition}-${correctNumber}-${numberToGroundWord(correctNumber)}`,
+    correctPosition: chosenPosition,
+  };
+}
+
+function buildGroundQuizQuestion(
+  id: string,
+  lessonNumber: 1 | 2 | 3,
+  skill: string,
+  practiceTask: GroundQuizPracticeTask
+): QuizQuestion {
+  return {
+    id,
+    lessonNumber,
+    lessonTag: lessonNumber,
+    skill,
+    kind: "practiceTask",
+    prompt: practiceTask.prompt,
+    practiceTask,
+  };
+}
+
+function buildPrepWeek1WeeklyQuizQuestions(
+  questionsPerLesson: number
+): QuizQuestion[] {
+  const totalExpected = questionsPerLesson * 3;
+  const targetHistory: number[] = [];
+  const objectHistory: GroundObjectType[] = [];
+  const positionHistory: number[] = [];
+
+  function nextTarget() {
+    const target = chooseGroundRecentSafe([1, 2, 3, 4, 5], targetHistory);
+    targetHistory.push(target);
+    if (targetHistory.length > 4) targetHistory.shift();
+    return target;
+  }
+
+  function nextObjectType(allowed: GroundObjectType[] = GROUND_OBJECT_TYPES) {
+    const objectType = chooseGroundRecentSafe(allowed, objectHistory);
+    objectHistory.push(objectType);
+    if (objectHistory.length > 4) objectHistory.shift();
+    return objectType;
+  }
+
+  function reservePosition(position: number) {
+    positionHistory.push(position);
+    if (positionHistory.length > 4) positionHistory.shift();
+  }
+
+  function makeLesson1Task(
+    index: number,
+    variant: "listen" | "numbot" | "memory" | "tap"
+  ): QuizQuestion {
+    const targetNumber = nextTarget();
+    const targetWord = numberToGroundWord(targetNumber);
+    const choice = makeGroundNumeralChoiceOptions(targetNumber, positionHistory);
+    reservePosition(choice.correctPosition);
+    return buildGroundQuizQuestion(`q${index}`, 1, `ground_l1_${variant}`, {
+      kind: "groundMatch",
+      prompt:
+        variant === "numbot"
+          ? "Numbot says tap the number."
+          : variant === "memory"
+          ? "Listen and remember."
+          : variant === "tap"
+          ? "Tap the number."
+          : "Listen and tap the number.",
+      speakText:
+        variant === "numbot"
+          ? `Numbot says tap ${targetWord}.`
+          : `Tap number ${targetWord}.`,
+      targetNumber,
+      targetNumberName: targetWord,
+      visualType: "ground-number-card",
+      promptType: "number_to_numeral",
+      helperVariant: variant === "numbot" ? "numbot" : variant === "memory" ? "memory" : undefined,
+      options: choice.options.map((option) => ({
+        id: option.id,
+        kind: "numeral",
+        numeral: option.numeral,
+      })),
+      correctOptionId: choice.correctOptionId,
+      feedback: {
+        correct: `Yes — that is ${targetWord}.`,
+        wrong: `Listen again and find ${targetWord}.`,
+      },
+    });
+  }
+
+  function makeLesson2MatchQuestion(
+    index: number,
+    mode: "group_to_numeral" | "numeral_to_group"
+  ): QuizQuestion {
+    const targetNumber = nextTarget();
+    const targetWord = numberToGroundWord(targetNumber);
+    const objectType = nextObjectType();
+    if (mode === "group_to_numeral") {
+      const choice = makeGroundNumeralChoiceOptions(targetNumber, positionHistory);
+      reservePosition(choice.correctPosition);
+      return buildGroundQuizQuestion(`q${index}`, 2, "ground_l2_count_match", {
+        kind: "groundMatch",
+        prompt: `How many ${GROUND_OBJECT_LABELS[objectType]}?`,
+        speakText: `How many ${GROUND_OBJECT_LABELS[objectType]} are there?`,
+        targetNumber,
+        visualType: "ground-quantity-card",
+        promptType: "group_to_numeral",
+        objectType,
+        shownQuantity: targetNumber,
+        options: choice.options.map((option) => ({
+          id: option.id,
+          kind: "numeral",
+          numeral: option.numeral,
+        })),
+        correctOptionId: choice.correctOptionId,
+        feedback: {
+          correct: `Yes — there are ${targetWord}.`,
+          wrong: "Count the objects carefully.",
+        },
+      });
+    }
+
+    const choice = makeGroundQuantityOptions(targetNumber, objectType, positionHistory);
+    reservePosition(choice.correctPosition);
+    return buildGroundQuizQuestion(`q${index}`, 2, "ground_l2_match_quantity", {
+      kind: "groundMatch",
+      prompt: "Which group matches?",
+      speakText: `Find the group with ${targetWord}.`,
+      targetNumber,
+      visualType: "ground-quantity-card",
+      promptType: "numeral_to_group",
+      shownNumeral: targetNumber,
+      objectType,
+      options: choice.options,
+      correctOptionId: choice.correctOptionId,
+      feedback: {
+        correct: `Correct — ${targetNumber} matches ${targetWord}.`,
+        wrong: "Count each object once.",
+      },
+    });
+  }
+
+  function makeLesson2TapCount(index: number): QuizQuestion {
+    const targetNumber = nextTarget();
+    const objectType = nextObjectType();
+    const choice = makeGroundNumeralChoiceOptions(targetNumber, positionHistory);
+    reservePosition(choice.correctPosition);
+    return buildGroundQuizQuestion(`q${index}`, 2, "ground_l2_tap_count", {
+      kind: "groundTapCount",
+      prompt: `Tap and count the ${GROUND_OBJECT_LABELS[objectType]}.`,
+      speakText: `Tap and count the ${GROUND_OBJECT_LABELS[objectType]}.`,
+      targetNumber,
+      objectType,
+      options: choice.options,
+      correctOptionId: choice.correctOptionId,
+      feedback: {
+        correct: `Great counting! You found ${targetNumber}.`,
+        wrong: "Tap each object once.",
+      },
+    });
+  }
+
+  function makeLesson2MoveCount(index: number): QuizQuestion {
+    const targetNumber = nextTarget();
+    const objectType = nextObjectType();
+    const choice = makeGroundNumeralChoiceOptions(targetNumber, positionHistory);
+    reservePosition(choice.correctPosition);
+    return buildGroundQuizQuestion(`q${index}`, 2, "ground_l2_move_count", {
+      kind: "groundMoveCount",
+      prompt: "Move each object into the counting zone.",
+      speakText: `Move and count ${targetNumber} ${GROUND_OBJECT_LABELS[objectType]}.`,
+      targetNumber,
+      objectType,
+      options: choice.options,
+      correctOptionId: choice.correctOptionId,
+      feedback: {
+        correct: `You moved and counted ${targetNumber}.`,
+        wrong: "Move each one, then choose.",
+      },
+    });
+  }
+
+  function makeLesson3Task(
+    index: number,
+    variant: "listen" | "hear_quantity" | "numbot" | "word_audio" | "word_pair"
+  ): QuizQuestion {
+    const targetNumber = nextTarget();
+    const targetWord = numberToGroundWord(targetNumber);
+    const objectType = nextObjectType();
+
+    if (variant === "hear_quantity") {
+      const choice = makeGroundQuantityOptions(targetNumber, objectType, positionHistory);
+      reservePosition(choice.correctPosition);
+      return buildGroundQuizQuestion(`q${index}`, 3, "ground_l3_hear_quantity", {
+        kind: "groundMatch",
+        prompt: "Listen. Which group matches?",
+        speakText: `Find the group with ${targetWord}.`,
+        targetNumber,
+        targetNumberName: targetWord,
+        visualType: "ground-quantity-card",
+        promptType: "numeral_to_group",
+        helperVariant: "speech_bubble",
+        objectType,
+        options: choice.options,
+        correctOptionId: choice.correctOptionId,
+        feedback: {
+          correct: `Correct — ${targetWord} matches ${targetNumber} objects.`,
+          wrong: "Count the group and listen again.",
+        },
+      });
+    }
+
+    if (variant === "word_audio") {
+      const choice = makeGroundWordOptions(targetNumber, positionHistory);
+      reservePosition(choice.correctPosition);
+      return buildGroundQuizQuestion(`q${index}`, 3, "ground_l3_word_audio", {
+        kind: "groundMatch",
+        prompt: "Listen and find the word.",
+        speakText: `Listen and find the word ${targetWord}.`,
+        targetNumber,
+        targetNumberName: targetWord,
+        visualType: "ground-flash-match-card",
+        promptType: "word_audio_match",
+        helperVariant: "speech_bubble",
+        options: choice.options,
+        correctOptionId: choice.correctOptionId,
+        feedback: {
+          correct: `Yes — that word says ${targetWord}.`,
+          wrong: "Listen again.",
+        },
+      });
+    }
+
+    if (variant === "word_pair") {
+      const choice = makeGroundPairWordOptions(targetNumber, positionHistory);
+      reservePosition(choice.correctPosition);
+      return buildGroundQuizQuestion(`q${index}`, 3, "ground_l3_word_pair", {
+        kind: "groundMatch",
+        prompt: "Which pair matches?",
+        speakText: `Find the pair for ${targetWord}.`,
+        targetNumber,
+        targetNumberName: targetWord,
+        visualType: "ground-flash-match-card",
+        promptType: "word_pair_match",
+        options: choice.options,
+        correctOptionId: choice.correctOptionId,
+        feedback: {
+          correct: `Correct — ${targetWord} matches ${targetNumber}.`,
+          wrong: "Find the pair that matches.",
+        },
+      });
+    }
+
+    const choice = makeGroundNumeralChoiceOptions(targetNumber, positionHistory);
+    reservePosition(choice.correctPosition);
+    return buildGroundQuizQuestion(`q${index}`, 3, variant === "numbot" ? "ground_l3_numbot" : "ground_l3_listen", {
+      kind: "groundMatch",
+      prompt: variant === "numbot" ? "Numbot says tap the number." : "Listen and tap the number.",
+      speakText: variant === "numbot" ? `Numbot says tap ${targetWord}.` : `Tap number ${targetWord}.`,
+      targetNumber,
+      targetNumberName: targetWord,
+      visualType: "ground-number-card",
+      promptType: "number_to_numeral",
+      helperVariant: variant === "numbot" ? "numbot" : undefined,
+      options: choice.options.map((option) => ({
+        id: option.id,
+        kind: "numeral",
+        numeral: option.numeral,
+      })),
+      correctOptionId: choice.correctOptionId,
+      feedback: {
+        correct: variant === "numbot" ? `You found ${targetWord}!` : `Yes — that is ${targetWord}.`,
+        wrong: variant === "numbot" ? "Find the number Numbot said." : "Listen again.",
+      },
+    });
+  }
+
+  const questions: QuizQuestion[] = [
+    makeLesson1Task(1, "listen"),
+    makeLesson1Task(2, "numbot"),
+    makeLesson1Task(3, "tap"),
+    makeLesson1Task(4, "memory"),
+    makeLesson1Task(5, "listen"),
+    makeLesson2MatchQuestion(6, "group_to_numeral"),
+    makeLesson2TapCount(7),
+    makeLesson2MatchQuestion(8, "numeral_to_group"),
+    makeLesson2MoveCount(9),
+    makeLesson2MatchQuestion(10, "group_to_numeral"),
+    makeLesson3Task(11, "listen"),
+    makeLesson3Task(12, "hear_quantity"),
+    makeLesson3Task(13, "numbot"),
+    makeLesson3Task(14, "word_audio"),
+    makeLesson3Task(15, "word_pair"),
+  ];
+
+  if (questions.length !== totalExpected) {
+    throw new Error(
+      `[GroundWeeklyQuiz] Week 1 expected ${totalExpected} questions, received ${questions.length}.`
+    );
+  }
+
+  return questions;
+}
+
 function toQuizQuestionFromYear2Data(
   questionData: Year2QuestionData,
   lessonNumber: number,
@@ -1648,7 +2117,7 @@ function isQuizQuestionCorrect(
   quizMoneyAnswers: Record<string, { attempted: boolean; correct: boolean }>,
   quizLessonActivityResults: Record<string, { attempted: boolean; correct: boolean }>
 ) {
-  if (q.kind === "lessonActivity") {
+  if (q.kind === "lessonActivity" || q.kind === "practiceTask") {
     return quizLessonActivityResults[q.id]?.correct === true;
   }
   if (q.kind === "typed") {
@@ -1775,7 +2244,7 @@ function buildQuizQuestionResults(
       const result = quizMoneyAnswers[q.id];
       selectedAnswer = result?.attempted ? (result.correct ? "correct" : "incorrect") : null;
       correctAnswer = q.moneyEnough?.answer ?? "correct";
-    } else if (q.kind === "lessonActivity") {
+    } else if (q.kind === "lessonActivity" || q.kind === "practiceTask") {
       const result = quizLessonActivityResults[q.id];
       selectedAnswer = result?.attempted ? (result.correct ? "correct" : "incorrect") : null;
       correctAnswer = "correct";
@@ -2247,7 +2716,7 @@ function pickStartForStep(step: number, min: number, max: number) {
     return first + 10 * randInt(0, count - 1);
   }
   if (step === 10) {
-    let first = min + ((10 - (min % 10)) % 10);
+    const first = min + ((10 - (min % 10)) % 10);
     const count = Math.max(1, Math.floor((max - first) / 10) + 1);
     return first + 10 * randInt(0, count - 1);
   }
@@ -3320,7 +3789,7 @@ function SessionPage() {
     }
 
     const weekProgress = getPersistedWeekProgress(store, year, numericWeek);
-    if (type === "quiz" && weekProgress.lessonsCompleted.filter(Boolean).length < 3) {
+    if (!DEMO_MODE && type === "quiz" && weekProgress.lessonsCompleted.filter(Boolean).length < 3) {
       router.replace(`/program?year=${encodeURIComponent(year)}&week=${week}`);
     }
   }, [router, type, week, year]);
@@ -3420,6 +3889,10 @@ function SessionPage() {
     const qConfig = quizConfig;
     const questionsPerLesson = qConfig?.questionsPerLesson ?? 5;
     const weekPlan = quizWeekPlan;
+
+    if (year === "Prep" && Number(week) === 1) {
+      return buildPrepWeek1WeeklyQuizQuestions(questionsPerLesson);
+    }
 
     if (
       year === "Year 2" ||
@@ -3974,7 +4447,12 @@ function SessionPage() {
   }
 
   const currentQuiz = quizQuestions[quizIndex];
-  const currentQuizPrompt = currentQuiz?.prompt ?? "";
+  const currentQuizPrompt =
+    currentQuiz?.kind === "practiceTask"
+      ? (currentQuiz.practiceTask && "speakText" in currentQuiz.practiceTask
+          ? currentQuiz.practiceTask.speakText
+          : undefined) ?? currentQuiz.prompt
+      : currentQuiz?.prompt ?? "";
   const currentQuizId = currentQuiz?.id ?? null;
   const { autoReadEnabled } = useAutoReadSetting();
   const isCurrentQuizReading =
@@ -4014,7 +4492,7 @@ function SessionPage() {
     }
   }, [currentQuiz, isTapSkipQuiz, quizGroupTaps]);
   const currentAnswered =
-    currentQuiz?.kind === "lessonActivity"
+    currentQuiz?.kind === "lessonActivity" || currentQuiz?.kind === "practiceTask"
       ? quizLessonActivityResults[currentQuiz.id]?.attempted === true
       : currentQuiz?.kind === "typed"
       ? (quizTyped[currentQuiz.id] ?? "").trim().length > 0
@@ -4504,6 +4982,32 @@ function SessionPage() {
                         }))
                       }
                     />
+                  ) : null}
+
+                  {currentQuiz?.kind === "practiceTask" && currentQuiz.practiceTask ? (
+                    <div>
+                      <TaskRenderer
+                        task={currentQuiz.practiceTask}
+                        taskNonce={quizIndex}
+                        callbacks={{
+                          markCorrect: () =>
+                            setQuizLessonActivityResults((prev) => ({
+                              ...prev,
+                              [currentQuiz.id]: { attempted: true, correct: true },
+                            })),
+                          markCorrectSoft: () =>
+                            setQuizLessonActivityResults((prev) => ({
+                              ...prev,
+                              [currentQuiz.id]: { attempted: true, correct: true },
+                            })),
+                          markWrong: () =>
+                            setQuizLessonActivityResults((prev) => ({
+                              ...prev,
+                              [currentQuiz.id]: { attempted: true, correct: false },
+                            })),
+                        }}
+                      />
+                    </div>
                   ) : null}
 
                   {currentQuiz?.kind === "lessonActivity" && currentQuiz.activity && currentQuiz.questionData ? (
