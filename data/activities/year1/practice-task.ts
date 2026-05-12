@@ -157,20 +157,33 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       targetNumber: number;
+      targetNumberName?: "one" | "two" | "three" | "four" | "five";
       visualType: "ground-number-card" | "ground-quantity-card" | "ground-flash-match-card";
-      promptType: "number_to_numeral" | "numeral_to_group" | "group_to_numeral" | "number_to_objects" | "match_pair";
+      promptType:
+        | "number_to_numeral"
+        | "numeral_to_group"
+        | "group_to_numeral"
+        | "number_to_objects"
+        | "match_pair"
+        | "word_audio_match"
+        | "numeral_to_word"
+        | "word_to_numeral"
+        | "word_pair_match";
       helperVariant?: "numbot" | "speech_bubble" | "memory";
       objectType?: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs";
       shownNumeral?: number;
       shownQuantity?: number;
+      shownWord?: "one" | "two" | "three" | "four" | "five";
       options: Array<{
         id: string;
-        kind: "numeral" | "quantity" | "pair";
+        kind: "numeral" | "quantity" | "pair" | "word";
         numeral?: number;
+        word?: "one" | "two" | "three" | "four" | "five";
         quantity?: number;
         objectType?: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs";
         pairNumeral?: number;
         pairQuantity?: number;
+        pairWord?: "one" | "two" | "three" | "four" | "five";
       }>;
       correctOptionId: string;
       feedback?: { correct: string; wrong: string };

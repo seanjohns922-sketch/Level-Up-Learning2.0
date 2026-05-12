@@ -22,6 +22,14 @@ function GroundNumberCard({ value }: { value: number }) {
   );
 }
 
+function GroundWordCard({ word }: { word: string }) {
+  return (
+    <div className="mx-auto flex min-h-[96px] w-full max-w-[188px] items-center justify-center rounded-[24px] border-2 border-cyan-300/70 bg-gradient-to-br from-cyan-100 via-white to-teal-100 px-4 text-3xl font-black lowercase text-teal-900 shadow-[0_0_18px_rgba(45,212,191,0.18)] sm:min-h-[108px] sm:text-4xl">
+      {word}
+    </div>
+  );
+}
+
 function GroundQuantityCard({
   quantity,
   objectType = "dots",
@@ -55,10 +63,12 @@ function GroundQuantityCard({
 function GroundPairCard({
   numeral,
   quantity,
+  word,
   objectType,
 }: {
   numeral: number;
   quantity: number;
+  word?: string;
   objectType?: GroundMatchTask["objectType"];
 }) {
   return (
@@ -66,7 +76,13 @@ function GroundPairCard({
       <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[18px] bg-gradient-to-br from-cyan-100 to-teal-100 text-3xl font-black text-teal-900 sm:h-16 sm:w-16 sm:text-4xl">
         {numeral}
       </div>
-      <GroundQuantityCard quantity={quantity} objectType={objectType} compact />
+      {word ? (
+        <div className="rounded-[18px] border-2 border-cyan-200 bg-cyan-50 px-4 py-3 text-2xl font-black lowercase text-teal-900 sm:text-3xl">
+          {word}
+        </div>
+      ) : (
+        <GroundQuantityCard quantity={quantity} objectType={objectType} compact />
+      )}
     </div>
   );
 }
@@ -92,6 +108,12 @@ function GroundOptionButton({
 function renderQuestionVisual(task: GroundMatchTask) {
   if (task.promptType === "group_to_numeral" && task.shownQuantity) {
     return <GroundQuantityCard quantity={task.shownQuantity} objectType={task.objectType} />;
+  }
+  if (task.promptType === "numeral_to_word" && task.shownNumeral) {
+    return <GroundNumberCard value={task.shownNumeral} />;
+  }
+  if (task.promptType === "word_to_numeral" && task.shownWord) {
+    return <GroundWordCard word={task.shownWord} />;
   }
   return null;
 }
@@ -135,15 +157,19 @@ function renderOption(option: GroundMatchTask["options"][number]) {
   if (option.kind === "quantity" && typeof option.quantity === "number") {
     return <GroundQuantityCard quantity={option.quantity} objectType={option.objectType} />;
   }
+  if (option.kind === "word" && typeof option.word === "string") {
+    return <GroundWordCard word={option.word} />;
+  }
   if (
     option.kind === "pair" &&
     typeof option.pairNumeral === "number" &&
-    typeof option.pairQuantity === "number"
+    (typeof option.pairQuantity === "number" || typeof option.pairWord === "string")
   ) {
     return (
       <GroundPairCard
         numeral={option.pairNumeral}
-        quantity={option.pairQuantity}
+        quantity={option.pairQuantity ?? option.pairNumeral}
+        word={option.pairWord}
         objectType={option.objectType}
       />
     );

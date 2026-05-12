@@ -6,7 +6,11 @@ type GroundPromptType =
   | "numeral_to_group"
   | "group_to_numeral"
   | "number_to_objects"
-  | "match_pair";
+  | "match_pair"
+  | "word_audio_match"
+  | "numeral_to_word"
+  | "word_to_numeral"
+  | "word_pair_match";
 
 type GroundMatchTask = Extract<PracticeTask, { kind: "groundMatch" }>;
 type GroundCollectTask = Extract<PracticeTask, { kind: "groundCollect" }>;
@@ -129,6 +133,12 @@ function numberWord(value: number) {
   return ["zero", "one", "two", "three", "four", "five"][value] ?? String(value);
 }
 
+type GroundWordValue = "one" | "two" | "three" | "four" | "five";
+
+function toGroundWord(value: number): GroundWordValue {
+  return numberWord(value) as GroundWordValue;
+}
+
 function objectLabel(objectType: GroundObjectType) {
   if (objectType === "gems") return "gems";
   if (objectType === "stars") return "stars";
@@ -222,6 +232,45 @@ function buildPairOptions(target: number, objectType: GroundObjectType, memory: 
     objectType,
     pairNumeral: option.pairNumeral,
     pairQuantity: option.pairQuantity,
+  }));
+  const correctIndex = options.findIndex((option) => option.id === correctOptionId);
+  pushRecent(memory.recentAnswerPositions, correctIndex, RECENT_POSITIONS_LIMIT);
+  return { options, correctOptionId };
+}
+
+function buildWordOptions(target: number, memory: GroundLessonMemory) {
+  const distractors = sampleDistinct([1, 2, 3, 4, 5], 2, [target]);
+  const correctPosition = chooseCorrectPosition(memory);
+  const ordered = new Array<number>(3);
+  ordered[correctPosition] = target;
+  const remainingPositions = [0, 1, 2].filter((position) => position !== correctPosition);
+  remainingPositions.forEach((position, index) => {
+    ordered[position] = distractors[index]!;
+  });
+  pushRecent(memory.recentAnswerPositions, correctPosition, RECENT_POSITIONS_LIMIT);
+  return ordered.map((value, index) => ({
+    id: `word-${target}-${index}-${value}`,
+    kind: "word" as const,
+    word: toGroundWord(value),
+  }));
+}
+
+function buildWordPairOptions(target: number, memory: GroundLessonMemory) {
+  const wrongNumbers = sampleDistinct([1, 2, 3, 4, 5], 2, [target]);
+  const candidates = shuffle([
+    { pairNumeral: target, pairWord: toGroundWord(target) },
+    { pairNumeral: wrongNumbers[0]!, pairWord: toGroundWord(target) },
+    { pairNumeral: target, pairWord: toGroundWord(wrongNumbers[1]!) },
+  ]);
+  const correctOptionId = `pair-word-${target}-${target}`;
+  const options = candidates.map((option, index) => ({
+    id:
+      option.pairNumeral === target && option.pairWord === toGroundWord(target)
+        ? correctOptionId
+        : `pair-word-${index}-${option.pairNumeral}-${option.pairWord}`,
+    kind: "pair" as const,
+    pairNumeral: option.pairNumeral,
+    pairWord: option.pairWord,
   }));
   const correctIndex = options.findIndex((option) => option.id === correctOptionId);
   pushRecent(memory.recentAnswerPositions, correctIndex, RECENT_POSITIONS_LIMIT);
@@ -846,6 +895,112 @@ export function createGroundQuickAudioFluencyTask(lessonId: string): PracticeTas
   };
 }
 
+export function createGroundWordAudioMatchTask(lessonId: string): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory);
+  const options = buildWordOptions(target, memory);
+  pushRecent(memory.recentTargets, target, RECENT_TARGETS_LIMIT);
+  pushRecent(memory.recentPrompts, "word_audio_match", RECENT_PROMPTS_LIMIT);
+  memory.taskCounter += 1;
+  recordGameKind(memory, "groundMatch:wordAudio");
+
+  return {
+    kind: "groundMatch",
+    prompt: "Listen and find the word.",
+    speakText: `Listen and find the word ${numberWord(target)}.`,
+    targetNumber: target,
+    targetNumberName: toGroundWord(target),
+    visualType: "ground-number-card",
+    promptType: "word_audio_match",
+    options,
+    correctOptionId: options.find((option) => option.word === toGroundWord(target))!.id,
+    feedback: {
+      correct: `Yes — that word says ${numberWord(target)}.`,
+      wrong: `Find the word Numbot said.`,
+    },
+  };
+}
+
+export function createGroundNumeralToWordTask(lessonId: string): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory);
+  const options = buildWordOptions(target, memory);
+  pushRecent(memory.recentTargets, target, RECENT_TARGETS_LIMIT);
+  pushRecent(memory.recentPrompts, "numeral_to_word", RECENT_PROMPTS_LIMIT);
+  memory.taskCounter += 1;
+  recordGameKind(memory, "groundMatch:numeralWord");
+
+  return {
+    kind: "groundMatch",
+    prompt: "Match the number.",
+    speakText: `${numberWord(target)} matches number ${numberWord(target)}.`,
+    targetNumber: target,
+    targetNumberName: toGroundWord(target),
+    visualType: "ground-number-card",
+    promptType: "numeral_to_word",
+    shownNumeral: target,
+    options,
+    correctOptionId: options.find((option) => option.word === toGroundWord(target))!.id,
+    feedback: {
+      correct: `Correct — ${numberWord(target)} matches ${target}.`,
+      wrong: "Listen again.",
+    },
+  };
+}
+
+export function createGroundWordToNumeralTask(lessonId: string): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory);
+  const options = buildNumeralOptions(target, memory);
+  pushRecent(memory.recentTargets, target, RECENT_TARGETS_LIMIT);
+  pushRecent(memory.recentPrompts, "word_to_numeral", RECENT_PROMPTS_LIMIT);
+  memory.taskCounter += 1;
+  recordGameKind(memory, "groundMatch:wordNumeral");
+
+  return {
+    kind: "groundMatch",
+    prompt: "Find the number.",
+    speakText: `This word is ${numberWord(target)}. Find number ${numberWord(target)}.`,
+    targetNumber: target,
+    targetNumberName: toGroundWord(target),
+    visualType: "ground-number-card",
+    promptType: "word_to_numeral",
+    shownWord: toGroundWord(target),
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: {
+      correct: `Correct — ${numberWord(target)} matches ${target}.`,
+      wrong: `Look for number ${numberWord(target)}.`,
+    },
+  };
+}
+
+export function createGroundThreeWayWordMatchTask(lessonId: string): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory);
+  const { options, correctOptionId } = buildWordPairOptions(target, memory);
+  pushRecent(memory.recentTargets, target, RECENT_TARGETS_LIMIT);
+  pushRecent(memory.recentPrompts, "word_pair_match", RECENT_PROMPTS_LIMIT);
+  memory.taskCounter += 1;
+  recordGameKind(memory, "groundMatch:threeWayWord");
+
+  return {
+    kind: "groundMatch",
+    prompt: "Which pair matches?",
+    speakText: `Find the pair for ${numberWord(target)}.`,
+    targetNumber: target,
+    targetNumberName: toGroundWord(target),
+    visualType: "ground-flash-match-card",
+    promptType: "word_pair_match",
+    options,
+    correctOptionId,
+    feedback: {
+      correct: "Nice match!",
+      wrong: "Listen again.",
+    },
+  };
+}
+
 export function generatePrepWeek1Task(
   lessonId: string,
   difficulty: Difficulty = "easy"
@@ -923,8 +1078,27 @@ export function generatePrepWeek1Lesson3Task(lessonId: string): PracticeTask {
       return createGroundHearQuantityTask(lessonId);
     case "C":
       return createGroundNumberMemoryTask(lessonId);
-    case "D":
-      return createGroundSpeakBubbleMatchTask(lessonId);
+    case "D": {
+      if (randInt(1, 4) === 1) {
+        return createGroundSpeakBubbleMatchTask(lessonId);
+      }
+      const wordMode = avoidRecentGameKind(memory, [
+        "groundMatch:wordAudio",
+        "groundMatch:numeralWord",
+        "groundMatch:wordNumeral",
+        "groundMatch:threeWayWord",
+      ]);
+      if (wordMode === "groundMatch:numeralWord") {
+        return createGroundNumeralToWordTask(lessonId);
+      }
+      if (wordMode === "groundMatch:wordNumeral") {
+        return createGroundWordToNumeralTask(lessonId);
+      }
+      if (wordMode === "groundMatch:threeWayWord") {
+        return createGroundThreeWayWordMatchTask(lessonId);
+      }
+      return createGroundWordAudioMatchTask(lessonId);
+    }
     case "E":
       return createGroundNumbotSaysTask(lessonId);
     case "F":
