@@ -102,9 +102,9 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
       buildLesson(
         3,
         2,
-        "Count Back from 10",
-        "Count backward from 10 and build reverse number order.",
-        ["Countdown blastoff", "Number removal", "Backward number paths"],
+        "Blast Off Countdown",
+        "Count backward from 10 to 1 and build reverse number order.",
+        ["Countdown blastoff", "What comes before", "Backward number paths"],
         ["AC9MFN01", "AC9MFN03"]
       ),
       buildLesson(

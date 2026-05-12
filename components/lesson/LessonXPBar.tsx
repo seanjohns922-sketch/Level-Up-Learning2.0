@@ -11,17 +11,30 @@ export function calcXP(correct: number) {
 export function LessonXPBar({
   correct,
   totalTarget,
+  mode = "xp",
+  currentValue,
+  maxValue,
+  valueLabel,
+  rightLabel,
 }: {
-  correct: number;
-  totalTarget: number;
+  correct?: number;
+  totalTarget?: number;
+  mode?: "xp" | "progress";
+  currentValue?: number;
+  maxValue?: number;
+  valueLabel?: string;
+  rightLabel?: string;
 }) {
-  const earned = calcXP(correct);
-  const max = totalTarget * XP_PER_CORRECT;
+  const earned = mode === "progress" ? Math.max(0, currentValue ?? 0) : calcXP(correct ?? 0);
+  const max = mode === "progress"
+    ? Math.max(1, maxValue ?? 1)
+    : Math.max(1, (totalTarget ?? 0) * XP_PER_CORRECT);
   const pct = max > 0 ? Math.min(100, (earned / max) * 100) : 0;
+  const leftLabel = valueLabel ?? (mode === "progress" ? `${earned} / ${max}` : `${earned} / ${max} XP`);
+  const trailingLabel = rightLabel ?? (mode === "progress" ? "Session Progress" : "Lesson Progress");
 
   return (
     <div className="relative">
-      {/* Bezel */}
       <div
         aria-hidden
         className="absolute -inset-[2px] pointer-events-none"
@@ -43,7 +56,6 @@ export function LessonXPBar({
             "inset 0 1px 0 rgba(251,191,36,0.25), inset 0 -8px 16px rgba(0,0,0,0.4)",
         }}
       >
-        {/* Scanlines */}
         <div
           aria-hidden
           className="absolute inset-0 opacity-[0.15] pointer-events-none"
@@ -75,10 +87,10 @@ export function LessonXPBar({
                 className="text-xs font-mono font-extrabold uppercase tracking-[0.16em] text-amber-100 md:text-sm"
                 style={{ textShadow: "0 0 10px rgba(251,191,36,0.4)" }}
               >
-                {earned} / {max} XP
+                {leftLabel}
               </span>
               <span className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-teal-200/70 md:text-[11px]">
-                Lesson Progress
+                {trailingLabel}
               </span>
             </div>
             <div

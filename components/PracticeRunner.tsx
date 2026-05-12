@@ -179,6 +179,13 @@ export function PracticeRunner({
   const safeQuestionsAnswered = Math.max(0, questionsAnswered);
   const safeCorrectAnswers = Math.max(0, correctAnswers);
   const cappedCorrectAnswers = clampNumber(correctAnswers, 0, scoreCap);
+  const isTimeOnlySession = completionMode === "time_only";
+  const elapsedWholeMinutes = Math.min(minutes, Math.floor(elapsedSeconds / 60));
+  const hudXPMode = isTimeOnlySession ? "progress" : "xp";
+  const hudXPValue = isTimeOnlySession ? elapsedWholeMinutes : undefined;
+  const hudXPMax = isTimeOnlySession ? minutes : undefined;
+  const hudXPLabel = isTimeOnlySession ? `${elapsedWholeMinutes} / ${minutes} MIN` : undefined;
+  const hudXPRightLabel = isTimeOnlySession ? "Session Progress" : undefined;
   const accuracy =
     safeQuestionsAnswered > 0
       ? Math.round((safeCorrectAnswers / safeQuestionsAnswered) * 100)
@@ -519,7 +526,7 @@ export function PracticeRunner({
         : null;
   const statusMessage =
     status === "correct"
-      ? hint ?? "✓ Correct! +10 XP"
+      ? hint ?? (completionMode === "time_only" ? "✓ Correct! Keep going!" : "✓ Correct! +10 XP")
       : status === "wrong"
         ? hint ?? "✗ Not quite — keep going!"
         : null;
@@ -627,6 +634,11 @@ export function PracticeRunner({
             secondsLeft={Math.max(0, secondsLeft)}
             totalSeconds={totalSeconds}
             xpTarget={scoreCap}
+            xpMode={hudXPMode}
+            xpDisplayValue={hudXPValue}
+            xpDisplayMax={hudXPMax}
+            xpDisplayLabel={hudXPLabel}
+            xpDisplayRightLabel={hudXPRightLabel}
             hint={hint}
           />
         </aside>

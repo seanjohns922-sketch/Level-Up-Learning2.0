@@ -82,7 +82,8 @@ function LessonPage() {
       effectiveLessonId === "y0-w2-l1" ||
       effectiveLessonId === "y0-w2-l2" ||
       effectiveLessonId === "y0-w2-l3" ||
-      effectiveLessonId === "y0-w3-l1"
+      effectiveLessonId === "y0-w3-l1" ||
+      effectiveLessonId === "y0-w3-l2"
     );
 
   useEffect(() => {
@@ -289,6 +290,8 @@ function LessonPage() {
             ? "You matched numbers, words, and groups!"
           : effectiveLessonId === "y0-w3-l1"
             ? "Great Counting!"
+            : effectiveLessonId === "y0-w3-l2"
+              ? "Blast Off Complete!"
         : effectiveLessonId === "y0-w1-l2"
           ? "You counted collections to 5!"
           : "You recognised numbers 1 to 5!";
@@ -297,7 +300,9 @@ function LessonPage() {
         ? "Weekly Quiz unlocked."
         : effectiveLessonId === "y0-w3-l1"
           ? "Lesson 2 unlocked."
-          : `Lesson ${lessonNumber + 1} unlocked.`;
+          : effectiveLessonId === "y0-w3-l2"
+            ? "Lesson 3 unlocked."
+            : `Lesson ${lessonNumber + 1} unlocked.`;
 
     return (
       <div className="rounded-[28px] border border-cyan-200 bg-gradient-to-br from-cyan-50 via-white to-teal-50 p-6 shadow-[0_12px_30px_rgba(13,148,136,0.08)]">
@@ -741,7 +746,7 @@ function LessonPage() {
                   ) {
                     return generatePrepWeek2Task(effectiveLessonId, d);
                   }
-                  if (effectiveLessonId === "y0-w3-l1") {
+                  if (effectiveLessonId === "y0-w3-l1" || effectiveLessonId === "y0-w3-l2") {
                     return generatePrepWeek3Task(effectiveLessonId, d);
                   }
                   return generatePrepWeek1Task(effectiveLessonId, d);

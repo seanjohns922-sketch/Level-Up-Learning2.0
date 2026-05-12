@@ -211,6 +211,8 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       targetNumber: number;
+      displayNumber?: number;
+      promptAfterReveal?: string;
       objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs";
       revealType?: "objects" | "numeral";
       revealMs?: number;
@@ -298,6 +300,7 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       targetNumber: number;
+      direction?: "ASC" | "DESC";
       tiles: Array<{
         id: string;
         numeral: number;

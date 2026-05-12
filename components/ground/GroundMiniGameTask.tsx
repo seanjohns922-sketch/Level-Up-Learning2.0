@@ -268,10 +268,10 @@ export function GroundFlashTaskCard({
         <div className="flex min-h-[108px] items-center justify-center rounded-[20px] bg-cyan-50 px-4 py-4">
           {revealed ? (
             task.revealType === "numeral" ? (
-              <div className="text-7xl font-black text-teal-900 sm:text-8xl">{task.targetNumber}</div>
+              <div className="text-7xl font-black text-teal-900 sm:text-8xl">{task.displayNumber ?? task.targetNumber}</div>
             ) : (
               <div className="flex flex-wrap justify-center gap-3">
-                {Array.from({ length: task.targetNumber }).map((_, index) => (
+                {Array.from({ length: task.displayNumber ?? task.targetNumber }).map((_, index) => (
                   <span
                     key={`${task.objectType}-${index}`}
                     className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-3xl text-teal-700 shadow-sm"
@@ -282,7 +282,7 @@ export function GroundFlashTaskCard({
               </div>
             )
           ) : (
-            <div className="text-lg font-black text-slate-500">What did you see?</div>
+            <div className="text-lg font-black text-slate-500">{task.promptAfterReveal ?? "What did you see?"}</div>
           )}
         </div>
       </div>
@@ -675,10 +675,11 @@ export function GroundOrderTapTaskCard({
   onWrong: () => void;
 }) {
   const [progressIndex, setProgressIndex] = useState(0);
+  const direction = task.direction ?? "ASC";
+  const expectedNumeral = direction === "DESC" ? task.targetNumber - progressIndex : progressIndex + 1;
 
   function tapTile(numeral: number) {
-    const expected = progressIndex + 1;
-    if (numeral !== expected) {
+    if (numeral !== expectedNumeral) {
       setProgressIndex(0);
       onWrong();
       return;
@@ -697,23 +698,29 @@ export function GroundOrderTapTaskCard({
       <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
         <GroundCountBadge count={progressIndex} target={task.targetNumber} />
         <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
-          Tap {progressIndex + 1} next
+          Tap {expectedNumeral} next
         </div>
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
-          {task.tiles.map((tile) => (
-            <button
-              key={tile.id}
-              type="button"
-              onClick={() => tapTile(tile.numeral)}
-              className={`flex min-h-[88px] items-center justify-center rounded-[22px] border-2 text-4xl font-black shadow-sm transition ${
-                tile.numeral <= progressIndex
-                  ? "border-teal-400 bg-teal-100 text-teal-900"
-                  : "border-cyan-200 bg-white text-teal-900 hover:border-cyan-300 hover:bg-cyan-50"
-              }`}
-            >
-              {tile.numeral}
-            </button>
-          ))}
+          {task.tiles.map((tile) => {
+            const isCompleted =
+              direction === "DESC"
+                ? tile.numeral > expectedNumeral && tile.numeral <= task.targetNumber
+                : tile.numeral <= progressIndex;
+            return (
+              <button
+                key={tile.id}
+                type="button"
+                onClick={() => tapTile(tile.numeral)}
+                className={`flex min-h-[88px] items-center justify-center rounded-[22px] border-2 text-4xl font-black shadow-sm transition ${
+                  isCompleted
+                    ? "border-teal-400 bg-teal-100 text-teal-900"
+                    : "border-cyan-200 bg-white text-teal-900 hover:border-cyan-300 hover:bg-cyan-50"
+                }`}
+              >
+                {tile.numeral}
+              </button>
+            );
+          })}
         </div>
       </div>
     </GroundMiniShell>

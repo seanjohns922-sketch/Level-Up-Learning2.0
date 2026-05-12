@@ -26,6 +26,11 @@ export function LessonHUDRail({
   secondsLeft,
   totalSeconds,
   xpTarget,
+  xpMode,
+  xpDisplayValue,
+  xpDisplayMax,
+  xpDisplayLabel,
+  xpDisplayRightLabel,
   hint,
 }: {
   levelNumber?: number;
@@ -40,6 +45,11 @@ export function LessonHUDRail({
   secondsLeft: number;
   totalSeconds: number;
   xpTarget: number;
+  xpMode?: "xp" | "progress";
+  xpDisplayValue?: number;
+  xpDisplayMax?: number;
+  xpDisplayLabel?: string;
+  xpDisplayRightLabel?: string;
   hint?: string | null;
 }) {
   const [hintOpen, setHintOpen] = useState(false);
@@ -95,7 +105,15 @@ export function LessonHUDRail({
         {/* XP + Timer */}
         <div className="flex items-stretch gap-2 lg:flex-col lg:items-stretch">
           <div className="flex-1 min-w-0">
-            <LessonXPBar correct={xpCorrectAnswers ?? correctAnswers} totalTarget={xpTarget} />
+            <LessonXPBar
+              correct={xpCorrectAnswers ?? correctAnswers}
+              totalTarget={xpTarget}
+              mode={xpMode}
+              currentValue={xpDisplayValue}
+              maxValue={xpDisplayMax}
+              valueLabel={xpDisplayLabel}
+              rightLabel={xpDisplayRightLabel}
+            />
           </div>
           <div className="flex-shrink-0 lg:self-end">
             <LessonTimer seconds={Math.max(0, secondsLeft)} total={totalSeconds} />
