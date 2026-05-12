@@ -13,6 +13,8 @@ type GroundTapCountTask = Extract<PracticeTask, { kind: "groundTapCount" }>;
 type GroundMoveCountTask = Extract<PracticeTask, { kind: "groundMoveCount" }>;
 type GroundFeedTask = Extract<PracticeTask, { kind: "groundFeed" }>;
 type GroundSoundCountTask = Extract<PracticeTask, { kind: "groundSoundCount" }>;
+type GroundOrderTapTask = Extract<PracticeTask, { kind: "groundOrderTap" }>;
+type GroundGrowingCountTask = Extract<PracticeTask, { kind: "groundGrowingCount" }>;
 
 const OBJECT_META = {
   dots: { label: "dots", emoji: "●" },
@@ -24,6 +26,9 @@ const OBJECT_META = {
   crystals: { label: "crystals", emoji: "✦" },
   bolts: { label: "bolts", emoji: "⚡" },
   futuristic_coins: { label: "coins", emoji: "◉" },
+  planets: { label: "planets", emoji: "🪐" },
+  rockets: { label: "rockets", emoji: "🚀" },
+  number_orbs: { label: "number orbs", emoji: "🔵" },
 } as const;
 
 function GroundMiniShell({
@@ -646,6 +651,113 @@ export function GroundSoundCountTaskCard({
         </div>
       </div>
 
+      <div className="grid grid-cols-3 gap-3">
+        {task.options.map((option) => (
+          <GroundNumeralOption
+            key={option.id}
+            numeral={option.numeral}
+            onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
+          />
+        ))}
+      </div>
+    </GroundMiniShell>
+  );
+}
+
+
+export function GroundOrderTapTaskCard({
+  task,
+  onCorrect,
+  onWrong,
+}: {
+  task: GroundOrderTapTask;
+  onCorrect: () => void;
+  onWrong: () => void;
+}) {
+  const [progressIndex, setProgressIndex] = useState(0);
+
+  function tapTile(numeral: number) {
+    const expected = progressIndex + 1;
+    if (numeral !== expected) {
+      setProgressIndex(0);
+      onWrong();
+      return;
+    }
+
+    const nextIndex = progressIndex + 1;
+    if (nextIndex >= task.targetNumber) {
+      onCorrect();
+      return;
+    }
+    setProgressIndex(nextIndex);
+  }
+
+  return (
+    <GroundMiniShell badge="Number Path" prompt={task.prompt} speakText={task.speakText}>
+      <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
+        <GroundCountBadge count={progressIndex} target={task.targetNumber} />
+        <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
+          Tap {progressIndex + 1} next
+        </div>
+        <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
+          {task.tiles.map((tile) => (
+            <button
+              key={tile.id}
+              type="button"
+              onClick={() => tapTile(tile.numeral)}
+              className={`flex min-h-[88px] items-center justify-center rounded-[22px] border-2 text-4xl font-black shadow-sm transition ${
+                tile.numeral <= progressIndex
+                  ? "border-teal-400 bg-teal-100 text-teal-900"
+                  : "border-cyan-200 bg-white text-teal-900 hover:border-cyan-300 hover:bg-cyan-50"
+              }`}
+            >
+              {tile.numeral}
+            </button>
+          ))}
+        </div>
+      </div>
+    </GroundMiniShell>
+  );
+}
+
+export function GroundGrowingCountTaskCard({
+  task,
+  onCorrect,
+  onWrong,
+}: {
+  task: GroundGrowingCountTask;
+  onCorrect: () => void;
+  onWrong: () => void;
+}) {
+  const [visibleCount, setVisibleCount] = useState(0);
+
+  useEffect(() => {
+    const timeouts: number[] = [];
+    for (let index = 0; index < task.targetNumber; index += 1) {
+      timeouts.push(window.setTimeout(() => setVisibleCount(index + 1), index * 420));
+    }
+    return () => {
+      timeouts.forEach((timeout) => window.clearTimeout(timeout));
+    };
+  }, [task]);
+
+  return (
+    <GroundMiniShell badge="Rocket Count" prompt={task.prompt} speakText={task.speakText}>
+      <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
+        <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
+          Count as they appear
+        </div>
+        <div className="flex min-h-[120px] flex-wrap justify-center gap-3 rounded-[20px] bg-cyan-50 px-4 py-4">
+          {Array.from({ length: visibleCount }).map((_, index) => (
+            <span
+              key={`${task.objectType}-${index}`}
+              className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white text-3xl text-teal-700 shadow-sm"
+            >
+              {OBJECT_META[task.objectType].emoji}
+            </span>
+          ))}
+        </div>
+      </div>
       <div className="grid grid-cols-3 gap-3">
         {task.options.map((option) => (
           <GroundNumeralOption

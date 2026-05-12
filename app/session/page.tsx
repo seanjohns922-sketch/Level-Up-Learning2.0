@@ -1295,6 +1295,9 @@ const GROUND_OBJECT_TYPES: GroundObjectType[] = [
   "crystals",
   "bolts",
   "futuristic_coins",
+  "planets",
+  "rockets",
+  "number_orbs",
 ];
 
 const GROUND_OBJECT_LABELS: Record<GroundObjectType, string> = {
@@ -1307,6 +1310,9 @@ const GROUND_OBJECT_LABELS: Record<GroundObjectType, string> = {
   crystals: "crystals",
   bolts: "bolts",
   futuristic_coins: "coins",
+  planets: "planets",
+  rockets: "rockets",
+  number_orbs: "number orbs",
 };
 
 function numberToGroundWord(value: number): GroundWord {

@@ -30,7 +30,9 @@ function formatPracticeTopicLabel(kind: PracticeTask["kind"]) {
   if (kind === "groundCollect") return "Ground Collect";
   if (kind === "groundBuild") return "Ground Build";
   if (kind === "groundFlash") return "Ground Flash";
+  if (kind === "groundGrowingCount") return "Rocket Count";
   if (kind === "groundHunt") return "Number Hunt";
+  if (kind === "groundOrderTap") return "Number Path";
   if (kind === "groundSequence") return "Missing Number";
   if (kind === "groundTapCount") return "Tap Count";
   if (kind === "groundMoveCount") return "Move To Count";
@@ -69,7 +71,9 @@ function getPracticeTaskCorrectAnswer(task: PracticeTask) {
   if (task.kind === "groundCollect") return String(task.targetNumber);
   if (task.kind === "groundBuild") return String(task.targetNumber);
   if (task.kind === "groundFlash") return String(task.targetNumber);
+  if (task.kind === "groundGrowingCount") return String(task.targetNumber);
   if (task.kind === "groundHunt") return String(task.targetNumber);
+  if (task.kind === "groundOrderTap") return String(task.targetNumber);
   if (task.kind === "groundSequence") return String(task.targetNumber);
   if (task.kind === "groundTapCount") return String(task.targetNumber);
   if (task.kind === "groundMoveCount") return String(task.targetNumber);
@@ -495,7 +499,9 @@ export function PracticeRunner({
     task.kind === "groundCollect" ||
     task.kind === "groundBuild" ||
     task.kind === "groundFlash" ||
+    task.kind === "groundGrowingCount" ||
     task.kind === "groundHunt" ||
+    task.kind === "groundOrderTap" ||
     task.kind === "groundSequence" ||
     task.kind === "groundTapCount" ||
     task.kind === "groundMoveCount" ||

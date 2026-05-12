@@ -84,8 +84,10 @@ import {
   GroundCollectTaskCard,
   GroundFeedTaskCard,
   GroundFlashTaskCard,
+  GroundGrowingCountTaskCard,
   GroundHuntTaskCard,
   GroundMoveCountTaskCard,
+  GroundOrderTapTaskCard,
   GroundSequenceTaskCard,
   GroundSoundCountTaskCard,
   GroundTapCountTaskCard,
@@ -281,8 +283,12 @@ function TaskRendererInner({
       return <GroundBuildTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundFlash":
       return <GroundFlashTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "groundGrowingCount":
+      return <GroundGrowingCountTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundHunt":
       return <GroundHuntTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "groundOrderTap":
+      return <GroundOrderTapTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundSequence":
       return <GroundSequenceTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundTapCount":

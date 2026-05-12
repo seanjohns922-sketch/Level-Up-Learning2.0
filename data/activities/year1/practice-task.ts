@@ -170,7 +170,7 @@ export type PracticeTask = (
         | "word_to_numeral"
         | "word_pair_match";
       helperVariant?: "numbot" | "speech_bubble" | "memory";
-      objectType?: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins";
+      objectType?: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs";
       shownNumeral?: number;
       shownQuantity?: number;
       shownWord?: string;
@@ -181,7 +181,7 @@ export type PracticeTask = (
         numeral?: number;
         word?: string;
         quantity?: number;
-        objectType?: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins";
+        objectType?: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs";
         pairNumeral?: number;
         pairQuantity?: number;
         pairWord?: string;
@@ -194,7 +194,7 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       targetNumber: number;
-      objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins";
+      objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs";
       totalObjects: number;
       feedback?: { correct: string; wrong: string };
     }
@@ -203,7 +203,7 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       targetNumber: number;
-      objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins";
+      objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs";
       feedback?: { correct: string; wrong: string };
     }
   | {
@@ -211,7 +211,7 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       targetNumber: number;
-      objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins";
+      objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs";
       revealType?: "objects" | "numeral";
       revealMs?: number;
       options: Array<{
@@ -251,7 +251,7 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       targetNumber: number;
-      objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins";
+      objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs";
       options: Array<{
         id: string;
         numeral: number;
@@ -264,7 +264,7 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       targetNumber: number;
-      objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins";
+      objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs";
       options: Array<{
         id: string;
         numeral: number;
@@ -286,6 +286,31 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       targetNumber: number;
+      options: Array<{
+        id: string;
+        numeral: number;
+      }>;
+      correctOptionId: string;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
+      kind: "groundOrderTap";
+      prompt: string;
+      speakText?: string;
+      targetNumber: number;
+      tiles: Array<{
+        id: string;
+        numeral: number;
+      }>;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
+      kind: "groundGrowingCount";
+      prompt: string;
+      speakText?: string;
+      targetNumber: number;
+      objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs";
+      revealMs?: number;
       options: Array<{
         id: string;
         numeral: number;

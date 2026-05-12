@@ -94,9 +94,9 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
       buildLesson(
         3,
         1,
-        "Count Forward to 10",
-        "Count forward fluently and identify missing numbers in sequence.",
-        ["Rocket countdown build", "Missing number", "Count along paths"],
+        "Rocket Count to 10",
+        "Count forward fluently to 10 and complete number paths in order.",
+        ["Count along the rocket path", "Find the missing number", "Tap numbers in order"],
         ["AC9MFN01", "AC9MFN03"]
       ),
       buildLesson(
