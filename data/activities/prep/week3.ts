@@ -108,8 +108,8 @@ function chooseRecentSafe<T>(pool: readonly T[] | T[], recent: T[]) {
 }
 
 function difficultyMaxTarget(difficulty: Difficulty) {
-  if (difficulty === "easy") return 5;
-  if (difficulty === "medium") return 8;
+  if (difficulty === "easy") return 7;
+  if (difficulty === "medium") return 9;
   return 10;
 }
 
@@ -179,7 +179,7 @@ function sequenceTask(
 
 function createCountAlongTask(lessonId: string, difficulty: Difficulty): GroundSequenceTask {
   const memory = getMemory(lessonId);
-  const target = Math.max(2, pickTarget(memory, difficulty, 2));
+  const target = Math.max(4, pickTarget(memory, difficulty, 4));
   pushRecent(memory.recentKinds, "count_along", 4);
   return sequenceTask(
     lessonId,
@@ -195,8 +195,9 @@ function createMissingNumberTask(lessonId: string, difficulty: Difficulty): Grou
   const memory = getMemory(lessonId);
   const maxTarget = difficultyMaxTarget(difficulty);
   const length = difficulty === "easy" ? 4 : difficulty === "medium" ? 5 : 6;
-  const startMax = Math.max(1, maxTarget - length + 1);
-  const start = randInt(1, startMax);
+  const minStart = difficulty === "easy" ? 3 : difficulty === "medium" ? 4 : 5;
+  const startMax = Math.max(minStart, maxTarget - length + 1);
+  const start = randInt(minStart, startMax);
   const sequence = Array.from({ length }, (_, index) => start + index);
   const missingIndex = difficulty === "easy" ? randInt(0, Math.min(2, length - 1)) : randInt(0, length - 1);
   const target = sequence[missingIndex]!;
@@ -214,7 +215,7 @@ function createMissingNumberTask(lessonId: string, difficulty: Difficulty): Grou
 
 function createNextNumberTask(lessonId: string, difficulty: Difficulty): GroundSequenceTask {
   const memory = getMemory(lessonId);
-  const previous = pickTarget(memory, difficulty, 1);
+  const previous = pickTarget(memory, difficulty, 5);
   const target = Math.min(10, previous + 1);
   pushRecent(memory.recentTargets, target, 4);
   pushRecent(memory.recentKinds, "next_number", 4);
@@ -231,7 +232,8 @@ function createNextNumberTask(lessonId: string, difficulty: Difficulty): GroundS
 function createNumberTrainTask(lessonId: string, difficulty: Difficulty): GroundSequenceTask {
   const memory = getMemory(lessonId);
   const maxTarget = difficultyMaxTarget(difficulty);
-  const start = randInt(1, Math.max(1, maxTarget - 3));
+  const minStart = difficulty === "easy" ? 3 : difficulty === "medium" ? 4 : 5;
+  const start = randInt(Math.min(minStart, Math.max(minStart, maxTarget - 3)), Math.max(minStart, maxTarget - 3));
   const sequence = [start, start + 1, start + 2, start + 3];
   const missingIndex = randInt(1, 2);
   const target = sequence[missingIndex]!;
@@ -249,7 +251,7 @@ function createNumberTrainTask(lessonId: string, difficulty: Difficulty): Ground
 
 function createFinishCountTask(lessonId: string, difficulty: Difficulty): GroundSequenceTask {
   const memory = getMemory(lessonId);
-  const target = Math.max(2, pickTarget(memory, difficulty, 2));
+  const target = Math.max(6, pickTarget(memory, difficulty, 6));
   pushRecent(memory.recentKinds, "finish_count", 4);
   return sequenceTask(
     lessonId,
@@ -272,7 +274,7 @@ function buildOrderTiles(target: number) {
 
 function createNumberPathTask(lessonId: string, difficulty: Difficulty): GroundOrderTapTask {
   const memory = getMemory(lessonId);
-  const target = pickTarget(memory, difficulty, 4);
+  const target = Math.max(6, pickTarget(memory, difficulty, 6));
   pushRecent(memory.recentKinds, "number_path", 4);
   return {
     kind: "groundOrderTap",
@@ -289,7 +291,7 @@ function createNumberPathTask(lessonId: string, difficulty: Difficulty): GroundO
 
 function createTapInOrderTask(lessonId: string, difficulty: Difficulty): GroundOrderTapTask {
   const memory = getMemory(lessonId);
-  const target = pickTarget(memory, difficulty, 5);
+  const target = Math.max(6, pickTarget(memory, difficulty, 6));
   pushRecent(memory.recentKinds, "tap_in_order", 4);
   return {
     kind: "groundOrderTap",
@@ -306,7 +308,7 @@ function createTapInOrderTask(lessonId: string, difficulty: Difficulty): GroundO
 
 function createListenAndBuildTask(lessonId: string, difficulty: Difficulty): GroundOrderTapTask {
   const memory = getMemory(lessonId);
-  const target = pickTarget(memory, difficulty, 4);
+  const target = Math.max(6, pickTarget(memory, difficulty, 6));
   pushRecent(memory.recentKinds, "listen_build", 4);
   return {
     kind: "groundOrderTap",
@@ -323,7 +325,7 @@ function createListenAndBuildTask(lessonId: string, difficulty: Difficulty): Gro
 
 function createCountRocketsTask(lessonId: string, difficulty: Difficulty): GroundGrowingCountTask {
   const memory = getMemory(lessonId);
-  const target = pickTarget(memory, difficulty, 3);
+  const target = Math.max(6, pickTarget(memory, difficulty, 6));
   const objectType = chooseRecentSafe(["rockets", "planets", "number_orbs", "stars", "crystals"] as const, memory.recentObjects) as GroundObjectType;
   pushRecent(memory.recentObjects, objectType, 4);
   pushRecent(memory.recentKinds, "count_rockets", 4);
@@ -346,7 +348,7 @@ function createCountRocketsTask(lessonId: string, difficulty: Difficulty): Groun
 
 function createFastFlashCountTask(lessonId: string, difficulty: Difficulty): GroundFlashTask {
   const memory = getMemory(lessonId);
-  const target = pickTarget(memory, difficulty, 3);
+  const target = Math.max(6, pickTarget(memory, difficulty, 6));
   const objectType = pickObject(memory);
   const { options, correctOptionId } = buildNumeralOptions(target, memory, difficultyMaxTarget(difficulty), 3);
   pushRecent(memory.recentKinds, "fast_flash_count", 4);
