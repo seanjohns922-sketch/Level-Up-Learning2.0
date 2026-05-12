@@ -174,6 +174,7 @@ export type PracticeTask = (
       shownNumeral?: number;
       shownQuantity?: number;
       shownWord?: "one" | "two" | "three" | "four" | "five";
+      shownSequence?: Array<number | "__">;
       options: Array<{
         id: string;
         kind: "numeral" | "quantity" | "pair" | "word";
@@ -211,7 +212,33 @@ export type PracticeTask = (
       speakText?: string;
       targetNumber: number;
       objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs";
+      revealType?: "objects" | "numeral";
       revealMs?: number;
+      options: Array<{
+        id: string;
+        numeral: number;
+      }>;
+      correctOptionId: string;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
+      kind: "groundHunt";
+      prompt: string;
+      speakText?: string;
+      targetNumber: number;
+      tiles: Array<{
+        id: string;
+        numeral: number;
+        isTarget: boolean;
+      }>;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
+      kind: "groundSequence";
+      prompt: string;
+      speakText?: string;
+      targetNumber: number;
+      sequence: Array<number | "__">;
       options: Array<{
         id: string;
         numeral: number;

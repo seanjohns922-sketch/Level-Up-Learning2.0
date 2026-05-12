@@ -109,6 +109,24 @@ function renderQuestionVisual(task: GroundMatchTask) {
   if (task.promptType === "group_to_numeral" && task.shownQuantity) {
     return <GroundQuantityCard quantity={task.shownQuantity} objectType={task.objectType} />;
   }
+  if (task.shownSequence && task.shownSequence.length > 0) {
+    return (
+      <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+        {task.shownSequence.map((value, index) => (
+          <div
+            key={`${task.targetNumber}-seq-${index}`}
+            className={`flex h-16 min-w-[72px] items-center justify-center rounded-[20px] border-2 px-4 text-3xl font-black shadow-sm sm:h-20 sm:min-w-[88px] sm:text-4xl ${
+              value === "__"
+                ? "border-dashed border-cyan-300 bg-cyan-50 text-cyan-500"
+                : "border-cyan-200 bg-white text-teal-900"
+            }`}
+          >
+            {value === "__" ? "?" : value}
+          </div>
+        ))}
+      </div>
+    );
+  }
   if (task.promptType === "numeral_to_word" && task.shownNumeral) {
     return <GroundNumberCard value={task.shownNumeral} />;
   }
@@ -204,7 +222,14 @@ export default function GroundMatchTaskCard({
         ) : null}
       </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+      <div
+        className={[
+          "grid gap-3 sm:gap-4",
+          task.options.length === 4
+            ? "grid-cols-2 sm:grid-cols-4"
+            : "grid-cols-1 sm:grid-cols-3",
+        ].join(" ")}
+      >
         {task.options.map((option) => (
           <GroundOptionButton
             key={option.id}

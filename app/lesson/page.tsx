@@ -23,6 +23,7 @@ import { resetWeek2TaskSessionState } from "@/data/activities/year1/week2";
 import { resetWeek3TaskSessionState } from "@/data/activities/year1/week3";
 import { resetWeek4TaskSessionState } from "@/data/activities/year1/week4";
 import { generatePrepWeek1Task, resetPrepWeek1TaskSessionState } from "@/data/activities/prep/week1";
+import { generatePrepWeek2Task, resetPrepWeek2TaskSessionState } from "@/data/activities/prep/week2";
 import { getProgramForYear } from "@/data/programs";
 import { DEMO_MODE } from "@/data/config";
 import { ACTIVE_STUDENT_KEY, readProgress, updateProgress } from "@/data/progress";
@@ -71,9 +72,14 @@ function LessonPage() {
   const safeLessonFocus = lessonMeta?.focus ?? null;
   const hasEmbeddedLessonVideo =
     year === "Year 4" && week === 2 && lessonNumber === 1;
-  const isGroundWeek1CustomLesson =
+  const isGroundCustomLesson =
     year === "Prep" &&
-    (effectiveLessonId === "y0-w1-l1" || effectiveLessonId === "y0-w1-l2" || effectiveLessonId === "y0-w1-l3");
+    (
+      effectiveLessonId === "y0-w1-l1" ||
+      effectiveLessonId === "y0-w1-l2" ||
+      effectiveLessonId === "y0-w1-l3" ||
+      effectiveLessonId === "y0-w2-l1"
+    );
 
   useEffect(() => {
     const p = readProgress();
@@ -121,10 +127,10 @@ function LessonPage() {
     if (year === "Year 1") {
       resetYear1SessionTaskState();
     }
-    if (isGroundWeek1CustomLesson) {
+    if (isGroundCustomLesson) {
       resetPrepSessionTaskState();
     }
-  }, [effectiveLessonId, isGroundWeek1CustomLesson, week, year]);
+  }, [effectiveLessonId, isGroundCustomLesson, week, year]);
 
   function completeLesson() {
     markLessonComplete(year, week, lessonNumber);
@@ -271,6 +277,8 @@ function LessonPage() {
     const prepSuccessTitle =
       effectiveLessonId === "y0-w1-l3"
         ? "You matched number names and numerals!"
+        : effectiveLessonId === "y0-w2-l1"
+          ? "You found numbers 6 to 10!"
         : effectiveLessonId === "y0-w1-l2"
           ? "You counted collections to 5!"
           : "You recognised numbers 1 to 5!";
@@ -637,7 +645,7 @@ function LessonPage() {
                       if (year === "Year 1") {
                         resetYear1SessionTaskState();
                       }
-                      if (isGroundWeek1CustomLesson) {
+                      if (isGroundCustomLesson) {
                         resetPrepSessionTaskState();
                       }
                       setStartedLessonId(effectiveLessonId);
@@ -676,7 +684,7 @@ function LessonPage() {
               </div>
             </div>
           </div>
-        ) : year === "Year 1" || isGroundWeek1CustomLesson ? (
+        ) : year === "Year 1" || isGroundCustomLesson ? (
           <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
             <LessonPageHero
                     levelNumber={levelNumber}
@@ -693,11 +701,11 @@ function LessonPage() {
               key={`${year}-${week}-${effectiveLessonId}`}
               minutes={9}
               lessonTitle={safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
-              completionMode={isGroundWeek1CustomLesson ? "time_only" : "question_or_time"}
+              completionMode={isGroundCustomLesson ? "time_only" : "question_or_time"}
               scoreCap={10}
               liveContext={liveLessonContext}
               renderCompletionCard={
-                isGroundWeek1CustomLesson
+                isGroundCustomLesson
                   ? renderPrepCompletionCard
                   : showWeek12Lesson3Summary
                   ? (summary: LessonPerformanceSummary) => (
@@ -711,7 +719,10 @@ function LessonPage() {
               }
               getTask={(ctx) => {
                 const d = ctx?.difficulty ?? "easy";
-                if (isGroundWeek1CustomLesson) {
+                if (isGroundCustomLesson) {
+                  if (effectiveLessonId === "y0-w2-l1") {
+                    return generatePrepWeek2Task(effectiveLessonId, d);
+                  }
                   return generatePrepWeek1Task(effectiveLessonId, d);
                 }
                 if (effectiveLessonId.startsWith("y1-w2-")) {
@@ -814,4 +825,5 @@ function LessonPage() {
 
   function resetPrepSessionTaskState() {
     resetPrepWeek1TaskSessionState();
+    resetPrepWeek2TaskSessionState();
   }

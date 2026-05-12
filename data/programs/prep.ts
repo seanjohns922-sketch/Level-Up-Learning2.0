@@ -62,7 +62,7 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
       buildLesson(
         2,
         1,
-        "Recognise Numbers 6–10",
+        "Find Numbers 6–10",
         "Recognise numerals 6–10 and connect them to quantities.",
         ["Tap and count collections", "Numeral match", "Fast number recognition"],
         ["AC9MFN01", "AC9MFN03"]

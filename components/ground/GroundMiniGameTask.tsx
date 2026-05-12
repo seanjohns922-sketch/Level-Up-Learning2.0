@@ -7,6 +7,8 @@ import type { PracticeTask } from "@/data/activities/year1/practice-task";
 type GroundCollectTask = Extract<PracticeTask, { kind: "groundCollect" }>;
 type GroundBuildTask = Extract<PracticeTask, { kind: "groundBuild" }>;
 type GroundFlashTask = Extract<PracticeTask, { kind: "groundFlash" }>;
+type GroundHuntTask = Extract<PracticeTask, { kind: "groundHunt" }>;
+type GroundSequenceTask = Extract<PracticeTask, { kind: "groundSequence" }>;
 type GroundTapCountTask = Extract<PracticeTask, { kind: "groundTapCount" }>;
 type GroundMoveCountTask = Extract<PracticeTask, { kind: "groundMoveCount" }>;
 type GroundFeedTask = Extract<PracticeTask, { kind: "groundFeed" }>;
@@ -257,23 +259,27 @@ export function GroundFlashTaskCard({
         </div>
         <div className="flex min-h-[108px] items-center justify-center rounded-[20px] bg-cyan-50 px-4 py-4">
           {revealed ? (
-            <div className="flex flex-wrap justify-center gap-3">
-              {Array.from({ length: task.targetNumber }).map((_, index) => (
-                <span
-                  key={`${task.objectType}-${index}`}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-3xl text-teal-700 shadow-sm"
-                >
-                  {OBJECT_META[task.objectType].emoji}
-                </span>
-              ))}
-            </div>
+            task.revealType === "numeral" ? (
+              <div className="text-7xl font-black text-teal-900 sm:text-8xl">{task.targetNumber}</div>
+            ) : (
+              <div className="flex flex-wrap justify-center gap-3">
+                {Array.from({ length: task.targetNumber }).map((_, index) => (
+                  <span
+                    key={`${task.objectType}-${index}`}
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-3xl text-teal-700 shadow-sm"
+                  >
+                    {OBJECT_META[task.objectType].emoji}
+                  </span>
+                ))}
+              </div>
+            )
           ) : (
             <div className="text-lg font-black text-slate-500">What did you see?</div>
           )}
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className={task.options.length === 4 ? "grid grid-cols-2 gap-3 sm:grid-cols-4" : "grid grid-cols-3 gap-3"}>
         {task.options.map((option) => (
           <button
             key={option.id}
@@ -283,6 +289,99 @@ export function GroundFlashTaskCard({
           >
             {option.numeral}
           </button>
+        ))}
+      </div>
+    </GroundMiniShell>
+  );
+}
+
+export function GroundHuntTaskCard({
+  task,
+  onCorrect,
+  onWrong,
+}: {
+  task: GroundHuntTask;
+  onCorrect: () => void;
+  onWrong: () => void;
+}) {
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  function tapTile(id: string, isTarget: boolean) {
+    if (selectedIds.includes(id)) return;
+    if (!isTarget) {
+      onWrong();
+      setSelectedIds([]);
+      return;
+    }
+
+    const nextSelected = [...selectedIds, id];
+    setSelectedIds(nextSelected);
+    const totalTargets = task.tiles.filter((tile) => tile.isTarget).length;
+    if (nextSelected.length === totalTargets) {
+      onCorrect();
+    }
+  }
+
+  return (
+    <GroundMiniShell badge="Number Hunt" prompt={task.prompt} speakText={task.speakText}>
+      <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
+        <GroundCountBadge count={selectedIds.length} target={task.tiles.filter((tile) => tile.isTarget).length} />
+        <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+          {task.tiles.map((tile) => (
+            <button
+              key={tile.id}
+              type="button"
+              onClick={() => tapTile(tile.id, tile.isTarget)}
+              className={`flex min-h-[88px] items-center justify-center rounded-[22px] border-2 text-4xl font-black shadow-sm transition ${
+                selectedIds.includes(tile.id)
+                  ? "border-teal-400 bg-teal-100 text-teal-900"
+                  : "border-cyan-200 bg-white text-teal-900 hover:border-cyan-300 hover:bg-cyan-50"
+              }`}
+            >
+              {tile.numeral}
+            </button>
+          ))}
+        </div>
+      </div>
+    </GroundMiniShell>
+  );
+}
+
+export function GroundSequenceTaskCard({
+  task,
+  onCorrect,
+  onWrong,
+}: {
+  task: GroundSequenceTask;
+  onCorrect: () => void;
+  onWrong: () => void;
+}) {
+  return (
+    <GroundMiniShell badge="Missing Number" prompt={task.prompt} speakText={task.speakText}>
+      <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
+        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+          {task.sequence.map((value, index) => (
+            <div
+              key={`${task.targetNumber}-seq-${index}`}
+              className={`flex h-16 min-w-[72px] items-center justify-center rounded-[20px] border-2 px-4 text-3xl font-black shadow-sm sm:h-20 sm:min-w-[88px] sm:text-4xl ${
+                value === "__"
+                  ? "border-dashed border-cyan-300 bg-cyan-50 text-cyan-500"
+                  : "border-cyan-200 bg-white text-teal-900"
+              }`}
+            >
+              {value === "__" ? "?" : value}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3">
+        {task.options.map((option) => (
+          <GroundNumeralOption
+            key={option.id}
+            numeral={option.numeral}
+            onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
+          />
         ))}
       </div>
     </GroundMiniShell>
