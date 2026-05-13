@@ -152,31 +152,31 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
   {
     id: "y0-w5",
     week: 5,
-    topic: "Subitising 6–10",
+    topic: "Comparing & Sorting Quantities",
     curriculum: ["AC9MFN02", "AC9MFN03"],
     lessons: [
       buildLesson(
         5,
         1,
-        "Recognise Dot Patterns 6–10",
-        "Use structured subitising to recognise quantities within 10.",
-        ["Flash ten-frame reveal", "Tap the amount", "Pattern sort"],
+        "More or Less",
+        "Compare two groups and identify which has more or less.",
+        ["Tap the bigger group", "More or less sort", "Quick compare cards"],
         ["AC9MFN02", "AC9MFN03"]
       ),
       buildLesson(
         5,
         2,
-        "Recognise Structured Groups",
-        "Notice smaller groups inside numbers to 10.",
-        ["Ten-frame spots", "Group and say", "Fast compare"],
+        "Equal Groups",
+        "Recognise when two collections have the same amount.",
+        ["Match equal sets", "Balance the groups", "Same amount game"],
         ["AC9MFN02", "AC9MFN03"]
       ),
       buildLesson(
         5,
         3,
-        "Match Quantities to Numerals",
-        "Match structured quantities within 10 to the correct numeral.",
-        ["Quantity reveal", "Drag to numeral", "Quick match challenge"],
+        "Sort from Least to Most",
+        "Order small collections from least to most.",
+        ["Drag to order", "Least to most ladder", "Group sorting race"],
         ["AC9MFN02", "AC9MFN03"]
       ),
     ],
@@ -184,31 +184,31 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
   {
     id: "y0-w6",
     week: 6,
-    topic: "Comparing Quantities",
+    topic: "Building Numbers to 10",
     curriculum: ["AC9MFN02", "AC9MFN03"],
     lessons: [
       buildLesson(
         6,
         1,
-        "More or Less",
-        "Compare two groups and identify which has more or less.",
-        ["Tap the larger group", "More or less sort", "Quick compare"],
+        "Make Numbers in Different Ways",
+        "Build the same number using different groups.",
+        ["Make it another way", "Build and swap", "Show the same number"],
         ["AC9MFN02", "AC9MFN03"]
       ),
       buildLesson(
         6,
         2,
-        "Equal Groups",
-        "Recognise when two collections are equal.",
-        ["Balance the groups", "Match equal sets", "Equal or not"],
+        "Build Number Pairs",
+        "Find two parts that make a whole number to 10.",
+        ["Partner pairs", "Two-part builder", "Make the whole"],
         ["AC9MFN02", "AC9MFN03"]
       ),
       buildLesson(
         6,
         3,
-        "Order by Quantity",
-        "Put small collections in order from least to most.",
-        ["Drag to order", "Line up the groups", "Quantity ladder"],
+        "Part-Part-Whole to 10",
+        "Connect parts and wholes using visual groups.",
+        ["Part-part-whole mats", "Fill the whole", "Split and join groups"],
         ["AC9MFN02", "AC9MFN03"]
       ),
     ],
@@ -216,95 +216,95 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
   {
     id: "y0-w7",
     week: 7,
-    topic: "Partitioning Numbers to 5",
-    curriculum: ["AC9MFN02"],
+    topic: "Teen Numbers & Collections to 20",
+    curriculum: ["AC9MFN01", "AC9MFN03"],
     lessons: [
       buildLesson(
         7,
         1,
-        "Break Apart Numbers",
-        "Break numbers to 5 into two smaller parts.",
-        ["Split the counters", "Part-part-whole bowls", "Make two parts"],
-        ["AC9MFN02"]
+        "Count Collections to 20",
+        "Count larger collections accurately using one-to-one correspondence.",
+        ["Count bigger groups", "Touch and count to 20", "Collection count challenge"],
+        ["AC9MFN01", "AC9MFN03"]
       ),
       buildLesson(
         7,
         2,
-        "Ways to Make 5",
-        "Find different combinations that make 5.",
-        ["Build 5", "Partner pairs", "Combination cards"],
-        ["AC9MFN02"]
+        "Teen Numbers 11–20",
+        "Recognise and match teen numerals to quantities.",
+        ["Teen number match", "Quantity to numeral", "Quick teen spotting"],
+        ["AC9MFN01", "AC9MFN03"]
       ),
       buildLesson(
         7,
         3,
-        "Build Number Groups",
-        "Compose and decompose groups to 5 flexibly.",
-        ["Build and break", "Show another way", "Group builder"],
-        ["AC9MFN02"]
+        "Build Groups to 20",
+        "Build and organise collections up to 20.",
+        ["Build the collection", "Group to 20", "Organise and count"],
+        ["AC9MFN01", "AC9MFN03"]
       ),
     ],
   },
   {
     id: "y0-w8",
     week: 8,
-    topic: "Partitioning Numbers to 10",
-    curriculum: ["AC9MFN02", "AC9MFN03"],
+    topic: "Number Patterns & Ordering",
+    curriculum: ["AC9MFN01", "AC9MFN03"],
     lessons: [
       buildLesson(
         8,
         1,
-        "Break Apart 6–10",
-        "Break numbers 6–10 into smaller parts.",
-        ["Split the ten-frame", "Move counters", "Part sorter"],
-        ["AC9MFN02", "AC9MFN03"]
+        "Missing Numbers",
+        "Find missing numbers in simple number sequences to 20.",
+        ["Missing number trail", "Fill the gap", "Pattern path"],
+        ["AC9MFN01", "AC9MFN03"]
       ),
       buildLesson(
         8,
         2,
-        "Ways to Make 10",
-        "Find and recognise combinations that make 10.",
-        ["Make 10 pairs", "Ten-frame partners", "Quick combo pick"],
-        ["AC9MFN02", "AC9MFN03"]
+        "Number Paths",
+        "Follow number paths forward and backward to 20.",
+        ["Forward path", "Backward path", "Path challenge"],
+        ["AC9MFN01", "AC9MFN03"]
       ),
       buildLesson(
         8,
         3,
-        "Build Groups to 10",
-        "Compose and decompose quantities to 10 in different ways.",
-        ["Build the whole", "Two-part builder", "Show a new split"],
-        ["AC9MFN02", "AC9MFN03"]
+        "Order Numbers to 20",
+        "Place numbers to 20 in the correct order.",
+        ["Order cards", "Number line build", "Line up to 20"],
+        ["AC9MFN01", "AC9MFN03"]
       ),
     ],
   },
   {
     id: "y0-w9",
     week: 9,
-    topic: "Counting to 20",
+    topic: "Ordinal Numbers & Position",
     curriculum: ["AC9MFN01", "AC9MFN03"],
     lessons: [
       buildLesson(
         9,
         1,
-        "Count Forward to 20",
-        "Count forward to 20 and notice teen-number patterns.",
-        ["Path counting", "Teen number train", "Forward count race"],
+        "First, Second, Third",
+        "Recognise ordinal positions in simple sequences.",
+        ["Who is first?", "Ordinal line-up", "Tap the position"],
         ["AC9MFN01", "AC9MFN03"]
       ),
       buildLesson(
         9,
         2,
-        "Count Back from 20",
-        "Count backward from 20 with support from visuals and movement.",
-        ["Backward steps", "Countdown tiles", "Blastoff path"],
+        "Ordinals in Games",
+        "Use ordinal language in familiar game contexts.",
+        ["Race positions", "Game line-up", "Ordinal goal"],
         ["AC9MFN01", "AC9MFN03"]
       ),
       buildLesson(
         9,
         3,
-        "Number Order to 20",
-        "Place numbers to 20 in the correct order.",
-        ["Order cards", "Missing teen numbers", "Number line build"],
+        "Position Challenges",
+        "Identify positions such as first, last, before and after.",
+        ["Before and after", "Last one challenge", "Position puzzle"],
         ["AC9MFN01", "AC9MFN03"]
       ),
     ],
@@ -312,95 +312,95 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
   {
     id: "y0-w10",
     week: 10,
-    topic: "Ordinal Numbers",
-    curriculum: ["AC9MFN01", "AC9MFN03"],
+    topic: "Mixed Number Fluency",
+    curriculum: ["AC9MFN01", "AC9MFN02", "AC9MFN03"],
     lessons: [
       buildLesson(
         10,
         1,
-        "Recognise Ordinal Numbers",
-        "Use first, second, third and later ordinal positions in order.",
-        ["Tap the runner", "Ordinal labels", "Position match"],
-        ["AC9MFN01", "AC9MFN03"]
+        "Number Arcade",
+        "Review counting, matching and numeral recognition in quick games.",
+        ["Arcade count", "Quick match", "Fast number rounds"],
+        ["AC9MFN01", "AC9MFN02", "AC9MFN03"]
       ),
       buildLesson(
         10,
         2,
-        "Ordinals in Context",
-        "Identify positions in short familiar contexts.",
-        ["Queue positions", "Animal race", "Line-up game"],
-        ["AC9MFN01", "AC9MFN03"]
+        "Quick Count Challenge",
+        "Practise subitising and counting small groups quickly.",
+        ["Quick count flash", "Fast spotting", "Tap the amount"],
+        ["AC9MFN01", "AC9MFN02", "AC9MFN03"]
       ),
       buildLesson(
         10,
         3,
-        "Ordinal Number Games",
-        "Apply ordinal language in quick interactive games.",
-        ["Treasure trail", "Place the sticker", "Who is third?"],
-        ["AC9MFN01", "AC9MFN03"]
+        "Build & Compare",
+        "Build, compare and match quantities in mixed challenges.",
+        ["Build the group", "Compare and choose", "Match and sort"],
+        ["AC9MFN01", "AC9MFN02", "AC9MFN03"]
       ),
     ],
   },
   {
     id: "y0-w11",
     week: 11,
-    topic: "Mixed Number Fluency",
-    curriculum: ["AC9MFN01", "AC9MFN02", "AC9MFN03"],
+    topic: "Review & Readiness",
+    curriculum: ["ALL"],
     lessons: [
       buildLesson(
         11,
         1,
-        "Mixed Counting Games",
-        "Review counting, sequencing and numeral recognition in mixed games.",
-        ["Counting spin", "Quick match", "Number path challenge"],
-        ["AC9MFN01", "AC9MFN03"]
+        "Counting Review",
+        "Review counting, sequencing and number order to 20.",
+        ["Counting mix", "Sequence review", "Number order games"],
+        ["ALL"]
       ),
       buildLesson(
         11,
         2,
-        "Partitioning Numbers",
-        "Review ways to make numbers within 10.",
-        ["Make and break", "Part-part-whole review", "Find another way"],
-        ["AC9MFN02", "AC9MFN03"]
+        "Subitising & Number Building",
+        "Review quick recognition and building numbers to 10.",
+        ["Flash review", "Build the number", "Quick pattern match"],
+        ["ALL"]
       ),
       buildLesson(
         11,
         3,
-        "Compare Quantities",
-        "Compare, sort and justify simple quantity choices.",
-        ["More or less mix", "Equal or not", "Order the groups"],
-        ["AC9MFN02", "AC9MFN03"]
+        "Ground Level Challenge Tower",
+        "Complete mixed Number Nexus challenges before final mastery week.",
+        ["Challenge tower", "Mixed mini-games", "Readiness missions"],
+        ["ALL"]
       ),
     ],
   },
   {
     id: "y0-w12",
     week: 12,
-    topic: "Review & Readiness",
+    topic: "Final Mastery Week",
     curriculum: ["ALL"],
     lessons: [
       buildLesson(
         12,
         1,
-        "Counting & Subitising Review",
-        "Review counting, numeral recognition and subitising foundations.",
-        ["Fast flash review", "Tap and count mix", "Choose the numeral"],
+        "Legend Training",
+        "Practise key Ground Level number skills in mixed mini-games.",
+        ["Legend warm-up", "Mixed skill arcade", "Number practice rounds"],
         ["ALL"]
       ),
       buildLesson(
         12,
         2,
-        "Partitioning & Comparing Review",
-        "Review composing, decomposing and comparing quantities.",
-        ["Build the whole review", "Compare and sort", "Make 10 recap"],
+        "Mastery Games",
+        "Apply counting, comparing, subitising and building skills.",
+        ["Mastery challenge", "Build and compare", "Quick skill mix"],
         ["ALL"]
       ),
       buildLesson(
         12,
         3,
-        "Final Review Challenge",
-        "Consolidate Ground Level number skills with confidence-building challenges.",
-        ["Mixed mini games", "Readiness check", "Celebration challenge"],
+        "Final Readiness Mission",
+        "Complete final review challenges before the post-test.",
+        ["Final mission", "Readiness check", "Celebrate and review"],
         ["ALL"]
       ),
     ],
