@@ -87,7 +87,8 @@ function LessonPage() {
       effectiveLessonId === "y0-w3-l2" ||
       effectiveLessonId === "y0-w3-l3" ||
       effectiveLessonId === "y0-w4-l1" ||
-      effectiveLessonId === "y0-w4-l2"
+      effectiveLessonId === "y0-w4-l2" ||
+      effectiveLessonId === "y0-w4-l3"
     );
 
   useEffect(() => {
@@ -302,6 +303,8 @@ function LessonPage() {
                   ? "Quick Number Eyes Complete!"
                   : effectiveLessonId === "y0-w4-l2"
                     ? "Quick Group Spotter Complete!"
+                    : effectiveLessonId === "y0-w4-l3"
+                      ? "Pattern Match Mission Complete!"
         : effectiveLessonId === "y0-w1-l2"
           ? "You counted collections to 5!"
           : "You recognised numbers 1 to 5!";
@@ -312,7 +315,7 @@ function LessonPage() {
           ? "Lesson 2 unlocked."
           : effectiveLessonId === "y0-w3-l2"
             ? "Lesson 3 unlocked."
-            : effectiveLessonId === "y0-w3-l3"
+            : effectiveLessonId === "y0-w3-l3" || effectiveLessonId === "y0-w4-l3"
               ? "Weekly Quiz unlocked."
               : `Lesson ${lessonNumber + 1} unlocked.`;
 
@@ -767,7 +770,8 @@ function LessonPage() {
                   }
                   if (
                     effectiveLessonId === "y0-w4-l1" ||
-                    effectiveLessonId === "y0-w4-l2"
+                    effectiveLessonId === "y0-w4-l2" ||
+                    effectiveLessonId === "y0-w4-l3"
                   ) {
                     return generatePrepWeek4Task(effectiveLessonId, d);
                   }

@@ -19,7 +19,7 @@ type GroundMatchTask = Extract<PracticeTask, { kind: "groundMatch" }>;
 type GroundFlashTask = Extract<PracticeTask, { kind: "groundFlash" }>;
 type GroundBuildTask = Extract<PracticeTask, { kind: "groundBuild" }>;
 
-type LessonMode = "dot_patterns" | "object_groups";
+type LessonMode = "dot_patterns" | "object_groups" | "pattern_match";
 
 type Week4Memory = {
   cursor: number;
@@ -66,6 +66,21 @@ const lesson2Rotation = [
   "build_the_group",
   "group_race",
   "same_or_different",
+] as const;
+
+const lesson3Rotation = [
+  "which_pattern_matches",
+  "dots_to_numbers_match",
+  "true_false_pattern_match",
+  "memory_pattern_match",
+  "ten_frame_pattern_match",
+  "quick_eyes_race_match",
+  "same_or_different_patterns",
+  "find_fast_pattern_match",
+  "match_all_three",
+  "build_pattern_match",
+  "pattern_path",
+  "numbot_spotter",
 ] as const;
 
 const memoryByLesson = new Map<string, Week4Memory>();
@@ -767,6 +782,295 @@ function createSameOrDifferentTask(lessonId: string, difficulty: Difficulty): Gr
   };
 }
 
+function createWhichPatternMatchesTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const layout = pickLayout(memory, target);
+  const { options, correctOptionId } = buildQuantityOptions(target, memory, "dots", layout, 3);
+  pushRecent(memory.recentKinds, "which_pattern_matches", 4);
+  return {
+    kind: "groundMatch",
+    prompt: "Which pattern matches?",
+    speakText: `Find the pattern for ${numberWord(target)}.`,
+    targetNumber: target,
+    targetNumberName: numberWord(target),
+    visualType: "ground-quantity-card",
+    promptType: "numeral_to_group",
+    shownNumeral: target,
+    objectType: "dots",
+    patternLayout: layout,
+    options,
+    correctOptionId,
+    feedback: { correct: "Pattern matched!", wrong: "Spot the structure, not each dot." },
+  };
+}
+
+function createDotsToNumbersMatchTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const layout = pickLayout(memory, target);
+  const { options, correctOptionId } = buildNumeralOptions(target, memory, 3);
+  pushRecent(memory.recentKinds, "dots_to_numbers_match", 4);
+  return {
+    kind: "groundMatch",
+    prompt: "Find the matching number!",
+    speakText: "Quick eyes. Find the matching number.",
+    targetNumber: target,
+    targetNumberName: numberWord(target),
+    visualType: "ground-quantity-card",
+    promptType: "group_to_numeral",
+    shownQuantity: target,
+    objectType: "dots",
+    patternLayout: layout,
+    options: options.map((option) => ({ id: option.id, kind: "numeral" as const, numeral: option.numeral })),
+    correctOptionId,
+    feedback: { correct: "Quick recognition!", wrong: "Look for the whole pattern." },
+  };
+}
+
+function createTrueOrFalsePatternMatchTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const shownNumeral = randInt(0, 1) === 1 ? target : chooseRecentSafe(TARGETS.filter((value) => value !== target), memory.recentTargets);
+  const layout = pickLayout(memory, target);
+  const { options, correctOptionId } = buildYesNoOptions(memory, shownNumeral === target);
+  pushRecent(memory.recentKinds, "true_false_pattern_match", 4);
+  return {
+    kind: "groundMatch",
+    prompt: `Does this match ${shownNumeral}?`,
+    speakText: `Does this pattern match ${numberWord(shownNumeral)}?`,
+    targetNumber: target,
+    targetNumberName: numberWord(target),
+    visualType: "ground-quantity-card",
+    promptType: "group_to_numeral",
+    shownQuantity: target,
+    objectType: "dots",
+    patternLayout: layout,
+    options,
+    correctOptionId,
+    feedback: { correct: "You checked it fast!", wrong: "Match the pattern to the number." },
+  };
+}
+
+function createMemoryPatternMatchTask(lessonId: string, difficulty: Difficulty): GroundFlashTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const layout = pickLayout(memory, target);
+  const { options, correctOptionId } = buildNumeralOptions(target, memory, 3);
+  pushRecent(memory.recentKinds, "memory_pattern_match", 4);
+  return {
+    kind: "groundFlash",
+    prompt: "Remember the pattern",
+    speakText: "Look fast, then match the pattern.",
+    targetNumber: target,
+    objectType: "dots",
+    patternLayout: layout,
+    revealType: "objects",
+    revealMs: difficulty === "easy" ? 1980 : difficulty === "medium" ? 1700 : 1520,
+    promptAfterReveal: "What did you notice instantly?",
+    options,
+    correctOptionId,
+    feedback: { correct: "Memory match!", wrong: "Hold the pattern in your mind." },
+  };
+}
+
+function createTenFramePatternMatchTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty, TEN_FRAME_TARGETS);
+  const { options, correctOptionId } = buildNumeralOptions(target, memory, 3);
+  pushRecent(memory.recentKinds, "ten_frame_pattern_match", 4);
+  return {
+    kind: "groundMatch",
+    prompt: "Ten frame match",
+    speakText: "Which number matches the frame?",
+    targetNumber: target,
+    targetNumberName: numberWord(target),
+    visualType: "ground-quantity-card",
+    promptType: "group_to_numeral",
+    shownQuantity: target,
+    objectType: "dots",
+    patternLayout: "ten_frame",
+    options: options.map((option) => ({ id: option.id, kind: "numeral" as const, numeral: option.numeral })),
+    correctOptionId,
+    feedback: { correct: "Frame matched!", wrong: "Look at the filled spaces as a whole." },
+  };
+}
+
+function createQuickEyesRaceMatchTask(lessonId: string, difficulty: Difficulty): GroundFlashTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const layout = pickLayout(memory, target, target > 6 ? ["ten_frame", "symmetry"] : undefined);
+  const { options, correctOptionId } = buildNumeralOptions(target, memory, 4);
+  pushRecent(memory.recentKinds, "quick_eyes_race_match", 4);
+  return {
+    kind: "groundFlash",
+    prompt: "Quick eyes race!",
+    speakText: "Spot the pattern before it fades.",
+    targetNumber: target,
+    objectType: "dots",
+    patternLayout: layout,
+    revealType: "objects",
+    revealMs: difficulty === "easy" ? 1820 : difficulty === "medium" ? 1620 : 1460,
+    options,
+    correctOptionId,
+    feedback: { correct: "Amazing eyes!", wrong: "Blink and spot it again." },
+  };
+}
+
+function createSameOrDifferentPatternsTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const isSame = randInt(0, 1) === 1;
+  const secondQuantity = isSame ? target : chooseRecentSafe(TARGETS.filter((value) => value !== target), memory.recentTargets);
+  const firstLayout = pickLayout(memory, target, ["dice", "domino", "ten_frame", "symmetry"]);
+  const secondLayout = pickLayout(memory, secondQuantity, ["dice", "domino", "ten_frame", "symmetry"]);
+  const { options, correctOptionId } = buildYesNoOptions(memory, isSame);
+  pushRecent(memory.recentKinds, "same_or_different_patterns", 4);
+  return {
+    kind: "groundMatch",
+    prompt: "Same or different?",
+    speakText: "Do these patterns show the same amount?",
+    targetNumber: target,
+    targetNumberName: numberWord(target),
+    visualType: "ground-quantity-card",
+    promptType: "same_or_different_group",
+    shownQuantity: target,
+    shownSecondQuantity: secondQuantity,
+    objectType: "dots",
+    shownSecondObjectType: "dots",
+    patternLayout: firstLayout,
+    shownSecondPatternLayout: secondLayout,
+    options,
+    correctOptionId,
+    feedback: { correct: "You matched the amounts!", wrong: "Compare the two structures again." },
+  };
+}
+
+function createFindFastPatternMatchTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const layout = pickLayout(memory, target);
+  const { options, correctOptionId } = buildQuantityOptions(target, memory, "dots", layout, 3);
+  pushRecent(memory.recentKinds, "find_fast_pattern_match", 4);
+  return {
+    kind: "groundMatch",
+    prompt: "Find the fast match",
+    speakText: `Which pattern shows ${numberWord(target)}?`,
+    targetNumber: target,
+    targetNumberName: numberWord(target),
+    visualType: "ground-quantity-card",
+    promptType: "numeral_to_group",
+    shownNumeral: target,
+    objectType: "dots",
+    patternLayout: layout,
+    options,
+    correctOptionId,
+    feedback: { correct: "Fast pattern match!", wrong: "Look for the matching structure." },
+  };
+}
+
+function createMatchAllThreeTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const objectType = pickObject(memory, ["stars", "gems", "energy_orbs", "robot_tokens", "crystals", "planets"]);
+  const correctLayout = pickLayout(memory, target, target > 6 ? ["ten_frame", "symmetry", "domino"] : ["dice", "domino", "symmetry", "ten_frame"]);
+  const distractorA = chooseRecentSafe(TARGETS.filter((value) => value !== target), memory.recentTargets);
+  const distractorB = chooseRecentSafe(TARGETS.filter((value) => value !== target && value !== distractorA), memory.recentTargets);
+  const correctPosition = chooseAnswerPosition(memory, 3);
+  const ordered = new Array<number>(3);
+  ordered[correctPosition] = target;
+  const fillPositions = [0, 1, 2].filter((index) => index !== correctPosition);
+  fillPositions.forEach((position, index) => {
+    ordered[position] = [distractorA, distractorB][index]!;
+  });
+  const options = ordered.map((value, index) => ({
+    id: `triple-${target}-${index}-${value}`,
+    kind: "pair" as const,
+    pairNumeral: value,
+    pairQuantity: value,
+    pairWord: numberWord(value),
+    objectType,
+    patternLayout: value === target ? correctLayout : pickLayout(memory, value),
+  }));
+  pushRecent(memory.recentKinds, "match_all_three", 4);
+  return {
+    kind: "groundMatch",
+    prompt: "Match all three",
+    speakText: `Which card matches ${numberWord(target)}?`,
+    targetNumber: target,
+    targetNumberName: numberWord(target),
+    visualType: "ground-quantity-card",
+    promptType: "match_pair",
+    shownNumeral: target,
+    objectType,
+    patternLayout: correctLayout,
+    options,
+    correctOptionId: options[correctPosition]!.id,
+    feedback: { correct: "All three match!", wrong: "Find the card where the number, pattern, and group all agree." },
+  };
+}
+
+function createBuildPatternMatchTask(lessonId: string, difficulty: Difficulty): GroundBuildTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty, TEN_FRAME_TARGETS);
+  pushRecent(memory.recentKinds, "build_pattern_match", 4);
+  return {
+    kind: "groundBuild",
+    prompt: `Build ${target}`,
+    speakText: `Build ${numberWord(target)} in the pattern.`,
+    targetNumber: target,
+    objectType: "dots",
+    feedback: { correct: "Pattern complete!", wrong: "Build until the pattern feels complete." },
+  };
+}
+
+function createPatternPathTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty, difficulty === "easy" ? LOW_TARGETS : TARGETS);
+  const start = Math.max(1, target - (difficulty === "easy" ? 2 : 3));
+  const missing = Math.min(10, start + (difficulty === "easy" ? 2 : 3));
+  const sequence: Array<number | "__"> = [];
+  for (let value = start; value <= missing; value += 1) {
+    sequence.push(value === target ? "__" : value);
+  }
+  const { options, correctOptionId } = buildNumeralOptions(target, memory, 3);
+  pushRecent(memory.recentKinds, "pattern_path", 4);
+  return {
+    kind: "groundSequence",
+    prompt: "Pattern path",
+    speakText: "Which number fits the pattern path?",
+    targetNumber: target,
+    sequence,
+    options,
+    correctOptionId,
+    feedback: { correct: "Pattern path complete!", wrong: "Look at the pattern order." },
+  };
+}
+
+function createNumbotSpotterTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const layout = pickLayout(memory, target);
+  const { options, correctOptionId } = buildQuantityOptions(target, memory, "dots", layout, 3);
+  pushRecent(memory.recentKinds, "numbot_spotter", 4);
+  return {
+    kind: "groundMatch",
+    prompt: `Find the pattern for ${target}!`,
+    speakText: `Numbot says find the pattern for ${numberWord(target)}.`,
+    targetNumber: target,
+    targetNumberName: numberWord(target),
+    visualType: "ground-quantity-card",
+    promptType: "numeral_to_group",
+    helperVariant: "numbot",
+    shownNumeral: target,
+    objectType: "dots",
+    patternLayout: layout,
+    options,
+    correctOptionId,
+    feedback: { correct: "Numbot is cheering!", wrong: "Listen again and find the pattern." },
+  };
+}
+
 export function resetPrepWeek4TaskSessionState() {
   memoryByLesson.clear();
 }
@@ -774,7 +1078,7 @@ export function resetPrepWeek4TaskSessionState() {
 export function generatePrepWeek4Task(lessonId: string, difficulty: Difficulty = "easy"): PracticeTask {
   const memory = getMemory(lessonId);
   const mode = getLessonMode(lessonId);
-  const rotation = mode === "object_groups" ? lesson2Rotation : lesson1Rotation;
+  const rotation = mode === "object_groups" ? lesson2Rotation : mode === "pattern_match" ? lesson3Rotation : lesson1Rotation;
   const gameKind = rotation[memory.cursor % rotation.length]!;
   memory.cursor += 1;
 
@@ -803,6 +1107,18 @@ export function generatePrepWeek4Task(lessonId: string, difficulty: Difficulty =
     case "build_the_group": return createBuildTheGroupTask(lessonId, difficulty);
     case "group_race": return createGroupRaceTask(lessonId, difficulty);
     case "same_or_different": return createSameOrDifferentTask(lessonId, difficulty);
-    default: return createQuickGroupFlashTask(lessonId, difficulty);
+    case "which_pattern_matches": return createWhichPatternMatchesTask(lessonId, difficulty);
+    case "dots_to_numbers_match": return createDotsToNumbersMatchTask(lessonId, difficulty);
+    case "true_false_pattern_match": return createTrueOrFalsePatternMatchTask(lessonId, difficulty);
+    case "memory_pattern_match": return createMemoryPatternMatchTask(lessonId, difficulty);
+    case "ten_frame_pattern_match": return createTenFramePatternMatchTask(lessonId, difficulty);
+    case "quick_eyes_race_match": return createQuickEyesRaceMatchTask(lessonId, difficulty);
+    case "same_or_different_patterns": return createSameOrDifferentPatternsTask(lessonId, difficulty);
+    case "find_fast_pattern_match": return createFindFastPatternMatchTask(lessonId, difficulty);
+    case "match_all_three": return createMatchAllThreeTask(lessonId, difficulty);
+    case "build_pattern_match": return createBuildPatternMatchTask(lessonId, difficulty);
+    case "pattern_path": return createPatternPathTask(lessonId, difficulty);
+    case "numbot_spotter": return createNumbotSpotterTask(lessonId, difficulty);
+    default: return createWhichPatternMatchesTask(lessonId, difficulty);
   }
 }

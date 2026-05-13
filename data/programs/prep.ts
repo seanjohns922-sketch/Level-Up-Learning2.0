@@ -147,9 +147,10 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         4,
         3,
         "Match Dots to Numerals",
-        "Connect subitised dot patterns to matching numerals.",
-        ["Dot to numeral match", "Dot pattern sorting", "Mixed quantity review"],
-        ["AC9MFN02"]
+        "Connect structured quantity patterns to numerals, matching quantities, and visual groups without counting one-by-one.",
+        ["Pattern to numeral match", "Match all three", "Fast pattern memory"],
+        ["AC9MFN02", "AC9MFN03"],
+        "Pattern Match Mission"
       ),
     ],
   },
