@@ -1268,6 +1268,7 @@ type GroundQuizPracticeTask = Extract<
   | { kind: "groundTapCount" }
   | { kind: "groundMoveCount" }
   | { kind: "groundBuild" }
+  | { kind: "groundCompare" }
   | { kind: "groundFeed" }
   | { kind: "groundSoundCount" }
   | { kind: "groundSequence" }
@@ -2912,6 +2913,406 @@ function buildPrepWeek4WeeklyQuizQuestions(
 
   if (questions.length !== totalExpected) {
     throw new Error(`[GroundWeeklyQuiz] Week 4 expected ${totalExpected} questions, received ${questions.length}.`);
+  }
+
+  return questions;
+}
+
+
+function buildPrepWeek5WeeklyQuizQuestions(
+  questionsPerLesson: number
+): QuizQuestion[] {
+  const totalExpected = questionsPerLesson * 3;
+  const targetHistory: number[] = [];
+  const objectHistory: GroundObjectType[] = [];
+  const positionHistory: number[] = [];
+  const layoutHistory: Array<"dice" | "ten_frame" | "domino" | "finger" | "symmetry"> = [];
+  type GroundPatternLayout = "dice" | "ten_frame" | "domino" | "finger" | "symmetry";
+
+  const lowTargets = [1, 2, 3, 4, 5] as const;
+  const midTargets = [4, 5, 6, 7, 8] as const;
+  const upperTargets = [6, 7, 8, 9, 10] as const;
+  const allTargets = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const;
+  const compareObjects: GroundObjectType[] = [
+    "stars",
+    "crystals",
+    "robot_tokens",
+    "blocks",
+    "planets",
+    "dots",
+    "energy_orbs",
+    "futuristic_coins",
+    "number_orbs",
+  ];
+
+  function reservePosition(position: number) {
+    positionHistory.push(position);
+    if (positionHistory.length > 4) positionHistory.shift();
+  }
+
+  function nextTarget(pool: readonly number[]) {
+    const target = chooseGroundRecentSafe([...pool], targetHistory);
+    targetHistory.push(target);
+    if (targetHistory.length > 4) targetHistory.shift();
+    return target;
+  }
+
+  function nextObjectType(allowed: GroundObjectType[] = compareObjects) {
+    const objectType = chooseGroundRecentSafe(allowed, objectHistory);
+    objectHistory.push(objectType);
+    if (objectHistory.length > 4) objectHistory.shift();
+    return objectType;
+  }
+
+  function nextLayout(target: number, preferred?: GroundPatternLayout[]) {
+    const pool: GroundPatternLayout[] = preferred
+      ? preferred
+      : target <= 5
+        ? ["dice", "ten_frame", "domino", "finger", "symmetry"]
+        : ["ten_frame", "domino", "symmetry"];
+    const layout = chooseGroundRecentSafe(pool, layoutHistory);
+    layoutHistory.push(layout);
+    if (layoutHistory.length > 4) layoutHistory.shift();
+    return layout;
+  }
+
+  function makeNumeralChoiceOptions(correctNumber: number, pool: readonly number[] = allTargets) {
+    const distractors = shuffle(pool.filter((value) => value !== correctNumber)).slice(0, 2);
+    const chosenPosition = chooseGroundRecentSafe([0, 1, 2], positionHistory);
+    const values = Array.from({ length: 3 }, (_, index) =>
+      index === chosenPosition ? correctNumber : distractors[index > chosenPosition ? index - 1 : index]
+    );
+    return {
+      options: values.map((value, index) => ({ id: `num-${correctNumber}-${index}-${value}`, numeral: value })),
+      correctOptionId: `num-${correctNumber}-${chosenPosition}-${correctNumber}`,
+      correctPosition: chosenPosition,
+    };
+  }
+
+  function makeThreeDistinct(pool: readonly number[]) {
+    const first = nextTarget(pool);
+    const secondPool = pool.filter((value) => value !== first && Math.abs(value - first) <= 3);
+    const second = chooseGroundRecentSafe([...(secondPool.length ? secondPool : pool.filter((value) => value !== first))], targetHistory);
+    const thirdPool = pool.filter((value) => value !== first && value !== second);
+    const thirdClosePool = thirdPool.filter((value) => Math.abs(value - second) <= 3 || Math.abs(value - first) <= 3);
+    const third = chooseGroundRecentSafe([...(thirdClosePool.length ? thirdClosePool : thirdPool)], targetHistory);
+    return shuffle([first, second, third]);
+  }
+
+  function makeComparisonGroups(quantities: number[], preferredLayouts?: GroundPatternLayout[]) {
+    return shuffle(
+      quantities.map((quantity, index) => ({
+        id: `group-${quantities.join("-")}-${index}-${quantity}`,
+        quantity,
+        objectType: nextObjectType(),
+        patternLayout: nextLayout(quantity, preferredLayouts),
+      }))
+    );
+  }
+
+  function makeTwoGroupTask(
+    index: number,
+    lessonNumber: 1 | 2 | 3,
+    skill: string,
+    prompt: string,
+    speakText: string,
+    comparisonType: "more" | "less" | "equal" | "statement",
+    quantities: [number, number],
+    options?: {
+      helperVariant?: "numbot" | "battle" | "flash" | "ten_frame";
+      statementRelation?: "more" | "less" | "equal";
+      preferredLayouts?: GroundPatternLayout[];
+      feedback?: { correct: string; wrong: string };
+    }
+  ): QuizQuestion {
+    const groups = makeComparisonGroups(quantities, options?.preferredLayouts);
+    const correctGroupId =
+      comparisonType === "more"
+        ? groups.reduce((best, group) => (group.quantity > best.quantity ? group : best)).id
+        : comparisonType === "less"
+          ? groups.reduce((best, group) => (group.quantity < best.quantity ? group : best)).id
+          : undefined;
+
+    if (comparisonType === "more" || comparisonType === "less") {
+      reservePosition(groups.findIndex((group) => group.id === correctGroupId));
+    }
+
+    return buildGroundQuizQuestion(`q${index}`, lessonNumber, skill, {
+      kind: "groundCompare",
+      prompt,
+      speakText,
+      targetNumber: Math.max(...quantities),
+      comparisonType,
+      helperVariant: options?.helperVariant,
+      statementRelation: options?.statementRelation,
+      groups,
+      correctGroupId,
+      feedback: options?.feedback,
+    });
+  }
+
+  function makeOrderTask(
+    index: number,
+    skill: string,
+    prompt: string,
+    speakText: string,
+    quantities: number[],
+    orderDirection: "ASC" | "DESC",
+    preferredLayouts?: GroundPatternLayout[]
+  ): QuizQuestion {
+    const groups = makeComparisonGroups(quantities, preferredLayouts);
+    return buildGroundQuizQuestion(`q${index}`, 3, skill, {
+      kind: "groundCompare",
+      prompt,
+      speakText,
+      targetNumber: Math.max(...quantities),
+      comparisonType: "order",
+      orderDirection,
+      groups,
+      feedback: { correct: "You sorted them perfectly!", wrong: "Try the order again from the start." },
+    });
+  }
+
+  function makeLesson1Task(index: number, variant: "more" | "less" | "flash" | "biggest" | "equal"): QuizQuestion {
+    if (variant === "equal") {
+      const target = nextTarget(index <= 4 ? midTargets : allTargets);
+      return makeTwoGroupTask(
+        index,
+        1,
+        "ground_w5_l1_equal",
+        "Are these equal?",
+        "Are these equal?",
+        "equal",
+        [target, target],
+        {
+          feedback: { correct: "Yes, same amount!", wrong: "Look at both groups together." },
+        }
+      );
+    }
+
+    if (variant === "flash") {
+      const base = nextTarget(midTargets);
+      const otherChoices = allTargets.filter((value) => value !== base && Math.abs(value - base) <= 2);
+      const other = chooseGroundRecentSafe(otherChoices.length ? [...otherChoices] : [...allTargets.filter((value) => value !== base)], targetHistory);
+      return makeTwoGroupTask(
+        index,
+        1,
+        "ground_w5_l1_flash",
+        "Quick compare!",
+        "Which group was bigger?",
+        "more",
+        [base, other],
+        {
+          helperVariant: "flash",
+          feedback: { correct: "Quick comparing!", wrong: "Spot the bigger group." },
+        }
+      );
+    }
+
+    if (variant === "biggest") {
+      const quantities = makeThreeDistinct(index <= 4 ? midTargets : allTargets);
+      const groups = makeComparisonGroups(quantities);
+      const correctGroup = groups.reduce((best, group) => (group.quantity > best.quantity ? group : best));
+      reservePosition(groups.findIndex((group) => group.id === correctGroup.id));
+      return buildGroundQuizQuestion(`q${index}`, 1, "ground_w5_l1_biggest", {
+        kind: "groundCompare",
+        prompt: "Which group has the most?",
+        speakText: "Tap the biggest group.",
+        targetNumber: correctGroup.quantity,
+        comparisonType: "biggest",
+        groups,
+        correctGroupId: correctGroup.id,
+        feedback: { correct: "You spotted the biggest group!", wrong: "Find the group with the most." },
+      });
+    }
+
+    const base = nextTarget(index <= 2 ? lowTargets : midTargets);
+    const otherChoices = allTargets.filter((value) => value !== base && Math.abs(value - base) <= 2);
+    const other = chooseGroundRecentSafe(otherChoices.length ? [...otherChoices] : [...allTargets.filter((value) => value !== base)], targetHistory);
+    return makeTwoGroupTask(
+      index,
+      1,
+      variant === "more" ? "ground_w5_l1_more" : "ground_w5_l1_less",
+      variant === "more" ? "Which group has more?" : "Which group has less?",
+      variant === "more" ? "Which group has more?" : "Which group has less?",
+      variant === "more" ? "more" : "less",
+      [base, other],
+      {
+        helperVariant: variant === "more" && index === 1 ? "numbot" : undefined,
+        feedback: {
+          correct: variant === "more" ? "Great comparing!" : "You found the smaller group!",
+          wrong: variant === "more" ? "Look for the bigger group." : "Look for the smaller group.",
+        },
+      }
+    );
+  }
+
+  function makeLesson2Task(index: number, variant: "same" | "match" | "build" | "true_false" | "ten_frame"): QuizQuestion {
+    if (variant === "build") {
+      const target = nextTarget(index <= 8 ? midTargets : allTargets);
+      const objectType = nextObjectType();
+      return buildGroundQuizQuestion(`q${index}`, 2, "ground_w5_l2_build_equal", {
+        kind: "groundBuild",
+        prompt: "Build the same amount.",
+        speakText: "Build the same amount.",
+        targetNumber: target,
+        objectType,
+        referenceGroup: {
+          quantity: target,
+          objectType: nextObjectType(),
+          patternLayout: nextLayout(target),
+        },
+        feedback: { correct: "Same amount built!", wrong: "Build the matching group." },
+      });
+    }
+
+    if (variant === "ten_frame") {
+      const target = nextTarget(upperTargets);
+      return makeTwoGroupTask(
+        index,
+        2,
+        "ground_w5_l2_ten_frame",
+        "Are these equal?",
+        "Are these equal?",
+        "equal",
+        [target, target],
+        {
+          helperVariant: "ten_frame",
+          preferredLayouts: ["ten_frame"],
+          feedback: { correct: "Perfect balance!", wrong: "Look at the filled spaces." },
+        }
+      );
+    }
+
+    if (variant === "match") {
+      const target = nextTarget(index <= 7 ? midTargets : allTargets);
+      const targetLayout = nextLayout(target);
+      const targetObject = nextObjectType();
+      const distractors = shuffle(allTargets.filter((value) => value !== target)).filter((value) => Math.abs(value - target) <= 2).slice(0, 2);
+      const fallbackDistractors = shuffle(allTargets.filter((value) => value !== target)).slice(0, 2);
+      const quantities = shuffle([target, ...(distractors.length === 2 ? distractors : fallbackDistractors)]);
+      const groups = shuffle(
+        quantities.map((quantity, choiceIndex) => ({
+          id: `match-${index}-${choiceIndex}-${quantity}`,
+          quantity,
+          objectType: nextObjectType(),
+          patternLayout: nextLayout(quantity),
+        }))
+      );
+      const correctGroup = groups.find((group) => group.quantity === target)!;
+      reservePosition(groups.findIndex((group) => group.id === correctGroup.id));
+      return buildGroundQuizQuestion(`q${index}`, 2, "ground_w5_l2_match", {
+        kind: "groundCompare",
+        prompt: "Find the matching group.",
+        speakText: "Find the matching group.",
+        targetNumber: target,
+        comparisonType: "match",
+        referenceGroup: {
+          quantity: target,
+          objectType: targetObject,
+          patternLayout: targetLayout,
+        },
+        groups,
+        correctGroupId: correctGroup.id,
+        feedback: { correct: "You matched the groups!", wrong: "Find the group with the same amount." },
+      });
+    }
+
+    const target = nextTarget(index <= 6 ? lowTargets : midTargets);
+    const nearChoices = allTargets.filter((value) => value !== target && Math.abs(value - target) <= 2);
+    const maybeDifferent = variant === "true_false"
+      ? (Math.random() < 0.5 ? target : chooseGroundRecentSafe([...(nearChoices.length ? nearChoices : allTargets.filter((value) => value !== target))], targetHistory))
+      : target;
+
+    return makeTwoGroupTask(
+      index,
+      2,
+      variant === "same" ? "ground_w5_l2_same" : "ground_w5_l2_true_false",
+      variant === "same" ? "Do these show the same amount?" : "These groups are equal.",
+      variant === "same" ? "Do these show the same amount?" : "Are these groups equal?",
+      variant === "same" ? "equal" : "statement",
+      [target, maybeDifferent],
+      {
+        statementRelation: "equal",
+        feedback: { correct: "Same amount!", wrong: "Look at whether both groups match." },
+      }
+    );
+  }
+
+  function makeLesson3Task(index: number, variant: "order" | "biggest" | "smallest" | "number_order" | "reverse"): QuizQuestion {
+    if (variant === "number_order") {
+      const numerals = makeThreeDistinct(allTargets).sort((a, b) => a - b);
+      const target = numerals[1]!;
+      const choice = makeNumeralChoiceOptions(target, allTargets);
+      reservePosition(choice.correctPosition);
+      return buildGroundQuizQuestion(`q${index}`, 3, "ground_w5_l3_number_order", {
+        kind: "groundSequence",
+        prompt: "Put the numbers in order.",
+        speakText: "Which number goes in the middle?",
+        targetNumber: target,
+        sequence: [numerals[0]!, "__", numerals[2]!],
+        options: choice.options,
+        correctOptionId: choice.correctOptionId,
+        feedback: { correct: "Order fixed!", wrong: "Look for the number that fits in the middle." },
+      });
+    }
+
+    if (variant === "biggest" || variant === "smallest") {
+      const quantities = makeThreeDistinct(index <= 13 ? midTargets : allTargets);
+      const groups = makeComparisonGroups(quantities);
+      const correctGroup = groups.reduce((best, group) => (
+        variant === "biggest"
+          ? group.quantity > best.quantity
+          : group.quantity < best.quantity
+      ) ? group : best);
+      reservePosition(groups.findIndex((group) => group.id === correctGroup.id));
+      return buildGroundQuizQuestion(`q${index}`, 3, variant === "biggest" ? "ground_w5_l3_biggest" : "ground_w5_l3_smallest", {
+        kind: "groundCompare",
+        prompt: variant === "biggest" ? "Which group is biggest?" : "Which group is smallest?",
+        speakText: variant === "biggest" ? "Which group is biggest?" : "Which group is smallest?",
+        targetNumber: correctGroup.quantity,
+        comparisonType: variant,
+        groups,
+        correctGroupId: correctGroup.id,
+        feedback: {
+          correct: variant === "biggest" ? "Biggest found!" : "Smallest found!",
+          wrong: variant === "biggest" ? "Look for the biggest group." : "Look for the smallest group.",
+        },
+      });
+    }
+
+    const quantities = makeThreeDistinct(index <= 12 ? midTargets : allTargets);
+    return makeOrderTask(
+      index,
+      variant === "reverse" ? "ground_w5_l3_reverse_order" : "ground_w5_l3_order",
+      variant === "reverse" ? "Sort biggest to smallest." : "Put the groups in order.",
+      variant === "reverse" ? "Sort the groups from biggest to smallest." : "Put the groups in order from least to most.",
+      quantities,
+      variant === "reverse" ? "DESC" : "ASC",
+      variant === "reverse" ? undefined : ["ten_frame", "domino", "symmetry", "dice"]
+    );
+  }
+
+  const questions: QuizQuestion[] = [
+    makeLesson1Task(1, "more"),
+    makeLesson1Task(2, "less"),
+    makeLesson1Task(3, "flash"),
+    makeLesson1Task(4, "biggest"),
+    makeLesson1Task(5, "equal"),
+    makeLesson2Task(6, "same"),
+    makeLesson2Task(7, "match"),
+    makeLesson2Task(8, "build"),
+    makeLesson2Task(9, "true_false"),
+    makeLesson2Task(10, "ten_frame"),
+    makeLesson3Task(11, "order"),
+    makeLesson3Task(12, "biggest"),
+    makeLesson3Task(13, "smallest"),
+    makeLesson3Task(14, "number_order"),
+    makeLesson3Task(15, "reverse"),
+  ];
+
+  if (questions.length !== totalExpected) {
+    throw new Error(`[GroundWeeklyQuiz] Week 5 expected ${totalExpected} questions, received ${questions.length}.`);
   }
 
   return questions;
@@ -4970,7 +5371,13 @@ function SessionPage() {
   const n = Number(sp.get("n") ?? "1"); // lesson number 1-3 or quiz number
 
   const isLesson = type === "lesson";
-  const title = isLesson ? `Lesson ${n}` : (year === "Prep" && Number(week) === 4 ? "Quick Eyes Challenge" : "Weekly Quiz");
+  const title = isLesson
+    ? `Lesson ${n}`
+    : year === "Prep" && Number(week) === 4
+      ? "Quick Eyes Challenge"
+      : year === "Prep" && Number(week) === 5
+        ? "Quantity Challenge"
+        : "Weekly Quiz";
 
   useEffect(() => {
     const progress = readProgress();
@@ -5100,6 +5507,10 @@ function SessionPage() {
 
     if (year === "Prep" && Number(week) === 4) {
       return buildPrepWeek4WeeklyQuizQuestions(questionsPerLesson);
+    }
+
+    if (year === "Prep" && Number(week) === 5) {
+      return buildPrepWeek5WeeklyQuizQuestions(questionsPerLesson);
     }
 
     if (
