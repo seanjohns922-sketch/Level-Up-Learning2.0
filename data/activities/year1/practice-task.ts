@@ -213,6 +213,12 @@ export type PracticeTask = (
       compareMode?: "exact" | "more_than" | "less_than";
       compareBase?: number;
       maxBuild?: number;
+      startingBuilt?: number;
+      referenceGroup?: {
+        quantity: number;
+        objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs";
+        patternLayout?: "dice" | "ten_frame" | "domino" | "finger" | "symmetry";
+      };
       feedback?: { correct: string; wrong: string };
     }
   | {
@@ -220,9 +226,14 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       targetNumber: number;
-      comparisonType: "more" | "less" | "equal" | "biggest" | "smallest" | "order" | "statement";
+      comparisonType: "more" | "less" | "equal" | "biggest" | "smallest" | "order" | "statement" | "match" | "different";
       helperVariant?: "numbot" | "battle" | "flash" | "ten_frame";
       statementRelation?: "more" | "less" | "equal";
+      referenceGroup?: {
+        quantity: number;
+        objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs";
+        patternLayout?: "dice" | "ten_frame" | "domino" | "finger" | "symmetry";
+      };
       groups: Array<{
         id: string;
         quantity: number;

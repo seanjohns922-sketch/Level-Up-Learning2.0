@@ -312,6 +312,8 @@ function LessonPage() {
                       ? "Pattern Match Mission Complete!"
                       : effectiveLessonId === "y0-w5-l1"
                         ? "More or Less Mission Complete!"
+                      : effectiveLessonId === "y0-w5-l2"
+                        ? "Match the Groups Complete!"
         : effectiveLessonId === "y0-w1-l2"
           ? "You counted collections to 5!"
           : "You recognised numbers 1 to 5!";

@@ -1,7 +1,7 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
 
-type GroundObjectType = Extract<PracticeTask, { kind: "groundBuild" }>['objectType'];
-type GroundPatternLayout = Extract<PracticeTask, { kind: "groundFlash" }>['patternLayout'];
+type GroundObjectType = Extract<PracticeTask, { kind: "groundBuild" }>["objectType"];
+type GroundPatternLayout = Extract<PracticeTask, { kind: "groundFlash" }>["patternLayout"];
 type GroundCompareTask = Extract<PracticeTask, { kind: "groundCompare" }>;
 type GroundBuildTask = Extract<PracticeTask, { kind: "groundBuild" }>;
 
@@ -27,7 +27,7 @@ const OBJECTS: GroundObjectType[] = [
   "futuristic_coins",
   "number_orbs",
 ];
-const ROTATION = [
+const LESSON1_ROTATION = [
   "which_more",
   "which_less",
   "same_or_different",
@@ -42,6 +42,23 @@ const ROTATION = [
   "equal_builder",
   "sort_groups",
   "true_false",
+] as const;
+const LESSON2_ROTATION = [
+  "same_or_different",
+  "match_equal_group",
+  "build_equal_group",
+  "which_group_matches",
+  "true_false_equal",
+  "numbot_balance",
+  "ten_frame_match",
+  "quick_equal_flash",
+  "fix_the_group",
+  "group_swap",
+  "which_is_not_equal",
+  "quick_eyes_match",
+  "balance_the_sides",
+  "equal_or_more",
+  "number_match_builder",
 ] as const;
 
 const memoryByLesson = new Map<string, Week5Memory>();
@@ -84,7 +101,7 @@ function numberWord(value: number) {
 
 function chooseRecentSafe<T>(pool: readonly T[] | T[], recent: T[]) {
   let candidate = pool[randInt(0, pool.length - 1)]!;
-  for (let attempts = 0; attempts < 2; attempts += 1) {
+  for (let attempts = 0; attempts < 3; attempts += 1) {
     const lastTwo = recent.slice(-2);
     if (lastTwo.length === 2 && lastTwo.every((value) => value === candidate)) {
       candidate = pool[randInt(0, pool.length - 1)]!;
@@ -115,8 +132,9 @@ function pickTarget(memory: Week5Memory, difficulty: Difficulty) {
   return target;
 }
 
-function pickObject(memory: Week5Memory) {
-  const objectType = chooseRecentSafe(OBJECTS, memory.recentObjects);
+function pickObject(memory: Week5Memory, preferred?: GroundObjectType[]) {
+  const pool = preferred ?? OBJECTS;
+  const objectType = chooseRecentSafe(pool, memory.recentObjects);
   pushRecent(memory.recentObjects, objectType, 4);
   return objectType;
 }
@@ -132,8 +150,9 @@ function pickLayout(memory: Week5Memory, quantity: number, preferred?: GroundPat
   return layout;
 }
 
-function nextKind(memory: Week5Memory) {
-  const kind = ROTATION[memory.cursor % ROTATION.length]!;
+function nextKind(memory: Week5Memory, lessonId: string) {
+  const rotation = lessonId.endsWith("-l2") ? LESSON2_ROTATION : LESSON1_ROTATION;
+  const kind = rotation[memory.cursor % rotation.length]!;
   memory.cursor += 1;
   pushRecent(memory.recentKinds, kind, 4);
   return kind;
@@ -221,7 +240,10 @@ function createWhichHasLessTask(lessonId: string, difficulty: Difficulty): Pract
 
 function createEqualTask(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
-  const [a, b] = Math.random() < 0.5 ? comparePair(memory, difficulty, "equal") : comparePair(memory, difficulty, Math.random() < 0.5 ? "more" : "less");
+  const useEqual = Math.random() < 0.55;
+  const [a, b] = useEqual
+    ? comparePair(memory, difficulty, "equal")
+    : comparePair(memory, difficulty, Math.random() < 0.5 ? "more" : "less");
   return makeCompareTask({
     prompt: "Are these equal?",
     speakText: "Are these equal?",
@@ -409,10 +431,263 @@ function createTrueFalseTask(lessonId: string, difficulty: Difficulty): Practice
   });
 }
 
-export function generatePrepWeek5Task(lessonId: string, difficulty: Difficulty = "easy"): PracticeTask {
-  const memory = getMemory(lessonId);
-  const kind = nextKind(memory);
+function makeEqualOptions(memory: Week5Memory, difficulty: Difficulty, target: number, optionsCount = 3) {
+  const correctIndex = randInt(0, optionsCount - 1);
+  const groups = [] as GroundCompareTask["groups"];
+  for (let index = 0; index < optionsCount; index += 1) {
+    if (index === correctIndex) {
+      groups.push(makeGroup(memory, target, pickObject(memory), pickLayout(memory, target)));
+      continue;
+    }
+    const deltaOptions = difficulty === "easy" ? [1, 2] : [1];
+    const delta = deltaOptions[randInt(0, deltaOptions.length - 1)]!;
+    const quantity = Math.random() < 0.5 ? Math.max(1, target - delta) : Math.min(10, target + delta);
+    groups.push(makeGroup(memory, quantity, pickObject(memory), pickLayout(memory, quantity)));
+  }
+  return { groups: shuffle(groups), correctQuantity: target };
+}
 
+function createEqualYesNoTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const isEqual = Math.random() < 0.6;
+  const second = isEqual ? target : Math.max(1, Math.min(10, target + (Math.random() < 0.5 ? -1 : 1)));
+  return makeCompareTask({
+    prompt: "Do these show the same amount?",
+    speakText: "Do these show the same amount?",
+    targetNumber: target,
+    comparisonType: "equal",
+    groups: [makeGroup(memory, target), makeGroup(memory, second)],
+    feedback: { correct: "Same amount!", wrong: "Look to see if both groups match." },
+  });
+}
+
+function createMatchEqualGroupTask(lessonId: string, difficulty: Difficulty, prompt = "Find the group equal to this one.", helperVariant: GroundCompareTask["helperVariant"] = undefined): PracticeTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const referenceGroup = {
+    quantity: target,
+    objectType: pickObject(memory),
+    patternLayout: pickLayout(memory, target),
+  };
+  const { groups } = makeEqualOptions(memory, difficulty, target);
+  const correctGroup = groups.find((group) => group.quantity === target)!;
+  return makeCompareTask({
+    prompt,
+    speakText: prompt,
+    targetNumber: target,
+    comparisonType: "match",
+    helperVariant,
+    referenceGroup,
+    groups,
+    correctGroupId: correctGroup.id,
+    feedback: { correct: "You matched the groups!", wrong: "Look for the group with the same amount." },
+  });
+}
+
+function createBuildEqualGroupTask(lessonId: string, difficulty: Difficulty, prompt = "Build the same amount.", objectType?: GroundObjectType, startingBuilt = 0): PracticeTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const safeStart = Math.min(startingBuilt, target);
+  return makeBuildTask({
+    prompt,
+    speakText: prompt,
+    targetNumber: target,
+    objectType: objectType ?? pickObject(memory),
+    compareMode: "exact",
+    maxBuild: 10,
+    startingBuilt: safeStart,
+    referenceGroup: {
+      quantity: target,
+      objectType: pickObject(memory),
+      patternLayout: pickLayout(memory, target),
+    },
+    feedback: { correct: "Perfect balance!", wrong: "Build the same amount as the first group." },
+  });
+}
+
+function createTrueFalseEqualTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const isEqual = Math.random() < 0.5;
+  const second = isEqual ? target : Math.max(1, Math.min(10, target + (Math.random() < 0.5 ? -1 : 1)));
+  return makeCompareTask({
+    prompt: "These groups are equal. Yes or no?",
+    speakText: "These groups are equal. Yes or no?",
+    targetNumber: target,
+    comparisonType: "statement",
+    statementRelation: "equal",
+    groups: [makeGroup(memory, target), makeGroup(memory, second)],
+    feedback: { correct: "Great matching!", wrong: "Look at whether both groups show the same amount." },
+  });
+}
+
+function createNumbotBalanceTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  return makeBuildTask({
+    prompt: "Numbot needs equal energy!",
+    speakText: "Numbot needs equal energy! Build the same amount.",
+    targetNumber: target,
+    objectType: "energy_orbs",
+    compareMode: "exact",
+    maxBuild: 10,
+    referenceGroup: {
+      quantity: target,
+      objectType: "energy_orbs",
+      patternLayout: pickLayout(memory, target, ["ten_frame", "domino", "symmetry"]),
+    },
+    feedback: { correct: "You balanced the energy!", wrong: "Match the same amount of energy." },
+  });
+}
+
+function createTenFrameMatchTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const referenceGroup = { quantity: target, objectType: "dots" as GroundObjectType, patternLayout: "ten_frame" as GroundPatternLayout };
+  const groups = [
+    makeGroup(memory, target, "dots", "ten_frame"),
+    makeGroup(memory, Math.max(1, Math.min(10, target + 1)), "dots", "ten_frame"),
+    makeGroup(memory, Math.max(1, target - 1), "dots", "ten_frame"),
+  ];
+  const shuffled = shuffle(groups);
+  const correctGroup = shuffled.find((group) => group.quantity === target)!;
+  return makeCompareTask({
+    prompt: "Which ten frame matches this one?",
+    speakText: "Which ten frame matches this one?",
+    targetNumber: target,
+    comparisonType: "match",
+    helperVariant: "ten_frame",
+    referenceGroup,
+    groups: shuffled,
+    correctGroupId: correctGroup.id,
+    feedback: { correct: "Ten frames match!", wrong: "Look for the ten frame with the same amount." },
+  });
+}
+
+function createQuickEqualFlashTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const isEqual = Math.random() < 0.5;
+  const other = isEqual ? target : Math.max(1, Math.min(10, target + (Math.random() < 0.5 ? -1 : 1)));
+  return makeCompareTask({
+    prompt: "Quick eyes! Are these equal?",
+    speakText: "Quick eyes! Are these equal?",
+    targetNumber: target,
+    comparisonType: "equal",
+    helperVariant: "flash",
+    groups: [makeGroup(memory, target), makeGroup(memory, other)],
+    feedback: { correct: "Quick eyes!", wrong: "Look again for the same amount." },
+  });
+}
+
+function createFixTheGroupTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const target = Math.max(3, pickTarget(memory, difficulty));
+  const gap = difficulty === "easy" ? 1 : randInt(1, 2);
+  const startingBuilt = Math.max(0, target - gap);
+  return makeBuildTask({
+    prompt: "Make the groups equal.",
+    speakText: "Make the groups equal.",
+    targetNumber: target,
+    objectType: pickObject(memory),
+    compareMode: "exact",
+    maxBuild: 10,
+    startingBuilt,
+    referenceGroup: {
+      quantity: target,
+      objectType: pickObject(memory),
+      patternLayout: pickLayout(memory, target),
+    },
+    feedback: { correct: "You fixed the group!", wrong: "Add just enough to match the first group." },
+  });
+}
+
+function createGroupSwapTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  return createMatchEqualGroupTask(lessonId, difficulty, "Find the matching group.");
+}
+
+function createWhichIsNotEqualTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const differentQuantity = Math.max(1, Math.min(10, target + (Math.random() < 0.5 ? -1 : 1)));
+  const referenceGroup = {
+    quantity: target,
+    objectType: pickObject(memory),
+    patternLayout: pickLayout(memory, target),
+  };
+  const groups = shuffle([
+    makeGroup(memory, target),
+    makeGroup(memory, target),
+    makeGroup(memory, differentQuantity),
+  ]);
+  const correctGroup = groups.find((group) => group.quantity !== target)!;
+  return makeCompareTask({
+    prompt: "Which group is NOT equal?",
+    speakText: "Which group is not equal?",
+    targetNumber: target,
+    comparisonType: "different",
+    referenceGroup,
+    groups,
+    correctGroupId: correctGroup.id,
+    feedback: { correct: "You found the different group!", wrong: "Two groups match. Tap the one that does not." },
+  });
+}
+
+function createQuickEyesMatchTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  return createMatchEqualGroupTask(lessonId, difficulty, "Quick eyes! Spot the equal group.", "flash");
+}
+
+function createBalanceTheSidesTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  return makeBuildTask({
+    prompt: "Balance the sides.",
+    speakText: "Balance the sides. Build the same amount.",
+    targetNumber: target,
+    objectType: "number_orbs",
+    compareMode: "exact",
+    maxBuild: 10,
+    referenceGroup: {
+      quantity: target,
+      objectType: "number_orbs",
+      patternLayout: pickLayout(memory, target, ["symmetry", "ten_frame", "domino"]),
+    },
+    feedback: { correct: "Perfect balance!", wrong: "Make both sides show the same amount." },
+  });
+}
+
+function createEqualOrMoreTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const isEqual = Math.random() < 0.5;
+  const second = isEqual ? target : Math.min(10, target + 1);
+  return makeCompareTask({
+    prompt: "Are they equal, or does one have more?",
+    speakText: "Are they equal, or does one have more?",
+    targetNumber: target,
+    comparisonType: "statement",
+    statementRelation: "equal",
+    groups: [makeGroup(memory, target), makeGroup(memory, second)],
+    feedback: { correct: "You spotted the match!", wrong: "If the groups do not match, one has more." },
+  });
+}
+
+function createNumberMatchBuilderTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  return makeBuildTask({
+    prompt: `Build ${target}.`,
+    speakText: `Build ${numberWord(target)}.`,
+    targetNumber: target,
+    objectType: pickObject(memory),
+    compareMode: "exact",
+    maxBuild: 10,
+    feedback: { correct: "You built the matching group!", wrong: "Build the same amount as the number." },
+  });
+}
+
+function generateLesson1Task(lessonId: string, difficulty: Difficulty, kind: (typeof LESSON1_ROTATION)[number]): PracticeTask {
   switch (kind) {
     case "which_more":
       return createWhichHasMoreTask(lessonId, difficulty);
@@ -442,9 +717,53 @@ export function generatePrepWeek5Task(lessonId: string, difficulty: Difficulty =
       return createSortGroupsTask(lessonId, difficulty);
     case "true_false":
       return createTrueFalseTask(lessonId, difficulty);
-    default:
-      return createWhichHasMoreTask(lessonId, difficulty);
   }
+}
+
+function generateLesson2Task(lessonId: string, difficulty: Difficulty, kind: (typeof LESSON2_ROTATION)[number]): PracticeTask {
+  switch (kind) {
+    case "same_or_different":
+      return createEqualYesNoTask(lessonId, difficulty);
+    case "match_equal_group":
+      return createMatchEqualGroupTask(lessonId, difficulty);
+    case "build_equal_group":
+      return createBuildEqualGroupTask(lessonId, difficulty);
+    case "which_group_matches":
+      return createMatchEqualGroupTask(lessonId, difficulty, "Which group matches this one?");
+    case "true_false_equal":
+      return createTrueFalseEqualTask(lessonId, difficulty);
+    case "numbot_balance":
+      return createNumbotBalanceTask(lessonId, difficulty);
+    case "ten_frame_match":
+      return createTenFrameMatchTask(lessonId, difficulty);
+    case "quick_equal_flash":
+      return createQuickEqualFlashTask(lessonId, difficulty);
+    case "fix_the_group":
+      return createFixTheGroupTask(lessonId, difficulty);
+    case "group_swap":
+      return createGroupSwapTask(lessonId, difficulty);
+    case "which_is_not_equal":
+      return createWhichIsNotEqualTask(lessonId, difficulty);
+    case "quick_eyes_match":
+      return createQuickEyesMatchTask(lessonId, difficulty);
+    case "balance_the_sides":
+      return createBalanceTheSidesTask(lessonId, difficulty);
+    case "equal_or_more":
+      return createEqualOrMoreTask(lessonId, difficulty);
+    case "number_match_builder":
+      return createNumberMatchBuilderTask(lessonId, difficulty);
+  }
+}
+
+export function generatePrepWeek5Task(lessonId: string, difficulty: Difficulty = "easy"): PracticeTask {
+  const memory = getMemory(lessonId);
+  const kind = nextKind(memory, lessonId);
+
+  if (lessonId.endsWith("-l2")) {
+    return generateLesson2Task(lessonId, difficulty, kind as (typeof LESSON2_ROTATION)[number]);
+  }
+
+  return generateLesson1Task(lessonId, difficulty, kind as (typeof LESSON1_ROTATION)[number]);
 }
 
 export function resetPrepWeek5TaskSessionState() {

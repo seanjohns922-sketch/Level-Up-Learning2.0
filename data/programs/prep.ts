@@ -173,9 +173,10 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         5,
         2,
         "Equal Groups",
-        "Recognise when two collections have the same amount.",
+        "Recognise when collections show the same amount even when they look different.",
         ["Match equal sets", "Balance the groups", "Same amount game"],
-        ["AC9MFN02", "AC9MFN03"]
+        ["AC9MFN03"],
+        "Match the Groups"
       ),
       buildLesson(
         5,

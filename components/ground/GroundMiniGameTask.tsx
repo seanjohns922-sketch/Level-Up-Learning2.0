@@ -267,7 +267,7 @@ export function GroundBuildTaskCard({
   onCorrect: () => void;
   onWrong: () => void;
 }) {
-  const [built, setBuilt] = useState(0);
+  const [built, setBuilt] = useState(task.startingBuilt ?? 0);
   const compareMode = task.compareMode ?? "exact";
   const compareBase = task.compareBase ?? task.targetNumber;
   const traySize = Math.max(5, Math.min(10, task.maxBuild ?? task.targetNumber ?? compareBase));
@@ -291,6 +291,16 @@ export function GroundBuildTaskCard({
           <div className="text-sm font-black uppercase tracking-[0.16em] text-teal-800">Built</div>
           <div className="text-2xl font-black text-teal-900">{built}</div>
         </div>
+        {task.referenceGroup ? (
+          <div className="mb-4 rounded-[22px] border-2 border-cyan-200 bg-cyan-50 p-3">
+            <div className="mb-2 text-center text-xs font-black uppercase tracking-[0.16em] text-teal-800">Match this group</div>
+            <CompareGroupCard
+              quantity={task.referenceGroup.quantity}
+              objectType={task.referenceGroup.objectType}
+              patternLayout={task.referenceGroup.patternLayout}
+            />
+          </div>
+        ) : null}
         {compareMode !== "exact" ? (
           <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
             {compareMode === "more_than" ? `Make more than ${compareBase}` : `Make less than ${compareBase}`}
@@ -419,6 +429,18 @@ export function GroundCompareTaskCard({
   return (
     <GroundMiniShell badge={badge} prompt={task.prompt} speakText={task.speakText}>
       <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
+        {task.referenceGroup ? (
+          <div className="mb-4 rounded-[22px] border-2 border-cyan-200 bg-cyan-50 p-3">
+            <div className="mb-2 text-center text-xs font-black uppercase tracking-[0.16em] text-teal-800">
+              {task.comparisonType === "different" ? "Find the different group" : "Match this group"}
+            </div>
+            <CompareGroupCard
+              quantity={task.referenceGroup.quantity}
+              objectType={task.referenceGroup.objectType}
+              patternLayout={task.referenceGroup.patternLayout}
+            />
+          </div>
+        ) : null}
         {task.comparisonType === "order" ? (
           <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
             Tap from smallest to biggest
