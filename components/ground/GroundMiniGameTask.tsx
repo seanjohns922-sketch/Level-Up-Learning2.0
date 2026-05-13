@@ -350,14 +350,21 @@ function CompareGroupCard({
   objectType,
   patternLayout,
   emphasized = false,
+  orderIndex,
 }: {
   quantity: number;
   objectType: keyof typeof OBJECT_META;
   patternLayout?: GroundPatternLayout;
   emphasized?: boolean;
+  orderIndex?: number;
 }) {
   return (
-    <div className={`rounded-[22px] border-2 px-3 py-3 shadow-sm transition ${emphasized ? "border-teal-300 bg-teal-50" : "border-cyan-200 bg-white"}`}>
+    <div className={`relative rounded-[22px] border-2 px-3 py-3 shadow-sm transition ${emphasized ? "border-teal-300 bg-teal-50" : "border-cyan-200 bg-white"}`}>
+      {typeof orderIndex === "number" ? (
+        <div className="absolute left-3 top-3 flex h-10 w-10 items-center justify-center rounded-full border-2 border-teal-300 bg-white text-xl font-black text-teal-800 shadow-sm">
+          {orderIndex + 1}
+        </div>
+      ) : null}
       <StructuredReveal quantity={quantity} objectType={objectType} patternLayout={patternLayout} />
     </div>
   );
@@ -389,6 +396,7 @@ export function GroundCompareTaskCard({
   }, [task.referenceGroup, task.referenceRevealMs]);
 
   const referenceVisible = Boolean(task.referenceGroup) && !referenceHidden;
+  const orderDirectionLabel = task.orderDirection === "DESC" ? "Biggest to smallest" : "Smallest to biggest";
 
   function tapGroup(groupId: string) {
     if (task.comparisonType === "order") {
@@ -460,9 +468,32 @@ export function GroundCompareTaskCard({
           </div>
         ) : null}
         {task.comparisonType === "order" ? (
-          <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
-            {task.orderDirection === "DESC" ? "Tap from biggest to smallest" : "Tap from smallest to biggest"}
-          </div>
+          <>
+            <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
+              {task.orderDirection === "DESC" ? "Tap from biggest to smallest" : "Tap from smallest to biggest"}
+            </div>
+            <div className="mb-4 rounded-[20px] border border-cyan-200 bg-cyan-50 px-4 py-3">
+              <div className="mb-2 text-center text-[11px] font-black uppercase tracking-[0.16em] text-teal-800">
+                {orderDirectionLabel}
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                {sortedOrder.map((_, index) => {
+                  const chosenId = orderProgress[index];
+                  const chosenGroup = task.groups.find((group) => group.id === chosenId);
+                  return (
+                    <div
+                      key={`slot-${index}`}
+                      className={`flex min-h-[52px] min-w-[72px] items-center justify-center rounded-[18px] border-2 px-3 text-sm font-black shadow-sm ${
+                        chosenGroup ? "border-teal-300 bg-white text-teal-900" : "border-dashed border-cyan-300 bg-white/70 text-cyan-400"
+                      }`}
+                    >
+                      {chosenGroup ? chosenGroup.quantity : index + 1}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </>
         ) : null}
         <div className={`grid gap-3 ${task.groups.length === 3 ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
           {task.groups.map((group) => (
@@ -478,6 +509,7 @@ export function GroundCompareTaskCard({
                 objectType={group.objectType}
                 patternLayout={group.patternLayout}
                 emphasized={orderProgress.includes(group.id)}
+                orderIndex={orderProgress.indexOf(group.id) >= 0 ? orderProgress.indexOf(group.id) : undefined}
               />
             </button>
           ))}
