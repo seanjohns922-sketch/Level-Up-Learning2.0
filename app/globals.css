@@ -174,3 +174,23 @@ body {
   0%, 100% { opacity: 0.85; transform: translateX(-50%) scaleX(1); }
   50% { opacity: 1; transform: translateX(-50%) scaleX(1.08); }
 }
+
+@keyframes global-tap-wiggle {
+  0% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.025) rotate(-0.8deg); }
+  50% { transform: scale(1.035) rotate(0.8deg); }
+  75% { transform: scale(1.015) rotate(-0.4deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.global-tap-wiggle {
+  animation: global-tap-wiggle 220ms ease-out;
+  transform-origin: center;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .global-tap-wiggle {
+    animation: none;
+  }
+}
