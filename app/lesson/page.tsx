@@ -42,6 +42,24 @@ export default function LessonPageWrapper() {
   return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><LessonPage /></Suspense>;
 }
 
+function isPrepGroundCustomLesson(lessonId: string) {
+  return (
+    lessonId.startsWith("y0-w1-") ||
+    lessonId.startsWith("y0-w2-") ||
+    lessonId.startsWith("y0-w3-") ||
+    lessonId.startsWith("y0-w4-") ||
+    lessonId.startsWith("y0-w5-")
+  );
+}
+
+function getPrepGroundTask(lessonId: string, difficulty: "easy" | "medium" | "hard") {
+  if (lessonId.startsWith("y0-w5-")) return generatePrepWeek5Task(lessonId, difficulty);
+  if (lessonId.startsWith("y0-w4-")) return generatePrepWeek4Task(lessonId, difficulty);
+  if (lessonId.startsWith("y0-w3-")) return generatePrepWeek3Task(lessonId, difficulty);
+  if (lessonId.startsWith("y0-w2-")) return generatePrepWeek2Task(lessonId, difficulty);
+  return generatePrepWeek1Task(lessonId, difficulty);
+}
+
 function LessonPage() {
   const router = useRouter();
   const params = useSearchParams();
@@ -76,22 +94,7 @@ function LessonPage() {
   const hasEmbeddedLessonVideo =
     year === "Year 4" && week === 2 && lessonNumber === 1;
   const isGroundCustomLesson =
-    year === "Prep" &&
-    (
-      effectiveLessonId === "y0-w1-l1" ||
-      effectiveLessonId === "y0-w1-l2" ||
-      effectiveLessonId === "y0-w1-l3" ||
-      effectiveLessonId === "y0-w2-l1" ||
-      effectiveLessonId === "y0-w2-l2" ||
-      effectiveLessonId === "y0-w2-l3" ||
-      effectiveLessonId === "y0-w3-l1" ||
-      effectiveLessonId === "y0-w3-l2" ||
-      effectiveLessonId === "y0-w3-l3" ||
-      effectiveLessonId === "y0-w4-l1" ||
-      effectiveLessonId === "y0-w4-l2" ||
-      effectiveLessonId === "y0-w4-l3" ||
-      effectiveLessonId === "y0-w5-l1"
-    );
+    year === "Prep" && isPrepGroundCustomLesson(effectiveLessonId);
 
   useEffect(() => {
     const p = readProgress();
@@ -758,31 +761,7 @@ function LessonPage() {
               getTask={(ctx) => {
                 const d = ctx?.difficulty ?? "easy";
                 if (isGroundCustomLesson) {
-                  if (
-                    effectiveLessonId === "y0-w2-l1" ||
-                    effectiveLessonId === "y0-w2-l2" ||
-                    effectiveLessonId === "y0-w2-l3"
-                  ) {
-                    return generatePrepWeek2Task(effectiveLessonId, d);
-                  }
-                  if (
-                    effectiveLessonId === "y0-w3-l1" ||
-                    effectiveLessonId === "y0-w3-l2" ||
-                    effectiveLessonId === "y0-w3-l3"
-                  ) {
-                    return generatePrepWeek3Task(effectiveLessonId, d);
-                  }
-                  if (
-                    effectiveLessonId === "y0-w4-l1" ||
-                    effectiveLessonId === "y0-w4-l2" ||
-                    effectiveLessonId === "y0-w4-l3"
-                  ) {
-                    return generatePrepWeek4Task(effectiveLessonId, d);
-                  }
-                  if (effectiveLessonId === "y0-w5-l1") {
-                    return generatePrepWeek5Task(effectiveLessonId, d);
-                  }
-                  return generatePrepWeek1Task(effectiveLessonId, d);
+                  return getPrepGroundTask(effectiveLessonId, d);
                 }
                 if (effectiveLessonId.startsWith("y1-w2-")) {
                   return generateWeek2Task(effectiveLessonId, d);
