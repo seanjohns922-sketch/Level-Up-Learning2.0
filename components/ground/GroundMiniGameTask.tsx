@@ -6,6 +6,7 @@ import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type GroundCollectTask = Extract<PracticeTask, { kind: "groundCollect" }>;
 type GroundBuildTask = Extract<PracticeTask, { kind: "groundBuild" }>;
+type GroundCompareTask = Extract<PracticeTask, { kind: "groundCompare" }>;
 type GroundFlashTask = Extract<PracticeTask, { kind: "groundFlash" }>;
 type GroundHuntTask = Extract<PracticeTask, { kind: "groundHunt" }>;
 type GroundSequenceTask = Extract<PracticeTask, { kind: "groundSequence" }>;
@@ -267,11 +268,19 @@ export function GroundBuildTaskCard({
   onWrong: () => void;
 }) {
   const [built, setBuilt] = useState(0);
-
-  const tray = useMemo(() => Array.from({ length: Math.max(5, Math.min(10, task.targetNumber)) }), [task.targetNumber]);
+  const compareMode = task.compareMode ?? "exact";
+  const compareBase = task.compareBase ?? task.targetNumber;
+  const traySize = Math.max(5, Math.min(10, task.maxBuild ?? task.targetNumber ?? compareBase));
+  const tray = useMemo(() => Array.from({ length: traySize }), [traySize]);
 
   function check() {
-    if (built === task.targetNumber) onCorrect();
+    const correct =
+      compareMode === "more_than"
+        ? built > compareBase
+        : compareMode === "less_than"
+          ? built < compareBase
+          : built === task.targetNumber;
+    if (correct) onCorrect();
     else onWrong();
   }
 
@@ -282,6 +291,11 @@ export function GroundBuildTaskCard({
           <div className="text-sm font-black uppercase tracking-[0.16em] text-teal-800">Built</div>
           <div className="text-2xl font-black text-teal-900">{built}</div>
         </div>
+        {compareMode !== "exact" ? (
+          <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
+            {compareMode === "more_than" ? `Make more than ${compareBase}` : `Make less than ${compareBase}`}
+          </div>
+        ) : null}
         <div className="grid grid-cols-5 gap-3">
           {tray.map((_, index) => (
             <div
@@ -298,13 +312,13 @@ export function GroundBuildTaskCard({
         <button
           type="button"
           onClick={() => setBuilt((current) => Math.max(0, current - 1))}
-            className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-4 text-2xl font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
+          className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-4 text-2xl font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
         >
           −
         </button>
         <button
           type="button"
-          onClick={() => setBuilt((current) => Math.min(Math.max(5, Math.min(10, task.targetNumber)), current + 1))}
+          onClick={() => setBuilt((current) => Math.min(traySize, current + 1))}
           className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-4 text-2xl font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
         >
           +
@@ -317,6 +331,137 @@ export function GroundBuildTaskCard({
           Done
         </button>
       </div>
+    </GroundMiniShell>
+  );
+}
+
+function CompareGroupCard({
+  quantity,
+  objectType,
+  patternLayout,
+  emphasized = false,
+}: {
+  quantity: number;
+  objectType: keyof typeof OBJECT_META;
+  patternLayout?: GroundPatternLayout;
+  emphasized?: boolean;
+}) {
+  return (
+    <div className={`rounded-[22px] border-2 px-3 py-3 shadow-sm transition ${emphasized ? "border-teal-300 bg-teal-50" : "border-cyan-200 bg-white"}`}>
+      <StructuredReveal quantity={quantity} objectType={objectType} patternLayout={patternLayout} />
+    </div>
+  );
+}
+
+export function GroundCompareTaskCard({
+  task,
+  onCorrect,
+  onWrong,
+}: {
+  task: GroundCompareTask;
+  onCorrect: () => void;
+  onWrong: () => void;
+}) {
+  const [orderProgress, setOrderProgress] = useState<string[]>([]);
+  const sortedOrder = useMemo(
+    () => [...task.groups].sort((a, b) => a.quantity - b.quantity).map((group) => group.id),
+    [task.groups]
+  );
+
+  function tapGroup(groupId: string) {
+    if (task.comparisonType === "order") {
+      if (orderProgress.includes(groupId)) return;
+      const expectedId = sortedOrder[orderProgress.length];
+      if (groupId !== expectedId) {
+        setOrderProgress([]);
+        onWrong();
+        return;
+      }
+      const next = [...orderProgress, groupId];
+      if (next.length === sortedOrder.length) {
+        onCorrect();
+        return;
+      }
+      setOrderProgress(next);
+      return;
+    }
+
+    if (groupId === task.correctGroupId) onCorrect();
+    else onWrong();
+  }
+
+  function answerYesNo(answer: boolean) {
+    const left = task.groups[0]?.quantity ?? 0;
+    const right = task.groups[1]?.quantity ?? 0;
+    const isTrue =
+      task.comparisonType === "equal"
+        ? left === right
+        : task.statementRelation === "less"
+          ? left < right
+          : task.statementRelation === "equal"
+            ? left === right
+            : left > right;
+    if (answer === isTrue) onCorrect();
+    else onWrong();
+  }
+
+  const badge =
+    task.helperVariant === "numbot"
+      ? "Numbot Compare"
+      : task.helperVariant === "battle"
+        ? "Group Battle"
+        : task.helperVariant === "flash"
+          ? "Quick Eyes"
+          : task.helperVariant === "ten_frame"
+            ? "Ten Frame Compare"
+            : "Compare Game";
+
+  return (
+    <GroundMiniShell badge={badge} prompt={task.prompt} speakText={task.speakText}>
+      <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
+        {task.comparisonType === "order" ? (
+          <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
+            Tap from smallest to biggest
+          </div>
+        ) : null}
+        <div className={`grid gap-3 ${task.groups.length === 3 ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
+          {task.groups.map((group) => (
+            <button
+              key={group.id}
+              type="button"
+              onClick={() => tapGroup(group.id)}
+              disabled={task.comparisonType === "equal" || task.comparisonType === "statement"}
+              className="text-left disabled:cursor-default"
+            >
+              <CompareGroupCard
+                quantity={group.quantity}
+                objectType={group.objectType}
+                patternLayout={group.patternLayout}
+                emphasized={orderProgress.includes(group.id)}
+              />
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {task.comparisonType === "equal" || task.comparisonType === "statement" ? (
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={() => answerYesNo(true)}
+            className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-4 text-2xl font-black uppercase text-teal-900 transition hover:border-cyan-300 hover:bg-cyan-50"
+          >
+            Yes
+          </button>
+          <button
+            type="button"
+            onClick={() => answerYesNo(false)}
+            className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-4 text-2xl font-black uppercase text-teal-900 transition hover:border-cyan-300 hover:bg-cyan-50"
+          >
+            No
+          </button>
+        </div>
+      ) : null}
     </GroundMiniShell>
   );
 }

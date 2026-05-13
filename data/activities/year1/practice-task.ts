@@ -210,6 +210,27 @@ export type PracticeTask = (
       speakText?: string;
       targetNumber: number;
       objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs";
+      compareMode?: "exact" | "more_than" | "less_than";
+      compareBase?: number;
+      maxBuild?: number;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
+      kind: "groundCompare";
+      prompt: string;
+      speakText?: string;
+      targetNumber: number;
+      comparisonType: "more" | "less" | "equal" | "biggest" | "smallest" | "order" | "statement";
+      helperVariant?: "numbot" | "battle" | "flash" | "ten_frame";
+      statementRelation?: "more" | "less" | "equal";
+      groups: Array<{
+        id: string;
+        quantity: number;
+        objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs";
+        patternLayout?: "dice" | "ten_frame" | "domino" | "finger" | "symmetry";
+      }>;
+      correctGroupId?: string;
+      correctOrderIds?: string[];
       feedback?: { correct: string; wrong: string };
     }
   | {

@@ -26,6 +26,7 @@ import { generatePrepWeek1Task, resetPrepWeek1TaskSessionState } from "@/data/ac
 import { generatePrepWeek2Task, resetPrepWeek2TaskSessionState } from "@/data/activities/prep/week2";
 import { generatePrepWeek3Task, resetPrepWeek3TaskSessionState } from "@/data/activities/prep/week3";
 import { generatePrepWeek4Task, resetPrepWeek4TaskSessionState } from "@/data/activities/prep/week4";
+import { generatePrepWeek5Task, resetPrepWeek5TaskSessionState } from "@/data/activities/prep/week5";
 import { getProgramForYear } from "@/data/programs";
 import { DEMO_MODE } from "@/data/config";
 import { ACTIVE_STUDENT_KEY, readProgress, updateProgress } from "@/data/progress";
@@ -88,7 +89,8 @@ function LessonPage() {
       effectiveLessonId === "y0-w3-l3" ||
       effectiveLessonId === "y0-w4-l1" ||
       effectiveLessonId === "y0-w4-l2" ||
-      effectiveLessonId === "y0-w4-l3"
+      effectiveLessonId === "y0-w4-l3" ||
+      effectiveLessonId === "y0-w5-l1"
     );
 
   useEffect(() => {
@@ -305,6 +307,8 @@ function LessonPage() {
                     ? "Quick Group Spotter Complete!"
                     : effectiveLessonId === "y0-w4-l3"
                       ? "Pattern Match Mission Complete!"
+                      : effectiveLessonId === "y0-w5-l1"
+                        ? "More or Less Mission Complete!"
         : effectiveLessonId === "y0-w1-l2"
           ? "You counted collections to 5!"
           : "You recognised numbers 1 to 5!";
@@ -775,6 +779,9 @@ function LessonPage() {
                   ) {
                     return generatePrepWeek4Task(effectiveLessonId, d);
                   }
+                  if (effectiveLessonId === "y0-w5-l1") {
+                    return generatePrepWeek5Task(effectiveLessonId, d);
+                  }
                   return generatePrepWeek1Task(effectiveLessonId, d);
                 }
                 if (effectiveLessonId.startsWith("y1-w2-")) {
@@ -880,4 +887,5 @@ function LessonPage() {
     resetPrepWeek2TaskSessionState();
     resetPrepWeek3TaskSessionState();
     resetPrepWeek4TaskSessionState();
+    resetPrepWeek5TaskSessionState();
   }

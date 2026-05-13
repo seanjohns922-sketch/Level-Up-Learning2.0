@@ -164,9 +164,10 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         5,
         1,
         "More or Less",
-        "Compare two groups and identify which has more or less.",
-        ["Tap the bigger group", "More or less sort", "Quick compare cards"],
-        ["AC9MFN02", "AC9MFN03"]
+        "Compare quantities and identify more, less, and equal using visual reasoning and structured groups.",
+        ["Which group has more", "Equal group checks", "Quick comparison games"],
+        ["AC9MFN03"],
+        "More or Less Mission"
       ),
       buildLesson(
         5,

@@ -81,6 +81,7 @@ import FunGames from "@/components/week12/FunGames";
 import GroundMatchTaskCard from "@/components/ground/GroundMatchTaskCard";
 import {
   GroundBuildTaskCard,
+  GroundCompareTaskCard,
   GroundCollectTaskCard,
   GroundFeedTaskCard,
   GroundFlashTaskCard,
@@ -281,6 +282,8 @@ function TaskRendererInner({
       return <GroundCollectTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundBuild":
       return <GroundBuildTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "groundCompare":
+      return <GroundCompareTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundFlash":
       return <GroundFlashTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundGrowingCount":
