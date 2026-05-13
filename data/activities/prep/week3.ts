@@ -77,17 +77,21 @@ const backwardRotationPattern = [
 
 const nameMatchRotationPattern = [
   "listen_tap",
+  "match_the_word",
+  "three_way_match",
+  "word_number_match",
   "hear_find",
   "match_group",
-  "numbot_says",
-  "word_number_match",
-  "count_match",
-  "number_path_match",
-  "speech_bubble",
   "flash_number",
-  "match_countdown",
+  "fix_match",
+  "count_match",
+  "listen_tap",
+  "word_number_match",
+  "speech_bubble",
+  "word_sequence",
   "three_way_match",
-  "word_reveal",
+  "numbot_says",
+  "match_the_word",
 ] as const;
 
 const memoryByLesson = new Map<string, Week3Memory>();
@@ -583,10 +587,19 @@ function createMatchGroupTask(lessonId: string, difficulty: Difficulty): GroundM
   return { kind: "groundMatch", prompt: `Which group shows ${target}?`, speakText: `Which group shows ${numberWord(target)}?`, targetNumber: target, targetNumberName: numberWord(target), visualType: "ground-quantity-card", promptType: "numeral_to_group", shownNumeral: target, options, correctOptionId, feedback: { correct: "Nice matching!", wrong: "Count the groups carefully." } };
 }
 
+function createMatchTheWordTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickNameMatchTarget(memory, difficulty);
+  const { options, correctOptionId } = buildGroundWordOptions(target, memory, 10, 3);
+  pushRecent(memory.recentKinds, "match_the_word", 4);
+  pushRecent(memory.recentPromptKinds, "match_the_word", 3);
+  return { kind: "groundMatch", prompt: "Find the word.", speakText: `Find the word ${numberWord(target)}.`, targetNumber: target, targetNumberName: numberWord(target), visualType: "ground-number-card", promptType: "word_audio_match", options, correctOptionId, feedback: { correct: `Yes — that word says ${numberWord(target)}.`, wrong: "Listen again and find the word." } };
+}
+
 function createNumbotSaysNameTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
   const memory = getMemory(lessonId);
   const target = pickNameMatchTarget(memory, difficulty);
-  const promptKind = chooseRecentSafe(["number_to_numeral", "word_audio_match"] as const, memory.recentPromptKinds);
+  const promptKind = chooseRecentSafe(["word_audio_match", "number_to_numeral", "word_audio_match"] as const, memory.recentPromptKinds);
   pushRecent(memory.recentPromptKinds, promptKind, 3);
   pushRecent(memory.recentKinds, "numbot_says", 4);
 
@@ -602,7 +615,7 @@ function createNumbotSaysNameTask(lessonId: string, difficulty: Difficulty): Gro
 function createHearAndFindTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
   const memory = getMemory(lessonId);
   const target = pickNameMatchTarget(memory, difficulty);
-  const promptKind = chooseRecentSafe(["numeral", "quantity", "word"] as const, memory.recentPromptKinds);
+  const promptKind = chooseRecentSafe(["word", "quantity", "numeral", "word"] as const, memory.recentPromptKinds);
   pushRecent(memory.recentPromptKinds, promptKind, 3);
   pushRecent(memory.recentKinds, "hear_find", 4);
 
@@ -624,7 +637,7 @@ function createThreeWayMatchTask(lessonId: string, difficulty: Difficulty): Grou
   const target = pickNameMatchTarget(memory, difficulty);
   const { options, correctOptionId } = buildThreeWayOptions(target, memory);
   pushRecent(memory.recentKinds, "three_way_match", 4);
-  return { kind: "groundMatch", prompt: "Which pair matches?", speakText: `Find the matching pair for ${numberWord(target)}.`, targetNumber: target, targetNumberName: numberWord(target), visualType: "ground-flash-match-card", promptType: "word_pair_match", options, correctOptionId, feedback: { correct: "Nice match!", wrong: "Find the pair where the number and dots are the same." } };
+  return { kind: "groundMatch", prompt: "Which pair matches?", speakText: `Find the card where ${numberWord(target)}, ${target}, and the group all match.`, targetNumber: target, targetNumberName: numberWord(target), visualType: "ground-flash-match-card", promptType: "word_pair_match", options, correctOptionId, feedback: { correct: "Nice match!", wrong: "Find the card where the number, word, and group are the same." } };
 }
 
 function createCountAndMatchNameTask(lessonId: string, difficulty: Difficulty): GroundTapCountTask {
@@ -650,13 +663,18 @@ function createNumberPathMatchTask(lessonId: string, difficulty: Difficulty): Gr
 function createSpeechBubbleMatchTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
   const memory = getMemory(lessonId);
   const target = pickNameMatchTarget(memory, difficulty);
-  const promptKind = chooseRecentSafe(["number", "group"] as const, memory.recentPromptKinds);
+  const promptKind = chooseRecentSafe(["number", "group", "word"] as const, memory.recentPromptKinds);
   pushRecent(memory.recentPromptKinds, promptKind, 3);
   pushRecent(memory.recentKinds, "speech_bubble", 4);
 
   if (promptKind === "group") {
     const { options, correctOptionId } = buildQuantityOptions(target, memory, 3);
     return { kind: "groundMatch", prompt: "Match the number bubble.", speakText: `Numbot says ${numberWord(target)}. Find the matching group.`, targetNumber: target, targetNumberName: numberWord(target), visualType: "ground-quantity-card", promptType: "numeral_to_group", helperVariant: "speech_bubble", options, correctOptionId, feedback: { correct: "Bubble matched!", wrong: "Count the group carefully." } };
+  }
+
+  if (promptKind === "word") {
+    const { options, correctOptionId } = buildGroundWordOptions(target, memory, 10, 3);
+    return { kind: "groundMatch", prompt: "Match the number bubble.", speakText: `Numbot says ${numberWord(target)}. Find the word ${numberWord(target)}.`, targetNumber: target, targetNumberName: numberWord(target), visualType: "ground-number-card", promptType: "word_audio_match", helperVariant: "speech_bubble", options, correctOptionId, feedback: { correct: "Bubble matched!", wrong: "Listen again and find the word." } };
   }
 
   const { options, correctOptionId } = buildGroundNumeralOptions(target, memory, 10, 3);
@@ -691,6 +709,26 @@ function createWordRevealTask(lessonId: string, difficulty: Difficulty): GroundM
   return { kind: "groundMatch", prompt: "Uncover the number.", speakText: `Find ${numberWord(target)}.`, targetNumber: target, targetNumberName: numberWord(target), visualType: "ground-number-card", promptType: "word_to_numeral", helperVariant: "memory", shownWord: numberWord(target), options, correctOptionId, feedback: { correct: `Yes — ${numberWord(target)} is ${target}.`, wrong: "Listen again and find the number." } };
 }
 
+function createFixTheMatchTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickNameMatchTarget(memory, difficulty);
+  const { options, correctOptionId } = buildGroundWordOptions(target, memory, 10, 3);
+  pushRecent(memory.recentKinds, "fix_match", 4);
+  pushRecent(memory.recentPromptKinds, "fix_match", 3);
+  return { kind: "groundMatch", prompt: "What should the word be?", speakText: `Number ${numberWord(target)} needs the matching word. What should the word be?`, targetNumber: target, targetNumberName: numberWord(target), visualType: "ground-number-card", promptType: "numeral_to_word", shownNumeral: target, options, correctOptionId, feedback: { correct: `Correct — ${numberWord(target)} matches ${target}.`, wrong: "Look for the word that matches the number." } };
+}
+
+function createWordSequenceTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const start = difficulty === "easy" ? randInt(1, 6) : difficulty === "medium" ? randInt(2, 7) : randInt(3, 8);
+  const target = start + 1;
+  const { options, correctOptionId } = buildGroundWordOptions(target, memory, 10, 3);
+  pushRecent(memory.recentTargets, target, 4);
+  pushRecent(memory.recentKinds, "word_sequence", 4);
+  pushRecent(memory.recentPromptKinds, "word_sequence", 3);
+  return { kind: "groundMatch", prompt: "What comes after?", speakText: `What comes after ${numberWord(start)}? Find the word ${numberWord(target)}.`, targetNumber: target, targetNumberName: numberWord(target), visualType: "ground-number-card", promptType: "word_audio_match", options, correctOptionId, feedback: { correct: "Great word matching!", wrong: "Think of the next number word." } };
+}
+
 export function resetPrepWeek3TaskSessionState() {
   memoryByLesson.clear();
 }
@@ -704,7 +742,7 @@ export function generatePrepWeek3Task(lessonId: string, difficulty: Difficulty =
       : lessonMode === "name_match"
         ? nameMatchRotationPattern
         : forwardRotationPattern;
-  const gameKind = rotationPattern[memory.cursor % rotationPattern.length]!;
+  const gameKind: string = rotationPattern[memory.cursor % rotationPattern.length]!;
   memory.cursor += 1;
 
   if (lessonMode === "backward") {
@@ -728,10 +766,12 @@ export function generatePrepWeek3Task(lessonId: string, difficulty: Difficulty =
   if (lessonMode === "name_match") {
     switch (gameKind) {
       case "listen_tap": return createListenAndTapNameTask(lessonId, difficulty);
+      case "match_the_word": return createMatchTheWordTask(lessonId, difficulty);
       case "hear_find": return createHearAndFindTask(lessonId, difficulty);
       case "match_group": return createMatchGroupTask(lessonId, difficulty);
       case "numbot_says": return createNumbotSaysNameTask(lessonId, difficulty);
       case "word_number_match": return createWordNumberMatchTask(lessonId, difficulty);
+      case "fix_match": return createFixTheMatchTask(lessonId, difficulty);
       case "count_match": return createCountAndMatchNameTask(lessonId, difficulty);
       case "number_path_match": return createNumberPathMatchTask(lessonId, difficulty);
       case "speech_bubble": return createSpeechBubbleMatchTask(lessonId, difficulty);
@@ -739,6 +779,7 @@ export function generatePrepWeek3Task(lessonId: string, difficulty: Difficulty =
       case "match_countdown": return createMatchCountdownTask(lessonId, difficulty);
       case "three_way_match": return createThreeWayMatchTask(lessonId, difficulty);
       case "word_reveal": return createWordRevealTask(lessonId, difficulty);
+      case "word_sequence": return createWordSequenceTask(lessonId, difficulty);
       default: return createListenAndTapNameTask(lessonId, difficulty);
     }
   }
