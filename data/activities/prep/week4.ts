@@ -86,7 +86,9 @@ const lesson3Rotation = [
 const memoryByLesson = new Map<string, Week4Memory>();
 
 function getLessonMode(lessonId: string): LessonMode {
-  return lessonId === "y0-w4-l2" ? "object_groups" : "dot_patterns";
+  if (lessonId === "y0-w4-l2") return "object_groups";
+  if (lessonId === "y0-w4-l3") return "pattern_match";
+  return "dot_patterns";
 }
 
 function getMemory(lessonId: string): Week4Memory {
