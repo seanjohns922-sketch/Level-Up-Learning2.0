@@ -4,6 +4,7 @@ import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type GroundMatchTask = Extract<PracticeTask, { kind: "groundMatch" }>;
+type GroundOption = GroundMatchTask["options"][number];
 
 const OBJECT_META = {
   dots: { label: "dots", emoji: "●" },
@@ -118,7 +119,7 @@ function GroundQuantityCard({
                 key={`${meta.label}-${index}`}
                 className={`${baseSize} ${bubbleSize} inline-flex items-center justify-center rounded-full ${filled ? "bg-cyan-50 text-teal-700 shadow-sm" : "bg-transparent text-transparent"}`}
               >
-                {filled ? meta.emoji : meta.emoji}
+                {meta.emoji}
               </span>
             );
           })}
@@ -135,6 +136,40 @@ function GroundQuantityCard({
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+function GroundPartsCard({
+  numeral,
+  parts,
+  partObjectTypes,
+  partLayouts,
+}: {
+  numeral: number;
+  parts: number[];
+  partObjectTypes?: GroundOption["pairPartObjectTypes"];
+  partLayouts?: GroundOption["pairPartLayouts"];
+}) {
+  return (
+    <div className="w-full rounded-[20px] border-2 border-cyan-200 bg-white/95 px-3 py-3 shadow-[0_0_14px_rgba(45,212,191,0.12)]">
+      <div className="mb-3 flex items-center justify-center gap-2 rounded-full bg-cyan-50 px-3 py-2 text-xs font-black uppercase tracking-[0.16em] text-teal-800">
+        <span>Make</span>
+        <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-cyan-100 to-teal-100 text-lg text-teal-900">{numeral}</span>
+      </div>
+      <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+        {parts.map((part, index) => (
+          <div key={`${numeral}-${part}-${index}`} className="flex items-center gap-2">
+            {index > 0 ? <span className="text-2xl font-black text-cyan-500">+</span> : null}
+            <GroundQuantityCard
+              quantity={part}
+              objectType={partObjectTypes?.[index] ?? "dots"}
+              patternLayout={partLayouts?.[index]}
+              compact
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -162,9 +197,7 @@ function GroundPairCard({
           {word}
         </div>
       ) : null}
-      {typeof quantity === "number" ? (
-        <GroundQuantityCard quantity={quantity} objectType={objectType} patternLayout={patternLayout} compact />
-      ) : null}
+      <GroundQuantityCard quantity={quantity} objectType={objectType} patternLayout={patternLayout} compact />
     </div>
   );
 }
@@ -188,7 +221,7 @@ function GroundOptionButton({
 }
 
 function renderQuestionVisual(task: GroundMatchTask) {
-  if (task.promptType === "group_to_numeral" && task.shownQuantity) {
+  if (typeof task.shownQuantity === "number" && (task.promptType === "group_to_numeral" || task.promptType === "match_pair")) {
     return <GroundQuantityCard quantity={task.shownQuantity} objectType={task.objectType} patternLayout={task.patternLayout} />;
   }
   if (task.shownSequence && task.shownSequence.length > 0) {
@@ -221,10 +254,13 @@ function renderQuestionVisual(task: GroundMatchTask) {
       </div>
     );
   }
-  if (task.promptType === "numeral_to_word" && task.shownNumeral) {
+  if (
+    typeof task.shownNumeral === "number" &&
+    (task.promptType === "numeral_to_word" || task.promptType === "numeral_to_group" || task.promptType === "number_to_objects" || task.promptType === "match_pair")
+  ) {
     return <GroundNumberCard value={task.shownNumeral} />;
   }
-  if (task.promptType === "word_to_numeral" && task.shownWord) {
+  if (typeof task.shownWord === "string") {
     return <GroundWordCard word={task.shownWord} />;
   }
   return null;
@@ -262,7 +298,7 @@ function renderHelperVisual(task: GroundMatchTask) {
   return null;
 }
 
-function renderOption(option: GroundMatchTask["options"][number]) {
+function renderOption(option: GroundOption) {
   if (option.kind === "numeral" && typeof option.numeral === "number") {
     return <GroundNumberCard value={option.numeral} />;
   }
@@ -272,20 +308,28 @@ function renderOption(option: GroundMatchTask["options"][number]) {
   if (option.kind === "word" && typeof option.word === "string") {
     return <GroundWordCard word={option.word} />;
   }
-  if (
-    option.kind === "pair" &&
-    typeof option.pairNumeral === "number" &&
-    (typeof option.pairQuantity === "number" || typeof option.pairWord === "string")
-  ) {
-    return (
-      <GroundPairCard
-        numeral={option.pairNumeral}
-        quantity={option.pairQuantity ?? option.pairNumeral}
-        word={option.pairWord}
-        objectType={option.objectType}
-        patternLayout={option.patternLayout}
-      />
-    );
+  if (option.kind === "pair" && typeof option.pairNumeral === "number") {
+    if (option.pairParts && option.pairParts.length > 0) {
+      return (
+        <GroundPartsCard
+          numeral={option.pairNumeral}
+          parts={option.pairParts}
+          partObjectTypes={option.pairPartObjectTypes}
+          partLayouts={option.pairPartLayouts}
+        />
+      );
+    }
+    if (typeof option.pairQuantity === "number" || typeof option.pairWord === "string") {
+      return (
+        <GroundPairCard
+          numeral={option.pairNumeral}
+          quantity={option.pairQuantity ?? option.pairNumeral}
+          word={option.pairWord}
+          objectType={option.objectType}
+          patternLayout={option.patternLayout}
+        />
+      );
+    }
   }
   return null;
 }

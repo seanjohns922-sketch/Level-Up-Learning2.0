@@ -201,7 +201,8 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         "Make Numbers in Different Ways",
         "Build the same number using different groups.",
         ["Make it another way", "Build and swap", "Show the same number"],
-        ["AC9MFN02", "AC9MFN03"]
+        ["AC9MFN02", "AC9MFN03"],
+        "Number Builder Lab"
       ),
       buildLesson(
         6,

@@ -191,6 +191,9 @@ export type PracticeTask = (
         pairNumeral?: number;
         pairQuantity?: number;
         pairWord?: string;
+        pairParts?: number[];
+        pairPartObjectTypes?: Array<"dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs">;
+        pairPartLayouts?: Array<"dice" | "ten_frame" | "domino" | "finger" | "symmetry">;
       }>;
       correctOptionId: string;
       feedback?: { correct: string; wrong: string };

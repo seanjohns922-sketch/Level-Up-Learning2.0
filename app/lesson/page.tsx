@@ -27,6 +27,7 @@ import { generatePrepWeek2Task, resetPrepWeek2TaskSessionState } from "@/data/ac
 import { generatePrepWeek3Task, resetPrepWeek3TaskSessionState } from "@/data/activities/prep/week3";
 import { generatePrepWeek4Task, resetPrepWeek4TaskSessionState } from "@/data/activities/prep/week4";
 import { generatePrepWeek5Task, resetPrepWeek5TaskSessionState } from "@/data/activities/prep/week5";
+import { generatePrepWeek6Task, resetPrepWeek6TaskSessionState } from "@/data/activities/prep/week6";
 import { getProgramForYear } from "@/data/programs";
 import { DEMO_MODE } from "@/data/config";
 import { ACTIVE_STUDENT_KEY, readProgress, updateProgress } from "@/data/progress";
@@ -48,11 +49,12 @@ function isPrepGroundCustomLesson(lessonId: string) {
     lessonId.startsWith("y0-w2-") ||
     lessonId.startsWith("y0-w3-") ||
     lessonId.startsWith("y0-w4-") ||
-    lessonId.startsWith("y0-w5-")
+    lessonId.startsWith("y0-w5-") || lessonId === "y0-w6-l1"
   );
 }
 
 function getPrepGroundTask(lessonId: string, difficulty: "easy" | "medium" | "hard") {
+  if (lessonId === "y0-w6-l1") return generatePrepWeek6Task(lessonId, difficulty);
   if (lessonId.startsWith("y0-w5-")) return generatePrepWeek5Task(lessonId, difficulty);
   if (lessonId.startsWith("y0-w4-")) return generatePrepWeek4Task(lessonId, difficulty);
   if (lessonId.startsWith("y0-w3-")) return generatePrepWeek3Task(lessonId, difficulty);
@@ -296,29 +298,31 @@ function LessonPage() {
           ? "You found numbers 6 to 10!"
           : effectiveLessonId === "y0-w2-l2"
             ? "You counted groups to 10!"
-          : effectiveLessonId === "y0-w2-l3"
-            ? "You matched numbers, words, and groups!"
-          : effectiveLessonId === "y0-w3-l1"
-            ? "Great Counting!"
-            : effectiveLessonId === "y0-w3-l2"
-              ? "Blast Off Complete!"
-              : effectiveLessonId === "y0-w3-l3"
-                ? "Number Match Complete!"
-                : effectiveLessonId === "y0-w4-l1"
-                  ? "Quick Number Eyes Complete!"
-                  : effectiveLessonId === "y0-w4-l2"
-                    ? "Quick Group Spotter Complete!"
-                    : effectiveLessonId === "y0-w4-l3"
-                      ? "Pattern Match Mission Complete!"
-                      : effectiveLessonId === "y0-w5-l1"
-                        ? "More or Less Mission Complete!"
-                      : effectiveLessonId === "y0-w5-l2"
-                        ? "Match the Groups Complete!"
-                      : effectiveLessonId === "y0-w5-l3"
-                        ? "Number Sort Challenge Complete!"
-        : effectiveLessonId === "y0-w1-l2"
-          ? "You counted collections to 5!"
-          : "You recognised numbers 1 to 5!";
+            : effectiveLessonId === "y0-w2-l3"
+              ? "You matched numbers, words, and groups!"
+              : effectiveLessonId === "y0-w3-l1"
+                ? "Great Counting!"
+                : effectiveLessonId === "y0-w3-l2"
+                  ? "Blast Off Complete!"
+                  : effectiveLessonId === "y0-w3-l3"
+                    ? "Number Match Complete!"
+                    : effectiveLessonId === "y0-w4-l1"
+                      ? "Quick Number Eyes Complete!"
+                      : effectiveLessonId === "y0-w4-l2"
+                        ? "Quick Group Spotter Complete!"
+                        : effectiveLessonId === "y0-w4-l3"
+                          ? "Pattern Match Mission Complete!"
+                          : effectiveLessonId === "y0-w5-l1"
+                            ? "More or Less Mission Complete!"
+                            : effectiveLessonId === "y0-w5-l2"
+                              ? "Match the Groups Complete!"
+                              : effectiveLessonId === "y0-w5-l3"
+                                ? "Number Sort Challenge Complete!"
+                                : effectiveLessonId === "y0-w6-l1"
+                                  ? "Number Builder Lab Complete!"
+                                  : effectiveLessonId === "y0-w1-l2"
+                                    ? "You counted collections to 5!"
+                                    : "You recognised numbers 1 to 5!";
     const prepUnlockText =
       effectiveLessonId === "y0-w1-l3" || effectiveLessonId === "y0-w2-l3"
         ? "Weekly Quiz unlocked."
@@ -871,4 +875,5 @@ function LessonPage() {
     resetPrepWeek3TaskSessionState();
     resetPrepWeek4TaskSessionState();
     resetPrepWeek5TaskSessionState();
+    resetPrepWeek6TaskSessionState();
   }
