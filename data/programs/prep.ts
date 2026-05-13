@@ -182,9 +182,10 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         5,
         3,
         "Sort from Least to Most",
-        "Order small collections from least to most.",
-        ["Drag to order", "Least to most ladder", "Group sorting race"],
-        ["AC9MFN02", "AC9MFN03"]
+        "Order quantities from least to most and most to least using visual groups and comparison.",
+        ["Sort the groups", "Biggest and smallest", "Quick ordering games"],
+        ["AC9MFN03"],
+        "Number Sort Challenge"
       ),
     ],
   },

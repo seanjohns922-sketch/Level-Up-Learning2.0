@@ -314,6 +314,8 @@ function LessonPage() {
                         ? "More or Less Mission Complete!"
                       : effectiveLessonId === "y0-w5-l2"
                         ? "Match the Groups Complete!"
+                      : effectiveLessonId === "y0-w5-l3"
+                        ? "Number Sort Challenge Complete!"
         : effectiveLessonId === "y0-w1-l2"
           ? "You counted collections to 5!"
           : "You recognised numbers 1 to 5!";
@@ -324,7 +326,7 @@ function LessonPage() {
           ? "Lesson 2 unlocked."
           : effectiveLessonId === "y0-w3-l2"
             ? "Lesson 3 unlocked."
-            : effectiveLessonId === "y0-w3-l3" || effectiveLessonId === "y0-w4-l3"
+            : effectiveLessonId === "y0-w3-l3" || effectiveLessonId === "y0-w4-l3" || effectiveLessonId === "y0-w5-l3"
               ? "Weekly Quiz unlocked."
               : `Lesson ${lessonNumber + 1} unlocked.`;
 

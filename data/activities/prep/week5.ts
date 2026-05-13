@@ -51,6 +51,7 @@ const LESSON2_ROTATION = [
   "true_false_equal",
   "numbot_balance",
   "ten_frame_match",
+  "memory_equal_match",
   "quick_equal_flash",
   "fix_the_group",
   "group_swap",
@@ -59,6 +60,23 @@ const LESSON2_ROTATION = [
   "balance_the_sides",
   "equal_or_more",
   "number_match_builder",
+] as const;
+const LESSON3_ROTATION = [
+  "order_groups_asc",
+  "which_biggest",
+  "which_smallest",
+  "number_path_order",
+  "build_number_order",
+  "quick_sort_flash",
+  "numbot_sorter",
+  "ten_frame_order",
+  "same_or_bigger",
+  "place_middle_group",
+  "order_numbers",
+  "group_train",
+  "order_groups_desc",
+  "match_the_order",
+  "quick_eyes_order",
 ] as const;
 
 const memoryByLesson = new Map<string, Week5Memory>();
@@ -151,7 +169,11 @@ function pickLayout(memory: Week5Memory, quantity: number, preferred?: GroundPat
 }
 
 function nextKind(memory: Week5Memory, lessonId: string) {
-  const rotation = lessonId.endsWith("-l2") ? LESSON2_ROTATION : LESSON1_ROTATION;
+  const rotation = lessonId.endsWith("-l3")
+    ? LESSON3_ROTATION
+    : lessonId.endsWith("-l2")
+      ? LESSON2_ROTATION
+      : LESSON1_ROTATION;
   const kind = rotation[memory.cursor % rotation.length]!;
   memory.cursor += 1;
   pushRecent(memory.recentKinds, kind, 4);
@@ -541,6 +563,30 @@ function createNumbotBalanceTask(lessonId: string, difficulty: Difficulty): Prac
   });
 }
 
+function createMemoryEqualMatchTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const referenceGroup = {
+    quantity: target,
+    objectType: pickObject(memory),
+    patternLayout: pickLayout(memory, target),
+  };
+  const { groups } = makeEqualOptions(memory, difficulty, target);
+  const correctGroup = groups.find((group) => group.quantity === target)!;
+  return makeCompareTask({
+    prompt: "Remember the group, then find its match.",
+    speakText: "Remember the group, then find its match.",
+    targetNumber: target,
+    comparisonType: "match",
+    helperVariant: "flash",
+    referenceGroup,
+    referenceRevealMs: difficulty === "easy" ? 2200 : difficulty === "medium" ? 1800 : 1500,
+    groups,
+    correctGroupId: correctGroup.id,
+    feedback: { correct: "Memory match!", wrong: "Think about the group you just saw." },
+  });
+}
+
 function createTenFrameMatchTask(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
   const target = pickTarget(memory, difficulty);
@@ -687,6 +733,62 @@ function createNumberMatchBuilderTask(lessonId: string, difficulty: Difficulty):
   });
 }
 
+function createOrderGroupsTask(lessonId: string, difficulty: Difficulty, direction: "ASC" | "DESC", count = 3, prompt?: string, helperVariant?: GroundCompareTask["helperVariant"], fixedLayout?: GroundPatternLayout, fixedObject?: GroundObjectType): PracticeTask {
+  const memory = getMemory(lessonId);
+  const values = new Set<number>();
+  while (values.size < count) values.add(pickTarget(memory, difficulty));
+  const groups = shuffle(Array.from(values).map((value) => makeGroup(memory, value, fixedObject, fixedLayout)));
+  const correctOrderIds = [...groups]
+    .sort((a, b) => (direction === "DESC" ? b.quantity - a.quantity : a.quantity - b.quantity))
+    .map((group) => group.id);
+  return makeCompareTask({
+    prompt: prompt ?? (direction === "DESC" ? "Sort from biggest to smallest." : "Sort from smallest to biggest."),
+    speakText: prompt ?? (direction === "DESC" ? "Sort from biggest to smallest." : "Sort from smallest to biggest."),
+    targetNumber: direction === "DESC" ? Math.max(...Array.from(values)) : Math.min(...Array.from(values)),
+    comparisonType: "order",
+    helperVariant,
+    orderDirection: direction,
+    groups,
+    correctOrderIds,
+    feedback: { correct: "You sorted them perfectly!", wrong: "Try the order again." },
+  });
+}
+
+function createNumeralOrderTask(lessonId: string, difficulty: Difficulty, direction: "ASC" | "DESC", prompt: string): PracticeTask {
+  const memory = getMemory(lessonId);
+  const values = new Set<number>();
+  while (values.size < 4) values.add(pickTarget(memory, difficulty));
+  const numerals = shuffle(Array.from(values));
+  return {
+    kind: "groundOrderTap",
+    prompt,
+    speakText: prompt,
+    targetNumber: direction === "DESC" ? Math.max(...numerals) : Math.min(...numerals),
+    direction,
+    tiles: numerals.map((numeral, index) => ({ id: `tile-${index}-${numeral}`, numeral })),
+    feedback: { correct: "Fast ordering!", wrong: "Follow the order carefully." },
+  };
+}
+
+function createMiddleChoiceTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const low = Math.max(1, pickTarget(memory, difficulty) - 1);
+  const middle = Math.min(9, low + 2);
+  const high = Math.min(10, middle + 2);
+  const correct = middle;
+  const options = shuffle([correct, Math.max(1, correct - 1), Math.min(10, correct + 3)]).slice(0, 3);
+  return {
+    kind: "groundSequence",
+    prompt: "Which number goes in the middle?",
+    speakText: "Which number goes in the middle?",
+    targetNumber: correct,
+    sequence: [low, "__", high],
+    options: options.map((numeral, index) => ({ id: `mid-${index}-${numeral}`, numeral })),
+    correctOptionId: options.findIndex((value) => value === correct) >= 0 ? `mid-${options.findIndex((value) => value === correct)}-${correct}` : `mid-0-${correct}`,
+    feedback: { correct: "You found the middle number!", wrong: "Look for the number between the smallest and largest." },
+  };
+}
+
 function generateLesson1Task(lessonId: string, difficulty: Difficulty, kind: (typeof LESSON1_ROTATION)[number]): PracticeTask {
   switch (kind) {
     case "which_more":
@@ -736,6 +838,8 @@ function generateLesson2Task(lessonId: string, difficulty: Difficulty, kind: (ty
       return createNumbotBalanceTask(lessonId, difficulty);
     case "ten_frame_match":
       return createTenFrameMatchTask(lessonId, difficulty);
+    case "memory_equal_match":
+      return createMemoryEqualMatchTask(lessonId, difficulty);
     case "quick_equal_flash":
       return createQuickEqualFlashTask(lessonId, difficulty);
     case "fix_the_group":
@@ -755,10 +859,49 @@ function generateLesson2Task(lessonId: string, difficulty: Difficulty, kind: (ty
   }
 }
 
+
+function generateLesson3Task(lessonId: string, difficulty: Difficulty, kind: (typeof LESSON3_ROTATION)[number]): PracticeTask {
+  switch (kind) {
+    case "order_groups_asc":
+      return createOrderGroupsTask(lessonId, difficulty, "ASC", 3, "Put the groups in order from least to most.");
+    case "which_biggest":
+      return createBiggestTask(lessonId, difficulty);
+    case "which_smallest":
+      return createSmallestTask(lessonId, difficulty);
+    case "number_path_order":
+      return createOrderGroupsTask(lessonId, difficulty, "ASC", 4, "Tap the groups from least to most.");
+    case "build_number_order":
+      return createNumeralOrderTask(lessonId, difficulty, "ASC", "Put the numbers in order.");
+    case "quick_sort_flash":
+      return createOrderGroupsTask(lessonId, difficulty, "ASC", 3, "Quick sort from least to most.", "flash");
+    case "numbot_sorter":
+      return createOrderGroupsTask(lessonId, difficulty, "ASC", 3, "Numbot says sort the energy groups!", "numbot", undefined, "energy_orbs");
+    case "ten_frame_order":
+      return createOrderGroupsTask(lessonId, difficulty, "ASC", 3, "Put the ten frames in order.", "ten_frame", "ten_frame", "dots");
+    case "same_or_bigger":
+      return createWhichHasMoreTask(lessonId, difficulty);
+    case "place_middle_group":
+      return createMiddleChoiceTask(lessonId, difficulty);
+    case "order_numbers":
+      return createNumeralOrderTask(lessonId, difficulty, "ASC", "Tap the numbers in order.");
+    case "group_train":
+      return createOrderGroupsTask(lessonId, difficulty, "ASC", 4, "Fix the group train from smallest to biggest.");
+    case "order_groups_desc":
+      return createOrderGroupsTask(lessonId, difficulty, "DESC", 3, "Sort from biggest to smallest.");
+    case "match_the_order":
+      return createNumeralOrderTask(lessonId, difficulty, "DESC", "Now sort from biggest to smallest.");
+    case "quick_eyes_order":
+      return createOrderGroupsTask(lessonId, difficulty, "DESC", 3, "Quick eyes! Tap biggest to smallest.", "flash");
+  }
+}
+
 export function generatePrepWeek5Task(lessonId: string, difficulty: Difficulty = "easy"): PracticeTask {
   const memory = getMemory(lessonId);
   const kind = nextKind(memory, lessonId);
 
+  if (lessonId.endsWith("-l3")) {
+    return generateLesson3Task(lessonId, difficulty, kind as (typeof LESSON3_ROTATION)[number]);
+  }
   if (lessonId.endsWith("-l2")) {
     return generateLesson2Task(lessonId, difficulty, kind as (typeof LESSON2_ROTATION)[number]);
   }

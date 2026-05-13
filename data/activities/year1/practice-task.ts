@@ -234,6 +234,7 @@ export type PracticeTask = (
         objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs";
         patternLayout?: "dice" | "ten_frame" | "domino" | "finger" | "symmetry";
       };
+      referenceRevealMs?: number;
       groups: Array<{
         id: string;
         quantity: number;
@@ -242,6 +243,7 @@ export type PracticeTask = (
       }>;
       correctGroupId?: string;
       correctOrderIds?: string[];
+      orderDirection?: "ASC" | "DESC";
       feedback?: { correct: string; wrong: string };
     }
   | {

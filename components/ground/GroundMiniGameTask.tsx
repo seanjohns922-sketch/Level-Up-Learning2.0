@@ -373,10 +373,22 @@ export function GroundCompareTaskCard({
   onWrong: () => void;
 }) {
   const [orderProgress, setOrderProgress] = useState<string[]>([]);
-  const sortedOrder = useMemo(
-    () => [...task.groups].sort((a, b) => a.quantity - b.quantity).map((group) => group.id),
-    [task.groups]
-  );
+  const [referenceHidden, setReferenceHidden] = useState(false);
+  const sortedOrder = useMemo(() => {
+    if (task.correctOrderIds?.length) return task.correctOrderIds;
+    const direction = task.orderDirection ?? "ASC";
+    return [...task.groups]
+      .sort((a, b) => (direction === "DESC" ? b.quantity - a.quantity : a.quantity - b.quantity))
+      .map((group) => group.id);
+  }, [task.correctOrderIds, task.groups, task.orderDirection]);
+
+  useEffect(() => {
+    if (!task.referenceGroup || !task.referenceRevealMs) return;
+    const timeout = window.setTimeout(() => setReferenceHidden(true), task.referenceRevealMs);
+    return () => window.clearTimeout(timeout);
+  }, [task.referenceGroup, task.referenceRevealMs]);
+
+  const referenceVisible = Boolean(task.referenceGroup) && !referenceHidden;
 
   function tapGroup(groupId: string) {
     if (task.comparisonType === "order") {
@@ -432,18 +444,24 @@ export function GroundCompareTaskCard({
         {task.referenceGroup ? (
           <div className="mb-4 rounded-[22px] border-2 border-cyan-200 bg-cyan-50 p-3">
             <div className="mb-2 text-center text-xs font-black uppercase tracking-[0.16em] text-teal-800">
-              {task.comparisonType === "different" ? "Find the different group" : "Match this group"}
+              {referenceVisible ? "Remember this group" : task.comparisonType === "different" ? "Find the different group" : "Match this group"}
             </div>
-            <CompareGroupCard
-              quantity={task.referenceGroup.quantity}
-              objectType={task.referenceGroup.objectType}
-              patternLayout={task.referenceGroup.patternLayout}
-            />
+            {referenceVisible ? (
+              <CompareGroupCard
+                quantity={task.referenceGroup.quantity}
+                objectType={task.referenceGroup.objectType}
+                patternLayout={task.referenceGroup.patternLayout}
+              />
+            ) : (
+              <div className="flex min-h-[96px] items-center justify-center rounded-[22px] border-2 border-dashed border-cyan-300 bg-white text-center text-sm font-black uppercase tracking-[0.16em] text-teal-700">
+                Which group matched?
+              </div>
+            )}
           </div>
         ) : null}
         {task.comparisonType === "order" ? (
           <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
-            Tap from smallest to biggest
+            {task.orderDirection === "DESC" ? "Tap from biggest to smallest" : "Tap from smallest to biggest"}
           </div>
         ) : null}
         <div className={`grid gap-3 ${task.groups.length === 3 ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
