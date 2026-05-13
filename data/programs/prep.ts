@@ -7,13 +7,15 @@ function buildLesson(
   title: string,
   focus: string,
   activityIdeas: string[],
-  curriculum: CurriculumCode[]
+  curriculum: CurriculumCode[],
+  displayTitle?: string
 ): Lesson {
   return {
     id: `y0-w${week}-l${lesson}`,
     week,
     lesson,
     title,
+    displayTitle,
     focus,
     activityIdeas,
     curriculum,
@@ -120,16 +122,17 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
   {
     id: "y0-w4",
     week: 4,
-    topic: "Subitising 1–5",
-    curriculum: ["AC9MFN02"],
+    topic: "Subitising 1–10",
+    curriculum: ["AC9MFN02", "AC9MFN03"],
     lessons: [
       buildLesson(
         4,
         1,
-        "Recognise Dot Patterns 1–5",
-        "Instantly recognise dot patterns to 5 without counting.",
-        ["Flash reveal", "Choose the quantity", "Dot pattern memory"],
-        ["AC9MFN02"]
+        "Recognise Dot Patterns 1–10",
+        "Instantly recognise structured quantities to 10 without counting one-by-one.",
+        ["Flash reveal", "Ten-frame quick look", "Pattern memory sprint"],
+        ["AC9MFN02", "AC9MFN03"],
+        "Quick Number Eyes"
       ),
       buildLesson(
         4,

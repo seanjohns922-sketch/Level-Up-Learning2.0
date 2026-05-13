@@ -53,6 +53,7 @@ export type Lesson = {
   week: number;
   lesson: number;
   title: string;
+  displayTitle?: string;
   focus: string;
   quizSafe?: boolean;
   activityIdeas: string[];

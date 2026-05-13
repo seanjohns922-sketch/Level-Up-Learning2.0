@@ -27,7 +27,7 @@ function getPatternGrid(layout: GroundPatternLayout, quantity: number) {
     return { columns: 5, slots: 10, filled: Array.from({ length: quantity }, (_, index) => index) };
   }
   if (layout === "finger") {
-    return { columns: 5, slots: 5, filled: Array.from({ length: quantity }, (_, index) => index) };
+    return { columns: 5, slots: 5, filled: Array.from({ length: Math.min(quantity, 5) }, (_, index) => index) };
   }
   if (layout === "domino") {
     const patterns: Record<number, number[]> = {
@@ -36,18 +36,28 @@ function getPatternGrid(layout: GroundPatternLayout, quantity: number) {
       3: [0, 1, 2],
       4: [0, 2, 3, 5],
       5: [0, 1, 2, 3, 5],
+      6: [0, 1, 2, 3, 4, 5],
+      7: [0, 1, 2, 3, 4, 5, 6],
+      8: [0, 1, 2, 3, 4, 5, 6, 7],
+      9: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+      10: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
     };
-    return { columns: 3, slots: 6, filled: patterns[quantity] ?? Array.from({ length: quantity }, (_, index) => index) };
+    return { columns: 2, slots: 10, filled: patterns[quantity] ?? Array.from({ length: Math.min(quantity, 10) }, (_, index) => index) };
   }
   if (layout === "symmetry") {
     const patterns: Record<number, number[]> = {
-      1: [1],
-      2: [0, 2],
-      3: [0, 1, 2],
-      4: [0, 2, 3, 5],
-      5: [0, 1, 2, 3, 5],
+      1: [2],
+      2: [1, 3],
+      3: [1, 2, 3],
+      4: [0, 1, 3, 4],
+      5: [0, 1, 2, 3, 4],
+      6: [0, 1, 3, 4, 6, 7],
+      7: [0, 1, 2, 3, 4, 6, 7],
+      8: [0, 1, 2, 3, 4, 5, 6, 7],
+      9: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+      10: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
     };
-    return { columns: 3, slots: 6, filled: patterns[quantity] ?? Array.from({ length: quantity }, (_, index) => index) };
+    return { columns: 5, slots: 10, filled: patterns[quantity] ?? Array.from({ length: Math.min(quantity, 10) }, (_, index) => index) };
   }
   const dicePatterns: Record<number, number[]> = {
     1: [4],
@@ -55,8 +65,9 @@ function getPatternGrid(layout: GroundPatternLayout, quantity: number) {
     3: [0, 4, 8],
     4: [0, 2, 6, 8],
     5: [0, 2, 4, 6, 8],
+    6: [0, 2, 3, 5, 6, 8],
   };
-  return { columns: 3, slots: 9, filled: dicePatterns[quantity] ?? Array.from({ length: quantity }, (_, index) => index) };
+  return { columns: 3, slots: 9, filled: dicePatterns[quantity] ?? Array.from({ length: Math.min(quantity, 9) }, (_, index) => index) };
 }
 
 function GroundNumberCard({ value }: { value: number }) {

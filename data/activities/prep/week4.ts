@@ -17,6 +17,7 @@ type GroundObjectType =
 type GroundPatternLayout = "dice" | "ten_frame" | "domino" | "finger" | "symmetry";
 type GroundMatchTask = Extract<PracticeTask, { kind: "groundMatch" }>;
 type GroundFlashTask = Extract<PracticeTask, { kind: "groundFlash" }>;
+type GroundBuildTask = Extract<PracticeTask, { kind: "groundBuild" }>;
 
 type Week4Memory = {
   cursor: number;
@@ -27,10 +28,12 @@ type Week4Memory = {
   recentLayouts: GroundPatternLayout[];
 };
 
-const TARGETS = [1, 2, 3, 4, 5] as const;
-const PATTERN_LAYOUTS: GroundPatternLayout[] = ["dice", "ten_frame", "domino", "finger", "symmetry"];
-const DOT_ONLY_LAYOUTS: GroundPatternLayout[] = ["dice", "ten_frame", "domino", "finger", "symmetry"];
+const TARGETS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const;
+const LOW_TARGETS = [1, 2, 3, 4, 5] as const;
+const MID_TARGETS = [4, 5, 6, 7, 8] as const;
+const TEN_FRAME_TARGETS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const;
 const REAL_WORLD_OBJECTS: GroundObjectType[] = ["stars", "planets", "energy_orbs", "robot_tokens", "crystals", "gems"];
+const FAST_OBJECTS: GroundObjectType[] = ["dots", "stars", "gems", "number_orbs", "crystals"];
 const rotationPattern = [
   "flash_dot",
   "ten_frame",
@@ -38,8 +41,12 @@ const rotationPattern = [
   "memory_flash",
   "fast_match",
   "subitising_race",
-  "dots_to_fingers",
+  "dots_to_numbers",
+  "ten_frame_match",
+  "finger_match",
   "real_world",
+  "true_false",
+  "quick_build",
 ] as const;
 
 const memoryByLesson = new Map<string, Week4Memory>();
@@ -102,14 +109,35 @@ function chooseRecentSafe<T>(pool: readonly T[] | T[], recent: T[]) {
   return candidate;
 }
 
-function pickTarget(memory: Week4Memory, difficulty: Difficulty) {
-  const pool = difficulty === "easy" ? [1, 2, 3] : difficulty === "medium" ? [2, 3, 4, 5] : [...TARGETS];
+function stagePool(memory: Week4Memory, difficulty: Difficulty) {
+  const step = memory.cursor;
+  if (difficulty === "easy") {
+    if (step < 14) return [...LOW_TARGETS];
+    if (step < 28) return [...MID_TARGETS];
+    return [...TARGETS];
+  }
+  if (difficulty === "medium") {
+    if (step < 10) return [...MID_TARGETS];
+    return [...TARGETS];
+  }
+  return [...TARGETS];
+}
+
+function pickTarget(memory: Week4Memory, difficulty: Difficulty, allowed?: readonly number[]) {
+  const pool = allowed ? [...allowed] : stagePool(memory, difficulty);
   const target = chooseRecentSafe(pool, memory.recentTargets);
   pushRecent(memory.recentTargets, target, 4);
   return target;
 }
 
-function pickLayout(memory: Week4Memory, allowed: readonly GroundPatternLayout[] = PATTERN_LAYOUTS) {
+function pickLayout(memory: Week4Memory, target: number, preferred?: readonly GroundPatternLayout[]) {
+  const allowed: GroundPatternLayout[] = preferred
+    ? [...preferred]
+    : target <= 5
+      ? ["dice", "ten_frame", "domino", "finger", "symmetry"]
+      : target <= 6
+        ? ["dice", "ten_frame", "domino", "symmetry"]
+        : ["ten_frame", "domino", "symmetry"];
   const layout = chooseRecentSafe(allowed, memory.recentLayouts);
   pushRecent(memory.recentLayouts, layout, 4);
   return layout;
@@ -127,8 +155,13 @@ function chooseAnswerPosition(memory: Week4Memory, optionCount: number) {
   return position;
 }
 
+function nearbyDistractors(target: number, optionCount: number) {
+  const closePool = TARGETS.filter((value) => value !== target).sort((a, b) => Math.abs(a - target) - Math.abs(b - target));
+  return shuffle(closePool.slice(0, Math.max(4, optionCount + 1))).slice(0, optionCount - 1);
+}
+
 function buildNumeralOptions(target: number, memory: Week4Memory, optionCount = 3) {
-  const distractors = shuffle(TARGETS.filter((value) => value !== target)).slice(0, optionCount - 1);
+  const distractors = nearbyDistractors(target, optionCount);
   const correctPosition = chooseAnswerPosition(memory, optionCount);
   const ordered = new Array<number>(optionCount);
   ordered[correctPosition] = target;
@@ -147,10 +180,10 @@ function buildQuantityOptions(
   target: number,
   memory: Week4Memory,
   objectType: GroundObjectType,
-  layout?: GroundPatternLayout,
+  layout: GroundPatternLayout,
   optionCount = 3
 ) {
-  const distractors = shuffle(TARGETS.filter((value) => value !== target)).slice(0, optionCount - 1);
+  const distractors = nearbyDistractors(target, optionCount);
   const correctPosition = chooseAnswerPosition(memory, optionCount);
   const ordered = new Array<number>(optionCount);
   ordered[correctPosition] = target;
@@ -163,7 +196,7 @@ function buildQuantityOptions(
     kind: "quantity" as const,
     quantity,
     objectType,
-    patternLayout: layout ?? pickLayout(memory),
+    patternLayout: quantity <= 5 && layout === "finger" ? "finger" : quantity > 6 ? "ten_frame" : layout,
   }));
   return {
     options,
@@ -171,10 +204,20 @@ function buildQuantityOptions(
   };
 }
 
+function buildYesNoOptions(isTrue: boolean) {
+  return {
+    options: [
+      { id: "yes", kind: "word" as const, word: "yes" },
+      { id: "no", kind: "word" as const, word: "no" },
+    ],
+    correctOptionId: isTrue ? "yes" : "no",
+  };
+}
+
 function createFlashDotRecognitionTask(lessonId: string, difficulty: Difficulty): GroundFlashTask {
   const memory = getMemory(lessonId);
   const target = pickTarget(memory, difficulty);
-  const layout = pickLayout(memory, DOT_ONLY_LAYOUTS);
+  const layout = pickLayout(memory, target, target > 6 ? ["ten_frame", "symmetry"] : undefined);
   const { options, correctOptionId } = buildNumeralOptions(target, memory, 3);
   pushRecent(memory.recentKinds, "flash_dot", 4);
   return {
@@ -185,7 +228,7 @@ function createFlashDotRecognitionTask(lessonId: string, difficulty: Difficulty)
     objectType: "dots",
     patternLayout: layout,
     revealType: "objects",
-    revealMs: difficulty === "easy" ? 1150 : difficulty === "medium" ? 900 : 720,
+    revealMs: difficulty === "easy" ? 1180 : difficulty === "medium" ? 860 : 620,
     options,
     correctOptionId,
     feedback: { correct: "Quick spotting!", wrong: "Look again, then recognise it." },
@@ -194,18 +237,18 @@ function createFlashDotRecognitionTask(lessonId: string, difficulty: Difficulty)
 
 function createTenFrameQuickLookTask(lessonId: string, difficulty: Difficulty): GroundFlashTask {
   const memory = getMemory(lessonId);
-  const target = pickTarget(memory, difficulty);
+  const target = pickTarget(memory, difficulty, TEN_FRAME_TARGETS);
   const { options, correctOptionId } = buildNumeralOptions(target, memory, 3);
   pushRecent(memory.recentKinds, "ten_frame", 4);
   return {
     kind: "groundFlash",
-    prompt: "Ten frame quick look",
-    speakText: "How many? Don't count. Recognise it.",
+    prompt: "Quick eyes on the frame",
+    speakText: "Ten frame quick look. How many instantly?",
     targetNumber: target,
     objectType: "dots",
     patternLayout: "ten_frame",
     revealType: "objects",
-    revealMs: difficulty === "easy" ? 1250 : difficulty === "medium" ? 980 : 780,
+    revealMs: difficulty === "easy" ? 1280 : difficulty === "medium" ? 900 : 680,
     options,
     correctOptionId,
     feedback: { correct: "You saw it fast!", wrong: "Trust what you noticed." },
@@ -215,13 +258,13 @@ function createTenFrameQuickLookTask(lessonId: string, difficulty: Difficulty): 
 function createWhichCardMatchesTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
   const memory = getMemory(lessonId);
   const target = pickTarget(memory, difficulty);
-  const layout = pickLayout(memory);
+  const layout = pickLayout(memory, target);
   const { options, correctOptionId } = buildQuantityOptions(target, memory, "dots", layout, 3);
   pushRecent(memory.recentKinds, "which_card", 4);
   return {
     kind: "groundMatch",
-    prompt: `Which one shows ${target}?`,
-    speakText: `Which card shows ${numberWord(target)}?`,
+    prompt: "Which card matches?",
+    speakText: `Which card shows ${numberWord(target)}? Do not count. Recognise it.`,
     targetNumber: target,
     targetNumberName: numberWord(target),
     visualType: "ground-quantity-card",
@@ -238,18 +281,18 @@ function createWhichCardMatchesTask(lessonId: string, difficulty: Difficulty): G
 function createMemoryFlashTask(lessonId: string, difficulty: Difficulty): GroundFlashTask {
   const memory = getMemory(lessonId);
   const target = pickTarget(memory, difficulty);
-  const layout = pickLayout(memory);
+  const layout = pickLayout(memory, target);
   const { options, correctOptionId } = buildNumeralOptions(target, memory, 3);
   pushRecent(memory.recentKinds, "memory_flash", 4);
   return {
     kind: "groundFlash",
     prompt: "Remember the pattern",
-    speakText: "Look, remember, then tap the number.",
+    speakText: "Look, remember, then tap the number you saw.",
     targetNumber: target,
     objectType: "dots",
     patternLayout: layout,
     revealType: "objects",
-    revealMs: difficulty === "easy" ? 1000 : difficulty === "medium" ? 760 : 620,
+    revealMs: difficulty === "easy" ? 980 : difficulty === "medium" ? 700 : 520,
     promptAfterReveal: "What did you see?",
     options,
     correctOptionId,
@@ -260,19 +303,21 @@ function createMemoryFlashTask(lessonId: string, difficulty: Difficulty): Ground
 function createFindFastMatchTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
   const memory = getMemory(lessonId);
   const target = pickTarget(memory, difficulty);
-  const objectType = pickObject(memory, ["dots", "gems", "stars", "crystals", "number_orbs"]);
-  const { options, correctOptionId } = buildQuantityOptions(target, memory, objectType, undefined, 3);
+  const objectType = pickObject(memory, FAST_OBJECTS);
+  const layout = pickLayout(memory, target);
+  const { options, correctOptionId } = buildQuantityOptions(target, memory, objectType, layout, 3);
   pushRecent(memory.recentKinds, "fast_match", 4);
   return {
     kind: "groundMatch",
     prompt: "Find the fast match",
-    speakText: `Which one shows ${numberWord(target)}?`,
+    speakText: `Which one shows ${numberWord(target)}? Quick eyes.`,
     targetNumber: target,
     targetNumberName: numberWord(target),
     visualType: "ground-quantity-card",
     promptType: "numeral_to_group",
     shownNumeral: target,
     objectType,
+    patternLayout: layout,
     options,
     correctOptionId,
     feedback: { correct: "Fast spotting!", wrong: "Notice the pattern, not one-by-one counting." },
@@ -282,7 +327,7 @@ function createFindFastMatchTask(lessonId: string, difficulty: Difficulty): Grou
 function createSubitisingRaceTask(lessonId: string, difficulty: Difficulty): GroundFlashTask {
   const memory = getMemory(lessonId);
   const target = pickTarget(memory, difficulty);
-  const layout = pickLayout(memory);
+  const layout = pickLayout(memory, target, target > 6 ? ["ten_frame", "symmetry"] : undefined);
   const { options, correctOptionId } = buildNumeralOptions(target, memory, 4);
   pushRecent(memory.recentKinds, "subitising_race", 4);
   return {
@@ -293,22 +338,67 @@ function createSubitisingRaceTask(lessonId: string, difficulty: Difficulty): Gro
     objectType: "dots",
     patternLayout: layout,
     revealType: "objects",
-    revealMs: difficulty === "easy" ? 900 : difficulty === "medium" ? 680 : 560,
+    revealMs: difficulty === "easy" ? 820 : difficulty === "medium" ? 620 : 460,
     options,
     correctOptionId,
     feedback: { correct: "FAST SPOTTING!", wrong: "Blink and spot it again." },
   };
 }
 
-function createDotsToFingersTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
+function createDotsToNumbersTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
   const memory = getMemory(lessonId);
   const target = pickTarget(memory, difficulty);
+  const layout = pickLayout(memory, target);
   const { options, correctOptionId } = buildNumeralOptions(target, memory, 3);
-  pushRecent(memory.recentKinds, "dots_to_fingers", 4);
+  pushRecent(memory.recentKinds, "dots_to_numbers", 4);
   return {
     kind: "groundMatch",
-    prompt: "Quick fingers!",
-    speakText: "How many instantly?",
+    prompt: "Dots to number",
+    speakText: "How many instantly? Tap the matching number.",
+    targetNumber: target,
+    targetNumberName: numberWord(target),
+    visualType: "ground-quantity-card",
+    promptType: "group_to_numeral",
+    shownQuantity: target,
+    objectType: "dots",
+    patternLayout: layout,
+    options: options.map((option) => ({ id: option.id, kind: "numeral" as const, numeral: option.numeral })),
+    correctOptionId,
+    feedback: { correct: "You noticed it quickly!", wrong: "See the pattern as a whole." },
+  };
+}
+
+function createTenFrameMatchTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty, TEN_FRAME_TARGETS);
+  const { options, correctOptionId } = buildNumeralOptions(target, memory, 3);
+  pushRecent(memory.recentKinds, "ten_frame_match", 4);
+  return {
+    kind: "groundMatch",
+    prompt: "Ten frame match",
+    speakText: "Spot the ten frame and tap the number.",
+    targetNumber: target,
+    targetNumberName: numberWord(target),
+    visualType: "ground-quantity-card",
+    promptType: "group_to_numeral",
+    shownQuantity: target,
+    objectType: "dots",
+    patternLayout: "ten_frame",
+    options: options.map((option) => ({ id: option.id, kind: "numeral" as const, numeral: option.numeral })),
+    correctOptionId,
+    feedback: { correct: "Ten-frame expert!", wrong: "Look at the filled spaces as a whole." },
+  };
+}
+
+function createFingerPatternMatchTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty, LOW_TARGETS);
+  const { options, correctOptionId } = buildNumeralOptions(target, memory, 3);
+  pushRecent(memory.recentKinds, "finger_match", 4);
+  return {
+    kind: "groundMatch",
+    prompt: "Finger pattern match",
+    speakText: "Quick eyes. Match the finger pattern.",
     targetNumber: target,
     targetNumberName: numberWord(target),
     visualType: "ground-quantity-card",
@@ -318,7 +408,7 @@ function createDotsToFingersTask(lessonId: string, difficulty: Difficulty): Grou
     patternLayout: "finger",
     options: options.map((option) => ({ id: option.id, kind: "numeral" as const, numeral: option.numeral })),
     correctOptionId,
-    feedback: { correct: "You noticed it quickly!", wrong: "See the pattern as a whole." },
+    feedback: { correct: "You saw the fingers fast!", wrong: "Notice the hand shape first." },
   };
 }
 
@@ -326,7 +416,7 @@ function createRealWorldQuickLookTask(lessonId: string, difficulty: Difficulty):
   const memory = getMemory(lessonId);
   const target = pickTarget(memory, difficulty);
   const objectType = pickObject(memory, REAL_WORLD_OBJECTS);
-  const layout = pickLayout(memory, ["dice", "domino", "symmetry"]);
+  const layout = pickLayout(memory, target, target > 6 ? ["ten_frame", "symmetry", "domino"] : ["dice", "domino", "symmetry", "ten_frame"]);
   const { options, correctOptionId } = buildNumeralOptions(target, memory, 3);
   pushRecent(memory.recentKinds, "real_world", 4);
   return {
@@ -337,10 +427,48 @@ function createRealWorldQuickLookTask(lessonId: string, difficulty: Difficulty):
     objectType,
     patternLayout: layout,
     revealType: "objects",
-    revealMs: difficulty === "easy" ? 1050 : difficulty === "medium" ? 820 : 700,
+    revealMs: difficulty === "easy" ? 980 : difficulty === "medium" ? 740 : 580,
     options,
     correctOptionId,
     feedback: { correct: "Amazing noticing!", wrong: "Look at the whole shape first." },
+  };
+}
+
+function createTrueOrFalseQuickLookTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const shownNumeral = randInt(0, 1) === 1 ? target : chooseRecentSafe(TARGETS.filter((value) => value !== target), memory.recentTargets);
+  const { options, correctOptionId } = buildYesNoOptions(shownNumeral === target);
+  pushRecent(memory.recentKinds, "true_false", 4);
+  return {
+    kind: "groundMatch",
+    prompt: `Does this show ${shownNumeral}?`,
+    speakText: `Quick look. Does this show ${numberWord(shownNumeral)}?`,
+    targetNumber: target,
+    targetNumberName: numberWord(target),
+    visualType: "ground-quantity-card",
+    promptType: "group_to_numeral",
+    shownQuantity: target,
+    objectType: pickObject(memory, ["dots", "stars", "gems", "number_orbs"]),
+    patternLayout: pickLayout(memory, target),
+    options,
+    correctOptionId,
+    feedback: { correct: "You checked it fast!", wrong: "Match the pattern to the number." },
+  };
+}
+
+function createQuickBuildTask(lessonId: string, difficulty: Difficulty): GroundBuildTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty, TEN_FRAME_TARGETS);
+  const objectType = pickObject(memory, ["dots", "energy_orbs", "stars", "number_orbs"]);
+  pushRecent(memory.recentKinds, "quick_build", 4);
+  return {
+    kind: "groundBuild",
+    prompt: `Build ${target} fast!`,
+    speakText: `Build ${numberWord(target)} fast. Fill the frame.`,
+    targetNumber: target,
+    objectType,
+    feedback: { correct: "Fast builder!", wrong: "Fill to the target, then try again." },
   };
 }
 
@@ -360,8 +488,12 @@ export function generatePrepWeek4Task(lessonId: string, difficulty: Difficulty =
     case "memory_flash": return createMemoryFlashTask(lessonId, difficulty);
     case "fast_match": return createFindFastMatchTask(lessonId, difficulty);
     case "subitising_race": return createSubitisingRaceTask(lessonId, difficulty);
-    case "dots_to_fingers": return createDotsToFingersTask(lessonId, difficulty);
+    case "dots_to_numbers": return createDotsToNumbersTask(lessonId, difficulty);
+    case "ten_frame_match": return createTenFrameMatchTask(lessonId, difficulty);
+    case "finger_match": return createFingerPatternMatchTask(lessonId, difficulty);
     case "real_world": return createRealWorldQuickLookTask(lessonId, difficulty);
+    case "true_false": return createTrueOrFalseQuickLookTask(lessonId, difficulty);
+    case "quick_build": return createQuickBuildTask(lessonId, difficulty);
     default: return createFlashDotRecognitionTask(lessonId, difficulty);
   }
 }

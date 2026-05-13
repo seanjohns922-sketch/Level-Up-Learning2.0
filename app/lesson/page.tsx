@@ -70,7 +70,7 @@ function LessonPage() {
     return weekPlan?.lessons.find((l) => l.id === effectiveLessonId) ?? null;
   }, [year, week, effectiveLessonId]);
   const started = startedLessonId === effectiveLessonId;
-  const safeLessonTitle = lessonMeta?.title ?? null;
+  const safeLessonTitle = lessonMeta?.displayTitle ?? lessonMeta?.title ?? null;
   const safeLessonFocus = lessonMeta?.focus ?? null;
   const hasEmbeddedLessonVideo =
     year === "Year 4" && week === 2 && lessonNumber === 1;
@@ -297,6 +297,8 @@ function LessonPage() {
               ? "Blast Off Complete!"
               : effectiveLessonId === "y0-w3-l3"
                 ? "Number Match Complete!"
+                : effectiveLessonId === "y0-w4-l1"
+                  ? "Quick Number Eyes Complete!"
         : effectiveLessonId === "y0-w1-l2"
           ? "You counted collections to 5!"
           : "You recognised numbers 1 to 5!";
