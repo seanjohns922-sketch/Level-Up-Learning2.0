@@ -20,6 +20,45 @@ const OBJECT_META = {
   number_orbs: { label: "number orbs", emoji: "🔵" },
 } as const;
 
+type GroundPatternLayout = GroundMatchTask["patternLayout"];
+
+function getPatternGrid(layout: GroundPatternLayout, quantity: number) {
+  if (layout === "ten_frame") {
+    return { columns: 5, slots: 10, filled: Array.from({ length: quantity }, (_, index) => index) };
+  }
+  if (layout === "finger") {
+    return { columns: 5, slots: 5, filled: Array.from({ length: quantity }, (_, index) => index) };
+  }
+  if (layout === "domino") {
+    const patterns: Record<number, number[]> = {
+      1: [1],
+      2: [0, 2],
+      3: [0, 1, 2],
+      4: [0, 2, 3, 5],
+      5: [0, 1, 2, 3, 5],
+    };
+    return { columns: 3, slots: 6, filled: patterns[quantity] ?? Array.from({ length: quantity }, (_, index) => index) };
+  }
+  if (layout === "symmetry") {
+    const patterns: Record<number, number[]> = {
+      1: [1],
+      2: [0, 2],
+      3: [0, 1, 2],
+      4: [0, 2, 3, 5],
+      5: [0, 1, 2, 3, 5],
+    };
+    return { columns: 3, slots: 6, filled: patterns[quantity] ?? Array.from({ length: quantity }, (_, index) => index) };
+  }
+  const dicePatterns: Record<number, number[]> = {
+    1: [4],
+    2: [0, 8],
+    3: [0, 4, 8],
+    4: [0, 2, 6, 8],
+    5: [0, 2, 4, 6, 8],
+  };
+  return { columns: 3, slots: 9, filled: dicePatterns[quantity] ?? Array.from({ length: quantity }, (_, index) => index) };
+}
+
 function GroundNumberCard({ value }: { value: number }) {
   return (
     <div className="mx-auto flex h-24 w-full max-w-[168px] items-center justify-center rounded-[24px] border-2 border-cyan-300/70 bg-gradient-to-br from-cyan-100 via-white to-teal-100 text-5xl font-black text-teal-900 shadow-[0_0_18px_rgba(45,212,191,0.18)] sm:h-28 sm:text-6xl">
@@ -40,28 +79,51 @@ function GroundQuantityCard({
   quantity,
   objectType = "dots",
   compact = false,
+  patternLayout,
 }: {
   quantity: number;
   objectType?: GroundMatchTask["objectType"];
   compact?: boolean;
+  patternLayout?: GroundPatternLayout;
 }) {
   const meta = OBJECT_META[objectType ?? "dots"];
   const baseSize = compact ? "text-xl sm:text-2xl" : "text-2xl sm:text-3xl";
   const bubbleSize = compact ? "h-8 w-8 sm:h-9 sm:w-9" : "h-9 w-9 sm:h-10 sm:w-10";
   const minHeight = compact ? "min-h-[64px]" : "min-h-[92px] sm:min-h-[104px]";
 
+  const grid = patternLayout ? getPatternGrid(patternLayout, quantity) : null;
+
   return (
     <div className={`rounded-[20px] border-2 border-cyan-200 bg-white/95 px-3 py-3 shadow-[0_0_14px_rgba(45,212,191,0.12)] ${minHeight}`}>
-      <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
-        {Array.from({ length: quantity }).map((_, index) => (
-          <span
-            key={`${meta.label}-${index}`}
-            className={`${baseSize} ${bubbleSize} inline-flex items-center justify-center rounded-full bg-cyan-50 text-teal-700 shadow-sm`}
-          >
-            {meta.emoji}
-          </span>
-        ))}
-      </div>
+      {grid ? (
+        <div
+          className="mx-auto grid max-w-[240px] justify-center gap-2 sm:gap-3"
+          style={{ gridTemplateColumns: `repeat(${grid.columns}, minmax(0, 1fr))` }}
+        >
+          {Array.from({ length: grid.slots }).map((_, index) => {
+            const filled = grid.filled.includes(index);
+            return (
+              <span
+                key={`${meta.label}-${index}`}
+                className={`${baseSize} ${bubbleSize} inline-flex items-center justify-center rounded-full ${filled ? "bg-cyan-50 text-teal-700 shadow-sm" : "bg-transparent text-transparent"}`}
+              >
+                {filled ? meta.emoji : meta.emoji}
+              </span>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
+          {Array.from({ length: quantity }).map((_, index) => (
+            <span
+              key={`${meta.label}-${index}`}
+              className={`${baseSize} ${bubbleSize} inline-flex items-center justify-center rounded-full bg-cyan-50 text-teal-700 shadow-sm`}
+            >
+              {meta.emoji}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -71,11 +133,13 @@ function GroundPairCard({
   quantity,
   word,
   objectType,
+  patternLayout,
 }: {
   numeral: number;
   quantity: number;
   word?: string;
   objectType?: GroundMatchTask["objectType"];
+  patternLayout?: GroundPatternLayout;
 }) {
   return (
     <div className="flex flex-wrap items-center justify-center gap-3 rounded-[20px] border-2 border-cyan-200 bg-white/95 px-3 py-3">
@@ -88,7 +152,7 @@ function GroundPairCard({
         </div>
       ) : null}
       {typeof quantity === "number" ? (
-        <GroundQuantityCard quantity={quantity} objectType={objectType} compact />
+        <GroundQuantityCard quantity={quantity} objectType={objectType} patternLayout={patternLayout} compact />
       ) : null}
     </div>
   );
@@ -114,7 +178,7 @@ function GroundOptionButton({
 
 function renderQuestionVisual(task: GroundMatchTask) {
   if (task.promptType === "group_to_numeral" && task.shownQuantity) {
-    return <GroundQuantityCard quantity={task.shownQuantity} objectType={task.objectType} />;
+    return <GroundQuantityCard quantity={task.shownQuantity} objectType={task.objectType} patternLayout={task.patternLayout} />;
   }
   if (task.shownSequence && task.shownSequence.length > 0) {
     return (
@@ -180,7 +244,7 @@ function renderOption(option: GroundMatchTask["options"][number]) {
     return <GroundNumberCard value={option.numeral} />;
   }
   if (option.kind === "quantity" && typeof option.quantity === "number") {
-    return <GroundQuantityCard quantity={option.quantity} objectType={option.objectType} />;
+    return <GroundQuantityCard quantity={option.quantity} objectType={option.objectType} patternLayout={option.patternLayout} />;
   }
   if (option.kind === "word" && typeof option.word === "string") {
     return <GroundWordCard word={option.word} />;
@@ -196,6 +260,7 @@ function renderOption(option: GroundMatchTask["options"][number]) {
         quantity={option.pairQuantity ?? option.pairNumeral}
         word={option.pairWord}
         objectType={option.objectType}
+        patternLayout={option.patternLayout}
       />
     );
   }

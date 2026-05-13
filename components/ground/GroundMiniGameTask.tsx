@@ -31,6 +31,63 @@ const OBJECT_META = {
   number_orbs: { label: "number orbs", emoji: "🔵" },
 } as const;
 
+type GroundPatternLayout = GroundFlashTask["patternLayout"];
+
+function getPatternGrid(layout: GroundPatternLayout, quantity: number) {
+  if (layout === "ten_frame") {
+    return { columns: 5, slots: 10, filled: Array.from({ length: quantity }, (_, index) => index) };
+  }
+  if (layout === "finger") {
+    return { columns: 5, slots: 5, filled: Array.from({ length: quantity }, (_, index) => index) };
+  }
+  if (layout === "domino" || layout === "symmetry") {
+    const patterns: Record<number, number[]> = {
+      1: [1],
+      2: [0, 2],
+      3: [0, 1, 2],
+      4: [0, 2, 3, 5],
+      5: [0, 1, 2, 3, 5],
+    };
+    return { columns: 3, slots: 6, filled: patterns[quantity] ?? Array.from({ length: quantity }, (_, index) => index) };
+  }
+  const dicePatterns: Record<number, number[]> = {
+    1: [4],
+    2: [0, 8],
+    3: [0, 4, 8],
+    4: [0, 2, 6, 8],
+    5: [0, 2, 4, 6, 8],
+  };
+  return { columns: 3, slots: 9, filled: dicePatterns[quantity] ?? Array.from({ length: quantity }, (_, index) => index) };
+}
+
+function StructuredReveal({ quantity, objectType, patternLayout }: { quantity: number; objectType: keyof typeof OBJECT_META; patternLayout?: GroundPatternLayout }) {
+  const meta = OBJECT_META[objectType];
+  const grid = patternLayout ? getPatternGrid(patternLayout, quantity) : null;
+  if (!grid) {
+    return (
+      <div className="flex flex-wrap justify-center gap-3">
+        {Array.from({ length: quantity }).map((_, index) => (
+          <span key={`${objectType}-${index}`} className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-3xl text-teal-700 shadow-sm">
+            {meta.emoji}
+          </span>
+        ))}
+      </div>
+    );
+  }
+  return (
+    <div className="mx-auto grid max-w-[240px] justify-center gap-3" style={{ gridTemplateColumns: `repeat(${grid.columns}, minmax(0, 1fr))` }}>
+      {Array.from({ length: grid.slots }).map((_, index) => {
+        const filled = grid.filled.includes(index);
+        return (
+          <span key={`${objectType}-${index}`} className={`inline-flex h-10 w-10 items-center justify-center rounded-full text-3xl ${filled ? "bg-white text-teal-700 shadow-sm" : "bg-transparent text-transparent"}`}>
+            {meta.emoji}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
 function GroundMiniShell({
   badge,
   prompt,
@@ -270,16 +327,7 @@ export function GroundFlashTaskCard({
             task.revealType === "numeral" ? (
               <div className="text-7xl font-black text-teal-900 sm:text-8xl">{task.displayNumber ?? task.targetNumber}</div>
             ) : (
-              <div className="flex flex-wrap justify-center gap-3">
-                {Array.from({ length: task.displayNumber ?? task.targetNumber }).map((_, index) => (
-                  <span
-                    key={`${task.objectType}-${index}`}
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-3xl text-teal-700 shadow-sm"
-                  >
-                    {OBJECT_META[task.objectType].emoji}
-                  </span>
-                ))}
-              </div>
+              <StructuredReveal quantity={task.displayNumber ?? task.targetNumber} objectType={task.objectType} patternLayout={task.patternLayout} />
             )
           ) : (
             <div className="text-lg font-black text-slate-500">{task.promptAfterReveal ?? "What did you see?"}</div>

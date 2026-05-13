@@ -25,6 +25,7 @@ import { resetWeek4TaskSessionState } from "@/data/activities/year1/week4";
 import { generatePrepWeek1Task, resetPrepWeek1TaskSessionState } from "@/data/activities/prep/week1";
 import { generatePrepWeek2Task, resetPrepWeek2TaskSessionState } from "@/data/activities/prep/week2";
 import { generatePrepWeek3Task, resetPrepWeek3TaskSessionState } from "@/data/activities/prep/week3";
+import { generatePrepWeek4Task, resetPrepWeek4TaskSessionState } from "@/data/activities/prep/week4";
 import { getProgramForYear } from "@/data/programs";
 import { DEMO_MODE } from "@/data/config";
 import { ACTIVE_STUDENT_KEY, readProgress, updateProgress } from "@/data/progress";
@@ -84,7 +85,8 @@ function LessonPage() {
       effectiveLessonId === "y0-w2-l3" ||
       effectiveLessonId === "y0-w3-l1" ||
       effectiveLessonId === "y0-w3-l2" ||
-      effectiveLessonId === "y0-w3-l3"
+      effectiveLessonId === "y0-w3-l3" ||
+      effectiveLessonId === "y0-w4-l1"
     );
 
   useEffect(() => {
@@ -758,6 +760,9 @@ function LessonPage() {
                   ) {
                     return generatePrepWeek3Task(effectiveLessonId, d);
                   }
+                  if (effectiveLessonId === "y0-w4-l1") {
+                    return generatePrepWeek4Task(effectiveLessonId, d);
+                  }
                   return generatePrepWeek1Task(effectiveLessonId, d);
                 }
                 if (effectiveLessonId.startsWith("y1-w2-")) {
@@ -862,4 +867,5 @@ function LessonPage() {
     resetPrepWeek1TaskSessionState();
     resetPrepWeek2TaskSessionState();
     resetPrepWeek3TaskSessionState();
+    resetPrepWeek4TaskSessionState();
   }

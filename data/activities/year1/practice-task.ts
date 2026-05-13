@@ -171,6 +171,7 @@ export type PracticeTask = (
         | "word_pair_match";
       helperVariant?: "numbot" | "speech_bubble" | "memory";
       objectType?: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs";
+      patternLayout?: "dice" | "ten_frame" | "domino" | "finger" | "symmetry";
       shownNumeral?: number;
       shownQuantity?: number;
       shownWord?: string;
@@ -182,6 +183,7 @@ export type PracticeTask = (
         word?: string;
         quantity?: number;
         objectType?: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs";
+        patternLayout?: "dice" | "ten_frame" | "domino" | "finger" | "symmetry";
         pairNumeral?: number;
         pairQuantity?: number;
         pairWord?: string;
@@ -214,6 +216,7 @@ export type PracticeTask = (
       displayNumber?: number;
       promptAfterReveal?: string;
       objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs";
+      patternLayout?: "dice" | "ten_frame" | "domino" | "finger" | "symmetry";
       revealType?: "objects" | "numeral";
       revealMs?: number;
       options: Array<{
