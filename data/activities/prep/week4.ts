@@ -19,6 +19,8 @@ type GroundMatchTask = Extract<PracticeTask, { kind: "groundMatch" }>;
 type GroundFlashTask = Extract<PracticeTask, { kind: "groundFlash" }>;
 type GroundBuildTask = Extract<PracticeTask, { kind: "groundBuild" }>;
 
+type LessonMode = "dot_patterns" | "object_groups";
+
 type Week4Memory = {
   cursor: number;
   recentTargets: number[];
@@ -34,7 +36,9 @@ const MID_TARGETS = [4, 5, 6, 7, 8] as const;
 const TEN_FRAME_TARGETS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const;
 const REAL_WORLD_OBJECTS: GroundObjectType[] = ["stars", "planets", "energy_orbs", "robot_tokens", "crystals", "gems"];
 const FAST_OBJECTS: GroundObjectType[] = ["dots", "stars", "gems", "number_orbs", "crystals"];
-const rotationPattern = [
+const OBJECT_GROUP_OBJECTS: GroundObjectType[] = ["stars", "crystals", "blocks", "robot_tokens", "planets", "energy_orbs", "futuristic_coins", "gems"];
+
+const lesson1Rotation = [
   "flash_dot",
   "ten_frame",
   "which_card",
@@ -49,7 +53,26 @@ const rotationPattern = [
   "quick_build",
 ] as const;
 
+const lesson2Rotation = [
+  "quick_group_flash",
+  "which_group_matches",
+  "real_world_quick_look",
+  "memory_group",
+  "fast_group_match",
+  "ten_frame_objects",
+  "true_false_group",
+  "objects_to_numbers",
+  "numbot_quick_eyes",
+  "build_the_group",
+  "group_race",
+  "same_or_different",
+] as const;
+
 const memoryByLesson = new Map<string, Week4Memory>();
+
+function getLessonMode(lessonId: string): LessonMode {
+  return lessonId === "y0-w4-l2" ? "object_groups" : "dot_patterns";
+}
 
 function getMemory(lessonId: string): Week4Memory {
   const existing = memoryByLesson.get(lessonId);
@@ -90,8 +113,8 @@ function numberWord(value: number) {
 
 function objectLabel(objectType: GroundObjectType) {
   if (objectType === "robot_tokens") return "robots";
-  if (objectType === "energy_orbs") return "orbs";
-  if (objectType === "number_orbs") return "number orbs";
+  if (objectType === "energy_orbs") return "energy cells";
+  if (objectType === "number_orbs") return "glowing orbs";
   if (objectType === "futuristic_coins") return "coins";
   return objectType;
 }
@@ -170,19 +193,10 @@ function buildNumeralOptions(target: number, memory: Week4Memory, optionCount = 
     ordered[position] = distractors[index]!;
   });
   const options = ordered.map((numeral, index) => ({ id: `num-${target}-${index}-${numeral}`, numeral }));
-  return {
-    options,
-    correctOptionId: options[correctPosition]!.id,
-  };
+  return { options, correctOptionId: options[correctPosition]!.id };
 }
 
-function buildQuantityOptions(
-  target: number,
-  memory: Week4Memory,
-  objectType: GroundObjectType,
-  layout: GroundPatternLayout,
-  optionCount = 3
-) {
+function buildQuantityOptions(target: number, memory: Week4Memory, objectType: GroundObjectType, layout: GroundPatternLayout, optionCount = 3) {
   const distractors = nearbyDistractors(target, optionCount);
   const correctPosition = chooseAnswerPosition(memory, optionCount);
   const ordered = new Array<number>(optionCount);
@@ -198,20 +212,21 @@ function buildQuantityOptions(
     objectType,
     patternLayout: quantity <= 5 && layout === "finger" ? "finger" : quantity > 6 ? "ten_frame" : layout,
   }));
-  return {
-    options,
-    correctOptionId: options[correctPosition]!.id,
-  };
+  return { options, correctOptionId: options[correctPosition]!.id };
 }
 
-function buildYesNoOptions(isTrue: boolean) {
-  return {
-    options: [
-      { id: "yes", kind: "word" as const, word: "yes" },
-      { id: "no", kind: "word" as const, word: "no" },
-    ],
-    correctOptionId: isTrue ? "yes" : "no",
-  };
+function buildYesNoOptions(memory: Week4Memory, isTrue: boolean) {
+  const yesFirst = chooseAnswerPosition(memory, 2) === 0;
+  const options = yesFirst
+    ? [
+        { id: "yes", kind: "word" as const, word: "yes" },
+        { id: "no", kind: "word" as const, word: "no" },
+      ]
+    : [
+        { id: "no", kind: "word" as const, word: "no" },
+        { id: "yes", kind: "word" as const, word: "yes" },
+      ];
+  return { options, correctOptionId: isTrue ? "yes" : "no" };
 }
 
 function createFlashDotRecognitionTask(lessonId: string, difficulty: Difficulty): GroundFlashTask {
@@ -438,7 +453,7 @@ function createTrueOrFalseQuickLookTask(lessonId: string, difficulty: Difficulty
   const memory = getMemory(lessonId);
   const target = pickTarget(memory, difficulty);
   const shownNumeral = randInt(0, 1) === 1 ? target : chooseRecentSafe(TARGETS.filter((value) => value !== target), memory.recentTargets);
-  const { options, correctOptionId } = buildYesNoOptions(shownNumeral === target);
+  const { options, correctOptionId } = buildYesNoOptions(memory, shownNumeral === target);
   pushRecent(memory.recentKinds, "true_false", 4);
   return {
     kind: "groundMatch",
@@ -472,13 +487,295 @@ function createQuickBuildTask(lessonId: string, difficulty: Difficulty): GroundB
   };
 }
 
+function createQuickGroupFlashTask(lessonId: string, difficulty: Difficulty): GroundFlashTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const objectType = pickObject(memory, OBJECT_GROUP_OBJECTS);
+  const layout = pickLayout(memory, target, target > 6 ? ["ten_frame", "symmetry", "domino"] : undefined);
+  const { options, correctOptionId } = buildNumeralOptions(target, memory, 3);
+  pushRecent(memory.recentKinds, "quick_group_flash", 4);
+  return {
+    kind: "groundFlash",
+    prompt: "Spot the group fast!",
+    speakText: `Quick eyes. How many ${objectLabel(objectType)} instantly?`,
+    targetNumber: target,
+    objectType,
+    patternLayout: layout,
+    revealType: "objects",
+    revealMs: difficulty === "easy" ? 1120 : difficulty === "medium" ? 820 : 620,
+    options,
+    correctOptionId,
+    feedback: { correct: "You spotted it instantly!", wrong: "See the group as a whole." },
+  };
+}
+
+function createWhichGroupMatchesTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const objectType = pickObject(memory, OBJECT_GROUP_OBJECTS);
+  const layout = pickLayout(memory, target);
+  const { options, correctOptionId } = buildQuantityOptions(target, memory, objectType, layout, 3);
+  pushRecent(memory.recentKinds, "which_group_matches", 4);
+  return {
+    kind: "groundMatch",
+    prompt: "Which group matches?",
+    speakText: `Which group shows ${numberWord(target)}? Quick eyes.`,
+    targetNumber: target,
+    targetNumberName: numberWord(target),
+    visualType: "ground-quantity-card",
+    promptType: "numeral_to_group",
+    shownNumeral: target,
+    objectType,
+    patternLayout: layout,
+    options,
+    correctOptionId,
+    feedback: { correct: "Group match found!", wrong: "Notice the shape of the group." },
+  };
+}
+
+function createRealWorldQuickLookObjectTask(lessonId: string, difficulty: Difficulty): GroundFlashTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const objectType = pickObject(memory, OBJECT_GROUP_OBJECTS);
+  const layout = pickLayout(memory, target, target > 6 ? ["ten_frame", "domino", "symmetry"] : ["dice", "domino", "symmetry"]);
+  const { options, correctOptionId } = buildNumeralOptions(target, memory, 3);
+  pushRecent(memory.recentKinds, "real_world_quick_look", 4);
+  return {
+    kind: "groundFlash",
+    prompt: "Real-world quick look",
+    speakText: `How many ${objectLabel(objectType)} instantly?`,
+    targetNumber: target,
+    objectType,
+    patternLayout: layout,
+    revealType: "objects",
+    revealMs: difficulty === "easy" ? 1040 : difficulty === "medium" ? 760 : 560,
+    options,
+    correctOptionId,
+    feedback: { correct: "Amazing eyes!", wrong: "Look for the pattern in the group." },
+  };
+}
+
+function createMemoryGroupTask(lessonId: string, difficulty: Difficulty): GroundFlashTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const objectType = pickObject(memory, OBJECT_GROUP_OBJECTS);
+  const layout = pickLayout(memory, target);
+  const { options, correctOptionId } = buildNumeralOptions(target, memory, 3);
+  pushRecent(memory.recentKinds, "memory_group", 4);
+  return {
+    kind: "groundFlash",
+    prompt: "Remember the group",
+    speakText: "Look, remember the group, then tap the number.",
+    targetNumber: target,
+    objectType,
+    patternLayout: layout,
+    revealType: "objects",
+    revealMs: difficulty === "easy" ? 980 : difficulty === "medium" ? 680 : 500,
+    promptAfterReveal: "What did you notice?",
+    options,
+    correctOptionId,
+    feedback: { correct: "Memory spotter!", wrong: "Hold the group picture in your mind." },
+  };
+}
+
+function createFastGroupMatchTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const objectType = pickObject(memory, OBJECT_GROUP_OBJECTS);
+  const layout = pickLayout(memory, target, target > 6 ? ["ten_frame", "symmetry"] : undefined);
+  const { options, correctOptionId } = buildQuantityOptions(target, memory, objectType, layout, 3);
+  pushRecent(memory.recentKinds, "fast_group_match", 4);
+  return {
+    kind: "groundMatch",
+    prompt: "Find the fast match",
+    speakText: `Find the group with ${numberWord(target)}.`,
+    targetNumber: target,
+    targetNumberName: numberWord(target),
+    visualType: "ground-quantity-card",
+    promptType: "numeral_to_group",
+    shownNumeral: target,
+    objectType,
+    patternLayout: layout,
+    options,
+    correctOptionId,
+    feedback: { correct: "Super fast!", wrong: "Look at the whole group, not each object." },
+  };
+}
+
+function createTenFrameObjectsTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty, TEN_FRAME_TARGETS);
+  const objectType = pickObject(memory, ["stars", "gems", "energy_orbs", "robot_tokens"]);
+  const { options, correctOptionId } = buildNumeralOptions(target, memory, 3);
+  pushRecent(memory.recentKinds, "ten_frame_objects", 4);
+  return {
+    kind: "groundMatch",
+    prompt: "Ten frame objects",
+    speakText: "Quick eyes. Match the object frame to the number.",
+    targetNumber: target,
+    targetNumberName: numberWord(target),
+    visualType: "ground-quantity-card",
+    promptType: "group_to_numeral",
+    shownQuantity: target,
+    objectType,
+    patternLayout: "ten_frame",
+    options: options.map((option) => ({ id: option.id, kind: "numeral" as const, numeral: option.numeral })),
+    correctOptionId,
+    feedback: { correct: "Frame spotted!", wrong: "Notice the filled spaces in the frame." },
+  };
+}
+
+function createTrueOrFalseGroupTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const shownNumeral = randInt(0, 1) === 1 ? target : chooseRecentSafe(TARGETS.filter((value) => value !== target), memory.recentTargets);
+  const objectType = pickObject(memory, OBJECT_GROUP_OBJECTS);
+  const layout = pickLayout(memory, target);
+  const { options, correctOptionId } = buildYesNoOptions(memory, shownNumeral === target);
+  pushRecent(memory.recentKinds, "true_false_group", 4);
+  return {
+    kind: "groundMatch",
+    prompt: `Does this group show ${shownNumeral}?`,
+    speakText: `Does this group show ${numberWord(shownNumeral)}?`,
+    targetNumber: target,
+    targetNumberName: numberWord(target),
+    visualType: "ground-quantity-card",
+    promptType: "group_to_numeral",
+    shownQuantity: target,
+    objectType,
+    patternLayout: layout,
+    options,
+    correctOptionId,
+    feedback: { correct: "You checked it fast!", wrong: "Compare the group to the number again." },
+  };
+}
+
+function createObjectsToNumbersTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const objectType = pickObject(memory, OBJECT_GROUP_OBJECTS);
+  const layout = pickLayout(memory, target);
+  const { options, correctOptionId } = buildNumeralOptions(target, memory, 3);
+  pushRecent(memory.recentKinds, "objects_to_numbers", 4);
+  return {
+    kind: "groundMatch",
+    prompt: "Objects to numbers",
+    speakText: "Recognise the group and tap the number.",
+    targetNumber: target,
+    targetNumberName: numberWord(target),
+    visualType: "ground-quantity-card",
+    promptType: "group_to_numeral",
+    shownQuantity: target,
+    objectType,
+    patternLayout: layout,
+    options: options.map((option) => ({ id: option.id, kind: "numeral" as const, numeral: option.numeral })),
+    correctOptionId,
+    feedback: { correct: "You recognised the group!", wrong: "Look at the structure of the group." },
+  };
+}
+
+function createNumbotQuickEyesTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const objectType = pickObject(memory, OBJECT_GROUP_OBJECTS);
+  const layout = pickLayout(memory, target);
+  const { options, correctOptionId } = buildQuantityOptions(target, memory, objectType, layout, 3);
+  pushRecent(memory.recentKinds, "numbot_quick_eyes", 4);
+  return {
+    kind: "groundMatch",
+    prompt: `Spot ${target} fast!`,
+    speakText: `Numbot says spot ${numberWord(target)} fast.`,
+    targetNumber: target,
+    targetNumberName: numberWord(target),
+    visualType: "ground-quantity-card",
+    promptType: "numeral_to_group",
+    helperVariant: "numbot",
+    shownNumeral: target,
+    objectType,
+    patternLayout: layout,
+    options,
+    correctOptionId,
+    feedback: { correct: "Numbot is impressed!", wrong: "Listen again and spot the group." },
+  };
+}
+
+function createBuildTheGroupTask(lessonId: string, difficulty: Difficulty): GroundBuildTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty, TEN_FRAME_TARGETS);
+  const objectType = pickObject(memory, OBJECT_GROUP_OBJECTS);
+  pushRecent(memory.recentKinds, "build_the_group", 4);
+  return {
+    kind: "groundBuild",
+    prompt: `Build ${target}`,
+    speakText: `Build ${numberWord(target)} fast.`,
+    targetNumber: target,
+    objectType,
+    feedback: { correct: "Group complete!", wrong: "Build until the amount feels right." },
+  };
+}
+
+function createGroupRaceTask(lessonId: string, difficulty: Difficulty): GroundFlashTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const objectType = pickObject(memory, OBJECT_GROUP_OBJECTS);
+  const layout = pickLayout(memory, target, target > 6 ? ["ten_frame", "symmetry"] : ["dice", "domino", "symmetry"]);
+  const { options, correctOptionId } = buildNumeralOptions(target, memory, 4);
+  pushRecent(memory.recentKinds, "group_race", 4);
+  return {
+    kind: "groundFlash",
+    prompt: "Group race!",
+    speakText: "Quick eyes. Spot the group before it disappears.",
+    targetNumber: target,
+    objectType,
+    patternLayout: layout,
+    revealType: "objects",
+    revealMs: difficulty === "easy" ? 760 : difficulty === "medium" ? 540 : 420,
+    options,
+    correctOptionId,
+    feedback: { correct: "FAST SPOTTING!", wrong: "Try another fast look." },
+  };
+}
+
+function createSameOrDifferentTask(lessonId: string, difficulty: Difficulty): GroundMatchTask {
+  const memory = getMemory(lessonId);
+  const target = pickTarget(memory, difficulty);
+  const isSame = randInt(0, 1) === 1;
+  const secondQuantity = isSame ? target : chooseRecentSafe(TARGETS.filter((value) => value !== target), memory.recentTargets);
+  const objectType = pickObject(memory, OBJECT_GROUP_OBJECTS);
+  const secondObjectType = pickObject(memory, OBJECT_GROUP_OBJECTS.filter((value) => value !== objectType));
+  const firstLayout = pickLayout(memory, target);
+  const secondLayout = pickLayout(memory, secondQuantity);
+  const { options, correctOptionId } = buildYesNoOptions(memory, isSame);
+  pushRecent(memory.recentKinds, "same_or_different", 4);
+  return {
+    kind: "groundMatch",
+    prompt: "Same or different?",
+    speakText: "Do these groups show the same amount?",
+    targetNumber: target,
+    targetNumberName: numberWord(target),
+    visualType: "ground-quantity-card",
+    promptType: "same_or_different_group",
+    shownQuantity: target,
+    shownSecondQuantity: secondQuantity,
+    objectType,
+    shownSecondObjectType: secondObjectType,
+    patternLayout: firstLayout,
+    shownSecondPatternLayout: secondLayout,
+    options,
+    correctOptionId,
+    feedback: { correct: "You noticed the amounts!", wrong: "Compare the group shapes again." },
+  };
+}
+
 export function resetPrepWeek4TaskSessionState() {
   memoryByLesson.clear();
 }
 
 export function generatePrepWeek4Task(lessonId: string, difficulty: Difficulty = "easy"): PracticeTask {
   const memory = getMemory(lessonId);
-  const gameKind = rotationPattern[memory.cursor % rotationPattern.length]!;
+  const mode = getLessonMode(lessonId);
+  const rotation = mode === "object_groups" ? lesson2Rotation : lesson1Rotation;
+  const gameKind = rotation[memory.cursor % rotation.length]!;
   memory.cursor += 1;
 
   switch (gameKind) {
@@ -494,6 +791,18 @@ export function generatePrepWeek4Task(lessonId: string, difficulty: Difficulty =
     case "real_world": return createRealWorldQuickLookTask(lessonId, difficulty);
     case "true_false": return createTrueOrFalseQuickLookTask(lessonId, difficulty);
     case "quick_build": return createQuickBuildTask(lessonId, difficulty);
-    default: return createFlashDotRecognitionTask(lessonId, difficulty);
+    case "quick_group_flash": return createQuickGroupFlashTask(lessonId, difficulty);
+    case "which_group_matches": return createWhichGroupMatchesTask(lessonId, difficulty);
+    case "real_world_quick_look": return createRealWorldQuickLookObjectTask(lessonId, difficulty);
+    case "memory_group": return createMemoryGroupTask(lessonId, difficulty);
+    case "fast_group_match": return createFastGroupMatchTask(lessonId, difficulty);
+    case "ten_frame_objects": return createTenFrameObjectsTask(lessonId, difficulty);
+    case "true_false_group": return createTrueOrFalseGroupTask(lessonId, difficulty);
+    case "objects_to_numbers": return createObjectsToNumbersTask(lessonId, difficulty);
+    case "numbot_quick_eyes": return createNumbotQuickEyesTask(lessonId, difficulty);
+    case "build_the_group": return createBuildTheGroupTask(lessonId, difficulty);
+    case "group_race": return createGroupRaceTask(lessonId, difficulty);
+    case "same_or_different": return createSameOrDifferentTask(lessonId, difficulty);
+    default: return createQuickGroupFlashTask(lessonId, difficulty);
   }
 }

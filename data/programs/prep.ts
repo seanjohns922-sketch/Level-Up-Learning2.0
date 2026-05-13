@@ -138,9 +138,10 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         4,
         2,
         "Recognise Object Groups",
-        "Instantly recognise small object groups without counting.",
-        ["Quick object reveal", "Select the quantity", "Group sorting"],
-        ["AC9MFN02"]
+        "Instantly recognise structured object groups to 10 without counting one-by-one.",
+        ["Quick group flash", "Object-frame match", "Real-world memory groups"],
+        ["AC9MFN02", "AC9MFN03"],
+        "Quick Group Spotter"
       ),
       buildLesson(
         4,

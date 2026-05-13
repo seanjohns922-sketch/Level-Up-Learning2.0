@@ -168,7 +168,8 @@ export type PracticeTask = (
         | "word_audio_match"
         | "numeral_to_word"
         | "word_to_numeral"
-        | "word_pair_match";
+        | "word_pair_match"
+        | "same_or_different_group";
       helperVariant?: "numbot" | "speech_bubble" | "memory";
       objectType?: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs";
       patternLayout?: "dice" | "ten_frame" | "domino" | "finger" | "symmetry";
@@ -176,6 +177,9 @@ export type PracticeTask = (
       shownQuantity?: number;
       shownWord?: string;
       shownSequence?: Array<number | "__">;
+      shownSecondQuantity?: number;
+      shownSecondObjectType?: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs";
+      shownSecondPatternLayout?: "dice" | "ten_frame" | "domino" | "finger" | "symmetry";
       options: Array<{
         id: string;
         kind: "numeral" | "quantity" | "pair" | "word";

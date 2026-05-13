@@ -209,6 +209,18 @@ function renderQuestionVisual(task: GroundMatchTask) {
       </div>
     );
   }
+  if (task.promptType === "same_or_different_group" && task.shownQuantity && task.shownSecondQuantity) {
+    return (
+      <div className="grid w-full gap-3 sm:grid-cols-2">
+        <GroundQuantityCard quantity={task.shownQuantity} objectType={task.objectType} patternLayout={task.patternLayout} />
+        <GroundQuantityCard
+          quantity={task.shownSecondQuantity}
+          objectType={task.shownSecondObjectType ?? task.objectType}
+          patternLayout={task.shownSecondPatternLayout ?? task.patternLayout}
+        />
+      </div>
+    );
+  }
   if (task.promptType === "numeral_to_word" && task.shownNumeral) {
     return <GroundNumberCard value={task.shownNumeral} />;
   }
