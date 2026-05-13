@@ -1270,6 +1270,9 @@ type GroundQuizPracticeTask = Extract<
   | { kind: "groundBuild" }
   | { kind: "groundFeed" }
   | { kind: "groundSoundCount" }
+  | { kind: "groundSequence" }
+  | { kind: "groundOrderTap" }
+  | { kind: "groundGrowingCount" }
 >;
 
 const GROUND_WORDS_BY_NUMBER: Record<1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10, GroundWord> = {
@@ -2113,6 +2116,421 @@ function buildPrepWeek2WeeklyQuizQuestions(
 
   if (questions.length !== totalExpected) {
     throw new Error(`[GroundWeeklyQuiz] Week 2 expected ${totalExpected} questions, received ${questions.length}.`);
+  }
+
+  return questions;
+}
+
+function buildPrepWeek3WeeklyQuizQuestions(
+  questionsPerLesson: number
+): QuizQuestion[] {
+  const totalExpected = questionsPerLesson * 3;
+  const forwardHistory: number[] = [];
+  const backwardHistory: number[] = [];
+  const mixedHistory: number[] = [];
+  const objectHistory: GroundObjectType[] = [];
+  const positionHistory: number[] = [];
+
+  function reservePosition(position: number) {
+    positionHistory.push(position);
+    if (positionHistory.length > 4) positionHistory.shift();
+  }
+
+  function nextObjectType(allowed: GroundObjectType[] = GROUND_OBJECT_TYPES) {
+    const objectType = chooseGroundRecentSafe(allowed, objectHistory);
+    objectHistory.push(objectType);
+    if (objectHistory.length > 4) objectHistory.shift();
+    return objectType;
+  }
+
+  function nextForwardTarget(min = 3, max = 10) {
+    const pool = Array.from({ length: max - min + 1 }, (_, index) => min + index);
+    const target = chooseGroundRecentSafe(pool, forwardHistory);
+    forwardHistory.push(target);
+    if (forwardHistory.length > 4) forwardHistory.shift();
+    return target;
+  }
+
+  function nextBackwardTarget(min = 3, max = 10) {
+    const pool = Array.from({ length: max - min + 1 }, (_, index) => min + index);
+    const target = chooseGroundRecentSafe(pool, backwardHistory);
+    backwardHistory.push(target);
+    if (backwardHistory.length > 4) backwardHistory.shift();
+    return target;
+  }
+
+  function nextMixedTarget(min = 1, max = 10) {
+    const pool = Array.from({ length: max - min + 1 }, (_, index) => min + index);
+    const target = chooseGroundRecentSafe(pool, mixedHistory);
+    mixedHistory.push(target);
+    if (mixedHistory.length > 4) mixedHistory.shift();
+    return target;
+  }
+
+  function makeNumeralChoiceOptions(correctNumber: number, pool: number[] = [1,2,3,4,5,6,7,8,9,10], optionCount = 3) {
+    const distractors = shuffle(pool.filter((value) => value !== correctNumber)).slice(0, optionCount - 1);
+    const chosenPosition = chooseGroundRecentSafe(Array.from({ length: optionCount }, (_, index) => index), positionHistory);
+    const values = Array.from({ length: optionCount }, (_, index) =>
+      index === chosenPosition ? correctNumber : distractors[index > chosenPosition ? index - 1 : index]
+    );
+    return {
+      options: values.map((value, index) => ({ id: `num-${index}-${value}`, numeral: value })),
+      correctOptionId: `num-${chosenPosition}-${correctNumber}`,
+      correctPosition: chosenPosition,
+    };
+  }
+
+  function makeWordOptions(correctNumber: number, pool: number[] = [1,2,3,4,5,6,7,8,9,10]) {
+    const correctWord = numberToGroundWord(correctNumber);
+    const distractors = shuffle(pool.filter((value) => value !== correctNumber).map(numberToGroundWord)).slice(0, 2);
+    const chosenPosition = chooseGroundRecentSafe([0, 1, 2], positionHistory);
+    const values = Array.from({ length: 3 }, (_, index) =>
+      index === chosenPosition ? correctWord : distractors[index > chosenPosition ? index - 1 : index]
+    );
+    return {
+      options: values.map((word, index) => ({ id: `word-${index}-${word}`, kind: 'word' as const, word })),
+      correctOptionId: `word-${chosenPosition}-${correctWord}`,
+      correctPosition: chosenPosition,
+    };
+  }
+
+  function makeQuantityOptions(correctNumber: number, objectType: GroundObjectType, pool: number[] = [1,2,3,4,5,6,7,8,9,10]) {
+    const distractors = shuffle(pool.filter((value) => value !== correctNumber)).slice(0, 2);
+    const chosenPosition = chooseGroundRecentSafe([0, 1, 2], positionHistory);
+    const values = Array.from({ length: 3 }, (_, index) =>
+      index === chosenPosition ? correctNumber : distractors[index > chosenPosition ? index - 1 : index]
+    );
+    return {
+      options: values.map((value, index) => ({
+        id: `qty-${index}-${value}`,
+        kind: 'quantity' as const,
+        quantity: value,
+        objectType,
+      })),
+      correctOptionId: `qty-${chosenPosition}-${correctNumber}`,
+      correctPosition: chosenPosition,
+    };
+  }
+
+  function makeThreeWayOptions(correctNumber: number) {
+    const chosenPosition = chooseGroundRecentSafe([0, 1, 2], positionHistory);
+    const distractors = shuffle(([1,2,3,4,5,6,7,8,9,10] as const).filter((value) => value !== correctNumber)).slice(0, 2);
+    const values = Array.from({ length: 3 }, (_, index) => {
+      if (index === chosenPosition) {
+        return {
+          id: `pair-${index}-${correctNumber}`,
+          kind: 'pair' as const,
+          pairNumeral: correctNumber,
+          pairWord: numberToGroundWord(correctNumber),
+          pairQuantity: correctNumber,
+          objectType: nextObjectType(),
+        };
+      }
+      const distractorIndex = index > chosenPosition ? index - 1 : index;
+      const numeral = distractors[distractorIndex]!;
+      const wrongType = distractorIndex % 3;
+      return {
+        id: `pair-${index}-${numeral}`,
+        kind: 'pair' as const,
+        pairNumeral: wrongType === 0 ? numeral : correctNumber,
+        pairWord: wrongType === 1 ? numberToGroundWord(numeral) : numberToGroundWord(correctNumber === 10 ? 9 : correctNumber + 1),
+        pairQuantity: wrongType === 2 ? numeral : correctNumber,
+        objectType: nextObjectType(),
+      };
+    });
+    return {
+      options: values,
+      correctOptionId: values[chosenPosition]!.id,
+      correctPosition: chosenPosition,
+    };
+  }
+
+  function makeForwardTask(index: number, variant: 'next' | 'finish' | 'after' | 'count' | 'path'): QuizQuestion {
+    if (variant === 'next') {
+      const target = nextForwardTarget(3, 10);
+      const sequence = Array.from({ length: target }, (_, i) => (i === target - 1 ? '__' : i + 1));
+      const choice = makeNumeralChoiceOptions(target);
+      reservePosition(choice.correctPosition);
+      return buildGroundQuizQuestion(`q${index}`, 1, 'ground_w3_l1_next', {
+        kind: 'groundSequence',
+        prompt: 'What comes next?',
+        speakText: `${Array.from({ length: target - 1 }, (_, i) => numberToGroundWord(i + 1)).join(', ')}. What comes next?`,
+        targetNumber: target,
+        sequence,
+        options: choice.options,
+        correctOptionId: choice.correctOptionId,
+        feedback: { correct: 'Great counting!', wrong: 'Keep counting forward.' },
+      });
+    }
+
+    if (variant === 'finish') {
+      const start = nextForwardTarget(2, 7);
+      const sequence: Array<number | "__"> = [start, start + 1, start + 2, '__', '__'];
+      const target = start + 3;
+      const choice = makeNumeralChoiceOptions(target);
+      reservePosition(choice.correctPosition);
+      return buildGroundQuizQuestion(`q${index}`, 1, 'ground_w3_l1_finish', {
+        kind: 'groundSequence',
+        prompt: 'Finish the count.',
+        speakText: `${numberToGroundWord(start)}, ${numberToGroundWord(start + 1)}, ${numberToGroundWord(start + 2)}. What comes next?`,
+        targetNumber: target,
+        sequence,
+        options: choice.options,
+        correctOptionId: choice.correctOptionId,
+        feedback: { correct: 'You finished the count!', wrong: 'Say the numbers in order.' },
+      });
+    }
+
+    if (variant === 'path') {
+      const target = nextForwardTarget(5, 10);
+      return buildGroundQuizQuestion(`q${index}`, 1, 'ground_w3_l1_path', {
+        kind: 'groundOrderTap',
+        prompt: 'Build the count.',
+        speakText: `Tap from one to ${numberToGroundWord(target)}.`,
+        targetNumber: target,
+        direction: 'ASC',
+        tiles: shuffle(Array.from({ length: target }, (_, i) => ({ id: `path-${target}-${i + 1}`, numeral: i + 1 }))),
+        feedback: { correct: 'Path complete!', wrong: 'Tap the numbers in order.' },
+      });
+    }
+
+    if (variant === 'count') {
+      const target = nextForwardTarget(4, 10);
+      const objectType = nextObjectType();
+      const choice = makeNumeralChoiceOptions(target);
+      reservePosition(choice.correctPosition);
+      return buildGroundQuizQuestion(`q${index}`, 1, 'ground_w3_l1_count', {
+        kind: 'groundMatch',
+        prompt: `How many ${GROUND_OBJECT_LABELS[objectType]}?`,
+        speakText: `How many ${GROUND_OBJECT_LABELS[objectType]} are there?`,
+        targetNumber: target,
+        targetNumberName: numberToGroundWord(target),
+        visualType: 'ground-quantity-card',
+        promptType: 'group_to_numeral',
+        objectType,
+        shownQuantity: target,
+        options: choice.options.map((option) => ({ id: option.id, kind: 'numeral' as const, numeral: option.numeral })),
+        correctOptionId: choice.correctOptionId,
+        feedback: { correct: 'Great counting!', wrong: 'Count the objects carefully.' },
+      });
+    }
+
+    const previous = nextForwardTarget(1, 9);
+    const target = previous + 1;
+    const choice = makeNumeralChoiceOptions(target);
+    reservePosition(choice.correctPosition);
+    return buildGroundQuizQuestion(`q${index}`, 1, 'ground_w3_l1_after', {
+      kind: 'groundMatch',
+      prompt: 'Tap the next number.',
+      speakText: `What comes after ${numberToGroundWord(previous)}?`,
+      targetNumber: target,
+      targetNumberName: numberToGroundWord(target),
+      visualType: 'ground-number-card',
+      promptType: 'number_to_numeral',
+      options: choice.options.map((option) => ({ id: option.id, kind: 'numeral' as const, numeral: option.numeral })),
+      correctOptionId: choice.correctOptionId,
+      feedback: { correct: 'You found it!', wrong: 'Think of the next number.' },
+    });
+  }
+
+  function makeBackwardTask(index: number, variant: 'before' | 'count_back' | 'reverse_path' | 'missing' | 'audio'): QuizQuestion {
+    if (variant === 'reverse_path') {
+      const start = nextBackwardTarget(6, 10);
+      return buildGroundQuizQuestion(`q${index}`, 2, 'ground_w3_l2_reverse_path', {
+        kind: 'groundOrderTap',
+        prompt: 'Tap the countdown path.',
+        speakText: `Tap from ${numberToGroundWord(start)} back to one.`,
+        targetNumber: start,
+        direction: 'DESC',
+        tiles: shuffle(Array.from({ length: start }, (_, i) => ({ id: `rev-${start}-${i + 1}`, numeral: i + 1 }))),
+        feedback: { correct: 'Blast off ready!', wrong: 'Start with the biggest number.' },
+      });
+    }
+
+    if (variant === 'count_back') {
+      const start = nextBackwardTarget(6, 10);
+      const sequence: Array<number | "__"> = [start, start - 1, start - 2, '__'];
+      const target = start - 3;
+      const choice = makeNumeralChoiceOptions(target);
+      reservePosition(choice.correctPosition);
+      return buildGroundQuizQuestion(`q${index}`, 2, 'ground_w3_l2_count_back', {
+        kind: 'groundSequence',
+        prompt: 'Count back.',
+        speakText: `${numberToGroundWord(start)}, ${numberToGroundWord(start - 1)}, ${numberToGroundWord(start - 2)}. What comes next?`,
+        targetNumber: target,
+        sequence,
+        options: choice.options,
+        correctOptionId: choice.correctOptionId,
+        feedback: { correct: 'Great countdown!', wrong: 'Count back one each time.' },
+      });
+    }
+
+    if (variant === 'missing') {
+      const start = nextBackwardTarget(7, 10);
+      const sequence: Array<number | "__"> = [start, start - 1, '__', start - 3];
+      const target = start - 2;
+      const choice = makeNumeralChoiceOptions(target);
+      reservePosition(choice.correctPosition);
+      return buildGroundQuizQuestion(`q${index}`, 2, 'ground_w3_l2_missing', {
+        kind: 'groundSequence',
+        prompt: 'Which number is missing?',
+        speakText: `Count back from ${numberToGroundWord(start)}. Which number is missing?`,
+        targetNumber: target,
+        sequence,
+        options: choice.options,
+        correctOptionId: choice.correctOptionId,
+        feedback: { correct: 'Countdown fixed!', wrong: 'Say the countdown slowly.' },
+      });
+    }
+
+    if (variant === 'audio') {
+      const start = nextBackwardTarget(5, 10);
+      const sequence: Array<number | "__"> = [start, start - 1, '__'];
+      const target = start - 2;
+      const choice = makeNumeralChoiceOptions(target);
+      reservePosition(choice.correctPosition);
+      return buildGroundQuizQuestion(`q${index}`, 2, 'ground_w3_l2_audio', {
+        kind: 'groundSequence',
+        prompt: 'Listen to the countdown.',
+        speakText: `${numberToGroundWord(start)}, ${numberToGroundWord(start - 1)}. What comes next?`,
+        targetNumber: target,
+        sequence,
+        options: choice.options,
+        correctOptionId: choice.correctOptionId,
+        feedback: { correct: 'Awesome countdown!', wrong: 'Listen and count back.' },
+      });
+    }
+
+    const current = nextBackwardTarget(2, 10);
+    const target = current - 1;
+    const choice = makeNumeralChoiceOptions(target);
+    reservePosition(choice.correctPosition);
+    return buildGroundQuizQuestion(`q${index}`, 2, 'ground_w3_l2_before', {
+      kind: 'groundMatch',
+      prompt: 'What comes before?',
+      speakText: `What comes before ${numberToGroundWord(current)}?`,
+      targetNumber: target,
+      targetNumberName: numberToGroundWord(target),
+      visualType: 'ground-number-card',
+      promptType: 'number_to_numeral',
+      options: choice.options.map((option) => ({ id: option.id, kind: 'numeral' as const, numeral: option.numeral })),
+      correctOptionId: choice.correctOptionId,
+      feedback: { correct: 'Yes — that comes before.', wrong: 'Think of the number before it.' },
+    });
+  }
+
+  function makeNameTask(index: number, variant: 'pair' | 'match_word' | 'word_to_number' | 'number_to_word' | 'hear_group'): QuizQuestion {
+    const target = nextMixedTarget(1, 10);
+    const targetWord = numberToGroundWord(target);
+    const objectType = nextObjectType();
+
+    if (variant === 'pair') {
+      const choice = makeThreeWayOptions(target);
+      reservePosition(choice.correctPosition);
+      return buildGroundQuizQuestion(`q${index}`, 3, 'ground_w3_l3_pair', {
+        kind: 'groundMatch',
+        prompt: 'Which pair matches?',
+        speakText: `Find the card where ${targetWord}, ${target}, and the group all match.`,
+        targetNumber: target,
+        targetNumberName: targetWord,
+        visualType: 'ground-flash-match-card',
+        promptType: 'word_pair_match',
+        options: choice.options,
+        correctOptionId: choice.correctOptionId,
+        feedback: { correct: 'Awesome matching!', wrong: 'Find the card where all three match.' },
+      });
+    }
+
+    if (variant === 'match_word') {
+      const choice = makeWordOptions(target);
+      reservePosition(choice.correctPosition);
+      return buildGroundQuizQuestion(`q${index}`, 3, 'ground_w3_l3_match_word', {
+        kind: 'groundMatch',
+        prompt: 'Find the word.',
+        speakText: `Find the word ${targetWord}.`,
+        targetNumber: target,
+        targetNumberName: targetWord,
+        visualType: 'ground-number-card',
+        promptType: 'word_audio_match',
+        options: choice.options,
+        correctOptionId: choice.correctOptionId,
+        feedback: { correct: `Yes — that word says ${targetWord}.`, wrong: 'Listen again and find the word.' },
+      });
+    }
+
+    if (variant === 'word_to_number') {
+      const choice = makeNumeralChoiceOptions(target);
+      reservePosition(choice.correctPosition);
+      return buildGroundQuizQuestion(`q${index}`, 3, 'ground_w3_l3_word_to_number', {
+        kind: 'groundMatch',
+        prompt: 'Find the number.',
+        speakText: `This word is ${targetWord}. Find number ${targetWord}.`,
+        targetNumber: target,
+        targetNumberName: targetWord,
+        visualType: 'ground-number-card',
+        promptType: 'word_to_numeral',
+        shownWord: targetWord,
+        options: choice.options.map((option) => ({ id: option.id, kind: 'numeral' as const, numeral: option.numeral })),
+        correctOptionId: choice.correctOptionId,
+        feedback: { correct: `Correct — ${targetWord} is ${target}.`, wrong: 'Listen again and find the number.' },
+      });
+    }
+
+    if (variant === 'number_to_word') {
+      const choice = makeWordOptions(target);
+      reservePosition(choice.correctPosition);
+      return buildGroundQuizQuestion(`q${index}`, 3, 'ground_w3_l3_number_to_word', {
+        kind: 'groundMatch',
+        prompt: 'Match the number.',
+        speakText: `${targetWord} matches number ${targetWord}.`,
+        targetNumber: target,
+        targetNumberName: targetWord,
+        visualType: 'ground-number-card',
+        promptType: 'numeral_to_word',
+        shownNumeral: target,
+        options: choice.options,
+        correctOptionId: choice.correctOptionId,
+        feedback: { correct: `Yes — ${targetWord} matches ${target}.`, wrong: 'Find the matching word.' },
+      });
+    }
+
+    const choice = makeQuantityOptions(target, objectType);
+    reservePosition(choice.correctPosition);
+    return buildGroundQuizQuestion(`q${index}`, 3, 'ground_w3_l3_hear_group', {
+      kind: 'groundMatch',
+      prompt: 'Listen. Which group matches?',
+      speakText: `Which group shows ${targetWord}?`,
+      targetNumber: target,
+      targetNumberName: targetWord,
+      visualType: 'ground-quantity-card',
+      promptType: 'numeral_to_group',
+      helperVariant: 'speech_bubble',
+      options: choice.options,
+      correctOptionId: choice.correctOptionId,
+      feedback: { correct: `Correct — ${targetWord} matches ${target}.`, wrong: 'Count the groups carefully.' },
+    });
+  }
+
+  const questions: QuizQuestion[] = [
+    makeForwardTask(1, 'next'),
+    makeForwardTask(2, 'finish'),
+    makeForwardTask(3, 'after'),
+    makeForwardTask(4, 'count'),
+    makeForwardTask(5, 'path'),
+    makeBackwardTask(6, 'before'),
+    makeBackwardTask(7, 'count_back'),
+    makeBackwardTask(8, 'reverse_path'),
+    makeBackwardTask(9, 'missing'),
+    makeBackwardTask(10, 'audio'),
+    makeNameTask(11, 'pair'),
+    makeNameTask(12, 'match_word'),
+    makeNameTask(13, 'word_to_number'),
+    makeNameTask(14, 'number_to_word'),
+    makeNameTask(15, 'hear_group'),
+  ];
+
+  if (questions.length !== totalExpected) {
+    throw new Error(`[GroundWeeklyQuiz] Week 3 expected ${totalExpected} questions, received ${questions.length}.`);
   }
 
   return questions;
@@ -4293,6 +4711,10 @@ function SessionPage() {
 
     if (year === "Prep" && Number(week) === 2) {
       return buildPrepWeek2WeeklyQuizQuestions(questionsPerLesson);
+    }
+
+    if (year === "Prep" && Number(week) === 3) {
+      return buildPrepWeek3WeeklyQuizQuestions(questionsPerLesson);
     }
 
     if (
