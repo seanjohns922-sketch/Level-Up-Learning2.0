@@ -259,14 +259,12 @@ export function GroundCollectTaskCard({
 }
 
 function SplitBuildZone({
-  label,
   count,
   objectType,
   patternLayout,
   onAdd,
   onRemove,
 }: {
-  label: string;
   count: number;
   objectType: keyof typeof OBJECT_META;
   patternLayout?: GroundPatternLayout;
@@ -275,25 +273,28 @@ function SplitBuildZone({
 }) {
   return (
     <div className="rounded-[28px] border-2 border-cyan-200 bg-white p-4 shadow-sm">
-      <div className="mb-3 flex items-center justify-between rounded-full bg-cyan-50 px-4 py-2">
-        <div className="text-sm font-black uppercase tracking-[0.16em] text-teal-800">{label}</div>
-        <div className="text-2xl font-black text-teal-900">{count}</div>
-      </div>
-      <div className="mb-4 rounded-[24px] border-2 border-dashed border-cyan-200 bg-cyan-50/60 p-4">
+      <button
+        type="button"
+        onClick={onAdd}
+        className="mb-3 flex min-h-[132px] w-full items-center justify-center rounded-[22px] border-2 border-dashed border-cyan-200 bg-cyan-50/70 p-4 transition hover:border-cyan-300 hover:bg-cyan-50"
+      >
         <StructuredReveal quantity={count} objectType={objectType} patternLayout={patternLayout} />
-      </div>
-      <div className="grid grid-cols-2 gap-3">
+      </button>
+      <div className="grid grid-cols-[56px_1fr_56px] items-center gap-2">
         <button
           type="button"
           onClick={onRemove}
-          className="rounded-[20px] border-2 border-cyan-200 bg-white px-4 py-3 text-2xl font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
+          className="rounded-[18px] border-2 border-cyan-200 bg-white px-3 py-3 text-2xl font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
         >
           −
         </button>
+        <div className="rounded-full bg-cyan-50 px-3 py-2 text-center text-2xl font-black text-teal-900">
+          {count}
+        </div>
         <button
           type="button"
           onClick={onAdd}
-          className="rounded-[20px] border-2 border-cyan-200 bg-white px-4 py-3 text-2xl font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
+          className="rounded-[18px] border-2 border-cyan-200 bg-white px-3 py-3 text-2xl font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
         >
           +
         </button>
@@ -317,18 +318,18 @@ function ExampleBuildRow({
 }) {
   const total = parts.reduce((sum, value) => sum + value, 0);
   return (
-    <div className="rounded-[28px] border border-cyan-200 bg-white p-4 shadow-sm">
-      <div className="mb-3 text-center text-xs font-black uppercase tracking-[0.16em] text-teal-800">Example build</div>
-      <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
-        <div className="min-w-[110px] rounded-[22px] border-2 border-cyan-200 bg-cyan-50 p-3">
+    <div className="rounded-[24px] border border-cyan-200 bg-white p-3 shadow-sm">
+      <div className="mb-2 text-center text-xs font-black uppercase tracking-[0.16em] text-teal-800">One way</div>
+      <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+        <div className="min-w-[96px] rounded-[18px] border-2 border-cyan-200 bg-cyan-50 p-2">
           <StructuredReveal quantity={parts[0] ?? 0} objectType={objectTypes[0] ?? wholeObjectType} patternLayout={layouts?.[0]} />
         </div>
-        <div className="text-3xl font-black text-cyan-500">+</div>
-        <div className="min-w-[110px] rounded-[22px] border-2 border-cyan-200 bg-cyan-50 p-3">
+        <div className="text-2xl font-black text-cyan-500">+</div>
+        <div className="min-w-[96px] rounded-[18px] border-2 border-cyan-200 bg-cyan-50 p-2">
           <StructuredReveal quantity={parts[1] ?? 0} objectType={objectTypes[1] ?? wholeObjectType} patternLayout={layouts?.[1]} />
         </div>
-        <div className="text-3xl font-black text-cyan-500">=</div>
-        <div className="min-w-[132px] rounded-[22px] border-2 border-teal-300 bg-gradient-to-br from-cyan-50 to-teal-50 p-3 shadow-[0_0_20px_rgba(45,212,191,0.12)]">
+        <div className="text-2xl font-black text-cyan-500">=</div>
+        <div className="min-w-[112px] rounded-[18px] border-2 border-teal-300 bg-gradient-to-br from-cyan-50 to-teal-50 p-2 shadow-[0_0_20px_rgba(45,212,191,0.12)]">
           <StructuredReveal quantity={total} objectType={wholeObjectType} patternLayout={wholeLayout} />
         </div>
       </div>
@@ -358,6 +359,7 @@ export function GroundBuildTaskCard({
   const splitLayouts = task.splitPartLayouts ?? [];
   const exampleKey = (task.exampleParts ?? []).slice().sort((a, b) => a - b).join("+");
   const builtKey = [leftBuilt, rightBuilt].slice().sort((a, b) => a - b).join("+");
+  const splitReady = splitTotal === task.targetNumber;
 
   function check() {
     if (buildMode === "split") {
@@ -381,6 +383,34 @@ export function GroundBuildTaskCard({
   if (buildMode === "split") {
     return (
       <GroundMiniShell badge="Build Game" prompt={task.prompt} speakText={task.speakText}>
+        <div className="rounded-[28px] border border-cyan-200 bg-gradient-to-br from-cyan-50 via-white to-teal-50 p-4 shadow-sm">
+          <div className="mb-3 text-center text-xs font-black uppercase tracking-[0.16em] text-teal-800">Target whole</div>
+          <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            <div
+              className={`rounded-[22px] border-2 p-3 transition ${
+                splitReady
+                  ? "border-emerald-300 bg-emerald-50 shadow-[0_0_24px_rgba(16,185,129,0.18)]"
+                  : "border-teal-300 bg-white shadow-[0_0_18px_rgba(45,212,191,0.12)]"
+              }`}
+            >
+              <StructuredReveal
+                quantity={task.targetNumber}
+                objectType={task.referenceGroup?.objectType ?? task.objectType}
+                patternLayout={task.referenceGroup?.patternLayout}
+              />
+            </div>
+            <div
+              className={`flex h-20 w-20 items-center justify-center rounded-full border-2 text-5xl font-black transition sm:h-24 sm:w-24 sm:text-6xl ${
+                splitReady
+                  ? "border-emerald-300 bg-emerald-50 text-emerald-700 shadow-[0_0_24px_rgba(16,185,129,0.18)]"
+                  : "border-teal-300 bg-white text-teal-900 shadow-[0_0_18px_rgba(45,212,191,0.16)]"
+              }`}
+            >
+              {task.targetNumber}
+            </div>
+          </div>
+        </div>
+
         {task.exampleParts && task.exampleParts.length === 2 ? (
           <ExampleBuildRow
             parts={task.exampleParts}
@@ -391,41 +421,16 @@ export function GroundBuildTaskCard({
           />
         ) : null}
 
-        <div className="rounded-[28px] border border-cyan-200 bg-gradient-to-br from-cyan-50 via-white to-teal-50 p-5 shadow-sm">
-          <div className="mb-3 text-center text-xs font-black uppercase tracking-[0.16em] text-teal-800">Target whole</div>
-          <div className="mb-4 flex items-center justify-center gap-4">
-            <div className="flex h-24 w-24 items-center justify-center rounded-[28px] border-2 border-teal-300 bg-white text-5xl font-black text-teal-900 shadow-[0_0_18px_rgba(45,212,191,0.16)] sm:h-28 sm:w-28 sm:text-6xl">
-              {task.targetNumber}
-            </div>
-            <div className="rounded-[24px] border-2 border-cyan-200 bg-white p-3">
-              <StructuredReveal
-                quantity={task.targetNumber}
-                objectType={task.referenceGroup?.objectType ?? task.objectType}
-                patternLayout={task.referenceGroup?.patternLayout}
-              />
-            </div>
-          </div>
-          <div className="flex items-center justify-center gap-3 rounded-full bg-cyan-50 px-4 py-2 text-lg font-black text-teal-900">
-            <span>{leftBuilt}</span>
-            <span className="text-cyan-500">+</span>
-            <span>{rightBuilt}</span>
-            <span className="text-cyan-500">=</span>
-            <span className={splitTotal === task.targetNumber ? "text-emerald-600" : ""}>{splitTotal}</span>
-          </div>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+        <div className="grid gap-3 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
           <SplitBuildZone
-            label="Left part"
             count={leftBuilt}
             objectType={splitObjectTypes[0]}
             patternLayout={splitLayouts[0]}
             onAdd={() => setLeftBuilt((current) => Math.min(traySize, current + 1))}
             onRemove={() => setLeftBuilt((current) => Math.max(0, current - 1))}
           />
-          <div className="hidden text-center text-4xl font-black text-cyan-500 sm:block">+</div>
+          <div className="text-center text-4xl font-black text-cyan-500">+</div>
           <SplitBuildZone
-            label="Right part"
             count={rightBuilt}
             objectType={splitObjectTypes[1] ?? splitObjectTypes[0]}
             patternLayout={splitLayouts[1]}
@@ -434,13 +439,61 @@ export function GroundBuildTaskCard({
           />
         </div>
 
-        <button
-          type="button"
-          onClick={check}
-          className="rounded-[24px] bg-gradient-to-r from-teal-600 to-cyan-500 px-4 py-4 text-base font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.18)] transition hover:brightness-110"
+        <div
+          className={`rounded-[28px] border p-4 shadow-sm transition ${
+            splitReady
+              ? "border-emerald-300 bg-emerald-50 shadow-[0_0_28px_rgba(16,185,129,0.18)]"
+              : "border-cyan-200 bg-white"
+          }`}
         >
-          Done
-        </button>
+          <div className="mb-3 text-center text-xs font-black uppercase tracking-[0.16em] text-teal-800">Live total</div>
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+            <div className="min-w-[92px] rounded-[18px] border-2 border-cyan-200 bg-cyan-50 p-2">
+              <StructuredReveal quantity={leftBuilt} objectType={splitObjectTypes[0]} patternLayout={splitLayouts[0]} />
+            </div>
+            <div className="text-2xl font-black text-cyan-500">+</div>
+            <div className="min-w-[92px] rounded-[18px] border-2 border-cyan-200 bg-cyan-50 p-2">
+              <StructuredReveal quantity={rightBuilt} objectType={splitObjectTypes[1] ?? splitObjectTypes[0]} patternLayout={splitLayouts[1]} />
+            </div>
+            <div className="text-2xl font-black text-cyan-500">=</div>
+            <div
+              className={`min-w-[112px] rounded-[18px] border-2 p-2 transition ${
+                splitReady
+                  ? "border-emerald-300 bg-emerald-50 shadow-[0_0_20px_rgba(16,185,129,0.18)]"
+                  : "border-teal-300 bg-gradient-to-br from-cyan-50 to-teal-50"
+              }`}
+            >
+              <StructuredReveal
+                quantity={splitTotal}
+                objectType={task.referenceGroup?.objectType ?? task.objectType}
+                patternLayout={task.referenceGroup?.patternLayout}
+              />
+            </div>
+          </div>
+          <div className="mt-3 text-center text-lg font-black text-teal-900">
+            {leftBuilt} + {rightBuilt} = <span className={splitReady ? "text-emerald-700" : ""}>{splitTotal}</span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-[1fr_auto] gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              setLeftBuilt(0);
+              setRightBuilt(0);
+            }}
+            className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-4 text-base font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
+          >
+            Clear
+          </button>
+          <button
+            type="button"
+            onClick={check}
+            className="rounded-[22px] bg-gradient-to-r from-teal-600 to-cyan-500 px-5 py-4 text-base font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.18)] transition hover:brightness-110"
+          >
+            Done
+          </button>
+        </div>
       </GroundMiniShell>
     );
   }
@@ -506,7 +559,8 @@ export function GroundBuildTaskCard({
   );
 }
 
-function CompareGroupCard({
+function CompareGroupCard(
+{
   quantity,
   objectType,
   patternLayout,
