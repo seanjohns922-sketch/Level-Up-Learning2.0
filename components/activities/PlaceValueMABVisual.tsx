@@ -11,15 +11,6 @@ function placeLabel(place: PlaceValueName) {
   return "Ones";
 }
 
-function unitValue(place: PlaceValueName) {
-  if (place === "hundred_thousands") return 100000;
-  if (place === "ten_thousands") return 10000;
-  if (place === "thousands") return 1000;
-  if (place === "hundreds") return 100;
-  if (place === "tens") return 10;
-  return 1;
-}
-
 function placeCount(questionData: MABVisualData, place: PlaceValueName) {
   if (place === "hundred_thousands") return questionData.hundredThousands;
   if (place === "ten_thousands") return questionData.tenThousands;
@@ -27,6 +18,11 @@ function placeCount(questionData: MABVisualData, place: PlaceValueName) {
   if (place === "hundreds") return questionData.hundreds;
   if (place === "tens") return questionData.tens;
   return questionData.ones;
+}
+
+function shouldShowPlace(questionData: MABVisualData, place: PlaceValueName) {
+  const count = placeCount(questionData, place);
+  return count === null || count > 0;
 }
 
 function MABChipVisual({
@@ -79,8 +75,8 @@ function MABChipVisual({
       place === "hundred_thousands"
         ? "border-fuchsia-300 bg-fuchsia-100 text-fuchsia-800"
         : place === "ten_thousands"
-        ? "border-indigo-300 bg-indigo-100 text-indigo-800"
-        : "border-sky-300 bg-sky-100 text-sky-800";
+          ? "border-indigo-300 bg-indigo-100 text-indigo-800"
+          : "border-sky-300 bg-sky-100 text-sky-800";
     const chipLabel =
       place === "hundred_thousands" ? "100k" : place === "ten_thousands" ? "10k" : "1k";
     return (
@@ -116,26 +112,22 @@ export default function PlaceValueMABVisual({
   questionData: MABVisualData;
   title?: string;
 }) {
+  const visiblePlaces = questionData.placeValues.filter((place) => shouldShowPlace(questionData, place));
+
   return (
     <div className="mt-4 rounded-2xl border border-teal-100 bg-teal-50 p-4">
       <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
         {title}
       </div>
       <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {questionData.placeValues
-          .filter((place) => {
-            if (place === "hundred_thousands" && (questionData.hundredThousands ?? 0) === 0) return false;
-            if (place === "ten_thousands" && (questionData.tenThousands ?? 0) === 0) return false;
-            return true;
-          })
-          .map((place) => {
-            const count = placeCount(questionData, place);
+        {visiblePlaces.map((place) => {
+          const count = placeCount(questionData, place);
 
-            return (
-              <div key={place} className="rounded-2xl border border-gray-200 bg-white p-3">
-                <div className="text-xs font-bold uppercase tracking-wide text-gray-500">
-                  {placeLabel(place)}
-                </div>
+          return (
+            <div key={place} className="rounded-2xl border border-gray-200 bg-white p-3">
+              <div className="text-xs font-bold uppercase tracking-wide text-gray-500">
+                {placeLabel(place)}
+              </div>
               <div className="mt-3">
                 <MABChipVisual place={place} count={count} />
               </div>

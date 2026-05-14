@@ -681,10 +681,29 @@ function numericOptionStrings(answer: number, spread: number, min = 0) {
 }
 
 function placeValueSummary(question: Year2PlaceValueBuilderQuestion) {
-  const hundreds = question.hundreds === null ? "? hundreds" : `${question.hundreds} hundreds`;
-  const tens = question.tens === null ? "? tens" : `${question.tens} tens`;
-  const ones = question.ones === null ? "? ones" : `${question.ones} ones`;
-  return `${hundreds}, ${tens}, ${ones}`;
+  const counts = {
+    hundred_thousands: question.hundredThousands,
+    ten_thousands: question.tenThousands,
+    thousands: question.thousands,
+    hundreds: question.hundreds,
+    tens: question.tens,
+    ones: question.ones,
+  } as const;
+
+  return question.placeValues
+    .map((place) => {
+      const count = counts[place];
+      const label = place === "hundred_thousands"
+        ? "hundred thousands"
+        : place === "ten_thousands"
+          ? "ten thousands"
+          : place;
+      if (count === null) return `? ${label}`;
+      if (count <= 0) return null;
+      return `${count} ${label}`;
+    })
+    .filter(Boolean)
+    .join(", ");
 }
 
 function buildAlternativePartition(question: Year2PartitionExpandQuestion) {

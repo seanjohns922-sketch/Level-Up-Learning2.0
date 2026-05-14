@@ -5356,6 +5356,28 @@ function placeLabel(place: PlaceValueName) {
   return "ones";
 }
 
+function relevantPlaceValues(places: PlaceValueName[], value: number) {
+  const nonZeroPlaces = places.filter((place) => digitForPlace(value, place) > 0);
+  return nonZeroPlaces.length > 0 ? nonZeroPlaces : [places[places.length - 1] ?? "ones"];
+}
+
+function mabPlaceSummary(
+  places: PlaceValueName[],
+  counts: Record<PlaceValueName, number | null>,
+  hiddenPlace?: PlaceValueName
+) {
+  return places
+    .map((place) => {
+      if (place === hiddenPlace) return `? ${placeLabel(place)}`;
+      const count = counts[place];
+      if (count === null) return `? ${placeLabel(place)}`;
+      if (count <= 0) return null;
+      return `${count} ${placeLabel(place)}`;
+    })
+    .filter(Boolean)
+    .join(", ");
+}
+
 function partitionNumber(value: number) {
   return {
     ...(value >= 1000 ? { thousands: Math.floor(value / 1000) * 1000 } : {}),
@@ -6176,8 +6198,9 @@ function generateInteractiveQuestion(
     const hundreds = digitForPlace(target, "hundreds");
     const tens = digitForPlace(target, "tens");
     const ones = digitForPlace(target, "ones");
+    const activePlaces = relevantPlaceValues(places, target);
     const place =
-      places[randInt(0, places.length - 1)] ?? "ones";
+      activePlaces[randInt(0, activePlaces.length - 1)] ?? "ones";
     const mode =
       config.hideOnePlaceValue === true
         ? "missing_mab_part"
@@ -6200,7 +6223,7 @@ function generateInteractiveQuestion(
         mode,
         place,
         visualMode: "mab",
-        placeValues: places,
+        placeValues: activePlaces,
       };
     }
 
@@ -6230,7 +6253,7 @@ function generateInteractiveQuestion(
         mode,
         place,
         visualMode: "mab",
-        placeValues: places,
+        placeValues: activePlaces,
       };
     }
 
@@ -6247,7 +6270,7 @@ function generateInteractiveQuestion(
       answer: target,
       mode: "identify_number",
       visualMode: "mab",
-      placeValues: places,
+      placeValues: activePlaces,
     };
   }
 
@@ -24997,7 +25020,8 @@ function generateGenericQuestion(
   if (sourceActivityType === "place_value_builder") {
     const target = randInt(Math.max(100, min || 100), Math.max(200, max || 999));
     const places = supportedPlaces(config);
-    const place = places[randInt(0, places.length - 1)] ?? "ones";
+    const activePlaces = relevantPlaceValues(places, target);
+    const place = activePlaces[randInt(0, activePlaces.length - 1)] ?? "ones";
     const partition = partitionNumber(target);
     const mode =
       config.mode === "identify_place" || config.mode === "missing_mab_part"
@@ -25009,23 +25033,19 @@ function generateGenericQuestion(
     const hundreds = digitForPlace(target, "hundreds");
     const tens = digitForPlace(target, "tens");
     const ones = digitForPlace(target, "ones");
-    const includeHundredThousands = places.includes("hundred_thousands") || hundredThousands > 0;
-    const mabSummary = [
-      includeHundredThousands ? `${hundredThousands} hundred thousands` : null,
-      `${tenThousands} ten thousands`,
-      `${thousands} thousands`,
-      `${hundreds} hundreds`,
-      `${tens} tens`,
-      `${ones} ones`,
-    ]
-      .filter(Boolean)
-      .join(", ");
+    const countsByPlace: Record<PlaceValueName, number | null> = {
+      hundred_thousands: hundredThousands,
+      ten_thousands: tenThousands,
+      thousands,
+      hundreds,
+      tens,
+      ones,
+    };
+    const mabSummary = mabPlaceSummary(activePlaces, countsByPlace);
     const mabVisual: MABVisualData = {
       type: "mab",
-      placeValues: includeHundredThousands
-        ? ["hundred_thousands", "ten_thousands", "thousands", "hundreds", "tens", "ones"]
-        : ["ten_thousands", "thousands", "hundreds", "tens", "ones"],
-      hundredThousands: includeHundredThousands ? hundredThousands : 0,
+      placeValues: activePlaces,
+      hundredThousands,
       tenThousands,
       thousands,
       hundreds,
@@ -25046,20 +25066,18 @@ function generateGenericQuestion(
           : place === "tens"
           ? partition.tens
           : partition.ones;
-      const visibleSummary = [
-        place === "hundred_thousands"
-          ? "? hundred thousands"
-          : includeHundredThousands
-          ? `${hundredThousands} hundred thousands`
-          : null,
-        place === "ten_thousands" ? "? ten thousands" : `${tenThousands} ten thousands`,
-        place === "thousands" ? "? thousands" : `${thousands} thousands`,
-        place === "hundreds" ? "? hundreds" : `${partition.hundreds / 100} hundreds`,
-        place === "tens" ? "? tens" : `${partition.tens / 10} tens`,
-        place === "ones" ? "? ones" : `${partition.ones} ones`,
-      ]
-        .filter(Boolean)
-        .join(", ");
+      const visibleSummary = mabPlaceSummary(
+        activePlaces,
+        {
+          hundred_thousands: hundredThousands,
+          ten_thousands: tenThousands,
+          thousands,
+          hundreds: partition.hundreds / 100,
+          tens: partition.tens / 10,
+          ones: partition.ones,
+        },
+        place
+      );
       return asMultipleChoice
         ? {
             kind: "multiple_choice",
