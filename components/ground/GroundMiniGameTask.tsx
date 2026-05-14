@@ -258,6 +258,84 @@ export function GroundCollectTaskCard({
   );
 }
 
+function SplitBuildZone({
+  label,
+  count,
+  objectType,
+  patternLayout,
+  onAdd,
+  onRemove,
+}: {
+  label: string;
+  count: number;
+  objectType: keyof typeof OBJECT_META;
+  patternLayout?: GroundPatternLayout;
+  onAdd: () => void;
+  onRemove: () => void;
+}) {
+  return (
+    <div className="rounded-[28px] border-2 border-cyan-200 bg-white p-4 shadow-sm">
+      <div className="mb-3 flex items-center justify-between rounded-full bg-cyan-50 px-4 py-2">
+        <div className="text-sm font-black uppercase tracking-[0.16em] text-teal-800">{label}</div>
+        <div className="text-2xl font-black text-teal-900">{count}</div>
+      </div>
+      <div className="mb-4 rounded-[24px] border-2 border-dashed border-cyan-200 bg-cyan-50/60 p-4">
+        <StructuredReveal quantity={count} objectType={objectType} patternLayout={patternLayout} />
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <button
+          type="button"
+          onClick={onRemove}
+          className="rounded-[20px] border-2 border-cyan-200 bg-white px-4 py-3 text-2xl font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
+        >
+          −
+        </button>
+        <button
+          type="button"
+          onClick={onAdd}
+          className="rounded-[20px] border-2 border-cyan-200 bg-white px-4 py-3 text-2xl font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
+        >
+          +
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ExampleBuildRow({
+  parts,
+  objectTypes,
+  layouts,
+  wholeObjectType,
+  wholeLayout,
+}: {
+  parts: number[];
+  objectTypes: Array<keyof typeof OBJECT_META>;
+  layouts?: GroundPatternLayout[];
+  wholeObjectType: keyof typeof OBJECT_META;
+  wholeLayout?: GroundPatternLayout;
+}) {
+  const total = parts.reduce((sum, value) => sum + value, 0);
+  return (
+    <div className="rounded-[28px] border border-cyan-200 bg-white p-4 shadow-sm">
+      <div className="mb-3 text-center text-xs font-black uppercase tracking-[0.16em] text-teal-800">Example build</div>
+      <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+        <div className="min-w-[110px] rounded-[22px] border-2 border-cyan-200 bg-cyan-50 p-3">
+          <StructuredReveal quantity={parts[0] ?? 0} objectType={objectTypes[0] ?? wholeObjectType} patternLayout={layouts?.[0]} />
+        </div>
+        <div className="text-3xl font-black text-cyan-500">+</div>
+        <div className="min-w-[110px] rounded-[22px] border-2 border-cyan-200 bg-cyan-50 p-3">
+          <StructuredReveal quantity={parts[1] ?? 0} objectType={objectTypes[1] ?? wholeObjectType} patternLayout={layouts?.[1]} />
+        </div>
+        <div className="text-3xl font-black text-cyan-500">=</div>
+        <div className="min-w-[132px] rounded-[22px] border-2 border-teal-300 bg-gradient-to-br from-cyan-50 to-teal-50 p-3 shadow-[0_0_20px_rgba(45,212,191,0.12)]">
+          <StructuredReveal quantity={total} objectType={wholeObjectType} patternLayout={wholeLayout} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function GroundBuildTaskCard({
   task,
   onCorrect,
@@ -267,13 +345,29 @@ export function GroundBuildTaskCard({
   onCorrect: () => void;
   onWrong: () => void;
 }) {
+  const buildMode = task.buildMode ?? "single";
   const [built, setBuilt] = useState(task.startingBuilt ?? 0);
+  const [leftBuilt, setLeftBuilt] = useState(0);
+  const [rightBuilt, setRightBuilt] = useState(0);
   const compareMode = task.compareMode ?? "exact";
   const compareBase = task.compareBase ?? task.targetNumber;
   const traySize = Math.max(5, Math.min(10, task.maxBuild ?? task.targetNumber ?? compareBase));
   const tray = useMemo(() => Array.from({ length: traySize }), [traySize]);
+  const splitTotal = leftBuilt + rightBuilt;
+  const splitObjectTypes = task.splitObjectTypes ?? [task.objectType, task.objectType];
+  const splitLayouts = task.splitPartLayouts ?? [];
+  const exampleKey = (task.exampleParts ?? []).slice().sort((a, b) => a - b).join("+");
+  const builtKey = [leftBuilt, rightBuilt].slice().sort((a, b) => a - b).join("+");
 
   function check() {
+    if (buildMode === "split") {
+      const hitsTarget = splitTotal === task.targetNumber;
+      const hasTwoParts = leftBuilt > 0 && rightBuilt > 0;
+      const differentFromExample = !task.requireDifferentFromExample || builtKey !== exampleKey;
+      if (hitsTarget && hasTwoParts && differentFromExample) onCorrect();
+      else onWrong();
+      return;
+    }
     const correct =
       compareMode === "more_than"
         ? built > compareBase
@@ -282,6 +376,73 @@ export function GroundBuildTaskCard({
           : built === task.targetNumber;
     if (correct) onCorrect();
     else onWrong();
+  }
+
+  if (buildMode === "split") {
+    return (
+      <GroundMiniShell badge="Build Game" prompt={task.prompt} speakText={task.speakText}>
+        {task.exampleParts && task.exampleParts.length === 2 ? (
+          <ExampleBuildRow
+            parts={task.exampleParts}
+            objectTypes={(task.exampleObjectTypes as Array<keyof typeof OBJECT_META> | undefined) ?? [task.objectType, task.objectType]}
+            layouts={task.examplePartLayouts}
+            wholeObjectType={task.objectType}
+            wholeLayout={task.referenceGroup?.patternLayout}
+          />
+        ) : null}
+
+        <div className="rounded-[28px] border border-cyan-200 bg-gradient-to-br from-cyan-50 via-white to-teal-50 p-5 shadow-sm">
+          <div className="mb-3 text-center text-xs font-black uppercase tracking-[0.16em] text-teal-800">Target whole</div>
+          <div className="mb-4 flex items-center justify-center gap-4">
+            <div className="flex h-24 w-24 items-center justify-center rounded-[28px] border-2 border-teal-300 bg-white text-5xl font-black text-teal-900 shadow-[0_0_18px_rgba(45,212,191,0.16)] sm:h-28 sm:w-28 sm:text-6xl">
+              {task.targetNumber}
+            </div>
+            <div className="rounded-[24px] border-2 border-cyan-200 bg-white p-3">
+              <StructuredReveal
+                quantity={task.targetNumber}
+                objectType={task.referenceGroup?.objectType ?? task.objectType}
+                patternLayout={task.referenceGroup?.patternLayout}
+              />
+            </div>
+          </div>
+          <div className="flex items-center justify-center gap-3 rounded-full bg-cyan-50 px-4 py-2 text-lg font-black text-teal-900">
+            <span>{leftBuilt}</span>
+            <span className="text-cyan-500">+</span>
+            <span>{rightBuilt}</span>
+            <span className="text-cyan-500">=</span>
+            <span className={splitTotal === task.targetNumber ? "text-emerald-600" : ""}>{splitTotal}</span>
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+          <SplitBuildZone
+            label="Left part"
+            count={leftBuilt}
+            objectType={splitObjectTypes[0]}
+            patternLayout={splitLayouts[0]}
+            onAdd={() => setLeftBuilt((current) => Math.min(traySize, current + 1))}
+            onRemove={() => setLeftBuilt((current) => Math.max(0, current - 1))}
+          />
+          <div className="hidden text-center text-4xl font-black text-cyan-500 sm:block">+</div>
+          <SplitBuildZone
+            label="Right part"
+            count={rightBuilt}
+            objectType={splitObjectTypes[1] ?? splitObjectTypes[0]}
+            patternLayout={splitLayouts[1]}
+            onAdd={() => setRightBuilt((current) => Math.min(traySize, current + 1))}
+            onRemove={() => setRightBuilt((current) => Math.max(0, current - 1))}
+          />
+        </div>
+
+        <button
+          type="button"
+          onClick={check}
+          className="rounded-[24px] bg-gradient-to-r from-teal-600 to-cyan-500 px-4 py-4 text-base font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.18)] transition hover:brightness-110"
+        >
+          Done
+        </button>
+      </GroundMiniShell>
+    );
   }
 
   return (

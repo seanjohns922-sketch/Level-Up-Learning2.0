@@ -222,6 +222,13 @@ export type PracticeTask = (
         objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs";
         patternLayout?: "dice" | "ten_frame" | "domino" | "finger" | "symmetry";
       };
+      buildMode?: "single" | "split";
+      exampleParts?: number[];
+      exampleObjectTypes?: Array<"dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs">;
+      examplePartLayouts?: Array<"dice" | "ten_frame" | "domino" | "finger" | "symmetry">;
+      splitObjectTypes?: Array<"dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs">;
+      splitPartLayouts?: Array<"dice" | "ten_frame" | "domino" | "finger" | "symmetry">;
+      requireDifferentFromExample?: boolean;
       feedback?: { correct: string; wrong: string };
     }
   | {
