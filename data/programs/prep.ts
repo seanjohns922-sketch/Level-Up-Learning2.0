@@ -217,9 +217,10 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         6,
         3,
         "Part-Part-Whole to 10",
-        "Connect parts and wholes using visual groups.",
-        ["Part-part-whole mats", "Fill the whole", "Split and join groups"],
-        ["AC9MFN02", "AC9MFN03"]
+        "Understand that numbers can be split into parts and recombined into a whole using visual groups to 10.",
+        ["Split the number", "Match the parts", "Quick split builder"],
+        ["AC9MFN02", "AC9MFN03"],
+        "Number Split Mission"
       ),
     ],
   },

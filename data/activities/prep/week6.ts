@@ -53,6 +53,23 @@ const LESSON2_ROTATION = [
   "match_all_tens",
   "quick_eyes_ten",
 ] as const;
+const LESSON3_ROTATION = [
+  "split_the_number",
+  "find_split_another_way",
+  "complete_the_whole",
+  "which_parts_match",
+  "numbot_split",
+  "same_whole",
+  "ten_frame_builder",
+  "match_the_parts",
+  "part_swap_visual",
+  "quick_split",
+  "build_missing_part_whole",
+  "balance_the_whole",
+  "split_the_group_visual",
+  "which_does_not_match",
+  "quick_eyes_split",
+] as const;
 
 const memoryByLesson = new Map<string, Week6Memory>();
 
@@ -141,6 +158,13 @@ function nextKind(memory: Week6Memory) {
 
 function nextLesson2Kind(memory: Week6Memory) {
   const kind = LESSON2_ROTATION[memory.cursor % LESSON2_ROTATION.length]!;
+  memory.cursor += 1;
+  pushRecent(memory.recentKinds, kind, 5);
+  return kind;
+}
+
+function nextLesson3Kind(memory: Week6Memory) {
+  const kind = LESSON3_ROTATION[memory.cursor % LESSON3_ROTATION.length]!;
   memory.cursor += 1;
   pushRecent(memory.recentKinds, kind, 5);
   return kind;
@@ -600,6 +624,147 @@ function createQuickEyesTenTask(lessonId: string, difficulty: Difficulty): Pract
   return createFillTo10Task(lessonId, difficulty);
 }
 
+
+function createSplitTheNumberTask(lessonId: string): PracticeTask {
+  const memory = getMemory(lessonId);
+  const exampleParts = chooseMake10Pair(memory);
+  return createSplitBuildTask({
+    lessonId,
+    prompt: "Can you split 10 another way?",
+    speakText: "Can you split ten another way?",
+    total: 10,
+    exampleParts,
+    requireDifferentFromExample: true,
+    feedback: { correct: "You split the number perfectly!", wrong: "Split ten into two different parts." },
+  });
+}
+
+function createFindSplitAnotherWayTask(lessonId: string): PracticeTask {
+  return createMake10AnotherWayTask(lessonId);
+}
+
+function createCompleteTheWholeTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  return createFillTo10Task(lessonId, difficulty);
+}
+
+function createWhichPartsMatchTask(lessonId: string): PracticeTask {
+  const memory = getMemory(lessonId);
+  const exampleParts = chooseMake10Pair(memory);
+  return createSplitBuildTask({
+    lessonId,
+    prompt: "Which parts match the same whole of 10?",
+    speakText: "Which parts match the same whole of ten?",
+    total: 10,
+    exampleParts,
+    requireDifferentFromExample: false,
+    feedback: { correct: "Those parts match the whole!", wrong: "Use two parts that still make the same whole." },
+  });
+}
+
+function createNumbotSplitTask(lessonId: string): PracticeTask {
+  const memory = getMemory(lessonId);
+  const exampleParts = chooseMake10Pair(memory);
+  return createSplitBuildTask({
+    lessonId,
+    prompt: "Numbot says: split the reactor energy!",
+    speakText: "Numbot says: split the reactor energy into ten.",
+    total: 10,
+    exampleParts,
+    requireDifferentFromExample: true,
+    feedback: { correct: "Reactor energy split!", wrong: "Split the whole into two parts that make ten." },
+  });
+}
+
+function createSameWholeTask(lessonId: string): PracticeTask {
+  return createSameTotalTenTask(lessonId);
+}
+
+function createTenFrameBuilderTask(lessonId: string): PracticeTask {
+  return createMake10BuilderTask(lessonId);
+}
+
+function createMatchThePartsTask(lessonId: string): PracticeTask {
+  const memory = getMemory(lessonId);
+  const exampleParts = chooseMake10Pair(memory);
+  return createSplitBuildTask({
+    lessonId,
+    prompt: "Match the parts to the whole of 10.",
+    speakText: "Match the parts to the whole of ten.",
+    total: 10,
+    exampleParts,
+    requireDifferentFromExample: false,
+    feedback: { correct: "The parts match the whole!", wrong: "Build the two parts that join to make ten." },
+  });
+}
+
+function createPartSwapVisualTask(lessonId: string): PracticeTask {
+  return createPartSwapTask(lessonId);
+}
+
+function createQuickSplitTask(lessonId: string): PracticeTask {
+  const memory = getMemory(lessonId);
+  const exampleParts = chooseMake10Pair(memory);
+  return createSplitBuildTask({
+    lessonId,
+    prompt: "Split 10 fast!",
+    speakText: "Split ten fast!",
+    total: 10,
+    exampleParts,
+    requireDifferentFromExample: true,
+    feedback: { correct: "Fast split!", wrong: "Use two parts to split ten." },
+  });
+}
+
+function createBuildMissingPartWholeTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  return createFillTo10Task(lessonId, difficulty);
+}
+
+function createBalanceTheWholeTask(lessonId: string): PracticeTask {
+  const memory = getMemory(lessonId);
+  const exampleParts = chooseMake10Pair(memory);
+  return createSplitBuildTask({
+    lessonId,
+    prompt: "Balance the whole with two parts.",
+    speakText: "Balance the whole with two parts.",
+    total: 10,
+    exampleParts,
+    requireDifferentFromExample: false,
+    feedback: { correct: "The whole is balanced!", wrong: "Use two parts that still make the whole of ten." },
+  });
+}
+
+function createSplitTheGroupVisualTask(lessonId: string): PracticeTask {
+  const memory = getMemory(lessonId);
+  const exampleParts = chooseMake10Pair(memory);
+  return createSplitBuildTask({
+    lessonId,
+    prompt: "Split the whole group into two parts.",
+    speakText: "Split the whole group into two parts.",
+    total: 10,
+    exampleParts,
+    requireDifferentFromExample: false,
+    feedback: { correct: "You split the group!", wrong: "Split the whole into two smaller parts." },
+  });
+}
+
+function createWhichDoesNotMatchTask(lessonId: string): PracticeTask {
+  const memory = getMemory(lessonId);
+  const exampleParts = chooseMake10Pair(memory);
+  return createSplitBuildTask({
+    lessonId,
+    prompt: "Which parts do not match 10? Build the correct whole.",
+    speakText: "Which parts do not match ten? Build the correct whole.",
+    total: 10,
+    exampleParts,
+    requireDifferentFromExample: false,
+    feedback: { correct: "That build matches ten!", wrong: "Use the parts that really make ten." },
+  });
+}
+
+function createQuickEyesSplitTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  return createFillTo10Task(lessonId, difficulty);
+}
+
 function generateLesson1Task(lessonId: string, difficulty: Difficulty, kind: (typeof LESSON1_ROTATION)[number]): PracticeTask {
   switch (kind) {
     case "build_number":
@@ -662,11 +827,50 @@ function generateLesson2Task(lessonId: string, difficulty: Difficulty, kind: (ty
   }
 }
 
+function generateLesson3Task(lessonId: string, difficulty: Difficulty, kind: (typeof LESSON3_ROTATION)[number]): PracticeTask {
+  switch (kind) {
+    case "split_the_number":
+      return createSplitTheNumberTask(lessonId);
+    case "find_split_another_way":
+      return createFindSplitAnotherWayTask(lessonId);
+    case "complete_the_whole":
+      return createCompleteTheWholeTask(lessonId, difficulty);
+    case "which_parts_match":
+      return createWhichPartsMatchTask(lessonId);
+    case "numbot_split":
+      return createNumbotSplitTask(lessonId);
+    case "same_whole":
+      return createSameWholeTask(lessonId);
+    case "ten_frame_builder":
+      return createTenFrameBuilderTask(lessonId);
+    case "match_the_parts":
+      return createMatchThePartsTask(lessonId);
+    case "part_swap_visual":
+      return createPartSwapVisualTask(lessonId);
+    case "quick_split":
+      return createQuickSplitTask(lessonId);
+    case "build_missing_part_whole":
+      return createBuildMissingPartWholeTask(lessonId, difficulty);
+    case "balance_the_whole":
+      return createBalanceTheWholeTask(lessonId);
+    case "split_the_group_visual":
+      return createSplitTheGroupVisualTask(lessonId);
+    case "which_does_not_match":
+      return createWhichDoesNotMatchTask(lessonId);
+    case "quick_eyes_split":
+      return createQuickEyesSplitTask(lessonId, difficulty);
+  }
+}
+
 export function generatePrepWeek6Task(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
   if (lessonId === "y0-w6-l2") {
     const kind = nextLesson2Kind(memory);
     return generateLesson2Task(lessonId, difficulty, kind);
+  }
+  if (lessonId === "y0-w6-l3") {
+    const kind = nextLesson3Kind(memory);
+    return generateLesson3Task(lessonId, difficulty, kind);
   }
   const kind = nextKind(memory);
   return generateLesson1Task(lessonId, difficulty, kind);
