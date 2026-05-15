@@ -37,6 +37,22 @@ const LESSON1_ROTATION = [
   "build_to_ten",
   "part_match",
 ] as const;
+const LESSON2_ROTATION = [
+  "make_10_builder",
+  "make_10_another_way",
+  "which_makes_10",
+  "fill_to_10",
+  "numbot_make_10",
+  "complete_ten_frame",
+  "same_total_ten",
+  "build_both_sides",
+  "quick_make_10",
+  "ten_frame_memory",
+  "part_swap",
+  "build_missing_part",
+  "match_all_tens",
+  "quick_eyes_ten",
+] as const;
 
 const memoryByLesson = new Map<string, Week6Memory>();
 
@@ -118,6 +134,13 @@ function pickLayout(memory: Week6Memory, quantity: number, preferred?: GroundPat
 
 function nextKind(memory: Week6Memory) {
   const kind = LESSON1_ROTATION[memory.cursor % LESSON1_ROTATION.length]!;
+  memory.cursor += 1;
+  pushRecent(memory.recentKinds, kind, 5);
+  return kind;
+}
+
+function nextLesson2Kind(memory: Week6Memory) {
+  const kind = LESSON2_ROTATION[memory.cursor % LESSON2_ROTATION.length]!;
   memory.cursor += 1;
   pushRecent(memory.recentKinds, kind, 5);
   return kind;
@@ -403,6 +426,180 @@ function createPartMatchTask(lessonId: string, difficulty: Difficulty): Practice
   });
 }
 
+function chooseMake10Pair(memory: Week6Memory, avoidKey?: string) {
+  return chooseParts(10, memory, avoidKey);
+}
+
+function createMake10BuilderTask(lessonId: string): PracticeTask {
+  const memory = getMemory(lessonId);
+  const exampleParts = chooseMake10Pair(memory);
+  return createSplitBuildTask({
+    lessonId,
+    prompt: "Make 10 with two parts.",
+    speakText: "Make ten with two parts. Use two colours.",
+    total: 10,
+    exampleParts,
+    requireDifferentFromExample: false,
+    feedback: { correct: "You made ten!", wrong: "Use two parts that join to make ten." },
+  });
+}
+
+function createMake10AnotherWayTask(lessonId: string): PracticeTask {
+  const memory = getMemory(lessonId);
+  const exampleParts = chooseMake10Pair(memory);
+  return createSplitBuildTask({
+    lessonId,
+    prompt: "Can you make 10 another way?",
+    speakText: "Can you make ten another way? Use two colours.",
+    total: 10,
+    exampleParts,
+    requireDifferentFromExample: true,
+    feedback: { correct: "Another great way!", wrong: "Build ten in a different way." },
+  });
+}
+
+function createWhichMakes10Task(lessonId: string): PracticeTask {
+  const memory = getMemory(lessonId);
+  const exampleParts = chooseMake10Pair(memory);
+  return createSplitBuildTask({
+    lessonId,
+    prompt: "Which parts make 10? Build the right pair.",
+    speakText: "Which parts make ten? Build the right pair.",
+    total: 10,
+    exampleParts,
+    requireDifferentFromExample: false,
+    feedback: { correct: "Those parts make ten!", wrong: "Build two parts that join to make ten." },
+  });
+}
+
+function createFillTo10Task(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const shown = difficulty === "easy" ? randInt(1, 7) : randInt(2, 9);
+  const missing = 10 - shown;
+  return createSingleBuildTask({
+    lessonId,
+    prompt: "How many more to make 10?",
+    speakText: "How many more to make ten?",
+    target: missing,
+    objectType: "dots",
+    referenceGroup: {
+      quantity: shown,
+      objectType: "dots",
+      patternLayout: "ten_frame",
+    },
+    feedback: { correct: "You filled to ten!", wrong: "Build the missing part that makes ten." },
+  });
+}
+
+function createNumbotMake10Task(lessonId: string): PracticeTask {
+  const memory = getMemory(lessonId);
+  const exampleParts = chooseMake10Pair(memory);
+  return createSplitBuildTask({
+    lessonId,
+    prompt: "Numbot says: power the reactor to 10!",
+    speakText: "Numbot says: power the reactor to ten.",
+    total: 10,
+    exampleParts,
+    requireDifferentFromExample: true,
+    feedback: { correct: "Reactor powered to ten!", wrong: "Build a new way to make ten." },
+  });
+}
+
+function createCompleteTenFrameTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  return createFillTo10Task(lessonId, difficulty);
+}
+
+function createSameTotalTenTask(lessonId: string): PracticeTask {
+  const memory = getMemory(lessonId);
+  const exampleParts = chooseMake10Pair(memory);
+  return createSplitBuildTask({
+    lessonId,
+    prompt: "Do both parts still make 10? Build one that does.",
+    speakText: "Do both parts still make ten? Build one that does.",
+    total: 10,
+    exampleParts,
+    requireDifferentFromExample: false,
+    feedback: { correct: "Yes, that still makes ten!", wrong: "Use two parts that still join to make ten." },
+  });
+}
+
+function createBuildBothSidesTask(lessonId: string): PracticeTask {
+  const memory = getMemory(lessonId);
+  const exampleParts = chooseMake10Pair(memory);
+  return createSplitBuildTask({
+    lessonId,
+    prompt: "Build both sides to make 10.",
+    speakText: "Build both sides to make ten.",
+    total: 10,
+    exampleParts,
+    requireDifferentFromExample: false,
+    feedback: { correct: "Both sides make ten!", wrong: "Use both colours to build ten." },
+  });
+}
+
+function createQuickMake10Task(lessonId: string): PracticeTask {
+  const memory = getMemory(lessonId);
+  const exampleParts = chooseMake10Pair(memory);
+  return createSplitBuildTask({
+    lessonId,
+    prompt: "Make 10 fast!",
+    speakText: "Make ten fast!",
+    total: 10,
+    exampleParts,
+    requireDifferentFromExample: true,
+    feedback: { correct: "Fast build!", wrong: "Keep building until you have ten in two parts." },
+  });
+}
+
+function createTenFrameMemoryTask(lessonId: string): PracticeTask {
+  const memory = getMemory(lessonId);
+  const exampleParts = chooseMake10Pair(memory);
+  return createSplitBuildTask({
+    lessonId,
+    prompt: "Remember the parts and make 10.",
+    speakText: "Remember the parts and make ten.",
+    total: 10,
+    exampleParts,
+    requireDifferentFromExample: false,
+    feedback: { correct: "You remembered the make-ten build!", wrong: "Use the frame to rebuild ten." },
+  });
+}
+
+function createPartSwapTask(lessonId: string): PracticeTask {
+  const memory = getMemory(lessonId);
+  const exampleParts = chooseMake10Pair(memory);
+  return createSplitBuildTask({
+    lessonId,
+    prompt: "Swap the parts and still make 10.",
+    speakText: "Swap the parts and still make ten.",
+    total: 10,
+    exampleParts,
+    requireDifferentFromExample: true,
+    feedback: { correct: "The parts still make ten!", wrong: "Try a different order or new pair that still makes ten." },
+  });
+}
+
+function createBuildMissingPartTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  return createFillTo10Task(lessonId, difficulty);
+}
+
+function createMatchAllTensTask(lessonId: string): PracticeTask {
+  const memory = getMemory(lessonId);
+  const exampleParts = chooseMake10Pair(memory);
+  return createSplitBuildTask({
+    lessonId,
+    prompt: "Build all the parts that make 10.",
+    speakText: "Build the parts that make ten.",
+    total: 10,
+    exampleParts,
+    requireDifferentFromExample: false,
+    feedback: { correct: "That build makes ten!", wrong: "Use two non-zero parts that join to make ten." },
+  });
+}
+
+function createQuickEyesTenTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  return createFillTo10Task(lessonId, difficulty);
+}
+
 function generateLesson1Task(lessonId: string, difficulty: Difficulty, kind: (typeof LESSON1_ROTATION)[number]): PracticeTask {
   switch (kind) {
     case "build_number":
@@ -432,8 +629,45 @@ function generateLesson1Task(lessonId: string, difficulty: Difficulty, kind: (ty
   }
 }
 
+function generateLesson2Task(lessonId: string, difficulty: Difficulty, kind: (typeof LESSON2_ROTATION)[number]): PracticeTask {
+  switch (kind) {
+    case "make_10_builder":
+      return createMake10BuilderTask(lessonId);
+    case "make_10_another_way":
+      return createMake10AnotherWayTask(lessonId);
+    case "which_makes_10":
+      return createWhichMakes10Task(lessonId);
+    case "fill_to_10":
+      return createFillTo10Task(lessonId, difficulty);
+    case "numbot_make_10":
+      return createNumbotMake10Task(lessonId);
+    case "complete_ten_frame":
+      return createCompleteTenFrameTask(lessonId, difficulty);
+    case "same_total_ten":
+      return createSameTotalTenTask(lessonId);
+    case "build_both_sides":
+      return createBuildBothSidesTask(lessonId);
+    case "quick_make_10":
+      return createQuickMake10Task(lessonId);
+    case "ten_frame_memory":
+      return createTenFrameMemoryTask(lessonId);
+    case "part_swap":
+      return createPartSwapTask(lessonId);
+    case "build_missing_part":
+      return createBuildMissingPartTask(lessonId, difficulty);
+    case "match_all_tens":
+      return createMatchAllTensTask(lessonId);
+    case "quick_eyes_ten":
+      return createQuickEyesTenTask(lessonId, difficulty);
+  }
+}
+
 export function generatePrepWeek6Task(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
+  if (lessonId === "y0-w6-l2") {
+    const kind = nextLesson2Kind(memory);
+    return generateLesson2Task(lessonId, difficulty, kind);
+  }
   const kind = nextKind(memory);
   return generateLesson1Task(lessonId, difficulty, kind);
 }

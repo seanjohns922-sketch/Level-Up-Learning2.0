@@ -49,12 +49,13 @@ function isPrepGroundCustomLesson(lessonId: string) {
     lessonId.startsWith("y0-w2-") ||
     lessonId.startsWith("y0-w3-") ||
     lessonId.startsWith("y0-w4-") ||
-    lessonId.startsWith("y0-w5-") || lessonId === "y0-w6-l1"
+    lessonId.startsWith("y0-w5-") ||
+    lessonId.startsWith("y0-w6-")
   );
 }
 
 function getPrepGroundTask(lessonId: string, difficulty: "easy" | "medium" | "hard") {
-  if (lessonId === "y0-w6-l1") return generatePrepWeek6Task(lessonId, difficulty);
+  if (lessonId.startsWith("y0-w6-")) return generatePrepWeek6Task(lessonId, difficulty);
   if (lessonId.startsWith("y0-w5-")) return generatePrepWeek5Task(lessonId, difficulty);
   if (lessonId.startsWith("y0-w4-")) return generatePrepWeek4Task(lessonId, difficulty);
   if (lessonId.startsWith("y0-w3-")) return generatePrepWeek3Task(lessonId, difficulty);

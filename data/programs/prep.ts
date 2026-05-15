@@ -207,10 +207,11 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
       buildLesson(
         6,
         2,
-        "Build Number Pairs",
-        "Find two parts that make a whole number to 10.",
-        ["Partner pairs", "Two-part builder", "Make the whole"],
-        ["AC9MFN02", "AC9MFN03"]
+        "Ways to Make 10",
+        "Build and recognise combinations that make 10 using visual part-part-whole groups.",
+        ["Make 10 builder", "Fill the ten frame", "Find another way to make 10"],
+        ["AC9MFN02", "AC9MFN03"],
+        "Make 10 Lab"
       ),
       buildLesson(
         6,
