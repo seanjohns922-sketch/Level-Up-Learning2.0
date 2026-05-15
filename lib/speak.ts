@@ -306,11 +306,20 @@ export async function speak(text: string, speechKey?: string) {
 
     await audio.play();
   } catch (error) {
-    if ((error as Error)?.name === "AbortError" || activeSpeakToken !== speakToken || controller.signal.aborted) {
+    const errorName = (error as Error)?.name;
+
+    if (errorName === "AbortError" || activeSpeakToken !== speakToken || controller.signal.aborted) {
       return;
     }
 
     if (currentRequest === controller) currentRequest = null;
+
+    // Browser autoplay blocks should not trigger the robotic fallback voice.
+    if (errorName === "NotAllowedError") {
+      setSpeakState({ currentText: null, isSpeaking: false });
+      return;
+    }
+
     fallbackSpeak(normalized);
   }
 }
