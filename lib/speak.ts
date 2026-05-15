@@ -235,6 +235,12 @@ function fallbackSpeak(text: string) {
   const synth = window.speechSynthesis;
   if (!synth) return;
 
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
+
   synth.cancel();
   setSpeakState({ currentText: text, isSpeaking: true });
 
@@ -264,31 +270,47 @@ export async function speak(text: string, speechKey?: string) {
 
   stopSpeaking();
   const speakToken = Symbol("speak");
+  const controller = new AbortController();
+  currentRequest = controller;
   activeSpeakToken = speakToken;
   setSpeakState({ currentText: normalized, isSpeaking: true });
 
   try {
-    const audio = await playLessonAudio(normalized, speechKey);
-    if (activeSpeakToken !== speakToken) return;
+    window.speechSynthesis?.cancel();
+
+    const audio = await playLessonAudio(normalized, speechKey, controller.signal);
+    if (activeSpeakToken !== speakToken || controller.signal.aborted) return;
+
+    window.speechSynthesis?.cancel();
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+      currentAudio = null;
+    }
 
     currentAudio = audio;
     audio.onended = () => {
       if (currentAudio === audio) {
         currentAudio = null;
+        if (currentRequest === controller) currentRequest = null;
         setSpeakState({ currentText: null, isSpeaking: false });
       }
     };
     audio.onerror = () => {
       if (currentAudio === audio) {
         currentAudio = null;
+        if (currentRequest === controller) currentRequest = null;
         setSpeakState({ currentText: null, isSpeaking: false });
       }
     };
+
     await audio.play();
   } catch (error) {
-    if ((error as Error)?.name === "AbortError" || activeSpeakToken !== speakToken) {
+    if ((error as Error)?.name === "AbortError" || activeSpeakToken !== speakToken || controller.signal.aborted) {
       return;
     }
+
+    if (currentRequest === controller) currentRequest = null;
     fallbackSpeak(normalized);
   }
 }
@@ -307,5 +329,6 @@ export function stopSpeaking() {
   if (typeof window !== "undefined") {
     window.speechSynthesis?.cancel();
   }
+
   setSpeakState({ currentText: null, isSpeaking: false });
 }

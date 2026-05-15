@@ -12,7 +12,7 @@ function makeClientCacheKey(text: string, speechKey?: string) {
   return `${speechKey ?? ""}::${text}`;
 }
 
-export async function resolveLessonAudioUrl(text: string, speechKey?: string) {
+export async function resolveLessonAudioUrl(text: string, speechKey?: string, signal?: AbortSignal) {
   const cacheKey = makeClientCacheKey(text, speechKey);
   const cached = speechUrlCache.get(cacheKey);
   if (cached) return cached;
@@ -23,6 +23,7 @@ export async function resolveLessonAudioUrl(text: string, speechKey?: string) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ text, speechKey }),
+    signal,
   });
 
   if (!response.ok) {
@@ -38,7 +39,7 @@ export async function resolveLessonAudioUrl(text: string, speechKey?: string) {
   return payload.url;
 }
 
-export async function playLessonAudio(text: string, speechKey?: string) {
-  const url = await resolveLessonAudioUrl(text, speechKey);
+export async function playLessonAudio(text: string, speechKey?: string, signal?: AbortSignal) {
+  const url = await resolveLessonAudioUrl(text, speechKey, signal);
   return new Audio(url);
 }
