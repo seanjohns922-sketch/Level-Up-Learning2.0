@@ -22,42 +22,91 @@ export function useAuthGuard() {
 
   useEffect(() => {
     let cancelled = false;
+    let initialSessionResolved = false;
+    let redirecting = false;
 
-    // 1. Read cached session first (synchronous-ish, from localStorage)
-    supabase.auth
-      .getSession()
-      .then(({ data, error }) => {
+    const applyAuthenticatedUser = (nextUser: User) => {
+      setUser(nextUser);
+      setLoading(false);
+    };
+
+    const redirectToLogin = async () => {
+      if (cancelled || redirecting) return;
+      redirecting = true;
+
+      try {
+        const { data, error } = await supabase.auth.getSession();
         if (cancelled) return;
         if (error) throw error;
+
         if (data.session?.user) {
-          setUser(data.session.user);
-          setLoading(false);
+          applyAuthenticatedUser(data.session.user);
+          return;
         }
-        // If no cached session, don't redirect yet — wait for onAuthStateChange
+
+        setUser(null);
+        setLoading(false);
+        router.replace("/login");
+      } catch (error) {
+        if (cancelled) return;
+        recoverInvalidRefreshToken(error);
+        setUser(null);
+        setLoading(false);
+        router.replace("/login");
+      } finally {
+        redirecting = false;
+      }
+    };
+
+    // Resolve the session before reacting to transient null auth events.
+    void supabase.auth
+      .getSession()
+      .then(async ({ data, error }) => {
+        if (cancelled) return;
+        if (error) throw error;
+
+        if (data.session?.user) {
+          applyAuthenticatedUser(data.session.user);
+          return;
+        }
+
+        // Preview/deploy environments can race local-storage hydration.
+        // Double-check with getUser() before deciding there is no session.
+        const { data: userData, error: userError } = await supabase.auth.getUser();
+        if (cancelled) return;
+        if (userError) throw userError;
+
+        if (userData.user) {
+          applyAuthenticatedUser(userData.user);
+          return;
+        }
+
+        setUser(null);
+        setLoading(false);
+        router.replace("/login");
       })
       .catch((error) => {
         if (cancelled) return;
         recoverInvalidRefreshToken(error);
         setUser(null);
         setLoading(false);
-        router.push("/login");
+        router.replace("/login");
+      })
+      .finally(() => {
+        initialSessionResolved = true;
       });
 
-    // 2. Listen for the definitive auth event
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        if (cancelled) return;
-        if (session?.user) {
-          setUser(session.user);
-          setLoading(false);
-        } else {
-          // Definitive: no session
-          setUser(null);
-          setLoading(false);
-          router.push("/login");
-        }
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (cancelled) return;
+      if (session?.user) {
+        applyAuthenticatedUser(session.user);
+      } else {
+        if (!initialSessionResolved) return;
+        void redirectToLogin();
       }
-    );
+    });
 
     return () => {
       cancelled = true;
