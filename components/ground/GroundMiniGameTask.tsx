@@ -260,48 +260,37 @@ export function GroundCollectTaskCard({
 
 function SplitBuildZone({
   count,
-  objectType,
-  patternLayout,
   onAdd,
   onRemove,
   canAdd,
   canRemove,
 }: {
   count: number;
-  objectType: keyof typeof OBJECT_META;
-  patternLayout?: GroundPatternLayout;
   onAdd: () => void;
   onRemove: () => void;
   canAdd: boolean;
   canRemove: boolean;
 }) {
   return (
-    <div className="rounded-[24px] border-2 border-cyan-200 bg-white p-3 shadow-sm">
-      <button
-        type="button"
-        onClick={onAdd}
-        disabled={!canAdd}
-        className="mb-2 flex min-h-[88px] w-full items-center justify-center rounded-[18px] border-2 border-dashed border-cyan-200 bg-cyan-50/70 p-3 transition enabled:hover:border-cyan-300 enabled:hover:bg-cyan-50 disabled:cursor-not-allowed disabled:opacity-55"
-      >
-        <StructuredReveal quantity={count} objectType={objectType} patternLayout={patternLayout} />
-      </button>
-      <div className="grid grid-cols-[48px_1fr_48px] items-center gap-2">
+    <div className="rounded-[18px] border border-cyan-200 bg-white px-3 py-2 shadow-sm">
+      <div className="mb-1 text-center text-3xl font-black text-teal-900">{count}</div>
+      <div className="grid grid-cols-[44px_1fr_44px] items-center gap-2">
         <button
           type="button"
           onClick={onRemove}
           disabled={!canRemove}
-          className="rounded-[16px] border-2 border-cyan-200 bg-white px-2 py-2 text-xl font-black text-slate-700 transition enabled:hover:border-cyan-300 enabled:hover:bg-cyan-50 disabled:cursor-not-allowed disabled:opacity-45"
+          className="rounded-[14px] border-2 border-cyan-200 bg-white px-2 py-2 text-lg font-black text-slate-700 transition enabled:hover:border-cyan-300 enabled:hover:bg-cyan-50 disabled:cursor-not-allowed disabled:opacity-45"
         >
           −
         </button>
-        <div className="rounded-full bg-cyan-50 px-2 py-2 text-center text-xl font-black text-teal-900">
+        <div className="rounded-full bg-cyan-50 px-2 py-1.5 text-center text-base font-black text-teal-800">
           {count}
         </div>
         <button
           type="button"
           onClick={onAdd}
           disabled={!canAdd}
-          className="rounded-[16px] border-2 border-cyan-200 bg-white px-2 py-2 text-xl font-black text-slate-700 transition enabled:hover:border-cyan-300 enabled:hover:bg-cyan-50 disabled:cursor-not-allowed disabled:opacity-45"
+          className="rounded-[14px] border-2 border-cyan-200 bg-white px-2 py-2 text-lg font-black text-slate-700 transition enabled:hover:border-cyan-300 enabled:hover:bg-cyan-50 disabled:cursor-not-allowed disabled:opacity-45"
         >
           +
         </button>
@@ -312,25 +301,93 @@ function SplitBuildZone({
 
 function ExampleBuildRow({
   parts,
-  objectTypes,
-  layouts,
 }: {
   parts: number[];
-  objectTypes: Array<keyof typeof OBJECT_META>;
-  layouts?: GroundPatternLayout[];
 }) {
   return (
     <div className="flex flex-wrap items-center justify-center gap-2 text-sm font-black text-teal-900">
       <span className="uppercase tracking-[0.14em] text-teal-700">One way</span>
-      <div className="rounded-[16px] border border-cyan-200 bg-cyan-50 px-2 py-1.5">
-        <StructuredReveal quantity={parts[0] ?? 0} objectType={objectTypes[0]} patternLayout={layouts?.[0]} />
-      </div>
+      <span>{parts[0] ?? 0}</span>
       <span className="text-cyan-500">+</span>
-      <div className="rounded-[16px] border border-cyan-200 bg-cyan-50 px-2 py-1.5">
-        <StructuredReveal quantity={parts[1] ?? 0} objectType={objectTypes[1]} patternLayout={layouts?.[1]} />
-      </div>
+      <span>{parts[1] ?? 0}</span>
       <span className="text-cyan-500">=</span>
       <span>{(parts[0] ?? 0) + (parts[1] ?? 0)}</span>
+    </div>
+  );
+}
+
+function TenFrameBuilder({
+  target,
+  leftCount,
+  rightCount,
+  activePart,
+  onSelectPart,
+  onToggleDot,
+}: {
+  target: number;
+  leftCount: number;
+  rightCount: number;
+  activePart: "left" | "right";
+  onSelectPart: (part: "left" | "right") => void;
+  onToggleDot: (index: number) => void;
+}) {
+  const cells = Array.from({ length: 10 }, (_, index) => {
+    if (index < leftCount) return "left" as const;
+    if (index < leftCount + rightCount) return "right" as const;
+    return "empty" as const;
+  });
+
+  return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={() => onSelectPart("left")}
+          className={`rounded-[16px] border-2 px-3 py-2 text-sm font-black transition ${
+            activePart === "left"
+              ? "border-teal-400 bg-teal-100 text-teal-900 shadow-[0_0_16px_rgba(20,184,166,0.16)]"
+              : "border-cyan-200 bg-white text-slate-700"
+          }`}
+        >
+          Green part
+        </button>
+        <button
+          type="button"
+          onClick={() => onSelectPart("right")}
+          className={`rounded-[16px] border-2 px-3 py-2 text-sm font-black transition ${
+            activePart === "right"
+              ? "border-orange-300 bg-orange-100 text-orange-900 shadow-[0_0_16px_rgba(251,146,60,0.16)]"
+              : "border-cyan-200 bg-white text-slate-700"
+          }`}
+        >
+          Red part
+        </button>
+      </div>
+      <div className="grid grid-cols-5 gap-2 rounded-[22px] border border-cyan-200 bg-white p-3 shadow-sm">
+        {cells.map((cell, index) => {
+          const filled = cell !== "empty";
+          const tone =
+            cell === "left"
+              ? "border-teal-400 bg-teal-400 shadow-[0_0_14px_rgba(20,184,166,0.18)]"
+              : cell === "right"
+                ? "border-orange-400 bg-orange-400 shadow-[0_0_14px_rgba(251,146,60,0.18)]"
+                : "border-cyan-200 bg-white";
+          return (
+            <button
+              key={`ten-frame-${index}`}
+              type="button"
+              onClick={() => onToggleDot(index)}
+              className={`flex h-12 w-full items-center justify-center rounded-full border-2 transition ${tone}`}
+              aria-label={`Dot ${index + 1} of 10`}
+            >
+              <span className={`h-6 w-6 rounded-full border-2 ${filled ? "border-transparent bg-white/15" : "border-cyan-300 bg-cyan-50"}`} />
+            </button>
+          );
+        })}
+      </div>
+      <div className="text-center text-xs font-black uppercase tracking-[0.16em] text-teal-700">
+        Tap dots to build {target} with two colours
+      </div>
     </div>
   );
 }
@@ -348,23 +405,18 @@ export function GroundBuildTaskCard({
   const [built, setBuilt] = useState(task.startingBuilt ?? 0);
   const [leftBuilt, setLeftBuilt] = useState(0);
   const [rightBuilt, setRightBuilt] = useState(0);
+  const [activePart, setActivePart] = useState<"left" | "right">("left");
   const compareMode = task.compareMode ?? "exact";
   const compareBase = task.compareBase ?? task.targetNumber;
   const traySize = Math.max(5, Math.min(10, task.maxBuild ?? task.targetNumber ?? compareBase));
   const tray = useMemo(() => Array.from({ length: traySize }), [traySize]);
   const splitTotal = leftBuilt + rightBuilt;
-  const splitObjectTypes = task.splitObjectTypes ?? [task.objectType, task.objectType];
-  const splitLayouts = task.splitPartLayouts ?? [];
   const exampleKey = (task.exampleParts ?? []).join("+");
   const builtKey = `${leftBuilt}+${rightBuilt}`;
   const splitHitsTarget = splitTotal === task.targetNumber;
   const splitHasTwoParts = leftBuilt > 0 && rightBuilt > 0;
   const splitDifferentFromExample = !task.requireDifferentFromExample || builtKey !== exampleKey;
   const splitValid = splitHitsTarget && splitHasTwoParts && splitDifferentFromExample;
-  const splitCanAddLeft = splitTotal < task.targetNumber && leftBuilt < traySize;
-  const splitCanAddRight = splitTotal < task.targetNumber && rightBuilt < traySize;
-  const splitCanRemoveLeft = leftBuilt > 0;
-  const splitCanRemoveRight = rightBuilt > 0;
 
   function check() {
     if (buildMode === "split") {
@@ -382,80 +434,84 @@ export function GroundBuildTaskCard({
     else onWrong();
   }
 
+  function toggleSplitDot(index: number) {
+    if (index < leftBuilt) {
+      setLeftBuilt((current) => current - 1);
+      return;
+    }
+    if (index < leftBuilt + rightBuilt) {
+      setRightBuilt((current) => current - 1);
+      return;
+    }
+    if (splitTotal >= task.targetNumber) return;
+    if (activePart === "left") setLeftBuilt((current) => current + 1);
+    else setRightBuilt((current) => current + 1);
+  }
+
   if (buildMode === "split") {
     return (
       <GroundMiniShell badge="Build Game" prompt={task.prompt} speakText={task.speakText}>
         <div className="rounded-[28px] border border-cyan-200 bg-gradient-to-br from-cyan-50 via-white to-teal-50 p-4 shadow-sm">
           <div className="space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-[22px] border border-cyan-200 bg-white px-4 py-3">
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-[20px] border border-cyan-200 bg-white px-4 py-3">
               <div>
                 <div className="text-xs font-black uppercase tracking-[0.16em] text-teal-700">Target</div>
-                <div className={`mt-1 text-4xl font-black transition ${splitValid ? "scale-105 text-emerald-700" : "text-teal-900"}`}>
-                  {task.targetNumber}
-                </div>
+                <div className={`mt-1 text-4xl font-black transition ${splitValid ? "scale-105 text-emerald-700" : "text-teal-900"}`}>{task.targetNumber}</div>
               </div>
-              <div
-                className={`rounded-[18px] border-2 px-3 py-2 transition ${
-                  splitValid
-                    ? "border-emerald-300 bg-emerald-50 shadow-[0_0_20px_rgba(16,185,129,0.18)]"
-                    : "border-teal-300 bg-white shadow-[0_0_16px_rgba(45,212,191,0.12)]"
-                }`}
-              >
+              <div className={`rounded-[18px] border-2 px-3 py-2 transition ${splitValid ? "border-emerald-300 bg-emerald-50 shadow-[0_0_20px_rgba(16,185,129,0.18)]" : "border-teal-300 bg-white shadow-[0_0_16px_rgba(45,212,191,0.12)]"}`}>
                 <StructuredReveal
                   quantity={task.targetNumber}
                   objectType={task.referenceGroup?.objectType ?? task.objectType}
-                  patternLayout={task.referenceGroup?.patternLayout}
+                  patternLayout="ten_frame"
                 />
               </div>
             </div>
 
             {task.exampleParts && task.exampleParts.length === 2 ? (
-              <div className="rounded-[20px] border border-cyan-200 bg-white px-3 py-2 shadow-sm">
-                <ExampleBuildRow
-                  parts={task.exampleParts}
-                  objectTypes={(task.exampleObjectTypes as Array<keyof typeof OBJECT_META> | undefined) ?? [task.objectType, task.objectType]}
-                  layouts={task.examplePartLayouts}
-                />
+              <div className="rounded-[18px] border border-cyan-200 bg-white px-3 py-2 shadow-sm">
+                <ExampleBuildRow parts={task.exampleParts} />
               </div>
             ) : null}
 
-            <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1.1fr)] xl:items-center">
+            <TenFrameBuilder
+              target={task.targetNumber}
+              leftCount={leftBuilt}
+              rightCount={rightBuilt}
+              activePart={activePart}
+              onSelectPart={setActivePart}
+              onToggleDot={toggleSplitDot}
+            />
+
+            <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1.2fr)] xl:items-center">
               <SplitBuildZone
                 count={leftBuilt}
-                objectType={splitObjectTypes[0]}
-                patternLayout={splitLayouts[0]}
-                canAdd={splitCanAddLeft}
-                canRemove={splitCanRemoveLeft}
-                onAdd={() => setLeftBuilt((current) => Math.min(traySize, current + 1))}
+                canAdd={splitTotal < task.targetNumber}
+                canRemove={leftBuilt > 0}
+                onAdd={() => {
+                  setActivePart("left");
+                  if (splitTotal < task.targetNumber) setLeftBuilt((current) => current + 1);
+                }}
                 onRemove={() => setLeftBuilt((current) => Math.max(0, current - 1))}
               />
               <div className="text-center text-3xl font-black text-cyan-500">+</div>
               <SplitBuildZone
                 count={rightBuilt}
-                objectType={splitObjectTypes[1] ?? splitObjectTypes[0]}
-                patternLayout={splitLayouts[1]}
-                canAdd={splitCanAddRight}
-                canRemove={splitCanRemoveRight}
-                onAdd={() => setRightBuilt((current) => Math.min(traySize, current + 1))}
+                canAdd={splitTotal < task.targetNumber}
+                canRemove={rightBuilt > 0}
+                onAdd={() => {
+                  setActivePart("right");
+                  if (splitTotal < task.targetNumber) setRightBuilt((current) => current + 1);
+                }}
                 onRemove={() => setRightBuilt((current) => Math.max(0, current - 1))}
               />
               <div className="text-center text-3xl font-black text-cyan-500">=</div>
-              <div
-                className={`rounded-[24px] border-2 p-3 shadow-sm transition ${
-                  splitHitsTarget
-                    ? "border-emerald-300 bg-emerald-50 shadow-[0_0_22px_rgba(16,185,129,0.18)]"
-                    : "border-cyan-200 bg-white"
-                }`}
-              >
-                <div className="flex items-center justify-center rounded-[18px] bg-cyan-50/70 p-2">
-                  <StructuredReveal
-                    quantity={splitTotal}
-                    objectType={task.referenceGroup?.objectType ?? task.objectType}
-                    patternLayout={task.referenceGroup?.patternLayout}
-                  />
-                </div>
-                <div className="mt-2 text-center text-lg font-black text-teal-900">
-                  {leftBuilt} + {rightBuilt} = <span className={splitHitsTarget ? "text-emerald-700" : ""}>{splitTotal}</span>
+              <div className={`rounded-[22px] border-2 p-3 shadow-sm transition ${splitHitsTarget ? "border-emerald-300 bg-emerald-50 shadow-[0_0_22px_rgba(16,185,129,0.18)]" : "border-cyan-200 bg-white"}`}>
+                <div className="text-center text-2xl font-black text-teal-900">
+                  <span className="text-teal-600">{leftBuilt}</span>
+                  <span className="mx-2 text-cyan-500">+</span>
+                  <span className="text-orange-500">{rightBuilt}</span>
+                  <span className="mx-2 text-cyan-500">=</span>
+                  <span className={splitHitsTarget ? "text-emerald-700" : ""}>{splitTotal}</span>
                 </div>
               </div>
             </div>
@@ -463,7 +519,7 @@ export function GroundBuildTaskCard({
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="text-sm font-black text-teal-800">
                 {splitValid
-                  ? `You made ${task.targetNumber} another way!`
+                  ? `Yes. ${leftBuilt} and ${rightBuilt} makes ${task.targetNumber}.`
                   : splitHitsTarget && !splitDifferentFromExample
                     ? "Try a different way."
                     : "Keep building."}
@@ -474,6 +530,7 @@ export function GroundBuildTaskCard({
                   onClick={() => {
                     setLeftBuilt(0);
                     setRightBuilt(0);
+                    setActivePart("left");
                   }}
                   className="rounded-[18px] border-2 border-cyan-200 bg-white px-4 py-3 text-sm font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
                 >
