@@ -7,6 +7,7 @@ const ELEVENLABS_MODEL_ID = "eleven_multilingual_v2";
 const AUDIO_OUTPUT_DIR = path.join(process.cwd(), "public", "audio", "generated");
 const AUDIO_PUBLIC_PREFIX = "/audio/generated";
 const RUNTIME_AUDIO_CACHE = new Map<string, string>();
+const SPEECH_CACHE_VERSION = "eleven-hannah-v1";
 
 function normalizeWhitespace(text: string) {
   return text.replace(/\s+/g, " ").trim();
@@ -28,10 +29,16 @@ export function hashSpeechText(text: string) {
   return createHash("sha256").update(normalizeSpeechText(text)).digest("hex");
 }
 
+function getVoiceCacheSegment() {
+  const voiceId = process.env.ELEVENLABS_VOICE_ID?.trim() || "unknown-voice";
+  return sanitizeSpeechKey(`${SPEECH_CACHE_VERSION}-${voiceId}`).slice(0, 40);
+}
+
 export function buildSpeechCacheKey(text: string, speechKey?: string) {
   const hash = hashSpeechText(text).slice(0, 16);
-  if (!speechKey) return hash;
-  return `${sanitizeSpeechKey(speechKey)}-${hash}`;
+  const voiceSegment = getVoiceCacheSegment();
+  if (!speechKey) return `${voiceSegment}-${hash}`;
+  return `${sanitizeSpeechKey(speechKey)}-${voiceSegment}-${hash}`;
 }
 
 export function getGeneratedSpeechPublicUrl(cacheKey: string) {
