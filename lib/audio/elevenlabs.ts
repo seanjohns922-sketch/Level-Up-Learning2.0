@@ -6,6 +6,7 @@ const ELEVENLABS_BASE_URL = "https://api.elevenlabs.io/v1/text-to-speech";
 const ELEVENLABS_MODEL_ID = "eleven_multilingual_v2";
 const AUDIO_OUTPUT_DIR = path.join(process.cwd(), "public", "audio", "generated");
 const AUDIO_PUBLIC_PREFIX = "/audio/generated";
+const RUNTIME_AUDIO_CACHE = new Map<string, string>();
 
 function normalizeWhitespace(text: string) {
   return text.replace(/\s+/g, " ").trim();
@@ -13,6 +14,10 @@ function normalizeWhitespace(text: string) {
 
 function sanitizeSpeechKey(speechKey: string) {
   return speechKey.toLowerCase().replace(/[^a-z0-9_-]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "") || "speech";
+}
+
+function makeInlineAudioDataUrl(audioBuffer: Uint8Array) {
+  return `data:audio/mpeg;base64,${Buffer.from(audioBuffer).toString("base64")}`;
 }
 
 export function normalizeSpeechText(text: string) {
@@ -38,6 +43,9 @@ function getGeneratedSpeechFilePath(cacheKey: string) {
 }
 
 export async function getCachedGeneratedSpeechUrl(cacheKey: string) {
+  const runtimeCached = RUNTIME_AUDIO_CACHE.get(cacheKey);
+  if (runtimeCached) return runtimeCached;
+
   const filePath = getGeneratedSpeechFilePath(cacheKey);
   try {
     await access(filePath);
@@ -86,8 +94,14 @@ export async function generateElevenLabsSpeech(text: string) {
 }
 
 export async function writeGeneratedSpeech(cacheKey: string, audioBuffer: Uint8Array) {
-  await mkdir(AUDIO_OUTPUT_DIR, { recursive: true });
-  const filePath = getGeneratedSpeechFilePath(cacheKey);
-  await writeFile(filePath, audioBuffer);
-  return getGeneratedSpeechPublicUrl(cacheKey);
+  try {
+    await mkdir(AUDIO_OUTPUT_DIR, { recursive: true });
+    const filePath = getGeneratedSpeechFilePath(cacheKey);
+    await writeFile(filePath, audioBuffer);
+    return getGeneratedSpeechPublicUrl(cacheKey);
+  } catch {
+    const inlineUrl = makeInlineAudioDataUrl(audioBuffer);
+    RUNTIME_AUDIO_CACHE.set(cacheKey, inlineUrl);
+    return inlineUrl;
+  }
 }
