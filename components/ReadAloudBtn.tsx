@@ -3,16 +3,14 @@
 import { Volume2 } from "lucide-react";
 import { speak } from "@/lib/speak";
 
-/**
- * Small 🔊 button that reads the given text aloud.
- * Drop this next to any label, heading, or paragraph.
- */
 export default function ReadAloudBtn({
   text,
+  speechKey,
   size = "sm",
   className = "",
 }: {
   text: string;
+  speechKey?: string;
   size?: "sm" | "md";
   className?: string;
 }) {
@@ -24,7 +22,7 @@ export default function ReadAloudBtn({
       type="button"
       onClick={(e) => {
         e.stopPropagation();
-        speak(text);
+        void speak(text, speechKey);
       }}
       aria-label="Read aloud with AI voice"
       title="AI-generated voice"

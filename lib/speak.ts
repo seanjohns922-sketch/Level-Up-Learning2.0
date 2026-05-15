@@ -1,10 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-
-type SpeakRequestPayload = {
-  text: string;
-};
+import { playLessonAudio } from "@/lib/audio/playLessonAudio";
 
 type SpeakState = {
   currentText: string | null;
@@ -14,7 +11,6 @@ type SpeakState = {
 
 const AUTO_READ_STORAGE_KEY = "levelup:autoReadEnabled";
 const LEGACY_AUTO_READ_STORAGE_KEY = "lul:auto_read_questions";
-const audioCache = new Map<string, string>();
 
 let currentAudio: HTMLAudioElement | null = null;
 let currentRequest: AbortController | null = null;
@@ -260,34 +256,7 @@ function fallbackSpeak(text: string) {
   synth.speak(utterance);
 }
 
-async function fetchTtsAudio(text: string) {
-  const cached = audioCache.get(text);
-  if (cached) return cached;
-
-  currentRequest?.abort();
-  const controller = new AbortController();
-  currentRequest = controller;
-
-  const response = await fetch("/api/tts", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ text } satisfies SpeakRequestPayload),
-    signal: controller.signal,
-  });
-
-  if (!response.ok) {
-    throw new Error(`TTS request failed: ${response.status}`);
-  }
-
-  const blob = await response.blob();
-  const objectUrl = URL.createObjectURL(blob);
-  audioCache.set(text, objectUrl);
-  return objectUrl;
-}
-
-export async function speak(text: string) {
+export async function speak(text: string, speechKey?: string) {
   if (typeof window === "undefined") return;
 
   const normalized = normalizeText(text);
@@ -299,10 +268,9 @@ export async function speak(text: string) {
   setSpeakState({ currentText: normalized, isSpeaking: true });
 
   try {
-    const audioUrl = await fetchTtsAudio(normalized);
+    const audio = await playLessonAudio(normalized, speechKey);
     if (activeSpeakToken !== speakToken) return;
 
-    const audio = new Audio(audioUrl);
     currentAudio = audio;
     audio.onended = () => {
       if (currentAudio === audio) {
