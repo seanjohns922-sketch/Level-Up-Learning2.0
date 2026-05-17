@@ -43,6 +43,23 @@ const LESSON1_ROTATION = [
   "same_path",
   "build_path",
 ] as const;
+const LESSON2_ROTATION = [
+  "follow_path",
+  "broken_trail",
+  "stepping_stones",
+  "count_forward_path",
+  "count_backward_path",
+  "number_maze",
+  "what_next_trail",
+  "what_before_trail",
+  "number_line_hops",
+  "complete_trail",
+  "portal_countdown",
+  "same_path_trails",
+  "river_crossing",
+  "quick_path_flash",
+  "build_trail",
+] as const;
 
 const memoryByLesson = new Map<string, Week8Memory>();
 
@@ -145,6 +162,13 @@ function pickLayout(memory: Week8Memory, preferred?: GroundPatternLayout[]) {
 
 function nextLesson1Kind(memory: Week8Memory) {
   const kind = LESSON1_ROTATION[memory.cursor % LESSON1_ROTATION.length]!;
+  memory.cursor += 1;
+  pushRecent(memory.recentKinds, kind, 6);
+  return kind;
+}
+
+function nextLesson2Kind(memory: Week8Memory) {
+  const kind = LESSON2_ROTATION[memory.cursor % LESSON2_ROTATION.length]!;
   memory.cursor += 1;
   pushRecent(memory.recentKinds, kind, 6);
   return kind;
@@ -417,6 +441,280 @@ function createBuildPathTask(lessonId: string, difficulty: Difficulty): Practice
   });
 }
 
+function createFollowPathTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const start = pickForwardStart(memory, difficulty, 3);
+  const target = start + 2;
+  const options = numeralOptions(target, memory);
+  return makeSequenceTask({
+    prompt: "Follow the number path.",
+    speakText: "Follow the number path.",
+    targetNumber: target,
+    sequence: [start, start + 1, "__", start + 3],
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: { correct: "You followed the path perfectly!", wrong: "Step along the trail one number at a time." },
+  });
+}
+
+function createBrokenTrailTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const start = pickForwardStart(memory, difficulty, 4);
+  const target = start + 1;
+  const options = numeralOptions(target, memory);
+  return makeSequenceTask({
+    prompt: "Fix the broken trail.",
+    speakText: "Fix the broken trail.",
+    targetNumber: target,
+    sequence: [start, "__", start + 2, start + 3],
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: { correct: "You fixed the trail!", wrong: "Find the number that repairs the route." },
+  });
+}
+
+function createSteppingStonesTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const start = pickForwardStart(memory, difficulty, 3);
+  const tiles = shuffle(Array.from({ length: 4 }, (_, index) => ({ id: `stones-${lessonId}-${start}-${index}`, numeral: start + index })));
+  pushRecent(memory.recentStarts, start, 6);
+  return makeOrderTapTask({
+    prompt: "Jump across the stepping stones.",
+    speakText: "Jump across the stepping stones in order.",
+    targetNumber: start + 3,
+    direction: "ASC",
+    tiles,
+    feedback: { correct: "Great stepping!", wrong: "Follow the stones in the right order." },
+  });
+}
+
+function createForwardPathTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const start = pickForwardStart(memory, difficulty, 4);
+  const target = start + 4;
+  const options = numeralOptions(target, memory);
+  return makeSequenceTask({
+    prompt: "Follow the forward path.",
+    speakText: "Follow the forward path.",
+    targetNumber: target,
+    sequence: [start, start + 1, start + 2, start + 3, "__"],
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: { correct: "Forward path complete!", wrong: "Keep moving forward one step each time." },
+  });
+}
+
+function createBackwardPathTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const start = pickBackwardStart(memory, difficulty, 3);
+  const target = start - 2;
+  const options = numeralOptions(target, memory);
+  return makeSequenceTask({
+    prompt: "Follow the backward path.",
+    speakText: "Follow the backward path.",
+    targetNumber: target,
+    sequence: [start, start - 1, "__", start - 3],
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: { correct: "Backward trail complete!", wrong: "Step back one number each time." },
+  });
+}
+
+function createNumberMazeTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const start = pickForwardStart(memory, difficulty, 4);
+  const tiles = shuffle(Array.from({ length: 5 }, (_, index) => ({ id: `maze-${lessonId}-${start}-${index}`, numeral: start + index })));
+  pushRecent(memory.recentStarts, start, 6);
+  return makeOrderTapTask({
+    prompt: "Find the path through the maze.",
+    speakText: "Find the path through the maze.",
+    targetNumber: start + 4,
+    direction: "ASC",
+    tiles,
+    feedback: { correct: "Maze solved!", wrong: "Choose the route that counts on in order." },
+  });
+}
+
+function createWhatNextTrailTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const start = pickForwardStart(memory, difficulty, 3);
+  const target = start + 3;
+  const options = numeralOptions(target, memory);
+  return makeSequenceTask({
+    prompt: "What comes next on the trail?",
+    speakText: "What comes next on the trail?",
+    targetNumber: target,
+    sequence: [start, start + 1, start + 2, "__"],
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: { correct: "You found the next step!", wrong: "Look for the next number on the trail." },
+  });
+}
+
+function createWhatBeforeTrailTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const target = pickForwardStart(memory, difficulty, 1) + 1;
+  const options = numeralOptions(target - 1, memory);
+  return makeMatchTask({
+    prompt: `What comes before ${target} on the trail?`,
+    speakText: `What comes before ${numberWord(target)} on the trail?`,
+    targetNumber: target - 1,
+    visualType: "ground-number-card",
+    promptType: "number_to_numeral",
+    shownNumeral: target,
+    options: options.map((option) => ({ id: option.id, kind: "numeral" as const, numeral: option.numeral })),
+    correctOptionId: options.find((option) => option.numeral === target - 1)!.id,
+    feedback: { correct: "That step comes before!", wrong: "Think about the step just before it." },
+  });
+}
+
+function createNumberLineHopsTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const start = pickForwardStart(memory, difficulty, 4);
+  const target = start + 2;
+  const options = numeralOptions(target, memory);
+  return makeSequenceTask({
+    prompt: "Complete the number line hops.",
+    speakText: "Complete the number line hops.",
+    targetNumber: target,
+    sequence: [start, start + 1, "__", start + 3],
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: { correct: "Hop path complete!", wrong: "Follow the hops in order." },
+  });
+}
+
+function createCompleteTrailTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const start = pickForwardStart(memory, difficulty, 4);
+  const target = start + 3;
+  const options = numeralOptions(target, memory);
+  return makeSequenceTask({
+    prompt: "Complete the trail.",
+    speakText: "Complete the trail.",
+    targetNumber: target,
+    sequence: [start, start + 1, start + 2, "__", start + 4],
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: { correct: "Trail complete!", wrong: "Use the path around the missing step." },
+  });
+}
+
+function createPortalCountdownTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const start = pickBackwardStart(memory, difficulty, 4);
+  const target = start - 4;
+  const options = numeralOptions(target, memory);
+  return makeSequenceTask({
+    prompt: "Count back to the portal.",
+    speakText: "Count back to the portal.",
+    targetNumber: target,
+    sequence: [start, start - 1, start - 2, start - 3, "__"],
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: { correct: "Portal countdown complete!", wrong: "Keep stepping back one each time." },
+  });
+}
+
+function createSamePathTrailsTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  return createSamePathTask(lessonId, difficulty);
+}
+
+function createRiverCrossingTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const descending = difficulty === "hard" || Math.random() < 0.4;
+  const start = descending ? pickBackwardStart(memory, difficulty, 3) : pickForwardStart(memory, difficulty, 3);
+  const values = descending
+    ? [start, start - 1, start - 2, start - 3]
+    : [start, start + 1, start + 2, start + 3];
+  pushRecent(memory.recentStarts, start, 6);
+  return makeOrderTapTask({
+    prompt: "Cross the number river.",
+    speakText: descending ? "Cross the number river counting back." : "Cross the number river counting on.",
+    targetNumber: values[values.length - 1] ?? start,
+    direction: descending ? "DESC" : "ASC",
+    tiles: shuffle(values.map((numeral, index) => ({ id: `river-${lessonId}-${start}-${index}`, numeral }))),
+    feedback: { correct: "River crossed!", wrong: "Follow the stepping stones in the correct order." },
+  });
+}
+
+function createQuickPathFlashTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const descending = difficulty === "hard" && Math.random() < 0.5;
+  const start = descending ? pickBackwardStart(memory, difficulty, 3) : pickForwardStart(memory, difficulty, 3);
+  const target = descending ? start - 2 : start + 2;
+  const options = numeralOptions(target, memory);
+  return makeFlashTask({
+    prompt: "Quick path flash. Which step is missing?",
+    speakText: "Quick path flash. Which step is missing?",
+    targetNumber: target,
+    displayNumber: descending ? start - 3 : start + 3,
+    objectType: pickObject(memory),
+    patternLayout: pickLayout(memory, ["symmetry", "domino"] as GroundPatternLayout[]),
+    revealType: "numeral",
+    revealMs: difficulty === "hard" ? 1000 : 1400,
+    promptAfterReveal: descending
+      ? `${start}, ${start - 1}, ?, ${start - 3}`
+      : `${start}, ${start + 1}, ?, ${start + 3}`,
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: { correct: "You spotted the missing trail step!", wrong: "Think about the path you just saw." },
+  });
+}
+
+function createBuildTrailTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const descending = difficulty === "hard" || Math.random() < 0.5;
+  const start = descending ? pickBackwardStart(memory, difficulty, 4) : pickForwardStart(memory, difficulty, 4);
+  const values = descending
+    ? [start, start - 1, start - 2, start - 3, start - 4].filter((value) => value >= 0)
+    : [start, start + 1, start + 2, start + 3, start + 4].filter((value) => value <= 20);
+  pushRecent(memory.recentStarts, start, 6);
+  return makeOrderTapTask({
+    prompt: "Build the number trail.",
+    speakText: descending ? "Build the number trail counting back." : "Build the number trail counting on.",
+    targetNumber: values[values.length - 1] ?? start,
+    direction: descending ? "DESC" : "ASC",
+    tiles: shuffle(values.map((numeral, index) => ({ id: `trail-${lessonId}-${start}-${index}`, numeral }))),
+    feedback: { correct: "Number trail built!", wrong: "Place the trail in the correct order." },
+  });
+}
+
+function generateLesson2Task(lessonId: string, difficulty: Difficulty, kind: (typeof LESSON2_ROTATION)[number]): PracticeTask {
+  switch (kind) {
+    case "follow_path":
+      return createFollowPathTask(lessonId, difficulty);
+    case "broken_trail":
+      return createBrokenTrailTask(lessonId, difficulty);
+    case "stepping_stones":
+      return createSteppingStonesTask(lessonId, difficulty);
+    case "count_forward_path":
+      return createForwardPathTask(lessonId, difficulty);
+    case "count_backward_path":
+      return createBackwardPathTask(lessonId, difficulty);
+    case "number_maze":
+      return createNumberMazeTask(lessonId, difficulty);
+    case "what_next_trail":
+      return createWhatNextTrailTask(lessonId, difficulty);
+    case "what_before_trail":
+      return createWhatBeforeTrailTask(lessonId, difficulty);
+    case "number_line_hops":
+      return createNumberLineHopsTask(lessonId, difficulty);
+    case "complete_trail":
+      return createCompleteTrailTask(lessonId, difficulty);
+    case "portal_countdown":
+      return createPortalCountdownTask(lessonId, difficulty);
+    case "same_path_trails":
+      return createSamePathTrailsTask(lessonId, difficulty);
+    case "river_crossing":
+      return createRiverCrossingTask(lessonId, difficulty);
+    case "quick_path_flash":
+      return createQuickPathFlashTask(lessonId, difficulty);
+    case "build_trail":
+      return createBuildTrailTask(lessonId, difficulty);
+  }
+}
+
 function generateLesson1Task(lessonId: string, difficulty: Difficulty, kind: (typeof LESSON1_ROTATION)[number]): PracticeTask {
   switch (kind) {
     case "missing_forward":
@@ -454,6 +752,10 @@ function generateLesson1Task(lessonId: string, difficulty: Difficulty, kind: (ty
 
 export function generatePrepWeek8Task(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
+  if (lessonId === "y0-w8-l2") {
+    const kind = nextLesson2Kind(memory);
+    return generateLesson2Task(lessonId, difficulty, kind);
+  }
   const kind = nextLesson1Kind(memory);
   return generateLesson1Task(lessonId, difficulty, kind);
 }
