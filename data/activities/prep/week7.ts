@@ -82,20 +82,20 @@ const LESSON2_ROTATION = [
   "which_is_bigger",
 ] as const;
 const LESSON3_ROTATION = [
-  "build_collection",
-  "build_groups",
+  "organise_collection",
+  "sort_into_groups",
+  "build_in_rows",
+  "ten_frame_plus_extras",
   "match_collection",
-  "build_to_20",
-  "numbot_group_builder",
-  "organise_objects",
+  "clean_up_collection",
+  "group_the_robots",
+  "sort_to_20",
   "how_many_more",
   "find_the_collection",
-  "build_teen_number",
-  "complete_the_frame",
   "quick_group_flash",
-  "group_the_robots",
+  "fill_the_trays",
+  "collection_station",
   "same_or_different",
-  "build_missing_part",
   "collection_sort",
 ] as const;
 
@@ -893,26 +893,49 @@ function createWhichIsBiggerTeenTask(lessonId: string, difficulty: Difficulty): 
   });
 }
 
-function createLesson3BuildCollectionTask(lessonId: string, difficulty: Difficulty): PracticeTask {
-  const target = pickTeenTarget(getMemory(lessonId), difficulty);
-  return createTeenBuilderTask(lessonId, difficulty, `Build ${target}.`, `Build ${numberWord(target)}.`, target, {
-    correct: `You built ${target}!`,
-    wrong: "Build the full 10 and then the extras."
-  });
-}
-
-function createLesson3BuildGroupsTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+function createLesson3OrganiseCollectionTask(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
   const target = pickTeenTarget(memory, difficulty);
   const options = closeNumeralOptions(target, memory);
   return makeMoveCountTask({
-    prompt: "Make groups to help count.",
-    speakText: "Make groups to help count, then choose the total.",
+    prompt: "Organise the collection to help count.",
+    speakText: "Organise the collection to help count, then choose the total.",
     targetNumber: target,
     objectType: pickObject(memory),
     options,
     correctOptionId: options.find((option) => option.numeral === target)!.id,
-    feedback: { correct: "Great grouping!", wrong: "Group the objects carefully, then count the total." },
+    feedback: { correct: "You organised the collection!", wrong: "Move the objects into tidy groups, then count again." },
+  });
+}
+
+function createLesson3SortIntoGroupsTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const target = pickTeenTarget(memory, difficulty);
+  const options = closeNumeralOptions(target, memory);
+  return makeMoveCountTask({
+    prompt: "Sort the objects into groups.",
+    speakText: "Sort the objects into groups, then count how many there are.",
+    targetNumber: target,
+    objectType: pickObject(memory),
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: { correct: "Great grouping!", wrong: "Sort the objects into groups to make counting easier." },
+  });
+}
+
+function createLesson3BuildInRowsTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const target = pickTeenTarget(getMemory(lessonId), difficulty);
+  return createTeenBuilderTask(lessonId, difficulty, `Build ${target} in rows.`, `Build ${numberWord(target)} in rows.`, target, {
+    correct: `You built ${target} in rows!`,
+    wrong: "Use neat rows to make the collection easier to count."
+  });
+}
+
+function createLesson3TenFrameExtrasTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const target = pickTeenTarget(getMemory(lessonId), difficulty);
+  return createTeenBuilderTask(lessonId, difficulty, `Make ${target} with a full ten and extras.`, `Make ${numberWord(target)} with a full ten and extras.`, target, {
+    correct: `You made ${target} with a full ten!`,
+    wrong: "Fill the ten frame first, then add the extras."
   });
 }
 
@@ -941,44 +964,26 @@ function createLesson3MatchCollectionTask(lessonId: string, difficulty: Difficul
   });
 }
 
-function createLesson3NumbotGroupBuilderTask(lessonId: string, difficulty: Difficulty): PracticeTask {
-  const target = pickTeenTarget(getMemory(lessonId), difficulty);
-  return makeBuildTask({
-    prompt: `Numbot says build ${target}.`,
-    speakText: `Numbot says build ${numberWord(target)} energy cells.`,
-    targetNumber: target,
-    objectType: "energy_orbs",
-    compareMode: "exact",
-    maxBuild: 20,
-    referenceGroup: {
-      quantity: target,
-      objectType: "energy_orbs",
-      patternLayout: "ten_frame",
-    },
-    feedback: { correct: `You built ${target}!`, wrong: "Use the full ten and the extras to power Numbot." },
-  });
-}
-
 function createLesson3OrganiseObjectsTask(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
   const target = pickTeenTarget(memory, difficulty);
   const options = closeNumeralOptions(target, memory);
   return makeMoveCountTask({
-    prompt: "Organise the objects, then count.",
-    speakText: "Organise the objects into rows or groups, then count them.",
+    prompt: "Clean up the collection.",
+    speakText: "Clean up the collection by moving the objects into neat groups, then count them.",
     targetNumber: target,
     objectType: pickObject(memory),
     options,
     correctOptionId: options.find((option) => option.numeral === target)!.id,
-    feedback: { correct: "You organised the collection perfectly!", wrong: "Move the objects into neat groups, then count again." },
+    feedback: { correct: "The collection is tidy and easy to count!", wrong: "Move the objects into tidy rows or groups, then count again." },
   });
 }
 
 function createLesson3CompleteFrameTask(lessonId: string, difficulty: Difficulty): PracticeTask {
   const target = pickTeenTarget(getMemory(lessonId), difficulty);
-  return createTeenBuilderTask(lessonId, difficulty, `Complete the frame to make ${target}.`, `Complete the frame to make ${numberWord(target)}.`, target, {
-    correct: `You completed ${target}!`,
-    wrong: "Fill the ten frame and then add the right extras."
+  return createTeenBuilderTask(lessonId, difficulty, `Fill the trays to make ${target}.`, `Fill the trays to make ${numberWord(target)}.`, target, {
+    correct: `You filled the trays for ${target}!`,
+    wrong: "Fill the trays in order to make counting easier."
   });
 }
 
@@ -987,8 +992,8 @@ function createLesson3QuickGroupFlashTask(lessonId: string, difficulty: Difficul
   const memory = getMemory(lessonId);
   const options = closeNumeralOptions(target, memory).map((option) => ({ id: option.id, numeral: option.numeral }));
   return makeFlashTask({
-    prompt: "Quick group flash. How many did you see?",
-    speakText: "Quick group flash. How many did you see?",
+    prompt: "Quick sort flash. Which collection was organised to count best?",
+    speakText: "Quick sort flash. Which collection was organised to count best?",
     targetNumber: target,
     objectType: pickObject(memory),
     patternLayout: "ten_frame",
@@ -996,7 +1001,7 @@ function createLesson3QuickGroupFlashTask(lessonId: string, difficulty: Difficul
     revealMs: WEEK7_QUICK_TEEN_REVEAL_MS[difficulty],
     options,
     correctOptionId: options.find((option) => option.numeral === target)!.id,
-    feedback: { correct: "You spotted the collection!", wrong: "Look for the full 10 and the extras." },
+    feedback: { correct: "You spotted the organised collection!", wrong: "Look for the full 10 and the extras." },
   });
 }
 
@@ -1005,38 +1010,28 @@ function createLesson3GroupRobotsTask(lessonId: string, difficulty: Difficulty):
   const target = pickTeenTarget(memory, difficulty);
   const options = closeNumeralOptions(target, memory);
   return makeMoveCountTask({
-    prompt: "Group the robots, then count.",
+    prompt: "Group the robots to help count.",
     speakText: "Group the robots to help count them, then choose the total.",
     targetNumber: target,
     objectType: "robot_tokens",
     options,
     correctOptionId: options.find((option) => option.numeral === target)!.id,
-    feedback: { correct: "The robots are grouped and counted!", wrong: "Group the robots neatly, then count again." },
+    feedback: { correct: "The robots are grouped and easy to count!", wrong: "Group the robots neatly, then count again." },
   });
 }
 
-function createLesson3BuildMissingPartTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+function createLesson3CollectionStationTask(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
   const target = pickTeenTarget(memory, difficulty);
-  const extras = target - 10;
-  const options = extraCountOptions(extras, memory).map((option) => ({
-    id: option.id,
-    kind: "numeral" as const,
-    numeral: option.numeral,
-  }));
-  return makeMatchTask({
-    prompt: `10 and how many more makes ${target}?`,
-    speakText: `10 and how many more makes ${numberWord(target)}?`,
-    targetNumber: extras,
-    visualType: "ground-quantity-card",
-    promptType: "group_to_numeral",
-    shownNumeral: target,
-    shownQuantity: 10,
+  const options = closeNumeralOptions(target, memory);
+  return makeMoveCountTask({
+    prompt: "Move the objects into the sorting station.",
+    speakText: "Move the objects into the sorting station to help count them.",
+    targetNumber: target,
     objectType: pickObject(memory),
-    patternLayout: "ten_frame",
     options,
-    correctOptionId: options.find((option) => option.numeral === extras)!.id,
-    feedback: { correct: `Yes, 10 and ${extras} more makes ${target}!`, wrong: "Count the extras after the full 10." },
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: { correct: "The sorting station is organised!", wrong: "Move the objects into the station in tidy groups." },
   });
 }
 
@@ -1141,34 +1136,34 @@ function generateLesson2Task(lessonId: string, difficulty: Difficulty, kind: (ty
 
 function generateLesson3Task(lessonId: string, difficulty: Difficulty, kind: (typeof LESSON3_ROTATION)[number]): PracticeTask {
   switch (kind) {
-    case "build_collection":
-      return createLesson3BuildCollectionTask(lessonId, difficulty);
-    case "build_groups":
-      return createLesson3BuildGroupsTask(lessonId, difficulty);
+    case "organise_collection":
+      return createLesson3OrganiseCollectionTask(lessonId, difficulty);
+    case "sort_into_groups":
+      return createLesson3SortIntoGroupsTask(lessonId, difficulty);
+    case "build_in_rows":
+      return createLesson3BuildInRowsTask(lessonId, difficulty);
+    case "ten_frame_plus_extras":
+      return createLesson3TenFrameExtrasTask(lessonId, difficulty);
     case "match_collection":
       return createLesson3MatchCollectionTask(lessonId, difficulty);
-    case "build_to_20":
-      return createBuildTo20Task(lessonId, difficulty);
-    case "numbot_group_builder":
-      return createLesson3NumbotGroupBuilderTask(lessonId, difficulty);
-    case "organise_objects":
+    case "clean_up_collection":
       return createLesson3OrganiseObjectsTask(lessonId, difficulty);
+    case "group_the_robots":
+      return createLesson3GroupRobotsTask(lessonId, difficulty);
+    case "sort_to_20":
+      return createBuildTo20Task(lessonId, difficulty);
     case "how_many_more":
       return createHowManyMoreTask(lessonId);
     case "find_the_collection":
       return createFindTeenNumberTask(lessonId, difficulty);
-    case "build_teen_number":
-      return createLesson3BuildCollectionTask(lessonId, difficulty);
-    case "complete_the_frame":
-      return createLesson3CompleteFrameTask(lessonId, difficulty);
     case "quick_group_flash":
       return createLesson3QuickGroupFlashTask(lessonId, difficulty);
-    case "group_the_robots":
-      return createLesson3GroupRobotsTask(lessonId, difficulty);
+    case "fill_the_trays":
+      return createLesson3CompleteFrameTask(lessonId, difficulty);
+    case "collection_station":
+      return createLesson3CollectionStationTask(lessonId, difficulty);
     case "same_or_different":
       return createSameOrDifferentTeenTask(lessonId, difficulty);
-    case "build_missing_part":
-      return createLesson3BuildMissingPartTask(lessonId, difficulty);
     case "collection_sort":
       return createLesson3CollectionSortTask(lessonId, difficulty);
   }

@@ -251,11 +251,11 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
       buildLesson(
         7,
         3,
-        "Build Groups to 20",
-        "Build and organise collections up to 20 using grouped structures, teen-number visuals, and efficient counting strategies.",
-        ["Build the collection", "Group to 20", "Organise and count"],
+        "Organise Collections to 20",
+        "Organise, sort, and build collections up to 20 using grouped structures, teen-number visuals, and efficient counting strategies.",
+        ["Organise the collection", "Sort into groups", "Collection station"],
         ["AC9MFN01", "AC9MFN02", "AC9MFN03"],
-        "Group Builder Challenge"
+        "Collection Sorting Station"
       ),
     ],
   },
