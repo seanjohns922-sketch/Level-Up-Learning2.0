@@ -3797,6 +3797,449 @@ function buildPrepWeek6WeeklyQuizQuestions(
   return questions;
 }
 
+function buildPrepWeek7WeeklyQuizQuestions(
+  questionsPerLesson: number
+): QuizQuestion[] {
+  const totalExpected = questionsPerLesson * 3;
+  const targetHistory: number[] = [];
+  const objectHistory: GroundObjectType[] = [];
+  const positionHistory: number[] = [];
+  const layoutHistory: GroundPatternLayout[] = [];
+  type GroundPatternLayout = "dice" | "ten_frame" | "domino" | "finger" | "symmetry";
+
+  const TEEN_POOL = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20] as const;
+  const COUNT_POOL = [12, 13, 14, 15, 16, 17, 18, 19] as const;
+
+  function teenWord(value: number) {
+    const words = [
+      "zero",
+      "one",
+      "two",
+      "three",
+      "four",
+      "five",
+      "six",
+      "seven",
+      "eight",
+      "nine",
+      "ten",
+      "eleven",
+      "twelve",
+      "thirteen",
+      "fourteen",
+      "fifteen",
+      "sixteen",
+      "seventeen",
+      "eighteen",
+      "nineteen",
+      "twenty",
+    ];
+    return words[value] ?? String(value);
+  }
+
+  function reservePosition(position: number) {
+    positionHistory.push(position);
+    if (positionHistory.length > 5) positionHistory.shift();
+  }
+
+  function nextTarget(pool: readonly number[] = TEEN_POOL) {
+    const target = chooseGroundRecentSafe([...pool], targetHistory);
+    targetHistory.push(target);
+    if (targetHistory.length > 6) targetHistory.shift();
+    return target;
+  }
+
+  function nextObjectType(allowed: GroundObjectType[] = GROUND_OBJECT_TYPES) {
+    const objectType = chooseGroundRecentSafe(allowed, objectHistory);
+    objectHistory.push(objectType);
+    if (objectHistory.length > 5) objectHistory.shift();
+    return objectType;
+  }
+
+  function nextLayout(quantity: number, preferred?: GroundPatternLayout[]) {
+    const pool: GroundPatternLayout[] = preferred
+      ? preferred
+      : quantity >= 11
+        ? ["ten_frame", "symmetry"]
+        : ["domino", "ten_frame", "symmetry"];
+    const layout = chooseGroundRecentSafe(pool, layoutHistory);
+    layoutHistory.push(layout);
+    if (layoutHistory.length > 5) layoutHistory.shift();
+    return layout;
+  }
+
+  function makeTeenNumeralChoiceOptions(correctNumber: number, optionCount = 3) {
+    const nearby = shuffle(TEEN_POOL.filter((value) => value !== correctNumber && Math.abs(value - correctNumber) <= 2));
+    const fallback = shuffle(TEEN_POOL.filter((value) => value !== correctNumber));
+    const distractors = (nearby.length >= optionCount - 1 ? nearby : fallback).slice(0, optionCount - 1);
+    const chosenPosition = chooseGroundRecentSafe(Array.from({ length: optionCount }, (_, index) => index), positionHistory);
+    const values = Array.from({ length: optionCount }, (_, index) =>
+      index === chosenPosition ? correctNumber : distractors[index > chosenPosition ? index - 1 : index]
+    );
+    return {
+      options: values.map((value, index) => ({ id: `teen-num-${index}-${value}`, numeral: value! })),
+      correctOptionId: `teen-num-${chosenPosition}-${correctNumber}`,
+      correctPosition: chosenPosition,
+    };
+  }
+
+  function makeTeenQuantityOptions(correctNumber: number, objectType: GroundObjectType) {
+    const nearby = shuffle(TEEN_POOL.filter((value) => value !== correctNumber && Math.abs(value - correctNumber) <= 2));
+    const fallback = shuffle(TEEN_POOL.filter((value) => value !== correctNumber));
+    const distractors = (nearby.length >= 2 ? nearby : fallback).slice(0, 2);
+    const chosenPosition = chooseGroundRecentSafe([0, 1, 2], positionHistory);
+    const values = Array.from({ length: 3 }, (_, index) =>
+      index === chosenPosition ? correctNumber : distractors[index > chosenPosition ? index - 1 : index]
+    );
+    return {
+      options: values.map((value, index) => ({
+        id: `teen-qty-${index}-${value}`,
+        kind: "quantity" as const,
+        quantity: value!,
+        objectType,
+        patternLayout: nextLayout(value!, ["ten_frame", "symmetry"]),
+      })),
+      correctOptionId: `teen-qty-${chosenPosition}-${correctNumber}`,
+      correctPosition: chosenPosition,
+    };
+  }
+
+  function makeExtraOptions(correctExtra: number) {
+    const pool = shuffle([correctExtra, Math.max(1, correctExtra - 1), Math.min(10, correctExtra + 1), Math.min(10, correctExtra + 2)]);
+    const unique = Array.from(new Set(pool)).slice(0, 3);
+    while (unique.length < 3) {
+      const filler = Math.max(1, Math.min(10, correctExtra + unique.length));
+      if (!unique.includes(filler)) unique.push(filler);
+    }
+    const chosenPosition = chooseGroundRecentSafe([0, 1, 2], positionHistory);
+    const values = Array.from({ length: 3 }, (_, index) =>
+      index === chosenPosition ? correctExtra : unique.filter((value) => value !== correctExtra)[index > chosenPosition ? index - 1 : index]
+    );
+    return {
+      options: values.map((value, index) => ({ id: `extra-${index}-${value}`, numeral: value! })),
+      correctOptionId: `extra-${chosenPosition}-${correctExtra}`,
+      correctPosition: chosenPosition,
+    };
+  }
+
+  function makeLesson1Question(index: number, variant: "count" | "tap" | "find" | "flash" | "more") : QuizQuestion {
+    if (variant === "count") {
+      const targetNumber = nextTarget(COUNT_POOL);
+      const objectType = nextObjectType();
+      const choice = makeTeenNumeralChoiceOptions(targetNumber);
+      reservePosition(choice.correctPosition);
+      return buildGroundQuizQuestion(`q${index}`, 1, "ground_w7_l1_count_collection", {
+        kind: "groundMatch",
+        prompt: `How many ${GROUND_OBJECT_LABELS[objectType]} are there?`,
+        speakText: `How many ${GROUND_OBJECT_LABELS[objectType]} are there?`,
+        targetNumber,
+        visualType: "ground-quantity-card",
+        promptType: "group_to_numeral",
+        objectType,
+        patternLayout: nextLayout(targetNumber, ["symmetry", "ten_frame"]),
+        shownQuantity: targetNumber,
+        options: choice.options.map((option) => ({ id: option.id, kind: "numeral" as const, numeral: option.numeral })),
+        correctOptionId: choice.correctOptionId,
+        feedback: { correct: `You counted ${targetNumber} carefully!`, wrong: "Count each object once." },
+      });
+    }
+
+    if (variant === "tap") {
+      const targetNumber = nextTarget([11, 12, 13, 14, 15, 16, 17] as const);
+      const objectType = nextObjectType();
+      const choice = makeTeenNumeralChoiceOptions(targetNumber);
+      reservePosition(choice.correctPosition);
+      return buildGroundQuizQuestion(`q${index}`, 1, "ground_w7_l1_tap_count", {
+        kind: "groundTapCount",
+        prompt: "Tap to count.",
+        speakText: "Tap to count each object once.",
+        targetNumber,
+        objectType,
+        options: choice.options,
+        correctOptionId: choice.correctOptionId,
+        feedback: { correct: `Great counting! You found ${targetNumber}.`, wrong: "Tap each object once." },
+      });
+    }
+
+    if (variant === "find") {
+      const targetNumber = nextTarget(COUNT_POOL);
+      const objectType = nextObjectType();
+      const choice = makeTeenQuantityOptions(targetNumber, objectType);
+      reservePosition(choice.correctPosition);
+      return buildGroundQuizQuestion(`q${index}`, 1, "ground_w7_l1_find_collection", {
+        kind: "groundMatch",
+        prompt: `Which collection shows ${targetNumber}?`,
+        speakText: `Which collection shows ${teenWord(targetNumber)}?`,
+        targetNumber,
+        visualType: "ground-quantity-card",
+        promptType: "numeral_to_group",
+        shownNumeral: targetNumber,
+        objectType,
+        options: choice.options,
+        correctOptionId: choice.correctOptionId,
+        feedback: { correct: `You found ${targetNumber}!`, wrong: "Count the objects carefully." },
+      });
+    }
+
+    if (variant === "flash") {
+      const targetNumber = nextTarget([14, 15, 16, 17, 18] as const);
+      const objectType = nextObjectType();
+      const choice = makeTeenNumeralChoiceOptions(targetNumber);
+      reservePosition(choice.correctPosition);
+      return buildGroundQuizQuestion(`q${index}`, 1, "ground_w7_l1_quick_count", {
+        kind: "groundFlash",
+        prompt: "How many did you see?",
+        speakText: "How many did you see?",
+        targetNumber,
+        objectType,
+        patternLayout: nextLayout(targetNumber, ["ten_frame", "symmetry"]),
+        revealType: "objects",
+        revealMs: 1800,
+        options: choice.options,
+        correctOptionId: choice.correctOptionId,
+        feedback: { correct: "You counted carefully!", wrong: "Look for groups to help you count." },
+      });
+    }
+
+    const shownQuantity = nextTarget([14, 15, 16, 17, 18, 19] as const);
+    const missing = 20 - shownQuantity;
+    const objectType = nextObjectType();
+    const choice = makeExtraOptions(missing);
+    reservePosition(choice.correctPosition);
+    return buildGroundQuizQuestion(`q${index}`, 1, "ground_w7_l1_more_to_20", {
+      kind: "groundMatch",
+      prompt: "How many more to make 20?",
+      speakText: "How many more to make 20?",
+      targetNumber: missing,
+      visualType: "ground-quantity-card",
+      promptType: "group_to_numeral",
+      shownNumeral: 20,
+      shownQuantity,
+      objectType,
+      patternLayout: "ten_frame",
+      options: choice.options.map((option) => ({ id: option.id, kind: "numeral" as const, numeral: option.numeral })),
+      correctOptionId: choice.correctOptionId,
+      feedback: { correct: `Yes, ${shownQuantity} and ${missing} makes 20!`, wrong: "Count how many more are needed." },
+    });
+  }
+
+  function makeLesson2Question(index: number, variant: "visual" | "more_than_10" | "find" | "build" | "same") : QuizQuestion {
+    if (variant === "visual") {
+      const targetNumber = nextTarget(TEEN_POOL);
+      const objectType = nextObjectType();
+      const choice = makeTeenNumeralChoiceOptions(targetNumber);
+      reservePosition(choice.correctPosition);
+      return buildGroundQuizQuestion(`q${index}`, 2, "ground_w7_l2_visual_match", {
+        kind: "groundMatch",
+        prompt: "What number is this?",
+        speakText: "What number is this?",
+        targetNumber,
+        visualType: "ground-quantity-card",
+        promptType: "group_to_numeral",
+        objectType,
+        patternLayout: "ten_frame",
+        shownQuantity: targetNumber,
+        options: choice.options.map((option) => ({ id: option.id, kind: "numeral" as const, numeral: option.numeral })),
+        correctOptionId: choice.correctOptionId,
+        feedback: { correct: `Yes, that is ${targetNumber}!`, wrong: "See the full 10 and the extras." },
+      });
+    }
+
+    if (variant === "more_than_10") {
+      const targetNumber = nextTarget([13, 14, 15, 16, 17, 18, 19, 20] as const);
+      const extras = targetNumber - 10;
+      const objectType = nextObjectType();
+      const choice = makeExtraOptions(extras);
+      reservePosition(choice.correctPosition);
+      return buildGroundQuizQuestion(`q${index}`, 2, "ground_w7_l2_more_than_10", {
+        kind: "groundMatch",
+        prompt: `How many more than 10 is ${targetNumber}?`,
+        speakText: `How many more than 10 is ${teenWord(targetNumber)}?`,
+        targetNumber: extras,
+        visualType: "ground-quantity-card",
+        promptType: "group_to_numeral",
+        objectType,
+        patternLayout: "ten_frame",
+        shownQuantity: targetNumber,
+        options: choice.options.map((option) => ({ id: option.id, kind: "numeral" as const, numeral: option.numeral })),
+        correctOptionId: choice.correctOptionId,
+        feedback: { correct: `Yes, ${targetNumber} is 10 and ${extras} more.`, wrong: "Count the extras after 10." },
+      });
+    }
+
+    if (variant === "find") {
+      const targetNumber = nextTarget(TEEN_POOL);
+      const objectType = nextObjectType();
+      const choice = makeTeenQuantityOptions(targetNumber, objectType);
+      reservePosition(choice.correctPosition);
+      return buildGroundQuizQuestion(`q${index}`, 2, "ground_w7_l2_find_teen", {
+        kind: "groundMatch",
+        prompt: `Find ${targetNumber}.`,
+        speakText: `Find ${teenWord(targetNumber)}.`,
+        targetNumber,
+        visualType: "ground-quantity-card",
+        promptType: "numeral_to_group",
+        shownNumeral: targetNumber,
+        objectType,
+        options: choice.options,
+        correctOptionId: choice.correctOptionId,
+        feedback: { correct: `You found ${targetNumber}!`, wrong: "Look for the full 10 and the correct extras." },
+      });
+    }
+
+    if (variant === "build") {
+      const targetNumber = nextTarget([13, 14, 15, 16, 17, 18] as const);
+      return buildGroundQuizQuestion(`q${index}`, 2, "ground_w7_l2_build_teen", {
+        kind: "groundBuild",
+        prompt: `Build ${targetNumber}.`,
+        speakText: `Build ${teenWord(targetNumber)}.`,
+        targetNumber,
+        objectType: nextObjectType(),
+        compareMode: "exact",
+        maxBuild: 20,
+        feedback: { correct: `You built ${targetNumber}!`, wrong: "Build the teen number carefully." },
+      });
+    }
+
+    const first = nextTarget([14, 15, 16, 17, 18, 19] as const);
+    const same = Math.random() < 0.5;
+    const secondPool = same ? [first] : TEEN_POOL.filter((value) => value !== first && Math.abs(value - first) <= 2);
+    const second = same ? first : chooseGroundRecentSafe([...secondPool], targetHistory);
+    targetHistory.push(second);
+    if (targetHistory.length > 6) targetHistory.shift();
+    return buildGroundQuizQuestion(`q${index}`, 2, "ground_w7_l2_same_or_different", {
+      kind: "groundCompare",
+      prompt: "Do these show the same number?",
+      speakText: "Do these show the same number?",
+      targetNumber: first,
+      comparisonType: "equal",
+      helperVariant: "ten_frame",
+      groups: [
+        { id: `same-left-${index}`, quantity: first, objectType: nextObjectType(), patternLayout: "ten_frame" },
+        { id: `same-right-${index}`, quantity: second, objectType: nextObjectType(), patternLayout: "ten_frame" },
+      ],
+      feedback: { correct: same ? "Yes, they match!" : "Correct, they are different!", wrong: "Look at the extras after 10." },
+    });
+  }
+
+  function makeLesson3Question(index: number, variant: "organise" | "sort" | "same_total" | "robots" | "ordered_match") : QuizQuestion {
+    if (variant === "organise") {
+      const targetNumber = nextTarget([14, 15, 16, 17, 18] as const);
+      const objectType = nextObjectType();
+      const choice = makeTeenNumeralChoiceOptions(targetNumber);
+      reservePosition(choice.correctPosition);
+      return buildGroundQuizQuestion(`q${index}`, 3, "ground_w7_l3_organise_collection", {
+        kind: "groundMoveCount",
+        prompt: "Organise the collection to help count.",
+        speakText: "Organise the collection to help count.",
+        targetNumber,
+        objectType,
+        options: choice.options,
+        correctOptionId: choice.correctOptionId,
+        feedback: { correct: "You organised the collection well!", wrong: "Move the objects into tidy groups, then count again." },
+      });
+    }
+
+    if (variant === "sort") {
+      const targetNumber = nextTarget([15, 16, 17, 18, 19] as const);
+      const objectType = nextObjectType();
+      const choice = makeTeenNumeralChoiceOptions(targetNumber);
+      reservePosition(choice.correctPosition);
+      return buildGroundQuizQuestion(`q${index}`, 3, "ground_w7_l3_sort_groups", {
+        kind: "groundMoveCount",
+        prompt: "Sort the objects into groups.",
+        speakText: "Sort the objects into groups to make counting easier.",
+        targetNumber,
+        objectType,
+        options: choice.options,
+        correctOptionId: choice.correctOptionId,
+        feedback: { correct: "Great grouping!", wrong: "Sort the objects into tidy groups, then count again." },
+      });
+    }
+
+    if (variant === "same_total") {
+      const first = nextTarget([14, 15, 16, 17, 18] as const);
+      const same = Math.random() < 0.5;
+      const secondChoices = same ? [first] : TEEN_POOL.filter((value) => value !== first && Math.abs(value - first) <= 2);
+      const second = same ? first : chooseGroundRecentSafe([...secondChoices], targetHistory);
+      targetHistory.push(second);
+      if (targetHistory.length > 6) targetHistory.shift();
+      return buildGroundQuizQuestion(`q${index}`, 3, "ground_w7_l3_same_total", {
+        kind: "groundCompare",
+        prompt: "Do these show the same amount?",
+        speakText: "Do these show the same amount?",
+        targetNumber: first,
+        comparisonType: "equal",
+        helperVariant: "ten_frame",
+        groups: [
+          { id: `messy-${index}`, quantity: first, objectType: nextObjectType(), patternLayout: undefined },
+          { id: `organised-${index}`, quantity: second, objectType: nextObjectType(), patternLayout: "ten_frame" },
+        ],
+        feedback: { correct: same ? "Yes, they show the same amount!" : "Correct, they do not match!", wrong: "Count both collections carefully." },
+      });
+    }
+
+    if (variant === "robots") {
+      const targetNumber = nextTarget([13, 14, 15, 16, 17, 18] as const);
+      const choice = makeTeenNumeralChoiceOptions(targetNumber);
+      reservePosition(choice.correctPosition);
+      return buildGroundQuizQuestion(`q${index}`, 3, "ground_w7_l3_group_robots", {
+        kind: "groundMoveCount",
+        prompt: "Group the robots to help count.",
+        speakText: "Group the robots to help count.",
+        targetNumber,
+        objectType: "robot_tokens",
+        options: choice.options,
+        correctOptionId: choice.correctOptionId,
+        feedback: { correct: "Great grouping!", wrong: "Group the robots neatly, then count again." },
+      });
+    }
+
+    const values = shuffle([nextTarget([14, 15, 16] as const), nextTarget([17, 18, 19] as const), nextTarget([18, 19, 20] as const)]).slice(0, 3).sort((a, b) => a - b);
+    const groups = shuffle(values).map((quantity, optionIndex) => ({
+      id: `order-${index}-${optionIndex}-${quantity}`,
+      quantity,
+      objectType: nextObjectType(),
+      patternLayout: "ten_frame" as const,
+    }));
+    return buildGroundQuizQuestion(`q${index}`, 3, "ground_w7_l3_collection_sort", {
+      kind: "groundCompare",
+      prompt: "Put the collections in order.",
+      speakText: "Put the collections in order from least to greatest.",
+      targetNumber: values[values.length - 1]!,
+      comparisonType: "order",
+      orderDirection: "ASC",
+      groups,
+      correctOrderIds: [...groups].sort((a, b) => a.quantity - b.quantity).map((group) => group.id),
+      feedback: { correct: "Great collection sorting!", wrong: "Start with the smallest organised collection." },
+    });
+  }
+
+  const questions: QuizQuestion[] = [
+    makeLesson1Question(1, "count"),
+    makeLesson1Question(2, "tap"),
+    makeLesson1Question(3, "find"),
+    makeLesson1Question(4, "flash"),
+    makeLesson1Question(5, "more"),
+    makeLesson2Question(6, "visual"),
+    makeLesson2Question(7, "more_than_10"),
+    makeLesson2Question(8, "find"),
+    makeLesson2Question(9, "build"),
+    makeLesson2Question(10, "same"),
+    makeLesson3Question(11, "organise"),
+    makeLesson3Question(12, "sort"),
+    makeLesson3Question(13, "same_total"),
+    makeLesson3Question(14, "robots"),
+    makeLesson3Question(15, "ordered_match"),
+  ];
+
+  if (questions.length !== totalExpected) {
+    throw new Error(`[GroundWeeklyQuiz] Week 7 expected ${totalExpected} questions, received ${questions.length}.`);
+  }
+
+  return questions;
+}
+
 function toQuizQuestionFromYear2Data(
   questionData: Year2QuestionData,
   lessonNumber: number,
@@ -5998,6 +6441,10 @@ function SessionPage() {
       return buildPrepWeek6WeeklyQuizQuestions(questionsPerLesson);
     }
 
+    if (year === "Prep" && Number(week) === 7) {
+      return buildPrepWeek7WeeklyQuizQuestions(questionsPerLesson);
+    }
+
     if (
       year === "Year 2" ||
       year === "Year 3" ||
@@ -6351,10 +6798,14 @@ function SessionPage() {
   ]);
   const quizCompletionTitle = year === "Prep" && Number(week) === 6
     ? "Number Builder Challenge Complete!"
-    : "Quiz Results";
+    : year === "Prep" && Number(week) === 7
+      ? "Teen Number Challenge Complete!"
+      : "Quiz Results";
   const quizCompletionMessage = year === "Prep" && Number(week) === 6
     ? "You built and split the numbers perfectly!"
-    : "Keep building across all three lessons.";
+    : year === "Prep" && Number(week) === 7
+      ? "You mastered collections and teen numbers!"
+      : "Keep building across all three lessons.";
 
   const lessonBreakdown = useMemo(
     () =>
