@@ -287,9 +287,10 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         8,
         3,
         "Order Numbers to 20",
-        "Place numbers to 20 in the correct order.",
-        ["Order cards", "Number line build", "Line up to 20"],
-        ["AC9MFN01", "AC9MFN03"]
+        "Compare and sort numbers to 20 from least to greatest and greatest to least using sorting trays, ladders, race tracks, and quick ordering challenges.",
+        ["Order the numbers", "Number podium", "Which number is biggest?"],
+        ["AC9MFN01", "AC9MFN03"],
+        "Number Order Arena"
       ),
     ],
   },

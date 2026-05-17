@@ -355,6 +355,8 @@ export type PracticeTask = (
       startNumber?: number;
       pathNumerals?: number[];
       direction?: "ASC" | "DESC";
+      uiMode?: "path" | "order";
+      badgeLabel?: string;
       tiles: Array<{
         id: string;
         numeral: number;

@@ -1230,6 +1230,7 @@ export function GroundOrderTapTaskCard({
 }) {
   const [progressIndex, setProgressIndex] = useState(0);
   const direction = task.direction ?? "ASC";
+  const isOrderMode = task.uiMode === "order";
   const orderedNumerals = (task.pathNumerals?.length ? [...task.pathNumerals] : [...task.tiles].map((tile) => tile.numeral))
     .sort((a, b) => (direction === "DESC" ? b - a : a - b));
   const expectedNumeral = orderedNumerals[progressIndex] ?? orderedNumerals[orderedNumerals.length - 1] ?? task.targetNumber;
@@ -1254,14 +1255,14 @@ export function GroundOrderTapTaskCard({
   }
 
   return (
-    <GroundMiniShell badge="Number Path" prompt={task.prompt} speakText={task.speakText}>
+    <GroundMiniShell badge={task.badgeLabel ?? (isOrderMode ? "Number Order" : "Number Path")} prompt={task.prompt} speakText={task.speakText}>
       <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
         <GroundCountBadge count={progressIndex} target={orderedNumerals.length} />
         <div className="mb-4 rounded-[20px] border border-cyan-200 bg-cyan-50 px-4 py-3 text-center shadow-sm">
-          <div className="text-[11px] font-black uppercase tracking-[0.18em] text-teal-700">Numbot Trail</div>
+          <div className="text-[11px] font-black uppercase tracking-[0.18em] text-teal-700">{isOrderMode ? "Sorting Tray" : "Numbot Trail"}</div>
           <div className="mt-2 flex items-center justify-center gap-3 text-base font-black text-teal-900 sm:text-lg">
-            <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-teal-300 bg-white text-2xl shadow-sm">🤖</span>
-            <span>On {currentNumeral}</span>
+            <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-teal-300 bg-white text-2xl shadow-sm">{isOrderMode ? "🏁" : "🤖"}</span>
+            <span>{isOrderMode ? `Placed ${progressIndex}` : `On ${currentNumeral}`}</span>
             <span className="text-cyan-400">→</span>
             <span className="rounded-full bg-white px-4 py-2 text-cyan-700 shadow-sm">Next {expectedNumeral}</span>
           </div>

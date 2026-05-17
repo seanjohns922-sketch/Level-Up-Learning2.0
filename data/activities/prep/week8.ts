@@ -60,6 +60,23 @@ const LESSON2_ROTATION = [
   "same_journey",
   "fast_path_challenge",
 ] as const;
+const LESSON3_ROTATION = [
+  "order_numbers",
+  "least_to_greatest",
+  "greatest_to_least",
+  "number_podium",
+  "which_biggest",
+  "which_smallest",
+  "number_race_track",
+  "sort_teen_numbers",
+  "number_ladder_sort",
+  "order_collections",
+  "quick_sort",
+  "same_order",
+  "build_order",
+  "which_comes_first",
+  "number_line_sort",
+] as const;
 
 const memoryByLesson = new Map<string, Week8Memory>();
 
@@ -169,6 +186,13 @@ function nextLesson1Kind(memory: Week8Memory) {
 
 function nextLesson2Kind(memory: Week8Memory) {
   const kind = LESSON2_ROTATION[memory.cursor % LESSON2_ROTATION.length]!;
+  memory.cursor += 1;
+  pushRecent(memory.recentKinds, kind, 6);
+  return kind;
+}
+
+function nextLesson3Kind(memory: Week8Memory) {
+  const kind = LESSON3_ROTATION[memory.cursor % LESSON3_ROTATION.length]!;
   memory.cursor += 1;
   pushRecent(memory.recentKinds, kind, 6);
   return kind;
@@ -846,6 +870,149 @@ function createFastPathChallengeTask(lessonId: string, difficulty: Difficulty): 
   return createQuickPathFlashTask(lessonId, difficulty);
 }
 
+function orderingPool(difficulty: Difficulty, teenOnly = false) {
+  if (teenOnly) return Array.from({ length: 10 }, (_, index) => index + 11);
+  if (difficulty === "easy") return Array.from({ length: 13 }, (_, index) => index + 6);
+  if (difficulty === "medium") return Array.from({ length: 13 }, (_, index) => index + 8);
+  return Array.from({ length: 21 }, (_, index) => index);
+}
+
+function pickOrderedValues(memory: Week8Memory, difficulty: Difficulty, count: number, teenOnly = false) {
+  const pool = orderingPool(difficulty, teenOnly).filter((value) => value <= 20);
+  const span = Math.max(count, difficulty === "easy" ? count : count + 1);
+  const startPool = pool.filter((value) => value + span <= 20);
+  const start = chooseRecentSafe(startPool, memory.recentStarts);
+  pushRecent(memory.recentStarts, start, 6);
+  const candidates = Array.from({ length: span + 1 }, (_, index) => start + index);
+  return shuffle(candidates).slice(0, count).sort((a, b) => a - b);
+}
+
+function createOrderingTask({
+  lessonId,
+  difficulty,
+  prompt,
+  speakText,
+  direction,
+  count,
+  teenOnly = false,
+  badgeLabel = "Number Order",
+}: {
+  lessonId: string;
+  difficulty: Difficulty;
+  prompt: string;
+  speakText: string;
+  direction: "ASC" | "DESC";
+  count: number;
+  teenOnly?: boolean;
+  badgeLabel?: string;
+}): PracticeTask {
+  const memory = getMemory(lessonId);
+  const ascending = pickOrderedValues(memory, difficulty, count, teenOnly);
+  const pathNumerals = direction === "DESC" ? [...ascending].sort((a, b) => b - a) : ascending;
+  const tiles = shuffle(pathNumerals.map((numeral, index) => ({ id: `order-${lessonId}-${direction}-${index}-${numeral}`, numeral })));
+  return makeOrderTapTask({
+    prompt,
+    speakText,
+    targetNumber: pathNumerals[pathNumerals.length - 1] ?? ascending[ascending.length - 1] ?? 0,
+    pathNumerals,
+    direction,
+    uiMode: "order",
+    badgeLabel,
+    tiles,
+    feedback: { correct: "You sorted them perfectly!", wrong: "Check which number should come next." },
+  });
+}
+
+function createMagnitudeChoiceTask({
+  lessonId,
+  difficulty,
+  mode,
+  prompt,
+  speakText,
+}: {
+  lessonId: string;
+  difficulty: Difficulty;
+  mode: "biggest" | "smallest";
+  prompt: string;
+  speakText: string;
+}): PracticeTask {
+  const memory = getMemory(lessonId);
+  const values = pickOrderedValues(memory, difficulty, 3, true);
+  const target = mode === "biggest" ? values[values.length - 1]! : values[0]!;
+  const options = shuffle(values).map((numeral, index) => ({ id: `mag-${lessonId}-${mode}-${index}-${numeral}`, numeral }));
+  return makeMatchTask({
+    prompt,
+    speakText,
+    targetNumber: target,
+    visualType: "ground-number-card",
+    promptType: "number_to_numeral",
+    shownSequence: values,
+    options: options.map((option) => ({ id: option.id, kind: "numeral" as const, numeral: option.numeral })),
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: {
+      correct: mode === "biggest" ? "You found the biggest number!" : "You found the smallest number!",
+      wrong: mode === "biggest" ? "Look for the number that is furthest along." : "Look for the number that comes first.",
+    },
+  });
+}
+
+function createSameOrderCheckTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const ascending = pickOrderedValues(memory, difficulty, difficulty === "easy" ? 3 : 4, true);
+  const isCorrect = Math.random() < 0.5;
+  const shownSequence = isCorrect ? ascending : [...ascending.slice(0, 2), ascending[ascending.length - 1]!, ascending[ascending.length - 2]!].slice(0, ascending.length);
+  return makeMatchTask({
+    prompt: "Is this order correct?",
+    speakText: "Is this order correct?",
+    targetNumber: shownSequence[shownSequence.length - 1] as number,
+    visualType: "ground-number-card",
+    promptType: "number_to_numeral",
+    shownSequence,
+    options: shuffle([
+      { id: `order-yes-${lessonId}`, kind: "word" as const, word: "yes" },
+      { id: `order-no-${lessonId}`, kind: "word" as const, word: "no" },
+    ]),
+    correctOptionId: isCorrect ? `order-yes-${lessonId}` : `order-no-${lessonId}`,
+    feedback: { correct: isCorrect ? "Yes, that order works!" : "Correct, that order is mixed up!", wrong: "Check whether the numbers keep going the right way." },
+  });
+}
+
+function generateLesson3Task(lessonId: string, difficulty: Difficulty, kind: (typeof LESSON3_ROTATION)[number]): PracticeTask {
+  const orderCount = difficulty === "easy" ? 3 : 4;
+  switch (kind) {
+    case "order_numbers":
+      return createOrderingTask({ lessonId, difficulty, prompt: "Order the numbers.", speakText: "Order the numbers.", direction: "ASC", count: orderCount });
+    case "least_to_greatest":
+      return createOrderingTask({ lessonId, difficulty, prompt: "Sort from smallest to biggest.", speakText: "Sort from smallest to biggest.", direction: "ASC", count: orderCount });
+    case "greatest_to_least":
+      return createOrderingTask({ lessonId, difficulty, prompt: "Sort from biggest to smallest.", speakText: "Sort from biggest to smallest.", direction: "DESC", count: orderCount });
+    case "number_podium":
+      return createOrderingTask({ lessonId, difficulty, prompt: "Place the numbers on the podium.", speakText: "Place the numbers on the podium.", direction: "ASC", count: 3, badgeLabel: "Number Podium" });
+    case "which_biggest":
+      return createMagnitudeChoiceTask({ lessonId, difficulty, mode: "biggest", prompt: "Which number is biggest?", speakText: "Which number is biggest?" });
+    case "which_smallest":
+      return createMagnitudeChoiceTask({ lessonId, difficulty, mode: "smallest", prompt: "Which number is smallest?", speakText: "Which number is smallest?" });
+    case "number_race_track":
+      return createOrderingTask({ lessonId, difficulty, prompt: "Put the race track in finishing order.", speakText: "Put the race track in finishing order.", direction: "DESC", count: orderCount, badgeLabel: "Race Track" });
+    case "sort_teen_numbers":
+      return createOrderingTask({ lessonId, difficulty, prompt: "Sort the teen numbers.", speakText: "Sort the teen numbers.", direction: "ASC", count: orderCount, teenOnly: true, badgeLabel: "Teen Sort" });
+    case "number_ladder_sort":
+      return createOrderingTask({ lessonId, difficulty, prompt: "Climb the number ladder in order.", speakText: "Climb the number ladder in order.", direction: "ASC", count: orderCount, badgeLabel: "Number Ladder" });
+    case "order_collections":
+      return createOrderingTask({ lessonId, difficulty, prompt: "Order the collections from least to greatest.", speakText: "Order the collections from least to greatest.", direction: "ASC", count: 3, teenOnly: true, badgeLabel: "Collection Sort" });
+    case "quick_sort":
+      return createOrderingTask({ lessonId, difficulty, prompt: "Quick sort. Smallest to biggest.", speakText: "Quick sort. Smallest to biggest.", direction: "ASC", count: 3, badgeLabel: "Quick Sort" });
+    case "same_order":
+      return createSameOrderCheckTask(lessonId, difficulty);
+    case "build_order":
+      return createOrderingTask({ lessonId, difficulty, prompt: "Build the order.", speakText: "Build the order.", direction: "ASC", count: orderCount });
+    case "which_comes_first":
+      return createMagnitudeChoiceTask({ lessonId, difficulty, mode: "smallest", prompt: "Which number comes first?", speakText: "Which number comes first?" });
+    case "number_line_sort":
+      return createOrderingTask({ lessonId, difficulty, prompt: "Place the numbers on the number line.", speakText: "Place the numbers on the number line.", direction: "ASC", count: orderCount, badgeLabel: "Number Line" });
+  }
+}
+
 function generateLesson2Task(lessonId: string, difficulty: Difficulty, kind: (typeof LESSON2_ROTATION)[number]): PracticeTask {
   switch (kind) {
     case "move_forward":
@@ -918,6 +1085,10 @@ function generateLesson1Task(lessonId: string, difficulty: Difficulty, kind: (ty
 
 export function generatePrepWeek8Task(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
+  if (lessonId === "y0-w8-l3") {
+    const kind = nextLesson3Kind(memory);
+    return generateLesson3Task(lessonId, difficulty, kind);
+  }
   if (lessonId === "y0-w8-l2") {
     const kind = nextLesson2Kind(memory);
     return generateLesson2Task(lessonId, difficulty, kind);
