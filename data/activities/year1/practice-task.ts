@@ -353,6 +353,7 @@ export type PracticeTask = (
       speakText?: string;
       targetNumber: number;
       startNumber?: number;
+      pathNumerals?: number[];
       direction?: "ASC" | "DESC";
       tiles: Array<{
         id: string;

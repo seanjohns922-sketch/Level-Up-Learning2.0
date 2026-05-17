@@ -1230,8 +1230,7 @@ export function GroundOrderTapTaskCard({
 }) {
   const [progressIndex, setProgressIndex] = useState(0);
   const direction = task.direction ?? "ASC";
-  const orderedNumerals = [...task.tiles]
-    .map((tile) => tile.numeral)
+  const orderedNumerals = (task.pathNumerals?.length ? [...task.pathNumerals] : [...task.tiles].map((tile) => tile.numeral))
     .sort((a, b) => (direction === "DESC" ? b - a : a - b));
   const expectedNumeral = orderedNumerals[progressIndex] ?? orderedNumerals[orderedNumerals.length - 1] ?? task.targetNumber;
   const currentNumeral =

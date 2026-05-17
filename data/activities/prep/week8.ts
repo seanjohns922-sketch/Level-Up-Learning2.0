@@ -447,6 +447,64 @@ function buildTrailValues(startNumber: number, steps: number, direction: "ASC" |
   ).filter((value) => value >= 0 && value <= 20);
 }
 
+function buildMovementDistractors(
+  startNumber: number,
+  steps: number,
+  direction: "ASC" | "DESC",
+  pathNumerals: number[],
+  count: number,
+) {
+  const target = pathNumerals[pathNumerals.length - 1] ?? startNumber;
+  const lessSteps = Math.max(1, steps - 1);
+  const candidates = [
+    startNumber,
+    direction === "ASC" ? startNumber - 1 : startNumber + 1,
+    direction === "ASC" ? startNumber + lessSteps : startNumber - lessSteps,
+    direction === "ASC" ? startNumber + steps + 1 : startNumber - (steps + 1),
+    direction === "ASC" ? target + 1 : target - 1,
+    direction === "ASC" ? target - 1 : target + 1,
+    direction === "ASC" ? startNumber + steps + 2 : startNumber - (steps + 2),
+  ];
+
+  const filtered = candidates.filter((value, index, list) => {
+    if (value < 0 || value > 20) return false;
+    if (pathNumerals.includes(value)) return false;
+    return list.indexOf(value) === index;
+  });
+
+  return filtered.slice(0, count);
+}
+
+function buildMovementOptions(
+  startNumber: number,
+  steps: number,
+  direction: "ASC" | "DESC",
+  difficulty: Difficulty,
+  memory: Week8Memory,
+) {
+  const target = direction === "DESC" ? startNumber - steps : startNumber + steps;
+  const optionCount = difficulty === "hard" ? 4 : 3;
+  const candidates = [
+    target,
+    startNumber,
+    direction === "ASC" ? startNumber + Math.max(1, steps - 1) : startNumber - Math.max(1, steps - 1),
+    direction === "ASC" ? startNumber - 1 : startNumber + 1,
+    direction === "ASC" ? startNumber + steps + 1 : startNumber - (steps + 1),
+    direction === "ASC" ? target + 1 : target - 1,
+    direction === "ASC" ? target - 1 : target + 1,
+  ].filter((value, index, list) => value >= 0 && value <= 20 && list.indexOf(value) === index);
+
+  const distractors = candidates.filter((value) => value !== target).slice(0, optionCount - 1);
+  const correctPosition = chooseAnswerPosition(memory, optionCount);
+  const ordered = new Array<number>(optionCount);
+  ordered[correctPosition] = target;
+  const positions = Array.from({ length: optionCount }, (_, index) => index).filter((index) => index !== correctPosition);
+  positions.forEach((position, index) => {
+    ordered[position] = distractors[index] ?? target;
+  });
+  return ordered.map((numeral, index) => ({ id: `move-${startNumber}-${steps}-${direction}-${index}-${numeral}`, numeral }));
+}
+
 function createMoveTrailTask({
   lessonId,
   startNumber,
@@ -455,6 +513,7 @@ function createMoveTrailTask({
   prompt,
   speakText,
   feedback,
+  difficulty,
 }: {
   lessonId: string;
   startNumber: number;
@@ -463,15 +522,22 @@ function createMoveTrailTask({
   prompt: string;
   speakText: string;
   feedback: { correct: string; wrong: string };
+  difficulty: Difficulty;
 }): PracticeTask {
   const values = buildTrailValues(startNumber, steps, direction);
+  const distractorCount = values.length <= 2 ? (difficulty === "hard" ? 3 : 2) : difficulty === "hard" ? 2 : 1;
+  const distractors = buildMovementDistractors(startNumber, steps, direction, values, distractorCount);
+  const tiles = shuffle(
+    [...values, ...distractors].map((numeral, index) => ({ id: `trail-${lessonId}-${startNumber}-${direction}-${index}-${numeral}`, numeral }))
+  );
   return makeOrderTapTask({
     prompt,
     speakText,
     targetNumber: values[values.length - 1] ?? startNumber,
     startNumber,
+    pathNumerals: values,
     direction,
-    tiles: shuffle(values.map((numeral, index) => ({ id: `trail-${lessonId}-${startNumber}-${direction}-${index}`, numeral }))),
+    tiles,
     feedback,
   });
 }
@@ -489,6 +555,7 @@ function createMoveForwardTask(lessonId: string, difficulty: Difficulty): Practi
     prompt: `Move Numbot forward ${steps}.`,
     speakText: `Move forward ${numberWord(steps)}.`,
     feedback: { correct: "Great navigating!", wrong: "Follow the trail forward one step at a time." },
+    difficulty,
   });
 }
 
@@ -505,6 +572,7 @@ function createMoveBackwardTask(lessonId: string, difficulty: Difficulty): Pract
     prompt: `Move Numbot back ${steps}.`,
     speakText: `Move back ${numberWord(steps)}.`,
     feedback: { correct: "Backward trail complete!", wrong: "Step back along the trail in order." },
+    difficulty,
   });
 }
 
@@ -514,10 +582,7 @@ function createChooseNextStepTask(lessonId: string, difficulty: Difficulty): Pra
   const startNumber = moveBackward ? pickBackwardStart(memory, difficulty, 2) : pickForwardStart(memory, difficulty, 2);
   pushRecent(memory.recentStarts, startNumber, 6);
   const target = moveBackward ? startNumber - 1 : startNumber + 1;
-  const distractors = moveBackward
-    ? [Math.max(0, startNumber + 1), Math.max(0, startNumber - 3)]
-    : [Math.max(0, startNumber - 1), Math.min(20, startNumber + 3)];
-  const options = shuffle([target, ...distractors]).slice(0, 3).map((numeral, index) => ({ id: `step-${startNumber}-${index}-${numeral}`, numeral }));
+  const options = buildMovementOptions(startNumber, 1, moveBackward ? "DESC" : "ASC", difficulty, memory);
   return makeMatchTask({
     prompt: moveBackward ? `Numbot is on ${startNumber}. Move back one.` : `Numbot is on ${startNumber}. Move forward one.`,
     speakText: moveBackward ? `Numbot is on ${numberWord(startNumber)}. Move back one.` : `Numbot is on ${numberWord(startNumber)}. Move forward one.`,
@@ -572,6 +637,7 @@ function createPortalTargetTask(lessonId: string, difficulty: Difficulty): Pract
     prompt: `Help Numbot reach ${portal}.`,
     speakText: `Help Numbot reach ${numberWord(portal)}.`,
     feedback: { correct: "Portal reached!", wrong: "Guide Numbot along the path to the portal." },
+    difficulty,
   });
 }
 
@@ -589,6 +655,7 @@ function createCountdownPortalTask(lessonId: string, difficulty: Difficulty): Pr
     prompt: `Count back to ${portal}.`,
     speakText: `Count back to ${numberWord(portal)}.`,
     feedback: { correct: "Countdown portal reached!", wrong: "Count back one step at a time." },
+    difficulty,
   });
 }
 
@@ -605,6 +672,7 @@ function createNumberLineHopsTask(lessonId: string, difficulty: Difficulty): Pra
     prompt: `Hop forward ${steps} from ${startNumber}.`,
     speakText: `Hop forward ${numberWord(steps)} from ${numberWord(startNumber)}.`,
     feedback: { correct: "Great hopping!", wrong: "Follow each hop forward along the line." },
+    difficulty,
   });
 }
 
@@ -638,7 +706,7 @@ function createAudioMoveTask(lessonId: string, difficulty: Difficulty): Practice
   const startNumber = moveBackward ? pickBackwardStart(memory, difficulty, steps) : pickForwardStart(memory, difficulty, steps);
   pushRecent(memory.recentStarts, startNumber, 6);
   const target = moveBackward ? startNumber - steps : startNumber + steps;
-  const options = numeralOptions(target, memory);
+  const options = buildMovementOptions(startNumber, 1, moveBackward ? "DESC" : "ASC", difficulty, memory);
   return makeMatchTask({
     prompt: "Follow Hannah's instruction.",
     speakText: moveBackward
@@ -667,6 +735,7 @@ function createBackwardRollTask(lessonId: string, difficulty: Difficulty): Pract
     prompt: `Numbot rolled back ${steps}.`,
     speakText: `Move Numbot back ${numberWord(steps)}.`,
     feedback: { correct: "Great backwards move!", wrong: "Move Numbot back the exact number of spaces." },
+    difficulty,
   });
 }
 
@@ -683,6 +752,7 @@ function createBackwardRiverCrossingTask(lessonId: string, difficulty: Difficult
     prompt: "Cross the number river counting back.",
     speakText: "Cross the number river counting back.",
     feedback: { correct: "River crossed!", wrong: "Step back across the stones in the right order." },
+    difficulty,
   });
 }
 
@@ -700,6 +770,7 @@ function createBridgeBuilderTask(lessonId: string, difficulty: Difficulty): Prac
     prompt: "Build the bridge path.",
     speakText: moveBackward ? "Build the bridge path counting back." : "Build the bridge path counting on.",
     feedback: { correct: "Bridge complete!", wrong: "Place the stones in the order Numbot needs." },
+    difficulty,
   });
 }
 
@@ -717,6 +788,7 @@ function createPathTraceTask(lessonId: string, difficulty: Difficulty, direction
     prompt: direction === "DESC" ? "Trace the path back." : "Trace the path forward.",
     speakText: direction === "DESC" ? "Trace the path back." : "Trace the path forward.",
     feedback: { correct: "Trail traced!", wrong: "Keep your trail moving one number at a time." },
+    difficulty,
   });
 }
 
@@ -752,7 +824,7 @@ function createQuickPathFlashTask(lessonId: string, difficulty: Difficulty): Pra
   const moveBackward = difficulty === "hard" && Math.random() < 0.5;
   const startNumber = moveBackward ? pickBackwardStart(memory, difficulty, 3) : pickForwardStart(memory, difficulty, 3);
   const target = moveBackward ? startNumber - 1 : startNumber + 1;
-  const options = numeralOptions(target, memory);
+  const options = buildMovementOptions(startNumber, 1, moveBackward ? "DESC" : "ASC", difficulty, memory);
   pushRecent(memory.recentStarts, startNumber, 6);
   return makeFlashTask({
     prompt: "Fast path challenge.",
