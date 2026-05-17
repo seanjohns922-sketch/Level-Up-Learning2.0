@@ -467,7 +467,7 @@ export function GroundBuildTaskCard({
               </div>
             </div>
 
-            {task.exampleParts && task.exampleParts.length === 2 ? (
+            {task.showExample !== false && task.exampleParts && task.exampleParts.length === 2 ? (
               <div className="rounded-[18px] border border-cyan-200 bg-white px-3 py-2 shadow-sm">
                 <ExampleBuildRow parts={task.exampleParts} />
               </div>

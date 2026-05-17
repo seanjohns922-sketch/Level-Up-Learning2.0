@@ -222,6 +222,14 @@ function GroundOptionButton({
 
 function renderQuestionVisual(task: GroundMatchTask) {
   if (typeof task.shownQuantity === "number" && (task.promptType === "group_to_numeral" || task.promptType === "match_pair")) {
+    if (typeof task.shownNumeral === "number" && task.promptType === "group_to_numeral") {
+      return (
+        <div className="grid w-full gap-3 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center">
+          <GroundNumberCard value={task.shownNumeral} />
+          <GroundQuantityCard quantity={task.shownQuantity} objectType={task.objectType} patternLayout={task.patternLayout} />
+        </div>
+      );
+    }
     return <GroundQuantityCard quantity={task.shownQuantity} objectType={task.objectType} patternLayout={task.patternLayout} />;
   }
   if (task.shownSequence && task.shownSequence.length > 0) {

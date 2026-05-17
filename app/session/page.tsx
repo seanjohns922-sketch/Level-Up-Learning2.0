@@ -3349,7 +3349,6 @@ function buildPrepWeek6WeeklyQuizQuestions(
 
   const lesson1Targets = [5, 6, 7, 8, 9] as const;
   const splitTargets = [6, 7, 8, 9, 10] as const;
-  const lesson3Targets = [8, 9, 10] as const;
 
   function reservePosition(position: number) {
     positionHistory.push(position);
@@ -3399,7 +3398,7 @@ function buildPrepWeek6WeeklyQuizQuestions(
   function makePairOption(parts: number[], index: number): GroundMatchOption {
     const total = parts[0]! + parts[1]!;
     return {
-      id: `pair-${index}-${parts[0]}-${parts[1]}`,
+      id: `pair-${index}-${parts[0]}-${parts[1]}` ,
       kind: "pair",
       pairNumeral: total,
       pairParts: parts,
@@ -3482,6 +3481,7 @@ function buildPrepWeek6WeeklyQuizQuestions(
       promptType: "group_to_numeral",
       objectType: nextObjectType(),
       patternLayout: nextLayout(shownPart, whole === 10 ? ["ten_frame"] : ["ten_frame", "domino"]),
+      shownNumeral: whole,
       shownQuantity: shownPart,
       options: values.map((value, optionIndex) => ({
         id: `miss-${index}-${optionIndex}-${value}`,
@@ -3503,8 +3503,7 @@ function buildPrepWeek6WeeklyQuizQuestions(
     prompt: string,
     speakText: string,
     total: number,
-    exampleParts: number[],
-    requireDifferentFromExample: boolean
+    feedback?: { correct: string; wrong: string }
   ): QuizQuestion {
     const objectType = nextObjectType();
     return buildGroundQuizQuestion(`q${index}`, lessonNumber, skill, {
@@ -3516,35 +3515,27 @@ function buildPrepWeek6WeeklyQuizQuestions(
       compareMode: "exact",
       maxBuild: 10,
       buildMode: "split",
-      exampleParts,
-      exampleObjectTypes: [nextObjectType(), nextObjectType()],
-      examplePartLayouts: [
-        nextLayout(exampleParts[0]!, total === 10 ? ["ten_frame"] : undefined),
-        nextLayout(exampleParts[1]!, total === 10 ? ["ten_frame"] : undefined),
-      ],
+      showExample: false,
       splitObjectTypes: [nextObjectType(), nextObjectType()],
       splitPartLayouts: [
-        nextLayout(exampleParts[0]!, total === 10 ? ["ten_frame"] : undefined),
-        nextLayout(exampleParts[1]!, total === 10 ? ["ten_frame"] : undefined),
+        nextLayout(Math.max(1, Math.floor(total / 2)), total === 10 ? ["ten_frame"] : undefined),
+        nextLayout(Math.max(1, total - Math.max(1, Math.floor(total / 2))), total === 10 ? ["ten_frame"] : undefined),
       ],
-      requireDifferentFromExample,
       referenceGroup: {
         quantity: total,
         objectType,
         patternLayout: nextLayout(total, total === 10 ? ["ten_frame"] : undefined),
       },
-      feedback: {
+      feedback: feedback ?? {
         correct: total === 10 ? "You made 10!" : "Perfect number build!",
-        wrong: requireDifferentFromExample
-          ? "Build the same whole in a different way."
-          : "Use two parts that join to make the whole.",
+        wrong: "Use two parts that join to make the whole.",
       },
     });
   }
 
   function makeLesson1Task(
     index: number,
-    variant: "build" | "another_way" | "same_total" | "missing_part" | "numbot"
+    variant: "build" | "choose_build" | "same_total" | "missing_part" | "numbot"
   ): QuizQuestion {
     if (variant === "build") {
       const total = nextTarget(lesson1Targets);
@@ -3555,53 +3546,55 @@ function buildPrepWeek6WeeklyQuizQuestions(
         `Build ${total}.`,
         `Build ${numberToGroundWord(total)}.`,
         total,
-        chooseParts(total),
-        false
+        { correct: `You built ${total}!`, wrong: "Use two parts to build the whole." }
       );
     }
 
-    if (variant === "another_way") {
-      const total = nextTarget(lesson1Targets);
-      const exampleParts = chooseParts(total);
-      return makeSplitBuildQuestion(
-        index,
-        1,
-        "ground_w6_l1_another_way",
-        `Can you make ${total} another way?`,
-        `Can you make ${numberToGroundWord(total)} another way?`,
-        total,
-        exampleParts,
-        true
-      );
-    }
-
-    if (variant === "same_total") {
-      const total = nextTarget(lesson1Targets);
+    if (variant === "choose_build") {
+      const total = nextTarget([6, 7, 8] as const);
       const correctParts = chooseParts(total);
-      const wrongA = chooseParts(Math.max(2, total - 1), [pairKey(correctParts)]);
+      const wrongA = chooseParts(Math.max(2, total - 2), [pairKey(correctParts)]);
       const wrongB = chooseParts(Math.min(10, total + 1), [pairKey(correctParts), pairKey(wrongA)]);
       return makePairOptionsQuestion(
         index,
         1,
-        "ground_w6_l1_same_total",
-        "Which parts make the same number?",
-        "Which groups make the same number?",
+        "ground_w6_l1_choose_build",
+        `Which build makes ${total}?`,
+        `Which build makes ${numberToGroundWord(total)}?`,
         total,
         correctParts,
         [wrongA, wrongB],
-        "quantity"
+        "numeral"
+      );
+    }
+
+    if (variant === "same_total") {
+      const total = nextTarget([5, 6, 7] as const);
+      const correctParts = chooseParts(total);
+      const wrongA = chooseParts(Math.min(10, total + 1), [pairKey(correctParts)]);
+      const wrongB = chooseParts(Math.max(2, total - 2), [pairKey(correctParts), pairKey(wrongA)]);
+      return makePairOptionsQuestion(
+        index,
+        1,
+        "ground_w6_l1_same_total",
+        `Which one also makes ${total}?`,
+        `Which one also makes ${numberToGroundWord(total)}?`,
+        total,
+        correctParts,
+        [wrongA, wrongB],
+        "numeral"
       );
     }
 
     if (variant === "missing_part") {
-      const whole = nextTarget([6, 7, 8, 9, 10] as const);
+      const whole = nextTarget([6, 7, 8] as const);
       const shownPart = chooseParts(whole)[0]!;
       return makeMissingPartQuestion(
         index,
         1,
         "ground_w6_l1_missing_part",
-        "Fill the missing part.",
-        `Fill the missing part to make ${numberToGroundWord(whole)}.`,
+        `${shownPart} and what makes ${whole}?`,
+        `${numberToGroundWord(shownPart)} and what makes ${numberToGroundWord(whole)}?`,
         whole,
         shownPart
       );
@@ -3615,14 +3608,13 @@ function buildPrepWeek6WeeklyQuizQuestions(
       `Numbot says build ${total}.`,
       `Numbot says build ${numberToGroundWord(total)}.`,
       total,
-      chooseParts(total),
-      false
+      { correct: "Great building!", wrong: "Build the whole with two parts." }
     );
   }
 
   function makeLesson2Task(
     index: number,
-    variant: "make_10" | "fill_to_10" | "which_makes_10" | "another_way" | "complete_frame"
+    variant: "make_10" | "fill_to_10" | "which_makes_10" | "complete_frame" | "true_false"
   ): QuizQuestion {
     if (variant === "make_10") {
       return makeSplitBuildQuestion(
@@ -3632,8 +3624,7 @@ function buildPrepWeek6WeeklyQuizQuestions(
         "Make 10.",
         "Make 10.",
         10,
-        chooseParts(10),
-        false
+        { correct: "You made 10!", wrong: "Use two colours to make 10." }
       );
     }
 
@@ -3643,8 +3634,8 @@ function buildPrepWeek6WeeklyQuizQuestions(
         index,
         2,
         "ground_w6_l2_fill_to_10",
-        "How many more to make 10?",
-        "How many more to make 10?",
+        `${shownPart} and what makes 10?`,
+        `${numberToGroundWord(shownPart)} and what makes 10?`,
         10,
         shownPart
       );
@@ -3652,8 +3643,8 @@ function buildPrepWeek6WeeklyQuizQuestions(
 
     if (variant === "which_makes_10") {
       const correctParts = chooseParts(10);
-      const wrongA = chooseParts(9, [pairKey(correctParts)]);
-      const wrongB = chooseParts(8, [pairKey(correctParts), pairKey(wrongA)]);
+      const wrongA = chooseParts(8, [pairKey(correctParts)]);
+      const wrongB = chooseParts(9, [pairKey(correctParts), pairKey(wrongA)]);
       return makePairOptionsQuestion(
         index,
         2,
@@ -3668,51 +3659,49 @@ function buildPrepWeek6WeeklyQuizQuestions(
       );
     }
 
-    if (variant === "another_way") {
-      const exampleParts = chooseParts(10);
-      return makeSplitBuildQuestion(
+    if (variant === "complete_frame") {
+      const shownPart = chooseParts(10)[0]!;
+      return makeMissingPartQuestion(
         index,
         2,
-        "ground_w6_l2_another_way",
-        "Can you make 10 another way?",
-        "Can you make 10 another way?",
+        "ground_w6_l2_complete_frame",
+        "Complete the frame to make 10.",
+        "Complete the frame to make 10.",
         10,
-        exampleParts,
-        true
+        shownPart
       );
     }
 
-    return makeSplitBuildQuestion(
+    const correctParts = chooseParts(10);
+    const wrongParts = chooseParts(9, [pairKey(correctParts)]);
+    return makePairOptionsQuestion(
       index,
       2,
-      "ground_w6_l2_complete_frame",
-      "Complete the frame to 10.",
-      "Complete the frame to 10.",
+      "ground_w6_l2_true_false",
+      "Which one makes 10?",
+      "Which one makes 10?",
       10,
-      chooseParts(10),
-      false
+      correctParts,
+      [wrongParts, chooseParts(8, [pairKey(correctParts), pairKey(wrongParts)])],
+      "numeral",
+      ["ten_frame"]
     );
   }
 
   function makeLesson3Task(
     index: number,
-    variant: "split_10" | "parts_match" | "missing_part" | "another_way" | "split_other"
+    variant: "split_whole" | "missing_part" | "same_parts" | "not_match" | "part_swap"
   ): QuizQuestion {
-    if (variant === "parts_match") {
-      const correctParts = chooseParts(10);
-      const wrongA = chooseParts(8, [pairKey(correctParts)]);
-      const wrongB = chooseParts(9, [pairKey(correctParts), pairKey(wrongA)]);
-      return makePairOptionsQuestion(
+    if (variant === "split_whole") {
+      const total = nextTarget([8, 9, 10] as const);
+      return makeSplitBuildQuestion(
         index,
         3,
-        "ground_w6_l3_parts_match",
-        "Which parts match the whole?",
-        "Which parts match the whole 10?",
-        10,
-        correctParts,
-        [wrongA, wrongB],
-        "numeral",
-        ["ten_frame"]
+        "ground_w6_l3_split_whole",
+        `Split ${total} into two parts.`,
+        `Split ${numberToGroundWord(total)} into two parts.`,
+        total,
+        { correct: "Perfect split!", wrong: "Split the whole into two parts." }
       );
     }
 
@@ -3722,69 +3711,83 @@ function buildPrepWeek6WeeklyQuizQuestions(
         index,
         3,
         "ground_w6_l3_missing_part",
-        "Build the missing part.",
-        "Build the missing part to make 10.",
+        `${shownPart} and what makes 10?`,
+        `${numberToGroundWord(shownPart)} and what makes 10?`,
         10,
         shownPart
       );
     }
 
-    if (variant === "another_way") {
-      const exampleParts = chooseParts(10);
-      return makeSplitBuildQuestion(
+    if (variant === "same_parts") {
+      const correctParts = chooseParts(10);
+      const swap = [correctParts[1]!, correctParts[0]!];
+      const wrong = chooseParts(9, [pairKey(correctParts)]);
+      return makePairOptionsQuestion(
         index,
         3,
-        "ground_w6_l3_another_way",
-        "Split 10 another way.",
-        "Can you split 10 another way?",
+        "ground_w6_l3_same_parts",
+        `Which shows the same parts as ${correctParts[0]} and ${correctParts[1]}?`,
+        `Which shows the same parts as ${numberToGroundWord(correctParts[0]!)} and ${numberToGroundWord(correctParts[1]!)}?`,
         10,
-        exampleParts,
-        true
+        swap,
+        [wrong, chooseParts(8, [pairKey(correctParts), pairKey(wrong)])],
+        "numeral",
+        ["ten_frame"]
       );
     }
 
-    if (variant === "split_other") {
-      const total = nextTarget(lesson3Targets.filter((value) => value !== 10));
-      return makeSplitBuildQuestion(
+    if (variant === "not_match") {
+      const correctParts = chooseParts(10);
+      const alsoCorrect = chooseParts(10, [pairKey(correctParts)]);
+      const wrong = chooseParts(9, [pairKey(correctParts), pairKey(alsoCorrect)]);
+      return makePairOptionsQuestion(
         index,
         3,
-        "ground_w6_l3_split_other",
-        `Can you split ${total}?`,
-        `Can you split ${numberToGroundWord(total)}?`,
-        total,
-        chooseParts(total),
-        false
+        "ground_w6_l3_not_match",
+        "Which one does not make 10?",
+        "Which one does not make 10?",
+        9,
+        wrong,
+        [correctParts, alsoCorrect],
+        "numeral",
+        ["ten_frame"]
       );
     }
 
-    return makeSplitBuildQuestion(
+    const targetParts = chooseParts(10);
+    const swap = [targetParts[1]!, targetParts[0]!];
+    const wrongA = chooseParts(10, [pairKey(targetParts)]);
+    const wrongB = chooseParts(9, [pairKey(targetParts), pairKey(wrongA)]);
+    return makePairOptionsQuestion(
       index,
       3,
-      "ground_w6_l3_split_10",
-      "Split 10 another way.",
-      "Split 10 another way.",
+      "ground_w6_l3_part_swap",
+      `Which shows the same parts as ${targetParts[0]} and ${targetParts[1]}?`,
+      `Which shows the same parts as ${numberToGroundWord(targetParts[0]!)} and ${numberToGroundWord(targetParts[1]!)}?`,
       10,
-      chooseParts(10),
-      false
+      swap,
+      [wrongA, wrongB],
+      "numeral",
+      ["ten_frame"]
     );
   }
 
   const questions: QuizQuestion[] = [
     makeLesson1Task(1, "build"),
-    makeLesson1Task(2, "another_way"),
+    makeLesson1Task(2, "choose_build"),
     makeLesson1Task(3, "same_total"),
     makeLesson1Task(4, "missing_part"),
     makeLesson1Task(5, "numbot"),
     makeLesson2Task(6, "make_10"),
     makeLesson2Task(7, "fill_to_10"),
     makeLesson2Task(8, "which_makes_10"),
-    makeLesson2Task(9, "another_way"),
-    makeLesson2Task(10, "complete_frame"),
-    makeLesson3Task(11, "split_10"),
-    makeLesson3Task(12, "parts_match"),
-    makeLesson3Task(13, "missing_part"),
-    makeLesson3Task(14, "another_way"),
-    makeLesson3Task(15, "split_other"),
+    makeLesson2Task(9, "complete_frame"),
+    makeLesson2Task(10, "true_false"),
+    makeLesson3Task(11, "split_whole"),
+    makeLesson3Task(12, "missing_part"),
+    makeLesson3Task(13, "same_parts"),
+    makeLesson3Task(14, "not_match"),
+    makeLesson3Task(15, "part_swap"),
   ];
 
   if (questions.length !== totalExpected) {
