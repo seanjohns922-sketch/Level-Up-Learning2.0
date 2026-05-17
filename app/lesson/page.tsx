@@ -53,7 +53,8 @@ function isPrepGroundCustomLesson(lessonId: string) {
     lessonId.startsWith("y0-w5-") ||
     lessonId.startsWith("y0-w6-") ||
     lessonId === "y0-w7-l1" ||
-    lessonId === "y0-w7-l2"
+    lessonId === "y0-w7-l2" ||
+    lessonId === "y0-w7-l3"
   );
 }
 
