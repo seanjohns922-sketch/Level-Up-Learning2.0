@@ -28,6 +28,7 @@ import { generatePrepWeek3Task, resetPrepWeek3TaskSessionState } from "@/data/ac
 import { generatePrepWeek4Task, resetPrepWeek4TaskSessionState } from "@/data/activities/prep/week4";
 import { generatePrepWeek5Task, resetPrepWeek5TaskSessionState } from "@/data/activities/prep/week5";
 import { generatePrepWeek6Task, resetPrepWeek6TaskSessionState } from "@/data/activities/prep/week6";
+import { generatePrepWeek7Task, resetPrepWeek7TaskSessionState } from "@/data/activities/prep/week7";
 import { getProgramForYear } from "@/data/programs";
 import { DEMO_MODE } from "@/data/config";
 import { ACTIVE_STUDENT_KEY, readProgress, updateProgress } from "@/data/progress";
@@ -50,11 +51,13 @@ function isPrepGroundCustomLesson(lessonId: string) {
     lessonId.startsWith("y0-w3-") ||
     lessonId.startsWith("y0-w4-") ||
     lessonId.startsWith("y0-w5-") ||
-    lessonId.startsWith("y0-w6-")
+    lessonId.startsWith("y0-w6-") ||
+    lessonId === "y0-w7-l1"
   );
 }
 
 function getPrepGroundTask(lessonId: string, difficulty: "easy" | "medium" | "hard") {
+  if (lessonId.startsWith("y0-w7-")) return generatePrepWeek7Task(lessonId, difficulty);
   if (lessonId.startsWith("y0-w6-")) return generatePrepWeek6Task(lessonId, difficulty);
   if (lessonId.startsWith("y0-w5-")) return generatePrepWeek5Task(lessonId, difficulty);
   if (lessonId.startsWith("y0-w4-")) return generatePrepWeek4Task(lessonId, difficulty);
@@ -319,8 +322,10 @@ function LessonPage() {
                               ? "Match the Groups Complete!"
                               : effectiveLessonId === "y0-w5-l3"
                                 ? "Number Sort Challenge Complete!"
-                                : effectiveLessonId === "y0-w6-l1"
-                                  ? "Number Builder Lab Complete!"
+                                : effectiveLessonId === "y0-w7-l1"
+                                  ? "Collection Counter Mission Complete!"
+                                  : effectiveLessonId === "y0-w6-l1"
+                                    ? "Number Builder Lab Complete!"
                                   : effectiveLessonId === "y0-w1-l2"
                                     ? "You counted collections to 5!"
                                     : "You recognised numbers 1 to 5!";
@@ -877,4 +882,5 @@ function LessonPage() {
     resetPrepWeek4TaskSessionState();
     resetPrepWeek5TaskSessionState();
     resetPrepWeek6TaskSessionState();
+    resetPrepWeek7TaskSessionState();
   }

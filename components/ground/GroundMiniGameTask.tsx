@@ -36,7 +36,7 @@ type GroundPatternLayout = GroundFlashTask["patternLayout"];
 
 function getPatternGrid(layout: GroundPatternLayout, quantity: number) {
   if (layout === "ten_frame") {
-    return { columns: 5, slots: 10, filled: Array.from({ length: quantity }, (_, index) => index) };
+    return { columns: 5, slots: quantity > 10 ? 20 : 10, filled: Array.from({ length: quantity }, (_, index) => index) };
   }
   if (layout === "finger") {
     return { columns: 5, slots: 5, filled: Array.from({ length: Math.min(quantity, 5) }, (_, index) => index) };
@@ -408,7 +408,7 @@ export function GroundBuildTaskCard({
   const [activePart, setActivePart] = useState<"left" | "right">("left");
   const compareMode = task.compareMode ?? "exact";
   const compareBase = task.compareBase ?? task.targetNumber;
-  const traySize = Math.max(5, Math.min(10, task.maxBuild ?? task.targetNumber ?? compareBase));
+  const traySize = Math.max(5, Math.min(20, task.maxBuild ?? task.targetNumber ?? compareBase));
   const tray = useMemo(() => Array.from({ length: traySize }), [traySize]);
   const splitTotal = leftBuilt + rightBuilt;
   const exampleKey = (task.exampleParts ?? []).join("+");

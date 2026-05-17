@@ -228,15 +228,16 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
     id: "y0-w7",
     week: 7,
     topic: "Teen Numbers & Collections to 20",
-    curriculum: ["AC9MFN01", "AC9MFN03"],
+    curriculum: ["AC9MFN01", "AC9MFN02", "AC9MFN03"],
     lessons: [
       buildLesson(
         7,
         1,
         "Count Collections to 20",
-        "Count larger collections accurately using one-to-one correspondence.",
+        "Count larger collections accurately using one-to-one correspondence, organised counting, and visual groups to 20.",
         ["Count bigger groups", "Touch and count to 20", "Collection count challenge"],
-        ["AC9MFN01", "AC9MFN03"]
+        ["AC9MFN01", "AC9MFN02", "AC9MFN03"],
+        "Collection Counter Mission"
       ),
       buildLesson(
         7,

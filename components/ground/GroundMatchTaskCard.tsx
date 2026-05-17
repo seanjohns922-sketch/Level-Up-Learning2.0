@@ -25,7 +25,7 @@ type GroundPatternLayout = GroundMatchTask["patternLayout"];
 
 function getPatternGrid(layout: GroundPatternLayout, quantity: number) {
   if (layout === "ten_frame") {
-    return { columns: 5, slots: 10, filled: Array.from({ length: quantity }, (_, index) => index) };
+    return { columns: 5, slots: quantity > 10 ? 20 : 10, filled: Array.from({ length: quantity }, (_, index) => index) };
   }
   if (layout === "finger") {
     return { columns: 5, slots: 5, filled: Array.from({ length: Math.min(quantity, 5) }, (_, index) => index) };
