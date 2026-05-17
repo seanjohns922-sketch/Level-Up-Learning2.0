@@ -224,8 +224,15 @@ export function useAutoReadSetting() {
   };
 }
 
+function isLovablePreviewHost() {
+  if (typeof window === "undefined") return false;
+  return /(^|\.)lovable\.dev$/i.test(window.location.hostname);
+}
+
 export function useSpeechInteractionReady() {
-  return useSpeakState().interactionUnlocked;
+  const interactionUnlocked = useSpeakState().interactionUnlocked;
+  if (isLovablePreviewHost()) return false;
+  return interactionUnlocked;
 }
 
 export function setAutoReadEnabled(enabled: boolean) {
