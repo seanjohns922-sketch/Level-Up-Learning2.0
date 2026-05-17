@@ -1230,7 +1230,14 @@ export function GroundOrderTapTaskCard({
 }) {
   const [progressIndex, setProgressIndex] = useState(0);
   const direction = task.direction ?? "ASC";
-  const expectedNumeral = direction === "DESC" ? task.targetNumber - progressIndex : progressIndex + 1;
+  const orderedNumerals = [...task.tiles]
+    .map((tile) => tile.numeral)
+    .sort((a, b) => (direction === "DESC" ? b - a : a - b));
+  const expectedNumeral = orderedNumerals[progressIndex] ?? orderedNumerals[orderedNumerals.length - 1] ?? task.targetNumber;
+  const currentNumeral =
+    progressIndex === 0
+      ? task.startNumber ?? orderedNumerals[0] ?? task.targetNumber
+      : orderedNumerals[Math.max(0, progressIndex - 1)] ?? task.targetNumber;
 
   function tapTile(numeral: number) {
     if (numeral !== expectedNumeral) {
@@ -1240,7 +1247,7 @@ export function GroundOrderTapTaskCard({
     }
 
     const nextIndex = progressIndex + 1;
-    if (nextIndex >= task.targetNumber) {
+    if (nextIndex >= orderedNumerals.length) {
       onCorrect();
       return;
     }
@@ -1250,27 +1257,35 @@ export function GroundOrderTapTaskCard({
   return (
     <GroundMiniShell badge="Number Path" prompt={task.prompt} speakText={task.speakText}>
       <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
-        <GroundCountBadge count={progressIndex} target={task.targetNumber} />
-        <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
-          Tap {expectedNumeral} next
+        <GroundCountBadge count={progressIndex} target={orderedNumerals.length} />
+        <div className="mb-4 rounded-[20px] border border-cyan-200 bg-cyan-50 px-4 py-3 text-center shadow-sm">
+          <div className="text-[11px] font-black uppercase tracking-[0.18em] text-teal-700">Numbot Trail</div>
+          <div className="mt-2 flex items-center justify-center gap-3 text-base font-black text-teal-900 sm:text-lg">
+            <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-teal-300 bg-white text-2xl shadow-sm">🤖</span>
+            <span>On {currentNumeral}</span>
+            <span className="text-cyan-400">→</span>
+            <span className="rounded-full bg-white px-4 py-2 text-cyan-700 shadow-sm">Next {expectedNumeral}</span>
+          </div>
         </div>
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
           {task.tiles.map((tile) => {
-            const isCompleted =
-              direction === "DESC"
-                ? tile.numeral > expectedNumeral && tile.numeral <= task.targetNumber
-                : tile.numeral <= progressIndex;
+            const completedIndex = orderedNumerals.indexOf(tile.numeral);
+            const isCompleted = completedIndex >= 0 && completedIndex < progressIndex;
+            const isTarget = tile.numeral === expectedNumeral;
             return (
               <button
                 key={tile.id}
                 type="button"
                 onClick={() => tapTile(tile.numeral)}
-                className={`flex min-h-[88px] items-center justify-center rounded-[22px] border-2 text-4xl font-black shadow-sm transition ${
+                className={`relative flex min-h-[88px] items-center justify-center rounded-[22px] border-2 text-4xl font-black shadow-sm transition ${
                   isCompleted
                     ? "border-teal-400 bg-teal-100 text-teal-900"
-                    : "border-cyan-200 bg-white text-teal-900 hover:border-cyan-300 hover:bg-cyan-50"
+                    : isTarget
+                      ? "border-cyan-300 bg-cyan-50 text-cyan-800 hover:border-cyan-400 hover:bg-cyan-100"
+                      : "border-cyan-200 bg-white text-teal-900 hover:border-cyan-300 hover:bg-cyan-50"
                 }`}
               >
+                {isCompleted ? <span className="absolute -top-2 right-2 text-lg">✨</span> : null}
                 {tile.numeral}
               </button>
             );

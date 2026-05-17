@@ -278,10 +278,10 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         8,
         2,
         "Number Paths",
-        "Follow, continue, repair, and navigate forward and backward number trails to 20 using stepping stones, glowing routes, and movement-based path patterns.",
-        ["Follow the trail", "Fix the broken route", "Number river crossing"],
+        "Navigate forward and backward through connected number trails to 20 using stepping stones, portals, number hops, and movement-based path choices.",
+        ["Move Numbot", "Countdown portal", "Number line hops"],
         ["AC9MFN01", "AC9MFN03"],
-        "Nexus Number Trails"
+        "Number Trail Adventure"
       ),
       buildLesson(
         8,
