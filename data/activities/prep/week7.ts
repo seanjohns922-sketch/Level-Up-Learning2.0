@@ -9,6 +9,7 @@ type GroundMatchTask = Extract<PracticeTask, { kind: "groundMatch" }>;
 type GroundGrowingCountTask = Extract<PracticeTask, { kind: "groundGrowingCount" }>;
 type GroundFeedTask = Extract<PracticeTask, { kind: "groundFeed" }>;
 type GroundFlashTask = Extract<PracticeTask, { kind: "groundFlash" }>;
+type GroundCompareTask = Extract<PracticeTask, { kind: "groundCompare" }>;
 
 type Week7Memory = {
   cursor: number;
@@ -31,6 +32,10 @@ const OBJECTS: GroundObjectType[] = [
 const LOW_TARGETS = [8, 9, 10, 11, 12, 13] as const;
 const MID_TARGETS = [11, 12, 13, 14, 15, 16, 17] as const;
 const HIGH_TARGETS = [12, 13, 14, 15, 16, 17, 18, 19, 20] as const;
+const EARLY_TEENS = [11, 12, 13, 14] as const;
+const MID_TEENS = [15, 16, 17] as const;
+const LATE_TEENS = [18, 19, 20] as const;
+const TEENS = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20] as const;
 const LESSON1_ROTATION = [
   "count_collection",
   "tap_to_count",
@@ -47,6 +52,23 @@ const LESSON1_ROTATION = [
   "quick_count",
   "teen_number_match",
   "how_many_more",
+] as const;
+const LESSON2_ROTATION = [
+  "build_teen_number",
+  "which_number_matches",
+  "teen_number_match",
+  "how_many_more_than_10",
+  "find_the_teen_number",
+  "fill_the_collection",
+  "numbot_teen_reactor",
+  "match_the_extras",
+  "teen_number_path",
+  "quick_teen_flash",
+  "count_the_extras",
+  "build_to_20",
+  "same_or_different",
+  "missing_teen_number",
+  "which_is_bigger",
 ] as const;
 
 const memoryByLesson = new Map<string, Week7Memory>();
@@ -144,8 +166,24 @@ function stagePool(memory: Week7Memory, difficulty: Difficulty) {
   return [...HIGH_TARGETS];
 }
 
+function teenStagePool(memory: Week7Memory, difficulty: Difficulty) {
+  if (difficulty === "easy") {
+    if (memory.cursor < 5) return [...EARLY_TEENS];
+    if (memory.cursor < 12) return [...MID_TEENS, ...EARLY_TEENS];
+    return [...TEENS];
+  }
+  if (difficulty === "medium") return [...MID_TEENS, ...LATE_TEENS, 14];
+  return [...TEENS];
+}
+
 function pickTarget(memory: Week7Memory, difficulty: Difficulty) {
   const target = chooseRecentSafe(stagePool(memory, difficulty), memory.recentTargets);
+  pushRecent(memory.recentTargets, target, 6);
+  return target;
+}
+
+function pickTeenTarget(memory: Week7Memory, difficulty: Difficulty) {
+  const target = chooseRecentSafe(teenStagePool(memory, difficulty), memory.recentTargets);
   pushRecent(memory.recentTargets, target, 6);
   return target;
 }
@@ -169,8 +207,15 @@ function pickLayout(memory: Week7Memory, quantity: number, preferred?: GroundPat
   return layout;
 }
 
-function nextKind(memory: Week7Memory) {
+function nextLesson1Kind(memory: Week7Memory) {
   const kind = LESSON1_ROTATION[memory.cursor % LESSON1_ROTATION.length]!;
+  memory.cursor += 1;
+  pushRecent(memory.recentKinds, kind, 6);
+  return kind;
+}
+
+function nextLesson2Kind(memory: Week7Memory) {
+  const kind = LESSON2_ROTATION[memory.cursor % LESSON2_ROTATION.length]!;
   memory.cursor += 1;
   pushRecent(memory.recentKinds, kind, 6);
   return kind;
@@ -203,6 +248,27 @@ function closeNumeralOptions(target: number, memory: Week7Memory, optionCount = 
   }));
 }
 
+function extraCountOptions(extras: number, memory: Week7Memory) {
+  const pool = shuffle([extras, Math.max(1, extras - 1), Math.min(10, extras + 1), Math.min(10, extras + 2)]);
+  const chosen = Array.from(new Set(pool)).slice(0, 3);
+  while (chosen.length < 3) {
+    const fallback = randInt(1, 10);
+    if (!chosen.includes(fallback)) chosen.push(fallback);
+  }
+  const correctPosition = chooseAnswerPosition(memory, 3);
+  const ordered = new Array<number>(3);
+  ordered[correctPosition] = extras;
+  const distractors = chosen.filter((value) => value !== extras).slice(0, 2);
+  const positions = [0, 1, 2].filter((index) => index !== correctPosition);
+  positions.forEach((position, index) => {
+    ordered[position] = distractors[index]!;
+  });
+  return ordered.map((numeral, index) => ({
+    id: `extra-${extras}-${index}-${numeral}`,
+    numeral,
+  }));
+}
+
 function makeTapCountTask(task: Omit<GroundTapCountTask, "kind">): PracticeTask {
   return { kind: "groundTapCount", ...task };
 }
@@ -229,6 +295,10 @@ function makeFeedTask(task: Omit<GroundFeedTask, "kind">): PracticeTask {
 
 function makeFlashTask(task: Omit<GroundFlashTask, "kind">): PracticeTask {
   return { kind: "groundFlash", ...task };
+}
+
+function makeCompareTask(task: Omit<GroundCompareTask, "kind">): PracticeTask {
+  return { kind: "groundCompare", ...task };
 }
 
 function createCountCollectionTask(lessonId: string, difficulty: Difficulty): PracticeTask {
@@ -281,7 +351,7 @@ function createOrganiseCollectionTask(lessonId: string, difficulty: Difficulty):
 
 function createCountRobotsTask(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
-  const target = Math.max(11, pickTarget(memory, difficulty));
+  const target = pickTeenTarget(memory, difficulty);
   return makeFeedTask({
     prompt: "How many robots are charging?",
     speakText: "How many robots are charging? Feed each robot into the charger as you count.",
@@ -544,6 +614,250 @@ function createHowManyMoreTask(lessonId: string): PracticeTask {
   });
 }
 
+function createTeenBuilderTask(lessonId: string, difficulty: Difficulty, prompt: string, speakText: string, target?: number, feedback?: NonNullable<GroundBuildTask["feedback"]>): PracticeTask {
+  const memory = getMemory(lessonId);
+  const teenTarget = target ?? pickTeenTarget(memory, difficulty);
+  const objectType = pickObject(memory);
+  return makeBuildTask({
+    prompt,
+    speakText,
+    targetNumber: teenTarget,
+    objectType,
+    compareMode: "exact",
+    maxBuild: 20,
+    referenceGroup: {
+      quantity: teenTarget,
+      objectType,
+      patternLayout: "ten_frame",
+    },
+    feedback: feedback ?? { correct: `You built ${teenTarget}!`, wrong: "Build the full ten and the extras." },
+  });
+}
+
+function createTeenWhichNumberMatchesTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const target = pickTeenTarget(memory, difficulty);
+  const options = closeNumeralOptions(target, memory).map((option) => ({
+    id: option.id,
+    kind: "numeral" as const,
+    numeral: option.numeral,
+  }));
+  return makeMatchTask({
+    prompt: "What number is this?",
+    speakText: "What number is this?",
+    targetNumber: target,
+    visualType: "ground-quantity-card",
+    promptType: "group_to_numeral",
+    objectType: pickObject(memory),
+    patternLayout: "ten_frame",
+    shownQuantity: target,
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: { correct: `Yes, that is ${target}!`, wrong: "See the full 10 and count the extras." },
+  });
+}
+
+function createHowManyMoreThan10Task(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const target = pickTeenTarget(memory, difficulty);
+  const extras = target - 10;
+  const options = extraCountOptions(extras, memory).map((option) => ({
+    id: option.id,
+    kind: "numeral" as const,
+    numeral: option.numeral,
+  }));
+  return makeMatchTask({
+    prompt: `How many more than 10 is ${target}?`,
+    speakText: `How many more than 10 is ${numberWord(target)}?`,
+    targetNumber: extras,
+    visualType: "ground-quantity-card",
+    promptType: "group_to_numeral",
+    objectType: pickObject(memory),
+    patternLayout: "ten_frame",
+    shownQuantity: target,
+    options,
+    correctOptionId: options.find((option) => option.numeral === extras)!.id,
+    feedback: { correct: `Yes, ${target} is 10 and ${extras} more.`, wrong: "Count the extras after the full 10." },
+  });
+}
+
+function createFindTeenNumberTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const target = pickTeenTarget(memory, difficulty);
+  const distractors = shuffle(TEENS.filter((value) => value !== target && Math.abs(value - target) <= 2)).slice(0, 2);
+  const values = shuffle([target, ...distractors]);
+  const options = values.map((value, index) => ({
+    id: `teen-find-${target}-${index}-${value}`,
+    kind: "quantity" as const,
+    quantity: value,
+    objectType: pickObject(memory),
+    patternLayout: "ten_frame" as const,
+  }));
+  return makeMatchTask({
+    prompt: `Find ${target}.`,
+    speakText: `Find ${numberWord(target)}.`,
+    targetNumber: target,
+    visualType: "ground-quantity-card",
+    promptType: "numeral_to_group",
+    shownNumeral: target,
+    objectType: pickObject(memory),
+    options,
+    correctOptionId: options.find((option) => option.quantity === target)!.id,
+    feedback: { correct: `You found ${target}!`, wrong: "Look for the full 10 and the correct extras." },
+  });
+}
+
+function createMatchExtrasTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const extras = chooseRecentSafe([1, 2, 3, 4, 5, 6, 7, 8, 9], memory.recentTargets);
+  pushRecent(memory.recentTargets, extras + 10, 6);
+  const target = 10 + extras;
+  const options = closeNumeralOptions(target, memory).map((option) => ({
+    id: option.id,
+    kind: "numeral" as const,
+    numeral: option.numeral,
+  }));
+  return makeMatchTask({
+    prompt: `Which number has ${extras} more than 10?`,
+    speakText: `Which number has ${numberWord(extras)} more than 10?`,
+    targetNumber: target,
+    visualType: "ground-quantity-card",
+    promptType: "group_to_numeral",
+    objectType: pickObject(memory),
+    patternLayout: "ten_frame",
+    shownQuantity: target,
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: { correct: `${target} is 10 and ${extras} more!`, wrong: "Look for the teen number with that many extras." },
+  });
+}
+
+function createTeenNumberPathTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const start = difficulty === "easy" ? randInt(11, 13) : difficulty === "medium" ? randInt(12, 15) : randInt(14, 17);
+  const values = [start, start + 1, start + 2];
+  pushRecent(memory.recentTargets, start + 2, 6);
+  const groups = shuffle(values).map((quantity, index) => ({
+    id: `teen-order-${lessonId}-${index}-${quantity}`,
+    quantity,
+    objectType: pickObject(memory),
+    patternLayout: "ten_frame" as const,
+  }));
+  return makeCompareTask({
+    prompt: "Put the teen collections in order.",
+    speakText: "Put the teen collections in order from least to most.",
+    targetNumber: values[values.length - 1]!,
+    comparisonType: "order",
+    groups,
+    correctOrderIds: [...groups].sort((a, b) => a.quantity - b.quantity).map((group) => group.id),
+    orderDirection: "ASC",
+    feedback: { correct: "Great teen number ordering!", wrong: "Start with the smallest teen number." },
+  });
+}
+
+function createQuickTeenFlashTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const target = pickTeenTarget(memory, difficulty);
+  const options = closeNumeralOptions(target, memory).map((option) => ({ id: option.id, numeral: option.numeral }));
+  return makeFlashTask({
+    prompt: "Quick teen flash. What number did you see?",
+    speakText: "Quick teen flash. What number did you see?",
+    targetNumber: target,
+    objectType: pickObject(memory),
+    patternLayout: "ten_frame",
+    revealType: "objects",
+    revealMs: difficulty === "hard" ? 1000 : 1300,
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: { correct: "You spotted the teen number!", wrong: "Look for the full ten and the extras." },
+  });
+}
+
+function createCountTheExtrasTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  return createHowManyMoreThan10Task(lessonId, difficulty);
+}
+
+function createBuildTo20Task(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const pool = difficulty === "easy" ? [18] : difficulty === "medium" ? [18, 19] : [18, 19, 20];
+  const memory = getMemory(lessonId);
+  const target = chooseRecentSafe(pool, memory.recentTargets);
+  pushRecent(memory.recentTargets, target, 6);
+  return createTeenBuilderTask(
+    lessonId,
+    difficulty,
+    `Build ${target}.`,
+    `Build ${numberWord(target)}.`,
+    target,
+    { correct: `You built ${target}!`, wrong: "Use a full ten and the extras to build the teen number." }
+  );
+}
+
+function createSameOrDifferentTeenTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const base = pickTeenTarget(memory, difficulty);
+  const same = Math.random() < 0.5;
+  const other = same ? base : chooseRecentSafe(TEENS.filter((value) => value !== base && Math.abs(value - base) <= 2), memory.recentTargets);
+  pushRecent(memory.recentTargets, other, 6);
+  return makeCompareTask({
+    prompt: "Do these show the same number?",
+    speakText: "Do these show the same number?",
+    targetNumber: base,
+    comparisonType: "equal",
+    helperVariant: "ten_frame",
+    groups: [
+      { id: `same-${base}-a`, quantity: base, objectType: pickObject(memory), patternLayout: "ten_frame" },
+      { id: `same-${other}-b`, quantity: other, objectType: pickObject(memory), patternLayout: "ten_frame" },
+    ],
+    feedback: { correct: same ? "Yes, they match!" : "Correct, they are different!", wrong: "Look at the extras after 10." },
+  });
+}
+
+function createMissingTeenNumberTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const target = pickTeenTarget(memory, difficulty);
+  const extras = target - 10;
+  const options = closeNumeralOptions(target, memory).map((option) => ({
+    id: option.id,
+    kind: "numeral" as const,
+    numeral: option.numeral,
+  }));
+  return makeMatchTask({
+    prompt: `10 and ${extras} more is...`,
+    speakText: `10 and ${numberWord(extras)} more is...`,
+    targetNumber: target,
+    visualType: "ground-quantity-card",
+    promptType: "group_to_numeral",
+    objectType: pickObject(memory),
+    patternLayout: "ten_frame",
+    shownQuantity: target,
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: { correct: `Yes, 10 and ${extras} more is ${target}!`, wrong: "Count on from the full ten." },
+  });
+}
+
+function createWhichIsBiggerTeenTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const first = pickTeenTarget(memory, difficulty);
+  const second = chooseRecentSafe(TEENS.filter((value) => value !== first), memory.recentTargets);
+  pushRecent(memory.recentTargets, second, 6);
+  const groups = shuffle([
+    { id: `bigger-${first}`, quantity: first, objectType: pickObject(memory), patternLayout: "ten_frame" as const },
+    { id: `bigger-${second}`, quantity: second, objectType: pickObject(memory), patternLayout: "ten_frame" as const },
+  ]);
+  const correctGroup = groups.reduce((best, current) => (current.quantity > best.quantity ? current : best));
+  return makeCompareTask({
+    prompt: "Which is bigger?",
+    speakText: "Which is bigger?",
+    targetNumber: Math.max(first, second),
+    comparisonType: "biggest",
+    helperVariant: "ten_frame",
+    groups,
+    correctGroupId: correctGroup.id,
+    feedback: { correct: "You found the bigger teen number!", wrong: "Look at which one has more extras after 10." },
+  });
+}
+
 function generateLesson1Task(lessonId: string, difficulty: Difficulty, kind: (typeof LESSON1_ROTATION)[number]): PracticeTask {
   switch (kind) {
     case "count_collection":
@@ -579,9 +893,54 @@ function generateLesson1Task(lessonId: string, difficulty: Difficulty, kind: (ty
   }
 }
 
+function generateLesson2Task(lessonId: string, difficulty: Difficulty, kind: (typeof LESSON2_ROTATION)[number]): PracticeTask {
+  switch (kind) {
+    case "build_teen_number": {
+      const target = pickTeenTarget(getMemory(lessonId), difficulty);
+      return createTeenBuilderTask(lessonId, difficulty, `Build ${target}.`, `Build ${numberWord(target)}.`, target);
+    }
+    case "which_number_matches":
+      return createTeenWhichNumberMatchesTask(lessonId, difficulty);
+    case "teen_number_match":
+      return createTeenNumberMatchTask(lessonId, difficulty);
+    case "how_many_more_than_10":
+      return createHowManyMoreThan10Task(lessonId, difficulty);
+    case "find_the_teen_number":
+      return createFindTeenNumberTask(lessonId, difficulty);
+    case "fill_the_collection": {
+      const target = pickTeenTarget(getMemory(lessonId), difficulty);
+      return createTeenBuilderTask(lessonId, difficulty, `Make ${target}.`, `Make ${numberWord(target)}.`, target, { correct: `You made ${target}!`, wrong: "Fill the ten frame and extras to make the teen number." });
+    }
+    case "numbot_teen_reactor": {
+      const target = pickTeenTarget(getMemory(lessonId), difficulty);
+      return createTeenBuilderTask(lessonId, difficulty, `Numbot says build ${target}.`, `Numbot says build ${numberWord(target)}.`, target, { correct: `You built ${target}!`, wrong: "Power the reactor with a full 10 and the right extras." });
+    }
+    case "match_the_extras":
+      return createMatchExtrasTask(lessonId, difficulty);
+    case "teen_number_path":
+      return createTeenNumberPathTask(lessonId, difficulty);
+    case "quick_teen_flash":
+      return createQuickTeenFlashTask(lessonId, difficulty);
+    case "count_the_extras":
+      return createCountTheExtrasTask(lessonId, difficulty);
+    case "build_to_20":
+      return createBuildTo20Task(lessonId, difficulty);
+    case "same_or_different":
+      return createSameOrDifferentTeenTask(lessonId, difficulty);
+    case "missing_teen_number":
+      return createMissingTeenNumberTask(lessonId, difficulty);
+    case "which_is_bigger":
+      return createWhichIsBiggerTeenTask(lessonId, difficulty);
+  }
+}
+
 export function generatePrepWeek7Task(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
-  const kind = nextKind(memory);
+  if (lessonId === "y0-w7-l2") {
+    const kind = nextLesson2Kind(memory);
+    return generateLesson2Task(lessonId, difficulty, kind);
+  }
+  const kind = nextLesson1Kind(memory);
   return generateLesson1Task(lessonId, difficulty, kind);
 }
 

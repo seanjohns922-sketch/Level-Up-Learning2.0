@@ -52,7 +52,8 @@ function isPrepGroundCustomLesson(lessonId: string) {
     lessonId.startsWith("y0-w4-") ||
     lessonId.startsWith("y0-w5-") ||
     lessonId.startsWith("y0-w6-") ||
-    lessonId === "y0-w7-l1"
+    lessonId === "y0-w7-l1" ||
+    lessonId === "y0-w7-l2"
   );
 }
 
@@ -322,8 +323,10 @@ function LessonPage() {
                               ? "Match the Groups Complete!"
                               : effectiveLessonId === "y0-w5-l3"
                                 ? "Number Sort Challenge Complete!"
-                                : effectiveLessonId === "y0-w7-l1"
-                                  ? "Collection Counter Mission Complete!"
+                                : effectiveLessonId === "y0-w7-l2"
+                                  ? "Teen Number Mission Complete!"
+                                  : effectiveLessonId === "y0-w7-l1"
+                                    ? "Collection Counter Mission Complete!"
                                   : effectiveLessonId === "y0-w6-l1"
                                     ? "Number Builder Lab Complete!"
                                   : effectiveLessonId === "y0-w1-l2"

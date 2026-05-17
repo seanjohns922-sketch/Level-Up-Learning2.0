@@ -243,9 +243,10 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         7,
         2,
         "Teen Numbers 11–20",
-        "Recognise and match teen numerals to quantities.",
-        ["Teen number match", "Quantity to numeral", "Quick teen spotting"],
-        ["AC9MFN01", "AC9MFN03"]
+        "Recognise, build, and match teen numbers as 10 and some more using structured visuals.",
+        ["Build 10 and extras", "Teen number match", "Find the teen collection"],
+        ["AC9MFN01", "AC9MFN02", "AC9MFN03"],
+        "Teen Number Mission"
       ),
       buildLesson(
         7,
