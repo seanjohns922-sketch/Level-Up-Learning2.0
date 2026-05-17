@@ -6314,6 +6314,12 @@ function SessionPage() {
           : "Weekly Quiz";
 
   useEffect(() => {
+    if (year === "Prep" && type === "lesson") {
+      router.replace(`/lesson?year=${encodeURIComponent(year)}&week=${encodeURIComponent(week)}&lessonId=y0-w${Number(week)}-l${n}`);
+    }
+  }, [router, year, week, type, n]);
+
+  useEffect(() => {
     const progress = readProgress();
     if (!progress || progress.status !== "ASSIGNED_PROGRAM" || progress.year !== year) return;
 
