@@ -3337,6 +3337,463 @@ function buildPrepWeek5WeeklyQuizQuestions(
   return questions;
 }
 
+function buildPrepWeek6WeeklyQuizQuestions(
+  questionsPerLesson: number
+): QuizQuestion[] {
+  const totalExpected = questionsPerLesson * 3;
+  const targetHistory: number[] = [];
+  const objectHistory: GroundObjectType[] = [];
+  const pairHistory: string[] = [];
+  const positionHistory: number[] = [];
+  type GroundPatternLayout = "dice" | "ten_frame" | "domino" | "finger" | "symmetry";
+
+  const lesson1Targets = [5, 6, 7, 8, 9] as const;
+  const splitTargets = [6, 7, 8, 9, 10] as const;
+  const lesson3Targets = [8, 9, 10] as const;
+
+  function reservePosition(position: number) {
+    positionHistory.push(position);
+    if (positionHistory.length > 4) positionHistory.shift();
+  }
+
+  function nextTarget(pool: readonly number[]) {
+    const target = chooseGroundRecentSafe([...pool], targetHistory);
+    targetHistory.push(target);
+    if (targetHistory.length > 5) targetHistory.shift();
+    return target;
+  }
+
+  function nextObjectType(allowed: GroundObjectType[] = GROUND_OBJECT_TYPES) {
+    const objectType = chooseGroundRecentSafe(allowed, objectHistory);
+    objectHistory.push(objectType);
+    if (objectHistory.length > 5) objectHistory.shift();
+    return objectType;
+  }
+
+  function nextLayout(quantity: number, preferred?: GroundPatternLayout[]) {
+    const pool: GroundPatternLayout[] = preferred
+      ? preferred
+      : quantity >= 6
+        ? ["ten_frame", "domino", "symmetry"]
+        : ["dice", "domino", "symmetry", "finger", "ten_frame"];
+    return chooseGroundRecentSafe(pool, []);
+  }
+
+  function pairKey(parts: number[]) {
+    return [...parts].sort((a, b) => a - b).join("+");
+  }
+
+  function chooseParts(total: number, avoidKeys: string[] = []) {
+    const combos: number[][] = [];
+    for (let left = 1; left < total; left += 1) {
+      combos.push([left, total - left]);
+    }
+    const pool = combos.filter((parts) => !avoidKeys.includes(pairKey(parts)));
+    const source = pool.length ? pool : combos;
+    const choice = source[randInt(0, source.length - 1)]!;
+    pairHistory.push(pairKey(choice));
+    if (pairHistory.length > 6) pairHistory.shift();
+    return choice;
+  }
+
+  function makePairOption(parts: number[], index: number): GroundMatchOption {
+    const total = parts[0]! + parts[1]!;
+    return {
+      id: `pair-${index}-${parts[0]}-${parts[1]}`,
+      kind: "pair",
+      pairNumeral: total,
+      pairParts: parts,
+      pairPartObjectTypes: [nextObjectType(), nextObjectType()],
+      pairPartLayouts: [
+        nextLayout(parts[0]!, total === 10 ? ["ten_frame"] : undefined),
+        nextLayout(parts[1]!, total === 10 ? ["ten_frame"] : undefined),
+      ],
+    };
+  }
+
+  function makePairOptionsQuestion(
+    index: number,
+    lessonNumber: 1 | 2 | 3,
+    skill: string,
+    prompt: string,
+    speakText: string,
+    target: number,
+    correctParts: number[],
+    distractorParts: number[][],
+    referenceMode: "numeral" | "quantity" = "numeral",
+    preferredLayouts?: GroundPatternLayout[]
+  ): QuizQuestion {
+    const options = shuffle([correctParts, ...distractorParts]).map((parts, optionIndex) =>
+      makePairOption(parts, optionIndex)
+    );
+    const correctOption = options.find((option) => pairKey(option.pairParts ?? []) === pairKey(correctParts))!;
+    reservePosition(options.findIndex((option) => option.id === correctOption.id));
+    return buildGroundQuizQuestion(`q${index}`, lessonNumber, skill, {
+      kind: "groundMatch",
+      prompt,
+      speakText,
+      targetNumber: target,
+      targetNumberName: numberToGroundWord(target),
+      visualType: "ground-flash-match-card",
+      promptType: "match_pair",
+      objectType: nextObjectType(),
+      patternLayout: nextLayout(target, preferredLayouts),
+      shownNumeral: referenceMode === "numeral" ? target : undefined,
+      shownQuantity: referenceMode === "quantity" ? target : undefined,
+      options,
+      correctOptionId: correctOption.id,
+      feedback: {
+        correct: target === 10 ? "You made 10!" : "Great building!",
+        wrong: "Check which parts join to make the whole.",
+      },
+    });
+  }
+
+  function makeMissingPartQuestion(
+    index: number,
+    lessonNumber: 1 | 2 | 3,
+    skill: string,
+    prompt: string,
+    speakText: string,
+    whole: number,
+    shownPart: number
+  ): QuizQuestion {
+    const missingPart = whole - shownPart;
+    const distractorPool = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter(
+      (value) => value !== missingPart && Math.abs(value - missingPart) <= 2
+    );
+    const distractors = shuffle(
+      distractorPool.length >= 2
+        ? distractorPool
+        : [1, 2, 3, 4, 5, 6, 7, 8, 9].filter((value) => value !== missingPart)
+    ).slice(0, 2);
+    const chosenPosition = chooseGroundRecentSafe([0, 1, 2], positionHistory);
+    reservePosition(chosenPosition);
+    const values = Array.from({ length: 3 }, (_, optionIndex) =>
+      optionIndex === chosenPosition ? missingPart : distractors[optionIndex > chosenPosition ? optionIndex - 1 : optionIndex]
+    );
+    return buildGroundQuizQuestion(`q${index}`, lessonNumber, skill, {
+      kind: "groundMatch",
+      prompt,
+      speakText,
+      targetNumber: missingPart,
+      targetNumberName: numberToGroundWord(missingPart),
+      visualType: "ground-quantity-card",
+      promptType: "group_to_numeral",
+      objectType: nextObjectType(),
+      patternLayout: nextLayout(shownPart, whole === 10 ? ["ten_frame"] : ["ten_frame", "domino"]),
+      shownQuantity: shownPart,
+      options: values.map((value, optionIndex) => ({
+        id: `miss-${index}-${optionIndex}-${value}`,
+        kind: "numeral" as const,
+        numeral: value!,
+      })),
+      correctOptionId: `miss-${index}-${chosenPosition}-${missingPart}`,
+      feedback: {
+        correct: whole === 10 ? "Perfect fill to 10!" : "You found the missing part!",
+        wrong: "Count how many more are needed.",
+      },
+    });
+  }
+
+  function makeSplitBuildQuestion(
+    index: number,
+    lessonNumber: 1 | 2 | 3,
+    skill: string,
+    prompt: string,
+    speakText: string,
+    total: number,
+    exampleParts: number[],
+    requireDifferentFromExample: boolean
+  ): QuizQuestion {
+    const objectType = nextObjectType();
+    return buildGroundQuizQuestion(`q${index}`, lessonNumber, skill, {
+      kind: "groundBuild",
+      prompt,
+      speakText,
+      targetNumber: total,
+      objectType,
+      compareMode: "exact",
+      maxBuild: 10,
+      buildMode: "split",
+      exampleParts,
+      exampleObjectTypes: [nextObjectType(), nextObjectType()],
+      examplePartLayouts: [
+        nextLayout(exampleParts[0]!, total === 10 ? ["ten_frame"] : undefined),
+        nextLayout(exampleParts[1]!, total === 10 ? ["ten_frame"] : undefined),
+      ],
+      splitObjectTypes: [nextObjectType(), nextObjectType()],
+      splitPartLayouts: [
+        nextLayout(exampleParts[0]!, total === 10 ? ["ten_frame"] : undefined),
+        nextLayout(exampleParts[1]!, total === 10 ? ["ten_frame"] : undefined),
+      ],
+      requireDifferentFromExample,
+      referenceGroup: {
+        quantity: total,
+        objectType,
+        patternLayout: nextLayout(total, total === 10 ? ["ten_frame"] : undefined),
+      },
+      feedback: {
+        correct: total === 10 ? "You made 10!" : "Perfect number build!",
+        wrong: requireDifferentFromExample
+          ? "Build the same whole in a different way."
+          : "Use two parts that join to make the whole.",
+      },
+    });
+  }
+
+  function makeLesson1Task(
+    index: number,
+    variant: "build" | "another_way" | "same_total" | "missing_part" | "numbot"
+  ): QuizQuestion {
+    if (variant === "build") {
+      const total = nextTarget(lesson1Targets);
+      return makeSplitBuildQuestion(
+        index,
+        1,
+        "ground_w6_l1_build",
+        `Build ${total}.`,
+        `Build ${numberToGroundWord(total)}.`,
+        total,
+        chooseParts(total),
+        false
+      );
+    }
+
+    if (variant === "another_way") {
+      const total = nextTarget(lesson1Targets);
+      const exampleParts = chooseParts(total);
+      return makeSplitBuildQuestion(
+        index,
+        1,
+        "ground_w6_l1_another_way",
+        `Can you make ${total} another way?`,
+        `Can you make ${numberToGroundWord(total)} another way?`,
+        total,
+        exampleParts,
+        true
+      );
+    }
+
+    if (variant === "same_total") {
+      const total = nextTarget(lesson1Targets);
+      const correctParts = chooseParts(total);
+      const wrongA = chooseParts(Math.max(2, total - 1), [pairKey(correctParts)]);
+      const wrongB = chooseParts(Math.min(10, total + 1), [pairKey(correctParts), pairKey(wrongA)]);
+      return makePairOptionsQuestion(
+        index,
+        1,
+        "ground_w6_l1_same_total",
+        "Which parts make the same number?",
+        "Which groups make the same number?",
+        total,
+        correctParts,
+        [wrongA, wrongB],
+        "quantity"
+      );
+    }
+
+    if (variant === "missing_part") {
+      const whole = nextTarget([6, 7, 8, 9, 10] as const);
+      const shownPart = chooseParts(whole)[0]!;
+      return makeMissingPartQuestion(
+        index,
+        1,
+        "ground_w6_l1_missing_part",
+        "Fill the missing part.",
+        `Fill the missing part to make ${numberToGroundWord(whole)}.`,
+        whole,
+        shownPart
+      );
+    }
+
+    const total = nextTarget(splitTargets);
+    return makeSplitBuildQuestion(
+      index,
+      1,
+      "ground_w6_l1_numbot",
+      `Numbot says build ${total}.`,
+      `Numbot says build ${numberToGroundWord(total)}.`,
+      total,
+      chooseParts(total),
+      false
+    );
+  }
+
+  function makeLesson2Task(
+    index: number,
+    variant: "make_10" | "fill_to_10" | "which_makes_10" | "another_way" | "complete_frame"
+  ): QuizQuestion {
+    if (variant === "make_10") {
+      return makeSplitBuildQuestion(
+        index,
+        2,
+        "ground_w6_l2_make_10",
+        "Make 10.",
+        "Make 10.",
+        10,
+        chooseParts(10),
+        false
+      );
+    }
+
+    if (variant === "fill_to_10") {
+      const shownPart = chooseParts(10)[0]!;
+      return makeMissingPartQuestion(
+        index,
+        2,
+        "ground_w6_l2_fill_to_10",
+        "How many more to make 10?",
+        "How many more to make 10?",
+        10,
+        shownPart
+      );
+    }
+
+    if (variant === "which_makes_10") {
+      const correctParts = chooseParts(10);
+      const wrongA = chooseParts(9, [pairKey(correctParts)]);
+      const wrongB = chooseParts(8, [pairKey(correctParts), pairKey(wrongA)]);
+      return makePairOptionsQuestion(
+        index,
+        2,
+        "ground_w6_l2_which_makes_10",
+        "Which groups make 10?",
+        "Which groups make 10?",
+        10,
+        correctParts,
+        [wrongA, wrongB],
+        "numeral",
+        ["ten_frame"]
+      );
+    }
+
+    if (variant === "another_way") {
+      const exampleParts = chooseParts(10);
+      return makeSplitBuildQuestion(
+        index,
+        2,
+        "ground_w6_l2_another_way",
+        "Can you make 10 another way?",
+        "Can you make 10 another way?",
+        10,
+        exampleParts,
+        true
+      );
+    }
+
+    return makeSplitBuildQuestion(
+      index,
+      2,
+      "ground_w6_l2_complete_frame",
+      "Complete the frame to 10.",
+      "Complete the frame to 10.",
+      10,
+      chooseParts(10),
+      false
+    );
+  }
+
+  function makeLesson3Task(
+    index: number,
+    variant: "split_10" | "parts_match" | "missing_part" | "another_way" | "split_other"
+  ): QuizQuestion {
+    if (variant === "parts_match") {
+      const correctParts = chooseParts(10);
+      const wrongA = chooseParts(8, [pairKey(correctParts)]);
+      const wrongB = chooseParts(9, [pairKey(correctParts), pairKey(wrongA)]);
+      return makePairOptionsQuestion(
+        index,
+        3,
+        "ground_w6_l3_parts_match",
+        "Which parts match the whole?",
+        "Which parts match the whole 10?",
+        10,
+        correctParts,
+        [wrongA, wrongB],
+        "numeral",
+        ["ten_frame"]
+      );
+    }
+
+    if (variant === "missing_part") {
+      const shownPart = chooseParts(10)[0]!;
+      return makeMissingPartQuestion(
+        index,
+        3,
+        "ground_w6_l3_missing_part",
+        "Build the missing part.",
+        "Build the missing part to make 10.",
+        10,
+        shownPart
+      );
+    }
+
+    if (variant === "another_way") {
+      const exampleParts = chooseParts(10);
+      return makeSplitBuildQuestion(
+        index,
+        3,
+        "ground_w6_l3_another_way",
+        "Split 10 another way.",
+        "Can you split 10 another way?",
+        10,
+        exampleParts,
+        true
+      );
+    }
+
+    if (variant === "split_other") {
+      const total = nextTarget(lesson3Targets.filter((value) => value !== 10));
+      return makeSplitBuildQuestion(
+        index,
+        3,
+        "ground_w6_l3_split_other",
+        `Can you split ${total}?`,
+        `Can you split ${numberToGroundWord(total)}?`,
+        total,
+        chooseParts(total),
+        false
+      );
+    }
+
+    return makeSplitBuildQuestion(
+      index,
+      3,
+      "ground_w6_l3_split_10",
+      "Split 10 another way.",
+      "Split 10 another way.",
+      10,
+      chooseParts(10),
+      false
+    );
+  }
+
+  const questions: QuizQuestion[] = [
+    makeLesson1Task(1, "build"),
+    makeLesson1Task(2, "another_way"),
+    makeLesson1Task(3, "same_total"),
+    makeLesson1Task(4, "missing_part"),
+    makeLesson1Task(5, "numbot"),
+    makeLesson2Task(6, "make_10"),
+    makeLesson2Task(7, "fill_to_10"),
+    makeLesson2Task(8, "which_makes_10"),
+    makeLesson2Task(9, "another_way"),
+    makeLesson2Task(10, "complete_frame"),
+    makeLesson3Task(11, "split_10"),
+    makeLesson3Task(12, "parts_match"),
+    makeLesson3Task(13, "missing_part"),
+    makeLesson3Task(14, "another_way"),
+    makeLesson3Task(15, "split_other"),
+  ];
+
+  if (questions.length !== totalExpected) {
+    throw new Error(`[GroundWeeklyQuiz] Week 6 expected ${totalExpected} questions, received ${questions.length}.`);
+  }
+
+  return questions;
+}
+
 function toQuizQuestionFromYear2Data(
   questionData: Year2QuestionData,
   lessonNumber: number,
@@ -5396,7 +5853,9 @@ function SessionPage() {
       ? "Quick Eyes Challenge"
       : year === "Prep" && Number(week) === 5
         ? "Quantity Challenge"
-        : "Weekly Quiz";
+        : year === "Prep" && Number(week) === 6
+          ? "Number Builder Challenge"
+          : "Weekly Quiz";
 
   useEffect(() => {
     const progress = readProgress();
@@ -5530,6 +5989,10 @@ function SessionPage() {
 
     if (year === "Prep" && Number(week) === 5) {
       return buildPrepWeek5WeeklyQuizQuestions(questionsPerLesson);
+    }
+
+    if (year === "Prep" && Number(week) === 6) {
+      return buildPrepWeek6WeeklyQuizQuestions(questionsPerLesson);
     }
 
     if (
@@ -5883,6 +6346,13 @@ function SessionPage() {
     quizMoneyAnswers,
     quizLessonActivityResults,
   ]);
+  const quizCompletionTitle = year === "Prep" && Number(week) === 6
+    ? "Number Builder Challenge Complete!"
+    : "Quiz Results";
+  const quizCompletionMessage = year === "Prep" && Number(week) === 6
+    ? "You built and split the numbers perfectly!"
+    : "Keep building across all three lessons.";
+
   const lessonBreakdown = useMemo(
     () =>
       buildLessonBreakdown(
@@ -7180,13 +7650,16 @@ function SessionPage() {
                   {/* Hero */}
                   <div className="px-6 py-6 text-center border-b border-teal-300/15">
                     <div className="inline-flex items-center gap-1.5 rounded-full border border-teal-300/30 bg-teal-500/10 px-2.5 py-1 text-[9px] font-mono font-bold uppercase tracking-[0.2em] text-teal-200/90">
-                      Quiz Results
+                      {quizCompletionTitle}
                     </div>
                     <div className="mt-2 text-4xl font-black tracking-[-0.01em] text-white">
                       {finalScore}<span className="text-teal-300/70">/{quizQuestions.length}</span>
                     </div>
                     <div className="mt-1 text-sm font-semibold text-teal-100/80">
                       Pass Rate · {Math.round((finalScore / Math.max(1, quizQuestions.length)) * 100)}%
+                    </div>
+                    <div className="mt-2 text-sm font-semibold text-emerald-200/90">
+                      {quizCompletionMessage}
                     </div>
                   </div>
 
