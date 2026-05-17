@@ -36,6 +36,17 @@ const EARLY_TEENS = [11, 12, 13, 14] as const;
 const MID_TEENS = [15, 16, 17] as const;
 const LATE_TEENS = [18, 19, 20] as const;
 const TEENS = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20] as const;
+const WEEK7_MOVING_REVEAL_MS = 650;
+const WEEK7_QUICK_COUNT_REVEAL_MS: Record<Difficulty, number> = {
+  easy: 2200,
+  medium: 1800,
+  hard: 1500,
+};
+const WEEK7_QUICK_TEEN_REVEAL_MS: Record<Difficulty, number> = {
+  easy: 2400,
+  medium: 2000,
+  hard: 1700,
+};
 const LESSON1_ROTATION = [
   "count_collection",
   "tap_to_count",
@@ -420,7 +431,7 @@ function createCountMovingObjectsTask(lessonId: string, difficulty: Difficulty):
     speakText: "Count the moving objects carefully.",
     targetNumber: target,
     objectType: pickObject(memory),
-    revealMs: 460,
+    revealMs: WEEK7_MOVING_REVEAL_MS,
     options,
     correctOptionId: options.find((option) => option.numeral === target)!.id,
     feedback: { correct: "You tracked them carefully!", wrong: "Watch the objects appear and count again." },
@@ -553,7 +564,7 @@ function createQuickCountTask(lessonId: string, difficulty: Difficulty): Practic
     objectType: pickObject(memory),
     patternLayout: pickLayout(memory, Math.min(target, 12), target >= 11 ? ["ten_frame"] : undefined),
     revealType: "objects",
-    revealMs: difficulty === "hard" ? 1100 : 1400,
+    revealMs: WEEK7_QUICK_COUNT_REVEAL_MS[difficulty],
     options,
     correctOptionId: options.find((option) => option.numeral === target)!.id,
     feedback: { correct: "Quick counting complete!", wrong: "Look for groups to help you count fast." },
@@ -766,7 +777,7 @@ function createQuickTeenFlashTask(lessonId: string, difficulty: Difficulty): Pra
     objectType: pickObject(memory),
     patternLayout: "ten_frame",
     revealType: "objects",
-    revealMs: difficulty === "hard" ? 1000 : 1300,
+    revealMs: WEEK7_QUICK_TEEN_REVEAL_MS[difficulty],
     options,
     correctOptionId: options.find((option) => option.numeral === target)!.id,
     feedback: { correct: "You spotted the teen number!", wrong: "Look for the full ten and the extras." },
