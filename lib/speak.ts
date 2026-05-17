@@ -226,7 +226,13 @@ export function useAutoReadSetting() {
 
 function isLovablePreviewHost() {
   if (typeof window === "undefined") return false;
-  return /(^|\.)lovable\.dev$/i.test(window.location.hostname);
+  const host = window.location.hostname.toLowerCase();
+  return (
+    host.includes("lovable") ||
+    /(^|\.)lovable\.dev$/i.test(host) ||
+    /(^|\.)lovable\.app$/i.test(host) ||
+    /(^|\.)lovableproject\.com$/i.test(host)
+  );
 }
 
 export function useSpeechInteractionReady() {
