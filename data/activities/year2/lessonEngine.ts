@@ -5356,6 +5356,16 @@ function placeLabel(place: PlaceValueName) {
   return "ones";
 }
 
+function placeCountLabel(place: PlaceValueName, count: number | null) {
+  if (count === null) return placeLabel(place);
+  if (place === "hundred_thousands") return count === 1 ? "hundred thousand" : "hundred thousands";
+  if (place === "ten_thousands") return count === 1 ? "ten thousand" : "ten thousands";
+  if (place === "thousands") return count === 1 ? "thousand" : "thousands";
+  if (place === "hundreds") return count === 1 ? "hundred" : "hundreds";
+  if (place === "tens") return count === 1 ? "ten" : "tens";
+  return count === 1 ? "one" : "ones";
+}
+
 function relevantPlaceValues(places: PlaceValueName[], value: number) {
   const nonZeroPlaces = places.filter((place) => digitForPlace(value, place) > 0);
   return nonZeroPlaces.length > 0 ? nonZeroPlaces : [places[places.length - 1] ?? "ones"];
@@ -5372,7 +5382,7 @@ function mabPlaceSummary(
       const count = counts[place];
       if (count === null) return `? ${placeLabel(place)}`;
       if (count <= 0) return null;
-      return `${count} ${placeLabel(place)}`;
+      return `${count} ${placeCountLabel(place, count)}`;
     })
     .filter(Boolean)
     .join(", ");

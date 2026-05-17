@@ -11,6 +11,16 @@ function placeLabel(place: PlaceValueName) {
   return "Ones";
 }
 
+function countLabel(place: PlaceValueName, count: number | null) {
+  if (count === null) return placeLabel(place).toLowerCase();
+  if (place === "hundred_thousands") return count === 1 ? "hundred thousand" : "hundred thousands";
+  if (place === "ten_thousands") return count === 1 ? "ten thousand" : "ten thousands";
+  if (place === "thousands") return count === 1 ? "thousand" : "thousands";
+  if (place === "hundreds") return count === 1 ? "hundred" : "hundreds";
+  if (place === "tens") return count === 1 ? "ten" : "tens";
+  return count === 1 ? "one" : "ones";
+}
+
 function placeCount(questionData: MABVisualData, place: PlaceValueName) {
   if (place === "hundred_thousands") return questionData.hundredThousands;
   if (place === "ten_thousands") return questionData.tenThousands;
@@ -132,7 +142,7 @@ export default function PlaceValueMABVisual({
                 <MABChipVisual place={place} count={count} />
               </div>
               <div className="mt-2 text-sm text-gray-600">
-                {count === null ? "Missing part" : `${count} ${placeLabel(place).toLowerCase()}`}
+                {count === null ? "Missing part" : `${count} ${countLabel(place, count)}`}
               </div>
             </div>
           );

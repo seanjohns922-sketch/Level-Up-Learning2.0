@@ -690,14 +690,24 @@ function placeValueSummary(question: Year2PlaceValueBuilderQuestion) {
     ones: question.ones,
   } as const;
 
+  function labelFor(place: keyof typeof counts, count: number | null) {
+    if (count === null) {
+      if (place === "hundred_thousands") return "hundred thousands";
+      if (place === "ten_thousands") return "ten thousands";
+      return place;
+    }
+    if (place === "hundred_thousands") return count === 1 ? "hundred thousand" : "hundred thousands";
+    if (place === "ten_thousands") return count === 1 ? "ten thousand" : "ten thousands";
+    if (place === "thousands") return count === 1 ? "thousand" : "thousands";
+    if (place === "hundreds") return count === 1 ? "hundred" : "hundreds";
+    if (place === "tens") return count === 1 ? "ten" : "tens";
+    return count === 1 ? "one" : "ones";
+  }
+
   return question.placeValues
     .map((place) => {
       const count = counts[place];
-      const label = place === "hundred_thousands"
-        ? "hundred thousands"
-        : place === "ten_thousands"
-          ? "ten thousands"
-          : place;
+      const label = labelFor(place, count);
       if (count === null) return `? ${label}`;
       if (count <= 0) return null;
       return `${count} ${label}`;
