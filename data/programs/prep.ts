@@ -269,9 +269,10 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         8,
         1,
         "Missing Numbers",
-        "Find missing numbers in simple number sequences to 20.",
+        "Identify missing numbers in forward and backward sequences to 20 using number paths, neighbours, and counting patterns.",
         ["Missing number trail", "Fill the gap", "Pattern path"],
-        ["AC9MFN01", "AC9MFN03"]
+        ["AC9MFN01", "AC9MFN03"],
+        "Number Detective Mission"
       ),
       buildLesson(
         8,
