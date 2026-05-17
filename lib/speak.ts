@@ -7,6 +7,7 @@ type SpeakState = {
   currentText: string | null;
   isSpeaking: boolean;
   autoReadEnabled: boolean;
+  interactionUnlocked: boolean;
 };
 
 const AUTO_READ_STORAGE_KEY = "levelup:autoReadEnabled";
@@ -20,7 +21,10 @@ let speakState: SpeakState = {
   currentText: null,
   isSpeaking: false,
   autoReadEnabled: false,
+  interactionUnlocked: false,
 };
+
+let interactionTrackingInstalled = false;
 
 const CARDINALS_UNDER_TWENTY = [
   "zero",
@@ -156,6 +160,27 @@ function setSpeakState(next: Partial<SpeakState>) {
   emitSpeakState();
 }
 
+function markSpeechInteractionUnlocked() {
+  if (speakState.interactionUnlocked) return;
+  setSpeakState({ interactionUnlocked: true });
+}
+
+function ensureSpeechInteractionTracking() {
+  if (typeof window === "undefined" || interactionTrackingInstalled) return;
+  interactionTrackingInstalled = true;
+
+  const unlock = () => {
+    markSpeechInteractionUnlocked();
+    window.removeEventListener("pointerdown", unlock);
+    window.removeEventListener("keydown", unlock);
+    window.removeEventListener("touchstart", unlock);
+  };
+
+  window.addEventListener("pointerdown", unlock, { passive: true });
+  window.addEventListener("keydown", unlock);
+  window.addEventListener("touchstart", unlock, { passive: true });
+}
+
 function readAutoReadPreference() {
   if (typeof window === "undefined") return false;
   const current = window.localStorage.getItem(AUTO_READ_STORAGE_KEY);
@@ -171,8 +196,11 @@ function readAutoReadPreference() {
 }
 
 function getSpeakStateSnapshot() {
-  if (typeof window !== "undefined" && speakState.autoReadEnabled !== readAutoReadPreference()) {
-    speakState = { ...speakState, autoReadEnabled: readAutoReadPreference() };
+  if (typeof window !== "undefined") {
+    ensureSpeechInteractionTracking();
+    if (speakState.autoReadEnabled !== readAutoReadPreference()) {
+      speakState = { ...speakState, autoReadEnabled: readAutoReadPreference() };
+    }
   }
   return speakState;
 }
@@ -194,6 +222,10 @@ export function useAutoReadSetting() {
     autoReadEnabled: state.autoReadEnabled,
     setAutoReadEnabled,
   };
+}
+
+export function useSpeechInteractionReady() {
+  return useSpeakState().interactionUnlocked;
 }
 
 export function setAutoReadEnabled(enabled: boolean) {
@@ -262,8 +294,11 @@ function fallbackSpeak(text: string) {
   synth.speak(utterance);
 }
 
-export async function speak(text: string, speechKey?: string) {
+export async function speak(text: string, speechKey?: string, source: "manual" | "auto" = "manual") {
   if (typeof window === "undefined") return;
+
+  ensureSpeechInteractionTracking();
+  if (source === "manual") markSpeechInteractionUnlocked();
 
   const normalized = normalizeText(text);
   if (!normalized) return;

@@ -32,7 +32,7 @@ import MoneyChange from "@/components/week7/MoneyChange";
 import MoneyEnough from "@/components/week7/MoneyEnough";
 import { MathFormattedText } from "@/components/FractionText";
 import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent } from "@/lib/live-class-client";
-import { prepareSpeechText, speak, useAutoReadSetting, useSpeakState } from "@/lib/speak";
+import { prepareSpeechText, speak, useAutoReadSetting, useSpeakState, useSpeechInteractionReady } from "@/lib/speak";
 import type { TeacherAttemptQuestion, TeacherInsight, TeacherInsightInput } from "@/lib/teacher-insights";
 import { ClickableDotGrid, ClickableDotRows } from "@/components/ClickableDots";
 import { StaticDotGrid, StaticDotRow, StaticDotRows } from "@/components/StaticDots";
@@ -6095,6 +6095,7 @@ function SessionPage() {
       : currentQuiz?.prompt ?? "";
   const currentQuizId = currentQuiz?.id ?? null;
   const { autoReadEnabled } = useAutoReadSetting();
+  const speechInteractionReady = useSpeechInteractionReady();
   const isCurrentQuizReading =
     speakState.isSpeaking &&
     speakState.currentText !== null &&
@@ -6104,13 +6105,13 @@ function SessionPage() {
   const lastAutoReadQuizIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!autoReadEnabled) return;
+    if (!autoReadEnabled || !speechInteractionReady) return;
     if (!currentQuizId || !currentQuizPrompt) return;
     if (lastAutoReadQuizIdRef.current === currentQuizId) return;
 
     lastAutoReadQuizIdRef.current = currentQuizId;
-    void speak(currentQuizPrompt);
-  }, [autoReadEnabled, currentQuizId, currentQuizPrompt]);
+    void speak(currentQuizPrompt, undefined, "auto");
+  }, [autoReadEnabled, currentQuizId, currentQuizPrompt, speechInteractionReady]);
   const isMoneyQuiz =
     currentQuiz?.kind === "moneyMake" ||
     currentQuiz?.kind === "moneyChange" ||

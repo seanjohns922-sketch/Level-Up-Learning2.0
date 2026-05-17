@@ -6,7 +6,7 @@ import type { PracticeTask, Difficulty } from "@/data/activities/year1/practice-
 import { getDifficultyFromTime } from "@/data/activities/year1/practice-task";
 import { TaskRenderer } from "@/components/TaskRenderer";
 import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent } from "@/lib/live-class-client";
-import { speak, useAutoReadSetting } from "@/lib/speak";
+import { speak, useAutoReadSetting, useSpeechInteractionReady } from "@/lib/speak";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { LessonHUDRail } from "@/components/lesson/LessonHUDRail";
 import { LessonCompleteCard } from "@/components/lesson/LessonCompleteCard";
@@ -173,6 +173,7 @@ export function PracticeRunner({
   const elapsedSeconds = totalSeconds - secondsLeft;
   const finished = secondsLeft <= 0 || questionsAnswered >= questionLimit;
   const { autoReadEnabled } = useAutoReadSetting();
+  const speechInteractionReady = useSpeechInteractionReady();
   const lastAutoReadTaskKeyRef = useRef<string | null>(null);
   const autoReadPrompt = getPracticeTaskSpeechText(task);
 
@@ -261,8 +262,9 @@ export function PracticeRunner({
 
   useEffect(() => {
     if (task.kind !== "numberHunt") return;
-    speak(String(task.targetNumber));
-  }, [task]);
+    if (!speechInteractionReady) return;
+    void speak(String(task.targetNumber), undefined, "auto");
+  }, [speechInteractionReady, task]);
 
   function buildProgressMeta(questionNumber: number) {
     if (completionMode === "time_only") {
@@ -278,15 +280,15 @@ export function PracticeRunner({
   }
 
   useEffect(() => {
-    if (!autoReadEnabled) return;
+    if (!autoReadEnabled || !speechInteractionReady) return;
     if (!autoReadPrompt) return;
 
     const currentTaskKey = `${task.kind}:${taskNonce}:${autoReadPrompt}`;
     if (lastAutoReadTaskKeyRef.current === currentTaskKey) return;
 
     lastAutoReadTaskKeyRef.current = currentTaskKey;
-    void speak(autoReadPrompt);
-  }, [autoReadEnabled, autoReadPrompt, task.kind, taskNonce]);
+    void speak(autoReadPrompt, undefined, "auto");
+  }, [autoReadEnabled, autoReadPrompt, speechInteractionReady, task.kind, taskNonce]);
 
   const correctOrder = useMemo(() => {
     if (task.kind !== "order3") return [];
