@@ -31,6 +31,7 @@ import { generatePrepWeek6Task, resetPrepWeek6TaskSessionState } from "@/data/ac
 import { generatePrepWeek7Task, resetPrepWeek7TaskSessionState } from "@/data/activities/prep/week7";
 import { generatePrepWeek8Task, resetPrepWeek8TaskSessionState } from "@/data/activities/prep/week8";
 import { generatePrepWeek9Task, resetPrepWeek9TaskSessionState } from "@/data/activities/prep/week9";
+import { generatePrepWeek10Task, resetPrepWeek10TaskSessionState } from "@/data/activities/prep/week10";
 import { getProgramForYear } from "@/data/programs";
 import { DEMO_MODE } from "@/data/config";
 import { ACTIVE_STUDENT_KEY, readProgress, updateProgress } from "@/data/progress";
@@ -62,11 +63,13 @@ function isPrepGroundCustomLesson(lessonId: string) {
     lessonId === "y0-w8-l3" ||
     lessonId === "y0-w9-l1" ||
     lessonId === "y0-w9-l2" ||
-    lessonId === "y0-w9-l3"
+    lessonId === "y0-w9-l3" ||
+    lessonId === "y0-w10-l1"
   );
 }
 
 function getPrepGroundTask(lessonId: string, difficulty: "easy" | "medium" | "hard") {
+  if (lessonId.startsWith("y0-w10-")) return generatePrepWeek10Task(lessonId, difficulty);
   if (lessonId.startsWith("y0-w9-")) return generatePrepWeek9Task(lessonId, difficulty);
   if (lessonId.startsWith("y0-w8-")) return generatePrepWeek8Task(lessonId, difficulty);
   if (lessonId.startsWith("y0-w7-")) return generatePrepWeek7Task(lessonId, difficulty);
@@ -898,5 +901,6 @@ function LessonPage() {
     resetPrepWeek6TaskSessionState();
     resetPrepWeek8TaskSessionState();
     resetPrepWeek9TaskSessionState();
+    resetPrepWeek10TaskSessionState();
     resetPrepWeek7TaskSessionState();
   }

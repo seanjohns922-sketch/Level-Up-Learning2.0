@@ -339,9 +339,10 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         10,
         1,
         "Number Arcade",
-        "Review counting, matching and numeral recognition in quick games.",
-        ["Arcade count", "Quick match", "Fast number rounds"],
-        ["AC9MFN01", "AC9MFN02", "AC9MFN03"]
+        "Review counting fluency, numeral recognition, matching quantities, teen numbers, ordering, positional understanding, and number relationships through fast arcade-style mini games.",
+        ["Tap the number", "Quick count flash", "Teen number match"],
+        ["AC9MFN01", "AC9MFN02", "AC9MFN03"],
+        "Nexus Number Arcade"
       ),
       buildLesson(
         10,
