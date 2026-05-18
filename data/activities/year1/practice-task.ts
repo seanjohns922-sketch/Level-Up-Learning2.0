@@ -156,6 +156,7 @@ export type PracticeTask = (
       kind: "groundMatch";
       prompt: string;
       speakText?: string;
+      introPrompt?: string;
       targetNumber: number;
       targetNumberName?: string;
       visualType: "ground-number-card" | "ground-quantity-card" | "ground-flash-match-card";
@@ -202,6 +203,7 @@ export type PracticeTask = (
       kind: "groundCollect";
       prompt: string;
       speakText?: string;
+      introPrompt?: string;
       targetNumber: number;
       objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs";
       totalObjects: number;
@@ -211,6 +213,7 @@ export type PracticeTask = (
       kind: "groundBuild";
       prompt: string;
       speakText?: string;
+      introPrompt?: string;
       targetNumber: number;
       objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs";
       compareMode?: "exact" | "more_than" | "less_than";
@@ -236,6 +239,7 @@ export type PracticeTask = (
       kind: "groundCompare";
       prompt: string;
       speakText?: string;
+      introPrompt?: string;
       targetNumber: number;
       comparisonType: "more" | "less" | "equal" | "biggest" | "smallest" | "order" | "statement" | "match" | "different";
       helperVariant?: "numbot" | "battle" | "flash" | "ten_frame";
@@ -261,6 +265,7 @@ export type PracticeTask = (
       kind: "groundFlash";
       prompt: string;
       speakText?: string;
+      introPrompt?: string;
       targetNumber: number;
       displayNumber?: number;
       promptAfterReveal?: string;
@@ -279,6 +284,7 @@ export type PracticeTask = (
       kind: "groundHunt";
       prompt: string;
       speakText?: string;
+      introPrompt?: string;
       targetNumber: number;
       tiles: Array<{
         id: string;
@@ -291,6 +297,7 @@ export type PracticeTask = (
       kind: "groundSequence";
       prompt: string;
       speakText?: string;
+      introPrompt?: string;
       targetNumber: number;
       sequence: Array<number | "__">;
       options: Array<{
@@ -304,6 +311,7 @@ export type PracticeTask = (
       kind: "groundTapCount";
       prompt: string;
       speakText?: string;
+      introPrompt?: string;
       targetNumber: number;
       objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs";
       options: Array<{
@@ -317,6 +325,7 @@ export type PracticeTask = (
       kind: "groundMoveCount";
       prompt: string;
       speakText?: string;
+      introPrompt?: string;
       targetNumber: number;
       objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs";
       options: Array<{
@@ -330,6 +339,7 @@ export type PracticeTask = (
       kind: "groundFeed";
       prompt: string;
       speakText?: string;
+      introPrompt?: string;
       targetNumber: number;
       objectType: "energy_orbs" | "robot_tokens";
       totalObjects: number;
@@ -339,6 +349,7 @@ export type PracticeTask = (
       kind: "groundSoundCount";
       prompt: string;
       speakText?: string;
+      introPrompt?: string;
       targetNumber: number;
       options: Array<{
         id: string;
@@ -351,6 +362,7 @@ export type PracticeTask = (
       kind: "groundOrderTap";
       prompt: string;
       speakText?: string;
+      introPrompt?: string;
       targetNumber: number;
       startNumber?: number;
       pathNumerals?: number[];
@@ -367,6 +379,7 @@ export type PracticeTask = (
       kind: "groundGrowingCount";
       prompt: string;
       speakText?: string;
+      introPrompt?: string;
       targetNumber: number;
       objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs";
       revealMs?: number;
@@ -381,6 +394,7 @@ export type PracticeTask = (
       kind: "groundOrdinal";
       prompt: string;
       speakText?: string;
+      introPrompt?: string;
       targetNumber: number;
       badgeLabel?: string;
       scenario: "line" | "race" | "train" | "podium" | "rockets" | "queue" | "stepping_stones";
@@ -391,6 +405,9 @@ export type PracticeTask = (
         emoji: string;
       }>;
       order: Array<string | null>;
+      raceStartOrder?: Array<string | null>;
+      raceProgressOrders?: Array<Array<string | null>>;
+      raceDurationMs?: number;
       secondaryOrder?: Array<string | null>;
       targetPosition?: number;
       positionOptions?: number[];
