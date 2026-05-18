@@ -347,10 +347,11 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
       buildLesson(
         10,
         2,
-        "Quick Count Challenge",
-        "Practise subitising and counting small groups quickly.",
-        ["Quick count flash", "Fast spotting", "Tap the amount"],
-        ["AC9MFN01", "AC9MFN02", "AC9MFN03"]
+        "Numbot Boss Battles",
+        "Apply counting, teen numbers, comparing, ordering, ordinals, positional language, missing numbers, number paths, and quantity matching in playful boss-battle style challenge rounds.",
+        ["Count Bot", "Teen Titan", "Final Boss Round"],
+        ["AC9MFN01", "AC9MFN02", "AC9MFN03"],
+        "Numbot Boss Arena"
       ),
       buildLesson(
         10,

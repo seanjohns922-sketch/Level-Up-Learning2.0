@@ -12,7 +12,7 @@ type GroundOrderTapTask = Extract<PracticeTask, { kind: "groundOrderTap" }>;
 type GroundOrdinalTask = Extract<PracticeTask, { kind: "groundOrdinal" }>;
 type GroundSpatialTask = Extract<PracticeTask, { kind: "groundSpatial" }>;
 
-type Week10Kind =
+type Lesson1Kind =
   | "tap_number"
   | "match_collection"
   | "quick_count_flash"
@@ -49,7 +49,7 @@ const OBJECTS: GroundObjectType[] = [
   "rockets",
   "number_orbs",
 ];
-const ROTATION: Week10Kind[] = [
+const LESSON1_ROTATION: Lesson1Kind[] = [
   "tap_number",
   "match_collection",
   "quick_count_flash",
@@ -208,6 +208,40 @@ function makeOrdinalTask(task: Omit<GroundOrdinalTask, "kind">): PracticeTask {
 function makeSpatialTask(task: Omit<GroundSpatialTask, "kind">): PracticeTask {
   return { kind: "groundSpatial", ...task };
 }
+
+const ORDINAL_CHARACTERS: GroundOrdinalTask["characters"] = [
+  { id: "numbot", label: "Numbot", emoji: "🤖" },
+  { id: "alien", label: "Alien", emoji: "👽" },
+  { id: "rocket", label: "Rocket", emoji: "🚀" },
+  { id: "pod", label: "Hover Pod", emoji: "🛸" },
+  { id: "runner", label: "Runner", emoji: "🏃" },
+  { id: "crystal", label: "Crystal", emoji: "💠" },
+];
+
+type Lesson2Kind =
+  | "count_bot"
+  | "teen_titan"
+  | "order_master"
+  | "position_phantom"
+  | "race_commander"
+  | "path_breaker"
+  | "biggest_blaster"
+  | "match_machine"
+  | "combo_round"
+  | "final_boss_round";
+
+const LESSON2_ROTATION: Lesson2Kind[] = [
+  "count_bot",
+  "teen_titan",
+  "order_master",
+  "position_phantom",
+  "race_commander",
+  "path_breaker",
+  "biggest_blaster",
+  "match_machine",
+  "combo_round",
+  "final_boss_round",
+];
 
 function createTapNumberTask(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
@@ -529,14 +563,14 @@ function createArcadeBonusTask(lessonId: string, difficulty: Difficulty): Practi
   });
 }
 
-function nextKind(memory: Week10Memory) {
-  const kind = ROTATION[memory.cursor % ROTATION.length]!;
+function nextKind<T extends string>(memory: Week10Memory, rotation: readonly T[]) {
+  const kind = rotation[memory.cursor % rotation.length]!;
   memory.cursor += 1;
   pushRecent(memory.recentKinds, kind, 6);
   return kind;
 }
 
-function generateLesson1Task(lessonId: string, difficulty: Difficulty, kind: Week10Kind): PracticeTask {
+function generateLesson1Task(lessonId: string, difficulty: Difficulty, kind: Lesson1Kind): PracticeTask {
   switch (kind) {
     case "tap_number":
       return createTapNumberTask(lessonId, difficulty);
@@ -571,9 +605,174 @@ function generateLesson1Task(lessonId: string, difficulty: Difficulty, kind: Wee
   }
 }
 
+function buildRaceBossTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const racerCount = difficulty === "easy" ? 3 : difficulty === "medium" ? 4 : 5;
+  const characters = shuffle(ORDINAL_CHARACTERS).slice(0, racerCount);
+  const finalOrder = characters.map((character) => character.id);
+  const targetIndex = randInt(0, Math.min(2, finalOrder.length - 1));
+  const mode = randInt(0, 2);
+  let startOrder = shuffle(finalOrder);
+  while (startOrder.join("|") == finalOrder.join("|")) startOrder = shuffle(finalOrder);
+  const midOne = [...startOrder];
+  const swapOne = randInt(0, Math.max(0, midOne.length - 2));
+  [midOne[swapOne], midOne[swapOne + 1]] = [midOne[swapOne + 1], midOne[swapOne]];
+  const midTwo = [...finalOrder];
+  if (midTwo.length > 3) {
+    const swapTwo = randInt(1, Math.max(1, midTwo.length - 2));
+    [midTwo[swapTwo - 1], midTwo[swapTwo]] = [midTwo[swapTwo], midTwo[swapTwo - 1]];
+  }
+  if (mode === 0) {
+    return makeOrdinalTask({
+      prompt: "Race Commander: Who finished first?",
+      speakText: "Race Commander. Who finished first?",
+      introPrompt: "Watch the racers.",
+      targetNumber: 1,
+      badgeLabel: "Race Commander",
+      scenario: "race",
+      mode: "identify",
+      characters,
+      order: finalOrder,
+      raceStartOrder: startOrder,
+      raceProgressOrders: [midOne, midTwo],
+      raceDurationMs: randInt(5200, 7600),
+      targetPosition: 1,
+      feedback: { correct: "Boss shield broken!", wrong: "Track the finish line again." },
+    });
+  }
+  if (mode === 1) {
+    return makeOrdinalTask({
+      prompt: "Race Commander: Who came second?",
+      speakText: "Race Commander. Who came second?",
+      introPrompt: "Watch the racers.",
+      targetNumber: 2,
+      badgeLabel: "Race Commander",
+      scenario: "race",
+      mode: "identify",
+      characters,
+      order: finalOrder,
+      raceStartOrder: startOrder,
+      raceProgressOrders: [midOne, midTwo],
+      raceDurationMs: randInt(5200, 7600),
+      targetPosition: 2,
+      feedback: { correct: "Boss shield broken!", wrong: "Check the finishing places again." },
+    });
+  }
+  const targetCharacterId = finalOrder[targetIndex];
+  return makeOrdinalTask({
+    prompt: "Race Commander: What place did Numbot finish?",
+    speakText: targetCharacterId === "numbot" ? "Race Commander. What place did Numbot finish?" : `Race Commander. What place did ${characters.find((character) => character.id === targetCharacterId)?.label ?? 'the racer'} finish?`,
+    introPrompt: "Watch the racers.",
+    targetNumber: targetIndex + 1,
+    badgeLabel: "Race Commander",
+    scenario: "race",
+    mode: "which_place",
+    characters,
+    order: finalOrder,
+    raceStartOrder: startOrder,
+    raceProgressOrders: [midOne, midTwo],
+    raceDurationMs: randInt(5200, 7600),
+    targetCharacterId,
+    positionOptions: [1, 2, 3, ...(finalOrder.length > 3 ? [4] : [])],
+    feedback: { correct: "Race tracked perfectly!", wrong: "Check the final race order again." },
+  });
+}
+
+function createCountBotBossTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const task = createQuickCountFlashTask(lessonId, difficulty) as GroundFlashTask;
+  return { ...task, prompt: "Count Bot: How many flashed?", speakText: "Defeat Count Bot. How many flashed?", introPrompt: "Count Bot shield up!", feedback: { correct: "Count Bot defeated!", wrong: "Count fast and try again." } };
+}
+
+function createTeenTitanBossTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const task = createTeenNumberMatchTask(lessonId, difficulty) as GroundMatchTask;
+  return { ...task, prompt: "Teen Titan: Match the teen number.", speakText: "Teen Titan. Match the teen number.", introPrompt: "Teen Titan challenge!", feedback: { correct: "Teen Titan defeated!", wrong: "Think ten and some more." } };
+}
+
+function createOrderMasterBossTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const task = createOrderNumbersTask(lessonId, difficulty) as GroundOrderTapTask;
+  return { ...task, prompt: "Order Master: Sort the numbers.", speakText: "Order Master. Sort the numbers.", introPrompt: "Order Master arena!", badgeLabel: "Order Master", feedback: { correct: "Order Master defeated!", wrong: "Sort them carefully again." } };
+}
+
+function createPositionPhantomBossTask(): PracticeTask {
+  const task = createPositionPopTask() as GroundSpatialTask;
+  return { ...task, prompt: "Position Phantom: Tap the object beside Numbot.", speakText: "Position Phantom. Tap the object beside Numbot.", badgeLabel: "Position Phantom", feedback: { correct: "Position Phantom faded away!", wrong: "Check beside Numbot again." } };
+}
+
+function createPathBreakerBossTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const task = randInt(0, 1) === 0 ? createNumberPathRushTask(lessonId, difficulty) as GroundSequenceTask : createBeforeOrAfterTask(lessonId, difficulty) as GroundSequenceTask;
+  return { ...task, prompt: task.prompt.startsWith("What comes") ? `Path Breaker: ${task.prompt}` : "Path Breaker: Repair the path.", speakText: task.speakText ? `Path Breaker. ${task.speakText}` : "Path Breaker. Repair the path.", introPrompt: "Path Breaker incoming!", feedback: { correct: "Path Breaker defeated!", wrong: "Fix the path carefully." } };
+}
+
+function createBiggestBlasterBossTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const task = randInt(0, 1) === 0 ? createFindBiggestTask(lessonId, difficulty) as GroundCompareTask : createFindSmallestTask(lessonId, difficulty) as GroundCompareTask;
+  const isBiggest = task.comparisonType === "biggest";
+  return { ...task, prompt: isBiggest ? "Biggest Blaster: Which number is biggest?" : "Biggest Blaster: Which number is smallest?", speakText: isBiggest ? "Biggest Blaster. Which number is biggest?" : "Biggest Blaster. Which number is smallest?", introPrompt: "Blaster challenge!", feedback: { correct: "Biggest Blaster defeated!", wrong: "Compare the groups again." } };
+}
+
+function createMatchMachineBossTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const task = createMatchCollectionTask(lessonId, difficulty) as GroundMatchTask;
+  return { ...task, prompt: "Match Machine: Match the collection.", speakText: "Match Machine. Match the collection.", introPrompt: "Match Machine online!", feedback: { correct: "Match Machine defeated!", wrong: "Check the quantity again." } };
+}
+
+function createComboRoundBossTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const pick = randInt(0, 2);
+  if (pick === 0) {
+    const task = createTapNumberTask(lessonId, difficulty) as GroundHuntTask;
+    return { ...task, prompt: `Combo Round: ${task.prompt}`, speakText: `Combo Round. ${task.speakText ?? ''}`.trim(), introPrompt: "Combo streak!", feedback: { correct: "Combo streak!", wrong: "Reset and try the combo again." } };
+  }
+  if (pick === 1) {
+    const task = createWhichGroupMoreTask(lessonId, difficulty) as GroundCompareTask;
+    return { ...task, prompt: "Combo Round: Which group has more?", speakText: "Combo Round. Which group has more?", introPrompt: "Combo streak!", feedback: { correct: "Combo streak!", wrong: "Compare quickly and try again." } };
+  }
+  const task = createWhatComesNextTask(lessonId, difficulty) as GroundSequenceTask;
+  return { ...task, prompt: "Combo Round: What comes next?", speakText: "Combo Round. What comes next?", introPrompt: "Combo streak!", feedback: { correct: "Combo streak!", wrong: "Count on and try again." } };
+}
+
+function createFinalBossRoundTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const pick = randInt(0, 2);
+  if (pick === 0) {
+    const task = createArcadeBonusTask(lessonId, difficulty) as GroundMatchTask;
+    return { ...task, prompt: "Final Boss Round: Match it all.", speakText: "Final Boss Round. Match it all.", introPrompt: "Final boss shield!", feedback: { correct: "Final boss defeated!", wrong: "Check the mixed match again." } };
+  }
+  if (pick === 1) {
+    const task = createBuildNumberTask(lessonId, difficulty) as GroundBuildTask;
+    return { ...task, prompt: `Final Boss Round: Build ${task.targetNumber}.`, speakText: `Final Boss Round. Build ${numberWord(task.targetNumber)}.`, introPrompt: "Final boss shield!", feedback: { correct: "Final boss defeated!", wrong: "Build the target carefully again." } };
+  }
+  const task = createOrderNumbersTask(lessonId, difficulty) as GroundOrderTapTask;
+  return { ...task, prompt: "Final Boss Round: Sort the numbers.", speakText: "Final Boss Round. Sort the numbers.", introPrompt: "Final boss shield!", badgeLabel: "Final Boss", feedback: { correct: "Final boss defeated!", wrong: "Sort them carefully again." } };
+}
+
+function generateLesson2Task(lessonId: string, difficulty: Difficulty, kind: Lesson2Kind): PracticeTask {
+  switch (kind) {
+    case "count_bot":
+      return createCountBotBossTask(lessonId, difficulty);
+    case "teen_titan":
+      return createTeenTitanBossTask(lessonId, difficulty);
+    case "order_master":
+      return createOrderMasterBossTask(lessonId, difficulty);
+    case "position_phantom":
+      return createPositionPhantomBossTask();
+    case "race_commander":
+      return buildRaceBossTask(lessonId, difficulty);
+    case "path_breaker":
+      return createPathBreakerBossTask(lessonId, difficulty);
+    case "biggest_blaster":
+      return createBiggestBlasterBossTask(lessonId, difficulty);
+    case "match_machine":
+      return createMatchMachineBossTask(lessonId, difficulty);
+    case "combo_round":
+      return createComboRoundBossTask(lessonId, difficulty);
+    case "final_boss_round":
+      return createFinalBossRoundTask(lessonId, difficulty);
+  }
+}
+
 export function generatePrepWeek10Task(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
-  const kind = nextKind(memory);
+  if (lessonId === "y0-w10-l2") {
+    const kind = nextKind(memory, LESSON2_ROTATION);
+    return generateLesson2Task(lessonId, difficulty, kind);
+  }
+  const kind = nextKind(memory, LESSON1_ROTATION);
   return generateLesson1Task(lessonId, difficulty, kind);
 }
 
