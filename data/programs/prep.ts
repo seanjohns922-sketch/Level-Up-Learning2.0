@@ -322,9 +322,10 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         9,
         3,
         "Position Challenges",
-        "Identify positions such as first, last, before and after.",
-        ["Before and after", "Last one challenge", "Position puzzle"],
-        ["AC9MFN01", "AC9MFN03"]
+        "Use spatial language such as beside, between, next to, above, below, left, right, in front, and behind while placing and navigating objects in futuristic maps, rooms, and obstacle scenes.",
+        ["Who is between?", "Place Numbot beside the crystal", "Position maze"],
+        ["AC9MFN03", "AC9MFSP02"],
+        "Nexus Position Lab"
       ),
     ],
   },

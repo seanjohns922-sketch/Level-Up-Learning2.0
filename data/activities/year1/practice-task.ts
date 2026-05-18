@@ -421,6 +421,34 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      kind: "groundSpatial";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scenario: "lab" | "map" | "obstacle" | "portal_room" | "treasure" | "maze";
+      mode: "identify" | "place" | "same_position" | "changed_position";
+      characters: Array<{
+        id: string;
+        label: string;
+        emoji: string;
+      }>;
+      slots: Array<{
+        id: string;
+        label: string;
+        row: number;
+        col: number;
+      }>;
+      placementBySlot: Record<string, string | null>;
+      secondaryPlacementBySlot?: Record<string, string | null>;
+      targetCharacterId?: string;
+      secondaryTargetCharacterId?: string;
+      targetSlotId?: string;
+      secondaryTargetSlotId?: string;
+      bankCharacterIds?: string[];
+      correctBoolean?: boolean;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       kind: "tensOnesMcq";
       prompt: string;
       min: number;
