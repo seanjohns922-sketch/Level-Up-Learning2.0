@@ -134,6 +134,12 @@ export function GroundOrdinalTaskCard({
     return null;
   }, [task]);
 
+  const positionAnswer = useMemo(() => {
+    if (task.mode !== "which_place" || !task.targetCharacterId) return null;
+    const index = task.order.findIndex((id) => id === task.targetCharacterId);
+    return index >= 0 ? index + 1 : null;
+  }, [task]);
+
   const placementTargets = useMemo(
     () => [
       task.targetCharacterId ? { id: task.targetCharacterId, position: task.targetPosition ?? 1 } : null,
@@ -224,6 +230,22 @@ export function GroundOrdinalTaskCard({
                   className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-5 text-xl font-black text-teal-900 shadow-sm transition hover:border-cyan-300 hover:bg-cyan-50"
                 >
                   {value ? "Yes" : "No"}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : task.mode === "which_place" ? (
+          <div className="space-y-4">
+            <div className="rounded-[20px] border border-cyan-200 bg-cyan-50/70 p-3">{renderLine(task.order, false)}</div>
+            <div className="grid grid-cols-3 gap-3">
+              {(task.positionOptions ?? [1, 2, 3]).map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => (value === positionAnswer ? onCorrect() : onWrong())}
+                  className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-5 text-xl font-black text-teal-900 shadow-sm transition hover:border-cyan-300 hover:bg-cyan-50"
+                >
+                  {ordinalWord(value)}
                 </button>
               ))}
             </div>

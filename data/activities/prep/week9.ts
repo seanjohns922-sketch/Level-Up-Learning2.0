@@ -3,7 +3,7 @@ import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-
 type GroundOrdinalTask = Extract<PracticeTask, { kind: "groundOrdinal" }>;
 
 type OrdinalCharacter = GroundOrdinalTask["characters"][number];
-type Week9Kind =
+type Lesson1Kind =
   | "who_first"
   | "who_second"
   | "who_last"
@@ -20,6 +20,23 @@ type Week9Kind =
   | "same_position"
   | "lineup_builder";
 
+type Lesson2Kind =
+  | "race_first"
+  | "race_second"
+  | "moved_up"
+  | "podium_builder"
+  | "race_track_order"
+  | "before_after_race"
+  | "leaderboard_sort"
+  | "finish_last"
+  | "position_switch"
+  | "fast_position_flash"
+  | "which_place"
+  | "obstacle_race"
+  | "follow_racer"
+  | "same_race_position"
+  | "champion_ceremony";
+
 type Week9Memory = {
   cursor: number;
   recentPositions: number[];
@@ -27,7 +44,7 @@ type Week9Memory = {
   recentScenarios: GroundOrdinalTask["scenario"][];
 };
 
-const ROTATION: Week9Kind[] = [
+const LESSON1_ROTATION: Lesson1Kind[] = [
   "who_first",
   "who_second",
   "who_last",
@@ -43,6 +60,24 @@ const ROTATION: Week9Kind[] = [
   "quick_flash",
   "same_position",
   "lineup_builder",
+];
+
+const LESSON2_ROTATION: Lesson2Kind[] = [
+  "race_first",
+  "race_second",
+  "moved_up",
+  "podium_builder",
+  "race_track_order",
+  "before_after_race",
+  "leaderboard_sort",
+  "finish_last",
+  "position_switch",
+  "fast_position_flash",
+  "which_place",
+  "obstacle_race",
+  "follow_racer",
+  "same_race_position",
+  "champion_ceremony",
 ];
 
 const ROSTER: OrdinalCharacter[] = [
@@ -126,21 +161,32 @@ function createIdentifyTask(
   scenarioChoices: GroundOrdinalTask["scenario"][],
   feedback: GroundOrdinalTask["feedback"],
   lineLength = 5,
-  revealMs?: number
-): PracticeTask {
+  revealMs?: number,
+  badgeLabel?: string,
+  useSecondary = false,
+  secondaryPrompt?: string,
+) {
   const memory = getMemory(lessonId);
   const scenario = pickScenario(memory, scenarioChoices);
   const characters = sampleCharacters(lineLength);
+  const order = buildOrder(characters);
   pushRecent(memory.recentPositions, position, 6);
+  let secondaryOrder: string[] | undefined;
+  let activeOrder = order;
+  if (useSecondary) {
+    secondaryOrder = shuffle([...order]);
+    activeOrder = secondaryOrder;
+  }
   return makeTask({
-    prompt,
+    prompt: secondaryPrompt ?? prompt,
     speakText,
     targetNumber: position,
-    badgeLabel: scenario === "race" ? "Race Positions" : undefined,
+    badgeLabel,
     scenario,
     mode: "identify",
     characters,
-    order: buildOrder(characters),
+    order: activeOrder,
+    secondaryOrder,
     targetPosition: position,
     revealMs,
     feedback,
@@ -152,9 +198,12 @@ function createRelativeTask(
   relation: "before" | "after",
   prompt: string,
   speakText: string,
-  referenceId: string
+  referenceId: string,
+  scenarioChoices: GroundOrdinalTask["scenario"][] = ["queue", "line"],
+  badgeLabel?: string,
 ): PracticeTask {
-  const scenario = relation === "before" ? "queue" : "line";
+  const memory = getMemory(lessonId);
+  const scenario = pickScenario(memory, scenarioChoices);
   const characters = sampleCharacters(5, [referenceId]);
   const order = buildOrder(characters);
   const refIndex = randInt(1, order.length - 2);
@@ -165,13 +214,14 @@ function createRelativeTask(
     prompt,
     speakText,
     targetNumber: refIndex + 1,
+    badgeLabel,
     scenario,
     mode: "relative",
     characters,
     order,
     referenceCharacterId: refChar.id,
     relation,
-    feedback: { correct: "Great position spotting!", wrong: "Check who is next in line." },
+    feedback: { correct: "Great position tracking!", wrong: "Check who is next in the race order." },
   });
 }
 
@@ -186,6 +236,7 @@ function createPlaceTask({
   secondaryTargetCharacterId,
   secondaryTargetPosition,
   feedback,
+  badgeLabel,
 }: {
   prompt: string;
   speakText: string;
@@ -197,11 +248,13 @@ function createPlaceTask({
   secondaryTargetCharacterId?: string;
   secondaryTargetPosition?: number;
   feedback: GroundOrdinalTask["feedback"];
+  badgeLabel?: string;
 }): PracticeTask {
   return makeTask({
     prompt,
     speakText,
     targetNumber: targetPosition,
+    badgeLabel,
     scenario,
     mode: "place",
     characters,
@@ -214,7 +267,30 @@ function createPlaceTask({
   });
 }
 
-function createSamePositionTask(): PracticeTask {
+function createWhichPlaceTask(lessonId: string): PracticeTask {
+  const memory = getMemory(lessonId);
+  const scenario = pickScenario(memory, ["race", "rockets"]);
+  const characters = sampleCharacters(4, ["numbot"]);
+  const targetIndex = randInt(0, 2);
+  const order = buildOrder(characters);
+  order.splice(order.indexOf("numbot"), 1);
+  order.splice(targetIndex, 0, "numbot");
+  return makeTask({
+    prompt: "What place is Numbot in?",
+    speakText: "What place is Numbot in?",
+    targetNumber: targetIndex + 1,
+    badgeLabel: "Race Position",
+    scenario,
+    mode: "which_place",
+    characters,
+    order,
+    targetCharacterId: "numbot",
+    positionOptions: [1, 2, 3],
+    feedback: { correct: "You tracked Numbot perfectly!", wrong: "Check Numbot's race place again." },
+  });
+}
+
+function createSamePositionTask(scenario: GroundOrdinalTask["scenario"] = "line", prompt = "Is Numbot still third?", speakText = "Is Numbot still third?", badgeLabel?: string): PracticeTask {
   const characters = sampleCharacters(5, ["numbot"]);
   const firstOrder = buildOrder(characters);
   const targetId = "numbot";
@@ -226,24 +302,24 @@ function createSamePositionTask(): PracticeTask {
     [secondOrder[currentIndex], secondOrder[swapIndex]] = [secondOrder[swapIndex]!, secondOrder[currentIndex]!];
   }
   return makeTask({
-    prompt: "Is Numbot still third?",
-    speakText: "Is Numbot still third?",
+    prompt,
+    speakText,
     targetNumber: 3,
-    scenario: "line",
+    badgeLabel,
+    scenario,
     mode: "same_position",
     characters,
     order: firstOrder,
     secondaryOrder: secondOrder,
     targetCharacterId: targetId,
     correctBoolean: keepSame,
-    feedback: { correct: "You checked the position carefully!", wrong: "Look at Numbot's place again." },
+    feedback: { correct: "You checked the race position carefully!", wrong: "Look at Numbot's place again." },
   });
 }
 
 function createPodiumPlacesTask(): PracticeTask {
   const characters = sampleCharacters(3, ["numbot"]);
   const otherIds = characters.filter((character) => character.id !== "numbot");
-  const targetPosition = 2;
   return createPlaceTask({
     prompt: "Put Numbot second on the podium.",
     speakText: "Put Numbot second on the podium.",
@@ -251,7 +327,8 @@ function createPodiumPlacesTask(): PracticeTask {
     characters,
     order: [otherIds[0]!.id, null, otherIds[1]!.id],
     targetCharacterId: "numbot",
-    targetPosition,
+    targetPosition: 2,
+    badgeLabel: "Podium Builder",
     feedback: { correct: "You found second place!", wrong: "Check the podium places again." },
   });
 }
@@ -305,14 +382,69 @@ function createLineupBuilderTask(): PracticeTask {
   });
 }
 
-function nextKind(memory: Week9Memory) {
-  const kind = ROTATION[memory.cursor % ROTATION.length]!;
+function createRaceTrackOrderTask(): PracticeTask {
+  const characters = sampleCharacters(3, ["numbot", "alien", "rocket"]);
+  return createPlaceTask({
+    prompt: "Put the racers in finishing order.",
+    speakText: "Put the racers in finishing order.",
+    scenario: "race",
+    characters,
+    order: [null, null, null],
+    targetCharacterId: characters[0]!.id,
+    targetPosition: 1,
+    secondaryTargetCharacterId: characters[1]!.id,
+    secondaryTargetPosition: 2,
+    badgeLabel: "Race Track Order",
+    feedback: { correct: "You sorted the race order!", wrong: "Try the finishing places again." },
+  });
+}
+
+function createChampionCeremonyTask(): PracticeTask {
+  const characters = sampleCharacters(3, ["numbot", "alien", "rocket"]);
+  return createPlaceTask({
+    prompt: "Place the racers on gold, silver, and bronze.",
+    speakText: "Place the racers on gold, silver, and bronze.",
+    scenario: "podium",
+    characters,
+    order: [null, null, null],
+    targetCharacterId: characters[0]!.id,
+    targetPosition: 1,
+    secondaryTargetCharacterId: characters[1]!.id,
+    secondaryTargetPosition: 2,
+    badgeLabel: "Champion Ceremony",
+    feedback: { correct: "You built the podium!", wrong: "Check the winners' places again." },
+  });
+}
+
+function createLeaderBoardTask(lessonId: string): PracticeTask {
+  return createIdentifyTask(
+    lessonId,
+    "Who is at the top of the leaderboard?",
+    "Who is at the top of the leaderboard?",
+    1,
+    ["race", "rockets"],
+    { correct: "You found the leader!", wrong: "Look at the top position." },
+    5,
+    undefined,
+    "Leaderboard"
+  );
+}
+
+function nextLesson1Kind(memory: Week9Memory) {
+  const kind = LESSON1_ROTATION[memory.cursor % LESSON1_ROTATION.length]!;
   memory.cursor += 1;
   pushRecent(memory.recentKinds, kind, 6);
   return kind;
 }
 
-function generateLesson1Task(lessonId: string, difficulty: Difficulty, kind: Week9Kind): PracticeTask {
+function nextLesson2Kind(memory: Week9Memory) {
+  const kind = LESSON2_ROTATION[memory.cursor % LESSON2_ROTATION.length]!;
+  memory.cursor += 1;
+  pushRecent(memory.recentKinds, kind, 6);
+  return kind;
+}
+
+function generateLesson1Task(lessonId: string, difficulty: Difficulty, kind: Lesson1Kind): PracticeTask {
   switch (kind) {
     case "who_first":
       return createIdentifyTask(lessonId, "Who is first?", "Who is first?", 1, ["queue", "line"], { correct: "You found first place!", wrong: "Look at the start of the line." }, 4);
@@ -347,9 +479,50 @@ function generateLesson1Task(lessonId: string, difficulty: Difficulty, kind: Wee
   }
 }
 
+function generateLesson2Task(lessonId: string, difficulty: Difficulty, kind: Lesson2Kind): PracticeTask {
+  switch (kind) {
+    case "race_first":
+      return createIdentifyTask(lessonId, "Who came first?", "Who came first?", 1, ["race", "rockets"], { correct: "You found the winner!", wrong: "Look at the winning racer." }, 4, undefined, "Race Winner");
+    case "race_second":
+      return createIdentifyTask(lessonId, "Who came second?", "Who came second?", 2, ["race", "rockets"], { correct: "Great race tracking!", wrong: "Check second place." }, 4, undefined, "Race Positions");
+    case "moved_up":
+      return createIdentifyTask(lessonId, "Who moved into third place?", "Who moved into third place?", 3, ["race"], { correct: "You tracked the change!", wrong: "Look at the new race order." }, 5, undefined, "Position Switch", true, "Who moved into third place?");
+    case "podium_builder":
+      return createPodiumPlacesTask();
+    case "race_track_order":
+      return createRaceTrackOrderTask();
+    case "before_after_race":
+      return randInt(0, 1) === 0
+        ? createRelativeTask(lessonId, "before", "Who is before the alien?", "Who is before the alien?", "alien", ["race"], "Race Order")
+        : createRelativeTask(lessonId, "after", "Who is after Numbot?", "Who is after Numbot?", "numbot", ["race"], "Race Order");
+    case "leaderboard_sort":
+      return createLeaderBoardTask(lessonId);
+    case "finish_last":
+      return createIdentifyTask(lessonId, "Who finished last?", "Who finished last?", 5, ["race", "rockets"], { correct: "You found the last racer!", wrong: "Check the end of the race." }, 5, undefined, "Finish Line");
+    case "position_switch":
+      return createIdentifyTask(lessonId, "Who is now second?", "Who is now second?", 2, ["race"], { correct: "You spotted the switch!", wrong: "Check second place again." }, 4, undefined, "Position Switch", true, "Who is now second?");
+    case "fast_position_flash":
+      return createIdentifyTask(lessonId, "Which racer was second?", "Which racer was second?", 2, ["race", "rockets"], { correct: "You tracked the flash!", wrong: "Try the flash challenge again." }, 4, difficulty === "easy" ? 1300 : 1000, "Fast Position Flash");
+    case "which_place":
+      return createWhichPlaceTask(lessonId);
+    case "obstacle_race":
+      return createIdentifyTask(lessonId, "Who is now third in the obstacle race?", "Who is now third in the obstacle race?", 3, ["race"], { correct: "You tracked the obstacle race!", wrong: "Check the updated race order." }, 5, undefined, "Obstacle Race", true);
+    case "follow_racer":
+      return createWhichPlaceTask(lessonId);
+    case "same_race_position":
+      return createSamePositionTask("race", "Is Numbot still third?", "Is Numbot still third?", "Same Position?");
+    case "champion_ceremony":
+      return createChampionCeremonyTask();
+  }
+}
+
 export function generatePrepWeek9Task(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
-  const kind = nextKind(memory);
+  if (lessonId === "y0-w9-l2") {
+    const kind = nextLesson2Kind(memory);
+    return generateLesson2Task(lessonId, difficulty, kind);
+  }
+  const kind = nextLesson1Kind(memory);
   return generateLesson1Task(lessonId, difficulty, kind);
 }
 

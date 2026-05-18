@@ -384,7 +384,7 @@ export type PracticeTask = (
       targetNumber: number;
       badgeLabel?: string;
       scenario: "line" | "race" | "train" | "podium" | "rockets" | "queue" | "stepping_stones";
-      mode: "identify" | "relative" | "place" | "same_position";
+      mode: "identify" | "relative" | "place" | "same_position" | "which_place";
       characters: Array<{
         id: string;
         label: string;
@@ -393,6 +393,7 @@ export type PracticeTask = (
       order: Array<string | null>;
       secondaryOrder?: Array<string | null>;
       targetPosition?: number;
+      positionOptions?: number[];
       secondaryTargetPosition?: number;
       targetCharacterId?: string;
       secondaryTargetCharacterId?: string;

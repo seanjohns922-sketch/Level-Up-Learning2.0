@@ -313,9 +313,10 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         9,
         2,
         "Ordinals in Games",
-        "Use ordinal language in familiar game contexts.",
-        ["Race positions", "Game line-up", "Ordinal goal"],
-        ["AC9MFN01", "AC9MFN03"]
+        "Use ordinal language in dynamic race, game, leaderboard, and podium contexts where positions change and students track first, second, third, before, after, and last.",
+        ["Who won the race?", "Race track order", "Champion ceremony"],
+        ["AC9MFN01", "AC9MFN03"],
+        "Nexus Race Arena"
       ),
       buildLesson(
         9,
