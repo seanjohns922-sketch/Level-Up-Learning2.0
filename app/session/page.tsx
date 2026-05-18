@@ -55,6 +55,7 @@ import {
 import type { Lesson, WeekPlan } from "@/data/programs/year1";
 import type { LessonActivity } from "@/data/programs/types";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
+import { generatePrepWeek8TaskByKind } from "@/data/activities/prep/week8";
 
 type WeekProgress = {
   lessonsCompleted: boolean[]; // [L1, L2, L3]
@@ -1491,6 +1492,42 @@ function buildGroundQuizQuestion(
     prompt: practiceTask.prompt,
     practiceTask,
   };
+}
+
+function buildPrepWeek8WeeklyQuizQuestions(
+  questionsPerLesson: number
+): QuizQuestion[] {
+  const totalExpected = questionsPerLesson * 3;
+  const specs = [
+    { lessonNumber: 1 as const, skill: "ground_w8_l1_missing", kind: "missing_forward" },
+    { lessonNumber: 1 as const, skill: "ground_w8_l1_before", kind: "what_comes_before" },
+    { lessonNumber: 1 as const, skill: "ground_w8_l1_middle", kind: "which_missing" },
+    { lessonNumber: 1 as const, skill: "ground_w8_l1_next", kind: "what_comes_next" },
+    { lessonNumber: 1 as const, skill: "ground_w8_l1_ladder", kind: "number_ladder" },
+    { lessonNumber: 2 as const, skill: "ground_w8_l2_forward", kind: "move_forward" },
+    { lessonNumber: 2 as const, skill: "ground_w8_l2_backward", kind: "move_backward" },
+    { lessonNumber: 2 as const, skill: "ground_w8_l2_portal", kind: "portal_target" },
+    { lessonNumber: 2 as const, skill: "ground_w8_l2_hops", kind: "number_line_hops" },
+    { lessonNumber: 2 as const, skill: "ground_w8_l2_countdown", kind: "countdown_portal" },
+    { lessonNumber: 3 as const, skill: "ground_w8_l3_least_to_greatest", kind: "least_to_greatest" },
+    { lessonNumber: 3 as const, skill: "ground_w8_l3_biggest", kind: "which_biggest" },
+    { lessonNumber: 3 as const, skill: "ground_w8_l3_first", kind: "which_comes_first" },
+    { lessonNumber: 3 as const, skill: "ground_w8_l3_greatest_to_least", kind: "greatest_to_least" },
+    { lessonNumber: 3 as const, skill: "ground_w8_l3_order_collections", kind: "order_collections" },
+  ];
+
+  if (specs.length !== totalExpected) {
+    throw new Error(`[GroundWeeklyQuiz] Week 8 expected ${totalExpected} questions, received ${specs.length}.`);
+  }
+
+  return specs.map((spec, index) =>
+    buildGroundQuizQuestion(
+      `q${index + 1}`,
+      spec.lessonNumber,
+      spec.skill,
+      generatePrepWeek8TaskByKind(`y0-w8-l${spec.lessonNumber}`, "medium", spec.kind) as GroundQuizPracticeTask
+    )
+  );
 }
 
 function buildPrepWeek1WeeklyQuizQuestions(
@@ -6461,6 +6498,10 @@ function SessionPage() {
       return buildPrepWeek7WeeklyQuizQuestions(questionsPerLesson);
     }
 
+    if (year === "Prep" && Number(week) === 8) {
+      return buildPrepWeek8WeeklyQuizQuestions(questionsPerLesson);
+    }
+
     if (
       year === "Year 2" ||
       year === "Year 3" ||
@@ -6816,12 +6857,16 @@ function SessionPage() {
     ? "Number Builder Challenge Complete!"
     : year === "Prep" && Number(week) === 7
       ? "Teen Number Challenge Complete!"
-      : "Quiz Results";
+      : year === "Prep" && Number(week) === 8
+        ? "Number Master Challenge Complete!"
+        : "Quiz Results";
   const quizCompletionMessage = year === "Prep" && Number(week) === 6
     ? "You built and split the numbers perfectly!"
     : year === "Prep" && Number(week) === 7
       ? "You mastered collections and teen numbers!"
-      : "Keep building across all three lessons.";
+      : year === "Prep" && Number(week) === 8
+        ? "You mastered number paths and ordering!"
+        : "Keep building across all three lessons.";
 
   const lessonBreakdown = useMemo(
     () =>
