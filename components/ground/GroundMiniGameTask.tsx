@@ -465,6 +465,7 @@ function TenFrameBuilder({
   onToggleDot: (index: number) => void;
 }) {
   const totalSlots = target > 10 ? 20 : 10;
+  const builderStyle: NonNullable<BuildVisualStyle> = target > 10 ? "double_ten_frame" : visualStyle ?? "build_trays";
   const cells = Array.from({ length: totalSlots }, (_, index) => {
     if (index < leftCount) return "left" as const;
     if (index < leftCount + rightCount) return "right" as const;
@@ -501,7 +502,7 @@ function TenFrameBuilder({
         objectType={objectType}
         totalSlots={totalSlots}
         filledStates={cells}
-        style={visualStyle ?? (target > 10 ? "double_ten_frame" : "build_trays")}
+        style={builderStyle}
         onCellClick={onToggleDot}
       />
       <div className="text-center text-xs font-black uppercase tracking-[0.16em] text-teal-700">
