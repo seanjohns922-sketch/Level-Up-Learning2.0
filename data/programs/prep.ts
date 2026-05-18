@@ -357,9 +357,10 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         10,
         3,
         "Build & Compare",
-        "Build, compare and match quantities in mixed challenges.",
-        ["Build the group", "Compare and choose", "Match and sort"],
-        ["AC9MFN01", "AC9MFN02", "AC9MFN03"]
+        "Build, compare, and match quantities using counting, teen-number understanding, ordering, more or less, same or different, and flexible quantity building in creative Number Nexus lab challenges.",
+        ["Build the number", "Make the groups equal", "Sort the groups"],
+        ["AC9MFN01", "AC9MFN02", "AC9MFN03"],
+        "Nexus Builder Lab"
       ),
     ],
   },

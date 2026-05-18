@@ -243,6 +243,42 @@ const LESSON2_ROTATION: Lesson2Kind[] = [
   "final_boss_round",
 ];
 
+
+type Lesson3Kind =
+  | "build_number_lab"
+  | "which_has_more"
+  | "which_has_less"
+  | "make_equal"
+  | "build_same_amount"
+  | "more_or_less_than_ten"
+  | "teen_builder"
+  | "balance_groups"
+  | "match_collection_lab"
+  | "which_is_bigger"
+  | "build_missing_part"
+  | "sort_groups"
+  | "quick_build_flash"
+  | "same_or_different"
+  | "nexus_build_challenge";
+
+const LESSON3_ROTATION: Lesson3Kind[] = [
+  "build_number_lab",
+  "which_has_more",
+  "which_has_less",
+  "make_equal",
+  "build_same_amount",
+  "more_or_less_than_ten",
+  "teen_builder",
+  "balance_groups",
+  "match_collection_lab",
+  "which_is_bigger",
+  "build_missing_part",
+  "sort_groups",
+  "quick_build_flash",
+  "same_or_different",
+  "nexus_build_challenge",
+];
+
 function createTapNumberTask(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
   const target = pickTarget(memory, difficulty);
@@ -605,6 +641,189 @@ function generateLesson1Task(lessonId: string, difficulty: Difficulty, kind: Les
   }
 }
 
+function makeCompareGroup(memory: Week10Memory, quantity: number, layout?: GroundPatternLayout): GroundCompareTask["groups"][number] {
+  return {
+    id: `compare-${quantity}-${pickObject(memory)}-${Math.random().toString(36).slice(2, 7)}`,
+    quantity,
+    objectType: pickObject(memory),
+    patternLayout: layout ?? pickLayout(memory, quantity >= 10 ? ["ten_frame", "symmetry"] : undefined),
+  };
+}
+
+function createBuildReferenceTask(
+  lessonId: string,
+  difficulty: Difficulty,
+  { prompt, speakText, target, objectType, startingBuilt = 0, feedback }: {
+    prompt: string;
+    speakText: string;
+    target?: number;
+    objectType?: GroundObjectType;
+    startingBuilt?: number;
+    feedback: { correct: string; wrong: string };
+  }
+): PracticeTask {
+  const memory = getMemory(lessonId);
+  const total = target ?? pickTarget(memory, difficulty);
+  const safeStart = Math.min(startingBuilt, total);
+  return makeBuildTask({
+    prompt,
+    speakText,
+    introPrompt: "Builder lab!",
+    targetNumber: total,
+    objectType: objectType ?? pickObject(memory),
+    compareMode: "exact",
+    maxBuild: 20,
+    startingBuilt: safeStart,
+    referenceGroup: {
+      quantity: total,
+      objectType: pickObject(memory),
+      patternLayout: total >= 10 ? "ten_frame" : pickLayout(memory),
+    },
+    buildMode: total >= 11 ? "split" : "single",
+    showExample: false,
+    feedback,
+  });
+}
+
+function createWhichHasLessTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const lower = pickTarget(memory, difficulty);
+  const higher = Math.min(20, lower + randInt(1, 3));
+  const groups = shuffle([makeCompareGroup(memory, lower), makeCompareGroup(memory, higher)]);
+  const correct = groups.find((group) => group.quantity === lower)!;
+  return makeCompareTask({
+    prompt: "Which group has less?",
+    speakText: "Which group has less?",
+    introPrompt: "Builder lab!",
+    targetNumber: lower,
+    comparisonType: "less",
+    helperVariant: "battle",
+    referenceGroup: { quantity: higher, objectType: groups[0]!.objectType, patternLayout: groups[0]!.patternLayout },
+    groups,
+    correctGroupId: correct.id,
+    feedback: { correct: "Great comparing!", wrong: "Look for the smaller group." },
+  });
+}
+
+function createMoreOrLessThanTenTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const pool = difficulty === "easy" ? [8, 9, 11, 12] : difficulty === "medium" ? [8, 9, 11, 12, 13, 14] : [7, 8, 9, 11, 12, 13, 14, 15];
+  const target = chooseRecentSafe(pool, memory.recentTargets);
+  pushRecent(memory.recentTargets, target, 6);
+  const asksMore = Math.random() < 0.5;
+  return makeCompareTask({
+    prompt: asksMore ? "Is this group more than 10?" : "Is this group less than 10?",
+    speakText: asksMore ? "Is this group more than 10?" : "Is this group less than 10?",
+    introPrompt: "Builder lab!",
+    targetNumber: target,
+    comparisonType: "statement",
+    statementRelation: asksMore ? "more" : "less",
+    groups: [
+      { id: `compare-ten-target-${target}`, quantity: target, objectType: pickObject(memory), patternLayout: target >= 10 ? "ten_frame" : pickLayout(memory) },
+      { id: `compare-ten-base-10`, quantity: 10, objectType: pickObject(memory), patternLayout: "ten_frame" },
+    ],
+    feedback: { correct: "You compared it carefully!", wrong: "Compare the group to 10 again." },
+  });
+}
+
+function createTeenBuilderTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const teen = Math.max(11, pickTarget(memory, difficulty));
+  return makeBuildTask({
+    prompt: `Build ${teen}.`,
+    speakText: `Build ${numberWord(teen)}.`,
+    introPrompt: "Teen builder!",
+    targetNumber: teen,
+    objectType: pickObject(memory, ["energy_orbs", "crystals", "number_orbs"]),
+    maxBuild: 20,
+    buildMode: "split",
+    showExample: false,
+    splitPartLayouts: ["ten_frame", teen - 10 >= 6 ? "ten_frame" : "symmetry"],
+    feedback: { correct: `You built ${teen}!`, wrong: "Use a full ten and the extras." },
+  });
+}
+
+function createSortGroupsTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const start = difficulty === "easy" ? randInt(6, 10) : difficulty === "medium" ? randInt(10, 14) : randInt(12, 16);
+  const values = [start, Math.min(20, start + 1), Math.min(20, start + 3)];
+  const groups = shuffle(values).map((quantity, index) => ({
+    id: `builder-order-${lessonId}-${index}-${quantity}`,
+    quantity,
+    objectType: pickObject(memory),
+    patternLayout: quantity >= 10 ? "ten_frame" as const : pickLayout(memory),
+  }));
+  return makeCompareTask({
+    prompt: "Sort the groups from least to greatest.",
+    speakText: "Sort the groups from least to greatest.",
+    introPrompt: "Builder lab!",
+    targetNumber: values[values.length - 1]!,
+    comparisonType: "order",
+    groups,
+    correctOrderIds: [...groups].sort((a, b) => a.quantity - b.quantity).map((group) => group.id),
+    orderDirection: "ASC",
+    feedback: { correct: "You sorted the groups!", wrong: "Start with the smallest group." },
+  });
+}
+
+function createSameOrDifferentTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const base = pickTarget(memory, difficulty);
+  const same = Math.random() < 0.5;
+  const otherPool = Array.from({ length: 21 }, (_, index) => index).filter((value) => value !== base && Math.abs(value - base) <= 2);
+  const other = same ? base : chooseRecentSafe(otherPool, memory.recentTargets);
+  pushRecent(memory.recentTargets, other, 6);
+  return makeCompareTask({
+    prompt: "Do these groups show the same amount?",
+    speakText: "Do these groups show the same amount?",
+    introPrompt: "Builder lab!",
+    targetNumber: base,
+    comparisonType: "equal",
+    helperVariant: base >= 10 ? "ten_frame" : "flash",
+    groups: [
+      { id: `same-a-${base}`, quantity: base, objectType: pickObject(memory), patternLayout: base >= 10 ? "ten_frame" : pickLayout(memory) },
+      { id: `same-b-${other}`, quantity: other, objectType: pickObject(memory), patternLayout: other >= 10 ? "ten_frame" : pickLayout(memory) },
+    ],
+    feedback: { correct: same ? "Yes, they match!" : "Correct, they are different!", wrong: "Check both groups carefully." },
+  });
+}
+
+function generateLesson3Task(lessonId: string, difficulty: Difficulty, kind: Lesson3Kind): PracticeTask {
+  const memory = getMemory(lessonId);
+  switch (kind) {
+    case "build_number_lab":
+      { const task = createBuildNumberTask(lessonId, difficulty) as GroundBuildTask; return { ...task, prompt: `Build ${task.targetNumber}.`, speakText: `Build ${numberWord(task.targetNumber)}.`, introPrompt: "Builder lab!", feedback: { correct: "You built the perfect amount!", wrong: "Build the target quantity." } }; }
+    case "which_has_more":
+      return { ...(createWhichGroupMoreTask(lessonId, difficulty) as GroundCompareTask), prompt: "Which group has more?", speakText: "Which group has more?", introPrompt: "Builder lab!", feedback: { correct: "Great comparing!", wrong: "Look for the larger group." } };
+    case "which_has_less":
+      return createWhichHasLessTask(lessonId, difficulty);
+    case "make_equal":
+      { const target = pickTarget(memory, difficulty); return createBuildReferenceTask(lessonId, difficulty, { prompt: "Make the groups equal.", speakText: "Make the groups equal.", target, startingBuilt: Math.max(0, target - randInt(1, 3)), feedback: { correct: "You made them equal!", wrong: "Match the first group." } }); }
+    case "build_same_amount":
+      return createBuildReferenceTask(lessonId, difficulty, { prompt: "Build the same amount.", speakText: "Build the same amount.", feedback: { correct: "You matched the amount!", wrong: "Build the same amount as the first group." } });
+    case "more_or_less_than_ten":
+      return createMoreOrLessThanTenTask(lessonId, difficulty);
+    case "teen_builder":
+      return createTeenBuilderTask(lessonId, difficulty);
+    case "balance_groups":
+      { const target = pickTarget(memory, difficulty); return createBuildReferenceTask(lessonId, difficulty, { prompt: "Balance the groups.", speakText: "Balance the groups.", target, startingBuilt: Math.max(0, target - randInt(2, 4)), feedback: { correct: "You balanced the groups!", wrong: "Make both groups show the same amount." } }); }
+    case "match_collection_lab":
+      return { ...(createMatchCollectionTask(lessonId, difficulty) as GroundMatchTask), prompt: "Match the collection.", speakText: "Match the collection.", introPrompt: "Builder lab!", feedback: { correct: "Collection matched!", wrong: "Check the quantity again." } };
+    case "which_is_bigger":
+      return { ...(createFindBiggestTask(lessonId, difficulty) as GroundCompareTask), prompt: "Which quantity is bigger?", speakText: "Which quantity is bigger?", introPrompt: "Builder lab!", feedback: { correct: "Great comparing!", wrong: "Look for the bigger quantity." } };
+    case "build_missing_part":
+      { const target = Math.max(11, pickTarget(memory, difficulty)); const built = Math.max(1, target - randInt(2, 5)); return makeBuildTask({ prompt: `Add more to make ${target}.`, speakText: `Add more to make ${numberWord(target)}.`, introPrompt: "Builder lab!", targetNumber: target, objectType: pickObject(memory), maxBuild: 20, startingBuilt: built, compareMode: "exact", buildMode: target >= 11 ? "split" : "single", showExample: false, feedback: { correct: "You built the missing part!", wrong: "Add the missing amount." } }); }
+    case "sort_groups":
+      return createSortGroupsTask(lessonId, difficulty);
+    case "quick_build_flash":
+      { const target = pickTarget(memory, difficulty); return makeBuildTask({ prompt: `Quick build! Make ${target}.`, speakText: `Quick build. Make ${numberWord(target)}.`, introPrompt: "Quick build!", targetNumber: target, objectType: pickObject(memory), maxBuild: 20, buildMode: target >= 11 ? "split" : "single", showExample: false, feedback: { correct: "Quick build complete!", wrong: "Build the target quickly and carefully." } }); }
+    case "same_or_different":
+      return createSameOrDifferentTask(lessonId, difficulty);
+    case "nexus_build_challenge":
+      { const target = Math.max(12, pickTarget(memory, difficulty)); return createBuildReferenceTask(lessonId, difficulty, { prompt: `Nexus Build Challenge: Build ${target} to match the lab.`, speakText: `Nexus Build Challenge. Build ${numberWord(target)} to match the lab.`, target, startingBuilt: Math.max(0, target - randInt(1, 4)), feedback: { correct: "Nexus Build Challenge complete!", wrong: "Build and match the lab amount." } }); }
+  }
+}
+
 function buildRaceBossTask(lessonId: string, difficulty: Difficulty): PracticeTask {
   const racerCount = difficulty === "easy" ? 3 : difficulty === "medium" ? 4 : 5;
   const characters = shuffle(ORDINAL_CHARACTERS).slice(0, racerCount);
@@ -768,6 +987,10 @@ function generateLesson2Task(lessonId: string, difficulty: Difficulty, kind: Les
 
 export function generatePrepWeek10Task(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
+  if (lessonId === "y0-w10-l3") {
+    const kind = nextKind(memory, LESSON3_ROTATION);
+    return generateLesson3Task(lessonId, difficulty, kind);
+  }
   if (lessonId === "y0-w10-l2") {
     const kind = nextKind(memory, LESSON2_ROTATION);
     return generateLesson2Task(lessonId, difficulty, kind);
