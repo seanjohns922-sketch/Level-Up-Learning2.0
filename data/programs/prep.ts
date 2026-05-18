@@ -304,9 +304,10 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         9,
         1,
         "First, Second, Third",
-        "Recognise ordinal positions in simple sequences.",
-        ["Who is first?", "Ordinal line-up", "Tap the position"],
-        ["AC9MFN01", "AC9MFN03"]
+        "Recognise and use first, second, third, fourth, fifth, last, before, and after in familiar ordered situations like races, queues, podiums, trains, and line-ups.",
+        ["Who is first?", "Race track positions", "Place Numbot second"],
+        ["AC9MFN01", "AC9MFN03"],
+        "Position Explorer Mission"
       ),
       buildLesson(
         9,

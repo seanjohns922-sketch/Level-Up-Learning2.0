@@ -378,6 +378,31 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      kind: "groundOrdinal";
+      prompt: string;
+      speakText?: string;
+      targetNumber: number;
+      badgeLabel?: string;
+      scenario: "line" | "race" | "train" | "podium" | "rockets" | "queue" | "stepping_stones";
+      mode: "identify" | "relative" | "place" | "same_position";
+      characters: Array<{
+        id: string;
+        label: string;
+        emoji: string;
+      }>;
+      order: Array<string | null>;
+      secondaryOrder?: Array<string | null>;
+      targetPosition?: number;
+      secondaryTargetPosition?: number;
+      targetCharacterId?: string;
+      secondaryTargetCharacterId?: string;
+      referenceCharacterId?: string;
+      relation?: "before" | "after";
+      revealMs?: number;
+      correctBoolean?: boolean;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       kind: "tensOnesMcq";
       prompt: string;
       min: number;

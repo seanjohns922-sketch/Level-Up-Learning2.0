@@ -79,6 +79,7 @@ import StrategyChoice from "@/components/week12/StrategyChoice";
 import TargetedRevision from "@/components/week12/TargetedRevision";
 import FunGames from "@/components/week12/FunGames";
 import GroundMatchTaskCard from "@/components/ground/GroundMatchTaskCard";
+import { GroundOrdinalTaskCard } from "@/components/ground/GroundOrdinalTaskCard";
 import {
   GroundBuildTaskCard,
   GroundCompareTaskCard,
@@ -278,6 +279,8 @@ function TaskRendererInner({
       return <FunGames key={k} onCorrect={onC} onWrong={onW} />;
     case "groundMatch":
       return <GroundMatchTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "groundOrdinal":
+      return <GroundOrdinalTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundCollect":
       return <GroundCollectTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundBuild":
