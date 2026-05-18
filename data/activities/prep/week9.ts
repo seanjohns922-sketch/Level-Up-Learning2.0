@@ -1125,6 +1125,20 @@ export function generatePrepWeek9Task(lessonId: string, difficulty: Difficulty):
   return generateLesson1Task(lessonId, difficulty, kind);
 }
 
+export function generatePrepWeek9TaskByKind(
+  lessonId: string,
+  difficulty: Difficulty,
+  kind: string
+): PracticeTask {
+  if (lessonId === "y0-w9-l3") {
+    return generateLesson3Task(lessonId, difficulty, kind as Lesson3Kind);
+  }
+  if (lessonId === "y0-w9-l2") {
+    return generateLesson2Task(lessonId, difficulty, kind as Lesson2Kind);
+  }
+  return generateLesson1Task(lessonId, difficulty, kind as Lesson1Kind);
+}
+
 export function resetPrepWeek9TaskSessionState() {
   memoryByLesson.clear();
 }
