@@ -1264,14 +1264,13 @@ export function GroundOrderTapTaskCard({
             <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-teal-300 bg-white text-2xl shadow-sm">{isOrderMode ? "🏁" : "🤖"}</span>
             <span>{isOrderMode ? `Placed ${progressIndex}` : `On ${currentNumeral}`}</span>
             <span className="text-cyan-400">→</span>
-            <span className="rounded-full bg-white px-4 py-2 text-cyan-700 shadow-sm">Next {expectedNumeral}</span>
+            <span className="rounded-full bg-white px-4 py-2 text-cyan-700 shadow-sm">{isOrderMode ? "Keep sorting" : "Keep moving"}</span>
           </div>
         </div>
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
           {task.tiles.map((tile) => {
             const completedIndex = orderedNumerals.indexOf(tile.numeral);
             const isCompleted = completedIndex >= 0 && completedIndex < progressIndex;
-            const isTarget = tile.numeral === expectedNumeral;
             return (
               <button
                 key={tile.id}
@@ -1280,9 +1279,7 @@ export function GroundOrderTapTaskCard({
                 className={`relative flex min-h-[88px] items-center justify-center rounded-[22px] border-2 text-4xl font-black shadow-sm transition ${
                   isCompleted
                     ? "border-teal-400 bg-teal-100 text-teal-900"
-                    : isTarget
-                      ? "border-cyan-300 bg-cyan-50 text-cyan-800 hover:border-cyan-400 hover:bg-cyan-100"
-                      : "border-cyan-200 bg-white text-teal-900 hover:border-cyan-300 hover:bg-cyan-50"
+                    : "border-cyan-200 bg-white text-teal-900 hover:border-cyan-300 hover:bg-cyan-50"
                 }`}
               >
                 {isCompleted ? <span className="absolute -top-2 right-2 text-lg">✨</span> : null}

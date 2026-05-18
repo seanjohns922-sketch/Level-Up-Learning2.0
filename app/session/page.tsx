@@ -7117,23 +7117,25 @@ function SessionPage() {
       }));
     }
   }, [currentQuiz, isTapSkipQuiz, quizGroupTaps]);
-  const currentAnswered =
-    currentQuiz?.kind === "lessonActivity" || currentQuiz?.kind === "practiceTask"
-      ? quizLessonActivityResults[currentQuiz.id]?.attempted === true
-      : currentQuiz?.kind === "typed"
-      ? (quizTyped[currentQuiz.id] ?? "").trim().length > 0
-      : currentQuiz?.kind === "numberLineTap" ||
-        currentQuiz?.kind === "numberLineJump"
-      ? typeof quizLineAnswers[currentQuiz.id] === "number"
-      : currentQuiz?.kind === "chartFill"
-      ? quizChartDone[currentQuiz.id] === true
-      : currentQuiz?.kind === "mab"
-      ? quizMabAnswers[currentQuiz.id]?.touched === true
-      : currentQuiz?.kind === "moneyMake" ||
-        currentQuiz?.kind === "moneyChange" ||
-        currentQuiz?.kind === "moneyEnough"
-      ? quizMoneyAnswers[currentQuiz.id]?.attempted === true
-      : typeof quizAnswers[currentQuiz?.id ?? ""] === "number";
+
+  function isQuestionAnswered(question: QuizQuestion | undefined | null) {
+    if (!question) return false;
+    if (question.kind === "lessonActivity" || question.kind === "practiceTask") {
+      return quizLessonActivityResults[question.id]?.attempted === true;
+    }
+    if (question.kind === "typed") return (quizTyped[question.id] ?? "").trim().length > 0;
+    if (question.kind === "numberLineTap" || question.kind === "numberLineJump") {
+      return typeof quizLineAnswers[question.id] === "number";
+    }
+    if (question.kind === "chartFill") return quizChartDone[question.id] === true;
+    if (question.kind === "mab") return quizMabAnswers[question.id]?.touched === true;
+    if (question.kind === "moneyMake" || question.kind === "moneyChange" || question.kind === "moneyEnough") {
+      return quizMoneyAnswers[question.id]?.attempted === true;
+    }
+    return typeof quizAnswers[question.id] === "number";
+  }
+
+  const currentAnswered = isQuestionAnswered(currentQuiz);
 
   useEffect(() => {
     if (!year || !week || quizQuestions.length === 0 || quizSubmitted) return;
@@ -7474,8 +7476,8 @@ function SessionPage() {
                     "inset 0 1px 0 rgba(94,234,212,0.12), 0 8px 20px -12px rgba(0,0,0,0.55)",
                 }}
               >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2">
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-teal-300/30 bg-teal-500/10 px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-teal-200">
                       <span className="h-1.5 w-1.5 rounded-full bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]" />
                       Q {quizIndex + 1}<span className="opacity-60">/{quizQuestions.length}</span>
@@ -7485,8 +7487,25 @@ function SessionPage() {
                         Lesson {currentQuiz.lessonTag}
                       </span>
                     ) : null}
+                    <label className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-mono font-bold uppercase tracking-[0.14em] text-white/80">
+                      <span className="text-teal-200">Jump</span>
+                      <select
+                        value={quizIndex}
+                        onChange={(e) => setQuizIndex(Number(e.target.value))}
+                        className="rounded-full border border-teal-300/20 bg-[#0b1220] px-3 py-1 text-[11px] font-bold text-white outline-none transition hover:border-teal-200/50"
+                      >
+                        {quizQuestions.map((question, index) => {
+                          const answered = isQuestionAnswered(question);
+                          return (
+                            <option key={question.id} value={index}>
+                              {`Q${index + 1} · L${question.lessonTag ?? question.lessonNumber ?? 1}${answered ? ' ✓' : ''}`}
+                            </option>
+                          );
+                        })}
+                      </select>
+                    </label>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-3">
                     <div className="rounded-full border border-amber-300/30 bg-amber-500/10 px-3 py-1 text-[11px] font-mono font-bold uppercase tracking-[0.18em] text-amber-100">
                       ✦ {liveCorrectCount} XP
                     </div>
