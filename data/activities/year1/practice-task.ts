@@ -218,6 +218,7 @@ export type PracticeTask = (
       objectType: "dots" | "gems" | "stars" | "blocks" | "robot_tokens" | "energy_orbs" | "crystals" | "bolts" | "futuristic_coins" | "planets" | "rockets" | "number_orbs";
       compareMode?: "exact" | "more_than" | "less_than";
       compareBase?: number;
+      visualStyle?: "double_ten_frame" | "energy_cell_grid" | "build_trays" | "crate_system" | "reactor_cells" | "stacked_groups" | "collection_shelves";
       maxBuild?: number;
       startingBuilt?: number;
       referenceGroup?: {
@@ -243,6 +244,7 @@ export type PracticeTask = (
       targetNumber: number;
       comparisonType: "more" | "less" | "equal" | "biggest" | "smallest" | "order" | "statement" | "match" | "different";
       helperVariant?: "numbot" | "battle" | "flash" | "ten_frame";
+      visualStyle?: "balance_panels" | "reactor_cells" | "collection_shelves" | "crate_system" | "double_ten_frame" | "energy_cell_grid" | "stacked_groups";
       statementRelation?: "more" | "less" | "equal";
       referenceGroup?: {
         quantity: number;

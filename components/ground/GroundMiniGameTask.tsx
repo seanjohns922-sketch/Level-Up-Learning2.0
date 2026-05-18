@@ -33,6 +33,8 @@ const OBJECT_META = {
 } as const;
 
 type GroundPatternLayout = GroundFlashTask["patternLayout"];
+type BuildVisualStyle = GroundBuildTask["visualStyle"];
+type CompareVisualStyle = GroundCompareTask["visualStyle"];
 
 function getPatternGrid(layout: GroundPatternLayout, quantity: number) {
   if (layout === "ten_frame") {
@@ -82,8 +84,50 @@ function getPatternGrid(layout: GroundPatternLayout, quantity: number) {
   return { columns: 3, slots: 9, filled: dicePatterns[quantity] ?? Array.from({ length: Math.min(quantity, 9) }, (_, index) => index) };
 }
 
+function StructuredFrame({
+  quantity,
+  objectType,
+  columns,
+  slots,
+  filled,
+}: {
+  quantity: number;
+  objectType: keyof typeof OBJECT_META;
+  columns: number;
+  slots: number;
+  filled: number[];
+}) {
+  const meta = OBJECT_META[objectType];
+  return (
+    <div className="mx-auto grid justify-center gap-3" style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}>
+      {Array.from({ length: slots }).map((_, index) => {
+        const isFilled = filled.includes(index);
+        return (
+          <span key={`${objectType}-${quantity}-${index}`} className={`inline-flex h-10 w-10 items-center justify-center rounded-full text-3xl ${isFilled ? "bg-white text-teal-700 shadow-sm" : "bg-transparent text-transparent"}`}>
+            {meta.emoji}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
 function StructuredReveal({ quantity, objectType, patternLayout }: { quantity: number; objectType: keyof typeof OBJECT_META; patternLayout?: GroundPatternLayout }) {
   const meta = OBJECT_META[objectType];
+  if (patternLayout === "ten_frame" && quantity > 10) {
+    return (
+      <div className="mx-auto flex max-w-[260px] flex-col gap-3">
+        <div className="rounded-[18px] border border-cyan-200 bg-white p-2 shadow-sm">
+          <div className="mb-2 text-center text-[10px] font-black uppercase tracking-[0.16em] text-teal-700">Full 10</div>
+          <StructuredFrame quantity={10} objectType={objectType} columns={5} slots={10} filled={Array.from({ length: 10 }, (_, index) => index)} />
+        </div>
+        <div className="rounded-[18px] border border-cyan-200 bg-white p-2 shadow-sm">
+          <div className="mb-2 text-center text-[10px] font-black uppercase tracking-[0.16em] text-teal-700">Extras</div>
+          <StructuredFrame quantity={quantity - 10} objectType={objectType} columns={5} slots={10} filled={Array.from({ length: quantity - 10 }, (_, index) => index)} />
+        </div>
+      </div>
+    );
+  }
   const grid = patternLayout ? getPatternGrid(patternLayout, quantity) : null;
   if (!grid) {
     return (
@@ -96,18 +140,7 @@ function StructuredReveal({ quantity, objectType, patternLayout }: { quantity: n
       </div>
     );
   }
-  return (
-    <div className="mx-auto grid max-w-[240px] justify-center gap-3" style={{ gridTemplateColumns: `repeat(${grid.columns}, minmax(0, 1fr))` }}>
-      {Array.from({ length: grid.slots }).map((_, index) => {
-        const filled = grid.filled.includes(index);
-        return (
-          <span key={`${objectType}-${index}`} className={`inline-flex h-10 w-10 items-center justify-center rounded-full text-3xl ${filled ? "bg-white text-teal-700 shadow-sm" : "bg-transparent text-transparent"}`}>
-            {meta.emoji}
-          </span>
-        );
-      })}
-    </div>
-  );
+  return <StructuredFrame quantity={quantity} objectType={objectType} columns={grid.columns} slots={grid.slots} filled={grid.filled} />;
 }
 
 function GroundMiniShell({
@@ -180,6 +213,102 @@ function GroundNumeralOption({
     >
       {numeral}
     </button>
+  );
+}
+
+function getBuildVisualStyle(task: GroundBuildTask): NonNullable<BuildVisualStyle> {
+  return task.visualStyle ?? (task.targetNumber > 10 ? "double_ten_frame" : "build_trays");
+}
+
+function getCompareVisualStyle(task: GroundCompareTask): NonNullable<CompareVisualStyle> {
+  return task.visualStyle ?? (task.targetNumber > 10 ? "double_ten_frame" : "balance_panels");
+}
+
+function getBoardConfig(style: BuildVisualStyle | CompareVisualStyle | undefined) {
+  switch (style) {
+    case "crate_system":
+      return { columns: 4, sectionSize: 4, panelClass: "rounded-[24px] border border-amber-200 bg-amber-50/60 p-3 shadow-sm", cellClass: "rounded-[14px] border-2 border-amber-200 bg-white" };
+    case "collection_shelves":
+      return { columns: 5, sectionSize: 5, panelClass: "rounded-[24px] border border-cyan-200 bg-slate-50/80 p-3 shadow-sm", cellClass: "rounded-[12px] border-2 border-cyan-200 bg-white" };
+    case "reactor_cells":
+      return { columns: 5, sectionSize: 10, panelClass: "rounded-[24px] border border-cyan-200 bg-gradient-to-br from-cyan-50 via-white to-teal-50 p-3 shadow-[0_0_20px_rgba(34,211,238,0.1)]", cellClass: "rounded-[16px] border-2 border-cyan-200 bg-slate-900/5" };
+    case "stacked_groups":
+      return { columns: 5, sectionSize: 5, panelClass: "rounded-[24px] border border-cyan-200 bg-white p-3 shadow-sm", cellClass: "rounded-full border-2 border-cyan-200 bg-cyan-50" };
+    case "energy_cell_grid":
+      return { columns: 5, sectionSize: 10, panelClass: "rounded-[24px] border border-cyan-200 bg-cyan-50/70 p-3 shadow-sm", cellClass: "rounded-[14px] border-2 border-cyan-200 bg-white" };
+    case "double_ten_frame":
+      return { columns: 5, sectionSize: 10, panelClass: "rounded-[24px] border border-cyan-200 bg-white p-3 shadow-sm", cellClass: "rounded-full border-2 border-cyan-200 bg-cyan-50" };
+    default:
+      return { columns: 5, sectionSize: 5, panelClass: "rounded-[24px] border border-cyan-200 bg-cyan-50/40 p-3 shadow-sm", cellClass: "rounded-[16px] border-2 border-dashed border-cyan-200 bg-white" };
+  }
+}
+
+function QuantityBoard({
+  objectType,
+  totalSlots,
+  filledStates,
+  style,
+  onCellClick,
+}: {
+  objectType: keyof typeof OBJECT_META;
+  totalSlots: number;
+  filledStates: Array<"empty" | "filled" | "left" | "right">;
+  style?: BuildVisualStyle | CompareVisualStyle;
+  onCellClick?: (index: number) => void;
+}) {
+  const config = getBoardConfig(style);
+  const meta = OBJECT_META[objectType];
+  const sections = [];
+  for (let start = 0; start < totalSlots; start += config.sectionSize) sections.push(start);
+  return (
+    <div className={`space-y-3 ${config.panelClass}`}>
+      {sections.map((start) => {
+        const end = Math.min(totalSlots, start + config.sectionSize);
+        const sectionCount = end - start;
+        const sectionLabel = style === "double_ten_frame" && totalSlots > 10 ? (start === 0 ? "Full 10" : "Extras") : style === "collection_shelves" ? `Shelf ${start / config.sectionSize + 1}` : style === "build_trays" ? `Tray ${start / config.sectionSize + 1}` : style === "reactor_cells" ? `Reactor ${start / config.sectionSize + 1}` : style === "crate_system" ? `Crates ${start / config.sectionSize + 1}` : undefined;
+        return (
+          <div key={`${style ?? "default"}-${start}`} className="space-y-2">
+            {sectionLabel ? <div className="text-center text-[10px] font-black uppercase tracking-[0.16em] text-teal-700">{sectionLabel}</div> : null}
+            <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${config.columns}, minmax(0, 1fr))` }}>
+              {Array.from({ length: sectionCount }).map((_, localIndex) => {
+                const index = start + localIndex;
+                const state = filledStates[index] ?? "empty";
+                const filled = state !== "empty";
+                const tone = state === "left"
+                  ? "border-teal-400 bg-teal-400/20 text-teal-900"
+                  : state === "right"
+                    ? "border-orange-400 bg-orange-400/20 text-orange-900"
+                    : state === "filled"
+                      ? "border-cyan-400 bg-cyan-100 text-teal-900"
+                      : "border-cyan-200 bg-white text-transparent";
+                const contentClass = state === "left"
+                  ? "bg-teal-400/80"
+                  : state === "right"
+                    ? "bg-orange-400/80"
+                    : state === "filled"
+                      ? "bg-cyan-400/80"
+                      : "bg-cyan-50";
+                const Component = onCellClick ? "button" : "div";
+                return (
+                  <Component
+                    key={`${style ?? "board"}-${index}`}
+                    type={onCellClick ? "button" : undefined}
+                    onClick={onCellClick ? () => onCellClick(index) : undefined}
+                    className={`flex h-12 w-full items-center justify-center border-2 text-2xl transition sm:h-14 ${config.cellClass} ${tone}`}
+                  >
+                    {filled ? (
+                      <span className={`flex h-7 w-7 items-center justify-center rounded-full text-lg ${contentClass}`}>{meta.emoji}</span>
+                    ) : (
+                      <span className="h-6 w-6 rounded-full border border-cyan-200 bg-cyan-50" />
+                    )}
+                  </Component>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
@@ -321,6 +450,8 @@ function TenFrameBuilder({
   leftCount,
   rightCount,
   activePart,
+  objectType,
+  visualStyle,
   onSelectPart,
   onToggleDot,
 }: {
@@ -328,10 +459,13 @@ function TenFrameBuilder({
   leftCount: number;
   rightCount: number;
   activePart: "left" | "right";
+  objectType: keyof typeof OBJECT_META;
+  visualStyle?: BuildVisualStyle;
   onSelectPart: (part: "left" | "right") => void;
   onToggleDot: (index: number) => void;
 }) {
-  const cells = Array.from({ length: 10 }, (_, index) => {
+  const totalSlots = target > 10 ? 20 : 10;
+  const cells = Array.from({ length: totalSlots }, (_, index) => {
     if (index < leftCount) return "left" as const;
     if (index < leftCount + rightCount) return "right" as const;
     return "empty" as const;
@@ -363,30 +497,15 @@ function TenFrameBuilder({
           Red part
         </button>
       </div>
-      <div className="grid grid-cols-5 gap-2 rounded-[22px] border border-cyan-200 bg-white p-3 shadow-sm">
-        {cells.map((cell, index) => {
-          const filled = cell !== "empty";
-          const tone =
-            cell === "left"
-              ? "border-teal-400 bg-teal-400 shadow-[0_0_14px_rgba(20,184,166,0.18)]"
-              : cell === "right"
-                ? "border-orange-400 bg-orange-400 shadow-[0_0_14px_rgba(251,146,60,0.18)]"
-                : "border-cyan-200 bg-white";
-          return (
-            <button
-              key={`ten-frame-${index}`}
-              type="button"
-              onClick={() => onToggleDot(index)}
-              className={`flex h-12 w-full items-center justify-center rounded-full border-2 transition ${tone}`}
-              aria-label={`Dot ${index + 1} of 10`}
-            >
-              <span className={`h-6 w-6 rounded-full border-2 ${filled ? "border-transparent bg-white/15" : "border-cyan-300 bg-cyan-50"}`} />
-            </button>
-          );
-        })}
-      </div>
+      <QuantityBoard
+        objectType={objectType}
+        totalSlots={totalSlots}
+        filledStates={cells}
+        style={visualStyle ?? (target > 10 ? "double_ten_frame" : "build_trays")}
+        onCellClick={onToggleDot}
+      />
       <div className="text-center text-xs font-black uppercase tracking-[0.16em] text-teal-700">
-        Tap dots to build {target} with two colours
+        Tap cells to build {target} with two colours
       </div>
     </div>
   );
@@ -408,6 +527,7 @@ export function GroundBuildTaskCard({
   const [activePart, setActivePart] = useState<"left" | "right">("left");
   const compareMode = task.compareMode ?? "exact";
   const compareBase = task.compareBase ?? task.targetNumber;
+  const visualStyle = getBuildVisualStyle(task);
   const traySize = Math.max(5, Math.min(20, task.maxBuild ?? task.targetNumber ?? compareBase));
   const tray = useMemo(() => Array.from({ length: traySize }), [traySize]);
   const splitTotal = leftBuilt + rightBuilt;
@@ -462,7 +582,7 @@ export function GroundBuildTaskCard({
                 <StructuredReveal
                   quantity={task.targetNumber}
                   objectType={task.referenceGroup?.objectType ?? task.objectType}
-                  patternLayout="ten_frame"
+                  patternLayout={task.targetNumber > 10 ? "ten_frame" : task.referenceGroup?.patternLayout ?? "ten_frame"}
                 />
               </div>
             </div>
@@ -478,6 +598,8 @@ export function GroundBuildTaskCard({
               leftCount={leftBuilt}
               rightCount={rightBuilt}
               activePart={activePart}
+              objectType={task.objectType}
+              visualStyle={visualStyle}
               onSelectPart={setActivePart}
               onToggleDot={toggleSplitDot}
             />
@@ -566,6 +688,7 @@ export function GroundBuildTaskCard({
               quantity={task.referenceGroup.quantity}
               objectType={task.referenceGroup.objectType}
               patternLayout={task.referenceGroup.patternLayout}
+              visualStyle={visualStyle as CompareVisualStyle}
             />
           </div>
         ) : null}
@@ -574,16 +697,12 @@ export function GroundBuildTaskCard({
             {compareMode === "more_than" ? `Make more than ${compareBase}` : `Make less than ${compareBase}`}
           </div>
         ) : null}
-        <div className="grid grid-cols-5 gap-3">
-          {tray.map((_, index) => (
-            <div
-              key={`tray-${index}`}
-              className="flex h-14 items-center justify-center rounded-full border-2 border-dashed border-cyan-200 bg-cyan-50/50 text-3xl sm:h-16"
-            >
-              {index < built ? OBJECT_META[task.objectType].emoji : ""}
-            </div>
-          ))}
-        </div>
+        <QuantityBoard
+          objectType={task.objectType}
+          totalSlots={traySize}
+          filledStates={tray.map((_, index) => (index < built ? "filled" : "empty"))}
+          style={visualStyle}
+        />
       </div>
 
       <div className="grid grid-cols-3 gap-3">
@@ -619,21 +738,33 @@ function CompareGroupCard(
   patternLayout,
   emphasized = false,
   orderIndex,
+  visualStyle,
 }: {
   quantity: number;
   objectType: keyof typeof OBJECT_META;
   patternLayout?: GroundPatternLayout;
   emphasized?: boolean;
   orderIndex?: number;
+  visualStyle?: CompareVisualStyle;
 }) {
+  const config = getBoardConfig(visualStyle);
+  const cardTone = visualStyle === "balance_panels"
+    ? emphasized ? "border-teal-300 bg-teal-50" : "border-cyan-200 bg-cyan-50/60"
+    : visualStyle === "reactor_cells"
+      ? emphasized ? "border-teal-300 bg-teal-50 shadow-[0_0_18px_rgba(45,212,191,0.12)]" : "border-cyan-200 bg-gradient-to-br from-cyan-50 via-white to-teal-50"
+      : visualStyle === "collection_shelves"
+        ? emphasized ? "border-teal-300 bg-teal-50" : "border-cyan-200 bg-slate-50"
+        : visualStyle === "crate_system"
+          ? emphasized ? "border-amber-300 bg-amber-50" : "border-amber-200 bg-white"
+          : emphasized ? "border-teal-300 bg-teal-50" : "border-cyan-200 bg-white";
   return (
-    <div className={`relative rounded-[22px] border-2 px-3 py-3 shadow-sm transition ${emphasized ? "border-teal-300 bg-teal-50" : "border-cyan-200 bg-white"}`}>
+    <div className={`relative rounded-[22px] border-2 px-3 py-3 shadow-sm transition ${cardTone}`}>
       {typeof orderIndex === "number" ? (
         <div className="absolute left-3 top-3 flex h-10 w-10 items-center justify-center rounded-full border-2 border-teal-300 bg-white text-xl font-black text-teal-800 shadow-sm">
           {orderIndex + 1}
         </div>
       ) : null}
-      <StructuredReveal quantity={quantity} objectType={objectType} patternLayout={patternLayout} />
+      <div className={config.panelClass}><StructuredReveal quantity={quantity} objectType={objectType} patternLayout={patternLayout} /></div>
     </div>
   );
 }
@@ -727,6 +858,7 @@ export function GroundCompareTaskCard({
                 quantity={task.referenceGroup.quantity}
                 objectType={task.referenceGroup.objectType}
                 patternLayout={task.referenceGroup.patternLayout}
+                visualStyle={getCompareVisualStyle(task)}
               />
             ) : (
               <div className="flex min-h-[96px] items-center justify-center rounded-[22px] border-2 border-dashed border-cyan-300 bg-white text-center text-sm font-black uppercase tracking-[0.16em] text-teal-700">
@@ -778,6 +910,7 @@ export function GroundCompareTaskCard({
                 patternLayout={group.patternLayout}
                 emphasized={orderProgress.includes(group.id)}
                 orderIndex={orderProgress.indexOf(group.id) >= 0 ? orderProgress.indexOf(group.id) : undefined}
+                visualStyle={getCompareVisualStyle(task)}
               />
             </button>
           ))}
