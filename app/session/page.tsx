@@ -1573,15 +1573,15 @@ function buildPrepWeek10WeeklyQuizQuestions(
 ): QuizQuestion[] {
   const totalExpected = questionsPerLesson * 3;
   const specs = [
-    { lessonNumber: 1 as const, skill: "ground_w10_l1_tap", kind: "tap_number" },
+    { lessonNumber: 1 as const, skill: "ground_w10_l1_tap", kind: "tap_number_quiz" },
     { lessonNumber: 1 as const, skill: "ground_w10_l1_flash", kind: "quick_count_flash" },
     { lessonNumber: 1 as const, skill: "ground_w10_l1_match", kind: "match_collection" },
     { lessonNumber: 1 as const, skill: "ground_w10_l1_bigger", kind: "find_biggest" },
     { lessonNumber: 1 as const, skill: "ground_w10_l1_next", kind: "what_comes_next" },
-    { lessonNumber: 2 as const, skill: "ground_w10_l2_count_bot", kind: "count_bot" },
+    { lessonNumber: 2 as const, skill: "ground_w10_l2_count_bot", kind: "count_bot_quiz" },
     { lessonNumber: 2 as const, skill: "ground_w10_l2_teen_titan", kind: "teen_titan" },
     { lessonNumber: 2 as const, skill: "ground_w10_l2_order_master", kind: "order_master" },
-    { lessonNumber: 2 as const, skill: "ground_w10_l2_race_commander", kind: "race_commander" },
+    { lessonNumber: 2 as const, skill: "ground_w10_l2_race_commander", kind: "race_commander_place" },
     { lessonNumber: 2 as const, skill: "ground_w10_l2_final_boss", kind: "final_boss_round" },
     { lessonNumber: 3 as const, skill: "ground_w10_l3_build", kind: "build_number_lab" },
     { lessonNumber: 3 as const, skill: "ground_w10_l3_less", kind: "which_has_less" },
@@ -1594,14 +1594,18 @@ function buildPrepWeek10WeeklyQuizQuestions(
     throw new Error(`[GroundWeeklyQuiz] Week 10 expected ${totalExpected} questions, received ${specs.length}.`);
   }
 
-  return specs.map((spec, index) =>
-    buildGroundQuizQuestion(
+  return specs.map((spec, index) => {
+    const practiceTask = generatePrepWeek10TaskByKind(`y0-w10-l${spec.lessonNumber}`, "medium", spec.kind) as GroundQuizPracticeTask;
+    const quizTask = spec.lessonNumber === 3 && practiceTask.kind === "groundBuild"
+      ? { ...practiceTask, hideSplitSupport: true }
+      : practiceTask;
+    return buildGroundQuizQuestion(
       `q${index + 1}`,
       spec.lessonNumber,
       spec.skill,
-      generatePrepWeek10TaskByKind(`y0-w10-l${spec.lessonNumber}`, "medium", spec.kind) as GroundQuizPracticeTask
-    )
-  );
+      quizTask
+    );
+  });
 }
 
 function buildPrepWeek1WeeklyQuizQuestions(

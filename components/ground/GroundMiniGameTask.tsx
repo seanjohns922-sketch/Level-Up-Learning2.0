@@ -538,6 +538,7 @@ export function GroundBuildTaskCard({
   const splitHasTwoParts = leftBuilt > 0 && rightBuilt > 0;
   const splitDifferentFromExample = !task.requireDifferentFromExample || builtKey !== exampleKey;
   const splitValid = splitHitsTarget && splitHasTwoParts && splitDifferentFromExample;
+  const hideSplitSupport = task.hideSplitSupport === true;
 
   function check() {
     if (buildMode === "split") {
@@ -605,49 +606,75 @@ export function GroundBuildTaskCard({
               onToggleDot={toggleSplitDot}
             />
 
-            <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1.2fr)] xl:items-center">
-              <SplitBuildZone
-                count={leftBuilt}
-                canAdd={splitTotal < task.targetNumber}
-                canRemove={leftBuilt > 0}
-                onAdd={() => {
-                  setActivePart("left");
-                  if (splitTotal < task.targetNumber) setLeftBuilt((current) => current + 1);
-                }}
-                onRemove={() => setLeftBuilt((current) => Math.max(0, current - 1))}
-              />
-              <div className="text-center text-3xl font-black text-cyan-500">+</div>
-              <SplitBuildZone
-                count={rightBuilt}
-                canAdd={splitTotal < task.targetNumber}
-                canRemove={rightBuilt > 0}
-                onAdd={() => {
-                  setActivePart("right");
-                  if (splitTotal < task.targetNumber) setRightBuilt((current) => current + 1);
-                }}
-                onRemove={() => setRightBuilt((current) => Math.max(0, current - 1))}
-              />
-              <div className="text-center text-3xl font-black text-cyan-500">=</div>
-              <div className={`rounded-[22px] border-2 p-3 shadow-sm transition ${splitHitsTarget ? "border-emerald-300 bg-emerald-50 shadow-[0_0_22px_rgba(16,185,129,0.18)]" : "border-cyan-200 bg-white"}`}>
-                <div className="text-center text-2xl font-black text-teal-900">
-                  <span className="text-teal-600">{leftBuilt}</span>
-                  <span className="mx-2 text-cyan-500">+</span>
-                  <span className="text-orange-500">{rightBuilt}</span>
-                  <span className="mx-2 text-cyan-500">=</span>
-                  <span className={splitHitsTarget ? "text-emerald-700" : ""}>{splitTotal}</span>
+            {!hideSplitSupport ? (
+              <>
+                <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1.2fr)] xl:items-center">
+                  <SplitBuildZone
+                    count={leftBuilt}
+                    canAdd={splitTotal < task.targetNumber}
+                    canRemove={leftBuilt > 0}
+                    onAdd={() => {
+                      setActivePart("left");
+                      if (splitTotal < task.targetNumber) setLeftBuilt((current) => current + 1);
+                    }}
+                    onRemove={() => setLeftBuilt((current) => Math.max(0, current - 1))}
+                  />
+                  <div className="text-center text-3xl font-black text-cyan-500">+</div>
+                  <SplitBuildZone
+                    count={rightBuilt}
+                    canAdd={splitTotal < task.targetNumber}
+                    canRemove={rightBuilt > 0}
+                    onAdd={() => {
+                      setActivePart("right");
+                      if (splitTotal < task.targetNumber) setRightBuilt((current) => current + 1);
+                    }}
+                    onRemove={() => setRightBuilt((current) => Math.max(0, current - 1))}
+                  />
+                  <div className="text-center text-3xl font-black text-cyan-500">=</div>
+                  <div className={`rounded-[22px] border-2 p-3 shadow-sm transition ${splitHitsTarget ? "border-emerald-300 bg-emerald-50 shadow-[0_0_22px_rgba(16,185,129,0.18)]" : "border-cyan-200 bg-white"}`}>
+                    <div className="text-center text-2xl font-black text-teal-900">
+                      <span className="text-teal-600">{leftBuilt}</span>
+                      <span className="mx-2 text-cyan-500">+</span>
+                      <span className="text-orange-500">{rightBuilt}</span>
+                      <span className="mx-2 text-cyan-500">=</span>
+                      <span className={splitHitsTarget ? "text-emerald-700" : ""}>{splitTotal}</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="text-sm font-black text-teal-800">
-                {splitValid
-                  ? `Yes. ${leftBuilt} and ${rightBuilt} makes ${task.targetNumber}.`
-                  : splitHitsTarget && !splitDifferentFromExample
-                    ? "Try a different way."
-                    : "Keep building."}
-              </div>
-              <div className="grid grid-cols-[1fr_auto] gap-2">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="text-sm font-black text-teal-800">
+                    {splitValid
+                      ? `Yes. ${leftBuilt} and ${rightBuilt} makes ${task.targetNumber}.`
+                      : splitHitsTarget && !splitDifferentFromExample
+                        ? "Try a different way."
+                        : "Keep building."}
+                  </div>
+                  <div className="grid grid-cols-[1fr_auto] gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLeftBuilt(0);
+                        setRightBuilt(0);
+                        setActivePart("left");
+                      }}
+                      className="rounded-[18px] border-2 border-cyan-200 bg-white px-4 py-3 text-sm font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
+                    >
+                      Clear
+                    </button>
+                    <button
+                      type="button"
+                      onClick={check}
+                      disabled={!splitValid}
+                      className="rounded-[18px] bg-gradient-to-r from-teal-600 to-cyan-500 px-5 py-3 text-sm font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.18)] transition enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-45"
+                    >
+                      Done
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => {
@@ -668,7 +695,7 @@ export function GroundBuildTaskCard({
                   Done
                 </button>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </GroundMiniShell>

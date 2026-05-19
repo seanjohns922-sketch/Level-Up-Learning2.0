@@ -896,6 +896,62 @@ function generateLesson3Task(lessonId: string, difficulty: Difficulty, kind: Les
   }
 }
 
+function createTapNumberQuizTask(lessonId: string): PracticeTask {
+  const task = createTapNumberTask(lessonId, "easy") as GroundHuntTask;
+  return {
+    ...task,
+    introPrompt: "Take your time.",
+    feedback: { correct: "Quick thinking!", wrong: "Try the target number again." },
+  };
+}
+
+function createCountBotQuizTask(lessonId: string): PracticeTask {
+  const task = createCountBotBossTask(lessonId, "easy") as GroundFlashTask;
+  return {
+    ...task,
+    revealMs: 2300,
+    prompt: "Count Bot: How many flashed?",
+    speakText: "Defeat Count Bot. How many flashed?",
+    introPrompt: "Count Bot shield up!",
+  };
+}
+
+function createRaceCommanderPlaceTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const racerCount = difficulty === "easy" ? 3 : difficulty === "medium" ? 4 : 5;
+  const otherCharacters = shuffle(ORDINAL_CHARACTERS.filter((character) => character.id !== "numbot")).slice(0, Math.max(0, racerCount - 1));
+  const characters = shuffle([{ id: "numbot", label: "Numbot", emoji: "🤖" } as const, ...otherCharacters]);
+  const finalOrder = shuffle(characters.map((character) => character.id));
+  let startOrder = shuffle(finalOrder);
+  while (startOrder.join("|") === finalOrder.join("|")) startOrder = shuffle(finalOrder);
+  const midOne = [...startOrder];
+  const swapOne = randInt(0, Math.max(0, midOne.length - 2));
+  [midOne[swapOne], midOne[swapOne + 1]] = [midOne[swapOne + 1], midOne[swapOne]];
+  const midTwo = [...finalOrder];
+  if (midTwo.length > 3) {
+    const swapTwo = randInt(1, Math.max(1, midTwo.length - 2));
+    [midTwo[swapTwo - 1], midTwo[swapTwo]] = [midTwo[swapTwo], midTwo[swapTwo - 1]];
+  }
+  const numbotPlace = finalOrder.findIndex((id) => id === "numbot") + 1;
+  const optionPool = [1, 2, 3, 4, 5].filter((value) => value <= finalOrder.length);
+  return makeOrdinalTask({
+    prompt: "Race Commander: What place did Numbot finish?",
+    speakText: "Race Commander. What place did Numbot finish?",
+    introPrompt: "Watch the racers.",
+    targetNumber: numbotPlace,
+    badgeLabel: "Race Commander",
+    scenario: "race",
+    mode: "which_place",
+    characters,
+    order: finalOrder,
+    raceStartOrder: startOrder,
+    raceProgressOrders: [midOne, midTwo],
+    raceDurationMs: randInt(7600, 9200),
+    targetCharacterId: "numbot",
+    positionOptions: optionPool,
+    feedback: { correct: "Race tracked perfectly!", wrong: "Check where Numbot finished." },
+  });
+}
+
 function buildRaceBossTask(lessonId: string, difficulty: Difficulty): PracticeTask {
   const racerCount = difficulty === "easy" ? 3 : difficulty === "medium" ? 4 : 5;
   const characters = shuffle(ORDINAL_CHARACTERS).slice(0, racerCount);
@@ -1076,6 +1132,15 @@ export function generatePrepWeek10TaskByKind(
   difficulty: Difficulty,
   kind: string
 ): PracticeTask {
+  if (kind === "tap_number_quiz") {
+    return createTapNumberQuizTask(lessonId);
+  }
+  if (kind === "count_bot_quiz") {
+    return createCountBotQuizTask(lessonId);
+  }
+  if (kind === "race_commander_place") {
+    return createRaceCommanderPlaceTask(lessonId, difficulty);
+  }
   if (lessonId === "y0-w10-l3") {
     return generateLesson3Task(lessonId, difficulty, kind as Lesson3Kind);
   }
