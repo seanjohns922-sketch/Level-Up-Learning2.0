@@ -963,6 +963,16 @@ export function generatePrepWeek11Task(lessonId: string, difficulty: Difficulty)
   return generateLesson1Task(lessonId, difficulty, kind);
 }
 
+export function generatePrepWeek11TaskByKind(
+  lessonId: string,
+  difficulty: Difficulty,
+  kind: Lesson1Kind | Lesson2Kind | Lesson3Kind
+): PracticeTask {
+  if (lessonId === "y0-w11-l3") return createLesson3Task(lessonId, difficulty, kind as Lesson3Kind);
+  if (lessonId === "y0-w11-l2") return createLesson2Task(lessonId, difficulty, kind as Lesson2Kind);
+  return generateLesson1Task(lessonId, difficulty, kind as Lesson1Kind);
+}
+
 export function resetPrepWeek11TaskSessionState() {
   memoryByLesson.clear();
 }

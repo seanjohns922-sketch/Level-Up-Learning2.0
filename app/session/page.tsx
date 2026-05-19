@@ -58,6 +58,7 @@ import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { generatePrepWeek8TaskByKind } from "@/data/activities/prep/week8";
 import { generatePrepWeek9TaskByKind } from "@/data/activities/prep/week9";
 import { generatePrepWeek10TaskByKind } from "@/data/activities/prep/week10";
+import { generatePrepWeek11TaskByKind } from "@/data/activities/prep/week11";
 
 type WeekProgress = {
   lessonsCompleted: boolean[]; // [L1, L2, L3]
@@ -1608,6 +1609,45 @@ function buildPrepWeek10WeeklyQuizQuestions(
   });
 }
 
+function buildPrepWeek11WeeklyQuizQuestions(
+  questionsPerLesson: number
+): QuizQuestion[] {
+  const totalExpected = questionsPerLesson * 3;
+  const specs = [
+    { lessonNumber: 1 as const, skill: "ground_w11_l1_next", kind: "what_comes_next" },
+    { lessonNumber: 1 as const, skill: "ground_w11_l1_before", kind: "what_comes_before" },
+    { lessonNumber: 1 as const, skill: "ground_w11_l1_backward", kind: "count_backward" },
+    { lessonNumber: 1 as const, skill: "ground_w11_l1_bigger", kind: "which_is_bigger" },
+    { lessonNumber: 1 as const, skill: "ground_w11_l1_order", kind: "order_the_numbers" },
+    { lessonNumber: 2 as const, skill: "ground_w11_l2_flash", kind: "quick_image_flash" },
+    { lessonNumber: 2 as const, skill: "ground_w11_l2_subitise", kind: "fast_subitise_round" },
+    { lessonNumber: 2 as const, skill: "ground_w11_l2_make10", kind: "make_ten_visual" },
+    { lessonNumber: 2 as const, skill: "ground_w11_l2_missing_part", kind: "missing_part_to_ten" },
+    { lessonNumber: 2 as const, skill: "ground_w11_l2_memory", kind: "number_image_memory" },
+    { lessonNumber: 3 as const, skill: "ground_w11_l3_race", kind: "race_track_analysis" },
+    { lessonNumber: 3 as const, skill: "ground_w11_l3_position", kind: "position_order_combo" },
+    { lessonNumber: 3 as const, skill: "ground_w11_l3_reactor", kind: "challenge_reactor" },
+    { lessonNumber: 3 as const, skill: "ground_w11_l3_puzzle", kind: "tower_puzzle_room" },
+    { lessonNumber: 3 as const, skill: "ground_w11_l3_master", kind: "master_floor" },
+  ] as const;
+
+  if (specs.length !== totalExpected) {
+    throw new Error(`[GroundWeeklyQuiz] Week 11 expected ${totalExpected} questions, received ${specs.length}.`);
+  }
+
+  return specs.map((spec, index) => {
+    const practiceTask = generatePrepWeek11TaskByKind(`y0-w11-l${spec.lessonNumber}`, "medium", spec.kind) as GroundQuizPracticeTask;
+    const quizTask = practiceTask.kind === "groundBuild"
+      ? { ...practiceTask, hideSplitSupport: true, showExample: false }
+      : practiceTask;
+    return buildGroundQuizQuestion(
+      `q${index + 1}`
+      ,spec.lessonNumber,
+      spec.skill,
+      quizTask
+    );
+  });
+}
 function buildPrepWeek1WeeklyQuizQuestions(
   questionsPerLesson: number
 ): QuizQuestion[] {
@@ -6587,6 +6627,9 @@ function SessionPage() {
     if (year === "Prep" && Number(week) === 10) {
       return buildPrepWeek10WeeklyQuizQuestions(questionsPerLesson);
     }
+    if (year === "Prep" && Number(week) === 11) {
+      return buildPrepWeek11WeeklyQuizQuestions(questionsPerLesson);
+    }
 
     if (
       year === "Year 2" ||
@@ -6949,7 +6992,9 @@ function SessionPage() {
           ? "Position Master Challenge Complete!"
           : year === "Prep" && Number(week) === 10
             ? "Ground Level Complete!"
-            : "Quiz Results";
+            : year === "Prep" && Number(week) === 11
+              ? "Ground Level Readiness Challenge Complete!"
+              : "Quiz Results";
   const quizCompletionMessage = year === "Prep" && Number(week) === 6
     ? "You built and split the numbers perfectly!"
     : year === "Prep" && Number(week) === 7
@@ -6960,7 +7005,9 @@ function SessionPage() {
           ? "You mastered ordinal and positional thinking!"
           : year === "Prep" && Number(week) === 10
             ? "You mastered Number Nexus Ground Level!"
-            : "Keep building across all three lessons.";
+            : year === "Prep" && Number(week) === 11
+              ? "You proved your Ground Level readiness across every challenge floor!"
+              : "Keep building across all three lessons.";
 
   const lessonBreakdown = useMemo(
     () =>
