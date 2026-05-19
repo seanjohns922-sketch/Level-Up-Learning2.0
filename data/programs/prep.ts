@@ -374,9 +374,10 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         11,
         1,
         "Counting Review",
-        "Review counting, sequencing and number order to 20.",
-        ["Counting mix", "Sequence review", "Number order games"],
-        ["ALL"]
+        "Review counting to 20, number sequencing, teen numbers, numeral recognition, quantity matching, forward and backward counting, and number order fluency through varied mixed review mini-games.",
+        ["Tap the number", "Quick count flash", "Teen number match"],
+        ["AC9MFN01", "AC9MFN02", "AC9MFN03"],
+        "Nexus Review Run"
       ),
       buildLesson(
         11,
