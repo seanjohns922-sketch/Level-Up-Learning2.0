@@ -502,10 +502,13 @@ function createTeenNumberMatchTask(difficulty: Difficulty): PracticeTask {
 }
 
 function createBuildTheNumberTask(difficulty: Difficulty): PracticeTask {
-  return normalizeReviewCopy(
-    generatePrepWeek10TaskByKind("y0-w10-l3", difficulty, "build_number_lab"),
-    { prompt: "Build the number.", speakText: "Build the number.", introPrompt: "Build it without help." }
-  );
+  const task = generatePrepWeek10TaskByKind("y0-w10-l3", difficulty, "build_number_lab");
+  if (task.kind !== "groundBuild") return task;
+  return normalizeReviewCopy(task, {
+    prompt: `Build ${task.targetNumber}.`,
+    speakText: `Build ${numberWord(task.targetNumber)}.`,
+    introPrompt: "Build it without help.",
+  });
 }
 
 function createSameOrDifferentTask(lessonId: string, difficulty: Difficulty): PracticeTask {
