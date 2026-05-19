@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
@@ -516,10 +516,12 @@ export function GroundBuildTaskCard({
   task,
   onCorrect,
   onWrong,
+  onInteract,
 }: {
   task: GroundBuildTask;
   onCorrect: () => void;
   onWrong: () => void;
+  onInteract?: () => void;
 }) {
   const buildMode = task.buildMode ?? "single";
   const [built, setBuilt] = useState(task.startingBuilt ?? 0);
@@ -539,6 +541,13 @@ export function GroundBuildTaskCard({
   const splitDifferentFromExample = !task.requireDifferentFromExample || builtKey !== exampleKey;
   const splitValid = splitHitsTarget && splitHasTwoParts && splitDifferentFromExample;
   const hideSplitSupport = task.hideSplitSupport === true;
+  const hasInteractedRef = useRef(false);
+
+  function markInteracted() {
+    if (hasInteractedRef.current) return;
+    hasInteractedRef.current = true;
+    onInteract?.();
+  }
 
   function check() {
     if (buildMode === "split") {
@@ -557,6 +566,7 @@ export function GroundBuildTaskCard({
   }
 
   function toggleSplitDot(index: number) {
+    markInteracted();
     if (index < leftBuilt) {
       setLeftBuilt((current) => current - 1);
       return;
@@ -615,7 +625,7 @@ export function GroundBuildTaskCard({
                     canRemove={leftBuilt > 0}
                     onAdd={() => {
                       setActivePart("left");
-                      if (splitTotal < task.targetNumber) setLeftBuilt((current) => current + 1);
+                      if (splitTotal < task.targetNumber) { markInteracted(); setLeftBuilt((current) => current + 1); }
                     }}
                     onRemove={() => setLeftBuilt((current) => Math.max(0, current - 1))}
                   />
@@ -626,7 +636,7 @@ export function GroundBuildTaskCard({
                     canRemove={rightBuilt > 0}
                     onAdd={() => {
                       setActivePart("right");
-                      if (splitTotal < task.targetNumber) setRightBuilt((current) => current + 1);
+                      if (splitTotal < task.targetNumber) { markInteracted(); setRightBuilt((current) => current + 1); }
                     }}
                     onRemove={() => setRightBuilt((current) => Math.max(0, current - 1))}
                   />
@@ -736,14 +746,14 @@ export function GroundBuildTaskCard({
       <div className="grid grid-cols-3 gap-3">
         <button
           type="button"
-          onClick={() => setBuilt((current) => Math.max(0, current - 1))}
+          onClick={() => { markInteracted(); setBuilt((current) => Math.max(0, current - 1)); }}
           className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-4 text-2xl font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
         >
           −
         </button>
         <button
           type="button"
-          onClick={() => setBuilt((current) => Math.min(traySize, current + 1))}
+          onClick={() => { markInteracted(); setBuilt((current) => Math.min(traySize, current + 1)); }}
           className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-4 text-2xl font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
         >
           +

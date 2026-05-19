@@ -100,6 +100,7 @@ type Callbacks = {
   markCorrect: () => void;
   markCorrectSoft: () => void;
   markWrong: () => void;
+  markAttempted?: () => void;
 };
 
 /**
@@ -115,7 +116,7 @@ function TaskRendererInner({
   taskNonce: number;
   callbacks: Callbacks;
 }) {
-  const { markCorrect, markCorrectSoft, markWrong } = callbacks;
+  const { markCorrect, markCorrectSoft, markWrong, markAttempted } = callbacks;
   const onC = () => setTimeout(() => markCorrect(), 0);
   const onCS = () => setTimeout(() => markCorrectSoft(), 0);
   const onW = () => markWrong();
@@ -287,7 +288,7 @@ function TaskRendererInner({
     case "groundCollect":
       return <GroundCollectTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundBuild":
-      return <GroundBuildTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return <GroundBuildTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} onInteract={markAttempted} />;
     case "groundCompare":
       return <GroundCompareTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundFlash":

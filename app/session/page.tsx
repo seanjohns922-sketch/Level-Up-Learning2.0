@@ -7744,6 +7744,11 @@ function SessionPage() {
                               ...prev,
                               [currentQuiz.id]: { attempted: true, correct: false },
                             })),
+                          markAttempted: () =>
+                            setQuizLessonActivityResults((prev) => ({
+                              ...prev,
+                              [currentQuiz.id]: { attempted: true, correct: prev[currentQuiz.id]?.correct ?? false },
+                            })),
                         }}
                       />
                     </div>
