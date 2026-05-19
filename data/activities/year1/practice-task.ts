@@ -278,7 +278,8 @@ export type PracticeTask = (
       revealMs?: number;
       options: Array<{
         id: string;
-        numeral: number;
+        numeral?: number;
+        numerals?: number[];
       }>;
       correctOptionId: string;
       feedback?: { correct: string; wrong: string };
@@ -305,7 +306,8 @@ export type PracticeTask = (
       sequence: Array<number | "__">;
       options: Array<{
         id: string;
-        numeral: number;
+        numeral?: number;
+        numerals?: number[];
       }>;
       correctOptionId: string;
       feedback?: { correct: string; wrong: string };

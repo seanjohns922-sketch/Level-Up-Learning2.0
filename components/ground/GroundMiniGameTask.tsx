@@ -1109,13 +1109,19 @@ export function GroundSequenceTaskCard({
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        {task.options.map((option) => (
-          <GroundNumeralOption
-            key={option.id}
-            numeral={option.numeral}
-            onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
-          />
-        ))}
+        {task.options.map((option) => {
+          const label = Array.isArray(option.numerals) ? option.numerals.join(", ") : String(option.numeral ?? "");
+          return (
+            <button
+              key={option.id}
+              type="button"
+              onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
+              className="flex min-h-[112px] items-center justify-center rounded-[24px] border-2 border-cyan-200 bg-white px-3 text-center text-3xl font-black text-teal-900 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:bg-cyan-50 hover:shadow-[0_0_18px_rgba(34,211,238,0.14)] active:scale-[0.98] sm:text-4xl"
+            >
+              {label}
+            </button>
+          );
+        })}
       </div>
     </GroundMiniShell>
   );
