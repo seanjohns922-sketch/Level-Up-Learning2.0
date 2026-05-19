@@ -557,7 +557,6 @@ function createReviewBonusRoundTask(lessonId: string, difficulty: Difficulty): P
 type Lesson2Kind =
   | "quick_image_flash"
   | "build_it_fast"
-  | "which_has_more"
   | "which_has_less"
   | "same_or_different"
   | "teen_number_builder"
@@ -565,7 +564,6 @@ type Lesson2Kind =
   | "make_ten_visual"
   | "fast_subitise_round"
   | "quick_build_challenge"
-  | "which_is_impossible"
   | "complete_the_frame"
   | "missing_part_to_ten"
   | "balance_the_groups"
@@ -576,7 +574,6 @@ type Lesson2Kind =
 const LESSON2_ROTATION: Lesson2Kind[] = [
   "quick_image_flash",
   "build_it_fast",
-  "which_has_more",
   "which_has_less",
   "same_or_different",
   "teen_number_builder",
@@ -584,7 +581,6 @@ const LESSON2_ROTATION: Lesson2Kind[] = [
   "make_ten_visual",
   "fast_subitise_round",
   "quick_build_challenge",
-  "which_is_impossible",
   "complete_the_frame",
   "missing_part_to_ten",
   "balance_the_groups",
@@ -706,31 +702,6 @@ function createCloseQuantityCompareTask(lessonId: string, difficulty: Difficulty
   });
 }
 
-function createImpossibleCollectionTask(lessonId: string, difficulty: Difficulty): PracticeTask {
-  const memory = getMemory(lessonId);
-  const target = Math.max(11, pickTarget(memory, difficulty));
-  const wrong = Math.max(0, target - 1);
-  const quantities = shuffle([target, target, wrong]);
-  const groups = quantities.map((quantity, index) => ({
-    id: `w11-l2-impossible-${index}-${quantity}`,
-    quantity,
-    objectType: pickObject(memory),
-    patternLayout: quantity >= 10 ? "ten_frame" : pickLayout(memory),
-  }));
-  const correct = groups.find((group) => group.quantity !== target)!;
-  return makeCompareTask({
-    prompt: `Which collection is impossible for ${target}?`,
-    speakText: `Which collection is impossible for ${numberWord(target)}?`,
-    introPrompt: "Look carefully.",
-    targetNumber: target,
-    comparisonType: "different",
-    helperVariant: "flash",
-    groups,
-    correctGroupId: correct.id,
-    feedback: { correct: "You spotted the wrong one!", wrong: "Check which collection does not show the target." },
-  });
-}
-
 function createCompleteFrameTask(difficulty: Difficulty): PracticeTask {
   const task = generatePrepWeek10TaskByKind("y0-w10-l3", difficulty, "build_missing_part");
   if (task.kind !== "groundBuild") return task;
@@ -767,8 +738,6 @@ function createLesson2Task(lessonId: string, difficulty: Difficulty, kind: Lesso
       return createSpeedFlashTask(lessonId, difficulty, { prompt: "Quick image flash!", speakText: "Quick image flash." });
     case "build_it_fast":
       return createFastBuildTask(difficulty);
-    case "which_has_more":
-      return createCloseQuantityCompareTask(lessonId, difficulty, "more");
     case "which_has_less":
       return createCloseQuantityCompareTask(lessonId, difficulty, "less");
     case "same_or_different":
@@ -783,8 +752,6 @@ function createLesson2Task(lessonId: string, difficulty: Difficulty, kind: Lesso
       return createSpeedFlashTask(lessonId, difficulty, { prompt: "Fast subitise round!", speakText: "Fast subitise round.", small: true });
     case "quick_build_challenge":
       return createQuickBuildChallengeTask(difficulty);
-    case "which_is_impossible":
-      return createImpossibleCollectionTask(lessonId, difficulty);
     case "complete_the_frame":
       return createCompleteFrameTask(difficulty);
     case "missing_part_to_ten":
@@ -799,7 +766,7 @@ function createLesson2Task(lessonId: string, difficulty: Difficulty, kind: Lesso
       {
         const pick = randInt(0, 4);
         if (pick === 0) return createSpeedFlashTask(lessonId, difficulty, { prompt: "Speed reactor round!", speakText: "Speed reactor round.", small: true });
-        if (pick === 1) return createCloseQuantityCompareTask(lessonId, difficulty, randInt(0, 1) === 0 ? "more" : "less");
+        if (pick === 1) return createCloseQuantityCompareTask(lessonId, difficulty, "less");
         if (pick === 2) return createTeenBuilderFluencyTask(difficulty);
         if (pick === 3) return createMakeTenVisualTask(difficulty);
         return createMissingPartToTenTask(difficulty);
