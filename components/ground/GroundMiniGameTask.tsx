@@ -618,7 +618,7 @@ export function GroundBuildTaskCard({
 
             {!hideSplitSupport ? (
               <>
-                <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1.2fr)] xl:items-center">
+                <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] xl:items-center">
                   <SplitBuildZone
                     count={leftBuilt}
                     canAdd={splitTotal < task.targetNumber}
@@ -640,25 +640,15 @@ export function GroundBuildTaskCard({
                     }}
                     onRemove={() => setRightBuilt((current) => Math.max(0, current - 1))}
                   />
-                  <div className="text-center text-3xl font-black text-cyan-500">=</div>
-                  <div className={`rounded-[22px] border-2 p-3 shadow-sm transition ${splitHitsTarget ? "border-emerald-300 bg-emerald-50 shadow-[0_0_22px_rgba(16,185,129,0.18)]" : "border-cyan-200 bg-white"}`}>
-                    <div className="text-center text-2xl font-black text-teal-900">
-                      <span className="text-teal-600">{leftBuilt}</span>
-                      <span className="mx-2 text-cyan-500">+</span>
-                      <span className="text-orange-500">{rightBuilt}</span>
-                      <span className="mx-2 text-cyan-500">=</span>
-                      <span className={splitHitsTarget ? "text-emerald-700" : ""}>{splitTotal}</span>
-                    </div>
-                  </div>
                 </div>
 
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="text-sm font-black text-teal-800">
                     {splitValid
-                      ? `Yes. ${leftBuilt} and ${rightBuilt} makes ${task.targetNumber}.`
+                      ? "You built it in two parts."
                       : splitHitsTarget && !splitDifferentFromExample
                         ? "Try a different way."
-                        : "Keep building."}
+                        : "Build it with two colours."}
                   </div>
                   <div className="grid grid-cols-[1fr_auto] gap-2">
                     <button
@@ -716,8 +706,8 @@ export function GroundBuildTaskCard({
     <GroundMiniShell badge="Build Game" prompt={task.prompt} speakText={task.speakText}>
       <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
         <div className="mb-3 flex items-center justify-between rounded-2xl bg-cyan-50 px-4 py-2">
-          <div className="text-sm font-black uppercase tracking-[0.16em] text-teal-800">Built</div>
-          <div className="text-2xl font-black text-teal-900">{built}</div>
+          <div className="text-sm font-black uppercase tracking-[0.16em] text-teal-800">Your Build</div>
+          <div className="text-sm font-black uppercase tracking-[0.16em] text-cyan-600">Count with your eyes</div>
         </div>
         {task.referenceGroup ? (
           <div className="mb-4 rounded-[22px] border-2 border-cyan-200 bg-cyan-50 p-3">

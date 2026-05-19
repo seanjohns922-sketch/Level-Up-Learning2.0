@@ -862,6 +862,23 @@ function generateLesson3Task(lessonId: string, difficulty: Difficulty, kind: (ty
   }
 }
 
+export function generatePrepWeek6TaskByKind(
+  lessonId: string,
+  difficulty: Difficulty,
+  kind:
+    | (typeof LESSON1_ROTATION)[number]
+    | (typeof LESSON2_ROTATION)[number]
+    | (typeof LESSON3_ROTATION)[number]
+): PracticeTask {
+  if ((LESSON1_ROTATION as readonly string[]).includes(kind)) {
+    return generateLesson1Task(lessonId, difficulty, kind as (typeof LESSON1_ROTATION)[number]);
+  }
+  if ((LESSON2_ROTATION as readonly string[]).includes(kind)) {
+    return generateLesson2Task(lessonId, difficulty, kind as (typeof LESSON2_ROTATION)[number]);
+  }
+  return generateLesson3Task(lessonId, difficulty, kind as (typeof LESSON3_ROTATION)[number]);
+}
+
 export function generatePrepWeek6Task(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
   if (lessonId === "y0-w6-l2") {

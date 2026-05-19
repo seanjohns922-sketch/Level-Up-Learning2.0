@@ -1,5 +1,6 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
 import { generatePrepWeek10TaskByKind } from "@/data/activities/prep/week10";
+import { generatePrepWeek6TaskByKind } from "@/data/activities/prep/week6";
 
 type GroundObjectType = Extract<PracticeTask, { kind: "groundBuild" }>["objectType"];
 type GroundPatternLayout = NonNullable<Extract<PracticeTask, { kind: "groundFlash" }>["patternLayout"]>;
@@ -20,8 +21,8 @@ type Lesson1Kind =
   | "number_path_review"
   | "teen_number_match"
   | "build_the_number"
+  | "make_ten_review"
   | "same_or_different"
-  | "who_is_first"
   | "review_bonus_round";
 
 type Week11Memory = {
@@ -58,8 +59,8 @@ const ROTATION: Lesson1Kind[] = [
   "number_path_review",
   "teen_number_match",
   "build_the_number",
+  "make_ten_review",
   "same_or_different",
-  "who_is_first",
   "review_bonus_round",
 ];
 
@@ -511,6 +512,16 @@ function createBuildTheNumberTask(difficulty: Difficulty): PracticeTask {
   });
 }
 
+function createMakeTenReviewTask(difficulty: Difficulty): PracticeTask {
+  const task = generatePrepWeek6TaskByKind("y0-w11-l1", difficulty, "make_10_another_way");
+  if (task.kind !== "groundBuild") return task;
+  return normalizeReviewCopy(task, {
+    prompt: "Make 10 another way.",
+    speakText: "Make ten another way.",
+    introPrompt: "Show the whole with two parts.",
+  });
+}
+
 function createSameOrDifferentTask(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
   const a = Math.max(11, pickTarget(memory, difficulty));
@@ -533,19 +544,13 @@ function createSameOrDifferentTask(lessonId: string, difficulty: Difficulty): Pr
   });
 }
 
-function createWhoIsFirstTask(difficulty: Difficulty): PracticeTask {
-  return normalizeReviewCopy(
-    generatePrepWeek10TaskByKind("y0-w10-l1", difficulty, "who_is_first"),
-    { prompt: "Who is first?", speakText: "Who is first?", introPrompt: "Quick position review." }
-  );
-}
-
 function createReviewBonusRoundTask(lessonId: string, difficulty: Difficulty): PracticeTask {
-  const pick = randInt(0, 4);
+  const pick = randInt(0, 5);
   if (pick === 0) return createMultipleMissingForwardTask(lessonId, difficulty);
   if (pick === 1) return createBackwardReasoningTask(lessonId, difficulty);
   if (pick === 2) return createOrderTheNumbersTask(lessonId, difficulty);
   if (pick === 3) return createCloseCompareTask(lessonId, difficulty, randInt(0, 1) === 0 ? "biggest" : "smallest");
+  if (pick === 4) return createMakeTenReviewTask(difficulty);
   return createBuildTheNumberTask(difficulty);
 }
 
@@ -557,10 +562,12 @@ type Lesson2Kind =
   | "same_or_different"
   | "teen_number_builder"
   | "double_ten_frame_match"
+  | "make_ten_visual"
   | "fast_subitise_round"
   | "quick_build_challenge"
   | "which_is_impossible"
   | "complete_the_frame"
+  | "missing_part_to_ten"
   | "balance_the_groups"
   | "grouped_count_challenge"
   | "number_image_memory"
@@ -574,10 +581,12 @@ const LESSON2_ROTATION: Lesson2Kind[] = [
   "same_or_different",
   "teen_number_builder",
   "double_ten_frame_match",
+  "make_ten_visual",
   "fast_subitise_round",
   "quick_build_challenge",
   "which_is_impossible",
   "complete_the_frame",
+  "missing_part_to_ten",
   "balance_the_groups",
   "grouped_count_challenge",
   "number_image_memory",
@@ -649,6 +658,26 @@ function createDoubleTenFrameMatchTask(difficulty: Difficulty): PracticeTask {
     prompt: "Match the double ten frame.",
     speakText: "Match the double ten frame.",
     introPrompt: "Think ten and extras.",
+  });
+}
+
+function createMakeTenVisualTask(difficulty: Difficulty): PracticeTask {
+  const task = generatePrepWeek6TaskByKind("y0-w11-l2", difficulty, "make_10_another_way");
+  if (task.kind !== "groundBuild") return task;
+  return normalizeReviewCopy(task, {
+    prompt: "Build 10 with two parts.",
+    speakText: "Build ten with two parts.",
+    introPrompt: "See the whole and its parts.",
+  });
+}
+
+function createMissingPartToTenTask(difficulty: Difficulty): PracticeTask {
+  const task = generatePrepWeek6TaskByKind("y0-w11-l2", difficulty, "build_missing_part_whole");
+  if (task.kind !== "groundBuild") return task;
+  return normalizeReviewCopy(task, {
+    prompt: "How many more to make 10?",
+    speakText: "How many more to make ten?",
+    introPrompt: "Picture the missing spaces.",
   });
 }
 
@@ -748,6 +777,8 @@ function createLesson2Task(lessonId: string, difficulty: Difficulty, kind: Lesso
       return createTeenBuilderFluencyTask(difficulty);
     case "double_ten_frame_match":
       return createDoubleTenFrameMatchTask(difficulty);
+    case "make_ten_visual":
+      return createMakeTenVisualTask(difficulty);
     case "fast_subitise_round":
       return createSpeedFlashTask(lessonId, difficulty, { prompt: "Fast subitise round!", speakText: "Fast subitise round.", small: true });
     case "quick_build_challenge":
@@ -756,6 +787,8 @@ function createLesson2Task(lessonId: string, difficulty: Difficulty, kind: Lesso
       return createImpossibleCollectionTask(lessonId, difficulty);
     case "complete_the_frame":
       return createCompleteFrameTask(difficulty);
+    case "missing_part_to_ten":
+      return createMissingPartToTenTask(difficulty);
     case "balance_the_groups":
       return createBalanceGroupsTask(difficulty);
     case "grouped_count_challenge":
@@ -768,8 +801,8 @@ function createLesson2Task(lessonId: string, difficulty: Difficulty, kind: Lesso
         if (pick === 0) return createSpeedFlashTask(lessonId, difficulty, { prompt: "Speed reactor round!", speakText: "Speed reactor round.", small: true });
         if (pick === 1) return createCloseQuantityCompareTask(lessonId, difficulty, randInt(0, 1) === 0 ? "more" : "less");
         if (pick === 2) return createTeenBuilderFluencyTask(difficulty);
-        if (pick === 3) return createDoubleTenFrameMatchTask(difficulty);
-        return createQuickBuildChallengeTask(difficulty);
+        if (pick === 3) return createMakeTenVisualTask(difficulty);
+        return createMissingPartToTenTask(difficulty);
       }
   }
 }
@@ -807,10 +840,10 @@ function generateLesson1Task(lessonId: string, difficulty: Difficulty, kind: Les
       return createTeenNumberMatchTask(difficulty);
     case "build_the_number":
       return createBuildTheNumberTask(difficulty);
+    case "make_ten_review":
+      return createMakeTenReviewTask(difficulty);
     case "same_or_different":
       return createSameOrDifferentTask(lessonId, difficulty);
-    case "who_is_first":
-      return createWhoIsFirstTask(difficulty);
     case "review_bonus_round":
       return createReviewBonusRoundTask(lessonId, difficulty);
   }

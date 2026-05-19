@@ -383,8 +383,8 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         11,
         2,
         "Subitising & Number Building",
-        "Rapidly recognise, build, compare, and manipulate quantities using subitising, teen-number structure, visual grouping, and flexible quantity thinking through fast visual Number Nexus fluency rounds.",
-        ["Quick image flash", "Teen number builder", "Double ten frame match"],
+        "Rapidly recognise, partition, build and compare quantities using subitising, double ten-frame structure, missing-part-to-10 reasoning and flexible visual number thinking.",
+        ["Quick image flash", "Build 10 with two parts", "How many more to make 10?"],
         ["AC9MFN01", "AC9MFN02", "AC9MFN03"],
         "Nexus Speed Builder"
       ),
