@@ -57,6 +57,7 @@ import type { LessonActivity } from "@/data/programs/types";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { generatePrepWeek8TaskByKind } from "@/data/activities/prep/week8";
 import { generatePrepWeek9TaskByKind } from "@/data/activities/prep/week9";
+import { generatePrepWeek10TaskByKind } from "@/data/activities/prep/week10";
 
 type WeekProgress = {
   lessonsCompleted: boolean[]; // [L1, L2, L3]
@@ -1563,6 +1564,42 @@ function buildPrepWeek9WeeklyQuizQuestions(
       spec.lessonNumber,
       spec.skill,
       generatePrepWeek9TaskByKind(`y0-w9-l${spec.lessonNumber}`, "medium", spec.kind) as GroundQuizPracticeTask
+    )
+  );
+}
+
+function buildPrepWeek10WeeklyQuizQuestions(
+  questionsPerLesson: number
+): QuizQuestion[] {
+  const totalExpected = questionsPerLesson * 3;
+  const specs = [
+    { lessonNumber: 1 as const, skill: "ground_w10_l1_tap", kind: "tap_number" },
+    { lessonNumber: 1 as const, skill: "ground_w10_l1_flash", kind: "quick_count_flash" },
+    { lessonNumber: 1 as const, skill: "ground_w10_l1_match", kind: "match_collection" },
+    { lessonNumber: 1 as const, skill: "ground_w10_l1_bigger", kind: "find_biggest" },
+    { lessonNumber: 1 as const, skill: "ground_w10_l1_next", kind: "what_comes_next" },
+    { lessonNumber: 2 as const, skill: "ground_w10_l2_count_bot", kind: "count_bot" },
+    { lessonNumber: 2 as const, skill: "ground_w10_l2_teen_titan", kind: "teen_titan" },
+    { lessonNumber: 2 as const, skill: "ground_w10_l2_order_master", kind: "order_master" },
+    { lessonNumber: 2 as const, skill: "ground_w10_l2_race_commander", kind: "race_commander" },
+    { lessonNumber: 2 as const, skill: "ground_w10_l2_final_boss", kind: "final_boss_round" },
+    { lessonNumber: 3 as const, skill: "ground_w10_l3_build", kind: "build_number_lab" },
+    { lessonNumber: 3 as const, skill: "ground_w10_l3_less", kind: "which_has_less" },
+    { lessonNumber: 3 as const, skill: "ground_w10_l3_equal", kind: "make_equal" },
+    { lessonNumber: 3 as const, skill: "ground_w10_l3_bigger", kind: "which_is_bigger" },
+    { lessonNumber: 3 as const, skill: "ground_w10_l3_match", kind: "build_same_amount" },
+  ];
+
+  if (specs.length !== totalExpected) {
+    throw new Error(`[GroundWeeklyQuiz] Week 10 expected ${totalExpected} questions, received ${specs.length}.`);
+  }
+
+  return specs.map((spec, index) =>
+    buildGroundQuizQuestion(
+      `q${index + 1}`,
+      spec.lessonNumber,
+      spec.skill,
+      generatePrepWeek10TaskByKind(`y0-w10-l${spec.lessonNumber}`, "medium", spec.kind) as GroundQuizPracticeTask
     )
   );
 }
@@ -6543,6 +6580,10 @@ function SessionPage() {
       return buildPrepWeek9WeeklyQuizQuestions(questionsPerLesson);
     }
 
+    if (year === "Prep" && Number(week) === 10) {
+      return buildPrepWeek10WeeklyQuizQuestions(questionsPerLesson);
+    }
+
     if (
       year === "Year 2" ||
       year === "Year 3" ||
@@ -6902,7 +6943,9 @@ function SessionPage() {
         ? "Number Master Challenge Complete!"
         : year === "Prep" && Number(week) === 9
           ? "Position Master Challenge Complete!"
-          : "Quiz Results";
+          : year === "Prep" && Number(week) === 10
+            ? "Ground Level Complete!"
+            : "Quiz Results";
   const quizCompletionMessage = year === "Prep" && Number(week) === 6
     ? "You built and split the numbers perfectly!"
     : year === "Prep" && Number(week) === 7
@@ -6911,7 +6954,9 @@ function SessionPage() {
         ? "You mastered number paths and ordering!"
         : year === "Prep" && Number(week) === 9
           ? "You mastered ordinal and positional thinking!"
-          : "Keep building across all three lessons.";
+          : year === "Prep" && Number(week) === 10
+            ? "You mastered Number Nexus Ground Level!"
+            : "Keep building across all three lessons.";
 
   const lessonBreakdown = useMemo(
     () =>
