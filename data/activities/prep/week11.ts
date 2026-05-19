@@ -549,8 +549,233 @@ function createReviewBonusRoundTask(lessonId: string, difficulty: Difficulty): P
   return createBuildTheNumberTask(difficulty);
 }
 
-function nextKind(memory: Week11Memory) {
-  const kind = ROTATION[memory.cursor % ROTATION.length]!;
+type Lesson2Kind =
+  | "quick_image_flash"
+  | "build_it_fast"
+  | "which_has_more"
+  | "which_has_less"
+  | "same_or_different"
+  | "teen_number_builder"
+  | "double_ten_frame_match"
+  | "fast_subitise_round"
+  | "quick_build_challenge"
+  | "which_is_impossible"
+  | "complete_the_frame"
+  | "balance_the_groups"
+  | "grouped_count_challenge"
+  | "number_image_memory"
+  | "speed_reactor_round";
+
+const LESSON2_ROTATION: Lesson2Kind[] = [
+  "quick_image_flash",
+  "build_it_fast",
+  "which_has_more",
+  "which_has_less",
+  "same_or_different",
+  "teen_number_builder",
+  "double_ten_frame_match",
+  "fast_subitise_round",
+  "quick_build_challenge",
+  "which_is_impossible",
+  "complete_the_frame",
+  "balance_the_groups",
+  "grouped_count_challenge",
+  "number_image_memory",
+  "speed_reactor_round",
+];
+
+function createSpeedFlashTask(
+  lessonId: string,
+  difficulty: Difficulty,
+  {
+    prompt,
+    speakText,
+    small = false,
+    memoryMode = false,
+    grouped = false,
+  }: { prompt: string; speakText: string; small?: boolean; memoryMode?: boolean; grouped?: boolean }
+): PracticeTask {
+  const baseTask = generatePrepWeek10TaskByKind("y0-w10-l1", difficulty, "quick_count_flash");
+  if (baseTask.kind !== "groundFlash") return baseTask;
+  const memory = getMemory(lessonId);
+  const target = small
+    ? chooseRecentSafe([4, 5, 6, 7, 8, 9], memory.recentTargets)
+    : Math.max(11, pickTarget(memory, difficulty));
+  pushRecent(memory.recentTargets, target, 6);
+  const options = numeralOptions(target, memory, 3, small ? 1 : 2);
+  return {
+    ...baseTask,
+    prompt,
+    speakText,
+    introPrompt: memoryMode ? "Remember the image." : small ? "See it fast." : "Watch the quantity.",
+    targetNumber: target,
+    objectType: pickObject(memory),
+    patternLayout: small
+      ? pickLayout(memory, ["dice", "domino", "symmetry", "ten_frame"])
+      : grouped
+        ? pickLayout(memory, ["ten_frame", "symmetry"])
+        : pickLayout(memory, target >= 10 ? ["ten_frame", "symmetry"] : ["domino", "symmetry", "ten_frame"]),
+    revealMs: small ? 700 : memoryMode ? 900 : 1050,
+    options,
+    correctOptionId: options.find((option) => option.numeral === target)!.id,
+    feedback: { correct: "Quick thinking!", wrong: "Picture the quantity again." },
+  } satisfies PracticeTask;
+}
+
+function createFastBuildTask(difficulty: Difficulty): PracticeTask {
+  const task = generatePrepWeek10TaskByKind("y0-w10-l3", difficulty, "build_number_lab");
+  if (task.kind !== "groundBuild") return task;
+  return normalizeReviewCopy(task, {
+    prompt: `Build ${task.targetNumber} quickly.`,
+    speakText: `Build ${numberWord(task.targetNumber)} quickly.`,
+    introPrompt: "Build it fast.",
+  });
+}
+
+function createTeenBuilderFluencyTask(difficulty: Difficulty): PracticeTask {
+  const task = generatePrepWeek10TaskByKind("y0-w10-l3", difficulty, "teen_builder");
+  if (task.kind !== "groundBuild") return task;
+  return normalizeReviewCopy(task, {
+    prompt: `Build ${task.targetNumber} with ten and extras.`,
+    speakText: `Build ${numberWord(task.targetNumber)} with ten and extras.`,
+    introPrompt: "Teen builder.",
+  });
+}
+
+function createDoubleTenFrameMatchTask(difficulty: Difficulty): PracticeTask {
+  const task = generatePrepWeek10TaskByKind("y0-w10-l1", difficulty, "teen_number_match");
+  if (task.kind !== "groundMatch") return task;
+  return normalizeReviewCopy(task, {
+    prompt: "Match the double ten frame.",
+    speakText: "Match the double ten frame.",
+    introPrompt: "Think ten and extras.",
+  });
+}
+
+function createCloseQuantityCompareTask(lessonId: string, difficulty: Difficulty, mode: "more" | "less"): PracticeTask {
+  const memory = getMemory(lessonId);
+  const base = Math.max(11, pickTarget(memory, difficulty));
+  const other = Math.min(20, base + 1);
+  const quantities = shuffle([base, other]);
+  const groups = quantities.map((quantity, index) => ({
+    id: `w11-l2-${mode}-${index}-${quantity}`,
+    quantity,
+    objectType: pickObject(memory),
+    patternLayout: pickLayout(memory, ["ten_frame", "symmetry"]),
+  }));
+  const correct = groups.find((group) => group.quantity === (mode === "more" ? other : base))!;
+  return makeCompareTask({
+    prompt: mode === "more" ? "Which has more?" : "Which has less?",
+    speakText: mode === "more" ? "Which has more?" : "Which has less?",
+    introPrompt: "Compare fast.",
+    targetNumber: correct.quantity,
+    comparisonType: mode,
+    helperVariant: "flash",
+    groups,
+    correctGroupId: correct.id,
+    feedback: { correct: "You saw it quickly!", wrong: "These groups are close. Compare again." },
+  });
+}
+
+function createImpossibleCollectionTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const target = Math.max(11, pickTarget(memory, difficulty));
+  const wrong = Math.max(0, target - 1);
+  const quantities = shuffle([target, target, wrong]);
+  const groups = quantities.map((quantity, index) => ({
+    id: `w11-l2-impossible-${index}-${quantity}`,
+    quantity,
+    objectType: pickObject(memory),
+    patternLayout: quantity >= 10 ? "ten_frame" : pickLayout(memory),
+  }));
+  const correct = groups.find((group) => group.quantity !== target)!;
+  return makeCompareTask({
+    prompt: `Which collection is impossible for ${target}?`,
+    speakText: `Which collection is impossible for ${numberWord(target)}?`,
+    introPrompt: "Look carefully.",
+    targetNumber: target,
+    comparisonType: "different",
+    helperVariant: "flash",
+    groups,
+    correctGroupId: correct.id,
+    feedback: { correct: "You spotted the wrong one!", wrong: "Check which collection does not show the target." },
+  });
+}
+
+function createCompleteFrameTask(difficulty: Difficulty): PracticeTask {
+  const task = generatePrepWeek10TaskByKind("y0-w10-l3", difficulty, "build_missing_part");
+  if (task.kind !== "groundBuild") return task;
+  return normalizeReviewCopy(task, {
+    prompt: `Complete the frame to make ${task.targetNumber}.`,
+    speakText: `Complete the frame to make ${numberWord(task.targetNumber)}.`,
+    introPrompt: "Finish the frame.",
+  });
+}
+
+function createBalanceGroupsTask(difficulty: Difficulty): PracticeTask {
+  const task = generatePrepWeek10TaskByKind("y0-w10-l3", difficulty, "balance_groups");
+  if (task.kind !== "groundBuild") return task;
+  return normalizeReviewCopy(task, {
+    prompt: "Balance the groups.",
+    speakText: "Balance the groups.",
+    introPrompt: "Make them equal.",
+  });
+}
+
+function createQuickBuildChallengeTask(difficulty: Difficulty): PracticeTask {
+  const task = generatePrepWeek10TaskByKind("y0-w10-l3", difficulty, "quick_build_flash");
+  if (task.kind !== "groundBuild") return task;
+  return normalizeReviewCopy(task, {
+    prompt: `Quick build ${task.targetNumber}.`,
+    speakText: `Quick build ${numberWord(task.targetNumber)}.`,
+    introPrompt: "Build from the image.",
+  });
+}
+
+function createLesson2Task(lessonId: string, difficulty: Difficulty, kind: Lesson2Kind): PracticeTask {
+  switch (kind) {
+    case "quick_image_flash":
+      return createSpeedFlashTask(lessonId, difficulty, { prompt: "Quick image flash!", speakText: "Quick image flash." });
+    case "build_it_fast":
+      return createFastBuildTask(difficulty);
+    case "which_has_more":
+      return createCloseQuantityCompareTask(lessonId, difficulty, "more");
+    case "which_has_less":
+      return createCloseQuantityCompareTask(lessonId, difficulty, "less");
+    case "same_or_different":
+      return createSameOrDifferentTask(lessonId, difficulty);
+    case "teen_number_builder":
+      return createTeenBuilderFluencyTask(difficulty);
+    case "double_ten_frame_match":
+      return createDoubleTenFrameMatchTask(difficulty);
+    case "fast_subitise_round":
+      return createSpeedFlashTask(lessonId, difficulty, { prompt: "Fast subitise round!", speakText: "Fast subitise round.", small: true });
+    case "quick_build_challenge":
+      return createQuickBuildChallengeTask(difficulty);
+    case "which_is_impossible":
+      return createImpossibleCollectionTask(lessonId, difficulty);
+    case "complete_the_frame":
+      return createCompleteFrameTask(difficulty);
+    case "balance_the_groups":
+      return createBalanceGroupsTask(difficulty);
+    case "grouped_count_challenge":
+      return createSpeedFlashTask(lessonId, difficulty, { prompt: "How many are in the groups?", speakText: "How many are in the groups?", grouped: true });
+    case "number_image_memory":
+      return createSpeedFlashTask(lessonId, difficulty, { prompt: "Number image memory!", speakText: "Number image memory.", memoryMode: true, grouped: true });
+    case "speed_reactor_round":
+      {
+        const pick = randInt(0, 4);
+        if (pick === 0) return createSpeedFlashTask(lessonId, difficulty, { prompt: "Speed reactor round!", speakText: "Speed reactor round.", small: true });
+        if (pick === 1) return createCloseQuantityCompareTask(lessonId, difficulty, randInt(0, 1) === 0 ? "more" : "less");
+        if (pick === 2) return createTeenBuilderFluencyTask(difficulty);
+        if (pick === 3) return createDoubleTenFrameMatchTask(difficulty);
+        return createQuickBuildChallengeTask(difficulty);
+      }
+  }
+}
+
+function nextKind<T extends string>(memory: Week11Memory, rotation: readonly T[]) {
+  const kind = rotation[memory.cursor % rotation.length]!;
   memory.cursor += 1;
   pushRecent(memory.recentKinds, kind, 6);
   return kind;
@@ -593,7 +818,11 @@ function generateLesson1Task(lessonId: string, difficulty: Difficulty, kind: Les
 
 export function generatePrepWeek11Task(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
-  const kind = nextKind(memory);
+  if (lessonId === "y0-w11-l2") {
+    const kind = nextKind(memory, LESSON2_ROTATION);
+    return createLesson2Task(lessonId, difficulty, kind);
+  }
+  const kind = nextKind(memory, ROTATION);
   return generateLesson1Task(lessonId, difficulty, kind);
 }
 
