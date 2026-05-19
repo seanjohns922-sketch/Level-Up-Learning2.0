@@ -392,9 +392,10 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         11,
         3,
         "Ground Level Challenge Tower",
-        "Complete mixed Number Nexus challenges before final mastery week.",
-        ["Challenge tower", "Mixed mini-games", "Readiness missions"],
-        ["ALL"]
+        "Apply counting, teen numbers, ordering, comparing, positional language, paths, subitising and reasoning through escalating challenge tower floors with reduced support.",
+        ["Multi-missing paths", "Challenge reactor", "Race track analysis"],
+        ["AC9MFN01", "AC9MFN02", "AC9MFN03", "AC9MFSP02"],
+        "Nexus Challenge Tower"
       ),
     ],
   },

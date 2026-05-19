@@ -1,5 +1,6 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
 import { generatePrepWeek10TaskByKind } from "@/data/activities/prep/week10";
+import { generatePrepWeek9TaskByKind } from "@/data/activities/prep/week9";
 import { generatePrepWeek6TaskByKind } from "@/data/activities/prep/week6";
 
 type GroundObjectType = Extract<PracticeTask, { kind: "groundBuild" }>["objectType"];
@@ -589,6 +590,41 @@ const LESSON2_ROTATION: Lesson2Kind[] = [
   "speed_reactor_round",
 ];
 
+type Lesson3Kind =
+  | "multi_missing_paths"
+  | "backward_multi_missing"
+  | "mixed_direction_paths"
+  | "close_quantity_comparison"
+  | "order_teen_numbers"
+  | "make_ten_tower"
+  | "missing_part_tower"
+  | "quick_image_memory"
+  | "race_track_analysis"
+  | "position_order_combo"
+  | "challenge_reactor"
+  | "tower_puzzle_room"
+  | "double_ten_frame_challenge"
+  | "fast_decision_round"
+  | "master_floor";
+
+const LESSON3_ROTATION: Lesson3Kind[] = [
+  "multi_missing_paths",
+  "backward_multi_missing",
+  "mixed_direction_paths",
+  "close_quantity_comparison",
+  "order_teen_numbers",
+  "make_ten_tower",
+  "missing_part_tower",
+  "quick_image_memory",
+  "race_track_analysis",
+  "position_order_combo",
+  "challenge_reactor",
+  "tower_puzzle_room",
+  "double_ten_frame_challenge",
+  "fast_decision_round",
+  "master_floor",
+];
+
 function createSpeedFlashTask(
   lessonId: string,
   difficulty: Difficulty,
@@ -774,6 +810,103 @@ function createLesson2Task(lessonId: string, difficulty: Difficulty, kind: Lesso
   }
 }
 
+function createRaceTrackAnalysisTask(difficulty: Difficulty): PracticeTask {
+  const task = generatePrepWeek10TaskByKind("y0-w10-l2", difficulty, "race_commander_place");
+  if (task.kind !== "groundOrdinal") return task;
+  return {
+    ...task,
+    prompt: "Race track analysis: What place did Numbot finish?",
+    speakText: "Race track analysis. What place did Numbot finish?",
+    introPrompt: "Tower race floor.",
+    feedback: { correct: "Race floor cleared!", wrong: "Track the final order again." },
+  } satisfies PracticeTask;
+}
+
+function createPositionOrderComboTask(difficulty: Difficulty): PracticeTask {
+  const kinds = ["next_to", "left_right", "same_spatial", "position_sort"] as const;
+  const kind = kinds[randInt(0, kinds.length - 1)]!;
+  const task = generatePrepWeek9TaskByKind("y0-w9-l3", difficulty, kind);
+  if (task.kind === "groundSpatial") {
+    return {
+      ...task,
+      feedback: { correct: "Position chamber cleared!", wrong: "Check the positions carefully." },
+    } satisfies PracticeTask;
+  }
+  return task;
+}
+
+function createChallengeReactorTask(difficulty: Difficulty): PracticeTask {
+  const kinds = ["balance_groups", "build_missing_part", "teen_builder"] as const;
+  const kind = kinds[randInt(0, kinds.length - 1)]!;
+  const task = generatePrepWeek10TaskByKind("y0-w10-l3", difficulty, kind);
+  if (task.kind !== "groundBuild") return task;
+  return normalizeReviewCopy(task, {
+    prompt: kind === "teen_builder" ? `Challenge Reactor: Build ${task.targetNumber} with ten and extras.` : kind === "balance_groups" ? "Challenge Reactor: Balance the groups." : `Challenge Reactor: Complete the build to make ${task.targetNumber}.`,
+    speakText: kind === "teen_builder" ? `Challenge Reactor. Build ${numberWord(task.targetNumber)} with ten and extras.` : kind === "balance_groups" ? "Challenge Reactor. Balance the groups." : `Challenge Reactor. Complete the build to make ${numberWord(task.targetNumber)}.`,
+    introPrompt: "Reactor chamber.",
+  });
+}
+
+function createTowerPuzzleRoomTask(difficulty: Difficulty): PracticeTask {
+  const kinds = ["order_numbers", "match_collection", "teen_number_match"] as const;
+  const kind = kinds[randInt(0, kinds.length - 1)]!;
+  const task = generatePrepWeek10TaskByKind("y0-w10-l1", difficulty, kind);
+  return normalizeReviewCopy(task, {
+    prompt: kind === "order_numbers" ? "Tower puzzle room: Put the numbers in order." : kind === "match_collection" ? "Tower puzzle room: Match the collection." : "Tower puzzle room: Match the teen number.",
+    speakText: kind === "order_numbers" ? "Tower puzzle room. Put the numbers in order." : kind === "match_collection" ? "Tower puzzle room. Match the collection." : "Tower puzzle room. Match the teen number.",
+    introPrompt: "Puzzle floor.",
+  });
+}
+
+function createDoubleTenFrameChallengeTask(difficulty: Difficulty): PracticeTask {
+  const task = generatePrepWeek10TaskByKind("y0-w10-l1", difficulty, "teen_number_match");
+  if (task.kind !== "groundMatch") return task;
+  return normalizeReviewCopy(task, {
+    prompt: "Double ten-frame challenge.",
+    speakText: "Double ten frame challenge.",
+    introPrompt: "Teen structure floor.",
+  });
+}
+
+function createFastDecisionRoundTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const pick = randInt(0, 4);
+  if (pick === 0) return createSpeedFlashTask(lessonId, difficulty, { prompt: "Fast decision round!", speakText: "Fast decision round.", small: true });
+  if (pick === 1) return createCloseCompareTask(lessonId, difficulty, randInt(0, 1) === 0 ? "biggest" : "smallest");
+  if (pick === 2) return createMixedDirectionPathTask(lessonId, difficulty);
+  if (pick === 3) return createMissingPartToTenTask(difficulty);
+  return createDoubleTenFrameChallengeTask(difficulty);
+}
+
+function createMasterFloorTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const pick = randInt(0, 5);
+  if (pick === 0) return createBackwardReasoningTask(lessonId, difficulty);
+  if (pick === 1) return createOrderTheNumbersTask(lessonId, difficulty);
+  if (pick === 2) return createChallengeReactorTask(difficulty);
+  if (pick === 3) return createRaceTrackAnalysisTask(difficulty);
+  if (pick === 4) return createPositionOrderComboTask(difficulty);
+  return createMakeTenReviewTask(difficulty);
+}
+
+function createLesson3Task(lessonId: string, difficulty: Difficulty, kind: Lesson3Kind): PracticeTask {
+  switch (kind) {
+    case "multi_missing_paths": return createMultipleMissingForwardTask(lessonId, difficulty);
+    case "backward_multi_missing": return createBackwardReasoningTask(lessonId, difficulty);
+    case "mixed_direction_paths": return createMixedDirectionPathTask(lessonId, difficulty);
+    case "close_quantity_comparison": return createCloseCompareTask(lessonId, difficulty, randInt(0, 1) === 0 ? "biggest" : "smallest");
+    case "order_teen_numbers": return createOrderTheNumbersTask(lessonId, difficulty);
+    case "make_ten_tower": return createMakeTenReviewTask(difficulty);
+    case "missing_part_tower": return createMissingPartToTenTask(difficulty);
+    case "quick_image_memory": return createSpeedFlashTask(lessonId, difficulty, { prompt: "Quick image memory!", speakText: "Quick image memory.", memoryMode: true, grouped: true });
+    case "race_track_analysis": return createRaceTrackAnalysisTask(difficulty);
+    case "position_order_combo": return createPositionOrderComboTask(difficulty);
+    case "challenge_reactor": return createChallengeReactorTask(difficulty);
+    case "tower_puzzle_room": return createTowerPuzzleRoomTask(difficulty);
+    case "double_ten_frame_challenge": return createDoubleTenFrameChallengeTask(difficulty);
+    case "fast_decision_round": return createFastDecisionRoundTask(lessonId, difficulty);
+    case "master_floor": return createMasterFloorTask(lessonId, difficulty);
+  }
+}
+
 function nextKind<T extends string>(memory: Week11Memory, rotation: readonly T[]) {
   const kind = rotation[memory.cursor % rotation.length]!;
   memory.cursor += 1;
@@ -818,6 +951,10 @@ function generateLesson1Task(lessonId: string, difficulty: Difficulty, kind: Les
 
 export function generatePrepWeek11Task(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
+  if (lessonId === "y0-w11-l3") {
+    const kind = nextKind(memory, LESSON3_ROTATION);
+    return createLesson3Task(lessonId, difficulty, kind);
+  }
   if (lessonId === "y0-w11-l2") {
     const kind = nextKind(memory, LESSON2_ROTATION);
     return createLesson2Task(lessonId, difficulty, kind);
