@@ -542,12 +542,14 @@ export function GroundBuildTaskCard({
   const splitValid = splitHitsTarget && splitHasTwoParts && splitDifferentFromExample;
   const hideSplitSupport = task.hideSplitSupport === true;
   const hasInteractedRef = useRef(false);
-
+  const [hasInteracted, setHasInteracted] = useState(false);
 
   function markInteracted() {
-    if (hasInteractedRef.current) return;
-    hasInteractedRef.current = true;
-    onInteract?.();
+    if (!hasInteractedRef.current) {
+      hasInteractedRef.current = true;
+      setHasInteracted(true);
+      onInteract?.();
+    }
   }
 
   function check() {
@@ -666,7 +668,7 @@ export function GroundBuildTaskCard({
                     <button
                       type="button"
                       onClick={check}
-                      disabled={!splitValid}
+                      disabled={!hasInteracted}
                       className="rounded-[18px] bg-gradient-to-r from-teal-600 to-cyan-500 px-5 py-3 text-sm font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.18)] transition enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-45"
                     >
                       Done
@@ -690,7 +692,7 @@ export function GroundBuildTaskCard({
                 <button
                   type="button"
                   onClick={check}
-                  disabled={!splitValid}
+                  disabled={!hasInteracted}
                   className="rounded-[18px] bg-gradient-to-r from-teal-600 to-cyan-500 px-5 py-3 text-sm font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.18)] transition enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-45"
                 >
                   Done
