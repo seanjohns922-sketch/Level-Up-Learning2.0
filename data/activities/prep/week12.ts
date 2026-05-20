@@ -161,19 +161,19 @@ function tightenFlashTask(task: PracticeTask, memory: Week12Memory, difficulty: 
 }
 
 function createQuickImageFlashTask(lessonId: string, difficulty: Difficulty): PracticeTask {
-  const task = generatePrepWeek11TaskByKind(lessonId, difficulty, "quick_image_flash");
+  const task = generatePrepWeek11TaskByKind("y0-w11-l2", difficulty, "quick_image_flash");
   return tightenFlashTask(task, getMemory(lessonId), difficulty, "flash");
 }
 
 function createNumberImageMemoryTask(lessonId: string, difficulty: Difficulty): PracticeTask {
-  const task = generatePrepWeek11TaskByKind(lessonId, difficulty, "number_image_memory");
+  const task = generatePrepWeek11TaskByKind("y0-w11-l2", difficulty, "number_image_memory");
   return tightenFlashTask(task, getMemory(lessonId), difficulty, "memory");
 }
 
 function createRepresentationSwitchTask(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
   const options = [
-    generatePrepWeek11TaskByKind(lessonId, difficulty, "double_ten_frame_match"),
+    generatePrepWeek11TaskByKind("y0-w11-l2", difficulty, "double_ten_frame_match"),
     generatePrepWeek10TaskByKind("y0-w10-l1", difficulty, "teen_number_match"),
     generatePrepWeek10TaskByKind("y0-w10-l1", difficulty, "match_collection"),
   ] as const;
