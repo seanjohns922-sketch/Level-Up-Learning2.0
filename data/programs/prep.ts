@@ -409,9 +409,10 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         12,
         1,
         "Legend Training",
-        "Practise key Ground Level number skills in mixed mini-games.",
-        ["Legend warm-up", "Mixed skill arcade", "Number practice rounds"],
-        ["ALL"]
+        "Strengthen final Ground Level fluency through quick image flashes, representation switching, teen-number building and number-image memory using structured visual number systems.",
+        ["Quick image flash", "Representation switch", "Number image memory"],
+        ["AC9MFN01", "AC9MFN02", "AC9MFN03", "AC9MFSP02"],
+        "Legend Training Arena"
       ),
       buildLesson(
         12,
