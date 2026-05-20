@@ -97,6 +97,192 @@ function EmptySlot({ index, selected, onClick }: { index: number; selected: bool
   );
 }
 
+function NexusRaceTrack({
+  characters,
+  displayOrder,
+  finalOrder,
+  phase,
+  onSkip,
+}: {
+  characters: Map<string, OrdinalCharacter>;
+  displayOrder: Array<string | null>;
+  finalOrder: Array<string | null>;
+  phase: RacePhase;
+  onSkip: () => void;
+}) {
+  const lanes = finalOrder.filter(Boolean) as string[];
+  const N = Math.max(lanes.length, 1);
+  const complete = phase === "done";
+
+  // progress 0..1 from start to finish line, based on current rank in displayOrder
+  function progressFor(id: string) {
+    const rank = displayOrder.findIndex((x) => x === id);
+    if (rank < 0) return 0;
+    // 1st place => 1.0, last => ~0.15 so they're still on track
+    const leaderPct = 0.92;
+    const tailPct = 0.18;
+    if (N === 1) return leaderPct;
+    const t = 1 - rank / (N - 1);
+    return tailPct + (leaderPct - tailPct) * t;
+  }
+
+  const statusText =
+    phase === "intro" ? "Ready... Set... GO!" : phase === "running" ? "Racing!" : "Photo finish!";
+
+  return (
+    <div
+      className="relative overflow-hidden rounded-[24px] p-4 shadow-[0_10px_30px_rgba(13,148,136,0.18)]"
+      style={{
+        background:
+          "radial-gradient(120% 80% at 50% 0%, #0f3a3a 0%, #0a2424 55%, #061818 100%)",
+        border: "1px solid rgba(56,230,200,0.35)",
+      }}
+    >
+      {/* Scanline / grid backdrop */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-30"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(56,230,200,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(56,230,200,0.08) 1px, transparent 1px)",
+          backgroundSize: "28px 28px, 28px 28px",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-16 left-1/2 h-48 w-[140%] -translate-x-1/2 rounded-full"
+        style={{ background: "radial-gradient(closest-side, rgba(56,230,200,0.25), transparent 70%)" }}
+      />
+
+      <div className="relative mb-3 flex items-center justify-between">
+        <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/40 bg-black/30 px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-cyan-200">
+          <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-300" />
+          Nexus Race Grid
+        </div>
+        {!complete ? (
+          <button
+            type="button"
+            onClick={onSkip}
+            className="rounded-full border border-cyan-300/40 bg-black/30 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-cyan-100 hover:bg-black/50"
+          >
+            Skip ▶▶
+          </button>
+        ) : (
+          <div className="rounded-full border border-amber-300/50 bg-amber-300/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-amber-200">
+            🏁 Finished
+          </div>
+        )}
+      </div>
+
+      <div
+        className={`relative mb-3 rounded-full px-4 py-2 text-center text-sm font-black tracking-wide ${
+          phase === "intro"
+            ? "bg-amber-400/15 text-amber-200 border border-amber-300/30"
+            : phase === "running"
+              ? "bg-cyan-400/10 text-cyan-100 border border-cyan-300/30"
+              : "bg-emerald-400/15 text-emerald-100 border border-emerald-300/30"
+        }`}
+      >
+        {statusText}
+      </div>
+
+      {/* Lanes */}
+      <div className="relative space-y-2.5">
+        {lanes.map((id, laneIdx) => {
+          const character = characters.get(id);
+          if (!character) return null;
+          const pct = progressFor(id) * 100;
+          const finalRank = finalOrder.findIndex((x) => x === id);
+          const medal =
+            complete && finalRank === 0 ? "🥇" : complete && finalRank === 1 ? "🥈" : complete && finalRank === 2 ? "🥉" : null;
+          return (
+            <div
+              key={id}
+              className="relative h-14 rounded-xl"
+              style={{
+                background:
+                  "linear-gradient(90deg, rgba(8,30,30,0.7) 0%, rgba(8,30,30,0.4) 100%)",
+                border: "1px solid rgba(56,230,200,0.18)",
+              }}
+            >
+              {/* Lane number */}
+              <div className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-black tracking-[0.18em] text-cyan-300/70">
+                L{laneIdx + 1}
+              </div>
+
+              {/* Dashed track */}
+              <div
+                aria-hidden
+                className="absolute left-9 right-12 top-1/2 h-[3px] -translate-y-1/2 rounded-full"
+                style={{
+                  backgroundImage:
+                    "repeating-linear-gradient(90deg, rgba(56,230,200,0.5) 0 10px, transparent 10px 18px)",
+                }}
+              />
+
+              {/* Finish line (checkered) */}
+              <div
+                aria-hidden
+                className="absolute right-2 top-1 bottom-1 w-6 rounded-md"
+                style={{
+                  backgroundImage:
+                    "repeating-conic-gradient(#fff 0 25%, #0a0a0a 0 50%)",
+                  backgroundSize: "10px 10px",
+                  boxShadow: "0 0 14px rgba(56,230,200,0.6)",
+                }}
+              />
+
+              {/* Racer token */}
+              <div
+                className="absolute top-1/2 -translate-y-1/2"
+                style={{
+                  left: `calc(${pct}% - 22px)`,
+                  transition: "left 700ms cubic-bezier(0.22, 1, 0.36, 1)",
+                  filter: complete && finalRank === 0 ? "drop-shadow(0 0 10px rgba(255,215,80,0.9))" : "drop-shadow(0 4px 6px rgba(0,0,0,0.5))",
+                }}
+              >
+                <div
+                  className="relative flex h-11 w-11 items-center justify-center rounded-full text-2xl"
+                  style={{
+                    background: "linear-gradient(180deg, #fff 0%, #d6fff5 100%)",
+                    border: "2px solid rgba(56,230,200,0.85)",
+                    boxShadow: "0 0 14px rgba(56,230,200,0.55), inset 0 1px 0 rgba(255,255,255,0.8)",
+                  }}
+                >
+                  <span>{character.emoji}</span>
+                  {/* Speed streaks while running */}
+                  {phase === "running" ? (
+                    <span
+                      aria-hidden
+                      className="absolute right-full top-1/2 mr-1 h-1 w-6 -translate-y-1/2 rounded-full"
+                      style={{
+                        background:
+                          "linear-gradient(90deg, transparent, rgba(56,230,200,0.85))",
+                        filter: "blur(1px)",
+                      }}
+                    />
+                  ) : null}
+                  {medal ? (
+                    <span className="absolute -top-2 -right-2 text-base drop-shadow">{medal}</span>
+                  ) : null}
+                </div>
+                <div className="mt-0.5 text-center text-[10px] font-black uppercase tracking-wider text-cyan-100/90">
+                  {character.label}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="relative mt-3 flex items-center justify-between text-[10px] font-black uppercase tracking-[0.22em] text-cyan-200/70">
+        <span>◀ Start</span>
+        <span>Finish 🏁</span>
+      </div>
+    </div>
+  );
+}
+
 export function GroundOrdinalTaskCard({ task, onCorrect, onWrong }: { task: GroundOrdinalTask; onCorrect: () => void; onWrong: () => void }) {
   const scenarioMeta = SCENARIO_META[task.scenario];
   const characterMap = useMemo(() => new Map(task.characters.map((character) => [character.id, character])), [task.characters]);
