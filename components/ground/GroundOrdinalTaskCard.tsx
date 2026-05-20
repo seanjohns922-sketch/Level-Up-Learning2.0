@@ -354,6 +354,15 @@ export function GroundOrdinalTaskCard({ task, onCorrect, onWrong }: { task: Grou
     [task]
   );
 
+  const placementBank = useMemo(() => {
+    const explicitIds = task.characters.map((character) => character.id);
+    const orderIds = task.order.filter((id): id is string => Boolean(id));
+    const targetIds = placementTargets.map((target) => target.id);
+    return Array.from(new Set([...explicitIds, ...orderIds, ...targetIds]))
+      .map((id) => characterMap.get(id))
+      .filter(Boolean) as OrdinalCharacter[];
+  }, [characterMap, placementTargets, task.characters, task.order]);
+
   const raceComplete = racePhase === "done";
   const shellPrompt = hasRaceAnimation && !raceComplete ? task.introPrompt ?? "Watch the racers." : task.prompt;
   const shellSpeakText = hasRaceAnimation && !raceComplete ? task.introPrompt ?? "Watch the racers." : task.speakText ?? task.prompt;
@@ -443,15 +452,12 @@ export function GroundOrdinalTaskCard({ task, onCorrect, onWrong }: { task: Grou
             <div className="rounded-[20px] border border-cyan-200 bg-cyan-50 px-4 py-3">
               <div className="mb-3 text-center text-[11px] font-black uppercase tracking-[0.18em] text-teal-700">Character Bank</div>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                {placementTargets.map(({ id }, index) => {
-                  const character = characterMap.get(id)!;
-                  return (
-                    <button key={`${id}-${index}`} type="button" disabled={!raceComplete} onClick={() => setSelectedCharacterId(id)} className={`flex min-h-[88px] flex-col items-center justify-center rounded-[22px] border-2 px-3 py-3 text-center shadow-sm transition ${selectedCharacterId === id ? "border-teal-400 bg-teal-100 text-teal-900" : "border-cyan-200 bg-white text-teal-900 enabled:hover:border-cyan-300 enabled:hover:bg-cyan-50"} disabled:opacity-60`}>
-                      <div className="text-3xl">{character.emoji}</div>
-                      <div className="mt-1 text-sm font-black">{character.label}</div>
-                    </button>
-                  );
-                })}
+                {placementBank.map((character, index) => (
+                  <button key={`${character.id}-${index}`} type="button" disabled={!raceComplete} onClick={() => setSelectedCharacterId(character.id)} className={`flex min-h-[88px] flex-col items-center justify-center rounded-[22px] border-2 px-3 py-3 text-center shadow-sm transition ${selectedCharacterId === character.id ? "border-teal-400 bg-teal-100 text-teal-900" : "border-cyan-200 bg-white text-teal-900 enabled:hover:border-cyan-300 enabled:hover:bg-cyan-50"} disabled:opacity-60`}>
+                    <div className="text-3xl">{character.emoji}</div>
+                    <div className="mt-1 text-sm font-black">{character.label}</div>
+                  </button>
+                ))}
               </div>
             </div>
             <button type="button" disabled={!raceComplete} onClick={checkPlacement} className="w-full rounded-[22px] bg-gradient-to-r from-teal-600 to-cyan-500 px-4 py-4 text-base font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.18)] transition enabled:hover:brightness-110 disabled:opacity-60">
