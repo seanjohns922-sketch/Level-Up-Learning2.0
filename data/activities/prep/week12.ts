@@ -139,7 +139,7 @@ function clonePracticeTask<T extends PracticeTask>(task: T): T {
 function tightenFlashTask(task: PracticeTask, memory: Week12Memory, difficulty: Difficulty, mode: "flash" | "memory") {
   if (task.kind !== "groundFlash") return task;
   const target = Math.max(4, pickTarget(memory, difficulty));
-  const baseReveal = mode === "memory" ? 850 : 780;
+  const baseReveal = mode === "memory" ? 1350 : 1280;
   const scaledReveal = difficulty === "hard" ? baseReveal - 80 : difficulty === "easy" ? baseReveal + 120 : baseReveal;
   return {
     ...task,
