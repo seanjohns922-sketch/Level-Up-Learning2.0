@@ -405,24 +405,13 @@ export function GroundOrdinalTaskCard({ task, onCorrect, onWrong }: { task: Grou
     <GroundMiniShell badge={task.badgeLabel ?? scenarioMeta.badge} prompt={shellPrompt} speakText={shellSpeakText}>
       <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm space-y-4">
         {hasRaceAnimation ? (
-          <div className="rounded-[20px] border border-cyan-200 bg-cyan-50 px-4 py-3 shadow-sm">
-            <div className="mb-3 flex items-center justify-between">
-              <div className="text-[11px] font-black uppercase tracking-[0.18em] text-teal-700">Nexus Race Track</div>
-              {!raceComplete ? (
-                <button type="button" onClick={skipRace} className="rounded-full border border-cyan-200 bg-white px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-cyan-700 hover:bg-cyan-50">
-                  Show Final Order
-                </button>
-              ) : null}
-            </div>
-            <div className="mb-3 flex items-center justify-center gap-3 rounded-[18px] bg-white/80 px-4 py-3 text-center text-base font-black text-teal-900">
-              <span>{racePhase === "intro" ? "Ready... Set... Go!" : racePhase === "running" ? "Watch the race!" : "Race complete!"}</span>
-            </div>
-            <div className="mb-3 rounded-[20px] border border-cyan-200 bg-white p-3">{renderLine(displayOrder, false)}</div>
-            <div className="flex items-center justify-between text-xs font-black uppercase tracking-[0.18em] text-teal-700">
-              <span>Start</span>
-              <span>Finish</span>
-            </div>
-          </div>
+          <NexusRaceTrack
+            characters={characterMap}
+            displayOrder={displayOrder}
+            finalOrder={task.order}
+            phase={racePhase}
+            onSkip={skipRace}
+          />
         ) : null}
 
         {task.mode === "same_position" ? (
