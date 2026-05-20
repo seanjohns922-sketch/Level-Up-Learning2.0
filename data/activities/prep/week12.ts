@@ -21,8 +21,10 @@ type Week12Memory = {
 const LESSON1_ROTATION: Lesson1Kind[] = [
   "quick_image_flash",
   "representation_switch",
-  "teen_number_builder",
   "number_image_memory",
+  "quick_image_flash",
+  "representation_switch",
+  "teen_number_builder",
 ];
 
 const OBJECTS: GroundObjectType[] = [
@@ -158,7 +160,7 @@ function createRepresentationSwitchTask(lessonId: string, difficulty: Difficulty
     const teenTarget = Math.max(11, pickTarget(memory, difficulty));
     return {
       ...task,
-      prompt: "Which number matches?",
+      prompt: chooseVariant(["Which number matches?", "Find the matching number."]),
       speakText: "Which number matches?",
       introPrompt: "Switch the representation.",
       targetNumber: teenTarget,

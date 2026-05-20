@@ -288,7 +288,7 @@ function TaskRendererInner({
     case "groundCollect":
       return <GroundCollectTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundBuild":
-      return <GroundBuildTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} onInteract={markAttempted} />;
+      return <GroundBuildTaskCard key={`${k}-${t.prompt}-${t.targetNumber}-${t.referenceGroup?.quantity ?? "none"}-${t.startingBuilt ?? 0}-${t.objectType}`} task={t} onCorrect={onC} onWrong={onW} onInteract={markAttempted} />;
     case "groundCompare":
       return <GroundCompareTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundFlash":

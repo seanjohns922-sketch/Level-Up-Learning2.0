@@ -543,6 +543,7 @@ export function GroundBuildTaskCard({
   const hideSplitSupport = task.hideSplitSupport === true;
   const hasInteractedRef = useRef(false);
 
+
   function markInteracted() {
     if (hasInteractedRef.current) return;
     hasInteractedRef.current = true;
