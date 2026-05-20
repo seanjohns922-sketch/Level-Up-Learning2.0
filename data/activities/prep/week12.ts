@@ -319,37 +319,50 @@ function createFlexibleBuilderTask(lessonId: string, difficulty: Difficulty): Pr
 function createMissingPartChallengeTask(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
   const variant = chooseVariant(["ten", "teen", "twenty"] as const);
+  const objectType = pickObject(memory);
+  const visualStyle = pickBuildStyle(memory, ["double_ten_frame", "reactor_cells", "collection_shelves"]);
   if (variant === "ten") {
-    const task = generatePrepWeek6TaskByKind("y0-w6-l3", difficulty, "build_missing_part_whole");
-    if (task.kind !== "groundBuild") return task;
+    const shownAmount = randInt(2, 8);
     return {
-      ...task,
-      prompt: "What part is missing to make 10?",
-      speakText: "What part is missing to make ten?",
+      kind: "groundBuild",
+      prompt: "How many more to make 10?",
+      speakText: "How many more to make ten?",
       introPrompt: "Find the missing part.",
-      objectType: pickObject(memory),
-      visualStyle: pickBuildStyle(memory, ["reactor_cells", "build_trays", "collection_shelves"]),
+      targetNumber: 10 - shownAmount,
+      objectType,
+      compareMode: "exact",
+      visualStyle,
+      maxBuild: 10,
+      referenceGroup: {
+        quantity: shownAmount,
+        objectType,
+        patternLayout: "ten_frame",
+      },
+      buildMode: "single",
       showExample: false,
-      hideSplitSupport: true,
-      feedback: { correct: "Missing part found!", wrong: "Look for the spaces still needed." },
+      feedback: { correct: "Missing part found!", wrong: "Build the part that completes the whole." },
     } satisfies PracticeTask;
   }
 
-  const task = generatePrepWeek10TaskByKind("y0-w10-l3", difficulty, "build_missing_part");
-  if (task.kind !== "groundBuild") return task;
-  const targetNumber = variant === "twenty" ? 20 : Math.max(14, pickTarget(memory, difficulty));
-  const shownAmount = variant === "twenty" ? randInt(12, 18) : Math.max(10, targetNumber - randInt(2, 6));
+  const total = variant === "twenty" ? 20 : Math.max(14, pickTarget(memory, difficulty));
+  const shownAmount = variant === "twenty" ? randInt(12, 18) : Math.max(10, total - randInt(2, 6));
   return {
-    ...task,
-    prompt: variant === "twenty" ? "How many more to make 20?" : `What part is missing to make ${targetNumber}?`,
-    speakText: variant === "twenty" ? "How many more to make twenty?" : `What part is missing to make ${numberWord(targetNumber)}?`,
+    kind: "groundBuild",
+    prompt: variant === "twenty" ? "How many more to make 20?" : `What part is missing to make ${total}?`,
+    speakText: variant === "twenty" ? "How many more to make twenty?" : `What part is missing to make ${numberWord(total)}?`,
     introPrompt: "Spot the hidden amount.",
-    targetNumber,
-    startingBuilt: shownAmount,
-    objectType: pickObject(memory),
-    visualStyle: pickBuildStyle(memory, ["double_ten_frame", "reactor_cells", "collection_shelves"]),
+    targetNumber: total - shownAmount,
+    objectType,
+    compareMode: "exact",
+    visualStyle,
+    maxBuild: 10,
+    referenceGroup: {
+      quantity: shownAmount,
+      objectType,
+      patternLayout: total >= 10 ? "ten_frame" : pickLayout(memory),
+    },
+    buildMode: "single",
     showExample: false,
-    hideSplitSupport: true,
     feedback: { correct: "Great missing-part reasoning!", wrong: "Find the amount that completes the whole." },
   } satisfies PracticeTask;
 }
@@ -362,8 +375,8 @@ function createMakeTenTwentyTask(lessonId: string, difficulty: Difficulty): Prac
     if (task.kind !== "groundBuild") return task;
     return {
       ...task,
-      prompt: "Make 10 another way.",
-      speakText: "Make ten another way.",
+      prompt: "Make 10 with two parts.",
+      speakText: "Make ten with two parts.",
       introPrompt: "Forge ten with two parts.",
       objectType: pickObject(memory),
       visualStyle: pickBuildStyle(memory, ["reactor_cells", "build_trays", "collection_shelves"]),
@@ -526,7 +539,7 @@ function createFlexibleNumberBuildingMasteryTask(lessonId: string, difficulty: D
 function createPracticalApplicationTask(lessonId: string, difficulty: Difficulty): PracticeTask {
   const pick = randInt(0, 3);
   if (pick === 0) {
-    const task = generatePrepWeek10TaskByKind("y0-w10-l3", difficulty, "which_is_bigger");
+    const task = generatePrepWeek10TaskByKind("y0-w10-l3", difficulty, "which_has_more");
     if (task.kind === "groundCompare") {
       return {
         ...task,
@@ -534,7 +547,7 @@ function createPracticalApplicationTask(lessonId: string, difficulty: Difficulty
         speakText: "Which reactor has more energy?",
         introPrompt: "Portal chamber.",
         referenceGroup: undefined,
-        feedback: { correct: "Reactor comparison solved!", wrong: "These collections are close. Compare again." },
+        feedback: { correct: "Reactor comparison solved!", wrong: "Look for the reactor with more energy." },
       } satisfies PracticeTask;
     }
     return task;
