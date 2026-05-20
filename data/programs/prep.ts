@@ -426,10 +426,11 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
       buildLesson(
         12,
         3,
-        "Final Readiness Mission",
-        "Complete final review challenges before the post-test.",
-        ["Final mission", "Readiness check", "Celebrate and review"],
-        ["ALL"]
+        "Final Mastery Application",
+        "Apply Ground Level skills independently through ordering mastery, multi-missing reasoning, flexible number building, and practical challenge rooms with minimal support.",
+        ["Ordering mastery", "Multi-missing reasoning", "Practical challenge rooms"],
+        ["AC9MFN01", "AC9MFN02", "AC9MFN03", "AC9MFSP02"],
+        "Legend Mastery Trial"
       ),
     ],
   },

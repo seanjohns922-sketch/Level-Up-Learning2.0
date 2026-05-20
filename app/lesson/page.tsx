@@ -73,7 +73,8 @@ function isPrepGroundCustomLesson(lessonId: string) {
     lessonId === "y0-w11-l2" ||
     lessonId === "y0-w11-l3" ||
     lessonId === "y0-w12-l1" ||
-    lessonId === "y0-w12-l2"
+    lessonId === "y0-w12-l2" ||
+    lessonId === "y0-w12-l3"
   );
 }
 

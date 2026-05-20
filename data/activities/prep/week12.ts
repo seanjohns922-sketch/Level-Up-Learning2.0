@@ -6,6 +6,8 @@ import { generatePrepWeek6TaskByKind } from "@/data/activities/prep/week6";
 type GroundObjectType = Extract<PracticeTask, { kind: "groundBuild" }>["objectType"];
 type GroundPatternLayout = NonNullable<Extract<PracticeTask, { kind: "groundFlash" }>["patternLayout"]>;
 type GroundBuildVisualStyle = NonNullable<Extract<PracticeTask, { kind: "groundBuild" }>["visualStyle"]>;
+type GroundOrderTapTask = Extract<PracticeTask, { kind: "groundOrderTap" }>;
+type GroundSequenceTask = Extract<PracticeTask, { kind: "groundSequence" }>;
 
 type Lesson1Kind =
   | "quick_image_flash"
@@ -18,6 +20,12 @@ type Lesson2Kind =
   | "missing_part_challenge"
   | "make_ten_twenty"
   | "same_whole_different_parts";
+
+type Lesson3Kind =
+  | "ordering_mastery"
+  | "multi_missing_reasoning"
+  | "flexible_number_building"
+  | "practical_application";
 
 type Week12Memory = {
   cursor: number;
@@ -43,6 +51,15 @@ const LESSON2_ROTATION: Lesson2Kind[] = [
   "same_whole_different_parts",
   "flexible_builder",
   "missing_part_challenge",
+];
+
+const LESSON3_ROTATION: Lesson3Kind[] = [
+  "ordering_mastery",
+  "multi_missing_reasoning",
+  "flexible_number_building",
+  "practical_application",
+  "ordering_mastery",
+  "multi_missing_reasoning",
 ];
 
 const OBJECTS: GroundObjectType[] = [
@@ -145,6 +162,44 @@ function pickBuildStyle(memory: Week12Memory, preferred?: GroundBuildVisualStyle
 
 function chooseVariant<T>(options: readonly T[]) {
   return options[randInt(0, options.length - 1)]!;
+}
+
+function shuffle<T>(items: readonly T[] | T[]) {
+  const next = [...items];
+  for (let index = next.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [next[index], next[swapIndex]] = [next[swapIndex]!, next[index]!];
+  }
+  return next;
+}
+
+function sequenceBundleOptions(correct: number[]) {
+  const targetSum = correct.reduce((sum, value) => sum + value, 0);
+  const distractors = shuffle([
+    correct.map((value, index) => (index === 0 ? value - 1 : value)),
+    correct.map((value, index) => (index === correct.length - 1 ? value + 1 : value)),
+    correct.map((value) => value + 1),
+    correct.map((value) => value - 1),
+  ])
+    .map((values) => values.map((value) => Math.max(0, Math.min(20, value))))
+    .filter((values, index, arr) => values.join(",") !== correct.join(",") && arr.findIndex((other) => other.join(",") === values.join(",")) === index)
+    .slice(0, 2);
+  const optionCount = distractors.length + 1;
+  const correctPosition = randInt(0, optionCount - 1);
+  const options: Array<{ id: string; numerals: number[] }> = [];
+  for (let index = 0, distractorIndex = 0; index < optionCount; index += 1) {
+    if (index === correctPosition) options.push({ id: `w12-bundle-${targetSum}-correct`, numerals: correct });
+    else options.push({ id: `w12-bundle-${targetSum}-${index}`, numerals: distractors[distractorIndex++]! });
+  }
+  return { options, correctOptionId: options[correctPosition]!.id };
+}
+
+function makeOrderTapTask(task: Omit<GroundOrderTapTask, "kind">): PracticeTask {
+  return { kind: "groundOrderTap", ...task };
+}
+
+function makeSequenceTask(task: Omit<GroundSequenceTask, "kind">): PracticeTask {
+  return { kind: "groundSequence", ...task };
 }
 
 function clonePracticeTask<T extends PracticeTask>(task: T): T {
@@ -370,8 +425,165 @@ function createSameWholeDifferentPartsTask(lessonId: string, difficulty: Difficu
   } satisfies PracticeTask;
 }
 
+function createOrderingMasteryTask(lessonId: string): PracticeTask {
+  const memory = getMemory(lessonId);
+  const direction: "ASC" | "DESC" = randInt(0, 1) === 0 ? "ASC" : "DESC";
+  const count = memory.cursor >= 5 ? 6 : 5;
+  const patterns: number[][] = [
+    [1, 4, 6, 8, 15, 18],
+    [19, 13, 17, 12, 15],
+    [14, 16, 15, 12, 18],
+    [18, 17, 16, 15, 12],
+    [3, 7, 11, 14, 19],
+  ];
+  let numerals: number[] = [...chooseVariant(patterns)];
+  if (numerals.length > count) numerals = numerals.slice(0, count);
+  if (numerals.length < count) {
+    const extras = shuffle(Array.from({ length: 20 }, (_, index) => index + 1).filter((value) => !numerals.includes(value))).slice(0, count - numerals.length);
+    numerals = [...numerals, ...extras];
+  }
+  const shuffled = shuffle(numerals);
+  const ordered = [...numerals].sort((a, b) => (direction === "ASC" ? a - b : b - a));
+  return makeOrderTapTask({
+    prompt: direction === "ASC" ? "Order the numbers from smallest to largest." : "Order the numbers from largest to smallest.",
+    speakText: direction === "ASC" ? "Order the numbers from smallest to largest." : "Order the numbers from largest to smallest.",
+    introPrompt: "Mastery floor: sort without hints.",
+    targetNumber: ordered[0]!,
+    direction,
+    uiMode: "order",
+    badgeLabel: "Ordering Mastery",
+    tiles: shuffled.map((numeral, index) => ({ id: `w12-order-${numeral}-${index}`, numeral })),
+    feedback: { correct: "Ordering mastery complete!", wrong: "Check the full order again." },
+  });
+}
+
+function createMultiMissingReasoningTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const variant = chooseVariant(["forward", "backward", "between"] as const);
+  if (variant === "forward") {
+    const start = Math.max(10, pickTarget(memory, difficulty) - 3);
+    const correct = [start + 1, start + 2];
+    const bundle = sequenceBundleOptions(correct);
+    return makeSequenceTask({
+      prompt: "Fill the missing numbers.",
+      speakText: "Fill the missing numbers.",
+      introPrompt: "Track both missing steps.",
+      targetNumber: correct[1],
+      sequence: [start, "__", "__", start + 3, start + 4],
+      options: bundle.options,
+      correctOptionId: bundle.correctOptionId,
+      feedback: { correct: "You tracked both gaps!", wrong: "Check each missing step carefully." },
+    });
+  }
+  if (variant === "backward") {
+    const mid = Math.max(17, pickTarget(memory, difficulty));
+    const correct = [mid + 1, mid - 2];
+    const bundle = sequenceBundleOptions(correct);
+    return makeSequenceTask({
+      prompt: "Count backward and fill the gaps.",
+      speakText: "Count backward and fill the gaps.",
+      introPrompt: "Step back each time.",
+      targetNumber: mid,
+      sequence: ["__", mid, mid - 1, "__", mid - 3],
+      options: bundle.options,
+      correctOptionId: bundle.correctOptionId,
+      feedback: { correct: "Backward reasoning solved!", wrong: "Count back one step at a time." },
+    });
+  }
+  const base = Math.max(14, pickTarget(memory, difficulty));
+  const correct = [base + 1, base + 3];
+  const bundle = sequenceBundleOptions(correct);
+  return makeSequenceTask({
+    prompt: "Fill the two missing numbers.",
+    speakText: "Fill the two missing numbers.",
+    introPrompt: "Look for the pattern across the whole path.",
+    targetNumber: correct[0],
+    sequence: [base, "__", base + 2, "__", base + 4],
+    options: bundle.options,
+    correctOptionId: bundle.correctOptionId,
+    feedback: { correct: "You found both missing numbers!", wrong: "Use all the numbers you can see." },
+  });
+}
+
+function createFlexibleNumberBuildingMasteryTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const pick = randInt(0, 3);
+  if (pick === 0) {
+    const task = createFlexibleBuilderTask(lessonId, difficulty);
+    return task.kind === "groundBuild" ? { ...task, introPrompt: "Mastery forge.", feedback: { correct: "You rebuilt the number!", wrong: "Try a different split for the same whole." } } satisfies PracticeTask : task;
+  }
+  if (pick === 1) {
+    const task = createMissingPartChallengeTask(lessonId, difficulty);
+    return task.kind === "groundBuild" ? { ...task, introPrompt: "Mastery forge.", feedback: { correct: "Missing-part mastery!", wrong: "Find the hidden part that completes the whole." } } satisfies PracticeTask : task;
+  }
+  if (pick === 2) {
+    const task = createMakeTenTwentyTask(lessonId, difficulty);
+    return task.kind === "groundBuild" ? { ...task, introPrompt: "Mastery forge.", feedback: { correct: "Whole completed!", wrong: "Use the parts to make the target whole." } } satisfies PracticeTask : task;
+  }
+  const task = createSameWholeDifferentPartsTask(lessonId, difficulty);
+  return task.kind === "groundBuild" ? { ...task, introPrompt: "Mastery forge.", feedback: { correct: "Same whole mastered!", wrong: "Keep the whole the same with new parts." } } satisfies PracticeTask : task;
+}
+
+function createPracticalApplicationTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const pick = randInt(0, 3);
+  if (pick === 0) {
+    const task = generatePrepWeek10TaskByKind("y0-w10-l3", difficulty, "which_is_bigger");
+    if (task.kind === "groundCompare") {
+      return {
+        ...task,
+        prompt: "Which reactor has more energy?",
+        speakText: "Which reactor has more energy?",
+        introPrompt: "Portal chamber.",
+        referenceGroup: undefined,
+        feedback: { correct: "Reactor comparison solved!", wrong: "These collections are close. Compare again." },
+      } satisfies PracticeTask;
+    }
+    return task;
+  }
+  if (pick === 1) {
+    const task = generatePrepWeek10TaskByKind("y0-w10-l1", difficulty, "match_collection");
+    if (task.kind === "groundMatch") {
+      const memory = getMemory(lessonId);
+      const target = Math.max(12, pickTarget(memory, difficulty));
+      return {
+        ...task,
+        prompt: `Which collection matches ${target}?`,
+        speakText: `Which collection matches ${numberWord(target)}?`,
+        introPrompt: "Portal chamber.",
+        targetNumber: target,
+        feedback: { correct: "Collection chosen correctly!", wrong: "Choose the collection that matches the number." },
+      } satisfies PracticeTask;
+    }
+    return task;
+  }
+  if (pick === 2) {
+    const task = generatePrepWeek10TaskByKind("y0-w10-l3", difficulty, "balance_groups");
+    return task.kind === "groundBuild" ? {
+      ...task,
+      prompt: "Can both robots have the same amount?",
+      speakText: "Can both robots have the same amount?",
+      introPrompt: "Robot lab.",
+      showExample: false,
+      hideSplitSupport: true,
+      feedback: { correct: "Equal sharing solved!", wrong: "Make both groups show the same amount." },
+    } satisfies PracticeTask : task;
+  }
+  const task = generatePrepWeek11TaskByKind("y0-w11-l3", difficulty, "master_floor");
+  switch (task.kind) {
+    case "groundOrderTap":
+      return { ...task, prompt: "Challenge room: Order the numbers.", speakText: "Challenge room. Order the numbers.", introPrompt: "Mastery chamber.", badgeLabel: "Mixed Challenge" } satisfies PracticeTask;
+    case "groundSequence":
+      return { ...task, prompt: "Challenge room: Solve the path.", speakText: "Challenge room. Solve the path.", introPrompt: "Mastery chamber." } satisfies PracticeTask;
+    case "groundBuild":
+      return { ...task, introPrompt: "Mastery chamber.", showExample: false, hideSplitSupport: true } satisfies PracticeTask;
+    case "groundCompare":
+      return { ...task, introPrompt: "Mastery chamber.", referenceGroup: undefined } satisfies PracticeTask;
+    default:
+      return task;
+  }
+}
+
 function nextKind(memory: Week12Memory, lessonId: string) {
-  const rotation = lessonId === "y0-w12-l2" ? LESSON2_ROTATION : LESSON1_ROTATION;
+  const rotation = lessonId === "y0-w12-l3" ? LESSON3_ROTATION : lessonId === "y0-w12-l2" ? LESSON2_ROTATION : LESSON1_ROTATION;
   const kind = rotation[memory.cursor % rotation.length]!;
   memory.cursor += 1;
   return kind;
@@ -403,9 +615,25 @@ function createLesson2Task(lessonId: string, difficulty: Difficulty, kind: Lesso
   }
 }
 
+function createLesson3Task(lessonId: string, difficulty: Difficulty, kind: Lesson3Kind): PracticeTask {
+  switch (kind) {
+    case "ordering_mastery":
+      return createOrderingMasteryTask(lessonId);
+    case "multi_missing_reasoning":
+      return createMultiMissingReasoningTask(lessonId, difficulty);
+    case "flexible_number_building":
+      return createFlexibleNumberBuildingMasteryTask(lessonId, difficulty);
+    case "practical_application":
+      return createPracticalApplicationTask(lessonId, difficulty);
+  }
+}
+
 export function generatePrepWeek12Task(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
   const kind = nextKind(memory, lessonId);
+  if (lessonId === "y0-w12-l3") {
+    return clonePracticeTask(createLesson3Task(lessonId, difficulty, kind as Lesson3Kind));
+  }
   if (lessonId === "y0-w12-l2") {
     return clonePracticeTask(createLesson2Task(lessonId, difficulty, kind as Lesson2Kind));
   }
@@ -417,6 +645,9 @@ export function generatePrepWeek12TaskByKind(
   difficulty: Difficulty,
   kind: Lesson1Kind | Lesson2Kind
 ): PracticeTask {
+  if (lessonId === "y0-w12-l3") {
+    return clonePracticeTask(createLesson3Task(lessonId, difficulty, kind as Lesson3Kind));
+  }
   if (lessonId === "y0-w12-l2") {
     return clonePracticeTask(createLesson2Task(lessonId, difficulty, kind as Lesson2Kind));
   }
