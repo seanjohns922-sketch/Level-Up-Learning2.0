@@ -114,6 +114,28 @@ function chooseVariant<T>(options: readonly T[]) {
   return options[randInt(0, options.length - 1)]!;
 }
 
+function clonePracticeTask<T extends PracticeTask>(task: T): T {
+  const clone = { ...task } as T & Record<string, unknown>;
+  if ("options" in task && Array.isArray(task.options)) {
+    clone.options = task.options.map((option) =>
+      typeof option === "object" && option !== null ? { ...option } : option
+    );
+  }
+  if ("groups" in task && Array.isArray((task as { groups?: unknown[] }).groups)) {
+    clone.groups = (task as { groups: Record<string, unknown>[] }).groups.map((group) => ({ ...group }));
+  }
+  if ("tiles" in task && Array.isArray((task as { tiles?: unknown[] }).tiles)) {
+    clone.tiles = (task as { tiles: Record<string, unknown>[] }).tiles.map((tile) => ({ ...tile }));
+  }
+  if ("cards" in task && Array.isArray((task as { cards?: unknown[] }).cards)) {
+    clone.cards = [...(task as { cards: unknown[] }).cards];
+  }
+  if ("shownSequence" in task && Array.isArray((task as { shownSequence?: unknown[] }).shownSequence)) {
+    clone.shownSequence = [...(task as { shownSequence: unknown[] }).shownSequence];
+  }
+  return clone as T;
+}
+
 function tightenFlashTask(task: PracticeTask, memory: Week12Memory, difficulty: Difficulty, mode: "flash" | "memory") {
   if (task.kind !== "groundFlash") return task;
   const target = Math.max(4, pickTarget(memory, difficulty));
@@ -209,7 +231,7 @@ function createLesson1Task(lessonId: string, difficulty: Difficulty, kind: Lesso
 export function generatePrepWeek12Task(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
   const kind = nextKind(memory);
-  return createLesson1Task(lessonId, difficulty, kind);
+  return clonePracticeTask(createLesson1Task(lessonId, difficulty, kind));
 }
 
 export function generatePrepWeek12TaskByKind(
@@ -217,7 +239,7 @@ export function generatePrepWeek12TaskByKind(
   difficulty: Difficulty,
   kind: Lesson1Kind
 ): PracticeTask {
-  return createLesson1Task(lessonId, difficulty, kind);
+  return clonePracticeTask(createLesson1Task(lessonId, difficulty, kind));
 }
 
 export function resetPrepWeek12TaskSessionState() {
