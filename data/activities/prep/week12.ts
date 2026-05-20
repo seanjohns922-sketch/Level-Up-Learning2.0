@@ -1,9 +1,11 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
 import { generatePrepWeek10TaskByKind } from "@/data/activities/prep/week10";
 import { generatePrepWeek11TaskByKind } from "@/data/activities/prep/week11";
+import { generatePrepWeek6TaskByKind } from "@/data/activities/prep/week6";
 
 type GroundObjectType = Extract<PracticeTask, { kind: "groundBuild" }>["objectType"];
 type GroundPatternLayout = NonNullable<Extract<PracticeTask, { kind: "groundFlash" }>["patternLayout"]>;
+type GroundBuildVisualStyle = NonNullable<Extract<PracticeTask, { kind: "groundBuild" }>["visualStyle"]>;
 
 type Lesson1Kind =
   | "quick_image_flash"
@@ -11,11 +13,18 @@ type Lesson1Kind =
   | "teen_number_builder"
   | "number_image_memory";
 
+type Lesson2Kind =
+  | "flexible_builder"
+  | "missing_part_challenge"
+  | "make_ten_twenty"
+  | "same_whole_different_parts";
+
 type Week12Memory = {
   cursor: number;
   recentTargets: number[];
   recentObjects: GroundObjectType[];
   recentLayouts: GroundPatternLayout[];
+  recentStyles: GroundBuildVisualStyle[];
 };
 
 const LESSON1_ROTATION: Lesson1Kind[] = [
@@ -27,6 +36,15 @@ const LESSON1_ROTATION: Lesson1Kind[] = [
   "teen_number_builder",
 ];
 
+const LESSON2_ROTATION: Lesson2Kind[] = [
+  "flexible_builder",
+  "missing_part_challenge",
+  "make_ten_twenty",
+  "same_whole_different_parts",
+  "flexible_builder",
+  "missing_part_challenge",
+];
+
 const OBJECTS: GroundObjectType[] = [
   "energy_orbs",
   "crystals",
@@ -34,6 +52,13 @@ const OBJECTS: GroundObjectType[] = [
   "stars",
   "number_orbs",
   "planets",
+];
+
+const BUILD_STYLES: GroundBuildVisualStyle[] = [
+  "double_ten_frame",
+  "reactor_cells",
+  "build_trays",
+  "collection_shelves",
 ];
 
 const memoryByLesson = new Map<string, Week12Memory>();
@@ -46,6 +71,7 @@ function getMemory(lessonId: string) {
     recentTargets: [],
     recentObjects: [],
     recentLayouts: [],
+    recentStyles: [],
   };
   memoryByLesson.set(lessonId, created);
   return created;
@@ -108,6 +134,13 @@ function pickLayout(memory: Week12Memory, preferred?: GroundPatternLayout[]) {
   const layout = chooseRecentSafe(pool, memory.recentLayouts);
   pushRecent(memory.recentLayouts, layout, 6);
   return layout;
+}
+
+function pickBuildStyle(memory: Week12Memory, preferred?: GroundBuildVisualStyle[]) {
+  const pool = preferred ?? BUILD_STYLES;
+  const style = chooseRecentSafe(pool, memory.recentStyles);
+  pushRecent(memory.recentStyles, style, 6);
+  return style;
 }
 
 function chooseVariant<T>(options: readonly T[]) {
@@ -209,8 +242,137 @@ function createTeenNumberBuilderTask(lessonId: string, difficulty: Difficulty): 
   } satisfies PracticeTask;
 }
 
-function nextKind(memory: Week12Memory) {
-  const kind = LESSON1_ROTATION[memory.cursor % LESSON1_ROTATION.length]!;
+function createFlexibleBuilderTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const task = generatePrepWeek10TaskByKind("y0-w10-l3", difficulty, "teen_builder");
+  if (task.kind !== "groundBuild") return task;
+  const targetNumber = Math.max(12, pickTarget(memory, difficulty));
+  return {
+    ...task,
+    prompt: `Build ${targetNumber} another way.`,
+    speakText: `Build ${numberWord(targetNumber)} another way.`,
+    introPrompt: "Forge the whole in new parts.",
+    targetNumber,
+    objectType: pickObject(memory),
+    visualStyle: pickBuildStyle(memory, ["double_ten_frame", "reactor_cells", "build_trays"]),
+    showExample: false,
+    hideSplitSupport: true,
+    feedback: { correct: "Flexible thinking!", wrong: "Build the whole in a different way." },
+  } satisfies PracticeTask;
+}
+
+function createMissingPartChallengeTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const variant = chooseVariant(["ten", "teen", "twenty"] as const);
+  if (variant === "ten") {
+    const task = generatePrepWeek6TaskByKind("y0-w6-l3", difficulty, "build_missing_part_whole");
+    if (task.kind !== "groundBuild") return task;
+    return {
+      ...task,
+      prompt: "What part is missing to make 10?",
+      speakText: "What part is missing to make ten?",
+      introPrompt: "Find the missing part.",
+      objectType: pickObject(memory),
+      visualStyle: pickBuildStyle(memory, ["reactor_cells", "build_trays", "collection_shelves"]),
+      showExample: false,
+      hideSplitSupport: true,
+      feedback: { correct: "Missing part found!", wrong: "Look for the spaces still needed." },
+    } satisfies PracticeTask;
+  }
+
+  const task = generatePrepWeek10TaskByKind("y0-w10-l3", difficulty, "build_missing_part");
+  if (task.kind !== "groundBuild") return task;
+  const targetNumber = variant === "twenty" ? 20 : Math.max(14, pickTarget(memory, difficulty));
+  const shownAmount = variant === "twenty" ? randInt(12, 18) : Math.max(10, targetNumber - randInt(2, 6));
+  return {
+    ...task,
+    prompt: variant === "twenty" ? "How many more to make 20?" : `What part is missing to make ${targetNumber}?`,
+    speakText: variant === "twenty" ? "How many more to make twenty?" : `What part is missing to make ${numberWord(targetNumber)}?`,
+    introPrompt: "Spot the hidden amount.",
+    targetNumber,
+    startingBuilt: shownAmount,
+    objectType: pickObject(memory),
+    visualStyle: pickBuildStyle(memory, ["double_ten_frame", "reactor_cells", "collection_shelves"]),
+    showExample: false,
+    hideSplitSupport: true,
+    feedback: { correct: "Great missing-part reasoning!", wrong: "Find the amount that completes the whole." },
+  } satisfies PracticeTask;
+}
+
+function createMakeTenTwentyTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const variant = chooseVariant(["ten", "twenty"] as const);
+  if (variant === "ten") {
+    const task = generatePrepWeek6TaskByKind("y0-w6-l2", difficulty, "make_10_another_way");
+    if (task.kind !== "groundBuild") return task;
+    return {
+      ...task,
+      prompt: "Make 10 another way.",
+      speakText: "Make ten another way.",
+      introPrompt: "Forge ten with two parts.",
+      objectType: pickObject(memory),
+      visualStyle: pickBuildStyle(memory, ["reactor_cells", "build_trays", "collection_shelves"]),
+      showExample: false,
+      hideSplitSupport: true,
+      feedback: { correct: "Ten forged another way!", wrong: "Use two parts that still make ten." },
+    } satisfies PracticeTask;
+  }
+
+  const task = generatePrepWeek10TaskByKind("y0-w10-l3", difficulty, "teen_builder");
+  if (task.kind !== "groundBuild") return task;
+  return {
+    ...task,
+    prompt: "Make 20 with two parts.",
+    speakText: "Make twenty with two parts.",
+    introPrompt: "Think in tens and extras.",
+    targetNumber: 20,
+    objectType: pickObject(memory),
+    visualStyle: pickBuildStyle(memory, ["double_ten_frame", "reactor_cells"]),
+    showExample: false,
+    hideSplitSupport: true,
+    feedback: { correct: "Twenty complete!", wrong: "Use two parts to build the whole of twenty." },
+  } satisfies PracticeTask;
+}
+
+function createSameWholeDifferentPartsTask(lessonId: string, difficulty: Difficulty): PracticeTask {
+  const memory = getMemory(lessonId);
+  const variant = chooseVariant(["ten", "teen"] as const);
+  if (variant === "ten") {
+    const task = generatePrepWeek6TaskByKind("y0-w6-l3", difficulty, "same_whole");
+    if (task.kind !== "groundBuild") return task;
+    return {
+      ...task,
+      prompt: "Build the same whole another way.",
+      speakText: "Build the same whole another way.",
+      introPrompt: "Same whole, new parts.",
+      objectType: pickObject(memory),
+      visualStyle: pickBuildStyle(memory, ["build_trays", "reactor_cells", "collection_shelves"]),
+      showExample: false,
+      hideSplitSupport: true,
+      feedback: { correct: "Same whole, different parts!", wrong: "Use different parts that still make the same whole." },
+    } satisfies PracticeTask;
+  }
+
+  const task = generatePrepWeek10TaskByKind("y0-w10-l3", difficulty, "build_same_amount");
+  if (task.kind !== "groundBuild") return task;
+  const targetNumber = Math.max(12, pickTarget(memory, difficulty));
+  return {
+    ...task,
+    prompt: "Build the same whole in a new way.",
+    speakText: "Build the same whole in a new way.",
+    introPrompt: "Match the whole, not the look.",
+    targetNumber,
+    objectType: pickObject(memory),
+    visualStyle: pickBuildStyle(memory, ["double_ten_frame", "reactor_cells", "build_trays"]),
+    showExample: false,
+    hideSplitSupport: true,
+    feedback: { correct: "You rebuilt the whole!", wrong: "Keep the whole the same, even with new parts." },
+  } satisfies PracticeTask;
+}
+
+function nextKind(memory: Week12Memory, lessonId: string) {
+  const rotation = lessonId === "y0-w12-l2" ? LESSON2_ROTATION : LESSON1_ROTATION;
+  const kind = rotation[memory.cursor % rotation.length]!;
   memory.cursor += 1;
   return kind;
 }
@@ -228,18 +390,37 @@ function createLesson1Task(lessonId: string, difficulty: Difficulty, kind: Lesso
   }
 }
 
+function createLesson2Task(lessonId: string, difficulty: Difficulty, kind: Lesson2Kind): PracticeTask {
+  switch (kind) {
+    case "flexible_builder":
+      return createFlexibleBuilderTask(lessonId, difficulty);
+    case "missing_part_challenge":
+      return createMissingPartChallengeTask(lessonId, difficulty);
+    case "make_ten_twenty":
+      return createMakeTenTwentyTask(lessonId, difficulty);
+    case "same_whole_different_parts":
+      return createSameWholeDifferentPartsTask(lessonId, difficulty);
+  }
+}
+
 export function generatePrepWeek12Task(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
-  const kind = nextKind(memory);
-  return clonePracticeTask(createLesson1Task(lessonId, difficulty, kind));
+  const kind = nextKind(memory, lessonId);
+  if (lessonId === "y0-w12-l2") {
+    return clonePracticeTask(createLesson2Task(lessonId, difficulty, kind as Lesson2Kind));
+  }
+  return clonePracticeTask(createLesson1Task(lessonId, difficulty, kind as Lesson1Kind));
 }
 
 export function generatePrepWeek12TaskByKind(
   lessonId: string,
   difficulty: Difficulty,
-  kind: Lesson1Kind
+  kind: Lesson1Kind | Lesson2Kind
 ): PracticeTask {
-  return clonePracticeTask(createLesson1Task(lessonId, difficulty, kind));
+  if (lessonId === "y0-w12-l2") {
+    return clonePracticeTask(createLesson2Task(lessonId, difficulty, kind as Lesson2Kind));
+  }
+  return clonePracticeTask(createLesson1Task(lessonId, difficulty, kind as Lesson1Kind));
 }
 
 export function resetPrepWeek12TaskSessionState() {

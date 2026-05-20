@@ -417,10 +417,11 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
       buildLesson(
         12,
         2,
-        "Mastery Games",
-        "Apply counting, comparing, subitising and building skills.",
-        ["Mastery challenge", "Build and compare", "Quick skill mix"],
-        ["ALL"]
+        "Flexible Number Building",
+        "Strengthen final flexible number thinking through rebuilding wholes, finding missing parts, making 10 and 20, and comparing same-whole structures with reduced support.",
+        ["Flexible builder", "Missing-part challenge", "Make 10 / Make 20"],
+        ["AC9MFN01", "AC9MFN02", "AC9MFN03"],
+        "Nexus Number Forge"
       ),
       buildLesson(
         12,
