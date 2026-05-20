@@ -81,6 +81,159 @@ function WholeOption({
   );
 }
 
+function prepObjectGlyph(object?: string) {
+  switch (object) {
+    case "rocket":
+      return "🚀";
+    case "robot":
+      return "🤖";
+    case "alien":
+      return "👽";
+    case "crystal":
+      return "✦";
+    case "portal":
+      return "◉";
+    case "energy":
+      return "●";
+    default:
+      return "●";
+  }
+}
+
+function PrepToken({ object }: { object?: string }) {
+  const glyph = prepObjectGlyph(object);
+  return (
+    <div className="flex h-14 w-14 items-center justify-center rounded-full border border-slate-600 bg-slate-700/60 text-3xl text-teal-300 shadow-sm">
+      {glyph}
+    </div>
+  );
+}
+
+function PrepCollectionVisual({
+  quantity,
+  object,
+  layout = "ten_frame",
+}: {
+  quantity: number;
+  object?: string;
+  layout?: string;
+}) {
+  if (layout === "double_ten_frame") {
+    const fullTen = Math.min(quantity, 10);
+    const extras = Math.max(0, quantity - 10);
+    return (
+      <div className="grid gap-4">
+        <div className="rounded-2xl border border-slate-600 bg-slate-700/50 p-4">
+          <div className="mb-3 text-xs font-bold uppercase tracking-wide text-teal-400">Full 10</div>
+          <div className="grid grid-cols-5 gap-3">
+            {Array.from({ length: 10 }).map((_, index) =>
+              index < fullTen ? (
+                <PrepToken key={`full-${index}`} object={object} />
+              ) : (
+                <div key={`full-${index}`} className="h-14 w-14 rounded-full border border-slate-600 bg-slate-800/40" />
+              )
+            )}
+          </div>
+        </div>
+        <div className="rounded-2xl border border-slate-600 bg-slate-700/50 p-4">
+          <div className="mb-3 text-xs font-bold uppercase tracking-wide text-teal-400">Extras</div>
+          <div className="grid grid-cols-5 gap-3">
+            {Array.from({ length: 10 }).map((_, index) =>
+              index < extras ? (
+                <PrepToken key={`extra-${index}`} object={object} />
+              ) : (
+                <div key={`extra-${index}`} className="h-14 w-14 rounded-full border border-slate-600 bg-slate-800/40" />
+              )
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const columns = layout === "columns" ? 2 : 5;
+  return (
+    <div
+      className="grid gap-3 rounded-2xl border border-slate-600 bg-slate-700/50 p-4"
+      style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, max-content))` }}
+    >
+      {Array.from({ length: quantity }).map((_, index) => (
+        <PrepToken key={index} object={object} />
+      ))}
+    </div>
+  );
+}
+
+function PrepCompareCollectionsVisual({
+  groups,
+}: {
+  groups: Array<{ id: string; label: string; quantity: number; object?: string; layout?: string }>;
+}) {
+  return (
+    <div className={`grid gap-4 ${groups.length === 2 ? "md:grid-cols-2" : "md:grid-cols-3"}`}>
+      {groups.map((group) => (
+        <div key={group.id} className="rounded-2xl border border-slate-600 bg-slate-700/50 p-4">
+          <div className="mb-3 text-sm font-black text-teal-300">{group.label}</div>
+          <PrepCollectionVisual quantity={group.quantity} object={group.object} layout={group.layout} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PrepRaceFinishVisual({
+  finishers,
+}: {
+  finishers: Array<{ name: string; icon: string; place: string }>;
+}) {
+  return (
+    <div className="grid gap-4 md:grid-cols-4">
+      {finishers.map((finisher) => (
+        <div key={finisher.place} className="rounded-2xl border border-slate-600 bg-slate-700/50 p-4 text-center">
+          <div className="text-xs font-bold uppercase tracking-wide text-amber-300">{finisher.place}</div>
+          <div className="mt-3 text-5xl">{finisher.icon}</div>
+          <div className="mt-2 text-lg font-black text-white">{finisher.name}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PrepSpatialSceneVisual({
+  rows,
+  cols,
+  items,
+}: {
+  rows: number;
+  cols: number;
+  items: Array<{ row: number; col: number; label: string; icon: string }>;
+}) {
+  return (
+    <div
+      className="grid gap-3 rounded-2xl border border-slate-600 bg-slate-700/50 p-4"
+      style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
+    >
+      {Array.from({ length: rows * cols }).map((_, index) => {
+        const row = Math.floor(index / cols);
+        const col = index % cols;
+        const item = items.find((entry) => entry.row === row && entry.col === col);
+        return (
+          <div key={`${row}-${col}`} className="flex min-h-28 flex-col items-center justify-center rounded-2xl border border-slate-600 bg-slate-800/40 p-3 text-center">
+            {item ? (
+              <>
+                <div className="text-4xl">{item.icon}</div>
+                <div className="mt-2 text-sm font-black text-white">{item.label}</div>
+              </>
+            ) : (
+              <div className="h-10 w-10 rounded-full border border-dashed border-slate-600" />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function AssessmentQuestionCard({
   question,
   value,
@@ -115,6 +268,30 @@ export default function AssessmentQuestionCard({
       {visual.type === "input_output_table" ? <InputOutputTableVisual visual={visual as never} /> : null}
       {visual.type === "function_machine_card" ? <FunctionMachineCardVisual visual={visual as never} /> : null}
       {visual.type === "balance_equation_card" ? <BalanceEquationCardVisual visual={visual as never} /> : null}
+      {visual.type === "prep_collection" ? (
+        <PrepCollectionVisual
+          quantity={Number(visual.quantity ?? 0)}
+          object={typeof visual.object === "string" ? visual.object : undefined}
+          layout={typeof visual.layout === "string" ? visual.layout : undefined}
+        />
+      ) : null}
+      {visual.type === "prep_compare_collections" ? (
+        <PrepCompareCollectionsVisual
+          groups={Array.isArray(visual.groups) ? (visual.groups as Array<{ id: string; label: string; quantity: number; object?: string; layout?: string }>) : []}
+        />
+      ) : null}
+      {visual.type === "prep_race_finish" ? (
+        <PrepRaceFinishVisual
+          finishers={Array.isArray(visual.finishers) ? (visual.finishers as Array<{ name: string; icon: string; place: string }>) : []}
+        />
+      ) : null}
+      {visual.type === "prep_spatial_scene" ? (
+        <PrepSpatialSceneVisual
+          rows={Number(visual.rows ?? 2)}
+          cols={Number(visual.cols ?? 3)}
+          items={Array.isArray(visual.items) ? (visual.items as Array<{ row: number; col: number; label: string; icon: string }>) : []}
+        />
+      ) : null}
     </>
   ) : null;
 

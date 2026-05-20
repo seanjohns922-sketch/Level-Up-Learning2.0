@@ -1016,7 +1016,200 @@ const YEAR6_POSTTEST_QUESTIONS: Question[] = [
   ),
 ];
 
+
+function shufflePostItems<T>(items: T[]): T[] {
+  const next = [...items];
+  for (let index = next.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [next[index], next[swapIndex]] = [next[swapIndex]!, next[index]!];
+  }
+  return next;
+}
+
+function pickPostItem<T>(items: readonly T[]): T {
+  return items[Math.floor(Math.random() * items.length)]!;
+}
+
+function orderAnswer(values: number[]) {
+  return values.map(String).join("||");
+}
+
+function nearbyNumberOptions(target: number, min: number, max: number, extra: number[] = []): string[] {
+  const set = new Set<number>([target, ...extra]);
+  let delta = 1;
+  while (set.size < 4 && delta < 6) {
+    if (target - delta >= min) set.add(target - delta);
+        if (target + delta <= max) set.add(target + delta);
+    delta += 1;
+  }
+  return shufflePostItems([...set].slice(0, 4)).map(String);
+}
+
+export function buildPrepPosttest(): PostTest {
+  const countTarget = pickPostItem([12, 13, 14, 15]);
+  const matchTarget = pickPostItem([16, 17, 18]);
+  const numeralTarget = pickPostItem([11, 12, 13, 14, 15, 16, 17, 18, 19]);
+  const missingStart = pickPostItem([11, 12, 13, 14]);
+  const teenExtras = pickPostItem([6, 7, 8, 9]);
+  const orderSetA = pickPostItem([
+    [1, 4, 6, 8, 15, 18],
+    [2, 5, 7, 9, 14, 17],
+    [3, 6, 8, 10, 13, 16],
+  ] as const);
+  const orderSetB = pickPostItem([
+    [19, 13, 17, 12, 15],
+    [18, 14, 16, 11, 19],
+    [17, 12, 18, 15, 13],
+  ] as const);
+  const doubleGapForward = pickPostItem([
+    { prompt: '12, __, __, 15, 16', answer: '13, 14', options: ['13, 14', '11, 13', '13, 15', '14, 15'] },
+    { prompt: '14, __, __, 17, 18', answer: '15, 16', options: ['15, 16', '14, 16', '15, 17', '16, 17'] },
+    { prompt: '11, __, __, 14, 15', answer: '12, 13', options: ['12, 13', '11, 12', '12, 14', '13, 14'] },
+  ] as const);
+  const doubleGapBackward = pickPostItem([
+    { prompt: '__, 18, 17, __, 15', answer: '19 and 16', options: ['19 and 16', '16 and 14', '20 and 16', '19 and 15'] },
+    { prompt: '20, __, 18, __, 16', answer: '19 and 17', options: ['19 and 17', '18 and 17', '19 and 16', '18 and 16'] },
+    { prompt: '__, 17, 16, __, 14', answer: '18 and 15', options: ['18 and 15', '17 and 15', '18 and 14', '19 and 15'] },
+  ] as const);
+  const descendingSet = pickPostItem([
+    [18, 17, 16, 15],
+    [20, 19, 18, 17],
+    [16, 15, 14, 13],
+  ] as const);
+  const missingWhole = pickPostItem([
+    { total: 14, shown: 10 },
+    { total: 15, shown: 10 },
+    { total: 16, shown: 10 },
+    { total: 18, shown: 10 },
+  ] as const);
+  const makeTwentyShown = pickPostItem([12, 14, 15, 16, 17, 18]);
+  const sameWhole = pickPostItem([
+    { left: '7 + 7', right: '10 + 4', same: true },
+    { left: '9 + 5', right: '8 + 6', same: true },
+    { left: '10 + 6', right: '7 + 8', same: false },
+    { left: '6 + 6', right: '10 + 2', same: true },
+  ] as const);
+  const comparePair = pickPostItem([
+    { left: 14, right: 15 },
+    { left: 17, right: 18 },
+    { left: 12, right: 13 },
+  ] as const);
+  const makeTwentyParts = pickPostItem([
+    { correct: '10 and 10', options: ['10 and 10', '12 and 7', '15 and 4', '9 and 9'] },
+    { correct: '12 and 8', options: ['12 and 8', '11 and 8', '13 and 6', '9 and 9'] },
+    { correct: '14 and 6', options: ['14 and 6', '13 and 6', '15 and 4', '12 and 7'] },
+  ] as const);
+  const raceA = pickPostItem([
+    [
+      { name: 'Alien', icon: '👽', place: 'First' },
+      { name: 'Rocket', icon: '🚀', place: 'Second' },
+      { name: 'Numbot', icon: '🤖', place: 'Third' },
+      { name: 'Hover Pod', icon: '🛸', place: 'Fourth' },
+    ],
+    [
+      { name: 'Rocket', icon: '🚀', place: 'First' },
+      { name: 'Numbot', icon: '🤖', place: 'Second' },
+      { name: 'Alien', icon: '👽', place: 'Third' },
+      { name: 'Hover Pod', icon: '🛸', place: 'Fourth' },
+    ],
+  ] as const);
+  const raceB = pickPostItem([
+    [
+      { name: 'Rocket', icon: '🚀', place: 'First' },
+      { name: 'Alien', icon: '👽', place: 'Second' },
+      { name: 'Numbot', icon: '🤖', place: 'Third' },
+      { name: 'Hover Pod', icon: '🛸', place: 'Fourth' },
+    ],
+    [
+      { name: 'Alien', icon: '👽', place: 'First' },
+      { name: 'Numbot', icon: '🤖', place: 'Second' },
+      { name: 'Rocket', icon: '🚀', place: 'Third' },
+      { name: 'Hover Pod', icon: '🛸', place: 'Fourth' },
+    ],
+  ] as const);
+  const spatialBetween = pickPostItem([
+    {
+      items: [
+        { row: 0, col: 0, label: 'Robot', icon: '🤖' },
+        { row: 0, col: 1, label: 'Crystal', icon: '✦' },
+        { row: 0, col: 2, label: 'Alien', icon: '👽' },
+      ],
+      prompt: 'Who is between the robot and the alien?',
+      answer: 'Crystal',
+      options: ['Crystal', 'Robot', 'Alien', 'Portal'],
+    },
+    {
+      items: [
+        { row: 0, col: 0, label: 'Rocket', icon: '🚀' },
+        { row: 0, col: 1, label: 'Portal', icon: '◉' },
+        { row: 0, col: 2, label: 'Numbot', icon: '🤖' },
+      ],
+      prompt: 'Who is between the rocket and Numbot?',
+      answer: 'Portal',
+      options: ['Portal', 'Rocket', 'Numbot', 'Alien'],
+    },
+  ] as const);
+  const spatialAbove = pickPostItem([
+    {
+      items: [
+        { row: 0, col: 1, label: 'Rocket', icon: '🚀' },
+        { row: 1, col: 0, label: 'Robot', icon: '🤖' },
+        { row: 1, col: 1, label: 'Portal', icon: '◉' },
+        { row: 1, col: 2, label: 'Alien', icon: '👽' },
+      ],
+      prompt: 'What is above the portal?',
+      answer: 'Rocket',
+      options: ['Rocket', 'Robot', 'Alien', 'Portal'],
+    },
+    {
+      items: [
+        { row: 0, col: 1, label: 'Crystal', icon: '✦' },
+        { row: 1, col: 0, label: 'Robot', icon: '🤖' },
+        { row: 1, col: 1, label: 'Portal', icon: '◉' },
+        { row: 1, col: 2, label: 'Rocket', icon: '🚀' },
+      ],
+      prompt: 'What is above the portal?',
+      answer: 'Crystal',
+      options: ['Crystal', 'Robot', 'Rocket', 'Portal'],
+    },
+  ] as const);
+  const matchEighteen = pickPostItem([
+    [17, 18, 19],
+    [18, 16, 20],
+    [19, 18, 17],
+  ] as const);
+
+  const questions: Question[] = [
+    buildPostQuestion({ id: 'prep-pt-01', type: 'mcq', prompt: 'How many are there?', options: nearbyNumberOptions(countTarget, 10, 20), correctAnswer: String(countTarget), answer: String(countTarget), skillId: 'count_collections', skillLabel: 'Count Collections', linkedWeeks: [1, 2, 10, 11, 12], linkedLessons: [1, 2, 3], strand: 'Number', difficultyBand: 'prep', visual: { type: 'prep_collection', quantity: countTarget, object: pickPostItem(['crystal', 'energy', 'rocket']), layout: countTarget > 10 ? 'double_ten_frame' : 'ten_frame' } }),
+    buildPostQuestion({ id: 'prep-pt-02', type: 'mcq', prompt: 'Which number matches this collection?', options: nearbyNumberOptions(matchTarget, 10, 20), correctAnswer: String(matchTarget), answer: String(matchTarget), skillId: 'teen_recognition', skillLabel: 'Teen Number Recognition', linkedWeeks: [2, 10, 11, 12], linkedLessons: [1, 2, 3], strand: 'Number', difficultyBand: 'prep', visual: { type: 'prep_collection', quantity: matchTarget, object: pickPostItem(['energy', 'crystal', 'robot']), layout: 'double_ten_frame' } }),
+    buildPostQuestion({ id: 'prep-pt-03', type: 'mcq', prompt: `Tap the numeral ${numeralTarget}.`, options: nearbyNumberOptions(numeralTarget, 10, 20), correctAnswer: String(numeralTarget), answer: String(numeralTarget), skillId: 'numeral_recognition', skillLabel: 'Numeral Recognition', linkedWeeks: [1, 2, 10, 11, 12], linkedLessons: [1, 2, 3], strand: 'Number', difficultyBand: 'prep' }),
+    buildPostQuestion({ id: 'prep-pt-04', type: 'mcq', prompt: `${missingStart}, __, ${missingStart + 2}`, options: nearbyNumberOptions(missingStart + 1, 1, 20), correctAnswer: String(missingStart + 1), answer: String(missingStart + 1), skillId: 'count_forward_backward', skillLabel: 'Forward and Backward Counting', linkedWeeks: [3, 11, 12], linkedLessons: [1, 2, 3], strand: 'Number', difficultyBand: 'prep' }),
+    buildPostQuestion({ id: 'prep-pt-05', type: 'mcq', prompt: `Which teen number is 10 and ${teenExtras} more?`, options: nearbyNumberOptions(10 + teenExtras, 10, 20), correctAnswer: String(10 + teenExtras), answer: String(10 + teenExtras), skillId: 'teen_structure', skillLabel: 'Teen Number Structure', linkedWeeks: [10, 11, 12], linkedLessons: [1, 2], strand: 'Number', difficultyBand: 'prep' }),
+    buildPostQuestion({ id: 'prep-pt-06', type: 'number_order', prompt: 'Order the numbers from smallest to largest.', options: orderSetA.map(String), correctAnswer: orderAnswer([...orderSetA].sort((a, b) => a - b)), answer: orderAnswer([...orderSetA].sort((a, b) => a - b)), skillId: 'ordering_numbers', skillLabel: 'Order Numbers', linkedWeeks: [3, 9, 11, 12], linkedLessons: [1, 2, 3], strand: 'Number', difficultyBand: 'prep' }),
+    buildPostQuestion({ id: 'prep-pt-07', type: 'number_order', prompt: 'Order the teen numbers from smallest to largest.', options: orderSetB.map(String), correctAnswer: orderAnswer([...orderSetB].sort((a, b) => a - b)), answer: orderAnswer([...orderSetB].sort((a, b) => a - b)), skillId: 'ordering_numbers', skillLabel: 'Order Numbers', linkedWeeks: [10, 11, 12], linkedLessons: [1, 2, 3], strand: 'Number', difficultyBand: 'prep' }),
+    buildPostQuestion({ id: 'prep-pt-08', type: 'mcq', prompt: `Which numbers are missing? ${doubleGapForward.prompt}`, options: [...doubleGapForward.options], correctAnswer: doubleGapForward.answer, answer: doubleGapForward.answer, skillId: 'multi_missing_reasoning', skillLabel: 'Multi-Missing Reasoning', linkedWeeks: [11, 12], linkedLessons: [1, 3], strand: 'Number', difficultyBand: 'prep' }),
+    buildPostQuestion({ id: 'prep-pt-09', type: 'mcq', prompt: `Which numbers are missing? ${doubleGapBackward.prompt}`, options: [...doubleGapBackward.options], correctAnswer: doubleGapBackward.answer, answer: doubleGapBackward.answer, skillId: 'multi_missing_reasoning', skillLabel: 'Multi-Missing Reasoning', linkedWeeks: [11, 12], linkedLessons: [1, 3], strand: 'Number', difficultyBand: 'prep' }),
+    buildPostQuestion({ id: 'prep-pt-10', type: 'number_order', prompt: 'Order the numbers from largest to smallest.', options: descendingSet.map(String), correctAnswer: orderAnswer([...descendingSet].sort((a, b) => b - a)), answer: orderAnswer([...descendingSet].sort((a, b) => b - a)), skillId: 'ordering_numbers', skillLabel: 'Order Numbers', linkedWeeks: [11, 12], linkedLessons: [1, 3], strand: 'Number', difficultyBand: 'prep' }),
+    buildPostQuestion({ id: 'prep-pt-11', type: 'mcq', prompt: `${missingWhole.total} = ${missingWhole.shown} + __`, options: nearbyNumberOptions(missingWhole.total - missingWhole.shown, 0, 10), correctAnswer: String(missingWhole.total - missingWhole.shown), answer: String(missingWhole.total - missingWhole.shown), skillId: 'missing_parts', skillLabel: 'Missing Parts', linkedWeeks: [6, 11, 12], linkedLessons: [2, 3], strand: 'Number', difficultyBand: 'prep', visual: { type: 'prep_collection', quantity: missingWhole.total, object: pickPostItem(['energy', 'crystal']), layout: 'double_ten_frame' } }),
+    buildPostQuestion({ id: 'prep-pt-12', type: 'mcq', prompt: 'How many more to make 20?', options: nearbyNumberOptions(20 - makeTwentyShown, 0, 10), correctAnswer: String(20 - makeTwentyShown), answer: String(20 - makeTwentyShown), skillId: 'make_twenty', skillLabel: 'Make 20', linkedWeeks: [10, 11, 12], linkedLessons: [2, 3], strand: 'Number', difficultyBand: 'prep', visual: { type: 'prep_collection', quantity: makeTwentyShown, object: pickPostItem(['energy', 'rocket']), layout: 'double_ten_frame' } }),
+    buildPostQuestion({ id: 'prep-pt-13', type: 'mcq', prompt: `One build is ${sameWhole.left}. Another build is ${sameWhole.right}. Do they make the same whole?`, options: ['Yes', 'No'], correctAnswer: sameWhole.same ? 'Yes' : 'No', answer: sameWhole.same ? 'Yes' : 'No', skillId: 'same_whole_different_parts', skillLabel: 'Same Whole, Different Parts', linkedWeeks: [6, 12], linkedLessons: [2, 3], strand: 'Number', difficultyBand: 'prep' }),
+    buildPostQuestion({ id: 'prep-pt-14', type: 'mcq', prompt: 'Which reactor has more energy?', options: ['Left reactor', 'Right reactor', 'They are the same'], correctAnswer: comparePair.left > comparePair.right ? 'Left reactor' : 'Right reactor', answer: comparePair.left > comparePair.right ? 'Left reactor' : 'Right reactor', skillId: 'compare_quantities', skillLabel: 'Compare Quantities', linkedWeeks: [5, 10, 11, 12], linkedLessons: [1, 2, 3], strand: 'Number', difficultyBand: 'prep', visual: { type: 'prep_compare_collections', groups: [ { id: 'left', label: 'Left reactor', quantity: comparePair.left, object: 'energy', layout: 'double_ten_frame' }, { id: 'right', label: 'Right reactor', quantity: comparePair.right, object: 'crystal', layout: 'double_ten_frame' } ] } }),
+    buildPostQuestion({ id: 'prep-pt-15', type: 'mcq', prompt: 'Which two parts make 20?', options: [...makeTwentyParts.options], correctAnswer: makeTwentyParts.correct, answer: makeTwentyParts.correct, skillId: 'flexible_building', skillLabel: 'Flexible Number Building', linkedWeeks: [6, 10, 11, 12], linkedLessons: [2, 3], strand: 'Number', difficultyBand: 'prep' }),
+    buildPostQuestion({ id: 'prep-pt-16', type: 'mcq', prompt: 'Who came third?', options: raceA.map((item) => item.name), correctAnswer: raceA[2].name, answer: raceA[2].name, skillId: 'ordinal_positions', skillLabel: 'Ordinal Positions', linkedWeeks: [9, 12], linkedLessons: [1, 2, 3], strand: 'Space', difficultyBand: 'prep', visual: { type: 'prep_race_finish', finishers: raceA } }),
+    buildPostQuestion({ id: 'prep-pt-17', type: 'mcq', prompt: spatialBetween.prompt, options: [...spatialBetween.options], correctAnswer: spatialBetween.answer, answer: spatialBetween.answer, skillId: 'spatial_language', skillLabel: 'Spatial Language', linkedWeeks: [9, 12], linkedLessons: [3], strand: 'Space', difficultyBand: 'prep', visual: { type: 'prep_spatial_scene', rows: 1, cols: 3, items: spatialBetween.items } }),
+    buildPostQuestion({ id: 'prep-pt-18', type: 'mcq', prompt: spatialAbove.prompt, options: [...spatialAbove.options], correctAnswer: spatialAbove.answer, answer: spatialAbove.answer, skillId: 'spatial_language', skillLabel: 'Spatial Language', linkedWeeks: [9, 12], linkedLessons: [3], strand: 'Space', difficultyBand: 'prep', visual: { type: 'prep_spatial_scene', rows: 2, cols: 3, items: spatialAbove.items } }),
+    buildPostQuestion({ id: 'prep-pt-19', type: 'mcq', prompt: 'Who finished before Numbot?', options: raceB.map((item) => item.name), correctAnswer: raceB[raceB.findIndex((item) => item.name === 'Numbot') - 1].name, answer: raceB[raceB.findIndex((item) => item.name === 'Numbot') - 1].name, skillId: 'ordinal_positions', skillLabel: 'Ordinal Positions', linkedWeeks: [9, 12], linkedLessons: [2, 3], strand: 'Space', difficultyBand: 'prep', visual: { type: 'prep_race_finish', finishers: raceB } }),
+    buildPostQuestion({ id: 'prep-pt-20', type: 'mcq', prompt: 'Which collection matches 18?', options: ['Reactor A', 'Reactor B', 'Reactor C'], correctAnswer: `Reactor ${['A', 'B', 'C'][matchEighteen.findIndex((value) => value === 18)]}`, answer: `Reactor ${['A', 'B', 'C'][matchEighteen.findIndex((value) => value === 18)]}`, skillId: 'practical_application', skillLabel: 'Practical Application', linkedWeeks: [10, 11, 12], linkedLessons: [2, 3], strand: 'Number', difficultyBand: 'prep', visual: { type: 'prep_compare_collections', groups: [ { id: 'A', label: 'Reactor A', quantity: matchEighteen[0], object: 'rocket', layout: 'double_ten_frame' }, { id: 'B', label: 'Reactor B', quantity: matchEighteen[1], object: 'energy', layout: 'double_ten_frame' }, { id: 'C', label: 'Reactor C', quantity: matchEighteen[2], object: 'crystal', layout: 'double_ten_frame' } ] } }),
+  ];
+
+  return {
+    yearLabel: 'Prep',
+    questions,
+  };
+}
+
 export const POSTTESTS: Record<string, PostTest> = {
+  Prep: buildPrepPosttest(),
   "Year 1": {
     yearLabel: "Year 1",
     questions: YEAR1_POSTTEST_QUESTIONS,

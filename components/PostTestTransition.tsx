@@ -83,7 +83,7 @@ export default function PostTestTransition({ year }: { year: string }) {
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-primary">•</span>
-                  Score 90% or higher to unlock your Legend
+                  Score 85% or higher to unlock your Legend
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-primary">•</span>

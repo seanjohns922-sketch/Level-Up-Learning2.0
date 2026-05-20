@@ -464,7 +464,9 @@ function ResultsPage() {
                 </div>
                 <p className="text-xs text-muted-foreground">
                   {isPostTest
-                    ? "You passed the post-test — your Legend is ready to collect!"
+                    ? year === "Prep"
+                      ? "You passed the Ground Level mastery test — your Legend is unlocked and Year 1 is ready next!"
+                      : "You passed the post-test — your Legend is ready to collect!"
                     : passedByProgram
                     ? "You completed the 12-week program — your Legend awaits!"
                     : nextYear

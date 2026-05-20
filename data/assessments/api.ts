@@ -1,5 +1,5 @@
 import { getPretestForYear, type Question as PretestQuestion } from "./pretests";
-import { POSTTESTS, type PostTest, type Question as PosttestQuestion } from "./posttests";
+import { POSTTESTS, buildPrepPosttest, type PostTest, type Question as PosttestQuestion } from "./posttests";
 import type { SupportedMathLevel } from "@/data/activities/year2/lessonEngine";
 import {
   buildLevel3PosttestFormB,
@@ -39,6 +39,9 @@ export function getPretestForYearLabel(yearLabel: string): PretestQuestion[] {
 }
 
 export function getPosttestForYearLabel(yearLabel: string): PostTest | undefined {
+  if (yearLabel === "Prep") {
+    return buildPrepPosttest();
+  }
   if (yearLabel === "Year 3") {
     return buildLevel3PosttestFormB();
   }

@@ -12,7 +12,7 @@ import AssessmentShell from "@/components/assessment/AssessmentShell";
 import { analyzeAssessmentResult } from "@/data/assessments/analysis";
 import { supabase } from "@/lib/supabase";
 
-const PASS_THRESHOLD = 90;
+const PASS_THRESHOLD = 85;
 
 function MabPicker({
   target,
@@ -343,7 +343,7 @@ function PostTestPage() {
     const profile = analyzeAssessmentResult({
       questions,
       answers,
-      yearLevel: Number(year.replace(/\D/g, "")) || 3,
+      yearLevel: year === "Prep" ? 0 : Number(year.replace(/\D/g, "")) || 3,
       testType: "post",
       passThreshold: PASS_THRESHOLD,
       studentId,
@@ -564,7 +564,7 @@ function PostTestPage() {
       year={year}
       currentIndex={idx}
       totalQuestions={questions.length}
-      subtitle="Complete all questions to unlock your Legend (90%+)"
+      subtitle={`Complete all ${questions.length} questions to unlock your Legend (${PASS_THRESHOLD}%+)`}
       questionPrompt={q.prompt}
       questionContent={
         <div>
