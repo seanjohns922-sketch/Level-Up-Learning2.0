@@ -15,9 +15,11 @@ function shuffle<T>(arr: T[]) {
 }
 
 function makeOptions(answer: number, min = 0, max = 20) {
-  const set = new Set<number>([answer]);
-  while (set.size < 4) set.add(randInt(min, max));
-  return shuffle(Array.from(set)).map(String);
+  const pool: number[] = [];
+  for (let x = min; x <= max; x += 1) {
+    if (x !== answer) pool.push(x);
+  }
+  return shuffle([answer, ...shuffle(pool).slice(0, 3)]).map(String);
 }
 
 const NAMES = ["Liam", "Ava", "Ben", "Mia", "Tom", "Ella"];
@@ -34,7 +36,7 @@ function makeAddStory(d: Difficulty) {
 
 function makeSubStory(d: Difficulty) {
   const [lo, hi] = diffRange(d, [5, 10], [8, 13], [8, 15]);
-  let a = randInt(lo, hi); let b = randInt(2, Math.min(8, a - 1));
+  const a = randInt(lo, hi); const b = randInt(2, Math.min(8, a - 1));
   const name = NAMES[randInt(0, NAMES.length - 1)];
   return { story: `${name} has ${a} apples. ${name} eats ${b}. How many left?`, a, b, answer: a - b };
 }
@@ -51,7 +53,7 @@ export function generateWeek8Task(lessonId: string, d: Difficulty = "easy"): Pra
       const isAdd = nextIsAdd();
       if (isAdd) {
         const [lo, hi] = diffRange(d, [2, 6], [3, 10], [3, 12]);
-        let a = randInt(lo, hi); let b = randInt(lo, Math.min(10, 20 - a));
+        const a = randInt(lo, hi); const b = randInt(lo, Math.min(10, 20 - a));
         const name = NAMES[randInt(0, NAMES.length - 1)];
         return { kind: "twoMats", story: `${name} has ${a} counters. ${name} gets ${b} more.`, mode: "add", a, b, options: makeOptions(a + b, 6, 20), answer: a + b, difficulty: d };
       }
@@ -62,7 +64,7 @@ export function generateWeek8Task(lessonId: string, d: Difficulty = "easy"): Pra
     }
     const isAdd = nextIsAdd();
     const [lo, hi] = diffRange(d, [3, 8], [3, 10], [3, 12]);
-    let before = randInt(lo, hi); let after = isAdd ? randInt(before + 1, Math.min(20, before + 8)) : randInt(Math.max(1, before - 6), before - 1);
+    const before = randInt(lo, hi); const after = isAdd ? randInt(before + 1, Math.min(20, before + 8)) : randInt(Math.max(1, before - 6), before - 1);
     return { kind: "whatHappened", before, after, answerOp: isAdd ? "add" : "subtract", options: makeOptions(after, 0, 20), answer: after, difficulty: d };
   }
 

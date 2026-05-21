@@ -15,9 +15,11 @@ function shuffle<T>(arr: T[]) {
 }
 
 function makeOptions(answer: number, min = 1, max = 20) {
-  const set = new Set<number>([answer]);
-  while (set.size < 4) set.add(randInt(min, max));
-  return shuffle(Array.from(set)).map(String);
+  const pool: number[] = [];
+  for (let x = min; x <= max; x += 1) {
+    if (x !== answer) pool.push(x);
+  }
+  return shuffle([answer, ...shuffle(pool).slice(0, 3)]).map(String);
 }
 
 function pick<T>(items: T[]) {

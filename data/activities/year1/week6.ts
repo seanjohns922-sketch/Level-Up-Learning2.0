@@ -32,9 +32,11 @@ function makeSubtractPair(d: Difficulty): { total: number; remove: number; answe
 }
 
 function makeOptions(answer: number, min = 0, max = 20) {
-  const set = new Set<number>([answer]);
-  while (set.size < 4) set.add(randInt(min, max));
-  return Array.from(set).sort(() => Math.random() - 0.5).map(String);
+  const pool: number[] = [];
+  for (let x = min; x <= max; x += 1) {
+    if (x !== answer) pool.push(x);
+  }
+  return [answer, ...pool.sort(() => Math.random() - 0.5).slice(0, 3)].sort(() => Math.random() - 0.5).map(String);
 }
 
 export function generateWeek6Task(

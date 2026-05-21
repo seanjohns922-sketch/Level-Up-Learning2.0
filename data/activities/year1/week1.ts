@@ -30,13 +30,12 @@ function pickFromBag(lessonId: string, count: number) {
 }
 
 function uniqueInts(n: number, min: number, max: number, avoid: number[] = []) {
-  const set = new Set<number>();
   const avoidSet = new Set(avoid);
-  while (set.size < n) {
-    const x = randInt(min, max);
-    if (!avoidSet.has(x)) set.add(x);
+  const pool: number[] = [];
+  for (let x = min; x <= max; x += 1) {
+    if (!avoidSet.has(x)) pool.push(x);
   }
-  return Array.from(set);
+  return shuffle(pool).slice(0, Math.max(0, n));
 }
 
 export function genY1W1L1(d: Difficulty): PracticeTask {

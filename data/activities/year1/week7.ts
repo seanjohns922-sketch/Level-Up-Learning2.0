@@ -44,9 +44,11 @@ function makeStory(op: "add" | "subtract", d: Difficulty) {
 }
 
 function makeStoryOptions(answer: number) {
-  const set = new Set<number>([answer]);
-  while (set.size < 4) set.add(randInt(0, 20));
-  return shuffle(Array.from(set)).map(String);
+  const pool: number[] = [];
+  for (let x = 0; x <= 20; x += 1) {
+    if (x !== answer) pool.push(x);
+  }
+  return shuffle([answer, ...shuffle(pool).slice(0, 3)]).map(String);
 }
 
 export function generateWeek7Task(
