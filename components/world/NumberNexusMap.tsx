@@ -21,10 +21,10 @@ import {
 // holographic label tethers to the structure ("top" | "side").
 const DISTRICT_ZONES = [
   { id: "counting", name: "COUNTING DISTRICT", sub: "WEEKS 1–3",   weekStart: 1,  weekEnd: 3,  left: "11%", top: "68%", color: "#14b8a6", depth: 0.95, anchor: "top",  panX: 14 },
-  { id: "bridge",   name: "NUMBER BRIDGE",      sub: "WEEKS 4–6",   weekStart: 4,  weekEnd: 6,  left: "32%", top: "55%", color: "#22d3ee", depth: 0.75, anchor: "top",  panX: 6  },
-  { id: "tower",    name: "LEGEND TOWER",       sub: "WEEK 12",     weekStart: 12, weekEnd: 12, left: "50%", top: "30%", color: "#fbbf24", depth: 1.00, anchor: "side", panX: 0  },
-  { id: "core",     name: "CALCULATION CORE",   sub: "WEEKS 7–9",   weekStart: 7,  weekEnd: 9,  left: "70%", top: "60%", color: "#f472b6", depth: 0.85, anchor: "top",  panX: -8 },
-  { id: "mastery",  name: "MASTERY SECTOR",     sub: "WEEKS 10–12", weekStart: 10, weekEnd: 11, left: "86%", top: "22%", color: "#a78bfa", depth: 0.55, anchor: "side", panX: -14},
+  { id: "bridge",   name: "NUMBER BRIDGE",      sub: "WEEKS 4–6",   weekStart: 4,  weekEnd: 6,  left: "30%", top: "64%", color: "#22d3ee", depth: 0.75, anchor: "top",  panX: 6  },
+  { id: "tower",    name: "LEGEND TOWER",       sub: "WEEK 12",     weekStart: 12, weekEnd: 12, left: "50%", top: "73%", color: "#fbbf24", depth: 1.00, anchor: "side", panX: 0  },
+  { id: "core",     name: "CALCULATION CORE",   sub: "WEEKS 7–9",   weekStart: 7,  weekEnd: 9,  left: "70%", top: "64%", color: "#f472b6", depth: 0.85, anchor: "top",  panX: -8 },
+  { id: "mastery",  name: "MASTERY SECTOR",     sub: "WEEKS 10–12", weekStart: 10, weekEnd: 11, left: "86%", top: "18%", color: "#a78bfa", depth: 0.55, anchor: "side", panX: -14},
 ] as const;
 
 // ─── World canvas (particles + vehicles + tower pulse) ──────────────────────────
@@ -799,7 +799,7 @@ export default function NumberNexusMap() {
         {/* Character — drifts horizontally toward the active district */}
         <div style={{
           position: "absolute",
-          bottom: "9%",
+          bottom: "3%",
           left: `calc(50% + ${(currentZone ? (parseFloat(currentZone.left) - 50) * 0.35 : 0)}%)`,
           transform: "translateX(-50%)",
           zIndex: 12,
