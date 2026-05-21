@@ -90,15 +90,33 @@ export default function TowerMapPage() {
             const mx = (tl + rl) / 2 + (rl > 50 ? 5 : rl < 50 ? -5 : 0);
             const my = (tt + rt) / 2 + (rt < tt ? -3 : 3);
             return (
-              <path
-                key={`path-${r.name}`}
-                d={`M${tl}% ${tt}% Q${mx}% ${my}% ${rl}% ${rt}%`}
-                fill="none"
-                stroke={r.active ? "url(#gpAct)" : "url(#gpLck)"}
-                strokeWidth={r.active ? "2.5" : "1.2"}
-                strokeDasharray={r.active ? "6 3" : "3 4"}
-                strokeLinecap="round"
-              />
+              <g key={`path-${r.name}`}>
+                {/* Path shadow base */}
+                <path
+                  d={`M${tl}% ${tt}% Q${mx}% ${my}% ${rl}% ${rt}%`}
+                  fill="none"
+                  stroke="rgba(0,0,0,0.45)"
+                  strokeWidth={r.active ? "11" : "7"}
+                  strokeLinecap="round"
+                />
+                {/* Path body */}
+                <path
+                  d={`M${tl}% ${tt}% Q${mx}% ${my}% ${rl}% ${rt}%`}
+                  fill="none"
+                  stroke={r.active ? "rgb(232,206,140)" : "rgba(120,100,75,0.55)"}
+                  strokeWidth={r.active ? "8" : "5"}
+                  strokeLinecap="round"
+                />
+                {/* Dashed walking line */}
+                <path
+                  d={`M${tl}% ${tt}% Q${mx}% ${my}% ${rl}% ${rt}%`}
+                  fill="none"
+                  stroke={r.active ? "rgba(255,255,255,0.75)" : "rgba(255,255,255,0.18)"}
+                  strokeWidth={r.active ? "2" : "1.4"}
+                  strokeDasharray="5 6"
+                  strokeLinecap="round"
+                />
+              </g>
             );
           })}
           {/* Small checkpoint nodes along active path */}
