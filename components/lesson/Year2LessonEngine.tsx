@@ -6,6 +6,7 @@ import { LessonRenderer } from "@/components/lesson/LessonRenderer";
 import { LessonHUDRail } from "@/components/lesson/LessonHUDRail";
 import { LessonCompleteCard } from "@/components/lesson/LessonCompleteCard";
 import { ComboMilestonePop } from "@/components/lesson/ComboMilestonePop";
+import SurgeAmbience from "@/components/lesson/SurgeAmbience";
 import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent } from "@/lib/live-class-client";
 import {
   buildLessonActivityPool,
@@ -852,6 +853,8 @@ export function Year2LessonEngine({
           status === "correct" ? "animate-pulse" : ""
         }`}
       />
+
+      <SurgeAmbience comboCount={comboCount} />
 
       <div className="grid gap-3 lg:grid-cols-[300px_1fr] lg:items-start lg:gap-5">
         <aside className="lg:sticky lg:top-4 lg:self-start">
