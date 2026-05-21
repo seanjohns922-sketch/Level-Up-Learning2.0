@@ -19,12 +19,13 @@ import {
 // positions to break the flat-menu feel. `depth` ∈ [0..1] — 0 = far/distant
 // (small + cool), 1 = foreground (large + saturated). `anchor` is where the
 // holographic label tethers to the structure ("top" | "side").
+// left/top = where the TOP-LEFT of the label text block sits (no translate)
 const DISTRICT_ZONES = [
-  { id: "counting", name: "COUNTING DISTRICT", sub: "WEEKS 1–3",   weekStart: 1,  weekEnd: 3,  left: "11%", top: "68%", color: "#14b8a6", depth: 0.95, anchor: "top",  panX: 14 },
-  { id: "bridge",   name: "NUMBER BRIDGE",      sub: "WEEKS 4–6",   weekStart: 4,  weekEnd: 6,  left: "30%", top: "64%", color: "#22d3ee", depth: 0.75, anchor: "top",  panX: 6  },
-  { id: "tower",    name: "LEGEND TOWER",       sub: "WEEK 12",     weekStart: 12, weekEnd: 12, left: "50%", top: "73%", color: "#fbbf24", depth: 1.00, anchor: "side", panX: 0  },
-  { id: "core",     name: "CALCULATION CORE",   sub: "WEEKS 7–9",   weekStart: 7,  weekEnd: 9,  left: "70%", top: "64%", color: "#f472b6", depth: 0.85, anchor: "top",  panX: -8 },
-  { id: "mastery",  name: "MASTERY SECTOR",     sub: "WEEKS 10–12", weekStart: 10, weekEnd: 11, left: "86%", top: "18%", color: "#a78bfa", depth: 0.55, anchor: "side", panX: -14},
+  { id: "counting", name: "COUNTING DISTRICT", sub: "WEEKS 1–3",   weekStart: 1,  weekEnd: 3,  left: "4%",  top: "18%", color: "#14b8a6", panX: 14 },
+  { id: "bridge",   name: "NUMBER BRIDGE",      sub: "WEEKS 4–6",   weekStart: 4,  weekEnd: 6,  left: "26%", top: "36%", color: "#22d3ee", panX: 6  },
+  { id: "tower",    name: "LEGEND TOWER",        sub: "WEEK 12",     weekStart: 12, weekEnd: 12, left: "50%", top: "46%", color: "#fbbf24", panX: 0  },
+  { id: "core",     name: "CALCULATION CORE",   sub: "WEEKS 7–9",   weekStart: 7,  weekEnd: 9,  left: "60%", top: "16%", color: "#f472b6", panX: -8 },
+  { id: "mastery",  name: "MASTERY SECTOR",      sub: "WEEKS 10–12", weekStart: 10, weekEnd: 11, left: "76%", top: "6%",  color: "#a78bfa", panX: -14},
 ] as const;
 
 // ─── World canvas (particles + vehicles + tower pulse) ──────────────────────────
@@ -149,10 +150,8 @@ function useWorldCanvas() {
   return ref;
 }
 
-// ─── District structures ───────────────────────────────────────────────────────
-// One bespoke shape per district id. Renders as an SVG so the structure feels
-// like part of the city, then a small floating holo-label tethers to it.
-function DistrictStructure({
+// ─── District label — just crisp text, no card chrome ─────────────────────────
+function DistrictLabel({
   zone, state, active, onClick,
 }: {
   zone: (typeof DISTRICT_ZONES)[number];
@@ -161,356 +160,75 @@ function DistrictStructure({
   onClick: () => void;
 }) {
   const [hovered, setHovered] = useState(false);
-  const interactive = state !== "locked";
+  const locked = state === "locked";
 
-  // Visual tone per state
-  const tone =
-    state === "locked"   ? { fill: "#081828", stroke: "#1e4060", glow: "rgba(0,0,0,0)",        labelTxt: "🔒 LOCKED",  labelCol: "rgba(100,140,180,0.5)" }
-  : state === "complete" ? { fill: "#0a3c36", stroke: "#14b8a6", glow: "rgba(20,184,166,0.6)", labelTxt: "✓ COMPLETE", labelCol: "#5eead4" }
-                         : { fill: zone.color, stroke: "#ffffff", glow: `${zone.color}cc`,      labelTxt: "▶ ENTER",    labelCol: "#ffffff" };
-
-  // Depth-aware scale; active district gets a bump
-  const baseScale = 0.7 + zone.depth * 0.55; // 0.7..1.25
-  const scale = (active ? baseScale * 1.08 : hovered && interactive ? baseScale * 1.04 : baseScale);
-
-  // Distance dimming: locked = dim silhouette; unlocked scales with depth
-  const distOpacity = state === "locked" ? 0.38 + zone.depth * 0.18 : 0.6 + zone.depth * 0.38;
+  const nameColor  = locked ? "rgba(90,120,160,0.45)" : "#ffffff";
+  const subColor   = locked ? "rgba(70,100,140,0.4)"  : zone.color;
+  const nameGlow   = locked ? "none" : `0 0 22px ${zone.color}99, 0 0 8px ${zone.color}55, 0 2px 10px rgba(0,0,0,0.95)`;
+  const statusText = state === "complete" ? "✓ COMPLETE" : locked ? "🔒 LOCKED" : "▶ ENTER";
 
   return (
     <div
-      onClick={interactive ? onClick : undefined}
+      onClick={!locked ? onClick : undefined}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        position: "relative",
-        cursor: interactive ? "pointer" : "default",
+        cursor: !locked ? "pointer" : "default",
         userSelect: "none",
-        transform: `scale(${scale})`,
-        transformOrigin: "center bottom",
-        transition: "transform 0.4s cubic-bezier(0.22,1,0.36,1), filter 0.3s",
-        filter: `drop-shadow(0 18px 30px rgba(0,0,0,0.55)) drop-shadow(0 0 ${active ? 22 : 10}px ${tone.glow})`,
-        opacity: distOpacity,
+        display: "flex",
+        flexDirection: "column",
+        gap: 5,
+        transform: active ? "scale(1.06)" : hovered && !locked ? "scale(1.03)" : "scale(1)",
+        transformOrigin: "left top",
+        transition: "transform 0.3s ease",
         pointerEvents: "auto",
-      }}
-    >
-      {/* The structure itself */}
-      <Structure id={zone.id} tone={tone} active={active} />
-
-      {/* Ground anchor glow — ties structure to the world */}
-      <div style={{
-        position: "absolute",
-        bottom: -8,
-        left: "50%",
-        transform: "translateX(-50%)",
-        width: "85%",
-        height: 18,
-        borderRadius: "50%",
-        background: `radial-gradient(ellipse, ${tone.stroke}55 0%, transparent 70%)`,
-        filter: "blur(5px)",
-        pointerEvents: "none",
-      }} />
-
-      {/* Tethered holo-label */}
-      <HoloLabel
-        zone={zone}
-        tone={tone}
-        active={active}
-        state={state}
-      />
-    </div>
-  );
-}
-
-function Structure({
-  id, tone, active,
-}: {
-  id: typeof DISTRICT_ZONES[number]["id"];
-  tone: { fill: string; stroke: string; glow: string };
-  active: boolean;
-}) {
-  const f = tone.fill, s = tone.stroke;
-
-  if (id === "counting") {
-    // Data-terminal tower: glowing number readout panels + antenna beacon
-    return (
-      <svg width="132" height="198" viewBox="0 0 132 198" style={{ display: "block" }}>
-        <defs>
-          <linearGradient id="ct" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={f} stopOpacity="0.95" />
-            <stop offset="100%" stopColor="#021418" stopOpacity="0.96" />
-          </linearGradient>
-        </defs>
-        {/* Main body */}
-        <rect x="18" y="42" width="96" height="138" rx="7" fill="url(#ct)" stroke={s} strokeOpacity="0.7" strokeWidth="1.5" />
-        {/* Side wing panels */}
-        <rect x="6"  y="70" width="14" height="80" rx="3" fill="#031018" stroke={s} strokeOpacity="0.45" />
-        <rect x="112" y="70" width="14" height="80" rx="3" fill="#031018" stroke={s} strokeOpacity="0.45" />
-        {/* Readout panels — animated digits */}
-        {[0,1,2,3,4].map(i => (
-          <g key={i}>
-            <rect x="28" y={58 + i*22} width="76" height="14" rx="3" fill={s} opacity={active ? 0.45 : 0.22}>
-              <animate attributeName="opacity" values={`${0.2};${0.65};${0.2}`} dur={`${1.5 + i*0.28}s`} repeatCount="indefinite" />
-            </rect>
-            {/* Digit dots */}
-            {Array.from({length:6}).map((_,d)=>(
-              <circle key={d} cx={36 + d*12} cy={65 + i*22} r="2.5" fill="#fff" opacity="0.35">
-                <animate attributeName="opacity" values={`0.15;${0.6 + d*0.05};0.15`} dur={`${0.9 + d*0.15 + i*0.1}s`} repeatCount="indefinite" />
-              </circle>
-            ))}
-          </g>
-        ))}
-        {/* Base plinth */}
-        <rect x="8" y="180" width="116" height="14" rx="3" fill="#021018" stroke={s} strokeOpacity="0.45" />
-        {/* Antenna rod */}
-        <rect x="63" y="10" width="6" height="34" fill={s} opacity="0.85" />
-        {/* Beacon */}
-        <circle cx="66" cy="8" r="5" fill={s}>
-          <animate attributeName="r" values="3.5;6;3.5" dur="1.5s" repeatCount="indefinite" />
-          <animate attributeName="opacity" values="0.7;1;0.7" dur="1.5s" repeatCount="indefinite" />
-        </circle>
-      </svg>
-    );
-  }
-
-  if (id === "bridge") {
-    // Suspension bridge spanning between two skyscrapers
-    return (
-      <svg width="220" height="130" viewBox="0 0 220 130" style={{ display: "block" }}>
-        {/* Two skyscraper pylons */}
-        <rect x="6"   y="20" width="28" height="100" rx="3" fill="#03161e" stroke={s} strokeOpacity="0.5" />
-        <rect x="186" y="20" width="28" height="100" rx="3" fill="#03161e" stroke={s} strokeOpacity="0.5" />
-        {/* Pylon tops */}
-        <rect x="14"  y="8" width="12" height="14" fill={s} opacity="0.6" />
-        <rect x="194" y="8" width="12" height="14" fill={s} opacity="0.6" />
-        {/* Suspension cables (curved) */}
-        <path d="M20 22 Q110 88 200 22" stroke={s} strokeWidth="1.5" fill="none" opacity="0.85" />
-        <path d="M20 28 Q110 96 200 28" stroke={s} strokeWidth="1"   fill="none" opacity="0.5" />
-        {/* Vertical cable hangers */}
-        {Array.from({length:9}).map((_,i)=>{
-          const x = 30 + i*20;
-          const cy = 22 + Math.sin(((x-20)/180)*Math.PI)*66;
-          return <line key={i} x1={x} y1={cy} x2={x} y2={84} stroke={s} strokeOpacity="0.4" strokeWidth="0.8" />;
-        })}
-        {/* Deck */}
-        <rect x="20" y="82" width="180" height="8" rx="2" fill={f} stroke={s} strokeOpacity="0.7" />
-        {/* Glowing road centerline */}
-        <line x1="24" y1="86" x2="196" y2="86" stroke={s} strokeWidth="1.5" strokeDasharray="6 5" opacity={active?0.9:0.5}>
-          <animate attributeName="stroke-dashoffset" from="0" to="-22" dur="1.2s" repeatCount="indefinite" />
-        </line>
-      </svg>
-    );
-  }
-
-  if (id === "tower") {
-    // Legend Tower — massive dominant spire, centrepiece of the city
-    return (
-      <svg width="170" height="340" viewBox="0 0 170 340" style={{ display: "block" }}>
-        <defs>
-          <linearGradient id="tw" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={f} stopOpacity="0.98" />
-            <stop offset="40%" stopColor="#8a6010" stopOpacity="0.92" />
-            <stop offset="100%" stopColor="#02141a" stopOpacity="0.96" />
-          </linearGradient>
-          <linearGradient id="twb" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={f} stopOpacity="0.3" />
-            <stop offset="100%" stopColor={f} stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        {/* Light beam upward from spire */}
-        <rect x="80" y="0" width="10" height="50" fill="url(#twb)" opacity="0.7">
-          <animate attributeName="opacity" values="0.4;0.9;0.4" dur="2.4s" repeatCount="indefinite" />
-        </rect>
-        {/* Spire needle */}
-        <polygon points="85,4 96,46 74,46" fill={s} opacity="0.95">
-          <animate attributeName="opacity" values="0.75;1;0.75" dur="2.2s" repeatCount="indefinite" />
-        </polygon>
-        {/* Rotating halo ring */}
-        <ellipse cx="85" cy="48" rx="38" ry="7" fill="none" stroke={s} strokeWidth="1.5" strokeOpacity="0.75">
-          <animate attributeName="rx" values="30;42;30" dur="3.2s" repeatCount="indefinite" />
-          <animate attributeName="opacity" values="0.5;0.9;0.5" dur="3.2s" repeatCount="indefinite" />
-        </ellipse>
-        {/* Upper stepped body */}
-        <polygon points="56,46 114,46 110,108 60,108" fill="url(#tw)" stroke={s} strokeOpacity="0.75" />
-        {/* Mid stepped body */}
-        <polygon points="44,108 126,108 122,196 48,196" fill="url(#tw)" stroke={s} strokeOpacity="0.65" />
-        {/* Lower stepped body */}
-        <polygon points="30,196 140,196 136,288 34,288" fill="url(#tw)" stroke={s} strokeOpacity="0.55" />
-        {/* Window grid — three columns */}
-        {Array.from({length:7}).map((_,row)=>(
-          Array.from({length:4}).map((__,col)=>{
-            const x = 58 + col*14, y = 120 + row*22;
-            return <rect key={`${row}-${col}`} x={x} y={y} width="8" height="10" fill={s} opacity={active ? 0.55 + (row%2)*0.3 : 0.2 + (row%2)*0.15}>
-              {active && <animate attributeName="opacity" values={`${0.3+(col%3)*0.2};${0.7+(col%3)*0.25};${0.3+(col%3)*0.2}`} dur={`${1.4+row*0.18}s`} repeatCount="indefinite" />}
-            </rect>;
-          })
-        ))}
-        {/* Corner buttresses */}
-        <rect x="28" y="160" width="10" height="128" fill={s} opacity="0.25" />
-        <rect x="132" y="160" width="10" height="128" fill={s} opacity="0.25" />
-        {/* Base platform */}
-        <rect x="16" y="288" width="138" height="40" rx="4" fill="#02141a" stroke={s} strokeOpacity="0.55" />
-        {/* Base glow ring */}
-        <ellipse cx="85" cy="286" rx="58" ry="8" fill="none" stroke={s} strokeOpacity={active ? 0.7 : 0.3}>
-          <animate attributeName="rx" values="52;64;52" dur="4s" repeatCount="indefinite" />
-        </ellipse>
-      </svg>
-    );
-  }
-
-  if (id === "core") {
-    // Calculation Reactor — energy orb with triple rotating rings + pipes
-    return (
-      <svg width="172" height="196" viewBox="0 0 172 196" style={{ display: "block" }}>
-        {/* Support tower */}
-        <rect x="80" y="108" width="12" height="52" fill="#031a20" stroke={s} strokeOpacity="0.5" />
-        {/* Plinth */}
-        <rect x="20" y="158" width="132" height="32" rx="5" fill="#031620" stroke={s} strokeOpacity="0.55" />
-        {/* Side connector pipes */}
-        <rect x="2"   y="86" width="26" height="12" rx="3" fill="#031620" stroke={s} strokeOpacity="0.5" />
-        <rect x="144" y="86" width="26" height="12" rx="3" fill="#031620" stroke={s} strokeOpacity="0.5" />
-        {/* Energy conduit lines */}
-        <line x1="28" y1="92" x2="54" y2="88" stroke={s} strokeOpacity="0.55" strokeWidth="1.5" />
-        <line x1="144" y1="92" x2="118" y2="88" stroke={s} strokeOpacity="0.55" strokeWidth="1.5" />
-        {/* Core orb outer glow */}
-        <circle cx="86" cy="80" r="36" fill={f} opacity="0.18" />
-        {/* Core orb */}
-        <circle cx="86" cy="80" r="28" fill={f} opacity="0.88" />
-        <circle cx="86" cy="80" r="28" fill="none" stroke={s} strokeWidth="2" strokeOpacity="0.85" />
-        {/* Inner bright core */}
-        <circle cx="86" cy="80" r="14" fill="#fff" opacity={active ? 0.9 : 0.5}>
-          <animate attributeName="opacity" values="0.45;0.95;0.45" dur="1.7s" repeatCount="indefinite" />
-        </circle>
-        <circle cx="86" cy="80" r="6" fill="#fff" opacity="0.95" />
-        {/* Rotating rings — 3 axes */}
-        <g style={{ transformOrigin: "86px 80px", animation: "core-spin 5s linear infinite" }}>
-          <ellipse cx="86" cy="80" rx="48" ry="14" fill="none" stroke={s} strokeWidth="1.8" strokeOpacity="0.9" />
-        </g>
-        <g style={{ transformOrigin: "86px 80px", animation: "core-spin 7s linear infinite reverse" }}>
-          <ellipse cx="86" cy="80" rx="40" ry="24" fill="none" stroke={s} strokeWidth="1.2" strokeOpacity="0.6" />
-        </g>
-        <g style={{ transformOrigin: "86px 80px", animation: "core-spin 9s linear infinite" }}>
-          <ellipse cx="86" cy="80" rx="32" ry="32" fill="none" stroke={s} strokeWidth="0.8" strokeOpacity="0.35" strokeDasharray="4 4" />
-        </g>
-      </svg>
-    );
-  }
-
-  // mastery — floating elite platform high in skyline
-  return (
-    <svg width="120" height="120" viewBox="0 0 120 120" style={{ display: "block" }}>
-      {/* Floating disc */}
-      <ellipse cx="60" cy="72" rx="50" ry="14" fill={f} opacity="0.9" stroke={s} strokeOpacity="0.7" />
-      <ellipse cx="60" cy="68" rx="50" ry="14" fill="#02141a" stroke={s} strokeOpacity="0.4" />
-      {/* Platform pillar */}
-      <rect x="56" y="40" width="8" height="32" fill={s} opacity="0.65" />
-      {/* Diamond crown */}
-      <polygon points="60,14 78,38 60,46 42,38" fill={f} stroke={s} strokeOpacity="0.85" opacity="0.95">
-        <animate attributeName="opacity" values="0.7;1;0.7" dur="2.4s" repeatCount="indefinite" />
-      </polygon>
-      {/* Anti-grav rings under disc */}
-      <ellipse cx="60" cy="92" rx="40" ry="6" fill="none" stroke={s} strokeOpacity="0.45">
-        <animate attributeName="rx" values="34;46;34" dur="2.6s" repeatCount="indefinite" />
-        <animate attributeName="opacity" values="0.1;0.55;0.1" dur="2.6s" repeatCount="indefinite" />
-      </ellipse>
-    </svg>
-  );
-}
-
-function HoloLabel({
-  zone, tone, active, state,
-}: {
-  zone: (typeof DISTRICT_ZONES)[number];
-  tone: { fill: string; stroke: string; glow: string; labelTxt: string; labelCol: string };
-  active: boolean;
-  state: "complete" | "current" | "locked";
-}) {
-  // Anchor offset — top or side of structure
-  const top = zone.anchor === "side" ? "10%" : "-32px";
-  const left = zone.anchor === "side" ? "calc(100% + 14px)" : "50%";
-  const translate = zone.anchor === "side" ? "translate(0,-50%)" : "translate(-50%,-100%)";
-
-  return (
-    <div
-      style={{
-        position: "absolute",
-        top, left,
-        transform: translate,
-        pointerEvents: "none",
         whiteSpace: "nowrap",
       }}
     >
-      {/* Tether line */}
-      <div
-        style={{
-          position: "absolute",
-          ...(zone.anchor === "side"
-            ? { left: -14, top: "50%", width: 14, height: 1 }
-            : { left: "50%", bottom: -8, width: 1, height: 8, transform: "translateX(-50%)" }),
-          background: tone.stroke,
-          opacity: 0.6,
-        }}
-      />
-      {/* Glowing dot at tether origin */}
-      <div
-        style={{
-          position: "absolute",
-          ...(zone.anchor === "side"
-            ? { left: -18, top: "50%", transform: "translateY(-50%)" }
-            : { left: "50%", bottom: -12, transform: "translateX(-50%)" }),
-          width: 6, height: 6, borderRadius: "50%",
-          background: tone.stroke,
-          boxShadow: `0 0 10px ${tone.stroke}`,
-          animation: state !== "locked" ? "holo-dot 1.6s ease-in-out infinite" : "none",
-        }}
-      />
-      {/* The label itself — bare, no card chrome */}
-      <div
-        style={{
-          display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 2,
-          padding: "2px 0",
-        }}
-      >
-        <span style={{
-          color: tone.labelCol,
-          fontSize: 13,
-          fontWeight: 900,
-          letterSpacing: "0.2em",
-          fontFamily: "ui-monospace, monospace",
-          textShadow: state !== "locked"
-            ? `0 0 18px ${tone.stroke}, 0 0 6px ${tone.stroke}88, 0 2px 8px rgba(0,0,0,0.95)`
-            : "0 1px 5px rgba(0,0,0,0.8)",
-        }}>
-          {zone.name}
-        </span>
-        <span style={{
-          color: tone.stroke,
-          fontSize: 9,
-          opacity: state === "locked" ? 0.4 : 0.88,
-          letterSpacing: "0.18em",
-          fontFamily: "ui-monospace, monospace",
-          textShadow: "0 1px 4px rgba(0,0,0,0.9)",
-        }}>
-          {zone.sub}  ·  {tone.labelTxt}
-        </span>
-        {active && state !== "locked" && (
-          <span
-            style={{
-              marginTop: 2,
-              fontSize: 8,
-              fontWeight: 900,
-              letterSpacing: "0.24em",
-              fontFamily: "ui-monospace, monospace",
-              color: tone.stroke,
-              padding: "1px 6px",
-              border: `1px solid ${tone.stroke}`,
-              borderRadius: 3,
-              animation: "holo-scan 2.4s linear infinite",
-            }}
-          >
-            TAP TO ENTER
-          </span>
-        )}
+      {/* District name */}
+      <div style={{
+        color: nameColor,
+        fontSize: 20,
+        fontWeight: 900,
+        letterSpacing: "0.2em",
+        fontFamily: "ui-monospace, monospace",
+        textShadow: nameGlow,
+        lineHeight: 1.1,
+      }}>
+        {zone.name}
       </div>
+
+      {/* Weeks · Status */}
+      <div style={{
+        color: subColor,
+        fontSize: 11,
+        fontWeight: 700,
+        letterSpacing: "0.18em",
+        fontFamily: "ui-monospace, monospace",
+        textShadow: "0 1px 8px rgba(0,0,0,0.95)",
+        opacity: locked ? 0.45 : 0.9,
+      }}>
+        {zone.sub}  ·  {statusText}
+      </div>
+
+      {/* TAP TO ENTER badge — active district only */}
+      {active && !locked && (
+        <div style={{
+          display: "inline-block",
+          padding: "3px 11px",
+          border: `1px solid ${zone.color}`,
+          borderRadius: 3,
+          color: zone.color,
+          fontSize: 9,
+          fontWeight: 800,
+          letterSpacing: "0.24em",
+          fontFamily: "ui-monospace, monospace",
+          textShadow: `0 0 10px ${zone.color}`,
+          boxShadow: `0 0 12px ${zone.color}33`,
+        }}>
+          TAP TO ENTER
+        </div>
+      )}
     </div>
   );
 }
@@ -772,29 +490,25 @@ export default function NumberNexusMap() {
           pointerEvents: "none",
         }}
       >
-        {/* Render far-depth districts first so closer ones overlap them */}
-        {[...DISTRICT_ZONES]
-          .sort((a, b) => a.depth - b.depth)
-          .map((zone) => (
-            <div
-              key={zone.id}
-              style={{
-                position: "absolute",
-                left: zone.left,
-                top: zone.top,
-                transform: "translate(-50%, -100%)",
-                pointerEvents: "auto",
-                zIndex: Math.round(zone.depth * 10),
-              }}
-            >
-              <DistrictStructure
-                zone={zone}
-                state={zoneState(zone)}
-                active={activeZoneId === zone.id}
-                onClick={() => onDistrictTap(zone.weekStart, zone.weekEnd)}
-              />
-            </div>
-          ))}
+        {/* District text labels — crisp, no card chrome */}
+        {DISTRICT_ZONES.map((zone) => (
+          <div
+            key={zone.id}
+            style={{
+              position: "absolute",
+              left: zone.left,
+              top: zone.top,
+              pointerEvents: "auto",
+            }}
+          >
+            <DistrictLabel
+              zone={zone}
+              state={zoneState(zone)}
+              active={activeZoneId === zone.id}
+              onClick={() => onDistrictTap(zone.weekStart, zone.weekEnd)}
+            />
+          </div>
+        ))}
 
         {/* Character — drifts horizontally toward the active district */}
         <div style={{
