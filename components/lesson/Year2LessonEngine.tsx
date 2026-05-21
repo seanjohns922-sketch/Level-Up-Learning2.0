@@ -6,6 +6,7 @@ import { LessonRenderer } from "@/components/lesson/LessonRenderer";
 import { LessonHUDRail } from "@/components/lesson/LessonHUDRail";
 import { LessonCompleteCard } from "@/components/lesson/LessonCompleteCard";
 import { ComboMilestonePop } from "@/components/lesson/ComboMilestonePop";
+import SurgeAmbience from "@/components/lesson/SurgeAmbience";
 import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent } from "@/lib/live-class-client";
 import {
   buildLessonActivityPool,
