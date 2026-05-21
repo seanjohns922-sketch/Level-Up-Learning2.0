@@ -854,6 +854,14 @@ export default function NumberNexusMap() {
           0%, 100% { opacity: 0.7; }
           50%       { opacity: 1.0; }
         }
+        @keyframes core-spin {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
+        }
+        @keyframes holo-dot {
+          0%, 100% { transform: scale(1);   opacity: 0.85; }
+          50%       { transform: scale(1.6); opacity: 1;   }
+        }
       `}</style>
     </div>
   );
