@@ -165,16 +165,16 @@ function DistrictStructure({
 
   // Visual tone per state
   const tone =
-    state === "locked"   ? { fill: "#1c2a3a", stroke: "#2d3a55", glow: "rgba(0,0,0,0)",        labelTxt: "🔒 LOCKED",  labelCol: "rgba(120,140,170,0.55)" }
-  : state === "complete" ? { fill: "#0f4a45", stroke: "#14b8a6", glow: "rgba(20,184,166,0.55)", labelTxt: "✓ COMPLETE", labelCol: "#5eead4" }
-                         : { fill: zone.color, stroke: "#ffffff", glow: `${zone.color}aa`,      labelTxt: "▶ ENTER",    labelCol: "#ffffff" };
+    state === "locked"   ? { fill: "#081828", stroke: "#1e4060", glow: "rgba(0,0,0,0)",        labelTxt: "🔒 LOCKED",  labelCol: "rgba(100,140,180,0.5)" }
+  : state === "complete" ? { fill: "#0a3c36", stroke: "#14b8a6", glow: "rgba(20,184,166,0.6)", labelTxt: "✓ COMPLETE", labelCol: "#5eead4" }
+                         : { fill: zone.color, stroke: "#ffffff", glow: `${zone.color}cc`,      labelTxt: "▶ ENTER",    labelCol: "#ffffff" };
 
   // Depth-aware scale; active district gets a bump
   const baseScale = 0.7 + zone.depth * 0.55; // 0.7..1.25
   const scale = (active ? baseScale * 1.08 : hovered && interactive ? baseScale * 1.04 : baseScale);
 
-  // Distance dimming for far structures
-  const distOpacity = state === "locked" ? 0.55 : 0.55 + zone.depth * 0.45;
+  // Distance dimming: locked = dim silhouette; unlocked scales with depth
+  const distOpacity = state === "locked" ? 0.38 + zone.depth * 0.18 : 0.6 + zone.depth * 0.38;
 
   return (
     <div
@@ -195,6 +195,20 @@ function DistrictStructure({
     >
       {/* The structure itself */}
       <Structure id={zone.id} tone={tone} active={active} />
+
+      {/* Ground anchor glow — ties structure to the world */}
+      <div style={{
+        position: "absolute",
+        bottom: -8,
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: "85%",
+        height: 18,
+        borderRadius: "50%",
+        background: `radial-gradient(ellipse, ${tone.stroke}55 0%, transparent 70%)`,
+        filter: "blur(5px)",
+        pointerEvents: "none",
+      }} />
 
       {/* Tethered holo-label */}
       <HoloLabel
@@ -217,28 +231,42 @@ function Structure({
   const f = tone.fill, s = tone.stroke;
 
   if (id === "counting") {
-    // Stubby data-terminal tower with antenna + glowing readout panels
+    // Data-terminal tower: glowing number readout panels + antenna beacon
     return (
-      <svg width="118" height="170" viewBox="0 0 118 170" style={{ display: "block" }}>
+      <svg width="132" height="198" viewBox="0 0 132 198" style={{ display: "block" }}>
         <defs>
           <linearGradient id="ct" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor={f} stopOpacity="0.95" />
-            <stop offset="100%" stopColor="#02141a" stopOpacity="0.95" />
+            <stop offset="100%" stopColor="#021418" stopOpacity="0.96" />
           </linearGradient>
         </defs>
-        <rect x="22" y="38" width="74" height="118" rx="6" fill="url(#ct)" stroke={s} strokeOpacity="0.7" />
-        {/* readout panels */}
-        {[0,1,2,3].map(i => (
-          <rect key={i} x="30" y={54 + i*22} width="58" height="12" rx="2" fill={s} opacity={active ? 0.55 : 0.35}>
-            <animate attributeName="opacity" values="0.25;0.7;0.25" dur={`${1.6 + i*0.3}s`} repeatCount="indefinite" />
-          </rect>
+        {/* Main body */}
+        <rect x="18" y="42" width="96" height="138" rx="7" fill="url(#ct)" stroke={s} strokeOpacity="0.7" strokeWidth="1.5" />
+        {/* Side wing panels */}
+        <rect x="6"  y="70" width="14" height="80" rx="3" fill="#031018" stroke={s} strokeOpacity="0.45" />
+        <rect x="112" y="70" width="14" height="80" rx="3" fill="#031018" stroke={s} strokeOpacity="0.45" />
+        {/* Readout panels — animated digits */}
+        {[0,1,2,3,4].map(i => (
+          <g key={i}>
+            <rect x="28" y={58 + i*22} width="76" height="14" rx="3" fill={s} opacity={active ? 0.45 : 0.22}>
+              <animate attributeName="opacity" values={`${0.2};${0.65};${0.2}`} dur={`${1.5 + i*0.28}s`} repeatCount="indefinite" />
+            </rect>
+            {/* Digit dots */}
+            {Array.from({length:6}).map((_,d)=>(
+              <circle key={d} cx={36 + d*12} cy={65 + i*22} r="2.5" fill="#fff" opacity="0.35">
+                <animate attributeName="opacity" values={`0.15;${0.6 + d*0.05};0.15`} dur={`${0.9 + d*0.15 + i*0.1}s`} repeatCount="indefinite" />
+              </circle>
+            ))}
+          </g>
         ))}
-        {/* base plinth */}
-        <rect x="10" y="156" width="98" height="10" rx="2" fill="#02141a" stroke={s} strokeOpacity="0.4" />
-        {/* antenna */}
-        <rect x="56" y="10" width="6" height="30" fill={s} opacity="0.8" />
-        <circle cx="59" cy="8" r="4" fill={s}>
-          <animate attributeName="r" values="3;5;3" dur="1.6s" repeatCount="indefinite" />
+        {/* Base plinth */}
+        <rect x="8" y="180" width="116" height="14" rx="3" fill="#021018" stroke={s} strokeOpacity="0.45" />
+        {/* Antenna rod */}
+        <rect x="63" y="10" width="6" height="34" fill={s} opacity="0.85" />
+        {/* Beacon */}
+        <circle cx="66" cy="8" r="5" fill={s}>
+          <animate attributeName="r" values="3.5;6;3.5" dur="1.5s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.7;1;0.7" dur="1.5s" repeatCount="indefinite" />
         </circle>
       </svg>
     );
@@ -274,62 +302,94 @@ function Structure({
   }
 
   if (id === "tower") {
-    // Tall central legend spire — dominant
+    // Legend Tower — massive dominant spire, centrepiece of the city
     return (
-      <svg width="140" height="280" viewBox="0 0 140 280" style={{ display: "block" }}>
+      <svg width="170" height="340" viewBox="0 0 170 340" style={{ display: "block" }}>
         <defs>
           <linearGradient id="tw" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={f} stopOpacity="0.95" />
-            <stop offset="50%" stopColor="#5a4214" stopOpacity="0.9" />
-            <stop offset="100%" stopColor="#02141a" stopOpacity="0.95" />
+            <stop offset="0%" stopColor={f} stopOpacity="0.98" />
+            <stop offset="40%" stopColor="#8a6010" stopOpacity="0.92" />
+            <stop offset="100%" stopColor="#02141a" stopOpacity="0.96" />
+          </linearGradient>
+          <linearGradient id="twb" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={f} stopOpacity="0.3" />
+            <stop offset="100%" stopColor={f} stopOpacity="0" />
           </linearGradient>
         </defs>
-        {/* Spire crown */}
-        <polygon points="70,4 84,40 56,40" fill={s} opacity="0.9">
-          <animate attributeName="opacity" values="0.7;1;0.7" dur="2.2s" repeatCount="indefinite" />
+        {/* Light beam upward from spire */}
+        <rect x="80" y="0" width="10" height="50" fill="url(#twb)" opacity="0.7">
+          <animate attributeName="opacity" values="0.4;0.9;0.4" dur="2.4s" repeatCount="indefinite" />
+        </rect>
+        {/* Spire needle */}
+        <polygon points="85,4 96,46 74,46" fill={s} opacity="0.95">
+          <animate attributeName="opacity" values="0.75;1;0.75" dur="2.2s" repeatCount="indefinite" />
         </polygon>
-        {/* Stepped tower body — narrows toward top */}
-        <polygon points="44,40 96,40 92,90 48,90" fill="url(#tw)" stroke={s} strokeOpacity="0.7" />
-        <polygon points="36,90 104,90 100,160 40,160" fill="url(#tw)" stroke={s} strokeOpacity="0.6" />
-        <polygon points="28,160 112,160 108,240 32,240" fill="url(#tw)" stroke={s} strokeOpacity="0.5" />
-        {/* Window grid */}
-        {Array.from({length:6}).map((_,row)=>(
-          Array.from({length:5}).map((__,col)=>{
-            const x = 42 + col*12, y = 100 + row*22;
-            return <rect key={`${row}-${col}`} x={x} y={y} width="6" height="8" fill={s} opacity={0.25 + (row%2)*0.25} />;
+        {/* Rotating halo ring */}
+        <ellipse cx="85" cy="48" rx="38" ry="7" fill="none" stroke={s} strokeWidth="1.5" strokeOpacity="0.75">
+          <animate attributeName="rx" values="30;42;30" dur="3.2s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.5;0.9;0.5" dur="3.2s" repeatCount="indefinite" />
+        </ellipse>
+        {/* Upper stepped body */}
+        <polygon points="56,46 114,46 110,108 60,108" fill="url(#tw)" stroke={s} strokeOpacity="0.75" />
+        {/* Mid stepped body */}
+        <polygon points="44,108 126,108 122,196 48,196" fill="url(#tw)" stroke={s} strokeOpacity="0.65" />
+        {/* Lower stepped body */}
+        <polygon points="30,196 140,196 136,288 34,288" fill="url(#tw)" stroke={s} strokeOpacity="0.55" />
+        {/* Window grid — three columns */}
+        {Array.from({length:7}).map((_,row)=>(
+          Array.from({length:4}).map((__,col)=>{
+            const x = 58 + col*14, y = 120 + row*22;
+            return <rect key={`${row}-${col}`} x={x} y={y} width="8" height="10" fill={s} opacity={active ? 0.55 + (row%2)*0.3 : 0.2 + (row%2)*0.15}>
+              {active && <animate attributeName="opacity" values={`${0.3+(col%3)*0.2};${0.7+(col%3)*0.25};${0.3+(col%3)*0.2}`} dur={`${1.4+row*0.18}s`} repeatCount="indefinite" />}
+            </rect>;
           })
         ))}
-        {/* Base */}
-        <rect x="20" y="240" width="100" height="34" rx="3" fill="#02141a" stroke={s} strokeOpacity="0.5" />
-        {/* Halo rings around spire */}
-        <ellipse cx="70" cy="42" rx="32" ry="6" fill="none" stroke={s} strokeOpacity="0.6">
-          <animate attributeName="rx" values="28;36;28" dur="3s" repeatCount="indefinite" />
+        {/* Corner buttresses */}
+        <rect x="28" y="160" width="10" height="128" fill={s} opacity="0.25" />
+        <rect x="132" y="160" width="10" height="128" fill={s} opacity="0.25" />
+        {/* Base platform */}
+        <rect x="16" y="288" width="138" height="40" rx="4" fill="#02141a" stroke={s} strokeOpacity="0.55" />
+        {/* Base glow ring */}
+        <ellipse cx="85" cy="286" rx="58" ry="8" fill="none" stroke={s} strokeOpacity={active ? 0.7 : 0.3}>
+          <animate attributeName="rx" values="52;64;52" dur="4s" repeatCount="indefinite" />
         </ellipse>
       </svg>
     );
   }
 
   if (id === "core") {
-    // Reactor — central orb with rotating rings + pipes
+    // Calculation Reactor — energy orb with triple rotating rings + pipes
     return (
-      <svg width="150" height="170" viewBox="0 0 150 170" style={{ display: "block" }}>
+      <svg width="172" height="196" viewBox="0 0 172 196" style={{ display: "block" }}>
+        {/* Support tower */}
+        <rect x="80" y="108" width="12" height="52" fill="#031a20" stroke={s} strokeOpacity="0.5" />
         {/* Plinth */}
-        <rect x="18" y="120" width="114" height="38" rx="5" fill="#03161e" stroke={s} strokeOpacity="0.5" />
-        {/* Side pipes */}
-        <rect x="2"   y="100" width="20" height="14" fill="#03161e" stroke={s} strokeOpacity="0.5" />
-        <rect x="128" y="100" width="20" height="14" fill="#03161e" stroke={s} strokeOpacity="0.5" />
+        <rect x="20" y="158" width="132" height="32" rx="5" fill="#031620" stroke={s} strokeOpacity="0.55" />
+        {/* Side connector pipes */}
+        <rect x="2"   y="86" width="26" height="12" rx="3" fill="#031620" stroke={s} strokeOpacity="0.5" />
+        <rect x="144" y="86" width="26" height="12" rx="3" fill="#031620" stroke={s} strokeOpacity="0.5" />
+        {/* Energy conduit lines */}
+        <line x1="28" y1="92" x2="54" y2="88" stroke={s} strokeOpacity="0.55" strokeWidth="1.5" />
+        <line x1="144" y1="92" x2="118" y2="88" stroke={s} strokeOpacity="0.55" strokeWidth="1.5" />
+        {/* Core orb outer glow */}
+        <circle cx="86" cy="80" r="36" fill={f} opacity="0.18" />
         {/* Core orb */}
-        <circle cx="75" cy="78" r="28" fill={f} opacity="0.85" />
-        <circle cx="75" cy="78" r="28" fill="none" stroke={s} strokeOpacity="0.8" />
-        <circle cx="75" cy="78" r="14" fill="#fff" opacity={active ? 0.85 : 0.55}>
-          <animate attributeName="opacity" values="0.4;0.95;0.4" dur="1.8s" repeatCount="indefinite" />
+        <circle cx="86" cy="80" r="28" fill={f} opacity="0.88" />
+        <circle cx="86" cy="80" r="28" fill="none" stroke={s} strokeWidth="2" strokeOpacity="0.85" />
+        {/* Inner bright core */}
+        <circle cx="86" cy="80" r="14" fill="#fff" opacity={active ? 0.9 : 0.5}>
+          <animate attributeName="opacity" values="0.45;0.95;0.45" dur="1.7s" repeatCount="indefinite" />
         </circle>
-        {/* Rotating ring */}
-        <g style={{ transformOrigin: "75px 78px", animation: "core-spin 6s linear infinite" }}>
-          <ellipse cx="75" cy="78" rx="44" ry="14" fill="none" stroke={s} strokeOpacity="0.85" strokeWidth="1.5" />
+        <circle cx="86" cy="80" r="6" fill="#fff" opacity="0.95" />
+        {/* Rotating rings — 3 axes */}
+        <g style={{ transformOrigin: "86px 80px", animation: "core-spin 5s linear infinite" }}>
+          <ellipse cx="86" cy="80" rx="48" ry="14" fill="none" stroke={s} strokeWidth="1.8" strokeOpacity="0.9" />
         </g>
-        <g style={{ transformOrigin: "75px 78px", animation: "core-spin 8s linear infinite reverse" }}>
-          <ellipse cx="75" cy="78" rx="38" ry="22" fill="none" stroke={s} strokeOpacity="0.55" strokeWidth="1" />
+        <g style={{ transformOrigin: "86px 80px", animation: "core-spin 7s linear infinite reverse" }}>
+          <ellipse cx="86" cy="80" rx="40" ry="24" fill="none" stroke={s} strokeWidth="1.2" strokeOpacity="0.6" />
+        </g>
+        <g style={{ transformOrigin: "86px 80px", animation: "core-spin 9s linear infinite" }}>
+          <ellipse cx="86" cy="80" rx="32" ry="32" fill="none" stroke={s} strokeWidth="0.8" strokeOpacity="0.35" strokeDasharray="4 4" />
         </g>
       </svg>
     );
@@ -412,21 +472,23 @@ function HoloLabel({
       >
         <span style={{
           color: tone.labelCol,
-          fontSize: 10,
+          fontSize: 13,
           fontWeight: 900,
-          letterSpacing: "0.22em",
+          letterSpacing: "0.2em",
           fontFamily: "ui-monospace, monospace",
-          textShadow: state !== "locked" ? `0 0 12px ${tone.stroke}, 0 2px 6px rgba(0,0,0,0.9)` : "0 1px 4px rgba(0,0,0,0.7)",
+          textShadow: state !== "locked"
+            ? `0 0 18px ${tone.stroke}, 0 0 6px ${tone.stroke}88, 0 2px 8px rgba(0,0,0,0.95)`
+            : "0 1px 5px rgba(0,0,0,0.8)",
         }}>
           {zone.name}
         </span>
         <span style={{
           color: tone.stroke,
-          fontSize: 8,
-          opacity: state === "locked" ? 0.45 : 0.9,
-          letterSpacing: "0.2em",
+          fontSize: 9,
+          opacity: state === "locked" ? 0.4 : 0.88,
+          letterSpacing: "0.18em",
           fontFamily: "ui-monospace, monospace",
-          textShadow: "0 1px 3px rgba(0,0,0,0.8)",
+          textShadow: "0 1px 4px rgba(0,0,0,0.9)",
         }}>
           {zone.sub}  ·  {tone.labelTxt}
         </span>
@@ -639,7 +701,7 @@ export default function NumberNexusMap() {
         alt=""
         style={{
           position: "absolute", inset: 0, width: "100%", height: "100%",
-          objectFit: "cover", objectPosition: "center 30%",
+          objectFit: "cover", objectPosition: "center 40%",
           zIndex: 0,
         }}
       />
