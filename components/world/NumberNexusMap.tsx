@@ -97,15 +97,14 @@ const BUILDINGS = genBuildings();
 
 // ─── 3D Components ────────────────────────────────────────────────────────────
 
-function CameraRig({ targetZ, viewWeek }: { targetZ: number; viewWeek: number }) {
+// Camera sits 18 units behind character, 11 units up — over-the-shoulder cinematic
+function CameraRig({ charZ }: { charZ: number }) {
   const { camera } = useThree();
   useFrame(() => {
     camera.position.x += (0 - camera.position.x) * 0.06;
-    camera.position.y += (3.8 - camera.position.y) * 0.06;
-    camera.position.z += (targetZ - camera.position.z) * 0.07;
-    const t = (viewWeek - 1) / 11;
-    // Look further up as we approach tower — dramatic upward angle close up
-    camera.lookAt(0, 8 + t * 32, 0);
+    camera.position.y += (11 - camera.position.y) * 0.06;
+    camera.position.z += ((charZ - 18) - camera.position.z) * 0.06;
+    camera.lookAt(0, 2.5, charZ);
   });
   return null;
 }
@@ -346,6 +345,115 @@ function LegendTower({ unlocked }: { unlocked: boolean }) {
   );
 }
 
+// ─── Player character ─────────────────────────────────────────────────────────
+// Simple stylised blocky character facing the tower (away from camera)
+function PlayerCharacter({ z, gender }: { z: number; gender: "boy" | "girl" }) {
+  const groupRef = useRef<THREE.Group>(null);
+  useFrame(({ clock }) => {
+    if (groupRef.current) {
+      groupRef.current.position.y = Math.sin(clock.elapsedTime * 1.4) * 0.06;
+    }
+  });
+
+  const skin     = "#c8825a";
+  const hair     = gender === "girl" ? "#3d1f06" : "#110a04";
+  const jacket   = "#0f2d5e";
+  const jacketE  = "#061828";
+  const pants    = "#0d1520";
+  const shoe     = "#090c12";
+  const pack     = "#0a3055";
+  const packE    = "#051a30";
+  const teal     = "#14b8a6";
+
+  // rotation={[0, Math.PI, 0]} faces character toward +z (toward tower)
+  return (
+    <group ref={groupRef} position={[0, 0, z]} rotation={[0, Math.PI, 0]}>
+      {/* Legs */}
+      {([-0.16, 0.16] as const).map((ox, i) => (
+        <group key={i}>
+          <mesh position={[ox, 0.47, 0]}>
+            <boxGeometry args={[0.22, 0.6, 0.22]} />
+            <meshStandardMaterial color={pants} roughness={0.75} />
+          </mesh>
+          <mesh position={[ox, 0.1, 0.04]}>
+            <boxGeometry args={[0.23, 0.28, 0.3]} />
+            <meshStandardMaterial color={shoe} roughness={0.8} metalness={0.12} />
+          </mesh>
+        </group>
+      ))}
+
+      {/* Body / jacket */}
+      <mesh position={[0, 1.1, 0]}>
+        <boxGeometry args={[0.6, 0.72, 0.32]} />
+        <meshStandardMaterial color={jacket} emissive={jacketE} emissiveIntensity={0.5} roughness={0.55} metalness={0.15} />
+      </mesh>
+
+      {/* Glowing shoulder trim */}
+      <mesh position={[0, 1.48, 0]}>
+        <boxGeometry args={[0.64, 0.07, 0.36]} />
+        <meshStandardMaterial color={teal} emissive={teal} emissiveIntensity={2.2} />
+      </mesh>
+
+      {/* Arms */}
+      {([-0.4, 0.4] as const).map((ox, i) => (
+        <mesh key={i} position={[ox, 1.08, 0]}>
+          <boxGeometry args={[0.17, 0.6, 0.2]} />
+          <meshStandardMaterial color={jacket} emissive={jacketE} emissiveIntensity={0.35} roughness={0.6} metalness={0.1} />
+        </mesh>
+      ))}
+
+      {/* Backpack — on the back (+z local = -z world after π rotation = facing camera) */}
+      <mesh position={[0, 1.08, 0.26]}>
+        <boxGeometry args={[0.38, 0.52, 0.2]} />
+        <meshStandardMaterial color={pack} emissive={packE} emissiveIntensity={0.35} roughness={0.6} />
+      </mesh>
+      {/* Backpack teal accent stripe */}
+      <mesh position={[0, 1.22, 0.37]}>
+        <boxGeometry args={[0.36, 0.06, 0.02]} />
+        <meshStandardMaterial color={teal} emissive={teal} emissiveIntensity={3.8} />
+      </mesh>
+      {/* Backpack emblem glow */}
+      <mesh position={[0, 1.08, 0.37]}>
+        <boxGeometry args={[0.15, 0.15, 0.02]} />
+        <meshStandardMaterial color={teal} emissive={teal} emissiveIntensity={2.8} transparent opacity={0.9} />
+      </mesh>
+
+      {/* Neck */}
+      <mesh position={[0, 1.58, 0]}>
+        <boxGeometry args={[0.17, 0.14, 0.17]} />
+        <meshStandardMaterial color={skin} roughness={0.8} />
+      </mesh>
+
+      {/* Head */}
+      <mesh position={[0, 1.86, 0]}>
+        <boxGeometry args={[0.44, 0.46, 0.42]} />
+        <meshStandardMaterial color={skin} roughness={0.78} />
+      </mesh>
+
+      {/* Hair */}
+      <mesh position={[0, 2.1, 0]}>
+        <boxGeometry args={[0.48, 0.14, 0.46]} />
+        <meshStandardMaterial color={hair} roughness={0.88} />
+      </mesh>
+      {gender === "girl" && (
+        <>
+          <mesh position={[-0.25, 1.78, 0]}>
+            <boxGeometry args={[0.06, 0.44, 0.4]} />
+            <meshStandardMaterial color={hair} roughness={0.88} />
+          </mesh>
+          <mesh position={[0.25, 1.78, 0]}>
+            <boxGeometry args={[0.06, 0.44, 0.4]} />
+            <meshStandardMaterial color={hair} roughness={0.88} />
+          </mesh>
+        </>
+      )}
+
+      {/* Backpack ambient glow — visible from behind */}
+      <pointLight position={[0, 1.2, 0.5]} color={teal} intensity={4} distance={4.5} />
+    </group>
+  );
+}
+
 // Floating data particles — teal motes drifting upward
 function DataParticles() {
   const COUNT = 280;
@@ -435,13 +543,15 @@ function Billboard({
 }
 
 function Scene({
-  currentWeek, viewWeek, completedByWeek, onDistrictTap,
+  currentWeek, viewWeek, completedByWeek, onDistrictTap, gender,
 }: {
   currentWeek: number; viewWeek: number;
   completedByWeek: Record<number, boolean>;
   onDistrictTap: (s: number, e: number) => void;
+  gender: "boy" | "girl";
 }) {
-  const cameraZ = weekToZ(viewWeek);
+  const charZ   = weekToZ(viewWeek);   // character world z position
+  const cameraZ = charZ - 18;          // Billboard fade distance uses camera z
 
   function zoneState(zone: (typeof DISTRICT_ZONES)[number]): "complete" | "current" | "locked" {
     const ws = Array.from({ length: zone.weekEnd - zone.weekStart + 1 }, (_, i) => zone.weekStart + i);
@@ -491,6 +601,7 @@ function Scene({
 
       <DataParticles />
       <LegendTower unlocked={completedByWeek[12] ?? false} />
+      <PlayerCharacter z={charZ} gender={gender} />
 
       {DISTRICT_ZONES.map((zone) => (
         <Billboard
@@ -502,7 +613,7 @@ function Scene({
         />
       ))}
 
-      <CameraRig targetZ={cameraZ} viewWeek={viewWeek} />
+      <CameraRig charZ={charZ} />
 
       <EffectComposer>
         <Bloom luminanceThreshold={0.18} luminanceSmoothing={0.88} intensity={1.8} levels={7} />
@@ -518,9 +629,17 @@ export default function NumberNexusMap() {
   const [progress] = useState(() => readProgress());
   const [store]    = useState(() => readProgramStore());
   const [bestChain, setBestChain] = useState(0);
+  const [gender, setGender] = useState<"boy" | "girl">("boy");
 
   useEffect(() => {
     try { setBestChain(Number(localStorage.getItem("lul_best_nexus_chain_v1") ?? 0)); } catch { /* ignore */ }
+    try {
+      const active = localStorage.getItem("lul_active_student_v1");
+      if (active) {
+        const parsed = JSON.parse(active);
+        if (parsed?.gender === "girl" || parsed?.gender === "female") setGender("girl");
+      }
+    } catch { /* ignore */ }
   }, []);
 
   const year       = progress?.year ?? "Year 1";
@@ -595,7 +714,7 @@ export default function NumberNexusMap() {
       <Canvas
         gl={{ antialias: true, powerPreference: "high-performance" }}
         dpr={[1, 1.5]}
-        camera={{ position: [0, 3.8, weekToZ(currentWeek)], fov: 75, near: 0.1, far: 250 }}
+        camera={{ position: [0, 11, weekToZ(currentWeek) - 18], fov: 65, near: 0.1, far: 250 }}
         style={{ position: "absolute", inset: 0 }}
       >
         <Scene
@@ -603,6 +722,7 @@ export default function NumberNexusMap() {
           viewWeek={viewWeek}
           completedByWeek={completedByWeek}
           onDistrictTap={onDistrictTap}
+          gender={gender}
         />
       </Canvas>
 
