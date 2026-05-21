@@ -186,7 +186,7 @@ export default function RealmCarousel() {
 
   function enterRealm() {
     if (!isActive) return;
-    if (current.id === "number-nexus") router.push("/home");
+    if (current.id === "number-nexus") router.push("/number-nexus");
   }
 
   return (
