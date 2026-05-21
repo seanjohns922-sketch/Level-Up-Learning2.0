@@ -4,15 +4,15 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Lock, Star } from "lucide-react";
 
 const REALMS = [
-  { name: "Number Nexus",    symbol: "⚡", active: true,  bg: "rgb(52,211,153)",  border: "rgba(52,211,153,0.6)", top: "12%", left: "50%" },
-  { name: "Reading Ridge",   symbol: "▧",  active: false, bg: "rgb(217,150,80)",  border: "rgba(217,150,80,0.4)", top: "28%", left: "25%" },
-  { name: "Inkwell Wilds",   symbol: "✎",  active: false, bg: "rgb(80,180,170)",  border: "rgba(80,180,170,0.4)", top: "28%", left: "75%" },
-  { name: "Runehaven Peaks", symbol: "♦",  active: false, bg: "rgb(140,140,165)", border: "rgba(140,140,165,0.4)", top: "48%", left: "12%" },
-  { name: "Measurelands",    symbol: "◈",  active: false, bg: "rgb(200,100,160)", border: "rgba(200,100,160,0.4)", top: "48%", left: "88%" },
-  { name: "Starpath Realm",  symbol: "✦",  active: false, bg: "rgb(110,120,200)", border: "rgba(110,120,200,0.4)", top: "68%", left: "18%" },
-  { name: "Statistica",      symbol: "▣",  active: false, bg: "rgb(160,120,210)", border: "rgba(160,120,210,0.4)", top: "68%", left: "82%" },
-  { name: "Chance Hollow",   symbol: "◉",  active: false, bg: "rgb(100,190,100)", border: "rgba(100,190,100,0.4)", top: "82%", left: "35%" },
-  { name: "Pattern Peaks",   symbol: "△",  active: false, bg: "rgb(210,100,100)", border: "rgba(210,100,100,0.4)", top: "82%", left: "65%" },
+  { name: "Number Nexus",    symbol: "⚡", active: true,  bg: "rgb(46,200,140)",  shade: "rgb(20,120,85)",  border: "rgba(255,255,255,0.9)", top: "13%", left: "50%" },
+  { name: "Reading Ridge",   symbol: "▧",  active: false, bg: "rgb(228,160,80)",  shade: "rgb(150,90,30)",  border: "rgba(255,255,255,0.5)", top: "28%", left: "23%" },
+  { name: "Inkwell Wilds",   symbol: "✎",  active: false, bg: "rgb(80,190,180)",  shade: "rgb(30,110,110)", border: "rgba(255,255,255,0.5)", top: "28%", left: "77%" },
+  { name: "Runehaven Peaks", symbol: "♦",  active: false, bg: "rgb(150,150,180)", shade: "rgb(80,80,110)",  border: "rgba(255,255,255,0.5)", top: "48%", left: "11%" },
+  { name: "Measurelands",    symbol: "◈",  active: false, bg: "rgb(220,110,170)", shade: "rgb(130,40,90)",  border: "rgba(255,255,255,0.5)", top: "48%", left: "89%" },
+  { name: "Starpath Realm",  symbol: "✦",  active: false, bg: "rgb(120,130,220)", shade: "rgb(55,60,140)",  border: "rgba(255,255,255,0.5)", top: "68%", left: "17%" },
+  { name: "Statistica",      symbol: "▣",  active: false, bg: "rgb(175,130,225)", shade: "rgb(95,60,150)",  border: "rgba(255,255,255,0.5)", top: "68%", left: "83%" },
+  { name: "Chance Hollow",   symbol: "◉",  active: false, bg: "rgb(110,200,110)", shade: "rgb(45,120,55)",  border: "rgba(255,255,255,0.5)", top: "82%", left: "33%" },
+  { name: "Pattern Peaks",   symbol: "△",  active: false, bg: "rgb(225,105,105)", shade: "rgb(140,40,40)",  border: "rgba(255,255,255,0.5)", top: "82%", left: "67%" },
 ];
 
 const TOWER = { top: "46%", left: "50%" };
