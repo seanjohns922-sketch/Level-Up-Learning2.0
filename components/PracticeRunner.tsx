@@ -20,7 +20,11 @@ type AudioPickTask = Extract<PracticeTask, { kind: "audioPick" }>;
 type NumberHuntTask = Extract<PracticeTask, { kind: "numberHunt" }>;
 type GroupCountVisualTask = Extract<PracticeTask, { kind: "groupCountVisual" }>;
 
+type Scalar = string | number | boolean | null;
+
 const MAX_LESSON_QUESTIONS = 10;
+const RECENT_TASK_WINDOW = 6;
+const NEXT_TASK_REROLLS = 8;
 
 function clampNumber(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -81,6 +85,92 @@ function getPracticeTaskCorrectAnswer(task: PracticeTask) {
   if (task.kind === "groundFeed") return String(task.targetNumber);
   if (task.kind === "groundSoundCount") return String(task.targetNumber);
   return null;
+}
+
+function normalizeScalar(value: unknown): Scalar | undefined {
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+    return value;
+  }
+  if (value === null) return null;
+  return undefined;
+}
+
+function stableSerialize(value: unknown): string {
+  if (Array.isArray(value)) {
+    return `[${value.map((entry) => stableSerialize(entry)).join(",")}]`;
+  }
+  if (value && typeof value === "object") {
+    const entries = Object.entries(value as Record<string, unknown>)
+      .filter(([, entry]) => entry !== undefined)
+      .sort(([left], [right]) => left.localeCompare(right));
+    return `{${entries
+      .map(([key, entry]) => `${key}:${stableSerialize(entry)}`)
+      .join(",")}}`;
+  }
+  return JSON.stringify(value);
+}
+
+function buildPracticeTaskRepeatKey(task: PracticeTask) {
+  const keyData: Record<string, unknown> = { kind: task.kind };
+  for (const [key, rawValue] of Object.entries(task as Record<string, unknown>)) {
+    if (
+      key === "feedback" ||
+      key === "introPrompt" ||
+      key === "speakText" ||
+      key === "difficulty"
+    ) {
+      continue;
+    }
+    if (key === "prompt") {
+      const promptValue = normalizeScalar(rawValue);
+      if (promptValue !== undefined) keyData.prompt = promptValue;
+      continue;
+    }
+    if (key === "config") {
+      continue;
+    }
+    const scalarValue = normalizeScalar(rawValue);
+    if (scalarValue !== undefined) {
+      keyData[key] = scalarValue;
+      continue;
+    }
+    if (Array.isArray(rawValue)) {
+      keyData[key] = rawValue;
+      continue;
+    }
+    if (rawValue && typeof rawValue === "object") {
+      keyData[key] = rawValue;
+    }
+  }
+  return stableSerialize(keyData);
+}
+
+function buildPracticeTaskTargetKey(task: PracticeTask) {
+  const targetFields = [
+    "targetNumber",
+    "target",
+    "count",
+    "answer",
+    "total",
+    "start",
+    "shownNumeral",
+    "shownQuantity",
+  ] as const;
+  const parts: string[] = [task.kind];
+  for (const field of targetFields) {
+    const value = (task as Record<string, unknown>)[field];
+    if (typeof value === "number") {
+      parts.push(`${field}:${value}`);
+    }
+  }
+  if (task.kind === "order3") {
+    parts.push(`numbers:${[...task.numbers].sort((a, b) => a - b).join("-")}`);
+    parts.push(`direction:${task.direction}`);
+  }
+  if (task.kind === "groundSequence") {
+    parts.push(`sequence:${task.sequence.join("-")}`);
+  }
+  return parts.join("|");
 }
 
 type LiveLessonContext = {
@@ -161,11 +251,37 @@ export function PracticeRunner({
     return { secondsLeft, totalSeconds, elapsedSeconds: elapsed, difficulty };
   }
 
+  const recentTaskKeysRef = useRef<string[]>([]);
+  const recentTargetKeysRef = useRef<string[]>([]);
+
+  const generateLessonTask = useCallback((ctx: {
+    secondsLeft: number;
+    totalSeconds: number;
+    elapsedSeconds: number;
+    difficulty: Difficulty;
+  }) => {
+    let fallbackTask: PracticeTask | null = null;
+    for (let attempt = 0; attempt < NEXT_TASK_REROLLS; attempt += 1) {
+      const candidate = getTask(ctx);
+      candidate.difficulty = ctx.difficulty;
+      const repeatKey = buildPracticeTaskRepeatKey(candidate);
+      const targetKey = buildPracticeTaskTargetKey(candidate);
+      if (!fallbackTask) fallbackTask = candidate;
+      const repeatedTask = recentTaskKeysRef.current.includes(repeatKey);
+      const repeatedTarget = recentTargetKeysRef.current.includes(targetKey);
+      if (repeatedTask || repeatedTarget) {
+        continue;
+      }
+      return candidate;
+    }
+    return fallbackTask ?? getTask(ctx);
+  }, [getTask]);
+
   const [task, setTask] = useState<PracticeTask>(() => {
     const ctx = { secondsLeft: totalSeconds, totalSeconds, elapsedSeconds: 0, difficulty: "easy" as Difficulty };
-    const t = getTask(ctx);
-    t.difficulty = ctx.difficulty;
-    return t;
+    const initialTask = getTask(ctx);
+    initialTask.difficulty = ctx.difficulty;
+    return initialTask;
   });
   const [status, setStatus] = useState<"idle" | "correct" | "wrong">("idle");
   const [typed, setTyped] = useState("");
@@ -359,13 +475,14 @@ export function PracticeRunner({
 
   function nextTask() {
     if (finished) return;
+    const currentRepeatKey = buildPracticeTaskRepeatKey(task);
+    const currentTargetKey = buildPracticeTaskTargetKey(task);
+    recentTaskKeysRef.current = [currentRepeatKey, ...recentTaskKeysRef.current].slice(0, RECENT_TASK_WINDOW);
+    recentTargetKeysRef.current = [currentTargetKey, ...recentTargetKeysRef.current].slice(0, RECENT_TASK_WINDOW);
+
     const ctx = makeCtx();
-    const requiredDifficulty = ctx.difficulty;
-    const generated = getTask(ctx);
-    generated.difficulty = requiredDifficulty;
-    if (requiredDifficulty === "easy" && generated.difficulty !== "easy") {
-      generated.difficulty = "easy";
-    }
+    const generated = generateLessonTask(ctx);
+    generated.difficulty = ctx.difficulty;
     setStatus("idle");
     setTyped("");
     setOrder([]);
