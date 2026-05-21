@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { LessonRenderer } from "@/components/lesson/LessonRenderer";
 import { LessonHUDRail } from "@/components/lesson/LessonHUDRail";
 import { LessonCompleteCard } from "@/components/lesson/LessonCompleteCard";
+import { ComboMilestonePop } from "@/components/lesson/ComboMilestonePop";
 import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent } from "@/lib/live-class-client";
 import {
   buildLessonActivityPool,
@@ -810,12 +811,20 @@ export function Year2LessonEngine({
   }
 
   // ── Active state ──
+  function getComboBorder(count: number) {
+    if (count >= 10) return "border-purple-300/80 shadow-[0_0_22px_rgba(167,139,250,0.4)]";
+    if (count >= 8)  return "border-orange-300/80 shadow-[0_0_22px_rgba(251,146,60,0.4)]";
+    if (count >= 5)  return "border-yellow-300/80 shadow-[0_0_22px_rgba(253,224,71,0.4)]";
+    if (count >= 3)  return "border-teal-300/70 shadow-[0_0_22px_rgba(94,234,212,0.35)]";
+    return "border-border/50";
+  }
+
   const statusBorder =
     status === "correct"
       ? "border-emerald-300 shadow-emerald-100/50"
       : status === "wrong"
       ? "border-red-300 shadow-red-100/50"
-      : "border-border/50";
+      : getComboBorder(comboCount);
 
   const feedbackOverlay =
     status === "correct"
@@ -890,25 +899,27 @@ export function Year2LessonEngine({
           )}
 
           {currentActivity && currentQuestion ? (
-            <div
-              className={`rounded-[1.75rem] border-2 bg-card p-5 shadow-lg transition-all duration-300 ${statusBorder} ${statusMotion}`}
-            >
-              <div className="mb-3">
-                <span className="inline-block rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-700">
-                  {activityLabel}
-                </span>
-              </div>
+            <ComboMilestonePop comboCount={comboCount}>
+              <div
+                className={`rounded-[1.75rem] border-2 bg-card p-5 shadow-lg transition-all duration-500 ${statusBorder} ${statusMotion}`}
+              >
+                <div className="mb-3">
+                  <span className="inline-block rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-700">
+                    {activityLabel}
+                  </span>
+                </div>
 
-              <LessonRenderer
-                key={questionKey}
-                activity={currentActivity}
-                prompt={lesson.title}
-                questionData={currentQuestion}
-                renderMode="lesson"
-                onCorrect={handleCorrect}
-                onWrong={handleWrong}
-              />
-            </div>
+                <LessonRenderer
+                  key={questionKey}
+                  activity={currentActivity}
+                  prompt={lesson.title}
+                  questionData={currentQuestion}
+                  renderMode="lesson"
+                  onCorrect={handleCorrect}
+                  onWrong={handleWrong}
+                />
+              </div>
+            </ComboMilestonePop>
           ) : (
             <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">
               This lesson has no valid activities for the current policy. Check the lesson config or
