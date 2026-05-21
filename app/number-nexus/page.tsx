@@ -1,318 +1,564 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Lock, Sparkles, Star, Zap, Target, Shield } from "lucide-react";
+import { ArrowLeft, Lock, CheckCircle, Zap, ChevronRight } from "lucide-react";
 import { readProgress, type StudentProgress } from "@/data/progress";
-import { readProgramStore, getRecommendedAssignedWeek, getWeekProgress, isWeekComplete } from "@/lib/program-progress";
-import { getAllLegends, getLegendForYear, type Legend } from "@/data/legends";
-import { YEAR_ORDER } from "@/data/yearOrder";
+import {
+  readProgramStore,
+  getRecommendedAssignedWeek,
+  getWeekProgress,
+  isWeekComplete,
+  type ProgramProgressStore,
+} from "@/lib/program-progress";
 
-function getLegendStatus(
-  legend: Legend,
-  unlockedIds: string[],
-  currentYear: string
-): "unlocked" | "current" | "locked" {
-  if (unlockedIds.includes(legend.id)) return "unlocked";
-  if (legend.yearLabel === currentYear) return "current";
+// ─── District definitions ────────────────────────────────────────────────────
+// Week 1 at the bottom (start), Week 12 at the top (boss destination).
+// x is in SVG units (0–384), y is px from top of the 2500px tall map.
+
+const SVG_W = 384;
+const SVG_H = 2500;
+
+const DISTRICTS = [
+  { week: 12, name: "Legend Tower",     sub: "The Final Challenge",  x: 192, y: 90,   isBoss: true  },
+  { week: 11, name: "Mastery Sector",   sub: "Prove your mastery",   x: 192, y: 310,  isBoss: false },
+  { week: 10, name: "Arcade District",  sub: "Speed run challenge",   x: 286, y: 515,  isBoss: false },
+  { week: 9,  name: "Position Arena",   sub: "Place with precision",  x: 192, y: 715,  isBoss: false },
+  { week: 8,  name: "Pathway Network",  sub: "Map the connections",   x: 100, y: 915,  isBoss: false },
+  { week: 7,  name: "Collection Zone",  sub: "Gather your knowledge", x: 192, y: 1115, isBoss: false },
+  { week: 6,  name: "Split Core",       sub: "Divide and conquer",    x: 286, y: 1315, isBoss: false },
+  { week: 5,  name: "Reactor District", sub: "Power up your skills",  x: 192, y: 1510, isBoss: false },
+  { week: 4,  name: "Build Labs",       sub: "Construct quantities",  x: 100, y: 1710, isBoss: false },
+  { week: 3,  name: "Number Bridge",    sub: "Connect the numbers",   x: 192, y: 1910, isBoss: false },
+  { week: 2,  name: "Counting Station", sub: "Build counting power",  x: 286, y: 2110, isBoss: false },
+  { week: 1,  name: "Training Yard",    sub: "Begin your journey",    x: 192, y: 2310, isBoss: false },
+] as const;
+
+// Ordered Week 1 → 12 (bottom to top) for path drawing
+const DISTRICTS_ASCENDING = [...DISTRICTS].reverse();
+
+type NodeState = "complete" | "current" | "accessible" | "locked" | "boss_locked" | "boss_unlocked";
+
+function getNodeState(
+  week: number,
+  currentWeek: number,
+  completedByWeek: Record<number, boolean>,
+  isBoss: boolean
+): NodeState {
+  if (isBoss) {
+    return completedByWeek[week] ? "boss_unlocked" : "boss_locked";
+  }
+  if (completedByWeek[week]) return "complete";
+  if (week === currentWeek) return "current";
+  if (week < currentWeek) return "accessible";
   return "locked";
 }
 
-function ProgressBar({ label, icon, value, color }: { label: string; icon: React.ReactNode; value: number; color: string }) {
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-1">
-        <span className="text-xs font-bold text-slate-200 flex items-center gap-1.5">{icon} {label}</span>
-        <span className={`text-xs font-extrabold ${color}`}>{value}%</span>
-      </div>
-      <div className="h-2 rounded-full bg-white/10 overflow-hidden">
-        <div
-          className={`h-full rounded-full transition-all duration-700`}
-          style={{
-            width: `${value}%`,
-            background: color.includes("emerald")
-              ? "linear-gradient(90deg, hsl(145 65% 42%), hsl(160 60% 50%))"
-              : color.includes("amber")
-              ? "linear-gradient(90deg, hsl(42 95% 55%), hsl(35 90% 60%))"
-              : "linear-gradient(90deg, hsl(215 65% 52%), hsl(230 60% 60%))",
-          }}
-        />
-      </div>
-    </div>
-  );
+// ─── Path helpers ────────────────────────────────────────────────────────────
+
+function buildPath(nodes: typeof DISTRICTS_ASCENDING) {
+  return nodes.map((n, i) => (i === 0 ? `M ${n.x} ${n.y}` : `L ${n.x} ${n.y}`)).join(" ");
 }
 
-function LegendCard({ legend, status }: { legend: Legend; status: "unlocked" | "current" | "locked" }) {
-  const isLocked = status === "locked";
-  const isCurrent = status === "current";
-
-  return (
-    <div
-      className={`relative rounded-2xl border p-4 transition-all duration-300 ${
-        isCurrent
-          ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-amber-400/50 shadow-lg shadow-amber-500/10 ring-1 ring-amber-400/20"
-          : isLocked
-          ? "bg-slate-900/60 border-white/5 opacity-60"
-          : "bg-gradient-to-br from-slate-800/80 to-slate-900/80 border-emerald-400/30 shadow-md"
-      }`}
-    >
-      {/* Status badge */}
-      <div className="absolute -top-2.5 right-3">
-        {status === "unlocked" && (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500 text-[9px] font-extrabold text-white shadow-md">
-            <Star className="h-2.5 w-2.5" fill="currentColor" /> UNLOCKED
-          </span>
-        )}
-        {status === "current" && (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500 text-[9px] font-extrabold text-white shadow-md animate-pulse">
-            <Target className="h-2.5 w-2.5" /> CURRENT
-          </span>
-        )}
-        {status === "locked" && (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-600 text-[9px] font-extrabold text-slate-300 shadow-md">
-            <Lock className="h-2.5 w-2.5" /> LOCKED
-          </span>
-        )}
-      </div>
-
-      {/* Card image area */}
-      <div className="flex items-start gap-3 mt-1">
-        <div
-          className={`relative flex-shrink-0 h-16 w-12 rounded-lg overflow-hidden border ${
-            isLocked ? "border-white/10 grayscale" : "border-white/20"
-          }`}
-        >
-          <img
-            src={legend.images.cardFront}
-            alt={legend.name}
-            className={`h-full w-full object-cover ${isLocked ? "blur-[2px] opacity-50" : ""}`}
-          />
-          {isLocked && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-              <Lock className="h-4 w-4 text-white/60" />
-            </div>
-          )}
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <p className="text-[10px] font-extrabold text-slate-400 tracking-wider">{legend.yearLabel.toUpperCase()}</p>
-          <h4 className={`text-sm font-extrabold leading-tight ${isLocked ? "text-slate-500" : "text-white"}`}>
-            {legend.name}
-          </h4>
-          <p className={`text-[11px] mt-0.5 leading-snug ${isLocked ? "text-slate-600" : "text-slate-400"}`}>
-            {legend.description}
-          </p>
-
-          {/* Star rating */}
-          {!isLocked && (
-            <div className="flex items-center gap-0.5 mt-1.5">
-              {Array.from({ length: Math.ceil(legend.stars) }).map((_, i) => (
-                <Star key={i} className="h-3 w-3 text-amber-400" fill="currentColor" />
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Current target glow */}
-      {isCurrent && (
-        <div className="absolute -inset-px rounded-2xl pointer-events-none" style={{
-          background: "linear-gradient(135deg, hsla(42,95%,55%,0.08), transparent, hsla(42,95%,55%,0.05))",
-        }} />
-      )}
-    </div>
-  );
+function buildPathUpTo(nodes: typeof DISTRICTS_ASCENDING, upToWeek: number) {
+  const slice = nodes.filter((n) => n.week <= upToWeek);
+  if (slice.length < 2) return "";
+  return buildPath(slice as typeof DISTRICTS_ASCENDING);
 }
 
-export default function NumberNexusPage() {
+// ─── Main page ───────────────────────────────────────────────────────────────
+
+export default function NumberNexusMapPage() {
   const router = useRouter();
   const [progress, setProgress] = useState<StudentProgress | null>(null);
+  const [store, setStore] = useState<ProgramProgressStore>({});
+  const nodeRefs = useRef<Record<number, HTMLDivElement | null>>({});
+  const scrolledRef = useRef(false);
 
   useEffect(() => {
     setProgress(readProgress());
+    setStore(readProgramStore());
   }, []);
 
   const year = progress?.year ?? "Year 1";
-  const store = readProgramStore();
-  const week = getRecommendedAssignedWeek(store, year, progress?.assignedWeek, progress?.requiredWeeks);
-  const unlockedIds = progress?.unlockedLegends ?? [];
-
-  const allLegends = useMemo(() => getAllLegends(), []);
-  const sortedLegends = useMemo(
-    () =>
-      [...allLegends].sort(
-        (a, b) => YEAR_ORDER.indexOf(a.yearLabel) - YEAR_ORDER.indexOf(b.yearLabel)
-      ),
-    [allLegends]
+  const currentWeek = getRecommendedAssignedWeek(
+    store,
+    year,
+    progress?.assignedWeek,
+    progress?.requiredWeeks
   );
 
-  const currentLegend = getLegendForYear(year);
-  const completedWeeks = Array.from({ length: 12 }, (_, i) => {
-    const wp = getWeekProgress(store, year, i + 1);
-    return isWeekComplete(wp);
-  }).filter(Boolean).length;
+  const completedByWeek: Record<number, boolean> = {};
+  for (let w = 1; w <= 12; w++) {
+    completedByWeek[w] = isWeekComplete(getWeekProgress(store, year, w));
+  }
 
-  const nexusProgress = Math.round((completedWeeks / 12) * 100);
-  const towerStrength = Math.round(nexusProgress * 0.6);
-  const fogCleared = Math.round(nexusProgress * 0.8);
+  const highestCompletedWeek = Math.max(
+    0,
+    ...Object.entries(completedByWeek)
+      .filter(([, v]) => v)
+      .map(([k]) => Number(k))
+  );
+
+  // Auto-scroll to current week on first load
+  useEffect(() => {
+    if (scrolledRef.current || !progress) return;
+    const ref = nodeRefs.current[currentWeek];
+    if (ref) {
+      scrolledRef.current = true;
+      setTimeout(() => ref.scrollIntoView({ behavior: "smooth", block: "center" }), 300);
+    }
+  }, [progress, currentWeek]);
+
+  function enterDistrict(week: number, state: NodeState) {
+    if (state === "locked" || state === "boss_locked") return;
+    router.push(`/program?year=${encodeURIComponent(year)}&week=${week}`);
+  }
+
+  const completedPath = highestCompletedWeek >= 2
+    ? buildPathUpTo(DISTRICTS_ASCENDING, highestCompletedWeek)
+    : "";
+  const fullPath = buildPath(DISTRICTS_ASCENDING);
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden">
-      {/* Background image */}
+    <main className="relative min-h-screen overflow-hidden bg-slate-950">
+      {/* ── Sticky header ───────────────────────────────────────── */}
       <div
-        className="absolute inset-0 bg-cover bg-top bg-no-repeat pointer-events-none"
-        style={{ backgroundImage: "url('/images/number-nexus-bg.jpg')" }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-950/30 via-slate-950/50 to-slate-950/95 pointer-events-none" />
-
-      {/* Floating light particles */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {Array.from({ length: 30 }).map((_, i) => {
-          const size = 2 + (i % 5) * 1.2;
-          const left = ((i * 31 + 7) % 100);
-          const delay = (i * 1.3) % 14;
-          const duration = 12 + (i % 6) * 3.5;
-          const drift = -25 + (i % 9) * 6;
-          const opacity = 0.15 + (i % 4) * 0.1;
-          const color = i % 4 === 0
-            ? "hsla(42, 95%, 65%, VAR)"
-            : i % 4 === 1
-            ? "hsla(175, 60%, 55%, VAR)"
-            : i % 4 === 2
-            ? "hsla(215, 65%, 60%, VAR)"
-            : "hsla(280, 50%, 65%, VAR)";
-          return (
-            <div
-              key={`p-${i}`}
-              className="absolute rounded-full"
-              style={{
-                width: size,
-                height: size,
-                left: `${left}%`,
-                bottom: `-${size}px`,
-                opacity: 0,
-                background: `radial-gradient(circle, ${color.replace(/VAR/g, "0.9")}, ${color.replace(/VAR/g, "0")})`,
-                boxShadow: `0 0 ${size * 3}px ${color.replace(/VAR/g, String(opacity))}`,
-                animation: `nexusFloat ${duration}s ${delay}s ease-in-out infinite`,
-                ["--drift" as string]: `${drift}px`,
-              }}
-            />
-          );
-        })}
-
-        {/* Flickering stars */}
-        {Array.from({ length: 24 }).map((_, i) => {
-          const size = 1 + (i % 3) * 0.8;
-          const left = ((i * 43 + 13) % 98) + 1;
-          const top = ((i * 29 + 5) % 55) + 2;
-          const delay = (i * 0.9) % 6;
-          const duration = 2 + (i % 4) * 1.2;
-          const color = i % 3 === 0
-            ? "hsla(42, 90%, 80%, 0.9)"
-            : i % 3 === 1
-            ? "hsla(195, 70%, 75%, 0.8)"
-            : "hsla(0, 0%, 95%, 0.7)";
-          return (
-            <div
-              key={`s-${i}`}
-              className="absolute rounded-full"
-              style={{
-                width: size,
-                height: size,
-                left: `${left}%`,
-                top: `${top}%`,
-                background: color,
-                boxShadow: `0 0 ${size * 4}px ${color}, 0 0 ${size * 2}px ${color}`,
-                animation: `nexusFlicker ${duration}s ${delay}s ease-in-out infinite`,
-              }}
-            />
-          );
-        })}
-      </div>
-
-      {/* Header */}
-      <div className="relative z-10 px-4 pt-4 pb-2 flex items-center justify-between">
+        className="fixed top-0 inset-x-0 z-40 flex items-center justify-between px-4 py-3"
+        style={{
+          background: "rgba(2,20,18,0.85)",
+          borderBottom: "1px solid rgba(94,234,212,0.12)",
+          backdropFilter: "blur(12px)",
+        }}
+      >
         <button
           onClick={() => router.push(`/realms?level=${encodeURIComponent(year)}`)}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/80 backdrop-blur-md text-slate-200 text-xs font-bold shadow-lg border border-teal-400/20 hover:bg-slate-800 transition-all active:scale-95"
+          className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold text-teal-100/80 transition-all active:scale-95 hover:text-white"
+          style={{
+            background: "rgba(15,118,110,0.25)",
+            border: "1px solid rgba(94,234,212,0.2)",
+          }}
         >
-          <ArrowLeft className="h-3.5 w-3.5" /> Tower
+          <ArrowLeft className="h-3.5 w-3.5" /> Back
         </button>
-        <div className="px-3 py-1.5 rounded-full bg-slate-800/70 backdrop-blur-md border border-teal-400/20 shadow-lg">
-          <span className="text-teal-300 text-[10px] font-extrabold tracking-[0.12em]">🔢 REALM</span>
+
+        <div
+          className="px-4 py-1.5 rounded-full"
+          style={{
+            background: "rgba(15,118,110,0.2)",
+            border: "1px solid rgba(94,234,212,0.2)",
+          }}
+        >
+          <span className="text-teal-300 text-[10px] font-extrabold tracking-[0.18em]">
+            NUMBER NEXUS
+          </span>
+        </div>
+
+        <div className="flex items-center gap-1.5 rounded-full px-3 py-1.5"
+          style={{
+            background: "rgba(15,118,110,0.2)",
+            border: "1px solid rgba(94,234,212,0.15)",
+          }}
+        >
+          <Zap className="h-3 w-3 text-teal-400" />
+          <span className="text-teal-200 text-[10px] font-bold tabular-nums">
+            {highestCompletedWeek}/12
+          </span>
         </div>
       </div>
 
-      {/* Hero */}
-      <div className="relative z-10 px-4 pt-4 pb-6">
-        <div className="text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-500/10 border border-teal-400/20 mb-3">
-            <Sparkles className="h-3.5 w-3.5 text-teal-400" />
-            <span className="text-[10px] font-extrabold text-teal-300 tracking-wider">MATHEMATICS REALM</span>
-          </div>
-          <h1 className="text-3xl font-extrabold bg-gradient-to-r from-teal-300 via-emerald-300 to-cyan-300 bg-clip-text text-transparent leading-tight">
-            Number Nexus
-          </h1>
-          <p className="text-sm text-slate-400 mt-1.5 max-w-sm mx-auto leading-relaxed">
-            A mechanical city of gears, circuits, and number bridges — home of the <span className="text-teal-300 font-bold">Numbots</span>.
-          </p>
+      {/* ── Scrollable map ──────────────────────────────────────── */}
+      <div className="relative pt-14 overflow-x-hidden">
+        {/* Full-screen background */}
+        <div
+          className="fixed inset-0 pointer-events-none"
+          style={{ zIndex: 0 }}
+        >
+          <img
+            src="/images/number-nexus-bg.jpg"
+            alt=""
+            className="w-full h-full object-cover object-top"
+            style={{ opacity: 0.35 }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-slate-950/55 to-slate-950/80" />
         </div>
-      </div>
 
-      {/* Progress Section */}
-      <div className="relative z-10 px-4 pb-5">
-        <div className="max-w-md mx-auto bg-slate-900/80 backdrop-blur-md rounded-2xl border border-white/5 p-4 space-y-3">
-          <h3 className="text-[10px] font-extrabold text-slate-500 tracking-[0.15em]">REALM STATUS</h3>
-          <ProgressBar label="Number Nexus Progress" icon={<Zap className="h-3 w-3 text-teal-400" />} value={nexusProgress} color="text-emerald-400" />
-          <ProgressBar label="Tower Strength" icon={<Shield className="h-3 w-3 text-amber-400" />} value={towerStrength} color="text-amber-400" />
-          <ProgressBar label="Fog Cleared" icon={<Sparkles className="h-3 w-3 text-blue-400" />} value={fogCleared} color="text-blue-400" />
+        {/* Map container — centred, fixed width, tall */}
+        <div
+          className="relative mx-auto"
+          style={{
+            width: `${SVG_W}px`,
+            height: `${SVG_H}px`,
+            maxWidth: "100vw",
+            zIndex: 10,
+          }}
+        >
+          {/* ── SVG path layer ──── */}
+          <svg
+            className="absolute inset-0 pointer-events-none"
+            width={SVG_W}
+            height={SVG_H}
+            viewBox={`0 0 ${SVG_W} ${SVG_H}`}
+          >
+            {/* Full dim route (shows the whole path ahead) */}
+            <path
+              d={fullPath}
+              fill="none"
+              stroke="rgba(94,234,212,0.1)"
+              strokeWidth="3"
+              strokeDasharray="8 7"
+              strokeLinecap="round"
+            />
 
-          {/* Next legend preview */}
-          <div className="flex items-center gap-3 rounded-xl bg-amber-500/10 border border-amber-400/15 px-3 py-2.5 mt-1">
-            <div className="h-10 w-8 rounded-md bg-slate-800 border border-amber-400/20 overflow-hidden flex-shrink-0">
-              <img src={currentLegend.images.cardFront} alt={currentLegend.name} className="h-full w-full object-cover" />
-            </div>
-            <div>
-              <p className="text-[9px] font-extrabold text-amber-400 tracking-wider">NEXT LEGEND</p>
-              <p className="text-xs font-bold text-white">{currentLegend.name}</p>
-            </div>
-          </div>
-        </div>
-      </div>
+            {/* Completed bright route */}
+            {completedPath && (
+              <path
+                d={completedPath}
+                fill="none"
+                stroke="rgba(94,234,212,0.65)"
+                strokeWidth="3.5"
+                strokeLinecap="round"
+              />
+            )}
 
-      {/* Legend Grid */}
-      <div className="relative z-10 px-4 pb-6">
-        <div className="max-w-md mx-auto">
-          <h2 className="text-xs font-extrabold text-slate-500 tracking-[0.15em] mb-3">NUMBOT LEGENDS</h2>
-          <div className="space-y-3">
-            {sortedLegends.map((legend) => {
-              const status = getLegendStatus(legend, unlockedIds, year);
-              return <LegendCard key={legend.id} legend={legend} status={status} />;
-            })}
-          </div>
-        </div>
-      </div>
+            {/* Glow layer on completed route */}
+            {completedPath && (
+              <path
+                d={completedPath}
+                fill="none"
+                stroke="rgba(94,234,212,0.25)"
+                strokeWidth="10"
+                strokeLinecap="round"
+              />
+            )}
+          </svg>
 
-      {/* CTA Banner */}
-      <div className="relative z-10 px-4 pb-8">
-        <div className="max-w-md mx-auto">
-          <div className="rounded-2xl bg-gradient-to-r from-teal-600/20 to-emerald-600/20 border border-teal-400/15 px-4 py-4 text-center">
-            <Sparkles className="h-5 w-5 text-amber-400 mx-auto mb-2" />
-            <p className="text-sm font-bold text-white">
-              Complete your number lessons to unlock <span className="text-amber-300">{currentLegend.name}</span>.
-            </p>
-            <p className="text-[11px] text-slate-400 mt-1">
-              Finish Week {week} to power up the Tower of Knowledge!
-            </p>
-            <button
-              onClick={() => router.push("/home")}
-              className="mt-3 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-teal-500 to-emerald-500 text-white text-xs font-extrabold shadow-lg shadow-teal-500/20 hover:shadow-teal-500/30 transition-all active:scale-95"
+          {/* ── District nodes ──── */}
+          {DISTRICTS.map((district) => {
+            const state = getNodeState(
+              district.week,
+              currentWeek,
+              completedByWeek,
+              district.isBoss
+            );
+            const canEnter = state !== "locked" && state !== "boss_locked";
+
+            return (
+              <div
+                key={district.week}
+                ref={(el) => { nodeRefs.current[district.week] = el; }}
+                className="absolute"
+                style={{
+                  left: district.x,
+                  top: district.y,
+                  transform: "translate(-50%, -50%)",
+                }}
+              >
+                {district.isBoss ? (
+                  <BossNode
+                    name={district.name}
+                    sub={district.sub}
+                    state={state}
+                    onTap={() => enterDistrict(district.week, state)}
+                  />
+                ) : (
+                  <DistrictNode
+                    week={district.week}
+                    name={district.name}
+                    sub={district.sub}
+                    state={state as "complete" | "current" | "accessible" | "locked"}
+                    onTap={() => enterDistrict(district.week, state)}
+                  />
+                )}
+              </div>
+            );
+          })}
+
+          {/* Start marker below Week 1 */}
+          <div
+            className="absolute"
+            style={{ left: 192, top: SVG_H - 60, transform: "translate(-50%, -50%)" }}
+          >
+            <div
+              className="px-4 py-1.5 rounded-full text-[10px] font-mono font-bold tracking-[0.2em]"
+              style={{
+                color: "rgba(94,234,212,0.5)",
+                border: "1px solid rgba(94,234,212,0.15)",
+                background: "rgba(2,26,24,0.7)",
+              }}
             >
-              <Zap className="h-3.5 w-3.5" /> Continue Lessons
-            </button>
+              ← ENTRY POINT
+            </div>
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes nexusPulse {
+          0%, 100% { box-shadow: 0 0 18px rgba(94,234,212,0.5), 0 0 36px rgba(94,234,212,0.2); }
+          50%       { box-shadow: 0 0 30px rgba(94,234,212,0.85), 0 0 60px rgba(94,234,212,0.35); }
+        }
+        @keyframes bossPulse {
+          0%, 100% { box-shadow: 0 0 20px rgba(251,191,36,0.4), 0 0 50px rgba(251,191,36,0.15); }
+          50%       { box-shadow: 0 0 36px rgba(251,191,36,0.75), 0 0 80px rgba(251,191,36,0.3); }
+        }
+        @keyframes bossLockedPulse {
+          0%, 100% { box-shadow: 0 0 12px rgba(251,191,36,0.12); }
+          50%       { box-shadow: 0 0 22px rgba(251,191,36,0.22); }
+        }
+        @keyframes nodeIn {
+          from { opacity: 0; transform: translate(-50%, calc(-50% + 12px)); }
+          to   { opacity: 1; transform: translate(-50%, -50%); }
+        }
+      `}</style>
     </main>
   );
 }
+
+// ─── District node ───────────────────────────────────────────────────────────
+
+function DistrictNode({
+  week,
+  name,
+  sub,
+  state,
+  onTap,
+}: {
+  week: number;
+  name: string;
+  sub: string;
+  state: "complete" | "current" | "accessible" | "locked";
+  onTap: () => void;
+}) {
+  const configs = {
+    complete: {
+      ring: "rgba(94,234,212,0.8)",
+      bg: "rgba(6,46,39,0.92)",
+      textPrimary: "rgba(167,243,208,1)",
+      textSub: "rgba(94,234,212,0.7)",
+      shadow: "0 0 16px rgba(94,234,212,0.4), 0 4px 16px rgba(0,0,0,0.5)",
+      badge: "COMPLETE",
+      badgeBg: "rgba(20,184,166,0.25)",
+      badgeColor: "rgba(94,234,212,1)",
+      animation: "",
+    },
+    current: {
+      ring: "rgba(94,234,212,1)",
+      bg: "rgba(6,78,59,0.95)",
+      textPrimary: "white",
+      textSub: "rgba(167,243,208,0.9)",
+      shadow: "0 0 0 rgba(94,234,212,0)",
+      badge: "ENTER",
+      badgeBg: "rgba(20,184,166,0.4)",
+      badgeColor: "white",
+      animation: "nexusPulse 2s ease-in-out infinite",
+    },
+    accessible: {
+      ring: "rgba(94,234,212,0.25)",
+      bg: "rgba(6,30,26,0.8)",
+      textPrimary: "rgba(94,234,212,0.65)",
+      textSub: "rgba(94,234,212,0.4)",
+      shadow: "0 4px 12px rgba(0,0,0,0.4)",
+      badge: "REVIEW",
+      badgeBg: "rgba(15,118,110,0.15)",
+      badgeColor: "rgba(94,234,212,0.5)",
+      animation: "",
+    },
+    locked: {
+      ring: "rgba(80,90,110,0.3)",
+      bg: "rgba(10,12,20,0.75)",
+      textPrimary: "rgba(120,130,150,0.5)",
+      textSub: "rgba(100,110,130,0.4)",
+      shadow: "0 4px 8px rgba(0,0,0,0.3)",
+      badge: "LOCKED",
+      badgeBg: "rgba(40,45,60,0.4)",
+      badgeColor: "rgba(100,110,130,0.5)",
+      animation: "",
+    },
+  };
+
+  const c = configs[state];
+  const isLocked = state === "locked";
+
+  return (
+    <button
+      type="button"
+      onClick={onTap}
+      disabled={isLocked}
+      className="group flex flex-col items-center gap-1.5 transition-transform duration-200 active:scale-95"
+      style={{ cursor: isLocked ? "default" : "pointer" }}
+    >
+      {/* Week number chip */}
+      <div
+        className="text-[8px] font-mono font-bold tracking-[0.2em] px-2 py-0.5 rounded-full"
+        style={{
+          color: c.textSub,
+          background: c.badgeBg,
+          border: `1px solid ${c.ring}`,
+        }}
+      >
+        W{week}
+      </div>
+
+      {/* Main node circle */}
+      <div
+        className="relative flex h-[68px] w-[68px] items-center justify-center rounded-2xl transition-transform duration-200 group-hover:scale-105"
+        style={{
+          background: c.bg,
+          border: `2.5px solid ${c.ring}`,
+          boxShadow: c.shadow,
+          animation: c.animation,
+        }}
+      >
+        {/* Scanlines overlay */}
+        <div
+          className="absolute inset-0 rounded-2xl pointer-events-none opacity-[0.07]"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(0deg, rgba(94,234,212,1) 0px, rgba(94,234,212,1) 1px, transparent 1px, transparent 4px)",
+          }}
+        />
+
+        {isLocked ? (
+          <Lock className="h-6 w-6" style={{ color: c.textPrimary }} />
+        ) : state === "complete" ? (
+          <CheckCircle className="h-7 w-7" style={{ color: c.textPrimary }} />
+        ) : (
+          <ChevronRight className="h-8 w-8" style={{ color: c.textPrimary }} />
+        )}
+      </div>
+
+      {/* Label */}
+      <div className="text-center max-w-[110px]">
+        <div
+          className="text-[11px] font-extrabold leading-tight"
+          style={{ color: c.textPrimary }}
+        >
+          {name}
+        </div>
+        <div
+          className="text-[9px] font-medium leading-snug mt-0.5"
+          style={{ color: c.textSub }}
+        >
+          {sub}
+        </div>
+      </div>
+
+      {/* State badge */}
+      <div
+        className="text-[8px] font-mono font-bold tracking-[0.18em] px-2.5 py-0.5 rounded-full"
+        style={{
+          color: c.badgeColor,
+          background: c.badgeBg,
+          border: `1px solid ${c.ring}`,
+        }}
+      >
+        {c.badge}
+      </div>
+    </button>
+  );
+}
+
+// ─── Boss node (Week 12 — Legend Tower) ──────────────────────────────────────
+
+function BossNode({
+  name,
+  sub,
+  state,
+  onTap,
+}: {
+  name: string;
+  sub: string;
+  state: NodeState;
+  onTap: () => void;
+}) {
+  const isUnlocked = state === "boss_unlocked";
+  const isComplete = state === "complete";
+
+  const colors = isUnlocked || isComplete
+    ? {
+        ring: "rgba(251,191,36,1)",
+        bg: "rgba(69,26,3,0.95)",
+        textPrimary: "rgba(254,240,138,1)",
+        textSub: "rgba(253,224,71,0.8)",
+        animation: "bossPulse 2s ease-in-out infinite",
+      }
+    : {
+        ring: "rgba(251,191,36,0.3)",
+        bg: "rgba(20,12,2,0.85)",
+        textPrimary: "rgba(254,240,138,0.4)",
+        textSub: "rgba(253,224,71,0.3)",
+        animation: "bossLockedPulse 3s ease-in-out infinite",
+      };
+
+  return (
+    <button
+      type="button"
+      onClick={onTap}
+      disabled={!isUnlocked && !isComplete}
+      className="group flex flex-col items-center gap-2 transition-transform duration-200 active:scale-95"
+      style={{ cursor: isUnlocked || isComplete ? "pointer" : "default" }}
+    >
+      {/* BOSS label above */}
+      <div
+        className="text-[9px] font-mono font-black tracking-[0.25em] px-3 py-1 rounded-full"
+        style={{
+          color: colors.textPrimary,
+          background: "rgba(120,53,15,0.4)",
+          border: `1.5px solid ${colors.ring}`,
+        }}
+      >
+        {isUnlocked || isComplete ? "⚡ BOSS" : "🔒 BOSS"}
+      </div>
+
+      {/* Main boss node — larger than regular nodes */}
+      <div
+        className="relative flex h-[88px] w-[88px] items-center justify-center rounded-3xl transition-transform duration-200 group-hover:scale-105"
+        style={{
+          background: colors.bg,
+          border: `3px solid ${colors.ring}`,
+          animation: colors.animation,
+        }}
+      >
+        {/* Inner glow */}
+        <div
+          className="absolute inset-0 rounded-3xl pointer-events-none"
+          style={{
+            background: isUnlocked || isComplete
+              ? "radial-gradient(circle at 35% 30%, rgba(251,191,36,0.15) 0%, transparent 65%)"
+              : "none",
+          }}
+        />
+        <span
+          className="text-3xl"
+          style={{
+            filter:
+              isUnlocked || isComplete
+                ? "drop-shadow(0 0 10px rgba(251,191,36,0.8))"
+                : "grayscale(0.8) opacity(0.4)",
+          }}
+        >
+          ♛
+        </span>
+      </div>
+
+      {/* Label */}
+      <div className="text-center max-w-[130px]">
+        <div
+          className="text-[13px] font-black leading-tight tracking-wide"
+          style={{ color: colors.textPrimary }}
+        >
+          {name}
+        </div>
+        <div
+          className="text-[10px] font-medium leading-snug mt-0.5"
+          style={{ color: colors.textSub }}
+        >
+          {sub}
+        </div>
+      </div>
+    </button>
+  );
+}
+
+type NodeState = "complete" | "current" | "accessible" | "locked" | "boss_locked" | "boss_unlocked";
