@@ -184,9 +184,14 @@ export default function RealmCarousel() {
   // Use the cathedral/tower-interior aesthetic across all levels.
   const isTopChamber = true;
 
+  const realmRoutes: Record<string, string> = {
+    "number-nexus": "/number-nexus",
+  };
+
   function enterRealm() {
     if (!isActive) return;
-    if (current.id === "number-nexus") router.push("/number-nexus");
+    const route = realmRoutes[current.id];
+    if (route) router.push(route);
   }
 
   return (
@@ -353,7 +358,10 @@ export default function RealmCarousel() {
 
             {/* CENTER PORTAL — the focused realm */}
             <div
-              className="absolute left-1/2 top-1/2"
+              className={`absolute left-1/2 top-1/2 ${isActive ? "cursor-pointer" : ""}`}
+              onClick={enterRealm}
+              role={isActive ? "button" : undefined}
+              aria-label={isActive ? `Enter ${current.name}` : undefined}
               style={{
                 transform: "translate(-50%, -52%)",
                 width: "220px",
