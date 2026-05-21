@@ -346,7 +346,7 @@ function ResultsPage() {
     })();
   }, [passed, year, scorePercent, isPostTest, passedByProgram, storedPosttestProfile, storedPretestProfile, unlockTargets, requiredWeeks, optionalWeeks]);
 
-  function goHome() { router.push("/home"); }
+  function goHome() { router.push("/number-nexus"); }
   const assignedStartWeek = isPostTest
     ? getAssignedReviewWeek(storedPosttestProfile) ?? 1
     : getAssignedReviewWeek(storedPretestProfile) ?? 1;
@@ -385,7 +385,7 @@ function ResultsPage() {
     router.push(`/program?${qs}`);
   }
   function goContinue() {
-    router.push("/home");
+    router.push("/number-nexus");
   }
 
   return (
