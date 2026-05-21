@@ -4,15 +4,15 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Lock, Star } from "lucide-react";
 
 const REALMS = [
-  { name: "Number Nexus",    symbol: "⚡", active: true,  bg: "rgb(52,211,153)",  border: "rgba(52,211,153,0.6)", top: "12%", left: "50%" },
-  { name: "Reading Ridge",   symbol: "▧",  active: false, bg: "rgb(217,150,80)",  border: "rgba(217,150,80,0.4)", top: "28%", left: "25%" },
-  { name: "Inkwell Wilds",   symbol: "✎",  active: false, bg: "rgb(80,180,170)",  border: "rgba(80,180,170,0.4)", top: "28%", left: "75%" },
-  { name: "Runehaven Peaks", symbol: "♦",  active: false, bg: "rgb(140,140,165)", border: "rgba(140,140,165,0.4)", top: "48%", left: "12%" },
-  { name: "Measurelands",    symbol: "◈",  active: false, bg: "rgb(200,100,160)", border: "rgba(200,100,160,0.4)", top: "48%", left: "88%" },
-  { name: "Starpath Realm",  symbol: "✦",  active: false, bg: "rgb(110,120,200)", border: "rgba(110,120,200,0.4)", top: "68%", left: "18%" },
-  { name: "Statistica",      symbol: "▣",  active: false, bg: "rgb(160,120,210)", border: "rgba(160,120,210,0.4)", top: "68%", left: "82%" },
-  { name: "Chance Hollow",   symbol: "◉",  active: false, bg: "rgb(100,190,100)", border: "rgba(100,190,100,0.4)", top: "82%", left: "35%" },
-  { name: "Pattern Peaks",   symbol: "△",  active: false, bg: "rgb(210,100,100)", border: "rgba(210,100,100,0.4)", top: "82%", left: "65%" },
+  { name: "Number Nexus",    symbol: "⚡", active: true,  bg: "rgb(46,200,140)",  shade: "rgb(20,120,85)",  border: "rgba(255,255,255,0.9)", top: "13%", left: "50%" },
+  { name: "Reading Ridge",   symbol: "▧",  active: false, bg: "rgb(228,160,80)",  shade: "rgb(150,90,30)",  border: "rgba(255,255,255,0.5)", top: "28%", left: "23%" },
+  { name: "Inkwell Wilds",   symbol: "✎",  active: false, bg: "rgb(80,190,180)",  shade: "rgb(30,110,110)", border: "rgba(255,255,255,0.5)", top: "28%", left: "77%" },
+  { name: "Runehaven Peaks", symbol: "♦",  active: false, bg: "rgb(150,150,180)", shade: "rgb(80,80,110)",  border: "rgba(255,255,255,0.5)", top: "48%", left: "11%" },
+  { name: "Measurelands",    symbol: "◈",  active: false, bg: "rgb(220,110,170)", shade: "rgb(130,40,90)",  border: "rgba(255,255,255,0.5)", top: "48%", left: "89%" },
+  { name: "Starpath Realm",  symbol: "✦",  active: false, bg: "rgb(120,130,220)", shade: "rgb(55,60,140)",  border: "rgba(255,255,255,0.5)", top: "68%", left: "17%" },
+  { name: "Statistica",      symbol: "▣",  active: false, bg: "rgb(175,130,225)", shade: "rgb(95,60,150)",  border: "rgba(255,255,255,0.5)", top: "68%", left: "83%" },
+  { name: "Chance Hollow",   symbol: "◉",  active: false, bg: "rgb(110,200,110)", shade: "rgb(45,120,55)",  border: "rgba(255,255,255,0.5)", top: "82%", left: "33%" },
+  { name: "Pattern Peaks",   symbol: "△",  active: false, bg: "rgb(225,105,105)", shade: "rgb(140,40,40)",  border: "rgba(255,255,255,0.5)", top: "82%", left: "67%" },
 ];
 
 const TOWER = { top: "46%", left: "50%" };
@@ -90,15 +90,33 @@ export default function TowerMapPage() {
             const mx = (tl + rl) / 2 + (rl > 50 ? 5 : rl < 50 ? -5 : 0);
             const my = (tt + rt) / 2 + (rt < tt ? -3 : 3);
             return (
-              <path
-                key={`path-${r.name}`}
-                d={`M${tl}% ${tt}% Q${mx}% ${my}% ${rl}% ${rt}%`}
-                fill="none"
-                stroke={r.active ? "url(#gpAct)" : "url(#gpLck)"}
-                strokeWidth={r.active ? "2.5" : "1.2"}
-                strokeDasharray={r.active ? "6 3" : "3 4"}
-                strokeLinecap="round"
-              />
+              <g key={`path-${r.name}`}>
+                {/* Path shadow base */}
+                <path
+                  d={`M${tl}% ${tt}% Q${mx}% ${my}% ${rl}% ${rt}%`}
+                  fill="none"
+                  stroke="rgba(0,0,0,0.45)"
+                  strokeWidth={r.active ? "11" : "7"}
+                  strokeLinecap="round"
+                />
+                {/* Path body */}
+                <path
+                  d={`M${tl}% ${tt}% Q${mx}% ${my}% ${rl}% ${rt}%`}
+                  fill="none"
+                  stroke={r.active ? "rgb(232,206,140)" : "rgba(120,100,75,0.55)"}
+                  strokeWidth={r.active ? "8" : "5"}
+                  strokeLinecap="round"
+                />
+                {/* Dashed walking line */}
+                <path
+                  d={`M${tl}% ${tt}% Q${mx}% ${my}% ${rl}% ${rt}%`}
+                  fill="none"
+                  stroke={r.active ? "rgba(255,255,255,0.75)" : "rgba(255,255,255,0.18)"}
+                  strokeWidth={r.active ? "2" : "1.4"}
+                  strokeDasharray="5 6"
+                  strokeLinecap="round"
+                />
+              </g>
             );
           })}
           {/* Small checkpoint nodes along active path */}
@@ -132,24 +150,29 @@ export default function TowerMapPage() {
         >
           <button
             onClick={() => router.push("/home")}
-            className="group flex flex-col items-center cursor-pointer"
+            className="group flex flex-col items-center cursor-pointer towerBob"
             type="button"
           >
             <div
-              className="px-5 py-2.5 rounded-xl transition-transform duration-200 group-hover:scale-105"
+              className="relative px-6 py-3 rounded-2xl transition-transform duration-200 group-hover:scale-110 group-active:scale-95"
               style={{
-                background: "rgba(20,18,14,0.8)",
-                border: "1.5px solid rgba(200,170,100,0.35)",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+                background: "linear-gradient(180deg, #f8d77a 0%, #d99a35 55%, #8a5418 100%)",
+                border: "3px solid #2a1a08",
+                boxShadow:
+                  "0 0 0 2px rgba(255,230,160,0.55) inset, 0 10px 0 #2a1a08, 0 14px 30px rgba(0,0,0,0.55)",
               }}
             >
               <p
-                className="text-amber-100 text-[11px] font-extrabold tracking-[0.15em] text-center whitespace-nowrap leading-tight"
-                style={{ textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}
+                className="text-white text-[13px] font-black tracking-[0.18em] text-center whitespace-nowrap leading-tight"
+                style={{
+                  textShadow:
+                    "0 2px 0 #2a1a08, 0 -1px 0 rgba(255,255,255,0.25), 0 0 12px rgba(255,210,120,0.6)",
+                  WebkitTextStroke: "0.5px #2a1a08",
+                }}
               >
-                TOWER OF
+                ⚔ TOWER OF
                 <br />
-                KNOWLEDGE
+                KNOWLEDGE ⚔
               </p>
             </div>
           </button>
@@ -164,43 +187,53 @@ export default function TowerMapPage() {
               top: realm.top,
               left: realm.left,
               transform: "translate(-50%,-50%)",
-              animation: `realmFadeIn 0.35s ${i * 0.04}s ease both`,
+              animation: `realmFadeIn 0.45s ${i * 0.05}s ease both`,
             }}
           >
             {realm.active ? (
               <button
                 onClick={() => router.push("/number-nexus")}
-                className="group flex flex-col items-center cursor-pointer"
+                className="group flex flex-col items-center cursor-pointer realmBob"
               >
                 <div className="relative">
-                  {/* Marker circle */}
+                  {/* Pulse halo */}
                   <div
-                    className="h-14 w-14 rounded-2xl flex items-center justify-center text-xl font-bold text-white transition-transform duration-200 group-hover:scale-110 group-active:scale-95"
+                    className="absolute inset-0 rounded-[28px] -z-10 animate-ping"
+                    style={{ background: realm.bg, opacity: 0.25 }}
+                  />
+                  {/* Chunky crest */}
+                  <div
+                    className="h-20 w-20 rounded-[28px] flex items-center justify-center text-3xl font-black text-white transition-transform duration-200 group-hover:scale-110 group-active:scale-95"
                     style={{
-                      background: realm.bg,
-                      border: `2px solid rgba(255,255,255,0.4)`,
-                      boxShadow: `0 4px 16px rgba(0,0,0,0.3), 0 2px 8px ${realm.border}`,
+                      background: `linear-gradient(180deg, ${realm.bg} 0%, ${realm.bg} 50%, ${realm.shade} 100%)`,
+                      border: `4px solid #1a1208`,
+                      boxShadow: `inset 0 2px 0 rgba(255,255,255,0.55), inset 0 -8px 0 rgba(0,0,0,0.25), 0 8px 0 #1a1208, 0 14px 24px rgba(0,0,0,0.45)`,
+                      textShadow: "0 2px 0 rgba(0,0,0,0.45)",
                     }}
                   >
                     {realm.symbol}
                   </div>
-                  {/* Star badge */}
+                  {/* Gem star badge */}
                   <div
-                    className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full flex items-center justify-center"
+                    className="absolute -top-2 -right-2 h-7 w-7 rounded-full flex items-center justify-center"
                     style={{
-                      background: "rgb(250,204,21)",
-                      border: "2px solid white",
-                      boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                      background: "linear-gradient(180deg, #ffe680 0%, #f5b400 60%, #8a5a00 100%)",
+                      border: "2.5px solid #1a1208",
+                      boxShadow: "0 3px 0 #1a1208, 0 0 12px rgba(255,200,60,0.7)",
                     }}
                   >
-                    <Star className="h-2.5 w-2.5 text-amber-800" fill="currentColor" />
+                    <Star className="h-3.5 w-3.5 text-amber-900" fill="currentColor" />
                   </div>
                 </div>
+                {/* Ribbon nameplate */}
                 <span
-                  className="mt-1.5 text-[10px] font-bold text-white px-3 py-1 rounded-full whitespace-nowrap"
+                  className="mt-2.5 text-[11px] font-black text-white px-4 py-1.5 whitespace-nowrap tracking-wide uppercase"
                   style={{
-                    background: realm.bg,
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
+                    background: `linear-gradient(180deg, ${realm.bg}, ${realm.shade})`,
+                    border: "2.5px solid #1a1208",
+                    borderRadius: "8px",
+                    boxShadow: "0 4px 0 #1a1208, 0 6px 14px rgba(0,0,0,0.4)",
+                    textShadow: "0 1.5px 0 rgba(0,0,0,0.5)",
                   }}
                 >
                   {realm.name}
@@ -208,28 +241,31 @@ export default function TowerMapPage() {
               </button>
             ) : (
               <div className="flex flex-col items-center">
-                {/* Locked marker */}
+                {/* Locked stone crest */}
                 <div
-                  className="h-12 w-12 rounded-xl flex items-center justify-center relative"
+                  className="h-16 w-16 rounded-[22px] flex items-center justify-center relative"
                   style={{
-                    background: realm.bg,
-                    border: `1.5px solid ${realm.border}`,
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
-                    opacity: 0.7,
+                    background: `linear-gradient(180deg, ${realm.bg}, ${realm.shade})`,
+                    border: "3.5px solid #1a1208",
+                    boxShadow: "inset 0 2px 0 rgba(255,255,255,0.3), inset 0 -6px 0 rgba(0,0,0,0.3), 0 6px 0 #1a1208, 0 10px 18px rgba(0,0,0,0.4)",
+                    filter: "saturate(0.55) brightness(0.75)",
                   }}
                 >
                   <div
-                    className="absolute inset-0 rounded-xl flex items-center justify-center"
-                    style={{ background: "rgba(0,0,0,0.4)" }}
+                    className="absolute inset-0 rounded-[18px] flex items-center justify-center"
+                    style={{ background: "rgba(0,0,0,0.45)" }}
                   >
-                    <Lock className="h-4 w-4 text-white/70" />
+                    <Lock className="h-5 w-5 text-white/85" />
                   </div>
                 </div>
                 <span
-                  className="mt-1 text-[9px] font-semibold px-2.5 py-0.5 rounded-full whitespace-nowrap"
+                  className="mt-2 text-[10px] font-extrabold px-3 py-1 whitespace-nowrap uppercase tracking-wide"
                   style={{
-                    color: "rgba(255,255,255,0.7)",
-                    background: "rgba(20,18,14,0.6)",
+                    color: "rgba(255,240,210,0.85)",
+                    background: "rgba(20,16,10,0.85)",
+                    border: "2px solid #1a1208",
+                    borderRadius: "6px",
+                    boxShadow: "0 3px 0 #1a1208",
                   }}
                 >
                   {realm.name}
@@ -276,13 +312,19 @@ export default function TowerMapPage() {
         @keyframes realmFadeIn {
           from {
             opacity: 0;
-            transform: translate(-50%, calc(-50% + 8px));
+            transform: translate(-50%, calc(-50% + 14px)) scale(0.85);
           }
           to {
             opacity: 1;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%) scale(1);
           }
         }
+        @keyframes bob {
+          0%, 100% { transform: translateY(0); }
+          50%      { transform: translateY(-4px); }
+        }
+        .realmBob { animation: bob 2.8s ease-in-out infinite; }
+        .towerBob { animation: bob 3.4s ease-in-out infinite; }
       `}</style>
     </main>
   );
