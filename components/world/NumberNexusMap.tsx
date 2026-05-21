@@ -701,38 +701,51 @@ export default function NumberNexusMap() {
         style={{ position: "absolute", inset: 0, zIndex: 4, pointerEvents: "none" }}
       />
 
-      {/* ── District signs ── */}
-      <div style={{ position: "absolute", inset: 0, zIndex: 10, pointerEvents: "none" }}>
-        {DISTRICT_ZONES.map((zone) => (
-          <div
-            key={zone.id}
-            style={{
-              position: "absolute",
-              left: zone.left,
-              top: zone.top,
-              transform: "translate(-50%, -50%)",
-              pointerEvents: "auto",
-            }}
-          >
-            <DistrictSign
-              zone={zone}
-              state={zoneState(zone)}
-              active={activeZoneId === zone.id}
-              onClick={() => onDistrictTap(zone.weekStart, zone.weekEnd)}
-            />
-          </div>
-        ))}
-      </div>
+      {/* ── World layer (districts + character) — pans subtly on district change ── */}
+      <div
+        style={{
+          position: "absolute", inset: 0, zIndex: 10,
+          transform: `translate3d(${(currentZone?.panX ?? 0)}px, 0, 0)`,
+          transition: "transform 0.9s cubic-bezier(0.22,1,0.36,1)",
+          pointerEvents: "none",
+        }}
+      >
+        {/* Render far-depth districts first so closer ones overlap them */}
+        {[...DISTRICT_ZONES]
+          .sort((a, b) => a.depth - b.depth)
+          .map((zone) => (
+            <div
+              key={zone.id}
+              style={{
+                position: "absolute",
+                left: zone.left,
+                top: zone.top,
+                transform: "translate(-50%, -100%)",
+                pointerEvents: "auto",
+                zIndex: Math.round(zone.depth * 10),
+              }}
+            >
+              <DistrictStructure
+                zone={zone}
+                state={zoneState(zone)}
+                active={activeZoneId === zone.id}
+                onClick={() => onDistrictTap(zone.weekStart, zone.weekEnd)}
+              />
+            </div>
+          ))}
 
-      {/* ── Character ── */}
-      <div style={{
-        position: "absolute",
-        bottom: "9%",
-        left: "50%",
-        transform: "translateX(-50%)",
-        zIndex: 8,
-      }}>
-        <PlayerCharacter gender={gender} />
+        {/* Character — drifts horizontally toward the active district */}
+        <div style={{
+          position: "absolute",
+          bottom: "9%",
+          left: `calc(50% + ${(currentZone ? (parseFloat(currentZone.left) - 50) * 0.35 : 0)}%)`,
+          transform: "translateX(-50%)",
+          zIndex: 12,
+          transition: "left 0.9s cubic-bezier(0.22,1,0.36,1)",
+          pointerEvents: "auto",
+        }}>
+          <PlayerCharacter gender={gender} />
+        </div>
       </div>
 
       {/* ── Top bar ── */}
