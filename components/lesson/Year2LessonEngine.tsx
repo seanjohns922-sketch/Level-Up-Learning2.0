@@ -854,6 +854,8 @@ export function Year2LessonEngine({
         }`}
       />
 
+      <SurgeAmbience comboCount={comboCount} />
+
       <div className="grid gap-3 lg:grid-cols-[300px_1fr] lg:items-start lg:gap-5">
         <aside className="lg:sticky lg:top-4 lg:self-start">
           <LessonHUDRail
