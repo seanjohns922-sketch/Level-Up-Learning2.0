@@ -4443,6 +4443,13 @@ function toQuizQuestionFromYear2Data(
           kind: "typed",
           prompt,
           correctValue: String(questionData.answer),
+          responseType: "number",
+          placeholder:
+            questionData.mode === "missing_mab_part"
+              ? "Type the missing value"
+              : questionData.mode === "identify_place"
+              ? "Type the count"
+              : "Type the number",
         }
       : {
           id: `q${index}`,
