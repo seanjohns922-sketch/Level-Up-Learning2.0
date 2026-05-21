@@ -15,12 +15,16 @@ import {
 } from "@/lib/program-progress";
 
 // ─── District zones ─────────────────────────────────────────────────────────────
+// Each district is a REAL structure in the city, placed at varied vertical
+// positions to break the flat-menu feel. `depth` ∈ [0..1] — 0 = far/distant
+// (small + cool), 1 = foreground (large + saturated). `anchor` is where the
+// holographic label tethers to the structure ("top" | "side").
 const DISTRICT_ZONES = [
-  { id: "counting", name: "COUNTING\nDISTRICT", sub: "WEEKS 1–3",   weekStart: 1,  weekEnd: 3,  left: "6%",  top: "30%", color: "#14b8a6", rot: "rotateY(10deg)" },
-  { id: "bridge",   name: "NUMBER\nBRIDGE",     sub: "WEEKS 4–6",   weekStart: 4,  weekEnd: 6,  left: "22%", top: "38%", color: "#818cf8", rot: "rotateY(5deg)"  },
-  { id: "tower",    name: "LEGEND\nTOWER",       sub: "WEEK 12",     weekStart: 12, weekEnd: 12, left: "44%", top: "34%", color: "#fbbf24", rot: "none"           },
-  { id: "core",     name: "CALCULATION\nCORE",   sub: "WEEKS 7–9",   weekStart: 7,  weekEnd: 9,  left: "63%", top: "36%", color: "#f472b6", rot: "rotateY(-5deg)" },
-  { id: "mastery",  name: "MASTERY\nSECTOR",     sub: "WEEKS 10–12", weekStart: 10, weekEnd: 11, left: "73%", top: "19%", color: "#a78bfa", rot: "rotateY(-10deg)"},
+  { id: "counting", name: "COUNTING DISTRICT", sub: "WEEKS 1–3",   weekStart: 1,  weekEnd: 3,  left: "11%", top: "68%", color: "#14b8a6", depth: 0.95, anchor: "top",  panX: 14 },
+  { id: "bridge",   name: "NUMBER BRIDGE",      sub: "WEEKS 4–6",   weekStart: 4,  weekEnd: 6,  left: "32%", top: "55%", color: "#22d3ee", depth: 0.75, anchor: "top",  panX: 6  },
+  { id: "tower",    name: "LEGEND TOWER",       sub: "WEEK 12",     weekStart: 12, weekEnd: 12, left: "50%", top: "30%", color: "#fbbf24", depth: 1.00, anchor: "side", panX: 0  },
+  { id: "core",     name: "CALCULATION CORE",   sub: "WEEKS 7–9",   weekStart: 7,  weekEnd: 9,  left: "70%", top: "60%", color: "#f472b6", depth: 0.85, anchor: "top",  panX: -8 },
+  { id: "mastery",  name: "MASTERY SECTOR",     sub: "WEEKS 10–12", weekStart: 10, weekEnd: 11, left: "86%", top: "22%", color: "#a78bfa", depth: 0.55, anchor: "side", panX: -14},
 ] as const;
 
 // ─── World canvas (particles + vehicles + tower pulse) ──────────────────────────
@@ -145,8 +149,10 @@ function useWorldCanvas() {
   return ref;
 }
 
-// ─── District sign ─────────────────────────────────────────────────────────────
-function DistrictSign({
+// ─── District structures ───────────────────────────────────────────────────────
+// One bespoke shape per district id. Renders as an SVG so the structure feels
+// like part of the city, then a small floating holo-label tethers to it.
+function DistrictStructure({
   zone, state, active, onClick,
 }: {
   zone: (typeof DISTRICT_ZONES)[number];
@@ -155,126 +161,294 @@ function DistrictSign({
   onClick: () => void;
 }) {
   const [hovered, setHovered] = useState(false);
+  const interactive = state !== "locked";
 
-  const cfg = {
-    complete: {
-      border: "1.5px solid #14b8a6",
-      bg: "rgba(3,22,20,0.91)",
-      nameColor: "#5eead4",
-      badge: "✓  COMPLETE",
-      badgeBg: "rgba(20,184,166,0.2)",
-      badgeColor: "#14b8a6",
-      glow: "0 0 28px rgba(20,184,166,0.5), 0 0 60px rgba(20,184,166,0.15), 0 6px 30px rgba(0,0,0,0.7)",
-    },
-    current: {
-      border: `2px solid ${zone.color}`,
-      bg: "rgba(3,6,18,0.93)",
-      nameColor: "#ffffff",
-      badge: "▶  ENTER",
-      badgeBg: `${zone.color}28`,
-      badgeColor: zone.color,
-      glow: `0 0 34px ${zone.color}66, 0 0 80px ${zone.color}1a, 0 6px 32px rgba(0,0,0,0.75)`,
-    },
-    locked: {
-      border: "1px solid rgba(45,58,95,0.4)",
-      bg: "rgba(3,5,12,0.78)",
-      nameColor: "rgba(70,88,128,0.6)",
-      badge: "🔒  LOCKED",
-      badgeBg: "rgba(15,20,40,0.45)",
-      badgeColor: "rgba(70,88,128,0.5)",
-      glow: "0 4px 20px rgba(0,0,0,0.6)",
-    },
-  }[state];
+  // Visual tone per state
+  const tone =
+    state === "locked"   ? { fill: "#1c2a3a", stroke: "#2d3a55", glow: "rgba(0,0,0,0)",        labelTxt: "🔒 LOCKED",  labelCol: "rgba(120,140,170,0.55)" }
+  : state === "complete" ? { fill: "#0f4a45", stroke: "#14b8a6", glow: "rgba(20,184,166,0.55)", labelTxt: "✓ COMPLETE", labelCol: "#5eead4" }
+                         : { fill: zone.color, stroke: "#ffffff", glow: `${zone.color}aa`,      labelTxt: "▶ ENTER",    labelCol: "#ffffff" };
 
-  const scale = active ? 1.09 : hovered && state !== "locked" ? 1.04 : 1;
+  // Depth-aware scale; active district gets a bump
+  const baseScale = 0.7 + zone.depth * 0.55; // 0.7..1.25
+  const scale = (active ? baseScale * 1.08 : hovered && interactive ? baseScale * 1.04 : baseScale);
+
+  // Distance dimming for far structures
+  const distOpacity = state === "locked" ? 0.55 : 0.55 + zone.depth * 0.45;
 
   return (
     <div
-      onClick={state !== "locked" ? onClick : undefined}
+      onClick={interactive ? onClick : undefined}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        padding: "12px 18px",
-        borderRadius: 14,
-        border: cfg.border,
-        background: cfg.bg,
-        backdropFilter: "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
-        textAlign: "center",
-        minWidth: 136,
-        cursor: state !== "locked" ? "pointer" : "default",
-        boxShadow: cfg.glow,
-        userSelect: "none",
-        transition: "transform 0.25s ease, box-shadow 0.25s ease",
-        transform: `${zone.rot} scale(${scale})`,
-        transformOrigin: "center center",
-        pointerEvents: "auto",
-        overflow: "hidden",
         position: "relative",
+        cursor: interactive ? "pointer" : "default",
+        userSelect: "none",
+        transform: `scale(${scale})`,
+        transformOrigin: "center bottom",
+        transition: "transform 0.4s cubic-bezier(0.22,1,0.36,1), filter 0.3s",
+        filter: `drop-shadow(0 18px 30px rgba(0,0,0,0.55)) drop-shadow(0 0 ${active ? 22 : 10}px ${tone.glow})`,
+        opacity: distOpacity,
+        pointerEvents: "auto",
       }}
     >
-      {/* Holographic scan shimmer */}
-      {(state === "current" || (hovered && state !== "locked")) && (
-        <div style={{
-          position: "absolute", inset: 0,
-          background: `linear-gradient(180deg, transparent 0%, ${zone.color}18 50%, transparent 100%)`,
-          backgroundSize: "100% 60px",
-          animation: "holo-scan 2.8s linear infinite",
-          pointerEvents: "none",
-        }} />
-      )}
+      {/* The structure itself */}
+      <Structure id={zone.id} tone={tone} active={active} />
 
-      {/* Top bar */}
-      <div style={{ width: "100%", height: 2, background: `linear-gradient(90deg, transparent, ${zone.color}, transparent)`, marginBottom: 10, borderRadius: 1 }} />
+      {/* Tethered holo-label */}
+      <HoloLabel
+        zone={zone}
+        tone={tone}
+        active={active}
+        state={state}
+      />
+    </div>
+  );
+}
 
-      {/* Name */}
-      <div style={{
-        color: cfg.nameColor,
-        fontSize: 12,
-        fontWeight: 900,
-        letterSpacing: "0.22em",
-        fontFamily: "ui-monospace, monospace",
-        whiteSpace: "pre-line",
-        lineHeight: 1.35,
-        marginBottom: 7,
-        textShadow: state !== "locked" ? `0 0 16px ${zone.color}` : "none",
-      }}>
-        {zone.name}
+function Structure({
+  id, tone, active,
+}: {
+  id: typeof DISTRICT_ZONES[number]["id"];
+  tone: { fill: string; stroke: string; glow: string };
+  active: boolean;
+}) {
+  const f = tone.fill, s = tone.stroke;
+
+  if (id === "counting") {
+    // Stubby data-terminal tower with antenna + glowing readout panels
+    return (
+      <svg width="118" height="170" viewBox="0 0 118 170" style={{ display: "block" }}>
+        <defs>
+          <linearGradient id="ct" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={f} stopOpacity="0.95" />
+            <stop offset="100%" stopColor="#02141a" stopOpacity="0.95" />
+          </linearGradient>
+        </defs>
+        <rect x="22" y="38" width="74" height="118" rx="6" fill="url(#ct)" stroke={s} strokeOpacity="0.7" />
+        {/* readout panels */}
+        {[0,1,2,3].map(i => (
+          <rect key={i} x="30" y={54 + i*22} width="58" height="12" rx="2" fill={s} opacity={active ? 0.55 : 0.35}>
+            <animate attributeName="opacity" values="0.25;0.7;0.25" dur={`${1.6 + i*0.3}s`} repeatCount="indefinite" />
+          </rect>
+        ))}
+        {/* base plinth */}
+        <rect x="10" y="156" width="98" height="10" rx="2" fill="#02141a" stroke={s} strokeOpacity="0.4" />
+        {/* antenna */}
+        <rect x="56" y="10" width="6" height="30" fill={s} opacity="0.8" />
+        <circle cx="59" cy="8" r="4" fill={s}>
+          <animate attributeName="r" values="3;5;3" dur="1.6s" repeatCount="indefinite" />
+        </circle>
+      </svg>
+    );
+  }
+
+  if (id === "bridge") {
+    // Suspension bridge spanning between two skyscrapers
+    return (
+      <svg width="220" height="130" viewBox="0 0 220 130" style={{ display: "block" }}>
+        {/* Two skyscraper pylons */}
+        <rect x="6"   y="20" width="28" height="100" rx="3" fill="#03161e" stroke={s} strokeOpacity="0.5" />
+        <rect x="186" y="20" width="28" height="100" rx="3" fill="#03161e" stroke={s} strokeOpacity="0.5" />
+        {/* Pylon tops */}
+        <rect x="14"  y="8" width="12" height="14" fill={s} opacity="0.6" />
+        <rect x="194" y="8" width="12" height="14" fill={s} opacity="0.6" />
+        {/* Suspension cables (curved) */}
+        <path d="M20 22 Q110 88 200 22" stroke={s} strokeWidth="1.5" fill="none" opacity="0.85" />
+        <path d="M20 28 Q110 96 200 28" stroke={s} strokeWidth="1"   fill="none" opacity="0.5" />
+        {/* Vertical cable hangers */}
+        {Array.from({length:9}).map((_,i)=>{
+          const x = 30 + i*20;
+          const cy = 22 + Math.sin(((x-20)/180)*Math.PI)*66;
+          return <line key={i} x1={x} y1={cy} x2={x} y2={84} stroke={s} strokeOpacity="0.4" strokeWidth="0.8" />;
+        })}
+        {/* Deck */}
+        <rect x="20" y="82" width="180" height="8" rx="2" fill={f} stroke={s} strokeOpacity="0.7" />
+        {/* Glowing road centerline */}
+        <line x1="24" y1="86" x2="196" y2="86" stroke={s} strokeWidth="1.5" strokeDasharray="6 5" opacity={active?0.9:0.5}>
+          <animate attributeName="stroke-dashoffset" from="0" to="-22" dur="1.2s" repeatCount="indefinite" />
+        </line>
+      </svg>
+    );
+  }
+
+  if (id === "tower") {
+    // Tall central legend spire — dominant
+    return (
+      <svg width="140" height="280" viewBox="0 0 140 280" style={{ display: "block" }}>
+        <defs>
+          <linearGradient id="tw" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={f} stopOpacity="0.95" />
+            <stop offset="50%" stopColor="#5a4214" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="#02141a" stopOpacity="0.95" />
+          </linearGradient>
+        </defs>
+        {/* Spire crown */}
+        <polygon points="70,4 84,40 56,40" fill={s} opacity="0.9">
+          <animate attributeName="opacity" values="0.7;1;0.7" dur="2.2s" repeatCount="indefinite" />
+        </polygon>
+        {/* Stepped tower body — narrows toward top */}
+        <polygon points="44,40 96,40 92,90 48,90" fill="url(#tw)" stroke={s} strokeOpacity="0.7" />
+        <polygon points="36,90 104,90 100,160 40,160" fill="url(#tw)" stroke={s} strokeOpacity="0.6" />
+        <polygon points="28,160 112,160 108,240 32,240" fill="url(#tw)" stroke={s} strokeOpacity="0.5" />
+        {/* Window grid */}
+        {Array.from({length:6}).map((_,row)=>(
+          Array.from({length:5}).map((__,col)=>{
+            const x = 42 + col*12, y = 100 + row*22;
+            return <rect key={`${row}-${col}`} x={x} y={y} width="6" height="8" fill={s} opacity={0.25 + (row%2)*0.25} />;
+          })
+        ))}
+        {/* Base */}
+        <rect x="20" y="240" width="100" height="34" rx="3" fill="#02141a" stroke={s} strokeOpacity="0.5" />
+        {/* Halo rings around spire */}
+        <ellipse cx="70" cy="42" rx="32" ry="6" fill="none" stroke={s} strokeOpacity="0.6">
+          <animate attributeName="rx" values="28;36;28" dur="3s" repeatCount="indefinite" />
+        </ellipse>
+      </svg>
+    );
+  }
+
+  if (id === "core") {
+    // Reactor — central orb with rotating rings + pipes
+    return (
+      <svg width="150" height="170" viewBox="0 0 150 170" style={{ display: "block" }}>
+        {/* Plinth */}
+        <rect x="18" y="120" width="114" height="38" rx="5" fill="#03161e" stroke={s} strokeOpacity="0.5" />
+        {/* Side pipes */}
+        <rect x="2"   y="100" width="20" height="14" fill="#03161e" stroke={s} strokeOpacity="0.5" />
+        <rect x="128" y="100" width="20" height="14" fill="#03161e" stroke={s} strokeOpacity="0.5" />
+        {/* Core orb */}
+        <circle cx="75" cy="78" r="28" fill={f} opacity="0.85" />
+        <circle cx="75" cy="78" r="28" fill="none" stroke={s} strokeOpacity="0.8" />
+        <circle cx="75" cy="78" r="14" fill="#fff" opacity={active ? 0.85 : 0.55}>
+          <animate attributeName="opacity" values="0.4;0.95;0.4" dur="1.8s" repeatCount="indefinite" />
+        </circle>
+        {/* Rotating ring */}
+        <g style={{ transformOrigin: "75px 78px", animation: "core-spin 6s linear infinite" }}>
+          <ellipse cx="75" cy="78" rx="44" ry="14" fill="none" stroke={s} strokeOpacity="0.85" strokeWidth="1.5" />
+        </g>
+        <g style={{ transformOrigin: "75px 78px", animation: "core-spin 8s linear infinite reverse" }}>
+          <ellipse cx="75" cy="78" rx="38" ry="22" fill="none" stroke={s} strokeOpacity="0.55" strokeWidth="1" />
+        </g>
+      </svg>
+    );
+  }
+
+  // mastery — floating elite platform high in skyline
+  return (
+    <svg width="120" height="120" viewBox="0 0 120 120" style={{ display: "block" }}>
+      {/* Floating disc */}
+      <ellipse cx="60" cy="72" rx="50" ry="14" fill={f} opacity="0.9" stroke={s} strokeOpacity="0.7" />
+      <ellipse cx="60" cy="68" rx="50" ry="14" fill="#02141a" stroke={s} strokeOpacity="0.4" />
+      {/* Platform pillar */}
+      <rect x="56" y="40" width="8" height="32" fill={s} opacity="0.65" />
+      {/* Diamond crown */}
+      <polygon points="60,14 78,38 60,46 42,38" fill={f} stroke={s} strokeOpacity="0.85" opacity="0.95">
+        <animate attributeName="opacity" values="0.7;1;0.7" dur="2.4s" repeatCount="indefinite" />
+      </polygon>
+      {/* Anti-grav rings under disc */}
+      <ellipse cx="60" cy="92" rx="40" ry="6" fill="none" stroke={s} strokeOpacity="0.45">
+        <animate attributeName="rx" values="34;46;34" dur="2.6s" repeatCount="indefinite" />
+        <animate attributeName="opacity" values="0.1;0.55;0.1" dur="2.6s" repeatCount="indefinite" />
+      </ellipse>
+    </svg>
+  );
+}
+
+function HoloLabel({
+  zone, tone, active, state,
+}: {
+  zone: (typeof DISTRICT_ZONES)[number];
+  tone: { fill: string; stroke: string; glow: string; labelTxt: string; labelCol: string };
+  active: boolean;
+  state: "complete" | "current" | "locked";
+}) {
+  // Anchor offset — top or side of structure
+  const top = zone.anchor === "side" ? "10%" : "-32px";
+  const left = zone.anchor === "side" ? "calc(100% + 14px)" : "50%";
+  const translate = zone.anchor === "side" ? "translate(0,-50%)" : "translate(-50%,-100%)";
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top, left,
+        transform: translate,
+        pointerEvents: "none",
+        whiteSpace: "nowrap",
+      }}
+    >
+      {/* Tether line */}
+      <div
+        style={{
+          position: "absolute",
+          ...(zone.anchor === "side"
+            ? { left: -14, top: "50%", width: 14, height: 1 }
+            : { left: "50%", bottom: -8, width: 1, height: 8, transform: "translateX(-50%)" }),
+          background: tone.stroke,
+          opacity: 0.6,
+        }}
+      />
+      {/* Glowing dot at tether origin */}
+      <div
+        style={{
+          position: "absolute",
+          ...(zone.anchor === "side"
+            ? { left: -18, top: "50%", transform: "translateY(-50%)" }
+            : { left: "50%", bottom: -12, transform: "translateX(-50%)" }),
+          width: 6, height: 6, borderRadius: "50%",
+          background: tone.stroke,
+          boxShadow: `0 0 10px ${tone.stroke}`,
+          animation: state !== "locked" ? "holo-dot 1.6s ease-in-out infinite" : "none",
+        }}
+      />
+      {/* The label itself — bare, no card chrome */}
+      <div
+        style={{
+          display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 2,
+          padding: "2px 0",
+        }}
+      >
+        <span style={{
+          color: tone.labelCol,
+          fontSize: 10,
+          fontWeight: 900,
+          letterSpacing: "0.22em",
+          fontFamily: "ui-monospace, monospace",
+          textShadow: state !== "locked" ? `0 0 12px ${tone.stroke}, 0 2px 6px rgba(0,0,0,0.9)` : "0 1px 4px rgba(0,0,0,0.7)",
+        }}>
+          {zone.name}
+        </span>
+        <span style={{
+          color: tone.stroke,
+          fontSize: 8,
+          opacity: state === "locked" ? 0.45 : 0.9,
+          letterSpacing: "0.2em",
+          fontFamily: "ui-monospace, monospace",
+          textShadow: "0 1px 3px rgba(0,0,0,0.8)",
+        }}>
+          {zone.sub}  ·  {tone.labelTxt}
+        </span>
+        {active && state !== "locked" && (
+          <span
+            style={{
+              marginTop: 2,
+              fontSize: 8,
+              fontWeight: 900,
+              letterSpacing: "0.24em",
+              fontFamily: "ui-monospace, monospace",
+              color: tone.stroke,
+              padding: "1px 6px",
+              border: `1px solid ${tone.stroke}`,
+              borderRadius: 3,
+              animation: "holo-scan 2.4s linear infinite",
+            }}
+          >
+            TAP TO ENTER
+          </span>
+        )}
       </div>
-
-      {/* Sub */}
-      <div style={{ color: zone.color, fontSize: 8, opacity: 0.8, letterSpacing: "0.16em", fontFamily: "ui-monospace, monospace", marginBottom: 10 }}>
-        {zone.sub}
-      </div>
-
-      {/* Badge */}
-      <div style={{
-        display: "inline-block",
-        padding: "3px 12px",
-        borderRadius: 6,
-        background: cfg.badgeBg,
-        border: `1px solid ${zone.color}44`,
-        color: cfg.badgeColor,
-        fontSize: 8,
-        fontWeight: 800,
-        letterSpacing: "0.15em",
-        fontFamily: "ui-monospace, monospace",
-      }}>
-        {cfg.badge}
-      </div>
-
-      {/* Bottom bar */}
-      <div style={{ width: "100%", height: 2, background: `linear-gradient(90deg, transparent, ${zone.color}, transparent)`, marginTop: 10, borderRadius: 1 }} />
-
-      {/* Corner accents */}
-      {state !== "locked" && (
-        <>
-          <div style={{ position: "absolute", top: 6, left: 6, width: 8, height: 8, borderTop: `1.5px solid ${zone.color}`, borderLeft: `1.5px solid ${zone.color}` }} />
-          <div style={{ position: "absolute", top: 6, right: 6, width: 8, height: 8, borderTop: `1.5px solid ${zone.color}`, borderRight: `1.5px solid ${zone.color}` }} />
-          <div style={{ position: "absolute", bottom: 6, left: 6, width: 8, height: 8, borderBottom: `1.5px solid ${zone.color}`, borderLeft: `1.5px solid ${zone.color}` }} />
-          <div style={{ position: "absolute", bottom: 6, right: 6, width: 8, height: 8, borderBottom: `1.5px solid ${zone.color}`, borderRight: `1.5px solid ${zone.color}` }} />
-        </>
-      )}
     </div>
   );
 }
@@ -527,38 +701,51 @@ export default function NumberNexusMap() {
         style={{ position: "absolute", inset: 0, zIndex: 4, pointerEvents: "none" }}
       />
 
-      {/* ── District signs ── */}
-      <div style={{ position: "absolute", inset: 0, zIndex: 10, pointerEvents: "none" }}>
-        {DISTRICT_ZONES.map((zone) => (
-          <div
-            key={zone.id}
-            style={{
-              position: "absolute",
-              left: zone.left,
-              top: zone.top,
-              transform: "translate(-50%, -50%)",
-              pointerEvents: "auto",
-            }}
-          >
-            <DistrictSign
-              zone={zone}
-              state={zoneState(zone)}
-              active={activeZoneId === zone.id}
-              onClick={() => onDistrictTap(zone.weekStart, zone.weekEnd)}
-            />
-          </div>
-        ))}
-      </div>
+      {/* ── World layer (districts + character) — pans subtly on district change ── */}
+      <div
+        style={{
+          position: "absolute", inset: 0, zIndex: 10,
+          transform: `translate3d(${(currentZone?.panX ?? 0)}px, 0, 0)`,
+          transition: "transform 0.9s cubic-bezier(0.22,1,0.36,1)",
+          pointerEvents: "none",
+        }}
+      >
+        {/* Render far-depth districts first so closer ones overlap them */}
+        {[...DISTRICT_ZONES]
+          .sort((a, b) => a.depth - b.depth)
+          .map((zone) => (
+            <div
+              key={zone.id}
+              style={{
+                position: "absolute",
+                left: zone.left,
+                top: zone.top,
+                transform: "translate(-50%, -100%)",
+                pointerEvents: "auto",
+                zIndex: Math.round(zone.depth * 10),
+              }}
+            >
+              <DistrictStructure
+                zone={zone}
+                state={zoneState(zone)}
+                active={activeZoneId === zone.id}
+                onClick={() => onDistrictTap(zone.weekStart, zone.weekEnd)}
+              />
+            </div>
+          ))}
 
-      {/* ── Character ── */}
-      <div style={{
-        position: "absolute",
-        bottom: "9%",
-        left: "50%",
-        transform: "translateX(-50%)",
-        zIndex: 8,
-      }}>
-        <PlayerCharacter gender={gender} />
+        {/* Character — drifts horizontally toward the active district */}
+        <div style={{
+          position: "absolute",
+          bottom: "9%",
+          left: `calc(50% + ${(currentZone ? (parseFloat(currentZone.left) - 50) * 0.35 : 0)}%)`,
+          transform: "translateX(-50%)",
+          zIndex: 12,
+          transition: "left 0.9s cubic-bezier(0.22,1,0.36,1)",
+          pointerEvents: "auto",
+        }}>
+          <PlayerCharacter gender={gender} />
+        </div>
       </div>
 
       {/* ── Top bar ── */}
@@ -666,6 +853,14 @@ export default function NumberNexusMap() {
         @keyframes beam-pulse {
           0%, 100% { opacity: 0.7; }
           50%       { opacity: 1.0; }
+        }
+        @keyframes core-spin {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
+        }
+        @keyframes holo-dot {
+          0%, 100% { transform: scale(1);   opacity: 0.85; }
+          50%       { transform: scale(1.6); opacity: 1;   }
         }
       `}</style>
     </div>
