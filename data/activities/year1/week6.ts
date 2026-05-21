@@ -1,5 +1,4 @@
 import type { PracticeTask, Difficulty } from "./practice-task";
-import { diffRange } from "./practice-task";
 
 function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -7,8 +6,8 @@ function randInt(min: number, max: number) {
 
 function makeSubtractPair(d: Difficulty): { total: number; remove: number; answer: number } {
   if (d === "hard") {
-    const total = randInt(30, 99);
-    const remove = randInt(10, total - 1);
+    const total = randInt(11, 20);
+    const remove = randInt(2, total - 1);
     return { total, remove, answer: total - remove };
   }
   const maxTotal = d === "easy" ? 12 : 16;

@@ -107,7 +107,7 @@ function genNumberLadder(d: Difficulty, min = 0, max = 120): PracticeTask {
 function genTypeNumber(d: Difficulty, min = 0, max = 120): PracticeTask {
   const [lo, hi] = diffRange(d, [0, 50], [0, 80], [min, max]);
   const answer = randInt(lo, hi);
-  return { kind: "typeNumber", prompt: "Write the number.", answer, min: lo, max: hi, difficulty: d };
+  return { kind: "typeNumber", prompt: "Type the number word.", answer, min: lo, max: hi, difficulty: d };
 }
 
 function genNumberLineTap(d: Difficulty, min = 0, max = 120): PracticeTask {

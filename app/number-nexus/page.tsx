@@ -70,15 +70,10 @@ function buildPathUpTo(nodes: typeof DISTRICTS_ASCENDING, upToWeek: number) {
 
 export default function NumberNexusMapPage() {
   const router = useRouter();
-  const [progress, setProgress] = useState<StudentProgress | null>(null);
-  const [store, setStore] = useState<ProgramProgressStore>({});
+  const [progress] = useState<StudentProgress | null>(() => readProgress());
+  const [store] = useState<ProgramProgressStore>(() => readProgramStore());
   const nodeRefs = useRef<Record<number, HTMLDivElement | null>>({});
   const scrolledRef = useRef(false);
-
-  useEffect(() => {
-    setProgress(readProgress());
-    setStore(readProgramStore());
-  }, []);
 
   const year = progress?.year ?? "Year 1";
   const currentWeek = getRecommendedAssignedWeek(
@@ -560,5 +555,3 @@ function BossNode({
     </button>
   );
 }
-
-type NodeState = "complete" | "current" | "accessible" | "locked" | "boss_locked" | "boss_unlocked";
