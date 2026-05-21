@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft, ChevronLeft, ChevronRight,
@@ -14,101 +14,218 @@ import {
   isWeekComplete,
 } from "@/lib/program-progress";
 
-// ─── District zones — positions tuned to match concept-art layout ─────────────
-
+// ─── District zones ─────────────────────────────────────────────────────────────
 const DISTRICT_ZONES = [
-  {
-    id: "counting", name: "COUNTING\nDISTRICT", sub: "WEEKS 1–3",
-    weekStart: 1,  weekEnd: 3,
-    left: "7%", top: "34%", color: "#14b8a6",
-  },
-  {
-    id: "bridge", name: "NUMBER\nBRIDGE", sub: "WEEKS 4–6",
-    weekStart: 4,  weekEnd: 6,
-    left: "23%", top: "40%", color: "#818cf8",
-  },
-  {
-    id: "tower", name: "LEGEND\nTOWER", sub: "WEEK 12",
-    weekStart: 12, weekEnd: 12,
-    left: "44%", top: "39%", color: "#fbbf24",
-  },
-  {
-    id: "core", name: "CALCULATION\nCORE", sub: "WEEKS 7–9",
-    weekStart: 7,  weekEnd: 9,
-    left: "62%", top: "37%", color: "#f472b6",
-  },
-  {
-    id: "mastery", name: "MASTERY\nSECTOR", sub: "WEEKS 10–12",
-    weekStart: 10, weekEnd: 11,
-    left: "72%", top: "24%", color: "#a78bfa",
-  },
+  { id: "counting", name: "COUNTING\nDISTRICT", sub: "WEEKS 1–3",   weekStart: 1,  weekEnd: 3,  left: "6%",  top: "30%", color: "#14b8a6", rot: "rotateY(10deg)" },
+  { id: "bridge",   name: "NUMBER\nBRIDGE",     sub: "WEEKS 4–6",   weekStart: 4,  weekEnd: 6,  left: "22%", top: "38%", color: "#818cf8", rot: "rotateY(5deg)"  },
+  { id: "tower",    name: "LEGEND\nTOWER",       sub: "WEEK 12",     weekStart: 12, weekEnd: 12, left: "44%", top: "34%", color: "#fbbf24", rot: "none"           },
+  { id: "core",     name: "CALCULATION\nCORE",   sub: "WEEKS 7–9",   weekStart: 7,  weekEnd: 9,  left: "63%", top: "36%", color: "#f472b6", rot: "rotateY(-5deg)" },
+  { id: "mastery",  name: "MASTERY\nSECTOR",     sub: "WEEKS 10–12", weekStart: 10, weekEnd: 11, left: "73%", top: "19%", color: "#a78bfa", rot: "rotateY(-10deg)"},
 ] as const;
 
-// ─── District sign ─────────────────────────────────────────────────────────────
+// ─── World canvas (particles + vehicles + tower pulse) ──────────────────────────
+function useWorldCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
 
+  useEffect(() => {
+    const canvas = ref.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const COLS = ["#14b8a6", "#818cf8", "#f472b6", "#a78bfa", "#22d3ee"];
+
+    const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+    resize();
+    window.addEventListener("resize", resize);
+
+    // Floating data particles
+    const particles = Array.from({ length: 130 }, (_, i) => ({
+      x: Math.random(),
+      y: Math.random(),
+      size: 0.8 + Math.random() * 2.2,
+      vy: -(0.18 + Math.random() * 0.55) / 1080,
+      vx: ((Math.random() - 0.5) * 0.15) / 1920,
+      color: COLS[i % COLS.length],
+      opacity: 0.2 + Math.random() * 0.5,
+    }));
+
+    // Flying vehicles — 2 altitude lanes, both directions
+    const vehicles = Array.from({ length: 9 }, (_, i) => ({
+      x: Math.random(),
+      yFrac: 0.36 + (i % 2) * 0.06 + Math.random() * 0.04,
+      w: 5 + Math.random() * 8,
+      speed: ((0.5 + Math.random() * 1.4) * (i % 2 === 0 ? 1 : -1)) / 1920,
+      color: COLS[i % 3],
+    }));
+
+    let pulse = 0;
+    let fid: number;
+
+    const draw = () => {
+      const W = canvas.width, H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+
+      // Particles
+      for (const p of particles) {
+        p.x += p.vx; p.y += p.vy;
+        if (p.y < -0.02) { p.y = 1.02; p.x = Math.random(); }
+        if (p.x < -0.02) p.x = 1.02;
+        if (p.x > 1.02)  p.x = -0.02;
+        ctx.globalAlpha = p.opacity;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x * W, p.y * H, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Vehicles + trails
+      for (const v of vehicles) {
+        v.x += v.speed;
+        if (v.x > 1.12) v.x = -0.12;
+        if (v.x < -0.12) v.x = 1.12;
+
+        const vx = v.x * W, vy = v.yFrac * H;
+        const trailLen = Math.abs(v.speed) * W * 14;
+        const dir = v.speed > 0 ? -1 : 1;
+
+        const g = ctx.createLinearGradient(vx + dir * trailLen, vy, vx, vy);
+        g.addColorStop(0, v.color + "00");
+        g.addColorStop(1, v.color + "88");
+        ctx.globalAlpha = 0.55;
+        ctx.fillStyle = g;
+        ctx.fillRect(vx + dir * trailLen, vy - 1, trailLen, 2);
+
+        ctx.globalAlpha = 0.9;
+        ctx.fillStyle = v.color;
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = v.color;
+        ctx.fillRect(vx, vy - 1.5, v.w, 3);
+        ctx.shadowBlur = 0;
+      }
+
+      // Tower pulse — rings expanding from tower
+      const tx = W * 0.5, ty = H * 0.36;
+      pulse += 0.45;
+      for (let i = 0; i < 4; i++) {
+        const ph = (pulse + i * 28) % 112;
+        const r  = ph * 1.4;
+        const a  = Math.max(0, 0.28 - ph / 392);
+        ctx.globalAlpha = a;
+        ctx.beginPath();
+        ctx.arc(tx, ty, r, 0, Math.PI * 2);
+        ctx.strokeStyle = "#14b8a6";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+
+      // Faint vertical data-stream lines near tower
+      for (let i = 0; i < 5; i++) {
+        const lx = tx + (i - 2) * 18;
+        const phase = (pulse * 1.2 + i * 22) % 200;
+        const ly = ty - 60 + phase;
+        const la = Math.max(0, 0.18 - Math.abs(phase - 100) / 1400);
+        ctx.globalAlpha = la;
+        ctx.strokeStyle = "#14b8a6";
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        ctx.moveTo(lx, ly);
+        ctx.lineTo(lx, ly + 40);
+        ctx.stroke();
+      }
+
+      ctx.globalAlpha = 1;
+      fid = requestAnimationFrame(draw);
+    };
+
+    draw();
+    return () => { cancelAnimationFrame(fid); window.removeEventListener("resize", resize); };
+  }, []);
+
+  return ref;
+}
+
+// ─── District sign ─────────────────────────────────────────────────────────────
 function DistrictSign({
-  zone,
-  state,
-  active,
-  onClick,
+  zone, state, active, onClick,
 }: {
   zone: (typeof DISTRICT_ZONES)[number];
   state: "complete" | "current" | "locked";
   active: boolean;
   onClick: () => void;
 }) {
+  const [hovered, setHovered] = useState(false);
+
   const cfg = {
     complete: {
       border: "1.5px solid #14b8a6",
-      bg: "rgba(4,30,26,0.90)",
+      bg: "rgba(3,22,20,0.91)",
       nameColor: "#5eead4",
       badge: "✓  COMPLETE",
-      badgeBg: "rgba(20,184,166,0.22)",
+      badgeBg: "rgba(20,184,166,0.2)",
       badgeColor: "#14b8a6",
-      glow: "0 0 26px rgba(20,184,166,0.45), 0 4px 24px rgba(0,0,0,0.65)",
+      glow: "0 0 28px rgba(20,184,166,0.5), 0 0 60px rgba(20,184,166,0.15), 0 6px 30px rgba(0,0,0,0.7)",
     },
     current: {
       border: `2px solid ${zone.color}`,
-      bg: "rgba(3,8,20,0.94)",
+      bg: "rgba(3,6,18,0.93)",
       nameColor: "#ffffff",
       badge: "▶  ENTER",
-      badgeBg: `${zone.color}2a`,
+      badgeBg: `${zone.color}28`,
       badgeColor: zone.color,
-      glow: `0 0 32px ${zone.color}60, 0 4px 28px rgba(0,0,0,0.7)`,
+      glow: `0 0 34px ${zone.color}66, 0 0 80px ${zone.color}1a, 0 6px 32px rgba(0,0,0,0.75)`,
     },
     locked: {
-      border: "1px solid rgba(50,62,95,0.38)",
-      bg: "rgba(4,6,14,0.75)",
-      nameColor: "rgba(80,95,130,0.55)",
+      border: "1px solid rgba(45,58,95,0.4)",
+      bg: "rgba(3,5,12,0.78)",
+      nameColor: "rgba(70,88,128,0.6)",
       badge: "🔒  LOCKED",
-      badgeBg: "rgba(20,25,40,0.42)",
-      badgeColor: "rgba(80,95,130,0.48)",
-      glow: "0 4px 18px rgba(0,0,0,0.55)",
+      badgeBg: "rgba(15,20,40,0.45)",
+      badgeColor: "rgba(70,88,128,0.5)",
+      glow: "0 4px 20px rgba(0,0,0,0.6)",
     },
   }[state];
+
+  const scale = active ? 1.09 : hovered && state !== "locked" ? 1.04 : 1;
 
   return (
     <div
       onClick={state !== "locked" ? onClick : undefined}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
-        padding: "11px 16px",
+        padding: "12px 18px",
         borderRadius: 14,
         border: cfg.border,
         background: cfg.bg,
-        backdropFilter: "blur(18px)",
-        WebkitBackdropFilter: "blur(18px)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
         textAlign: "center",
-        minWidth: 130,
+        minWidth: 136,
         cursor: state !== "locked" ? "pointer" : "default",
         boxShadow: cfg.glow,
         userSelect: "none",
-        transition: "transform 0.2s, box-shadow 0.2s",
-        transform: active ? "scale(1.07)" : "scale(1)",
+        transition: "transform 0.25s ease, box-shadow 0.25s ease",
+        transform: `${zone.rot} scale(${scale})`,
+        transformOrigin: "center center",
         pointerEvents: "auto",
+        overflow: "hidden",
+        position: "relative",
       }}
     >
-      {/* Gradient top bar */}
-      <div style={{ width: "100%", height: 2, background: `linear-gradient(90deg, transparent, ${zone.color}, transparent)`, marginBottom: 9, borderRadius: 1 }} />
+      {/* Holographic scan shimmer */}
+      {(state === "current" || (hovered && state !== "locked")) && (
+        <div style={{
+          position: "absolute", inset: 0,
+          background: `linear-gradient(180deg, transparent 0%, ${zone.color}18 50%, transparent 100%)`,
+          backgroundSize: "100% 60px",
+          animation: "holo-scan 2.8s linear infinite",
+          pointerEvents: "none",
+        }} />
+      )}
+
+      {/* Top bar */}
+      <div style={{ width: "100%", height: 2, background: `linear-gradient(90deg, transparent, ${zone.color}, transparent)`, marginBottom: 10, borderRadius: 1 }} />
 
       {/* Name */}
       <div style={{
@@ -119,24 +236,24 @@ function DistrictSign({
         fontFamily: "ui-monospace, monospace",
         whiteSpace: "pre-line",
         lineHeight: 1.35,
-        marginBottom: 6,
-        textShadow: state === "current" ? `0 0 16px ${zone.color}` : "none",
+        marginBottom: 7,
+        textShadow: state !== "locked" ? `0 0 16px ${zone.color}` : "none",
       }}>
         {zone.name}
       </div>
 
       {/* Sub */}
-      <div style={{ color: zone.color, fontSize: 8, opacity: 0.8, letterSpacing: "0.16em", fontFamily: "ui-monospace, monospace", marginBottom: 9 }}>
+      <div style={{ color: zone.color, fontSize: 8, opacity: 0.8, letterSpacing: "0.16em", fontFamily: "ui-monospace, monospace", marginBottom: 10 }}>
         {zone.sub}
       </div>
 
       {/* Badge */}
       <div style={{
         display: "inline-block",
-        padding: "3px 11px",
+        padding: "3px 12px",
         borderRadius: 6,
         background: cfg.badgeBg,
-        border: `1px solid ${zone.color}40`,
+        border: `1px solid ${zone.color}44`,
         color: cfg.badgeColor,
         fontSize: 8,
         fontWeight: 800,
@@ -146,111 +263,118 @@ function DistrictSign({
         {cfg.badge}
       </div>
 
-      {/* Gradient bottom bar */}
-      <div style={{ width: "100%", height: 2, background: `linear-gradient(90deg, transparent, ${zone.color}, transparent)`, marginTop: 9, borderRadius: 1 }} />
+      {/* Bottom bar */}
+      <div style={{ width: "100%", height: 2, background: `linear-gradient(90deg, transparent, ${zone.color}, transparent)`, marginTop: 10, borderRadius: 1 }} />
+
+      {/* Corner accents */}
+      {state !== "locked" && (
+        <>
+          <div style={{ position: "absolute", top: 6, left: 6, width: 8, height: 8, borderTop: `1.5px solid ${zone.color}`, borderLeft: `1.5px solid ${zone.color}` }} />
+          <div style={{ position: "absolute", top: 6, right: 6, width: 8, height: 8, borderTop: `1.5px solid ${zone.color}`, borderRight: `1.5px solid ${zone.color}` }} />
+          <div style={{ position: "absolute", bottom: 6, left: 6, width: 8, height: 8, borderBottom: `1.5px solid ${zone.color}`, borderLeft: `1.5px solid ${zone.color}` }} />
+          <div style={{ position: "absolute", bottom: 6, right: 6, width: 8, height: 8, borderBottom: `1.5px solid ${zone.color}`, borderRight: `1.5px solid ${zone.color}` }} />
+        </>
+      )}
     </div>
   );
 }
 
-// ─── Character silhouette (blocky boy/girl facing tower) ─────────────────────
-
-function CharacterSilhouette({ gender }: { gender: "boy" | "girl" }) {
+// ─── Player character (SVG silhouette with breathing animation) ─────────────────
+function PlayerCharacter({ gender }: { gender: "boy" | "girl" }) {
   const teal = "#14b8a6";
-  const jacket = "#0e2848";
-  const pants = "#0a1220";
-  const pack = "#09283d";
+  const jacket = "#0d2644";
+  const pants = "#090f1c";
+  const pack = "#082540";
   const skin = "#b87652";
   const hair = gender === "girl" ? "#3a1e06" : "#110b03";
 
   return (
-    <div style={{ position: "relative", display: "inline-block" }}>
-      <svg
-        width="82"
-        height="170"
-        viewBox="0 0 82 170"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        {/* Legs */}
-        <rect x="22" y="118" width="15" height="44" rx="4" fill={pants} />
-        <rect x="45" y="118" width="15" height="44" rx="4" fill={pants} />
+    <div
+      style={{
+        position: "relative",
+        display: "inline-block",
+        animation: "char-float 4.5s ease-in-out infinite",
+        filter: "drop-shadow(0 0 14px rgba(20,184,166,0.28)) drop-shadow(0 8px 18px rgba(0,0,0,0.7))",
+      }}
+    >
+      <svg width="96" height="196" viewBox="0 0 96 196" fill="none">
         {/* Shoes */}
-        <rect x="20" y="153" width="18" height="9" rx="3" fill="#080c14" />
-        <rect x="43" y="153" width="18" height="9" rx="3" fill="#080c14" />
-
+        <rect x="23" y="172" width="20" height="10" rx="3" fill="#060912" />
+        <rect x="53" y="172" width="20" height="10" rx="3" fill="#060912" />
+        {/* Legs */}
+        <rect x="25" y="130" width="16" height="46" rx="4" fill={pants} />
+        <rect x="55" y="130" width="16" height="46" rx="4" fill={pants} />
         {/* Body */}
-        <rect x="14" y="66" width="54" height="56" rx="7" fill={jacket} />
-
-        {/* Shoulder glow trim */}
-        <rect x="12" y="66" width="58" height="6" rx="4" fill={teal} opacity="0.75" />
-
+        <rect x="16" y="74" width="64" height="60" rx="8" fill={jacket} />
+        {/* Body neon trim */}
+        <rect x="14" y="74" width="68" height="7" rx="5" fill={teal} opacity="0.7" />
         {/* Arms */}
-        <rect x="2"  y="70" width="14" height="44" rx="5" fill={jacket} />
-        <rect x="66" y="70" width="14" height="44" rx="5" fill={jacket} />
-
+        <rect x="2"  y="80" width="16" height="48" rx="5" fill={jacket} />
+        <rect x="78" y="80" width="16" height="48" rx="5" fill={jacket} />
+        {/* Arm trim */}
+        <rect x="2"  y="80" width="16" height="5" rx="3" fill={teal} opacity="0.5" />
+        <rect x="78" y="80" width="16" height="5" rx="3" fill={teal} opacity="0.5" />
         {/* Backpack */}
-        <rect x="16" y="73" width="26" height="38" rx="5" fill={pack} />
-        <rect x="20" y="78" width="18" height="2.5" rx="1" fill={teal} opacity="0.85" />
-        <rect x="24" y="87" width="10" height="10"  rx="2" fill={teal} opacity="0.55" />
-        {/* Backpack emblem glow */}
-        <rect x="26" y="89" width="6" height="6" rx="1" fill={teal} opacity="0.9" />
-
+        <rect x="18" y="82" width="30" height="42" rx="5" fill={pack} />
+        {/* Backpack strap top */}
+        <rect x="22" y="88" width="22" height="3" rx="1.5" fill={teal} opacity="0.8" />
+        {/* Backpack emblem */}
+        <rect x="27" y="98" width="12" height="12" rx="2.5" fill={teal} opacity="0.55" />
+        <rect x="30" y="101" width="6" height="6" rx="1" fill={teal} opacity="0.9" />
         {/* Neck */}
-        <rect x="31" y="55" width="20" height="13" rx="4" fill={skin} />
-
+        <rect x="36" y="62" width="24" height="15" rx="5" fill={skin} />
         {/* Head */}
-        <rect x="21" y="24" width="40" height="36" rx="9" fill={skin} />
-
-        {/* Hair */}
-        <rect x="19" y="20" width="44" height="16" rx="8" fill={hair} />
-        <rect x="19" y="26" width="44" height="8"  fill={hair} />
-
-        {/* Girl side hair panels */}
+        <rect x="25" y="27" width="46" height="40" rx="10" fill={skin} />
+        {/* Hair top */}
+        <rect x="23" y="22" width="50" height="19" rx="9" fill={hair} />
+        <rect x="23" y="30" width="50" height="9" fill={hair} />
+        {/* Girl side hair */}
         {gender === "girl" && (
           <>
-            <rect x="17" y="35" width="6" height="20" rx="3" fill={hair} />
-            <rect x="59" y="35" width="6" height="20" rx="3" fill={hair} />
+            <rect x="20" y="40" width="7" height="22" rx="4" fill={hair} />
+            <rect x="69" y="40" width="7" height="22" rx="4" fill={hair} />
           </>
         )}
       </svg>
 
-      {/* Ground glow beneath character */}
+      {/* Backpack pack glow orb */}
       <div style={{
         position: "absolute",
-        bottom: -8,
-        left: "50%",
-        transform: "translateX(-50%)",
-        width: 90,
-        height: 22,
+        top: "50%",
+        left: "22%",
+        width: 32,
+        height: 32,
         borderRadius: "50%",
-        background: `radial-gradient(ellipse, ${teal}44 0%, transparent 70%)`,
-        filter: "blur(5px)",
+        background: `radial-gradient(circle, ${teal}66 0%, transparent 70%)`,
+        filter: "blur(7px)",
+        animation: "pack-pulse 2.8s ease-in-out infinite",
+        pointerEvents: "none",
       }} />
 
-      {/* Backpack glow */}
+      {/* Ground glow */}
       <div style={{
         position: "absolute",
-        top: "44%",
-        left: "20%",
-        width: 28,
-        height: 28,
+        bottom: -12,
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: 100,
+        height: 24,
         borderRadius: "50%",
-        background: `radial-gradient(ellipse, ${teal}55 0%, transparent 70%)`,
+        background: `radial-gradient(ellipse, ${teal}40 0%, transparent 70%)`,
         filter: "blur(6px)",
-        animation: "nb-pulse 3s ease-in-out infinite",
       }} />
     </div>
   );
 }
 
-// ─── Main component ────────────────────────────────────────────────────────────
-
+// ─── Main component ─────────────────────────────────────────────────────────────
 export default function NumberNexusMap() {
   const router   = useRouter();
   const [progress] = useState(() => readProgress());
   const [store]    = useState(() => readProgramStore());
   const [bestChain, setBestChain] = useState(0);
   const [gender, setGender]       = useState<"boy" | "girl">("boy");
+  const canvasRef = useWorldCanvas();
 
   useEffect(() => {
     try { setBestChain(Number(localStorage.getItem("lul_best_nexus_chain_v1") ?? 0)); } catch { /* ignore */ }
@@ -308,11 +432,8 @@ export default function NumberNexusMap() {
   const canBack    = viewWeek > 1;
   const canForward = viewWeek < 12 && viewWeek <= currentWeek + 1;
   const currentZone = DISTRICT_ZONES.find((z) => viewWeek >= z.weekStart && viewWeek <= z.weekEnd);
-
-  // Which zone is active in the current viewWeek
   const activeZoneId = currentZone?.id ?? null;
 
-  // ── Shared style helpers ──
   const chip = (extra?: React.CSSProperties): React.CSSProperties => ({
     padding: "5px 12px", borderRadius: 999,
     background: "rgba(14,118,110,0.18)", border: "1px solid rgba(94,234,212,0.18)",
@@ -321,9 +442,9 @@ export default function NumberNexusMap() {
   const hudBtn: React.CSSProperties = {
     display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
     padding: "10px 10px", borderRadius: 12, cursor: "pointer",
-    background: "rgba(2,10,22,0.88)", border: "1px solid rgba(94,234,212,0.18)",
+    background: "rgba(2,8,20,0.88)", border: "1px solid rgba(94,234,212,0.18)",
     backdropFilter: "blur(12px)", minWidth: 52,
-    boxShadow: "0 0 10px rgba(94,234,212,0.05), 0 4px 16px rgba(0,0,0,0.55)",
+    boxShadow: "0 0 12px rgba(94,234,212,0.06), 0 4px 18px rgba(0,0,0,0.6)",
   };
   const navBtn = (active: boolean): React.CSSProperties => ({
     display: "flex", alignItems: "center", gap: 6,
@@ -349,16 +470,62 @@ export default function NumberNexusMap() {
         }}
       />
 
-      {/* Depth gradient overlays */}
+      {/* Atmospheric depth overlay — teal-tinted, not just dark */}
       <div style={{
         position: "absolute", inset: 0, zIndex: 1,
-        background: "linear-gradient(180deg, rgba(2,8,20,0.55) 0%, rgba(2,8,20,0.0) 35%, rgba(2,8,20,0.0) 55%, rgba(2,8,20,0.82) 100%)",
+        background: "linear-gradient(180deg, rgba(2,10,22,0.58) 0%, rgba(1,20,28,0.12) 38%, rgba(1,10,18,0.08) 55%, rgba(2,8,18,0.88) 100%)",
       }} />
-      {/* Side darkening */}
+      {/* Radial vignette — wider centre keep so city visible */}
       <div style={{
         position: "absolute", inset: 0, zIndex: 1,
-        background: "radial-gradient(ellipse at 50% 42%, transparent 38%, rgba(2,8,20,0.38) 100%)",
+        background: "radial-gradient(ellipse 82% 72% at 50% 44%, transparent 38%, rgba(2,6,18,0.42) 100%)",
       }} />
+      {/* Teal tint bias to shift toward concept-art palette */}
+      <div style={{
+        position: "absolute", inset: 0, zIndex: 1,
+        background: "radial-gradient(ellipse 60% 55% at 50% 36%, rgba(14,184,166,0.08) 0%, transparent 70%)",
+      }} />
+
+      {/* Scanline texture */}
+      <div style={{
+        position: "absolute", inset: 0, zIndex: 2, pointerEvents: "none",
+        backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px)",
+      }} />
+
+      {/* Volumetric tower light beam (CSS) */}
+      <div style={{
+        position: "absolute",
+        left: "50%",
+        top: "0%",
+        transform: "translateX(-50%)",
+        width: 90,
+        height: "52%",
+        background: "linear-gradient(180deg, rgba(20,184,166,0.0) 0%, rgba(20,184,166,0.12) 60%, rgba(20,184,166,0.3) 100%)",
+        filter: "blur(16px)",
+        zIndex: 3,
+        pointerEvents: "none",
+        animation: "beam-pulse 3.5s ease-in-out infinite",
+      }} />
+
+      {/* Ground road reflection glow */}
+      <div style={{
+        position: "absolute",
+        bottom: "12%",
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: "38%",
+        height: 120,
+        background: "radial-gradient(ellipse at 50% 0%, rgba(20,184,166,0.22) 0%, transparent 75%)",
+        filter: "blur(10px)",
+        zIndex: 3,
+        pointerEvents: "none",
+      }} />
+
+      {/* ── Canvas overlay — particles, vehicles, pulse ── */}
+      <canvas
+        ref={canvasRef}
+        style={{ position: "absolute", inset: 0, zIndex: 4, pointerEvents: "none" }}
+      />
 
       {/* ── District signs ── */}
       <div style={{ position: "absolute", inset: 0, zIndex: 10, pointerEvents: "none" }}>
@@ -383,12 +550,15 @@ export default function NumberNexusMap() {
         ))}
       </div>
 
-      {/* ── Character at bottom center ── */}
+      {/* ── Character ── */}
       <div style={{
-        position: "absolute", bottom: "11%", left: "50%", transform: "translateX(-50%)",
+        position: "absolute",
+        bottom: "9%",
+        left: "50%",
+        transform: "translateX(-50%)",
         zIndex: 8,
       }}>
-        <CharacterSilhouette gender={gender} />
+        <PlayerCharacter gender={gender} />
       </div>
 
       {/* ── Top bar ── */}
@@ -396,7 +566,7 @@ export default function NumberNexusMap() {
         position: "absolute", top: 0, left: 0, right: 0, zIndex: 20,
         display: "flex", alignItems: "center", gap: 8, padding: "10px 14px",
         background: "rgba(2,6,16,0.72)", borderBottom: "1px solid rgba(94,234,212,0.1)",
-        backdropFilter: "blur(14px)",
+        backdropFilter: "blur(16px)",
       }}>
         <button
           onClick={() => router.push(`/realms?level=${encodeURIComponent(year)}`)}
@@ -429,7 +599,7 @@ export default function NumberNexusMap() {
       {/* ── Right HUD ── */}
       <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", zIndex: 20, display: "flex", flexDirection: "column", gap: 10 }}>
         {[
-          { Icon: BookOpen,  label: "LEGENDS", route: "/legends"     },
+          { Icon: BookOpen,   label: "LEGENDS", route: "/legends"     },
           { Icon: LayoutGrid, label: "LEVELS",  route: "/levels"      },
           { Icon: BarChart3,  label: "STATS",   route: "/realm-stats" },
         ].map(({ Icon, label, route }) => (
@@ -454,8 +624,8 @@ export default function NumberNexusMap() {
         position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 20,
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "12px 20px",
-        background: "rgba(2,6,16,0.82)", borderTop: "1px solid rgba(94,234,212,0.1)",
-        backdropFilter: "blur(14px)",
+        background: "rgba(2,6,16,0.84)", borderTop: "1px solid rgba(94,234,212,0.1)",
+        backdropFilter: "blur(16px)",
       }}>
         <button onClick={() => canBack && setViewWeek((v) => v - 1)} disabled={!canBack} style={navBtn(canBack)}>
           <ChevronLeft size={15} /> Prev
@@ -463,7 +633,7 @@ export default function NumberNexusMap() {
         <div style={{ textAlign: "center" }}>
           {currentZone && (
             <>
-              <div style={{ color: currentZone.color, fontSize: 11, fontWeight: 900, letterSpacing: "0.2em", fontFamily: "ui-monospace,monospace", textShadow: `0 0 12px ${currentZone.color}` }}>
+              <div style={{ color: currentZone.color, fontSize: 11, fontWeight: 900, letterSpacing: "0.2em", fontFamily: "ui-monospace,monospace", textShadow: `0 0 14px ${currentZone.color}` }}>
                 {currentZone.name.replace("\n", " ")}
               </div>
               <div style={{ color: "rgba(148,163,184,0.55)", fontSize: 9, letterSpacing: "0.14em", fontFamily: "ui-monospace,monospace", marginTop: 2 }}>
@@ -477,9 +647,26 @@ export default function NumberNexusMap() {
         </button>
       </div>
 
-      {/* Keyframe animations */}
+      {/* ── Global keyframes ── */}
       <style>{`
-        @keyframes nb-pulse { 0%,100%{opacity:0.7} 50%{opacity:1} }
+        @keyframes holo-scan {
+          0%   { background-position: 0 -100px; opacity: 0; }
+          10%  { opacity: 1; }
+          90%  { opacity: 1; }
+          100% { background-position: 0 300px; opacity: 0; }
+        }
+        @keyframes char-float {
+          0%, 100% { transform: translateY(0px);  }
+          50%       { transform: translateY(-7px); }
+        }
+        @keyframes pack-pulse {
+          0%, 100% { opacity: 0.55; transform: scale(1);    }
+          50%       { opacity: 0.9;  transform: scale(1.15); }
+        }
+        @keyframes beam-pulse {
+          0%, 100% { opacity: 0.7; }
+          50%       { opacity: 1.0; }
+        }
       `}</style>
     </div>
   );
