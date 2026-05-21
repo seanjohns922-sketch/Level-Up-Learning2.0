@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Lock, CheckCircle, Zap, ChevronRight } from "lucide-react";
+import { ArrowLeft, Lock, CheckCircle, Zap, ChevronRight, User, BookOpen, LayoutGrid, BarChart3 } from "lucide-react";
 import { readProgress, type StudentProgress } from "@/data/progress";
 import {
   readProgramStore,
@@ -76,6 +76,15 @@ export default function NumberNexusMapPage() {
   const scrolledRef = useRef(false);
 
   const year = progress?.year ?? "Year 1";
+  const isPrep = year === "Prep";
+  const levelNum = isPrep ? 0 : parseInt(year.replace(/\D/g, ""), 10) || 1;
+  const levelLabel = isPrep ? "PREP" : `LV ${levelNum}`;
+
+  const [bestChain, setBestChain] = useState(0);
+  useEffect(() => {
+    try { setBestChain(Number(localStorage.getItem("lul_best_nexus_chain_v1") ?? 0)); } catch { /* ignore */ }
+  }, []);
+
   const currentWeek = getRecommendedAssignedWeek(
     store,
     year,
@@ -94,6 +103,16 @@ export default function NumberNexusMapPage() {
       .filter(([, v]) => v)
       .map(([k]) => Number(k))
   );
+
+  const totalXP = useMemo(() => {
+    let xp = 0;
+    for (let w = 1; w <= 12; w++) {
+      const wwp = getWeekProgress(store, year, w);
+      xp += wwp.lessonsCompleted.filter(Boolean).length * 40;
+      if (wwp.quizScore !== undefined) xp += Math.round((wwp.quizScore / 100) * 60);
+    }
+    return xp;
+  }, [store, year]);
 
   // Auto-scroll to current week on first load
   useEffect(() => {
@@ -119,51 +138,111 @@ export default function NumberNexusMapPage() {
     <main className="relative min-h-screen overflow-hidden bg-slate-950">
       {/* ── Sticky header ───────────────────────────────────────── */}
       <div
-        className="fixed top-0 inset-x-0 z-40 flex items-center justify-between px-4 py-3"
+        className="fixed top-0 inset-x-0 z-40 flex items-center gap-2 px-3 py-2.5"
         style={{
-          background: "rgba(2,20,18,0.85)",
+          background: "rgba(2,20,18,0.88)",
           borderBottom: "1px solid rgba(94,234,212,0.12)",
           backdropFilter: "blur(12px)",
         }}
       >
+        {/* Left: back + realm + level */}
         <button
           onClick={() => router.push(`/realms?level=${encodeURIComponent(year)}`)}
-          className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold text-teal-100/80 transition-all active:scale-95 hover:text-white"
-          style={{
-            background: "rgba(15,118,110,0.25)",
-            border: "1px solid rgba(94,234,212,0.2)",
-          }}
+          className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold text-teal-100/80 transition-all active:scale-95 hover:text-white shrink-0"
+          style={{ background: "rgba(15,118,110,0.25)", border: "1px solid rgba(94,234,212,0.2)" }}
         >
           <ArrowLeft className="h-3.5 w-3.5" /> Back
         </button>
-
         <div
-          className="px-4 py-1.5 rounded-full"
-          style={{
-            background: "rgba(15,118,110,0.2)",
-            border: "1px solid rgba(94,234,212,0.2)",
-          }}
+          className="px-3 py-1 rounded-full shrink-0"
+          style={{ background: "rgba(15,118,110,0.2)", border: "1px solid rgba(94,234,212,0.2)" }}
         >
-          <span className="text-teal-300 text-[10px] font-extrabold tracking-[0.18em]">
-            NUMBER NEXUS
-          </span>
+          <span className="text-teal-300 text-[10px] font-extrabold tracking-[0.16em]">⚡ NUMBER NEXUS</span>
+        </div>
+        <div
+          className="px-2.5 py-1 rounded-full shrink-0"
+          style={{ background: "rgba(94,234,212,0.08)", border: "1px solid rgba(94,234,212,0.15)" }}
+        >
+          <span className="text-teal-400 text-[9px] font-mono font-bold tracking-widest">{levelLabel}</span>
         </div>
 
-        <div className="flex items-center gap-1.5 rounded-full px-3 py-1.5"
-          style={{
-            background: "rgba(15,118,110,0.2)",
-            border: "1px solid rgba(94,234,212,0.15)",
-          }}
+        <div className="flex-1" />
+
+        {/* Right: XP + progress + profile */}
+        <div
+          className="flex items-center gap-1 px-2.5 py-1 rounded-full shrink-0"
+          style={{ background: "rgba(15,118,110,0.15)", border: "1px solid rgba(94,234,212,0.12)" }}
         >
           <Zap className="h-3 w-3 text-teal-400" />
-          <span className="text-teal-200 text-[10px] font-bold tabular-nums">
-            {highestCompletedWeek}/12
-          </span>
+          <span className="text-teal-200 text-[10px] font-bold tabular-nums">{totalXP} XP</span>
         </div>
+        <div
+          className="flex items-center gap-1 px-2.5 py-1 rounded-full shrink-0"
+          style={{ background: "rgba(15,118,110,0.15)", border: "1px solid rgba(94,234,212,0.12)" }}
+        >
+          <span className="text-teal-200 text-[10px] font-bold tabular-nums">{highestCompletedWeek}/12</span>
+        </div>
+        <button
+          onClick={() => router.push("/profile")}
+          className="flex items-center justify-center h-8 w-8 rounded-full transition-all active:scale-95 hover:scale-105 shrink-0"
+          style={{ background: "rgba(15,118,110,0.3)", border: "1px solid rgba(94,234,212,0.3)" }}
+          aria-label="Profile"
+        >
+          <User className="h-4 w-4 text-teal-300" />
+        </button>
+      </div>
+
+      {/* ── Right-side HUD (floating game buttons) ──────────────── */}
+      <div className="fixed right-3 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-2.5">
+        {[
+          { Icon: BookOpen, label: "LEGENDS", route: "/legends", title: "Legend Crew" },
+          { Icon: LayoutGrid, label: "LEVELS",  route: "/levels",  title: "World Levels" },
+          { Icon: BarChart3, label: "STATS",    route: "/realm-stats", title: "Reactor Stats" },
+        ].map(({ Icon, label, route, title }) => (
+          <button
+            key={label}
+            onClick={() => router.push(route)}
+            title={title}
+            className="group flex flex-col items-center gap-1 px-2.5 py-2.5 rounded-xl transition-all duration-200 active:scale-95 hover:scale-105"
+            style={{
+              background: "rgba(2,26,22,0.9)",
+              border: "1px solid rgba(94,234,212,0.2)",
+              backdropFilter: "blur(10px)",
+              boxShadow: "0 0 12px rgba(94,234,212,0.06), 0 4px 14px rgba(0,0,0,0.45)",
+              minWidth: "48px",
+            }}
+          >
+            <div
+              className="flex items-center justify-center h-8 w-8 rounded-lg transition-colors"
+              style={{ background: "rgba(15,118,110,0.25)" }}
+            >
+              <Icon className="h-4 w-4 text-teal-400 group-hover:text-teal-200 transition-colors" />
+            </div>
+            <span className="text-[7px] font-mono font-bold tracking-[0.16em] text-teal-400/70 group-hover:text-teal-300 transition-colors">
+              {label}
+            </span>
+          </button>
+        ))}
+        {/* Best chain display */}
+        {bestChain > 0 && (
+          <div
+            className="flex flex-col items-center gap-0.5 px-2 py-2 rounded-xl"
+            style={{
+              background: "rgba(2,26,22,0.85)",
+              border: "1px solid rgba(94,234,212,0.12)",
+              backdropFilter: "blur(10px)",
+            }}
+          >
+            <span className="text-[7px] font-mono font-bold tracking-widest text-teal-500/60">BEST</span>
+            <span className="text-[7px] font-mono font-bold tracking-widest text-teal-500/60">CHAIN</span>
+            <span className="text-sm font-black text-teal-300 tabular-nums leading-none">{bestChain}</span>
+            <span className="text-[7px] text-yellow-400/70">⚡</span>
+          </div>
+        )}
       </div>
 
       {/* ── Scrollable map ──────────────────────────────────────── */}
-      <div className="relative pt-14 overflow-x-hidden">
+      <div className="relative pt-14 pb-8 overflow-x-hidden" style={{ paddingRight: "64px" }}>
         {/* Full-screen background */}
         <div
           className="fixed inset-0 pointer-events-none"

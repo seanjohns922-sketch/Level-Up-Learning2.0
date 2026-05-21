@@ -461,6 +461,16 @@ export function Year2LessonEngine({
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [comboCount, setComboCount] = useState(0);
+  const bestChainRef = useRef(0);
+  useEffect(() => {
+    try { bestChainRef.current = Number(localStorage.getItem("lul_best_nexus_chain_v1") ?? 0); } catch { /* ignore */ }
+  }, []);
+  function saveBestChain(chain: number) {
+    if (chain > bestChainRef.current) {
+      bestChainRef.current = chain;
+      try { localStorage.setItem("lul_best_nexus_chain_v1", String(chain)); } catch { /* ignore */ }
+    }
+  }
   const [currentActivityIndex, setCurrentActivityIndex] = useState(initialTurn.activityIndex);
   const [currentQuestion, setCurrentQuestion] = useState<Year2QuestionData | null>(initialTurn.question);
   const [questionKey, setQuestionKey] = useState(0);
@@ -717,7 +727,9 @@ export function Year2LessonEngine({
     questionsAnsweredRef.current += 1;
     setQuestionsAnswered((v) => v + 1);
     setCorrectAnswers((v) => v + 1);
-    setComboCount((v) => v + 1);
+    const newChain = comboCount + 1;
+    saveBestChain(newChain);
+    setComboCount(newChain);
     timeoutRef.current = setTimeout(() => loadNextQuestion(), 1000);
   }
 
@@ -764,6 +776,7 @@ export function Year2LessonEngine({
     }
     questionsAnsweredRef.current += 1;
     setQuestionsAnswered((v) => v + 1);
+    saveBestChain(comboCount);
     setComboCount(0);
     timeoutRef.current = setTimeout(() => loadNextQuestion(), 1200);
   }
