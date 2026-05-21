@@ -458,6 +458,7 @@ export function Year2LessonEngine({
   const [status, setStatus] = useState<"idle" | "correct" | "wrong">("idle");
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [comboCount, setComboCount] = useState(0);
   const [currentActivityIndex, setCurrentActivityIndex] = useState(initialTurn.activityIndex);
   const [currentQuestion, setCurrentQuestion] = useState<Year2QuestionData | null>(initialTurn.question);
   const [questionKey, setQuestionKey] = useState(0);
@@ -714,6 +715,7 @@ export function Year2LessonEngine({
     questionsAnsweredRef.current += 1;
     setQuestionsAnswered((v) => v + 1);
     setCorrectAnswers((v) => v + 1);
+    setComboCount((v) => v + 1);
     timeoutRef.current = setTimeout(() => loadNextQuestion(), 1000);
   }
 
@@ -760,6 +762,7 @@ export function Year2LessonEngine({
     }
     questionsAnsweredRef.current += 1;
     setQuestionsAnswered((v) => v + 1);
+    setComboCount(0);
     timeoutRef.current = setTimeout(() => loadNextQuestion(), 1200);
   }
 
@@ -852,6 +855,7 @@ export function Year2LessonEngine({
             totalSeconds={totalSeconds}
             xpTarget={Math.max(XP_TARGET, questionsAnswered + 2)}
             hint={hint}
+            comboCount={comboCount}
           />
         </aside>
 

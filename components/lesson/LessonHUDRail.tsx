@@ -5,6 +5,7 @@ import { ChevronDown, Lightbulb } from "lucide-react";
 import { LessonXPBar } from "@/components/lesson/LessonXPBar";
 import { LessonTimer } from "@/components/lesson/LessonTimer";
 import { LessonStatStrip } from "@/components/lesson/LessonStatStrip";
+import { ComboCounter } from "@/components/lesson/ComboCounter";
 import { MathFormattedText } from "@/components/FractionText";
 
 /**
@@ -32,6 +33,7 @@ export function LessonHUDRail({
   xpDisplayLabel,
   xpDisplayRightLabel,
   hint,
+  comboCount = 0,
 }: {
   levelNumber?: number;
   week?: number;
@@ -51,6 +53,7 @@ export function LessonHUDRail({
   xpDisplayLabel?: string;
   xpDisplayRightLabel?: string;
   hint?: string | null;
+  comboCount?: number;
 }) {
   const [hintOpen, setHintOpen] = useState(false);
 
@@ -128,6 +131,9 @@ export function LessonHUDRail({
             accuracy={accuracy}
           />
         </div>
+
+        {/* Combo chain counter */}
+        <ComboCounter count={comboCount} />
 
         {/* Collapsible hint */}
         {hint ? (
