@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { PracticeTask, Difficulty } from "@/data/activities/year1/practice-task";
 import { getDifficultyFromTime } from "@/data/activities/year1/practice-task";
 import { TaskRenderer } from "@/components/TaskRenderer";
@@ -10,6 +10,7 @@ import { speak, useAutoReadSetting, useSpeechInteractionReady } from "@/lib/spea
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { LessonHUDRail } from "@/components/lesson/LessonHUDRail";
 import { LessonCompleteCard } from "@/components/lesson/LessonCompleteCard";
+import SurgeAmbience from "@/components/lesson/SurgeAmbience";
 import type { LessonPerformanceSummary } from "@/components/lesson/Year2LessonEngine";
 
 type McqTask = Extract<PracticeTask, { kind: "mcq" }>;
@@ -146,6 +147,7 @@ export function PracticeRunner({
 
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [comboCount, setComboCount] = useState(0);
   const [attemptLog, setAttemptLog] = useState<
     Array<{ topicLabel: string; correct: boolean; timeSpentSeconds: number }>
   >([]);
@@ -266,7 +268,7 @@ export function PracticeRunner({
     void speak(String(task.targetNumber), undefined, "auto");
   }, [speechInteractionReady, task]);
 
-  function buildProgressMeta(questionNumber: number) {
+  const buildProgressMeta = useCallback((questionNumber: number) => {
     if (completionMode === "time_only") {
       return {
         progressPercent: Math.round((elapsedSeconds / totalSeconds) * 100),
@@ -277,7 +279,7 @@ export function PracticeRunner({
       progressPercent: Math.round((questionsAnsweredRef.current / MAX_LESSON_QUESTIONS) * 100),
       progressLabel: `Question ${questionNumber} of ${MAX_LESSON_QUESTIONS}`,
     };
-  }
+  }, [completionMode, elapsedSeconds, totalSeconds]);
 
   useEffect(() => {
     if (!autoReadEnabled || !speechInteractionReady) return;
@@ -353,7 +355,7 @@ export function PracticeRunner({
     return () => {
       clearIdleLiveEventTimer();
     };
-  }, [completionMode, elapsedSeconds, liveContext, task, taskNonce, totalSeconds]);
+  }, [buildProgressMeta, completionMode, elapsedSeconds, liveContext, task, taskNonce, totalSeconds]);
 
   function nextTask() {
     if (finished) return;
@@ -383,6 +385,7 @@ export function PracticeRunner({
       const nextCorrectAnswers = correctAnswersRef.current + 1;
       correctAnswersRef.current = nextCorrectAnswers;
       setCorrectAnswers(nextCorrectAnswers);
+      setComboCount((current) => current + 1);
     }
 
     return nextQuestionsAnswered;
@@ -426,6 +429,7 @@ export function PracticeRunner({
       });
     }
     const nextQuestionsAnswered = bumpSessionCounters(false);
+    setComboCount(0);
     clearPendingTimeout();
     if (nextQuestionsAnswered >= questionLimit) {
       return;
@@ -590,12 +594,20 @@ export function PracticeRunner({
   }
 
   // ── Active state ──
+  function getComboBorder(count: number) {
+    if (count >= 10) return "border-purple-300/80 shadow-[0_0_22px_rgba(167,139,250,0.4)]";
+    if (count >= 8) return "border-orange-300/80 shadow-[0_0_22px_rgba(251,146,60,0.4)]";
+    if (count >= 5) return "border-yellow-300/80 shadow-[0_0_22px_rgba(253,224,71,0.4)]";
+    if (count >= 3) return "border-teal-300/70 shadow-[0_0_22px_rgba(94,234,212,0.35)]";
+    return "border-border/50";
+  }
+
   const statusBorder =
     status === "correct"
       ? "border-emerald-300 shadow-emerald-100/50"
       : status === "wrong"
       ? "border-red-300 shadow-red-100/50"
-      : "border-border/50";
+      : getComboBorder(comboCount);
 
   const feedbackOverlay =
     status === "correct"
@@ -624,6 +636,8 @@ export function PracticeRunner({
         }`}
       />
 
+      <SurgeAmbience comboCount={comboCount} />
+
       {/* Two-column landscape: sticky HUD rail + question workspace */}
       <div className="grid gap-3 lg:grid-cols-[300px_1fr] lg:items-start lg:gap-5">
         <aside className="lg:sticky lg:top-4 lg:self-start">
@@ -642,6 +656,7 @@ export function PracticeRunner({
             xpDisplayLabel={hudXPLabel}
             xpDisplayRightLabel={hudXPRightLabel}
             hint={hint}
+            comboCount={comboCount}
           />
         </aside>
 

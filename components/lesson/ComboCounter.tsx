@@ -82,14 +82,14 @@ export function ComboCounter({ count }: { count: number }) {
   const [broken, setBroken] = useState(false);
   const [bump, setBump] = useState(false);
   const [milestone, setMilestone] = useState<string | null>(null);
-  const brokenFromRef = useRef(0);
+  const [brokenFromCount, setBrokenFromCount] = useState(0);
 
   useEffect(() => {
     const prev = prevCountRef.current;
     prevCountRef.current = count;
 
     if (count === 0 && prev >= 3) {
-      brokenFromRef.current = prev;
+      setBrokenFromCount(prev);
       setBroken(true);
       const t = setTimeout(() => setBroken(false), 800);
       return () => clearTimeout(t);
@@ -209,7 +209,7 @@ export function ComboCounter({ count }: { count: number }) {
               "color 0.4s ease, text-shadow 0.4s ease, transform 0.15s ease-out",
           }}
         >
-          {broken ? brokenFromRef.current : count}
+          {broken ? brokenFromCount : count}
         </div>
       </div>
     </div>
