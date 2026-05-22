@@ -6,6 +6,10 @@ import QRCode from "qrcode";
 import { supabase } from "@/lib/supabase";
 import { setActiveStudentProfile } from "@/lib/studentIdentity";
 
+function normalizeClassCode(code: string) {
+  return code.replace(/\s+/g, "").trim().toUpperCase();
+}
+
 export default function JoinPageWrapper() {
   return <Suspense fallback={<div className="min-h-screen bg-[#fbf7f1] flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><JoinPage /></Suspense>;
 }
@@ -29,12 +33,21 @@ function JoinPage() {
   const lookupCode = useCallback(async (code: string) => {
     setLoading(true);
     setError(null);
-    const upper = code.trim().toUpperCase();
-    const { data } = await supabase
+    const normalizedCode = normalizeClassCode(code);
+    console.log("[JoinPage] submitted code:", code);
+    console.log("[JoinPage] normalised code:", normalizedCode);
+    const { data, error: queryError } = await supabase
       .from("classes")
       .select("id, name, class_code")
-      .eq("class_code", upper)
+      .eq("class_code", normalizedCode)
       .maybeSingle();
+    console.log("[JoinPage] Supabase query result:", data);
+    console.log("[JoinPage] Supabase error:", queryError);
+    if (queryError) {
+      setError("Class not found. Check the code and try again.");
+      setLoading(false);
+      return;
+    }
     if (!data) {
       setError("Class not found. Check the code and try again.");
       setLoading(false);
@@ -71,9 +84,12 @@ function JoinPage() {
 
   async function handleJoin() {
     setError("");
-    const normalizedCode = classCode.trim().toUpperCase();
+    const normalizedCode = normalizeClassCode(classCode);
     const cleanName = studentName.trim();
     const cleanPin = pin.trim();
+
+    console.log("[JoinPage] submitted code:", classCode);
+    console.log("[JoinPage] normalised code:", normalizedCode);
 
     if (!normalizedCode || !cleanName || !cleanPin) {
       setError("Please enter class code, name, and PIN.");
@@ -93,6 +109,9 @@ function JoinPage() {
       .select("id, class_code, name")
       .eq("class_code", normalizedCode)
       .single();
+
+    console.log("[JoinPage] Supabase query result:", klass);
+    console.log("[JoinPage] Supabase error:", classErr);
 
     if (classErr || !klass) {
       setError("Class code not found.");
