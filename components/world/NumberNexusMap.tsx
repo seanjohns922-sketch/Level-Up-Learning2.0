@@ -706,30 +706,17 @@ export default function NumberNexusMap() {
       {/* ── Guided mode (Prep–Year 2): ONE giant button — "press play and go" ── */}
       {isGuided && currentZone && (
         <div style={{
-          position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 22,
+          position: "absolute", top: 58, left: 0, right: 0, zIndex: 22,
           display: "flex", flexDirection: "column", alignItems: "center",
-          padding: "0 20px 28px",
+          padding: "20px 20px 0",
           pointerEvents: "none",
         }}>
-          {/* Soft floor wash so the button reads on any background */}
+          {/* Soft top wash so the button reads on any background */}
           <div style={{
-            position: "absolute", left: 0, right: 0, bottom: 0, height: 220,
-            background: "linear-gradient(180deg, transparent 0%, rgba(2,6,16,0.55) 55%, rgba(2,6,16,0.92) 100%)",
+            position: "absolute", left: 0, right: 0, top: 0, height: 220,
+            background: "linear-gradient(0deg, transparent 0%, rgba(2,6,16,0.55) 55%, rgba(2,6,16,0.92) 100%)",
             pointerEvents: "none",
           }} />
-
-          <div style={{
-            position: "relative",
-            color: currentZone.color,
-            fontSize: 11, fontWeight: 800, letterSpacing: "0.28em",
-            fontFamily: "ui-monospace, monospace",
-            textShadow: `0 0 14px ${currentZone.color}, 0 2px 8px rgba(0,0,0,0.9)`,
-            marginBottom: 10,
-            opacity: launching ? 0 : 1,
-            transition: "opacity 0.3s",
-          }}>
-            WEEK {currentWeek}  ·  {currentZone.name}
-          </div>
 
           <button
             onClick={launchGuidedAdventure}
@@ -738,12 +725,12 @@ export default function NumberNexusMap() {
               position: "relative",
               pointerEvents: "auto",
               cursor: launching ? "default" : "pointer",
-              padding: "20px 56px",
+              padding: "16px 48px",
               borderRadius: 999,
               border: "2px solid rgba(94,234,212,0.85)",
               background: "linear-gradient(180deg, #14b8a6 0%, #0d9488 55%, #0f766e 100%)",
               color: "#ffffff",
-              fontSize: 22,
+              fontSize: 18,
               fontWeight: 900,
               letterSpacing: "0.22em",
               fontFamily: "ui-monospace, monospace",
@@ -770,11 +757,24 @@ export default function NumberNexusMap() {
             color: "rgba(167,243,208,0.7)",
             fontSize: 10, fontWeight: 700, letterSpacing: "0.2em",
             fontFamily: "ui-monospace, monospace",
-            marginTop: 12,
+            marginTop: 10,
             opacity: launching ? 0 : 1,
             transition: "opacity 0.3s",
           }}>
             TAP TO FLY INTO YOUR NEXT MISSION
+          </div>
+
+          <div style={{
+            position: "relative",
+            color: currentZone.color,
+            fontSize: 11, fontWeight: 800, letterSpacing: "0.28em",
+            fontFamily: "ui-monospace, monospace",
+            textShadow: `0 0 14px ${currentZone.color}, 0 2px 8px rgba(0,0,0,0.9)`,
+            marginTop: 10,
+            opacity: launching ? 0 : 1,
+            transition: "opacity 0.3s",
+          }}>
+            WEEK {currentWeek}  ·  {currentZone.name}
           </div>
         </div>
       )}
