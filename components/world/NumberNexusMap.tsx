@@ -545,13 +545,16 @@ export default function NumberNexusMap() {
       <div
         style={{
           position: "absolute", inset: 0, zIndex: 10,
-          transform: `translate3d(${(currentZone?.panX ?? 0)}px, 0, 0)`,
-          transition: "transform 0.9s cubic-bezier(0.22,1,0.36,1)",
+          transform: launching
+            ? `translate3d(${(currentZone?.panX ?? 0)}px, 0, 0) scale(1.35)`
+            : `translate3d(${(currentZone?.panX ?? 0)}px, 0, 0) scale(1)`,
+          transition: "transform 0.9s cubic-bezier(0.5, 0, 0.75, 0)",
+          opacity: launching ? 0 : 1,
           pointerEvents: "none",
         }}
       >
-        {/* District text labels — crisp, no card chrome */}
-        {DISTRICT_ZONES.map((zone) => (
+        {/* District text labels — hidden in guided mode (Prep–Y2): less decision friction */}
+        {!isGuided && DISTRICT_ZONES.map((zone) => (
           <div
             key={zone.id}
             style={{
@@ -572,6 +575,34 @@ export default function NumberNexusMap() {
             />
           </div>
         ))}
+
+        {/* Guided mode: ambient district names only — no decisions, just atmosphere */}
+        {isGuided && DISTRICT_ZONES.map((zone) => {
+          const state = zoneState(zone);
+          if (state === "locked") return null;
+          return (
+            <div
+              key={zone.id}
+              style={{
+                position: "absolute",
+                left: zone.left,
+                top: zone.top,
+                transform: zone.id === "tower" ? "translateX(-50%)" : undefined,
+                pointerEvents: "none",
+                color: "#ffffff",
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: "0.22em",
+                fontFamily: "ui-monospace, monospace",
+                opacity: activeZoneId === zone.id ? 0.85 : 0.35,
+                textShadow: `0 0 14px ${zone.color}88, 0 2px 8px rgba(0,0,0,0.9)`,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {zone.name}
+            </div>
+          );
+        })}
 
         {/* Character — dead center, grounded on the foreground platform */}
         <div style={{
