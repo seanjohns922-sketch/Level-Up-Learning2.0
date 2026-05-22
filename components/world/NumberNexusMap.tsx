@@ -366,6 +366,68 @@ function PlayerCharacter({ gender }: { gender: "boy" | "girl" }) {
 }
 
 // ─── Main component ─────────────────────────────────────────────────────────────
+// ─── Chunky in-world HUD icons (Clash Royale readability / hologram styling) ───
+function LegendsIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="nnLegA" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#5eead4" />
+          <stop offset="100%" stopColor="#0d9488" />
+        </linearGradient>
+      </defs>
+      {/* back card */}
+      <rect x="5" y="9" width="14" height="18" rx="2.4" transform="rotate(-12 12 18)" fill="#0f766e" stroke="#5eead4" strokeWidth="1.2" opacity="0.85" />
+      {/* front card */}
+      <rect x="11" y="6" width="15" height="20" rx="2.6" fill="url(#nnLegA)" stroke="#ccfbf1" strokeWidth="1.4" />
+      {/* character silhouette */}
+      <circle cx="18.5" cy="13" r="2.6" fill="#022c22" />
+      <path d="M13.5 23c1.2-3.4 3.2-5 5-5s3.8 1.6 5 5z" fill="#022c22" />
+      {/* star */}
+      <path d="M18.5 19.6l0.7 1.5 1.6.2-1.2 1.1.3 1.6-1.4-.8-1.4.8.3-1.6-1.2-1.1 1.6-.2z" fill="#fde68a" />
+    </svg>
+  );
+}
+function WorldsIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="nnTwr" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#99f6e4" />
+          <stop offset="100%" stopColor="#0f766e" />
+        </linearGradient>
+      </defs>
+      {/* portal ring base */}
+      <ellipse cx="16" cy="27" rx="11" ry="2.4" fill="#022c22" opacity="0.7" />
+      <ellipse cx="16" cy="27" rx="11" ry="2.4" fill="none" stroke="#5eead4" strokeWidth="1.2" />
+      {/* stacked tower districts */}
+      <rect x="6"  y="20" width="6" height="6" rx="1" fill="url(#nnTwr)" stroke="#ccfbf1" strokeWidth="1" />
+      <rect x="20" y="20" width="6" height="6" rx="1" fill="url(#nnTwr)" stroke="#ccfbf1" strokeWidth="1" />
+      <rect x="11" y="14" width="10" height="7" rx="1.2" fill="url(#nnTwr)" stroke="#ccfbf1" strokeWidth="1.2" />
+      <rect x="13" y="6"  width="6"  height="9" rx="1.2" fill="url(#nnTwr)" stroke="#ccfbf1" strokeWidth="1.2" />
+      {/* tower peak beacon */}
+      <circle cx="16" cy="5.5" r="1.6" fill="#fde68a" />
+      <circle cx="16" cy="5.5" r="3.2" fill="#fde68a" opacity="0.25" />
+    </svg>
+  );
+}
+function ProgressIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="nnBdg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#fde68a" />
+          <stop offset="100%" stopColor="#f59e0b" />
+        </linearGradient>
+      </defs>
+      {/* medal shield */}
+      <path d="M16 3l10 3v8c0 7-5 11-10 13C11 25 6 21 6 14V6z" fill="url(#nnBdg)" stroke="#fffbeb" strokeWidth="1.3" />
+      {/* lightning bolt */}
+      <path d="M17 9l-5 8h3.5l-1.5 6 5.5-8H16z" fill="#0f172a" stroke="#fffbeb" strokeWidth="0.8" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export default function NumberNexusMap() {
   const router   = useRouter();
   const [progress] = useState(() => readProgress());
