@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useAuthGuard } from "@/lib/useAuthGuard";
 
+const YEAR_LEVELS = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"];
+
 type ClassRow = {
   id: string;
   class_code: string;
@@ -19,6 +21,9 @@ type StudentRow = {
   class_id: string | null;
   pin?: string | null;
   qr_token?: string | null;
+  year_level?: string | null;
+  notes?: string | null;
+  archived_at?: string | null;
 };
 
 type StudentAccessCredentialRow = {
@@ -31,6 +36,12 @@ type StudentAccessCredentialRow = {
 type ParentStudentLinkRow = {
   student_id: string;
   status: string;
+};
+
+type EditForm = {
+  display_name: string;
+  year_level: string;
+  notes: string;
 };
 
 export default function TeacherClassesPage() {
@@ -50,6 +61,12 @@ export default function TeacherClassesPage() {
     pin: string;
     claimCode: string;
   } | null>(null);
+  // Edit state
+  const [editingStudentId, setEditingStudentId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState<EditForm>({ display_name: "", year_level: "", notes: "" });
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [archivingStudentId, setArchivingStudentId] = useState<string | null>(null);
+  const [showArchivedForClass, setShowArchivedForClass] = useState<Record<string, boolean>>({});
 
   const loadClasses = useCallback(async (teacherId: string) => {
     const { data: cls } = await supabase
@@ -115,8 +132,8 @@ export default function TeacherClassesPage() {
     void Promise.resolve().then(() => loadClasses(authUser.id));
   }, [authLoading, authUser, loadClasses]);
 
-  const studentsForClass = (classId: string) =>
-    students.filter((s) => s.class_id === classId);
+  const studentsForClass = (classId: string, includeArchived = false) =>
+    students.filter((s) => s.class_id === classId && (includeArchived ? true : !s.archived_at));
 
   function linkStatus(studentId: string) {
     if (linkedStudentIds.has(studentId)) return "Home linked";
@@ -160,6 +177,67 @@ export default function TeacherClassesPage() {
     if (authUser?.id) await loadClasses(authUser.id);
   }
 
+  function startEdit(student: StudentRow) {
+    setEditingStudentId(student.id);
+    setEditForm({
+      display_name: student.display_name,
+      year_level: student.year_level ?? "",
+      notes: student.notes ?? "",
+    });
+  }
+
+  function cancelEdit() {
+    setEditingStudentId(null);
+  }
+
+  async function saveStudentEdit(studentId: string) {
+    if (!editForm.display_name.trim()) return;
+    setSavingEdit(true);
+    const { error } = await supabase
+      .from("students")
+      .update({
+        display_name: editForm.display_name.trim(),
+        year_level: editForm.year_level || null,
+        notes: editForm.notes.trim() || null,
+      } as any)
+      .eq("id", studentId);
+    setSavingEdit(false);
+    if (error) { alert(error.message); return; }
+    setStudents((prev) =>
+      prev.map((s) =>
+        s.id === studentId
+          ? { ...s, display_name: editForm.display_name.trim(), year_level: editForm.year_level || null, notes: editForm.notes.trim() || null }
+          : s
+      )
+    );
+    setEditingStudentId(null);
+  }
+
+  async function archiveStudent(student: StudentRow) {
+    if (!confirm(`Archive ${student.display_name}? They will be hidden from the class but their progress is kept.`)) return;
+    setArchivingStudentId(student.id);
+    const { error } = await supabase
+      .from("students")
+      .update({ archived_at: new Date().toISOString() } as any)
+      .eq("id", student.id);
+    setArchivingStudentId(null);
+    if (error) { alert(error.message); return; }
+    setStudents((prev) =>
+      prev.map((s) => (s.id === student.id ? { ...s, archived_at: new Date().toISOString() } : s))
+    );
+  }
+
+  async function unarchiveStudent(student: StudentRow) {
+    const { error } = await supabase
+      .from("students")
+      .update({ archived_at: null } as any)
+      .eq("id", student.id);
+    if (error) { alert(error.message); return; }
+    setStudents((prev) =>
+      prev.map((s) => (s.id === student.id ? { ...s, archived_at: null } : s))
+    );
+  }
+
   function copyText(value: string) {
     navigator.clipboard.writeText(value);
   }
@@ -198,7 +276,11 @@ export default function TeacherClassesPage() {
         ) : (
           <div className="grid gap-4">
             {classes.map((cls) => {
-              const studs = studentsForClass(cls.id);
+              const showArchived = showArchivedForClass[cls.id] ?? false;
+              const activeStuds = studentsForClass(cls.id, false);
+              const archivedStuds = studentsForClass(cls.id, true).filter((s) => s.archived_at);
+              const visibleStuds = showArchived ? studentsForClass(cls.id, true) : activeStuds;
+
               return (
                 <div
                   key={cls.id}
@@ -213,67 +295,191 @@ export default function TeacherClassesPage() {
                       </p>
                     </div>
                     <span className="text-sm font-semibold text-gray-500">
-                      {studs.length} student{studs.length !== 1 ? "s" : ""}
+                      {activeStuds.length} student{activeStuds.length !== 1 ? "s" : ""}
                     </span>
                   </div>
 
-                  {studs.length > 0 && (
+                  {visibleStuds.length > 0 && (
                     <div className="mt-4 grid gap-2">
-                      {studs.map((s) => (
-                        <div
-                          key={s.id}
-                          className="grid gap-2 text-sm px-3 py-3 bg-gray-50 rounded-xl md:grid-cols-[1fr_auto]"
-                        >
-                          <div>
-                            <div className="flex flex-wrap items-center gap-2">
-                              <span className="font-semibold text-gray-700">{s.display_name}</span>
-                              <span
-                                className={[
-                                  "rounded-full px-2 py-0.5 text-[11px] font-black",
-                                  linkedStudentIds.has(s.id)
-                                    ? "bg-emerald-100 text-emerald-700"
-                                    : claimCodesByStudentId[s.id]
-                                    ? "bg-amber-100 text-amber-700"
-                                    : "bg-slate-100 text-slate-500",
-                                ].join(" ")}
-                              >
-                                {linkStatus(s.id)}
-                              </span>
+                      {visibleStuds.map((s) => {
+                        const isEditing = editingStudentId === s.id;
+                        const isArchived = !!s.archived_at;
+
+                        if (isEditing) {
+                          return (
+                            <div key={s.id} className="grid gap-3 text-sm px-3 py-3 bg-blue-50 rounded-xl border border-blue-100">
+                              <div className="text-xs font-black uppercase tracking-wide text-blue-700">Edit Student</div>
+                              <div className="grid gap-2 md:grid-cols-2">
+                                <div>
+                                  <label className="text-xs font-bold text-gray-500 mb-1 block">Display Name *</label>
+                                  <input
+                                    value={editForm.display_name}
+                                    onChange={(e) => setEditForm((f) => ({ ...f, display_name: e.target.value }))}
+                                    className="w-full rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-blue-300"
+                                    placeholder="Display name"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-xs font-bold text-gray-500 mb-1 block">Year Level</label>
+                                  <select
+                                    value={editForm.year_level}
+                                    onChange={(e) => setEditForm((f) => ({ ...f, year_level: e.target.value }))}
+                                    className="w-full rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-blue-300"
+                                  >
+                                    <option value="">— select —</option>
+                                    {YEAR_LEVELS.map((yr) => (
+                                      <option key={yr} value={yr}>{yr}</option>
+                                    ))}
+                                  </select>
+                                </div>
+                              </div>
+                              <div>
+                                <label className="text-xs font-bold text-gray-500 mb-1 block">Notes (optional)</label>
+                                <textarea
+                                  value={editForm.notes}
+                                  onChange={(e) => setEditForm((f) => ({ ...f, notes: e.target.value }))}
+                                  rows={2}
+                                  className="w-full rounded-xl border border-white bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-300 resize-none"
+                                  placeholder="e.g. IEP, reading support, parent contact preference…"
+                                />
+                              </div>
+                              <div className="flex gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => saveStudentEdit(s.id)}
+                                  disabled={savingEdit || !editForm.display_name.trim()}
+                                  className="rounded-xl bg-blue-600 px-4 py-2 text-xs font-black text-white disabled:opacity-50"
+                                >
+                                  {savingEdit ? "Saving…" : "Save"}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={cancelEdit}
+                                  className="rounded-xl bg-gray-100 px-4 py-2 text-xs font-bold text-gray-600 hover:bg-gray-200"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
                             </div>
-                            <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
-                              <span>
-                                PIN: <span className="font-mono font-bold text-gray-700">{s.pin ?? "—"}</span>
-                              </span>
-                              <span>
-                                Claim:{" "}
-                                <span className="font-mono font-bold text-gray-700">
-                                  {claimCodesByStudentId[s.id] ?? "—"}
+                          );
+                        }
+
+                        return (
+                          <div
+                            key={s.id}
+                            className={[
+                              "grid gap-2 text-sm px-3 py-3 rounded-xl md:grid-cols-[1fr_auto]",
+                              isArchived ? "bg-gray-100 opacity-60" : "bg-gray-50",
+                            ].join(" ")}
+                          >
+                            <div>
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="font-semibold text-gray-700">{s.display_name}</span>
+                                {s.year_level && (
+                                  <span className="rounded-full px-2 py-0.5 text-[11px] font-black bg-indigo-50 text-indigo-600">
+                                    {s.year_level}
+                                  </span>
+                                )}
+                                {isArchived && (
+                                  <span className="rounded-full px-2 py-0.5 text-[11px] font-black bg-gray-200 text-gray-500">
+                                    Archived
+                                  </span>
+                                )}
+                                {!isArchived && (
+                                  <span
+                                    className={[
+                                      "rounded-full px-2 py-0.5 text-[11px] font-black",
+                                      linkedStudentIds.has(s.id)
+                                        ? "bg-emerald-100 text-emerald-700"
+                                        : claimCodesByStudentId[s.id]
+                                        ? "bg-amber-100 text-amber-700"
+                                        : "bg-slate-100 text-slate-500",
+                                    ].join(" ")}
+                                  >
+                                    {linkStatus(s.id)}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+                                <span>
+                                  PIN: <span className="font-mono font-bold text-gray-700">{s.pin ?? "—"}</span>
                                 </span>
-                              </span>
+                                {!isArchived && claimCodesByStudentId[s.id] && (
+                                  <span>
+                                    Claim:{" "}
+                                    <span className="font-mono font-bold text-gray-700">
+                                      {claimCodesByStudentId[s.id]}
+                                    </span>
+                                  </span>
+                                )}
+                                {s.notes && (
+                                  <span className="text-gray-400 italic">{s.notes}</span>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex flex-wrap gap-2 md:justify-end items-start">
+                              {!isArchived && (
+                                <>
+                                  {claimCodesByStudentId[s.id] ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => copyText(claimCodesByStudentId[s.id])}
+                                      className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-bold text-gray-600 hover:bg-gray-50"
+                                    >
+                                      Copy claim
+                                    </button>
+                                  ) : null}
+                                  {s.qr_token ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => copyText(`${window.location.origin}/student?token=${s.qr_token}`)}
+                                      className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-bold text-gray-600 hover:bg-gray-50"
+                                    >
+                                      Copy QR link
+                                    </button>
+                                  ) : null}
+                                  <button
+                                    type="button"
+                                    onClick={() => startEdit(s)}
+                                    className="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 hover:bg-blue-100"
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => archiveStudent(s)}
+                                    disabled={archivingStudentId === s.id}
+                                    className="rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-100 disabled:opacity-50"
+                                  >
+                                    {archivingStudentId === s.id ? "Archiving…" : "Archive"}
+                                  </button>
+                                </>
+                              )}
+                              {isArchived && (
+                                <button
+                                  type="button"
+                                  onClick={() => unarchiveStudent(s)}
+                                  className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700 hover:bg-emerald-100"
+                                >
+                                  Restore
+                                </button>
+                              )}
                             </div>
                           </div>
-                          <div className="flex flex-wrap gap-2 md:justify-end">
-                            {claimCodesByStudentId[s.id] ? (
-                              <button
-                                type="button"
-                                onClick={() => copyText(claimCodesByStudentId[s.id])}
-                                className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-bold text-gray-600 hover:bg-gray-50"
-                              >
-                                Copy claim
-                              </button>
-                            ) : null}
-                            {s.qr_token ? (
-                              <button
-                                type="button"
-                                onClick={() => copyText(`${window.location.origin}/student?token=${s.qr_token}`)}
-                                className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-bold text-gray-600 hover:bg-gray-50"
-                              >
-                                Copy QR link
-                              </button>
-                            ) : null}
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {archivedStuds.length > 0 && (
+                    <div className="mt-2">
+                      <button
+                        type="button"
+                        onClick={() => setShowArchivedForClass((prev) => ({ ...prev, [cls.id]: !showArchived }))}
+                        className="text-xs text-gray-400 hover:text-gray-600 font-semibold"
+                      >
+                        {showArchived ? "Hide archived" : `Show ${archivedStuds.length} archived student${archivedStuds.length !== 1 ? "s" : ""}`}
+                      </button>
                     </div>
                   )}
 
