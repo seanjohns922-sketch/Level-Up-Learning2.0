@@ -372,6 +372,7 @@ export default function NumberNexusMap() {
   const [store]    = useState(() => readProgramStore());
   const [bestChain, setBestChain] = useState(0);
   const [gender, setGender]       = useState<"boy" | "girl">("boy");
+  const [launching, setLaunching] = useState(false);
 
   useEffect(() => {
     try { setBestChain(Number(localStorage.getItem("lul_best_nexus_chain_v1") ?? 0)); } catch { /* ignore */ }
@@ -388,7 +389,9 @@ export default function NumberNexusMap() {
   const isPrep     = year === "Prep";
   const levelNum   = isPrep ? 0 : parseInt(year.replace(/\D/g, ""), 10) || 1;
   const levelLabel = isPrep ? "PREP" : `LV ${levelNum}`;
-  const era        = ERA_CONFIGS[getEra(year)];
+  const eraIdx     = getEra(year);
+  const era        = ERA_CONFIGS[eraIdx];
+  const isGuided   = eraIdx <= 1; // Prep, Year 1, Year 2 — single big button, no menu decisions
   const canvasRef  = useWorldCanvas(era);
 
   const currentWeek = getRecommendedAssignedWeek(store, year, progress?.assignedWeek, progress?.requiredWeeks);
@@ -426,6 +429,15 @@ export default function NumberNexusMap() {
       if (!completedByWeek[w]) { router.push(`/program?year=${encodeURIComponent(year)}&week=${w}`); return; }
     }
     router.push(`/program?year=${encodeURIComponent(year)}&week=${weekEnd}`);
+  }
+
+  function launchGuidedAdventure() {
+    if (launching || !currentZone) return;
+    setLaunching(true);
+    // Cinematic zoom transition, then navigate into the current district.
+    window.setTimeout(() => {
+      onDistrictTap(currentZone.weekStart, currentZone.weekEnd);
+    }, 900);
   }
 
   const canBack    = viewWeek > 1;
@@ -467,6 +479,8 @@ export default function NumberNexusMap() {
           position: "absolute", inset: 0, width: "100%", height: "100%",
           objectFit: "cover", objectPosition: "center 40%",
           zIndex: 0,
+          transform: launching ? "scale(1.35)" : "scale(1)",
+          transition: "transform 0.9s cubic-bezier(0.5, 0, 0.75, 0)",
         }}
       />
 
