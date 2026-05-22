@@ -25,7 +25,7 @@ const DISTRICT_ZONES = [
   { id: "bridge",   name: "NUMBER BRIDGE",      sub: "WEEKS 4–6",   weekStart: 4,  weekEnd: 6,  left: "26%", top: "36%", color: "#22d3ee", panX: 6  },
   { id: "tower",    name: "LEGEND TOWER",        sub: "WEEK 12",     weekStart: 12, weekEnd: 12, left: "50%", top: "46%", color: "#fbbf24", panX: 0  },
   { id: "core",     name: "CALCULATION CORE",   sub: "WEEKS 7–9",   weekStart: 7,  weekEnd: 9,  left: "60%", top: "16%", color: "#f472b6", panX: -8 },
-  { id: "mastery",  name: "MASTERY SECTOR",      sub: "WEEKS 10–12", weekStart: 10, weekEnd: 11, left: "76%", top: "6%",  color: "#a78bfa", panX: -14},
+  { id: "mastery",  name: "MASTERY SECTOR",      sub: "WEEKS 10–11", weekStart: 10, weekEnd: 11, left: "72%", top: "74%", color: "#a78bfa", panX: -14},
 ] as const;
 
 // ─── World canvas (particles + vehicles + tower pulse) ──────────────────────────
@@ -162,10 +162,8 @@ function DistrictLabel({
   const [hovered, setHovered] = useState(false);
   const locked = state === "locked";
 
-  const nameColor  = locked ? "rgba(90,120,160,0.45)" : "#ffffff";
-  const subColor   = locked ? "rgba(70,100,140,0.4)"  : zone.color;
-  const nameGlow   = locked ? "none" : `0 0 22px ${zone.color}99, 0 0 8px ${zone.color}55, 0 2px 10px rgba(0,0,0,0.95)`;
-  const statusText = state === "complete" ? "✓ COMPLETE" : locked ? "🔒 LOCKED" : "▶ ENTER";
+  const nameGlow   = `0 0 22px ${zone.color}99, 0 0 8px ${zone.color}55, 0 2px 10px rgba(0,0,0,0.95)`;
+  const statusText = state === "complete" ? "✓ COMPLETE" : "▶ ENTER";
 
   return (
     <div
@@ -187,28 +185,32 @@ function DistrictLabel({
     >
       {/* District name */}
       <div style={{
-        color: nameColor,
+        color: "#ffffff",
         fontSize: 20,
         fontWeight: 900,
         letterSpacing: "0.2em",
         fontFamily: "ui-monospace, monospace",
         textShadow: nameGlow,
         lineHeight: 1.1,
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
       }}>
         {zone.name}
+        {locked && <span style={{ fontSize: 16, lineHeight: 1 }}>🔒</span>}
       </div>
 
       {/* Weeks · Status */}
       <div style={{
-        color: subColor,
+        color: zone.color,
         fontSize: 11,
         fontWeight: 700,
         letterSpacing: "0.18em",
         fontFamily: "ui-monospace, monospace",
         textShadow: "0 1px 8px rgba(0,0,0,0.95)",
-        opacity: locked ? 0.45 : 0.9,
+        opacity: 0.9,
       }}>
-        {zone.sub}  ·  {statusText}
+        {zone.sub}{!locked && `  ·  ${statusText}`}
       </div>
 
       {/* TAP TO ENTER badge — active district only */}
