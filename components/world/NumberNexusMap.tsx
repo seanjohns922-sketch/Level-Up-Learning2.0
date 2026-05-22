@@ -657,15 +657,22 @@ export default function NumberNexusMap() {
       {/* ── Right HUD ── */}
       <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", zIndex: 20, display: "flex", flexDirection: "column", gap: 10 }}>
         {[
-          { Icon: BookOpen,   label: "LEGENDS", route: "/legends"     },
-          { Icon: LayoutGrid, label: "LEVELS",  route: "/levels"      },
-          { Icon: BarChart3,  label: "STATS",   route: "/realm-stats" },
-        ].map(({ Icon, label, route }) => (
-          <button key={label} onClick={() => router.push(route)} style={hudBtn}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: 8, background: "rgba(14,118,110,0.22)" }}>
-              <Icon size={16} color="#14b8a6" />
+          { key: "legends",  label: "LEGENDS",  route: "/legends",     icon: <LegendsIcon /> },
+          { key: "worlds",   label: "WORLDS",   route: "/levels",      icon: <WorldsIcon /> },
+          { key: "progress", label: "PROGRESS", route: "/realm-stats", icon: <ProgressIcon /> },
+        ].map(({ key, label, route, icon }) => (
+          <button key={key} onClick={() => router.push(route)} style={hudBtn} className="nn-hud-btn">
+            <div className="nn-hud-icon" style={{
+              display: "flex", alignItems: "center", justifyContent: "center",
+              width: 48, height: 48, borderRadius: 14,
+              background: "radial-gradient(circle at 50% 35%, rgba(45,212,191,0.32) 0%, rgba(13,148,136,0.18) 55%, rgba(2,8,16,0.0) 100%)",
+              border: "1px solid rgba(94,234,212,0.28)",
+              boxShadow: "inset 0 0 14px rgba(20,184,166,0.25), 0 0 18px rgba(20,184,166,0.18)",
+              transition: "transform 200ms ease, box-shadow 220ms ease",
+            }}>
+              {icon}
             </div>
-            <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: "0.16em", color: "rgba(94,234,212,0.7)", fontFamily: "ui-monospace,monospace" }}>{label}</span>
+            <span style={{ fontSize: 9, fontWeight: 900, letterSpacing: "0.18em", color: "#5eead4", fontFamily: "ui-monospace,monospace", textShadow: "0 0 10px rgba(20,184,166,0.55)" }}>{label}</span>
           </button>
         ))}
         {bestChain > 0 && (
