@@ -777,15 +777,15 @@ export default function NumberNexusMap() {
       {/* ── Guided mode (Prep–Year 2): ONE giant button — "press play and go" ── */}
       {isGuided && currentZone && (
         <div style={{
-          position: "absolute", top: 58, left: 0, right: 0, zIndex: 22,
-          display: "flex", flexDirection: "column", alignItems: "center",
-          padding: "20px 20px 0",
+          position: "absolute", inset: 0, zIndex: 22,
+          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+          padding: "20px",
           pointerEvents: "none",
         }}>
-          {/* Soft top wash so the button reads on any background */}
+          {/* Soft radial wash so the button reads on any background */}
           <div style={{
-            position: "absolute", left: 0, right: 0, top: 0, height: 220,
-            background: "linear-gradient(0deg, transparent 0%, rgba(2,6,16,0.55) 55%, rgba(2,6,16,0.92) 100%)",
+            position: "absolute", inset: 0,
+            background: "radial-gradient(circle at 50% 50%, rgba(2,6,16,0.78) 0%, rgba(2,6,16,0.45) 50%, rgba(2,6,16,0.0) 100%)",
             pointerEvents: "none",
           }} />
 
@@ -796,12 +796,12 @@ export default function NumberNexusMap() {
               position: "relative",
               pointerEvents: "auto",
               cursor: launching ? "default" : "pointer",
-              padding: "16px 48px",
+              padding: "22px 56px",
               borderRadius: 999,
               border: "2px solid rgba(94,234,212,0.85)",
               background: "linear-gradient(180deg, #14b8a6 0%, #0d9488 55%, #0f766e 100%)",
               color: "#ffffff",
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: 900,
               letterSpacing: "0.22em",
               fontFamily: "ui-monospace, monospace",
@@ -828,7 +828,7 @@ export default function NumberNexusMap() {
             color: "rgba(167,243,208,0.7)",
             fontSize: 10, fontWeight: 700, letterSpacing: "0.2em",
             fontFamily: "ui-monospace, monospace",
-            marginTop: 10,
+            marginTop: 14,
             opacity: launching ? 0 : 1,
             transition: "opacity 0.3s",
           }}>
@@ -841,7 +841,7 @@ export default function NumberNexusMap() {
             fontSize: 11, fontWeight: 800, letterSpacing: "0.28em",
             fontFamily: "ui-monospace, monospace",
             textShadow: `0 0 14px ${currentZone.color}, 0 2px 8px rgba(0,0,0,0.9)`,
-            marginTop: 10,
+            marginTop: 14,
             opacity: launching ? 0 : 1,
             transition: "opacity 0.3s",
           }}>
