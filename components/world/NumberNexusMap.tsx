@@ -862,6 +862,16 @@ export default function NumberNexusMap() {
 
       {/* ── Global keyframes ── */}
       <style>{`
+        .nn-hud-btn:hover {
+          transform: translateX(-3px) scale(1.04);
+          border-color: rgba(94,234,212,0.75) !important;
+          box-shadow: 0 0 28px rgba(45,212,191,0.55), 0 8px 26px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.12) !important;
+        }
+        .nn-hud-btn:hover .nn-hud-icon {
+          transform: scale(1.08);
+          box-shadow: inset 0 0 18px rgba(94,234,212,0.45), 0 0 28px rgba(45,212,191,0.55) !important;
+        }
+        .nn-hud-btn:active { transform: translateX(-2px) scale(0.98); }
         @keyframes holo-scan {
           0%   { background-position: 0 -100px; opacity: 0; }
           10%  { opacity: 1; }
