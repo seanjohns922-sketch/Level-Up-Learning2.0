@@ -30,17 +30,22 @@ function JoinPage() {
   const [step, setStep] = useState<"code" | "signup">(codeFromUrl ? "code" : "code");
   const [loading, setLoading] = useState(!!codeFromUrl);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    console.log("[JoinPage] raw URL:", window.location.href);
+    console.log("[JoinPage] raw code param:", codeFromUrl);
+  }, [codeFromUrl]);
+
   const lookupCode = useCallback(async (code: string) => {
     setLoading(true);
     setError(null);
     const normalizedCode = normalizeClassCode(code);
     console.log("[JoinPage] submitted code:", code);
     console.log("[JoinPage] normalised code:", normalizedCode);
-    const { data, error: queryError } = await supabase
-      .from("classes")
-      .select("id, name, class_code")
-      .eq("class_code", normalizedCode)
-      .maybeSingle();
+    console.log("[JoinPage] Supabase query target:", "public.classes.class_code via find_class_by_code RPC");
+    const { data: lookupRows, error: queryError } = await supabase
+      .rpc("find_class_by_code", { input_code: normalizedCode });
+    const data = Array.isArray(lookupRows) ? lookupRows[0] ?? null : null;
     console.log("[JoinPage] Supabase query result:", data);
     console.log("[JoinPage] Supabase error:", queryError);
     if (queryError) {
@@ -104,11 +109,10 @@ function JoinPage() {
     setLoading(true);
 
     // 1) Find class
-    const { data: klass, error: classErr } = await supabase
-      .from("classes")
-      .select("id, class_code, name")
-      .eq("class_code", normalizedCode)
-      .single();
+    console.log("[JoinPage] Supabase query target:", "public.classes.class_code via find_class_by_code RPC");
+    const { data: lookupRows, error: classErr } = await supabase
+      .rpc("find_class_by_code", { input_code: normalizedCode });
+    const klass = Array.isArray(lookupRows) ? lookupRows[0] ?? null : null;
 
     console.log("[JoinPage] Supabase query result:", klass);
     console.log("[JoinPage] Supabase error:", classErr);
