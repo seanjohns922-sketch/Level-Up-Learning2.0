@@ -817,6 +817,26 @@ export default function NumberNexusMap() {
           0%, 100% { transform: scale(1);   opacity: 0.85; }
           50%       { transform: scale(1.6); opacity: 1;   }
         }
+        @keyframes guided-pulse {
+          0%, 100% {
+            box-shadow:
+              0 0 0 4px rgba(20,184,166,0.18),
+              0 0 38px rgba(20,184,166,0.55),
+              0 0 90px rgba(20,184,166,0.40),
+              0 14px 32px rgba(0,0,0,0.55),
+              inset 0 2px 0 rgba(255,255,255,0.35),
+              inset 0 -4px 0 rgba(0,0,0,0.25);
+          }
+          50% {
+            box-shadow:
+              0 0 0 6px rgba(94,234,212,0.30),
+              0 0 60px rgba(94,234,212,0.85),
+              0 0 130px rgba(20,184,166,0.65),
+              0 14px 32px rgba(0,0,0,0.55),
+              inset 0 2px 0 rgba(255,255,255,0.45),
+              inset 0 -4px 0 rgba(0,0,0,0.25);
+          }
+        }
       `}</style>
     </div>
   );
