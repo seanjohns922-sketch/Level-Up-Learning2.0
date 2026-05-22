@@ -451,11 +451,13 @@ export default function NumberNexusMap() {
     ...extra,
   });
   const hudBtn: React.CSSProperties = {
-    display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
-    padding: "10px 10px", borderRadius: 12, cursor: "pointer",
-    background: "rgba(2,8,20,0.88)", border: "1px solid rgba(94,234,212,0.18)",
-    backdropFilter: "blur(12px)", minWidth: 52,
-    boxShadow: "0 0 12px rgba(94,234,212,0.06), 0 4px 18px rgba(0,0,0,0.6)",
+    display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
+    padding: "12px 10px 10px", borderRadius: 18, cursor: "pointer",
+    background: "linear-gradient(180deg, rgba(8,20,32,0.92) 0%, rgba(2,8,16,0.95) 100%)",
+    border: "1.5px solid rgba(94,234,212,0.32)",
+    backdropFilter: "blur(14px)", width: 72,
+    boxShadow: "0 0 18px rgba(20,184,166,0.18), 0 6px 22px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.06)",
+    transition: "transform 180ms ease, box-shadow 220ms ease, border-color 220ms ease",
   };
   const navBtn = (active: boolean): React.CSSProperties => ({
     display: "flex", alignItems: "center", gap: 6,
