@@ -6,22 +6,33 @@ import { recoverInvalidRefreshToken, supabase } from "@/lib/supabase";
 import { useAuthGuard } from "@/lib/useAuthGuard";
 import QRCode from "qrcode";
 
+type AddedStudent = { name: string; pin: string; claimCode: string };
+
 export default function NewClassPage() {
   const router = useRouter();
   useAuthGuard();
   const [className, setClassName] = useState("");
-  const [yearLevel, setYearLevel] = useState("1");
+  const [yearLevel, setYearLevel] = useState("");
   const [creating, setCreating] = useState(false);
   const [createdCode, setCreatedCode] = useState<string | null>(null);
+  const [createdClassId, setCreatedClassId] = useState<string | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Student adding state
+  const [newStudentName, setNewStudentName] = useState("");
+  const [newStudentPin, setNewStudentPin] = useState("");
+  const [addingStudent, setAddingStudent] = useState(false);
+  const [addedStudents, setAddedStudents] = useState<AddedStudent[]>([]);
+  const [studentError, setStudentError] = useState<string | null>(null);
+
   const yearLevelOptions = [
-    { value: 1, label: "Year 1" },
-    { value: 2, label: "Year 2" },
-    { value: 3, label: "Year 3" },
-    { value: 4, label: "Year 4" },
-    { value: 5, label: "Year 5" },
-    { value: 6, label: "Year 6" },
+    { value: "Prep", label: "Prep" },
+    { value: "Year 1", label: "Year 1" },
+    { value: "Year 2", label: "Year 2" },
+    { value: "Year 3", label: "Year 3" },
+    { value: "Year 4", label: "Year 4" },
+    { value: "Year 5", label: "Year 5" },
+    { value: "Year 6", label: "Year 6" },
   ];
 
   function generateLocalClassCode(length = 5) {
@@ -58,12 +69,18 @@ export default function NewClassPage() {
         code = rpcCode;
       }
 
-      let { error: classErr } = await supabase.from("classes").insert({
+      const insertPayload: Record<string, string> = {
         name: className.trim(),
-        year_level: yearLevel,
         class_code: code,
         teacher_id: user.id,
-      });
+      };
+      if (yearLevel) insertPayload.year_level = yearLevel;
+
+      let { data: insertedClass, error: classErr } = await supabase
+        .from("classes")
+        .insert(insertPayload)
+        .select("id")
+        .single();
 
       if (classErr && /row-level security|get_teacher_id|permission/i.test(classErr.message)) {
         const displayName =
@@ -71,32 +88,19 @@ export default function NewClassPage() {
           user.email ??
           "Teacher";
 
-        await supabase
-          .from("teachers")
-          .upsert(
-            {
-              id: user.id,
-              user_id: user.id,
-              name: displayName,
-              email: user.email ?? `${user.id}@placeholder.local`,
-            },
-            { onConflict: "user_id" },
-          );
+        await supabase.from("teachers").upsert(
+          { id: user.id, display_name: displayName, email: user.email ?? `${user.id}@placeholder.local` },
+          { onConflict: "id" },
+        );
 
-        await supabase.from("teachers").upsert({
-          id: user.id,
-          display_name: displayName,
-          email: user.email ?? `${user.id}@placeholder.local`,
-        });
-
-        const retry = await supabase.from("classes").insert({
-          name: className.trim(),
-          year_level: yearLevel,
-          class_code: code,
-          teacher_id: user.id,
-        });
+        const retry = await supabase
+          .from("classes")
+          .insert(insertPayload)
+          .select("id")
+          .single();
 
         classErr = retry.error;
+        insertedClass = retry.data;
       }
 
       if (classErr) {
@@ -105,6 +109,7 @@ export default function NewClassPage() {
       }
 
       setCreatedCode(code);
+      setCreatedClassId(insertedClass?.id ?? null);
 
       const joinUrl = `${window.location.origin}/join?code=${code}`;
       const dataUrl = await QRCode.toDataURL(joinUrl, { width: 256, margin: 2 });
@@ -115,6 +120,32 @@ export default function NewClassPage() {
     } finally {
       setCreating(false);
     }
+  }
+
+  async function addStudent() {
+    if (!newStudentName.trim() || !createdClassId) return;
+    if (newStudentPin && !/^\d{4}$/.test(newStudentPin)) {
+      setStudentError("PIN must be 4 digits.");
+      return;
+    }
+    setStudentError(null);
+    setAddingStudent(true);
+    const { data, error: stuErr } = await supabase.rpc("create_student_for_class", {
+      class_uuid: createdClassId,
+      display_name_input: newStudentName.trim(),
+      pin_input: newStudentPin || null,
+    });
+    setAddingStudent(false);
+    if (stuErr) { setStudentError(stuErr.message); return; }
+    const created = Array.isArray(data) ? data[0] : data;
+    if (created) {
+      setAddedStudents((prev) => [
+        ...prev,
+        { name: newStudentName.trim(), pin: created.pin, claimCode: created.claim_code },
+      ]);
+    }
+    setNewStudentName("");
+    setNewStudentPin("");
   }
 
   return (
@@ -135,14 +166,15 @@ export default function NewClassPage() {
             </label>
 
             <label className="grid gap-1">
-              <span className="text-sm font-bold text-gray-600">Year Level</span>
+              <span className="text-sm font-bold text-gray-600">Year Level <span className="font-normal text-gray-400">(optional)</span></span>
               <select
                 value={yearLevel}
                 onChange={(e) => setYearLevel(e.target.value)}
                 className="px-4 py-3 rounded-2xl border border-gray-200 bg-white"
               >
+                <option value="">— select —</option>
                 {yearLevelOptions.map((option) => (
-                  <option key={option.value} value={String(option.value)}>
+                  <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
                 ))}
@@ -160,40 +192,91 @@ export default function NewClassPage() {
             </button>
           </div>
         ) : (
-          <div className="bg-white/80 backdrop-blur rounded-2xl border border-white shadow p-6 text-center">
-            <div className="text-green-600 text-lg font-bold mb-2">✅ Class Created!</div>
-            <p className="text-gray-600 mb-4">Share this code or QR with your students:</p>
-
-            <div className="text-4xl font-mono font-black tracking-[0.3em] text-gray-900 mb-6">
-              {createdCode}
+          <div className="grid gap-4">
+            {/* Class code + QR */}
+            <div className="bg-white/80 backdrop-blur rounded-2xl border border-white shadow p-6 text-center">
+              <div className="text-green-600 text-lg font-bold mb-1">Class Created!</div>
+              <p className="text-gray-500 text-sm mb-4">Share this code or QR so students can join:</p>
+              <div className="text-4xl font-mono font-black tracking-[0.3em] text-gray-900 mb-4">
+                {createdCode}
+              </div>
+              {qrDataUrl && (
+                <div className="flex justify-center mb-3">
+                  <img src={qrDataUrl} alt="QR code to join class" className="rounded-xl w-40 h-40" />
+                </div>
+              )}
+              <p className="text-xs text-gray-400">
+                Students go to <span className="font-mono">/join?code={createdCode}</span>
+              </p>
             </div>
 
-            {qrDataUrl && (
-              <div className="flex justify-center mb-6">
-                <img src={qrDataUrl} alt="QR code to join class" className="rounded-xl" />
+            {/* Add students inline */}
+            <div className="bg-white/80 backdrop-blur rounded-2xl border border-white shadow p-6">
+              <div className="text-sm font-black uppercase tracking-wide text-emerald-700 mb-4">
+                Add Students to This Class
               </div>
-            )}
 
-            <p className="text-sm text-gray-500 mb-4">
-              Students go to <span className="font-mono font-bold">/join?code={createdCode}</span>
-            </p>
+              {addedStudents.length > 0 && (
+                <div className="mb-4 grid gap-2">
+                  {addedStudents.map((s, i) => (
+                    <div key={i} className="flex items-center justify-between rounded-xl bg-gray-50 px-4 py-2 text-sm">
+                      <span className="font-semibold text-gray-800">{s.name}</span>
+                      <span className="text-gray-500 font-mono text-xs">PIN: <span className="font-black text-gray-800">{s.pin}</span></span>
+                    </div>
+                  ))}
+                </div>
+              )}
 
-            <div className="flex gap-3 justify-center">
+              <div className="grid gap-2 md:grid-cols-[1fr_120px_auto]">
+                <input
+                  value={newStudentName}
+                  onChange={(e) => setNewStudentName(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") void addStudent(); }}
+                  placeholder="Student name"
+                  className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
+                />
+                <input
+                  value={newStudentPin}
+                  onChange={(e) => setNewStudentPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                  onKeyDown={(e) => { if (e.key === "Enter") void addStudent(); }}
+                  placeholder="PIN (opt.)"
+                  inputMode="numeric"
+                  className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
+                />
+                <button
+                  type="button"
+                  onClick={() => void addStudent()}
+                  disabled={addingStudent || !newStudentName.trim()}
+                  className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-black text-white disabled:cursor-not-allowed disabled:bg-gray-300"
+                >
+                  {addingStudent ? "Adding…" : "Add"}
+                </button>
+              </div>
+              {studentError && <p className="mt-2 text-xs text-red-600 font-bold">{studentError}</p>}
+            </div>
+
+            {/* Done / Create Another */}
+            <div className="flex gap-3">
               <button
                 onClick={() => router.push("/teacher/classes")}
-                className="px-5 py-2.5 rounded-2xl bg-[#eef2f6] text-gray-700 font-bold hover:bg-white"
+                className="flex-1 py-3 rounded-2xl bg-[#9fd7b1] text-[#1f3b2a] font-black text-base hover:bg-[#8fcea4] transition"
               >
-                View Classes
+                Done — View Classes
               </button>
               <button
                 onClick={() => {
                   setCreatedCode(null);
+                  setCreatedClassId(null);
                   setClassName("");
+                  setYearLevel("");
                   setQrDataUrl(null);
+                  setAddedStudents([]);
+                  setNewStudentName("");
+                  setNewStudentPin("");
                 }}
-                className="px-5 py-2.5 rounded-2xl bg-[#9fd7b1] text-[#1f3b2a] font-bold hover:bg-[#8fcea4]"
+                className="px-5 py-3 rounded-2xl bg-white border border-gray-200 text-gray-600 font-bold hover:bg-gray-50 transition"
               >
-                Create Another
+                + New Class
               </button>
             </div>
           </div>
