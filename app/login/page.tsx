@@ -179,19 +179,8 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/15 pointer-events-none" />
       </div>
 
-      {/* ── Skip to Demo ── */}
-      <div className="absolute top-4 right-5 z-30">
-        <button
-          onClick={() => { supabase.auth.signOut().then(() => router.push("/home")); }}
-          className="px-4 py-1.5 rounded-full text-white/60 text-xs font-semibold hover:text-white/90 transition"
-          style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}
-          type="button"
-        >
-          Skip to Demo
-        </button>
-      </div>
 
-      {/* ── Left panel — floating UI ── */}
+{/* ── Left panel — floating UI ── */}
       <div
         className="relative z-10 w-full md:w-[440px] min-h-screen flex flex-col justify-center px-8 md:px-12 py-10"
         style={{ animation: "fadeUp 0.7s ease both" }}

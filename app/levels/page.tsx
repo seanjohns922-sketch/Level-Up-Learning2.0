@@ -221,16 +221,6 @@ export default function LevelsPage() {
                 My Legends
               </button>
             ) : null}
-            <button
-              onClick={resetMvp}
-              className="px-5 py-2.5 rounded-2xl text-sm font-bold transition"
-              style={{
-                background: "rgba(255,255,255,0.65)",
-                boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
-              }}
-            >
-              Reset
-            </button>
           </div>
         </div>
 
