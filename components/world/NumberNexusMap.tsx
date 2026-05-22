@@ -14,38 +14,38 @@ import {
   isWeekComplete,
 } from "@/lib/program-progress";
 
-// ─── Era system — ONE city, four evolving atmospheres ───────────────────────────
-// Prep=0  Year1-2=1  Year3-4=2  Year5-6=3
-// Same background image; era drives filters, overlays, canvas density.
-function getEra(year: string): 0 | 1 | 2 | 3 {
+// ─── Era system — ONE evolving city, five real background images ─────────────────
+// Prep=0  Y1-2=1  Y3-4=2  Y5=3  Y6=4
+function getEra(year: string): 0 | 1 | 2 | 3 | 4 {
   if (year === "Prep") return 0;
   const n = parseInt(year.replace(/\D/g, ""), 10) || 1;
   if (n <= 2) return 1;
   if (n <= 4) return 2;
-  return 3;
+  if (n <= 5) return 3;
+  return 4;
 }
 
 const ERA_CONFIGS = [
-  // 0 — Prep: bright, friendly, simple — arriving for the first time
-  { bgFilter: "brightness(1.35) saturate(0.72) hue-rotate(-8deg)",
-    skyTint: "rgba(45,212,191,0.22)", particleCount: 50, particleSpeedMult: 0.5,
-    vehicleCount: 3, vehicleSpeedMult: 0.6, pulseRings: 2, pulseColor: "#2dd4bf",
-    beamOpacity: 0.16, groundGlowOpacity: 0.14, labelSize: 16 },
-  // 1 — Year 1-2: expanding, more lights, more movement
-  { bgFilter: "brightness(1.1) saturate(0.88)",
-    skyTint: "rgba(20,184,166,0.14)", particleCount: 80, particleSpeedMult: 0.75,
-    vehicleCount: 5, vehicleSpeedMult: 0.8, pulseRings: 3, pulseColor: "#14b8a6",
-    beamOpacity: 0.22, groundGlowOpacity: 0.18, labelSize: 18 },
-  // 2 — Year 3-4: deep city, current vibe — dense skyline
-  { bgFilter: "none",
-    skyTint: "rgba(14,184,166,0.08)", particleCount: 130, particleSpeedMult: 1.0,
-    vehicleCount: 9, vehicleSpeedMult: 1.0, pulseRings: 4, pulseColor: "#14b8a6",
-    beamOpacity: 0.30, groundGlowOpacity: 0.22, labelSize: 20 },
-  // 3 — Year 5-6: mythic, gold + teal, god-like tower
-  { bgFilter: "brightness(0.88) saturate(1.35) hue-rotate(14deg)",
-    skyTint: "rgba(100,60,200,0.28)", particleCount: 190, particleSpeedMult: 1.45,
-    vehicleCount: 15, vehicleSpeedMult: 1.6, pulseRings: 6, pulseColor: "#fbbf24",
-    beamOpacity: 0.55, groundGlowOpacity: 0.38, labelSize: 22 },
+  // 0 — Prep: first arrival, friendly, simple
+  { bgImage: "/images/number-nexus-bg-prep.png",
+    particleCount: 50,  particleSpeedMult: 0.5,  vehicleCount: 3,  vehicleSpeedMult: 0.6,
+    pulseRings: 2, pulseColor: "#2dd4bf", labelSize: 16 },
+  // 1 — Year 1-2: city expanding, more life
+  { bgImage: "/images/number-nexus-bg-y1.png",
+    particleCount: 80,  particleSpeedMult: 0.75, vehicleCount: 5,  vehicleSpeedMult: 0.8,
+    pulseRings: 3, pulseColor: "#14b8a6", labelSize: 18 },
+  // 2 — Year 3-4: deep city, dense skyline (existing image)
+  { bgImage: "/images/number-nexus-home-bg.jpg",
+    particleCount: 130, particleSpeedMult: 1.0,  vehicleCount: 9,  vehicleSpeedMult: 1.0,
+    pulseRings: 4, pulseColor: "#14b8a6", labelSize: 20 },
+  // 3 — Year 5: epic, gold + teal, massive scale
+  { bgImage: "/images/number-nexus-bg-y5.png",
+    particleCount: 160, particleSpeedMult: 1.25, vehicleCount: 12, vehicleSpeedMult: 1.3,
+    pulseRings: 5, pulseColor: "#fbbf24", labelSize: 21 },
+  // 4 — Year 6: legendary, god-like tower, final destination
+  { bgImage: "/images/number-nexus-bg-y6.png",
+    particleCount: 200, particleSpeedMult: 1.5,  vehicleCount: 16, vehicleSpeedMult: 1.6,
+    pulseRings: 6, pulseColor: "#fbbf24", labelSize: 22 },
 ] as const;
 type EraConfig = typeof ERA_CONFIGS[number];
 
@@ -457,17 +457,16 @@ export default function NumberNexusMap() {
   return (
     <div style={{ position: "relative", width: "100vw", height: "100vh", overflow: "hidden", background: "#020810" }}>
 
-      {/* ── Background image — era-specific filter ── */}
+      {/* ── Background image — real image per era, no CSS filters ── */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/images/number-nexus-home-bg.jpg"
+        key={era.bgImage}
+        src={era.bgImage}
         alt=""
         style={{
           position: "absolute", inset: 0, width: "100%", height: "100%",
           objectFit: "cover", objectPosition: "center 40%",
           zIndex: 0,
-          filter: era.bgFilter === "none" ? undefined : era.bgFilter,
-          transition: "filter 1.2s ease",
         }}
       />
 
@@ -481,11 +480,10 @@ export default function NumberNexusMap() {
         position: "absolute", inset: 0, zIndex: 1,
         background: "radial-gradient(ellipse 82% 72% at 50% 44%, transparent 38%, rgba(2,6,18,0.42) 100%)",
       }} />
-      {/* Era sky tint — each era has its own colour cast */}
+      {/* Teal center glow — consistent identity across all eras */}
       <div style={{
         position: "absolute", inset: 0, zIndex: 1,
-        background: `radial-gradient(ellipse 70% 60% at 50% 28%, ${era.skyTint} 0%, transparent 75%)`,
-        transition: "background 1.2s ease",
+        background: "radial-gradient(ellipse 60% 55% at 50% 36%, rgba(14,184,166,0.07) 0%, transparent 70%)",
       }} />
 
       {/* Scanline texture */}
@@ -494,7 +492,7 @@ export default function NumberNexusMap() {
         backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px)",
       }} />
 
-      {/* Volumetric tower light beam — intensity scales with era */}
+      {/* Volumetric tower light beam — colour + width driven by era */}
       <div style={{
         position: "absolute",
         left: "50%",
@@ -503,12 +501,10 @@ export default function NumberNexusMap() {
         width: era.pulseRings > 4 ? 130 : 90,
         height: "52%",
         background: `linear-gradient(180deg, ${era.pulseColor}00 0%, ${era.pulseColor}22 60%, ${era.pulseColor}55 100%)`,
-        opacity: era.beamOpacity / 0.3,
         filter: "blur(16px)",
         zIndex: 3,
         pointerEvents: "none",
         animation: "beam-pulse 3.5s ease-in-out infinite",
-        transition: "opacity 1.2s ease, width 1.2s ease",
       }} />
 
       {/* Ground road reflection glow */}
@@ -519,7 +515,7 @@ export default function NumberNexusMap() {
         transform: "translateX(-50%)",
         width: "38%",
         height: 120,
-        background: `radial-gradient(ellipse at 50% 0%, ${era.pulseColor}${Math.round(era.groundGlowOpacity * 255).toString(16).padStart(2,"0")} 0%, transparent 75%)`,
+        background: `radial-gradient(ellipse at 50% 0%, ${era.pulseColor}38 0%, transparent 75%)`,
         filter: "blur(10px)",
         zIndex: 3,
         pointerEvents: "none",
