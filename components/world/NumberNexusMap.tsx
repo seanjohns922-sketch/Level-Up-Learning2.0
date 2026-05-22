@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft, ChevronLeft, ChevronRight,
-  User, BookOpen, LayoutGrid, BarChart3, Zap,
+  User, Zap,
 } from "lucide-react";
 import { readProgress } from "@/data/progress";
 import {
