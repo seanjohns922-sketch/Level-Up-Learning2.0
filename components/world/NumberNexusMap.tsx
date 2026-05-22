@@ -20,12 +20,16 @@ import {
 // (small + cool), 1 = foreground (large + saturated). `anchor` is where the
 // holographic label tethers to the structure ("top" | "side").
 // left/top = where the TOP-LEFT of the label text block sits (no translate)
+// Balanced symmetric composition:
+//   LEFT  column: Counting (upper) → Bridge (lower)
+//   CENTER:       Legend Tower (mid, beam-aligned)
+//   RIGHT column: Core (upper) → Mastery (lower)
 const DISTRICT_ZONES = [
-  { id: "counting", name: "COUNTING DISTRICT", sub: "WEEKS 1–3",   weekStart: 1,  weekEnd: 3,  left: "4%",  top: "18%", color: "#14b8a6", panX: 14 },
-  { id: "bridge",   name: "NUMBER BRIDGE",      sub: "WEEKS 4–6",   weekStart: 4,  weekEnd: 6,  left: "26%", top: "36%", color: "#22d3ee", panX: 6  },
-  { id: "tower",    name: "LEGEND TOWER",        sub: "WEEK 12",     weekStart: 12, weekEnd: 12, left: "50%", top: "46%", color: "#fbbf24", panX: 0  },
-  { id: "core",     name: "CALCULATION CORE",   sub: "WEEKS 7–9",   weekStart: 7,  weekEnd: 9,  left: "60%", top: "16%", color: "#f472b6", panX: -8 },
-  { id: "mastery",  name: "MASTERY SECTOR",      sub: "WEEKS 10–11", weekStart: 10, weekEnd: 11, left: "72%", top: "74%", color: "#a78bfa", panX: -14},
+  { id: "counting", name: "COUNTING DISTRICT", sub: "WEEKS 1–3",   weekStart: 1,  weekEnd: 3,  left: "3%",  top: "12%", color: "#14b8a6", panX: 10  },
+  { id: "bridge",   name: "NUMBER BRIDGE",      sub: "WEEKS 4–6",   weekStart: 4,  weekEnd: 6,  left: "3%",  top: "56%", color: "#22d3ee", panX: 6   },
+  { id: "tower",    name: "LEGEND TOWER",        sub: "WEEK 12",     weekStart: 12, weekEnd: 12, left: "50%", top: "36%", color: "#fbbf24", panX: 0   },
+  { id: "core",     name: "CALCULATION CORE",   sub: "WEEKS 7–9",   weekStart: 7,  weekEnd: 9,  left: "63%", top: "12%", color: "#f472b6", panX: -8  },
+  { id: "mastery",  name: "MASTERY SECTOR",      sub: "WEEKS 10–11", weekStart: 10, weekEnd: 11, left: "63%", top: "56%", color: "#a78bfa", panX: -12 },
 ] as const;
 
 // ─── World canvas (particles + vehicles + tower pulse) ──────────────────────────
@@ -500,6 +504,8 @@ export default function NumberNexusMap() {
               position: "absolute",
               left: zone.left,
               top: zone.top,
+              // Center the tower label on the beam axis
+              transform: zone.id === "tower" ? "translateX(-50%)" : undefined,
               pointerEvents: "auto",
             }}
           >
@@ -512,14 +518,13 @@ export default function NumberNexusMap() {
           </div>
         ))}
 
-        {/* Character — drifts horizontally toward the active district */}
+        {/* Character — dead center, grounded on the foreground platform */}
         <div style={{
           position: "absolute",
-          bottom: "3%",
-          left: `calc(50% + ${(currentZone ? (parseFloat(currentZone.left) - 50) * 0.35 : 0)}%)`,
+          bottom: "2%",
+          left: "50%",
           transform: "translateX(-50%)",
           zIndex: 12,
-          transition: "left 0.9s cubic-bezier(0.22,1,0.36,1)",
           pointerEvents: "auto",
         }}>
           <PlayerCharacter gender={gender} />
