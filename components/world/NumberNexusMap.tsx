@@ -676,7 +676,7 @@ export default function NumberNexusMap() {
       </div>
 
       {/* ── Bottom nav ── */}
-      <div style={{
+      {!isGuided && (<div style={{
         position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 20,
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "12px 20px",
@@ -701,7 +701,93 @@ export default function NumberNexusMap() {
         <button onClick={() => canForward && setViewWeek((v) => v + 1)} disabled={!canForward} style={navBtn(canForward)}>
           Next <ChevronRight size={15} />
         </button>
-      </div>
+      </div>)}
+
+      {/* ── Guided mode (Prep–Year 2): ONE giant button — "press play and go" ── */}
+      {isGuided && currentZone && (
+        <div style={{
+          position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 22,
+          display: "flex", flexDirection: "column", alignItems: "center",
+          padding: "0 20px 28px",
+          pointerEvents: "none",
+        }}>
+          {/* Soft floor wash so the button reads on any background */}
+          <div style={{
+            position: "absolute", left: 0, right: 0, bottom: 0, height: 220,
+            background: "linear-gradient(180deg, transparent 0%, rgba(2,6,16,0.55) 55%, rgba(2,6,16,0.92) 100%)",
+            pointerEvents: "none",
+          }} />
+
+          <div style={{
+            position: "relative",
+            color: currentZone.color,
+            fontSize: 11, fontWeight: 800, letterSpacing: "0.28em",
+            fontFamily: "ui-monospace, monospace",
+            textShadow: `0 0 14px ${currentZone.color}, 0 2px 8px rgba(0,0,0,0.9)`,
+            marginBottom: 10,
+            opacity: launching ? 0 : 1,
+            transition: "opacity 0.3s",
+          }}>
+            WEEK {currentWeek}  ·  {currentZone.name}
+          </div>
+
+          <button
+            onClick={launchGuidedAdventure}
+            disabled={launching}
+            style={{
+              position: "relative",
+              pointerEvents: "auto",
+              cursor: launching ? "default" : "pointer",
+              padding: "20px 56px",
+              borderRadius: 999,
+              border: "2px solid rgba(94,234,212,0.85)",
+              background: "linear-gradient(180deg, #14b8a6 0%, #0d9488 55%, #0f766e 100%)",
+              color: "#ffffff",
+              fontSize: 22,
+              fontWeight: 900,
+              letterSpacing: "0.22em",
+              fontFamily: "ui-monospace, monospace",
+              textShadow: "0 2px 8px rgba(0,0,0,0.55)",
+              boxShadow: [
+                "0 0 0 4px rgba(20,184,166,0.18)",
+                "0 0 38px rgba(20,184,166,0.65)",
+                "0 0 90px rgba(20,184,166,0.45)",
+                "0 14px 32px rgba(0,0,0,0.55)",
+                "inset 0 2px 0 rgba(255,255,255,0.35)",
+                "inset 0 -4px 0 rgba(0,0,0,0.25)",
+              ].join(", "),
+              transform: launching ? "scale(1.08)" : "scale(1)",
+              transition: "transform 0.25s ease",
+              animation: "guided-pulse 2.4s ease-in-out infinite",
+              whiteSpace: "nowrap",
+            }}
+          >
+            ▶  {highestDone === 0 ? "START ADVENTURE" : "CONTINUE ADVENTURE"}
+          </button>
+
+          <div style={{
+            position: "relative",
+            color: "rgba(167,243,208,0.7)",
+            fontSize: 10, fontWeight: 700, letterSpacing: "0.2em",
+            fontFamily: "ui-monospace, monospace",
+            marginTop: 12,
+            opacity: launching ? 0 : 1,
+            transition: "opacity 0.3s",
+          }}>
+            TAP TO FLY INTO YOUR NEXT MISSION
+          </div>
+        </div>
+      )}
+
+      {/* ── Guided launch flash overlay ── */}
+      {isGuided && (
+        <div style={{
+          position: "absolute", inset: 0, zIndex: 50, pointerEvents: "none",
+          background: `radial-gradient(circle at 50% 60%, ${era.pulseColor}cc 0%, ${era.pulseColor}66 25%, rgba(2,8,20,0.95) 70%)`,
+          opacity: launching ? 1 : 0,
+          transition: "opacity 0.6s ease-in 0.25s",
+        }} />
+      )}
 
       {/* ── Global keyframes ── */}
       <style>{`
