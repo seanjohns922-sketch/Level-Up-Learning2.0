@@ -14,12 +14,42 @@ import {
   isWeekComplete,
 } from "@/lib/program-progress";
 
+// ─── Era system — ONE city, four evolving atmospheres ───────────────────────────
+// Prep=0  Year1-2=1  Year3-4=2  Year5-6=3
+// Same background image; era drives filters, overlays, canvas density.
+function getEra(year: string): 0 | 1 | 2 | 3 {
+  if (year === "Prep") return 0;
+  const n = parseInt(year.replace(/\D/g, ""), 10) || 1;
+  if (n <= 2) return 1;
+  if (n <= 4) return 2;
+  return 3;
+}
+
+const ERA_CONFIGS = [
+  // 0 — Prep: bright, friendly, simple — arriving for the first time
+  { bgFilter: "brightness(1.35) saturate(0.72) hue-rotate(-8deg)",
+    skyTint: "rgba(45,212,191,0.22)", particleCount: 50, particleSpeedMult: 0.5,
+    vehicleCount: 3, vehicleSpeedMult: 0.6, pulseRings: 2, pulseColor: "#2dd4bf",
+    beamOpacity: 0.16, groundGlowOpacity: 0.14, labelSize: 16 },
+  // 1 — Year 1-2: expanding, more lights, more movement
+  { bgFilter: "brightness(1.1) saturate(0.88)",
+    skyTint: "rgba(20,184,166,0.14)", particleCount: 80, particleSpeedMult: 0.75,
+    vehicleCount: 5, vehicleSpeedMult: 0.8, pulseRings: 3, pulseColor: "#14b8a6",
+    beamOpacity: 0.22, groundGlowOpacity: 0.18, labelSize: 18 },
+  // 2 — Year 3-4: deep city, current vibe — dense skyline
+  { bgFilter: "none",
+    skyTint: "rgba(14,184,166,0.08)", particleCount: 130, particleSpeedMult: 1.0,
+    vehicleCount: 9, vehicleSpeedMult: 1.0, pulseRings: 4, pulseColor: "#14b8a6",
+    beamOpacity: 0.30, groundGlowOpacity: 0.22, labelSize: 20 },
+  // 3 — Year 5-6: mythic, gold + teal, god-like tower
+  { bgFilter: "brightness(0.88) saturate(1.35) hue-rotate(14deg)",
+    skyTint: "rgba(100,60,200,0.28)", particleCount: 190, particleSpeedMult: 1.45,
+    vehicleCount: 15, vehicleSpeedMult: 1.6, pulseRings: 6, pulseColor: "#fbbf24",
+    beamOpacity: 0.55, groundGlowOpacity: 0.38, labelSize: 22 },
+] as const;
+type EraConfig = typeof ERA_CONFIGS[number];
+
 // ─── District zones ─────────────────────────────────────────────────────────────
-// Each district is a REAL structure in the city, placed at varied vertical
-// positions to break the flat-menu feel. `depth` ∈ [0..1] — 0 = far/distant
-// (small + cool), 1 = foreground (large + saturated). `anchor` is where the
-// holographic label tethers to the structure ("top" | "side").
-// left/top = where the TOP-LEFT of the label text block sits (no translate)
 // Balanced symmetric composition:
 //   LEFT  column: Counting (upper) → Bridge (lower)
 //   CENTER:       Legend Tower (mid, beam-aligned)
@@ -33,7 +63,7 @@ const DISTRICT_ZONES = [
 ] as const;
 
 // ─── World canvas (particles + vehicles + tower pulse) ──────────────────────────
-function useWorldCanvas() {
+function useWorldCanvas(era: EraConfig) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -42,30 +72,35 @@ function useWorldCanvas() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const COLS = ["#14b8a6", "#818cf8", "#f472b6", "#a78bfa", "#22d3ee"];
+    // Era 3 adds gold to the colour palette
+    const COLS = era.pulseColor === "#fbbf24"
+      ? ["#fbbf24", "#14b8a6", "#a78bfa", "#f472b6", "#22d3ee"]
+      : ["#14b8a6", "#818cf8", "#f472b6", "#a78bfa", "#22d3ee"];
 
     const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
     resize();
     window.addEventListener("resize", resize);
 
-    // Floating data particles
-    const particles = Array.from({ length: 130 }, (_, i) => ({
+    const sm = era.particleSpeedMult;
+    const particles = Array.from({ length: era.particleCount }, (_, i) => ({
       x: Math.random(),
       y: Math.random(),
       size: 0.8 + Math.random() * 2.2,
-      vy: -(0.18 + Math.random() * 0.55) / 1080,
-      vx: ((Math.random() - 0.5) * 0.15) / 1920,
+      vy: -(0.18 + Math.random() * 0.55) * sm / 1080,
+      vx: ((Math.random() - 0.5) * 0.15) * sm / 1920,
       color: COLS[i % COLS.length],
       opacity: 0.2 + Math.random() * 0.5,
     }));
 
-    // Flying vehicles — 2 altitude lanes, both directions
-    const vehicles = Array.from({ length: 9 }, (_, i) => ({
+    const vm = era.vehicleSpeedMult;
+    // More altitude lanes for higher eras
+    const laneCount = era.vehicleCount > 9 ? 4 : 2;
+    const vehicles = Array.from({ length: era.vehicleCount }, (_, i) => ({
       x: Math.random(),
-      yFrac: 0.36 + (i % 2) * 0.06 + Math.random() * 0.04,
+      yFrac: 0.30 + (i % laneCount) * 0.05 + Math.random() * 0.03,
       w: 5 + Math.random() * 8,
-      speed: ((0.5 + Math.random() * 1.4) * (i % 2 === 0 ? 1 : -1)) / 1920,
-      color: COLS[i % 3],
+      speed: ((0.5 + Math.random() * 1.4) * vm * (i % 2 === 0 ? 1 : -1)) / 1920,
+      color: COLS[i % COLS.length],
     }));
 
     let pulse = 0;
@@ -113,29 +148,30 @@ function useWorldCanvas() {
         ctx.shadowBlur = 0;
       }
 
-      // Tower pulse — rings expanding from tower
+      // Tower pulse rings — count + colour driven by era
       const tx = W * 0.5, ty = H * 0.36;
       pulse += 0.45;
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < era.pulseRings; i++) {
         const ph = (pulse + i * 28) % 112;
         const r  = ph * 1.4;
         const a  = Math.max(0, 0.28 - ph / 392);
         ctx.globalAlpha = a;
         ctx.beginPath();
         ctx.arc(tx, ty, r, 0, Math.PI * 2);
-        ctx.strokeStyle = "#14b8a6";
+        ctx.strokeStyle = era.pulseColor;
         ctx.lineWidth = 1.5;
         ctx.stroke();
       }
 
-      // Faint vertical data-stream lines near tower
-      for (let i = 0; i < 5; i++) {
-        const lx = tx + (i - 2) * 18;
+      // Vertical data-stream lines near tower
+      const streamCount = era.pulseRings > 4 ? 9 : 5;
+      for (let i = 0; i < streamCount; i++) {
+        const lx = tx + (i - Math.floor(streamCount / 2)) * 18;
         const phase = (pulse * 1.2 + i * 22) % 200;
         const ly = ty - 60 + phase;
         const la = Math.max(0, 0.18 - Math.abs(phase - 100) / 1400);
         ctx.globalAlpha = la;
-        ctx.strokeStyle = "#14b8a6";
+        ctx.strokeStyle = era.pulseColor;
         ctx.lineWidth = 0.8;
         ctx.beginPath();
         ctx.moveTo(lx, ly);
@@ -149,19 +185,21 @@ function useWorldCanvas() {
 
     draw();
     return () => { cancelAnimationFrame(fid); window.removeEventListener("resize", resize); };
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [era.particleCount, era.vehicleCount, era.pulseRings, era.pulseColor]);
 
   return ref;
 }
 
 // ─── District label — just crisp text, no card chrome ─────────────────────────
 function DistrictLabel({
-  zone, state, active, onClick,
+  zone, state, active, onClick, fontSize = 20,
 }: {
   zone: (typeof DISTRICT_ZONES)[number];
   state: "complete" | "current" | "locked";
   active: boolean;
   onClick: () => void;
+  fontSize?: number;
 }) {
   const [hovered, setHovered] = useState(false);
   const locked = state === "locked";
@@ -190,7 +228,7 @@ function DistrictLabel({
       {/* District name */}
       <div style={{
         color: "#ffffff",
-        fontSize: 20,
+        fontSize,
         fontWeight: 900,
         letterSpacing: "0.2em",
         fontFamily: "ui-monospace, monospace",
@@ -334,7 +372,6 @@ export default function NumberNexusMap() {
   const [store]    = useState(() => readProgramStore());
   const [bestChain, setBestChain] = useState(0);
   const [gender, setGender]       = useState<"boy" | "girl">("boy");
-  const canvasRef = useWorldCanvas();
 
   useEffect(() => {
     try { setBestChain(Number(localStorage.getItem("lul_best_nexus_chain_v1") ?? 0)); } catch { /* ignore */ }
@@ -351,6 +388,8 @@ export default function NumberNexusMap() {
   const isPrep     = year === "Prep";
   const levelNum   = isPrep ? 0 : parseInt(year.replace(/\D/g, ""), 10) || 1;
   const levelLabel = isPrep ? "PREP" : `LV ${levelNum}`;
+  const era        = ERA_CONFIGS[getEra(year)];
+  const canvasRef  = useWorldCanvas(era);
 
   const currentWeek = getRecommendedAssignedWeek(store, year, progress?.assignedWeek, progress?.requiredWeeks);
   const [viewWeek, setViewWeek] = useState(currentWeek);
@@ -418,7 +457,7 @@ export default function NumberNexusMap() {
   return (
     <div style={{ position: "relative", width: "100vw", height: "100vh", overflow: "hidden", background: "#020810" }}>
 
-      {/* ── Background image ── */}
+      {/* ── Background image — era-specific filter ── */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/images/number-nexus-home-bg.jpg"
@@ -427,23 +466,26 @@ export default function NumberNexusMap() {
           position: "absolute", inset: 0, width: "100%", height: "100%",
           objectFit: "cover", objectPosition: "center 40%",
           zIndex: 0,
+          filter: era.bgFilter === "none" ? undefined : era.bgFilter,
+          transition: "filter 1.2s ease",
         }}
       />
 
-      {/* Atmospheric depth overlay — teal-tinted, not just dark */}
+      {/* Atmospheric depth — top & bottom darken, mid stays open */}
       <div style={{
         position: "absolute", inset: 0, zIndex: 1,
         background: "linear-gradient(180deg, rgba(2,10,22,0.58) 0%, rgba(1,20,28,0.12) 38%, rgba(1,10,18,0.08) 55%, rgba(2,8,18,0.88) 100%)",
       }} />
-      {/* Radial vignette — wider centre keep so city visible */}
+      {/* Radial vignette */}
       <div style={{
         position: "absolute", inset: 0, zIndex: 1,
         background: "radial-gradient(ellipse 82% 72% at 50% 44%, transparent 38%, rgba(2,6,18,0.42) 100%)",
       }} />
-      {/* Teal tint bias to shift toward concept-art palette */}
+      {/* Era sky tint — each era has its own colour cast */}
       <div style={{
         position: "absolute", inset: 0, zIndex: 1,
-        background: "radial-gradient(ellipse 60% 55% at 50% 36%, rgba(14,184,166,0.08) 0%, transparent 70%)",
+        background: `radial-gradient(ellipse 70% 60% at 50% 28%, ${era.skyTint} 0%, transparent 75%)`,
+        transition: "background 1.2s ease",
       }} />
 
       {/* Scanline texture */}
@@ -452,19 +494,21 @@ export default function NumberNexusMap() {
         backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px)",
       }} />
 
-      {/* Volumetric tower light beam (CSS) */}
+      {/* Volumetric tower light beam — intensity scales with era */}
       <div style={{
         position: "absolute",
         left: "50%",
         top: "0%",
         transform: "translateX(-50%)",
-        width: 90,
+        width: era.pulseRings > 4 ? 130 : 90,
         height: "52%",
-        background: "linear-gradient(180deg, rgba(20,184,166,0.0) 0%, rgba(20,184,166,0.12) 60%, rgba(20,184,166,0.3) 100%)",
+        background: `linear-gradient(180deg, ${era.pulseColor}00 0%, ${era.pulseColor}22 60%, ${era.pulseColor}55 100%)`,
+        opacity: era.beamOpacity / 0.3,
         filter: "blur(16px)",
         zIndex: 3,
         pointerEvents: "none",
         animation: "beam-pulse 3.5s ease-in-out infinite",
+        transition: "opacity 1.2s ease, width 1.2s ease",
       }} />
 
       {/* Ground road reflection glow */}
@@ -475,7 +519,7 @@ export default function NumberNexusMap() {
         transform: "translateX(-50%)",
         width: "38%",
         height: 120,
-        background: "radial-gradient(ellipse at 50% 0%, rgba(20,184,166,0.22) 0%, transparent 75%)",
+        background: `radial-gradient(ellipse at 50% 0%, ${era.pulseColor}${Math.round(era.groundGlowOpacity * 255).toString(16).padStart(2,"0")} 0%, transparent 75%)`,
         filter: "blur(10px)",
         zIndex: 3,
         pointerEvents: "none",
@@ -514,6 +558,7 @@ export default function NumberNexusMap() {
               state={zoneState(zone)}
               active={activeZoneId === zone.id}
               onClick={() => onDistrictTap(zone.weekStart, zone.weekEnd)}
+              fontSize={era.labelSize}
             />
           </div>
         ))}
