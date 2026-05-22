@@ -265,7 +265,7 @@ function ResultsPage() {
   const shouldShowUnlock =
     passed && unlockTargets.some((id) => !(initialProgress?.unlockedLegends ?? []).includes(id)) && !unlockDismissed;
   const isFailedPretest = !isPostTest && !passedByPretest;
-  const requiresFullPathway = isFailedPretest && scorePercent < 50;
+  const requiresFullPathway = isFailedPretest && scorePercent < PRETEST_PASS_THRESHOLD;
   const diagnosticRequiredWeeks = useMemo(
     () => (!isPostTest ? normalizeWeekList(storedPretestProfile?.recommendedWeeks) : []),
     [isPostTest, storedPretestProfile]
@@ -371,7 +371,7 @@ function ResultsPage() {
   const getMessage = () => {
     if (passed) return { emoji: "🏆", title: "Amazing Work!", sub: "You crushed it!" };
     if (scorePercent >= 70) return { emoji: "💪", title: "So Close!", sub: "A little more practice and you'll nail it." };
-    if (scorePercent >= 50) return { emoji: "🌱", title: "Good Start!", sub: "Let's build your skills with a personalised program." };
+    if (scorePercent >= PRETEST_PASS_THRESHOLD) return { emoji: "🌱", title: "Good Start!", sub: "Let's build your skills with a personalised program." };
     return { emoji: "🚀", title: "Let's Level Up!", sub: "Your adventure is just beginning." };
   };
   const msg = getMessage();

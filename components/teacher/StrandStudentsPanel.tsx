@@ -74,7 +74,7 @@ function pctComplete(ids: string[], prefix: string): number {
 function computeStatus(prog: ProgressRow | undefined, completedCount: number, pct: number): StrandStatus {
   if (!prog || (prog.week == null && completedCount === 0)) return "Not Started";
   if (pct >= 100) return "Completed";
-  if (prog.pretest_score != null && prog.pretest_score < 50) return "Needs Support";
+  if (prog.pretest_score != null && prog.pretest_score < ASSESSMENT_PASS_THRESHOLD) return "Needs Support";
   // Latest post-test failed?
   const latest = getLatestPosttestProfile(prog.quiz_scores);
   if (latest && !latest.passed) return "Needs Support";
@@ -89,6 +89,8 @@ function statusTone(s: StrandStatus) {
     default:              return "bg-slate-50 text-slate-500 border-slate-200";
   }
 }
+
+const ASSESSMENT_PASS_THRESHOLD = 85;
 
 const INSIGHT_SEVERITY: Record<TeacherInsightStatus, number> = {
   "Needs Support": 3,
@@ -552,7 +554,7 @@ function StudentStrandDetail({
   // Teacher insights
   const insights: string[] = [];
   if (!isPlaceholder) {
-    if (prog?.pretest_score != null && prog.pretest_score < 50) {
+    if (prog?.pretest_score != null && prog.pretest_score < ASSESSMENT_PASS_THRESHOLD) {
       insights.push("Failed pre-test — start with foundation review");
     }
     if (latestPost && !latestPost.passed) {
@@ -584,7 +586,7 @@ function StudentStrandDetail({
         <SnapshotTile
           label="Pre-test"
           value={prog?.pretest_score != null ? `${prog.pretest_score}%` : "—"}
-          sub={prog?.pretest_score != null ? (prog.pretest_score >= 50 ? "Pass" : "Below 50%") : "Not taken"}
+          sub={prog?.pretest_score != null ? (prog.pretest_score >= ASSESSMENT_PASS_THRESHOLD ? "Pass" : `Below ${ASSESSMENT_PASS_THRESHOLD}%`) : "Not taken"}
         />
         <SnapshotTile
           label="Last Post-test"
