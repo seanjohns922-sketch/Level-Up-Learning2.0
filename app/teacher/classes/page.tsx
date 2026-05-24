@@ -45,6 +45,18 @@ type EditForm = {
   notes: string;
 };
 
+function isMissingCreateStudentRpc(message?: string | null) {
+  return Boolean(message && /create_student_for_class|schema cache|could not find the function/i.test(message));
+}
+
+function generateFallbackPin(existingPins: Set<string>) {
+  let nextPin = "";
+  do {
+    nextPin = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
+  } while (existingPins.has(nextPin));
+  return nextPin;
+}
+
 export default function TeacherClassesPage() {
   const router = useRouter();
   const { user: authUser, loading: authLoading } = useAuthGuard();
@@ -162,19 +174,60 @@ export default function TeacherClassesPage() {
       pin_input: pin || null,
     });
 
-    setCreatingStudentForClass(null);
-    if (error) {
+    let created = Array.isArray(data) ? data[0] : data;
+
+    if (error && isMissingCreateStudentRpc(error.message)) {
+      console.warn("[TeacherClasses] create_student_for_class RPC missing, using direct insert fallback", error.message);
+      const existingPins = new Set(
+        students
+          .filter((student) => student.class_id === classId)
+          .map((student) => student.pin)
+          .filter((value): value is string => Boolean(value))
+      );
+      const fallbackPin = pin || generateFallbackPin(existingPins);
+      if (existingPins.has(fallbackPin)) {
+        setCreatingStudentForClass(null);
+        alert("That PIN is already used in this class.");
+        return;
+      }
+
+      const { data: insertedStudent, error: insertError } = await supabase
+        .from("students")
+        .insert({
+          id: crypto.randomUUID(),
+          class_id: classId,
+          display_name: name,
+          pin: fallbackPin,
+          user_id: null,
+        })
+        .select("id, pin, qr_token")
+        .single();
+
+      if (insertError) {
+        setCreatingStudentForClass(null);
+        alert(insertError.message);
+        return;
+      }
+
+      created = {
+        student_id: insertedStudent.id,
+        pin: insertedStudent.pin ?? fallbackPin,
+        claim_code: "Pending setup",
+        qr_token: insertedStudent.qr_token ?? "",
+      };
+    } else if (error) {
+      setCreatingStudentForClass(null);
       alert(error.message);
       return;
     }
 
-    const created = Array.isArray(data) ? data[0] : data;
+    setCreatingStudentForClass(null);
     if (created) {
       setLastCreatedLogin({
         classId,
         name,
         pin: created.pin,
-        claimCode: created.claim_code,
+        claimCode: created.claim_code || "Pending setup",
       });
     }
     setNewStudentNames((current) => ({ ...current, [classId]: "" }));

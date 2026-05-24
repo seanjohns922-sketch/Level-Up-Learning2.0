@@ -27,6 +27,9 @@ type ClassRecord = {
 type ClassesStore = Record<string, ClassRecord>;
 
 const CLASSES_KEY = "lul_classes_v1";
+function normalizeClassCode(code: string) {
+  return code.replace(/\s+/g, "").trim().toUpperCase();
+}
 function readClasses(): ClassesStore {
   if (typeof window === "undefined") return {};
   try {
@@ -119,13 +122,26 @@ export default function LoginPage() {
 
   async function handleStudentLogin() {
     setStudentError(null);
-    const normalizedCode = studentCode.trim().toUpperCase();
+    const normalizedCode = normalizeClassCode(studentCode);
     const displayName = studentName.trim();
     const name = displayName;
     const pin = studentPin.trim();
+
+    console.log("[LoginPage] raw class code:", studentCode);
+    console.log("[LoginPage] normalised class code:", normalizedCode);
+    console.log("[LoginPage] Supabase query target:", "public.classes.class_code via find_class_by_code RPC");
+
     if (!normalizedCode || !name || pin.length !== 4) { setStudentError("Please enter class code, name, and 4-digit PIN."); return; }
-    const { data: cls } = await supabase.from("classes").select("id").eq("class_code", normalizedCode).single();
-    if (!cls) { setStudentError("Class code not found."); return; }
+
+    const { data: lookupRows, error: classLookupError } = await supabase
+      .rpc("find_class_by_code", { input_code: normalizedCode });
+    const cls = Array.isArray(lookupRows) ? lookupRows[0] ?? null : null;
+
+    console.log("[LoginPage] Supabase query result:", cls);
+    console.log("[LoginPage] Supabase error:", classLookupError);
+
+    if (classLookupError || !cls) { setStudentError("Class code not found."); return; }
+
     const syntheticEmail = `${name.toLowerCase().replace(/[^a-z0-9]/g, "")}.${normalizedCode.toLowerCase()}@leveluplearning.app`;
     const paddedPin = pin + "xx";
     const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({ email: syntheticEmail, password: paddedPin });

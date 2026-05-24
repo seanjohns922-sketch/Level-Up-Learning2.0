@@ -8,6 +8,18 @@ import QRCode from "qrcode";
 
 type AddedStudent = { name: string; pin: string; claimCode: string };
 
+function isMissingCreateStudentRpc(message?: string | null) {
+  return Boolean(message && /create_student_for_class|schema cache|could not find the function/i.test(message));
+}
+
+function generateFallbackPin(existingPins: Set<string>) {
+  let nextPin = "";
+  do {
+    nextPin = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
+  } while (existingPins.has(nextPin));
+  return nextPin;
+}
+
 export default function NewClassPage() {
   const router = useRouter();
   useAuthGuard();
@@ -135,13 +147,54 @@ export default function NewClassPage() {
       display_name_input: newStudentName.trim(),
       pin_input: newStudentPin || null,
     });
+
+    let created = Array.isArray(data) ? data[0] : data;
+
+    if (stuErr && isMissingCreateStudentRpc(stuErr.message)) {
+      console.warn("[NewClassPage] create_student_for_class RPC missing, using direct insert fallback", stuErr.message);
+      const existingPins = new Set(addedStudents.map((student) => student.pin));
+      const fallbackPin = newStudentPin || generateFallbackPin(existingPins);
+      if (existingPins.has(fallbackPin)) {
+        setAddingStudent(false);
+        setStudentError("That PIN is already used in this class.");
+        return;
+      }
+
+      const { data: insertedStudent, error: insertError } = await supabase
+        .from("students")
+        .insert({
+          id: crypto.randomUUID(),
+          class_id: createdClassId,
+          display_name: newStudentName.trim(),
+          pin: fallbackPin,
+          user_id: null,
+        })
+        .select("id, pin, qr_token")
+        .single();
+
+      if (insertError) {
+        setAddingStudent(false);
+        setStudentError(insertError.message);
+        return;
+      }
+
+      created = {
+        student_id: insertedStudent.id,
+        pin: insertedStudent.pin ?? fallbackPin,
+        claim_code: "Pending setup",
+        qr_token: insertedStudent.qr_token ?? "",
+      };
+    } else if (stuErr) {
+      setAddingStudent(false);
+      setStudentError(stuErr.message);
+      return;
+    }
+
     setAddingStudent(false);
-    if (stuErr) { setStudentError(stuErr.message); return; }
-    const created = Array.isArray(data) ? data[0] : data;
     if (created) {
       setAddedStudents((prev) => [
         ...prev,
-        { name: newStudentName.trim(), pin: created.pin, claimCode: created.claim_code },
+        { name: newStudentName.trim(), pin: created.pin, claimCode: created.claim_code || "Pending setup" },
       ]);
     }
     setNewStudentName("");
