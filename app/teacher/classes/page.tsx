@@ -67,6 +67,7 @@ export default function TeacherClassesPage() {
   const [loading, setLoading] = useState(true);
   const [newStudentNames, setNewStudentNames] = useState<Record<string, string>>({});
   const [newStudentPins, setNewStudentPins] = useState<Record<string, string>>({});
+  const [newStudentYearLevels, setNewStudentYearLevels] = useState<Record<string, string>>({});
   const [creatingStudentForClass, setCreatingStudentForClass] = useState<string | null>(null);
   const [lastCreatedLogin, setLastCreatedLogin] = useState<{
     classId: string;
@@ -229,8 +230,14 @@ export default function TeacherClassesPage() {
         claimCode: created.claim_code || "Pending setup",
       });
     }
+    // Save year level to student record if selected
+    const yearLevel = newStudentYearLevels[classId] ?? "";
+    if (yearLevel && created?.student_id) {
+      await supabase.from("students").update({ year_level: yearLevel } as any).eq("id", created.student_id);
+    }
     setNewStudentNames((current) => ({ ...current, [classId]: "" }));
     setNewStudentPins((current) => ({ ...current, [classId]: "" }));
+    setNewStudentYearLevels((current) => ({ ...current, [classId]: "" }));
     if (authUser?.id) await loadClasses(authUser.id);
   }
 
@@ -637,7 +644,7 @@ export default function TeacherClassesPage() {
                         <div className="text-xs font-black uppercase tracking-wide text-emerald-700">
                           Add Student
                         </div>
-                        <div className="mt-3 grid gap-2 md:grid-cols-[1fr_120px_auto]">
+                        <div className="mt-3 grid gap-2 md:grid-cols-[1fr_130px_120px_auto]">
                           <input
                             value={newStudentNames[cls.id] ?? ""}
                             onChange={(event) =>
@@ -646,6 +653,18 @@ export default function TeacherClassesPage() {
                             placeholder="Student name"
                             className="rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
                           />
+                          <select
+                            value={newStudentYearLevels[cls.id] ?? ""}
+                            onChange={(event) =>
+                              setNewStudentYearLevels((current) => ({ ...current, [cls.id]: event.target.value }))
+                            }
+                            className="rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
+                          >
+                            <option value="">Year level</option>
+                            {YEAR_LEVELS.map((yr) => (
+                              <option key={yr} value={yr}>{yr}</option>
+                            ))}
+                          </select>
                           <input
                             value={newStudentPins[cls.id] ?? ""}
                             onChange={(event) =>
@@ -654,7 +673,7 @@ export default function TeacherClassesPage() {
                                 [cls.id]: event.target.value.replace(/\D/g, "").slice(0, 4),
                               }))
                             }
-                            placeholder="PIN"
+                            placeholder="PIN (opt.)"
                             inputMode="numeric"
                             className="rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
                           />
@@ -667,6 +686,7 @@ export default function TeacherClassesPage() {
                             {creatingStudentForClass === cls.id ? "Adding…" : "Add"}
                           </button>
                         </div>
+                        <p className="mt-1.5 text-[11px] text-emerald-600/70">Year level sets the student's starting pre-test when they first log in.</p>
                         {lastCreatedLogin?.classId === cls.id ? (
                           <div className="mt-3 rounded-xl bg-white px-3 py-2 text-xs font-semibold text-gray-600">
                             Login card ready for {lastCreatedLogin.name}: PIN{" "}

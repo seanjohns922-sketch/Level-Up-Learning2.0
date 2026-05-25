@@ -153,17 +153,33 @@ export default function LoginPage() {
       if (signUpErr.message.includes("already")) {
         const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({ email: syntheticEmail, password: paddedPin });
         if (signInErr) { setStudentError("That name is taken in this class, or your PIN is wrong."); return; }
-        const { data: existing, error: existingError } = await supabase.from("students").select("id, class_id").eq("user_id", signInData.user.id).single();
-        if (existing) { setActiveStudentProfile(existing.id, existing.class_id); router.push("/home"); return; }
+        const { data: existing, error: existingError } = await supabase.from("students").select("id, class_id, year_level").eq("user_id", signInData.user.id).single();
+        if (existing) {
+          setActiveStudentProfile(existing.id, existing.class_id);
+          const existingProgressKey = `lul:${existing.id}:student_progress_v1`;
+          const dest = (!localStorage.getItem(existingProgressKey) && existing.year_level)
+            ? `/pretest?year=${encodeURIComponent(existing.year_level)}`
+            : "/home";
+          router.push(dest);
+          return;
+        }
         if (existingError && isMissingStudentUserIdColumn(existingError.message)) {
           const { data: legacyExisting } = await supabase
             .from("students")
-            .select("id, class_id")
+            .select("id, class_id, year_level")
             .eq("class_id", cls.id)
             .eq("display_name", displayName.trim())
             .eq("pin", pin)
             .single();
-          if (legacyExisting) { setActiveStudentProfile(legacyExisting.id, legacyExisting.class_id); router.push("/home"); return; }
+          if (legacyExisting) {
+            setActiveStudentProfile(legacyExisting.id, legacyExisting.class_id);
+            const existingProgressKey = `lul:${legacyExisting.id}:student_progress_v1`;
+            const dest = (!localStorage.getItem(existingProgressKey) && legacyExisting.year_level)
+              ? `/pretest?year=${encodeURIComponent(legacyExisting.year_level)}`
+              : "/home";
+            router.push(dest);
+            return;
+          }
         }
       }
       setStudentError(signUpErr.message);

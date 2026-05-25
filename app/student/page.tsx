@@ -101,13 +101,24 @@ function StudentQRPage() {
       await supabase.auth.signInWithPassword({ email: syntheticEmail, password: paddedPin });
     }
 
+    // Check if student has a teacher-assigned starting year and no existing local progress
+    let destination = "/home";
+    const existingProgressKey = `lul:${row.student_id}:student_progress_v1`;
+    const hasExistingProgress = Boolean(localStorage.getItem(existingProgressKey));
+    if (!hasExistingProgress) {
+      const { data: startingYear } = await supabase.rpc("get_student_starting_year", { p_student_id: row.student_id });
+      if (startingYear) {
+        destination = `/pretest?year=${encodeURIComponent(startingYear as string)}`;
+      }
+    }
+
     // Clear old progress, set active student profile id.
     switchActiveStudentProfile(row.student_id);
 
     // Show welcome message
     setWelcomeName(row.display_name);
     setTimeout(() => {
-      router.push("/home");
+      router.push(destination);
     }, 1500);
   }
 
