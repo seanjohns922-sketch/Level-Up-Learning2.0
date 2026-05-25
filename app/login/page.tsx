@@ -162,14 +162,14 @@ export default function LoginPage() {
       if (!signUpData.user) { setStudentError("Could not create account."); return; }
     }
 
-    // Look up existing student row by class + name + pin
+    // Look up existing student row by class + username (or display_name for backward compat) + pin
     const { data: existingStudent } = await supabase
       .from("students")
       .select("id, class_id, year_level")
       .eq("class_id", cls.id)
-      .eq("display_name", displayName.trim())
+      .or(`username.eq.${displayName.trim()},display_name.eq.${displayName.trim()}`)
       .eq("pin", pin)
-      .single();
+      .maybeSingle();
 
     if (existingStudent) {
       setActiveStudentProfile(existingStudent.id, existingStudent.class_id);

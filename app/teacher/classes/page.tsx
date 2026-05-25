@@ -19,6 +19,7 @@ type ClassRow = {
 type StudentRow = {
   id: string;
   display_name: string;
+  username?: string | null;
   class_id: string | null;
   pin?: string | null;
   qr_token?: string | null;
@@ -41,6 +42,7 @@ type ParentStudentLinkRow = {
 
 type EditForm = {
   display_name: string;
+  username: string;
   pin: string;
   year_level: string;
   notes: string;
@@ -67,6 +69,7 @@ export default function TeacherClassesPage() {
   const [linkedStudentIds, setLinkedStudentIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [newStudentNames, setNewStudentNames] = useState<Record<string, string>>({});
+  const [newStudentUsernames, setNewStudentUsernames] = useState<Record<string, string>>({});
   const [newStudentPins, setNewStudentPins] = useState<Record<string, string>>({});
   const [newStudentYearLevels, setNewStudentYearLevels] = useState<Record<string, string>>({});
   const [creatingStudentForClass, setCreatingStudentForClass] = useState<string | null>(null);
@@ -78,7 +81,7 @@ export default function TeacherClassesPage() {
   } | null>(null);
   // Student edit/archive state
   const [editingStudentId, setEditingStudentId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState<EditForm>({ display_name: "", pin: "", year_level: "", notes: "" });
+  const [editForm, setEditForm] = useState<EditForm>({ display_name: "", username: "", pin: "", year_level: "", notes: "" });
   const [savingEdit, setSavingEdit] = useState(false);
   const [archivingStudentId, setArchivingStudentId] = useState<string | null>(null);
   const [showArchivedForClass, setShowArchivedForClass] = useState<Record<string, boolean>>({});
@@ -162,6 +165,7 @@ export default function TeacherClassesPage() {
 
   async function addStudentToClass(classId: string) {
     const name = (newStudentNames[classId] ?? "").trim();
+    const username = (newStudentUsernames[classId] ?? "").trim();
     const pin = (newStudentPins[classId] ?? "").trim();
     if (!name) return;
     if (pin && !/^\d{4}$/.test(pin)) {
@@ -199,6 +203,7 @@ export default function TeacherClassesPage() {
           id: crypto.randomUUID(),
           class_id: classId,
           display_name: name,
+          username: username || null,
           pin: fallbackPin,
         })
         .select("id, pin, qr_token")
@@ -237,6 +242,7 @@ export default function TeacherClassesPage() {
       await supabase.from("students").update({ year_level: yearLevel } as any).eq("id", created.student_id);
     }
     setNewStudentNames((current) => ({ ...current, [classId]: "" }));
+    setNewStudentUsernames((current) => ({ ...current, [classId]: "" }));
     setNewStudentPins((current) => ({ ...current, [classId]: "" }));
     setNewStudentYearLevels((current) => ({ ...current, [classId]: "" }));
     if (authUser?.id) await loadClasses(authUser.id);
@@ -246,6 +252,7 @@ export default function TeacherClassesPage() {
     setEditingStudentId(student.id);
     setEditForm({
       display_name: student.display_name,
+      username: student.username ?? "",
       pin: student.pin ?? "",
       year_level: student.year_level ?? "",
       notes: student.notes ?? "",
@@ -267,6 +274,7 @@ export default function TeacherClassesPage() {
       .from("students")
       .update({
         display_name: editForm.display_name.trim(),
+        username: editForm.username.trim() || null,
         pin: editForm.pin || null,
         year_level: editForm.year_level || null,
         notes: editForm.notes.trim() || null,
@@ -277,7 +285,7 @@ export default function TeacherClassesPage() {
     setStudents((prev) =>
       prev.map((s) =>
         s.id === studentId
-          ? { ...s, display_name: editForm.display_name.trim(), pin: editForm.pin || null, year_level: editForm.year_level || null, notes: editForm.notes.trim() || null }
+          ? { ...s, display_name: editForm.display_name.trim(), username: editForm.username.trim() || null, pin: editForm.pin || null, year_level: editForm.year_level || null, notes: editForm.notes.trim() || null }
           : s
       )
     );
@@ -474,6 +482,18 @@ export default function TeacherClassesPage() {
                                 <div key={s.id} className="grid gap-3 text-sm px-3 py-3 bg-blue-50 rounded-xl border border-blue-100">
                                   <div className="text-xs font-black uppercase tracking-wide text-blue-700">Edit Student</div>
 
+                                  {/* Name */}
+                                  <div>
+                                    <label className="text-xs font-bold text-gray-500 mb-1 block">Full Name *</label>
+                                    <input
+                                      value={editForm.display_name}
+                                      onChange={(e) => setEditForm((f) => ({ ...f, display_name: e.target.value }))}
+                                      className="w-full rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-blue-300"
+                                      placeholder="e.g. Sean Johns"
+                                    />
+                                    <p className="text-[10px] text-gray-400 mt-1">Shown on the teacher dashboard</p>
+                                  </div>
+
                                   {/* Login credentials */}
                                   <div>
                                     <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1.5">Login Details</div>
@@ -485,12 +505,12 @@ export default function TeacherClassesPage() {
                                         </div>
                                       </div>
                                       <div>
-                                        <label className="text-xs font-bold text-gray-500 mb-1 block">Username *</label>
+                                        <label className="text-xs font-bold text-gray-500 mb-1 block">Username</label>
                                         <input
-                                          value={editForm.display_name}
-                                          onChange={(e) => setEditForm((f) => ({ ...f, display_name: e.target.value }))}
+                                          value={editForm.username}
+                                          onChange={(e) => setEditForm((f) => ({ ...f, username: e.target.value }))}
                                           className="w-full rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-blue-300"
-                                          placeholder="Student username"
+                                          placeholder="e.g. sean"
                                         />
                                       </div>
                                       <div>
@@ -590,6 +610,11 @@ export default function TeacherClassesPage() {
                                     )}
                                   </div>
                                   <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+                                    {s.username && (
+                                      <span>
+                                        Username: <span className="font-semibold text-gray-700">{s.username}</span>
+                                      </span>
+                                    )}
                                     <span>
                                       Password: <span className="font-mono font-bold text-gray-700">{s.pin ?? "—"}</span>
                                     </span>
@@ -679,13 +704,21 @@ export default function TeacherClassesPage() {
                             Class code: <span className="font-mono font-black tracking-widest">{cls.class_code}</span> · Username + password are what students type to log in.
                           </p>
                         </div>
-                        <div className="mt-3 grid gap-2 md:grid-cols-[1fr_160px_130px_auto]">
+                        <div className="mt-3 grid gap-2 md:grid-cols-[1fr_1fr_160px_130px_auto]">
                           <input
                             value={newStudentNames[cls.id] ?? ""}
                             onChange={(event) =>
                               setNewStudentNames((current) => ({ ...current, [cls.id]: event.target.value }))
                             }
-                            placeholder="Username"
+                            placeholder="Full name"
+                            className="rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
+                          />
+                          <input
+                            value={newStudentUsernames[cls.id] ?? ""}
+                            onChange={(event) =>
+                              setNewStudentUsernames((current) => ({ ...current, [cls.id]: event.target.value }))
+                            }
+                            placeholder="Username (login)"
                             className="rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
                           />
                           <select

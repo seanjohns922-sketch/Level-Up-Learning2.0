@@ -11,7 +11,7 @@ import StrandStudentsPanel from "@/components/teacher/StrandStudentsPanel";
 
 /* ── types ─────────────────────────────────────────── */
 type ClassRow = { id: string; class_code: string; name: string; year_level: string };
-type StudentRow = { id: string; display_name: string; class_id: string; user_id: string; pin?: string | null; qr_token?: string | null };
+type StudentRow = { id: string; display_name: string; username?: string | null; class_id: string; user_id: string; pin?: string | null; qr_token?: string | null };
 type ProgressRow = {
   student_id: string;
   year: string;
@@ -307,7 +307,7 @@ export default function TeacherDashboardPage() {
         <img class="qr" src="${s.qrSrc}" alt="QR Code" />
         <div class="scan-hint">Scan to open login page</div>
         <div class="creds">
-          <div class="cred"><div class="cred-label">Username</div><div class="cred-value">${s.display_name}</div></div>
+          <div class="cred"><div class="cred-label">Username</div><div class="cred-value">${s.username ?? s.display_name}</div></div>
           <div class="divider"></div>
           <div class="cred"><div class="cred-label">Password</div><div class="cred-value">${s.pin ?? "—"}</div></div>
         </div>
