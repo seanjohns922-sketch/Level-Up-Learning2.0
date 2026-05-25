@@ -148,68 +148,45 @@ export default function LoginPage() {
 
     const syntheticEmail = `${name.toLowerCase().replace(/[^a-z0-9]/g, "")}.${normalizedCode.toLowerCase()}@leveluplearning.app`;
     const paddedPin = pin + "xx";
-    const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({ email: syntheticEmail, password: paddedPin });
-    if (signUpErr) {
-      if (signUpErr.message.includes("already")) {
-        const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({ email: syntheticEmail, password: paddedPin });
-        if (signInErr) { setStudentError("That name is taken in this class, or your PIN is wrong."); return; }
-        const { data: existing, error: existingError } = await supabase.from("students").select("id, class_id, year_level").eq("user_id", signInData.user.id).single();
-        if (existing) {
-          setActiveStudentProfile(existing.id, existing.class_id);
-          const existingProgressKey = `lul:${existing.id}:student_progress_v1`;
-          const dest = (!localStorage.getItem(existingProgressKey) && existing.year_level)
-            ? `/pretest?year=${encodeURIComponent(existing.year_level)}`
-            : "/home";
-          router.push(dest);
-          return;
-        }
-        // Legacy lookup — find student by name + pin + class (no user_id column)
-        const { data: legacyExisting } = await supabase
-          .from("students")
-          .select("id, class_id, year_level")
-          .eq("class_id", cls.id)
-          .eq("display_name", displayName.trim())
-          .eq("pin", pin)
-          .single();
-        if (legacyExisting) {
-          setActiveStudentProfile(legacyExisting.id, legacyExisting.class_id);
-          const existingProgressKey = `lul:${legacyExisting.id}:student_progress_v1`;
-          const dest = (!localStorage.getItem(existingProgressKey) && legacyExisting.year_level)
-            ? `/pretest?year=${encodeURIComponent(legacyExisting.year_level)}`
-            : "/home";
-          router.push(dest);
-          return;
-        }
-        // Auth account exists but student row was never saved — create it now
-        const recoveryId = crypto.randomUUID();
-        const { data: recoveredStudent, error: recoveryErr } = await supabase
-          .from("students")
-          .insert({ id: recoveryId, class_id: cls.id, display_name: displayName.trim(), pin })
-          .select("id, class_id")
-          .single();
-        if (!recoveryErr && recoveredStudent) {
-          setActiveStudentProfile(recoveredStudent.id, recoveredStudent.class_id);
-          router.push("/home");
-          return;
-        }
-      }
-      setStudentError(signUpErr.message);
+
+    // Try sign-in first — avoids "already registered" errors on repeat logins
+    const { data: signInData } = await supabase.auth.signInWithPassword({ email: syntheticEmail, password: paddedPin });
+
+    if (!signInData?.user) {
+      // New student — create auth account
+      const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({ email: syntheticEmail, password: paddedPin });
+      if (signUpErr) { setStudentError("Could not create account. Please try again."); return; }
+      if (!signUpData.user) { setStudentError("Could not create account."); return; }
+    }
+
+    // Look up existing student row by class + name + pin
+    const { data: existingStudent } = await supabase
+      .from("students")
+      .select("id, class_id, year_level")
+      .eq("class_id", cls.id)
+      .eq("display_name", displayName.trim())
+      .eq("pin", pin)
+      .single();
+
+    if (existingStudent) {
+      setActiveStudentProfile(existingStudent.id, existingStudent.class_id);
+      const existingProgressKey = `lul:${existingStudent.id}:student_progress_v1`;
+      const dest = (!localStorage.getItem(existingProgressKey) && existingStudent.year_level)
+        ? `/pretest?year=${encodeURIComponent(existingStudent.year_level)}`
+        : "/home";
+      router.push(dest);
       return;
     }
-    const userId = signUpData.user?.id;
-    if (!userId) { setStudentError("Could not create account."); return; }
+
+    // No student row yet — create one
     const studentId = crypto.randomUUID();
-    const createPayload = { id: studentId, class_id: cls.id, display_name: displayName.trim(), pin, user_id: userId };
-    let { data: student, error: studentCreateError } = await supabase.from("students").insert(createPayload).select().single();
-    if (studentCreateError && isMissingStudentUserIdColumn(studentCreateError.message)) {
-      ({ data: student, error: studentCreateError } = await supabase
-        .from("students")
-        .insert({ id: studentId, class_id: cls.id, display_name: displayName.trim(), pin })
-        .select()
-        .single());
-    }
-    if (studentCreateError || !student) { setStudentError(studentCreateError?.message ?? "Could not create student."); return; }
-    setActiveStudentProfile(student.id, cls.id);
+    const { data: newStudent, error: createErr } = await supabase
+      .from("students")
+      .insert({ id: studentId, class_id: cls.id, display_name: displayName.trim(), pin })
+      .select("id, class_id")
+      .single();
+    if (createErr || !newStudent) { setStudentError(createErr?.message ?? "Could not create student."); return; }
+    setActiveStudentProfile(newStudent.id, newStudent.class_id);
     router.push("/home");
   }
 
