@@ -41,6 +41,14 @@ type ParentStudentLinkRow = {
   status: string;
 };
 
+type ProgressRow = {
+  student_id: string;
+  year: string;
+  status: string;
+};
+
+type StudentSortMode = "alphabetical" | "working_level" | "actual_year";
+
 type EditForm = {
   display_name: string;
   username: string;
@@ -90,6 +98,8 @@ export default function TeacherClassesPage() {
   const [archivingClassId, setArchivingClassId] = useState<string | null>(null);
   const [deletingClassId, setDeletingClassId] = useState<string | null>(null);
   const [showArchivedClasses, setShowArchivedClasses] = useState(false);
+  const [studentActualYearById, setStudentActualYearById] = useState<Record<string, string>>({});
+  const [studentSortMode, setStudentSortMode] = useState<StudentSortMode>("alphabetical");
   const [editingClassId, setEditingClassId] = useState<string | null>(null);
   const [editClassForm, setEditClassForm] = useState<{ name: string; year_levels: string[] }>({ name: "", year_levels: [] });
   const [savingClassEdit, setSavingClassEdit] = useState(false);
@@ -113,7 +123,7 @@ export default function TeacherClassesPage() {
 
       const studentIds = loadedStudents.map((student) => student.id);
       if (studentIds.length > 0) {
-        const [{ data: links }, { data: credentials }] = await Promise.all([
+        const [{ data: links }, { data: credentials }, { data: progressRows }] = await Promise.all([
           supabase
             .from("parent_student_links")
             .select("student_id,status")
@@ -124,7 +134,29 @@ export default function TeacherClassesPage() {
             .eq("credential_type", "claim_code")
             .is("revoked_at", null)
             .in("student_id", studentIds),
+          supabase
+            .from("progress")
+            .select("student_id,year,status")
+            .in("student_id", studentIds),
         ]);
+
+        const actualYearByStudentId = new Map<string, string>();
+        for (const row of ((progressRows ?? []) as ProgressRow[])) {
+          const existing = actualYearByStudentId.get(row.student_id);
+          if (row.status === "ASSIGNED_PROGRAM") {
+            actualYearByStudentId.set(row.student_id, row.year);
+            continue;
+          }
+          if (!existing) {
+            actualYearByStudentId.set(row.student_id, row.year);
+            continue;
+          }
+          const currentIndex = YEAR_LEVELS.indexOf(existing);
+          const candidateIndex = YEAR_LEVELS.indexOf(row.year);
+          if (candidateIndex > currentIndex) {
+            actualYearByStudentId.set(row.student_id, row.year);
+          }
+        }
 
         setLinkedStudentIds(
           new Set(
@@ -141,14 +173,17 @@ export default function TeacherClassesPage() {
             ])
           )
         );
+        setStudentActualYearById(Object.fromEntries(actualYearByStudentId.entries()));
       } else {
         setLinkedStudentIds(new Set());
         setClaimCodesByStudentId({});
+        setStudentActualYearById({});
       }
     } else {
       setStudents([]);
       setLinkedStudentIds(new Set());
       setClaimCodesByStudentId({});
+      setStudentActualYearById({});
     }
     setLoading(false);
   }, []);
@@ -243,7 +278,7 @@ export default function TeacherClassesPage() {
     // Save year level to student record if selected
     const yearLevel = newStudentYearLevels[classId] ?? "";
     if (yearLevel && created?.student_id) {
-      await supabase.from("students").update({ year_level: yearLevel } as any).eq("id", created.student_id);
+      await supabase.from("students").update({ year_level: yearLevel }).eq("id", created.student_id);
     }
     setNewStudentNames((current) => ({ ...current, [classId]: "" }));
     setNewStudentUsernames((current) => ({ ...current, [classId]: "" }));
@@ -282,7 +317,7 @@ export default function TeacherClassesPage() {
         pin: editForm.pin || null,
         year_level: editForm.year_level || null,
         notes: editForm.notes.trim() || null,
-      } as any)
+      })
       .eq("id", studentId);
     setSavingEdit(false);
     if (error) { alert(error.message); return; }
@@ -301,7 +336,7 @@ export default function TeacherClassesPage() {
     setArchivingStudentId(student.id);
     const { error } = await supabase
       .from("students")
-      .update({ archived_at: new Date().toISOString() } as any)
+      .update({ archived_at: new Date().toISOString() })
       .eq("id", student.id);
     setArchivingStudentId(null);
     if (error) { alert(error.message); return; }
@@ -313,7 +348,7 @@ export default function TeacherClassesPage() {
   async function unarchiveStudent(student: StudentRow) {
     const { error } = await supabase
       .from("students")
-      .update({ archived_at: null } as any)
+      .update({ archived_at: null })
       .eq("id", student.id);
     if (error) { alert(error.message); return; }
     setStudents((prev) =>
@@ -328,7 +363,7 @@ export default function TeacherClassesPage() {
     setArchivingClassId(cls.id);
     const { error } = await supabase
       .from("classes")
-      .update({ archived_at: new Date().toISOString() } as any)
+      .update({ archived_at: new Date().toISOString() })
       .eq("id", cls.id);
     setArchivingClassId(null);
     if (error) { alert(error.message); return; }
@@ -340,7 +375,7 @@ export default function TeacherClassesPage() {
   async function unarchiveClass(cls: ClassRow) {
     const { error } = await supabase
       .from("classes")
-      .update({ archived_at: null } as any)
+      .update({ archived_at: null })
       .eq("id", cls.id);
     if (error) { alert(error.message); return; }
     setClasses((prev) =>
@@ -349,7 +384,6 @@ export default function TeacherClassesPage() {
   }
 
   async function deleteClass(cls: ClassRow) {
-    const activeCount = studentsForClass(cls.id, false).length;
     const totalCount = studentsForClass(cls.id, true).length;
     const studentWarning =
       totalCount > 0
@@ -391,7 +425,7 @@ export default function TeacherClassesPage() {
     setSavingClassEdit(true);
     const { error } = await supabase
       .from("classes")
-      .update({ name: editClassForm.name.trim(), year_levels: editClassForm.year_levels.length ? editClassForm.year_levels : null } as any)
+      .update({ name: editClassForm.name.trim(), year_levels: editClassForm.year_levels.length ? editClassForm.year_levels : null })
       .eq("id", classId);
     setSavingClassEdit(false);
     if (error) { alert(error.message); return; }
@@ -418,18 +452,58 @@ export default function TeacherClassesPage() {
   const activeClasses = classes.filter((c) => !c.archived_at);
   const archivedClasses = classes.filter((c) => c.archived_at);
   const visibleClasses = showArchivedClasses ? classes : activeClasses;
+  const yearIndex = (label?: string | null) => {
+    if (!label) return Number.POSITIVE_INFINITY;
+    const index = YEAR_LEVELS.indexOf(label);
+    return index === -1 ? Number.POSITIVE_INFINITY : index;
+  };
+
+  const sortStudentsForClass = (classId: string, includeArchived = false) => {
+    const base = students.filter((s) => s.class_id === classId && (includeArchived ? true : !s.archived_at));
+    return [...base].sort((a, b) => {
+      if (studentSortMode === "working_level") {
+        const levelDiff = yearIndex(a.year_level) - yearIndex(b.year_level);
+        if (levelDiff !== 0) return levelDiff;
+      }
+      if (studentSortMode === "actual_year") {
+        const yearDiff = yearIndex(studentActualYearById[a.id]) - yearIndex(studentActualYearById[b.id]);
+        if (yearDiff !== 0) return yearDiff;
+      }
+      return a.display_name.localeCompare(b.display_name, undefined, { sensitivity: "base" });
+    });
+  };
+
+  const sortLabel = studentSortMode === "working_level"
+    ? "Working level"
+    : studentSortMode === "actual_year"
+      ? "Actual year"
+      : "Alphabetical";
 
   return (
     <main className="min-h-screen bg-[#fbf7f1] px-6 py-10">
       <div className="max-w-3xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
           <h1 className="text-3xl font-black text-gray-900">My Classes</h1>
-          <button
-            onClick={() => router.push("/teacher/classes/new")}
-            className="px-5 py-2.5 rounded-2xl bg-[#9fd7b1] text-[#1f3b2a] font-bold hover:bg-[#8fcea4] transition"
-          >
-            + New Class
-          </button>
+          <div className="flex items-center gap-3 flex-wrap">
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-500">
+              <span>Order students by</span>
+              <select
+                value={studentSortMode}
+                onChange={(event) => setStudentSortMode(event.target.value as StudentSortMode)}
+                className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
+              >
+                <option value="alphabetical">Alphabetical</option>
+                <option value="working_level">Working level</option>
+                <option value="actual_year">Actual year</option>
+              </select>
+            </label>
+            <button
+              onClick={() => router.push("/teacher/classes/new")}
+              className="px-5 py-2.5 rounded-2xl bg-[#9fd7b1] text-[#1f3b2a] font-bold hover:bg-[#8fcea4] transition"
+            >
+              + New Class
+            </button>
+          </div>
         </div>
 
         {activeClasses.length === 0 && archivedClasses.length === 0 ? (
@@ -447,9 +521,9 @@ export default function TeacherClassesPage() {
             {visibleClasses.map((cls) => {
               const isClassArchived = !!cls.archived_at;
               const showArchived = showArchivedForClass[cls.id] ?? false;
-              const activeStuds = studentsForClass(cls.id, false);
-              const archivedStuds = studentsForClass(cls.id, true).filter((s) => s.archived_at);
-              const visibleStuds = showArchived ? studentsForClass(cls.id, true) : activeStuds;
+              const activeStuds = sortStudentsForClass(cls.id, false);
+              const archivedStuds = sortStudentsForClass(cls.id, true).filter((s) => s.archived_at);
+              const visibleStuds = showArchived ? sortStudentsForClass(cls.id, true) : activeStuds;
 
               return (
                 <div
@@ -535,6 +609,9 @@ export default function TeacherClassesPage() {
                       <div className="flex items-center gap-2 shrink-0">
                         <span className="text-sm font-semibold text-gray-500 mr-1">
                           {activeStuds.length} student{activeStuds.length !== 1 ? "s" : ""}
+                        </span>
+                        <span className="text-xs font-semibold text-gray-400">
+                          Sorted: {sortLabel}
                         </span>
                         {!isClassArchived && (
                           <button
