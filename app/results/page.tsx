@@ -428,7 +428,7 @@ function ResultsPage() {
             </h1>
             <p className="text-sm text-muted-foreground mb-2">{msg.sub}</p>
             <div className="text-xs font-semibold text-muted-foreground/60 uppercase tracking-wider">
-              {year} • {isPostTest ? "Post-Test" : source === "program_complete" ? "Program" : "Pre-Test"}
+              {isPostTest ? "Post-Test" : source === "program_complete" ? "Program Complete" : "Pre-Test"}
             </div>
 
             <ScoreRing percent={displayPercent} passed={passed} />
@@ -464,13 +464,11 @@ function ResultsPage() {
                 </div>
                 <p className="text-xs text-muted-foreground">
                   {isPostTest
-                    ? year === "Prep"
-                      ? "You passed the Ground Level mastery test — your Legend is unlocked and Year 1 is ready next!"
-                      : "You passed the post-test — your Legend is ready to collect!"
+                    ? "You passed the mastery test — your Legend is unlocked and the next level is ready!"
                     : passedByProgram
                     ? "You completed the 12-week program — your Legend awaits!"
                     : nextYear
-                    ? `You passed this pre-test. Next stop: ${nextYear}.`
+                    ? "You passed this skill check — keep going, your next level is ready!"
                     : "You passed the final pre-test — your Legends are ready to collect!"}
                 </p>
               </div>
