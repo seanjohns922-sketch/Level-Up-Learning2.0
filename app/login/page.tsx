@@ -162,35 +162,25 @@ export default function LoginPage() {
       if (!signUpData.user) { setStudentError("Could not create account."); return; }
     }
 
-    // Look up existing student row by class + username (or display_name for backward compat) + pin
-    const { data: existingStudent } = await supabase
-      .from("students")
-      .select("id, class_id, year_level")
-      .eq("class_id", cls.id)
-      .or(`username.eq.${displayName.trim()},display_name.eq.${displayName.trim()}`)
-      .eq("pin", pin)
-      .maybeSingle();
+    // Find existing student or create new one — handled server-side to bypass RLS
+    const { data: studentRows, error: studentErr } = await supabase.rpc("find_or_create_student", {
+      p_class_id: cls.id,
+      p_display_name: displayName.trim(),
+      p_pin: pin,
+    });
 
-    if (existingStudent) {
-      setActiveStudentProfile(existingStudent.id, existingStudent.class_id);
-      const existingProgressKey = `lul:${existingStudent.id}:student_progress_v1`;
-      const dest = (!localStorage.getItem(existingProgressKey) && existingStudent.year_level)
-        ? `/pretest?year=${encodeURIComponent(existingStudent.year_level)}`
-        : "/home";
-      router.push(dest);
+    const student = Array.isArray(studentRows) ? studentRows[0] : studentRows;
+    if (studentErr || !student?.student_id) {
+      setStudentError(studentErr?.message ?? "Could not find your account. Check your username and password.");
       return;
     }
 
-    // No student row yet — create one
-    const studentId = crypto.randomUUID();
-    const { data: newStudent, error: createErr } = await supabase
-      .from("students")
-      .insert({ id: studentId, class_id: cls.id, display_name: displayName.trim(), pin })
-      .select("id, class_id")
-      .single();
-    if (createErr || !newStudent) { setStudentError(createErr?.message ?? "Could not create student."); return; }
-    setActiveStudentProfile(newStudent.id, newStudent.class_id);
-    router.push("/home");
+    setActiveStudentProfile(student.student_id, student.class_id);
+    const existingProgressKey = `lul:${student.student_id}:student_progress_v1`;
+    const dest = (!localStorage.getItem(existingProgressKey) && student.year_level)
+      ? `/pretest?year=${encodeURIComponent(student.year_level)}`
+      : "/home";
+    router.push(dest);
   }
 
   const inputCls =
