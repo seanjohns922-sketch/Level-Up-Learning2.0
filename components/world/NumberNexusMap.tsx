@@ -488,9 +488,9 @@ export default function NumberNexusMap() {
 
   function onDistrictTap(weekStart: number, weekEnd: number) {
     for (let w = weekStart; w <= weekEnd; w++) {
-      if (!completedByWeek[w]) { router.push(`/program?year=${encodeURIComponent(year)}&week=${w}`); return; }
+      if (!completedByWeek[w]) { router.push(`/program?year=${encodeURIComponent(year)}&week=${w}&legacy=1`); return; }
     }
-    router.push(`/program?year=${encodeURIComponent(year)}&week=${weekEnd}`);
+    router.push(`/program?year=${encodeURIComponent(year)}&week=${weekEnd}&legacy=1`);
   }
 
   function launchGuidedAdventure() {

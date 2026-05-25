@@ -224,7 +224,7 @@ function ProgramPage() {
   function goToWeek(targetWeek: number) {
     const clamped = Math.max(1, Math.min(12, targetWeek));
     if (!DEMO_MODE && !teacherMode && hasPersonalizedPlan && !playableWeeks.includes(clamped)) return;
-    router.push(`/program?year=${encodeURIComponent(year)}&week=${clamped}`);
+    router.push(`/program?year=${encodeURIComponent(year)}&week=${clamped}&legacy=1`);
   }
 
   function setTeacherModeState(next: boolean) {
