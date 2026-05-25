@@ -609,11 +609,11 @@ const LEVEL3_SKILL_FACTORIES: Record<string, Record<AssessmentForm, QuestionFact
       }),
       () => ({
         type: "build_whole",
-        prompt: "If this one part is one-third, which picture shows the whole?",
+        prompt: "This single block is 1 of 3 equal parts. Which picture shows the whole?",
         options: [
-          { id: "a", label: "2 parts", parts: 2 },
-          { id: "b", label: "3 parts", parts: 3 },
-          { id: "c", label: "4 parts", parts: 4 },
+          { id: "a", label: "2 equal parts", parts: 2 },
+          { id: "b", label: "3 equal parts", parts: 3 },
+          { id: "c", label: "4 equal parts", parts: 4 },
         ],
         correctAnswer: "b",
         skillId: "fractions_foundations",

@@ -527,6 +527,9 @@ export default function AssessmentQuestionCard({
           <div className="mt-3 text-lg font-black text-white">
             <FractionText value={fractionLabel} />
           </div>
+          <div className="mt-2 text-sm font-semibold text-slate-300">
+            This block is 1 of {denominator} equal parts.
+          </div>
         </div>
         <div className="grid gap-4 md:grid-cols-3">
           {options.map((option) => (
