@@ -162,11 +162,9 @@ export default function LoginPage() {
     const progress = readProgress();
 
     let dest: string;
-    if (progress?.status === "ASSIGNED_PROGRAM" && progress.year) {
-      const week = progress.assignedWeek ?? 1;
-      dest = `/program?year=${encodeURIComponent(progress.year)}&week=${week}`;
-    } else if (progress?.status === "PASSED") {
-      dest = `/number-nexus`;
+    if (progress?.status === "ASSIGNED_PROGRAM" || progress?.status === "PASSED") {
+      // Has completed pre-test — follow the proper flow: Levels → Tower → Realm → World Map
+      dest = `/levels`;
     } else if (student.year_level) {
       // No progress yet but teacher assigned a starting year — send to pre-test
       dest = `/pretest?year=${encodeURIComponent(student.year_level)}`;
