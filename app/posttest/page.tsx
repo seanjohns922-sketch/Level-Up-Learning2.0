@@ -1,16 +1,18 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getPosttestForYearLabel } from "@/data/assessments/api";
 import type { Question } from "@/data/assessments/posttests";
 import { getLegendForYear } from "@/data/legends";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
-import { ACTIVE_STUDENT_KEY, readProgress, writeProgress, type StudentProgress } from "@/data/progress";
+import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, writeProgress, type StudentProgress } from "@/data/progress";
 import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCard";
 import AssessmentShell from "@/components/assessment/AssessmentShell";
 import { analyzeAssessmentResult } from "@/data/assessments/analysis";
 import { supabase } from "@/lib/supabase";
+import { DEMO_MODE } from "@/data/config";
+import { getWeekProgress, hasCompletedRequiredWeeks, readProgramStore } from "@/lib/program-progress";
 
 const PASS_THRESHOLD = 85;
 
@@ -306,6 +308,33 @@ function PostTestPage() {
   const picked = answers[q?.id ?? ""] ?? "";
   const mabHasSelection = mab.tens > 0 || mab.ones > 0;
 
+  useEffect(() => {
+    const progress = readProgress();
+
+    if (!isPlacementComplete(progress)) {
+      router.replace("/home");
+      return;
+    }
+
+    if (!DEMO_MODE && progress?.year && progress.year !== year) {
+      router.replace("/levels");
+      return;
+    }
+
+    if (!DEMO_MODE && progress?.status === "ASSIGNED_PROGRAM" && progress.year === year) {
+      const store = readProgramStore();
+      const hasRequiredPlan = Array.isArray(progress.requiredWeeks) && progress.requiredWeeks.length > 0;
+      const eligibleForPostTest = hasRequiredPlan
+        ? hasCompletedRequiredWeeks(store, year, progress.requiredWeeks)
+        : getWeekProgress(store, year, 12).lessonsCompleted.filter(Boolean).length === 3;
+
+      if (!eligibleForPostTest) {
+        const fallbackWeek = Math.max(1, Math.min(12, progress.assignedWeek ?? 1));
+        router.replace(`/program?year=${encodeURIComponent(year)}&week=${fallbackWeek}&legacy=1`);
+      }
+    }
+  }, [router, year]);
+
   function pick(option: string) {
     if (!q) return;
     setAnswers((prev) => ({ ...prev, [q.id]: option }));
@@ -364,6 +393,7 @@ function PostTestPage() {
       year,
       scorePercent: prev?.scorePercent ?? 0,
       status: didPass ? "PASSED" : "ASSIGNED_PROGRAM",
+      placementComplete: true,
       assignedWeek: didPass ? prev?.assignedWeek : assignedWeek,
       assignedWeeksHistory: didPass
         ? prev?.assignedWeeksHistory ?? []
@@ -440,7 +470,7 @@ function PostTestPage() {
             is not available yet.
           </p>
           <button
-            onClick={() => router.push("/")}
+            onClick={() => router.push(`/program?year=${encodeURIComponent(year)}&week=12&legacy=1`)}
             className="w-full py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold hover:from-teal-400 hover:to-emerald-400 transition"
           >
             Back to Home
@@ -580,7 +610,7 @@ function PostTestPage() {
       onBack={back}
       onNext={next}
       onSubmit={submit}
-      onExit={() => router.push("/")}
+      onExit={() => router.push(`/program?year=${encodeURIComponent(year)}&week=12&legacy=1`)}
     />
   );
 }

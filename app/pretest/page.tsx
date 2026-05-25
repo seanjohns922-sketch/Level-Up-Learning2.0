@@ -8,7 +8,7 @@ import ReadAloudBtn from "@/components/ReadAloudBtn";
 import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCard";
 import AssessmentShell from "@/components/assessment/AssessmentShell";
 import { analyzeAssessmentResult, isAssessmentAnswerCorrect } from "@/data/assessments/analysis";
-import { ACTIVE_STUDENT_KEY, readProgress, type StudentProgress, writeProgress } from "@/data/progress";
+import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, type StudentProgress, writeProgress } from "@/data/progress";
 import { clearYearProgress } from "@/lib/program-progress";
 
 /* ── Inline visuals (kept from original) ── */
@@ -312,6 +312,25 @@ function PretestPage() {
   const selected = answers[index];
 
   useEffect(() => {
+    const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY)?.trim() : null;
+    const progress = readProgress();
+
+    if (!studentId) {
+      router.replace("/login");
+      return;
+    }
+
+    if (isPlacementComplete(progress)) {
+      router.replace("/levels");
+      return;
+    }
+
+    if (progress?.year && progress.year !== year) {
+      router.replace(`/pretest?year=${encodeURIComponent(progress.year)}`);
+    }
+  }, [router, year]);
+
+  useEffect(() => {
     setMab({ tens: 0, ones: 0 });
   }, [index]);
 
@@ -545,7 +564,7 @@ function PretestPage() {
       onBack={prevQuestion}
       onNext={nextQuestion}
       onSubmit={finish}
-      onExit={() => router.push(readProgress()?.placementComplete ? "/levels" : "/home")}
+      onExit={() => router.push(isPlacementComplete(readProgress()) ? "/levels" : "/home")}
     />
   );
 }

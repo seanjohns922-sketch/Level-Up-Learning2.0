@@ -36,7 +36,7 @@ import { generatePrepWeek11Task, resetPrepWeek11TaskSessionState } from "@/data/
 import { generatePrepWeek12Task, resetPrepWeek12TaskSessionState } from "@/data/activities/prep/week12";
 import { getProgramForYear } from "@/data/programs";
 import { DEMO_MODE } from "@/data/config";
-import { ACTIVE_STUDENT_KEY, readProgress, updateProgress } from "@/data/progress";
+import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, updateProgress } from "@/data/progress";
 import { trackLiveLearningEvent } from "@/lib/live-class-client";
 import { markLessonComplete } from "@/lib/program-progress";
 import { getRecommendedAssignedWeek, isWeekPlayable, readProgramStore, getWeekProgress } from "@/lib/program-progress";
@@ -131,6 +131,17 @@ function LessonPage() {
 
   useEffect(() => {
     const p = readProgress();
+    if (!isPlacementComplete(p)) {
+      router.replace(`/home`);
+      return;
+    }
+    if (!DEMO_MODE && p?.year && p.year !== year) {
+      router.replace(`/number-nexus`);
+    }
+  }, [router, year]);
+
+  useEffect(() => {
+    const p = readProgress();
     if (!p || p.status !== "ASSIGNED_PROGRAM") return;
     if (p.requiredWeeks?.length) return;
     const nextWeek = Math.max(p.assignedWeek ?? 1, week);
@@ -144,7 +155,7 @@ function LessonPage() {
     const store = readProgramStore();
     const weekPlayable = isWeekPlayable(store, year, week, p.requiredWeeks, p.optionalWeeks);
     if (!weekPlayable) {
-      router.replace(`/home`);
+      router.replace(`/number-nexus`);
       return;
     }
 
@@ -193,7 +204,7 @@ function LessonPage() {
         updateProgress({ assignedWeek: nextAssignedWeek });
       }
     }
-    router.push(`/home`);
+    router.push(`/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1`);
   }
 
   function markLessonDone() {
@@ -201,7 +212,7 @@ function LessonPage() {
   }
 
   function goBackToProgram() {
-    router.push(`/home`);
+    router.push(`/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1`);
   }
 
   const showWeek12Lesson3Summary = week === 12 && lessonNumber === 3;
@@ -415,7 +426,7 @@ function LessonPage() {
         <div className="mb-4">
           <button
             onClick={() =>
-              router.push(`/home`)
+              router.push(`/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1`)
             }
             className="text-sm font-mono font-bold uppercase tracking-[0.18em] text-teal-700 hover:text-teal-600 transition-colors"
           >
@@ -461,7 +472,7 @@ function LessonPage() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => router.push(`/home`)}
+                      onClick={() => router.push(`/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1`)}
                       className="rounded-[22px] border-2 border-cyan-200 bg-white px-6 py-4 text-lg font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
                     >
                       Back to Week

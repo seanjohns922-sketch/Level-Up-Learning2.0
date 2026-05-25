@@ -2,8 +2,7 @@
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { readProgress, updateProgress } from "@/data/progress";
-import { ACTIVE_STUDENT_KEY } from "@/data/progress";
+import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, updateProgress } from "@/data/progress";
 import { supabase } from "@/lib/supabase";
 import { getProgramForYear } from "@/data/programs";
 import { getYear6WeeklyQuiz, type Year6WeeklyQuizQuestion } from "@/data/quizzes/year6";
@@ -6476,6 +6475,17 @@ function SessionPage() {
           : "Weekly Quiz";
 
   useEffect(() => {
+    const progress = readProgress();
+    if (!isPlacementComplete(progress)) {
+      router.replace(`/home`);
+      return;
+    }
+    if (!DEMO_MODE && progress?.year && progress.year !== year) {
+      router.replace(`/number-nexus`);
+    }
+  }, [router, year]);
+
+  useEffect(() => {
     if (year === "Prep" && type === "lesson") {
       router.replace(`/lesson?year=${encodeURIComponent(year)}&week=${encodeURIComponent(week)}&lessonId=y0-w${Number(week)}-l${n}`);
     }
@@ -6489,18 +6499,18 @@ function SessionPage() {
     const numericWeek = Number(week);
     if (!isWeekPlayable(store, year, numericWeek, progress.requiredWeeks, progress.optionalWeeks)) {
       const fallbackWeek = getRecommendedAssignedWeek(store, year, progress.assignedWeek, progress.requiredWeeks);
-      router.replace(`/home`);
+      router.replace(`/number-nexus`);
       return;
     }
 
     const weekProgress = getPersistedWeekProgress(store, year, numericWeek);
     if (!DEMO_MODE && type === "quiz" && weekProgress.lessonsCompleted.filter(Boolean).length < 3) {
-      router.replace(`/home`);
+      router.replace(`/number-nexus`);
     }
   }, [router, type, week, year]);
 
   function backToWeek() {
-    router.push(`/home`);
+    router.push(`/program?year=${encodeURIComponent(year)}&week=${encodeURIComponent(week)}&legacy=1`);
   }
 
   // ---------------------------
@@ -8233,7 +8243,7 @@ function SessionPage() {
                   {finalScore >= Math.ceil(quizQuestions.length * ((quizConfig?.passPercent ?? 80) / 100)) ? (
                     <button
                       onClick={() =>
-                        router.push(`/home`)
+                        router.push(`/program?year=${encodeURIComponent(year)}&week=${encodeURIComponent(String(Math.min(12, Number(week) + 1)))}&legacy=1`)
                       }
                       className="px-5 py-3 rounded-2xl font-bold transition bg-trust-blue text-white hover:opacity-90"
                     >

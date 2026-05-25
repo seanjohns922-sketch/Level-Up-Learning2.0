@@ -4,7 +4,7 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getProgramForYear } from "@/data/programs";
 import { DEMO_MODE } from "@/data/config";
-import { readProgress, updateProgress } from "@/data/progress";
+import { isPlacementComplete, readProgress, updateProgress } from "@/data/progress";
 import {
   getOptionalWeeks,
   getPlayableWeeks,
@@ -64,8 +64,22 @@ function ProgramPage() {
   const legacyProgramMode = sp.get("legacy") === "1";
 
   useEffect(() => {
-    if (legacyProgramMode) return;
+    const progress = readProgress();
+    if (!isPlacementComplete(progress)) {
+      router.replace("/home");
+    }
+  }, [router]);
 
+  useEffect(() => {
+    const progress = readProgress();
+    if (!DEMO_MODE && progress?.year && progress.year !== year) {
+      const targetWeek = Math.max(1, Math.min(12, progress.assignedWeek ?? 1));
+      router.replace(`/program?year=${encodeURIComponent(progress.year)}&week=${targetWeek}&legacy=1`);
+      return;
+    }
+  }, [router, year]);
+
+  useEffect(() => {
     const progress = readProgress();
     if (progress?.status === "ASSIGNED_PROGRAM" && progress.year === year) {
       const nextAssignedWeek = Math.max(1, Math.min(12, weekNum));
@@ -73,9 +87,7 @@ function ProgramPage() {
         updateProgress({ assignedWeek: nextAssignedWeek });
       }
     }
-
-    router.replace("/number-nexus");
-  }, [legacyProgramMode, router, weekNum, year]);
+  }, [weekNum, year]);
 
   useEffect(() => {
     if (!weekMenuOpen) return;

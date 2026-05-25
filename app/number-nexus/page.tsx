@@ -1,6 +1,9 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { isPlacementComplete, readProgress } from "@/data/progress";
 
 const NumberNexusMap = dynamic(
   () => import("@/components/world/NumberNexusMap"),
@@ -47,5 +50,14 @@ const NumberNexusMap = dynamic(
 );
 
 export default function NumberNexusPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const progress = readProgress();
+    if (!isPlacementComplete(progress)) {
+      router.replace("/home");
+    }
+  }, [router]);
+
   return <NumberNexusMap />;
 }

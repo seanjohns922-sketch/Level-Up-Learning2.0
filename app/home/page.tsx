@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { readProgress } from "@/data/progress";
+import { isPlacementComplete, readProgress } from "@/data/progress";
 import { clearActiveStudentSession, getActiveStudentProfile, getPlacementEntryYear, hasActiveStudentSeenIntro, markActiveStudentIntroSeen } from "@/lib/studentIdentity";
 import { supabase } from "@/lib/supabase";
 
@@ -13,7 +13,7 @@ export default function StudentHomePage() {
   const placementYear = useMemo(() => progress?.year ?? getPlacementEntryYear(), [progress?.year]);
 
   useEffect(() => {
-    if (progress?.placementComplete === true) {
+    if (isPlacementComplete(progress)) {
       router.replace("/levels");
       return;
     }
@@ -21,7 +21,7 @@ export default function StudentHomePage() {
     if (studentProfile?.studentId && hasActiveStudentSeenIntro(studentProfile.studentId)) {
       router.replace(`/pretest?year=${encodeURIComponent(placementYear)}`);
     }
-  }, [placementYear, progress?.placementComplete, router, studentProfile?.studentId]);
+  }, [placementYear, progress, router, studentProfile?.studentId]);
 
   async function handleLogout() {
     await supabase.auth.signOut();

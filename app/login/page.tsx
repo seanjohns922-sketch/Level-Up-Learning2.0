@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { hasActiveStudentSeenIntro, setActiveStudentProfile } from "@/lib/studentIdentity";
-import { readProgress } from "@/data/progress";
+import { isPlacementComplete, readProgress } from "@/data/progress";
 import { GraduationCap, Briefcase, KeyRound, User, Lock } from "lucide-react";
 
 type StudentRecord = {
@@ -162,7 +162,7 @@ export default function LoginPage() {
     });
 
     const progress = readProgress();
-    const placementComplete = progress?.placementComplete === true;
+    const placementComplete = isPlacementComplete(progress);
     const introSeen = hasActiveStudentSeenIntro(student.student_id);
 
     let dest: string;

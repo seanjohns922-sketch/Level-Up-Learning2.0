@@ -57,6 +57,13 @@ export default function RealmCarousel() {
     return () => window.clearTimeout(t);
   }, [level]);
 
+  useEffect(() => {
+    const progress = readProgress();
+    if (!DEMO_MODE && progress?.year && level !== progress.year) {
+      router.replace(`/realms?level=${encodeURIComponent(progress.year)}`);
+    }
+  }, [level, router]);
+
   const levelLabel = level.startsWith("Year")
     ? `Level ${level.replace("Year ", "")}`
     : level;

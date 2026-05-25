@@ -295,10 +295,10 @@ function ResultsPage() {
         : Array.from(new Set([...prevUnlocked, ...unlockTargets]));
       next = {
         ...prev,
-        year,
+        year: !isPostTest && !passedByProgram && nextYear ? nextYear : year,
         scorePercent: passedByProgram ? Math.max(prev?.scorePercent ?? 0, POSTTEST_PASS_THRESHOLD) : scorePercent,
         status: "PASSED",
-        placementComplete: isPostTest || passedByProgram,
+        placementComplete: isPostTest || passedByProgram || !nextYear,
         assignedWeek: prev?.assignedWeek,
         assignedWeeksHistory: prev?.assignedWeeksHistory,
         requiredWeeks: [],
@@ -341,7 +341,7 @@ function ResultsPage() {
         console.warn("[Results] DB pretest save failed:", e);
       }
     })();
-  }, [passed, year, scorePercent, isPostTest, passedByProgram, storedPosttestProfile, storedPretestProfile, unlockTargets, requiredWeeks, optionalWeeks]);
+  }, [passed, year, scorePercent, isPostTest, passedByProgram, storedPosttestProfile, storedPretestProfile, unlockTargets, requiredWeeks, optionalWeeks, nextYear]);
 
   function goHome() { router.push("/levels"); }
   const assignedStartWeek = isPostTest
@@ -673,18 +673,18 @@ function ResultsPage() {
                   </button>
                 ) : (
                   <button
-                    onClick={nextYear ? goNextPretest : goLegends}
+                    onClick={nextYear ? goNextPretest : goHome}
                     className="w-full py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base hover:opacity-90 transition-all active:scale-[0.98] shadow-lg"
                     style={{ boxShadow: "0 8px 24px -8px hsl(var(--primary) / 0.4)" }}
                   >
-                    {nextYear ? `Start ${nextYear} Pre-Test` : "🏅 View My Legends"}
+                    {nextYear ? `Start ${nextYear} Pre-Test` : "Enter the Tower"}
                   </button>
                 )}
                 <button
                   onClick={goHome}
                   className="w-full py-3 rounded-2xl bg-secondary text-secondary-foreground font-semibold text-sm hover:bg-muted transition-all active:scale-[0.98]"
                 >
-                  Back to Home
+                  Go to Levels
                 </button>
               </>
             ) : isPostTest ? (
@@ -729,7 +729,7 @@ function ResultsPage() {
                   onClick={goHome}
                   className="w-full py-3 rounded-2xl bg-secondary text-secondary-foreground font-semibold text-sm hover:bg-muted transition-all active:scale-[0.98]"
                 >
-                  Back to Home
+                  Go to Levels
                 </button>
               </>
             )}

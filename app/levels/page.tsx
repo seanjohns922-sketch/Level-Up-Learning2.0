@@ -2,23 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { clearScopedProgress, readProgress, writeProgress, StudentProgress } from "@/data/progress";
-import { clearScopedProgramStore, getRecommendedAssignedWeek, readProgramStore } from "@/lib/program-progress";
+import { isPlacementComplete, readProgress, writeProgress, StudentProgress } from "@/data/progress";
+import { getLegendForYear } from "@/data/legends";
+import { getRecommendedAssignedWeek, readProgramStore } from "@/lib/program-progress";
 import { getProgramForYear } from "@/data/programs";
 import { DEMO_MODE } from "@/data/config";
-
-function clearProgress() {
-  if (typeof window === "undefined") return;
-  clearScopedProgress();
-  clearScopedProgramStore();
-  try {
-    Object.keys(localStorage).forEach((key) => {
-      if (key.startsWith("lul_week_")) localStorage.removeItem(key);
-    });
-  } catch {
-    // ignore
-  }
-}
 
 export default function LevelsPage() {
   const router = useRouter();
@@ -36,16 +24,14 @@ export default function LevelsPage() {
     []
   );
 
-  const [selectedYear, setSelectedYear] = useState<string | null>(null);
-  const [progress, setProgress] = useState<StudentProgress | null>(null);
+  const [progress] = useState<StudentProgress | null>(() => readProgress());
+  const [selectedYear, setSelectedYear] = useState<string | null>(() => readProgress()?.year ?? null);
 
   useEffect(() => {
-    setProgress(readProgress());
-  }, []);
-
-  useEffect(() => {
-    if (!selectedYear && progress?.year) setSelectedYear(progress.year);
-  }, [progress, selectedYear]);
+    if (!isPlacementComplete(progress)) {
+      router.replace("/home");
+    }
+  }, [progress, router]);
 
   const hasProgressForSelected =
     progress && selectedYear && progress.year === selectedYear;
@@ -60,26 +46,10 @@ export default function LevelsPage() {
         )
       : null;
 
-  const programWeek = useMemo(() => {
-    if (!selectedYear) return null;
-    const program = getProgramForYear(selectedYear);
-    if (!program.length) return null;
-    const week = savedWeek ?? 1;
-    return program.find((w) => w.week === week) ?? null;
-  }, [selectedYear, savedWeek]);
-
-  function startPretest(forYear: string) {
-    const qs = new URLSearchParams({ year: forYear }).toString();
-    router.push(`/pretest?${qs}`);
-  }
 
   function continueProgram() {
     if (!progress) return;
-    if (progress.status === "ASSIGNED_PROGRAM") {
-      router.push("/tower-map");
-      return;
-    }
-    router.push("/legends");
+    router.push(`/realms?level=${encodeURIComponent(progress.year)}`);
   }
 
   function goLegends() {
@@ -87,23 +57,10 @@ export default function LevelsPage() {
   }
 
   function goHome() {
-    router.push("/home");
+    router.push("/login");
   }
 
-  function nextYear(year: string) {
-    const ids = levels.map((l) => l.id);
-    const idx = ids.indexOf(year);
-    if (idx === -1) return ids[0];
-    return ids[Math.min(ids.length - 1, idx + 1)];
-  }
-
-  function resetMvp() {
-    clearProgress();
-    setProgress(null);
-    setSelectedYear(null);
-  }
-
-  const primaryCta = useMemo(() => {
+  const primaryCta = (() => {
     if (!selectedYear) {
       return { label: "Start Pre-Test", onClick: () => {}, disabled: true };
     }
@@ -140,31 +97,24 @@ export default function LevelsPage() {
     }
 
     if (hasProgressForSelected && progress?.status === "PASSED") {
-      const ny = nextYear(progress.year);
       return {
-        label: ny === progress.year ? "Year Passed" : `Start ${ny} Pre-Test`,
-        onClick: () => {
-          if (ny === progress.year) return;
-          startPretest(ny);
-        },
-        disabled: ny === progress.year,
+        label: "Enter the Tower",
+        onClick: continueProgram,
+        disabled: false,
       };
     }
 
     return {
-      label: `Start ${selectedYear} Pre-Test`,
-      onClick: () => startPretest(selectedYear),
+      label: `Enter ${selectedYear}`,
+      onClick: () => router.push(`/realms?level=${encodeURIComponent(selectedYear)}`),
       disabled: false,
     };
-  }, [selectedYear, hasProgressForSelected, progress, levels]);
+  })();
 
   const showLegendsButton = !!progress;
   const unlockedYear = progress?.year ?? "Year 1";
-  const hasAssignedProgram =
-    progress?.status === "ASSIGNED_PROGRAM" ||
-    typeof progress?.assignedWeek === "number" ||
-    !!(progress as any)?.assignedProgram ||
-    !!(progress as any)?.currentProgram;
+  const unlockedYearIndex = levels.findIndex((level) => level.id === unlockedYear);
+  const passedLegendIds = new Set((progress?.unlockedLegends ?? []).filter(Boolean));
 
   return (
     <main className="min-h-screen relative px-6 py-10">
@@ -251,7 +201,10 @@ export default function LevelsPage() {
               <div className="flex flex-col gap-1.5">
                 {levels.map((level) => {
                   const isSelected = selectedYear === level.id;
-                  const isUnlocked = DEMO_MODE || !hasAssignedProgram || level.id === unlockedYear;
+                  const levelIndex = levels.findIndex((item) => item.id === level.id);
+                  const currentLevelLegendId = getLegendForYear(level.id).id;
+                  const isPreviouslyPassed = passedLegendIds.has(currentLevelLegendId) && levelIndex < unlockedYearIndex;
+                  const isUnlocked = DEMO_MODE || level.id === unlockedYear || isPreviouslyPassed;
                   return (
                     <button
                       key={level.id}
