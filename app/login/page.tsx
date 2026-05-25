@@ -30,6 +30,10 @@ const CLASSES_KEY = "lul_classes_v1";
 function normalizeClassCode(code: string) {
   return code.replace(/\s+/g, "").trim().toUpperCase();
 }
+
+function isMissingStudentUserIdColumn(message?: string | null) {
+  return Boolean(message && /user_id.*students|students.*user_id|schema cache/i.test(message));
+}
 function readClasses(): ClassesStore {
   if (typeof window === "undefined") return {};
   try {
@@ -149,8 +153,18 @@ export default function LoginPage() {
       if (signUpErr.message.includes("already")) {
         const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({ email: syntheticEmail, password: paddedPin });
         if (signInErr) { setStudentError("That name is taken in this class, or your PIN is wrong."); return; }
-        const { data: existing } = await supabase.from("students").select("id, class_id").eq("user_id", signInData.user.id).single();
+        const { data: existing, error: existingError } = await supabase.from("students").select("id, class_id").eq("user_id", signInData.user.id).single();
         if (existing) { setActiveStudentProfile(existing.id, existing.class_id); router.push("/home"); return; }
+        if (existingError && isMissingStudentUserIdColumn(existingError.message)) {
+          const { data: legacyExisting } = await supabase
+            .from("students")
+            .select("id, class_id")
+            .eq("class_id", cls.id)
+            .eq("display_name", displayName.trim())
+            .eq("pin", pin)
+            .single();
+          if (legacyExisting) { setActiveStudentProfile(legacyExisting.id, legacyExisting.class_id); router.push("/home"); return; }
+        }
       }
       setStudentError(signUpErr.message);
       return;
@@ -158,8 +172,16 @@ export default function LoginPage() {
     const userId = signUpData.user?.id;
     if (!userId) { setStudentError("Could not create account."); return; }
     const studentId = crypto.randomUUID();
-    const { data: student } = await supabase.from("students").insert({ id: studentId, class_id: cls.id, display_name: displayName.trim(), pin, user_id: userId }).select().single();
-    if (!student) { setStudentError("Could not create student."); return; }
+    const createPayload = { id: studentId, class_id: cls.id, display_name: displayName.trim(), pin, user_id: userId };
+    let { data: student, error: studentCreateError } = await supabase.from("students").insert(createPayload).select().single();
+    if (studentCreateError && isMissingStudentUserIdColumn(studentCreateError.message)) {
+      ({ data: student, error: studentCreateError } = await supabase
+        .from("students")
+        .insert({ id: studentId, class_id: cls.id, display_name: displayName.trim(), pin })
+        .select()
+        .single());
+    }
+    if (studentCreateError || !student) { setStudentError(studentCreateError?.message ?? "Could not create student."); return; }
     setActiveStudentProfile(student.id, cls.id);
     router.push("/home");
   }

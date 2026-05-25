@@ -10,6 +10,10 @@ function normalizeClassCode(code: string) {
   return code.replace(/\s+/g, "").trim().toUpperCase();
 }
 
+function isMissingStudentUserIdColumn(message?: string | null) {
+  return Boolean(message && /user_id.*students|students.*user_id|schema cache/i.test(message));
+}
+
 export default function JoinPageWrapper() {
   return <Suspense fallback={<div className="min-h-screen bg-[#fbf7f1] flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><JoinPage /></Suspense>;
 }
@@ -147,7 +151,7 @@ function JoinPage() {
       return;
     }
 
-    const { data: student, error: studentErr } = await supabase
+    let { data: student, error: studentErr } = await supabase
       .from("students")
       .insert({
         id: studentId,
@@ -158,6 +162,19 @@ function JoinPage() {
       })
       .select("id, class_id, display_name")
       .single();
+
+    if (studentErr && isMissingStudentUserIdColumn(studentErr.message)) {
+      ({ data: student, error: studentErr } = await supabase
+        .from("students")
+        .insert({
+          id: studentId,
+          class_id: klass.id,
+          display_name: cleanName,
+          pin: cleanPin,
+        })
+        .select("id, class_id, display_name")
+        .single());
+    }
 
     if (studentErr || !student) {
       setError(studentErr?.message ?? "Could not create student.");

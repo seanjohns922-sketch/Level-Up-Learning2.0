@@ -198,7 +198,6 @@ export default function TeacherClassesPage() {
           class_id: classId,
           display_name: name,
           pin: fallbackPin,
-          user_id: null,
         })
         .select("id, pin, qr_token")
         .single();

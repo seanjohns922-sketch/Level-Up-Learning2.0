@@ -167,7 +167,6 @@ export default function NewClassPage() {
           class_id: createdClassId,
           display_name: newStudentName.trim(),
           pin: fallbackPin,
-          user_id: null,
         })
         .select("id, pin, qr_token")
         .single();
