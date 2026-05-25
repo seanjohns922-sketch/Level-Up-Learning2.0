@@ -41,6 +41,7 @@ type ParentStudentLinkRow = {
 
 type EditForm = {
   display_name: string;
+  pin: string;
   year_level: string;
   notes: string;
 };
@@ -77,7 +78,7 @@ export default function TeacherClassesPage() {
   } | null>(null);
   // Student edit/archive state
   const [editingStudentId, setEditingStudentId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState<EditForm>({ display_name: "", year_level: "", notes: "" });
+  const [editForm, setEditForm] = useState<EditForm>({ display_name: "", pin: "", year_level: "", notes: "" });
   const [savingEdit, setSavingEdit] = useState(false);
   const [archivingStudentId, setArchivingStudentId] = useState<string | null>(null);
   const [showArchivedForClass, setShowArchivedForClass] = useState<Record<string, boolean>>({});
@@ -245,6 +246,7 @@ export default function TeacherClassesPage() {
     setEditingStudentId(student.id);
     setEditForm({
       display_name: student.display_name,
+      pin: student.pin ?? "",
       year_level: student.year_level ?? "",
       notes: student.notes ?? "",
     });
@@ -256,11 +258,16 @@ export default function TeacherClassesPage() {
 
   async function saveStudentEdit(studentId: string) {
     if (!editForm.display_name.trim()) return;
+    if (editForm.pin && !/^\d{4}$/.test(editForm.pin)) {
+      alert("Password must be 4 digits.");
+      return;
+    }
     setSavingEdit(true);
     const { error } = await supabase
       .from("students")
       .update({
         display_name: editForm.display_name.trim(),
+        pin: editForm.pin || null,
         year_level: editForm.year_level || null,
         notes: editForm.notes.trim() || null,
       } as any)
@@ -270,7 +277,7 @@ export default function TeacherClassesPage() {
     setStudents((prev) =>
       prev.map((s) =>
         s.id === studentId
-          ? { ...s, display_name: editForm.display_name.trim(), year_level: editForm.year_level || null, notes: editForm.notes.trim() || null }
+          ? { ...s, display_name: editForm.display_name.trim(), pin: editForm.pin || null, year_level: editForm.year_level || null, notes: editForm.notes.trim() || null }
           : s
       )
     );
@@ -466,31 +473,55 @@ export default function TeacherClassesPage() {
                               return (
                                 <div key={s.id} className="grid gap-3 text-sm px-3 py-3 bg-blue-50 rounded-xl border border-blue-100">
                                   <div className="text-xs font-black uppercase tracking-wide text-blue-700">Edit Student</div>
-                                  <div className="grid gap-2 md:grid-cols-2">
-                                    <div>
-                                      <label className="text-xs font-bold text-gray-500 mb-1 block">Display Name *</label>
-                                      <input
-                                        value={editForm.display_name}
-                                        onChange={(e) => setEditForm((f) => ({ ...f, display_name: e.target.value }))}
-                                        className="w-full rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-blue-300"
-                                        placeholder="Display name"
-                                      />
-                                    </div>
-                                    <div>
-                                      <label className="text-xs font-bold text-gray-500 mb-1 block">Working Level</label>
-                                      <select
-                                        value={editForm.year_level}
-                                        onChange={(e) => setEditForm((f) => ({ ...f, year_level: e.target.value }))}
-                                        className="w-full rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-blue-300"
-                                      >
-                                        <option value="">— select —</option>
-                                        {YEAR_LEVELS.map((yr) => (
-                                          <option key={yr} value={yr}>{yr}</option>
-                                        ))}
-                                      </select>
-                                      <p className="text-[10px] text-gray-400 mt-1">Where this student works — can differ from class year</p>
+
+                                  {/* Login credentials */}
+                                  <div>
+                                    <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1.5">Login Details</div>
+                                    <div className="grid gap-2 md:grid-cols-3">
+                                      <div>
+                                        <label className="text-xs font-bold text-gray-500 mb-1 block">Class Code</label>
+                                        <div className="w-full rounded-xl border border-white bg-white/60 px-3 py-2 text-sm font-mono font-black text-gray-500 tracking-widest select-all">
+                                          {cls.class_code}
+                                        </div>
+                                      </div>
+                                      <div>
+                                        <label className="text-xs font-bold text-gray-500 mb-1 block">Username *</label>
+                                        <input
+                                          value={editForm.display_name}
+                                          onChange={(e) => setEditForm((f) => ({ ...f, display_name: e.target.value }))}
+                                          className="w-full rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-blue-300"
+                                          placeholder="Student username"
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="text-xs font-bold text-gray-500 mb-1 block">Password (4-digit)</label>
+                                        <input
+                                          value={editForm.pin}
+                                          onChange={(e) => setEditForm((f) => ({ ...f, pin: e.target.value.replace(/\D/g, "").slice(0, 4) }))}
+                                          className="w-full rounded-xl border border-white bg-white px-3 py-2 text-sm font-mono font-bold text-gray-900 tracking-widest outline-none focus:border-blue-300"
+                                          placeholder="1234"
+                                          inputMode="numeric"
+                                        />
+                                      </div>
                                     </div>
                                   </div>
+
+                                  {/* Working level */}
+                                  <div>
+                                    <label className="text-xs font-bold text-gray-500 mb-1 block">Working Level</label>
+                                    <select
+                                      value={editForm.year_level}
+                                      onChange={(e) => setEditForm((f) => ({ ...f, year_level: e.target.value }))}
+                                      className="w-full rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-blue-300"
+                                    >
+                                      <option value="">— select —</option>
+                                      {YEAR_LEVELS.map((yr) => (
+                                        <option key={yr} value={yr}>{yr}</option>
+                                      ))}
+                                    </select>
+                                    <p className="text-[10px] text-gray-400 mt-1">Where this student works — can differ from class year</p>
+                                  </div>
+
                                   <div>
                                     <label className="text-xs font-bold text-gray-500 mb-1 block">Notes (optional)</label>
                                     <textarea
@@ -560,7 +591,7 @@ export default function TeacherClassesPage() {
                                   </div>
                                   <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
                                     <span>
-                                      PIN: <span className="font-mono font-bold text-gray-700">{s.pin ?? "—"}</span>
+                                      Password: <span className="font-mono font-bold text-gray-700">{s.pin ?? "—"}</span>
                                     </span>
                                     {!isArchived && claimCodesByStudentId[s.id] && (
                                       <span>
@@ -645,16 +676,16 @@ export default function TeacherClassesPage() {
                         <div>
                           <div className="text-xs font-black uppercase tracking-wide text-emerald-700">Add Student</div>
                           <p className="text-[11px] text-emerald-600/70 mt-0.5">
-                            Working level is where this student starts — it can differ from the class year.
+                            Class code: <span className="font-mono font-black tracking-widest">{cls.class_code}</span> · Username + password are what students type to log in.
                           </p>
                         </div>
-                        <div className="mt-3 grid gap-2 md:grid-cols-[1fr_160px_120px_auto]">
+                        <div className="mt-3 grid gap-2 md:grid-cols-[1fr_160px_130px_auto]">
                           <input
                             value={newStudentNames[cls.id] ?? ""}
                             onChange={(event) =>
                               setNewStudentNames((current) => ({ ...current, [cls.id]: event.target.value }))
                             }
-                            placeholder="Student name"
+                            placeholder="Username"
                             className="rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
                           />
                           <select
@@ -677,7 +708,7 @@ export default function TeacherClassesPage() {
                                 [cls.id]: event.target.value.replace(/\D/g, "").slice(0, 4),
                               }))
                             }
-                            placeholder="PIN (opt.)"
+                            placeholder="Password (4-digit)"
                             inputMode="numeric"
                             className="rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
                           />
@@ -692,9 +723,8 @@ export default function TeacherClassesPage() {
                         </div>
                         {lastCreatedLogin?.classId === cls.id ? (
                           <div className="mt-3 rounded-xl bg-white px-3 py-2 text-xs font-semibold text-gray-600">
-                            Login card ready for {lastCreatedLogin.name}: PIN{" "}
-                            <span className="font-mono font-black text-gray-900">{lastCreatedLogin.pin}</span>, claim code{" "}
-                            <span className="font-mono font-black text-gray-900">{lastCreatedLogin.claimCode}</span>.
+                            Student added: <span className="font-black text-gray-900">{lastCreatedLogin.name}</span> · Password:{" "}
+                            <span className="font-mono font-black text-gray-900">{lastCreatedLogin.pin}</span>
                           </div>
                         ) : null}
                       </div>
