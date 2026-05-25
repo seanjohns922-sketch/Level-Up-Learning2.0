@@ -155,6 +155,13 @@ export default function TeacherDashboardPage() {
   const [activeTab, setActiveTab] = useState<"live" | "students" | "curriculum">("live");
   const [copiedCode, setCopiedCode] = useState(false);
   const [showLoginMenu, setShowLoginMenu] = useState(false);
+  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordSaving, setPasswordSaving] = useState(false);
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
 
   // Refs to prevent duplicate fetches and stale closures
   const mountedRef = useRef(false);
@@ -286,6 +293,23 @@ export default function TeacherDashboardPage() {
     navigator.clipboard.writeText(selectedClass.class_code);
     setCopiedCode(true);
     setTimeout(() => setCopiedCode(false), 2000);
+  }
+
+  async function changePassword() {
+    setPasswordError(null);
+    if (newPassword.length < 6) { setPasswordError("Password must be at least 6 characters."); return; }
+    if (newPassword !== confirmPassword) { setPasswordError("Passwords don't match."); return; }
+    setPasswordSaving(true);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    setPasswordSaving(false);
+    if (error) { setPasswordError(error.message); return; }
+    setPasswordSuccess(true);
+    setNewPassword("");
+    setConfirmPassword("");
+    setTimeout(() => {
+      setPasswordSuccess(false);
+      setShowPasswordModal(false);
+    }, 2000);
   }
 
   async function printAllLoginCards() {
@@ -733,18 +757,49 @@ export default function TeacherDashboardPage() {
             </button>
 
             {/* Settings gear */}
-            <button
-              onClick={() => router.push("/teacher/classes")}
-              className="h-9 w-9 rounded-lg border border-[#E6E8EC] text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] hover:border-[#CBD5E1] transition flex items-center justify-center"
-              type="button"
-              aria-label="Class settings"
-              title="Class settings"
-            >
-              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="3" />
-                <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
-              </svg>
-            </button>
+            <div className="relative">
+              <button
+                onClick={() => setShowSettingsMenu((v) => !v)}
+                className="h-9 w-9 rounded-lg border border-[#E6E8EC] text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] hover:border-[#CBD5E1] transition flex items-center justify-center"
+                type="button"
+                aria-label="Settings"
+                title="Settings"
+              >
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
+                </svg>
+              </button>
+              {showSettingsMenu && (
+                <div className="absolute right-0 top-full mt-1 w-52 bg-white rounded-xl border border-[#E6E8EC] shadow-lg z-30 py-1">
+                  <div className="px-4 py-2 border-b border-[#F1F5F9]">
+                    <p className="text-xs font-bold text-[#0F172A]">Account Settings</p>
+                    <p className="text-[11px] text-[#94A3B8] truncate">{authUser?.email}</p>
+                  </div>
+                  <button
+                    onClick={() => { setShowSettingsMenu(false); setShowPasswordModal(true); }}
+                    className="w-full text-left px-4 py-2.5 text-sm font-semibold text-[#0F172A] hover:bg-[#F8FAFC] flex items-center gap-2"
+                  >
+                    <svg viewBox="0 0 24 24" className="h-4 w-4 text-[#64748B]" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0110 0v4" />
+                    </svg>
+                    Change Password
+                  </button>
+                  <button
+                    onClick={() => { setShowSettingsMenu(false); router.push("/teacher/classes"); }}
+                    className="w-full text-left px-4 py-2.5 text-sm font-semibold text-[#0F172A] hover:bg-[#F8FAFC] flex items-center gap-2"
+                  >
+                    <svg viewBox="0 0 24 24" className="h-4 w-4 text-[#64748B]" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m3-5.13a4 4 0 100-8 4 4 0 000 8zm6-2a3 3 0 100-6 3 3 0 000 6z" />
+                    </svg>
+                    Manage Classes
+                  </button>
+                </div>
+              )}
+              {showSettingsMenu && (
+                <div className="fixed inset-0 z-20" onClick={() => setShowSettingsMenu(false)} />
+              )}
+            </div>
 
             <button
               onClick={async () => {
@@ -861,6 +916,67 @@ export default function TeacherDashboardPage() {
           to { opacity: 1; transform: translateY(0); }
         }
       `}</style>
+
+      {/* ── Change Password Modal ── */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => { setShowPasswordModal(false); setPasswordError(null); setNewPassword(""); setConfirmPassword(""); }} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 z-10">
+            <h2 className="text-lg font-black text-[#0F172A] mb-1">Change Password</h2>
+            <p className="text-sm text-[#64748B] mb-5">Enter a new password for your account.</p>
+
+            <div className="grid gap-3">
+              <label className="grid gap-1">
+                <span className="text-xs font-bold text-[#64748B]">New Password</span>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Min. 6 characters"
+                  className="w-full px-3 py-2.5 rounded-xl border border-[#E6E8EC] text-sm font-medium text-[#0F172A] outline-none focus:border-[#0F172A] transition"
+                  autoFocus
+                />
+              </label>
+              <label className="grid gap-1">
+                <span className="text-xs font-bold text-[#64748B]">Confirm Password</span>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Repeat new password"
+                  className="w-full px-3 py-2.5 rounded-xl border border-[#E6E8EC] text-sm font-medium text-[#0F172A] outline-none focus:border-[#0F172A] transition"
+                  onKeyDown={(e) => e.key === "Enter" && changePassword()}
+                />
+              </label>
+
+              {passwordError && (
+                <p className="text-sm font-bold text-red-600 text-center">{passwordError}</p>
+              )}
+              {passwordSuccess && (
+                <p className="text-sm font-bold text-emerald-600 text-center">Password updated!</p>
+              )}
+
+              <div className="flex gap-2 mt-1">
+                <button
+                  type="button"
+                  onClick={changePassword}
+                  disabled={passwordSaving || passwordSuccess}
+                  className="flex-1 py-2.5 rounded-xl bg-[#0F172A] text-white font-bold text-sm hover:bg-[#1E293B] transition disabled:opacity-50"
+                >
+                  {passwordSaving ? "Saving…" : passwordSuccess ? "Saved!" : "Save Password"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setShowPasswordModal(false); setPasswordError(null); setNewPassword(""); setConfirmPassword(""); }}
+                  className="px-4 py-2.5 rounded-xl border border-[#E6E8EC] text-sm font-bold text-[#64748B] hover:bg-[#F8FAFC] transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
