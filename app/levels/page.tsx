@@ -7,6 +7,8 @@ import { getLegendForYear } from "@/data/legends";
 import { getRecommendedAssignedWeek, readProgramStore } from "@/lib/program-progress";
 import { getProgramForYear } from "@/data/programs";
 import { DEMO_MODE } from "@/data/config";
+import { clearActiveStudentSession } from "@/lib/studentIdentity";
+import { supabase } from "@/lib/supabase";
 
 export default function LevelsPage() {
   const router = useRouter();
@@ -56,7 +58,9 @@ export default function LevelsPage() {
     router.push("/legends");
   }
 
-  function goHome() {
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    clearActiveStudentSession();
     router.push("/login");
   }
 
@@ -128,11 +132,11 @@ export default function LevelsPage() {
           {/* TOP — aligns with tower peak / panel header */}
           <div className="w-full pt-4 md:pt-[8vh] lg:pt-[10vh]">
             <button
-              onClick={goHome}
+              onClick={handleLogout}
               className="text-sm text-white/80 hover:text-white hover:underline"
               type="button"
             >
-              ← Back to Dashboard
+              ← Log out
             </button>
           </div>
 
