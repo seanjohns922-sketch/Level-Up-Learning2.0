@@ -162,8 +162,8 @@ export default function LoginPage() {
       if (!signUpData.user) { setStudentError("Could not create account."); return; }
     }
 
-    // Find existing student or create new one — handled server-side to bypass RLS
-    const { data: studentRows, error: studentErr } = await supabase.rpc("find_or_create_student", {
+    // Look up student server-side (SECURITY DEFINER bypasses RLS on both SELECT and name matching)
+    const { data: studentRows, error: studentErr } = await supabase.rpc("student_login_lookup", {
       p_class_id: cls.id,
       p_display_name: displayName.trim(),
       p_pin: pin,
@@ -171,7 +171,7 @@ export default function LoginPage() {
 
     const student = Array.isArray(studentRows) ? studentRows[0] : studentRows;
     if (studentErr || !student?.student_id) {
-      setStudentError(studentErr?.message ?? "Could not find your account. Check your username and password.");
+      setStudentError("Username or password not recognised. Ask your teacher to check your details.");
       return;
     }
 
