@@ -158,21 +158,21 @@ export default function LoginPage() {
 
     setActiveStudentProfile(student.student_id, student.class_id);
 
-    // Route based on existing progress
+    // Route based on existing progress (scoped to this student)
     const progress = readProgress();
+
     let dest: string;
-    if (!progress && student.year_level) {
-      // First login — send to pre-test for their assigned year
-      dest = `/pretest?year=${encodeURIComponent(student.year_level)}`;
-    } else if (progress?.status === "ASSIGNED_PROGRAM" && progress.year) {
-      // Has a program assigned — go straight to their week
+    if (progress?.status === "ASSIGNED_PROGRAM" && progress.year) {
       const week = progress.assignedWeek ?? 1;
       dest = `/program?year=${encodeURIComponent(progress.year)}&week=${week}`;
-    } else if (progress?.status === "PASSED" && progress.year) {
-      // Passed — go to the hub
+    } else if (progress?.status === "PASSED") {
       dest = `/number-nexus`;
+    } else if (student.year_level) {
+      // No progress yet but teacher assigned a starting year — send to pre-test
+      dest = `/pretest?year=${encodeURIComponent(student.year_level)}`;
     } else {
-      dest = "/home";
+      // No progress, no assigned year — main hub
+      dest = `/number-nexus`;
     }
     router.push(dest);
   }
