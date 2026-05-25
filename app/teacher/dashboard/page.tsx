@@ -154,6 +154,7 @@ export default function TeacherDashboardPage() {
   const [activeYear, setActiveYear] = useState("Year 1");
   const [activeTab, setActiveTab] = useState<"live" | "students" | "curriculum">("live");
   const [copiedCode, setCopiedCode] = useState(false);
+  const [showLoginMenu, setShowLoginMenu] = useState(false);
 
   // Refs to prevent duplicate fetches and stale closures
   const mountedRef = useRef(false);
@@ -285,6 +286,80 @@ export default function TeacherDashboardPage() {
     navigator.clipboard.writeText(selectedClass.class_code);
     setCopiedCode(true);
     setTimeout(() => setCopiedCode(false), 2000);
+  }
+
+  async function printAllLoginCards() {
+    if (!selectedClass || classStudents.length === 0) return;
+    setShowLoginMenu(false);
+
+    const QRCode = await import("qrcode");
+    const cards = await Promise.all(
+      classStudents.map(async (s) => {
+        let qrSrc = "";
+        if (s.qr_token) {
+          const url = `${window.location.origin}/student?token=${s.qr_token}`;
+          qrSrc = await QRCode.toDataURL(url, { width: 220, margin: 1 });
+        }
+        return { ...s, qrSrc };
+      })
+    );
+
+    const cardHtml = cards
+      .map(
+        (s) => `
+      <div class="card">
+        <div class="brand">Level Up Learning</div>
+        <div class="student-name">${s.display_name}</div>
+        <div class="class-name">${selectedClass.name}</div>
+        ${s.qrSrc ? `<img class="qr" src="${s.qrSrc}" alt="QR Code" />` : '<div class="qr-missing">No QR code</div>'}
+        <div class="scan-hint">Scan to log in instantly</div>
+        <div class="creds">
+          <div class="cred"><div class="cred-label">Class Code</div><div class="cred-value">${selectedClass.class_code}</div></div>
+          <div class="divider"></div>
+          <div class="cred"><div class="cred-label">PIN</div><div class="cred-value">${s.pin ?? "—"}</div></div>
+        </div>
+      </div>`
+      )
+      .join("");
+
+    const html = `<!DOCTYPE html><html><head>
+      <meta charset="utf-8"/>
+      <title>Student Login Cards — ${selectedClass.name}</title>
+      <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background:#f5f5f5; padding:24px; }
+        h1 { font-size:18px; font-weight:800; color:#0F172A; margin-bottom:4px; }
+        .subtitle { font-size:12px; color:#64748B; margin-bottom:20px; }
+        .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+        .card { background:#fff; border:2px solid #E2E8F0; border-radius:16px; padding:20px; text-align:center; page-break-inside:avoid; }
+        .brand { font-size:10px; font-weight:800; color:#00C2A8; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:12px; }
+        .student-name { font-size:18px; font-weight:900; color:#0F172A; margin-bottom:2px; }
+        .class-name { font-size:11px; color:#64748B; margin-bottom:12px; }
+        .qr { width:140px; height:140px; margin:0 auto 6px; display:block; }
+        .qr-missing { width:140px; height:140px; margin:0 auto 6px; background:#f1f5f9; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#94A3B8; }
+        .scan-hint { font-size:10px; color:#94A3B8; margin-bottom:12px; }
+        .creds { display:flex; align-items:center; justify-content:center; gap:0; background:#F8FAFC; border-radius:10px; overflow:hidden; }
+        .cred { flex:1; padding:10px 8px; }
+        .divider { width:1px; background:#E2E8F0; height:36px; }
+        .cred-label { font-size:9px; font-weight:700; color:#94A3B8; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:3px; }
+        .cred-value { font-size:16px; font-weight:900; color:#0F172A; font-family:monospace; letter-spacing:0.12em; }
+        @media print {
+          body { background:#fff; padding:10px; }
+          .grid { gap:10px; }
+          .card { border-color:#D1D5DB; }
+        }
+      </style>
+    </head><body>
+      <h1>Student Login Details — ${selectedClass.name}</h1>
+      <div class="subtitle">Class Code: ${selectedClass.class_code} · ${classStudents.length} student${classStudents.length !== 1 ? "s" : ""} · Level Up Learning</div>
+      <div class="grid">${cardHtml}</div>
+      <script>window.onload = function(){ window.print(); }</script>
+    </body></html>`;
+
+    const w = window.open("", "_blank");
+    if (!w) return;
+    w.document.write(html);
+    w.document.close();
   }
 
   async function handleResetPin(student: StudentRow) {
@@ -612,6 +687,43 @@ export default function TeacherDashboardPage() {
                 ))}
               </select>
             )}
+
+            {/* Student Login Details */}
+            {selectedClass && classStudents.length > 0 && (
+              <div className="relative">
+                <button
+                  onClick={() => setShowLoginMenu((v) => !v)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#E6E8EC] bg-white text-[#0F172A] font-bold text-sm hover:border-[#CBD5E1] hover:bg-[#F8FAFC] transition active:scale-[0.98]"
+                >
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.25">
+                    <path d="M16 2H8a2 2 0 00-2 2v16a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2z" />
+                    <path d="M12 18h.01M8 6h8M8 10h8M8 14h4" />
+                  </svg>
+                  Student Login Details
+                  <svg viewBox="0 0 24 24" className="h-3 w-3 text-[#94A3B8]" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </button>
+                {showLoginMenu && (
+                  <div className="absolute right-0 top-full mt-1 w-44 bg-white rounded-xl border border-[#E6E8EC] shadow-lg z-30 py-1">
+                    <button
+                      onClick={printAllLoginCards}
+                      className="w-full text-left px-4 py-2.5 text-sm font-semibold text-[#0F172A] hover:bg-[#F8FAFC] flex items-center gap-2"
+                    >
+                      <svg viewBox="0 0 24 24" className="h-4 w-4 text-[#64748B]" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" />
+                        <rect x="6" y="14" width="12" height="8" />
+                      </svg>
+                      PDF Version
+                    </button>
+                  </div>
+                )}
+                {showLoginMenu && (
+                  <div className="fixed inset-0 z-20" onClick={() => setShowLoginMenu(false)} />
+                )}
+              </div>
+            )}
+
             <button
               onClick={() => router.push("/teacher/classes")}
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#E6E8EC] bg-white text-[#0F172A] font-bold text-sm hover:border-[#CBD5E1] hover:bg-[#F8FAFC] transition active:scale-[0.98]"
@@ -626,6 +738,21 @@ export default function TeacherDashboardPage() {
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14" /></svg>
               New Class
             </button>
+
+            {/* Settings gear */}
+            <button
+              onClick={() => router.push("/teacher/classes")}
+              className="h-9 w-9 rounded-lg border border-[#E6E8EC] text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] hover:border-[#CBD5E1] transition flex items-center justify-center"
+              type="button"
+              aria-label="Class settings"
+              title="Class settings"
+            >
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
+              </svg>
+            </button>
+
             <button
               onClick={async () => {
                 await supabase.auth.signOut();
