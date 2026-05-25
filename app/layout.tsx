@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { GlobalTapFeedback } from "@/components/GlobalTapFeedback";
+import { FullscreenToggle } from "@/components/FullscreenToggle";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -18,6 +19,7 @@ export default function RootLayout({
       <body className="antialiased">
         <ErrorBoundary>
           <GlobalTapFeedback />
+          <FullscreenToggle />
           {children}
         </ErrorBoundary>
       </body>
