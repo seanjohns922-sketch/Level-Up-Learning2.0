@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { setActiveStudentProfile } from "@/lib/studentIdentity";
+import { readProgress } from "@/data/progress";
 import { GraduationCap, Briefcase, KeyRound, User, Lock } from "lucide-react";
 
 type StudentRecord = {
@@ -156,10 +157,23 @@ export default function LoginPage() {
     }
 
     setActiveStudentProfile(student.student_id, student.class_id);
-    const existingProgressKey = `lul:${student.student_id}:student_progress_v1`;
-    const dest = (!localStorage.getItem(existingProgressKey) && student.year_level)
-      ? `/pretest?year=${encodeURIComponent(student.year_level)}`
-      : "/home";
+
+    // Route based on existing progress
+    const progress = readProgress();
+    let dest: string;
+    if (!progress && student.year_level) {
+      // First login — send to pre-test for their assigned year
+      dest = `/pretest?year=${encodeURIComponent(student.year_level)}`;
+    } else if (progress?.status === "ASSIGNED_PROGRAM" && progress.year) {
+      // Has a program assigned — go straight to their week
+      const week = progress.assignedWeek ?? 1;
+      dest = `/program?year=${encodeURIComponent(progress.year)}&week=${week}`;
+    } else if (progress?.status === "PASSED" && progress.year) {
+      // Passed — go to the hub
+      dest = `/number-nexus`;
+    } else {
+      dest = "/home";
+    }
     router.push(dest);
   }
 
