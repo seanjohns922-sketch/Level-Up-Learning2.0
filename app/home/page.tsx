@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { clearScopedProgress, readProgress, StudentProgress } from "@/data/progress";
 import { getProgramForYear } from "@/data/programs";
@@ -14,21 +14,18 @@ import { getHomeBg, getHomeBgFilter, getVignetteStyle } from "@/lib/levelBand";
 
 export default function StudentHomePage() {
   const router = useRouter();
-  const [progress, setProgress] = useState<StudentProgress | null>(null);
-  const [store, setStore] = useState<ProgramProgressStore>({});
-  const [studentName, setStudentName] = useState<string>("");
-
-  useEffect(() => {
-    setProgress(readProgress());
-    setStore(readProgramStore());
+  const [progress] = useState<StudentProgress | null>(() => readProgress());
+  const [store] = useState<ProgramProgressStore>(() => readProgramStore());
+  const [studentName] = useState<string>(() => {
     try {
       const active = localStorage.getItem("lul_active_student_v1");
       if (active) {
         const parsed = JSON.parse(active);
-        if (parsed?.display_name) setStudentName(parsed.display_name);
+        if (parsed?.display_name) return parsed.display_name as string;
       }
     } catch { /* ignore */ }
-  }, []);
+    return "";
+  });
 
   const year = progress?.year ?? "Year 1";
   const isPrep = year === "Prep";
@@ -62,7 +59,18 @@ export default function StudentHomePage() {
   function goLevels() { router.push("/levels"); }
   function goLegends() { router.push("/legends"); }
   function continueWeek() {
-    router.push(`/program?year=${encodeURIComponent(year)}&week=${week}`);
+    const nextLesson = programWeek?.lessons?.[lessonsDone] ?? null;
+    if (nextLesson) {
+      router.push(`/lesson?year=${encodeURIComponent(curriculumYear)}&week=${week}&lessonId=${encodeURIComponent(nextLesson.id)}`);
+      return;
+    }
+
+    if (week === 12) {
+      router.push(`/posttest?year=${encodeURIComponent(curriculumYear)}`);
+      return;
+    }
+
+    router.push(`/session?year=${encodeURIComponent(curriculumYear)}&week=${week}&type=quiz&n=1`);
   }
 
   async function handleLogout() {

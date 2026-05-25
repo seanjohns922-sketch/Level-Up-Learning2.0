@@ -61,6 +61,22 @@ function ProgramPage() {
   const [weekMenuOpen, setWeekMenuOpen] = useState(false);
   const weekMenuRef = useRef<HTMLDivElement | null>(null);
 
+  const legacyProgramMode = sp.get("legacy") === "1";
+
+  useEffect(() => {
+    if (legacyProgramMode) return;
+
+    const progress = readProgress();
+    if (progress?.status === "ASSIGNED_PROGRAM" && progress.year === year) {
+      const nextAssignedWeek = Math.max(1, Math.min(12, weekNum));
+      if ((progress.assignedWeek ?? 1) !== nextAssignedWeek) {
+        updateProgress({ assignedWeek: nextAssignedWeek });
+      }
+    }
+
+    router.replace("/home");
+  }, [legacyProgramMode, router, weekNum, year]);
+
   useEffect(() => {
     if (!weekMenuOpen) return;
     function onDown(e: MouseEvent) {
@@ -243,6 +259,14 @@ function ProgramPage() {
   const xp = lessonsDoneCount * 10 + (progress.quizCompleted ? 20 : 0);
   const totalXp = 50;
   const percent = Math.round((xp / totalXp) * 100);
+
+  if (!legacyProgramMode) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-[#f6f2ec]">
+        <p className="text-gray-400">Opening your adventure…</p>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen relative">
