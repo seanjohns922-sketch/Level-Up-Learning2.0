@@ -24,7 +24,7 @@ export default function NewClassPage() {
   const router = useRouter();
   useAuthGuard();
   const [className, setClassName] = useState("");
-  const [yearLevel, setYearLevel] = useState("");
+  const [yearLevels, setYearLevels] = useState<string[]>([]);
   const [creating, setCreating] = useState(false);
   const [createdCode, setCreatedCode] = useState<string | null>(null);
   const [createdClassId, setCreatedClassId] = useState<string | null>(null);
@@ -37,15 +37,11 @@ export default function NewClassPage() {
   const [addedStudents, setAddedStudents] = useState<AddedStudent[]>([]);
   const [studentError, setStudentError] = useState<string | null>(null);
 
-  const yearLevelOptions = [
-    { value: "Prep", label: "Prep" },
-    { value: "Year 1", label: "Year 1" },
-    { value: "Year 2", label: "Year 2" },
-    { value: "Year 3", label: "Year 3" },
-    { value: "Year 4", label: "Year 4" },
-    { value: "Year 5", label: "Year 5" },
-    { value: "Year 6", label: "Year 6" },
-  ];
+  const yearLevelOptions = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"];
+
+  function toggleYear(yr: string) {
+    setYearLevels((prev) => prev.includes(yr) ? prev.filter((y) => y !== yr) : [...prev, yr]);
+  }
 
   function generateLocalClassCode(length = 5) {
     const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -81,12 +77,12 @@ export default function NewClassPage() {
         code = rpcCode;
       }
 
-      const insertPayload: Record<string, string> = {
+      const insertPayload: Record<string, unknown> = {
         name: className.trim(),
         class_code: code,
         teacher_id: user.id,
       };
-      if (yearLevel) insertPayload.year_level = yearLevel;
+      if (yearLevels.length > 0) insertPayload.year_levels = yearLevels;
 
       let { data: insertedClass, error: classErr } = await supabase
         .from("classes")
@@ -217,21 +213,33 @@ export default function NewClassPage() {
               />
             </label>
 
-            <label className="grid gap-1">
-              <span className="text-sm font-bold text-gray-600">Year Level <span className="font-normal text-gray-400">(optional)</span></span>
-              <select
-                value={yearLevel}
-                onChange={(e) => setYearLevel(e.target.value)}
-                className="px-4 py-3 rounded-2xl border border-gray-200 bg-white"
-              >
-                <option value="">— select —</option>
-                {yearLevelOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
+            <div className="grid gap-2">
+              <span className="text-sm font-bold text-gray-600">
+                Year Levels <span className="font-normal text-gray-400">(select all that apply)</span>
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {yearLevelOptions.map((yr) => (
+                  <button
+                    key={yr}
+                    type="button"
+                    onClick={() => toggleYear(yr)}
+                    className={[
+                      "px-3 py-1.5 rounded-full text-sm font-bold border transition",
+                      yearLevels.includes(yr)
+                        ? "bg-emerald-600 text-white border-emerald-600"
+                        : "bg-white text-gray-500 border-gray-200 hover:border-emerald-300 hover:text-emerald-700",
+                    ].join(" ")}
+                  >
+                    {yr}
+                  </button>
                 ))}
-              </select>
-            </label>
+              </div>
+              {yearLevels.length > 0 && (
+                <p className="text-xs text-emerald-600 font-semibold">
+                  Selected: {yearLevels.join(", ")}
+                </p>
+              )}
+            </div>
 
             {error && <p className="text-sm text-red-600 font-bold">{error}</p>}
 
@@ -320,7 +328,7 @@ export default function NewClassPage() {
                   setCreatedCode(null);
                   setCreatedClassId(null);
                   setClassName("");
-                  setYearLevel("");
+                  setYearLevels([]);
                   setQrDataUrl(null);
                   setAddedStudents([]);
                   setNewStudentName("");

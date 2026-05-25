@@ -12,6 +12,7 @@ type ClassRow = {
   class_code: string;
   name: string;
   year_level: string;
+  year_levels?: string[] | null;
   created_at: string;
   archived_at?: string | null;
 };
@@ -85,10 +86,13 @@ export default function TeacherClassesPage() {
   const [savingEdit, setSavingEdit] = useState(false);
   const [archivingStudentId, setArchivingStudentId] = useState<string | null>(null);
   const [showArchivedForClass, setShowArchivedForClass] = useState<Record<string, boolean>>({});
-  // Class archive/delete state
+  // Class archive/delete/edit state
   const [archivingClassId, setArchivingClassId] = useState<string | null>(null);
   const [deletingClassId, setDeletingClassId] = useState<string | null>(null);
   const [showArchivedClasses, setShowArchivedClasses] = useState(false);
+  const [editingClassId, setEditingClassId] = useState<string | null>(null);
+  const [editClassForm, setEditClassForm] = useState<{ name: string; year_levels: string[] }>({ name: "", year_levels: [] });
+  const [savingClassEdit, setSavingClassEdit] = useState(false);
 
   const loadClasses = useCallback(async (teacherId: string) => {
     const { data: cls } = await supabase
@@ -365,6 +369,40 @@ export default function TeacherClassesPage() {
     setStudents((prev) => prev.filter((s) => s.class_id !== cls.id));
   }
 
+  function startClassEdit(cls: ClassRow) {
+    setEditingClassId(cls.id);
+    setEditClassForm({
+      name: cls.name,
+      year_levels: cls.year_levels ?? (cls.year_level ? [cls.year_level] : []),
+    });
+  }
+
+  function toggleClassYear(yr: string) {
+    setEditClassForm((f) => ({
+      ...f,
+      year_levels: f.year_levels.includes(yr)
+        ? f.year_levels.filter((y) => y !== yr)
+        : [...f.year_levels, yr],
+    }));
+  }
+
+  async function saveClassEdit(classId: string) {
+    if (!editClassForm.name.trim()) return;
+    setSavingClassEdit(true);
+    const { error } = await supabase
+      .from("classes")
+      .update({ name: editClassForm.name.trim(), year_levels: editClassForm.year_levels.length ? editClassForm.year_levels : null } as any)
+      .eq("id", classId);
+    setSavingClassEdit(false);
+    if (error) { alert(error.message); return; }
+    setClasses((prev) =>
+      prev.map((c) =>
+        c.id === classId ? { ...c, name: editClassForm.name.trim(), year_levels: editClassForm.year_levels.length ? editClassForm.year_levels : null } : c
+      )
+    );
+    setEditingClassId(null);
+  }
+
   function copyText(value: string) {
     navigator.clipboard.writeText(value);
   }
@@ -421,53 +459,121 @@ export default function TeacherClassesPage() {
                     isClassArchived ? "opacity-60" : "",
                   ].join(" ")}
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h2 className="text-xl font-bold text-gray-900">{cls.name}</h2>
-                        {isClassArchived && (
-                          <span className="rounded-full px-2 py-0.5 text-[11px] font-black bg-gray-200 text-gray-500">
-                            Archived
-                          </span>
-                        )}
+                  {/* ── Class header / edit form ── */}
+                  {editingClassId === cls.id ? (
+                    <div className="grid gap-3 p-3 bg-blue-50 rounded-xl border border-blue-100 mb-3">
+                      <div className="text-xs font-black uppercase tracking-wide text-blue-700">Edit Class</div>
+                      <div>
+                        <label className="text-xs font-bold text-gray-500 mb-1 block">Class Name *</label>
+                        <input
+                          value={editClassForm.name}
+                          onChange={(e) => setEditClassForm((f) => ({ ...f, name: e.target.value }))}
+                          className="w-full rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-blue-300"
+                          placeholder="e.g. 3/4 SJ"
+                        />
                       </div>
-                      <p className="text-sm text-gray-500 mt-1">
-                        Code: <span className="font-mono font-bold tracking-wider">{cls.class_code}</span>
-                        {cls.year_level ? ` · Year ${cls.year_level}` : ""}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-sm font-semibold text-gray-500 mr-1">
-                        {activeStuds.length} student{activeStuds.length !== 1 ? "s" : ""}
-                      </span>
-                      {isClassArchived ? (
+                      <div>
+                        <label className="text-xs font-bold text-gray-500 mb-1.5 block">Year Levels</label>
+                        <div className="flex flex-wrap gap-2">
+                          {YEAR_LEVELS.map((yr) => (
+                            <button
+                              key={yr}
+                              type="button"
+                              onClick={() => toggleClassYear(yr)}
+                              className={[
+                                "px-3 py-1 rounded-full text-xs font-bold border transition",
+                                editClassForm.year_levels.includes(yr)
+                                  ? "bg-blue-600 text-white border-blue-600"
+                                  : "bg-white text-gray-500 border-gray-200 hover:border-blue-300 hover:text-blue-700",
+                              ].join(" ")}
+                            >
+                              {yr}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
                         <button
                           type="button"
-                          onClick={() => unarchiveClass(cls)}
-                          className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700 hover:bg-emerald-100"
+                          onClick={() => saveClassEdit(cls.id)}
+                          disabled={savingClassEdit || !editClassForm.name.trim()}
+                          className="rounded-xl bg-blue-600 px-4 py-2 text-xs font-black text-white disabled:opacity-50"
                         >
-                          Restore
+                          {savingClassEdit ? "Saving…" : "Save"}
                         </button>
-                      ) : (
                         <button
                           type="button"
-                          onClick={() => archiveClass(cls)}
-                          disabled={archivingClassId === cls.id}
-                          className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-bold text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                          onClick={() => setEditingClassId(null)}
+                          className="rounded-xl bg-gray-100 px-4 py-2 text-xs font-bold text-gray-600 hover:bg-gray-200"
                         >
-                          {archivingClassId === cls.id ? "Archiving…" : "Archive"}
+                          Cancel
                         </button>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => deleteClass(cls)}
-                        disabled={deletingClassId === cls.id}
-                        className="rounded-xl border border-red-100 bg-red-50 px-3 py-1.5 text-xs font-bold text-red-600 hover:bg-red-100 disabled:opacity-50"
-                      >
-                        {deletingClassId === cls.id ? "Deleting…" : "Delete"}
-                      </button>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h2 className="text-xl font-bold text-gray-900">{cls.name}</h2>
+                          {isClassArchived && (
+                            <span className="rounded-full px-2 py-0.5 text-[11px] font-black bg-gray-200 text-gray-500">
+                              Archived
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 flex-wrap mt-1">
+                          <p className="text-sm text-gray-500">
+                            Code: <span className="font-mono font-bold tracking-wider">{cls.class_code}</span>
+                          </p>
+                          {(cls.year_levels?.length ? cls.year_levels : cls.year_level ? [cls.year_level] : []).map((yr) => (
+                            <span key={yr} className="rounded-full px-2 py-0.5 text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                              {yr}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-sm font-semibold text-gray-500 mr-1">
+                          {activeStuds.length} student{activeStuds.length !== 1 ? "s" : ""}
+                        </span>
+                        {!isClassArchived && (
+                          <button
+                            type="button"
+                            onClick={() => startClassEdit(cls)}
+                            className="rounded-xl border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700 hover:bg-blue-100"
+                          >
+                            Edit
+                          </button>
+                        )}
+                        {isClassArchived ? (
+                          <button
+                            type="button"
+                            onClick={() => unarchiveClass(cls)}
+                            className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700 hover:bg-emerald-100"
+                          >
+                            Restore
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => archiveClass(cls)}
+                            disabled={archivingClassId === cls.id}
+                            className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-bold text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                          >
+                            {archivingClassId === cls.id ? "Archiving…" : "Archive"}
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => deleteClass(cls)}
+                          disabled={deletingClassId === cls.id}
+                          className="rounded-xl border border-red-100 bg-red-50 px-3 py-1.5 text-xs font-bold text-red-600 hover:bg-red-100 disabled:opacity-50"
+                        >
+                          {deletingClassId === cls.id ? "Deleting…" : "Delete"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
                   {!isClassArchived && (
                     <>
