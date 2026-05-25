@@ -44,7 +44,7 @@ export default function TowerMapPage() {
       {/* Header */}
       <div className="relative z-30 flex items-center justify-between px-4 pt-3 pb-1">
         <button
-          onClick={() => router.push("/home")}
+          onClick={() => router.push("/levels")}
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-white/80 text-xs font-bold transition-all active:scale-95 hover:text-white"
           style={{
             background: "rgba(20,18,14,0.7)",
@@ -149,7 +149,7 @@ export default function TowerMapPage() {
           style={{ top: TOWER.top, left: TOWER.left, transform: "translate(-50%,-50%)" }}
         >
           <button
-            onClick={() => router.push("/home")}
+            onClick={() => router.push("/levels")}
             className="group flex flex-col items-center cursor-pointer towerBob"
             type="button"
           >

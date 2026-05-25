@@ -56,6 +56,9 @@ export default function AssessmentShell({
           </button>
 
           <div className="flex items-center gap-2">
+            <span className="px-3 py-1 rounded-full text-xs font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30">
+              {year}
+            </span>
             <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
               {testType}
             </span>

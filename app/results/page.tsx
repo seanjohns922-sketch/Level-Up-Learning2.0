@@ -298,6 +298,7 @@ function ResultsPage() {
         year,
         scorePercent: passedByProgram ? Math.max(prev?.scorePercent ?? 0, POSTTEST_PASS_THRESHOLD) : scorePercent,
         status: "PASSED",
+        placementComplete: isPostTest || passedByProgram,
         assignedWeek: prev?.assignedWeek,
         assignedWeeksHistory: prev?.assignedWeeksHistory,
         requiredWeeks: [],
@@ -313,6 +314,7 @@ function ResultsPage() {
         year,
         scorePercent,
         status: "ASSIGNED_PROGRAM",
+        placementComplete: true,
         assignedWeek,
         requiredWeeks: isPostTest ? prev?.requiredWeeks ?? [] : requiredWeeks,
         optionalWeeks: isPostTest ? prev?.optionalWeeks ?? ALL_PROGRAM_WEEKS : optionalWeeks,
@@ -327,33 +329,27 @@ function ResultsPage() {
         if (isPostTest || passedByProgram) return;
         const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY) : null;
         if (!studentId) return;
-        const { error } = await supabase
-          .from("progress")
-          .upsert(
-            {
-              student_id: studentId,
-              year,
-              pretest_score: scorePercent,
-              status: next.status === "PASSED" ? "PASSED" : "ASSIGNED_PROGRAM",
-              week: next.assignedWeek ?? null,
-            },
-            { onConflict: "student_id,year" }
-          );
+        const { error } = await supabase.rpc("save_pretest_progress", {
+          p_student_id: studentId,
+          p_year: year,
+          p_score: scorePercent,
+          p_status: next.status === "PASSED" ? "PASSED" : "ASSIGNED_PROGRAM",
+          p_week: next.assignedWeek ?? null,
+        });
         if (error) console.warn("[Results] DB pretest save error:", error);
       } catch (e) {
         console.warn("[Results] DB pretest save failed:", e);
-        }
+      }
     })();
   }, [passed, year, scorePercent, isPostTest, passedByProgram, storedPosttestProfile, storedPretestProfile, unlockTargets, requiredWeeks, optionalWeeks]);
 
-  function goHome() { router.push("/number-nexus"); }
+  function goHome() { router.push("/levels"); }
   const assignedStartWeek = isPostTest
     ? getAssignedReviewWeek(storedPosttestProfile) ?? 1
     : getAssignedReviewWeek(storedPretestProfile) ?? 1;
 
   function goProgram() {
-    const qs = new URLSearchParams({ year, week: String(assignedStartWeek) }).toString();
-    router.push(`/program?${qs}`);
+    router.push("/levels");
   }
   function goNextPretest() {
     if (!nextYear) {
@@ -382,10 +378,10 @@ function ResultsPage() {
   function goAssignedWeek() {
     const week = assignedReviewWeek ?? 1;
     const qs = new URLSearchParams({ year, week: String(week) }).toString();
-    router.push(`/program?${qs}`);
+    router.push(`/program?${qs}&legacy=1`);
   }
   function goContinue() {
-    router.push("/number-nexus");
+    router.push("/levels");
   }
 
   return (
@@ -428,7 +424,7 @@ function ResultsPage() {
             </h1>
             <p className="text-sm text-muted-foreground mb-2">{msg.sub}</p>
             <div className="text-xs font-semibold text-muted-foreground/60 uppercase tracking-wider">
-              {isPostTest ? "Post-Test" : source === "program_complete" ? "Program Complete" : "Pre-Test"}
+              {year} • {isPostTest ? "Post-Test" : source === "program_complete" ? "Program" : "Pre-Test"}
             </div>
 
             <ScoreRing percent={displayPercent} passed={passed} />
@@ -464,11 +460,13 @@ function ResultsPage() {
                 </div>
                 <p className="text-xs text-muted-foreground">
                   {isPostTest
-                    ? "You passed the mastery test — your Legend is unlocked and the next level is ready!"
+                    ? year === "Prep"
+                      ? "You passed the Ground Level mastery test — your Legend is unlocked and Year 1 is ready next!"
+                      : "You passed the post-test — your Legend is ready to collect!"
                     : passedByProgram
                     ? "You completed the 12-week program — your Legend awaits!"
                     : nextYear
-                    ? "You passed this skill check — keep going, your next level is ready!"
+                    ? `You passed this pre-test. Next stop: ${nextYear}.`
                     : "You passed the final pre-test — your Legends are ready to collect!"}
                 </p>
               </div>

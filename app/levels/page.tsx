@@ -76,9 +76,7 @@ export default function LevelsPage() {
   function continueProgram() {
     if (!progress) return;
     if (progress.status === "ASSIGNED_PROGRAM") {
-      const year = encodeURIComponent(progress.year);
-      const week = savedWeek ?? progress.assignedWeek ?? 1;
-      router.push(`/program?year=${year}&week=${week}`);
+      router.push("/tower-map");
       return;
     }
     router.push("/legends");

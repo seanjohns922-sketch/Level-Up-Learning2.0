@@ -4,6 +4,7 @@ export type StudentProgress = {
   year: string; // "Year 3"
   scorePercent: number;
   status: "PASSED" | "ASSIGNED_PROGRAM";
+  placementComplete?: boolean;
   assignedWeek?: number; // 1..12 (only for ASSIGNED_PROGRAM)
   assignedWeeksHistory?: number[];
   requiredWeeks?: number[];

@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ACTIVE_STUDENT_KEY, readProgress } from "@/data/progress";
+import { getPlacementEntryYear, hasActiveStudentSeenIntro } from "@/lib/studentIdentity";
 import { supabase } from "@/lib/supabase";
 
 export default function Page() {
@@ -16,7 +17,14 @@ export default function Page() {
         const activeStudentId = window.localStorage.getItem(ACTIVE_STUDENT_KEY)?.trim();
         const progress = readProgress();
         if (activeStudentId || progress) {
-          if (!cancelled) router.replace("/home");
+          if (cancelled) return;
+          if (progress?.placementComplete === true) {
+            router.replace("/levels");
+          } else if (hasActiveStudentSeenIntro(activeStudentId)) {
+            router.replace(`/pretest?year=${encodeURIComponent(progress?.year ?? getPlacementEntryYear())}`);
+          } else {
+            router.replace("/home");
+          }
           return;
         }
       }

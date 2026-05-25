@@ -74,7 +74,7 @@ function ProgramPage() {
       }
     }
 
-    router.replace("/home");
+    router.replace("/number-nexus");
   }, [legacyProgramMode, router, weekNum, year]);
 
   useEffect(() => {

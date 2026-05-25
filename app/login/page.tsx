@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { setActiveStudentProfile } from "@/lib/studentIdentity";
+import { hasActiveStudentSeenIntro, setActiveStudentProfile } from "@/lib/studentIdentity";
 import { readProgress } from "@/data/progress";
 import { GraduationCap, Briefcase, KeyRound, User, Lock } from "lucide-react";
 
@@ -156,21 +156,22 @@ export default function LoginPage() {
       return;
     }
 
-    setActiveStudentProfile(student.student_id, student.class_id);
+    setActiveStudentProfile(student.student_id, student.class_id, {
+      displayName,
+      yearLevel: student.year_level ?? "Year 1",
+    });
 
-    // Route based on existing progress (scoped to this student)
     const progress = readProgress();
+    const placementComplete = progress?.placementComplete === true;
+    const introSeen = hasActiveStudentSeenIntro(student.student_id);
 
     let dest: string;
-    if (progress?.status === "ASSIGNED_PROGRAM" || progress?.status === "PASSED") {
-      // Has completed pre-test — follow the proper flow: Levels → Tower → Realm → World Map
+    if (placementComplete && (progress?.status === "ASSIGNED_PROGRAM" || progress?.status === "PASSED")) {
       dest = `/levels`;
-    } else if (student.year_level) {
-      // No progress yet but teacher assigned a starting year — send to pre-test
-      dest = `/pretest?year=${encodeURIComponent(student.year_level)}`;
+    } else if (introSeen) {
+      dest = `/pretest?year=${encodeURIComponent(progress?.year ?? student.year_level ?? "Year 1")}`;
     } else {
-      // No progress, no assigned year — main hub
-      dest = `/number-nexus`;
+      dest = `/home`;
     }
     router.push(dest);
   }

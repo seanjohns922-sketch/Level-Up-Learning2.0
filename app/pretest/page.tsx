@@ -366,6 +366,7 @@ function PretestPage() {
       }),
       year,
       scorePercent: profile.percentage,
+      placementComplete: false,
       lastPreTestPercent: profile.percentage,
       lastPreTestProfile: profile,
       unlockedLegends: prev?.unlockedLegends ?? [],
@@ -405,7 +406,7 @@ function PretestPage() {
             We couldn&apos;t find a pre-test for {year}.
           </p>
           <button
-            onClick={() => router.push("/levels")}
+            onClick={() => router.push("/home")}
             className="px-5 py-3 rounded-2xl font-bold bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:from-teal-400 hover:to-emerald-400 transition"
           >
             Back to Home
@@ -544,7 +545,7 @@ function PretestPage() {
       onBack={prevQuestion}
       onNext={nextQuestion}
       onSubmit={finish}
-      onExit={() => router.push("/levels")}
+      onExit={() => router.push(readProgress()?.placementComplete ? "/levels" : "/home")}
     />
   );
 }

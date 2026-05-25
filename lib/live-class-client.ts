@@ -221,41 +221,35 @@ export async function trackLiveLearningEvent(input: LiveLearningEventInput) {
   const timestamp = input.timestamp ?? new Date().toISOString();
 
   try {
-    const { data: existing, error: existingError } = await supabase
-      .from("live_student_activity")
-      .select("*")
-      .eq("student_id", studentId)
-      .eq("class_id", classId)
-      .maybeSingle();
+    // Use SECURITY DEFINER RPCs — students have no auth session so direct table access is blocked by RLS
+    const { data: existingJson, error: existingError } = await supabase
+      .rpc("get_live_student_activity", { p_student_id: studentId, p_class_id: classId });
 
     if (existingError) {
       console.warn("[LiveClass] Could not read existing activity row", existingError);
     }
 
+    const existing = existingJson ?? null;
     const nextRow = buildNextActivityRow(existing, input, studentId, classId, timestamp);
 
-    const { error: upsertError } = await supabase
-      .from("live_student_activity")
-      .upsert(nextRow, { onConflict: "class_id,student_id" });
+    const { error: upsertError } = await supabase.rpc("upsert_live_student_activity", {
+      p_student_id: studentId,
+      p_class_id: classId,
+      p_data: nextRow,
+    });
 
     if (upsertError) {
       console.warn("[LiveClass] Activity upsert failed", upsertError);
     }
 
-    const payload = {
-      ...input,
-      studentId,
-      classId,
-      timestamp,
-    };
+    const payload = { ...input, studentId, classId, timestamp };
 
-    const { error: eventError } = await supabase.from("live_activity_events").insert({
-      session_id: existing?.session_id ?? null,
-      student_id: studentId,
-      class_id: classId,
-      event_type: input.eventType,
-      payload,
-      created_at: timestamp,
+    const { error: eventError } = await supabase.rpc("insert_live_activity_event", {
+      p_student_id: studentId,
+      p_class_id: classId,
+      p_session_id: existing?.session_id ?? null,
+      p_event_type: input.eventType,
+      p_payload: payload,
     });
 
     if (eventError) {
