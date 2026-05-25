@@ -477,7 +477,7 @@ export default function TeacherClassesPage() {
                                       />
                                     </div>
                                     <div>
-                                      <label className="text-xs font-bold text-gray-500 mb-1 block">Year Level</label>
+                                      <label className="text-xs font-bold text-gray-500 mb-1 block">Working Level</label>
                                       <select
                                         value={editForm.year_level}
                                         onChange={(e) => setEditForm((f) => ({ ...f, year_level: e.target.value }))}
@@ -488,6 +488,7 @@ export default function TeacherClassesPage() {
                                           <option key={yr} value={yr}>{yr}</option>
                                         ))}
                                       </select>
+                                      <p className="text-[10px] text-gray-400 mt-1">Where this student works — can differ from class year</p>
                                     </div>
                                   </div>
                                   <div>
@@ -534,7 +535,7 @@ export default function TeacherClassesPage() {
                                     <span className="font-semibold text-gray-700">{s.display_name}</span>
                                     {s.year_level && (
                                       <span className="rounded-full px-2 py-0.5 text-[11px] font-black bg-indigo-50 text-indigo-600">
-                                        {s.year_level}
+                                        Working: {s.year_level}
                                       </span>
                                     )}
                                     {isArchived && (
@@ -641,10 +642,13 @@ export default function TeacherClassesPage() {
                       )}
 
                       <div className="mt-4 rounded-2xl border border-dashed border-emerald-200 bg-emerald-50/60 p-4">
-                        <div className="text-xs font-black uppercase tracking-wide text-emerald-700">
-                          Add Student
+                        <div>
+                          <div className="text-xs font-black uppercase tracking-wide text-emerald-700">Add Student</div>
+                          <p className="text-[11px] text-emerald-600/70 mt-0.5">
+                            Working level is where this student starts — it can differ from the class year.
+                          </p>
                         </div>
-                        <div className="mt-3 grid gap-2 md:grid-cols-[1fr_130px_120px_auto]">
+                        <div className="mt-3 grid gap-2 md:grid-cols-[1fr_160px_120px_auto]">
                           <input
                             value={newStudentNames[cls.id] ?? ""}
                             onChange={(event) =>
@@ -660,7 +664,7 @@ export default function TeacherClassesPage() {
                             }
                             className="rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
                           >
-                            <option value="">Year level</option>
+                            <option value="">Working level…</option>
                             {YEAR_LEVELS.map((yr) => (
                               <option key={yr} value={yr}>{yr}</option>
                             ))}
@@ -686,7 +690,6 @@ export default function TeacherClassesPage() {
                             {creatingStudentForClass === cls.id ? "Adding…" : "Add"}
                           </button>
                         </div>
-                        <p className="mt-1.5 text-[11px] text-emerald-600/70">Year level sets the student's starting pre-test when they first log in.</p>
                         {lastCreatedLogin?.classId === cls.id ? (
                           <div className="mt-3 rounded-xl bg-white px-3 py-2 text-xs font-semibold text-gray-600">
                             Login card ready for {lastCreatedLogin.name}: PIN{" "}
