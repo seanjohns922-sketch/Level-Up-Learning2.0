@@ -745,11 +745,11 @@ function digitCells(value: number, width: number) {
   return String(value).padStart(width, " ").split("");
 }
 
-function normalizeNumberInput(value: string) {
-  return value.replace(/,/g, "").replace(/\s+/g, "");
+function normalizeNumberInput(value: string | number) {
+  return String(value).replace(/,/g, "").replace(/\s+/g, "");
 }
 
-function numericInputsMatch(actual: string, expected: string) {
+function numericInputsMatch(actual: string | number, expected: string | number) {
   const normalizedActual = normalizeDecimalEquivalent(normalizeNumberInput(actual));
   const normalizedExpected = normalizeDecimalEquivalent(normalizeNumberInput(expected));
   if (normalizedActual === normalizedExpected) return true;
@@ -2624,8 +2624,12 @@ export default function TypedResponseActivity({
         ? rawValue
         : normalizeDecimalEquivalent(rawValue);
     const expected = isOrderingResponse ? rawExpected : normalizeDecimalEquivalent(rawExpected);
+    const matchesAcceptedNumericAnswer = acceptedAnswerList.some((answerOption) =>
+      numericInputsMatch(typed, answerOption)
+    );
     const matchesAcceptedAnswer =
       value === expected ||
+      matchesAcceptedNumericAnswer ||
       isEquivalentNumberSequence(typed, questionData.answer) ||
       acceptedAnswerList.slice(1).some((answerOption) => {
         const normalizedOption = normalizeDecimalEquivalent(normalize(answerOption));
