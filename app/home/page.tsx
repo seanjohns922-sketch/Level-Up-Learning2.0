@@ -63,13 +63,16 @@ export default function StudentHomePage() {
         </p>
 
         <div className="rounded-[28px] border border-dashed border-teal-300/90 bg-teal-50/70 p-5 md:p-6 mb-8">
-          <div className="aspect-video w-full rounded-[22px] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-slate-700/60 flex items-center justify-center text-center px-6">
-            <div>
-              <div className="text-teal-300 text-xs font-bold uppercase tracking-[0.28em] mb-3">Intro Video Placeholder</div>
-              <p className="text-white/80 text-sm md:text-base max-w-xl">
-                This space is ready for the Tower intro video. For now, students can begin their placement journey here.
-              </p>
-            </div>
+          <div className="aspect-video w-full overflow-hidden rounded-[22px] border border-slate-700/60 bg-slate-950 shadow-[0_12px_28px_rgba(2,23,22,0.18)]">
+            <video
+              className="h-full w-full object-cover"
+              controls
+              playsInline
+              preload="metadata"
+            >
+              <source src="/videos/tower-intro.mp4" type="video/mp4" />
+              Your browser does not support the intro video.
+            </video>
           </div>
         </div>
 
