@@ -698,7 +698,7 @@ export default function TeacherClassesPage() {
         )}
 
         <button
-          onClick={() => router.push("/login")}
+          onClick={() => router.push("/teacher/dashboard")}
           className="mt-8 text-sm text-gray-400 hover:text-gray-600"
         >
           ← Back
