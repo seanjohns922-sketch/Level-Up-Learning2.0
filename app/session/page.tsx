@@ -6489,20 +6489,18 @@ function SessionPage() {
     const numericWeek = Number(week);
     if (!isWeekPlayable(store, year, numericWeek, progress.requiredWeeks, progress.optionalWeeks)) {
       const fallbackWeek = getRecommendedAssignedWeek(store, year, progress.assignedWeek, progress.requiredWeeks);
-      router.replace(`/program?year=${encodeURIComponent(year)}&week=${fallbackWeek}`);
+      router.replace(`/home`);
       return;
     }
 
     const weekProgress = getPersistedWeekProgress(store, year, numericWeek);
     if (!DEMO_MODE && type === "quiz" && weekProgress.lessonsCompleted.filter(Boolean).length < 3) {
-      router.replace(`/program?year=${encodeURIComponent(year)}&week=${week}`);
+      router.replace(`/home`);
     }
   }, [router, type, week, year]);
 
   function backToWeek() {
-    router.push(
-      `/program?year=${encodeURIComponent(year)}&week=${encodeURIComponent(week)}`
-    );
+    router.push(`/home`);
   }
 
   // ---------------------------
@@ -8235,12 +8233,7 @@ function SessionPage() {
                   {finalScore >= Math.ceil(quizQuestions.length * ((quizConfig?.passPercent ?? 80) / 100)) ? (
                     <button
                       onClick={() =>
-                        router.push(
-                          `/program?year=${encodeURIComponent(year)}&week=${Math.min(
-                            12,
-                            Number(week) + 1
-                          )}`
-                        )
+                        router.push(`/home`)
                       }
                       className="px-5 py-3 rounded-2xl font-bold transition bg-trust-blue text-white hover:opacity-90"
                     >

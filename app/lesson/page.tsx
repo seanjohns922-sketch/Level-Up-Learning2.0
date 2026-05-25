@@ -144,8 +144,7 @@ function LessonPage() {
     const store = readProgramStore();
     const weekPlayable = isWeekPlayable(store, year, week, p.requiredWeeks, p.optionalWeeks);
     if (!weekPlayable) {
-      const fallbackWeek = getRecommendedAssignedWeek(store, year, p.assignedWeek, p.requiredWeeks);
-      router.replace(`/program?year=${encodeURIComponent(year)}&week=${fallbackWeek}`);
+      router.replace(`/home`);
       return;
     }
 
@@ -194,7 +193,7 @@ function LessonPage() {
         updateProgress({ assignedWeek: nextAssignedWeek });
       }
     }
-    router.push(`/program?year=${encodeURIComponent(year)}&week=${week}`);
+    router.push(`/home`);
   }
 
   function markLessonDone() {
@@ -202,7 +201,7 @@ function LessonPage() {
   }
 
   function goBackToProgram() {
-    router.push(`/program?year=${encodeURIComponent(year)}&week=${week}`);
+    router.push(`/home`);
   }
 
   const showWeek12Lesson3Summary = week === 12 && lessonNumber === 3;
@@ -416,7 +415,7 @@ function LessonPage() {
         <div className="mb-4">
           <button
             onClick={() =>
-              router.push(`/program?year=${encodeURIComponent(year)}&week=${week}`)
+              router.push(`/home`)
             }
             className="text-sm font-mono font-bold uppercase tracking-[0.18em] text-teal-700 hover:text-teal-600 transition-colors"
           >
@@ -462,7 +461,7 @@ function LessonPage() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => router.push(`/program?year=${encodeURIComponent(year)}&week=${week}`)}
+                      onClick={() => router.push(`/home`)}
                       className="rounded-[22px] border-2 border-cyan-200 bg-white px-6 py-4 text-lg font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
                     >
                       Back to Week
