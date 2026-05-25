@@ -72,7 +72,10 @@ export default function LoginPage() {
   const [className, setClassName] = useState("");
   const [createdCode, setCreatedCode] = useState<string | null>(null);
 
-  const [studentCode, setStudentCode] = useState("");
+  const [studentCode, setStudentCode] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return new URLSearchParams(window.location.search).get("code") ?? "";
+  });
   const [studentName, setStudentName] = useState("");
   const [studentPin, setStudentPin] = useState("");
   const [studentError, setStudentError] = useState<string | null>(null);
@@ -286,13 +289,13 @@ export default function LoginPage() {
               </InputField>
             </label>
             <label className="grid gap-1.5">
-              <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Your Name</span>
+              <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Username</span>
               <InputField icon={<User size={15} />}>
-                <input value={studentName} onChange={(e) => setStudentName(e.target.value)} placeholder="Enter your first name" className={inputCls} />
+                <input value={studentName} onChange={(e) => setStudentName(e.target.value)} placeholder="Enter your username" className={inputCls} />
               </InputField>
             </label>
             <label className="grid gap-1.5">
-              <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">4-Digit PIN</span>
+              <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Password</span>
               <InputField icon={<Lock size={15} />}>
                 <input
                   value={studentPin}

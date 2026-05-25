@@ -293,16 +293,9 @@ export default function TeacherDashboardPage() {
     setShowLoginMenu(false);
 
     const QRCode = await import("qrcode");
-    const cards = await Promise.all(
-      classStudents.map(async (s) => {
-        let qrSrc = "";
-        if (s.qr_token) {
-          const url = `${window.location.origin}/student?token=${s.qr_token}`;
-          qrSrc = await QRCode.toDataURL(url, { width: 220, margin: 1 });
-        }
-        return { ...s, qrSrc };
-      })
-    );
+    const classQrUrl = `${window.location.origin}/login?code=${selectedClass.class_code}`;
+    const classQrSrc = await QRCode.toDataURL(classQrUrl, { width: 220, margin: 1 });
+    const cards = classStudents.map((s) => ({ ...s, qrSrc: classQrSrc }));
 
     const cardHtml = cards
       .map(
@@ -310,13 +303,13 @@ export default function TeacherDashboardPage() {
       <div class="card">
         <div class="brand">Level Up Learning</div>
         <div class="student-name">${s.display_name}</div>
-        <div class="class-name">${selectedClass.name}</div>
-        ${s.qrSrc ? `<img class="qr" src="${s.qrSrc}" alt="QR Code" />` : '<div class="qr-missing">No QR code</div>'}
-        <div class="scan-hint">Scan to log in instantly</div>
+        <div class="class-name">${selectedClass.name} · Code: <strong>${selectedClass.class_code}</strong></div>
+        <img class="qr" src="${s.qrSrc}" alt="QR Code" />
+        <div class="scan-hint">Scan to open login page</div>
         <div class="creds">
-          <div class="cred"><div class="cred-label">Class Code</div><div class="cred-value">${selectedClass.class_code}</div></div>
+          <div class="cred"><div class="cred-label">Username</div><div class="cred-value">${s.display_name}</div></div>
           <div class="divider"></div>
-          <div class="cred"><div class="cred-label">PIN</div><div class="cred-value">${s.pin ?? "—"}</div></div>
+          <div class="cred"><div class="cred-label">Password</div><div class="cred-value">${s.pin ?? "—"}</div></div>
         </div>
       </div>`
       )
