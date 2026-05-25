@@ -134,35 +134,15 @@ export default function LoginPage() {
     const name = displayName;
     const pin = studentPin.trim();
 
-    console.log("[LoginPage] raw class code:", studentCode);
-    console.log("[LoginPage] normalised class code:", normalizedCode);
-    console.log("[LoginPage] Supabase query target:", "public.classes.class_code via find_class_by_code RPC");
-
-    if (!normalizedCode || !name || pin.length !== 4) { setStudentError("Please enter class code, name, and 4-digit PIN."); return; }
+    if (!normalizedCode || !name || pin.length !== 4) { setStudentError("Please enter class code, username, and password."); return; }
 
     const { data: lookupRows, error: classLookupError } = await supabase
       .rpc("find_class_by_code", { input_code: normalizedCode });
     const cls = Array.isArray(lookupRows) ? lookupRows[0] ?? null : null;
 
-    console.log("[LoginPage] Supabase query result:", cls);
-    console.log("[LoginPage] Supabase error:", classLookupError);
-
     if (classLookupError || !cls) { setStudentError("Class code not found."); return; }
 
-    const syntheticEmail = `${name.toLowerCase().replace(/[^a-z0-9]/g, "")}.${normalizedCode.toLowerCase()}@leveluplearning.app`;
-    const paddedPin = pin + "xx";
-
-    // Try sign-in first — avoids "already registered" errors on repeat logins
-    const { data: signInData } = await supabase.auth.signInWithPassword({ email: syntheticEmail, password: paddedPin });
-
-    if (!signInData?.user) {
-      // New student — create auth account
-      const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({ email: syntheticEmail, password: paddedPin });
-      if (signUpErr) { setStudentError("Could not create account. Please try again."); return; }
-      if (!signUpData.user) { setStudentError("Could not create account."); return; }
-    }
-
-    // Look up student server-side (SECURITY DEFINER bypasses RLS on both SELECT and name matching)
+    // Look up student server-side — SECURITY DEFINER bypasses RLS entirely, no auth needed
     const { data: studentRows, error: studentErr } = await supabase.rpc("student_login_lookup", {
       p_class_id: cls.id,
       p_display_name: displayName.trim(),
