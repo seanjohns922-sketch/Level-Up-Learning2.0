@@ -163,23 +163,34 @@ export default function LoginPage() {
           router.push(dest);
           return;
         }
-        if (existingError && isMissingStudentUserIdColumn(existingError.message)) {
-          const { data: legacyExisting } = await supabase
-            .from("students")
-            .select("id, class_id, year_level")
-            .eq("class_id", cls.id)
-            .eq("display_name", displayName.trim())
-            .eq("pin", pin)
-            .single();
-          if (legacyExisting) {
-            setActiveStudentProfile(legacyExisting.id, legacyExisting.class_id);
-            const existingProgressKey = `lul:${legacyExisting.id}:student_progress_v1`;
-            const dest = (!localStorage.getItem(existingProgressKey) && legacyExisting.year_level)
-              ? `/pretest?year=${encodeURIComponent(legacyExisting.year_level)}`
-              : "/home";
-            router.push(dest);
-            return;
-          }
+        // Legacy lookup — find student by name + pin + class (no user_id column)
+        const { data: legacyExisting } = await supabase
+          .from("students")
+          .select("id, class_id, year_level")
+          .eq("class_id", cls.id)
+          .eq("display_name", displayName.trim())
+          .eq("pin", pin)
+          .single();
+        if (legacyExisting) {
+          setActiveStudentProfile(legacyExisting.id, legacyExisting.class_id);
+          const existingProgressKey = `lul:${legacyExisting.id}:student_progress_v1`;
+          const dest = (!localStorage.getItem(existingProgressKey) && legacyExisting.year_level)
+            ? `/pretest?year=${encodeURIComponent(legacyExisting.year_level)}`
+            : "/home";
+          router.push(dest);
+          return;
+        }
+        // Auth account exists but student row was never saved — create it now
+        const recoveryId = crypto.randomUUID();
+        const { data: recoveredStudent, error: recoveryErr } = await supabase
+          .from("students")
+          .insert({ id: recoveryId, class_id: cls.id, display_name: displayName.trim(), pin })
+          .select("id, class_id")
+          .single();
+        if (!recoveryErr && recoveredStudent) {
+          setActiveStudentProfile(recoveredStudent.id, recoveredStudent.class_id);
+          router.push("/home");
+          return;
         }
       }
       setStudentError(signUpErr.message);
