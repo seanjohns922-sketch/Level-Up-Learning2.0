@@ -364,7 +364,7 @@ function ResultsPage() {
         console.warn("[Results] DB pretest save failed:", e);
       }
     })();
-  }, [passed, year, scorePercent, isPostTest, passedByProgram, storedPosttestProfile, storedPretestProfile, unlockTargets, requiredWeeks, optionalWeeks, nextYear]);
+  }, [passed, year, scorePercent, isPostTest, isFailedPretest, passedByProgram, storedPosttestProfile, storedPretestProfile, unlockTargets, requiredWeeks, optionalWeeks, nextYear]);
 
   function goHome() { router.push("/levels"); }
   const assignedStartWeek = isPostTest

@@ -19,8 +19,10 @@ export function ClickableDotRow({
   inactiveClassName = "bg-white",
   borderClassName = "border border-gray-200",
 }: DotRowProps) {
-  const [active, setActive] = useState<boolean[]>([]);
+  const [active, setActive] = useState<boolean[]>(() => Array.from({ length: count }, () => true));
+  // Reset all dots when count prop changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setActive(Array.from({ length: count }, () => true));
   }, [count]);
 

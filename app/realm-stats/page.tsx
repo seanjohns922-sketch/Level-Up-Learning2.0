@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { readProgress } from "@/data/progress";
 import { readProgramStore, getRecommendedAssignedWeek, getWeekProgress } from "@/lib/program-progress";
@@ -9,13 +9,8 @@ import { getHomeBg, getHomeBgFilter, getVignetteStyle } from "@/lib/levelBand";
 
 export default function RealmStatsPage() {
   const router = useRouter();
-  const [progress, setProgress] = useState<ReturnType<typeof readProgress>>(null);
-  const [store, setStore] = useState<ReturnType<typeof readProgramStore>>({});
-
-  useEffect(() => {
-    setProgress(readProgress());
-    setStore(readProgramStore());
-  }, []);
+  const [progress] = useState<ReturnType<typeof readProgress>>(() => readProgress());
+  const [store] = useState<ReturnType<typeof readProgramStore>>(() => readProgramStore());
 
   const year = progress?.year ?? "Year 1";
   const week = useMemo(

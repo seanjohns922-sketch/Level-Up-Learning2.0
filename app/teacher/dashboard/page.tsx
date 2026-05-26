@@ -18,23 +18,21 @@ type ProgressRow = {
   week: number | null;
   status: string;
   pretest_score: number | null;
-  completed_lesson_ids: any;
-  unlocked_legends: any;
-  quiz_scores: any;
+  completed_lesson_ids: unknown;
+  unlocked_legends: unknown;
+  quiz_scores: unknown;
 };
-
-type WeekResult = { week: number; score: number; passed: boolean };
 
 const YEAR_LEVELS = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"];
 const WEEKS = Array.from({ length: 12 }, (_, i) => i + 1);
 
 /* ── helpers ───────────────────────────────────────── */
-function parseCompletedLessons(raw: any): string[] {
+function parseCompletedLessons(raw: unknown): string[] {
   if (Array.isArray(raw)) return raw as string[];
   if (typeof raw === "string") try { return JSON.parse(raw); } catch { return []; }
   return [];
 }
-function parseUnlockedLegends(raw: any): string[] {
+function parseUnlockedLegends(raw: unknown): string[] {
   if (Array.isArray(raw)) return raw as string[];
   if (typeof raw === "string") try { return JSON.parse(raw); } catch { return []; }
   return [];
@@ -385,6 +383,7 @@ export default function TeacherDashboardPage() {
       alert("PIN must be exactly 4 digits.");
       return;
     }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await supabase.from("students").update({ pin: newPin } as any).eq("id", student.id);
     setStudents((prev) =>
       prev.map((s) => (s.id === student.id ? { ...s, pin: newPin } : s))
@@ -561,6 +560,7 @@ export default function TeacherDashboardPage() {
         <div>
           <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Quiz History</h4>
           {(() => {
+            /* eslint-disable @typescript-eslint/no-explicit-any */
             const qs: Record<string, any> = (prog?.quiz_scores && typeof prog.quiz_scores === "object") ? prog.quiz_scores as any : {};
             const weekKeys = Object.keys(qs).map(Number).filter(n => !isNaN(n)).sort((a, b) => a - b);
 
@@ -629,6 +629,7 @@ export default function TeacherDashboardPage() {
                 })}
               </div>
             );
+            /* eslint-enable @typescript-eslint/no-explicit-any */
           })()}
         </div>
       </div>
@@ -888,6 +889,7 @@ export default function TeacherDashboardPage() {
               </div>
             </div>
 
+            {/* eslint-disable @typescript-eslint/no-explicit-any */}
             {activeTab === "live" ? (
               <LiveClassPanel
                 selectedClass={selectedClass ?? null}
@@ -906,6 +908,7 @@ export default function TeacherDashboardPage() {
                 progress={progress as any}
               />
             )}
+            {/* eslint-enable @typescript-eslint/no-explicit-any */}
           </>
         )}
       </div>

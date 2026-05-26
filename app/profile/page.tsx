@@ -45,14 +45,12 @@ function getMonthGrid() {
 export default function ProfilePage() {
   const router = useRouter();
   const { autoReadEnabled, setAutoReadEnabled } = useAutoReadSetting();
-  const [progress, setProgress] = useState<ReturnType<typeof readProgress>>(null);
-  const [store, setStore] = useState<ReturnType<typeof readProgramStore>>({});
+  const [progress, setProgress] = useState<ReturnType<typeof readProgress>>(() => readProgress());
+  const [store, setStore] = useState<ReturnType<typeof readProgramStore>>(() => readProgramStore());
   const [studentName, setStudentName] = useState("Adventurer");
   const [activeDays, setActiveDays] = useState<Set<number>>(new Set());
 
   useEffect(() => {
-    setProgress(readProgress());
-    setStore(readProgramStore());
     try {
       const active = localStorage.getItem("lul_active_student_v1");
       if (active) {
