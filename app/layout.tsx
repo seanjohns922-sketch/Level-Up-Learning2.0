@@ -4,6 +4,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { GlobalTapFeedback } from "@/components/GlobalTapFeedback";
 import { FullscreenToggle } from "@/components/FullscreenToggle";
 import StudentScreenRecorder from "@/components/StudentScreenRecorder";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -24,6 +25,7 @@ export default function RootLayout({
           <StudentScreenRecorder />
           {children}
         </ErrorBoundary>
+        <SpeedInsights />
       </body>
     </html>
   );
