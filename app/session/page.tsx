@@ -6612,6 +6612,7 @@ function SessionPage() {
     writeStore(store);
 
     // Persist lesson completion to Supabase so teacher dashboard reflects progress
+    // Uses SECURITY DEFINER RPC — students are anonymous so direct table access is blocked by RLS
     (async () => {
       try {
         const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY) : null;
@@ -6619,24 +6620,12 @@ function SessionPage() {
         const yearNum = parseInt(year.replace(/\D/g, ""), 10) || 0;
         const lessonId = `y${yearNum}-w${week}-l${n}`;
 
-        const { data: existing } = await supabase
-          .from("progress_snapshot")
-          .select("completed_lesson_ids")
-          .eq("student_id", studentId)
-          .eq("year", year)
-          .maybeSingle();
-
-        const prevIds: string[] = Array.isArray(existing?.completed_lesson_ids)
-          ? (existing.completed_lesson_ids as string[])
-          : [];
-        const updatedIds = prevIds.includes(lessonId) ? prevIds : [...prevIds, lessonId];
-
-        const { error } = await supabase
-          .from("progress_snapshot")
-          .upsert(
-            { student_id: studentId, year, week: Number(week), completed_lesson_ids: updatedIds, status: "active" },
-            { onConflict: "student_id,year" }
-          );
+        const { error } = await supabase.rpc("save_lesson_completion", {
+          p_student_id: studentId,
+          p_year: year,
+          p_week: Number(week),
+          p_lesson_id: lessonId,
+        });
         if (error) console.warn("[Lesson] DB save error:", error);
       } catch (e) {
         console.warn("[Lesson] DB save failed:", e);

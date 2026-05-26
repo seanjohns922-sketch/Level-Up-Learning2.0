@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { hasActiveStudentSeenIntro, setActiveStudentProfile } from "@/lib/studentIdentity";
-import { isPlacementComplete, readProgress } from "@/data/progress";
+import { isPlacementComplete, readProgress, writeProgress, type StudentProgress } from "@/data/progress";
 import { GraduationCap, Briefcase, KeyRound, User, Lock } from "lucide-react";
 
 type StudentRecord = {
@@ -161,7 +161,37 @@ export default function LoginPage() {
       yearLevel: student.year_level ?? "Year 1",
     });
 
-    const progress = readProgress();
+    // Restore progress from Supabase if localStorage is empty (new device / cleared cache)
+    let progress = readProgress();
+    if (!progress) {
+      try {
+        const { data: snapRows } = await supabase.rpc("get_student_progress_snapshot", {
+          p_student_id: student.student_id,
+        });
+        if (Array.isArray(snapRows) && snapRows.length > 0) {
+          // Use the row with the highest week (most advanced year)
+          const best = snapRows.reduce((a: { week?: number | null }, b: { week?: number | null }) =>
+            (b.week ?? 0) > (a.week ?? 0) ? b : a
+          ) as { year: string; pretest_score: number | null; status: string; week: number | null };
+
+          if (best.status === "PASSED" || best.status === "ASSIGNED_PROGRAM") {
+            const restored: StudentProgress = {
+              year: best.year,
+              scorePercent: best.pretest_score ?? 0,
+              status: best.status as "PASSED" | "ASSIGNED_PROGRAM",
+              placementComplete: true,
+              assignedWeek: best.week ?? 1,
+              unlockedLegends: [],
+            };
+            writeProgress(restored);
+            progress = restored;
+          }
+        }
+      } catch {
+        // Non-fatal — fall through to normal routing
+      }
+    }
+
     const placementComplete = isPlacementComplete(progress);
     const introSeen = hasActiveStudentSeenIntro(student.student_id);
 
