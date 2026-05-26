@@ -3,6 +3,7 @@ import "./globals.css";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { GlobalTapFeedback } from "@/components/GlobalTapFeedback";
 import { FullscreenToggle } from "@/components/FullscreenToggle";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -22,6 +23,7 @@ export default function RootLayout({
           <FullscreenToggle />
           {children}
         </ErrorBoundary>
+        <Analytics />
       </body>
     </html>
   );
