@@ -6611,6 +6611,38 @@ function SessionPage() {
     setLessonComplete(store, year, week, n);
     writeStore(store);
 
+    // Persist lesson completion to Supabase so teacher dashboard reflects progress
+    (async () => {
+      try {
+        const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY) : null;
+        if (!studentId) return;
+        const yearNum = parseInt(year.replace(/\D/g, ""), 10) || 0;
+        const lessonId = `y${yearNum}-w${week}-l${n}`;
+
+        const { data: existing } = await supabase
+          .from("progress_snapshot")
+          .select("completed_lesson_ids")
+          .eq("student_id", studentId)
+          .eq("year", year)
+          .maybeSingle();
+
+        const prevIds: string[] = Array.isArray(existing?.completed_lesson_ids)
+          ? (existing.completed_lesson_ids as string[])
+          : [];
+        const updatedIds = prevIds.includes(lessonId) ? prevIds : [...prevIds, lessonId];
+
+        const { error } = await supabase
+          .from("progress_snapshot")
+          .upsert(
+            { student_id: studentId, year, week: Number(week), completed_lesson_ids: updatedIds, status: "active" },
+            { onConflict: "student_id,year" }
+          );
+        if (error) console.warn("[Lesson] DB save error:", error);
+      } catch (e) {
+        console.warn("[Lesson] DB save failed:", e);
+      }
+    })();
+
     // After Week 12 Lesson 3, route to post-test transition
     if (Number(week) === 12 && n === 3) {
       setShowPostTestTransition(true);
