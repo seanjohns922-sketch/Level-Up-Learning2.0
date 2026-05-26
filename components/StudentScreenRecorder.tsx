@@ -13,8 +13,9 @@ import { startScreenRecording } from "@/lib/screen-recorder";
 export default function StudentScreenRecorder() {
   useEffect(() => {
     const { studentId, classId } = getActiveStudentIdentity();
-    if (!studentId || !classId) return;
-    return startScreenRecording(studentId, classId);
+    // classId is optional — channel name only needs studentId
+    if (!studentId) return;
+    return startScreenRecording(studentId, classId ?? "");
   }, []);
 
   return null;

@@ -29,17 +29,28 @@ export function startScreenRecording(studentId: string, classId: string): () => 
   };
 
   channel.subscribe(async (status) => {
+    console.log("[ScreenRecorder] channel status:", status);
     if (status !== "SUBSCRIBED") return;
 
     // Dynamic import — rrweb is browser-only
-    const rrweb = await import("rrweb");
+    let rrweb: Awaited<typeof import("rrweb")>;
+    try {
+      rrweb = await import("rrweb");
+    } catch (e) {
+      console.warn("[ScreenRecorder] rrweb import failed:", e);
+      return;
+    }
 
+    console.log("[ScreenRecorder] recording started for student:", studentId);
     stopRecord =
       rrweb.record({
         emit(event: RRWebEvent) {
           buffer.push(event);
           // Full snapshot (type 2) — flush immediately so teachers see it fast
-          if (event.type === 2) flush();
+          if (event.type === 2) {
+            console.log("[ScreenRecorder] full snapshot captured, flushing");
+            flush();
+          }
         },
         // Re-emit a full snapshot every 10 s so late-joining teachers catch up quickly
         checkoutEveryNms: 10_000,

@@ -350,7 +350,9 @@ export function buildLiveStudentInsight(
     lastActiveMs > 0 ? Math.max(0, Math.round((now - lastActiveMs) / 1000)) : thresholds.idleSeconds;
   const timeOnQuestion = Math.max(0, snapshot.timeOnCurrentQuestion ?? 0);
   const questionAttempts = Math.max(0, snapshot.currentQuestionAttempts ?? 0);
-  const incorrectCount = Math.max(0, snapshot.sessionIncorrectCount ?? 0);
+  // Use consecutive incorrect count (resets on correct answer / new activity) rather than
+  // session total, which accumulates across all lessons and causes false "Needs Support"
+  const incorrectCount = Math.max(0, snapshot.consecutiveIncorrectCount ?? snapshot.sessionIncorrectCount ?? 0);
   const hintCount = Math.max(0, snapshot.sessionHintCount ?? 0);
   const latestEventType = snapshot.latestEventType ?? null;
 
@@ -375,7 +377,7 @@ export function buildLiveStudentInsight(
       questionAttempts >= thresholds.needsSupportSameQuestionAttempts
         ? `${name} has made ${questionAttempts} attempt${questionAttempts !== 1 ? "s" : ""} on the same question${activityLabel ? ` in ${activityLabel}` : ""} without success`
         : incorrectCount >= thresholds.needsSupportRecentIncorrectCount
-        ? `${name} has had ${incorrectCount} incorrect answer${incorrectCount !== 1 ? "s" : ""} this session${activityLabel ? ` — currently on ${activityLabel}` : ""}`
+        ? `${name} has got ${incorrectCount} in a row wrong${activityLabel ? ` on ${activityLabel}` : ""}`
         : `${name} has been on the same question for ${Math.floor(timeOnQuestion / 60)} min${Math.floor(timeOnQuestion / 60) !== 1 ? "s" : ""}${activityLabel ? ` in ${activityLabel}` : ""}`;
     return {
       status: "needs_support",
