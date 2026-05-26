@@ -78,6 +78,52 @@ function parseCoordinatePoint(value: string) {
   return { x, y };
 }
 
+function mabPlaceCount(visual: Extract<NonNullable<TypedResponseQuestion["visual"]>, { type: "mab" }>, place: "hundred_thousands" | "ten_thousands" | "thousands" | "hundreds" | "tens" | "ones") {
+  if (place === "hundred_thousands") return visual.hundredThousands;
+  if (place === "ten_thousands") return visual.tenThousands;
+  if (place === "thousands") return visual.thousands;
+  if (place === "hundreds") return visual.hundreds;
+  if (place === "tens") return visual.tens;
+  return visual.ones;
+}
+
+function deriveMabVisualAnswer(questionData: TypedResponseQuestion): string | null {
+  if (questionData.visual?.type !== "mab") return null;
+
+  const prompt = questionData.prompt.toLowerCase();
+  const placeMatch = [
+    ["hundred thousands", "hundred_thousands"],
+    ["ten thousands", "ten_thousands"],
+    ["thousands", "thousands"],
+    ["hundreds", "hundreds"],
+    ["tens", "tens"],
+    ["ones", "ones"],
+  ] as const;
+
+  for (const [label, place] of placeMatch) {
+    if (prompt.includes(`how many ${label}`)) {
+      const count = mabPlaceCount(questionData.visual, place);
+      return typeof count === "number" ? String(count) : null;
+    }
+  }
+
+  if (prompt.includes("what number is shown")) {
+    const counts = [
+      [questionData.visual.hundredThousands, 100000],
+      [questionData.visual.tenThousands, 10000],
+      [questionData.visual.thousands, 1000],
+      [questionData.visual.hundreds, 100],
+      [questionData.visual.tens, 10],
+      [questionData.visual.ones, 1],
+    ] as const;
+
+    const total = counts.reduce((sum, [count, multiplier]) => sum + ((typeof count === "number" ? count : 0) * multiplier), 0);
+    return String(total);
+  }
+
+  return null;
+}
+
 function promptNeedsRelationshipVisual(prompt: string) {
   const lower = prompt.toLowerCase();
   return (
@@ -1617,7 +1663,8 @@ export default function TypedResponseActivity({
   const isGuidedWrittenMethod = isGuidedAddition || isGuidedSubtraction;
   const orderingAnswerParts = !writtenMethod ? extractOrderingNumbers(questionData.answer) : [];
   const expectedStructuredFraction = !writtenMethod ? parseStructuredFraction(questionData.answer) : null;
-  const acceptedAnswerList = [questionData.answer, ...(questionData.acceptedAnswers ?? [])].filter(Boolean);
+  const derivedMabAnswer = deriveMabVisualAnswer(questionData);
+  const acceptedAnswerList = [derivedMabAnswer, questionData.answer, ...(questionData.acceptedAnswers ?? [])].filter((value): value is string => Boolean(value));
   const declaredInputType = questionData.inputType;
   const isOrderingResponse =
     !writtenMethod &&
