@@ -11,10 +11,12 @@ export default function NumberOrder({
   questionData,
   onCorrect,
   onWrong,
+  renderMode = "lesson",
 }: {
   questionData: NumberOrderQuestion;
   onCorrect?: () => void;
   onWrong?: () => void;
+  renderMode?: "lesson" | "quiz";
 }) {
   const isFractionOrder = Array.isArray(questionData.fractions) && questionData.fractions.length > 0;
   const isUnsupportedFractionOrder = isFractionOrder && !questionData.visual;
@@ -203,7 +205,7 @@ export default function NumberOrder({
             </h2>
             <ReadAloudBtn text={questionData.prompt} />
           </div>
-          {questionData.helper ? (
+          {renderMode === "lesson" && questionData.helper ? (
             <p className="mt-2 text-[15px] text-slate-500 leading-relaxed">
               <MathFormattedText text={questionData.helper} fractionSize="sm" />
             </p>

@@ -405,7 +405,6 @@ function toExplicitWeeklyQuizQuestion(
         numbers: isFractionOrdering ? [] : values.map((value) => Number(value)),
         fractions: isFractionOrdering ? values : undefined,
         ascending: true,
-        helper: question.instructionText,
         visual,
         correctOrder: question.correctOrder,
       },
@@ -415,7 +414,7 @@ function toExplicitWeeklyQuizQuestion(
         config: {},
       },
       feedbackCorrect: question.feedbackCorrect,
-      feedbackIncorrect: question.feedbackIncorrect,
+      feedbackIncorrect: "Not quite. Keep going.",
     };
   }
 
@@ -505,7 +504,7 @@ function toExplicitWeeklyQuizQuestion(
         config: {},
       },
       feedbackCorrect: question.feedbackCorrect,
-      feedbackIncorrect: question.feedbackIncorrect,
+      feedbackIncorrect: "Not quite. Keep going.",
     };
   }
 
@@ -521,7 +520,6 @@ function toExplicitWeeklyQuizQuestion(
           prompt,
           answer: correctAnswer,
           acceptedAnswers: question.acceptedAnswers,
-          helper: question.feedbackIncorrect,
           placeholder: question.placeholder ?? "Type the answer",
           inputType: typedInputType,
           visual: mappedVisual,
@@ -532,7 +530,7 @@ function toExplicitWeeklyQuizQuestion(
           config: {},
         },
         feedbackCorrect: question.feedbackCorrect,
-        feedbackIncorrect: question.feedbackIncorrect,
+        feedbackIncorrect: "Not quite. Keep going.",
       };
     }
 
@@ -546,7 +544,6 @@ function toExplicitWeeklyQuizQuestion(
         prompt,
         options: (question.options ?? []).map((option) => String(option ?? "").trim()),
         answer: correctAnswer,
-        helper: question.feedbackIncorrect,
         visual: mappedVisual,
       },
       activity: {
@@ -555,7 +552,7 @@ function toExplicitWeeklyQuizQuestion(
         config: {},
       },
       feedbackCorrect: question.feedbackCorrect,
-      feedbackIncorrect: question.feedbackIncorrect,
+      feedbackIncorrect: "Not quite. Keep going.",
     };
   }
 
@@ -570,7 +567,6 @@ function toExplicitWeeklyQuizQuestion(
           kind: "typed_response",
           prompt,
           answer: correctAnswer,
-          helper: question.feedbackIncorrect,
           placeholder:
             question.placeholder ??
             (typedInputType === "integer"
@@ -586,7 +582,7 @@ function toExplicitWeeklyQuizQuestion(
           config: {},
         },
         feedbackCorrect: question.feedbackCorrect,
-        feedbackIncorrect: question.feedbackIncorrect,
+        feedbackIncorrect: "Not quite. Keep going.",
       };
     }
     return {
@@ -597,7 +593,7 @@ function toExplicitWeeklyQuizQuestion(
       correctValue: correctAnswer,
       acceptedValues: question.acceptedAnswers,
       feedbackCorrect: question.feedbackCorrect,
-      feedbackIncorrect: question.feedbackIncorrect,
+      feedbackIncorrect: "Not quite. Keep going.",
       responseType:
         typedInputType === "integer" || (!typedInputType && !isFractionTypedAnswer) ? "number" : undefined,
       placeholder: question.placeholder ?? "Type the integer",
@@ -615,7 +611,6 @@ function toExplicitWeeklyQuizQuestion(
         prompt,
         answer: correctAnswer,
         acceptedAnswers: question.acceptedAnswers,
-        helper: question.feedbackIncorrect,
         placeholder: question.placeholder ?? "Type a short explanation",
       },
       activity: {
@@ -624,7 +619,7 @@ function toExplicitWeeklyQuizQuestion(
         config: {},
       },
       feedbackCorrect: question.feedbackCorrect,
-      feedbackIncorrect: question.feedbackIncorrect,
+      feedbackIncorrect: "Not quite. Keep going.",
     };
   }
 
@@ -637,7 +632,7 @@ function toExplicitWeeklyQuizQuestion(
     options,
     correctIndex: options.findIndex((option) => option === correctAnswer),
     feedbackCorrect: question.feedbackCorrect,
-    feedbackIncorrect: question.feedbackIncorrect,
+    feedbackIncorrect: "Not quite. Keep going.",
   };
 }
 

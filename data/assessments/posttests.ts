@@ -991,14 +991,14 @@ const YEAR6_POSTTEST_QUESTIONS: Question[] = [
   ),
   buildPostMcqQuestion(
     "y6-pt-20",
-    "Which skill is MOST important when solving multi-step problems?",
+    "Calculate: (18 ÷ 3) + 7 × 2",
     [
-      "Following steps carefully",
-      "Guessing quickly",
-      "Ignoring operation order",
-      "Using the biggest numbers first",
+      "20",
+      "14",
+      "26",
+      "34",
     ],
-    "Following steps carefully",
+    "20",
     "problem_solving_reasoning",
     "Problem Solving & Reasoning",
     [11, 12],
@@ -1007,10 +1007,13 @@ const YEAR6_POSTTEST_QUESTIONS: Question[] = [
     [1, 2, 3],
     {
       visual: {
-        type: "rule_box",
-        title: "Readiness Check",
-        steps: ["Read the whole problem", "Choose a strategy", "Follow the steps in order"],
-        decisionLabel: "Careful strategy beats quick guessing",
+        type: "expression_flow",
+        title: "Expression",
+        cards: [
+          {
+            tokens: ["(", "18", "÷", "3", ")", "+", "7", "×", "2"],
+          },
+        ],
       },
     }
   ),

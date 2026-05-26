@@ -276,6 +276,7 @@ export function LessonRenderer({
           questionData={safeQuestion as NumberOrderQuestion}
           onCorrect={onCorrect}
           onWrong={onWrong}
+          renderMode={renderMode}
         />
       );
     }

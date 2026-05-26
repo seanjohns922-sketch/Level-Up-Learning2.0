@@ -407,23 +407,21 @@ export const YEAR6_PRETEST: Question[] = [
   ),
   mcqQuestion(
     "y6-q20",
-    "Which skill is MOST important when solving multi-step problems?",
-    [
-      "Choosing a strategy before solving",
-      "Guessing quickly",
-      "Ignoring operation order",
-      "Using the biggest numbers first",
-    ],
-    "Choosing a strategy before solving",
+    "Calculate: 4 + 3 × 6",
+    ["42", "22", "18", "30"],
+    "22",
     "problem_solving_reasoning",
     "Problem Solving & Reasoning",
     [11, 12],
     [1, 2, 3],
     {
-      type: "rule_box",
-      title: "Readiness Check",
-      steps: ["Read the whole problem", "Choose a strategy", "Follow the steps in order"],
-      decisionLabel: "Strong problem-solvers choose a strategy first",
+      type: "expression_flow",
+      title: "Expression",
+      cards: [
+        {
+          tokens: ["4", "+", "3", "×", "6"],
+        },
+      ],
     }
   ),
 ];

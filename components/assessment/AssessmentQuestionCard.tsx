@@ -259,9 +259,9 @@ export default function AssessmentQuestionCard({
   const renderedVisual = visual ? (
     <>
       {visual.type === "decimal_model" ? <DecimalModelVisual visual={visual as never} title="Decimal model" /> : null}
-      {visual.type === "rule_box" ? <RuleBoxVisual visual={visual as never} title="Strategy card" /> : null}
+      {visual.type === "rule_box" ? <RuleBoxVisual visual={{ ...(visual as Record<string, unknown>), decisionLabel: undefined } as never} title="Given information" /> : null}
       {visual.type === "best_buy_card_comparison" ? (
-        <BestBuyCardComparisonVisual visual={visual as never} revealUnitRates />
+        <BestBuyCardComparisonVisual visual={visual as never} revealUnitRates={false} />
       ) : null}
       {visual.type === "cartesian_grid" ? <CartesianGridVisual visual={visual as never} /> : null}
       {visual.type === "expression_flow" ? <ExpressionFlowVisual visual={visual as never} /> : null}
