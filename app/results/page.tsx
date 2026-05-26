@@ -55,15 +55,15 @@ function getLegendIdsBeforeYear(year: string) {
 function getStrandBadgeClass(strand?: string) {
   switch (strand) {
     case "fractions":
-      return "bg-violet-100 text-violet-700 border-violet-200";
+      return "bg-violet-500/15 text-violet-300 border-violet-400/30";
     case "patterns":
-      return "bg-sky-100 text-sky-700 border-sky-200";
+      return "bg-sky-500/15 text-sky-300 border-sky-400/30";
     case "multiplication_division":
-      return "bg-emerald-100 text-emerald-700 border-emerald-200";
+      return "bg-emerald-500/15 text-emerald-300 border-emerald-400/30";
     case "addition_subtraction":
-      return "bg-amber-100 text-amber-700 border-amber-200";
+      return "bg-amber-500/15 text-amber-300 border-amber-400/30";
     default:
-      return "bg-teal-100 text-teal-700 border-teal-200";
+      return "bg-teal-500/15 text-teal-300 border-teal-400/30";
   }
 }
 
@@ -141,38 +141,41 @@ function ScoreRing({ percent, passed }: { percent: number; passed: boolean }) {
     return () => clearTimeout(timer);
   }, [percent]);
 
-  const ringColor = passed ? "hsl(var(--primary))" : "hsl(var(--accent))";
+  const ringColor = passed ? "rgb(45 212 191)" : "rgb(251 191 36)";
+  const ringGlow = passed ? "rgb(20 184 166)" : "rgb(245 158 11)";
 
   return (
-    <div className="relative flex items-center justify-center my-6">
-      {/* glow behind */}
+    <div className="relative flex items-center justify-center my-8">
       <div
-        className="absolute w-48 h-48 rounded-full blur-2xl opacity-30"
-        style={{ background: ringColor }}
+        className="absolute w-56 h-56 rounded-full blur-3xl opacity-40"
+        style={{ background: ringGlow }}
       />
-      <svg width="200" height="200" className="relative z-10 -rotate-90">
+      <svg width="220" height="220" className="relative z-10 -rotate-90">
         <circle
-          cx="100" cy="100" r={radius}
+          cx="110" cy="110" r={radius}
           fill="none"
-          stroke="hsl(var(--border))"
+          stroke="rgba(148, 163, 184, 0.15)"
           strokeWidth={stroke}
         />
         <circle
-          cx="100" cy="100" r={radius}
+          cx="110" cy="110" r={radius}
           fill="none"
           stroke={ringColor}
           strokeWidth={stroke}
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
-          style={{ transition: "stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)" }}
+          style={{
+            transition: "stroke-dashoffset 1.4s cubic-bezier(0.4,0,0.2,1)",
+            filter: `drop-shadow(0 0 12px ${ringColor})`,
+          }}
         />
       </svg>
       <div className="absolute z-20 text-center">
-        <div className="text-5xl font-extrabold font-display" style={{ color: ringColor }}>
+        <div className="text-6xl font-extrabold font-display tracking-tight" style={{ color: ringColor }}>
           {percent}%
         </div>
-        <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">
+        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-2">
           Score
         </div>
       </div>
@@ -195,14 +198,28 @@ const SHAPES = [
 function FloatingShapes() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* ambient radial glows */}
+      <div className="absolute -top-32 -left-32 w-[28rem] h-[28rem] rounded-full bg-teal-500/10 blur-[120px]" />
+      <div className="absolute -bottom-32 -right-32 w-[28rem] h-[28rem] rounded-full bg-emerald-500/10 blur-[120px]" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[22rem] h-[22rem] rounded-full bg-cyan-500/5 blur-[100px]" />
+      {/* grid texture */}
+      <div
+        className="absolute inset-0 opacity-[0.04]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+        }}
+      />
       {SHAPES.map((s, i) => (
         <div
           key={i}
-          className="absolute rounded-full opacity-10"
+          className="absolute rounded-full opacity-20"
           style={{
             width: `${s.w}px`,
             height: `${s.h}px`,
-            background: i % 2 === 0 ? "hsl(var(--primary))" : "hsl(var(--accent))",
+            background: i % 2 === 0 ? "rgb(45 212 191)" : "rgb(16 185 129)",
+            filter: "blur(8px)",
             left: `${s.l}%`,
             top: `${s.t}%`,
             animation: `floatShape ${s.dur}s ease-in-out infinite alternate`,
@@ -408,7 +425,7 @@ function ResultsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background flex items-start justify-center p-4 pt-8 relative overflow-y-auto">
+    <main className="min-h-screen bg-slate-950 flex items-start justify-center p-4 pt-8 relative overflow-y-auto">
       <FloatingShapes />
 
         <div
@@ -420,68 +437,69 @@ function ResultsPage() {
         }}
       >
         {/* Hero card */}
-        <div className="bg-card rounded-3xl shadow-2xl overflow-hidden border border-border/50">
+        <div className="bg-slate-900/70 backdrop-blur-xl rounded-3xl shadow-[0_20px_70px_-20px_rgba(0,0,0,0.6)] overflow-hidden border border-white/10 ring-1 ring-white/5">
           {/* Top gradient band */}
           <div
-            className="h-2"
+            className="h-1"
             style={{
               background: passed
-                ? "linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)))"
-                : "linear-gradient(90deg, hsl(var(--accent)), hsl(42 95% 65%))",
+                ? "linear-gradient(90deg, rgb(20 184 166), rgb(16 185 129), rgb(45 212 191))"
+                : "linear-gradient(90deg, rgb(251 191 36), rgb(245 158 11), rgb(251 146 60))",
             }}
           />
 
-          <div className="p-8 pb-6 text-center">
+          <div className="p-8 pb-6 text-center relative">
             {/* Emoji badge */}
             <div
-              className="text-5xl mb-2"
+              className="text-5xl mb-3 inline-block"
               style={{
                 animation: "bounceIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both",
+                filter: "drop-shadow(0 0 24px rgba(45, 212, 191, 0.4))",
               }}
             >
               {msg.emoji}
             </div>
 
-            <h1 className="text-2xl font-extrabold font-display text-foreground mb-1">
+            <h1 className="text-3xl font-extrabold font-display text-white mb-1 tracking-tight">
               {msg.title}
             </h1>
-            <p className="text-sm text-muted-foreground mb-2">{msg.sub}</p>
-            <div className="text-xs font-semibold text-muted-foreground/60 uppercase tracking-wider">
+            <p className="text-sm text-slate-400 mb-3">{msg.sub}</p>
+            <div className="inline-flex items-center gap-2 text-[10px] font-bold text-teal-300/80 uppercase tracking-[0.25em] px-3 py-1 rounded-full border border-teal-400/20 bg-teal-500/5">
               {studentLevelLabel} • {isPostTest ? "Post-Test" : source === "program_complete" ? "Program" : "Pre-Test"}
             </div>
 
             <ScoreRing percent={displayPercent} passed={passed} />
 
             {/* Score breakdown */}
-            <div className="flex items-center justify-center gap-6 text-sm mb-6">
+            <div className="flex items-center justify-center gap-6 text-sm mb-2">
               <div className="text-center">
-                <div className="text-2xl font-extrabold text-foreground">{score}</div>
-                <div className="text-xs text-muted-foreground">Correct</div>
+                <div className="text-2xl font-extrabold text-white">{score}</div>
+                <div className="text-[10px] uppercase tracking-wider text-slate-500 mt-0.5">Correct</div>
               </div>
-              <div className="w-px h-8 bg-border" />
+              <div className="w-px h-8 bg-white/10" />
               <div className="text-center">
-                <div className="text-2xl font-extrabold text-foreground">{total}</div>
-                <div className="text-xs text-muted-foreground">Total</div>
+                <div className="text-2xl font-extrabold text-white">{total}</div>
+                <div className="text-[10px] uppercase tracking-wider text-slate-500 mt-0.5">Total</div>
               </div>
-              <div className="w-px h-8 bg-border" />
+              <div className="w-px h-8 bg-white/10" />
               <div className="text-center">
-                <div className="text-2xl font-extrabold" style={{ color: passed ? "hsl(var(--primary))" : "hsl(var(--accent))" }}>
+                <div className="text-2xl font-extrabold" style={{ color: passed ? "rgb(45 212 191)" : "rgb(251 191 36)" }}>
                   {passed ? "PASS" : "GROW"}
                 </div>
-                <div className="text-xs text-muted-foreground">Status</div>
+                <div className="text-[10px] uppercase tracking-wider text-slate-500 mt-0.5">Status</div>
               </div>
             </div>
           </div>
 
           {/* Info section */}
-          <div className="px-8 pb-6 space-y-3">
+          <div className="px-8 pb-6 pt-4 space-y-3">
             {passed ? (
-              <div className="rounded-2xl bg-primary-light p-4 border border-primary/20">
+              <div className="rounded-2xl p-4 border border-teal-400/20 bg-gradient-to-br from-teal-500/10 to-emerald-500/5">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-lg">✨</span>
-                  <span className="font-bold text-sm text-foreground">Legend Unlocked!</span>
+                  <span className="font-bold text-sm text-teal-200">Legend Unlocked!</span>
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-slate-400 leading-relaxed">
                   {isPostTest
                     ? year === "Prep"
                       ? "You passed the Ground Level mastery test — your Legend is unlocked and Year 1 is ready next!"
@@ -494,27 +512,27 @@ function ResultsPage() {
                 </p>
               </div>
             ) : isPostTest ? (
-              <div className="rounded-2xl p-4 border border-accent/30" style={{ background: "hsl(42 95% 97%)" }}>
+              <div className="rounded-2xl p-4 border border-amber-400/20 bg-amber-500/5">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-lg">💪</span>
-                  <span className="font-bold text-sm text-foreground">Almost there!</span>
+                  <span className="font-bold text-sm text-amber-200">Almost there!</span>
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-slate-400 leading-relaxed">
                   You need {POSTTEST_PASS_THRESHOLD}% to pass. Review the suggested weeks and try again when you&apos;re ready.
                 </p>
               </div>
             ) : (
               <>
-                <div className="rounded-2xl p-4 border border-accent/30" style={{ background: "hsl(42 95% 97%)" }}>
+                <div className="rounded-2xl p-4 border border-amber-400/20 bg-gradient-to-br from-amber-500/10 to-orange-500/5">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-lg">📚</span>
-                    <span className="font-bold text-sm text-foreground">Learning Path Ready</span>
+                    <span className="font-bold text-sm text-amber-200">Learning Path Ready</span>
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-slate-400 leading-relaxed">
                     Good effort! You scored {scorePercent}% — you&apos;ll be working through {studentLevelLabel} to build your skills.
                   </p>
                   {requiredWeeks.length > 0 ? (
-                    <p className="mt-2 text-xs text-muted-foreground">
+                    <p className="mt-2 text-xs text-slate-400 leading-relaxed">
                       {requiresFullPathway
                         ? "Complete the full 12-week pathway to be ready to pass this level."
                         : `You need to complete Weeks ${requiredWeeks.join(", ")} to be ready to pass this level.`}
@@ -522,12 +540,12 @@ function ResultsPage() {
                   ) : null}
                 </div>
                 {unlockTargets.length > 0 && (
-                  <div className="rounded-2xl p-4 border border-primary/20 bg-primary-light">
+                  <div className="rounded-2xl p-4 border border-teal-400/20 bg-gradient-to-br from-teal-500/10 to-emerald-500/5">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-lg">🏅</span>
-                      <span className="font-bold text-sm text-foreground">Legends Unlocked!</span>
+                      <span className="font-bold text-sm text-teal-200">Legends Unlocked!</span>
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-slate-400 leading-relaxed">
                       Well done — all Numbots from{" "}
                       {formatStudentLevelLabel(YEAR_SEQUENCE[0])}{" "}
                       to{" "}
@@ -543,31 +561,31 @@ function ResultsPage() {
 
             {isPostTest && storedPosttestProfile ? (
               <>
-                <div className="rounded-2xl bg-secondary p-4">
-                  <div className="font-bold text-sm text-foreground mb-2">Your Growth</div>
+                <div className="rounded-2xl bg-white/5 border border-white/10 p-4">
+                  <div className="font-bold text-sm text-white mb-2">Your Growth</div>
                   {storedPretestProfile ? (
                     <div className="space-y-3">
-                      <p className="text-sm text-secondary-foreground">
+                      <p className="text-sm text-slate-300">
                         You improved from {storedPretestProfile.percentage}% to {storedPosttestProfile.percentage}%.
                       </p>
                       <div className="grid grid-cols-3 gap-3 text-center">
-                        <div className="rounded-xl bg-background/80 border border-border/60 p-3">
-                          <div className="text-xs text-muted-foreground">Pre-Test</div>
-                          <div className="text-xl font-extrabold text-foreground">{storedPretestProfile.percentage}%</div>
+                        <div className="rounded-xl bg-slate-950/60 border border-white/10 p-3">
+                          <div className="text-[10px] uppercase tracking-wider text-slate-500">Pre-Test</div>
+                          <div className="text-xl font-extrabold text-white mt-1">{storedPretestProfile.percentage}%</div>
                         </div>
-                        <div className="rounded-xl bg-background/80 border border-border/60 p-3">
-                          <div className="text-xs text-muted-foreground">Post-Test</div>
-                          <div className="text-xl font-extrabold text-foreground">{storedPosttestProfile.percentage}%</div>
+                        <div className="rounded-xl bg-slate-950/60 border border-white/10 p-3">
+                          <div className="text-[10px] uppercase tracking-wider text-slate-500">Post-Test</div>
+                          <div className="text-xl font-extrabold text-white mt-1">{storedPosttestProfile.percentage}%</div>
                         </div>
-                        <div className="rounded-xl bg-background/80 border border-border/60 p-3">
-                          <div className="text-xs text-muted-foreground">Growth</div>
-                          <div className={`text-xl font-extrabold ${growthPercentagePoints && growthPercentagePoints >= 0 ? "text-emerald-600" : "text-amber-600"}`}>
+                        <div className="rounded-xl bg-slate-950/60 border border-white/10 p-3">
+                          <div className="text-[10px] uppercase tracking-wider text-slate-500">Growth</div>
+                          <div className={`text-xl font-extrabold mt-1 ${growthPercentagePoints && growthPercentagePoints >= 0 ? "text-emerald-400" : "text-amber-400"}`}>
                             {growthPercentagePoints && growthPercentagePoints > 0 ? "+" : ""}
                             {growthPercentagePoints ?? 0}%
                           </div>
                         </div>
                       </div>
-                      <div className="flex flex-wrap gap-3 text-xs text-secondary-foreground">
+                      <div className="flex flex-wrap gap-3 text-xs text-slate-400">
                         <span>
                           Pre correct: {storedPretestProfile.score}/{storedPretestProfile.total}
                         </span>
@@ -580,39 +598,39 @@ function ResultsPage() {
                         </span>
                       </div>
                       {strongestGrowth ? (
-                        <div className="text-xs text-secondary-foreground">
-                          Strongest growth: <span className="font-bold text-foreground">{strongestGrowth.skillLabel}</span>
+                        <div className="text-xs text-slate-400">
+                          Strongest growth: <span className="font-bold text-white">{strongestGrowth.skillLabel}</span>
                         </div>
                       ) : null}
                       {keepPractising ? (
-                        <div className="text-xs text-secondary-foreground">
-                          Keep practising: <span className="font-bold text-foreground">{keepPractising.skillLabel}</span>
+                        <div className="text-xs text-slate-400">
+                          Keep practising: <span className="font-bold text-white">{keepPractising.skillLabel}</span>
                         </div>
                       ) : null}
                     </div>
                   ) : (
-                    <p className="text-sm text-secondary-foreground">
+                    <p className="text-sm text-slate-400">
                       Pre-test result not found. Complete the pre-test to compare growth.
                     </p>
                   )}
                 </div>
 
                 {storedPretestProfile && skillGrowth.length > 0 ? (
-                  <div className="rounded-2xl p-4 border border-border/60 bg-card/80">
-                    <div className="font-bold text-sm text-foreground mb-3">Skill Growth</div>
+                  <div className="rounded-2xl p-4 border border-white/10 bg-white/5">
+                    <div className="font-bold text-sm text-white mb-3">Skill Growth</div>
                     <div className="space-y-2">
                       {skillGrowth.slice(0, 5).map((item) => (
-                        <div key={item.skillId} className="rounded-xl border border-border/60 bg-background/70 p-3">
+                        <div key={item.skillId} className="rounded-xl border border-white/10 bg-slate-950/50 p-3">
                           <div className="flex items-center justify-between gap-2 mb-1">
-                            <div className="text-xs font-bold text-foreground">{item.skillLabel}</div>
+                            <div className="text-xs font-bold text-white">{item.skillLabel}</div>
                             <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-bold ${getStrandBadgeClass(item.strand)}`}>
                               {getStrandLabel(item.strand)}
                             </span>
                           </div>
-                          <div className="flex flex-wrap gap-3 text-[11px] text-muted-foreground">
+                          <div className="flex flex-wrap gap-3 text-[11px] text-slate-400">
                             <span>Pre: {item.preAccuracy}%</span>
                             <span>Post: {item.postAccuracy}%</span>
-                            <span className={item.improvement >= 0 ? "text-emerald-600 font-bold" : "text-amber-600 font-bold"}>
+                            <span className={item.improvement >= 0 ? "text-emerald-400 font-bold" : "text-amber-400 font-bold"}>
                               {item.improvement > 0 ? "+" : ""}
                               {item.improvement}%
                             </span>
@@ -624,11 +642,11 @@ function ResultsPage() {
                 ) : null}
 
                 {topStrengths.length > 0 ? (
-                  <div className="rounded-2xl bg-secondary p-4">
-                    <div className="font-bold text-sm text-foreground mb-2">You did well with</div>
+                  <div className="rounded-2xl bg-white/5 border border-white/10 p-4">
+                    <div className="font-bold text-sm text-white mb-2">You did well with</div>
                     <div className="space-y-2">
                       {topStrengths.map((item) => (
-                        <div key={item.skillId} className="text-xs text-secondary-foreground">
+                        <div key={item.skillId} className="text-xs text-slate-300">
                           {item.skillLabel}
                         </div>
                       ))}
@@ -637,20 +655,20 @@ function ResultsPage() {
                 ) : null}
 
                 {topWeakAreas.length > 0 ? (
-                  <div className="rounded-2xl p-4 border border-accent/30" style={{ background: "hsl(42 95% 97%)" }}>
-                    <div className="font-bold text-sm text-foreground mb-2">Focus on these next</div>
+                  <div className="rounded-2xl p-4 border border-amber-400/20 bg-amber-500/5">
+                    <div className="font-bold text-sm text-amber-200 mb-2">Focus on these next</div>
                     <div className="space-y-2">
                       {topWeakAreas.map((item) => (
-                        <div key={item.skillId} className="rounded-xl bg-background/70 border border-border/60 p-3">
+                        <div key={item.skillId} className="rounded-xl bg-slate-950/50 border border-white/10 p-3">
                           <div className="flex items-center gap-2 mb-1">
                             <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-bold ${getStrandBadgeClass(item.strand)}`}>
                               {getStrandLabel(item.strand)}
                             </span>
-                            <span className="text-[11px] font-semibold text-muted-foreground">
+                            <span className="text-[11px] font-semibold text-slate-500">
                               Week{item.linkedWeeks.length > 1 ? "s" : ""} {item.linkedWeeks.join(", ")}
                             </span>
                           </div>
-                          <div className="text-xs text-foreground">
+                          <div className="text-xs text-slate-200">
                             {item.skillLabel}
                           </div>
                         </div>
@@ -660,11 +678,11 @@ function ResultsPage() {
                 ) : null}
 
                 {!passed && storedPosttestProfile.recommendedWeeks.length > 0 ? (
-                  <div className="rounded-2xl bg-secondary p-4">
-                    <div className="font-bold text-sm text-foreground mb-2">Start here</div>
+                  <div className="rounded-2xl bg-white/5 border border-white/10 p-4">
+                    <div className="font-bold text-sm text-white mb-2">Start here</div>
                     <div className="space-y-2">
                       {storedPosttestProfile.recommendedWeeks.slice(0, 3).map((week, index) => (
-                        <div key={week} className="text-xs text-secondary-foreground">
+                        <div key={week} className="text-xs text-slate-300">
                           {index === 0 ? `Start with Week ${week}` : `Then revisit Week ${week}`}
                         </div>
                       ))}
@@ -675,9 +693,12 @@ function ResultsPage() {
             ) : null}
 
             {/* What's next */}
-            <div className="rounded-2xl bg-secondary p-4">
-              <div className="font-bold text-sm text-foreground mb-2">What&apos;s next?</div>
-              <div className="space-y-2">
+            <div className="rounded-2xl bg-white/5 border border-white/10 p-4">
+              <div className="font-bold text-sm text-white mb-3 flex items-center gap-2">
+                <span className="inline-block w-1 h-4 rounded-full bg-gradient-to-b from-teal-400 to-emerald-500" />
+                What&apos;s next?
+              </div>
+              <div className="space-y-2.5">
                 {(isPostTest && !passed
                   ? [
                       { icon: "🔁", text: "Review any week's lessons" },
@@ -690,8 +711,8 @@ function ResultsPage() {
                       { icon: "🏅", text: "Legends unlock with mastery" },
                     ]
                 ).map((item) => (
-                  <div key={item.text} className="flex items-center gap-2 text-xs text-secondary-foreground">
-                    <span>{item.icon}</span>
+                  <div key={item.text} className="flex items-center gap-3 text-xs text-slate-300">
+                    <span className="text-base">{item.icon}</span>
                     <span>{item.text}</span>
                   </div>
                 ))}
@@ -706,23 +727,23 @@ function ResultsPage() {
                 {isPostTest || passedByProgram ? (
                   <button
                     onClick={goLegends}
-                    className="w-full py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base hover:opacity-90 transition-all active:scale-[0.98] shadow-lg"
-                    style={{ boxShadow: "0 8px 24px -8px hsl(var(--primary) / 0.4)" }}
+                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold text-base hover:from-teal-400 hover:to-emerald-400 transition-all active:scale-[0.98]"
+                    style={{ boxShadow: "0 10px 30px -8px rgba(16, 185, 129, 0.5)" }}
                   >
                     🏅 View My Legends
                   </button>
                 ) : (
                   <button
                     onClick={nextYear ? goNextPretest : goHome}
-                    className="w-full py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base hover:opacity-90 transition-all active:scale-[0.98] shadow-lg"
-                    style={{ boxShadow: "0 8px 24px -8px hsl(var(--primary) / 0.4)" }}
+                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold text-base hover:from-teal-400 hover:to-emerald-400 transition-all active:scale-[0.98]"
+                    style={{ boxShadow: "0 10px 30px -8px rgba(16, 185, 129, 0.5)" }}
                   >
                     {nextYear ? `Start ${formatStudentLevelLabel(nextYear)} Pre-Test` : "Enter the Tower"}
                   </button>
                 )}
                 <button
                   onClick={goHome}
-                  className="w-full py-3 rounded-2xl bg-secondary text-secondary-foreground font-semibold text-sm hover:bg-muted transition-all active:scale-[0.98]"
+                  className="w-full py-3 rounded-2xl bg-white/5 border border-white/10 text-slate-300 font-semibold text-sm hover:bg-white/10 transition-all active:scale-[0.98]"
                 >
                   Go to Levels
                 </button>
@@ -731,24 +752,21 @@ function ResultsPage() {
               <>
                 <button
                   onClick={goContinue}
-                  className="w-full py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base hover:opacity-90 transition-all active:scale-[0.98] shadow-lg"
-                  style={{ boxShadow: "0 8px 24px -8px hsl(var(--primary) / 0.4)" }}
+                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold text-base hover:from-teal-400 hover:to-emerald-400 transition-all active:scale-[0.98]"
+                  style={{ boxShadow: "0 10px 30px -8px rgba(16, 185, 129, 0.5)" }}
                 >
                   Continue
                 </button>
                 <button
                   onClick={goAssignedWeek}
-                  className="w-full py-4 rounded-2xl font-bold text-base hover:opacity-90 transition-all active:scale-[0.98]"
-                  style={{
-                    background: "linear-gradient(135deg, hsl(var(--accent)), hsl(42 95% 60%))",
-                    boxShadow: "0 8px 24px -8px hsl(var(--accent) / 0.4)",
-                  }}
+                  className="w-full py-4 rounded-2xl font-bold text-base text-white bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 transition-all active:scale-[0.98]"
+                  style={{ boxShadow: "0 10px 30px -8px rgba(245, 158, 11, 0.5)" }}
                 >
                   Practise weak areas
                 </button>
                 <button
                   onClick={goRetryPostTest}
-                  className="w-full py-3 rounded-2xl bg-secondary text-secondary-foreground font-semibold text-sm hover:bg-muted transition-all active:scale-[0.98]"
+                  className="w-full py-3 rounded-2xl bg-white/5 border border-white/10 text-slate-300 font-semibold text-sm hover:bg-white/10 transition-all active:scale-[0.98]"
                 >
                   Retry Post-Test
                 </button>
@@ -757,17 +775,14 @@ function ResultsPage() {
               <>
                 <button
                   onClick={goProgram}
-                  className="w-full py-4 rounded-2xl font-bold text-base text-foreground hover:opacity-90 transition-all active:scale-[0.98] shadow-lg"
-                  style={{
-                    background: "linear-gradient(135deg, hsl(var(--accent)), hsl(42 95% 60%))",
-                    boxShadow: "0 8px 24px -8px hsl(var(--accent) / 0.4)",
-                  }}
+                  className="w-full py-4 rounded-2xl font-bold text-base text-white bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 transition-all active:scale-[0.98]"
+                  style={{ boxShadow: "0 10px 30px -8px rgba(16, 185, 129, 0.5)" }}
                 >
                   {requiresFullPathway ? "🚀 Start Full Pathway" : `🚀 Start Required Pathway (Week ${assignedStartWeek})`}
                 </button>
                 <button
                   onClick={goHome}
-                  className="w-full py-3 rounded-2xl bg-secondary text-secondary-foreground font-semibold text-sm hover:bg-muted transition-all active:scale-[0.98]"
+                  className="w-full py-3 rounded-2xl bg-white/5 border border-white/10 text-slate-300 font-semibold text-sm hover:bg-white/10 transition-all active:scale-[0.98]"
                 >
                   Go to Levels
                 </button>
