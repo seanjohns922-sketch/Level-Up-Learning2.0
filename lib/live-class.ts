@@ -143,52 +143,201 @@ function inferLikelyGap(snapshot: LiveStudentSnapshot) {
   const skillTag = normalizeText(snapshot.skillTag).toLowerCase();
   const questionText = normalizeText(snapshot.currentQuestionText).toLowerCase();
 
-  if (skillTag.includes("discount") || questionText.includes("%") || questionText.includes("discount")) {
-    return "May be mixing up the discount amount and the final price.";
+  // ── Place value / MAB ──
+  if (skillTag.includes("place_value") || skillTag.includes("mab") || skillTag.includes("base_ten") ||
+      questionText.includes("mab") || questionText.includes("hundreds") || questionText.includes("tens") ||
+      questionText.includes("ones") || questionText.includes("digit") || (questionText.includes("value") && !questionText.includes("per "))) {
+    return "May be confusing the value of each position — mixing up hundreds, tens and ones.";
   }
-  if (skillTag.includes("unit_rate") || questionText.includes("per ") || questionText.includes("value")) {
-    return "May not be comparing both options using the same unit.";
+  // ── Number lines ──
+  if (skillTag.includes("number_line") || questionText.includes("number line") || questionText.includes("place") && questionText.match(/\d{2,}/)) {
+    return "May not be partitioning the intervals correctly to locate the number.";
   }
-  if (skillTag.includes("pattern") || questionText.includes("rule") || questionText.includes("sequence")) {
+  // ── Rounding ──
+  if (skillTag.includes("round") || questionText.includes("round") || questionText.includes("nearest")) {
+    return "May be rounding to the wrong place value or not identifying the midpoint correctly.";
+  }
+  // ── Skip counting / sequences ──
+  if (skillTag.includes("skip_count") || skillTag.includes("count_by") || questionText.includes("skip") ||
+      questionText.includes("count by") || questionText.includes("rule") || questionText.includes("sequence")) {
+    return "May not have identified the rule before extending the sequence.";
+  }
+  // ── Addition / subtraction with regrouping ──
+  if (skillTag.includes("addition") || skillTag.includes("subtraction") || skillTag.includes("regroup") ||
+      skillTag.includes("carrying") || questionText.includes("add") || questionText.includes("subtract") ||
+      questionText.includes("difference") || questionText.includes("total")) {
+    return "May be struggling with regrouping (carrying or trading) across place value columns.";
+  }
+  // ── Multiplication / times tables ──
+  if (skillTag.includes("multiplication") || skillTag.includes("times_table") || skillTag.includes("factor") ||
+      questionText.includes("multiply") || questionText.includes("times") || questionText.includes("product")) {
+    return "May not have a reliable strategy — could be guessing rather than using a known fact or array.";
+  }
+  // ── Division ──
+  if (skillTag.includes("division") || questionText.includes("divid") || questionText.includes("share") || questionText.includes("groups of")) {
+    return "May be unsure of the relationship between multiplication and division, or losing track of remainders.";
+  }
+  // ── Fractions ──
+  if (skillTag.includes("fraction") || questionText.includes("fraction") || questionText.includes("numerator") ||
+      questionText.includes("denominator") || questionText.includes("/") || questionText.includes("half") || questionText.includes("quarter")) {
+    return "May be treating the numerator and denominator as separate whole numbers rather than as a ratio.";
+  }
+  // ── Time ──
+  if (skillTag.includes("time") || skillTag.includes("clock") || questionText.includes("o'clock") ||
+      questionText.includes("minutes") || questionText.includes("hours") || questionText.includes("duration")) {
+    return "May be misreading the clock hands or not converting between hours and minutes correctly.";
+  }
+  // ── Money ──
+  if (skillTag.includes("money") || skillTag.includes("change") || questionText.includes("$") ||
+      questionText.includes("change") || questionText.includes("cost") || questionText.includes("price")) {
+    return "May be struggling to calculate change — subtracting the cost from the amount paid.";
+  }
+  // ── Measurement ──
+  if (skillTag.includes("measurement") || skillTag.includes("length") || skillTag.includes("mass") ||
+      skillTag.includes("volume") || skillTag.includes("capacity") || questionText.includes("cm") ||
+      questionText.includes("metre") || questionText.includes("kg") || questionText.includes("litre")) {
+    return "May be confusing units or not converting between units (e.g. cm to m) correctly.";
+  }
+  // ── Area / perimeter ──
+  if (skillTag.includes("area") || skillTag.includes("perimeter") || questionText.includes("area") || questionText.includes("perimeter")) {
+    return "May be mixing up area (total squares) and perimeter (total edge length).";
+  }
+  // ── Data / graphs ──
+  if (skillTag.includes("data") || skillTag.includes("graph") || skillTag.includes("tally") ||
+      questionText.includes("graph") || questionText.includes("tally") || questionText.includes("table")) {
+    return "May be misreading the scale or not matching data labels to the correct values.";
+  }
+  // ── Patterns ──
+  if (skillTag.includes("pattern") || questionText.includes("pattern")) {
     return "May not have identified the rule before extending the pattern.";
   }
-  if (skillTag.includes("coordinate") || questionText.includes("(") || questionText.includes("quadrant")) {
-    return "May be mixing up x and y or the direction of negatives.";
+  // ── Geometry / shape ──
+  if (skillTag.includes("shape") || skillTag.includes("geometry") || skillTag.includes("angle") ||
+      questionText.includes("shape") || questionText.includes("angle") || questionText.includes("triangle")) {
+    return "May be relying on appearance rather than properties to identify the shape.";
   }
-  if (skillTag.includes("equation") || questionText.includes("x") || questionText.includes("unknown")) {
-    return "May need to undo the outer operation first to isolate the unknown.";
-  }
+  // ── Order of operations (upper years) ──
   if (skillTag.includes("order") || questionText.includes("÷") || questionText.includes("×") || questionText.includes("bracket")) {
     return "May be solving left-to-right instead of following the operation priority.";
   }
+  // ── Percentages / discount ──
+  if (skillTag.includes("discount") || skillTag.includes("percent") || questionText.includes("%") || questionText.includes("discount")) {
+    return "May be mixing up the discount amount and the final price.";
+  }
+  // ── Unit rates / best buys ──
+  if (skillTag.includes("unit_rate") || questionText.includes("per ")) {
+    return "May not be comparing both options using the same unit.";
+  }
+  // ── Coordinates ──
+  if (skillTag.includes("coordinate") || questionText.includes("quadrant") || questionText.includes("grid")) {
+    return "May be mixing up x and y or the direction of negatives on the grid.";
+  }
+  // ── Equations / unknowns ──
+  if (skillTag.includes("equation") || questionText.includes("unknown") || questionText.includes("= ?")) {
+    return "May need to undo the outer operation first to isolate the unknown.";
+  }
 
-  return "May need a quick strategy check before continuing.";
+  return "May need a strategy check — ask them to explain what they tried before answering.";
 }
 
 function inferSuggestedAction(snapshot: LiveStudentSnapshot) {
   const skillTag = normalizeText(snapshot.skillTag).toLowerCase();
   const questionText = normalizeText(snapshot.currentQuestionText).toLowerCase();
 
-  if (skillTag.includes("discount") || questionText.includes("discount")) {
-    return "Ask the student to find the discount amount first, then subtract it.";
+  // ── Place value / MAB ──
+  if (skillTag.includes("place_value") || skillTag.includes("mab") || skillTag.includes("base_ten") ||
+      questionText.includes("mab") || questionText.includes("hundreds") || questionText.includes("tens") ||
+      questionText.includes("ones") || questionText.includes("digit") || (questionText.includes("value") && !questionText.includes("per "))) {
+    return "Ask the student to draw or build the number using MAB blocks — one column at a time — before writing the answer.";
   }
-  if (skillTag.includes("unit_rate") || questionText.includes("per ")) {
-    return "Ask the student to compare both options per one unit before choosing.";
+  // ── Number lines ──
+  if (skillTag.includes("number_line") || questionText.includes("number line") || questionText.includes("place") && questionText.match(/\d{2,}/)) {
+    return "Ask the student to identify the start and end values first, count the intervals, then estimate where the number sits.";
   }
-  if (skillTag.includes("pattern") || questionText.includes("sequence")) {
+  // ── Rounding ──
+  if (skillTag.includes("round") || questionText.includes("round") || questionText.includes("nearest")) {
+    return "Ask the student to underline the digit they're rounding and look at the next digit to decide up or down.";
+  }
+  // ── Skip counting / sequences ──
+  if (skillTag.includes("skip_count") || skillTag.includes("count_by") || questionText.includes("skip") ||
+      questionText.includes("count by") || questionText.includes("rule") || questionText.includes("sequence")) {
+    return "Ask the student to say the pattern aloud, identify the jump size, then continue the sequence step by step.";
+  }
+  // ── Addition / subtraction ──
+  if (skillTag.includes("addition") || skillTag.includes("subtraction") || skillTag.includes("regroup") ||
+      skillTag.includes("carrying") || questionText.includes("add") || questionText.includes("subtract") ||
+      questionText.includes("difference") || questionText.includes("total")) {
+    return "Ask the student to line up the digits by place value and work through regrouping one column at a time.";
+  }
+  // ── Multiplication ──
+  if (skillTag.includes("multiplication") || skillTag.includes("times_table") || skillTag.includes("factor") ||
+      questionText.includes("multiply") || questionText.includes("times") || questionText.includes("product")) {
+    return "Ask the student to use an array or repeated addition to build the answer from a fact they know.";
+  }
+  // ── Division ──
+  if (skillTag.includes("division") || questionText.includes("divid") || questionText.includes("share") || questionText.includes("groups of")) {
+    return "Ask the student to think of the related multiplication fact — what times the divisor gets close to the dividend?";
+  }
+  // ── Fractions ──
+  if (skillTag.includes("fraction") || questionText.includes("fraction") || questionText.includes("numerator") ||
+      questionText.includes("denominator") || questionText.includes("half") || questionText.includes("quarter")) {
+    return "Ask the student to draw a model (bar or circle) and shade the fraction before choosing the answer.";
+  }
+  // ── Time ──
+  if (skillTag.includes("time") || skillTag.includes("clock") || questionText.includes("o'clock") ||
+      questionText.includes("minutes") || questionText.includes("hours") || questionText.includes("duration")) {
+    return "Ask the student to sketch the clock or timeline and count the intervals rather than guessing.";
+  }
+  // ── Money ──
+  if (skillTag.includes("money") || skillTag.includes("change") || questionText.includes("$") ||
+      questionText.includes("change") || questionText.includes("cost") || questionText.includes("price")) {
+    return "Ask the student to count up from the price to the amount paid to find the change.";
+  }
+  // ── Measurement ──
+  if (skillTag.includes("measurement") || skillTag.includes("length") || skillTag.includes("mass") ||
+      skillTag.includes("volume") || questionText.includes("cm") || questionText.includes("metre") || questionText.includes("kg")) {
+    return "Ask the student to write the conversion factor (e.g. 100 cm = 1 m) and then apply it.";
+  }
+  // ── Area / perimeter ──
+  if (skillTag.includes("area") || skillTag.includes("perimeter") || questionText.includes("area") || questionText.includes("perimeter")) {
+    return "Ask the student to label whether they need the total inside (area) or the total edge (perimeter), then choose the right formula.";
+  }
+  // ── Data / graphs ──
+  if (skillTag.includes("data") || skillTag.includes("graph") || skillTag.includes("tally") ||
+      questionText.includes("graph") || questionText.includes("tally") || questionText.includes("table")) {
+    return "Point to the scale or key and ask the student to re-read the value for the category in question.";
+  }
+  // ── Patterns ──
+  if (skillTag.includes("pattern") || questionText.includes("pattern")) {
     return "Ask the student to say the rule aloud before finding the next term.";
   }
-  if (skillTag.includes("coordinate") || questionText.includes("quadrant")) {
-    return "Point to the axes and ask the student to move across first, then up or down.";
+  // ── Geometry ──
+  if (skillTag.includes("shape") || skillTag.includes("geometry") || skillTag.includes("angle") ||
+      questionText.includes("shape") || questionText.includes("angle")) {
+    return "Ask the student to list the properties (sides, angles) of the shape rather than going by looks alone.";
   }
-  if (skillTag.includes("equation") || questionText.includes("unknown")) {
-    return "Ask the student which operation happened last and how to undo it.";
+  // ── Order of operations ──
+  if (skillTag.includes("order") || questionText.includes("÷") || questionText.includes("×") || questionText.includes("bracket")) {
+    return "Ask the student to highlight the operation they must solve first before doing any calculation.";
   }
-  if (skillTag.includes("order") || questionText.includes("÷") || questionText.includes("×")) {
-    return "Ask the student to highlight the operation they must solve first.";
+  // ── Percentages / discount ──
+  if (skillTag.includes("discount") || skillTag.includes("percent") || questionText.includes("%") || questionText.includes("discount")) {
+    return "Ask the student to find the discount amount first, then subtract it from the original price.";
+  }
+  // ── Unit rates ──
+  if (skillTag.includes("unit_rate") || questionText.includes("per ")) {
+    return "Ask the student to compare both options per one unit before deciding.";
+  }
+  // ── Coordinates ──
+  if (skillTag.includes("coordinate") || questionText.includes("quadrant") || questionText.includes("grid")) {
+    return "Point to the axes and ask the student to move across first (x), then up or down (y).";
+  }
+  // ── Equations / unknowns ──
+  if (skillTag.includes("equation") || questionText.includes("unknown") || questionText.includes("= ?")) {
+    return "Ask the student which operation happened last and how they would undo it to find the missing value.";
   }
 
-  return "Check in now and ask the student to explain the strategy before solving.";
+  return "Sit with the student and ask them to talk through what they tried — listen for where their reasoning breaks down.";
 }
 
 export function buildLiveStudentInsight(
@@ -220,14 +369,18 @@ export function buildLiveStudentInsight(
     incorrectCount >= thresholds.needsSupportRecentIncorrectCount ||
     timeOnQuestion >= thresholds.needsSupportTimeOnQuestionSeconds
   ) {
+    const name = snapshot.studentName ?? "This student";
+    const activityLabel = snapshot.currentActivityLabel ?? snapshot.currentLessonTitle ?? null;
+    const issueText =
+      questionAttempts >= thresholds.needsSupportSameQuestionAttempts
+        ? `${name} has made ${questionAttempts} attempt${questionAttempts !== 1 ? "s" : ""} on the same question${activityLabel ? ` in ${activityLabel}` : ""} without success`
+        : incorrectCount >= thresholds.needsSupportRecentIncorrectCount
+        ? `${name} has had ${incorrectCount} incorrect answer${incorrectCount !== 1 ? "s" : ""} this session${activityLabel ? ` — currently on ${activityLabel}` : ""}`
+        : `${name} has been on the same question for ${Math.floor(timeOnQuestion / 60)} min${Math.floor(timeOnQuestion / 60) !== 1 ? "s" : ""}${activityLabel ? ` in ${activityLabel}` : ""}`;
     return {
       status: "needs_support",
       statusLabel: STATUS_LABELS.needs_support,
-      issue: sentenceCase(
-        latestEventType === "answer_incorrect"
-          ? `${snapshot.studentName ?? "This student"} has repeated errors on the current question`
-          : `${snapshot.studentName ?? "This student"} has been stuck on the same task for too long`
-      ),
+      issue: sentenceCase(issueText),
       likelyGap: inferLikelyGap(snapshot),
       suggestedTeacherAction: inferSuggestedAction(snapshot),
     };
@@ -240,18 +393,19 @@ export function buildLiveStudentInsight(
     secondsSinceActive >= thresholds.checkInIdleSeconds
   ) {
     const isInactiveCheckIn = secondsSinceActive >= thresholds.checkInIdleSeconds;
+    const name = snapshot.studentName ?? "This student";
+    const activityLabel = snapshot.currentActivityLabel ?? snapshot.currentLessonTitle ?? null;
+    const issueText = isInactiveCheckIn
+      ? `${name} has been inactive for ${Math.floor(secondsSinceActive / 60)} minute${Math.floor(secondsSinceActive / 60) !== 1 ? "s" : ""}`
+      : latestEventType === "answer_incorrect"
+      ? `${name} just answered incorrectly${activityLabel ? ` on ${activityLabel}` : ""}`
+      : hintCount >= thresholds.checkInHintCount
+      ? `${name} has used ${hintCount} hints${activityLabel ? ` on ${activityLabel}` : ""} — may need guidance`
+      : `${name} has been on the current question for ${Math.floor(timeOnQuestion / 60)} min${Math.floor(timeOnQuestion / 60) !== 1 ? "s" : ""}`;
     return {
       status: "check_in",
       statusLabel: STATUS_LABELS.check_in,
-      issue: sentenceCase(
-        isInactiveCheckIn
-          ? `${snapshot.studentName ?? "This student"} has been inactive for ${Math.floor(
-              secondsSinceActive / 60
-            )} minutes`
-          : latestEventType === "answer_incorrect"
-          ? `${snapshot.studentName ?? "This student"} has just missed a question`
-          : `${snapshot.studentName ?? "This student"} may need a quick check-in soon`
-      ),
+      issue: sentenceCase(issueText),
       likelyGap: isInactiveCheckIn
         ? "The task may be incomplete, or the student may have stepped away from the app."
         : inferLikelyGap(snapshot),
