@@ -345,6 +345,13 @@ export default function TeacherClassesPage() {
     );
   }
 
+  async function deleteStudent(student: StudentRow) {
+    if (!confirm(`Permanently delete ${student.display_name}? This cannot be undone and all their progress will be lost.`)) return;
+    const { error } = await supabase.from("students").delete().eq("id", student.id);
+    if (error) { alert(error.message); return; }
+    setStudents((prev) => prev.filter((s) => s.id !== student.id));
+  }
+
   async function unarchiveStudent(student: StudentRow) {
     const { error } = await supabase
       .from("students")
@@ -850,16 +857,32 @@ export default function TeacherClassesPage() {
                                       >
                                         {archivingStudentId === s.id ? "Archiving…" : "Archive"}
                                       </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => deleteStudent(s)}
+                                        className="rounded-xl border border-red-300 bg-red-100 px-3 py-2 text-xs font-bold text-red-800 hover:bg-red-200"
+                                      >
+                                        Delete
+                                      </button>
                                     </>
                                   )}
                                   {isArchived && (
-                                    <button
-                                      type="button"
-                                      onClick={() => unarchiveStudent(s)}
-                                      className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700 hover:bg-emerald-100"
-                                    >
-                                      Restore
-                                    </button>
+                                    <>
+                                      <button
+                                        type="button"
+                                        onClick={() => unarchiveStudent(s)}
+                                        className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700 hover:bg-emerald-100"
+                                      >
+                                        Restore
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => deleteStudent(s)}
+                                        className="rounded-xl border border-red-300 bg-red-100 px-3 py-2 text-xs font-bold text-red-800 hover:bg-red-200"
+                                      >
+                                        Delete
+                                      </button>
+                                    </>
                                   )}
                                 </div>
                               </div>
