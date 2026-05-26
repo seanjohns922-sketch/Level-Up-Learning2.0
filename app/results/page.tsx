@@ -403,12 +403,12 @@ function ResultsPage() {
   }
   function goLegends() { router.push("/legends"); }
 
-  // Emoji + message based on score
+  // Icon + message based on score (no emojis)
   const getMessage = () => {
-    if (passed) return { emoji: "🏆", title: "Amazing Work!", sub: "You crushed it!" };
-    if (scorePercent >= 70) return { emoji: "💪", title: "So Close!", sub: "A little more practice and you'll nail it." };
-    if (scorePercent >= PRETEST_PASS_THRESHOLD) return { emoji: "🌱", title: "Good Start!", sub: "Let's build your skills with a personalised program." };
-    return { emoji: "🚀", title: "Let's Level Up!", sub: "Your adventure is just beginning." };
+    if (passed) return { icon: "star", title: isPostTest ? "Level Mastered" : "Pre-Test Passed", sub: isPostTest ? "You've proven your skills — collect your Legend." : "Strong result — moving to the next level." };
+    if (isPostTest) return { icon: "arrow", title: "Not Quite Yet", sub: `You need ${POSTTEST_PASS_THRESHOLD}% to pass. Review the suggested weeks and try again.` };
+    if (scorePercent >= 70) return { icon: "arrow", title: "Nearly There", sub: "Strong attempt. Your personalised program will close the gap." };
+    return { icon: "play", title: "Program Assigned", sub: "Your learning path is ready — work through it week by week." };
   };
   const msg = getMessage();
   const topStrengths = storedPosttestProfile?.strengths?.slice(0, 3) ?? [];
@@ -449,15 +449,32 @@ function ResultsPage() {
           />
 
           <div className="p-8 pb-6 text-center relative">
-            {/* Emoji badge */}
+            {/* Icon badge — SVG, no emoji */}
             <div
-              className="text-5xl mb-3 inline-block"
+              className="mx-auto mb-4 flex items-center justify-center rounded-full"
               style={{
+                width: 56,
+                height: 56,
+                background: passed
+                  ? "radial-gradient(circle, rgba(20,184,166,0.2) 0%, rgba(20,184,166,0.05) 100%)"
+                  : "radial-gradient(circle, rgba(251,191,36,0.2) 0%, rgba(251,191,36,0.05) 100%)",
+                border: passed ? "1px solid rgba(45,212,191,0.3)" : "1px solid rgba(251,191,36,0.3)",
                 animation: "bounceIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both",
-                filter: "drop-shadow(0 0 24px rgba(45, 212, 191, 0.4))",
               }}
             >
-              {msg.emoji}
+              {msg.icon === "star" ? (
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="rgb(45 212 191)" stroke="none">
+                  <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+                </svg>
+              ) : msg.icon === "arrow" ? (
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="rgb(251 191 36)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 19V5M5 12l7-7 7 7" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="rgb(251 191 36)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="5,3 19,12 5,21" />
+                </svg>
+              )}
             </div>
 
             <h1 className="text-3xl font-extrabold font-display text-white mb-1 tracking-tight">
@@ -495,64 +512,74 @@ function ResultsPage() {
           <div className="px-8 pb-6 pt-4 space-y-3">
             {passed ? (
               <div className="rounded-2xl p-4 border border-teal-400/20 bg-gradient-to-br from-teal-500/10 to-emerald-500/5">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-lg">✨</span>
-                  <span className="font-bold text-sm text-teal-200">Legend Unlocked!</span>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="rgb(94 234 212)" stroke="none">
+                    <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+                  </svg>
+                  <span className="font-bold text-sm text-teal-200">Legend Unlocked</span>
                 </div>
                 <p className="text-xs text-slate-400 leading-relaxed">
                   {isPostTest
                     ? year === "Prep"
-                      ? "You passed the Ground Level mastery test — your Legend is unlocked and Year 1 is ready next!"
-                      : "You passed the post-test — your Legend is ready to collect!"
+                      ? "You passed the Ground Level mastery test — your Legend is ready to collect and Year 1 is now open."
+                      : "Post-test passed — your Legend is ready to collect."
                     : passedByProgram
-                    ? "You completed the 12-week program — your Legend awaits!"
+                    ? "You completed the 12-week program — your Legend is waiting."
                     : nextYear
-                    ? `You passed this pre-test. Next stop: ${nextYear}.`
-                    : "You passed the final pre-test — your Legends are ready to collect!"}
+                    ? `Pre-test passed. Up next: ${nextYear}.`
+                    : "Final pre-test passed — all Legends are ready to collect."}
                 </p>
               </div>
             ) : isPostTest ? (
               <div className="rounded-2xl p-4 border border-amber-400/20 bg-amber-500/5">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-lg">💪</span>
-                  <span className="font-bold text-sm text-amber-200">Almost there!</span>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="rgb(252 211 77)" strokeWidth="2.5" strokeLinecap="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 8v4M12 16h.01" />
+                  </svg>
+                  <span className="font-bold text-sm text-amber-200">Keep Going</span>
                 </div>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  You need {POSTTEST_PASS_THRESHOLD}% to pass. Review the suggested weeks and try again when you&apos;re ready.
+                  {POSTTEST_PASS_THRESHOLD}% required to pass. Revisit the recommended weeks below and retry when ready.
                 </p>
               </div>
             ) : (
               <>
                 <div className="rounded-2xl p-4 border border-amber-400/20 bg-gradient-to-br from-amber-500/10 to-orange-500/5">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-lg">📚</span>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="rgb(252 211 77)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                    </svg>
                     <span className="font-bold text-sm text-amber-200">Learning Path Ready</span>
                   </div>
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    Good effort! You scored {scorePercent}% — you&apos;ll be working through {studentLevelLabel} to build your skills.
+                    You scored {scorePercent}% — your personalised program for {studentLevelLabel} is set up and ready to begin.
                   </p>
                   {requiredWeeks.length > 0 ? (
                     <p className="mt-2 text-xs text-slate-400 leading-relaxed">
                       {requiresFullPathway
                         ? "Complete the full 12-week pathway to be ready to pass this level."
-                        : `You need to complete Weeks ${requiredWeeks.join(", ")} to be ready to pass this level.`}
+                        : `Focus on Weeks ${requiredWeeks.join(", ")} to reach mastery.`}
                     </p>
                   ) : null}
                 </div>
                 {unlockTargets.length > 0 && (
                   <div className="rounded-2xl p-4 border border-teal-400/20 bg-gradient-to-br from-teal-500/10 to-emerald-500/5">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-lg">🏅</span>
-                      <span className="font-bold text-sm text-teal-200">Legends Unlocked!</span>
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="rgb(94 234 212)" stroke="none">
+                        <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+                      </svg>
+                      <span className="font-bold text-sm text-teal-200">Legends Unlocked</span>
                     </div>
                     <p className="text-xs text-slate-400 leading-relaxed">
-                      Well done — all Numbots from{" "}
+                      All Numbots from{" "}
                       {formatStudentLevelLabel(YEAR_SEQUENCE[0])}{" "}
                       to{" "}
                       {formatStudentLevelLabel(
                         YEAR_SEQUENCE[Math.max(0, YEAR_SEQUENCE.indexOf(year as (typeof YEAR_SEQUENCE)[number]) - 1)]
                       )}{" "}
-                      are now unlocked and ready to collect!
+                      are now unlocked and ready to collect.
                     </p>
                   </div>
                 )}
@@ -701,19 +728,19 @@ function ResultsPage() {
               <div className="space-y-2.5">
                 {(isPostTest && !passed
                   ? [
-                      { icon: "🔁", text: "Review any week's lessons" },
-                      { icon: "📝", text: "Retry the post-test when ready" },
-                      { icon: "🏅", text: `Score ${POSTTEST_PASS_THRESHOLD}%+ to unlock your Legend` },
+                      "Review any week's lessons",
+                      "Retry the post-test when ready",
+                      `Score ${POSTTEST_PASS_THRESHOLD}%+ to unlock your Legend`,
                     ]
                   : [
-                      { icon: "📖", text: "3 lessons every week" },
-                      { icon: "🧪", text: "1 quiz to test your skills" },
-                      { icon: "🏅", text: "Legends unlock with mastery" },
+                      "3 lessons every week",
+                      "1 quiz to test your skills",
+                      "Legends unlock with mastery",
                     ]
-                ).map((item) => (
-                  <div key={item.text} className="flex items-center gap-3 text-xs text-slate-300">
-                    <span className="text-base">{item.icon}</span>
-                    <span>{item.text}</span>
+                ).map((text) => (
+                  <div key={text} className="flex items-center gap-3 text-xs text-slate-300">
+                    <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-teal-500/60" />
+                    <span>{text}</span>
                   </div>
                 ))}
               </div>
@@ -730,7 +757,7 @@ function ResultsPage() {
                     className="w-full py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold text-base hover:from-teal-400 hover:to-emerald-400 transition-all active:scale-[0.98]"
                     style={{ boxShadow: "0 10px 30px -8px rgba(16, 185, 129, 0.5)" }}
                   >
-                    🏅 View My Legends
+                    View My Legends
                   </button>
                 ) : (
                   <button
@@ -778,7 +805,7 @@ function ResultsPage() {
                   className="w-full py-4 rounded-2xl font-bold text-base text-white bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 transition-all active:scale-[0.98]"
                   style={{ boxShadow: "0 10px 30px -8px rgba(16, 185, 129, 0.5)" }}
                 >
-                  {requiresFullPathway ? "🚀 Start Full Pathway" : `🚀 Start Required Pathway (Week ${assignedStartWeek})`}
+                  {requiresFullPathway ? "Start Full Pathway" : `Start Required Pathway — Week ${assignedStartWeek}`}
                 </button>
                 <button
                   onClick={goHome}
@@ -798,7 +825,7 @@ function ResultsPage() {
           legend={unlockDisplayLegend}
           scorePercent={isFailedPretest ? undefined : displayPercent}
           headerTitle={isFailedPretest ? "GREAT EFFORT!" : "LEVEL COMPLETE!"}
-          scoreLabel={isFailedPretest ? undefined : "You crushed it! 🔥"}
+          scoreLabel={isFailedPretest ? undefined : "Well done"}
           onContinue={() => setUnlockDismissed(true)}
           onViewLegends={goLegends}
         />

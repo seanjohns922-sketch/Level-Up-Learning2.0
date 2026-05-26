@@ -62,7 +62,7 @@ export default function LegendUnlockReveal({
   legend,
   scorePercent,
   headerTitle = "LEVEL COMPLETE!",
-  scoreLabel = "You crushed it! 🔥",
+  scoreLabel = "Well done",
   onContinue,
   onViewLegends,
 }: {
@@ -127,16 +127,26 @@ export default function LegendUnlockReveal({
         <div className="absolute inset-0 flex items-center justify-center z-20">
           <div
             className="text-center"
-            style={{
-              animation: "levelUpPulse 1.2s ease-out forwards",
-            }}
+            style={{ animation: "levelUpPulse 1.2s ease-out forwards" }}
           >
-            <div
-              className="text-6xl mb-4"
-              style={{ animation: "bounceInEmoji 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards" }}
+            {/* Diamond star icon — no emoji */}
+            <svg
+              viewBox="0 0 48 48"
+              className="mx-auto mb-5"
+              style={{
+                width: 64,
+                height: 64,
+                animation: "bounceInEmoji 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
+                filter: "drop-shadow(0 0 20px hsla(42, 95%, 55%, 0.7))",
+              }}
             >
-              🏆
-            </div>
+              <polygon
+                points="24,2 29,18 46,18 33,28 38,44 24,35 10,44 15,28 2,18 19,18"
+                fill="hsl(42, 95%, 55%)"
+                stroke="hsla(42, 95%, 80%, 0.6)"
+                strokeWidth="1"
+              />
+            </svg>
             <h1
               className="text-4xl md:text-5xl font-black tracking-tight"
               style={{
@@ -398,7 +408,7 @@ export default function LegendUnlockReveal({
               boxShadow: "0 4px 24px hsla(42, 95%, 55%, 0.5)",
             }}
           >
-            🏅 View My Legends
+            View My Legends
           </button>
           <button
             onClick={onContinue}
