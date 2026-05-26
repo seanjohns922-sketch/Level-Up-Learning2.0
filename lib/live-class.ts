@@ -38,8 +38,8 @@ export type LiveStatusThresholds = {
 export const DEFAULT_LIVE_STATUS_THRESHOLDS: LiveStatusThresholds = {
   checkInTimeOnQuestionSeconds: 90,
   needsSupportTimeOnQuestionSeconds: 180,
-  checkInIdleSeconds: 90,
-  idleSeconds: 120,
+  checkInIdleSeconds: 540,
+  idleSeconds: 600,
   checkInHintCount: 2,
   needsSupportSameQuestionAttempts: 2,
   needsSupportRecentIncorrectCount: 3,
@@ -239,16 +239,25 @@ export function buildLiveStudentInsight(
     latestEventType === "answer_incorrect" ||
     secondsSinceActive >= thresholds.checkInIdleSeconds
   ) {
+    const isInactiveCheckIn = secondsSinceActive >= thresholds.checkInIdleSeconds;
     return {
       status: "check_in",
       statusLabel: STATUS_LABELS.check_in,
       issue: sentenceCase(
-        latestEventType === "answer_incorrect"
+        isInactiveCheckIn
+          ? `${snapshot.studentName ?? "This student"} has been inactive for ${Math.floor(
+              secondsSinceActive / 60
+            )} minutes`
+          : latestEventType === "answer_incorrect"
           ? `${snapshot.studentName ?? "This student"} has just missed a question`
           : `${snapshot.studentName ?? "This student"} may need a quick check-in soon`
       ),
-      likelyGap: inferLikelyGap(snapshot),
-      suggestedTeacherAction: inferSuggestedAction(snapshot),
+      likelyGap: isInactiveCheckIn
+        ? "The task may be incomplete, or the student may have stepped away from the app."
+        : inferLikelyGap(snapshot),
+      suggestedTeacherAction: isInactiveCheckIn
+        ? "Check whether the student has paused the task and decide whether to restart or continue."
+        : inferSuggestedAction(snapshot),
     };
   }
 

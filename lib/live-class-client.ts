@@ -271,7 +271,7 @@ export function scheduleIdleLiveEvent(base: Omit<LiveLearningEventInput, "eventT
       ...base,
       eventType: "idle_detected",
     });
-  }, 120000);
+  }, 600000);
 }
 
 export function clearIdleLiveEventTimer() {

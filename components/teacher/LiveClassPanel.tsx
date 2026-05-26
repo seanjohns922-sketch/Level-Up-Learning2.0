@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import {
   buildLiveClassInsight,
+  buildLiveStudentInsight,
   formatRelativeTime,
   formatTimeActive,
   getLiveStatusTone,
@@ -43,7 +44,7 @@ type LiveStudentActivityRow = {
   current_step_label?: string | null;
   progress_percent?: number | null;
   progress_label?: string | null;
-  latest_event_type?: string | null;
+  latest_event_type?: import("@/lib/live-class").LiveLearningEventType | null;
   latest_answer_correct?: boolean | null;
   latest_selected_answer?: string | null;
   latest_correct_answer?: string | null;
@@ -101,10 +102,47 @@ const STATUS_PRIORITY: Record<LiveStudentStatus, number> = {
 };
 
 function toLiveCard(student: StudentRow, row?: LiveStudentActivityRow | null): LiveStudentCard {
+  const insight = row
+    ? buildLiveStudentInsight({
+        studentId: student.id,
+        studentName: student.display_name,
+        classId: student.class_id,
+        currentLevel: row.current_level ?? null,
+        currentStrand: null,
+        currentWeek: row.current_week ?? null,
+        currentLesson: row.current_lesson ?? null,
+        currentLessonTitle: row.current_lesson_title ?? null,
+        currentActivityId: row.current_activity_id ?? null,
+        currentActivityLabel: row.current_activity_label ?? null,
+        currentQuestionId: row.current_question_id ?? null,
+        currentQuestionText: row.current_question_text ?? null,
+        currentQuestionType: row.current_question_type ?? null,
+        currentQuestionOptions: row.current_question_options ?? null,
+        currentStepLabel: row.current_step_label ?? null,
+        progressPercent: row.progress_percent ?? null,
+        progressLabel: row.progress_label ?? null,
+        latestEventType: row.latest_event_type ?? null,
+        latestAnswerCorrect: row.latest_answer_correct ?? null,
+        latestSelectedAnswer: row.latest_selected_answer ?? null,
+        latestCorrectAnswer: row.latest_correct_answer ?? null,
+        lastEventText: row.last_event_text ?? null,
+        timeOnCurrentQuestion: row.time_on_current_question ?? null,
+        currentQuestionAttempts: row.current_question_attempts ?? null,
+        sessionIncorrectCount: row.session_incorrect_count ?? null,
+        consecutiveIncorrectCount: row.consecutive_incorrect_count ?? null,
+        sessionHintCount: row.session_hint_count ?? null,
+        attemptNumber: row.attempt_number ?? null,
+        skillTag: row.skill_tag ?? null,
+        misconceptionTag: row.misconception_tag ?? null,
+        lastActiveAt: row.last_active_at ?? null,
+        updatedAt: row.updated_at ?? null,
+      })
+    : null;
+
   return {
     id: student.id,
     displayName: student.display_name,
-    status: row?.ai_status ?? "idle",
+    status: insight?.status ?? row?.ai_status ?? "idle",
     currentLevel: row?.current_level ?? null,
     currentWeek: row?.current_week ?? null,
     currentLesson: row?.current_lesson ?? null,
@@ -121,9 +159,9 @@ function toLiveCard(student: StudentRow, row?: LiveStudentActivityRow | null): L
     latestCorrectAnswer: row?.latest_correct_answer ?? null,
     latestAnswerCorrect: row?.latest_answer_correct ?? null,
     timeOnCurrentQuestion: row?.time_on_current_question ?? 0,
-    aiIssue: row?.ai_issue ?? null,
-    aiLikelyGap: row?.ai_likely_gap ?? null,
-    aiSuggestedAction: row?.ai_suggested_action ?? null,
+    aiIssue: insight?.issue ?? row?.ai_issue ?? null,
+    aiLikelyGap: insight?.likelyGap ?? row?.ai_likely_gap ?? null,
+    aiSuggestedAction: insight?.suggestedTeacherAction ?? row?.ai_suggested_action ?? null,
     skillTag: row?.skill_tag ?? null,
     misconceptionTag: row?.misconception_tag ?? null,
   };
@@ -166,11 +204,6 @@ export default function LiveClassPanel({
   const [spotlightMode, setSpotlightMode] = useState(false);
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [selectedStudentEvents, setSelectedStudentEvents] = useState<LiveStudentEventRow[]>([]);
-
-  useEffect(() => {
-    setSelectedStudentId(null);
-    setSelectedStudentEvents([]);
-  }, [selectedClass?.id]);
 
   useEffect(() => {
     let cancelled = false;
@@ -229,7 +262,6 @@ export default function LiveClassPanel({
     let cancelled = false;
     const selectedClassId = selectedClass?.id ?? null;
     if (!selectedClassId || !selectedStudentId) {
-      setSelectedStudentEvents([]);
       return;
     }
 
@@ -308,6 +340,8 @@ export default function LiveClassPanel({
       ),
     [cards, selectedClass?.id]
   );
+
+  const isDrawerOpen = Boolean(selectedStudent);
 
   return (
     <>
@@ -468,10 +502,10 @@ export default function LiveClassPanel({
       </section>
 
       <LiveStudentDrawer
-        open={Boolean(selectedStudentId)}
+        open={isDrawerOpen}
         onClose={() => setSelectedStudentId(null)}
         student={selectedStudent}
-        events={selectedStudentEvents}
+        events={isDrawerOpen ? selectedStudentEvents : []}
       />
     </>
   );
