@@ -238,15 +238,6 @@ function ResultsPage() {
   const nextYear = getNextYearLabel(year);
 
   const legend = useMemo(() => getLegendForYear(year), [year]);
-
-  // For a failed pretest we unlock prior-year legends — show the highest one in the overlay
-  const unlockDisplayLegend = useMemo(() => {
-    if (!isPostTest && !passedByPretest && unlockTargets.length > 0) {
-      const yearIndex = YEAR_SEQUENCE.indexOf(year as (typeof YEAR_SEQUENCE)[number]);
-      if (yearIndex > 0) return getLegendForYear(YEAR_SEQUENCE[yearIndex - 1]);
-    }
-    return legend;
-  }, [isPostTest, passedByPretest, unlockTargets, year, legend]);
   const storedPosttestProfile: AssessmentResultProfile | null = useMemo(() => {
     const progress = readProgress();
     return isPostTest ? progress?.lastPostTestProfile ?? null : null;
@@ -280,6 +271,16 @@ function ResultsPage() {
     if (!isPostTest) return getLegendIdsBeforeYear(year); // failed pretest → unlock all prior years
     return [legend.id];
   }, [passedByPretest, isPostTest, year, legend.id]);
+
+  // For a failed pretest we unlock prior-year legends — show the highest one in the overlay
+  const unlockDisplayLegend = useMemo(() => {
+    if (!isPostTest && !passedByPretest && unlockTargets.length > 0) {
+      const yearIndex = YEAR_SEQUENCE.indexOf(year as (typeof YEAR_SEQUENCE)[number]);
+      if (yearIndex > 0) return getLegendForYear(YEAR_SEQUENCE[yearIndex - 1]);
+    }
+    return legend;
+  }, [isPostTest, passedByPretest, unlockTargets, year, legend]);
+
   const shouldShowUnlock =
     unlockTargets.length > 0 &&
     unlockTargets.some((id) => !(initialProgress?.unlockedLegends ?? []).includes(id)) &&
