@@ -4404,6 +4404,30 @@ function buildPrepWeek7WeeklyQuizQuestions(
   return questions;
 }
 
+function derivedPlaceValueBuilderAnswer(questionData: Extract<Year2QuestionData, { kind: "place_value_builder" }>) {
+  if (questionData.mode === "identify_number") return questionData.targetNumber;
+  const place = questionData.place ?? "ones";
+  const count =
+    place === "hundred_thousands"
+      ? questionData.hundredThousands ?? 0
+      : place === "ten_thousands"
+      ? questionData.tenThousands ?? 0
+      : place === "thousands"
+      ? questionData.thousands ?? 0
+      : place === "hundreds"
+      ? questionData.hundreds ?? 0
+      : place === "tens"
+      ? questionData.tens ?? 0
+      : questionData.ones ?? 0;
+  if (questionData.mode === "identify_place") return count;
+  if (place === "hundred_thousands") return count * 100000;
+  if (place === "ten_thousands") return count * 10000;
+  if (place === "thousands") return count * 1000;
+  if (place === "hundreds") return count * 100;
+  if (place === "tens") return count * 10;
+  return count;
+}
+
 function toQuizQuestionFromYear2Data(
   questionData: Year2QuestionData,
   lessonNumber: number,
@@ -4429,9 +4453,10 @@ function toQuizQuestionFromYear2Data(
         : questionData.mode === "identify_place"
         ? `The MAB shows ${placeValueSummary(questionData)}. How many ${questionData.place ?? "ones"} are shown?`
         : `The MAB shows ${placeValueSummary(questionData)}. What number is shown?`;
+    const expectedAnswer = derivedPlaceValueBuilderAnswer(questionData);
     const options = numericOptionStrings(
-      questionData.answer,
-      Math.max(10, questionData.answer > 99 ? 100 : 10)
+      expectedAnswer,
+      Math.max(10, expectedAnswer > 99 ? 100 : 10)
     );
 
     return useTyped
@@ -4441,7 +4466,7 @@ function toQuizQuestionFromYear2Data(
           skill,
           kind: "typed",
           prompt,
-          correctValue: String(questionData.answer),
+          correctValue: String(expectedAnswer),
           responseType: "number",
           placeholder:
             questionData.mode === "missing_mab_part"
@@ -4457,7 +4482,7 @@ function toQuizQuestionFromYear2Data(
           kind: "mcq",
           prompt,
           options,
-          correctIndex: options.findIndex((option) => option === String(questionData.answer)),
+          correctIndex: options.findIndex((option) => option === String(expectedAnswer)),
         };
   }
 
@@ -6526,13 +6551,14 @@ function SessionPage() {
   );
 
   // Session-stable start time (persists across re-renders)
-  const sessionKeyRef = useRef(`lul_session_${year}_w${week}_${type}_${n}`);
+  const sessionKey = `lul_session_${year}_w${week}_${type}_${n}`;
+  const sessionKeyRef = useRef(sessionKey);
   const [sessionStartTime] = useState<number>(() => {
     if (typeof window === "undefined") return Date.now();
-    const stored = sessionStorage.getItem(sessionKeyRef.current);
+    const stored = sessionStorage.getItem(sessionKey);
     if (stored) return Number(stored);
     const now = Date.now();
-    sessionStorage.setItem(sessionKeyRef.current, String(now));
+    sessionStorage.setItem(sessionKey, String(now));
     return now;
   });
 
@@ -7138,9 +7164,11 @@ function SessionPage() {
           .eq("year", yearLabel)
           .maybeSingle();
 
-        const prevScores: Record<string, any> = (existing?.quiz_scores as any) ?? {};
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const prevScores: Record<string, any> = (existing?.quiz_scores as Record<string, unknown>) ?? {};
         const weekKey = String(weekNum);
-        const prevAttempts: any[] = prevScores[weekKey]?.attempts ?? [];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const prevAttempts: any[] = (prevScores[weekKey] as Record<string, unknown>)?.attempts as any[] ?? [];
         let insight: TeacherInsight | null = null;
 
         try {

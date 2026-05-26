@@ -5397,6 +5397,41 @@ function partitionNumber(value: number) {
   };
 }
 
+function placeMultiplier(place: PlaceValueName) {
+  if (place === "hundred_thousands") return 100000;
+  if (place === "ten_thousands") return 10000;
+  if (place === "thousands") return 1000;
+  if (place === "hundreds") return 100;
+  if (place === "tens") return 10;
+  return 1;
+}
+
+export function derivePlaceValueBuilderAnswer(question: Pick<PlaceValueBuilderQuestion, "targetNumber" | "mode" | "place" | "hundredThousands" | "tenThousands" | "thousands" | "hundreds" | "tens" | "ones">) {
+  if (question.mode === "identify_number") {
+    return question.targetNumber;
+  }
+
+  const place = question.place ?? "ones";
+  const count =
+    place === "hundred_thousands"
+      ? question.hundredThousands ?? 0
+      : place === "ten_thousands"
+      ? question.tenThousands ?? 0
+      : place === "thousands"
+      ? question.thousands ?? 0
+      : place === "hundreds"
+      ? question.hundreds ?? 0
+      : place === "tens"
+      ? question.tens ?? 0
+      : question.ones ?? 0;
+
+  if (question.mode === "identify_place") {
+    return count;
+  }
+
+  return count * placeMultiplier(place);
+}
+
 function roundToNearest(value: number, unit: number) {
   return Math.round(value / unit) * unit;
 }
@@ -6229,7 +6264,17 @@ function generateInteractiveQuestion(
         tens,
         ones,
         targetNumber: target,
-        answer: digitForPlace(target, place),
+        answer: derivePlaceValueBuilderAnswer({
+          targetNumber: target,
+          mode,
+          place,
+          hundredThousands,
+          tenThousands,
+          thousands,
+          hundreds,
+          tens,
+          ones,
+        }),
         mode,
         place,
         visualMode: "mab",
@@ -6248,18 +6293,17 @@ function generateInteractiveQuestion(
         tens: place === "tens" ? null : tens,
         ones: place === "ones" ? null : ones,
         targetNumber: target,
-        answer:
-          place === "hundred_thousands"
-            ? hundredThousands * 100000
-            : place === "ten_thousands"
-            ? tenThousands * 10000
-            : place === "thousands"
-            ? thousands * 1000
-            : place === "hundreds"
-            ? hundreds * 100
-            : place === "tens"
-            ? tens * 10
-            : ones,
+        answer: derivePlaceValueBuilderAnswer({
+          targetNumber: target,
+          mode,
+          place,
+          hundredThousands,
+          tenThousands,
+          thousands,
+          hundreds,
+          tens,
+          ones,
+        }),
         mode,
         place,
         visualMode: "mab",
@@ -6277,7 +6321,16 @@ function generateInteractiveQuestion(
       tens,
       ones,
       targetNumber: target,
-      answer: target,
+      answer: derivePlaceValueBuilderAnswer({
+        targetNumber: target,
+        mode: "identify_number",
+        hundredThousands,
+        tenThousands,
+        thousands,
+        hundreds,
+        tens,
+        ones,
+      }),
       mode: "identify_number",
       visualMode: "mab",
       placeValues: activePlaces,
@@ -25064,18 +25117,17 @@ function generateGenericQuestion(
     };
 
     if (mode === "missing_mab_part") {
-      const hiddenValue =
-        place === "hundred_thousands"
-          ? hundredThousands * 100000
-          : place === "ten_thousands"
-          ? tenThousands * 10000
-          : place === "thousands"
-          ? thousands * 1000
-          : place === "hundreds"
-          ? partition.hundreds
-          : place === "tens"
-          ? partition.tens
-          : partition.ones;
+      const hiddenValue = derivePlaceValueBuilderAnswer({
+        targetNumber: target,
+        mode,
+        place,
+        hundredThousands,
+        tenThousands,
+        thousands,
+        hundreds: partition.hundreds / 100,
+        tens: partition.tens / 10,
+        ones: partition.ones,
+      });
       const visibleSummary = mabPlaceSummary(
         activePlaces,
         {
@@ -25106,7 +25158,17 @@ function generateGenericQuestion(
     }
 
     if (mode === "identify_place") {
-      const answer = String(digitForPlace(target, place));
+      const answer = String(derivePlaceValueBuilderAnswer({
+        targetNumber: target,
+        mode,
+        place,
+        hundredThousands,
+        tenThousands,
+        thousands,
+        hundreds,
+        tens,
+        ones,
+      }));
       return asMultipleChoice
         ? {
             kind: "multiple_choice",
@@ -25129,7 +25191,16 @@ function generateGenericQuestion(
           kind: "multiple_choice",
           prompt: `The MAB shows ${mabSummary}. What number is shown?`,
           options: uniqueNumberOptions(target, 80),
-          answer: String(target),
+          answer: String(derivePlaceValueBuilderAnswer({
+            targetNumber: target,
+            mode: "identify_number",
+            hundredThousands,
+            tenThousands,
+            thousands,
+            hundreds,
+            tens,
+            ones,
+          })),
           visual: mabVisual,
         }
       : {

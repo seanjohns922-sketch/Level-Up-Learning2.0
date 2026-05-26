@@ -23,6 +23,23 @@ function placeCount(questionData: PlaceValueBuilderQuestion, place: PlaceValueNa
   return questionData.ones;
 }
 
+function placeMultiplier(place: PlaceValueName) {
+  if (place === "hundred_thousands") return 100000;
+  if (place === "ten_thousands") return 10000;
+  if (place === "thousands") return 1000;
+  if (place === "hundreds") return 100;
+  if (place === "tens") return 10;
+  return 1;
+}
+
+function expectedPlaceValueAnswer(questionData: PlaceValueBuilderQuestion) {
+  if (questionData.mode === "identify_number") return questionData.targetNumber;
+  const place = questionData.place ?? "ones";
+  const count = placeCount(questionData, place) ?? 0;
+  if (questionData.mode === "identify_place") return count;
+  return count * placeMultiplier(place);
+}
+
 export default function PlaceValueBuilder({
   questionData,
   onCorrect,
@@ -67,7 +84,7 @@ export default function PlaceValueBuilder({
       onWrong?.();
       return;
     }
-    if (numericResponse === questionData.answer) onCorrect?.();
+    if (numericResponse === expectedPlaceValueAnswer(questionData)) onCorrect?.();
     else onWrong?.();
   }
 
