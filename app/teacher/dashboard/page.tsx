@@ -193,6 +193,21 @@ export default function TeacherDashboardPage() {
     return () => window.removeEventListener("focus", handleFocus);
   }, []); // stable — no deps needed thanks to ref
 
+  // Poll class progress so the student roster stays in sync with live lesson activity.
+  useEffect(() => {
+    const cid = selectedClassRef.current;
+    if (!cid) return;
+
+    const intervalId = window.setInterval(() => {
+      const currentClassId = selectedClassRef.current;
+      if (currentClassId) {
+        void loadClassData(currentClassId, true);
+      }
+    }, 10000);
+
+    return () => window.clearInterval(intervalId);
+  }, [selectedClassId]);
+
   async function loadClasses(teacherId: string) {
     if (fetchingRef.current) return;
     fetchingRef.current = true;
@@ -220,6 +235,7 @@ export default function TeacherDashboardPage() {
         const firstClassId = cls[0].id;
         setSelectedClassId(firstClassId);
         selectedClassRef.current = firstClassId;
+        setActiveYear(cls[0].year_level ?? "Year 1");
         await loadClassData(firstClassId, false);
       } else {
         setSelectedClassId(null);
@@ -275,6 +291,7 @@ export default function TeacherDashboardPage() {
     const cls = classes.find(c => c.id === classId);
     console.log("[TeacherDashboard] selectedClassId:", classId, "code:", cls?.class_code);
     setSelectedClassId(classId);
+    setActiveYear(cls?.year_level ?? "Year 1");
     setExpandedStudent(null);
     loadClassData(classId, false);
   }
