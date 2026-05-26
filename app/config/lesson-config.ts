@@ -16,9 +16,9 @@ export type LessonConfig = {
     hardUntil: 540;
   };
   difficultyHints?: {
-    easy?: Record<string, any>;
-    medium?: Record<string, any>;
-    hard?: Record<string, any>;
+    easy?: Record<string, unknown>;
+    medium?: Record<string, unknown>;
+    hard?: Record<string, unknown>;
   };
 };
 
