@@ -55,15 +55,15 @@ function getLegendIdsBeforeYear(year: string) {
 function getStrandBadgeClass(strand?: string) {
   switch (strand) {
     case "fractions":
-      return "bg-violet-100 text-violet-700 border-violet-200";
+      return "bg-violet-500/15 text-violet-300 border-violet-400/30";
     case "patterns":
-      return "bg-sky-100 text-sky-700 border-sky-200";
+      return "bg-sky-500/15 text-sky-300 border-sky-400/30";
     case "multiplication_division":
-      return "bg-emerald-100 text-emerald-700 border-emerald-200";
+      return "bg-emerald-500/15 text-emerald-300 border-emerald-400/30";
     case "addition_subtraction":
-      return "bg-amber-100 text-amber-700 border-amber-200";
+      return "bg-amber-500/15 text-amber-300 border-amber-400/30";
     default:
-      return "bg-teal-100 text-teal-700 border-teal-200";
+      return "bg-teal-500/15 text-teal-300 border-teal-400/30";
   }
 }
 
