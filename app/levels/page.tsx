@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { isPlacementComplete, readProgress, writeProgress, StudentProgress } from "@/data/progress";
-import { getLegendForYear } from "@/data/legends";
+import { getEffectiveUnlockedLegendIds, getLegendForYear } from "@/data/legends";
 import { getRecommendedAssignedWeek, readProgramStore } from "@/lib/program-progress";
 import { getProgramForYear } from "@/data/programs";
 import { DEMO_MODE } from "@/data/config";
@@ -118,7 +118,7 @@ export default function LevelsPage() {
   const showLegendsButton = !!progress;
   const unlockedYear = progress?.year ?? "Year 1";
   const unlockedYearIndex = levels.findIndex((level) => level.id === unlockedYear);
-  const passedLegendIds = new Set((progress?.unlockedLegends ?? []).filter(Boolean));
+  const passedLegendIds = new Set(getEffectiveUnlockedLegendIds(progress?.year, progress?.unlockedLegends).filter(Boolean));
 
   return (
     <main className="min-h-screen relative px-6 py-10">

@@ -151,3 +151,21 @@ export function getLegendForYear(yearLabel: string): Legend {
     }
   );
 }
+
+export function getLegendIdsUpToYear(yearLabel: string) {
+  const yearIndex = LEGENDS.map((legend) => legend.yearLabel).filter((value, index, arr) => arr.indexOf(value) === index).indexOf(yearLabel);
+  if (yearIndex === -1) return [getLegendForYear(yearLabel).id];
+  const labels = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"].slice(0, yearIndex + 1);
+  return labels.map((label) => getLegendForYear(label).id);
+}
+
+export function getLegendIdsBeforeYear(yearLabel: string) {
+  const labels = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"];
+  const yearIndex = labels.indexOf(yearLabel);
+  if (yearIndex <= 0) return [];
+  return labels.slice(0, yearIndex).map((label) => getLegendForYear(label).id);
+}
+
+export function getEffectiveUnlockedLegendIds(yearLabel: string | null | undefined, unlockedIds: string[] | null | undefined) {
+  return Array.from(new Set([...(unlockedIds ?? []), ...(yearLabel ? getLegendIdsBeforeYear(yearLabel) : [])]));
+}

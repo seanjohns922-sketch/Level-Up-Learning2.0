@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Lock, Sparkles, ChevronRight, Zap, Clock, Mountain, Compass, Triangle, BarChart3, Dices, BookOpen, Feather, Languages } from "lucide-react";
-import { getAllLegends } from "@/data/legends";
+import { Zap, Clock, Mountain, Compass, Triangle, BarChart3, Dices, BookOpen, Feather, Languages } from "lucide-react";
+import { getAllLegends, getEffectiveUnlockedLegendIds } from "@/data/legends";
 import { readProgress, type StudentProgress } from "@/data/progress";
 import RealmCard from "@/components/legends/RealmCard";
 
@@ -125,13 +125,12 @@ const REALMS: RealmDef[] = [
 
 export default function LegendsPage() {
   const router = useRouter();
-  const [progress, setProgress] = useState<StudentProgress | null>(null);
+  const [progress] = useState<StudentProgress | null>(() => readProgress());
 
-  useEffect(() => {
-    setProgress(readProgress());
-  }, []);
-
-  const unlockedIds = progress?.unlockedLegends ?? [];
+  const unlockedIds = useMemo(
+    () => getEffectiveUnlockedLegendIds(progress?.year, progress?.unlockedLegends),
+    [progress]
+  );
 
   const numbotCollected = useMemo(() => {
     const all = getAllLegends();
@@ -169,11 +168,11 @@ export default function LegendsPage() {
         <div className="max-w-4xl mx-auto w-full px-5 pt-5 pb-2">
           <div className="flex items-center justify-between mb-6">
             <button
-              onClick={() => router.push("/home")}
+              onClick={() => router.push("/number-nexus")}
               className="text-sm font-bold text-amber-200 hover:text-white transition flex items-center gap-1"
               style={{ textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}
             >
-              ← Home
+              ← World Map
             </button>
             <div
               className="text-sm font-bold px-4 py-1.5 rounded-full border shadow-sm"

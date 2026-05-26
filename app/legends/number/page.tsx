@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Sparkles } from "lucide-react";
 import { readProgress, type StudentProgress } from "@/data/progress";
-import { getAllLegends, type Legend } from "@/data/legends";
+import { getAllLegends, getEffectiveUnlockedLegendIds, type Legend } from "@/data/legends";
 import { YEAR_ORDER } from "@/data/yearOrder";
 import BinderCard from "@/components/legends/BinderCard";
 import LegendDetailModal from "@/components/legends/LegendDetailModal";
@@ -23,7 +23,10 @@ export default function NumbotCollectionPage() {
     return () => clearTimeout(t);
   }, []);
 
-  const unlockedIds = progress?.unlockedLegends ?? [];
+  const unlockedIds = useMemo(
+    () => getEffectiveUnlockedLegendIds(progress?.year, progress?.unlockedLegends),
+    [progress]
+  );
 
   const allLegends = useMemo(() => getAllLegends(), []);
   const sortedLegends = useMemo(
