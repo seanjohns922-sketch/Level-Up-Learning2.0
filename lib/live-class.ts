@@ -2,6 +2,52 @@
 
 export type LiveStudentStatus = "on_track" | "check_in" | "needs_support" | "idle";
 
+/**
+ * Richer per-student learning state derived from live telemetry.
+ * Sits on top of the coarser LiveStudentStatus to give teachers more nuanced coaching cues.
+ */
+export type LearningState =
+  | "confident"    // Answering correctly, good pace
+  | "mastering"    // High accuracy + high progress
+  | "improving"    // Getting it right after earlier errors
+  | "recovering"   // Just got one right after a run of wrong
+  | "struggling"   // Multiple consecutive incorrect answers
+  | "persistent"   // Retrying same question without giving up
+  | "guessing"     // Very fast wrong answers — likely not reading
+  | "rushing"      // Fast answers, not checking work
+  | "hesitating"   // Long time on question before attempting
+  | "disengaged";  // Inactive but not fully idle
+
+export function getLearningStateMeta(state: LearningState): {
+  label: string;
+  badge: string;
+  dot: string;
+  description: string;
+} {
+  switch (state) {
+    case "mastering":
+      return { label: "Mastering", badge: "bg-violet-50 text-violet-700 border-violet-200", dot: "bg-violet-500", description: "High accuracy at pace — let them lead." };
+    case "confident":
+      return { label: "Confident", badge: "bg-emerald-50 text-emerald-700 border-emerald-200", dot: "bg-emerald-400", description: "Working steadily through the task." };
+    case "improving":
+      return { label: "Improving", badge: "bg-sky-50 text-sky-700 border-sky-200", dot: "bg-sky-500", description: "Getting it now after earlier errors." };
+    case "recovering":
+      return { label: "Recovering", badge: "bg-lime-50 text-lime-700 border-lime-200", dot: "bg-lime-500", description: "Just got one right — momentum returning." };
+    case "struggling":
+      return { label: "Struggling", badge: "bg-rose-50 text-rose-700 border-rose-200", dot: "bg-rose-500", description: "Repeated errors — needs direct support." };
+    case "persistent":
+      return { label: "Persisting", badge: "bg-orange-50 text-orange-700 border-orange-200", dot: "bg-orange-500", description: "Trying again without giving up — guide the strategy." };
+    case "guessing":
+      return { label: "Guessing", badge: "bg-amber-50 text-amber-800 border-amber-200", dot: "bg-amber-500", description: "Choosing answers too fast — not reading the question." };
+    case "rushing":
+      return { label: "Rushing", badge: "bg-yellow-50 text-yellow-700 border-yellow-200", dot: "bg-yellow-500", description: "Moving fast — answers may not be thought through." };
+    case "hesitating":
+      return { label: "Hesitating", badge: "bg-indigo-50 text-indigo-700 border-indigo-200", dot: "bg-indigo-500", description: "Long pause before answering — may feel stuck." };
+    case "disengaged":
+      return { label: "Drifting", badge: "bg-slate-100 text-slate-600 border-slate-200", dot: "bg-slate-400", description: "Not actively working — may need a prompt." };
+  }
+}
+
 export type LiveStudentStatusLabel = "On Track" | "Check-in" | "Needs Support" | "Idle / Away";
 
 export type LiveLearningEventType =
@@ -20,6 +66,7 @@ export type LiveLearningEventType =
 export type LiveStudentInsight = {
   status: LiveStudentStatus;
   statusLabel: LiveStudentStatusLabel;
+  learningState: LearningState;
   issue: string;
   likelyGap: string;
   suggestedTeacherAction: string;
@@ -340,6 +387,74 @@ function inferSuggestedAction(snapshot: LiveStudentSnapshot) {
   return "Sit with the student and ask them to talk through what they tried — listen for where their reasoning breaks down.";
 }
 
+function determineLearningState(
+  snapshot: LiveStudentSnapshot,
+  secondsSinceActive: number,
+  thresholds: LiveStatusThresholds
+): LearningState {
+  const timeOnQuestion = Math.max(0, snapshot.timeOnCurrentQuestion ?? 0);
+  const questionAttempts = Math.max(0, snapshot.currentQuestionAttempts ?? 0);
+  const consecutiveIncorrect = Math.max(0, snapshot.consecutiveIncorrectCount ?? 0);
+  const sessionIncorrect = Math.max(0, snapshot.sessionIncorrectCount ?? 0);
+  const progressPercent = Math.max(0, snapshot.progressPercent ?? 0);
+  const latestCorrect = snapshot.latestAnswerCorrect;
+  const latestEventType = snapshot.latestEventType;
+
+  // Drifting — inactive but not fully idle
+  if (secondsSinceActive >= 180 && secondsSinceActive < thresholds.idleSeconds) {
+    return "disengaged";
+  }
+
+  // Guessing — answers very quickly but keeps getting it wrong
+  if (timeOnQuestion > 0 && timeOnQuestion < 8 && consecutiveIncorrect >= 2 && latestCorrect === false) {
+    return "guessing";
+  }
+
+  // Rushing — fast answer that was wrong
+  if (timeOnQuestion > 0 && timeOnQuestion < 12 && latestCorrect === false && questionAttempts <= 1) {
+    return "rushing";
+  }
+
+  // Struggling — consecutive wrong answers or repeated attempts on same question
+  if (consecutiveIncorrect >= thresholds.needsSupportRecentIncorrectCount ||
+      questionAttempts >= thresholds.needsSupportSameQuestionAttempts) {
+    return "struggling";
+  }
+
+  // Persisting — retrying same question, hasn't given up
+  if (questionAttempts >= 2 && latestCorrect !== true) {
+    return "persistent";
+  }
+
+  // Hesitating — long time on question, no attempt yet
+  if (timeOnQuestion >= thresholds.checkInTimeOnQuestionSeconds && questionAttempts === 0) {
+    return "hesitating";
+  }
+
+  // Recovering — just got one right after a bad run
+  if (latestCorrect === true && consecutiveIncorrect === 0 && sessionIncorrect >= 3) {
+    return "recovering";
+  }
+
+  // Mastering — high progress, all correct, moving fast
+  if (progressPercent >= 80 && consecutiveIncorrect === 0 && sessionIncorrect === 0 &&
+      (latestEventType === "answer_correct" || latestEventType === "lesson_completed")) {
+    return "mastering";
+  }
+
+  // Improving — recent correct answer after some earlier mistakes
+  if (latestCorrect === true && sessionIncorrect > 0 && consecutiveIncorrect === 0) {
+    return "improving";
+  }
+
+  // Confident — working well, answering correctly
+  if (latestCorrect === true && consecutiveIncorrect === 0) {
+    return "confident";
+  }
+
+  return "confident";
+}
+
 export function buildLiveStudentInsight(
   snapshot: LiveStudentSnapshot,
   thresholds: LiveStatusThresholds = DEFAULT_LIVE_STATUS_THRESHOLDS,
@@ -356,10 +471,13 @@ export function buildLiveStudentInsight(
   const hintCount = Math.max(0, snapshot.sessionHintCount ?? 0);
   const latestEventType = snapshot.latestEventType ?? null;
 
+  const learningState = determineLearningState(snapshot, secondsSinceActive, thresholds);
+
   if (secondsSinceActive >= thresholds.idleSeconds) {
     return {
       status: "idle",
       statusLabel: STATUS_LABELS.idle,
+      learningState,
       issue: "No recent learning activity has been recorded.",
       likelyGap: "Student may be away from the task or needs a restart prompt.",
       suggestedTeacherAction: "Prompt the student to resume the current activity.",
@@ -374,7 +492,11 @@ export function buildLiveStudentInsight(
     const name = snapshot.studentName ?? "This student";
     const activityLabel = snapshot.currentActivityLabel ?? snapshot.currentLessonTitle ?? null;
     const issueText =
-      questionAttempts >= thresholds.needsSupportSameQuestionAttempts
+      learningState === "guessing"
+        ? `${name} is choosing answers too quickly — likely not reading the question`
+        : learningState === "rushing"
+        ? `${name} is rushing through questions without checking their work`
+        : questionAttempts >= thresholds.needsSupportSameQuestionAttempts
         ? `${name} has made ${questionAttempts} attempt${questionAttempts !== 1 ? "s" : ""} on the same question${activityLabel ? ` in ${activityLabel}` : ""} without success`
         : incorrectCount >= thresholds.needsSupportRecentIncorrectCount
         ? `${name} has got ${incorrectCount} in a row wrong${activityLabel ? ` on ${activityLabel}` : ""}`
@@ -382,9 +504,15 @@ export function buildLiveStudentInsight(
     return {
       status: "needs_support",
       statusLabel: STATUS_LABELS.needs_support,
+      learningState,
       issue: sentenceCase(issueText),
       likelyGap: inferLikelyGap(snapshot),
-      suggestedTeacherAction: inferSuggestedAction(snapshot),
+      suggestedTeacherAction:
+        learningState === "guessing"
+          ? "Ask the student to read each option aloud before choosing — slow them down."
+          : learningState === "rushing"
+          ? "Ask the student to check their answer makes sense before submitting."
+          : inferSuggestedAction(snapshot),
     };
   }
 
@@ -399,6 +527,8 @@ export function buildLiveStudentInsight(
     const activityLabel = snapshot.currentActivityLabel ?? snapshot.currentLessonTitle ?? null;
     const issueText = isInactiveCheckIn
       ? `${name} has been inactive for ${Math.floor(secondsSinceActive / 60)} minute${Math.floor(secondsSinceActive / 60) !== 1 ? "s" : ""}`
+      : learningState === "hesitating"
+      ? `${name} has been reading the question for ${Math.floor(timeOnQuestion / 60)} min without attempting${activityLabel ? ` on ${activityLabel}` : ""}`
       : latestEventType === "answer_incorrect"
       ? `${name} just answered incorrectly${activityLabel ? ` on ${activityLabel}` : ""}`
       : hintCount >= thresholds.checkInHintCount
@@ -407,22 +537,42 @@ export function buildLiveStudentInsight(
     return {
       status: "check_in",
       statusLabel: STATUS_LABELS.check_in,
+      learningState,
       issue: sentenceCase(issueText),
       likelyGap: isInactiveCheckIn
         ? "The task may be incomplete, or the student may have stepped away from the app."
         : inferLikelyGap(snapshot),
       suggestedTeacherAction: isInactiveCheckIn
         ? "Check whether the student has paused the task and decide whether to restart or continue."
+        : learningState === "hesitating"
+        ? "Sit with the student — ask what they understand about the question, not just what answer they'd pick."
         : inferSuggestedAction(snapshot),
     };
   }
 
+  const onTrackIssue =
+    learningState === "mastering"
+      ? `${snapshot.studentName ?? "This student"} is mastering this topic — strong accuracy and pace.`
+      : learningState === "recovering"
+      ? `${snapshot.studentName ?? "This student"} just got back on track after some earlier errors.`
+      : learningState === "improving"
+      ? `${snapshot.studentName ?? "This student"} is getting it now — errors have stopped.`
+      : "Student is working steadily through the current task.";
+
+  const onTrackAction =
+    learningState === "mastering"
+      ? "Consider giving an extension challenge — they're ready for more."
+      : learningState === "recovering" || learningState === "improving"
+      ? "Encourage them — a brief acknowledgement can maintain momentum."
+      : "Let the student continue independently.";
+
   return {
     status: "on_track",
     statusLabel: STATUS_LABELS.on_track,
-    issue: "Student is working steadily through the current task.",
+    learningState,
+    issue: onTrackIssue,
     likelyGap: "No immediate gap is showing in the live data.",
-    suggestedTeacherAction: "Let the student continue independently.",
+    suggestedTeacherAction: onTrackAction,
   };
 }
 
@@ -486,16 +636,75 @@ export function formatTimeActive(seconds?: number | null) {
 }
 
 export function buildLiveClassInsight(
-  rows: Array<LiveStudentSnapshot & { aiStatus?: LiveStudentStatus | null }>
+  rows: Array<LiveStudentSnapshot & { aiStatus?: LiveStudentStatus | null; learningState?: LearningState | null }>
 ): LiveClassInsight {
-  const flagged = rows.filter((row) => (row.aiStatus ?? "on_track") === "needs_support" || (row.aiStatus ?? "on_track") === "check_in");
+  const flagged = rows.filter(
+    (row) => (row.aiStatus ?? "on_track") === "needs_support" || (row.aiStatus ?? "on_track") === "check_in"
+  );
+
   if (flagged.length === 0) {
+    // Check for positive patterns worth surfacing
+    const mastering = rows.filter((r) => r.learningState === "mastering").length;
+    const improving = rows.filter((r) => r.learningState === "improving" || r.learningState === "recovering").length;
+    if (mastering >= 2) {
+      return {
+        headline: `Class Insight: ${mastering} students are mastering their current topic.`,
+        suggestedAction: "Suggested Action: Consider setting extension challenges for these students.",
+      };
+    }
+    if (improving >= 2) {
+      return {
+        headline: `Class Insight: ${improving} students are showing improvement — errors have stopped.`,
+        suggestedAction: "Suggested Action: Acknowledge the progress to keep momentum going.",
+      };
+    }
     return {
       headline: "Class Insight: Most students are moving steadily through their current work.",
       suggestedAction: "Suggested Action: Continue circulating and check completion pace.",
     };
   }
 
+  // Cluster by learning state first (more informative than skill tag alone)
+  const stateCounts = new Map<LearningState, number>();
+  for (const row of flagged) {
+    if (row.learningState) {
+      stateCounts.set(row.learningState, (stateCounts.get(row.learningState) ?? 0) + 1);
+    }
+  }
+
+  const urgentStates: LearningState[] = ["struggling", "guessing", "rushing"];
+  const urgentCluster = urgentStates
+    .map((s) => ({ state: s, count: stateCounts.get(s) ?? 0 }))
+    .filter((x) => x.count > 0)
+    .sort((a, b) => b.count - a.count)[0];
+
+  if (urgentCluster) {
+    const { state, count } = urgentCluster;
+    const stateLabel = state === "guessing" ? "guessing rather than thinking" :
+                       state === "rushing" ? "rushing through questions" :
+                       "struggling with the current task";
+    const action = state === "guessing"
+      ? "Pause the class and ask students to read each answer option aloud before choosing."
+      : state === "rushing"
+      ? "Ask students to check their answer makes sense before submitting."
+      : "Check in with flagged students first, then decide if a brief reteach is needed.";
+
+    // Also check for a shared misconception topic
+    const gapBuckets = new Map<string, number>();
+    for (const row of flagged) {
+      const key = normalizeText(row.skillTag) || normalizeText(row.misconceptionTag) || null;
+      if (key) gapBuckets.set(key, (gapBuckets.get(key) ?? 0) + 1);
+    }
+    const [topGap, topGapCount] = [...gapBuckets.entries()].sort((a, b) => b[1] - a[1])[0] ?? [null, 0];
+    const topicSuffix = topGap && topGapCount >= 2 ? ` on ${topGap.replace(/_/g, " ")}` : "";
+
+    return {
+      headline: `Class Insight: ${count} student${count !== 1 ? "s" : ""} ${stateLabel}${topicSuffix}.`,
+      suggestedAction: `Suggested Action: ${action}`,
+    };
+  }
+
+  // Fall back to topic-based clustering
   const gapBuckets = new Map<string, number>();
   for (const row of flagged) {
     const key = normalizeText(row.skillTag) || normalizeText(row.misconceptionTag) || "current task";
@@ -507,8 +716,8 @@ export function buildLiveClassInsight(
 
   const label =
     topGap === "current task"
-      ? `${topCount} students need support on their current task`
-      : `${topCount} students are struggling with ${topGap.replace(/_/g, " ")}`;
+      ? `${topCount} student${topCount !== 1 ? "s" : ""} need support on their current task`
+      : `${topCount} student${topCount !== 1 ? "s" : ""} are struggling with ${topGap.replace(/_/g, " ")}`;
 
   const suggestedAction =
     topGap.toLowerCase().includes("discount")

@@ -7,7 +7,9 @@ import {
   buildLiveStudentInsight,
   formatRelativeTime,
   formatTimeActive,
+  getLearningStateMeta,
   getLiveStatusTone,
+  type LearningState,
   type LiveStudentStatus,
 } from "@/lib/live-class";
 import { LiveStudentDrawer, type LiveStudentDrawerData, type LiveStudentEventRow } from "@/components/teacher/LiveStudentDrawer";
@@ -90,6 +92,7 @@ type LiveStudentCard = {
   aiSuggestedAction?: string | null;
   skillTag?: string | null;
   misconceptionTag?: string | null;
+  learningState?: LearningState | null;
 };
 
 type LiveStatusFilter = "all" | LiveStudentStatus;
@@ -164,6 +167,7 @@ function toLiveCard(student: StudentRow, row?: LiveStudentActivityRow | null): L
     aiSuggestedAction: insight?.suggestedTeacherAction ?? row?.ai_suggested_action ?? null,
     skillTag: row?.skill_tag ?? null,
     misconceptionTag: row?.misconception_tag ?? null,
+    learningState: insight?.learningState ?? null,
   };
 }
 
@@ -336,6 +340,7 @@ export default function LiveClassPanel({
           skillTag: card.skillTag,
           misconceptionTag: card.misconceptionTag,
           aiStatus: card.status,
+          learningState: card.learningState,
         }))
       ),
     [cards, selectedClass?.id]
@@ -442,16 +447,27 @@ export default function LiveClassPanel({
                       <div className="text-lg font-black text-slate-900">{card.displayName}</div>
                       <div className="mt-1 text-sm text-slate-500">{formatLocation(card)}</div>
                     </div>
-                    <span className={`inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-[11px] font-bold ${tone.badge}`}>
-                      <span className={`h-2 w-2 rounded-full ${tone.dot}`} />
-                      {card.status === "on_track"
-                        ? "On Track"
-                        : card.status === "check_in"
-                        ? "Check-in"
-                        : card.status === "needs_support"
-                        ? "Needs Support"
-                        : "Idle"}
-                    </span>
+                    <div className="flex flex-col items-end gap-1.5">
+                      <span className={`inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-[11px] font-bold ${tone.badge}`}>
+                        <span className={`h-2 w-2 rounded-full ${tone.dot}`} />
+                        {card.status === "on_track"
+                          ? "On Track"
+                          : card.status === "check_in"
+                          ? "Check-in"
+                          : card.status === "needs_support"
+                          ? "Needs Support"
+                          : "Idle"}
+                      </span>
+                      {card.learningState && card.learningState !== "confident" && card.status !== "idle" ? (() => {
+                        const meta = getLearningStateMeta(card.learningState);
+                        return (
+                          <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-bold ${meta.badge}`}>
+                            <span className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} />
+                            {meta.label}
+                          </span>
+                        );
+                      })() : null}
+                    </div>
                   </div>
 
                   <div className="mt-4">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { formatRelativeTime, formatTimeActive, getLiveStatusTone, type LiveStudentStatus } from "@/lib/live-class";
+import { formatRelativeTime, formatTimeActive, getLearningStateMeta, getLiveStatusTone, type LearningState, type LiveStudentStatus } from "@/lib/live-class";
 import StudentScreenViewer from "@/components/teacher/StudentScreenViewer";
 
 export type LiveStudentEventRow = {
@@ -42,6 +42,7 @@ export type LiveStudentDrawerData = {
   aiIssue?: string | null;
   aiLikelyGap?: string | null;
   aiSuggestedAction?: string | null;
+  learningState?: LearningState | null;
 };
 
 function formatTimelineLabel(eventType: string) {
@@ -238,24 +239,70 @@ export function LiveStudentDrawer({
             </div>
           </section>
 
-          {(student.aiIssue || student.aiSuggestedAction) && (
-            <section className={`rounded-2xl border p-4 ${tone.badge} ${tone.border}`}>
-              <div className="text-[11px] font-mono font-bold uppercase tracking-[0.18em]">
-                AI Insight
-              </div>
-              {student.aiIssue ? <div className="mt-2 text-sm font-semibold">{student.aiIssue}</div> : null}
-              {student.aiLikelyGap ? (
-                <div className="mt-2 text-sm">
-                  <span className="font-bold">Likely Gap:</span> {student.aiLikelyGap}
+          {(student.aiIssue || student.aiSuggestedAction || student.learningState) && (() => {
+            const stateMeta = student.learningState ? getLearningStateMeta(student.learningState) : null;
+            const isAlert = student.status === "needs_support" || student.status === "check_in";
+            const isPositive = student.learningState === "mastering" || student.learningState === "recovering" || student.learningState === "improving";
+            return (
+              <section className="rounded-2xl border border-slate-200 bg-white overflow-hidden">
+                {/* Header bar */}
+                <div className={`px-4 py-3 flex items-center justify-between gap-3 ${
+                  isAlert ? "bg-slate-900 text-white" : "bg-slate-50 border-b border-slate-100"
+                }`}>
+                  <div className={`text-[11px] font-mono font-bold uppercase tracking-[0.18em] ${isAlert ? "text-slate-300" : "text-slate-500"}`}>
+                    Teaching Insight
+                  </div>
+                  {stateMeta ? (
+                    <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold ${stateMeta.badge}`}>
+                      <span className={`h-1.5 w-1.5 rounded-full ${stateMeta.dot}`} />
+                      {stateMeta.label}
+                    </span>
+                  ) : null}
                 </div>
-              ) : null}
-              {student.aiSuggestedAction ? (
-                <div className="mt-2 text-sm">
-                  <span className="font-bold">Suggested Teacher Action:</span> {student.aiSuggestedAction}
+
+                <div className="p-4 grid gap-3">
+                  {/* What's happening */}
+                  {student.aiIssue ? (
+                    <div>
+                      <div className="text-[10px] font-mono font-bold uppercase tracking-[0.16em] text-slate-400 mb-1">What&apos;s happening</div>
+                      <div className={`text-sm font-semibold leading-snug ${isAlert ? "text-slate-900" : isPositive ? "text-emerald-800" : "text-slate-700"}`}>
+                        {student.aiIssue}
+                      </div>
+                      {stateMeta ? (
+                        <div className="mt-1 text-xs text-slate-500">{stateMeta.description}</div>
+                      ) : null}
+                    </div>
+                  ) : null}
+
+                  {/* Likely gap — only show when there's a real concern */}
+                  {student.aiLikelyGap && isAlert ? (
+                    <div className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2.5">
+                      <div className="text-[10px] font-mono font-bold uppercase tracking-[0.16em] text-slate-400 mb-1">Likely gap</div>
+                      <div className="text-sm text-slate-700">{student.aiLikelyGap}</div>
+                    </div>
+                  ) : null}
+
+                  {/* Teacher action — always prominent */}
+                  {student.aiSuggestedAction ? (
+                    <div className={`rounded-xl px-4 py-3 ${
+                      isAlert
+                        ? "bg-slate-900 text-white"
+                        : isPositive
+                        ? "bg-teal-50 border border-teal-100"
+                        : "bg-slate-100"
+                    }`}>
+                      <div className={`text-[10px] font-mono font-bold uppercase tracking-[0.16em] mb-1.5 ${isAlert ? "text-slate-400" : "text-slate-500"}`}>
+                        Action now
+                      </div>
+                      <div className={`text-sm font-bold leading-snug ${isAlert ? "text-white" : isPositive ? "text-teal-900" : "text-slate-800"}`}>
+                        {student.aiSuggestedAction}
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
-              ) : null}
-            </section>
-          )}
+              </section>
+            );
+          })()}
 
           <section className="rounded-2xl border border-slate-200 bg-white p-4">
             <div className="text-[11px] font-mono font-bold uppercase tracking-[0.18em] text-slate-500">
