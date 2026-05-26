@@ -141,38 +141,41 @@ function ScoreRing({ percent, passed }: { percent: number; passed: boolean }) {
     return () => clearTimeout(timer);
   }, [percent]);
 
-  const ringColor = passed ? "hsl(var(--primary))" : "hsl(var(--accent))";
+  const ringColor = passed ? "rgb(45 212 191)" : "rgb(251 191 36)";
+  const ringGlow = passed ? "rgb(20 184 166)" : "rgb(245 158 11)";
 
   return (
-    <div className="relative flex items-center justify-center my-6">
-      {/* glow behind */}
+    <div className="relative flex items-center justify-center my-8">
       <div
-        className="absolute w-48 h-48 rounded-full blur-2xl opacity-30"
-        style={{ background: ringColor }}
+        className="absolute w-56 h-56 rounded-full blur-3xl opacity-40"
+        style={{ background: ringGlow }}
       />
-      <svg width="200" height="200" className="relative z-10 -rotate-90">
+      <svg width="220" height="220" className="relative z-10 -rotate-90">
         <circle
-          cx="100" cy="100" r={radius}
+          cx="110" cy="110" r={radius}
           fill="none"
-          stroke="hsl(var(--border))"
+          stroke="rgba(148, 163, 184, 0.15)"
           strokeWidth={stroke}
         />
         <circle
-          cx="100" cy="100" r={radius}
+          cx="110" cy="110" r={radius}
           fill="none"
           stroke={ringColor}
           strokeWidth={stroke}
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
-          style={{ transition: "stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)" }}
+          style={{
+            transition: "stroke-dashoffset 1.4s cubic-bezier(0.4,0,0.2,1)",
+            filter: `drop-shadow(0 0 12px ${ringColor})`,
+          }}
         />
       </svg>
       <div className="absolute z-20 text-center">
-        <div className="text-5xl font-extrabold font-display" style={{ color: ringColor }}>
+        <div className="text-6xl font-extrabold font-display tracking-tight" style={{ color: ringColor }}>
           {percent}%
         </div>
-        <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">
+        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-2">
           Score
         </div>
       </div>
