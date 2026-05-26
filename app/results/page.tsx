@@ -238,6 +238,15 @@ function ResultsPage() {
   const nextYear = getNextYearLabel(year);
 
   const legend = useMemo(() => getLegendForYear(year), [year]);
+
+  // For a failed pretest we unlock prior-year legends — show the highest one in the overlay
+  const unlockDisplayLegend = useMemo(() => {
+    if (!isPostTest && !passedByPretest && unlockTargets.length > 0) {
+      const yearIndex = YEAR_SEQUENCE.indexOf(year as (typeof YEAR_SEQUENCE)[number]);
+      if (yearIndex > 0) return getLegendForYear(YEAR_SEQUENCE[yearIndex - 1]);
+    }
+    return legend;
+  }, [isPostTest, passedByPretest, unlockTargets, year, legend]);
   const storedPosttestProfile: AssessmentResultProfile | null = useMemo(() => {
     const progress = readProgress();
     return isPostTest ? progress?.lastPostTestProfile ?? null : null;
@@ -398,7 +407,7 @@ function ResultsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background flex items-center justify-center p-4 relative">
+    <main className="min-h-screen bg-background flex items-start justify-center p-4 pt-8 relative overflow-y-auto">
       <FloatingShapes />
 
         <div
@@ -494,24 +503,41 @@ function ResultsPage() {
                 </p>
               </div>
             ) : (
-              <div className="rounded-2xl p-4 border border-accent/30" style={{ background: "hsl(42 95% 97%)" }}>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-lg">📚</span>
-                  <span className="font-bold text-sm text-foreground">Learning Path Ready</span>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {requiresFullPathway
-                    ? "You need the full 12-week pathway for this level."
-                    : "We&apos;ve crafted a personalised required pathway for this level."}
-                </p>
-                {requiredWeeks.length > 0 ? (
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    {requiresFullPathway
-                      ? "Complete the full 12-week pathway in order to be ready to pass this level."
-                      : `You need to complete Weeks ${requiredWeeks.join(", ")} to be ready to pass this level. Other weeks can be completed later for extra practice and XP.`}
+              <>
+                <div className="rounded-2xl p-4 border border-accent/30" style={{ background: "hsl(42 95% 97%)" }}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-lg">📚</span>
+                    <span className="font-bold text-sm text-foreground">Learning Path Ready</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Good effort! You scored {scorePercent}% — you&apos;ll be working through {studentLevelLabel} to build your skills.
                   </p>
-                ) : null}
-              </div>
+                  {requiredWeeks.length > 0 ? (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      {requiresFullPathway
+                        ? "Complete the full 12-week pathway to be ready to pass this level."
+                        : `You need to complete Weeks ${requiredWeeks.join(", ")} to be ready to pass this level.`}
+                    </p>
+                  ) : null}
+                </div>
+                {unlockTargets.length > 0 && (
+                  <div className="rounded-2xl p-4 border border-primary/20 bg-primary-light">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-lg">🏅</span>
+                      <span className="font-bold text-sm text-foreground">Legends Unlocked!</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Well done — all Numbots from{" "}
+                      {formatStudentLevelLabel(YEAR_SEQUENCE[0])}{" "}
+                      to{" "}
+                      {formatStudentLevelLabel(
+                        YEAR_SEQUENCE[Math.max(0, YEAR_SEQUENCE.indexOf(year as (typeof YEAR_SEQUENCE)[number]) - 1)]
+                      )}{" "}
+                      are now unlocked and ready to collect!
+                    </p>
+                  </div>
+                )}
+              </>
             )}
 
             {isPostTest && storedPosttestProfile ? (
@@ -753,8 +779,10 @@ function ResultsPage() {
       {/* Legend Unlock overlay */}
       {shouldShowUnlock && (
         <LegendUnlockReveal
-          legend={legend}
-          scorePercent={displayPercent}
+          legend={unlockDisplayLegend}
+          scorePercent={isFailedPretest ? undefined : displayPercent}
+          headerTitle={isFailedPretest ? "GREAT EFFORT!" : "LEVEL COMPLETE!"}
+          scoreLabel={isFailedPretest ? undefined : "You crushed it! 🔥"}
           onContinue={() => setUnlockDismissed(true)}
           onViewLegends={goLegends}
         />

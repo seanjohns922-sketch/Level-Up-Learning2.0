@@ -61,11 +61,15 @@ function makeConfetti(count: number) {
 export default function LegendUnlockReveal({
   legend,
   scorePercent,
+  headerTitle = "LEVEL COMPLETE!",
+  scoreLabel = "You crushed it! 🔥",
   onContinue,
   onViewLegends,
 }: {
   legend: Legend;
   scorePercent?: number;
+  headerTitle?: string;
+  scoreLabel?: string;
   onContinue: () => void;
   onViewLegends: () => void;
 }) {
@@ -140,7 +144,7 @@ export default function LegendUnlockReveal({
                 textShadow: "0 0 40px hsla(42, 95%, 55%, 0.6), 0 0 80px hsla(42, 95%, 55%, 0.3)",
               }}
             >
-              LEVEL COMPLETE!
+              {headerTitle}
             </h1>
           </div>
         </div>
@@ -364,7 +368,7 @@ export default function LegendUnlockReveal({
                 className="text-sm font-bold"
                 style={{ color: "hsla(0, 0%, 100%, 0.7)" }}
               >
-                You crushed it! 🔥
+                {scoreLabel}
               </span>
             </div>
           )}
