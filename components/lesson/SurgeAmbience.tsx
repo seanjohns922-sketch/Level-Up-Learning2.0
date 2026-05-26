@@ -1,6 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
+
+function seededValue(seed: number) {
+  const x = Math.sin(seed * 12.9898) * 43758.5453;
+  return x - Math.floor(x);
+}
 
 /**
  * Full-screen ambient overlay that grows more gold + animated
@@ -17,26 +22,28 @@ export default function SurgeAmbience({ comboCount }: { comboCount: number }) {
     comboCount >= 10 ? 4 : comboCount >= 8 ? 3 : comboCount >= 5 ? 2 : comboCount >= 3 ? 1 : 0;
 
   // Sparkle field — regenerate on tier change
-  const [sparkles, setSparkles] = useState<
-    { id: number; left: number; delay: number; duration: number; size: number; hue: number }[]
-  >([]);
-
-  useEffect(() => {
-    if (tier === 0) {
-      setSparkles([]);
-      return;
-    }
-    const count = tier === 1 ? 8 : tier === 2 ? 18 : tier === 3 ? 28 : 42;
-    const next = Array.from({ length: count }, (_, i) => ({
-      id: i + Math.random(),
-      left: Math.random() * 100,
-      delay: Math.random() * 4,
-      duration: 4 + Math.random() * 4,
-      size: 2 + Math.random() * (tier >= 3 ? 5 : 3),
-      hue: tier >= 4 ? (Math.random() < 0.3 ? 280 : 45) : tier >= 3 ? (Math.random() < 0.3 ? 25 : 45) : 48,
-    }));
-    setSparkles(next);
-  }, [tier]);
+  const sparkles = useMemo(
+    () => {
+      if (tier === 0) return [];
+      const count = tier === 1 ? 8 : tier === 2 ? 18 : tier === 3 ? 28 : 42;
+      return Array.from({ length: count }, (_, i) => {
+        const leftSeed = seededValue(tier * 100 + i * 7 + 1);
+        const delaySeed = seededValue(tier * 100 + i * 7 + 2);
+        const durationSeed = seededValue(tier * 100 + i * 7 + 3);
+        const sizeSeed = seededValue(tier * 100 + i * 7 + 4);
+        const hueSeed = seededValue(tier * 100 + i * 7 + 5);
+        return {
+          id: tier * 1000 + i,
+          left: leftSeed * 100,
+          delay: delaySeed * 4,
+          duration: 4 + durationSeed * 4,
+          size: 2 + sizeSeed * (tier >= 3 ? 5 : 3),
+          hue: tier >= 4 ? (hueSeed < 0.3 ? 280 : 45) : tier >= 3 ? (hueSeed < 0.3 ? 25 : 45) : 48,
+        };
+      });
+    },
+    [tier]
+  );
 
   if (tier === 0) return null;
 

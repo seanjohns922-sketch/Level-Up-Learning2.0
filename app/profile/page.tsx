@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { readProgress } from "@/data/progress";
 import { readProgramStore, getWeekProgress, isWeekComplete } from "@/lib/program-progress";
@@ -25,6 +25,31 @@ const REALMS = [
 
 const DAYS = ["M", "T", "W", "T", "F", "S", "S"];
 
+function readStudentNameFromStorage() {
+  if (typeof window === "undefined") return "Adventurer";
+  try {
+    const active = localStorage.getItem("lul_active_student_v1");
+    if (!active) return "Adventurer";
+    const parsed = JSON.parse(active);
+    if (parsed?.display_name) return parsed.display_name as string;
+    if (typeof active === "string" && active.length < 40) return active;
+  } catch {
+    // ignore
+  }
+  return "Adventurer";
+}
+
+function readActiveDaysFromStorage() {
+  if (typeof window === "undefined") return new Set<number>();
+  try {
+    const raw = localStorage.getItem("lul_active_days");
+    if (raw) return new Set<number>(JSON.parse(raw));
+  } catch {
+    // ignore
+  }
+  return new Set<number>();
+}
+
 function getMonthGrid() {
   const now = new Date();
   const year = now.getFullYear();
@@ -47,23 +72,8 @@ export default function ProfilePage() {
   const { autoReadEnabled, setAutoReadEnabled } = useAutoReadSetting();
   const [progress, setProgress] = useState<ReturnType<typeof readProgress>>(() => readProgress());
   const [store, setStore] = useState<ReturnType<typeof readProgramStore>>(() => readProgramStore());
-  const [studentName, setStudentName] = useState("Adventurer");
-  const [activeDays, setActiveDays] = useState<Set<number>>(new Set());
-
-  useEffect(() => {
-    try {
-      const active = localStorage.getItem("lul_active_student_v1");
-      if (active) {
-        const parsed = JSON.parse(active);
-        if (parsed?.display_name) setStudentName(parsed.display_name);
-        else if (typeof active === "string" && active.length < 40) setStudentName(active);
-      }
-    } catch { /* ignore */ }
-    try {
-      const raw = localStorage.getItem("lul_active_days");
-      if (raw) setActiveDays(new Set(JSON.parse(raw)));
-    } catch { /* ignore */ }
-  }, []);
+  const [studentName] = useState(readStudentNameFromStorage);
+  const [activeDays] = useState<Set<number>>(readActiveDaysFromStorage);
 
   const year = progress?.year ?? "Year 1";
   const levelNum = parseInt(year.replace(/\D/g, ""), 10) || 1;

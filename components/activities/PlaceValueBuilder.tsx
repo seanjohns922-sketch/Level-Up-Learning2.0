@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { PlaceValueBuilderQuestion, PlaceValueName } from "@/data/activities/year2/lessonEngine";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import PlaceValueMABVisual from "@/components/activities/PlaceValueMABVisual";
@@ -40,7 +40,7 @@ function expectedPlaceValueAnswer(questionData: PlaceValueBuilderQuestion) {
   return count * placeMultiplier(place);
 }
 
-export default function PlaceValueBuilder({
+function PlaceValueBuilderInner({
   questionData,
   onCorrect,
   onWrong,
@@ -50,10 +50,6 @@ export default function PlaceValueBuilder({
   onWrong?: () => void;
 }) {
   const [response, setResponse] = useState("");
-
-  useEffect(() => {
-    setResponse("");
-  }, [questionData]);
 
   const mabVisualData = useMemo(
     () => ({
@@ -151,4 +147,25 @@ export default function PlaceValueBuilder({
       </div>
     </div>
   );
+}
+
+export default function PlaceValueBuilder(props: {
+  questionData: PlaceValueBuilderQuestion;
+  onCorrect?: () => void;
+  onWrong?: () => void;
+}) {
+  const { questionData } = props;
+  const questionKey = JSON.stringify({
+    prompt: questionData.prompt,
+    mode: questionData.mode,
+    place: questionData.place,
+    targetNumber: questionData.targetNumber,
+    hundredThousands: questionData.hundredThousands,
+    tenThousands: questionData.tenThousands,
+    thousands: questionData.thousands,
+    hundreds: questionData.hundreds,
+    tens: questionData.tens,
+    ones: questionData.ones,
+  });
+  return <PlaceValueBuilderInner key={questionKey} {...props} />;
 }

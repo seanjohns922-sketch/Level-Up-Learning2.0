@@ -24,7 +24,7 @@ type RealmPortalPreviewProps = {
   levelNumber?: number;
 };
 
-export default function RealmPortalPreview({
+function RealmPortalPreviewInner({
   realmId,
   symbol,
   color,
@@ -41,9 +41,6 @@ export default function RealmPortalPreview({
     !requiresLevel3Video || (typeof levelNumber === "number" && levelNumber >= 3);
   const shouldShowVideo = isSelected && isRealmVideoUnlocked && Boolean(videoSrc) && !hasVideoError;
 
-  useEffect(() => {
-    setHasVideoError(false);
-  }, [realmId]);
 
   useEffect(() => {
     if (!shouldShowVideo || !videoRef.current) return;
@@ -101,4 +98,8 @@ export default function RealmPortalPreview({
       </span>
     </div>
   );
+}
+
+export default function RealmPortalPreview(props: RealmPortalPreviewProps) {
+  return <RealmPortalPreviewInner key={props.realmId} {...props} />;
 }

@@ -1,9 +1,23 @@
+type QuestionOption = number | string | { label?: string; value?: string; id?: string; groups?: number[] };
+
+type QuestionVisual = {
+  type?: string;
+  leftTarget?: number;
+  rightTarget?: number;
+  maxDots?: number;
+  totalCounters?: number;
+  groups?: number;
+  groupSize?: number;
+  selectTarget?: number;
+  [key: string]: unknown;
+};
+
 export type Question = {
   type?: string;
   id: string;
   prompt: string;
-  options?: any[];
-  answer?: any;
+  options?: QuestionOption[];
+  answer?: string | number | boolean | null;
   answerIndex?: number;
   answerOptionId?: string;
   correctAnswer?: string;
@@ -13,7 +27,7 @@ export type Question = {
   linkedLessons?: number[];
   strand?: string;
   difficultyBand?: string;
-  visual?: any;
+  visual?: QuestionVisual | null;
   min?: number;
   max?: number;
   target?: number;

@@ -356,7 +356,7 @@ function PretestPage() {
       if (!answer) return acc;
       if (q.answerIndex !== undefined && q.answer == null && q.correctAnswer == null) {
         const opt = (q.options ?? [])[q.answerIndex ?? 0];
-        const correctLabel = typeof opt === "string" ? opt : opt.label;
+        const correctLabel = typeof opt === "string" || typeof opt === "number" ? String(opt) : opt.label;
         return acc + (answer === correctLabel ? 1 : 0);
       }
       return acc + (isAssessmentAnswerCorrect(q, answer) ? 1 : 0);
@@ -519,17 +519,20 @@ function PretestPage() {
   } else {
     questionContent = (
       <>
-        {question.visual?.type === "dot_add" ? (
+        {question.visual?.type === "dot_add" &&
+          question.visual.leftTarget !== undefined &&
+          question.visual.rightTarget !== undefined ? (
           <DotAddVisual
             leftTarget={question.visual.leftTarget}
             rightTarget={question.visual.rightTarget}
             maxDots={question.visual.maxDots ?? 10}
           />
         ) : question.visual?.type === "group_counters" &&
+          question.visual.totalCounters !== undefined &&
           question.visual.groupSize !== undefined &&
           question.visual.selectTarget !== undefined &&
           !(question.options ?? []).some(
-            (opt) => typeof opt !== "string" && opt.groups
+            (opt) => typeof opt === "object" && opt !== null && "groups" in opt && Boolean(opt.groups)
           ) ? (
           <GroupCountersVisual
             totalCounters={question.visual.totalCounters}

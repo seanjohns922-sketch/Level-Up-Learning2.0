@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { speak } from "@/lib/speak";
 
 function randInt(min: number, max: number) {
@@ -83,8 +83,10 @@ export default function MixedReviewSprint({
 
   useEffect(() => {
     if (timeLeft <= 0 && !finished) {
-      setFinished(true);
-      onCorrect?.();
+      window.setTimeout(() => {
+        setFinished(true);
+        onCorrect?.();
+      }, 0);
     }
   }, [timeLeft, finished, onCorrect]);
 

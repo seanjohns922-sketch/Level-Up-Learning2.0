@@ -31,7 +31,7 @@ export function pickWeightedIndex<T extends WeightedItem>(
     return { index: -1, bag: [] };
   }
 
-  let bag = currentBag.length > 0 ? [...currentBag] : buildBag(items);
+  const bag = currentBag.length > 0 ? [...currentBag] : buildBag(items);
   let nextIndex = bag.pop() ?? 0;
 
   if (lastIndex !== null && nextIndex === lastIndex && bag.length > 0) {

@@ -61,8 +61,10 @@ export default function FlashFacts({
 
   useEffect(() => {
     if (timeLeft <= 0 && !finished) {
-      setFinished(true);
-      onCorrect?.();
+      window.setTimeout(() => {
+        setFinished(true);
+        onCorrect?.();
+      }, 0);
     }
   }, [timeLeft, finished, onCorrect]);
 

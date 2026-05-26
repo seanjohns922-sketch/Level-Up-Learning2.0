@@ -57,8 +57,8 @@ export default function SpeedRound({
   const [streak, setStreak] = useState(0);
   const [bestStreak, setBestStreak] = useState(0);
   const [flash, setFlash] = useState<"correct" | "wrong" | null>(null);
-  const [finished, setFinished] = useState(false);
   const finishedRef = useRef(false);
+  const finished = timeLeft <= 0;
 
   useEffect(() => {
     const t = setInterval(() => setTimeLeft((s) => s - 1), 1000);
@@ -68,7 +68,6 @@ export default function SpeedRound({
   useEffect(() => {
     if (timeLeft <= 0 && !finishedRef.current) {
       finishedRef.current = true;
-      setFinished(true);
     }
   }, [timeLeft]);
 

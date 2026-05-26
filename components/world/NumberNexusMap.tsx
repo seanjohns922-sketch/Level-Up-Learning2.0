@@ -366,6 +366,29 @@ function PlayerCharacter({ gender }: { gender: "boy" | "girl" }) {
 }
 
 // ─── Main component ─────────────────────────────────────────────────────────────
+function readBestChainFromStorage() {
+  if (typeof window === "undefined") return 0;
+  try {
+    return Number(localStorage.getItem("lul_best_nexus_chain_v1") ?? 0);
+  } catch {
+    return 0;
+  }
+}
+
+function readGenderFromStorage(): "boy" | "girl" {
+  if (typeof window === "undefined") return "boy";
+  try {
+    const raw = localStorage.getItem("lul_active_student_v1");
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed?.gender === "girl" || parsed?.gender === "female") return "girl";
+    }
+  } catch {
+    // ignore
+  }
+  return "boy";
+}
+
 // ─── Chunky in-world HUD icons (Clash Royale readability / hologram styling) ───
 function LegendsIcon() {
   return (
@@ -432,20 +455,9 @@ export default function NumberNexusMap() {
   const router   = useRouter();
   const [progress] = useState(() => readProgress());
   const [store]    = useState(() => readProgramStore());
-  const [bestChain, setBestChain] = useState(0);
-  const [gender, setGender]       = useState<"boy" | "girl">("boy");
+  const [bestChain] = useState(readBestChainFromStorage);
+  const [gender] = useState<"boy" | "girl">(readGenderFromStorage);
   const [launching, setLaunching] = useState(false);
-
-  useEffect(() => {
-    try { setBestChain(Number(localStorage.getItem("lul_best_nexus_chain_v1") ?? 0)); } catch { /* ignore */ }
-    try {
-      const raw = localStorage.getItem("lul_active_student_v1");
-      if (raw) {
-        const p = JSON.parse(raw);
-        if (p?.gender === "girl" || p?.gender === "female") setGender("girl");
-      }
-    } catch { /* ignore */ }
-  }, []);
 
   const year       = progress?.year ?? "Year 1";
   const isPrep     = year === "Prep";
