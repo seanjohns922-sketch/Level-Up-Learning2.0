@@ -7168,37 +7168,25 @@ function SessionPage() {
     (async () => {
       try {
         const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY) : null;
-        if (!studentId) { console.warn("[Quiz] No active student ID, skipping DB save"); return; }
-        const yearLabel = year; // e.g. "Year 1"
-        const weekNum = week; // e.g. "1"
+        if (!studentId) {
+          console.warn("[Quiz] No active student ID, skipping DB save");
+          return;
+        }
 
-        // Read existing quiz_scores for this progress snapshot row
-        const { data: existing } = await supabase
-          .from("progress_snapshot")
-          .select("quiz_scores")
-          .eq("student_id", studentId)
-          .eq("year", yearLabel)
-          .maybeSingle();
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const prevScores: Record<string, any> = (existing?.quiz_scores as Record<string, unknown>) ?? {};
-        const weekKey = String(weekNum);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const prevAttempts: any[] = (prevScores[weekKey] as Record<string, unknown>)?.attempts as any[] ?? [];
         let insight: TeacherInsight | null = null;
 
         try {
           const insightInput: TeacherInsightInput = {
             studentId,
-            level: yearLabel,
+            level: year,
             strand: "Number",
-            week: Number(weekNum),
-            quizId: `${yearLabel}-w${weekNum}-weekly-quiz`,
+            week: Number(week),
+            quizId: `${year}-w${week}-weekly-quiz`,
             title: "Weekly Quiz",
             score,
             accuracy: percent,
             timeSpent: null,
-            attempts: prevAttempts.length + 1,
+            attempts: 1,
             questionsAnswered: total,
             questionResults,
             lessonBreakdown: lessonBreakdown.map((item) => ({
@@ -7240,31 +7228,16 @@ function SessionPage() {
           insight,
           at: new Date().toISOString(),
         };
-        const updatedWeek = {
-          score,
-          total,
-          percent,
-          passRate,
-          passed,
-          lessonBreakdown,
-          latestInsight: insight,
-          attempts: [...prevAttempts, attempt],
-        };
-        const updatedScores = { ...prevScores, [weekKey]: updatedWeek };
 
-        const { error } = await supabase
-          .from("progress_snapshot")
-          .upsert(
-            {
-              student_id: studentId,
-              year: yearLabel,
-              quiz_scores: updatedScores,
-              week: passed ? Math.min(12, Number(weekNum) + 1) : Number(weekNum),
-            },
-            { onConflict: "student_id,year" }
-          );
+        const { error } = await supabase.rpc("save_weekly_quiz_progress", {
+          p_student_id: studentId,
+          p_year: year,
+          p_week: Number(week),
+          p_attempt: attempt,
+          p_next_week: passed ? Math.min(12, Number(week) + 1) : Number(week),
+        });
         if (error) console.warn("[Quiz] DB save error:", error);
-        else console.log("[Quiz] Quiz score saved to DB:", updatedWeek);
+        else console.log("[Quiz] Quiz score saved to DB:", attempt);
       } catch (e) {
         console.warn("[Quiz] DB save failed:", e);
       }

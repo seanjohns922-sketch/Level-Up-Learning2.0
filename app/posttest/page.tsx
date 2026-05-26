@@ -412,43 +412,14 @@ function PostTestPage() {
       try {
         if (!studentId) return;
 
-        const { data: existing } = await supabase
-          .from("progress_snapshot")
-          .select("quiz_scores")
-          .eq("student_id", studentId)
-          .eq("year", year)
-          .maybeSingle();
-
-        const prevScores = ((existing?.quiz_scores as Record<string, unknown> | null) ?? {}) as Record<
-          string,
-          unknown
-        >;
-        const existingPosttest =
-          typeof prevScores.posttest === "object" && prevScores.posttest !== null
-            ? (prevScores.posttest as { attempts?: unknown[] })
-            : undefined;
-        const previousAttempts = existingPosttest?.attempts ?? [];
         const latest = { ...profile, assignedWeek, at: new Date().toISOString() };
-        const updatedScores = {
-          ...prevScores,
-          posttest: {
-            latest,
-            attempts: [...previousAttempts, latest],
-          },
-        };
-
-        const { error } = await supabase
-          .from("progress_snapshot")
-          .upsert(
-            {
-              student_id: studentId,
-              year,
-              quiz_scores: updatedScores,
-              status: didPass ? "PASSED" : "ASSIGNED_PROGRAM",
-              week: didPass ? prev?.assignedWeek ?? null : assignedWeek ?? prev?.assignedWeek ?? 1,
-            },
-            { onConflict: "student_id,year" }
-          );
+        const { error } = await supabase.rpc("save_posttest_progress", {
+          p_student_id: studentId,
+          p_year: year,
+          p_latest: latest,
+          p_status: didPass ? "PASSED" : "ASSIGNED_PROGRAM",
+          p_week: didPass ? prev?.assignedWeek ?? null : assignedWeek ?? prev?.assignedWeek ?? 1,
+        });
         if (error) console.warn("[PostTest] DB save error:", error);
       } catch (error) {
         console.warn("[PostTest] DB save failed:", error);

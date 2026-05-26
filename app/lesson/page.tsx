@@ -44,6 +44,7 @@ import { getLessonChrome } from "@/lib/levelTheme";
 import { LessonPageHero } from "@/components/lesson/LessonPageHero";
 import { supabase } from "@/lib/supabase";
 import type { TeacherInsight, TeacherInsightInput } from "@/lib/teacher-insights";
+import { saveStudentProgressState } from "@/lib/student-progress-sync";
 
 export default function LessonPageWrapper() {
   return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><LessonPage /></Suspense>;
@@ -193,8 +194,9 @@ function LessonPage() {
   function completeLesson() {
     markLessonComplete(year, week, lessonNumber);
     const progress = readProgress();
+    let nextAssignedWeek = progress?.assignedWeek;
     if (progress?.status === "ASSIGNED_PROGRAM" && progress.requiredWeeks?.length) {
-      const nextAssignedWeek = getRecommendedAssignedWeek(
+      nextAssignedWeek = getRecommendedAssignedWeek(
         readProgramStore(),
         year,
         progress.assignedWeek,
@@ -204,6 +206,35 @@ function LessonPage() {
         updateProgress({ assignedWeek: nextAssignedWeek });
       }
     }
+
+    const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY) : null;
+    if (studentId) {
+      void (async () => {
+        const { error } = await supabase.rpc("save_lesson_completion", {
+          p_student_id: studentId,
+          p_year: year,
+          p_week: week,
+          p_lesson_id: effectiveLessonId,
+        });
+        if (error) {
+          console.warn("[Lesson] Completion save failed:", error);
+        }
+      })();
+
+      const latest = readProgress();
+      void saveStudentProgressState(studentId, year, {
+        status: latest?.status ?? progress?.status ?? "ASSIGNED_PROGRAM",
+        week,
+        placement_complete: latest?.placementComplete ?? progress?.placementComplete ?? false,
+        assigned_week: nextAssignedWeek ?? latest?.assignedWeek ?? progress?.assignedWeek ?? null,
+        required_weeks: latest?.requiredWeeks ?? progress?.requiredWeeks ?? [],
+        optional_weeks: latest?.optionalWeeks ?? progress?.optionalWeeks ?? [],
+        unlocked_legends: latest?.unlockedLegends ?? progress?.unlockedLegends ?? [],
+      }).catch((error) => {
+        console.warn("[Lesson] Progress state sync failed:", error);
+      });
+    }
+
     router.push(`/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1`);
   }
 
@@ -266,20 +297,6 @@ function LessonPage() {
         console.warn("[Lesson] Insight generation failed:", error);
       }
 
-      const { data: existing } = await supabase
-        .from("progress_snapshot")
-        .select("lesson_attempts")
-        .eq("student_id", studentId)
-        .eq("year", year)
-        .maybeSingle();
-
-      const previousLessonAttempts = ((existing?.lesson_attempts as Record<string, unknown> | null) ?? {}) as Record<
-        string,
-        { attempts?: unknown[] }
-      >;
-      const previousLessonEntry = previousLessonAttempts[effectiveLessonId] ?? {};
-      const previousAttempts = Array.isArray(previousLessonEntry.attempts) ? previousLessonEntry.attempts : [];
-
       const attempt = {
         at: new Date().toISOString(),
         lessonId: effectiveLessonId,
@@ -295,23 +312,13 @@ function LessonPage() {
         insight,
       };
 
-      const updatedLessonAttempts = {
-        ...previousLessonAttempts,
-        [effectiveLessonId]: {
-          latestSummary: attempt,
-          latestInsight: insight,
-          attempts: [...previousAttempts, attempt],
-        },
-      };
-
-      const { error } = await supabase.from("progress_snapshot").upsert(
-        {
-          student_id: studentId,
-          year,
-          lesson_attempts: updatedLessonAttempts,
-        },
-        { onConflict: "student_id,year" }
-      );
+      const { error } = await supabase.rpc("save_lesson_progress", {
+        p_student_id: studentId,
+        p_year: year,
+        p_week: week,
+        p_lesson_id: effectiveLessonId,
+        p_attempt: attempt,
+      });
 
       if (error) {
         console.warn("[Lesson] DB save error:", error);

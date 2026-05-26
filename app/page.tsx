@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress } from "@/data/progress";
 import { getPlacementEntryYear, hasActiveStudentSeenIntro } from "@/lib/studentIdentity";
+import { restoreStudentStateFromServer } from "@/lib/student-progress-sync";
 import { supabase } from "@/lib/supabase";
 
 export default function Page() {
@@ -15,7 +16,15 @@ export default function Page() {
     async function routeUser() {
       if (typeof window !== "undefined") {
         const activeStudentId = window.localStorage.getItem(ACTIVE_STUDENT_KEY)?.trim();
-        const progress = readProgress();
+        let progress = readProgress();
+        if (activeStudentId) {
+          try {
+            const restored = await restoreStudentStateFromServer(activeStudentId);
+            if (restored.progress) progress = restored.progress;
+          } catch (error) {
+            console.warn("[RootRoute] Could not restore student progress", error);
+          }
+        }
         if (activeStudentId || progress) {
           if (cancelled) return;
           if (isPlacementComplete(progress)) {

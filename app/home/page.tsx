@@ -4,6 +4,7 @@ import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { isPlacementComplete, readProgress } from "@/data/progress";
 import { clearActiveStudentSession, getActiveStudentProfile, getPlacementEntryYear, hasActiveStudentSeenIntro, markActiveStudentIntroSeen } from "@/lib/studentIdentity";
+import { markStudentIntroSeen } from "@/lib/student-progress-sync";
 import { supabase } from "@/lib/supabase";
 
 export default function StudentHomePage() {
@@ -31,6 +32,11 @@ export default function StudentHomePage() {
 
   function beginJourney() {
     markActiveStudentIntroSeen(studentProfile?.studentId);
+    if (studentProfile?.studentId) {
+      void markStudentIntroSeen(studentProfile.studentId).catch((error) => {
+        console.warn("[Home] Could not persist intro state", error);
+      });
+    }
     router.push(`/pretest?year=${encodeURIComponent(placementYear)}`);
   }
 

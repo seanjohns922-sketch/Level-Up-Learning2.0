@@ -4,7 +4,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getLegendForYear } from "@/data/legends";
 import { readProgress, StudentProgress, writeProgress, ACTIVE_STUDENT_KEY } from "@/data/progress";
-import { supabase } from "@/lib/supabase";
+import { saveStudentProgressState } from "@/lib/student-progress-sync";
 import LegendUnlockReveal from "@/components/LegendUnlockReveal";
 import type { AssessmentResultProfile } from "@/data/assessments/analysis";
 import { ALL_PROGRAM_WEEKS, getOptionalWeeks, normalizeWeekList } from "@/lib/program-progress";
@@ -253,6 +253,7 @@ function ResultsPage() {
   const passed = passedByPretest || passedByPosttest || passedByProgram;
   const displayPercent = passedByProgram ? 100 : scorePercent;
   const nextYear = getNextYearLabel(year);
+  const nextStudentLevelLabel = nextYear ? formatStudentLevelLabel(nextYear) : null;
 
   const legend = useMemo(() => getLegendForYear(year), [year]);
   const storedPosttestProfile: AssessmentResultProfile | null = useMemo(() => {
@@ -369,14 +370,16 @@ function ResultsPage() {
         if (isPostTest || passedByProgram) return;
         const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY) : null;
         if (!studentId) return;
-        const { error } = await supabase.rpc("save_pretest_progress", {
-          p_student_id: studentId,
-          p_year: year,
-          p_score: scorePercent,
-          p_status: next.status === "PASSED" ? "PASSED" : "ASSIGNED_PROGRAM",
-          p_week: next.assignedWeek ?? null,
+        await saveStudentProgressState(studentId, year, {
+          pretest_score: scorePercent,
+          status: next.status === "PASSED" ? "PASSED" : "ASSIGNED_PROGRAM",
+          week: next.assignedWeek ?? null,
+          placement_complete: next.placementComplete ?? false,
+          assigned_week: next.assignedWeek ?? null,
+          required_weeks: next.requiredWeeks ?? [],
+          optional_weeks: next.optionalWeeks ?? [],
+          unlocked_legends: next.unlockedLegends ?? [],
         });
-        if (error) console.warn("[Results] DB pretest save error:", error);
       } catch (e) {
         console.warn("[Results] DB pretest save failed:", e);
       }
@@ -521,12 +524,12 @@ function ResultsPage() {
                 <p className="text-xs text-slate-400 leading-relaxed">
                   {isPostTest
                     ? year === "Prep"
-                      ? "You passed the Ground Level mastery test — your Legend is ready to collect and Year 1 is now open."
+                      ? "You passed the Ground Level mastery test — your Legend is ready to collect and Level 1 is now open."
                       : "Post-test passed — your Legend is ready to collect."
                     : passedByProgram
                     ? "You completed the 12-week program — your Legend is waiting."
                     : nextYear
-                    ? `Pre-test passed. Up next: ${nextYear}.`
+                    ? `Pre-test passed. Up next: ${nextStudentLevelLabel}.`
                     : "Final pre-test passed — all Legends are ready to collect."}
                 </p>
               </div>
