@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabase";
 import LegendUnlockReveal from "@/components/LegendUnlockReveal";
 import type { AssessmentResultProfile } from "@/data/assessments/analysis";
 import { ALL_PROGRAM_WEEKS, getOptionalWeeks, normalizeWeekList } from "@/lib/program-progress";
+import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 const POSTTEST_PASS_THRESHOLD = 85;
 const PRETEST_PASS_THRESHOLD = 85;
 
@@ -43,6 +44,12 @@ function getLegendIdsUpToYear(year: string) {
   const yearIndex = YEAR_SEQUENCE.indexOf(year as (typeof YEAR_SEQUENCE)[number]);
   if (yearIndex === -1) return [getLegendForYear(year).id];
   return YEAR_SEQUENCE.slice(0, yearIndex + 1).map((label) => getLegendForYear(label).id);
+}
+
+function getLegendIdsBeforeYear(year: string) {
+  const yearIndex = YEAR_SEQUENCE.indexOf(year as (typeof YEAR_SEQUENCE)[number]);
+  if (yearIndex <= 0) return [];
+  return YEAR_SEQUENCE.slice(0, yearIndex).map((label) => getLegendForYear(label).id);
 }
 
 function getStrandBadgeClass(strand?: string) {
@@ -212,6 +219,7 @@ function ResultsPage() {
   const sp = useSearchParams();
 
   const year = sp.get("year") ?? "Year 3";
+  const studentLevelLabel = formatStudentLevelLabel(year);
   const score = Number(sp.get("score") ?? "0");
   const total = Number(sp.get("total") ?? "0");
   const source = sp.get("source") ?? "pretest";
@@ -258,12 +266,15 @@ function ResultsPage() {
 
   const initialProgress = useMemo(() => readProgress(), []);
   const [unlockDismissed, setUnlockDismissed] = useState(false);
-  const unlockTargets = useMemo(
-    () => (passedByPretest ? getLegendIdsUpToYear(year) : [legend.id]),
-    [passedByPretest, year, legend.id]
-  );
+  const unlockTargets = useMemo(() => {
+    if (passedByPretest) return getLegendIdsUpToYear(year);
+    if (!isPostTest) return getLegendIdsBeforeYear(year); // failed pretest → unlock all prior years
+    return [legend.id];
+  }, [passedByPretest, isPostTest, year, legend.id]);
   const shouldShowUnlock =
-    passed && unlockTargets.some((id) => !(initialProgress?.unlockedLegends ?? []).includes(id)) && !unlockDismissed;
+    unlockTargets.length > 0 &&
+    unlockTargets.some((id) => !(initialProgress?.unlockedLegends ?? []).includes(id)) &&
+    !unlockDismissed;
   const isFailedPretest = !isPostTest && !passedByPretest;
   const requiresFullPathway = isFailedPretest && scorePercent < PRETEST_PASS_THRESHOLD;
   const diagnosticRequiredWeeks = useMemo(
@@ -309,6 +320,8 @@ function ResultsPage() {
       const assignedWeek = isPostTest
         ? getLowestRecommendedWeek(storedPosttestProfile) ?? 1
         : requiredWeeks[0] ?? getLowestRecommendedWeek(storedPretestProfile) ?? 1;
+      const lowerLegendUnlocks = isFailedPretest ? getLegendIdsBeforeYear(year) : [];
+      const unlocked = Array.from(new Set([...prevUnlocked, ...lowerLegendUnlocks]));
       next = {
         ...prev,
         year,
@@ -318,7 +331,7 @@ function ResultsPage() {
         assignedWeek,
         requiredWeeks: isPostTest ? prev?.requiredWeeks ?? [] : requiredWeeks,
         optionalWeeks: isPostTest ? prev?.optionalWeeks ?? ALL_PROGRAM_WEEKS : optionalWeeks,
-        unlockedLegends: prevUnlocked,
+        unlockedLegends: unlocked,
       };
     }
 
@@ -424,7 +437,7 @@ function ResultsPage() {
             </h1>
             <p className="text-sm text-muted-foreground mb-2">{msg.sub}</p>
             <div className="text-xs font-semibold text-muted-foreground/60 uppercase tracking-wider">
-              {year} • {isPostTest ? "Post-Test" : source === "program_complete" ? "Program" : "Pre-Test"}
+              {studentLevelLabel} • {isPostTest ? "Post-Test" : source === "program_complete" ? "Program" : "Pre-Test"}
             </div>
 
             <ScoreRing percent={displayPercent} passed={passed} />
@@ -677,7 +690,7 @@ function ResultsPage() {
                     className="w-full py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base hover:opacity-90 transition-all active:scale-[0.98] shadow-lg"
                     style={{ boxShadow: "0 8px 24px -8px hsl(var(--primary) / 0.4)" }}
                   >
-                    {nextYear ? `Start ${nextYear} Pre-Test` : "Enter the Tower"}
+                    {nextYear ? `Start ${formatStudentLevelLabel(nextYear)} Pre-Test` : "Enter the Tower"}
                   </button>
                 )}
                 <button
