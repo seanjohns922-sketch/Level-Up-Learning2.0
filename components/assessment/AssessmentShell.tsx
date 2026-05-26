@@ -3,6 +3,7 @@
 import { ReactNode } from "react";
 import { ChevronLeft, Trophy, Zap } from "lucide-react";
 import { MathFormattedText } from "@/components/FractionText";
+import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 
 interface AssessmentShellProps {
   /** "Pre-Test" or "Post-Test" */
@@ -40,6 +41,7 @@ export default function AssessmentShell({
 }: AssessmentShellProps) {
   const progress = ((currentIndex + 1) / totalQuestions) * 100;
   const isPost = testType.toLowerCase().includes("post");
+  const studentLevelLabel = formatStudentLevelLabel(year);
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex flex-col items-center px-4 py-6 md:py-10">
@@ -57,7 +59,7 @@ export default function AssessmentShell({
 
           <div className="flex items-center gap-2">
             <span className="px-3 py-1 rounded-full text-xs font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30">
-              {year}
+              {studentLevelLabel}
             </span>
             <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
               {testType}

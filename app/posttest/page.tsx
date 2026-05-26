@@ -13,6 +13,7 @@ import { analyzeAssessmentResult } from "@/data/assessments/analysis";
 import { supabase } from "@/lib/supabase";
 import { DEMO_MODE } from "@/data/config";
 import { getWeekProgress, hasCompletedRequiredWeeks, readProgramStore } from "@/lib/program-progress";
+import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 
 const PASS_THRESHOLD = 85;
 
@@ -289,6 +290,7 @@ function PostTestPage() {
   const router = useRouter();
   const params = useSearchParams();
   const year = params.get("year") ?? "Year 3";
+  const studentLevelLabel = formatStudentLevelLabel(year);
 
   const test = useMemo(() => {
     return getPosttestForYearLabel(year);
@@ -466,7 +468,7 @@ function PostTestPage() {
             Post-Test coming soon
           </h1>
           <p className="text-slate-400 mb-6">
-            A post-test for <span className="font-bold text-white">{year}</span>{" "}
+            A post-test for <span className="font-bold text-white">{studentLevelLabel}</span>{" "}
             is not available yet.
           </p>
           <button

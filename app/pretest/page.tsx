@@ -10,6 +10,7 @@ import AssessmentShell from "@/components/assessment/AssessmentShell";
 import { analyzeAssessmentResult, isAssessmentAnswerCorrect } from "@/data/assessments/analysis";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, type StudentProgress, writeProgress } from "@/data/progress";
 import { clearYearProgress } from "@/lib/program-progress";
+import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 
 /* ── Inline visuals (kept from original) ── */
 
@@ -293,6 +294,7 @@ function PretestPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const year = searchParams.get("year") ?? "Year 3";
+  const studentLevelLabel = formatStudentLevelLabel(year);
 
   const questions: Question[] = useMemo(
     () => getPretestForYearLabel(year),
@@ -422,7 +424,7 @@ function PretestPage() {
             No questions found
           </h2>
           <p className="text-slate-400 mb-4">
-            We couldn&apos;t find a pre-test for {year}.
+            We couldn&apos;t find a pre-test for {studentLevelLabel}.
           </p>
           <button
             onClick={() => router.push("/home")}
