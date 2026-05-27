@@ -30,7 +30,14 @@ type StudentRow = {
 };
 
 type JsonObject = Record<string, unknown>;
-type InsightCarrier = { latestInsight?: TeacherInsight | null | undefined };
+type InsightCarrier = {
+  latestInsight?: TeacherInsight | null | undefined;
+  latestSummary?: {
+    timeSpentSeconds?: number | null;
+    accuracy?: number | null;
+  } | null;
+  attempts?: unknown[] | null;
+};
 type ProgressRow = {
   student_id: string;
   year: string;
@@ -122,6 +129,20 @@ function parseLessonAttempts(raw: unknown): Record<string, InsightCarrier> {
 function weekLessonsDone(ids: string[], week: number): number {
   const tag = `-w${week}-`;
   return ids.filter((id) => id.includes(tag)).length;
+}
+
+function getQuizPercent(quiz: JsonObject | undefined): number | null {
+  const value = quiz?.percent;
+  return typeof value == "number" ? value : null;
+}
+
+function getQuizPassed(quiz: JsonObject | undefined): boolean {
+  return quiz?.passed === true;
+}
+
+function getQuizAttemptsCount(quiz: JsonObject | undefined): number {
+  const attempts = quiz?.attempts;
+  return Array.isArray(attempts) ? attempts.length : quiz ? 1 : 0;
 }
 
 function countCompletedQuizzes(raw: unknown): number {
@@ -687,7 +708,7 @@ function StudentStrandDetail({
     if (isPlaceholder) return "Not Started";
     const done = weekLessonsDone(ids, w);
     const q = quizScores[String(w)];
-    if (q && q.passed === false) return "Struggled";
+    if (q && !getQuizPassed(q)) return "Struggled";
     if (done >= 3) return "Complete";
     if (done > 0 || w === currentWeek) return "In Progress";
     return "Not Started";
@@ -696,6 +717,10 @@ function StudentStrandDetail({
   const week = plan.find((p) => p.week === selectedWeek) ?? plan[0];
   const weekDone = weekLessonsDone(ids, week?.week ?? 1);
   const weekQuiz = quizScores[String(week?.week ?? 1)];
+  const weekQuizPercent = getQuizPercent(weekQuiz);
+  const weekQuizPassed = getQuizPassed(weekQuiz);
+  const weekQuizAttempts = getQuizAttemptsCount(weekQuiz);
+  const weekQuizInsight = (weekQuiz?.latestInsight ?? null) as TeacherInsight | null;
   const weekLessonIds = week?.lessons.map((lesson) => lesson.id) ?? [];
   const weekInsights = getWeekInsightList(prog, week?.week ?? 1, weekLessonIds);
   const overallPct = overallProgramPercent(prog, yearLabel, plan);
@@ -720,7 +745,7 @@ function StudentStrandDetail({
     }
     plan.forEach((w) => {
       const q = quizScores[String(w.week)];
-      if (q && q.passed === false) insights.push(`Failed Week ${w.week} quiz — revisit lessons`);
+      if (q && !getQuizPassed(q)) insights.push(`Failed Week ${w.week} quiz — revisit lessons`);
     });
     if (weekDone > 0 && weekDone < 3 && week?.week === currentWeek) {
       insights.push(`Currently on Week ${currentWeek}, ${weekDone}/3 lessons done`);
@@ -876,10 +901,10 @@ function StudentStrandDetail({
               {weekQuiz ? (
                 <span className={[
                   "text-[11px] font-extrabold px-2 py-0.5 rounded-md border",
-                  weekQuiz.passed ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                  weekQuizPassed ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                                   : "bg-rose-50 text-rose-700 border-rose-200",
                 ].join(" ")}>
-                  {weekQuiz.percent ?? 0}% · {weekQuiz.passed ? "Pass" : "Fail"}
+                  {weekQuizPercent ?? 0}% · {weekQuizPassed ? "Pass" : "Fail"}
                 </span>
               ) : (
                 <span className="text-[11px] font-bold text-[#94A3B8]">Not attempted</span>
@@ -887,8 +912,8 @@ function StudentStrandDetail({
             </div>
             <div className="flex items-center gap-3 text-[11px] text-[#64748B]">
               <span>Time: <b className="text-[#0F172A]">n/a</b></span>
-              <span>Attempts: <b className="text-[#0F172A]">{weekQuiz?.attempts?.length ?? (weekQuiz ? 1 : 0)}</b></span>
-              <span>Accuracy: <b className="text-[#0F172A]">{weekQuiz?.percent ? `${weekQuiz.percent}%` : "n/a"}</b></span>
+              <span>Attempts: <b className="text-[#0F172A]">{weekQuizAttempts}</b></span>
+              <span>Accuracy: <b className="text-[#0F172A]">{weekQuizPercent != null ? `${weekQuizPercent}%` : "n/a"}</b></span>
               <button
                 disabled
                 title="Coming soon"
@@ -898,17 +923,17 @@ function StudentStrandDetail({
               </button>
             </div>
           </div>
-          {weekQuiz?.latestInsight ? (
+          {weekQuizInsight ? (
             <div className="rounded-xl border border-[#E6E8EC] bg-[#F8FAFC] px-3 py-3">
               <div className="text-[10px] font-extrabold text-indigo-700 uppercase tracking-[0.14em] mb-2">
                 AI Quiz Insight
               </div>
               <div className="grid md:grid-cols-2 gap-2 text-xs">
-                <div><b className="text-[#64748B]">Status:</b> <span className="font-semibold text-[#0F172A]">{weekQuiz.latestInsight.status}</span></div>
-                <div><b className="text-[#64748B]">Strength:</b> <span className="font-semibold text-[#0F172A]">{weekQuiz.latestInsight.strength}</span></div>
-                <div><b className="text-[#64748B]">Gap:</b> <span className="font-semibold text-[#0F172A]">{weekQuiz.latestInsight.gap}</span></div>
-                <div><b className="text-[#64748B]">Teacher action:</b> <span className="font-semibold text-[#0F172A]">{weekQuiz.latestInsight.teacherAction}</span></div>
-                <div className="md:col-span-2"><b className="text-[#64748B]">Recommended revisit:</b> <span className="font-semibold text-[#0F172A]">{weekQuiz.latestInsight.recommendedRevisit}</span></div>
+                <div><b className="text-[#64748B]">Status:</b> <span className="font-semibold text-[#0F172A]">{weekQuizInsight.status}</span></div>
+                <div><b className="text-[#64748B]">Strength:</b> <span className="font-semibold text-[#0F172A]">{weekQuizInsight.strength}</span></div>
+                <div><b className="text-[#64748B]">Gap:</b> <span className="font-semibold text-[#0F172A]">{weekQuizInsight.gap}</span></div>
+                <div><b className="text-[#64748B]">Teacher action:</b> <span className="font-semibold text-[#0F172A]">{weekQuizInsight.teacherAction}</span></div>
+                <div className="md:col-span-2"><b className="text-[#64748B]">Recommended revisit:</b> <span className="font-semibold text-[#0F172A]">{weekQuizInsight.recommendedRevisit}</span></div>
               </div>
             </div>
           ) : null}
@@ -952,13 +977,10 @@ function StudentStrandDetail({
             timeSpent: formatDuration(latestSummary?.timeSpentSeconds),
             accuracy: latestSummary?.accuracy ?? null,
             aiInsight: latestInsight ?? null,
-            quizPercent: (() => {
-              const q = quizScores[String(previewLesson.week)];
-              return q?.percent ?? null;
-            })(),
+            quizPercent: getQuizPercent(quizScores[String(previewLesson.week)]),
             quizPassed: (() => {
               const q = quizScores[String(previewLesson.week)];
-              return q?.passed ?? null;
+              return q ? getQuizPassed(q) : null;
             })(),
           };
         })() : null}
