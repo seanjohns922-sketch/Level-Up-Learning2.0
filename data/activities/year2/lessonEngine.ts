@@ -5514,9 +5514,17 @@ function supportedPlaces(config: GenericConfig) {
       value === "tens" ||
       value === "ones"
   );
-  return candidates && candidates.length > 0
-    ? candidates
-    : (["hundreds", "tens", "ones"] as PlaceValueName[]);
+  if (candidates && candidates.length > 0) return candidates;
+
+  // Infer sensible place values from the minimum of the number range so that
+  // MAB visuals and generated answers are consistent (e.g. min:1000 needs
+  // "thousands" in the visual, otherwise the displayed blocks only show
+  // hundreds/tens/ones but the answer is the full 4-digit target number).
+  const min = typeof config.min === "number" ? config.min : 0;
+  if (min >= 100000) return ["hundred_thousands", "ten_thousands", "thousands", "hundreds", "tens", "ones"] as PlaceValueName[];
+  if (min >= 10000) return ["ten_thousands", "thousands", "hundreds", "tens", "ones"] as PlaceValueName[];
+  if (min >= 1000) return ["thousands", "hundreds", "tens", "ones"] as PlaceValueName[];
+  return ["hundreds", "tens", "ones"] as PlaceValueName[];
 }
 
 export function getDifficultyProfile(level: SupportedMathLevel, week: number): DifficultyProfile {
