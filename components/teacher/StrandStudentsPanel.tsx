@@ -33,10 +33,27 @@ type ProgressRow = {
   updated_at?: string;
 };
 
+type LiveStudentActivityRow = {
+  student_id: string;
+  class_id: string;
+  current_level?: string | null;
+  current_week?: number | null;
+  current_lesson?: string | null;
+  current_lesson_title?: string | null;
+  current_activity_label?: string | null;
+  progress_percent?: number | null;
+  progress_label?: string | null;
+  latest_event_type?: string | null;
+  current_lesson_status?: string | null;
+  last_active_at?: string | null;
+  updated_at?: string | null;
+};
+
 type Props = {
   yearLabel: string;
   students: StudentRow[];
   progress: ProgressRow[];
+  liveRows: LiveStudentActivityRow[];
 };
 
 type StrandStatus = "Not Started" | "In Progress" | "Needs Support" | "Completed";
@@ -284,7 +301,21 @@ function pickStudentYear(rows: ProgressRow[], fallback: string): string {
   return sorted[0].year;
 }
 
-export default function StrandStudentsPanel({ yearLabel, students, progress }: Props) {
+function levelToYearLabel(level?: string | null): string | null {
+  if (!level) return null;
+  if (/^prep$/i.test(level) || /^ground/i.test(level)) return "Prep";
+  const m = level.match(/(?:year|level)\s*(\d+)/i);
+  return m ? `Year ${m[1]}` : null;
+}
+
+function liveRowToStatus(row?: LiveStudentActivityRow | undefined): StrandStatus {
+  if (!row) return "Not Started";
+  if (row.current_lesson_status === "completed") return "Completed";
+  if (row.latest_event_type) return "In Progress";
+  return "Not Started";
+}
+
+export default function StrandStudentsPanel({ yearLabel, students, progress, liveRows }: Props) {
   const genres = getGenresForYear(yearLabel);
   const firstAvail = genres.find((g) => g.available) ?? genres[0];
   const [genreId, setGenreId] = useState<string>(firstAvail.id);
@@ -306,21 +337,31 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
     return progress.find((p) => p.student_id === studentId && p.year === year);
   }
 
+  function getLiveRow(studentId: string) {
+    return liveRows.find((row) => row.student_id === studentId);
+  }
+
   function getStudentYear(studentId: string): string {
+    const liveYear = levelToYearLabel(getLiveRow(studentId)?.current_level);
+    if (liveYear) return liveYear;
     const rows = progress.filter((p) => p.student_id === studentId);
-    return pickStudentYear(rows, yearLabel);
+    if (rows.length > 0) return pickStudentYear(rows, yearLabel);
+    return yearLabel;
   }
 
   const studentRows = students
     .map((s) => {
       const studentYear = getStudentYear(s.id);
       const prog = getProg(s.id, studentYear);
+      const liveRow = getLiveRow(s.id);
       const ids = prog ? parseCompleted(prog.completed_lesson_ids) : [];
       const sPrefix = lessonIdPrefix(studentYear);
       const strandIds = isPlaceholder ? [] : ids.filter((id) => id.startsWith(sPrefix));
-      const pct = isPlaceholder ? 0 : pctComplete(ids, sPrefix);
-      const status = isPlaceholder ? "Not Started" : computeStatus(prog, strandIds.length, pct);
-      const week = isPlaceholder ? null : (prog?.week ?? null);
+      const pctFromProgress = isPlaceholder ? 0 : pctComplete(ids, sPrefix);
+      const pct = pctFromProgress > 0 ? pctFromProgress : Math.max(0, Math.min(100, liveRow?.progress_percent ?? 0));
+      const computedStatus = isPlaceholder ? "Not Started" : computeStatus(prog, strandIds.length, pct);
+      const status = computedStatus === "Not Started" && liveRow ? liveRowToStatus(liveRow) : computedStatus;
+      const week = isPlaceholder ? null : (prog?.week ?? liveRow?.current_week ?? null);
       const planForStudentYear = getCurriculumPlan(studentYear, genreId);
       const activeWeek = week ?? 1;
       const activeWeekPlan = planForStudentYear.find((entry) => entry.week === activeWeek);
@@ -329,7 +370,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress }: P
       const summary = buildWeekSummary(weekInsights, status);
       const flag = deriveStudentFlag(pickPrimaryInsight(weekInsights), status);
 
-      return { s, prog, pct, status, week, studentYear, summary, flag };
+      return { s, prog, liveRow, pct, status, week, studentYear, summary, flag };
     })
     .sort((a, b) => {
       const dir = sortDir === "asc" ? 1 : -1;

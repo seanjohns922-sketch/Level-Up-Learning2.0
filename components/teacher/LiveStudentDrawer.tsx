@@ -38,6 +38,11 @@ export type LiveStudentDrawerData = {
   latestAnswerCorrect?: boolean | null;
   lastActiveAt?: string | null;
   timeOnCurrentQuestion?: number | null;
+  questionsAnswered?: number | null;
+  correctCount?: number | null;
+  accuracyPercent?: number | null;
+  currentLessonStatus?: string | null;
+  completedAt?: string | null;
   lastEventText?: string | null;
   aiIssue?: string | null;
   aiLikelyGap?: string | null;
@@ -232,8 +237,14 @@ export function LiveStudentDrawer({
                   ) : null}
                 </div>
               ) : null}
+              {(student.questionsAnswered ?? 0) > 0 ? (
+                <div className="mt-3 flex flex-wrap items-center gap-3 text-xs font-semibold text-slate-600">
+                  <span>Correct: {student.correctCount ?? 0} / {student.questionsAnswered ?? 0}</span>
+                  <span>Accuracy: {student.accuracyPercent ?? 0}%</span>
+                </div>
+              ) : null}
               <div className="mt-3 text-xs text-slate-500">
-                {student.lastEventText ?? "Working"} · On question for{" "}
+                {student.currentLessonStatus === "completed" ? "Completed lesson" : (student.lastEventText ?? "Working")} · On question for{" "}
                 {formatTimeActive(student.timeOnCurrentQuestion)}
               </div>
             </div>

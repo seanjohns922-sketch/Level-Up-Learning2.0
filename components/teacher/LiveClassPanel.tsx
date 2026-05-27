@@ -57,6 +57,11 @@ type LiveStudentActivityRow = {
   consecutive_incorrect_count?: number | null;
   session_hint_count?: number | null;
   attempt_number?: number | null;
+  questions_answered?: number | null;
+  correct_count?: number | null;
+  accuracy_percent?: number | null;
+  current_lesson_status?: string | null;
+  completed_at?: string | null;
   skill_tag?: string | null;
   misconception_tag?: string | null;
   ai_status?: LiveStudentStatus | null;
@@ -87,6 +92,11 @@ type LiveStudentCard = {
   latestCorrectAnswer?: string | null;
   latestAnswerCorrect?: boolean | null;
   timeOnCurrentQuestion?: number | null;
+  questionsAnswered?: number | null;
+  correctCount?: number | null;
+  accuracyPercent?: number | null;
+  currentLessonStatus?: string | null;
+  completedAt?: string | null;
   aiIssue?: string | null;
   aiLikelyGap?: string | null;
   aiSuggestedAction?: string | null;
@@ -135,6 +145,10 @@ function toLiveCard(student: StudentRow, row?: LiveStudentActivityRow | null): L
         consecutiveIncorrectCount: row.consecutive_incorrect_count ?? null,
         sessionHintCount: row.session_hint_count ?? null,
         attemptNumber: row.attempt_number ?? null,
+        questionsAnswered: row.questions_answered ?? null,
+        correctCount: row.correct_count ?? null,
+        accuracy: row.accuracy_percent ?? null,
+        completedAt: row.completed_at ?? null,
         skillTag: row.skill_tag ?? null,
         misconceptionTag: row.misconception_tag ?? null,
         lastActiveAt: row.last_active_at ?? null,
@@ -162,6 +176,11 @@ function toLiveCard(student: StudentRow, row?: LiveStudentActivityRow | null): L
     latestCorrectAnswer: row?.latest_correct_answer ?? null,
     latestAnswerCorrect: row?.latest_answer_correct ?? null,
     timeOnCurrentQuestion: row?.time_on_current_question ?? 0,
+    questionsAnswered: row?.questions_answered ?? null,
+    correctCount: row?.correct_count ?? null,
+    accuracyPercent: row?.accuracy_percent ?? null,
+    currentLessonStatus: row?.current_lesson_status ?? null,
+    completedAt: row?.completed_at ?? null,
     aiIssue: insight?.issue ?? row?.ai_issue ?? null,
     aiLikelyGap: insight?.likelyGap ?? row?.ai_likely_gap ?? null,
     aiSuggestedAction: insight?.suggestedTeacherAction ?? row?.ai_suggested_action ?? null,
@@ -495,10 +514,18 @@ export default function LiveClassPanel({
                   <div className="mt-4 grid gap-2 text-sm text-slate-600">
                     <div>{card.currentActivityLabel ?? "No current activity recorded"}</div>
                     <div className="line-clamp-2 text-slate-500">
-                      {card.currentQuestionText ?? card.lastEventText}
+                      {card.currentLessonStatus === "completed"
+                        ? `${card.currentLessonTitle ?? card.currentLesson ?? "Lesson"} completed`
+                        : (card.currentQuestionText ?? card.lastEventText)}
                     </div>
+                    {(card.questionsAnswered ?? 0) > 0 ? (
+                      <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-slate-600">
+                        <span>Correct: {card.correctCount ?? 0} / {card.questionsAnswered ?? 0}</span>
+                        <span>Accuracy: {card.accuracyPercent ?? 0}%</span>
+                      </div>
+                    ) : null}
                     <div className="flex items-center justify-between text-xs text-slate-500">
-                      <span>{card.lastEventText}</span>
+                      <span>{card.currentLessonStatus === "completed" ? "Completed lesson" : card.lastEventText}</span>
                       <span>{formatRelativeTime(card.lastActiveAt)}</span>
                     </div>
                     <div className="text-xs text-slate-500">

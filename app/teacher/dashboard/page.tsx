@@ -23,6 +23,22 @@ type ProgressRow = {
   quiz_scores: unknown;
 };
 
+type LiveStudentActivityRow = {
+  student_id: string;
+  class_id: string;
+  current_level?: string | null;
+  current_week?: number | null;
+  current_lesson?: string | null;
+  current_lesson_title?: string | null;
+  current_activity_label?: string | null;
+  progress_percent?: number | null;
+  progress_label?: string | null;
+  latest_event_type?: string | null;
+  current_lesson_status?: string | null;
+  last_active_at?: string | null;
+  updated_at?: string | null;
+};
+
 const YEAR_LEVELS = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"];
 const WEEKS = Array.from({ length: 12 }, (_, i) => i + 1);
 
@@ -148,6 +164,7 @@ export default function TeacherDashboardPage() {
   const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
   const [students, setStudents] = useState<StudentRow[]>([]);
   const [progress, setProgress] = useState<ProgressRow[]>([]);
+  const [liveRows, setLiveRows] = useState<LiveStudentActivityRow[]>([]);
   const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
   const [activeYear, setActiveYear] = useState("Year 1");
   const [activeTab, setActiveTab] = useState<"live" | "students" | "curriculum">("live");
@@ -242,6 +259,7 @@ export default function TeacherDashboardPage() {
         selectedClassRef.current = null;
         setStudents([]);
         setProgress([]);
+        setLiveRows([]);
       }
       setLoading(false);
     } finally {
@@ -266,6 +284,7 @@ export default function TeacherDashboardPage() {
     console.log("[TeacherDashboard] students fetched for selectedClassId:", classId, "count:", newStuds.length, "error:", studErr);
 
     let newProg: ProgressRow[] = [];
+    let newLiveRows: LiveStudentActivityRow[] = [];
     if (newStuds.length > 0) {
       const ids = newStuds.map((s) => s.id);
       const { data: prog } = await supabase
@@ -273,17 +292,27 @@ export default function TeacherDashboardPage() {
         .select("*")
         .in("student_id", ids);
       newProg = prog ?? [];
+
+      const { data: live } = await supabase
+        .from("live_student_activity")
+        .select("*")
+        .in("student_id", ids)
+        .eq("class_id", classId);
+      newLiveRows = (live ?? []) as LiveStudentActivityRow[];
     }
 
     if (diffOnly) {
       // Only update state if data actually changed — prevents unnecessary re-renders
       const studJson = JSON.stringify(newStuds);
       const progJson = JSON.stringify(newProg);
+      const liveJson = JSON.stringify(newLiveRows);
       setStudents((prev) => JSON.stringify(prev) === studJson ? prev : newStuds);
       setProgress((prev) => JSON.stringify(prev) === progJson ? prev : newProg);
+      setLiveRows((prev) => JSON.stringify(prev) === liveJson ? prev : newLiveRows);
     } else {
       setStudents(newStuds);
       setProgress(newProg);
+      setLiveRows(newLiveRows);
     }
   }
 
@@ -923,6 +952,7 @@ export default function TeacherDashboardPage() {
                 yearLabel={activeYear}
                 students={classStudents as any}
                 progress={progress as any}
+                liveRows={liveRows as any}
               />
             )}
             {/* eslint-enable @typescript-eslint/no-explicit-any */}

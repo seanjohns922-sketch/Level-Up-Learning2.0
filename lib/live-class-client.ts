@@ -67,6 +67,11 @@ type LiveStudentActivityRow = {
   consecutive_incorrect_count?: number | null;
   session_hint_count?: number | null;
   attempt_number?: number | null;
+  questions_answered?: number | null;
+  correct_count?: number | null;
+  accuracy_percent?: number | null;
+  current_lesson_status?: string | null;
+  completed_at?: string | null;
   skill_tag?: string | null;
   misconception_tag?: string | null;
   ai_status?: string | null;
@@ -109,6 +114,10 @@ function toSnapshot(row: Partial<LiveStudentActivityRow>): LiveStudentSnapshot {
     consecutiveIncorrectCount: row.consecutive_incorrect_count ?? null,
     sessionHintCount: row.session_hint_count ?? null,
     attemptNumber: row.attempt_number ?? null,
+    questionsAnswered: row.questions_answered ?? null,
+    correctCount: row.correct_count ?? null,
+    accuracy: row.accuracy_percent ?? null,
+    completedAt: row.completed_at ?? null,
     skillTag: row.skill_tag ?? null,
     misconceptionTag: row.misconception_tag ?? null,
     lastActiveAt: row.last_active_at ?? null,
@@ -131,6 +140,8 @@ function buildNextActivityRow(
   const prevIncorrect = existing?.session_incorrect_count ?? 0;
   const prevConsecutiveIncorrect = existing?.consecutive_incorrect_count ?? 0;
   const prevHints = existing?.session_hint_count ?? 0;
+  const prevQuestionsAnswered = existing?.questions_answered ?? 0;
+  const prevCorrectCount = existing?.correct_count ?? 0;
 
   let currentQuestionAttempts =
     input.eventType === "question_loaded"
@@ -143,6 +154,10 @@ function buildNextActivityRow(
   let sessionIncorrectCount = prevIncorrect;
   let consecutiveIncorrectCount = prevConsecutiveIncorrect;
   let sessionHintCount = prevHints;
+  let questionsAnswered = prevQuestionsAnswered;
+  let correctCount = prevCorrectCount;
+  let currentLessonStatus = existing?.current_lesson_status ?? "active";
+  let completedAt = existing?.completed_at ?? null;
 
   if (input.eventType === "answer_correct" || input.eventType === "answer_incorrect") {
     currentQuestionAttempts = sameQuestion ? prevAttempts + 1 : 1;
@@ -150,8 +165,11 @@ function buildNextActivityRow(
   if (input.eventType === "answer_incorrect") {
     sessionIncorrectCount += 1;
     consecutiveIncorrectCount += 1;
+    questionsAnswered += 1;
   } else if (input.eventType === "answer_correct") {
     consecutiveIncorrectCount = 0;
+    questionsAnswered += 1;
+    correctCount += 1;
   }
   if (input.eventType === "hint_used") {
     sessionHintCount += 1;
@@ -161,7 +179,19 @@ function buildNextActivityRow(
     consecutiveIncorrectCount = 0;
     sessionHintCount = 0;
     currentQuestionAttempts = 0;
+    questionsAnswered = 0;
+    correctCount = 0;
+    currentLessonStatus = "active";
+    completedAt = null;
   }
+
+  if (input.eventType === "lesson_completed" || input.eventType === "quiz_completed") {
+    currentLessonStatus = "completed";
+    completedAt = timestamp;
+  }
+
+  const shouldClearQuestion = input.eventType === "lesson_completed" || input.eventType === "quiz_completed";
+  const accuracyPercent = questionsAnswered > 0 ? Math.round((correctCount / questionsAnswered) * 100) : 0;
 
   const row: LiveStudentActivityRow = {
     ...(existing ?? {}),
@@ -172,13 +202,13 @@ function buildNextActivityRow(
     current_week: input.week ?? existing?.current_week ?? null,
     current_lesson: input.lessonId ?? existing?.current_lesson ?? null,
     current_lesson_title: input.lessonTitle ?? existing?.current_lesson_title ?? null,
-    current_activity_id: input.activityId ?? existing?.current_activity_id ?? null,
-    current_activity_label: input.activityLabel ?? existing?.current_activity_label ?? null,
-    current_question_id: input.questionId ?? existing?.current_question_id ?? null,
-    current_question_text: input.questionText ?? existing?.current_question_text ?? null,
-    current_question_type: input.questionType ?? existing?.current_question_type ?? null,
-    current_question_options: input.questionOptions ?? existing?.current_question_options ?? [],
-    current_step_label: input.currentStepLabel ?? existing?.current_step_label ?? null,
+    current_activity_id: shouldClearQuestion ? null : (input.activityId ?? existing?.current_activity_id ?? null),
+    current_activity_label: shouldClearQuestion ? `${input.lessonTitle ?? existing?.current_lesson_title ?? "Lesson"} complete` : (input.activityLabel ?? existing?.current_activity_label ?? null),
+    current_question_id: shouldClearQuestion ? null : (input.questionId ?? existing?.current_question_id ?? null),
+    current_question_text: shouldClearQuestion ? null : (input.questionText ?? existing?.current_question_text ?? null),
+    current_question_type: shouldClearQuestion ? null : (input.questionType ?? existing?.current_question_type ?? null),
+    current_question_options: shouldClearQuestion ? [] : (input.questionOptions ?? existing?.current_question_options ?? []),
+    current_step_label: shouldClearQuestion ? null : (input.currentStepLabel ?? existing?.current_step_label ?? null),
     progress_percent: input.progressPercent ?? existing?.progress_percent ?? null,
     progress_label: input.progressLabel ?? existing?.progress_label ?? null,
     latest_event_type: input.eventType,
@@ -191,7 +221,12 @@ function buildNextActivityRow(
       progressLabel: input.progressLabel,
     }),
     time_on_current_question: input.timeOnQuestion ?? existing?.time_on_current_question ?? 0,
-    current_question_attempts: currentQuestionAttempts,
+    current_question_attempts: shouldClearQuestion ? 0 : currentQuestionAttempts,
+    questions_answered: questionsAnswered,
+    correct_count: correctCount,
+    accuracy_percent: accuracyPercent,
+    current_lesson_status: currentLessonStatus,
+    completed_at: completedAt,
     session_incorrect_count: sessionIncorrectCount,
     consecutive_incorrect_count: consecutiveIncorrectCount,
     session_hint_count: sessionHintCount,

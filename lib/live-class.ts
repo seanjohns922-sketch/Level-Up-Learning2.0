@@ -121,6 +121,10 @@ export type LiveStudentSnapshot = {
   consecutiveIncorrectCount?: number | null;
   sessionHintCount?: number | null;
   attemptNumber?: number | null;
+  questionsAnswered?: number | null;
+  correctCount?: number | null;
+  accuracy?: number | null;
+  completedAt?: string | null;
   skillTag?: string | null;
   misconceptionTag?: string | null;
   lastActiveAt?: string | null;
