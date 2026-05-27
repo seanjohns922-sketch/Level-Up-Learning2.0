@@ -366,17 +366,17 @@ export function PracticeRunner({
   }, []);
 
   useEffect(() => {
+    if (!finished || emittedSummaryRef.current) return;
+    emittedSummaryRef.current = true;
+    onPerformanceSummary?.(summary);
+  }, [finished, onPerformanceSummary, summary]);
+
+  useEffect(() => {
     if (finished && !completedRef.current) {
       completedRef.current = true;
       onComplete();
     }
   }, [finished, onComplete]);
-
-  useEffect(() => {
-    if (!finished || emittedSummaryRef.current) return;
-    emittedSummaryRef.current = true;
-    onPerformanceSummary?.(summary);
-  }, [finished, onPerformanceSummary, summary]);
 
   useEffect(() => {
     if (task.kind !== "numberHunt") return;

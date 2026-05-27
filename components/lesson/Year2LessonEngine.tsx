@@ -599,18 +599,18 @@ export function Year2LessonEngine({
   }, []);
 
   useEffect(() => {
+    if (!finished || emittedSummaryRef.current) return;
+    emittedSummaryRef.current = true;
+    onPerformanceSummary?.(summary);
+  }, [finished, onPerformanceSummary, summary]);
+
+  useEffect(() => {
     if (!finished) return;
     if (!markedCompleteRef.current) {
       markedCompleteRef.current = true;
       onTimedComplete();
     }
   }, [finished, onTimedComplete]);
-
-  useEffect(() => {
-    if (!finished || emittedSummaryRef.current) return;
-    emittedSummaryRef.current = true;
-    onPerformanceSummary?.(summary);
-  }, [finished, onPerformanceSummary, summary]);
 
   useEffect(() => {
     if (!liveContext || !currentActivity || !currentQuestion) return;

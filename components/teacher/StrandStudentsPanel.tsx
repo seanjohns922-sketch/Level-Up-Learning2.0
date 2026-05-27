@@ -417,7 +417,8 @@ function buildStudentWeeklyPerformanceSummary({
       liveAccuracy ??
       (total && correct != null ? Math.round((correct / total) * 100) : null);
 
-    const status: LessonCardPerformance["status"] = completedIds.includes(lesson.id)
+    const hasPersistedSummary = summaryTotal != null || summaryCorrect != null || summaryAccuracy != null;
+    const status: LessonCardPerformance["status"] = completedIds.includes(lesson.id) || hasPersistedSummary
       ? "Completed"
       : total != null || liveMatchesThisLesson
         ? "In Progress"

@@ -191,7 +191,7 @@ function LessonPage() {
     }
   }, [effectiveLessonId, isGroundCustomLesson, week, year]);
 
-  function completeLesson() {
+  async function completeLesson() {
     markLessonComplete(year, week, lessonNumber);
     const progress = readProgress();
     let nextAssignedWeek = progress?.assignedWeek;
@@ -209,7 +209,11 @@ function LessonPage() {
 
     const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY) : null;
     if (studentId) {
-      void (async () => {
+      try {
+        if (latestLessonSummaryRef.current) {
+          await persistLessonPerformanceSummary(latestLessonSummaryRef.current);
+        }
+
         const { error } = await supabase.rpc("save_lesson_completion", {
           p_student_id: studentId,
           p_year: year,
@@ -219,27 +223,23 @@ function LessonPage() {
         if (error) {
           console.warn("[Lesson] Completion save failed:", error);
         }
-      })();
 
-      const latest = readProgress();
-      void saveStudentProgressState(studentId, year, {
-        status: latest?.status ?? progress?.status ?? "ASSIGNED_PROGRAM",
-        week,
-        placement_complete: latest?.placementComplete ?? progress?.placementComplete ?? false,
-        assigned_week: nextAssignedWeek ?? latest?.assignedWeek ?? progress?.assignedWeek ?? null,
-        required_weeks: latest?.requiredWeeks ?? progress?.requiredWeeks ?? [],
-        optional_weeks: latest?.optionalWeeks ?? progress?.optionalWeeks ?? [],
-        unlocked_legends: latest?.unlockedLegends ?? progress?.unlockedLegends ?? [],
-      }).catch((error) => {
-        console.warn("[Lesson] Progress state sync failed:", error);
-      });
+        const latest = readProgress();
+        await saveStudentProgressState(studentId, year, {
+          status: latest?.status ?? progress?.status ?? "ASSIGNED_PROGRAM",
+          week,
+          placement_complete: latest?.placementComplete ?? progress?.placementComplete ?? false,
+          assigned_week: nextAssignedWeek ?? latest?.assignedWeek ?? progress?.assignedWeek ?? null,
+          required_weeks: latest?.requiredWeeks ?? progress?.requiredWeeks ?? [],
+          optional_weeks: latest?.optionalWeeks ?? progress?.optionalWeeks ?? [],
+          unlocked_legends: latest?.unlockedLegends ?? progress?.unlockedLegends ?? [],
+        });
+      } catch (error) {
+        console.warn("[Lesson] Final completion sync failed:", error);
+      }
     }
 
     router.push(`/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1`);
-  }
-
-  function markLessonDone() {
-    markLessonComplete(year, week, lessonNumber);
   }
 
   function goBackToProgram() {
@@ -248,6 +248,7 @@ function LessonPage() {
 
   const showWeek12Lesson3Summary = week === 12 && lessonNumber === 3;
   const savedLessonSummaryKeysRef = useRef<Set<string>>(new Set());
+  const latestLessonSummaryRef = useRef<LessonPerformanceSummary | null>(null);
   const liveLessonContext = useMemo(
     () => ({
       level: year,
@@ -260,6 +261,7 @@ function LessonPage() {
   );
 
   async function persistLessonPerformanceSummary(summary: LessonPerformanceSummary) {
+    latestLessonSummaryRef.current = summary;
     const summaryKey = `${effectiveLessonId}:${summary.questionsAnswered}:${summary.correctAnswers}:${summary.timeSpentSeconds}`;
     if (savedLessonSummaryKeysRef.current.has(summaryKey)) return;
     savedLessonSummaryKeysRef.current.add(summaryKey);
@@ -884,7 +886,7 @@ function LessonPage() {
                 <Year2LessonEngine
                   key={lessonMeta.id}
                   lesson={lessonMeta}
-                  onTimedComplete={markLessonDone}
+                  onTimedComplete={completeLesson}
                   onExit={goBackToProgram}
                   liveContext={liveLessonContext}
                   renderCompletionCard={
