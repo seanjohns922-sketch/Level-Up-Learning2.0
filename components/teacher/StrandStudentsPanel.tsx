@@ -45,6 +45,12 @@ type LiveStudentActivityRow = {
   progress_label?: string | null;
   latest_event_type?: string | null;
   current_lesson_status?: string | null;
+  questions_answered?: number | null;
+  correct_count?: number | null;
+  accuracy_percent?: number | null;
+  current_question_text?: string | null;
+  completed_at?: string | null;
+  time_on_current_question?: number | null;
   last_active_at?: string | null;
   updated_at?: string | null;
 };
@@ -78,6 +84,19 @@ function parseCompleted(raw: any): string[] {
   return [];
 }
 
+function parseQuizScores(raw: any): Record<string, any> {
+  if (raw && typeof raw === "object") return raw as Record<string, any>;
+  if (typeof raw === "string") {
+    try {
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === "object" ? (parsed as Record<string, any>) : {};
+    } catch {
+      return {};
+    }
+  }
+  return {};
+}
+
 function weekLessonsDone(ids: string[], week: number): number {
   const tag = `-w${week}-`;
   return ids.filter((id) => id.includes(tag)).length;
@@ -86,6 +105,37 @@ function weekLessonsDone(ids: string[], week: number): number {
 function pctComplete(ids: string[], prefix: string): number {
   const mine = ids.filter((id) => id.startsWith(prefix));
   return Math.min(100, Math.round((mine.length / 36) * 100));
+}
+
+function countCompletedQuizzes(raw: any): number {
+  const quizScores = parseQuizScores(raw);
+  return Object.entries(quizScores).filter(([key, value]) => {
+    if (!/^\d+$/.test(key)) return false;
+    if (!value || typeof value !== "object") return false;
+    const candidate = value as Record<string, unknown>;
+    if (Array.isArray(candidate.attempts)) return true;
+    return ["score", "percent", "passed", "total"].some((field) => field in candidate);
+  }).length;
+}
+
+function totalProgramActivities(plan: ReturnType<typeof getCurriculumPlan>): number {
+  if (plan.length === 0) return 48;
+  return plan.reduce((sum, week) => sum + week.lessons.length + 1, 0);
+}
+
+function overallProgramPercent(
+  prog: ProgressRow | undefined,
+  yearLabel: string,
+  plan: ReturnType<typeof getCurriculumPlan>,
+): number {
+  if (!prog) return 0;
+  const ids = parseCompleted(prog.completed_lesson_ids);
+  const prefix = lessonIdPrefix(yearLabel);
+  const completedLessons = ids.filter((id) => id.startsWith(prefix)).length;
+  const completedQuizzes = countCompletedQuizzes(prog.quiz_scores);
+  const totalActivities = totalProgramActivities(plan);
+  if (totalActivities <= 0) return 0;
+  return Math.max(0, Math.min(100, Math.round(((completedLessons + completedQuizzes) / totalActivities) * 100)));
 }
 
 function computeStatus(prog: ProgressRow | undefined, completedCount: number, pct: number): StrandStatus {
@@ -184,6 +234,7 @@ function simplifyGapLabel(gap: string) {
 function buildWeekSummary(
   insights: TeacherInsight[],
   fallbackStatus: StrandStatus,
+  liveRow?: LiveStudentActivityRow | null,
 ): {
   status: string;
   mainGap: string;
@@ -196,6 +247,40 @@ function buildWeekSummary(
       mainGap: simplifyGapLabel(primary.gap),
       suggestedAction: primary.teacherAction,
     };
+  }
+
+  if (liveRow) {
+    const answered = liveRow.questions_answered ?? 0;
+    const correct = liveRow.correct_count ?? 0;
+    const accuracy = liveRow.accuracy_percent ?? (answered > 0 ? Math.round((correct / answered) * 100) : 0);
+    const lessonLabel = liveRow.current_lesson_title ?? liveRow.current_lesson ?? "current lesson";
+    const inactive = timeAgo(liveRow.last_active_at ?? undefined);
+
+    if (liveRow.current_lesson_status === "completed") {
+      return {
+        status: "Completed",
+        mainGap: `Completed ${lessonLabel}`,
+        suggestedAction: answered > 0
+          ? `Finished with ${correct}/${answered} correct (${accuracy}%). Last active ${inactive}.`
+          : `Lesson completed. Last active ${inactive}.`,
+      };
+    }
+
+    if (answered > 0) {
+      return {
+        status: fallbackStatus === "Needs Support" ? "Needs Support" : "On Track",
+        mainGap: liveRow.current_question_text ? "Student has started but not completed this lesson yet" : "Student worked steadily in this lesson",
+        suggestedAction: `Answered ${answered} question${answered === 1 ? "" : "s"} with ${correct}/${answered} correct (${accuracy}%). Last active ${inactive}.`,
+      };
+    }
+
+    if (liveRow.latest_event_type) {
+      return {
+        status: fallbackStatus === "Needs Support" ? "Check-in Recommended" : "On Track",
+        mainGap: "Student has started but not completed this lesson yet",
+        suggestedAction: `No completed attempt data yet. Last active ${inactive}. Check in if they appear stuck.`,
+      };
+    }
   }
 
   if (fallbackStatus === "Needs Support") {
@@ -331,10 +416,23 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
 
   const genre = genres.find((g) => g.id === genreId)!;
   const isPlaceholder = !genre.available;
-  const plan = useMemo(() => getCurriculumPlan(yearLabel, genreId), [yearLabel, genreId]);
 
   function getProg(studentId: string, year: string) {
     return progress.find((p) => p.student_id === studentId && p.year === year);
+  }
+
+  function getStudentProgressRows(studentId: string) {
+    return progress.filter((p) => p.student_id === studentId);
+  }
+
+  function getLatestPretestProgress(studentId: string): ProgressRow | undefined {
+    const rows = getStudentProgressRows(studentId).filter((p) => p.pretest_score != null);
+    return [...rows].sort((a, b) => {
+      const tA = a.updated_at ? new Date(a.updated_at).getTime() : 0;
+      const tB = b.updated_at ? new Date(b.updated_at).getTime() : 0;
+      if (tA !== tB) return tB - tA;
+      return yearOrdinal(b.year) - yearOrdinal(a.year);
+    })[0];
   }
 
   function getLiveRow(studentId: string) {
@@ -357,20 +455,20 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
       const ids = prog ? parseCompleted(prog.completed_lesson_ids) : [];
       const sPrefix = lessonIdPrefix(studentYear);
       const strandIds = isPlaceholder ? [] : ids.filter((id) => id.startsWith(sPrefix));
-      const pctFromProgress = isPlaceholder ? 0 : pctComplete(ids, sPrefix);
-      const pct = pctFromProgress > 0 ? pctFromProgress : Math.max(0, Math.min(100, liveRow?.progress_percent ?? 0));
+      const planForStudentYear = getCurriculumPlan(studentYear, genreId);
+      const pct = isPlaceholder ? 0 : overallProgramPercent(prog, studentYear, planForStudentYear);
       const computedStatus = isPlaceholder ? "Not Started" : computeStatus(prog, strandIds.length, pct);
       const status = computedStatus === "Not Started" && liveRow ? liveRowToStatus(liveRow) : computedStatus;
       const week = isPlaceholder ? null : (prog?.week ?? liveRow?.current_week ?? null);
-      const planForStudentYear = getCurriculumPlan(studentYear, genreId);
       const activeWeek = week ?? 1;
       const activeWeekPlan = planForStudentYear.find((entry) => entry.week === activeWeek);
       const activeLessonIds = activeWeekPlan?.lessons.map((lesson) => lesson.id) ?? [];
       const weekInsights = getWeekInsightList(prog, activeWeek, activeLessonIds);
-      const summary = buildWeekSummary(weekInsights, status);
+      const summary = buildWeekSummary(weekInsights, status, liveRow);
       const flag = deriveStudentFlag(pickPrimaryInsight(weekInsights), status);
+      const latestPretest = getLatestPretestProgress(s.id);
 
-      return { s, prog, liveRow, pct, status, week, studentYear, summary, flag };
+      return { s, prog, liveRow, pct, status, week, studentYear, summary, flag, latestPretest };
     })
     .sort((a, b) => {
       const dir = sortDir === "asc" ? 1 : -1;
@@ -492,7 +590,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
             No students enrolled yet.
           </div>
         ) : (
-          studentRows.map(({ s, prog, pct, status, week, studentYear, flag }) => {
+          studentRows.map(({ s, prog, liveRow, pct, status, week, studentYear, flag, latestPretest }) => {
               const isOpen = expandedId === s.id;
 
             return (
@@ -534,8 +632,9 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                     student={s}
                     yearLabel={studentYear}
                     genre={genre}
-                    plan={plan}
                     prog={prog}
+                    liveRow={liveRow}
+                    latestPretest={latestPretest}
                     isPlaceholder={isPlaceholder}
                     prefix={lessonIdPrefix(studentYear)}
                   />
@@ -552,24 +651,25 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
 /* ───────── Detail view ───────── */
 
 function StudentStrandDetail({
-  student, yearLabel, genre, plan, prog, isPlaceholder, prefix,
+  student, yearLabel, genre, prog, liveRow, latestPretest, isPlaceholder, prefix,
 }: {
   student: StudentRow;
   yearLabel: string;
   genre: Genre;
-  plan: ReturnType<typeof getCurriculumPlan>;
   prog: ProgressRow | undefined;
+  liveRow?: LiveStudentActivityRow | undefined;
+  latestPretest?: ProgressRow | undefined;
   isPlaceholder: boolean;
   prefix: string;
 }) {
+  const plan = useMemo(() => getCurriculumPlan(yearLabel, genre.id), [yearLabel, genre.id]);
   const ids = prog ? parseCompleted(prog.completed_lesson_ids) : [];
-  const currentWeek = prog?.week ?? 1;
+  const currentWeek = prog?.week ?? liveRow?.current_week ?? 1;
   const [selectedWeek, setSelectedWeek] = useState<number>(currentWeek);
   const [expandedWeek, setExpandedWeek] = useState<number | null>(null);
   const [previewLesson, setPreviewLesson] = useState<Lesson | null>(null);
 
-  const quizScores: Record<string, any> =
-    prog?.quiz_scores && typeof prog.quiz_scores === "object" ? (prog.quiz_scores as any) : {};
+  const quizScores = parseQuizScores(prog?.quiz_scores);
   const lessonAttempts: Record<string, any> =
     prog?.lesson_attempts && typeof prog.lesson_attempts === "object" ? (prog.lesson_attempts as any) : {};
   const latestPost = getLatestPosttestProfile(prog?.quiz_scores);
@@ -589,8 +689,16 @@ function StudentStrandDetail({
   const weekQuiz = quizScores[String(week?.week ?? 1)];
   const weekLessonIds = week?.lessons.map((lesson) => lesson.id) ?? [];
   const weekInsights = getWeekInsightList(prog, week?.week ?? 1, weekLessonIds);
-  const summaryStatus = computeStatus(prog, ids.filter((id) => id.startsWith(prefix)).length, pctTotal(ids, prefix));
-  const weekSummary = buildWeekSummary(weekInsights, summaryStatus);
+  const overallPct = overallProgramPercent(prog, yearLabel, plan);
+  const summaryStatus = computeStatus(prog, ids.filter((id) => id.startsWith(prefix)).length, overallPct);
+  const weekSummary = buildWeekSummary(weekInsights, summaryStatus, liveRow);
+  const pretestScore = latestPretest?.pretest_score ?? null;
+  const pretestSub =
+    pretestScore == null
+      ? "Not taken"
+      : pretestScore >= ASSESSMENT_PASS_THRESHOLD
+        ? `Passed, moved on from ${yearToLevelLabel(latestPretest?.year ?? yearLabel)}`
+        : `${yearToLevelLabel(latestPretest?.year ?? yearLabel)} assigned`;
 
   // Teacher insights
   const insights: string[] = [];
@@ -623,11 +731,11 @@ function StudentStrandDetail({
       {/* Snapshot */}
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-3">
         <SnapshotTile label="Strand" value={`${genre.strand}`} sub={genre.realm} />
-        <SnapshotTile label="Level / Week" value={yearLabel} sub={`Week ${currentWeek} / 12`} />
+        <SnapshotTile label="Level / Week" value={yearToLevelLabel(yearLabel)} sub={`Week ${currentWeek} / 12`} />
         <SnapshotTile
           label="Pre-test"
-          value={prog?.pretest_score != null ? `${prog.pretest_score}%` : "—"}
-          sub={prog?.pretest_score != null ? (prog.pretest_score >= ASSESSMENT_PASS_THRESHOLD ? "Pass" : `Below ${ASSESSMENT_PASS_THRESHOLD}%`) : "Not taken"}
+          value={pretestScore != null ? `${pretestScore}%` : "—"}
+          sub={pretestSub}
         />
         <SnapshotTile
           label="Last Post-test"
