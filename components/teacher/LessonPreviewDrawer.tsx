@@ -441,7 +441,7 @@ export default function LessonPreviewDrawer({
               </div>
               {classStats.quizAvg != null && (
                 <div className="text-xs text-[#64748B]">
-                  Quiz accuracy on this lesson's questions:{" "}
+                  Quiz accuracy on this lesson&apos;s questions:{" "}
                   <b className={
                     (classStats.quizAttempts ?? 0) === 0 ? "text-[#94A3B8]" :
                     (classStats.quizAvg ?? 0) >= 80 ? "text-emerald-700" :

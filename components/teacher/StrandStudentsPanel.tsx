@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import {
   getGenresForYear,
   getCurriculumPlan,
@@ -35,6 +35,9 @@ type InsightCarrier = {
   latestSummary?: {
     timeSpentSeconds?: number | null;
     accuracy?: number | null;
+    questionsAnswered?: number | null;
+    correctAnswers?: number | null;
+    incorrectAnswers?: number | null;
   } | null;
   attempts?: unknown[] | null;
 };
@@ -71,6 +74,32 @@ type LiveStudentActivityRow = {
   time_on_current_question?: number | null;
   last_active_at?: string | null;
   updated_at?: string | null;
+};
+
+type LessonCardPerformance = {
+  lessonId: string;
+  status: "Completed" | "In Progress" | "Not Started";
+  correct: number | null;
+  total: number | null;
+  accuracy: number | null;
+};
+
+type WeeklyPerformanceSummary = {
+  status: string;
+  mainGap: string;
+  suggestedAction: string;
+  lessonsCompleted: number;
+  totalLessons: number;
+  lessonCards: LessonCardPerformance[];
+  questionsAnswered: number;
+  correctCount: number;
+  incorrectCount: number;
+  weeklyAccuracy: number | null;
+  weeklyQuizStatus: "Completed" | "Attempted" | "Not Attempted";
+  weeklyQuizCorrect: number | null;
+  weeklyQuizTotal: number | null;
+  weeklyQuizAccuracy: number | null;
+  weeklyQuizPassed: boolean | null;
 };
 
 type Props = {
@@ -134,6 +163,16 @@ function weekLessonsDone(ids: string[], week: number): number {
 function getQuizPercent(quiz: JsonObject | undefined): number | null {
   const value = quiz?.percent;
   return typeof value == "number" ? value : null;
+}
+
+function getQuizScore(quiz: JsonObject | undefined): number | null {
+  const value = quiz?.score;
+  return typeof value === "number" ? value : null;
+}
+
+function getQuizTotal(quiz: JsonObject | undefined): number | null {
+  const value = quiz?.total;
+  return typeof value === "number" ? value : null;
 }
 
 function getQuizPassed(quiz: JsonObject | undefined): boolean {
@@ -237,25 +276,16 @@ function deriveStudentFlag(
   return { label: "Not started", emoji: "⚪", tone: "neutral" };
 }
 
-function flagTone(flag: StudentFlagTone) {
-  switch (flag) {
-    case "red":
-      return "bg-rose-50 text-rose-700 border-rose-200";
-    case "yellow":
-      return "bg-amber-50 text-amber-700 border-amber-200";
-    case "green":
-      return "bg-emerald-50 text-emerald-700 border-emerald-200";
-    default:
-      return "bg-slate-50 text-slate-500 border-slate-200";
-  }
-}
-
 function simplifyGapLabel(gap: string) {
   return gap
     .replace(/^They were least secure in\s+/i, "")
     .replace(/, where accuracy dropped\.$/i, "")
     .replace(/\.$/, "")
     .trim();
+}
+
+function numberOrNull(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
 function buildWeekSummary(
@@ -338,6 +368,111 @@ function buildWeekSummary(
     status: "On Track",
     mainGap: "No attempt data yet",
     suggestedAction: "Wait for a completed lesson or quiz to generate insight.",
+  };
+}
+
+function buildStudentWeeklyPerformanceSummary({
+  weekNumber,
+  lessons,
+  completedIds,
+  lessonAttempts,
+  weekQuiz,
+  fallbackStatus,
+  liveRow,
+}: {
+  weekNumber: number;
+  lessons: Lesson[];
+  completedIds: string[];
+  lessonAttempts: Record<string, InsightCarrier>;
+  weekQuiz: JsonObject | undefined;
+  fallbackStatus: StrandStatus;
+  liveRow?: LiveStudentActivityRow | null;
+}): WeeklyPerformanceSummary {
+  const liveLessonMatch =
+    liveRow &&
+    liveRow.current_week === weekNumber &&
+    (liveRow.current_lesson ?? liveRow.current_lesson_title)
+      ? `${liveRow.current_lesson ?? ""}|${liveRow.current_lesson_title ?? ""}`
+      : null;
+
+  const lessonCards = lessons.map((lesson) => {
+    const attempt = lessonAttempts[lesson.id];
+    const latestSummary = attempt?.latestSummary;
+    const summaryTotal = numberOrNull(latestSummary?.questionsAnswered);
+    const summaryCorrect = numberOrNull(latestSummary?.correctAnswers);
+    const summaryAccuracy = numberOrNull(latestSummary?.accuracy);
+
+    const liveMatchesThisLesson =
+      liveLessonMatch &&
+      (liveRow?.current_lesson === lesson.id || liveRow?.current_lesson_title === lesson.title);
+
+    const liveTotal = liveMatchesThisLesson ? numberOrNull(liveRow?.questions_answered) : null;
+    const liveCorrect = liveMatchesThisLesson ? numberOrNull(liveRow?.correct_count) : null;
+    const liveAccuracy = liveMatchesThisLesson ? numberOrNull(liveRow?.accuracy_percent) : null;
+
+    const total = summaryTotal ?? liveTotal;
+    const correct = summaryCorrect ?? liveCorrect;
+    const accuracy =
+      summaryAccuracy ??
+      liveAccuracy ??
+      (total && correct != null ? Math.round((correct / total) * 100) : null);
+
+    const status: LessonCardPerformance["status"] = completedIds.includes(lesson.id)
+      ? "Completed"
+      : total != null || liveMatchesThisLesson
+        ? "In Progress"
+        : "Not Started";
+
+    return {
+      lessonId: lesson.id,
+      status,
+      correct,
+      total,
+      accuracy,
+    };
+  });
+
+  const lessonsCompleted = lessonCards.filter((card) => card.status === "Completed").length;
+  const questionsAnswered = lessonCards.reduce((sum, card) => sum + (card.total ?? 0), 0);
+  const correctCount = lessonCards.reduce((sum, card) => sum + (card.correct ?? 0), 0);
+  const incorrectCount = Math.max(0, questionsAnswered - correctCount);
+  const weeklyAccuracy = questionsAnswered > 0 ? Math.round((correctCount / questionsAnswered) * 100) : null;
+
+  const weekInsights = lessons
+    .map((lesson) => lessonAttempts[lesson.id]?.latestInsight as TeacherInsight | null | undefined)
+    .filter((insight): insight is TeacherInsight => Boolean(insight));
+  const weekSummary = buildWeekSummary(weekInsights, fallbackStatus, liveRow ?? undefined);
+
+  const weeklyQuizCorrect = getQuizScore(weekQuiz);
+  const weeklyQuizTotal = getQuizTotal(weekQuiz);
+  const weeklyQuizAccuracy =
+    getQuizPercent(weekQuiz) ??
+    (weeklyQuizCorrect != null && weeklyQuizTotal && weeklyQuizTotal > 0
+      ? Math.round((weeklyQuizCorrect / weeklyQuizTotal) * 100)
+      : null);
+  const weeklyQuizPassed = weekQuiz ? getQuizPassed(weekQuiz) : null;
+  const weeklyQuizStatus: WeeklyPerformanceSummary["weeklyQuizStatus"] = weekQuiz
+    ? weeklyQuizPassed
+      ? "Completed"
+      : "Attempted"
+    : "Not Attempted";
+
+  return {
+    status: questionsAnswered === 0 && !weekQuiz ? "Not Started" : weekSummary.status,
+    mainGap: weekSummary.mainGap,
+    suggestedAction: weekSummary.suggestedAction,
+    lessonsCompleted,
+    totalLessons: lessons.length,
+    lessonCards,
+    questionsAnswered,
+    correctCount,
+    incorrectCount,
+    weeklyAccuracy,
+    weeklyQuizStatus,
+    weeklyQuizCorrect,
+    weeklyQuizTotal,
+    weeklyQuizAccuracy,
+    weeklyQuizPassed,
   };
 }
 
@@ -619,7 +754,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
             No students enrolled yet.
           </div>
         ) : (
-          studentRows.map(({ s, prog, liveRow, pct, week, schoolYear, workingYear, flag, latestPretest }) => {
+          studentRows.map(({ s, prog, liveRow, pct, week, schoolYear, workingYear, latestPretest }) => {
               const isOpen = expandedId === s.id;
 
             return (
@@ -637,10 +772,6 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                     </div>
                     <div className="min-w-0 flex items-center gap-2.5 flex-wrap">
                       <div className="text-sm font-bold text-[#0F172A] truncate">{s.display_name}</div>
-                      <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-[10px] font-extrabold uppercase tracking-wider ${flagTone(flag.tone)}`}>
-                        <span>{flag.emoji}</span>
-                        <span>{flag.label}</span>
-                      </div>
                     </div>
                   </div>
                   <span className="text-xs font-bold text-[#475569]">{schoolYear}</span>
@@ -716,23 +847,25 @@ function StudentStrandDetail({
 
   const week = plan.find((p) => p.week === selectedWeek) ?? plan[0];
   const weekDone = weekLessonsDone(ids, week?.week ?? 1);
-  const weekQuiz = quizScores[String(week?.week ?? 1)];
-  const weekQuizPercent = getQuizPercent(weekQuiz);
-  const weekQuizPassed = getQuizPassed(weekQuiz);
-  const weekQuizAttempts = getQuizAttemptsCount(weekQuiz);
-  const weekQuizInsight = (weekQuiz?.latestInsight ?? null) as TeacherInsight | null;
-  const weekLessonIds = week?.lessons.map((lesson) => lesson.id) ?? [];
-  const weekInsights = getWeekInsightList(prog, week?.week ?? 1, weekLessonIds);
-  const overallPct = overallProgramPercent(prog, yearLabel, plan);
+  const weekQuiz = quizScores[String(week?.week ?? 1)];  const weekQuizAttempts = getQuizAttemptsCount(weekQuiz);
+  const weekQuizInsight = (weekQuiz?.latestInsight ?? null) as TeacherInsight | null;  const overallPct = overallProgramPercent(prog, yearLabel, plan);
   const summaryStatus = computeStatus(prog, ids.filter((id) => id.startsWith(prefix)).length, overallPct);
-  const weekSummary = buildWeekSummary(weekInsights, summaryStatus, liveRow);
+  const weekPerformance = buildStudentWeeklyPerformanceSummary({
+    weekNumber: week?.week ?? 1,
+    lessons: week?.lessons ?? [],
+    completedIds: ids,
+    lessonAttempts,
+    weekQuiz,
+    fallbackStatus: summaryStatus,
+    liveRow,
+  });
   const pretestScore = latestPretest?.pretest_score ?? null;
   const pretestSub =
     pretestScore == null
       ? "Not taken"
       : pretestScore >= ASSESSMENT_PASS_THRESHOLD
         ? `${yearToLevelLabel(latestPretest?.year ?? yearLabel)} pre-test passed · ${timeAgo(latestPretest?.updated_at)}`
-        : `${yearToLevelLabel(yearLabel)} assigned · ${timeAgo(latestPretest?.updated_at)}`;
+        : `${yearToLevelLabel(latestPretest?.year ?? yearLabel)} assigned · ${timeAgo(latestPretest?.updated_at)}`;
 
   // Teacher insights
   const insights: string[] = [];
@@ -784,10 +917,42 @@ function StudentStrandDetail({
         <div className="text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.12em] mb-2">
           This Week Summary
         </div>
-        <div className="grid md:grid-cols-3 gap-3">
-          <SummaryMetric label="Status" value={weekSummary.status} />
-          <SummaryMetric label="Main Gap" value={weekSummary.mainGap} />
-          <SummaryMetric label="Suggested Action" value={weekSummary.suggestedAction} />
+        <div className="grid md:grid-cols-2 xl:grid-cols-5 gap-3">
+          <SummaryMetric label="Status" value={weekPerformance.status} />
+          <SummaryMetric
+            label="Performance"
+            value={
+              <div className="space-y-1.5">
+                <div>Lessons Completed: {weekPerformance.lessonsCompleted} / {weekPerformance.totalLessons}</div>
+                <div>Questions Answered: {weekPerformance.questionsAnswered}</div>
+                <div>Correct: {weekPerformance.correctCount} / {weekPerformance.questionsAnswered || "—"}</div>
+                <div>Accuracy: {weekPerformance.weeklyAccuracy != null ? `${weekPerformance.weeklyAccuracy}%` : "—"}</div>
+              </div>
+            }
+          />
+          <SummaryMetric
+            label="Weekly Quiz"
+            value={
+              <div className="space-y-1.5">
+                <div>{weekPerformance.weeklyQuizStatus}</div>
+                <div>
+                  {weekPerformance.weeklyQuizCorrect != null && weekPerformance.weeklyQuizTotal != null
+                    ? `${weekPerformance.weeklyQuizCorrect} / ${weekPerformance.weeklyQuizTotal}`
+                    : "— / —"}
+                </div>
+                <div>{weekPerformance.weeklyQuizAccuracy != null ? `${weekPerformance.weeklyQuizAccuracy}% accuracy` : "— accuracy"}</div>
+                <div>
+                  {weekPerformance.weeklyQuizPassed == null
+                    ? "Not attempted"
+                    : weekPerformance.weeklyQuizPassed
+                      ? "Passed"
+                      : "Needs Review"}
+                </div>
+              </div>
+            }
+          />
+          <SummaryMetric label="Main Gap" value={weekPerformance.mainGap} />
+          <SummaryMetric label="Suggested Action" value={weekPerformance.suggestedAction} />
         </div>
       </div>
 
@@ -851,6 +1016,9 @@ function StudentStrandDetail({
           <div className="grid md:grid-cols-3 gap-2.5">
             {week.lessons.map((lsn) => {
               const done = !isPlaceholder && ids.includes(lsn.id);
+              const performance =
+                weekPerformance.lessonCards.find((card) => card.lessonId === lsn.id) ??
+                { lessonId: lsn.id, status: done ? "Completed" : "Not Started", correct: null, total: null, accuracy: null };
               return (
                 <button
                   key={lsn.id}
@@ -868,15 +1036,29 @@ function StudentStrandDetail({
                     </span>
                     <span className={[
                       "text-[9px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded",
-                      done ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500",
+                      performance.status === "Completed"
+                        ? "bg-emerald-100 text-emerald-700"
+                        : performance.status === "In Progress"
+                          ? "bg-amber-100 text-amber-700"
+                          : "bg-slate-100 text-slate-500",
                     ].join(" ")}>
-                      {done ? "Done" : "Not done"}
+                      {performance.status}
                     </span>
                   </div>
                   <div>
                     <div className="text-xs font-black text-[#0F172A] leading-snug">{lsn.title}</div>
                     <div className="text-[11px] text-[#64748B] mt-1 leading-relaxed line-clamp-3">
                       {lsn.focus}
+                    </div>
+                  </div>
+                  <div className="space-y-1 text-[11px]">
+                    <div className="font-semibold text-[#475569]">
+                      {performance.correct != null && performance.total != null
+                        ? `${performance.correct} / ${performance.total}`
+                        : "— / —"}
+                    </div>
+                    <div className="font-semibold text-[#475569]">
+                      {performance.accuracy != null ? `${performance.accuracy}% accuracy` : "— accuracy"}
                     </div>
                   </div>
                   <div className="flex items-center justify-between mt-auto pt-1">
@@ -901,19 +1083,20 @@ function StudentStrandDetail({
               {weekQuiz ? (
                 <span className={[
                   "text-[11px] font-extrabold px-2 py-0.5 rounded-md border",
-                  weekQuizPassed ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                                  : "bg-rose-50 text-rose-700 border-rose-200",
+                  weekPerformance.weeklyQuizPassed ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                                   : "bg-rose-50 text-rose-700 border-rose-200",
                 ].join(" ")}>
-                  {weekQuizPercent ?? 0}% · {weekQuizPassed ? "Pass" : "Fail"}
+                  {weekPerformance.weeklyQuizStatus}
                 </span>
               ) : (
                 <span className="text-[11px] font-bold text-[#94A3B8]">Not attempted</span>
               )}
             </div>
             <div className="flex items-center gap-3 text-[11px] text-[#64748B]">
-              <span>Time: <b className="text-[#0F172A]">n/a</b></span>
+              <span>Score: <b className="text-[#0F172A]">{weekPerformance.weeklyQuizCorrect != null && weekPerformance.weeklyQuizTotal != null ? `${weekPerformance.weeklyQuizCorrect} / ${weekPerformance.weeklyQuizTotal}` : "— / —"}</b></span>
               <span>Attempts: <b className="text-[#0F172A]">{weekQuizAttempts}</b></span>
-              <span>Accuracy: <b className="text-[#0F172A]">{weekQuizPercent != null ? `${weekQuizPercent}%` : "n/a"}</b></span>
+              <span>Accuracy: <b className="text-[#0F172A]">{weekPerformance.weeklyQuizAccuracy != null ? `${weekPerformance.weeklyQuizAccuracy}%` : "n/a"}</b></span>
+              <span>Result: <b className="text-[#0F172A]">{weekPerformance.weeklyQuizPassed == null ? "Not attempted" : weekPerformance.weeklyQuizPassed ? "Passed" : "Needs Review"}</b></span>
               <button
                 disabled
                 title="Coming soon"
@@ -1010,20 +1193,11 @@ function SnapshotTile({ label, value, sub }: { label: string; value: string; sub
   );
 }
 
-function SummaryMetric({ label, value }: { label: string; value: string }) {
+function SummaryMetric({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="rounded-xl border border-[#E6E8EC] bg-[#F8FAFC] px-3 py-3">
       <div className="text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.12em]">{label}</div>
       <div className="mt-1 text-sm font-bold text-[#0F172A]">{value}</div>
-    </div>
-  );
-}
-
-function FlagLegend({ label, emoji, tone }: { label: string; emoji: string; tone: StudentFlagTone }) {
-  return (
-    <div className={`inline-flex items-center gap-1.5 px-2.5 py-2 rounded-lg border text-[11px] font-extrabold uppercase tracking-wider ${flagTone(tone)}`}>
-      <span>{emoji}</span>
-      <span>{label}</span>
     </div>
   );
 }
