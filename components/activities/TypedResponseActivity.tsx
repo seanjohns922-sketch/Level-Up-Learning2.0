@@ -108,16 +108,31 @@ function deriveMabVisualAnswer(questionData: TypedResponseQuestion): string | nu
   }
 
   if (prompt.includes("what number is shown")) {
-    const counts = [
-      [questionData.visual.hundredThousands, 100000],
-      [questionData.visual.tenThousands, 10000],
-      [questionData.visual.thousands, 1000],
-      [questionData.visual.hundreds, 100],
-      [questionData.visual.tens, 10],
-      [questionData.visual.ones, 1],
-    ] as const;
-
-    const total = counts.reduce((sum, [count, multiplier]) => sum + ((typeof count === "number" ? count : 0) * multiplier), 0);
+    // Only sum the place values that are actually displayed in the visual.
+    // Using all 6 fields regardless of placeValues caused the bug where a
+    // 4-digit target (e.g. 1604) with placeValues=["hundreds","ones"] showed
+    // "6 hundreds, 4 ones" visually but derivedMabAnswer returned "1604".
+    const placeMultipliers: Record<string, number> = {
+      hundred_thousands: 100000,
+      ten_thousands: 10000,
+      thousands: 1000,
+      hundreds: 100,
+      tens: 10,
+      ones: 1,
+    };
+    const placeFields: Record<string, number | null | undefined> = {
+      hundred_thousands: questionData.visual.hundredThousands,
+      ten_thousands: questionData.visual.tenThousands,
+      thousands: questionData.visual.thousands,
+      hundreds: questionData.visual.hundreds,
+      tens: questionData.visual.tens,
+      ones: questionData.visual.ones,
+    };
+    const visiblePlaces = questionData.visual.placeValues ?? Object.keys(placeMultipliers);
+    const total = visiblePlaces.reduce(
+      (sum, place) => sum + (typeof placeFields[place] === "number" ? (placeFields[place] as number) * (placeMultipliers[place] ?? 0) : 0),
+      0
+    );
     return String(total);
   }
 
