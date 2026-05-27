@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { hasActiveStudentSeenIntro, setActiveStudentProfile } from "@/lib/studentIdentity";
 import { restoreStudentStateFromServer } from "@/lib/student-progress-sync";
-import { isPlacementComplete, readProgress } from "@/data/progress";
+import { isPlacementComplete, readProgress, writeProgress } from "@/data/progress";
+import { normalizeSchoolYearLabel, normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
 import { GraduationCap, Briefcase, KeyRound, User, Lock } from "lucide-react";
 
 type StudentRecord = {
@@ -157,9 +158,12 @@ export default function LoginPage() {
       return;
     }
 
+    const studentWorkingYear = normalizeWorkingLevelLabel(student.working_level ?? student.year_level) ?? null;
+    const studentSchoolYear = normalizeSchoolYearLabel(student.school_year_level) ?? null;
+
     setActiveStudentProfile(student.student_id, student.class_id, {
       displayName,
-      yearLevel: student.year_level ?? "Year 1",
+      yearLevel: studentWorkingYear ?? studentSchoolYear ?? "Year 1",
     });
 
     let progress = readProgress();
@@ -172,6 +176,20 @@ export default function LoginPage() {
       console.warn("[Login] Could not restore student progress from Supabase", error);
     }
 
+    if (!progress && studentWorkingYear) {
+      progress = {
+        year: studentWorkingYear,
+        scorePercent: 0,
+        status: "ASSIGNED_PROGRAM",
+        placementComplete: true,
+        assignedWeek: 1,
+        requiredWeeks: [],
+        optionalWeeks: [],
+        unlockedLegends: [],
+      };
+      writeProgress(progress);
+    }
+
     const placementComplete = isPlacementComplete(progress);
     const introSeen = hasActiveStudentSeenIntro(student.student_id);
 
@@ -179,7 +197,7 @@ export default function LoginPage() {
     if (placementComplete && (progress?.status === "ASSIGNED_PROGRAM" || progress?.status === "PASSED")) {
       dest = `/levels`;
     } else if (introSeen) {
-      dest = `/pretest?year=${encodeURIComponent(progress?.year ?? student.year_level ?? "Year 1")}`;
+      dest = `/pretest?year=${encodeURIComponent(progress?.year ?? studentWorkingYear ?? studentSchoolYear ?? "Year 1")}`;
     } else {
       dest = `/home`;
     }

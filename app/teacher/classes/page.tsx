@@ -4,8 +4,14 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useAuthGuard } from "@/lib/useAuthGuard";
+import {
+  SCHOOL_YEAR_LEVEL_OPTIONS,
+  formatWorkingLevelOptionLabel,
+  normalizeSchoolYearLabel,
+  normalizeWorkingLevelLabel,
+} from "@/lib/studentLevelLabel";
 
-const YEAR_LEVELS = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"];
+const YEAR_LEVELS: Array<string> = [...SCHOOL_YEAR_LEVEL_OPTIONS];
 
 type ClassRow = {
   id: string;
@@ -25,6 +31,8 @@ type StudentRow = {
   pin?: string | null;
   qr_token?: string | null;
   year_level?: string | null;
+  school_year_level?: string | null;
+  working_level?: string | null;
   notes?: string | null;
   archived_at?: string | null;
 };
@@ -41,19 +49,14 @@ type ParentStudentLinkRow = {
   status: string;
 };
 
-type ProgressRow = {
-  student_id: string;
-  year: string;
-  status: string;
-};
-
 type StudentSortMode = "alphabetical" | "working_level" | "actual_year";
 
 type EditForm = {
   display_name: string;
   username: string;
   pin: string;
-  year_level: string;
+  school_year_level: string;
+  working_level: string;
   notes: string;
 };
 
@@ -80,7 +83,8 @@ export default function TeacherClassesPage() {
   const [newStudentNames, setNewStudentNames] = useState<Record<string, string>>({});
   const [newStudentUsernames, setNewStudentUsernames] = useState<Record<string, string>>({});
   const [newStudentPins, setNewStudentPins] = useState<Record<string, string>>({});
-  const [newStudentYearLevels, setNewStudentYearLevels] = useState<Record<string, string>>({});
+  const [newStudentSchoolYears, setNewStudentSchoolYears] = useState<Record<string, string>>({});
+  const [newStudentWorkingLevels, setNewStudentWorkingLevels] = useState<Record<string, string>>({});
   const [creatingStudentForClass, setCreatingStudentForClass] = useState<string | null>(null);
   const [lastCreatedLogin, setLastCreatedLogin] = useState<{
     classId: string;
@@ -90,7 +94,14 @@ export default function TeacherClassesPage() {
   } | null>(null);
   // Student edit/archive state
   const [editingStudentId, setEditingStudentId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState<EditForm>({ display_name: "", username: "", pin: "", year_level: "", notes: "" });
+  const [editForm, setEditForm] = useState<EditForm>({
+    display_name: "",
+    username: "",
+    pin: "",
+    school_year_level: "",
+    working_level: "AUTO_PLACEMENT",
+    notes: "",
+  });
   const [savingEdit, setSavingEdit] = useState(false);
   const [archivingStudentId, setArchivingStudentId] = useState<string | null>(null);
   const [showArchivedForClass, setShowArchivedForClass] = useState<Record<string, boolean>>({});
@@ -98,7 +109,6 @@ export default function TeacherClassesPage() {
   const [archivingClassId, setArchivingClassId] = useState<string | null>(null);
   const [deletingClassId, setDeletingClassId] = useState<string | null>(null);
   const [showArchivedClasses, setShowArchivedClasses] = useState(false);
-  const [studentActualYearById, setStudentActualYearById] = useState<Record<string, string>>({});
   const [studentSortMode, setStudentSortMode] = useState<StudentSortMode>("alphabetical");
   const [editingClassId, setEditingClassId] = useState<string | null>(null);
   const [editClassForm, setEditClassForm] = useState<{ name: string; year_levels: string[] }>({ name: "", year_levels: [] });
@@ -123,7 +133,7 @@ export default function TeacherClassesPage() {
 
       const studentIds = loadedStudents.map((student) => student.id);
       if (studentIds.length > 0) {
-        const [{ data: links }, { data: credentials }, { data: progressRows }] = await Promise.all([
+        const [{ data: links }, { data: credentials }] = await Promise.all([
           supabase
             .from("parent_student_links")
             .select("student_id,status")
@@ -134,29 +144,7 @@ export default function TeacherClassesPage() {
             .eq("credential_type", "claim_code")
             .is("revoked_at", null)
             .in("student_id", studentIds),
-          supabase
-            .from("progress")
-            .select("student_id,year,status")
-            .in("student_id", studentIds),
         ]);
-
-        const actualYearByStudentId = new Map<string, string>();
-        for (const row of ((progressRows ?? []) as ProgressRow[])) {
-          const existing = actualYearByStudentId.get(row.student_id);
-          if (row.status === "ASSIGNED_PROGRAM") {
-            actualYearByStudentId.set(row.student_id, row.year);
-            continue;
-          }
-          if (!existing) {
-            actualYearByStudentId.set(row.student_id, row.year);
-            continue;
-          }
-          const currentIndex = YEAR_LEVELS.indexOf(existing);
-          const candidateIndex = YEAR_LEVELS.indexOf(row.year);
-          if (candidateIndex > currentIndex) {
-            actualYearByStudentId.set(row.student_id, row.year);
-          }
-        }
 
         setLinkedStudentIds(
           new Set(
@@ -173,17 +161,14 @@ export default function TeacherClassesPage() {
             ])
           )
         );
-        setStudentActualYearById(Object.fromEntries(actualYearByStudentId.entries()));
       } else {
         setLinkedStudentIds(new Set());
         setClaimCodesByStudentId({});
-        setStudentActualYearById({});
       }
     } else {
       setStudents([]);
       setLinkedStudentIds(new Set());
       setClaimCodesByStudentId({});
-      setStudentActualYearById({});
     }
     setLoading(false);
   }, []);
@@ -196,6 +181,35 @@ export default function TeacherClassesPage() {
   const studentsForClass = (classId: string, includeArchived = false) =>
     students.filter((s) => s.class_id === classId && (includeArchived ? true : !s.archived_at));
 
+  function resolveSchoolYearLabel(student: StudentRow, classId?: string) {
+    const direct = normalizeSchoolYearLabel(student.school_year_level);
+    if (direct) return direct;
+    const cls = classes.find((entry) => entry.id === (classId ?? student.class_id));
+    const fallback = normalizeSchoolYearLabel(cls?.year_level ?? null);
+    return fallback ?? "—";
+  }
+
+  function resolveWorkingYearLabel(student: StudentRow) {
+    return normalizeWorkingLevelLabel(student.working_level ?? student.year_level) ?? null;
+  }
+
+  async function syncWorkingLevelProgress(studentId: string, workingYear: string | null) {
+    if (!workingYear) return;
+    const { error } = await supabase.rpc("save_student_progress_state", {
+      p_student_id: studentId,
+      p_year: workingYear,
+      p_data: {
+        status: "ASSIGNED_PROGRAM",
+        placement_complete: true,
+        week: 1,
+        assigned_week: 1,
+      },
+    });
+    if (error) {
+      console.warn("[TeacherClasses] could not sync working level progress", error.message);
+    }
+  }
+
   function linkStatus(studentId: string) {
     if (linkedStudentIds.has(studentId)) return "Home linked";
     if (claimCodesByStudentId[studentId]) return "Pending link";
@@ -206,7 +220,17 @@ export default function TeacherClassesPage() {
     const name = (newStudentNames[classId] ?? "").trim();
     const username = (newStudentUsernames[classId] ?? "").trim();
     const pin = (newStudentPins[classId] ?? "").trim();
+    const schoolYear = normalizeSchoolYearLabel(newStudentSchoolYears[classId] ?? "");
+    const workingYear = normalizeWorkingLevelLabel(newStudentWorkingLevels[classId] ?? "");
     if (!name) return;
+    if (!schoolYear) {
+      alert("Please select the student's school year level.");
+      return;
+    }
+    if ((newStudentWorkingLevels[classId] ?? "") === "") {
+      alert("Please choose a working level or auto placement.");
+      return;
+    }
     if (pin && !/^\d{4}$/.test(pin)) {
       alert("PIN must be 4 digits.");
       return;
@@ -275,15 +299,22 @@ export default function TeacherClassesPage() {
         claimCode: created.claim_code || "Pending setup",
       });
     }
-    // Save year level to student record if selected
-    const yearLevel = newStudentYearLevels[classId] ?? "";
-    if (yearLevel && created?.student_id) {
-      await supabase.from("students").update({ year_level: yearLevel }).eq("id", created.student_id);
+    if (created?.student_id) {
+      await supabase
+        .from("students")
+        .update({
+          school_year_level: schoolYear,
+          working_level: workingYear,
+          year_level: workingYear,
+        })
+        .eq("id", created.student_id);
+      await syncWorkingLevelProgress(created.student_id, workingYear);
     }
     setNewStudentNames((current) => ({ ...current, [classId]: "" }));
     setNewStudentUsernames((current) => ({ ...current, [classId]: "" }));
     setNewStudentPins((current) => ({ ...current, [classId]: "" }));
-    setNewStudentYearLevels((current) => ({ ...current, [classId]: "" }));
+    setNewStudentSchoolYears((current) => ({ ...current, [classId]: "" }));
+    setNewStudentWorkingLevels((current) => ({ ...current, [classId]: "AUTO_PLACEMENT" }));
     if (authUser?.id) await loadClasses(authUser.id);
   }
 
@@ -293,7 +324,8 @@ export default function TeacherClassesPage() {
       display_name: student.display_name,
       username: student.username ?? "",
       pin: student.pin ?? "",
-      year_level: student.year_level ?? "",
+      school_year_level: resolveSchoolYearLabel(student),
+      working_level: resolveWorkingYearLabel(student) ?? "AUTO_PLACEMENT",
       notes: student.notes ?? "",
     });
   }
@@ -304,6 +336,10 @@ export default function TeacherClassesPage() {
 
   async function saveStudentEdit(studentId: string) {
     if (!editForm.display_name.trim()) return;
+    if (!normalizeSchoolYearLabel(editForm.school_year_level)) {
+      alert("Please select the student's school year level.");
+      return;
+    }
     if (editForm.pin && !/^\d{4}$/.test(editForm.pin)) {
       alert("Password must be 4 digits.");
       return;
@@ -315,16 +351,29 @@ export default function TeacherClassesPage() {
         display_name: editForm.display_name.trim(),
         username: editForm.username.trim() || null,
         pin: editForm.pin || null,
-        year_level: editForm.year_level || null,
+        school_year_level: normalizeSchoolYearLabel(editForm.school_year_level),
+        working_level: normalizeWorkingLevelLabel(editForm.working_level === "AUTO_PLACEMENT" ? null : editForm.working_level),
+        year_level: normalizeWorkingLevelLabel(editForm.working_level === "AUTO_PLACEMENT" ? null : editForm.working_level),
         notes: editForm.notes.trim() || null,
       })
       .eq("id", studentId);
     setSavingEdit(false);
     if (error) { alert(error.message); return; }
+    const normalizedWorking = normalizeWorkingLevelLabel(editForm.working_level === "AUTO_PLACEMENT" ? null : editForm.working_level);
+    await syncWorkingLevelProgress(studentId, normalizedWorking);
     setStudents((prev) =>
       prev.map((s) =>
         s.id === studentId
-          ? { ...s, display_name: editForm.display_name.trim(), username: editForm.username.trim() || null, pin: editForm.pin || null, year_level: editForm.year_level || null, notes: editForm.notes.trim() || null }
+          ? {
+              ...s,
+              display_name: editForm.display_name.trim(),
+              username: editForm.username.trim() || null,
+              pin: editForm.pin || null,
+              school_year_level: normalizeSchoolYearLabel(editForm.school_year_level),
+              working_level: normalizedWorking,
+              year_level: normalizedWorking,
+              notes: editForm.notes.trim() || null,
+            }
           : s
       )
     );
@@ -469,11 +518,11 @@ export default function TeacherClassesPage() {
     const base = students.filter((s) => s.class_id === classId && (includeArchived ? true : !s.archived_at));
     return [...base].sort((a, b) => {
       if (studentSortMode === "working_level") {
-        const levelDiff = yearIndex(a.year_level) - yearIndex(b.year_level);
+        const levelDiff = yearIndex(resolveWorkingYearLabel(a)) - yearIndex(resolveWorkingYearLabel(b));
         if (levelDiff !== 0) return levelDiff;
       }
       if (studentSortMode === "actual_year") {
-        const yearDiff = yearIndex(studentActualYearById[a.id]) - yearIndex(studentActualYearById[b.id]);
+        const yearDiff = yearIndex(resolveSchoolYearLabel(a, classId)) - yearIndex(resolveSchoolYearLabel(b, classId));
         if (yearDiff !== 0) return yearDiff;
       }
       return a.display_name.localeCompare(b.display_name, undefined, { sensitivity: "base" });
@@ -716,20 +765,34 @@ export default function TeacherClassesPage() {
                                     </div>
                                   </div>
 
-                                  {/* Working level */}
-                                  <div>
-                                    <label className="text-xs font-bold text-gray-500 mb-1 block">Working Level</label>
-                                    <select
-                                      value={editForm.year_level}
-                                      onChange={(e) => setEditForm((f) => ({ ...f, year_level: e.target.value }))}
-                                      className="w-full rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-blue-300"
-                                    >
-                                      <option value="">— select —</option>
-                                      {YEAR_LEVELS.map((yr) => (
-                                        <option key={yr} value={yr}>{yr}</option>
-                                      ))}
-                                    </select>
-                                    <p className="text-[10px] text-gray-400 mt-1">Where this student works — can differ from class year</p>
+                                  <div className="grid gap-2 md:grid-cols-2">
+                                    <div>
+                                      <label className="text-xs font-bold text-gray-500 mb-1 block">School Year Level</label>
+                                      <select
+                                        value={editForm.school_year_level}
+                                        onChange={(e) => setEditForm((f) => ({ ...f, school_year_level: e.target.value }))}
+                                        className="w-full rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-blue-300"
+                                      >
+                                        <option value="">— select —</option>
+                                        {YEAR_LEVELS.map((yr) => (
+                                          <option key={yr} value={yr}>{yr}</option>
+                                        ))}
+                                      </select>
+                                    </div>
+                                    <div>
+                                      <label className="text-xs font-bold text-gray-500 mb-1 block">Working Level</label>
+                                      <select
+                                        value={editForm.working_level}
+                                        onChange={(e) => setEditForm((f) => ({ ...f, working_level: e.target.value }))}
+                                        className="w-full rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-blue-300"
+                                      >
+                                        <option value="AUTO_PLACEMENT">Placement not completed / Auto placement</option>
+                                        {YEAR_LEVELS.map((yr) => (
+                                          <option key={yr} value={yr}>{formatWorkingLevelOptionLabel(yr)}</option>
+                                        ))}
+                                      </select>
+                                      <p className="text-[10px] text-gray-400 mt-1">Placement updates this level, not the school year.</p>
+                                    </div>
                                   </div>
 
                                   <div>
@@ -774,11 +837,12 @@ export default function TeacherClassesPage() {
                                 <div>
                                   <div className="flex flex-wrap items-center gap-2">
                                     <span className="font-semibold text-gray-700">{s.display_name}</span>
-                                    {s.year_level && (
-                                      <span className="rounded-full px-2 py-0.5 text-[11px] font-black bg-indigo-50 text-indigo-600">
-                                        Working: {s.year_level}
-                                      </span>
-                                    )}
+                                    <span className="rounded-full px-2 py-0.5 text-[11px] font-black bg-sky-50 text-sky-700">
+                                      School: {resolveSchoolYearLabel(s, cls.id)}
+                                    </span>
+                                    <span className="rounded-full px-2 py-0.5 text-[11px] font-black bg-indigo-50 text-indigo-600">
+                                      Working: {resolveWorkingYearLabel(s) ? formatWorkingLevelOptionLabel(resolveWorkingYearLabel(s)!) : "Placement pending"}
+                                    </span>
                                     {isArchived && (
                                       <span className="rounded-full px-2 py-0.5 text-[11px] font-black bg-gray-200 text-gray-500">
                                         Archived
@@ -910,7 +974,7 @@ export default function TeacherClassesPage() {
                             Class code: <span className="font-mono font-black tracking-widest">{cls.class_code}</span> · Username + password are what students type to log in.
                           </p>
                         </div>
-                        <div className="mt-3 grid gap-2 md:grid-cols-[1fr_1fr_160px_130px_auto]">
+                        <div className="mt-3 grid gap-2 md:grid-cols-[1fr_1fr_160px_180px_130px_auto]">
                           <input
                             value={newStudentNames[cls.id] ?? ""}
                             onChange={(event) =>
@@ -928,15 +992,27 @@ export default function TeacherClassesPage() {
                             className="rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
                           />
                           <select
-                            value={newStudentYearLevels[cls.id] ?? ""}
+                            value={newStudentSchoolYears[cls.id] ?? ""}
                             onChange={(event) =>
-                              setNewStudentYearLevels((current) => ({ ...current, [cls.id]: event.target.value }))
+                              setNewStudentSchoolYears((current) => ({ ...current, [cls.id]: event.target.value }))
                             }
                             className="rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
                           >
-                            <option value="">Working level…</option>
+                            <option value="">School year…</option>
                             {YEAR_LEVELS.map((yr) => (
                               <option key={yr} value={yr}>{yr}</option>
+                            ))}
+                          </select>
+                          <select
+                            value={newStudentWorkingLevels[cls.id] ?? "AUTO_PLACEMENT"}
+                            onChange={(event) =>
+                              setNewStudentWorkingLevels((current) => ({ ...current, [cls.id]: event.target.value }))
+                            }
+                            className="rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
+                          >
+                            <option value="AUTO_PLACEMENT">Auto placement…</option>
+                            {YEAR_LEVELS.map((yr) => (
+                              <option key={yr} value={yr}>{formatWorkingLevelOptionLabel(yr)}</option>
                             ))}
                           </select>
                           <input

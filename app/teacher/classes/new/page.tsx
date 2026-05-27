@@ -5,6 +5,12 @@ import { useRouter } from "next/navigation";
 import { recoverInvalidRefreshToken, supabase } from "@/lib/supabase";
 import { useAuthGuard } from "@/lib/useAuthGuard";
 import QRCode from "qrcode";
+import {
+  SCHOOL_YEAR_LEVEL_OPTIONS,
+  formatWorkingLevelOptionLabel,
+  normalizeSchoolYearLabel,
+  normalizeWorkingLevelLabel,
+} from "@/lib/studentLevelLabel";
 
 type AddedStudent = { name: string; pin: string; claimCode: string };
 
@@ -32,12 +38,14 @@ export default function NewClassPage() {
   const [error, setError] = useState<string | null>(null);
   // Student adding state
   const [newStudentName, setNewStudentName] = useState("");
+  const [newStudentSchoolYear, setNewStudentSchoolYear] = useState("");
+  const [newStudentWorkingLevel, setNewStudentWorkingLevel] = useState("AUTO_PLACEMENT");
   const [newStudentPin, setNewStudentPin] = useState("");
   const [addingStudent, setAddingStudent] = useState(false);
   const [addedStudents, setAddedStudents] = useState<AddedStudent[]>([]);
   const [studentError, setStudentError] = useState<string | null>(null);
 
-  const yearLevelOptions = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"];
+  const yearLevelOptions = [...SCHOOL_YEAR_LEVEL_OPTIONS];
 
   function toggleYear(yr: string) {
     setYearLevels((prev) => prev.includes(yr) ? prev.filter((y) => y !== yr) : [...prev, yr]);
@@ -132,6 +140,12 @@ export default function NewClassPage() {
 
   async function addStudent() {
     if (!newStudentName.trim() || !createdClassId) return;
+    const schoolYear = normalizeSchoolYearLabel(newStudentSchoolYear);
+    const workingYear = normalizeWorkingLevelLabel(newStudentWorkingLevel === "AUTO_PLACEMENT" ? null : newStudentWorkingLevel);
+    if (!schoolYear) {
+      setStudentError("Please select the student's school year level.");
+      return;
+    }
     if (newStudentPin && !/^\d{4}$/.test(newStudentPin)) {
       setStudentError("PIN must be 4 digits.");
       return;
@@ -186,6 +200,28 @@ export default function NewClassPage() {
     }
 
     setAddingStudent(false);
+    if (created?.student_id) {
+      await supabase
+        .from("students")
+        .update({
+          school_year_level: schoolYear,
+          working_level: workingYear,
+          year_level: workingYear,
+        })
+        .eq("id", created.student_id);
+      if (workingYear) {
+        await supabase.rpc("save_student_progress_state", {
+          p_student_id: created.student_id,
+          p_year: workingYear,
+          p_data: {
+            status: "ASSIGNED_PROGRAM",
+            placement_complete: true,
+            week: 1,
+            assigned_week: 1,
+          },
+        });
+      }
+    }
     if (created) {
       setAddedStudents((prev) => [
         ...prev,
@@ -193,6 +229,8 @@ export default function NewClassPage() {
       ]);
     }
     setNewStudentName("");
+    setNewStudentSchoolYear("");
+    setNewStudentWorkingLevel("AUTO_PLACEMENT");
     setNewStudentPin("");
   }
 
@@ -287,7 +325,7 @@ export default function NewClassPage() {
                 </div>
               )}
 
-              <div className="grid gap-2 md:grid-cols-[1fr_120px_auto]">
+              <div className="grid gap-2 md:grid-cols-[1fr_160px_180px_120px_auto]">
                 <input
                   value={newStudentName}
                   onChange={(e) => setNewStudentName(e.target.value)}
@@ -295,6 +333,26 @@ export default function NewClassPage() {
                   placeholder="Student name"
                   className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
                 />
+                <select
+                  value={newStudentSchoolYear}
+                  onChange={(e) => setNewStudentSchoolYear(e.target.value)}
+                  className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
+                >
+                  <option value="">School year…</option>
+                  {yearLevelOptions.map((yr) => (
+                    <option key={yr} value={yr}>{yr}</option>
+                  ))}
+                </select>
+                <select
+                  value={newStudentWorkingLevel}
+                  onChange={(e) => setNewStudentWorkingLevel(e.target.value)}
+                  className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
+                >
+                  <option value="AUTO_PLACEMENT">Auto placement…</option>
+                  {yearLevelOptions.map((yr) => (
+                    <option key={yr} value={yr}>{formatWorkingLevelOptionLabel(yr)}</option>
+                  ))}
+                </select>
                 <input
                   value={newStudentPin}
                   onChange={(e) => setNewStudentPin(e.target.value.replace(/\D/g, "").slice(0, 4))}

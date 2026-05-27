@@ -8,6 +8,12 @@ import {
   DEFAULT_LESSON_XP,
   type Genre,
 } from "@/data/programs/genres";
+import {
+  formatSchoolYearDisplayLabel,
+  formatStudentLevelLabel,
+  normalizeSchoolYearLabel,
+  normalizeWorkingLevelLabel,
+} from "@/lib/studentLevelLabel";
 import type { Lesson } from "@/data/programs/year1";
 import { getLatestPosttestProfile } from "@/data/assessments/analysis";
 import LessonPreviewDrawer from "./LessonPreviewDrawer";
@@ -18,18 +24,23 @@ type StudentRow = {
   display_name: string;
   class_id: string;
   user_id: string;
+  school_year_level?: string | null;
+  working_level?: string | null;
+  year_level?: string | null;
 };
 
+type JsonObject = Record<string, unknown>;
+type InsightCarrier = { latestInsight?: TeacherInsight | null | undefined };
 type ProgressRow = {
   student_id: string;
   year: string;
   week: number | null;
   status: string;
   pretest_score: number | null;
-  completed_lesson_ids: any;
-  unlocked_legends: any;
-  quiz_scores: any;
-  lesson_attempts?: any;
+  completed_lesson_ids: unknown;
+  unlocked_legends: unknown;
+  quiz_scores: unknown;
+  lesson_attempts?: unknown;
   updated_at?: string;
 };
 
@@ -65,9 +76,7 @@ type Props = {
 type StrandStatus = "Not Started" | "In Progress" | "Needs Support" | "Completed";
 
 function yearToLevelLabel(year: string): string {
-  if (year === "Prep") return "Ground";
-  const m = year.match(/Year\s*(\d+)/i);
-  return m ? `Level ${m[1]}` : year;
+  return formatStudentLevelLabel(year);
 }
 type StudentFlagTone = "neutral" | "red" | "yellow" | "green";
 type StudentFlag = {
@@ -76,7 +85,7 @@ type StudentFlag = {
   tone: StudentFlagTone;
 };
 
-function parseCompleted(raw: any): string[] {
+function parseCompleted(raw: unknown): string[] {
   if (Array.isArray(raw)) return raw as string[];
   if (typeof raw === "string") {
     try { return JSON.parse(raw); } catch { return []; }
@@ -84,12 +93,25 @@ function parseCompleted(raw: any): string[] {
   return [];
 }
 
-function parseQuizScores(raw: any): Record<string, any> {
-  if (raw && typeof raw === "object") return raw as Record<string, any>;
+function parseQuizScores(raw: unknown): Record<string, JsonObject> {
+  if (raw && typeof raw === "object") return raw as Record<string, JsonObject>;
   if (typeof raw === "string") {
     try {
       const parsed = JSON.parse(raw);
-      return parsed && typeof parsed === "object" ? (parsed as Record<string, any>) : {};
+      return parsed && typeof parsed === "object" ? (parsed as Record<string, JsonObject>) : {};
+    } catch {
+      return {};
+    }
+  }
+  return {};
+}
+
+function parseLessonAttempts(raw: unknown): Record<string, InsightCarrier> {
+  if (raw && typeof raw === "object") return raw as Record<string, InsightCarrier>;
+  if (typeof raw === "string") {
+    try {
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === "object" ? (parsed as Record<string, InsightCarrier>) : {};
     } catch {
       return {};
     }
@@ -102,12 +124,7 @@ function weekLessonsDone(ids: string[], week: number): number {
   return ids.filter((id) => id.includes(tag)).length;
 }
 
-function pctComplete(ids: string[], prefix: string): number {
-  const mine = ids.filter((id) => id.startsWith(prefix));
-  return Math.min(100, Math.round((mine.length / 36) * 100));
-}
-
-function countCompletedQuizzes(raw: any): number {
+function countCompletedQuizzes(raw: unknown): number {
   const quizScores = parseQuizScores(raw);
   return Object.entries(quizScores).filter(([key, value]) => {
     if (!/^\d+$/.test(key)) return false;
@@ -148,15 +165,6 @@ function computeStatus(prog: ProgressRow | undefined, completedCount: number, pc
   return "In Progress";
 }
 
-function statusTone(s: StrandStatus) {
-  switch (s) {
-    case "Completed":     return "bg-emerald-50 text-emerald-700 border-emerald-200";
-    case "In Progress":   return "bg-amber-50 text-amber-700 border-amber-200";
-    case "Needs Support": return "bg-rose-50 text-rose-700 border-rose-200";
-    default:              return "bg-slate-50 text-slate-500 border-slate-200";
-  }
-}
-
 const ASSESSMENT_PASS_THRESHOLD = 85;
 
 const INSIGHT_SEVERITY: Record<TeacherInsightStatus, number> = {
@@ -172,10 +180,8 @@ function getWeekInsightList(
   lessonIds: string[],
 ): TeacherInsight[] {
   if (!prog) return [];
-  const quizScores: Record<string, any> =
-    prog.quiz_scores && typeof prog.quiz_scores === "object" ? (prog.quiz_scores as Record<string, any>) : {};
-  const lessonAttempts: Record<string, any> =
-    prog.lesson_attempts && typeof prog.lesson_attempts === "object" ? (prog.lesson_attempts as Record<string, any>) : {};
+  const quizScores = parseQuizScores(prog.quiz_scores);
+  const lessonAttempts = parseLessonAttempts(prog.lesson_attempts);
 
   const lessonInsights = lessonIds
     .map((lessonId) => lessonAttempts[lessonId]?.latestInsight as TeacherInsight | null | undefined)
@@ -387,10 +393,7 @@ function pickStudentYear(rows: ProgressRow[], fallback: string): string {
 }
 
 function levelToYearLabel(level?: string | null): string | null {
-  if (!level) return null;
-  if (/^prep$/i.test(level) || /^ground/i.test(level)) return "Prep";
-  const m = level.match(/(?:year|level)\s*(\d+)/i);
-  return m ? `Year ${m[1]}` : null;
+  return normalizeWorkingLevelLabel(level);
 }
 
 function liveRowToStatus(row?: LiveStudentActivityRow | undefined): StrandStatus {
@@ -439,24 +442,29 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
     return liveRows.find((row) => row.student_id === studentId);
   }
 
-  function getStudentYear(studentId: string): string {
-    const liveYear = levelToYearLabel(getLiveRow(studentId)?.current_level);
+  function getWorkingYear(student: StudentRow): string {
+    const liveYear = levelToYearLabel(getLiveRow(student.id)?.current_level);
     if (liveYear) return liveYear;
-    const rows = progress.filter((p) => p.student_id === studentId);
-    if (rows.length > 0) return pickStudentYear(rows, yearLabel);
-    return yearLabel;
+    const rows = progress.filter((p) => p.student_id === student.id);
+    if (rows.length > 0) return pickStudentYear(rows, normalizeWorkingLevelLabel(student.working_level ?? student.year_level) ?? yearLabel);
+    return normalizeWorkingLevelLabel(student.working_level ?? student.year_level) ?? yearLabel;
+  }
+
+  function getSchoolYear(student: StudentRow): string {
+    return normalizeSchoolYearLabel(student.school_year_level) ?? formatSchoolYearDisplayLabel(yearLabel);
   }
 
   const studentRows = students
     .map((s) => {
-      const studentYear = getStudentYear(s.id);
-      const prog = getProg(s.id, studentYear);
+      const schoolYear = getSchoolYear(s);
+      const workingYear = getWorkingYear(s);
+      const prog = getProg(s.id, workingYear);
       const liveRow = getLiveRow(s.id);
       const ids = prog ? parseCompleted(prog.completed_lesson_ids) : [];
-      const sPrefix = lessonIdPrefix(studentYear);
+      const sPrefix = lessonIdPrefix(workingYear);
       const strandIds = isPlaceholder ? [] : ids.filter((id) => id.startsWith(sPrefix));
-      const planForStudentYear = getCurriculumPlan(studentYear, genreId);
-      const pct = isPlaceholder ? 0 : overallProgramPercent(prog, studentYear, planForStudentYear);
+      const planForStudentYear = getCurriculumPlan(workingYear, genreId);
+      const pct = isPlaceholder ? 0 : overallProgramPercent(prog, workingYear, planForStudentYear);
       const computedStatus = isPlaceholder ? "Not Started" : computeStatus(prog, strandIds.length, pct);
       const status = computedStatus === "Not Started" && liveRow ? liveRowToStatus(liveRow) : computedStatus;
       const week = isPlaceholder ? null : (prog?.week ?? liveRow?.current_week ?? null);
@@ -468,7 +476,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
       const flag = deriveStudentFlag(pickPrimaryInsight(weekInsights), status);
       const latestPretest = getLatestPretestProgress(s.id);
 
-      return { s, prog, liveRow, pct, status, week, studentYear, summary, flag, latestPretest };
+      return { s, prog, liveRow, pct, status, week, schoolYear, workingYear, summary, flag, latestPretest };
     })
     .sort((a, b) => {
       const dir = sortDir === "asc" ? 1 : -1;
@@ -476,7 +484,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
       const nameCmp = a.s.display_name.localeCompare(b.s.display_name);
       switch (sortKey) {
         case "name":   return dir * nameCmp;
-        case "level":  return dir * (yearOrdinal(a.studentYear) - yearOrdinal(b.studentYear)) || nameCmp;
+        case "level":  return dir * (yearOrdinal(a.workingYear) - yearOrdinal(b.workingYear)) || nameCmp;
         case "week":   return dir * ((a.week ?? -1) - (b.week ?? -1)) || nameCmp;
         case "status": return dir * (rank[a.status] - rank[b.status]) || nameCmp;
         case "tower":  return dir * (a.pct - b.pct) || nameCmp;
@@ -561,8 +569,8 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
         <div className="grid grid-cols-[2fr_0.7fr_0.7fr_0.7fr_1.1fr] px-5 py-3 bg-gradient-to-b from-[#F8FAFC] to-[#F1F5F9] border-b border-[#E6E8EC]">
           {([
             ["name",   "Student"],
-            ["level",  "Year"],
-            ["level",  "Level"],
+            ["level",  "School Year"],
+            ["level",  "Working Level"],
             ["week",   "Week"],
             ["tower",  "Tower"],
           ] as [SortKey, string][]).map(([key, label], idx) => {
@@ -590,7 +598,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
             No students enrolled yet.
           </div>
         ) : (
-          studentRows.map(({ s, prog, liveRow, pct, status, week, studentYear, flag, latestPretest }) => {
+          studentRows.map(({ s, prog, liveRow, pct, week, schoolYear, workingYear, flag, latestPretest }) => {
               const isOpen = expandedId === s.id;
 
             return (
@@ -614,8 +622,8 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                       </div>
                     </div>
                   </div>
-                  <span className="text-xs font-bold text-[#475569]">{studentYear}</span>
-                  <span className="text-xs font-bold text-[#475569]">{yearToLevelLabel(studentYear)}</span>
+                  <span className="text-xs font-bold text-[#475569]">{schoolYear}</span>
+                  <span className="text-xs font-bold text-[#475569]">{yearToLevelLabel(workingYear)}</span>
                   <span className="text-xs font-bold text-[#475569] tabular-nums">
                     {week ? `W${week}` : "—"}
                   </span>
@@ -630,13 +638,14 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                 {isOpen && (
                   <StudentStrandDetail
                     student={s}
-                    yearLabel={studentYear}
+                    schoolYearLabel={schoolYear}
+                    yearLabel={workingYear}
                     genre={genre}
                     prog={prog}
                     liveRow={liveRow}
                     latestPretest={latestPretest}
                     isPlaceholder={isPlaceholder}
-                    prefix={lessonIdPrefix(studentYear)}
+                    prefix={lessonIdPrefix(workingYear)}
                   />
                 )}
               </div>
@@ -651,9 +660,10 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
 /* ───────── Detail view ───────── */
 
 function StudentStrandDetail({
-  student, yearLabel, genre, prog, liveRow, latestPretest, isPlaceholder, prefix,
+  student, schoolYearLabel, yearLabel, genre, prog, liveRow, latestPretest, isPlaceholder, prefix,
 }: {
   student: StudentRow;
+  schoolYearLabel: string;
   yearLabel: string;
   genre: Genre;
   prog: ProgressRow | undefined;
@@ -670,8 +680,7 @@ function StudentStrandDetail({
   const [previewLesson, setPreviewLesson] = useState<Lesson | null>(null);
 
   const quizScores = parseQuizScores(prog?.quiz_scores);
-  const lessonAttempts: Record<string, any> =
-    prog?.lesson_attempts && typeof prog.lesson_attempts === "object" ? (prog.lesson_attempts as any) : {};
+  const lessonAttempts = parseLessonAttempts(prog?.lesson_attempts);
   const latestPost = getLatestPosttestProfile(prog?.quiz_scores);
 
   function weekStatus(w: number): "Complete" | "In Progress" | "Not Started" | "Struggled" {
@@ -697,8 +706,8 @@ function StudentStrandDetail({
     pretestScore == null
       ? "Not taken"
       : pretestScore >= ASSESSMENT_PASS_THRESHOLD
-        ? `Passed, moved on from ${yearToLevelLabel(latestPretest?.year ?? yearLabel)}`
-        : `${yearToLevelLabel(latestPretest?.year ?? yearLabel)} assigned`;
+        ? `${yearToLevelLabel(latestPretest?.year ?? yearLabel)} pre-test passed · ${timeAgo(latestPretest?.updated_at)}`
+        : `${yearToLevelLabel(yearLabel)} assigned · ${timeAgo(latestPretest?.updated_at)}`;
 
   // Teacher insights
   const insights: string[] = [];
@@ -731,7 +740,9 @@ function StudentStrandDetail({
       {/* Snapshot */}
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-3">
         <SnapshotTile label="Strand" value={`${genre.strand}`} sub={genre.realm} />
-        <SnapshotTile label="Level / Week" value={yearToLevelLabel(yearLabel)} sub={`Week ${currentWeek} / 12`} />
+        <SnapshotTile label="School Year" value={schoolYearLabel} sub="Student's class year" />
+        <SnapshotTile label="Working Level / Week" value={yearToLevelLabel(yearLabel)} sub={`Week ${currentWeek} / 12`} />
+        <SnapshotTile label="Current Plan" value={`${yearToLevelLabel(yearLabel)} ${genre.realm}`} sub={week?.topic ?? `Week ${currentWeek}`} />
         <SnapshotTile
           label="Pre-test"
           value={pretestScore != null ? `${pretestScore}%` : "—"}
