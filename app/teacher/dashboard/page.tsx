@@ -103,6 +103,7 @@ function StudentQRSection({ student, classCode, className2, onRegenerate }: {
   function handlePrint() {
     const printWindow = window.open("", "_blank");
     if (!printWindow || !qrDataUrl) return;
+    const websiteUrl = window.location.origin;
     printWindow.document.write(`<!DOCTYPE html><html><head><title>Login Card - ${student.display_name}</title>
       <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',system-ui,sans-serif;display:flex;justify-content:center;padding:20px}
       .card{border:2px solid #e5e7eb;border-radius:16px;padding:32px;width:340px;text-align:center}
@@ -110,7 +111,8 @@ function StudentQRSection({ student, classCode, className2, onRegenerate }: {
       .name{font-size:22px;font-weight:900;color:#111827;margin-bottom:4px}
       .class{font-size:14px;color:#6b7280;margin-bottom:16px}
       .qr{margin:16px auto}.qr img{width:160px;height:160px}
-      .scan-label{font-size:12px;color:#9ca3af;margin-bottom:16px}
+      .scan-label{font-size:12px;color:#9ca3af;margin-bottom:8px}
+      .website{font-size:12px;color:#0f172a;font-weight:700;word-break:break-all;margin-bottom:16px}
       .details{display:flex;justify-content:space-between;padding:12px 16px;background:#f9fafb;border-radius:12px;margin-top:12px}
       .detail-label{font-size:11px;color:#9ca3af;text-transform:uppercase;font-weight:700}
       .detail-value{font-size:16px;font-weight:800;color:#111827;font-family:monospace;letter-spacing:0.15em}
@@ -121,6 +123,7 @@ function StudentQRSection({ student, classCode, className2, onRegenerate }: {
       <div class="class">${className2}</div>
       <div class="qr"><img src="${qrDataUrl}" alt="QR Code"/></div>
       <div class="scan-label">Scan to log in</div>
+      <div class="website">${websiteUrl}</div>
       <div class="details"><div><div class="detail-label">Class Code</div><div class="detail-value">${classCode}</div></div>
       <div><div class="detail-label">PIN</div><div class="detail-value">${student.pin ?? "—"}</div></div></div>
       </div><script>window.onload=function(){window.print()}</script></body></html>`);
@@ -441,6 +444,8 @@ export default function TeacherDashboardPage() {
     if (!selectedClass || classStudents.length === 0) return;
     setShowLoginMenu(false);
 
+    const websiteUrl = window.location.origin;
+
     const QRCode = await import("qrcode");
     const classQrUrl = `${window.location.origin}/login?code=${selectedClass.class_code}`;
     const classQrSrc = await QRCode.toDataURL(classQrUrl, { width: 220, margin: 1 });
@@ -455,6 +460,7 @@ export default function TeacherDashboardPage() {
         <div class="class-name">${selectedClass.name} · Code: <strong>${selectedClass.class_code}</strong></div>
         <img class="qr" src="${s.qrSrc}" alt="QR Code" />
         <div class="scan-hint">Scan to open login page</div>
+        <div class="website">${websiteUrl}</div>
         <div class="creds">
           <div class="cred"><div class="cred-label">Username</div><div class="cred-value">${s.username ?? s.display_name}</div></div>
           <div class="divider"></div>
@@ -479,7 +485,8 @@ export default function TeacherDashboardPage() {
         .class-name { font-size:11px; color:#64748B; margin-bottom:12px; }
         .qr { width:140px; height:140px; margin:0 auto 6px; display:block; }
         .qr-missing { width:140px; height:140px; margin:0 auto 6px; background:#f1f5f9; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#94A3B8; }
-        .scan-hint { font-size:10px; color:#94A3B8; margin-bottom:12px; }
+        .scan-hint { font-size:10px; color:#94A3B8; margin-bottom:6px; }
+        .website { font-size:10px; font-weight:800; color:#0F172A; margin-bottom:12px; word-break:break-all; }
         .creds { display:flex; align-items:center; justify-content:center; gap:0; background:#F8FAFC; border-radius:10px; overflow:hidden; }
         .cred { flex:1; padding:10px 8px; }
         .divider { width:1px; background:#E2E8F0; height:36px; }

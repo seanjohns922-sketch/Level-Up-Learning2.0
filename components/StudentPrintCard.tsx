@@ -27,6 +27,7 @@ export default function StudentPrintCard({ studentName, className, classCode, pi
   function handlePrint() {
     const printWindow = window.open("", "_blank");
     if (!printWindow) return;
+    const websiteUrl = window.location.origin;
 
     printWindow.document.write(`
       <!DOCTYPE html>
@@ -48,7 +49,8 @@ export default function StudentPrintCard({ studentName, className, classCode, pi
           .class { font-size: 14px; color: #6b7280; margin-bottom: 16px; }
           .qr { margin: 16px auto; }
           .qr img { width: 160px; height: 160px; }
-          .scan-label { font-size: 12px; color: #9ca3af; margin-bottom: 16px; }
+          .scan-label { font-size: 12px; color: #9ca3af; margin-bottom: 8px; }
+          .website { font-size: 12px; color: #111827; font-weight: 700; word-break: break-all; margin-bottom: 16px; }
           .details { display: flex; justify-content: space-between; padding: 12px 16px; background: #f9fafb; border-radius: 12px; margin-top: 12px; }
           .detail-label { font-size: 11px; color: #9ca3af; text-transform: uppercase; font-weight: 700; }
           .detail-value { font-size: 16px; font-weight: 800; color: #111827; font-family: monospace; letter-spacing: 0.15em; }
@@ -67,6 +69,7 @@ export default function StudentPrintCard({ studentName, className, classCode, pi
             <img src="${qrDataUrl}" alt="QR Code" />
           </div>
           <div class="scan-label">Scan to log in</div>
+          <div class="website">${websiteUrl}</div>
           <div class="details">
             <div>
               <div class="detail-label">Class Code</div>
