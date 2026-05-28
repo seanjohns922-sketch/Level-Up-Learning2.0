@@ -15,8 +15,8 @@ type ProgressLike = {
   student_id: string;
   year: string;
   week: number | null;
-  completed_lesson_ids: any;
-  quiz_scores?: any;
+  completed_lesson_ids: string[] | null;
+  quiz_scores?: Record<string, unknown>;
 };
 
 type Props = {
@@ -25,7 +25,7 @@ type Props = {
   progress: ProgressLike[];
 };
 
-function parseCompleted(raw: any): string[] {
+function parseCompleted(raw: unknown): string[] {
   if (Array.isArray(raw)) return raw as string[];
   if (typeof raw === "string") {
     try { return JSON.parse(raw); } catch { return []; }
@@ -82,8 +82,8 @@ export default function CurriculumExplorer({
     return total === 0 ? 0 : Math.round((done / total) * 100);
   }
 
-  function parseQuiz(raw: any): Record<string, any> {
-    return raw && typeof raw === "object" ? raw : {};
+  function parseQuiz(raw: unknown): Record<string, unknown> {
+    return raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
   }
 
   /** Class average quiz accuracy % for a week (across all students who attempted). */
@@ -110,10 +110,10 @@ export default function CurriculumExplorer({
       const qs = parseQuiz(p.quiz_scores);
       const wq = qs[String(w)];
       const lb = Array.isArray(wq?.lessonBreakdown) ? wq.lessonBreakdown : [];
-      const item = lb.find((x: any) => Number(x?.lessonNumber) === lessonNumber);
-      if (item && typeof item.correct === "number" && typeof item.total === "number" && item.total > 0) {
-        sumCorrect += item.correct;
-        sumTotal += item.total;
+      const item = lb.find((x: unknown) => Number((x as Record<string, unknown>)?.lessonNumber) === lessonNumber);
+      if (item && typeof (item as Record<string, unknown>).correct === "number" && typeof (item as Record<string, unknown>).total === "number" && (item as Record<string, unknown>).total as number > 0) {
+        sumCorrect += (item as Record<string, unknown>).correct as number;
+        sumTotal += (item as Record<string, unknown>).total as number;
         n += 1;
       }
     }
