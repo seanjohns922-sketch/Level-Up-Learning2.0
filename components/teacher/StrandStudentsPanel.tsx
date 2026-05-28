@@ -559,10 +559,33 @@ function buildStudentWeeklyPerformanceSummary({
       : "Attempted"
     : "Not Attempted";
 
+  let resolvedStatus = questionsAnswered === 0 && !weekQuiz ? "Not Started" : weekSummary.status;
+  let resolvedMainGap = weekSummary.mainGap;
+  let resolvedSuggestedAction = weekSummary.suggestedAction;
+
+  if (lessonsCompleted >= lessons.length && lessons.length > 0) {
+    if (weeklyQuizStatus === "Not Attempted") {
+      resolvedStatus = "Lessons Complete — Quiz Pending";
+      resolvedMainGap = "Weekly quiz not attempted yet";
+      resolvedSuggestedAction = "Complete the weekly quiz to finish this week.";
+    } else if (weeklyQuizPassed) {
+      resolvedStatus = "Week Complete";
+      resolvedMainGap = weekSummary.mainGap === "No attempt data yet" ? "Weekly goals completed" : weekSummary.mainGap;
+      resolvedSuggestedAction =
+        weekSummary.suggestedAction === "Wait for a completed lesson or quiz to generate insight."
+          ? "Move to the next week when ready."
+          : weekSummary.suggestedAction;
+    } else {
+      resolvedStatus = "Needs Review";
+      resolvedMainGap = "Weekly quiz needs review";
+      resolvedSuggestedAction = "Review this week's gaps, then retry the weekly quiz.";
+    }
+  }
+
   return {
-    status: questionsAnswered === 0 && !weekQuiz ? "Not Started" : weekSummary.status,
-    mainGap: weekSummary.mainGap,
-    suggestedAction: weekSummary.suggestedAction,
+    status: resolvedStatus,
+    mainGap: resolvedMainGap,
+    suggestedAction: resolvedSuggestedAction,
     lessonsCompleted,
     totalLessons: lessons.length,
     lessonCards,
@@ -949,12 +972,13 @@ function StudentStrandDetail({
   const lessonAttempts = parseLessonAttempts(prog?.lesson_attempts);
   const latestPost = getLatestPosttestProfile(prog?.quiz_scores);
 
-  function weekStatus(w: number): "Complete" | "In Progress" | "Not Started" | "Struggled" {
+  function weekStatus(w: number): "Complete" | "Quiz Pending" | "In Progress" | "Not Started" | "Struggled" {
     if (isPlaceholder) return "Not Started";
     const done = weekLessonsDone(ids, w);
     const q = quizScores[String(w)];
     if (q && !getQuizPassed(q)) return "Struggled";
-    if (done >= 3) return "Complete";
+    if (done >= 3 && q && getQuizPassed(q)) return "Complete";
+    if (done >= 3) return "Quiz Pending";
     if (done > 0 || w === currentWeek) return "In Progress";
     return "Not Started";
   }
@@ -1096,6 +1120,7 @@ function StudentStrandDetail({
             const isExpanded = w.week === expandedWeek;
             const tone =
               st === "Complete"   ? "bg-emerald-500 text-white border-emerald-500" :
+              st === "Quiz Pending" ? "bg-amber-50 text-amber-700 border-amber-300" :
               st === "In Progress"? "bg-amber-100 text-amber-800 border-amber-300" :
               st === "Struggled"  ? "bg-rose-100 text-rose-800 border-rose-300" :
                                     "bg-slate-50 text-slate-500 border-slate-200";
@@ -1306,6 +1331,7 @@ function pctTotal(ids: string[], prefix: string) {
 
 function shortStatus(s: string) {
   if (s === "Complete")    return "✓";
+  if (s === "Quiz Pending") return "Quiz";
   if (s === "In Progress") return "•••";
   if (s === "Struggled")   return "!";
   return "—";

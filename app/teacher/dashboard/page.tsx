@@ -21,6 +21,8 @@ type ProgressRow = {
   completed_lesson_ids: unknown;
   unlocked_legends: unknown;
   quiz_scores: unknown;
+  lesson_attempts?: unknown;
+  updated_at?: string | null;
 };
 
 type LiveStudentActivityRow = {
@@ -302,7 +304,63 @@ export default function TeacherDashboardPage() {
         .from("progress_snapshot")
         .select("*")
         .in("student_id", ids);
-      newProg = prog ?? [];
+      const { data: legacyProg } = await supabase
+        .from("progress")
+        .select("student_id,year,week,status,pretest_score,updated_at")
+        .in("student_id", ids)
+        .not("pretest_score", "is", null);
+
+      const snapshotRows = (prog ?? []) as ProgressRow[];
+      const legacyRows = ((legacyProg ?? []) as Array<{
+        student_id: string;
+        year: string | null;
+        week: number | null;
+        status: string | null;
+        pretest_score: number | null;
+        updated_at?: string | null;
+      }>).filter((row): row is {
+        student_id: string;
+        year: string;
+        week: number | null;
+        status: string | null;
+        pretest_score: number;
+        updated_at?: string | null;
+      } => typeof row.year === "string" && typeof row.pretest_score === "number");
+
+      const mergedProgress = [...snapshotRows];
+      legacyRows.forEach((legacyRow) => {
+        const snapshotIndex = mergedProgress.findIndex(
+          (row) => row.student_id === legacyRow.student_id && row.year === legacyRow.year
+        );
+
+        if (snapshotIndex >= 0) {
+          if (mergedProgress[snapshotIndex].pretest_score == null) {
+            mergedProgress[snapshotIndex] = {
+              ...mergedProgress[snapshotIndex],
+              pretest_score: legacyRow.pretest_score,
+              updated_at: mergedProgress[snapshotIndex].updated_at ?? legacyRow.updated_at ?? null,
+              status: mergedProgress[snapshotIndex].status || legacyRow.status || "ACTIVE",
+              week: mergedProgress[snapshotIndex].week ?? legacyRow.week,
+            };
+          }
+          return;
+        }
+
+        mergedProgress.push({
+          student_id: legacyRow.student_id,
+          year: legacyRow.year,
+          week: legacyRow.week,
+          status: legacyRow.status ?? "ACTIVE",
+          pretest_score: legacyRow.pretest_score,
+          completed_lesson_ids: [],
+          unlocked_legends: [],
+          quiz_scores: {},
+          lesson_attempts: {},
+          updated_at: legacyRow.updated_at ?? null,
+        });
+      });
+
+      newProg = mergedProgress;
 
       const { data: live } = await supabase
         .from("live_student_activity")
