@@ -39,6 +39,14 @@ type LiveStudentActivityRow = {
   updated_at?: string | null;
 };
 
+type LiveActivityEventRow = {
+  student_id: string;
+  class_id: string;
+  event_type: string;
+  created_at: string;
+  payload: Record<string, unknown> | null;
+};
+
 const YEAR_LEVELS = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"];
 const WEEKS = Array.from({ length: 12 }, (_, i) => i + 1);
 
@@ -165,6 +173,7 @@ export default function TeacherDashboardPage() {
   const [students, setStudents] = useState<StudentRow[]>([]);
   const [progress, setProgress] = useState<ProgressRow[]>([]);
   const [liveRows, setLiveRows] = useState<LiveStudentActivityRow[]>([]);
+  const [liveEvents, setLiveEvents] = useState<LiveActivityEventRow[]>([]);
   const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
   const [activeYear, setActiveYear] = useState("Year 1");
   const [activeTab, setActiveTab] = useState<"live" | "students" | "curriculum">("live");
@@ -260,6 +269,7 @@ export default function TeacherDashboardPage() {
         setStudents([]);
         setProgress([]);
         setLiveRows([]);
+        setLiveEvents([]);
       }
       setLoading(false);
     } finally {
@@ -285,6 +295,7 @@ export default function TeacherDashboardPage() {
 
     let newProg: ProgressRow[] = [];
     let newLiveRows: LiveStudentActivityRow[] = [];
+    let newLiveEvents: LiveActivityEventRow[] = [];
     if (newStuds.length > 0) {
       const ids = newStuds.map((s) => s.id);
       const { data: prog } = await supabase
@@ -299,6 +310,15 @@ export default function TeacherDashboardPage() {
         .in("student_id", ids)
         .eq("class_id", classId);
       newLiveRows = (live ?? []) as LiveStudentActivityRow[];
+
+      const { data: events } = await supabase
+        .from("live_activity_events")
+        .select("student_id,class_id,event_type,created_at,payload")
+        .in("student_id", ids)
+        .eq("class_id", classId)
+        .in("event_type", ["lesson_started", "question_loaded", "answer_correct", "answer_incorrect", "lesson_completed"])
+        .order("created_at", { ascending: true });
+      newLiveEvents = (events ?? []) as LiveActivityEventRow[];
     }
 
     if (diffOnly) {
@@ -306,13 +326,16 @@ export default function TeacherDashboardPage() {
       const studJson = JSON.stringify(newStuds);
       const progJson = JSON.stringify(newProg);
       const liveJson = JSON.stringify(newLiveRows);
+      const eventsJson = JSON.stringify(newLiveEvents);
       setStudents((prev) => JSON.stringify(prev) === studJson ? prev : newStuds);
       setProgress((prev) => JSON.stringify(prev) === progJson ? prev : newProg);
       setLiveRows((prev) => JSON.stringify(prev) === liveJson ? prev : newLiveRows);
+      setLiveEvents((prev) => JSON.stringify(prev) === eventsJson ? prev : newLiveEvents);
     } else {
       setStudents(newStuds);
       setProgress(newProg);
       setLiveRows(newLiveRows);
+      setLiveEvents(newLiveEvents);
     }
   }
 
@@ -953,6 +976,7 @@ export default function TeacherDashboardPage() {
                 students={classStudents as any}
                 progress={progress as any}
                 liveRows={liveRows as any}
+                liveEvents={liveEvents as any}
               />
             )}
             {/* eslint-enable @typescript-eslint/no-explicit-any */}

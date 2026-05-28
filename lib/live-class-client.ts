@@ -277,7 +277,17 @@ export async function trackLiveLearningEvent(input: LiveLearningEventInput) {
       console.warn("[LiveClass] Activity upsert failed", upsertError);
     }
 
-    const payload = { ...input, studentId, classId, timestamp };
+    const payload = {
+      ...input,
+      studentId,
+      classId,
+      timestamp,
+      questionsAnswered: nextRow.questions_answered ?? null,
+      correctCount: nextRow.correct_count ?? null,
+      accuracyPercent: nextRow.accuracy_percent ?? null,
+      currentLessonStatus: nextRow.current_lesson_status ?? null,
+      completedAt: nextRow.completed_at ?? null,
+    };
 
     const { error: eventError } = await supabase.rpc("insert_live_activity_event", {
       p_student_id: studentId,

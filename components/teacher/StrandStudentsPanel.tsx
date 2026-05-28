@@ -14,6 +14,7 @@ import {
   normalizeSchoolYearLabel,
   normalizeWorkingLevelLabel,
 } from "@/lib/studentLevelLabel";
+import { normalizeLessonId, parseLessonNumberFromId } from "@/lib/lessonIdentity";
 import type { Lesson } from "@/data/programs/year1";
 import { getLatestPosttestProfile } from "@/data/assessments/analysis";
 import LessonPreviewDrawer from "./LessonPreviewDrawer";
@@ -76,6 +77,14 @@ type LiveStudentActivityRow = {
   updated_at?: string | null;
 };
 
+type LiveActivityEventRow = {
+  student_id: string;
+  class_id: string;
+  event_type: string;
+  created_at: string;
+  payload: Record<string, unknown> | null;
+};
+
 type LessonCardPerformance = {
   lessonId: string;
   status: "Completed" | "In Progress" | "Not Started";
@@ -107,6 +116,7 @@ type Props = {
   students: StudentRow[];
   progress: ProgressRow[];
   liveRows: LiveStudentActivityRow[];
+  liveEvents: LiveActivityEventRow[];
 };
 
 type StrandStatus = "Not Started" | "In Progress" | "Needs Support" | "Completed";
@@ -184,6 +194,95 @@ function getQuizAttemptsCount(quiz: JsonObject | undefined): number {
   return Array.isArray(attempts) ? attempts.length : quiz ? 1 : 0;
 }
 
+function parseEventPayload(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : {};
+}
+
+type EventLessonSummary = {
+  started: boolean;
+  completed: boolean;
+  total: number | null;
+  correct: number | null;
+  accuracy: number | null;
+  completedAt: string | null;
+};
+
+function buildCompletedLessonIdsFromEvents(events: LiveActivityEventRow[], yearLabel: string) {
+  const ids = new Set<string>();
+  events.forEach((event) => {
+    const payload = parseEventPayload(event.payload);
+    if (event.event_type !== "lesson_completed") return;
+    const eventLevel = normalizeWorkingLevelLabel(typeof payload.level === "string" ? payload.level : null) ?? yearLabel;
+    const eventWeek = numberOrNull(payload.week);
+    const eventLessonId = typeof payload.lessonId === "string" ? payload.lessonId : null;
+    const lessonNumber = parseLessonNumberFromId(eventLessonId) ?? numberOrNull(payload.lessonNumber);
+    if (eventLevel !== yearLabel || !eventWeek || !lessonNumber) return;
+    ids.add(normalizeLessonId(eventLevel, eventWeek, lessonNumber));
+  });
+  return [...ids];
+}
+
+function buildEventLessonSummary(
+  events: LiveActivityEventRow[],
+  yearLabel: string,
+  weekNumber: number,
+  lesson: Lesson,
+): EventLessonSummary {
+  let started = false;
+  let completed = false;
+  let total = 0;
+  let correct = 0;
+  let accuracy: number | null = null;
+  let completedAt: string | null = null;
+
+  events.forEach((event) => {
+    const payload = parseEventPayload(event.payload);
+    const eventLevel = normalizeWorkingLevelLabel(typeof payload.level === "string" ? payload.level : null) ?? yearLabel;
+    const eventWeek = numberOrNull(payload.week);
+    const rawLessonId = typeof payload.lessonId === "string" ? payload.lessonId : null;
+    const eventLessonNumber = parseLessonNumberFromId(rawLessonId) ?? numberOrNull(payload.lessonNumber);
+    const normalizedId = eventWeek && eventLessonNumber
+      ? normalizeLessonId(eventLevel, eventWeek, eventLessonNumber)
+      : rawLessonId;
+
+    if (eventLevel !== yearLabel || eventWeek !== weekNumber || normalizedId !== lesson.id) return;
+
+    started = true;
+    if (event.event_type === "answer_correct") {
+      total += 1;
+      correct += 1;
+    } else if (event.event_type === "answer_incorrect") {
+      total += 1;
+    } else if (event.event_type === "lesson_completed") {
+      completed = true;
+      completedAt = event.created_at;
+      const payloadTotal = numberOrNull(payload.questionsAnswered ?? payload.totalQuestions);
+      const payloadCorrect = numberOrNull(payload.correctCount ?? payload.correctAnswers);
+      const payloadAccuracy = numberOrNull(payload.accuracyPercent ?? payload.accuracy);
+      if (payloadTotal != null) total = payloadTotal;
+      if (payloadCorrect != null) correct = payloadCorrect;
+      if (payloadAccuracy != null) accuracy = payloadAccuracy;
+    }
+  });
+
+  const resolvedTotal = total > 0 ? total : null;
+  const resolvedCorrect = resolvedTotal != null ? correct : null;
+  const resolvedAccuracy = accuracy ?? (resolvedTotal && resolvedCorrect != null
+    ? Math.round((resolvedCorrect / resolvedTotal) * 100)
+    : null);
+
+  return {
+    started,
+    completed,
+    total: resolvedTotal,
+    correct: resolvedCorrect,
+    accuracy: resolvedAccuracy,
+    completedAt,
+  };
+}
+
 function countCompletedQuizzes(raw: unknown): number {
   const quizScores = parseQuizScores(raw);
   return Object.entries(quizScores).filter(([key, value]) => {
@@ -201,22 +300,18 @@ function totalProgramActivities(plan: ReturnType<typeof getCurriculumPlan>): num
 }
 
 function overallProgramPercent(
-  prog: ProgressRow | undefined,
-  yearLabel: string,
+  completedLessons: number,
+  completedQuizzes: number,
   plan: ReturnType<typeof getCurriculumPlan>,
 ): number {
-  if (!prog) return 0;
-  const ids = parseCompleted(prog.completed_lesson_ids);
-  const prefix = lessonIdPrefix(yearLabel);
-  const completedLessons = ids.filter((id) => id.startsWith(prefix)).length;
-  const completedQuizzes = countCompletedQuizzes(prog.quiz_scores);
   const totalActivities = totalProgramActivities(plan);
   if (totalActivities <= 0) return 0;
   return Math.max(0, Math.min(100, Math.round(((completedLessons + completedQuizzes) / totalActivities) * 100)));
 }
 
 function computeStatus(prog: ProgressRow | undefined, completedCount: number, pct: number): StrandStatus {
-  if (!prog || (prog.week == null && completedCount === 0)) return "Not Started";
+  if (!prog) return completedCount > 0 ? (pct >= 100 ? "Completed" : "In Progress") : "Not Started";
+  if (prog.week == null && completedCount === 0) return "Not Started";
   if (pct >= 100) return "Completed";
   if (prog.pretest_score != null && prog.pretest_score < ASSESSMENT_PASS_THRESHOLD) return "Needs Support";
   // Latest post-test failed?
@@ -372,6 +467,7 @@ function buildWeekSummary(
 }
 
 function buildStudentWeeklyPerformanceSummary({
+  yearLabel,
   weekNumber,
   lessons,
   completedIds,
@@ -379,7 +475,9 @@ function buildStudentWeeklyPerformanceSummary({
   weekQuiz,
   fallbackStatus,
   liveRow,
+  liveEvents,
 }: {
+  yearLabel: string;
   weekNumber: number;
   lessons: Lesson[];
   completedIds: string[];
@@ -387,6 +485,7 @@ function buildStudentWeeklyPerformanceSummary({
   weekQuiz: JsonObject | undefined;
   fallbackStatus: StrandStatus;
   liveRow?: LiveStudentActivityRow | null;
+  liveEvents: LiveActivityEventRow[];
 }): WeeklyPerformanceSummary {
   const liveLessonMatch =
     liveRow &&
@@ -401,6 +500,7 @@ function buildStudentWeeklyPerformanceSummary({
     const summaryTotal = numberOrNull(latestSummary?.questionsAnswered);
     const summaryCorrect = numberOrNull(latestSummary?.correctAnswers);
     const summaryAccuracy = numberOrNull(latestSummary?.accuracy);
+    const eventSummary = buildEventLessonSummary(liveEvents, yearLabel, weekNumber, lesson);
 
     const liveMatchesThisLesson =
       liveLessonMatch &&
@@ -410,17 +510,18 @@ function buildStudentWeeklyPerformanceSummary({
     const liveCorrect = liveMatchesThisLesson ? numberOrNull(liveRow?.correct_count) : null;
     const liveAccuracy = liveMatchesThisLesson ? numberOrNull(liveRow?.accuracy_percent) : null;
 
-    const total = summaryTotal ?? liveTotal;
-    const correct = summaryCorrect ?? liveCorrect;
+    const total = summaryTotal ?? eventSummary.total ?? liveTotal;
+    const correct = summaryCorrect ?? eventSummary.correct ?? liveCorrect;
     const accuracy =
       summaryAccuracy ??
+      eventSummary.accuracy ??
       liveAccuracy ??
       (total && correct != null ? Math.round((correct / total) * 100) : null);
 
     const hasPersistedSummary = summaryTotal != null || summaryCorrect != null || summaryAccuracy != null;
-    const status: LessonCardPerformance["status"] = completedIds.includes(lesson.id) || hasPersistedSummary
+    const status: LessonCardPerformance["status"] = completedIds.includes(lesson.id) || hasPersistedSummary || eventSummary.completed
       ? "Completed"
-      : total != null || liveMatchesThisLesson
+      : total != null || liveMatchesThisLesson || eventSummary.started
         ? "In Progress"
         : "Not Started";
 
@@ -560,7 +661,7 @@ function liveRowToStatus(row?: LiveStudentActivityRow | undefined): StrandStatus
   return "Not Started";
 }
 
-export default function StrandStudentsPanel({ yearLabel, students, progress, liveRows }: Props) {
+export default function StrandStudentsPanel({ yearLabel, students, progress, liveRows, liveEvents }: Props) {
   const genres = getGenresForYear(yearLabel);
   const firstAvail = genres.find((g) => g.available) ?? genres[0];
   const [genreId, setGenreId] = useState<string>(firstAvail.id);
@@ -599,6 +700,10 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
     return liveRows.find((row) => row.student_id === studentId);
   }
 
+  function getStudentEvents(studentId: string) {
+    return liveEvents.filter((event) => event.student_id === studentId);
+  }
+
   function getWorkingYear(student: StudentRow): string {
     const liveYear = levelToYearLabel(getLiveRow(student.id)?.current_level);
     if (liveYear) return liveYear;
@@ -617,11 +722,15 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
       const workingYear = getWorkingYear(s);
       const prog = getProg(s.id, workingYear);
       const liveRow = getLiveRow(s.id);
-      const ids = prog ? parseCompleted(prog.completed_lesson_ids) : [];
+      const studentEvents = getStudentEvents(s.id);
+      const persistedIds = prog ? parseCompleted(prog.completed_lesson_ids) : [];
+      const eventIds = buildCompletedLessonIdsFromEvents(studentEvents, workingYear);
+      const ids = [...new Set([...persistedIds, ...eventIds])];
       const sPrefix = lessonIdPrefix(workingYear);
       const strandIds = isPlaceholder ? [] : ids.filter((id) => id.startsWith(sPrefix));
       const planForStudentYear = getCurriculumPlan(workingYear, genreId);
-      const pct = isPlaceholder ? 0 : overallProgramPercent(prog, workingYear, planForStudentYear);
+      const completedQuizzes = prog ? countCompletedQuizzes(prog.quiz_scores) : 0;
+      const pct = isPlaceholder ? 0 : overallProgramPercent(strandIds.length, completedQuizzes, planForStudentYear);
       const computedStatus = isPlaceholder ? "Not Started" : computeStatus(prog, strandIds.length, pct);
       const status = computedStatus === "Not Started" && liveRow ? liveRowToStatus(liveRow) : computedStatus;
       const week = isPlaceholder ? null : (prog?.week ?? liveRow?.current_week ?? null);
@@ -633,7 +742,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
       const flag = deriveStudentFlag(pickPrimaryInsight(weekInsights), status);
       const latestPretest = getLatestPretestProgress(s.id);
 
-      return { s, prog, liveRow, pct, status, week, schoolYear, workingYear, summary, flag, latestPretest };
+      return { s, prog, liveRow, studentEvents, pct, status, week, schoolYear, workingYear, summary, flag, latestPretest };
     })
     .sort((a, b) => {
       const dir = sortDir === "asc" ? 1 : -1;
@@ -755,7 +864,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
             No students enrolled yet.
           </div>
         ) : (
-          studentRows.map(({ s, prog, liveRow, pct, week, schoolYear, workingYear, latestPretest }) => {
+          studentRows.map(({ s, prog, liveRow, studentEvents, pct, week, schoolYear, workingYear, latestPretest }) => {
               const isOpen = expandedId === s.id;
 
             return (
@@ -796,6 +905,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                     genre={genre}
                     prog={prog}
                     liveRow={liveRow}
+                    liveEvents={studentEvents}
                     latestPretest={latestPretest}
                     isPlaceholder={isPlaceholder}
                     prefix={lessonIdPrefix(workingYear)}
@@ -813,7 +923,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
 /* ───────── Detail view ───────── */
 
 function StudentStrandDetail({
-  student, schoolYearLabel, yearLabel, genre, prog, liveRow, latestPretest, isPlaceholder, prefix,
+  student, schoolYearLabel, yearLabel, genre, prog, liveRow, liveEvents, latestPretest, isPlaceholder, prefix,
 }: {
   student: StudentRow;
   schoolYearLabel: string;
@@ -821,12 +931,15 @@ function StudentStrandDetail({
   genre: Genre;
   prog: ProgressRow | undefined;
   liveRow?: LiveStudentActivityRow | undefined;
+  liveEvents: LiveActivityEventRow[];
   latestPretest?: ProgressRow | undefined;
   isPlaceholder: boolean;
   prefix: string;
 }) {
   const plan = useMemo(() => getCurriculumPlan(yearLabel, genre.id), [yearLabel, genre.id]);
-  const ids = prog ? parseCompleted(prog.completed_lesson_ids) : [];
+  const persistedIds = prog ? parseCompleted(prog.completed_lesson_ids) : [];
+  const eventIds = buildCompletedLessonIdsFromEvents(liveEvents, yearLabel);
+  const ids = [...new Set([...persistedIds, ...eventIds])];
   const currentWeek = prog?.week ?? liveRow?.current_week ?? 1;
   const [selectedWeek, setSelectedWeek] = useState<number>(currentWeek);
   const [expandedWeek, setExpandedWeek] = useState<number | null>(null);
@@ -849,9 +962,10 @@ function StudentStrandDetail({
   const week = plan.find((p) => p.week === selectedWeek) ?? plan[0];
   const weekDone = weekLessonsDone(ids, week?.week ?? 1);
   const weekQuiz = quizScores[String(week?.week ?? 1)];  const weekQuizAttempts = getQuizAttemptsCount(weekQuiz);
-  const weekQuizInsight = (weekQuiz?.latestInsight ?? null) as TeacherInsight | null;  const overallPct = overallProgramPercent(prog, yearLabel, plan);
+  const weekQuizInsight = (weekQuiz?.latestInsight ?? null) as TeacherInsight | null;  const overallPct = overallProgramPercent(ids.filter((id) => id.startsWith(prefix)).length, countCompletedQuizzes(prog?.quiz_scores), plan);
   const summaryStatus = computeStatus(prog, ids.filter((id) => id.startsWith(prefix)).length, overallPct);
   const weekPerformance = buildStudentWeeklyPerformanceSummary({
+    yearLabel,
     weekNumber: week?.week ?? 1,
     lessons: week?.lessons ?? [],
     completedIds: ids,
@@ -859,6 +973,7 @@ function StudentStrandDetail({
     weekQuiz,
     fallbackStatus: summaryStatus,
     liveRow,
+    liveEvents,
   });
   const pretestScore = latestPretest?.pretest_score ?? null;
   const pretestSub =
@@ -867,6 +982,18 @@ function StudentStrandDetail({
       : pretestScore >= ASSESSMENT_PASS_THRESHOLD
         ? `${yearToLevelLabel(latestPretest?.year ?? yearLabel)} pre-test passed · ${timeAgo(latestPretest?.updated_at)}`
         : `${yearToLevelLabel(latestPretest?.year ?? yearLabel)} assigned · ${timeAgo(latestPretest?.updated_at)}`;
+
+  if (process.env.NODE_ENV !== "production") {
+    console.debug("[StudentsTabDebug]", {
+      student_id: student.id,
+      working_level: yearLabel,
+      week: week?.week ?? 1,
+      expected_lesson_ids: (week?.lessons ?? []).map((lesson) => lesson.id),
+      saved_completed_lesson_ids: ids,
+      matched_attempt_count: Object.keys(lessonAttempts).filter((key) => (week?.lessons ?? []).some((lesson) => lesson.id === key)).length,
+      matching_event_ids: eventIds,
+    });
+  }
 
   // Teacher insights
   const insights: string[] = [];
