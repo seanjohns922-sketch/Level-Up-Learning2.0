@@ -508,7 +508,17 @@ export default function LiveClassPanel({
                         style={{ width: `${card.progressPercent}%` }}
                       />
                     </div>
-                    <div className="mt-2 text-sm font-semibold text-slate-700">{card.progressLabel}</div>
+                    <div className="mt-2 flex items-center justify-between gap-2">
+                      <div className="text-sm font-semibold text-slate-700">{card.progressLabel}</div>
+                      {(card.questionsAnswered ?? 0) > 0 ? (
+                        <div className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1">
+                          <span className="text-[13px] font-black text-slate-900">
+                            {card.correctCount ?? 0}/{card.questionsAnswered ?? 0}
+                          </span>
+                          <span className="text-[10px] font-bold text-slate-400">correct</span>
+                        </div>
+                      ) : null}
+                    </div>
                   </div>
 
                   <div className="mt-4 grid gap-2 text-sm text-slate-600">
@@ -518,12 +528,6 @@ export default function LiveClassPanel({
                         ? `${card.currentLessonTitle ?? card.currentLesson ?? "Lesson"} completed`
                         : (card.currentQuestionText ?? card.lastEventText)}
                     </div>
-                    {(card.questionsAnswered ?? 0) > 0 ? (
-                      <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-slate-600">
-                        <span>Correct: {card.correctCount ?? 0} / {card.questionsAnswered ?? 0}</span>
-                        <span>Accuracy: {card.accuracyPercent ?? 0}%</span>
-                      </div>
-                    ) : null}
                     <div className="flex items-center justify-between text-xs text-slate-500">
                       <span>{card.currentLessonStatus === "completed" ? "Completed lesson" : card.lastEventText}</span>
                       <span>{formatRelativeTime(card.lastActiveAt)}</span>
