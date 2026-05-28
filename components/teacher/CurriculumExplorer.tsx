@@ -16,7 +16,24 @@ type ProgressLike = {
   year: string;
   week: number | null;
   completed_lesson_ids: string[] | null;
-  quiz_scores?: Record<string, unknown>;
+  quiz_scores?: unknown;
+};
+
+type QuizLessonBreakdownItem = {
+  lessonNumber?: number;
+  correct?: number;
+  total?: number;
+};
+
+type QuizScoreLike = {
+  percent?: number;
+  score?: number;
+  correct?: number;
+  total?: number;
+  accuracy?: number;
+  status?: string;
+  completedAt?: string;
+  lessonBreakdown?: QuizLessonBreakdownItem[];
 };
 
 type Props = {
@@ -82,8 +99,38 @@ export default function CurriculumExplorer({
     return total === 0 ? 0 : Math.round((done / total) * 100);
   }
 
-  function parseQuiz(raw: unknown): Record<string, unknown> {
-    return raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
+  function parseQuizLessonBreakdown(raw: unknown): QuizLessonBreakdownItem[] {
+    if (!Array.isArray(raw)) return [];
+    return raw
+      .filter((item) => item && typeof item === "object")
+      .map((item) => {
+        const record = item as Record<string, unknown>;
+        return {
+          lessonNumber: typeof record.lessonNumber === "number" ? record.lessonNumber : undefined,
+          correct: typeof record.correct === "number" ? record.correct : undefined,
+          total: typeof record.total === "number" ? record.total : undefined,
+        };
+      });
+  }
+
+  function parseQuiz(raw: unknown): Record<string, QuizScoreLike> {
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return {};
+    const parsed: Record<string, QuizScoreLike> = {};
+    for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
+      if (!value || typeof value !== "object" || Array.isArray(value)) continue;
+      const record = value as Record<string, unknown>;
+      parsed[key] = {
+        percent: typeof record.percent === "number" ? record.percent : undefined,
+        score: typeof record.score === "number" ? record.score : undefined,
+        correct: typeof record.correct === "number" ? record.correct : undefined,
+        total: typeof record.total === "number" ? record.total : undefined,
+        accuracy: typeof record.accuracy === "number" ? record.accuracy : undefined,
+        status: typeof record.status === "string" ? record.status : undefined,
+        completedAt: typeof record.completedAt === "string" ? record.completedAt : undefined,
+        lessonBreakdown: parseQuizLessonBreakdown(record.lessonBreakdown),
+      };
+    }
+    return parsed;
   }
 
   /** Class average quiz accuracy % for a week (across all students who attempted). */
@@ -93,7 +140,7 @@ export default function CurriculumExplorer({
     for (const p of yearProgress) {
       const qs = parseQuiz(p.quiz_scores);
       const wq = qs[String(w)];
-      if (wq && typeof wq.percent === "number") {
+      if (typeof wq?.percent === "number") {
         sum += wq.percent;
         n += 1;
       }
@@ -109,11 +156,11 @@ export default function CurriculumExplorer({
     for (const p of yearProgress) {
       const qs = parseQuiz(p.quiz_scores);
       const wq = qs[String(w)];
-      const lb = Array.isArray(wq?.lessonBreakdown) ? wq.lessonBreakdown : [];
-      const item = lb.find((x: unknown) => Number((x as Record<string, unknown>)?.lessonNumber) === lessonNumber);
-      if (item && typeof (item as Record<string, unknown>).correct === "number" && typeof (item as Record<string, unknown>).total === "number" && (item as Record<string, unknown>).total as number > 0) {
-        sumCorrect += (item as Record<string, unknown>).correct as number;
-        sumTotal += (item as Record<string, unknown>).total as number;
+      const lb = wq?.lessonBreakdown ?? [];
+      const item = lb.find((entry) => entry.lessonNumber === lessonNumber);
+      if (typeof item?.correct === "number" && typeof item.total === "number" && item.total > 0) {
+        sumCorrect += item.correct;
+        sumTotal += item.total;
         n += 1;
       }
     }
