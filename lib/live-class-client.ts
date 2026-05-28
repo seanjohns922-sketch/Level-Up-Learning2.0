@@ -72,6 +72,7 @@ type LiveStudentActivityRow = {
   accuracy_percent?: number | null;
   current_lesson_status?: string | null;
   completed_at?: string | null;
+  lesson_started_at?: string | null;
   skill_tag?: string | null;
   misconception_tag?: string | null;
   ai_status?: string | null;
@@ -185,6 +186,11 @@ function buildNextActivityRow(
     completedAt = null;
   }
 
+  const lessonStartedAt =
+    (input.eventType === "lesson_started" || input.eventType === "quiz_started")
+      ? timestamp
+      : (existing?.lesson_started_at ?? null);
+
   if (input.eventType === "lesson_completed" || input.eventType === "quiz_completed") {
     currentLessonStatus = "completed";
     completedAt = timestamp;
@@ -233,6 +239,7 @@ function buildNextActivityRow(
     attempt_number: input.attemptNumber ?? existing?.attempt_number ?? null,
     skill_tag: input.skillTag ?? existing?.skill_tag ?? null,
     misconception_tag: input.misconceptionTag ?? existing?.misconception_tag ?? null,
+    lesson_started_at: lessonStartedAt,
     last_active_at: timestamp,
     updated_at: timestamp,
   };

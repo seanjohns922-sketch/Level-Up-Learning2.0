@@ -62,6 +62,7 @@ type LiveStudentActivityRow = {
   accuracy_percent?: number | null;
   current_lesson_status?: string | null;
   completed_at?: string | null;
+  lesson_started_at?: string | null;
   skill_tag?: string | null;
   misconception_tag?: string | null;
   ai_status?: LiveStudentStatus | null;
@@ -97,6 +98,7 @@ type LiveStudentCard = {
   accuracyPercent?: number | null;
   currentLessonStatus?: string | null;
   completedAt?: string | null;
+  lessonStartedAt?: string | null;
   aiIssue?: string | null;
   aiLikelyGap?: string | null;
   aiSuggestedAction?: string | null;
@@ -181,6 +183,7 @@ function toLiveCard(student: StudentRow, row?: LiveStudentActivityRow | null): L
     accuracyPercent: row?.accuracy_percent ?? null,
     currentLessonStatus: row?.current_lesson_status ?? null,
     completedAt: row?.completed_at ?? null,
+    lessonStartedAt: row?.lesson_started_at ?? null,
     aiIssue: insight?.issue ?? row?.ai_issue ?? null,
     aiLikelyGap: insight?.likelyGap ?? row?.ai_likely_gap ?? null,
     aiSuggestedAction: insight?.suggestedTeacherAction ?? row?.ai_suggested_action ?? null,
@@ -197,6 +200,20 @@ function formatLocation(card: LiveStudentCard) {
     card.currentActivityLabel ? card.currentActivityLabel : null,
   ].filter(Boolean);
   return parts.length > 0 ? parts.join(" · ") : "No live lesson yet";
+}
+
+const LESSON_DURATION_SECS = 9 * 60;
+
+function formatLessonTimer(lessonStartedAt: string | null | undefined, now: number): string | null {
+  if (!lessonStartedAt) return null;
+  const elapsed = Math.floor((now - new Date(lessonStartedAt).getTime()) / 1000);
+  if (elapsed < 0) return null;
+  const mins = Math.floor(elapsed / 60);
+  const secs = elapsed % 60;
+  if (elapsed >= LESSON_DURATION_SECS) {
+    return `${mins}m (over 9min)`;
+  }
+  return `${mins}m ${secs}s / 9min`;
 }
 
 function statusFilterLabel(filter: LiveStatusFilter) {
@@ -224,6 +241,12 @@ export default function LiveClassPanel({
   const [rows, setRows] = useState<LiveStudentActivityRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<LiveStatusFilter>("all");
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
   const [spotlightMode, setSpotlightMode] = useState(false);
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [selectedStudentEvents, setSelectedStudentEvents] = useState<LiveStudentEventRow[]>([]);
@@ -461,6 +484,7 @@ export default function LiveClassPanel({
                   onClick={() => setSelectedStudentId(card.id)}
                   className={`group rounded-3xl border bg-white p-4 text-left shadow-[0_14px_36px_rgba(15,23,42,0.07)] transition hover:-translate-y-0.5 hover:shadow-[0_18px_48px_rgba(15,23,42,0.12)] ${tone.border}`}
                 >
+                  {/* Header: name + badges */}
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <div className="text-lg font-black text-slate-900">{card.displayName}</div>
@@ -489,58 +513,60 @@ export default function LiveClassPanel({
                     </div>
                   </div>
 
-                  <div className="mt-4">
-                    <div className="flex items-center justify-between text-[11px] font-mono uppercase tracking-[0.16em] text-slate-500">
-                      <span>Progress</span>
-                      <span>{card.progressPercent}%</span>
-                    </div>
-                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
-                      <div
-                        className={`h-full rounded-full ${
-                          card.status === "needs_support"
-                            ? "bg-rose-500"
-                            : card.status === "check_in"
-                            ? "bg-amber-400"
-                            : card.status === "idle"
-                            ? "bg-slate-300"
-                            : "bg-emerald-500"
-                        }`}
-                        style={{ width: `${card.progressPercent}%` }}
-                      />
-                    </div>
-                    <div className="mt-2 flex items-center justify-between gap-2">
-                      <div className="text-sm font-semibold text-slate-700">{card.progressLabel}</div>
+                  {/* Score + lesson timer */}
+                  <div className="mt-3 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
                       {(card.questionsAnswered ?? 0) > 0 ? (
-                        <div className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1">
-                          <span className="text-[13px] font-black text-slate-900">
-                            {card.correctCount ?? 0}/{card.questionsAnswered ?? 0}
-                          </span>
-                          <span className="text-[10px] font-bold text-slate-400">correct</span>
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-2xl font-black text-slate-900">{card.correctCount ?? 0}/{card.questionsAnswered ?? 0}</span>
+                          <span className="text-[11px] font-bold text-slate-400">correct</span>
                         </div>
+                      ) : (
+                        <div className="text-sm font-semibold text-slate-400">No answers yet</div>
+                      )}
+                      {(card.questionsAnswered ?? 0) > 0 && (card.accuracyPercent ?? 0) > 0 ? (
+                        <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${
+                          (card.accuracyPercent ?? 0) >= 80
+                            ? "bg-emerald-50 text-emerald-700"
+                            : (card.accuracyPercent ?? 0) >= 60
+                            ? "bg-amber-50 text-amber-700"
+                            : "bg-rose-50 text-rose-700"
+                        }`}>
+                          {card.accuracyPercent ?? 0}%
+                        </span>
                       ) : null}
                     </div>
+                    {formatLessonTimer(card.lessonStartedAt, now) ? (
+                      <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-bold text-slate-500 tabular-nums">
+                        {formatLessonTimer(card.lessonStartedAt, now)}
+                      </span>
+                    ) : null}
                   </div>
 
-                  <div className="mt-4 grid gap-2 text-sm text-slate-600">
-                    <div>{card.currentActivityLabel ?? "No current activity recorded"}</div>
-                    <div className="line-clamp-2 text-slate-500">
+                  {/* Current question */}
+                  <div className="mt-3 grid gap-1.5 text-sm">
+                    <div className="font-semibold text-slate-700">
+                      {card.currentActivityLabel ?? "No activity yet"}
+                    </div>
+                    <div className="line-clamp-2 text-slate-500 text-xs">
                       {card.currentLessonStatus === "completed"
                         ? `${card.currentLessonTitle ?? card.currentLesson ?? "Lesson"} completed`
                         : (card.currentQuestionText ?? card.lastEventText)}
                     </div>
-                    <div className="flex items-center justify-between text-xs text-slate-500">
-                      <span>{card.currentLessonStatus === "completed" ? "Completed lesson" : card.lastEventText}</span>
-                      <span>{formatRelativeTime(card.lastActiveAt)}</span>
-                    </div>
-                    <div className="text-xs text-slate-500">
-                      Time active: {formatTimeActive(card.timeOnCurrentQuestion)}
-                    </div>
-                    {card.aiIssue && card.status !== "on_track" ? (
-                      <div className={`rounded-xl border px-3 py-2 text-xs font-semibold ${tone.badge}`}>
-                        {card.aiIssue}
-                      </div>
-                    ) : null}
                   </div>
+
+                  {/* Footer: last event + time */}
+                  <div className="mt-3 flex items-center justify-between text-xs text-slate-400">
+                    <span>{card.currentLessonStatus === "completed" ? "Completed lesson" : card.lastEventText}</span>
+                    <span>{formatRelativeTime(card.lastActiveAt)}</span>
+                  </div>
+
+                  {/* AI insight — alert states only */}
+                  {card.aiIssue && card.status !== "on_track" ? (
+                    <div className={`mt-3 rounded-xl border px-3 py-2 text-xs font-semibold ${tone.badge}`}>
+                      {card.aiIssue}
+                    </div>
+                  ) : null}
                 </button>
               );
             })}
