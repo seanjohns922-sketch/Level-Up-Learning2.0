@@ -190,8 +190,15 @@ function LessonPage() {
       resetPrepSessionTaskState();
     }
   }, [effectiveLessonId, isGroundCustomLesson, week, year]);
+  const lessonFinalizedRef = useRef(false);
 
   async function completeLesson() {
+    if (lessonFinalizedRef.current) {
+      router.push(`/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1`);
+      return;
+    }
+    lessonFinalizedRef.current = true;
+
     markLessonComplete(year, week, lessonNumber);
     const progress = readProgress();
     let nextAssignedWeek = progress?.assignedWeek;
@@ -211,7 +218,28 @@ function LessonPage() {
     if (studentId) {
       try {
         if (latestLessonSummaryRef.current) {
+          await trackLiveLearningEvent({
+            eventType: "lesson_completed",
+            level: liveLessonContext.level,
+            strand: liveLessonContext.strand,
+            week: liveLessonContext.week,
+            lessonId: liveLessonContext.lessonId,
+            lessonTitle: liveLessonContext.lessonTitle,
+            progressPercent: 100,
+            progressLabel: `Completed ${latestLessonSummaryRef.current.questionsAnswered} questions`,
+          });
           await persistLessonPerformanceSummary(latestLessonSummaryRef.current);
+        } else {
+          await trackLiveLearningEvent({
+            eventType: "lesson_completed",
+            level: liveLessonContext.level,
+            strand: liveLessonContext.strand,
+            week: liveLessonContext.week,
+            lessonId: liveLessonContext.lessonId,
+            lessonTitle: liveLessonContext.lessonTitle,
+            progressPercent: 100,
+            progressLabel: "Lesson completed",
+          });
         }
 
         const { error } = await supabase.rpc("save_lesson_completion", {
@@ -249,16 +277,13 @@ function LessonPage() {
   const showWeek12Lesson3Summary = week === 12 && lessonNumber === 3;
   const savedLessonSummaryKeysRef = useRef<Set<string>>(new Set());
   const latestLessonSummaryRef = useRef<LessonPerformanceSummary | null>(null);
-  const liveLessonContext = useMemo(
-    () => ({
-      level: year,
-      strand: "Number",
-      week,
-      lessonId: effectiveLessonId,
-      lessonTitle: safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`,
-    }),
-    [effectiveLessonId, lessonNumber, safeLessonTitle, week, year]
-  );
+  const liveLessonContext = {
+    level: year,
+    strand: "Number",
+    week,
+    lessonId: effectiveLessonId,
+    lessonTitle: safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`,
+  };
 
   async function persistLessonPerformanceSummary(summary: LessonPerformanceSummary) {
     latestLessonSummaryRef.current = summary;
