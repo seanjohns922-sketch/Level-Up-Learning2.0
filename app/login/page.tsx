@@ -158,12 +158,17 @@ export default function LoginPage() {
       return;
     }
 
-    const studentWorkingYear = normalizeWorkingLevelLabel(student.working_level ?? student.year_level) ?? null;
-    const studentSchoolYear = normalizeSchoolYearLabel(student.school_year_level) ?? null;
+    const explicitWorkingYear = normalizeWorkingLevelLabel(student.working_level) ?? null;
+    const legacyWorkingYear = normalizeWorkingLevelLabel(student.year_level) ?? null;
+    const studentWorkingYear = explicitWorkingYear ?? legacyWorkingYear;
+    const studentSchoolYear =
+      normalizeSchoolYearLabel(student.school_year_level) ??
+      normalizeSchoolYearLabel(student.year_level) ??
+      null;
 
     setActiveStudentProfile(student.student_id, student.class_id, {
       displayName,
-      yearLevel: studentWorkingYear ?? studentSchoolYear ?? "Year 1",
+      yearLevel: studentSchoolYear ?? studentWorkingYear ?? "Year 1",
     });
 
     let progress = readProgress();
@@ -176,12 +181,12 @@ export default function LoginPage() {
       console.warn("[Login] Could not restore student progress from Supabase", error);
     }
 
-    if (!progress && studentWorkingYear) {
+    if (!progress) {
       progress = {
-        year: studentWorkingYear,
+        year: studentSchoolYear ?? studentWorkingYear ?? "Year 1",
         scorePercent: 0,
         status: "ASSIGNED_PROGRAM",
-        placementComplete: true,
+        placementComplete: false,
         assignedWeek: 1,
         requiredWeeks: [],
         optionalWeeks: [],
