@@ -38,7 +38,17 @@ export default function SurgeAmbience({ comboCount }: { comboCount: number }) {
           delay: delaySeed * 4,
           duration: 4 + durationSeed * 4,
           size: 2 + sizeSeed * (tier >= 3 ? 5 : 3),
-          hue: tier >= 4 ? (hueSeed < 0.3 ? 280 : 45) : tier >= 3 ? (hueSeed < 0.3 ? 25 : 45) : 48,
+          // Tier 4 (Nexus) → teal/emerald. Tier 3 → orange/gold. Lower tiers → gold.
+          hue:
+            tier >= 4
+              ? hueSeed < 0.5
+                ? 168 // teal
+                : 152 // emerald
+              : tier >= 3
+              ? hueSeed < 0.3
+                ? 25
+                : 45
+              : 48,
         };
       });
     },
@@ -55,7 +65,7 @@ export default function SurgeAmbience({ comboCount }: { comboCount: number }) {
       ? "radial-gradient(ellipse at 50% 100%, rgba(253,200,40,0.22) 0%, transparent 60%), radial-gradient(ellipse at 50% 0%, rgba(253,224,71,0.14) 0%, transparent 55%), radial-gradient(ellipse at 0% 50%, rgba(251,191,36,0.10) 0%, transparent 45%), radial-gradient(ellipse at 100% 50%, rgba(251,191,36,0.10) 0%, transparent 45%)"
       : tier === 3
       ? "radial-gradient(ellipse at 50% 100%, rgba(251,146,60,0.30) 0%, transparent 65%), radial-gradient(ellipse at 50% 0%, rgba(253,224,71,0.22) 0%, transparent 60%), radial-gradient(ellipse at 0% 50%, rgba(251,146,60,0.16) 0%, transparent 50%), radial-gradient(ellipse at 100% 50%, rgba(251,146,60,0.16) 0%, transparent 50%)"
-      : "radial-gradient(ellipse at 50% 100%, rgba(251,191,36,0.35) 0%, transparent 70%), radial-gradient(ellipse at 50% 0%, rgba(167,139,250,0.28) 0%, transparent 65%), radial-gradient(ellipse at 0% 50%, rgba(253,186,116,0.22) 0%, transparent 55%), radial-gradient(ellipse at 100% 50%, rgba(196,181,253,0.22) 0%, transparent 55%)";
+      : "radial-gradient(ellipse at 50% 100%, rgba(45,212,191,0.42) 0%, transparent 70%), radial-gradient(ellipse at 50% 0%, rgba(16,185,129,0.32) 0%, transparent 65%), radial-gradient(ellipse at 0% 50%, rgba(94,234,212,0.26) 0%, transparent 55%), radial-gradient(ellipse at 100% 50%, rgba(45,212,191,0.26) 0%, transparent 55%)";
 
   const pulseSpeed = tier === 1 ? "5s" : tier === 2 ? "3.5s" : tier === 3 ? "2.4s" : "1.6s";
 
@@ -108,7 +118,7 @@ export default function SurgeAmbience({ comboCount }: { comboCount: number }) {
             style={{
               background:
                 tier >= 4
-                  ? "linear-gradient(to top, rgba(251,191,36,0.45), rgba(167,139,250,0.18), transparent)"
+                  ? "linear-gradient(to top, rgba(45,212,191,0.5), rgba(16,185,129,0.22), transparent)"
                   : tier >= 3
                   ? "linear-gradient(to top, rgba(251,146,60,0.42), transparent)"
                   : "linear-gradient(to top, rgba(253,200,40,0.32), transparent)",
