@@ -240,6 +240,38 @@ function LessonPage() {
             progressPercent: 100,
             progressLabel: "Lesson completed",
           });
+
+          const fallbackAttempt = {
+            at: new Date().toISOString(),
+            completedAt: new Date().toISOString(),
+            completed: true,
+            lessonId: effectiveLessonId,
+            lessonNumber,
+            title: liveLessonContext.lessonTitle,
+            questionsAnswered: 0,
+            totalQuestions: 0,
+            correctAnswers: 0,
+            correctCount: 0,
+            accuracy: 0,
+            accuracyPercent: 0,
+            timeSpentSeconds: 0,
+            topicSummaries: [],
+            strengths: [],
+            areasToImprove: [],
+            struggledQuestionTypes: [],
+            insight: null,
+          };
+
+          const { error: fallbackError } = await supabase.rpc("save_lesson_progress", {
+            p_student_id: studentId,
+            p_year: year,
+            p_week: week,
+            p_lesson_id: effectiveLessonId,
+            p_attempt: fallbackAttempt,
+          });
+          if (fallbackError) {
+            throw fallbackError;
+          }
         }
 
         const { error } = await supabase.rpc("save_lesson_completion", {
@@ -249,7 +281,7 @@ function LessonPage() {
           p_lesson_id: effectiveLessonId,
         });
         if (error) {
-          console.warn("[Lesson] Completion save failed:", error);
+          throw error;
         }
 
         const latest = readProgress();
@@ -263,7 +295,10 @@ function LessonPage() {
           unlocked_legends: latest?.unlockedLegends ?? progress?.unlockedLegends ?? [],
         });
       } catch (error) {
+        lessonFinalizedRef.current = false;
         console.warn("[Lesson] Final completion sync failed:", error);
+        window.alert("We couldn't save this lesson yet. Please try again.");
+        return;
       }
     }
 
@@ -324,13 +359,20 @@ function LessonPage() {
         console.warn("[Lesson] Insight generation failed:", error);
       }
 
+      const completedAt = new Date().toISOString();
       const attempt = {
-        at: new Date().toISOString(),
+        at: completedAt,
+        completedAt,
+        completed: true,
         lessonId: effectiveLessonId,
+        lessonNumber,
         title: summary.lessonTitle,
         questionsAnswered: summary.questionsAnswered,
+        totalQuestions: summary.questionsAnswered,
         correctAnswers: summary.correctAnswers,
+        correctCount: summary.correctAnswers,
         accuracy: summary.accuracy,
+        accuracyPercent: summary.accuracy,
         timeSpentSeconds: summary.timeSpentSeconds,
         topicSummaries: summary.topicSummaries,
         strengths: summary.strengths,
@@ -348,10 +390,11 @@ function LessonPage() {
       });
 
       if (error) {
-        console.warn("[Lesson] DB save error:", error);
+        throw error;
       }
     } catch (error) {
       console.warn("[Lesson] Persist summary failed:", error);
+      throw error;
     }
   }
 

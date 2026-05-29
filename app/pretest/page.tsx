@@ -9,8 +9,23 @@ import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCa
 import AssessmentShell from "@/components/assessment/AssessmentShell";
 import { analyzeAssessmentResult, isAssessmentAnswerCorrect } from "@/data/assessments/analysis";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, type StudentProgress, writeProgress } from "@/data/progress";
-import { clearYearProgress } from "@/lib/program-progress";
+import { ALL_PROGRAM_WEEKS, clearYearProgress, getOptionalWeeks, normalizeWeekList } from "@/lib/program-progress";
+import { saveStudentProgressState } from "@/lib/student-progress-sync";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
+
+const PRETEST_PASS_THRESHOLD = 85;
+const YEAR_SEQUENCE = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"] as const;
+
+function getNextYearLabel(year: string) {
+  const index = YEAR_SEQUENCE.indexOf(year as (typeof YEAR_SEQUENCE)[number]);
+  if (index === -1) return null;
+  return YEAR_SEQUENCE[index + 1] ?? null;
+}
+
+function getLowestRecommendedWeek(recommendedWeeks: number[] | undefined) {
+  if (!recommendedWeeks?.length) return undefined;
+  return Math.min(...recommendedWeeks);
+}
 
 /* ── Inline visuals (kept from original) ── */
 
@@ -350,7 +365,7 @@ function PretestPage() {
     if (index > 0) setIndex(index - 1);
   }
 
-  function finish() {
+  async function finish() {
     const score = answers.reduce((acc, answer, i) => {
       const q = questions[i];
       if (!answer) return acc;
@@ -377,22 +392,88 @@ function PretestPage() {
       studentId,
     });
     clearYearProgress(year);
+
     const prev = readProgress();
-    const nextProgress: StudentProgress = {
-      ...(prev ?? {
+    const prevUnlocked = prev?.unlockedLegends ?? [];
+    const nextYear = getNextYearLabel(year);
+    const passed = profile.percentage >= PRETEST_PASS_THRESHOLD;
+    const diagnosticRequiredWeeks = normalizeWeekList(profile.recommendedWeeks);
+    const requiresFullPathway = !passed && profile.percentage < PRETEST_PASS_THRESHOLD;
+    const requiredWeeks = passed
+      ? []
+      : requiresFullPathway || diagnosticRequiredWeeks.length === 0
+        ? ALL_PROGRAM_WEEKS
+        : diagnosticRequiredWeeks;
+    const optionalWeeks = passed
+      ? ALL_PROGRAM_WEEKS
+      : requiresFullPathway
+        ? []
+        : getOptionalWeeks(requiredWeeks);
+
+    let nextProgress: StudentProgress;
+
+    if (passed) {
+      nextProgress = {
+        ...(prev ?? {
+          year,
+          scorePercent: 0,
+          status: "ASSIGNED_PROGRAM" as const,
+          unlockedLegends: [],
+        }),
+        year: nextYear ?? year,
+        scorePercent: profile.percentage,
+        status: "PASSED",
+        placementComplete: !nextYear,
+        assignedWeek: prev?.assignedWeek,
+        assignedWeeksHistory: prev?.assignedWeeksHistory,
+        requiredWeeks: [],
+        optionalWeeks: ALL_PROGRAM_WEEKS,
+        unlockedLegends: prevUnlocked,
+        lastPreTestPercent: profile.percentage,
+        lastPreTestProfile: profile,
+      };
+    } else {
+      const assignedWeek = profile.assignedWeek ?? getLowestRecommendedWeek(profile.recommendedWeeks) ?? 1;
+      nextProgress = {
+        ...(prev ?? {
+          year,
+          scorePercent: 0,
+          status: "ASSIGNED_PROGRAM" as const,
+          unlockedLegends: [],
+        }),
         year,
-        scorePercent: 0,
-        status: "ASSIGNED_PROGRAM" as const,
-        unlockedLegends: [],
-      }),
-      year,
-      scorePercent: profile.percentage,
-      placementComplete: false,
-      lastPreTestPercent: profile.percentage,
-      lastPreTestProfile: profile,
-      unlockedLegends: prev?.unlockedLegends ?? [],
-    };
+        scorePercent: profile.percentage,
+        status: "ASSIGNED_PROGRAM",
+        placementComplete: true,
+        assignedWeek,
+        requiredWeeks,
+        optionalWeeks,
+        unlockedLegends: prevUnlocked,
+        lastPreTestPercent: profile.percentage,
+        lastPreTestProfile: profile,
+      };
+    }
+
     writeProgress(nextProgress);
+
+    if (studentId) {
+      try {
+        await saveStudentProgressState(studentId, year, {
+          pretest_score: profile.percentage,
+          status: nextProgress.status === "PASSED" ? "PASSED" : "ASSIGNED_PROGRAM",
+          week: nextProgress.assignedWeek ?? 1,
+          placement_complete: nextProgress.placementComplete ?? false,
+          assigned_week: nextProgress.assignedWeek ?? null,
+          required_weeks: nextProgress.requiredWeeks ?? [],
+          optional_weeks: nextProgress.optionalWeeks ?? [],
+          unlocked_legends: nextProgress.unlockedLegends ?? [],
+        });
+      } catch (error) {
+        console.warn("[Pretest] DB save failed:", error);
+        window.alert("We couldn't save your pre-test result yet. Please try again.");
+        return;
+      }
+    }
 
     router.push(
       `/results?year=${encodeURIComponent(year)}&score=${score}&total=${questions.length}`

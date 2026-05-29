@@ -6601,19 +6601,45 @@ function SessionPage() {
     [quizWeekPlan]
   );
 
-  function completeLesson() {
+  async function completeLesson() {
     const store = readStore();
     setLessonComplete(store, year, week, n);
     writeStore(store);
 
-    // Persist lesson completion to Supabase so teacher dashboard reflects progress
-    // Uses SECURITY DEFINER RPC — students are anonymous so direct table access is blocked by RLS
-    (async () => {
-      try {
-        const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY) : null;
-        if (!studentId) return;
+    try {
+      const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY) : null;
+      if (studentId) {
         const yearNum = parseInt(year.replace(/\D/g, ""), 10) || 0;
         const lessonId = `y${yearNum}-w${week}-l${n}`;
+        const fallbackAttempt = {
+          at: new Date().toISOString(),
+          completedAt: new Date().toISOString(),
+          completed: true,
+          lessonId,
+          lessonNumber: n,
+          title: `Lesson ${n}`,
+          questionsAnswered: 0,
+          totalQuestions: 0,
+          correctAnswers: 0,
+          correctCount: 0,
+          accuracy: 0,
+          accuracyPercent: 0,
+          timeSpentSeconds: Math.max(0, elapsedSeconds),
+          topicSummaries: [],
+          strengths: [],
+          areasToImprove: [],
+          struggledQuestionTypes: [],
+          insight: null,
+        };
+
+        const { error: attemptError } = await supabase.rpc("save_lesson_progress", {
+          p_student_id: studentId,
+          p_year: year,
+          p_week: Number(week),
+          p_lesson_id: lessonId,
+          p_attempt: fallbackAttempt,
+        });
+        if (attemptError) throw attemptError;
 
         const { error } = await supabase.rpc("save_lesson_completion", {
           p_student_id: studentId,
@@ -6621,11 +6647,13 @@ function SessionPage() {
           p_week: Number(week),
           p_lesson_id: lessonId,
         });
-        if (error) console.warn("[Lesson] DB save error:", error);
-      } catch (e) {
-        console.warn("[Lesson] DB save failed:", e);
+        if (error) throw error;
       }
-    })();
+    } catch (e) {
+      console.warn("[Lesson] DB save failed:", e);
+      window.alert("We couldn't save this lesson yet. Please try again.");
+      return;
+    }
 
     // After Week 12 Lesson 3, route to post-test transition
     if (Number(week) === 12 && n === 3) {
