@@ -11,6 +11,7 @@ import {
   normalizeSchoolYearLabel,
   normalizeWorkingLevelLabel,
 } from "@/lib/studentLevelLabel";
+import { buildDisplayName } from "@/lib/studentName";
 
 type AddedStudent = { name: string; pin: string; claimCode: string };
 
@@ -37,7 +38,8 @@ export default function NewClassPage() {
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   // Student adding state
-  const [newStudentName, setNewStudentName] = useState("");
+  const [newStudentFirstName, setNewStudentFirstName] = useState("");
+  const [newStudentLastName, setNewStudentLastName] = useState("");
   const [newStudentSchoolYear, setNewStudentSchoolYear] = useState("");
   const [newStudentWorkingLevel, setNewStudentWorkingLevel] = useState("AUTO_PLACEMENT");
   const [newStudentPin, setNewStudentPin] = useState("");
@@ -139,7 +141,10 @@ export default function NewClassPage() {
   }
 
   async function addStudent() {
-    if (!newStudentName.trim() || !createdClassId) return;
+    const firstName = newStudentFirstName.trim();
+    const lastName = newStudentLastName.trim();
+    const displayName = buildDisplayName(firstName, lastName);
+    if (!firstName || !createdClassId) return;
     const schoolYear = normalizeSchoolYearLabel(newStudentSchoolYear);
     const workingYear = normalizeWorkingLevelLabel(newStudentWorkingLevel === "AUTO_PLACEMENT" ? null : newStudentWorkingLevel);
     if (!schoolYear) {
@@ -154,7 +159,7 @@ export default function NewClassPage() {
     setAddingStudent(true);
     const { data, error: stuErr } = await supabase.rpc("create_student_for_class", {
       class_uuid: createdClassId,
-      display_name_input: newStudentName.trim(),
+      display_name_input: displayName,
       pin_input: newStudentPin || null,
     });
 
@@ -175,7 +180,9 @@ export default function NewClassPage() {
         .insert({
           id: crypto.randomUUID(),
           class_id: createdClassId,
-          display_name: newStudentName.trim(),
+          display_name: displayName,
+          first_name: firstName,
+          last_name: lastName || null,
           pin: fallbackPin,
         })
         .select("id, pin, qr_token")
@@ -204,6 +211,9 @@ export default function NewClassPage() {
       await supabase
         .from("students")
         .update({
+          first_name: firstName,
+          last_name: lastName || null,
+          display_name: displayName,
           school_year_level: schoolYear,
           working_level: workingYear,
           year_level: workingYear,
@@ -213,10 +223,11 @@ export default function NewClassPage() {
     if (created) {
       setAddedStudents((prev) => [
         ...prev,
-        { name: newStudentName.trim(), pin: created.pin, claimCode: created.claim_code || "Pending setup" },
+        { name: displayName, pin: created.pin, claimCode: created.claim_code || "Pending setup" },
       ]);
     }
-    setNewStudentName("");
+    setNewStudentFirstName("");
+    setNewStudentLastName("");
     setNewStudentSchoolYear("");
     setNewStudentWorkingLevel("AUTO_PLACEMENT");
     setNewStudentPin("");
@@ -313,12 +324,19 @@ export default function NewClassPage() {
                 </div>
               )}
 
-              <div className="grid gap-2 md:grid-cols-[1fr_160px_180px_120px_auto]">
+              <div className="grid gap-2 md:grid-cols-[1fr_1fr_160px_180px_120px_auto]">
                 <input
-                  value={newStudentName}
-                  onChange={(e) => setNewStudentName(e.target.value)}
+                  value={newStudentFirstName}
+                  onChange={(e) => setNewStudentFirstName(e.target.value)}
                   onKeyDown={(e) => { if (e.key === "Enter") void addStudent(); }}
-                  placeholder="Student name"
+                  placeholder="First name"
+                  className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
+                />
+                <input
+                  value={newStudentLastName}
+                  onChange={(e) => setNewStudentLastName(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") void addStudent(); }}
+                  placeholder="Last name"
                   className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
                 />
                 <select
@@ -352,7 +370,7 @@ export default function NewClassPage() {
                 <button
                   type="button"
                   onClick={() => void addStudent()}
-                  disabled={addingStudent || !newStudentName.trim()}
+                  disabled={addingStudent || !newStudentFirstName.trim()}
                   className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-black text-white disabled:cursor-not-allowed disabled:bg-gray-300"
                 >
                   {addingStudent ? "Adding…" : "Add"}
@@ -377,7 +395,8 @@ export default function NewClassPage() {
                   setYearLevels([]);
                   setQrDataUrl(null);
                   setAddedStudents([]);
-                  setNewStudentName("");
+                  setNewStudentFirstName("");
+                  setNewStudentLastName("");
                   setNewStudentPin("");
                 }}
                 className="px-5 py-3 rounded-2xl bg-white border border-gray-200 text-gray-600 font-bold hover:bg-gray-50 transition"

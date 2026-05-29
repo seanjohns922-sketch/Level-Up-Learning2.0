@@ -10,6 +10,7 @@ import {
   normalizeSchoolYearLabel,
   normalizeWorkingLevelLabel,
 } from "@/lib/studentLevelLabel";
+import { buildDisplayName, resolveStudentNameParts } from "@/lib/studentName";
 
 const YEAR_LEVELS: Array<string> = [...SCHOOL_YEAR_LEVEL_OPTIONS];
 
@@ -26,6 +27,8 @@ type ClassRow = {
 type StudentRow = {
   id: string;
   display_name: string;
+  first_name?: string | null;
+  last_name?: string | null;
   username?: string | null;
   class_id: string | null;
   pin?: string | null;
@@ -49,10 +52,11 @@ type ParentStudentLinkRow = {
   status: string;
 };
 
-type StudentSortMode = "alphabetical" | "working_level" | "actual_year";
+type StudentSortMode = "display_name" | "first_name" | "last_name" | "working_level" | "actual_year";
 
 type EditForm = {
-  display_name: string;
+  first_name: string;
+  last_name: string;
   username: string;
   pin: string;
   school_year_level: string;
@@ -80,7 +84,8 @@ export default function TeacherClassesPage() {
   const [claimCodesByStudentId, setClaimCodesByStudentId] = useState<Record<string, string>>({});
   const [linkedStudentIds, setLinkedStudentIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
-  const [newStudentNames, setNewStudentNames] = useState<Record<string, string>>({});
+  const [newStudentFirstNames, setNewStudentFirstNames] = useState<Record<string, string>>({});
+  const [newStudentLastNames, setNewStudentLastNames] = useState<Record<string, string>>({});
   const [newStudentUsernames, setNewStudentUsernames] = useState<Record<string, string>>({});
   const [newStudentPins, setNewStudentPins] = useState<Record<string, string>>({});
   const [newStudentSchoolYears, setNewStudentSchoolYears] = useState<Record<string, string>>({});
@@ -95,7 +100,8 @@ export default function TeacherClassesPage() {
   // Student edit/archive state
   const [editingStudentId, setEditingStudentId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<EditForm>({
-    display_name: "",
+    first_name: "",
+    last_name: "",
     username: "",
     pin: "",
     school_year_level: "",
@@ -109,7 +115,7 @@ export default function TeacherClassesPage() {
   const [archivingClassId, setArchivingClassId] = useState<string | null>(null);
   const [deletingClassId, setDeletingClassId] = useState<string | null>(null);
   const [showArchivedClasses, setShowArchivedClasses] = useState(false);
-  const [studentSortMode, setStudentSortMode] = useState<StudentSortMode>("alphabetical");
+  const [studentSortMode, setStudentSortMode] = useState<StudentSortMode>("last_name");
   const [editingClassId, setEditingClassId] = useState<string | null>(null);
   const [editClassForm, setEditClassForm] = useState<{ name: string; year_levels: string[] }>({ name: "", year_levels: [] });
   const [savingClassEdit, setSavingClassEdit] = useState(false);
@@ -193,7 +199,6 @@ export default function TeacherClassesPage() {
     return normalizeWorkingLevelLabel(student.working_level ?? student.year_level) ?? null;
   }
 
-
   function linkStatus(studentId: string) {
     if (linkedStudentIds.has(studentId)) return "Home linked";
     if (claimCodesByStudentId[studentId]) return "Pending link";
@@ -201,12 +206,14 @@ export default function TeacherClassesPage() {
   }
 
   async function addStudentToClass(classId: string) {
-    const name = (newStudentNames[classId] ?? "").trim();
+    const firstName = (newStudentFirstNames[classId] ?? "").trim();
+    const lastName = (newStudentLastNames[classId] ?? "").trim();
+    const name = buildDisplayName(firstName, lastName);
     const username = (newStudentUsernames[classId] ?? "").trim();
     const pin = (newStudentPins[classId] ?? "").trim();
     const schoolYear = normalizeSchoolYearLabel(newStudentSchoolYears[classId] ?? "");
     const workingYear = normalizeWorkingLevelLabel(newStudentWorkingLevels[classId] ?? "");
-    if (!name) return;
+    if (!firstName) return;
     if (!schoolYear) {
       alert("Please select the student's school year level.");
       return;
@@ -250,6 +257,8 @@ export default function TeacherClassesPage() {
           id: crypto.randomUUID(),
           class_id: classId,
           display_name: name,
+          first_name: firstName || null,
+          last_name: lastName || null,
           username: username || null,
           pin: fallbackPin,
         })
@@ -287,13 +296,17 @@ export default function TeacherClassesPage() {
       await supabase
         .from("students")
         .update({
+          first_name: firstName || null,
+          last_name: lastName || null,
+          display_name: name,
           school_year_level: schoolYear,
           working_level: workingYear,
           year_level: workingYear,
         })
         .eq("id", created.student_id);
     }
-    setNewStudentNames((current) => ({ ...current, [classId]: "" }));
+    setNewStudentFirstNames((current) => ({ ...current, [classId]: "" }));
+    setNewStudentLastNames((current) => ({ ...current, [classId]: "" }));
     setNewStudentUsernames((current) => ({ ...current, [classId]: "" }));
     setNewStudentPins((current) => ({ ...current, [classId]: "" }));
     setNewStudentSchoolYears((current) => ({ ...current, [classId]: "" }));
@@ -302,9 +315,11 @@ export default function TeacherClassesPage() {
   }
 
   function startEdit(student: StudentRow) {
+    const nameParts = resolveStudentNameParts(student);
     setEditingStudentId(student.id);
     setEditForm({
-      display_name: student.display_name,
+      first_name: nameParts.firstName,
+      last_name: nameParts.lastName,
       username: student.username ?? "",
       pin: student.pin ?? "",
       school_year_level: resolveSchoolYearLabel(student),
@@ -318,7 +333,7 @@ export default function TeacherClassesPage() {
   }
 
   async function saveStudentEdit(studentId: string) {
-    if (!editForm.display_name.trim()) return;
+    if (!editForm.first_name.trim()) return;
     if (!normalizeSchoolYearLabel(editForm.school_year_level)) {
       alert("Please select the student's school year level.");
       return;
@@ -328,10 +343,13 @@ export default function TeacherClassesPage() {
       return;
     }
     setSavingEdit(true);
+    const displayName = buildDisplayName(editForm.first_name, editForm.last_name);
     const { error } = await supabase
       .from("students")
       .update({
-        display_name: editForm.display_name.trim(),
+        first_name: editForm.first_name.trim(),
+        last_name: editForm.last_name.trim() || null,
+        display_name: displayName,
         username: editForm.username.trim() || null,
         pin: editForm.pin || null,
         school_year_level: normalizeSchoolYearLabel(editForm.school_year_level),
@@ -348,7 +366,9 @@ export default function TeacherClassesPage() {
         s.id === studentId
           ? {
               ...s,
-              display_name: editForm.display_name.trim(),
+              first_name: editForm.first_name.trim(),
+              last_name: editForm.last_name.trim() || null,
+              display_name: displayName,
               username: editForm.username.trim() || null,
               pin: editForm.pin || null,
               school_year_level: normalizeSchoolYearLabel(editForm.school_year_level),
@@ -495,19 +515,33 @@ export default function TeacherClassesPage() {
     const index = YEAR_LEVELS.indexOf(label);
     return index === -1 ? Number.POSITIVE_INFINITY : index;
   };
+  const sortSchoolYearLabel = (student: StudentRow) => normalizeSchoolYearLabel(student.school_year_level);
+  const sortWorkingLevelLabel = (student: StudentRow) => normalizeWorkingLevelLabel(student.working_level);
 
   const sortStudentsForClass = (classId: string, includeArchived = false) => {
     const base = students.filter((s) => s.class_id === classId && (includeArchived ? true : !s.archived_at));
     return [...base].sort((a, b) => {
       if (studentSortMode === "working_level") {
-        const levelDiff = yearIndex(normalizeWorkingLevelLabel(a.working_level)) - yearIndex(normalizeWorkingLevelLabel(b.working_level));
+        const levelDiff = yearIndex(sortWorkingLevelLabel(a)) - yearIndex(sortWorkingLevelLabel(b));
         if (levelDiff !== 0) return levelDiff;
       }
       if (studentSortMode === "actual_year") {
-        const yearDiff = yearIndex(normalizeSchoolYearLabel(a.school_year_level)) - yearIndex(normalizeSchoolYearLabel(b.school_year_level));
+        const yearDiff = yearIndex(sortSchoolYearLabel(a)) - yearIndex(sortSchoolYearLabel(b));
         if (yearDiff !== 0) return yearDiff;
       }
-      return a.display_name.localeCompare(b.display_name, undefined, { sensitivity: "base" });
+      const aNames = resolveStudentNameParts(a);
+      const bNames = resolveStudentNameParts(b);
+      if (studentSortMode === "first_name") {
+        const firstDiff = aNames.firstName.localeCompare(bNames.firstName, undefined, { sensitivity: "base" });
+        if (firstDiff !== 0) return firstDiff;
+        return aNames.lastName.localeCompare(bNames.lastName, undefined, { sensitivity: "base" });
+      }
+      if (studentSortMode === "last_name") {
+        const lastDiff = aNames.lastName.localeCompare(bNames.lastName, undefined, { sensitivity: "base" });
+        if (lastDiff !== 0) return lastDiff;
+        return aNames.firstName.localeCompare(bNames.firstName, undefined, { sensitivity: "base" });
+      }
+      return aNames.displayName.localeCompare(bNames.displayName, undefined, { sensitivity: "base" });
     });
   };
 
@@ -515,7 +549,11 @@ export default function TeacherClassesPage() {
     ? "Working level"
     : studentSortMode === "actual_year"
       ? "School year"
-      : "Alphabetical";
+      : studentSortMode === "first_name"
+        ? "First name"
+        : studentSortMode === "last_name"
+          ? "Surname"
+          : "Full name";
 
   return (
     <main className="min-h-screen bg-[#fbf7f1] px-6 py-10">
@@ -530,7 +568,9 @@ export default function TeacherClassesPage() {
                 onChange={(event) => setStudentSortMode(event.target.value as StudentSortMode)}
                 className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
               >
-                <option value="alphabetical">Alphabetical</option>
+                <option value="display_name">Full name</option>
+                <option value="first_name">First name</option>
+                <option value="last_name">Surname</option>
                 <option value="working_level">Working level</option>
                 <option value="actual_year">School year</option>
               </select>
@@ -705,14 +745,23 @@ export default function TeacherClassesPage() {
 
                                   {/* Name */}
                                   <div>
-                                    <label className="text-xs font-bold text-gray-500 mb-1 block">Full Name *</label>
+                                    <label className="text-xs font-bold text-gray-500 mb-1 block">First Name *</label>
                                     <input
-                                      value={editForm.display_name}
-                                      onChange={(e) => setEditForm((f) => ({ ...f, display_name: e.target.value }))}
+                                      value={editForm.first_name}
+                                      onChange={(e) => setEditForm((f) => ({ ...f, first_name: e.target.value }))}
                                       className="w-full rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-blue-300"
-                                      placeholder="e.g. Sean Johns"
+                                      placeholder="e.g. Sean"
                                     />
-                                    <p className="text-[10px] text-gray-400 mt-1">Shown on the teacher dashboard</p>
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-bold text-gray-500 mb-1 block">Last Name</label>
+                                    <input
+                                      value={editForm.last_name}
+                                      onChange={(e) => setEditForm((f) => ({ ...f, last_name: e.target.value }))}
+                                      className="w-full rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-blue-300"
+                                      placeholder="e.g. Johns"
+                                    />
+                                    <p className="text-[10px] text-gray-400 mt-1">Display name is generated from first + last name.</p>
                                   </div>
 
                                   {/* Login credentials */}
@@ -791,7 +840,7 @@ export default function TeacherClassesPage() {
                                     <button
                                       type="button"
                                       onClick={() => saveStudentEdit(s.id)}
-                                      disabled={savingEdit || !editForm.display_name.trim()}
+                                      disabled={savingEdit || !editForm.first_name.trim()}
                                       className="rounded-xl bg-blue-600 px-4 py-2 text-xs font-black text-white disabled:opacity-50"
                                     >
                                       {savingEdit ? "Saving…" : "Save"}
@@ -818,7 +867,7 @@ export default function TeacherClassesPage() {
                               >
                                 <div>
                                   <div className="flex flex-wrap items-center gap-2">
-                                    <span className="font-semibold text-gray-700">{s.display_name}</span>
+                                    <span className="font-semibold text-gray-700">{resolveStudentNameParts(s).displayName}</span>
                                     <span className="rounded-full px-2 py-0.5 text-[11px] font-black bg-sky-50 text-sky-700">
                                       School: {resolveSchoolYearLabel(s, cls.id)}
                                     </span>
@@ -958,11 +1007,19 @@ export default function TeacherClassesPage() {
                         </div>
                         <div className="mt-3 grid gap-2 md:grid-cols-[1fr_1fr_160px_180px_130px_auto]">
                           <input
-                            value={newStudentNames[cls.id] ?? ""}
+                            value={newStudentFirstNames[cls.id] ?? ""}
                             onChange={(event) =>
-                              setNewStudentNames((current) => ({ ...current, [cls.id]: event.target.value }))
+                              setNewStudentFirstNames((current) => ({ ...current, [cls.id]: event.target.value }))
                             }
-                            placeholder="Full name"
+                            placeholder="First name"
+                            className="rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
+                          />
+                          <input
+                            value={newStudentLastNames[cls.id] ?? ""}
+                            onChange={(event) =>
+                              setNewStudentLastNames((current) => ({ ...current, [cls.id]: event.target.value }))
+                            }
+                            placeholder="Last name"
                             className="rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
                           />
                           <input
@@ -1012,7 +1069,7 @@ export default function TeacherClassesPage() {
                           <button
                             type="button"
                             onClick={() => addStudentToClass(cls.id)}
-                            disabled={creatingStudentForClass === cls.id || !(newStudentNames[cls.id] ?? "").trim()}
+                            disabled={creatingStudentForClass === cls.id || !(newStudentFirstNames[cls.id] ?? "").trim()}
                             className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-black text-white disabled:cursor-not-allowed disabled:bg-gray-300"
                           >
                             {creatingStudentForClass === cls.id ? "Adding…" : "Add"}
