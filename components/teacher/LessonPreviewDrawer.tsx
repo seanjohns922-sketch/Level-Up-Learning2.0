@@ -244,6 +244,183 @@ function exampleForActivity(idea: string): ActivityExample {
 
 type ActivityPreview = ActivityExample & { label: string; description: string };
 
+type TopicExample = {
+  tag?: string;
+  description?: string;
+  prompt: string;
+  options?: string[];
+  correct?: string;
+};
+
+function topicExampleFromMode(mode: string, min: number, max: number): TopicExample {
+  const m = mode.toLowerCase();
+
+  if (m.includes("decimal") || m.includes("thousandth") || m.includes("rename")) {
+    return {
+      tag: "decimals",
+      description: "Work with decimal place value, renaming, or ordering.",
+      prompt: "What is the value of the digit 7 in 3.472?",
+      options: ["7 ones", "7 tenths", "7 hundredths", "7 thousandths"],
+      correct: "7 hundredths",
+    };
+  }
+  if (m.includes("percent") || m.includes("discount")) {
+    return {
+      tag: "percentages",
+      description: "Find percentages of amounts or apply to real-world problems.",
+      prompt: "What is 25% of 80?",
+      options: ["15", "20", "25", "40"],
+      correct: "20",
+    };
+  }
+  if (m.includes("fdp") || m.includes("fraction_decimal")) {
+    return {
+      tag: "fractions, decimals & percents",
+      description: "Match and convert between fractions, decimals, and percentages.",
+      prompt: "Which of these is equal to 0.75?",
+      options: ["3/5", "3/4", "7/10", "7/5"],
+      correct: "3/4",
+    };
+  }
+  if (m.includes("fraction") || m.includes("denominator") || m.includes("numerator") || m.includes("improper")) {
+    return {
+      tag: "fractions",
+      description: "Work with fractions — comparing, adding, or converting.",
+      prompt: "What is 1/3 + 1/6?",
+      options: ["1/2", "2/9", "1/3", "2/6"],
+      correct: "1/2",
+    };
+  }
+  if (m.includes("remainder") || m.includes("interpret")) {
+    return {
+      tag: "division & remainders",
+      description: "Decide what to do with a remainder in context.",
+      prompt: "27 students need to travel in cars. Each car holds 4. How many cars are needed?",
+      options: ["5", "6", "7", "8"],
+      correct: "7",
+    };
+  }
+  if (m.includes("division") || m.includes("quot") || m.includes("divisib")) {
+    return {
+      tag: "division",
+      description: "Solve division problems or apply divisibility rules.",
+      prompt: "Which number is divisible by both 3 and 4?",
+      options: ["14", "18", "24", "26"],
+      correct: "24",
+    };
+  }
+  if (m.includes("factor") || m.includes("multiple") || m.includes("prime") || m.includes("square")) {
+    return {
+      tag: "factors & multiples",
+      description: "Identify factors, multiples, primes, or square numbers.",
+      prompt: "Which of these is a factor of 48?",
+      options: ["7", "9", "12", "14"],
+      correct: "12",
+    };
+  }
+  if (m.includes("multipl") || m.includes("product")) {
+    return {
+      tag: "multiplication",
+      description: "Multiply using an efficient strategy.",
+      prompt: `Work out ${min >= 1000 ? "4 × 1,236" : "7 × 48"}`,
+      options: min >= 1000 ? ["4,844", "4,944", "5,044", "4,904"] : ["316", "326", "336", "346"],
+      correct: min >= 1000 ? "4,944" : "336",
+    };
+  }
+  if (m.includes("subtract") || m.includes("minus") || m.includes("add_sub")) {
+    return {
+      tag: "addition & subtraction",
+      description: "Add or subtract using an efficient strategy.",
+      prompt: "Work out 503 − 278",
+      options: ["215", "225", "235", "245"],
+      correct: "225",
+    };
+  }
+  if (m.includes("addition") || m.includes("strategy_fluency")) {
+    return {
+      tag: "addition",
+      description: "Add using a mental or written strategy.",
+      prompt: "Work out 347 + 285",
+      options: ["622", "632", "632", "642"],
+      correct: "632",
+    };
+  }
+  if (m.includes("multi_step") || m.includes("mixed_op") || m.includes("order_op")) {
+    return {
+      tag: "multi-step problems",
+      description: "Solve a problem requiring two or more operations.",
+      prompt: "A shop sells 12 boxes of 24 pencils and gives away 38 as samples. How many are left to sell?",
+      options: ["240", "248", "250", "250"],
+      correct: "250",
+    };
+  }
+  if (m.includes("round") || m.includes("estimat") || m.includes("reasonab")) {
+    return {
+      tag: "rounding & estimation",
+      description: "Round a number or estimate whether an answer is reasonable.",
+      prompt: "Which is the best estimate for 487 × 6?",
+      options: ["2,400", "2,800", "3,000", "3,200"],
+      correct: "3,000",
+    };
+  }
+  if (m.includes("pattern") || m.includes("sequence") || m.includes("function") || m.includes("algebra") || m.includes("equation")) {
+    return {
+      tag: "patterns & algebra",
+      description: "Find, describe, or continue a pattern or rule.",
+      prompt: "The rule is 'multiply by 3 then subtract 1'. What comes after 14?",
+      options: ["38", "40", "41", "43"],
+      correct: "41",
+    };
+  }
+  if (m.includes("integer")) {
+    return {
+      tag: "integers",
+      description: "Work with positive and negative numbers.",
+      prompt: "The temperature is −4°C. It rises by 9°C. What is the new temperature?",
+      options: ["3°C", "4°C", "5°C", "6°C"],
+      correct: "5°C",
+    };
+  }
+  if (m.includes("coord") || m.includes("cartesian") || m.includes("plot")) {
+    return {
+      tag: "coordinates",
+      description: "Read or plot points on a Cartesian plane.",
+      prompt: "Point A is at (3, −2). In which quadrant does it lie?",
+      options: ["Quadrant I", "Quadrant II", "Quadrant III", "Quadrant IV"],
+      correct: "Quadrant IV",
+    };
+  }
+  if (m.includes("money") || m.includes("budget") || m.includes("real_world") || m.includes("unit_rate")) {
+    return {
+      tag: "real-world problems",
+      description: "Apply maths to everyday money or rate problems.",
+      prompt: "A bag of 8 apples costs $4.80. What is the cost of 1 apple?",
+      options: ["50c", "55c", "60c", "65c"],
+      correct: "60c",
+    };
+  }
+  if (m.includes("place_value") || m.includes("identify_place") || m.includes("identify_number") || m.includes("rename")) {
+    const exNum = max >= 10000 ? 48326 : max >= 1000 ? 3847 : 476;
+    return {
+      tag: "place value",
+      description: "Read, build, or identify digits in their place value positions.",
+      prompt: `What is the value of the 8 in ${exNum.toLocaleString()}?`,
+      options: max >= 10000 ? ["8", "800", "8,000", "80,000"] : ["8", "80", "800", "8,000"],
+      correct: max >= 10000 ? "8,000" : "800",
+    };
+  }
+
+  // Generic fallback — at least use the mode string as the label
+  const cleanMode = mode.replace(/_/g, " ").replace(/y\d+_?/gi, "").trim();
+  return {
+    tag: cleanMode || undefined,
+    description: "Answer a question testing this lesson's key concept.",
+    prompt: "Choose the correct answer from the options below.",
+    options: ["Option A", "Option B", "Option C", "Option D"],
+    correct: "Option C",
+  };
+}
+
 function activityPreviewData(type: ActivityType, config: Record<string, unknown>): ActivityPreview {
   const mode    = typeof config.mode    === "string" ? config.mode    : "";
   const min     = typeof config.min     === "number" ? config.min     : 0;
@@ -792,22 +969,30 @@ function activityPreviewData(type: ActivityType, config: Record<string, unknown>
     }
 
     case "multiple_choice": {
+      const m = mode.toLowerCase();
+      const src = typeof config.sourceActivityType === "string" ? config.sourceActivityType : "";
+      const topicEx = topicExampleFromMode(m || src, min, max);
       return {
-        label: "Multiple choice",
-        description: "Answer by choosing from four options.",
-        prompt: "Example question tied to the lesson concept (varies each session).",
-        options: ["Option A", "Option B", "Option C ✓", "Option D"],
-        correct: "Option C ✓",
+        label: `Multiple choice${topicEx.tag ? ` — ${topicEx.tag}` : ""}`,
+        description: topicEx.description || "Choose the correct answer from four options.",
+        prompt: topicEx.prompt,
+        options: topicEx.options,
+        correct: topicEx.correct,
         note: "4-option card. Wrong answers shake; correct answers award XP.",
       };
     }
 
     case "typed_response": {
+      const m = mode.toLowerCase();
+      const src = typeof config.sourceActivityType === "string" ? config.sourceActivityType : "";
+      const topicEx = topicExampleFromMode(m || src, min, max);
       return {
-        label: "Type your answer",
-        description: "Work out the answer and type it using the number pad.",
-        prompt: "Calculate the answer and type it in.",
-        note: "Instant feedback after submitting. No multiple choice — student must recall.",
+        label: `Type your answer${topicEx.tag ? ` — ${topicEx.tag}` : ""}`,
+        description: topicEx.description || "Work out the answer and type it using the number pad.",
+        prompt: topicEx.prompt,
+        options: topicEx.options,
+        correct: topicEx.correct,
+        note: "No multiple choice — student must recall the answer. Instant feedback on submit.",
       };
     }
 
