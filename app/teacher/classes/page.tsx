@@ -518,11 +518,11 @@ export default function TeacherClassesPage() {
     const base = students.filter((s) => s.class_id === classId && (includeArchived ? true : !s.archived_at));
     return [...base].sort((a, b) => {
       if (studentSortMode === "working_level") {
-        const levelDiff = yearIndex(resolveWorkingYearLabel(a)) - yearIndex(resolveWorkingYearLabel(b));
+        const levelDiff = yearIndex(normalizeWorkingLevelLabel(a.working_level)) - yearIndex(normalizeWorkingLevelLabel(b.working_level));
         if (levelDiff !== 0) return levelDiff;
       }
       if (studentSortMode === "actual_year") {
-        const yearDiff = yearIndex(resolveSchoolYearLabel(a, classId)) - yearIndex(resolveSchoolYearLabel(b, classId));
+        const yearDiff = yearIndex(normalizeSchoolYearLabel(a.school_year_level)) - yearIndex(normalizeSchoolYearLabel(b.school_year_level));
         if (yearDiff !== 0) return yearDiff;
       }
       return a.display_name.localeCompare(b.display_name, undefined, { sensitivity: "base" });
@@ -532,7 +532,7 @@ export default function TeacherClassesPage() {
   const sortLabel = studentSortMode === "working_level"
     ? "Working level"
     : studentSortMode === "actual_year"
-      ? "Actual year"
+      ? "School year"
       : "Alphabetical";
 
   return (
@@ -550,7 +550,7 @@ export default function TeacherClassesPage() {
               >
                 <option value="alphabetical">Alphabetical</option>
                 <option value="working_level">Working level</option>
-                <option value="actual_year">Actual year</option>
+                <option value="actual_year">School year</option>
               </select>
             </label>
             <button
