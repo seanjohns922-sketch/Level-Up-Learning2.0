@@ -134,21 +134,23 @@ export default function SurgeAmbience({ comboCount }: { comboCount: number }) {
           className="absolute inset-0"
           style={{
             background:
-              "repeating-conic-gradient(from 0deg at 50% 110%, rgba(253,224,71,0.10) 0deg, transparent 6deg, transparent 12deg, rgba(253,224,71,0.10) 18deg)",
+              tier >= 4
+                ? "repeating-conic-gradient(from 0deg at 50% 110%, rgba(94,234,212,0.14) 0deg, transparent 6deg, transparent 12deg, rgba(45,212,191,0.14) 18deg)"
+                : "repeating-conic-gradient(from 0deg at 50% 110%, rgba(253,224,71,0.10) 0deg, transparent 6deg, transparent 12deg, rgba(253,224,71,0.10) 18deg)",
             mixBlendMode: "screen",
             animation: "surgeRays 3.2s ease-in-out infinite",
           }}
         />
       )}
 
-      {/* Diagonal shimmer band (tier 4) */}
+      {/* Diagonal shimmer band (tier 4 — teal data stream) */}
       {tier >= 4 && (
         <div className="absolute inset-0 overflow-hidden">
           <div
             className="absolute top-0 bottom-0 w-1/3"
             style={{
               background:
-                "linear-gradient(115deg, transparent 0%, rgba(255,240,180,0.22) 50%, transparent 100%)",
+                "linear-gradient(115deg, transparent 0%, rgba(167,243,208,0.28) 50%, transparent 100%)",
               animation: "surgeShimmer 2.8s linear infinite",
               filter: "blur(8px)",
             }}
@@ -166,7 +168,7 @@ export default function SurgeAmbience({ comboCount }: { comboCount: number }) {
             bottom: 0,
             width: s.size,
             height: s.size,
-            background: `hsl(${s.hue} 95% ${s.hue === 280 ? 75 : 65}%)`,
+            background: `hsl(${s.hue} 95% 65%)`,
             boxShadow: `0 0 ${s.size * 3}px hsl(${s.hue} 95% 60% / 0.9), 0 0 ${
               s.size * 6
             }px hsl(${s.hue} 95% 55% / 0.5)`,
