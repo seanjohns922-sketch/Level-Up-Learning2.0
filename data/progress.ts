@@ -68,5 +68,5 @@ export function updateProgress(patch: Partial<StudentProgress>) {
 export function isPlacementComplete(progress: StudentProgress | null | undefined) {
   if (!progress) return false;
   if (typeof progress.placementComplete === "boolean") return progress.placementComplete;
-  return progress.status === "ASSIGNED_PROGRAM" || progress.status === "PASSED";
+  return progress.status === "PASSED";
 }

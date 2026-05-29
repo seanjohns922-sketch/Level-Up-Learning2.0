@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { hasActiveStudentSeenIntro, setActiveStudentProfile } from "@/lib/studentIdentity";
 import { restoreStudentStateFromServer } from "@/lib/student-progress-sync";
-import { isPlacementComplete, readProgress, writeProgress } from "@/data/progress";
+import { clearScopedProgress, isPlacementComplete, readProgress, writeProgress } from "@/data/progress";
+import { clearScopedProgramStore } from "@/lib/program-progress";
 import { normalizeSchoolYearLabel, normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
 import { GraduationCap, Briefcase, KeyRound, User, Lock } from "lucide-react";
 
@@ -170,13 +171,17 @@ export default function LoginPage() {
       displayName,
       yearLevel: studentSchoolYear ?? studentWorkingYear ?? "Year 1",
     });
+    clearScopedProgress(student.student_id);
+    clearScopedProgramStore(student.student_id);
 
     let progress = readProgress();
+    let introSeen = hasActiveStudentSeenIntro(student.student_id);
     try {
       const restored = await restoreStudentStateFromServer(student.student_id);
       if (restored.progress) {
         progress = restored.progress;
       }
+      introSeen = restored.introSeen || introSeen;
     } catch (error) {
       console.warn("[Login] Could not restore student progress from Supabase", error);
     }
@@ -196,15 +201,14 @@ export default function LoginPage() {
     }
 
     const placementComplete = isPlacementComplete(progress);
-    const introSeen = hasActiveStudentSeenIntro(student.student_id);
 
     let dest: string;
-    if (placementComplete && (progress?.status === "ASSIGNED_PROGRAM" || progress?.status === "PASSED")) {
-      dest = `/levels`;
-    } else if (introSeen) {
+    if (!introSeen) {
+      dest = `/home`;
+    } else if (!placementComplete) {
       dest = `/pretest?year=${encodeURIComponent(progress?.year ?? studentWorkingYear ?? studentSchoolYear ?? "Year 1")}`;
     } else {
-      dest = `/home`;
+      dest = `/levels`;
     }
     router.push(dest);
   }

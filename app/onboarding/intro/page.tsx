@@ -2,23 +2,23 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-
-const INTRO_SEEN_KEY = "lul_intro_seen";
+import { getActiveStudentProfile, hasActiveStudentSeenIntro, markActiveStudentIntroSeen } from "@/lib/studentIdentity";
 
 export default function IntroPage() {
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [ended, setEnded] = useState(false);
+  const studentProfile = getActiveStudentProfile();
 
   useEffect(() => {
-    if (typeof window !== "undefined" && localStorage.getItem(INTRO_SEEN_KEY) === "1") {
-      router.replace("/levels");
+    if (studentProfile?.studentId && hasActiveStudentSeenIntro(studentProfile.studentId)) {
+      router.replace("/home");
     }
-  }, [router]);
+  }, [router, studentProfile?.studentId]);
 
   function finish() {
-    if (typeof window !== "undefined") localStorage.setItem(INTRO_SEEN_KEY, "1");
-    router.push("/levels");
+    markActiveStudentIntroSeen(studentProfile?.studentId);
+    router.push("/home");
   }
 
   return (

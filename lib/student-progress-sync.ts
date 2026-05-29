@@ -118,10 +118,7 @@ function buildStudentProgress(row: StudentProgressSnapshotRow): StudentProgress 
     year: row.year,
     scorePercent: row.pretest_score ?? 0,
     status: row.status === "PASSED" ? "PASSED" : "ASSIGNED_PROGRAM",
-    placementComplete:
-      typeof row.placement_complete === "boolean"
-        ? row.placement_complete
-        : row.status === "PASSED" || row.status === "ASSIGNED_PROGRAM",
+    placementComplete: row.placement_complete === true || row.status === "PASSED",
     assignedWeek: row.assigned_week ?? row.week ?? 1,
     requiredWeeks: parseNumberArray(row.required_weeks),
     optionalWeeks: parseNumberArray(row.optional_weeks),

@@ -193,22 +193,6 @@ export default function TeacherClassesPage() {
     return normalizeWorkingLevelLabel(student.working_level ?? student.year_level) ?? null;
   }
 
-  async function syncWorkingLevelProgress(studentId: string, workingYear: string | null) {
-    if (!workingYear) return;
-    const { error } = await supabase.rpc("save_student_progress_state", {
-      p_student_id: studentId,
-      p_year: workingYear,
-      p_data: {
-        status: "ASSIGNED_PROGRAM",
-        placement_complete: true,
-        week: 1,
-        assigned_week: 1,
-      },
-    });
-    if (error) {
-      console.warn("[TeacherClasses] could not sync working level progress", error.message);
-    }
-  }
 
   function linkStatus(studentId: string) {
     if (linkedStudentIds.has(studentId)) return "Home linked";
@@ -308,7 +292,6 @@ export default function TeacherClassesPage() {
           year_level: workingYear,
         })
         .eq("id", created.student_id);
-      await syncWorkingLevelProgress(created.student_id, workingYear);
     }
     setNewStudentNames((current) => ({ ...current, [classId]: "" }));
     setNewStudentUsernames((current) => ({ ...current, [classId]: "" }));
@@ -360,7 +343,6 @@ export default function TeacherClassesPage() {
     setSavingEdit(false);
     if (error) { alert(error.message); return; }
     const normalizedWorking = normalizeWorkingLevelLabel(editForm.working_level === "AUTO_PLACEMENT" ? null : editForm.working_level);
-    await syncWorkingLevelProgress(studentId, normalizedWorking);
     setStudents((prev) =>
       prev.map((s) =>
         s.id === studentId

@@ -27,12 +27,12 @@ export default function Page() {
         }
         if (activeStudentId || progress) {
           if (cancelled) return;
-          if (isPlacementComplete(progress)) {
-            router.replace("/levels");
-          } else if (hasActiveStudentSeenIntro(activeStudentId)) {
+          if (!hasActiveStudentSeenIntro(activeStudentId)) {
+            router.replace("/home");
+          } else if (!isPlacementComplete(progress)) {
             router.replace(`/pretest?year=${encodeURIComponent(progress?.year ?? getPlacementEntryYear())}`);
           } else {
-            router.replace("/home");
+            router.replace("/levels");
           }
           return;
         }

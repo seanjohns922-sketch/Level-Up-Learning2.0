@@ -14,12 +14,11 @@ export default function StudentHomePage() {
   const placementYear = useMemo(() => progress?.year ?? getPlacementEntryYear(), [progress?.year]);
 
   useEffect(() => {
-    if (isPlacementComplete(progress)) {
-      router.replace("/levels");
-      return;
-    }
-
     if (studentProfile?.studentId && hasActiveStudentSeenIntro(studentProfile.studentId)) {
+      if (isPlacementComplete(progress)) {
+        router.replace("/levels");
+        return;
+      }
       router.replace(`/pretest?year=${encodeURIComponent(placementYear)}`);
     }
   }, [placementYear, progress, router, studentProfile?.studentId]);

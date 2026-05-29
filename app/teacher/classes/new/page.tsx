@@ -209,18 +209,6 @@ export default function NewClassPage() {
           year_level: workingYear,
         })
         .eq("id", created.student_id);
-      if (workingYear) {
-        await supabase.rpc("save_student_progress_state", {
-          p_student_id: created.student_id,
-          p_year: workingYear,
-          p_data: {
-            status: "ASSIGNED_PROGRAM",
-            placement_complete: true,
-            week: 1,
-            assigned_week: 1,
-          },
-        });
-      }
     }
     if (created) {
       setAddedStudents((prev) => [
