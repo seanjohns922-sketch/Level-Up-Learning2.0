@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { Lesson } from "@/data/programs/year1";
 import { DEFAULT_LESSON_XP } from "@/data/programs/genres";
 import type { TeacherInsight } from "@/lib/teacher-insights";
+import type { LessonActivity, ActivityType } from "@/data/programs/types";
 
 export type LessonPreviewStudent = {
   id: string;
@@ -241,6 +242,646 @@ function exampleForActivity(idea: string): ActivityExample {
   };
 }
 
+type ActivityPreview = ActivityExample & { label: string; description: string };
+
+function activityPreviewData(type: ActivityType, config: Record<string, unknown>): ActivityPreview {
+  const mode    = typeof config.mode    === "string" ? config.mode    : "";
+  const min     = typeof config.min     === "number" ? config.min     : 0;
+  const max     = typeof config.max     === "number" ? config.max     : 100;
+  const asc     = config.ascending !== false;
+  const denos   = Array.isArray(config.denominators) ? (config.denominators as number[]) : [2, 4, 8];
+  const den     = denos[1] ?? denos[0] ?? 4;
+  const pvs     = Array.isArray(config.placeValues) ? (config.placeValues as string[]) : ["hundreds", "tens", "ones"];
+
+  // Pick representative example numbers within the config range
+  const exNum   = min >= 10000 ? 48326 : min >= 1000 ? 3847 : min >= 100 ? 476 : 47;
+
+  switch (type) {
+    case "place_value_builder": {
+      if (mode === "identify_number") {
+        return {
+          label: "MAB — Read the number",
+          description: "Count MAB blocks to identify the number shown.",
+          prompt: "What number is shown by the MAB blocks?",
+          visual: <MabVisual number={exNum} places={pvs} />,
+          options: [String(exNum - 100), String(exNum), String(exNum + 10), String(exNum - 1000)],
+          correct: String(exNum),
+          note: "Student counts each column and types or taps the total.",
+        };
+      }
+      if (mode === "identify_place") {
+        const d = Math.floor((exNum % 1000) / 100);
+        return {
+          label: "MAB — Identify place value",
+          description: "Identify the value of a highlighted digit.",
+          prompt: `What is the value of the digit ${d} in ${exNum.toLocaleString()}?`,
+          options: [String(d), String(d * 100), String(d * 10), String(d * 1000)],
+          correct: String(d * 100),
+          note: "Tests understanding that a digit's value depends on its position.",
+        };
+      }
+      return {
+        label: "MAB — Build the number",
+        description: "Drag MAB blocks onto the mat to build a given number.",
+        prompt: `Build ${exNum.toLocaleString()} using MAB blocks.`,
+        visual: <MabVisual number={exNum} places={pvs} />,
+        note: "Student drags thousands, hundreds, tens and ones blocks onto the mat.",
+      };
+    }
+
+    case "partition_expand": {
+      const n = exNum;
+      const th = Math.floor(n / 1000) * 1000;
+      const h  = Math.floor((n % 1000) / 100) * 100;
+      const t  = Math.floor((n % 100) / 10) * 10;
+      const o  = n % 10;
+      const expanded = n >= 1000 ? `${th} + ${h} + ${t} + ${o}` : `${h} + ${t} + ${o}`;
+      if (mode === "expand") {
+        return {
+          label: "Expanded form",
+          description: "Break a number into its place value parts.",
+          prompt: `Write ${n.toLocaleString()} in expanded form.`,
+          options: [expanded, `${th} × ${h} + ${t}`, `${n - 100} + 100`, `${Math.floor(n / 10)} + ${o}`],
+          correct: expanded,
+          note: "Student selects or types each place value part.",
+        };
+      }
+      return {
+        label: "Standard form",
+        description: "Combine expanded parts to write the standard number.",
+        prompt: `What number is ${expanded}?`,
+        options: [String(n), String(n + 100), String(n - 10), String(n + 1000)],
+        correct: String(n),
+        note: "Student adds the parts to reconstruct the full number.",
+      };
+    }
+
+    case "number_order": {
+      const isDecimal = max <= 10 && min < 1;
+      const count     = typeof config.count === "number" ? config.count : 4;
+      const nums      = isDecimal
+        ? [1.2, 0.7, 3.4, 2.1].slice(0, count)
+        : [exNum, exNum - 2000, exNum + 5000, exNum - 800, exNum + 300].slice(0, count);
+      const sorted = [...nums].sort((a, b) => asc ? a - b : b - a);
+      return {
+        label: asc ? "Order smallest → largest" : "Order largest → smallest",
+        description: `Arrange numbers in ${asc ? "ascending" : "descending"} order.`,
+        prompt: `Put these in order from ${asc ? "smallest to largest" : "largest to smallest"}: ${nums.join(", ")}`,
+        visual: (
+          <div className="p-2 rounded-lg bg-white border border-[#E6E8EC] space-y-1.5">
+            <div className="flex gap-1.5 flex-wrap">
+              {nums.map((n, i) => <div key={i} className="px-2 py-1.5 rounded-md bg-slate-100 border border-slate-200 text-sm font-bold text-slate-700">{n}</div>)}
+            </div>
+            <div className="text-[10px] font-bold text-teal-700">Answer: {sorted.join(" → ")}</div>
+          </div>
+        ),
+        note: "Student drags tiles into the correct sequence.",
+      };
+    }
+
+    case "number_line": {
+      const isDecimal = max <= 1;
+      const step   = typeof config.step === "number" ? config.step : 1;
+      const target = isDecimal ? 0.6 : Math.round((min + max) / 2 / step) * step;
+      const lMin   = isDecimal ? 0 : Math.floor(min / step) * step;
+      const lMax   = isDecimal ? 1 : Math.ceil(max / step) * step;
+      const pct    = Math.max(0, Math.min(100, ((target - lMin) / (lMax - lMin)) * 100));
+      const modeLabel = mode === "rounding" ? "Round to nearest" : mode === "estimate" ? "Estimate position" : "Place on number line";
+      return {
+        label: `Number line — ${modeLabel}`,
+        description: mode === "rounding" ? "Round a number to the nearest given place." : "Drag a marker to the correct position on the number line.",
+        prompt: mode === "rounding" ? `Round ${target.toLocaleString()} to the nearest ${step.toLocaleString()}.` : `Place ${target.toLocaleString()} on the number line.`,
+        visual: (
+          <div className="p-3 rounded-lg bg-white border border-[#E6E8EC]">
+            <div className="relative h-2 bg-slate-200 rounded-full mx-2">
+              <div className="absolute -top-1.5 h-5 w-5 rounded-full bg-teal-500 border-2 border-white shadow -translate-x-1/2" style={{ left: `${pct}%` }} />
+            </div>
+            <div className="flex justify-between text-[10px] font-bold text-slate-500 mt-2">
+              <span>{lMin.toLocaleString()}</span>
+              <span>{Math.round((lMin + lMax) / 2).toLocaleString()}</span>
+              <span>{lMax.toLocaleString()}</span>
+            </div>
+          </div>
+        ),
+        note: "Student drags the marker to the target position.",
+      };
+    }
+
+    case "number_line_place": {
+      if (mode === "place_fraction" || mode === "order_compare_fractions") {
+        return {
+          label: "Fraction on number line",
+          description: "Drag a fraction to its correct position on a 0–1 number line.",
+          prompt: `Place 3/${den} on the number line.`,
+          visual: (
+            <div className="p-3 rounded-lg bg-white border border-[#E6E8EC]">
+              <div className="relative h-2 bg-slate-200 rounded-full mx-2">
+                <div className="absolute -top-1.5 h-5 w-5 rounded-full bg-teal-500 border-2 border-white shadow -translate-x-1/2" style={{ left: `${(3 / den) * 100}%` }} />
+              </div>
+              <div className="flex justify-between text-[10px] font-bold text-slate-500 mt-2">
+                <span>0</span><span>1/{den}</span><span>2/{den}</span><span>1</span>
+              </div>
+            </div>
+          ),
+          note: "Tick marks show equal parts. Student taps or drags to the correct spot.",
+        };
+      }
+      if (mode === "skip_count_fraction") {
+        return {
+          label: "Skip count by fractions",
+          description: `Fill in the missing fraction counting by 1/${den}s.`,
+          prompt: `Count by 1/${den}s: 1/${den}, 2/${den}, ___, 4/${den}`,
+          options: [`3/${den}`, `2/${den}`, `5/${den}`, `1/${den - 1 || 1}`],
+          correct: `3/${den}`,
+          note: "Student identifies the pattern and picks the missing fraction.",
+        };
+      }
+      if (mode === "mixed_numerals") {
+        return {
+          label: "Mixed numerals on number line",
+          description: "Place a mixed numeral in its correct position.",
+          prompt: `Place 2 and 3/${den} on the number line between 2 and 3.`,
+          visual: (
+            <div className="p-3 rounded-lg bg-white border border-[#E6E8EC]">
+              <div className="relative h-2 bg-slate-200 rounded-full mx-2">
+                <div className="absolute -top-1.5 h-5 w-5 rounded-full bg-teal-500 border-2 border-white shadow -translate-x-1/2" style={{ left: `${(3 / den) * 100}%` }} />
+              </div>
+              <div className="flex justify-between text-[10px] font-bold text-slate-500 mt-2">
+                <span>2</span><span>2½</span><span>3</span>
+              </div>
+            </div>
+          ),
+          note: "Tests that students understand mixed numerals sit between whole numbers.",
+        };
+      }
+      return {
+        label: "Read a point on number line",
+        description: "Name the fraction shown by a marked point.",
+        prompt: "What fraction does the arrow point to?",
+        options: [`1/${den}`, `2/${den}`, `3/${den}`, `4/${den}`],
+        correct: `3/${den}`,
+        note: "Student reads the position of the dot relative to the tick marks.",
+      };
+    }
+
+    case "odd_even_sort": {
+      const numSet = [1204, 3871, 5560, 9043, 2208, 7775];
+      if (mode === "odd_even_sums") {
+        return {
+          label: "Odd/even — sums",
+          description: "Predict whether a sum will be odd or even without calculating.",
+          prompt: "Is 14 + 7 odd or even?",
+          options: ["Odd", "Even"],
+          correct: "Odd",
+          note: "Even + odd = odd. Students apply the rule, not compute the answer.",
+        };
+      }
+      if (mode === "odd_even_products") {
+        return {
+          label: "Odd/even — products",
+          description: "Predict whether a product will be odd or even.",
+          prompt: "Is 4 × 6 odd or even?",
+          options: ["Even", "Odd"],
+          correct: "Even",
+          note: "Even × anything = even.",
+        };
+      }
+      return {
+        label: "Sort odd & even",
+        description: "Sort large numbers by tapping them into the correct group.",
+        prompt: "Sort these into Odd and Even:",
+        visual: (
+          <div className="p-2 rounded-lg bg-white border border-[#E6E8EC]">
+            <div className="flex flex-wrap gap-1.5 mb-1.5">
+              {numSet.map((n, i) => (
+                <div key={i} className={`px-2 py-1 rounded-md text-xs font-bold ${n % 2 === 0 ? "bg-teal-50 border border-teal-200 text-teal-700" : "bg-rose-50 border border-rose-200 text-rose-700"}`}>
+                  {n.toLocaleString()}
+                </div>
+              ))}
+            </div>
+            <div className="text-[10px] font-bold text-slate-400">Teal = Even · Rose = Odd</div>
+          </div>
+        ),
+        note: "Last digit determines odd/even — strategy applies to any size number.",
+      };
+    }
+
+    case "equal_groups": {
+      const maxG = typeof config.maxGroups === "number" ? config.maxGroups : 6;
+      const maxI = typeof config.maxItemsPerGroup === "number" ? config.maxItemsPerGroup : 5;
+      const g = Math.min(4, maxG), perG = Math.min(4, maxI);
+      return {
+        label: "Equal groups",
+        description: "Count equal groups to find the total.",
+        prompt: `There are ${g} groups of ${perG}. How many altogether?`,
+        visual: (
+          <div className="flex gap-2 p-2 rounded-lg bg-white border border-[#E6E8EC]">
+            {Array.from({ length: g }).map((_, gi) => (
+              <div key={gi} className="flex flex-col gap-0.5 rounded-md border border-slate-200 p-1.5">
+                {Array.from({ length: perG }).map((_, ci) => <div key={ci} className="h-3 w-3 rounded-full bg-teal-500" />)}
+              </div>
+            ))}
+          </div>
+        ),
+        options: [String(g * perG - g), String(g * perG), String(g + perG), String(g * perG + 2)],
+        correct: String(g * perG),
+        note: `${g} × ${perG} = ${g * perG}. Visual groups build the multiplication concept.`,
+      };
+    }
+
+    case "arrays": {
+      const maxR = typeof config.maxRows === "number" ? config.maxRows : 5;
+      const maxC = typeof config.maxColumns === "number" ? config.maxColumns : 6;
+      const r = Math.min(3, maxR), c = Math.min(4, maxC);
+      return {
+        label: "Arrays",
+        description: "Count rows × columns to find the product.",
+        prompt: `How many dots in this ${r}×${c} array?`,
+        visual: (
+          <div className="p-2 rounded-lg bg-white border border-[#E6E8EC] w-fit">
+            <div className="grid gap-1.5" style={{ gridTemplateColumns: `repeat(${c}, 1fr)` }}>
+              {Array.from({ length: r * c }).map((_, i) => <div key={i} className="h-4 w-4 rounded-full bg-teal-500" />)}
+            </div>
+          </div>
+        ),
+        options: [String(r * c - 2), String(r * c), String(r * c + 2), String(r * c + r)],
+        correct: String(r * c),
+        note: `${r} rows × ${c} cols = ${r * c}. Reading both ways shows commutativity.`,
+      };
+    }
+
+    case "skip_count": {
+      const step = typeof config.step === "number" ? config.step : 7;
+      return {
+        label: `Skip count by ${step}s`,
+        description: `Count forward in equal jumps of ${step}.`,
+        prompt: `Fill in the blank: ${step}, ${step * 2}, ___, ${step * 4}`,
+        options: [String(step * 3), String(step * 3 - 1), String(step * 3 + step), String(step * 2 + 1)],
+        correct: String(step * 3),
+        note: `Builds times-table fluency for the ${step}s.`,
+      };
+    }
+
+    case "fact_family": {
+      const a = 7, b = 8, c = a * b;
+      return {
+        label: "Fact family",
+        description: "Complete all four related multiplication and division facts.",
+        prompt: `Numbers: ${a}, ${b}, ${c}. Write the complete fact family.`,
+        visual: (
+          <div className="grid grid-cols-2 gap-1 p-2 rounded-lg bg-white border border-[#E6E8EC] text-xs font-bold text-[#0F172A]">
+            <div>{a} × {b} = {c}</div>
+            <div>{b} × {a} = {c}</div>
+            <div>{c} ÷ {a} = {b}</div>
+            <div>{c} ÷ {b} = {a}</div>
+          </div>
+        ),
+        note: "Tap to complete each missing value. Links × and ÷ in one set.",
+      };
+    }
+
+    case "division_groups": {
+      if (mode === "sharing") {
+        return {
+          label: "Division — sharing",
+          description: "Share a total equally into a given number of groups.",
+          prompt: "Share 24 equally into 4 groups. How many in each group?",
+          options: ["5", "6", "7", "8"],
+          correct: "6",
+          note: "24 ÷ 4 = 6. Items are distributed one-by-one into equal groups.",
+        };
+      }
+      return {
+        label: "Division — grouping",
+        description: "Find how many equal-sized groups can be made from a total.",
+        prompt: "How many groups of 6 can you make from 30?",
+        options: ["4", "5", "6", "7"],
+        correct: "5",
+        note: "30 ÷ 6 = 5. Circles fill up to show grouping.",
+      };
+    }
+
+    case "addition_strategy": {
+      const modeLabels: Record<string, string> = {
+        doubles: "doubles", near_doubles: "near doubles", split: "split strategy",
+        friendly_numbers: "friendly numbers", compensation: "compensation",
+      };
+      const a = min >= 1000 ? 4736 : min >= 100 ? 347 : 64;
+      const b = min >= 1000 ? 2958 : min >= 100 ? 285 : 27;
+      return {
+        label: `Addition — ${modeLabels[mode] ?? "mental strategy"}`,
+        description: `Add using the ${modeLabels[mode] ?? "most efficient"} strategy.`,
+        prompt: `Work out ${a.toLocaleString()} + ${b.toLocaleString()}`,
+        options: [String(a + b - 10), String(a + b), String(a + b + 100), String(a + b - 1)],
+        correct: String(a + b),
+        note: `Students choose their strategy and explain their reasoning.`,
+      };
+    }
+
+    case "subtraction_strategy": {
+      const modeLabels: Record<string, string> = {
+        jump: "jump strategy", split: "split strategy",
+        fact_strategy: "known fact strategy", compensation: "compensation",
+      };
+      const a = min >= 1000 ? 7003 : min >= 100 ? 503 : 82;
+      const b = min >= 1000 ? 2458 : min >= 100 ? 278 : 37;
+      return {
+        label: `Subtraction — ${modeLabels[mode] ?? "mental strategy"}`,
+        description: `Subtract using the ${modeLabels[mode] ?? "most efficient"} strategy.`,
+        prompt: `Work out ${a.toLocaleString()} − ${b.toLocaleString()}`,
+        options: [String(a - b + 10), String(a - b - 1), String(a - b), String(a - b + 100)],
+        correct: String(a - b),
+        note: "Students show their working then check with the inverse operation.",
+      };
+    }
+
+    case "mixed_word_problem": {
+      if (mode === "budgeting") {
+        return {
+          label: "Word problem — budgeting",
+          description: "Multi-step money problem set in a real-world context.",
+          prompt: "You have $50. You spend $12.50 on lunch and $18 on a book. How much is left?",
+          options: ["$18.50", "$19.50", "$20.50", "$21.50"],
+          correct: "$19.50",
+          note: "$12.50 + $18 = $30.50. $50 − $30.50 = $19.50.",
+        };
+      }
+      if (mode === "shop_transactions") {
+        return {
+          label: "Word problem — shop",
+          description: "Multiply to find a total cost, then calculate change.",
+          prompt: "4 drinks cost $3.50 each. You pay with $20. How much change?",
+          options: ["$5", "$6", "$6.50", "$7"],
+          correct: "$6",
+          note: "4 × $3.50 = $14. Change = $20 − $14 = $6.",
+        };
+      }
+      return {
+        label: "Word problem — two steps",
+        description: "Solve a problem requiring two separate operations.",
+        prompt: "28 students split into groups of 4, then 2 groups finish early and leave. How many groups remain?",
+        options: ["3", "5", "7", "9"],
+        correct: "5",
+        note: "28 ÷ 4 = 7 groups. 7 − 2 = 5.",
+      };
+    }
+
+    case "fraction_compare": {
+      if (mode === "greater_less_visual") {
+        return {
+          label: "Compare fractions — visual",
+          description: "Use shaded bar models to decide which fraction is larger.",
+          prompt: "Which is greater: 3/4 or 5/8?",
+          visual: (
+            <div className="flex gap-3 p-2 rounded-lg bg-white border border-[#E6E8EC]">
+              <FractionBar label="3/4" filled={3} total={4} />
+              <FractionBar label="5/8" filled={5} total={8} />
+            </div>
+          ),
+          options: ["3/4", "5/8", "They're equal"],
+          correct: "3/4",
+          note: "Equal-length bars — student sees which shaded area is larger.",
+        };
+      }
+      return {
+        label: "Compare fractions — equivalence",
+        description: "Convert to a common denominator to compare.",
+        prompt: "Which is greater: 2/3 or 3/4?",
+        options: ["2/3", "3/4", "They're equal"],
+        correct: "3/4",
+        note: "2/3 = 8/12, 3/4 = 9/12. So 3/4 > 2/3.",
+      };
+    }
+
+    case "area_model_select": {
+      if (mode === "pick_model") {
+        return {
+          label: "Area model — pick the fraction",
+          description: "Choose the shaded shape that correctly represents the fraction.",
+          prompt: `Which model shows 3/${den}?`,
+          visual: <FractionBarGrid den={den} correct={3} />,
+          note: "Student taps the model with the right number of shaded parts.",
+        };
+      }
+      return {
+        label: "Area model — match equivalent",
+        description: "Pair area models that represent the same fraction.",
+        prompt: "Match the fractions that are equivalent.",
+        visual: (
+          <div className="grid grid-cols-2 gap-1.5 p-2 rounded-lg bg-white border border-[#E6E8EC]">
+            <FractionBar label="1/2" filled={1} total={2} />
+            <FractionBar label="2/4" filled={2} total={4} />
+            <FractionBar label="3/4" filled={3} total={4} />
+            <FractionBar label="6/8" filled={6} total={8} />
+          </div>
+        ),
+        note: "1/2 ↔ 2/4 and 3/4 ↔ 6/8. Shaded areas look identical.",
+      };
+    }
+
+    case "equivalent_fraction_build": {
+      return {
+        label: "Build equivalent fractions",
+        description: "Find the missing numerator or denominator.",
+        prompt: `Complete: 2/4 = ?/${den}`,
+        options: [String(den / 2), String(den), String(den * 2), "2"],
+        correct: String(den / 2),
+        note: "Multiply both numerator and denominator by the same factor.",
+      };
+    }
+
+    case "equivalent_fraction_match": {
+      return {
+        label: "Match equivalent fractions",
+        description: "Drag pairs of fractions that represent the same amount.",
+        prompt: "Match each fraction to its equivalent.",
+        visual: (
+          <div className="grid grid-cols-2 gap-1.5 p-2 rounded-lg bg-white border border-[#E6E8EC] text-sm font-black text-center">
+            {[["1/2","2/4"],["3/4","6/8"],["1/3","2/6"]].map(([a, b], i) => (
+              <>
+                <div key={`a${i}`} className="rounded-md bg-teal-50 border border-teal-200 text-teal-800 px-2 py-1.5">{a}</div>
+                <div key={`b${i}`} className="rounded-md bg-emerald-50 border border-emerald-200 text-emerald-800 px-2 py-1.5">{b}</div>
+              </>
+            ))}
+          </div>
+        ),
+        note: "Drag lines to connect matching fractions.",
+      };
+    }
+
+    case "equivalent_fraction_yes_no": {
+      return {
+        label: "Equivalent? Yes or No",
+        description: "Decide quickly whether two fractions are equivalent.",
+        prompt: "Are 3/6 and 1/2 equivalent?",
+        options: ["Yes ✓", "No"],
+        correct: "Yes ✓",
+        note: "3/6 simplifies to 1/2. Quick-fire rounds build fluency.",
+      };
+    }
+
+    case "fraction_decimal_percent_match": {
+      return {
+        label: "Fraction ↔ Decimal ↔ Percent",
+        description: "Match three equivalent representations of the same amount.",
+        prompt: "Match: 1/2 = ? = ?",
+        visual: (
+          <div className="grid grid-cols-3 gap-1 p-2 rounded-lg bg-white border border-[#E6E8EC] text-center text-sm font-black">
+            <div className="rounded-md bg-teal-50 border border-teal-200 text-teal-800 py-2">1/2</div>
+            <div className="rounded-md bg-indigo-50 border border-indigo-200 text-indigo-800 py-2">0.5</div>
+            <div className="rounded-md bg-violet-50 border border-violet-200 text-violet-800 py-2">50%</div>
+          </div>
+        ),
+        note: "Progresses to harder values like 3/8 = 0.375 = 37.5%.",
+      };
+    }
+
+    case "benchmark_sort": {
+      return {
+        label: "Sort by benchmark",
+        description: "Group fractions by whether they are closer to 0, 1/2, or 1.",
+        prompt: "Sort: 1/8, 3/4, 5/9, 1/3",
+        visual: (
+          <div className="grid grid-cols-3 gap-1.5 p-2 rounded-lg bg-white border border-[#E6E8EC] text-xs font-bold text-center">
+            <div className="rounded-md bg-rose-50 border border-rose-200 text-rose-700 p-1.5">Near 0<br /><span className="font-extrabold">1/8</span></div>
+            <div className="rounded-md bg-amber-50 border border-amber-200 text-amber-700 p-1.5">Near ½<br /><span className="font-extrabold">5/9, 1/3</span></div>
+            <div className="rounded-md bg-emerald-50 border border-emerald-200 text-emerald-700 p-1.5">Near 1<br /><span className="font-extrabold">3/4</span></div>
+          </div>
+        ),
+        note: "Uses number sense — no need to convert, just reason about size.",
+      };
+    }
+
+    case "set_model_select": {
+      return {
+        label: "Set model",
+        description: "Choose the group of objects that shows the fraction.",
+        prompt: "Which group shows 2/5 shaded?",
+        visual: (
+          <div className="flex gap-3 p-2 rounded-lg bg-white border border-[#E6E8EC]">
+            {[2, 3, 4].map((filled) => (
+              <div key={filled} className={`rounded-md border p-1.5 ${filled === 2 ? "border-teal-300 bg-teal-50 ring-1 ring-teal-200" : "border-slate-200"}`}>
+                <div className="flex gap-0.5 mb-0.5">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className={`h-4 w-4 rounded-full ${i < filled ? "bg-teal-500" : "bg-slate-200"}`} />
+                  ))}
+                </div>
+                <div className="text-center text-[10px] font-bold text-slate-500">{filled}/5</div>
+              </div>
+            ))}
+          </div>
+        ),
+        note: "Student taps the group with exactly the right number filled.",
+      };
+    }
+
+    case "build_the_whole": {
+      return {
+        label: "Build the whole",
+        description: "Given a fraction piece, identify what the whole looks like.",
+        prompt: "This strip shows 1/3. How long is the whole strip?",
+        visual: (
+          <div className="flex gap-0.5 p-2 rounded-lg bg-white border border-[#E6E8EC]">
+            <div className="h-8 rounded-sm bg-teal-400 border border-teal-500 flex-1" />
+            <div className="h-8 rounded-sm bg-slate-100 border border-dashed border-slate-300 flex-1" />
+            <div className="h-8 rounded-sm bg-slate-100 border border-dashed border-slate-300 flex-1" />
+          </div>
+        ),
+        note: "Reinforces inverse thinking — if this is 1/3, there must be 3 equal parts.",
+      };
+    }
+
+    case "multiple_choice": {
+      return {
+        label: "Multiple choice",
+        description: "Answer by choosing from four options.",
+        prompt: "Example question tied to the lesson concept (varies each session).",
+        options: ["Option A", "Option B", "Option C ✓", "Option D"],
+        correct: "Option C ✓",
+        note: "4-option card. Wrong answers shake; correct answers award XP.",
+      };
+    }
+
+    case "typed_response": {
+      return {
+        label: "Type your answer",
+        description: "Work out the answer and type it using the number pad.",
+        prompt: "Calculate the answer and type it in.",
+        note: "Instant feedback after submitting. No multiple choice — student must recall.",
+      };
+    }
+
+    default:
+      return {
+        label: "Practice activity",
+        description: "Interactive questions tied to the lesson focus.",
+        prompt: "Complete the question shown on screen.",
+        note: "Multiple question styles rotate to build fluency.",
+      };
+  }
+}
+
+function FractionBar({ label, filled, total }: { label: string; filled: number; total: number }) {
+  return (
+    <div className="flex-1 min-w-0">
+      <div className="flex gap-0.5 mb-1">
+        {Array.from({ length: total }).map((_, i) => (
+          <div key={i} className={`h-6 flex-1 rounded-sm border ${i < filled ? "bg-teal-400 border-teal-500" : "bg-slate-100 border-slate-300"}`} />
+        ))}
+      </div>
+      <div className="text-center text-[10px] font-extrabold text-slate-600">{label}</div>
+    </div>
+  );
+}
+
+function FractionBarGrid({ den, correct }: { den: number; correct: number }) {
+  return (
+    <div className="grid grid-cols-2 gap-1.5 p-2 rounded-lg bg-white border border-[#E6E8EC]">
+      {[1, 2, 3, 4].map((n) => (
+        <div key={n} className={`rounded-md border p-1.5 ${n === correct ? "border-teal-300 bg-teal-50 ring-1 ring-teal-200" : "border-slate-200"}`}>
+          <div className="flex gap-0.5 mb-0.5">
+            {Array.from({ length: den }).map((_, i) => (
+              <div key={i} className={`h-5 flex-1 rounded-sm ${i < n ? "bg-teal-400" : "bg-slate-100"}`} />
+            ))}
+          </div>
+          <div className="text-center text-[10px] font-bold text-slate-600">{n}/{den}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function MabVisual({ number, places }: { number: number; places: string[] }) {
+  const placeInfo: Record<string, { label: string; getValue: (n: number) => number; color: string }> = {
+    hundred_thousands: { label: "HTh", getValue: (n) => Math.floor(n / 100000) % 10, color: "bg-purple-400" },
+    ten_thousands:     { label: "TTh", getValue: (n) => Math.floor(n / 10000) % 10,  color: "bg-indigo-400" },
+    thousands:         { label: "Th",  getValue: (n) => Math.floor(n / 1000) % 10,   color: "bg-blue-400"   },
+    hundreds:          { label: "H",   getValue: (n) => Math.floor(n / 100) % 10,    color: "bg-teal-400"   },
+    tens:              { label: "T",   getValue: (n) => Math.floor(n / 10) % 10,     color: "bg-emerald-400"},
+    ones:              { label: "O",   getValue: (n) => n % 10,                      color: "bg-amber-400"  },
+  };
+  return (
+    <div className="flex gap-3 p-2 rounded-lg bg-white border border-[#E6E8EC] overflow-x-auto">
+      {places.map((p) => {
+        const info = placeInfo[p];
+        if (!info) return null;
+        const count = info.getValue(number);
+        return (
+          <div key={p} className="flex flex-col items-center gap-1 min-w-[28px]">
+            <div className="text-[9px] font-extrabold text-slate-400 uppercase">{info.label}</div>
+            <div className="flex flex-col gap-0.5">
+              {Array.from({ length: count || 1 }).map((_, i) => (
+                <div key={i} className={`h-3 w-6 rounded-sm ${count > 0 ? info.color : "bg-slate-100 border border-dashed border-slate-300"}`} />
+              ))}
+            </div>
+            <div className="text-xs font-black text-slate-700">{count}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function statusTone(s: LessonPreviewStudent["status"]) {
   switch (s) {
     case "Completed":   return "bg-emerald-50 text-emerald-700 border-emerald-200";
@@ -339,61 +980,108 @@ export default function LessonPreviewDrawer({
           </Section>
 
           {/* Activity breakdown */}
-          <Section title="Activity breakdown (3 rotations)">
-            <div className="space-y-2">
-              {ideas.map((idea, i) => {
-                const isOpen = openIdx === i;
-                const ex = exampleForActivity(idea);
-                return (
-                  <div key={i} className="rounded-xl border border-[#E6E8EC] bg-[#FAFBFC] overflow-hidden">
-                    <button
-                      onClick={() => setOpenIdx(isOpen ? null : i)}
-                      className="w-full text-left p-3 hover:bg-white transition-colors"
-                      aria-expanded={isOpen}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center justify-center h-6 w-6 rounded-md bg-teal-50 text-teal-700 text-[11px] font-black">
-                          {i + 1}
-                        </span>
-                        <span className="text-sm font-bold text-[#0F172A] flex-1">{idea}</span>
-                        <span className="text-[11px] font-bold text-teal-700">{isOpen ? "Hide example ▴" : "See example ▾"}</span>
-                      </div>
-                      <div className="text-[11px] text-[#64748B] mt-1 leading-relaxed pl-8">
-                        {describeActivity(idea)}
-                      </div>
-                    </button>
-                    {isOpen && (
-                      <div className="border-t border-[#E6E8EC] bg-white px-3 py-3 space-y-2.5">
-                        <div className="text-[10px] font-extrabold text-teal-700 uppercase tracking-wider">Example question</div>
-                        <div className="text-sm font-semibold text-[#0F172A]">{ex.prompt}</div>
-                        {ex.visual && <div>{ex.visual}</div>}
-                        {ex.options && (
-                          <div className="grid grid-cols-2 gap-1.5">
-                            {ex.options.map((opt) => {
-                              const isCorrect = opt === ex.correct;
-                              return (
-                                <div
-                                  key={opt}
-                                  className={`rounded-lg border px-2.5 py-2 text-xs font-bold ${
-                                    isCorrect
-                                      ? "bg-emerald-50 border-emerald-300 text-emerald-800"
-                                      : "bg-white border-[#E6E8EC] text-[#0F172A]"
-                                  }`}
-                                >
-                                  {opt}{isCorrect ? " ✓" : ""}
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-                        <div className="text-[11px] text-[#64748B] italic leading-relaxed">{ex.note}</div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </Section>
+          {lesson.activities?.length ? (
+            <Section title={`Activity breakdown (${lesson.activities.length} question types)`}>
+              <div className="space-y-2">
+                {lesson.activities.map((act, i) => {
+                  const isOpen = openIdx === i;
+                  const preview = activityPreviewData(act.activityType, act.config as Record<string, unknown>);
+                  return (
+                    <div key={i} className="rounded-xl border border-[#E6E8EC] bg-[#FAFBFC] overflow-hidden">
+                      <button
+                        onClick={() => setOpenIdx(isOpen ? null : i)}
+                        className="w-full text-left p-3 hover:bg-white transition-colors"
+                        aria-expanded={isOpen}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="inline-flex items-center justify-center h-6 w-6 rounded-md bg-teal-50 text-teal-700 text-[11px] font-black">
+                            {i + 1}
+                          </span>
+                          <span className="text-sm font-bold text-[#0F172A] flex-1">{preview.label}</span>
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-slate-100 text-[9px] font-extrabold text-slate-500 uppercase tracking-wider shrink-0">
+                            wt {act.weight}
+                          </span>
+                          <span className="text-[11px] font-bold text-teal-700 shrink-0">{isOpen ? "Hide ▴" : "See example ▾"}</span>
+                        </div>
+                        <div className="text-[11px] text-[#64748B] mt-1 leading-relaxed pl-8">
+                          {preview.description}
+                        </div>
+                      </button>
+                      {isOpen && (
+                        <div className="border-t border-[#E6E8EC] bg-white px-3 py-3 space-y-2.5">
+                          <div className="text-[10px] font-extrabold text-teal-700 uppercase tracking-wider">Example question</div>
+                          <div className="text-sm font-semibold text-[#0F172A]">{preview.prompt}</div>
+                          {preview.visual && <div>{preview.visual}</div>}
+                          {preview.options && (
+                            <div className="grid grid-cols-2 gap-1.5">
+                              {preview.options.map((opt) => {
+                                const isCorrect = opt === preview.correct;
+                                return (
+                                  <div key={opt} className={`rounded-lg border px-2.5 py-2 text-xs font-bold ${isCorrect ? "bg-emerald-50 border-emerald-300 text-emerald-800" : "bg-white border-[#E6E8EC] text-[#0F172A]"}`}>
+                                    {opt}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                          <div className="text-[11px] text-[#64748B] italic leading-relaxed">{preview.note}</div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </Section>
+          ) : (
+            <Section title="Activity breakdown (3 rotations)">
+              <div className="space-y-2">
+                {ideas.map((idea, i) => {
+                  const isOpen = openIdx === i;
+                  const ex = exampleForActivity(idea);
+                  return (
+                    <div key={i} className="rounded-xl border border-[#E6E8EC] bg-[#FAFBFC] overflow-hidden">
+                      <button
+                        onClick={() => setOpenIdx(isOpen ? null : i)}
+                        className="w-full text-left p-3 hover:bg-white transition-colors"
+                        aria-expanded={isOpen}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="inline-flex items-center justify-center h-6 w-6 rounded-md bg-teal-50 text-teal-700 text-[11px] font-black">
+                            {i + 1}
+                          </span>
+                          <span className="text-sm font-bold text-[#0F172A] flex-1">{idea}</span>
+                          <span className="text-[11px] font-bold text-teal-700">{isOpen ? "Hide example ▴" : "See example ▾"}</span>
+                        </div>
+                        <div className="text-[11px] text-[#64748B] mt-1 leading-relaxed pl-8">
+                          {describeActivity(idea)}
+                        </div>
+                      </button>
+                      {isOpen && (
+                        <div className="border-t border-[#E6E8EC] bg-white px-3 py-3 space-y-2.5">
+                          <div className="text-[10px] font-extrabold text-teal-700 uppercase tracking-wider">Example question</div>
+                          <div className="text-sm font-semibold text-[#0F172A]">{ex.prompt}</div>
+                          {ex.visual && <div>{ex.visual}</div>}
+                          {ex.options && (
+                            <div className="grid grid-cols-2 gap-1.5">
+                              {ex.options.map((opt) => {
+                                const isCorrect = opt === ex.correct;
+                                return (
+                                  <div key={opt} className={`rounded-lg border px-2.5 py-2 text-xs font-bold ${isCorrect ? "bg-emerald-50 border-emerald-300 text-emerald-800" : "bg-white border-[#E6E8EC] text-[#0F172A]"}`}>
+                                    {opt}{isCorrect ? " ✓" : ""}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                          <div className="text-[11px] text-[#64748B] italic leading-relaxed">{ex.note}</div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </Section>
+          )}
 
           {/* Student-specific progress */}
           {student && (
