@@ -134,7 +134,11 @@ export async function restoreStudentStateFromServer(studentId: string) {
   if (error) throw error;
 
   const rows = (Array.isArray(data) ? data : []) as StudentProgressSnapshotRow[];
-  const introSeen = rows.some((row) => row.has_seen_intro === true);
+  const introSeenFromStudentFlag = rows.some((row) => row.has_seen_intro === true);
+  const introSeenFromHistoricalProgress = rows.some(
+    (row) => row.pretest_score != null || row.placement_complete === true || row.status === "PASSED"
+  );
+  const introSeen = introSeenFromStudentFlag || introSeenFromHistoricalProgress;
   if (introSeen) {
     markActiveStudentIntroSeen(studentId);
   }

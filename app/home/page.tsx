@@ -36,7 +36,7 @@ export default function StudentHomePage() {
         console.warn("[Home] Could not persist intro state", error);
       });
     }
-    router.push(`/pretest?year=${encodeURIComponent(placementYear)}`);
+    router.push(isPlacementComplete(progress) ? "/levels" : `/pretest?year=${encodeURIComponent(placementYear)}`);
   }
 
   return (
