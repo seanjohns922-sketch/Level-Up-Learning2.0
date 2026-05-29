@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
 import {
   buildLiveClassInsight,
   buildLiveStudentInsight,
@@ -26,6 +27,7 @@ type StudentRow = {
   display_name: string;
   class_id: string;
   user_id: string;
+  working_level?: string | null;
 };
 
 type LiveStudentActivityRow = {
@@ -76,6 +78,7 @@ type LiveStudentActivityRow = {
 type LiveStudentCard = {
   id: string;
   displayName: string;
+  workingLevelBadge?: string | null;
   status: LiveStudentStatus;
   currentLevel?: string | null;
   currentWeek?: number | null;
@@ -115,6 +118,15 @@ const STATUS_PRIORITY: Record<LiveStudentStatus, number> = {
   on_track: 2,
   idle: 3,
 };
+
+function formatWorkingLevelBadge(workingLevel?: string | null) {
+  const normalized = normalizeWorkingLevelLabel(workingLevel);
+  if (!normalized) return null;
+  if (normalized === "Prep") return "GROUND";
+  const match = /Year\s+(\d+)/i.exec(normalized);
+  if (match) return `LVL ${match[1]}`;
+  return normalized.toUpperCase();
+}
 
 function toLiveCard(student: StudentRow, row?: LiveStudentActivityRow | null): LiveStudentCard {
   const insight = row
@@ -161,6 +173,7 @@ function toLiveCard(student: StudentRow, row?: LiveStudentActivityRow | null): L
   return {
     id: student.id,
     displayName: student.display_name,
+    workingLevelBadge: formatWorkingLevelBadge(student.working_level),
     status: insight?.status ?? row?.ai_status ?? "idle",
     currentLevel: row?.current_level ?? null,
     currentWeek: row?.current_week ?? null,
@@ -487,7 +500,14 @@ export default function LiveClassPanel({
                   {/* Header: name + badges */}
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <div className="text-lg font-black text-slate-900">{card.displayName}</div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <div className="text-lg font-black text-slate-900">{card.displayName}</div>
+                        {card.workingLevelBadge ? (
+                          <span className="inline-flex items-center rounded-full border border-teal-200 bg-teal-50 px-2.5 py-1 text-[11px] font-black uppercase tracking-[0.12em] text-teal-700">
+                            {card.workingLevelBadge}
+                          </span>
+                        ) : null}
+                      </div>
                       <div className="mt-1 text-sm text-slate-500">{formatLocation(card)}</div>
                     </div>
                     <div className="flex flex-col items-end gap-1.5">
