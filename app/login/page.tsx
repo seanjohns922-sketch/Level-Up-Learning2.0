@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { hasActiveStudentSeenIntro, setActiveStudentProfile } from "@/lib/studentIdentity";
+import { getActiveStudentIdentity, hasActiveStudentSeenIntro, setActiveStudentProfile } from "@/lib/studentIdentity";
 import { restoreStudentStateFromServer } from "@/lib/student-progress-sync";
 import { clearScopedProgress, isPlacementComplete, readProgress, writeProgress } from "@/data/progress";
 import { clearScopedProgramStore } from "@/lib/program-progress";
@@ -52,6 +52,17 @@ function readClasses(): ClassesStore {
 function writeClasses(store: ClassesStore) {
   if (typeof window === "undefined") return;
   localStorage.setItem(CLASSES_KEY, JSON.stringify(store));
+}
+
+function summarizeProgress(progress: ReturnType<typeof readProgress>) {
+  return progress
+    ? {
+        status: progress.status ?? null,
+        year: progress.year ?? null,
+        week: progress.assignedWeek ?? null,
+        placementComplete: progress.placementComplete ?? null,
+      }
+    : null;
 }
 
 /* ── Shared input wrapper (defined outside LoginPage to avoid remounts) ── */
@@ -166,6 +177,13 @@ export default function LoginPage() {
       normalizeSchoolYearLabel(student.school_year_level) ??
       normalizeSchoolYearLabel(student.year_level) ??
       null;
+    const previousActiveStudent = getActiveStudentIdentity().studentId;
+    const previousScopedProgress = readProgress();
+
+    if (previousActiveStudent && previousActiveStudent !== student.student_id) {
+      clearScopedProgress(previousActiveStudent);
+      clearScopedProgramStore(previousActiveStudent);
+    }
 
     setActiveStudentProfile(student.student_id, student.class_id, {
       displayName,
@@ -176,12 +194,26 @@ export default function LoginPage() {
 
     let progress = readProgress();
     let introSeen = hasActiveStudentSeenIntro(student.student_id);
+    let introSeenSource: "localStorage" | "students_table" = "localStorage";
+    let progressSource: "localStorage" | "progress_snapshot" | "default" = progress ? "localStorage" : "default";
+    let restoredRowsSummary: unknown[] = [];
     try {
       const restored = await restoreStudentStateFromServer(student.student_id);
       if (restored.progress) {
         progress = restored.progress;
+        progressSource = "progress_snapshot";
       }
-      introSeen = restored.introSeen || introSeen;
+      introSeen = restored.introSeen;
+      introSeenSource = "students_table";
+      restoredRowsSummary = restored.rows.map((row) => ({
+        year: row.year,
+        status: row.status,
+        week: row.week,
+        placement_complete: row.placement_complete,
+        assigned_week: row.assigned_week,
+        has_seen_intro: row.has_seen_intro,
+        pretest_score: row.pretest_score,
+      }));
     } catch (error) {
       console.warn("[Login] Could not restore student progress from Supabase", error);
     }
@@ -198,6 +230,7 @@ export default function LoginPage() {
         unlockedLegends: [],
       };
       writeProgress(progress);
+      progressSource = "default";
     }
 
     const placementComplete = isPlacementComplete(progress);
@@ -210,6 +243,36 @@ export default function LoginPage() {
     } else {
       dest = `/levels`;
     }
+    console.log("[LoginRouteDebug]", {
+      student_id: student.student_id,
+      previous_active_student_id: previousActiveStudent,
+      student_table: {
+        working_level: student.working_level ?? null,
+        school_year_level: student.school_year_level ?? null,
+      },
+      localStorage_before_switch: {
+        activeStudentId: previousActiveStudent,
+        progress: summarizeProgress(previousScopedProgress),
+      },
+      localStorage_after_switch: {
+        introSeenForStudent: hasActiveStudentSeenIntro(student.student_id),
+        progress: summarizeProgress(readProgress()),
+      },
+      progress_snapshot_rows: restoredRowsSummary,
+      resolved: {
+        hasSeenIntro: introSeen,
+        hasSeenIntroSource: introSeenSource,
+        placementComplete,
+        placementCompleteSource: progressSource === "progress_snapshot" ? "progress_snapshot.placement_complete" : progressSource,
+        progressStatus: progress?.status ?? null,
+        progressStatusSource: progressSource,
+        progressYear: progress?.year ?? null,
+        progressYearSource: progressSource === "progress_snapshot" ? "progress_snapshot.year" : progressSource,
+        progressWeek: progress?.assignedWeek ?? null,
+        progressWeekSource: progressSource === "progress_snapshot" ? "progress_snapshot.assigned_week/week" : progressSource,
+      },
+      route: dest,
+    });
     router.push(dest);
   }
 
