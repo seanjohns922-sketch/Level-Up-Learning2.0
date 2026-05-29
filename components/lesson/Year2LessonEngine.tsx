@@ -7,6 +7,7 @@ import { LessonHUDRail } from "@/components/lesson/LessonHUDRail";
 import { LessonCompleteCard } from "@/components/lesson/LessonCompleteCard";
 import { ComboMilestonePop } from "@/components/lesson/ComboMilestonePop";
 import SurgeAmbience from "@/components/lesson/SurgeAmbience";
+import NexusActivation from "@/components/lesson/NexusActivation";
 import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent } from "@/lib/live-class-client";
 import {
   buildLessonActivityPool,
@@ -826,7 +827,7 @@ export function Year2LessonEngine({
 
   // ── Active state ──
   function getComboBorder(count: number) {
-    if (count >= 10) return "border-purple-300/80 shadow-[0_0_22px_rgba(167,139,250,0.4)]";
+    if (count >= 10) return "border-teal-300 shadow-[0_0_38px_rgba(45,212,191,0.65)] ring-2 ring-emerald-400/40 ring-offset-2 ring-offset-slate-950";
     if (count >= 8)  return "border-orange-300/80 shadow-[0_0_22px_rgba(251,146,60,0.4)]";
     if (count >= 5)  return "border-yellow-300/80 shadow-[0_0_22px_rgba(253,224,71,0.4)]";
     if (count >= 3)  return "border-teal-300/70 shadow-[0_0_22px_rgba(94,234,212,0.35)]";
@@ -868,6 +869,7 @@ export function Year2LessonEngine({
       />
 
       <SurgeAmbience comboCount={comboCount} />
+      <NexusActivation comboCount={comboCount} />
 
       <div className="grid gap-3 lg:grid-cols-[300px_1fr] lg:items-start lg:gap-5">
         <aside className="lg:sticky lg:top-4 lg:self-start">
