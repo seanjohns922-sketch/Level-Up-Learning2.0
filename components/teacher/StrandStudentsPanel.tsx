@@ -580,6 +580,8 @@ function buildStudentWeeklyPerformanceSummary({
       resolvedMainGap = "Weekly quiz needs review";
       resolvedSuggestedAction = "Review this week's gaps, then retry the weekly quiz.";
     }
+  } else if (lessonsCompleted > 0 || questionsAnswered > 0 || weeklyQuizStatus !== "Not Attempted") {
+    resolvedStatus = "In Progress";
   }
 
   return {
