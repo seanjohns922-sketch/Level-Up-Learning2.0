@@ -12,10 +12,41 @@ import { startScreenRecording } from "@/lib/screen-recorder";
  */
 export default function StudentScreenRecorder() {
   useEffect(() => {
-    const { studentId, classId } = getActiveStudentIdentity();
-    // classId is optional — channel name only needs studentId
-    if (!studentId) return;
-    return startScreenRecording(studentId, classId ?? "");
+    let stopRecording: (() => void) | null = null;
+    let activeKey: string | null = null;
+
+    const syncRecorder = () => {
+      const { studentId, classId } = getActiveStudentIdentity();
+      const nextKey = studentId ? `${studentId}:${classId ?? ""}` : null;
+
+      if (nextKey === activeKey) return;
+
+      if (stopRecording) {
+        stopRecording();
+        stopRecording = null;
+      }
+
+      activeKey = nextKey;
+
+      if (!studentId) return;
+      stopRecording = startScreenRecording(studentId, classId ?? "");
+    };
+
+    syncRecorder();
+
+    const pollTimer = window.setInterval(syncRecorder, 1000);
+    const handleFocus = () => syncRecorder();
+    const handleStorage = () => syncRecorder();
+
+    window.addEventListener("focus", handleFocus);
+    window.addEventListener("storage", handleStorage);
+
+    return () => {
+      window.clearInterval(pollTimer);
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("storage", handleStorage);
+      if (stopRecording) stopRecording();
+    };
   }, []);
 
   return null;
