@@ -174,12 +174,51 @@ export default function CurriculumExplorer({
     return "bg-rose-50 text-rose-700 border-rose-200";
   }
 
+  function handleDownloadCsv() {
+    const rows: string[] = [
+      ["Week", "Topic", "Lesson", "Title", "Focus", "Curriculum Codes"].join(","),
+    ];
+    for (const w of plan) {
+      for (const l of w.lessons) {
+        rows.push(
+          [
+            w.week,
+            `"${w.topic.replace(/"/g, '""')}"`,
+            l.lesson,
+            `"${l.title.replace(/"/g, '""')}"`,
+            `"${l.focus.replace(/"/g, '""')}"`,
+            `"${l.curriculum.join(", ")}"`,
+          ].join(",")
+        );
+      }
+    }
+    const csv = rows.join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${yearLabel.replace(" ", "-").toLowerCase()}-lesson-schedule.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <div className="space-y-5">
       {/* Genre row */}
       <div className="bg-white rounded-2xl border border-[#E6E8EC] p-4">
-        <div className="text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.12em] mb-2">
-          Strand / Realm
+        <div className="flex items-center justify-between mb-2">
+          <div className="text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.12em]">
+            Strand / Realm
+          </div>
+          <button
+            onClick={handleDownloadCsv}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E6E8EC] bg-white text-[11px] font-bold text-[#64748B] hover:border-teal-300 hover:text-teal-700 hover:bg-teal-50 transition"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
+            </svg>
+            Download Schedule
+          </button>
         </div>
         <div className="flex flex-wrap gap-2">
           {genres.map((g) => {
