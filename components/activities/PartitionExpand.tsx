@@ -6,6 +6,27 @@ import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 type PlaceKey = "thousands" | "hundreds" | "tens" | "ones";
 
+const PLACE_MULTIPLIERS: Record<PlaceKey, number> = {
+  thousands: 1000,
+  hundreds: 100,
+  tens: 10,
+  ones: 1,
+};
+
+function standardQuantity(key: PlaceKey, value?: number) {
+  const multiplier = PLACE_MULTIPLIERS[key];
+  return Math.floor((value ?? 0) / multiplier);
+}
+
+function placeValueFromQuantity(key: PlaceKey, quantity: number) {
+  return quantity * PLACE_MULTIPLIERS[key];
+}
+
+function formatPlaceQuantity(key: PlaceKey, quantity: number) {
+  const singular = key === "thousands" ? "thousand" : key.slice(0, -1);
+  return `${quantity} ${quantity === 1 ? singular : key}`;
+}
+
 export default function PartitionExpand({
   questionData,
   onCorrect,
@@ -25,10 +46,22 @@ export default function PartitionExpand({
   ];
 
   const [values, setValues] = useState<Record<PlaceKey, string>>({
-    thousands: questionData.mode === "flexible_partition" ? String(questionData.standard.thousands ?? 0) : "",
-    hundreds: questionData.mode === "flexible_partition" ? String(questionData.standard.hundreds) : "",
-    tens: "0",
-    ones: "0",
+    thousands:
+      questionData.mode === "flexible_partition"
+        ? String(standardQuantity("thousands", questionData.standard.thousands))
+        : "",
+    hundreds:
+      questionData.mode === "flexible_partition"
+        ? String(standardQuantity("hundreds", questionData.standard.hundreds))
+        : "",
+    tens:
+      questionData.mode === "flexible_partition"
+        ? String(standardQuantity("tens", questionData.standard.tens))
+        : "",
+    ones:
+      questionData.mode === "flexible_partition"
+        ? String(standardQuantity("ones", questionData.standard.ones))
+        : "",
   });
 
   function setValue(key: PlaceKey, next: string) {
@@ -47,29 +80,43 @@ export default function PartitionExpand({
     const hundreds = numericValue("hundreds");
     const tens = numericValue("tens");
     const ones = numericValue("ones");
-    const sum = thousands + hundreds + tens + ones;
+    const sum =
+      placeValueFromQuantity("thousands", thousands) +
+      placeValueFromQuantity("hundreds", hundreds) +
+      placeValueFromQuantity("tens", tens) +
+      placeValueFromQuantity("ones", ones);
 
     const std = questionData.standard;
-    const stdThousands = std.thousands ?? 0;
+    const stdThousands = standardQuantity("thousands", std.thousands);
+    const stdHundreds = standardQuantity("hundreds", std.hundreds);
+    const stdTens = standardQuantity("tens", std.tens);
+    const stdOnes = standardQuantity("ones", std.ones);
 
     const isCorrect =
       questionData.mode === "flexible_partition"
         ? sum === questionData.target &&
           (thousands !== stdThousands ||
-            hundreds !== std.hundreds ||
-            tens !== std.tens ||
-            ones !== std.ones)
+            hundreds !== stdHundreds ||
+            tens !== stdTens ||
+            ones !== stdOnes)
         : thousands === stdThousands &&
-          hundreds === std.hundreds &&
-          tens === std.tens &&
-          ones === std.ones;
+          hundreds === stdHundreds &&
+          tens === stdTens &&
+          ones === stdOnes;
 
     if (isCorrect) onCorrect?.();
     else onWrong?.();
   }
 
-  const sum = places.reduce((s, p) => s + numericValue(p.key), 0);
-  const expression = places.map((p) => numericValue(p.key)).join(" + ");
+  const total = places.reduce((sum, place) => {
+    return sum + placeValueFromQuantity(place.key, numericValue(place.key));
+  }, 0);
+  const quantityExpression = places
+    .map((place) => formatPlaceQuantity(place.key, numericValue(place.key)))
+    .join(" + ");
+  const expandedExpression = places
+    .map((place) => placeValueFromQuantity(place.key, numericValue(place.key)).toLocaleString())
+    .join(" + ");
 
   return (
     <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -92,6 +139,9 @@ export default function PartitionExpand({
             <div className="text-xs font-bold uppercase tracking-wide text-gray-500">
               {item.label}
             </div>
+            <div className="mt-1 text-sm text-gray-500">
+              How many {item.label.toLowerCase()}?
+            </div>
             <input
               value={values[item.key]}
               onChange={(event) => setValue(item.key, event.target.value)}
@@ -105,10 +155,16 @@ export default function PartitionExpand({
 
       <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-4">
         <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
-          Your expression
+          Place value quantities
+        </div>
+        <div className="mt-2 text-2xl font-black text-teal-900">
+          {quantityExpression}
+        </div>
+        <div className="mt-4 text-xs font-bold uppercase tracking-wide text-teal-700">
+          Expanded value
         </div>
         <div className="mt-2 text-3xl font-black text-teal-900">
-          {expression} = {sum}
+          {expandedExpression} = {total.toLocaleString()}
         </div>
         {questionData.mode === "flexible_partition" ? (
           <div className="mt-2 text-sm text-teal-800">
