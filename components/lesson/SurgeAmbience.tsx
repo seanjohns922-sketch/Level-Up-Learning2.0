@@ -38,7 +38,17 @@ export default function SurgeAmbience({ comboCount }: { comboCount: number }) {
           delay: delaySeed * 4,
           duration: 4 + durationSeed * 4,
           size: 2 + sizeSeed * (tier >= 3 ? 5 : 3),
-          hue: tier >= 4 ? (hueSeed < 0.3 ? 280 : 45) : tier >= 3 ? (hueSeed < 0.3 ? 25 : 45) : 48,
+          // Tier 4 (Nexus) → teal/emerald. Tier 3 → orange/gold. Lower tiers → gold.
+          hue:
+            tier >= 4
+              ? hueSeed < 0.5
+                ? 168 // teal
+                : 152 // emerald
+              : tier >= 3
+              ? hueSeed < 0.3
+                ? 25
+                : 45
+              : 48,
         };
       });
     },
@@ -55,7 +65,7 @@ export default function SurgeAmbience({ comboCount }: { comboCount: number }) {
       ? "radial-gradient(ellipse at 50% 100%, rgba(253,200,40,0.22) 0%, transparent 60%), radial-gradient(ellipse at 50% 0%, rgba(253,224,71,0.14) 0%, transparent 55%), radial-gradient(ellipse at 0% 50%, rgba(251,191,36,0.10) 0%, transparent 45%), radial-gradient(ellipse at 100% 50%, rgba(251,191,36,0.10) 0%, transparent 45%)"
       : tier === 3
       ? "radial-gradient(ellipse at 50% 100%, rgba(251,146,60,0.30) 0%, transparent 65%), radial-gradient(ellipse at 50% 0%, rgba(253,224,71,0.22) 0%, transparent 60%), radial-gradient(ellipse at 0% 50%, rgba(251,146,60,0.16) 0%, transparent 50%), radial-gradient(ellipse at 100% 50%, rgba(251,146,60,0.16) 0%, transparent 50%)"
-      : "radial-gradient(ellipse at 50% 100%, rgba(251,191,36,0.35) 0%, transparent 70%), radial-gradient(ellipse at 50% 0%, rgba(167,139,250,0.28) 0%, transparent 65%), radial-gradient(ellipse at 0% 50%, rgba(253,186,116,0.22) 0%, transparent 55%), radial-gradient(ellipse at 100% 50%, rgba(196,181,253,0.22) 0%, transparent 55%)";
+      : "radial-gradient(ellipse at 50% 100%, rgba(45,212,191,0.42) 0%, transparent 70%), radial-gradient(ellipse at 50% 0%, rgba(16,185,129,0.32) 0%, transparent 65%), radial-gradient(ellipse at 0% 50%, rgba(94,234,212,0.26) 0%, transparent 55%), radial-gradient(ellipse at 100% 50%, rgba(45,212,191,0.26) 0%, transparent 55%)";
 
   const pulseSpeed = tier === 1 ? "5s" : tier === 2 ? "3.5s" : tier === 3 ? "2.4s" : "1.6s";
 
@@ -108,7 +118,7 @@ export default function SurgeAmbience({ comboCount }: { comboCount: number }) {
             style={{
               background:
                 tier >= 4
-                  ? "linear-gradient(to top, rgba(251,191,36,0.45), rgba(167,139,250,0.18), transparent)"
+                  ? "linear-gradient(to top, rgba(45,212,191,0.5), rgba(16,185,129,0.22), transparent)"
                   : tier >= 3
                   ? "linear-gradient(to top, rgba(251,146,60,0.42), transparent)"
                   : "linear-gradient(to top, rgba(253,200,40,0.32), transparent)",
@@ -124,21 +134,23 @@ export default function SurgeAmbience({ comboCount }: { comboCount: number }) {
           className="absolute inset-0"
           style={{
             background:
-              "repeating-conic-gradient(from 0deg at 50% 110%, rgba(253,224,71,0.10) 0deg, transparent 6deg, transparent 12deg, rgba(253,224,71,0.10) 18deg)",
+              tier >= 4
+                ? "repeating-conic-gradient(from 0deg at 50% 110%, rgba(94,234,212,0.14) 0deg, transparent 6deg, transparent 12deg, rgba(45,212,191,0.14) 18deg)"
+                : "repeating-conic-gradient(from 0deg at 50% 110%, rgba(253,224,71,0.10) 0deg, transparent 6deg, transparent 12deg, rgba(253,224,71,0.10) 18deg)",
             mixBlendMode: "screen",
             animation: "surgeRays 3.2s ease-in-out infinite",
           }}
         />
       )}
 
-      {/* Diagonal shimmer band (tier 4) */}
+      {/* Diagonal shimmer band (tier 4 — teal data stream) */}
       {tier >= 4 && (
         <div className="absolute inset-0 overflow-hidden">
           <div
             className="absolute top-0 bottom-0 w-1/3"
             style={{
               background:
-                "linear-gradient(115deg, transparent 0%, rgba(255,240,180,0.22) 50%, transparent 100%)",
+                "linear-gradient(115deg, transparent 0%, rgba(167,243,208,0.28) 50%, transparent 100%)",
               animation: "surgeShimmer 2.8s linear infinite",
               filter: "blur(8px)",
             }}
@@ -156,7 +168,7 @@ export default function SurgeAmbience({ comboCount }: { comboCount: number }) {
             bottom: 0,
             width: s.size,
             height: s.size,
-            background: `hsl(${s.hue} 95% ${s.hue === 280 ? 75 : 65}%)`,
+            background: `hsl(${s.hue} 95% 65%)`,
             boxShadow: `0 0 ${s.size * 3}px hsl(${s.hue} 95% 60% / 0.9), 0 0 ${
               s.size * 6
             }px hsl(${s.hue} 95% 55% / 0.5)`,

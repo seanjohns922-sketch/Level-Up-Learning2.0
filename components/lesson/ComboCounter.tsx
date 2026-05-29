@@ -67,13 +67,13 @@ const TIER_CONFIG: Record<
   },
   nexus: {
     label: "NEXUS STATE",
-    counterColor: "rgba(233,213,255,1)",
-    labelColor: "rgba(233,213,255,0.95)",
-    glowColor: "rgba(167,139,250,0.8)",
+    counterColor: "rgba(236,254,255,1)",
+    labelColor: "rgba(167,243,208,0.98)",
+    glowColor: "rgba(45,212,191,0.9)",
     borderGradient:
-      "linear-gradient(135deg, rgba(167,139,250,0.75) 0%, rgba(109,40,217,0.45) 50%, rgba(167,139,250,0.65) 100%)",
-    bgGradient: "linear-gradient(135deg, #0d0520 0%, #1e0a45 60%, #140630 100%)",
-    iconColor: "rgba(196,181,253,0.95)",
+      "linear-gradient(135deg, rgba(94,234,212,0.85) 0%, rgba(16,185,129,0.5) 50%, rgba(45,212,191,0.8) 100%)",
+    bgGradient: "linear-gradient(135deg, #022c28 0%, #064e3b 60%, #032420 100%)",
+    iconColor: "rgba(167,243,208,1)",
   },
 };
 
