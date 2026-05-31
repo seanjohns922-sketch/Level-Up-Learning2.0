@@ -557,7 +557,7 @@ export default function TeacherClassesPage() {
 
   return (
     <main className="min-h-screen bg-[#fbf7f1] px-6 py-10">
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
           <h1 className="text-3xl font-black text-gray-900">My Classes</h1>
           <div className="flex items-center gap-3 flex-wrap">
