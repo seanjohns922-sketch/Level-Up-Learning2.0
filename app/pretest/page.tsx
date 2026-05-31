@@ -7,6 +7,7 @@ import type { Question } from "@/data/assessments/pretests";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCard";
 import AssessmentShell from "@/components/assessment/AssessmentShell";
+import { ActiveLearningTracker } from "@/components/student/ActiveLearningTracker";
 import { analyzeAssessmentResult, isAssessmentAnswerCorrect } from "@/data/assessments/analysis";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, type StudentProgress, writeProgress } from "@/data/progress";
 import { ALL_PROGRAM_WEEKS, clearYearProgress, getOptionalWeeks, normalizeWeekList } from "@/lib/program-progress";
@@ -631,26 +632,29 @@ function PretestPage() {
   }
 
   return (
-    <AssessmentShell
-      testType="Pre-Test"
-      year={year}
-      currentIndex={index}
-      totalQuestions={questions.length}
-      questionPrompt={question.prompt}
-      questionContent={
-        <div>
-          <div className="flex justify-end mb-3">
-            <ReadAloudBtn text={question.prompt} />
+    <>
+      <ActiveLearningTracker context="pretest" />
+      <AssessmentShell
+        testType="Pre-Test"
+        year={year}
+        currentIndex={index}
+        totalQuestions={questions.length}
+        questionPrompt={question.prompt}
+        questionContent={
+          <div>
+            <div className="flex justify-end mb-3">
+              <ReadAloudBtn text={question.prompt} />
+            </div>
+            {questionContent}
           </div>
-          {questionContent}
-        </div>
-      }
-      hasAnswer={isReady}
-      isLast={index === questions.length - 1}
-      onBack={prevQuestion}
-      onNext={nextQuestion}
-      onSubmit={finish}
-      onExit={() => router.push(isPlacementComplete(readProgress()) ? "/levels" : "/home")}
-    />
+        }
+        hasAnswer={isReady}
+        isLast={index === questions.length - 1}
+        onBack={prevQuestion}
+        onNext={nextQuestion}
+        onSubmit={finish}
+        onExit={() => router.push(isPlacementComplete(readProgress()) ? "/levels" : "/home")}
+      />
+    </>
   );
 }

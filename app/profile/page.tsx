@@ -1,15 +1,35 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { readProgress } from "@/data/progress";
-import { readProgramStore, getWeekProgress, isWeekComplete } from "@/lib/program-progress";
+import { getWeekProgress, isWeekComplete, readProgramStore } from "@/lib/program-progress";
 import { useAutoReadSetting } from "@/lib/speak";
+import { fetchStudentActivityDaily, type StudentActivityDailyRow } from "@/lib/student-activity";
+import { getActiveStudentProfile } from "@/lib/studentIdentity";
+import { supabase } from "@/lib/supabase";
 import {
-  ChevronLeft, Zap, Flame, Clock, Target, Calendar,
-  Lock, ChevronRight, Users, Swords, Medal,
-  TrendingUp, BookOpen, Trophy, Star, Settings, LogOut, Search,
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Flame,
+  Lock,
+  LogOut,
+  Medal,
+  Search,
+  Settings,
+  Star,
+  Swords,
+  Target,
+  TrendingUp,
+  Trophy,
+  Users,
+  Zap,
+  BookOpen,
 } from "lucide-react";
+
+const MELBOURNE_TIME_ZONE = "Australia/Melbourne";
 
 const REALMS = [
   { name: "Number Nexus", icon: BookOpen, status: "active" as const },
@@ -25,8 +45,39 @@ const REALMS = [
 
 const DAYS = ["M", "T", "W", "T", "F", "S", "S"];
 
+const SOCIAL_TEASERS = [
+  {
+    icon: Users,
+    label: "Friends",
+    copy: "Coming soon: add classmates, celebrate progress, and cheer each other on.",
+  },
+  {
+    icon: Swords,
+    label: "Battles",
+    copy: "Coming soon: friendly skill battles where students can challenge others using maths questions.",
+  },
+  {
+    icon: Medal,
+    label: "Rankings",
+    copy: "Coming soon: class and school leaderboards based on effort, streaks and learning progress.",
+  },
+];
+
+type SnapshotRow = {
+  lesson_attempts?: Record<
+    string,
+    {
+      attempts?: Array<Record<string, unknown>>;
+      latestSummary?: Record<string, unknown> | null;
+    }
+  > | null;
+};
+
 function readStudentNameFromStorage() {
   if (typeof window === "undefined") return "Adventurer";
+  const profile = getActiveStudentProfile();
+  if (profile?.displayName?.trim()) return profile.displayName.trim();
+
   try {
     const active = localStorage.getItem("lul_active_student_v1");
     if (!active) return "Adventurer";
@@ -36,47 +87,174 @@ function readStudentNameFromStorage() {
   } catch {
     // ignore
   }
+
   return "Adventurer";
 }
 
-function readActiveDaysFromStorage() {
-  if (typeof window === "undefined") return new Set<number>();
-  try {
-    const raw = localStorage.getItem("lul_active_days");
-    if (raw) return new Set<number>(JSON.parse(raw));
-  } catch {
-    // ignore
-  }
-  return new Set<number>();
+function getMelbourneDateParts(date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-AU", {
+    timeZone: MELBOURNE_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+
+  return {
+    year: Number(parts.find((part) => part.type === "year")?.value ?? "1970"),
+    month: Number(parts.find((part) => part.type === "month")?.value ?? "1"),
+    day: Number(parts.find((part) => part.type === "day")?.value ?? "1"),
+  };
+}
+
+function getMelbourneDateKey(date = new Date()) {
+  const parts = getMelbourneDateParts(date);
+  return `${parts.year}-${String(parts.month).padStart(2, "0")}-${String(parts.day).padStart(2, "0")}`;
 }
 
 function getMonthGrid() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth();
-  const today = now.getDate();
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const parts = getMelbourneDateParts();
+  const year = parts.year;
+  const monthIndex = parts.month - 1;
+  const today = parts.day;
+  const firstDay = new Date(year, monthIndex, 1).getDay();
+  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
   const offset = firstDay === 0 ? 6 : firstDay - 1;
-  const monthName = now.toLocaleString("default", { month: "long" });
-  return { offset, daysInMonth, today, monthName, year };
+  const monthName = new Intl.DateTimeFormat("en-AU", {
+    timeZone: MELBOURNE_TIME_ZONE,
+    month: "long",
+  }).format(new Date(year, monthIndex, 1));
+
+  return { offset, daysInMonth, today, monthName, year, monthIndex };
 }
 
-// ─── Clean Dashboard System ───
-// bg #F7F8FA / card #FFFFFF / border #E6E8EC
-// text #0F172A / muted #64748B
-// accent teal #0EA5A4 / reward gold #F59E0B
+function formatDurationCompact(totalSeconds: number) {
+  const safeSeconds = Math.max(0, Math.round(totalSeconds));
+  const hours = Math.floor(safeSeconds / 3600);
+  const minutes = Math.floor((safeSeconds % 3600) / 60);
+
+  if (hours > 0) return `${hours}h ${minutes}m`;
+  if (minutes > 0) return `${minutes}m`;
+  return safeSeconds > 0 ? "<1m" : "0m";
+}
+
+function toSafeNumber(value: unknown) {
+  const next = typeof value === "number" ? value : Number(value ?? 0);
+  return Number.isFinite(next) ? next : 0;
+}
+
+function computeOverallLessonAccuracy(rows: SnapshotRow[]) {
+  let totalCorrect = 0;
+  let totalQuestions = 0;
+
+  rows.forEach((row) => {
+    const attemptsByLesson = row.lesson_attempts ?? {};
+    Object.values(attemptsByLesson).forEach((entry) => {
+      const attempts = Array.isArray(entry?.attempts)
+        ? entry.attempts
+        : entry?.latestSummary && typeof entry.latestSummary === "object"
+          ? [entry.latestSummary]
+          : [];
+
+      attempts.forEach((attempt) => {
+        if (typeof attempt?.completedAt !== "string" && typeof attempt?.at !== "string") return;
+        const total = toSafeNumber(attempt?.totalQuestions ?? attempt?.questionsAnswered);
+        const correct = toSafeNumber(attempt?.correctCount ?? attempt?.correctAnswers);
+        if (total <= 0) return;
+        totalQuestions += total;
+        totalCorrect += Math.min(correct, total);
+      });
+    });
+  });
+
+  if (totalQuestions <= 0) return null;
+  return Math.round((totalCorrect / totalQuestions) * 100);
+}
+
+function calculateDayStreak(activityKeys: Set<string>) {
+  if (activityKeys.size === 0) return 0;
+
+  const today = new Date();
+  const todayKey = getMelbourneDateKey(today);
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayKey = getMelbourneDateKey(yesterday);
+
+  if (!activityKeys.has(todayKey) && !activityKeys.has(yesterdayKey)) return 0;
+
+  const anchor = activityKeys.has(todayKey) ? new Date(today) : yesterday;
+  let streak = 0;
+  const cursor = new Date(anchor);
+
+  while (activityKeys.has(getMelbourneDateKey(cursor))) {
+    streak += 1;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+
+  return streak;
+}
+
+function formatActivityDateLabel(dateKey: string) {
+  const [year, month, day] = dateKey.split("-").map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString("en-AU", {
+    day: "numeric",
+    month: "short",
+  });
+}
+
+function formatActivitySummary(row: StudentActivityDailyRow) {
+  const details: string[] = [];
+  if (row.seconds_active > 0) details.push(`${formatDurationCompact(row.seconds_active)} active`);
+  if (row.lessons_completed > 0) {
+    details.push(`${row.lessons_completed} lesson${row.lessons_completed === 1 ? "" : "s"} completed`);
+  }
+  if (row.questions_answered > 0) {
+    details.push(`${Math.round((row.correct_answers / row.questions_answered) * 100)}% accuracy`);
+  }
+  return details.length > 0 ? details.join(" • ") : "Started learning";
+}
 
 export default function ProfilePage() {
   const router = useRouter();
   const { autoReadEnabled, setAutoReadEnabled } = useAutoReadSetting();
-  const [progress, setProgress] = useState<ReturnType<typeof readProgress>>(() => readProgress());
-  const [store, setStore] = useState<ReturnType<typeof readProgramStore>>(() => readProgramStore());
-  const [studentName] = useState(readStudentNameFromStorage);
-  const [activeDays] = useState<Set<number>>(readActiveDaysFromStorage);
+  const [progress] = useState<ReturnType<typeof readProgress>>(() => readProgress());
+  const [store] = useState<ReturnType<typeof readProgramStore>>(() => readProgramStore());
+  const [studentName, setStudentName] = useState(readStudentNameFromStorage);
+  const [activityRows, setActivityRows] = useState<StudentActivityDailyRow[]>([]);
+  const [persistedAccuracy, setPersistedAccuracy] = useState<number | null>(null);
+  const [openTooltip, setOpenTooltip] = useState<string | null>(null);
 
   const year = progress?.year ?? "Year 1";
   const levelNum = parseInt(year.replace(/\D/g, ""), 10) || 1;
+
+  useEffect(() => {
+    const profile = getActiveStudentProfile();
+    if (profile?.displayName?.trim()) {
+      setStudentName(profile.displayName.trim());
+    }
+    if (!profile?.studentId) return;
+
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        const [daily, snapshotResponse] = await Promise.all([
+          fetchStudentActivityDaily(profile.studentId),
+          supabase.rpc("get_student_progress_snapshot", { p_student_id: profile.studentId }),
+        ]);
+
+        if (cancelled) return;
+
+        setActivityRows(daily);
+        setPersistedAccuracy(computeOverallLessonAccuracy((snapshotResponse.data ?? []) as SnapshotRow[]));
+      } catch (error) {
+        console.warn("[Profile] Failed to load activity stats:", error);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const stats = useMemo(() => {
     let xp = 0;
@@ -85,72 +263,104 @@ export default function ProfilePage() {
     let quizCount = 0;
     let quizTotal = 0;
 
-    for (let w = 1; w <= 12; w++) {
-      const wp = getWeekProgress(store, year, w);
-      const done = wp.lessonsCompleted.filter(Boolean).length;
+    for (let week = 1; week <= 12; week += 1) {
+      const weekProgress = getWeekProgress(store, year, week);
+      const done = weekProgress.lessonsCompleted.filter(Boolean).length;
       completedLessons += done;
       xp += done * 40;
-      if (wp.quizScore !== undefined) {
-        xp += Math.round((wp.quizScore / 100) * 60);
-        quizCount++;
-        quizTotal += wp.quizScore;
+      if (weekProgress.quizScore !== undefined) {
+        xp += Math.round((weekProgress.quizScore / 100) * 60);
+        quizCount += 1;
+        quizTotal += weekProgress.quizScore;
       }
-      if (isWeekComplete(wp)) weeksCompleted++;
+      if (isWeekComplete(weekProgress)) weeksCompleted += 1;
     }
 
-    const accuracy = quizCount > 0 ? Math.round(quizTotal / quizCount) : (progress?.scorePercent ?? 0);
+    const accuracy =
+      quizCount > 0 ? Math.round(quizTotal / quizCount) : (progress?.scorePercent ?? 0);
     const realmProgress = Math.round((weeksCompleted / 12) * 100);
 
     return { xp, completedLessons, accuracy, weeksCompleted, realmProgress };
-  }, [store, year, progress]);
-
-  const recentActivity = useMemo(() => {
-    const items: { icon: typeof Star; text: string; color: string }[] = [];
-    if (stats.completedLessons > 0)
-      items.push({ icon: BookOpen, text: `Completed ${stats.completedLessons} lesson${stats.completedLessons !== 1 ? "s" : ""}`, color: "text-[#0EA5A4]" });
-    if (stats.accuracy > 0)
-      items.push({ icon: Target, text: `Accuracy at ${stats.accuracy}%`, color: "text-[#0EA5A4]" });
-    if (stats.weeksCompleted > 0)
-      items.push({ icon: Trophy, text: `${stats.weeksCompleted} week${stats.weeksCompleted !== 1 ? "s" : ""} mastered`, color: "text-[#F59E0B]" });
-    if (items.length === 0)
-      items.push({ icon: Star, text: "Start your first lesson!", color: "text-[#94A3B8]" });
-    return items;
-  }, [stats]);
+  }, [progress, store, year]);
 
   const levelTitle = levelNum <= 2 ? "Apprentice" : levelNum <= 4 ? "Processor" : "Master";
   const initials = studentName.charAt(0).toUpperCase();
-  const { offset, daysInMonth, today, monthName } = useMemo(() => getMonthGrid(), []);
+  const { offset, daysInMonth, today, monthName, year: calendarYear, monthIndex } = useMemo(
+    () => getMonthGrid(),
+    []
+  );
+
+  const activityByDate = useMemo(
+    () => new Map(activityRows.map((row) => [row.activity_date, row])),
+    [activityRows]
+  );
+  const activityKeys = useMemo(() => new Set(activityRows.map((row) => row.activity_date)), [activityRows]);
+  const totalActiveSeconds = useMemo(
+    () => activityRows.reduce((sum, row) => sum + Math.max(0, row.seconds_active ?? 0), 0),
+    [activityRows]
+  );
+  const dayStreak = useMemo(() => calculateDayStreak(activityKeys), [activityKeys]);
+  const dashboardAccuracy = persistedAccuracy ?? (stats.completedLessons > 0 ? stats.accuracy : null);
+
+  const recentActivity = useMemo(() => {
+    const items: { icon: typeof Star; text: string; color: string }[] = [];
+    if (stats.completedLessons > 0) {
+      items.push({
+        icon: BookOpen,
+        text: `Completed ${stats.completedLessons} lesson${stats.completedLessons !== 1 ? "s" : ""}`,
+        color: "text-[#0EA5A4]",
+      });
+    }
+    if (dashboardAccuracy != null) {
+      items.push({
+        icon: Target,
+        text: `Accuracy at ${dashboardAccuracy}%`,
+        color: "text-[#0EA5A4]",
+      });
+    }
+    if (stats.weeksCompleted > 0) {
+      items.push({
+        icon: Trophy,
+        text: `${stats.weeksCompleted} week${stats.weeksCompleted !== 1 ? "s" : ""} mastered`,
+        color: "text-[#F59E0B]",
+      });
+    }
+    if (items.length === 0) {
+      items.push({ icon: Star, text: "Start your first lesson!", color: "text-[#94A3B8]" });
+    }
+    return items;
+  }, [dashboardAccuracy, stats.completedLessons, stats.weeksCompleted]);
 
   return (
     <main className="min-h-screen bg-[#F7F8FA] p-4 md:p-6">
-      <div className="max-w-[1400px] mx-auto space-y-5">
-
-        {/* ─── TOP BAR ─── */}
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <div className="flex items-center gap-3 flex-1 min-w-0">
+      <div className="mx-auto max-w-[1400px] space-y-5">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex min-w-0 flex-1 items-center gap-3">
             <button
               onClick={() => router.back()}
-              className="h-10 w-10 rounded-xl bg-white border border-[#E6E8EC] flex items-center justify-center text-[#0F172A] hover:bg-[#F1F5F9] transition-all flex-shrink-0"
+              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-[#E6E8EC] bg-white text-[#0F172A] transition-all hover:bg-[#F1F5F9]"
               aria-label="Back"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
-            <div className="hidden md:flex items-center gap-2 bg-white rounded-xl px-4 py-2.5 border border-[#E6E8EC] w-full max-w-md">
+            <div className="hidden w-full max-w-md items-center gap-2 rounded-xl border border-[#E6E8EC] bg-white px-4 py-2.5 md:flex">
               <Search className="h-4 w-4 text-[#94A3B8]" />
               <span className="text-sm text-[#94A3B8]">Search your journey…</span>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-3 rounded-xl bg-white border border-[#E6E8EC] px-3 py-2">
-              <div className="h-10 w-10 rounded-lg bg-[#0F172A] flex items-center justify-center text-sm font-black text-white">
+            <div className="flex items-center gap-3 rounded-xl border border-[#E6E8EC] bg-white px-3 py-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#0F172A] text-sm font-black text-white">
                 {initials}
               </div>
-              <div className="hidden sm:block pr-1">
-                <h2 className="text-sm font-bold text-[#0F172A] leading-tight">{studentName}</h2>
-                <p className="text-[10px] font-semibold text-[#64748B]">Numbot {levelTitle} · Lvl {levelNum}</p>
+              <div className="hidden pr-1 sm:block">
+                <h2 className="text-sm font-bold leading-tight text-[#0F172A]">{studentName}</h2>
+                <p className="text-[10px] font-semibold text-[#64748B]">
+                  Numbot {levelTitle} · Lvl {levelNum}
+                </p>
               </div>
-              <div className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#FEF3C7] border border-[#FDE68A]">
+              <div className="flex items-center gap-1 rounded-md border border-[#FDE68A] bg-[#FEF3C7] px-2.5 py-1">
                 <Zap className="h-3 w-3 text-[#F59E0B]" />
                 <span className="text-xs font-extrabold text-[#B45309]">{stats.xp.toLocaleString()}</span>
               </div>
@@ -158,7 +368,7 @@ export default function ProfilePage() {
 
             <button
               onClick={() => router.push("/profile")}
-              className="h-11 w-11 rounded-xl bg-white border border-[#E6E8EC] flex items-center justify-center text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-all"
+              className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#E6E8EC] bg-white text-[#64748B] transition-all hover:bg-[#F1F5F9] hover:text-[#0F172A]"
               aria-label="Settings"
               title="Settings"
             >
@@ -166,7 +376,7 @@ export default function ProfilePage() {
             </button>
             <button
               onClick={() => router.push("/login")}
-              className="h-11 w-11 rounded-xl bg-white border border-[#E6E8EC] flex items-center justify-center text-[#64748B] hover:text-[#DC2626] hover:bg-[#FEF2F2] transition-all"
+              className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#E6E8EC] bg-white text-[#64748B] transition-all hover:bg-[#FEF2F2] hover:text-[#DC2626]"
               aria-label="Logout"
               title="Logout"
             >
@@ -175,23 +385,26 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* ─── HERO BANNER ─── */}
-        <div className="relative rounded-2xl bg-gradient-to-br from-[#0F172A] to-[#1E293B] p-6 md:p-8 overflow-hidden border border-[#1E293B]">
-          <div className="absolute -top-16 -right-16 h-56 w-56 rounded-full bg-[#0EA5A4]/10 blur-3xl pointer-events-none" />
+        <div className="relative overflow-hidden rounded-2xl border border-[#1E293B] bg-gradient-to-br from-[#0F172A] to-[#1E293B] p-6 md:p-8">
+          <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[#0EA5A4]/10 blur-3xl" />
           <div className="relative flex items-center justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              <p className="text-[11px] font-bold text-[#94A3B8] uppercase tracking-[0.18em] mb-2">
-                {new Date().toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long" })}
+            <div className="min-w-0 flex-1">
+              <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#94A3B8]">
+                {new Date().toLocaleDateString("en-AU", {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                })}
               </p>
-              <h1 className="text-2xl md:text-3xl font-black text-white leading-tight">
+              <h1 className="text-2xl font-black leading-tight text-white md:text-3xl">
                 Welcome back, {studentName}!
               </h1>
-              <p className="text-sm text-[#CBD5E1] mt-1.5 max-w-md">
+              <p className="mt-1.5 max-w-md text-sm text-[#CBD5E1]">
                 Your Number Nexus journey continues. {stats.realmProgress}% through Level {levelNum}.
               </p>
               <button
                 onClick={() => router.push("/home")}
-                className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#F59E0B] text-[#0F172A] text-sm font-extrabold hover:bg-[#FBBF24] transition-all active:scale-95"
+                className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#F59E0B] px-5 py-2.5 text-sm font-extrabold text-[#0F172A] transition-all hover:bg-[#FBBF24] active:scale-95"
               >
                 Continue Lessons <ChevronRight className="h-4 w-4" />
               </button>
@@ -199,33 +412,39 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* ─── STATS ─── */}
         <section>
-          <div className="flex items-center justify-between mb-3">
+          <div className="mb-3 flex items-center justify-between">
             <h3 className="text-base font-bold text-[#0F172A]">Your Stats</h3>
             <button className="text-xs font-semibold text-[#64748B] hover:text-[#0F172A]">See all</button>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             {[
-              { icon: Flame, value: "0", label: "Day Streak", accent: "#F59E0B" },
-              { icon: Calendar, value: activeDays.size.toString(), label: "Days Active", accent: "#0EA5A4" },
-              { icon: Clock, value: "--", label: "Time", accent: "#0EA5A4" },
-              { icon: Target, value: `${stats.accuracy}%`, label: "Accuracy", accent: "#0EA5A4" },
-            ].map((c) => (
+              { icon: Flame, value: String(dayStreak), label: "Day Streak", accent: "#F59E0B" },
+              { icon: Calendar, value: String(activityRows.length), label: "Days Active", accent: "#0EA5A4" },
+              { icon: Clock, value: formatDurationCompact(totalActiveSeconds), label: "Time", accent: "#0EA5A4" },
+              {
+                icon: Target,
+                value: dashboardAccuracy == null ? "—" : `${dashboardAccuracy}%`,
+                label: "Accuracy",
+                accent: "#0EA5A4",
+              },
+            ].map((card) => (
               <div
-                key={c.label}
-                className="rounded-xl bg-white border border-[#E6E8EC] p-4 hover:border-[#CBD5E1] transition-all duration-200 cursor-pointer"
+                key={card.label}
+                className="cursor-pointer rounded-xl border border-[#E6E8EC] bg-white p-4 transition-all duration-200 hover:border-[#CBD5E1]"
               >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="h-10 w-10 rounded-lg bg-[#F1F5F9] flex items-center justify-center">
-                    <c.icon className="h-5 w-5" style={{ color: c.accent }} />
+                <div className="mb-3 flex items-start justify-between">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#F1F5F9]">
+                    <card.icon className="h-5 w-5" style={{ color: card.accent }} />
                   </div>
                 </div>
-                <div className="text-2xl font-black text-[#0F172A] leading-none">{c.value}</div>
-                <div className="flex items-center gap-2 mt-1.5">
-                  <div className="h-0.5 w-5 rounded-full" style={{ backgroundColor: c.accent }} />
-                  <div className="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider">{c.label}</div>
+                <div className="text-2xl font-black leading-none text-[#0F172A]">{card.value}</div>
+                <div className="mt-1.5 flex items-center gap-2">
+                  <div className="h-0.5 w-5 rounded-full" style={{ backgroundColor: card.accent }} />
+                  <div className="text-[11px] font-semibold uppercase tracking-wider text-[#64748B]">
+                    {card.label}
+                  </div>
                 </div>
               </div>
             ))}
@@ -233,13 +452,11 @@ export default function ProfilePage() {
         </section>
 
         <section>
-          <div className="rounded-xl bg-white border border-[#E6E8EC] p-5">
+          <div className="rounded-xl border border-[#E6E8EC] bg-white p-5">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-base font-bold text-[#0F172A]">Auto Read</h3>
-                <p className="mt-1 text-sm text-[#64748B]">
-                  Automatically read new questions aloud
-                </p>
+                <p className="mt-1 text-sm text-[#64748B]">Automatically read new questions aloud</p>
               </div>
               <button
                 type="button"
@@ -263,21 +480,23 @@ export default function ProfilePage() {
           </div>
         </section>
 
-        {/* ─── REALMS + WINS (left) + RIGHT RAIL ─── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-
-          <div className="lg:col-span-2 space-y-5">
-            {/* Enrolled Realms */}
-            <div className="rounded-xl bg-white border border-[#E6E8EC] p-5">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-base font-bold text-[#0F172A] flex items-center gap-2">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+          <div className="space-y-5 lg:col-span-2">
+            <div className="rounded-xl border border-[#E6E8EC] bg-white p-5">
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="flex items-center gap-2 text-base font-bold text-[#0F172A]">
                   <BookOpen className="h-4 w-4 text-[#0EA5A4]" />
                   Enrolled Realms
                 </h3>
-                <button onClick={() => router.push("/realms")} className="text-xs font-semibold text-[#64748B] hover:text-[#0F172A]">See all</button>
+                <button
+                  onClick={() => router.push("/realms")}
+                  className="text-xs font-semibold text-[#64748B] hover:text-[#0F172A]"
+                >
+                  See all
+                </button>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 {REALMS.map((realm) => {
                   const isActive = realm.status === "active";
                   const isComingSoon = realm.status === "coming-soon";
@@ -285,29 +504,29 @@ export default function ProfilePage() {
                     <div
                       key={realm.name}
                       onClick={() => isActive && router.push("/realms")}
-                      className={`relative flex items-center gap-3 rounded-lg p-2.5 transition-all duration-200 border
-                        ${isActive
-                          ? "bg-white border-[#E6E8EC] hover:border-[#0EA5A4] cursor-pointer"
-                          : "bg-[#F7F8FA] border-[#E6E8EC] opacity-70"
-                        }`}
+                      className={`relative flex items-center gap-3 rounded-lg border p-2.5 transition-all duration-200 ${
+                        isActive
+                          ? "cursor-pointer border-[#E6E8EC] bg-white hover:border-[#0EA5A4]"
+                          : "border-[#E6E8EC] bg-[#F7F8FA] opacity-70"
+                      }`}
                     >
                       {isActive ? (
                         <div
-                          className="h-9 w-9 rounded-md bg-cover bg-center border border-[#E6E8EC] flex-shrink-0"
-                          style={{ backgroundImage: `url('/images/number-nexus-tile.jpg')` }}
+                          className="h-9 w-9 flex-shrink-0 rounded-md border border-[#E6E8EC] bg-cover bg-center"
+                          style={{ backgroundImage: "url('/images/number-nexus-tile.jpg')" }}
                         />
                       ) : (
-                        <div className="h-9 w-9 rounded-md bg-[#F1F5F9] border border-[#E6E8EC] flex items-center justify-center flex-shrink-0">
+                        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md border border-[#E6E8EC] bg-[#F1F5F9]">
                           <realm.icon className="h-4 w-4 text-[#94A3B8]" />
                         </div>
                       )}
-                      <div className="flex-1 min-w-0">
-                        <div className={`text-xs font-bold truncate ${isActive ? "text-[#0F172A]" : "text-[#94A3B8]"}`}>
+                      <div className="min-w-0 flex-1">
+                        <div className={`truncate text-xs font-bold ${isActive ? "text-[#0F172A]" : "text-[#94A3B8]"}`}>
                           {realm.name}
                         </div>
                         {isActive ? (
-                          <div className="flex items-center gap-1.5 mt-1">
-                            <div className="flex-1 h-1 rounded-full bg-[#E5E7EB] overflow-hidden">
+                          <div className="mt-1 flex items-center gap-1.5">
+                            <div className="h-1 flex-1 overflow-hidden rounded-full bg-[#E5E7EB]">
                               <div
                                 className="h-full rounded-full bg-[#0EA5A4] transition-all duration-700"
                                 style={{ width: `${stats.realmProgress}%` }}
@@ -316,11 +535,19 @@ export default function ProfilePage() {
                             <span className="text-[9px] font-extrabold text-[#0EA5A4]">{stats.realmProgress}%</span>
                           </div>
                         ) : (
-                          <div className="inline-flex items-center gap-1 mt-0.5">
-                            {isComingSoon
-                              ? <span className="text-[9px] font-bold text-[#64748B] uppercase tracking-wider">Coming Soon</span>
-                              : <><Lock className="h-2.5 w-2.5 text-[#94A3B8]" /><span className="text-[9px] font-bold text-[#94A3B8] uppercase tracking-wider">Locked</span></>
-                            }
+                          <div className="mt-0.5 inline-flex items-center gap-1">
+                            {isComingSoon ? (
+                              <span className="text-[9px] font-bold uppercase tracking-wider text-[#64748B]">
+                                Coming Soon
+                              </span>
+                            ) : (
+                              <>
+                                <Lock className="h-2.5 w-2.5 text-[#94A3B8]" />
+                                <span className="text-[9px] font-bold uppercase tracking-wider text-[#94A3B8]">
+                                  Locked
+                                </span>
+                              </>
+                            )}
                           </div>
                         )}
                       </div>
@@ -330,15 +557,17 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Your Wins */}
-            <div className="rounded-xl bg-white border border-[#E6E8EC] p-5">
-              <h3 className="text-base font-bold text-[#0F172A] mb-3 flex items-center gap-2">
+            <div className="rounded-xl border border-[#E6E8EC] bg-white p-5">
+              <h3 className="mb-3 flex items-center gap-2 text-base font-bold text-[#0F172A]">
                 <Star className="h-4 w-4 text-[#F59E0B]" />
                 Your Wins
               </h3>
               <div className="flex flex-wrap gap-2">
-                {recentActivity.map((item, i) => (
-                  <div key={i} className="flex items-center gap-2 bg-[#F7F8FA] rounded-lg px-3 py-2 border border-[#E6E8EC]">
+                {recentActivity.map((item, index) => (
+                  <div
+                    key={`${item.text}-${index}`}
+                    className="flex items-center gap-2 rounded-lg border border-[#E6E8EC] bg-[#F7F8FA] px-3 py-2"
+                  >
                     <item.icon className={`h-4 w-4 ${item.color}`} />
                     <span className="text-xs font-semibold text-[#0F172A]">{item.text}</span>
                   </div>
@@ -346,87 +575,107 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Coming Soon — social teaser */}
-            <div className="rounded-xl bg-white border border-[#E6E8EC] px-6 py-4 flex flex-wrap items-center justify-center gap-6">
-              {[
-                { icon: Users, label: "Friends" },
-                { icon: Swords, label: "Battles" },
-                { icon: Medal, label: "Rankings" },
-              ].map((item) => (
-                <div key={item.label} className="flex items-center gap-1.5 opacity-60">
+            <div className="flex flex-wrap items-center justify-center gap-6 rounded-xl border border-[#E6E8EC] bg-white px-6 py-4">
+              {SOCIAL_TEASERS.map((item) => (
+                <button
+                  key={item.label}
+                  type="button"
+                  title={item.copy}
+                  onClick={() => setOpenTooltip((current) => (current === item.label ? null : item.label))}
+                  className="group relative flex items-center gap-1.5 opacity-60 transition hover:opacity-100 focus:opacity-100"
+                >
                   <item.icon className="h-4 w-4 text-[#64748B]" />
-                  <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider">{item.label}</span>
-                </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#64748B]">{item.label}</span>
+                  <div
+                    className={`absolute bottom-full left-1/2 z-10 mb-3 w-60 -translate-x-1/2 rounded-lg bg-[#0F172A] px-3 py-2 text-left text-[11px] font-semibold text-white shadow-xl transition ${
+                      openTooltip === item.label
+                        ? "translate-y-0 opacity-100"
+                        : "pointer-events-none translate-y-1 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 group-focus:translate-y-0 group-focus:opacity-100"
+                    }`}
+                  >
+                    {item.copy}
+                  </div>
+                </button>
               ))}
-              <div className="flex items-center gap-1.5 pl-3 border-l border-[#E6E8EC]">
+              <div className="flex items-center gap-1.5 border-l border-[#E6E8EC] pl-3">
                 <Lock className="h-3 w-3 text-[#94A3B8]" />
-                <span className="text-[9px] font-bold text-[#94A3B8] uppercase tracking-[0.15em]">Coming Soon</span>
+                <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-[#94A3B8]">Coming Soon</span>
               </div>
             </div>
           </div>
 
-          {/* RIGHT RAIL */}
           <div className="space-y-5">
-            {/* Calendar */}
-            <div className="rounded-xl bg-white border border-[#E6E8EC] p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-bold text-[#0F172A] flex items-center gap-2">
+            <div className="rounded-xl border border-[#E6E8EC] bg-white p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="flex items-center gap-2 text-sm font-bold text-[#0F172A]">
                   <Calendar className="h-4 w-4 text-[#0EA5A4]" />
                   Activity
                 </h3>
-                <span className="text-[10px] font-semibold text-[#64748B] uppercase tracking-wider">{monthName}</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-[#64748B]">
+                  {monthName}
+                </span>
               </div>
 
-              <div className="grid grid-cols-7 gap-1 mb-1">
-                {DAYS.map((d, i) => (
-                  <div key={i} className="text-center text-[9px] font-bold text-[#94A3B8]">{d}</div>
+              <div className="mb-1 grid grid-cols-7 gap-1">
+                {DAYS.map((day) => (
+                  <div key={day} className="text-center text-[9px] font-bold text-[#94A3B8]">
+                    {day}
+                  </div>
                 ))}
               </div>
 
               <div className="grid grid-cols-7 gap-1">
-                {Array.from({ length: offset }).map((_, i) => <div key={`e-${i}`} className="aspect-square" />)}
-                {Array.from({ length: daysInMonth }).map((_, i) => {
-                  const day = i + 1;
+                {Array.from({ length: offset }).map((_, index) => (
+                  <div key={`empty-${index}`} className="aspect-square" />
+                ))}
+                {Array.from({ length: daysInMonth }).map((_, index) => {
+                  const day = index + 1;
+                  const dateKey = `${calendarYear}-${String(monthIndex + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+                  const row = activityByDate.get(dateKey);
                   const isToday = day === today;
-                  const isActive = activeDays.has(day);
+                  const isActive = Boolean(row);
                   const isPast = day < today;
+
                   return (
                     <div
-                      key={day}
-                      className={`flex items-center justify-center rounded-md aspect-square text-[10px] font-bold transition-all
-                        ${isToday
+                      key={dateKey}
+                      title={`${formatActivityDateLabel(dateKey)} • ${row ? formatActivitySummary(row) : "No learning activity yet"}`}
+                      className={`relative flex aspect-square items-center justify-center rounded-md text-[10px] font-bold transition-all ${
+                        isToday
                           ? "bg-[#0F172A] text-white"
                           : isActive
-                            ? "bg-[#CCFBF1] text-[#0F766E] font-extrabold"
+                            ? "bg-[#CCFBF1] font-extrabold text-[#0F766E]"
                             : isPast
                               ? "text-[#64748B]"
                               : "text-[#CBD5E1]"
-                        }
-                      `}
+                      }`}
                     >
                       {day}
+                      {isActive && !isToday ? (
+                        <span className="absolute bottom-1.5 h-1.5 w-1.5 rounded-full bg-[#0EA5A4]" />
+                      ) : null}
                     </div>
                   );
                 })}
               </div>
             </div>
 
-            {/* Daily Challenge */}
-            <div className="rounded-xl bg-gradient-to-br from-[#0F172A] to-[#1E293B] p-5 text-white relative overflow-hidden border border-[#1E293B]">
-              <div className="absolute -top-6 -right-6 h-24 w-24 rounded-full bg-[#0EA5A4]/15 blur-2xl" />
+            <div className="relative overflow-hidden rounded-xl border border-[#1E293B] bg-gradient-to-br from-[#0F172A] to-[#1E293B] p-5 text-white">
+              <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-[#0EA5A4]/15 blur-2xl" />
               <div className="relative">
-                <h4 className="text-base font-bold mb-1">Daily Challenge</h4>
-                <p className="text-xs text-[#CBD5E1] mb-4 leading-snug">A quick sprint for bonus XP</p>
+                <h4 className="mb-1 text-base font-bold">Daily Challenge</h4>
+                <p className="mb-4 text-xs leading-snug text-[#CBD5E1]">A quick sprint for bonus XP</p>
                 <div className="flex items-center justify-between">
                   <span className="text-base font-extrabold text-[#F59E0B]">+50 XP</span>
-                  <span className="text-[9px] font-bold text-[#94A3B8] uppercase tracking-wider px-2 py-1 rounded-full bg-white/[0.06]">Soon</span>
+                  <span className="rounded-full bg-white/[0.06] px-2 py-1 text-[9px] font-bold uppercase tracking-wider text-[#94A3B8]">
+                    Soon
+                  </span>
                 </div>
               </div>
             </div>
 
-            {/* Level Progress mini */}
-            <div className="rounded-xl bg-white border border-[#E6E8EC] p-4">
-              <h4 className="text-sm font-bold text-[#0F172A] mb-3 flex items-center gap-2">
+            <div className="rounded-xl border border-[#E6E8EC] bg-white p-4">
+              <h4 className="mb-3 flex items-center gap-2 text-sm font-bold text-[#0F172A]">
                 <TrendingUp className="h-4 w-4 text-[#0EA5A4]" />
                 Level Progress
               </h4>
@@ -435,13 +684,20 @@ export default function ProfilePage() {
                   <svg viewBox="0 0 36 36" className="h-full w-full -rotate-90">
                     <circle cx="18" cy="18" r="15.5" fill="none" stroke="#E5E7EB" strokeWidth="3" />
                     <circle
-                      cx="18" cy="18" r="15.5" fill="none"
-                      stroke="#0EA5A4" strokeWidth="3" strokeLinecap="round"
-                      strokeDasharray={`${stats.accuracy} ${100 - stats.accuracy}`}
+                      cx="18"
+                      cy="18"
+                      r="15.5"
+                      fill="none"
+                      stroke="#0EA5A4"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeDasharray={`${dashboardAccuracy ?? 0} ${100 - (dashboardAccuracy ?? 0)}`}
                     />
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-sm font-black text-[#0F172A] leading-none">{stats.accuracy}%</span>
+                    <span className="text-sm font-black leading-none text-[#0F172A]">
+                      {dashboardAccuracy == null ? "—" : `${dashboardAccuracy}%`}
+                    </span>
                   </div>
                 </div>
                 <div className="flex-1 space-y-1">
@@ -458,7 +714,6 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
-
       </div>
     </main>
   );

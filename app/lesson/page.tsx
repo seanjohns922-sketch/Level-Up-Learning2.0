@@ -42,7 +42,9 @@ import { markLessonComplete } from "@/lib/program-progress";
 import { getRecommendedAssignedWeek, isWeekPlayable, readProgramStore, getWeekProgress } from "@/lib/program-progress";
 import { getLessonChrome } from "@/lib/levelTheme";
 import { LessonPageHero } from "@/components/lesson/LessonPageHero";
+import { ActiveLearningTracker } from "@/components/student/ActiveLearningTracker";
 import { supabase } from "@/lib/supabase";
+import { recordStudentActivityDelta } from "@/lib/student-activity";
 import type { TeacherInsight, TeacherInsightInput } from "@/lib/teacher-insights";
 import { saveStudentProgressState } from "@/lib/student-progress-sync";
 
@@ -392,6 +394,13 @@ function LessonPage() {
       if (error) {
         throw error;
       }
+
+      void recordStudentActivityDelta({
+        questionsAnswered: summary.questionsAnswered,
+        correctAnswers: summary.correctAnswers,
+        lessonsCompleted: 1,
+        xpEarned: 40,
+      });
     } catch (error) {
       console.warn("[Lesson] Persist summary failed:", error);
       throw error;
@@ -499,6 +508,7 @@ function LessonPage() {
 
   return (
     <main className="min-h-screen flex items-start justify-center px-4 py-6 bg-background">
+      <ActiveLearningTracker context="lesson" />
       <div className="w-full max-w-6xl">
         <div className="mb-4">
           <button

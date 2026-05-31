@@ -8,6 +8,7 @@ import { getProgramForYear } from "@/data/programs";
 import { getYear6WeeklyQuiz, type Year6WeeklyQuizQuestion } from "@/data/quizzes/year6";
 import { DEMO_MODE } from "@/data/config";
 import PostTestTransition from "@/components/PostTestTransition";
+import { ActiveLearningTracker } from "@/components/student/ActiveLearningTracker";
 import {
   buildQuizActivityPool,
   generateQuestionForLevelLessonActivity,
@@ -31,6 +32,7 @@ import MoneyChange from "@/components/week7/MoneyChange";
 import MoneyEnough from "@/components/week7/MoneyEnough";
 import { MathFormattedText } from "@/components/FractionText";
 import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent } from "@/lib/live-class-client";
+import { recordStudentActivityDelta } from "@/lib/student-activity";
 import { prepareSpeechText, speak, useAutoReadSetting, useSpeakState, useSpeechInteractionReady } from "@/lib/speak";
 import type { TeacherAttemptQuestion, TeacherInsight, TeacherInsightInput } from "@/lib/teacher-insights";
 import { ClickableDotGrid, ClickableDotRows } from "@/components/ClickableDots";
@@ -6648,6 +6650,11 @@ function SessionPage() {
           p_lesson_id: lessonId,
         });
         if (error) throw error;
+
+        void recordStudentActivityDelta({
+          lessonsCompleted: 1,
+          xpEarned: 40,
+        });
       }
     } catch (e) {
       console.warn("[Lesson] DB save failed:", e);
@@ -7265,7 +7272,15 @@ function SessionPage() {
           p_next_week: passed ? Math.min(12, Number(week) + 1) : Number(week),
         });
         if (error) console.warn("[Quiz] DB save error:", error);
-        else console.log("[Quiz] Quiz score saved to DB:", attempt);
+        else {
+          void recordStudentActivityDelta({
+            questionsAnswered: total,
+            correctAnswers: score,
+            quizzesCompleted: 1,
+            xpEarned: Math.round((percent / 100) * 60),
+          });
+          console.log("[Quiz] Quiz score saved to DB:", attempt);
+        }
       } catch (e) {
         console.warn("[Quiz] DB save failed:", e);
       }
@@ -7495,6 +7510,7 @@ function SessionPage() {
 
   return (
     <main className="min-h-screen bg-background flex items-center justify-center px-6 py-10">
+      <ActiveLearningTracker context="session" />
       <div className="w-full max-w-5xl">
         <div className="mb-4">
           <button

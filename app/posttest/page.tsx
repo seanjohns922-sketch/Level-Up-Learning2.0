@@ -10,6 +10,7 @@ import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, writeProgress, t
 import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCard";
 import AssessmentShell from "@/components/assessment/AssessmentShell";
 import { analyzeAssessmentResult } from "@/data/assessments/analysis";
+import { ActiveLearningTracker } from "@/components/student/ActiveLearningTracker";
 import { supabase } from "@/lib/supabase";
 import { DEMO_MODE } from "@/data/config";
 import { getWeekProgress, hasCompletedRequiredWeeks, readProgramStore } from "@/lib/program-progress";
@@ -562,28 +563,31 @@ function PostTestPage() {
   }
 
   return (
-    <AssessmentShell
-      testType="Post-Test"
-      year={year}
-      currentIndex={idx}
-      totalQuestions={questions.length}
-      subtitle={`Complete all ${questions.length} questions to unlock your Legend (${PASS_THRESHOLD}%+)`}
-      questionPrompt={q.prompt}
-      questionContent={
-        <div>
-          <div className="flex justify-end mb-3">
-            <ReadAloudBtn text={q.prompt} />
+    <>
+      <ActiveLearningTracker context="posttest" />
+      <AssessmentShell
+        testType="Post-Test"
+        year={year}
+        currentIndex={idx}
+        totalQuestions={questions.length}
+        subtitle={`Complete all ${questions.length} questions to unlock your Legend (${PASS_THRESHOLD}%+)`}
+        questionPrompt={q.prompt}
+        questionContent={
+          <div>
+            <div className="flex justify-end mb-3">
+              <ReadAloudBtn text={q.prompt} />
+            </div>
+            {questionContent}
           </div>
-          {questionContent}
-        </div>
-      }
-      hasAnswer={hasAnswer}
-      isLast={idx === questions.length - 1}
-      submitted={submitted}
-      onBack={back}
-      onNext={next}
-      onSubmit={submit}
-      onExit={() => router.push(`/program?year=${encodeURIComponent(year)}&week=12&legacy=1`)}
-    />
+        }
+        hasAnswer={hasAnswer}
+        isLast={idx === questions.length - 1}
+        submitted={submitted}
+        onBack={back}
+        onNext={next}
+        onSubmit={submit}
+        onExit={() => router.push(`/program?year=${encodeURIComponent(year)}&week=12&legacy=1`)}
+      />
+    </>
   );
 }
