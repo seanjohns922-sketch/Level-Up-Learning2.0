@@ -20,11 +20,9 @@ function cleanInsight(candidate: Partial<TeacherInsight>, fallback: TeacherInsig
 
   return {
     status,
-    strength: pick(candidate.strength, fallback.strength),
-    gap: pick(candidate.gap, fallback.gap),
-    likelyMisconception: pick(candidate.likelyMisconception, fallback.likelyMisconception),
+    strongestSkill: pick(candidate.strongestSkill, fallback.strongestSkill),
+    needsSupport: pick(candidate.needsSupport, fallback.needsSupport),
     teacherAction: pick(candidate.teacherAction, fallback.teacherAction),
-    recommendedRevisit: pick(candidate.recommendedRevisit, fallback.recommendedRevisit),
   };
 }
 
@@ -35,12 +33,12 @@ async function generateAiInsight(input: TeacherInsightInput, fallback: TeacherIn
 
   const prompt = [
     "You are generating a short teacher dashboard insight from student maths attempt data.",
-    "Return strict JSON with keys: status, strength, gap, likelyMisconception, teacherAction, recommendedRevisit.",
+    "Return strict JSON with keys: status, strongestSkill, needsSupport, teacherAction.",
     "Rules:",
-    "- Keep each field short and practical.",
-    "- Focus on what the teacher should do next.",
-    "- Do not shame the student.",
-    "- Use one sentence per field.",
+    "- strongestSkill: a short topic label (e.g. 'Place Value') where the student performed best.",
+    "- needsSupport: a short topic label (e.g. 'Flexible Partitioning') where they need help.",
+    "- teacherAction: one practical sentence — what the teacher should do next.",
+    "- Do not shame the student. Keep it concise and actionable.",
     `Attempt data: ${JSON.stringify(input)}`,
     `Fallback draft: ${JSON.stringify(fallback)}`,
   ].join("\n");
@@ -58,8 +56,7 @@ async function generateAiInsight(input: TeacherInsightInput, fallback: TeacherIn
       messages: [
         {
           role: "system",
-          content:
-            "Generate concise teacher-facing maths lesson insights as JSON only.",
+          content: "Generate concise teacher-facing maths lesson insights as JSON only.",
         },
         {
           role: "user",

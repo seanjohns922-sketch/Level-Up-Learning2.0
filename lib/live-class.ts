@@ -132,7 +132,9 @@ export type LiveStudentSnapshot = {
 };
 
 export type LiveClassInsight = {
+  title: string;
   headline: string;
+  detail?: string;
   suggestedAction: string;
 };
 
@@ -478,13 +480,30 @@ export function buildLiveStudentInsight(
   const learningState = determineLearningState(snapshot, secondsSinceActive, thresholds);
 
   if (secondsSinceActive >= thresholds.idleSeconds) {
+    const name = snapshot.studentName ?? "This student";
+    const mins = Math.floor(secondsSinceActive / 60);
     return {
       status: "idle",
       statusLabel: STATUS_LABELS.idle,
       learningState,
-      issue: "No recent learning activity has been recorded.",
-      likelyGap: "Student may be away from the task or needs a restart prompt.",
-      suggestedTeacherAction: "Prompt the student to resume the current activity.",
+      issue: `${name} has not submitted an answer for ${mins} minute${mins !== 1 ? "s" : ""}.`,
+      likelyGap: "Student may be away from the device or needs a prompt to continue.",
+      suggestedTeacherAction: "Prompt the student to continue their lesson.",
+    };
+  }
+
+  // Accuracy alert — enough data and below 60%
+  const sessionAccuracy = typeof snapshot.accuracy === "number" ? snapshot.accuracy : null;
+  const qAnswered = snapshot.questionsAnswered ?? 0;
+  if (sessionAccuracy !== null && sessionAccuracy < 60 && qAnswered >= 5) {
+    const name = snapshot.studentName ?? "This student";
+    return {
+      status: "needs_support",
+      statusLabel: STATUS_LABELS.needs_support,
+      learningState,
+      issue: `${name} has ${Math.round(sessionAccuracy)}% accuracy over ${qAnswered} questions.`,
+      likelyGap: inferLikelyGap(snapshot),
+      suggestedTeacherAction: "Teacher check-in recommended. Sit with the student to identify where they are getting stuck.",
     };
   }
 
@@ -503,7 +522,7 @@ export function buildLiveStudentInsight(
         : questionAttempts >= thresholds.needsSupportSameQuestionAttempts
         ? `${name} has made ${questionAttempts} attempt${questionAttempts !== 1 ? "s" : ""} on the same question${activityLabel ? ` in ${activityLabel}` : ""} without success`
         : incorrectCount >= thresholds.needsSupportRecentIncorrectCount
-        ? `${name} has got ${incorrectCount} in a row wrong${activityLabel ? ` on ${activityLabel}` : ""}`
+        ? `${name} has ${incorrectCount} consecutive incorrect answers${activityLabel ? ` on ${activityLabel}` : ""}`
         : `${name} has been on the same question for ${Math.floor(timeOnQuestion / 60)} min${Math.floor(timeOnQuestion / 60) !== 1 ? "s" : ""}${activityLabel ? ` in ${activityLabel}` : ""}`;
     return {
       status: "needs_support",
@@ -516,6 +535,8 @@ export function buildLiveStudentInsight(
           ? "Ask the student to read each option aloud before choosing — slow them down."
           : learningState === "rushing"
           ? "Ask the student to check their answer makes sense before submitting."
+          : incorrectCount >= thresholds.needsSupportRecentIncorrectCount
+          ? "Provide a worked example for this question type, then have the student try a similar problem."
           : inferSuggestedAction(snapshot),
     };
   }
@@ -529,53 +550,58 @@ export function buildLiveStudentInsight(
     const isInactiveCheckIn = secondsSinceActive >= thresholds.checkInIdleSeconds;
     const name = snapshot.studentName ?? "This student";
     const activityLabel = snapshot.currentActivityLabel ?? snapshot.currentLessonTitle ?? null;
+    const mins = Math.floor(secondsSinceActive / 60);
+    const qMins = Math.floor(timeOnQuestion / 60);
     const issueText = isInactiveCheckIn
-      ? `${name} has been inactive for ${Math.floor(secondsSinceActive / 60)} minute${Math.floor(secondsSinceActive / 60) !== 1 ? "s" : ""}`
+      ? `${name} has no activity for ${mins} minute${mins !== 1 ? "s" : ""}`
       : learningState === "hesitating"
-      ? `${name} has been reading the question for ${Math.floor(timeOnQuestion / 60)} min without attempting${activityLabel ? ` on ${activityLabel}` : ""}`
+      ? `${name} has been reading the question for ${qMins} min without attempting${activityLabel ? ` in ${activityLabel}` : ""}`
       : latestEventType === "answer_incorrect"
       ? `${name} just answered incorrectly${activityLabel ? ` on ${activityLabel}` : ""}`
       : hintCount >= thresholds.checkInHintCount
-      ? `${name} has used ${hintCount} hints${activityLabel ? ` on ${activityLabel}` : ""} — may need guidance`
-      : `${name} has been on the current question for ${Math.floor(timeOnQuestion / 60)} min${Math.floor(timeOnQuestion / 60) !== 1 ? "s" : ""}`;
+      ? `${name} has used ${hintCount} hints${activityLabel ? ` on ${activityLabel}` : ""}`
+      : `${name} has been on the current question for ${qMins} min${qMins !== 1 ? "s" : ""}`;
     return {
       status: "check_in",
       statusLabel: STATUS_LABELS.check_in,
       learningState,
       issue: sentenceCase(issueText),
       likelyGap: isInactiveCheckIn
-        ? "The task may be incomplete, or the student may have stepped away from the app."
+        ? "Student may have stepped away or needs a prompt to continue."
         : inferLikelyGap(snapshot),
       suggestedTeacherAction: isInactiveCheckIn
-        ? "Check whether the student has paused the task and decide whether to restart or continue."
+        ? "Prompt the student to continue."
         : learningState === "hesitating"
-        ? "Sit with the student — ask what they understand about the question, not just what answer they'd pick."
+        ? "Sit with the student — ask what they understand about the question before they attempt it."
+        : latestEventType === "answer_incorrect"
+        ? "Check in — ask the student to talk through their thinking on the question."
         : inferSuggestedAction(snapshot),
     };
   }
 
+  const name = snapshot.studentName ?? "This student";
   const onTrackIssue =
     learningState === "mastering"
-      ? `${snapshot.studentName ?? "This student"} is mastering this topic — strong accuracy and pace.`
+      ? `${name} is on a strong run — high accuracy and good pace.`
       : learningState === "recovering"
-      ? `${snapshot.studentName ?? "This student"} just got back on track after some earlier errors.`
+      ? `${name} corrected their errors and is back on track.`
       : learningState === "improving"
-      ? `${snapshot.studentName ?? "This student"} is getting it now — errors have stopped.`
-      : "Student is working steadily through the current task.";
+      ? `${name} has stopped making errors — momentum is building.`
+      : null;
 
   const onTrackAction =
     learningState === "mastering"
-      ? "Consider giving an extension challenge — they're ready for more."
+      ? "Consider offering an extension challenge — they are ready for more."
       : learningState === "recovering" || learningState === "improving"
-      ? "Encourage them — a brief acknowledgement can maintain momentum."
-      : "Let the student continue independently.";
+      ? "A brief acknowledgement will help maintain their momentum."
+      : "No action needed — let the student continue independently.";
 
   return {
     status: "on_track",
     statusLabel: STATUS_LABELS.on_track,
     learningState,
-    issue: onTrackIssue,
-    likelyGap: "No immediate gap is showing in the live data.",
+    issue: onTrackIssue ?? "",
+    likelyGap: "",
     suggestedTeacherAction: onTrackAction,
   };
 }
@@ -639,101 +665,142 @@ export function formatTimeActive(seconds?: number | null) {
   return leftoverMinutes > 0 ? `${hours}h ${leftoverMinutes}m` : `${hours}h`;
 }
 
-export function buildLiveClassInsight(
-  rows: Array<LiveStudentSnapshot & { aiStatus?: LiveStudentStatus | null; learningState?: LearningState | null }>
-): LiveClassInsight {
-  const flagged = rows.filter(
-    (row) => (row.aiStatus ?? "on_track") === "needs_support" || (row.aiStatus ?? "on_track") === "check_in"
+type ClassInsightRow = {
+  studentId: string;
+  studentName?: string | null;
+  classId: string;
+  skillTag?: string | null;
+  misconceptionTag?: string | null;
+  aiStatus?: LiveStudentStatus | null;
+  learningState?: LearningState | null;
+  accuracyPercent?: number | null;
+  questionsAnswered?: number | null;
+};
+
+export function buildLiveClassInsight(rows: ClassInsightRow[]): LiveClassInsight {
+  const total = rows.length;
+
+  // Students with enough data to have meaningful accuracy
+  const withAccuracy = rows.filter(
+    (r) => r.accuracyPercent != null && (r.questionsAnswered ?? 0) >= 5
   );
 
-  if (flagged.length === 0) {
-    // Check for positive patterns worth surfacing
-    const mastering = rows.filter((r) => r.learningState === "mastering").length;
-    const improving = rows.filter((r) => r.learningState === "improving" || r.learningState === "recovering").length;
-    if (mastering >= 2) {
-      return {
-        headline: `Class Insight: ${mastering} students are mastering their current topic.`,
-        suggestedAction: "Suggested Action: Consider setting extension challenges for these students.",
-      };
-    }
-    if (improving >= 2) {
-      return {
-        headline: `Class Insight: ${improving} students are showing improvement — errors have stopped.`,
-        suggestedAction: "Suggested Action: Acknowledge the progress to keep momentum going.",
-      };
-    }
+  // Priority 1 — Accuracy Alert: 2+ students below 60%
+  const lowAccuracy = withAccuracy.filter((r) => (r.accuracyPercent ?? 100) < 60);
+  if (lowAccuracy.length >= 2) {
+    const names = lowAccuracy
+      .map((r) => r.studentName)
+      .filter(Boolean)
+      .slice(0, 3)
+      .join(", ");
     return {
-      headline: "Class Insight: Most students are moving steadily through their current work.",
-      suggestedAction: "Suggested Action: Continue circulating and check completion pace.",
+      title: "Accuracy Alert",
+      headline: `${lowAccuracy.length} of ${total} students below 60% accuracy.`,
+      detail: names || undefined,
+      suggestedAction: "Check in with these students now. They may be stuck on a core concept.",
     };
   }
 
-  // Cluster by learning state first (more informative than skill tag alone)
-  const stateCounts = new Map<LearningState, number>();
+  const needsSupportRows = rows.filter((r) => (r.aiStatus ?? "on_track") === "needs_support");
+  const flagged = rows.filter(
+    (r) => (r.aiStatus ?? "on_track") === "needs_support" || (r.aiStatus ?? "on_track") === "check_in"
+  );
+
+  // Priority 2 — Most Struggled Skill: shared topic + multiple students below 70%
+  const skillCounts = new Map<string, { count: number; names: string[] }>();
   for (const row of flagged) {
-    if (row.learningState) {
-      stateCounts.set(row.learningState, (stateCounts.get(row.learningState) ?? 0) + 1);
-    }
+    const key = normalizeText(row.skillTag) || normalizeText(row.misconceptionTag) || null;
+    if (!key) continue;
+    const existing = skillCounts.get(key) ?? { count: 0, names: [] };
+    existing.count += 1;
+    if (row.studentName) existing.names.push(row.studentName);
+    skillCounts.set(key, existing);
   }
+  const [topSkill, topSkillData] =
+    [...skillCounts.entries()].sort((a, b) => b[1].count - a[1].count)[0] ?? [null, null];
 
-  const urgentStates: LearningState[] = ["struggling", "guessing", "rushing"];
-  const urgentCluster = urgentStates
-    .map((s) => ({ state: s, count: stateCounts.get(s) ?? 0 }))
-    .filter((x) => x.count > 0)
-    .sort((a, b) => b.count - a.count)[0];
-
-  if (urgentCluster) {
-    const { state, count } = urgentCluster;
-    const stateLabel = state === "guessing" ? "guessing rather than thinking" :
-                       state === "rushing" ? "rushing through questions" :
-                       "struggling with the current task";
-    const action = state === "guessing"
-      ? "Pause the class and ask students to read each answer option aloud before choosing."
-      : state === "rushing"
-      ? "Ask students to check their answer makes sense before submitting."
-      : "Check in with flagged students first, then decide if a brief reteach is needed.";
-
-    // Also check for a shared misconception topic
-    const gapBuckets = new Map<string, number>();
-    for (const row of flagged) {
-      const key = normalizeText(row.skillTag) || normalizeText(row.misconceptionTag) || null;
-      if (key) gapBuckets.set(key, (gapBuckets.get(key) ?? 0) + 1);
-    }
-    const [topGap, topGapCount] = [...gapBuckets.entries()].sort((a, b) => b[1] - a[1])[0] ?? [null, 0];
-    const topicSuffix = topGap && topGapCount >= 2 ? ` on ${topGap.replace(/_/g, " ")}` : "";
-
+  if (topSkill && topSkillData && topSkillData.count >= 2) {
+    const skillLabel = topSkill.replace(/_/g, " ");
+    const pct = total > 0 ? Math.round((topSkillData.count / total) * 100) : 0;
     return {
-      headline: `Class Insight: ${count} student${count !== 1 ? "s" : ""} ${stateLabel}${topicSuffix}.`,
-      suggestedAction: `Suggested Action: ${action}`,
+      title: "Most Struggled Skill",
+      headline: skillLabel,
+      detail: `${topSkillData.count} of ${total} students flagged (${pct}%)`,
+      suggestedAction: "Small-group reteach recommended. Pull these students together for a 10-minute targeted session.",
     };
   }
 
-  // Fall back to topic-based clustering
-  const gapBuckets = new Map<string, number>();
-  for (const row of flagged) {
-    const key = normalizeText(row.skillTag) || normalizeText(row.misconceptionTag) || "current task";
-    gapBuckets.set(key, (gapBuckets.get(key) ?? 0) + 1);
+  // Priority 3 — Intervention Group: 2+ needs-support students
+  if (needsSupportRows.length >= 2) {
+    const names = needsSupportRows
+      .map((r) => r.studentName)
+      .filter(Boolean)
+      .slice(0, 4)
+      .join(", ");
+
+    // Find any shared topic across them
+    const groupTopics = new Map<string, number>();
+    for (const r of needsSupportRows) {
+      const key = normalizeText(r.skillTag) || normalizeText(r.misconceptionTag) || null;
+      if (key) groupTopics.set(key, (groupTopics.get(key) ?? 0) + 1);
+    }
+    const [sharedTopic] = [...groupTopics.entries()].sort((a, b) => b[1] - a[1])[0] ?? [null];
+    const topicLabel = sharedTopic ? sharedTopic.replace(/_/g, " ") : "current content";
+
+    return {
+      title: "Intervention Group",
+      headline: names || `${needsSupportRows.length} students`,
+      detail: `Shared difficulty: ${topicLabel}`,
+      suggestedAction: "10-minute targeted intervention recommended for this group.",
+    };
   }
 
-  const [topGap, topCount] =
-    [...gapBuckets.entries()].sort((left, right) => right[1] - left[1])[0] ?? ["current task", 0];
+  // Priority 4 — Single urgent student
+  if (needsSupportRows.length === 1) {
+    const row = needsSupportRows[0]!;
+    const skill = normalizeText(row.skillTag) || normalizeText(row.misconceptionTag) || "current task";
+    return {
+      title: "Student Needs Support",
+      headline: row.studentName ?? "1 student needs support",
+      detail: skill !== "current task" ? skill.replace(/_/g, " ") : undefined,
+      suggestedAction: "Check in with this student before continuing to circulate.",
+    };
+  }
 
-  const label =
-    topGap === "current task"
-      ? `${topCount} student${topCount !== 1 ? "s" : ""} need support on their current task`
-      : `${topCount} student${topCount !== 1 ? "s" : ""} are struggling with ${topGap.replace(/_/g, " ")}`;
+  // Priority 5 — Class Accuracy (positive)
+  if (withAccuracy.length >= 2) {
+    const avg = Math.round(
+      withAccuracy.reduce((sum, r) => sum + (r.accuracyPercent ?? 0), 0) / withAccuracy.length
+    );
+    const detail = `${withAccuracy.length} of ${total} students have lesson data`;
+    if (avg >= 80) {
+      return {
+        title: "Class Accuracy",
+        headline: `${avg}% class average`,
+        detail,
+        suggestedAction: "Students are progressing well. Consider extension challenges for high performers.",
+      };
+    }
+    if (avg >= 65) {
+      return {
+        title: "Class Accuracy",
+        headline: `${avg}% class average`,
+        detail,
+        suggestedAction: "Monitor for students dropping below 60%. Check in if accuracy falls.",
+      };
+    }
+    return {
+      title: "Class Accuracy",
+      headline: `${avg}% class average — lower than expected`,
+      detail,
+      suggestedAction: "Consider pausing to review the current concept with the whole class.",
+    };
+  }
 
-  const suggestedAction =
-    topGap.toLowerCase().includes("discount")
-      ? "Pause for a quick reteach on finding the discount amount before subtracting."
-      : topGap.toLowerCase().includes("coordinate")
-      ? "Model one example on the axes: across first, then up or down."
-      : topGap.toLowerCase().includes("equation")
-      ? "Reteach how to undo the outside operation first."
-      : "Check in with the flagged students first, then decide if a brief reteach is needed.";
-
+  // Fallback — not enough data yet
   return {
-    headline: `Class Insight: ${label}.`,
-    suggestedAction: `Suggested Action: ${suggestedAction}`,
+    title: "Class Insight",
+    headline: "Waiting for lesson data",
+    suggestedAction: "Ensure students have started their lesson. Insights will appear as they work.",
   };
 }

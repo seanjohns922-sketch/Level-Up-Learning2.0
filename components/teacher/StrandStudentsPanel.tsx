@@ -351,7 +351,7 @@ function pickPrimaryInsight(insights: TeacherInsight[]): TeacherInsight | null {
   return [...insights].sort((left, right) => {
     const severityGap = INSIGHT_SEVERITY[right.status] - INSIGHT_SEVERITY[left.status];
     if (severityGap !== 0) return severityGap;
-    return left.gap.localeCompare(right.gap);
+    return left.needsSupport.localeCompare(right.needsSupport);
   })[0] ?? null;
 }
 
@@ -371,13 +371,6 @@ function deriveStudentFlag(
   return { label: "Not started", emoji: "⚪", tone: "neutral" };
 }
 
-function simplifyGapLabel(gap: string) {
-  return gap
-    .replace(/^They were least secure in\s+/i, "")
-    .replace(/, where accuracy dropped\.$/i, "")
-    .replace(/\.$/, "")
-    .trim();
-}
 
 function numberOrNull(value: unknown): number | null {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
@@ -396,7 +389,7 @@ function buildWeekSummary(
   if (primary) {
     return {
       status: primary.status,
-      mainGap: simplifyGapLabel(primary.gap),
+      mainGap: primary.needsSupport,
       suggestedAction: primary.teacherAction,
     };
   }
@@ -1268,10 +1261,9 @@ function StudentStrandDetail({
               </div>
               <div className="grid md:grid-cols-2 gap-2 text-xs">
                 <div><b className="text-[#64748B]">Status:</b> <span className="font-semibold text-[#0F172A]">{weekQuizInsight.status}</span></div>
-                <div><b className="text-[#64748B]">Strength:</b> <span className="font-semibold text-[#0F172A]">{weekQuizInsight.strength}</span></div>
-                <div><b className="text-[#64748B]">Gap:</b> <span className="font-semibold text-[#0F172A]">{weekQuizInsight.gap}</span></div>
-                <div><b className="text-[#64748B]">Teacher action:</b> <span className="font-semibold text-[#0F172A]">{weekQuizInsight.teacherAction}</span></div>
-                <div className="md:col-span-2"><b className="text-[#64748B]">Recommended revisit:</b> <span className="font-semibold text-[#0F172A]">{weekQuizInsight.recommendedRevisit}</span></div>
+                <div><b className="text-[#64748B]">Strongest Skill:</b> <span className="font-semibold text-emerald-700">{weekQuizInsight.strongestSkill}</span></div>
+                <div><b className="text-[#64748B]">Needs Support:</b> <span className="font-semibold text-rose-700">{weekQuizInsight.needsSupport}</span></div>
+                <div><b className="text-[#64748B]">Teacher Action:</b> <span className="font-semibold text-[#0F172A]">{weekQuizInsight.teacherAction}</span></div>
               </div>
             </div>
           ) : null}

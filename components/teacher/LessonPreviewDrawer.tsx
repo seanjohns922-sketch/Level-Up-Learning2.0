@@ -1289,16 +1289,25 @@ export default function LessonPreviewDrawer({
                 <Meta label="Accuracy" value={student.accuracy != null ? `${student.accuracy}%` : "n/a"} />
               </div>
               {student.aiInsight ? (
-                <div className="mt-3 rounded-xl border border-[#E6E8EC] bg-[#F8FAFC] p-3">
-                  <div className="text-[10px] font-extrabold text-teal-700 uppercase tracking-[0.14em] mb-2">
-                    AI Lesson Insight
+                <div className="mt-3 space-y-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="rounded-xl border border-[#E6E8EC] bg-white px-3 py-2.5">
+                      <div className="text-[9px] font-extrabold uppercase tracking-wider text-[#94A3B8]">Status</div>
+                      <div className="mt-0.5 text-xs font-black text-[#0F172A]">{student.aiInsight.status}</div>
+                    </div>
+                    <div className="rounded-xl border border-[#E6E8EC] bg-white px-3 py-2.5">
+                      <div className="text-[9px] font-extrabold uppercase tracking-wider text-[#94A3B8]">Strongest Skill</div>
+                      <div className="mt-0.5 text-xs font-black text-emerald-700">{student.aiInsight.strongestSkill}</div>
+                    </div>
                   </div>
-                  <InsightRow label="Status" value={student.aiInsight.status} />
-                  <InsightRow label="Strength" value={student.aiInsight.strength} />
-                  <InsightRow label="Gap" value={student.aiInsight.gap} />
-                  <InsightRow label="Likely misconception" value={student.aiInsight.likelyMisconception} />
-                  <InsightRow label="Teacher action" value={student.aiInsight.teacherAction} />
-                  <InsightRow label="Recommended revisit" value={student.aiInsight.recommendedRevisit} />
+                  <div className="rounded-xl border border-rose-100 bg-rose-50 px-3 py-2.5">
+                    <div className="text-[9px] font-extrabold uppercase tracking-wider text-rose-400">Needs Support</div>
+                    <div className="mt-0.5 text-xs font-bold text-rose-900">{student.aiInsight.needsSupport}</div>
+                  </div>
+                  <div className="rounded-xl bg-[#0F172A] px-3 py-2.5">
+                    <div className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400">Teacher Action</div>
+                    <div className="mt-1 text-xs font-bold text-white leading-relaxed">{student.aiInsight.teacherAction}</div>
+                  </div>
                 </div>
               ) : null}
             </Section>
@@ -1385,11 +1394,3 @@ function Bullet({ children }: { children: React.ReactNode }) {
   );
 }
 
-function InsightRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="mb-2 last:mb-0">
-      <div className="text-[10px] font-extrabold uppercase tracking-wider text-[#94A3B8]">{label}</div>
-      <div className="text-xs font-semibold text-[#0F172A] leading-relaxed">{value}</div>
-    </div>
-  );
-}

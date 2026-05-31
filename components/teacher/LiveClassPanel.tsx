@@ -7,7 +7,6 @@ import {
   buildLiveClassInsight,
   buildLiveStudentInsight,
   formatRelativeTime,
-  formatTimeActive,
   getLearningStateMeta,
   getLiveStatusTone,
   type LearningState,
@@ -75,6 +74,14 @@ type LiveStudentActivityRow = {
   updated_at?: string | null;
 };
 
+type LiveActivityEventRow = {
+  student_id: string;
+  class_id: string;
+  event_type: string;
+  created_at: string;
+  payload: Record<string, unknown> | null;
+};
+
 type LiveStudentCard = {
   id: string;
   displayName: string;
@@ -128,7 +135,83 @@ function formatWorkingLevelBadge(workingLevel?: string | null) {
   return normalized.toUpperCase();
 }
 
-function toLiveCard(student: StudentRow, row?: LiveStudentActivityRow | null): LiveStudentCard {
+function parseEventPayload(payload: Record<string, unknown> | null | undefined) {
+  return payload && typeof payload === "object" ? payload : {};
+}
+
+function numberOrNull(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function matchesCurrentLesson(row: LiveStudentActivityRow, event: LiveActivityEventRow) {
+  const payload = parseEventPayload(event.payload);
+  const eventLessonId = typeof payload.lessonId === "string" ? payload.lessonId : null;
+  const eventLessonTitle = typeof payload.lessonTitle === "string" ? payload.lessonTitle : null;
+  return Boolean(
+    (row.current_lesson && eventLessonId === row.current_lesson) ||
+    (row.current_lesson_title && eventLessonTitle === row.current_lesson_title)
+  );
+}
+
+function buildCurrentLessonPerformance(
+  row: LiveStudentActivityRow | null | undefined,
+  events: LiveActivityEventRow[],
+) {
+  if (!row) return null;
+
+  const lessonEvents = events
+    .filter((event) => matchesCurrentLesson(row, event))
+    .sort((left, right) => new Date(left.created_at).getTime() - new Date(right.created_at).getTime());
+
+  if (lessonEvents.length === 0) return null;
+
+  let startIndex = 0;
+  for (let index = lessonEvents.length - 1; index >= 0; index -= 1) {
+    const eventType = lessonEvents[index]?.event_type;
+    if (eventType === "lesson_started" || eventType === "quiz_started") {
+      startIndex = index;
+      break;
+    }
+  }
+
+  const attemptEvents = lessonEvents.slice(startIndex);
+  let answered = 0;
+  let correct = 0;
+  let completed = false;
+
+  attemptEvents.forEach((event) => {
+    if (event.event_type === "answer_correct") {
+      answered += 1;
+      correct += 1;
+      return;
+    }
+    if (event.event_type === "answer_incorrect") {
+      answered += 1;
+      return;
+    }
+    if (event.event_type === "lesson_completed" || event.event_type === "quiz_completed") {
+      completed = true;
+      const payload = parseEventPayload(event.payload);
+      const payloadAnswered = numberOrNull(payload.questionsAnswered ?? payload.totalQuestions);
+      const payloadCorrect = numberOrNull(payload.correctCount ?? payload.correctAnswers);
+      if (payloadAnswered != null) answered = payloadAnswered;
+      if (payloadCorrect != null) correct = payloadCorrect;
+    }
+  });
+
+  return {
+    answered,
+    correct,
+    accuracy: answered > 0 ? Math.round((correct / answered) * 100) : 0,
+    completed,
+  };
+}
+
+function toLiveCard(
+  student: StudentRow,
+  row?: LiveStudentActivityRow | null,
+  lessonPerformance?: ReturnType<typeof buildCurrentLessonPerformance> | null,
+): LiveStudentCard {
   const insight = row
     ? buildLiveStudentInsight({
         studentId: student.id,
@@ -174,7 +257,7 @@ function toLiveCard(student: StudentRow, row?: LiveStudentActivityRow | null): L
     id: student.id,
     displayName: student.display_name,
     workingLevelBadge: formatWorkingLevelBadge(student.working_level),
-    status: insight?.status ?? row?.ai_status ?? "idle",
+    status: lessonPerformance?.completed ? "on_track" : (insight?.status ?? row?.ai_status ?? "idle"),
     currentLevel: row?.current_level ?? null,
     currentWeek: row?.current_week ?? null,
     currentLesson: row?.current_lesson ?? null,
@@ -191,10 +274,10 @@ function toLiveCard(student: StudentRow, row?: LiveStudentActivityRow | null): L
     latestCorrectAnswer: row?.latest_correct_answer ?? null,
     latestAnswerCorrect: row?.latest_answer_correct ?? null,
     timeOnCurrentQuestion: row?.time_on_current_question ?? 0,
-    questionsAnswered: row?.questions_answered ?? null,
-    correctCount: row?.correct_count ?? null,
-    accuracyPercent: row?.accuracy_percent ?? null,
-    currentLessonStatus: row?.current_lesson_status ?? null,
+    questionsAnswered: lessonPerformance?.answered ?? null,
+    correctCount: lessonPerformance?.correct ?? null,
+    accuracyPercent: lessonPerformance?.accuracy ?? null,
+    currentLessonStatus: lessonPerformance?.completed ? "completed" : (row?.current_lesson_status ?? null),
     completedAt: row?.completed_at ?? null,
     lessonStartedAt: row?.lesson_started_at ?? null,
     aiIssue: insight?.issue ?? row?.ai_issue ?? null,
@@ -252,6 +335,7 @@ export default function LiveClassPanel({
   students: StudentRow[];
 }) {
   const [rows, setRows] = useState<LiveStudentActivityRow[]>([]);
+  const [events, setEvents] = useState<LiveActivityEventRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<LiveStatusFilter>("all");
   const [now, setNow] = useState(() => Date.now());
@@ -289,6 +373,7 @@ export default function LiveClassPanel({
       if (!selectedClass?.id) {
         if (!cancelled) {
           setRows([]);
+          setEvents([]);
           setLoading(false);
         }
         return;
@@ -299,11 +384,28 @@ export default function LiveClassPanel({
         .select("*")
         .eq("class_id", selectedClass.id)
         .order("last_active_at", { ascending: false });
+      const { data: eventData, error: eventError } = await supabase
+        .from("live_activity_events")
+        .select("student_id,class_id,event_type,created_at,payload")
+        .eq("class_id", selectedClass.id)
+        .in("event_type", [
+          "lesson_started",
+          "quiz_started",
+          "answer_correct",
+          "answer_incorrect",
+          "lesson_completed",
+          "quiz_completed",
+        ])
+        .order("created_at", { ascending: true });
       if (error) {
         console.warn("[LiveClassPanel] Failed to load live student activity", error);
       }
+      if (eventError) {
+        console.warn("[LiveClassPanel] Failed to load live activity events", eventError);
+      }
       if (!cancelled) {
         setRows((data ?? []) as LiveStudentActivityRow[]);
+        setEvents((eventData ?? []) as LiveActivityEventRow[]);
         setLoading(false);
       }
     }
@@ -350,8 +452,18 @@ export default function LiveClassPanel({
 
   const cards = useMemo(() => {
     const rowMap = new Map(rows.map((row) => [row.student_id, row]));
-    return students.map((student) => toLiveCard(student, rowMap.get(student.id)));
-  }, [rows, students]);
+    const eventMap = new Map<string, LiveActivityEventRow[]>();
+    events.forEach((event) => {
+      const current = eventMap.get(event.student_id);
+      if (current) current.push(event);
+      else eventMap.set(event.student_id, [event]);
+    });
+    return students.map((student) => {
+      const row = rowMap.get(student.id);
+      const lessonPerformance = buildCurrentLessonPerformance(row, eventMap.get(student.id) ?? []);
+      return toLiveCard(student, row, lessonPerformance);
+    });
+  }, [events, rows, students]);
 
   const filteredCards = useMemo(() => {
     const base = filter === "all" ? cards : cards.filter((card) => card.status === filter);
@@ -391,11 +503,14 @@ export default function LiveClassPanel({
       buildLiveClassInsight(
         cards.map((card) => ({
           studentId: card.id,
+          studentName: card.displayName,
           classId: selectedClass?.id ?? "",
           skillTag: card.skillTag,
           misconceptionTag: card.misconceptionTag,
           aiStatus: card.status,
           learningState: card.learningState,
+          accuracyPercent: card.accuracyPercent ?? null,
+          questionsAnswered: card.questionsAnswered ?? null,
         }))
       ),
     [cards, selectedClass?.id]
@@ -448,12 +563,20 @@ export default function LiveClassPanel({
             </div>
           </div>
 
-          <div className="rounded-3xl border border-slate-200 bg-[linear-gradient(135deg,#062521_0%,#0a2f2a_45%,#0e3f38_100%)] p-5 text-white shadow-[0_18px_40px_rgba(2,23,22,0.28)]">
+          <div className="rounded-3xl border border-slate-200 bg-[linear-gradient(135deg,#062521_0%,#0a2f2a_45%,#0e3f38_100%)] p-5 text-white shadow-[0_18px_40px_rgba(2,23,22,0.28)] flex flex-col">
             <div className="text-[11px] font-mono font-bold uppercase tracking-[0.2em] text-[#7DE7D7]">
-              Class Insight
+              {classInsight.title}
             </div>
-            <div className="mt-3 text-lg font-black leading-tight">{classInsight.headline}</div>
-            <div className="mt-3 text-sm text-slate-200">{classInsight.suggestedAction}</div>
+            <div className="mt-2 text-xl font-black leading-tight">{classInsight.headline}</div>
+            {classInsight.detail && (
+              <div className="mt-1 text-sm font-semibold text-teal-200/80">{classInsight.detail}</div>
+            )}
+            <div className="mt-auto pt-4 border-t border-white/10">
+              <div className="text-[10px] font-mono font-bold uppercase tracking-[0.18em] text-teal-400/80 mb-1">
+                Suggested Action
+              </div>
+              <div className="text-sm font-semibold text-slate-100 leading-snug">{classInsight.suggestedAction}</div>
+            </div>
           </div>
         </div>
 
@@ -508,13 +631,17 @@ export default function LiveClassPanel({
                           </span>
                         ) : null}
                       </div>
-                      <div className="mt-1 text-sm text-slate-500">{formatLocation(card)}</div>
+                      <div className="mt-1 text-sm text-slate-500">
+                        {card.currentLessonTitle ?? formatLocation(card)}
+                      </div>
                     </div>
                     <div className="flex flex-col items-end gap-1.5">
                       <span className={`inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-[11px] font-bold ${tone.badge}`}>
                         <span className={`h-2 w-2 rounded-full ${tone.dot}`} />
-                        {card.status === "on_track"
-                          ? "On Track"
+                        {card.currentLessonStatus === "completed"
+                          ? "Completed"
+                          : card.status === "on_track"
+                          ? "Working"
                           : card.status === "check_in"
                           ? "Check-in"
                           : card.status === "needs_support"
@@ -565,6 +692,14 @@ export default function LiveClassPanel({
 
                   {/* Current question */}
                   <div className="mt-3 grid gap-1.5 text-sm">
+                    <div className="font-semibold text-slate-700">
+                      {card.currentLesson ? card.currentLesson.replace(/^.*-/, "").toUpperCase() : "No lesson yet"}
+                    </div>
+                    <div className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">
+                      {card.currentLessonStatus === "completed"
+                        ? "Lesson complete"
+                        : card.progressLabel ?? formatLocation(card)}
+                    </div>
                     <div className="font-semibold text-slate-700">
                       {card.currentActivityLabel ?? "No activity yet"}
                     </div>
