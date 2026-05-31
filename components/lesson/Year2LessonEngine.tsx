@@ -9,6 +9,7 @@ import { ComboMilestonePop } from "@/components/lesson/ComboMilestonePop";
 import SurgeAmbience from "@/components/lesson/SurgeAmbience";
 import NexusActivation from "@/components/lesson/NexusActivation";
 import ComboActivation from "@/components/lesson/ComboActivation";
+import LessonReflection from "@/components/lesson/LessonReflection";
 import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent } from "@/lib/live-class-client";
 import {
   buildLessonActivityPool,
@@ -463,6 +464,7 @@ export function Year2LessonEngine({
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [comboCount, setComboCount] = useState(0);
+  const [reflectionDone, setReflectionDone] = useState(false);
   const bestChainRef = useRef(0);
   useEffect(() => {
     try { bestChainRef.current = Number(localStorage.getItem("lul_best_nexus_chain_v1") ?? 0); } catch { /* ignore */ }
@@ -811,6 +813,20 @@ export function Year2LessonEngine({
 
   // ── Finished state ──
   if (finished) {
+    if (!reflectionDone) {
+      return (
+        <LessonReflection
+          lessonId={liveContext?.lessonId ?? lesson.id}
+          lessonTitle={lesson.title}
+          level={liveContext?.level ?? ""}
+          week={liveContext?.week ?? 0}
+          accuracy={accuracy}
+          questionsAnswered={questionsAnswered}
+          onComplete={() => setReflectionDone(true)}
+        />
+      );
+    }
+
     if (renderCompletionCard) {
       return <>{renderCompletionCard(summary)}</>;
     }
