@@ -53,6 +53,8 @@ const YEAR_LEVELS = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "
 const WEEKS = Array.from({ length: 12 }, (_, i) => i + 1);
 
 /* ── helpers ───────────────────────────────────────── */
+type JsonObject = Record<string, unknown>;
+
 function parseCompletedLessons(raw: unknown): string[] {
   if (Array.isArray(raw)) return raw as string[];
   if (typeof raw === "string") try { return JSON.parse(raw); } catch { return []; }
@@ -62,6 +64,81 @@ function parseUnlockedLegends(raw: unknown): string[] {
   if (Array.isArray(raw)) return raw as string[];
   if (typeof raw === "string") try { return JSON.parse(raw); } catch { return []; }
   return [];
+}
+
+function parseQuizScores(raw: unknown): Record<string, JsonObject> {
+  if (raw && typeof raw === "object" && !Array.isArray(raw)) return raw as Record<string, JsonObject>;
+  if (typeof raw === "string") {
+    try {
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+        ? (parsed as Record<string, JsonObject>)
+        : {};
+    } catch {
+      return {};
+    }
+  }
+  return {};
+}
+
+type LessonAttemptSummary = {
+  completedAt?: string | null;
+  questionsAnswered?: number | null;
+  correctAnswers?: number | null;
+  correctCount?: number | null;
+  totalQuestions?: number | null;
+};
+
+type LessonAttemptRecord = {
+  latestSummary?: LessonAttemptSummary | null;
+  attempts?: LessonAttemptSummary[] | null;
+};
+
+function parseLessonAttempts(raw: unknown): Record<string, LessonAttemptRecord> {
+  if (raw && typeof raw === "object" && !Array.isArray(raw)) return raw as Record<string, LessonAttemptRecord>;
+  if (typeof raw === "string") {
+    try {
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+        ? (parsed as Record<string, LessonAttemptRecord>)
+        : {};
+    } catch {
+      return {};
+    }
+  }
+  return {};
+}
+
+function isRecentIso(value: unknown, cutoffMs: number) {
+  if (typeof value !== "string" || !value) return false;
+  const time = new Date(value).getTime();
+  return Number.isFinite(time) && time >= cutoffMs;
+}
+
+function lessonSummaryStats(summary: LessonAttemptSummary | null | undefined) {
+  if (!summary) return { correct: 0, total: 0 };
+  const correctCandidate = summary.correctCount ?? summary.correctAnswers ?? null;
+  const totalCandidate = summary.totalQuestions ?? summary.questionsAnswered ?? null;
+  const correct = typeof correctCandidate === "number" && Number.isFinite(correctCandidate) ? correctCandidate : 0;
+  const total = typeof totalCandidate === "number" && Number.isFinite(totalCandidate) ? totalCandidate : 0;
+  return { correct, total };
+}
+
+function weekCompletedLessons(ids: string[], week: number) {
+  const tag = `-w${week}-`;
+  return ids.filter((id) => id.includes(tag)).length;
+}
+
+function weekQuizPassed(quiz: JsonObject | undefined) {
+  if (!quiz) return false;
+  if (quiz.passed === true) return true;
+  if (typeof quiz.status === "string" && quiz.status.toLowerCase() === "completed") return true;
+  const attempts = Array.isArray(quiz.attempts) ? quiz.attempts : [];
+  return attempts.some((attempt) => {
+    if (!attempt || typeof attempt !== "object") return false;
+    const record = attempt as Record<string, unknown>;
+    return record.passed === true || (typeof record.status === "string" && record.status.toLowerCase() === "completed");
+  });
 }
 
 function weekCompletionCount(completedIds: string[], week: number): number {
@@ -781,14 +858,87 @@ export default function TeacherDashboardPage() {
     );
   }
 
-  // Stats (precomputed for header KPI strip + summary tiles)
-  const yearProg = progress.filter((p) => p.year === activeYear);
-  const activeThisWeek = yearProg.filter((p) => (p.week ?? 0) > 0).length;
-  const legendsUnlocked = yearProg.filter((p) => parseUnlockedLegends(p.unlocked_legends).length > 0).length;
-  const avgWeek = classStudents.length > 0 && yearProg.length > 0
-    ? (yearProg.reduce((s, p) => s + (p.week ?? 0), 0) / yearProg.length).toFixed(1)
+  // Whole-class KPI strip — never filter by active year/strand/tab.
+  const classStudentIds = new Set(classStudents.map((student) => student.id));
+  const classProgressRows = progress.filter((row) => classStudentIds.has(row.student_id));
+  const sevenDaysAgoMs = Date.now() - (7 * 24 * 60 * 60 * 1000);
+  const activeStudentsThisWeek = new Set<string>();
+
+  classProgressRows.forEach((row) => {
+    const lessonAttempts = parseLessonAttempts(row.lesson_attempts);
+    const quizScores = parseQuizScores(row.quiz_scores);
+
+    Object.values(lessonAttempts).forEach((attempt) => {
+      const attempts = Array.isArray(attempt?.attempts) ? attempt.attempts : [];
+      attempts.forEach((entry) => {
+        if (isRecentIso(entry?.completedAt, sevenDaysAgoMs)) {
+          activeStudentsThisWeek.add(row.student_id);
+        }
+      });
+      if (isRecentIso(attempt?.latestSummary?.completedAt, sevenDaysAgoMs)) {
+        activeStudentsThisWeek.add(row.student_id);
+      }
+    });
+
+    Object.values(quizScores).forEach((quiz) => {
+      if (isRecentIso(quiz?.completedAt, sevenDaysAgoMs)) {
+        activeStudentsThisWeek.add(row.student_id);
+      }
+      const attempts = Array.isArray(quiz?.attempts) ? quiz.attempts : [];
+      attempts.forEach((attempt) => {
+        if (attempt && typeof attempt === "object" && isRecentIso((attempt as Record<string, unknown>).completedAt, sevenDaysAgoMs)) {
+          activeStudentsThisWeek.add(row.student_id);
+        }
+      });
+    });
+
+    if (isRecentIso(row.updated_at, sevenDaysAgoMs)) {
+      activeStudentsThisWeek.add(row.student_id);
+    }
+  });
+
+  liveEvents.forEach((event) => {
+    if (classStudentIds.has(event.student_id) && isRecentIso(event.created_at, sevenDaysAgoMs)) {
+      activeStudentsThisWeek.add(event.student_id);
+    }
+  });
+
+  let lessonCorrectSum = 0;
+  let lessonQuestionSum = 0;
+  classProgressRows.forEach((row) => {
+    const lessonAttempts = parseLessonAttempts(row.lesson_attempts);
+    Object.values(lessonAttempts).forEach((attempt) => {
+      const attempts = Array.isArray(attempt?.attempts) && attempt.attempts.length > 0
+        ? attempt.attempts
+        : attempt?.latestSummary
+          ? [attempt.latestSummary]
+          : [];
+      attempts.forEach((summary) => {
+        if (!summary?.completedAt) return;
+        const stats = lessonSummaryStats(summary);
+        if (stats.total <= 0) return;
+        lessonCorrectSum += stats.correct;
+        lessonQuestionSum += stats.total;
+      });
+    });
+  });
+
+  const averageLessonScore = lessonQuestionSum > 0
+    ? `${Math.round((lessonCorrectSum / lessonQuestionSum) * 100)}%`
     : "—";
-  const postTests = yearProg.filter((p) => getLatestPosttestProfile(p.quiz_scores)).length;
+
+  const legendsUnlocked = classProgressRows.reduce((sum, row) => {
+    return sum + parseUnlockedLegends(row.unlocked_legends).length;
+  }, 0);
+
+  const weeksPassed = classProgressRows.reduce((sum, row) => {
+    const completedIds = parseCompletedLessons(row.completed_lesson_ids);
+    const quizScores = parseQuizScores(row.quiz_scores);
+    const passedWeeks = WEEKS.filter((week) => {
+      return weekCompletedLessons(completedIds, week) >= 3 && weekQuizPassed(quizScores[String(week)]);
+    }).length;
+    return sum + passedWeeks;
+  }, 0);
   const isDev = process.env.NODE_ENV !== "production";
 
   return (
@@ -971,11 +1121,11 @@ export default function TeacherDashboardPage() {
           <>
             {/* KPI strip — primary stat dominates, secondary stats supporting */}
             <div className="grid grid-cols-1 md:grid-cols-[1.6fr_1fr_1fr_1fr_1fr] gap-3">
-              <KpiTile primary label="Students" value={classStudents.length} accent="#0EA5A4" icon={(<path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m3-5.13a4 4 0 100-8 4 4 0 000 8zm6-2a3 3 0 100-6 3 3 0 000 6z" />)} />
-              <KpiTile label="Active This Week" value={activeThisWeek} accent="#0EA5A4" icon={(<><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>)} />
-              <KpiTile label="Legends Unlocked" value={legendsUnlocked} accent="#F59E0B" icon={(<path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z" />)} />
-              <KpiTile label="Avg Week" value={avgWeek} accent="#0EA5A4" icon={(<><path d="M3 3v18h18" /><path d="M7 14l3-3 3 3 5-5" /></>)} />
-              <KpiTile label="Post-Tests" value={postTests} accent="#6366F1" icon={(<><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></>)} />
+              <KpiTile primary label="Students" value={classStudents.length} subtitle="enrolled in this class" accent="#0EA5A4" icon={(<path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m3-5.13a4 4 0 100-8 4 4 0 000 8zm6-2a3 3 0 100-6 3 3 0 000 6z" />)} />
+              <KpiTile label="Active This Week" value={activeStudentsThisWeek.size} subtitle={`${activeStudentsThisWeek.size} student${activeStudentsThisWeek.size === 1 ? "" : "s"} active`} accent="#0EA5A4" icon={(<><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>)} />
+              <KpiTile label="Average Lesson Score" value={averageLessonScore} subtitle={averageLessonScore === "—" ? "no completed lessons" : "lesson accuracy"} accent="#0EA5A4" icon={(<><path d="M3 3v18h18" /><path d="M7 14l3-3 3 3 5-5" /></>)} />
+              <KpiTile label="Legends Unlocked" value={legendsUnlocked} subtitle={`${legendsUnlocked} total unlocked`} accent="#F59E0B" icon={(<path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z" />)} />
+              <KpiTile label="Weeks Passed" value={weeksPassed} subtitle={`${weeksPassed} week${weeksPassed === 1 ? "" : "s"} completed`} accent="#6366F1" icon={(<><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></>)} />
             </div>
 
             {/* Year level + view tabs */}
@@ -1121,9 +1271,14 @@ export default function TeacherDashboardPage() {
 }
 
 function KpiTile({
-  label, value, accent, icon, primary,
+  label, value, subtitle, accent, icon, primary,
 }: {
-  label: string; value: string | number; accent: string; icon: React.ReactNode; primary?: boolean;
+  label: string;
+  value: string | number;
+  subtitle?: string;
+  accent: string;
+  icon: React.ReactNode;
+  primary?: boolean;
 }) {
   if (primary) {
     return (
@@ -1139,7 +1294,7 @@ function KpiTile({
               {value}
             </div>
             <div className="mt-1.5 text-[11px] font-semibold text-slate-300/80 tracking-wide">
-              enrolled in this class
+              {subtitle ?? "enrolled in this class"}
             </div>
           </div>
           <div className="h-9 w-9 rounded-xl bg-[#062521] border border-[#00C2A8]/30 shadow-[inset_0_0_8px_rgba(0,229,195,0.18)] flex items-center justify-center">
@@ -1164,6 +1319,9 @@ function KpiTile({
       <div className="flex items-center gap-2 mt-1.5">
         <div className="h-0.5 w-4 rounded-full" style={{ backgroundColor: accent }} />
         <div className="text-[10px] font-extrabold text-[#64748B] uppercase tracking-[0.14em]">{label}</div>
+      </div>
+      <div className="mt-1 text-[11px] font-semibold text-[#94A3B8]">
+        {subtitle ?? ""}
       </div>
     </div>
   );
