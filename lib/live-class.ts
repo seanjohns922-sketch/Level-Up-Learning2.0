@@ -149,6 +149,19 @@ function normalizeText(value?: string | null) {
   return String(value ?? "").trim();
 }
 
+function formatInactiveDuration(seconds: number): string {
+  if (seconds >= 86400) {
+    const days = Math.floor(seconds / 86400);
+    return `${days} day${days !== 1 ? "s" : ""}`;
+  }
+  if (seconds >= 3600) {
+    const hours = Math.floor(seconds / 3600);
+    return `${hours} hour${hours !== 1 ? "s" : ""}`;
+  }
+  const mins = Math.floor(seconds / 60);
+  return `${mins} minute${mins !== 1 ? "s" : ""}`;
+}
+
 function sentenceCase(value: string) {
   const trimmed = value.trim();
   if (!trimmed) return "";
@@ -481,12 +494,11 @@ export function buildLiveStudentInsight(
 
   if (secondsSinceActive >= thresholds.idleSeconds) {
     const name = snapshot.studentName ?? "This student";
-    const mins = Math.floor(secondsSinceActive / 60);
     return {
       status: "idle",
       statusLabel: STATUS_LABELS.idle,
       learningState,
-      issue: `${name} has not submitted an answer for ${mins} minute${mins !== 1 ? "s" : ""}.`,
+      issue: `${name} has not submitted an answer for ${formatInactiveDuration(secondsSinceActive)}.`,
       likelyGap: "Student may be away from the device or needs a prompt to continue.",
       suggestedTeacherAction: "Prompt the student to continue their lesson.",
     };
@@ -550,10 +562,9 @@ export function buildLiveStudentInsight(
     const isInactiveCheckIn = secondsSinceActive >= thresholds.checkInIdleSeconds;
     const name = snapshot.studentName ?? "This student";
     const activityLabel = snapshot.currentActivityLabel ?? snapshot.currentLessonTitle ?? null;
-    const mins = Math.floor(secondsSinceActive / 60);
     const qMins = Math.floor(timeOnQuestion / 60);
     const issueText = isInactiveCheckIn
-      ? `${name} has no activity for ${mins} minute${mins !== 1 ? "s" : ""}`
+      ? `${name} has no activity for ${formatInactiveDuration(secondsSinceActive)}`
       : learningState === "hesitating"
       ? `${name} has been reading the question for ${qMins} min without attempting${activityLabel ? ` in ${activityLabel}` : ""}`
       : latestEventType === "answer_incorrect"

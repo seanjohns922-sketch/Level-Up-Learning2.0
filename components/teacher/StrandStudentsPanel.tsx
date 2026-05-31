@@ -14,6 +14,7 @@ import {
   normalizeSchoolYearLabel,
   normalizeWorkingLevelLabel,
 } from "@/lib/studentLevelLabel";
+import { resolveStudentNameParts } from "@/lib/studentName";
 import { normalizeLessonId, parseLessonNumberFromId } from "@/lib/lessonIdentity";
 import type { Lesson } from "@/data/programs/year1";
 import { getLatestPosttestProfile } from "@/data/assessments/analysis";
@@ -25,6 +26,8 @@ type StudentRow = {
   display_name: string;
   class_id: string;
   user_id: string;
+  first_name?: string | null;
+  last_name?: string | null;
   school_year_level?: string | null;
   working_level?: string | null;
   year_level?: string | null;
@@ -684,13 +687,16 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
   const firstAvail = genres.find((g) => g.available) ?? genres[0];
   const [genreId, setGenreId] = useState<string>(firstAvail.id);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  type SortKey = "name" | "level" | "week" | "status" | "tower";
+  type SortKey = "name" | "lastName" | "schoolYear" | "workingLevel" | "week" | "status" | "tower";
   const [sortKey, setSortKey] = useState<SortKey>("name");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
   function toggleSort(k: SortKey) {
     if (sortKey === k) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    else { setSortKey(k); setSortDir(k === "name" ? "asc" : "desc"); }
+    else {
+      setSortKey(k);
+      setSortDir(k === "name" || k === "lastName" ? "asc" : "desc");
+    }
   }
 
   const genre = genres.find((g) => g.id === genreId)!;
@@ -736,6 +742,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
 
   const studentRows = students
     .map((s) => {
+      const nameParts = resolveStudentNameParts(s);
       const schoolYear = getSchoolYear(s);
       const workingYear = getWorkingYear(s);
       const prog = getProg(s.id, workingYear);
@@ -760,18 +767,32 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
       const flag = deriveStudentFlag(pickPrimaryInsight(weekInsights), status);
       const latestPretest = getLatestPretestProgress(s.id);
 
-      return { s, prog, liveRow, studentEvents, pct, status, week, schoolYear, workingYear, summary, flag, latestPretest };
+      return { s, prog, liveRow, studentEvents, pct, status, week, schoolYear, workingYear, summary, flag, latestPretest, nameParts };
     })
     .sort((a, b) => {
       const dir = sortDir === "asc" ? 1 : -1;
       const rank: Record<string, number> = { "Not Started": 0, "In Progress": 1, "Needs Support": 2, "Completed": 3 };
-      const nameCmp = a.s.display_name.localeCompare(b.s.display_name);
+      const displayNameCmp = a.nameParts.displayName.localeCompare(b.nameParts.displayName);
+      const firstNameCmp = a.nameParts.firstName.localeCompare(b.nameParts.firstName) || displayNameCmp;
+      const lastNameCmp =
+        a.nameParts.lastName.localeCompare(b.nameParts.lastName) ||
+        a.nameParts.firstName.localeCompare(b.nameParts.firstName) ||
+        displayNameCmp;
       switch (sortKey) {
-        case "name":   return dir * nameCmp;
-        case "level":  return dir * (yearOrdinal(a.workingYear) - yearOrdinal(b.workingYear)) || nameCmp;
-        case "week":   return dir * ((a.week ?? -1) - (b.week ?? -1)) || nameCmp;
-        case "status": return dir * (rank[a.status] - rank[b.status]) || nameCmp;
-        case "tower":  return dir * (a.pct - b.pct) || nameCmp;
+        case "name":
+          return dir * firstNameCmp;
+        case "lastName":
+          return dir * lastNameCmp;
+        case "schoolYear":
+          return dir * (yearOrdinal(a.schoolYear) - yearOrdinal(b.schoolYear)) || lastNameCmp;
+        case "workingLevel":
+          return dir * (yearOrdinal(a.workingYear) - yearOrdinal(b.workingYear)) || lastNameCmp;
+        case "week":
+          return dir * ((a.week ?? -1) - (b.week ?? -1)) || lastNameCmp;
+        case "status":
+          return dir * (rank[a.status] - rank[b.status]) || lastNameCmp;
+        case "tower":
+          return dir * (a.pct - b.pct) || lastNameCmp;
       }
     });
 
@@ -851,12 +872,34 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
       {/* Student table */}
       <div className="bg-white rounded-2xl border border-[#E6E8EC] overflow-hidden shadow-[0_4px_16px_-12px_rgba(15,23,42,0.18)]">
         <div className="grid grid-cols-[2fr_0.7fr_0.7fr_0.7fr_1.1fr] px-5 py-3 bg-gradient-to-b from-[#F8FAFC] to-[#F1F5F9] border-b border-[#E6E8EC]">
+          <div className="flex items-center gap-3">
+            {([
+              ["name", "Student"],
+              ["lastName", "Surname"],
+            ] as [SortKey, string][]).map(([key, label]) => {
+              const active = sortKey === key;
+              return (
+                <button
+                  key={key}
+                  onClick={() => toggleSort(key)}
+                  className={[
+                    "text-left text-[10px] font-extrabold uppercase tracking-[0.12em] transition flex items-center gap-1",
+                    active ? "text-[#0A2F2A]" : "text-[#94A3B8] hover:text-[#475569]",
+                  ].join(" ")}
+                >
+                  {label}
+                  <span className="text-[9px] opacity-70">
+                    {active ? (sortDir === "asc" ? "▲" : "▼") : "↕"}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
           {([
-            ["name",   "Student"],
-            ["level",  "School Year"],
-            ["level",  "Working Level"],
-            ["week",   "Week"],
-            ["tower",  "Tower"],
+            ["schoolYear", "School Year"],
+            ["workingLevel", "Working Level"],
+            ["week", "Week"],
+            ["tower", "Tower"],
           ] as [SortKey, string][]).map(([key, label], idx) => {
             const active = sortKey === key;
             return (
