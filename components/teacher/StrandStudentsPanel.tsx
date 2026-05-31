@@ -1085,6 +1085,16 @@ function StudentStrandDetail({
 
   return (
     <div className="bg-[#F8FAFC] border-t border-[#E6E8EC] px-5 py-5 space-y-5">
+      <div className="flex justify-end">
+        <a
+          href={`/teacher/student-insights?studentId=${student.id}`}
+          className="inline-flex items-center gap-2 rounded-xl border border-[#E6E8EC] bg-white px-3.5 py-2 text-sm font-bold text-[#0F172A] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition hover:border-[#CBD5E1] hover:bg-[#F8FAFC]"
+        >
+          <span aria-hidden>📊</span>
+          Learning Insights
+        </a>
+      </div>
+
       {/* Snapshot */}
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-3">
         <SnapshotTile label="Strand" value={`${genre.strand}`} sub={genre.realm} />
