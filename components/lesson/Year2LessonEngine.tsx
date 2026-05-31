@@ -8,6 +8,7 @@ import { LessonCompleteCard } from "@/components/lesson/LessonCompleteCard";
 import { ComboMilestonePop } from "@/components/lesson/ComboMilestonePop";
 import SurgeAmbience from "@/components/lesson/SurgeAmbience";
 import NexusActivation from "@/components/lesson/NexusActivation";
+import ComboActivation from "@/components/lesson/ComboActivation";
 import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent } from "@/lib/live-class-client";
 import {
   buildLessonActivityPool,
@@ -892,6 +893,7 @@ export function Year2LessonEngine({
       />
 
       <SurgeAmbience comboCount={comboCount} />
+      <ComboActivation comboCount={comboCount} />
       <NexusActivation comboCount={comboCount} />
 
       <div className="grid gap-3 lg:grid-cols-[300px_1fr] lg:items-start lg:gap-5">
