@@ -65,7 +65,6 @@ function parseUnlockedLegends(raw: unknown): string[] {
   if (typeof raw === "string") try { return JSON.parse(raw); } catch { return []; }
   return [];
 }
-
 function parseQuizScores(raw: unknown): Record<string, JsonObject> {
   if (raw && typeof raw === "object" && !Array.isArray(raw)) return raw as Record<string, JsonObject>;
   if (typeof raw === "string") {
@@ -905,6 +904,7 @@ export default function TeacherDashboardPage() {
 
   let lessonCorrectSum = 0;
   let lessonQuestionSum = 0;
+  let lessonsCompleted = 0;
   classProgressRows.forEach((row) => {
     const lessonAttempts = parseLessonAttempts(row.lesson_attempts);
     Object.values(lessonAttempts).forEach((attempt) => {
@@ -917,6 +917,7 @@ export default function TeacherDashboardPage() {
         if (!summary?.completedAt) return;
         const stats = lessonSummaryStats(summary);
         if (stats.total <= 0) return;
+        lessonsCompleted += 1;
         lessonCorrectSum += stats.correct;
         lessonQuestionSum += stats.total;
       });
@@ -926,10 +927,6 @@ export default function TeacherDashboardPage() {
   const averageLessonScore = lessonQuestionSum > 0
     ? `${Math.round((lessonCorrectSum / lessonQuestionSum) * 100)}%`
     : "—";
-
-  const legendsUnlocked = classProgressRows.reduce((sum, row) => {
-    return sum + parseUnlockedLegends(row.unlocked_legends).length;
-  }, 0);
 
   const weeksPassed = classProgressRows.reduce((sum, row) => {
     const completedIds = parseCompletedLessons(row.completed_lesson_ids);
@@ -1123,8 +1120,8 @@ export default function TeacherDashboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-[1.6fr_1fr_1fr_1fr_1fr] gap-3">
               <KpiTile primary label="Students" value={classStudents.length} subtitle="enrolled in this class" accent="#0EA5A4" icon={(<path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m3-5.13a4 4 0 100-8 4 4 0 000 8zm6-2a3 3 0 100-6 3 3 0 000 6z" />)} />
               <KpiTile label="Active This Week" value={activeStudentsThisWeek.size} subtitle={`${activeStudentsThisWeek.size} student${activeStudentsThisWeek.size === 1 ? "" : "s"} active`} accent="#0EA5A4" icon={(<><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>)} />
-              <KpiTile label="Average Lesson Score" value={averageLessonScore} subtitle={averageLessonScore === "—" ? "no completed lessons" : "lesson accuracy"} accent="#0EA5A4" icon={(<><path d="M3 3v18h18" /><path d="M7 14l3-3 3 3 5-5" /></>)} />
-              <KpiTile label="Legends Unlocked" value={legendsUnlocked} subtitle={`${legendsUnlocked} total unlocked`} accent="#F59E0B" icon={(<path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z" />)} />
+              <KpiTile label="Average Accuracy" value={averageLessonScore} subtitle={averageLessonScore === "—" ? "no completed lessons" : "average lesson accuracy"} accent="#0EA5A4" icon={(<><path d="M3 3v18h18" /><path d="M7 14l3-3 3 3 5-5" /></>)} />
+              <KpiTile label="Lessons Completed" value={lessonsCompleted} subtitle={`${lessonsCompleted} lesson${lessonsCompleted === 1 ? "" : "s"} completed`} accent="#F59E0B" icon={(<><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></>)} />
               <KpiTile label="Weeks Passed" value={weeksPassed} subtitle={`${weeksPassed} week${weeksPassed === 1 ? "" : "s"} completed`} accent="#6366F1" icon={(<><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></>)} />
             </div>
 
