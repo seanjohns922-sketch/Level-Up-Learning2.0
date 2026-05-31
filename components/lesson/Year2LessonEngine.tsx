@@ -827,15 +827,19 @@ export function Year2LessonEngine({
 
   // ── Active state ──
   function getComboBorder(count: number) {
-    if (count >= 10) return "border-teal-300 shadow-[0_0_38px_rgba(45,212,191,0.65)] ring-2 ring-emerald-400/40 ring-offset-2 ring-offset-slate-950";
+    if (count >= 10) return "border-teal-300 ring-2 ring-emerald-400/50 ring-offset-2 ring-offset-slate-950 nexus-card-glow";
     if (count >= 8)  return "border-orange-300/80 shadow-[0_0_22px_rgba(251,146,60,0.4)]";
     if (count >= 5)  return "border-yellow-300/80 shadow-[0_0_22px_rgba(253,224,71,0.4)]";
     if (count >= 3)  return "border-teal-300/70 shadow-[0_0_22px_rgba(94,234,212,0.35)]";
     return "border-border/50";
   }
 
+  const isNexus = comboCount >= 10;
+
   const statusBorder =
-    status === "correct"
+    status === "correct" && isNexus
+      ? "border-teal-300 nexus-correct-pulse ring-2 ring-emerald-400/50 ring-offset-2 ring-offset-slate-950"
+      : status === "correct"
       ? "border-emerald-300 shadow-emerald-100/50"
       : status === "wrong"
       ? "border-red-300 shadow-red-100/50"
@@ -859,6 +863,25 @@ export function Year2LessonEngine({
           40% { transform: translateX(4px); }
           60% { transform: translateX(-3px); }
           80% { transform: translateX(3px); }
+        }
+        @keyframes nexusCardGlow {
+          0%, 100% { box-shadow: 0 0 38px rgba(45,212,191,0.65), 0 0 70px rgba(45,212,191,0.3), inset 0 0 20px rgba(45,212,191,0.07); }
+          50% { box-shadow: 0 0 64px rgba(45,212,191,0.95), 0 0 120px rgba(45,212,191,0.5), inset 0 0 32px rgba(45,212,191,0.12); }
+        }
+        @keyframes nexusCorrectPulse {
+          0% { box-shadow: 0 0 0 0 rgba(45,212,191,0.8); }
+          70% { box-shadow: 0 0 0 20px rgba(45,212,191,0); }
+          100% { box-shadow: 0 0 0 0 rgba(45,212,191,0); }
+        }
+        @keyframes nexusBadgePulse {
+          0%, 100% { opacity: 0.9; }
+          50% { opacity: 1; }
+        }
+        .nexus-card-glow {
+          animation: nexusCardGlow 2s ease-in-out infinite;
+        }
+        .nexus-correct-pulse {
+          animation: nexusCorrectPulse 0.6s ease-out forwards;
         }
       `}</style>
       <div
@@ -921,10 +944,25 @@ export function Year2LessonEngine({
               <div
                 className={`rounded-[1.75rem] border-2 bg-card p-5 shadow-lg transition-all duration-500 ${statusBorder} ${statusMotion}`}
               >
-                <div className="mb-3">
+                <div className="mb-3 flex items-center justify-between gap-2">
                   <span className="inline-block rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-700">
                     {activityLabel}
                   </span>
+                  {isNexus && (
+                    <span
+                      className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em]"
+                      style={{
+                        background: "rgba(4,47,46,0.85)",
+                        border: "1px solid rgba(45,212,191,0.5)",
+                        color: "rgba(94,234,212,1)",
+                        textShadow: "0 0 10px rgba(45,212,191,0.8)",
+                        boxShadow: "0 0 12px rgba(45,212,191,0.3)",
+                        animation: "nexusBadgePulse 2s ease-in-out infinite",
+                      }}
+                    >
+                      ⚡ Nexus State
+                    </span>
+                  )}
                 </div>
 
                 <LessonRenderer

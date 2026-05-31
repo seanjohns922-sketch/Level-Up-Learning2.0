@@ -90,6 +90,12 @@ export default function SurgeAmbience({ comboCount }: { comboCount: number }) {
           0% { transform: translateX(-30%); }
           100% { transform: translateX(130%); }
         }
+        @keyframes dataColumn {
+          0% { transform: translateY(-100%); opacity: 0; }
+          8% { opacity: 1; }
+          90% { opacity: 0.6; }
+          100% { transform: translateY(100vh); opacity: 0; }
+        }
       `}</style>
 
       {/* Vignette */}
@@ -143,7 +149,7 @@ export default function SurgeAmbience({ comboCount }: { comboCount: number }) {
         />
       )}
 
-      {/* Diagonal shimmer band (tier 4 — teal data stream) */}
+      {/* Diagonal shimmer bands (tier 4 — teal data streams) */}
       {tier >= 4 && (
         <div className="absolute inset-0 overflow-hidden">
           <div
@@ -155,6 +161,34 @@ export default function SurgeAmbience({ comboCount }: { comboCount: number }) {
               filter: "blur(8px)",
             }}
           />
+          <div
+            className="absolute top-0 bottom-0 w-1/4"
+            style={{
+              background:
+                "linear-gradient(115deg, transparent 0%, rgba(94,234,212,0.18) 50%, transparent 100%)",
+              animation: "surgeShimmer 4.2s linear 1.1s infinite",
+              filter: "blur(6px)",
+            }}
+          />
+        </div>
+      )}
+
+      {/* Vertical data columns (tier 4 — Matrix-style teal streams) */}
+      {tier >= 4 && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[8, 22, 38, 55, 71, 86].map((left, i) => (
+            <div
+              key={i}
+              className="absolute top-0 w-px"
+              style={{
+                left: `${left}%`,
+                height: "35%",
+                background: "linear-gradient(to bottom, transparent, rgba(94,234,212,0.7), rgba(45,212,191,0.4), transparent)",
+                animation: `dataColumn ${5 + i * 0.7}s linear ${i * 0.9}s infinite`,
+                mixBlendMode: "screen",
+              }}
+            />
+          ))}
         </div>
       )}
 
