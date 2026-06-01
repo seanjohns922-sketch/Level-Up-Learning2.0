@@ -117,13 +117,15 @@ type LiveStudentCard = {
   learningState?: LearningState | null;
 };
 
-type LiveStatusFilter = "all" | LiveStudentStatus;
+type LiveCardDisplayGroup = LiveStudentStatus | "completed";
+type LiveStatusFilter = "all" | LiveCardDisplayGroup;
 
-const STATUS_PRIORITY: Record<LiveStudentStatus, number> = {
+const STATUS_PRIORITY: Record<LiveCardDisplayGroup, number> = {
   needs_support: 0,
-  check_in: 1,
-  on_track: 2,
-  idle: 3,
+  on_track: 1,
+  check_in: 2,
+  completed: 3,
+  idle: 4,
 };
 
 function formatWorkingLevelBadge(workingLevel?: string | null) {
@@ -326,14 +328,35 @@ function formatLessonTimer(lessonStartedAt: string | null | undefined, now: numb
   return `${mins}m ${secs}s / 9min`;
 }
 
+function getCardDisplayGroup(card: LiveStudentCard): LiveCardDisplayGroup {
+  if (card.currentLessonStatus === "completed") return "completed";
+  return card.status;
+}
+
+function getCardTone(group: LiveCardDisplayGroup) {
+  if (group === "completed") {
+    return {
+      dot: "bg-emerald-400",
+      badge: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      border: "border-emerald-100 bg-emerald-50/40",
+    };
+  }
+  return {
+    ...getLiveStatusTone(group),
+    border: `${getLiveStatusTone(group).border} bg-white`,
+  };
+}
+
 function statusFilterLabel(filter: LiveStatusFilter) {
   switch (filter) {
     case "needs_support":
       return "Needs Support";
-    case "check_in":
-      return "Check-in";
+    case "completed":
+      return "Completed";
     case "on_track":
       return "On Track";
+    case "check_in":
+      return "Check-in";
     case "idle":
       return "Idle";
     default:
@@ -480,9 +503,11 @@ export default function LiveClassPanel({
   }, [events, rows, students]);
 
   const filteredCards = useMemo(() => {
-    const base = filter === "all" ? cards : cards.filter((card) => card.status === filter);
+    const base =
+      filter === "all" ? cards : cards.filter((card) => getCardDisplayGroup(card) === filter);
     const sorted = [...base].sort((left, right) => {
-      const statusGap = STATUS_PRIORITY[left.status] - STATUS_PRIORITY[right.status];
+      const statusGap =
+        STATUS_PRIORITY[getCardDisplayGroup(left)] - STATUS_PRIORITY[getCardDisplayGroup(right)];
       if (statusGap !== 0) return statusGap;
       const leftTime = left.lastActiveAt ? new Date(left.lastActiveAt).getTime() : 0;
       const rightTime = right.lastActiveAt ? new Date(right.lastActiveAt).getTime() : 0;
@@ -499,19 +524,23 @@ export default function LiveClassPanel({
   const statusCounts = useMemo(() => {
     return cards.reduce(
       (acc, card) => {
-        acc[card.status] += 1;
+        acc[getCardDisplayGroup(card)] += 1;
         return acc;
       },
       {
         on_track: 0,
         check_in: 0,
         needs_support: 0,
+        completed: 0,
         idle: 0,
-      } as Record<LiveStudentStatus, number>
+      } as Record<LiveCardDisplayGroup, number>
     );
   }, [cards]);
 
-  const activeStudentCount = cards.filter((card) => card.status !== "idle").length;
+  const activeStudentCount = cards.filter((card) => {
+    const group = getCardDisplayGroup(card);
+    return group === "needs_support" || group === "check_in" || group === "on_track";
+  }).length;
   const classInsight = useMemo(
     () =>
       buildLiveClassInsight(
@@ -565,6 +594,7 @@ export default function LiveClassPanel({
                 { label: "Students Active", value: activeStudentCount, tone: "text-teal-700" },
                 { label: "Needs Support", value: statusCounts.needs_support, tone: "text-rose-700" },
                 { label: "Check-in", value: statusCounts.check_in, tone: "text-amber-700" },
+                { label: "Completed", value: statusCounts.completed, tone: "text-emerald-700" },
                 { label: "Idle", value: statusCounts.idle, tone: "text-slate-600" },
               ].map((item) => (
                 <div key={item.label} className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
@@ -595,7 +625,7 @@ export default function LiveClassPanel({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {(["all", "needs_support", "check_in", "on_track", "idle"] as const).map((status) => {
+          {(["all", "needs_support", "check_in", "on_track", "completed", "idle"] as const).map((status) => {
             const active = filter === status;
             return (
               <button
@@ -626,7 +656,8 @@ export default function LiveClassPanel({
         ) : (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {filteredCards.map((card) => {
-              const tone = getLiveStatusTone(card.status);
+              const displayGroup = getCardDisplayGroup(card);
+              const tone = getCardTone(displayGroup);
               const answered = Math.max(0, card.questionsAnswered ?? 0);
               const correct = Math.max(0, card.correctCount ?? 0);
               const accuracy = answered > 0 ? Math.max(0, card.accuracyPercent ?? 0) : 0;
@@ -635,7 +666,7 @@ export default function LiveClassPanel({
                   key={card.id}
                   type="button"
                   onClick={() => setSelectedStudentId(card.id)}
-                  className={`group rounded-3xl border bg-white p-4 text-left shadow-[0_14px_36px_rgba(15,23,42,0.07)] transition hover:-translate-y-0.5 hover:shadow-[0_18px_48px_rgba(15,23,42,0.12)] ${tone.border}`}
+                  className={`group rounded-3xl border p-4 text-left shadow-[0_14px_36px_rgba(15,23,42,0.07)] transition hover:-translate-y-0.5 hover:shadow-[0_18px_48px_rgba(15,23,42,0.12)] ${tone.border}`}
                 >
                   {/* Header: name + badges */}
                   <div className="flex items-start justify-between gap-3">
@@ -655,7 +686,7 @@ export default function LiveClassPanel({
                     <div className="flex flex-col items-end gap-1.5">
                       <span className={`inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-[11px] font-bold ${tone.badge}`}>
                         <span className={`h-2 w-2 rounded-full ${tone.dot}`} />
-                        {card.currentLessonStatus === "completed"
+                        {displayGroup === "completed"
                           ? "Completed"
                           : card.status === "on_track"
                           ? "Working"
@@ -665,7 +696,7 @@ export default function LiveClassPanel({
                           ? "Needs Support"
                           : "Idle"}
                       </span>
-                      {card.learningState && card.learningState !== "confident" && card.status !== "idle" ? (() => {
+                      {card.learningState && card.learningState !== "confident" && displayGroup !== "idle" && displayGroup !== "completed" ? (() => {
                         const meta = getLearningStateMeta(card.learningState);
                         return (
                           <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-bold ${meta.badge}`}>
@@ -681,7 +712,7 @@ export default function LiveClassPanel({
                   <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3">
                     <div>
                       <div className="text-[10px] font-mono font-bold uppercase tracking-[0.18em] text-slate-500">
-                        Current Lesson Score
+                        {displayGroup === "completed" ? "Final Lesson Score" : "Current Lesson Score"}
                       </div>
                       <div className="mt-1 flex items-end gap-2">
                         <span className="text-3xl font-black leading-none text-slate-900">
@@ -692,7 +723,7 @@ export default function LiveClassPanel({
                     </div>
                     <div className="text-right">
                       <div className="text-[10px] font-mono font-bold uppercase tracking-[0.18em] text-slate-500">
-                        Accuracy
+                        {displayGroup === "completed" ? "Final Accuracy" : "Accuracy"}
                       </div>
                       <span className={`mt-1 inline-flex rounded-full px-2.5 py-1 text-sm font-black ${
                         accuracy >= 80
@@ -717,15 +748,17 @@ export default function LiveClassPanel({
                       {card.currentLesson ? card.currentLesson.replace(/^.*-/, "").toUpperCase() : "No lesson yet"}
                     </div>
                     <div className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">
-                      {card.currentLessonStatus === "completed"
+                      {displayGroup === "completed"
                         ? "Lesson complete"
                         : card.progressLabel ?? formatLocation(card)}
                     </div>
                     <div className="font-semibold text-slate-700">
-                      {card.currentActivityLabel ?? "No activity yet"}
+                      {displayGroup === "completed"
+                        ? "Ready for next lesson / quiz"
+                        : (card.currentActivityLabel ?? "No activity yet")}
                     </div>
                     <div className="line-clamp-2 text-slate-500 text-xs">
-                      {card.currentLessonStatus === "completed"
+                      {displayGroup === "completed"
                         ? `${card.currentLessonTitle ?? card.currentLesson ?? "Lesson"} completed`
                         : (card.currentQuestionText ?? card.lastEventText)}
                     </div>
@@ -733,12 +766,12 @@ export default function LiveClassPanel({
 
                   {/* Footer: last event + time */}
                   <div className="mt-3 flex items-center justify-between text-xs text-slate-400">
-                    <span>{card.currentLessonStatus === "completed" ? "Completed lesson" : card.lastEventText}</span>
+                    <span>{displayGroup === "completed" ? "Completed lesson" : card.lastEventText}</span>
                     <span>{formatRelativeTime(card.lastActiveAt)}</span>
                   </div>
 
                   {/* AI insight — alert states only */}
-                  {card.aiIssue && card.status !== "on_track" ? (
+                  {card.aiIssue && displayGroup !== "on_track" && displayGroup !== "completed" ? (
                     <div className={`mt-3 rounded-xl border px-3 py-2 text-xs font-semibold ${tone.badge}`}>
                       {card.aiIssue}
                     </div>
