@@ -1,6 +1,8 @@
 import { normalizeWeekPlans } from "./buildProgram";
 import type { CurriculumCode, Lesson, WeekPlan } from "./year1";
 
+const PREP_MEASURELANDS_CURRICULUM: CurriculumCode[] = ["AC9MFM01", "AC9MFM02"];
+
 export const PREP_MEASURELANDS_META = {
   realm: "Measurelands",
   strand: "Measurement",
@@ -26,7 +28,7 @@ export const PREP_MEASURELANDS_META = {
     "Year 5": { stars: 5, timing: 80, estimation: 85, balance: 75 },
     "Year 6": { stars: 6, timing: 95, estimation: 100, balance: 90 },
   },
-  curriculum: ["AC9MFM01", "AC9MFM02"] as CurriculumCode[],
+  curriculum: PREP_MEASURELANDS_CURRICULUM,
 } as const;
 
 function buildLesson(
