@@ -4,6 +4,7 @@ import { YEAR_ORDER } from "@/data/yearOrder";
 import { type StudentProgress, writeProgress } from "@/data/progress";
 import { writeProgramStore, type ProgramProgressStore } from "@/lib/program-progress";
 import { markActiveStudentIntroSeen } from "@/lib/studentIdentity";
+import { fetchNumberCompatProgressForStudent } from "@/lib/realm-progress-compat";
 import { supabase } from "@/lib/supabase";
 
 export type StudentProgressSnapshotRow = {
@@ -22,6 +23,28 @@ export type StudentProgressSnapshotRow = {
   has_seen_intro: boolean | null;
   updated_at: string | null;
 };
+
+type StudentRuntimeContextRow = {
+  class_id: string | null;
+  school_year_level: string | null;
+  has_seen_intro: boolean | null;
+};
+
+function numberProgramKey(year: string) {
+  return `${year.toLowerCase().replace(/\s+/g, "")}-number`;
+}
+
+async function getStudentRuntimeContext(studentId: string) {
+  const { data, error } = await supabase.rpc("get_student_runtime_context", {
+    p_student_id: studentId,
+  });
+  if (error) throw error;
+  return Array.isArray(data) ? ((data[0] ?? null) as StudentRuntimeContextRow | null) : null;
+}
+
+function warnLegacyWrite(label: string, error: unknown) {
+  console.warn(`[RealmMigration] Legacy ${label} write failed after realm write succeeded:`, error);
+}
 
 function yearIndex(year: string | null | undefined) {
   if (!year) return -1;
@@ -128,13 +151,15 @@ function buildStudentProgress(row: StudentProgressSnapshotRow): StudentProgress 
 }
 
 export async function restoreStudentStateFromServer(studentId: string) {
-  const { data, error } = await supabase.rpc("get_student_progress_snapshot", {
-    p_student_id: studentId,
-  });
-  if (error) throw error;
+  const [rows, studentResponse] = await Promise.all([
+    fetchNumberCompatProgressForStudent(studentId),
+    getStudentRuntimeContext(studentId),
+  ]);
 
-  const rows = (Array.isArray(data) ? data : []) as StudentProgressSnapshotRow[];
-  const introSeenFromStudentFlag = rows.some((row) => row.has_seen_intro === true);
+  const compatRows = rows as StudentProgressSnapshotRow[];
+  const contextRow = studentResponse;
+  const introSeenFromStudentFlag =
+    contextRow?.has_seen_intro === true || compatRows.some((row) => row.has_seen_intro === true);
   const introSeenFromHistoricalProgress = rows.some(
     (row) => row.pretest_score != null || row.placement_complete === true || row.status === "PASSED"
   );
@@ -143,18 +168,18 @@ export async function restoreStudentStateFromServer(studentId: string) {
     markActiveStudentIntroSeen(studentId);
   }
 
-  const primaryRow = choosePrimaryRow(rows);
+  const primaryRow = choosePrimaryRow(compatRows);
   if (!primaryRow) {
-    return { rows, progress: null as StudentProgress | null, introSeen };
+    return { rows: compatRows, progress: null as StudentProgress | null, introSeen };
   }
 
   const progress = buildStudentProgress(primaryRow);
   if (progress) {
     writeProgress(progress);
   }
-  hydrateProgramStore(rows);
+  hydrateProgramStore(compatRows);
 
-  return { rows, progress, introSeen };
+  return { rows: compatRows, progress, introSeen };
 }
 
 export async function saveStudentProgressState(
@@ -162,12 +187,212 @@ export async function saveStudentProgressState(
   year: string,
   data: Record<string, unknown>
 ) {
-  const { error } = await supabase.rpc("save_student_progress_state", {
+  const studentRow = await getStudentRuntimeContext(studentId);
+
+  const payload = {
+    status: data.status ?? "ASSIGNED_PROGRAM",
+    current_week: data.week ?? null,
+    assigned_week: data.assigned_week ?? data.week ?? null,
+    placement_complete: data.placement_complete ?? false,
+    pretest_score: data.pretest_score ?? null,
+    required_weeks: data.required_weeks ?? [],
+    optional_weeks: data.optional_weeks ?? [],
+    unlocked_legends: data.unlocked_legends ?? [],
+  };
+
+  const { error } = await supabase.rpc("save_student_realm_progress", {
+    p_student_id: studentId,
+    p_class_id: studentRow?.class_id ?? null,
+    p_realm_id: "number",
+    p_program_key: numberProgramKey(year),
+    p_school_year_level: studentRow?.school_year_level ?? null,
+    p_working_level: year,
+    p_data: payload,
+  });
+  if (error) throw error;
+
+  const { error: legacyError } = await supabase.rpc("save_student_progress_state", {
     p_student_id: studentId,
     p_year: year,
     p_data: data,
   });
+  if (legacyError) {
+    warnLegacyWrite("progress summary", legacyError);
+  }
+}
+
+export async function saveNumberLessonAttempt(
+  studentId: string,
+  year: string,
+  week: number,
+  lessonNumber: number,
+  lessonId: string,
+  attempt: Record<string, unknown>,
+) {
+  const studentRow = await getStudentRuntimeContext(studentId);
+
+  const { error } = await supabase.rpc("save_realm_lesson_attempt", {
+    p_student_id: studentId,
+    p_class_id: studentRow?.class_id ?? null,
+    p_realm_id: "number",
+    p_program_key: numberProgramKey(year),
+    p_school_year_level: studentRow?.school_year_level ?? null,
+    p_working_level: year,
+    p_week: week,
+    p_lesson: lessonNumber,
+    p_lesson_id: lessonId,
+    p_attempt: attempt,
+  });
   if (error) throw error;
+
+  const { error: legacyAttemptError } = await supabase.rpc("save_lesson_progress", {
+    p_student_id: studentId,
+    p_year: year,
+    p_week: week,
+    p_lesson_id: lessonId,
+    p_attempt: attempt,
+  });
+  if (legacyAttemptError) {
+    warnLegacyWrite("lesson attempt", legacyAttemptError);
+  }
+
+  const isCompleted = attempt.completed !== false;
+  if (isCompleted) {
+    const { error: legacyCompletionError } = await supabase.rpc("save_lesson_completion", {
+      p_student_id: studentId,
+      p_year: year,
+      p_week: week,
+      p_lesson_id: lessonId,
+    });
+    if (legacyCompletionError) {
+      warnLegacyWrite("lesson completion", legacyCompletionError);
+    }
+  }
+}
+
+export async function saveNumberWeeklyQuizAttempt(
+  studentId: string,
+  year: string,
+  week: number,
+  attempt: Record<string, unknown>,
+) {
+  const studentRow = await getStudentRuntimeContext(studentId);
+
+  const yearNumber = parseInt(year.replace(/\D/g, ""), 10) || 0;
+  const quizId = `y${yearNumber}-number-w${week}-quiz`;
+
+  const { error } = await supabase.rpc("save_realm_weekly_quiz_attempt", {
+    p_student_id: studentId,
+    p_class_id: studentRow?.class_id ?? null,
+    p_realm_id: "number",
+    p_program_key: numberProgramKey(year),
+    p_school_year_level: studentRow?.school_year_level ?? null,
+    p_working_level: year,
+    p_week: week,
+    p_quiz_id: quizId,
+    p_attempt: attempt,
+  });
+  if (error) throw error;
+
+  const nextWeek =
+    typeof attempt.passed === "boolean"
+      ? (attempt.passed ? Math.min(12, week + 1) : week)
+      : week;
+  const { error: legacyError } = await supabase.rpc("save_weekly_quiz_progress", {
+    p_student_id: studentId,
+    p_year: year,
+    p_week: week,
+    p_attempt: attempt,
+    p_next_week: nextWeek,
+  });
+  if (legacyError) {
+    warnLegacyWrite("weekly quiz", legacyError);
+  }
+}
+
+export async function saveNumberAssessment(
+  studentId: string,
+  year: string,
+  assessmentType: "pretest" | "posttest",
+  attempt: Record<string, unknown>,
+) {
+  const studentRow = await getStudentRuntimeContext(studentId);
+
+  const { error } = await supabase.rpc("save_realm_assessment", {
+    p_student_id: studentId,
+    p_class_id: studentRow?.class_id ?? null,
+    p_realm_id: "number",
+    p_program_key: numberProgramKey(year),
+    p_school_year_level: studentRow?.school_year_level ?? null,
+    p_working_level: year,
+    p_assessment_type: assessmentType,
+    p_attempt: attempt,
+  });
+  if (error) throw error;
+
+  if (assessmentType === "pretest") {
+    const placementResult =
+      attempt.placement_result && typeof attempt.placement_result === "object"
+        ? (attempt.placement_result as Record<string, unknown>)
+        : {};
+    const score =
+      typeof attempt.score_percent === "number"
+        ? attempt.score_percent
+        : typeof attempt.percent === "number"
+        ? attempt.percent
+        : 0;
+    const status =
+      typeof attempt.passed === "boolean" && attempt.passed
+        ? "PASSED"
+        : "ASSIGNED_PROGRAM";
+    const week =
+      typeof attempt.assigned_week === "number"
+        ? attempt.assigned_week
+        : typeof placementResult.assignedWeek === "number"
+        ? placementResult.assignedWeek
+        : typeof attempt.week === "number"
+        ? attempt.week
+        : 1;
+    const { error: legacyError } = await supabase.rpc("save_pretest_progress", {
+      p_student_id: studentId,
+      p_year: year,
+      p_score: score,
+      p_status: status,
+      p_week: week,
+    });
+    if (legacyError) {
+      warnLegacyWrite("pre-test", legacyError);
+    }
+    return;
+  }
+
+  const latest = attempt.placement_result ?? attempt.profile ?? attempt;
+  const latestRecord =
+    latest && typeof latest === "object" && !Array.isArray(latest)
+      ? (latest as Record<string, unknown>)
+      : {};
+  const status =
+    typeof attempt.passed === "boolean" && attempt.passed
+      ? "PASSED"
+      : "ASSIGNED_PROGRAM";
+  const week =
+    typeof attempt.assigned_week === "number"
+      ? attempt.assigned_week
+      : typeof latestRecord.assignedWeek === "number"
+      ? latestRecord.assignedWeek
+      : typeof attempt.week === "number"
+      ? attempt.week
+      : null;
+  const { error: legacyError } = await supabase.rpc("save_posttest_progress", {
+    p_student_id: studentId,
+    p_year: year,
+    p_latest: latest,
+    p_status: status,
+    p_week: week,
+  });
+  if (legacyError) {
+    warnLegacyWrite("post-test", legacyError);
+  }
 }
 
 export async function markStudentIntroSeen(studentId: string) {

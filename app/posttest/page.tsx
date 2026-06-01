@@ -11,10 +11,10 @@ import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCa
 import AssessmentShell from "@/components/assessment/AssessmentShell";
 import { analyzeAssessmentResult } from "@/data/assessments/analysis";
 import { ActiveLearningTracker } from "@/components/student/ActiveLearningTracker";
-import { supabase } from "@/lib/supabase";
 import { DEMO_MODE } from "@/data/config";
 import { getWeekProgress, hasCompletedRequiredWeeks, readProgramStore } from "@/lib/program-progress";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
+import { saveNumberAssessment, saveStudentProgressState } from "@/lib/student-progress-sync";
 
 const PASS_THRESHOLD = 85;
 
@@ -414,14 +414,24 @@ function PostTestPage() {
         if (!studentId) return;
 
         const latest = { ...profile, assignedWeek, at: new Date().toISOString() };
-        const { error } = await supabase.rpc("save_posttest_progress", {
-          p_student_id: studentId,
-          p_year: year,
-          p_latest: latest,
-          p_status: didPass ? "PASSED" : "ASSIGNED_PROGRAM",
-          p_week: didPass ? prev?.assignedWeek ?? null : assignedWeek ?? prev?.assignedWeek ?? 1,
+        await saveNumberAssessment(studentId, year, "posttest", {
+          correct_count: correct,
+          total_questions: questions.length,
+          score_percent: percent,
+          passed: didPass,
+          placement_result: latest,
+          question_results: [],
+          completed_at: new Date().toISOString(),
         });
-        if (error) console.warn("[PostTest] DB save error:", error);
+        await saveStudentProgressState(studentId, year, {
+          status: didPass ? "PASSED" : "ASSIGNED_PROGRAM",
+          week: didPass ? prev?.assignedWeek ?? null : assignedWeek ?? prev?.assignedWeek ?? 1,
+          placement_complete: true,
+          assigned_week: didPass ? prev?.assignedWeek ?? null : assignedWeek ?? prev?.assignedWeek ?? 1,
+          required_weeks: prev?.requiredWeeks ?? [],
+          optional_weeks: prev?.optionalWeeks ?? [],
+          unlocked_legends: nextUnlocked,
+        });
       } catch (error) {
         console.warn("[PostTest] DB save failed:", error);
       }

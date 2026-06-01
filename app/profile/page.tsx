@@ -6,8 +6,8 @@ import { readProgress } from "@/data/progress";
 import { getWeekProgress, isWeekComplete, readProgramStore } from "@/lib/program-progress";
 import { useAutoReadSetting } from "@/lib/speak";
 import { fetchStudentActivityDaily, type StudentActivityDailyRow } from "@/lib/student-activity";
+import { fetchNumberCompatProgressForStudent } from "@/lib/realm-progress-compat";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
-import { supabase } from "@/lib/supabase";
 import {
   Calendar,
   ChevronLeft,
@@ -239,13 +239,13 @@ export default function ProfilePage() {
       try {
         const [daily, snapshotResponse] = await Promise.all([
           fetchStudentActivityDaily(profile.studentId),
-          supabase.rpc("get_student_progress_snapshot", { p_student_id: profile.studentId }),
+          fetchNumberCompatProgressForStudent(profile.studentId),
         ]);
 
         if (cancelled) return;
 
         setActivityRows(daily);
-        setPersistedAccuracy(computeOverallLessonAccuracy((snapshotResponse.data ?? []) as SnapshotRow[]));
+        setPersistedAccuracy(computeOverallLessonAccuracy((snapshotResponse ?? []) as SnapshotRow[]));
       } catch (error) {
         console.warn("[Profile] Failed to load activity stats:", error);
       }

@@ -9,6 +9,7 @@ import { getLatestPosttestProfile } from "@/data/assessments/analysis";
 import { YEAR_ORDER } from "@/data/yearOrder";
 import { normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
 import { buildHeuristicTeacherInsight, type TeacherAttemptTopicSummary } from "@/lib/teacher-insights";
+import { fetchNumberCompatProgressForStudent } from "@/lib/realm-progress-compat";
 
 type StudentRow = {
   id: string;
@@ -231,6 +232,7 @@ function StudentInsightsPageInner() {
 
   useEffect(() => {
     if (authLoading || !user || !studentId) return;
+    const activeStudentId = studentId;
 
     let cancelled = false;
 
@@ -240,7 +242,7 @@ function StudentInsightsPageInner() {
       const { data: studentRow } = await supabase
         .from("students")
         .select("id,display_name,class_id,school_year_level,working_level,year_level")
-        .eq("id", studentId)
+        .eq("id", activeStudentId)
         .maybeSingle();
 
       if (!studentRow) {
@@ -260,62 +262,13 @@ function StudentInsightsPageInner() {
         .eq("id", studentRow.class_id)
         .maybeSingle();
 
-      const { data: snapshotRows } = await supabase
-        .from("progress_snapshot")
-        .select("*")
-        .eq("student_id", studentId);
-
-      const { data: legacyRows } = await supabase
-        .from("progress")
-        .select("student_id,year,week,status,pretest_score,updated_at")
-        .eq("student_id", studentId)
-        .not("pretest_score", "is", null);
-
-      const mergedProgress = [...((snapshotRows ?? []) as ProgressRow[])];
-      ((legacyRows ?? []) as Array<{
-        student_id: string;
-        year: string | null;
-        week: number | null;
-        status: string | null;
-        pretest_score: number | null;
-        updated_at?: string | null;
-      }>).forEach((legacyRow) => {
-        if (!legacyRow.year || typeof legacyRow.pretest_score !== "number") return;
-        const existingIndex = mergedProgress.findIndex(
-          (row) => row.student_id === legacyRow.student_id && row.year === legacyRow.year
-        );
-        if (existingIndex >= 0) {
-          if (mergedProgress[existingIndex].pretest_score == null) {
-            mergedProgress[existingIndex] = {
-              ...mergedProgress[existingIndex],
-              pretest_score: legacyRow.pretest_score,
-              updated_at: mergedProgress[existingIndex].updated_at ?? legacyRow.updated_at ?? null,
-              status: mergedProgress[existingIndex].status || legacyRow.status || "ACTIVE",
-              week: mergedProgress[existingIndex].week ?? legacyRow.week,
-            };
-          }
-          return;
-        }
-
-        mergedProgress.push({
-          student_id: legacyRow.student_id,
-          year: legacyRow.year,
-          week: legacyRow.week,
-          status: legacyRow.status ?? "ACTIVE",
-          pretest_score: legacyRow.pretest_score,
-          completed_lesson_ids: [],
-          unlocked_legends: [],
-          quiz_scores: {},
-          lesson_attempts: {},
-          updated_at: legacyRow.updated_at ?? null,
-        });
-      });
+      const mergedProgress = await fetchNumberCompatProgressForStudent(activeStudentId);
 
       let nextReflections: LessonReflectionRow[] = [];
       const { data: reflectionRows, error: reflectionError } = await supabase
         .from("lesson_reflections")
         .select("id,lesson_title,level,week,confidence,hardest_part,lesson_accuracy,questions_answered,created_at")
-        .eq("student_id", studentId)
+        .eq("student_id", activeStudentId)
         .order("created_at", { ascending: false });
       if (!reflectionError) {
         nextReflections = (reflectionRows ?? []) as LessonReflectionRow[];

@@ -4,6 +4,7 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, updateProgress } from "@/data/progress";
 import { supabase } from "@/lib/supabase";
+import { saveNumberLessonAttempt, saveNumberWeeklyQuizAttempt, saveStudentProgressState } from "@/lib/student-progress-sync";
 import { getProgramForYear } from "@/data/programs";
 import { getYear6WeeklyQuiz, type Year6WeeklyQuizQuestion } from "@/data/quizzes/year6";
 import { DEMO_MODE } from "@/data/config";
@@ -6634,22 +6635,7 @@ function SessionPage() {
           insight: null,
         };
 
-        const { error: attemptError } = await supabase.rpc("save_lesson_progress", {
-          p_student_id: studentId,
-          p_year: year,
-          p_week: Number(week),
-          p_lesson_id: lessonId,
-          p_attempt: fallbackAttempt,
-        });
-        if (attemptError) throw attemptError;
-
-        const { error } = await supabase.rpc("save_lesson_completion", {
-          p_student_id: studentId,
-          p_year: year,
-          p_week: Number(week),
-          p_lesson_id: lessonId,
-        });
-        if (error) throw error;
+        await saveNumberLessonAttempt(studentId, year, Number(week), n, lessonId, fallbackAttempt);
 
         void recordStudentActivityDelta({
           lessonsCompleted: 1,
@@ -7264,15 +7250,19 @@ function SessionPage() {
           at: new Date().toISOString(),
         };
 
-        const { error } = await supabase.rpc("save_weekly_quiz_progress", {
-          p_student_id: studentId,
-          p_year: year,
-          p_week: Number(week),
-          p_attempt: attempt,
-          p_next_week: passed ? Math.min(12, Number(week) + 1) : Number(week),
-        });
-        if (error) console.warn("[Quiz] DB save error:", error);
-        else {
+        try {
+          await saveNumberWeeklyQuizAttempt(studentId, year, Number(week), attempt);
+          const latestProgress = readProgress();
+          await saveStudentProgressState(studentId, year, {
+            status: latestProgress?.status ?? "ASSIGNED_PROGRAM",
+            week: passed ? Math.min(12, Number(week) + 1) : Number(week),
+            placement_complete: latestProgress?.placementComplete ?? false,
+            assigned_week:
+              latestProgress?.assignedWeek ?? (passed ? Math.min(12, Number(week) + 1) : Number(week)),
+            required_weeks: latestProgress?.requiredWeeks ?? [],
+            optional_weeks: latestProgress?.optionalWeeks ?? [],
+            unlocked_legends: latestProgress?.unlockedLegends ?? [],
+          });
           void recordStudentActivityDelta({
             questionsAnswered: total,
             correctAnswers: score,
@@ -7280,6 +7270,8 @@ function SessionPage() {
             xpEarned: Math.round((percent / 100) * 60),
           });
           console.log("[Quiz] Quiz score saved to DB:", attempt);
+        } catch (error) {
+          console.warn("[Quiz] DB save error:", error);
         }
       } catch (e) {
         console.warn("[Quiz] DB save failed:", e);

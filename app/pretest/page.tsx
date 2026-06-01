@@ -11,7 +11,7 @@ import { ActiveLearningTracker } from "@/components/student/ActiveLearningTracke
 import { analyzeAssessmentResult, isAssessmentAnswerCorrect } from "@/data/assessments/analysis";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, type StudentProgress, writeProgress } from "@/data/progress";
 import { ALL_PROGRAM_WEEKS, clearYearProgress, getOptionalWeeks, normalizeWeekList } from "@/lib/program-progress";
-import { saveStudentProgressState } from "@/lib/student-progress-sync";
+import { saveNumberAssessment, saveStudentProgressState } from "@/lib/student-progress-sync";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 
 const PRETEST_PASS_THRESHOLD = 85;
@@ -459,6 +459,15 @@ function PretestPage() {
 
     if (studentId) {
       try {
+        await saveNumberAssessment(studentId, year, "pretest", {
+          correct_count: score,
+          total_questions: questions.length,
+          score_percent: profile.percentage,
+          passed: nextProgress.status === "PASSED",
+          placement_result: profile,
+          question_results: [],
+          completed_at: new Date().toISOString(),
+        });
         await saveStudentProgressState(studentId, year, {
           pretest_score: profile.percentage,
           status: nextProgress.status === "PASSED" ? "PASSED" : "ASSIGNED_PROGRAM",

@@ -46,7 +46,7 @@ import { ActiveLearningTracker } from "@/components/student/ActiveLearningTracke
 import { supabase } from "@/lib/supabase";
 import { recordStudentActivityDelta } from "@/lib/student-activity";
 import type { TeacherInsight, TeacherInsightInput } from "@/lib/teacher-insights";
-import { saveStudentProgressState } from "@/lib/student-progress-sync";
+import { saveNumberLessonAttempt, saveStudentProgressState } from "@/lib/student-progress-sync";
 
 export default function LessonPageWrapper() {
   return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><LessonPage /></Suspense>;
@@ -264,26 +264,7 @@ function LessonPage() {
             insight: null,
           };
 
-          const { error: fallbackError } = await supabase.rpc("save_lesson_progress", {
-            p_student_id: studentId,
-            p_year: year,
-            p_week: week,
-            p_lesson_id: effectiveLessonId,
-            p_attempt: fallbackAttempt,
-          });
-          if (fallbackError) {
-            throw fallbackError;
-          }
-        }
-
-        const { error } = await supabase.rpc("save_lesson_completion", {
-          p_student_id: studentId,
-          p_year: year,
-          p_week: week,
-          p_lesson_id: effectiveLessonId,
-        });
-        if (error) {
-          throw error;
+          await saveNumberLessonAttempt(studentId, year, week, lessonNumber, effectiveLessonId, fallbackAttempt);
         }
 
         const latest = readProgress();
@@ -383,17 +364,7 @@ function LessonPage() {
         insight,
       };
 
-      const { error } = await supabase.rpc("save_lesson_progress", {
-        p_student_id: studentId,
-        p_year: year,
-        p_week: week,
-        p_lesson_id: effectiveLessonId,
-        p_attempt: attempt,
-      });
-
-      if (error) {
-        throw error;
-      }
+      await saveNumberLessonAttempt(studentId, year, week, lessonNumber, effectiveLessonId, attempt);
 
       void recordStudentActivityDelta({
         questionsAnswered: summary.questionsAnswered,
