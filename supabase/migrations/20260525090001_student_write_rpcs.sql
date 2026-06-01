@@ -27,7 +27,7 @@ USING (
   )
 );
 
--- ── SECURITY DEFINER RPCs (bypass RLS — students have no auth session) ────────
+-- SECURITY DEFINER RPCs (bypass RLS - students have no auth session)
 
 -- Save pretest result
 CREATE OR REPLACE FUNCTION public.save_pretest_progress(
