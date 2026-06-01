@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { deactivateDemoPreviewMode, isDemoPreviewMode } from "@/lib/demo-mode";
 import { clearScopedProgress } from "@/data/progress";
@@ -9,12 +8,8 @@ import { clearActiveStudentSession } from "@/lib/studentIdentity";
 
 export default function DemoPreviewBanner() {
   const router = useRouter();
-  const pathname = usePathname();
-  const [active, setActive] = useState(false);
-
-  useEffect(() => {
-    setActive(isDemoPreviewMode());
-  }, [pathname]);
+  usePathname();
+  const active = isDemoPreviewMode();
 
   if (!active) return null;
 

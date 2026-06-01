@@ -153,22 +153,24 @@ export default function MatchThePair({
 
   function pick(card: Card) {
     if (locked || card.matched) return;
+    const nextLeft = card.kind === "left" ? card : pickedLeft;
+    const nextRight = card.kind === "right" ? card : pickedRight;
+
     if (card.kind === "left") setPickedLeft(card);
     if (card.kind === "right") setPickedRight(card);
-  }
 
-  useEffect(() => {
-    if (!pickedLeft || !pickedRight) return;
+    if (!nextLeft || !nextRight) return;
+
     setAttempts((a) => a + 1);
-    const isMatch = pickedLeft.pairId === pickedRight.pairId;
+    const isMatch = nextLeft.pairId === nextRight.pairId;
     setLocked(true);
 
     if (isMatch) {
       setCorrectMatches((c) => c + 1);
-      speak(String(pickedLeft.value));
+      speak(String(nextLeft.value));
       setCards((prev) =>
-        prev.map((c) =>
-          c.pairId === pickedLeft.pairId ? { ...c, matched: true } : c
+        prev.map((current) =>
+          current.pairId === nextLeft.pairId ? { ...current, matched: true } : current
         )
       );
       setTimeout(() => {
@@ -176,14 +178,15 @@ export default function MatchThePair({
         setPickedRight(null);
         setLocked(false);
       }, 350);
-    } else {
-      setTimeout(() => {
-        setPickedLeft(null);
-        setPickedRight(null);
-        setLocked(false);
-      }, 500);
+      return;
     }
-  }, [pickedLeft, pickedRight]);
+
+    setTimeout(() => {
+      setPickedLeft(null);
+      setPickedRight(null);
+      setLocked(false);
+    }, 500);
+  }
 
   function cardClass(c: Card, side: "left" | "right") {
     const picked = (side === "left" ? pickedLeft?.id : pickedRight?.id) === c.id;

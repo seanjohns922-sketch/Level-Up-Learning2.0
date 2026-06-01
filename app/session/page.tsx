@@ -6475,17 +6475,32 @@ function makeSubtractionCountUpQuestion(): QuizQuestion {
 }
 
 export default function SessionPageWrapper() {
-  return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><SessionPage /></Suspense>;
+  return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><SessionPageRouteInstance /></Suspense>;
 }
 
-function SessionPage() {
-  const router = useRouter();
+function SessionPageRouteInstance() {
   const sp = useSearchParams();
-
   const year = sp.get("year") ?? "Year 3";
   const week = sp.get("week") ?? "1";
-  const type = sp.get("type") ?? "lesson"; // "lesson" | "quiz"
-  const n = Number(sp.get("n") ?? "1"); // lesson number 1-3 or quiz number
+  const type = sp.get("type") ?? "lesson";
+  const n = Number(sp.get("n") ?? "1");
+  const routeKey = `${year}|${week}|${type}|${n}`;
+
+  return <SessionPage key={routeKey} year={year} week={week} type={type} n={n} />;
+}
+
+function SessionPage({
+  year,
+  week,
+  type,
+  n,
+}: {
+  year: string;
+  week: string;
+  type: string;
+  n: number;
+}) {
+  const router = useRouter();
 
   const isLesson = type === "lesson";
   const previewMode = isDemoPreviewMode();
@@ -6969,10 +6984,10 @@ function SessionPage() {
     return base;
   }
 
-  const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([]);
-  useEffect(() => {
-    setQuizQuestions(buildQuizQuestions());
-  }, [year, week, quizWeekPlan]);
+  const quizQuestions = useMemo(
+    () => buildQuizQuestions(),
+    [buildQuizQuestions]
+  );
 
   const [quizAnswers, setQuizAnswers] = useState<Record<string, number>>({});
   const [quizTyped, setQuizTyped] = useState<Record<string, string>>({});
@@ -7000,21 +7015,6 @@ function SessionPage() {
   const isWeek10 = Number(week) === 10;
   const liveQuizStartedRef = useRef<string | null>(null);
   const liveAnsweredQuestionIdsRef = useRef<Set<string>>(new Set());
-
-  useEffect(() => {
-    setQuizAnswers({});
-    setQuizTyped({});
-    setQuizLineAnswers({});
-    setQuizChartDone({});
-    setQuizMabAnswers({});
-    setQuizMoneyAnswers({});
-    setQuizLessonActivityResults({});
-    setQuizGroupTaps({});
-    setQuizSubmitted(false);
-    setFinalScore(0);
-    setQuizIndex(0);
-    liveAnsweredQuestionIdsRef.current = new Set();
-  }, [quizQuestions]);
 
   function chooseQuiz(qIndex: number, optIndex: number) {
     if (quizSubmitted) return;
@@ -7315,18 +7315,11 @@ function SessionPage() {
     currentQuiz?.visual?.type === "rows" &&
     currentQuiz?.prompt?.toLowerCase().startsWith("tap the groups");
 
-  useEffect(() => {
-    if (!currentQuiz || !isTapSkipQuiz) return;
-    if (!quizGroupTaps[currentQuiz.id]) {
-      setQuizGroupTaps((prev) => ({
-        ...prev,
-        [currentQuiz.id]: Array.from(
-          { length: (currentQuiz.visual?.type === "rows" ? currentQuiz.visual.rows.length : 0) },
-          () => false
-        ),
-      }));
-    }
-  }, [currentQuiz, isTapSkipQuiz, quizGroupTaps]);
+  const currentQuizGroupTaps =
+    currentQuiz && isTapSkipQuiz && currentQuiz.visual?.type === "rows"
+      ? (quizGroupTaps[currentQuiz.id] ??
+          Array.from({ length: currentQuiz.visual.rows.length }, () => false))
+      : [];
 
   function isQuestionAnswered(question: QuizQuestion | undefined | null) {
     if (!question) return false;
@@ -7927,28 +7920,33 @@ function SessionPage() {
                         {isTapSkipQuiz ? (
                           <div className="grid" style={{ rowGap: currentQuiz.visual.rowGap }}>
                             {currentQuiz.visual.rows.map((count, ri) => {
-                              const tapped = quizGroupTaps[currentQuiz.id]?.[ri] ?? false;
+                              const tapped = currentQuizGroupTaps[ri] ?? false;
+                              const rowCount = currentQuiz.visual?.type === "rows"
+                                ? currentQuiz.visual.rows.length
+                                : 0;
+                              const toggleQuizGroupTap = () =>
+                                setQuizGroupTaps((prev) => {
+                                  const currentTaps =
+                                    prev[currentQuiz.id] ??
+                                    Array.from({ length: rowCount }, () => false);
+
+                                  return {
+                                    ...prev,
+                                    [currentQuiz.id]: currentTaps.map((value, index) =>
+                                      index === ri ? !value : value
+                                    ),
+                                  };
+                                });
+
                               return (
                                 <div
                                   key={ri}
                                   role="button"
                                   tabIndex={0}
-                                  onClick={() =>
-                                    setQuizGroupTaps((prev) => ({
-                                      ...prev,
-                                      [currentQuiz.id]: (prev[currentQuiz.id] ?? []).map(
-                                        (v, idx) => (idx === ri ? !v : v)
-                                      ),
-                                    }))
-                                  }
+                                  onClick={toggleQuizGroupTap}
                                   onKeyDown={(e) => {
                                     if (e.key === "Enter" || e.key === " ") {
-                                      setQuizGroupTaps((prev) => ({
-                                        ...prev,
-                                        [currentQuiz.id]: (prev[currentQuiz.id] ?? []).map(
-                                          (v, idx) => (idx === ri ? !v : v)
-                                        ),
-                                      }));
+                                      toggleQuizGroupTap();
                                     }
                                   }}
                                   className={[
@@ -7991,8 +7989,7 @@ function SessionPage() {
                           <div className="mt-3 text-sm font-bold text-gray-700">
                             Skip count:{" "}
                             {(() => {
-                              const taps = quizGroupTaps[currentQuiz.id] ?? [];
-                              const count = taps.filter(Boolean).length;
+                              const count = currentQuizGroupTaps.filter(Boolean).length;
                               const per = currentQuiz.visual.rows[0] ?? 0;
                               return count
                                 ? Array.from({ length: count }, (_, i) => (i + 1) * per).join(" → ")

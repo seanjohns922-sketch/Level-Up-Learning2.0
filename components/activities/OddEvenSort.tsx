@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { OddEvenSortQuestion } from "@/data/activities/year2/lessonEngine";
 
@@ -15,55 +15,74 @@ export default function OddEvenSort({
   onCorrect?: () => void;
   onWrong?: () => void;
 }) {
-  const [placements, setPlacements] = useState<Record<string, Bucket | null>>({});
+  const questionKey = JSON.stringify(questionData);
+
+  return (
+    <OddEvenSortInner
+      key={questionKey}
+      questionData={questionData}
+      onCorrect={onCorrect}
+      onWrong={onWrong}
+    />
+  );
+}
+
+function OddEvenSortInner({
+  questionData,
+  onCorrect,
+  onWrong,
+}: {
+  questionData: OddEvenSortQuestion;
+  onCorrect?: () => void;
+  onWrong?: () => void;
+}) {
+  const [placements, setPlacements] = useState<Record<string, Bucket | null>>(() =>
+    Object.fromEntries(
+      questionData.numbers.map((value, index) => [`${value}-${index}`, null])
+    ) as Record<string, Bucket | null>
+  );
   const [pickedPattern, setPickedPattern] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const submittedRef = useRef(false);
 
-  useEffect(() => {
-    const nextPlacements = Object.fromEntries(
-      questionData.numbers.map((value, index) => [`${value}-${index}`, null])
-    ) as Record<string, Bucket | null>;
-    setPlacements(nextPlacements);
-    setPickedPattern(null);
-    setSubmitted(false);
-    submittedRef.current = false;
-  }, [questionData]);
-
-  const allPlaced = useMemo(
-    () =>
+  function finalizeIfReady(
+    nextPlacements: Record<string, Bucket | null>,
+    nextPattern: string | null
+  ) {
+    const nextAllPlaced =
       questionData.numbers.length > 0 &&
       questionData.numbers.every((value, index) => {
         const key = `${value}-${index}`;
-        return key in placements && placements[key] !== null;
-      }),
-    [placements, questionData.numbers]
-  );
+        return key in nextPlacements && nextPlacements[key] !== null;
+      });
 
-  useEffect(() => {
-    if (!allPlaced) return;
-    if (questionData.patternOptions && !pickedPattern) return;
+    if (!nextAllPlaced) return;
+    if (questionData.patternOptions && !nextPattern) return;
     if (submittedRef.current) return;
 
     const placedCorrectly = questionData.numbers.every((value, index) => {
       const expected: Bucket = value % 2 === 0 ? "even" : "odd";
-      return placements[`${value}-${index}`] === expected;
+      return nextPlacements[`${value}-${index}`] === expected;
     });
     const patternCorrect =
-      !questionData.patternOptions || pickedPattern === questionData.patternAnswer;
+      !questionData.patternOptions || nextPattern === questionData.patternAnswer;
 
     submittedRef.current = true;
     setSubmitted(true);
     if (placedCorrectly && patternCorrect) onCorrect?.();
     else onWrong?.();
-  }, [allPlaced, onCorrect, onWrong, pickedPattern, placements, questionData.mode, questionData.numbers, questionData.patternAnswer]);
+  }
 
   function assign(value: number, index: number, bucket: Bucket) {
     if (submittedRef.current) return;
-    setPlacements((current) => ({
-      ...current,
-      [`${value}-${index}`]: bucket,
-    }));
+    setPlacements((current) => {
+      const nextPlacements = {
+        ...current,
+        [`${value}-${index}`]: bucket,
+      };
+      finalizeIfReady(nextPlacements, pickedPattern);
+      return nextPlacements;
+    });
   }
 
   function bucketValues(bucket: Bucket) {
@@ -196,7 +215,10 @@ export default function OddEvenSort({
                 key={option}
                 type="button"
                 disabled={submitted}
-                onClick={() => setPickedPattern(option)}
+                onClick={() => {
+                  setPickedPattern(option);
+                  finalizeIfReady(placements, option);
+                }}
                 className={[
                   "rounded-xl border px-4 py-3 text-left text-sm font-bold transition",
                   pickedPattern === option

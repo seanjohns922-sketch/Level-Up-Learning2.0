@@ -256,7 +256,15 @@ export default function NumbotCollectionPage() {
                     key={legend.id}
                     legend={legend}
                     isUnlocked={isUnlocked}
-                    onClick={() => setSelectedLegend(legend)}
+                    onClick={() => {
+                      console.log("[CardBinder] Legend selected", {
+                        id: legend.id,
+                        name: legend.name,
+                        frontImage: legend.images.cardFront,
+                        backImage: legend.images.cardBack,
+                      });
+                      setSelectedLegend(legend);
+                    }}
                   />
                 );
               })}
@@ -289,6 +297,7 @@ export default function NumbotCollectionPage() {
       {/* Detail Modal */}
       {selectedLegend && (
         <LegendDetailModal
+          key={selectedLegend.id}
           legend={selectedLegend}
           onClose={() => setSelectedLegend(null)}
         />

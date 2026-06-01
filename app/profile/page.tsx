@@ -244,9 +244,6 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const profile = getActiveStudentProfile();
-    if (profile?.displayName?.trim()) {
-      setStudentName(profile.displayName.trim());
-    }
     if (!profile?.studentId) return;
 
     let cancelled = false;
