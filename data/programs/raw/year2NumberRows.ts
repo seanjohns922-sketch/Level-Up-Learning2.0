@@ -77,7 +77,7 @@ export const year2NumberRows: ProgramRow[] = [
   },
   {
     week: 1,
-    focus: "Place Value to 1000",
+    focus: "Partitioning & Expanding",
     lesson: 2,
     topic: "Using MAB identify unknown numbers",
     activity: scopedActivity(
@@ -86,7 +86,7 @@ export const year2NumberRows: ProgramRow[] = [
       "If you trade 10 ones for 1 ten, what changes and what stays the same?"
     ),
     activities: [
-      makeActivity("place_value_builder", 1, {
+      makeActivity("place_value_builder", 2, {
         min: 100,
         max: 1000,
         placeValues: ["hundreds", "tens", "ones"],
@@ -143,7 +143,7 @@ export const year2NumberRows: ProgramRow[] = [
   },
   {
     week: 2,
-    focus: "Partitioning & Expanding",
+    focus: "Place Value to 1000",
     lesson: 1,
     topic: "Break numbers into hundreds, tens, and ones",
     activity: scopedActivity(
