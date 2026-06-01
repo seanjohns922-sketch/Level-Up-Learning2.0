@@ -613,6 +613,9 @@ export default function LiveClassPanel({
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {filteredCards.map((card) => {
               const tone = getLiveStatusTone(card.status);
+              const answered = Math.max(0, card.questionsAnswered ?? 0);
+              const correct = Math.max(0, card.correctCount ?? 0);
+              const accuracy = answered > 0 ? Math.max(0, card.accuracyPercent ?? 0) : 0;
               return (
                 <button
                   key={card.id}
@@ -660,28 +663,32 @@ export default function LiveClassPanel({
                     </div>
                   </div>
 
-                  {/* Score + lesson timer */}
-                  <div className="mt-3 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      {(card.questionsAnswered ?? 0) > 0 ? (
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-2xl font-black text-slate-900">{card.correctCount ?? 0}/{card.questionsAnswered ?? 0}</span>
-                          <span className="text-[11px] font-bold text-slate-400">correct</span>
-                        </div>
-                      ) : (
-                        <div className="text-sm font-semibold text-slate-400">No answers yet</div>
-                      )}
-                      {(card.questionsAnswered ?? 0) > 0 && (card.accuracyPercent ?? 0) > 0 ? (
-                        <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${
-                          (card.accuracyPercent ?? 0) >= 80
-                            ? "bg-emerald-50 text-emerald-700"
-                            : (card.accuracyPercent ?? 0) >= 60
-                            ? "bg-amber-50 text-amber-700"
-                            : "bg-rose-50 text-rose-700"
-                        }`}>
-                          {card.accuracyPercent ?? 0}%
+                  {/* Current lesson score */}
+                  <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3">
+                    <div>
+                      <div className="text-[10px] font-mono font-bold uppercase tracking-[0.18em] text-slate-500">
+                        Current Lesson Score
+                      </div>
+                      <div className="mt-1 flex items-end gap-2">
+                        <span className="text-3xl font-black leading-none text-slate-900">
+                          {correct}/{answered}
                         </span>
-                      ) : null}
+                        <span className="pb-0.5 text-[11px] font-bold text-slate-500">correct</span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-[10px] font-mono font-bold uppercase tracking-[0.18em] text-slate-500">
+                        Accuracy
+                      </div>
+                      <span className={`mt-1 inline-flex rounded-full px-2.5 py-1 text-sm font-black ${
+                        accuracy >= 80
+                          ? "bg-emerald-50 text-emerald-700"
+                          : accuracy >= 60
+                          ? "bg-amber-50 text-amber-700"
+                          : "bg-rose-50 text-rose-700"
+                      }`}>
+                        {accuracy}%
+                      </span>
                     </div>
                     {formatLessonTimer(card.lessonStartedAt, now) ? (
                       <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-bold text-slate-500 tabular-nums">
