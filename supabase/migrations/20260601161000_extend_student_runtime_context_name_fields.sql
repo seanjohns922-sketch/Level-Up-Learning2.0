@@ -1,3 +1,5 @@
+DROP FUNCTION IF EXISTS public.get_student_runtime_context(UUID);
+
 CREATE OR REPLACE FUNCTION public.get_student_runtime_context(
   p_student_id UUID
 )
