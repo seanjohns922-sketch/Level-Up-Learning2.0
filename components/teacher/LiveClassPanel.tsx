@@ -163,7 +163,21 @@ function buildCurrentLessonPerformance(
     .filter((event) => matchesCurrentLesson(row, event))
     .sort((left, right) => new Date(left.created_at).getTime() - new Date(right.created_at).getTime());
 
-  if (lessonEvents.length === 0) return null;
+  if (lessonEvents.length === 0) {
+    const answered = Math.max(0, row.questions_answered ?? 0);
+    const correct = Math.max(0, row.correct_count ?? 0);
+    const accuracy =
+      answered > 0
+        ? Math.max(0, row.accuracy_percent ?? Math.round((correct / answered) * 100))
+        : 0;
+
+    return {
+      answered,
+      correct,
+      accuracy,
+      completed: row.current_lesson_status === "completed",
+    };
+  }
 
   let startIndex = 0;
   for (let index = lessonEvents.length - 1; index >= 0; index -= 1) {
