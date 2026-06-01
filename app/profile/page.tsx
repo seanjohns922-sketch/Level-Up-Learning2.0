@@ -8,6 +8,8 @@ import { useAutoReadSetting } from "@/lib/speak";
 import { fetchStudentActivityDaily, type StudentActivityDailyRow } from "@/lib/student-activity";
 import { fetchNumberCompatProgressForStudent } from "@/lib/realm-progress-compat";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
+import { resolveStudentNameParts } from "@/lib/studentName";
+import { supabase } from "@/lib/supabase";
 import {
   Calendar,
   ChevronLeft,
@@ -89,6 +91,20 @@ function readStudentNameFromStorage() {
   }
 
   return "Adventurer";
+}
+
+async function fetchStudentDisplayName(studentId: string) {
+  const { data, error } = await supabase
+    .from("students")
+    .select("display_name,first_name,last_name")
+    .eq("id", studentId)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) return null;
+
+  const resolved = resolveStudentNameParts(data);
+  return resolved.displayName?.trim() || data.display_name?.trim() || null;
 }
 
 function getMelbourneDateParts(date = new Date()) {
@@ -246,6 +262,11 @@ export default function ProfilePage() {
 
         setActivityRows(daily);
         setPersistedAccuracy(computeOverallLessonAccuracy((snapshotResponse ?? []) as SnapshotRow[]));
+
+        const fullName = await fetchStudentDisplayName(profile.studentId);
+        if (!cancelled && fullName) {
+          setStudentName(fullName);
+        }
       } catch (error) {
         console.warn("[Profile] Failed to load activity stats:", error);
       }
@@ -298,6 +319,10 @@ export default function ProfilePage() {
   const totalActiveSeconds = useMemo(
     () => activityRows.reduce((sum, row) => sum + Math.max(0, row.seconds_active ?? 0), 0),
     [activityRows]
+  );
+  const displayedActiveSeconds = useMemo(
+    () => Math.max(totalActiveSeconds, stats.completedLessons * 9 * 60),
+    [stats.completedLessons, totalActiveSeconds]
   );
   const dayStreak = useMemo(() => calculateDayStreak(activityKeys), [activityKeys]);
   const dashboardAccuracy = persistedAccuracy ?? (stats.completedLessons > 0 ? stats.accuracy : null);
@@ -422,7 +447,7 @@ export default function ProfilePage() {
             {[
               { icon: Flame, value: String(dayStreak), label: "Day Streak", accent: "#F59E0B" },
               { icon: Calendar, value: String(activityRows.length), label: "Days Active", accent: "#0EA5A4" },
-              { icon: Clock, value: formatDurationCompact(totalActiveSeconds), label: "Time", accent: "#0EA5A4" },
+              { icon: Clock, value: formatDurationCompact(displayedActiveSeconds), label: "Time", accent: "#0EA5A4" },
               {
                 icon: Target,
                 value: dashboardAccuracy == null ? "—" : `${dashboardAccuracy}%`,
