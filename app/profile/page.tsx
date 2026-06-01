@@ -253,6 +253,17 @@ export default function ProfilePage() {
 
     void (async () => {
       try {
+        const fullName = await fetchStudentDisplayName(profile.studentId);
+        if (!cancelled && fullName) {
+          setStudentName(fullName);
+        }
+      } catch (error) {
+        console.warn("[Profile] Failed to load student name:", error);
+      }
+    })();
+
+    void (async () => {
+      try {
         const [daily, snapshotResponse] = await Promise.all([
           fetchStudentActivityDaily(profile.studentId),
           fetchNumberCompatProgressForStudent(profile.studentId),
@@ -262,11 +273,6 @@ export default function ProfilePage() {
 
         setActivityRows(daily);
         setPersistedAccuracy(computeOverallLessonAccuracy((snapshotResponse ?? []) as SnapshotRow[]));
-
-        const fullName = await fetchStudentDisplayName(profile.studentId);
-        if (!cancelled && fullName) {
-          setStudentName(fullName);
-        }
       } catch (error) {
         console.warn("[Profile] Failed to load activity stats:", error);
       }

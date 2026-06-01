@@ -39,6 +39,16 @@ function normalizeClassCode(code: string) {
 function isMissingStudentUserIdColumn(message?: string | null) {
   return Boolean(message && /user_id.*students|students.*user_id|schema cache/i.test(message));
 }
+
+async function fetchStudentRuntimeName(studentId: string) {
+  const { data, error } = await supabase.rpc("get_student_runtime_context", {
+    p_student_id: studentId,
+  });
+  if (error) throw error;
+  const row = Array.isArray(data) ? data[0] : null;
+  if (!row) return null;
+  return resolveStudentNameParts(row).displayName?.trim() || row.display_name?.trim() || null;
+}
 function readClasses(): ClassesStore {
   if (typeof window === "undefined") return {};
   try {
@@ -219,6 +229,18 @@ export default function LoginPage() {
       }));
     } catch (error) {
       console.warn("[Login] Could not restore student progress from Supabase", error);
+    }
+
+    try {
+      const runtimeDisplayName = await fetchStudentRuntimeName(student.student_id);
+      if (runtimeDisplayName) {
+        setActiveStudentProfile(student.student_id, student.class_id, {
+          displayName: runtimeDisplayName,
+          yearLevel: studentSchoolYear ?? studentWorkingYear ?? "Year 1",
+        });
+      }
+    } catch (error) {
+      console.warn("[Login] Could not refresh runtime student name", error);
     }
 
     if (!progress) {
