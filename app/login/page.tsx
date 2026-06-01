@@ -7,6 +7,7 @@ import { getActiveStudentIdentity, hasActiveStudentSeenIntro, setActiveStudentPr
 import { restoreStudentStateFromServer } from "@/lib/student-progress-sync";
 import { clearScopedProgress, isPlacementComplete, readProgress, writeProgress } from "@/data/progress";
 import { clearScopedProgramStore } from "@/lib/program-progress";
+import { resolveStudentNameParts } from "@/lib/studentName";
 import { normalizeSchoolYearLabel, normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
 import { GraduationCap, Briefcase, KeyRound, User, Lock } from "lucide-react";
 
@@ -185,8 +186,10 @@ export default function LoginPage() {
       clearScopedProgramStore(previousActiveStudent);
     }
 
+    const resolvedStudentName = resolveStudentNameParts(student).displayName || displayName;
+
     setActiveStudentProfile(student.student_id, student.class_id, {
-      displayName,
+      displayName: resolvedStudentName,
       yearLevel: studentSchoolYear ?? studentWorkingYear ?? "Year 1",
     });
     clearScopedProgress(student.student_id);

@@ -28,6 +28,9 @@ type StudentRuntimeContextRow = {
   class_id: string | null;
   school_year_level: string | null;
   has_seen_intro: boolean | null;
+  display_name?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
 };
 
 function numberProgramKey(year: string) {

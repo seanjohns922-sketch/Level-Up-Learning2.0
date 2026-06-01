@@ -95,16 +95,16 @@ function readStudentNameFromStorage() {
 
 async function fetchStudentDisplayName(studentId: string) {
   const { data, error } = await supabase
-    .from("students")
-    .select("display_name,first_name,last_name")
-    .eq("id", studentId)
-    .maybeSingle();
+    .rpc("get_student_runtime_context", {
+      p_student_id: studentId,
+    });
 
   if (error) throw error;
-  if (!data) return null;
+  const row = Array.isArray(data) ? data[0] : null;
+  if (!row) return null;
 
-  const resolved = resolveStudentNameParts(data);
-  return resolved.displayName?.trim() || data.display_name?.trim() || null;
+  const resolved = resolveStudentNameParts(row);
+  return resolved.displayName?.trim() || row.display_name?.trim() || null;
 }
 
 function getMelbourneDateParts(date = new Date()) {
