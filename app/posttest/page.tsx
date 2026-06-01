@@ -12,6 +12,7 @@ import AssessmentShell from "@/components/assessment/AssessmentShell";
 import { analyzeAssessmentResult } from "@/data/assessments/analysis";
 import { ActiveLearningTracker } from "@/components/student/ActiveLearningTracker";
 import { DEMO_MODE } from "@/data/config";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { getWeekProgress, hasCompletedRequiredWeeks, readProgramStore } from "@/lib/program-progress";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { saveNumberAssessment, saveStudentProgressState } from "@/lib/student-progress-sync";
@@ -306,6 +307,7 @@ function PostTestPage() {
     tens: 0,
     ones: 0,
   });
+  const previewMode = isDemoPreviewMode();
 
   const q = questions[idx];
   const picked = answers[q?.id ?? ""] ?? "";
@@ -314,17 +316,17 @@ function PostTestPage() {
   useEffect(() => {
     const progress = readProgress();
 
-    if (!isPlacementComplete(progress)) {
+    if (!previewMode && !isPlacementComplete(progress)) {
       router.replace("/home");
       return;
     }
 
-    if (!DEMO_MODE && progress?.year && progress.year !== year) {
+    if (!DEMO_MODE && !previewMode && progress?.year && progress.year !== year) {
       router.replace("/levels");
       return;
     }
 
-    if (!DEMO_MODE && progress?.status === "ASSIGNED_PROGRAM" && progress.year === year) {
+    if (!DEMO_MODE && !previewMode && progress?.status === "ASSIGNED_PROGRAM" && progress.year === year) {
       const store = readProgramStore();
       const hasRequiredPlan = Array.isArray(progress.requiredWeeks) && progress.requiredWeeks.length > 0;
       const eligibleForPostTest = hasRequiredPlan
@@ -336,7 +338,7 @@ function PostTestPage() {
         router.replace(`/program?year=${encodeURIComponent(year)}&week=${fallbackWeek}&legacy=1`);
       }
     }
-  }, [router, year]);
+  }, [previewMode, router, year]);
 
   function pick(option: string) {
     if (!q) return;

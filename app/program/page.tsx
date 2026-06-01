@@ -4,6 +4,7 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getProgramForYear } from "@/data/programs";
 import { DEMO_MODE } from "@/data/config";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { isPlacementComplete, readProgress, updateProgress } from "@/data/progress";
 import {
   getOptionalWeeks,
@@ -62,22 +63,23 @@ function ProgramPage() {
   const weekMenuRef = useRef<HTMLDivElement | null>(null);
 
   const legacyProgramMode = sp.get("legacy") === "1";
+  const previewMode = isDemoPreviewMode();
 
   useEffect(() => {
     const progress = readProgress();
-    if (!isPlacementComplete(progress)) {
+    if (!previewMode && !isPlacementComplete(progress)) {
       router.replace("/home");
     }
-  }, [router]);
+  }, [previewMode, router]);
 
   useEffect(() => {
     const progress = readProgress();
-    if (!DEMO_MODE && progress?.year && progress.year !== year) {
+    if (!DEMO_MODE && !previewMode && progress?.year && progress.year !== year) {
       const targetWeek = Math.max(1, Math.min(12, progress.assignedWeek ?? 1));
       router.replace(`/program?year=${encodeURIComponent(progress.year)}&week=${targetWeek}&legacy=1`);
       return;
     }
-  }, [router, year]);
+  }, [previewMode, router, year]);
 
   useEffect(() => {
     const progress = readProgress();
@@ -151,17 +153,17 @@ function ProgramPage() {
 
   const prevProgress = getWeekProgress(store, year, Math.max(1, weekNum - 1));
   const weekUnlocked =
-    DEMO_MODE || teacherMode ? true : hasPersonalizedPlan ? weekIsPlayable : weekNum === 1 ? true : isWeekComplete(prevProgress);
+    DEMO_MODE || previewMode || teacherMode ? true : hasPersonalizedPlan ? weekIsPlayable : weekNum === 1 ? true : isWeekComplete(prevProgress);
 
   const lastAllowedWeek = useMemo(() => {
-    if (DEMO_MODE || teacherMode || hasPersonalizedPlan) return 12;
+    if (DEMO_MODE || previewMode || teacherMode || hasPersonalizedPlan) return 12;
     let allowed = 1;
     for (let w = 2; w <= 12; w++) {
       if (isWeekComplete(getWeekProgress(store, year, w - 1))) allowed = w;
       else break;
     }
     return allowed;
-  }, [teacherMode, year, store, hasPersonalizedPlan]);
+  }, [previewMode, teacherMode, year, store, hasPersonalizedPlan]);
 
   const progress = getWeekProgress(store, year, week);
 
@@ -189,9 +191,9 @@ function ProgramPage() {
   }, [curriculumYear, weekNum]);
 
   function openItem(item: (typeof items)[number]) {
-    if (!weekUnlocked && !teacherMode && !DEMO_MODE) return;
+    if (!weekUnlocked && !teacherMode && !DEMO_MODE && !previewMode) return;
 
-    if (!DEMO_MODE && !teacherMode) {
+    if (!DEMO_MODE && !previewMode && !teacherMode) {
       if (item.type === "lesson") {
         const lessonIdx = item.n - 1;
         if (lessonIdx > 0 && !progress.lessonsCompleted[lessonIdx - 1]) return;
@@ -223,7 +225,7 @@ function ProgramPage() {
 
   function goToWeek(targetWeek: number) {
     const clamped = Math.max(1, Math.min(12, targetWeek));
-    if (!DEMO_MODE && !teacherMode && hasPersonalizedPlan && !playableWeeks.includes(clamped)) return;
+    if (!DEMO_MODE && !previewMode && !teacherMode && hasPersonalizedPlan && !playableWeeks.includes(clamped)) return;
     router.push(`/program?year=${encodeURIComponent(year)}&week=${clamped}&legacy=1`);
   }
 
@@ -398,7 +400,7 @@ function ProgramPage() {
                     <ul className="py-0.5">
                       {Array.from({ length: 12 }).map((_, index) => {
                         const targetWeek = index + 1;
-                        const isUnlocked = DEMO_MODE || teacherMode || (hasPersonalizedPlan ? playableWeeks.includes(targetWeek) : targetWeek <= lastAllowedWeek);
+                        const isUnlocked = DEMO_MODE || previewMode || teacherMode || (hasPersonalizedPlan ? playableWeeks.includes(targetWeek) : targetWeek <= lastAllowedWeek);
                         const isCurrent = targetWeek === weekNum;
                         const isRequiredWeek = requiredWeeks.includes(targetWeek);
                         const isDoneWeek = isWeekComplete(getWeekProgress(store, year, targetWeek));
@@ -667,7 +669,7 @@ function ProgramPage() {
                   : progress.quizCompleted;
 
               let locked = false;
-              if (!DEMO_MODE && !teacherMode) {
+              if (!DEMO_MODE && !previewMode && !teacherMode) {
                 if (!weekUnlocked) {
                   locked = true;
                 }

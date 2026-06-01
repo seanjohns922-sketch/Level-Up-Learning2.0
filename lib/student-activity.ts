@@ -1,6 +1,7 @@
 "use client";
 
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { supabase } from "@/lib/supabase";
 
 export type StudentActivityDailyRow = {
@@ -34,6 +35,7 @@ function getActivityScope() {
 }
 
 async function upsertStudentActivity(delta: StudentActivityDelta) {
+  if (isDemoPreviewMode()) return;
   const { studentId, classId } = getActivityScope();
   if (!studentId) return;
 
@@ -62,6 +64,7 @@ export async function recordStudentActivityDelta(delta: StudentActivityDelta) {
 }
 
 export async function fetchStudentActivityDaily(studentId: string) {
+  if (isDemoPreviewMode()) return [];
   const { data, error } = await supabase.rpc("get_student_activity_daily", {
     p_student_id: studentId,
   });

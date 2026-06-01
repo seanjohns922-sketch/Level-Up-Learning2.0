@@ -8,6 +8,7 @@ import { saveNumberLessonAttempt, saveNumberWeeklyQuizAttempt, saveStudentProgre
 import { getProgramForYear } from "@/data/programs";
 import { getYear6WeeklyQuiz, type Year6WeeklyQuizQuestion } from "@/data/quizzes/year6";
 import { DEMO_MODE } from "@/data/config";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
 import PostTestTransition from "@/components/PostTestTransition";
 import { ActiveLearningTracker } from "@/components/student/ActiveLearningTracker";
 import {
@@ -6487,6 +6488,7 @@ function SessionPage() {
   const n = Number(sp.get("n") ?? "1"); // lesson number 1-3 or quiz number
 
   const isLesson = type === "lesson";
+  const previewMode = isDemoPreviewMode();
   const title = isLesson
     ? `Lesson ${n}`
     : year === "Prep" && Number(week) === 4
@@ -6499,14 +6501,14 @@ function SessionPage() {
 
   useEffect(() => {
     const progress = readProgress();
-    if (!isPlacementComplete(progress)) {
+    if (!previewMode && !isPlacementComplete(progress)) {
       router.replace(`/home`);
       return;
     }
-    if (!DEMO_MODE && progress?.year && progress.year !== year) {
+    if (!DEMO_MODE && !previewMode && progress?.year && progress.year !== year) {
       router.replace(`/number-nexus`);
     }
-  }, [router, year]);
+  }, [previewMode, router, year]);
 
   useEffect(() => {
     if (year === "Prep" && type === "lesson") {
@@ -6516,7 +6518,7 @@ function SessionPage() {
 
   useEffect(() => {
     const progress = readProgress();
-    if (!progress || progress.status !== "ASSIGNED_PROGRAM" || progress.year !== year) return;
+    if (previewMode || !progress || progress.status !== "ASSIGNED_PROGRAM" || progress.year !== year) return;
 
     const store = readPersistedProgramStore();
     const numericWeek = Number(week);
@@ -6527,10 +6529,10 @@ function SessionPage() {
     }
 
     const weekProgress = getPersistedWeekProgress(store, year, numericWeek);
-    if (!DEMO_MODE && type === "quiz" && weekProgress.lessonsCompleted.filter(Boolean).length < 3) {
+    if (!DEMO_MODE && !previewMode && type === "quiz" && weekProgress.lessonsCompleted.filter(Boolean).length < 3) {
       router.replace(`/number-nexus`);
     }
-  }, [router, type, week, year]);
+  }, [previewMode, router, type, week, year]);
 
   function backToWeek() {
     router.push(`/program?year=${encodeURIComponent(year)}&week=${encodeURIComponent(week)}&legacy=1`);

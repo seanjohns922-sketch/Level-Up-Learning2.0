@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { isPlacementComplete, readProgress } from "@/data/progress";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
 
 const NumberNexusMap = dynamic(
   () => import("@/components/world/NumberNexusMap"),
@@ -53,6 +54,7 @@ export default function NumberNexusPage() {
   const router = useRouter();
 
   useEffect(() => {
+    if (isDemoPreviewMode()) return;
     const progress = readProgress();
     if (!isPlacementComplete(progress)) {
       router.replace("/home");

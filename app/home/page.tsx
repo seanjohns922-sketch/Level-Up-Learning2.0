@@ -3,6 +3,7 @@
 import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { isPlacementComplete, readProgress } from "@/data/progress";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { clearActiveStudentSession, getActiveStudentProfile, getPlacementEntryYear, hasActiveStudentSeenIntro, markActiveStudentIntroSeen } from "@/lib/studentIdentity";
 import { markStudentIntroSeen } from "@/lib/student-progress-sync";
 import { supabase } from "@/lib/supabase";
@@ -14,6 +15,10 @@ export default function StudentHomePage() {
   const placementYear = useMemo(() => progress?.year ?? getPlacementEntryYear(), [progress?.year]);
 
   useEffect(() => {
+    if (isDemoPreviewMode()) {
+      router.replace("/levels");
+      return;
+    }
     if (studentProfile?.studentId && hasActiveStudentSeenIntro(studentProfile.studentId)) {
       if (isPlacementComplete(progress)) {
         router.replace("/levels");

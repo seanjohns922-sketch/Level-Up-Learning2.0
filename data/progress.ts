@@ -1,4 +1,5 @@
 import type { AssessmentResultProfile } from "@/data/assessments/analysis";
+import { DEMO_PREVIEW_SCOPE, isDemoPreviewMode } from "@/lib/demo-mode";
 
 export type StudentProgress = {
   year: string; // "Year 3"
@@ -21,6 +22,7 @@ export const ACTIVE_STUDENT_KEY = "lul_active_student_v1";
 
 function getActiveStudentScope() {
   if (typeof window === "undefined") return "server";
+  if (isDemoPreviewMode()) return DEMO_PREVIEW_SCOPE;
   const active = localStorage.getItem(ACTIVE_STUDENT_KEY);
   if (active && active.trim()) return active.trim();
   const isDemo = new URLSearchParams(window.location.search).get("demo") === "1";

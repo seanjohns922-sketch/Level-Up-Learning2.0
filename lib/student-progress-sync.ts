@@ -5,6 +5,7 @@ import { type StudentProgress, writeProgress } from "@/data/progress";
 import { writeProgramStore, type ProgramProgressStore } from "@/lib/program-progress";
 import { markActiveStudentIntroSeen } from "@/lib/studentIdentity";
 import { fetchNumberCompatProgressForStudent } from "@/lib/realm-progress-compat";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { supabase } from "@/lib/supabase";
 
 export type StudentProgressSnapshotRow = {
@@ -154,6 +155,21 @@ function buildStudentProgress(row: StudentProgressSnapshotRow): StudentProgress 
 }
 
 export async function restoreStudentStateFromServer(studentId: string) {
+  if (isDemoPreviewMode()) {
+    const progress = {
+      year: "Prep",
+      scorePercent: 0,
+      status: "ASSIGNED_PROGRAM" as const,
+      placementComplete: true,
+      assignedWeek: 1,
+      requiredWeeks: [],
+      optionalWeeks: [],
+      unlockedLegends: [],
+    };
+    writeProgress(progress);
+    return { rows: [] as StudentProgressSnapshotRow[], progress, introSeen: true };
+  }
+
   const [rows, studentResponse] = await Promise.all([
     fetchNumberCompatProgressForStudent(studentId),
     getStudentRuntimeContext(studentId),
@@ -190,6 +206,8 @@ export async function saveStudentProgressState(
   year: string,
   data: Record<string, unknown>
 ) {
+  if (isDemoPreviewMode()) return;
+
   const studentRow = await getStudentRuntimeContext(studentId);
 
   const payload = {
@@ -232,6 +250,8 @@ export async function saveNumberLessonAttempt(
   lessonId: string,
   attempt: Record<string, unknown>,
 ) {
+  if (isDemoPreviewMode()) return;
+
   const studentRow = await getStudentRuntimeContext(studentId);
 
   const { error } = await supabase.rpc("save_realm_lesson_attempt", {
@@ -279,6 +299,8 @@ export async function saveNumberWeeklyQuizAttempt(
   week: number,
   attempt: Record<string, unknown>,
 ) {
+  if (isDemoPreviewMode()) return;
+
   const studentRow = await getStudentRuntimeContext(studentId);
 
   const yearNumber = parseInt(year.replace(/\D/g, ""), 10) || 0;
@@ -319,6 +341,8 @@ export async function saveNumberAssessment(
   assessmentType: "pretest" | "posttest",
   attempt: Record<string, unknown>,
 ) {
+  if (isDemoPreviewMode()) return;
+
   const studentRow = await getStudentRuntimeContext(studentId);
 
   const { error } = await supabase.rpc("save_realm_assessment", {
@@ -399,6 +423,8 @@ export async function saveNumberAssessment(
 }
 
 export async function markStudentIntroSeen(studentId: string) {
+  if (isDemoPreviewMode()) return;
+
   const { error } = await supabase.rpc("mark_student_intro_seen", {
     p_student_id: studentId,
   });

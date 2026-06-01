@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress } from "@/data/progress";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { getPlacementEntryYear, hasActiveStudentSeenIntro } from "@/lib/studentIdentity";
 import { restoreStudentStateFromServer } from "@/lib/student-progress-sync";
 import { supabase } from "@/lib/supabase";
@@ -15,6 +16,10 @@ export default function Page() {
 
     async function routeUser() {
       if (typeof window !== "undefined") {
+        if (isDemoPreviewMode()) {
+          if (!cancelled) router.replace("/levels");
+          return;
+        }
         const activeStudentId = window.localStorage.getItem(ACTIVE_STUDENT_KEY)?.trim();
         let progress = readProgress();
         let introSeen = hasActiveStudentSeenIntro(activeStudentId);

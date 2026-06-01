@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { DEMO_MODE } from "@/data/config";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
 import RealmPortalPreview from "@/components/realms/RealmPortalPreview";
 import { readProgress } from "@/data/progress";
 import { getWeekProgress, readProgramStore } from "@/lib/program-progress";
@@ -34,6 +35,7 @@ export default function RealmCarousel() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const level = searchParams.get("level") ?? "Year 1";
+  const previewMode = isDemoPreviewMode();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [entered, setEntered] = useState(false);
@@ -59,10 +61,10 @@ export default function RealmCarousel() {
 
   useEffect(() => {
     const progress = readProgress();
-    if (!DEMO_MODE && progress?.year && level !== progress.year) {
+    if (!DEMO_MODE && !previewMode && progress?.year && level !== progress.year) {
       router.replace(`/realms?level=${encodeURIComponent(progress.year)}`);
     }
-  }, [level, router]);
+  }, [level, previewMode, router]);
 
   const levelLabel = level.startsWith("Year")
     ? `Level ${level.replace("Year ", "")}`
@@ -184,7 +186,7 @@ export default function RealmCarousel() {
   }, [navigate]);
 
   const current = REALMS[currentIndex];
-  const isActive = current.active || DEMO_MODE;
+  const isActive = current.active || DEMO_MODE || previewMode;
   const prevIdx = (currentIndex - 1 + REALMS.length) % REALMS.length;
   const nextIdx = (currentIndex + 1) % REALMS.length;
   const bgShift = -2 + (currentIndex / REALMS.length) * 4;
@@ -198,7 +200,13 @@ export default function RealmCarousel() {
   function enterRealm() {
     if (!isActive) return;
     const route = realmRoutes[current.id];
-    if (route) router.push(route);
+    if (route) {
+      router.push(route);
+      return;
+    }
+    if (previewMode) {
+      router.push(`/program?year=${encodeURIComponent(level)}&week=1&legacy=1`);
+    }
   }
 
   return (

@@ -7,6 +7,7 @@
  */
 
 import { ACTIVE_STUDENT_KEY } from "@/data/progress";
+import { DEMO_PREVIEW_SCOPE, isDemoPreviewMode } from "@/lib/demo-mode";
 
 export type WeekProgress = {
   lessonsCompleted: boolean[];   // [L1, L2, L3]
@@ -21,6 +22,7 @@ export const PROGRAM_STORE_KEY = "lul_program_progress_v1";
 
 function getActiveStudentScope() {
   if (typeof window === "undefined") return "server";
+  if (isDemoPreviewMode()) return DEMO_PREVIEW_SCOPE;
   const active = localStorage.getItem(ACTIVE_STUDENT_KEY);
   if (active && active.trim()) return active.trim();
   const isDemo = new URLSearchParams(window.location.search).get("demo") === "1";

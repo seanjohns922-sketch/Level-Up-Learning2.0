@@ -1,6 +1,7 @@
 "use client";
 
 import { supabase } from "@/lib/supabase";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
 import {
   buildLastEventText,
   buildLiveStudentInsight,
@@ -254,6 +255,7 @@ function buildNextActivityRow(
 
 export async function trackLiveLearningEvent(input: LiveLearningEventInput) {
   if (typeof window === "undefined") return;
+  if (isDemoPreviewMode()) return;
 
   const identity = getActiveStudentIdentity();
   const studentId = input.studentId ?? identity.studentId;

@@ -1,14 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { getActiveStudentIdentity, hasActiveStudentSeenIntro, setActiveStudentProfile } from "@/lib/studentIdentity";
+import { getActiveStudentIdentity, hasActiveStudentSeenIntro, markActiveStudentIntroSeen, setActiveStudentProfile } from "@/lib/studentIdentity";
 import { restoreStudentStateFromServer } from "@/lib/student-progress-sync";
 import { clearScopedProgress, isPlacementComplete, readProgress, writeProgress } from "@/data/progress";
 import { clearScopedProgramStore } from "@/lib/program-progress";
 import { resolveStudentNameParts } from "@/lib/studentName";
 import { normalizeSchoolYearLabel, normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
+import { activateDemoPreviewMode, isDemoAccessFeatureEnabled } from "@/lib/demo-mode";
 import { GraduationCap, Briefcase, KeyRound, User, Lock } from "lucide-react";
 
 type StudentRecord = {
@@ -106,11 +107,17 @@ export default function LoginPage() {
   const [studentPin, setStudentPin] = useState("");
   const [studentError, setStudentError] = useState<string | null>(null);
   const [showPin, setShowPin] = useState(false);
+  const doorTapCountRef = useRef(0);
+  const [showDemoModal, setShowDemoModal] = useState(false);
+  const [demoCode, setDemoCode] = useState("");
+  const [demoError, setDemoError] = useState<string | null>(null);
+  const [demoSubmitting, setDemoSubmitting] = useState(false);
 
   const createdClass = createdCode ? classes[createdCode] : null;
   const classList = useMemo(() => Object.values(classes), [classes]);
   const [teacherError, setTeacherError] = useState<string | null>(null);
   const [teacherLoading, setTeacherLoading] = useState(false);
+  const demoAccessEnabled = isDemoAccessFeatureEnabled();
 
   function saveClasses(next: ClassesStore) {
     setClasses(next);
@@ -301,6 +308,61 @@ export default function LoginPage() {
     router.push(dest);
   }
 
+  function handleSecretDoorTap() {
+    if (!demoAccessEnabled) return;
+    setDemoError(null);
+    doorTapCountRef.current += 1;
+    if (doorTapCountRef.current >= 5) {
+      doorTapCountRef.current = 0;
+      setShowDemoModal(true);
+    }
+  }
+
+  async function handleDemoAccess() {
+    if (!demoAccessEnabled || !demoCode.trim()) return;
+    setDemoSubmitting(true);
+    setDemoError(null);
+    try {
+      const response = await fetch("/api/demo-access", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: demoCode.trim() }),
+      });
+
+      if (!response.ok) {
+        setDemoError("Access code not recognised.");
+        setDemoSubmitting(false);
+        return;
+      }
+
+      activateDemoPreviewMode();
+      setActiveStudentProfile("demo-preview", null, {
+        displayName: "Demo Preview",
+        yearLevel: "Prep",
+      });
+      markActiveStudentIntroSeen("demo-preview");
+      clearScopedProgress("demo-preview");
+      clearScopedProgramStore("demo-preview");
+      writeProgress({
+        year: "Prep",
+        scorePercent: 0,
+        status: "ASSIGNED_PROGRAM",
+        placementComplete: true,
+        assignedWeek: 1,
+        requiredWeeks: [],
+        optionalWeeks: [],
+        unlockedLegends: [],
+      });
+      setShowDemoModal(false);
+      setDemoCode("");
+      router.push("/levels");
+    } catch {
+      setDemoError("Demo access could not be activated.");
+    } finally {
+      setDemoSubmitting(false);
+    }
+  }
+
   const inputCls =
     "w-full pl-10 pr-4 py-3 rounded-xl text-[15px] text-white font-medium placeholder-white/30 bg-transparent border border-white/15 focus:outline-none focus:border-amber-400/50 focus:bg-white/[0.03] transition-all duration-200";
 
@@ -330,6 +392,24 @@ export default function LoginPage() {
         />
         {/* Bottom gradient */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/15 pointer-events-none" />
+        {demoAccessEnabled ? (
+          <button
+            type="button"
+            aria-hidden="true"
+            tabIndex={-1}
+            onClick={handleSecretDoorTap}
+            className="absolute z-10 cursor-default bg-transparent"
+            style={{
+              left: "69%",
+              top: "61%",
+              width: "7.5rem",
+              height: "10rem",
+              opacity: 0,
+            }}
+          >
+            Hidden demo access hotspot
+          </button>
+        ) : null}
       </div>
 
 
@@ -528,6 +608,58 @@ export default function LoginPage() {
           Unlock your Level Up Legend by mastering your skills
         </p>
       </div>
+
+      {showDemoModal ? (
+        <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/55 px-6">
+          <div className="w-full max-w-md rounded-[28px] border border-white/12 bg-[#111827]/95 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+            <div className="mb-5">
+              <div className="text-[11px] font-bold uppercase tracking-[0.24em] text-amber-300/70">Demo Access</div>
+              <h2 className="mt-2 text-2xl font-black text-white">Enter access code</h2>
+            </div>
+
+            <label className="grid gap-1.5">
+              <span className="text-[11px] font-bold text-white/45 uppercase tracking-widest pl-1">Access Code</span>
+              <input
+                value={demoCode}
+                onChange={(event) => setDemoCode(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") void handleDemoAccess();
+                }}
+                placeholder="Enter code"
+                className={inputCls}
+              />
+            </label>
+
+            {demoError ? (
+              <div className="mt-4 rounded-xl bg-red-500/10 py-2 text-center text-sm font-bold text-red-200">
+                {demoError}
+              </div>
+            ) : null}
+
+            <div className="mt-5 flex gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDemoModal(false);
+                  setDemoCode("");
+                  setDemoError(null);
+                }}
+                className="flex-1 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-bold text-white/80 transition hover:bg-white/10"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleDemoAccess()}
+                disabled={demoSubmitting || !demoCode.trim()}
+                className="flex-1 rounded-2xl bg-amber-400 px-4 py-3 text-sm font-black text-slate-950 transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {demoSubmitting ? "Checking..." : "Unlock"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }

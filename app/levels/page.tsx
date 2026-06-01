@@ -8,6 +8,7 @@ import { getRecommendedAssignedWeek, readProgramStore } from "@/lib/program-prog
 import { getProgramForYear } from "@/data/programs";
 import { DEMO_MODE } from "@/data/config";
 import { clearActiveStudentSession } from "@/lib/studentIdentity";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { supabase } from "@/lib/supabase";
 
 export default function LevelsPage() {
@@ -28,12 +29,13 @@ export default function LevelsPage() {
 
   const [progress] = useState<StudentProgress | null>(() => readProgress());
   const [selectedYear, setSelectedYear] = useState<string | null>(() => readProgress()?.year ?? null);
+  const previewMode = typeof window !== "undefined" && isDemoPreviewMode();
 
   useEffect(() => {
-    if (!isPlacementComplete(progress)) {
+    if (!previewMode && !isPlacementComplete(progress)) {
       router.replace("/home");
     }
-  }, [progress, router]);
+  }, [previewMode, progress, router]);
 
   const hasProgressForSelected =
     progress && selectedYear && progress.year === selectedYear;
@@ -69,7 +71,7 @@ export default function LevelsPage() {
       return { label: "Start Pre-Test", onClick: () => {}, disabled: true };
     }
 
-    if (DEMO_MODE) {
+    if (DEMO_MODE || previewMode) {
       const selectedProgram = getProgramForYear(selectedYear);
       const fallbackYear = "Year 1";
       const targetYear = selectedProgram.length > 0 ? selectedYear : fallbackYear;
@@ -208,7 +210,7 @@ export default function LevelsPage() {
                   const levelIndex = levels.findIndex((item) => item.id === level.id);
                   const currentLevelLegendId = getLegendForYear(level.id).id;
                   const isPreviouslyPassed = passedLegendIds.has(currentLevelLegendId) && levelIndex < unlockedYearIndex;
-                  const isUnlocked = DEMO_MODE || level.id === unlockedYear || isPreviouslyPassed;
+                  const isUnlocked = DEMO_MODE || previewMode || level.id === unlockedYear || isPreviouslyPassed;
                   return (
                     <button
                       key={level.id}

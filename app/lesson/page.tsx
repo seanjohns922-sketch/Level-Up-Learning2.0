@@ -36,6 +36,7 @@ import { generatePrepWeek11Task, resetPrepWeek11TaskSessionState } from "@/data/
 import { generatePrepWeek12Task, resetPrepWeek12TaskSessionState } from "@/data/activities/prep/week12";
 import { getProgramForYear } from "@/data/programs";
 import { DEMO_MODE } from "@/data/config";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, updateProgress } from "@/data/progress";
 import { trackLiveLearningEvent } from "@/lib/live-class-client";
 import { markLessonComplete } from "@/lib/program-progress";
@@ -107,6 +108,7 @@ function LessonPage() {
   const levelLabel = year === "Prep" ? "Ground Level" : `Level ${levelNumber}`;
   const lessonId = params.get("lessonId") ?? `y${yearNumber}-w1-l1`;
   const expectedPrefix = `y${yearNumber}-w${week}-`;
+  const previewMode = isDemoPreviewMode();
   const effectiveLessonId = lessonId.startsWith(expectedPrefix)
     ? lessonId
     : `y${yearNumber}-w${week}-l1`;
@@ -134,14 +136,14 @@ function LessonPage() {
 
   useEffect(() => {
     const p = readProgress();
-    if (!isPlacementComplete(p)) {
+    if (!previewMode && !isPlacementComplete(p)) {
       router.replace(`/home`);
       return;
     }
-    if (!DEMO_MODE && p?.year && p.year !== year) {
+    if (!DEMO_MODE && !previewMode && p?.year && p.year !== year) {
       router.replace(`/number-nexus`);
     }
-  }, [router, year]);
+  }, [previewMode, router, year]);
 
   useEffect(() => {
     const p = readProgress();
@@ -153,7 +155,7 @@ function LessonPage() {
 
   useEffect(() => {
     const p = readProgress();
-    if (!p || p.status !== "ASSIGNED_PROGRAM" || p.year !== year) return;
+    if (previewMode || !p || p.status !== "ASSIGNED_PROGRAM" || p.year !== year) return;
 
     const store = readProgramStore();
     const weekPlayable = isWeekPlayable(store, year, week, p.requiredWeeks, p.optionalWeeks);
@@ -166,10 +168,10 @@ function LessonPage() {
     if (lessonNumber > 1 && !weekProgress.lessonsCompleted[lessonNumber - 2]) {
       return;
     }
-  }, [lessonNumber, router, week, year]);
+  }, [lessonNumber, previewMode, router, week, year]);
 
   const blockedPreviousLesson = useMemo(() => {
-    if (DEMO_MODE) return null;
+    if (DEMO_MODE || previewMode) return null;
     const p = readProgress();
     if (!p || p.status !== "ASSIGNED_PROGRAM" || p.year !== year) return null;
     const store = readProgramStore();
@@ -179,7 +181,7 @@ function LessonPage() {
       return lessonNumber - 1;
     }
     return null;
-  }, [lessonNumber, week, year]);
+  }, [lessonNumber, previewMode, week, year]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
