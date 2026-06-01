@@ -86,7 +86,7 @@ export const year2NumberRows: ProgramRow[] = [
       "If you trade 10 ones for 1 ten, what changes and what stays the same?"
     ),
     activities: [
-      makeActivity("place_value_builder", 2, {
+      makeActivity("place_value_builder", 1, {
         min: 100,
         max: 1000,
         placeValues: ["hundreds", "tens", "ones"],
