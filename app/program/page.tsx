@@ -110,7 +110,7 @@ function ProgramPage() {
     pillShadow: "inset 0 1px 0 rgba(200,160,48,0.25), inset 0 -1px 0 rgba(0,0,0,0.5), 0 0 16px rgba(109,40,217,0.18)",
     pillDot:    "bg-yellow-200/80 shadow-[0_0_8px_rgba(200,160,48,0.5)]",
     headingGlow:  "drop-shadow-[0_2px_14px_rgba(109,40,217,0.3)]",
-    focusColor:   "text-yellow-100/70",
+    focusColor:   "text-amber-200/90 [text-shadow:0_1px_6px_rgba(0,0,0,0.7)]",
     dividerColor: "border-yellow-900/25",
     xpLabelColor: "text-yellow-100/65",
   } : {
@@ -635,11 +635,11 @@ function ProgramPage() {
               {currentWeekPlan?.topic ?? "Your current focus"}
             </p>
             {hasPersonalizedPlan ? (
-              <p className="text-teal-200/80 mt-2 text-xs font-mono uppercase tracking-[0.16em]">
+              <p className={`mt-2 text-xs font-mono uppercase tracking-[0.16em] ${isMeasurementRealm ? "text-amber-100/85 [text-shadow:0_1px_6px_rgba(0,0,0,0.65)]" : "text-teal-200/80"}`}>
                 {currentWeekIsRequired ? "◆ Required Week" : canTakePostTestEarly ? "◆ Optional Practice Week" : "◆ Locked Bonus Week"}
               </p>
             ) : null}
-            <p className="text-teal-200/80 mt-2 text-xs font-mono uppercase tracking-[0.16em]">
+            <p className={`mt-2 text-xs font-mono uppercase tracking-[0.16em] ${isMeasurementRealm ? "text-amber-100/85 [text-shadow:0_1px_6px_rgba(0,0,0,0.65)]" : "text-teal-200/80"}`}>
               {weekUnlocked
                 ? weekComplete
                   ? "◆ Completed"
