@@ -17,15 +17,10 @@ import { supabase } from "@/lib/supabase";
 
 const YEAR = "Prep";
 const REALM_ID = "measurement";
-const BG_IMAGE = "/images/tower-plaza-bg.jpg";
-
-const DISTRICT_ZONES = [
-  { id: "length", name: "LENGTH LANDS", sub: "WEEKS 1–2", weekStart: 1, weekEnd: 2, left: "7%", top: "14%", color: "#67e8f9" },
-  { id: "balance", name: "BALANCE BASIN", sub: "WEEKS 3–4", weekStart: 3, weekEnd: 4, left: "10%", top: "56%", color: "#86efac" },
-  { id: "tower", name: "TIMEWIELDER TOWER", sub: "WEEK 8", weekStart: 8, weekEnd: 8, left: "50%", top: "30%", color: "#fde68a" },
-  { id: "capacity", name: "CAPACITY SPRINGS", sub: "WEEKS 5–6", weekStart: 5, weekEnd: 6, left: "70%", top: "15%", color: "#c4b5fd" },
-  { id: "clockwork", name: "CLOCKWORK CROSSING", sub: "WEEK 7", weekStart: 7, weekEnd: 7, left: "69%", top: "57%", color: "#f9a8d4" },
-] as const;
+const BG_IMAGE = "/images/measurelands-home-bg.jpg";
+const ACCENT = "#fbbf24";
+const ACCENT_SOFT = "#fde68a";
+const TEAL = "#5eead4";
 
 function useWorldCanvas() {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -273,20 +268,17 @@ export default function MeasurelandsMap() {
     };
   }, []);
 
-  const currentZone =
-    DISTRICT_ZONES.find((zone) => currentWeek >= zone.weekStart && currentWeek <= zone.weekEnd) ?? DISTRICT_ZONES[0];
-
   function launchGuidedAdventure() {
     if (launching) return;
     setLaunching(true);
     window.setTimeout(() => {
-      for (let week = currentZone.weekStart; week <= currentZone.weekEnd; week += 1) {
+      for (let week = 1; week <= 8; week += 1) {
         if (!completedByWeek[week]) {
           router.push(`/program?year=${encodeURIComponent(YEAR)}&week=${week}&legacy=1&realm_id=${REALM_ID}`);
           return;
         }
       }
-      router.push(`/program?year=${encodeURIComponent(YEAR)}&week=${currentZone.weekEnd}&legacy=1&realm_id=${REALM_ID}`);
+      router.push(`/program?year=${encodeURIComponent(YEAR)}&week=${Math.max(1, currentWeek)}&legacy=1&realm_id=${REALM_ID}`);
     }, 900);
   }
 
@@ -331,18 +323,18 @@ export default function MeasurelandsMap() {
         }}
       />
 
-      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(8,14,32,0.58) 0%, rgba(8,14,32,0.16) 40%, rgba(5,8,24,0.88) 100%)" }} />
-      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 55% at 50% 36%, rgba(103,232,249,0.09) 0%, transparent 70%)" }} />
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(255,236,200,0.10) 0%, rgba(255,236,200,0) 35%, rgba(20,30,60,0.45) 100%)" }} />
+      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 55% at 50% 40%, rgba(251,191,36,0.18) 0%, transparent 70%)" }} />
       <div
         style={{
           position: "absolute",
           left: "50%",
           top: 0,
           transform: "translateX(-50%)",
-          width: 100,
-          height: "52%",
-          background: "linear-gradient(180deg, rgba(253,230,138,0) 0%, rgba(253,230,138,0.18) 60%, rgba(253,230,138,0.4) 100%)",
-          filter: "blur(16px)",
+          width: 140,
+          height: "60%",
+          background: "linear-gradient(180deg, rgba(253,230,138,0) 0%, rgba(253,230,138,0.22) 55%, rgba(251,191,36,0.45) 100%)",
+          filter: "blur(22px)",
           pointerEvents: "none",
         }}
       />
@@ -358,27 +350,48 @@ export default function MeasurelandsMap() {
           pointerEvents: "none",
         }}
       >
-        {DISTRICT_ZONES.filter((zone) => currentWeek >= zone.weekStart).map((zone) => (
+        {/* Meazurex mentor card */}
+        <div
+          style={{
+            position: "absolute",
+            left: "4%",
+            bottom: "10%",
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            padding: "10px 16px 10px 12px",
+            borderRadius: 18,
+            background: "linear-gradient(180deg, rgba(76,29,149,0.78) 0%, rgba(30,27,75,0.85) 100%)",
+            border: "1.5px solid rgba(253,230,138,0.45)",
+            boxShadow: "0 0 24px rgba(251,191,36,0.28), 0 10px 28px rgba(0,0,0,0.55)",
+            backdropFilter: "blur(10px)",
+            maxWidth: 260,
+          }}
+        >
           <div
-            key={zone.id}
             style={{
-              position: "absolute",
-              left: zone.left,
-              top: zone.top,
-              transform: zone.id === "tower" ? "translateX(-50%)" : undefined,
-              color: "#ffffff",
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: "0.22em",
-              fontFamily: "ui-monospace, monospace",
-              opacity: currentZone.id === zone.id ? 0.88 : 0.34,
-              textShadow: `0 0 14px ${zone.color}88, 0 2px 8px rgba(0,0,0,0.9)`,
-              whiteSpace: "nowrap",
+              width: 46,
+              height: 46,
+              borderRadius: "50%",
+              background: "radial-gradient(circle at 50% 35%, #fde68a 0%, #b45309 75%)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 26,
+              boxShadow: "inset 0 -3px 6px rgba(0,0,0,0.3)",
             }}
           >
-            {zone.name}
+            🧙
           </div>
-        ))}
+          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <span style={{ color: "#fde68a", fontSize: 9, fontWeight: 900, letterSpacing: "0.2em", fontFamily: "ui-monospace,monospace" }}>
+              MEAZUREX
+            </span>
+            <span style={{ color: "#f5f3ff", fontSize: 12, fontWeight: 600, lineHeight: 1.25 }}>
+              Welcome, young measurer! Your adventure begins.
+            </span>
+          </div>
+        </div>
 
         <div
           style={{
@@ -551,18 +564,18 @@ export default function MeasurelandsMap() {
         <div
           style={{
             position: "relative",
-            color: currentZone.color,
-            fontSize: 11,
+            color: ACCENT_SOFT,
+            fontSize: 12,
             fontWeight: 800,
             letterSpacing: "0.28em",
             fontFamily: "ui-monospace, monospace",
-            textShadow: `0 0 14px ${currentZone.color}, 0 2px 8px rgba(0,0,0,0.9)`,
+            textShadow: `0 0 14px ${ACCENT}, 0 2px 8px rgba(0,0,0,0.9)`,
             marginTop: 14,
             opacity: launching ? 0 : 1,
             transition: "opacity 0.3s",
           }}
         >
-          WEEK {currentWeek} · {currentZone.name}
+          WEEK {Math.max(1, currentWeek)} · LENGTH LANDS
         </div>
       </div>
 
