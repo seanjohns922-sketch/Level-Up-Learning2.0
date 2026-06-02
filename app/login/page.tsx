@@ -418,26 +418,50 @@ export default function LoginPage() {
         {/* Bottom gradient */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/15 pointer-events-none" />
         {demoAccessEnabled ? (
-          <button
-            type="button"
-            aria-hidden="true"
-            tabIndex={-1}
-            onClick={() => registerSecretDoorTap("click")}
-            onPointerUp={() => registerSecretDoorTap("pointer")}
-            onTouchEnd={() => registerSecretDoorTap("touch")}
-            className="absolute z-10 cursor-default bg-transparent"
-            style={{
-              left: "70.5%",
-              top: "59%",
-              width: "10rem",
-              height: "14rem",
-              opacity: 0,
-              transform: "translate(-50%, -50%)",
-              touchAction: "manipulation",
-            }}
-          >
-            Hidden demo access hotspot
-          </button>
+          <>
+            <button
+              type="button"
+              aria-hidden="true"
+              tabIndex={-1}
+              onClick={() => registerSecretDoorTap("click")}
+              onPointerDown={() => registerSecretDoorTap("pointer")}
+              onTouchStart={() => registerSecretDoorTap("touch")}
+              className="absolute z-10 cursor-default bg-transparent"
+              style={{
+                left: "50.5%",
+                top: "64%",
+                width: "11rem",
+                height: "15rem",
+                opacity: 0,
+                transform: "translate(-50%, -50%)",
+                touchAction: "manipulation",
+                pointerEvents: "auto",
+              }}
+            >
+              Hidden demo access door hotspot
+            </button>
+            <button
+              type="button"
+              aria-hidden="true"
+              tabIndex={-1}
+              onClick={() => registerSecretDoorTap("click")}
+              onPointerDown={() => registerSecretDoorTap("pointer")}
+              onTouchStart={() => registerSecretDoorTap("touch")}
+              className="absolute z-10 cursor-default bg-transparent"
+              style={{
+                left: "52%",
+                top: "48%",
+                width: "18rem",
+                height: "30rem",
+                opacity: 0,
+                transform: "translate(-50%, -50%)",
+                touchAction: "manipulation",
+                pointerEvents: "auto",
+              }}
+            >
+              Hidden demo access tower hotspot
+            </button>
+          </>
         ) : null}
       </div>
 
