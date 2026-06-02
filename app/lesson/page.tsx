@@ -122,6 +122,118 @@ function LessonPage() {
   }, [effectiveLessonId]);
   const lessonChrome = useMemo(() => getLessonChrome(levelNumber), [levelNumber]);
   const mapRoute = realmId === "measurement" ? "/measurelands" : "/number-nexus";
+  const isMeasurement = realmId === "measurement";
+
+  // ── Lesson page theme — add a new entry here for future realms ────────────
+  const lt = isMeasurement ? {
+    // outer wrapper
+    outerBorder: "border-amber-900/35",
+    // content area
+    contentBg: "bg-[#faf3e4]",
+    // card shared
+    cardBorder: "border-amber-800/25",
+    cardShadow: "0 2px 6px rgba(44,28,8,0.05), 0 8px 24px rgba(44,28,8,0.09)",
+    // mission briefing
+    missionBg: "#fdf6e8",
+    missionBadgeBg: "rgba(75,40,100,0.08)",
+    missionBadgeBorder: "rgba(139,92,246,0.35)",
+    missionBadgeText: "#5b21b6",
+    missionBadgeIconBg: "rgba(109,40,217,0.85)",
+    missionFocusLabel: "#7c3aed",
+    // corner decoration — ruler marks
+    cornerDecoration: "ruler" as const,
+    // video card
+    videoBg: "linear-gradient(135deg, #1e1040 0%, #2d1b69 55%, #3c1f8a 100%)",
+    videoGridColor: "rgba(139,92,246,0.22)",
+    videoCornerColor: "rgba(167,139,250,0.55)",
+    videoPlayBorder: "rgba(167,139,250,0.45)",
+    videoPlayBg: "rgba(139,92,246,0.12)",
+    videoPlayIcon: "#c4b5fd",
+    videoPlayGlow: "0 0 24px rgba(109,40,217,0.3)",
+    videoText: "rgba(196,181,253,0.85)",
+    videoHeaderIconBg: "linear-gradient(135deg, #6d28d9, #4c1d95)",
+    videoHeaderIconShadow: "0 2px 6px rgba(109,40,217,0.4), inset 0 1px 0 rgba(255,255,255,0.15)",
+    videoLiveDot: "#c8a030",
+    videoLiveText: "rgba(200,160,48,0.7)",
+    // action strip
+    stripBg: "#fdf6e8",
+    stripBorder: "rgba(180,120,20,0.22)",
+    // time widget
+    timeBezel: "linear-gradient(135deg, rgba(200,160,48,0.5) 0%, rgba(120,90,15,0.2) 50%, rgba(200,160,48,0.44) 100%)",
+    timeBg: "linear-gradient(135deg, #140e04 0%, #2a1a06 50%, #3d2808 100%)",
+    timeShadow: "inset 0 1px 0 rgba(200,160,48,0.28), inset 0 -8px 16px rgba(0,0,0,0.4)",
+    timeIconBg: "radial-gradient(circle at 35% 30%, #c8a030 0%, #4a3010 60%, #1a0e04 100%)",
+    timeIconShadow: "inset 0 0 6px rgba(200,160,48,0.6), 0 0 8px rgba(200,160,48,0.28)",
+    timeIconShape: "50%" as const,
+    timeText: "#faf0d0",
+    // xp widget (keep existing gold — works for both)
+    xpBezel: "linear-gradient(135deg, rgba(251,191,36,0.55) 0%, rgba(94,234,212,0.3) 50%, rgba(251,191,36,0.45) 100%)",
+    xpBg: "linear-gradient(135deg, #021a18 0%, #0a3d36 45%, #154d3a 100%)",
+    xpShadow: "inset 0 1px 0 rgba(251,191,36,0.3), inset 0 -8px 16px rgba(0,0,0,0.4), 0 0 18px rgba(251,191,36,0.18)",
+    // legend widget
+    legendBezel: "linear-gradient(135deg, rgba(139,92,246,0.52) 0%, rgba(109,40,217,0.22) 50%, rgba(139,92,246,0.46) 100%)",
+    legendBg: "linear-gradient(135deg, #140a2e 0%, #2d1b69 45%, #4c1d95 100%)",
+    legendShadow: "inset 0 1px 0 rgba(139,92,246,0.32), inset 0 -8px 16px rgba(0,0,0,0.4), 0 0 14px rgba(109,40,217,0.2)",
+    legendIconBg: "radial-gradient(circle at 35% 30%, #a78bfa 0%, #4c1d95 60%, #1e1040 100%)",
+    legendIconShadow: "inset 0 0 6px rgba(139,92,246,0.7), 0 0 10px rgba(109,40,217,0.4)",
+    legendIconShape: "50%" as const,
+    legendText: "#e9d5ff",
+    // begin practise button
+    btnBezel: "linear-gradient(135deg, rgba(200,160,48,0.65) 0%, rgba(120,90,15,0.3) 50%, rgba(200,160,48,0.58) 100%)",
+    btnBg: "linear-gradient(135deg, #2a1a04 0%, #5c3d0e 40%, #8b6520 75%, #c8a030 100%)",
+    btnShadow: "inset 0 1px 0 rgba(200,160,48,0.35), inset 0 -10px 20px rgba(0,0,0,0.45), 0 8px 22px rgba(44,28,8,0.5), 0 0 20px rgba(109,40,217,0.12)",
+    btnText: "#faf0d0",
+    btnBorderRadius: 12 as number,
+  } : {
+    // Number Nexus — keep every existing value unchanged
+    outerBorder: "border-border/40",
+    contentBg: "bg-background",
+    cardBorder: "border-teal-200/60",
+    cardShadow: "0 2px 6px rgba(2,23,22,0.04), 0 8px 24px rgba(2,23,22,0.06)",
+    missionBg: undefined,
+    missionBadgeBg: undefined,
+    missionBadgeBorder: undefined,
+    missionBadgeText: undefined,
+    missionBadgeIconBg: undefined,
+    missionFocusLabel: undefined,
+    cornerDecoration: "circuit" as const,
+    videoBg: "linear-gradient(135deg, #021716 0%, #064e47 60%, #0d9488 100%)",
+    videoGridColor: "rgba(94,234,212,1)",
+    videoCornerColor: "rgba(94,234,212,0.7)",
+    videoPlayBorder: "rgba(94,234,212,0.4)",
+    videoPlayBg: "rgba(94,234,212,0.15)",
+    videoPlayIcon: "#5eead4",
+    videoPlayGlow: "0 0 24px rgba(94,234,212,0.35)",
+    videoText: "rgba(255,255,255,0.8)",
+    videoHeaderIconBg: "linear-gradient(135deg, #0d9488, #047857)",
+    videoHeaderIconShadow: "0 2px 6px rgba(13,148,136,0.35), inset 0 1px 0 rgba(255,255,255,0.2)",
+    videoLiveDot: "#10b981",
+    videoLiveText: "rgba(13,148,136,0.7)",
+    stripBg: undefined,
+    stripBorder: undefined,
+    timeBezel: "linear-gradient(135deg, rgba(94,234,212,0.55) 0%, rgba(15,118,110,0.25) 50%, rgba(94,234,212,0.45) 100%)",
+    timeBg: "linear-gradient(135deg, #021a18 0%, #063d38 45%, #0a5048 100%)",
+    timeShadow: "inset 0 1px 0 rgba(94,234,212,0.35), inset 0 -8px 16px rgba(0,0,0,0.4)",
+    timeIconBg: "radial-gradient(circle at 35% 30%, #0d9488 0%, #064e47 60%, #021716 100%)",
+    timeIconShadow: "inset 0 0 6px rgba(94,234,212,0.6), 0 0 8px rgba(94,234,212,0.3)",
+    timeIconShape: "polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)" as unknown as "50%",
+    timeText: "#ecfeff",
+    xpBezel: "linear-gradient(135deg, rgba(251,191,36,0.55) 0%, rgba(94,234,212,0.3) 50%, rgba(251,191,36,0.45) 100%)",
+    xpBg: "linear-gradient(135deg, #021a18 0%, #0a3d36 45%, #154d3a 100%)",
+    xpShadow: "inset 0 1px 0 rgba(251,191,36,0.3), inset 0 -8px 16px rgba(0,0,0,0.4), 0 0 18px rgba(251,191,36,0.18)",
+    legendBezel: "linear-gradient(135deg, rgba(110,231,183,0.55) 0%, rgba(15,118,110,0.3) 50%, rgba(110,231,183,0.45) 100%)",
+    legendBg: "linear-gradient(135deg, #021a18 0%, #063d38 45%, #0d6b50 100%)",
+    legendShadow: "inset 0 1px 0 rgba(110,231,183,0.35), inset 0 -8px 16px rgba(0,0,0,0.4), 0 0 14px rgba(52,211,153,0.15)",
+    legendIconBg: "radial-gradient(circle at 35% 30%, #34d399 0%, #065f46 60%, #021716 100%)",
+    legendIconShadow: "inset 0 0 6px rgba(110,231,183,0.7), 0 0 10px rgba(52,211,153,0.4)",
+    legendIconShape: "polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)" as unknown as "50%",
+    legendText: "#ecfdf5",
+    btnBezel: "linear-gradient(135deg, rgba(94,234,212,0.7) 0%, rgba(15,118,110,0.35) 50%, rgba(94,234,212,0.6) 100%)",
+    btnBg: "linear-gradient(135deg, #021a18 0%, #064e47 45%, #0d9488 100%)",
+    btnShadow: "inset 0 1px 0 rgba(94,234,212,0.4), inset 0 -10px 20px rgba(0,0,0,0.45), 0 8px 22px rgba(2,23,22,0.5), 0 0 18px rgba(94,234,212,0.2)",
+    btnText: "#ecfeff",
+    btnBorderRadius: 0,
+  };
   const lessonProgram = useMemo(
     () => (realmId === "measurement" ? getCurriculumPlan(year, "measurement") : getProgramForYear(year)),
     [realmId, year]
@@ -516,6 +628,7 @@ function LessonPage() {
               lessonTitle={safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
               focus={`Complete Lesson ${blockedPreviousLesson} first to unlock this lesson.`}
               heroClass={lessonChrome.heroClass}
+              realmId={realmId}
             />
             <div className="bg-background px-6 py-8">
               <div className="mx-auto max-w-2xl rounded-[28px] border border-cyan-200 bg-gradient-to-br from-cyan-50 via-white to-teal-50 p-6 shadow-[0_12px_30px_rgba(13,148,136,0.08)]">
@@ -564,286 +677,309 @@ function LessonPage() {
               lessonTitle={safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
               focus={safeLessonFocus ?? "Watch the video and complete activities"}
               heroClass={lessonChrome.heroClass}
+              realmId={realmId}
             />
 
-            <div className="bg-background px-4 py-5 md:px-6 md:py-6">
-              {/* ROW 1: 2-column landscape — left intro / right video */}
+            <div className={`px-4 py-5 md:px-6 md:py-6 ${lt.contentBg}`}>
+              {/* ROW 1: 2-column — left mission briefing / right video */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                {/* LEFT: Mission briefing */}
-                <div className="relative overflow-hidden bg-card rounded-[20px] border border-teal-200/60 shadow-[0_2px_6px_rgba(2,23,22,0.04),0_8px_24px_rgba(2,23,22,0.06)] p-5 md:p-6 flex flex-col">
-                  {/* Circuit corner accents */}
-                  <svg aria-hidden className="pointer-events-none absolute -top-px -left-px h-16 w-16 text-teal-500/25" viewBox="0 0 64 64" fill="none">
-                    <path d="M0 16 H20 L28 24 H48" stroke="currentColor" strokeWidth="1" />
-                    <path d="M0 28 H10 L16 34" stroke="currentColor" strokeWidth="1" />
-                    <circle cx="48" cy="24" r="1.5" fill="currentColor" />
-                    <circle cx="16" cy="34" r="1.5" fill="currentColor" />
-                  </svg>
-                  <svg aria-hidden className="pointer-events-none absolute -bottom-px -right-px h-20 w-20 text-emerald-500/20" viewBox="0 0 80 80" fill="none">
-                    <path d="M80 50 H60 L52 58 H30" stroke="currentColor" strokeWidth="1" />
-                    <path d="M80 64 H66 L60 70" stroke="currentColor" strokeWidth="1" />
-                    <circle cx="30" cy="58" r="1.5" fill="currentColor" />
-                    <circle cx="60" cy="70" r="1.5" fill="currentColor" />
-                  </svg>
-                  {/* Faint number grid */}
-                  <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[0.04]" style={{
-                    backgroundImage: "linear-gradient(rgba(13,148,136,1) 1px, transparent 1px), linear-gradient(90deg, rgba(13,148,136,1) 1px, transparent 1px)",
-                    backgroundSize: "24px 24px",
-                  }} />
 
-                  <div className="relative inline-flex w-fit items-center gap-2 rounded-full bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-300/40 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-teal-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
-                    <span className="inline-flex h-4 w-4 items-center justify-center rounded-sm bg-teal-600/90 text-white shadow-sm">
-                      <svg viewBox="0 0 16 16" className="h-2.5 w-2.5" fill="currentColor"><path d="M8 1l6 3.5v7L8 15 2 11.5v-7L8 1zm0 2.3L4 5.6v4.8l4 2.3 4-2.3V5.6L8 3.3z"/></svg>
+                {/* LEFT: Mission briefing */}
+                <div
+                  className="relative overflow-hidden rounded-[20px] p-5 md:p-6 flex flex-col"
+                  style={{
+                    background: lt.missionBg ?? "var(--card)",
+                    border: `1px solid ${lt.cardBorder.replace("border-", "").replace(/\/\d+$/, "")}`,
+                    borderColor: isMeasurement ? "rgba(180,120,20,0.22)" : undefined,
+                    boxShadow: lt.cardShadow,
+                  }}
+                >
+                  {/* Corner decoration */}
+                  {lt.cornerDecoration === "circuit" ? (
+                    <>
+                      <svg aria-hidden className="pointer-events-none absolute -top-px -left-px h-16 w-16 text-teal-500/25" viewBox="0 0 64 64" fill="none">
+                        <path d="M0 16 H20 L28 24 H48" stroke="currentColor" strokeWidth="1" />
+                        <path d="M0 28 H10 L16 34" stroke="currentColor" strokeWidth="1" />
+                        <circle cx="48" cy="24" r="1.5" fill="currentColor" />
+                        <circle cx="16" cy="34" r="1.5" fill="currentColor" />
+                      </svg>
+                      <svg aria-hidden className="pointer-events-none absolute -bottom-px -right-px h-20 w-20 text-emerald-500/20" viewBox="0 0 80 80" fill="none">
+                        <path d="M80 50 H60 L52 58 H30" stroke="currentColor" strokeWidth="1" />
+                        <path d="M80 64 H66 L60 70" stroke="currentColor" strokeWidth="1" />
+                        <circle cx="30" cy="58" r="1.5" fill="currentColor" />
+                        <circle cx="60" cy="70" r="1.5" fill="currentColor" />
+                      </svg>
+                      <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[0.04]" style={{
+                        backgroundImage: "linear-gradient(rgba(13,148,136,1) 1px, transparent 1px), linear-gradient(90deg, rgba(13,148,136,1) 1px, transparent 1px)",
+                        backgroundSize: "24px 24px",
+                      }} />
+                    </>
+                  ) : (
+                    /* Measurelands: ruler marks in corners */
+                    <>
+                      <div aria-hidden className="pointer-events-none absolute top-0 left-0 right-0 flex" style={{ height: 3 }}>
+                        {Array.from({ length: 20 }).map((_, i) => (
+                          <div key={i} style={{ flex: 1, borderRight: i % 5 === 4 ? "1.5px solid rgba(200,160,48,0.35)" : "1px solid rgba(200,160,48,0.15)", height: i % 5 === 4 ? 8 : 4, alignSelf: "flex-start", marginTop: 0 }} />
+                        ))}
+                      </div>
+                      <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[0.025]" style={{
+                        backgroundImage: "radial-gradient(circle at 80% 80%, rgba(109,40,217,1) 0%, transparent 60%)",
+                      }} />
+                    </>
+                  )}
+
+                  {/* Badge */}
+                  <div
+                    className="relative inline-flex w-fit items-center gap-2 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] shadow-[inset_0_1px_0_rgba(255,255,255,0.5)]"
+                    style={isMeasurement ? {
+                      background: lt.missionBadgeBg,
+                      border: `1px solid ${lt.missionBadgeBorder}`,
+                      color: lt.missionBadgeText,
+                    } : {
+                      background: "linear-gradient(to right, #f0fdfa, #ecfdf5)",
+                      border: "1px solid rgba(94,234,212,0.4)",
+                      color: "#115e59",
+                    }}
+                  >
+                    <span
+                      className="inline-flex h-4 w-4 items-center justify-center rounded-sm text-white shadow-sm"
+                      style={{ background: isMeasurement ? lt.missionBadgeIconBg : "rgba(13,148,136,0.9)" }}
+                    >
+                      {isMeasurement ? (
+                        /* Scroll / compass icon */
+                        <svg viewBox="0 0 16 16" className="h-2.5 w-2.5" fill="currentColor">
+                          <circle cx="8" cy="8" r="5" stroke="currentColor" strokeWidth="1.2" fill="none" />
+                          <circle cx="8" cy="8" r="1.5" fill="currentColor" />
+                          <path d="M8 3v1.5M8 11.5V13M3 8h1.5M11.5 8H13" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+                        </svg>
+                      ) : (
+                        <svg viewBox="0 0 16 16" className="h-2.5 w-2.5" fill="currentColor"><path d="M8 1l6 3.5v7L8 15 2 11.5v-7L8 1zm0 2.3L4 5.6v4.8l4 2.3 4-2.3V5.6L8 3.3z"/></svg>
+                      )}
                     </span>
-                    Mission Briefing
+                    {isMeasurement ? "Mission Journal" : "Mission Briefing"}
                   </div>
+
                   <h2 className="relative mt-3 text-[1.35rem] md:text-2xl font-bold text-foreground leading-[1.15] tracking-[-0.02em]">
                     {safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
                   </h2>
                   {safeLessonFocus ? (
                     <p className="relative mt-2 text-sm font-medium text-foreground/80 leading-relaxed">
-                      <span className="font-semibold text-teal-800">Focus:</span> {safeLessonFocus}
+                      <span className="font-semibold" style={{ color: isMeasurement ? lt.missionFocusLabel : "#115e59" }}>Focus:</span> {safeLessonFocus}
                     </p>
                   ) : null}
                   <p className="relative mt-2.5 text-sm font-normal text-muted-foreground leading-relaxed">
-                    {year === "Prep"
-                      ? "Meet the Ground Explorer, watch the short example, then jump into 9 minutes of easy number practice."
-                      : "Watch the short lesson video, then jump into 9 minutes of practice. Earn XP for every correct answer and unlock your Level Up Legend."}
+                    {isMeasurement
+                      ? (year === "Prep"
+                          ? "Watch the example, then set off on 9 minutes of magical measurement practice. Earn XP and unlock Meazurex."
+                          : "Watch the lesson, then practise your measurement skills for 9 minutes. Earn XP for every correct answer and unlock your Measurelands Legend.")
+                      : (year === "Prep"
+                          ? "Meet the Ground Explorer, watch the short example, then jump into 9 minutes of easy number practice."
+                          : "Watch the short lesson video, then jump into 9 minutes of practice. Earn XP for every correct answer and unlock your Level Up Legend.")}
                   </p>
                 </div>
 
                 {/* RIGHT: Video card */}
-                <div className="relative overflow-hidden bg-card rounded-[20px] border border-teal-200/60 shadow-[0_2px_6px_rgba(2,23,22,0.04),0_8px_24px_rgba(2,23,22,0.06)] p-3 md:p-4">
-                  <svg aria-hidden className="pointer-events-none absolute -top-px -right-px h-16 w-16 text-teal-500/25" viewBox="0 0 64 64" fill="none">
-                    <path d="M64 16 H44 L36 24 H16" stroke="currentColor" strokeWidth="1" />
-                    <path d="M64 28 H54 L48 34" stroke="currentColor" strokeWidth="1" />
-                    <circle cx="16" cy="24" r="1.5" fill="currentColor" />
-                  </svg>
+                <div
+                  className="relative overflow-hidden rounded-[20px] p-3 md:p-4"
+                  style={{
+                    background: "var(--card)",
+                    border: isMeasurement ? "1px solid rgba(109,40,217,0.2)" : "1px solid rgba(94,234,212,0.6) ",
+                    borderColor: isMeasurement ? "rgba(109,40,217,0.2)" : undefined,
+                    boxShadow: lt.cardShadow,
+                  }}
+                >
+                  {!isMeasurement && (
+                    <svg aria-hidden className="pointer-events-none absolute -top-px -right-px h-16 w-16 text-teal-500/25" viewBox="0 0 64 64" fill="none">
+                      <path d="M64 16 H44 L36 24 H16" stroke="currentColor" strokeWidth="1" />
+                      <path d="M64 28 H54 L48 34" stroke="currentColor" strokeWidth="1" />
+                      <circle cx="16" cy="24" r="1.5" fill="currentColor" />
+                    </svg>
+                  )}
                   <div className="relative flex items-center gap-2 text-foreground font-semibold mb-2.5 px-1 tracking-tight">
-                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-teal-600 to-emerald-700 text-white shadow-[0_2px_6px_rgba(13,148,136,0.35),inset_0_1px_0_rgba(255,255,255,0.2)]">
-                      <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="currentColor">
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
+                    <span
+                      className="inline-flex h-7 w-7 items-center justify-center rounded-md text-white"
+                      style={{ background: lt.videoHeaderIconBg, boxShadow: lt.videoHeaderIconShadow }}
+                    >
+                      <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
                     </span>
-                    <span className="text-sm">Lesson Video</span>
-                    <span className="ml-auto inline-flex items-center gap-1 text-[9px] font-mono uppercase tracking-[0.2em] text-teal-700/70">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.7)]" />
+                    <span className="text-sm">{isMeasurement ? "Lesson Scroll" : "Lesson Video"}</span>
+                    <span className="ml-auto inline-flex items-center gap-1 text-[9px] font-mono uppercase tracking-[0.2em]" style={{ color: lt.videoLiveText }}>
+                      <span className="h-1.5 w-1.5 rounded-full" style={{ background: lt.videoLiveDot, boxShadow: `0 0 6px ${lt.videoLiveDot}` }} />
                       Live
                     </span>
                   </div>
+
                   {hasEmbeddedLessonVideo ? (
-                    <div
-                      className="relative rounded-xl overflow-hidden bg-black shadow-inner ring-1 ring-teal-500/20"
-                      style={{ position: "relative", width: "100%", paddingTop: "56.25%" }}
-                    >
-                      <iframe
-                        src="https://player.vimeo.com/video/1183966051?h=ff99ab69f7"
-                        width="100%"
-                        height="100%"
-                        frameBorder="0"
-                        allow="autoplay; fullscreen; picture-in-picture"
-                        allowFullScreen
-                        className="absolute left-0 top-0 h-full w-full"
-                        title="Lesson video"
-                      />
+                    <div className="relative rounded-xl overflow-hidden bg-black shadow-inner" style={{ position: "relative", width: "100%", paddingTop: "56.25%", boxShadow: `inset 0 0 0 1px rgba(109,40,217,0.2)` }}>
+                      <iframe src="https://player.vimeo.com/video/1183966051?h=ff99ab69f7" width="100%" height="100%" frameBorder="0" allow="autoplay; fullscreen; picture-in-picture" allowFullScreen className="absolute left-0 top-0 h-full w-full" title="Lesson video" />
                     </div>
                   ) : (
-                    <div className="relative aspect-video rounded-xl overflow-hidden flex flex-col items-center justify-center text-white/80 text-xs gap-2 shadow-inner ring-1 ring-teal-400/30"
-                      style={{ background: "linear-gradient(135deg, #021716 0%, #064e47 60%, #0d9488 100%)" }}
+                    <div
+                      className="relative aspect-video rounded-xl overflow-hidden flex flex-col items-center justify-center text-xs gap-2 shadow-inner"
+                      style={{ background: lt.videoBg, boxShadow: `inset 0 0 0 1px rgba(139,92,246,0.15)` }}
                     >
-                      {/* Holographic grid */}
-                      <div aria-hidden className="absolute inset-0 opacity-[0.18]" style={{
-                        backgroundImage: "linear-gradient(rgba(94,234,212,1) 1px, transparent 1px), linear-gradient(90deg, rgba(94,234,212,1) 1px, transparent 1px)",
+                      {/* Grid overlay */}
+                      <div aria-hidden className="absolute inset-0 opacity-[0.16]" style={{
+                        backgroundImage: `linear-gradient(${lt.videoGridColor} 1px, transparent 1px), linear-gradient(90deg, ${lt.videoGridColor} 1px, transparent 1px)`,
                         backgroundSize: "28px 28px",
                         maskImage: "radial-gradient(ellipse at center, black 40%, transparent 80%)",
                         WebkitMaskImage: "radial-gradient(ellipse at center, black 40%, transparent 80%)",
                       }} />
                       {/* Corner brackets */}
-                      <svg aria-hidden className="absolute top-2 left-2 h-5 w-5 text-teal-300/70" viewBox="0 0 20 20" fill="none"><path d="M2 8V2h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-                      <svg aria-hidden className="absolute top-2 right-2 h-5 w-5 text-teal-300/70" viewBox="0 0 20 20" fill="none"><path d="M18 8V2h-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-                      <svg aria-hidden className="absolute bottom-2 left-2 h-5 w-5 text-teal-300/70" viewBox="0 0 20 20" fill="none"><path d="M2 12v6h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-                      <svg aria-hidden className="absolute bottom-2 right-2 h-5 w-5 text-teal-300/70" viewBox="0 0 20 20" fill="none"><path d="M18 12v6h-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-                      <span className="relative inline-flex h-12 w-12 items-center justify-center rounded-full bg-teal-500/15 backdrop-blur-sm border border-teal-300/40 shadow-[0_0_24px_rgba(94,234,212,0.35)]">
-                        <svg viewBox="0 0 24 24" className="h-5 w-5 ml-0.5 text-teal-200" fill="currentColor">
+                      {(["top-2 left-2","top-2 right-2","bottom-2 left-2","bottom-2 right-2"] as const).map((pos, i) => (
+                        <svg key={i} aria-hidden className={`absolute ${pos} h-5 w-5 pointer-events-none`} style={{ color: lt.videoCornerColor }} viewBox="0 0 20 20" fill="none">
+                          {i === 0 && <path d="M2 8V2h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>}
+                          {i === 1 && <path d="M18 8V2h-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>}
+                          {i === 2 && <path d="M2 12v6h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>}
+                          {i === 3 && <path d="M18 12v6h-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>}
+                        </svg>
+                      ))}
+                      <span
+                        className="relative inline-flex h-12 w-12 items-center justify-center rounded-full backdrop-blur-sm"
+                        style={{ background: lt.videoPlayBg, border: `1px solid ${lt.videoPlayBorder}`, boxShadow: lt.videoPlayGlow }}
+                      >
+                        <svg viewBox="0 0 24 24" className="h-5 w-5 ml-0.5" style={{ color: lt.videoPlayIcon }} fill="currentColor">
                           <path d="M8 5v14l11-7z" />
                         </svg>
                       </span>
-                      <span className="relative font-mono text-[10px] uppercase tracking-[0.25em] text-teal-200/90">Video coming soon</span>
+                      <span className="relative font-mono text-[10px] uppercase tracking-[0.25em]" style={{ color: lt.videoText }}>
+                        {isMeasurement ? "Coming Soon" : "Video coming soon"}
+                      </span>
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* ROW 2: Compact action strip */}
-              <div className="relative overflow-hidden mt-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3 rounded-[20px] border border-teal-200/60 bg-card px-4 py-3 md:px-5 md:py-3.5 shadow-[0_2px_6px_rgba(2,23,22,0.04),0_8px_24px_rgba(2,23,22,0.06)]">
-                <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-1/3 opacity-[0.05]" style={{
-                  backgroundImage: "linear-gradient(rgba(13,148,136,1) 1px, transparent 1px), linear-gradient(90deg, rgba(13,148,136,1) 1px, transparent 1px)",
-                  backgroundSize: "20px 20px",
-                  maskImage: "linear-gradient(90deg, transparent, black)",
-                  WebkitMaskImage: "linear-gradient(90deg, transparent, black)",
-                }} />
+              {/* ROW 2: Action strip */}
+              <div
+                className="relative overflow-hidden mt-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3 rounded-[20px] px-4 py-3 md:px-5 md:py-3.5"
+                style={{
+                  background: lt.stripBg ?? "var(--card)",
+                  border: `1px solid ${isMeasurement ? "rgba(180,120,20,0.2)" : "rgba(94,234,212,0.6)"}`,
+                  boxShadow: lt.cardShadow,
+                }}
+              >
+                {!isMeasurement && (
+                  <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-1/3 opacity-[0.05]" style={{
+                    backgroundImage: "linear-gradient(rgba(13,148,136,1) 1px, transparent 1px), linear-gradient(90deg, rgba(13,148,136,1) 1px, transparent 1px)",
+                    backgroundSize: "20px 20px",
+                    maskImage: "linear-gradient(90deg, transparent, black)",
+                    WebkitMaskImage: "linear-gradient(90deg, transparent, black)",
+                  }} />
+                )}
+
                 <div className="relative flex flex-wrap items-center gap-3">
-                  {/* Nexus Plate: Time */}
+                  {/* TIME widget */}
                   <div className="relative">
                     <div className="absolute -inset-[3px] pointer-events-none" style={{
-                      background: "linear-gradient(135deg, rgba(94,234,212,0.55) 0%, rgba(15,118,110,0.25) 50%, rgba(94,234,212,0.45) 100%)",
-                      clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
+                      background: lt.timeBezel,
+                      clipPath: isMeasurement ? undefined : "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
+                      borderRadius: isMeasurement ? 12 : undefined,
                     }} />
                     <div className="relative inline-flex items-center gap-2.5 pl-2 pr-4 py-2 overflow-hidden"
                       style={{
-                        background: "linear-gradient(135deg, #021a18 0%, #063d38 45%, #0a5048 100%)",
-                        clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
-                        boxShadow: "inset 0 1px 0 rgba(94,234,212,0.35), inset 0 -8px 16px rgba(0,0,0,0.4)",
+                        background: lt.timeBg,
+                        clipPath: isMeasurement ? undefined : "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
+                        borderRadius: isMeasurement ? 10 : undefined,
+                        boxShadow: lt.timeShadow,
                       }}
                     >
-                      <div aria-hidden className="absolute inset-0 opacity-20 pointer-events-none" style={{
-                        backgroundImage: "repeating-linear-gradient(0deg, rgba(94,234,212,0.15) 0px, rgba(94,234,212,0.15) 1px, transparent 1px, transparent 3px)",
-                      }} />
-                      <svg aria-hidden className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-10 text-teal-300/40 pointer-events-none" viewBox="0 0 40 24" fill="none">
-                        <path d="M0 12 H14 L18 8 H32" stroke="currentColor" strokeWidth="0.8" />
-                        <path d="M0 18 H10 L14 14 H28" stroke="currentColor" strokeWidth="0.8" />
-                        <circle cx="32" cy="8" r="1.2" fill="currentColor" />
-                        <circle cx="28" cy="14" r="1" fill="currentColor" />
-                      </svg>
-                      <span className="relative inline-flex h-7 w-7 items-center justify-center" style={{
-                        background: "radial-gradient(circle at 35% 30%, #0d9488 0%, #064e47 60%, #021716 100%)",
-                        clipPath: "polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)",
-                        boxShadow: "inset 0 0 6px rgba(94,234,212,0.6), 0 0 8px rgba(94,234,212,0.3)",
-                      }}>
-                        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-teal-100 drop-shadow-[0_0_3px_rgba(94,234,212,0.9)]" fill="none" stroke="currentColor" strokeWidth="2">
-                          <circle cx="12" cy="13" r="7" />
-                          <path d="M12 9v4l2.5 1.5M9 2h6" strokeLinecap="round" />
+                      {!isMeasurement && <div aria-hidden className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: "repeating-linear-gradient(0deg, rgba(94,234,212,0.15) 0px, rgba(94,234,212,0.15) 1px, transparent 1px, transparent 3px)" }} />}
+                      <span className="relative inline-flex h-7 w-7 items-center justify-center" style={{ background: lt.timeIconBg, clipPath: isMeasurement ? undefined : (lt.timeIconShape as string), borderRadius: isMeasurement ? "50%" : undefined, boxShadow: lt.timeIconShadow }}>
+                        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 drop-shadow-[0_0_3px_rgba(200,160,48,0.8)]" style={{ color: isMeasurement ? "#fde68a" : "#e0f2fe" }} fill="none" stroke="currentColor" strokeWidth="2">
+                          <circle cx="12" cy="13" r="7" /><path d="M12 9v4l2.5 1.5M9 2h6" strokeLinecap="round" />
                         </svg>
                       </span>
-                      <span className="relative text-[11px] font-mono font-bold uppercase tracking-[0.22em] text-teal-50 drop-shadow-[0_1px_0_rgba(0,0,0,0.6)]">8 Min</span>
+                      <span className="relative text-[11px] font-mono font-bold uppercase tracking-[0.22em] drop-shadow-[0_1px_0_rgba(0,0,0,0.6)]" style={{ color: lt.timeText }}>8 Min</span>
                     </div>
                   </div>
 
-                  {/* Nexus Plate: XP */}
+                  {/* XP widget (same structure, uses lt.xp*) */}
                   <div className="relative">
                     <div className="absolute -inset-[3px] pointer-events-none" style={{
-                      background: "linear-gradient(135deg, rgba(251,191,36,0.55) 0%, rgba(94,234,212,0.3) 50%, rgba(251,191,36,0.45) 100%)",
-                      clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
+                      background: lt.xpBezel,
+                      clipPath: isMeasurement ? undefined : "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
+                      borderRadius: isMeasurement ? 12 : undefined,
                     }} />
-                    <div className="relative inline-flex items-center gap-2.5 pl-2 pr-4 py-2 overflow-hidden"
-                      style={{
-                        background: "linear-gradient(135deg, #021a18 0%, #0a3d36 45%, #154d3a 100%)",
-                        clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
-                        boxShadow: "inset 0 1px 0 rgba(251,191,36,0.3), inset 0 -8px 16px rgba(0,0,0,0.4), 0 0 18px rgba(251,191,36,0.18)",
-                      }}
-                    >
-                      <div aria-hidden className="absolute inset-0 opacity-20 pointer-events-none" style={{
-                        backgroundImage: "repeating-linear-gradient(0deg, rgba(251,191,36,0.15) 0px, rgba(251,191,36,0.15) 1px, transparent 1px, transparent 3px)",
-                      }} />
-                      <div aria-hidden className="absolute left-0 top-0 h-full w-12 pointer-events-none" style={{
-                        background: "radial-gradient(circle at 30% 50%, rgba(251,191,36,0.45), transparent 70%)",
-                      }} />
-                      <svg aria-hidden className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-10 text-amber-300/40 pointer-events-none" viewBox="0 0 40 24" fill="none">
-                        <path d="M0 12 H14 L18 8 H32" stroke="currentColor" strokeWidth="0.8" />
-                        <circle cx="32" cy="8" r="1.2" fill="currentColor" />
-                      </svg>
-                      <span className="relative inline-flex h-7 w-7 items-center justify-center" style={{
-                        background: "radial-gradient(circle at 35% 30%, #fbbf24 0%, #92400e 70%, #1c1917 100%)",
-                        clipPath: "polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)",
-                        boxShadow: "inset 0 0 6px rgba(253,224,71,0.7), 0 0 10px rgba(251,191,36,0.5)",
-                      }}>
-                        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-amber-50 drop-shadow-[0_0_4px_rgba(253,224,71,1)]" fill="currentColor">
-                          <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" />
-                        </svg>
+                    <div className="relative inline-flex items-center gap-2.5 pl-2 pr-4 py-2 overflow-hidden" style={{ background: lt.xpBg, clipPath: isMeasurement ? undefined : "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)", borderRadius: isMeasurement ? 10 : undefined, boxShadow: lt.xpShadow }}>
+                      {!isMeasurement && <div aria-hidden className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: "repeating-linear-gradient(0deg, rgba(251,191,36,0.15) 0px, rgba(251,191,36,0.15) 1px, transparent 1px, transparent 3px)" }} />}
+                      <div aria-hidden className="absolute left-0 top-0 h-full w-12 pointer-events-none" style={{ background: "radial-gradient(circle at 30% 50%, rgba(251,191,36,0.45), transparent 70%)" }} />
+                      <span className="relative inline-flex h-7 w-7 items-center justify-center" style={{ background: "radial-gradient(circle at 35% 30%, #fbbf24 0%, #92400e 70%, #1c1917 100%)", clipPath: isMeasurement ? undefined : "polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)", borderRadius: isMeasurement ? "50%" : undefined, boxShadow: "inset 0 0 6px rgba(253,224,71,0.7), 0 0 10px rgba(251,191,36,0.5)" }}>
+                        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-amber-50 drop-shadow-[0_0_4px_rgba(253,224,71,1)]" fill="currentColor"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" /></svg>
                       </span>
                       <span className="relative text-[11px] font-mono font-bold uppercase tracking-[0.22em] text-amber-50 drop-shadow-[0_1px_0_rgba(0,0,0,0.6)]">50 XP</span>
                     </div>
                   </div>
 
-                  {/* Nexus Plate: Legend */}
+                  {/* LEGEND widget */}
                   <div className="relative">
                     <div className="absolute -inset-[3px] pointer-events-none" style={{
-                      background: "linear-gradient(135deg, rgba(110,231,183,0.55) 0%, rgba(15,118,110,0.3) 50%, rgba(110,231,183,0.45) 100%)",
-                      clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
+                      background: lt.legendBezel,
+                      clipPath: isMeasurement ? undefined : "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
+                      borderRadius: isMeasurement ? 12 : undefined,
                     }} />
-                    <div className="relative inline-flex items-center gap-2.5 pl-2 pr-4 py-2 overflow-hidden"
-                      style={{
-                        background: "linear-gradient(135deg, #021a18 0%, #063d38 45%, #0d6b50 100%)",
-                        clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
-                        boxShadow: "inset 0 1px 0 rgba(110,231,183,0.35), inset 0 -8px 16px rgba(0,0,0,0.4), 0 0 14px rgba(52,211,153,0.15)",
-                      }}
-                    >
-                      <div aria-hidden className="absolute inset-0 opacity-20 pointer-events-none" style={{
-                        backgroundImage: "repeating-linear-gradient(0deg, rgba(110,231,183,0.15) 0px, rgba(110,231,183,0.15) 1px, transparent 1px, transparent 3px)",
-                      }} />
-                      <svg aria-hidden className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-10 text-emerald-300/40 pointer-events-none" viewBox="0 0 40 24" fill="none">
-                        <path d="M0 12 H14 L18 8 H32" stroke="currentColor" strokeWidth="0.8" />
-                        <path d="M0 18 H10 L14 14 H28" stroke="currentColor" strokeWidth="0.8" />
-                        <circle cx="32" cy="8" r="1.2" fill="currentColor" />
-                      </svg>
-                      <span className="relative inline-flex h-7 w-7 items-center justify-center" style={{
-                        background: "radial-gradient(circle at 35% 30%, #34d399 0%, #065f46 60%, #021716 100%)",
-                        clipPath: "polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)",
-                        boxShadow: "inset 0 0 6px rgba(110,231,183,0.7), 0 0 10px rgba(52,211,153,0.4)",
-                      }}>
-                        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-emerald-50 drop-shadow-[0_0_3px_rgba(110,231,183,0.9)]" fill="none" stroke="currentColor" strokeWidth="1.8">
-                          <path d="M12 2l9 5v10l-9 5-9-5V7l9-5z" strokeLinejoin="round" />
-                          <path d="M12 7l5 2.8v5.4L12 18l-5-2.8V9.8L12 7z" strokeLinejoin="round" opacity="0.65" />
+                    <div className="relative inline-flex items-center gap-2.5 pl-2 pr-4 py-2 overflow-hidden" style={{ background: lt.legendBg, clipPath: isMeasurement ? undefined : "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)", borderRadius: isMeasurement ? 10 : undefined, boxShadow: lt.legendShadow }}>
+                      {!isMeasurement && <div aria-hidden className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: "repeating-linear-gradient(0deg, rgba(110,231,183,0.15) 0px, rgba(110,231,183,0.15) 1px, transparent 1px, transparent 3px)" }} />}
+                      <span className="relative inline-flex h-7 w-7 items-center justify-center" style={{ background: lt.legendIconBg, clipPath: isMeasurement ? undefined : "polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)", borderRadius: isMeasurement ? "50%" : undefined, boxShadow: lt.legendIconShadow }}>
+                        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 drop-shadow-[0_0_3px_rgba(167,139,250,0.9)]" style={{ color: isMeasurement ? "#e9d5ff" : "#ecfdf5" }} fill="none" stroke="currentColor" strokeWidth="1.8">
+                          {isMeasurement ? (
+                            /* Hourglass icon for Meazurex */
+                            <path d="M6 2h12M6 22h12M8 2c0 4 8 5 8 10s-8 6-8 10M16 2c0 4-8 5-8 10s8 6 8 10" strokeLinecap="round" />
+                          ) : (
+                            <>
+                              <path d="M12 2l9 5v10l-9 5-9-5V7l9-5z" strokeLinejoin="round" />
+                              <path d="M12 7l5 2.8v5.4L12 18l-5-2.8V9.8L12 7z" strokeLinejoin="round" opacity="0.65" />
+                            </>
+                          )}
                         </svg>
                       </span>
-                      <span className="relative text-[11px] font-mono font-bold uppercase tracking-[0.22em] text-emerald-50 drop-shadow-[0_1px_0_rgba(0,0,0,0.6)]">Unlock Legend</span>
+                      <span className="relative text-[11px] font-mono font-bold uppercase tracking-[0.22em] drop-shadow-[0_1px_0_rgba(0,0,0,0.6)]" style={{ color: lt.legendText }}>
+                        {isMeasurement ? "Unlock Meazurex" : "Unlock Legend"}
+                      </span>
                     </div>
                   </div>
                 </div>
+
+                {/* BEGIN PRACTISE button */}
                 <div className="relative group">
-                  {/* Outer bracket bezel */}
-                  <div className="absolute -inset-[3px] pointer-events-none transition-opacity duration-200 group-hover:opacity-100" style={{
-                    background: "linear-gradient(135deg, rgba(94,234,212,0.7) 0%, rgba(15,118,110,0.35) 50%, rgba(94,234,212,0.6) 100%)",
-                    clipPath: "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
-                  }} />
+                  <div
+                    className="absolute -inset-[3px] pointer-events-none transition-opacity duration-200 group-hover:opacity-100"
+                    style={{
+                      background: lt.btnBezel,
+                      clipPath: lt.btnBorderRadius ? undefined : "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
+                      borderRadius: lt.btnBorderRadius ? lt.btnBorderRadius + 3 : undefined,
+                    }}
+                  />
                   <button
                     onClick={() => {
-                      void trackLiveLearningEvent({
-                        eventType: "lesson_started",
-                        level: liveLessonContext.level,
-                        strand: liveLessonContext.strand,
-                        week: liveLessonContext.week,
-                        lessonId: liveLessonContext.lessonId,
-                        lessonTitle: liveLessonContext.lessonTitle,
-                        progressPercent: 0,
-                        progressLabel: "Lesson started",
-                      });
-                      if (year === "Year 1") {
-                        resetYear1SessionTaskState();
-                      }
-                      if (isGroundCustomLesson) {
-                        resetPrepSessionTaskState();
-                      }
+                      void trackLiveLearningEvent({ eventType: "lesson_started", level: liveLessonContext.level, strand: liveLessonContext.strand, week: liveLessonContext.week, lessonId: liveLessonContext.lessonId, lessonTitle: liveLessonContext.lessonTitle, progressPercent: 0, progressLabel: "Lesson started" });
+                      if (year === "Year 1") resetYear1SessionTaskState();
+                      if (isGroundCustomLesson) resetPrepSessionTaskState();
                       setStartedLessonId(effectiveLessonId);
                     }}
-                    className="relative inline-flex items-center justify-center gap-2 text-white font-bold tracking-tight px-7 py-3 text-sm md:text-base overflow-hidden hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200"
+                    className="relative inline-flex items-center justify-center gap-2 font-bold tracking-tight px-7 py-3 text-sm md:text-base overflow-hidden hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200"
                     style={{
-                      background: "linear-gradient(135deg, #021a18 0%, #064e47 45%, #0d9488 100%)",
-                      clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
-                      boxShadow: "inset 0 1px 0 rgba(94,234,212,0.4), inset 0 -10px 20px rgba(0,0,0,0.45), 0 8px 22px rgba(2,23,22,0.5), 0 0 18px rgba(94,234,212,0.2)",
+                      background: lt.btnBg,
+                      clipPath: lt.btnBorderRadius ? undefined : "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
+                      borderRadius: lt.btnBorderRadius ? lt.btnBorderRadius : undefined,
+                      boxShadow: lt.btnShadow,
+                      color: lt.btnText,
                     }}
                   >
-                    {/* Scanlines */}
-                    <div aria-hidden className="absolute inset-0 opacity-20 pointer-events-none" style={{
-                      backgroundImage: "repeating-linear-gradient(0deg, rgba(94,234,212,0.18) 0px, rgba(94,234,212,0.18) 1px, transparent 1px, transparent 3px)",
-                    }} />
-                    {/* Circuit traces - left */}
-                    <svg aria-hidden className="absolute left-1.5 top-1/2 -translate-y-1/2 h-7 w-10 text-teal-300/40 pointer-events-none" viewBox="0 0 40 28" fill="none">
-                      <path d="M0 14 H14 L18 10 H32" stroke="currentColor" strokeWidth="0.8" />
-                      <path d="M0 20 H10 L14 16 H28" stroke="currentColor" strokeWidth="0.8" />
-                      <circle cx="32" cy="10" r="1.2" fill="currentColor" />
-                    </svg>
-                    {/* Circuit traces - right */}
-                    <svg aria-hidden className="absolute right-1.5 top-1/2 -translate-y-1/2 h-7 w-10 text-teal-300/40 pointer-events-none" viewBox="0 0 40 28" fill="none">
-                      <path d="M40 14 H26 L22 10 H8" stroke="currentColor" strokeWidth="0.8" />
-                      <path d="M40 20 H30 L26 16 H12" stroke="currentColor" strokeWidth="0.8" />
-                      <circle cx="8" cy="10" r="1.2" fill="currentColor" />
-                    </svg>
-                    {/* Energy glow sweep */}
-                    <div aria-hidden className="absolute inset-y-0 left-1/4 right-1/4 pointer-events-none" style={{
-                      background: "radial-gradient(ellipse at center, rgba(94,234,212,0.25), transparent 70%)",
-                    }} />
-                    <span className="relative font-mono uppercase tracking-[0.18em] text-teal-50 drop-shadow-[0_1px_0_rgba(0,0,0,0.6)]">Begin Practise</span>
-                    <span className="relative inline-flex h-5 w-5 items-center justify-center text-teal-200 drop-shadow-[0_0_4px_rgba(94,234,212,0.9)]">→</span>
+                    {!isMeasurement && (
+                      <>
+                        <div aria-hidden className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: "repeating-linear-gradient(0deg, rgba(94,234,212,0.18) 0px, rgba(94,234,212,0.18) 1px, transparent 1px, transparent 3px)" }} />
+                        <svg aria-hidden className="absolute left-1.5 top-1/2 -translate-y-1/2 h-7 w-10 text-teal-300/40 pointer-events-none" viewBox="0 0 40 28" fill="none"><path d="M0 14 H14 L18 10 H32" stroke="currentColor" strokeWidth="0.8" /><path d="M0 20 H10 L14 16 H28" stroke="currentColor" strokeWidth="0.8" /><circle cx="32" cy="10" r="1.2" fill="currentColor" /></svg>
+                        <svg aria-hidden className="absolute right-1.5 top-1/2 -translate-y-1/2 h-7 w-10 text-teal-300/40 pointer-events-none" viewBox="0 0 40 28" fill="none"><path d="M40 14 H26 L22 10 H8" stroke="currentColor" strokeWidth="0.8" /><path d="M40 20 H30 L26 16 H12" stroke="currentColor" strokeWidth="0.8" /><circle cx="8" cy="10" r="1.2" fill="currentColor" /></svg>
+                        <div aria-hidden className="absolute inset-y-0 left-1/4 right-1/4 pointer-events-none" style={{ background: "radial-gradient(ellipse at center, rgba(94,234,212,0.25), transparent 70%)" }} />
+                      </>
+                    )}
+                    {isMeasurement && (
+                      /* Subtle gold sweep for Measurelands */
+                      <div aria-hidden className="absolute inset-y-0 left-1/4 right-1/4 pointer-events-none" style={{ background: "radial-gradient(ellipse at center, rgba(200,160,48,0.18), transparent 70%)" }} />
+                    )}
+                    <span className="relative font-mono uppercase tracking-[0.18em] drop-shadow-[0_1px_0_rgba(0,0,0,0.6)]">Begin Practise</span>
+                    <span className="relative inline-flex h-5 w-5 items-center justify-center drop-shadow-[0_0_4px_rgba(200,160,48,0.7)]">→</span>
                   </button>
                 </div>
               </div>
@@ -860,6 +996,7 @@ function LessonPage() {
               lessonTitle={safeLessonTitle}
               focus={safeLessonFocus}
               heroClass={lessonChrome.heroClass}
+              realmId={realmId}
             />
             <div className="bg-background px-6 py-8">
             <PracticeRunner
@@ -941,6 +1078,7 @@ function LessonPage() {
               lessonTitle={safeLessonTitle}
               focus={safeLessonFocus}
               heroClass={lessonChrome.heroClass}
+              realmId={realmId}
             />
 
             <div className="bg-background px-4 py-5">
