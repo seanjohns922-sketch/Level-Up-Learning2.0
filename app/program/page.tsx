@@ -374,7 +374,7 @@ function ProgramPage() {
           <div className="flex items-start justify-between gap-3 mb-6">
             <div className="flex items-center gap-3">
               <button
-                onClick={() => router.push(isMeasurementRealm ? `/realms?level=${encodeURIComponent(year)}` : "/number-nexus")}
+                onClick={() => router.push(isMeasurementRealm ? "/measurelands" : "/number-nexus")}
                 className="border border-teal-300/25 bg-black/25 px-4 py-2 text-xs font-mono font-black uppercase tracking-[0.14em] text-teal-50 backdrop-blur-md transition hover:border-teal-200/45 hover:bg-teal-950/45 focus:outline-none focus:ring-2 focus:ring-teal-300/25"
                 style={{
                   clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
@@ -916,7 +916,7 @@ function ProgramPage() {
                   Go to Week {lastAllowedWeek}
                 </button>
                 <button
-                  onClick={() => router.push(isMeasurementRealm ? `/realms?level=${encodeURIComponent(year)}` : "/number-nexus")}
+                  onClick={() => router.push(isMeasurementRealm ? "/measurelands" : "/number-nexus")}
                   className="rounded-2xl bg-white/10 px-5 py-3 text-sm font-black text-white transition hover:bg-white/15"
                 >
                   Back to Map

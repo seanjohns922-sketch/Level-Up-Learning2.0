@@ -210,7 +210,7 @@ export default function RealmCarousel() {
 
   const realmRoutes: Record<string, string> = {
     "number-nexus": "/number-nexus",
-    "measurelands": "/program?year=Prep&week=1&legacy=1&realm_id=measurement",
+    "measurelands": "/measurelands",
   };
 
   function enterRealm() {

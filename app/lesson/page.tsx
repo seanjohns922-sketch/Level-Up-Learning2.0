@@ -121,6 +121,7 @@ function LessonPage() {
     return match ? Number(match[1]) : 1;
   }, [effectiveLessonId]);
   const lessonChrome = useMemo(() => getLessonChrome(levelNumber), [levelNumber]);
+  const mapRoute = realmId === "measurement" ? "/measurelands" : "/number-nexus";
   const lessonProgram = useMemo(
     () => (realmId === "measurement" ? getCurriculumPlan(year, "measurement") : getProgramForYear(year)),
     [realmId, year]
@@ -146,7 +147,7 @@ function LessonPage() {
       return;
     }
     if (!DEMO_MODE && !previewMode && p?.year && p.year !== year) {
-      router.replace(`/number-nexus`);
+      router.replace(mapRoute);
     }
   }, [previewMode, router, year]);
 
@@ -165,7 +166,7 @@ function LessonPage() {
     const store = readProgramStore();
     const weekPlayable = isWeekPlayable(store, year, week, p.requiredWeeks, p.optionalWeeks);
     if (!weekPlayable) {
-      router.replace(`/number-nexus`);
+      router.replace(mapRoute);
       return;
     }
 
@@ -299,7 +300,8 @@ function LessonPage() {
   }
 
   function goBackToProgram() {
-    router.push(`/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1`);
+    const realmParam = realmId === "measurement" ? `&realm_id=${encodeURIComponent(realmId)}` : "";
+    router.push(`/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1${realmParam}`);
   }
 
   const showWeek12Lesson3Summary = week === 12 && lessonNumber === 3;
@@ -495,7 +497,7 @@ function LessonPage() {
         <div className="mb-4">
           <button
             onClick={() =>
-              router.push(`/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1`)
+              router.push(`/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1${realmId === "measurement" ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`)
             }
             className="text-sm font-mono font-bold uppercase tracking-[0.18em] text-teal-700 hover:text-teal-600 transition-colors"
           >
@@ -541,7 +543,7 @@ function LessonPage() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => router.push(`/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1`)}
+                      onClick={() => router.push(`/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1${realmId === "measurement" ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`)}
                       className="rounded-[22px] border-2 border-cyan-200 bg-white px-6 py-4 text-lg font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
                     >
                       Back to Week

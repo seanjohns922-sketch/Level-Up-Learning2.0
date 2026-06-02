@@ -1,6 +1,9 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
 
 const MeasurelandsMap = dynamic(
   () => import("@/components/world/MeasurelandsMap"),
@@ -11,7 +14,7 @@ const MeasurelandsMap = dynamic(
         style={{
           width: "100vw",
           height: "100vh",
-          background: "#0d0820",
+          background: "#07121a",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -24,21 +27,21 @@ const MeasurelandsMap = dynamic(
             width: 48,
             height: 48,
             borderRadius: "50%",
-            border: "2px solid rgba(245,176,66,0.18)",
-            borderTopColor: "#f5b042",
+            border: "2px solid rgba(125,211,252,0.15)",
+            borderTopColor: "#22d3ee",
             animation: "spin 0.9s linear infinite",
           }}
         />
         <p
           style={{
-            color: "rgba(253,230,138,0.6)",
+            color: "rgba(186,230,253,0.7)",
             fontSize: 11,
             fontFamily: "ui-monospace,monospace",
             letterSpacing: "0.2em",
             fontWeight: 700,
           }}
         >
-          ENTERING MEASURELANDS…
+          INITIALISING MEASURELANDS…
         </p>
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
@@ -47,5 +50,13 @@ const MeasurelandsMap = dynamic(
 );
 
 export default function MeasurelandsPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isDemoPreviewMode()) {
+      router.replace("/realms");
+    }
+  }, [router]);
+
   return <MeasurelandsMap />;
 }
