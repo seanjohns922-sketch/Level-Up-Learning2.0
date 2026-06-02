@@ -56,6 +56,111 @@ function ProgramPage() {
   const lastWeek = Math.max(program.length, 1);
   const isMeasurementRealm = realmId === "measurement";
 
+  // ── Realm theme ── add a new entry here to support any future realm
+  const rt = isMeasurementRealm ? {
+    rounded: true,
+    scanline: false,
+    // shapes
+    cardClip:   undefined as string | undefined,
+    bezelClip:  undefined as string | undefined,
+    badgeClip:  undefined as string | undefined,
+    statusClip: undefined as string | undefined,
+    actionClip: undefined as string | undefined,
+    connClip:   undefined as string | undefined,
+    // colours — card body
+    cardActiveBg:     "linear-gradient(135deg, rgba(120,53,15,0.92) 0%, rgba(180,83,9,0.88) 100%)",
+    cardCompletedBg:  "linear-gradient(135deg, #022c22 0%, #064e3b 50%, #047857 100%)",
+    cardLockedBg:     "linear-gradient(135deg, rgba(76,29,149,0.62) 0%, rgba(88,28,135,0.55) 100%)",
+    // colours — bezel / border gradient
+    bezelActiveBg:    "linear-gradient(135deg, rgba(251,191,36,0.58), rgba(245,158,11,0.22) 40%, rgba(251,191,36,0.52))",
+    bezelCompletedBg: "linear-gradient(135deg, rgba(16,185,129,0.52), rgba(13,148,136,0.22) 40%, rgba(16,185,129,0.48))",
+    bezelLockedBg:    "linear-gradient(135deg, rgba(139,92,246,0.26), rgba(109,40,217,0.12))",
+    bezelPosttestBg:  "linear-gradient(135deg, rgba(167,139,250,0.62), rgba(124,58,237,0.28) 40%, rgba(167,139,250,0.56))",
+    // box shadows
+    cardActiveShadow:    "0 8px 32px rgba(180,83,9,0.36)",
+    cardCompletedShadow: "0 8px 32px rgba(16,185,129,0.32), inset 0 1px 0 rgba(110,231,183,0.35)",
+    cardLockedShadow:    "0 4px 16px rgba(0,0,0,0.32)",
+    // badge (lesson label pill)
+    badgeActiveBg:    "linear-gradient(135deg, #92400e 0%, #b45309 100%)",
+    badgeCompletedBg: "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
+    badgeLockedBg:    "linear-gradient(135deg, #4c1d95 0%, #5b21b6 100%)",
+    badgePosttestBg:  "linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%)",
+    badgeShadow:      "0 0 10px rgba(180,83,9,0.38)",
+    // status pill (ACTIVE / DONE / LOCKED)
+    statusActiveBg:    "linear-gradient(135deg, #b45309 0%, #d97706 100%)",
+    statusCompletedBg: "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
+    statusLockedBg:    "linear-gradient(135deg, #4c1d95 0%, #5b21b6 100%)",
+    statusPosttestBg:  "linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%)",
+    statusShadow:      "0 0 10px rgba(217,119,6,0.42)",
+    dotClass:          "bg-amber-300 shadow-[0_0_6px_rgba(251,191,36,0.9)]",
+    // action button (START / REPLAY)
+    actionActiveBg:    "linear-gradient(135deg, #b45309 0%, #d97706 50%, #f59e0b 100%)",
+    actionCompletedBg: "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
+    actionPosttestBg:  "linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)",
+    actionShadow:      "0 0 14px rgba(217,119,6,0.5)",
+    // connector between cards
+    connActiveBg:    "radial-gradient(circle, #f59e0b, #b45309 70%)",
+    connCompletedBg: "radial-gradient(circle, #10b981, #064e3b 70%)",
+    connShadow:      "0 0 10px rgba(251,191,36,0.5)",
+    // XP bar
+    xpBg:   "linear-gradient(90deg, #fde68a 0%, #f59e0b 50%, #b45309 100%)",
+    xpGlow: "0 0 10px rgba(251,191,36,0.7)",
+    // header / nav
+    pillBg:     "linear-gradient(135deg, #3a1a00 0%, #7c3d00 50%, #9a5100 100%)",
+    pillShadow: "inset 0 1px 0 rgba(251,191,36,0.35), inset 0 -1px 0 rgba(0,0,0,0.5), 0 0 18px rgba(180,83,9,0.25)",
+    pillDot:    "bg-amber-300 shadow-[0_0_8px_rgba(251,191,36,0.9)]",
+    headingGlow:  "drop-shadow-[0_2px_12px_rgba(180,83,9,0.35)]",
+    focusColor:   "text-amber-300/80",
+    dividerColor: "border-amber-400/15",
+    xpLabelColor: "text-amber-200/70",
+  } : {
+    rounded: false,
+    scanline: true,
+    cardClip:   "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
+    bezelClip:  "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
+    badgeClip:  "polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px)",
+    statusClip: "polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px)",
+    actionClip: "polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px)",
+    connClip:   "polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)",
+    cardActiveBg:     "linear-gradient(135deg, #021a18 0%, #052e2b 50%, #064e47 100%)",
+    cardCompletedBg:  "linear-gradient(135deg, #022c22 0%, #064e3b 50%, #047857 100%)",
+    cardLockedBg:     "linear-gradient(135deg, #021a18 0%, #052e2b 100%)",
+    bezelActiveBg:    "linear-gradient(135deg, rgba(94,234,212,0.6), rgba(13,148,136,0.2) 40%, rgba(20,184,166,0.55))",
+    bezelCompletedBg: "linear-gradient(135deg, rgba(16,185,129,0.5), rgba(13,148,136,0.2) 40%, rgba(16,185,129,0.45))",
+    bezelLockedBg:    "linear-gradient(135deg, rgba(94,234,212,0.12), rgba(13,148,136,0.08))",
+    bezelPosttestBg:  "linear-gradient(135deg, rgba(251,191,36,0.6), rgba(245,158,11,0.25) 40%, rgba(251,191,36,0.55))",
+    cardActiveShadow:    "inset 0 1px 0 rgba(94,234,212,0.25), inset 0 -10px 24px rgba(0,0,0,0.45), 0 0 22px rgba(20,184,166,0.3)",
+    cardCompletedShadow: "inset 0 1px 0 rgba(110,231,183,0.4), inset 0 -10px 24px rgba(0,0,0,0.4), 0 0 26px rgba(16,185,129,0.45)",
+    cardLockedShadow:    "inset 0 1px 0 rgba(94,234,212,0.18), inset 0 -10px 20px rgba(0,0,0,0.4), 0 0 14px rgba(20,184,166,0.15)",
+    badgeActiveBg:    "linear-gradient(135deg, #064e47 0%, #14b8a6 100%)",
+    badgeCompletedBg: "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
+    badgeLockedBg:    "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
+    badgePosttestBg:  "linear-gradient(135deg, #78350f 0%, #f59e0b 100%)",
+    badgeShadow:      "inset 0 1px 0 rgba(94,234,212,0.35)",
+    statusActiveBg:    "linear-gradient(135deg, #064e47 0%, #14b8a6 100%)",
+    statusCompletedBg: "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
+    statusLockedBg:    "linear-gradient(135deg, #1e293b 0%, #334155 100%)",
+    statusPosttestBg:  "linear-gradient(135deg, #78350f 0%, #f59e0b 100%)",
+    statusShadow:      "inset 0 1px 0 rgba(94,234,212,0.4)",
+    dotClass:          "bg-teal-200 shadow-[0_0_6px_rgba(94,234,212,0.9)]",
+    actionActiveBg:    "linear-gradient(135deg, #064e47 0%, #0d9488 50%, #14b8a6 100%)",
+    actionCompletedBg: "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
+    actionPosttestBg:  "linear-gradient(135deg, #78350f 0%, #f59e0b 100%)",
+    actionShadow:      "inset 0 1px 0 rgba(94,234,212,0.4), 0 0 8px rgba(20,184,166,0.35)",
+    connActiveBg:    "radial-gradient(circle, #14b8a6, #064e47 70%)",
+    connCompletedBg: "radial-gradient(circle, #10b981, #064e3b 70%)",
+    connShadow:      "0 0 10px rgba(94,234,212,0.5)",
+    xpBg:   "linear-gradient(90deg, #5eead4 0%, #14b8a6 50%, #10b981 100%)",
+    xpGlow: "0 0 10px rgba(94,234,212,0.7)",
+    pillBg:     "linear-gradient(135deg, #021a18 0%, #064e47 50%, #0a5048 100%)",
+    pillShadow: "inset 0 1px 0 rgba(94,234,212,0.35), inset 0 -1px 0 rgba(0,0,0,0.5), 0 0 18px rgba(20,184,166,0.25)",
+    pillDot:    "bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]",
+    headingGlow:  "drop-shadow-[0_2px_12px_rgba(20,184,166,0.35)]",
+    focusColor:   "text-teal-300/80",
+    dividerColor: "border-teal-400/15",
+    xpLabelColor: "text-teal-100/90",
+  };
+
   const [store, setStore] = useState<ProgramProgressStore>(() =>
     typeof window !== "undefined" ? readProgramStore() : {}
   );
@@ -491,17 +596,18 @@ function ProgramPage() {
               onClick={handleSecretTeacherToggle}
               className="inline-flex items-center gap-2 px-4 py-1.5 text-[11px] font-mono font-bold uppercase tracking-[0.18em] text-teal-50"
               style={{
-                background: "linear-gradient(135deg, #021a18 0%, #064e47 50%, #0a5048 100%)",
-                clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
-                boxShadow: "inset 0 1px 0 rgba(94,234,212,0.35), inset 0 -1px 0 rgba(0,0,0,0.5), 0 0 18px rgba(20,184,166,0.25)",
+                background: rt.pillBg,
+                clipPath: rt.rounded ? undefined : "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
+                borderRadius: rt.rounded ? 999 : undefined,
+                boxShadow: rt.pillShadow,
               }}
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]" />
+              <span className={`h-1.5 w-1.5 rounded-full ${rt.pillDot}`} />
               {levelLabel} · Program
             </button>
-            <h1 className="text-4xl md:text-5xl font-black text-white mt-3 tracking-tight drop-shadow-[0_2px_12px_rgba(20,184,166,0.35)]">Week {weekNum}</h1>
+            <h1 className={`text-4xl md:text-5xl font-black text-white mt-3 tracking-tight ${rt.headingGlow}`}>Week {weekNum}</h1>
             <p className="text-base md:text-lg text-teal-50/95 mt-2 font-semibold">
-              <span className="text-teal-300/80 font-mono text-xs uppercase tracking-[0.18em] mr-2">Focus</span>
+              <span className={`${rt.focusColor} font-mono text-xs uppercase tracking-[0.18em] mr-2`}>Focus</span>
               {currentWeekPlan?.topic ?? "Your current focus"}
             </p>
             {hasPersonalizedPlan ? (
@@ -549,14 +655,10 @@ function ProgramPage() {
                 <div className="relative h-2 rounded-full bg-black/50 overflow-hidden ring-1 ring-teal-400/20">
                   <div
                     className="h-full rounded-full transition-all duration-500"
-                    style={{
-                      width: `${percent}%`,
-                      background: "linear-gradient(90deg, #5eead4 0%, #14b8a6 50%, #10b981 100%)",
-                      boxShadow: "0 0 10px rgba(94,234,212,0.7)",
-                    }}
+                    style={{ width: `${percent}%`, background: rt.xpBg, boxShadow: rt.xpGlow }}
                   />
                 </div>
-                <p className="relative text-[10px] text-teal-100/90 mt-2 text-center font-mono font-bold tracking-[0.2em]">
+                <p className={`relative text-[10px] mt-2 text-center font-mono font-bold tracking-[0.2em] ${rt.xpLabelColor ?? "text-teal-100/90"}`}>
                   {xp} / {totalXp} XP
                 </p>
               </div>
@@ -704,20 +806,19 @@ function ProgramPage() {
               const isLast = idx === items.length - 1;
               return (
                 <div key={`${item.type}-${item.n}`} className="relative flex">
-                  {/* Bezel frame */}
+                  {/* Bezel / border frame */}
                   <div
                     className="absolute -inset-[2px] pointer-events-none"
                     style={{
-                      clipPath: "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
+                      clipPath: rt.bezelClip,
+                      borderRadius: rt.rounded ? 28 : undefined,
                       background: locked
-                        ? "linear-gradient(135deg, rgba(94,234,212,0.12), rgba(13,148,136,0.08))"
+                        ? rt.bezelLockedBg
                         : postTestReady
-                          ? "linear-gradient(135deg, rgba(251,191,36,0.6), rgba(245,158,11,0.25) 40%, rgba(251,191,36,0.55))"
+                          ? rt.bezelPosttestBg
                           : isActive
-                            ? "linear-gradient(135deg, rgba(94,234,212,0.6), rgba(13,148,136,0.2) 40%, rgba(20,184,166,0.55))"
-                            : completed
-                              ? "linear-gradient(135deg, rgba(16,185,129,0.5), rgba(13,148,136,0.2) 40%, rgba(16,185,129,0.45))"
-                              : "linear-gradient(135deg, rgba(94,234,212,0.35), rgba(13,148,136,0.15) 40%, rgba(20,184,166,0.35))",
+                            ? rt.bezelActiveBg
+                            : rt.bezelCompletedBg,
                     }}
                   />
                   <button
@@ -725,76 +826,69 @@ function ProgramPage() {
                     disabled={locked}
                     className={[
                       "relative w-full text-left p-5 transition-all flex flex-col gap-3 group overflow-hidden",
-                      locked
-                        ? "opacity-60 cursor-not-allowed"
-                        : "hover:-translate-y-1",
+                      rt.rounded ? "rounded-3xl" : "",
+                      locked ? "opacity-60 cursor-not-allowed" : "hover:-translate-y-1",
                     ].join(" ")}
                     style={{
-                      clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
+                      clipPath: rt.cardClip,
                       background: locked
-                        ? "linear-gradient(135deg, #021a18 0%, #052e2b 100%)"
+                        ? rt.cardLockedBg
                         : completed
-                          ? "linear-gradient(135deg, #022c22 0%, #064e3b 50%, #047857 100%)"
-                          : "linear-gradient(135deg, #021a18 0%, #052e2b 50%, #064e47 100%)",
+                          ? rt.cardCompletedBg
+                          : rt.cardActiveBg,
                       boxShadow: completed
-                        ? "inset 0 1px 0 rgba(110,231,183,0.4), inset 0 -10px 24px rgba(0,0,0,0.4), 0 0 26px rgba(16,185,129,0.45)"
+                        ? rt.cardCompletedShadow
                         : isActive
-                          ? "inset 0 1px 0 rgba(94,234,212,0.25), inset 0 -10px 24px rgba(0,0,0,0.45), 0 0 22px rgba(20,184,166,0.3)"
-                          : "inset 0 1px 0 rgba(94,234,212,0.18), inset 0 -10px 20px rgba(0,0,0,0.4), 0 0 14px rgba(20,184,166,0.15)",
+                          ? rt.cardActiveShadow
+                          : rt.cardLockedShadow,
                     }}
                   >
-                    {/* Scanline texture */}
-                    <div
-                      className="absolute inset-0 pointer-events-none opacity-[0.06]"
-                      style={{ backgroundImage: "repeating-linear-gradient(0deg, rgba(94,234,212,0.6) 0 1px, transparent 1px 3px)" }}
-                    />
+                    {/* Scanline texture — Nexus only */}
+                    {rt.scanline && (
+                      <div
+                        className="absolute inset-0 pointer-events-none opacity-[0.06]"
+                        style={{ backgroundImage: "repeating-linear-gradient(0deg, rgba(94,234,212,0.6) 0 1px, transparent 1px 3px)" }}
+                      />
+                    )}
                     {/* Completed checkmark watermark */}
                     {completed && (
-                      <svg
-                        className="absolute -right-4 -bottom-4 h-32 w-32 text-emerald-400/10 pointer-events-none"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                      >
+                      <svg className="absolute -right-4 -bottom-4 h-32 w-32 text-emerald-400/10 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                         <path d="M20 6L9 17l-5-5" />
                       </svg>
                     )}
-                    {/* Completed corner stripe */}
+                    {/* Completed top stripe */}
                     {completed && (
-                      <div
-                        className="absolute top-0 left-0 h-1 w-full pointer-events-none"
-                        style={{
-                          background: "linear-gradient(90deg, #6ee7b7, #10b981 50%, transparent 100%)",
-                          boxShadow: "0 0 12px rgba(110,231,183,0.7)",
-                        }}
-                      />
+                      <div className="absolute top-0 left-0 h-1 w-full pointer-events-none" style={{ background: "linear-gradient(90deg, #6ee7b7, #10b981 50%, transparent 100%)", boxShadow: "0 0 12px rgba(110,231,183,0.7)" }} />
                     )}
 
+                    {/* Row 1: lesson label + status badge */}
                     <div className="relative flex items-center justify-between">
                       <span
                         className="inline-flex items-center px-3 py-1 text-[11px] font-mono font-extrabold uppercase tracking-[0.18em]"
                         style={{
-                          clipPath: "polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px)",
+                          clipPath: rt.badgeClip,
+                          borderRadius: rt.rounded ? 999 : undefined,
                           background: locked
-                            ? "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)"
+                            ? rt.badgeLockedBg
                             : postTestReady
-                              ? "linear-gradient(135deg, #78350f 0%, #f59e0b 100%)"
+                              ? rt.badgePosttestBg
                               : completed
-                                ? "linear-gradient(135deg, #064e3b 0%, #10b981 100%)"
-                                : "linear-gradient(135deg, #064e47 0%, #14b8a6 100%)",
-                          color: locked ? "#64748b" : "#ecfeff",
-                          boxShadow: "inset 0 1px 0 rgba(94,234,212,0.35)",
+                                ? rt.badgeCompletedBg
+                                : rt.badgeActiveBg,
+                          color: locked ? "#94a3b8" : "#ecfeff",
+                          boxShadow: locked ? undefined : rt.badgeShadow,
                         }}
                       >
                         {isPostTest ? "Post Test" : item.type === "quiz" ? "Weekly Quiz" : `Lesson ${item.n}`}
                       </span>
+
                       {completed ? (
                         <span
-                          className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-mono font-extrabold tracking-[0.14em] text-emerald-100"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-mono font-extrabold tracking-[0.14em] text-emerald-100"
                           style={{
-                            clipPath: "polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px)",
-                            background: "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
+                            clipPath: rt.statusClip,
+                            borderRadius: rt.rounded ? 999 : undefined,
+                            background: rt.statusCompletedBg,
                             boxShadow: "inset 0 1px 0 rgba(110,231,183,0.4)",
                           }}
                         >
@@ -803,39 +897,37 @@ function ProgramPage() {
                         </span>
                       ) : locked ? (
                         <span
-                          className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-mono font-extrabold tracking-[0.14em] text-slate-400"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-mono font-extrabold tracking-[0.14em] text-slate-400"
                           style={{
-                            clipPath: "polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px)",
-                            background: "linear-gradient(135deg, #1e293b 0%, #334155 100%)",
+                            clipPath: rt.statusClip,
+                            borderRadius: rt.rounded ? 999 : undefined,
+                            background: rt.statusLockedBg,
                           }}
                         >
-                          LOCKED
+                          🔒 LOCKED
                         </span>
                       ) : (
                         <span
-                          className="inline-flex items-center gap-1.5 px-2 py-1 text-[10px] font-mono font-extrabold tracking-[0.14em] text-teal-100"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono font-extrabold tracking-[0.14em] text-white"
                           style={{
-                            clipPath: "polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px)",
-                            background: postTestReady
-                              ? "linear-gradient(135deg, #78350f 0%, #f59e0b 100%)"
-                              : "linear-gradient(135deg, #064e47 0%, #14b8a6 100%)",
-                            boxShadow: "inset 0 1px 0 rgba(94,234,212,0.4)",
+                            clipPath: rt.statusClip,
+                            borderRadius: rt.rounded ? 999 : undefined,
+                            background: postTestReady ? rt.statusPosttestBg : rt.statusActiveBg,
+                            boxShadow: rt.statusShadow,
                           }}
                         >
-                          <span className="h-1 w-1 rounded-full bg-teal-200 shadow-[0_0_6px_rgba(94,234,212,0.9)] animate-pulse" />
+                          <span className={`h-1.5 w-1.5 rounded-full ${rt.dotClass} animate-pulse`} />
                           ACTIVE
                         </span>
                       )}
                     </div>
 
+                    {/* Row 2: title + focus */}
                     <div className="relative flex-1 min-w-0">
                       <div className="font-extrabold text-white leading-tight line-clamp-2 drop-shadow-[0_1px_4px_rgba(0,0,0,0.5)]">
                         {item.title}
                       </div>
-                      <div
-                        className="mt-1.5 text-xs text-teal-100/60 leading-snug"
-                        style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}
-                      >
+                      <div className="mt-1.5 text-xs text-white/60 leading-snug line-clamp-2">
                         {!weekUnlocked
                           ? hasPersonalizedPlan
                             ? "Complete your current lesson to unlock this"
@@ -848,8 +940,9 @@ function ProgramPage() {
                       </div>
                     </div>
 
-                    <div className="relative flex items-center justify-between pt-2 border-t border-teal-400/15">
-                      <span className="text-[10px] font-mono font-bold text-teal-200/70 tracking-[0.14em]">
+                    {/* Row 3: XP + action button */}
+                    <div className={`relative flex items-center justify-between pt-2 border-t ${rt.dividerColor ?? "border-teal-400/15"}`}>
+                      <span className={`text-[10px] font-mono font-bold tracking-[0.14em] ${rt.xpLabelColor ?? "text-teal-200/70"}`}>
                         {isPostTest ? "MASTERY" : isLesson ? "10 XP" : "20 XP"}
                       </span>
                       {locked ? (
@@ -858,15 +951,16 @@ function ProgramPage() {
                         </span>
                       ) : (
                         <span
-                          className="text-[10px] font-mono font-extrabold tracking-[0.18em] px-3 py-1 text-white"
+                          className="text-[10px] font-mono font-extrabold tracking-[0.18em] px-4 py-1.5 text-white"
                           style={{
-                            clipPath: "polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px)",
+                            clipPath: rt.actionClip,
+                            borderRadius: rt.rounded ? 999 : undefined,
                             background: postTestReady
-                              ? "linear-gradient(135deg, #78350f 0%, #f59e0b 100%)"
+                              ? rt.actionPosttestBg
                               : completed
-                                ? "linear-gradient(135deg, #064e3b 0%, #10b981 100%)"
-                                : "linear-gradient(135deg, #064e47 0%, #0d9488 50%, #14b8a6 100%)",
-                            boxShadow: "inset 0 1px 0 rgba(94,234,212,0.4), 0 0 8px rgba(20,184,166,0.35)",
+                                ? rt.actionCompletedBg
+                                : rt.actionActiveBg,
+                            boxShadow: locked ? undefined : rt.actionShadow,
                           }}
                         >
                           {completed ? "REPLAY" : "START"}
@@ -875,19 +969,19 @@ function ProgramPage() {
                     </div>
                   </button>
 
+                  {/* Connector between cards */}
                   {!isLast && (
                     <div className="hidden lg:flex absolute top-1/2 -right-3 -translate-y-1/2 z-20 pointer-events-none">
                       <div
                         className="h-7 w-7 flex items-center justify-center"
                         style={{
-                          clipPath: "polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)",
-                          background: completed
-                            ? "radial-gradient(circle, #10b981, #064e3b 70%)"
-                            : "radial-gradient(circle, #14b8a6, #064e47 70%)",
-                          boxShadow: "0 0 10px rgba(94,234,212,0.5)",
+                          clipPath: rt.connClip,
+                          borderRadius: rt.rounded ? "50%" : undefined,
+                          background: completed ? rt.connCompletedBg : rt.connActiveBg,
+                          boxShadow: rt.connShadow,
                         }}
                       >
-                        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-teal-50" fill="none" stroke="currentColor" strokeWidth="3"><path d="M9 6l6 6-6 6" /></svg>
+                        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-white" fill="none" stroke="currentColor" strokeWidth="3"><path d="M9 6l6 6-6 6" /></svg>
                       </div>
                     </div>
                   )}

@@ -17,7 +17,7 @@ import { supabase } from "@/lib/supabase";
 
 const YEAR = "Prep";
 const REALM_ID = "measurement";
-const BG_IMAGE = "/images/tower-plaza-bg.jpg";
+const BG_IMAGE = "/images/measurelands-home-bg.jpg";
 
 const DISTRICT_ZONES = [
   { id: "length", name: "LENGTH LANDS", sub: "WEEKS 1–2", weekStart: 1, weekEnd: 2, left: "7%", top: "14%", color: "#67e8f9" },
@@ -293,8 +293,8 @@ export default function MeasurelandsMap() {
   const chip = (extra?: React.CSSProperties): React.CSSProperties => ({
     padding: "5px 12px",
     borderRadius: 999,
-    background: "rgba(17,24,39,0.55)",
-    border: "1px solid rgba(186,230,253,0.16)",
+    background: "rgba(30,15,0,0.6)",
+    border: "1px solid rgba(251,191,36,0.22)",
     ...extra,
   });
 
@@ -306,16 +306,17 @@ export default function MeasurelandsMap() {
     padding: "12px 10px 10px",
     borderRadius: 18,
     cursor: "pointer",
-    background: "linear-gradient(180deg, rgba(10,18,30,0.92) 0%, rgba(5,10,18,0.95) 100%)",
-    border: "1.5px solid rgba(186,230,253,0.24)",
+    background: "linear-gradient(180deg, rgba(28,14,2,0.92) 0%, rgba(15,6,0,0.95) 100%)",
+    border: "1.5px solid rgba(251,191,36,0.28)",
     backdropFilter: "blur(14px)",
     width: 72,
-    boxShadow: "0 0 18px rgba(103,232,249,0.14), 0 6px 22px rgba(0,0,0,0.64), inset 0 1px 0 rgba(255,255,255,0.05)",
+    boxShadow: "0 0 18px rgba(251,191,36,0.12), 0 6px 22px rgba(0,0,0,0.64), inset 0 1px 0 rgba(255,255,255,0.05)",
     transition: "transform 180ms ease, box-shadow 220ms ease, border-color 220ms ease",
   };
 
   return (
-    <div style={{ position: "relative", width: "100vw", height: "100vh", overflow: "hidden", background: "#050818" }}>
+    <div style={{ position: "relative", width: "100vw", height: "100vh", overflow: "hidden", background: "#1a0d00" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={BG_IMAGE}
         alt=""
@@ -328,11 +329,13 @@ export default function MeasurelandsMap() {
           objectPosition: "center 42%",
           transform: launching ? "scale(1.35)" : "scale(1)",
           transition: "transform 0.9s cubic-bezier(0.5, 0, 0.75, 0)",
+          filter: "brightness(1.05) saturate(1.1)",
         }}
       />
 
-      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(8,14,32,0.58) 0%, rgba(8,14,32,0.16) 40%, rgba(5,8,24,0.88) 100%)" }} />
-      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 55% at 50% 36%, rgba(103,232,249,0.09) 0%, transparent 70%)" }} />
+      {/* Warm atmospheric overlays */}
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(20,8,0,0.52) 0%, rgba(15,6,0,0.1) 42%, rgba(10,4,0,0.85) 100%)" }} />
+      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 70% 60% at 50% 38%, rgba(251,191,36,0.07) 0%, transparent 70%)" }} />
       <div
         style={{
           position: "absolute",
@@ -394,33 +397,28 @@ export default function MeasurelandsMap() {
         </div>
       </div>
 
+      {/* ── Top nav bar ── */}
       <div
         style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 20,
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
+          position: "absolute", top: 0, left: 0, right: 0, zIndex: 20,
+          display: "flex", alignItems: "center", gap: 8,
           padding: "10px 14px",
-          background: "rgba(5,8,24,0.72)",
-          borderBottom: "1px solid rgba(186,230,253,0.1)",
+          background: "rgba(20,8,0,0.72)",
+          borderBottom: "1px solid rgba(251,191,36,0.12)",
           backdropFilter: "blur(16px)",
         }}
       >
         <button
           onClick={() => router.push(`/realms?level=${encodeURIComponent(YEAR)}`)}
-          style={{ display: "flex", alignItems: "center", gap: 6, ...chip(), cursor: "pointer", color: "rgba(226,232,240,0.92)", fontSize: 12, fontWeight: 700 }}
+          style={{ display: "flex", alignItems: "center", gap: 6, ...chip(), cursor: "pointer", color: "rgba(254,243,199,0.92)", fontSize: 12, fontWeight: 700 }}
         >
           <ArrowLeft size={14} /> Back
         </button>
-        <div style={chip()}>
-          <span style={{ color: "#67e8f9", fontSize: 10, fontWeight: 900, letterSpacing: "0.18em", fontFamily: "ui-monospace,monospace" }}>◈ MEASURELANDS</span>
+        <div style={chip({ background: "rgba(120,53,15,0.45)", border: "1px solid rgba(251,191,36,0.32)" })}>
+          <span style={{ color: "#fde68a", fontSize: 10, fontWeight: 900, letterSpacing: "0.18em", fontFamily: "ui-monospace,monospace" }}>⚗ MEASURELANDS</span>
         </div>
-        <div style={chip({ background: "rgba(103,232,249,0.07)", border: "1px solid rgba(103,232,249,0.14)" })}>
-          <span style={{ color: "#67e8f9", fontSize: 9, fontWeight: 700, letterSpacing: "0.2em", fontFamily: "ui-monospace,monospace" }}>PREP</span>
+        <div style={chip({ background: "rgba(109,40,217,0.2)", border: "1px solid rgba(167,139,250,0.28)" })}>
+          <span style={{ color: "#ddd6fe", fontSize: 9, fontWeight: 700, letterSpacing: "0.2em", fontFamily: "ui-monospace,monospace" }}>GROUND LEVEL</span>
         </div>
         <div style={{ flex: 1 }} />
         <div style={{ display: "flex", alignItems: "center", gap: 5, ...chip() }}>
@@ -428,16 +426,17 @@ export default function MeasurelandsMap() {
           <span style={{ color: "#fef3c7", fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{totalXP} XP</span>
         </div>
         <div style={chip()}>
-          <span style={{ color: "#e0f2fe", fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{highestDone}/8</span>
+          <span style={{ color: "#fde68a", fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{highestDone}/8 weeks</span>
         </div>
         <button
           onClick={() => router.push("/profile")}
-          style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, borderRadius: "50%", cursor: "pointer", background: "rgba(30,41,59,0.48)", border: "1px solid rgba(186,230,253,0.24)" }}
+          style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, borderRadius: "50%", cursor: "pointer", background: "rgba(60,28,0,0.55)", border: "1px solid rgba(251,191,36,0.28)" }}
         >
-          <User size={16} color="#e0f2fe" />
+          <User size={16} color="#fde68a" />
         </button>
       </div>
 
+      {/* ── Right HUD buttons ── */}
       <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", zIndex: 20, display: "flex", flexDirection: "column", gap: 10 }}>
         {[
           { key: "legends", label: "LEGENDS", route: "/legends", icon: <LegendsIcon /> },
@@ -447,33 +446,29 @@ export default function MeasurelandsMap() {
           <button key={key} onClick={() => router.push(route)} style={hudBtn}>
             <div
               style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: 48,
-                height: 48,
-                borderRadius: 14,
-                background: "radial-gradient(circle at 50% 35%, rgba(103,232,249,0.28) 0%, rgba(30,41,59,0.18) 55%, rgba(5,10,18,0) 100%)",
-                border: "1px solid rgba(186,230,253,0.24)",
-                boxShadow: "inset 0 0 14px rgba(103,232,249,0.18), 0 0 18px rgba(103,232,249,0.14)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                width: 48, height: 48, borderRadius: 14,
+                background: "radial-gradient(circle at 50% 35%, rgba(251,191,36,0.22) 0%, rgba(120,53,15,0.18) 55%, rgba(15,6,0,0) 100%)",
+                border: "1px solid rgba(251,191,36,0.28)",
+                boxShadow: "inset 0 0 14px rgba(251,191,36,0.14), 0 0 18px rgba(251,191,36,0.1)",
               }}
             >
               {icon}
             </div>
-            <span style={{ fontSize: 9, fontWeight: 900, letterSpacing: "0.18em", color: "#bae6fd", fontFamily: "ui-monospace,monospace", textShadow: "0 0 10px rgba(103,232,249,0.38)" }}>
+            <span style={{ fontSize: 9, fontWeight: 900, letterSpacing: "0.18em", color: "#fde68a", fontFamily: "ui-monospace,monospace", textShadow: "0 0 10px rgba(251,191,36,0.4)" }}>
               {label}
             </span>
           </button>
         ))}
         <div style={{ ...hudBtn, cursor: "default", gap: 4 }}>
-          <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: "0.12em", color: "rgba(186,230,253,0.52)", fontFamily: "ui-monospace,monospace", textAlign: "center", lineHeight: 1.15 }}>
+          <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: "0.12em", color: "rgba(251,191,36,0.5)", fontFamily: "ui-monospace,monospace", textAlign: "center", lineHeight: 1.15 }}>
             MY BEST
           </span>
-          <span style={{ fontSize: 18, fontWeight: 900, color: "#67e8f9", lineHeight: 1 }}>{bestChain}</span>
-          <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: "0.12em", color: "rgba(253,230,138,0.65)", fontFamily: "ui-monospace,monospace", textAlign: "center", lineHeight: 1.15, marginTop: 2 }}>
+          <span style={{ fontSize: 18, fontWeight: 900, color: "#fde68a", lineHeight: 1 }}>{bestChain}</span>
+          <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: "0.12em", color: "rgba(167,139,250,0.65)", fontFamily: "ui-monospace,monospace", textAlign: "center", lineHeight: 1.15, marginTop: 2 }}>
             CLASS BEST
           </span>
-          <span style={{ fontSize: 14, fontWeight: 900, color: "#fde68a", lineHeight: 1 }}>{classBestChain ?? "—"}</span>
+          <span style={{ fontSize: 14, fontWeight: 900, color: "#c4b5fd", lineHeight: 1 }}>{classBestChain ?? "—"}</span>
         </div>
       </div>
 
@@ -498,6 +493,7 @@ export default function MeasurelandsMap() {
             pointerEvents: "none",
           }}
         />
+        {/* Main adventure button — warm gold, round, magical */}
         <button
           onClick={launchGuidedAdventure}
           disabled={launching}
@@ -505,23 +501,23 @@ export default function MeasurelandsMap() {
             position: "relative",
             pointerEvents: "auto",
             cursor: launching ? "default" : "pointer",
-            padding: "22px 56px",
+            padding: "22px 60px",
             borderRadius: 999,
-            border: "2px solid rgba(103,232,249,0.82)",
-            background: "linear-gradient(180deg, #22d3ee 0%, #14b8a6 55%, #0f766e 100%)",
-            color: "#ffffff",
+            border: "2px solid rgba(251,191,36,0.85)",
+            background: "linear-gradient(180deg, #fbbf24 0%, #d97706 55%, #b45309 100%)",
+            color: "#1a0800",
             fontSize: 20,
             fontWeight: 900,
-            letterSpacing: "0.22em",
+            letterSpacing: "0.2em",
             fontFamily: "ui-monospace, monospace",
-            textShadow: "0 2px 8px rgba(0,0,0,0.55)",
+            textShadow: "0 1px 0 rgba(255,255,255,0.4)",
             boxShadow: [
-              "0 0 0 4px rgba(34,211,238,0.16)",
-              "0 0 38px rgba(34,211,238,0.54)",
-              "0 0 90px rgba(20,184,166,0.34)",
+              "0 0 0 4px rgba(251,191,36,0.2)",
+              "0 0 40px rgba(251,191,36,0.58)",
+              "0 0 90px rgba(217,119,6,0.36)",
               "0 14px 32px rgba(0,0,0,0.55)",
-              "inset 0 2px 0 rgba(255,255,255,0.35)",
-              "inset 0 -4px 0 rgba(0,0,0,0.25)",
+              "inset 0 2px 0 rgba(255,255,255,0.45)",
+              "inset 0 -4px 0 rgba(0,0,0,0.22)",
             ].join(", "),
             transform: launching ? "scale(1.08)" : "scale(1)",
             transition: "transform 0.25s ease",
@@ -529,23 +525,23 @@ export default function MeasurelandsMap() {
             whiteSpace: "nowrap",
           }}
         >
-          ▶ {highestDone === 0 ? "START ADVENTURE" : "CONTINUE ADVENTURE"}
+          ✦ {highestDone === 0 ? "START ADVENTURE" : "CONTINUE ADVENTURE"}
         </button>
 
         <div
           style={{
             position: "relative",
-            color: "rgba(186,230,253,0.85)",
+            color: "rgba(253,230,138,0.85)",
             fontSize: 10,
             fontWeight: 700,
-            letterSpacing: "0.2em",
+            letterSpacing: "0.22em",
             fontFamily: "ui-monospace, monospace",
             marginTop: 14,
             opacity: launching ? 0 : 1,
             transition: "opacity 0.3s",
           }}
         >
-          TAP TO STEP INTO MEASURELANDS
+          MASTER MEASUREMENT · BALANCE THE WORLD
         </div>
 
         <div
@@ -557,7 +553,7 @@ export default function MeasurelandsMap() {
             letterSpacing: "0.28em",
             fontFamily: "ui-monospace, monospace",
             textShadow: `0 0 14px ${currentZone.color}, 0 2px 8px rgba(0,0,0,0.9)`,
-            marginTop: 14,
+            marginTop: 12,
             opacity: launching ? 0 : 1,
             transition: "opacity 0.3s",
           }}
