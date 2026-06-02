@@ -31,6 +31,10 @@ const DROPDOWN_REALM_IDS = [
   "pattern-peaks",
 ] as const;
 
+function isRealmAccessible(realmId: string, previewMode: boolean) {
+  return realmId === "number-nexus" || (previewMode && realmId === "measurelands");
+}
+
 export default function RealmCarousel() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -125,6 +129,16 @@ export default function RealmCarousel() {
         };
       }
 
+      if (realm.id === "measurelands" && previewMode) {
+        return {
+          id: realm.id,
+          name: realm.name,
+          percent: 0,
+          status: "Preview",
+          barClass: "from-sky-400 to-cyan-300",
+        };
+      }
+
       if (realm.comingSoon) {
         return {
           id: realm.id,
@@ -152,7 +166,7 @@ export default function RealmCarousel() {
       status: string;
       barClass: string;
     }>;
-  }, [levelNumber, programStore, studentYear]);
+  }, [levelNumber, previewMode, programStore, studentYear]);
 
   const navigate = useCallback((dir: 1 | -1) => {
     if (transitioning) return;
@@ -186,7 +200,8 @@ export default function RealmCarousel() {
   }, [navigate]);
 
   const current = REALMS[currentIndex];
-  const isActive = current.active || DEMO_MODE || previewMode;
+  const isActive = DEMO_MODE || isRealmAccessible(current.id, previewMode);
+  const isPreviewRealm = previewMode && current.id === "measurelands";
   const prevIdx = (currentIndex - 1 + REALMS.length) % REALMS.length;
   const nextIdx = (currentIndex + 1) % REALMS.length;
   const bgShift = -2 + (currentIndex / REALMS.length) * 4;
@@ -195,6 +210,7 @@ export default function RealmCarousel() {
 
   const realmRoutes: Record<string, string> = {
     "number-nexus": "/number-nexus",
+    "measurelands": "/program?year=Prep&week=1&legacy=1&realm_id=measurement",
   };
 
   function enterRealm() {
@@ -203,9 +219,6 @@ export default function RealmCarousel() {
     if (route) {
       router.push(route);
       return;
-    }
-    if (previewMode) {
-      router.push(`/program?year=${encodeURIComponent(level)}&week=1&legacy=1`);
     }
   }
 
@@ -509,7 +522,7 @@ export default function RealmCarousel() {
             </h2>
             <p className="text-sm text-white/55 mb-4">{current.description}</p>
 
-            {current.active ? (
+            {isActive ? (
               <button
                 onClick={enterRealm}
                 className="px-8 py-3 rounded-2xl font-bold text-white text-base transition-all hover:scale-105 active:scale-95 cursor-pointer"
@@ -518,7 +531,7 @@ export default function RealmCarousel() {
                   boxShadow: `0 6px 24px ${current.colorDim}`,
                 }}
               >
-                Enter Realm
+                {isPreviewRealm ? "Preview Realm" : "Enter Realm"}
               </button>
             ) : current.comingSoon ? (
               <span className="inline-block px-6 py-2.5 rounded-2xl text-sm font-bold text-amber-300/80 border border-amber-400/30" style={{ background: "rgba(251,191,36,0.1)" }}>
@@ -533,6 +546,12 @@ export default function RealmCarousel() {
                 Locked
               </span>
             )}
+
+            {isPreviewRealm ? (
+              <div className="mt-3 inline-flex items-center rounded-full border border-sky-300/35 bg-sky-400/10 px-3 py-1 text-[11px] font-mono font-bold uppercase tracking-[0.16em] text-sky-100">
+                Preview
+              </div>
+            ) : null}
 
             {/* Dot indicators */}
             <div className="flex items-center justify-center gap-1.5 mt-5">

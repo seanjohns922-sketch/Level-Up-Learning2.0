@@ -35,6 +35,7 @@ import { generatePrepWeek10Task, resetPrepWeek10TaskSessionState } from "@/data/
 import { generatePrepWeek11Task, resetPrepWeek11TaskSessionState } from "@/data/activities/prep/week11";
 import { generatePrepWeek12Task, resetPrepWeek12TaskSessionState } from "@/data/activities/prep/week12";
 import { getProgramForYear } from "@/data/programs";
+import { getCurriculumPlan } from "@/data/programs/genres";
 import { DEMO_MODE } from "@/data/config";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, updateProgress } from "@/data/progress";
@@ -102,6 +103,7 @@ function LessonPage() {
   const params = useSearchParams();
 
   const year = params.get("year") ?? "Year 1";
+  const realmId = params.get("realm_id") ?? "number";
   const week = Number(params.get("week") ?? "1");
   const yearNumber = year === "Prep" ? 0 : parseInt(year.replace(/\D/g, ""), 10) || 1;
   const levelNumber = year === "Prep" ? 1 : yearNumber;
@@ -119,13 +121,16 @@ function LessonPage() {
     return match ? Number(match[1]) : 1;
   }, [effectiveLessonId]);
   const lessonChrome = useMemo(() => getLessonChrome(levelNumber), [levelNumber]);
+  const lessonProgram = useMemo(
+    () => (realmId === "measurement" ? getCurriculumPlan(year, "measurement") : getProgramForYear(year)),
+    [realmId, year]
+  );
 
   const [startedLessonId, setStartedLessonId] = useState<string | null>(null);
   const lessonMeta = useMemo(() => {
-    const program = getProgramForYear(year);
-    const weekPlan = program.find((w) => w.week === week);
+    const weekPlan = lessonProgram.find((w) => w.week === week);
     return weekPlan?.lessons.find((l) => l.id === effectiveLessonId) ?? null;
-  }, [year, week, effectiveLessonId]);
+  }, [effectiveLessonId, lessonProgram, week]);
   const started = startedLessonId === effectiveLessonId;
   const safeLessonTitle = lessonMeta?.displayTitle ?? lessonMeta?.title ?? null;
   const safeLessonFocus = lessonMeta?.focus ?? null;
@@ -198,7 +203,8 @@ function LessonPage() {
 
   async function completeLesson() {
     if (lessonFinalizedRef.current) {
-      router.push(`/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1`);
+      const realmParam = realmId === "measurement" ? `&realm_id=${encodeURIComponent(realmId)}` : "";
+      router.push(`/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1${realmParam}`);
       return;
     }
     lessonFinalizedRef.current = true;
@@ -288,7 +294,8 @@ function LessonPage() {
       }
     }
 
-    router.push(`/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1`);
+    const realmParam = realmId === "measurement" ? `&realm_id=${encodeURIComponent(realmId)}` : "";
+    router.push(`/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1${realmParam}`);
   }
 
   function goBackToProgram() {

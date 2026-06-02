@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getProgramForYear } from "@/data/programs";
+import { getCurriculumPlan } from "@/data/programs/genres";
 import { DEMO_MODE } from "@/data/config";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { isPlacementComplete, readProgress, updateProgress } from "@/data/progress";
@@ -36,17 +37,24 @@ function ProgramPage() {
   const sp = useSearchParams();
 
   const year = sp.get("year") ?? "Year 1";
+  const realmId = sp.get("realm_id") ?? "number";
   const weekNum = Number(sp.get("week") ?? "1");
   const week = String(weekNum);
+  const program = useMemo(
+    () => (realmId === "measurement" ? getCurriculumPlan(year, "measurement") : getProgramForYear(year)),
+    [realmId, year]
+  );
   const curriculumYear = useMemo(() => {
-    const selected = getProgramForYear(year);
+    const selected = program;
     return selected.length > 0 ? year : "Year 1";
-  }, [year]);
+  }, [program, year]);
   const programYearIndex =
     curriculumYear === "Prep" ? 0 : parseInt(curriculumYear.replace(/\D/g, ""), 10) || 1;
   const levelNum = year === "Prep" ? 1 : parseInt(year.replace(/\D/g, ""), 10) || 1;
   const levelLabel = curriculumYear === "Prep" ? "Ground Level" : `Level ${programYearIndex}`;
   const isPrep = curriculumYear === "Prep";
+  const lastWeek = Math.max(program.length, 1);
+  const isMeasurementRealm = realmId === "measurement";
 
   const [store, setStore] = useState<ProgramProgressStore>(() =>
     typeof window !== "undefined" ? readProgramStore() : {}
@@ -75,21 +83,21 @@ function ProgramPage() {
   useEffect(() => {
     const progress = readProgress();
     if (!DEMO_MODE && !previewMode && progress?.year && progress.year !== year) {
-      const targetWeek = Math.max(1, Math.min(12, progress.assignedWeek ?? 1));
+      const targetWeek = Math.max(1, Math.min(lastWeek, progress.assignedWeek ?? 1));
       router.replace(`/program?year=${encodeURIComponent(progress.year)}&week=${targetWeek}&legacy=1`);
       return;
     }
-  }, [previewMode, router, year]);
+  }, [lastWeek, previewMode, router, year]);
 
   useEffect(() => {
     const progress = readProgress();
     if (progress?.status === "ASSIGNED_PROGRAM" && progress.year === year) {
-      const nextAssignedWeek = Math.max(1, Math.min(12, weekNum));
+      const nextAssignedWeek = Math.max(1, Math.min(lastWeek, weekNum));
       if ((progress.assignedWeek ?? 1) !== nextAssignedWeek) {
         updateProgress({ assignedWeek: nextAssignedWeek });
       }
     }
-  }, [weekNum, year]);
+  }, [lastWeek, weekNum, year]);
 
   useEffect(() => {
     if (!weekMenuOpen) return;
@@ -156,20 +164,19 @@ function ProgramPage() {
     DEMO_MODE || previewMode || teacherMode ? true : hasPersonalizedPlan ? weekIsPlayable : weekNum === 1 ? true : isWeekComplete(prevProgress);
 
   const lastAllowedWeek = useMemo(() => {
-    if (DEMO_MODE || previewMode || teacherMode || hasPersonalizedPlan) return 12;
+    if (DEMO_MODE || previewMode || teacherMode || hasPersonalizedPlan) return lastWeek;
     let allowed = 1;
-    for (let w = 2; w <= 12; w++) {
+    for (let w = 2; w <= lastWeek; w++) {
       if (isWeekComplete(getWeekProgress(store, year, w - 1))) allowed = w;
       else break;
     }
     return allowed;
-  }, [previewMode, teacherMode, year, store, hasPersonalizedPlan]);
+  }, [hasPersonalizedPlan, lastWeek, previewMode, store, teacherMode, year]);
 
   const progress = getWeekProgress(store, year, week);
 
   type ProgramItem = { type: "lesson" | "quiz" | "posttest"; n: number; title: string; focus: string };
   const items: ProgramItem[] = useMemo(() => {
-    const program = getProgramForYear(curriculumYear);
     const weekPlan = program.find((w) => w.week === weekNum);
     const lessons = weekPlan?.lessons ?? [];
     const base: ProgramItem[] = [
@@ -177,18 +184,17 @@ function ProgramPage() {
       { type: "lesson" as const, n: 2, title: lessons[1]?.displayTitle ?? lessons[1]?.title ?? "Lesson 2", focus: lessons[1]?.focus ?? "" },
       { type: "lesson" as const, n: 3, title: lessons[2]?.displayTitle ?? lessons[2]?.title ?? "Lesson 3", focus: lessons[2]?.focus ?? "" },
     ];
-    if (weekNum !== 12) {
+    if (weekNum !== lastWeek) {
       base.push({ type: "quiz" as const, n: 1, title: "Weekly Quiz", focus: "15 questions from all 3 lessons" });
     } else {
       base.push({ type: "posttest" as const, n: 1, title: "Post-Test", focus: "Score 85%+ to unlock your Legend" });
     }
     return base;
-  }, [curriculumYear, weekNum]);
+  }, [lastWeek, program, weekNum]);
 
   const currentWeekPlan = useMemo(() => {
-    const program = getProgramForYear(curriculumYear);
     return program.find((w) => w.week === weekNum);
-  }, [curriculumYear, weekNum]);
+  }, [program, weekNum]);
 
   function openItem(item: (typeof items)[number]) {
     if (!weekUnlocked && !teacherMode && !DEMO_MODE && !previewMode) return;
@@ -210,23 +216,26 @@ function ProgramPage() {
       }
     }
 
+    const realmParam = isMeasurementRealm ? `&realm_id=${encodeURIComponent(realmId)}` : "";
+
     if (item.type === "lesson") {
       router.push(
-        `/lesson?year=${encodeURIComponent(curriculumYear)}&week=${week}&lessonId=y${programYearIndex}-w${weekNum}-l${item.n}`
+        `/lesson?year=${encodeURIComponent(curriculumYear)}&week=${week}&lessonId=y${programYearIndex}-w${weekNum}-l${item.n}${realmParam}`
       );
       return;
     }
     if (item.type === "posttest") {
-      router.push(`/posttest?year=${encodeURIComponent(curriculumYear)}`);
+      router.push(`/posttest?year=${encodeURIComponent(curriculumYear)}${realmParam}`);
       return;
     }
-    router.push(`/session?year=${encodeURIComponent(curriculumYear)}&week=${week}&type=${item.type}&n=${item.n}`);
+    router.push(`/session?year=${encodeURIComponent(curriculumYear)}&week=${week}&type=${item.type}&n=${item.n}${realmParam}`);
   }
 
   function goToWeek(targetWeek: number) {
-    const clamped = Math.max(1, Math.min(12, targetWeek));
+    const clamped = Math.max(1, Math.min(lastWeek, targetWeek));
     if (!DEMO_MODE && !previewMode && !teacherMode && hasPersonalizedPlan && !playableWeeks.includes(clamped)) return;
-    router.push(`/program?year=${encodeURIComponent(year)}&week=${clamped}&legacy=1`);
+    const realmParam = isMeasurementRealm ? `&realm_id=${encodeURIComponent(realmId)}` : "";
+    router.push(`/program?year=${encodeURIComponent(year)}&week=${clamped}&legacy=1${realmParam}`);
   }
 
   function setTeacherModeState(next: boolean) {
@@ -265,10 +274,10 @@ function ProgramPage() {
       nextWeek = getRecommendedAssignedWeek(store, curriculumYear, savedWeek, student.requiredWeeks);
     } else {
       if (weekNum > savedWeek) nextWeek = weekNum;
-      if (weekComplete) nextWeek = Math.max(nextWeek, Math.min(12, weekNum + 1));
+      if (weekComplete) nextWeek = Math.max(nextWeek, Math.min(lastWeek, weekNum + 1));
     }
     if (nextWeek !== savedWeek) updateProgress({ assignedWeek: nextWeek });
-  }, [weekComplete, weekNum, hasPersonalizedPlan, store, curriculumYear]);
+  }, [curriculumYear, hasPersonalizedPlan, lastWeek, store, weekComplete, weekNum]);
 
   const xp = lessonsDoneCount * 10 + (progress.quizCompleted ? 20 : 0);
   const totalXp = 50;
@@ -356,7 +365,7 @@ function ProgramPage() {
           <div className="flex items-start justify-between gap-3 mb-6">
             <div className="flex items-center gap-3">
               <button
-                onClick={() => router.push("/number-nexus")}
+                onClick={() => router.push(isMeasurementRealm ? `/realms?level=${encodeURIComponent(year)}` : "/number-nexus")}
                 className="border border-teal-300/25 bg-black/25 px-4 py-2 text-xs font-mono font-black uppercase tracking-[0.14em] text-teal-50 backdrop-blur-md transition hover:border-teal-200/45 hover:bg-teal-950/45 focus:outline-none focus:ring-2 focus:ring-teal-300/25"
                 style={{
                   clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
@@ -398,7 +407,7 @@ function ProgramPage() {
                       Select Week
                     </div>
                     <ul className="py-0.5">
-                      {Array.from({ length: 12 }).map((_, index) => {
+                      {Array.from({ length: lastWeek }).map((_, index) => {
                         const targetWeek = index + 1;
                         const isUnlocked = DEMO_MODE || previewMode || teacherMode || (hasPersonalizedPlan ? playableWeeks.includes(targetWeek) : targetWeek <= lastAllowedWeek);
                         const isCurrent = targetWeek === weekNum;
@@ -898,7 +907,7 @@ function ProgramPage() {
                   Go to Week {lastAllowedWeek}
                 </button>
                 <button
-                  onClick={() => router.push("/number-nexus")}
+                  onClick={() => router.push(isMeasurementRealm ? `/realms?level=${encodeURIComponent(year)}` : "/number-nexus")}
                   className="rounded-2xl bg-white/10 px-5 py-3 text-sm font-black text-white transition hover:bg-white/15"
                 >
                   Back to Map
