@@ -564,18 +564,18 @@ export default function MeasurelandsMap() {
         <div
           style={{
             position: "relative",
-            color: currentZone.color,
-            fontSize: 11,
+            color: ACCENT_SOFT,
+            fontSize: 12,
             fontWeight: 800,
             letterSpacing: "0.28em",
             fontFamily: "ui-monospace, monospace",
-            textShadow: `0 0 14px ${currentZone.color}, 0 2px 8px rgba(0,0,0,0.9)`,
+            textShadow: `0 0 14px ${ACCENT}, 0 2px 8px rgba(0,0,0,0.9)`,
             marginTop: 14,
             opacity: launching ? 0 : 1,
             transition: "opacity 0.3s",
           }}
         >
-          WEEK {currentWeek} · {currentZone.name}
+          WEEK {Math.max(1, currentWeek)} · LENGTH LANDS
         </div>
       </div>
 
