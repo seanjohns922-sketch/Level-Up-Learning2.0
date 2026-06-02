@@ -19,13 +19,13 @@ const YEAR = "Prep";
 const REALM_ID = "measurement";
 const BG_IMAGE = "/images/measurelands-home-bg.jpg";
 
-const DISTRICT_ZONES = [
-  { id: "length", name: "LENGTH LANDS", sub: "WEEKS 1–2", weekStart: 1, weekEnd: 2, left: "7%", top: "14%", color: "#67e8f9" },
-  { id: "balance", name: "BALANCE BASIN", sub: "WEEKS 3–4", weekStart: 3, weekEnd: 4, left: "10%", top: "56%", color: "#86efac" },
-  { id: "tower", name: "TIMEWIELDER TOWER", sub: "WEEK 8", weekStart: 8, weekEnd: 8, left: "50%", top: "30%", color: "#fde68a" },
-  { id: "capacity", name: "CAPACITY SPRINGS", sub: "WEEKS 5–6", weekStart: 5, weekEnd: 6, left: "70%", top: "15%", color: "#c4b5fd" },
-  { id: "clockwork", name: "CLOCKWORK CROSSING", sub: "WEEK 7", weekStart: 7, weekEnd: 7, left: "69%", top: "57%", color: "#f9a8d4" },
-] as const;
+// Measurelands palette
+const GOLD = "#fbbf24";
+const GOLD_SOFT = "#fde68a";
+const AMBER_DEEP = "#b45309";
+const PURPLE = "#a78bfa"; // Clockwork purple
+const PURPLE_DEEP = "#6d28d9";
+const TEAL = "#5eead4"; // Capacity teal
 
 function useWorldCanvas() {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -440,11 +440,11 @@ export default function MeasurelandsMap() {
         </div>
         <div style={{ flex: 1 }} />
         <div style={{ display: "flex", alignItems: "center", gap: 5, ...chip() }}>
-          <Zap size={11} color="#fde68a" />
+          <Zap size={11} color={PURPLE} />
           <span style={{ color: "#fef3c7", fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{totalXP} XP</span>
         </div>
-        <div style={chip()}>
-          <span style={{ color: "#fde68a", fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{highestDone}/8 weeks</span>
+        <div style={chip({ border: `1px solid rgba(94,234,212,0.32)` })}>
+          <span style={{ color: TEAL, fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{highestDone}/8 weeks</span>
         </div>
         <button
           onClick={() => router.push("/profile")}
@@ -457,23 +457,23 @@ export default function MeasurelandsMap() {
       {/* ── Right HUD buttons ── */}
       <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", zIndex: 20, display: "flex", flexDirection: "column", gap: 10 }}>
         {[
-          { key: "legends", label: "LEGENDS", route: "/legends", icon: <LegendsIcon /> },
-          { key: "worlds", label: "WORLDS", route: "/levels", icon: <WorldsIcon /> },
-          { key: "progress", label: "PROGRESS", route: "/realm-stats", icon: <ProgressIcon /> },
-        ].map(({ key, label, route, icon }) => (
+          { key: "legends", label: "LEGENDS", route: "/legends", icon: <LegendsIcon />, accent: GOLD, accentSoft: GOLD_SOFT },
+          { key: "worlds", label: "WORLDS", route: "/levels", icon: <WorldsIcon />, accent: PURPLE, accentSoft: "#ddd6fe" },
+          { key: "progress", label: "PROGRESS", route: "/realm-stats", icon: <ProgressIcon />, accent: TEAL, accentSoft: "#99f6e4" },
+        ].map(({ key, label, route, icon, accent, accentSoft }) => (
           <button key={key} onClick={() => router.push(route)} style={hudBtn}>
             <div
               style={{
                 display: "flex", alignItems: "center", justifyContent: "center",
                 width: 48, height: 48, borderRadius: 14,
-                background: "radial-gradient(circle at 50% 35%, rgba(251,191,36,0.22) 0%, rgba(120,53,15,0.18) 55%, rgba(15,6,0,0) 100%)",
-                border: "1px solid rgba(251,191,36,0.28)",
-                boxShadow: "inset 0 0 14px rgba(251,191,36,0.14), 0 0 18px rgba(251,191,36,0.1)",
+                background: `radial-gradient(circle at 50% 35%, ${accent}38 0%, ${accent}1f 55%, rgba(15,6,0,0) 100%)`,
+                border: `1px solid ${accent}55`,
+                boxShadow: `inset 0 0 14px ${accent}26, 0 0 18px ${accent}1f`,
               }}
             >
               {icon}
             </div>
-            <span style={{ fontSize: 9, fontWeight: 900, letterSpacing: "0.18em", color: "#fde68a", fontFamily: "ui-monospace,monospace", textShadow: "0 0 10px rgba(251,191,36,0.4)" }}>
+            <span style={{ fontSize: 9, fontWeight: 900, letterSpacing: "0.18em", color: accentSoft, fontFamily: "ui-monospace,monospace", textShadow: `0 0 10px ${accent}66` }}>
               {label}
             </span>
           </button>
@@ -565,12 +565,12 @@ export default function MeasurelandsMap() {
         <div
           style={{
             position: "relative",
-            color: ACCENT_SOFT,
+            color: GOLD_SOFT,
             fontSize: 12,
             fontWeight: 800,
             letterSpacing: "0.28em",
             fontFamily: "ui-monospace, monospace",
-            textShadow: `0 0 14px ${currentZone.color}, 0 2px 8px rgba(0,0,0,0.9)`,
+            textShadow: `0 0 14px ${PURPLE}, 0 2px 8px rgba(0,0,0,0.9)`,
             marginTop: 12,
             opacity: launching ? 0 : 1,
             transition: "opacity 0.3s",
