@@ -29,10 +29,18 @@ export function getHomeBg(levelNum: number, isPrep?: boolean): string {
   return "/images/number-nexus-home-bg.jpg"; // L1+L2 starter Nexus
 }
 
-/** Image filter per band — unified Level-5 "Clash Royale" crisp treatment across all levels */
-export function getHomeBgFilter(_levelNum: number): string {
-  // Single crisp recipe: punchy contrast, deeper blacks, vivid teals, no haze.
-  return "brightness(1.12) contrast(1.22) saturate(1.28)";
+/** Image filter per band */
+export function getHomeBgFilter(levelNum: number): string {
+  const band = getLevelBand(levelNum);
+  switch (band) {
+    case "apex":
+      return "brightness(1.08) contrast(1.16) saturate(1.18)";
+    case "advanced":
+      return "brightness(1.1) contrast(1.18) saturate(1.22)";
+    default:
+      // Foundation city should feel playable and cinematic, not hyper-rendered.
+      return "brightness(1.03) contrast(1.08) saturate(1.12)";
+  }
 }
 
 /** Particle palette per band */

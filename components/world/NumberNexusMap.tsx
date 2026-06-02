@@ -34,23 +34,48 @@ const ERA_CONFIGS = [
   // 0 — Prep: first arrival, friendly, simple
   { bgImage: "/images/number-nexus-bg-prep.png",
     particleCount: 50,  particleSpeedMult: 0.5,  vehicleCount: 3,  vehicleSpeedMult: 0.6,
-    pulseRings: 2, pulseColor: "#2dd4bf", labelSize: 16 },
+    pulseRings: 2, pulseColor: "#2dd4bf", labelSize: 16,
+    bgFilter: "brightness(1.04) contrast(1.06) saturate(1.04)",
+    atmosphericGlow: "radial-gradient(ellipse 64% 58% at 50% 34%, rgba(94,234,212,0.05) 0%, transparent 72%)",
+    skylineHaze: "linear-gradient(180deg, rgba(214,236,255,0.12) 0%, rgba(214,236,255,0.06) 12%, transparent 30%)",
+    scanlineOpacity: 0.03,
+    beamOpacity: 0.34 },
   // 1 — Year 1-2: city expanding, more life
   { bgImage: "/images/number-nexus-bg-y1.png",
     particleCount: 80,  particleSpeedMult: 0.75, vehicleCount: 5,  vehicleSpeedMult: 0.8,
-    pulseRings: 3, pulseColor: "#14b8a6", labelSize: 18 },
+    pulseRings: 3, pulseColor: "#14b8a6", labelSize: 18,
+    bgFilter: "blur(0.35px) brightness(1.01) contrast(1.05) saturate(1.08)",
+    atmosphericGlow: "radial-gradient(ellipse 68% 60% at 50% 38%, rgba(94,234,212,0.045) 0%, transparent 72%)",
+    skylineHaze: "linear-gradient(180deg, rgba(220,234,252,0.16) 0%, rgba(220,234,252,0.08) 14%, transparent 32%)",
+    scanlineOpacity: 0.025,
+    beamOpacity: 0.28 },
   // 2 — Year 3-4: deep city, dense skyline (existing image)
   { bgImage: "/images/number-nexus-home-bg.jpg",
     particleCount: 130, particleSpeedMult: 1.0,  vehicleCount: 9,  vehicleSpeedMult: 1.0,
-    pulseRings: 4, pulseColor: "#14b8a6", labelSize: 20 },
+    pulseRings: 4, pulseColor: "#14b8a6", labelSize: 20,
+    bgFilter: "brightness(1.04) contrast(1.12) saturate(1.14)",
+    atmosphericGlow: "radial-gradient(ellipse 60% 55% at 50% 36%, rgba(14,184,166,0.07) 0%, transparent 70%)",
+    skylineHaze: "linear-gradient(180deg, rgba(205,225,255,0.08) 0%, transparent 22%)",
+    scanlineOpacity: 0.06,
+    beamOpacity: 0.42 },
   // 3 — Year 5: epic, gold + teal, massive scale
   { bgImage: "/images/number-nexus-bg-y5.png",
     particleCount: 160, particleSpeedMult: 1.25, vehicleCount: 12, vehicleSpeedMult: 1.3,
-    pulseRings: 5, pulseColor: "#fbbf24", labelSize: 21 },
+    pulseRings: 5, pulseColor: "#fbbf24", labelSize: 21,
+    bgFilter: "brightness(1.05) contrast(1.14) saturate(1.18)",
+    atmosphericGlow: "radial-gradient(ellipse 60% 55% at 50% 36%, rgba(251,191,36,0.08) 0%, transparent 70%)",
+    skylineHaze: "linear-gradient(180deg, rgba(255,237,213,0.08) 0%, transparent 24%)",
+    scanlineOpacity: 0.06,
+    beamOpacity: 0.46 },
   // 4 — Year 6: legendary, god-like tower, final destination
   { bgImage: "/images/number-nexus-bg-y6.png",
     particleCount: 200, particleSpeedMult: 1.5,  vehicleCount: 16, vehicleSpeedMult: 1.6,
-    pulseRings: 6, pulseColor: "#fbbf24", labelSize: 22 },
+    pulseRings: 6, pulseColor: "#fbbf24", labelSize: 22,
+    bgFilter: "brightness(1.06) contrast(1.16) saturate(1.18)",
+    atmosphericGlow: "radial-gradient(ellipse 60% 55% at 50% 36%, rgba(251,191,36,0.09) 0%, transparent 70%)",
+    skylineHaze: "linear-gradient(180deg, rgba(255,237,213,0.09) 0%, transparent 24%)",
+    scanlineOpacity: 0.06,
+    beamOpacity: 0.5 },
 ] as const;
 type EraConfig = typeof ERA_CONFIGS[number];
 
@@ -617,6 +642,7 @@ export default function NumberNexusMap() {
           position: "absolute", inset: 0, width: "100%", height: "100%",
           objectFit: "cover", objectPosition: "center 40%",
           zIndex: 0,
+          filter: era.bgFilter,
           transform: launching ? "scale(1.35)" : "scale(1)",
           transition: "transform 0.9s cubic-bezier(0.5, 0, 0.75, 0)",
         }}
@@ -625,23 +651,33 @@ export default function NumberNexusMap() {
       {/* Atmospheric depth — top & bottom darken, mid stays open */}
       <div style={{
         position: "absolute", inset: 0, zIndex: 1,
-        background: "linear-gradient(180deg, rgba(2,10,22,0.58) 0%, rgba(1,20,28,0.12) 38%, rgba(1,10,18,0.08) 55%, rgba(2,8,18,0.88) 100%)",
+        background: eraIdx <= 1
+          ? "linear-gradient(180deg, rgba(6,18,34,0.42) 0%, rgba(7,20,30,0.08) 40%, rgba(4,10,18,0.12) 58%, rgba(3,8,16,0.72) 100%)"
+          : "linear-gradient(180deg, rgba(2,10,22,0.58) 0%, rgba(1,20,28,0.12) 38%, rgba(1,10,18,0.08) 55%, rgba(2,8,18,0.88) 100%)",
       }} />
       {/* Radial vignette */}
       <div style={{
         position: "absolute", inset: 0, zIndex: 1,
-        background: "radial-gradient(ellipse 82% 72% at 50% 44%, transparent 38%, rgba(2,6,18,0.42) 100%)",
+        background: eraIdx <= 1
+          ? "radial-gradient(ellipse 84% 74% at 50% 44%, transparent 34%, rgba(7,16,28,0.34) 100%)"
+          : "radial-gradient(ellipse 82% 72% at 50% 44%, transparent 38%, rgba(2,6,18,0.42) 100%)",
       }} />
-      {/* Teal center glow — consistent identity across all eras */}
+      {/* Center glow */}
       <div style={{
         position: "absolute", inset: 0, zIndex: 1,
-        background: "radial-gradient(ellipse 60% 55% at 50% 36%, rgba(14,184,166,0.07) 0%, transparent 70%)",
+        background: era.atmosphericGlow,
+      }} />
+      {/* Distance haze softens skyline and reduces concept-art harshness in early city eras */}
+      <div style={{
+        position: "absolute", inset: 0, zIndex: 1, pointerEvents: "none",
+        background: era.skylineHaze,
       }} />
 
       {/* Scanline texture */}
       <div style={{
         position: "absolute", inset: 0, zIndex: 2, pointerEvents: "none",
         backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px)",
+        opacity: era.scanlineOpacity,
       }} />
 
       {/* Volumetric tower light beam — colour + width driven by era */}
@@ -652,8 +688,8 @@ export default function NumberNexusMap() {
         transform: "translateX(-50%)",
         width: era.pulseRings > 4 ? 130 : 90,
         height: "52%",
-        background: `linear-gradient(180deg, ${era.pulseColor}00 0%, ${era.pulseColor}22 60%, ${era.pulseColor}55 100%)`,
-        filter: "blur(16px)",
+        background: `linear-gradient(180deg, ${era.pulseColor}00 0%, ${era.pulseColor}${Math.round(era.beamOpacity * 255).toString(16).padStart(2, "0")} 60%, ${era.pulseColor}${Math.round((era.beamOpacity + 0.08) * 255).toString(16).padStart(2, "0")} 100%)`,
+        filter: eraIdx <= 1 ? "blur(20px)" : "blur(16px)",
         zIndex: 3,
         pointerEvents: "none",
         animation: "beam-pulse 3.5s ease-in-out infinite",
@@ -667,8 +703,10 @@ export default function NumberNexusMap() {
         transform: "translateX(-50%)",
         width: "38%",
         height: 120,
-        background: `radial-gradient(ellipse at 50% 0%, ${era.pulseColor}38 0%, transparent 75%)`,
-        filter: "blur(10px)",
+        background: eraIdx <= 1
+          ? `radial-gradient(ellipse at 50% 0%, ${era.pulseColor}22 0%, transparent 78%)`
+          : `radial-gradient(ellipse at 50% 0%, ${era.pulseColor}38 0%, transparent 75%)`,
+        filter: eraIdx <= 1 ? "blur(14px)" : "blur(10px)",
         zIndex: 3,
         pointerEvents: "none",
       }} />
