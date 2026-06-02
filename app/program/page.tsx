@@ -480,8 +480,17 @@ function ProgramPage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => router.push(isMeasurementRealm ? "/measurelands" : "/number-nexus")}
-                className="border border-teal-300/25 bg-black/25 px-4 py-2 text-xs font-mono font-black uppercase tracking-[0.14em] text-teal-50 backdrop-blur-md transition hover:border-teal-200/45 hover:bg-teal-950/45 focus:outline-none focus:ring-2 focus:ring-teal-300/25"
-                style={{
+                className={`px-4 py-2 text-xs font-mono font-black uppercase tracking-[0.14em] backdrop-blur-md transition focus:outline-none ${
+                  isMeasurementRealm
+                    ? "text-yellow-100/85 hover:bg-yellow-950/30"
+                    : "border border-teal-300/25 bg-black/25 text-teal-50 hover:border-teal-200/45 hover:bg-teal-950/45 focus:ring-2 focus:ring-teal-300/25"
+                }`}
+                style={isMeasurementRealm ? {
+                  borderRadius: 999,
+                  border: "1px solid rgba(200,160,48,0.32)",
+                  background: "rgba(22,14,4,0.65)",
+                  boxShadow: "inset 0 1px 0 rgba(200,160,48,0.18), 0 0 12px rgba(109,40,217,0.08)",
+                } : {
                   clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
                   boxShadow: "inset 0 1px 0 rgba(94,234,212,0.2), 0 0 18px rgba(20,184,166,0.12)",
                 }}
@@ -494,30 +503,50 @@ function ProgramPage() {
                   onClick={() => setWeekMenuOpen((v) => !v)}
                   aria-haspopup="listbox"
                   aria-expanded={weekMenuOpen}
-                  className="relative flex min-w-[170px] items-center justify-between gap-3 border border-teal-300/25 bg-black/25 px-4 py-2 text-xs font-mono font-black uppercase tracking-[0.14em] text-teal-50 backdrop-blur-md transition hover:border-teal-200/45 hover:bg-teal-950/45 focus:outline-none focus:ring-2 focus:ring-teal-300/25"
-                  style={{
+                  className={`relative flex min-w-[170px] items-center justify-between gap-3 px-4 py-2 text-xs font-mono font-black uppercase tracking-[0.14em] backdrop-blur-md transition focus:outline-none ${
+                    isMeasurementRealm
+                      ? "text-yellow-100/85 hover:bg-yellow-950/30"
+                      : "border border-teal-300/25 bg-black/25 text-teal-50 hover:border-teal-200/45 hover:bg-teal-950/45 focus:ring-2 focus:ring-teal-300/25"
+                  }`}
+                  style={isMeasurementRealm ? {
+                    borderRadius: 999,
+                    border: "1px solid rgba(200,160,48,0.32)",
+                    background: "rgba(22,14,4,0.65)",
+                    boxShadow: "inset 0 1px 0 rgba(200,160,48,0.18), 0 0 12px rgba(109,40,217,0.08)",
+                  } : {
                     clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
                     boxShadow: "inset 0 1px 0 rgba(94,234,212,0.2), 0 0 18px rgba(20,184,166,0.12)",
                   }}
                 >
                   <span className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]" />
+                    <span className={`h-1.5 w-1.5 rounded-full ${isMeasurementRealm ? "bg-yellow-200/80 shadow-[0_0_6px_rgba(200,160,48,0.6)]" : "bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]"}`} />
                     Week {weekNum}
                   </span>
-                  <svg viewBox="0 0 24 24" className={`h-3.5 w-3.5 text-teal-100/80 transition-transform ${weekMenuOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <svg viewBox="0 0 24 24" className={`h-3.5 w-3.5 transition-transform ${isMeasurementRealm ? "text-yellow-200/60" : "text-teal-100/80"} ${weekMenuOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M6 9l6 6 6-6" />
                   </svg>
                 </button>
                 {weekMenuOpen && (
                   <div
                     role="listbox"
-                    className="absolute left-0 top-[calc(100%+6px)] z-50 max-h-[260px] w-[170px] overflow-y-auto border border-teal-300/30 bg-[rgba(2,18,18,0.92)] backdrop-blur-xl"
-                    style={{
+                    className={`absolute left-0 top-[calc(100%+6px)] z-50 max-h-[260px] w-[170px] overflow-y-auto backdrop-blur-xl ${
+                      isMeasurementRealm
+                        ? "border border-yellow-900/40"
+                        : "border border-teal-300/30"
+                    }`}
+                    style={isMeasurementRealm ? {
+                      borderRadius: 14,
+                      background: "rgba(22,14,4,0.94)",
+                      boxShadow: "inset 0 1px 0 rgba(200,160,48,0.18), 0 14px 40px rgba(0,0,0,0.6), 0 0 24px rgba(109,40,217,0.12)",
+                    } : {
                       clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
+                      background: "rgba(2,18,18,0.92)",
                       boxShadow: "inset 0 1px 0 rgba(94,234,212,0.25), 0 14px 40px rgba(0,0,0,0.55), 0 0 28px rgba(20,184,166,0.18)",
                     }}
                   >
-                    <div className="px-3 py-1.5 border-b border-teal-300/15 text-[9px] font-mono font-bold uppercase tracking-[0.2em] text-teal-300/80">
+                    <div className={`px-3 py-1.5 border-b text-[9px] font-mono font-bold uppercase tracking-[0.2em] ${
+                      isMeasurementRealm ? "border-yellow-900/30 text-yellow-200/50" : "border-teal-300/15 text-teal-300/80"
+                    }`}>
                       Select Week
                     </div>
                     <ul className="py-0.5">
@@ -528,52 +557,47 @@ function ProgramPage() {
                         const isRequiredWeek = requiredWeeks.includes(targetWeek);
                         const isDoneWeek = isWeekComplete(getWeekProgress(store, year, targetWeek));
                         const status = hasPersonalizedPlan
-                          ? isCurrent
-                            ? "Current"
-                            : isRequiredWeek
-                              ? isDoneWeek
-                                ? "Required Done"
-                                : "Required"
-                              : isDoneWeek
-                                ? "Optional Done"
-                                : requiredWeeksComplete
-                                  ? "Optional"
-                                  : "Locked"
-                          : isCurrent
-                            ? "Current"
-                            : isUnlocked
-                              ? "Open"
-                              : "Locked";
+                          ? isCurrent ? "Current" : isRequiredWeek ? isDoneWeek ? "Required Done" : "Required" : isDoneWeek ? "Optional Done" : requiredWeeksComplete ? "Optional" : "Locked"
+                          : isCurrent ? "Current" : isUnlocked ? "Open" : "Locked";
                         return (
                           <li key={targetWeek}>
                             <button
                               type="button"
                               role="option"
                               aria-selected={isCurrent}
-                              onClick={() => {
-                                setWeekMenuOpen(false);
-                                goToWeek(targetWeek);
-                              }}
+                              onClick={() => { setWeekMenuOpen(false); goToWeek(targetWeek); }}
                               className={`group flex w-full items-center justify-between gap-2 px-3 py-1 text-left text-[10px] font-mono font-bold uppercase tracking-[0.12em] transition ${
-                                isCurrent
-                                  ? "bg-teal-400/15 text-teal-100"
-                                  : isUnlocked
-                                  ? "text-teal-50/85 hover:bg-teal-400/10 hover:text-teal-50"
-                                  : "text-teal-50/30 hover:bg-white/5"
+                                isMeasurementRealm
+                                  ? isCurrent
+                                    ? "bg-yellow-900/20 text-yellow-100"
+                                    : isUnlocked
+                                    ? "text-yellow-100/70 hover:bg-yellow-900/15 hover:text-yellow-100"
+                                    : "text-yellow-100/25 hover:bg-white/5"
+                                  : isCurrent
+                                    ? "bg-teal-400/15 text-teal-100"
+                                    : isUnlocked
+                                    ? "text-teal-50/85 hover:bg-teal-400/10 hover:text-teal-50"
+                                    : "text-teal-50/30 hover:bg-white/5"
                               }`}
                             >
                               <span className="flex items-center gap-1.5">
                                 {isCurrent ? (
-                                  <svg viewBox="0 0 24 24" className="h-2.5 w-2.5 text-teal-300" fill="none" stroke="currentColor" strokeWidth="3">
+                                  <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 ${isMeasurementRealm ? "text-yellow-300" : "text-teal-300"}`} fill="none" stroke="currentColor" strokeWidth="3">
                                     <path d="M5 12l5 5L20 7" />
                                   </svg>
                                 ) : (
-                                  <span className={`h-1 w-1 rounded-full ${isUnlocked ? "bg-teal-400/70" : "bg-white/20"}`} />
+                                  <span className={`h-1 w-1 rounded-full ${
+                                    isMeasurementRealm
+                                      ? isUnlocked ? "bg-yellow-600/60" : "bg-white/15"
+                                      : isUnlocked ? "bg-teal-400/70" : "bg-white/20"
+                                  }`} />
                                 )}
                                 Week {targetWeek}
                               </span>
                               <span className={`text-[8px] tracking-[0.16em] ${
-                                isCurrent ? "text-teal-300" : isUnlocked ? "text-teal-200/60" : "text-white/30"
+                                isMeasurementRealm
+                                  ? isCurrent ? "text-yellow-300/80" : isUnlocked ? "text-yellow-200/45" : "text-white/25"
+                                  : isCurrent ? "text-teal-300" : isUnlocked ? "text-teal-200/60" : "text-white/30"
                               }`}>
                                 {status}
                               </span>
@@ -629,30 +653,37 @@ function ProgramPage() {
               </div>
             ) : null}
 
-            {/* Nexus XP plate */}
+            {/* XP plate */}
             <div className="mt-5 mx-auto max-w-sm relative">
               <div
-                className="absolute -inset-[2px]"
-                style={{
+                className="absolute -inset-[2px] pointer-events-none"
+                style={isMeasurementRealm ? {
+                  borderRadius: 14,
+                  background: "linear-gradient(135deg, rgba(200,160,48,0.42), rgba(120,90,15,0.14) 40%, rgba(200,160,48,0.36))",
+                } : {
                   clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
                   background: "linear-gradient(135deg, rgba(94,234,212,0.55), rgba(20,184,166,0.15) 40%, rgba(13,148,136,0.5))",
                 }}
               />
               <div
                 className="relative px-5 py-3"
-                style={{
+                style={isMeasurementRealm ? {
+                  borderRadius: 12,
+                  background: "linear-gradient(135deg, #140e04 0%, #1e1506 50%, #2a1e08 100%)",
+                  boxShadow: "inset 0 1px 0 rgba(200,160,48,0.2), inset 0 -8px 18px rgba(0,0,0,0.5), 0 0 18px rgba(109,40,217,0.08)",
+                } : {
                   clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
                   background: "linear-gradient(135deg, #021a18 0%, #052e2b 50%, #064e47 100%)",
                   boxShadow: "inset 0 1px 0 rgba(94,234,212,0.25), inset 0 -8px 18px rgba(0,0,0,0.45)",
                 }}
               >
-                <div
-                  className="absolute inset-0 opacity-15 pointer-events-none"
-                  style={{
-                    backgroundImage: "repeating-linear-gradient(0deg, rgba(94,234,212,0.4) 0 1px, transparent 1px 3px)",
-                  }}
-                />
-                <div className="relative h-2 rounded-full bg-black/50 overflow-hidden ring-1 ring-teal-400/20">
+                {!isMeasurementRealm && (
+                  <div
+                    className="absolute inset-0 opacity-15 pointer-events-none"
+                    style={{ backgroundImage: "repeating-linear-gradient(0deg, rgba(94,234,212,0.4) 0 1px, transparent 1px 3px)" }}
+                  />
+                )}
+                <div className={`relative h-2 rounded-full bg-black/50 overflow-hidden ${isMeasurementRealm ? "ring-1 ring-yellow-900/40" : "ring-1 ring-teal-400/20"}`}>
                   <div
                     className="h-full rounded-full transition-all duration-500"
                     style={{ width: `${percent}%`, background: rt.xpBg, boxShadow: rt.xpGlow }}
