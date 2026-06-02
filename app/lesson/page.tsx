@@ -1089,6 +1089,7 @@ function LessonPage() {
                   onTimedComplete={completeLesson}
                   onExit={goBackToProgram}
                   liveContext={liveLessonContext}
+                  realmId={realmId}
                   renderCompletionCard={
                     showWeek12Lesson3Summary
                       ? (summary: LessonPerformanceSummary) => (

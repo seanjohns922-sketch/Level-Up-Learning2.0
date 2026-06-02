@@ -77,7 +77,7 @@ const TIER_CONFIG: Record<
   },
 };
 
-export function ComboCounter({ count }: { count: number }) {
+export function ComboCounter({ count, chainLabel }: { count: number; chainLabel?: string }) {
   const prevCountRef = useRef(count);
   const [broken, setBroken] = useState(false);
   const [bump, setBump] = useState(false);
@@ -178,7 +178,7 @@ export function ComboCounter({ count }: { count: number }) {
               transition: "color 0.4s ease",
             }}
           >
-            {broken ? "CHAIN BROKEN" : milestone ?? config.label}
+            {broken ? "CHAIN BROKEN" : milestone ?? (activeTier === "cold" && chainLabel ? chainLabel : config.label)}
           </span>
           {activeTier !== "cold" && !broken && (
             <span

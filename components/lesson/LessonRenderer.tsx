@@ -63,6 +63,7 @@ type LessonRendererProps = {
   onCorrect?: () => void;
   onWrong?: () => void;
   renderMode?: "lesson" | "quiz";
+  realmId?: string;
 };
 
 function ErrorCard({ message }: { message: string }) {
@@ -251,6 +252,7 @@ export function LessonRenderer({
   onCorrect,
   onWrong,
   renderMode = "lesson",
+  realmId,
 }: LessonRendererProps) {
   switch (activity.activityType) {
     case "place_value_builder": {
@@ -596,6 +598,7 @@ export function LessonRenderer({
           onCorrect={onCorrect}
           onWrong={onWrong}
           renderMode={renderMode}
+          realmId={realmId}
         />
       );
     }
@@ -608,6 +611,7 @@ export function LessonRenderer({
             onCorrect={onCorrect}
             onWrong={onWrong}
             renderMode={renderMode}
+            realmId={realmId}
           />
         );
       }

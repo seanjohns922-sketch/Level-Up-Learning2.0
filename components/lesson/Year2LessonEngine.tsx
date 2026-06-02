@@ -457,6 +457,7 @@ export function Year2LessonEngine({
   renderCompletionCard,
   onPerformanceSummary,
   liveContext,
+  realmId,
 }: {
   lesson: Lesson;
   onTimedComplete: () => void;
@@ -464,7 +465,9 @@ export function Year2LessonEngine({
   renderCompletionCard?: (summary: LessonPerformanceSummary) => ReactNode;
   onPerformanceSummary?: (summary: LessonPerformanceSummary) => void;
   liveContext?: LiveLessonContext;
+  realmId?: string;
 }) {
+  const isMeasurement = realmId === "measurement";
   const totalSeconds = 9 * 60;
   const level = useMemo(() => getLevelForLesson(lesson), [lesson]);
   const workingLevel = useMemo(() => getWorkingLevelForLesson(lesson), [lesson]);
@@ -857,6 +860,13 @@ export function Year2LessonEngine({
 
   // ── Active state ──
   function getComboBorder(count: number) {
+    if (isMeasurement) {
+      if (count >= 10) return "border-amber-400/60 ring-2 ring-amber-300/40 ring-offset-2 ring-offset-amber-950 nexus-card-glow";
+      if (count >= 8)  return "border-orange-300/70 shadow-[0_0_22px_rgba(251,146,60,0.35)]";
+      if (count >= 5)  return "border-amber-400/60 shadow-[0_0_22px_rgba(200,160,48,0.35)]";
+      if (count >= 3)  return "border-amber-600/40 shadow-[0_0_18px_rgba(180,120,20,0.28)]";
+      return "border-amber-800/20";
+    }
     if (count >= 10) return "border-teal-300 ring-2 ring-emerald-400/50 ring-offset-2 ring-offset-slate-950 nexus-card-glow";
     if (count >= 8)  return "border-orange-300/80 shadow-[0_0_22px_rgba(251,146,60,0.4)]";
     if (count >= 5)  return "border-yellow-300/80 shadow-[0_0_22px_rgba(253,224,71,0.4)]";
@@ -868,7 +878,9 @@ export function Year2LessonEngine({
 
   const statusBorder =
     status === "correct" && isNexus
-      ? "border-teal-300 nexus-correct-pulse ring-2 ring-emerald-400/50 ring-offset-2 ring-offset-slate-950"
+      ? isMeasurement
+        ? "border-amber-400/60 nexus-correct-pulse ring-2 ring-amber-300/40 ring-offset-2 ring-offset-amber-950"
+        : "border-teal-300 nexus-correct-pulse ring-2 ring-emerald-400/50 ring-offset-2 ring-offset-slate-950"
       : status === "correct"
       ? "border-emerald-300 shadow-emerald-100/50"
       : status === "wrong"
@@ -937,6 +949,7 @@ export function Year2LessonEngine({
             xpTarget={Math.max(XP_TARGET, questionsAnswered + 2)}
             hint={hint}
             comboCount={comboCount}
+            realmId={realmId}
           />
         </aside>
 
@@ -973,16 +986,34 @@ export function Year2LessonEngine({
           {currentActivity && currentQuestion ? (
             <ComboMilestonePop comboCount={comboCount}>
               <div
-                className={`rounded-[1.75rem] border-2 bg-card p-5 shadow-lg transition-all duration-500 ${statusBorder} ${statusMotion}`}
+                className={`rounded-[1.75rem] border-2 p-5 shadow-lg transition-all duration-500 ${statusBorder} ${statusMotion}`}
+                style={isMeasurement ? { background: "#fdf6e8" } : undefined}
               >
                 <div className="mb-3 flex items-center justify-between gap-2">
-                  <span className="inline-block rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-700">
+                  <span
+                    className="inline-block rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em]"
+                    style={isMeasurement ? {
+                      background: "rgba(75,40,100,0.08)",
+                      border: "1px solid rgba(139,92,246,0.3)",
+                      color: "#5b21b6",
+                    } : {
+                      background: "#f0fdf4",
+                      color: "#15803d",
+                    }}
+                  >
                     {activityLabel}
                   </span>
                   {isNexus && (
                     <span
                       className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em]"
-                      style={{
+                      style={isMeasurement ? {
+                        background: "rgba(44,15,5,0.85)",
+                        border: "1px solid rgba(200,160,48,0.45)",
+                        color: "rgba(240,210,150,1)",
+                        textShadow: "0 0 10px rgba(200,160,48,0.7)",
+                        boxShadow: "0 0 12px rgba(200,160,48,0.25)",
+                        animation: "nexusBadgePulse 2s ease-in-out infinite",
+                      } : {
                         background: "rgba(4,47,46,0.85)",
                         border: "1px solid rgba(45,212,191,0.5)",
                         color: "rgba(94,234,212,1)",
@@ -991,7 +1022,7 @@ export function Year2LessonEngine({
                         animation: "nexusBadgePulse 2s ease-in-out infinite",
                       }}
                     >
-                      ⚡ Nexus State
+                      {isMeasurement ? "✦ Surge State" : "⚡ Nexus State"}
                     </span>
                   )}
                 </div>
@@ -1004,6 +1035,7 @@ export function Year2LessonEngine({
                   renderMode="lesson"
                   onCorrect={handleCorrect}
                   onWrong={handleWrong}
+                  realmId={realmId}
                 />
               </div>
             </ComboMilestonePop>

@@ -191,12 +191,15 @@ export default function MultipleChoiceActivity({
   onCorrect,
   onWrong,
   renderMode = "lesson",
+  realmId,
 }: {
   questionData: MultipleChoiceQuestion;
   onCorrect?: () => void;
   onWrong?: () => void;
   renderMode?: "lesson" | "quiz";
+  realmId?: string;
 }) {
+  const isMeasurement = realmId === "measurement";
   const [picked, setPicked] = useState<string | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
@@ -439,19 +442,27 @@ export default function MultipleChoiceActivity({
               className={[
                 "group relative w-full rounded-2xl border px-5 py-4 text-left text-xl md:text-[1.4rem] font-extrabold tracking-tight transition-all duration-150",
                 "active:translate-y-[1px] active:shadow-none",
-                isPicked
-                  ? "border-teal-400 bg-gradient-to-br from-teal-50 to-emerald-50 text-teal-900 shadow-[0_2px_0_rgba(13,148,136,0.25),inset_0_1px_0_rgba(255,255,255,0.8)] ring-1 ring-teal-300/60"
-                  : "border-slate-200 bg-white text-slate-800 hover:-translate-y-[1px] hover:border-teal-300 hover:bg-teal-50/30 hover:shadow-[0_4px_12px_rgba(13,148,136,0.08)]",
+                isMeasurement
+                  ? isPicked
+                    ? "border-amber-500/60 bg-amber-50 text-amber-900 shadow-[0_2px_0_rgba(180,83,9,0.2),inset_0_1px_0_rgba(255,255,255,0.8)] ring-1 ring-amber-400/40"
+                    : "border-amber-800/25 bg-[#fdf6e8] text-slate-800 hover:-translate-y-[1px] hover:border-amber-600/40 hover:shadow-[0_4px_12px_rgba(180,83,9,0.1)]"
+                  : isPicked
+                    ? "border-teal-400 bg-gradient-to-br from-teal-50 to-emerald-50 text-teal-900 shadow-[0_2px_0_rgba(13,148,136,0.25),inset_0_1px_0_rgba(255,255,255,0.8)] ring-1 ring-teal-300/60"
+                    : "border-slate-200 bg-white text-slate-800 hover:-translate-y-[1px] hover:border-teal-300 hover:bg-teal-50/30 hover:shadow-[0_4px_12px_rgba(13,148,136,0.08)]",
               ].join(" ")}
             >
-              {/* Left accent bar (appears on hover/picked) */}
+              {/* Left accent bar */}
               <span
                 aria-hidden
                 className={[
                   "absolute left-0 top-2 bottom-2 w-[3px] rounded-full transition-opacity",
-                  isPicked
-                    ? "bg-gradient-to-b from-teal-400 to-emerald-500 opacity-100"
-                    : "bg-teal-400 opacity-0 group-hover:opacity-60",
+                  isMeasurement
+                    ? isPicked
+                      ? "opacity-100 bg-gradient-to-b from-amber-400 to-amber-600"
+                      : "opacity-0 group-hover:opacity-60 bg-amber-500"
+                    : isPicked
+                      ? "bg-gradient-to-b from-teal-400 to-emerald-500 opacity-100"
+                      : "bg-teal-400 opacity-0 group-hover:opacity-60",
                 ].join(" ")}
               />
               <MathFormattedText text={option} fractionSize="md" />
@@ -465,7 +476,7 @@ export default function MultipleChoiceActivity({
             type="button"
             onClick={submitMultiSelect}
             disabled={selected.length === 0 || submitted}
-            className="rounded-2xl bg-teal-600 px-5 py-3 text-lg font-black text-white transition disabled:cursor-not-allowed disabled:bg-gray-300"
+            className={`rounded-2xl px-5 py-3 text-lg font-black text-white transition disabled:cursor-not-allowed disabled:bg-gray-300 ${isMeasurement ? "bg-amber-700 hover:bg-amber-600" : "bg-teal-600"}`}
           >
             Check answer
           </button>

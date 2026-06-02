@@ -8,12 +8,6 @@ import { LessonStatStrip } from "@/components/lesson/LessonStatStrip";
 import { ComboCounter } from "@/components/lesson/ComboCounter";
 import { MathFormattedText } from "@/components/FractionText";
 
-/**
- * Compact HUD rail used by lesson runners.
- * - Landscape (lg+): rendered as a sticky left rail (~320px) so the question card has the full right column.
- * - Mobile/portrait: stacked above the question card.
- * Hint is collapsed by default (chip) and can be expanded inline.
- */
 export function LessonHUDRail({
   levelNumber,
   week,
@@ -34,6 +28,7 @@ export function LessonHUDRail({
   xpDisplayRightLabel,
   hint,
   comboCount = 0,
+  realmId,
 }: {
   levelNumber?: number;
   week?: number;
@@ -54,8 +49,10 @@ export function LessonHUDRail({
   xpDisplayRightLabel?: string;
   hint?: string | null;
   comboCount?: number;
+  realmId?: string;
 }) {
   const [hintOpen, setHintOpen] = useState(false);
+  const isMeasurement = realmId === "measurement";
 
   const showCrumb =
     typeof levelNumber === "number" &&
@@ -68,28 +65,41 @@ export function LessonHUDRail({
       <div
         aria-hidden
         className="absolute -inset-[2px] pointer-events-none"
-        style={{
-          clipPath:
-            "polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px)",
-          background:
-            "linear-gradient(135deg, rgba(94,234,212,0.4) 0%, rgba(15,118,110,0.2) 50%, rgba(94,234,212,0.3) 100%)",
+        style={isMeasurement ? {
+          borderRadius: 18,
+          background: "linear-gradient(135deg, rgba(200,160,48,0.42) 0%, rgba(120,90,15,0.18) 50%, rgba(200,160,48,0.36) 100%)",
+        } : {
+          clipPath: "polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px)",
+          background: "linear-gradient(135deg, rgba(94,234,212,0.4) 0%, rgba(15,118,110,0.2) 50%, rgba(94,234,212,0.3) 100%)",
         }}
       />
       <div
         className="relative p-3.5 space-y-3 overflow-hidden"
-        style={{
-          clipPath:
-            "polygon(13px 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%, 0 13px)",
-          background:
-            "linear-gradient(135deg, #021716 0%, #042925 50%, #053b35 100%)",
-          boxShadow:
-            "inset 0 1px 0 rgba(94,234,212,0.18), inset 0 -10px 20px rgba(0,0,0,0.45)",
+        style={isMeasurement ? {
+          borderRadius: 16,
+          background: "linear-gradient(135deg, #140e04 0%, #2a1a06 50%, #3d2808 100%)",
+          boxShadow: "inset 0 1px 0 rgba(200,160,48,0.18), inset 0 -10px 20px rgba(0,0,0,0.45), 0 0 18px rgba(109,40,217,0.08)",
+        } : {
+          clipPath: "polygon(13px 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%, 0 13px)",
+          background: "linear-gradient(135deg, #021716 0%, #042925 50%, #053b35 100%)",
+          boxShadow: "inset 0 1px 0 rgba(94,234,212,0.18), inset 0 -10px 20px rgba(0,0,0,0.45)",
         }}
       >
         {/* Compact crumb + title */}
         {showCrumb && (
           <div>
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-teal-300/30 bg-teal-500/10 px-2.5 py-1 text-[9px] font-mono font-bold uppercase tracking-[0.2em] text-teal-200/90">
+            <div
+              className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[9px] font-mono font-bold uppercase tracking-[0.2em]"
+              style={isMeasurement ? {
+                border: "1px solid rgba(200,160,48,0.35)",
+                background: "rgba(60,30,5,0.4)",
+                color: "rgba(240,210,150,0.88)",
+              } : {
+                border: "1px solid rgba(94,234,212,0.3)",
+                background: "rgba(94,234,212,0.1)",
+                color: "rgba(167,243,208,0.9)",
+              }}
+            >
               L{levelNumber} · W{week} · L{lessonNumber}
             </div>
             {lessonTitle ? (
@@ -98,7 +108,18 @@ export function LessonHUDRail({
               </div>
             ) : null}
             {targetLabel ? (
-              <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-emerald-300/30 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-[0.16em] text-emerald-100">
+              <div
+                className="mt-2 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-[0.16em]"
+                style={isMeasurement ? {
+                  border: "1px solid rgba(139,92,246,0.3)",
+                  background: "rgba(109,40,217,0.12)",
+                  color: "rgba(196,181,253,0.9)",
+                } : {
+                  border: "1px solid rgba(110,231,183,0.3)",
+                  background: "rgba(110,231,183,0.1)",
+                  color: "#d1fae5",
+                }}
+              >
                 {targetLabel}
               </div>
             ) : null}
@@ -123,17 +144,21 @@ export function LessonHUDRail({
           </div>
         </div>
 
-        {/* Stats: 3-col on mobile, 1-col on lg rail */}
+        {/* Stats strip */}
         <div className="lg:[&>div]:!grid-cols-1">
           <LessonStatStrip
             questionsAnswered={questionsAnswered}
             correctAnswers={correctAnswers}
             accuracy={accuracy}
+            realmId={realmId}
           />
         </div>
 
         {/* Combo chain counter */}
-        <ComboCounter count={comboCount} />
+        <ComboCounter
+          count={comboCount}
+          chainLabel={isMeasurement ? "MEASURE CHAIN" : undefined}
+        />
 
         {/* Collapsible hint */}
         {hint ? (
@@ -141,37 +166,55 @@ export function LessonHUDRail({
             <button
               type="button"
               onClick={() => setHintOpen((v) => !v)}
-              className="group relative flex w-full items-center gap-2 rounded-lg border border-amber-400/30 bg-amber-500/10 px-3 py-2 text-left transition hover:bg-amber-500/15"
-              style={{ boxShadow: hintOpen ? "0 0 14px rgba(251,191,36,0.18)" : undefined }}
+              className="group relative flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left transition"
+              style={isMeasurement ? {
+                border: "1px solid rgba(200,160,48,0.3)",
+                background: hintOpen ? "rgba(200,160,48,0.1)" : "rgba(200,160,48,0.07)",
+                boxShadow: hintOpen ? "0 0 14px rgba(200,160,48,0.15)" : undefined,
+              } : {
+                border: "1px solid rgba(251,191,36,0.3)",
+                background: "rgba(245,158,11,0.1)",
+                boxShadow: hintOpen ? "0 0 14px rgba(251,191,36,0.18)" : undefined,
+              }}
             >
               <span
                 className="flex h-6 w-6 flex-shrink-0 items-center justify-center"
-                style={{
-                  clipPath:
-                    "polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)",
-                  background:
-                    "radial-gradient(circle at 35% 30%, #fbbf24 0%, #b45309 65%, #451a03 100%)",
+                style={isMeasurement ? {
+                  borderRadius: "50%",
+                  background: "radial-gradient(circle at 35% 30%, #c8a030 0%, #4a3010 65%, #1a0e04 100%)",
+                  boxShadow: "inset 0 0 4px rgba(200,160,48,0.6)",
+                } : {
+                  clipPath: "polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)",
+                  background: "radial-gradient(circle at 35% 30%, #fbbf24 0%, #b45309 65%, #451a03 100%)",
                   boxShadow: "inset 0 0 4px rgba(254,240,138,0.6)",
                 }}
               >
                 <Lightbulb className="h-3 w-3 text-amber-50" />
               </span>
-              <span className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-amber-200">
-                Hint
+              <span
+                className="text-[10px] font-mono font-bold uppercase tracking-[0.2em]"
+                style={{ color: isMeasurement ? "rgba(240,210,150,0.85)" : "rgba(253,230,138,0.9)" }}
+              >
+                {isMeasurement ? "Clue" : "Hint"}
               </span>
               <ChevronDown
-                className={`ml-auto h-3.5 w-3.5 text-amber-200/70 transition-transform ${
-                  hintOpen ? "rotate-180" : ""
-                }`}
+                className={`ml-auto h-3.5 w-3.5 transition-transform ${hintOpen ? "rotate-180" : ""}`}
+                style={{ color: isMeasurement ? "rgba(240,210,150,0.6)" : "rgba(253,230,138,0.7)" }}
               />
             </button>
             {hintOpen && (
               <div
-                className="mt-1.5 rounded-lg border border-amber-400/25 px-3 py-2.5 text-[13px] font-medium leading-relaxed text-amber-50/95"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #1a1305 0%, #2e1f05 100%)",
+                className="mt-1.5 rounded-lg px-3 py-2.5 text-[13px] font-medium leading-relaxed"
+                style={isMeasurement ? {
+                  border: "1px solid rgba(200,160,48,0.22)",
+                  background: "linear-gradient(135deg, #1a1304 0%, #2e1f05 100%)",
+                  boxShadow: "inset 0 1px 0 rgba(200,160,48,0.15)",
+                  color: "rgba(240,220,175,0.92)",
+                } : {
+                  border: "1px solid rgba(251,191,36,0.25)",
+                  background: "linear-gradient(135deg, #1a1305 0%, #2e1f05 100%)",
                   boxShadow: "inset 0 1px 0 rgba(251,191,36,0.18)",
+                  color: "rgba(255,251,235,0.95)",
                 }}
               >
                 <MathFormattedText text={hint} />
