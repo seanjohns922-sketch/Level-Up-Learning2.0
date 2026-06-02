@@ -13,6 +13,7 @@ import {
 import { readBestChain } from "@/lib/best-chain";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
+import StudentAvatar from "@/components/avatar/StudentAvatar";
 import { supabase } from "@/lib/supabase";
 
 const YEAR = "Prep";
