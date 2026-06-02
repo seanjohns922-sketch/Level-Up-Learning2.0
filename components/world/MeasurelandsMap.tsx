@@ -24,16 +24,16 @@ import { supabase } from "@/lib/supabase";
 
 const BG_IMAGE = "/images/measurelands-home-bg.jpg";
 
-// Warm magical palette — teal, gold, soft purple, warm twilight blue.
+// Magical clockwork-town palette — deep navy night, warm amber, wizard purple, teal accents.
 const PALETTE = {
-  primary: "#f5b042",   // warm gold
-  primaryDeep: "#c98018",
+  primary: "#fbbf24",   // warm amber (clock glow)
+  primaryDeep: "#b45309",
   teal: "#5eead4",
   tealDeep: "#0d9488",
   purple: "#a78bfa",
   blue: "#7dd3fc",
-  ink: "#1a1330",
-  inkDeep: "#0d0820",
+  ink: "#0a0f24",
+  inkDeep: "#050818",
 } as const;
 
 // ─── Measurelands districts (Ground Level, 8 weeks) ───────────────────────────
