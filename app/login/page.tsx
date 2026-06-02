@@ -38,6 +38,11 @@ type DemoAccessDebug = {
   submittedCodeLength?: number;
   submittedTrimmedLength?: number;
   trimmedComparisonPasses?: boolean;
+  status?: number;
+  contentType?: string | null;
+  rawText?: string | null;
+  error?: string | null;
+  message?: string | null;
 };
 
 const CLASSES_KEY = "lul_classes_v1";
@@ -363,10 +368,25 @@ export default function LoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code: demoCode.trim() }),
       });
-      const payload = (await response.json()) as { ok?: boolean; debug?: DemoAccessDebug };
+      const contentType = response.headers.get("content-type");
+      let payload: { ok?: boolean; debug?: DemoAccessDebug; error?: string; message?: string } | null = null;
+      let rawText: string | null = null;
+
+      if (contentType?.includes("application/json")) {
+        payload = (await response.json()) as { ok?: boolean; debug?: DemoAccessDebug; error?: string; message?: string };
+      } else {
+        rawText = await response.text();
+      }
 
       if (!response.ok) {
-        setDemoDebug(payload.debug ?? null);
+        setDemoDebug({
+          ...(payload?.debug ?? {}),
+          status: response.status,
+          contentType,
+          rawText,
+          error: payload?.error ?? null,
+          message: payload?.message ?? null,
+        });
         setDemoError("Access code not recognised.");
         setDemoSubmitting(false);
         return;
@@ -700,12 +720,17 @@ export default function LoginPage() {
                 <div>{demoError}</div>
                 {demoDebug ? (
                   <div className="mt-2 space-y-1 text-[11px] font-semibold tracking-[0.04em] text-red-100/80">
+                    <div>status: {demoDebug.status ?? 0}</div>
+                    <div>content type: {demoDebug.contentType ?? "null"}</div>
                     <div>feature enabled: {String(demoDebug.featureEnabledRaw ?? "null")}</div>
                     <div>has expected code: {String(Boolean(demoDebug.hasExpectedCode))}</div>
                     <div>expected length: {demoDebug.expectedCodeLength ?? 0}</div>
                     <div>submitted length: {demoDebug.submittedCodeLength ?? 0}</div>
                     <div>submitted trimmed length: {demoDebug.submittedTrimmedLength ?? 0}</div>
                     <div>trimmed match: {String(Boolean(demoDebug.trimmedComparisonPasses))}</div>
+                    {demoDebug.error ? <div>error: {demoDebug.error}</div> : null}
+                    {demoDebug.message ? <div>message: {demoDebug.message}</div> : null}
+                    {demoDebug.rawText ? <div>raw: {demoDebug.rawText.slice(0, 120)}</div> : null}
                   </div>
                 ) : null}
               </div>
