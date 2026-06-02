@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { getActiveStudentIdentity, hasActiveStudentSeenIntro, markActiveStudentIntroSeen, setActiveStudentProfile } from "@/lib/studentIdentity";
@@ -108,6 +108,7 @@ export default function LoginPage() {
   const [studentError, setStudentError] = useState<string | null>(null);
   const [showPin, setShowPin] = useState(false);
   const doorTapCountRef = useRef(0);
+  const lastDoorTapAtRef = useRef(0);
   const [showDemoModal, setShowDemoModal] = useState(false);
   const [demoCode, setDemoCode] = useState("");
   const [demoError, setDemoError] = useState<string | null>(null);
@@ -118,6 +119,16 @@ export default function LoginPage() {
   const [teacherError, setTeacherError] = useState<string | null>(null);
   const [teacherLoading, setTeacherLoading] = useState(false);
   const demoAccessEnabled = isDemoAccessFeatureEnabled();
+
+  useEffect(() => {
+    console.log("[DemoAccess] demo enabled:", demoAccessEnabled);
+  }, [demoAccessEnabled]);
+
+  useEffect(() => {
+    if (showDemoModal) {
+      console.log("[DemoAccess] modal opened");
+    }
+  }, [showDemoModal]);
 
   function saveClasses(next: ClassesStore) {
     setClasses(next);
@@ -308,10 +319,24 @@ export default function LoginPage() {
     router.push(dest);
   }
 
-  function handleSecretDoorTap() {
-    if (!demoAccessEnabled) return;
+  function registerSecretDoorTap(source: "click" | "pointer" | "touch") {
+    if (!demoAccessEnabled) {
+      console.log("[DemoAccess] tap ignored because feature is disabled");
+      return;
+    }
+
+    const now = Date.now();
+    if (now - lastDoorTapAtRef.current < 300) {
+      return;
+    }
+    lastDoorTapAtRef.current = now;
+
     setDemoError(null);
     doorTapCountRef.current += 1;
+    console.log("[DemoAccess] hotspot click count", {
+      source,
+      count: doorTapCountRef.current,
+    });
     if (doorTapCountRef.current >= 5) {
       doorTapCountRef.current = 0;
       setShowDemoModal(true);
@@ -397,14 +422,18 @@ export default function LoginPage() {
             type="button"
             aria-hidden="true"
             tabIndex={-1}
-            onClick={handleSecretDoorTap}
+            onClick={() => registerSecretDoorTap("click")}
+            onPointerUp={() => registerSecretDoorTap("pointer")}
+            onTouchEnd={() => registerSecretDoorTap("touch")}
             className="absolute z-10 cursor-default bg-transparent"
             style={{
-              left: "69%",
-              top: "61%",
-              width: "7.5rem",
-              height: "10rem",
+              left: "70.5%",
+              top: "59%",
+              width: "10rem",
+              height: "14rem",
               opacity: 0,
+              transform: "translate(-50%, -50%)",
+              touchAction: "manipulation",
             }}
           >
             Hidden demo access hotspot
