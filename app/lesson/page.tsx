@@ -1006,6 +1006,7 @@ function LessonPage() {
               completionMode={year === "Year 1" || isGroundCustomLesson ? "time_only" : "question_or_time"}
               scoreCap={10}
               liveContext={liveLessonContext}
+              realmId={realmId}
               renderCompletionCard={
                 isGroundCustomLesson
                   ? renderPrepCompletionCard

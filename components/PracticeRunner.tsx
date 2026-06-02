@@ -212,6 +212,7 @@ export function PracticeRunner({
   renderCompletionCard,
   onPerformanceSummary,
   liveContext,
+  realmId,
 }: {
   minutes?: number;
   getTask: (ctx?: {
@@ -227,7 +228,9 @@ export function PracticeRunner({
   renderCompletionCard?: (summary: LessonPerformanceSummary) => ReactNode;
   onPerformanceSummary?: (summary: LessonPerformanceSummary) => void;
   liveContext?: LiveLessonContext;
+  realmId?: string;
 }) {
+  const isMeasurement = realmId === "measurement";
   const totalSeconds = minutes * 60;
   const questionLimit =
     completionMode === "question_or_time" ? MAX_LESSON_QUESTIONS : Number.POSITIVE_INFINITY;
@@ -714,6 +717,13 @@ export function PracticeRunner({
 
   // ── Active state ──
   function getComboBorder(count: number) {
+    if (isMeasurement) {
+      if (count >= 10) return "border-amber-400/60 ring-2 ring-amber-300/40 ring-offset-2 ring-offset-amber-950 nexus-card-glow";
+      if (count >= 8)  return "border-orange-300/70 shadow-[0_0_22px_rgba(251,146,60,0.35)]";
+      if (count >= 5)  return "border-amber-400/60 shadow-[0_0_22px_rgba(200,160,48,0.35)]";
+      if (count >= 3)  return "border-amber-600/40 shadow-[0_0_18px_rgba(180,120,20,0.28)]";
+      return "border-amber-800/20";
+    }
     if (count >= 10) return "border-teal-300 shadow-[0_0_38px_rgba(45,212,191,0.65)] ring-2 ring-emerald-400/40 ring-offset-2 ring-offset-slate-950";
     if (count >= 8) return "border-orange-300/80 shadow-[0_0_22px_rgba(251,146,60,0.4)]";
     if (count >= 5) return "border-yellow-300/80 shadow-[0_0_22px_rgba(253,224,71,0.4)]";
@@ -777,6 +787,7 @@ export function PracticeRunner({
             xpDisplayRightLabel={hudXPRightLabel}
             hint={hint}
             comboCount={comboCount}
+            realmId={realmId}
           />
         </aside>
 
@@ -796,11 +807,22 @@ export function PracticeRunner({
 
           {/* Main task card */}
           <div
-            className={`rounded-[1.75rem] border-2 bg-card p-5 shadow-lg transition-all duration-300 ${statusBorder} ${statusMotion}`}
+            className={`rounded-[1.75rem] border-2 p-5 shadow-lg transition-all duration-300 ${statusBorder} ${statusMotion}`}
+            style={isMeasurement ? { background: "#fdf6e8" } : undefined}
           >
         {/* Activity type label */}
         <div className="mb-3">
-          <span className="inline-block rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-700">
+          <span
+            className="inline-block rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em]"
+            style={isMeasurement ? {
+              background: "rgba(75,40,100,0.08)",
+              border: "1px solid rgba(139,92,246,0.3)",
+              color: "#5b21b6",
+            } : {
+              background: "#f0fdf4",
+              color: "#15803d",
+            }}
+          >
             {task.kind.replace(/([A-Z])/g, " $1").toUpperCase()}
           </span>
         </div>
@@ -839,7 +861,7 @@ export function PracticeRunner({
                   {Array.from({ length: t.groups }).map((_: unknown, gi: number) => (
                     <div key={gi} className="flex items-center gap-2">
                       {Array.from({ length: t.perGroup }).map((__: unknown, di: number) => (
-                        <span key={di} className="inline-block h-5 w-5 rounded-full bg-teal-600" />
+                        <span key={di} className={`inline-block h-5 w-5 rounded-full ${isMeasurement ? "bg-amber-700" : "bg-teal-600"}`} />
                       ))}
                     </div>
                   ))}
@@ -861,7 +883,7 @@ export function PracticeRunner({
             <Dots count={(task as CountTask).count} />
             <div className="flex items-center gap-3">
               <input value={typed} onChange={(e) => setTyped(e.target.value.replace(/[^\d]/g, ""))} inputMode="numeric" placeholder="Type your answer" className="flex-1 px-4 py-3 rounded-2xl border border-border text-xl font-bold bg-card" />
-              <button onClick={check} className="px-5 py-3 rounded-2xl bg-teal-600 text-white font-extrabold text-xl hover:bg-teal-700 transition">Check</button>
+              <button onClick={check} className={`px-5 py-3 rounded-2xl text-white font-extrabold text-xl transition ${isMeasurement ? "bg-amber-700 hover:bg-amber-600" : "bg-teal-600 hover:bg-teal-700"}`}>Check</button>
             </div>
           </div>
         )}
@@ -895,7 +917,7 @@ export function PracticeRunner({
           return (
             <div className="grid gap-4">
               <div className="flex items-center justify-between gap-3">
-                <button type="button" onClick={() => { speak(t.speechText ?? String(t.targetNumber)); setHasPlayed(true); }} className="px-5 py-3 rounded-2xl bg-teal-600 text-white font-extrabold text-xl hover:bg-teal-700 transition">🔊 Listen</button>
+                <button type="button" onClick={() => { speak(t.speechText ?? String(t.targetNumber)); setHasPlayed(true); }} className={`px-5 py-3 rounded-2xl text-white font-extrabold text-xl transition ${isMeasurement ? "bg-amber-700 hover:bg-amber-600" : "bg-teal-600 hover:bg-teal-700"}`}>🔊 Listen</button>
                 <div className="text-sm font-bold text-muted-foreground">{hasPlayed ? "Now tap the number." : "Tap Listen first."}</div>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -914,7 +936,7 @@ export function PracticeRunner({
             <div className="grid gap-4">
               <div className="flex items-center justify-between gap-3">
                 <div className="text-sm text-muted-foreground">Tap the correct number tile.</div>
-                <button type="button" onClick={() => speak(String(t.targetNumber))} className="px-3 py-2 rounded-xl bg-teal-600 text-white font-bold hover:bg-teal-700 transition">🔊 Hear number</button>
+                <button type="button" onClick={() => speak(String(t.targetNumber))} className={`px-3 py-2 rounded-xl text-white font-bold transition ${isMeasurement ? "bg-amber-700 hover:bg-amber-600" : "bg-teal-600 hover:bg-teal-700"}`}>🔊 Hear number</button>
               </div>
               <div className="grid grid-cols-5 sm:grid-cols-6 gap-2">
                 {t.tiles.map((n: number) => (
