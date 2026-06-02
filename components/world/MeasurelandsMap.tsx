@@ -523,21 +523,21 @@ export default function MeasurelandsMap() {
             cursor: launching ? "default" : "pointer",
             padding: "22px 60px",
             borderRadius: 999,
-            border: "2px solid rgba(251,191,36,0.85)",
-            background: "linear-gradient(180deg, #fbbf24 0%, #d97706 55%, #b45309 100%)",
-            color: "#1a0800",
+            border: "2px solid rgba(200,160,48,0.65)",
+            background: "linear-gradient(135deg, #2a1a04 0%, #5c3d0e 38%, #8b6520 72%, #c8a030 100%)",
+            color: "#faf0d0",
             fontSize: 20,
             fontWeight: 900,
             letterSpacing: "0.2em",
             fontFamily: "ui-monospace, monospace",
-            textShadow: "0 1px 0 rgba(255,255,255,0.4)",
+            textShadow: "0 1px 4px rgba(0,0,0,0.5)",
             boxShadow: [
-              "0 0 0 4px rgba(251,191,36,0.2)",
-              "0 0 40px rgba(251,191,36,0.58)",
-              "0 0 90px rgba(217,119,6,0.36)",
+              "0 0 0 4px rgba(200,160,48,0.18)",
+              "0 0 40px rgba(200,160,48,0.42)",
+              "0 0 90px rgba(109,40,217,0.18)",
               "0 14px 32px rgba(0,0,0,0.55)",
-              "inset 0 2px 0 rgba(255,255,255,0.45)",
-              "inset 0 -4px 0 rgba(0,0,0,0.22)",
+              "inset 0 2px 0 rgba(200,160,48,0.3)",
+              "inset 0 -4px 0 rgba(0,0,0,0.3)",
             ].join(", "),
             transform: launching ? "scale(1.08)" : "scale(1)",
             transition: "transform 0.25s ease",
@@ -602,21 +602,21 @@ export default function MeasurelandsMap() {
         @keyframes ml-guided-pulse {
           0%, 100% {
             box-shadow:
-              0 0 0 4px rgba(251,191,36,0.16),
-              0 0 38px rgba(251,191,36,0.54),
-              0 0 90px rgba(217,119,6,0.34),
+              0 0 0 4px rgba(200,160,48,0.18),
+              0 0 38px rgba(200,160,48,0.42),
+              0 0 90px rgba(109,40,217,0.18),
               0 14px 32px rgba(0,0,0,0.55),
-              inset 0 2px 0 rgba(255,255,255,0.35),
-              inset 0 -4px 0 rgba(0,0,0,0.25);
+              inset 0 2px 0 rgba(200,160,48,0.3),
+              inset 0 -4px 0 rgba(0,0,0,0.3);
           }
           50% {
             box-shadow:
-              0 0 0 6px rgba(253,230,138,0.24),
-              0 0 58px rgba(253,230,138,0.74),
-              0 0 120px rgba(217,119,6,0.46),
+              0 0 0 6px rgba(200,160,48,0.28),
+              0 0 58px rgba(200,160,48,0.6),
+              0 0 120px rgba(109,40,217,0.28),
               0 14px 32px rgba(0,0,0,0.55),
-              inset 0 2px 0 rgba(255,255,255,0.42),
-              inset 0 -4px 0 rgba(0,0,0,0.25);
+              inset 0 2px 0 rgba(200,160,48,0.38),
+              inset 0 -4px 0 rgba(0,0,0,0.3);
           }
         }
       `}</style>
