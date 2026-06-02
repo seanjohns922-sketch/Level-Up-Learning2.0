@@ -411,7 +411,7 @@ function ProgramPage() {
               : isPrep
               ? "brightness(1.22) contrast(1.05) saturate(1.18)"
               : getHomeBgFilter(levelNum),
-            imageRendering: isMeasurementRealm ? "high-quality" : undefined,
+            imageRendering: isMeasurementRealm ? "auto" : undefined,
             WebkitBackfaceVisibility: isMeasurementRealm ? "hidden" : undefined,
           }}
         />
@@ -707,7 +707,11 @@ function ProgramPage() {
       </div>
 
       {/* ── Horizontal lesson dashboard ── */}
-      <div className="relative z-10 px-4 pb-16 pt-10 md:px-6 md:pt-16">
+      <div
+        className={`relative z-10 px-4 pb-16 md:px-6 ${
+          isMeasurementRealm ? "pt-16 md:pt-24" : "pt-10 md:pt-16"
+        }`}
+      >
         <div className="max-w-6xl mx-auto">
           {hasPersonalizedPlan ? (
             <div className="mb-6 grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
