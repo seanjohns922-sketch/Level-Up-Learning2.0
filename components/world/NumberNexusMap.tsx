@@ -13,6 +13,10 @@ import {
   getWeekProgress,
   isWeekComplete,
 } from "@/lib/program-progress";
+import { readBestChain } from "@/lib/best-chain";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
+import { getActiveStudentProfile } from "@/lib/studentIdentity";
+import { supabase } from "@/lib/supabase";
 
 // ─── Era system — ONE evolving city, five real background images ─────────────────
 // Prep=0  Y1-2=1  Y3-4=2  Y5=3  Y6=4
@@ -365,16 +369,6 @@ function PlayerCharacter({ gender }: { gender: "boy" | "girl" }) {
   );
 }
 
-// ─── Main component ─────────────────────────────────────────────────────────────
-function readBestChainFromStorage() {
-  if (typeof window === "undefined") return 0;
-  try {
-    return Number(localStorage.getItem("lul_best_nexus_chain_v1") ?? 0);
-  } catch {
-    return 0;
-  }
-}
-
 function readGenderFromStorage(): "boy" | "girl" {
   if (typeof window === "undefined") return "boy";
   try {
@@ -455,11 +449,12 @@ export default function NumberNexusMap() {
   const router   = useRouter();
   const [progress] = useState(() => readProgress());
   const [store]    = useState(() => readProgramStore());
-  const [bestChain] = useState(readBestChainFromStorage);
   const [gender] = useState<"boy" | "girl">(readGenderFromStorage);
   const [launching, setLaunching] = useState(false);
 
   const year       = progress?.year ?? "Year 1";
+  const [bestChain] = useState(() => readBestChain("number", year));
+  const [classBestChain, setClassBestChain] = useState<number | null>(null);
   const isPrep     = year === "Prep";
   const levelNum   = isPrep ? 0 : parseInt(year.replace(/\D/g, ""), 10) || 1;
   const levelLabel = isPrep ? "PREP" : `LV ${levelNum}`;
@@ -490,6 +485,72 @@ export default function NumberNexusMap() {
     }
     return xp;
   }, [store, year]);
+
+  useEffect(() => {
+    if (isDemoPreviewMode()) {
+      setClassBestChain(null);
+      return;
+    }
+
+    const profile = getActiveStudentProfile();
+    const classId = profile?.classId?.trim();
+    if (!classId) {
+      setClassBestChain(null);
+      return;
+    }
+
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        const workingLevel = year;
+        const readMaxBestChain = async (filterWorkingLevel: boolean) => {
+          let query = supabase
+            .from("student_lesson_attempts")
+            .select("summary")
+            .eq("class_id", classId)
+            .eq("realm_id", "number");
+
+          if (filterWorkingLevel) {
+            query = query.eq("working_level", workingLevel);
+          }
+
+          const { data, error } = await query;
+          if (error) throw error;
+
+          let max = 0;
+          for (const row of data ?? []) {
+            const summary =
+              row.summary && typeof row.summary === "object" && !Array.isArray(row.summary)
+                ? (row.summary as Record<string, unknown>)
+                : null;
+            const candidate = Number(summary?.bestChain ?? summary?.best_chain ?? 0);
+            if (Number.isFinite(candidate) && candidate > max) {
+              max = candidate;
+            }
+          }
+
+          return max > 0 ? max : null;
+        };
+
+        const scopedBest = await readMaxBestChain(true);
+        const fallbackBest = scopedBest ?? (await readMaxBestChain(false));
+
+        if (!cancelled) {
+          setClassBestChain(fallbackBest);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.warn("[NumberNexusMap] Failed to load class best chain:", error);
+          setClassBestChain(null);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [year]);
 
   function zoneState(zone: (typeof DISTRICT_ZONES)[number]): "complete" | "current" | "locked" {
     const weeks = Array.from({ length: zone.weekEnd - zone.weekStart + 1 }, (_, i) => zone.weekStart + i);
@@ -749,13 +810,18 @@ export default function NumberNexusMap() {
             <span style={{ fontSize: 9, fontWeight: 900, letterSpacing: "0.18em", color: "#5eead4", fontFamily: "ui-monospace,monospace", textShadow: "0 0 10px rgba(20,184,166,0.55)" }}>{label}</span>
           </button>
         ))}
-        {bestChain > 0 && (
-          <div style={{ ...hudBtn, cursor: "default" }}>
-            <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: "0.12em", color: "rgba(94,234,212,0.5)", fontFamily: "ui-monospace,monospace", textAlign: "center", lineHeight: 1.4 }}>{"BEST\nCHAIN"}</span>
-            <span style={{ fontSize: 18, fontWeight: 900, color: "#5eead4", lineHeight: 1 }}>{bestChain}</span>
-            <span style={{ fontSize: 9, color: "#fbbf24" }}>⚡</span>
-          </div>
-        )}
+        <div style={{ ...hudBtn, cursor: "default", gap: 4 }}>
+          <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: "0.12em", color: "rgba(94,234,212,0.5)", fontFamily: "ui-monospace,monospace", textAlign: "center", lineHeight: 1.15 }}>
+            {"MY BEST"}
+          </span>
+          <span style={{ fontSize: 18, fontWeight: 900, color: "#5eead4", lineHeight: 1 }}>{bestChain}</span>
+          <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: "0.12em", color: "rgba(251,191,36,0.6)", fontFamily: "ui-monospace,monospace", textAlign: "center", lineHeight: 1.15, marginTop: 2 }}>
+            {"CLASS BEST"}
+          </span>
+          <span style={{ fontSize: 14, fontWeight: 900, color: "#fbbf24", lineHeight: 1 }}>
+            {classBestChain ?? "—"}
+          </span>
+        </div>
       </div>
 
       {/* ── Bottom nav ── */}

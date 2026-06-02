@@ -1,6 +1,7 @@
 "use client";
 
 import { ACTIVE_STUDENT_KEY, clearScopedProgress } from "@/data/progress";
+import { clearLegacyBestChainStorage } from "@/lib/best-chain";
 import { clearScopedProgramStore } from "@/lib/program-progress";
 
 const LEGACY_STUDENT_ID_KEY = "lul_student_id";
@@ -64,6 +65,7 @@ export function markActiveStudentIntroSeen(studentId?: string | null) {
 
 export function clearActiveStudentSession() {
   if (typeof window === "undefined") return;
+  clearLegacyBestChainStorage();
   localStorage.removeItem(ACTIVE_STUDENT_KEY);
   localStorage.removeItem(ACTIVE_STUDENT_PROFILE_KEY);
   localStorage.removeItem(LEGACY_STUDENT_ID_KEY);
@@ -81,6 +83,7 @@ export function setActiveStudentProfile(
   profile?: { displayName?: string | null; yearLevel?: string | null }
 ) {
   if (typeof window === "undefined") return;
+  clearLegacyBestChainStorage();
   localStorage.setItem(ACTIVE_STUDENT_KEY, studentId);
   localStorage.setItem(LEGACY_STUDENT_ID_KEY, studentId);
   if (classId) localStorage.setItem(LEGACY_CLASS_ID_KEY, classId);

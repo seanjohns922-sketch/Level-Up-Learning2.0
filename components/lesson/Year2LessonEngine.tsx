@@ -11,6 +11,7 @@ import NexusActivation from "@/components/lesson/NexusActivation";
 import ComboActivation from "@/components/lesson/ComboActivation";
 import LessonReflection from "@/components/lesson/LessonReflection";
 import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent } from "@/lib/live-class-client";
+import { readBestChain, writeBestChain } from "@/lib/best-chain";
 import {
   buildLessonActivityPool,
   generateQuestion,
@@ -21,6 +22,12 @@ import {
 } from "@/data/activities/year2/lessonEngine";
 import { pickWeightedIndex } from "@/lib/weightedRandom";
 import type { Lesson } from "@/data/programs/year1";
+
+function getWorkingLevelForLesson(lesson: Lesson) {
+  const yearMatch = lesson.id.match(/^y(\d+)-/);
+  const yearNumber = yearMatch ? Number(yearMatch[1]) : 2;
+  return yearNumber === 0 ? "Prep" : `Year ${yearNumber}`;
+}
 
 function buildInitialTurn(lesson: Lesson, activities: Lesson["activities"] = []) {
   const level = getLevelForLesson(lesson);
@@ -232,6 +239,7 @@ export type LessonPerformanceSummary = {
   correctAnswers: number;
   accuracy: number;
   timeSpentSeconds: number;
+  bestChain: number;
   topicSummaries: LessonPerformanceTopicSummary[];
   strengths: LessonPerformanceTopicSummary[];
   areasToImprove: LessonPerformanceTopicSummary[];
@@ -299,6 +307,7 @@ function buildLessonPerformanceSummary({
   correctAnswers,
   accuracy,
   timeSpentSeconds,
+  bestChain,
 }: {
   lessonTitle: string;
   attempts: LessonAttemptEntry[];
@@ -306,6 +315,7 @@ function buildLessonPerformanceSummary({
   correctAnswers: number;
   accuracy: number;
   timeSpentSeconds: number;
+  bestChain: number;
 }): LessonPerformanceSummary {
   const topicMap = new Map<string, LessonPerformanceTopicSummary>();
   const struggleMap = new Map<string, number>();
@@ -351,6 +361,7 @@ function buildLessonPerformanceSummary({
     correctAnswers,
     accuracy,
     timeSpentSeconds,
+    bestChain,
     topicSummaries,
     strengths,
     areasToImprove,
@@ -456,6 +467,7 @@ export function Year2LessonEngine({
 }) {
   const totalSeconds = 9 * 60;
   const level = useMemo(() => getLevelForLesson(lesson), [lesson]);
+  const workingLevel = useMemo(() => getWorkingLevelForLesson(lesson), [lesson]);
   const lessonPool = useMemo(() => buildLessonActivityPool(level, lesson), [level, lesson]);
   const activities = lessonPool.activities;
   const initialTurn = useMemo(() => buildInitialTurn(lesson, activities), [activities, lesson]);
@@ -467,12 +479,12 @@ export function Year2LessonEngine({
   const [reflectionDone, setReflectionDone] = useState(false);
   const bestChainRef = useRef(0);
   useEffect(() => {
-    try { bestChainRef.current = Number(localStorage.getItem("lul_best_nexus_chain_v1") ?? 0); } catch { /* ignore */ }
-  }, []);
+    bestChainRef.current = readBestChain("number", workingLevel);
+  }, [workingLevel]);
   function saveBestChain(chain: number) {
     if (chain > bestChainRef.current) {
       bestChainRef.current = chain;
-      try { localStorage.setItem("lul_best_nexus_chain_v1", String(chain)); } catch { /* ignore */ }
+      writeBestChain("number", workingLevel, chain);
     }
   }
   const [currentActivityIndex, setCurrentActivityIndex] = useState(initialTurn.activityIndex);
@@ -520,8 +532,9 @@ export function Year2LessonEngine({
         correctAnswers,
         accuracy,
         timeSpentSeconds: Math.max(0, totalSeconds - Math.max(0, secondsLeft)),
+        bestChain: Math.max(bestChainRef.current, comboCount),
       }),
-    [accuracy, attemptLog, correctAnswers, lesson.title, questionsAnswered, secondsLeft, totalSeconds]
+    [accuracy, attemptLog, comboCount, correctAnswers, lesson.title, questionsAnswered, secondsLeft, totalSeconds]
   );
   const emittedSummaryRef = useRef(false);
 

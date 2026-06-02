@@ -343,6 +343,7 @@ export function PracticeRunner({
       correctAnswers: safeCorrectAnswers,
       accuracy,
       timeSpentSeconds: Math.max(0, totalSeconds - Math.max(0, secondsLeft)),
+      bestChain: 0,
       topicSummaries,
       strengths,
       areasToImprove,
