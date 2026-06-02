@@ -480,7 +480,7 @@ export default function MeasurelandsMap() {
   });
 
   return (
-    <div style={{ position: "relative", width: "100vw", height: "100vh", overflow: "hidden", background: "#0d0820" }}>
+    <div style={{ position: "relative", width: "100vw", height: "100vh", overflow: "hidden", background: "#050818" }}>
 
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
@@ -495,18 +495,18 @@ export default function MeasurelandsMap() {
         }}
       />
 
-      {/* Atmospheric depth — soft warm wash */}
+      {/* Atmospheric depth — deep navy night with warm amber bloom on tower */}
       <div style={{
         position: "absolute", inset: 0, zIndex: 1,
-        background: "linear-gradient(180deg, rgba(20,12,40,0.42) 0%, rgba(40,24,60,0.06) 38%, rgba(20,12,40,0.05) 55%, rgba(10,6,24,0.86) 100%)",
+        background: "linear-gradient(180deg, rgba(8,14,32,0.48) 0%, rgba(10,16,36,0.06) 38%, rgba(8,14,32,0.05) 55%, rgba(5,8,24,0.88) 100%)",
       }} />
       <div style={{
         position: "absolute", inset: 0, zIndex: 1,
-        background: "radial-gradient(ellipse 82% 72% at 50% 44%, transparent 38%, rgba(10,6,24,0.42) 100%)",
+        background: "radial-gradient(ellipse 82% 72% at 50% 44%, transparent 38%, rgba(5,8,24,0.45) 100%)",
       }} />
       <div style={{
         position: "absolute", inset: 0, zIndex: 1,
-        background: "radial-gradient(ellipse 60% 55% at 50% 32%, rgba(245,176,66,0.10) 0%, transparent 70%)",
+        background: "radial-gradient(ellipse 60% 55% at 50% 30%, rgba(251,191,36,0.12) 0%, transparent 70%)",
       }} />
 
       {/* Volumetric tower beam — warm gold */}
@@ -617,7 +617,7 @@ export default function MeasurelandsMap() {
       <div style={{
         position: "absolute", top: 0, left: 0, right: 0, zIndex: 20,
         display: "flex", alignItems: "center", gap: 8, padding: "10px 14px",
-        background: "rgba(10,6,24,0.72)", borderBottom: "1px solid rgba(245,176,66,0.16)",
+        background: "rgba(5,8,24,0.72)", borderBottom: "1px solid rgba(251,191,36,0.18)",
         backdropFilter: "blur(16px)",
       }}>
         <button
