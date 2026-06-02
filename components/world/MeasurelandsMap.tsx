@@ -17,15 +17,10 @@ import { supabase } from "@/lib/supabase";
 
 const YEAR = "Prep";
 const REALM_ID = "measurement";
-const BG_IMAGE = "/images/tower-plaza-bg.jpg";
-
-const DISTRICT_ZONES = [
-  { id: "length", name: "LENGTH LANDS", sub: "WEEKS 1–2", weekStart: 1, weekEnd: 2, left: "7%", top: "14%", color: "#67e8f9" },
-  { id: "balance", name: "BALANCE BASIN", sub: "WEEKS 3–4", weekStart: 3, weekEnd: 4, left: "10%", top: "56%", color: "#86efac" },
-  { id: "tower", name: "TIMEWIELDER TOWER", sub: "WEEK 8", weekStart: 8, weekEnd: 8, left: "50%", top: "30%", color: "#fde68a" },
-  { id: "capacity", name: "CAPACITY SPRINGS", sub: "WEEKS 5–6", weekStart: 5, weekEnd: 6, left: "70%", top: "15%", color: "#c4b5fd" },
-  { id: "clockwork", name: "CLOCKWORK CROSSING", sub: "WEEK 7", weekStart: 7, weekEnd: 7, left: "69%", top: "57%", color: "#f9a8d4" },
-] as const;
+const BG_IMAGE = "/images/measurelands-home-bg.jpg";
+const ACCENT = "#fbbf24";
+const ACCENT_SOFT = "#fde68a";
+const TEAL = "#5eead4";
 
 function useWorldCanvas() {
   const ref = useRef<HTMLCanvasElement>(null);
