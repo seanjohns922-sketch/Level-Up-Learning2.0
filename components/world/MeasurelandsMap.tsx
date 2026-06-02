@@ -1,54 +1,323 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
-import { getWeekProgress, isWeekComplete, readProgramStore } from "@/lib/program-progress";
+import { ArrowLeft, User, Zap } from "lucide-react";
+import { readProgress } from "@/data/progress";
+import {
+  getRecommendedAssignedWeek,
+  getWeekProgress,
+  isWeekComplete,
+  readProgramStore,
+} from "@/lib/program-progress";
+import { readBestChain } from "@/lib/best-chain";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
+import { getActiveStudentProfile } from "@/lib/studentIdentity";
+import { supabase } from "@/lib/supabase";
 
 const YEAR = "Prep";
 const REALM_ID = "measurement";
+const BG_IMAGE = "/images/tower-plaza-bg.jpg";
 
-const WEEK_NODES = [
-  { week: 1, title: "Length Lands", focus: "Longer and shorter", left: "12%", top: "22%", color: "#38bdf8" },
-  { week: 2, title: "Balance Basin", focus: "Heavy and light", left: "31%", top: "14%", color: "#34d399" },
-  { week: 3, title: "Capacity Springs", focus: "Which holds more?", left: "54%", top: "20%", color: "#22d3ee" },
-  { week: 4, title: "Duration Dunes", focus: "Quick or slow?", left: "74%", top: "15%", color: "#f59e0b" },
-  { week: 5, title: "Daylight Grove", focus: "Days of the week", left: "18%", top: "56%", color: "#facc15" },
-  { week: 6, title: "Clockwork Crossing", focus: "Time of day", left: "40%", top: "64%", color: "#fb7185" },
-  { week: 7, title: "Calendar Keep", focus: "Today, yesterday, tomorrow", left: "62%", top: "58%", color: "#a78bfa" },
-  { week: 8, title: "Timewielder Trial", focus: "Mixed mastery", left: "80%", top: "66%", color: "#f97316" },
+const DISTRICT_ZONES = [
+  { id: "length", name: "LENGTH LANDS", sub: "WEEKS 1–2", weekStart: 1, weekEnd: 2, left: "7%", top: "14%", color: "#67e8f9" },
+  { id: "balance", name: "BALANCE BASIN", sub: "WEEKS 3–4", weekStart: 3, weekEnd: 4, left: "10%", top: "56%", color: "#86efac" },
+  { id: "tower", name: "TIMEWIELDER TOWER", sub: "WEEK 8", weekStart: 8, weekEnd: 8, left: "50%", top: "30%", color: "#fde68a" },
+  { id: "capacity", name: "CAPACITY SPRINGS", sub: "WEEKS 5–6", weekStart: 5, weekEnd: 6, left: "70%", top: "15%", color: "#c4b5fd" },
+  { id: "clockwork", name: "CLOCKWORK CROSSING", sub: "WEEK 7", weekStart: 7, weekEnd: 7, left: "69%", top: "57%", color: "#f9a8d4" },
 ] as const;
+
+function useWorldCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = ref.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const colors = ["#67e8f9", "#fde68a", "#c4b5fd", "#86efac", "#f9a8d4"];
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    const particles = Array.from({ length: 70 }, (_, i) => ({
+      x: Math.random(),
+      y: Math.random(),
+      size: 0.8 + Math.random() * 2.4,
+      vy: -(0.14 + Math.random() * 0.42) / 1080,
+      vx: ((Math.random() - 0.5) * 0.1) / 1920,
+      color: colors[i % colors.length],
+      opacity: 0.18 + Math.random() * 0.46,
+    }));
+
+    let pulse = 0;
+    let fid: number;
+
+    const draw = () => {
+      const W = canvas.width;
+      const H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+
+      for (const p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.y < -0.02) {
+          p.y = 1.02;
+          p.x = Math.random();
+        }
+        if (p.x < -0.02) p.x = 1.02;
+        if (p.x > 1.02) p.x = -0.02;
+        ctx.globalAlpha = p.opacity;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x * W, p.y * H, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      const tx = W * 0.5;
+      const ty = H * 0.31;
+      pulse += 0.42;
+      for (let i = 0; i < 4; i += 1) {
+        const phase = (pulse + i * 24) % 108;
+        const radius = phase * 1.55;
+        const alpha = Math.max(0, 0.28 - phase / 380);
+        ctx.globalAlpha = alpha;
+        ctx.beginPath();
+        ctx.arc(tx, ty, radius, 0, Math.PI * 2);
+        ctx.strokeStyle = "#fde68a";
+        ctx.lineWidth = 1.4;
+        ctx.stroke();
+      }
+
+      ctx.globalAlpha = 1;
+      fid = requestAnimationFrame(draw);
+    };
+
+    draw();
+    return () => {
+      cancelAnimationFrame(fid);
+      window.removeEventListener("resize", resize);
+    };
+  }, []);
+
+  return ref;
+}
+
+function PlayerCharacter() {
+  return (
+    <div
+      style={{
+        position: "relative",
+        display: "inline-block",
+        animation: "ml-char-float 4.6s ease-in-out infinite",
+        filter: "drop-shadow(0 0 14px rgba(253,230,138,0.24)) drop-shadow(0 8px 18px rgba(0,0,0,0.72))",
+      }}
+    >
+      <svg width="96" height="188" viewBox="0 0 96 188" fill="none">
+        <rect x="24" y="165" width="18" height="10" rx="3" fill="#09090b" />
+        <rect x="54" y="165" width="18" height="10" rx="3" fill="#09090b" />
+        <rect x="27" y="122" width="14" height="46" rx="4" fill="#28170c" />
+        <rect x="55" y="122" width="14" height="46" rx="4" fill="#28170c" />
+        <rect x="18" y="72" width="60" height="58" rx="9" fill="#4c1d95" />
+        <rect x="16" y="72" width="64" height="8" rx="5" fill="#fde68a" opacity="0.75" />
+        <rect x="5" y="78" width="14" height="46" rx="5" fill="#4c1d95" />
+        <rect x="77" y="78" width="14" height="46" rx="5" fill="#4c1d95" />
+        <rect x="5" y="78" width="14" height="5" rx="3" fill="#67e8f9" opacity="0.55" />
+        <rect x="77" y="78" width="14" height="5" rx="3" fill="#67e8f9" opacity="0.55" />
+        <rect x="35" y="58" width="22" height="15" rx="5" fill="#b87652" />
+        <rect x="24" y="24" width="44" height="38" rx="10" fill="#b87652" />
+        <path d="M19 28c7-11 20-17 33-14 8 2 14 7 19 14v8H19z" fill="#312e81" />
+        <path d="M18 31l14-18h28l14 18-8 4H26z" fill="#1e1b4b" />
+      </svg>
+
+      <div
+        style={{
+          position: "absolute",
+          bottom: -12,
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: 104,
+          height: 24,
+          borderRadius: "50%",
+          background: "radial-gradient(ellipse, rgba(103,232,249,0.36) 0%, transparent 70%)",
+          filter: "blur(6px)",
+        }}
+      />
+    </div>
+  );
+}
+
+function LegendsIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <path d="M16 3L23 21H9L16 3Z" fill="#fde68a" stroke="#fffbeb" strokeWidth="1.3" />
+      <rect x="7" y="20" width="18" height="4" rx="2" fill="#7c3aed" stroke="#fffbeb" strokeWidth="1" />
+    </svg>
+  );
+}
+
+function WorldsIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <circle cx="16" cy="16" r="10.5" fill="#1f2937" stroke="#67e8f9" strokeWidth="1.5" />
+      <path d="M5.5 16h21M16 5.5c3.7 3.9 3.7 17.1 0 21M16 5.5c-3.7 3.9-3.7 17.1 0 21" stroke="#fffbeb" strokeWidth="1" opacity="0.75" />
+    </svg>
+  );
+}
+
+function ProgressIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <path d="M9 4h14M9 28h14" stroke="#fffbeb" strokeWidth="1.4" />
+      <path d="M10 5h12l-5 10 5 12H10l5-12-5-10Z" fill="#fde68a" stroke="#fffbeb" strokeWidth="1.1" />
+    </svg>
+  );
+}
 
 export default function MeasurelandsMap() {
   const router = useRouter();
+  const [progress] = useState(() => readProgress());
   const [store] = useState(() => readProgramStore());
+  const [launching, setLaunching] = useState(false);
+  const [bestChain] = useState(() => readBestChain("measurement", YEAR));
+  const [classBestChain, setClassBestChain] = useState<number | null>(null);
+  const canvasRef = useWorldCanvas();
 
+  const currentWeek = getRecommendedAssignedWeek(store, YEAR, progress?.assignedWeek, progress?.requiredWeeks);
   const completedByWeek = useMemo(() => {
-    const map: Record<number, boolean> = {};
+    const result: Record<number, boolean> = {};
     for (let week = 1; week <= 8; week += 1) {
-      map[week] = isWeekComplete(getWeekProgress(store, YEAR, week));
+      result[week] = isWeekComplete(getWeekProgress(store, YEAR, week));
     }
-    return map;
+    return result;
   }, [store]);
 
-  const currentWeek = useMemo(() => {
+  const highestDone = useMemo(
+    () => Math.max(0, ...Object.entries(completedByWeek).filter(([, done]) => done).map(([week]) => Number(week))),
+    [completedByWeek]
+  );
+
+  const totalXP = useMemo(() => {
+    let xp = 0;
     for (let week = 1; week <= 8; week += 1) {
-      if (!completedByWeek[week]) return week;
+      const wp = getWeekProgress(store, YEAR, week);
+      xp += wp.lessonsCompleted.filter(Boolean).length * 40;
+      if (wp.quizScore !== undefined) xp += Math.round((wp.quizScore / 100) * 60);
     }
-    return 8;
-  }, [completedByWeek]);
+    return xp;
+  }, [store]);
 
-  const [viewWeek, setViewWeek] = useState(currentWeek);
-  const currentNode = WEEK_NODES.find((node) => node.week === viewWeek) ?? WEEK_NODES[0];
+  useEffect(() => {
+    if (isDemoPreviewMode()) {
+      setClassBestChain(null);
+      return;
+    }
 
-  function openWeek(week: number) {
-    router.push(`/program?year=${encodeURIComponent(YEAR)}&week=${week}&legacy=1&realm_id=${REALM_ID}`);
+    const profile = getActiveStudentProfile();
+    const classId = profile?.classId?.trim();
+    if (!classId) {
+      setClassBestChain(null);
+      return;
+    }
+
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        const readMaxBestChain = async (filterWorkingLevel: boolean) => {
+          let query = supabase
+            .from("student_lesson_attempts")
+            .select("summary")
+            .eq("class_id", classId)
+            .eq("realm_id", "measurement");
+
+          if (filterWorkingLevel) {
+            query = query.eq("working_level", YEAR);
+          }
+
+          const { data, error } = await query;
+          if (error) throw error;
+
+          let max = 0;
+          for (const row of data ?? []) {
+            const summary =
+              row.summary && typeof row.summary === "object" && !Array.isArray(row.summary)
+                ? (row.summary as Record<string, unknown>)
+                : null;
+            const candidate = Number(summary?.bestChain ?? summary?.best_chain ?? 0);
+            if (Number.isFinite(candidate) && candidate > max) {
+              max = candidate;
+            }
+          }
+
+          return max > 0 ? max : null;
+        };
+
+        const scopedBest = await readMaxBestChain(true);
+        const fallbackBest = scopedBest ?? (await readMaxBestChain(false));
+        if (!cancelled) setClassBestChain(fallbackBest);
+      } catch (error) {
+        if (!cancelled) {
+          console.warn("[MeasurelandsMap] Failed to load class best chain:", error);
+          setClassBestChain(null);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const currentZone =
+    DISTRICT_ZONES.find((zone) => currentWeek >= zone.weekStart && currentWeek <= zone.weekEnd) ?? DISTRICT_ZONES[0];
+
+  function launchGuidedAdventure() {
+    if (launching) return;
+    setLaunching(true);
+    window.setTimeout(() => {
+      for (let week = currentZone.weekStart; week <= currentZone.weekEnd; week += 1) {
+        if (!completedByWeek[week]) {
+          router.push(`/program?year=${encodeURIComponent(YEAR)}&week=${week}&legacy=1&realm_id=${REALM_ID}`);
+          return;
+        }
+      }
+      router.push(`/program?year=${encodeURIComponent(YEAR)}&week=${currentZone.weekEnd}&legacy=1&realm_id=${REALM_ID}`);
+    }, 900);
   }
 
+  const chip = (extra?: React.CSSProperties): React.CSSProperties => ({
+    padding: "5px 12px",
+    borderRadius: 999,
+    background: "rgba(17,24,39,0.55)",
+    border: "1px solid rgba(186,230,253,0.16)",
+    ...extra,
+  });
+
+  const hudBtn: React.CSSProperties = {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 6,
+    padding: "12px 10px 10px",
+    borderRadius: 18,
+    cursor: "pointer",
+    background: "linear-gradient(180deg, rgba(10,18,30,0.92) 0%, rgba(5,10,18,0.95) 100%)",
+    border: "1.5px solid rgba(186,230,253,0.24)",
+    backdropFilter: "blur(14px)",
+    width: 72,
+    boxShadow: "0 0 18px rgba(103,232,249,0.14), 0 6px 22px rgba(0,0,0,0.64), inset 0 1px 0 rgba(255,255,255,0.05)",
+    transition: "transform 180ms ease, box-shadow 220ms ease, border-color 220ms ease",
+  };
+
   return (
-    <div style={{ position: "relative", width: "100vw", height: "100vh", overflow: "hidden", background: "#07121a" }}>
+    <div style={{ position: "relative", width: "100vw", height: "100vh", overflow: "hidden", background: "#050818" }}>
       <img
-        src="/images/tower-plaza-bg.jpg"
+        src={BG_IMAGE}
         alt=""
         style={{
           position: "absolute",
@@ -56,159 +325,285 @@ export default function MeasurelandsMap() {
           width: "100%",
           height: "100%",
           objectFit: "cover",
-          objectPosition: "center",
+          objectPosition: "center 42%",
+          transform: launching ? "scale(1.35)" : "scale(1)",
+          transition: "transform 0.9s cubic-bezier(0.5, 0, 0.75, 0)",
         }}
       />
-      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(4,10,16,0.45) 0%, rgba(3,8,12,0.72) 100%)" }} />
-      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at 50% 35%, rgba(45,212,191,0.22), transparent 40%)" }} />
 
-      <div style={{ position: "relative", zIndex: 2, height: "100%", padding: "20px 24px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16 }}>
-          <button
-            type="button"
-            onClick={() => router.push(`/realms?level=${encodeURIComponent(YEAR)}`)}
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(8,14,32,0.58) 0%, rgba(8,14,32,0.16) 40%, rgba(5,8,24,0.88) 100%)" }} />
+      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 55% at 50% 36%, rgba(103,232,249,0.09) 0%, transparent 70%)" }} />
+      <div
+        style={{
+          position: "absolute",
+          left: "50%",
+          top: 0,
+          transform: "translateX(-50%)",
+          width: 100,
+          height: "52%",
+          background: "linear-gradient(180deg, rgba(253,230,138,0) 0%, rgba(253,230,138,0.18) 60%, rgba(253,230,138,0.4) 100%)",
+          filter: "blur(16px)",
+          pointerEvents: "none",
+        }}
+      />
+      <canvas ref={canvasRef} style={{ position: "absolute", inset: 0, pointerEvents: "none" }} />
+
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 10,
+          opacity: launching ? 0 : 1,
+          transition: "opacity 0.4s ease",
+          pointerEvents: "none",
+        }}
+      >
+        {DISTRICT_ZONES.filter((zone) => currentWeek >= zone.weekStart).map((zone) => (
+          <div
+            key={zone.id}
             style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "12px 18px",
-              borderRadius: 18,
-              border: "1px solid rgba(186,230,253,0.25)",
-              background: "rgba(5,16,22,0.72)",
-              color: "white",
-              fontSize: 12,
-              fontWeight: 900,
-              letterSpacing: "0.18em",
-              textTransform: "uppercase",
-              backdropFilter: "blur(10px)",
+              position: "absolute",
+              left: zone.left,
+              top: zone.top,
+              transform: zone.id === "tower" ? "translateX(-50%)" : undefined,
+              color: "#ffffff",
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: "0.22em",
+              fontFamily: "ui-monospace, monospace",
+              opacity: currentZone.id === zone.id ? 0.88 : 0.34,
+              textShadow: `0 0 14px ${zone.color}88, 0 2px 8px rgba(0,0,0,0.9)`,
+              whiteSpace: "nowrap",
             }}
           >
-            <ArrowLeft size={16} />
-            Back to Realms
-          </button>
-
-          <div style={{ color: "rgba(226,232,240,0.92)", fontSize: 30, fontWeight: 900, letterSpacing: "-0.02em" }}>
-            Measurelands
+            {zone.name}
           </div>
+        ))}
 
-          <div style={{ color: "rgba(186,230,253,0.85)", fontSize: 16, fontWeight: 700 }}>Ground Level</div>
+        <div
+          style={{
+            position: "absolute",
+            bottom: "2%",
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 12,
+            pointerEvents: "auto",
+          }}
+        >
+          <PlayerCharacter />
         </div>
+      </div>
 
-        <div style={{ position: "absolute", left: "50%", top: "14%", transform: "translateX(-50%)", textAlign: "center", maxWidth: 480 }}>
-          <div style={{ color: "rgba(125,211,252,0.95)", fontSize: 13, fontWeight: 900, letterSpacing: "0.22em", textTransform: "uppercase" }}>
-            World Map
-          </div>
-          <h1 style={{ marginTop: 10, color: "white", fontSize: 58, lineHeight: 1, fontWeight: 900 }}>Week {currentNode.week}</h1>
-          <div style={{ marginTop: 12, color: "rgba(226,232,240,0.96)", fontSize: 24, fontWeight: 700 }}>{currentNode.title}</div>
-          <div style={{ marginTop: 8, color: "rgba(186,230,253,0.85)", fontSize: 14, letterSpacing: "0.08em", textTransform: "uppercase" }}>
-            {currentNode.focus}
-          </div>
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 20,
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "10px 14px",
+          background: "rgba(5,8,24,0.72)",
+          borderBottom: "1px solid rgba(186,230,253,0.1)",
+          backdropFilter: "blur(16px)",
+        }}
+      >
+        <button
+          onClick={() => router.push(`/realms?level=${encodeURIComponent(YEAR)}`)}
+          style={{ display: "flex", alignItems: "center", gap: 6, ...chip(), cursor: "pointer", color: "rgba(226,232,240,0.92)", fontSize: 12, fontWeight: 700 }}
+        >
+          <ArrowLeft size={14} /> Back
+        </button>
+        <div style={chip()}>
+          <span style={{ color: "#67e8f9", fontSize: 10, fontWeight: 900, letterSpacing: "0.18em", fontFamily: "ui-monospace,monospace" }}>◈ MEASURELANDS</span>
         </div>
-
-        <div style={{ position: "absolute", left: "50%", top: "30%", transform: "translateX(-50%)", display: "flex", gap: 12 }}>
-          <button
-            type="button"
-            onClick={() => setViewWeek((current) => Math.max(1, current - 1))}
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: 999,
-              border: "1px solid rgba(186,230,253,0.25)",
-              background: "rgba(5,16,22,0.72)",
-              color: "white",
-              display: "grid",
-              placeItems: "center",
-              backdropFilter: "blur(10px)",
-            }}
-          >
-            <ChevronLeft size={20} />
-          </button>
-          <button
-            type="button"
-            onClick={() => openWeek(currentNode.week)}
-            style={{
-              padding: "14px 26px",
-              borderRadius: 999,
-              border: "1px solid rgba(125,211,252,0.28)",
-              background: "linear-gradient(135deg, rgba(14,165,233,0.9), rgba(20,184,166,0.86))",
-              color: "#06202c",
-              fontSize: 13,
-              fontWeight: 900,
-              letterSpacing: "0.18em",
-              textTransform: "uppercase",
-              boxShadow: "0 10px 30px rgba(8,145,178,0.28)",
-            }}
-          >
-            Enter Week
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewWeek((current) => Math.min(8, current + 1))}
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: 999,
-              border: "1px solid rgba(186,230,253,0.25)",
-              background: "rgba(5,16,22,0.72)",
-              color: "white",
-              display: "grid",
-              placeItems: "center",
-              backdropFilter: "blur(10px)",
-            }}
-          >
-            <ChevronRight size={20} />
-          </button>
+        <div style={chip({ background: "rgba(103,232,249,0.07)", border: "1px solid rgba(103,232,249,0.14)" })}>
+          <span style={{ color: "#67e8f9", fontSize: 9, fontWeight: 700, letterSpacing: "0.2em", fontFamily: "ui-monospace,monospace" }}>PREP</span>
         </div>
+        <div style={{ flex: 1 }} />
+        <div style={{ display: "flex", alignItems: "center", gap: 5, ...chip() }}>
+          <Zap size={11} color="#fde68a" />
+          <span style={{ color: "#fef3c7", fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{totalXP} XP</span>
+        </div>
+        <div style={chip()}>
+          <span style={{ color: "#e0f2fe", fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{highestDone}/8</span>
+        </div>
+        <button
+          onClick={() => router.push("/profile")}
+          style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, borderRadius: "50%", cursor: "pointer", background: "rgba(30,41,59,0.48)", border: "1px solid rgba(186,230,253,0.24)" }}
+        >
+          <User size={16} color="#e0f2fe" />
+        </button>
+      </div>
 
-        {WEEK_NODES.map((node) => {
-          const complete = completedByWeek[node.week];
-          const active = node.week === currentWeek;
-          const focused = node.week === viewWeek;
-
-          return (
-            <button
-              key={node.week}
-              type="button"
-              onClick={() => setViewWeek(node.week)}
+      <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", zIndex: 20, display: "flex", flexDirection: "column", gap: 10 }}>
+        {[
+          { key: "legends", label: "LEGENDS", route: "/legends", icon: <LegendsIcon /> },
+          { key: "worlds", label: "WORLDS", route: "/levels", icon: <WorldsIcon /> },
+          { key: "progress", label: "PROGRESS", route: "/realm-stats", icon: <ProgressIcon /> },
+        ].map(({ key, label, route, icon }) => (
+          <button key={key} onClick={() => router.push(route)} style={hudBtn}>
+            <div
               style={{
-                position: "absolute",
-                left: node.left,
-                top: node.top,
-                transform: focused ? "scale(1.08)" : "scale(1)",
-                transition: "transform 180ms ease",
-                width: 180,
-                padding: "14px 16px",
-                borderRadius: 22,
-                border: `1px solid ${focused ? `${node.color}99` : "rgba(226,232,240,0.18)"}`,
-                background: focused ? "rgba(6,24,33,0.88)" : "rgba(6,18,24,0.72)",
-                backdropFilter: "blur(12px)",
-                boxShadow: focused ? `0 14px 34px ${node.color}22` : "0 10px 28px rgba(0,0,0,0.22)",
-                textAlign: "left",
-                color: "white",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 48,
+                height: 48,
+                borderRadius: 14,
+                background: "radial-gradient(circle at 50% 35%, rgba(103,232,249,0.28) 0%, rgba(30,41,59,0.18) 55%, rgba(5,10,18,0) 100%)",
+                border: "1px solid rgba(186,230,253,0.24)",
+                boxShadow: "inset 0 0 14px rgba(103,232,249,0.18), 0 0 18px rgba(103,232,249,0.14)",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                <div style={{ fontSize: 12, fontWeight: 900, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(186,230,253,0.9)" }}>
-                  Week {node.week}
-                </div>
-                <div
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 900,
-                    letterSpacing: "0.14em",
-                    textTransform: "uppercase",
-                    color: complete ? "#86efac" : active ? "#67e8f9" : "rgba(226,232,240,0.6)",
-                  }}
-                >
-                  {complete ? "Complete" : active ? "Active" : "Preview"}
-                </div>
-              </div>
-              <div style={{ marginTop: 10, fontSize: 25, lineHeight: 1, fontWeight: 900 }}>{node.title}</div>
-              <div style={{ marginTop: 8, fontSize: 13, lineHeight: 1.35, color: "rgba(226,232,240,0.82)" }}>{node.focus}</div>
-            </button>
-          );
-        })}
+              {icon}
+            </div>
+            <span style={{ fontSize: 9, fontWeight: 900, letterSpacing: "0.18em", color: "#bae6fd", fontFamily: "ui-monospace,monospace", textShadow: "0 0 10px rgba(103,232,249,0.38)" }}>
+              {label}
+            </span>
+          </button>
+        ))}
+        <div style={{ ...hudBtn, cursor: "default", gap: 4 }}>
+          <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: "0.12em", color: "rgba(186,230,253,0.52)", fontFamily: "ui-monospace,monospace", textAlign: "center", lineHeight: 1.15 }}>
+            MY BEST
+          </span>
+          <span style={{ fontSize: 18, fontWeight: 900, color: "#67e8f9", lineHeight: 1 }}>{bestChain}</span>
+          <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: "0.12em", color: "rgba(253,230,138,0.65)", fontFamily: "ui-monospace,monospace", textAlign: "center", lineHeight: 1.15, marginTop: 2 }}>
+            CLASS BEST
+          </span>
+          <span style={{ fontSize: 14, fontWeight: 900, color: "#fde68a", lineHeight: 1 }}>{classBestChain ?? "—"}</span>
+        </div>
       </div>
+
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 22,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: 20,
+          pointerEvents: "none",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "radial-gradient(circle at 50% 50%, rgba(5,8,24,0.78) 0%, rgba(5,8,24,0.45) 50%, rgba(5,8,24,0) 100%)",
+            pointerEvents: "none",
+          }}
+        />
+        <button
+          onClick={launchGuidedAdventure}
+          disabled={launching}
+          style={{
+            position: "relative",
+            pointerEvents: "auto",
+            cursor: launching ? "default" : "pointer",
+            padding: "22px 56px",
+            borderRadius: 999,
+            border: "2px solid rgba(103,232,249,0.82)",
+            background: "linear-gradient(180deg, #22d3ee 0%, #14b8a6 55%, #0f766e 100%)",
+            color: "#ffffff",
+            fontSize: 20,
+            fontWeight: 900,
+            letterSpacing: "0.22em",
+            fontFamily: "ui-monospace, monospace",
+            textShadow: "0 2px 8px rgba(0,0,0,0.55)",
+            boxShadow: [
+              "0 0 0 4px rgba(34,211,238,0.16)",
+              "0 0 38px rgba(34,211,238,0.54)",
+              "0 0 90px rgba(20,184,166,0.34)",
+              "0 14px 32px rgba(0,0,0,0.55)",
+              "inset 0 2px 0 rgba(255,255,255,0.35)",
+              "inset 0 -4px 0 rgba(0,0,0,0.25)",
+            ].join(", "),
+            transform: launching ? "scale(1.08)" : "scale(1)",
+            transition: "transform 0.25s ease",
+            animation: "ml-guided-pulse 2.4s ease-in-out infinite",
+            whiteSpace: "nowrap",
+          }}
+        >
+          ▶ {highestDone === 0 ? "START ADVENTURE" : "CONTINUE ADVENTURE"}
+        </button>
+
+        <div
+          style={{
+            position: "relative",
+            color: "rgba(186,230,253,0.85)",
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: "0.2em",
+            fontFamily: "ui-monospace, monospace",
+            marginTop: 14,
+            opacity: launching ? 0 : 1,
+            transition: "opacity 0.3s",
+          }}
+        >
+          TAP TO STEP INTO MEASURELANDS
+        </div>
+
+        <div
+          style={{
+            position: "relative",
+            color: currentZone.color,
+            fontSize: 11,
+            fontWeight: 800,
+            letterSpacing: "0.28em",
+            fontFamily: "ui-monospace, monospace",
+            textShadow: `0 0 14px ${currentZone.color}, 0 2px 8px rgba(0,0,0,0.9)`,
+            marginTop: 14,
+            opacity: launching ? 0 : 1,
+            transition: "opacity 0.3s",
+          }}
+        >
+          WEEK {currentWeek} · {currentZone.name}
+        </div>
+      </div>
+
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 50,
+          pointerEvents: "none",
+          background: "radial-gradient(circle at 50% 60%, rgba(253,230,138,0.7) 0%, rgba(253,230,138,0.28) 25%, rgba(5,8,24,0.95) 70%)",
+          opacity: launching ? 1 : 0,
+          transition: "opacity 0.6s ease-in 0.25s",
+        }}
+      />
+
+      <style>{`
+        @keyframes ml-char-float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-7px); }
+        }
+        @keyframes ml-guided-pulse {
+          0%, 100% {
+            box-shadow:
+              0 0 0 4px rgba(34,211,238,0.16),
+              0 0 38px rgba(34,211,238,0.54),
+              0 0 90px rgba(20,184,166,0.34),
+              0 14px 32px rgba(0,0,0,0.55),
+              inset 0 2px 0 rgba(255,255,255,0.35),
+              inset 0 -4px 0 rgba(0,0,0,0.25);
+          }
+          50% {
+            box-shadow:
+              0 0 0 6px rgba(186,230,253,0.24),
+              0 0 58px rgba(103,232,249,0.74),
+              0 0 120px rgba(20,184,166,0.46),
+              0 14px 32px rgba(0,0,0,0.55),
+              inset 0 2px 0 rgba(255,255,255,0.42),
+              inset 0 -4px 0 rgba(0,0,0,0.25);
+          }
+        }
+      `}</style>
     </div>
   );
 }
