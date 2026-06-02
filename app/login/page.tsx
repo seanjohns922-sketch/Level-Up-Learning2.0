@@ -31,6 +31,14 @@ type ClassRecord = {
 };
 
 type ClassesStore = Record<string, ClassRecord>;
+type DemoAccessDebug = {
+  featureEnabledRaw?: string | null;
+  hasExpectedCode?: boolean;
+  expectedCodeLength?: number;
+  submittedCodeLength?: number;
+  submittedTrimmedLength?: number;
+  trimmedComparisonPasses?: boolean;
+};
 
 const CLASSES_KEY = "lul_classes_v1";
 function normalizeClassCode(code: string) {
@@ -112,6 +120,7 @@ export default function LoginPage() {
   const [showDemoModal, setShowDemoModal] = useState(false);
   const [demoCode, setDemoCode] = useState("");
   const [demoError, setDemoError] = useState<string | null>(null);
+  const [demoDebug, setDemoDebug] = useState<DemoAccessDebug | null>(null);
   const [demoSubmitting, setDemoSubmitting] = useState(false);
 
   const createdClass = createdCode ? classes[createdCode] : null;
@@ -347,14 +356,17 @@ export default function LoginPage() {
     if (!demoAccessEnabled || !demoCode.trim()) return;
     setDemoSubmitting(true);
     setDemoError(null);
+    setDemoDebug(null);
     try {
       const response = await fetch("/api/demo-access", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code: demoCode.trim() }),
       });
+      const payload = (await response.json()) as { ok?: boolean; debug?: DemoAccessDebug };
 
       if (!response.ok) {
+        setDemoDebug(payload.debug ?? null);
         setDemoError("Access code not recognised.");
         setDemoSubmitting(false);
         return;
@@ -684,8 +696,18 @@ export default function LoginPage() {
             </label>
 
             {demoError ? (
-              <div className="mt-4 rounded-xl bg-red-500/10 py-2 text-center text-sm font-bold text-red-200">
-                {demoError}
+              <div className="mt-4 rounded-xl bg-red-500/10 px-4 py-3 text-center text-sm font-bold text-red-200">
+                <div>{demoError}</div>
+                {demoDebug ? (
+                  <div className="mt-2 space-y-1 text-[11px] font-semibold tracking-[0.04em] text-red-100/80">
+                    <div>feature enabled: {String(demoDebug.featureEnabledRaw ?? "null")}</div>
+                    <div>has expected code: {String(Boolean(demoDebug.hasExpectedCode))}</div>
+                    <div>expected length: {demoDebug.expectedCodeLength ?? 0}</div>
+                    <div>submitted length: {demoDebug.submittedCodeLength ?? 0}</div>
+                    <div>submitted trimmed length: {demoDebug.submittedTrimmedLength ?? 0}</div>
+                    <div>trimmed match: {String(Boolean(demoDebug.trimmedComparisonPasses))}</div>
+                  </div>
+                ) : null}
               </div>
             ) : null}
 
@@ -696,6 +718,7 @@ export default function LoginPage() {
                   setShowDemoModal(false);
                   setDemoCode("");
                   setDemoError(null);
+                  setDemoDebug(null);
                 }}
                 className="flex-1 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-bold text-white/80 transition hover:bg-white/10"
               >
