@@ -17,6 +17,7 @@ import { readBestChain } from "@/lib/best-chain";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import { supabase } from "@/lib/supabase";
+import StudentAvatar from "@/components/avatar/StudentAvatar";
 
 // ─── Era system — ONE evolving city, five real background images ─────────────────
 // Prep=0  Y1-2=1  Y3-4=2  Y5=3  Y6=4
@@ -750,7 +751,11 @@ export default function NumberNexusMap() {
           zIndex: 12,
           pointerEvents: "auto",
         }}>
-          <PlayerCharacter gender={gender} />
+          <StudentAvatar
+            height={196}
+            glowColor="rgba(20,184,166,0.32)"
+            floatAnimation="char-float 4.5s ease-in-out infinite"
+          />
         </div>
       </div>
 

@@ -13,6 +13,7 @@ import {
 import { readBestChain } from "@/lib/best-chain";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
+import StudentAvatar from "@/components/avatar/StudentAvatar";
 import { supabase } from "@/lib/supabase";
 
 const YEAR = "Prep";
@@ -109,45 +110,11 @@ function useWorldCanvas() {
 
 function PlayerCharacter() {
   return (
-    <div
-      style={{
-        position: "relative",
-        display: "inline-block",
-        animation: "ml-char-float 4.6s ease-in-out infinite",
-        filter: "drop-shadow(0 0 14px rgba(253,230,138,0.24)) drop-shadow(0 8px 18px rgba(0,0,0,0.72))",
-      }}
-    >
-      <svg width="96" height="188" viewBox="0 0 96 188" fill="none">
-        <rect x="24" y="165" width="18" height="10" rx="3" fill="#09090b" />
-        <rect x="54" y="165" width="18" height="10" rx="3" fill="#09090b" />
-        <rect x="27" y="122" width="14" height="46" rx="4" fill="#28170c" />
-        <rect x="55" y="122" width="14" height="46" rx="4" fill="#28170c" />
-        <rect x="18" y="72" width="60" height="58" rx="9" fill="#4c1d95" />
-        <rect x="16" y="72" width="64" height="8" rx="5" fill="#fde68a" opacity="0.75" />
-        <rect x="5" y="78" width="14" height="46" rx="5" fill="#4c1d95" />
-        <rect x="77" y="78" width="14" height="46" rx="5" fill="#4c1d95" />
-        <rect x="5" y="78" width="14" height="5" rx="3" fill="#67e8f9" opacity="0.55" />
-        <rect x="77" y="78" width="14" height="5" rx="3" fill="#67e8f9" opacity="0.55" />
-        <rect x="35" y="58" width="22" height="15" rx="5" fill="#b87652" />
-        <rect x="24" y="24" width="44" height="38" rx="10" fill="#b87652" />
-        <path d="M19 28c7-11 20-17 33-14 8 2 14 7 19 14v8H19z" fill="#312e81" />
-        <path d="M18 31l14-18h28l14 18-8 4H26z" fill="#1e1b4b" />
-      </svg>
-
-      <div
-        style={{
-          position: "absolute",
-          bottom: -12,
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: 104,
-          height: 24,
-          borderRadius: "50%",
-          background: "radial-gradient(ellipse, rgba(103,232,249,0.36) 0%, transparent 70%)",
-          filter: "blur(6px)",
-        }}
-      />
-    </div>
+    <StudentAvatar
+      height={188}
+      glowColor="rgba(253,230,138,0.34)"
+      floatAnimation="ml-char-float 4.6s ease-in-out infinite"
+    />
   );
 }
 
