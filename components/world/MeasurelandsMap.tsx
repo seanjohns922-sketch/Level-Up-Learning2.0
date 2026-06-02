@@ -520,8 +520,8 @@ export default function MeasurelandsMap() {
             cursor: launching ? "default" : "pointer",
             padding: "22px 56px",
             borderRadius: 999,
-            border: "2px solid rgba(103,232,249,0.82)",
-            background: "linear-gradient(180deg, #22d3ee 0%, #14b8a6 55%, #0f766e 100%)",
+            border: "2px solid rgba(251,191,36,0.82)",
+            background: "linear-gradient(180deg, #fbbf24 0%, #d97706 55%, #b45309 100%)",
             color: "#ffffff",
             fontSize: 20,
             fontWeight: 900,
@@ -529,9 +529,9 @@ export default function MeasurelandsMap() {
             fontFamily: "ui-monospace, monospace",
             textShadow: "0 2px 8px rgba(0,0,0,0.55)",
             boxShadow: [
-              "0 0 0 4px rgba(34,211,238,0.16)",
-              "0 0 38px rgba(34,211,238,0.54)",
-              "0 0 90px rgba(20,184,166,0.34)",
+              "0 0 0 4px rgba(251,191,36,0.16)",
+              "0 0 38px rgba(251,191,36,0.54)",
+              "0 0 90px rgba(217,119,6,0.34)",
               "0 14px 32px rgba(0,0,0,0.55)",
               "inset 0 2px 0 rgba(255,255,255,0.35)",
               "inset 0 -4px 0 rgba(0,0,0,0.25)",
@@ -548,7 +548,7 @@ export default function MeasurelandsMap() {
         <div
           style={{
             position: "relative",
-            color: "rgba(186,230,253,0.85)",
+            color: "rgba(253,230,138,0.85)",
             fontSize: 10,
             fontWeight: 700,
             letterSpacing: "0.2em",
@@ -599,18 +599,18 @@ export default function MeasurelandsMap() {
         @keyframes ml-guided-pulse {
           0%, 100% {
             box-shadow:
-              0 0 0 4px rgba(34,211,238,0.16),
-              0 0 38px rgba(34,211,238,0.54),
-              0 0 90px rgba(20,184,166,0.34),
+              0 0 0 4px rgba(251,191,36,0.16),
+              0 0 38px rgba(251,191,36,0.54),
+              0 0 90px rgba(217,119,6,0.34),
               0 14px 32px rgba(0,0,0,0.55),
               inset 0 2px 0 rgba(255,255,255,0.35),
               inset 0 -4px 0 rgba(0,0,0,0.25);
           }
           50% {
             box-shadow:
-              0 0 0 6px rgba(186,230,253,0.24),
-              0 0 58px rgba(103,232,249,0.74),
-              0 0 120px rgba(20,184,166,0.46),
+              0 0 0 6px rgba(253,230,138,0.24),
+              0 0 58px rgba(253,230,138,0.74),
+              0 0 120px rgba(217,119,6,0.46),
               0 14px 32px rgba(0,0,0,0.55),
               inset 0 2px 0 rgba(255,255,255,0.42),
               inset 0 -4px 0 rgba(0,0,0,0.25);
