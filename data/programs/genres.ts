@@ -1,4 +1,5 @@
 import type { WeekPlan, Lesson } from "./year1";
+import { PREP_MEASURELANDS_PROGRAM } from "./prepMeasurelands";
 import { programs } from "./index";
 
 export type Genre = {
@@ -94,6 +95,10 @@ export function getCurriculumPlan(yearLabel: string, genreId: string): WeekPlan[
     if (program) {
       return program;
     }
+  }
+
+  if (genreId === "measurement" && yearLabel === "Prep") {
+    return PREP_MEASURELANDS_PROGRAM;
   }
 
   return placeholderWeeks(yearLabel, genre);
