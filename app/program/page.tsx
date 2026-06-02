@@ -297,22 +297,31 @@ function ProgramPage() {
       <div className="fixed inset-0 z-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={getHomeBg(levelNum, isPrep)}
+          src={isMeasurementRealm ? "/images/measurelands-home-bg.jpg" : getHomeBg(levelNum, isPrep)}
           alt=""
           className="w-full h-full object-cover"
-          style={{ filter: isPrep ? "brightness(1.22) contrast(1.05) saturate(1.18)" : getHomeBgFilter(levelNum) }}
+          style={{ filter: isMeasurementRealm ? "brightness(1.05) contrast(1.08) saturate(1.12)" : isPrep ? "brightness(1.22) contrast(1.05) saturate(1.18)" : getHomeBgFilter(levelNum) }}
         />
         <div
           className="absolute inset-0 pointer-events-none"
           style={{ boxShadow: getVignetteStyle(levelNum) }}
         />
         <div className={`absolute inset-0 ${isPrep ? "bg-black/10" : "bg-black/30"}`} />
-        {isPrep && (
+        {isPrep && !isMeasurementRealm && (
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
               background:
                 "radial-gradient(ellipse at 50% 70%, rgba(94,234,212,0.22), transparent 65%), linear-gradient(180deg, rgba(186,230,253,0.10) 0%, transparent 40%)",
+            }}
+          />
+        )}
+        {isMeasurementRealm && (
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(ellipse at 50% 70%, rgba(251,191,36,0.18), transparent 60%), linear-gradient(180deg, rgba(5,8,24,0.25) 0%, transparent 45%)",
             }}
           />
         )}
@@ -324,7 +333,7 @@ function ProgramPage() {
               "radial-gradient(circle at top, rgba(255,255,255,0.10), transparent 60%)",
           }}
         />
-        {isPrep && (
+        {isPrep && !isMeasurementRealm && (
           <div className="absolute right-3 sm:right-6 md:right-10 top-[32%] pointer-events-none select-none hidden md:block">
             <div
               className="absolute left-1/2 -translate-x-1/2 -bottom-2 w-[18vh] h-[4vh] rounded-[50%]"
