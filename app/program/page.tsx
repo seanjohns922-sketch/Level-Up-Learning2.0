@@ -405,7 +405,15 @@ function ProgramPage() {
           src={isMeasurementRealm ? "/images/measurelands-home-bg.jpg" : getHomeBg(levelNum, isPrep)}
           alt=""
           className="w-full h-full object-cover"
-          style={{ filter: isMeasurementRealm ? "brightness(1.05) contrast(1.08) saturate(1.12)" : isPrep ? "brightness(1.22) contrast(1.05) saturate(1.18)" : getHomeBgFilter(levelNum) }}
+          style={{
+            filter: isMeasurementRealm
+              ? "brightness(1.02) contrast(1.18) saturate(1.14)"
+              : isPrep
+              ? "brightness(1.22) contrast(1.05) saturate(1.18)"
+              : getHomeBgFilter(levelNum),
+            imageRendering: isMeasurementRealm ? "high-quality" : undefined,
+            WebkitBackfaceVisibility: isMeasurementRealm ? "hidden" : undefined,
+          }}
         />
         <div
           className="absolute inset-0 pointer-events-none"

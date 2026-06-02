@@ -41,8 +41,9 @@ export function LessonPageHero({
           className="h-full w-full object-cover"
           style={isMeasurement ? {
             objectPosition: "center 35%",
-            transform: "scale(1.04)",
-            filter: "brightness(0.88) saturate(1.12) contrast(1.05)",
+            filter: "brightness(0.88) saturate(1.14) contrast(1.18)",
+            imageRendering: "high-quality" as React.CSSProperties["imageRendering"],
+            WebkitBackfaceVisibility: "hidden" as React.CSSProperties["WebkitBackfaceVisibility"],
           } : {
             objectPosition: "78% center",
             transform: "scale(1.02)",
