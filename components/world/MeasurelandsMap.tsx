@@ -188,6 +188,8 @@ export default function MeasurelandsMap() {
   const canvasRef = useWorldCanvas();
 
   const currentWeek = getRecommendedAssignedWeek(store, YEAR, progress?.assignedWeek, progress?.requiredWeeks);
+  const currentZone =
+    DISTRICT_ZONES.find((zone) => currentWeek >= zone.weekStart && currentWeek <= zone.weekEnd) ?? DISTRICT_ZONES[0];
   const completedByWeek = useMemo(() => {
     const result: Record<number, boolean> = {};
     for (let week = 1; week <= 8; week += 1) {
@@ -565,7 +567,7 @@ export default function MeasurelandsMap() {
         <div
           style={{
             position: "relative",
-            color: ACCENT_SOFT,
+            color: "rgba(186,230,253,0.9)",
             fontSize: 12,
             fontWeight: 800,
             letterSpacing: "0.28em",
