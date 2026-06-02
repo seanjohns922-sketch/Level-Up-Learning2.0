@@ -22,15 +22,15 @@ export default function DemoPreviewBanner() {
   }
 
   return (
-    <div className="fixed inset-x-0 top-0 z-[90] px-3 pt-3">
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 rounded-2xl border border-amber-300/50 bg-amber-50/95 px-4 py-3 text-sm text-amber-950 shadow-[0_12px_32px_rgba(0,0,0,0.18)] backdrop-blur-md">
-        <div className="font-bold">Demo Preview Mode — progress may not save</div>
+    <div className="pointer-events-none fixed inset-x-0 top-3 z-[90] flex justify-center px-3 sm:top-4">
+      <div className="pointer-events-auto inline-flex max-w-[calc(100vw-1.5rem)] items-center gap-2 rounded-full border border-amber-300/55 bg-amber-50/95 px-3 py-2 text-[11px] font-bold uppercase tracking-[0.14em] text-amber-950 shadow-[0_10px_24px_rgba(0,0,0,0.16)] backdrop-blur-md sm:max-w-none sm:px-3.5">
+        <div className="whitespace-nowrap">Demo Mode</div>
         <button
           type="button"
           onClick={exitDemoMode}
-          className="rounded-xl bg-amber-900 px-3 py-1.5 text-xs font-black uppercase tracking-[0.14em] text-amber-50 transition hover:brightness-110"
+          className="rounded-full bg-amber-900 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.14em] text-amber-50 transition hover:brightness-110"
         >
-          Exit Demo Mode
+          Exit
         </button>
       </div>
     </div>
