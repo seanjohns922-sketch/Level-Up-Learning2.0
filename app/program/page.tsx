@@ -67,52 +67,52 @@ function ProgramPage() {
     statusClip: undefined as string | undefined,
     actionClip: undefined as string | undefined,
     connClip:   undefined as string | undefined,
-    // colours — card body
-    cardActiveBg:     "linear-gradient(135deg, rgba(120,53,15,0.92) 0%, rgba(180,83,9,0.88) 100%)",
+    // colours — card body (aged parchment / dark leather)
+    cardActiveBg:     "linear-gradient(135deg, rgba(22,14,4,0.95) 0%, rgba(40,26,6,0.92) 50%, rgba(58,38,10,0.88) 100%)",
     cardCompletedBg:  "linear-gradient(135deg, #022c22 0%, #064e3b 50%, #047857 100%)",
-    cardLockedBg:     "linear-gradient(135deg, rgba(76,29,149,0.62) 0%, rgba(88,28,135,0.55) 100%)",
-    // colours — bezel / border gradient
-    bezelActiveBg:    "linear-gradient(135deg, rgba(251,191,36,0.58), rgba(245,158,11,0.22) 40%, rgba(251,191,36,0.52))",
-    bezelCompletedBg: "linear-gradient(135deg, rgba(16,185,129,0.52), rgba(13,148,136,0.22) 40%, rgba(16,185,129,0.48))",
-    bezelLockedBg:    "linear-gradient(135deg, rgba(139,92,246,0.26), rgba(109,40,217,0.12))",
-    bezelPosttestBg:  "linear-gradient(135deg, rgba(167,139,250,0.62), rgba(124,58,237,0.28) 40%, rgba(167,139,250,0.56))",
-    // box shadows
-    cardActiveShadow:    "0 8px 32px rgba(180,83,9,0.36)",
-    cardCompletedShadow: "0 8px 32px rgba(16,185,129,0.32), inset 0 1px 0 rgba(110,231,183,0.35)",
-    cardLockedShadow:    "0 4px 16px rgba(0,0,0,0.32)",
-    // badge (lesson label pill)
-    badgeActiveBg:    "linear-gradient(135deg, #92400e 0%, #b45309 100%)",
+    cardLockedBg:     "linear-gradient(135deg, rgba(20,12,35,0.78) 0%, rgba(35,18,60,0.70) 100%)",
+    // colours — bezel / border (aged brass — less saturated, more antique)
+    bezelActiveBg:    "linear-gradient(135deg, rgba(200,160,48,0.48), rgba(120,90,15,0.16) 40%, rgba(200,160,48,0.42))",
+    bezelCompletedBg: "linear-gradient(135deg, rgba(16,185,129,0.48), rgba(13,148,136,0.18) 40%, rgba(16,185,129,0.44))",
+    bezelLockedBg:    "linear-gradient(135deg, rgba(109,40,217,0.22), rgba(76,29,149,0.10))",
+    bezelPosttestBg:  "linear-gradient(135deg, rgba(139,92,246,0.52), rgba(109,40,217,0.22) 40%, rgba(139,92,246,0.46))",
+    // box shadows (warm depth + subtle purple magical glow)
+    cardActiveShadow:    "0 8px 28px rgba(22,14,4,0.55), 0 0 22px rgba(109,40,217,0.12), inset 0 1px 0 rgba(200,160,48,0.12)",
+    cardCompletedShadow: "0 8px 28px rgba(16,185,129,0.28), inset 0 1px 0 rgba(110,231,183,0.32)",
+    cardLockedShadow:    "0 4px 16px rgba(0,0,0,0.4)",
+    // badge (lesson label pill — bronze gradient)
+    badgeActiveBg:    "linear-gradient(135deg, #2a1a04 0%, #5c3d0e 50%, #8b6520 100%)",
     badgeCompletedBg: "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
-    badgeLockedBg:    "linear-gradient(135deg, #4c1d95 0%, #5b21b6 100%)",
-    badgePosttestBg:  "linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%)",
-    badgeShadow:      "0 0 10px rgba(180,83,9,0.38)",
-    // status pill (ACTIVE / DONE / LOCKED)
-    statusActiveBg:    "linear-gradient(135deg, #b45309 0%, #d97706 100%)",
+    badgeLockedBg:    "linear-gradient(135deg, #2d1b69 0%, #4c1d95 100%)",
+    badgePosttestBg:  "linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%)",
+    badgeShadow:      "inset 0 1px 0 rgba(200,160,48,0.28), 0 0 8px rgba(120,90,15,0.3)",
+    // status pill (ACTIVE — muted brass, not bright gold)
+    statusActiveBg:    "linear-gradient(135deg, #3d2808 0%, #5c3d0e 50%, #7a5418 100%)",
     statusCompletedBg: "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
-    statusLockedBg:    "linear-gradient(135deg, #4c1d95 0%, #5b21b6 100%)",
-    statusPosttestBg:  "linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%)",
-    statusShadow:      "0 0 10px rgba(217,119,6,0.42)",
-    dotClass:          "bg-amber-300 shadow-[0_0_6px_rgba(251,191,36,0.9)]",
-    // action button (START / REPLAY)
-    actionActiveBg:    "linear-gradient(135deg, #b45309 0%, #d97706 50%, #f59e0b 100%)",
+    statusLockedBg:    "linear-gradient(135deg, #2d1b69 0%, #4c1d95 100%)",
+    statusPosttestBg:  "linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%)",
+    statusShadow:      "0 0 8px rgba(120,90,15,0.35)",
+    dotClass:          "bg-yellow-200/80 shadow-[0_0_6px_rgba(200,160,48,0.55)]",
+    // action button (START — soft brass, warm bronze glow on hover)
+    actionActiveBg:    "linear-gradient(135deg, #2a1a04 0%, #5c3d0e 40%, #8b6520 75%, #c8a030 100%)",
     actionCompletedBg: "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
-    actionPosttestBg:  "linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)",
-    actionShadow:      "0 0 14px rgba(217,119,6,0.5)",
+    actionPosttestBg:  "linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%)",
+    actionShadow:      "0 0 16px rgba(120,90,15,0.5), 0 4px 12px rgba(0,0,0,0.45), inset 0 1px 0 rgba(200,160,48,0.3)",
     // connector between cards
-    connActiveBg:    "radial-gradient(circle, #f59e0b, #b45309 70%)",
+    connActiveBg:    "radial-gradient(circle, #c8a030, #3d2808 70%)",
     connCompletedBg: "radial-gradient(circle, #10b981, #064e3b 70%)",
-    connShadow:      "0 0 10px rgba(251,191,36,0.5)",
-    // XP bar
-    xpBg:   "linear-gradient(90deg, #fde68a 0%, #f59e0b 50%, #b45309 100%)",
-    xpGlow: "0 0 10px rgba(251,191,36,0.7)",
-    // header / nav
-    pillBg:     "linear-gradient(135deg, #3a1a00 0%, #7c3d00 50%, #9a5100 100%)",
-    pillShadow: "inset 0 1px 0 rgba(251,191,36,0.35), inset 0 -1px 0 rgba(0,0,0,0.5), 0 0 18px rgba(180,83,9,0.25)",
-    pillDot:    "bg-amber-300 shadow-[0_0_8px_rgba(251,191,36,0.9)]",
-    headingGlow:  "drop-shadow-[0_2px_12px_rgba(180,83,9,0.35)]",
-    focusColor:   "text-amber-300/80",
-    dividerColor: "border-amber-400/15",
-    xpLabelColor: "text-amber-200/70",
+    connShadow:      "0 0 10px rgba(200,160,48,0.35)",
+    // XP bar — brass shimmer (light catches at 60%)
+    xpBg:   "linear-gradient(90deg, #3d2808 0%, #7a5418 25%, #c8a030 55%, #e8d5a8 65%, #c8a030 75%, #7a5418 90%, #3d2808 100%)",
+    xpGlow: "0 0 10px rgba(200,160,48,0.5)",
+    // header / nav (antiqued dark + purple magical glow)
+    pillBg:     "linear-gradient(135deg, #140e04 0%, #2a1a06 50%, #3d2808 100%)",
+    pillShadow: "inset 0 1px 0 rgba(200,160,48,0.25), inset 0 -1px 0 rgba(0,0,0,0.5), 0 0 16px rgba(109,40,217,0.18)",
+    pillDot:    "bg-yellow-200/80 shadow-[0_0_8px_rgba(200,160,48,0.5)]",
+    headingGlow:  "drop-shadow-[0_2px_14px_rgba(109,40,217,0.3)]",
+    focusColor:   "text-yellow-100/70",
+    dividerColor: "border-yellow-900/25",
+    xpLabelColor: "text-yellow-100/65",
   } : {
     rounded: false,
     scanline: true,
