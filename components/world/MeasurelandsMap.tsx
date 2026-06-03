@@ -301,17 +301,25 @@ export default function MeasurelandsMap() {
 
       {/* Warm atmospheric overlays */}
       <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(20,8,0,0.52) 0%, rgba(15,6,0,0.1) 42%, rgba(10,4,0,0.85) 100%)" }} />
-      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 70% 60% at 50% 38%, rgba(251,191,36,0.07) 0%, transparent 70%)" }} />
+      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 68% 58% at 50% 38%, rgba(251,191,36,0.05) 0%, transparent 72%)" }} />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: "radial-gradient(ellipse 34% 38% at 50% 40%, rgba(20,8,0,0.12) 0%, rgba(20,8,0,0.06) 38%, transparent 72%)",
+          pointerEvents: "none",
+        }}
+      />
       <div
         style={{
           position: "absolute",
           left: "50%",
           top: 0,
           transform: "translateX(-50%)",
-          width: 140,
-          height: "60%",
-          background: "linear-gradient(180deg, rgba(253,230,138,0) 0%, rgba(253,230,138,0.22) 55%, rgba(251,191,36,0.45) 100%)",
-          filter: "blur(22px)",
+          width: 128,
+          height: "56%",
+          background: "linear-gradient(180deg, rgba(253,230,138,0) 0%, rgba(253,230,138,0.16) 55%, rgba(251,191,36,0.32) 100%)",
+          filter: "blur(18px)",
           pointerEvents: "none",
         }}
       />
