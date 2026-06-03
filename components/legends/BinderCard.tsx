@@ -6,10 +6,12 @@ import type { Legend } from "@/data/legends";
 export default function BinderCard({
   legend,
   isUnlocked,
+  isDemoPreview = false,
   onClick,
 }: {
   legend: Legend;
   isUnlocked: boolean;
+  isDemoPreview?: boolean;
   onClick: () => void;
 }) {
   return (
@@ -102,13 +104,15 @@ export default function BinderCard({
             <span
               className="inline-flex items-center px-2 py-0.5 rounded-full text-[8px] font-extrabold tracking-wide text-white shadow"
               style={{
-                background: "hsla(155, 60%, 42%, 0.9)",
+                background: isDemoPreview ? "hsla(38, 84%, 52%, 0.92)" : "hsla(155, 60%, 42%, 0.9)",
                 backdropFilter: "blur(4px)",
-                boxShadow: "0 0 8px hsla(155, 60%, 45%, 0.3)",
+                boxShadow: isDemoPreview
+                  ? "0 0 8px hsla(38, 84%, 52%, 0.34)"
+                  : "0 0 8px hsla(155, 60%, 45%, 0.3)",
                 fontFamily: "'Orbitron', 'Rajdhani', 'Exo 2', sans-serif",
               }}
             >
-              ✦ UNLOCKED
+              ✦ {isDemoPreview ? "DEMO PREVIEW" : "UNLOCKED"}
             </span>
           ) : (
             <span

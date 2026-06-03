@@ -6,6 +6,7 @@ import { ArrowLeft, Sparkles } from "lucide-react";
 import { readProgress, type StudentProgress } from "@/data/progress";
 import { getAllLegends, getEffectiveUnlockedLegendIds, type Legend } from "@/data/legends";
 import { YEAR_ORDER } from "@/data/yearOrder";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
 import BinderCard from "@/components/legends/BinderCard";
 import LegendDetailModal from "@/components/legends/LegendDetailModal";
 
@@ -14,6 +15,7 @@ export default function NumbotCollectionPage() {
   const [progress, setProgress] = useState<StudentProgress | null>(null);
   const [selectedLegend, setSelectedLegend] = useState<Legend | null>(null);
   const [barAnimated, setBarAnimated] = useState(false);
+  const demoPreview = isDemoPreviewMode();
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -29,6 +31,10 @@ export default function NumbotCollectionPage() {
   );
 
   const allLegends = useMemo(() => getAllLegends(), []);
+  const visibleUnlockedIds = useMemo(
+    () => (demoPreview ? allLegends.map((legend) => legend.id) : unlockedIds),
+    [allLegends, demoPreview, unlockedIds]
+  );
   const sortedLegends = useMemo(
     () =>
       [...allLegends].sort(
@@ -37,7 +43,7 @@ export default function NumbotCollectionPage() {
     [allLegends]
   );
 
-  const collectedCount = allLegends.filter((l) => unlockedIds.includes(l.id)).length;
+  const collectedCount = allLegends.filter((legend) => visibleUnlockedIds.includes(legend.id)).length;
   const totalCount = allLegends.length;
   const pct = totalCount > 0 ? Math.round((collectedCount / totalCount) * 100) : 0;
 
@@ -250,12 +256,13 @@ export default function NumbotCollectionPage() {
             />
             <div className="relative grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
               {sortedLegends.map((legend) => {
-                const isUnlocked = unlockedIds.includes(legend.id);
+                const isUnlocked = visibleUnlockedIds.includes(legend.id);
                 return (
                   <BinderCard
                     key={legend.id}
                     legend={legend}
                     isUnlocked={isUnlocked}
+                    isDemoPreview={demoPreview}
                     onClick={() => {
                       console.log("[CardBinder] Legend selected", {
                         id: legend.id,
