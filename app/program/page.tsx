@@ -21,6 +21,7 @@ import {
   type ProgramProgressStore,
 } from "@/lib/program-progress";
 import { getHomeBg, getHomeBgFilter, getVignetteStyle } from "@/lib/levelBand";
+import StudentAvatar from "@/components/avatar/StudentAvatar";
 
 const TEACHER_MODE_KEY = "lul:hidden_teacher_mode";
 
@@ -479,6 +480,22 @@ function ProgramPage() {
             />
           </div>
         )}
+      </div>
+
+      {/* ── Student avatar (shared component — appears on every Week page) ── */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed left-1/2 -translate-x-1/2 z-[5] hidden md:block"
+        style={{ bottom: "1.5rem" }}
+      >
+        <StudentAvatar
+          height={160}
+          glowColor={
+            isMeasurementRealm
+              ? "rgba(251,191,36,0.28)"
+              : "rgba(94,234,212,0.30)"
+          }
+        />
       </div>
 
       {/* ── Hero header ── */}
