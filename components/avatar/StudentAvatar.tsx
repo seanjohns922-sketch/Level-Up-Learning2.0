@@ -34,10 +34,10 @@ export type AvatarOutfit = {
 };
 
 export const DEFAULT_OUTFIT: Required<AvatarOutfit> = {
-  skin: "#e8b48a",
-  skinShade: "#c98c63",
-  hair: "#3a2418",
-  hairShade: "#1f1209",
+  skin: "#f1c8a6",
+  skinShade: "#d6a07a",
+  hair: "#4a2e1c",
+  hairShade: "#2e1a0e",
   hairStyle: "swept",
   shirt: "#1d4ed8",
   shirtTrim: "#93c5fd",
