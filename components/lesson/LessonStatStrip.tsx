@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle, Compass, Hourglass, Sparkles } from "lucide-react";
+import { CheckCircle, Compass, HelpCircle, Hourglass, Sparkles, Target } from "lucide-react";
 
 export function LessonStatStrip({
   questionsAnswered,
@@ -19,7 +19,7 @@ export function LessonStatStrip({
     {
       label: isMeasurement ? "Challenges" : "Questions",
       value: questionsAnswered,
-      icon: isMeasurement ? Compass : Hourglass,
+      icon: isMeasurement ? Compass : HelpCircle,
       iconColor: isMeasurement ? "text-amber-300" : "text-cyan-300",
       glow: isMeasurement ? "rgba(200,160,48,0.5)" : "rgba(34,211,238,0.45)",
     },
@@ -33,7 +33,7 @@ export function LessonStatStrip({
     {
       label: isMeasurement ? "Mastery" : "Accuracy",
       value: `${accuracy}%`,
-      icon: isMeasurement ? Sparkles : CheckCircle,
+      icon: isMeasurement ? Sparkles : Target,
       iconColor: isMeasurement ? "text-amber-200" : "text-teal-200",
       glow: isMeasurement ? "rgba(200,160,48,0.5)" : "rgba(94,234,212,0.5)",
     },
