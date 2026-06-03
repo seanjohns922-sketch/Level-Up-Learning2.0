@@ -25,24 +25,24 @@ export type AvatarOutfit = {
   skinShade?: string;
   hair?: string;
   hairShade?: string;
-  hairStyle?: "short" | "tuft"; // future: "long" | "bun" | "cap" ...
+  hairStyle?: "short" | "tuft" | "swept"; // future: "long" | "bun" | "cap" ...
   shirt?: string;
   shirtTrim?: string;
   pants?: string;
   shoes?: string;
-  accessory?: "none"; // future: "backpack" | "wand" | "hat" ...
+  accessory?: "none" | "backpack" | "glasses"; // future: ...
 };
 
 export const DEFAULT_OUTFIT: Required<AvatarOutfit> = {
   skin: "#e8b48a",
   skinShade: "#c98c63",
-  hair: "#5a3a22",
-  hairShade: "#3d2613",
-  hairStyle: "short",
-  shirt: "#3b82f6",
-  shirtTrim: "#bfdbfe",
-  pants: "#1f2937",
-  shoes: "#0b0d12",
+  hair: "#3a2418",
+  hairShade: "#1f1209",
+  hairStyle: "swept",
+  shirt: "#1d4ed8",
+  shirtTrim: "#93c5fd",
+  pants: "#111827",
+  shoes: "#f8fafc",
   accessory: "none",
 };
 
