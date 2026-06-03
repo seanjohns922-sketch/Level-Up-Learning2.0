@@ -1,6 +1,6 @@
 import type { WeekPlan, Lesson } from "./year1";
-import { PREP_MEASURELANDS_PROGRAM } from "./prepMeasurelands";
 import { programs } from "./index";
+import { PREP_MEASURELANDS_PROGRAM } from "./prepMeasurelands";
 
 export type Genre = {
   id: string;
@@ -8,6 +8,10 @@ export type Genre = {
   realm: string;         // e.g. "Number Nexus"
   available: boolean;    // true = real curriculum, false = placeholder
   unlocksFromLevel: number; // 0 = Prep, 1..6 = Year 1..6. Hidden below this.
+};
+
+type GenreCatalogEntry = Omit<Genre, "available"> & {
+  availableLevels?: number[];
 };
 
 /** Year label → numeric key (Prep = 0, Year 1..6 = 1..6). */
@@ -18,17 +22,17 @@ function yearOrdinal(yearLabel: string): number {
 }
 
 /** Master genre catalogue. Future strands unlock from Year 3+. */
-const ALL_GENRES: Genre[] = [
-  { id: "number",      strand: "Number",      realm: "Number Nexus",    available: true,  unlocksFromLevel: 0 },
-  { id: "measurement", strand: "Measurement", realm: "Measurelands",    available: false, unlocksFromLevel: 0 },
-  { id: "space",       strand: "Space",       realm: "Geospin",         available: false, unlocksFromLevel: 0 },
-  { id: "reading",     strand: "Reading",     realm: "Reading Ridge",   available: false, unlocksFromLevel: 0 },
-  { id: "writing",     strand: "Writing",     realm: "Inkwell Wilds",   available: false, unlocksFromLevel: 0 },
-  { id: "grammar",     strand: "Grammar",     realm: "Runehaven Peaks", available: false, unlocksFromLevel: 0 },
+const ALL_GENRES: GenreCatalogEntry[] = [
+  { id: "number",      strand: "Number",      realm: "Number Nexus",    availableLevels: [0, 1, 2, 3, 4, 5, 6], unlocksFromLevel: 0 },
+  { id: "measurement", strand: "Measurement", realm: "Measurelands",    availableLevels: [0], unlocksFromLevel: 0 },
+  { id: "space",       strand: "Space",       realm: "Geospin",         unlocksFromLevel: 0 },
+  { id: "reading",     strand: "Reading",     realm: "Reading Ridge",   unlocksFromLevel: 0 },
+  { id: "writing",     strand: "Writing",     realm: "Inkwell Wilds",   unlocksFromLevel: 0 },
+  { id: "grammar",     strand: "Grammar",     realm: "Runehaven Peaks", unlocksFromLevel: 0 },
   // Future strands — appear from Year 3+, always placeholder for now.
-  { id: "statistics",  strand: "Statistics",  realm: "Datara",          available: false, unlocksFromLevel: 3 },
-  { id: "algebra",     strand: "Algebra",     realm: "Patternox",       available: false, unlocksFromLevel: 3 },
-  { id: "probability", strand: "Probability", realm: "Chanzia",         available: false, unlocksFromLevel: 3 },
+  { id: "statistics",  strand: "Statistics",  realm: "Datara",          unlocksFromLevel: 3 },
+  { id: "algebra",     strand: "Algebra",     realm: "Patternox",       unlocksFromLevel: 3 },
+  { id: "probability", strand: "Probability", realm: "Chanzia",         unlocksFromLevel: 3 },
 ];
 
 /** Genres visible for a given year. Number has real curriculum from Prep upward. */
@@ -36,7 +40,13 @@ export function getGenresForYear(yearLabel: string): Genre[] {
   const ord = yearOrdinal(yearLabel);
   return ALL_GENRES
     .filter((g) => ord >= g.unlocksFromLevel)
-    .map((g) => g);
+    .map((g) => ({
+      id: g.id,
+      strand: g.strand,
+      realm: g.realm,
+      unlocksFromLevel: g.unlocksFromLevel,
+      available: g.availableLevels?.includes(ord) ?? false,
+    }));
 }
 
 /** Year label → numeric key for the `programs` map (Prep = 0, Year 1..6 = 1..6). */
@@ -97,7 +107,7 @@ export function getCurriculumPlan(yearLabel: string, genreId: string): WeekPlan[
     }
   }
 
-  if (genreId === "measurement" && yearLabel === "Prep") {
+  if (genre.available && genreId === "measurement" && yearLabel === "Prep") {
     return PREP_MEASURELANDS_PROGRAM;
   }
 

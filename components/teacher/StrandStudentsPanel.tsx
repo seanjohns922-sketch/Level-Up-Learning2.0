@@ -42,6 +42,24 @@ type InsightCarrier = {
     questionsAnswered?: number | null;
     correctAnswers?: number | null;
     incorrectAnswers?: number | null;
+    accuracyPercent?: number | null;
+    totalQuestions?: number | null;
+    completedAt?: string | null;
+    at?: string | null;
+    title?: string | null;
+    topicSummaries?: Array<{
+      label?: string | null;
+      correct?: number | null;
+      total?: number | null;
+      accuracy?: number | null;
+    }> | null;
+    areasToImprove?: Array<{
+      label?: string | null;
+      correct?: number | null;
+      total?: number | null;
+      accuracy?: number | null;
+    }> | null;
+    struggledQuestionTypes?: string[] | null;
   } | null;
   attempts?: unknown[] | null;
 };
@@ -123,6 +141,21 @@ type Props = {
 };
 
 type StrandStatus = "Not Started" | "In Progress" | "Needs Support" | "Completed";
+type ClassInsightCard = {
+  title: string;
+  headline: string;
+  detail: string;
+  action: string;
+};
+type ClassPerformanceEvidence = {
+  studentId: string;
+  studentName: string;
+  focus: string;
+  accuracy: number;
+  correct: number;
+  total: number;
+  source: "lesson" | "quiz";
+};
 
 function yearToLevelLabel(year: string): string {
   return formatStudentLevelLabel(year);
@@ -600,35 +633,192 @@ function buildStudentWeeklyPerformanceSummary({
 }
 
 function buildClassInsight(
-  rows: Array<{ flag: StudentFlag; summary: ReturnType<typeof buildWeekSummary> }>,
-) {
-  const activeRows = rows.filter((row) => row.summary.mainGap !== "No attempt data yet");
-  if (activeRows.length === 0) {
+  rows: Array<{
+    studentId: string;
+    studentName: string;
+    prog?: ProgressRow;
+    workingYear: string;
+    flag: StudentFlag;
+  }>,
+): ClassInsightCard {
+  const classSize = rows.length;
+  const evidence: ClassPerformanceEvidence[] = [];
+
+  function pushLessonEvidence(row: { studentId: string; studentName: string; prog?: ProgressRow; workingYear: string }) {
+    if (!row.prog) return;
+    const lessonAttempts = parseLessonAttempts(row.prog.lesson_attempts);
+    const lessonPrefix = lessonIdPrefix(row.workingYear);
+
+    Object.entries(lessonAttempts).forEach(([lessonId, carrier]) => {
+      if (!lessonId.startsWith(lessonPrefix)) return;
+
+      const attempts = Array.isArray(carrier.attempts)
+        ? [...carrier.attempts].reverse()
+        : [];
+      const latestCompleted =
+        attempts.find((attempt) => {
+          if (!attempt || typeof attempt !== "object") return false;
+          const candidate = attempt as Record<string, unknown>;
+          return Boolean(candidate.completedAt ?? candidate.at);
+        }) ??
+        (carrier.latestSummary && (carrier.latestSummary.completedAt || carrier.latestSummary.title)
+          ? carrier.latestSummary
+          : null);
+
+      if (!latestCompleted || typeof latestCompleted !== "object") return;
+
+      const record = latestCompleted as Record<string, unknown>;
+      const total = numberOrNull(record.totalQuestions ?? record.questionsAnswered);
+      const correct = numberOrNull(record.correctCount ?? record.correctAnswers);
+      const accuracy =
+        numberOrNull(record.accuracy ?? record.accuracyPercent) ??
+        (total && correct != null && total > 0 ? Math.round((correct / total) * 100) : null);
+
+      if (!total || total <= 0 || correct == null || accuracy == null) return;
+
+      const weakestTopic =
+        carrier.latestInsight?.needsSupport?.trim() ||
+        carrier.latestSummary?.areasToImprove?.[0]?.label?.trim() ||
+        [...(carrier.latestSummary?.topicSummaries ?? [])]
+          .filter((topic) => typeof topic?.accuracy === "number")
+          .sort((left, right) => (left?.accuracy ?? 100) - (right?.accuracy ?? 100))[0]
+          ?.label?.trim() ||
+        carrier.latestSummary?.struggledQuestionTypes?.[0]?.trim() ||
+        carrier.latestSummary?.title?.trim() ||
+        lessonId;
+
+      evidence.push({
+        studentId: row.studentId,
+        studentName: row.studentName,
+        focus: weakestTopic,
+        accuracy,
+        correct,
+        total,
+        source: "lesson",
+      });
+    });
+  }
+
+  function pushQuizEvidence(row: { studentId: string; studentName: string; prog?: ProgressRow }) {
+    if (!row.prog) return;
+    const quizScores = parseQuizScores(row.prog.quiz_scores);
+
+    Object.entries(quizScores).forEach(([key, quiz]) => {
+      if (!/^\d+$/.test(key) || !quiz || typeof quiz !== "object") return;
+      const breakdown = Array.isArray(quiz.lessonBreakdown)
+        ? (quiz.lessonBreakdown as Array<Record<string, unknown>>)
+        : [];
+
+      breakdown.forEach((item) => {
+        const total = numberOrNull(item.total);
+        const correct = numberOrNull(item.correct);
+        const accuracy = numberOrNull(item.percent);
+        if (!total || total <= 0 || correct == null || accuracy == null) return;
+
+        evidence.push({
+          studentId: row.studentId,
+          studentName: row.studentName,
+          focus:
+            (typeof item.title === "string" && item.title.trim()) ||
+            (typeof item.lessonNumber === "number" ? `Lesson ${item.lessonNumber}` : "Weekly Quiz"),
+          accuracy,
+          correct,
+          total,
+          source: "quiz",
+        });
+      });
+    });
+  }
+
+  rows.forEach((row) => {
+    pushLessonEvidence(row);
+    pushQuizEvidence(row);
+  });
+
+  const lowEvidence = evidence.filter((item) => item.accuracy < 70);
+  const focusGroups = new Map<string, { studentIds: Set<string>; studentNames: Set<string>; lowestAccuracy: number }>();
+  lowEvidence.forEach((item) => {
+    const current = focusGroups.get(item.focus) ?? {
+      studentIds: new Set<string>(),
+      studentNames: new Set<string>(),
+      lowestAccuracy: 100,
+    };
+    current.studentIds.add(item.studentId);
+    current.studentNames.add(item.studentName);
+    current.lowestAccuracy = Math.min(current.lowestAccuracy, item.accuracy);
+    focusGroups.set(item.focus, current);
+  });
+
+  const sortedGroups = [...focusGroups.entries()].sort((left, right) => {
+    const countGap = right[1].studentIds.size - left[1].studentIds.size;
+    if (countGap !== 0) return countGap;
+    return left[1].lowestAccuracy - right[1].lowestAccuracy;
+  });
+
+  const struggledGroup = sortedGroups.find(([, group]) => {
+    const count = group.studentIds.size;
+    return count >= 3 || (classSize > 0 && count / classSize >= 0.3);
+  });
+  if (struggledGroup) {
+    const [focus, group] = struggledGroup;
+    const count = group.studentIds.size;
     return {
-      percent: 0,
-      gap: "No class insight yet",
-      action: "Complete a lesson or weekly quiz to generate class-level insight.",
+      title: "Most Struggled Skill",
+      headline: focus,
+      detail: `${count} of ${classSize} students scored below 70%.`,
+      action: "Run a 10-minute reteach before the weekly quiz.",
     };
   }
 
-  const gapCounts = new Map<string, number>();
-  for (const row of activeRows) {
-    const key = row.summary.mainGap;
-    gapCounts.set(key, (gapCounts.get(key) ?? 0) + 1);
+  const interventionGroup = sortedGroups.find(([, group]) => group.studentIds.size >= 2);
+  if (interventionGroup) {
+    const [focus, group] = interventionGroup;
+    const names = [...group.studentNames].sort().slice(0, 3);
+    const nameLabel =
+      names.length === 1
+        ? names[0]!
+        : names.length === 2
+          ? `${names[0]} and ${names[1]}`
+          : `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+
+    return {
+      title: "Intervention Group",
+      headline: `${nameLabel} need support with ${focus}.`,
+      detail: "These students are below 70% accuracy on the same focus area.",
+      action: "Pull this group for a short targeted mini-lesson.",
+    };
   }
 
-  const [topGap, topCount] =
-    [...gapCounts.entries()].sort((left, right) => right[1] - left[1])[0] ?? ["No clear shared gap", 0];
-  const percent = Math.round((topCount / activeRows.length) * 100);
-  const supportCount = activeRows.filter((row) => row.flag.tone === "red" || row.flag.tone === "yellow").length;
+  const completedLessonEvidence = evidence.filter((item) => item.source === "lesson");
+  const lessonCount = completedLessonEvidence.length;
+  const totalQuestions = completedLessonEvidence.reduce((sum, item) => sum + item.total, 0);
+  const totalCorrect = completedLessonEvidence.reduce((sum, item) => sum + item.correct, 0);
+  const averageAccuracy =
+    totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : null;
+
+  if (averageAccuracy != null && lessonCount > 0 && averageAccuracy >= 85) {
+    return {
+      title: "Celebration",
+      headline: "Most students are progressing successfully.",
+      detail: `Class average lesson accuracy is ${averageAccuracy}%.`,
+      action: "Celebrate effort and encourage students to continue their current pathway.",
+    };
+  }
+
+  if (averageAccuracy != null && lessonCount > 0) {
+    return {
+      title: "Class Snapshot",
+      headline: `Average lesson accuracy is ${averageAccuracy}%.`,
+      detail: `Students have completed ${lessonCount} lesson${lessonCount === 1 ? "" : "s"} across the class.`,
+      action: "Continue current pathway and monitor students below 70%.",
+    };
+  }
 
   return {
-    percent,
-    gap: topGap,
-    action:
-      supportCount >= Math.ceil(activeRows.length / 2)
-        ? "Suggested whole-class reteach recommended."
-        : "Target a small group before reteaching the whole class.",
+    title: "No Class Trend Yet",
+    headline: "More completed lessons are needed before a reliable class insight can be generated.",
+    detail: "Insights will improve as students complete more lessons and quizzes.",
+    action: "Check back after students complete their next lesson.",
   };
 }
 
@@ -701,6 +891,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
 
   const genre = genres.find((g) => g.id === genreId)!;
   const isPlaceholder = !genre.available;
+  const isNumberGenre = genreId === "number";
 
   function getProg(studentId: string, year: string) {
     return progress.find((p) => p.student_id === studentId && p.year === year);
@@ -745,27 +936,27 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
       const nameParts = resolveStudentNameParts(s);
       const schoolYear = getSchoolYear(s);
       const workingYear = getWorkingYear(s);
-      const prog = getProg(s.id, workingYear);
+      const prog = isNumberGenre ? getProg(s.id, workingYear) : undefined;
       const liveRow = getLiveRow(s.id);
       const studentEvents = getStudentEvents(s.id);
       const persistedIds = prog ? parseCompleted(prog.completed_lesson_ids) : [];
       const eventIds = buildCompletedLessonIdsFromEvents(studentEvents, workingYear);
       const ids = [...new Set([...persistedIds, ...eventIds])];
-      const sPrefix = lessonIdPrefix(workingYear);
+      const sPrefix = isNumberGenre ? lessonIdPrefix(workingYear) : `${lessonIdPrefix(workingYear)}${genreId}-`;
       const strandIds = isPlaceholder ? [] : ids.filter((id) => id.startsWith(sPrefix));
       const planForStudentYear = getCurriculumPlan(workingYear, genreId);
-      const completedQuizzes = prog ? countCompletedQuizzes(prog.quiz_scores) : 0;
+      const completedQuizzes = isNumberGenre && prog ? countCompletedQuizzes(prog.quiz_scores) : 0;
       const pct = isPlaceholder ? 0 : overallProgramPercent(strandIds.length, completedQuizzes, planForStudentYear);
       const computedStatus = isPlaceholder ? "Not Started" : computeStatus(prog, strandIds.length, pct);
-      const status = computedStatus === "Not Started" && liveRow ? liveRowToStatus(liveRow) : computedStatus;
-      const week = isPlaceholder ? null : (prog?.week ?? liveRow?.current_week ?? null);
+      const status = isNumberGenre && computedStatus === "Not Started" && liveRow ? liveRowToStatus(liveRow) : computedStatus;
+      const week = isPlaceholder || !isNumberGenre ? null : (prog?.week ?? liveRow?.current_week ?? null);
       const activeWeek = week ?? 1;
       const activeWeekPlan = planForStudentYear.find((entry) => entry.week === activeWeek);
       const activeLessonIds = activeWeekPlan?.lessons.map((lesson) => lesson.id) ?? [];
-      const weekInsights = getWeekInsightList(prog, activeWeek, activeLessonIds);
-      const summary = buildWeekSummary(weekInsights, status, liveRow);
+      const weekInsights = isNumberGenre ? getWeekInsightList(prog, activeWeek, activeLessonIds) : [];
+      const summary = buildWeekSummary(weekInsights, status, isNumberGenre ? liveRow : undefined);
       const flag = deriveStudentFlag(pickPrimaryInsight(weekInsights), status);
-      const latestPretest = getLatestPretestProgress(s.id);
+      const latestPretest = isNumberGenre ? getLatestPretestProgress(s.id) : undefined;
 
       return { s, prog, liveRow, studentEvents, pct, status, week, schoolYear, workingYear, summary, flag, latestPretest, nameParts };
     })
@@ -796,7 +987,13 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
       }
     });
 
-  const classInsight = buildClassInsight(studentRows.map((row) => ({ flag: row.flag, summary: row.summary })));
+  const classInsight = buildClassInsight(studentRows.map((row) => ({
+    studentId: row.s.id,
+    studentName: row.nameParts.displayName,
+    prog: row.prog,
+    workingYear: row.workingYear,
+    flag: row.flag,
+  })));
 
   return (
     <div className="space-y-5">
@@ -855,16 +1052,19 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
               Class Insight
             </span>
             <span className="h-1.5 w-1.5 rounded-full bg-[#00E5C3] shadow-[0_0_6px_rgba(0,229,195,0.8)]" />
-            <span className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider">live</span>
+            <span className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider">planning</span>
           </div>
           <div className="text-2xl font-black text-[#0F172A] tracking-tight leading-snug">
-            {classInsight.percent > 0 ? `${classInsight.percent}% of students struggled with:` : "Class insight pending"}
+            {classInsight.title}
           </div>
           <div className="mt-2 text-base font-bold text-[#0A2F2A]">
-            → {classInsight.gap}
+            {classInsight.headline}
           </div>
           <div className="mt-3 text-sm font-medium text-[#475569] tracking-wide">
-            {classInsight.action}
+            {classInsight.detail}
+          </div>
+          <div className="mt-3 text-sm font-semibold text-[#0F172A]">
+            Suggested Action: {classInsight.action}
           </div>
         </div>
       </div>

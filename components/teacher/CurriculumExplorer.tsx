@@ -66,14 +66,18 @@ export default function CurriculumExplorer({
     () => getCurriculumPlan(yearLabel, genreId),
     [yearLabel, genreId]
   );
+  const isNumberGenre = genreId === "number";
 
   const week = plan.find((w) => w.week === weekNum) ?? plan[0];
-  const yearProgress = progress.filter((p) => p.year === yearLabel);
+  const yearProgress = isNumberGenre ? progress.filter((p) => p.year === yearLabel) : [];
   const isPlaceholder = !genre?.available;
-  const prefix = lessonIdPrefix(yearLabel);
+  const prefix = isNumberGenre ? lessonIdPrefix(yearLabel) : `${lessonIdPrefix(yearLabel)}${genreId}-`;
 
   /** Per-lesson status counts across loaded students. */
   function lessonStatusCounts(lessonId: string) {
+    if (!isNumberGenre) {
+      return { completed: 0, inProgress: 0, notStarted: studentCount, struggling: 0 };
+    }
     let completed = 0;
     let inProgress = 0;
     for (const p of yearProgress) {
@@ -87,6 +91,7 @@ export default function CurriculumExplorer({
 
   /** Class average completion % for a given week. */
   function weekAvgPct(w: number) {
+    if (!isNumberGenre) return 0;
     if (yearProgress.length === 0 || studentCount === 0) return 0;
     const lessonsInWeek = plan.find((x) => x.week === w)?.lessons.length ?? 3;
     const total = lessonsInWeek * studentCount;
@@ -135,6 +140,7 @@ export default function CurriculumExplorer({
 
   /** Class average quiz accuracy % for a week (across all students who attempted). */
   function weekAvgAccuracy(w: number): { avg: number; attempts: number } {
+    if (!isNumberGenre) return { avg: 0, attempts: 0 };
     let sum = 0;
     let n = 0;
     for (const p of yearProgress) {
@@ -150,6 +156,7 @@ export default function CurriculumExplorer({
 
   /** Class average per-lesson accuracy from weekly quiz lessonBreakdown. */
   function lessonAvgAccuracy(w: number, lessonNumber: number): { avg: number; attempts: number } {
+    if (!isNumberGenre) return { avg: 0, attempts: 0 };
     let sumCorrect = 0;
     let sumTotal = 0;
     let n = 0;
