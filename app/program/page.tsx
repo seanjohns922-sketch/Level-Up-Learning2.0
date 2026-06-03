@@ -24,6 +24,7 @@ import { getHomeBg, getHomeBgFilter, getVignetteStyle } from "@/lib/levelBand";
 import StudentAvatar from "@/components/avatar/StudentAvatar";
 
 const TEACHER_MODE_KEY = "lul:hidden_teacher_mode";
+const PATHWAY_JOURNAL_KEY_PREFIX = "lul:pathway-journal";
 
 export default function ProgramPageWrapper() {
   return (
@@ -175,6 +176,11 @@ function ProgramPage() {
   const secretTapCountRef = useRef(0);
   const [weekMenuOpen, setWeekMenuOpen] = useState(false);
   const weekMenuRef = useRef<HTMLDivElement | null>(null);
+  const pathwayJournalStorageKey = `${PATHWAY_JOURNAL_KEY_PREFIX}:${realmId}:${curriculumYear}`;
+  const [pathwayJournalOpen, setPathwayJournalOpen] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.sessionStorage.getItem(pathwayJournalStorageKey) === "true";
+  });
 
   const legacyProgramMode = sp.get("legacy") === "1";
   const previewMode = isDemoPreviewMode();
@@ -222,6 +228,11 @@ function ProgramPage() {
       window.removeEventListener("keydown", onKey);
     };
   }, [weekMenuOpen]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.sessionStorage.setItem(pathwayJournalStorageKey, pathwayJournalOpen ? "true" : "false");
+  }, [pathwayJournalOpen, pathwayJournalStorageKey]);
 
   // Re-read store on window focus (in case lesson page updated it)
   useEffect(() => {
@@ -280,6 +291,12 @@ function ProgramPage() {
   }, [hasPersonalizedPlan, lastWeek, previewMode, store, teacherMode, year]);
 
   const progress = getWeekProgress(store, year, week);
+  const pathwayChipBase = isMeasurementRealm
+    ? "border border-yellow-900/30 bg-[#2a1a06]/85 text-yellow-100"
+    : "border border-teal-300/25 bg-black/35 text-teal-50";
+  const optionalChipBase = isMeasurementRealm
+    ? "border border-white/10 bg-[#1f1407]/75 text-amber-50/90"
+    : "border border-white/10 bg-white/5 text-white/85";
 
   type ProgramItem = { type: "lesson" | "quiz" | "posttest"; n: number; title: string; focus: string };
   const items: ProgramItem[] = useMemo(() => {
@@ -719,6 +736,167 @@ function ProgramPage() {
                 </p>
               </div>
             </div>
+
+            {hasPersonalizedPlan ? (
+              <div className="mt-4 mx-auto max-w-3xl">
+                <div
+                  className={`overflow-hidden backdrop-blur-md ${isMeasurementRealm ? "rounded-[22px]" : ""}`}
+                  style={isMeasurementRealm ? {
+                    background: "rgba(20,14,6,0.66)",
+                    border: "1px solid rgba(200,160,48,0.24)",
+                    boxShadow: "0 14px 34px rgba(0,0,0,0.24), inset 0 1px 0 rgba(200,160,48,0.12)",
+                  } : {
+                    clipPath: "polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px)",
+                    background: "rgba(2,18,18,0.72)",
+                    border: "1px solid rgba(94,234,212,0.18)",
+                    boxShadow: "0 14px 34px rgba(0,0,0,0.22), inset 0 1px 0 rgba(94,234,212,0.08)",
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setPathwayJournalOpen((open) => !open)}
+                    className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
+                  >
+                    <div className="min-w-0">
+                      <div className={`text-[11px] font-mono font-black uppercase tracking-[0.22em] ${isMeasurementRealm ? "text-amber-100/90" : "text-teal-300/85"}`}>
+                        Pathway Journal
+                      </div>
+                      <div className={`mt-1 text-xs ${isMeasurementRealm ? "text-amber-50/75" : "text-white/70"}`}>
+                        {requiredWeeks.length} required week{requiredWeeks.length === 1 ? "" : "s"}
+                        {optionalWeeks.length > 0 ? ` · ${optionalWeeks.length} optional` : ""}
+                      </div>
+                    </div>
+                    <span className={`inline-flex items-center gap-2 whitespace-nowrap text-[11px] font-mono font-black uppercase tracking-[0.18em] ${isMeasurementRealm ? "text-yellow-100/85" : "text-teal-100/85"}`}>
+                      {pathwayJournalOpen ? "Hide" : "Show"}
+                      <svg
+                        viewBox="0 0 24 24"
+                        className={`h-3.5 w-3.5 transition-transform ${pathwayJournalOpen ? "rotate-180" : ""}`}
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                      >
+                        <path d="M6 9l6 6 6-6" />
+                      </svg>
+                    </span>
+                  </button>
+
+                  {pathwayJournalOpen ? (
+                    <div className={`border-t px-4 pb-4 pt-3 ${isMeasurementRealm ? "border-yellow-900/20" : "border-teal-400/15"}`}>
+                      <div className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
+                        <div>
+                          <div className={`text-[11px] font-mono font-black uppercase tracking-[0.22em] ${isMeasurementRealm ? "text-yellow-100/90" : "text-teal-300/85"}`}>
+                            Required Pathway
+                          </div>
+                          <div className={`mt-2 text-sm ${isMeasurementRealm ? "text-amber-50/80" : "text-teal-50/90"}`}>
+                            {fullRequiredPath
+                              ? "These weeks are needed to pass this level. Complete them in order."
+                              : "These weeks are needed to pass this level."}
+                          </div>
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {requiredWeeks.map((requiredWeek) => {
+                              const done = isWeekComplete(getWeekProgress(store, year, requiredWeek));
+                              const unlocked = playableWeeks.includes(requiredWeek) || done || requiredWeek === weekNum;
+                              return (
+                                <button
+                                  key={requiredWeek}
+                                  type="button"
+                                  onClick={() => goToWeek(requiredWeek)}
+                                  className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-mono font-black uppercase tracking-[0.16em] transition hover:-translate-y-0.5 ${pathwayChipBase}`}
+                                  style={done
+                                    ? {
+                                        background: isMeasurementRealm
+                                          ? "linear-gradient(135deg, #1d3b22 0%, #0f6b4c 100%)"
+                                          : "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
+                                        boxShadow: isMeasurementRealm
+                                          ? "inset 0 1px 0 rgba(167,243,208,0.18)"
+                                          : "inset 0 1px 0 rgba(110,231,183,0.45), 0 0 16px rgba(16,185,129,0.28)",
+                                      }
+                                    : unlocked
+                                      ? undefined
+                                      : {
+                                          opacity: 0.72,
+                                          background: isMeasurementRealm ? "rgba(42,26,6,0.55)" : "rgba(15,23,42,0.72)",
+                                        }}
+                                >
+                                  <span>{done ? "✓" : unlocked ? "🔓" : "🔒"}</span>
+                                  <span>Week {requiredWeek}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        <div>
+                          <div className={`text-[11px] font-mono font-black uppercase tracking-[0.22em] ${isMeasurementRealm ? "text-amber-200/90" : "text-amber-200/90"}`}>
+                            Optional Practice
+                          </div>
+                          <div className={`mt-2 text-sm ${isMeasurementRealm ? "text-amber-50/80" : "text-white/80"}`}>
+                            {canTakePostTestEarly
+                              ? "You’ve completed your required pathway. You can take the post-test now or keep practising for extra XP."
+                              : "Complete your required pathway to unlock these extra weeks for more XP, rewards, and practice."}
+                          </div>
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {optionalWeeks.length === 0 ? (
+                              <div className={`rounded-full px-3 py-2 text-xs ${optionalChipBase}`}>
+                                No optional weeks in this pathway.
+                              </div>
+                            ) : optionalWeeks.map((optionalWeek) => {
+                              const done = isWeekComplete(getWeekProgress(store, year, optionalWeek));
+                              const optionalPlayable = requiredWeeksComplete || done;
+                              return (
+                                <button
+                                  key={optionalWeek}
+                                  type="button"
+                                  onClick={() => goToWeek(optionalWeek)}
+                                  className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-mono font-black uppercase tracking-[0.16em] transition hover:-translate-y-0.5 ${optionalChipBase}`}
+                                  style={done
+                                    ? {
+                                        background: isMeasurementRealm
+                                          ? "linear-gradient(135deg, #1d3b22 0%, #0f6b4c 100%)"
+                                          : "linear-gradient(135deg, rgba(16,185,129,0.28), rgba(6,78,59,0.9))",
+                                      }
+                                    : optionalPlayable
+                                      ? undefined
+                                      : {
+                                          opacity: 0.72,
+                                          background: isMeasurementRealm ? "rgba(31,20,7,0.55)" : "linear-gradient(135deg, rgba(30,41,59,0.9), rgba(15,23,42,0.92))",
+                                        }}
+                                >
+                                  <span>{done ? "✓" : optionalPlayable ? "🔓" : "🔒"}</span>
+                                  <span>Week {optionalWeek}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+
+                          {requiredWeeksComplete ? (
+                            <div className={`mt-4 rounded-2xl p-4 ${isMeasurementRealm ? "border border-emerald-300/20 bg-emerald-400/8" : "border border-emerald-300/25 bg-emerald-400/10"}`}>
+                              <div className="text-[11px] font-mono font-black uppercase tracking-[0.18em] text-emerald-200">
+                                Ready For Post-Test
+                              </div>
+                              <p className="mt-2 text-sm text-white/85">
+                                All required weeks are complete. You can take the post-test now, or keep working through optional weeks first.
+                              </p>
+                              <button
+                                type="button"
+                                onClick={() => router.push(`/posttest?year=${encodeURIComponent(curriculumYear)}`)}
+                                className="mt-3 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-mono font-black uppercase tracking-[0.16em] text-white"
+                                style={{
+                                  background: "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
+                                  boxShadow: "inset 0 1px 0 rgba(110,231,183,0.45), 0 0 16px rgba(16,185,129,0.22)",
+                                }}
+                              >
+                                Take Post-Test
+                              </button>
+                            </div>
+                          ) : null}
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
@@ -730,114 +908,6 @@ function ProgramPage() {
         }`}
       >
         <div className="max-w-6xl mx-auto">
-          {hasPersonalizedPlan ? (
-            <div className="mb-6 grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
-              <div className="rounded-[26px] border border-teal-300/25 bg-black/25 p-5 backdrop-blur-md shadow-[0_16px_40px_rgba(0,0,0,0.24)]">
-                <div className="text-[11px] font-mono font-black uppercase tracking-[0.22em] text-teal-300/85">
-                  Required Pathway
-                </div>
-                <p className="mt-2 text-sm text-teal-50/90">
-                  {fullRequiredPath
-                    ? "These weeks are needed to pass this level. Complete them in order."
-                    : "These weeks are needed to pass this level."}
-                </p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {requiredWeeks.map((requiredWeek) => {
-                    const done = isWeekComplete(getWeekProgress(store, year, requiredWeek));
-                    return (
-                      <button
-                        key={requiredWeek}
-                        type="button"
-                        onClick={() => goToWeek(requiredWeek)}
-                        className="inline-flex items-center gap-2 px-3 py-2 text-xs font-mono font-black uppercase tracking-[0.16em] text-teal-50 transition hover:-translate-y-0.5"
-                        style={{
-                          clipPath: "polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px)",
-                          background: done
-                            ? "linear-gradient(135deg, #064e3b 0%, #10b981 100%)"
-                            : "linear-gradient(135deg, #064e47 0%, #14b8a6 100%)",
-                          boxShadow: done
-                            ? "inset 0 1px 0 rgba(110,231,183,0.45), 0 0 16px rgba(16,185,129,0.28)"
-                            : "inset 0 1px 0 rgba(94,234,212,0.35), 0 0 14px rgba(20,184,166,0.22)",
-                        }}
-                      >
-                        <span>Week {requiredWeek}</span>
-                        <span className="text-[10px] text-white/80">{done ? "Done" : "Required"}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="rounded-[26px] border border-white/12 bg-black/20 p-5 backdrop-blur-md shadow-[0_16px_40px_rgba(0,0,0,0.22)]">
-                <div className="text-[11px] font-mono font-black uppercase tracking-[0.22em] text-amber-200/90">
-                  Optional Practice
-                </div>
-                <p className="mt-2 text-sm text-white/80">
-                  {canTakePostTestEarly
-                    ? "You’ve completed your required pathway. You can take the post-test now or keep practising for extra XP."
-                    : "Complete your required pathway to unlock these extra weeks for more XP, rewards, and practice."}
-                </p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {optionalWeeks.length === 0 ? (
-                    <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/60">
-                      No optional weeks in this pathway.
-                    </div>
-                  ) : optionalWeeks.map((optionalWeek) => {
-                    const done = isWeekComplete(getWeekProgress(store, year, optionalWeek));
-                    const optionalPlayable = requiredWeeksComplete || done;
-                    return (
-                      <button
-                        key={optionalWeek}
-                        type="button"
-                        onClick={() => goToWeek(optionalWeek)}
-                        className="inline-flex items-center gap-2 px-3 py-2 text-xs font-mono font-black uppercase tracking-[0.16em] text-white/85 transition hover:-translate-y-0.5"
-                        style={{
-                          clipPath: "polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px)",
-                          background: done
-                            ? "linear-gradient(135deg, rgba(16,185,129,0.28), rgba(6,78,59,0.9))"
-                            : optionalPlayable
-                              ? "linear-gradient(135deg, rgba(15,23,42,0.85), rgba(51,65,85,0.7))"
-                              : "linear-gradient(135deg, rgba(30,41,59,0.9), rgba(15,23,42,0.92))",
-                          boxShadow: done
-                            ? "inset 0 1px 0 rgba(110,231,183,0.18)"
-                            : optionalPlayable
-                              ? "inset 0 1px 0 rgba(255,255,255,0.08)"
-                              : "inset 0 1px 0 rgba(148,163,184,0.08)",
-                        }}
-                      >
-                        <span>Week {optionalWeek}</span>
-                        <span className="text-[10px] text-white/60">
-                          {done ? "Done" : optionalPlayable ? "Optional" : "Locked"}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-                {requiredWeeksComplete ? (
-                  <div className="mt-4 rounded-2xl border border-emerald-300/25 bg-emerald-400/10 p-4">
-                    <div className="text-[11px] font-mono font-black uppercase tracking-[0.18em] text-emerald-200">
-                      Ready For Post-Test
-                    </div>
-                    <p className="mt-2 text-sm text-white/85">
-                      All required weeks are complete. You can take the post-test now, or keep working through optional weeks first.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => router.push(`/posttest?year=${encodeURIComponent(curriculumYear)}`)}
-                      className="mt-3 inline-flex items-center gap-2 px-4 py-2 text-xs font-mono font-black uppercase tracking-[0.16em] text-white"
-                      style={{
-                        clipPath: "polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px)",
-                        background: "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
-                        boxShadow: "inset 0 1px 0 rgba(110,231,183,0.45), 0 0 16px rgba(16,185,129,0.22)",
-                      }}
-                    >
-                      Take Post-Test
-                    </button>
-                  </div>
-                ) : null}
-              </div>
-            </div>
-          ) : null}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 items-stretch relative">
             {items.map((item, idx) => {
               const isLesson = item.type === "lesson";
