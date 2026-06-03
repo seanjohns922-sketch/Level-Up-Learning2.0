@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle, Compass, HelpCircle, Hourglass, Sparkles, Target } from "lucide-react";
+import { CheckCircle, Compass, HelpCircle, Sparkles, Target } from "lucide-react";
 
 export function LessonStatStrip({
   questionsAnswered,
