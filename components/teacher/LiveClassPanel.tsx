@@ -116,13 +116,14 @@ type LiveStudentCard = {
   learningState?: LearningState | null;
 };
 
-type LiveCardDisplayGroup = "live" | "needs_support" | "idle";
+type LiveCardDisplayGroup = "live" | "needs_support" | "idle" | "waiting_to_start";
 type LiveStatusFilter = "all" | LiveCardDisplayGroup;
 
 const STATUS_PRIORITY: Record<LiveCardDisplayGroup, number> = {
   needs_support: 0,
   live: 1,
   idle: 2,
+  waiting_to_start: 3,
 };
 
 function formatWorkingLevelBadge(workingLevel?: string | null) {
@@ -325,17 +326,47 @@ function formatLessonTimer(lessonStartedAt: string | null | undefined, now: numb
   return `${mins}m ${secs}s / 9min`;
 }
 
-function getCardDisplayGroup(card: LiveStudentCard): LiveCardDisplayGroup {
-  const accuracy = Math.max(0, card.accuracyPercent ?? 0);
-  const hasAnswered = Math.max(0, card.questionsAnswered ?? 0) > 0;
-  const isCompleted = card.currentLessonStatus === "completed";
+function hasLiveTelemetry(card: LiveStudentCard) {
+  return Boolean(
+    card.lastActiveAt ||
+    card.currentLesson ||
+    card.currentActivityLabel ||
+    card.currentQuestionText ||
+    card.questionsAnswered ||
+    card.correctCount ||
+    card.progressPercent > 0
+  );
+}
 
+function getDisplayStatusLabel(card: LiveStudentCard, group: LiveCardDisplayGroup) {
+  if (group === "needs_support") return "Needs Support";
+  if (group === "waiting_to_start") return "Waiting To Start";
+  if (group === "idle") return "Idle";
+  if (card.currentLessonStatus === "completed") return "Completed";
+  return "Active Now";
+}
+
+function getDisplayStatusSubtext(card: LiveStudentCard, group: LiveCardDisplayGroup) {
+  if (group === "waiting_to_start") return "Waiting To Start";
+  if (card.currentLessonStatus === "completed" && card.lastActiveAt) {
+    return `Completed ${formatRelativeTime(card.lastActiveAt)}`;
+  }
+  if (group === "idle" && card.lastActiveAt) {
+    return `Idle ${formatRelativeTime(card.lastActiveAt)}`;
+  }
+  if (group === "live" && card.lastActiveAt) {
+    return "Active now";
+  }
+  return formatRelativeTime(card.lastActiveAt);
+}
+
+function getCardDisplayGroup(card: LiveStudentCard): LiveCardDisplayGroup {
+  const hasTelemetry = hasLiveTelemetry(card);
   if (card.status === "needs_support") return "needs_support";
-  if (isCompleted) return accuracy > 0 && accuracy < 60 ? "needs_support" : "idle";
+  if (!hasTelemetry) return "waiting_to_start";
   if (card.status === "idle") return "idle";
   if (card.status === "check_in" || card.status === "on_track") return "live";
-  if (hasAnswered || card.currentLesson || card.currentActivityLabel) return "live";
-  return "idle";
+  return "live";
 }
 
 function getCardTone(group: LiveCardDisplayGroup) {
@@ -363,11 +394,13 @@ function getCardTone(group: LiveCardDisplayGroup) {
 function statusFilterLabel(filter: LiveStatusFilter) {
   switch (filter) {
     case "live":
-      return "Live";
+      return "Active Now";
     case "needs_support":
       return "Needs Support";
     case "idle":
       return "Idle";
+    case "waiting_to_start":
+      return "Waiting To Start";
     default:
       return "Live View";
   }
@@ -519,16 +552,8 @@ export default function LiveClassPanel({
       const rightGroup = getCardDisplayGroup(right);
       const statusGap = STATUS_PRIORITY[leftGroup] - STATUS_PRIORITY[rightGroup];
       if (statusGap !== 0) return statusGap;
-      if (leftGroup === "needs_support") {
-        const leftAccuracy = left.accuracyPercent ?? 101;
-        const rightAccuracy = right.accuracyPercent ?? 101;
-        if (leftAccuracy !== rightAccuracy) return leftAccuracy - rightAccuracy;
-      }
       const leftTime = left.lastActiveAt ? new Date(left.lastActiveAt).getTime() : 0;
       const rightTime = right.lastActiveAt ? new Date(right.lastActiveAt).getTime() : 0;
-      if (leftGroup === "idle") {
-        return leftTime - rightTime;
-      }
       return rightTime - leftTime;
     });
     return spotlightMode ? sorted.slice(0, 6) : sorted;
@@ -549,6 +574,7 @@ export default function LiveClassPanel({
         live: 0,
         needs_support: 0,
         idle: 0,
+        waiting_to_start: 0,
       } as Record<LiveCardDisplayGroup, number>
     );
   }, [cards]);
@@ -602,11 +628,12 @@ export default function LiveClassPanel({
               </label>
             </div>
 
-            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               {[
-                { label: "Live", value: activeStudentCount, tone: "text-emerald-700" },
+                { label: "Active Now", value: activeStudentCount, tone: "text-emerald-700" },
                 { label: "Needs Support", value: statusCounts.needs_support, tone: "text-rose-700" },
                 { label: "Idle", value: statusCounts.idle, tone: "text-slate-600" },
+                { label: "Waiting To Start", value: statusCounts.waiting_to_start, tone: "text-slate-500" },
               ].map((item) => (
                 <div key={item.label} className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
                   <div className="text-[11px] font-mono font-bold uppercase tracking-[0.18em] text-slate-500">
@@ -636,7 +663,7 @@ export default function LiveClassPanel({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {(["live", "needs_support", "idle"] as const).map((status) => {
+          {(["live", "needs_support", "idle", "waiting_to_start"] as const).map((status) => {
             const active = filter === status;
             return (
               <button
@@ -697,9 +724,9 @@ export default function LiveClassPanel({
                     <div className="flex flex-col items-end gap-1.5">
                       <span className={`inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-[11px] font-bold ${tone.badge}`}>
                         <span className={`h-2 w-2 rounded-full ${tone.dot}`} />
-                        {displayGroup === "live" ? "Live" : displayGroup === "needs_support" ? "Needs Support" : "Idle"}
+                        {getDisplayStatusLabel(card, displayGroup)}
                       </span>
-                      {card.learningState && card.learningState !== "confident" && displayGroup !== "idle" ? (() => {
+                      {card.learningState && card.learningState !== "confident" && displayGroup !== "idle" && displayGroup !== "waiting_to_start" ? (() => {
                         const meta = getLearningStateMeta(card.learningState);
                         return (
                           <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-bold ${meta.badge}`}>
@@ -753,17 +780,23 @@ export default function LiveClassPanel({
                       {card.currentLesson ? card.currentLesson.replace(/^.*-/, "").toUpperCase() : "No lesson yet"}
                     </div>
                     <div className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">
-                      {card.currentLessonStatus === "completed"
+                      {displayGroup === "waiting_to_start"
+                        ? "Waiting To Start"
+                        : card.currentLessonStatus === "completed"
                         ? "Lesson complete"
                         : card.progressLabel ?? formatLocation(card)}
                     </div>
                     <div className="font-semibold text-slate-700">
-                      {card.currentLessonStatus === "completed"
+                      {displayGroup === "waiting_to_start"
+                        ? "No activity or lesson telemetry yet"
+                        : card.currentLessonStatus === "completed"
                         ? "Ready for next lesson / quiz"
                         : (card.currentActivityLabel ?? "No activity yet")}
                     </div>
                     <div className="line-clamp-2 text-slate-500 text-xs">
-                      {card.currentLessonStatus === "completed"
+                      {displayGroup === "waiting_to_start"
+                        ? "This student has not opened a live lesson or quiz yet."
+                        : card.currentLessonStatus === "completed"
                         ? `${card.currentLessonTitle ?? card.currentLesson ?? "Lesson"} completed`
                         : (card.currentQuestionText ?? card.lastEventText)}
                     </div>
@@ -771,12 +804,12 @@ export default function LiveClassPanel({
 
                   {/* Footer: last event + time */}
                   <div className="mt-3 flex items-center justify-between text-xs text-slate-400">
-                    <span>{card.currentLessonStatus === "completed" ? "Completed lesson" : card.lastEventText}</span>
-                    <span>{formatRelativeTime(card.lastActiveAt)}</span>
+                    <span>{displayGroup === "waiting_to_start" ? "No live activity yet" : card.currentLessonStatus === "completed" ? "Completed lesson" : card.lastEventText}</span>
+                    <span>{getDisplayStatusSubtext(card, displayGroup)}</span>
                   </div>
 
                   {/* AI insight — alert states only */}
-                  {card.aiIssue && displayGroup !== "live" ? (
+                  {card.aiIssue && displayGroup !== "live" && displayGroup !== "waiting_to_start" ? (
                     <div className={`mt-3 rounded-xl border px-3 py-2 text-xs font-semibold ${tone.badge}`}>
                       {card.aiIssue}
                     </div>

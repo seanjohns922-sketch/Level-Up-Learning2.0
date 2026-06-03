@@ -186,6 +186,15 @@ function buildNextActivityRow(
     currentLessonStatus = "active";
     completedAt = null;
   }
+  if (
+    input.eventType === "activity_started" ||
+    input.eventType === "question_loaded" ||
+    input.eventType === "answer_correct" ||
+    input.eventType === "answer_incorrect"
+  ) {
+    currentLessonStatus = "active";
+    completedAt = null;
+  }
 
   const lessonStartedAt =
     (input.eventType === "lesson_started" || input.eventType === "quiz_started")
