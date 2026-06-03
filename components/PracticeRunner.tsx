@@ -12,6 +12,7 @@ import { LessonHUDRail } from "@/components/lesson/LessonHUDRail";
 import { LessonCompleteCard } from "@/components/lesson/LessonCompleteCard";
 import SurgeAmbience from "@/components/lesson/SurgeAmbience";
 import NexusActivation from "@/components/lesson/NexusActivation";
+import ComboActivation from "@/components/lesson/ComboActivation";
 import type { LessonPerformanceSummary } from "@/components/lesson/Year2LessonEngine";
 
 type McqTask = Extract<PracticeTask, { kind: "mcq" }>;
@@ -767,8 +768,9 @@ export function PracticeRunner({
         }`}
       />
 
-      <SurgeAmbience comboCount={comboCount} />
-      <NexusActivation comboCount={comboCount} />
+      <SurgeAmbience comboCount={comboCount} realmId={realmId} />
+      <ComboActivation comboCount={comboCount} realmId={realmId} />
+      <NexusActivation comboCount={comboCount} realmId={realmId} />
 
       {/* Two-column landscape: sticky HUD rail + question workspace */}
       <div className="grid gap-3 lg:grid-cols-[300px_1fr] lg:items-start lg:gap-5">

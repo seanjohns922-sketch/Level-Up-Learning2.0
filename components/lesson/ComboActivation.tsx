@@ -3,10 +3,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 /**
- * Full-screen activation burst for Surge (5-combo) and Overdrive (8-combo).
- * Same DNA as NexusActivation — rings, particles, corner bursts, scanline —
- * scaled proportionally smaller so the tiers feel distinct from Nexus.
- * NexusActivation handles 10-combo separately and is not affected.
+ * Full-screen activation burst for the mid-streak tiers (5 and 8).
+ * Realm-aware:
+ *   - Number Nexus: SURGE (5, gold) / OVERDRIVE (8, orange) — sci-fi energy.
+ *   - Measurelands: BREAKTHROUGH (5, brass) / MASTER EXPLORER (8, purple+brass)
+ *     — magical measurement bursts with floating hourglass/ruler glyphs.
+ * NexusActivation handles 10-combo (Nexus State / Legendary) separately.
+ * Same DNA — rings, particles, corner bursts, scanline — scaled per tier.
  */
 
 function seeded(seed: number) {
@@ -30,9 +33,11 @@ type TierConfig = {
   titleFilter: string;
   accentColor: string;
   dividerGradient: string;
+  /** Measurement symbols that float upward (Measurelands only). */
+  glyphs?: string[];
 };
 
-const TIERS: TierConfig[] = [
+const NEXUS_TIERS: TierConfig[] = [
   {
     threshold: 5,
     title: "SURGE",
@@ -69,9 +74,50 @@ const TIERS: TierConfig[] = [
   },
 ];
 
+const MEASURE_TIERS: TierConfig[] = [
+  {
+    threshold: 5,
+    title: "BREAKTHROUGH",
+    engaged: "DISCOVERED",
+    subtitle: "5 in a row — you're measuring like a master!",
+    hues: [42, 38], // brass / deep gold
+    flashColor: "rgba(200,160,48,0.5)",
+    ringColor: "rgba(200,160,48,0.85)",
+    ringCount: 3,
+    particleCount: 26,
+    duration: 1.8,
+    cornerSize: 120,
+    titleGradient: "linear-gradient(180deg, #fff8e8 0%, #e8c878 48%, #8b6520 100%)",
+    titleFilter: "drop-shadow(0 0 20px rgba(200,160,48,0.9)) drop-shadow(0 0 42px rgba(139,101,32,0.7))",
+    accentColor: "rgba(232,200,120,0.95)",
+    dividerGradient: "linear-gradient(90deg, transparent, rgba(200,160,48,0.9), rgba(139,101,32,0.7), transparent)",
+    glyphs: ["⏳", "½", "⏱", "⚖", "📏"],
+  },
+  {
+    threshold: 8,
+    title: "MASTER EXPLORER",
+    engaged: "ASCENDING",
+    subtitle: "8 in a row — the magic is surging!",
+    hues: [265, 42], // wizard purple + brass
+    flashColor: "rgba(167,139,250,0.52)",
+    ringColor: "rgba(167,139,250,0.85)",
+    ringCount: 4,
+    particleCount: 38,
+    duration: 2.2,
+    cornerSize: 140,
+    titleGradient: "linear-gradient(180deg, #f5f0ff 0%, #c4b5fd 45%, #6d28d9 100%)",
+    titleFilter: "drop-shadow(0 0 22px rgba(167,139,250,0.95)) drop-shadow(0 0 46px rgba(109,40,217,0.72))",
+    accentColor: "rgba(196,181,253,0.95)",
+    dividerGradient: "linear-gradient(90deg, transparent, rgba(167,139,250,0.9), rgba(200,160,48,0.6), transparent)",
+    glyphs: ["⏳", "⚙", "½", "⏱", "⚖", "📏"],
+  },
+];
+
 type ActivationKey = { id: number; tier: TierConfig };
 
-export default function ComboActivation({ comboCount }: { comboCount: number }) {
+export default function ComboActivation({ comboCount, realmId }: { comboCount: number; realmId?: string }) {
+  const isMeasurement = realmId === "measurement";
+  const tiers = isMeasurement ? MEASURE_TIERS : NEXUS_TIERS;
   const prevRef = useRef(comboCount);
   const idRef = useRef(0);
   const [active, setActive] = useState<ActivationKey | null>(null);
@@ -80,20 +126,19 @@ export default function ComboActivation({ comboCount }: { comboCount: number }) 
     const prev = prevRef.current;
     prevRef.current = comboCount;
 
-    // Check from highest threshold down — only fire if not crossing into Nexus (handled separately)
-    for (const tier of [...TIERS].reverse()) {
+    // Highest threshold down — only fire below 10 (Nexus/Legendary handled separately)
+    for (const tier of [...tiers].reverse()) {
       if (prev < tier.threshold && comboCount >= tier.threshold && comboCount < 10) {
         idRef.current += 1;
-        const key = { id: idRef.current, tier };
-        setActive(key);
+        setActive({ id: idRef.current, tier });
         const t = setTimeout(() => setActive(null), Math.round(tier.duration * 1000) + 300);
         try {
-          window.dispatchEvent(new CustomEvent(`lul:${tier.title.toLowerCase()}-activated`));
+          window.dispatchEvent(new CustomEvent(`lul:${tier.title.toLowerCase().replace(/\s+/g, "-")}-activated`));
         } catch {}
         return () => clearTimeout(t);
       }
     }
-  }, [comboCount]);
+  }, [comboCount, tiers]);
 
   const particles = useMemo(() => {
     if (!active) return [];
@@ -106,6 +151,19 @@ export default function ComboActivation({ comboCount }: { comboCount: number }) 
       const duration = 0.85 + seeded(active.id * 31 + i) * 0.6;
       const hue = tier.hues[seeded(active.id * 37 + i) < 0.5 ? 0 : 1];
       return { id: i, x: Math.cos(angle) * distance, y: Math.sin(angle) * distance, size, delay, duration, hue };
+    });
+  }, [active]);
+
+  const glyphs = useMemo(() => {
+    if (!active || !active.tier.glyphs) return [];
+    const set = active.tier.glyphs;
+    return Array.from({ length: 11 }, (_, i) => {
+      const left = 6 + seeded(active.id * 41 + i) * 88;
+      const delay = seeded(active.id * 43 + i) * 0.5;
+      const size = 22 + seeded(active.id * 47 + i) * 26;
+      const drift = (seeded(active.id * 53 + i) - 0.5) * 80;
+      const rot = (seeded(active.id * 59 + i) - 0.5) * 40;
+      return { id: i, char: set[i % set.length], left, delay, size, drift, rot };
     });
   }, [active]);
 
@@ -155,6 +213,12 @@ export default function ComboActivation({ comboCount }: { comboCount: number }) 
           72% { opacity: 0.6; }
           100% { opacity: 0; }
         }
+        @keyframes comboGlyph {
+          0% { opacity: 0; transform: translate(-50%, 0) translateY(60px) scale(0.5) rotate(var(--rot)); }
+          18% { opacity: 0.95; }
+          75% { opacity: 0.7; }
+          100% { opacity: 0; transform: translate(-50%, 0) translateY(-240px) scale(1.15) rotate(calc(var(--rot) * -1)); }
+        }
       `}</style>
 
       {/* Colour flash */}
@@ -175,6 +239,28 @@ export default function ComboActivation({ comboCount }: { comboCount: number }) 
           animation: `comboScan ${(tier.duration * 0.44).toFixed(2)}s ease-in forwards`,
         }}
       />
+
+      {/* Floating measurement glyphs (Measurelands only) */}
+      {glyphs.map((g) => (
+        <span
+          key={g.id}
+          className="absolute bottom-[18%]"
+          style={
+            {
+              left: `${g.left}%`,
+              fontSize: g.size,
+              lineHeight: 1,
+              filter: `drop-shadow(0 0 10px ${tier.flashColor})`,
+              "--rot": `${g.rot}deg`,
+              "--dx": `${g.drift}px`,
+              animation: `comboGlyph ${(tier.duration * 0.95).toFixed(2)}s ease-out ${g.delay.toFixed(2)}s forwards`,
+              opacity: 0,
+            } as React.CSSProperties
+          }
+        >
+          {g.char}
+        </span>
+      ))}
 
       {/* Shockwave rings */}
       {Array.from({ length: tier.ringCount }, (_, i) => (
@@ -238,12 +324,11 @@ export default function ComboActivation({ comboCount }: { comboCount: number }) 
         className="absolute left-1/2 top-1/2 text-center"
         style={{ animation: `comboTitleIn ${(tier.duration + 0.18).toFixed(2)}s cubic-bezier(0.22,1,0.36,1) forwards` }}
       >
-        {/* Title */}
         <div
           className="font-mono font-black uppercase leading-none"
           style={{
-            fontSize: "clamp(2.4rem, 7vw, 4.6rem)",
-            letterSpacing: "0.14em",
+            fontSize: "clamp(2.2rem, 6.5vw, 4.4rem)",
+            letterSpacing: "0.12em",
             background: tier.titleGradient,
             WebkitBackgroundClip: "text",
             backgroundClip: "text",
@@ -254,7 +339,6 @@ export default function ComboActivation({ comboCount }: { comboCount: number }) 
           {tier.title}
         </div>
 
-        {/* Engaged/Activated sub-line */}
         <div
           className="font-mono font-black uppercase"
           style={{
@@ -268,7 +352,6 @@ export default function ComboActivation({ comboCount }: { comboCount: number }) 
           {tier.engaged}
         </div>
 
-        {/* Divider */}
         <div
           className="mx-auto mt-3 h-[2px] rounded-full"
           style={{
@@ -278,7 +361,6 @@ export default function ComboActivation({ comboCount }: { comboCount: number }) 
           }}
         />
 
-        {/* Sub-copy */}
         <div
           className="mt-2 font-sans font-extrabold"
           style={{

@@ -933,9 +933,9 @@ export function Year2LessonEngine({
         }`}
       />
 
-      <SurgeAmbience comboCount={comboCount} />
-      <ComboActivation comboCount={comboCount} />
-      <NexusActivation comboCount={comboCount} />
+      <SurgeAmbience comboCount={comboCount} realmId={realmId} />
+      <ComboActivation comboCount={comboCount} realmId={realmId} />
+      <NexusActivation comboCount={comboCount} realmId={realmId} />
 
       <div className="grid gap-3 lg:grid-cols-[300px_1fr] lg:items-start lg:gap-5">
         <aside className="lg:sticky lg:top-4 lg:self-start">
