@@ -10,6 +10,8 @@ import SurgeAmbience from "@/components/lesson/SurgeAmbience";
 import NexusActivation from "@/components/lesson/NexusActivation";
 import ComboActivation from "@/components/lesson/ComboActivation";
 import LessonReflection from "@/components/lesson/LessonReflection";
+import BrainBreak from "@/components/lesson/BrainBreak";
+import { pickVillain, BRAIN_BREAK_AT_SECONDS_LEFT, type Villain } from "@/lib/brain-break";
 import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent } from "@/lib/live-class-client";
 import { readBestChain, writeBestChain } from "@/lib/best-chain";
 import {
@@ -475,6 +477,9 @@ export function Year2LessonEngine({
   const activities = lessonPool.activities;
   const initialTurn = useMemo(() => buildInitialTurn(lesson, activities), [activities, lesson]);
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
+  const [brainBreakVillain, setBrainBreakVillain] = useState<Villain | null>(null);
+  const brainBreakDoneRef = useRef(false);
+  const brainBreakActiveRef = useRef(false);
   const [status, setStatus] = useState<"idle" | "correct" | "wrong">("idle");
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
@@ -610,13 +615,23 @@ export function Year2LessonEngine({
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setSecondsLeft((c) => c - 1);
+      setSecondsLeft((c) => (brainBreakActiveRef.current ? c : c - 1));
     }, 1000);
     return () => {
       clearInterval(interval);
       clearPendingTimeout();
     };
   }, []);
+
+  // Fire the brain break once at the 4:30 mark — pauses the lesson clock.
+  useEffect(() => {
+    if (finished || brainBreakDoneRef.current) return;
+    if (secondsLeft <= BRAIN_BREAK_AT_SECONDS_LEFT && secondsLeft > 0) {
+      brainBreakDoneRef.current = true;
+      brainBreakActiveRef.current = true;
+      setBrainBreakVillain(pickVillain());
+    }
+  }, [secondsLeft, finished]);
 
   useEffect(() => {
     if (!finished || emittedSummaryRef.current) return;
@@ -936,6 +951,15 @@ export function Year2LessonEngine({
       <SurgeAmbience comboCount={comboCount} realmId={realmId} />
       <ComboActivation comboCount={comboCount} realmId={realmId} />
       <NexusActivation comboCount={comboCount} realmId={realmId} />
+      {brainBreakVillain && (
+        <BrainBreak
+          villain={brainBreakVillain}
+          onComplete={() => {
+            brainBreakActiveRef.current = false;
+            setBrainBreakVillain(null);
+          }}
+        />
+      )}
 
       <div className="grid gap-3 lg:grid-cols-[300px_1fr] lg:items-start lg:gap-5">
         <aside className="lg:sticky lg:top-4 lg:self-start">
