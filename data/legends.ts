@@ -21,11 +21,17 @@ export type Legend = {
   stats: LegendStats; // calc/speed/accuracy
 
   images: LegendImages;
+  unlockVideoUrl?: string;
+  showcaseVideoUrl?: string;
 };
 
 // Helpers
 const DEFAULT_AVATAR = "/cards/numbot-solver-y4-front.png"; // safe fallback
 const DEFAULT_BACK = "/cards/numbot-solver-y4-back.png";
+
+function legendVideoUrl(slug: string) {
+  return `/videos/legends/${slug}.mp4`;
+}
 
 const LEGENDS: Legend[] = [
   // ✅ Your new real card
@@ -42,6 +48,8 @@ const LEGENDS: Legend[] = [
       cardFront: "/cards/numbot-solver-y4-front.png",
       cardBack: "/cards/numbot-solver-y4-back.png",
     },
+    unlockVideoUrl: legendVideoUrl("numbot-solver"),
+    showcaseVideoUrl: legendVideoUrl("numbot-solver"),
   },
 
   // --- Placeholders for other years (so the app doesn’t break) ---
@@ -58,6 +66,8 @@ const LEGENDS: Legend[] = [
       cardFront: "/cards/numbot-bouncer-y0-front.png",
       cardBack: "/cards/numbot-bouncer-y0-back.png",
     },
+    unlockVideoUrl: legendVideoUrl("numbot-bouncer"),
+    showcaseVideoUrl: legendVideoUrl("numbot-bouncer"),
   },
   {
     id: "numbot-counter-y1",
@@ -72,6 +82,8 @@ const LEGENDS: Legend[] = [
       cardFront: "/cards/numbot-counter-y1-front.png",
       cardBack: "/cards/numbot-counter-y1-back.png",
     },
+    unlockVideoUrl: legendVideoUrl("numbot-counter"),
+    showcaseVideoUrl: legendVideoUrl("numbot-counter"),
   },
   {
     id: "numbot-builder-y2",
@@ -86,6 +98,8 @@ const LEGENDS: Legend[] = [
       cardFront: "/cards/numbot-builder-y2-front.png",
       cardBack: "/cards/numbot-builder-y2-back.png",
     },
+    unlockVideoUrl: legendVideoUrl("numbot-builder"),
+    showcaseVideoUrl: legendVideoUrl("numbot-builder"),
   },
   {
     id: "numbot-processor-y3",
@@ -100,6 +114,8 @@ const LEGENDS: Legend[] = [
       cardFront: "/cards/numbot-processor-y3-front.png",
       cardBack: "/cards/numbot-processor-y3-back.png",
     },
+    unlockVideoUrl: legendVideoUrl("numbot-processor"),
+    showcaseVideoUrl: legendVideoUrl("numbot-processor"),
   },
   {
     id: "numbot-calculator-y5",
@@ -114,6 +130,8 @@ const LEGENDS: Legend[] = [
       cardFront: "/cards/numbot-calculator-y5-front.png",
       cardBack: "/cards/numbot-calculator-y5-back.png",
     },
+    unlockVideoUrl: legendVideoUrl("numbot-calculator"),
+    showcaseVideoUrl: legendVideoUrl("numbot-calculator"),
   },
   {
     id: "numbot-equationator-y6",
@@ -128,6 +146,8 @@ const LEGENDS: Legend[] = [
       cardFront: "/cards/numbot-equationator-y6-front.png",
       cardBack: "/cards/numbot-equationator-y6-back.png",
     },
+    unlockVideoUrl: legendVideoUrl("numbot-equationator"),
+    showcaseVideoUrl: legendVideoUrl("numbot-equationator"),
   },
 ];
 
@@ -148,6 +168,8 @@ export function getLegendForYear(yearLabel: string): Legend {
       stars: 1,
       stats: { calculation: 0, speed: 0, accuracy: 0 },
       images: { avatar: DEFAULT_AVATAR, cardFront: DEFAULT_AVATAR, cardBack: DEFAULT_BACK },
+      unlockVideoUrl: undefined,
+      showcaseVideoUrl: undefined,
     }
   );
 }

@@ -7,6 +7,7 @@ import { readProgress, StudentProgress, writeProgress, ACTIVE_STUDENT_KEY } from
 import { saveStudentProgressState } from "@/lib/student-progress-sync";
 import LegendUnlockReveal from "@/components/LegendUnlockReveal";
 import type { AssessmentResultProfile } from "@/data/assessments/analysis";
+import { hasSeenLegendUnlockVideo } from "@/lib/legend-video-state";
 import { ALL_PROGRAM_WEEKS, getOptionalWeeks, normalizeWeekList } from "@/lib/program-progress";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 const POSTTEST_PASS_THRESHOLD = 85;
@@ -302,6 +303,7 @@ function ResultsPage() {
   const shouldShowUnlock =
     unlockTargets.length > 0 &&
     unlockTargets.some((id) => !(initialProgress?.unlockedLegends ?? []).includes(id)) &&
+    !hasSeenLegendUnlockVideo(unlockDisplayLegend.id) &&
     !unlockDismissed;
   const isFailedPretest = !isPostTest && !passedByPretest;
   const requiresFullPathway = isFailedPretest && scorePercent < PRETEST_PASS_THRESHOLD;

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Legend } from "@/data/legends";
+import { markLegendUnlockVideoSeen } from "@/lib/legend-video-state";
 
 /* ── animation stages ── */
 type Stage =
@@ -74,6 +75,10 @@ export default function LegendUnlockReveal({
   onViewLegends: () => void;
 }) {
   const [stage, setStage] = useState<Stage>("dark");
+  const [videoComplete, setVideoComplete] = useState(!legend.unlockVideoUrl);
+  const [videoFailed, setVideoFailed] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const unlockVideoUrl = legend.unlockVideoUrl;
 
   const particles = useMemo(() => makeParticles(50), []);
   const confetti = useMemo(() => makeConfetti(100), []);
@@ -106,6 +111,22 @@ export default function LegendUnlockReveal({
   const showReveal = past("reveal");
   const showInfo = past("info");
   const showButtons = past("ready");
+  const hasUnlockVideo = Boolean(unlockVideoUrl);
+
+  useEffect(() => {
+    if (!hasUnlockVideo || !showInfo || videoComplete || videoFailed || !videoRef.current) return;
+    const playback = videoRef.current.play();
+    if (playback && typeof playback.catch === "function") {
+      playback.catch(() => {
+        // Browser autoplay restrictions should not break the reward flow.
+      });
+    }
+  }, [hasUnlockVideo, showInfo, videoComplete, videoFailed]);
+
+  function finishUnlockVideo() {
+    markLegendUnlockVideoSeen(legend.id);
+    setVideoComplete(true);
+  }
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden">
@@ -389,6 +410,37 @@ export default function LegendUnlockReveal({
           >
             {legend.description}
           </p>
+
+          {showInfo && hasUnlockVideo ? (
+            <div className="mt-6 w-full max-w-[420px] rounded-2xl border border-white/12 bg-black/30 p-3 backdrop-blur-sm">
+              <div className="mb-2 text-[11px] font-bold tracking-[0.22em]" style={{ color: "hsla(42, 95%, 55%, 0.86)" }}>
+                LEGEND CINEMATIC
+              </div>
+              <div className="overflow-hidden rounded-xl bg-black shadow-2xl">
+                <div className="aspect-video w-full">
+                  {videoFailed ? (
+                    <div className="flex h-full items-center justify-center px-5 text-center text-sm text-white/75">
+                      Video unavailable right now. You can still continue and view the legend.
+                    </div>
+                  ) : (
+                    <video
+                      ref={videoRef}
+                      src={unlockVideoUrl}
+                      controls
+                      autoPlay
+                      playsInline
+                      className="h-full w-full"
+                      onEnded={finishUnlockVideo}
+                      onError={() => {
+                        setVideoFailed(true);
+                        finishUnlockVideo();
+                      }}
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : null}
         </div>
 
         {/* Action buttons */}
@@ -399,6 +451,22 @@ export default function LegendUnlockReveal({
             transform: showButtons ? "translateY(0)" : "translateY(16px)",
           }}
         >
+          {hasUnlockVideo && !videoComplete && !videoFailed ? (
+            <button
+              onClick={() => {
+                finishUnlockVideo();
+                onContinue();
+              }}
+              className="w-full py-4 rounded-2xl font-bold text-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+              style={{
+                background: "hsla(0, 0%, 100%, 0.1)",
+                color: "hsla(0, 0%, 100%, 0.9)",
+                border: "1px solid hsla(0, 0%, 100%, 0.15)",
+              }}
+            >
+              Skip Video
+            </button>
+          ) : null}
           <button
             onClick={onViewLegends}
             className="w-full py-4 rounded-2xl font-bold text-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
@@ -406,18 +474,25 @@ export default function LegendUnlockReveal({
               background: "linear-gradient(135deg, hsl(42, 95%, 55%), hsl(35, 95%, 50%))",
               color: "hsl(30, 50%, 12%)",
               boxShadow: "0 4px 24px hsla(42, 95%, 55%, 0.5)",
+              opacity: hasUnlockVideo && !videoComplete && !videoFailed ? 0.75 : 1,
             }}
+            disabled={hasUnlockVideo && !videoComplete && !videoFailed}
           >
             View My Legends
           </button>
           <button
-            onClick={onContinue}
+            onClick={() => {
+              if (hasUnlockVideo) finishUnlockVideo();
+              onContinue();
+            }}
             className="w-full py-4 rounded-2xl font-bold text-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
             style={{
               background: "hsla(0, 0%, 100%, 0.1)",
               color: "hsla(0, 0%, 100%, 0.9)",
               border: "1px solid hsla(0, 0%, 100%, 0.15)",
+              opacity: hasUnlockVideo && !videoComplete && !videoFailed ? 0.75 : 1,
             }}
+            disabled={hasUnlockVideo && !videoComplete && !videoFailed}
           >
             Continue →
           </button>

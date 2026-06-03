@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Star } from "lucide-react";
+import { Play, Star, X } from "lucide-react";
 import type { Legend } from "@/data/legends";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
 
 function StatBar({ label, value }: { label: string; value: number }) {
   return (
@@ -27,9 +28,15 @@ export default function LegendDetailModal({
   onClose: () => void;
 }) {
   const [showBack, setShowBack] = useState(false);
+  const [videoMode, setVideoMode] = useState<"showcase" | "unlock" | null>(null);
+  const [videoFailed, setVideoFailed] = useState(false);
 
   const frontImage = legend.images.cardFront;
   const backImage = legend.images.cardBack;
+  const showcaseVideoUrl = legend.showcaseVideoUrl;
+  const unlockVideoUrl = legend.unlockVideoUrl;
+  const demoPreview = isDemoPreviewMode();
+  const activeVideoUrl = videoMode === "unlock" ? unlockVideoUrl : showcaseVideoUrl;
 
   useEffect(() => {
     console.log("[CardBinder] Legend detail opened", {
@@ -39,6 +46,12 @@ export default function LegendDetailModal({
       backImage,
     });
   }, [backImage, frontImage, legend.id, legend.name]);
+
+  useEffect(() => {
+    setVideoMode(null);
+    setVideoFailed(false);
+    setShowBack(false);
+  }, [legend.id]);
 
   return (
     <div
@@ -59,6 +72,40 @@ export default function LegendDetailModal({
 
         {/* Card artwork */}
         <div className="relative bg-gradient-to-br from-teal-50 via-emerald-50 to-cyan-50 flex flex-col items-center justify-center gap-4 py-8 px-6">
+          {videoMode && activeVideoUrl ? (
+            <div className="w-full max-w-[420px]">
+              <div className="relative overflow-hidden rounded-2xl border-2 border-white/70 bg-slate-950 shadow-xl">
+                <div className="aspect-video w-full bg-black">
+                  {videoFailed ? (
+                    <div className="flex h-full items-center justify-center px-6 text-center text-sm font-semibold text-white/80">
+                      Video unavailable right now. You can still view the card.
+                    </div>
+                  ) : (
+                    <video
+                      key={activeVideoUrl}
+                      src={activeVideoUrl}
+                      controls
+                      playsInline
+                      autoPlay
+                      className="h-full w-full"
+                      onError={() => setVideoFailed(true)}
+                    />
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setVideoMode(null);
+                    setVideoFailed(false);
+                  }}
+                  className="absolute right-3 top-3 rounded-full border border-white/20 bg-black/60 px-3 py-1 text-[11px] font-black uppercase tracking-[0.16em] text-white transition hover:bg-black/80"
+                >
+                  Close Video
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
           <div className="relative">
             <div className="absolute -inset-4 rounded-2xl bg-gradient-to-br from-teal-400/20 to-emerald-400/20 blur-xl" />
             <button
@@ -74,6 +121,8 @@ export default function LegendDetailModal({
               />
             </button>
           </div>
+            </>
+          )}
 
           <div className="flex items-center gap-2">
             <button
@@ -105,6 +154,32 @@ export default function LegendDetailModal({
             >
               Flip Card
             </button>
+            {showcaseVideoUrl ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setVideoFailed(false);
+                  setVideoMode("showcase");
+                }}
+                className="inline-flex items-center gap-1 rounded-full border border-teal-600/20 bg-white/80 px-3 py-1 text-xs font-black text-teal-700 transition hover:bg-white"
+              >
+                <Play className="h-3.5 w-3.5" />
+                Watch Video
+              </button>
+            ) : null}
+            {demoPreview && unlockVideoUrl ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setVideoFailed(false);
+                  setVideoMode("unlock");
+                }}
+                className="inline-flex items-center gap-1 rounded-full border border-amber-500/25 bg-amber-50/90 px-3 py-1 text-xs font-black text-amber-700 transition hover:bg-amber-50"
+              >
+                <Play className="h-3.5 w-3.5" />
+                Preview Unlock
+              </button>
+            ) : null}
           </div>
         </div>
 
