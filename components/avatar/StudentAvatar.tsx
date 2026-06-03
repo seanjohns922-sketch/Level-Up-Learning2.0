@@ -244,14 +244,8 @@ export default function StudentAvatar({
                 d="M30 44 Q28 16 60 14 Q92 16 90 44 Q86 36 80 34 Q72 28 60 30 Q48 28 40 34 Q34 36 30 44 Z"
                 fill="url(#lul-hair)"
               />
-              {/* Soft side-swept fringe — short, sits ABOVE the brow line.
-                  Top edge ~y=34, bottom edge ~y=42; brows are at y=51-53. */}
-              <path
-                d="M38 34 Q52 30 70 34 Q82 36 84 42 Q72 40 60 41 Q48 40 38 42 Z"
-                fill={o.hairShade}
-              />
               {/* Sweep highlight */}
-              <path d="M44 36 Q58 33 78 38" stroke="#ffffff" strokeOpacity="0.22" strokeWidth="1.2" fill="none" />
+              <path d="M40 28 Q60 22 80 28" stroke="#ffffff" strokeOpacity="0.18" strokeWidth="1.2" fill="none" />
             </>
           )}
         </g>
