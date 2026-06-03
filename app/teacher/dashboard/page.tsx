@@ -132,12 +132,11 @@ function weekCompletedLessons(ids: string[], week: number) {
 function weekQuizPassed(quiz: JsonObject | undefined) {
   if (!quiz) return false;
   if (quiz.passed === true) return true;
-  if (typeof quiz.status === "string" && quiz.status.toLowerCase() === "completed") return true;
   const attempts = Array.isArray(quiz.attempts) ? quiz.attempts : [];
   return attempts.some((attempt) => {
     if (!attempt || typeof attempt !== "object") return false;
     const record = attempt as Record<string, unknown>;
-    return record.passed === true || (typeof record.status === "string" && record.status.toLowerCase() === "completed");
+    return record.passed === true;
   });
 }
 

@@ -74,7 +74,7 @@ export function getWeekProgress(store: ProgramProgressStore, year: string, week:
 }
 
 export function isWeekComplete(p: WeekProgress): boolean {
-  return (p.quizScore ?? 0) >= 80 || (p.lessonsCompleted.filter(Boolean).length === 3 && p.quizCompleted);
+  return (p.quizScore ?? 0) >= 80;
 }
 
 export function normalizeWeekList(weeks: number[] | undefined | null): number[] {
