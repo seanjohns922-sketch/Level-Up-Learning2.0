@@ -34,10 +34,10 @@ export type AvatarOutfit = {
 };
 
 export const DEFAULT_OUTFIT: Required<AvatarOutfit> = {
-  skin: "#e8b48a",
-  skinShade: "#c98c63",
-  hair: "#3a2418",
-  hairShade: "#1f1209",
+  skin: "#f1c8a6",
+  skinShade: "#d6a07a",
+  hair: "#4a2e1c",
+  hairShade: "#2e1a0e",
   hairStyle: "swept",
   shirt: "#1d4ed8",
   shirtTrim: "#93c5fd",
@@ -196,8 +196,8 @@ export default function StudentAvatar({
           <ellipse cx="76" cy="68" rx="4.5" ry="2.6" fill="#f4a8a8" opacity="0.55" />
 
           {/* Eyebrows — SEPARATE, not a monobrow */}
-          <path d="M44 50 Q49 47 54 50" stroke={o.hairShade} strokeWidth="2.2" strokeLinecap="round" fill="none" />
-          <path d="M66 50 Q71 47 76 50" stroke={o.hairShade} strokeWidth="2.2" strokeLinecap="round" fill="none" />
+          <path d="M45 53 Q49 51 53 53" stroke={o.hairShade} strokeWidth="1.4" strokeLinecap="round" fill="none" />
+          <path d="M67 53 Q71 51 75 53" stroke={o.hairShade} strokeWidth="1.4" strokeLinecap="round" fill="none" />
 
           {/* Eyes — larger, glossy */}
           <ellipse cx="49" cy="60" rx="3.6" ry="4.6" fill="#ffffff" />
@@ -237,18 +237,21 @@ export default function StudentAvatar({
             </>
           ) : (
             <>
-              {/* Swept/modern Roblox-style fringe */}
+              {/* Swept Roblox-style cap of hair — sits HIGH on the head,
+                  exposing a clear forehead so it can never be mistaken
+                  for a brow or visor. */}
               <path
-                d="M30 52 Q28 18 60 16 Q92 18 90 52 Q86 38 82 36 Q76 30 68 32 Q58 26 48 34 Q40 36 36 44 Q32 46 30 52 Z"
+                d="M30 44 Q28 16 60 14 Q92 16 90 44 Q86 36 80 34 Q72 28 60 30 Q48 28 40 34 Q34 36 30 44 Z"
                 fill="url(#lul-hair)"
               />
-              {/* Side-swept fringe over forehead */}
+              {/* Soft side-swept fringe — short, sits ABOVE the brow line.
+                  Top edge ~y=34, bottom edge ~y=42; brows are at y=51-53. */}
               <path
-                d="M36 40 Q46 36 60 38 Q74 36 86 42 Q82 52 70 50 Q60 48 50 52 Q42 52 36 40 Z"
+                d="M38 34 Q52 30 70 34 Q82 36 84 42 Q72 40 60 41 Q48 40 38 42 Z"
                 fill={o.hairShade}
               />
-              {/* Sweep accent */}
-              <path d="M44 42 Q58 38 78 44" stroke="#ffffff" strokeOpacity="0.18" strokeWidth="1.4" fill="none" />
+              {/* Sweep highlight */}
+              <path d="M44 36 Q58 33 78 38" stroke="#ffffff" strokeOpacity="0.22" strokeWidth="1.2" fill="none" />
             </>
           )}
         </g>
