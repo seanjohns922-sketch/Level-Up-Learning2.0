@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Zap } from "lucide-react";
+import { Compass, Zap } from "lucide-react";
 
 type ComboTier = "cold" | "spark" | "surge" | "overdrive" | "nexus";
 
@@ -13,7 +13,7 @@ function getTier(count: number): ComboTier {
   return "cold";
 }
 
-const TIER_CONFIG: Record<
+const NEXUS_TIER_CONFIG: Record<
   ComboTier,
   {
     label: string;
@@ -77,7 +77,63 @@ const TIER_CONFIG: Record<
   },
 };
 
-export function ComboCounter({ count, chainLabel }: { count: number; chainLabel?: string }) {
+const MEASUREMENT_TIER_CONFIG: typeof NEXUS_TIER_CONFIG = {
+  cold: {
+    label: "EXPLORER STREAK",
+    counterColor: "rgba(200,160,48,0.55)",
+    labelColor: "rgba(240,210,150,0.6)",
+    glowColor: "rgba(200,160,48,0.15)",
+    borderGradient:
+      "linear-gradient(135deg, rgba(200,160,48,0.2) 0%, rgba(120,90,15,0.1) 50%, rgba(200,160,48,0.16) 100%)",
+    bgGradient: "linear-gradient(135deg, #140e04 0%, #2a1a06 100%)",
+    iconColor: "rgba(200,160,48,0.4)",
+  },
+  spark: {
+    label: "DISCOVERY",
+    counterColor: "rgba(232,200,120,1)",
+    labelColor: "rgba(240,220,175,1)",
+    glowColor: "rgba(200,160,48,0.55)",
+    borderGradient:
+      "linear-gradient(135deg, rgba(200,160,48,0.6) 0%, rgba(139,101,32,0.3) 50%, rgba(200,160,48,0.5) 100%)",
+    bgGradient: "linear-gradient(135deg, #1a1004 0%, #3d2808 60%, #2a1a06 100%)",
+    iconColor: "rgba(232,200,120,0.95)",
+  },
+  surge: {
+    label: "BREAKTHROUGH",
+    counterColor: "rgba(253,224,71,1)",
+    labelColor: "rgba(253,224,71,0.95)",
+    glowColor: "rgba(253,224,71,0.6)",
+    borderGradient:
+      "linear-gradient(135deg, rgba(253,224,71,0.65) 0%, rgba(202,138,4,0.35) 50%, rgba(253,224,71,0.55) 100%)",
+    bgGradient: "linear-gradient(135deg, #1a1200 0%, #3d2e00 60%, #261d00 100%)",
+    iconColor: "rgba(253,224,71,0.95)",
+  },
+  overdrive: {
+    label: "MASTER EXPLORER",
+    counterColor: "rgba(167,139,250,1)",
+    labelColor: "rgba(196,181,253,0.98)",
+    glowColor: "rgba(167,139,250,0.7)",
+    borderGradient:
+      "linear-gradient(135deg, rgba(167,139,250,0.7) 0%, rgba(109,40,217,0.4) 50%, rgba(200,160,48,0.55) 100%)",
+    bgGradient: "linear-gradient(135deg, #1a0e1f 0%, #2e1f5c 60%, #1a1004 100%)",
+    iconColor: "rgba(196,181,253,0.98)",
+  },
+  nexus: {
+    label: "LEGENDARY",
+    counterColor: "rgba(254,243,199,1)",
+    labelColor: "rgba(232,200,120,1)",
+    glowColor: "rgba(200,160,48,0.9)",
+    borderGradient:
+      "linear-gradient(135deg, rgba(232,200,120,0.85) 0%, rgba(167,139,250,0.5) 50%, rgba(232,200,120,0.8) 100%)",
+    bgGradient: "linear-gradient(135deg, #2a1a04 0%, #5c3d0e 60%, #2a1a06 100%)",
+    iconColor: "rgba(254,243,199,1)",
+  },
+};
+
+export function ComboCounter({ count, chainLabel, realmId }: { count: number; chainLabel?: string; realmId?: string }) {
+  const isMeasurement = realmId === "measurement";
+  const TIER_CONFIG = isMeasurement ? MEASUREMENT_TIER_CONFIG : NEXUS_TIER_CONFIG;
+  const IconCmp = isMeasurement ? Compass : Zap;
   const prevCountRef = useRef(count);
   const [broken, setBroken] = useState(false);
   const [bump, setBump] = useState(false);
@@ -124,7 +180,11 @@ export function ComboCounter({ count, chainLabel }: { count: number; chainLabel?
       <div
         aria-hidden
         className="absolute -inset-[2px] pointer-events-none"
-        style={{
+        style={isMeasurement ? {
+          borderRadius: 12,
+          background: config.borderGradient,
+          transition: "background 0.5s ease",
+        } : {
           clipPath:
             "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
           background: config.borderGradient,
@@ -135,7 +195,15 @@ export function ComboCounter({ count, chainLabel }: { count: number; chainLabel?
       {/* Inner plate */}
       <div
         className="relative overflow-hidden px-3 py-2.5"
-        style={{
+        style={isMeasurement ? {
+          borderRadius: 10,
+          background: config.bgGradient,
+          boxShadow:
+            activeTier !== "cold"
+              ? `inset 0 1px 0 ${config.glowColor}, inset 0 -8px 16px rgba(0,0,0,0.5), 0 0 16px ${config.glowColor}`
+              : "inset 0 1px 0 rgba(200,160,48,0.12), inset 0 -8px 16px rgba(0,0,0,0.4)",
+          transition: "background 0.5s ease, box-shadow 0.5s ease",
+        } : {
           clipPath:
             "polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px)",
           background: config.bgGradient,
@@ -160,7 +228,7 @@ export function ComboCounter({ count, chainLabel }: { count: number; chainLabel?
 
         {/* Header row: icon + label + count badge */}
         <div className="relative flex items-center gap-1.5">
-          <Zap
+          <IconCmp
             className="h-3.5 w-3.5 flex-shrink-0"
             style={{
               color: config.iconColor,
@@ -178,7 +246,9 @@ export function ComboCounter({ count, chainLabel }: { count: number; chainLabel?
               transition: "color 0.4s ease",
             }}
           >
-            {broken ? "CHAIN BROKEN" : milestone ?? (activeTier === "cold" && chainLabel ? chainLabel : config.label)}
+            {broken
+              ? (isMeasurement ? "STREAK LOST" : "CHAIN BROKEN")
+              : milestone ?? (activeTier === "cold" && chainLabel ? chainLabel : config.label)}
           </span>
           {activeTier !== "cold" && !broken && (
             <span
