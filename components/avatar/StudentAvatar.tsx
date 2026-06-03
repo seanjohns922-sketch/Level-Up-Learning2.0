@@ -25,24 +25,24 @@ export type AvatarOutfit = {
   skinShade?: string;
   hair?: string;
   hairShade?: string;
-  hairStyle?: "short" | "tuft"; // future: "long" | "bun" | "cap" ...
+  hairStyle?: "short" | "tuft" | "swept"; // future: "long" | "bun" | "cap" ...
   shirt?: string;
   shirtTrim?: string;
   pants?: string;
   shoes?: string;
-  accessory?: "none"; // future: "backpack" | "wand" | "hat" ...
+  accessory?: "none" | "backpack" | "glasses"; // future: ...
 };
 
 export const DEFAULT_OUTFIT: Required<AvatarOutfit> = {
   skin: "#e8b48a",
   skinShade: "#c98c63",
-  hair: "#5a3a22",
-  hairShade: "#3d2613",
-  hairStyle: "short",
-  shirt: "#3b82f6",
-  shirtTrim: "#bfdbfe",
-  pants: "#1f2937",
-  shoes: "#0b0d12",
+  hair: "#3a2418",
+  hairShade: "#1f1209",
+  hairStyle: "swept",
+  shirt: "#1d4ed8",
+  shirtTrim: "#93c5fd",
+  pants: "#111827",
+  shoes: "#f8fafc",
   accessory: "none",
 };
 
@@ -115,75 +115,109 @@ export default function StudentAvatar({
             <stop offset="0%" stopColor={o.hair} />
             <stop offset="100%" stopColor={o.hairShade} />
           </linearGradient>
+          <linearGradient id="lul-pants" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={o.pants} />
+            <stop offset="100%" stopColor="#000000" stopOpacity="0.85" />
+          </linearGradient>
+          <linearGradient id="lul-shoe" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#ffffff" />
+            <stop offset="100%" stopColor={o.shoes} />
+          </linearGradient>
         </defs>
 
-        {/* ── SHOES layer ──────────────────────────────── */}
+        {/* ── SHOES layer (chunky sneakers) ────────────── */}
         <g data-layer="shoes">
-          <ellipse cx="44" cy="208" rx="14" ry="6" fill={o.shoes} />
-          <ellipse cx="76" cy="208" rx="14" ry="6" fill={o.shoes} />
-          <path d="M32 204 Q44 196 58 204 L58 210 Q44 214 32 210 Z" fill={o.shoes} />
-          <path d="M62 204 Q76 196 88 204 L88 210 Q76 214 62 210 Z" fill={o.shoes} />
-          <rect x="32" y="201" width="26" height="3" rx="1.5" fill={o.shirtTrim} opacity="0.6" />
-          <rect x="62" y="201" width="26" height="3" rx="1.5" fill={o.shirtTrim} opacity="0.6" />
+          <path d="M30 206 Q30 198 42 198 L58 198 Q60 204 60 210 Q60 214 56 214 L32 214 Q28 214 28 210 Z" fill="url(#lul-shoe)" />
+          <path d="M90 206 Q90 198 78 198 L62 198 Q60 204 60 210 Q60 214 64 214 L88 214 Q92 214 92 210 Z" fill="url(#lul-shoe)" />
+          {/* sole */}
+          <rect x="28" y="210" width="32" height="4" rx="2" fill={o.shirt} opacity="0.85" />
+          <rect x="60" y="210" width="32" height="4" rx="2" fill={o.shirt} opacity="0.85" />
+          {/* swoosh accent */}
+          <path d="M34 205 Q44 202 56 205" stroke={o.shirt} strokeWidth="1.6" strokeLinecap="round" fill="none" opacity="0.7" />
+          <path d="M64 205 Q76 202 86 205" stroke={o.shirt} strokeWidth="1.6" strokeLinecap="round" fill="none" opacity="0.7" />
         </g>
 
-        {/* ── PANTS layer ──────────────────────────────── */}
+        {/* ── PANTS layer (slim joggers) ───────────────── */}
         <g data-layer="pants">
-          <path d="M40 146 L36 204 L54 204 L58 168 Z" fill={o.pants} />
-          <path d="M80 146 L84 204 L66 204 L62 168 Z" fill={o.pants} />
-          <path d="M40 146 Q60 152 80 146 L80 162 Q60 168 40 162 Z" fill={o.pants} opacity="0.85" />
+          <path d="M40 150 L34 200 L56 200 L58 168 Z" fill="url(#lul-pants)" />
+          <path d="M80 150 L86 200 L64 200 L62 168 Z" fill="url(#lul-pants)" />
+          {/* waistband */}
+          <path d="M38 148 Q60 154 82 148 L82 158 Q60 164 38 158 Z" fill="#000" opacity="0.35" />
+          {/* center seam */}
+          <line x1="60" y1="158" x2="60" y2="200" stroke="#000" strokeOpacity="0.25" strokeWidth="1" />
         </g>
 
-        {/* ── SHIRT layer (torso + arms) ──────────────── */}
+        {/* ── HOODIE layer (torso + arms + hood) ────── */}
         <g data-layer="shirt">
           {/* Arms */}
-          <path d="M20 96 Q14 104 16 144 Q22 152 30 148 Q32 124 32 104 Z" fill="url(#lul-shirt)" />
-          <path d="M100 96 Q106 104 104 144 Q98 152 90 148 Q88 124 88 104 Z" fill="url(#lul-shirt)" />
+          <path d="M22 100 Q14 112 18 150 Q24 158 32 154 Q34 128 34 108 Z" fill="url(#lul-shirt)" />
+          <path d="M98 100 Q106 112 102 150 Q96 158 88 154 Q86 128 86 108 Z" fill="url(#lul-shirt)" />
           {/* Hands */}
-          <circle cx="22" cy="150" r="7" fill="url(#lul-skin)" />
-          <circle cx="98" cy="150" r="7" fill="url(#lul-skin)" />
-          {/* Torso */}
+          <circle cx="24" cy="156" r="7.5" fill="url(#lul-skin)" />
+          <circle cx="96" cy="156" r="7.5" fill="url(#lul-skin)" />
+          {/* Torso (hoodie body) */}
           <path
-            d="M32 96 Q60 88 88 96 L92 152 Q60 162 28 152 Z"
+            d="M32 100 Q60 92 88 100 L94 156 Q60 168 26 156 Z"
             fill="url(#lul-shirt)"
           />
-          {/* Collar / trim */}
+          {/* Hood back (behind neck) */}
           <path
-            d="M44 92 Q60 102 76 92 L72 102 Q60 108 48 102 Z"
-            fill={o.shirtTrim}
-            opacity="0.9"
+            d="M34 100 Q40 82 60 80 Q80 82 86 100 Q72 92 60 92 Q48 92 34 100 Z"
+            fill={o.shirt}
+            opacity="0.95"
           />
-          {/* Subtle highlight */}
-          <path d="M36 100 Q40 130 38 150" stroke="#ffffff" strokeOpacity="0.12" strokeWidth="3" fill="none" />
+          {/* Kangaroo pocket */}
+          <path d="M42 128 L78 128 Q80 142 60 144 Q40 142 42 128 Z" fill="#000" opacity="0.18" />
+          {/* Drawstrings */}
+          <line x1="54" y1="100" x2="52" y2="118" stroke={o.shirtTrim} strokeWidth="1.4" strokeLinecap="round" />
+          <line x1="66" y1="100" x2="68" y2="118" stroke={o.shirtTrim} strokeWidth="1.4" strokeLinecap="round" />
+          <circle cx="52" cy="119" r="1.4" fill={o.shirtTrim} />
+          <circle cx="68" cy="119" r="1.4" fill={o.shirtTrim} />
+          {/* Side highlight */}
+          <path d="M32 108 Q34 138 30 156" stroke="#ffffff" strokeOpacity="0.14" strokeWidth="3" fill="none" />
         </g>
 
         {/* ── NECK + HEAD ──────────────────────────────── */}
         <g data-layer="head">
-          <rect x="52" y="80" width="16" height="14" rx="5" fill="url(#lul-skin)" />
-          {/* Head */}
+          <rect x="54" y="82" width="12" height="10" rx="4" fill={o.skinShade} />
+          {/* Head — softly rounded */}
           <path
-            d="M34 52 Q34 22 60 22 Q86 22 86 52 L86 64 Q86 86 60 88 Q34 86 34 64 Z"
+            d="M32 50 Q32 18 60 18 Q88 18 88 50 L88 62 Q88 86 60 90 Q32 86 32 62 Z"
             fill="url(#lul-skin)"
           />
           {/* Ears */}
-          <ellipse cx="34" cy="60" rx="4" ry="6" fill="url(#lul-skin)" />
-          <ellipse cx="86" cy="60" rx="4" ry="6" fill="url(#lul-skin)" />
+          <ellipse cx="32" cy="58" rx="4" ry="6" fill="url(#lul-skin)" />
+          <ellipse cx="88" cy="58" rx="4" ry="6" fill="url(#lul-skin)" />
+          <ellipse cx="32" cy="59" rx="1.6" ry="3" fill={o.skinShade} opacity="0.6" />
+          <ellipse cx="88" cy="59" rx="1.6" ry="3" fill={o.skinShade} opacity="0.6" />
 
           {/* Cheeks */}
-          <ellipse cx="44" cy="66" rx="4" ry="2.5" fill="#f0a0a0" opacity="0.55" />
-          <ellipse cx="76" cy="66" rx="4" ry="2.5" fill="#f0a0a0" opacity="0.55" />
+          <ellipse cx="44" cy="68" rx="4.5" ry="2.6" fill="#f4a8a8" opacity="0.55" />
+          <ellipse cx="76" cy="68" rx="4.5" ry="2.6" fill="#f4a8a8" opacity="0.55" />
 
-          {/* Eyes */}
-          <ellipse cx="49" cy="58" rx="3" ry="4" fill="#1a1a2e" />
-          <ellipse cx="71" cy="58" rx="3" ry="4" fill="#1a1a2e" />
-          <circle cx="50" cy="56.5" r="1" fill="#ffffff" />
-          <circle cx="72" cy="56.5" r="1" fill="#ffffff" />
+          {/* Eyebrows — SEPARATE, not a monobrow */}
+          <path d="M44 50 Q49 47 54 50" stroke={o.hairShade} strokeWidth="2.2" strokeLinecap="round" fill="none" />
+          <path d="M66 50 Q71 47 76 50" stroke={o.hairShade} strokeWidth="2.2" strokeLinecap="round" fill="none" />
 
-          {/* Smile */}
-          <path d="M54 70 Q60 74 66 70" stroke="#3d2613" strokeWidth="1.6" strokeLinecap="round" fill="none" />
+          {/* Eyes — larger, glossy */}
+          <ellipse cx="49" cy="60" rx="3.6" ry="4.6" fill="#ffffff" />
+          <ellipse cx="71" cy="60" rx="3.6" ry="4.6" fill="#ffffff" />
+          <ellipse cx="49" cy="61" rx="2.4" ry="3.2" fill="#2c1810" />
+          <ellipse cx="71" cy="61" rx="2.4" ry="3.2" fill="#2c1810" />
+          <circle cx="50" cy="59.5" r="1.1" fill="#ffffff" />
+          <circle cx="72" cy="59.5" r="1.1" fill="#ffffff" />
+          <circle cx="48.2" cy="62.4" r="0.5" fill="#ffffff" opacity="0.8" />
+          <circle cx="70.2" cy="62.4" r="0.5" fill="#ffffff" opacity="0.8" />
+
+          {/* Nose hint */}
+          <path d="M60 64 Q61 68 60 70" stroke={o.skinShade} strokeWidth="1.2" strokeLinecap="round" fill="none" opacity="0.6" />
+
+          {/* Friendly smile */}
+          <path d="M52 74 Q60 80 68 74" stroke="#3d2613" strokeWidth="1.8" strokeLinecap="round" fill="none" />
+          <path d="M54 75 Q60 78 66 75" stroke="#f4a8a8" strokeWidth="1.2" strokeLinecap="round" fill="none" opacity="0.7" />
         </g>
 
-        {/* ── HAIR layer ───────────────────────────────── */}
+        {/* ── HAIR layer (modern silhouettes) ─────────── */}
         <g data-layer="hair">
           {o.hairStyle === "tuft" ? (
             <>
@@ -191,20 +225,30 @@ export default function StudentAvatar({
                 d="M32 50 Q34 18 60 18 Q86 18 88 50 Q80 38 70 40 Q66 30 60 32 Q54 30 50 40 Q40 38 32 50 Z"
                 fill="url(#lul-hair)"
               />
-              <path d="M58 20 Q62 12 68 20 Q64 18 58 20 Z" fill="url(#lul-hair)" />
+              <path d="M58 20 Q62 10 68 20 Q64 16 58 20 Z" fill="url(#lul-hair)" />
+            </>
+          ) : o.hairStyle === "short" ? (
+            <>
+              <path
+                d="M30 54 Q28 20 60 16 Q92 20 90 54 Q86 42 80 40 Q76 34 68 34 Q60 30 52 36 Q44 34 40 40 Q34 42 30 54 Z"
+                fill="url(#lul-hair)"
+              />
+              <path d="M40 44 Q50 50 62 46 Q72 50 82 44 Q80 54 70 54 Q60 56 50 54 Q42 54 40 44 Z" fill={o.hairShade} />
             </>
           ) : (
             <>
-              {/* Short brown hair — covers crown + side fringe */}
+              {/* Swept/modern Roblox-style fringe */}
               <path
-                d="M32 54 Q30 22 60 18 Q90 22 88 54 Q86 44 80 42 Q76 36 68 36 Q60 32 52 38 Q44 36 40 42 Q34 44 32 54 Z"
+                d="M30 52 Q28 18 60 16 Q92 18 90 52 Q86 38 82 36 Q76 30 68 32 Q58 26 48 34 Q40 36 36 44 Q32 46 30 52 Z"
                 fill="url(#lul-hair)"
               />
-              {/* Front fringe */}
+              {/* Side-swept fringe over forehead */}
               <path
-                d="M40 44 Q50 50 62 46 Q72 50 82 44 Q80 54 70 54 Q60 56 50 54 Q42 54 40 44 Z"
+                d="M36 40 Q46 36 60 38 Q74 36 86 42 Q82 52 70 50 Q60 48 50 52 Q42 52 36 40 Z"
                 fill={o.hairShade}
               />
+              {/* Sweep accent */}
+              <path d="M44 42 Q58 38 78 44" stroke="#ffffff" strokeOpacity="0.18" strokeWidth="1.4" fill="none" />
             </>
           )}
         </g>
