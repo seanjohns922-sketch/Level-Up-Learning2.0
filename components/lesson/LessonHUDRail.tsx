@@ -137,10 +137,11 @@ export function LessonHUDRail({
               maxValue={xpDisplayMax}
               valueLabel={xpDisplayLabel}
               rightLabel={xpDisplayRightLabel}
+              realmId={realmId}
             />
           </div>
           <div className="flex-shrink-0 lg:self-end">
-            <LessonTimer seconds={Math.max(0, secondsLeft)} total={totalSeconds} />
+            <LessonTimer seconds={Math.max(0, secondsLeft)} total={totalSeconds} realmId={realmId} />
           </div>
         </div>
 
@@ -157,7 +158,8 @@ export function LessonHUDRail({
         {/* Combo chain counter */}
         <ComboCounter
           count={comboCount}
-          chainLabel={isMeasurement ? "MEASURE CHAIN" : undefined}
+          chainLabel={isMeasurement ? "EXPLORER STREAK" : undefined}
+          realmId={realmId}
         />
 
         {/* Collapsible hint */}

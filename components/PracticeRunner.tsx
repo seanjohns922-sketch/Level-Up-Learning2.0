@@ -308,7 +308,9 @@ export function PracticeRunner({
   const hudXPValue = isTimeOnlySession ? elapsedWholeMinutes : undefined;
   const hudXPMax = isTimeOnlySession ? minutes : undefined;
   const hudXPLabel = isTimeOnlySession ? `${elapsedWholeMinutes} / ${minutes} MIN` : undefined;
-  const hudXPRightLabel = isTimeOnlySession ? "Session Progress" : undefined;
+  const hudXPRightLabel = isTimeOnlySession
+    ? (isMeasurement ? "Explorer Progress" : "Session Progress")
+    : undefined;
   const accuracy =
     safeQuestionsAnswered > 0
       ? Math.round((safeCorrectAnswers / safeQuestionsAnswered) * 100)
