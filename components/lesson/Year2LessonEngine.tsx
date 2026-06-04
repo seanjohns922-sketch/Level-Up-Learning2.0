@@ -460,6 +460,7 @@ export function Year2LessonEngine({
   onPerformanceSummary,
   liveContext,
   realmId,
+  levelNumber,
 }: {
   lesson: Lesson;
   onTimedComplete: () => void;
@@ -468,6 +469,7 @@ export function Year2LessonEngine({
   onPerformanceSummary?: (summary: LessonPerformanceSummary) => void;
   liveContext?: LiveLessonContext;
   realmId?: string;
+  levelNumber?: number;
 }) {
   const isMeasurement = realmId === "measurement";
   const totalSeconds = 9 * 60;
@@ -629,7 +631,7 @@ export function Year2LessonEngine({
     if (secondsLeft <= BRAIN_BREAK_AT_SECONDS_LEFT && secondsLeft > 0) {
       brainBreakDoneRef.current = true;
       brainBreakActiveRef.current = true;
-      setBrainBreakVillain(pickVillain());
+      setBrainBreakVillain(pickVillain(levelNumber ?? 2));
     }
   }, [secondsLeft, finished]);
 

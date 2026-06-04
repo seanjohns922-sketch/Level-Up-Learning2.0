@@ -216,6 +216,7 @@ export function PracticeRunner({
   onPerformanceSummary,
   liveContext,
   realmId,
+  levelNumber,
 }: {
   minutes?: number;
   getTask: (ctx?: {
@@ -232,6 +233,7 @@ export function PracticeRunner({
   onPerformanceSummary?: (summary: LessonPerformanceSummary) => void;
   liveContext?: LiveLessonContext;
   realmId?: string;
+  levelNumber?: number;
 }) {
   const isMeasurement = realmId === "measurement";
   const totalSeconds = minutes * 60;
@@ -386,7 +388,7 @@ export function PracticeRunner({
     if (secondsLeft <= BRAIN_BREAK_AT_SECONDS_LEFT && secondsLeft > 0) {
       brainBreakDoneRef.current = true;
       brainBreakActiveRef.current = true;
-      setBrainBreakVillain(pickVillain());
+      setBrainBreakVillain(pickVillain(levelNumber ?? 1));
     }
   }, [secondsLeft, finished]);
 

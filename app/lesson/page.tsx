@@ -1007,6 +1007,7 @@ function LessonPage() {
               scoreCap={10}
               liveContext={liveLessonContext}
               realmId={realmId}
+              levelNumber={levelNumber}
               renderCompletionCard={
                 isGroundCustomLesson
                   ? renderPrepCompletionCard
@@ -1091,6 +1092,7 @@ function LessonPage() {
                   onExit={goBackToProgram}
                   liveContext={liveLessonContext}
                   realmId={realmId}
+                  levelNumber={levelNumber}
                   renderCompletionCard={
                     showWeek12Lesson3Summary
                       ? (summary: LessonPerformanceSummary) => (
