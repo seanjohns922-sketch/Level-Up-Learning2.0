@@ -163,6 +163,16 @@ export default function LevelsPage() {
 
           {/* BOTTOM — anchored to tower base / bridge */}
           <div className="w-full pb-4 md:pb-[8vh] lg:pb-[10vh] flex items-center gap-3">
+            <button
+              onClick={() => router.push("/tower")}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-black text-[#1a0e00] transition hover:brightness-105"
+              style={{
+                background: "linear-gradient(135deg, #fff8e8, #e8c878 60%, #c8a030)",
+                boxShadow: "0 4px 16px rgba(200,160,48,0.35)",
+              }}
+            >
+              🏰 Tower of Knowledge
+            </button>
             {showLegendsButton ? (
               <button
                 onClick={goLegends}

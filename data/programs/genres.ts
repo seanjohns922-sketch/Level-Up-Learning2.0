@@ -49,6 +49,26 @@ export function getGenresForYear(yearLabel: string): Genre[] {
     }));
 }
 
+export type RealmInfo = {
+  id: string;
+  strand: string;
+  realm: string;
+  unlocksFromLevel: number;
+  /** Whether this realm has any real curriculum yet (vs placeholder). */
+  hasContent: boolean;
+};
+
+/** Full catalogue of all nine realms (for the Tower of Knowledge hub). */
+export function getAllRealms(): RealmInfo[] {
+  return ALL_GENRES.map((g) => ({
+    id: g.id,
+    strand: g.strand,
+    realm: g.realm,
+    unlocksFromLevel: g.unlocksFromLevel,
+    hasContent: (g.availableLevels?.length ?? 0) > 0,
+  }));
+}
+
 /** Year label → numeric key for the `programs` map (Prep = 0, Year 1..6 = 1..6). */
 function yearKey(yearLabel: string): 0 | 1 | 2 | 3 | 4 | 5 | 6 | null {
   const map: Record<string, 0 | 1 | 2 | 3 | 4 | 5 | 6> = {
