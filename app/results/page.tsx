@@ -6,6 +6,8 @@ import { getLegendForYear } from "@/data/legends";
 import { readProgress, StudentProgress, writeProgress, ACTIVE_STUDENT_KEY } from "@/data/progress";
 import { saveStudentProgressState } from "@/lib/student-progress-sync";
 import LegendUnlockReveal from "@/components/LegendUnlockReveal";
+import FogClearCinematic from "@/components/lesson/FogClearCinematic";
+import { getFogProgress } from "@/lib/fog-progress";
 import type { AssessmentResultProfile } from "@/data/assessments/analysis";
 import { hasSeenLegendUnlockVideo } from "@/lib/legend-video-state";
 import { ALL_PROGRAM_WEEKS, getOptionalWeeks, normalizeWeekList } from "@/lib/program-progress";
@@ -250,6 +252,10 @@ function ResultsPage() {
 
   const passedByPretest = !isPostTest && scorePercent >= PRETEST_PASS_THRESHOLD;
   const passedByPosttest = isPostTest && scorePercent >= POSTTEST_PASS_THRESHOLD;
+  const [showFogCinematic, setShowFogCinematic] = useState(false);
+  useEffect(() => {
+    if (passedByPosttest) setShowFogCinematic(true);
+  }, [passedByPosttest]);
   const passedByProgram = source === "program_complete";
   const passed = passedByPretest || passedByPosttest || passedByProgram;
   const displayPercent = passedByProgram ? 100 : scorePercent;
@@ -431,6 +437,9 @@ function ResultsPage() {
 
   return (
     <main className="min-h-screen bg-slate-950 flex items-start justify-center p-4 pt-8 relative overflow-y-auto">
+      {showFogCinematic && (
+        <FogClearCinematic progress={getFogProgress()} onDone={() => setShowFogCinematic(false)} />
+      )}
       <FloatingShapes />
 
         <div

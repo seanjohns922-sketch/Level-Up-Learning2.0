@@ -4,6 +4,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, User, Zap } from "lucide-react";
 import { readProgress } from "@/data/progress";
+import { computeFogProgress } from "@/lib/fog-progress";
+import FogOfForgetfulness from "@/components/world/FogOfForgetfulness";
 import {
   getRecommendedAssignedWeek,
   getWeekProgress,
@@ -153,6 +155,7 @@ export default function MeasurelandsMap() {
   const [bestChain] = useState(() => readBestChain("measurement", YEAR));
   const [classBestChain, setClassBestChain] = useState<number | null>(null);
   const canvasRef = useWorldCanvas();
+  const fogProgress = useMemo(() => computeFogProgress(progress?.year, progress?.unlockedLegends), [progress?.year, progress?.unlockedLegends]);
 
   const currentWeek = getRecommendedAssignedWeek(store, YEAR, progress?.assignedWeek, progress?.requiredWeeks);
   const currentZone =
@@ -282,6 +285,7 @@ export default function MeasurelandsMap() {
 
   return (
     <div style={{ position: "relative", width: "100vw", height: "100vh", overflow: "hidden", background: "#1a0d00" }}>
+      <FogOfForgetfulness progress={fogProgress} accent="#c8a030" glow="rgba(200,160,48,0.6)" />
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={BG_IMAGE}

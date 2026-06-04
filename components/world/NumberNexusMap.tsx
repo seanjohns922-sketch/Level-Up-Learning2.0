@@ -7,6 +7,8 @@ import {
   User, Zap,
 } from "lucide-react";
 import { readProgress } from "@/data/progress";
+import { computeFogProgress } from "@/lib/fog-progress";
+import FogOfForgetfulness from "@/components/world/FogOfForgetfulness";
 import {
   readProgramStore,
   getRecommendedAssignedWeek,
@@ -479,6 +481,7 @@ export default function NumberNexusMap() {
   const [launching, setLaunching] = useState(false);
 
   const year       = progress?.year ?? "Year 1";
+  const fogProgress = useMemo(() => computeFogProgress(year, progress?.unlockedLegends), [year, progress?.unlockedLegends]);
   const [bestChain] = useState(() => readBestChain("number", year));
   const [classBestChain, setClassBestChain] = useState<number | null>(null);
   const isPrep     = year === "Prep";
@@ -631,6 +634,8 @@ export default function NumberNexusMap() {
 
   return (
     <div style={{ position: "relative", width: "100vw", height: "100vh", overflow: "hidden", background: "#020810" }}>
+
+      <FogOfForgetfulness progress={fogProgress} accent="#5eead4" glow="rgba(45,212,191,0.6)" />
 
       {/* ── Background image — real image per era, no CSS filters ── */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
