@@ -58,8 +58,8 @@ export const VILLAINS: Villain[] = [
     tip: "When it feels confusing, take it one step at a time.",
     color: "#a78bfa",
     glow: "rgba(167,139,250,0.6)",
-    winCount: 12,
-    durationSec: 28,
+    winCount: 24,
+    durationSec: 55,
   },
   {
     id: "time_snatcher",
@@ -73,8 +73,8 @@ export const VILLAINS: Villain[] = [
     tip: "Use your time well. You've got this.",
     color: "#c8a030",
     glow: "rgba(200,160,48,0.6)",
-    winCount: 14,
-    durationSec: 28,
+    winCount: 28,
+    durationSec: 55,
   },
   {
     id: "noise_nibbler",
@@ -88,8 +88,8 @@ export const VILLAINS: Villain[] = [
     tip: "Quiet the noise around you and your mind can think.",
     color: "#f472b6",
     glow: "rgba(244,114,182,0.6)",
-    winCount: 13,
-    durationSec: 28,
+    winCount: 26,
+    durationSec: 55,
   },
   {
     id: "gamer_gremlin",
@@ -103,8 +103,8 @@ export const VILLAINS: Villain[] = [
     tip: "Finish your work first — then play is even more fun.",
     color: "#4ade80",
     glow: "rgba(74,222,128,0.55)",
-    winCount: 14,
-    durationSec: 30,
+    winCount: 26,
+    durationSec: 55,
   },
   {
     id: "worry_wasp",
@@ -118,8 +118,8 @@ export const VILLAINS: Villain[] = [
     tip: "Believe in yourself. You can do hard things.",
     color: "#fcd34d",
     glow: "rgba(252,211,77,0.6)",
-    winCount: 24,
-    durationSec: 18,
+    winCount: 44,
+    durationSec: 38,
   },
   {
     id: "snooze_sloth",
@@ -134,7 +134,7 @@ export const VILLAINS: Villain[] = [
     color: "#c8956c",
     glow: "rgba(200,149,108,0.55)",
     winCount: 100,
-    durationSec: 22,
+    durationSec: 42,
   },
 
   // ── Senior gallery (Level 3 → 6) ──
@@ -150,8 +150,8 @@ export const VILLAINS: Villain[] = [
     tip: "Put the screen down — your real adventure is here.",
     color: "#38bdf8",
     glow: "rgba(56,189,248,0.6)",
-    winCount: 16,
-    durationSec: 28,
+    winCount: 30,
+    durationSec: 55,
   },
   {
     id: "overthink_owl",
@@ -165,8 +165,8 @@ export const VILLAINS: Villain[] = [
     tip: "Don't spiral — pick one thought and start there.",
     color: "#818cf8",
     glow: "rgba(129,140,248,0.6)",
-    winCount: 15,
-    durationSec: 28,
+    winCount: 28,
+    durationSec: 55,
   },
   {
     id: "hype_beast",
@@ -180,8 +180,8 @@ export const VILLAINS: Villain[] = [
     tip: "You're not missing out. The important stuff is right here.",
     color: "#fb7185",
     glow: "rgba(251,113,133,0.6)",
-    winCount: 16,
-    durationSec: 28,
+    winCount: 30,
+    durationSec: 55,
   },
   {
     id: "perfecto",
@@ -195,8 +195,8 @@ export const VILLAINS: Villain[] = [
     tip: "Done is better than perfect. Keep going.",
     color: "#67e8f9",
     glow: "rgba(103,232,249,0.6)",
-    winCount: 15,
-    durationSec: 30,
+    winCount: 28,
+    durationSec: 55,
   },
   {
     id: "the_comparer",
@@ -211,7 +211,7 @@ export const VILLAINS: Villain[] = [
     color: "#c4b5fd",
     glow: "rgba(196,181,253,0.6)",
     winCount: 100,
-    durationSec: 24,
+    durationSec: 42,
   },
 ];
 

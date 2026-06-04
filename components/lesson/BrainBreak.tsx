@@ -450,8 +450,8 @@ function ChargeGame({ villain, onWin }: { villain: Villain; onWin: () => void })
 
 // ── DUEL (tug-of-war clicker race) ──────────────────────────────────────────
 function DuelGame({ villain, onWin }: { villain: Villain; onWin: () => void }) {
-  const [bar, setBar] = useState(50);
-  const barRef = useRef(50);
+  const [bar, setBar] = useState(32);
+  const barRef = useRef(32);
   const wonRef = useRef(false);
 
   useEffect(() => {
@@ -463,7 +463,7 @@ function DuelGame({ villain, onWin }: { villain: Villain; onWin: () => void }) {
   }, []);
 
   function tap() {
-    barRef.current = Math.min(100, barRef.current + 3.5);
+    barRef.current = Math.min(100, barRef.current + 2.6);
     setBar(barRef.current);
     if (barRef.current >= 100 && !wonRef.current) {
       wonRef.current = true;
