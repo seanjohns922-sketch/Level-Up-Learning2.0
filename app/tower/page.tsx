@@ -3,12 +3,13 @@
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { getTowerRealms, getTowerRestoration } from "@/lib/tower-realms";
+import { getTowerRealms, getTowerRestoration, getTowerStreakLevel } from "@/lib/tower-realms";
 
 export default function TowerOfKnowledgePage() {
   const router = useRouter();
   const realms = useMemo(() => getTowerRealms(), []);
   const restoration = useMemo(() => getTowerRestoration(realms), [realms]);
+  const streakLevel = useMemo(() => getTowerStreakLevel(), []);
   const pct = Math.round(restoration * 100);
 
   // Tower restores from the base up — strongest realms at the bottom.
@@ -65,16 +66,21 @@ export default function TowerOfKnowledgePage() {
         </p>
       </div>
 
-      {/* Beacon */}
-      <div className="relative z-10 mt-6 flex justify-center">
+      {/* Beacon — brightness powered by the learner's best streak */}
+      <div className="relative z-10 mt-6 flex flex-col items-center gap-1.5">
         <div
-          className="h-10 w-10 rounded-full"
+          className="rounded-full"
           style={{
-            background: `radial-gradient(circle, rgba(255,248,232,${0.4 + restoration * 0.6}) 0%, rgba(200,160,48,${0.3 + restoration * 0.5}) 50%, transparent 75%)`,
-            boxShadow: `0 0 ${20 + restoration * 50}px rgba(200,160,48,${0.4 + restoration * 0.5})`,
+            width: 40 + streakLevel * 18,
+            height: 40 + streakLevel * 18,
+            background: `radial-gradient(circle, rgba(255,248,232,${0.35 + streakLevel * 0.65}) 0%, rgba(200,160,48,${0.25 + streakLevel * 0.6}) 50%, transparent 75%)`,
+            boxShadow: `0 0 ${18 + streakLevel * 70}px rgba(200,160,48,${0.35 + streakLevel * 0.6})`,
             animation: "beaconPulse 2.6s ease-in-out infinite",
           }}
         />
+        <div className="text-[9px] font-mono font-bold uppercase tracking-[0.22em] text-amber-200/70">
+          {streakLevel > 0 ? "Beacon glows with your streak" : "Build a streak to light the beacon"}
+        </div>
       </div>
 
       {/* The Tower — 9 realm segments, base (most restored) at the bottom */}
