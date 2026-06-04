@@ -110,3 +110,72 @@ export function getTowerRestoration(realms: TowerRealm[]): number {
   if (realms.length === 0) return 0;
   return realms.reduce((sum, r) => sum + r.percent, 0) / realms.length;
 }
+
+// ── Tower as LEVEL FLOORS ────────────────────────────────────────────────────
+// The Tower restores level by level. Each floor (Ground → Level 6) fills as the
+// learner completes that level's realms — small wins throughout, climbing the
+// Tower. MVP: only the Number realm has full level coverage, so a floor fills
+// from Number's completion at that level (legend passed = restored; current
+// level = week progress). As more realms ship, each floor blends their
+// per-level completion in (denominator grows) — one line change here.
+
+export type TowerFloorState = "restored" | "current" | "locked";
+
+export type TowerFloor = {
+  label: string; // "Ground Level", "Level 1"…
+  year: string; // "Prep", "Year 1"…
+  percent: number; // 0..1 restoration of this floor
+  state: TowerFloorState;
+};
+
+const TOWER_LEVELS: { label: string; year: string }[] = [
+  { label: "Ground Level", year: "Prep" },
+  { label: "Level 1", year: "Year 1" },
+  { label: "Level 2", year: "Year 2" },
+  { label: "Level 3", year: "Year 3" },
+  { label: "Level 4", year: "Year 4" },
+  { label: "Level 5", year: "Year 5" },
+  { label: "Level 6", year: "Year 6" },
+];
+
+export function getTowerFloors(): TowerFloor[] {
+  const progress = readProgress();
+  const currentYear = progress?.year ?? "Year 1";
+  const placed = isPlacementComplete(progress);
+  const effective = getEffectiveUnlockedLegendIds(currentYear, progress?.unlockedLegends);
+
+  // Week completion for the learner's current level.
+  let currentWeekFraction = 0;
+  if (typeof window !== "undefined") {
+    const store = readProgramStore();
+    let weeksComplete = 0;
+    for (let w = 1; w <= WEEKS_PER_LEVEL; w += 1) {
+      if (isWeekComplete(getWeekProgress(store, currentYear, w))) weeksComplete += 1;
+    }
+    currentWeekFraction = weeksComplete / WEEKS_PER_LEVEL;
+  }
+
+  return TOWER_LEVELS.map((lvl) => {
+    const passed = effective.includes(getLegendForYear(lvl.year).id);
+    const isCurrent = lvl.year === currentYear;
+
+    let percent: number;
+    let state: TowerFloorState;
+    if (passed) {
+      percent = 1;
+      state = "restored";
+    } else if (isCurrent) {
+      percent = placed ? Math.max(0.04, currentWeekFraction) : currentWeekFraction; // pre-test spark
+      state = "current";
+    } else {
+      percent = 0;
+      state = "locked";
+    }
+    return { label: lvl.label, year: lvl.year, percent, state };
+  });
+}
+
+/** Count of fully-restored Tower floors (levels passed). */
+export function getFloorsRestored(floors: TowerFloor[]): number {
+  return floors.filter((f) => f.state === "restored").length;
+}

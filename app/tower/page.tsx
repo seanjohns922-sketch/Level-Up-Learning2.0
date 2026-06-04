@@ -2,22 +2,19 @@
 
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
-import { getTowerRealms, getTowerRestoration, getTowerStreakLevel } from "@/lib/tower-realms";
+import { ArrowLeft, Lock } from "lucide-react";
+import { getTowerFloors, getFloorsRestored, getTowerStreakLevel } from "@/lib/tower-realms";
 
 export default function TowerOfKnowledgePage() {
   const router = useRouter();
-  const realms = useMemo(() => getTowerRealms(), []);
-  const restoration = useMemo(() => getTowerRestoration(realms), [realms]);
+  const floors = useMemo(() => getTowerFloors(), []);
+  const restoredCount = useMemo(() => getFloorsRestored(floors), [floors]);
   const streakLevel = useMemo(() => getTowerStreakLevel(), []);
-  const pct = Math.round(restoration * 100);
-
-  // Tower restores from the base up — strongest realms at the bottom.
-  const ordered = useMemo(() => [...realms].sort((a, b) => a.percent - b.percent), [realms]);
+  const overall = floors.length ? floors.reduce((s, f) => s + f.percent, 0) / floors.length : 0;
+  const pct = Math.round(overall * 100);
 
   return (
     <main className="relative min-h-screen overflow-hidden" style={{ background: "#0a0814" }}>
-      {/* Background */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/images/dashboard-bg.jpg"
@@ -25,11 +22,10 @@ export default function TowerOfKnowledgePage() {
         className="pointer-events-none fixed inset-0 h-full w-full object-cover"
         style={{ objectPosition: "center 35%", filter: "brightness(0.4) saturate(1.05)" }}
       />
-      <div className="pointer-events-none fixed inset-0" style={{ background: "radial-gradient(ellipse 80% 70% at 50% 30%, rgba(200,160,48,0.10) 0%, transparent 60%), linear-gradient(180deg, rgba(8,6,20,0.7) 0%, rgba(6,4,14,0.92) 100%)" }} />
+      <div className="pointer-events-none fixed inset-0" style={{ background: "radial-gradient(ellipse 80% 70% at 50% 25%, rgba(200,160,48,0.12) 0%, transparent 60%), linear-gradient(180deg, rgba(8,6,20,0.72) 0%, rgba(6,4,14,0.93) 100%)" }} />
 
       <style jsx>{`
         @keyframes beaconPulse { 0%,100% { opacity: 0.7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.08); } }
-        @keyframes segFog { 0%,100% { opacity: 0.5; } 50% { opacity: 0.75; } }
       `}</style>
 
       {/* Top bar */}
@@ -41,7 +37,7 @@ export default function TowerOfKnowledgePage() {
           <ArrowLeft size={14} /> Back
         </button>
         <div className="rounded-full border border-amber-300/30 bg-black/30 px-4 py-2 text-[11px] font-mono font-bold uppercase tracking-[0.2em] text-amber-200/90 backdrop-blur-md">
-          {pct}% Restored
+          {restoredCount}/{floors.length} Floors · {pct}%
         </div>
       </div>
 
@@ -61,18 +57,18 @@ export default function TowerOfKnowledgePage() {
           Tower of Knowledge
         </h1>
         <p className="mx-auto mt-2 max-w-xl text-sm font-medium text-white/65">
-          The Fog of Forgetfulness shattered the Tower and scattered its shards across the nine realms.
-          Restore each realm to relight the Tower, one lesson at a time.
+          The Fog of Forgetfulness shattered the Tower. Restore it floor by floor —
+          complete each level&apos;s realms and fight off the villains to relight it.
         </p>
       </div>
 
-      {/* Beacon — brightness powered by the learner's best streak */}
-      <div className="relative z-10 mt-6 flex flex-col items-center gap-1.5">
+      {/* Beacon — brightness from streak */}
+      <div className="relative z-10 mt-5 flex flex-col items-center gap-1.5">
         <div
           className="rounded-full"
           style={{
-            width: 40 + streakLevel * 18,
-            height: 40 + streakLevel * 18,
+            width: 38 + streakLevel * 18,
+            height: 38 + streakLevel * 18,
             background: `radial-gradient(circle, rgba(255,248,232,${0.35 + streakLevel * 0.65}) 0%, rgba(200,160,48,${0.25 + streakLevel * 0.6}) 50%, transparent 75%)`,
             boxShadow: `0 0 ${18 + streakLevel * 70}px rgba(200,160,48,${0.35 + streakLevel * 0.6})`,
             animation: "beaconPulse 2.6s ease-in-out infinite",
@@ -83,61 +79,45 @@ export default function TowerOfKnowledgePage() {
         </div>
       </div>
 
-      {/* The Tower — 9 realm segments, base (most restored) at the bottom */}
-      <div className="relative z-10 mx-auto mt-4 flex w-full max-w-md flex-col gap-2 px-4 pb-12">
-        {ordered.map((r) => {
-          const filled = Math.round(r.percent * 100);
-          const lit = r.percent > 0;
-          const enterable = Boolean(r.route);
+      {/* The Tower — level floors, base (Ground) at the bottom */}
+      <div className="relative z-10 mx-auto mt-5 flex w-full max-w-md flex-col gap-2 px-4 pb-12">
+        {[...floors].reverse().map((floor) => {
+          const filled = Math.round(floor.percent * 100);
+          const enterable = floor.state !== "locked";
+          const accent =
+            floor.state === "restored" ? "#e8c878" : floor.state === "current" ? "#5eead4" : "#64748b";
+          const glow =
+            floor.state === "restored" ? "rgba(200,160,48,0.5)" : floor.state === "current" ? "rgba(45,212,191,0.45)" : "transparent";
           return (
             <button
-              key={r.id}
+              key={floor.year}
               type="button"
-              onClick={() => { if (r.route) router.push(r.route); }}
               disabled={!enterable}
+              onClick={() => enterable && router.push(`/realms?level=${encodeURIComponent(floor.year)}`)}
               className="group relative w-full overflow-hidden rounded-2xl px-4 py-3 text-left transition-all"
               style={{
-                background: lit
-                  ? `linear-gradient(135deg, rgba(20,14,4,0.85), rgba(40,30,10,0.7))`
-                  : "rgba(18,18,28,0.7)",
-                border: `1px solid ${lit ? r.accent + "66" : "rgba(255,255,255,0.08)"}`,
-                boxShadow: lit ? `0 0 18px ${r.glow}, inset 0 1px 0 rgba(255,255,255,0.06)` : "inset 0 1px 0 rgba(255,255,255,0.03)",
+                background: floor.state === "locked" ? "rgba(18,18,28,0.7)" : "linear-gradient(135deg, rgba(20,14,4,0.85), rgba(40,30,10,0.7))",
+                border: `1px solid ${enterable ? accent + "66" : "rgba(255,255,255,0.08)"}`,
+                boxShadow: enterable ? `0 0 16px ${glow}, inset 0 1px 0 rgba(255,255,255,0.06)` : "inset 0 1px 0 rgba(255,255,255,0.03)",
                 cursor: enterable ? "pointer" : "default",
-                opacity: enterable || lit ? 1 : 0.72,
+                opacity: floor.state === "locked" ? 0.72 : 1,
               }}
             >
-              {/* restoration fill */}
-              <div
-                aria-hidden
-                className="pointer-events-none absolute inset-y-0 left-0 transition-all duration-700"
-                style={{ width: `${filled}%`, background: `linear-gradient(90deg, ${r.accent}22, ${r.accent}05)` }}
-              />
-              {/* foggy shimmer for locked realms */}
-              {!lit && (
-                <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(200,205,225,0.06), transparent)", animation: "segFog 4s ease-in-out infinite" }} />
-              )}
+              <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 transition-all duration-700" style={{ width: `${filled}%`, background: `linear-gradient(90deg, ${accent}22, ${accent}05)` }} />
 
               <div className="relative flex items-center gap-3">
-                <span
-                  className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-xl"
-                  style={{
-                    background: lit ? `radial-gradient(circle at 40% 35%, ${r.accent}55, rgba(0,0,0,0.3))` : "rgba(255,255,255,0.05)",
-                    boxShadow: lit ? `0 0 12px ${r.glow}` : "none",
-                    filter: lit ? "none" : "grayscale(0.7) opacity(0.8)",
-                  }}
-                >
-                  {r.emoji}
-                </span>
                 <div className="min-w-0 flex-1">
                   <div className="font-black leading-tight text-white" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.6)" }}>
-                    {r.realm}
+                    {floor.label}
                   </div>
-                  <div className="text-[11px] font-semibold text-white/55">{r.strand}</div>
+                  <div className="text-[11px] font-semibold" style={{ color: floor.state === "restored" ? "#e8c878" : floor.state === "current" ? "#7de7d7" : "rgba(255,255,255,0.4)" }}>
+                    {floor.state === "restored" ? "Restored" : floor.state === "current" ? "Restoring…" : "Shrouded in fog"}
+                  </div>
                 </div>
                 <div className="text-right">
                   {enterable ? (
                     <>
-                      <div className="font-mono font-black tabular-nums" style={{ color: r.accent, fontSize: "1.05rem", textShadow: `0 0 10px ${r.glow}` }}>
+                      <div className="font-mono font-black tabular-nums" style={{ color: accent, fontSize: "1.05rem", textShadow: `0 0 10px ${glow}` }}>
                         {filled}%
                       </div>
                       <div className="text-[9px] font-bold uppercase tracking-[0.16em] text-white/45 group-hover:text-white/70">
@@ -145,17 +125,14 @@ export default function TowerOfKnowledgePage() {
                       </div>
                     </>
                   ) : (
-                    <div className="rounded-full border border-white/12 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.16em] text-white/40">
-                      Coming soon
-                    </div>
+                    <Lock size={16} className="text-white/35" />
                   )}
                 </div>
               </div>
 
-              {/* thin restoration bar */}
               {enterable && (
                 <div className="relative mt-2 h-1 w-full overflow-hidden rounded-full bg-white/10">
-                  <div className="h-full rounded-full transition-all duration-700" style={{ width: `${filled}%`, background: r.accent, boxShadow: `0 0 8px ${r.glow}` }} />
+                  <div className="h-full rounded-full transition-all duration-700" style={{ width: `${filled}%`, background: accent, boxShadow: `0 0 8px ${glow}` }} />
                 </div>
               )}
             </button>

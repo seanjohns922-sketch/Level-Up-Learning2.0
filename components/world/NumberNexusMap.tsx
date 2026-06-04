@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  ArrowLeft, ChevronLeft, ChevronRight,
+  ArrowLeft,
   User, Zap,
 } from "lucide-react";
 import { readProgress } from "@/data/progress";
@@ -493,7 +493,7 @@ export default function NumberNexusMap() {
   const canvasRef  = useWorldCanvas(era);
 
   const currentWeek = getRecommendedAssignedWeek(store, year, progress?.assignedWeek, progress?.requiredWeeks);
-  const [viewWeek, setViewWeek] = useState(currentWeek);
+  const [viewWeek] = useState(currentWeek);
 
   const completedByWeek = useMemo(() => {
     const m: Record<number, boolean> = {};
@@ -604,8 +604,6 @@ export default function NumberNexusMap() {
     }, 900);
   }
 
-  const canBack    = viewWeek > 1;
-  const canForward = viewWeek < 12 && viewWeek <= currentWeek + 1;
   const currentZone = DISTRICT_ZONES.find((z) => viewWeek >= z.weekStart && viewWeek <= z.weekEnd);
   const activeZoneId = currentZone?.id ?? null;
 
@@ -623,15 +621,6 @@ export default function NumberNexusMap() {
     boxShadow: "0 0 18px rgba(20,184,166,0.18), 0 6px 22px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.06)",
     transition: "transform 180ms ease, box-shadow 220ms ease, border-color 220ms ease",
   };
-  const navBtn = (active: boolean): React.CSSProperties => ({
-    display: "flex", alignItems: "center", gap: 6,
-    padding: "9px 20px", borderRadius: 999, cursor: active ? "pointer" : "default",
-    background: active ? "rgba(14,118,110,0.26)" : "rgba(12,20,32,0.2)",
-    border: `1px solid ${active ? "rgba(94,234,212,0.28)" : "rgba(94,234,212,0.07)"}`,
-    color: active ? "#5eead4" : "rgba(94,234,212,0.22)",
-    fontSize: 12, fontWeight: 700, transition: "all 0.2s",
-  });
-
   return (
     <div style={{ position: "relative", width: "100vw", height: "100vh", overflow: "hidden", background: "#020810" }}>
 
@@ -872,32 +861,22 @@ export default function NumberNexusMap() {
         </div>
       </div>
 
-      {/* ── Bottom nav ── */}
-      {!isGuided && (<div style={{
+      {/* ── Bottom label (week navigation arrows removed — entry is via districts) ── */}
+      {!isGuided && currentZone && (<div style={{
         position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 20,
-        display: "flex", alignItems: "center", justifyContent: "space-between",
+        display: "flex", alignItems: "center", justifyContent: "center",
         padding: "12px 20px",
         background: "rgba(2,6,16,0.84)", borderTop: "1px solid rgba(94,234,212,0.1)",
         backdropFilter: "blur(16px)",
       }}>
-        <button onClick={() => canBack && setViewWeek((v) => v - 1)} disabled={!canBack} style={navBtn(canBack)}>
-          <ChevronLeft size={15} /> Prev
-        </button>
         <div style={{ textAlign: "center" }}>
-          {currentZone && (
-            <>
-              <div style={{ color: currentZone.color, fontSize: 11, fontWeight: 900, letterSpacing: "0.2em", fontFamily: "ui-monospace,monospace", textShadow: `0 0 14px ${currentZone.color}` }}>
-                {currentZone.name.replace("\n", " ")}
-              </div>
-              <div style={{ color: "rgba(148,163,184,0.55)", fontSize: 9, letterSpacing: "0.14em", fontFamily: "ui-monospace,monospace", marginTop: 2 }}>
-                WEEK {viewWeek} · {currentZone.sub}
-              </div>
-            </>
-          )}
+          <div style={{ color: currentZone.color, fontSize: 11, fontWeight: 900, letterSpacing: "0.2em", fontFamily: "ui-monospace,monospace", textShadow: `0 0 14px ${currentZone.color}` }}>
+            {currentZone.name.replace("\n", " ")}
+          </div>
+          <div style={{ color: "rgba(148,163,184,0.55)", fontSize: 9, letterSpacing: "0.14em", fontFamily: "ui-monospace,monospace", marginTop: 2 }}>
+            WEEK {viewWeek} · {currentZone.sub}
+          </div>
         </div>
-        <button onClick={() => canForward && setViewWeek((v) => v + 1)} disabled={!canForward} style={navBtn(canForward)}>
-          Next <ChevronRight size={15} />
-        </button>
       </div>)}
 
       {/* ── Guided mode (Prep–Year 2): ONE giant button — "press play and go" ── */}
