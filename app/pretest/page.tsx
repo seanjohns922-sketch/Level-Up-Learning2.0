@@ -390,6 +390,7 @@ function PretestPage() {
       answers: answerMap,
       yearLevel: Number(year.replace(/\D/g, "")) || 3,
       testType: "pre",
+      passThreshold: PRETEST_PASS_THRESHOLD,
       studentId,
     });
     clearYearProgress(year);
