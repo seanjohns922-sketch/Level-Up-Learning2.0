@@ -264,6 +264,14 @@ export default function RealmCarousel() {
           <div ref={levelMenuRef} className="relative flex items-center gap-2">
             <button
               type="button"
+              onClick={() => router.push("/tower")}
+              className="inline-flex items-center gap-1.5 text-xs font-black text-[#1a0e00] px-3.5 py-1.5 rounded-full transition hover:brightness-105"
+              style={{ background: "linear-gradient(135deg, #fff8e8, #e8c878 60%, #c8a030)", boxShadow: "0 2px 10px rgba(200,160,48,0.35)" }}
+            >
+              🏰 Tower of Knowledge
+            </button>
+            <button
+              type="button"
               onClick={() => setIsLevelMenuOpen((currentValue) => !currentValue)}
               className="text-xs font-bold text-white/90 px-3.5 py-1.5 rounded-full transition hover:scale-[1.02] hover:bg-white/15"
               style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)" }}
