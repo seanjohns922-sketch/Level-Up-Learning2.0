@@ -257,6 +257,14 @@ function selectBrowserVoice(synth: SpeechSynthesis) {
   const voices = synth.getVoices();
   if (!voices.length) return null;
 
+  // Only ever read the (English) question text with an English voice. Picking an
+  // arbitrary voices[0] could be any language installed on the device, which is
+  // why some students heard the questions read in a different language.
+  const isEnglish = (voice: SpeechSynthesisVoice) =>
+    (voice.lang ?? "").toLowerCase().startsWith("en") || /english/i.test(voice.name ?? "");
+  const englishVoices = voices.filter(isEnglish);
+  if (englishVoices.length === 0) return null; // fall back to lang="en-AU" only
+
   const preferred = [
     /en-AU/i,
     /Australian/i,
@@ -264,15 +272,15 @@ function selectBrowserVoice(synth: SpeechSynthesis) {
     /Samantha/i,
     /Daniel/i,
     /en-GB/i,
-    /en-US/i,
+    /en[-_]US/i,
   ];
 
   for (const pattern of preferred) {
-    const found = voices.find((voice) => pattern.test(voice.lang) || pattern.test(voice.name));
+    const found = englishVoices.find((voice) => pattern.test(voice.lang) || pattern.test(voice.name));
     if (found) return found;
   }
 
-  return voices[0] ?? null;
+  return englishVoices[0];
 }
 
 function fallbackSpeak(text: string) {
