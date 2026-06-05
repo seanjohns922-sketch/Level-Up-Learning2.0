@@ -119,6 +119,20 @@ function getPrepGroundTask(lessonId: string, difficulty: "easy" | "medium" | "ha
   return generatePrepWeek1Task(normalizedLessonId, difficulty);
 }
 
+// Optional per-lesson reflection bullets ("Today you practised: ✅ …").
+// Lessons not listed here fall back to the single "Today you practised <title>" line.
+const LESSON_PRACTISED_SKILLS: Record<string, string[]> = {
+  "y0-measurement-w1-l2": [
+    "Finding the shortest object",
+    "Finding the longest object",
+    "Putting objects in order",
+  ],
+};
+
+function getLessonPractisedSkills(lessonId: string): string[] | undefined {
+  return LESSON_PRACTISED_SKILLS[lessonId];
+}
+
 function LessonPage() {
   const router = useRouter();
   const params = useSearchParams();
@@ -1047,6 +1061,7 @@ function LessonPage() {
               liveContext={liveLessonContext}
               realmId={realmId}
               levelNumber={levelNumber}
+              practisedSkills={getLessonPractisedSkills(effectiveLessonId)}
               renderCompletionCard={
                 isMeasurement
                   ? undefined // Measurelands uses the realm-aware Meazurex reflection screen
@@ -1134,6 +1149,7 @@ function LessonPage() {
                   liveContext={liveLessonContext}
                   realmId={realmId}
                   levelNumber={levelNumber}
+                  practisedSkills={getLessonPractisedSkills(lessonMeta.id)}
                   renderCompletionCard={
                     showWeek12Lesson3Summary
                       ? (summary: LessonPerformanceSummary) => (

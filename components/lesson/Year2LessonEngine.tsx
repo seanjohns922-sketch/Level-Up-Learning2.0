@@ -468,6 +468,7 @@ export function Year2LessonEngine({
   liveContext,
   realmId,
   levelNumber,
+  practisedSkills,
 }: {
   lesson: Lesson;
   onTimedComplete: () => void;
@@ -477,6 +478,7 @@ export function Year2LessonEngine({
   liveContext?: LiveLessonContext;
   realmId?: string;
   levelNumber?: number;
+  practisedSkills?: string[];
 }) {
   const isMeasurement = realmId === "measurement";
   const totalSeconds = 9 * 60;
@@ -941,6 +943,7 @@ export function Year2LessonEngine({
           questionsAnswered={questionsAnswered}
           correctAnswers={correctAnswers}
           bestChain={Math.max(bestChainRef.current, comboCount)}
+          practisedSkills={practisedSkills}
           realmId={realmId}
           onComplete={() => {
             setReflectionDone(true);

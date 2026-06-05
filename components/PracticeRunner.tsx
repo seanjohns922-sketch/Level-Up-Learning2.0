@@ -229,6 +229,7 @@ export function PracticeRunner({
   liveContext,
   realmId,
   levelNumber,
+  practisedSkills,
 }: {
   minutes?: number;
   getTask: (ctx?: {
@@ -246,6 +247,7 @@ export function PracticeRunner({
   liveContext?: LiveLessonContext;
   realmId?: string;
   levelNumber?: number;
+  practisedSkills?: string[];
 }) {
   const isMeasurement = realmId === "measurement";
   const totalSeconds = minutes * 60;
@@ -838,6 +840,7 @@ export function PracticeRunner({
           questionsAnswered={safeQuestionsAnswered}
           correctAnswers={safeCorrectAnswers}
           bestChain={bestChainRef.current}
+          practisedSkills={practisedSkills}
           realmId={realmId}
           onComplete={() => {
             setReflectionDone(true);

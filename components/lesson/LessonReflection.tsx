@@ -40,6 +40,9 @@ type Props = {
   correctAnswers: number;
   /** Best combo chain reached this lesson. */
   bestChain?: number;
+  /** Optional per-lesson skill bullets ("Finding the shortest object", …).
+   *  Falls back to a single "Today you practised <lessonTitle>" line. */
+  practisedSkills?: string[];
   realmId?: string;
   onComplete: () => void;
 };
@@ -174,9 +177,11 @@ export default function LessonReflection({
   questionsAnswered,
   correctAnswers,
   bestChain = 0,
+  practisedSkills,
   realmId,
   onComplete,
 }: Props) {
+  const hasSkills = Array.isArray(practisedSkills) && practisedSkills.length > 0;
   const band = bandFromProps(levelNumber, level);
   const mascot = mascotForRealm(realmId);
   const xp = calcXP(correctAnswers);
@@ -250,10 +255,23 @@ export default function LessonReflection({
           </div>
           <div className="mt-2 text-2xl font-black text-white">Amazing work! 🎉</div>
 
-          <div className="mt-3 text-base text-teal-100/90">
-            Today you practised{" "}
-            <span className="font-extrabold text-white">{lessonTitle}</span> ✅
-          </div>
+          {hasSkills ? (
+            <div className="mt-3">
+              <div className="text-sm font-bold text-teal-100/80">Today you practised:</div>
+              <div className="mt-2 inline-flex flex-col items-start gap-1.5 text-left">
+                {practisedSkills!.map((skill) => (
+                  <div key={skill} className="text-base font-semibold text-white">
+                    ✅ {skill}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="mt-3 text-base text-teal-100/90">
+              Today you practised{" "}
+              <span className="font-extrabold text-white">{lessonTitle}</span> ✅
+            </div>
+          )}
 
           <div className="mt-3 flex justify-center gap-1.5 text-3xl">
             {[0, 1, 2].map((i) => (
@@ -293,6 +311,15 @@ export default function LessonReflection({
             </div>
             <div className="mt-1 text-2xl font-black text-white">Nice work!</div>
             <div className="mt-1 text-sm text-teal-100/80">{lessonTitle}</div>
+            {hasSkills ? (
+              <div className="mt-3 inline-flex flex-col items-start gap-1 text-left">
+                {practisedSkills!.map((skill) => (
+                  <div key={skill} className="text-sm font-semibold text-teal-100/90">
+                    ✅ {skill}
+                  </div>
+                ))}
+              </div>
+            ) : null}
 
             <StatChips xp={xp} chain={bestChain} accuracy={accuracy} />
 
