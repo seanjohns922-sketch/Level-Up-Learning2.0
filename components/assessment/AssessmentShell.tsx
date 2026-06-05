@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { ChevronLeft, Trophy, Zap } from "lucide-react";
+import { ChevronLeft, Home, LogOut, DoorOpen, Trophy, Zap } from "lucide-react";
 import { MathFormattedText } from "@/components/FractionText";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 
@@ -21,6 +21,12 @@ interface AssessmentShellProps {
   onNext: () => void;
   onSubmit: () => void;
   onExit: () => void;
+  /** When provided, shows the "I Don't Know" skip button below the answers. */
+  onIdk?: () => void;
+  /** When provided, replaces the single Exit control with Home / Exit / Logout. */
+  onHome?: () => void;
+  onExitAssessment?: () => void;
+  onLogout?: () => void;
 }
 
 export default function AssessmentShell({
@@ -38,7 +44,12 @@ export default function AssessmentShell({
   onNext,
   onSubmit,
   onExit,
+  onIdk,
+  onHome,
+  onExitAssessment,
+  onLogout,
 }: AssessmentShellProps) {
+  const hasExitMenu = Boolean(onHome || onExitAssessment || onLogout);
   const progress = ((currentIndex + 1) / totalQuestions) * 100;
   const isPost = testType.toLowerCase().includes("post");
   const studentLevelLabel = formatStudentLevelLabel(year);
@@ -49,13 +60,48 @@ export default function AssessmentShell({
       <div className="w-full max-w-2xl mb-6">
         {/* Top bar */}
         <div className="flex items-center justify-between mb-4">
-          <button
-            onClick={onExit}
-            className="flex items-center gap-1 text-sm font-semibold text-slate-400 hover:text-white transition"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            Exit
-          </button>
+          {hasExitMenu ? (
+            <div className="flex items-center gap-1.5">
+              {onHome && (
+                <button
+                  onClick={onHome}
+                  title="Save & go Home"
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-300 bg-slate-800/80 border border-slate-700/60 hover:bg-slate-700 hover:text-white transition"
+                >
+                  <Home className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Home</span>
+                </button>
+              )}
+              {onExitAssessment && (
+                <button
+                  onClick={onExitAssessment}
+                  title="Save & exit assessment"
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-300 bg-slate-800/80 border border-slate-700/60 hover:bg-slate-700 hover:text-white transition"
+                >
+                  <DoorOpen className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Exit</span>
+                </button>
+              )}
+              {onLogout && (
+                <button
+                  onClick={onLogout}
+                  title="Save & log out"
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold text-rose-300 bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20 hover:text-rose-200 transition"
+                >
+                  <LogOut className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Logout</span>
+                </button>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={onExit}
+              className="flex items-center gap-1 text-sm font-semibold text-slate-400 hover:text-white transition"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Exit
+            </button>
+          )}
 
           <div className="flex items-center gap-2">
             <span className="px-3 py-1 rounded-full text-xs font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30">
@@ -130,6 +176,19 @@ export default function AssessmentShell({
           <div className="relative">
             {questionContent}
           </div>
+
+          {/* "I Don't Know" — marks incorrect, records the response, advances */}
+          {onIdk && (
+            <div className="mt-6 flex justify-center">
+              <button
+                onClick={onIdk}
+                className="flex items-center gap-2 px-5 py-3 rounded-2xl text-sm font-bold text-slate-300 bg-slate-700/40 border border-slate-600/60 hover:bg-slate-700/70 hover:text-white transition active:scale-[0.98]"
+              >
+                <span className="text-lg leading-none">🤔</span>
+                I Don&apos;t Know — Skip This Question
+              </button>
+            </div>
+          )}
         </div>
 
         {/* ── Navigation ── */}

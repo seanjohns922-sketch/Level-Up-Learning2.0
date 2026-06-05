@@ -13,6 +13,14 @@ import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, type StudentProg
 import { ALL_PROGRAM_WEEKS, clearYearProgress, getOptionalWeeks, normalizeWeekList } from "@/lib/program-progress";
 import { saveNumberAssessment, saveStudentProgressState } from "@/lib/student-progress-sync";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
+import {
+  clearPretestResume,
+  loadPretestResume,
+  pretestResumeHasProgress,
+  savePretestResume,
+} from "@/lib/resume-state";
+import { clearActiveStudentSession } from "@/lib/studentIdentity";
+import { supabase } from "@/lib/supabase";
 
 const PRETEST_PASS_THRESHOLD = 85;
 const YEAR_SEQUENCE = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"] as const;
@@ -325,6 +333,18 @@ function PretestPage() {
     tens: 0,
     ones: 0,
   });
+  // Question ids the student tapped "I Don't Know" on (analytics-only).
+  const [idkResponses, setIdkResponses] = useState<string[]>([]);
+  // Save & resume gate + restored-snapshot flag.
+  const [resumeReady, setResumeReady] = useState(false);
+  const [showResumePrompt, setShowResumePrompt] = useState(false);
+  // 85%+ pass celebration before routing to results.
+  const [passCelebration, setPassCelebration] = useState<{
+    score: number;
+    total: number;
+    nextYear: string | null;
+  } | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const question = questions[index];
   const selected = answers[index];
@@ -352,6 +372,50 @@ function PretestPage() {
     setMab({ tens: 0, ones: 0 });
   }, [index]);
 
+  // ── Load any saved snapshot once; offer to resume rather than auto-restart ──
+  useEffect(() => {
+    const snapshot = loadPretestResume(year);
+    if (pretestResumeHasProgress(snapshot)) {
+      setShowResumePrompt(true);
+    }
+    setResumeReady(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [year]);
+
+  function resumeFromSnapshot() {
+    const snapshot = loadPretestResume(year);
+    if (snapshot) {
+      const restored = [...Array(questions.length).fill(null)];
+      snapshot.answers.forEach((a, i) => {
+        if (i < restored.length) restored[i] = a;
+      });
+      setAnswers(restored);
+      setIdkResponses(snapshot.idkResponses ?? []);
+      setIndex(Math.min(snapshot.index, Math.max(0, questions.length - 1)));
+    }
+    setShowResumePrompt(false);
+  }
+
+  function restartAssessment() {
+    clearPretestResume(year);
+    setAnswers(Array(questions.length).fill(null));
+    setIdkResponses([]);
+    setIndex(0);
+    setShowResumePrompt(false);
+  }
+
+  // ── Auto-save snapshot on every change (after the resume gate is resolved) ──
+  useEffect(() => {
+    if (!resumeReady || showResumePrompt) return;
+    savePretestResume({
+      year,
+      index,
+      answers,
+      idkResponses,
+      updatedAt: Date.now(),
+    });
+  }, [resumeReady, showResumePrompt, year, index, answers, idkResponses]);
+
   function choose(value: string) {
     const next = [...answers];
     next[index] = value;
@@ -366,8 +430,50 @@ function PretestPage() {
     if (index > 0) setIndex(index - 1);
   }
 
-  async function finish() {
-    const score = answers.reduce((acc, answer, i) => {
+  // "I Don't Know" — record the response, mark the question incorrect ("idk"),
+  // then auto-advance (or finish if this is the last question).
+  function answerIdk() {
+    const next = [...answers];
+    next[index] = "idk";
+    setAnswers(next);
+    if (question?.id) {
+      setIdkResponses((prev) => (prev.includes(question.id) ? prev : [...prev, question.id]));
+    }
+    if (index < questions.length - 1) {
+      setIndex(index + 1);
+    } else {
+      void finish(next);
+    }
+  }
+
+  // ── Exit options — every path saves the snapshot first so nothing is lost ──
+  function persistSnapshot() {
+    savePretestResume({ year, index, answers, idkResponses, updatedAt: Date.now() });
+  }
+  function exitToHome() {
+    persistSnapshot();
+    router.push("/home");
+  }
+  function exitToLevels() {
+    persistSnapshot();
+    router.push("/levels");
+  }
+  async function exitLogout() {
+    persistSnapshot();
+    try {
+      await supabase.auth.signOut();
+    } catch {
+      /* offline / already signed out — non-fatal */
+    }
+    clearActiveStudentSession();
+    router.push("/login");
+  }
+
+  async function finish(finalAnswers?: Array<string | null>) {
+    if (submitting) return;
+    setSubmitting(true);
+    const resolved = finalAnswers ?? answers;
+    const score = resolved.reduce((acc, answer, i) => {
       const q = questions[i];
       if (!answer) return acc;
       if (q.answerIndex !== undefined && q.answer == null && q.correctAnswer == null) {
@@ -379,7 +485,7 @@ function PretestPage() {
     }, 0);
 
     const answerMap = questions.reduce<Record<string, string | undefined>>((acc, q, i) => {
-      const answer = answers[i];
+      const answer = resolved[i];
       if (answer != null) acc[q.id] = answer;
       return acc;
     }, {});
@@ -482,12 +588,29 @@ function PretestPage() {
       } catch (error) {
         console.warn("[Pretest] DB save failed:", error);
         window.alert("We couldn't save your pre-test result yet. Please try again.");
+        setSubmitting(false);
         return;
       }
     }
 
+    // Assessment complete — clear the resume snapshot so we don't re-offer it.
+    clearPretestResume(year);
+
+    // 85%+ → celebrate the level advancement before showing the full results.
+    if (passed) {
+      setPassCelebration({ score, total: questions.length, nextYear });
+      return;
+    }
+
     router.push(
       `/results?year=${encodeURIComponent(year)}&score=${score}&total=${questions.length}`
+    );
+  }
+
+  function continueFromCelebration() {
+    if (!passCelebration) return;
+    router.push(
+      `/results?year=${encodeURIComponent(year)}&score=${passCelebration.score}&total=${passCelebration.total}`
     );
   }
 
@@ -660,11 +783,116 @@ function PretestPage() {
         }
         hasAnswer={isReady}
         isLast={index === questions.length - 1}
+        submitted={submitting}
         onBack={prevQuestion}
         onNext={nextQuestion}
-        onSubmit={finish}
-        onExit={() => router.push(isPlacementComplete(readProgress()) ? "/levels" : "/home")}
+        onSubmit={() => finish()}
+        onExit={exitToLevels}
+        onIdk={answerIdk}
+        onHome={exitToHome}
+        onExitAssessment={exitToLevels}
+        onLogout={exitLogout}
       />
+
+      {/* ── Save & Resume gate ── */}
+      {showResumePrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 backdrop-blur-sm p-6">
+          <div className="w-full max-w-md rounded-3xl border border-slate-700/60 bg-slate-900 p-8 text-center shadow-2xl">
+            <div className="text-5xl mb-4">📌</div>
+            <h2 className="text-2xl font-extrabold text-white mb-2">Welcome back!</h2>
+            <p className="text-slate-400 mb-6">
+              You started the {studentLevelLabel} Pre-Test earlier. Want to pick up right where you left off?
+            </p>
+            <div className="space-y-3">
+              <button
+                onClick={resumeFromSnapshot}
+                className="w-full py-3.5 rounded-2xl font-extrabold text-white bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 transition active:scale-[0.98]"
+              >
+                ▶ Resume Pre-Test
+              </button>
+              <button
+                onClick={restartAssessment}
+                className="w-full py-3 rounded-2xl font-semibold text-slate-300 bg-white/5 border border-white/10 hover:bg-white/10 transition active:scale-[0.98]"
+              >
+                Start Over
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 85%+ Pass celebration ── */}
+      {passCelebration && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-6 overflow-hidden">
+          <PassConfetti />
+          <div className="relative z-10 w-full max-w-lg rounded-3xl border border-teal-400/30 bg-gradient-to-b from-slate-900 to-slate-950 p-10 text-center shadow-[0_20px_70px_-20px_rgba(20,184,166,0.6)]">
+            <div className="text-7xl mb-4 animate-bounce">🎉</div>
+            <h2 className="text-3xl font-extrabold text-white mb-2">Amazing Work!</h2>
+            <p className="text-slate-300 mb-2 text-lg">
+              You already know most of {studentLevelLabel}.
+            </p>
+            <div className="my-6 inline-flex flex-col items-center gap-1 px-6 py-4 rounded-2xl border border-teal-400/30 bg-teal-500/10">
+              <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-teal-300/80">
+                You have unlocked
+              </span>
+              <span className="text-xl font-extrabold text-teal-200">
+                {passCelebration.nextYear
+                  ? `${formatStudentLevelLabel(passCelebration.nextYear)} Pre-Test`
+                  : "The Tower of Knowledge"}
+              </span>
+            </div>
+            <div className="mb-6 text-sm text-slate-400">
+              You scored {Math.round((passCelebration.score / passCelebration.total) * 100)}% — that&apos;s a pass!
+            </div>
+            <button
+              onClick={continueFromCelebration}
+              className="w-full py-4 rounded-2xl font-extrabold text-white bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 transition active:scale-[0.98]"
+              style={{ boxShadow: "0 10px 30px -8px rgba(16,185,129,0.5)" }}
+            >
+              Continue →
+            </button>
+          </div>
+        </div>
+      )}
     </>
+  );
+}
+
+/* ── lightweight confetti for the pass celebration ── */
+function PassConfetti() {
+  const pieces = Array.from({ length: 40 });
+  const colors = ["#2dd4bf", "#34d399", "#fcd34d", "#f472b6", "#38bdf8"];
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      {pieces.map((_, i) => {
+        const left = (i * 53) % 100;
+        const delay = (i % 10) * 0.18;
+        const dur = 2.6 + (i % 5) * 0.5;
+        const color = colors[i % colors.length];
+        const size = 6 + (i % 4) * 3;
+        return (
+          <span
+            key={i}
+            style={{
+              position: "absolute",
+              top: "-24px",
+              left: `${left}%`,
+              width: `${size}px`,
+              height: `${size}px`,
+              background: color,
+              borderRadius: i % 2 === 0 ? "2px" : "50%",
+              animation: `confettiFall ${dur}s linear ${delay}s infinite`,
+              opacity: 0.9,
+            }}
+          />
+        );
+      })}
+      <style jsx>{`
+        @keyframes confettiFall {
+          0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+          100% { transform: translateY(105vh) rotate(540deg); opacity: 0.8; }
+        }
+      `}</style>
+    </div>
   );
 }
