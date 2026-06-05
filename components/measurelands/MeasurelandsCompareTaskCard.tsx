@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
@@ -184,6 +185,179 @@ function TeachingMomentRow({ moment }: { moment: TeachingMoment }) {
   );
 }
 
+/* ── Activity A & B: tap objects into the correct order (Prep-friendly drag) ── */
+function OrderScene({
+  task,
+  onCorrect,
+  onWrong,
+}: {
+  task: MeasurelandsCompareTask;
+  onCorrect: () => void;
+  onWrong: () => void;
+}) {
+  const orderedIds = task.orderedIds ?? task.objects.map((o) => o.id);
+  const slotCount = orderedIds.length;
+  const descending = task.targetMode === "longest"; // longest → shortest
+  const slotLabels =
+    slotCount === 3
+      ? descending
+        ? ["Longest", "Middle", "Shortest"]
+        : ["Shortest", "Middle", "Longest"]
+      : orderedIds.map((_, i) => `#${i + 1}`);
+
+  const [placed, setPlaced] = useState<string[]>([]);
+  const [locked, setLocked] = useState(false);
+  const [shake, setShake] = useState(false);
+
+  const byId = (id: string) => task.objects.find((o) => o.id === id)!;
+  const bank = task.objects.filter((o) => !placed.includes(o.id));
+
+  function placeObject(id: string) {
+    if (locked || placed.includes(id) || placed.length >= slotCount) return;
+    const next = [...placed, id];
+    setPlaced(next);
+    if (next.length === slotCount) {
+      const correct = next.every((pid, i) => pid === orderedIds[i]);
+      setLocked(true);
+      if (correct) {
+        window.setTimeout(() => onCorrect(), 450);
+      } else {
+        setShake(true);
+        window.setTimeout(() => onWrong(), 700);
+      }
+    }
+  }
+
+  function removeFromSlot(index: number) {
+    if (locked) return;
+    setPlaced((current) => current.filter((_, i) => i !== index));
+  }
+
+  const allCorrect = locked && placed.every((pid, i) => pid === orderedIds[i]);
+
+  return (
+    <MeasurementShell
+      badge={task.badgeLabel ?? "Meazurex's Sorting Machine"}
+      prompt={task.prompt}
+      speakText={task.speakText ?? task.prompt}
+    >
+      {/* Ordered slots */}
+      <div className={`grid gap-3 md:grid-cols-3 ${shake ? "animate-[shake_0.4s_ease-in-out]" : ""}`}>
+        {Array.from({ length: slotCount }).map((_, index) => {
+          const id = placed[index];
+          const item = id ? byId(id) : null;
+          const slotState =
+            locked && id ? (id === orderedIds[index] ? "right" : "wrong") : "idle";
+          return (
+            <div key={index} className="text-center">
+              <div className="mb-1.5 text-[11px] font-black uppercase tracking-[0.16em] text-[#7c3aed]">
+                {slotLabels[index]}
+              </div>
+              <button
+                type="button"
+                onClick={() => id && removeFromSlot(index)}
+                className="w-full rounded-[26px] border-2 border-dashed p-1 transition"
+                style={{
+                  borderColor:
+                    slotState === "right"
+                      ? "rgba(34,197,94,0.8)"
+                      : slotState === "wrong"
+                      ? "rgba(244,63,94,0.8)"
+                      : "rgba(167,139,250,0.5)",
+                  background: id ? "transparent" : "rgba(167,139,250,0.06)",
+                  minHeight: 210,
+                }}
+              >
+                {item ? (
+                  <CompareVisual item={item} />
+                ) : (
+                  <div className="flex h-[200px] items-center justify-center text-5xl text-[#c4b5fd]">
+                    {index + 1}
+                  </div>
+                )}
+              </button>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Object bank */}
+      <div className="mt-4 rounded-[26px] border border-[rgba(214,184,108,0.34)] bg-[rgba(255,252,245,0.92)] p-3">
+        <div className="mb-2 text-center text-[11px] font-black uppercase tracking-[0.16em] text-[#5f4725]">
+          {bank.length > 0 ? "Tap an object to place it" : allCorrect ? "Perfect order!" : "Tap a slot to undo"}
+        </div>
+        <div className="grid gap-3 md:grid-cols-3">
+          {bank.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => placeObject(item.id)}
+              disabled={locked}
+              className="rounded-[28px] border border-transparent transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)] disabled:opacity-50"
+            >
+              <CompareVisual item={item} />
+            </button>
+          ))}
+          {bank.length === 0 && !allCorrect ? (
+            <div className="col-span-full text-center text-sm font-semibold text-[#9f1239]">
+              Not quite — let&apos;s try again.
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </MeasurementShell>
+  );
+}
+
+/* ── Activity C: which object continues the length sequence? ── */
+function SequenceScene({
+  task,
+  onCorrect,
+  onWrong,
+}: {
+  task: MeasurelandsCompareTask;
+  onCorrect: () => void;
+  onWrong: () => void;
+}) {
+  const prefix = task.sequencePrefix ?? [];
+  return (
+    <MeasurementShell
+      badge={task.badgeLabel ?? "Which Comes Next?"}
+      prompt={task.prompt}
+      speakText={task.speakText ?? task.prompt}
+    >
+      {/* The growing sequence with a mystery slot */}
+      <div className="rounded-[26px] border border-[rgba(214,184,108,0.34)] bg-[rgba(255,252,245,0.92)] p-3">
+        <div className="grid items-center gap-3" style={{ gridTemplateColumns: `repeat(${prefix.length + 1}, minmax(0, 1fr))` }}>
+          {prefix.map((item) => (
+            <CompareVisual key={item.id} item={item} compact />
+          ))}
+          <div
+            className="flex h-[220px] items-center justify-center rounded-[26px] border-2 border-dashed text-6xl font-black text-[#c4b5fd]"
+            style={{ borderColor: "rgba(167,139,250,0.5)", background: "rgba(167,139,250,0.06)" }}
+          >
+            ?
+          </div>
+        </div>
+      </div>
+
+      {/* Options */}
+      <div className="mt-4 grid gap-4 md:grid-cols-3">
+        {task.objects.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => (item.id === task.correctOptionId ? onCorrect() : onWrong())}
+            className="rounded-[28px] border border-transparent transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
+          >
+            <CompareVisual item={item} />
+          </button>
+        ))}
+      </div>
+    </MeasurementShell>
+  );
+}
+
 export function MeasurelandsCompareTaskCard({
   task,
   onCorrect,
@@ -193,6 +367,12 @@ export function MeasurelandsCompareTaskCard({
   onCorrect: () => void;
   onWrong: () => void;
 }) {
+  if (task.scene === "order") {
+    return <OrderScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  }
+  if (task.scene === "sequence") {
+    return <SequenceScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  }
   if (task.scene === "intro") {
     return (
       <MeasurementShell

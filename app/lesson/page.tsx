@@ -38,6 +38,10 @@ import {
   generatePrepMeasurelandsWeek1Task,
   resetPrepMeasurelandsWeek1TaskSessionState,
 } from "@/data/activities/prepMeasurelands/week1";
+import {
+  generatePrepMeasurelandsWeek1Lesson2Task,
+  resetPrepMeasurelandsWeek1Lesson2TaskSessionState,
+} from "@/data/activities/prepMeasurelands/week1Lesson2";
 import { getProgramForYear } from "@/data/programs";
 import { getCurriculumPlan } from "@/data/programs/genres";
 import { DEMO_MODE } from "@/data/config";
@@ -92,6 +96,9 @@ function isPrepGroundCustomLesson(lessonId: string) {
 function getPrepGroundTask(lessonId: string, difficulty: "easy" | "medium" | "hard") {
   if (lessonId.startsWith("y0-measurement-w1-l1")) {
     return generatePrepMeasurelandsWeek1Task(lessonId, difficulty);
+  }
+  if (lessonId.startsWith("y0-measurement-w1-l2")) {
+    return generatePrepMeasurelandsWeek1Lesson2Task(lessonId, difficulty);
   }
 
   const normalizedLessonId = lessonId.startsWith("y0-measurement-")
@@ -1041,7 +1048,9 @@ function LessonPage() {
               realmId={realmId}
               levelNumber={levelNumber}
               renderCompletionCard={
-                isGroundCustomLesson
+                isMeasurement
+                  ? undefined // Measurelands uses the realm-aware Meazurex reflection screen
+                  : isGroundCustomLesson
                   ? renderPrepCompletionCard
                   : showWeek12Lesson3Summary
                   ? (summary: LessonPerformanceSummary) => (
@@ -1173,4 +1182,5 @@ function LessonPage() {
     resetPrepWeek12TaskSessionState();
     resetPrepWeek7TaskSessionState();
     resetPrepMeasurelandsWeek1TaskSessionState();
+    resetPrepMeasurelandsWeek1Lesson2TaskSessionState();
   }

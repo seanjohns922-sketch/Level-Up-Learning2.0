@@ -458,9 +458,20 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "pair" | "trio";
+      scene: "intro" | "pair" | "trio" | "order" | "sequence";
       targetMode?: "longer" | "taller" | "longest" | "shortest";
       objects: Array<{
+        id: string;
+        label: string;
+        icon: string;
+        compareValue: number;
+        axis: "length" | "height";
+        accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
+      }>;
+      /** Correct ordering of object ids for the "order" scene (first slot → last). */
+      orderedIds?: string[];
+      /** Objects already shown before the "?" in the "sequence" scene. */
+      sequencePrefix?: Array<{
         id: string;
         label: string;
         icon: string;
