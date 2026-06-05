@@ -111,6 +111,14 @@ export default function LoginPage() {
   const [teacherName, setTeacherName] = useState("");
   const [className, setClassName] = useState("");
   const [createdCode, setCreatedCode] = useState<string | null>(null);
+  const [teacherResetNotice, setTeacherResetNotice] = useState<string | null>(null);
+  const [teacherResetLoading, setTeacherResetLoading] = useState(false);
+  const [passwordRecoveryMode, setPasswordRecoveryMode] = useState(false);
+  const [recoveryPassword, setRecoveryPassword] = useState("");
+  const [recoveryConfirmPassword, setRecoveryConfirmPassword] = useState("");
+  const [recoveryError, setRecoveryError] = useState<string | null>(null);
+  const [recoverySaving, setRecoverySaving] = useState(false);
+  const [recoverySuccess, setRecoverySuccess] = useState<string | null>(null);
 
   const [studentCode, setStudentCode] = useState(() => {
     if (typeof window === "undefined") return "";
@@ -143,6 +151,26 @@ export default function LoginPage() {
       console.log("[DemoAccess] modal opened");
     }
   }, [showDemoModal]);
+
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") {
+        setTab("teacher");
+        setTeacherMode("login");
+        setPasswordRecoveryMode(true);
+        setTeacherError(null);
+        setTeacherResetNotice(null);
+        setRecoveryError(null);
+        setRecoverySuccess(null);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   function saveClasses(next: ClassesStore) {
     setClasses(next);
@@ -183,6 +211,63 @@ export default function LoginPage() {
     if (data?.user) { setTeacherLoading(false); router.push("/teacher/dashboard"); return; }
     setTeacherError("Login failed.");
     setTeacherLoading(false);
+  }
+
+  async function handleTeacherPasswordReset() {
+    const email = teacherEmail.trim();
+    if (!email) {
+      setTeacherError("Enter your email first.");
+      return;
+    }
+
+    setTeacherError(null);
+    setTeacherResetNotice(null);
+    setTeacherResetLoading(true);
+    const redirectTo =
+      typeof window !== "undefined" ? `${window.location.origin}/login` : undefined;
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo,
+    });
+    setTeacherResetLoading(false);
+
+    if (error) {
+      setTeacherError(error.message);
+      return;
+    }
+
+    setTeacherResetNotice("Reset link sent. Check your email.");
+  }
+
+  async function handleRecoveredPasswordUpdate() {
+    setRecoveryError(null);
+    setRecoverySuccess(null);
+
+    if (recoveryPassword.length < 6) {
+      setRecoveryError("Password must be at least 6 characters.");
+      return;
+    }
+
+    if (recoveryPassword !== recoveryConfirmPassword) {
+      setRecoveryError("Passwords do not match.");
+      return;
+    }
+
+    setRecoverySaving(true);
+    const { error } = await supabase.auth.updateUser({ password: recoveryPassword });
+    setRecoverySaving(false);
+
+    if (error) {
+      setRecoveryError(error.message);
+      return;
+    }
+
+    setRecoverySuccess("Password updated. Redirecting…");
+    setRecoveryPassword("");
+    setRecoveryConfirmPassword("");
+    setPasswordRecoveryMode(false);
+    setTimeout(() => {
+      router.push("/teacher/dashboard");
+    }, 900);
   }
 
   async function handleStudentLogin() {
@@ -608,6 +693,60 @@ export default function LoginPage() {
               Enter the Tower
             </button>
           </div>
+        ) : passwordRecoveryMode ? (
+          <div className="grid gap-4">
+            <div
+              className="rounded-2xl px-4 py-3 text-sm font-semibold text-white/80"
+              style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)" }}
+            >
+              Enter a new password for your account.
+            </div>
+
+            <label className="grid gap-1.5">
+              <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">New Password</span>
+              <InputField icon={<Lock size={15} />}>
+                <input
+                  value={recoveryPassword}
+                  onChange={(e) => setRecoveryPassword(e.target.value)}
+                  placeholder="At least 6 characters"
+                  type="password"
+                  className={inputCls}
+                />
+              </InputField>
+            </label>
+            <label className="grid gap-1.5">
+              <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Confirm Password</span>
+              <InputField icon={<Lock size={15} />}>
+                <input
+                  value={recoveryConfirmPassword}
+                  onChange={(e) => setRecoveryConfirmPassword(e.target.value)}
+                  placeholder="Repeat password"
+                  type="password"
+                  className={inputCls}
+                />
+              </InputField>
+            </label>
+
+            {recoveryError && (
+              <p className="text-sm text-red-300 font-bold text-center rounded-xl py-2" style={{ background: "rgba(220,50,50,0.12)" }}>{recoveryError}</p>
+            )}
+            {recoverySuccess && (
+              <p className="text-sm text-emerald-200 font-bold text-center rounded-xl py-2" style={{ background: "rgba(40,180,100,0.12)" }}>{recoverySuccess}</p>
+            )}
+
+            <button
+              onClick={handleRecoveredPasswordUpdate}
+              disabled={recoverySaving}
+              className="mt-1 w-full py-4 rounded-2xl font-black text-lg text-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(0,0,0,0.3)] active:scale-[0.97] disabled:opacity-50 cursor-pointer"
+              style={{
+                background: "linear-gradient(135deg, hsl(0 0% 22%), hsl(0 0% 15%))",
+                boxShadow: "0 6px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)",
+              }}
+              type="button"
+            >
+              {recoverySaving ? "Saving..." : "Set New Password"}
+            </button>
+          </div>
         ) : (
           /* ── Teacher Form ── */
           <div className="grid gap-4">
@@ -642,6 +781,19 @@ export default function LoginPage() {
               </InputField>
             </label>
 
+            {teacherMode === "login" && (
+              <div className="flex justify-end -mt-1">
+                <button
+                  type="button"
+                  onClick={handleTeacherPasswordReset}
+                  disabled={teacherResetLoading}
+                  className="text-xs font-bold tracking-wide text-amber-200/90 hover:text-amber-100 disabled:opacity-50 transition"
+                >
+                  {teacherResetLoading ? "Sending reset link..." : "Forgot password?"}
+                </button>
+              </div>
+            )}
+
             {teacherMode === "signup" && (
               <>
                 <label className="grid gap-1.5">
@@ -661,6 +813,9 @@ export default function LoginPage() {
 
             {teacherError && (
               <p className="text-sm text-red-300 font-bold text-center rounded-xl py-2" style={{ background: "rgba(220,50,50,0.12)" }}>{teacherError}</p>
+            )}
+            {teacherResetNotice && (
+              <p className="text-sm text-emerald-200 font-bold text-center rounded-xl py-2" style={{ background: "rgba(40,180,100,0.12)" }}>{teacherResetNotice}</p>
             )}
 
             <button
