@@ -11,7 +11,7 @@ import NexusActivation from "@/components/lesson/NexusActivation";
 import ComboActivation from "@/components/lesson/ComboActivation";
 import LessonReflection from "@/components/lesson/LessonReflection";
 import BrainBreak from "@/components/lesson/BrainBreak";
-import { pickVillain, BRAIN_BREAK_AT_SECONDS_LEFT, type Villain } from "@/lib/brain-break";
+import { pickVillain, BRAIN_BREAK_1_AT_SECONDS_LEFT, BRAIN_BREAK_2_AT_SECONDS_LEFT, type Villain } from "@/lib/brain-break";
 import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent } from "@/lib/live-class-client";
 import { readBestChain, writeBestChain } from "@/lib/best-chain";
 import {
@@ -480,7 +480,9 @@ export function Year2LessonEngine({
   const initialTurn = useMemo(() => buildInitialTurn(lesson, activities), [activities, lesson]);
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
   const [brainBreakVillain, setBrainBreakVillain] = useState<Villain | null>(null);
-  const brainBreakDoneRef = useRef(false);
+  const brainBreak1DoneRef = useRef(false);
+  const brainBreak2DoneRef = useRef(false);
+  const lastVillainIdRef = useRef<string | null>(null);
   const brainBreakActiveRef = useRef(false);
   const [status, setStatus] = useState<"idle" | "correct" | "wrong">("idle");
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
@@ -625,15 +627,25 @@ export function Year2LessonEngine({
     };
   }, []);
 
-  // Fire the brain break once at the 4:30 mark — pauses the lesson clock.
+  // Two brain breaks (~3 min and ~6 min in) — each pauses the lesson clock and
+  // uses a different villain.
   useEffect(() => {
-    if (finished || brainBreakDoneRef.current) return;
-    if (secondsLeft <= BRAIN_BREAK_AT_SECONDS_LEFT && secondsLeft > 0) {
-      brainBreakDoneRef.current = true;
+    if (finished || brainBreakActiveRef.current) return;
+    if (!brainBreak1DoneRef.current && secondsLeft <= BRAIN_BREAK_1_AT_SECONDS_LEFT && secondsLeft > BRAIN_BREAK_2_AT_SECONDS_LEFT) {
+      brainBreak1DoneRef.current = true;
       brainBreakActiveRef.current = true;
-      setBrainBreakVillain(pickVillain(levelNumber ?? 2));
+      const villain = pickVillain(levelNumber ?? 2);
+      lastVillainIdRef.current = villain.id;
+      setBrainBreakVillain(villain);
+    } else if (!brainBreak2DoneRef.current && secondsLeft <= BRAIN_BREAK_2_AT_SECONDS_LEFT && secondsLeft > 0) {
+      brainBreak1DoneRef.current = true;
+      brainBreak2DoneRef.current = true;
+      brainBreakActiveRef.current = true;
+      const villain = pickVillain(levelNumber ?? 2, lastVillainIdRef.current ?? undefined);
+      lastVillainIdRef.current = villain.id;
+      setBrainBreakVillain(villain);
     }
-  }, [secondsLeft, finished]);
+  }, [secondsLeft, finished, levelNumber]);
 
   useEffect(() => {
     if (!finished || emittedSummaryRef.current) return;

@@ -215,18 +215,26 @@ export const VILLAINS: Villain[] = [
   },
 ];
 
-/** The second of the 9-minute lesson at which the brain break fires (4:30). */
-export const BRAIN_BREAK_AT_SECONDS_LEFT = 270;
+// Two brain breaks per 9-minute (540s) lesson:
+//   Break 1 ≈ 3 minutes in  (360s left)
+//   Break 2 ≈ 6 minutes in  (180s left)
+export const BRAIN_BREAK_1_AT_SECONDS_LEFT = 360;
+export const BRAIN_BREAK_2_AT_SECONDS_LEFT = 180;
 
 /** Ground (Prep) → Level 2 are junior; Level 3+ are senior. */
 export function bandForLevel(levelNumber: number): VillainBand {
   return levelNumber <= 2 ? "junior" : "senior";
 }
 
-/** Pick a villain appropriate for the student's level (varied each time). */
-export function pickVillain(levelNumber: number): Villain {
+/**
+ * Pick a villain appropriate for the student's level (varied each time).
+ * Pass `excludeId` to avoid repeating the same villain within a lesson.
+ */
+export function pickVillain(levelNumber: number, excludeId?: string): Villain {
   const band = bandForLevel(levelNumber);
-  const pool = VILLAINS.filter((v) => v.band === band);
-  const choices = pool.length > 0 ? pool : VILLAINS;
+  let pool = VILLAINS.filter((v) => v.band === band);
+  if (pool.length === 0) pool = VILLAINS;
+  const filtered = excludeId ? pool.filter((v) => v.id !== excludeId) : pool;
+  const choices = filtered.length > 0 ? filtered : pool;
   return choices[Math.floor(Math.random() * choices.length)];
 }
