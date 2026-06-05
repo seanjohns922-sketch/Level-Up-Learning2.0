@@ -1,7 +1,6 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { playLessonAudio } from "@/lib/audio/playLessonAudio";
 
 type SpeakState = {
   currentText: string | null;
@@ -13,9 +12,6 @@ type SpeakState = {
 const AUTO_READ_STORAGE_KEY = "levelup:autoReadEnabled";
 const LEGACY_AUTO_READ_STORAGE_KEY = "lul:auto_read_questions";
 
-let currentAudio: HTMLAudioElement | null = null;
-let currentRequest: AbortController | null = null;
-let activeSpeakToken: symbol | null = null;
 const speakListeners = new Set<() => void>();
 let speakState: SpeakState = {
   currentText: null,
@@ -262,15 +258,41 @@ function selectBrowserVoice(synth: SpeechSynthesis) {
   // why some students heard the questions read in a different language.
   const isEnglish = (voice: SpeechSynthesisVoice) =>
     (voice.lang ?? "").toLowerCase().startsWith("en") || /english/i.test(voice.name ?? "");
-  const englishVoices = voices.filter(isEnglish);
+
+  // Skip the robotic / novelty voices (mostly macOS) so it doesn't sound "AI".
+  const robotic =
+    /albert|bad news|bahh|bells|boing|bubbles|cellos|wobble|deranged|good news|jester|organ|superstar|trinoids|whisper|zarvox|fred|junior|ralph|kathy|princess|bruce|agnes|grandma|grandpa|reed|rocko|sandy|shelley|flo|eddy|grandstand|espeak|e-speak/i;
+
+  const englishVoices = voices.filter((v) => isEnglish(v) && !robotic.test(v.name ?? ""));
   if (englishVoices.length === 0) return null; // fall back to lang="en-AU" only
 
+  // Most natural / human-sounding first: neural & flagship voices, then nice
+  // named voices, then locale preferences.
   const preferred = [
+    /Google US English/i,
+    /Google UK English Female/i,
+    /Google UK English/i,
+    /Google Australian/i,
+    /Google/i,
+    /Natural/i,
+    /Neural/i,
+    /Premium/i,
+    /Enhanced/i,
+    /Siri/i,
+    /Samantha/i,
+    /Karen/i,
+    /Catherine/i,
+    /Matilda/i,
+    /Aria/i,
+    /Jenny/i,
+    /Libby/i,
+    /Sonia/i,
+    /Ava/i,
+    /Allison/i,
+    /Daniel/i,
+    /Arthur/i,
     /en-AU/i,
     /Australian/i,
-    /Karen/i,
-    /Samantha/i,
-    /Daniel/i,
     /en-GB/i,
     /en[-_]US/i,
   ];
@@ -283,16 +305,10 @@ function selectBrowserVoice(synth: SpeechSynthesis) {
   return englishVoices[0];
 }
 
-function fallbackSpeak(text: string) {
+function speakWithBrowser(text: string) {
   if (typeof window === "undefined") return;
   const synth = window.speechSynthesis;
   if (!synth) return;
-
-  if (currentAudio) {
-    currentAudio.pause();
-    currentAudio.currentTime = 0;
-    currentAudio = null;
-  }
 
   synth.cancel();
   setSpeakState({ currentText: text, isSpeaking: true });
@@ -302,8 +318,8 @@ function fallbackSpeak(text: string) {
 
   utterance.lang = voice?.lang ?? "en-AU";
   if (voice) utterance.voice = voice;
-  utterance.rate = 0.9;
-  utterance.pitch = 1.0;
+  utterance.rate = 0.95; // natural pace, not dragging
+  utterance.pitch = 1.05; // slightly warmer
   utterance.volume = 1.0;
   utterance.onend = () => {
     setSpeakState({ currentText: null, isSpeaking: false });
@@ -312,10 +328,40 @@ function fallbackSpeak(text: string) {
     setSpeakState({ currentText: null, isSpeaking: false });
   };
 
+  // Voices can be empty on first call (Safari/Chrome load them async). If so,
+  // pick the English voice once they arrive, then speak.
+  if (!voice && synth.getVoices().length === 0) {
+    const onVoices = () => {
+      synth.removeEventListener("voiceschanged", onVoices);
+      const ready = selectBrowserVoice(synth);
+      if (ready) {
+        utterance.voice = ready;
+        utterance.lang = ready.lang;
+      }
+      synth.speak(utterance);
+    };
+    synth.addEventListener("voiceschanged", onVoices);
+    // Safety: if voiceschanged never fires, speak anyway shortly.
+    window.setTimeout(() => {
+      synth.removeEventListener("voiceschanged", onVoices);
+      if (speakState.currentText === text && !speakState.isSpeaking) return;
+      if (!synth.speaking) synth.speak(utterance);
+    }, 250);
+    return;
+  }
+
   synth.speak(utterance);
 }
 
-export async function speak(text: string, speechKey?: string, source: "manual" | "auto" = "manual") {
+/**
+ * Speak text using the device's built-in (Web Speech API) voice.
+ * Free, instant, offline-capable, no API keys — and always English.
+ */
+export async function speak(
+  text: string,
+  _speechKey?: string,
+  source: "manual" | "auto" = "manual"
+) {
   if (typeof window === "undefined") return;
 
   ensureSpeechInteractionTracking();
@@ -325,72 +371,10 @@ export async function speak(text: string, speechKey?: string, source: "manual" |
   if (!normalized) return;
 
   stopSpeaking();
-  const speakToken = Symbol("speak");
-  const controller = new AbortController();
-  currentRequest = controller;
-  activeSpeakToken = speakToken;
-  setSpeakState({ currentText: normalized, isSpeaking: true });
-
-  try {
-    window.speechSynthesis?.cancel();
-
-    const audio = await playLessonAudio(normalized, speechKey, controller.signal);
-    if (activeSpeakToken !== speakToken || controller.signal.aborted) return;
-
-    window.speechSynthesis?.cancel();
-    if (currentAudio) {
-      currentAudio.pause();
-      currentAudio.currentTime = 0;
-      currentAudio = null;
-    }
-
-    currentAudio = audio;
-    audio.onended = () => {
-      if (currentAudio === audio) {
-        currentAudio = null;
-        if (currentRequest === controller) currentRequest = null;
-        setSpeakState({ currentText: null, isSpeaking: false });
-      }
-    };
-    audio.onerror = () => {
-      if (currentAudio === audio) {
-        currentAudio = null;
-        if (currentRequest === controller) currentRequest = null;
-        setSpeakState({ currentText: null, isSpeaking: false });
-      }
-    };
-
-    await audio.play();
-  } catch (error) {
-    const errorName = (error as Error)?.name;
-
-    if (errorName === "AbortError" || activeSpeakToken !== speakToken || controller.signal.aborted) {
-      return;
-    }
-
-    if (currentRequest === controller) currentRequest = null;
-
-    // Browser autoplay blocks should not trigger the robotic fallback voice.
-    if (errorName === "NotAllowedError") {
-      setSpeakState({ currentText: null, isSpeaking: false });
-      return;
-    }
-
-    fallbackSpeak(normalized);
-  }
+  speakWithBrowser(normalized);
 }
 
 export function stopSpeaking() {
-  activeSpeakToken = null;
-  currentRequest?.abort();
-  currentRequest = null;
-
-  if (currentAudio) {
-    currentAudio.pause();
-    currentAudio.currentTime = 0;
-    currentAudio = null;
-  }
-
   if (typeof window !== "undefined") {
     window.speechSynthesis?.cancel();
   }
