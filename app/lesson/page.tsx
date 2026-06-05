@@ -44,6 +44,7 @@ import { DEMO_MODE } from "@/data/config";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, updateProgress } from "@/data/progress";
 import { trackLiveLearningEvent } from "@/lib/live-class-client";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { markLessonComplete } from "@/lib/program-progress";
 import { getRecommendedAssignedWeek, isWeekPlayable, readProgramStore, getWeekProgress } from "@/lib/program-progress";
 import { getLessonChrome } from "@/lib/levelTheme";
@@ -779,9 +780,19 @@ function LessonPage() {
                     {isMeasurement ? "Mission Journal" : "Mission Briefing"}
                   </div>
 
-                  <h2 className="relative mt-3 text-[1.35rem] md:text-2xl font-bold text-foreground leading-[1.15] tracking-[-0.02em]">
-                    {safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
-                  </h2>
+                  <div className="relative mt-3 flex items-start gap-2">
+                    <h2 className="text-[1.35rem] md:text-2xl font-bold text-foreground leading-[1.15] tracking-[-0.02em]">
+                      {safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
+                    </h2>
+                    <ReadAloudBtn
+                      size="md"
+                      className="shrink-0 mt-0.5"
+                      text={
+                        (safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`) +
+                        (safeLessonFocus ? `. Focus: ${safeLessonFocus}` : "")
+                      }
+                    />
+                  </div>
                   {safeLessonFocus ? (
                     <p className="relative mt-2 text-sm font-medium text-foreground/80 leading-relaxed">
                       <span className="font-semibold" style={{ color: isMeasurement ? lt.missionFocusLabel : "#115e59" }}>Focus:</span> {safeLessonFocus}

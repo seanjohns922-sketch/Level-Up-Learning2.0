@@ -22,6 +22,7 @@ import {
 } from "@/lib/program-progress";
 import { getHomeBg, getHomeBgFilter, getVignetteStyle } from "@/lib/levelBand";
 import StudentAvatar from "@/components/avatar/StudentAvatar";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 const TEACHER_MODE_KEY = "lul:hidden_teacher_mode";
 const PATHWAY_JOURNAL_KEY_PREFIX = "lul:pathway-journal";
@@ -951,13 +952,21 @@ function ProgramPage() {
                             : rt.bezelCompletedBg,
                     }}
                   />
-                  <button
+                  <div
+                    role="button"
+                    tabIndex={locked ? -1 : 0}
+                    aria-disabled={locked}
                     onClick={() => !locked && openItem(item)}
-                    disabled={locked}
+                    onKeyDown={(e) => {
+                      if (!locked && (e.key === "Enter" || e.key === " ")) {
+                        e.preventDefault();
+                        openItem(item);
+                      }
+                    }}
                     className={[
                       "relative w-full text-left p-5 transition-all flex flex-col gap-3 group overflow-hidden",
                       rt.rounded ? "rounded-3xl" : "",
-                      locked ? "opacity-60 cursor-not-allowed" : "hover:-translate-y-1",
+                      locked ? "opacity-60 cursor-not-allowed" : "hover:-translate-y-1 cursor-pointer",
                     ].join(" ")}
                     style={{
                       clipPath: rt.cardClip,
@@ -1054,8 +1063,14 @@ function ProgramPage() {
 
                     {/* Row 2: title + focus */}
                     <div className="relative flex-1 min-w-0">
-                      <div className="font-extrabold text-white leading-tight line-clamp-2 drop-shadow-[0_1px_4px_rgba(0,0,0,0.5)]">
-                        {item.title}
+                      <div className="flex items-start gap-2">
+                        <div className="font-extrabold text-white leading-tight line-clamp-2 drop-shadow-[0_1px_4px_rgba(0,0,0,0.5)]">
+                          {item.title}
+                        </div>
+                        <ReadAloudBtn
+                          text={item.title}
+                          className="shrink-0 mt-0.5 !bg-white/10 !border-white/25 !text-white hover:!text-white hover:!border-white/40"
+                        />
                       </div>
                       <div className="mt-1.5 text-xs text-white/60 leading-snug line-clamp-2">
                         {!weekUnlocked
@@ -1097,7 +1112,7 @@ function ProgramPage() {
                         </span>
                       )}
                     </div>
-                  </button>
+                  </div>
 
                   {/* Connector between cards */}
                   {!isLast && (
