@@ -443,7 +443,7 @@ function ResultsPage() {
       <FloatingShapes />
 
         <div
-        className="relative z-10 w-full max-w-lg"
+        className="relative z-10 w-full max-w-lg lg:max-w-4xl"
         style={{
           opacity: 1,
           transform: "translateY(0)",
@@ -522,8 +522,8 @@ function ResultsPage() {
             </div>
           </div>
 
-          {/* Info section */}
-          <div className="px-8 pb-6 pt-4 space-y-3">
+          {/* Info section — tiles into 2 columns on iPad landscape to cut height */}
+          <div className="px-8 pb-6 pt-4 space-y-3 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0 lg:items-start [&>*]:lg:min-w-0">
             {passed ? (
               <div className="rounded-2xl p-4 border border-teal-400/20 bg-gradient-to-br from-teal-500/10 to-emerald-500/5">
                 <div className="flex items-center gap-2 mb-1.5">
@@ -762,7 +762,7 @@ function ResultsPage() {
           </div>
 
           {/* Action buttons */}
-          <div className="px-8 pb-8 space-y-3">
+          <div className="px-8 pb-8 space-y-3 lg:mx-auto lg:w-full lg:max-w-md">
             {passed ? (
               <>
                 {isPostTest || passedByProgram ? (
