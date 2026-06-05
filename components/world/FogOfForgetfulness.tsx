@@ -89,7 +89,7 @@ export default function FogOfForgetfulness({
       )}
 
       {/* ── Tower of Knowledge badge ── (raised to clear the bottom nav bar) */}
-      <div className="absolute bottom-24 left-4 z-[20] select-none">
+      <div className="absolute bottom-32 left-4 z-[20] select-none">
         <div
           className="flex items-end gap-2.5 rounded-2xl px-3 py-2.5 backdrop-blur-md"
           style={{
