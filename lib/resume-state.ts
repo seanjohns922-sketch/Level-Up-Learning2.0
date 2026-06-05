@@ -68,12 +68,16 @@ export function pretestResumeHasProgress(state: PretestResumeState | null): bool
 
 export type LessonResumeState = {
   lessonKey: string;
-  /** Index of the current activity/step within the lesson. */
-  activityIndex: number;
   /** Seconds left on the lesson countdown when saved. */
   secondsLeft: number;
-  /** XP earned so far in this lesson. */
-  xpEarned: number;
+  /** Questions answered so far (drives the HUD progress). */
+  questionsAnswered: number;
+  /** Correct answers / XP earned so far. */
+  correctAnswers: number;
+  /** Current combo chain. */
+  comboCount: number;
+  /** Index of the current activity/step (Year 2+ engine only). */
+  activityIndex?: number;
   updatedAt: number;
 };
 
@@ -115,5 +119,6 @@ export function clearLessonResume(lessonId: string): void {
 /** True when a lesson snapshot has meaningful progress worth offering to restore. */
 export function lessonResumeHasProgress(state: LessonResumeState | null): boolean {
   if (!state) return false;
-  return state.activityIndex > 0 || state.xpEarned > 0;
+  if (state.secondsLeft <= 0) return false; // already finished
+  return state.questionsAnswered > 0 || state.correctAnswers > 0 || (state.activityIndex ?? 0) > 0;
 }

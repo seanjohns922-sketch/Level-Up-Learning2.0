@@ -10,6 +10,14 @@ import { speak, useAutoReadSetting, useSpeechInteractionReady } from "@/lib/spea
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { LessonHUDRail } from "@/components/lesson/LessonHUDRail";
 import { LessonCompleteCard } from "@/components/lesson/LessonCompleteCard";
+import LessonReflection from "@/components/lesson/LessonReflection";
+import LessonResumeGate from "@/components/lesson/LessonResumeGate";
+import {
+  clearLessonResume,
+  loadLessonResume,
+  lessonResumeHasProgress,
+  saveLessonResume,
+} from "@/lib/resume-state";
 import SurgeAmbience from "@/components/lesson/SurgeAmbience";
 import NexusActivation from "@/components/lesson/NexusActivation";
 import ComboActivation from "@/components/lesson/ComboActivation";
@@ -258,12 +266,20 @@ export function PracticeRunner({
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [comboCount, setComboCount] = useState(0);
+  const [reflectionDone, setReflectionDone] = useState(false);
   const [attemptLog, setAttemptLog] = useState<
     Array<{ topicLabel: string; correct: boolean; timeSpentSeconds: number }>
   >([]);
   const questionStartedAtElapsedRef = useRef(0);
   const questionsAnsweredRef = useRef(0);
   const correctAnswersRef = useRef(0);
+  const bestChainRef = useRef(0);
+
+  // ── Lesson save & resume ──
+  const resumeLessonKey = liveContext?.lessonId ?? null;
+  const [showLessonResume, setShowLessonResume] = useState(false);
+  const resumeResolvedRef = useRef(false);
+  const showLessonResumeRef = useRef(false);
 
   function makeCtx() {
     const elapsed = totalSeconds - secondsLeft;
@@ -381,12 +397,80 @@ export function PracticeRunner({
   }
 
   useEffect(() => {
-    const t = setInterval(() => setSecondsLeft((s) => (brainBreakActiveRef.current ? s : s - 1)), 1000);
+    const t = setInterval(
+      () =>
+        setSecondsLeft((s) =>
+          brainBreakActiveRef.current || showLessonResumeRef.current ? s : s - 1
+        ),
+      1000
+    );
     return () => {
       clearInterval(t);
       clearPendingTimeout();
     };
   }, []);
+
+  // Track the best combo chain reached (for the reflection screen).
+  useEffect(() => {
+    if (comboCount > bestChainRef.current) bestChainRef.current = comboCount;
+  }, [comboCount]);
+
+  // ── Resume gate: load a saved snapshot once and offer to continue ──
+  useEffect(() => {
+    if (!resumeLessonKey) {
+      resumeResolvedRef.current = true;
+      return;
+    }
+    const snap = loadLessonResume(resumeLessonKey);
+    if (lessonResumeHasProgress(snap)) {
+      setShowLessonResume(true);
+      showLessonResumeRef.current = true;
+    } else {
+      resumeResolvedRef.current = true;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resumeLessonKey]);
+
+  function resumeLesson() {
+    const snap = resumeLessonKey ? loadLessonResume(resumeLessonKey) : null;
+    if (snap) {
+      setSecondsLeft(snap.secondsLeft);
+      setQuestionsAnswered(snap.questionsAnswered);
+      questionsAnsweredRef.current = snap.questionsAnswered;
+      setCorrectAnswers(snap.correctAnswers);
+      correctAnswersRef.current = snap.correctAnswers;
+      setComboCount(snap.comboCount);
+      bestChainRef.current = Math.max(bestChainRef.current, snap.comboCount);
+      // Don't replay brain breaks the student already passed before exiting.
+      if (snap.secondsLeft <= BRAIN_BREAK_1_AT_SECONDS_LEFT) brainBreak1DoneRef.current = true;
+      if (snap.secondsLeft <= BRAIN_BREAK_2_AT_SECONDS_LEFT) brainBreak2DoneRef.current = true;
+    }
+    setShowLessonResume(false);
+    showLessonResumeRef.current = false;
+    resumeResolvedRef.current = true;
+  }
+
+  function restartLesson() {
+    if (resumeLessonKey) clearLessonResume(resumeLessonKey);
+    setShowLessonResume(false);
+    showLessonResumeRef.current = false;
+    resumeResolvedRef.current = true;
+  }
+
+  // Auto-save a snapshot as the clock ticks (after the resume gate resolves).
+  useEffect(() => {
+    if (!resumeLessonKey || !resumeResolvedRef.current || finished) return;
+    if (brainBreakActiveRef.current) return;
+    saveLessonResume({
+      lessonKey: resumeLessonKey,
+      secondsLeft,
+      questionsAnswered,
+      correctAnswers,
+      comboCount,
+      updatedAt: Date.now(),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resumeLessonKey, secondsLeft, finished, questionsAnswered, correctAnswers, comboCount]);
 
   // Two brain breaks (~3 min and ~6 min in) — each pauses the lesson clock and
   // uses a different villain.
@@ -417,9 +501,10 @@ export function PracticeRunner({
   useEffect(() => {
     if (finished && !completedRef.current) {
       completedRef.current = true;
+      if (resumeLessonKey) clearLessonResume(resumeLessonKey);
       onComplete();
     }
-  }, [finished, onComplete]);
+  }, [finished, onComplete, resumeLessonKey]);
 
   useEffect(() => {
     if (task.kind !== "numberHunt") return;
@@ -738,6 +823,30 @@ export function PracticeRunner({
 
   // ── Finished state ──
   if (finished) {
+    // Bespoke completion cards (Prep celebration, Week-12 summary) own their own
+    // post-lesson screen. For every other lesson the reflection IS the
+    // celebration / completion screen; its Continue returns to the week page.
+    if (liveContext && !renderCompletionCard && !reflectionDone) {
+      return (
+        <LessonReflection
+          lessonId={liveContext.lessonId}
+          lessonTitle={lessonTitle ?? liveContext.lessonTitle ?? "Practice Session"}
+          level={liveContext.level}
+          levelNumber={levelNumber}
+          week={liveContext.week}
+          accuracy={accuracy}
+          questionsAnswered={safeQuestionsAnswered}
+          correctAnswers={safeCorrectAnswers}
+          bestChain={bestChainRef.current}
+          realmId={realmId}
+          onComplete={() => {
+            setReflectionDone(true);
+            onComplete(); // returns to the week page (lesson already finalised)
+          }}
+        />
+      );
+    }
+
     if (renderCompletionCard) {
       return <>{renderCompletionCard(summary)}</>;
     }
@@ -788,6 +897,13 @@ export function PracticeRunner({
 
   return (
     <div className="relative">
+      {showLessonResume && (
+        <LessonResumeGate
+          lessonTitle={lessonTitle ?? liveContext?.lessonTitle}
+          onResume={resumeLesson}
+          onRestart={restartLesson}
+        />
+      )}
       <style jsx>{`
         @keyframes shake {
           0%, 100% { transform: translateX(0); }

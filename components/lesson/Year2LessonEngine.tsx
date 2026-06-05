@@ -10,6 +10,13 @@ import SurgeAmbience from "@/components/lesson/SurgeAmbience";
 import NexusActivation from "@/components/lesson/NexusActivation";
 import ComboActivation from "@/components/lesson/ComboActivation";
 import LessonReflection from "@/components/lesson/LessonReflection";
+import LessonResumeGate from "@/components/lesson/LessonResumeGate";
+import {
+  clearLessonResume,
+  loadLessonResume,
+  lessonResumeHasProgress,
+  saveLessonResume,
+} from "@/lib/resume-state";
 import BrainBreak from "@/components/lesson/BrainBreak";
 import { pickVillain, BRAIN_BREAK_1_AT_SECONDS_LEFT, BRAIN_BREAK_2_AT_SECONDS_LEFT, type Villain } from "@/lib/brain-break";
 import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent } from "@/lib/live-class-client";
@@ -489,6 +496,11 @@ export function Year2LessonEngine({
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [comboCount, setComboCount] = useState(0);
   const [reflectionDone, setReflectionDone] = useState(false);
+  // ── Lesson save & resume ──
+  const resumeLessonKey = liveContext?.lessonId ?? lesson.id;
+  const [showLessonResume, setShowLessonResume] = useState(false);
+  const resumeResolvedRef = useRef(false);
+  const showLessonResumeRef = useRef(false);
   const bestChainRef = useRef(0);
   useEffect(() => {
     bestChainRef.current = readBestChain("number", workingLevel);
@@ -619,13 +631,68 @@ export function Year2LessonEngine({
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setSecondsLeft((c) => (brainBreakActiveRef.current ? c : c - 1));
+      setSecondsLeft((c) =>
+        brainBreakActiveRef.current || showLessonResumeRef.current ? c : c - 1
+      );
     }, 1000);
     return () => {
       clearInterval(interval);
       clearPendingTimeout();
     };
   }, []);
+
+  // ── Resume gate: load a saved snapshot once and offer to continue ──
+  useEffect(() => {
+    const snap = loadLessonResume(resumeLessonKey);
+    if (lessonResumeHasProgress(snap)) {
+      setShowLessonResume(true);
+      showLessonResumeRef.current = true;
+    } else {
+      resumeResolvedRef.current = true;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resumeLessonKey]);
+
+  function resumeLesson() {
+    const snap = loadLessonResume(resumeLessonKey);
+    if (snap) {
+      setSecondsLeft(snap.secondsLeft);
+      setQuestionsAnswered(snap.questionsAnswered);
+      questionsAnsweredRef.current = snap.questionsAnswered;
+      setCorrectAnswers(snap.correctAnswers);
+      setComboCount(snap.comboCount);
+      if (typeof snap.activityIndex === "number" && activities[snap.activityIndex]) {
+        setCurrentActivityIndex(snap.activityIndex);
+      }
+      if (snap.secondsLeft <= BRAIN_BREAK_1_AT_SECONDS_LEFT) brainBreak1DoneRef.current = true;
+      if (snap.secondsLeft <= BRAIN_BREAK_2_AT_SECONDS_LEFT) brainBreak2DoneRef.current = true;
+    }
+    setShowLessonResume(false);
+    showLessonResumeRef.current = false;
+    resumeResolvedRef.current = true;
+  }
+
+  function restartLesson() {
+    clearLessonResume(resumeLessonKey);
+    setShowLessonResume(false);
+    showLessonResumeRef.current = false;
+    resumeResolvedRef.current = true;
+  }
+
+  // Auto-save a snapshot as the clock ticks (after the resume gate resolves).
+  useEffect(() => {
+    if (!resumeResolvedRef.current || finished || brainBreakActiveRef.current) return;
+    saveLessonResume({
+      lessonKey: resumeLessonKey,
+      secondsLeft,
+      questionsAnswered,
+      correctAnswers,
+      comboCount,
+      activityIndex: currentActivityIndex,
+      updatedAt: Date.now(),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resumeLessonKey, secondsLeft, finished, questionsAnswered, correctAnswers, comboCount, currentActivityIndex]);
 
   // Two brain breaks (~3 min and ~6 min in) — each pauses the lesson clock and
   // uses a different villain.
@@ -657,9 +724,10 @@ export function Year2LessonEngine({
     if (!finished) return;
     if (!markedCompleteRef.current) {
       markedCompleteRef.current = true;
+      clearLessonResume(resumeLessonKey);
       onTimedComplete();
     }
-  }, [finished, onTimedComplete]);
+  }, [finished, onTimedComplete, resumeLessonKey]);
 
   useEffect(() => {
     if (!liveContext || !currentActivity || !currentQuestion) return;
@@ -858,16 +926,26 @@ export function Year2LessonEngine({
 
   // ── Finished state ──
   if (finished) {
-    if (!reflectionDone) {
+    // Bespoke completion cards (e.g. the Week-12 summary) own their own
+    // post-lesson screen. Otherwise the reflection IS the completion screen;
+    // its Continue returns to the week page.
+    if (!renderCompletionCard && !reflectionDone) {
       return (
         <LessonReflection
           lessonId={liveContext?.lessonId ?? lesson.id}
           lessonTitle={lesson.title}
           level={liveContext?.level ?? ""}
+          levelNumber={levelNumber}
           week={liveContext?.week ?? 0}
           accuracy={accuracy}
           questionsAnswered={questionsAnswered}
-          onComplete={() => setReflectionDone(true)}
+          correctAnswers={correctAnswers}
+          bestChain={Math.max(bestChainRef.current, comboCount)}
+          realmId={realmId}
+          onComplete={() => {
+            setReflectionDone(true);
+            onExit(); // returns to the week page (lesson already finalised)
+          }}
         />
       );
     }
@@ -927,6 +1005,13 @@ export function Year2LessonEngine({
 
   return (
     <div className="relative">
+      {showLessonResume && (
+        <LessonResumeGate
+          lessonTitle={liveContext?.lessonTitle ?? lesson.title}
+          onResume={resumeLesson}
+          onRestart={restartLesson}
+        />
+      )}
       <style jsx>{`
         @keyframes shake {
           0%, 100% { transform: translateX(0); }

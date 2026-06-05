@@ -427,9 +427,10 @@ function LessonPage() {
         return;
       }
     }
-
-    const realmParam = realmId === "measurement" ? `&realm_id=${encodeURIComponent(realmId)}` : "";
-    router.push(`/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1${realmParam}`);
+    // First call only FINALISES the lesson (marks complete + persists) so XP /
+    // progress are never lost — even if the student exits during the reflection
+    // screen. Navigation to the week page happens on the explicit Continue /
+    // "Back to Week" action (which re-enters this function with the ref set).
   }
 
   function goBackToProgram() {
