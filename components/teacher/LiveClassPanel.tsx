@@ -159,65 +159,64 @@ function buildCurrentLessonPerformance(
 ) {
   if (!row) return null;
 
+  // The row stores authoritative running totals; the event log is an independent
+  // record of every answer. We derive from BOTH and take whichever is higher so
+  // the card never shows 0 / 0 when either source has fallen behind (e.g. the
+  // row's score columns weren't persisting) and a lesson_completed event never
+  // clobbers a good count with a stale/zero payload.
+  const rowAnswered = Math.max(0, row.questions_answered ?? 0);
+  const rowCorrect = Math.max(0, row.correct_count ?? 0);
+  const rowCompleted = row.current_lesson_status === "completed";
+
   const lessonEvents = events
     .filter((event) => matchesCurrentLesson(row, event))
     .sort((left, right) => new Date(left.created_at).getTime() - new Date(right.created_at).getTime());
 
-  if (lessonEvents.length === 0) {
-    const answered = Math.max(0, row.questions_answered ?? 0);
-    const correct = Math.max(0, row.correct_count ?? 0);
-    const accuracy =
-      answered > 0
-        ? Math.max(0, row.accuracy_percent ?? Math.round((correct / answered) * 100))
-        : 0;
+  let eventAnswered = 0;
+  let eventCorrect = 0;
+  let eventCompleted = false;
+  let payloadAnswered: number | null = null;
+  let payloadCorrect: number | null = null;
 
-    return {
-      answered,
-      correct,
-      accuracy,
-      completed: row.current_lesson_status === "completed",
-    };
+  if (lessonEvents.length > 0) {
+    let startIndex = 0;
+    for (let index = lessonEvents.length - 1; index >= 0; index -= 1) {
+      const eventType = lessonEvents[index]?.event_type;
+      if (eventType === "lesson_started" || eventType === "quiz_started") {
+        startIndex = index;
+        break;
+      }
+    }
+
+    lessonEvents.slice(startIndex).forEach((event) => {
+      if (event.event_type === "answer_correct") {
+        eventAnswered += 1;
+        eventCorrect += 1;
+        return;
+      }
+      if (event.event_type === "answer_incorrect") {
+        eventAnswered += 1;
+        return;
+      }
+      if (event.event_type === "lesson_completed" || event.event_type === "quiz_completed") {
+        eventCompleted = true;
+        const payload = parseEventPayload(event.payload);
+        payloadAnswered = numberOrNull(payload.questionsAnswered ?? payload.totalQuestions);
+        payloadCorrect = numberOrNull(payload.correctCount ?? payload.correctAnswers);
+      }
+    });
   }
 
-  let startIndex = 0;
-  for (let index = lessonEvents.length - 1; index >= 0; index -= 1) {
-    const eventType = lessonEvents[index]?.event_type;
-    if (eventType === "lesson_started" || eventType === "quiz_started") {
-      startIndex = index;
-      break;
-    }
-  }
-
-  const attemptEvents = lessonEvents.slice(startIndex);
-  let answered = 0;
-  let correct = 0;
-  let completed = false;
-
-  attemptEvents.forEach((event) => {
-    if (event.event_type === "answer_correct") {
-      answered += 1;
-      correct += 1;
-      return;
-    }
-    if (event.event_type === "answer_incorrect") {
-      answered += 1;
-      return;
-    }
-    if (event.event_type === "lesson_completed" || event.event_type === "quiz_completed") {
-      completed = true;
-      const payload = parseEventPayload(event.payload);
-      const payloadAnswered = numberOrNull(payload.questionsAnswered ?? payload.totalQuestions);
-      const payloadCorrect = numberOrNull(payload.correctCount ?? payload.correctAnswers);
-      if (payloadAnswered != null) answered = payloadAnswered;
-      if (payloadCorrect != null) correct = payloadCorrect;
-    }
-  });
+  // Take the strongest evidence from any source; never downgrade to 0.
+  const answered = Math.max(rowAnswered, eventAnswered, payloadAnswered ?? 0);
+  const correctRaw = Math.max(rowCorrect, eventCorrect, payloadCorrect ?? 0);
+  const correct = Math.min(correctRaw, answered); // correct can't exceed answered
 
   return {
     answered,
     correct,
     accuracy: answered > 0 ? Math.round((correct / answered) * 100) : 0,
-    completed,
+    completed: rowCompleted || eventCompleted,
   };
 }
 
