@@ -240,7 +240,7 @@ export default function LegendUnlockReveal({
       )}
 
       {/* Content */}
-      <div className="relative flex flex-col items-center z-10 px-4" style={{ maxWidth: "400px" }}>
+      <div className="relative z-10 flex w-full max-w-[400px] flex-col items-center px-4 lg:max-w-[960px]">
         {/* "LEGEND UNLOCKED" header text */}
         {showBurst && (
           <div
@@ -263,10 +263,12 @@ export default function LegendUnlockReveal({
           </div>
         )}
 
+        {/* Card + details — two columns on iPad landscape */}
+        <div className="flex w-full flex-col items-center lg:flex-row lg:items-center lg:justify-center lg:gap-10">
         {/* Card — silhouette then reveal */}
         {showSilhouette && (
           <div
-            className="relative transition-all"
+            className="relative transition-all lg:flex-shrink-0"
             style={{
               opacity: 1,
               transform: showReveal
@@ -352,9 +354,11 @@ export default function LegendUnlockReveal({
           </div>
         )}
 
+        {/* RIGHT column: details + cinematic + actions */}
+        <div className="flex w-full flex-col items-center lg:max-w-[460px] lg:items-stretch">
         {/* Legend name + score + message */}
         <div
-          className="text-center mt-8 transition-all duration-600"
+          className="text-center mt-8 lg:mt-0 lg:text-left transition-all duration-600"
           style={{
             opacity: showInfo ? 1 : 0,
             transform: showInfo ? "translateY(0)" : "translateY(20px)",
@@ -405,7 +409,7 @@ export default function LegendUnlockReveal({
           )}
 
           <p
-            className="text-sm leading-relaxed max-w-xs mx-auto"
+            className="text-sm leading-relaxed max-w-xs mx-auto lg:mx-0"
             style={{ color: "hsla(0, 0%, 100%, 0.6)" }}
           >
             {legend.description}
@@ -445,7 +449,7 @@ export default function LegendUnlockReveal({
 
         {/* Action buttons */}
         <div
-          className="w-full grid gap-3 mt-8 transition-all duration-500"
+          className="w-full grid gap-3 mt-6 transition-all duration-500"
           style={{
             opacity: showButtons ? 1 : 0,
             transform: showButtons ? "translateY(0)" : "translateY(16px)",
@@ -497,6 +501,8 @@ export default function LegendUnlockReveal({
             Continue →
           </button>
         </div>
+        </div>{/* right column */}
+        </div>{/* two-column row */}
       </div>
 
       <style jsx>{`
