@@ -1,0 +1,270 @@
+"use client";
+
+import ReadAloudBtn from "@/components/ReadAloudBtn";
+import type { PracticeTask } from "@/data/activities/year1/practice-task";
+
+type MeasurelandsCompareTask = Extract<PracticeTask, { kind: "measurementCompare" }>;
+type MeasurelandsCompareObject = MeasurelandsCompareTask["objects"][number];
+type TeachingMoment = NonNullable<MeasurelandsCompareTask["teachingMoments"]>[number];
+
+const ACCENT_STYLES: Record<
+  MeasurelandsCompareObject["accent"],
+  {
+    border: string;
+    glow: string;
+    fill: string;
+    chip: string;
+    text: string;
+  }
+> = {
+  gold: {
+    border: "rgba(214, 184, 108, 0.82)",
+    glow: "0 16px 36px rgba(180, 120, 20, 0.22)",
+    fill: "linear-gradient(135deg, rgba(254, 240, 138, 0.96), rgba(217, 119, 6, 0.9))",
+    chip: "rgba(120, 53, 15, 0.9)",
+    text: "#fff8e1",
+  },
+  teal: {
+    border: "rgba(94, 234, 212, 0.78)",
+    glow: "0 16px 36px rgba(13, 148, 136, 0.2)",
+    fill: "linear-gradient(135deg, rgba(153, 246, 228, 0.96), rgba(13, 148, 136, 0.92))",
+    chip: "rgba(4, 120, 87, 0.92)",
+    text: "#ecfeff",
+  },
+  violet: {
+    border: "rgba(196, 181, 253, 0.82)",
+    glow: "0 16px 36px rgba(109, 40, 217, 0.22)",
+    fill: "linear-gradient(135deg, rgba(221, 214, 254, 0.98), rgba(109, 40, 217, 0.92))",
+    chip: "rgba(76, 29, 149, 0.92)",
+    text: "#f5f3ff",
+  },
+  rose: {
+    border: "rgba(253, 164, 175, 0.82)",
+    glow: "0 16px 36px rgba(225, 29, 72, 0.18)",
+    fill: "linear-gradient(135deg, rgba(254, 205, 211, 0.98), rgba(244, 63, 94, 0.9))",
+    chip: "rgba(159, 18, 57, 0.92)",
+    text: "#fff1f2",
+  },
+  sky: {
+    border: "rgba(125, 211, 252, 0.82)",
+    glow: "0 16px 36px rgba(2, 132, 199, 0.2)",
+    fill: "linear-gradient(135deg, rgba(186, 230, 253, 0.96), rgba(2, 132, 199, 0.9))",
+    chip: "rgba(3, 105, 161, 0.92)",
+    text: "#f0f9ff",
+  },
+  leaf: {
+    border: "rgba(134, 239, 172, 0.82)",
+    glow: "0 16px 36px rgba(21, 128, 61, 0.18)",
+    fill: "linear-gradient(135deg, rgba(220, 252, 231, 0.98), rgba(34, 197, 94, 0.9))",
+    chip: "rgba(22, 101, 52, 0.92)",
+    text: "#f0fdf4",
+  },
+};
+
+function MeasurementShell({
+  badge,
+  prompt,
+  speakText,
+  children,
+}: {
+  badge: string;
+  prompt: string;
+  speakText?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-4">
+      <div
+        className="rounded-[30px] border px-5 py-5 shadow-[0_14px_42px_rgba(76,29,149,0.1)]"
+        style={{
+          borderColor: "rgba(214,184,108,0.38)",
+          background:
+            "linear-gradient(145deg, rgba(255,248,232,0.98) 0%, rgba(250,243,228,0.98) 52%, rgba(244,232,205,0.96) 100%)",
+        }}
+      >
+        <div
+          className="mb-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em]"
+          style={{
+            background: "rgba(91,33,182,0.08)",
+            border: "1px solid rgba(167,139,250,0.34)",
+            color: "#5b21b6",
+          }}
+        >
+          {badge}
+        </div>
+        <div className="flex items-start gap-3">
+          <div className="flex-1 text-2xl font-black leading-tight text-[#2c1c07] sm:text-3xl">
+            {prompt}
+          </div>
+          <ReadAloudBtn text={speakText ?? prompt} size="md" className="shrink-0" />
+        </div>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function CompareVisual({
+  item,
+  compact = false,
+}: {
+  item: MeasurelandsCompareObject | TeachingMoment["left"] | TeachingMoment["right"];
+  compact?: boolean;
+}) {
+  const accent = ACCENT_STYLES[item.accent];
+  const axis = item.axis;
+  const trackSize = compact ? 152 : 188;
+  const fillLength = Math.round((item.compareValue / 10) * trackSize);
+  const fillHeight = Math.round((item.compareValue / 10) * (compact ? 122 : 150));
+
+  return (
+    <div
+      className="rounded-[26px] border px-4 py-4 text-center"
+      style={{
+        borderColor: accent.border,
+        background: "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,248,232,0.96))",
+        boxShadow: accent.glow,
+      }}
+    >
+      <div className="mb-2 text-4xl sm:text-5xl">{item.icon}</div>
+      <div className="mb-3 text-sm font-black uppercase tracking-[0.14em] text-[#5f4725]">
+        {item.label}
+      </div>
+      {axis === "length" ? (
+        <div className="mx-auto flex h-16 w-full max-w-[210px] items-center justify-start rounded-full border border-[#ead6a8] bg-[#fffaf0] px-2">
+          <div
+            className="rounded-full"
+            style={{
+              width: fillLength,
+              minWidth: 34,
+              height: compact ? 22 : 26,
+              background: accent.fill,
+            }}
+          />
+        </div>
+      ) : (
+        <div className="flex h-[160px] items-end justify-center">
+          <div className="relative flex h-[150px] w-20 items-end justify-center rounded-[22px] border border-[#ead6a8] bg-[#fffaf0] pb-2">
+            <div
+              className="rounded-t-[20px] rounded-b-[10px]"
+              style={{
+                width: compact ? 34 : 40,
+                height: fillHeight,
+                minHeight: 34,
+                background: accent.fill,
+              }}
+            />
+          </div>
+        </div>
+      )}
+      <div
+        className="mt-3 inline-flex rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em]"
+        style={{ background: accent.chip, color: accent.text }}
+      >
+        {axis === "length" ? "Length" : "Height"}
+      </div>
+    </div>
+  );
+}
+
+function TeachingMomentRow({ moment }: { moment: TeachingMoment }) {
+  return (
+    <div className="rounded-[28px] border border-[rgba(214,184,108,0.28)] bg-[rgba(255,252,245,0.92)] p-4 shadow-[0_10px_30px_rgba(91,33,182,0.06)]">
+      <div className="mb-3 text-center text-xs font-black uppercase tracking-[0.18em] text-[#7c3aed]">
+        {moment.title}
+      </div>
+      <div className="grid gap-3 md:grid-cols-2">
+        <CompareVisual item={moment.left} compact />
+        <CompareVisual item={moment.right} compact />
+      </div>
+      <div className="mt-3 text-center text-sm font-semibold text-[#5f4725]">
+        {moment.narration}
+      </div>
+    </div>
+  );
+}
+
+export function MeasurelandsCompareTaskCard({
+  task,
+  onCorrect,
+  onWrong,
+}: {
+  task: MeasurelandsCompareTask;
+  onCorrect: () => void;
+  onWrong: () => void;
+}) {
+  if (task.scene === "intro") {
+    return (
+      <MeasurementShell
+        badge={task.badgeLabel ?? "Meazurex Mission"}
+        prompt={task.prompt}
+        speakText={task.speakText ?? task.prompt}
+      >
+        <div className="rounded-[30px] border border-[rgba(214,184,108,0.36)] bg-[rgba(255,248,232,0.98)] p-5 shadow-[0_18px_38px_rgba(180,120,20,0.08)]">
+          <div className="mb-4 flex items-start gap-4 rounded-[26px] border border-[rgba(167,139,250,0.22)] bg-[rgba(109,40,217,0.08)] p-4">
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#6d28d9,#4c1d95)] text-3xl shadow-[0_10px_24px_rgba(109,40,217,0.24)]">
+              ⏳
+            </div>
+            <div className="space-y-2">
+              <div className="text-sm font-black uppercase tracking-[0.16em] text-[#5b21b6]">
+                Meazurex
+              </div>
+              <p className="text-base font-semibold leading-relaxed text-[#2c1c07]">
+                The Fog of Forgetfulness has mixed up all the lengths in Length Lands.
+              </p>
+              <p className="text-base font-semibold leading-relaxed text-[#5f4725]">
+                Some things are longer. Some things are shorter. Some things are taller.
+              </p>
+              <p className="text-base font-semibold leading-relaxed text-[#5f4725]">
+                Let&apos;s become Length Explorers and compare carefully.
+              </p>
+            </div>
+          </div>
+          <div className="space-y-4">
+            {task.teachingMoments?.map((moment) => (
+              <TeachingMomentRow key={moment.id} moment={moment} />
+            ))}
+          </div>
+          <div className="mt-5 flex justify-center">
+            <button
+              type="button"
+              onClick={onCorrect}
+              className="rounded-full px-6 py-3 text-lg font-black uppercase tracking-[0.12em] text-[#fff8e1] shadow-[0_16px_32px_rgba(180,120,20,0.22)] transition hover:-translate-y-0.5"
+              style={{
+                background:
+                  "linear-gradient(135deg, rgba(120,53,15,0.96), rgba(180,120,20,0.96), rgba(214,184,108,0.92))",
+              }}
+            >
+              Start Exploring
+            </button>
+          </div>
+        </div>
+      </MeasurementShell>
+    );
+  }
+
+  const promptVerb = task.targetMode === "taller" ? "Which is taller?" : task.prompt;
+
+  return (
+    <MeasurementShell
+      badge={task.badgeLabel ?? "Length Explorer"}
+      prompt={promptVerb}
+      speakText={task.speakText ?? promptVerb}
+    >
+      <div
+        className={`grid gap-4 ${task.scene === "trio" ? "md:grid-cols-3" : "md:grid-cols-2"}`}
+      >
+        {task.objects.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => (item.id === task.correctOptionId ? onCorrect() : onWrong())}
+            className="group rounded-[28px] border border-transparent text-left transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
+          >
+            <CompareVisual item={item} />
+          </button>
+        ))}
+      </div>
+    </MeasurementShell>
+  );
+}

@@ -454,6 +454,43 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      kind: "measurementCompare";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "pair" | "trio";
+      targetMode?: "longer" | "taller" | "longest" | "shortest";
+      objects: Array<{
+        id: string;
+        label: string;
+        icon: string;
+        compareValue: number;
+        axis: "length" | "height";
+        accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
+      }>;
+      teachingMoments?: Array<{
+        id: string;
+        title: string;
+        left: {
+          label: string;
+          icon: string;
+          compareValue: number;
+          axis: "length" | "height";
+          accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
+        };
+        right: {
+          label: string;
+          icon: string;
+          compareValue: number;
+          axis: "length" | "height";
+          accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
+        };
+        narration: string;
+      }>;
+      correctOptionId: string;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       kind: "tensOnesMcq";
       prompt: string;
       min: number;

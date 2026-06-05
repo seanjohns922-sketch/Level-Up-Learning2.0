@@ -34,6 +34,10 @@ import { generatePrepWeek9Task, resetPrepWeek9TaskSessionState } from "@/data/ac
 import { generatePrepWeek10Task, resetPrepWeek10TaskSessionState } from "@/data/activities/prep/week10";
 import { generatePrepWeek11Task, resetPrepWeek11TaskSessionState } from "@/data/activities/prep/week11";
 import { generatePrepWeek12Task, resetPrepWeek12TaskSessionState } from "@/data/activities/prep/week12";
+import {
+  generatePrepMeasurelandsWeek1Task,
+  resetPrepMeasurelandsWeek1TaskSessionState,
+} from "@/data/activities/prepMeasurelands/week1";
 import { getProgramForYear } from "@/data/programs";
 import { getCurriculumPlan } from "@/data/programs/genres";
 import { DEMO_MODE } from "@/data/config";
@@ -79,23 +83,32 @@ function isPrepGroundCustomLesson(lessonId: string) {
     lessonId === "y0-w11-l3" ||
     lessonId === "y0-w12-l1" ||
     lessonId === "y0-w12-l2" ||
-    lessonId === "y0-w12-l3"
+    lessonId === "y0-w12-l3" ||
+    lessonId.startsWith("y0-measurement-w")
   );
 }
 
 function getPrepGroundTask(lessonId: string, difficulty: "easy" | "medium" | "hard") {
-  if (lessonId.startsWith("y0-w12-")) return generatePrepWeek12Task(lessonId, difficulty);
-  if (lessonId.startsWith("y0-w11-")) return generatePrepWeek11Task(lessonId, difficulty);
-  if (lessonId.startsWith("y0-w10-")) return generatePrepWeek10Task(lessonId, difficulty);
-  if (lessonId.startsWith("y0-w9-")) return generatePrepWeek9Task(lessonId, difficulty);
-  if (lessonId.startsWith("y0-w8-")) return generatePrepWeek8Task(lessonId, difficulty);
-  if (lessonId.startsWith("y0-w7-")) return generatePrepWeek7Task(lessonId, difficulty);
-  if (lessonId.startsWith("y0-w6-")) return generatePrepWeek6Task(lessonId, difficulty);
-  if (lessonId.startsWith("y0-w5-")) return generatePrepWeek5Task(lessonId, difficulty);
-  if (lessonId.startsWith("y0-w4-")) return generatePrepWeek4Task(lessonId, difficulty);
-  if (lessonId.startsWith("y0-w3-")) return generatePrepWeek3Task(lessonId, difficulty);
-  if (lessonId.startsWith("y0-w2-")) return generatePrepWeek2Task(lessonId, difficulty);
-  return generatePrepWeek1Task(lessonId, difficulty);
+  if (lessonId.startsWith("y0-measurement-w1-l1")) {
+    return generatePrepMeasurelandsWeek1Task(lessonId, difficulty);
+  }
+
+  const normalizedLessonId = lessonId.startsWith("y0-measurement-")
+    ? lessonId.replace("y0-measurement-", "y0-")
+    : lessonId;
+
+  if (normalizedLessonId.startsWith("y0-w12-")) return generatePrepWeek12Task(normalizedLessonId, difficulty);
+  if (normalizedLessonId.startsWith("y0-w11-")) return generatePrepWeek11Task(normalizedLessonId, difficulty);
+  if (normalizedLessonId.startsWith("y0-w10-")) return generatePrepWeek10Task(normalizedLessonId, difficulty);
+  if (normalizedLessonId.startsWith("y0-w9-")) return generatePrepWeek9Task(normalizedLessonId, difficulty);
+  if (normalizedLessonId.startsWith("y0-w8-")) return generatePrepWeek8Task(normalizedLessonId, difficulty);
+  if (normalizedLessonId.startsWith("y0-w7-")) return generatePrepWeek7Task(normalizedLessonId, difficulty);
+  if (normalizedLessonId.startsWith("y0-w6-")) return generatePrepWeek6Task(normalizedLessonId, difficulty);
+  if (normalizedLessonId.startsWith("y0-w5-")) return generatePrepWeek5Task(normalizedLessonId, difficulty);
+  if (normalizedLessonId.startsWith("y0-w4-")) return generatePrepWeek4Task(normalizedLessonId, difficulty);
+  if (normalizedLessonId.startsWith("y0-w3-")) return generatePrepWeek3Task(normalizedLessonId, difficulty);
+  if (normalizedLessonId.startsWith("y0-w2-")) return generatePrepWeek2Task(normalizedLessonId, difficulty);
+  return generatePrepWeek1Task(normalizedLessonId, difficulty);
 }
 
 function LessonPage() {
@@ -108,12 +121,19 @@ function LessonPage() {
   const yearNumber = year === "Prep" ? 0 : parseInt(year.replace(/\D/g, ""), 10) || 1;
   const levelNumber = year === "Prep" ? 1 : yearNumber;
   const levelLabel = year === "Prep" ? "Ground Level" : `Level ${levelNumber}`;
-  const lessonId = params.get("lessonId") ?? `y${yearNumber}-w1-l1`;
-  const expectedPrefix = `y${yearNumber}-w${week}-`;
+  const defaultLessonId =
+    realmId === "measurement" && year === "Prep"
+      ? `y0-measurement-w${week}-l1`
+      : `y${yearNumber}-w${week}-l1`;
+  const lessonId = params.get("lessonId") ?? defaultLessonId;
+  const expectedPrefix =
+    realmId === "measurement" && year === "Prep"
+      ? `y0-measurement-w${week}-`
+      : `y${yearNumber}-w${week}-`;
   const previewMode = isDemoPreviewMode();
   const effectiveLessonId = lessonId.startsWith(expectedPrefix)
     ? lessonId
-    : `y${yearNumber}-w${week}-l1`;
+    : defaultLessonId;
 
   // Extract lesson number from lessonId (e.g. "y1-w1-l2" → 2)
   const lessonNumber = useMemo(() => {
@@ -1140,4 +1160,5 @@ function LessonPage() {
     resetPrepWeek11TaskSessionState();
     resetPrepWeek12TaskSessionState();
     resetPrepWeek7TaskSessionState();
+    resetPrepMeasurelandsWeek1TaskSessionState();
   }

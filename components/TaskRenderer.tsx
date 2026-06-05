@@ -95,6 +95,7 @@ import {
   GroundSoundCountTaskCard,
   GroundTapCountTaskCard,
 } from "@/components/ground/GroundMiniGameTask";
+import { MeasurelandsCompareTaskCard } from "@/components/measurelands/MeasurelandsCompareTaskCard";
 
 type Callbacks = {
   markCorrect: () => void;
@@ -285,6 +286,8 @@ function TaskRendererInner({
       return <GroundOrdinalTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundSpatial":
       return <GroundSpatialTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "measurementCompare":
+      return <MeasurelandsCompareTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundCollect":
       return <GroundCollectTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundBuild":

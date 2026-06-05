@@ -35,6 +35,7 @@ function clampNumber(value: number, min: number, max: number) {
 }
 
 function formatPracticeTopicLabel(kind: PracticeTask["kind"]) {
+  if (kind === "measurementCompare") return "Length Explorer";
   if (kind === "groundMatch") return "Ground Match";
   if (kind === "groundCollect") return "Ground Collect";
   if (kind === "groundBuild") return "Ground Build";
@@ -88,6 +89,9 @@ function getPracticeTaskCorrectAnswer(task: PracticeTask) {
   if (task.kind === "groundMoveCount") return String(task.targetNumber);
   if (task.kind === "groundFeed") return String(task.targetNumber);
   if (task.kind === "groundSoundCount") return String(task.targetNumber);
+  if (task.kind === "measurementCompare") {
+    return task.objects.find((item) => item.id === task.correctOptionId)?.label ?? task.correctOptionId;
+  }
   return null;
 }
 
@@ -652,6 +656,7 @@ export function PracticeRunner({
   const isBuiltinKind = ["mcq", "count", "order3", "audioPick", "numberHunt", "groupCountVisual"].includes(task.kind);
 
   const hasGroundFeedback =
+    task.kind === "measurementCompare" ||
     task.kind === "groundMatch" ||
     task.kind === "groundCollect" ||
     task.kind === "groundBuild" ||
