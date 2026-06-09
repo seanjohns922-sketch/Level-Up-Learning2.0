@@ -800,6 +800,73 @@ function CompareGroupCard(
   );
 }
 
+// ── Memory Challenge (student-controlled reveal) ─────────────────────────────
+// Lower-level memory activities used to flash a quantity for 2–3 seconds and
+// auto-hide it, so a distracted student could miss the reveal entirely. Instead
+// the student now controls the timing: press Reveal → study for as long as they
+// like → press "I've Seen It" → the quantity hides → they answer. This measures
+// number recognition / subitising / memory, not reaction speed.
+export type MemoryPhase = "ready" | "revealed" | "hidden";
+
+export function MemoryChallengeBox({
+  phase,
+  onReveal,
+  onHide,
+  studyLabel,
+  hiddenLabel,
+  children,
+  hiddenPlaceholder,
+}: {
+  phase: MemoryPhase;
+  onReveal: () => void;
+  onHide: () => void;
+  studyLabel: string;
+  hiddenLabel: string;
+  children: React.ReactNode;
+  hiddenPlaceholder: React.ReactNode;
+}) {
+  if (phase === "ready") {
+    return (
+      <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
+        <div className="flex flex-col items-center justify-center gap-3 rounded-[20px] bg-cyan-50 px-4 py-6 text-center">
+          <div className="text-5xl" aria-hidden>👀</div>
+          <div className="text-lg font-black uppercase tracking-[0.16em] text-teal-800">Memory Challenge</div>
+          <div className="text-sm font-bold text-slate-500">Press when ready.</div>
+          <button
+            type="button"
+            onClick={onReveal}
+            className="mt-1 rounded-full bg-gradient-to-r from-teal-600 to-cyan-500 px-8 py-3 text-lg font-black uppercase tracking-[0.12em] text-white shadow-[0_10px_24px_rgba(13,148,136,0.22)] transition hover:-translate-y-0.5 active:scale-[0.98]"
+          >
+            Reveal
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
+      <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
+        {phase === "revealed" ? studyLabel : hiddenLabel}
+      </div>
+      <div className="flex min-h-[108px] items-center justify-center rounded-[20px] bg-cyan-50 px-4 py-4">
+        {phase === "revealed" ? children : hiddenPlaceholder}
+      </div>
+      {phase === "revealed" ? (
+        <div className="mt-3 flex justify-center">
+          <button
+            type="button"
+            onClick={onHide}
+            className="rounded-full bg-gradient-to-r from-teal-600 to-cyan-500 px-8 py-3 text-base font-black uppercase tracking-[0.12em] text-white shadow-[0_10px_24px_rgba(13,148,136,0.22)] transition hover:-translate-y-0.5 active:scale-[0.98]"
+          >
+            I&apos;ve Seen It
+          </button>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export function GroundCompareTaskCard({
   task,
   onCorrect,
@@ -810,7 +877,7 @@ export function GroundCompareTaskCard({
   onWrong: () => void;
 }) {
   const [orderProgress, setOrderProgress] = useState<string[]>([]);
-  const [referenceHidden, setReferenceHidden] = useState(false);
+  const [memoryPhase, setMemoryPhase] = useState<MemoryPhase>(task.referenceGroup ? "ready" : "hidden");
   const sortedOrder = useMemo(() => {
     if (task.correctOrderIds?.length) return task.correctOrderIds;
     const direction = task.orderDirection ?? "ASC";
@@ -819,13 +886,11 @@ export function GroundCompareTaskCard({
       .map((group) => group.id);
   }, [task.correctOrderIds, task.groups, task.orderDirection]);
 
-  useEffect(() => {
-    if (!task.referenceGroup || !task.referenceRevealMs) return;
-    const timeout = window.setTimeout(() => setReferenceHidden(true), task.referenceRevealMs);
-    return () => window.clearTimeout(timeout);
-  }, [task.referenceGroup, task.referenceRevealMs]);
-
-  const referenceVisible = Boolean(task.referenceGroup) && !referenceHidden;
+  // When a reference group must be memorised, the student controls the reveal
+  // and hide timing (no auto-timeout); answers stay locked until they've hidden
+  // it, so a delayed glance never costs accuracy.
+  const hasReferenceMemory = Boolean(task.referenceGroup);
+  const answersEnabled = !hasReferenceMemory || memoryPhase === "hidden";
   const orderDirectionLabel = task.orderDirection === "DESC" ? "Biggest to smallest" : "Smallest to biggest";
 
   function tapGroup(groupId: string) {
@@ -880,22 +945,26 @@ export function GroundCompareTaskCard({
     <GroundMiniShell badge={badge} prompt={task.prompt} speakText={task.speakText}>
       <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
         {task.referenceGroup ? (
-          <div className="mb-4 rounded-[22px] border-2 border-cyan-200 bg-cyan-50 p-3">
-            <div className="mb-2 text-center text-xs font-black uppercase tracking-[0.16em] text-teal-800">
-              {referenceVisible ? "Remember this group" : task.comparisonType === "different" ? "Find the different group" : "Match this group"}
-            </div>
-            {referenceVisible ? (
+          <div className="mb-4">
+            <MemoryChallengeBox
+              phase={memoryPhase}
+              onReveal={() => setMemoryPhase("revealed")}
+              onHide={() => setMemoryPhase("hidden")}
+              studyLabel="Remember this group"
+              hiddenLabel={task.comparisonType === "different" ? "Find the different group" : "Match this group"}
+              hiddenPlaceholder={
+                <div className="text-center text-sm font-black uppercase tracking-[0.16em] text-teal-700">
+                  Which group matched?
+                </div>
+              }
+            >
               <CompareGroupCard
                 quantity={task.referenceGroup.quantity}
                 objectType={task.referenceGroup.objectType}
                 patternLayout={task.referenceGroup.patternLayout}
                 visualStyle={getCompareVisualStyle(task)}
               />
-            ) : (
-              <div className="flex min-h-[96px] items-center justify-center rounded-[22px] border-2 border-dashed border-cyan-300 bg-white text-center text-sm font-black uppercase tracking-[0.16em] text-teal-700">
-                Which group matched?
-              </div>
-            )}
+            </MemoryChallengeBox>
           </div>
         ) : null}
         {task.comparisonType === "order" ? (
@@ -926,13 +995,17 @@ export function GroundCompareTaskCard({
             </div>
           </>
         ) : null}
-        <div className={`grid gap-3 ${task.groups.length === 3 ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
+        <div
+          className={`grid gap-3 ${task.groups.length === 3 ? "md:grid-cols-3" : "md:grid-cols-2"} ${
+            answersEnabled ? "" : "pointer-events-none opacity-40"
+          }`}
+        >
           {task.groups.map((group) => (
             <button
               key={group.id}
               type="button"
               onClick={() => tapGroup(group.id)}
-              disabled={task.comparisonType === "equal" || task.comparisonType === "statement"}
+              disabled={task.comparisonType === "equal" || task.comparisonType === "statement" || !answersEnabled}
               className="text-left disabled:cursor-default"
             >
               <CompareGroupCard
@@ -953,14 +1026,16 @@ export function GroundCompareTaskCard({
           <button
             type="button"
             onClick={() => answerYesNo(true)}
-            className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-4 text-2xl font-black uppercase text-teal-900 transition hover:border-cyan-300 hover:bg-cyan-50"
+            disabled={!answersEnabled}
+            className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-4 text-2xl font-black uppercase text-teal-900 transition hover:border-cyan-300 hover:bg-cyan-50 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-cyan-200 disabled:hover:bg-white"
           >
             Yes
           </button>
           <button
             type="button"
             onClick={() => answerYesNo(false)}
-            className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-4 text-2xl font-black uppercase text-teal-900 transition hover:border-cyan-300 hover:bg-cyan-50"
+            disabled={!answersEnabled}
+            className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-4 text-2xl font-black uppercase text-teal-900 transition hover:border-cyan-300 hover:bg-cyan-50 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-cyan-200 disabled:hover:bg-white"
           >
             No
           </button>
@@ -979,39 +1054,38 @@ export function GroundFlashTaskCard({
   onCorrect: () => void;
   onWrong: () => void;
 }) {
-  const [revealed, setRevealed] = useState(true);
-
-  useEffect(() => {
-    const timeout = window.setTimeout(() => setRevealed(false), task.revealMs ?? 1200);
-    return () => window.clearTimeout(timeout);
-  }, [task]);
+  // Student-controlled reveal: starts on the "ready" screen, the student decides
+  // when to reveal and when to hide. No automatic timeout.
+  const [phase, setPhase] = useState<MemoryPhase>("ready");
+  const answerEnabled = phase === "hidden";
 
   return (
     <GroundMiniShell badge="Flash Game" prompt={task.prompt} speakText={task.speakText}>
-      <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
-        <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
-          {revealed ? "Look carefully" : "Now tap the number"}
-        </div>
-        <div className="flex min-h-[108px] items-center justify-center rounded-[20px] bg-cyan-50 px-4 py-4">
-          {revealed ? (
-            task.revealType === "numeral" ? (
-              <div className="text-7xl font-black text-teal-900 sm:text-8xl">{task.displayNumber ?? task.targetNumber}</div>
-            ) : (
-              <StructuredReveal quantity={task.displayNumber ?? task.targetNumber} objectType={task.objectType} patternLayout={task.patternLayout} />
-            )
-          ) : (
-            <div className="text-lg font-black text-slate-500">{task.promptAfterReveal ?? "What did you see?"}</div>
-          )}
-        </div>
-      </div>
+      <MemoryChallengeBox
+        phase={phase}
+        onReveal={() => setPhase("revealed")}
+        onHide={() => setPhase("hidden")}
+        studyLabel="Look carefully"
+        hiddenLabel="Now tap the number"
+        hiddenPlaceholder={
+          <div className="text-lg font-black text-slate-500">{task.promptAfterReveal ?? "What did you see?"}</div>
+        }
+      >
+        {task.revealType === "numeral" ? (
+          <div className="text-7xl font-black text-teal-900 sm:text-8xl">{task.displayNumber ?? task.targetNumber}</div>
+        ) : (
+          <StructuredReveal quantity={task.displayNumber ?? task.targetNumber} objectType={task.objectType} patternLayout={task.patternLayout} />
+        )}
+      </MemoryChallengeBox>
 
       <div className={task.options.length === 4 ? "grid grid-cols-2 gap-3 sm:grid-cols-4" : "grid grid-cols-3 gap-3"}>
         {task.options.map((option) => (
           <button
             key={option.id}
             type="button"
+            disabled={!answerEnabled}
             onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
-            className="flex min-h-[112px] items-center justify-center rounded-[24px] border-2 border-cyan-200 bg-white text-5xl font-black text-teal-900 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-[0_0_18px_rgba(34,211,238,0.14)] active:scale-[0.98]"
+            className="flex min-h-[112px] items-center justify-center rounded-[24px] border-2 border-cyan-200 bg-white text-5xl font-black text-teal-900 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-[0_0_18px_rgba(34,211,238,0.14)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:border-cyan-200 disabled:hover:shadow-sm"
           >
             {option.numeral}
           </button>
