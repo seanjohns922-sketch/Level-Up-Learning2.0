@@ -4,6 +4,8 @@ import dynamic from "next/dynamic";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
+import { readProgress } from "@/data/progress";
+import { getActiveStudentProfile, hasActiveStudentSeenIntro } from "@/lib/studentIdentity";
 
 const MeasurelandsMap = dynamic(
   () => import("@/components/world/MeasurelandsMap"),
@@ -53,7 +55,20 @@ export default function MeasurelandsPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!isDemoPreviewMode()) {
+    if (isDemoPreviewMode()) return;
+
+    const progress = readProgress();
+    const studentProfile = getActiveStudentProfile();
+    const introSeen = studentProfile?.studentId
+      ? hasActiveStudentSeenIntro(studentProfile.studentId)
+      : false;
+
+    if (!introSeen) {
+      router.replace("/home");
+      return;
+    }
+
+    if (progress?.year !== "Prep") {
       router.replace("/realms");
     }
   }, [router]);

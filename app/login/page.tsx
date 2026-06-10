@@ -360,12 +360,14 @@ export default function LoginPage() {
       console.warn("[Login] Could not refresh runtime student name", error);
     }
 
+    const isGroundLevelStudent = (studentSchoolYear ?? studentWorkingYear ?? progress?.year ?? "").trim() === "Prep";
+
     if (!progress) {
       progress = {
         year: studentSchoolYear ?? studentWorkingYear ?? "Year 1",
         scorePercent: 0,
         status: "ASSIGNED_PROGRAM",
-        placementComplete: false,
+        placementComplete: isGroundLevelStudent,
         assignedWeek: 1,
         requiredWeeks: [],
         optionalWeeks: [],
@@ -375,11 +377,26 @@ export default function LoginPage() {
       progressSource = "default";
     }
 
+    if (isGroundLevelStudent && progress.year === "Prep" && progress.placementComplete !== true) {
+      progress = {
+        ...progress,
+        status: "ASSIGNED_PROGRAM",
+        placementComplete: true,
+        assignedWeek: progress.assignedWeek ?? 1,
+        requiredWeeks: progress.requiredWeeks ?? [],
+        optionalWeeks: progress.optionalWeeks ?? [],
+        unlockedLegends: progress.unlockedLegends ?? [],
+      };
+      writeProgress(progress);
+    }
+
     const placementComplete = isPlacementComplete(progress);
 
     let dest: string;
     if (!introSeen) {
       dest = `/home`;
+    } else if (isGroundLevelStudent && progress?.year === "Prep") {
+      dest = `/measurelands`;
     } else if (!placementComplete) {
       dest = `/pretest?year=${encodeURIComponent(progress?.year ?? studentWorkingYear ?? studentSchoolYear ?? "Year 1")}`;
     } else {

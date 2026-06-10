@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { isPlacementComplete, readProgress } from "@/data/progress";
+import { isPlacementComplete, readProgress, writeProgress } from "@/data/progress";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { clearActiveStudentSession, getActiveStudentProfile, getPlacementEntryYear, hasActiveStudentSeenIntro, markActiveStudentIntroSeen } from "@/lib/studentIdentity";
 import { markStudentIntroSeen } from "@/lib/student-progress-sync";
@@ -13,6 +13,7 @@ export default function StudentHomePage() {
   const progress = useMemo(() => readProgress(), []);
   const studentProfile = useMemo(() => getActiveStudentProfile(), []);
   const placementYear = useMemo(() => progress?.year ?? getPlacementEntryYear(), [progress?.year]);
+  const isGroundLevel = placementYear === "Prep";
 
   useEffect(() => {
     if (isDemoPreviewMode()) {
@@ -20,13 +21,17 @@ export default function StudentHomePage() {
       return;
     }
     if (studentProfile?.studentId && hasActiveStudentSeenIntro(studentProfile.studentId)) {
+      if (isGroundLevel) {
+        router.replace("/measurelands");
+        return;
+      }
       if (isPlacementComplete(progress)) {
         router.replace("/levels");
         return;
       }
       router.replace(`/pretest?year=${encodeURIComponent(placementYear)}`);
     }
-  }, [placementYear, progress, router, studentProfile?.studentId]);
+  }, [isGroundLevel, placementYear, progress, router, studentProfile?.studentId]);
 
   async function handleLogout() {
     await supabase.auth.signOut();
@@ -40,6 +45,32 @@ export default function StudentHomePage() {
       void markStudentIntroSeen(studentProfile.studentId).catch((error) => {
         console.warn("[Home] Could not persist intro state", error);
       });
+    }
+    if (isGroundLevel) {
+      if (!progress) {
+        writeProgress({
+          year: "Prep",
+          scorePercent: 0,
+          status: "ASSIGNED_PROGRAM",
+          placementComplete: true,
+          assignedWeek: 1,
+          requiredWeeks: [],
+          optionalWeeks: [],
+          unlockedLegends: [],
+        });
+      } else if (!isPlacementComplete(progress)) {
+        writeProgress({
+          ...progress,
+          status: "ASSIGNED_PROGRAM",
+          placementComplete: true,
+          assignedWeek: progress.assignedWeek ?? 1,
+          requiredWeeks: progress.requiredWeeks ?? [],
+          optionalWeeks: progress.optionalWeeks ?? [],
+          unlockedLegends: progress.unlockedLegends ?? [],
+        });
+      }
+      router.push("/measurelands");
+      return;
     }
     router.push(isPlacementComplete(progress) ? "/levels" : `/pretest?year=${encodeURIComponent(placementYear)}`);
   }
@@ -66,10 +97,13 @@ export default function StudentHomePage() {
         style={{ background: "rgba(255,255,255,0.88)", border: "1px solid rgba(255,255,255,0.45)", boxShadow: "0 20px 40px rgba(0,0,0,0.18), 0 6px 12px rgba(0,0,0,0.06)" }}
       >
         <p className="text-sm font-semibold text-amber-800 uppercase tracking-widest mb-2">Welcome to the</p>
-        <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-3 uppercase tracking-wide">Tower of Knowledge</h1>
+        <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-3 uppercase tracking-wide">
+          {isGroundLevel ? "Measurelands" : "Tower of Knowledge"}
+        </h1>
         <p className="text-gray-700 max-w-2xl mx-auto mb-8">
-          {studentProfile?.displayName ? `${studentProfile.displayName}, ` : ""}your journey starts with a short skill check.
-          We&apos;ll use your pre-test to place you at the right level, unlock the correct learning path, and guide you into the Tower.
+          {isGroundLevel
+            ? `${studentProfile?.displayName ? `${studentProfile.displayName}, ` : ""}meet Meazurex, watch the intro, and begin your Ground Level adventure in Measurelands.`
+            : `${studentProfile?.displayName ? `${studentProfile.displayName}, ` : ""}your journey starts with a short skill check. We&apos;ll use your pre-test to place you at the right level, unlock the correct learning path, and guide you into the Tower.`}
         </p>
 
         <div className="rounded-[28px] border border-dashed border-teal-300/90 bg-teal-50/70 p-5 md:p-6 mb-8">
@@ -92,7 +126,7 @@ export default function StudentHomePage() {
           style={{ boxShadow: "0 6px 14px rgba(30,160,90,0.35)" }}
           type="button"
         >
-          Begin Your Journey
+          {isGroundLevel ? "Start Adventure" : "Begin Your Journey"}
         </button>
       </div>
     </main>

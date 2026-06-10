@@ -318,7 +318,18 @@ function PretestPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const year = searchParams.get("year") ?? "Year 3";
+  const realmId = searchParams.get("realm_id") ?? "number";
   const studentLevelLabel = formatStudentLevelLabel(year);
+
+  useEffect(() => {
+    if (year === "Prep") {
+      router.replace(realmId === "measurement" ? "/measurelands" : "/home");
+    }
+  }, [realmId, router, year]);
+
+  if (year === "Prep") {
+    return null;
+  }
 
   const questions: Question[] = useMemo(
     () => getPretestForYearLabel(year),
