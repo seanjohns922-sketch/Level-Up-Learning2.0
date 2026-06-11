@@ -502,6 +502,30 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Ground W1 L3 — measuring paths with equal informal units.
+      kind: "measurePath";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "count" | "compare" | "build";
+      /** Unit being used to measure (footstep / block / star / flower / stone). */
+      unitEmoji?: string;
+      unitLabel?: string;
+      /** "count" scene: a single path of this many equal units, MCQ on length. */
+      pathLength?: number;
+      options?: number[];
+      correctAnswer?: number;
+      /** "compare" scene: two paths; tap the longer one. */
+      paths?: Array<{ id: string; length: number; unitEmoji: string; unitLabel: string }>;
+      correctPathId?: string;
+      /** "build" scene: build a path exactly this many units long. */
+      targetLength?: number;
+      maxUnits?: number;
+      /** "intro" scene: worked example paths shown during the teaching sequence. */
+      teachingPaths?: Array<{ length: number; unitEmoji: string; caption: string }>;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       kind: "tensOnesMcq";
       prompt: string;
       min: number;

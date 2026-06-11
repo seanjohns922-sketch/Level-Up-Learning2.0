@@ -44,6 +44,7 @@ function clampNumber(value: number, min: number, max: number) {
 
 function formatPracticeTopicLabel(kind: PracticeTask["kind"]) {
   if (kind === "measurementCompare") return "Length Explorer";
+  if (kind === "measurePath") return "Path Measurer";
   if (kind === "groundMatch") return "Ground Match";
   if (kind === "groundCollect") return "Ground Collect";
   if (kind === "groundBuild") return "Ground Build";
@@ -756,6 +757,7 @@ export function PracticeRunner({
 
   const hasGroundFeedback =
     task.kind === "measurementCompare" ||
+    task.kind === "measurePath" ||
     task.kind === "groundMatch" ||
     task.kind === "groundCollect" ||
     task.kind === "groundBuild" ||
