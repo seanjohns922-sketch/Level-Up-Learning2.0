@@ -167,31 +167,36 @@ function CompareScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onC
   );
 }
 
-/* ── Activity C: build a path of a given number of units ── */
-function BuildScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
+/* ── Activity C: build a path of a given number of units ──
+ * Prep-friendly construction: the path is correct the moment the right number
+ * of units is placed (auto-success, no wrong-answer penalty). Remove lets a
+ * child undo and recount while building. */
+function BuildScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
   const target = task.targetLength ?? 0;
-  const maxUnits = task.maxUnits ?? target + 3;
+  const maxUnits = task.maxUnits ?? target + 2;
   const unitEmoji = task.unitEmoji ?? "🟦";
   const [count, setCount] = useState(0);
   const [locked, setLocked] = useState(false);
 
+  function succeedIfComplete(next: number) {
+    if (next === target) {
+      setLocked(true);
+      window.setTimeout(() => onCorrect(), 450);
+    }
+  }
+
   function addUnit() {
     if (locked || count >= maxUnits) return;
-    setCount((c) => c + 1);
+    const next = count + 1;
+    setCount(next);
+    succeedIfComplete(next);
   }
   function removeUnit() {
     if (locked || count <= 0) return;
     setCount((c) => c - 1);
   }
-  function build() {
-    if (locked || count === 0) return;
-    setLocked(true);
-    if (count === target) {
-      window.setTimeout(() => onCorrect(), 350);
-    } else {
-      window.setTimeout(() => onWrong(), 500);
-    }
-  }
+
+  const complete = locked || count === target;
 
   return (
     <PathShell badge={task.badgeLabel ?? "Build the Path"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
@@ -202,7 +207,10 @@ function BuildScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCor
         </div>
         <div
           className="flex min-h-[88px] flex-wrap items-center justify-center gap-2 rounded-[22px] border-2 border-dashed px-3 py-4"
-          style={{ borderColor: "rgba(214,184,108,0.6)", background: "rgba(255,248,232,0.6)" }}
+          style={{
+            borderColor: complete ? "rgba(94,234,212,0.85)" : "rgba(214,184,108,0.6)",
+            background: complete ? "rgba(204,251,241,0.5)" : "rgba(255,248,232,0.6)",
+          }}
         >
           {count === 0 ? (
             <span className="text-sm font-bold text-[#a98b52]">Tap “Add” to build your path</span>
@@ -242,16 +250,6 @@ function BuildScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCor
           ↩ Remove
         </button>
       </div>
-
-      <button
-        type="button"
-        onClick={build}
-        disabled={locked || count === 0}
-        className="w-full rounded-full px-6 py-4 text-lg font-black uppercase tracking-[0.12em] text-[#fff8e1] shadow-[0_16px_32px_rgba(180,120,20,0.22)] transition hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50"
-        style={{ background: "linear-gradient(135deg, rgba(120,53,15,0.96), rgba(180,120,20,0.96), rgba(214,184,108,0.92))" }}
-      >
-        Build It!
-      </button>
     </PathShell>
   );
 }
