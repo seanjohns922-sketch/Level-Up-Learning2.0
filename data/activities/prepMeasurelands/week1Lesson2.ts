@@ -76,10 +76,34 @@ const VALUE_TRIPLES: Array<[number, number, number]> = [
   [3, 7, 10],
 ];
 
+// Four-step progressions for "Which comes next?" — three shown + the next one.
+// Equal, clearly visible steps so the growing pattern is unmistakable.
+const VALUE_QUADS: Array<[number, number, number, number]> = [
+  [2, 4, 6, 8],
+  [3, 5, 7, 9],
+  [2, 4, 6, 10],
+  [1, 4, 7, 10],
+];
+
 function buildFamilyTrio(family: Family): MeasurelandsObject[] {
   const values = choose(VALUE_TRIPLES);
   const accents = shuffle(ACCENTS).slice(0, 3);
   const sizeTags = ["short", "mid", "long"];
+  return values.map((value, i) => ({
+    id: `${family.setId}-${sizeTags[i]}`,
+    label: family.label,
+    icon: family.icon,
+    compareValue: value,
+    axis: family.axis,
+    accent: accents[i]!,
+  }));
+}
+
+// Ascending 4-size set of the same object (tiny → small → medium → large).
+function buildFamilyQuad(family: Family): MeasurelandsObject[] {
+  const values = choose(VALUE_QUADS);
+  const accents = shuffle(ACCENTS).slice(0, 4);
+  const sizeTags = ["xs", "s", "m", "l"];
   return values.map((value, i) => ({
     id: `${family.setId}-${sizeTags[i]}`,
     label: family.label,
@@ -214,36 +238,31 @@ function buildSortingMachineTask(difficulty: Difficulty, memory: LessonMemory): 
 function buildWhichComesNextTask(memory: LessonMemory): MeasurelandsTask {
   const family = choose(FAMILIES.filter((f) => f.setId !== memory.lastSetId));
   memory.lastSetId = family.setId;
-  const trio = buildFamilyTrio(family).sort((a, b) => a.compareValue - b.compareValue);
 
-  // Show the two smallest; the next in the sequence is the largest.
-  const prefix = [trio[0]!, trio[1]!];
-  const correct = trio[2]!;
+  // A full four-step growing progression, ascending: tiny → small → medium → large.
+  const quad = buildFamilyQuad(family).sort((a, b) => a.compareValue - b.compareValue);
 
-  // Distractors: a too-small option and a duplicate-of-middle option, clearly wrong.
-  const distractorSmall: MeasurelandsObject = {
-    ...trio[0]!,
-    id: `${family.setId}-tiny`,
-    compareValue: Math.max(1, trio[0]!.compareValue - 2),
-    accent: choose(ACCENTS),
-  };
-  const distractorMid: MeasurelandsObject = {
-    ...trio[1]!,
-    id: `${family.setId}-again`,
-    accent: choose(ACCENTS),
-  };
+  // Show the first THREE (so the "getting bigger" pattern is unambiguous), then
+  // ask for the fourth. The correct answer is the only option larger than the
+  // last shown item — both distractors are smaller — so there is exactly one
+  // defensible answer.
+  const prefix = [quad[0]!, quad[1]!, quad[2]!];
+  const correct = quad[3]!;
+
+  const distractorA: MeasurelandsObject = { ...quad[0]!, id: `${family.setId}-dA` };
+  const distractorB: MeasurelandsObject = { ...quad[1]!, id: `${family.setId}-dB` };
 
   return {
     kind: "measurementCompare",
     scene: "sequence",
     prompt: "Which object comes next?",
-    speakText: "Look at the pattern. Which object comes next?",
+    speakText: "Look at the pattern. They are getting bigger. Which object comes next?",
     badgeLabel: "Which Comes Next?",
     targetMode: "longest",
     sequencePrefix: prefix,
-    objects: shuffle([correct, distractorSmall, distractorMid]),
+    objects: shuffle([correct, distractorA, distractorB]),
     correctOptionId: correct.id,
-    feedback: { correct: "Great pattern spotting!", wrong: "Let's look at the sizes again." },
+    feedback: { correct: "Great pattern spotting!", wrong: "Look — they keep getting bigger." },
   };
 }
 
