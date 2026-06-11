@@ -62,6 +62,7 @@ import { generatePrepWeek8TaskByKind } from "@/data/activities/prep/week8";
 import { generatePrepWeek9TaskByKind } from "@/data/activities/prep/week9";
 import { generatePrepWeek10TaskByKind } from "@/data/activities/prep/week10";
 import { generatePrepWeek11TaskByKind } from "@/data/activities/prep/week11";
+import { buildMeasurelandsWeek1QuizTasks } from "@/data/activities/prepMeasurelands/week1Quiz";
 
 type WeekProgress = {
   lessonsCompleted: boolean[]; // [L1, L2, L3]
@@ -1305,6 +1306,8 @@ type GroundQuizPracticeTask = Extract<
   | { kind: "groundSequence" }
   | { kind: "groundOrderTap" }
   | { kind: "groundGrowingCount" }
+  | { kind: "measurementCompare" }
+  | { kind: "measurePath" }
 >;
 
 const GROUND_WORDS_BY_NUMBER: Record<1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10, GroundWord> = {
@@ -1493,6 +1496,29 @@ function buildGroundQuizQuestion(
     prompt: practiceTask.prompt,
     practiceTask,
   };
+}
+
+// Measurelands · Ground · Week 1 — 15 questions (5 per lesson), each with
+// exactly one defensible answer, built from the lesson task kinds.
+function buildMeasurelandsWeek1WeeklyQuizQuestions(
+  questionsPerLesson: number
+): QuizQuestion[] {
+  const totalExpected = questionsPerLesson * 3;
+  const tasks = buildMeasurelandsWeek1QuizTasks();
+  if (tasks.length !== totalExpected) {
+    throw new Error(
+      `[MeasurelandsWeeklyQuiz] Week 1 expected ${totalExpected} questions, received ${tasks.length}.`
+    );
+  }
+  return tasks.map((task, index) => {
+    const lessonNumber = (Math.floor(index / questionsPerLesson) + 1) as 1 | 2 | 3;
+    return buildGroundQuizQuestion(
+      `mq${index + 1}`,
+      lessonNumber,
+      `measurelands_w1_l${lessonNumber}_q${(index % questionsPerLesson) + 1}`,
+      task as GroundQuizPracticeTask
+    );
+  });
 }
 
 function buildPrepWeek8WeeklyQuizQuestions(
@@ -6484,9 +6510,10 @@ function SessionPageRouteInstance() {
   const week = sp.get("week") ?? "1";
   const type = sp.get("type") ?? "lesson";
   const n = Number(sp.get("n") ?? "1");
-  const routeKey = `${year}|${week}|${type}|${n}`;
+  const realmId = sp.get("realm_id") ?? "number";
+  const routeKey = `${year}|${week}|${type}|${n}|${realmId}`;
 
-  return <SessionPage key={routeKey} year={year} week={week} type={type} n={n} />;
+  return <SessionPage key={routeKey} year={year} week={week} type={type} n={n} realmId={realmId} />;
 }
 
 function SessionPage({
@@ -6494,13 +6521,16 @@ function SessionPage({
   week,
   type,
   n,
+  realmId,
 }: {
   year: string;
   week: string;
   type: string;
   n: number;
+  realmId: string;
 }) {
   const router = useRouter();
+  const isMeasurementRealm = realmId === "measurement";
 
   const isLesson = type === "lesson";
   const previewMode = isDemoPreviewMode();
@@ -6549,8 +6579,10 @@ function SessionPage({
     }
   }, [previewMode, router, type, week, year]);
 
+  const realmParam = isMeasurementRealm ? `&realm_id=${encodeURIComponent(realmId)}` : "";
+
   function backToWeek() {
-    router.push(`/program?year=${encodeURIComponent(year)}&week=${encodeURIComponent(week)}&legacy=1`);
+    router.push(`/program?year=${encodeURIComponent(year)}&week=${encodeURIComponent(week)}&legacy=1${realmParam}`);
   }
 
   // ---------------------------
@@ -6682,6 +6714,10 @@ function SessionPage({
     const qConfig = quizConfig;
     const questionsPerLesson = qConfig?.questionsPerLesson ?? 5;
     const weekPlan = quizWeekPlan;
+
+    if (isMeasurementRealm && year === "Prep" && Number(week) === 1) {
+      return buildMeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson);
+    }
 
     if (year === "Prep" && Number(week) === 1) {
       return buildPrepWeek1WeeklyQuizQuestions(questionsPerLesson);
@@ -7062,7 +7098,9 @@ function SessionPage({
     quizMoneyAnswers,
     quizLessonActivityResults,
   ]);
-  const quizCompletionTitle = year === "Prep" && Number(week) === 6
+  const quizCompletionTitle = isMeasurementRealm && Number(week) === 1
+    ? "Length Lands Complete!"
+    : year === "Prep" && Number(week) === 6
     ? "Number Builder Challenge Complete!"
     : year === "Prep" && Number(week) === 7
       ? "Teen Number Challenge Complete!"
@@ -7075,7 +7113,9 @@ function SessionPage({
             : year === "Prep" && Number(week) === 11
               ? "Ground Level Readiness Challenge Complete!"
               : "Quiz Results";
-  const quizCompletionMessage = year === "Prep" && Number(week) === 6
+  const quizCompletionMessage = isMeasurementRealm && Number(week) === 1
+    ? "You learned longer and shorter, ordering lengths, and measuring paths!"
+    : year === "Prep" && Number(week) === 6
     ? "You built and split the numbers perfectly!"
     : year === "Prep" && Number(week) === 7
       ? "You mastered collections and teen numbers!"
@@ -8295,7 +8335,7 @@ function SessionPage({
                   {finalScore >= Math.ceil(quizQuestions.length * ((quizConfig?.passPercent ?? 80) / 100)) ? (
                     <button
                       onClick={() =>
-                        router.push(`/program?year=${encodeURIComponent(year)}&week=${encodeURIComponent(String(Math.min(12, Number(week) + 1)))}&legacy=1`)
+                        router.push(`/program?year=${encodeURIComponent(year)}&week=${encodeURIComponent(String(Math.min(12, Number(week) + 1)))}&legacy=1${realmParam}`)
                       }
                       className="px-5 py-3 rounded-2xl font-bold transition bg-trust-blue text-white hover:opacity-90"
                     >
@@ -8487,15 +8527,15 @@ function SessionPage({
                       : "You’re close! Let’s try the lessons again to build confidence."}
                   </div>
                   <button
-                    onClick={() =>
+                    onClick={() => {
+                      const lessonNo = weakestLessonBreakdown?.lessonNumber ?? 1;
+                      const lessonId = isMeasurementRealm
+                        ? `y0-measurement-w${week}-l${lessonNo}`
+                        : `y${parseInt(year.replace(/\D/g, ""), 10) || 1}-w${week}-l${lessonNo}`;
                       router.push(
-                        `/lesson?year=${encodeURIComponent(year)}&week=${encodeURIComponent(
-                          week
-                        )}&lessonId=y${parseInt(year.replace(/\D/g, ""), 10) || 1}-w${week}-l${
-                          weakestLessonBreakdown?.lessonNumber ?? 1
-                        }`
-                      )
-                    }
+                        `/lesson?year=${encodeURIComponent(year)}&week=${encodeURIComponent(week)}&lessonId=${lessonId}${realmParam}`
+                      );
+                    }}
                     className="shrink-0 rounded-lg px-4 py-2.5 text-sm font-bold text-white transition active:scale-[0.99]"
                     style={{
                       background:
