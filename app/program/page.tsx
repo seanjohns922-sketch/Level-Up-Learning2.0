@@ -343,8 +343,11 @@ function ProgramPage() {
     const realmParam = isMeasurementRealm ? `&realm_id=${encodeURIComponent(realmId)}` : "";
 
     if (item.type === "lesson") {
+      const lessonId = isMeasurementRealm
+        ? `y0-measurement-w${weekNum}-l${item.n}`
+        : `y${programYearIndex}-w${weekNum}-l${item.n}`;
       router.push(
-        `/lesson?year=${encodeURIComponent(curriculumYear)}&week=${week}&lessonId=y${programYearIndex}-w${weekNum}-l${item.n}${realmParam}`
+        `/lesson?year=${encodeURIComponent(curriculumYear)}&week=${week}&lessonId=${lessonId}${realmParam}`
       );
       return;
     }
