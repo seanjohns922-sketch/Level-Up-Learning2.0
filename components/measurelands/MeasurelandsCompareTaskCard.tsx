@@ -127,42 +127,59 @@ function CompareVisual({
         boxShadow: accent.glow,
       }}
     >
-      <div className="mb-2 text-4xl sm:text-5xl">{item.icon}</div>
-      <div className="mb-3 text-sm font-black uppercase tracking-[0.14em] text-[#5f4725]">
-        {item.label}
-      </div>
-      {axis === "length" ? (
-        <div className="mx-auto flex h-16 w-full max-w-[210px] items-center justify-start rounded-full border border-[#ead6a8] bg-[#fffaf0] px-2">
+      {axis === "mass" ? (
+        // Mass: the object itself conveys weight (a brick is heavy, a feather is
+        // light) — no proportional bar. Show it big on a little scale pan.
+        <div className="flex h-[160px] flex-col items-center justify-end">
+          <div className={compact ? "text-6xl" : "text-7xl sm:text-8xl"}>{item.icon}</div>
+          <div className="mb-3 mt-2 text-sm font-black uppercase tracking-[0.14em] text-[#5f4725]">
+            {item.label}
+          </div>
           <div
-            className="rounded-full"
-            style={{
-              width: fillLength,
-              minWidth: 34,
-              height: compact ? 22 : 26,
-              background: accent.fill,
-            }}
+            className="rounded-b-[14px] rounded-t-[6px]"
+            style={{ width: compact ? 96 : 120, height: 12, background: accent.fill, boxShadow: accent.glow }}
           />
         </div>
       ) : (
-        <div className="flex h-[160px] items-end justify-center">
-          <div className="relative flex h-[150px] w-20 items-end justify-center rounded-[22px] border border-[#ead6a8] bg-[#fffaf0] pb-2">
-            <div
-              className="rounded-t-[20px] rounded-b-[10px]"
-              style={{
-                width: compact ? 34 : 40,
-                height: fillHeight,
-                minHeight: 34,
-                background: accent.fill,
-              }}
-            />
+        <>
+          <div className="mb-2 text-4xl sm:text-5xl">{item.icon}</div>
+          <div className="mb-3 text-sm font-black uppercase tracking-[0.14em] text-[#5f4725]">
+            {item.label}
           </div>
-        </div>
+          {axis === "length" ? (
+            <div className="mx-auto flex h-16 w-full max-w-[210px] items-center justify-start rounded-full border border-[#ead6a8] bg-[#fffaf0] px-2">
+              <div
+                className="rounded-full"
+                style={{
+                  width: fillLength,
+                  minWidth: 34,
+                  height: compact ? 22 : 26,
+                  background: accent.fill,
+                }}
+              />
+            </div>
+          ) : (
+            <div className="flex h-[160px] items-end justify-center">
+              <div className="relative flex h-[150px] w-20 items-end justify-center rounded-[22px] border border-[#ead6a8] bg-[#fffaf0] pb-2">
+                <div
+                  className="rounded-t-[20px] rounded-b-[10px]"
+                  style={{
+                    width: compact ? 34 : 40,
+                    height: fillHeight,
+                    minHeight: 34,
+                    background: accent.fill,
+                  }}
+                />
+              </div>
+            </div>
+          )}
+        </>
       )}
       <div
         className="mt-3 inline-flex rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em]"
         style={{ background: accent.chip, color: accent.text }}
       >
-        {axis === "length" ? "Length" : "Height"}
+        {axis === "mass" ? "Weight" : axis === "length" ? "Length" : "Height"}
       </div>
     </div>
   );
@@ -383,21 +400,24 @@ export function MeasurelandsCompareTaskCard({
         <div className="rounded-[30px] border border-[rgba(214,184,108,0.36)] bg-[rgba(255,248,232,0.98)] p-5 shadow-[0_18px_38px_rgba(180,120,20,0.08)]">
           <div className="mb-4 flex items-start gap-4 rounded-[26px] border border-[rgba(167,139,250,0.22)] bg-[rgba(109,40,217,0.08)] p-4">
             <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#6d28d9,#4c1d95)] text-3xl shadow-[0_10px_24px_rgba(109,40,217,0.24)]">
-              ⏳
+              {task.introIcon ?? "⏳"}
             </div>
             <div className="space-y-2">
               <div className="text-sm font-black uppercase tracking-[0.16em] text-[#5b21b6]">
                 Meazurex
               </div>
-              <p className="text-base font-semibold leading-relaxed text-[#2c1c07]">
-                The Fog of Forgetfulness has mixed up all the lengths in Length Lands.
-              </p>
-              <p className="text-base font-semibold leading-relaxed text-[#5f4725]">
-                Some things are longer. Some things are shorter. Some things are taller.
-              </p>
-              <p className="text-base font-semibold leading-relaxed text-[#5f4725]">
-                Let&apos;s become Length Explorers and compare carefully.
-              </p>
+              {(task.introBody ?? [
+                "The Fog of Forgetfulness has mixed up all the lengths in Length Lands.",
+                "Some things are longer. Some things are shorter. Some things are taller.",
+                "Let's become Length Explorers and compare carefully.",
+              ]).map((line, i) => (
+                <p
+                  key={i}
+                  className={`text-base font-semibold leading-relaxed ${i === 0 ? "text-[#2c1c07]" : "text-[#5f4725]"}`}
+                >
+                  {line}
+                </p>
+              ))}
             </div>
           </div>
           <div className="space-y-4">

@@ -459,13 +459,16 @@ export type PracticeTask = (
       speakText?: string;
       badgeLabel?: string;
       scene: "intro" | "pair" | "trio" | "order" | "sequence";
-      targetMode?: "longer" | "taller" | "longest" | "shortest";
+      /** Intro scene: themeable Meazurex copy (falls back to the length copy). */
+      introBody?: string[];
+      introIcon?: string;
+      targetMode?: "longer" | "taller" | "longest" | "shortest" | "heavier" | "lighter" | "heaviest" | "lightest";
       objects: Array<{
         id: string;
         label: string;
         icon: string;
         compareValue: number;
-        axis: "length" | "height";
+        axis: "length" | "height" | "mass";
         accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
       }>;
       /** Correct ordering of object ids for the "order" scene (first slot → last). */
@@ -476,7 +479,7 @@ export type PracticeTask = (
         label: string;
         icon: string;
         compareValue: number;
-        axis: "length" | "height";
+        axis: "length" | "height" | "mass";
         accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
       }>;
       teachingMoments?: Array<{
@@ -486,14 +489,14 @@ export type PracticeTask = (
           label: string;
           icon: string;
           compareValue: number;
-          axis: "length" | "height";
+          axis: "length" | "height" | "mass";
           accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
         };
         right: {
           label: string;
           icon: string;
           compareValue: number;
-          axis: "length" | "height";
+          axis: "length" | "height" | "mass";
           accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
         };
         narration: string;

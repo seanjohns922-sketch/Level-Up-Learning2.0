@@ -46,6 +46,10 @@ import {
   generatePrepMeasurelandsWeek1Lesson3Task,
   resetPrepMeasurelandsWeek1Lesson3TaskSessionState,
 } from "@/data/activities/prepMeasurelands/week1Lesson3";
+import {
+  generatePrepMeasurelandsWeek2Lesson1Task,
+  resetPrepMeasurelandsWeek2Lesson1TaskSessionState,
+} from "@/data/activities/prepMeasurelands/week2Lesson1";
 import { getProgramForYear } from "@/data/programs";
 import { getCurriculumPlan } from "@/data/programs/genres";
 import { DEMO_MODE } from "@/data/config";
@@ -107,6 +111,9 @@ function getPrepGroundTask(lessonId: string, difficulty: "easy" | "medium" | "ha
   if (lessonId.startsWith("y0-measurement-w1-l3")) {
     return generatePrepMeasurelandsWeek1Lesson3Task(lessonId, difficulty);
   }
+  if (lessonId.startsWith("y0-measurement-w2-l1")) {
+    return generatePrepMeasurelandsWeek2Lesson1Task(lessonId, difficulty);
+  }
 
   const normalizedLessonId = lessonId.startsWith("y0-measurement-")
     ? lessonId.replace("y0-measurement-", "y0-")
@@ -138,6 +145,11 @@ const LESSON_PRACTISED_SKILLS: Record<string, string[]> = {
     "Counting equal units",
     "Comparing path lengths",
     "Building paths",
+  ],
+  "y0-measurement-w2-l1": [
+    "Heavier objects",
+    "Lighter objects",
+    "Comparing mass",
   ],
 };
 
@@ -1212,4 +1224,5 @@ function LessonPage() {
     resetPrepMeasurelandsWeek1TaskSessionState();
     resetPrepMeasurelandsWeek1Lesson2TaskSessionState();
     resetPrepMeasurelandsWeek1Lesson3TaskSessionState();
+    resetPrepMeasurelandsWeek2Lesson1TaskSessionState();
   }
