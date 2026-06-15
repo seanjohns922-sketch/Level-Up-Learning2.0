@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, updateProgress } from "@/data/progress";
 import { supabase } from "@/lib/supabase";
@@ -6710,7 +6710,7 @@ function SessionPage({
   // QUIZ: 15-question mix from 3 lessons
   // Uses YEAR1_WEEKLY_QUIZZES config: 5 questions per lesson, 80% pass
   // ---------------------------
-  function buildQuizQuestions() {
+  const buildQuizQuestions = useCallback(() => {
     const qConfig = quizConfig;
     const questionsPerLesson = qConfig?.questionsPerLesson ?? 5;
     const weekPlan = quizWeekPlan;
@@ -7018,17 +7018,10 @@ function SessionPage({
     }
 
     return base;
-  }
+  }, [isMeasurementRealm, quizConfig, quizWeekPlan, week, year]);
 
-  const quizQuestions = useMemo(
-    () => buildQuizQuestions(),
-    // buildQuizQuestions is re-created every render, so depending on it
-    // regenerated (and re-randomised) the whole quiz on every answer tap —
-    // which desynced the current question and made "answer → Next" feel broken.
-    // Depend on the real inputs so the quiz is generated ONCE per load.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [year, week, realmId, quizConfig, quizWeekPlan]
-  );
+  const quizAttemptKey = `${type}|${realmId}|${year}|${week}|${quizConfig?.questionsPerLesson ?? 5}`;
+  const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>(() => buildQuizQuestions());
 
   const [quizAnswers, setQuizAnswers] = useState<Record<string, number>>({});
   const [quizTyped, setQuizTyped] = useState<Record<string, string>>({});
@@ -7054,6 +7047,7 @@ function SessionPage({
   const speakState = useSpeakState();
   const isWeek9 = Number(week) === 9;
   const isWeek10 = Number(week) === 10;
+  const quizAttemptKeyRef = useRef(quizAttemptKey);
   const liveQuizStartedRef = useRef<string | null>(null);
   const liveAnsweredQuestionIdsRef = useRef<Set<string>>(new Set());
 
@@ -7343,6 +7337,27 @@ function SessionPage({
     speakState.currentText === prepareSpeechText(currentQuizPrompt);
 
   const lastAutoReadQuizIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (quizAttemptKeyRef.current === quizAttemptKey) return;
+    quizAttemptKeyRef.current = quizAttemptKey;
+
+    setQuizQuestions(buildQuizQuestions());
+    setQuizAnswers({});
+    setQuizTyped({});
+    setQuizLineAnswers({});
+    setQuizChartDone({});
+    setQuizMabAnswers({});
+    setQuizMoneyAnswers({});
+    setQuizLessonActivityResults({});
+    setQuizSubmitted(false);
+    setFinalScore(0);
+    setQuizIndex(0);
+    setQuizGroupTaps({});
+    liveQuizStartedRef.current = null;
+    liveAnsweredQuestionIdsRef.current = new Set();
+    lastAutoReadQuizIdRef.current = null;
+  }, [buildQuizQuestions, quizAttemptKey]);
 
   useEffect(() => {
     if (!autoReadEnabled || !speechInteractionReady) return;
