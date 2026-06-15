@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "eslint",
     "qa:year2-smoke": "node scripts/year2-smoke-qa.mjs",
-    "qa:level-aware-regression": "node scripts/level-aware-regression.mjs"
+    "qa:level-aware-regression": "node scripts/level-aware-regression.mjs",
+    "qa:quiz-nav": "node scripts/quiz-nav-audit.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
