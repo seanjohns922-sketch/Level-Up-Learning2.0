@@ -72,13 +72,35 @@ has(
 );
 has(
   "Jump dropdown changes the active question (onChange → setQuizIndex)",
-  /onChange=\{\(e\) => setQuizIndex\(Number\(e\.target\.value\)\)\}/
+  /const target = Number\(e\.target\.value\);[\s\S]*setQuizIndex\(target\)/
 );
 
-// The dropdown lists every question with its real index → can jump anywhere.
+// The dropdown lists every question with its real index.
 has(
-  "Dropdown lists every question with its index (toggle to any question)",
-  /quizQuestions\.map\(\(question, index\) => \{[\s\S]*<option key=\{question\.id\} value=\{index\}>/
+  "Dropdown lists every question with its index",
+  /quizQuestions\.map\(\(question, index\) => \{[\s\S]*<option key=\{question\.id\} value=\{index\}/
+);
+
+// Jumping is restricted to already-answered questions (or the current one).
+has(
+  "Dropdown disables questions that are not answered (no skipping ahead)",
+  /disabled=\{!selectable\}/
+);
+has(
+  "Dropdown onChange only allows jumping to answered questions",
+  /if \(target === quizIndex \|\| isQuestionAnswered\(quizQuestions\[target\]\)\)/
+);
+
+// The quiz must be generated once (not re-randomised every render). Guard the
+// regression where the memo depended on the re-created buildQuizQuestions fn.
+has(
+  "Quiz questions are generated from stable inputs (not regenerated every render)",
+  /\[year, week, realmId, quizConfig, quizWeekPlan\]/
+);
+check(
+  "Quiz questions memo does NOT depend on the re-created buildQuizQuestions function",
+  !/\(\) => buildQuizQuestions\(\),\s*\[buildQuizQuestions\]/.test(flat),
+  "found useMemo(() => buildQuizQuestions(), [buildQuizQuestions]) — this re-randomises the quiz every render"
 );
 
 // BACK toggles backward and is only disabled at the first question.
@@ -128,15 +150,21 @@ const dropdownValue = (i) => i; // controlled select reflects the active index
   check("Dropdown value + titles stay in sync with the active question through a mixed nav path", ok);
 }
 
-// Can toggle to ANY question from ANY question (free back-and-forth via dropdown).
+// Jump is allowed only to answered questions (or the current one). Model: the
+// student answers sequentially, so when on question `active`, indices 0..active
+// are answered and selectable; ahead is locked.
 {
+  const canJump = (active, target, answered) => target === active || answered.has(target);
+  const answered = new Set([0, 1, 2, 3]); // answered Q1–Q4
+  const active = 4; // currently on Q5 (unanswered)
   let ok = true;
-  for (let from = 0; from < N && ok; from += 1) {
-    for (let to = 0; to < N; to += 1) {
-      if (jump(from, to) !== to) { ok = false; break; }
-    }
-  }
-  check("Student can jump to any question from any question (toggle freely)", ok);
+  // Can jump back to any answered question.
+  for (const t of answered) if (!canJump(active, t, answered)) ok = false;
+  // Can stay on the current one.
+  if (!canJump(active, active, answered)) ok = false;
+  // Cannot skip ahead to an unanswered question.
+  if (canJump(active, 9, answered)) ok = false;
+  check("Student can jump to answered questions (and current), but not skip ahead to unanswered", ok);
 }
 
 // Clamping: BACK at first stays first, NEXT at last stays last.

@@ -7022,7 +7022,12 @@ function SessionPage({
 
   const quizQuestions = useMemo(
     () => buildQuizQuestions(),
-    [buildQuizQuestions]
+    // buildQuizQuestions is re-created every render, so depending on it
+    // regenerated (and re-randomised) the whole quiz on every answer tap —
+    // which desynced the current question and made "answer → Next" feel broken.
+    // Depend on the real inputs so the quiz is generated ONCE per load.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [year, week, realmId, quizConfig, quizWeekPlan]
   );
 
   const [quizAnswers, setQuizAnswers] = useState<Record<string, number>>({});
@@ -7735,14 +7740,22 @@ function SessionPage({
                       <span className="text-teal-200">Jump</span>
                       <select
                         value={quizIndex}
-                        onChange={(e) => setQuizIndex(Number(e.target.value))}
+                        onChange={(e) => {
+                          // Only allow jumping to already-answered questions (or
+                          // staying on the current one) — no skipping ahead.
+                          const target = Number(e.target.value);
+                          if (target === quizIndex || isQuestionAnswered(quizQuestions[target])) {
+                            setQuizIndex(target);
+                          }
+                        }}
                         className="rounded-full border border-teal-300/20 bg-[#0b1220] px-3 py-1 text-[11px] font-bold text-white outline-none transition hover:border-teal-200/50"
                       >
                         {quizQuestions.map((question, index) => {
                           const answered = isQuestionAnswered(question);
+                          const selectable = answered || index === quizIndex;
                           return (
-                            <option key={question.id} value={index}>
-                              {`Q${index + 1} · L${question.lessonTag ?? question.lessonNumber ?? 1}${answered ? ' ✓' : ''}`}
+                            <option key={question.id} value={index} disabled={!selectable}>
+                              {`Q${index + 1} · L${question.lessonTag ?? question.lessonNumber ?? 1}${answered ? ' ✓' : index === quizIndex ? ' •' : ' 🔒'}`}
                             </option>
                           );
                         })}
