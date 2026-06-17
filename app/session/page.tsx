@@ -35,6 +35,7 @@ import MoneyEnough from "@/components/week7/MoneyEnough";
 import { MathFormattedText } from "@/components/FractionText";
 import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent } from "@/lib/live-class-client";
 import { recordStudentActivityDelta } from "@/lib/student-activity";
+import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { prepareSpeechText, speak, useAutoReadSetting, useSpeakState, useSpeechInteractionReady } from "@/lib/speak";
 import type { TeacherAttemptQuestion, TeacherInsight, TeacherInsightInput } from "@/lib/teacher-insights";
 import { ClickableDotGrid, ClickableDotRows } from "@/components/ClickableDots";
@@ -6531,6 +6532,7 @@ function SessionPage({
 }) {
   const router = useRouter();
   const isMeasurementRealm = realmId === "measurement";
+  const studentLevelLabel = formatStudentLevelLabel(year);
 
   const isLesson = type === "lesson";
   const previewMode = isDemoPreviewMode();
@@ -7579,7 +7581,7 @@ function SessionPage({
           {isLesson ? (
             <div className="bg-gradient-to-br from-primary to-primary/80 text-white px-6 py-8">
               <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1 text-sm font-semibold mb-3">
-                {year} • Week {week}
+                {studentLevelLabel} • Week {week}
               </div>
               <h1 className="text-3xl md:text-4xl font-extrabold font-display">{title}</h1>
               <p className="text-white/80 text-sm mt-1">
@@ -7644,7 +7646,7 @@ function SessionPage({
               {/* Content */}
               <div className="relative z-10 px-5 py-4 md:px-7 md:py-5 max-w-[58%]">
                 <div className="inline-flex items-center gap-2 rounded-full bg-white/10 border border-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] backdrop-blur-sm md:text-xs">
-                  {year} • Week {week}
+                  {studentLevelLabel} • Week {week}
                 </div>
                 <h1 className="mt-2 text-2xl font-bold tracking-[-0.02em] drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)] md:text-3xl">
                   {title}
