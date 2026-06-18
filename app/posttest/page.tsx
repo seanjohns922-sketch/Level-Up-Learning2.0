@@ -64,7 +64,7 @@ function MabPicker({
                 className={[
                   "w-10 h-20 rounded-xl border-2 transition",
                   selected
-                    ? "border-teal-500 bg-teal-500/20"
+                    ? theme.isMeasurement ? "border-[#d6b86c] bg-[#d6b86c]/20" : "border-teal-500 bg-teal-500/20"
                     : "border-slate-600 bg-slate-700/50 hover:bg-slate-700",
                 ].join(" ")}
               >
@@ -74,7 +74,7 @@ function MabPicker({
                       key={k}
                       className={[
                         "h-2 rounded",
-                        selected ? "bg-teal-500/60" : "bg-slate-600",
+                        selected ? theme.isMeasurement ? "bg-[#d6b86c]/60" : "bg-teal-500/60" : "bg-slate-600",
                       ].join(" ")}
                     />
                   ))}
@@ -98,7 +98,7 @@ function MabPicker({
                 className={[
                   "w-10 h-10 rounded-lg border-2 transition",
                   selected
-                    ? "border-teal-500 bg-teal-500/20"
+                    ? theme.isMeasurement ? "border-[#d6b86c] bg-[#d6b86c]/20" : "border-teal-500 bg-teal-500/20"
                     : "border-slate-600 bg-slate-700/50 hover:bg-slate-700",
                 ].join(" ")}
               >
@@ -178,7 +178,7 @@ function DotAddVisual({
               className={[
                 "h-8 w-8 rounded-full border transition",
                 on
-                  ? "bg-teal-500 border-teal-400"
+                  ? theme.isMeasurement ? "bg-[#d6b86c] border-[#e8c97e]" : "bg-teal-500 border-teal-400"
                   : "bg-slate-700 border-slate-500 hover:bg-slate-600",
               ].join(" ")}
             />
@@ -194,7 +194,7 @@ function DotAddVisual({
               className={[
                 "h-8 w-8 rounded-full border transition",
                 on
-                  ? "bg-teal-500 border-teal-400"
+                  ? theme.isMeasurement ? "bg-[#d6b86c] border-[#e8c97e]" : "bg-teal-500 border-teal-400"
                   : "bg-slate-700 border-slate-500 hover:bg-slate-600",
               ].join(" ")}
             />
@@ -255,7 +255,7 @@ function GroupCountersVisual({
             className={[
               "h-10 w-10 rounded-full border transition",
               on
-                ? "bg-teal-500 border-teal-400"
+                ? theme.isMeasurement ? "bg-[#d6b86c] border-[#e8c97e]" : "bg-teal-500 border-teal-400"
                 : "bg-slate-700 border-slate-500 hover:bg-slate-600",
             ].join(" ")}
           />
@@ -458,7 +458,7 @@ function PostTestPage() {
           </p>
           <button
             onClick={() => router.push(`/program?year=${encodeURIComponent(year)}&week=12&legacy=1`)}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold hover:from-teal-400 hover:to-emerald-400 transition"
+            className="w-full py-3 rounded-xl text-white font-bold transition" style={{ background: theme.ctaGradientCss }}
           >
             Back to Home
           </button>
@@ -508,7 +508,7 @@ function PostTestPage() {
                   "absolute top-1/2 -translate-y-1/2 -translate-x-1/2",
                   "w-14 h-14 rounded-full border-2 font-extrabold transition",
                   isSelected
-                    ? "border-teal-500 bg-teal-500/20 text-teal-300"
+                    ? theme.isMeasurement ? "border-[#d6b86c] bg-[#d6b86c]/20 text-[#e8c97e]" : "border-teal-500 bg-teal-500/20 text-teal-300"
                     : "border-slate-500 bg-slate-700 hover:bg-slate-600 text-slate-300",
                 ].join(" ")}
                 style={{ left: `${pct}%` }}
@@ -533,7 +533,7 @@ function PostTestPage() {
               className={[
                 "w-full rounded-2xl border p-5 text-left transition",
                 isSelected
-                  ? "border-teal-500 bg-teal-500/10"
+                  ? theme.isMeasurement ? "border-[#d6b86c] bg-[#d6b86c]/10" : "border-teal-500 bg-teal-500/10"
                   : "border-slate-600 bg-slate-700/50 hover:bg-slate-700",
               ].join(" ")}
             >
