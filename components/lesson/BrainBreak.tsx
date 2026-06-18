@@ -125,7 +125,8 @@ export default function BrainBreak({
       {/* ── INTRO ── */}
       {phase === "intro" && (
         <>
-          {/* Make it unmistakable this is a rest, not a maths test. */}
+          {/* Frame the stakes: a villain is stealing your XP — fight it off.
+              (Also makes clear it's a quick break, not a maths test.) */}
           <div
             className="absolute left-1/2 top-[12%] -translate-x-1/2 text-center"
             style={{ animation: "bbTextIn 0.4s ease-out forwards", width: "min(92vw, 620px)" }}
@@ -134,10 +135,10 @@ export default function BrainBreak({
               className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 font-mono font-black uppercase tracking-[0.2em] text-white/90"
               style={{ fontSize: "clamp(0.8rem, 2.2vw, 1.1rem)" }}
             >
-              🧠 Quick Brain Break
+              🛡️ Brain Break — Defend Your XP!
             </div>
-            <div className="mt-1.5 font-sans font-bold text-white/55" style={{ fontSize: "clamp(0.7rem, 1.6vw, 0.9rem)" }}>
-              Not a test — just have fun!
+            <div className="mt-1.5 font-sans font-bold text-white/60" style={{ fontSize: "clamp(0.75rem, 1.7vw, 0.95rem)" }}>
+              {villain.name} wants to steal your XP. Tap fast to fight it off!
             </div>
           </div>
           <div
@@ -165,7 +166,7 @@ export default function BrainBreak({
               “{villain.taunt}”
             </div>
             <div className="mt-4 font-mono font-bold uppercase tracking-[0.24em] text-white/60" style={{ fontSize: "clamp(0.65rem, 1.4vw, 0.85rem)" }}>
-              Tap to fight back!
+              Tap to defend your XP!
             </div>
           </div>
         </>
@@ -198,7 +199,7 @@ export default function BrainBreak({
               )}
             </div>
             <div className="mt-2 text-center font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-white/45">
-              🧠 Brain Break · {playHint(villain.game)}
+              🛡️ Defend your XP · {playHint(villain.game)}
             </div>
           </div>
 
@@ -235,6 +236,12 @@ export default function BrainBreak({
             </div>
             <div className="mt-2 font-sans font-bold text-white/95" style={{ fontSize: "clamp(1rem, 2.6vw, 1.4rem)" }}>
               {villain.victory}
+            </div>
+            <div
+              className="mx-auto mt-3 inline-flex items-center gap-2 rounded-full border border-emerald-300/40 bg-emerald-400/15 px-4 py-1.5 font-mono font-black uppercase tracking-[0.16em] text-emerald-100"
+              style={{ fontSize: "clamp(0.75rem, 1.8vw, 1rem)" }}
+            >
+              🛡️ XP defended!
             </div>
             <div
               className="mx-auto mt-4 rounded-2xl border border-white/15 bg-white/5 px-4 py-2.5 font-sans font-semibold text-white/80"
