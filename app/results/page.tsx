@@ -538,12 +538,20 @@ function ResultsPage() {
           {/* Info section — tiles into 2 columns on iPad landscape to cut height */}
           <div className="px-8 pb-6 pt-4 space-y-3 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0 lg:items-start [&>*]:lg:min-w-0">
             {passed ? (
-              <div className="rounded-2xl p-4 border border-teal-400/20 bg-gradient-to-br from-teal-500/10 to-emerald-500/5">
+              <div
+                className="rounded-2xl p-4 border"
+                style={{
+                  borderColor: theme.borderRing,
+                  background: theme.isMeasurement
+                    ? "linear-gradient(135deg, rgba(214,184,108,0.12), rgba(167,139,250,0.06))"
+                    : "linear-gradient(135deg, rgba(20,184,166,0.10), rgba(16,185,129,0.05))",
+                }}
+              >
                 <div className="flex items-center gap-2 mb-1.5">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="rgb(94 234 212)" stroke="none">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill={theme.accentText} stroke="none">
                     <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
                   </svg>
-                  <span className="font-bold text-sm text-teal-200">Legend Unlocked</span>
+                  <span className="font-bold text-sm" style={{ color: theme.accentText }}>Legend Unlocked</span>
                 </div>
                 <p className="text-xs text-slate-400 leading-relaxed">
                   {isPostTest
@@ -592,12 +600,20 @@ function ResultsPage() {
                   ) : null}
                 </div>
                 {unlockTargets.length > 0 && (
-                  <div className="rounded-2xl p-4 border border-teal-400/20 bg-gradient-to-br from-teal-500/10 to-emerald-500/5">
+                  <div
+                    className="rounded-2xl p-4 border"
+                    style={{
+                      borderColor: theme.borderRing,
+                      background: theme.isMeasurement
+                        ? "linear-gradient(135deg, rgba(214,184,108,0.12), rgba(167,139,250,0.06))"
+                        : "linear-gradient(135deg, rgba(20,184,166,0.10), rgba(16,185,129,0.05))",
+                    }}
+                  >
                     <div className="flex items-center gap-2 mb-1.5">
-                      <svg viewBox="0 0 24 24" width="14" height="14" fill="rgb(94 234 212)" stroke="none">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill={theme.accentText} stroke="none">
                         <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
                       </svg>
-                      <span className="font-bold text-sm text-teal-200">Legends Unlocked</span>
+                      <span className="font-bold text-sm" style={{ color: theme.accentText }}>Legends Unlocked</span>
                     </div>
                     <p className="text-xs text-slate-400 leading-relaxed">
                       All Numbots from{" "}
@@ -749,7 +765,14 @@ function ResultsPage() {
             {/* What's next */}
             <div className="rounded-2xl bg-white/5 border border-white/10 p-4">
               <div className="font-bold text-sm text-white mb-3 flex items-center gap-2">
-                <span className="inline-block w-1 h-4 rounded-full bg-gradient-to-b from-teal-400 to-emerald-500" />
+                <span
+                  className="inline-block w-1 h-4 rounded-full"
+                  style={{
+                    background: theme.isMeasurement
+                      ? "linear-gradient(180deg, #e8c97e, #b8893a)"
+                      : "linear-gradient(180deg, #2dd4bf, #10b981)",
+                  }}
+                />
                 What&apos;s next?
               </div>
               <div className="space-y-2.5">
@@ -766,7 +789,10 @@ function ResultsPage() {
                     ]
                 ).map((text) => (
                   <div key={text} className="flex items-center gap-3 text-xs text-slate-300">
-                    <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-teal-500/60" />
+                    <span
+                      className="flex-shrink-0 w-1.5 h-1.5 rounded-full"
+                      style={{ background: theme.isMeasurement ? "rgba(214,184,108,0.65)" : "rgba(20,184,166,0.6)" }}
+                    />
                     <span>{text}</span>
                   </div>
                 ))}
