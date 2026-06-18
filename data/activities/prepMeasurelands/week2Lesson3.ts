@@ -90,12 +90,15 @@ function buildIntroTask(): BalanceTask {
 // Activity — Tip Fixer: scale starts tilted (heavy object vs a few smalls);
 // add smalls to the light side until it balances. (Heavy object so the child
 // reads the beam rather than counting identical objects.)
-function buildTipFixer(memory: LessonMemory): BalanceTask {
-  const heavyWeight = choose([2, 3]);
+// Difficulty: easy = medium object (2); medium/hard = large object (3), with
+// hard giving no overshoot room so the last piece must be exact.
+function buildTipFixer(memory: LessonMemory, diff: Difficulty): BalanceTask {
+  const heavyWeight = diff === "easy" ? 2 : 3;
   const heavy = mk(choose(TIER[heavyWeight as 2 | 3]), heavyWeight);
   const small = choose(SMALL);
   const start = 1 + randInt(heavyWeight - 1); // 1 … heavyWeight-1 (always tilted)
   const startItems = Array.from({ length: start }, (_, i) => mk(small, 1, `-base${i}`));
+  const adds = heavyWeight - start;
   memory.lastKey = `tip-${heavy.id}-${small.id}`;
 
   return {
@@ -106,15 +109,16 @@ function buildTipFixer(memory: LessonMemory): BalanceTask {
     leftItems: [heavy],
     rightItems: startItems,
     target: "right",
-    supply: { mode: "pile", items: [mk(small, 1)], maxAdds: heavyWeight + 1 },
+    supply: { mode: "pile", items: [mk(small, 1)], maxAdds: diff === "hard" ? adds : adds + 2 },
     feedback: { correct: "You balanced it!", wrong: "Watch the beam and keep adding." },
   };
 }
 
 // Activity — Perfect Partner: one object on the left; pick the ONE object that
 // weighs the same so the scale balances.
-function buildPerfectPartner(memory: LessonMemory): BalanceTask {
-  const w = choose([1, 2, 3]) as 1 | 2 | 3;
+function buildPerfectPartner(memory: LessonMemory, diff: Difficulty): BalanceTask {
+  // easy = lighter targets (1–2); medium/hard = heavier targets (2–3).
+  const w = (diff === "easy" ? choose([1, 2]) : choose([2, 3])) as 1 | 2 | 3;
   const pool = TIER[w];
   const left = choose(pool);
   let partner = choose(pool);
@@ -143,8 +147,10 @@ function buildPerfectPartner(memory: LessonMemory): BalanceTask {
 
 // Activity — Match-Maker Cart: empty pan vs a heavy object; fill with smalls
 // until it balances (2 smalls = medium, 3 smalls = large).
-function buildMatchMaker(memory: LessonMemory): BalanceTask {
-  const heavyWeight = choose([2, 3]);
+function buildMatchMaker(memory: LessonMemory, diff: Difficulty): BalanceTask {
+  // easy = 2 smalls (medium); medium/hard = 3 smalls (large). Hard removes the
+  // overshoot room so the cart only rolls on the exact match.
+  const heavyWeight = diff === "easy" ? 2 : 3;
   const heavy = mk(choose(TIER[heavyWeight as 2 | 3]), heavyWeight);
   const small = choose(SMALL);
   memory.lastKey = `cart-${heavy.id}-${small.id}`;
@@ -157,10 +163,16 @@ function buildMatchMaker(memory: LessonMemory): BalanceTask {
     leftItems: [heavy],
     rightItems: [],
     target: "right",
-    supply: { mode: "pile", items: [mk(small, 1)], maxAdds: heavyWeight + 1 },
+    supply: { mode: "pile", items: [mk(small, 1)], maxAdds: diff === "hard" ? heavyWeight : heavyWeight + 1 },
     feedback: { correct: "Balanced — the cart rolls away!", wrong: "Keep adding until it's level." },
   };
 }
+
+// Rotate the three difficulty levels through the session so consecutive
+// questions feel fresh (easy → medium → hard → easy …) rather than the same
+// challenge repeated. Decoupled from the activity rotation so activity ×
+// difficulty pairings keep varying across the 9 minutes.
+const DIFFICULTY_CYCLE: Difficulty[] = ["easy", "medium", "hard"];
 
 export function generatePrepMeasurelandsWeek2Lesson3Task(
   lessonId: string,
@@ -173,11 +185,12 @@ export function generatePrepMeasurelandsWeek2Lesson3Task(
   }
 
   const rotation = ROTATION[memory.cursor % ROTATION.length]!;
+  const diff = DIFFICULTY_CYCLE[memory.cursor % DIFFICULTY_CYCLE.length]!;
   memory.cursor += 1;
 
-  if (rotation === "A") return buildTipFixer(memory);
-  if (rotation === "B") return buildPerfectPartner(memory);
-  return buildMatchMaker(memory);
+  if (rotation === "A") return buildTipFixer(memory, diff);
+  if (rotation === "B") return buildPerfectPartner(memory, diff);
+  return buildMatchMaker(memory, diff);
 }
 
 export function resetPrepMeasurelandsWeek2Lesson3TaskSessionState() {
