@@ -64,6 +64,7 @@ import { generatePrepWeek9TaskByKind } from "@/data/activities/prep/week9";
 import { generatePrepWeek10TaskByKind } from "@/data/activities/prep/week10";
 import { generatePrepWeek11TaskByKind } from "@/data/activities/prep/week11";
 import { buildMeasurelandsWeek1QuizTasks } from "@/data/activities/prepMeasurelands/week1Quiz";
+import { buildMeasurelandsWeek2QuizTasks } from "@/data/activities/prepMeasurelands/week2Quiz";
 
 type WeekProgress = {
   lessonsCompleted: boolean[]; // [L1, L2, L3]
@@ -1309,6 +1310,7 @@ type GroundQuizPracticeTask = Extract<
   | { kind: "groundGrowingCount" }
   | { kind: "measurementCompare" }
   | { kind: "measurePath" }
+  | { kind: "balanceScale" }
 >;
 
 const GROUND_WORDS_BY_NUMBER: Record<1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10, GroundWord> = {
@@ -1517,6 +1519,27 @@ function buildMeasurelandsWeek1WeeklyQuizQuestions(
       `mq${index + 1}`,
       lessonNumber,
       `measurelands_w1_l${lessonNumber}_q${(index % questionsPerLesson) + 1}`,
+      task as GroundQuizPracticeTask
+    );
+  });
+}
+
+function buildMeasurelandsWeek2WeeklyQuizQuestions(
+  questionsPerLesson: number
+): QuizQuestion[] {
+  const totalExpected = questionsPerLesson * 3;
+  const tasks = buildMeasurelandsWeek2QuizTasks();
+  if (tasks.length !== totalExpected) {
+    throw new Error(
+      `[MeasurelandsWeeklyQuiz] Week 2 expected ${totalExpected} questions, received ${tasks.length}.`
+    );
+  }
+  return tasks.map((task, index) => {
+    const lessonNumber = (Math.floor(index / questionsPerLesson) + 1) as 1 | 2 | 3;
+    return buildGroundQuizQuestion(
+      `mw2q${index + 1}`,
+      lessonNumber,
+      `measurelands_w2_l${lessonNumber}_q${(index % questionsPerLesson) + 1}`,
       task as GroundQuizPracticeTask
     );
   });
@@ -6719,6 +6742,10 @@ function SessionPage({
 
     if (isMeasurementRealm && year === "Prep" && Number(week) === 1) {
       return buildMeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson);
+    }
+
+    if (isMeasurementRealm && year === "Prep" && Number(week) === 2) {
+      return buildMeasurelandsWeek2WeeklyQuizQuestions(questionsPerLesson);
     }
 
     if (year === "Prep" && Number(week) === 1) {
