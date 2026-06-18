@@ -7,6 +7,7 @@ import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { getPlacementEntryYear, hasActiveStudentSeenIntro } from "@/lib/studentIdentity";
 import { restoreStudentStateFromServer } from "@/lib/student-progress-sync";
 import { supabase } from "@/lib/supabase";
+import { resolveStudentDestination } from "@/lib/student-destination";
 
 export default function Page() {
   const router = useRouter();
@@ -50,14 +51,11 @@ export default function Page() {
         }
         if (activeStudentId || progress) {
           if (cancelled) return;
-          let dest: string;
-          if (!introSeen) {
-            dest = "/home";
-          } else if (!isPlacementComplete(progress)) {
-            dest = `/pretest?year=${encodeURIComponent(progress?.year ?? getPlacementEntryYear())}`;
-          } else {
-            dest = "/levels";
-          }
+          const dest = resolveStudentDestination({
+            progress,
+            introSeen,
+            fallbackYear: progress?.year ?? getPlacementEntryYear(),
+          });
           console.log("[RootRouteDebug]", {
             student_id: activeStudentId ?? null,
             localStorage: {
@@ -86,13 +84,7 @@ export default function Page() {
             },
             route: dest,
           });
-          if (!introSeen) {
-            router.replace("/home");
-          } else if (!isPlacementComplete(progress)) {
-            router.replace(`/pretest?year=${encodeURIComponent(progress?.year ?? getPlacementEntryYear())}`);
-          } else {
-            router.replace("/levels");
-          }
+          router.replace(dest);
           return;
         }
       }

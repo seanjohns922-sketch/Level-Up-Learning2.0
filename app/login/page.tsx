@@ -2,14 +2,15 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
-import { getActiveStudentIdentity, hasActiveStudentSeenIntro, markActiveStudentIntroSeen, setActiveStudentProfile } from "@/lib/studentIdentity";
+import { recoverInvalidRefreshToken, supabase } from "@/lib/supabase";
+import { clearActiveStudentSession, getActiveStudentIdentity, getActiveStudentProfile, hasActiveStudentSeenIntro, markActiveStudentIntroSeen, setActiveStudentProfile } from "@/lib/studentIdentity";
 import { restoreStudentStateFromServer } from "@/lib/student-progress-sync";
 import { clearScopedProgress, isPlacementComplete, readProgress, writeProgress } from "@/data/progress";
 import { clearScopedProgramStore } from "@/lib/program-progress";
 import { resolveStudentNameParts } from "@/lib/studentName";
 import { normalizeSchoolYearLabel, normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
 import { activateDemoPreviewMode, isDemoAccessFeatureEnabled } from "@/lib/demo-mode";
+import { buildDefaultStudentProgress, resolveStudentDestination } from "@/lib/student-destination";
 import { GraduationCap, Briefcase, KeyRound, User, Lock } from "lucide-react";
 
 type StudentRecord = {
@@ -62,6 +63,38 @@ async function fetchStudentRuntimeName(studentId: string) {
   const row = Array.isArray(data) ? data[0] : null;
   if (!row) return null;
   return resolveStudentNameParts(row).displayName?.trim() || row.display_name?.trim() || null;
+}
+
+function persistStudentBootstrapState(args: {
+  studentId: string;
+  classId: string | null;
+  displayName: string;
+  yearLevel: string;
+  progress: ReturnType<typeof buildDefaultStudentProgress>;
+}) {
+  try {
+    setActiveStudentProfile(args.studentId, args.classId, {
+      displayName: args.displayName,
+      yearLevel: args.yearLevel,
+    });
+    const activeIdentity = getActiveStudentIdentity();
+    const activeProfile = getActiveStudentProfile();
+    if (activeIdentity.studentId !== args.studentId || activeProfile?.studentId !== args.studentId) {
+      throw new Error("active student profile did not persist");
+    }
+
+    writeProgress(args.progress);
+    const storedProgress = readProgress();
+    if (!storedProgress || storedProgress.year !== args.progress.year) {
+      throw new Error("student progress did not persist");
+    }
+
+    return true;
+  } catch (error) {
+    console.warn("[Login] Student bootstrap storage failed", error);
+    clearActiveStudentSession();
+    return false;
+  }
 }
 function readClasses(): ClassesStore {
   if (typeof window === "undefined") return {};
@@ -206,7 +239,10 @@ export default function LoginPage() {
     if (!teacherEmail || !teacherPassword) return;
     setTeacherError(null);
     setTeacherLoading(true);
-    const { data, error: signInErr } = await supabase.auth.signInWithPassword({ email: teacherEmail, password: teacherPassword });
+    let { data, error: signInErr } = await supabase.auth.signInWithPassword({ email: teacherEmail, password: teacherPassword });
+    if (signInErr && recoverInvalidRefreshToken(signInErr)) {
+      ({ data, error: signInErr } = await supabase.auth.signInWithPassword({ email: teacherEmail, password: teacherPassword }));
+    }
     if (signInErr) { setTeacherError(signInErr.message); setTeacherLoading(false); return; }
     if (data?.user) { setTeacherLoading(false); router.push("/teacher/dashboard"); return; }
     setTeacherError("Login failed.");
@@ -315,12 +351,37 @@ export default function LoginPage() {
 
     const resolvedStudentName = resolveStudentNameParts(student).displayName || displayName;
 
-    setActiveStudentProfile(student.student_id, student.class_id, {
-      displayName: resolvedStudentName,
-      yearLevel: studentSchoolYear ?? studentWorkingYear ?? "Year 1",
-    });
+    const resolvedYearLevel = studentSchoolYear ?? studentWorkingYear ?? "Year 1";
+    const initialBootstrapProgress = buildDefaultStudentProgress(resolvedYearLevel);
+
+    if (
+      !persistStudentBootstrapState({
+        studentId: student.student_id,
+        classId: student.class_id,
+        displayName: resolvedStudentName,
+        yearLevel: resolvedYearLevel,
+        progress: initialBootstrapProgress,
+      })
+    ) {
+      setStudentError("This device could not save your session. Please allow browser storage, refresh, and try again.");
+      return;
+    }
+
     clearScopedProgress(student.student_id);
     clearScopedProgramStore(student.student_id);
+
+    if (
+      !persistStudentBootstrapState({
+        studentId: student.student_id,
+        classId: student.class_id,
+        displayName: resolvedStudentName,
+        yearLevel: resolvedYearLevel,
+        progress: initialBootstrapProgress,
+      })
+    ) {
+      setStudentError("This device could not save your session. Please allow browser storage, refresh, and try again.");
+      return;
+    }
 
     let progress = readProgress();
     let introSeen = hasActiveStudentSeenIntro(student.student_id);
@@ -363,17 +424,7 @@ export default function LoginPage() {
     const isGroundLevelStudent = (studentSchoolYear ?? studentWorkingYear ?? progress?.year ?? "").trim() === "Prep";
 
     if (!progress) {
-      progress = {
-        year: studentSchoolYear ?? studentWorkingYear ?? "Year 1",
-        scorePercent: 0,
-        status: "ASSIGNED_PROGRAM",
-        placementComplete: isGroundLevelStudent,
-        assignedWeek: 1,
-        requiredWeeks: [],
-        optionalWeeks: [],
-        unlockedLegends: [],
-      };
-      writeProgress(progress);
+      progress = buildDefaultStudentProgress(studentSchoolYear ?? studentWorkingYear ?? "Year 1");
       progressSource = "default";
     }
 
@@ -387,21 +438,28 @@ export default function LoginPage() {
         optionalWeeks: progress.optionalWeeks ?? [],
         unlockedLegends: progress.unlockedLegends ?? [],
       };
-      writeProgress(progress);
+    }
+
+    if (
+      !persistStudentBootstrapState({
+        studentId: student.student_id,
+        classId: student.class_id,
+        displayName: resolvedStudentName,
+        yearLevel: resolvedYearLevel,
+        progress,
+      })
+    ) {
+      setStudentError("This device could not finish loading your session. Please refresh and try again.");
+      return;
     }
 
     const placementComplete = isPlacementComplete(progress);
 
-    let dest: string;
-    if (!introSeen) {
-      dest = `/home`;
-    } else if (isGroundLevelStudent && progress?.year === "Prep") {
-      dest = `/measurelands`;
-    } else if (!placementComplete) {
-      dest = `/pretest?year=${encodeURIComponent(progress?.year ?? studentWorkingYear ?? studentSchoolYear ?? "Year 1")}`;
-    } else {
-      dest = `/levels`;
-    }
+    const dest = resolveStudentDestination({
+      progress,
+      introSeen,
+      fallbackYear: studentWorkingYear ?? studentSchoolYear ?? "Year 1",
+    });
     console.log("[LoginRouteDebug]", {
       student_id: student.student_id,
       previous_active_student_id: previousActiveStudent,

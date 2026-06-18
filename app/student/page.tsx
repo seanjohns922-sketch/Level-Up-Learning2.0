@@ -24,7 +24,9 @@ function StudentQRPage() {
   const code = searchParams.get("code");
 
   useEffect(() => {
-    // Legacy QR tokens: redirect to login, no code pre-fill
+    // Student QR entry is intentionally only a redirect helper.
+    // It does not complete login by itself; students still authenticate on /login.
+    // Legacy token-style links are preserved by sending students to the login page.
     if (code) {
       router.replace(`/login?code=${encodeURIComponent(code)}`);
     } else {

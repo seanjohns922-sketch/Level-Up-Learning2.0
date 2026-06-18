@@ -7,6 +7,7 @@ import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { clearActiveStudentSession, getActiveStudentProfile, getPlacementEntryYear, hasActiveStudentSeenIntro, markActiveStudentIntroSeen } from "@/lib/studentIdentity";
 import { markStudentIntroSeen } from "@/lib/student-progress-sync";
 import { supabase } from "@/lib/supabase";
+import { buildDefaultStudentProgress, resolveStudentDestination } from "@/lib/student-destination";
 
 export default function StudentHomePage() {
   const router = useRouter();
@@ -21,15 +22,13 @@ export default function StudentHomePage() {
       return;
     }
     if (studentProfile?.studentId && hasActiveStudentSeenIntro(studentProfile.studentId)) {
-      if (isGroundLevel) {
-        router.replace("/measurelands");
-        return;
-      }
-      if (isPlacementComplete(progress)) {
-        router.replace("/levels");
-        return;
-      }
-      router.replace(`/pretest?year=${encodeURIComponent(placementYear)}`);
+      router.replace(
+        resolveStudentDestination({
+          progress,
+          introSeen: true,
+          fallbackYear: placementYear,
+        })
+      );
     }
   }, [isGroundLevel, placementYear, progress, router, studentProfile?.studentId]);
 
@@ -48,16 +47,7 @@ export default function StudentHomePage() {
     }
     if (isGroundLevel) {
       if (!progress) {
-        writeProgress({
-          year: "Prep",
-          scorePercent: 0,
-          status: "ASSIGNED_PROGRAM",
-          placementComplete: true,
-          assignedWeek: 1,
-          requiredWeeks: [],
-          optionalWeeks: [],
-          unlockedLegends: [],
-        });
+        writeProgress(buildDefaultStudentProgress("Prep"));
       } else if (!isPlacementComplete(progress)) {
         writeProgress({
           ...progress,
@@ -69,10 +59,22 @@ export default function StudentHomePage() {
           unlockedLegends: progress.unlockedLegends ?? [],
         });
       }
-      router.push("/measurelands");
+      router.push(
+        resolveStudentDestination({
+          progress: readProgress(),
+          introSeen: true,
+          fallbackYear: "Prep",
+        })
+      );
       return;
     }
-    router.push(isPlacementComplete(progress) ? "/levels" : `/pretest?year=${encodeURIComponent(placementYear)}`);
+    router.push(
+      resolveStudentDestination({
+        progress: readProgress(),
+        introSeen: true,
+        fallbackYear: placementYear,
+      })
+    );
   }
 
   return (

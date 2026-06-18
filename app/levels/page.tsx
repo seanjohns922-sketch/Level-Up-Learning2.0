@@ -2,14 +2,15 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { isPlacementComplete, readProgress, writeProgress, StudentProgress } from "@/data/progress";
+import { readProgress, writeProgress, StudentProgress } from "@/data/progress";
 import { getEffectiveUnlockedLegendIds, getLegendForYear } from "@/data/legends";
 import { getRecommendedAssignedWeek, readProgramStore } from "@/lib/program-progress";
 import { getProgramForYear } from "@/data/programs";
 import { DEMO_MODE } from "@/data/config";
-import { clearActiveStudentSession } from "@/lib/studentIdentity";
+import { clearActiveStudentSession, getActiveStudentProfile, hasActiveStudentSeenIntro } from "@/lib/studentIdentity";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { supabase } from "@/lib/supabase";
+import { resolveStudentDestination } from "@/lib/student-destination";
 
 export default function LevelsPage() {
   const router = useRouter();
@@ -30,12 +31,20 @@ export default function LevelsPage() {
   const [progress] = useState<StudentProgress | null>(() => readProgress());
   const [selectedYear, setSelectedYear] = useState<string | null>(() => readProgress()?.year ?? null);
   const previewMode = typeof window !== "undefined" && isDemoPreviewMode();
+  const [studentProfile] = useState(() => getActiveStudentProfile());
 
   useEffect(() => {
-    if (!previewMode && !isPlacementComplete(progress)) {
-      router.replace("/home");
+    if (previewMode) return;
+    const introSeen = hasActiveStudentSeenIntro(studentProfile?.studentId);
+    const destination = resolveStudentDestination({
+      progress,
+      introSeen,
+      fallbackYear: progress?.year ?? studentProfile?.yearLevel ?? "Year 1",
+    });
+    if (destination !== "/levels") {
+      router.replace(destination);
     }
-  }, [previewMode, progress, router]);
+  }, [previewMode, progress, router, studentProfile?.studentId, studentProfile?.yearLevel]);
 
   const hasProgressForSelected =
     progress && selectedYear && progress.year === selectedYear;
