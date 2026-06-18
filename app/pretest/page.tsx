@@ -13,6 +13,7 @@ import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, type StudentProg
 import { ALL_PROGRAM_WEEKS, clearYearProgress, getOptionalWeeks, normalizeWeekList } from "@/lib/program-progress";
 import { saveNumberAssessment, saveStudentProgressState } from "@/lib/student-progress-sync";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
+import { getRealmTheme } from "@/lib/useRealmTheme";
 import {
   clearPretestResume,
   loadPretestResume,
@@ -319,6 +320,7 @@ function PretestPage() {
   const searchParams = useSearchParams();
   const year = searchParams.get("year") ?? "Year 3";
   const realmId = searchParams.get("realm_id") ?? "number";
+  const theme = getRealmTheme(realmId);
   const studentLevelLabel = formatStudentLevelLabel(year);
 
   useEffect(() => {
@@ -614,14 +616,14 @@ function PretestPage() {
     }
 
     router.push(
-      `/results?year=${encodeURIComponent(year)}&score=${score}&total=${questions.length}`
+      `/results?year=${encodeURIComponent(year)}&score=${score}&total=${questions.length}${realmId ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`
     );
   }
 
   function continueFromCelebration() {
     if (!passCelebration) return;
     router.push(
-      `/results?year=${encodeURIComponent(year)}&score=${passCelebration.score}&total=${passCelebration.total}`
+      `/results?year=${encodeURIComponent(year)}&score=${passCelebration.score}&total=${passCelebration.total}${realmId ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`
     );
   }
 
@@ -654,7 +656,7 @@ function PretestPage() {
           </p>
           <button
             onClick={() => router.push("/home")}
-            className="px-5 py-3 rounded-2xl font-bold bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:from-teal-400 hover:to-emerald-400 transition"
+            className="px-5 py-3 rounded-2xl font-bold text-white transition" style={{ background: theme.ctaGradientCss }}
           >
             Back to Home
           </button>
@@ -817,7 +819,8 @@ function PretestPage() {
             <div className="space-y-3">
               <button
                 onClick={resumeFromSnapshot}
-                className="w-full py-3.5 rounded-2xl font-extrabold text-white bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 transition active:scale-[0.98]"
+                className="w-full py-3.5 rounded-2xl font-extrabold text-white transition active:scale-[0.98]"
+                style={{ background: theme.ctaGradientCss }}
               >
                 ▶ Resume Pre-Test
               </button>
@@ -835,18 +838,32 @@ function PretestPage() {
       {/* ── 85%+ Pass celebration ── */}
       {passCelebration && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-6 overflow-hidden">
-          <PassConfetti />
-          <div className="relative z-10 w-full max-w-lg rounded-3xl border border-teal-400/30 bg-gradient-to-b from-slate-900 to-slate-950 p-10 text-center shadow-[0_20px_70px_-20px_rgba(20,184,166,0.6)]">
+          <PassConfetti theme={theme} />
+          <div
+            className="relative z-10 w-full max-w-lg rounded-3xl border bg-gradient-to-b from-slate-900 to-slate-950 p-10 text-center"
+            style={{
+              borderColor: theme.borderRing,
+              boxShadow: theme.isMeasurement
+                ? "0 20px 70px -20px rgba(184,137,58,0.55)"
+                : "0 20px 70px -20px rgba(20,184,166,0.6)",
+            }}
+          >
             <div className="text-7xl mb-4 animate-bounce">🎉</div>
             <h2 className="text-3xl font-extrabold text-white mb-2">Amazing Work!</h2>
             <p className="text-slate-300 mb-2 text-lg">
               You already know most of {studentLevelLabel}.
             </p>
-            <div className="my-6 inline-flex flex-col items-center gap-1 px-6 py-4 rounded-2xl border border-teal-400/30 bg-teal-500/10">
-              <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-teal-300/80">
+            <div
+              className="my-6 inline-flex flex-col items-center gap-1 px-6 py-4 rounded-2xl border"
+              style={{ borderColor: theme.borderRing, background: theme.surfaceTint }}
+            >
+              <span
+                className="text-[10px] font-bold uppercase tracking-[0.25em]"
+                style={{ color: theme.accentTextSoft }}
+              >
                 You have unlocked
               </span>
-              <span className="text-xl font-extrabold text-teal-200">
+              <span className="text-xl font-extrabold" style={{ color: theme.accentText }}>
                 {passCelebration.nextYear
                   ? `${formatStudentLevelLabel(passCelebration.nextYear)} Pre-Test`
                   : "The Tower of Knowledge"}
@@ -857,8 +874,8 @@ function PretestPage() {
             </div>
             <button
               onClick={continueFromCelebration}
-              className="w-full py-4 rounded-2xl font-extrabold text-white bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 transition active:scale-[0.98]"
-              style={{ boxShadow: "0 10px 30px -8px rgba(16,185,129,0.5)" }}
+              className="w-full py-4 rounded-2xl font-extrabold text-white transition active:scale-[0.98]"
+              style={{ background: theme.ctaGradientCss, boxShadow: theme.ctaShadow }}
             >
               Continue →
             </button>
@@ -870,9 +887,9 @@ function PretestPage() {
 }
 
 /* ── lightweight confetti for the pass celebration ── */
-function PassConfetti() {
+function PassConfetti({ theme }: { theme: ReturnType<typeof getRealmTheme> }) {
   const pieces = Array.from({ length: 40 });
-  const colors = ["#2dd4bf", "#34d399", "#fcd34d", "#f472b6", "#38bdf8"];
+  const colors = theme.confetti;
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
       {pieces.map((_, i) => {

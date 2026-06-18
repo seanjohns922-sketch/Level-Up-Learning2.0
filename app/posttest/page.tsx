@@ -16,6 +16,7 @@ import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { getWeekProgress, hasCompletedRequiredWeeks, readProgramStore } from "@/lib/program-progress";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { saveNumberAssessment, saveStudentProgressState } from "@/lib/student-progress-sync";
+import { getRealmTheme } from "@/lib/useRealmTheme";
 
 const PASS_THRESHOLD = 85;
 
@@ -292,6 +293,8 @@ function PostTestPage() {
   const router = useRouter();
   const params = useSearchParams();
   const year = params.get("year") ?? "Year 3";
+  const realmId = params.get("realm_id") ?? undefined;
+  const theme = getRealmTheme(realmId);
   const studentLevelLabel = formatStudentLevelLabel(year);
 
   const test = useMemo(() => {
@@ -440,7 +443,7 @@ function PostTestPage() {
     })();
 
     router.push(
-      `/results?year=${encodeURIComponent(year)}&score=${correct}&total=${questions.length}&posttest=1`
+      `/results?year=${encodeURIComponent(year)}&score=${correct}&total=${questions.length}&posttest=1${realmId ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`
     );
   }
 
@@ -457,7 +460,7 @@ function PostTestPage() {
           </p>
           <button
             onClick={() => router.push(`/program?year=${encodeURIComponent(year)}&week=12&legacy=1`)}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold hover:from-teal-400 hover:to-emerald-400 transition"
+            className="w-full py-3 rounded-xl text-white font-bold transition" style={{ background: theme.ctaGradientCss }}
           >
             Back to Home
           </button>

@@ -1013,6 +1013,7 @@ export function Year2LessonEngine({
         questionsAnswered={questionsAnswered}
         correctAnswers={correctAnswers}
         accuracy={accuracy}
+        realmId={realmId}
         onExit={onExit}
       />
     );

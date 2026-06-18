@@ -12,6 +12,7 @@ import type { AssessmentResultProfile } from "@/data/assessments/analysis";
 import { hasSeenLegendUnlockVideo } from "@/lib/legend-video-state";
 import { ALL_PROGRAM_WEEKS, getOptionalWeeks, normalizeWeekList } from "@/lib/program-progress";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
+import { getRealmTheme, type RealmTheme } from "@/lib/useRealmTheme";
 const POSTTEST_PASS_THRESHOLD = 85;
 const PRETEST_PASS_THRESHOLD = 85;
 
@@ -132,7 +133,7 @@ export default function ResultsPageWrapper() {
 }
 
 /* ── animated circular progress ring ── */
-function ScoreRing({ percent, passed }: { percent: number; passed: boolean }) {
+function ScoreRing({ percent, passed, theme }: { percent: number; passed: boolean; theme: RealmTheme }) {
   const [animatedPercent, setAnimatedPercent] = useState(0);
   const radius = 80;
   const stroke = 10;
@@ -144,8 +145,8 @@ function ScoreRing({ percent, passed }: { percent: number; passed: boolean }) {
     return () => clearTimeout(timer);
   }, [percent]);
 
-  const ringColor = passed ? "rgb(45 212 191)" : "rgb(251 191 36)";
-  const ringGlow = passed ? "rgb(20 184 166)" : "rgb(245 158 11)";
+  const ringColor = passed ? theme.passRing : "rgb(251 191 36)";
+  const ringGlow = passed ? theme.passRingGlow : "rgb(245 158 11)";
 
   return (
     <div className="relative flex items-center justify-center my-8">
@@ -198,13 +199,16 @@ const SHAPES = [
   { w: 44, h: 34, l: 70, t: 72, dur: 6.5, del: 0.9 },
 ];
 
-function FloatingShapes() {
+function FloatingShapes({ theme }: { theme: RealmTheme }) {
+  const shapeColors = theme.isMeasurement
+    ? ["#d6b86c", "#a78bfa"]
+    : ["rgb(45 212 191)", "rgb(16 185 129)"];
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       {/* ambient radial glows */}
-      <div className="absolute -top-32 -left-32 w-[28rem] h-[28rem] rounded-full bg-teal-500/10 blur-[120px]" />
-      <div className="absolute -bottom-32 -right-32 w-[28rem] h-[28rem] rounded-full bg-emerald-500/10 blur-[120px]" />
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[22rem] h-[22rem] rounded-full bg-cyan-500/5 blur-[100px]" />
+      <div className="absolute -top-32 -left-32 w-[28rem] h-[28rem] rounded-full blur-[120px]" style={{ background: theme.haloA }} />
+      <div className="absolute -bottom-32 -right-32 w-[28rem] h-[28rem] rounded-full blur-[120px]" style={{ background: theme.haloB }} />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[22rem] h-[22rem] rounded-full blur-[100px]" style={{ background: theme.haloC }} />
       {/* grid texture */}
       <div
         className="absolute inset-0 opacity-[0.04]"
@@ -221,7 +225,7 @@ function FloatingShapes() {
           style={{
             width: `${s.w}px`,
             height: `${s.h}px`,
-            background: i % 2 === 0 ? "rgb(45 212 191)" : "rgb(16 185 129)",
+            background: shapeColors[i % shapeColors.length],
             filter: "blur(8px)",
             left: `${s.l}%`,
             top: `${s.t}%`,
@@ -239,6 +243,8 @@ function ResultsPage() {
   const sp = useSearchParams();
 
   const year = sp.get("year") ?? "Year 3";
+  const realmId = sp.get("realm_id") ?? undefined;
+  const theme = getRealmTheme(realmId);
   const studentLevelLabel = formatStudentLevelLabel(year);
   const score = Number(sp.get("score") ?? "0");
   const total = Number(sp.get("total") ?? "0");
@@ -440,7 +446,7 @@ function ResultsPage() {
       {showFogCinematic && (
         <FogClearCinematic progress={getFogProgress()} onDone={() => setShowFogCinematic(false)} />
       )}
-      <FloatingShapes />
+      <FloatingShapes theme={theme} />
 
         <div
         className="relative z-10 w-full max-w-lg lg:max-w-4xl"
@@ -495,11 +501,18 @@ function ResultsPage() {
               {msg.title}
             </h1>
             <p className="text-sm text-slate-400 mb-3">{msg.sub}</p>
-            <div className="inline-flex items-center gap-2 text-[10px] font-bold text-teal-300/80 uppercase tracking-[0.25em] px-3 py-1 rounded-full border border-teal-400/20 bg-teal-500/5">
+            <div
+              className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.25em] px-3 py-1 rounded-full border"
+              style={{
+                color: theme.accentTextSoft,
+                borderColor: theme.borderRing,
+                background: theme.surfaceTint,
+              }}
+            >
               {studentLevelLabel} • {isPostTest ? "Post-Test" : source === "program_complete" ? "Program" : "Pre-Test"}
             </div>
 
-            <ScoreRing percent={displayPercent} passed={passed} />
+            <ScoreRing percent={displayPercent} passed={passed} theme={theme} />
 
             {/* Score breakdown */}
             <div className="flex items-center justify-center gap-6 text-sm mb-2">
@@ -525,12 +538,20 @@ function ResultsPage() {
           {/* Info section — tiles into 2 columns on iPad landscape to cut height */}
           <div className="px-8 pb-6 pt-4 space-y-3 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0 lg:items-start [&>*]:lg:min-w-0">
             {passed ? (
-              <div className="rounded-2xl p-4 border border-teal-400/20 bg-gradient-to-br from-teal-500/10 to-emerald-500/5">
+              <div
+                className="rounded-2xl p-4 border"
+                style={{
+                  borderColor: theme.borderRing,
+                  background: theme.isMeasurement
+                    ? "linear-gradient(135deg, rgba(214,184,108,0.12), rgba(167,139,250,0.06))"
+                    : "linear-gradient(135deg, rgba(20,184,166,0.10), rgba(16,185,129,0.05))",
+                }}
+              >
                 <div className="flex items-center gap-2 mb-1.5">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="rgb(94 234 212)" stroke="none">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill={theme.accentText} stroke="none">
                     <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
                   </svg>
-                  <span className="font-bold text-sm text-teal-200">Legend Unlocked</span>
+                  <span className="font-bold text-sm" style={{ color: theme.accentText }}>Legend Unlocked</span>
                 </div>
                 <p className="text-xs text-slate-400 leading-relaxed">
                   {isPostTest
@@ -579,12 +600,20 @@ function ResultsPage() {
                   ) : null}
                 </div>
                 {unlockTargets.length > 0 && (
-                  <div className="rounded-2xl p-4 border border-teal-400/20 bg-gradient-to-br from-teal-500/10 to-emerald-500/5">
+                  <div
+                    className="rounded-2xl p-4 border"
+                    style={{
+                      borderColor: theme.borderRing,
+                      background: theme.isMeasurement
+                        ? "linear-gradient(135deg, rgba(214,184,108,0.12), rgba(167,139,250,0.06))"
+                        : "linear-gradient(135deg, rgba(20,184,166,0.10), rgba(16,185,129,0.05))",
+                    }}
+                  >
                     <div className="flex items-center gap-2 mb-1.5">
-                      <svg viewBox="0 0 24 24" width="14" height="14" fill="rgb(94 234 212)" stroke="none">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill={theme.accentText} stroke="none">
                         <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
                       </svg>
-                      <span className="font-bold text-sm text-teal-200">Legends Unlocked</span>
+                      <span className="font-bold text-sm" style={{ color: theme.accentText }}>Legends Unlocked</span>
                     </div>
                     <p className="text-xs text-slate-400 leading-relaxed">
                       All Numbots from{" "}
@@ -736,7 +765,14 @@ function ResultsPage() {
             {/* What's next */}
             <div className="rounded-2xl bg-white/5 border border-white/10 p-4">
               <div className="font-bold text-sm text-white mb-3 flex items-center gap-2">
-                <span className="inline-block w-1 h-4 rounded-full bg-gradient-to-b from-teal-400 to-emerald-500" />
+                <span
+                  className="inline-block w-1 h-4 rounded-full"
+                  style={{
+                    background: theme.isMeasurement
+                      ? "linear-gradient(180deg, #e8c97e, #b8893a)"
+                      : "linear-gradient(180deg, #2dd4bf, #10b981)",
+                  }}
+                />
                 What&apos;s next?
               </div>
               <div className="space-y-2.5">
@@ -753,7 +789,10 @@ function ResultsPage() {
                     ]
                 ).map((text) => (
                   <div key={text} className="flex items-center gap-3 text-xs text-slate-300">
-                    <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-teal-500/60" />
+                    <span
+                      className="flex-shrink-0 w-1.5 h-1.5 rounded-full"
+                      style={{ background: theme.isMeasurement ? "rgba(214,184,108,0.65)" : "rgba(20,184,166,0.6)" }}
+                    />
                     <span>{text}</span>
                   </div>
                 ))}
@@ -768,16 +807,16 @@ function ResultsPage() {
                 {isPostTest || passedByProgram ? (
                   <button
                     onClick={goLegends}
-                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold text-base hover:from-teal-400 hover:to-emerald-400 transition-all active:scale-[0.98]"
-                    style={{ boxShadow: "0 10px 30px -8px rgba(16, 185, 129, 0.5)" }}
+                    className="w-full py-4 rounded-2xl text-white font-bold text-base transition-all active:scale-[0.98]"
+                    style={{ background: theme.ctaGradientCss, boxShadow: theme.ctaShadow }}
                   >
                     View My Legends
                   </button>
                 ) : (
                   <button
                     onClick={nextYear ? goNextPretest : goHome}
-                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold text-base hover:from-teal-400 hover:to-emerald-400 transition-all active:scale-[0.98]"
-                    style={{ boxShadow: "0 10px 30px -8px rgba(16, 185, 129, 0.5)" }}
+                    className="w-full py-4 rounded-2xl text-white font-bold text-base transition-all active:scale-[0.98]"
+                    style={{ background: theme.ctaGradientCss, boxShadow: theme.ctaShadow }}
                   >
                     {nextYear ? `Start ${formatStudentLevelLabel(nextYear)} Pre-Test` : "Enter the Tower"}
                   </button>
@@ -793,8 +832,8 @@ function ResultsPage() {
               <>
                 <button
                   onClick={goContinue}
-                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold text-base hover:from-teal-400 hover:to-emerald-400 transition-all active:scale-[0.98]"
-                  style={{ boxShadow: "0 10px 30px -8px rgba(16, 185, 129, 0.5)" }}
+                  className="w-full py-4 rounded-2xl text-white font-bold text-base transition-all active:scale-[0.98]"
+                  style={{ background: theme.ctaGradientCss, boxShadow: theme.ctaShadow }}
                 >
                   Continue
                 </button>
@@ -816,8 +855,8 @@ function ResultsPage() {
               <>
                 <button
                   onClick={goProgram}
-                  className="w-full py-4 rounded-2xl font-bold text-base text-white bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 transition-all active:scale-[0.98]"
-                  style={{ boxShadow: "0 10px 30px -8px rgba(16, 185, 129, 0.5)" }}
+                  className="w-full py-4 rounded-2xl font-bold text-base text-white transition-all active:scale-[0.98]"
+                  style={{ background: theme.ctaGradientCss, boxShadow: theme.ctaShadow }}
                 >
                   {requiresFullPathway ? "Start Full Pathway" : `Start Required Pathway — Week ${assignedStartWeek}`}
                 </button>
