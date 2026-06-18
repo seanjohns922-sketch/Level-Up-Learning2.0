@@ -12,6 +12,7 @@ import type { AssessmentResultProfile } from "@/data/assessments/analysis";
 import { hasSeenLegendUnlockVideo } from "@/lib/legend-video-state";
 import { ALL_PROGRAM_WEEKS, getOptionalWeeks, normalizeWeekList } from "@/lib/program-progress";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
+import { getRealmTheme, type RealmTheme } from "@/lib/useRealmTheme";
 const POSTTEST_PASS_THRESHOLD = 85;
 const PRETEST_PASS_THRESHOLD = 85;
 
@@ -132,7 +133,7 @@ export default function ResultsPageWrapper() {
 }
 
 /* ── animated circular progress ring ── */
-function ScoreRing({ percent, passed }: { percent: number; passed: boolean }) {
+function ScoreRing({ percent, passed, theme }: { percent: number; passed: boolean; theme: RealmTheme }) {
   const [animatedPercent, setAnimatedPercent] = useState(0);
   const radius = 80;
   const stroke = 10;
@@ -144,8 +145,8 @@ function ScoreRing({ percent, passed }: { percent: number; passed: boolean }) {
     return () => clearTimeout(timer);
   }, [percent]);
 
-  const ringColor = passed ? "rgb(45 212 191)" : "rgb(251 191 36)";
-  const ringGlow = passed ? "rgb(20 184 166)" : "rgb(245 158 11)";
+  const ringColor = passed ? theme.passRing : "rgb(251 191 36)";
+  const ringGlow = passed ? theme.passRingGlow : "rgb(245 158 11)";
 
   return (
     <div className="relative flex items-center justify-center my-8">
@@ -198,13 +199,16 @@ const SHAPES = [
   { w: 44, h: 34, l: 70, t: 72, dur: 6.5, del: 0.9 },
 ];
 
-function FloatingShapes() {
+function FloatingShapes({ theme }: { theme: RealmTheme }) {
+  const shapeColors = theme.isMeasurement
+    ? ["#d6b86c", "#a78bfa"]
+    : ["rgb(45 212 191)", "rgb(16 185 129)"];
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       {/* ambient radial glows */}
-      <div className="absolute -top-32 -left-32 w-[28rem] h-[28rem] rounded-full bg-teal-500/10 blur-[120px]" />
-      <div className="absolute -bottom-32 -right-32 w-[28rem] h-[28rem] rounded-full bg-emerald-500/10 blur-[120px]" />
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[22rem] h-[22rem] rounded-full bg-cyan-500/5 blur-[100px]" />
+      <div className="absolute -top-32 -left-32 w-[28rem] h-[28rem] rounded-full blur-[120px]" style={{ background: theme.haloA }} />
+      <div className="absolute -bottom-32 -right-32 w-[28rem] h-[28rem] rounded-full blur-[120px]" style={{ background: theme.haloB }} />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[22rem] h-[22rem] rounded-full blur-[100px]" style={{ background: theme.haloC }} />
       {/* grid texture */}
       <div
         className="absolute inset-0 opacity-[0.04]"
@@ -221,7 +225,7 @@ function FloatingShapes() {
           style={{
             width: `${s.w}px`,
             height: `${s.h}px`,
-            background: i % 2 === 0 ? "rgb(45 212 191)" : "rgb(16 185 129)",
+            background: shapeColors[i % shapeColors.length],
             filter: "blur(8px)",
             left: `${s.l}%`,
             top: `${s.t}%`,
@@ -239,6 +243,8 @@ function ResultsPage() {
   const sp = useSearchParams();
 
   const year = sp.get("year") ?? "Year 3";
+  const realmId = sp.get("realm_id") ?? (year === "Prep" ? undefined : undefined) ?? undefined;
+  const theme = getRealmTheme(realmId);
   const studentLevelLabel = formatStudentLevelLabel(year);
   const score = Number(sp.get("score") ?? "0");
   const total = Number(sp.get("total") ?? "0");
