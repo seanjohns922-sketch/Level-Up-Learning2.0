@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import type { CoachReview } from "@/lib/lesson-coach";
 import { speak, useAutoReadSetting, useSpeechInteractionReady } from "@/lib/speak";
+import { getRealmTheme } from "@/lib/useRealmTheme";
 
 // Post-lesson "coach" screen — performance guidance only (the Reflection screen
 // owns celebration + confidence). Short, positive, actionable. Ground-friendly:
@@ -20,7 +21,8 @@ export default function LessonCoachReview({
   onContinue: () => void;
 }) {
   const junior = (levelNumber ?? 1) <= 2;
-  const isMeasurement = realmId === "measurement";
+  const theme = getRealmTheme(realmId);
+  const isMeasurement = theme.isMeasurement;
   const { autoReadEnabled } = useAutoReadSetting();
   const speechReady = useSpeechInteractionReady();
   const readOnceRef = useRef(false);
@@ -38,14 +40,14 @@ export default function LessonCoachReview({
     void speak(lines.join(" "), undefined, "auto");
   }, [junior, autoReadEnabled, speechReady, review]);
 
-  const accent = isMeasurement ? "#d6b86c" : "#5eead4";
+  const accent = theme.accentText;
 
   return (
     <div
       className="relative overflow-hidden rounded-3xl px-6 py-7 text-center"
       style={{
-        background: "linear-gradient(135deg, #021716 0%, #042925 50%, #053b35 100%)",
-        boxShadow: "inset 0 1px 0 rgba(94,234,212,0.18), inset 0 -10px 20px rgba(0,0,0,0.45)",
+        background: theme.cardSurface,
+        boxShadow: theme.cardInsetShadow,
       }}
     >
       <div className="relative">
@@ -102,8 +104,8 @@ export default function LessonCoachReview({
 
         <button
           onClick={onContinue}
-          className="mt-5 w-full rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-500 px-6 py-4 text-base font-extrabold text-white transition hover:from-teal-400 hover:to-emerald-400 active:scale-[0.98]"
-          style={{ boxShadow: "0 10px 30px -8px rgba(16,185,129,0.5)" }}
+          className="mt-5 w-full rounded-2xl px-6 py-4 text-base font-extrabold text-white transition active:scale-[0.98]"
+          style={{ background: theme.ctaGradientCss, boxShadow: theme.ctaShadow }}
         >
           Continue →
         </button>
@@ -115,7 +117,7 @@ export default function LessonCoachReview({
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mt-5">
-      <div className="text-[11px] font-mono font-black uppercase tracking-[0.18em] text-teal-300/70">{title}</div>
+      <div className="text-[11px] font-mono font-black uppercase tracking-[0.18em] text-white/55">{title}</div>
       <div className="mt-2 inline-flex flex-col items-start gap-1.5 text-left">{children}</div>
     </div>
   );
