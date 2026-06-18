@@ -501,7 +501,14 @@ function ResultsPage() {
               {msg.title}
             </h1>
             <p className="text-sm text-slate-400 mb-3">{msg.sub}</p>
-            <div className="inline-flex items-center gap-2 text-[10px] font-bold text-teal-300/80 uppercase tracking-[0.25em] px-3 py-1 rounded-full border border-teal-400/20 bg-teal-500/5">
+            <div
+              className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.25em] px-3 py-1 rounded-full border"
+              style={{
+                color: theme.accentTextSoft,
+                borderColor: theme.borderRing,
+                background: theme.surfaceTint,
+              }}
+            >
               {studentLevelLabel} • {isPostTest ? "Post-Test" : source === "program_complete" ? "Program" : "Pre-Test"}
             </div>
 
