@@ -443,7 +443,7 @@ function PostTestPage() {
     })();
 
     router.push(
-      `/results?year=${encodeURIComponent(year)}&score=${correct}&total=${questions.length}&posttest=1`
+      `/results?year=${encodeURIComponent(year)}&score=${correct}&total=${questions.length}&posttest=1${realmId ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`
     );
   }
 

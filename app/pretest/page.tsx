@@ -616,14 +616,14 @@ function PretestPage() {
     }
 
     router.push(
-      `/results?year=${encodeURIComponent(year)}&score=${score}&total=${questions.length}`
+      `/results?year=${encodeURIComponent(year)}&score=${score}&total=${questions.length}${realmId ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`
     );
   }
 
   function continueFromCelebration() {
     if (!passCelebration) return;
     router.push(
-      `/results?year=${encodeURIComponent(year)}&score=${passCelebration.score}&total=${passCelebration.total}`
+      `/results?year=${encodeURIComponent(year)}&score=${passCelebration.score}&total=${passCelebration.total}${realmId ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`
     );
   }
 
