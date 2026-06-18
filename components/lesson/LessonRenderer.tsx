@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import AdditionStrategy from "@/components/activities/AdditionStrategy";
 import EqualGroups from "@/components/activities/EqualGroups";
 import Arrays from "@/components/activities/Arrays";
@@ -55,6 +56,7 @@ import type {
   Year2QuestionData,
 } from "@/data/activities/year2/lessonEngine";
 import type { LessonActivity } from "@/data/programs/types";
+import { canRenderByGeneratedKind, isLessonQuestionSafe } from "@/lib/task-safety";
 
 type LessonRendererProps = {
   activity: LessonActivity;
@@ -66,10 +68,26 @@ type LessonRendererProps = {
   realmId?: string;
 };
 
-function ErrorCard({ message }: { message: string }) {
+function RecoveryCard({
+  message,
+  onRecover,
+}: {
+  message: string;
+  onRecover?: () => void;
+}) {
+  const hasRecoveredRef = useRef(false);
+
+  useEffect(() => {
+    if (!onRecover || hasRecoveredRef.current) return;
+    hasRecoveredRef.current = true;
+    const timeout = window.setTimeout(() => onRecover(), 450);
+    return () => window.clearTimeout(timeout);
+  }, [onRecover]);
+
   return (
-    <div className="rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-700 shadow-sm">
-      {message}
+    <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900 shadow-sm">
+      <div className="font-bold">Loading the next challenge…</div>
+      <div className="mt-1">{message}</div>
     </div>
   );
 }
@@ -213,11 +231,6 @@ function getSafeQuestion(
   return questionData;
 }
 
-function canRenderByGeneratedKind(activity: LessonActivity) {
-  const mode = typeof activity.config?.mode === "string" ? activity.config.mode : "";
-  return mode.startsWith("y6_");
-}
-
 function renderNestedActivity({
   activityType,
   questionData,
@@ -254,28 +267,32 @@ export function LessonRenderer({
   renderMode = "lesson",
   realmId,
 }: LessonRendererProps) {
+  const safeQuestion = isLessonQuestionSafe(activity, questionData)
+    ? questionData
+    : null;
+
   switch (activity.activityType) {
     case "place_value_builder": {
-      const safeQuestion = getSafeQuestion(activity, questionData, prompt);
-      if (safeQuestion.kind !== "place_value_builder") {
-        return <ErrorCard message="Place value question failed to load." />;
+      const resolvedQuestion = safeQuestion ? getSafeQuestion(activity, safeQuestion, prompt) : null;
+      if (!resolvedQuestion || resolvedQuestion.kind !== "place_value_builder") {
+        return <RecoveryCard message="Place value question failed to load." onRecover={onWrong} />;
       }
       return (
         <PlaceValueBuilder
-          questionData={safeQuestion as PlaceValueBuilderQuestion}
+          questionData={resolvedQuestion as PlaceValueBuilderQuestion}
           onCorrect={onCorrect}
           onWrong={onWrong}
         />
       );
     }
     case "number_order": {
-      const safeQuestion = getSafeQuestion(activity, questionData, prompt);
-      if (safeQuestion.kind !== "number_order") {
-        return <ErrorCard message="Number order question failed to load." />;
+      const resolvedQuestion = safeQuestion ? getSafeQuestion(activity, safeQuestion, prompt) : null;
+      if (!resolvedQuestion || resolvedQuestion.kind !== "number_order") {
+        return <RecoveryCard message="Number order question failed to load." onRecover={onWrong} />;
       }
       return (
         <NumberOrder
-          questionData={safeQuestion as NumberOrderQuestion}
+          questionData={resolvedQuestion as NumberOrderQuestion}
           onCorrect={onCorrect}
           onWrong={onWrong}
           renderMode={renderMode}
@@ -283,26 +300,26 @@ export function LessonRenderer({
       );
     }
     case "partition_expand": {
-      const safeQuestion = getSafeQuestion(activity, questionData, prompt);
-      if (safeQuestion.kind !== "partition_expand") {
-        return <ErrorCard message="Partition question failed to load." />;
+      const resolvedQuestion = safeQuestion ? getSafeQuestion(activity, safeQuestion, prompt) : null;
+      if (!resolvedQuestion || resolvedQuestion.kind !== "partition_expand") {
+        return <RecoveryCard message="Partition question failed to load." onRecover={onWrong} />;
       }
       return (
         <PartitionExpand
-          questionData={safeQuestion as PartitionExpandQuestion}
+          questionData={resolvedQuestion as PartitionExpandQuestion}
           onCorrect={onCorrect}
           onWrong={onWrong}
         />
       );
     }
     case "number_line": {
-      const safeQuestion = getSafeQuestion(activity, questionData, prompt);
-      if (safeQuestion.kind !== "number_line") {
-        return <ErrorCard message="Number line question failed to load." />;
+      const resolvedQuestion = safeQuestion ? getSafeQuestion(activity, safeQuestion, prompt) : null;
+      if (!resolvedQuestion || resolvedQuestion.kind !== "number_line") {
+        return <RecoveryCard message="Number line question failed to load." onRecover={onWrong} />;
       }
       return (
         <NumberLineActivity
-          questionData={safeQuestion as NumberLineQuestion}
+          questionData={resolvedQuestion as NumberLineQuestion}
           onCorrect={onCorrect}
           onWrong={onWrong}
         />
@@ -311,7 +328,7 @@ export function LessonRenderer({
     case "area_model_select": {
       const safeQuestion = getSafeQuestion(activity, questionData, prompt);
       if (safeQuestion.kind !== "area_model_select") {
-        return <ErrorCard message="Area model question failed to load." />;
+        return <RecoveryCard message="Area model question failed to load." onRecover={onWrong} />;
       }
       return (
         <AreaModelSelect
@@ -324,7 +341,7 @@ export function LessonRenderer({
     case "set_model_select": {
       const safeQuestion = getSafeQuestion(activity, questionData, prompt);
       if (safeQuestion.kind !== "set_model_select") {
-        return <ErrorCard message="Set model question failed to load." />;
+        return <RecoveryCard message="Set model question failed to load." onRecover={onWrong} />;
       }
       return (
         <SetModelSelect
@@ -337,7 +354,7 @@ export function LessonRenderer({
     case "build_the_whole": {
       const safeQuestion = getSafeQuestion(activity, questionData, prompt);
       if (safeQuestion.kind !== "build_the_whole") {
-        return <ErrorCard message="Build the whole question failed to load." />;
+        return <RecoveryCard message="Build the whole question failed to load." onRecover={onWrong} />;
       }
       return (
         <BuildTheWhole
@@ -350,7 +367,7 @@ export function LessonRenderer({
     case "number_line_place": {
       const safeQuestion = getSafeQuestion(activity, questionData, prompt);
       if (safeQuestion.kind !== "number_line_place") {
-        return <ErrorCard message="Fraction number line question failed to load." />;
+        return <RecoveryCard message="Fraction number line question failed to load." onRecover={onWrong} />;
       }
       return (
         <NumberLinePlace
@@ -364,7 +381,7 @@ export function LessonRenderer({
     case "fraction_compare": {
       const safeQuestion = getSafeQuestion(activity, questionData, prompt);
       if (safeQuestion.kind !== "fraction_compare") {
-        return <ErrorCard message="Fraction comparison question failed to load." />;
+        return <RecoveryCard message="Fraction comparison question failed to load." onRecover={onWrong} />;
       }
       return (
         <FractionCompare
@@ -377,7 +394,7 @@ export function LessonRenderer({
     case "equivalent_fraction_match": {
       const safeQuestion = getSafeQuestion(activity, questionData, prompt);
       if (safeQuestion.kind !== "equivalent_fraction_match") {
-        return <ErrorCard message="Equivalent fraction match failed to load." />;
+        return <RecoveryCard message="Equivalent fraction match failed to load." onRecover={onWrong} />;
       }
       return (
         <EquivalentFractionBar
@@ -390,7 +407,7 @@ export function LessonRenderer({
     case "fraction_decimal_percent_match": {
       const safeQuestion = getSafeQuestion(activity, questionData, prompt);
       if (safeQuestion.kind !== "fraction_decimal_percent_match") {
-        return <ErrorCard message="Fraction, decimal and percentage match failed to load." />;
+        return <RecoveryCard message="Fraction, decimal and percentage match failed to load." onRecover={onWrong} />;
       }
       return (
         <FractionDecimalPercentMatch
@@ -403,7 +420,7 @@ export function LessonRenderer({
     case "benchmark_sort": {
       const safeQuestion = getSafeQuestion(activity, questionData, prompt);
       if (safeQuestion.kind !== "benchmark_sort") {
-        return <ErrorCard message="Benchmark sort question failed to load." />;
+        return <RecoveryCard message="Benchmark sort question failed to load." onRecover={onWrong} />;
       }
       return (
         <BenchmarkSort
@@ -416,7 +433,7 @@ export function LessonRenderer({
     case "equivalent_fraction_build": {
       const safeQuestion = getSafeQuestion(activity, questionData, prompt);
       if (safeQuestion.kind !== "equivalent_fraction_build") {
-        return <ErrorCard message="Equivalent fraction build failed to load." />;
+        return <RecoveryCard message="Equivalent fraction build failed to load." onRecover={onWrong} />;
       }
       return (
         <EquivalentFractionBar
@@ -429,7 +446,7 @@ export function LessonRenderer({
     case "equivalent_fraction_yes_no": {
       const safeQuestion = getSafeQuestion(activity, questionData, prompt);
       if (safeQuestion.kind !== "equivalent_fraction_yes_no") {
-        return <ErrorCard message="Equivalent fraction yes/no failed to load." />;
+        return <RecoveryCard message="Equivalent fraction yes/no failed to load." onRecover={onWrong} />;
       }
       return (
         <EquivalentFractionBar
@@ -442,7 +459,7 @@ export function LessonRenderer({
     case "addition_strategy": {
       const safeQuestion = getSafeQuestion(activity, questionData, prompt);
       if (safeQuestion.kind !== "addition_strategy") {
-        return <ErrorCard message="Addition strategy question failed to load." />;
+        return <RecoveryCard message="Addition strategy question failed to load." onRecover={onWrong} />;
       }
       return (
         <AdditionStrategy
@@ -455,7 +472,7 @@ export function LessonRenderer({
     case "equal_groups": {
       const safeQuestion = getSafeQuestion(activity, questionData, prompt);
       if (safeQuestion.kind !== "equal_groups") {
-        return <ErrorCard message="Equal groups question failed to load." />;
+        return <RecoveryCard message="Equal groups question failed to load." onRecover={onWrong} />;
       }
       return (
         <EqualGroups
@@ -468,7 +485,7 @@ export function LessonRenderer({
     case "arrays": {
       const safeQuestion = getSafeQuestion(activity, questionData, prompt);
       if (safeQuestion.kind !== "arrays") {
-        return <ErrorCard message="Array question failed to load." />;
+        return <RecoveryCard message="Array question failed to load." onRecover={onWrong} />;
       }
       return (
         <Arrays
@@ -481,7 +498,7 @@ export function LessonRenderer({
     case "division_groups": {
       const safeQuestion = getSafeQuestion(activity, questionData, prompt);
       if (safeQuestion.kind !== "division_groups") {
-        return <ErrorCard message="Division groups question failed to load." />;
+        return <RecoveryCard message="Division groups question failed to load." onRecover={onWrong} />;
       }
       return (
         <DivisionGroups
@@ -494,7 +511,7 @@ export function LessonRenderer({
     case "mixed_word_problem": {
       const safeQuestion = getSafeQuestion(activity, questionData, prompt);
       if (safeQuestion.kind !== "mixed_word_problem") {
-        return <ErrorCard message="Mixed word problem failed to load." />;
+        return <RecoveryCard message="Mixed word problem failed to load." onRecover={onWrong} />;
       }
       return (
         <MixedWordProblem
@@ -507,7 +524,7 @@ export function LessonRenderer({
     case "review_quiz": {
       const safeQuestion = getSafeQuestion(activity, questionData, prompt);
       if (safeQuestion.kind !== "review_quiz") {
-        return <ErrorCard message="Review quiz failed to load." />;
+        return <RecoveryCard message="Review quiz failed to load." onRecover={onWrong} />;
       }
         return renderNestedActivity({
           activityType: safeQuestion.activityType,
@@ -521,7 +538,7 @@ export function LessonRenderer({
     case "subtraction_strategy": {
       const safeQuestion = getSafeQuestion(activity, questionData, prompt);
       if (safeQuestion.kind !== "subtraction_strategy") {
-        return <ErrorCard message="Subtraction strategy question failed to load." />;
+        return <RecoveryCard message="Subtraction strategy question failed to load." onRecover={onWrong} />;
       }
       return (
         <SubtractionStrategy
@@ -534,7 +551,7 @@ export function LessonRenderer({
     case "fact_family": {
       const safeQuestion = getSafeQuestion(activity, questionData, prompt);
       if (safeQuestion.kind !== "fact_family") {
-        return <ErrorCard message="Fact family question failed to load." />;
+        return <RecoveryCard message="Fact family question failed to load." onRecover={onWrong} />;
       }
       const ffQuestion = safeQuestion as FactFamilyQuestion;
       if (ffQuestion.mode === "write_sentences") {
@@ -557,7 +574,7 @@ export function LessonRenderer({
     case "odd_even_sort": {
       const safeQuestion = getSafeQuestion(activity, questionData, prompt);
       if (safeQuestion.kind !== "odd_even_sort") {
-        return <ErrorCard message="Odd and even question failed to load." />;
+        return <RecoveryCard message="Odd and even question failed to load." onRecover={onWrong} />;
       }
       return (
         <OddEvenSort
@@ -570,7 +587,7 @@ export function LessonRenderer({
     case "skip_count": {
       const safeQuestion = getSafeQuestion(activity, questionData, prompt);
       if (safeQuestion.kind !== "skip_count") {
-        return <ErrorCard message="Skip count question failed to load." />;
+        return <RecoveryCard message="Skip count question failed to load." onRecover={onWrong} />;
       }
       return (
         <SkipCount
@@ -616,7 +633,7 @@ export function LessonRenderer({
         );
       }
       if (safeQuestion.kind !== "typed_response") {
-        return <ErrorCard message="Typed response question failed to load." />;
+        return <RecoveryCard message="Typed response question failed to load." onRecover={onWrong} />;
       }
       return (
         <TypedResponseActivity
@@ -630,7 +647,7 @@ export function LessonRenderer({
     case "speed_round": {
       const safeQuestion = getSafeQuestion(activity, questionData, prompt);
       if (safeQuestion.kind !== "speed_round") {
-        return <ErrorCard message="Speed round failed to load." />;
+        return <RecoveryCard message="Speed round failed to load." onRecover={onWrong} />;
       }
       return (
         <SpeedRound
@@ -641,6 +658,6 @@ export function LessonRenderer({
       );
     }
     default:
-      return <ErrorCard message="This activity is not available yet." />;
+      return <RecoveryCard message="This activity is not available yet." onRecover={onWrong} />;
   }
 }

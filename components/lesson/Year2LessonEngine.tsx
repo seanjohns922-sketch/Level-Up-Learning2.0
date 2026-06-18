@@ -32,6 +32,7 @@ import {
 } from "@/data/activities/year2/lessonEngine";
 import { pickWeightedIndex } from "@/lib/weightedRandom";
 import type { Lesson } from "@/data/programs/year1";
+import { isLessonQuestionSafe } from "@/lib/task-safety";
 
 function getWorkingLevelForLesson(lesson: Lesson) {
   const yearMatch = lesson.id.match(/^y(\d+)-/);
@@ -138,6 +139,9 @@ function chooseNextLessonTurn(
 
     for (let attempt = 0; attempt < CANDIDATES_PER_ACTIVITY; attempt += 1) {
       const question = generateQuestion(level, lesson, activityWithTemplateIndex);
+      if (!isLessonQuestionSafe(activityWithTemplateIndex, question)) {
+        continue;
+      }
       const fingerprint = getLessonQuestionFingerprint(activity, question);
       const candidateScore = scoreQuestionCandidate(fingerprint, history, questionOrder);
       const candidate = {
@@ -547,7 +551,12 @@ export function Year2LessonEngine({
   const questionStartedAtElapsedRef = useRef(0);
   const finished = secondsLeft <= 0;
   const currentActivity = activities[currentActivityIndex] ?? null;
+  const currentTurnSafe =
+    currentActivity !== null &&
+    currentQuestion !== null &&
+    isLessonQuestionSafe(currentActivity, currentQuestion);
   const questionsAnsweredRef = useRef(0);
+  const invalidRecoveryCountRef = useRef(0);
   const showMultiStepCalculationFeedback = isMultiStepCalculationLesson(level, lesson);
   const lastLoggedActivityIdRef = useRef<string | null>(null);
 
@@ -636,6 +645,21 @@ export function Year2LessonEngine({
       .join(" | ");
     console.error(`[Year2LessonPool] ${lesson.title}: ${summary}`);
   }, [lesson.title, lessonPool.violations]);
+
+  useEffect(() => {
+    if (finished || activities.length === 0) return;
+    if (showLessonResumeRef.current || brainBreakActiveRef.current) return;
+    if (currentTurnSafe) {
+      invalidRecoveryCountRef.current = 0;
+      return;
+    }
+    if (invalidRecoveryCountRef.current >= 3) {
+      return;
+    }
+    invalidRecoveryCountRef.current += 1;
+    const timeout = window.setTimeout(() => loadNextQuestion(), 0);
+    return () => window.clearTimeout(timeout);
+  }, [activities.length, currentTurnSafe, finished]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -1111,7 +1135,7 @@ export function Year2LessonEngine({
             </div>
           )}
 
-          {currentActivity && currentQuestion ? (
+          {currentTurnSafe && currentActivity && currentQuestion ? (
             <ComboMilestonePop comboCount={comboCount}>
               <div
                 className={`rounded-[1.75rem] border-2 p-5 shadow-lg transition-all duration-500 ${statusBorder} ${statusMotion}`}
@@ -1167,10 +1191,22 @@ export function Year2LessonEngine({
                 />
               </div>
             </ComboMilestonePop>
+          ) : activities.length > 0 && invalidRecoveryCountRef.current < 3 ? (
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">
+              Loading the next challenge…
+            </div>
           ) : (
             <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">
-              This lesson has no valid activities for the current policy. Check the lesson config or
-              source activity pool.
+              This lesson could not load a safe challenge right now.
+              <div className="mt-3">
+                <button
+                  type="button"
+                  onClick={onExit}
+                  className="rounded-xl bg-amber-700 px-4 py-2 font-black text-white hover:bg-amber-600"
+                >
+                  Return to Week
+                </button>
+              </div>
             </div>
           )}
         </div>

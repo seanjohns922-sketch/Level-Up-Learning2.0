@@ -1,6 +1,6 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useEffect, useRef } from "react";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import MatchThePair from "@/components/MatchThePair";
 import CountObjects from "@/components/CountObjects";
@@ -98,6 +98,7 @@ import {
 import { MeasurelandsCompareTaskCard } from "@/components/measurelands/MeasurelandsCompareTaskCard";
 import { MeasurelandsPathTaskCard } from "@/components/measurelands/MeasurelandsPathTaskCard";
 import { MeasurelandsBalanceScaleCard } from "@/components/measurelands/MeasurelandsBalanceScaleCard";
+import { isPracticeTaskSafe } from "@/lib/task-safety";
 
 type Callbacks = {
   markCorrect: () => void;
@@ -105,6 +106,28 @@ type Callbacks = {
   markWrong: () => void;
   markAttempted?: () => void;
 };
+
+function TaskRecoveryCard({
+  onRecover,
+}: {
+  onRecover: () => void;
+}) {
+  const hasRecoveredRef = useRef(false);
+
+  useEffect(() => {
+    if (hasRecoveredRef.current) return;
+    hasRecoveredRef.current = true;
+    const timeout = window.setTimeout(() => onRecover(), 450);
+    return () => window.clearTimeout(timeout);
+  }, [onRecover]);
+
+  return (
+    <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900 shadow-sm">
+      <div className="font-bold">Loading the next challenge…</div>
+      <div className="mt-1">This task was not available, so we are moving you on automatically.</div>
+    </div>
+  );
+}
 
 /**
  * Renders the active task component using a direct lookup instead of 60+ conditional branches.
@@ -128,6 +151,10 @@ function TaskRendererInner({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const t = task as any;
   const k = `${task.kind}-${taskNonce}`;
+
+  if (!isPracticeTaskSafe(task)) {
+    return <TaskRecoveryCard onRecover={onW} />;
+  }
 
   switch (task.kind) {
     case "matchPairs":
@@ -319,7 +346,7 @@ function TaskRendererInner({
     case "groundSoundCount":
       return <GroundSoundCountTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     default:
-      return null;
+      return <TaskRecoveryCard onRecover={onW} />;
   }
 }
 

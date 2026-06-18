@@ -66,6 +66,7 @@ import { generatePrepWeek10TaskByKind } from "@/data/activities/prep/week10";
 import { generatePrepWeek11TaskByKind } from "@/data/activities/prep/week11";
 import { buildMeasurelandsWeek1QuizTasks } from "@/data/activities/prepMeasurelands/week1Quiz";
 import { buildMeasurelandsWeek2QuizTasks } from "@/data/activities/prepMeasurelands/week2Quiz";
+import { isLessonQuestionSafe, isPracticeTaskSafe } from "@/lib/task-safety";
 
 type WeekProgress = {
   lessonsCompleted: boolean[]; // [L1, L2, L3]
@@ -241,6 +242,64 @@ type QuizQuestion = {
     difficulty?: "early" | "middle" | "late";
   };
 };
+
+function isQuizChoiceQuestionSafe(question: QuizQuestion) {
+  return (
+    Array.isArray(question.options) &&
+    question.options.length >= 2 &&
+    typeof question.correctIndex === "number" &&
+    question.correctIndex >= 0 &&
+    question.correctIndex < question.options.length
+  );
+}
+
+function isQuizQuestionSafe(question: QuizQuestion | null | undefined): boolean {
+  if (!question) return false;
+
+  switch (question.kind) {
+    case "lessonActivity":
+      return !!question.activity && !!question.questionData && isLessonQuestionSafe(question.activity, question.questionData);
+    case "practiceTask":
+      return !!question.practiceTask && isPracticeTaskSafe(question.practiceTask);
+    case "mcq":
+    case "audio":
+      return isQuizChoiceQuestionSafe(question);
+    case "typed":
+      return typeof question.correctValue === "string" && question.correctValue.trim().length > 0;
+    case "numberLineTap":
+    case "numberLineJump":
+      return !!question.line;
+    case "chartFill":
+      return !!question.chart;
+    case "mab":
+      return !!question.mab;
+    case "moneyMake":
+      return !!question.moneyMake;
+    case "moneyChange":
+      return !!question.moneyChange;
+    case "moneyEnough":
+      return !!question.moneyEnough;
+    default:
+      return false;
+  }
+}
+
+function buildQuizRecoveryQuestion(question: QuizQuestion, index: number): QuizQuestion {
+  return {
+    id: question.id || `q${index}`,
+    lessonNumber: question.lessonNumber,
+    lessonTag: question.lessonTag,
+    skill: question.skill,
+    activityType: "multiple_choice",
+    kind: "mcq",
+    prompt: "This challenge did not load. Tap Continue to keep moving.",
+    options: ["Continue", "Wait"],
+    correctIndex: 0,
+    feedbackCorrect: "Moving on.",
+    feedbackIncorrect: "Tap Continue to keep moving.",
+    quizMeta: question.quizMeta,
+  };
+}
 
 function getQuizQuestionOptions(question: QuizQuestion | undefined | null) {
   if (!question) return [];
@@ -7050,8 +7109,23 @@ function SessionPage({
     return base;
   }, [isMeasurementRealm, quizConfig, quizWeekPlan, week, year]);
 
+  const buildSafeQuizQuestions = useCallback(() => {
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      const questions = buildQuizQuestions();
+      if (questions.length > 0 && questions.every((question) => isQuizQuestionSafe(question))) {
+        return questions;
+      }
+    }
+
+    const recovered = buildQuizQuestions().map((question, index) =>
+      isQuizQuestionSafe(question) ? question : buildQuizRecoveryQuestion(question, index + 1)
+    );
+
+    return recovered;
+  }, [buildQuizQuestions]);
+
   const quizAttemptKey = `${type}|${realmId}|${year}|${week}|${quizConfig?.questionsPerLesson ?? 5}`;
-  const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>(() => buildQuizQuestions());
+  const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>(() => buildSafeQuizQuestions());
 
   const [quizAnswers, setQuizAnswers] = useState<Record<string, number>>({});
   const [quizTyped, setQuizTyped] = useState<Record<string, string>>({});
@@ -7369,13 +7443,22 @@ function SessionPage({
     currentQuizPrompt.length > 0 &&
     speakState.currentText === prepareSpeechText(currentQuizPrompt);
 
+  useEffect(() => {
+    if (!currentQuiz || isQuizQuestionSafe(currentQuiz)) return;
+    setQuizQuestions((prev) =>
+      prev.map((question, index) =>
+        question.id === currentQuiz.id ? buildQuizRecoveryQuestion(question, index + 1) : question
+      )
+    );
+  }, [currentQuiz]);
+
   const lastAutoReadQuizIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (quizAttemptKeyRef.current === quizAttemptKey) return;
     quizAttemptKeyRef.current = quizAttemptKey;
 
-    setQuizQuestions(buildQuizQuestions());
+    setQuizQuestions(buildSafeQuizQuestions());
     setQuizAnswers({});
     setQuizTyped({});
     setQuizLineAnswers({});
@@ -7390,7 +7473,7 @@ function SessionPage({
     liveQuizStartedRef.current = null;
     liveAnsweredQuestionIdsRef.current = new Set();
     lastAutoReadQuizIdRef.current = null;
-  }, [buildQuizQuestions, quizAttemptKey]);
+  }, [buildSafeQuizQuestions, quizAttemptKey]);
 
   useEffect(() => {
     if (!autoReadEnabled || !speechInteractionReady) return;

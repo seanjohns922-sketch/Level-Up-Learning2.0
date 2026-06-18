@@ -24,6 +24,7 @@ import ComboActivation from "@/components/lesson/ComboActivation";
 import BrainBreak from "@/components/lesson/BrainBreak";
 import { pickVillain, type Villain } from "@/lib/brain-break";
 import { getBrainBreakSchedule, type BrainBreakFrequency } from "@/lib/brain-break-settings";
+import { isPracticeTaskSafe } from "@/lib/task-safety";
 import type { LessonPerformanceSummary } from "@/components/lesson/Year2LessonEngine";
 
 type McqTask = Extract<PracticeTask, { kind: "mcq" }>;
@@ -309,6 +310,9 @@ export function PracticeRunner({
     let fallbackTask: PracticeTask | null = null;
     for (let attempt = 0; attempt < NEXT_TASK_REROLLS; attempt += 1) {
       const candidate = getTask(ctx);
+      if (!isPracticeTaskSafe(candidate)) {
+        continue;
+      }
       candidate.difficulty = ctx.difficulty;
       const repeatKey = buildPracticeTaskRepeatKey(candidate);
       const targetKey = buildPracticeTaskTargetKey(candidate);
@@ -320,14 +324,16 @@ export function PracticeRunner({
       }
       return candidate;
     }
-    return fallbackTask ?? getTask(ctx);
+    const emergency = fallbackTask ?? getTask(ctx);
+    return isPracticeTaskSafe(emergency) ? emergency : null;
   }, [getTask]);
 
   const [task, setTask] = useState<PracticeTask>(() => {
     const ctx = { secondsLeft: totalSeconds, totalSeconds, elapsedSeconds: 0, difficulty: "easy" as Difficulty };
-    const initialTask = getTask(ctx);
-    initialTask.difficulty = ctx.difficulty;
-    return initialTask;
+    const initialTask = generateLessonTask(ctx);
+    const safeTask = initialTask ?? getTask(ctx);
+    safeTask.difficulty = ctx.difficulty;
+    return safeTask;
   });
   const [status, setStatus] = useState<"idle" | "correct" | "wrong">("idle");
   const [typed, setTyped] = useState("");
@@ -615,7 +621,7 @@ export function PracticeRunner({
     recentTargetKeysRef.current = [currentTargetKey, ...recentTargetKeysRef.current].slice(0, RECENT_TASK_WINDOW);
 
     const ctx = makeCtx();
-    const generated = generateLessonTask(ctx);
+    const generated = generateLessonTask(ctx) ?? task;
     generated.difficulty = ctx.difficulty;
     setStatus("idle");
     setTyped("");
