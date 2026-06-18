@@ -148,7 +148,10 @@ function CompareVisual({
             {item.label}
           </div>
           <div className="flex w-full max-w-[180px] flex-col items-center gap-2">
-            <div className="mx-auto h-3 w-full rounded-full bg-[rgba(120,53,15,0.1)]">
+            <div
+              className="mx-auto h-3 rounded-full bg-[rgba(120,53,15,0.1)]"
+              style={{ width: compact ? 118 : 146 }}
+            >
               <div
                 className="h-3 rounded-full"
                 style={{
@@ -161,11 +164,11 @@ function CompareVisual({
             <div
               className="rounded-b-[14px] rounded-t-[6px] transition-all"
               style={{
-                width: compact ? 96 : 120,
-                height: 12,
-                background: accent.fill,
-                boxShadow: accent.glow,
-                transform: `translateY(${Math.round(massPanDrop * 0.35)}px)`,
+                width: compact ? 78 : 96,
+                height: 10,
+                background: "linear-gradient(180deg, rgba(120,53,15,0.16), rgba(120,53,15,0.28))",
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.28)",
+                transform: `translateY(${Math.round(massPanDrop * 0.3)}px)`,
               }}
             />
           </div>
