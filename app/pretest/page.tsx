@@ -13,6 +13,7 @@ import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, type StudentProg
 import { ALL_PROGRAM_WEEKS, clearYearProgress, getOptionalWeeks, normalizeWeekList } from "@/lib/program-progress";
 import { saveNumberAssessment, saveStudentProgressState } from "@/lib/student-progress-sync";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
+import { getRealmTheme } from "@/lib/useRealmTheme";
 import {
   clearPretestResume,
   loadPretestResume,

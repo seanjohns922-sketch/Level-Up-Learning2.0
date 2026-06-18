@@ -16,6 +16,7 @@ import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { getWeekProgress, hasCompletedRequiredWeeks, readProgramStore } from "@/lib/program-progress";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { saveNumberAssessment, saveStudentProgressState } from "@/lib/student-progress-sync";
+import { getRealmTheme } from "@/lib/useRealmTheme";
 
 const PASS_THRESHOLD = 85;
 
