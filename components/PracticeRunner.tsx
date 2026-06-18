@@ -898,6 +898,7 @@ export function PracticeRunner({
         correctAnswers={safeCorrectAnswers}
         accuracy={accuracy}
         xpCorrectAnswers={cappedCorrectAnswers}
+        realmId={realmId}
         onExit={onComplete}
       />
     );
