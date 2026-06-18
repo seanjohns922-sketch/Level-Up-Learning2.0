@@ -58,6 +58,26 @@ type DisplayConfig = {
   fractionDigits: number;
 };
 
+function getNumberLineTolerance(
+  questionData: NumberLineQuestion,
+  displayConfig: DisplayConfig
+) {
+  const step = displayConfig.snapStep;
+  const range = displayConfig.max - displayConfig.min || 1;
+
+  if (questionData.mode === "estimate") {
+    // Estimation should be forgiving: allow about one full snap interval, with a
+    // small range-aware floor so larger lines do not feel pixel-sensitive.
+    return Math.max(step, range * 0.015);
+  }
+
+  // Exact placement should still reflect the displayed interval structure, but
+  // it should not require landing on the exact snapped value. Half a snap is a
+  // fair "closest correct region", with a small floor for wider displayed
+  // ranges.
+  return Math.max(step / 2, range * 0.008);
+}
+
 function getDisplayConfig(questionData: NumberLineQuestion): DisplayConfig {
   const originalMin = questionData.min;
   const originalMax = questionData.max;
@@ -423,12 +443,7 @@ export default function NumberLineActivity({
     setChecked(true);
 
     const difference = Math.abs(placed - questionData.expected);
-    const allowed =
-      questionData.mode === "estimate"
-        ? Math.max(displayConfig.snapStep, displayConfig.snapStep * 2)
-        : displayConfig.snapStep < 1
-          ? displayConfig.snapStep / 4
-          : Math.max(1, Math.floor(displayConfig.snapStep / 4));
+    const allowed = getNumberLineTolerance(questionData, displayConfig);
 
     if (difference <= allowed) {
       setIsCorrect(true);
