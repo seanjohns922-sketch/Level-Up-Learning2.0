@@ -8,6 +8,7 @@ type LessonPageHeroProps = {
   levelLabel?: string;
   week: number;
   lessonNumber: number;
+  breadcrumbText?: string;
   pageTitle: string;
   lessonTitle?: string | null;
   focus?: string | null;
@@ -20,6 +21,7 @@ export function LessonPageHero({
   levelLabel,
   week,
   lessonNumber,
+  breadcrumbText,
   pageTitle,
   lessonTitle,
   focus,
@@ -139,7 +141,7 @@ export function LessonPageHero({
             border: "1px solid rgba(255,255,255,0.15)",
           }}
         >
-          {(levelLabel ?? `Level ${levelNumber}`)} • Week {week} • Lesson {lessonNumber}
+          {breadcrumbText ?? `${levelLabel ?? `Level ${levelNumber}`} • Week ${week} • Lesson ${lessonNumber}`}
         </div>
 
         <h1

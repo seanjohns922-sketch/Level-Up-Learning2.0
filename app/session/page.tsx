@@ -33,6 +33,7 @@ import MoneyMakeAmount from "@/components/week7/MoneyMakeAmount";
 import MoneyChange from "@/components/week7/MoneyChange";
 import MoneyEnough from "@/components/week7/MoneyEnough";
 import { MathFormattedText } from "@/components/FractionText";
+import { LessonPageHero } from "@/components/lesson/LessonPageHero";
 import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent } from "@/lib/live-class-client";
 import { recordStudentActivityDelta } from "@/lib/student-activity";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
@@ -7154,8 +7155,11 @@ function SessionPage({
           : year === "Prep" && Number(week) === 10
             ? "You mastered Number Nexus Ground Level!"
             : year === "Prep" && Number(week) === 11
-              ? "You proved your Ground Level readiness across every challenge floor!"
+            ? "You proved your Ground Level readiness across every challenge floor!"
               : "Keep building across all three lessons.";
+  const measurementQuizFocus = isMeasurementRealm
+    ? quizWeekPlan?.lessons?.map((lesson) => lesson.title).filter(Boolean).join(" · ") || null
+    : null;
 
   const lessonBreakdown = useMemo(
     () =>
@@ -7595,7 +7599,9 @@ function SessionPage({
               "text-sm font-bold transition",
               isLesson
                 ? "text-primary hover:underline"
-                : "text-teal-300 hover:text-teal-200",
+                : isMeasurementRealm
+                  ? "text-amber-500 hover:text-amber-400"
+                  : "text-teal-300 hover:text-teal-200",
             ].join(" ")}
           >
             ← Back to Week {week}
@@ -7615,6 +7621,19 @@ function SessionPage({
                 {lessonStarted ? "Complete the timed practice" : "Watch the video and begin practice"}
               </p>
             </div>
+          ) : isMeasurementRealm ? (
+            <LessonPageHero
+              levelNumber={0}
+              levelLabel={studentLevelLabel}
+              week={Number(week)}
+              lessonNumber={0}
+              breadcrumbText={`${studentLevelLabel} • Week ${week}`}
+              pageTitle={title}
+              lessonTitle="15 questions · Show what you know"
+              focus={measurementQuizFocus}
+              heroClass=""
+              realmId={realmId}
+            />
           ) : (
             <div className="relative overflow-hidden text-white" style={{ background: "#021716" }}>
               {/* Number Nexus city artwork */}
@@ -7761,8 +7780,16 @@ function SessionPage({
             {/* Game-style HUD */}
             {quizQuestions.length ? (
               <div
-                className="-mx-6 -mt-8 mb-6 border-t border-teal-300/15 px-6 pt-3 pb-4"
-                style={{
+                className={[
+                  "-mx-6 -mt-8 mb-6 border-t px-6 pt-3 pb-4",
+                  isMeasurementRealm ? "border-yellow-900/20" : "border-teal-300/15",
+                ].join(" ")}
+                style={isMeasurementRealm ? {
+                  background:
+                    "linear-gradient(135deg, #1f1406 0%, #342109 50%, #5b3a10 100%)",
+                  boxShadow:
+                    "inset 0 1px 0 rgba(200,160,48,0.12), 0 8px 20px -12px rgba(0,0,0,0.55)",
+                } : {
                   background:
                     "linear-gradient(135deg, #021716 0%, #042925 55%, #053b35 100%)",
                   boxShadow:
@@ -7771,17 +7798,37 @@ function SessionPage({
               >
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-teal-300/30 bg-teal-500/10 px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-teal-200">
-                      <span className="h-1.5 w-1.5 rounded-full bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]" />
+                    <span className={[
+                      "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-[0.2em]",
+                      isMeasurementRealm
+                        ? "border-yellow-800/35 bg-yellow-400/10 text-yellow-100"
+                        : "border-teal-300/30 bg-teal-500/10 text-teal-200",
+                    ].join(" ")}>
+                      <span className={[
+                        "h-1.5 w-1.5 rounded-full",
+                        isMeasurementRealm
+                          ? "bg-yellow-200 shadow-[0_0_8px_rgba(200,160,48,0.85)]"
+                          : "bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]",
+                      ].join(" ")} />
                       Q {quizIndex + 1}<span className="opacity-60">/{quizQuestions.length}</span>
                     </span>
                     {currentQuiz?.lessonTag ? (
-                      <span className="rounded-full border border-emerald-300/25 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-[0.18em] text-emerald-100">
+                      <span className={[
+                        "rounded-full border px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-[0.18em]",
+                        isMeasurementRealm
+                          ? "border-violet-300/25 bg-violet-500/10 text-violet-100"
+                          : "border-emerald-300/25 bg-emerald-500/10 text-emerald-100",
+                      ].join(" ")}>
                         Lesson {currentQuiz.lessonTag}
                       </span>
                     ) : null}
-                    <label className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-mono font-bold uppercase tracking-[0.14em] text-white/80">
-                      <span className="text-teal-200">Jump</span>
+                    <label className={[
+                      "flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-mono font-bold uppercase tracking-[0.14em]",
+                      isMeasurementRealm
+                        ? "border-yellow-900/20 bg-black/15 text-amber-50/85"
+                        : "border-white/10 bg-white/5 text-white/80",
+                    ].join(" ")}>
+                      <span className={isMeasurementRealm ? "text-yellow-100" : "text-teal-200"}>Jump</span>
                       <select
                         value={quizIndex}
                         onChange={(e) => {
@@ -7792,7 +7839,12 @@ function SessionPage({
                             setQuizIndex(target);
                           }
                         }}
-                        className="rounded-full border border-teal-300/20 bg-[#0b1220] px-3 py-1 text-[11px] font-bold text-white outline-none transition hover:border-teal-200/50"
+                        className={[
+                          "rounded-full border px-3 py-1 text-[11px] font-bold text-white outline-none transition",
+                          isMeasurementRealm
+                            ? "border-yellow-900/25 bg-[#2a1a06] hover:border-yellow-400/40"
+                            : "border-teal-300/20 bg-[#0b1220] hover:border-teal-200/50",
+                        ].join(" ")}
                       >
                         {quizQuestions.map((question, index) => {
                           const answered = isQuestionAnswered(question);
@@ -7817,8 +7869,12 @@ function SessionPage({
                       className={[
                         "rounded-full border px-3 py-1 text-[11px] font-bold transition",
                         isCurrentQuizReading
-                          ? "border-teal-300/60 bg-teal-400/20 text-teal-100"
-                          : "border-white/15 bg-white/5 text-white/80 hover:bg-white/10",
+                          ? isMeasurementRealm
+                            ? "border-yellow-300/50 bg-yellow-400/15 text-yellow-50"
+                            : "border-teal-300/60 bg-teal-400/20 text-teal-100"
+                          : isMeasurementRealm
+                            ? "border-yellow-900/20 bg-white/5 text-amber-50/85 hover:bg-white/10"
+                            : "border-white/15 bg-white/5 text-white/80 hover:bg-white/10",
                       ].join(" ")}
                     >
                       🔊 Read
@@ -7830,9 +7886,12 @@ function SessionPage({
                     className="h-full rounded-full transition-all duration-500"
                     style={{
                       width: `${progressPct}%`,
-                      background:
-                        "linear-gradient(90deg, #00C2A8 0%, #00E5C3 100%)",
-                      boxShadow: "0 0 12px rgba(0,229,195,0.55)",
+                      background: isMeasurementRealm
+                        ? "linear-gradient(90deg, #8b6520 0%, #c8a030 55%, #e8d5a8 100%)"
+                        : "linear-gradient(90deg, #00C2A8 0%, #00E5C3 100%)",
+                      boxShadow: isMeasurementRealm
+                        ? "0 0 12px rgba(200,160,48,0.45)"
+                        : "0 0 12px rgba(0,229,195,0.55)",
                     }}
                   />
                 </div>
@@ -7852,7 +7911,12 @@ function SessionPage({
                           : "",
                       ].join(" ")}
                     >
-                      <div className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-teal-700/80 mb-1">
+                      <div
+                        className={[
+                          "mb-1 text-[10px] font-mono font-bold uppercase tracking-[0.2em]",
+                          isMeasurementRealm ? "text-amber-700/80" : "text-teal-700/80",
+                        ].join(" ")}
+                      >
                         Prompt
                       </div>
                       <div className="text-[1.05rem] md:text-[1.15rem] font-semibold leading-snug text-foreground">
