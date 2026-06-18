@@ -243,7 +243,7 @@ function ResultsPage() {
   const sp = useSearchParams();
 
   const year = sp.get("year") ?? "Year 3";
-  const realmId = sp.get("realm_id") ?? (year === "Prep" ? undefined : undefined) ?? undefined;
+  const realmId = sp.get("realm_id") ?? undefined;
   const theme = getRealmTheme(realmId);
   const studentLevelLabel = formatStudentLevelLabel(year);
   const score = Number(sp.get("score") ?? "0");
@@ -446,7 +446,7 @@ function ResultsPage() {
       {showFogCinematic && (
         <FogClearCinematic progress={getFogProgress()} onDone={() => setShowFogCinematic(false)} />
       )}
-      <FloatingShapes />
+      <FloatingShapes theme={theme} />
 
         <div
         className="relative z-10 w-full max-w-lg lg:max-w-4xl"
@@ -505,7 +505,7 @@ function ResultsPage() {
               {studentLevelLabel} • {isPostTest ? "Post-Test" : source === "program_complete" ? "Program" : "Pre-Test"}
             </div>
 
-            <ScoreRing percent={displayPercent} passed={passed} />
+            <ScoreRing percent={displayPercent} passed={passed} theme={theme} />
 
             {/* Score breakdown */}
             <div className="flex items-center justify-center gap-6 text-sm mb-2">
