@@ -2,6 +2,7 @@
 
 import { Trophy, Star, Target, CheckCircle } from "lucide-react";
 import { calcXP } from "./LessonXPBar";
+import { getRealmTheme } from "@/lib/useRealmTheme";
 
 export function LessonCompleteCard({
   lessonTitle,
@@ -10,6 +11,7 @@ export function LessonCompleteCard({
   xpCorrectAnswers,
   accuracy,
   onExit,
+  realmId,
 }: {
   lessonTitle: string;
   questionsAnswered: number;
@@ -17,8 +19,10 @@ export function LessonCompleteCard({
   xpCorrectAnswers?: number;
   accuracy: number;
   onExit: () => void;
+  realmId?: string;
 }) {
   const xp = calcXP(xpCorrectAnswers ?? correctAnswers);
+  const theme = getRealmTheme(realmId);
 
   return (
     <div className="relative">
@@ -29,8 +33,9 @@ export function LessonCompleteCard({
         style={{
           clipPath:
             "polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px)",
-          background:
-            "linear-gradient(135deg, rgba(94,234,212,0.4) 0%, rgba(15,118,110,0.2) 50%, rgba(94,234,212,0.3) 100%)",
+          background: theme.isMeasurement
+            ? "linear-gradient(135deg, rgba(214,184,108,0.45) 0%, rgba(138,100,34,0.22) 50%, rgba(232,201,126,0.35) 100%)"
+            : "linear-gradient(135deg, rgba(94,234,212,0.4) 0%, rgba(15,118,110,0.2) 50%, rgba(94,234,212,0.3) 100%)",
         }}
       />
       <div
@@ -38,27 +43,37 @@ export function LessonCompleteCard({
         style={{
           clipPath:
             "polygon(13px 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%, 0 13px)",
-          background:
-            "linear-gradient(135deg, #021716 0%, #042925 50%, #053b35 100%)",
-          boxShadow:
-            "inset 0 1px 0 rgba(94,234,212,0.18), inset 0 -10px 20px rgba(0,0,0,0.45)",
+          background: theme.cardSurface,
+          boxShadow: theme.cardInsetShadow,
         }}
       >
         {/* Hero */}
-        <div className="px-6 py-7 text-center border-b border-teal-300/15">
+        <div
+          className="px-6 py-7 text-center border-b"
+          style={{ borderColor: theme.cardBorderTint }}
+        >
           <div
             className="mx-auto mb-3 flex h-14 w-14 items-center justify-center"
             style={{
               clipPath:
                 "polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)",
-              background:
-                "radial-gradient(circle at 35% 30%, #5eead4 0%, #0f766e 65%, #042925 100%)",
-              boxShadow: "inset 0 0 8px rgba(204,251,241,0.5)",
+              background: theme.trophyGradient,
+              boxShadow: theme.trophyShadow,
             }}
           >
-            <Trophy className="h-6 w-6 text-teal-50" />
+            <Trophy
+              className="h-6 w-6"
+              style={{ color: theme.isMeasurement ? "#fff7e0" : "#ccfbf1" }}
+            />
           </div>
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-teal-300/30 bg-teal-500/10 px-2.5 py-1 text-[9px] font-mono font-bold uppercase tracking-[0.2em] text-teal-200/90">
+          <div
+            className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[9px] font-mono font-bold uppercase tracking-[0.2em]"
+            style={{
+              borderColor: theme.chipBorder,
+              background: theme.chipBg,
+              color: theme.chipText,
+            }}
+          >
             Lesson Complete
           </div>
           <h2 className="mt-2 text-2xl font-bold tracking-[-0.01em] text-white">
@@ -90,12 +105,24 @@ export function LessonCompleteCard({
             ].map((s) => (
               <div
                 key={s.label}
-                className="rounded-lg border border-teal-300/20 bg-teal-500/5 px-2 py-3 text-center"
-                style={{ boxShadow: "inset 0 1px 0 rgba(94,234,212,0.12)" }}
+                className="rounded-lg border px-2 py-3 text-center"
+                style={{
+                  borderColor: theme.statBorder,
+                  background: theme.statBg,
+                  boxShadow: theme.isMeasurement
+                    ? "inset 0 1px 0 rgba(232,201,126,0.14)"
+                    : "inset 0 1px 0 rgba(94,234,212,0.12)",
+                }}
               >
-                <s.icon className="h-3.5 w-3.5 mx-auto mb-1 text-teal-300" />
+                <s.icon
+                  className="h-3.5 w-3.5 mx-auto mb-1"
+                  style={{ color: theme.statIcon }}
+                />
                 <div className="text-xl font-bold text-white">{s.value}</div>
-                <div className="text-[9px] font-mono font-bold uppercase tracking-[0.18em] text-teal-200/70 mt-0.5">
+                <div
+                  className="text-[9px] font-mono font-bold uppercase tracking-[0.18em] mt-0.5"
+                  style={{ color: theme.statLabel }}
+                >
                   {s.label}
                 </div>
               </div>
@@ -103,7 +130,14 @@ export function LessonCompleteCard({
           </div>
 
           {/* Status note */}
-          <div className="rounded-lg border border-teal-300/20 bg-teal-500/5 px-3 py-2 text-center text-[12px] font-semibold text-teal-100">
+          <div
+            className="rounded-lg border px-3 py-2 text-center text-[12px] font-semibold"
+            style={{
+              borderColor: theme.statBorder,
+              background: theme.statBg,
+              color: theme.isMeasurement ? "#f5e6c4" : "#ccfbf1",
+            }}
+          >
             Nice work — your progress has been updated.
           </div>
 
@@ -112,10 +146,10 @@ export function LessonCompleteCard({
             onClick={onExit}
             className="w-full rounded-lg px-6 py-3 text-sm font-bold text-white transition active:scale-[0.99]"
             style={{
-              background:
-                "linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #2dd4bf 100%)",
-              boxShadow:
-                "inset 0 1px 0 rgba(204,251,241,0.3), 0 0 18px rgba(45,212,191,0.25)",
+              background: theme.ctaGradientCss,
+              boxShadow: theme.isMeasurement
+                ? "inset 0 1px 0 rgba(245,220,160,0.35), 0 0 18px rgba(214,184,108,0.30)"
+                : "inset 0 1px 0 rgba(204,251,241,0.3), 0 0 18px rgba(45,212,191,0.25)",
             }}
           >
             Return to Week →
