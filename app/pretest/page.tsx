@@ -83,7 +83,7 @@ function MabPicker({
                 className={[
                   "w-10 h-20 rounded-xl border-2 transition",
                   selected
-                    ? theme.isMeasurement ? "border-[#d6b86c] bg-[#d6b86c]/20" : "border-teal-500 bg-teal-500/20"
+                    ? "border-teal-500 bg-teal-500/20"
                     : "border-slate-600 bg-slate-700/50 hover:bg-slate-700",
                 ].join(" ")}
                 title={selected ? "Tap to remove" : "Tap to add"}
@@ -94,7 +94,7 @@ function MabPicker({
                       key={k}
                       className={[
                         "h-2 rounded",
-                        selected ? theme.isMeasurement ? "bg-[#d6b86c]/60" : "bg-teal-500/60" : "bg-slate-600",
+                        selected ? "bg-teal-500/60" : "bg-slate-600",
                       ].join(" ")}
                     />
                   ))}
@@ -118,7 +118,7 @@ function MabPicker({
                 className={[
                   "w-10 h-10 rounded-lg border-2 transition",
                   selected
-                    ? theme.isMeasurement ? "border-[#d6b86c] bg-[#d6b86c]/20" : "border-teal-500 bg-teal-500/20"
+                    ? "border-teal-500 bg-teal-500/20"
                     : "border-slate-600 bg-slate-700/50 hover:bg-slate-700",
                 ].join(" ")}
                 title={selected ? "Tap to remove" : "Tap to add"}
@@ -199,7 +199,7 @@ function DotAddVisual({
               className={[
                 "h-8 w-8 rounded-full border transition",
                 on
-                  ? theme.isMeasurement ? "bg-[#d6b86c] border-[#e8c97e]" : "bg-teal-500 border-teal-400"
+                  ? "bg-teal-500 border-teal-400"
                   : "bg-slate-700 border-slate-500 hover:bg-slate-600",
               ].join(" ")}
               aria-label={`left dot ${i + 1}`}
@@ -216,7 +216,7 @@ function DotAddVisual({
               className={[
                 "h-8 w-8 rounded-full border transition",
                 on
-                  ? theme.isMeasurement ? "bg-[#d6b86c] border-[#e8c97e]" : "bg-teal-500 border-teal-400"
+                  ? "bg-teal-500 border-teal-400"
                   : "bg-slate-700 border-slate-500 hover:bg-slate-600",
               ].join(" ")}
               aria-label={`right dot ${i + 1}`}
@@ -278,7 +278,7 @@ function GroupCountersVisual({
             className={[
               "h-10 w-10 rounded-full border transition",
               on
-                ? theme.isMeasurement ? "bg-[#d6b86c] border-[#e8c97e]" : "bg-teal-500 border-teal-400"
+                ? "bg-teal-500 border-teal-400"
                 : "bg-slate-700 border-slate-500 hover:bg-slate-600",
             ].join(" ")}
             aria-label={`counter ${i + 1}`}
@@ -704,7 +704,7 @@ function PretestPage() {
                   "absolute top-1/2 -translate-y-1/2 -translate-x-1/2",
                   "w-14 h-14 rounded-full border-2 font-extrabold transition",
                   isSelected
-                    ? theme.isMeasurement ? "border-[#d6b86c] bg-[#d6b86c]/20 text-[#e8c97e]" : "border-teal-500 bg-teal-500/20 text-teal-300"
+                    ? "border-teal-500 bg-teal-500/20 text-teal-300"
                     : "border-slate-500 bg-slate-700 hover:bg-slate-600 text-slate-300",
                 ].join(" ")}
                 style={{ left: `${pct}%` }}
@@ -731,7 +731,7 @@ function PretestPage() {
               className={[
                 "w-full rounded-2xl border p-5 text-left transition",
                 isSelected
-                  ? theme.isMeasurement ? "border-[#d6b86c] bg-[#d6b86c]/10" : "border-teal-500 bg-teal-500/10"
+                  ? "border-teal-500 bg-teal-500/10"
                   : "border-slate-600 bg-slate-700/50 hover:bg-slate-700",
               ].join(" ")}
             >
