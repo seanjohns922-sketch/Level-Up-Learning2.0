@@ -538,6 +538,32 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Generic, reusable interactive balance scale for equivalence activities
+      // (Measurelands "Balance the Scales" and any future same-weight tasks).
+      // The student fills/edits one pan; the scale is solved when both pans
+      // weigh the same. Weights are abstract whole "units" (never shown).
+      kind: "balanceScale";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      /** Non-interactive teaching demo: auto-animates tip-left/right/level. */
+      demo?: boolean;
+      /** Items already resting on each pan. */
+      leftItems: Array<{ id: string; label: string; icon: string; weight: number }>;
+      rightItems: Array<{ id: string; label: string; icon: string; weight: number }>;
+      /** Which pan the student fills/edits; the other stays fixed. */
+      target: "left" | "right";
+      supply: {
+        // "pile" = tap to add copies of a single unit (add/remove freely until
+        //          balanced — forgiving). "shelf" = pick ONE candidate (scored).
+        mode: "pile" | "shelf";
+        items: Array<{ id: string; label: string; icon: string; weight: number }>;
+        /** pile only: max copies the student may add. */
+        maxAdds?: number;
+      };
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       kind: "tensOnesMcq";
       prompt: string;
       min: number;

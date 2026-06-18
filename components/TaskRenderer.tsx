@@ -97,6 +97,7 @@ import {
 } from "@/components/ground/GroundMiniGameTask";
 import { MeasurelandsCompareTaskCard } from "@/components/measurelands/MeasurelandsCompareTaskCard";
 import { MeasurelandsPathTaskCard } from "@/components/measurelands/MeasurelandsPathTaskCard";
+import { MeasurelandsBalanceScaleCard } from "@/components/measurelands/MeasurelandsBalanceScaleCard";
 
 type Callbacks = {
   markCorrect: () => void;
@@ -291,6 +292,8 @@ function TaskRendererInner({
       return <MeasurelandsCompareTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "measurePath":
       return <MeasurelandsPathTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "balanceScale":
+      return <MeasurelandsBalanceScaleCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundCollect":
       return <GroundCollectTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundBuild":
