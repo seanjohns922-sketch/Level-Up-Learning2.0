@@ -125,6 +125,21 @@ export default function BrainBreak({
       {/* ── INTRO ── */}
       {phase === "intro" && (
         <>
+          {/* Make it unmistakable this is a rest, not a maths test. */}
+          <div
+            className="absolute left-1/2 top-[12%] -translate-x-1/2 text-center"
+            style={{ animation: "bbTextIn 0.4s ease-out forwards", width: "min(92vw, 620px)" }}
+          >
+            <div
+              className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 font-mono font-black uppercase tracking-[0.2em] text-white/90"
+              style={{ fontSize: "clamp(0.8rem, 2.2vw, 1.1rem)" }}
+            >
+              🧠 Quick Brain Break
+            </div>
+            <div className="mt-1.5 font-sans font-bold text-white/55" style={{ fontSize: "clamp(0.7rem, 1.6vw, 0.9rem)" }}>
+              Not a test — just have fun!
+            </div>
+          </div>
           <div
             className="absolute left-1/2 top-[38%]"
             style={{
@@ -183,7 +198,7 @@ export default function BrainBreak({
               )}
             </div>
             <div className="mt-2 text-center font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-white/45">
-              {playHint(villain.game)}
+              🧠 Brain Break · {playHint(villain.game)}
             </div>
           </div>
 
@@ -293,14 +308,15 @@ function SlashGame({ villain, onHit }: { villain: Villain; onHit: () => void }) 
   useEffect(() => {
     const spawn = window.setInterval(() => {
       setTargets((prev) => {
-        if (prev.length >= 4) return prev;
+        if (prev.length >= 3) return prev;
         idRef.current += 1;
         const id = idRef.current;
-        const dur = 2400 + Math.random() * 700;
+        // Gentler pacing: targets float for longer so they're catchable, not a blur.
+        const dur = 3000 + Math.random() * 800;
         window.setTimeout(() => setTargets((c) => c.filter((x) => x.id !== id)), dur);
-        return [...prev, { id, xPct: 12 + Math.random() * 76, drift: (Math.random() - 0.5) * 160, dur }];
+        return [...prev, { id, xPct: 12 + Math.random() * 76, drift: (Math.random() - 0.5) * 140, dur }];
       });
-    }, 720);
+    }, 900);
     return () => window.clearInterval(spawn);
   }, []);
   function hit(t: { id: number; xPct: number }) {

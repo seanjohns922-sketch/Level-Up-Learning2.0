@@ -150,8 +150,8 @@ export const VILLAINS: Villain[] = [
     tip: "Put the screen down — your real adventure is here.",
     color: "#38bdf8",
     glow: "rgba(56,189,248,0.6)",
-    winCount: 30,
-    durationSec: 55,
+    winCount: 12,
+    durationSec: 40,
   },
   {
     id: "overthink_owl",
