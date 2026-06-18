@@ -18,7 +18,17 @@ function seededValue(seed: number) {
  *   - Number Nexus: gold → orange → teal/emerald (sci-fi energy).
  *   - Measurelands: brass → gold → purple+brass (magical measurement).
  */
-export default function SurgeAmbience({ comboCount, realmId }: { comboCount: number; realmId?: string }) {
+export default function SurgeAmbience({
+  comboCount,
+  realmId,
+  dimmed = false,
+}: {
+  comboCount: number;
+  realmId?: string;
+  /** Calm the persistent ambient glow while the student is answering; it flares
+   *  back to full on reward moments (correct answer) and settles again. */
+  dimmed?: boolean;
+}) {
   const isMeasurement = realmId === "measurement";
   const tier =
     comboCount >= 10 ? 4 : comboCount >= 8 ? 3 : comboCount >= 5 ? 2 : comboCount >= 3 ? 1 : 0;
@@ -120,7 +130,15 @@ export default function SurgeAmbience({ comboCount, realmId }: { comboCount: num
     : "linear-gradient(to bottom, transparent, rgba(94,234,212,0.7), rgba(45,212,191,0.4), transparent)";
 
   return (
-    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-30 overflow-hidden">
+    <div
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-0 z-30 overflow-hidden"
+      style={{
+        // Calm during answering, full on reward moments — settles smoothly.
+        opacity: dimmed ? 0.22 : 1,
+        transition: "opacity 600ms ease",
+      }}
+    >
       <style jsx>{`
         @keyframes surgePulse { 0%, 100% { opacity: 0.75; } 50% { opacity: 1; } }
         @keyframes surgeFloat {

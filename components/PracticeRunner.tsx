@@ -935,7 +935,7 @@ export function PracticeRunner({
         }`}
       />
 
-      <SurgeAmbience comboCount={comboCount} realmId={realmId} />
+      <SurgeAmbience comboCount={comboCount} realmId={realmId} dimmed={status !== "correct"} />
       <ComboActivation comboCount={comboCount} realmId={realmId} />
       <NexusActivation comboCount={comboCount} realmId={realmId} />
       {brainBreakVillain && (
