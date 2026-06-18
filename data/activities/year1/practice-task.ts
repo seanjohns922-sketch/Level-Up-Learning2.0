@@ -548,6 +548,8 @@ export type PracticeTask = (
       badgeLabel?: string;
       /** Non-interactive teaching demo: auto-animates tip-left/right/level. */
       demo?: boolean;
+      /** "Recognise" mode: a pre-set scale the student judges Balanced / Not. */
+      judge?: boolean;
       /** Items already resting on each pan. */
       leftItems: Array<{ id: string; label: string; icon: string; weight: number }>;
       rightItems: Array<{ id: string; label: string; icon: string; weight: number }>;

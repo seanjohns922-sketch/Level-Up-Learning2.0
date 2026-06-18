@@ -57,12 +57,14 @@ function Scale({
   leftWeight,
   rightWeight,
   onRemove,
+  hideVerdict = false,
 }: {
   leftItems: BalanceItem[];
   rightItems: BalanceItem[];
   leftWeight: number;
   rightWeight: number;
   onRemove?: (side: "left" | "right", index: number) => void;
+  hideVerdict?: boolean;
 }) {
   const diff = rightWeight - leftWeight; // >0 → right heavier (right drops)
   const angle = Math.max(-16, Math.min(16, diff * 6));
@@ -113,7 +115,7 @@ function Scale({
       {/* fulcrum */}
       <div className="mx-auto mt-1 h-0 w-0" style={{ borderLeft: "18px solid transparent", borderRight: "18px solid transparent", borderBottom: "26px solid #8a5a16" }} />
       <div className="mx-auto h-2 w-28 rounded-full bg-[#8a5a16]" />
-      {balanced ? (
+      {hideVerdict ? null : balanced ? (
         <div className="mt-2 text-center text-sm font-black uppercase tracking-[0.16em] text-[#0f766e]">⚖️ Balanced!</div>
       ) : (
         <div className="mt-2 text-center text-sm font-black uppercase tracking-[0.16em] text-[#9f1239]">
@@ -168,6 +170,45 @@ function DemoScene({ task, onCorrect }: { task: BalanceTask; onCorrect: () => vo
   );
 }
 
+/* ── Recognise: judge a pre-set scale as Balanced / Not Balanced ── */
+function JudgeScene({ task, onCorrect, onWrong }: { task: BalanceTask; onCorrect: () => void; onWrong: () => void }) {
+  const [locked, setLocked] = useState(false);
+  const lw = sumWeight(task.leftItems);
+  const rw = sumWeight(task.rightItems);
+  const isBalanced = lw === rw;
+
+  function answer(saidBalanced: boolean) {
+    if (locked) return;
+    setLocked(true);
+    const correct = saidBalanced === isBalanced;
+    window.setTimeout(() => (correct ? onCorrect() : onWrong()), 650);
+  }
+
+  return (
+    <Shell badge={task.badgeLabel ?? "Balanced or Not?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <Scale leftItems={task.leftItems} rightItems={task.rightItems} leftWeight={lw} rightWeight={rw} hideVerdict />
+      <div className="grid grid-cols-2 gap-3">
+        <button
+          type="button"
+          onClick={() => answer(true)}
+          disabled={locked}
+          className="flex min-h-[88px] items-center justify-center gap-2 rounded-[24px] border-2 border-[rgba(94,234,212,0.6)] bg-[rgba(204,251,241,0.4)] text-xl font-black text-[#0f766e] shadow-sm transition hover:-translate-y-1 active:scale-[0.98] disabled:opacity-50"
+        >
+          <span className="text-4xl">⚖️</span> Balanced
+        </button>
+        <button
+          type="button"
+          onClick={() => answer(false)}
+          disabled={locked}
+          className="flex min-h-[88px] items-center justify-center gap-2 rounded-[24px] border-2 border-[rgba(214,184,108,0.6)] bg-[#fffaf0] text-xl font-black text-[#9f1239] shadow-sm transition hover:-translate-y-1 active:scale-[0.98] disabled:opacity-50"
+        >
+          <span className="text-4xl">↔️</span> Not Balanced
+        </button>
+      </div>
+    </Shell>
+  );
+}
+
 export function MeasurelandsBalanceScaleCard({
   task,
   onCorrect,
@@ -178,6 +219,7 @@ export function MeasurelandsBalanceScaleCard({
   onWrong: () => void;
 }) {
   if (task.demo) return <DemoScene task={task} onCorrect={onCorrect} />;
+  if (task.judge) return <JudgeScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 
   const isPile = task.supply.mode === "pile";
   const unit = task.supply.items[0]!;
@@ -261,7 +303,7 @@ export function MeasurelandsBalanceScaleCard({
               disabled={locked}
               className="flex min-h-[110px] flex-col items-center justify-center gap-2 rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] shadow-sm transition hover:-translate-y-1 active:scale-[0.98] disabled:opacity-50"
             >
-              <span className="text-5xl">{candidate.icon}</span>
+              <span className="flex max-w-full flex-wrap items-center justify-center gap-0.5 text-3xl leading-none sm:text-4xl">{candidate.icon}</span>
               <span className="text-xs font-black uppercase tracking-[0.12em] text-[#5f4725]">{candidate.label}</span>
             </button>
           ))}
