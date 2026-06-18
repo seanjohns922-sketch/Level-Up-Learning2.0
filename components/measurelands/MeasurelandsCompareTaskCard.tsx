@@ -122,7 +122,10 @@ function CompareVisual({
   const fillLength = Math.round((item.compareValue / 10) * trackSize);
   const fillHeight = Math.round((item.compareValue / 10) * (compact ? 122 : 150));
   const massTrackSize = compact ? 118 : 146;
-  const massFillLength = Math.max(Math.round((item.compareValue / 10) * massTrackSize), compact ? 40 : 54);
+  const massFillLength = Math.max(
+    Math.round((item.compareValue / 10) * massTrackSize),
+    compact ? 12 : 16,
+  );
   const massPanDrop = Math.round((item.compareValue / 10) * (compact ? 12 : 16));
 
   return (
