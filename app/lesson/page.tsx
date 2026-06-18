@@ -330,6 +330,22 @@ function LessonPage() {
     [realmId, year]
   );
 
+  // "What's next" after this lesson: next lesson → weekly quiz → post-test.
+  const nextUpLabel = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const weeks = (lessonProgram as any) ?? [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const weekPlan = Array.isArray(weeks) ? weeks.find((w: any) => w?.week === week) : null;
+    const lessons = weekPlan?.lessons ?? [];
+    if (lessonNumber < 3) {
+      const next = lessons[lessonNumber];
+      const title = next?.displayTitle ?? next?.title;
+      return title ? `Lesson ${lessonNumber + 1}: ${title}` : `Lesson ${lessonNumber + 1}`;
+    }
+    const lastWeek = Array.isArray(weeks) && weeks.length ? weeks.length : 12;
+    return week >= lastWeek ? "the Post-Test" : "this week's Quiz";
+  }, [lessonProgram, week, lessonNumber]);
+
   const [startedLessonId, setStartedLessonId] = useState<string | null>(null);
 
   // Teacher-set brain-break frequency (per-student override → class default →
@@ -1134,6 +1150,7 @@ function LessonPage() {
               realmId={realmId}
               levelNumber={levelNumber}
               practisedSkills={getLessonPractisedSkills(effectiveLessonId)}
+              nextUpLabel={nextUpLabel}
               brainBreakFrequency={brainBreakFrequency}
               renderCompletionCard={
                 isMeasurement
@@ -1223,6 +1240,7 @@ function LessonPage() {
                   realmId={realmId}
                   levelNumber={levelNumber}
                   practisedSkills={getLessonPractisedSkills(lessonMeta.id)}
+                  nextUpLabel={nextUpLabel}
                   brainBreakFrequency={brainBreakFrequency}
                   renderCompletionCard={
                     showWeek12Lesson3Summary

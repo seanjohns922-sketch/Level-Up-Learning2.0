@@ -234,6 +234,7 @@ export function PracticeRunner({
   realmId,
   levelNumber,
   practisedSkills,
+  nextUpLabel,
   brainBreakFrequency = "normal",
 }: {
   minutes?: number;
@@ -253,6 +254,7 @@ export function PracticeRunner({
   realmId?: string;
   levelNumber?: number;
   practisedSkills?: string[];
+  nextUpLabel?: string;
   brainBreakFrequency?: BrainBreakFrequency;
 }) {
   const isMeasurement = realmId === "measurement";
@@ -853,6 +855,7 @@ export function PracticeRunner({
           correctAnswers={safeCorrectAnswers}
           bestChain={bestChainRef.current}
           practisedSkills={practisedSkills}
+          nextUpLabel={nextUpLabel}
           realmId={realmId}
           onComplete={() => {
             setReflectionDone(true);

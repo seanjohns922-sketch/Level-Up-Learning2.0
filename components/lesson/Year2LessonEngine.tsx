@@ -474,6 +474,7 @@ export function Year2LessonEngine({
   realmId,
   levelNumber,
   practisedSkills,
+  nextUpLabel,
   brainBreakFrequency = "normal",
 }: {
   lesson: Lesson;
@@ -485,6 +486,7 @@ export function Year2LessonEngine({
   realmId?: string;
   levelNumber?: number;
   practisedSkills?: string[];
+  nextUpLabel?: string;
   brainBreakFrequency?: BrainBreakFrequency;
 }) {
   const isMeasurement = realmId === "measurement";
@@ -970,6 +972,7 @@ export function Year2LessonEngine({
           correctAnswers={correctAnswers}
           bestChain={Math.max(bestChainRef.current, comboCount)}
           practisedSkills={practisedSkills}
+          nextUpLabel={nextUpLabel}
           realmId={realmId}
           onComplete={() => {
             setReflectionDone(true);

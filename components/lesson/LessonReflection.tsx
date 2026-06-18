@@ -43,6 +43,8 @@ type Props = {
   /** Optional per-lesson skill bullets ("Finding the shortest object", …).
    *  Falls back to a single "Today you practised <lessonTitle>" line. */
   practisedSkills?: string[];
+  /** What the student unlocks / does next, e.g. "Lesson 2" or "This week's Quiz". */
+  nextUpLabel?: string;
   realmId?: string;
   onComplete: () => void;
 };
@@ -178,6 +180,7 @@ export default function LessonReflection({
   correctAnswers,
   bestChain = 0,
   practisedSkills,
+  nextUpLabel,
   realmId,
   onComplete,
 }: Props) {
@@ -281,13 +284,19 @@ export default function LessonReflection({
 
           <StatChips xp={xp} chain={bestChain} accuracy={accuracy} />
 
+          {nextUpLabel ? (
+            <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-teal-300/30 bg-teal-400/10 px-4 py-2 text-sm font-bold text-teal-100">
+              ⏭️ Next up: <span className="font-black text-white">{nextUpLabel}</span>
+            </div>
+          ) : null}
+
           <button
             onClick={() => finishWith(null, null)}
             disabled={saving}
-            className="mt-6 w-full rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-500 px-6 py-4 text-base font-extrabold text-white transition hover:from-teal-400 hover:to-emerald-400 active:scale-[0.98] disabled:opacity-60"
+            className="mt-4 w-full rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-500 px-6 py-4 text-base font-extrabold text-white transition hover:from-teal-400 hover:to-emerald-400 active:scale-[0.98] disabled:opacity-60"
             style={{ boxShadow: "0 10px 30px -8px rgba(16,185,129,0.5)" }}
           >
-            Continue →
+            {nextUpLabel ? `Continue to ${nextUpLabel} →` : "Continue →"}
           </button>
         </div>
       </div>
@@ -322,6 +331,12 @@ export default function LessonReflection({
             ) : null}
 
             <StatChips xp={xp} chain={bestChain} accuracy={accuracy} />
+
+            {nextUpLabel ? (
+              <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-teal-300/30 bg-teal-400/10 px-4 py-1.5 text-sm font-bold text-teal-100">
+                ⏭️ Next up: <span className="font-black text-white">{nextUpLabel}</span>
+              </div>
+            ) : null}
 
             <div className="mt-7 text-base font-bold text-white">
               How confident do you feel now?
@@ -381,9 +396,9 @@ export default function LessonReflection({
             <button
               onClick={() => finishWith(confidence, null)}
               disabled={saving}
-              className="mt-5 text-[11px] font-semibold text-teal-400/50 transition hover:text-teal-400/80 disabled:opacity-30"
+              className="mt-5 w-full rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-500 px-6 py-3.5 text-sm font-extrabold text-white transition hover:from-teal-400 hover:to-emerald-400 active:scale-[0.98] disabled:opacity-60"
             >
-              Skip
+              {nextUpLabel ? `Continue to ${nextUpLabel} →` : "Continue →"}
             </button>
           </>
         )}

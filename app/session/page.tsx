@@ -8605,7 +8605,10 @@ function SessionPage({
                       "inset 0 1px 0 rgba(251,191,36,0.2), inset 0 -10px 20px rgba(0,0,0,0.45)",
                   }}
                 >
-                  🎉 Congratulations — you’re one step closer to unlocking your Level Up Legend!
+                  🎉 You passed! Week {Math.min(12, Number(week) + 1)} is unlocked.
+                  <div className="mt-1 font-semibold text-amber-100/80">
+                    ⏭️ Next up: tap “Go to Week {Math.min(12, Number(week) + 1)}” below.
+                  </div>
                 </div>
               </div>
             ) : null}
