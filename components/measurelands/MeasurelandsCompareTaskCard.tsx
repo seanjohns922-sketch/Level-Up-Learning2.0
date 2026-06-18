@@ -117,6 +117,9 @@ function CompareVisual({
   const trackSize = compact ? 152 : 188;
   const fillLength = Math.round((item.compareValue / 10) * trackSize);
   const fillHeight = Math.round((item.compareValue / 10) * (compact ? 122 : 150));
+  const massTrackSize = compact ? 118 : 146;
+  const massFillLength = Math.max(Math.round((item.compareValue / 10) * massTrackSize), compact ? 40 : 54);
+  const massPanDrop = Math.round((item.compareValue / 10) * (compact ? 12 : 16));
 
   return (
     <div
@@ -128,17 +131,40 @@ function CompareVisual({
       }}
     >
       {axis === "mass" ? (
-        // Mass: the object itself conveys weight (a brick is heavy, a feather is
-        // light) — no proportional bar. Show it big on a little scale pan.
+        // For mass, use the bar and pan position as a gentle clue:
+        // heavier objects get a longer weight bar and sit slightly lower.
         <div className="flex h-[160px] flex-col items-center justify-end">
-          <div className={compact ? "text-6xl" : "text-7xl sm:text-8xl"}>{item.icon}</div>
+          <div
+            className={compact ? "text-6xl" : "text-7xl sm:text-8xl"}
+            style={{ transform: `translateY(${massPanDrop}px)` }}
+          >
+            {item.icon}
+          </div>
           <div className="mb-3 mt-2 text-sm font-black uppercase tracking-[0.14em] text-[#5f4725]">
             {item.label}
           </div>
-          <div
-            className="rounded-b-[14px] rounded-t-[6px]"
-            style={{ width: compact ? 96 : 120, height: 12, background: accent.fill, boxShadow: accent.glow }}
-          />
+          <div className="flex w-full max-w-[180px] flex-col items-center gap-2">
+            <div className="mx-auto h-3 w-full rounded-full bg-[rgba(120,53,15,0.1)]">
+              <div
+                className="h-3 rounded-full"
+                style={{
+                  width: massFillLength,
+                  background: accent.fill,
+                  boxShadow: accent.glow,
+                }}
+              />
+            </div>
+            <div
+              className="rounded-b-[14px] rounded-t-[6px] transition-all"
+              style={{
+                width: compact ? 96 : 120,
+                height: 12,
+                background: accent.fill,
+                boxShadow: accent.glow,
+                transform: `translateY(${Math.round(massPanDrop * 0.35)}px)`,
+              }}
+            />
+          </div>
         </div>
       ) : (
         <>
