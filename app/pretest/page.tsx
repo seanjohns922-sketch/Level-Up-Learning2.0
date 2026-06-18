@@ -320,6 +320,7 @@ function PretestPage() {
   const searchParams = useSearchParams();
   const year = searchParams.get("year") ?? "Year 3";
   const realmId = searchParams.get("realm_id") ?? "number";
+  const theme = getRealmTheme(realmId);
   const studentLevelLabel = formatStudentLevelLabel(year);
 
   useEffect(() => {
