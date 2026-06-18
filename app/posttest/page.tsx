@@ -293,6 +293,8 @@ function PostTestPage() {
   const router = useRouter();
   const params = useSearchParams();
   const year = params.get("year") ?? "Year 3";
+  const realmId = params.get("realm_id") ?? undefined;
+  const theme = getRealmTheme(realmId);
   const studentLevelLabel = formatStudentLevelLabel(year);
 
   const test = useMemo(() => {
