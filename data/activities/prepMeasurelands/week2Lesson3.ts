@@ -1,16 +1,16 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
 
 // ── Measurelands · Ground · Week 2 · Lesson 3 — "Balance the Scales" ──
-// AC9MFM01 (Ground): discover equivalence — same weight → the scale balances.
-// All activities are configs of the reusable balanceScale toy, mapped to a
-// thinking progression so the lesson asks for MORE than "click until it works":
-//   A · Tip Fixer        — EXPERIMENT  (pile: add smalls to fix a tilt)
-//   B · Perfect Partner  — PREDICT     (shelf: pick the object that matches)
-//   C · Balanced or Not? — RECOGNISE   (judge a pre-set scale)
-//   D · Which Load?       — PROBLEM-SOLVE(shelf: pick the load that balances)
-// Only Tip Fixer is open-ended (Stage-1 discovery); B/C/D are single-decision,
-// so students must think, not spam. Weights are abstract whole units
-// (small 1 / medium 2 / large 3), never shown. Everyday, instantly-known objects.
+// AC9MFM01 (Ground): balanced / not balanced / same weight — using real-world
+// intuition only. Balance ALWAYS comes from the SAME object on both sides
+// (same object = same weight = balanced). No hidden cross-object equivalence
+// (no "pumpkin = 3 leaves") — that belongs to later levels and breaks a
+// Foundation child's real-world trust. Every distinct object has a distinct
+// weight (never shown), so the only way to balance is to match identical
+// objects. Three activities, all configs of the reusable balanceScale toy:
+//   A · Find the Balanced Scale — RECOGNISE (tap the scale that matches)
+//   B · Match the Object        — PREDICT   (pick the same object)
+//   C · Fix the Scale           — PROBLEM-SOLVE (choose the fix)
 
 type BalanceTask = Extract<PracticeTask, { kind: "balanceScale" }>;
 type Item = BalanceTask["leftItems"][number];
@@ -18,7 +18,7 @@ type Item = BalanceTask["leftItems"][number];
 type LessonMemory = { introShown: boolean; cursor: number; lastKey: string | null };
 
 const lessonMemory = new Map<string, LessonMemory>();
-const ROTATION: Array<"A" | "B" | "C" | "D"> = ["A", "B", "C", "D"];
+const ROTATION: Array<"A" | "B" | "C"> = ["A", "B", "C"];
 const DIFFICULTY_CYCLE: Difficulty[] = ["easy", "medium", "hard"];
 
 function getMemory(lessonId: string): LessonMemory {
@@ -40,55 +40,38 @@ function shuffle<T>(items: T[]): T[] {
   }
   return next;
 }
-function choose<T>(items: T[]): T {
-  return items[randInt(items.length)]!;
+
+// Everyday objects, each with a DISTINCT (hidden) weight roughly following
+// real-world mass — so different objects never accidentally balance, and any
+// tilt the child sees looks believable.
+type Obj = { id: string; label: string; icon: string; weight: number };
+const OBJECTS: Obj[] = [
+  { id: "leaf", label: "Leaf", icon: "🍃", weight: 1 },
+  { id: "pencil", label: "Pencil", icon: "✏️", weight: 2 },
+  { id: "crayon", label: "Crayon", icon: "🖍️", weight: 3 },
+  { id: "spoon", label: "Spoon", icon: "🥄", weight: 4 },
+  { id: "tennis", label: "Tennis Ball", icon: "🎾", weight: 5 },
+  { id: "banana", label: "Banana", icon: "🍌", weight: 6 },
+  { id: "apple", label: "Apple", icon: "🍎", weight: 7 },
+  { id: "orange", label: "Orange", icon: "🍊", weight: 8 },
+  { id: "mug", label: "Mug", icon: "☕", weight: 9 },
+  { id: "shoe", label: "Shoe", icon: "👟", weight: 10 },
+  { id: "book", label: "Book", icon: "📕", weight: 11 },
+  { id: "soccer", label: "Soccer Ball", icon: "⚽", weight: 12 },
+  { id: "teddy", label: "Teddy", icon: "🧸", weight: 13 },
+  { id: "basketball", label: "Basketball", icon: "🏀", weight: 14 },
+  { id: "backpack", label: "Backpack", icon: "🎒", weight: 15 },
+  { id: "boot", label: "Boot", icon: "🥾", weight: 16 },
+  { id: "pumpkin", label: "Pumpkin", icon: "🎃", weight: 17 },
+  { id: "watermelon", label: "Watermelon", icon: "🍉", weight: 18 },
+  { id: "rock", label: "Rock", icon: "🪨", weight: 19 },
+];
+
+function pickDistinct(n: number): Obj[] {
+  return shuffle(OBJECTS).slice(0, n);
 }
-
-type Thing = { id: string; label: string; icon: string };
-
-// Everyday, instantly-recognisable objects, grouped by mass tier.
-const SMALL: Thing[] = [
-  { id: "leaf", label: "Leaf", icon: "🍃" },
-  { id: "pencil", label: "Pencil", icon: "✏️" },
-  { id: "crayon", label: "Crayon", icon: "🖍️" },
-  { id: "spoon", label: "Spoon", icon: "🥄" },
-  { id: "tennisball", label: "Tennis Ball", icon: "🎾" },
-  { id: "stick", label: "Stick", icon: "🪵" },
-];
-const MEDIUM: Thing[] = [
-  { id: "apple", label: "Apple", icon: "🍎" },
-  { id: "orange", label: "Orange", icon: "🍊" },
-  { id: "banana", label: "Banana", icon: "🍌" },
-  { id: "carrot", label: "Carrot", icon: "🥕" },
-  { id: "mug", label: "Mug", icon: "☕" },
-  { id: "book", label: "Book", icon: "📕" },
-  { id: "soccer", label: "Soccer Ball", icon: "⚽" },
-  { id: "shoe", label: "Shoe", icon: "👟" },
-  { id: "teddy", label: "Teddy", icon: "🧸" },
-];
-const LARGE: Thing[] = [
-  { id: "watermelon", label: "Watermelon", icon: "🍉" },
-  { id: "pumpkin", label: "Pumpkin", icon: "🎃" },
-  { id: "backpack", label: "Backpack", icon: "🎒" },
-  { id: "basketball", label: "Basketball", icon: "🏀" },
-  { id: "rock", label: "Rock", icon: "🪨" },
-  { id: "boot", label: "Boot", icon: "🥾" },
-];
-
-const TIER = { 1: SMALL, 2: MEDIUM, 3: LARGE } as const;
-
-function mk(thing: Thing, weight: number, suffix = ""): Item {
-  return { id: `${thing.id}${suffix}`, label: thing.label, icon: thing.icon, weight };
-}
-
-// A bundled load of `count` identical smalls (one shelf option, no spam).
-function load(unit: Thing, count: number): Item {
-  return {
-    id: `load-${unit.id}-${count}`,
-    label: `${count} ${unit.label}${count > 1 ? "s" : ""}`,
-    icon: unit.icon.repeat(count),
-    weight: count,
-  };
+function item(obj: Obj, suffix = ""): Item {
+  return { id: `${obj.id}${suffix}`, label: obj.label, icon: obj.icon, weight: obj.weight };
 }
 
 function buildIntroTask(): BalanceTask {
@@ -97,122 +80,96 @@ function buildIntroTask(): BalanceTask {
     demo: true,
     prompt: "Let’s balance the scales!",
     speakText:
-      "These are the Balance Basin scales. When one side is heavier, it drops down. When both sides weigh the same, the scale balances and stays level. Let's make some balance!",
+      "These are the Balance Basin scales. When one side is heavier, it drops down. When both sides have the same thing, the scale balances and stays level. Let's find the balanced scales!",
     badgeLabel: "Meazurex Mission",
     leftItems: [],
     rightItems: [],
     target: "right",
-    supply: { mode: "pile", items: [mk(SMALL[0]!, 1)] },
+    supply: { mode: "pile", items: [item(OBJECTS[0]!)] },
     feedback: { correct: "Let's balance!", wrong: "Let's get ready." },
   };
 }
 
-// A · Tip Fixer — EXPERIMENT (pile). Heavy object vs a few smalls; add to the
-// light side until it balances. Open-ended discovery; low cognitive load.
-function buildTipFixer(memory: LessonMemory, diff: Difficulty): BalanceTask {
-  const heavyWeight = diff === "easy" ? 2 : 3;
-  const heavy = mk(choose(TIER[heavyWeight as 2 | 3]), heavyWeight);
-  const small = choose(SMALL);
-  const start = 1 + randInt(heavyWeight - 1);
-  const startItems = Array.from({ length: start }, (_, i) => mk(small, 1, `-base${i}`));
-  const adds = heavyWeight - start;
-  memory.lastKey = `A-${heavy.id}`;
-  return {
-    kind: "balanceScale",
-    prompt: "Make the scale balance!",
-    speakText: "One side is heavier. Add to the lighter side until the scale balances.",
-    badgeLabel: "Tip Fixer",
-    leftItems: [heavy],
-    rightItems: startItems,
-    target: "right",
-    supply: { mode: "pile", items: [mk(small, 1)], maxAdds: diff === "hard" ? adds : adds + 2 },
-    feedback: { correct: "You balanced it!", wrong: "Watch the beam and keep adding." },
-  };
-}
+// A · Find the Balanced Scale — RECOGNISE. Several mini-scales; exactly one has
+// the same object on both sides (balanced). Tap it.
+function buildFind(memory: LessonMemory, diff: Difficulty): BalanceTask {
+  const count = diff === "easy" ? 3 : 4;
+  const objs = pickDistinct(count + 1); // 1 for the balanced pair + one per other scale
+  const balancedObj = objs[0]!;
 
-// B · Perfect Partner — PREDICT (shelf). Pick the ONE object that weighs the
-// same, before touching the scale.
-function buildPerfectPartner(memory: LessonMemory, diff: Difficulty): BalanceTask {
-  const w = (diff === "easy" ? choose([1, 2]) : choose([2, 3])) as 1 | 2 | 3;
-  const pool = TIER[w];
-  const left = choose(pool);
-  let partner = choose(pool);
-  let guard = 0;
-  while (partner.id === left.id && guard++ < 20) partner = choose(pool);
-  memory.lastKey = `B-${left.id}`;
+  const scales: NonNullable<BalanceTask["scales"]> = [];
+  const balancedId = "scale-balanced";
+  scales.push({ id: balancedId, left: [item(balancedObj, "-l")], right: [item(balancedObj, "-r")] });
 
-  const otherWeights = ([1, 2, 3] as Array<1 | 2 | 3>).filter((x) => x !== w);
-  const distractors = otherWeights.map((dw) => mk(choose(TIER[dw]), dw, `-d${dw}`));
-  const candidates = shuffle([mk(partner, w, "-ok"), ...distractors]);
-
-  return {
-    kind: "balanceScale",
-    prompt: "Which one will balance the scale?",
-    speakText: "Look first. Pick the object that weighs the same so the scale balances.",
-    badgeLabel: "Perfect Partner",
-    leftItems: [mk(left, w)],
-    rightItems: [],
-    target: "right",
-    supply: { mode: "shelf", items: candidates },
-    feedback: { correct: "Perfect match — it balances!", wrong: "Look at the beam — try one that weighs the same." },
-  };
-}
-
-// C · Balanced or Not? — RECOGNISE (judge). A pre-set scale; is it balanced?
-function buildJudge(memory: LessonMemory, diff: Difficulty): BalanceTask {
-  const balanced = Math.random() < 0.5;
-  const w = choose([1, 2, 3]) as 1 | 2 | 3;
-  const leftObj = mk(choose(TIER[w]), w, "-L");
-
-  let rightItems: Item[];
-  if (balanced) {
-    let partner = choose(TIER[w]);
-    let guard = 0;
-    while (partner.id === leftObj.id.replace("-L", "") && guard++ < 20) partner = choose(TIER[w]);
-    rightItems = [mk(partner, w, "-R")];
-  } else {
-    const gap = diff === "easy" ? 2 : 1; // easy tilts are more obvious
-    const otherW = Math.max(1, Math.min(3, w + (Math.random() < 0.5 ? gap : -gap))) as 1 | 2 | 3;
-    const safeW = (otherW === w ? ((w === 1 ? 3 : 1) as 1 | 2 | 3) : otherW);
-    rightItems = [mk(choose(TIER[safeW]), safeW, "-R")];
+  // Each other scale shows two DIFFERENT objects (always tilted, never balanced).
+  for (let i = 1; i < count; i += 1) {
+    const a = objs[i]!;
+    const b = objs[(i % count) + 1] ?? objs[0]!;
+    const left = a;
+    const right = b.id === a.id ? balancedObj : b;
+    scales.push({ id: `scale-${i}`, left: [item(left, `-l${i}`)], right: [item(right, `-r${i}`)] });
   }
-  memory.lastKey = `C-${leftObj.id}-${balanced}`;
+  memory.lastKey = `A-${balancedObj.id}`;
 
   return {
     kind: "balanceScale",
-    judge: true,
-    prompt: "Is this scale balanced?",
-    speakText: "Look at the scale. Is it balanced, or not balanced?",
-    badgeLabel: "Balanced or Not?",
-    leftItems: [leftObj],
-    rightItems,
+    prompt: "Which scale is balanced?",
+    speakText: "Find the scale that is balanced. Both sides must be the same.",
+    badgeLabel: "Find the Balanced Scale",
+    leftItems: [],
+    rightItems: [],
     target: "right",
     supply: { mode: "shelf", items: [] },
-    feedback: { correct: "Great looking!", wrong: "Look again — does it sit level?" },
+    scales: shuffle(scales),
+    correctScaleId: balancedId,
+    feedback: { correct: "That one is balanced!", wrong: "Look for two that are the same." },
   };
 }
 
-// D · Which Load? — PROBLEM-SOLVE (shelf). Pick the bundle of smalls that
-// balances the heavy object. One reasoned choice, no spam.
-function buildWhichLoad(memory: LessonMemory, diff: Difficulty): BalanceTask {
-  const heavyWeight = diff === "easy" ? 2 : 3;
-  const heavy = mk(choose(TIER[heavyWeight as 2 | 3]), heavyWeight);
-  const unit = choose(SMALL);
-  memory.lastKey = `D-${heavy.id}`;
-
-  const counts = [heavyWeight, heavyWeight - 1, heavyWeight + 1].filter((c) => c >= 1);
-  const candidates = shuffle(counts.map((c) => load(unit, c)));
+// B · Match the Object — PREDICT. Left has an object; pick the SAME object so
+// the scale balances. (Distractors are different objects → they tip.)
+function buildMatch(memory: LessonMemory, _diff: Difficulty): BalanceTask {
+  const [target, d1, d2] = pickDistinct(3);
+  memory.lastKey = `B-${target!.id}`;
+  const candidates = shuffle([item(target!, "-ok"), item(d1!, "-d1"), item(d2!, "-d2")]);
 
   return {
     kind: "balanceScale",
-    prompt: "Which load balances it?",
-    speakText: "Pick the load that weighs the same, so the scale balances.",
-    badgeLabel: "Which Load?",
-    leftItems: [heavy],
+    prompt: "Which one balances the scale?",
+    speakText: "Pick the object that is the same, so the scale balances.",
+    badgeLabel: "Match the Object",
+    leftItems: [item(target!, "-L")],
     rightItems: [],
     target: "right",
-    supply: { mode: "shelf", items: candidates },
-    feedback: { correct: "You worked it out — balanced!", wrong: "Think how many it takes to match." },
+    supply: { mode: "shelf", items: candidates }, // shelf balances on equal weight = same object
+    feedback: { correct: "Same object — it balances!", wrong: "Pick the one that is the same." },
+  };
+}
+
+// C · Fix the Scale — PROBLEM-SOLVE. One side matches; the other has the same
+// object PLUS an extra. Choose the action that balances it (take off the extra).
+function buildFix(memory: LessonMemory, _diff: Difficulty): BalanceTask {
+  const [base, extra, other] = pickDistinct(3);
+  memory.lastKey = `C-${base!.id}-${extra!.id}`;
+
+  const actions = shuffle([
+    { id: "fix", label: `Take off`, icon: extra!.icon },        // remove the extra → balances
+    { id: `add-${other!.id}`, label: `Add`, icon: other!.icon }, // add a different object → no
+    { id: `add-${base!.id}`, label: `Add`, icon: base!.icon },   // add another base → no
+  ]);
+
+  return {
+    kind: "balanceScale",
+    prompt: "One side is too heavy. What will fix it?",
+    speakText: "One side has something extra. Choose what will make it balance.",
+    badgeLabel: "Fix the Scale",
+    leftItems: [item(base!, "-L")],
+    rightItems: [item(base!, "-Rbase"), item(extra!, "-Rextra")],
+    target: "right",
+    supply: { mode: "shelf", items: [] },
+    fixActions: actions,
+    correctFixId: "fix",
+    feedback: { correct: "Balanced — you fixed it!", wrong: "Take off the one that doesn't match." },
   };
 }
 
@@ -230,10 +187,9 @@ export function generatePrepMeasurelandsWeek2Lesson3Task(
   const diff = DIFFICULTY_CYCLE[memory.cursor % DIFFICULTY_CYCLE.length]!;
   memory.cursor += 1;
 
-  if (rotation === "A") return buildTipFixer(memory, diff);
-  if (rotation === "B") return buildPerfectPartner(memory, diff);
-  if (rotation === "C") return buildJudge(memory, diff);
-  return buildWhichLoad(memory, diff);
+  if (rotation === "A") return buildFind(memory, diff);
+  if (rotation === "B") return buildMatch(memory, diff);
+  return buildFix(memory, diff);
 }
 
 export function resetPrepMeasurelandsWeek2Lesson3TaskSessionState() {

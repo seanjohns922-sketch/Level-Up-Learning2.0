@@ -550,6 +550,16 @@ export type PracticeTask = (
       demo?: boolean;
       /** "Recognise" mode: a pre-set scale the student judges Balanced / Not. */
       judge?: boolean;
+      /** "Find the balanced scale": several mini-scales; tap the balanced one. */
+      scales?: Array<{
+        id: string;
+        left: Array<{ id: string; label: string; icon: string; weight: number }>;
+        right: Array<{ id: string; label: string; icon: string; weight: number }>;
+      }>;
+      correctScaleId?: string;
+      /** "Fix the scale": pick the action (add/remove) that balances it. */
+      fixActions?: Array<{ id: string; label: string; icon?: string }>;
+      correctFixId?: string;
       /** Items already resting on each pan. */
       leftItems: Array<{ id: string; label: string; icon: string; weight: number }>;
       rightItems: Array<{ id: string; label: string; icon: string; weight: number }>;

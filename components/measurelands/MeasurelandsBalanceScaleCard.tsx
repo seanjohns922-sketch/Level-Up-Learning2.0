@@ -129,19 +129,19 @@ function Scale({
 /* ── Teaching demo: auto-cycles heavier-left → heavier-right → balanced ── */
 const DEMO_STATES: Array<{ left: BalanceItem[]; right: BalanceItem[]; caption: string }> = [
   {
-    left: [{ id: "d-rock", label: "Rock", icon: "🪨", weight: 3 }],
-    right: [{ id: "d-feather", label: "Feather", icon: "🪶", weight: 1 }],
-    caption: "The left side is heavier — it drops down.",
+    left: [{ id: "d-rock", label: "Rock", icon: "🪨", weight: 9 }],
+    right: [{ id: "d-leaf", label: "Leaf", icon: "🍃", weight: 1 }],
+    caption: "The rock is heavier — it drops down.",
   },
   {
-    left: [{ id: "d-leaf", label: "Leaf", icon: "🍃", weight: 1 }],
-    right: [{ id: "d-melon", label: "Watermelon", icon: "🍉", weight: 3 }],
-    caption: "The right side is heavier now.",
+    left: [{ id: "d-leaf2", label: "Leaf", icon: "🍃", weight: 1 }],
+    right: [{ id: "d-melon", label: "Watermelon", icon: "🍉", weight: 9 }],
+    caption: "Now the watermelon is heavier.",
   },
   {
-    left: [{ id: "d-a1", label: "Apple", icon: "🍎", weight: 2 }],
-    right: [{ id: "d-a2", label: "Apple", icon: "🍎", weight: 2 }],
-    caption: "Both sides weigh the same — it balances!",
+    left: [{ id: "d-a1", label: "Apple", icon: "🍎", weight: 4 }],
+    right: [{ id: "d-a2", label: "Apple", icon: "🍎", weight: 4 }],
+    caption: "Two apples are the same — it balances!",
   },
 ];
 
@@ -209,6 +209,83 @@ function JudgeScene({ task, onCorrect, onWrong }: { task: BalanceTask; onCorrect
   );
 }
 
+/* ── A small non-interactive scale for the "find the balanced one" grid ── */
+function MiniScale({ left, right, picked }: { left: BalanceItem[]; right: BalanceItem[]; picked: boolean }) {
+  const diff = sumWeight(right) - sumWeight(left);
+  const angle = Math.max(-14, Math.min(14, diff * 6));
+  return (
+    <div
+      className="rounded-[20px] border-2 p-3"
+      style={{
+        borderColor: picked ? "rgba(94,234,212,0.9)" : "rgba(214,184,108,0.55)",
+        background: picked ? "rgba(204,251,241,0.5)" : "rgba(255,255,255,0.95)",
+      }}
+    >
+      <div className="mx-auto h-2 w-[80%] rounded-full" style={{ background: "linear-gradient(90deg,#b45309,#d6b86c,#b45309)", transform: `rotate(${angle}deg)`, transition: "transform 300ms" }} />
+      <div className="mt-1 flex items-start justify-between">
+        <div className="flex w-[42%] justify-center text-3xl sm:text-4xl" style={{ transform: `translateY(${-angle * 1.4}px)`, transition: "transform 300ms" }}>
+          {left.map((it) => it.icon).join("")}
+        </div>
+        <div className="flex w-[42%] justify-center text-3xl sm:text-4xl" style={{ transform: `translateY(${angle * 1.4}px)`, transition: "transform 300ms" }}>
+          {right.map((it) => it.icon).join("")}
+        </div>
+      </div>
+      <div className="mx-auto mt-1 h-0 w-0" style={{ borderLeft: "12px solid transparent", borderRight: "12px solid transparent", borderBottom: "18px solid #8a5a16" }} />
+    </div>
+  );
+}
+
+/* ── Find the Balanced Scale: tap the one where both sides match ── */
+function PickBalancedScene({ task, onCorrect, onWrong }: { task: BalanceTask; onCorrect: () => void; onWrong: () => void }) {
+  const [pickedId, setPickedId] = useState<string | null>(null);
+  const scales = task.scales ?? [];
+  function pick(id: string) {
+    if (pickedId) return;
+    setPickedId(id);
+    window.setTimeout(() => (id === task.correctScaleId ? onCorrect() : onWrong()), 650);
+  }
+  return (
+    <Shell badge={task.badgeLabel ?? "Find the Balanced Scale"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className={`grid gap-3 ${scales.length >= 4 ? "grid-cols-2" : "grid-cols-1 sm:grid-cols-3"}`}>
+        {scales.map((s) => (
+          <button key={s.id} type="button" onClick={() => pick(s.id)} disabled={pickedId !== null} className="text-left transition hover:-translate-y-1 active:scale-[0.98] disabled:opacity-60">
+            <MiniScale left={s.left} right={s.right} picked={pickedId === s.id} />
+          </button>
+        ))}
+      </div>
+    </Shell>
+  );
+}
+
+/* ── Fix the Scale: pick the action that makes it balance ── */
+function FixScene({ task, onCorrect, onWrong }: { task: BalanceTask; onCorrect: () => void; onWrong: () => void }) {
+  const [locked, setLocked] = useState(false);
+  function choose(id: string) {
+    if (locked) return;
+    setLocked(true);
+    window.setTimeout(() => (id === task.correctFixId ? onCorrect() : onWrong()), 650);
+  }
+  return (
+    <Shell badge={task.badgeLabel ?? "Fix the Scale"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <Scale leftItems={task.leftItems} rightItems={task.rightItems} leftWeight={sumWeight(task.leftItems)} rightWeight={sumWeight(task.rightItems)} hideVerdict />
+      <div className={`grid gap-3 ${(task.fixActions?.length ?? 0) >= 3 ? "grid-cols-3" : "grid-cols-2"}`}>
+        {(task.fixActions ?? []).map((a) => (
+          <button
+            key={a.id}
+            type="button"
+            onClick={() => choose(a.id)}
+            disabled={locked}
+            className="flex min-h-[84px] flex-col items-center justify-center gap-1 rounded-[22px] border-2 border-[rgba(214,184,108,0.6)] bg-[#fffaf0] px-2 text-center text-sm font-black uppercase tracking-[0.1em] text-[#5f4725] shadow-sm transition hover:-translate-y-1 active:scale-[0.98] disabled:opacity-50"
+          >
+            {a.icon ? <span className="text-3xl">{a.icon}</span> : null}
+            {a.label}
+          </button>
+        ))}
+      </div>
+    </Shell>
+  );
+}
+
 export function MeasurelandsBalanceScaleCard({
   task,
   onCorrect,
@@ -220,6 +297,8 @@ export function MeasurelandsBalanceScaleCard({
 }) {
   if (task.demo) return <DemoScene task={task} onCorrect={onCorrect} />;
   if (task.judge) return <JudgeScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scales) return <PickBalancedScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.fixActions) return <FixScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 
   const isPile = task.supply.mode === "pile";
   const unit = task.supply.items[0]!;
