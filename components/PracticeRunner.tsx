@@ -11,6 +11,8 @@ import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { LessonHUDRail } from "@/components/lesson/LessonHUDRail";
 import { LessonCompleteCard } from "@/components/lesson/LessonCompleteCard";
 import LessonReflection from "@/components/lesson/LessonReflection";
+import LessonCoachReview from "@/components/lesson/LessonCoachReview";
+import { buildCoachReview } from "@/lib/lesson-coach";
 import LessonResumeGate from "@/components/lesson/LessonResumeGate";
 import {
   clearLessonResume,
@@ -279,6 +281,7 @@ export function PracticeRunner({
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [comboCount, setComboCount] = useState(0);
+  const [coachDone, setCoachDone] = useState(false);
   const [reflectionDone, setReflectionDone] = useState(false);
   const [attemptLog, setAttemptLog] = useState<
     Array<{ topicLabel: string; correct: boolean; timeSpentSeconds: number }>
@@ -839,9 +842,28 @@ export function PracticeRunner({
 
   // ── Finished state ──
   if (finished) {
-    // Bespoke completion cards (Prep celebration, Week-12 summary) own their own
-    // post-lesson screen. For every other lesson the reflection IS the
-    // celebration / completion screen; its Continue returns to the week page.
+    // Coach Review (performance guidance) shows first for every lesson —
+    // including ones with a bespoke completion card (Prep celebration) — then
+    // the Reflection (celebration + confidence) or that bespoke card follows.
+    if (liveContext && !coachDone) {
+      return (
+        <LessonCoachReview
+          review={buildCoachReview({
+            levelNumber,
+            accuracy,
+            topicSummaries: summary.topicSummaries,
+            strengths: summary.strengths,
+            areasToImprove: summary.areasToImprove,
+            practisedSkills,
+            nextUpLabel,
+            lessonId: liveContext.lessonId,
+          })}
+          levelNumber={levelNumber}
+          realmId={realmId}
+          onContinue={() => setCoachDone(true)}
+        />
+      );
+    }
     if (liveContext && !renderCompletionCard && !reflectionDone) {
       return (
         <LessonReflection

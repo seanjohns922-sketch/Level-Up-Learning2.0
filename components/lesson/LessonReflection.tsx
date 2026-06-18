@@ -179,12 +179,11 @@ export default function LessonReflection({
   questionsAnswered,
   correctAnswers,
   bestChain = 0,
-  practisedSkills,
-  nextUpLabel,
   realmId,
   onComplete,
 }: Props) {
-  const hasSkills = Array.isArray(practisedSkills) && practisedSkills.length > 0;
+  // practisedSkills / nextUpLabel now live on the Coach Review screen; the
+  // Reflection is celebration + confidence only (no performance recap).
   const band = bandFromProps(levelNumber, level);
   const mascot = mascotForRealm(realmId);
   const xp = calcXP(correctAnswers);
@@ -258,25 +257,7 @@ export default function LessonReflection({
           </div>
           <div className="mt-2 text-2xl font-black text-white">Amazing work! 🎉</div>
 
-          {hasSkills ? (
-            <div className="mt-3">
-              <div className="text-sm font-bold text-teal-100/80">Today you practised:</div>
-              <div className="mt-2 inline-flex flex-col items-start gap-1.5 text-left">
-                {practisedSkills!.map((skill) => (
-                  <div key={skill} className="text-base font-semibold text-white">
-                    ✅ {skill}
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="mt-3 text-base text-teal-100/90">
-              Today you practised{" "}
-              <span className="font-extrabold text-white">{lessonTitle}</span> ✅
-            </div>
-          )}
-
-          <div className="mt-3 flex justify-center gap-1.5 text-3xl">
+          <div className="mt-4 flex justify-center gap-1.5 text-3xl">
             {[0, 1, 2].map((i) => (
               <span key={i} style={{ opacity: i < stars ? 1 : 0.2 }}>⭐</span>
             ))}
@@ -284,19 +265,13 @@ export default function LessonReflection({
 
           <StatChips xp={xp} chain={bestChain} accuracy={accuracy} />
 
-          {nextUpLabel ? (
-            <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-teal-300/30 bg-teal-400/10 px-4 py-2 text-sm font-bold text-teal-100">
-              ⏭️ Next up: <span className="font-black text-white">{nextUpLabel}</span>
-            </div>
-          ) : null}
-
           <button
             onClick={() => finishWith(null, null)}
             disabled={saving}
-            className="mt-4 w-full rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-500 px-6 py-4 text-base font-extrabold text-white transition hover:from-teal-400 hover:to-emerald-400 active:scale-[0.98] disabled:opacity-60"
+            className="mt-6 w-full rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-500 px-6 py-4 text-base font-extrabold text-white transition hover:from-teal-400 hover:to-emerald-400 active:scale-[0.98] disabled:opacity-60"
             style={{ boxShadow: "0 10px 30px -8px rgba(16,185,129,0.5)" }}
           >
-            {nextUpLabel ? `Continue to ${nextUpLabel} →` : "Continue →"}
+            Continue →
           </button>
         </div>
       </div>
@@ -320,23 +295,8 @@ export default function LessonReflection({
             </div>
             <div className="mt-1 text-2xl font-black text-white">Nice work!</div>
             <div className="mt-1 text-sm text-teal-100/80">{lessonTitle}</div>
-            {hasSkills ? (
-              <div className="mt-3 inline-flex flex-col items-start gap-1 text-left">
-                {practisedSkills!.map((skill) => (
-                  <div key={skill} className="text-sm font-semibold text-teal-100/90">
-                    ✅ {skill}
-                  </div>
-                ))}
-              </div>
-            ) : null}
 
             <StatChips xp={xp} chain={bestChain} accuracy={accuracy} />
-
-            {nextUpLabel ? (
-              <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-teal-300/30 bg-teal-400/10 px-4 py-1.5 text-sm font-bold text-teal-100">
-                ⏭️ Next up: <span className="font-black text-white">{nextUpLabel}</span>
-              </div>
-            ) : null}
 
             <div className="mt-7 text-base font-bold text-white">
               How confident do you feel now?
@@ -398,7 +358,7 @@ export default function LessonReflection({
               disabled={saving}
               className="mt-5 w-full rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-500 px-6 py-3.5 text-sm font-extrabold text-white transition hover:from-teal-400 hover:to-emerald-400 active:scale-[0.98] disabled:opacity-60"
             >
-              {nextUpLabel ? `Continue to ${nextUpLabel} →` : "Continue →"}
+              Continue →
             </button>
           </>
         )}

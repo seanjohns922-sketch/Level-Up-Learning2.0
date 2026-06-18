@@ -10,6 +10,8 @@ import SurgeAmbience from "@/components/lesson/SurgeAmbience";
 import NexusActivation from "@/components/lesson/NexusActivation";
 import ComboActivation from "@/components/lesson/ComboActivation";
 import LessonReflection from "@/components/lesson/LessonReflection";
+import LessonCoachReview from "@/components/lesson/LessonCoachReview";
+import { buildCoachReview } from "@/lib/lesson-coach";
 import LessonResumeGate from "@/components/lesson/LessonResumeGate";
 import {
   clearLessonResume,
@@ -509,6 +511,7 @@ export function Year2LessonEngine({
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [comboCount, setComboCount] = useState(0);
+  const [coachDone, setCoachDone] = useState(false);
   const [reflectionDone, setReflectionDone] = useState(false);
   // ── Lesson save & resume ──
   const resumeLessonKey = liveContext?.lessonId ?? lesson.id;
@@ -956,9 +959,27 @@ export function Year2LessonEngine({
 
   // ── Finished state ──
   if (finished) {
-    // Bespoke completion cards (e.g. the Week-12 summary) own their own
-    // post-lesson screen. Otherwise the reflection IS the completion screen;
-    // its Continue returns to the week page.
+    // Coach Review (performance guidance) shows first for every lesson, then
+    // the Reflection (celebration + confidence) or a bespoke completion card.
+    if (!coachDone) {
+      return (
+        <LessonCoachReview
+          review={buildCoachReview({
+            levelNumber,
+            accuracy,
+            topicSummaries: summary.topicSummaries,
+            strengths: summary.strengths,
+            areasToImprove: summary.areasToImprove,
+            practisedSkills,
+            nextUpLabel,
+            lessonId: liveContext?.lessonId ?? lesson.id,
+          })}
+          levelNumber={levelNumber}
+          realmId={realmId}
+          onContinue={() => setCoachDone(true)}
+        />
+      );
+    }
     if (!renderCompletionCard && !reflectionDone) {
       return (
         <LessonReflection
