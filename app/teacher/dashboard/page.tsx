@@ -9,10 +9,16 @@ import CurriculumExplorer from "@/components/teacher/CurriculumExplorer";
 import LiveClassPanel from "@/components/teacher/LiveClassPanel";
 import StrandStudentsPanel from "@/components/teacher/StrandStudentsPanel";
 import { fetchNumberCompatProgressForClass } from "@/lib/realm-progress-compat";
+import {
+  BRAIN_BREAK_FREQUENCIES,
+  BRAIN_BREAK_FREQUENCY_LABEL,
+  isBrainBreakFrequency,
+  type BrainBreakFrequency,
+} from "@/lib/brain-break-settings";
 
 /* ── types ─────────────────────────────────────────── */
-type ClassRow = { id: string; class_code: string; name: string; year_level: string };
-type StudentRow = { id: string; display_name: string; username?: string | null; class_id: string; user_id: string; pin?: string | null; qr_token?: string | null; school_year_level?: string | null; working_level?: string | null; year_level?: string | null };
+type ClassRow = { id: string; class_code: string; name: string; year_level: string; brain_break_frequency?: string | null };
+type StudentRow = { id: string; display_name: string; username?: string | null; class_id: string; user_id: string; pin?: string | null; qr_token?: string | null; school_year_level?: string | null; working_level?: string | null; year_level?: string | null; brain_break_frequency?: string | null };
 type ProgressRow = {
   student_id: string;
   year: string;
@@ -541,6 +547,19 @@ export default function TeacherDashboardPage() {
     alert(`PIN for ${student.display_name} reset to ${newPin}.`);
   }
 
+  // Brain-break frequency: class default + per-student override (null = inherit).
+  async function setClassBrainBreak(value: BrainBreakFrequency) {
+    if (!selectedClassId) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await supabase.from("classes").update({ brain_break_frequency: value } as any).eq("id", selectedClassId);
+    setClasses((prev) => prev.map((c) => (c.id === selectedClassId ? { ...c, brain_break_frequency: value } : c)));
+  }
+  async function setStudentBrainBreak(student: StudentRow, value: BrainBreakFrequency | null) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await supabase.from("students").update({ brain_break_frequency: value } as any).eq("id", student.id);
+    setStudents((prev) => prev.map((s) => (s.id === student.id ? { ...s, brain_break_frequency: value } : s)));
+  }
+
   /* ── segment bar for a student's level ─── */
   function renderWeekBar(prog: ProgressRow | undefined) {
     const completedIds = prog ? parseCompletedLessons(prog.completed_lesson_ids) : [];
@@ -640,6 +659,23 @@ export default function TeacherDashboardPage() {
                   Reset
                 </button>
               </div>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-500">Brain breaks</span>
+              <select
+                value={isBrainBreakFrequency(student.brain_break_frequency) ? student.brain_break_frequency : ""}
+                onClick={(e) => e.stopPropagation()}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  void setStudentBrainBreak(student, isBrainBreakFrequency(v) ? v : null);
+                }}
+                className="rounded-full border border-gray-200 bg-white px-2 py-1 text-xs font-bold text-gray-900"
+              >
+                <option value="">Class default</option>
+                {BRAIN_BREAK_FREQUENCIES.map((f) => (
+                  <option key={f} value={f}>{BRAIN_BREAK_FREQUENCY_LABEL[f]}</option>
+                ))}
+              </select>
             </div>
           </div>
 
@@ -907,6 +943,19 @@ export default function TeacherDashboardPage() {
                   </svg>
                 </button>
                 <span className="text-[11px] font-semibold text-[#94A3B8]">· {classStudents.length} student{classStudents.length === 1 ? "" : "s"}</span>
+                <span className="h-1 w-1 rounded-full bg-[#CBD5E1]" />
+                <label className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#475569]">
+                  <span title="Mid-lesson mini-game frequency. Override per student in their card.">🧠 Brain breaks</span>
+                  <select
+                    value={isBrainBreakFrequency(selectedClass.brain_break_frequency) ? selectedClass.brain_break_frequency : "normal"}
+                    onChange={(e) => { if (isBrainBreakFrequency(e.target.value)) void setClassBrainBreak(e.target.value); }}
+                    className="rounded-md border border-[#E6E8EC] bg-white px-2 py-0.5 text-[11px] font-bold text-[#0F172A] hover:border-[#CBD5E1] transition"
+                  >
+                    {BRAIN_BREAK_FREQUENCIES.map((f) => (
+                      <option key={f} value={f}>{BRAIN_BREAK_FREQUENCY_LABEL[f]}</option>
+                    ))}
+                  </select>
+                </label>
                 {isDev && (
                   <span className="ml-2 text-[10px] font-mono text-[#94A3B8]">id:{selectedClass.id.slice(0, 8)}</span>
                 )}

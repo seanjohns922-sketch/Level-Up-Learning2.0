@@ -22,7 +22,8 @@ import SurgeAmbience from "@/components/lesson/SurgeAmbience";
 import NexusActivation from "@/components/lesson/NexusActivation";
 import ComboActivation from "@/components/lesson/ComboActivation";
 import BrainBreak from "@/components/lesson/BrainBreak";
-import { pickVillain, BRAIN_BREAK_1_AT_SECONDS_LEFT, BRAIN_BREAK_2_AT_SECONDS_LEFT, type Villain } from "@/lib/brain-break";
+import { pickVillain, type Villain } from "@/lib/brain-break";
+import { getBrainBreakSchedule, type BrainBreakFrequency } from "@/lib/brain-break-settings";
 import type { LessonPerformanceSummary } from "@/components/lesson/Year2LessonEngine";
 
 type McqTask = Extract<PracticeTask, { kind: "mcq" }>;
@@ -232,6 +233,7 @@ export function PracticeRunner({
   realmId,
   levelNumber,
   practisedSkills,
+  brainBreakFrequency = "normal",
 }: {
   minutes?: number;
   getTask: (ctx?: {
@@ -250,6 +252,7 @@ export function PracticeRunner({
   realmId?: string;
   levelNumber?: number;
   practisedSkills?: string[];
+  brainBreakFrequency?: BrainBreakFrequency;
 }) {
   const isMeasurement = realmId === "measurement";
   const totalSeconds = minutes * 60;
@@ -260,10 +263,13 @@ export function PracticeRunner({
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scoredThisTurnRef = useRef(false);
 
-  // ── Brain breaks (two mid-lesson villains) ──
+  // ── Brain breaks (teacher-configurable frequency → 0/1/2 mid-lesson villains) ──
   const [brainBreakVillain, setBrainBreakVillain] = useState<Villain | null>(null);
-  const brainBreak1DoneRef = useRef(false);
-  const brainBreak2DoneRef = useRef(false);
+  const brainBreakSchedule = useMemo(
+    () => getBrainBreakSchedule(levelNumber, brainBreakFrequency),
+    [levelNumber, brainBreakFrequency]
+  );
+  const nextBreakIdxRef = useRef(0);
   const lastVillainIdRef = useRef<string | null>(null);
   const brainBreakActiveRef = useRef(false);
 
@@ -446,8 +452,7 @@ export function PracticeRunner({
       setComboCount(snap.comboCount);
       bestChainRef.current = Math.max(bestChainRef.current, snap.comboCount);
       // Don't replay brain breaks the student already passed before exiting.
-      if (snap.secondsLeft <= BRAIN_BREAK_1_AT_SECONDS_LEFT) brainBreak1DoneRef.current = true;
-      if (snap.secondsLeft <= BRAIN_BREAK_2_AT_SECONDS_LEFT) brainBreak2DoneRef.current = true;
+      nextBreakIdxRef.current = brainBreakSchedule.filter((t) => snap.secondsLeft <= t).length;
     }
     setShowLessonResume(false);
     showLessonResumeRef.current = false;
@@ -476,25 +481,22 @@ export function PracticeRunner({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resumeLessonKey, secondsLeft, finished, questionsAnswered, correctAnswers, comboCount]);
 
-  // Two brain breaks (~3 min and ~6 min in) — each pauses the lesson clock and
-  // uses a different villain.
+  // Brain breaks fire at the scheduled seconds-left thresholds (count + timing
+  // come from the teacher-set frequency × level). Each pauses the clock and uses
+  // a different villain than the last.
   useEffect(() => {
     if (finished || brainBreakActiveRef.current) return;
-    if (!brainBreak1DoneRef.current && secondsLeft <= BRAIN_BREAK_1_AT_SECONDS_LEFT && secondsLeft > BRAIN_BREAK_2_AT_SECONDS_LEFT) {
-      brainBreak1DoneRef.current = true;
-      brainBreakActiveRef.current = true;
-      const villain = pickVillain(levelNumber ?? 1);
-      lastVillainIdRef.current = villain.id;
-      setBrainBreakVillain(villain);
-    } else if (!brainBreak2DoneRef.current && secondsLeft <= BRAIN_BREAK_2_AT_SECONDS_LEFT && secondsLeft > 0) {
-      brainBreak1DoneRef.current = true; // in case break 1 was skipped (short lesson)
-      brainBreak2DoneRef.current = true;
+    const idx = nextBreakIdxRef.current;
+    if (idx >= brainBreakSchedule.length) return;
+    const threshold = brainBreakSchedule[idx]!;
+    if (secondsLeft <= threshold && secondsLeft > 0) {
+      nextBreakIdxRef.current = idx + 1;
       brainBreakActiveRef.current = true;
       const villain = pickVillain(levelNumber ?? 1, lastVillainIdRef.current ?? undefined);
       lastVillainIdRef.current = villain.id;
       setBrainBreakVillain(villain);
     }
-  }, [secondsLeft, finished, levelNumber]);
+  }, [secondsLeft, finished, levelNumber, brainBreakSchedule]);
 
   useEffect(() => {
     if (!finished || emittedSummaryRef.current) return;

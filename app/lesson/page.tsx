@@ -63,6 +63,7 @@ import { getCurriculumPlan } from "@/data/programs/genres";
 import { DEMO_MODE } from "@/data/config";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, updateProgress } from "@/data/progress";
+import { resolveBrainBreakFrequency, type BrainBreakFrequency } from "@/lib/brain-break-settings";
 import { trackLiveLearningEvent } from "@/lib/live-class-client";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { markLessonComplete } from "@/lib/program-progress";
@@ -330,6 +331,29 @@ function LessonPage() {
   );
 
   const [startedLessonId, setStartedLessonId] = useState<string | null>(null);
+
+  // Teacher-set brain-break frequency (per-student override → class default →
+  // "normal"). Fetched fresh each lesson so teacher changes apply next session.
+  const [brainBreakFrequency, setBrainBreakFrequency] = useState<BrainBreakFrequency>("normal");
+  useEffect(() => {
+    const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY) : null;
+    if (!studentId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase.rpc("get_student_runtime_context", { p_student_id: studentId });
+        if (error || cancelled) return;
+        const row = Array.isArray(data) ? data[0] : null;
+        if (!row) return;
+        setBrainBreakFrequency(
+          resolveBrainBreakFrequency(row.brain_break_frequency, row.class_brain_break_frequency)
+        );
+      } catch {
+        /* keep default "normal" */
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
   const lessonMeta = useMemo(() => {
     const weekPlan = lessonProgram.find((w) => w.week === week);
     return weekPlan?.lessons.find((l) => l.id === effectiveLessonId) ?? null;
@@ -1110,6 +1134,7 @@ function LessonPage() {
               realmId={realmId}
               levelNumber={levelNumber}
               practisedSkills={getLessonPractisedSkills(effectiveLessonId)}
+              brainBreakFrequency={brainBreakFrequency}
               renderCompletionCard={
                 isMeasurement
                   ? undefined // Measurelands uses the realm-aware Meazurex reflection screen
@@ -1198,6 +1223,7 @@ function LessonPage() {
                   realmId={realmId}
                   levelNumber={levelNumber}
                   practisedSkills={getLessonPractisedSkills(lessonMeta.id)}
+                  brainBreakFrequency={brainBreakFrequency}
                   renderCompletionCard={
                     showWeek12Lesson3Summary
                       ? (summary: LessonPerformanceSummary) => (
