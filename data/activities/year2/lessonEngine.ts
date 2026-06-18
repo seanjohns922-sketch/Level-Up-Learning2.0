@@ -25333,9 +25333,9 @@ function generateGenericQuestion(
         }
       : {
           kind: "typed_response",
-          prompt: `How many tens are in ${target}?`,
+          prompt: `What digit is in the tens column in ${target}?`,
           answer: String(Math.floor((target % 100) / 10)),
-          placeholder: "Type a number",
+          placeholder: "Type the digit",
         };
   }
 

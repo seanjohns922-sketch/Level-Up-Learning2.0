@@ -4553,7 +4553,7 @@ function toQuizQuestionFromYear2Data(
             lessonNumber,
             skill,
             kind: "typed",
-            prompt: `How many tens are in ${target}?`,
+            prompt: `What digit is in the tens column in ${target}?`,
             correctValue: String(questionData.standard.tens / 10),
           }
         : {
