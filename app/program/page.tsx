@@ -72,39 +72,39 @@ function ProgramPage() {
     connClip:   undefined as string | undefined,
     // colours — card body (aged parchment / dark leather)
     cardActiveBg:     "linear-gradient(135deg, rgba(22,14,4,0.95) 0%, rgba(40,26,6,0.92) 50%, rgba(58,38,10,0.88) 100%)",
-    cardCompletedBg:  "linear-gradient(135deg, #022c22 0%, #064e3b 50%, #047857 100%)",
+    cardCompletedBg:  "linear-gradient(135deg, #261306 0%, #4a2410 45%, #6d28d9 100%)",
     cardLockedBg:     "linear-gradient(135deg, rgba(20,12,35,0.78) 0%, rgba(35,18,60,0.70) 100%)",
     // colours — bezel / border (aged brass — less saturated, more antique)
     bezelActiveBg:    "linear-gradient(135deg, rgba(200,160,48,0.48), rgba(120,90,15,0.16) 40%, rgba(200,160,48,0.42))",
-    bezelCompletedBg: "linear-gradient(135deg, rgba(16,185,129,0.48), rgba(13,148,136,0.18) 40%, rgba(16,185,129,0.44))",
+    bezelCompletedBg: "linear-gradient(135deg, rgba(200,160,48,0.48), rgba(109,40,217,0.18) 45%, rgba(200,160,48,0.44))",
     bezelLockedBg:    "linear-gradient(135deg, rgba(109,40,217,0.22), rgba(76,29,149,0.10))",
     bezelPosttestBg:  "linear-gradient(135deg, rgba(139,92,246,0.52), rgba(109,40,217,0.22) 40%, rgba(139,92,246,0.46))",
     // box shadows (warm depth + subtle purple magical glow)
     cardActiveShadow:    "0 8px 28px rgba(22,14,4,0.55), 0 0 22px rgba(109,40,217,0.12), inset 0 1px 0 rgba(200,160,48,0.12)",
-    cardCompletedShadow: "0 8px 28px rgba(16,185,129,0.28), inset 0 1px 0 rgba(110,231,183,0.32)",
+    cardCompletedShadow: "0 8px 28px rgba(109,40,217,0.22), 0 0 22px rgba(200,160,48,0.18), inset 0 1px 0 rgba(200,160,48,0.22)",
     cardLockedShadow:    "0 4px 16px rgba(0,0,0,0.4)",
     // badge (lesson label pill — bronze gradient)
     badgeActiveBg:    "linear-gradient(135deg, #2a1a04 0%, #5c3d0e 50%, #8b6520 100%)",
-    badgeCompletedBg: "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
+    badgeCompletedBg: "linear-gradient(135deg, #5b21b6 0%, #7c3aed 60%, #c8a030 100%)",
     badgeLockedBg:    "linear-gradient(135deg, #2d1b69 0%, #4c1d95 100%)",
     badgePosttestBg:  "linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%)",
     badgeShadow:      "inset 0 1px 0 rgba(200,160,48,0.28), 0 0 8px rgba(120,90,15,0.3)",
     // status pill (ACTIVE — muted brass, not bright gold)
     statusActiveBg:    "linear-gradient(135deg, #3d2808 0%, #5c3d0e 50%, #7a5418 100%)",
-    statusCompletedBg: "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
+    statusCompletedBg: "linear-gradient(135deg, #5b21b6 0%, #7c3aed 55%, #c8a030 100%)",
     statusLockedBg:    "linear-gradient(135deg, #2d1b69 0%, #4c1d95 100%)",
     statusPosttestBg:  "linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%)",
     statusShadow:      "0 0 8px rgba(120,90,15,0.35)",
     dotClass:          "bg-yellow-200/80 shadow-[0_0_6px_rgba(200,160,48,0.55)]",
     // action button (START — soft brass, warm bronze glow on hover)
     actionActiveBg:    "linear-gradient(135deg, #2a1a04 0%, #5c3d0e 40%, #8b6520 75%, #c8a030 100%)",
-    actionCompletedBg: "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
+    actionCompletedBg: "linear-gradient(135deg, #5b21b6 0%, #7c3aed 55%, #c8a030 100%)",
     actionPosttestBg:  "linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%)",
     actionShadow:      "0 0 16px rgba(120,90,15,0.5), 0 4px 12px rgba(0,0,0,0.45), inset 0 1px 0 rgba(200,160,48,0.3)",
     // connector between cards
     connActiveBg:    "radial-gradient(circle, #c8a030, #3d2808 70%)",
-    connCompletedBg: "radial-gradient(circle, #10b981, #064e3b 70%)",
-    connShadow:      "0 0 10px rgba(200,160,48,0.35)",
+    connCompletedBg: "radial-gradient(circle, #c8a030, #6d28d9 72%)",
+    connShadow:      "0 0 10px rgba(200,160,48,0.35), 0 0 14px rgba(109,40,217,0.18)",
     // XP bar — brass shimmer (light catches at 60%)
     xpBg:   "linear-gradient(90deg, #3d2808 0%, #7a5418 25%, #c8a030 55%, #e8d5a8 65%, #c8a030 75%, #7a5418 90%, #3d2808 100%)",
     xpGlow: "0 0 10px rgba(200,160,48,0.5)",
@@ -994,13 +994,35 @@ function ProgramPage() {
                     )}
                     {/* Completed checkmark watermark */}
                     {completed && (
-                      <svg className="absolute -right-4 -bottom-4 h-32 w-32 text-emerald-400/10 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <svg
+                        className={`absolute -right-4 -bottom-4 h-32 w-32 pointer-events-none ${isMeasurementRealm ? "text-yellow-200/10" : "text-emerald-400/10"}`}
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                      >
                         <path d="M20 6L9 17l-5-5" />
                       </svg>
                     )}
                     {/* Completed top stripe */}
                     {completed && (
-                      <div className="absolute top-0 left-0 h-1 w-full pointer-events-none" style={{ background: "linear-gradient(90deg, #6ee7b7, #10b981 50%, transparent 100%)", boxShadow: "0 0 12px rgba(110,231,183,0.7)" }} />
+                      <div
+                        className="absolute top-0 left-0 h-1 w-full pointer-events-none"
+                        style={
+                          isMeasurementRealm
+                            ? {
+                                background:
+                                  "linear-gradient(90deg, #fcd34d, #c8a030 45%, #7c3aed 80%, transparent 100%)",
+                                boxShadow:
+                                  "0 0 12px rgba(200,160,48,0.55), 0 0 16px rgba(109,40,217,0.22)",
+                              }
+                            : {
+                                background:
+                                  "linear-gradient(90deg, #6ee7b7, #10b981 50%, transparent 100%)",
+                                boxShadow: "0 0 12px rgba(110,231,183,0.7)",
+                              }
+                        }
+                      />
                     )}
 
                     {/* Row 1: lesson label + status badge */}
@@ -1026,12 +1048,14 @@ function ProgramPage() {
 
                       {completed ? (
                         <span
-                          className="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-mono font-extrabold tracking-[0.14em] text-emerald-100"
+                          className={`inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-mono font-extrabold tracking-[0.14em] ${isMeasurementRealm ? "text-yellow-50" : "text-emerald-100"}`}
                           style={{
                             clipPath: rt.statusClip,
                             borderRadius: rt.rounded ? 999 : undefined,
                             background: rt.statusCompletedBg,
-                            boxShadow: "inset 0 1px 0 rgba(110,231,183,0.4)",
+                            boxShadow: isMeasurementRealm
+                              ? "inset 0 1px 0 rgba(252,211,77,0.32), 0 0 10px rgba(109,40,217,0.18)"
+                              : "inset 0 1px 0 rgba(110,231,183,0.4)",
                           }}
                         >
                           <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="3"><path d="M20 6L9 17l-5-5" /></svg>
