@@ -6,6 +6,7 @@ import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, updateProgress }
 import { supabase } from "@/lib/supabase";
 import { saveNumberLessonAttempt, saveNumberWeeklyQuizAttempt, saveStudentProgressState } from "@/lib/student-progress-sync";
 import { getProgramForYear } from "@/data/programs";
+import { getCurriculumPlan } from "@/data/programs/genres";
 import { getYear6WeeklyQuiz, type Year6WeeklyQuizQuestion } from "@/data/quizzes/year6";
 import { DEMO_MODE } from "@/data/config";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
@@ -6726,10 +6727,12 @@ function SessionPage({
   const [showPostTestTransition, setShowPostTestTransition] = useState(false);
   const hasEmbeddedLessonVideo =
     year === "Year 4" && Number(week) === 2 && n === 1;
-  const quizWeekPlan = useMemo(
-    () => getProgramForYear(year).find((plan) => plan.week === Number(week)),
-    [year, week]
-  );
+  const quizWeekPlan = useMemo(() => {
+    const planSource = isMeasurementRealm
+      ? getCurriculumPlan(year, "measurement")
+      : getProgramForYear(year);
+    return planSource.find((plan) => plan.week === Number(week));
+  }, [isMeasurementRealm, year, week]);
   const lessonTitleLookup = useMemo<Record<number, string>>(
     () =>
       Object.fromEntries(
@@ -7201,8 +7204,8 @@ function SessionPage({
     quizMoneyAnswers,
     quizLessonActivityResults,
   ]);
-  const quizCompletionTitle = isMeasurementRealm && Number(week) === 1
-    ? "Length Lands Complete!"
+  const quizCompletionTitle = isMeasurementRealm
+    ? `${quizWeekPlan?.topic ?? "Measurelands"} Complete!`
     : year === "Prep" && Number(week) === 6
     ? "Number Builder Challenge Complete!"
     : year === "Prep" && Number(week) === 7
@@ -7216,8 +7219,10 @@ function SessionPage({
             : year === "Prep" && Number(week) === 11
               ? "Ground Level Readiness Challenge Complete!"
               : "Quiz Results";
-  const quizCompletionMessage = isMeasurementRealm && Number(week) === 1
-    ? "You learned longer and shorter, ordering lengths, and measuring paths!"
+  const quizCompletionMessage = isMeasurementRealm
+    ? quizWeekPlan?.lessons?.length
+      ? `You explored ${quizWeekPlan.lessons.map((lesson) => lesson.title).join(", ")}.`
+      : "You built your Measurelands skills across all three lessons."
     : year === "Prep" && Number(week) === 6
     ? "You built and split the numbers perfectly!"
     : year === "Prep" && Number(week) === 7
