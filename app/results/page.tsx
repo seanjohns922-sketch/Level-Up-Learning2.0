@@ -807,16 +807,16 @@ function ResultsPage() {
                 {isPostTest || passedByProgram ? (
                   <button
                     onClick={goLegends}
-                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold text-base hover:from-teal-400 hover:to-emerald-400 transition-all active:scale-[0.98]"
-                    style={{ boxShadow: "0 10px 30px -8px rgba(16, 185, 129, 0.5)" }}
+                    className="w-full py-4 rounded-2xl text-white font-bold text-base transition-all active:scale-[0.98]"
+                    style={{ background: theme.ctaGradientCss, boxShadow: theme.ctaShadow }}
                   >
                     View My Legends
                   </button>
                 ) : (
                   <button
                     onClick={nextYear ? goNextPretest : goHome}
-                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold text-base hover:from-teal-400 hover:to-emerald-400 transition-all active:scale-[0.98]"
-                    style={{ boxShadow: "0 10px 30px -8px rgba(16, 185, 129, 0.5)" }}
+                    className="w-full py-4 rounded-2xl text-white font-bold text-base transition-all active:scale-[0.98]"
+                    style={{ background: theme.ctaGradientCss, boxShadow: theme.ctaShadow }}
                   >
                     {nextYear ? `Start ${formatStudentLevelLabel(nextYear)} Pre-Test` : "Enter the Tower"}
                   </button>
@@ -832,8 +832,8 @@ function ResultsPage() {
               <>
                 <button
                   onClick={goContinue}
-                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold text-base hover:from-teal-400 hover:to-emerald-400 transition-all active:scale-[0.98]"
-                  style={{ boxShadow: "0 10px 30px -8px rgba(16, 185, 129, 0.5)" }}
+                  className="w-full py-4 rounded-2xl text-white font-bold text-base transition-all active:scale-[0.98]"
+                  style={{ background: theme.ctaGradientCss, boxShadow: theme.ctaShadow }}
                 >
                   Continue
                 </button>
@@ -855,8 +855,8 @@ function ResultsPage() {
               <>
                 <button
                   onClick={goProgram}
-                  className="w-full py-4 rounded-2xl font-bold text-base text-white bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 transition-all active:scale-[0.98]"
-                  style={{ boxShadow: "0 10px 30px -8px rgba(16, 185, 129, 0.5)" }}
+                  className="w-full py-4 rounded-2xl font-bold text-base text-white transition-all active:scale-[0.98]"
+                  style={{ background: theme.ctaGradientCss, boxShadow: theme.ctaShadow }}
                 >
                   {requiresFullPathway ? "Start Full Pathway" : `Start Required Pathway — Week ${assignedStartWeek}`}
                 </button>
