@@ -8,6 +8,10 @@ type MeasurelandsCompareTask = Extract<PracticeTask, { kind: "measurementCompare
 type MeasurelandsCompareObject = MeasurelandsCompareTask["objects"][number];
 type TeachingMoment = NonNullable<MeasurelandsCompareTask["teachingMoments"]>[number];
 
+function isDescendingTarget(mode?: MeasurelandsCompareTask["targetMode"]) {
+  return mode === "longest" || mode === "heaviest";
+}
+
 const ACCENT_STYLES: Record<
   MeasurelandsCompareObject["accent"],
   {
@@ -212,15 +216,30 @@ function CompareVisual({
 }
 
 function TeachingMomentRow({ moment }: { moment: TeachingMoment }) {
+  const trioObjects = moment.objects;
   return (
     <div className="rounded-[28px] border border-[rgba(214,184,108,0.28)] bg-[rgba(255,252,245,0.92)] p-4 shadow-[0_10px_30px_rgba(91,33,182,0.06)]">
       <div className="mb-3 text-center text-xs font-black uppercase tracking-[0.18em] text-[#7c3aed]">
         {moment.title}
       </div>
-      <div className="grid gap-3 md:grid-cols-2">
-        <CompareVisual item={moment.left} compact />
-        <CompareVisual item={moment.right} compact />
-      </div>
+      {trioObjects && trioObjects.length > 0 ? (
+        <div
+          className={`grid gap-3 ${trioObjects.length === 3 ? "md:grid-cols-3" : "md:grid-cols-2"}`}
+        >
+          {trioObjects.map((item, index) => (
+            <CompareVisual
+              key={`${moment.id}-${item.label}-${index}`}
+              item={{ ...item, id: `${moment.id}-${index}` }}
+              compact
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="grid gap-3 md:grid-cols-2">
+          <CompareVisual item={moment.left} compact />
+          <CompareVisual item={moment.right} compact />
+        </div>
+      )}
       <div className="mt-3 text-center text-sm font-semibold text-[#5f4725]">
         {moment.narration}
       </div>
@@ -287,13 +306,22 @@ function OrderScene({
 }) {
   const orderedIds = task.orderedIds ?? task.objects.map((o) => o.id);
   const slotCount = orderedIds.length;
-  const descending = task.targetMode === "longest"; // longest → shortest
+  const descending = isDescendingTarget(task.targetMode);
+  const isMass = task.objects[0]?.axis === "mass";
   const slotLabels =
     slotCount === 3
-      ? descending
-        ? ["Longest", "Middle", "Shortest"]
-        : ["Shortest", "Middle", "Longest"]
-      : orderedIds.map((_, i) => `#${i + 1}`);
+      ? isMass
+        ? descending
+          ? ["Heaviest", "Middle", "Lightest"]
+          : ["Lightest", "Middle", "Heaviest"]
+        : descending
+          ? ["Longest", "Middle", "Shortest"]
+          : ["Shortest", "Middle", "Longest"]
+      : isMass
+        ? descending
+          ? ["Heaviest", "Next", "Next", "Lightest"]
+          : ["Lightest", "Next", "Next", "Heaviest"]
+        : orderedIds.map((_, i) => `#${i + 1}`);
 
   const [placed, setPlaced] = useState<string[]>([]);
   const [locked, setLocked] = useState(false);
@@ -332,7 +360,9 @@ function OrderScene({
       speakText={task.speakText ?? task.prompt}
     >
       {/* Ordered slots */}
-      <div className={`grid gap-3 md:grid-cols-3 ${shake ? "animate-[shake_0.4s_ease-in-out]" : ""}`}>
+      <div
+        className={`grid gap-3 ${slotCount === 4 ? "md:grid-cols-4" : "md:grid-cols-3"} ${shake ? "animate-[shake_0.4s_ease-in-out]" : ""}`}
+      >
         {Array.from({ length: slotCount }).map((_, index) => {
           const id = placed[index];
           const item = id ? byId(id) : null;
@@ -376,7 +406,7 @@ function OrderScene({
         <div className="mb-2 text-center text-[11px] font-black uppercase tracking-[0.16em] text-[#5f4725]">
           {bank.length > 0 ? "Tap an object to place it" : allCorrect ? "Perfect order!" : "Tap a slot to undo"}
         </div>
-        <div className="grid gap-3 md:grid-cols-3">
+        <div className={`grid gap-3 ${slotCount === 4 ? "md:grid-cols-4" : "md:grid-cols-3"}`}>
           {bank.map((item) => (
             <button
               key={item.id}
@@ -410,11 +440,16 @@ function SequenceScene({
   onWrong: () => void;
 }) {
   const prefix = task.sequencePrefix ?? [];
+  const axis = (prefix[0] ?? task.objects[0])?.axis;
+  const sequenceHint =
+    axis === "mass"
+      ? "Look at the pattern. They are getting heavier. Which object comes next?"
+      : "Look at the pattern. They are getting bigger. Which object comes next?";
   return (
     <MeasurementShell
       badge={task.badgeLabel ?? "Which Comes Next?"}
       prompt={task.prompt}
-      speakText={task.speakText ?? task.prompt}
+      speakText={task.speakText ?? sequenceHint}
     >
       {/* The growing sequence with a mystery slot */}
       <div className="rounded-[26px] border border-[rgba(214,184,108,0.34)] bg-[rgba(255,252,245,0.92)] p-3">

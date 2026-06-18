@@ -487,6 +487,13 @@ export type PracticeTask = (
       teachingMoments?: Array<{
         id: string;
         title: string;
+        objects?: Array<{
+          label: string;
+          icon: string;
+          compareValue: number;
+          axis: "length" | "height" | "mass";
+          accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
+        }>;
         left: {
           label: string;
           icon: string;
