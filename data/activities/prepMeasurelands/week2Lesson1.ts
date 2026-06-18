@@ -2,9 +2,11 @@ import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-
 
 // ── Measurelands · Ground · Week 2 · Lesson 1 — "Heavy or Light?" ──
 // AC9MFM01 (Ground, no formal units): compare mass using heavier / lighter.
-//   A — Heavy or Light?        (scene "pair", tap the heavier)
-//   B — Lightest Explorer      (scene "pair", tap the lighter)
-//   C — Meazurex's Mass Sorter (scene "trio", tap the heaviest / lightest)
+//   A — Which Is Heavier?   (scene "pair", tap the heavier)
+//   B — Which Is Lighter?   (scene "pair", tap the lighter)
+//   C — Heavy or Light Sort (scene "sort", drop one object into Heavy / Light)
+// Objects have obviously different masses (heavy ≥ 7, light ≤ 3) so every
+// question has exactly one defensible answer.
 
 type CompareTask = Extract<PracticeTask, { kind: "measurementCompare" }>;
 type MObj = CompareTask["objects"][number];
@@ -40,31 +42,41 @@ function choose<T>(items: T[]): T {
 
 const ACCENTS: Accent[] = ["rose", "gold", "teal", "sky", "violet", "leaf"];
 
-// Object weights are real-world obvious (a brick is heavy, a feather is light).
+// Object mass is real-world obvious. Heavy ≥ 7, light ≤ 3 — never ambiguous.
 type Thing = { id: string; label: string; icon: string; weight: number };
+
 const HEAVY: Thing[] = [
-  { id: "brick", label: "Brick", icon: "🧱", weight: 8 },
-  { id: "watermelon", label: "Watermelon", icon: "🍉", weight: 9 },
-  { id: "elephant", label: "Elephant", icon: "🐘", weight: 10 },
   { id: "rock", label: "Rock", icon: "🪨", weight: 8 },
+  { id: "brick", label: "Brick", icon: "🧱", weight: 8 },
+  { id: "elephant", label: "Elephant", icon: "🐘", weight: 10 },
   { id: "truck", label: "Truck", icon: "🚚", weight: 10 },
-  { id: "anvil", label: "Anvil", icon: "🪨", weight: 9 },
+  { id: "watermelon", label: "Watermelon", icon: "🍉", weight: 8 },
+  { id: "bowling", label: "Bowling Ball", icon: "🎳", weight: 9 },
+  { id: "backpack", label: "Backpack", icon: "🎒", weight: 7 },
+  { id: "boot", label: "Boot", icon: "🥾", weight: 7 },
+  { id: "chair", label: "Chair", icon: "🪑", weight: 8 },
+  { id: "horse", label: "Horse", icon: "🐎", weight: 10 },
+  { id: "car", label: "Car", icon: "🚗", weight: 10 },
+  { id: "bucket", label: "Bucket", icon: "🪣", weight: 7 },
+  { id: "treasure", label: "Treasure Chest", icon: "🧰", weight: 9 },
+  { id: "bicycle", label: "Bicycle", icon: "🚲", weight: 7 },
 ];
-const MEDIUM: Thing[] = [
-  { id: "apple", label: "Apple", icon: "🍎", weight: 4 },
-  { id: "book", label: "Book", icon: "📕", weight: 5 },
-  { id: "backpack", label: "Backpack", icon: "🎒", weight: 5 },
-  { id: "bicycle", label: "Bicycle", icon: "🚲", weight: 6 },
-  { id: "dog", label: "Dog", icon: "🐕", weight: 5 },
-  { id: "rabbit", label: "Rabbit", icon: "🐰", weight: 4 },
-];
+
 const LIGHT: Thing[] = [
   { id: "feather", label: "Feather", icon: "🪶", weight: 1 },
   { id: "leaf", label: "Leaf", icon: "🍃", weight: 1 },
   { id: "pencil", label: "Pencil", icon: "✏️", weight: 2 },
-  { id: "eraser", label: "Eraser", icon: "🧽", weight: 1 },
+  { id: "eraser", label: "Eraser", icon: "🧽", weight: 2 },
   { id: "flower", label: "Flower", icon: "🌸", weight: 2 },
   { id: "balloon", label: "Balloon", icon: "🎈", weight: 1 },
+  { id: "coin", label: "Coin", icon: "🪙", weight: 2 },
+  { id: "strawberry", label: "Strawberry", icon: "🍓", weight: 2 },
+  { id: "tennis", label: "Tennis Ball", icon: "🎾", weight: 3 },
+  { id: "spoon", label: "Spoon", icon: "🥄", weight: 2 },
+  { id: "cup", label: "Cup", icon: "🥤", weight: 3 },
+  { id: "mouse", label: "Mouse", icon: "🐭", weight: 3 },
+  { id: "butterfly", label: "Butterfly", icon: "🦋", weight: 1 },
+  { id: "apple", label: "Apple", icon: "🍎", weight: 3 },
 ];
 
 function toObj(thing: Thing, accent: Accent): MObj {
@@ -73,18 +85,25 @@ function toObj(thing: Thing, accent: Accent): MObj {
 
 const TEACHING_MOMENTS: NonNullable<CompareTask["teachingMoments"]> = [
   {
-    id: "feather-brick",
+    id: "rock-feather",
     title: "Heavier and Lighter",
-    left: { label: "Brick", icon: "🧱", compareValue: 8, axis: "mass", accent: "gold" },
+    left: { label: "Rock", icon: "🪨", compareValue: 8, axis: "mass", accent: "gold" },
     right: { label: "Feather", icon: "🪶", compareValue: 1, axis: "mass", accent: "sky" },
-    narration: "The brick is heavier. The feather is lighter.",
+    narration: "The rock is heavier. The feather is lighter.",
   },
   {
-    id: "apple-watermelon",
-    title: "Which Weighs More?",
-    left: { label: "Watermelon", icon: "🍉", compareValue: 9, axis: "mass", accent: "leaf" },
-    right: { label: "Apple", icon: "🍎", compareValue: 4, axis: "mass", accent: "rose" },
-    narration: "The watermelon is heavier. The apple is lighter.",
+    id: "elephant-car",
+    title: "Which Pushes Down More?",
+    left: { label: "Elephant", icon: "🐘", compareValue: 10, axis: "mass", accent: "leaf" },
+    right: { label: "Toy Car", icon: "🚗", compareValue: 3, axis: "mass", accent: "rose" },
+    narration: "The elephant is heavier. The toy car is lighter.",
+  },
+  {
+    id: "chest-coin",
+    title: "Heavy or Light?",
+    left: { label: "Treasure Chest", icon: "🧰", compareValue: 9, axis: "mass", accent: "violet" },
+    right: { label: "Coin", icon: "🪙", compareValue: 1, axis: "mass", accent: "teal" },
+    narration: "The treasure chest is heavier. The coin is lighter.",
   },
 ];
 
@@ -92,15 +111,15 @@ function buildIntroTask(): CompareTask {
   return {
     kind: "measurementCompare",
     scene: "intro",
-    prompt: "Let’s explore heavy and light!",
+    prompt: "Welcome to Balance Basin!",
     speakText:
-      "Meazurex has arrived at the Balance Basin. The Fog of Forgetfulness has mixed everything up, so nobody knows what is heavy and what is light. Let's become Mass Explorers and compare carefully.",
+      "Welcome to Balance Basin! Today we're going to discover which things are heavy and which things are light. When something is heavier, it pushes down more. When something is lighter, it stays higher. Let's look carefully and spot the heavy objects!",
     badgeLabel: "Meazurex Mission",
     introIcon: "⚖️",
     introBody: [
-      "The Fog of Forgetfulness has mixed up the Balance Basin.",
-      "Some things are heavy. Some things are light.",
-      "Let's become Mass Explorers and compare carefully.",
+      "A giant golden scale is wobbling at Balance Basin!",
+      "When something is heavier, it pushes down. When something is lighter, it stays up high.",
+      "Let's spot the heavy and light objects.",
     ],
     objects: [],
     teachingMoments: TEACHING_MOMENTS,
@@ -109,16 +128,14 @@ function buildIntroTask(): CompareTask {
   };
 }
 
-// Pick a heavy/light pair with a clear weight gap (>= 3).
+// A heavy + a light object → guaranteed clear difference, no repeat of last set.
 function pickPair(memory: LessonMemory): [MObj, MObj] {
-  const heavyPool = [...HEAVY, ...MEDIUM];
-  const lightPool = [...LIGHT, ...MEDIUM];
-  let heavy = choose(heavyPool);
-  let light = choose(lightPool);
+  let heavy = choose(HEAVY);
+  let light = choose(LIGHT);
   let guard = 0;
-  while ((heavy.weight - light.weight < 3 || heavy.id === light.id || `${heavy.id}-${light.id}` === memory.lastSetId) && guard++ < 20) {
-    heavy = choose(heavyPool);
-    light = choose(lightPool);
+  while (`${heavy.id}-${light.id}` === memory.lastSetId && guard++ < 20) {
+    heavy = choose(HEAVY);
+    light = choose(LIGHT);
   }
   memory.lastSetId = `${heavy.id}-${light.id}`;
   const acc = shuffle(ACCENTS);
@@ -130,9 +147,9 @@ function buildHeavierTask(memory: LessonMemory): CompareTask {
   const [heavy, light] = pickPair(memory);
   return {
     kind: "measurementCompare", scene: "pair", targetMode: "heavier",
-    prompt: "Which is heavier?", speakText: "Which is heavier?", badgeLabel: "Heavy or Light?",
+    prompt: "Which is heavier?", speakText: "Which is heavier?", badgeLabel: "Which Is Heavier?",
     objects: shuffle([heavy, light]), correctOptionId: heavy.id,
-    feedback: { correct: "Great comparing!", wrong: "Let's try another one." },
+    feedback: { correct: choose(["Great spotting!", "That's heavier!", "Excellent!"]), wrong: "Look carefully at the scale." },
   };
 }
 
@@ -141,38 +158,33 @@ function buildLighterTask(memory: LessonMemory): CompareTask {
   const [heavy, light] = pickPair(memory);
   return {
     kind: "measurementCompare", scene: "pair", targetMode: "lighter",
-    prompt: "Which is lighter?", speakText: "Which is lighter?", badgeLabel: "Lightest Explorer",
+    prompt: "Which is lighter?", speakText: "Which is lighter?", badgeLabel: "Which Is Lighter?",
     objects: shuffle([heavy, light]), correctOptionId: light.id,
-    feedback: { correct: "Featherweight find!", wrong: "Let's try another one." },
+    feedback: { correct: choose(["You found the lighter object!", "Nice work!"]), wrong: "Look carefully at the scale." },
   };
 }
 
-// Activity C — tap the heaviest / lightest of three (always distinct weights).
-function buildMassSorterTask(memory: LessonMemory): CompareTask {
-  const acc = shuffle(ACCENTS);
-  let light = choose(LIGHT);
-  let medium = choose(MEDIUM);
-  let heavy = choose(HEAVY);
+// Activity C — Heavy or Light Sort: drop one object into the right basket.
+function buildSortTask(memory: LessonMemory): CompareTask {
+  const fromHeavy = Math.random() < 0.5;
+  const pool = fromHeavy ? HEAVY : LIGHT;
+  let thing = choose(pool);
   let guard = 0;
-  // Guarantee strictly increasing, clearly-separated weights.
-  while ((!(light.weight < medium.weight && medium.weight < heavy.weight) || `${light.id}-${medium.id}-${heavy.id}` === memory.lastSetId) && guard++ < 20) {
-    light = choose(LIGHT);
-    medium = choose(MEDIUM);
-    heavy = choose(HEAVY);
-  }
-  memory.lastSetId = `${light.id}-${medium.id}-${heavy.id}`;
-  const trio = [toObj(light, acc[0]!), toObj(medium, acc[1]!), toObj(heavy, acc[2]!)];
-  const wantHeaviest = Math.random() < 0.5;
+  while (thing.id === memory.lastSetId && guard++ < 20) thing = choose(pool);
+  memory.lastSetId = thing.id;
+  const correctBin = thing.weight >= 5 ? "heavy" : "light";
 
   return {
-    kind: "measurementCompare", scene: "trio",
-    targetMode: wantHeaviest ? "heaviest" : "lightest",
-    prompt: wantHeaviest ? "Tap the heaviest object." : "Tap the lightest object.",
-    speakText: wantHeaviest ? "Tap the heaviest object." : "Tap the lightest object.",
-    badgeLabel: "Meazurex's Mass Sorter",
-    objects: shuffle(trio),
-    correctOptionId: wantHeaviest ? heavy.id : light.id,
-    feedback: { correct: "Wonderful sorting!", wrong: "Let's try another one." },
+    kind: "measurementCompare", scene: "sort",
+    prompt: "Is it heavy or light?", speakText: `Is the ${thing.label.toLowerCase()} heavy or light?`,
+    badgeLabel: "Heavy or Light Sort",
+    objects: [toObj(thing, choose(ACCENTS))],
+    bins: [
+      { id: "heavy", label: "Heavy", icon: "🪨" },
+      { id: "light", label: "Light", icon: "🪶" },
+    ],
+    correctOptionId: correctBin,
+    feedback: { correct: choose(["Great sorting!", "Excellent!"]), wrong: "Look carefully — does it push down or stay up?" },
   };
 }
 
@@ -191,7 +203,7 @@ export function generatePrepMeasurelandsWeek2Lesson1Task(
 
   if (rotation === "A") return buildHeavierTask(memory);
   if (rotation === "B") return buildLighterTask(memory);
-  return buildMassSorterTask(memory);
+  return buildSortTask(memory);
 }
 
 export function resetPrepMeasurelandsWeek2Lesson1TaskSessionState() {

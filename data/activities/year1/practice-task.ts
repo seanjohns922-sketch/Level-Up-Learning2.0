@@ -458,11 +458,13 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "pair" | "trio" | "order" | "sequence";
+      scene: "intro" | "pair" | "trio" | "order" | "sequence" | "sort";
       /** Intro scene: themeable Meazurex copy (falls back to the length copy). */
       introBody?: string[];
       introIcon?: string;
       targetMode?: "longer" | "taller" | "longest" | "shortest" | "heavier" | "lighter" | "heaviest" | "lightest";
+      /** "sort" scene: two labelled baskets; correctOptionId is the right one. */
+      bins?: Array<{ id: string; label: string; icon: string }>;
       objects: Array<{
         id: string;
         label: string;

@@ -202,6 +202,53 @@ function TeachingMomentRow({ moment }: { moment: TeachingMoment }) {
   );
 }
 
+/* ── Activity C: sort one object into the HEAVY or LIGHT basket ── */
+function SortScene({
+  task,
+  onCorrect,
+  onWrong,
+}: {
+  task: MeasurelandsCompareTask;
+  onCorrect: () => void;
+  onWrong: () => void;
+}) {
+  const item = task.objects[0];
+  const bins = task.bins ?? [
+    { id: "heavy", label: "Heavy", icon: "🪨" },
+    { id: "light", label: "Light", icon: "🪶" },
+  ];
+  return (
+    <MeasurementShell
+      badge={task.badgeLabel ?? "Heavy or Light Sort"}
+      prompt={task.prompt}
+      speakText={task.speakText ?? task.prompt}
+    >
+      {item ? (
+        <div className="mx-auto max-w-[260px]">
+          <CompareVisual item={item} />
+        </div>
+      ) : null}
+      <div className="mt-4 grid grid-cols-2 gap-4">
+        {bins.map((bin) => (
+          <button
+            key={bin.id}
+            type="button"
+            onClick={() => (bin.id === task.correctOptionId ? onCorrect() : onWrong())}
+            className="flex min-h-[120px] flex-col items-center justify-center gap-2 rounded-[26px] border-2 transition hover:-translate-y-1 active:scale-[0.98]"
+            style={{
+              borderColor: "rgba(214,184,108,0.6)",
+              background: "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,248,232,0.96))",
+            }}
+          >
+            <span className="text-5xl sm:text-6xl">{bin.icon}</span>
+            <span className="text-base font-black uppercase tracking-[0.14em] text-[#5f4725]">{bin.label}</span>
+          </button>
+        ))}
+      </div>
+    </MeasurementShell>
+  );
+}
+
 /* ── Activity A & B: tap objects into the correct order (Prep-friendly drag) ── */
 function OrderScene({
   task,
@@ -384,6 +431,9 @@ export function MeasurelandsCompareTaskCard({
   onCorrect: () => void;
   onWrong: () => void;
 }) {
+  if (task.scene === "sort") {
+    return <SortScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  }
   if (task.scene === "order") {
     return <OrderScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   }
