@@ -39,6 +39,8 @@ import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent 
 import { recordStudentActivityDelta } from "@/lib/student-activity";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { prepareSpeechText, speak, useAutoReadSetting, useSpeakState, useSpeechInteractionReady } from "@/lib/speak";
+import { Volume2 } from "lucide-react";
+import { getSkillCoaching, resolveCoachingKey } from "@/lib/skill-coaching";
 import type { TeacherAttemptQuestion, TeacherInsight, TeacherInsightInput } from "@/lib/teacher-insights";
 import { ClickableDotGrid, ClickableDotRows } from "@/components/ClickableDots";
 import { StaticDotGrid, StaticDotRow, StaticDotRows } from "@/components/StaticDots";
@@ -7276,6 +7278,30 @@ function SessionPage({
     [lessonBreakdown]
   );
 
+  // ── Quiz coach tip + Read Aloud summary (presentation layer only) ──
+  const quizCoachTip = useMemo(() => {
+    const labels = (weakestLessonBreakdown
+      ? [weakestLessonBreakdown.lessonTitle ?? "", (weakestLessonBreakdown.skill ?? "").replace(/_/g, " ")]
+      : lessonBreakdown.map((b) => b.lessonTitle ?? "")
+    ).filter(Boolean);
+    return getSkillCoaching(resolveCoachingKey({ topicLabels: labels })).tip;
+  }, [weakestLessonBreakdown, lessonBreakdown]);
+
+  const quizReviewSpoken = useMemo(() => {
+    const total = Math.max(1, quizQuestions.length);
+    const pct = Math.round((finalScore / total) * 100);
+    const passed = finalScore >= Math.ceil(quizQuestions.length * ((quizConfig?.passPercent ?? 80) / 100));
+    const parts: string[] = [
+      `You scored ${finalScore} out of ${quizQuestions.length}, ${pct} percent.`,
+      passed ? "You passed!" : "Keep going — you're close.",
+    ];
+    lessonBreakdown.forEach((b) => parts.push(`Lesson ${b.lessonNumber}: ${b.correct} out of ${b.total}.`));
+    if (!passed && weakestLessonBreakdown) parts.push(`Keep practising Lesson ${weakestLessonBreakdown.lessonNumber}.`);
+    parts.push(`Coach tip: ${quizCoachTip}`);
+    return parts.join(" ");
+  }, [finalScore, quizQuestions.length, quizConfig, lessonBreakdown, weakestLessonBreakdown, quizCoachTip]);
+  const isReadingQuizReview = speakState.isSpeaking && speakState.currentText === quizReviewSpoken;
+
   function completeWeek(currentWeek: number) {
     const p = readProgress();
     if (!p || p.status !== "ASSIGNED_PROGRAM") return;
@@ -8655,6 +8681,22 @@ function SessionPage({
                     <div className="mt-2 text-sm font-semibold text-emerald-200/90">
                       {quizCompletionMessage}
                     </div>
+                    <div className="mt-3 flex justify-center">
+                      <button
+                        type="button"
+                        onClick={() => void speak(quizReviewSpoken, undefined, "manual")}
+                        className={[
+                          "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition",
+                          isReadingQuizReview
+                            ? "border-teal-300/60 bg-teal-400/20 text-teal-100"
+                            : "border-white/15 bg-white/5 text-white/80 hover:bg-white/10",
+                        ].join(" ")}
+                        aria-label="Read the quiz review aloud"
+                      >
+                        <Volume2 className="h-4 w-4" />
+                        Read Aloud
+                      </button>
+                    </div>
                   </div>
 
                   <div className="p-4 space-y-3">
@@ -8704,6 +8746,14 @@ function SessionPage({
                             ? `Go back and practise Lesson ${weakestLessonBreakdown.lessonNumber}${weakestLessonBreakdown.lessonTitle ? `: ${weakestLessonBreakdown.lessonTitle}` : ""}.`
                             : "Keep building across all three lessons."}
                       </div>
+                    </div>
+
+                    {/* Coach Tip */}
+                    <div className="rounded-lg border border-white/12 bg-white/5 px-3 py-3">
+                      <div className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-white/55">
+                        Coach Tip
+                      </div>
+                      <div className="mt-1 text-sm font-bold text-white">{quizCoachTip}</div>
                     </div>
                   </div>
                 </div>
