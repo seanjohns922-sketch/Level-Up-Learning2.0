@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- handle -->
+  <path d="M82 56 a16 16 0 0 1 0 32" fill="none" stroke="#34616f" stroke-width="6" stroke-linecap="round"/>
+  <!-- body -->
+  <path d="M36 50 H82 L86 98 a6 6 0 0 1 -6 5 H42 a6 6 0 0 1 -6 -5 Z"
+        fill="#bfe3ee" stroke="#34616f" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- spout -->
+  <path d="M36 50 L26 42 L34 56" fill="#bfe3ee" stroke="#34616f" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- rim -->
+  <path d="M36 56 H82" stroke="#34616f" stroke-width="3" opacity="0.4"/>
+  <!-- highlight -->
+  <path d="M47 62 V96" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.55"/>
+</svg>

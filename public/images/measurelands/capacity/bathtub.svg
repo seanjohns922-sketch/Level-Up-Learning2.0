@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- faucet -->
+  <path d="M28 50 V40 H38" fill="none" stroke="#34616f" stroke-width="4" stroke-linecap="round"/>
+  <!-- tub body -->
+  <path d="M22 58 H98 V76 a18 18 0 0 1 -18 18 H40 a18 18 0 0 1 -18 -18 Z"
+        fill="#bfe3ee" stroke="#34616f" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- rim -->
+  <rect x="18" y="52" width="84" height="10" rx="5" fill="#e3f3f8" stroke="#34616f" stroke-width="3.5"/>
+  <!-- feet -->
+  <rect x="32" y="94" width="9" height="9" rx="2.5" fill="#34616f"/>
+  <rect x="79" y="94" width="9" height="9" rx="2.5" fill="#34616f"/>
+  <!-- highlight -->
+  <path d="M30 68 H86" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
+</svg>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- spout -->
+  <path d="M40 64 L16 46" stroke="#34616f" stroke-width="6" stroke-linecap="round"/>
+  <!-- rose (sprinkler head) -->
+  <path d="M9 39 L23 51" stroke="#34616f" stroke-width="9" stroke-linecap="round"/>
+  <!-- handle -->
+  <path d="M46 52 a14 12 0 0 1 26 -1" fill="none" stroke="#34616f" stroke-width="5" stroke-linecap="round"/>
+  <!-- body -->
+  <path d="M40 58 H80 L75 98 a8 8 0 0 1 -8 7 H53 a8 8 0 0 1 -8 -7 Z"
+        fill="#bfe3ee" stroke="#34616f" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- rim -->
+  <path d="M40 64 H80" stroke="#34616f" stroke-width="3" opacity="0.4"/>
+  <!-- highlight -->
+  <path d="M50 70 V96" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.55"/>
+</svg>

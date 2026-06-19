@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- straw -->
+  <path d="M70 30 L80 16" stroke="#e2574c" stroke-width="7" stroke-linecap="round"/>
+  <!-- cup body (tapered) -->
+  <path d="M42 42 H78 L72 102 a5 5 0 0 1 -5 4 H53 a5 5 0 0 1 -5 -4 Z"
+        fill="#bfe3ee" stroke="#34616f" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- lid -->
+  <rect x="38" y="34" width="44" height="11" rx="4.5" fill="#e3f3f8" stroke="#34616f" stroke-width="3.5"/>
+  <!-- band -->
+  <path d="M47 72 H73" stroke="#34616f" stroke-width="3" opacity="0.45"/>
+  <!-- highlight -->
+  <path d="M52 50 L50 96" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+</svg>

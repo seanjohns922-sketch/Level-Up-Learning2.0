@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- cap -->
+  <rect x="51" y="16" width="18" height="12" rx="3" fill="#9ccede" stroke="#34616f" stroke-width="3.5"/>
+  <!-- neck -->
+  <path d="M54 28 H66 V36 H54 Z" fill="#bfe3ee" stroke="#34616f" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- body -->
+  <rect x="40" y="34" width="40" height="72" rx="16" fill="#bfe3ee" stroke="#34616f" stroke-width="3.5"/>
+  <!-- label band -->
+  <path d="M40 60 H80" stroke="#34616f" stroke-width="3" opacity="0.4"/>
+  <path d="M40 76 H80" stroke="#34616f" stroke-width="3" opacity="0.4"/>
+  <!-- highlight -->
+  <path d="M49 50 V96" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+</svg>

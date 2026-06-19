@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- handle -->
+  <path d="M82 56 a18 18 0 0 1 0 32" fill="none" stroke="#34616f" stroke-width="7" stroke-linecap="round"/>
+  <!-- mug body -->
+  <path d="M38 46 H84 V92 a8 8 0 0 1 -8 8 H46 a8 8 0 0 1 -8 -8 Z"
+        fill="#bfe3ee" stroke="#34616f" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- rim -->
+  <path d="M38 52 H84" stroke="#34616f" stroke-width="3" opacity="0.45"/>
+  <!-- highlight -->
+  <path d="M47 58 V90" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+</svg>
