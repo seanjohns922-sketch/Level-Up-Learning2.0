@@ -64,7 +64,10 @@ export default function LessonPageWrapper() {
   return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><LessonPage /></Suspense>;
 }
 
-function isPrepGroundCustomLesson(lessonId: string) {
+function isPrepGroundCustomLesson(lessonId: string, realmId: string) {
+  if (realmId === "measurement") {
+    return isPrepMeasurelandsLessonId(lessonId);
+  }
   return (
     lessonId.startsWith("y0-w1-") ||
     lessonId.startsWith("y0-w2-") ||
@@ -89,33 +92,51 @@ function isPrepGroundCustomLesson(lessonId: string) {
     lessonId === "y0-w11-l3" ||
     lessonId === "y0-w12-l1" ||
     lessonId === "y0-w12-l2" ||
-    lessonId === "y0-w12-l3" ||
-    isPrepMeasurelandsLessonId(lessonId)
+    lessonId === "y0-w12-l3"
   );
 }
 
-function getPrepGroundTask(lessonId: string, difficulty: "easy" | "medium" | "hard") {
-  const measurelandsTask = resolvePrepMeasurelandsLessonTask(lessonId, difficulty);
-  if (measurelandsTask) {
-    return measurelandsTask;
+function buildMissingMeasurelandsLessonTask(lessonId: string) {
+  return {
+    kind: "measurementCompare" as const,
+    scene: "intro" as const,
+    prompt: "This Measurelands lesson is not ready yet.",
+    speakText: "This Measurelands lesson is not ready yet. Please go back to the week page.",
+    badgeLabel: "Measurelands",
+    introIcon: "🧭",
+    introBody: [
+      `Lesson id: ${lessonId}`,
+      "Please go back to the week page.",
+      "This lesson should not fall back to Number Nexus.",
+    ],
+    objects: [],
+    correctOptionId: "continue",
+    feedback: { correct: "Back to week.", wrong: "Back to week." },
+  };
+}
+
+function getPrepGroundTask(
+  lessonId: string,
+  difficulty: "easy" | "medium" | "hard",
+  realmId: string,
+) {
+  if (realmId === "measurement") {
+    const measurelandsTask = resolvePrepMeasurelandsLessonTask(lessonId, difficulty);
+    return measurelandsTask ?? buildMissingMeasurelandsLessonTask(lessonId);
   }
 
-  const normalizedLessonId = lessonId.startsWith("y0-measurement-")
-    ? lessonId.replace("y0-measurement-", "y0-")
-    : lessonId;
-
-  if (normalizedLessonId.startsWith("y0-w12-")) return generatePrepWeek12Task(normalizedLessonId, difficulty);
-  if (normalizedLessonId.startsWith("y0-w11-")) return generatePrepWeek11Task(normalizedLessonId, difficulty);
-  if (normalizedLessonId.startsWith("y0-w10-")) return generatePrepWeek10Task(normalizedLessonId, difficulty);
-  if (normalizedLessonId.startsWith("y0-w9-")) return generatePrepWeek9Task(normalizedLessonId, difficulty);
-  if (normalizedLessonId.startsWith("y0-w8-")) return generatePrepWeek8Task(normalizedLessonId, difficulty);
-  if (normalizedLessonId.startsWith("y0-w7-")) return generatePrepWeek7Task(normalizedLessonId, difficulty);
-  if (normalizedLessonId.startsWith("y0-w6-")) return generatePrepWeek6Task(normalizedLessonId, difficulty);
-  if (normalizedLessonId.startsWith("y0-w5-")) return generatePrepWeek5Task(normalizedLessonId, difficulty);
-  if (normalizedLessonId.startsWith("y0-w4-")) return generatePrepWeek4Task(normalizedLessonId, difficulty);
-  if (normalizedLessonId.startsWith("y0-w3-")) return generatePrepWeek3Task(normalizedLessonId, difficulty);
-  if (normalizedLessonId.startsWith("y0-w2-")) return generatePrepWeek2Task(normalizedLessonId, difficulty);
-  return generatePrepWeek1Task(normalizedLessonId, difficulty);
+  if (lessonId.startsWith("y0-w12-")) return generatePrepWeek12Task(lessonId, difficulty);
+  if (lessonId.startsWith("y0-w11-")) return generatePrepWeek11Task(lessonId, difficulty);
+  if (lessonId.startsWith("y0-w10-")) return generatePrepWeek10Task(lessonId, difficulty);
+  if (lessonId.startsWith("y0-w9-")) return generatePrepWeek9Task(lessonId, difficulty);
+  if (lessonId.startsWith("y0-w8-")) return generatePrepWeek8Task(lessonId, difficulty);
+  if (lessonId.startsWith("y0-w7-")) return generatePrepWeek7Task(lessonId, difficulty);
+  if (lessonId.startsWith("y0-w6-")) return generatePrepWeek6Task(lessonId, difficulty);
+  if (lessonId.startsWith("y0-w5-")) return generatePrepWeek5Task(lessonId, difficulty);
+  if (lessonId.startsWith("y0-w4-")) return generatePrepWeek4Task(lessonId, difficulty);
+  if (lessonId.startsWith("y0-w3-")) return generatePrepWeek3Task(lessonId, difficulty);
+  if (lessonId.startsWith("y0-w2-")) return generatePrepWeek2Task(lessonId, difficulty);
+  return generatePrepWeek1Task(lessonId, difficulty);
 }
 
 // Optional per-lesson reflection bullets ("Today you practised: ✅ …").
@@ -316,13 +337,21 @@ function LessonPage() {
     const weekPlan = lessonProgram.find((w) => w.week === week);
     return weekPlan?.lessons.find((l) => l.id === effectiveLessonId) ?? null;
   }, [effectiveLessonId, lessonProgram, week]);
+  const measurelandsMeta = useMemo(
+    () => (realmId === "measurement" ? getPrepMeasurelandsLessonMeta(effectiveLessonId) : null),
+    [effectiveLessonId, realmId]
+  );
   const started = startedLessonId === effectiveLessonId;
   const safeLessonTitle = lessonMeta?.displayTitle ?? lessonMeta?.title ?? null;
   const safeLessonFocus = lessonMeta?.focus ?? null;
   const hasEmbeddedLessonVideo =
     year === "Year 4" && week === 2 && lessonNumber === 1;
   const isGroundCustomLesson =
-    year === "Prep" && isPrepGroundCustomLesson(effectiveLessonId);
+    year === "Prep" && isPrepGroundCustomLesson(effectiveLessonId, realmId);
+  const invalidMeasurelandsLesson =
+    year === "Prep" &&
+    realmId === "measurement" &&
+    !measurelandsMeta;
 
   useEffect(() => {
     const p = readProgress();
@@ -592,8 +621,6 @@ function LessonPage() {
   }
 
   function renderPrepCompletionCard(summary: LessonPerformanceSummary) {
-    const measurelandsMeta =
-      realmId === "measurement" ? getPrepMeasurelandsLessonMeta(effectiveLessonId) : null;
     const prepSuccessTitle =
       measurelandsMeta?.completionTitle
         ? measurelandsMeta.completionTitle
@@ -751,6 +778,47 @@ function LessonPage() {
                       Back to Week
                     </button>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : invalidMeasurelandsLesson ? (
+          <div className="rounded-[24px] overflow-hidden shadow-[0_2px_6px_rgba(0,0,0,0.04),0_16px_40px_rgba(0,0,0,0.08)] border border-border/40 bg-card">
+            <LessonPageHero
+              levelNumber={levelNumber}
+              levelLabel={levelLabel}
+              week={week}
+              lessonNumber={lessonNumber}
+              pageTitle={`Lesson ${lessonNumber} Practise`}
+              lessonTitle={safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
+              focus="This Measurelands lesson is missing from the registry."
+              heroClass={lessonChrome.heroClass}
+              realmId={realmId}
+            />
+            <div className="bg-background px-6 py-8">
+              <div className="mx-auto max-w-2xl rounded-[28px] border border-amber-200 bg-amber-50 p-6 shadow-[0_12px_30px_rgba(180,120,20,0.12)]">
+                <div className="text-center">
+                  <div className="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-amber-800">
+                    Measurelands Registry Error
+                  </div>
+                  <h2 className="mt-3 text-3xl font-black text-slate-900">
+                    This lesson is not registered yet
+                  </h2>
+                  <p className="mt-2 text-base text-slate-700">
+                    Lesson id: <span className="font-mono">{effectiveLessonId}</span>
+                  </p>
+                  <p className="mt-2 text-lg font-semibold text-amber-900">
+                    Measurelands lessons will not fall back to Number Nexus content.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      router.push(`/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1&realm_id=${encodeURIComponent(realmId)}`)
+                    }
+                    className="mt-6 w-full rounded-[22px] bg-gradient-to-r from-amber-700 to-orange-500 px-6 py-4 text-lg font-black text-white shadow-[0_10px_24px_rgba(180,120,20,0.22)] transition hover:brightness-110"
+                  >
+                    Back to Week →
+                  </button>
                 </div>
               </div>
             </div>
@@ -1128,7 +1196,7 @@ function LessonPage() {
               getTask={(ctx) => {
                 const d = ctx?.difficulty ?? "easy";
                 if (isGroundCustomLesson) {
-                  return getPrepGroundTask(effectiveLessonId, d);
+                  return getPrepGroundTask(effectiveLessonId, d, realmId);
                 }
                 if (effectiveLessonId.startsWith("y1-w2-")) {
                   return generateWeek2Task(effectiveLessonId, d);
