@@ -1,4 +1,5 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
+import { WEEK3_CONTAINERS, type Week3Container } from "@/data/activities/prepMeasurelands/week3Containers";
 
 // ── Measurelands · Ground Level · Week 3 · Lesson 1 — "Which Holds More?" ──
 // Foundation Measurement: compare familiar containers by capacity using
@@ -51,6 +52,7 @@ type ContainerThing = {
   id: string;
   label: string;
   icon: string;
+  imageSrc: string;
   capacity: number;
 };
 
@@ -65,18 +67,7 @@ type OrderSet = {
   items: ContainerThing[];
 };
 
-const CONTAINERS: Record<string, ContainerThing> = {
-  cup: { id: "cup", label: "Cup", icon: "🥤", capacity: 1 },
-  mug: { id: "mug", label: "Mug", icon: "☕", capacity: 2 },
-  bottle: { id: "bottle", label: "Bottle", icon: "🍼", capacity: 3 },
-  lunchbox: { id: "lunchbox", label: "Lunchbox", icon: "🍱", capacity: 4 },
-  jug: { id: "jug", label: "Jug", icon: "🍶", capacity: 5 },
-  kettle: { id: "kettle", label: "Kettle", icon: "🫖", capacity: 6 },
-  wateringCan: { id: "watering-can", label: "Watering Can", icon: "🪴", capacity: 7 },
-  bucket: { id: "bucket", label: "Bucket", icon: "🪣", capacity: 8 },
-  fishTank: { id: "fish-tank", label: "Fish Tank", icon: "🐠", capacity: 9 },
-  bathtub: { id: "bathtub", label: "Bathtub", icon: "🛁", capacity: 10 },
-};
+const CONTAINERS: Record<string, ContainerThing> = WEEK3_CONTAINERS;
 
 const PAIR_SETS: PairSet[] = [
   { setId: "cup-bucket", less: CONTAINERS.cup, more: CONTAINERS.bucket },
@@ -129,8 +120,21 @@ function toObj(thing: ContainerThing, accent: Accent, waterLevel = 0, suffix = "
     id: `${thing.id}${suffix}`,
     label: thing.label,
     icon: thing.icon,
+    imageSrc: thing.imageSrc,
     compareValue: thing.capacity,
     axis: "capacity",
+    waterLevel,
+    accent,
+  };
+}
+
+function toTeachingObj(thing: Week3Container, accent: Accent, waterLevel: number) {
+  return {
+    label: thing.label,
+    icon: thing.icon,
+    imageSrc: thing.imageSrc,
+    compareValue: thing.capacity,
+    axis: "capacity" as const,
     waterLevel,
     accent,
   };
@@ -151,36 +155,36 @@ const TEACHING_MOMENTS: NonNullable<CompareTask["teachingMoments"]> = [
     id: "cup-bottle-bucket",
     title: "Holds Less and Holds More",
     objects: [
-      { label: "Tiny Cup", icon: "🥤", compareValue: 1, axis: "capacity", waterLevel: 0.7, accent: "sky" },
-      { label: "Bottle", icon: "🍼", compareValue: 3, axis: "capacity", waterLevel: 0.7, accent: "rose" },
-      { label: "Bucket", icon: "🪣", compareValue: 8, axis: "capacity", waterLevel: 0.7, accent: "gold" },
+      { ...toTeachingObj(CONTAINERS.cup, "sky", 0.7), label: "Tiny Cup" },
+      toTeachingObj(CONTAINERS.bottle, "rose", 0.7),
+      toTeachingObj(CONTAINERS.bucket, "gold", 0.7),
     ],
-    left: { label: "Tiny Cup", icon: "🥤", compareValue: 1, axis: "capacity", waterLevel: 0.7, accent: "sky" },
-    right: { label: "Bucket", icon: "🪣", compareValue: 8, axis: "capacity", waterLevel: 0.7, accent: "gold" },
+    left: { ...toTeachingObj(CONTAINERS.cup, "sky", 0.7), label: "Tiny Cup" },
+    right: toTeachingObj(CONTAINERS.bucket, "gold", 0.7),
     narration: "The tiny cup holds less. The bucket holds more.",
   },
   {
     id: "mug-jug-bucket",
     title: "Compare the Containers",
     objects: [
-      { label: "Mug", icon: "☕", compareValue: 2, axis: "capacity", waterLevel: 0.68, accent: "violet" },
-      { label: "Jug", icon: "🍶", compareValue: 5, axis: "capacity", waterLevel: 0.68, accent: "teal" },
-      { label: "Bucket", icon: "🪣", compareValue: 8, axis: "capacity", waterLevel: 0.68, accent: "leaf" },
+      toTeachingObj(CONTAINERS.mug, "violet", 0.68),
+      toTeachingObj(CONTAINERS.jug, "teal", 0.68),
+      toTeachingObj(CONTAINERS.bucket, "leaf", 0.68),
     ],
-    left: { label: "Mug", icon: "☕", compareValue: 2, axis: "capacity", waterLevel: 0.68, accent: "violet" },
-    right: { label: "Jug", icon: "🍶", compareValue: 5, axis: "capacity", waterLevel: 0.68, accent: "teal" },
+    left: toTeachingObj(CONTAINERS.mug, "violet", 0.68),
+    right: toTeachingObj(CONTAINERS.jug, "teal", 0.68),
     narration: "A mug holds less than a jug. A bucket holds more than both.",
   },
   {
     id: "bottle-fish-tank-bathtub",
     title: "Big Containers Hold More",
     objects: [
-      { label: "Bottle", icon: "🍼", compareValue: 3, axis: "capacity", waterLevel: 0.7, accent: "rose" },
-      { label: "Fish Tank", icon: "🐠", compareValue: 9, axis: "capacity", waterLevel: 0.7, accent: "sky" },
-      { label: "Bathtub", icon: "🛁", compareValue: 10, axis: "capacity", waterLevel: 0.7, accent: "gold" },
+      toTeachingObj(CONTAINERS.bottle, "rose", 0.7),
+      toTeachingObj(CONTAINERS.fishTank, "sky", 0.7),
+      toTeachingObj(CONTAINERS.bathtub, "gold", 0.7),
     ],
-    left: { label: "Bottle", icon: "🍼", compareValue: 3, axis: "capacity", waterLevel: 0.7, accent: "rose" },
-    right: { label: "Bathtub", icon: "🛁", compareValue: 10, axis: "capacity", waterLevel: 0.7, accent: "gold" },
+    left: toTeachingObj(CONTAINERS.bottle, "rose", 0.7),
+    right: toTeachingObj(CONTAINERS.bathtub, "gold", 0.7),
     narration: "The bathtub holds the most. The bottle holds less.",
   },
 ];

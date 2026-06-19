@@ -1,4 +1,5 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
+import { WEEK3_CONTAINERS, type Week3Container } from "@/data/activities/prepMeasurelands/week3Containers";
 
 // ── Measurelands · Ground Level · Week 3 · Lesson 2 — "Ordering Containers" ──
 // Foundation Measurement: order familiar containers by capacity using
@@ -22,6 +23,7 @@ type ContainerThing = {
   id: string;
   label: string;
   icon: string;
+  imageSrc: string;
   capacityRank: number;
 };
 
@@ -34,16 +36,9 @@ const lessonMemory = new Map<string, LessonMemory>();
 const ROTATION: Array<"A" | "B" | "C"> = ["A", "B", "C", "A", "C", "B"];
 const ACCENTS: Accent[] = ["rose", "gold", "teal", "sky", "violet", "leaf"];
 
-const CONTAINERS: Record<string, ContainerThing> = {
-  cup: { id: "cup", label: "Cup", icon: "🥤", capacityRank: 1 },
-  mug: { id: "mug", label: "Mug", icon: "☕", capacityRank: 2 },
-  bottle: { id: "bottle", label: "Bottle", icon: "🍼", capacityRank: 3 },
-  jug: { id: "jug", label: "Jug", icon: "🍶", capacityRank: 5 },
-  kettle: { id: "kettle", label: "Kettle", icon: "🫖", capacityRank: 6 },
-  wateringCan: { id: "watering-can", label: "Watering Can", icon: "🪴", capacityRank: 7 },
-  bucket: { id: "bucket", label: "Bucket", icon: "🪣", capacityRank: 8 },
-  bathtub: { id: "bathtub", label: "Bathtub", icon: "🛁", capacityRank: 10 },
-};
+const CONTAINERS: Record<string, ContainerThing> = Object.fromEntries(
+  Object.entries(WEEK3_CONTAINERS).map(([key, item]) => [key, { ...item, capacityRank: item.capacity }]),
+) as Record<string, ContainerThing>;
 
 const ORDER_SETS: ContainerSet[] = [
   {
@@ -108,8 +103,20 @@ function toObj(thing: ContainerThing, accent: Accent, suffix = ""): MObj {
     id: `${thing.id}${suffix}`,
     label: thing.label,
     icon: thing.icon,
+    imageSrc: thing.imageSrc,
     compareValue: thing.capacityRank,
     axis: "capacity",
+    accent,
+  };
+}
+
+function toTeachingObj(thing: Week3Container, accent: Accent) {
+  return {
+    label: thing.label,
+    icon: thing.icon,
+    imageSrc: thing.imageSrc,
+    compareValue: thing.capacity,
+    axis: "capacity" as const,
     accent,
   };
 }
@@ -127,39 +134,39 @@ const TEACHING_MOMENTS: NonNullable<CompareTask["teachingMoments"]> = [
     id: "cup-bottle-kettle-bucket",
     title: "Smallest to Largest",
     objects: [
-      { label: "Cup", icon: "🥤", compareValue: 1, axis: "capacity", accent: "sky" },
-      { label: "Bottle", icon: "🍼", compareValue: 3, axis: "capacity", accent: "rose" },
-      { label: "Kettle", icon: "🫖", compareValue: 6, axis: "capacity", accent: "violet" },
-      { label: "Bucket", icon: "🪣", compareValue: 8, axis: "capacity", accent: "gold" },
+      toTeachingObj(WEEK3_CONTAINERS.cup, "sky"),
+      toTeachingObj(WEEK3_CONTAINERS.bottle, "rose"),
+      toTeachingObj(WEEK3_CONTAINERS.kettle, "violet"),
+      toTeachingObj(WEEK3_CONTAINERS.bucket, "gold"),
     ],
-    left: { label: "Cup", icon: "🥤", compareValue: 1, axis: "capacity", accent: "sky" },
-    right: { label: "Bucket", icon: "🪣", compareValue: 8, axis: "capacity", accent: "gold" },
+    left: toTeachingObj(WEEK3_CONTAINERS.cup, "sky"),
+    right: toTeachingObj(WEEK3_CONTAINERS.bucket, "gold"),
     narration: "The cup is smallest. The bucket is largest.",
   },
   {
     id: "mug-bottle-jug-bucket",
     title: "Holds Less to Holds More",
     objects: [
-      { label: "Mug", icon: "☕", compareValue: 2, axis: "capacity", accent: "leaf" },
-      { label: "Bottle", icon: "🍼", compareValue: 3, axis: "capacity", accent: "teal" },
-      { label: "Jug", icon: "🍶", compareValue: 5, axis: "capacity", accent: "rose" },
-      { label: "Bucket", icon: "🪣", compareValue: 8, axis: "capacity", accent: "gold" },
+      toTeachingObj(WEEK3_CONTAINERS.mug, "leaf"),
+      toTeachingObj(WEEK3_CONTAINERS.bottle, "teal"),
+      toTeachingObj(WEEK3_CONTAINERS.jug, "rose"),
+      toTeachingObj(WEEK3_CONTAINERS.bucket, "gold"),
     ],
-    left: { label: "Mug", icon: "☕", compareValue: 2, axis: "capacity", accent: "leaf" },
-    right: { label: "Bucket", icon: "🪣", compareValue: 8, axis: "capacity", accent: "gold" },
+    left: toTeachingObj(WEEK3_CONTAINERS.mug, "leaf"),
+    right: toTeachingObj(WEEK3_CONTAINERS.bucket, "gold"),
     narration: "We start with the container that holds less. Then we move to the one that holds more.",
   },
   {
     id: "cup-bottle-jug-bathtub",
     title: "Largest Holds the Most",
     objects: [
-      { label: "Cup", icon: "🥤", compareValue: 1, axis: "capacity", accent: "sky" },
-      { label: "Bottle", icon: "🍼", compareValue: 3, axis: "capacity", accent: "violet" },
-      { label: "Jug", icon: "🍶", compareValue: 5, axis: "capacity", accent: "teal" },
-      { label: "Bathtub", icon: "🛁", compareValue: 10, axis: "capacity", accent: "gold" },
+      toTeachingObj(WEEK3_CONTAINERS.cup, "sky"),
+      toTeachingObj(WEEK3_CONTAINERS.bottle, "violet"),
+      toTeachingObj(WEEK3_CONTAINERS.jug, "teal"),
+      toTeachingObj(WEEK3_CONTAINERS.bathtub, "gold"),
     ],
-    left: { label: "Cup", icon: "🥤", compareValue: 1, axis: "capacity", accent: "sky" },
-    right: { label: "Bathtub", icon: "🛁", compareValue: 10, axis: "capacity", accent: "gold" },
+    left: toTeachingObj(WEEK3_CONTAINERS.cup, "sky"),
+    right: toTeachingObj(WEEK3_CONTAINERS.bathtub, "gold"),
     narration: "The bathtub holds the most, so it goes last.",
   },
 ];

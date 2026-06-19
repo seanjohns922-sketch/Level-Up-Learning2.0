@@ -146,19 +146,67 @@ function CompareVisual({
     axis === "mass" ? "Weight" : axis === "length" ? "Length" : axis === "capacity" ? "Capacity" : "Height";
 
   // ── Real image path ──────────────────────────────────────────────────────
-  // When the lesson supplies `imageSrc`, render the photo/illustration instead
-  // of the emoji + CSS glyph. The bounding box scales with `compareValue` so a
-  // bigger-capacity (or longer / heavier) object LOOKS bigger — except in the
-  // fill-state task (showWater, not the intro pour), where size is fixed so the
-  // student focuses on level, not size.
-  const imageFixed = showWater && !animateFill;
-  const imageBox = imageFixed
-    ? compact
-      ? 96
-      : 120
-    : Math.round((compact ? 84 : 104) + (item.compareValue / 10) * (compact ? 40 : 64));
+  // Measurelands Week 3 uses real container photos. Keep the photo box a
+  // consistent size so students compare the OBJECTS, not the artwork scaling.
+  const imageBox = compact ? 96 : 120;
+  const capacityGaugeWidth = compact ? 80 : 96;
+  const capacityGaugeHeight = compact ? 106 : 126;
 
   if (item.imageSrc) {
+    // Activity C (fill-state, scene "sort"): the concept IS the water level, so
+    // show the fillable gauge with water — and ONLY the gauge, never a photo too
+    // (a photo + gauge would put two containers on screen).
+    if (axis === "capacity" && showWater) {
+      const gaugeWaterHeight = Math.round(capacityGaugeHeight * Math.max(0, Math.min(1, waterLevel)));
+      return (
+        <div
+          className="rounded-[26px] border px-4 py-4 text-center"
+          style={{
+            borderColor: accent.border,
+            background: "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,248,232,0.96))",
+            boxShadow: accent.glow,
+          }}
+        >
+          <div className="mb-3 text-sm font-black uppercase tracking-[0.14em] text-[#5f4725]">
+            {item.label}
+          </div>
+          <div className="flex h-[160px] items-end justify-center">
+            <div
+              className="relative flex items-end justify-center overflow-hidden rounded-[24px] border-[3px] border-[#ead6a8] bg-[#fffaf0] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]"
+              style={{
+                width: capacityGaugeWidth,
+                height: capacityGaugeHeight,
+              }}
+            >
+              <div
+                className="absolute inset-x-0 top-[7px] border-t border-dashed"
+                style={{ borderColor: "rgba(120,53,15,0.28)" }}
+              />
+              {renderWater ? (
+                <div
+                  className="absolute inset-x-0 bottom-0 rounded-b-[18px]"
+                  style={{
+                    height: gaugeWaterHeight,
+                    background:
+                      "linear-gradient(180deg, rgba(125,211,252,0.88) 0%, rgba(45,212,191,0.92) 100%)",
+                    boxShadow: animateFill ? "0 -8px 18px rgba(45,212,191,0.26)" : "none",
+                    transition: animateFill ? "height 0.7s ease" : undefined,
+                  }}
+                />
+              ) : null}
+            </div>
+          </div>
+          <div
+            className="mt-3 inline-flex rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em]"
+            style={{ background: accent.chip, color: accent.text }}
+          >
+            {axisLabel}
+          </div>
+        </div>
+      );
+    }
+
+    // Compare (A) / order (B) / sequence / intro: ONLY the flat container image.
     return (
       <div
         className="rounded-[26px] border px-4 py-4 text-center"
