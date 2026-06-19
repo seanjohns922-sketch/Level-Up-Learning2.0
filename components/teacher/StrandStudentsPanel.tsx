@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, type ReactNode } from "react";
+import { BarChart3 } from "lucide-react";
 import {
   getGenresForYear,
   getCurriculumPlan,
@@ -163,7 +164,6 @@ function yearToLevelLabel(year: string): string {
 type StudentFlagTone = "neutral" | "red" | "yellow" | "green";
 type StudentFlag = {
   label: string;
-  emoji: string;
   tone: StudentFlagTone;
 };
 
@@ -396,15 +396,15 @@ function deriveStudentFlag(
   fallbackStatus: StrandStatus,
 ): StudentFlag {
   if (insight?.status === "Needs Support" || fallbackStatus === "Needs Support") {
-    return { label: "Needs support", emoji: "🔴", tone: "red" };
+    return { label: "Needs support", tone: "red" };
   }
   if (insight?.status === "Quick Check-in Recommended" || fallbackStatus === "In Progress") {
-    return { label: "Check-in", emoji: "🟡", tone: "yellow" };
+    return { label: "Check-in", tone: "yellow" };
   }
   if (insight?.status === "On Track" || insight?.status === "Ready to Move On" || fallbackStatus === "Completed") {
-    return { label: "On track", emoji: "🟢", tone: "green" };
+    return { label: "On track", tone: "green" };
   }
-  return { label: "Not started", emoji: "⚪", tone: "neutral" };
+  return { label: "Not started", tone: "neutral" };
 }
 
 
@@ -1290,7 +1290,7 @@ function StudentStrandDetail({
           href={`/teacher/student-insights?studentId=${student.id}`}
           className="inline-flex items-center gap-2 rounded-xl border border-[#E6E8EC] bg-white px-3.5 py-2 text-sm font-bold text-[#0F172A] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition hover:border-[#CBD5E1] hover:bg-[#F8FAFC]"
         >
-          <span aria-hidden>📊</span>
+          <BarChart3 className="h-4 w-4" aria-hidden />
           Learning Insights
         </a>
       </div>

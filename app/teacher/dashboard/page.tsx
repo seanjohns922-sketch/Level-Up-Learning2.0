@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Star, Check, X, Lock, LockOpen, KeyRound, Trophy, Brain } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useAuthGuard } from "@/lib/useAuthGuard";
@@ -602,7 +603,7 @@ export default function TeacherDashboardPage() {
           <span className="tabular-nums text-xs font-bold text-slate-700">{overallPct}%</span>
           {hasLegend && (
             <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-teal-700 bg-teal-50 border border-teal-100 px-1.5 py-0.5 rounded-md whitespace-nowrap">
-              ★ Legend
+              <Star className="h-3 w-3" fill="currentColor" /> Legend
             </span>
           )}
         </div>
@@ -693,7 +694,7 @@ export default function TeacherDashboardPage() {
                   done ? "bg-emerald-100 text-emerald-700" : "bg-gray-200 text-gray-400",
                 ].join(" ")}
               >
-                {label} {done ? "✓" : "🔒"}
+                <span className="inline-flex items-center gap-1">{label} {done ? <Check className="h-3 w-3" /> : <Lock className="h-3 w-3" />}</span>
               </span>
             ))}
             <span
@@ -702,13 +703,13 @@ export default function TeacherDashboardPage() {
                 quizUnlocked ? "bg-blue-100 text-blue-700" : "bg-gray-200 text-gray-400",
               ].join(" ")}
             >
-              Quiz {quizUnlocked ? "🔓" : "🔒"}
+              <span className="inline-flex items-center gap-1">Quiz {quizUnlocked ? <LockOpen className="h-3 w-3" /> : <Lock className="h-3 w-3" />}</span>
             </span>
           </div>
 
           {legends.length > 0 && (
             <div className="mt-4 flex items-center gap-2 text-sm">
-              <span className="text-teal-600 font-bold">🏆 Legend Unlocked</span>
+              <span className="inline-flex items-center gap-1.5 text-teal-600 font-bold"><Trophy className="h-4 w-4" /> Legend Unlocked</span>
             </div>
           )}
 
@@ -736,7 +737,7 @@ export default function TeacherDashboardPage() {
 
         {/* Login Details - QR + PIN */}
         <div>
-          <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">🔐 Login Details</h4>
+          <h4 className="flex items-center gap-1.5 text-xs font-bold text-gray-400 uppercase tracking-wider mb-3"><KeyRound className="h-3.5 w-3.5" /> Login Details</h4>
           <StudentQRSection student={student} classCode={selectedClass?.class_code ?? ""} className2={selectedClass?.name ?? ""} onRegenerate={(newToken) => {
             setStudents((prev) => prev.map((s) => s.id === student.id ? { ...s, qr_token: newToken } : s));
           }} />
@@ -784,8 +785,8 @@ export default function TeacherDashboardPage() {
                               <span className="text-gray-600 text-xs">
                                 Attempt {i + 1} — {a.score}/{a.total} ({a.percent}%)
                               </span>
-                              <span className={["font-bold text-xs px-2 py-0.5 rounded-full", a.passed ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-600"].join(" ")}>
-                                {a.passed ? "✅ Pass" : "❌ Fail"}
+                              <span className={["inline-flex items-center gap-1 font-bold text-xs px-2 py-0.5 rounded-full", a.passed ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-600"].join(" ")}>
+                                {a.passed ? <><Check className="h-3 w-3" /> Pass</> : <><X className="h-3 w-3" /> Fail</>}
                               </span>
                             </div>
                             <div className="mt-1 text-[11px] text-gray-500">
@@ -805,8 +806,8 @@ export default function TeacherDashboardPage() {
                       ) : (
                         <div className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-white">
                           <span className="text-gray-600">Score: {wd?.score}/{wd?.total} ({wd?.percent}%)</span>
-                          <span className={["font-bold text-xs px-2 py-0.5 rounded-full", wd?.passed ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-600"].join(" ")}>
-                            {wd?.passed ? "✅ Pass" : "❌ Fail"}
+                          <span className={["inline-flex items-center gap-1 font-bold text-xs px-2 py-0.5 rounded-full", wd?.passed ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-600"].join(" ")}>
+                            {wd?.passed ? <><Check className="h-3 w-3" /> Pass</> : <><X className="h-3 w-3" /> Fail</>}
                           </span>
                         </div>
                       )}
@@ -945,7 +946,7 @@ export default function TeacherDashboardPage() {
                 <span className="text-[11px] font-semibold text-[#94A3B8]">· {classStudents.length} student{classStudents.length === 1 ? "" : "s"}</span>
                 <span className="h-1 w-1 rounded-full bg-[#CBD5E1]" />
                 <label className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#475569]">
-                  <span title="Mid-lesson mini-game frequency. Override per student in their card.">🧠 Brain breaks</span>
+                  <span className="inline-flex items-center gap-1.5" title="Mid-lesson mini-game frequency. Override per student in their card."><Brain className="h-3.5 w-3.5" /> Brain breaks</span>
                   <select
                     value={isBrainBreakFrequency(selectedClass.brain_break_frequency) ? selectedClass.brain_break_frequency : "normal"}
                     onChange={(e) => { if (isBrainBreakFrequency(e.target.value)) void setClassBrainBreak(e.target.value); }}

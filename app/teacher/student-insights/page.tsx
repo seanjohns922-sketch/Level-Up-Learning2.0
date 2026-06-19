@@ -1,6 +1,7 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState, type ComponentType } from "react";
+import { Laugh, Smile, Meh, Frown } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -174,11 +175,14 @@ function formatRelativeWeeks(from?: string | null, to?: string | null) {
   return Math.max(1, Math.round(diffMs / (7 * 24 * 60 * 60 * 1000)));
 }
 
-function confidenceMeta(value: number) {
-  if (value >= 4) return { emoji: "😀", label: "Very Confident" };
-  if (value === 3) return { emoji: "🙂", label: "Confident" };
-  if (value === 2) return { emoji: "😐", label: "Unsure" };
-  return { emoji: "☹", label: "Need Help" };
+function confidenceMeta(value: number): {
+  Icon: ComponentType<{ className?: string }>;
+  label: string;
+} {
+  if (value >= 4) return { Icon: Laugh, label: "Very Confident" };
+  if (value === 3) return { Icon: Smile, label: "Confident" };
+  if (value === 2) return { Icon: Meh, label: "Unsure" };
+  return { Icon: Frown, label: "Need Help" };
 }
 
 function weekQuizPassed(quiz: JsonObject | undefined) {
@@ -666,7 +670,7 @@ function StudentInsightsPageInner() {
                       const meta = confidenceMeta(item.confidence);
                       return (
                         <div key={item.id} className="rounded-xl border border-[#E6E8EC] bg-[#F8FAFC] px-3 py-2">
-                          <div className="text-sm font-bold text-[#0F172A]">{meta.emoji} {meta.label}</div>
+                          <div className="flex items-center gap-1.5 text-sm font-bold text-[#0F172A]"><meta.Icon className="h-4 w-4" /> {meta.label}</div>
                           <div className="text-xs text-[#64748B]">{item.lesson_title ?? item.level ?? "Lesson"} · {formatDate(item.created_at)}</div>
                         </div>
                       );
@@ -685,7 +689,7 @@ function StudentInsightsPageInner() {
                         <div className="text-sm font-bold text-[#0F172A]">{item.lesson_title ?? item.level ?? "Lesson"}</div>
                         <div className="text-xs text-[#64748B]">{formatDate(item.created_at)}</div>
                       </div>
-                      <div className="text-sm font-bold text-[#0F172A]">{meta.emoji} {meta.label}</div>
+                      <div className="flex items-center gap-1.5 text-sm font-bold text-[#0F172A]"><meta.Icon className="h-4 w-4" /> {meta.label}</div>
                     </div>
                     {item.hardest_part ? (
                       <div className="mt-2 text-sm text-[#475569]">Hardest part: {item.hardest_part}</div>

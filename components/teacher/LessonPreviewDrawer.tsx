@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Star, Check } from "lucide-react";
 import type { Lesson } from "@/data/programs/year1";
 import { DEFAULT_LESSON_XP } from "@/data/programs/genres";
 import type { TeacherInsight } from "@/lib/teacher-insights";
@@ -225,7 +226,7 @@ function exampleForActivity(idea: string): ActivityExample {
       visual: (
         <div className="p-3 rounded-lg bg-white border border-[#E6E8EC]">
           <div className="flex flex-wrap gap-1 max-w-[200px]">
-            {Array.from({length:14}).map((_,i)=><span key={i} className="text-amber-500 text-lg">★</span>)}
+            {Array.from({length:14}).map((_,i)=><Star key={i} className="h-4 w-4 text-amber-500" fill="currentColor" />)}
           </div>
         </div>
       ),
@@ -891,8 +892,8 @@ function activityPreviewData(type: ActivityType, config: Record<string, unknown>
         label: "Equivalent? Yes or No",
         description: "Decide quickly whether two fractions are equivalent.",
         prompt: "Are 3/6 and 1/2 equivalent?",
-        options: ["Yes ✓", "No"],
-        correct: "Yes ✓",
+        options: ["Yes", "No"],
+        correct: "Yes",
         note: "3/6 simplifies to 1/2. Quick-fire rounds build fluency.",
       };
     }
@@ -1251,8 +1252,8 @@ export default function LessonPreviewDrawer({
                               {ex.options.map((opt) => {
                                 const isCorrect = opt === ex.correct;
                                 return (
-                                  <div key={opt} className={`rounded-lg border px-2.5 py-2 text-xs font-bold ${isCorrect ? "bg-emerald-50 border-emerald-300 text-emerald-800" : "bg-white border-[#E6E8EC] text-[#0F172A]"}`}>
-                                    {opt}{isCorrect ? " ✓" : ""}
+                                  <div key={opt} className={`flex items-center gap-1 rounded-lg border px-2.5 py-2 text-xs font-bold ${isCorrect ? "bg-emerald-50 border-emerald-300 text-emerald-800" : "bg-white border-[#E6E8EC] text-[#0F172A]"}`}>
+                                    {opt}{isCorrect ? <Check className="h-3.5 w-3.5" /> : null}
                                   </div>
                                 );
                               })}

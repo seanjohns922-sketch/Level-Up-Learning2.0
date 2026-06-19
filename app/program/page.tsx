@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Check, Lock, LockOpen } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getProgramForYear } from "@/data/programs";
 import { getCurriculumPlan } from "@/data/programs/genres";
@@ -825,7 +826,7 @@ function ProgramPage() {
                                           background: isMeasurementRealm ? "rgba(42,26,6,0.55)" : "rgba(15,23,42,0.72)",
                                         }}
                                 >
-                                  <span>{done ? "✓" : unlocked ? "🔓" : "🔒"}</span>
+                                  <span>{done ? <Check className="h-4 w-4" /> : unlocked ? <LockOpen className="h-4 w-4" /> : <Lock className="h-4 w-4" />}</span>
                                   <span>Week {requiredWeek}</span>
                                 </button>
                               );
@@ -869,7 +870,7 @@ function ProgramPage() {
                                           background: isMeasurementRealm ? "rgba(31,20,7,0.55)" : "linear-gradient(135deg, rgba(30,41,59,0.9), rgba(15,23,42,0.92))",
                                         }}
                                 >
-                                  <span>{done ? "✓" : optionalPlayable ? "🔓" : "🔒"}</span>
+                                  <span>{done ? <Check className="h-4 w-4" /> : optionalPlayable ? <LockOpen className="h-4 w-4" /> : <Lock className="h-4 w-4" />}</span>
                                   <span>Week {optionalWeek}</span>
                                 </button>
                               );
@@ -1077,7 +1078,7 @@ function ProgramPage() {
                             background: rt.statusLockedBg,
                           }}
                         >
-                          🔒 LOCKED
+                          <span className="inline-flex items-center gap-1.5"><Lock className="h-3.5 w-3.5" /> LOCKED</span>
                         </span>
                       ) : (
                         <span
