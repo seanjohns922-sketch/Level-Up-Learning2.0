@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Zap, Sparkle } from "lucide-react";
 import { LessonRenderer } from "@/components/lesson/LessonRenderer";
 import { LessonHUDRail } from "@/components/lesson/LessonHUDRail";
 import { LessonCompleteCard } from "@/components/lesson/LessonCompleteCard";
@@ -1199,7 +1200,10 @@ export function Year2LessonEngine({
                         animation: "nexusBadgePulse 2s ease-in-out infinite",
                       }}
                     >
-                      {isMeasurement ? "✦ Surge State" : "⚡ Nexus State"}
+                      <span className="inline-flex items-center gap-1">
+                        {isMeasurement ? <Sparkle className="h-3.5 w-3.5" /> : <Zap className="h-3.5 w-3.5" />}
+                        {isMeasurement ? "Surge State" : "Nexus State"}
+                      </span>
                     </span>
                   )}
                 </div>

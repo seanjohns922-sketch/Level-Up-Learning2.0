@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Zap, Flame } from "lucide-react";
 
 function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -99,7 +100,7 @@ export default function SpeedRound({
   if (finished) {
     return (
       <div className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm text-center">
-        <div className="text-5xl mb-3">⚡</div>
+        <div className="mb-3 flex justify-center"><Zap className="h-12 w-12 text-amber-500" fill="currentColor" /></div>
         <h2 className="text-2xl font-black text-gray-900">Speed Round Complete!</h2>
         <div className="mt-4 grid grid-cols-2 gap-3">
           <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
@@ -142,12 +143,12 @@ export default function SpeedRound({
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <span className="text-lg">⚡</span>
+          <Zap className="h-5 w-5 text-amber-500" fill="currentColor" />
           <span className="text-sm font-extrabold text-gray-700">Speed Round</span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-xs font-bold text-gray-500">
-            🔥 {streak}
+          <span className="inline-flex items-center gap-1 text-xs font-bold text-gray-500">
+            <Flame className="h-4 w-4" /> {streak}
           </span>
           <span className="text-sm font-black tabular-nums text-gray-700">
             {timeLeft}s

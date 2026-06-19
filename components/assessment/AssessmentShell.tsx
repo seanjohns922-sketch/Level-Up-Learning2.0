@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { ChevronLeft, Home, LogOut, DoorOpen, Trophy, Zap } from "lucide-react";
+import { ChevronLeft, Home, LogOut, DoorOpen, Trophy, Zap, HelpCircle } from "lucide-react";
 import { MathFormattedText } from "@/components/FractionText";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { getRealmTheme } from "@/lib/useRealmTheme";
@@ -227,7 +227,7 @@ export default function AssessmentShell({
                 onClick={onIdk}
                 className="flex items-center gap-2 px-5 py-3 rounded-2xl text-sm font-bold text-slate-300 bg-slate-700/40 border border-slate-600/60 hover:bg-slate-700/70 hover:text-white transition active:scale-[0.98]"
               >
-                <span className="text-lg leading-none">🤔</span>
+                <HelpCircle className="h-5 w-5" />
                 I Don&apos;t Know — Skip This Question
               </button>
             </div>

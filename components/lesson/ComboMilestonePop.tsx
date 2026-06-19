@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
+import { Zap } from "lucide-react";
 
 const MILESTONES = [
   {
@@ -11,7 +12,6 @@ const MILESTONES = [
     glow: "rgba(139,92,246,0.8)",
     bg: "rgba(109,40,217,0.18)",
     border: "rgba(167,139,250,0.65)",
-    icon: "⚡",
   },
   {
     at: 8,
@@ -20,7 +20,6 @@ const MILESTONES = [
     glow: "rgba(234,88,12,0.8)",
     bg: "rgba(194,65,12,0.18)",
     border: "rgba(251,146,60,0.65)",
-    icon: "⚡",
   },
   {
     at: 5,
@@ -29,7 +28,6 @@ const MILESTONES = [
     glow: "rgba(202,138,4,0.8)",
     bg: "rgba(161,98,7,0.18)",
     border: "rgba(253,224,71,0.65)",
-    icon: "⚡",
   },
   {
     at: 3,
@@ -38,7 +36,6 @@ const MILESTONES = [
     glow: "rgba(20,184,166,0.8)",
     bg: "rgba(15,118,110,0.18)",
     border: "rgba(94,234,212,0.65)",
-    icon: "⚡",
   },
 ] as const;
 
@@ -101,7 +98,7 @@ function MilestoneBadge({
           boxShadow: `0 0 40px ${milestone.glow}, 0 0 80px ${milestone.glow}50, 0 6px 24px rgba(0,0,0,0.35)`,
         }}
       >
-        <span style={{ fontSize: "1.75rem", lineHeight: 1 }}>{milestone.icon}</span>
+        <Zap style={{ width: "1.75rem", height: "1.75rem", color: milestone.color, fill: milestone.color }} />
         <div>
           <div
             style={{

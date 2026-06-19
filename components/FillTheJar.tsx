@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Check, X, RotateCw } from "lucide-react";
 
 type FillJarConfig = {
   minTarget?: number;
@@ -116,11 +117,11 @@ export default function FillTheJar({
 
           {status === "correct" ? (
             <div className="inline-flex items-center gap-2 rounded-full bg-green-100 text-green-800 px-3 py-1 text-sm font-bold">
-              ✅ Perfect!
+              <Check className="h-4 w-4" /> Perfect!
             </div>
           ) : status === "tooHigh" ? (
             <div className="inline-flex items-center gap-2 rounded-full bg-red-100 text-red-800 px-3 py-1 text-sm font-bold">
-              ❌ Too high — reset!
+              <X className="h-4 w-4" /> Too high — reset!
             </div>
           ) : (
             <div className="text-sm text-gray-400"> </div>
@@ -184,7 +185,7 @@ export default function FillTheJar({
           className="px-4 py-3 rounded-xl bg-gray-100 text-gray-800 font-bold hover:bg-gray-200 transition"
           title="New target (testing)"
         >
-          New target 🔁
+          <span className="inline-flex items-center gap-1.5">New target <RotateCw className="h-4 w-4" /></span>
         </button>
 
         <button

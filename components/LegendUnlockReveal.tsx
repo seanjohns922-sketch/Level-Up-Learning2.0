@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Star } from "lucide-react";
 import type { Legend } from "@/data/legends";
 import { markLegendUnlockVideoSeen } from "@/lib/legend-video-state";
 
@@ -258,7 +259,10 @@ export default function LegendUnlockReveal({
                 animation: "shimmerText 2s ease-in-out infinite",
               }}
             >
-              ★ LEGEND UNLOCKED ★
+              <span className="inline-flex items-center gap-2">
+                <Star className="h-5 w-5" fill="currentColor" /> LEGEND UNLOCKED{" "}
+                <Star className="h-5 w-5" fill="currentColor" />
+              </span>
             </div>
           </div>
         )}

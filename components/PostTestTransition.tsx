@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { PartyPopper, Star, Trophy, Sparkles, Award, Dumbbell, Rocket, ClipboardList } from "lucide-react";
+
+const FLOAT_ICONS = [PartyPopper, Star, Trophy, Sparkles, Award, Dumbbell];
 
 export default function PostTestTransition({ year }: { year: string }) {
   const router = useRouter();
@@ -15,10 +18,10 @@ export default function PostTestTransition({ year }: { year: string }) {
     <main className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
       {/* Floating celebration shapes */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {["🎉", "⭐", "🏆", "✨", "🎊", "💪"].map((emoji, i) => (
+        {FLOAT_ICONS.map((Icon, i) => (
           <div
             key={i}
-            className="absolute text-3xl opacity-20"
+            className="absolute opacity-20"
             style={{
               left: `${10 + i * 15}%`,
               top: `${15 + (i % 3) * 25}%`,
@@ -26,7 +29,7 @@ export default function PostTestTransition({ year }: { year: string }) {
               animationDelay: `${i * 0.3}s`,
             }}
           >
-            {emoji}
+            <Icon className="h-8 w-8 text-primary" />
           </div>
         ))}
       </div>
@@ -49,14 +52,14 @@ export default function PostTestTransition({ year }: { year: string }) {
           />
 
           <div className="p-8 space-y-6">
-            {/* Big celebration emoji */}
+            {/* Big celebration icon */}
             <div
-              className="text-6xl"
+              className="flex justify-center"
               style={{
                 animation: "bounceIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both",
               }}
             >
-              🎉
+              <PartyPopper className="h-16 w-16 text-primary" />
             </div>
 
             <div>
@@ -73,7 +76,7 @@ export default function PostTestTransition({ year }: { year: string }) {
             {/* Info card */}
             <div className="rounded-2xl border border-primary/20 bg-primary-light p-4 text-left">
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-lg">📝</span>
+                <ClipboardList className="h-5 w-5 text-primary" />
                 <span className="font-bold text-sm text-foreground">What to expect</span>
               </div>
               <ul className="space-y-1 text-xs text-muted-foreground">
@@ -98,7 +101,7 @@ export default function PostTestTransition({ year }: { year: string }) {
               className="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-extrabold text-lg hover:opacity-90 transition-all active:scale-[0.98] shadow-lg"
               style={{ boxShadow: "0 8px 24px -8px hsl(var(--primary) / 0.4)" }}
             >
-              🚀 Start Post-Test
+              <span className="inline-flex items-center justify-center gap-2"><Rocket className="h-5 w-5" /> Start Post-Test</span>
             </button>
           </div>
         </div>
