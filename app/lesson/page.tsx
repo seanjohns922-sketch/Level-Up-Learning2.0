@@ -58,6 +58,10 @@ import {
   generatePrepMeasurelandsWeek2Lesson3Task,
   resetPrepMeasurelandsWeek2Lesson3TaskSessionState,
 } from "@/data/activities/prepMeasurelands/week2Lesson3";
+import {
+  generatePrepMeasurelandsWeek3Lesson1Task,
+  resetPrepMeasurelandsWeek3Lesson1TaskSessionState,
+} from "@/data/activities/prepMeasurelands/week3Lesson1";
 import { getProgramForYear } from "@/data/programs";
 import { getCurriculumPlan } from "@/data/programs/genres";
 import { DEMO_MODE } from "@/data/config";
@@ -129,6 +133,9 @@ function getPrepGroundTask(lessonId: string, difficulty: "easy" | "medium" | "ha
   if (lessonId.startsWith("y0-measurement-w2-l3")) {
     return generatePrepMeasurelandsWeek2Lesson3Task(lessonId, difficulty);
   }
+  if (lessonId.startsWith("y0-measurement-w3-l1")) {
+    return generatePrepMeasurelandsWeek3Lesson1Task(lessonId, difficulty);
+  }
 
   const normalizedLessonId = lessonId.startsWith("y0-measurement-")
     ? lessonId.replace("y0-measurement-", "y0-")
@@ -175,6 +182,11 @@ const LESSON_PRACTISED_SKILLS: Record<string, string[]> = {
     "Making a scale balance",
     "Finding objects that weigh the same",
     "Spotting balanced and not balanced",
+  ],
+  "y0-measurement-w3-l1": [
+    "Comparing which container holds more",
+    "Comparing which container holds less",
+    "Using capacity words",
   ],
 };
 
@@ -1295,4 +1307,5 @@ function LessonPage() {
     resetPrepMeasurelandsWeek2Lesson1TaskSessionState();
     resetPrepMeasurelandsWeek2Lesson2TaskSessionState();
     resetPrepMeasurelandsWeek2Lesson3TaskSessionState();
+    resetPrepMeasurelandsWeek3Lesson1TaskSessionState();
   }

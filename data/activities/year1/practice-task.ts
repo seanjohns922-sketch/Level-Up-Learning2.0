@@ -470,7 +470,9 @@ export type PracticeTask = (
         label: string;
         icon: string;
         compareValue: number;
-        axis: "length" | "height" | "mass";
+        axis: "length" | "height" | "mass" | "capacity";
+        /** Optional visible fill amount for capacity scenes, 0..1 */
+        waterLevel?: number;
         accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
       }>;
       /** Correct ordering of object ids for the "order" scene (first slot → last). */
@@ -481,7 +483,8 @@ export type PracticeTask = (
         label: string;
         icon: string;
         compareValue: number;
-        axis: "length" | "height" | "mass";
+        axis: "length" | "height" | "mass" | "capacity";
+        waterLevel?: number;
         accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
       }>;
       teachingMoments?: Array<{
@@ -491,21 +494,24 @@ export type PracticeTask = (
           label: string;
           icon: string;
           compareValue: number;
-          axis: "length" | "height" | "mass";
+          axis: "length" | "height" | "mass" | "capacity";
+          waterLevel?: number;
           accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
         }>;
         left: {
           label: string;
           icon: string;
           compareValue: number;
-          axis: "length" | "height" | "mass";
+          axis: "length" | "height" | "mass" | "capacity";
+          waterLevel?: number;
           accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
         };
         right: {
           label: string;
           icon: string;
           compareValue: number;
-          axis: "length" | "height" | "mass";
+          axis: "length" | "height" | "mass" | "capacity";
+          waterLevel?: number;
           accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
         };
         narration: string;

@@ -121,6 +121,10 @@ function CompareVisual({
   const trackSize = compact ? 152 : 188;
   const fillLength = Math.round((item.compareValue / 10) * trackSize);
   const fillHeight = Math.round((item.compareValue / 10) * (compact ? 122 : 150));
+  const capacityWidth = Math.round((compact ? 62 : 74) + (item.compareValue / 10) * (compact ? 34 : 44));
+  const capacityHeight = Math.round((compact ? 88 : 108) + (item.compareValue / 10) * (compact ? 38 : 52));
+  const waterLevel = typeof item.waterLevel === "number" ? item.waterLevel : 0.62;
+  const waterHeight = Math.round(capacityHeight * Math.max(0, Math.min(1, waterLevel)));
   const massTrackSize = compact ? 118 : 146;
   const massFillLength = Math.max(
     Math.round((item.compareValue / 10) * massTrackSize),
@@ -176,6 +180,34 @@ function CompareVisual({
             />
           </div>
         </div>
+      ) : axis === "capacity" ? (
+        <>
+          <div className="mb-2 text-4xl sm:text-5xl">{item.icon}</div>
+          <div className="mb-3 text-sm font-black uppercase tracking-[0.14em] text-[#5f4725]">
+            {item.label}
+          </div>
+          <div className="flex h-[160px] items-end justify-center">
+            <div
+              className="relative flex items-end justify-center rounded-[24px] border-[3px] border-[#ead6a8] bg-[#fffaf0] pb-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]"
+              style={{
+                width: capacityWidth,
+                height: capacityHeight,
+                minWidth: compact ? 78 : 96,
+              }}
+            >
+              <div
+                className="absolute inset-x-1 bottom-1 rounded-b-[18px] rounded-t-[8px] transition-all"
+                style={{
+                  height: waterHeight,
+                  background: accent.fill,
+                  opacity: waterLevel === 0 ? 0 : 1,
+                  boxShadow: waterLevel > 0 ? accent.glow : "none",
+                }}
+              />
+              <div className="absolute inset-0 rounded-[20px] bg-[linear-gradient(180deg,rgba(255,255,255,0.35),transparent_45%)]" />
+            </div>
+          </div>
+        </>
       ) : (
         <>
           <div className="mb-2 text-4xl sm:text-5xl">{item.icon}</div>
@@ -215,7 +247,7 @@ function CompareVisual({
         className="mt-3 inline-flex rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em]"
         style={{ background: accent.chip, color: accent.text }}
       >
-        {axis === "mass" ? "Weight" : axis === "length" ? "Length" : "Height"}
+        {axis === "mass" ? "Weight" : axis === "length" ? "Length" : axis === "capacity" ? "Capacity" : "Height"}
       </div>
     </div>
   );
@@ -279,7 +311,7 @@ function SortScene({
           <CompareVisual item={item} />
         </div>
       ) : null}
-      <div className="mt-4 grid grid-cols-2 gap-4">
+      <div className={`mt-4 grid gap-4 ${bins.length >= 4 ? "grid-cols-2 md:grid-cols-4" : "grid-cols-2"}`}>
         {bins.map((bin) => (
           <button
             key={bin.id}
@@ -313,21 +345,31 @@ function OrderScene({
   const orderedIds = task.orderedIds ?? task.objects.map((o) => o.id);
   const slotCount = orderedIds.length;
   const descending = isDescendingTarget(task.targetMode);
-  const isMass = task.objects[0]?.axis === "mass";
+  const axis = task.objects[0]?.axis;
+  const isMass = axis === "mass";
+  const isCapacity = axis === "capacity";
   const slotLabels =
     slotCount === 3
       ? isMass
         ? descending
           ? ["Heaviest", "Middle", "Lightest"]
           : ["Lightest", "Middle", "Heaviest"]
-        : descending
+        : isCapacity
+          ? descending
+            ? ["Holds More", "Middle", "Holds Less"]
+            : ["Holds Less", "Middle", "Holds More"]
+          : descending
           ? ["Longest", "Middle", "Shortest"]
           : ["Shortest", "Middle", "Longest"]
       : isMass
         ? descending
           ? ["Heaviest", "Next", "Next", "Lightest"]
           : ["Lightest", "Next", "Next", "Heaviest"]
-        : orderedIds.map((_, i) => `#${i + 1}`);
+        : isCapacity
+          ? descending
+            ? ["Largest Capacity", "Next", "Next", "Smallest Capacity"]
+            : ["Smallest Capacity", "Next", "Next", "Largest Capacity"]
+          : orderedIds.map((_, i) => `#${i + 1}`);
 
   const [placed, setPlaced] = useState<string[]>([]);
   const [locked, setLocked] = useState(false);
