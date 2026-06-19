@@ -39,7 +39,7 @@ import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent 
 import { recordStudentActivityDelta } from "@/lib/student-activity";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { prepareSpeechText, speak, useAutoReadSetting, useSpeakState, useSpeechInteractionReady } from "@/lib/speak";
-import { Volume2 } from "lucide-react";
+import { Volume2, Sparkles, Zap, Check, PartyPopper } from "lucide-react";
 import { getSkillCoaching, resolveCoachingKey } from "@/lib/skill-coaching";
 import type { TeacherAttemptQuestion, TeacherInsight, TeacherInsightInput } from "@/lib/teacher-insights";
 import { ClickableDotGrid, ClickableDotRows } from "@/components/ClickableDots";
@@ -7870,7 +7870,7 @@ function SessionPage({
 
                 {/* Motivation banner */}
                 <div className="rounded-2xl border border-primary/20 bg-primary-light p-6 mb-8">
-                  <div className="flex items-center gap-2 font-bold text-primary mb-2">✨ Keep going!</div>
+                  <div className="flex items-center gap-2 font-bold text-primary mb-2"><Sparkles className="h-4 w-4" /> Keep going!</div>
                   <div className="text-sm text-foreground/80">Keep working to unlock your Level Up Legend.</div>
                 </div>
 
@@ -7973,7 +7973,7 @@ function SessionPage({
                           const selectable = answered || index === quizIndex;
                           return (
                             <option key={question.id} value={index} disabled={!selectable}>
-                              {`Q${index + 1} · L${question.lessonTag ?? question.lessonNumber ?? 1}${answered ? ' ✓' : index === quizIndex ? ' •' : ' 🔒'}`}
+                              {`Q${index + 1} · L${question.lessonTag ?? question.lessonNumber ?? 1}${answered ? ' (done)' : index === quizIndex ? ' (current)' : ''}`}
                             </option>
                           );
                         })}
@@ -7981,8 +7981,8 @@ function SessionPage({
                     </label>
                   </div>
                   <div className="flex flex-wrap items-center gap-3">
-                    <div className="rounded-full border border-amber-300/30 bg-amber-500/10 px-3 py-1 text-[11px] font-mono font-bold uppercase tracking-[0.18em] text-amber-100">
-                      ✦ {liveCorrectCount} XP
+                    <div className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/30 bg-amber-500/10 px-3 py-1 text-[11px] font-mono font-bold uppercase tracking-[0.18em] text-amber-100">
+                      <Zap className="h-3.5 w-3.5" /> {liveCorrectCount} XP
                     </div>
                     <button
                       type="button"
@@ -8614,7 +8614,7 @@ function SessionPage({
                       : "bg-muted text-muted-foreground cursor-not-allowed",
                   ].join(" ")}
                 >
-                  Submit ✓
+                  <span className="inline-flex items-center justify-center gap-1.5">Submit <Check className="h-4 w-4" /></span>
                 </button>
               )}
             </div>
@@ -8644,7 +8644,7 @@ function SessionPage({
                       "inset 0 1px 0 rgba(251,191,36,0.2), inset 0 -10px 20px rgba(0,0,0,0.45)",
                   }}
                 >
-                  🎉 You passed! Week {Math.min(12, Number(week) + 1)} is unlocked.
+                  <span className="inline-flex items-center gap-1.5"><PartyPopper className="h-4 w-4" /> You passed! Week {Math.min(12, Number(week) + 1)} is unlocked.</span>
                   <div className="mt-1 font-semibold text-amber-100/80">
                     ⏭️ Next up: tap “Go to Week {Math.min(12, Number(week) + 1)}” below.
                   </div>
