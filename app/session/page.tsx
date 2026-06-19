@@ -70,6 +70,7 @@ import { generatePrepWeek11TaskByKind } from "@/data/activities/prep/week11";
 import { buildMeasurelandsWeek1QuizTasks } from "@/data/activities/prepMeasurelands/week1Quiz";
 import { buildMeasurelandsWeek2QuizTasks } from "@/data/activities/prepMeasurelands/week2Quiz";
 import { isLessonQuestionSafe, isPracticeTaskSafe } from "@/lib/task-safety";
+import { buildLessonRoute, isGroundLevelYear, normalizeStudentYearLabel } from "@/lib/lesson-routing";
 
 type WeekProgress = {
   lessonsCompleted: boolean[]; // [L1, L2, L3]
@@ -6593,7 +6594,7 @@ export default function SessionPageWrapper() {
 
 function SessionPageRouteInstance() {
   const sp = useSearchParams();
-  const year = sp.get("year") ?? "Year 3";
+  const year = normalizeStudentYearLabel(sp.get("year") ?? "Year 3");
   const week = sp.get("week") ?? "1";
   const type = sp.get("type") ?? "lesson";
   const n = Number(sp.get("n") ?? "1");
@@ -6644,10 +6645,17 @@ function SessionPage({
   }, [previewMode, router, year]);
 
   useEffect(() => {
-    if (year === "Prep" && type === "lesson") {
-      router.replace(`/lesson?year=${encodeURIComponent(year)}&week=${encodeURIComponent(week)}&lessonId=y0-w${Number(week)}-l${n}`);
+    if (isGroundLevelYear(year) && type === "lesson") {
+      router.replace(
+        buildLessonRoute({
+          yearLabel: year,
+          week: Number(week),
+          lessonNumber: n,
+          realmId,
+        })
+      );
     }
-  }, [router, year, week, type, n]);
+  }, [router, year, week, type, n, realmId]);
 
   useEffect(() => {
     const progress = readProgress();
@@ -8791,11 +8799,13 @@ function SessionPage({
                   <button
                     onClick={() => {
                       const lessonNo = weakestLessonBreakdown?.lessonNumber ?? 1;
-                      const lessonId = isMeasurementRealm
-                        ? `y0-measurement-w${week}-l${lessonNo}`
-                        : `y${parseInt(year.replace(/\D/g, ""), 10) || 1}-w${week}-l${lessonNo}`;
                       router.push(
-                        `/lesson?year=${encodeURIComponent(year)}&week=${encodeURIComponent(week)}&lessonId=${lessonId}${realmParam}`
+                        buildLessonRoute({
+                          yearLabel: year,
+                          week: Number(week),
+                          lessonNumber: lessonNo,
+                          realmId,
+                        })
                       );
                     }}
                     className="shrink-0 rounded-lg px-4 py-2.5 text-sm font-bold text-white transition active:scale-[0.99]"

@@ -21,6 +21,7 @@ import {
   type ProgramProgressStore,
 } from "@/lib/program-progress";
 import { getHomeBg, getHomeBgFilter, getVignetteStyle } from "@/lib/levelBand";
+import { buildLessonRoute, normalizeStudentYearLabel } from "@/lib/lesson-routing";
 import StudentAvatar from "@/components/avatar/StudentAvatar";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 
@@ -39,7 +40,7 @@ function ProgramPage() {
   const router = useRouter();
   const sp = useSearchParams();
 
-  const year = sp.get("year") ?? "Year 1";
+  const year = normalizeStudentYearLabel(sp.get("year") ?? "Year 1");
   const realmId = sp.get("realm_id") ?? "number";
   const weekNum = Number(sp.get("week") ?? "1");
   const week = String(weekNum);
@@ -343,11 +344,13 @@ function ProgramPage() {
     const realmParam = isMeasurementRealm ? `&realm_id=${encodeURIComponent(realmId)}` : "";
 
     if (item.type === "lesson") {
-      const lessonId = isMeasurementRealm
-        ? `y0-measurement-w${weekNum}-l${item.n}`
-        : `y${programYearIndex}-w${weekNum}-l${item.n}`;
       router.push(
-        `/lesson?year=${encodeURIComponent(curriculumYear)}&week=${week}&lessonId=${lessonId}${realmParam}`
+        buildLessonRoute({
+          yearLabel: curriculumYear,
+          week: weekNum,
+          lessonNumber: item.n,
+          realmId,
+        })
       );
       return;
     }

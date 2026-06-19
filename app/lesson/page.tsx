@@ -35,33 +35,12 @@ import { generatePrepWeek10Task, resetPrepWeek10TaskSessionState } from "@/data/
 import { generatePrepWeek11Task, resetPrepWeek11TaskSessionState } from "@/data/activities/prep/week11";
 import { generatePrepWeek12Task, resetPrepWeek12TaskSessionState } from "@/data/activities/prep/week12";
 import {
-  generatePrepMeasurelandsWeek1Task,
-  resetPrepMeasurelandsWeek1TaskSessionState,
-} from "@/data/activities/prepMeasurelands/week1";
-import {
-  generatePrepMeasurelandsWeek1Lesson2Task,
-  resetPrepMeasurelandsWeek1Lesson2TaskSessionState,
-} from "@/data/activities/prepMeasurelands/week1Lesson2";
-import {
-  generatePrepMeasurelandsWeek1Lesson3Task,
-  resetPrepMeasurelandsWeek1Lesson3TaskSessionState,
-} from "@/data/activities/prepMeasurelands/week1Lesson3";
-import {
-  generatePrepMeasurelandsWeek2Lesson1Task,
-  resetPrepMeasurelandsWeek2Lesson1TaskSessionState,
-} from "@/data/activities/prepMeasurelands/week2Lesson1";
-import {
-  generatePrepMeasurelandsWeek2Lesson2Task,
-  resetPrepMeasurelandsWeek2Lesson2TaskSessionState,
-} from "@/data/activities/prepMeasurelands/week2Lesson2";
-import {
-  generatePrepMeasurelandsWeek2Lesson3Task,
-  resetPrepMeasurelandsWeek2Lesson3TaskSessionState,
-} from "@/data/activities/prepMeasurelands/week2Lesson3";
-import {
-  generatePrepMeasurelandsWeek3Lesson1Task,
-  resetPrepMeasurelandsWeek3Lesson1TaskSessionState,
-} from "@/data/activities/prepMeasurelands/week3Lesson1";
+  getPrepMeasurelandsLessonMeta,
+  getPrepMeasurelandsPractisedSkills,
+  isPrepMeasurelandsLessonId,
+  resetPrepMeasurelandsLessonSessionState,
+  resolvePrepMeasurelandsLessonTask,
+} from "@/data/activities/prepMeasurelands/registry";
 import { getProgramForYear } from "@/data/programs";
 import { getCurriculumPlan } from "@/data/programs/genres";
 import { DEMO_MODE } from "@/data/config";
@@ -79,6 +58,7 @@ import { supabase } from "@/lib/supabase";
 import { recordStudentActivityDelta } from "@/lib/student-activity";
 import type { TeacherInsight, TeacherInsightInput } from "@/lib/teacher-insights";
 import { saveNumberLessonAttempt, saveStudentProgressState } from "@/lib/student-progress-sync";
+import { buildLessonRoute, normalizeStudentYearLabel } from "@/lib/lesson-routing";
 
 export default function LessonPageWrapper() {
   return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><LessonPage /></Suspense>;
@@ -110,31 +90,14 @@ function isPrepGroundCustomLesson(lessonId: string) {
     lessonId === "y0-w12-l1" ||
     lessonId === "y0-w12-l2" ||
     lessonId === "y0-w12-l3" ||
-    lessonId.startsWith("y0-measurement-w")
+    isPrepMeasurelandsLessonId(lessonId)
   );
 }
 
 function getPrepGroundTask(lessonId: string, difficulty: "easy" | "medium" | "hard") {
-  if (lessonId.startsWith("y0-measurement-w1-l1")) {
-    return generatePrepMeasurelandsWeek1Task(lessonId, difficulty);
-  }
-  if (lessonId.startsWith("y0-measurement-w1-l2")) {
-    return generatePrepMeasurelandsWeek1Lesson2Task(lessonId, difficulty);
-  }
-  if (lessonId.startsWith("y0-measurement-w1-l3")) {
-    return generatePrepMeasurelandsWeek1Lesson3Task(lessonId, difficulty);
-  }
-  if (lessonId.startsWith("y0-measurement-w2-l1")) {
-    return generatePrepMeasurelandsWeek2Lesson1Task(lessonId, difficulty);
-  }
-  if (lessonId.startsWith("y0-measurement-w2-l2")) {
-    return generatePrepMeasurelandsWeek2Lesson2Task(lessonId, difficulty);
-  }
-  if (lessonId.startsWith("y0-measurement-w2-l3")) {
-    return generatePrepMeasurelandsWeek2Lesson3Task(lessonId, difficulty);
-  }
-  if (lessonId.startsWith("y0-measurement-w3-l1")) {
-    return generatePrepMeasurelandsWeek3Lesson1Task(lessonId, difficulty);
+  const measurelandsTask = resolvePrepMeasurelandsLessonTask(lessonId, difficulty);
+  if (measurelandsTask) {
+    return measurelandsTask;
   }
 
   const normalizedLessonId = lessonId.startsWith("y0-measurement-")
@@ -157,48 +120,15 @@ function getPrepGroundTask(lessonId: string, difficulty: "easy" | "medium" | "ha
 
 // Optional per-lesson reflection bullets ("Today you practised: ✅ …").
 // Lessons not listed here fall back to the single "Today you practised <title>" line.
-const LESSON_PRACTISED_SKILLS: Record<string, string[]> = {
-  "y0-measurement-w1-l2": [
-    "Finding the shortest object",
-    "Finding the longest object",
-    "Putting objects in order",
-  ],
-  "y0-measurement-w1-l3": [
-    "Counting equal units",
-    "Comparing path lengths",
-    "Building paths",
-  ],
-  "y0-measurement-w2-l1": [
-    "Heavier objects",
-    "Lighter objects",
-    "Comparing mass",
-  ],
-  "y0-measurement-w2-l2": [
-    "Finding the lightest object",
-    "Finding the heaviest object",
-    "Putting objects in mass order",
-  ],
-  "y0-measurement-w2-l3": [
-    "Making a scale balance",
-    "Finding objects that weigh the same",
-    "Spotting balanced and not balanced",
-  ],
-  "y0-measurement-w3-l1": [
-    "Comparing which container holds more",
-    "Comparing which container holds less",
-    "Using capacity words",
-  ],
-};
-
 function getLessonPractisedSkills(lessonId: string): string[] | undefined {
-  return LESSON_PRACTISED_SKILLS[lessonId];
+  return getPrepMeasurelandsPractisedSkills(lessonId);
 }
 
 function LessonPage() {
   const router = useRouter();
   const params = useSearchParams();
 
-  const year = params.get("year") ?? "Year 1";
+  const year = normalizeStudentYearLabel(params.get("year") ?? "Year 1");
   const realmId = params.get("realm_id") ?? "number";
   const week = Number(params.get("week") ?? "1");
   const yearNumber = year === "Prep" ? 0 : parseInt(year.replace(/\D/g, ""), 10) || 1;
@@ -652,13 +582,22 @@ function LessonPage() {
 
   function practiseWeakAreas() {
     router.push(
-      `/lesson?year=${encodeURIComponent(year)}&week=${week}&lessonId=y${yearNumber}-w${week}-l3`
+      buildLessonRoute({
+        yearLabel: year,
+        week,
+        lessonNumber: 3,
+        realmId,
+      })
     );
   }
 
   function renderPrepCompletionCard(summary: LessonPerformanceSummary) {
+    const measurelandsMeta =
+      realmId === "measurement" ? getPrepMeasurelandsLessonMeta(effectiveLessonId) : null;
     const prepSuccessTitle =
-      effectiveLessonId === "y0-w1-l3"
+      measurelandsMeta?.completionTitle
+        ? measurelandsMeta.completionTitle
+        : effectiveLessonId === "y0-w1-l3"
         ? "You matched number names and numerals!"
         : effectiveLessonId === "y0-w2-l1"
           ? "You found numbers 6 to 10!"
@@ -694,7 +633,9 @@ function LessonPage() {
                                     ? "You counted collections to 5!"
                                     : "You recognised numbers 1 to 5!";
     const prepUnlockText =
-      effectiveLessonId === "y0-w1-l3" || effectiveLessonId === "y0-w2-l3"
+      measurelandsMeta?.unlockMessage
+        ? measurelandsMeta.unlockMessage
+        : effectiveLessonId === "y0-w1-l3" || effectiveLessonId === "y0-w2-l3"
         ? "Weekly Quiz unlocked."
         : effectiveLessonId === "y0-w3-l1"
           ? "Lesson 2 unlocked."
@@ -790,7 +731,12 @@ function LessonPage() {
                       type="button"
                       onClick={() =>
                         router.push(
-                          `/lesson?year=${encodeURIComponent(year)}&week=${week}&lessonId=y${yearNumber}-w${week}-l${blockedPreviousLesson}`
+                          buildLessonRoute({
+                            yearLabel: year,
+                            week,
+                            lessonNumber: blockedPreviousLesson,
+                            realmId,
+                          })
                         )
                       }
                       className="rounded-[22px] bg-gradient-to-r from-teal-600 to-cyan-500 px-6 py-4 text-lg font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.22)] transition hover:brightness-110"
@@ -1301,11 +1247,5 @@ function LessonPage() {
     resetPrepWeek11TaskSessionState();
     resetPrepWeek12TaskSessionState();
     resetPrepWeek7TaskSessionState();
-    resetPrepMeasurelandsWeek1TaskSessionState();
-    resetPrepMeasurelandsWeek1Lesson2TaskSessionState();
-    resetPrepMeasurelandsWeek1Lesson3TaskSessionState();
-    resetPrepMeasurelandsWeek2Lesson1TaskSessionState();
-    resetPrepMeasurelandsWeek2Lesson2TaskSessionState();
-    resetPrepMeasurelandsWeek2Lesson3TaskSessionState();
-    resetPrepMeasurelandsWeek3Lesson1TaskSessionState();
+    resetPrepMeasurelandsLessonSessionState();
   }
