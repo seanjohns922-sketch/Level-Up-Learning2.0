@@ -772,6 +772,7 @@ function PretestPage() {
           question={question}
           value={selected}
           onChange={choose}
+          realmId={realmId}
         />
       </>
     );
@@ -805,6 +806,7 @@ function PretestPage() {
         onHome={exitToHome}
         onExitAssessment={exitToLevels}
         onLogout={exitLogout}
+        realmId={realmId}
       />
 
       {/* ── Save & Resume gate ── */}

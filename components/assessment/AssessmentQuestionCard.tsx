@@ -10,6 +10,7 @@ import ExpressionFlowVisual from "@/components/activities/ExpressionFlowVisual";
 import InputOutputTableVisual from "@/components/activities/InputOutputTableVisual";
 import FunctionMachineCardVisual from "@/components/activities/FunctionMachineCardVisual";
 import { BalanceEquationCardVisual } from "@/components/activities/EquationVisualCards";
+import { getRealmTheme } from "@/lib/useRealmTheme";
 
 type GenericQuestion = {
   type?: string;
@@ -238,13 +239,22 @@ export default function AssessmentQuestionCard({
   question,
   value,
   onChange,
+  realmId,
 }: {
   question: GenericQuestion;
   value: string | null;
   onChange: (value: string) => void;
+  realmId?: string;
 }) {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const lineRef = useRef<HTMLDivElement | null>(null);
+  const theme = getRealmTheme(realmId);
+  const accentLabel = theme.isMeasurement ? "text-[#b8893a]" : "text-teal-400";
+  const selectedCard = theme.isMeasurement
+    ? "border-[#b8893a] bg-[#3c280f]/40 shadow-lg shadow-[#b8893a]/10"
+    : "border-teal-500 bg-teal-500/15 shadow-lg shadow-teal-500/10";
+  const selectedSoft = theme.isMeasurement ? "border-[#b8893a] bg-[#3c280f]/25" : "border-teal-500 bg-teal-500/10";
+  const focusBorder = theme.isMeasurement ? "focus:border-[#b8893a]" : "focus:border-teal-500";
 
   const type = question.type ?? "mcq";
   const visual =
@@ -337,7 +347,7 @@ export default function AssessmentQuestionCard({
           ))}
         </div>
         <div className="mt-5 rounded-2xl border border-dashed border-slate-600 bg-slate-800/50 p-4">
-          <div className="text-xs font-bold uppercase tracking-wide text-teal-400">Drag To Reorder</div>
+          <div className={`text-xs font-bold uppercase tracking-wide ${accentLabel}`}>Drag To Reorder</div>
           <div className="mt-3 grid gap-3 md:grid-cols-3">
             {order.length > 0 ? (
               order.map((num, index) => (
@@ -428,7 +438,7 @@ export default function AssessmentQuestionCard({
           ))}
         </div>
         <div className="mt-5 rounded-2xl border border-dashed border-slate-600 bg-slate-800/50 p-4">
-          <div className="text-xs font-bold uppercase tracking-wide text-teal-400">Drag To Reorder</div>
+          <div className={`text-xs font-bold uppercase tracking-wide ${accentLabel}`}>Drag To Reorder</div>
           <div className="mt-3 grid gap-3 md:grid-cols-3">
             {order.length > 0 ? (
               order.map((fraction, index) => (
@@ -496,7 +506,7 @@ export default function AssessmentQuestionCard({
             className={[
               "rounded-2xl border p-4 text-left shadow-sm transition",
               value === option.id
-                ? "border-teal-500 bg-teal-500/10"
+                ? selectedSoft
                 : "border-slate-600 bg-slate-700/50 hover:bg-slate-700",
             ].join(" ")}
           >
@@ -636,7 +646,7 @@ export default function AssessmentQuestionCard({
           value={value ?? ""}
           onChange={(event) => onChange(event.target.value)}
           placeholder="Enter your answer"
-          className="w-full rounded-2xl border border-slate-600 bg-slate-700/50 px-5 py-4 text-2xl font-black text-white outline-none transition placeholder:text-slate-400 focus:border-teal-500 focus:bg-slate-700"
+          className={`w-full rounded-2xl border border-slate-600 bg-slate-700/50 px-5 py-4 text-2xl font-black text-white outline-none transition placeholder:text-slate-400 ${focusBorder} focus:bg-slate-700`}
         />
       </div>
     );
@@ -658,7 +668,7 @@ export default function AssessmentQuestionCard({
             className={[
               "text-left rounded-2xl border p-5 transition font-semibold text-white",
               isSelected
-                ? "border-teal-500 bg-teal-500/15 shadow-lg shadow-teal-500/10"
+                ? selectedCard
                 : "border-slate-600 bg-slate-700/50 hover:bg-slate-700 hover:border-slate-500",
             ].join(" ")}
           >

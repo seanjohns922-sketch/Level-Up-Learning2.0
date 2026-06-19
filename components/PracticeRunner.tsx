@@ -1003,7 +1003,9 @@ export function PracticeRunner({
             <div
               className={`rounded-xl px-4 py-2.5 text-center text-sm font-extrabold shadow-sm transition-all ${
                 status === "correct"
-                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                  ? isMeasurement
+                    ? "bg-[#fff7e5] text-[#7c5a20] border border-[#d6b86c]"
+                    : "bg-emerald-50 text-emerald-700 border border-emerald-200"
                   : "bg-red-50 text-red-700 border border-red-200"
               }`}
             >
@@ -1075,7 +1077,7 @@ export function PracticeRunner({
               </div>
               <div className="grid gap-3">
                 {t.options.map((opt: string, idx: number) => (
-                  <button key={`${opt}-${idx}`} onClick={() => opt === t.answer ? markCorrect() : markWrong()} className="w-full text-left px-5 py-4 rounded-2xl border border-border bg-card hover:bg-muted transition text-xl font-bold">
+                  <button key={`${opt}-${idx}`} onClick={() => opt === t.answer ? markCorrect() : markWrong()} className={`w-full text-left px-5 py-4 rounded-2xl border transition text-xl font-bold ${isMeasurement ? "border-amber-900/20 bg-[#fffaf0] hover:bg-[#fff4dd]" : "border-border bg-card hover:bg-muted"}`}>
                     {opt}
                   </button>
                 ))}
@@ -1089,7 +1091,7 @@ export function PracticeRunner({
             <Dots count={(task as CountTask).count} />
             <div className="flex items-center gap-3">
               <input value={typed} onChange={(e) => setTyped(e.target.value.replace(/[^\d]/g, ""))} inputMode="numeric" placeholder="Type your answer" className="flex-1 px-4 py-3 rounded-2xl border border-border text-xl font-bold bg-card" />
-              <button onClick={check} className={`px-5 py-3 rounded-2xl text-white font-extrabold text-xl transition ${isMeasurement ? "bg-amber-700 hover:bg-amber-600" : "bg-teal-600 hover:bg-teal-700"}`}>Check</button>
+              <button onClick={check} className={`px-5 py-3 rounded-2xl text-white font-extrabold text-xl transition ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : "bg-teal-600 hover:bg-teal-700"}`}>Check</button>
             </div>
           </div>
         )}
@@ -1112,7 +1114,7 @@ export function PracticeRunner({
               </div>
               <div className="flex items-center gap-3">
                 <button onClick={() => setOrder([])} className="px-5 py-3 rounded-2xl bg-muted text-foreground font-extrabold text-xl hover:bg-muted/80 transition">Reset</button>
-                <button onClick={check} className="flex-1 px-5 py-3 rounded-2xl bg-teal-600 text-white font-extrabold text-xl hover:bg-teal-700 transition">Check</button>
+                <button onClick={check} className={`flex-1 px-5 py-3 rounded-2xl text-white font-extrabold text-xl transition ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : "bg-teal-600 hover:bg-teal-700"}`}>Check</button>
               </div>
             </div>
           );
@@ -1123,7 +1125,7 @@ export function PracticeRunner({
           return (
             <div className="grid gap-4">
               <div className="flex items-center justify-between gap-3">
-                <button type="button" onClick={() => { speak(t.speechText ?? String(t.targetNumber)); setHasPlayed(true); }} className={`px-5 py-3 rounded-2xl text-white font-extrabold text-xl transition ${isMeasurement ? "bg-amber-700 hover:bg-amber-600" : "bg-teal-600 hover:bg-teal-700"}`}>🔊 Listen</button>
+                <button type="button" onClick={() => { speak(t.speechText ?? String(t.targetNumber)); setHasPlayed(true); }} className={`px-5 py-3 rounded-2xl text-white font-extrabold text-xl transition ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : "bg-teal-600 hover:bg-teal-700"}`}>🔊 Listen</button>
                 <div className="text-sm font-bold text-muted-foreground">{hasPlayed ? "Now tap the number." : "Tap Listen first."}</div>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -1142,7 +1144,7 @@ export function PracticeRunner({
             <div className="grid gap-4">
               <div className="flex items-center justify-between gap-3">
                 <div className="text-sm text-muted-foreground">Tap the correct number tile.</div>
-                <button type="button" onClick={() => speak(String(t.targetNumber))} className={`px-3 py-2 rounded-xl text-white font-bold transition ${isMeasurement ? "bg-amber-700 hover:bg-amber-600" : "bg-teal-600 hover:bg-teal-700"}`}>🔊 Hear number</button>
+                <button type="button" onClick={() => speak(String(t.targetNumber))} className={`px-3 py-2 rounded-xl text-white font-bold transition ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : "bg-teal-600 hover:bg-teal-700"}`}>🔊 Hear number</button>
               </div>
               <div className="grid grid-cols-5 sm:grid-cols-6 gap-2">
                 {t.tiles.map((n: number) => (

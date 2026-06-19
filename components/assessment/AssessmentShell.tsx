@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 import { ChevronLeft, Home, LogOut, DoorOpen, Trophy, Zap } from "lucide-react";
 import { MathFormattedText } from "@/components/FractionText";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
+import { getRealmTheme } from "@/lib/useRealmTheme";
 
 interface AssessmentShellProps {
   /** "Pre-Test" or "Post-Test" */
@@ -27,6 +28,7 @@ interface AssessmentShellProps {
   onHome?: () => void;
   onExitAssessment?: () => void;
   onLogout?: () => void;
+  realmId?: string;
 }
 
 export default function AssessmentShell({
@@ -48,14 +50,28 @@ export default function AssessmentShell({
   onHome,
   onExitAssessment,
   onLogout,
+  realmId,
 }: AssessmentShellProps) {
   const hasExitMenu = Boolean(onHome || onExitAssessment || onLogout);
   const progress = ((currentIndex + 1) / totalQuestions) * 100;
   const isPost = testType.toLowerCase().includes("post");
   const studentLevelLabel = formatStudentLevelLabel(year);
+  const theme = getRealmTheme(realmId);
+  const titleIconGradient = theme.isMeasurement
+    ? "linear-gradient(135deg, #7c5a20 0%, #b8893a 55%, #d6b86c 100%)"
+    : "linear-gradient(135deg, #14b8a6 0%, #059669 100%)";
+  const progressTrack = theme.isMeasurement ? "rgba(214,184,108,0.22)" : "rgba(94,234,212,0.18)";
+  const progressBg = theme.ctaGradientCss;
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex flex-col items-center px-4 py-6 md:py-10">
+    <main
+      className="min-h-screen flex flex-col items-center px-4 py-6 md:py-10"
+      style={{
+        background: theme.isMeasurement
+          ? "linear-gradient(180deg, #140d04 0%, #2a1a06 40%, #120b03 100%)"
+          : "linear-gradient(to bottom, rgb(2 6 23), rgb(15 23 42), rgb(2 6 23))",
+      }}
+    >
       {/* ── Mission Header ── */}
       <div className="w-full max-w-2xl mb-6">
         {/* Top bar */}
@@ -104,10 +120,24 @@ export default function AssessmentShell({
           )}
 
           <div className="flex items-center gap-2">
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30">
+            <span
+              className="px-3 py-1 rounded-full text-xs font-bold"
+              style={{
+                background: theme.chipBg,
+                color: theme.chipText,
+                border: `1px solid ${theme.chipBorder}`,
+              }}
+            >
               {studentLevelLabel}
             </span>
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+            <span
+              className="px-3 py-1 rounded-full text-xs font-bold"
+              style={{
+                background: theme.chipBg,
+                color: theme.chipText,
+                border: `1px solid ${theme.chipBorder}`,
+              }}
+            >
               {testType}
             </span>
           </div>
@@ -115,7 +145,10 @@ export default function AssessmentShell({
 
         {/* Title block */}
         <div className="flex items-center gap-3 mb-1">
-          <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-600 shadow-lg shadow-teal-500/25">
+          <div
+            className="flex items-center justify-center h-10 w-10 rounded-xl shadow-lg"
+            style={{ background: titleIconGradient, boxShadow: theme.ctaShadow }}
+          >
             {isPost ? (
               <Trophy className="h-5 w-5 text-white" />
             ) : (
@@ -141,14 +174,17 @@ export default function AssessmentShell({
             <span className="text-xs font-bold text-slate-400">
               Question {currentIndex + 1} of {totalQuestions}
             </span>
-            <span className="text-xs font-bold text-teal-400">
+            <span className="text-xs font-bold" style={{ color: theme.accentText }}>
               {Math.round(progress)}%
             </span>
           </div>
-          <div className="h-2.5 w-full rounded-full bg-slate-800 overflow-hidden border border-slate-700/50">
+          <div
+            className="h-2.5 w-full rounded-full overflow-hidden border border-slate-700/50"
+            style={{ background: progressTrack }}
+          >
             <div
-              className="h-full rounded-full bg-gradient-to-r from-teal-500 to-emerald-400 transition-all duration-500 ease-out"
-              style={{ width: `${progress}%` }}
+              className="h-full rounded-full transition-all duration-500 ease-out"
+              style={{ background: progressBg, width: `${progress}%` }}
             />
           </div>
         </div>
@@ -159,7 +195,14 @@ export default function AssessmentShell({
         <div className="rounded-3xl border border-slate-700/60 bg-slate-800/80 backdrop-blur-sm shadow-2xl shadow-black/30 p-6 md:p-8">
           {/* Question number chip */}
           <div className="flex items-center gap-2 mb-4">
-            <span className="inline-flex items-center justify-center h-7 w-7 rounded-lg bg-teal-500/20 text-xs font-black text-teal-400 border border-teal-500/30">
+            <span
+              className="inline-flex items-center justify-center h-7 w-7 rounded-lg text-xs font-black"
+              style={{
+                background: theme.chipBg,
+                color: theme.accentText,
+                border: `1px solid ${theme.chipBorder}`,
+              }}
+            >
               {currentIndex + 1}
             </span>
             <div className="h-px flex-1 bg-slate-700/50" />
@@ -213,9 +256,10 @@ export default function AssessmentShell({
               className={[
                 "px-8 py-3 rounded-2xl font-extrabold text-sm transition shadow-lg",
                 hasAnswer && !submitted
-                  ? "bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:from-teal-400 hover:to-emerald-400 shadow-teal-500/25"
+                  ? `${theme.ctaGradientClass} ${theme.ctaHoverGradientClass} text-white`
                   : "bg-slate-800 text-slate-600 cursor-not-allowed border border-slate-700/50 shadow-none",
               ].join(" ")}
+              style={hasAnswer && !submitted ? { boxShadow: theme.ctaShadow } : undefined}
             >
               {isPost ? "Submit" : "Finish"}
             </button>
@@ -226,9 +270,10 @@ export default function AssessmentShell({
               className={[
                 "px-8 py-3 rounded-2xl font-extrabold text-sm transition shadow-lg",
                 hasAnswer
-                  ? "bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:from-teal-400 hover:to-emerald-400 shadow-teal-500/25"
+                  ? `${theme.ctaGradientClass} ${theme.ctaHoverGradientClass} text-white`
                   : "bg-slate-800 text-slate-600 cursor-not-allowed border border-slate-700/50 shadow-none",
               ].join(" ")}
+              style={hasAnswer ? { boxShadow: theme.ctaShadow } : undefined}
             >
               Next
             </button>

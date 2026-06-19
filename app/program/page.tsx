@@ -664,7 +664,7 @@ function ProgramPage() {
             <button
               type="button"
               onClick={handleSecretTeacherToggle}
-              className="inline-flex items-center gap-2 px-4 py-1.5 text-[11px] font-mono font-bold uppercase tracking-[0.18em] text-teal-50"
+              className={`inline-flex items-center gap-2 px-4 py-1.5 text-[11px] font-mono font-bold uppercase tracking-[0.18em] ${isMeasurementRealm ? "text-yellow-50/95" : "text-teal-50"}`}
               style={{
                 background: rt.pillBg,
                 clipPath: rt.rounded ? undefined : "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
@@ -676,7 +676,7 @@ function ProgramPage() {
               {levelLabel} · Program
             </button>
             <h1 className={`text-4xl md:text-5xl font-black text-white mt-3 tracking-tight ${rt.headingGlow}`}>Week {weekNum}</h1>
-            <p className="text-base md:text-lg text-teal-50/95 mt-2 font-semibold">
+            <p className={`text-base md:text-lg mt-2 font-semibold ${isMeasurementRealm ? "text-amber-50/95 [text-shadow:0_1px_6px_rgba(0,0,0,0.7)]" : "text-teal-50/95"}`}>
               <span className={`${rt.focusColor} font-mono text-xs uppercase tracking-[0.18em] mr-2`}>Focus</span>
               {currentWeekPlan?.topic ?? "Your current focus"}
             </p>
@@ -694,7 +694,7 @@ function ProgramPage() {
             </p>
 
             {teacherToast ? (
-              <div className="mt-3 inline-flex items-center rounded-full border border-teal-300/35 bg-black/30 px-3 py-1 text-[11px] font-mono font-bold uppercase tracking-[0.16em] text-teal-100">
+              <div className={`mt-3 inline-flex items-center rounded-full px-3 py-1 text-[11px] font-mono font-bold uppercase tracking-[0.16em] ${isMeasurementRealm ? "border border-yellow-900/35 bg-[#2a1a06]/75 text-yellow-100/90" : "border border-teal-300/35 bg-black/30 text-teal-100"}`}>
                 {teacherToast}
               </div>
             ) : null}
@@ -874,8 +874,8 @@ function ProgramPage() {
                           </div>
 
                           {requiredWeeksComplete ? (
-                            <div className={`mt-4 rounded-2xl p-4 ${isMeasurementRealm ? "border border-emerald-300/20 bg-emerald-400/8" : "border border-emerald-300/25 bg-emerald-400/10"}`}>
-                              <div className="text-[11px] font-mono font-black uppercase tracking-[0.18em] text-emerald-200">
+                            <div className={`mt-4 rounded-2xl p-4 ${isMeasurementRealm ? "border border-yellow-900/30 bg-[#2a1a06]/70" : "border border-emerald-300/25 bg-emerald-400/10"}`}>
+                              <div className={`text-[11px] font-mono font-black uppercase tracking-[0.18em] ${isMeasurementRealm ? "text-yellow-100/90" : "text-emerald-200"}`}>
                                 Ready For Post-Test
                               </div>
                               <p className="mt-2 text-sm text-white/85">
@@ -883,11 +883,15 @@ function ProgramPage() {
                               </p>
                               <button
                                 type="button"
-                                onClick={() => router.push(`/posttest?year=${encodeURIComponent(curriculumYear)}`)}
+                                onClick={() => router.push(`/posttest?year=${encodeURIComponent(curriculumYear)}${isMeasurementRealm ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`)}
                                 className="mt-3 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-mono font-black uppercase tracking-[0.16em] text-white"
                                 style={{
-                                  background: "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
-                                  boxShadow: "inset 0 1px 0 rgba(110,231,183,0.45), 0 0 16px rgba(16,185,129,0.22)",
+                                  background: isMeasurementRealm
+                                    ? "linear-gradient(135deg, #7c5a20 0%, #b8893a 55%, #d6b86c 100%)"
+                                    : "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
+                                  boxShadow: isMeasurementRealm
+                                    ? "inset 0 1px 0 rgba(245,220,160,0.35), 0 0 16px rgba(184,137,58,0.22)"
+                                    : "inset 0 1px 0 rgba(110,231,183,0.45), 0 0 16px rgba(16,185,129,0.22)",
                                 }}
                               >
                                 Take Post-Test
@@ -1164,20 +1168,24 @@ function ProgramPage() {
 
           {!weekUnlocked ? (
             <div className="mt-6 rounded-[28px] border border-white/10 bg-black/25 p-6 text-center backdrop-blur-md shadow-[0_16px_48px_rgba(0,0,0,0.24)]">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/8 text-teal-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
+              <div className={`mx-auto flex h-16 w-16 items-center justify-center rounded-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] ${isMeasurementRealm ? "bg-[#2a1a06]/85 text-yellow-100" : "bg-white/8 text-teal-100"}`}>
                 <svg viewBox="0 0 24 24" className="h-8 w-8" fill="none" stroke="currentColor" strokeWidth="2">
                   <rect x="4" y="11" width="16" height="9" rx="2" />
                   <path d="M8 11V8a4 4 0 018 0v3" />
                 </svg>
               </div>
               <h2 className="mt-4 text-2xl font-black text-white">Week {weekNum} Preview</h2>
-              <p className="mt-2 text-sm font-semibold text-teal-100/75">
+              <p className={`mt-2 text-sm font-semibold ${isMeasurementRealm ? "text-amber-50/80" : "text-teal-100/75"}`}>
                 Complete previous weeks to unlock
               </p>
               <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
                 <button
                   onClick={() => goToWeek(lastAllowedWeek)}
-                  className="rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-emerald-950/30 transition hover:-translate-y-0.5"
+                  className={`rounded-2xl px-5 py-3 text-sm font-black text-white shadow-lg transition hover:-translate-y-0.5 ${isMeasurementRealm ? "" : "bg-gradient-to-r from-emerald-500 to-emerald-600 shadow-emerald-950/30"}`}
+                  style={isMeasurementRealm ? {
+                    background: "linear-gradient(135deg, #7c5a20 0%, #b8893a 55%, #d6b86c 100%)",
+                    boxShadow: "0 10px 24px rgba(80,45,8,0.32)",
+                  } : undefined}
                 >
                   Go to Week {lastAllowedWeek}
                 </button>

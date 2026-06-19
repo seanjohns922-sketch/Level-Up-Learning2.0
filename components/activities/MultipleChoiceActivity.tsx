@@ -42,6 +42,7 @@ import TermPositionCardVisual from "@/components/activities/TermPositionCardVisu
 import TermPredictorCardVisual from "@/components/activities/TermPredictorCardVisual";
 import ReversePatternCardVisual from "@/components/activities/ReversePatternCardVisual";
 import { FractionText, MathFormattedText } from "@/components/FractionText";
+import { getRealmTheme } from "@/lib/useRealmTheme";
 
 function FractionBar({
   numerator,
@@ -200,6 +201,7 @@ export default function MultipleChoiceActivity({
   realmId?: string;
 }) {
   const isMeasurement = realmId === "measurement";
+  const theme = getRealmTheme(realmId);
   const [picked, setPicked] = useState<string | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
@@ -287,14 +289,27 @@ export default function MultipleChoiceActivity({
   }
 
   return (
-    <div className="rounded-3xl border border-gray-200/80 bg-white p-6 shadow-[0_1px_2px_rgba(2,23,22,0.04),0_8px_24px_rgba(2,23,22,0.05)]">
+    <div
+      className="rounded-3xl border p-6 shadow-[0_1px_2px_rgba(2,23,22,0.04),0_8px_24px_rgba(2,23,22,0.05)]"
+      style={
+        isMeasurement
+          ? {
+              borderColor: "rgba(184,137,58,0.28)",
+              background: "linear-gradient(180deg, #fff9ee 0%, #fdf6e8 100%)",
+            }
+          : undefined
+      }
+    >
       {questionData.visual?.type === "shopping_list" ||
       questionData.visual?.type === "australian_money" ||
       questionData.visual?.type === "receipt" ? (
         <MoneyContextVisual visual={questionData.visual} />
       ) : null}
-      <div className="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-[0.22em] text-teal-700/90">
-        <span className="h-1.5 w-1.5 rounded-full bg-teal-500 shadow-[0_0_6px_rgba(20,184,166,0.6)]" />
+      <div className={`inline-flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-[0.22em] ${isMeasurement ? "text-[#7c5a20]" : "text-teal-700/90"}`}>
+        <span
+          className="h-1.5 w-1.5 rounded-full"
+          style={{ background: theme.ctaTo, boxShadow: `0 0 6px ${theme.ctaFrom}` }}
+        />
         Multiple Choice
       </div>
       <div className="flex items-start gap-2.5 mt-2">
@@ -311,7 +326,7 @@ export default function MultipleChoiceActivity({
         </p>
       ) : null}
       {isMultiSelect && questionData.instruction ? (
-        <p className="mt-2 text-sm font-bold text-emerald-700">
+        <p className={`mt-2 text-sm font-bold ${isMeasurement ? "text-[#7c5a20]" : "text-emerald-700"}`}>
           <MathFormattedText text={questionData.instruction} />
         </p>
       ) : null}
@@ -476,7 +491,7 @@ export default function MultipleChoiceActivity({
             type="button"
             onClick={submitMultiSelect}
             disabled={selected.length === 0 || submitted}
-            className={`rounded-2xl px-5 py-3 text-lg font-black text-white transition disabled:cursor-not-allowed disabled:bg-gray-300 ${isMeasurement ? "bg-amber-700 hover:bg-amber-600" : "bg-teal-600"}`}
+            className={`rounded-2xl px-5 py-3 text-lg font-black text-white transition disabled:cursor-not-allowed disabled:bg-gray-300 ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : "bg-teal-600 hover:bg-teal-700"}`}
           >
             Check answer
           </button>
@@ -487,7 +502,9 @@ export default function MultipleChoiceActivity({
           className={[
             "mt-4 rounded-2xl border px-4 py-3 text-sm font-semibold",
             feedbackTone === "correct"
-              ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+              ? isMeasurement
+                ? "border-[#d6b86c] bg-[#fff7e5] text-[#5c3d0e]"
+                : "border-emerald-200 bg-emerald-50 text-emerald-900"
               : feedbackTone === "partial"
               ? "border-amber-200 bg-amber-50 text-amber-900"
               : "border-red-200 bg-red-50 text-red-900",

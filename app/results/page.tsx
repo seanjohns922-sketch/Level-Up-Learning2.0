@@ -245,6 +245,7 @@ function ResultsPage() {
   const year = sp.get("year") ?? "Year 3";
   const realmId = sp.get("realm_id") ?? undefined;
   const theme = getRealmTheme(realmId);
+  const realmParam = realmId ? `&realm_id=${encodeURIComponent(realmId)}` : "";
   const studentLevelLabel = formatStudentLevelLabel(year);
   const score = Number(sp.get("score") ?? "0");
   const total = Number(sp.get("total") ?? "0");
@@ -400,23 +401,23 @@ function ResultsPage() {
     })();
   }, [passed, year, scorePercent, isPostTest, isFailedPretest, passedByProgram, storedPosttestProfile, storedPretestProfile, unlockTargets, requiredWeeks, optionalWeeks, nextYear]);
 
-  function goHome() { router.push("/levels"); }
+  function goHome() { router.push(realmId === "measurement" ? "/measurelands" : "/levels"); }
   const assignedStartWeek = isPostTest
     ? getAssignedReviewWeek(storedPosttestProfile) ?? 1
     : getAssignedReviewWeek(storedPretestProfile) ?? 1;
 
   function goProgram() {
-    router.push("/levels");
+    router.push(realmId === "measurement" ? "/measurelands" : "/levels");
   }
   function goNextPretest() {
     if (!nextYear) {
       router.push("/legends");
       return;
     }
-    router.push(`/pretest?year=${encodeURIComponent(nextYear)}`);
+    router.push(`/pretest?year=${encodeURIComponent(nextYear)}${realmParam}`);
   }
   function goRetryPostTest() {
-    router.push(`/posttest?year=${encodeURIComponent(year)}`);
+    router.push(`/posttest?year=${encodeURIComponent(year)}${realmParam}`);
   }
   function goLegends() { router.push("/legends"); }
 
@@ -435,10 +436,10 @@ function ResultsPage() {
   function goAssignedWeek() {
     const week = assignedReviewWeek ?? 1;
     const qs = new URLSearchParams({ year, week: String(week) }).toString();
-    router.push(`/program?${qs}&legacy=1`);
+    router.push(`/program?${qs}&legacy=1${realmParam}`);
   }
   function goContinue() {
-    router.push("/levels");
+    router.push(realmId === "measurement" ? "/measurelands" : "/levels");
   }
 
   return (

@@ -338,7 +338,7 @@ function PostTestPage() {
 
       if (!eligibleForPostTest) {
         const fallbackWeek = Math.max(1, Math.min(12, progress.assignedWeek ?? 1));
-        router.replace(`/program?year=${encodeURIComponent(year)}&week=${fallbackWeek}&legacy=1`);
+        router.replace(`/program?year=${encodeURIComponent(year)}&week=${fallbackWeek}&legacy=1${realmId ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`);
       }
     }
   }, [previewMode, router, year]);
@@ -459,7 +459,7 @@ function PostTestPage() {
             is not available yet.
           </p>
           <button
-            onClick={() => router.push(`/program?year=${encodeURIComponent(year)}&week=12&legacy=1`)}
+            onClick={() => router.push(`/program?year=${encodeURIComponent(year)}&week=12&legacy=1${realmId ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`)}
             className="w-full py-3 rounded-xl text-white font-bold transition" style={{ background: theme.ctaGradientCss }}
           >
             Back to Home
@@ -572,7 +572,7 @@ function PostTestPage() {
             selectTarget={Number(visual.selectTarget)}
           />
         ) : null}
-        <AssessmentQuestionCard question={q} value={picked} onChange={pick} />
+        <AssessmentQuestionCard question={q} value={picked} onChange={pick} realmId={realmId} />
       </>
     );
   }
@@ -601,7 +601,8 @@ function PostTestPage() {
         onBack={back}
         onNext={next}
         onSubmit={submit}
-        onExit={() => router.push(`/program?year=${encodeURIComponent(year)}&week=12&legacy=1`)}
+        onExit={() => router.push(`/program?year=${encodeURIComponent(year)}&week=12&legacy=1${realmId ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`)}
+        realmId={realmId}
       />
     </>
   );
