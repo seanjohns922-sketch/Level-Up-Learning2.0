@@ -146,9 +146,15 @@ function CompareVisual({
     axis === "mass" ? "Weight" : axis === "length" ? "Length" : axis === "capacity" ? "Capacity" : "Height";
 
   // ── Real image path ──────────────────────────────────────────────────────
-  // Measurelands Week 3 uses real container photos. Keep the photo box a
-  // consistent size so students compare the OBJECTS, not the artwork scaling.
-  const imageBox = compact ? 96 : 120;
+  // Week 3 compare/order cards keep the CARD size fixed, but the container
+  // photo itself scales with compareValue so students can see which container
+  // would hold more without reintroducing water bars.
+  const imageBox =
+    axis === "capacity"
+      ? Math.round((compact ? 54 : 68) + (item.compareValue / 10) * (compact ? 44 : 72))
+      : compact
+        ? 96
+        : 120;
   const capacityGaugeWidth = compact ? 80 : 96;
   const capacityGaugeHeight = compact ? 106 : 126;
 
