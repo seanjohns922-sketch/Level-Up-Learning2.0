@@ -476,6 +476,8 @@ export type PracticeTask = (
         /** Optional visible fill amount for capacity scenes, 0..1 */
         waterLevel?: number;
         accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
+        /** Optional real image (transparent PNG/SVG). Falls back to `icon` emoji. */
+        imageSrc?: string;
       }>;
       /** Correct ordering of object ids for the "order" scene (first slot → last). */
       orderedIds?: string[];
@@ -488,6 +490,8 @@ export type PracticeTask = (
         axis: "length" | "height" | "mass" | "capacity";
         waterLevel?: number;
         accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
+        /** Optional real image (transparent PNG/SVG). Falls back to `icon` emoji. */
+        imageSrc?: string;
       }>;
       teachingMoments?: Array<{
         id: string;
@@ -499,7 +503,9 @@ export type PracticeTask = (
           axis: "length" | "height" | "mass" | "capacity";
           waterLevel?: number;
           accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
-        }>;
+          /** Optional real image (transparent PNG/SVG). Falls back to `icon` emoji. */
+          imageSrc?: string;
+}>;
         left: {
           label: string;
           icon: string;
@@ -507,7 +513,9 @@ export type PracticeTask = (
           axis: "length" | "height" | "mass" | "capacity";
           waterLevel?: number;
           accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
-        };
+          /** Optional real image (transparent PNG/SVG). Falls back to `icon` emoji. */
+          imageSrc?: string;
+};
         right: {
           label: string;
           icon: string;
@@ -515,7 +523,9 @@ export type PracticeTask = (
           axis: "length" | "height" | "mass" | "capacity";
           waterLevel?: number;
           accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
-        };
+          /** Optional real image (transparent PNG/SVG). Falls back to `icon` emoji. */
+          imageSrc?: string;
+};
         narration: string;
       }>;
       correctOptionId: string;

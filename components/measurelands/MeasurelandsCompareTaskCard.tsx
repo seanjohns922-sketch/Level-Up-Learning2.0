@@ -142,6 +142,52 @@ function CompareVisual({
   );
   const massPanDrop = Math.round((item.compareValue / 10) * (compact ? 12 : 16));
 
+  const axisLabel =
+    axis === "mass" ? "Weight" : axis === "length" ? "Length" : axis === "capacity" ? "Capacity" : "Height";
+
+  // ── Real image path ──────────────────────────────────────────────────────
+  // When the lesson supplies `imageSrc`, render the photo/illustration instead
+  // of the emoji + CSS glyph. The bounding box scales with `compareValue` so a
+  // bigger-capacity (or longer / heavier) object LOOKS bigger — except in the
+  // fill-state task (showWater, not the intro pour), where size is fixed so the
+  // student focuses on level, not size.
+  const imageFixed = showWater && !animateFill;
+  const imageBox = imageFixed
+    ? compact
+      ? 96
+      : 120
+    : Math.round((compact ? 84 : 104) + (item.compareValue / 10) * (compact ? 40 : 64));
+
+  if (item.imageSrc) {
+    return (
+      <div
+        className="rounded-[26px] border px-4 py-4 text-center"
+        style={{
+          borderColor: accent.border,
+          background: "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,248,232,0.96))",
+          boxShadow: accent.glow,
+        }}
+      >
+        <div className="mb-3 text-sm font-black uppercase tracking-[0.14em] text-[#5f4725]">{item.label}</div>
+        <div className="flex h-[160px] items-end justify-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={item.imageSrc}
+            alt={item.label}
+            draggable={false}
+            style={{ width: imageBox, height: imageBox, objectFit: "contain" }}
+          />
+        </div>
+        <div
+          className="mt-3 inline-flex rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em]"
+          style={{ background: accent.chip, color: accent.text }}
+        >
+          {axisLabel}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className="rounded-[26px] border px-4 py-4 text-center"
