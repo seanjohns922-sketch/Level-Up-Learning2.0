@@ -1,5 +1,6 @@
 "use client";
 
+import { Check } from "lucide-react";
 import { useState } from "react";
 
 type Option = { groups: number[] };
@@ -70,7 +71,7 @@ export default function EqualGroupsMCQ({
 
       <div className="mt-4 text-sm font-bold">
         {status === "correct" ? (
-          <span className="text-green-700">✅ Correct!</span>
+          <span className="text-green-700"><Check className="inline-block h-4 w-4 align-[-3px]" /> Correct!</span>
         ) : status === "wrong" ? (
           <span className="text-red-700">Not quite — try again.</span>
         ) : (

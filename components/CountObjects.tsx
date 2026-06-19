@@ -1,5 +1,6 @@
 "use client";
 
+import { RotateCw } from "lucide-react";
 import { useMemo, useState } from "react";
 
 type CountConfig = {
@@ -196,7 +197,7 @@ export default function CountObjects({
           }}
           className="px-4 py-3 rounded-xl bg-gray-100 text-gray-800 font-bold hover:bg-gray-200 transition"
         >
-          New counters 🔁
+          New counters <RotateCw className="inline-block h-4 w-4 align-[-3px]" />
         </button>
 
         <button

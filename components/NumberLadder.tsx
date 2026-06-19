@@ -1,5 +1,6 @@
 "use client";
 
+import { Flag } from "lucide-react";
 import { useState } from "react";
 
 export default function NumberLadder({
@@ -73,7 +74,7 @@ export default function NumberLadder({
       </div>
 
       {status === "correct" && (
-        <div className="mt-3 text-green-600 font-bold">🏁 Finished!</div>
+        <div className="mt-3 text-green-600 font-bold"><Flag className="inline-block h-4 w-4 align-[-3px]" /> Finished!</div>
       )}
     </div>
   );

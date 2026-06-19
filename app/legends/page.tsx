@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Zap, Clock, Mountain, Compass, Triangle, BarChart3, Dices, BookOpen, Feather, Languages } from "lucide-react";
+import { Zap, Clock, Mountain, Compass, Triangle, BarChart3, Dices, BookOpen, Feather, Languages, Lightbulb } from "lucide-react";
 import { getAllLegends, getEffectiveUnlockedLegendIds } from "@/data/legends";
 import { readProgress, type StudentProgress } from "@/data/progress";
 import RealmCard from "@/components/legends/RealmCard";
@@ -257,7 +257,7 @@ export default function LegendsPage() {
               border: "1px solid rgba(255,255,255,0.2)",
             }}
           >
-            <span className="text-2xl flex-shrink-0">💡</span>
+            <Lightbulb className="h-6 w-6 flex-shrink-0" />
             <div>
               <div className="font-bold text-white mb-0.5" style={{ textShadow: "0 1px 3px rgba(0,0,0,0.3)" }}>
                 How to unlock Legends

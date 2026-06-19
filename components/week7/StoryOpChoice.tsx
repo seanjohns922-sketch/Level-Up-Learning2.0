@@ -1,6 +1,6 @@
 "use client";
 
-import { Volume2 } from "lucide-react";
+import { Volume2, Plus, Minus } from "lucide-react";
 import { useState } from "react";
 import { speak } from "@/lib/speak";
 
@@ -55,7 +55,7 @@ export default function StoryOpChoice({
           ].join(" ")}
           type="button"
         >
-          ➕ {variant === "sort" ? "Addition Box" : "Add"}
+          <span className="inline-flex items-center gap-1.5"><Plus className="h-5 w-5" /> {variant === "sort" ? "Addition Box" : "Add"}</span>
         </button>
         <button
           onClick={() => choose("subtract")}
@@ -67,7 +67,7 @@ export default function StoryOpChoice({
           ].join(" ")}
           type="button"
         >
-          ➖ {variant === "sort" ? "Subtraction Box" : "Subtract"}
+          <span className="inline-flex items-center gap-1.5"><Minus className="h-5 w-5" /> {variant === "sort" ? "Subtraction Box" : "Subtract"}</span>
         </button>
       </div>
     </div>

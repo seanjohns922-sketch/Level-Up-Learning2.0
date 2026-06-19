@@ -1,5 +1,6 @@
 "use client";
 
+import { Check, Hand } from "lucide-react";
 import { useMemo, useState } from "react";
 
 const fmt = (n: number) => n.toLocaleString();
@@ -88,7 +89,7 @@ export default function NumberLineTap({
   return (
     <div className="w-full">
       <div className="text-sm text-muted-foreground mb-3">
-        👆 Tap on the number line to place{" "}
+        <Hand className="inline-block h-4 w-4 align-[-3px]" /> Tap on the number line to place{" "}
         <span className="font-bold text-foreground">{target}</span>
       </div>
 
@@ -190,7 +191,7 @@ export default function NumberLineTap({
       )}
       {correct && (
         <div className="mt-2 text-sm text-primary font-bold text-center">
-          ✅ Correct!
+          <Check className="inline-block h-4 w-4 align-[-3px]" /> Correct!
         </div>
       )}
     </div>

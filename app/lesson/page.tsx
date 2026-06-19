@@ -139,7 +139,7 @@ function getPrepGroundTask(
   return generatePrepWeek1Task(lessonId, difficulty);
 }
 
-// Optional per-lesson reflection bullets ("Today you practised: ✅ …").
+// Optional per-lesson reflection bullets ("Today you practised: ...").
 // Lessons not listed here fall back to the single "Today you practised <title>" line.
 function getLessonPractisedSkills(lessonId: string): string[] | undefined {
   return getPrepMeasurelandsPractisedSkills(lessonId);

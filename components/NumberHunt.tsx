@@ -1,5 +1,6 @@
 "use client";
 
+import { Check, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 type NumberHuntConfig = {
@@ -124,11 +125,11 @@ export default function NumberHunt({
         <div className="mt-3">
           {status === "correct" ? (
             <div className="inline-flex items-center gap-2 rounded-full bg-green-100 text-green-800 px-3 py-1 text-sm font-bold">
-              ✅ Correct!
+              <Check className="inline-block h-4 w-4 align-[-3px]" /> Correct!
             </div>
           ) : status === "wrong" ? (
             <div className="inline-flex items-center gap-2 rounded-full bg-red-100 text-red-800 px-3 py-1 text-sm font-bold">
-              ❌ Try again
+              <X className="inline-block h-4 w-4 align-[-3px]" /> Try again
             </div>
           ) : (
             <div className="text-sm text-gray-400"> </div>

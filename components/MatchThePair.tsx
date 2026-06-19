@@ -1,5 +1,6 @@
 "use client";
 
+import { RotateCw } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { speak } from "@/lib/speak";
 
@@ -261,7 +262,7 @@ export default function MatchThePair({
           className="px-4 py-3 rounded-xl bg-gray-100 text-gray-800 font-bold hover:bg-gray-200 transition"
           title="Regenerate this round"
         >
-          New set 🔁
+          New set <RotateCw className="inline-block h-4 w-4 align-[-3px]" />
         </button>
 
         <button

@@ -1,5 +1,6 @@
 "use client";
 
+import { Check, X } from "lucide-react";
 import { useMemo, useState } from "react";
 
 type CountCircleConfig = {
@@ -87,10 +88,10 @@ export default function CountAndCircle({
         </div>
 
         {status === "correct" && (
-          <div className="mt-2 text-green-700 font-bold">✅ Correct!</div>
+          <div className="mt-2 text-green-700 font-bold"><Check className="inline-block h-4 w-4 align-[-3px]" /> Correct!</div>
         )}
         {status === "wrong" && (
-          <div className="mt-2 text-red-700 font-bold">❌ Try again</div>
+          <div className="mt-2 text-red-700 font-bold"><X className="inline-block h-4 w-4 align-[-3px]" /> Try again</div>
         )}
       </div>
 

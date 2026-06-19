@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useMemo, useState } from "react";
+import { Pin, PartyPopper } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { getPretestForYearLabel } from "@/data/assessments/api";
 import type { Question } from "@/data/assessments/pretests";
@@ -813,7 +814,7 @@ function PretestPage() {
       {showResumePrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 backdrop-blur-sm p-6">
           <div className="w-full max-w-md rounded-3xl border border-slate-700/60 bg-slate-900 p-8 text-center shadow-2xl">
-            <div className="text-5xl mb-4">📌</div>
+            <div className="mb-4 flex justify-center"><Pin className="h-12 w-12 text-slate-300" /></div>
             <h2 className="text-2xl font-extrabold text-white mb-2">Welcome back!</h2>
             <p className="text-slate-400 mb-6">
               You started the {studentLevelLabel} Pre-Test earlier. Want to pick up right where you left off?
@@ -850,7 +851,7 @@ function PretestPage() {
                 : "0 20px 70px -20px rgba(20,184,166,0.6)",
             }}
           >
-            <div className="text-7xl mb-4 animate-bounce">🎉</div>
+            <div className="mb-4 flex justify-center animate-bounce"><PartyPopper className="h-16 w-16 text-white" /></div>
             <h2 className="text-3xl font-extrabold text-white mb-2">Amazing Work!</h2>
             <p className="text-slate-300 mb-2 text-lg">
               You already know most of {studentLevelLabel}.

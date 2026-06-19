@@ -1,6 +1,6 @@
 "use client";
 
-import { Volume2 } from "lucide-react";
+import { Volume2, Plus, Minus } from "lucide-react";
 import { useState } from "react";
 import { speak } from "@/lib/speak";
 
@@ -74,7 +74,7 @@ export default function StorySolve({
             ].join(" ")}
             type="button"
           >
-            ➕ Add
+            <span className="inline-flex items-center gap-1.5"><Plus className="h-5 w-5" /> Add</span>
           </button>
           <button
             onClick={() => chooseOp("subtract")}
@@ -86,7 +86,7 @@ export default function StorySolve({
             ].join(" ")}
             type="button"
           >
-            ➖ Subtract
+            <span className="inline-flex items-center gap-1.5"><Minus className="h-5 w-5" /> Subtract</span>
           </button>
         </div>
       ) : null}

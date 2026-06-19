@@ -1,5 +1,6 @@
 "use client";
 
+import { Check, X } from "lucide-react";
 import { useState } from "react";
 
 const WORDS_0_20 = [
@@ -136,10 +137,10 @@ export default function TypeTheNumber({
       </button>
 
       {status === "correct" && (
-        <div className="mt-2 text-green-600 font-bold">✅ Correct</div>
+        <div className="mt-2 text-green-600 font-bold"><Check className="inline-block h-4 w-4 align-[-3px]" /> Correct</div>
       )}
       {status === "wrong" && (
-        <div className="mt-2 text-red-600 font-bold">❌ Try again</div>
+        <div className="mt-2 text-red-600 font-bold"><X className="inline-block h-4 w-4 align-[-3px]" /> Try again</div>
       )}
     </div>
   );

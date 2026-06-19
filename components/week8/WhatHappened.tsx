@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Plus, Minus } from "lucide-react";
 import { StaticDotRow } from "@/components/StaticDots";
 
 export default function WhatHappened({
@@ -54,14 +55,14 @@ export default function WhatHappened({
           onClick={() => chooseOp("add")}
           className="px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 font-extrabold"
         >
-          ➕ Added
+          <span className="inline-flex items-center gap-1.5"><Plus className="h-5 w-5" /> Added</span>
         </button>
         <button
           type="button"
           onClick={() => chooseOp("subtract")}
           className="px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 font-extrabold"
         >
-          ➖ Taken away
+          <span className="inline-flex items-center gap-1.5"><Minus className="h-5 w-5" /> Taken away</span>
         </button>
       </div>
 
