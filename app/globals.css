@@ -124,6 +124,14 @@ body {
   50% { opacity: 1; transform: scale(1.05); }
 }
 
+/* Measurelands capacity intro: water pours up to the brim, holds, then resets. */
+@keyframes mzFillToBrim {
+  0% { transform: scaleY(0); }
+  45% { transform: scaleY(1); }
+  80% { transform: scaleY(1); }
+  100% { transform: scaleY(0); }
+}
+
 @keyframes nexusFloat {
   0% { opacity: 0; transform: translateY(0) translateX(0); }
   15% { opacity: 1; }

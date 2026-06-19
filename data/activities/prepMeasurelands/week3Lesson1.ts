@@ -108,22 +108,23 @@ const ORDER_SETS: OrderSet[] = [
   },
 ];
 
+// Fill levels are spaced so the four states read clearly against the brim line:
+// empty = nothing, nearly-empty = thin layer, nearly-full = just below the brim,
+// full = right up to the brim.
 const FILL_STATES = [
   { id: "empty", label: "Empty", icon: "⚪", waterLevel: 0 },
-  { id: "nearly-empty", label: "Nearly Empty", icon: "💧", waterLevel: 0.25 },
-  { id: "nearly-full", label: "Nearly Full", icon: "💦", waterLevel: 0.75 },
+  { id: "nearly-empty", label: "Nearly Empty", icon: "💧", waterLevel: 0.16 },
+  { id: "nearly-full", label: "Nearly Full", icon: "💦", waterLevel: 0.78 },
   { id: "full", label: "Full", icon: "🌊", waterLevel: 1 },
 ] as const;
 
-const FILL_CONTAINERS = [
-  CONTAINERS.cup,
-  CONTAINERS.bottle,
-  CONTAINERS.bucket,
-  CONTAINERS.fishTank,
-  CONTAINERS.jug,
-];
+// One fixed container for every fill-state task so students focus on the WATER
+// LEVEL, not the container's size/shape.
+const FILL_CONTAINER = CONTAINERS.jug;
 
-function toObj(thing: ContainerThing, accent: Accent, waterLevel = 0.65, suffix = ""): MObj {
+// waterLevel defaults to 0 (empty) — capacity compare/order cards must stay
+// empty so container SIZE is the only cue. Only fill-state tasks pass a level.
+function toObj(thing: ContainerThing, accent: Accent, waterLevel = 0, suffix = ""): MObj {
   return {
     id: `${thing.id}${suffix}`,
     label: thing.label,
@@ -250,11 +251,10 @@ function buildSortContainersTask(memory: LessonMemory): CompareTask {
 }
 
 function buildFillContainerTask(memory: LessonMemory): CompareTask {
-  let container = choose(FILL_CONTAINERS);
+  const container = FILL_CONTAINER;
   let state = choose([...FILL_STATES]);
   let guard = 0;
   while (`${container.id}-${state.id}` === memory.lastSetId && guard++ < 20) {
-    container = choose(FILL_CONTAINERS);
     state = choose([...FILL_STATES]);
   }
   memory.lastSetId = `${container.id}-${state.id}`;
@@ -283,11 +283,12 @@ export function buildMeasurelandsWeek3Lesson1QuizTasks(): PracticeTask[] {
   const smallestSet = [CONTAINERS.cup, CONTAINERS.bottle, CONTAINERS.jug];
   const emptyState = FILL_STATES[0]!;
 
+  // Capacity comparison/order questions show EMPTY containers (waterLevel 0).
   const greatestObjects = greatestSet.map((item, index) =>
-    toObj(item, ACCENTS[index]!, 0.64, `-greatest-${index}`),
+    toObj(item, ACCENTS[index]!, 0, `-greatest-${index}`),
   );
   const smallestObjects = smallestSet.map((item, index) =>
-    toObj(item, ACCENTS[index + 2]!, 0.64, `-smallest-${index}`),
+    toObj(item, ACCENTS[index + 2]!, 0, `-smallest-${index}`),
   );
 
   return [
@@ -298,8 +299,8 @@ export function buildMeasurelandsWeek3Lesson1QuizTasks(): PracticeTask[] {
       speakText: "Which container holds more?",
       badgeLabel: "Capacity Check",
       objects: shuffle([
-        toObj(moreSet.less, "sky", 0.65, "-q1a"),
-        toObj(moreSet.more, "gold", 0.65, "-q1b"),
+        toObj(moreSet.less, "sky", 0, "-q1a"),
+        toObj(moreSet.more, "gold", 0, "-q1b"),
       ]),
       correctOptionId: `${moreSet.more.id}-q1b`,
       feedback: { correct: "Yes!", wrong: "Look again." },
@@ -311,8 +312,8 @@ export function buildMeasurelandsWeek3Lesson1QuizTasks(): PracticeTask[] {
       speakText: "Which container holds less?",
       badgeLabel: "Capacity Check",
       objects: shuffle([
-        toObj(lessSet.less, "violet", 0.65, "-q2a"),
-        toObj(lessSet.more, "teal", 0.65, "-q2b"),
+        toObj(lessSet.less, "violet", 0, "-q2a"),
+        toObj(lessSet.more, "teal", 0, "-q2b"),
       ]),
       correctOptionId: `${lessSet.less.id}-q2a`,
       feedback: { correct: "Yes!", wrong: "Look again." },
@@ -343,7 +344,7 @@ export function buildMeasurelandsWeek3Lesson1QuizTasks(): PracticeTask[] {
       prompt: "How full is this container?",
       speakText: "How full is this container?",
       badgeLabel: "Full or Empty",
-      objects: [toObj(CONTAINERS.bucket, "leaf", emptyState.waterLevel, "-q5")],
+      objects: [toObj(FILL_CONTAINER, "leaf", emptyState.waterLevel, "-q5")],
       bins: FILL_STATES.map((fillState) => ({
         id: fillState.id,
         label: fillState.label,

@@ -112,9 +112,16 @@ function MeasurementShell({
 function CompareVisual({
   item,
   compact = false,
+  showWater = false,
+  animateFill = false,
 }: {
   item: MeasurelandsCompareObject | TeachingMoment["left"] | TeachingMoment["right"];
   compact?: boolean;
+  /** Only capacity fill-state tasks (and the intro demo) should show liquid.
+   *  Capacity compare/order tasks leave the container EMPTY so size = capacity. */
+  showWater?: boolean;
+  /** Intro demo only: water pours up to the brim to model "how much it can hold". */
+  animateFill?: boolean;
 }) {
   const accent = ACCENT_STYLES[item.accent];
   const axis = item.axis;
@@ -123,8 +130,11 @@ function CompareVisual({
   const fillHeight = Math.round((item.compareValue / 10) * (compact ? 122 : 150));
   const capacityWidth = Math.round((compact ? 62 : 74) + (item.compareValue / 10) * (compact ? 34 : 44));
   const capacityHeight = Math.round((compact ? 88 : 108) + (item.compareValue / 10) * (compact ? 38 : 52));
-  const waterLevel = typeof item.waterLevel === "number" ? item.waterLevel : 0.62;
+  const waterLevel = typeof item.waterLevel === "number" ? item.waterLevel : 0;
   const waterHeight = Math.round(capacityHeight * Math.max(0, Math.min(1, waterLevel)));
+  // Liquid is only drawn for fill-state tasks or the intro demo; compare/order
+  // capacity cards stay empty so the container's SIZE is the only capacity cue.
+  const renderWater = axis === "capacity" && (animateFill || (showWater && waterLevel > 0));
   const massTrackSize = compact ? 118 : 146;
   const massFillLength = Math.max(
     Math.round((item.compareValue / 10) * massTrackSize),
@@ -188,23 +198,32 @@ function CompareVisual({
           </div>
           <div className="flex h-[160px] items-end justify-center">
             <div
-              className="relative flex items-end justify-center rounded-[24px] border-[3px] border-[#ead6a8] bg-[#fffaf0] pb-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]"
+              className="relative flex items-end justify-center overflow-hidden rounded-[24px] border-[3px] border-[#ead6a8] bg-[#fffaf0] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]"
               style={{
                 width: capacityWidth,
                 height: capacityHeight,
                 minWidth: compact ? 78 : 96,
               }}
             >
+              {/* Brim / "full" line — marks how much the container can hold. */}
               <div
-                className="absolute inset-x-1 bottom-1 rounded-b-[18px] rounded-t-[8px] transition-all"
-                style={{
-                  height: waterHeight,
-                  background: accent.fill,
-                  opacity: waterLevel === 0 ? 0 : 1,
-                  boxShadow: waterLevel > 0 ? accent.glow : "none",
-                }}
+                className="absolute inset-x-0 top-[7px] border-t border-dashed"
+                style={{ borderColor: "rgba(120,53,15,0.28)" }}
               />
-              <div className="absolute inset-0 rounded-[20px] bg-[linear-gradient(180deg,rgba(255,255,255,0.35),transparent_45%)]" />
+              {/* Liquid: only for fill-state tasks (static) or the intro demo (animated). */}
+              {renderWater ? (
+                <div
+                  className="absolute inset-x-0 bottom-0 transition-all"
+                  style={{
+                    height: animateFill ? capacityHeight - 7 : waterHeight,
+                    background: accent.fill,
+                    boxShadow: accent.glow,
+                    transformOrigin: "bottom",
+                    animation: animateFill ? "mzFillToBrim 3.2s ease-in-out infinite" : undefined,
+                  }}
+                />
+              ) : null}
+              <div className="pointer-events-none absolute inset-0 rounded-[20px] bg-[linear-gradient(180deg,rgba(255,255,255,0.35),transparent_45%)]" />
             </div>
           </div>
         </>
@@ -269,13 +288,25 @@ function TeachingMomentRow({ moment }: { moment: TeachingMoment }) {
               key={`${moment.id}-${item.label}-${index}`}
               item={{ ...item, id: `${moment.id}-${index}` }}
               compact
+              showWater={item.axis === "capacity"}
+              animateFill={item.axis === "capacity"}
             />
           ))}
         </div>
       ) : (
         <div className="grid gap-3 md:grid-cols-2">
-          <CompareVisual item={moment.left} compact />
-          <CompareVisual item={moment.right} compact />
+          <CompareVisual
+            item={moment.left}
+            compact
+            showWater={moment.left.axis === "capacity"}
+            animateFill={moment.left.axis === "capacity"}
+          />
+          <CompareVisual
+            item={moment.right}
+            compact
+            showWater={moment.right.axis === "capacity"}
+            animateFill={moment.right.axis === "capacity"}
+          />
         </div>
       )}
       <div className="mt-3 text-center text-sm font-semibold text-[#5f4725]">
@@ -308,7 +339,7 @@ function SortScene({
     >
       {item ? (
         <div className="mx-auto max-w-[260px]">
-          <CompareVisual item={item} />
+          <CompareVisual item={item} showWater />
         </div>
       ) : null}
       <div className={`mt-4 grid gap-4 ${bins.length >= 4 ? "grid-cols-2 md:grid-cols-4" : "grid-cols-2"}`}>
