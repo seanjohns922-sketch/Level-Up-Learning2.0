@@ -13688,13 +13688,13 @@ function generateGenericQuestion(
       };
     }> = [
       {
-        prompt: "A student says, '245 is divisible by 3 because it ends in 5.' Who is right?",
-        answer: "The student is incorrect because divisibility by 3 depends on the digit sum, not the last digit",
+        prompt: "245 divisible by 3 because it ends in 5?\nCorrect?",
+        answer: "No — use the digit sum",
         options: [
-          "The student is incorrect because divisibility by 3 depends on the digit sum, not the last digit",
-          "The student is correct because numbers ending in 5 are always divisible by 3",
-          "The student is partly correct because 245 is divisible by both 3 and 5",
-          "The student is incorrect because odd numbers are never divisible by 3",
+          "No — use the digit sum",
+          "Yes — numbers ending in 5 are divisible by 3",
+          "Partly — 245 is divisible by 3 and 5",
+          "No — odd numbers are never divisible by 3",
         ],
         visual: {
           type: "rule_box",
@@ -13703,13 +13703,13 @@ function generateGenericQuestion(
         },
       },
       {
-        prompt: "A student says, '312 is divisible by 4 because it is even.' Who is right?",
-        answer: "The student is partly correct because 312 is divisible by 4, but being even is not enough proof",
+        prompt: "312 divisible by 4 because it is even?\nCorrect?",
+        answer: "Partly — 312 works, but even is not enough",
         options: [
-          "The student is partly correct because 312 is divisible by 4, but being even is not enough proof",
-          "The student is correct because every even number is divisible by 4",
-          "The student is incorrect because 312 is odd",
-          "The student is incorrect because divisibility by 4 uses the digit sum",
+          "Partly — 312 works, but even is not enough",
+          "Yes — every even number is divisible by 4",
+          "No — 312 is odd",
+          "No — use the digit sum",
         ],
         visual: {
           type: "rule_box",
@@ -13718,13 +13718,13 @@ function generateGenericQuestion(
         },
       },
       {
-        prompt: "A student says, '450 is divisible by both 3 and 5, so it works for both rules.' Who is right?",
-        answer: "The student is correct because 4 + 5 + 0 = 9 and the number ends in 0",
+        prompt: "450 divisible by both 3 and 5?\nCorrect?",
+        answer: "Yes — digit sum 9 and ends in 0",
         options: [
-          "The student is correct because 4 + 5 + 0 = 9 and the number ends in 0",
-          "The student is incorrect because numbers ending in 0 cannot be divisible by 3",
-          "The student is partly correct because 450 is divisible by 5 but not by 3",
-          "The student is incorrect because only 2-digit numbers can be divisible by both 3 and 5",
+          "Yes — digit sum 9 and ends in 0",
+          "No — numbers ending in 0 cannot be divisible by 3",
+          "Partly — divisible by 5 only",
+          "No — only 2-digit numbers can do both",
         ],
         visual: {
           type: "rule_box",
@@ -13734,13 +13734,13 @@ function generateGenericQuestion(
         },
       },
       {
-        prompt: "A student says, '1,218 is not divisible by 6 because it is too big.' Who is right?",
-        answer: "The student is incorrect because size does not matter; 1,218 is even and its digit sum is 12",
+        prompt: "1,218 not divisible by 6 because it is too big?\nCorrect?",
+        answer: "No — it is even and digit sum is 12",
         options: [
-          "The student is incorrect because size does not matter; 1,218 is even and its digit sum is 12",
-          "The student is correct because only 2-digit numbers can be divisible by 6",
-          "The student is partly correct because 1,218 is divisible by 3 but not by 2",
-          "The student is correct because 1,218 ends in 8",
+          "No — it is even and digit sum is 12",
+          "Yes — only 2-digit numbers can be divisible by 6",
+          "Partly — divisible by 3 but not 2",
+          "Yes — it ends in 8",
         ],
         visual: {
           type: "rule_box",
@@ -13749,13 +13749,13 @@ function generateGenericQuestion(
         },
       },
       {
-        prompt: "A student says, '372 is divisible by 3 because 3 + 7 + 2 = 12.' Who is right?",
-        answer: "The student is correct because 12 is divisible by 3",
+        prompt: "372 divisible by 3 because 3 + 7 + 2 = 12?\nCorrect?",
+        answer: "Yes — 12 is divisible by 3",
         options: [
-          "The student is correct because 12 is divisible by 3",
-          "The student is incorrect because 372 is even",
-          "The student is partly correct because 372 is only divisible by 2",
-          "The student is incorrect because the last digit should be checked instead",
+          "Yes — 12 is divisible by 3",
+          "No — 372 is even",
+          "Partly — it is only divisible by 2",
+          "No — check the last digit",
         ],
         visual: {
           type: "rule_box",
@@ -13764,13 +13764,13 @@ function generateGenericQuestion(
         },
       },
       {
-        prompt: "A student says, '630 is divisible by 10, so it must also be divisible by 5.' Who is right?",
-        answer: "The student is correct because every number divisible by 10 ends in 0, so it is also divisible by 5",
+        prompt: "630 divisible by 10, so also divisible by 5?\nCorrect?",
+        answer: "Yes — numbers ending in 0 are divisible by 5",
         options: [
-          "The student is correct because every number divisible by 10 ends in 0, so it is also divisible by 5",
-          "The student is incorrect because divisibility by 10 and 5 are unrelated",
-          "The student is partly correct because 630 is divisible by 10 but not by 5",
-          "The student is incorrect because numbers divisible by 10 must be even, not multiples of 5",
+          "Yes — numbers ending in 0 are divisible by 5",
+          "No — 10 and 5 are unrelated",
+          "Partly — divisible by 10 but not 5",
+          "No — divisible by 10 means even only",
         ],
         visual: {
           type: "rule_box",
@@ -13779,13 +13779,13 @@ function generateGenericQuestion(
         },
       },
       {
-        prompt: "A student says, '248 is divisible by 8 because it ends in 8.' Who is right?",
-        answer: "The student is partly correct because 248 is divisible by 8, but you must check the last three digits, not just the last digit",
+        prompt: "248 divisible by 8 because it ends in 8?\nCorrect?",
+        answer: "Partly — check the last three digits",
         options: [
-          "The student is partly correct because 248 is divisible by 8, but you must check the last three digits, not just the last digit",
-          "The student is correct because any number ending in 8 is divisible by 8",
-          "The student is incorrect because 248 is odd",
-          "The student is incorrect because divisibility by 8 uses the digit sum",
+          "Partly — check the last three digits",
+          "Yes — any number ending in 8 is divisible by 8",
+          "No — 248 is odd",
+          "No — use the digit sum",
         ],
         visual: {
           type: "rule_box",
@@ -13794,13 +13794,13 @@ function generateGenericQuestion(
         },
       },
       {
-        prompt: "A student says, '555 is divisible by both 3 and 5.' Who is right?",
-        answer: "The student is correct because 5 + 5 + 5 = 15 and the number ends in 5",
+        prompt: "555 divisible by both 3 and 5?\nCorrect?",
+        answer: "Yes — digit sum 15 and ends in 5",
         options: [
-          "The student is correct because 5 + 5 + 5 = 15 and the number ends in 5",
-          "The student is incorrect because odd numbers cannot be divisible by 3",
-          "The student is partly correct because 555 is divisible by 5 but not by 3",
-          "The student is incorrect because only numbers ending in 0 can be divisible by 5",
+          "Yes — digit sum 15 and ends in 5",
+          "No — odd numbers cannot be divisible by 3",
+          "Partly — divisible by 5 only",
+          "No — only numbers ending in 0 can be divisible by 5",
         ],
         visual: {
           type: "rule_box",
@@ -13815,7 +13815,7 @@ function generateGenericQuestion(
       prompt: chosen.prompt,
       options: shuffle(chosen.options),
       answer: chosen.answer,
-      helper: "Decide whether the student's reasoning is correct, partly correct, or incorrect.",
+      helper: "Check the rule, not just the student's words.",
       visual: chosen.visual,
     };
   }
@@ -15751,24 +15751,24 @@ function generateGenericQuestion(
       };
     }> = [
       {
-        prompt: "Multiples of 4: 4, 8, 12, 16, 20. Noah says, 'They always go up by 4.' Mia says, 'They are all even numbers.' Who is correct?",
+        prompt: "4, 8, 12, 16, 20\nWhich statement is true?",
         answer: "Both are correct",
         options: [
           "Both are correct",
-          "Only Noah is correct",
-          "Only Mia is correct",
+          "Only “add 4” is correct",
+          "Only “all even” is correct",
           "Neither is correct",
         ],
         helper: "A pattern can have more than one true description.",
       },
       {
-        prompt: "Why do multiples of 5 always end in 0 or 5?",
-        answer: "Because they are made by adding 5 each time, so the ones digit repeats in a 0, 5 pattern",
+        prompt: "Why do multiples of 5 end in 0 or 5?",
+        answer: "Adding 5 repeats the ones digit pattern",
         options: [
-          "Because they are made by adding 5 each time, so the ones digit repeats in a 0, 5 pattern",
-          "Because every odd number is a multiple of 5",
-          "Because multiplying always makes the last digit 5",
-          "Because only 2-digit numbers can be multiples of 5",
+          "Adding 5 repeats the ones digit pattern",
+          "Every odd number is a multiple of 5",
+          "Multiplying always makes the last digit 5",
+          "Only 2-digit numbers can be multiples of 5",
         ],
         helper: "Think about what happens to the ones digit when 5 keeps being added.",
         visual: {
@@ -15778,13 +15778,13 @@ function generateGenericQuestion(
         },
       },
       {
-        prompt: "A student says, '30, 40, 50, 60 are multiples of 10, so they all end in 0.' Which answer is best?",
-        answer: "The student is correct because adding 10 keeps the ones digit at 0",
+        prompt: "30, 40, 50, 60\nWhy do they all end in 0?",
+        answer: "Adding 10 keeps the ones digit at 0",
         options: [
-          "The student is correct because adding 10 keeps the ones digit at 0",
-          "The student is incorrect because some multiples of 10 end in 5",
-          "The student is partly correct because only 30 and 40 are multiples of 10",
-          "The student is incorrect because ending in 0 means the number is odd",
+          "Adding 10 keeps the ones digit at 0",
+          "Some multiples of 10 end in 5",
+          "Only 30 and 40 are multiples of 10",
+          "Ending in 0 means odd",
         ],
         helper: "Use the pattern and the place-value effect of adding 10.",
       },
@@ -15800,24 +15800,24 @@ function generateGenericQuestion(
         helper: "Choose the rule that explains both the step and the pattern property.",
       },
       {
-        prompt: "Ella says, 'All multiples of 6 are even.' Zane says, 'All multiples of 6 have a digit sum of 6.' Who is correct?",
+        prompt: "Multiples of 6\nWhich statement is true?",
         answer: "Only Ella is correct",
         options: [
-          "Only Ella is correct",
-          "Only Zane is correct",
+          "Only “all are even” is correct",
+          "Only “digit sum is 6” is correct",
           "Both are correct",
           "Neither is correct",
         ],
         helper: "Test which statement always works and which works only sometimes.",
       },
       {
-        prompt: "Why do multiples of 10 always end in 0?",
-        answer: "Because multiplying by 10 makes the ones digit 0 in whole numbers",
+        prompt: "Why do multiples of 10 end in 0?",
+        answer: "×10 makes the ones digit 0",
         options: [
-          "Because multiplying by 10 makes the ones digit 0 in whole numbers",
-          "Because every even number ends in 0",
-          "Because 10 is an odd number",
-          "Because multiples of 10 only use two digits",
+          "×10 makes the ones digit 0",
+          "Every even number ends in 0",
+          "10 is odd",
+          "Multiples of 10 only use two digits",
         ],
         helper: "Connect the pattern to place value, not just memorising the rule.",
         visual: {
@@ -15911,46 +15911,46 @@ function generateGenericQuestion(
       helper: string;
     }> = [
       {
-        prompt: "Which number does not belong: 18, 24, 30, 35, 42?",
-        answer: "35, because the others are all multiples of 6",
+        prompt: "Which number does not belong?\n18, 24, 30, 35, 42",
+        answer: "35",
         options: [
-          "35, because the others are all multiples of 6",
-          "24, because it is the only even number",
-          "30, because it is the only multiple of 5",
-          "42, because it is the largest number",
+          "35",
+          "24",
+          "30",
+          "42",
         ],
         helper: "Check which numbers share the same divisibility rule.",
       },
       {
-        prompt: "Which number does not belong: 45, 60, 75, 83, 90?",
-        answer: "83, because the others are divisible by both 3 and 5",
+        prompt: "Which number does not belong?\n45, 60, 75, 83, 90",
+        answer: "83",
         options: [
-          "83, because the others are divisible by both 3 and 5",
-          "60, because it is the only even number",
-          "75, because it is the only odd multiple of 5",
-          "90, because it has the most factors",
+          "83",
+          "60",
+          "75",
+          "90",
         ],
         helper: "Look for a rule that works for four numbers, not just one feature.",
       },
       {
-        prompt: "What rule is being used in 24, 36, 48, 60, 72?",
-        answer: "Add 12 each time, so every term stays a multiple of 12",
+        prompt: "24, 36, 48, 60, 72\nWhat is the rule?",
+        answer: "Add 12 each time",
         options: [
-          "Add 12 each time, so every term stays a multiple of 12",
-          "Add 10 each time, so every term stays even",
+          "Add 12 each time",
+          "Add 10 each time",
           "Multiply by 2 each time",
-          "Add 6 each time, so every term is a multiple of 6 only",
+          "Add 6 each time",
         ],
         helper: "Check the difference between each pair of numbers.",
       },
       {
-        prompt: "What rule best describes 135, 150, 165, 180, 195?",
-        answer: "Add 15 each time, so every term is divisible by both 3 and 5",
+        prompt: "135, 150, 165, 180, 195\nWhat is the rule?",
+        answer: "Add 15 each time",
         options: [
-          "Add 15 each time, so every term is divisible by both 3 and 5",
-          "Add 10 each time, so every term ends in 0",
+          "Add 15 each time",
+          "Add 10 each time",
           "Multiply by 3 each time",
-          "Add 5 each time, so every term is odd",
+          "Add 5 each time",
         ],
         helper: "Test both the step size and the divisibility pattern.",
       },
@@ -15966,40 +15966,40 @@ function generateGenericQuestion(
         helper: "Use a rule that always works, not one that works only sometimes.",
       },
       {
-        prompt: "A student says, 'If a number is divisible by both 3 and 4, it must be divisible by 12.' Which answer is best?",
-        answer: "True, because 12 is made from 3 and 4 with no overlap in factors",
+        prompt: "If a number is divisible by 3 and 4, must it be divisible by 12?",
+        answer: "Yes",
         options: [
-          "True, because 12 is made from 3 and 4 with no overlap in factors",
-          "False, because every multiple of 3 is odd",
-          "False, because divisibility by 4 cancels divisibility by 3",
-          "True, but only for numbers below 100",
+          "Yes",
+          "No — multiples of 3 are odd",
+          "No — divisibility by 4 cancels divisibility by 3",
+          "Yes, but only below 100",
         ],
         helper: "Think about what numbers divisible by both 3 and 4 must have in common.",
       },
       {
-        prompt: "Which number could go in the blank: __, 48, 60, 72, 84?",
-        answer: "36, because the pattern adds 12 each time",
+        prompt: "__, 48, 60, 72, 84\nWhich number fits?",
+        answer: "36",
         options: [
-          "36, because the pattern adds 12 each time",
-          "40, because it is close to 48",
-          "42, because it is a multiple of 6",
-          "24, because it is half of 48",
+          "36",
+          "40",
+          "42",
+          "24",
         ],
         helper: "Work backward using the same step size.",
       },
       {
-        prompt: "Which missing number makes the pattern work: 84, 96, __, 120, 132?",
-        answer: "108, because the pattern increases by 12 each time",
+        prompt: "84, 96, __, 120, 132\nWhich number fits?",
+        answer: "108",
         options: [
-          "108, because the pattern increases by 12 each time",
-          "102, because it is between 96 and 120",
-          "110, because it is close to 108",
-          "112, because it is even",
+          "108",
+          "102",
+          "110",
+          "112",
         ],
         helper: "Find the constant increase first, then check the divisibility pattern.",
       },
       {
-        prompt: "Which list shows only numbers divisible by 3?",
+        prompt: "Which list shows only multiples of 3?",
         answer: "96, 117, 138",
         options: [
           "96, 117, 138",
@@ -16010,7 +16010,7 @@ function generateGenericQuestion(
         helper: "Check the divisibility test on every number in the group.",
       },
       {
-        prompt: "Which group correctly sorts the numbers by the rule 'divisible by both 3 and 5'?",
+        prompt: "Which group is correct?",
         answer: "Divisible by both: 45, 90, 135 | Not both: 48, 75, 124",
         options: [
           "Divisible by both: 45, 90, 135 | Not both: 48, 75, 124",
@@ -16021,13 +16021,13 @@ function generateGenericQuestion(
         helper: "A number must pass both divisibility tests to belong in the first group.",
       },
       {
-        prompt: "Which explanation best fits 128, 136, 144, 152, 160?",
-        answer: "Add 8 each time, so the numbers stay even and every second term is divisible by 16",
+        prompt: "128, 136, 144, 152, 160\nWhich explanation fits?",
+        answer: "Add 8 each time",
         options: [
-          "Add 8 each time, so the numbers stay even and every second term is divisible by 16",
-          "Add 6 each time, so the numbers stay multiples of 6",
+          "Add 8 each time",
+          "Add 6 each time",
           "Multiply by 2 each time",
-          "Add 10 each time, so the numbers all end in 0",
+          "Add 10 each time",
         ],
         helper: "Use the actual step size, then describe the pattern it creates.",
       },
@@ -18374,24 +18374,24 @@ function generateGenericQuestion(
       };
     }> = [
       {
-        prompt: "324 × 3. Noah says: 300 × 3 = 900 and 24 × 3 = 72, so the total is 972. Mia says: 324 × 3 = 972. Who used a helpful strategy?",
-        answer: "Both are correct, but Noah shows a helpful strategy",
+        prompt: "324 × 3 = 972.\nWhich working helps most?",
+        answer: "300 × 3 = 900 and 24 × 3 = 72",
         options: [
-          "Both are correct, but Noah shows a helpful strategy",
-          "Only Noah is correct",
-          "Only Mia is correct",
-          "Neither is correct",
+          "300 × 3 = 900 and 24 × 3 = 72",
+          "Just write 972",
+          "300 × 3 = 300 and 24 × 3 = 72",
+          "3 + 2 + 4 = 9",
         ],
-        helper: "A correct answer can still be stronger when it explains the place value thinking.",
+        helper: "Pick the working that shows the place-value parts.",
       },
       {
-        prompt: "40 × 6 = 240. A student says, 'I did 4 × 6 = 24 and added a zero.' Why does this work?",
-        answer: "Because 40 is 4 tens, so the answer is 24 tens",
+        prompt: "40 × 6 = 240.\nWhy does this work?",
+        answer: "40 is 4 tens, so 4 × 6 = 24 tens",
         options: [
-          "Because 40 is 4 tens, so the answer is 24 tens",
-          "Because multiplication always means adding a zero",
-          "Because 6 changes into 60 during multiplication",
-          "Because 24 is the same as 240",
+          "40 is 4 tens, so 4 × 6 = 24 tens",
+          "You always add a zero",
+          "6 becomes 60",
+          "24 and 240 are the same",
         ],
         helper: "The zero comes from place value, not from a trick.",
         visual: {
@@ -18412,24 +18412,24 @@ function generateGenericQuestion(
         helper: "Choose the method that uses a known fact and place value.",
       },
       {
-        prompt: "A student says 506 × 3 = 1,518 because 500 × 3 = 1,500, 0 × 3 = 0, and 6 × 3 = 18. Is this correct?",
-        answer: "Yes, because each place-value part was multiplied correctly",
+        prompt: "Is this correct?\n500 × 3 = 1,500\n0 × 3 = 0\n6 × 3 = 18\n506 × 3 = 1,518",
+        answer: "Yes",
         options: [
-          "Yes, because each place-value part was multiplied correctly",
-          "No, because the 0 should become 30",
-          "No, because 500 × 3 is 150",
-          "No, because 6 × 3 should be added before 500 × 3",
+          "Yes",
+          "No, 0 × 3 should be 30",
+          "No, 500 × 3 should be 150",
+          "No, add 18 first",
         ],
         helper: "Check each partitioned part, then combine them.",
       },
       {
         prompt: "Why does 5 × 400 = 2,000?",
-        answer: "Because 400 is 4 hundreds, and 5 × 4 hundreds is 20 hundreds",
+        answer: "400 is 4 hundreds, so 5 × 4 hundreds = 20 hundreds",
         options: [
-          "Because 400 is 4 hundreds, and 5 × 4 hundreds is 20 hundreds",
-          "Because 5 × 4 = 20, then a zero is added at random",
-          "Because 400 becomes 40 during multiplication",
-          "Because all answers with 400 end in 2,000",
+          "400 is 4 hundreds, so 5 × 4 hundreds = 20 hundreds",
+          "Add zeros at random",
+          "400 becomes 40",
+          "All answers with 400 are 2,000",
         ],
         helper: "Explain the hundreds, not just the digits.",
         visual: {
@@ -18593,23 +18593,23 @@ function generateGenericQuestion(
     }> = [
       {
         prompt: "Which method is most efficient for 48 × 25?",
-        answer: "Use a friendly factor strategy because 4 × 25 = 100",
+        answer: "Use 4 × 25 = 100",
         options: [
-          "Use a friendly factor strategy because 4 × 25 = 100",
-          "Use repeated addition because 25 is large",
-          "Draw an area model every time because it is the only correct method",
-          "Round 48 to 50 and keep that answer",
+          "Use 4 × 25 = 100",
+          "Use repeated addition",
+          "Always draw an area model",
+          "Round 48 to 50 and stop",
         ],
         helper: "Efficiency means choosing a correct method that reduces the work.",
       },
       {
-        prompt: "A student uses the standard algorithm for 20 × 34. Was that efficient?",
-        answer: "No, using 2 × 34 and then scaling by 10 is more efficient",
+        prompt: "20 × 34\nWas the standard algorithm the quickest method?",
+        answer: "No, 2 × 34 then ×10 is quicker",
         options: [
-          "No, using 2 × 34 and then scaling by 10 is more efficient",
-          "Yes, the standard algorithm is always the most efficient",
-          "No, because 20 × 34 should be solved by subtraction",
-          "Yes, because multiplying by 20 is the same as multiplying by 2",
+          "No, 2 × 34 then ×10 is quicker",
+          "Yes, written methods are always quickest",
+          "No, use subtraction",
+          "Yes, ×20 is the same as ×2",
         ],
         helper: "A formal method can be correct without being the quickest choice.",
         visual: {
@@ -18619,35 +18619,35 @@ function generateGenericQuestion(
         },
       },
       {
-        prompt: "Why is 25 × 16 easier than it looks?",
-        answer: "Because 16 can be seen as 4 × 4, and 25 × 4 = 100",
+        prompt: "Why is 25 × 16 a friendly-number question?",
+        answer: "Because 25 × 4 = 100",
         options: [
-          "Because 16 can be seen as 4 × 4, and 25 × 4 = 100",
-          "Because 25 can be rounded to 30 with no change",
-          "Because any number multiplied by 25 ends in 00",
-          "Because 16 should be changed to 10 first",
+          "Because 25 × 4 = 100",
+          "Because 25 rounds to 30",
+          "Because answers with 25 end in 00",
+          "Because 16 should become 10",
         ],
         helper: "Friendly factors can turn a tricky fact into a simple chain of facts.",
       },
       {
-        prompt: "Noah says 48 × 26 is best solved with a written method. Mia says partitioning into 48 × 20 and 48 × 6 is more efficient. Who is correct?",
-        answer: "Both can work, but Mia's partitioning is more efficient to explain the calculation",
+        prompt: "48 × 26\nWhich method is easier to explain?",
+        answer: "48 × 20 and 48 × 6",
         options: [
-          "Both can work, but Mia's partitioning is more efficient to explain the calculation",
-          "Only Noah is correct because written methods are always best",
-          "Only Mia is correct because written methods are never allowed",
-          "Neither is correct because 48 × 26 cannot be partitioned",
+          "48 × 20 and 48 × 6",
+          "Written method only",
+          "Partitioning is never allowed",
+          "48 × 26 cannot be split",
         ],
         helper: "At this level, students should compare valid methods and choose the more efficient one.",
       },
       {
-        prompt: "A student says 32 × 25 = 32 × 20 + 32 × 5. Is that correct?",
-        answer: "Yes, because 25 can be partitioned into 20 and 5",
+        prompt: "Is this correct?\n32 × 25 = 32 × 20 + 32 × 5",
+        answer: "Yes",
         options: [
-          "Yes, because 25 can be partitioned into 20 and 5",
-          "No, because only one factor can be split",
-          "No, because 20 and 5 should be multiplied together first",
-          "Yes, but only if 32 is changed to 30",
+          "Yes",
+          "No, factors cannot be split",
+          "No, multiply 20 and 5 first",
+          "Yes, but change 32 to 30 first",
         ],
         helper: "Partitioning keeps the total the same when the place values are handled correctly.",
       },
@@ -18852,42 +18852,42 @@ function generateGenericQuestion(
     const templates = [
       {
         prompt: "47 ÷ 5 = 9 r3. Is this correct?",
-        answer: "No, because 5 × 9 + 3 = 48",
+        answer: "No — 5 × 9 + 3 = 48",
         options: [
-          "Yes, because 5 × 9 + 3 = 47",
-          "No, because 5 × 9 + 3 = 48",
-          "No, because the remainder is too large",
-          "Yes, because 9 remainder 3 always works for dividing by 5",
+          "Yes — 5 × 9 + 3 = 47",
+          "No — 5 × 9 + 3 = 48",
+          "No — remainder too large",
+          "Yes — 9 r3 always works",
         ],
       },
       {
         prompt: "68 ÷ 6 = 11 r2. Is this correct?",
-        answer: "Yes, because 6 × 11 + 2 = 68",
+        answer: "Yes — 6 × 11 + 2 = 68",
         options: [
-          "Yes, because 6 × 11 + 2 = 68",
-          "No, because 6 × 11 + 2 = 66",
-          "No, because the remainder is too large",
-          "Yes, because all division answers need a remainder",
+          "Yes — 6 × 11 + 2 = 68",
+          "No — 6 × 11 + 2 = 66",
+          "No — remainder too large",
+          "Yes — all division answers need a remainder",
         ],
       },
       {
         prompt: "94 ÷ 8 = 11 r8. Is this correct?",
-        answer: "No, because the remainder is too large",
+        answer: "No — remainder too large",
         options: [
-          "Yes, because 8 × 11 + 8 = 96",
-          "No, because 8 × 11 + 8 = 94",
-          "No, because the remainder is too large",
-          "Yes, because 11 is the correct quotient",
+          "Yes — 8 × 11 + 8 = 96",
+          "No — 8 × 11 + 8 = 94",
+          "No — remainder too large",
+          "Yes — quotient is 11",
         ],
       },
       {
         prompt: "125 ÷ 9 = 13 r8. Is this correct?",
-        answer: "Yes, because 9 × 13 + 8 = 125",
+        answer: "Yes — 9 × 13 + 8 = 125",
         options: [
-          "Yes, because 9 × 13 + 8 = 125",
-          "No, because 9 × 13 + 8 = 126",
-          "No, because the remainder is too large",
-          "Yes, because 13 is close to 12",
+          "Yes — 9 × 13 + 8 = 125",
+          "No — 9 × 13 + 8 = 126",
+          "No — remainder too large",
+          "Yes — 13 is close to 12",
         ],
       },
     ] as const;
@@ -19051,132 +19051,13 @@ function generateGenericQuestion(
         options: ["8 boxes", "7 boxes", "8 boxes, 0 left over", "9 boxes"],
       },
     ] as const;
-    const practicalTemplates = [
-      {
-        prompt: "34 players are put into teams of 5. What is the most practical solution for a real game?",
-        answer: "6 teams and 4 players sit out and rotate",
-        options: [
-          "6 teams and 4 players sit out and rotate",
-          "7 full teams",
-          "6 teams only",
-          "5 teams",
-        ],
-      },
-      {
-        prompt: "47 students are seated in rows of 6. What is the most practical seating plan?",
-        answer: "7 full rows and 5 students in a shorter row",
-        options: [
-          "7 full rows and 5 students in a shorter row",
-          "8 full rows",
-          "7 rows only",
-          "6 rows",
-        ],
-      },
-      {
-        prompt: "125 players are organised into teams of 8. What is the most practical solution for a real game day?",
-        answer: "15 teams and 5 players rotate in",
-        options: [
-          "15 teams and 5 players rotate in",
-          "16 full teams",
-          "15 teams only",
-          "14 teams",
-        ],
-      },
-    ] as const;
-    const multiSelectTemplates = [
-      {
-        prompt: "34 lollies are shared between 5 children. Which answers could make sense?",
-        instruction: "Select all that apply.",
-        options: [
-          "6 each with 4 left over",
-          "7 each (if 1 more lolly is added)",
-          "5 each",
-          "10 each",
-        ],
-        correctAnswers: [
-          "6 each with 4 left over",
-          "7 each (if 1 more lolly is added)",
-        ],
-        selectionFeedback: {
-          "6 each with 4 left over": "This is the exact mathematical answer from 34 ÷ 5.",
-          "7 each (if 1 more lolly is added)": "This would work if there were 35 lollies instead of 34.",
-        },
-        allCorrectFeedback:
-          "Great thinking. One answer is mathematically exact, and the other would work if 1 more lolly was added.",
-        partialFeedback: "Partly right. There is one more answer that could also make sense.",
-        incorrectFeedback: "That selection does not fit 34 shared between 5 children.",
-        visual: { type: "array" as const, rows: 5, columns: 6 },
-      },
-      {
-        prompt: "47 stickers are shared between 6 children. Which answers could make sense?",
-        instruction: "Select all that apply.",
-        options: [
-          "7 each with 5 left over",
-          "8 each (if 1 more sticker is added)",
-          "6 each",
-          "10 each",
-        ],
-        correctAnswers: [
-          "7 each with 5 left over",
-          "8 each (if 1 more sticker is added)",
-        ],
-        selectionFeedback: {
-          "7 each with 5 left over": "This is the exact mathematical answer from 47 ÷ 6.",
-          "8 each (if 1 more sticker is added)": "This would work if there were 48 stickers instead of 47.",
-        },
-        allCorrectFeedback:
-          "Great thinking. One answer is mathematically exact, and the other would work if 1 more sticker was added.",
-        partialFeedback: "Partly right. There is one more answer that could also make sense.",
-        incorrectFeedback: "That selection does not fit 47 shared between 6 children.",
-      },
-      {
-        prompt: "83 pencils are packed into boxes of 7. Which answers could make sense?",
-        instruction: "Select all that apply.",
-        options: [
-          "11 boxes, 6 left over",
-          "12 full boxes (if 1 more pencil is added)",
-          "10 boxes",
-          "7 boxes, 11 left over",
-        ],
-        correctAnswers: [
-          "11 boxes, 6 left over",
-          "12 full boxes (if 1 more pencil is added)",
-        ],
-        selectionFeedback: {
-          "11 boxes, 6 left over": "This is the exact mathematical answer from 83 ÷ 7.",
-          "12 full boxes (if 1 more pencil is added)": "This would work if there were 84 pencils instead of 83.",
-        },
-        allCorrectFeedback:
-          "Great thinking. One answer is mathematically exact, and the other would work if 1 more pencil was added.",
-        partialFeedback: "Partly right. There is one more answer that could also make sense.",
-        incorrectFeedback: "That selection does not fit 83 packed into boxes of 7.",
-      },
-    ] as const;
-    const roll = randInt(0, 6);
-    const chosen =
-      roll === 0
-        ? (multiSelectTemplates[randInt(0, multiSelectTemplates.length - 1)] ?? multiSelectTemplates[0]!)
-        : roll === 1
-      ? (practicalTemplates[randInt(0, practicalTemplates.length - 1)] ?? practicalTemplates[0]!)
-      : (standardTemplates[randInt(0, standardTemplates.length - 1)] ?? standardTemplates[0]!);
+    const chosen = standardTemplates[randInt(0, standardTemplates.length - 1)] ?? standardTemplates[0]!;
     return {
       kind: "multiple_choice",
       prompt: chosen.prompt,
       options: shuffle([...chosen.options]),
-      answer: "answer" in chosen ? chosen.answer : (chosen.correctAnswers?.[0] ?? ""),
-      helper: "correctAnswers" in chosen
-        ? "Select all the answers that could make sense."
-        : roll === 1
-        ? "Read the wording carefully. A practical solution can be different from the strict maths answer."
-        : "Use the question wording to decide the correct mathematical answer.",
-      instruction: "instruction" in chosen ? chosen.instruction : undefined,
-      correctAnswers: "correctAnswers" in chosen ? [...chosen.correctAnswers] : undefined,
-      selectionFeedback:
-        "selectionFeedback" in chosen ? { ...chosen.selectionFeedback } : undefined,
-      allCorrectFeedback: "allCorrectFeedback" in chosen ? chosen.allCorrectFeedback : undefined,
-      partialFeedback: "partialFeedback" in chosen ? chosen.partialFeedback : undefined,
-      incorrectFeedback: "incorrectFeedback" in chosen ? chosen.incorrectFeedback : undefined,
-      visual: "visual" in chosen ? chosen.visual : undefined,
+      answer: chosen.answer,
+      helper: "Use the wording to decide what to do with the remainder.",
     };
   }
 
@@ -19267,52 +19148,13 @@ function generateGenericQuestion(
         ],
       },
     ] as const;
-    const practicalTemplates = [
-      {
-        prompt: "34 players are put into teams of 5. What is the most practical solution for a real game?",
-        answer: "6 teams and 4 players sit out and rotate",
-        options: [
-          "6 teams and 4 players sit out and rotate",
-          "7 full teams",
-          "6 teams only",
-          "5 teams",
-        ],
-        visual: { type: "array" as const, rows: 6, columns: 5 },
-      },
-      {
-        prompt: "47 students are seated in rows of 6. What is the most practical seating plan?",
-        answer: "7 full rows and 5 students in a shorter row",
-        options: [
-          "7 full rows and 5 students in a shorter row",
-          "8 full rows",
-          "7 rows only",
-          "6 rows",
-        ],
-        visual: { type: "array" as const, rows: 7, columns: 6 },
-      },
-      {
-        prompt: "125 players are organised into teams of 8. What is the most practical solution for a real game day?",
-        answer: "15 teams and 5 players rotate in",
-        options: [
-          "15 teams and 5 players rotate in",
-          "16 full teams",
-          "15 teams only",
-          "14 teams",
-        ],
-      },
-    ] as const;
-    const usePractical = randInt(0, 4) === 0;
-    const chosen = usePractical
-      ? (practicalTemplates[randInt(0, practicalTemplates.length - 1)] ?? practicalTemplates[0]!)
-      : (standardTemplates[randInt(0, standardTemplates.length - 1)] ?? standardTemplates[0]!);
+    const chosen = standardTemplates[randInt(0, standardTemplates.length - 1)] ?? standardTemplates[0]!;
     return {
       kind: "multiple_choice",
       prompt: chosen.prompt,
       options: shuffle([...chosen.options]),
       answer: chosen.answer,
-      helper: usePractical
-        ? "This asks for the most practical real-world solution, not the strict maths interpretation."
-        : "Choose the answer that matches the mathematical interpretation of the situation.",
+      helper: "Choose the answer that matches the situation.",
       visual: "visual" in chosen ? chosen.visual : undefined,
     };
   }
@@ -19384,23 +19226,23 @@ function generateGenericQuestion(
   if (explicitMode === "division_reasonableness") {
     const templates = [
       {
-        prompt: "A student says 68 ÷ 6 = 15 r2. Does this make sense?",
-        answer: "No, because 6 × 15 + 2 = 92",
+        prompt: "68 ÷ 6 = 15 r2\nDoes this make sense?",
+        answer: "No — 6 × 15 + 2 = 92",
         options: [
-          "Yes, because 15 is close to 12",
-          "No, because 6 × 15 + 2 = 92",
-          "No, because the remainder should be 6",
-          "Yes, because 15 r2 is bigger than 10",
+          "Yes — 15 is close to 12",
+          "No — 6 × 15 + 2 = 92",
+          "No — remainder should be 6",
+          "Yes — 15 r2 is bigger than 10",
         ],
       },
       {
         prompt: "Is 84 ÷ 7 = 10 r14 reasonable?",
-        answer: "No, because the remainder is too large",
+        answer: "No — remainder too large",
         options: [
-          "Yes, because 10 × 7 = 70",
-          "No, because the remainder is too large",
-          "Yes, because 14 is the leftover",
-          "No, because 84 cannot be divided by 7",
+          "Yes — 10 × 7 = 70",
+          "No — remainder too large",
+          "Yes — 14 is the leftover",
+          "No — 84 cannot be divided by 7",
         ],
       },
       {
@@ -19409,13 +19251,13 @@ function generateGenericQuestion(
         options: ["18 r1", "22 r3", "25 r4", "30 r1"],
       },
       {
-        prompt: "A student says 125 ÷ 8 = 15 r5. Does this make sense?",
-        answer: "Yes, because 8 × 15 + 5 = 125",
+        prompt: "125 ÷ 8 = 15 r5\nDoes this make sense?",
+        answer: "Yes — 8 × 15 + 5 = 125",
         options: [
-          "Yes, because 8 × 15 + 5 = 125",
-          "No, because 8 × 15 + 5 = 120",
-          "No, because the remainder is too large",
-          "Yes, because 15 is an even number",
+          "Yes — 8 × 15 + 5 = 125",
+          "No — 8 × 15 + 5 = 120",
+          "No — remainder too large",
+          "Yes — 15 is even",
         ],
       },
       {
@@ -19993,7 +19835,7 @@ function generateGenericQuestion(
     const templates: Array<MultipleChoiceQuestion> = [
       {
         kind: "multiple_choice",
-        prompt: "A tank is 5/6 full. 1/3 of the tank is used, then another 1/6 is used. What fraction of the tank remains?",
+        prompt: "A tank is 5/6 full. Then 1/3 and 1/6 are used. What remains?",
         options: ["1/3", "5/6", "7/6"],
         answer: "1/3",
         helper: "Two amounts are being removed from the starting level.",
@@ -20016,7 +19858,7 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "How do you decide whether to add or subtract in a word problem?",
+        prompt: "Add or subtract?",
         options: [
           "Look at whether amounts are being combined or taken away",
           "Always add first",
@@ -20027,21 +19869,21 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "A tank is almost full. You remove 1/3. Which answer makes sense?",
+        prompt: "A tank is almost full. You remove 1/3. What happens?",
         options: ["The amount increases", "The amount decreases", "It stays the same"],
         answer: "The amount decreases",
         helper: "Removing part should make the amount smaller.",
       },
       {
         kind: "multiple_choice",
-        prompt: "A student solves 2/3 + 3/5 - 1/2 and gets 5/8. Is this reasonable?",
+        prompt: "2/3 + 3/5 - 1/2 = 5/8\nReasonable?",
         options: ["Yes", "No"],
         answer: "No",
         helper: "Estimate the size before trusting the exact answer.",
       },
       {
         kind: "multiple_choice",
-        prompt: "Which problem needs addition first, then subtraction?",
+        prompt: "Which needs add first, then subtract?",
         options: [
           "A runner plans 2 km and has already run 3/4 km and 5/8 km",
           "A tank has 7/8 full and 1/4 is emptied",
@@ -20059,7 +19901,7 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "A student adds 2/3 and 1/6 by writing 3/9. What did they do wrong?",
+        prompt: "2/3 + 1/6 = 3/9\nWhat went wrong?",
         options: [
           "They added denominators instead of renaming the fractions",
           "They should have multiplied the numerators",
@@ -20070,7 +19912,7 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "Which situation would most likely give an answer greater than 1?",
+        prompt: "Which answer would be greater than 1?",
         options: [
           "Adding 3/4 km and 5/6 km",
           "Removing 1/4 from 7/8",
@@ -20081,21 +19923,21 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "Which operation fits this situation best: “You already added 1/4 cup, but the recipe needs 3/5 cup”?",
+        prompt: "Recipe needs 3/5 cup. You already added 1/4 cup. Which operation?",
         options: ["Addition", "Subtraction", "Multiplication"],
         answer: "Subtraction",
         helper: "You are finding how much more is needed.",
       },
       {
         kind: "multiple_choice",
-        prompt: "A student claims 5/6 + 1/3 = 6/9. Is this correct?",
+        prompt: "5/6 + 1/3 = 6/9\nCorrect?",
         options: ["Yes", "No"],
         answer: "No",
         helper: "Check whether the common denominator step was done properly.",
       },
       {
         kind: "multiple_choice",
-        prompt: "Which expression best matches “How much remains?”",
+        prompt: "Which expression matches “How much remains”?",
         options: ["Start amount minus amount used", "Part plus part", "Target plus amount used"],
         answer: "Start amount minus amount used",
         helper: "Remaining means something has been taken away from a starting amount.",
@@ -20109,14 +19951,14 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "A runner plans 3 km and has already run 5/6 km and 7/8 km. To find what is left, what should they do after adding the distances run?",
+        prompt: "A runner plans 3 km and has run 5/6 km and 7/8 km. After adding, what next?",
         options: ["Subtract from 3 km", "Add 3 km", "Multiply by 3"],
         answer: "Subtract from 3 km",
         helper: "You compare the amount done to the total target.",
       },
       {
         kind: "multiple_choice",
-        prompt: "Which situation shows subtraction followed by addition?",
+        prompt: "Which shows subtract, then add?",
         options: [
           "A tank loses 2/3 litre, then gains 3/4 litre",
           "A student reads 2/3 then 1/6 of a book",
@@ -20127,7 +19969,7 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "Why should you check whether a fraction answer makes sense in a word problem?",
+        prompt: "Why check if a fraction answer makes sense?",
         options: [
           "Because the context tells you whether the amount should increase or decrease",
           "Because fractions always need decimals",
@@ -20138,7 +19980,7 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "Which situation is most likely to end with exactly 1?",
+        prompt: "Which could end with exactly 1?",
         options: [
           "A container has 7/5 litres and 2/5 litres are used",
           "A rope is 5/6 m and 1/3 m is cut off",
@@ -20149,14 +19991,14 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "A student gets 3/2 for a problem about removing part of 7/8. Is this likely correct?",
+        prompt: "Removing part of 7/8 gives 3/2.\nLikely correct?",
         options: ["Yes", "No"],
         answer: "No",
         helper: "Removing part from less than 1 should not make the answer larger than 1.",
       },
       {
         kind: "multiple_choice",
-        prompt: "Which is the best first step in a multi-step fraction word problem?",
+        prompt: "Best first step?",
         options: [
           "Decide what each change means",
           "Add every number you see",
@@ -20167,7 +20009,7 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "Which answer is most reasonable for 5/6 capacity, then 1/3 used, then another 1/6 used?",
+        prompt: "5/6 full, then 1/3 used, then 1/6 used. What remains?",
         options: ["1/3 remains", "7/6 remains", "5/6 remains"],
         answer: "1/3 remains",
         helper: "Two amounts are being removed from the starting level.",
@@ -21982,7 +21824,7 @@ function generateGenericQuestion(
     const templates: MultipleChoiceQuestion[] = [
       {
         kind: "multiple_choice",
-        prompt: "A student says, “$54 is cheaper so it is better.” Is this correct?",
+        prompt: "$54 vs $72\nIs “cheaper total” enough?",
         options: ["Yes", "No"],
         answer: "No",
         helper: "Check the value per bar, not just the total price.",
@@ -21993,9 +21835,9 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "Why is that reasoning wrong?",
-        options: ["Compared totals instead of unit price", "Added incorrectly", "Guessed"],
-        answer: "Compared totals instead of unit price",
+        prompt: "What was missed?",
+        options: ["Unit price", "Addition", "Guessing"],
+        answer: "Unit price",
         helper: "Different sizes need the same unit before comparing.",
         visual: bestBuyVisual("Spot the Thinking", [
           { label: "First", productName: "Rice A", price: 45, quantityLabel: "500 g", unitRateLabel: "Per 100 g", unitRate: 9, hideUnitRateUntilReveal: true, chunkCount: 5, chunkLabel: "100 g" },
@@ -22004,9 +21846,9 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "Which reasoning is correct?",
-        options: ["$76 is smaller", "$9.50 per bottle vs $9.50 per bottle — same value", "8 bottles is enough"],
-        answer: "$9.50 per bottle vs $9.50 per bottle — same value",
+        prompt: "Which reason is correct?",
+        options: ["$76 is smaller", "Same unit price", "8 bottles is enough"],
+        answer: "Same unit price",
         helper: "Pick the answer that compares the same unit.",
         visual: bestBuyVisual("Spot the Thinking", [
           { label: "First", productName: "Sports Bottle Set A", price: 76, quantityLabel: "8 bottles", unitRateLabel: "Per bottle", unitRate: 9.5, hideUnitRateUntilReveal: true },
@@ -22015,7 +21857,7 @@ function generateGenericQuestion(
       },
       {
         kind: "multiple_choice",
-        prompt: "A student says, “The bigger pack is always better value.” Is this correct?",
+        prompt: "“The bigger pack is always better value.” Correct?",
         options: ["Yes", "No"],
         answer: "No",
         helper: "More items only helps if the price per item is better.",
@@ -22050,7 +21892,7 @@ function generateGenericQuestion(
     const templates: TypedResponseQuestion[] = [
       {
         kind: "typed_response",
-        prompt: "Explain why these are the same value.",
+        prompt: "Why same value?",
         answer: "same unit price",
         acceptedAnswers: ["same unit price", "same per item", "$6 per item", "same unit"],
         helper: "Name what is the same.",
@@ -22062,7 +21904,7 @@ function generateGenericQuestion(
       },
       {
         kind: "typed_response",
-        prompt: "Explain why the first option is better.",
+        prompt: "Why is First better?",
         answer: "costs less per item",
         acceptedAnswers: ["costs less per item", "$8 per item", "lower per item", "per item is lower"],
         helper: "Use the matching unit in your answer.",
@@ -22074,7 +21916,7 @@ function generateGenericQuestion(
       },
       {
         kind: "typed_response",
-        prompt: "Explain why the second option is better.",
+        prompt: "Why is Second better?",
         answer: "costs less per 100g",
         acceptedAnswers: ["costs less per 100g", "per 100g is lower", "$8.20 per 100g", "same unit"],
         helper: "Say which matching unit is lower.",
@@ -22086,7 +21928,7 @@ function generateGenericQuestion(
       },
       {
         kind: "typed_response",
-        prompt: "Why is this comparison fair?",
+        prompt: "Why is this fair?",
         answer: "same unit",
         acceptedAnswers: ["same unit", "per litre", "compare per litre", "fair comparison"],
         helper: "Keep it short.",
@@ -22098,7 +21940,7 @@ function generateGenericQuestion(
       },
       {
         kind: "typed_response",
-        prompt: "Explain why the second option is better.",
+        prompt: "Why is Second better?",
         answer: "costs less per battery",
         acceptedAnswers: ["costs less per battery", "$9 per battery", "lower per battery", "per battery is lower"],
         helper: "Name the unit price difference.",
