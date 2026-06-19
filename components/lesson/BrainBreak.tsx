@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Shield, Sparkles, Lightbulb } from "lucide-react";
 import type { Villain } from "@/lib/brain-break";
 
 /**
@@ -135,7 +136,7 @@ export default function BrainBreak({
               className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 font-mono font-black uppercase tracking-[0.2em] text-white/90"
               style={{ fontSize: "clamp(0.8rem, 2.2vw, 1.1rem)" }}
             >
-              🛡️ Brain Break — Defend Your XP!
+              <Shield className="h-4 w-4" /> Brain Break — Defend Your XP!
             </div>
             <div className="mt-1.5 font-sans font-bold text-white/60" style={{ fontSize: "clamp(0.75rem, 1.7vw, 0.95rem)" }}>
               {villain.name} wants to steal your XP. Tap fast to fight it off!
@@ -198,8 +199,8 @@ export default function BrainBreak({
                 </div>
               )}
             </div>
-            <div className="mt-2 text-center font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-white/45">
-              🛡️ Defend your XP · {playHint(villain.game)}
+            <div className="mt-2 inline-flex items-center justify-center gap-1.5 text-center font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-white/45">
+              <Shield className="h-3 w-3" /> Defend your XP · {playHint(villain.game)}
             </div>
           </div>
 
@@ -219,7 +220,7 @@ export default function BrainBreak({
             style={{ width: 300, height: 300, background: `radial-gradient(circle, ${villain.glow} 0%, transparent 70%)`, animation: "bbVictoryBurst 1s ease-out forwards" }}
           />
           <div className="absolute left-1/2 top-[40%] text-center" style={{ animation: "bbTextIn 0.5s ease-out forwards", width: "min(90vw, 640px)" }}>
-            <div style={{ fontSize: "clamp(3.5rem, 12vw, 6rem)", lineHeight: 1 }}>✨</div>
+            <Sparkles className="mx-auto" style={{ width: "clamp(3.5rem, 12vw, 6rem)", height: "clamp(3.5rem, 12vw, 6rem)" }} />
             <div
               className="mt-3 font-mono font-black uppercase"
               style={{
@@ -241,13 +242,13 @@ export default function BrainBreak({
               className="mx-auto mt-3 inline-flex items-center gap-2 rounded-full border border-emerald-300/40 bg-emerald-400/15 px-4 py-1.5 font-mono font-black uppercase tracking-[0.16em] text-emerald-100"
               style={{ fontSize: "clamp(0.75rem, 1.8vw, 1rem)" }}
             >
-              🛡️ XP defended!
+              <span className="inline-flex items-center justify-center gap-1.5"><Shield className="h-4 w-4" /> XP defended!</span>
             </div>
             <div
               className="mx-auto mt-4 rounded-2xl border border-white/15 bg-white/5 px-4 py-2.5 font-sans font-semibold text-white/80"
               style={{ fontSize: "clamp(0.8rem, 1.8vw, 1rem)", maxWidth: 460 }}
             >
-              💡 {villain.tip}
+              <span className="inline-flex items-center gap-1.5"><Lightbulb className="h-4 w-4 shrink-0" /> {villain.tip}</span>
             </div>
             <div className="mt-4 font-mono font-bold uppercase tracking-[0.28em] text-white/55" style={{ fontSize: "clamp(0.65rem, 1.4vw, 0.85rem)" }}>
               Back to the adventure…

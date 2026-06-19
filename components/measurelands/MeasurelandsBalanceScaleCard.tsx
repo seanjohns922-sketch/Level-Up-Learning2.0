@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { Scale as ScaleIcon } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
@@ -116,7 +117,7 @@ function Scale({
       <div className="mx-auto mt-1 h-0 w-0" style={{ borderLeft: "18px solid transparent", borderRight: "18px solid transparent", borderBottom: "26px solid #8a5a16" }} />
       <div className="mx-auto h-2 w-28 rounded-full bg-[#8a5a16]" />
       {hideVerdict ? null : balanced ? (
-        <div className="mt-2 text-center text-sm font-black uppercase tracking-[0.16em] text-[#0f766e]">⚖️ Balanced!</div>
+        <div className="mt-2 flex items-center justify-center gap-1.5 text-center text-sm font-black uppercase tracking-[0.16em] text-[#0f766e]"><ScaleIcon className="h-4 w-4" /> Balanced!</div>
       ) : (
         <div className="mt-2 text-center text-sm font-black uppercase tracking-[0.16em] text-[#9f1239]">
           {diff > 0 ? "Right side is heavier" : "Left side is heavier"}
@@ -194,7 +195,7 @@ function JudgeScene({ task, onCorrect, onWrong }: { task: BalanceTask; onCorrect
           disabled={locked}
           className="flex min-h-[88px] items-center justify-center gap-2 rounded-[24px] border-2 border-[rgba(94,234,212,0.6)] bg-[rgba(204,251,241,0.4)] text-xl font-black text-[#0f766e] shadow-sm transition hover:-translate-y-1 active:scale-[0.98] disabled:opacity-50"
         >
-          <span className="text-4xl">⚖️</span> Balanced
+          <ScaleIcon className="h-9 w-9" /> Balanced
         </button>
         <button
           type="button"

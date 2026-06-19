@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
-  User, Zap,
+  User, Zap, Lock,
 } from "lucide-react";
 import { readProgress } from "@/data/progress";
 import { computeFogProgress } from "@/lib/fog-progress";
@@ -271,7 +271,7 @@ function DistrictLabel({
         gap: 8,
       }}>
         {zone.name}
-        {locked && <span style={{ fontSize: 16, lineHeight: 1 }}>🔒</span>}
+        {locked && <Lock style={{ width: 16, height: 16 }} />}
       </div>
 
       {/* Weeks · Status */}
