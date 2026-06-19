@@ -463,8 +463,10 @@ export type PracticeTask = (
       introBody?: string[];
       introIcon?: string;
       targetMode?: "longer" | "taller" | "longest" | "shortest" | "heavier" | "lighter" | "heaviest" | "lightest";
-      /** "sort" scene: two labelled baskets; correctOptionId is the right one. */
-      bins?: Array<{ id: string; label: string; icon: string }>;
+      /** "sort" scene: two labelled baskets; correctOptionId is the right one.
+       *  `fill` (0..1) renders a mini container at that level (capacity bins)
+       *  instead of the emoji icon. */
+      bins?: Array<{ id: string; label: string; icon: string; fill?: number }>;
       objects: Array<{
         id: string;
         label: string;

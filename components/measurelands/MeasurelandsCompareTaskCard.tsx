@@ -316,6 +316,36 @@ function TeachingMomentRow({ moment }: { moment: TeachingMoment }) {
   );
 }
 
+/* Mini container glyph for fill-state bins — a small jar filled to `fill` (0..1)
+   so the option visually matches the container the student is reading. */
+function FillGlyph({ fill }: { fill: number }) {
+  const level = Math.max(0, Math.min(1, fill));
+  const waterFill = "linear-gradient(135deg, rgba(186,230,253,0.98), rgba(2,132,199,0.92))";
+  return (
+    <div
+      className="relative overflow-hidden rounded-[14px] rounded-t-[8px] border-[3px] border-[#cbb078] bg-[#fffaf0] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]"
+      style={{ width: 52, height: 64 }}
+      aria-hidden
+    >
+      {/* brim / full line */}
+      <div
+        className="absolute inset-x-0 top-[5px] border-t border-dashed"
+        style={{ borderColor: "rgba(120,53,15,0.3)" }}
+      />
+      {level > 0 ? (
+        <div
+          className="absolute inset-x-0 bottom-0"
+          style={{
+            height: level >= 1 ? "100%" : `${Math.round(level * 100)}%`,
+            background: waterFill,
+          }}
+        />
+      ) : null}
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.4),transparent_45%)]" />
+    </div>
+  );
+}
+
 /* ── Activity C: sort one object into the HEAVY or LIGHT basket ── */
 function SortScene({
   task,
@@ -354,7 +384,11 @@ function SortScene({
               background: "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,248,232,0.96))",
             }}
           >
-            <span className="text-5xl sm:text-6xl">{bin.icon}</span>
+            {typeof bin.fill === "number" ? (
+              <FillGlyph fill={bin.fill} />
+            ) : (
+              <span className="text-5xl sm:text-6xl">{bin.icon}</span>
+            )}
             <span className="text-base font-black uppercase tracking-[0.14em] text-[#5f4725]">{bin.label}</span>
           </button>
         ))}

@@ -270,6 +270,7 @@ function buildFillContainerTask(memory: LessonMemory): CompareTask {
       id: fillState.id,
       label: fillState.label,
       icon: fillState.icon,
+      fill: fillState.waterLevel,
     })),
     correctOptionId: state.id,
     feedback: { correct: "Great looking!", wrong: "Look at the water level." },
