@@ -1,6 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ComponentType } from "react";
+import { Hourglass, Cog, Timer, Scale, Ruler } from "lucide-react";
+
+type GlyphIcon = ComponentType<{ className?: string; style?: React.CSSProperties }>;
 
 /**
  * Full-screen activation burst for the mid-streak tiers (5 and 8).
@@ -34,7 +37,7 @@ type TierConfig = {
   accentColor: string;
   dividerGradient: string;
   /** Measurement symbols that float upward (Measurelands only). */
-  glyphs?: string[];
+  glyphs?: GlyphIcon[];
 };
 
 const NEXUS_TIERS: TierConfig[] = [
@@ -91,7 +94,7 @@ const MEASURE_TIERS: TierConfig[] = [
     titleFilter: "drop-shadow(0 0 20px rgba(200,160,48,0.9)) drop-shadow(0 0 42px rgba(139,101,32,0.7))",
     accentColor: "rgba(232,200,120,0.95)",
     dividerGradient: "linear-gradient(90deg, transparent, rgba(200,160,48,0.9), rgba(139,101,32,0.7), transparent)",
-    glyphs: ["⏳", "½", "⏱", "⚖", "📏"],
+    glyphs: [Hourglass, Timer, Scale, Ruler],
   },
   {
     threshold: 8,
@@ -109,7 +112,7 @@ const MEASURE_TIERS: TierConfig[] = [
     titleFilter: "drop-shadow(0 0 22px rgba(167,139,250,0.95)) drop-shadow(0 0 46px rgba(109,40,217,0.72))",
     accentColor: "rgba(196,181,253,0.95)",
     dividerGradient: "linear-gradient(90deg, transparent, rgba(167,139,250,0.9), rgba(200,160,48,0.6), transparent)",
-    glyphs: ["⏳", "⚙", "½", "⏱", "⚖", "📏"],
+    glyphs: [Hourglass, Cog, Timer, Scale, Ruler],
   },
 ];
 
@@ -163,7 +166,7 @@ export default function ComboActivation({ comboCount, realmId }: { comboCount: n
       const size = 22 + seeded(active.id * 47 + i) * 26;
       const drift = (seeded(active.id * 53 + i) - 0.5) * 80;
       const rot = (seeded(active.id * 59 + i) - 0.5) * 40;
-      return { id: i, char: set[i % set.length], left, delay, size, drift, rot };
+      return { id: i, Icon: set[i % set.length], left, delay, size, drift, rot };
     });
   }, [active]);
 
@@ -241,26 +244,28 @@ export default function ComboActivation({ comboCount, realmId }: { comboCount: n
       />
 
       {/* Floating measurement glyphs (Measurelands only) */}
-      {glyphs.map((g) => (
-        <span
-          key={g.id}
-          className="absolute bottom-[18%]"
-          style={
-            {
-              left: `${g.left}%`,
-              fontSize: g.size,
-              lineHeight: 1,
-              filter: `drop-shadow(0 0 10px ${tier.flashColor})`,
-              "--rot": `${g.rot}deg`,
-              "--dx": `${g.drift}px`,
-              animation: `comboGlyph ${(tier.duration * 0.95).toFixed(2)}s ease-out ${g.delay.toFixed(2)}s forwards`,
-              opacity: 0,
-            } as React.CSSProperties
-          }
-        >
-          {g.char}
-        </span>
-      ))}
+      {glyphs.map((g) => {
+        const G = g.Icon;
+        return (
+          <span
+            key={g.id}
+            className="absolute bottom-[18%]"
+            style={
+              {
+                left: `${g.left}%`,
+                lineHeight: 1,
+                filter: `drop-shadow(0 0 10px ${tier.flashColor})`,
+                "--rot": `${g.rot}deg`,
+                "--dx": `${g.drift}px`,
+                animation: `comboGlyph ${(tier.duration * 0.95).toFixed(2)}s ease-out ${g.delay.toFixed(2)}s forwards`,
+                opacity: 0,
+              } as React.CSSProperties
+            }
+          >
+            <G style={{ width: g.size, height: g.size, color: tier.accentColor }} />
+          </span>
+        );
+      })}
 
       {/* Shockwave rings */}
       {Array.from({ length: tier.ringCount }, (_, i) => (

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Hourglass, Cog, Timer, Scale, Ruler } from "lucide-react";
 
 /**
  * The top-tier 10-combo celebration.
@@ -97,7 +98,7 @@ const MEASURE_THEME: RealmTheme = {
   particleSplit: 0.5,
 };
 
-const MEASURE_GLYPHS = ["⏳", "⚙", "½", "⏱", "⚖", "📏"];
+const MEASURE_GLYPHS = [Hourglass, Cog, Timer, Scale, Ruler];
 
 export default function NexusActivation({ comboCount, realmId }: { comboCount: number; realmId?: string }) {
   const isMeasurement = realmId === "measurement";
@@ -140,7 +141,7 @@ export default function NexusActivation({ comboCount, realmId }: { comboCount: n
       const delay = seeded(active.id * 67 + i) * 0.7;
       const size = 24 + seeded(active.id * 71 + i) * 32;
       const rot = (seeded(active.id * 73 + i) - 0.5) * 50;
-      return { id: i, char: MEASURE_GLYPHS[i % MEASURE_GLYPHS.length], left, delay, size, rot };
+      return { id: i, Icon: MEASURE_GLYPHS[i % MEASURE_GLYPHS.length], left, delay, size, rot };
     });
   }, [active, isMeasurement]);
 
@@ -297,25 +298,27 @@ export default function NexusActivation({ comboCount, realmId }: { comboCount: n
       ))}
 
       {/* Floating measurement glyphs (Measurelands only) */}
-      {glyphs.map((g) => (
-        <span
-          key={g.id}
-          className="absolute bottom-[16%]"
-          style={
-            {
-              left: `${g.left}%`,
-              fontSize: g.size,
-              lineHeight: 1,
-              filter: "drop-shadow(0 0 12px rgba(200,160,48,0.7))",
-              "--rot": `${g.rot}deg`,
-              animation: `nexusGlyph 2.5s ease-out ${g.delay.toFixed(2)}s forwards`,
-              opacity: 0,
-            } as React.CSSProperties
-          }
-        >
-          {g.char}
-        </span>
-      ))}
+      {glyphs.map((g) => {
+        const G = g.Icon;
+        return (
+          <span
+            key={g.id}
+            className="absolute bottom-[16%]"
+            style={
+              {
+                left: `${g.left}%`,
+                lineHeight: 1,
+                filter: "drop-shadow(0 0 12px rgba(200,160,48,0.7))",
+                "--rot": `${g.rot}deg`,
+                animation: `nexusGlyph 2.5s ease-out ${g.delay.toFixed(2)}s forwards`,
+                opacity: 0,
+              } as React.CSSProperties
+            }
+          >
+            <G style={{ width: g.size, height: g.size, color: "rgb(200,160,48)" }} />
+          </span>
+        );
+      })}
 
       {/* Corner energy bursts */}
       {[
