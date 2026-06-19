@@ -21,14 +21,6 @@ const CONFIDENCE_OPTIONS: { value: Confidence; emoji: string; label: string }[] 
   { value: 4, emoji: "⚡", label: "Too easy!" },
 ];
 
-// Senior follow-up — "What did you find easiest?"
-const EASIEST_OPTIONS: { value: ReflectionChoice; label: string }[] = [
-  { value: "questions", label: "Answering the questions" },
-  { value: "speed", label: "Working quickly" },
-  { value: "understanding", label: "Understanding what to do" },
-  { value: "everything", label: "All of it!" },
-];
-
 type Props = {
   lessonId: string;
   lessonTitle: string;
@@ -228,8 +220,6 @@ export default function LessonReflection({
   const optionBorderColor = theme.isMeasurement ? "rgba(214,184,108,0.25)" : "rgba(94,234,212,0.20)";
   const optionTextColor = theme.isMeasurement ? "#f5e6c4" : "rgba(204,251,241,0.85)";
 
-  const [confidence, setConfidence] = useState<Confidence | null>(null);
-  const [step, setStep] = useState<"main" | "easiest">("main");
   const [saving, setSaving] = useState(false);
 
   // Celebration chime for juniors (best-effort; respects autoplay rules).
@@ -330,89 +320,49 @@ export default function LessonReflection({
       }}
     >
       <div className="relative">
-        {step === "main" ? (
-          <>
-            <div
-              className="text-[11px] font-mono font-bold uppercase tracking-[0.22em]"
-              style={{ color: theme.accentTextSoft }}
-            >
-              Lesson complete
-            </div>
-            <div className="mt-1 text-2xl font-black text-white">Nice work!</div>
-            <div className="mt-1 text-sm" style={{ color: optionTextColor }}>{lessonTitle}</div>
+        <div
+          className="text-[11px] font-mono font-bold uppercase tracking-[0.22em]"
+          style={{ color: theme.accentTextSoft }}
+        >
+          Lesson complete
+        </div>
+        <div className="mt-1 text-2xl font-black text-white">Nice work!</div>
+        <div className="mt-1 text-sm" style={{ color: optionTextColor }}>{lessonTitle}</div>
 
-            <StatChips xp={xp} chain={bestChain} accuracy={accuracy} {...statChipProps} />
+        <StatChips xp={xp} chain={bestChain} accuracy={accuracy} {...statChipProps} />
 
-            <div className="mt-7 text-base font-bold text-white">
-              How confident do you feel now?
-            </div>
-            <div className="mt-4 grid grid-cols-4 gap-3">
-              {CONFIDENCE_OPTIONS.map((opt) => (
-                <button
-                  key={opt.value}
-                  onClick={() => {
-                    if (saving) return;
-                    setConfidence(opt.value);
-                    setStep("easiest");
-                  }}
-                  disabled={saving}
-                  className={`flex flex-col items-center gap-2 rounded-2xl border bg-white/5 px-2 py-4 transition-all ${buttonHoverClass} active:scale-95 disabled:opacity-50`}
-                  style={{ borderColor: optionBorderColor }}
-                >
-                  <span className="text-4xl leading-none">{opt.emoji}</span>
-                  <span
-                    className="text-[11px] font-bold leading-tight"
-                    style={{ color: optionTextColor }}
-                  >
-                    {opt.label}
-                  </span>
-                </button>
-              ))}
-            </div>
-
+        <div className="mt-7 text-base font-bold text-white">
+          How confident do you feel now?
+        </div>
+        <div className="mt-4 grid grid-cols-4 gap-3">
+          {CONFIDENCE_OPTIONS.map((opt) => (
             <button
-              onClick={() => finishWith(null, null)}
+              key={opt.value}
+              onClick={() => {
+                if (!saving) finishWith(opt.value, null);
+              }}
               disabled={saving}
-              className="mt-5 text-[11px] font-semibold text-white/50 transition hover:text-white/80 disabled:opacity-30"
+              className={`flex flex-col items-center gap-2 rounded-2xl border bg-white/5 px-2 py-4 transition-all ${buttonHoverClass} active:scale-95 disabled:opacity-50`}
+              style={{ borderColor: optionBorderColor }}
             >
-              Skip
+              <span className="text-4xl leading-none">{opt.emoji}</span>
+              <span
+                className="text-[11px] font-bold leading-tight"
+                style={{ color: optionTextColor }}
+              >
+                {opt.label}
+              </span>
             </button>
-          </>
-        ) : (
-          <>
-            <div className="text-[11px] font-mono font-bold uppercase tracking-[0.22em] text-amber-400/80">
-              One more thing
-            </div>
-            <div className="mt-2 text-xl font-black text-white">
-              What did you find easiest?
-            </div>
+          ))}
+        </div>
 
-            <div className="mt-6 grid gap-3">
-              {EASIEST_OPTIONS.map((opt) => (
-                <button
-                  key={opt.value}
-                  onClick={() => {
-                    if (!saving) finishWith(confidence, opt.value);
-                  }}
-                  disabled={saving}
-                  className={`w-full rounded-2xl border bg-white/5 px-5 py-3.5 text-left text-sm font-bold transition-all ${buttonHoverClass} active:scale-[0.98] disabled:opacity-50`}
-                  style={{ borderColor: optionBorderColor, color: optionTextColor }}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-
-            <button
-              onClick={() => finishWith(confidence, null)}
-              disabled={saving}
-              className="mt-5 w-full rounded-2xl px-6 py-3.5 text-sm font-extrabold text-white transition active:scale-[0.98] disabled:opacity-60"
-              style={{ background: theme.ctaGradientCss, boxShadow: theme.ctaShadow }}
-            >
-              Continue →
-            </button>
-          </>
-        )}
+        <button
+          onClick={() => finishWith(null, null)}
+          disabled={saving}
+          className="mt-5 text-[11px] font-semibold text-white/50 transition hover:text-white/80 disabled:opacity-30"
+        >
+          Skip
+        </button>
       </div>
     </div>
   );
