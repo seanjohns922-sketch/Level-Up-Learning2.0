@@ -1,5 +1,6 @@
 "use client";
 
+import { Volume2 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { PracticeTask, Difficulty } from "@/data/activities/year1/practice-task";
@@ -1125,7 +1126,7 @@ export function PracticeRunner({
           return (
             <div className="grid gap-4">
               <div className="flex items-center justify-between gap-3">
-                <button type="button" onClick={() => { speak(t.speechText ?? String(t.targetNumber)); setHasPlayed(true); }} className={`px-5 py-3 rounded-2xl text-white font-extrabold text-xl transition ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : "bg-teal-600 hover:bg-teal-700"}`}>🔊 Listen</button>
+                <button type="button" onClick={() => { speak(t.speechText ?? String(t.targetNumber)); setHasPlayed(true); }} className={`px-5 py-3 rounded-2xl text-white font-extrabold text-xl transition ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : "bg-teal-600 hover:bg-teal-700"}`}><span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Listen</span></button>
                 <div className="text-sm font-bold text-muted-foreground">{hasPlayed ? "Now tap the number." : "Tap Listen first."}</div>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -1144,7 +1145,7 @@ export function PracticeRunner({
             <div className="grid gap-4">
               <div className="flex items-center justify-between gap-3">
                 <div className="text-sm text-muted-foreground">Tap the correct number tile.</div>
-                <button type="button" onClick={() => speak(String(t.targetNumber))} className={`px-3 py-2 rounded-xl text-white font-bold transition ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : "bg-teal-600 hover:bg-teal-700"}`}>🔊 Hear number</button>
+                <button type="button" onClick={() => speak(String(t.targetNumber))} className={`px-3 py-2 rounded-xl text-white font-bold transition ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : "bg-teal-600 hover:bg-teal-700"}`}><span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Hear number</span></button>
               </div>
               <div className="grid grid-cols-5 sm:grid-cols-6 gap-2">
                 {t.tiles.map((n: number) => (

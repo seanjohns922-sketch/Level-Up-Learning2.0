@@ -1,5 +1,6 @@
 "use client";
 
+import { Volume2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { speak } from "@/lib/speak";
 
@@ -170,7 +171,7 @@ export default function FunGames({
               onClick={() => speak(`${tEq.a} ${tEq.op} ${tEq.b} = ?`)}
               className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-50"
             >
-              🔊 Read
+              <span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Read</span>
             </button>
           </div>
           <div className="text-2xl font-extrabold text-gray-900 mb-3 text-center">
@@ -204,7 +205,7 @@ export default function FunGames({
               onClick={() => speak(`${gEq.a} ${gEq.op} ${gEq.b} = ?`)}
               className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-50"
             >
-              🔊 Read
+              <span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Read</span>
             </button>
           </div>
           <div className="text-2xl font-extrabold text-gray-900 mb-3 text-center">
@@ -247,7 +248,7 @@ export default function FunGames({
               onClick={() => speak(bossQ.prompt)}
               className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-50"
             >
-              🔊 Read
+              <span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Read</span>
             </button>
           </div>
           <div className="text-lg font-extrabold text-gray-900 mb-3">{bossQ.prompt}</div>

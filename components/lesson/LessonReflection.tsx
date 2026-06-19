@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ComponentType } from "react";
+import { Frown, Meh, Smile, Zap, Star, Flame, Bot, Ruler } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { ACTIVE_STUDENT_KEY } from "@/data/progress";
 import { calcXP } from "./LessonXPBar";
@@ -14,11 +15,15 @@ type ReflectionChoice =
   | "everything"
   | "not_sure";
 
-const CONFIDENCE_OPTIONS: { value: Confidence; emoji: string; label: string }[] = [
-  { value: 1, emoji: "😫", label: "Really hard" },
-  { value: 2, emoji: "🤔", label: "A bit tricky" },
-  { value: 3, emoji: "😊", label: "Got it" },
-  { value: 4, emoji: "⚡", label: "Too easy!" },
+const CONFIDENCE_OPTIONS: {
+  value: Confidence;
+  Icon: ComponentType<{ className?: string }>;
+  label: string;
+}[] = [
+  { value: 1, Icon: Frown, label: "Really hard" },
+  { value: 2, Icon: Meh, label: "A bit tricky" },
+  { value: 3, Icon: Smile, label: "Got it" },
+  { value: 4, Icon: Zap, label: "Too easy!" },
 ];
 
 type Props = {
@@ -49,9 +54,12 @@ function bandFromProps(levelNumber: number | undefined, level: string): "junior"
   return n <= 2 ? "junior" : "senior";
 }
 
-function mascotForRealm(realmId?: string): { emoji: string; name: string } {
-  if (realmId === "measurement") return { emoji: "📐", name: "Meazurex" };
-  return { emoji: "🤖", name: "Numbot" };
+function mascotForRealm(realmId?: string): {
+  Icon: ComponentType<{ className?: string }>;
+  name: string;
+} {
+  if (realmId === "measurement") return { Icon: Ruler, name: "Meazurex" };
+  return { Icon: Bot, name: "Numbot" };
 }
 
 async function persistReflection(args: {
@@ -158,7 +166,9 @@ function StatChips({
         <div className="text-[10px] font-bold uppercase tracking-wider text-amber-300/70">XP Earned</div>
       </div>
       <div className="rounded-2xl border border-orange-300/25 bg-orange-400/10 px-2 py-3">
-        <div className="text-2xl font-black text-orange-200">🔥 {chain}</div>
+        <div className="flex items-center justify-center gap-1 text-2xl font-black text-orange-200">
+          <Flame className="h-5 w-5" /> {chain}
+        </div>
         <div className="text-[10px] font-bold uppercase tracking-wider text-orange-300/70">Best Chain</div>
       </div>
       <div
@@ -278,8 +288,8 @@ export default function LessonReflection({
       >
         <Confetti colors={theme.confetti} />
         <div className="relative">
-          <div className="text-7xl animate-bounce" aria-hidden>
-            {mascot.emoji}
+          <div className="flex animate-bounce justify-center" aria-hidden>
+            <mascot.Icon className="h-16 w-16 text-white" />
           </div>
           <div
             className="mt-1 text-[11px] font-mono font-bold uppercase tracking-[0.22em]"
@@ -287,11 +297,19 @@ export default function LessonReflection({
           >
             {mascot.name} is proud of you!
           </div>
-          <div className="mt-2 text-2xl font-black text-white">Amazing work! 🎉</div>
+          <div className="mt-2 text-2xl font-black text-white">Amazing work!</div>
 
-          <div className="mt-4 flex justify-center gap-1.5 text-3xl">
+          <div className="mt-4 flex justify-center gap-1.5">
             {[0, 1, 2].map((i) => (
-              <span key={i} style={{ opacity: i < stars ? 1 : 0.2 }}>⭐</span>
+              <Star
+                key={i}
+                className="h-8 w-8"
+                style={{
+                  opacity: i < stars ? 1 : 0.2,
+                  color: theme.accentText,
+                  fill: i < stars ? theme.accentText : "transparent",
+                }}
+              />
             ))}
           </div>
 
@@ -345,7 +363,7 @@ export default function LessonReflection({
               className={`flex flex-col items-center gap-2 rounded-2xl border bg-white/5 px-2 py-4 transition-all ${buttonHoverClass} active:scale-95 disabled:opacity-50`}
               style={{ borderColor: optionBorderColor }}
             >
-              <span className="text-4xl leading-none">{opt.emoji}</span>
+              <opt.Icon className="h-9 w-9" />
               <span
                 className="text-[11px] font-bold leading-tight"
                 style={{ color: optionTextColor }}

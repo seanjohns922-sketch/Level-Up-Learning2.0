@@ -7999,7 +7999,7 @@ function SessionPage({
                             : "border-white/15 bg-white/5 text-white/80 hover:bg-white/10",
                       ].join(" ")}
                     >
-                      🔊 Read
+                      <span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Read</span>
                     </button>
                   </div>
                 </div>
@@ -8503,7 +8503,7 @@ function SessionPage({
                           onClick={() => speak(currentQuiz.audioText ?? "")}
                           className="mb-2 px-4 py-3 rounded-2xl bg-trust-blue text-white font-bold hover:opacity-90 transition w-full"
                         >
-                          🔊 Listen
+                          <span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Listen</span>
                         </button>
                       ) : null}
 

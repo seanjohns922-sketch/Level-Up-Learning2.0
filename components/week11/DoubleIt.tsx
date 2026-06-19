@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { StaticDotGrid } from "@/components/StaticDots";
 import { speak } from "@/lib/speak";
+import { Volume2 } from "lucide-react";
 
 const doubles = [6, 8, 9, 7, 5];
 
@@ -51,7 +52,7 @@ export default function DoubleIt({
           onClick={() => speak(prompt)}
           className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-50"
         >
-          🔊 Read
+          <span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Read</span>
         </button>
       </div>
 

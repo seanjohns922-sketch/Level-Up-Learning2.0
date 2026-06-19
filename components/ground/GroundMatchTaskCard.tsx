@@ -1,5 +1,6 @@
 "use client";
 
+import { Volume2 } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
@@ -289,7 +290,7 @@ function renderHelperVisual(task: GroundMatchTask) {
     return (
       <div className="mt-4 flex justify-center">
         <div className="rounded-[22px] border border-cyan-200 bg-white/90 px-5 py-3 text-sm font-black uppercase tracking-[0.16em] text-teal-800 shadow-sm">
-          🔊 Number bubble
+          <span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Number bubble</span>
         </div>
       </div>
     );

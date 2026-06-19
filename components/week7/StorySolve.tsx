@@ -1,5 +1,6 @@
 "use client";
 
+import { Volume2 } from "lucide-react";
 import { useState } from "react";
 import { speak } from "@/lib/speak";
 
@@ -53,7 +54,7 @@ export default function StorySolve({
           className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-50"
           type="button"
         >
-          🔊 Read
+          <span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Read</span>
         </button>
       </div>
 
