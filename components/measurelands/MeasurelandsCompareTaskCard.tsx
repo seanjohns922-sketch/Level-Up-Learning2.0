@@ -607,7 +607,7 @@ function OrderScene({
                 }}
               >
                 {item ? (
-                  <CompareVisual item={item} showWater={Boolean(task.fillState)} />
+                  <CompareVisual item={item} />
                 ) : (
                   <div className="flex h-[200px] items-center justify-center text-5xl text-[#c4b5fd]">
                     {index + 1}
@@ -633,7 +633,7 @@ function OrderScene({
               disabled={locked}
               className="rounded-[28px] border border-transparent transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)] disabled:opacity-50"
             >
-              <CompareVisual item={item} showWater={Boolean(task.fillState)} />
+              <CompareVisual item={item} />
             </button>
           ))}
           {bank.length === 0 && !allCorrect ? (
@@ -673,7 +673,7 @@ function SequenceScene({
       <div className="rounded-[26px] border border-[rgba(214,184,108,0.34)] bg-[rgba(255,252,245,0.92)] p-3">
         <div className="grid items-center gap-3" style={{ gridTemplateColumns: `repeat(${prefix.length + 1}, minmax(0, 1fr))` }}>
           {prefix.map((item) => (
-            <CompareVisual key={item.id} item={item} compact showWater={Boolean(task.fillState)} />
+            <CompareVisual key={item.id} item={item} compact />
           ))}
           <div
             className="flex h-[220px] items-center justify-center rounded-[26px] border-2 border-dashed text-6xl font-black text-[#c4b5fd]"
@@ -693,7 +693,7 @@ function SequenceScene({
             onClick={() => (item.id === task.correctOptionId ? onCorrect() : onWrong())}
             className="rounded-[28px] border border-transparent transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
           >
-            <CompareVisual item={item} showWater={Boolean(task.fillState)} />
+            <CompareVisual item={item} />
           </button>
         ))}
       </div>
@@ -790,7 +790,7 @@ export function MeasurelandsCompareTaskCard({
             onClick={() => (item.id === task.correctOptionId ? onCorrect() : onWrong())}
             className="group rounded-[28px] border border-transparent text-left transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
           >
-            <CompareVisual item={item} showWater={Boolean(task.fillState)} />
+            <CompareVisual item={item} />
           </button>
         ))}
       </div>
