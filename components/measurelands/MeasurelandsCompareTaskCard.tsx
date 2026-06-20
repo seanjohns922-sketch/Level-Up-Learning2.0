@@ -158,10 +158,10 @@ function CompareVisual({
   const capacityGaugeWidth = compact ? 80 : 96;
   const capacityGaugeHeight = compact ? 106 : 126;
 
-  if (item.imageSrc) {
-    // Activity C (fill-state, scene "sort"): the concept IS the water level, so
-    // show the fillable gauge with water — and ONLY the gauge, never a photo too
-    // (a photo + gauge would put two containers on screen).
+  // Fill-state tasks (scene "sort", or any task flagged `fillState`): show the
+  // fixed fillable gauge with water — one consistent container so the LEVEL is
+  // the only variable. Works with or without an imageSrc (the gauge is drawn).
+  if (item.imageSrc || (axis === "capacity" && showWater)) {
     if (axis === "capacity" && showWater) {
       const gaugeWaterHeight = Math.round(capacityGaugeHeight * Math.max(0, Math.min(1, waterLevel)));
       return (
@@ -513,8 +513,13 @@ function OrderScene({
   const axis = task.objects[0]?.axis;
   const isMass = axis === "mass";
   const isCapacity = axis === "capacity";
-  const slotLabels =
-    slotCount === 3
+  // Ordering by fill level (Lesson 3) uses fullness labels, not size labels.
+  const isFill = Boolean(task.fillState);
+  const slotLabels = isFill
+    ? slotCount === 3
+      ? ["Empty", "Middle", "Full"]
+      : ["Empty", "Next", "Next", "Full"]
+    : slotCount === 3
       ? isMass
         ? descending
           ? ["Heaviest", "Middle", "Lightest"]
@@ -602,7 +607,7 @@ function OrderScene({
                 }}
               >
                 {item ? (
-                  <CompareVisual item={item} />
+                  <CompareVisual item={item} showWater={Boolean(task.fillState)} />
                 ) : (
                   <div className="flex h-[200px] items-center justify-center text-5xl text-[#c4b5fd]">
                     {index + 1}
@@ -628,7 +633,7 @@ function OrderScene({
               disabled={locked}
               className="rounded-[28px] border border-transparent transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)] disabled:opacity-50"
             >
-              <CompareVisual item={item} />
+              <CompareVisual item={item} showWater={Boolean(task.fillState)} />
             </button>
           ))}
           {bank.length === 0 && !allCorrect ? (
@@ -668,7 +673,7 @@ function SequenceScene({
       <div className="rounded-[26px] border border-[rgba(214,184,108,0.34)] bg-[rgba(255,252,245,0.92)] p-3">
         <div className="grid items-center gap-3" style={{ gridTemplateColumns: `repeat(${prefix.length + 1}, minmax(0, 1fr))` }}>
           {prefix.map((item) => (
-            <CompareVisual key={item.id} item={item} compact />
+            <CompareVisual key={item.id} item={item} compact showWater={Boolean(task.fillState)} />
           ))}
           <div
             className="flex h-[220px] items-center justify-center rounded-[26px] border-2 border-dashed text-6xl font-black text-[#c4b5fd]"
@@ -688,7 +693,7 @@ function SequenceScene({
             onClick={() => (item.id === task.correctOptionId ? onCorrect() : onWrong())}
             className="rounded-[28px] border border-transparent transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
           >
-            <CompareVisual item={item} />
+            <CompareVisual item={item} showWater={Boolean(task.fillState)} />
           </button>
         ))}
       </div>
@@ -785,7 +790,7 @@ export function MeasurelandsCompareTaskCard({
             onClick={() => (item.id === task.correctOptionId ? onCorrect() : onWrong())}
             className="group rounded-[28px] border border-transparent text-left transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
           >
-            <CompareVisual item={item} />
+            <CompareVisual item={item} showWater={Boolean(task.fillState)} />
           </button>
         ))}
       </div>

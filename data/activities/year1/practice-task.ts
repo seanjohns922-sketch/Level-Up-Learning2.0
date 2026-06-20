@@ -467,6 +467,9 @@ export type PracticeTask = (
        *  `fill` (0..1) renders a mini container at that level (capacity bins)
        *  instead of the emoji icon. */
       bins?: Array<{ id: string; label: string; icon: string; fill?: number }>;
+      /** Fill-state task (Lesson 3): renders the fillable water gauge in
+       *  compare/trio/order scenes instead of the flat container image. */
+      fillState?: boolean;
       objects: Array<{
         id: string;
         label: string;
