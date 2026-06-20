@@ -42,24 +42,24 @@ const CONTAINERS: Record<string, ContainerThing> = Object.fromEntries(
 
 const ORDER_SETS: ContainerSet[] = [
   {
-    setId: "mug-bottle-jug-bucket",
-    items: [CONTAINERS.mug, CONTAINERS.bottle, CONTAINERS.jug, CONTAINERS.bucket],
+    setId: "cup-bottle-jug-bucket",
+    items: [CONTAINERS.cup, CONTAINERS.bottle, CONTAINERS.jug, CONTAINERS.bucket],
   },
   {
-    setId: "cup-kettle-watering-bathtub",
-    items: [CONTAINERS.cup, CONTAINERS.kettle, CONTAINERS.wateringCan, CONTAINERS.bathtub],
+    setId: "mug-bottle-watering-bathtub",
+    items: [CONTAINERS.mug, CONTAINERS.bottle, CONTAINERS.wateringCan, CONTAINERS.bathtub],
   },
   {
-    setId: "cup-bottle-bucket-bathtub",
-    items: [CONTAINERS.cup, CONTAINERS.bottle, CONTAINERS.bucket, CONTAINERS.bathtub],
+    setId: "cup-lunchbox-bucket-bathtub",
+    items: [CONTAINERS.cup, CONTAINERS.lunchbox, CONTAINERS.bucket, CONTAINERS.bathtub],
   },
   {
-    setId: "mug-jug-kettle-bucket",
-    items: [CONTAINERS.mug, CONTAINERS.jug, CONTAINERS.kettle, CONTAINERS.bucket],
+    setId: "mug-kettle-bucket-bathtub",
+    items: [CONTAINERS.mug, CONTAINERS.kettle, CONTAINERS.bucket, CONTAINERS.bathtub],
   },
   {
-    setId: "cup-bottle-jug-watering",
-    items: [CONTAINERS.cup, CONTAINERS.bottle, CONTAINERS.jug, CONTAINERS.wateringCan],
+    setId: "cup-bottle-jug-bucket-2",
+    items: [CONTAINERS.cup, CONTAINERS.bottle, CONTAINERS.jug, CONTAINERS.bucket],
   },
 ];
 
@@ -136,7 +136,7 @@ const TEACHING_MOMENTS: NonNullable<CompareTask["teachingMoments"]> = [
     objects: [
       toTeachingObj(WEEK3_CONTAINERS.cup, "sky"),
       toTeachingObj(WEEK3_CONTAINERS.bottle, "rose"),
-      toTeachingObj(WEEK3_CONTAINERS.kettle, "violet"),
+      toTeachingObj(WEEK3_CONTAINERS.jug, "violet"),
       toTeachingObj(WEEK3_CONTAINERS.bucket, "gold"),
     ],
     left: toTeachingObj(WEEK3_CONTAINERS.cup, "sky"),
@@ -144,25 +144,25 @@ const TEACHING_MOMENTS: NonNullable<CompareTask["teachingMoments"]> = [
     narration: "The cup is smallest. The bucket is largest.",
   },
   {
-    id: "mug-bottle-jug-bucket",
+    id: "mug-bottle-watering-bathtub",
     title: "Holds Less to Holds More",
     objects: [
       toTeachingObj(WEEK3_CONTAINERS.mug, "leaf"),
       toTeachingObj(WEEK3_CONTAINERS.bottle, "teal"),
-      toTeachingObj(WEEK3_CONTAINERS.jug, "rose"),
-      toTeachingObj(WEEK3_CONTAINERS.bucket, "gold"),
+      toTeachingObj(WEEK3_CONTAINERS.wateringCan, "rose"),
+      toTeachingObj(WEEK3_CONTAINERS.bathtub, "gold"),
     ],
     left: toTeachingObj(WEEK3_CONTAINERS.mug, "leaf"),
-    right: toTeachingObj(WEEK3_CONTAINERS.bucket, "gold"),
+    right: toTeachingObj(WEEK3_CONTAINERS.bathtub, "gold"),
     narration: "We start with the container that holds less. Then we move to the one that holds more.",
   },
   {
-    id: "cup-bottle-jug-bathtub",
+    id: "cup-lunchbox-bucket-bathtub",
     title: "Largest Holds the Most",
     objects: [
       toTeachingObj(WEEK3_CONTAINERS.cup, "sky"),
-      toTeachingObj(WEEK3_CONTAINERS.bottle, "violet"),
-      toTeachingObj(WEEK3_CONTAINERS.jug, "teal"),
+      toTeachingObj(WEEK3_CONTAINERS.lunchbox, "violet"),
+      toTeachingObj(WEEK3_CONTAINERS.bucket, "teal"),
       toTeachingObj(WEEK3_CONTAINERS.bathtub, "gold"),
     ],
     left: toTeachingObj(WEEK3_CONTAINERS.cup, "sky"),
