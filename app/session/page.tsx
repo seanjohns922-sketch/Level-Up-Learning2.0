@@ -69,6 +69,7 @@ import { generatePrepWeek10TaskByKind } from "@/data/activities/prep/week10";
 import { generatePrepWeek11TaskByKind } from "@/data/activities/prep/week11";
 import { buildMeasurelandsWeek1QuizTasks } from "@/data/activities/prepMeasurelands/week1Quiz";
 import { buildMeasurelandsWeek2QuizTasks } from "@/data/activities/prepMeasurelands/week2Quiz";
+import { buildMeasurelandsWeek3QuizTasks } from "@/data/activities/prepMeasurelands/week3Quiz";
 import { isLessonQuestionSafe, isPracticeTaskSafe } from "@/lib/task-safety";
 import { buildLessonRoute, isGroundLevelYear, normalizeStudentYearLabel } from "@/lib/lesson-routing";
 
@@ -1604,6 +1605,27 @@ function buildMeasurelandsWeek2WeeklyQuizQuestions(
       `mw2q${index + 1}`,
       lessonNumber,
       `measurelands_w2_l${lessonNumber}_q${(index % questionsPerLesson) + 1}`,
+      task as GroundQuizPracticeTask
+    );
+  });
+}
+
+function buildMeasurelandsWeek3WeeklyQuizQuestions(
+  questionsPerLesson: number
+): QuizQuestion[] {
+  const totalExpected = questionsPerLesson * 3;
+  const tasks = buildMeasurelandsWeek3QuizTasks();
+  if (tasks.length !== totalExpected) {
+    throw new Error(
+      `[MeasurelandsWeeklyQuiz] Week 3 expected ${totalExpected} questions, received ${tasks.length}.`
+    );
+  }
+  return tasks.map((task, index) => {
+    const lessonNumber = (Math.floor(index / questionsPerLesson) + 1) as 1 | 2 | 3;
+    return buildGroundQuizQuestion(
+      `mw3q${index + 1}`,
+      lessonNumber,
+      `measurelands_w3_l${lessonNumber}_q${(index % questionsPerLesson) + 1}`,
       task as GroundQuizPracticeTask
     );
   });
@@ -6819,6 +6841,10 @@ function SessionPage({
 
     if (isMeasurementRealm && year === "Prep" && Number(week) === 2) {
       return buildMeasurelandsWeek2WeeklyQuizQuestions(questionsPerLesson);
+    }
+
+    if (isMeasurementRealm && year === "Prep" && Number(week) === 3) {
+      return buildMeasurelandsWeek3WeeklyQuizQuestions(questionsPerLesson);
     }
 
     if (year === "Prep" && Number(week) === 1) {

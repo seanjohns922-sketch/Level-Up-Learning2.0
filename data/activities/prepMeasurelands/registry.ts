@@ -34,6 +34,11 @@ import {
   buildMeasurelandsWeek3Lesson2QuizTasks,
   resetPrepMeasurelandsWeek3Lesson2TaskSessionState,
 } from "@/data/activities/prepMeasurelands/week3Lesson2";
+import {
+  generatePrepMeasurelandsWeek3Lesson3Task,
+  buildMeasurelandsWeek3Lesson3QuizTasks,
+  resetPrepMeasurelandsWeek3Lesson3TaskSessionState,
+} from "@/data/activities/prepMeasurelands/week3Lesson3";
 
 type MeasurelandsLessonEntry = {
   prefix: string;
@@ -184,6 +189,24 @@ const PREP_MEASURELANDS_LESSONS: MeasurelandsLessonEntry[] = [
     unlockMessage: "Lesson 3 unlocked.",
     returnRoute: "/program?year=Prep&week=3&legacy=1&realm_id=measurement",
     quizContributionBuilder: buildMeasurelandsWeek3Lesson2QuizTasks,
+  },
+  {
+    prefix: "y0-measurement-w3-l3",
+    week: 3,
+    lessonNumber: 3,
+    title: "Filling the Springs",
+    subtitle: "Capacity Springs",
+    generate: generatePrepMeasurelandsWeek3Lesson3Task,
+    reset: resetPrepMeasurelandsWeek3Lesson3TaskSessionState,
+    practisedSkills: [
+      "Describing how full a container is",
+      "Finding empty, half full and full",
+      "Ordering containers from empty to full",
+    ],
+    completionTitle: "Filling the Springs Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+    returnRoute: "/program?year=Prep&week=3&legacy=1&realm_id=measurement",
+    quizContributionBuilder: buildMeasurelandsWeek3Lesson3QuizTasks,
   },
 ];
 
