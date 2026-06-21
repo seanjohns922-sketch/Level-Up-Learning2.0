@@ -10,6 +10,16 @@ import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-
 type MeasurelandsTask = Extract<PracticeTask, { kind: "measurementCompare" }>;
 type MeasurelandsObject = MeasurelandsTask["objects"][number];
 type Accent = MeasurelandsObject["accent"];
+const WEEK1_BASE = "/images/measurelands/week1-3d";
+const WEEK1_IMAGES = {
+  ladder: `${WEEK1_BASE}/ladder.png`,
+  pencil: `${WEEK1_BASE}/pencil.png`,
+  road: `${WEEK1_BASE}/road.png`,
+  rocket: `${WEEK1_BASE}/rocket.png`,
+  snake: `${WEEK1_BASE}/snake.png`,
+  tree: `${WEEK1_BASE}/tree.png`,
+  vine: `${WEEK1_BASE}/vine.png`,
+} as const;
 
 type LessonMemory = {
   introShown: boolean;
@@ -48,16 +58,16 @@ function choose<T>(items: T[]): T {
 const ACCENTS: Accent[] = ["rose", "gold", "teal", "sky", "violet", "leaf"];
 
 // Same object grown to three clearly different sizes (for ordering + sequences).
-type Family = { setId: string; label: string; icon: string; axis: "length" | "height" };
+type Family = { setId: string; label: string; icon: string; imageSrc?: string; axis: "length" | "height" };
 
 const FAMILIES: Family[] = [
-  { setId: "pencil", label: "Pencil", icon: "✏️", axis: "length" },
-  { setId: "snake", label: "Snake", icon: "🐍", axis: "length" },
-  { setId: "road", label: "Road", icon: "🛣️", axis: "length" },
-  { setId: "ladder", label: "Ladder", icon: "🪜", axis: "length" },
-  { setId: "vine", label: "Vine", icon: "🌿", axis: "length" },
-  { setId: "rocket", label: "Rocket", icon: "🚀", axis: "length" },
-  { setId: "tree", label: "Tree", icon: "🌳", axis: "height" },
+  { setId: "pencil", label: "Pencil", icon: "✏️", imageSrc: WEEK1_IMAGES.pencil, axis: "length" },
+  { setId: "snake", label: "Snake", icon: "🐍", imageSrc: WEEK1_IMAGES.snake, axis: "length" },
+  { setId: "road", label: "Road", icon: "🛣️", imageSrc: WEEK1_IMAGES.road, axis: "length" },
+  { setId: "ladder", label: "Ladder", icon: "🪜", imageSrc: WEEK1_IMAGES.ladder, axis: "length" },
+  { setId: "vine", label: "Vine", icon: "🌿", imageSrc: WEEK1_IMAGES.vine, axis: "length" },
+  { setId: "rocket", label: "Rocket", icon: "🚀", imageSrc: WEEK1_IMAGES.rocket, axis: "length" },
+  { setId: "tree", label: "Tree", icon: "🌳", imageSrc: WEEK1_IMAGES.tree, axis: "height" },
 ];
 
 // Three different creatures/objects naturally ordered by length (smallest → biggest).
@@ -93,6 +103,7 @@ function buildFamilyTrio(family: Family): MeasurelandsObject[] {
     id: `${family.setId}-${sizeTags[i]}`,
     label: family.label,
     icon: family.icon,
+    imageSrc: family.imageSrc,
     compareValue: value,
     axis: family.axis,
     accent: accents[i]!,
@@ -108,6 +119,7 @@ function buildFamilyQuad(family: Family): MeasurelandsObject[] {
     id: `${family.setId}-${sizeTags[i]}`,
     label: family.label,
     icon: family.icon,
+    imageSrc: family.imageSrc,
     compareValue: value,
     axis: family.axis,
     accent: accents[i]!,
@@ -134,15 +146,15 @@ const TEACHING_MOMENTS: NonNullable<MeasurelandsTask["teachingMoments"]> = [
   {
     id: "pencil-order",
     title: "Shortest and Longest",
-    left: { label: "Short Pencil", icon: "✏️", compareValue: 4, axis: "length", accent: "rose" },
-    right: { label: "Long Pencil", icon: "✏️", compareValue: 10, axis: "length", accent: "teal" },
+    left: { label: "Short Pencil", icon: "✏️", imageSrc: WEEK1_IMAGES.pencil, compareValue: 4, axis: "length", accent: "rose" },
+    right: { label: "Long Pencil", icon: "✏️", imageSrc: WEEK1_IMAGES.pencil, compareValue: 10, axis: "length", accent: "teal" },
     narration: "This pencil is the shortest. This pencil is the longest.",
   },
   {
     id: "road-order",
     title: "Putting Things In Order",
-    left: { label: "Short Road", icon: "🛣️", compareValue: 4, axis: "length", accent: "gold" },
-    right: { label: "Long Road", icon: "🛣️", compareValue: 9, axis: "length", accent: "violet" },
+    left: { label: "Short Road", icon: "🛣️", imageSrc: WEEK1_IMAGES.road, compareValue: 4, axis: "length", accent: "gold" },
+    right: { label: "Long Road", icon: "🛣️", imageSrc: WEEK1_IMAGES.road, compareValue: 9, axis: "length", accent: "violet" },
     narration: "We can place objects in order from shortest to longest.",
   },
 ];

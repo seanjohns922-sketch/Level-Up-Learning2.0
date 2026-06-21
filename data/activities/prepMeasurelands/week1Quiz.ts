@@ -9,6 +9,30 @@ type CompareTask = Extract<PracticeTask, { kind: "measurementCompare" }>;
 type PathTask = Extract<PracticeTask, { kind: "measurePath" }>;
 type MObj = CompareTask["objects"][number];
 type Accent = MObj["accent"];
+const WEEK1_BASE = "/images/measurelands/week1-3d";
+const WEEK1_IMAGES = {
+  bridge: `${WEEK1_BASE}/bridge.png`,
+  building: `${WEEK1_BASE}/building.png`,
+  carrot: `${WEEK1_BASE}/carrot.png`,
+  crayon: `${WEEK1_BASE}/crayon.png`,
+  cucumber: `${WEEK1_BASE}/cucumber.png`,
+  dinosaur: `${WEEK1_BASE}/dinosaur.png`,
+  house: `${WEEK1_BASE}/house.png`,
+  ladder: `${WEEK1_BASE}/ladder.png`,
+  littleDino: `${WEEK1_BASE}/little-dino.png`,
+  miniRobot: `${WEEK1_BASE}/mini-robot.png`,
+  pencil: `${WEEK1_BASE}/pencil.png`,
+  plank: `${WEEK1_BASE}/plank.png`,
+  road: `${WEEK1_BASE}/road.png`,
+  robot: `${WEEK1_BASE}/robot.png`,
+  rocket: `${WEEK1_BASE}/rocket.png`,
+  sapling: `${WEEK1_BASE}/sapling.png`,
+  snake: `${WEEK1_BASE}/snake.png`,
+  tower: `${WEEK1_BASE}/tower.png`,
+  tree: `${WEEK1_BASE}/tree.png`,
+  vine: `${WEEK1_BASE}/vine.png`,
+  worm: `${WEEK1_BASE}/worm.png`,
+} as const;
 
 function randInt(maxExclusive: number) {
   return Math.floor(Math.random() * maxExclusive);
@@ -28,19 +52,34 @@ function choose<T>(items: T[]): T {
 const ACCENTS: Accent[] = ["rose", "gold", "teal", "sky", "violet", "leaf"];
 
 // ── Lesson 1: distinct-length / distinct-height pairs (clear gaps) ──
-const PAIRS_LENGTH: Array<{ longLabel: string; longIcon: string; shortLabel: string; shortIcon: string }> = [
-  { longLabel: "Snake", longIcon: "🐍", shortLabel: "Worm", shortIcon: "🪱" },
-  { longLabel: "Ruler", longIcon: "📏", shortLabel: "Pencil", shortIcon: "✏️" },
-  { longLabel: "Road", longIcon: "🛣️", shortLabel: "Path", shortIcon: "🪧" },
-  { longLabel: "Train", longIcon: "🚆", shortLabel: "Car", shortIcon: "🚗" },
-  { longLabel: "Cucumber", longIcon: "🥒", shortLabel: "Carrot", shortIcon: "🥕" },
-  { longLabel: "Bridge", longIcon: "🌉", shortLabel: "Plank", shortIcon: "🪵" },
+const PAIRS_LENGTH: Array<{
+  longLabel: string;
+  longIcon: string;
+  longImageSrc?: string;
+  shortLabel: string;
+  shortIcon: string;
+  shortImageSrc?: string;
+}> = [
+  { longLabel: "Snake", longIcon: "🐍", longImageSrc: WEEK1_IMAGES.snake, shortLabel: "Worm", shortIcon: "🪱", shortImageSrc: WEEK1_IMAGES.worm },
+  { longLabel: "Pencil", longIcon: "✏️", longImageSrc: WEEK1_IMAGES.pencil, shortLabel: "Crayon", shortIcon: "🖍️", shortImageSrc: WEEK1_IMAGES.crayon },
+  { longLabel: "Road", longIcon: "🛣️", longImageSrc: WEEK1_IMAGES.road, shortLabel: "Plank", shortIcon: "🪵", shortImageSrc: WEEK1_IMAGES.plank },
+  { longLabel: "Cucumber", longIcon: "🥒", longImageSrc: WEEK1_IMAGES.cucumber, shortLabel: "Carrot", shortIcon: "🥕", shortImageSrc: WEEK1_IMAGES.carrot },
+  { longLabel: "Bridge", longIcon: "🌉", longImageSrc: WEEK1_IMAGES.bridge, shortLabel: "Plank", shortIcon: "🪵", shortImageSrc: WEEK1_IMAGES.plank },
+  { longLabel: "Rocket", longIcon: "🚀", longImageSrc: WEEK1_IMAGES.rocket, shortLabel: "Carrot", shortIcon: "🥕", shortImageSrc: WEEK1_IMAGES.carrot },
 ];
-const PAIRS_HEIGHT: Array<{ tallLabel: string; tallIcon: string; shortLabel: string; shortIcon: string }> = [
-  { tallLabel: "Tree", tallIcon: "🌳", shortLabel: "Bush", shortIcon: "🌿" },
-  { tallLabel: "Tower", tallIcon: "🗼", shortLabel: "House", shortIcon: "🏠" },
-  { tallLabel: "Giraffe", tallIcon: "🦒", shortLabel: "Dog", shortIcon: "🐕" },
-  { tallLabel: "Building", tallIcon: "🏢", shortLabel: "Tent", shortIcon: "⛺" },
+const PAIRS_HEIGHT: Array<{
+  tallLabel: string;
+  tallIcon: string;
+  tallImageSrc?: string;
+  shortLabel: string;
+  shortIcon: string;
+  shortImageSrc?: string;
+}> = [
+  { tallLabel: "Tree", tallIcon: "🌳", tallImageSrc: WEEK1_IMAGES.tree, shortLabel: "Sapling", shortIcon: "🌱", shortImageSrc: WEEK1_IMAGES.sapling },
+  { tallLabel: "Tower", tallIcon: "🗼", tallImageSrc: WEEK1_IMAGES.tower, shortLabel: "House", shortIcon: "🏠", shortImageSrc: WEEK1_IMAGES.house },
+  { tallLabel: "Building", tallIcon: "🏢", tallImageSrc: WEEK1_IMAGES.building, shortLabel: "House", shortIcon: "🏠", shortImageSrc: WEEK1_IMAGES.house },
+  { tallLabel: "Dinosaur", tallIcon: "🦕", tallImageSrc: WEEK1_IMAGES.dinosaur, shortLabel: "Little Dino", shortIcon: "🦖", shortImageSrc: WEEK1_IMAGES.littleDino },
+  { tallLabel: "Robot", tallIcon: "🤖", tallImageSrc: WEEK1_IMAGES.robot, shortLabel: "Mini Robot", shortIcon: "🤖", shortImageSrc: WEEK1_IMAGES.miniRobot },
 ];
 
 function bigSmall(): [number, number] {
@@ -49,8 +88,16 @@ function bigSmall(): [number, number] {
   return [big, small];
 }
 
-function makeObj(id: string, label: string, icon: string, value: number, axis: "length" | "height", accent: Accent): MObj {
-  return { id, label, icon, compareValue: value, axis, accent };
+function makeObj(
+  id: string,
+  label: string,
+  icon: string,
+  value: number,
+  axis: "length" | "height",
+  accent: Accent,
+  imageSrc?: string,
+): MObj {
+  return { id, label, icon, imageSrc, compareValue: value, axis, accent };
 }
 
 // ── Lesson 1 builders ──
@@ -62,8 +109,8 @@ function qWhichLonger(used: Set<string>): CompareTask {
   const [big, small] = bigSmall();
   const acc = shuffle(ACCENTS);
   const objects = shuffle([
-    makeObj("long", pair.longLabel, pair.longIcon, big, "length", acc[0]!),
-    makeObj("short", pair.shortLabel, pair.shortIcon, small, "length", acc[1]!),
+    makeObj("long", pair.longLabel, pair.longIcon, big, "length", acc[0]!, pair.longImageSrc),
+    makeObj("short", pair.shortLabel, pair.shortIcon, small, "length", acc[1]!, pair.shortImageSrc),
   ]);
   return {
     kind: "measurementCompare", scene: "pair", targetMode: "longer",
@@ -78,8 +125,8 @@ function qWhichShorter(): CompareTask {
   const [big, small] = bigSmall();
   const acc = shuffle(ACCENTS);
   const objects = shuffle([
-    makeObj("long", pair.longLabel, pair.longIcon, big, "length", acc[0]!),
-    makeObj("short", pair.shortLabel, pair.shortIcon, small, "length", acc[1]!),
+    makeObj("long", pair.longLabel, pair.longIcon, big, "length", acc[0]!, pair.longImageSrc),
+    makeObj("short", pair.shortLabel, pair.shortIcon, small, "length", acc[1]!, pair.shortImageSrc),
   ]);
   return {
     kind: "measurementCompare", scene: "pair", targetMode: "longer",
@@ -94,8 +141,8 @@ function qWhichTaller(): CompareTask {
   const [big, small] = bigSmall();
   const acc = shuffle(ACCENTS);
   const objects = shuffle([
-    makeObj("tall", pair.tallLabel, pair.tallIcon, big, "height", acc[0]!),
-    makeObj("low", pair.shortLabel, pair.shortIcon, small, "height", acc[1]!),
+    makeObj("tall", pair.tallLabel, pair.tallIcon, big, "height", acc[0]!, pair.tallImageSrc),
+    makeObj("low", pair.shortLabel, pair.shortIcon, small, "height", acc[1]!, pair.shortImageSrc),
   ]);
   return {
     kind: "measurementCompare", scene: "pair", targetMode: "taller",
@@ -112,9 +159,9 @@ function qSameLength(): CompareTask {
   const diff = 2 + randInt(2); // 2–3 (clearly different)
   const acc = shuffle(ACCENTS);
   const objects = shuffle([
-    makeObj("a", fam.label, fam.icon, same, fam.axis, acc[0]!),
-    makeObj("b", fam.label, fam.icon, same, fam.axis, acc[1]!),
-    makeObj("c", fam.label, fam.icon, diff, fam.axis, acc[2]!),
+    makeObj("a", fam.label, fam.icon, same, fam.axis, acc[0]!, fam.imageSrc),
+    makeObj("b", fam.label, fam.icon, same, fam.axis, acc[1]!, fam.imageSrc),
+    makeObj("c", fam.label, fam.icon, diff, fam.axis, acc[2]!, fam.imageSrc),
   ]);
   return {
     kind: "measurementCompare", scene: "trio", targetMode: "longest",
@@ -126,14 +173,14 @@ function qSameLength(): CompareTask {
 }
 
 // ── Lesson 2 families & builders ──
-type Family = { id: string; label: string; icon: string; axis: "length" | "height" };
+type Family = { id: string; label: string; icon: string; imageSrc?: string; axis: "length" | "height" };
 const FAMILIES: Family[] = [
-  { id: "pencil", label: "Pencil", icon: "✏️", axis: "length" },
-  { id: "snake", label: "Snake", icon: "🐍", axis: "length" },
-  { id: "road", label: "Road", icon: "🛣️", axis: "length" },
-  { id: "ladder", label: "Ladder", icon: "🪜", axis: "length" },
-  { id: "vine", label: "Vine", icon: "🌿", axis: "length" },
-  { id: "rocket", label: "Rocket", icon: "🚀", axis: "length" },
+  { id: "pencil", label: "Pencil", icon: "✏️", imageSrc: WEEK1_IMAGES.pencil, axis: "length" },
+  { id: "snake", label: "Snake", icon: "🐍", imageSrc: WEEK1_IMAGES.snake, axis: "length" },
+  { id: "road", label: "Road", icon: "🛣️", imageSrc: WEEK1_IMAGES.road, axis: "length" },
+  { id: "ladder", label: "Ladder", icon: "🪜", imageSrc: WEEK1_IMAGES.ladder, axis: "length" },
+  { id: "vine", label: "Vine", icon: "🌿", imageSrc: WEEK1_IMAGES.vine, axis: "length" },
+  { id: "rocket", label: "Rocket", icon: "🚀", imageSrc: WEEK1_IMAGES.rocket, axis: "length" },
 ];
 const VALUE_TRIPLES: Array<[number, number, number]> = [[3, 6, 10], [2, 5, 9], [4, 7, 10], [3, 7, 10]];
 const VALUE_QUADS: Array<[number, number, number, number]> = [[2, 4, 6, 8], [3, 5, 7, 9], [2, 4, 6, 10], [1, 4, 7, 10]];
@@ -141,7 +188,7 @@ const VALUE_QUADS: Array<[number, number, number, number]> = [[2, 4, 6, 8], [3, 
 function familyTrio(fam: Family): MObj[] {
   const vals = choose(VALUE_TRIPLES);
   const acc = shuffle(ACCENTS).slice(0, 3);
-  return vals.map((v, i) => makeObj(`${fam.id}-${["s", "m", "l"][i]}`, fam.label, fam.icon, v, fam.axis, acc[i]!));
+  return vals.map((v, i) => makeObj(`${fam.id}-${["s", "m", "l"][i]}`, fam.label, fam.icon, v, fam.axis, acc[i]!, fam.imageSrc));
 }
 
 function qTapShortest(): CompareTask {
@@ -184,7 +231,7 @@ function qSequence(): CompareTask {
   const fam = choose(FAMILIES);
   const vals = choose(VALUE_QUADS);
   const acc = shuffle(ACCENTS).slice(0, 4);
-  const quad = vals.map((v, i) => makeObj(`${fam.id}-${["xs", "s", "m", "l"][i]}`, fam.label, fam.icon, v, fam.axis, acc[i]!));
+  const quad = vals.map((v, i) => makeObj(`${fam.id}-${["xs", "s", "m", "l"][i]}`, fam.label, fam.icon, v, fam.axis, acc[i]!, fam.imageSrc));
   const prefix = [quad[0]!, quad[1]!, quad[2]!];
   const correct = quad[3]!;
   const distractorA: MObj = { ...quad[0]!, id: `${fam.id}-dA` };
