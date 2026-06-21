@@ -74,6 +74,11 @@ import {
   buildMeasurelandsWeek6Lesson1QuizTasks,
   resetPrepMeasurelandsWeek6Lesson1TaskSessionState,
 } from "@/data/activities/prepMeasurelands/week6Lesson1";
+import {
+  generatePrepMeasurelandsWeek6Lesson2Task,
+  buildMeasurelandsWeek6Lesson2QuizTasks,
+  resetPrepMeasurelandsWeek6Lesson2TaskSessionState,
+} from "@/data/activities/prepMeasurelands/week6Lesson2";
 
 type MeasurelandsLessonEntry = {
   prefix: string;
@@ -370,6 +375,24 @@ const PREP_MEASURELANDS_LESSONS: MeasurelandsLessonEntry[] = [
     unlockMessage: "Lesson 2 unlocked.",
     returnRoute: "/program?year=Prep&week=6&legacy=1&realm_id=measurement",
     quizContributionBuilder: buildMeasurelandsWeek6Lesson1QuizTasks,
+  },
+  {
+    prefix: "y0-measurement-w6-l2",
+    week: 6,
+    lessonNumber: 2,
+    title: "Match Activities to Time of Day",
+    subtitle: "Clockwork Crossing",
+    generate: generatePrepMeasurelandsWeek6Lesson2Task,
+    reset: resetPrepMeasurelandsWeek6Lesson2TaskSessionState,
+    practisedSkills: [
+      "Matching activities to a time of day",
+      "Finding what we do at each time",
+      "Telling morning from night",
+    ],
+    completionTitle: "Match the Time Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+    returnRoute: "/program?year=Prep&week=6&legacy=1&realm_id=measurement",
+    quizContributionBuilder: buildMeasurelandsWeek6Lesson2QuizTasks,
   },
 ];
 
