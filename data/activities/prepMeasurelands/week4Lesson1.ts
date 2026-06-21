@@ -239,20 +239,16 @@ export function buildMeasurelandsWeek4Lesson1QuizTasks(): PracticeTask[] {
       correctOptionId: "wash-hands-q4a",
       feedback: { correct: "Great!", wrong: "Look for the quickest one." },
     },
-    // 5 — quick or slow (sort)
+    // 5 — longer pair (pair)
     {
       kind: "measurementCompare",
-      scene: "sort",
-      prompt: "Quick or slow?",
-      speakText: "Does watching a movie take a quick time or a slow time?",
-      badgeLabel: "Quick or Slow?",
-      objects: [toActObj(A.movie, "teal", "-q5")],
-      bins: [
-        { id: "quick", label: "Quick", icon: "quick" },
-        { id: "slow", label: "Slow", icon: "slow" },
-      ],
-      correctOptionId: "slow",
-      feedback: { correct: "Yes! That is slow.", wrong: "A movie takes a long time." },
+      scene: "pair",
+      prompt: "Which takes longer?",
+      speakText: "Which one takes longer?",
+      badgeLabel: "Takes Longer?",
+      objects: shuffle([toActObj(A.brushTeeth, "teal", "-q5a"), toActObj(A.sandcastle, "gold", "-q5b")]),
+      correctOptionId: "sandcastle-q5b",
+      feedback: { correct: "Yes!", wrong: "Think about which takes more time." },
     },
   ];
 }

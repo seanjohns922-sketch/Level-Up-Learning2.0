@@ -553,7 +553,9 @@ function OrderScene({
   const isFill = Boolean(task.fillState);
   // Ordering days uses positional labels (First → Last) for any count.
   const isDay = axis === "day";
-  const slotLabels = isDay
+  const slotLabels = task.orderLabels && task.orderLabels.length === slotCount
+    ? task.orderLabels
+    : isDay
     ? orderedIds.map((_, i) => (i === 0 ? "First" : i === slotCount - 1 ? "Last" : "Next"))
     : isFill
     ? slotCount === 3

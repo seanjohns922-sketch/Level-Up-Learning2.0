@@ -50,6 +50,11 @@ import {
   resetPrepMeasurelandsWeek4Lesson2TaskSessionState,
 } from "@/data/activities/prepMeasurelands/week4Lesson2";
 import {
+  generatePrepMeasurelandsWeek4Lesson3Task,
+  buildMeasurelandsWeek4Lesson3QuizTasks,
+  resetPrepMeasurelandsWeek4Lesson3TaskSessionState,
+} from "@/data/activities/prepMeasurelands/week4Lesson3";
+import {
   generatePrepMeasurelandsWeek5Lesson1Task,
   buildMeasurelandsWeek5Lesson1QuizTasks,
   resetPrepMeasurelandsWeek5Lesson1TaskSessionState,
@@ -259,6 +264,25 @@ const PREP_MEASURELANDS_LESSONS: MeasurelandsLessonEntry[] = [
     unlockMessage: "Lesson 3 unlocked.",
     returnRoute: "/program?year=Prep&week=4&legacy=1&realm_id=measurement",
     quizContributionBuilder: buildMeasurelandsWeek4Lesson2QuizTasks,
+  },
+  {
+    prefix: "y0-measurement-w4-l3",
+    week: 4,
+    lessonNumber: 3,
+    title: "Quick or Slow?",
+    subtitle: "Duration Dunes",
+    generate: generatePrepMeasurelandsWeek4Lesson3Task,
+    reset: resetPrepMeasurelandsWeek4Lesson3TaskSessionState,
+    practisedSkills: [
+      "Identifying quick activities",
+      "Identifying slow activities",
+      "Putting activities in order",
+      "Using duration words",
+    ],
+    completionTitle: "Quick or Slow Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+    returnRoute: "/program?year=Prep&week=4&legacy=1&realm_id=measurement",
+    quizContributionBuilder: buildMeasurelandsWeek4Lesson3QuizTasks,
   },
   {
     prefix: "y0-measurement-w5-l1",
