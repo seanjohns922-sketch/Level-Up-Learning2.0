@@ -164,16 +164,16 @@ const TEACHING_MOMENTS: NonNullable<CompareTask["teachingMoments"]> = [
     narration: "The tiny cup holds less. The bucket holds more.",
   },
   {
-    id: "mug-jug-bucket",
+    id: "mug-jug-watering-can",
     title: "Compare the Containers",
     objects: [
       toTeachingObj(CONTAINERS.mug, "violet", 0),
       toTeachingObj(CONTAINERS.jug, "teal", 0),
-      toTeachingObj(CONTAINERS.bucket, "leaf", 0),
+      toTeachingObj(CONTAINERS.wateringCan, "leaf", 0),
     ],
     left: toTeachingObj(CONTAINERS.mug, "violet", 0),
-    right: toTeachingObj(CONTAINERS.jug, "teal", 0),
-    narration: "A mug holds less than a jug. A bucket holds more than both.",
+    right: toTeachingObj(CONTAINERS.wateringCan, "teal", 0),
+    narration: "A mug holds less than a jug. A watering can holds more than both.",
   },
   {
     id: "bottle-fish-tank-bathtub",
