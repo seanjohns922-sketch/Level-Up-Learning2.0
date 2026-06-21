@@ -374,6 +374,8 @@ function CompareVisual({
 
 function TeachingMomentRow({ moment }: { moment: TeachingMoment }) {
   const trioObjects = moment.objects;
+  const shouldShowTeachingWater = (item: TeachingMoment["left"] | TeachingMoment["right"]) =>
+    item.axis === "capacity" && typeof item.waterLevel === "number" && item.waterLevel > 0;
   return (
     <div className="rounded-[28px] border border-[rgba(214,184,108,0.28)] bg-[rgba(255,252,245,0.92)] p-4 shadow-[0_10px_30px_rgba(91,33,182,0.06)]">
       <div className="mb-3 text-center text-xs font-black uppercase tracking-[0.18em] text-[#7c3aed]">
@@ -388,8 +390,8 @@ function TeachingMomentRow({ moment }: { moment: TeachingMoment }) {
               key={`${moment.id}-${item.label}-${index}`}
               item={{ ...item, id: `${moment.id}-${index}` }}
               compact
-              showWater={item.axis === "capacity"}
-              animateFill={item.axis === "capacity"}
+              showWater={shouldShowTeachingWater(item)}
+              animateFill={shouldShowTeachingWater(item)}
             />
           ))}
         </div>
@@ -398,14 +400,14 @@ function TeachingMomentRow({ moment }: { moment: TeachingMoment }) {
           <CompareVisual
             item={moment.left}
             compact
-            showWater={moment.left.axis === "capacity"}
-            animateFill={moment.left.axis === "capacity"}
+            showWater={shouldShowTeachingWater(moment.left)}
+            animateFill={shouldShowTeachingWater(moment.left)}
           />
           <CompareVisual
             item={moment.right}
             compact
-            showWater={moment.right.axis === "capacity"}
-            animateFill={moment.right.axis === "capacity"}
+            showWater={shouldShowTeachingWater(moment.right)}
+            animateFill={shouldShowTeachingWater(moment.right)}
           />
         </div>
       )}
