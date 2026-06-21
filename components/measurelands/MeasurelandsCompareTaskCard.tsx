@@ -160,15 +160,17 @@ function CompareVisual({
                 : "Height";
 
   // ── Real image path ──────────────────────────────────────────────────────
-  // Week 3 compare/order cards keep the CARD size fixed, but the container
-  // photo itself scales with compareValue so students can see which container
-  // would hold more without reintroducing water bars.
-  const imageBox =
-    axis === "capacity"
-      ? Math.round((compact ? 54 : 68) + (item.compareValue / 10) * (compact ? 44 : 72))
-      : compact
-        ? 96
-        : 120;
+  // For size attributes (length, height, capacity) the image itself scales with
+  // compareValue so the SIZE carries the answer (the longest pencil looks
+  // longest, the bucket looks bigger than the cup). Recognition attributes
+  // (duration / day / time of day) stay a fixed size — the scene, not the
+  // artwork scaling, carries the meaning.
+  const sizeScaled = axis === "capacity" || axis === "length" || axis === "height";
+  const imageBox = sizeScaled
+    ? Math.round((compact ? 52 : 64) + (item.compareValue / 10) * (compact ? 48 : 80))
+    : compact
+      ? 96
+      : 120;
   const capacityGaugeWidth = compact ? 80 : 96;
   const capacityGaugeHeight = compact ? 106 : 126;
 
