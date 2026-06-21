@@ -64,6 +64,11 @@ import {
   buildMeasurelandsWeek5Lesson2QuizTasks,
   resetPrepMeasurelandsWeek5Lesson2TaskSessionState,
 } from "@/data/activities/prepMeasurelands/week5Lesson2";
+import {
+  generatePrepMeasurelandsWeek5Lesson3Task,
+  buildMeasurelandsWeek5Lesson3QuizTasks,
+  resetPrepMeasurelandsWeek5Lesson3TaskSessionState,
+} from "@/data/activities/prepMeasurelands/week5Lesson3";
 
 type MeasurelandsLessonEntry = {
   prefix: string;
@@ -324,6 +329,24 @@ const PREP_MEASURELANDS_LESSONS: MeasurelandsLessonEntry[] = [
     unlockMessage: "Lesson 3 unlocked.",
     returnRoute: "/program?year=Prep&week=5&legacy=1&realm_id=measurement",
     quizContributionBuilder: buildMeasurelandsWeek5Lesson2QuizTasks,
+  },
+  {
+    prefix: "y0-measurement-w5-l3",
+    week: 5,
+    lessonNumber: 3,
+    title: "Weekdays and Weekends",
+    subtitle: "Daylight Grove",
+    generate: generatePrepMeasurelandsWeek5Lesson3Task,
+    reset: resetPrepMeasurelandsWeek5Lesson3TaskSessionState,
+    practisedSkills: [
+      "Telling weekdays from the weekend",
+      "Sorting school days and weekend days",
+      "Knowing the week repeats",
+    ],
+    completionTitle: "Daylight Grove Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+    returnRoute: "/program?year=Prep&week=5&legacy=1&realm_id=measurement",
+    quizContributionBuilder: buildMeasurelandsWeek5Lesson3QuizTasks,
   },
 ];
 

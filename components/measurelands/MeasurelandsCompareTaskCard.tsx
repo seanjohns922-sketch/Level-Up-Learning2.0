@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Rabbit, Turtle, Volume2 } from "lucide-react";
+import { Rabbit, Turtle, Volume2, School, House } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { speak } from "@/lib/speak";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
@@ -522,6 +522,10 @@ function SortScene({
               <Rabbit className="h-12 w-12 text-[#5f4725]" />
             ) : bin.icon === "slow" ? (
               <Turtle className="h-12 w-12 text-[#5f4725]" />
+            ) : bin.icon === "weekday" ? (
+              <School className="h-12 w-12 text-[#5f4725]" />
+            ) : bin.icon === "weekend" ? (
+              <House className="h-12 w-12 text-[#5f4725]" />
             ) : (
               <span className="text-5xl sm:text-6xl">{bin.icon}</span>
             )}
