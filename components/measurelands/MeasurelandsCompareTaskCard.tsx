@@ -153,7 +153,9 @@ function CompareVisual({
           ? "Capacity"
           : axis === "duration"
             ? "Time"
-            : "Height";
+            : axis === "day"
+              ? "Day"
+              : "Height";
 
   // ── Real image path ──────────────────────────────────────────────────────
   // Week 3 compare/order cards keep the CARD size fixed, but the container
@@ -253,7 +255,7 @@ function CompareVisual({
               work, the speaker + label are support. A span (not a button) so it
               can live inside the parent answer button; stopPropagation keeps a
               speaker tap from selecting the answer. */}
-          {axis === "duration" && (
+          {(axis === "duration" || axis === "day") && (
             <span
               role="button"
               tabIndex={0}
@@ -549,7 +551,11 @@ function OrderScene({
   const isCapacity = axis === "capacity";
   // Ordering by fill level (Lesson 3) uses fullness labels, not size labels.
   const isFill = Boolean(task.fillState);
-  const slotLabels = isFill
+  // Ordering days uses positional labels (First → Last) for any count.
+  const isDay = axis === "day";
+  const slotLabels = isDay
+    ? orderedIds.map((_, i) => (i === 0 ? "First" : i === slotCount - 1 ? "Last" : "Next"))
+    : isFill
     ? slotCount === 3
       ? ["Empty", "Middle", "Full"]
       : ["Empty", "Next", "Next", "Full"]

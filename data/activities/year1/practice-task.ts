@@ -475,7 +475,7 @@ export type PracticeTask = (
         label: string;
         icon: string;
         compareValue: number;
-        axis: "length" | "height" | "mass" | "capacity" | "duration";
+        axis: "length" | "height" | "mass" | "capacity" | "duration" | "day";
         /** Optional visible fill amount for capacity scenes, 0..1 */
         waterLevel?: number;
         accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
@@ -484,13 +484,15 @@ export type PracticeTask = (
       }>;
       /** Correct ordering of object ids for the "order" scene (first slot → last). */
       orderedIds?: string[];
+      /** Optional explicit slot labels for the "order" scene. */
+      orderLabels?: string[];
       /** Objects already shown before the "?" in the "sequence" scene. */
       sequencePrefix?: Array<{
         id: string;
         label: string;
         icon: string;
         compareValue: number;
-        axis: "length" | "height" | "mass" | "capacity" | "duration";
+        axis: "length" | "height" | "mass" | "capacity" | "duration" | "day";
         waterLevel?: number;
         accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
         /** Optional real image (transparent PNG/SVG). Falls back to `icon` emoji. */
@@ -503,7 +505,7 @@ export type PracticeTask = (
           label: string;
           icon: string;
           compareValue: number;
-          axis: "length" | "height" | "mass" | "capacity" | "duration";
+          axis: "length" | "height" | "mass" | "capacity" | "duration" | "day";
           waterLevel?: number;
           accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
           /** Optional real image (transparent PNG/SVG). Falls back to `icon` emoji. */
@@ -513,7 +515,7 @@ export type PracticeTask = (
           label: string;
           icon: string;
           compareValue: number;
-          axis: "length" | "height" | "mass" | "capacity" | "duration";
+          axis: "length" | "height" | "mass" | "capacity" | "duration" | "day";
           waterLevel?: number;
           accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
           /** Optional real image (transparent PNG/SVG). Falls back to `icon` emoji. */
@@ -523,7 +525,7 @@ export type PracticeTask = (
           label: string;
           icon: string;
           compareValue: number;
-          axis: "length" | "height" | "mass" | "capacity" | "duration";
+          axis: "length" | "height" | "mass" | "capacity" | "duration" | "day";
           waterLevel?: number;
           accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
           /** Optional real image (transparent PNG/SVG). Falls back to `icon` emoji. */
