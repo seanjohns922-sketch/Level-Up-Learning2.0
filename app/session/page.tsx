@@ -72,6 +72,7 @@ import { buildMeasurelandsWeek2QuizTasks } from "@/data/activities/prepMeasurela
 import { buildMeasurelandsWeek3QuizTasks } from "@/data/activities/prepMeasurelands/week3Quiz";
 import { buildMeasurelandsWeek4QuizTasks } from "@/data/activities/prepMeasurelands/week4Quiz";
 import { buildMeasurelandsWeek5QuizTasks } from "@/data/activities/prepMeasurelands/week5Quiz";
+import { buildMeasurelandsWeek6QuizTasks } from "@/data/activities/prepMeasurelands/week6Quiz";
 import { isLessonQuestionSafe, isPracticeTaskSafe } from "@/lib/task-safety";
 import { buildLessonRoute, isGroundLevelYear, normalizeStudentYearLabel } from "@/lib/lesson-routing";
 
@@ -1670,6 +1671,27 @@ function buildMeasurelandsWeek5WeeklyQuizQuestions(
       `mw5q${index + 1}`,
       lessonNumber,
       `measurelands_w5_l${lessonNumber}_q${(index % questionsPerLesson) + 1}`,
+      task as GroundQuizPracticeTask
+    );
+  });
+}
+
+function buildMeasurelandsWeek6WeeklyQuizQuestions(
+  questionsPerLesson: number
+): QuizQuestion[] {
+  const totalExpected = questionsPerLesson * 3;
+  const tasks = buildMeasurelandsWeek6QuizTasks();
+  if (tasks.length !== totalExpected) {
+    throw new Error(
+      `[MeasurelandsWeeklyQuiz] Week 6 expected ${totalExpected} questions, received ${tasks.length}.`
+    );
+  }
+  return tasks.map((task, index) => {
+    const lessonNumber = (Math.floor(index / questionsPerLesson) + 1) as 1 | 2 | 3;
+    return buildGroundQuizQuestion(
+      `mw6q${index + 1}`,
+      lessonNumber,
+      `measurelands_w6_l${lessonNumber}_q${(index % questionsPerLesson) + 1}`,
       task as GroundQuizPracticeTask
     );
   });
@@ -6897,6 +6919,10 @@ function SessionPage({
 
     if (isMeasurementRealm && year === "Prep" && Number(week) === 5) {
       return buildMeasurelandsWeek5WeeklyQuizQuestions(questionsPerLesson);
+    }
+
+    if (isMeasurementRealm && year === "Prep" && Number(week) === 6) {
+      return buildMeasurelandsWeek6WeeklyQuizQuestions(questionsPerLesson);
     }
 
     if (year === "Prep" && Number(week) === 1) {

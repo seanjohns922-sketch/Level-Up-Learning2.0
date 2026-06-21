@@ -79,6 +79,11 @@ import {
   buildMeasurelandsWeek6Lesson2QuizTasks,
   resetPrepMeasurelandsWeek6Lesson2TaskSessionState,
 } from "@/data/activities/prepMeasurelands/week6Lesson2";
+import {
+  generatePrepMeasurelandsWeek6Lesson3Task,
+  buildMeasurelandsWeek6Lesson3QuizTasks,
+  resetPrepMeasurelandsWeek6Lesson3TaskSessionState,
+} from "@/data/activities/prepMeasurelands/week6Lesson3";
 
 type MeasurelandsLessonEntry = {
   prefix: string;
@@ -393,6 +398,24 @@ const PREP_MEASURELANDS_LESSONS: MeasurelandsLessonEntry[] = [
     unlockMessage: "Lesson 3 unlocked.",
     returnRoute: "/program?year=Prep&week=6&legacy=1&realm_id=measurement",
     quizContributionBuilder: buildMeasurelandsWeek6Lesson2QuizTasks,
+  },
+  {
+    prefix: "y0-measurement-w6-l3",
+    week: 6,
+    lessonNumber: 3,
+    title: "My Daily Routine",
+    subtitle: "Clockwork Crossing",
+    generate: generatePrepMeasurelandsWeek6Lesson3Task,
+    reset: resetPrepMeasurelandsWeek6Lesson3TaskSessionState,
+    practisedSkills: [
+      "Putting the day in order",
+      "Finding what happens first and last",
+      "Finding what comes next",
+    ],
+    completionTitle: "Clockwork Crossing Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+    returnRoute: "/program?year=Prep&week=6&legacy=1&realm_id=measurement",
+    quizContributionBuilder: buildMeasurelandsWeek6Lesson3QuizTasks,
   },
 ];
 
