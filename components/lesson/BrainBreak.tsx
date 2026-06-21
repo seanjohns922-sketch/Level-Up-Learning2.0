@@ -209,6 +209,9 @@ export default function BrainBreak({
           {villain.game === "keepuppy" && <KeepUppyGame villain={villain} onHit={onHit} />}
           {villain.game === "charge" && <ChargeGame villain={villain} onWin={finish} />}
           {villain.game === "duel" && <DuelGame villain={villain} onWin={finish} />}
+          {villain.game === "dodge" && <DodgeGame villain={villain} onWin={finish} />}
+          {villain.game === "copyme" && <CopyMeGame villain={villain} onWin={finish} />}
+          {villain.game === "trace" && <TraceGame villain={villain} onWin={finish} />}
         </>
       )}
 
@@ -266,6 +269,9 @@ function playHint(game: Villain["game"]): string {
     case "keepuppy": return "Tap to keep it up!";
     case "charge": return "Tap fast to shine!";
     case "duel": return "Tap to win the tug-of-war!";
+    case "dodge": return "Drag to dodge!";
+    case "copyme": return "Watch, then copy!";
+    case "trace": return "Trace the glowing path!";
     default: return "Tap them all!";
   }
 }
@@ -516,5 +522,215 @@ function DuelGame({ villain, onWin }: { villain: Villain; onWin: () => void }) {
         TAP!
       </div>
     </button>
+  );
+}
+
+// ── DODGE (drag your hero to avoid the villain's projectiles) ───────────────
+function DodgeGame({ villain, onWin }: { villain: Villain; onWin: () => void }) {
+  const [hero, setHero] = useState({ x: 50, y: 80 });
+  const heroRef = useRef({ x: 50, y: 80 });
+  const [projectiles, setProjectiles] = useState<{ id: number; x: number; y: number }[]>([]);
+  const projRef = useRef<{ id: number; x: number; y: number; vx: number; vy: number }[]>([]);
+  const idRef = useRef(0);
+  const [progress, setProgress] = useState(0);
+  const [hitFlash, setHitFlash] = useState(false);
+  const wonRef = useRef(false);
+  const startRef = useRef(0);
+  const lastHitRef = useRef(0);
+  const durMs = villain.durationSec * 1000;
+
+  function move(e: React.PointerEvent) {
+    const x = (e.clientX / window.innerWidth) * 100;
+    const y = (e.clientY / window.innerHeight) * 100;
+    heroRef.current = { x: Math.max(6, Math.min(94, x)), y: Math.max(22, Math.min(94, y)) };
+    setHero(heroRef.current);
+  }
+
+  useEffect(() => {
+    const spawn = window.setInterval(() => {
+      if (projRef.current.length >= 7) return;
+      idRef.current += 1;
+      const edge = Math.floor(Math.random() * 3); // 0 top, 1 left, 2 right
+      const speed = 0.7 + Math.random() * 0.5;
+      let x: number, y: number, vx: number, vy: number;
+      if (edge === 0) { x = 10 + Math.random() * 80; y = -6; vx = (Math.random() - 0.5) * 0.6; vy = speed; }
+      else if (edge === 1) { x = -6; y = 24 + Math.random() * 46; vx = speed; vy = (Math.random() - 0.5) * 0.6; }
+      else { x = 106; y = 24 + Math.random() * 46; vx = -speed; vy = (Math.random() - 0.5) * 0.6; }
+      projRef.current.push({ id: idRef.current, x, y, vx, vy });
+    }, 520);
+    return () => window.clearInterval(spawn);
+  }, []);
+
+  useEffect(() => {
+    let raf = 0;
+    const loop = (now: number) => {
+      if (startRef.current === 0) startRef.current = now;
+      for (const p of projRef.current) { p.x += p.vx; p.y += p.vy; }
+      projRef.current = projRef.current.filter((p) => p.x > -14 && p.x < 114 && p.y > -14 && p.y < 114);
+      const h = heroRef.current;
+      for (const p of projRef.current) {
+        const dx = p.x - h.x, dy = p.y - h.y;
+        if (dx * dx + dy * dy < 34 && now - lastHitRef.current > 600) {
+          lastHitRef.current = now;
+          setHitFlash(true);
+          window.setTimeout(() => setHitFlash(false), 220);
+        }
+      }
+      setProjectiles(projRef.current.map((p) => ({ id: p.id, x: p.x, y: p.y })));
+      const frac = Math.min(1, (now - startRef.current) / durMs);
+      setProgress(frac);
+      if (frac >= 1 && !wonRef.current) { wonRef.current = true; onWin(); return; }
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, [durMs, onWin]);
+
+  return (
+    <div className="absolute inset-0" style={{ touchAction: "none" }} onPointerMove={move} onPointerDown={move}>
+      <div className="absolute inset-x-0 top-[84px] mx-auto h-2.5 w-[min(70vw,360px)] overflow-hidden rounded-full bg-white/10 ring-1 ring-white/10">
+        <div className="h-full rounded-full" style={{ width: `${progress * 100}%`, background: `linear-gradient(90deg, ${villain.color}, #fff8e8)`, boxShadow: `0 0 10px ${villain.glow}` }} />
+      </div>
+      {projectiles.map((p) => (
+        <div key={p.id} className="absolute" style={{ left: `${p.x}%`, top: `${p.y}%`, transform: "translate(-50%,-50%)", fontSize: "clamp(2rem,7vw,3.2rem)", filter: `drop-shadow(0 0 10px ${villain.glow})`, pointerEvents: "none" }}>{villain.targetEmoji}</div>
+      ))}
+      <div className="absolute" style={{ left: `${hero.x}%`, top: `${hero.y}%`, transform: "translate(-50%,-50%)", fontSize: "clamp(2.6rem,9vw,4rem)", filter: hitFlash ? "drop-shadow(0 0 16px #f87171)" : "drop-shadow(0 0 14px rgba(200,160,48,0.6))", opacity: hitFlash ? 0.6 : 1, pointerEvents: "none" }}>🦸</div>
+      <div className="absolute inset-x-0 bottom-6 text-center font-sans font-bold text-white/70" style={{ fontSize: "clamp(0.85rem,2vw,1.1rem)" }}>Drag your hero to dodge!</div>
+    </div>
+  );
+}
+
+// ── COPY ME (watch a flashing pattern, then tap it back — memory) ───────────
+function CopyMeGame({ villain, onWin }: { villain: Villain; onWin: () => void }) {
+  const PADS = 4;
+  const TARGET_ROUNDS = 3;
+  const padColors = ["#f87171", "#60a5fa", "#fbbf24", "#4ade80"];
+  const [round, setRound] = useState(0);
+  const [seq, setSeq] = useState<number[]>([]);
+  const [active, setActive] = useState<number | null>(null);
+  const [showing, setShowing] = useState(true);
+  const inputRef = useRef(0);
+  const wonRef = useRef(false);
+  const timersRef = useRef<number[]>([]);
+
+  const clearTimers = useCallback(() => {
+    timersRef.current.forEach((t) => window.clearTimeout(t));
+    timersRef.current = [];
+  }, []);
+
+  const playSequence = useCallback((s: number[]) => {
+    setShowing(true);
+    inputRef.current = 0;
+    clearTimers();
+    s.forEach((pad, i) => {
+      timersRef.current.push(window.setTimeout(() => setActive(pad), 500 + i * 720));
+      timersRef.current.push(window.setTimeout(() => setActive(null), 500 + i * 720 + 420));
+    });
+    timersRef.current.push(window.setTimeout(() => setShowing(false), 500 + s.length * 720 + 120));
+  }, [clearTimers]);
+
+  useEffect(() => {
+    const len = round + 2; // 2, 3, 4
+    const s = Array.from({ length: len }, () => Math.floor(Math.random() * PADS));
+    setSeq(s);
+    playSequence(s);
+    return clearTimers;
+  }, [round, playSequence, clearTimers]);
+
+  function tapPad(pad: number) {
+    if (showing || wonRef.current) return;
+    setActive(pad);
+    window.setTimeout(() => setActive(null), 160);
+    if (pad === seq[inputRef.current]) {
+      inputRef.current += 1;
+      if (inputRef.current >= seq.length) {
+        if (round + 1 >= TARGET_ROUNDS) { wonRef.current = true; onWin(); }
+        else setRound((r) => r + 1);
+      }
+    } else {
+      playSequence(seq); // wrong — forgiving: replay the same pattern
+    }
+  }
+
+  return (
+    <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 px-6">
+      <div className="font-sans font-extrabold text-white/90" style={{ fontSize: "clamp(1rem,3vw,1.4rem)" }}>
+        {showing ? "Watch the pattern…" : "Now copy it!"}
+      </div>
+      <div className="grid grid-cols-2 gap-4" style={{ width: "min(74vw, 320px)" }}>
+        {Array.from({ length: PADS }).map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            onPointerDown={() => tapPad(i)}
+            className="aspect-square rounded-3xl border-2"
+            style={{
+              background: padColors[i],
+              opacity: active === i ? 1 : 0.4,
+              transform: active === i ? "scale(1.06)" : "scale(1)",
+              borderColor: "rgba(255,255,255,0.5)",
+              boxShadow: active === i ? `0 0 28px ${villain.glow}` : "none",
+              transition: "transform 0.1s, opacity 0.1s",
+            }}
+          />
+        ))}
+      </div>
+      <div className="font-mono font-bold uppercase tracking-[0.2em] text-white/55" style={{ fontSize: "clamp(0.7rem,1.6vw,0.9rem)" }}>
+        Round {Math.min(round + 1, TARGET_ROUNDS)} / {TARGET_ROUNDS}
+      </div>
+    </div>
+  );
+}
+
+// ── TRACE THE SEAL (drag along the glowing path without leaving it) ──────────
+function TraceGame({ villain, onWin }: { villain: Villain; onWin: () => void }) {
+  const pts = [
+    { x: 14, y: 70 }, { x: 28, y: 42 }, { x: 42, y: 64 },
+    { x: 56, y: 36 }, { x: 70, y: 60 }, { x: 86, y: 34 },
+  ];
+  const last = pts.length - 1;
+  const [idx, setIdx] = useState(0);
+  const wonRef = useRef(false);
+  const TOL = 11;
+
+  function move(e: React.PointerEvent) {
+    if (wonRef.current) return;
+    const x = (e.clientX / window.innerWidth) * 100;
+    const y = (e.clientY / window.innerHeight) * 100;
+    let i = idx;
+    while (i < last) {
+      const n = pts[i + 1]!;
+      const dx = n.x - x, dy = n.y - y;
+      if (dx * dx + dy * dy <= TOL * TOL) i += 1;
+      else break;
+    }
+    if (i !== idx) setIdx(i);
+    if (i >= last && !wonRef.current) { wonRef.current = true; window.setTimeout(onWin, 250); }
+  }
+
+  const progress = idx / last;
+  const polyAll = pts.map((p) => `${p.x},${p.y}`).join(" ");
+  const polyDone = pts.slice(0, idx + 1).map((p) => `${p.x},${p.y}`).join(" ");
+  const marker = pts[Math.min(idx, last)]!;
+  const start = pts[0]!;
+
+  return (
+    <div className="absolute inset-0" style={{ touchAction: "none" }} onPointerMove={move} onPointerDown={move}>
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
+        <polyline points={polyAll} fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" />
+        <polyline points={polyDone} fill="none" stroke={villain.color} strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" style={{ filter: `drop-shadow(0 0 6px ${villain.glow})` }} />
+        {pts.map((p, i) => (
+          <circle key={i} cx={p.x} cy={p.y} r={i === last ? 2.8 : 1.8} fill={i <= idx ? villain.color : "rgba(255,255,255,0.3)"} />
+        ))}
+      </svg>
+      {idx === 0 && (
+        <div className="absolute font-mono font-bold uppercase tracking-[0.2em] text-white/70" style={{ left: `${start.x}%`, top: `${start.y + 7}%`, transform: "translate(-50%,0)", fontSize: "clamp(0.6rem,1.4vw,0.8rem)" }}>Start</div>
+      )}
+      <div className="absolute" style={{ left: `${marker.x}%`, top: `${marker.y}%`, transform: "translate(-50%,-50%)", fontSize: "clamp(2rem,6vw,3rem)", filter: `drop-shadow(0 0 14px ${villain.glow})`, pointerEvents: "none" }}>{villain.targetEmoji}</div>
+      <div className="absolute inset-x-0 top-[84px] mx-auto h-2.5 w-[min(70vw,360px)] overflow-hidden rounded-full bg-white/10 ring-1 ring-white/10">
+        <div className="h-full rounded-full transition-all" style={{ width: `${progress * 100}%`, background: `linear-gradient(90deg, ${villain.color}, #fff8e8)`, boxShadow: `0 0 10px ${villain.glow}` }} />
+      </div>
+      <div className="absolute inset-x-0 bottom-6 text-center font-sans font-bold text-white/70" style={{ fontSize: "clamp(0.85rem,2vw,1.1rem)" }}>Trace the glowing path with your finger</div>
+    </div>
   );
 }

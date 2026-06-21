@@ -277,6 +277,7 @@ export function PracticeRunner({
   );
   const nextBreakIdxRef = useRef(0);
   const lastVillainIdRef = useRef<string | null>(null);
+  const lastVillainGameRef = useRef<Villain["game"] | null>(null);
   const brainBreakActiveRef = useRef(false);
 
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
@@ -504,8 +505,12 @@ export function PracticeRunner({
     if (secondsLeft <= threshold && secondsLeft > 0) {
       nextBreakIdxRef.current = idx + 1;
       brainBreakActiveRef.current = true;
-      const villain = pickVillain(levelNumber ?? 1, lastVillainIdRef.current ?? undefined);
+      const villain = pickVillain(levelNumber ?? 1, {
+        excludeId: lastVillainIdRef.current ?? undefined,
+        excludeGame: lastVillainGameRef.current ?? undefined,
+      });
       lastVillainIdRef.current = villain.id;
+      lastVillainGameRef.current = villain.game;
       setBrainBreakVillain(villain);
     }
   }, [secondsLeft, finished, levelNumber, brainBreakSchedule]);

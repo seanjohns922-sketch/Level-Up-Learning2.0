@@ -11,7 +11,16 @@
 // Adding a villain is a single entry here — pick a shared game mechanic, a band,
 // and supply the copy/colours.
 
-export type BrainBreakGame = "whack" | "slash" | "keepuppy" | "charge" | "duel";
+export type BrainBreakGame =
+  | "whack"
+  | "slash"
+  | "keepuppy"
+  | "charge"
+  | "duel"
+  // Phase 1 variety expansion — distinct verbs/cognition:
+  | "dodge" // drag to avoid projectiles
+  | "copyme" // tap-back a flashing sequence (memory)
+  | "trace"; // trace a glowing path
 export type VillainBand = "junior" | "senior";
 
 export type Villain = {
@@ -51,7 +60,7 @@ export const VILLAINS: Villain[] = [
     name: "Confusion Creeper",
     face: "🌀",
     band: "junior",
-    game: "whack",
+    game: "trace",
     targetEmoji: "❓",
     taunt: "Feeling muddled? I'll scramble your thoughts!",
     victory: "Confusion cleared — your mind is sharp again!",
@@ -59,14 +68,14 @@ export const VILLAINS: Villain[] = [
     color: "#a78bfa",
     glow: "rgba(167,139,250,0.6)",
     winCount: 24,
-    durationSec: 55,
+    durationSec: 24,
   },
   {
     id: "time_snatcher",
     name: "Time Snatcher",
     face: "🕰️",
     band: "junior",
-    game: "slash",
+    game: "dodge",
     targetEmoji: "⏰",
     taunt: "Tick tock! I'm stealing all your time!",
     victory: "Time reclaimed — every second is yours again!",
@@ -74,14 +83,14 @@ export const VILLAINS: Villain[] = [
     color: "#c8a030",
     glow: "rgba(200,160,48,0.6)",
     winCount: 28,
-    durationSec: 55,
+    durationSec: 18,
   },
   {
     id: "noise_nibbler",
     name: "Noise Nibbler",
     face: "📣",
     band: "junior",
-    game: "whack",
+    game: "copyme",
     targetEmoji: "🔊",
     taunt: "Listen to allll this noise! You can't focus now!",
     victory: "Hushed! Lovely and quiet again.",
@@ -89,7 +98,7 @@ export const VILLAINS: Villain[] = [
     color: "#f472b6",
     glow: "rgba(244,114,182,0.6)",
     winCount: 26,
-    durationSec: 55,
+    durationSec: 26,
   },
   {
     id: "gamer_gremlin",
@@ -143,7 +152,7 @@ export const VILLAINS: Villain[] = [
     name: "Doom Scroller",
     face: "📱",
     band: "senior",
-    game: "slash",
+    game: "dodge",
     targetEmoji: "📲",
     taunt: "Keep scrolling… one more… one more… one more…",
     victory: "Screen down. Focus up. The scroll is broken!",
@@ -151,14 +160,14 @@ export const VILLAINS: Villain[] = [
     color: "#38bdf8",
     glow: "rgba(56,189,248,0.6)",
     winCount: 12,
-    durationSec: 40,
+    durationSec: 18,
   },
   {
     id: "overthink_owl",
     name: "Overthink Owl",
     face: "🦉",
     band: "senior",
-    game: "whack",
+    game: "copyme",
     targetEmoji: "💭",
     taunt: "But what if… but what if… but WHAT IF…?",
     victory: "Spiral broken! One clear thought at a time.",
@@ -166,7 +175,7 @@ export const VILLAINS: Villain[] = [
     color: "#818cf8",
     glow: "rgba(129,140,248,0.6)",
     winCount: 28,
-    durationSec: 55,
+    durationSec: 26,
   },
   {
     id: "hype_beast",
@@ -188,7 +197,7 @@ export const VILLAINS: Villain[] = [
     name: "Perfecto",
     face: "💎",
     band: "senior",
-    game: "keepuppy",
+    game: "trace",
     targetEmoji: "⭐",
     taunt: "It must be PERFECT… or don't even try…",
     victory: "Done beats perfect! You kept going anyway.",
@@ -196,7 +205,7 @@ export const VILLAINS: Villain[] = [
     color: "#67e8f9",
     glow: "rgba(103,232,249,0.6)",
     winCount: 28,
-    durationSec: 55,
+    durationSec: 24,
   },
   {
     id: "the_comparer",
@@ -228,13 +237,28 @@ export function bandForLevel(levelNumber: number): VillainBand {
 
 /**
  * Pick a villain appropriate for the student's level (varied each time).
- * Pass `excludeId` to avoid repeating the same villain within a lesson.
+ *
+ * Archetype rotation: pass the previous break's `excludeGame` so the two brain
+ * breaks in a lesson are always DIFFERENT gameplay loops (a different villain
+ * alone is not enough). `excludeId` additionally avoids the same villain.
  */
-export function pickVillain(levelNumber: number, excludeId?: string): Villain {
+export function pickVillain(
+  levelNumber: number,
+  opts?: { excludeId?: string; excludeGame?: BrainBreakGame },
+): Villain {
   const band = bandForLevel(levelNumber);
   let pool = VILLAINS.filter((v) => v.band === band);
   if (pool.length === 0) pool = VILLAINS;
-  const filtered = excludeId ? pool.filter((v) => v.id !== excludeId) : pool;
-  const choices = filtered.length > 0 ? filtered : pool;
+
+  // 1) Rotate the archetype first — never the same game back-to-back.
+  let choices = opts?.excludeGame ? pool.filter((v) => v.game !== opts.excludeGame) : pool;
+  if (choices.length === 0) choices = pool;
+
+  // 2) Then avoid repeating the exact same villain, if possible.
+  if (opts?.excludeId) {
+    const noRepeat = choices.filter((v) => v.id !== opts.excludeId);
+    if (noRepeat.length > 0) choices = noRepeat;
+  }
+
   return choices[Math.floor(Math.random() * choices.length)];
 }
