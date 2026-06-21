@@ -171,6 +171,8 @@ function CompareVisual({
     : compact
       ? 96
       : 120;
+  const isDayAxis = axis === "day";
+  const isWeekendDay = isDayAxis && item.compareValue >= 5;
   const capacityGaugeWidth = compact ? 80 : 96;
   const capacityGaugeHeight = compact ? 106 : 126;
 
@@ -248,6 +250,34 @@ function CompareVisual({
             style={{ width: imageBox, height: imageBox, objectFit: "contain" }}
           />
         </div>
+        {isDayAxis ? (
+          <div className="mt-2 flex flex-col items-center gap-2">
+            <div className="flex items-center gap-1.5">
+              {Array.from({ length: 7 }, (_, index) => (
+                <span
+                  key={`${item.label}-day-${index}`}
+                  className="rounded-full transition-all"
+                  style={{
+                    width: index === item.compareValue ? 14 : 8,
+                    height: index === item.compareValue ? 14 : 8,
+                    background: index === item.compareValue ? accent.chip : "rgba(120,53,15,0.18)",
+                    boxShadow: index === item.compareValue ? accent.glow : "none",
+                  }}
+                />
+              ))}
+            </div>
+            <div
+              className="inline-flex rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em]"
+              style={{
+                background: isWeekendDay ? "rgba(91,33,182,0.12)" : "rgba(2,132,199,0.1)",
+                color: isWeekendDay ? "#6d28d9" : "#075985",
+                border: `1px solid ${isWeekendDay ? "rgba(167,139,250,0.34)" : "rgba(125,211,252,0.38)"}`,
+              }}
+            >
+              {isWeekendDay ? "Weekend" : "School Day"}
+            </div>
+          </div>
+        ) : null}
         <div className="mt-3 flex items-center justify-center gap-2">
           <div
             className="inline-flex rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em]"

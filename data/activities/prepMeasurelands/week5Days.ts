@@ -14,16 +14,16 @@ export type DayOfWeek = {
   isWeekend: boolean;
 };
 
-const base = "/images/measurelands/days";
+const base = "/images/measurelands/days-3d";
 
 export const WEEK5_DAYS: DayOfWeek[] = [
-  { id: "monday", label: "Monday", imageSrc: `${base}/monday.svg`, dayIndex: 0, isWeekend: false },
-  { id: "tuesday", label: "Tuesday", imageSrc: `${base}/tuesday.svg`, dayIndex: 1, isWeekend: false },
-  { id: "wednesday", label: "Wednesday", imageSrc: `${base}/wednesday.svg`, dayIndex: 2, isWeekend: false },
-  { id: "thursday", label: "Thursday", imageSrc: `${base}/thursday.svg`, dayIndex: 3, isWeekend: false },
-  { id: "friday", label: "Friday", imageSrc: `${base}/friday.svg`, dayIndex: 4, isWeekend: false },
-  { id: "saturday", label: "Saturday", imageSrc: `${base}/saturday.svg`, dayIndex: 5, isWeekend: true },
-  { id: "sunday", label: "Sunday", imageSrc: `${base}/sunday.svg`, dayIndex: 6, isWeekend: true },
+  { id: "monday", label: "Monday", imageSrc: `${base}/monday.png`, dayIndex: 0, isWeekend: false },
+  { id: "tuesday", label: "Tuesday", imageSrc: `${base}/tuesday.png`, dayIndex: 1, isWeekend: false },
+  { id: "wednesday", label: "Wednesday", imageSrc: `${base}/wednesday.png`, dayIndex: 2, isWeekend: false },
+  { id: "thursday", label: "Thursday", imageSrc: `${base}/thursday.png`, dayIndex: 3, isWeekend: false },
+  { id: "friday", label: "Friday", imageSrc: `${base}/friday.png`, dayIndex: 4, isWeekend: false },
+  { id: "saturday", label: "Saturday", imageSrc: `${base}/saturday.png`, dayIndex: 5, isWeekend: true },
+  { id: "sunday", label: "Sunday", imageSrc: `${base}/sunday.png`, dayIndex: 6, isWeekend: true },
 ];
 
 /** The day after a given index, wrapping Sunday → Monday (the cycle). */
