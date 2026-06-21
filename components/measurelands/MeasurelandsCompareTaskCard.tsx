@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Rabbit, Turtle, Volume2, School, House } from "lucide-react";
+import { Rabbit, Turtle, Volume2, School, House, Sunrise, Sun, Sunset, Moon } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { speak } from "@/lib/speak";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
@@ -155,7 +155,9 @@ function CompareVisual({
             ? "Time"
             : axis === "day"
               ? "Day"
-              : "Height";
+              : axis === "timeofday"
+                ? "Time of Day"
+                : "Height";
 
   // ── Real image path ──────────────────────────────────────────────────────
   // Week 3 compare/order cards keep the CARD size fixed, but the container
@@ -255,7 +257,7 @@ function CompareVisual({
               work, the speaker + label are support. A span (not a button) so it
               can live inside the parent answer button; stopPropagation keeps a
               speaker tap from selecting the answer. */}
-          {(axis === "duration" || axis === "day") && (
+          {(axis === "duration" || axis === "day" || axis === "timeofday") && (
             <span
               role="button"
               tabIndex={0}
@@ -526,6 +528,14 @@ function SortScene({
               <School className="h-12 w-12 text-[#5f4725]" />
             ) : bin.icon === "weekend" ? (
               <House className="h-12 w-12 text-[#5f4725]" />
+            ) : bin.icon === "morning" ? (
+              <Sunrise className="h-12 w-12 text-[#5f4725]" />
+            ) : bin.icon === "afternoon" ? (
+              <Sun className="h-12 w-12 text-[#5f4725]" />
+            ) : bin.icon === "evening" ? (
+              <Sunset className="h-12 w-12 text-[#5f4725]" />
+            ) : bin.icon === "night" ? (
+              <Moon className="h-12 w-12 text-[#5f4725]" />
             ) : (
               <span className="text-5xl sm:text-6xl">{bin.icon}</span>
             )}
@@ -555,8 +565,8 @@ function OrderScene({
   const isCapacity = axis === "capacity";
   // Ordering by fill level (Lesson 3) uses fullness labels, not size labels.
   const isFill = Boolean(task.fillState);
-  // Ordering days uses positional labels (First → Last) for any count.
-  const isDay = axis === "day";
+  // Ordering days / times of day uses positional labels (First → Last).
+  const isDay = axis === "day" || axis === "timeofday";
   const slotLabels = task.orderLabels && task.orderLabels.length === slotCount
     ? task.orderLabels
     : isDay
