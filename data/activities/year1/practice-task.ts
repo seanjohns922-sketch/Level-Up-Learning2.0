@@ -576,23 +576,23 @@ export type PracticeTask = (
       /** "Find the balanced scale": several mini-scales; tap the balanced one. */
       scales?: Array<{
         id: string;
-        left: Array<{ id: string; label: string; icon: string; weight: number }>;
-        right: Array<{ id: string; label: string; icon: string; weight: number }>;
+        left: Array<{ id: string; label: string; icon: string; imageSrc?: string; weight: number }>;
+        right: Array<{ id: string; label: string; icon: string; imageSrc?: string; weight: number }>;
       }>;
       correctScaleId?: string;
       /** "Fix the scale": pick the action (add/remove) that balances it. */
       fixActions?: Array<{ id: string; label: string; icon?: string }>;
       correctFixId?: string;
       /** Items already resting on each pan. */
-      leftItems: Array<{ id: string; label: string; icon: string; weight: number }>;
-      rightItems: Array<{ id: string; label: string; icon: string; weight: number }>;
+      leftItems: Array<{ id: string; label: string; icon: string; imageSrc?: string; weight: number }>;
+      rightItems: Array<{ id: string; label: string; icon: string; imageSrc?: string; weight: number }>;
       /** Which pan the student fills/edits; the other stays fixed. */
       target: "left" | "right";
       supply: {
         // "pile" = tap to add copies of a single unit (add/remove freely until
         //          balanced — forgiving). "shelf" = pick ONE candidate (scored).
         mode: "pile" | "shelf";
-        items: Array<{ id: string; label: string; icon: string; weight: number }>;
+        items: Array<{ id: string; label: string; icon: string; imageSrc?: string; weight: number }>;
         /** pile only: max copies the student may add. */
         maxAdds?: number;
       };

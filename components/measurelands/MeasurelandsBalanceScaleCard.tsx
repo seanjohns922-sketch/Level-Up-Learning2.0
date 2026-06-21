@@ -14,6 +14,20 @@ type BalanceItem = BalanceTask["leftItems"][number];
 
 const sumWeight = (items: BalanceItem[]) => items.reduce((acc, it) => acc + it.weight, 0);
 
+function BalanceVisual({ item, size = 56 }: { item: BalanceItem; size?: number }) {
+  if (item.imageSrc) {
+    return (
+      <img
+        src={item.imageSrc}
+        alt={item.label}
+        className="object-contain"
+        style={{ width: size, height: size }}
+      />
+    );
+  }
+  return <span className="text-3xl sm:text-4xl">{item.icon}</span>;
+}
+
 /* ── Gold/violet Meazurex shell (matches the other Measurelands cards) ── */
 function Shell({
   badge,
@@ -92,10 +106,10 @@ function Scale({
               type="button"
               onClick={() => onRemove?.(side, i)}
               disabled={!onRemove}
-              className="text-3xl sm:text-4xl disabled:cursor-default"
+              className="disabled:cursor-default"
               title={onRemove ? "Tap to remove" : undefined}
             >
-              {it.icon}
+              <BalanceVisual item={it} />
             </button>
           ))
         )}
@@ -130,18 +144,18 @@ function Scale({
 /* ── Teaching demo: auto-cycles heavier-left → heavier-right → balanced ── */
 const DEMO_STATES: Array<{ left: BalanceItem[]; right: BalanceItem[]; caption: string }> = [
   {
-    left: [{ id: "d-rock", label: "Rock", icon: "🪨", weight: 9 }],
-    right: [{ id: "d-leaf", label: "Leaf", icon: "🍃", weight: 1 }],
+    left: [{ id: "d-rock", label: "Rock", icon: "🪨", imageSrc: "/images/measurelands/week2-3d/rock.png", weight: 9 }],
+    right: [{ id: "d-leaf", label: "Leaf", icon: "🍃", imageSrc: "/images/measurelands/week2-3d/leaf.png", weight: 1 }],
     caption: "The rock is heavier — it drops down.",
   },
   {
-    left: [{ id: "d-leaf2", label: "Leaf", icon: "🍃", weight: 1 }],
-    right: [{ id: "d-melon", label: "Watermelon", icon: "🍉", weight: 9 }],
+    left: [{ id: "d-leaf2", label: "Leaf", icon: "🍃", imageSrc: "/images/measurelands/week2-3d/leaf.png", weight: 1 }],
+    right: [{ id: "d-melon", label: "Watermelon", icon: "🍉", imageSrc: "/images/measurelands/week2-3d/watermelon.png", weight: 9 }],
     caption: "Now the watermelon is heavier.",
   },
   {
-    left: [{ id: "d-a1", label: "Apple", icon: "🍎", weight: 4 }],
-    right: [{ id: "d-a2", label: "Apple", icon: "🍎", weight: 4 }],
+    left: [{ id: "d-a1", label: "Apple", icon: "🍎", imageSrc: "/images/measurelands/week2-3d/apple.png", weight: 4 }],
+    right: [{ id: "d-a2", label: "Apple", icon: "🍎", imageSrc: "/images/measurelands/week2-3d/apple.png", weight: 4 }],
     caption: "Two apples are the same — it balances!",
   },
 ];
@@ -224,11 +238,11 @@ function MiniScale({ left, right, picked }: { left: BalanceItem[]; right: Balanc
     >
       <div className="mx-auto h-2 w-[80%] rounded-full" style={{ background: "linear-gradient(90deg,#b45309,#d6b86c,#b45309)", transform: `rotate(${angle}deg)`, transition: "transform 300ms" }} />
       <div className="mt-1 flex items-start justify-between">
-        <div className="flex w-[42%] justify-center text-3xl sm:text-4xl" style={{ transform: `translateY(${-angle * 1.4}px)`, transition: "transform 300ms" }}>
-          {left.map((it) => it.icon).join("")}
+        <div className="flex w-[42%] justify-center gap-1" style={{ transform: `translateY(${-angle * 1.4}px)`, transition: "transform 300ms" }}>
+          {left.map((it) => <BalanceVisual key={it.id} item={it} size={44} />)}
         </div>
-        <div className="flex w-[42%] justify-center text-3xl sm:text-4xl" style={{ transform: `translateY(${angle * 1.4}px)`, transition: "transform 300ms" }}>
-          {right.map((it) => it.icon).join("")}
+        <div className="flex w-[42%] justify-center gap-1" style={{ transform: `translateY(${angle * 1.4}px)`, transition: "transform 300ms" }}>
+          {right.map((it) => <BalanceVisual key={it.id} item={it} size={44} />)}
         </div>
       </div>
       <div className="mx-auto mt-1 h-0 w-0" style={{ borderLeft: "12px solid transparent", borderRight: "12px solid transparent", borderBottom: "18px solid #8a5a16" }} />

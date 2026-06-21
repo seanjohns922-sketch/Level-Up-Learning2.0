@@ -1,5 +1,15 @@
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { buildMeasurelandsWeek2Lesson2QuizTasks } from "./week2Lesson2";
+import {
+  WEEK2_BALANCE_OBJECTS,
+  WEEK2_HEAVY_OBJECTS,
+  WEEK2_LIGHT_OBJECTS,
+  WEEK2_MASS_OBJECTS,
+  WEEK2_TRIO_SETS,
+  type Week2MassThing,
+  toWeek2BalanceItem,
+  toWeek2MassCompareObject,
+} from "./week2MassObjects";
 
 // ── Measurelands · Ground · Week 2 Weekly Quiz — "Balance Basin" ──
 // 15 questions total:
@@ -29,82 +39,10 @@ function shuffle<T>(items: T[]): T[] {
 
 const ACCENTS: Accent[] = ["rose", "gold", "teal", "sky", "violet", "leaf"];
 
-type Thing = { id: string; label: string; icon: string; weight: number };
-
-const HEAVY: Thing[] = [
-  { id: "rock", label: "Rock", icon: "🪨", weight: 10 },
-  { id: "truck", label: "Truck", icon: "🚚", weight: 10 },
-  { id: "elephant", label: "Elephant", icon: "🐘", weight: 10 },
-  { id: "treasure", label: "Treasure Chest", icon: "🧰", weight: 10 },
-  { id: "boot", label: "Boot", icon: "🥾", weight: 7 },
-  { id: "chair", label: "Chair", icon: "🪑", weight: 8 },
-  { id: "basketball", label: "Basketball", icon: "🏀", weight: 8 },
-  { id: "backpack", label: "Backpack", icon: "🎒", weight: 8 },
-];
-
-const LIGHT: Thing[] = [
-  { id: "feather", label: "Feather", icon: "🪶", weight: 1 },
-  { id: "leaf", label: "Leaf", icon: "🍃", weight: 1 },
-  { id: "coin", label: "Coin", icon: "🪙", weight: 1 },
-  { id: "spoon", label: "Spoon", icon: "🥄", weight: 2 },
-  { id: "pencil", label: "Pencil", icon: "✏️", weight: 2 },
-  { id: "apple", label: "Apple", icon: "🍎", weight: 3 },
-  { id: "tennis", label: "Tennis Ball", icon: "🎾", weight: 3 },
-  { id: "orange", label: "Orange", icon: "🍊", weight: 3 },
-];
-
-const TRIO_SETS: Array<Thing[]> = [
-  [
-    { id: "coin", label: "Coin", icon: "🪙", weight: 1 },
-    { id: "apple", label: "Apple", icon: "🍎", weight: 3 },
-    { id: "backpack", label: "Backpack", icon: "🎒", weight: 8 },
-  ],
-  [
-    { id: "leaf", label: "Leaf", icon: "🍃", weight: 1 },
-    { id: "boot", label: "Boot", icon: "🥾", weight: 7 },
-    { id: "rock", label: "Rock", icon: "🪨", weight: 10 },
-  ],
-  [
-    { id: "spoon", label: "Spoon", icon: "🥄", weight: 2 },
-    { id: "bucket", label: "Bucket", icon: "🪣", weight: 6 },
-    { id: "treasure", label: "Treasure Chest", icon: "🧰", weight: 10 },
-  ],
-  [
-    { id: "mouse", label: "Mouse", icon: "🐭", weight: 2 },
-    { id: "dog", label: "Dog", icon: "🐕", weight: 6 },
-    { id: "elephant", label: "Elephant", icon: "🐘", weight: 10 },
-  ],
-  [
-    { id: "coin", label: "Coin", icon: "🪙", weight: 1 },
-    { id: "helmet", label: "Helmet", icon: "⛑️", weight: 5 },
-    { id: "boulder", label: "Boulder", icon: "🪨", weight: 10 },
-  ],
-];
-
-function toMassObj(thing: Thing, accent: Accent, suffix = ""): MObj {
-  return {
-    id: `${thing.id}${suffix}`,
-    label: thing.label,
-    icon: thing.icon,
-    compareValue: thing.weight,
-    axis: "mass",
-    accent,
-  };
-}
-
-function makeBalanceItem(thing: Thing, suffix = ""): BalanceItem {
-  return {
-    id: `${thing.id}${suffix}`,
-    label: thing.label,
-    icon: thing.icon,
-    weight: thing.weight,
-  };
-}
-
-function makePairQuestion(targetMode: "heavier" | "lighter", heavy: Thing, light: Thing): CompareTask {
+function makePairQuestion(targetMode: "heavier" | "lighter", heavy: Week2MassThing, light: Week2MassThing): CompareTask {
   const accents = shuffle(ACCENTS);
-  const heavyObj = toMassObj(heavy, accents[0]!);
-  const lightObj = toMassObj(light, accents[1]!);
+  const heavyObj = toWeek2MassCompareObject(heavy, accents[0]!);
+  const lightObj = toWeek2MassCompareObject(light, accents[1]!);
   return {
     kind: "measurementCompare",
     scene: "pair",
@@ -121,9 +59,9 @@ function makePairQuestion(targetMode: "heavier" | "lighter", heavy: Thing, light
   };
 }
 
-function makeTrioQuestion(targetMode: "heaviest" | "lightest", things: Thing[]): CompareTask {
+function makeTrioQuestion(targetMode: "heaviest" | "lightest", things: Week2MassThing[]): CompareTask {
   const accents = shuffle(ACCENTS);
-  const objects = things.map((thing, index) => toMassObj(thing, accents[index]!));
+  const objects = things.map((thing, index) => toWeek2MassCompareObject(thing, accents[index]!));
   const ordered = [...objects].sort((a, b) => a.compareValue - b.compareValue);
   const correct = targetMode === "heaviest" ? ordered[ordered.length - 1]! : ordered[0]!;
   return {
@@ -142,29 +80,11 @@ function makeTrioQuestion(targetMode: "heaviest" | "lightest", things: Thing[]):
   };
 }
 
-const BALANCE_OBJECTS: Thing[] = [
-  { id: "apple", label: "Apple", icon: "🍎", weight: 3 },
-  { id: "banana", label: "Banana", icon: "🍌", weight: 4 },
-  { id: "orange", label: "Orange", icon: "🍊", weight: 3 },
-  { id: "watermelon", label: "Watermelon", icon: "🍉", weight: 9 },
-  { id: "pencil", label: "Pencil", icon: "✏️", weight: 2 },
-  { id: "book", label: "Book", icon: "📕", weight: 7 },
-  { id: "backpack", label: "Backpack", icon: "🎒", weight: 9 },
-  { id: "soccer", label: "Soccer Ball", icon: "⚽", weight: 6 },
-  { id: "basketball", label: "Basketball", icon: "🏀", weight: 8 },
-  { id: "tennis", label: "Tennis Ball", icon: "🎾", weight: 3 },
-  { id: "shoe", label: "Shoe", icon: "👟", weight: 5 },
-  { id: "spoon", label: "Spoon", icon: "🥄", weight: 2 },
-  { id: "teddy", label: "Teddy Bear", icon: "🧸", weight: 6 },
-  { id: "rock", label: "Rock", icon: "🪨", weight: 8 },
-  { id: "leaf", label: "Leaf", icon: "🍃", weight: 1 },
-];
-
-function pickDistinctBalanceThings(count: number): Thing[] {
-  return shuffle(BALANCE_OBJECTS).slice(0, count);
+function pickDistinctBalanceThings(count: number): Week2MassThing[] {
+  return shuffle(WEEK2_BALANCE_OBJECTS).slice(0, count);
 }
 
-function makeJudgeQuestion(left: Thing, right: Thing, balanced: boolean): BalanceTask {
+function makeJudgeQuestion(left: Week2MassThing, right: Week2MassThing, balanced: boolean): BalanceTask {
   const rightThing = balanced ? right : { ...right, weight: right.weight + 2 };
   return {
     kind: "balanceScale",
@@ -172,29 +92,29 @@ function makeJudgeQuestion(left: Thing, right: Thing, balanced: boolean): Balanc
     prompt: "Will it balance?",
     speakText: "Look at the scale. Will it balance? Yes or no?",
     badgeLabel: "Will It Balance?",
-    leftItems: [makeBalanceItem(left, "-L")],
-    rightItems: [makeBalanceItem(rightThing, "-R")],
+    leftItems: [toWeek2BalanceItem(left, "-L")],
+    rightItems: [toWeek2BalanceItem(rightThing, "-R")],
     target: "right",
     supply: { mode: "shelf", items: [] },
     feedback: { correct: "Yes, you spotted it!", wrong: "Look again. Do both sides match?" },
   };
 }
 
-function makePickSameObjectQuestion(target: Thing, distractorA: Thing, distractorB: Thing): BalanceTask {
+function makePickSameObjectQuestion(target: Week2MassThing, distractorA: Week2MassThing, distractorB: Week2MassThing): BalanceTask {
   return {
     kind: "balanceScale",
     prompt: "Match the object.",
     speakText: "Pick the same object so the scale balances.",
     badgeLabel: "Match the Object",
-    leftItems: [makeBalanceItem(target, "-L")],
+    leftItems: [toWeek2BalanceItem(target, "-L")],
     rightItems: [],
     target: "right",
     supply: {
       mode: "shelf",
       items: shuffle([
-        makeBalanceItem(target, "-ok"),
-        makeBalanceItem(distractorA, "-d1"),
-        makeBalanceItem(distractorB, "-d2"),
+        toWeek2BalanceItem(target, "-ok"),
+        toWeek2BalanceItem(distractorA, "-d1"),
+        toWeek2BalanceItem(distractorB, "-d2"),
       ]),
     },
     feedback: { correct: "Same object — it balances!", wrong: "Pick the one that matches." },
@@ -216,18 +136,18 @@ function makePickBalancedScaleQuestion(): BalanceTask {
     scales: shuffle([
       {
         id: balancedId,
-        left: [makeBalanceItem(balancedObj!, "-l")],
-        right: [makeBalanceItem(balancedObj!, "-r")],
+        left: [toWeek2BalanceItem(balancedObj!, "-l")],
+        right: [toWeek2BalanceItem(balancedObj!, "-r")],
       },
       {
         id: "scale-1",
-        left: [makeBalanceItem(leftA!, "-l1")],
-        right: [makeBalanceItem(rightA!, "-r1")],
+        left: [toWeek2BalanceItem(leftA!, "-l1")],
+        right: [toWeek2BalanceItem(rightA!, "-r1")],
       },
       {
         id: "scale-2",
-        left: [makeBalanceItem(leftB!, "-l2")],
-        right: [makeBalanceItem(rightB!, "-r2")],
+        left: [toWeek2BalanceItem(leftB!, "-l2")],
+        right: [toWeek2BalanceItem(rightB!, "-r2")],
       },
     ]),
     correctScaleId: balancedId,
@@ -235,14 +155,14 @@ function makePickBalancedScaleQuestion(): BalanceTask {
   };
 }
 
-function makeFixScaleQuestion(base: Thing, extra: Thing, distractor: Thing): BalanceTask {
+function makeFixScaleQuestion(base: Week2MassThing, extra: Week2MassThing, distractor: Week2MassThing): BalanceTask {
   return {
     kind: "balanceScale",
     prompt: "Fix the scale.",
     speakText: "One side has something extra. Choose what will fix the scale.",
     badgeLabel: "Fix the Scale",
-    leftItems: [makeBalanceItem(base, "-L")],
-    rightItems: [makeBalanceItem(base, "-Rbase"), makeBalanceItem(extra, "-Rextra")],
+    leftItems: [toWeek2BalanceItem(base, "-L")],
+    rightItems: [toWeek2BalanceItem(base, "-Rbase"), toWeek2BalanceItem(extra, "-Rextra")],
     target: "right",
     supply: { mode: "shelf", items: [] },
     fixActions: shuffle([
@@ -270,18 +190,18 @@ function makeFindMatchingScaleQuestion(): BalanceTask {
     scales: shuffle([
       {
         id: correctScaleId,
-        left: [makeBalanceItem(balancedObj!, "-same-l")],
-        right: [makeBalanceItem(balancedObj!, "-same-r")],
+        left: [toWeek2BalanceItem(balancedObj!, "-same-l")],
+        right: [toWeek2BalanceItem(balancedObj!, "-same-r")],
       },
       {
         id: "different-1",
-        left: [makeBalanceItem(leftA!, "-d1-l")],
-        right: [makeBalanceItem(rightA!, "-d1-r")],
+        left: [toWeek2BalanceItem(leftA!, "-d1-l")],
+        right: [toWeek2BalanceItem(rightA!, "-d1-r")],
       },
       {
         id: "different-2",
-        left: [makeBalanceItem(leftB!, "-d2-l")],
-        right: [makeBalanceItem(rightB!, "-d2-r")],
+        left: [toWeek2BalanceItem(leftB!, "-d2-l")],
+        right: [toWeek2BalanceItem(rightB!, "-d2-r")],
       },
     ]),
     correctScaleId,
@@ -291,17 +211,17 @@ function makeFindMatchingScaleQuestion(): BalanceTask {
 
 export function buildMeasurelandsWeek2QuizTasks(): PracticeTask[] {
   const lesson1: PracticeTask[] = [
-    makePairQuestion("heavier", HEAVY[0]!, LIGHT[0]!),
-    makePairQuestion("lighter", HEAVY[1]!, LIGHT[1]!),
-    makeTrioQuestion("heaviest", TRIO_SETS[0]!),
-    makeTrioQuestion("lightest", TRIO_SETS[1]!),
+    makePairQuestion("heavier", WEEK2_HEAVY_OBJECTS[0]!, WEEK2_LIGHT_OBJECTS[0]!),
+    makePairQuestion("lighter", WEEK2_HEAVY_OBJECTS[1]!, WEEK2_LIGHT_OBJECTS[1]!),
+    makeTrioQuestion("heaviest", WEEK2_TRIO_SETS[0]!.items),
+    makeTrioQuestion("lightest", WEEK2_TRIO_SETS[1]!.items),
     {
       kind: "measurementCompare",
       scene: "sort",
       prompt: "Is it heavy or light?",
       speakText: "Is the apple heavy or light?",
       badgeLabel: "Heavy or Light Sort",
-      objects: [toMassObj({ id: "apple", label: "Apple", icon: "🍎", weight: 3 }, "rose")],
+      objects: [toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.apple, "rose")],
       bins: [
         { id: "heavy", label: "Heavy", icon: "🪨" },
         { id: "light", label: "Light", icon: "🪶" },

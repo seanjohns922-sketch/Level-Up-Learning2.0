@@ -1,4 +1,10 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
+import {
+  WEEK2_HEAVY_OBJECTS,
+  WEEK2_LIGHT_OBJECTS,
+  WEEK2_MASS_OBJECTS,
+  toWeek2MassCompareObject,
+} from "./week2MassObjects";
 
 // ── Measurelands · Ground · Week 2 · Lesson 1 — "Heavy or Light?" ──
 // AC9MFM01 (Ground, no formal units): compare mass using heavier / lighter.
@@ -43,67 +49,27 @@ function choose<T>(items: T[]): T {
 const ACCENTS: Accent[] = ["rose", "gold", "teal", "sky", "violet", "leaf"];
 
 // Object mass is real-world obvious. Heavy ≥ 7, light ≤ 3 — never ambiguous.
-type Thing = { id: string; label: string; icon: string; weight: number };
-
-const HEAVY: Thing[] = [
-  { id: "rock", label: "Rock", icon: "🪨", weight: 8 },
-  { id: "brick", label: "Brick", icon: "🧱", weight: 8 },
-  { id: "elephant", label: "Elephant", icon: "🐘", weight: 10 },
-  { id: "truck", label: "Truck", icon: "🚚", weight: 10 },
-  { id: "watermelon", label: "Watermelon", icon: "🍉", weight: 8 },
-  { id: "bowling", label: "Bowling Ball", icon: "🎳", weight: 9 },
-  { id: "backpack", label: "Backpack", icon: "🎒", weight: 7 },
-  { id: "boot", label: "Boot", icon: "🥾", weight: 7 },
-  { id: "chair", label: "Chair", icon: "🪑", weight: 8 },
-  { id: "horse", label: "Horse", icon: "🐎", weight: 10 },
-  { id: "car", label: "Car", icon: "🚗", weight: 10 },
-  { id: "bucket", label: "Bucket", icon: "🪣", weight: 7 },
-  { id: "treasure", label: "Treasure Chest", icon: "🧰", weight: 9 },
-  { id: "bicycle", label: "Bicycle", icon: "🚲", weight: 7 },
-];
-
-const LIGHT: Thing[] = [
-  { id: "feather", label: "Feather", icon: "🪶", weight: 1 },
-  { id: "leaf", label: "Leaf", icon: "🍃", weight: 1 },
-  { id: "pencil", label: "Pencil", icon: "✏️", weight: 2 },
-  { id: "eraser", label: "Eraser", icon: "🧽", weight: 2 },
-  { id: "flower", label: "Flower", icon: "🌸", weight: 2 },
-  { id: "balloon", label: "Balloon", icon: "🎈", weight: 1 },
-  { id: "coin", label: "Coin", icon: "🪙", weight: 2 },
-  { id: "strawberry", label: "Strawberry", icon: "🍓", weight: 2 },
-  { id: "tennis", label: "Tennis Ball", icon: "🎾", weight: 3 },
-  { id: "spoon", label: "Spoon", icon: "🥄", weight: 2 },
-  { id: "cup", label: "Cup", icon: "🥤", weight: 3 },
-  { id: "mouse", label: "Mouse", icon: "🐭", weight: 3 },
-  { id: "butterfly", label: "Butterfly", icon: "🦋", weight: 1 },
-  { id: "apple", label: "Apple", icon: "🍎", weight: 3 },
-];
-
-function toObj(thing: Thing, accent: Accent): MObj {
-  return { id: thing.id, label: thing.label, icon: thing.icon, compareValue: thing.weight, axis: "mass", accent };
-}
-
 const TEACHING_MOMENTS: NonNullable<CompareTask["teachingMoments"]> = [
   {
     id: "rock-feather",
     title: "Heavier and Lighter",
-    left: { label: "Rock", icon: "🪨", compareValue: 8, axis: "mass", accent: "gold" },
-    right: { label: "Feather", icon: "🪶", compareValue: 1, axis: "mass", accent: "sky" },
+    left: { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.rock, "gold") },
+    right: { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.feather, "sky") },
     narration: "The rock is heavier. The feather is lighter.",
   },
   {
-    id: "elephant-car",
+    id: "elephant-apple",
     title: "Which Pushes Down More?",
-    left: { label: "Elephant", icon: "🐘", compareValue: 10, axis: "mass", accent: "leaf" },
-    right: { label: "Toy Car", icon: "🚗", compareValue: 3, axis: "mass", accent: "rose" },
-    narration: "The elephant is heavier. The toy car is lighter.",
+    left: { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.elephant, "leaf") },
+    right: { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.apple, "rose") },
+    narration: "The elephant is heavier. The apple is lighter.",
   },
   {
-    id: "chest-coin",
+    id: "backpack-coin",
     title: "Heavy or Light?",
-    left: { label: "Treasure Chest", icon: "🧰", compareValue: 9, axis: "mass", accent: "violet" },
-    right: { label: "Coin", icon: "🪙", compareValue: 1, axis: "mass", accent: "teal" },
-    narration: "The treasure chest is heavier. The coin is lighter.",
+    left: { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.backpack, "violet") },
+    right: { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.coin, "teal") },
+    narration: "The backpack is heavier. The coin is lighter.",
   },
 ];
 
@@ -130,16 +96,16 @@ function buildIntroTask(): CompareTask {
 
 // A heavy + a light object → guaranteed clear difference, no repeat of last set.
 function pickPair(memory: LessonMemory): [MObj, MObj] {
-  let heavy = choose(HEAVY);
-  let light = choose(LIGHT);
+  let heavy = choose(WEEK2_HEAVY_OBJECTS);
+  let light = choose(WEEK2_LIGHT_OBJECTS);
   let guard = 0;
   while (`${heavy.id}-${light.id}` === memory.lastSetId && guard++ < 20) {
-    heavy = choose(HEAVY);
-    light = choose(LIGHT);
+    heavy = choose(WEEK2_HEAVY_OBJECTS);
+    light = choose(WEEK2_LIGHT_OBJECTS);
   }
   memory.lastSetId = `${heavy.id}-${light.id}`;
   const acc = shuffle(ACCENTS);
-  return [toObj(heavy, acc[0]!), toObj(light, acc[1]!)];
+  return [toWeek2MassCompareObject(heavy, acc[0]!), toWeek2MassCompareObject(light, acc[1]!)];
 }
 
 // Activity A — Which is heavier?
@@ -167,7 +133,7 @@ function buildLighterTask(memory: LessonMemory): CompareTask {
 // Activity C — Heavy or Light Sort: drop one object into the right basket.
 function buildSortTask(memory: LessonMemory): CompareTask {
   const fromHeavy = Math.random() < 0.5;
-  const pool = fromHeavy ? HEAVY : LIGHT;
+  const pool = fromHeavy ? WEEK2_HEAVY_OBJECTS : WEEK2_LIGHT_OBJECTS;
   let thing = choose(pool);
   let guard = 0;
   while (thing.id === memory.lastSetId && guard++ < 20) thing = choose(pool);
@@ -178,7 +144,7 @@ function buildSortTask(memory: LessonMemory): CompareTask {
     kind: "measurementCompare", scene: "sort",
     prompt: "Is it heavy or light?", speakText: `Is the ${thing.label.toLowerCase()} heavy or light?`,
     badgeLabel: "Heavy or Light Sort",
-    objects: [toObj(thing, choose(ACCENTS))],
+    objects: [toWeek2MassCompareObject(thing, choose(ACCENTS))],
     bins: [
       { id: "heavy", label: "Heavy", icon: "🪨" },
       { id: "light", label: "Light", icon: "🪶" },

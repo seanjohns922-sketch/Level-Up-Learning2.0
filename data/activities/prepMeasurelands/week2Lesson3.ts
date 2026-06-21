@@ -1,4 +1,10 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
+import {
+  WEEK2_BALANCE_OBJECTS,
+  WEEK2_MASS_OBJECTS,
+  type Week2MassThing,
+  toWeek2BalanceItem,
+} from "./week2MassObjects";
 
 // ── Measurelands · Ground · Week 2 · Lesson 3 — "Balance the Scales" ──
 // AC9MFM01 (Ground): balanced / not balanced / same weight — using real-world
@@ -44,34 +50,11 @@ function shuffle<T>(items: T[]): T[] {
 // Everyday objects, each with a DISTINCT (hidden) weight roughly following
 // real-world mass — so different objects never accidentally balance, and any
 // tilt the child sees looks believable.
-type Obj = { id: string; label: string; icon: string; weight: number };
-const OBJECTS: Obj[] = [
-  { id: "leaf", label: "Leaf", icon: "🍃", weight: 1 },
-  { id: "pencil", label: "Pencil", icon: "✏️", weight: 2 },
-  { id: "crayon", label: "Crayon", icon: "🖍️", weight: 3 },
-  { id: "spoon", label: "Spoon", icon: "🥄", weight: 4 },
-  { id: "tennis", label: "Tennis Ball", icon: "🎾", weight: 5 },
-  { id: "banana", label: "Banana", icon: "🍌", weight: 6 },
-  { id: "apple", label: "Apple", icon: "🍎", weight: 7 },
-  { id: "orange", label: "Orange", icon: "🍊", weight: 8 },
-  { id: "mug", label: "Mug", icon: "☕", weight: 9 },
-  { id: "shoe", label: "Shoe", icon: "👟", weight: 10 },
-  { id: "book", label: "Book", icon: "📕", weight: 11 },
-  { id: "soccer", label: "Soccer Ball", icon: "⚽", weight: 12 },
-  { id: "teddy", label: "Teddy", icon: "🧸", weight: 13 },
-  { id: "basketball", label: "Basketball", icon: "🏀", weight: 14 },
-  { id: "backpack", label: "Backpack", icon: "🎒", weight: 15 },
-  { id: "boot", label: "Boot", icon: "🥾", weight: 16 },
-  { id: "pumpkin", label: "Pumpkin", icon: "🎃", weight: 17 },
-  { id: "watermelon", label: "Watermelon", icon: "🍉", weight: 18 },
-  { id: "rock", label: "Rock", icon: "🪨", weight: 19 },
-];
-
-function pickDistinct(n: number): Obj[] {
-  return shuffle(OBJECTS).slice(0, n);
+function pickDistinct(n: number): Week2MassThing[] {
+  return shuffle(WEEK2_BALANCE_OBJECTS).slice(0, n);
 }
-function item(obj: Obj, suffix = ""): Item {
-  return { id: `${obj.id}${suffix}`, label: obj.label, icon: obj.icon, weight: obj.weight };
+function item(obj: Week2MassThing, suffix = ""): Item {
+  return toWeek2BalanceItem(obj, suffix);
 }
 
 function buildIntroTask(): BalanceTask {
@@ -85,7 +68,7 @@ function buildIntroTask(): BalanceTask {
     leftItems: [],
     rightItems: [],
     target: "right",
-    supply: { mode: "pile", items: [item(OBJECTS[0]!)] },
+    supply: { mode: "pile", items: [item(WEEK2_MASS_OBJECTS.leaf)] },
     feedback: { correct: "Let's balance!", wrong: "Let's get ready." },
   };
 }

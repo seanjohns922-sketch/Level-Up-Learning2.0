@@ -1,4 +1,12 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
+import {
+  WEEK2_MASS_OBJECTS,
+  WEEK2_QUAD_SETS,
+  WEEK2_TRIO_SETS,
+  type Week2MassSet,
+  type Week2MassThing,
+  toWeek2MassCompareObject,
+} from "./week2MassObjects";
 
 // ── Measurelands · Ground Level · Week 2 · Lesson 2 — "Order by Mass" ──
 // AC9MFM01: order objects by mass from lightest to heaviest using obvious
@@ -47,112 +55,7 @@ function choose<T>(items: T[]): T {
   return items[randInt(items.length)]!;
 }
 
-type MassThing = {
-  id: string;
-  label: string;
-  icon: string;
-  weight: number;
-};
-
-type MassSet = {
-  setId: string;
-  items: MassThing[];
-};
-
-const TRIO_SETS: MassSet[] = [
-  {
-    setId: "feather-apple-backpack",
-    items: [
-      { id: "feather", label: "Feather", icon: "🪶", weight: 1 },
-      { id: "apple", label: "Apple", icon: "🍎", weight: 4 },
-      { id: "backpack", label: "Backpack", icon: "🎒", weight: 8 },
-    ],
-  },
-  {
-    setId: "leaf-boot-rock",
-    items: [
-      { id: "leaf", label: "Leaf", icon: "🍃", weight: 1 },
-      { id: "boot", label: "Boot", icon: "🥾", weight: 7 },
-      { id: "rock", label: "Rock", icon: "🪨", weight: 10 },
-    ],
-  },
-  {
-    setId: "spoon-bucket-treasure",
-    items: [
-      { id: "spoon", label: "Spoon", icon: "🥄", weight: 2 },
-      { id: "bucket", label: "Bucket", icon: "🪣", weight: 6 },
-      { id: "treasure", label: "Treasure Chest", icon: "🧰", weight: 10 },
-    ],
-  },
-  {
-    setId: "mouse-dog-elephant",
-    items: [
-      { id: "mouse", label: "Mouse", icon: "🐭", weight: 2 },
-      { id: "dog", label: "Dog", icon: "🐕", weight: 6 },
-      { id: "elephant", label: "Elephant", icon: "🐘", weight: 10 },
-    ],
-  },
-  {
-    setId: "coin-helmet-boulder",
-    items: [
-      { id: "coin", label: "Coin", icon: "🪙", weight: 1 },
-      { id: "helmet", label: "Helmet", icon: "⛑️", weight: 5 },
-      { id: "boulder", label: "Boulder", icon: "🪨", weight: 10 },
-    ],
-  },
-];
-
-const QUAD_SETS: MassSet[] = [
-  {
-    setId: "feather-apple-backpack-elephant",
-    items: [
-      { id: "feather", label: "Feather", icon: "🪶", weight: 1 },
-      { id: "apple", label: "Apple", icon: "🍎", weight: 4 },
-      { id: "backpack", label: "Backpack", icon: "🎒", weight: 8 },
-      { id: "elephant", label: "Elephant", icon: "🐘", weight: 10 },
-    ],
-  },
-  {
-    setId: "leaf-spoon-boot-rock",
-    items: [
-      { id: "leaf", label: "Leaf", icon: "🍃", weight: 1 },
-      { id: "spoon", label: "Spoon", icon: "🥄", weight: 2 },
-      { id: "boot", label: "Boot", icon: "🥾", weight: 7 },
-      { id: "rock", label: "Rock", icon: "🪨", weight: 10 },
-    ],
-  },
-  {
-    setId: "coin-bucket-helmet-boulder",
-    items: [
-      { id: "coin", label: "Coin", icon: "🪙", weight: 1 },
-      { id: "bucket", label: "Bucket", icon: "🪣", weight: 6 },
-      { id: "helmet", label: "Helmet", icon: "⛑️", weight: 8 },
-      { id: "boulder", label: "Boulder", icon: "🪨", weight: 10 },
-    ],
-  },
-  {
-    setId: "butterfly-tennis-chair-car",
-    items: [
-      { id: "butterfly", label: "Butterfly", icon: "🦋", weight: 1 },
-      { id: "tennis", label: "Tennis Ball", icon: "🎾", weight: 3 },
-      { id: "chair", label: "Chair", icon: "🪑", weight: 8 },
-      { id: "car", label: "Car", icon: "🚗", weight: 10 },
-    ],
-  },
-];
-
-function toObj(thing: MassThing, accent: Accent, suffix = ""): MObj {
-  return {
-    id: `${thing.id}${suffix}`,
-    label: thing.label,
-    icon: thing.icon,
-    compareValue: thing.weight,
-    axis: "mass",
-    accent,
-  };
-}
-
-function chooseMassSet(pool: MassSet[], memory: LessonMemory): MassSet {
+function chooseMassSet(pool: Week2MassSet[], memory: LessonMemory): Week2MassSet {
   let set = choose(pool);
   let guard = 0;
   while (set.setId === memory.lastSetId && guard++ < 20) {
@@ -162,12 +65,12 @@ function chooseMassSet(pool: MassSet[], memory: LessonMemory): MassSet {
   return set;
 }
 
-function buildAscendingObjects(set: MassSet): MObj[] {
+function buildAscendingObjects(set: Week2MassSet): MObj[] {
   const accents = shuffle(ACCENTS).slice(0, set.items.length);
   return set.items
     .slice()
     .sort((a, b) => a.weight - b.weight)
-    .map((item, index) => toObj(item, accents[index]!));
+    .map((item, index) => toWeek2MassCompareObject(item, accents[index]!));
 }
 
 const TEACHING_MOMENTS: NonNullable<CompareTask["teachingMoments"]> = [
@@ -175,37 +78,37 @@ const TEACHING_MOMENTS: NonNullable<CompareTask["teachingMoments"]> = [
     id: "feather-apple-backpack",
     title: "Lightest to Heaviest",
     objects: [
-      { label: "Feather", icon: "🪶", compareValue: 1, axis: "mass", accent: "sky" },
-      { label: "Apple", icon: "🍎", compareValue: 4, axis: "mass", accent: "rose" },
-      { label: "Backpack", icon: "🎒", compareValue: 8, axis: "mass", accent: "gold" },
+      { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.feather, "sky") },
+      { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.apple, "rose") },
+      { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.backpack, "gold") },
     ],
-    left: { label: "Feather", icon: "🪶", compareValue: 1, axis: "mass", accent: "sky" },
-    right: { label: "Backpack", icon: "🎒", compareValue: 8, axis: "mass", accent: "gold" },
+    left: { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.feather, "sky") },
+    right: { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.backpack, "gold") },
     narration: "Feather is lightest. Apple goes in the middle. Backpack is heaviest.",
   },
   {
     id: "leaf-boot-rock",
     title: "Put Them in Order",
     objects: [
-      { label: "Leaf", icon: "🍃", compareValue: 1, axis: "mass", accent: "leaf" },
-      { label: "Boot", icon: "🥾", compareValue: 7, axis: "mass", accent: "violet" },
-      { label: "Rock", icon: "🪨", compareValue: 10, axis: "mass", accent: "teal" },
+      { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.leaf, "leaf") },
+      { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.boot, "violet") },
+      { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.rock, "teal") },
     ],
-    left: { label: "Leaf", icon: "🍃", compareValue: 1, axis: "mass", accent: "leaf" },
-    right: { label: "Rock", icon: "🪨", compareValue: 10, axis: "mass", accent: "teal" },
+    left: { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.leaf, "leaf") },
+    right: { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.rock, "teal") },
     narration: "Leaf goes first. Boot goes next. Rock goes last because it is heaviest.",
   },
   {
-    id: "mouse-dog-elephant",
+    id: "coin-chair-elephant",
     title: "Heaviest Goes Last",
     objects: [
-      { label: "Mouse", icon: "🐭", compareValue: 2, axis: "mass", accent: "rose" },
-      { label: "Dog", icon: "🐕", compareValue: 6, axis: "mass", accent: "gold" },
-      { label: "Elephant", icon: "🐘", compareValue: 10, axis: "mass", accent: "leaf" },
+      { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.coin, "rose") },
+      { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.chair, "gold") },
+      { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.elephant, "leaf") },
     ],
-    left: { label: "Mouse", icon: "🐭", compareValue: 2, axis: "mass", accent: "rose" },
-    right: { label: "Elephant", icon: "🐘", compareValue: 10, axis: "mass", accent: "leaf" },
-    narration: "Mouse is lightest. Elephant is heaviest. We line them up from lightest to heaviest.",
+    left: { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.coin, "rose") },
+    right: { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.elephant, "leaf") },
+    narration: "Coin is lightest. Elephant is heaviest. We line them up from lightest to heaviest.",
   },
 ];
 
@@ -231,7 +134,7 @@ function buildIntroTask(): CompareTask {
 }
 
 function buildLightestToHeaviestTask(memory: LessonMemory): CompareTask {
-  const set = chooseMassSet(TRIO_SETS, memory);
+  const set = chooseMassSet(WEEK2_TRIO_SETS, memory);
   const ordered = buildAscendingObjects(set);
   return {
     kind: "measurementCompare",
@@ -248,12 +151,12 @@ function buildLightestToHeaviestTask(memory: LessonMemory): CompareTask {
 }
 
 function buildBalanceBridgeTask(memory: LessonMemory): CompareTask {
-  const set = chooseMassSet(QUAD_SETS, memory);
+  const set = chooseMassSet(WEEK2_QUAD_SETS, memory);
   const ordered = buildAscendingObjects(set);
   const prefix = [ordered[0]!, ordered[1]!, ordered[2]!];
   const correct = ordered[3]!;
-  const distractorA = toObj(set.items[0]!, choose(ACCENTS), "-dA");
-  const distractorB = toObj(set.items[1]!, choose(ACCENTS), "-dB");
+  const distractorA = toWeek2MassCompareObject(set.items[0]!, choose(ACCENTS), "-dA");
+  const distractorB = toWeek2MassCompareObject(set.items[1]!, choose(ACCENTS), "-dB");
 
   return {
     kind: "measurementCompare",
@@ -270,7 +173,7 @@ function buildBalanceBridgeTask(memory: LessonMemory): CompareTask {
 }
 
 function buildMassSortingLineTask(memory: LessonMemory): CompareTask {
-  const set = chooseMassSet(QUAD_SETS, memory);
+  const set = chooseMassSet(WEEK2_QUAD_SETS, memory);
   const ordered = buildAscendingObjects(set);
   return {
     kind: "measurementCompare",
@@ -287,11 +190,11 @@ function buildMassSortingLineTask(memory: LessonMemory): CompareTask {
 }
 
 export function buildMeasurelandsWeek2Lesson2QuizTasks(): PracticeTask[] {
-  const q1Set = buildAscendingObjects(TRIO_SETS[0]!);
-  const q2Set = buildAscendingObjects(TRIO_SETS[1]!);
-  const q3Set = buildAscendingObjects(TRIO_SETS[2]!);
-  const q4Set = buildAscendingObjects(QUAD_SETS[0]!);
-  const q5Set = buildAscendingObjects(QUAD_SETS[1]!);
+  const q1Set = buildAscendingObjects(WEEK2_TRIO_SETS[0]!);
+  const q2Set = buildAscendingObjects(WEEK2_TRIO_SETS[1]!);
+  const q3Set = buildAscendingObjects(WEEK2_TRIO_SETS[2]!);
+  const q4Set = buildAscendingObjects(WEEK2_QUAD_SETS[0]!);
+  const q5Set = buildAscendingObjects(WEEK2_QUAD_SETS[1]!);
 
   const q4Correct = q4Set[3]!;
   const q4DistractorA = { ...q4Set[0]!, id: `${q4Set[0]!.id}-qa` };
