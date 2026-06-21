@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Rabbit, Turtle } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
@@ -143,7 +144,15 @@ function CompareVisual({
   const massPanDrop = Math.round((item.compareValue / 10) * (compact ? 12 : 16));
 
   const axisLabel =
-    axis === "mass" ? "Weight" : axis === "length" ? "Length" : axis === "capacity" ? "Capacity" : "Height";
+    axis === "mass"
+      ? "Weight"
+      : axis === "length"
+        ? "Length"
+        : axis === "capacity"
+          ? "Capacity"
+          : axis === "duration"
+            ? "Time"
+            : "Height";
 
   // ── Real image path ──────────────────────────────────────────────────────
   // Week 3 compare/order cards keep the CARD size fixed, but the container
@@ -366,7 +375,7 @@ function CompareVisual({
         className="mt-3 inline-flex rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em]"
         style={{ background: accent.chip, color: accent.text }}
       >
-        {axis === "mass" ? "Weight" : axis === "length" ? "Length" : axis === "capacity" ? "Capacity" : "Height"}
+        {axisLabel}
       </div>
     </div>
   );
@@ -488,6 +497,10 @@ function SortScene({
           >
             {typeof bin.fill === "number" ? (
               <FillGlyph fill={bin.fill} />
+            ) : bin.icon === "quick" ? (
+              <Rabbit className="h-12 w-12 text-[#5f4725]" />
+            ) : bin.icon === "slow" ? (
+              <Turtle className="h-12 w-12 text-[#5f4725]" />
             ) : (
               <span className="text-5xl sm:text-6xl">{bin.icon}</span>
             )}

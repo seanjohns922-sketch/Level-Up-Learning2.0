@@ -475,7 +475,7 @@ export type PracticeTask = (
         label: string;
         icon: string;
         compareValue: number;
-        axis: "length" | "height" | "mass" | "capacity";
+        axis: "length" | "height" | "mass" | "capacity" | "duration";
         /** Optional visible fill amount for capacity scenes, 0..1 */
         waterLevel?: number;
         accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
@@ -490,7 +490,7 @@ export type PracticeTask = (
         label: string;
         icon: string;
         compareValue: number;
-        axis: "length" | "height" | "mass" | "capacity";
+        axis: "length" | "height" | "mass" | "capacity" | "duration";
         waterLevel?: number;
         accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
         /** Optional real image (transparent PNG/SVG). Falls back to `icon` emoji. */
@@ -503,7 +503,7 @@ export type PracticeTask = (
           label: string;
           icon: string;
           compareValue: number;
-          axis: "length" | "height" | "mass" | "capacity";
+          axis: "length" | "height" | "mass" | "capacity" | "duration";
           waterLevel?: number;
           accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
           /** Optional real image (transparent PNG/SVG). Falls back to `icon` emoji. */
@@ -513,7 +513,7 @@ export type PracticeTask = (
           label: string;
           icon: string;
           compareValue: number;
-          axis: "length" | "height" | "mass" | "capacity";
+          axis: "length" | "height" | "mass" | "capacity" | "duration";
           waterLevel?: number;
           accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
           /** Optional real image (transparent PNG/SVG). Falls back to `icon` emoji. */
@@ -523,7 +523,7 @@ export type PracticeTask = (
           label: string;
           icon: string;
           compareValue: number;
-          axis: "length" | "height" | "mass" | "capacity";
+          axis: "length" | "height" | "mass" | "capacity" | "duration";
           waterLevel?: number;
           accent: "gold" | "teal" | "violet" | "rose" | "sky" | "leaf";
           /** Optional real image (transparent PNG/SVG). Falls back to `icon` emoji. */

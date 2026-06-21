@@ -39,6 +39,11 @@ import {
   buildMeasurelandsWeek3Lesson3QuizTasks,
   resetPrepMeasurelandsWeek3Lesson3TaskSessionState,
 } from "@/data/activities/prepMeasurelands/week3Lesson3";
+import {
+  generatePrepMeasurelandsWeek4Lesson1Task,
+  buildMeasurelandsWeek4Lesson1QuizTasks,
+  resetPrepMeasurelandsWeek4Lesson1TaskSessionState,
+} from "@/data/activities/prepMeasurelands/week4Lesson1";
 
 type MeasurelandsLessonEntry = {
   prefix: string;
@@ -207,6 +212,24 @@ const PREP_MEASURELANDS_LESSONS: MeasurelandsLessonEntry[] = [
     unlockMessage: "Weekly Quiz unlocked.",
     returnRoute: "/program?year=Prep&week=3&legacy=1&realm_id=measurement",
     quizContributionBuilder: buildMeasurelandsWeek3Lesson3QuizTasks,
+  },
+  {
+    prefix: "y0-measurement-w4-l1",
+    week: 4,
+    lessonNumber: 1,
+    title: "Which Takes Longer?",
+    subtitle: "Duration Dunes",
+    generate: generatePrepMeasurelandsWeek4Lesson1Task,
+    reset: resetPrepMeasurelandsWeek4Lesson1TaskSessionState,
+    practisedSkills: [
+      "Comparing how long activities take",
+      "Finding longer and shorter activities",
+      "Using quick and slow language",
+    ],
+    completionTitle: "Duration Dunes Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+    returnRoute: "/program?year=Prep&week=4&legacy=1&realm_id=measurement",
+    quizContributionBuilder: buildMeasurelandsWeek4Lesson1QuizTasks,
   },
 ];
 
