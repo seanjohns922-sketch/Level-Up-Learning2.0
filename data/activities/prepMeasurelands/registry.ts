@@ -44,6 +44,11 @@ import {
   buildMeasurelandsWeek4Lesson1QuizTasks,
   resetPrepMeasurelandsWeek4Lesson1TaskSessionState,
 } from "@/data/activities/prepMeasurelands/week4Lesson1";
+import {
+  generatePrepMeasurelandsWeek4Lesson2Task,
+  buildMeasurelandsWeek4Lesson2QuizTasks,
+  resetPrepMeasurelandsWeek4Lesson2TaskSessionState,
+} from "@/data/activities/prepMeasurelands/week4Lesson2";
 
 type MeasurelandsLessonEntry = {
   prefix: string;
@@ -230,6 +235,25 @@ const PREP_MEASURELANDS_LESSONS: MeasurelandsLessonEntry[] = [
     unlockMessage: "Lesson 2 unlocked.",
     returnRoute: "/program?year=Prep&week=4&legacy=1&realm_id=measurement",
     quizContributionBuilder: buildMeasurelandsWeek4Lesson1QuizTasks,
+  },
+  {
+    prefix: "y0-measurement-w4-l2",
+    week: 4,
+    lessonNumber: 2,
+    title: "Order the Activities",
+    subtitle: "Duration Dunes",
+    generate: generatePrepMeasurelandsWeek4Lesson2Task,
+    reset: resetPrepMeasurelandsWeek4Lesson2TaskSessionState,
+    practisedSkills: [
+      "Ordering activities by how long they take",
+      "Finding the quickest activity",
+      "Finding the longest activity",
+      "Using quickest and longest",
+    ],
+    completionTitle: "Time Trail Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+    returnRoute: "/program?year=Prep&week=4&legacy=1&realm_id=measurement",
+    quizContributionBuilder: buildMeasurelandsWeek4Lesson2QuizTasks,
   },
 ];
 
