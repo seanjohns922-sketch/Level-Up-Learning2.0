@@ -74,7 +74,7 @@ const PAIR_SETS: PairSet[] = [
   { setId: "mug-bathtub", less: CONTAINERS.mug, more: CONTAINERS.bathtub },
   { setId: "bottle-fish-tank", less: CONTAINERS.bottle, more: CONTAINERS.fishTank },
   { setId: "cup-jug", less: CONTAINERS.cup, more: CONTAINERS.jug },
-  { setId: "lunchbox-bucket", less: CONTAINERS.lunchbox, more: CONTAINERS.bucket },
+  { setId: "watering-can-bathtub", less: CONTAINERS.wateringCan, more: CONTAINERS.bathtub },
   { setId: "mug-kettle", less: CONTAINERS.mug, more: CONTAINERS.kettle },
   { setId: "bottle-watering-can", less: CONTAINERS.bottle, more: CONTAINERS.wateringCan },
   { setId: "jug-bathtub", less: CONTAINERS.jug, more: CONTAINERS.bathtub },
@@ -86,8 +86,8 @@ const ORDER_SETS: OrderSet[] = [
     items: [CONTAINERS.cup, CONTAINERS.bottle, CONTAINERS.jug, CONTAINERS.bucket],
   },
   {
-    setId: "mug-lunchbox-kettle-fish-tank",
-    items: [CONTAINERS.mug, CONTAINERS.lunchbox, CONTAINERS.kettle, CONTAINERS.fishTank],
+    setId: "mug-bottle-kettle-fish-tank",
+    items: [CONTAINERS.mug, CONTAINERS.bottle, CONTAINERS.kettle, CONTAINERS.fishTank],
   },
   {
     setId: "cup-bottle-watering-can-bathtub",

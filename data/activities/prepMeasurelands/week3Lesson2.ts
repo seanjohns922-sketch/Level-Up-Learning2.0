@@ -50,8 +50,8 @@ const ORDER_SETS: ContainerSet[] = [
     items: [CONTAINERS.mug, CONTAINERS.bottle, CONTAINERS.wateringCan, CONTAINERS.bathtub],
   },
   {
-    setId: "cup-lunchbox-bucket-bathtub",
-    items: [CONTAINERS.cup, CONTAINERS.lunchbox, CONTAINERS.bucket, CONTAINERS.bathtub],
+    setId: "cup-jug-bucket-bathtub",
+    items: [CONTAINERS.cup, CONTAINERS.jug, CONTAINERS.bucket, CONTAINERS.bathtub],
   },
   {
     setId: "mug-kettle-bucket-bathtub",
@@ -157,11 +157,11 @@ const TEACHING_MOMENTS: NonNullable<CompareTask["teachingMoments"]> = [
     narration: "We start with the container that holds less. Then we move to the one that holds more.",
   },
   {
-    id: "cup-lunchbox-bucket-bathtub",
+    id: "cup-jug-bucket-bathtub",
     title: "Largest Holds the Most",
     objects: [
       toTeachingObj(WEEK3_CONTAINERS.cup, "sky"),
-      toTeachingObj(WEEK3_CONTAINERS.lunchbox, "violet"),
+      toTeachingObj(WEEK3_CONTAINERS.jug, "violet"),
       toTeachingObj(WEEK3_CONTAINERS.bucket, "teal"),
       toTeachingObj(WEEK3_CONTAINERS.bathtub, "gold"),
     ],

@@ -28,13 +28,6 @@ export const WEEK3_CONTAINERS = {
     imageSrc: "/images/measurelands/containers/bottle.png",
     capacity: 3,
   },
-  lunchbox: {
-    id: "lunchbox",
-    label: "Lunchbox",
-    icon: "🍱",
-    imageSrc: "/images/measurelands/containers/lunchbox.png",
-    capacity: 4,
-  },
   jug: {
     id: "jug",
     label: "Jug",
