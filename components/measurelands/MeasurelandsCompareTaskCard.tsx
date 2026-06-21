@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Rabbit, Turtle } from "lucide-react";
+import { Rabbit, Turtle, Volume2 } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
+import { speak } from "@/lib/speak";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type MeasurelandsCompareTask = Extract<PracticeTask, { kind: "measurementCompare" }>;
@@ -241,11 +242,29 @@ function CompareVisual({
             style={{ width: imageBox, height: imageBox, objectFit: "contain" }}
           />
         </div>
-        <div
-          className="mt-3 inline-flex rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em]"
-          style={{ background: accent.chip, color: accent.text }}
-        >
-          {axisLabel}
+        <div className="mt-3 flex items-center justify-center gap-2">
+          <div
+            className="inline-flex rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em]"
+            style={{ background: accent.chip, color: accent.text }}
+          >
+            {axisLabel}
+          </div>
+          {/* Read-aloud support for non-readers (Foundation): the scene does the
+              work, the speaker + label are support. A span (not a button) so it
+              can live inside the parent answer button; stopPropagation keeps a
+              speaker tap from selecting the answer. */}
+          {axis === "duration" && (
+            <span
+              role="button"
+              tabIndex={0}
+              aria-label={`Hear: ${item.label}`}
+              onClick={(e) => { e.stopPropagation(); void speak(item.label, undefined, "manual"); }}
+              onPointerDown={(e) => e.stopPropagation()}
+              className="inline-flex items-center justify-center rounded-full border border-[#ead6a8] bg-white/80 p-1.5 text-[#5f4725] transition hover:bg-white"
+            >
+              <Volume2 className="h-4 w-4" />
+            </span>
+          )}
         </div>
       </div>
     );
