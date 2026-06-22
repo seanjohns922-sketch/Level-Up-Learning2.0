@@ -31,6 +31,11 @@ const OBJECTS: MassObject[] = [
   { id: "rock", label: "Rock", image: `${BASE}/rock.png`, cubes: 9, look: 2 },
   { id: "chair", label: "Chair", image: `${BASE}/chair.png`, cubes: 9, look: 5 },
   { id: "elephant", label: "Elephant", image: `${BASE}/elephant.png`, cubes: 10, look: 5 },
+  // New big-light / small-heavy busters.
+  { id: "balloon", label: "Balloon", image: `${BASE}/balloon.png`, cubes: 2, look: 5 },
+  { id: "soccer-ball", label: "Soccer Ball", image: `${BASE}/soccer-ball.png`, cubes: 3, look: 5 },
+  { id: "pumpkin", label: "Pumpkin", image: `${BASE}/pumpkin.png`, cubes: 5, look: 5 },
+  { id: "book", label: "Book", image: `${BASE}/book.png`, cubes: 7, look: 2 },
 ];
 
 const BY_ID: Record<string, MassObject> = Object.fromEntries(OBJECTS.map((o) => [o.id, o]));
@@ -82,8 +87,8 @@ function buildIntroTask(): MassTask {
       "Professor Gauge has reached Balance Basin! Last year we compared heavy and light. Now we can measure mass. If we use the same balance cubes each time, our measurements are fair. The object that needs more cubes has greater mass.",
     badgeLabel: "Meazurex Mission",
     teachingItems: [
-      { imageSrc: BY_ID.apple!.image, label: "Apple", cubes: 3, caption: "The apple balances 3 balance cubes." },
-      { imageSrc: BY_ID.watermelon!.image, label: "Watermelon", cubes: 8, caption: "The watermelon needs 8 cubes — it has greater mass." },
+      { imageSrc: BY_ID["soccer-ball"]!.image, label: "Soccer Ball", cubes: 3, caption: "The big soccer ball is only 3 balance cubes." },
+      { imageSrc: BY_ID.book!.image, label: "Book", cubes: 7, caption: "The small book is 7 cubes — it has greater mass! Size doesn't tell us mass; the cubes do." },
     ],
     feedback: { correct: "Let's start measuring!", wrong: "Let's get ready." },
   };
