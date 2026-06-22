@@ -136,6 +136,26 @@ function rodDepth(unitPx: number) {
   return Math.round(unitPx * 0.32);
 }
 
+// Audit-driven visible-span ratios for the horizontal Measurelands measuring
+// assets. These are based on the actual non-transparent pixel width inside each
+// 768px PNG, so the visible object length can be calibrated against the block
+// rod instead of assuming every file fills its canvas equally.
+const MEASURE_OBJECT_VISIBLE_RATIO: Record<string, number> = {
+  "carrot.png": 705 / 768,
+  "crayon.png": 512 / 768,
+  "cucumber.png": 637 / 768,
+  "pencil.png": 725 / 768,
+  "plank.png": 759 / 768,
+  "snake.png": 732 / 768,
+  "vine.png": 751 / 768,
+  "worm.png": 742 / 768,
+};
+
+function visibleRatioForImage(imageSrc: string) {
+  const filename = imageSrc.split("/").pop() ?? "";
+  return MEASURE_OBJECT_VISIBLE_RATIO[filename] ?? 1;
+}
+
 /* ── A connected MAB-style rod: N unit cubes joined end-to-end ── */
 function BlockRod({ length, unitPx = UNIT_PX }: { length: number; unitPx?: number }) {
   if (length <= 0) return null;
@@ -187,7 +207,9 @@ function MeasuredObject({
 }) {
   const unitPx = compact ? COMPACT_UNIT_PX : UNIT_PX;
   const depth = rodDepth(unitPx);
-  const width = length * unitPx + depth;
+  const rodWidth = length * unitPx + depth;
+  const visibleRatio = visibleRatioForImage(imageSrc);
+  const width = rodWidth / visibleRatio;
   return (
     <div className="mb-1 flex flex-col items-center">
       <div style={{ width }}>
