@@ -433,8 +433,12 @@ function ProgramPage() {
         <img
           src={
             isMeasurementRealm
-              ? !isPrep && levelNum === 1
+              ? isPrep
+                ? "/images/measurelands-home-bg.jpg"
+                : levelNum === 1
                 ? "/images/measurelands-home-bg-y1.jpg"
+                : levelNum === 2
+                ? "/images/measurelands-home-bg-y2.jpg"
                 : "/images/measurelands-home-bg.jpg"
               : getHomeBg(levelNum, isPrep)
           }
