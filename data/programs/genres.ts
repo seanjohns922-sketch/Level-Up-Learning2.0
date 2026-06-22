@@ -1,6 +1,7 @@
 import type { WeekPlan, Lesson } from "./year1";
 import { programs } from "./index";
 import { PREP_MEASURELANDS_PROGRAM } from "./prepMeasurelands";
+import { YEAR1_MEASURELANDS_PROGRAM } from "./year1Measurelands";
 
 export type Genre = {
   id: string;
@@ -129,6 +130,12 @@ export function getCurriculumPlan(yearLabel: string, genreId: string): WeekPlan[
 
   if (genre.available && genreId === "measurement" && yearLabel === "Prep") {
     return PREP_MEASURELANDS_PROGRAM;
+  }
+
+  // Keep Year 1 Measurelands curriculum visible in planning/explorer views
+  // before the actual lesson registry/launch pipeline is built.
+  if (genreId === "measurement" && yearLabel === "Year 1") {
+    return YEAR1_MEASURELANDS_PROGRAM;
   }
 
   return placeholderWeeks(yearLabel, genre);
