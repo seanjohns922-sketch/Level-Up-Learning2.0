@@ -26,7 +26,9 @@ const CONTAINERS: Container[] = [
   { id: "jug", label: "Jug", image: `${BASE}/jug.png`, cups: 5, look: 3 },
   { id: "kettle", label: "Kettle", image: `${BASE}/kettle.png`, cups: 5, look: 3 },
   { id: "watering-can", label: "Watering Can", image: `${BASE}/watering-can.png`, cups: 6, look: 3 },
+  { id: "teapot", label: "Teapot", image: `${BASE}/teapot.png`, cups: 6, look: 3 },
   { id: "bucket", label: "Bucket", image: `${BASE}/bucket.png`, cups: 7, look: 4 },
+  { id: "pot", label: "Pot", image: `${BASE}/pot.png`, cups: 8, look: 4 },
 ];
 
 const BY_ID: Record<string, Container> = Object.fromEntries(CONTAINERS.map((c) => [c.id, c]));
