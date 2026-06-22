@@ -21,7 +21,7 @@ export type Week2MassSet = {
 };
 
 export const WEEK2_MASS_OBJECTS = {
-  feather: { id: "feather", label: "Feather", icon: "🪶", imageSrc: `${BASE}/feather.png`, weight: 1 },
+  feather: { id: "feather", label: "Feather", icon: "🪶", imageSrc: `${BASE}/feather-v2.png`, weight: 1 },
   leaf: { id: "leaf", label: "Leaf", icon: "🍃", imageSrc: `${BASE}/leaf.png`, weight: 1 },
   coin: { id: "coin", label: "Coin", icon: "🪙", imageSrc: `${BASE}/coin.png`, weight: 1 },
   pencil: { id: "pencil", label: "Pencil", icon: "✏️", imageSrc: `${BASE}/pencil.png`, weight: 2 },
@@ -138,4 +138,3 @@ export function toWeek2BalanceItem(thing: Week2MassThing, suffix = ""): BalanceI
     weight: thing.weight,
   };
 }
-
