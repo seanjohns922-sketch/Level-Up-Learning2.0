@@ -98,7 +98,7 @@ const Y1_MEASURELANDS_LESSONS: Y1MeasurelandsLessonEntry[] = [
     prefix: "y1-measurement-w2-l1",
     week: 2,
     lessonNumber: 1,
-    title: "Measure with Balance Cubes",
+    title: "Measuring Mass",
     subtitle: "Balance Basin",
     generate: generateY1MeasurelandsWeek2Lesson1Task,
     reset: resetY1MeasurelandsWeek2Lesson1TaskSessionState,
