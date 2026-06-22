@@ -84,6 +84,11 @@ import {
   buildMeasurelandsWeek6Lesson3QuizTasks,
   resetPrepMeasurelandsWeek6Lesson3TaskSessionState,
 } from "@/data/activities/prepMeasurelands/week6Lesson3";
+import {
+  generatePrepMeasurelandsWeek7Lesson1Task,
+  buildMeasurelandsWeek7Lesson1QuizTasks,
+  resetPrepMeasurelandsWeek7Lesson1TaskSessionState,
+} from "@/data/activities/prepMeasurelands/week7Lesson1";
 
 type MeasurelandsLessonEntry = {
   prefix: string;
@@ -416,6 +421,24 @@ const PREP_MEASURELANDS_LESSONS: MeasurelandsLessonEntry[] = [
     unlockMessage: "Weekly Quiz unlocked.",
     returnRoute: "/program?year=Prep&week=6&legacy=1&realm_id=measurement",
     quizContributionBuilder: buildMeasurelandsWeek6Lesson3QuizTasks,
+  },
+  {
+    prefix: "y0-measurement-w7-l1",
+    week: 7,
+    lessonNumber: 1,
+    title: "Today",
+    subtitle: "Calendar Keep",
+    generate: generatePrepMeasurelandsWeek7Lesson1Task,
+    reset: resetPrepMeasurelandsWeek7Lesson1TaskSessionState,
+    practisedSkills: [
+      "Finding today on the calendar",
+      "Telling today from another day",
+      "Putting today's events in order",
+    ],
+    completionTitle: "Today Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+    returnRoute: "/program?year=Prep&week=7&legacy=1&realm_id=measurement",
+    quizContributionBuilder: buildMeasurelandsWeek7Lesson1QuizTasks,
   },
 ];
 

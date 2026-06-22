@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Rabbit, Turtle, Volume2, School, House, Sunrise, Sun, Sunset, Moon } from "lucide-react";
+import { Rabbit, Turtle, Volume2, School, House, Sunrise, Sun, Sunset, Moon, Star, CalendarDays } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { speak } from "@/lib/speak";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
@@ -157,7 +157,9 @@ function CompareVisual({
               ? "Day"
               : axis === "timeofday"
                 ? "Time of Day"
-                : "Height";
+                : axis === "calendar"
+                  ? "Calendar"
+                  : "Height";
 
   // ── Real image path ──────────────────────────────────────────────────────
   // For size attributes (length, height, capacity) the image itself scales with
@@ -289,7 +291,7 @@ function CompareVisual({
               work, the speaker + label are support. A span (not a button) so it
               can live inside the parent answer button; stopPropagation keeps a
               speaker tap from selecting the answer. */}
-          {(axis === "duration" || axis === "day" || axis === "timeofday") && (
+          {(axis === "duration" || axis === "day" || axis === "timeofday" || axis === "calendar") && (
             <span
               role="button"
               tabIndex={0}
@@ -568,6 +570,10 @@ function SortScene({
               <Sunset className="h-12 w-12 text-[#5f4725]" />
             ) : bin.icon === "night" ? (
               <Moon className="h-12 w-12 text-[#5f4725]" />
+            ) : bin.icon === "today" ? (
+              <Star className="h-12 w-12 text-[#f6b93b]" fill="#f6b93b" />
+            ) : bin.icon === "another-day" ? (
+              <CalendarDays className="h-12 w-12 text-[#5f4725]" />
             ) : (
               <span className="text-5xl sm:text-6xl">{bin.icon}</span>
             )}
