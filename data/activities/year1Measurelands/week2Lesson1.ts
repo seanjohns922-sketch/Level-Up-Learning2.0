@@ -16,9 +16,9 @@ const BASE = "/images/measurelands/week2-3d";
 // separately from `cubes` (its actual mass). Compare questions are built so the
 // heavier object never looks bigger — that forces students to count cubes
 // instead of guessing by picture size (breaks "bigger = heavier").
-type MassObject = { id: string; label: string; image: string; cubes: number; look: number };
+export type MassObject = { id: string; label: string; image: string; cubes: number; look: number };
 
-const OBJECTS: MassObject[] = [
+export const MASS_OBJECTS: MassObject[] = [
   { id: "feather", label: "Feather", image: `${BASE}/feather.png`, cubes: 2, look: 4 },
   { id: "leaf", label: "Leaf", image: `${BASE}/leaf.png`, cubes: 2, look: 4 },
   { id: "coin", label: "Coin", image: `${BASE}/coin.png`, cubes: 3, look: 1 },
@@ -38,7 +38,7 @@ const OBJECTS: MassObject[] = [
   { id: "book", label: "Book", image: `${BASE}/book.png`, cubes: 7, look: 2 },
 ];
 
-const BY_ID: Record<string, MassObject> = Object.fromEntries(OBJECTS.map((o) => [o.id, o]));
+const BY_ID: Record<string, MassObject> = Object.fromEntries(MASS_OBJECTS.map((o) => [o.id, o]));
 
 type LessonMemory = { introShown: boolean; cursor: number; lastId: string | null };
 const lessonMemory = new Map<string, LessonMemory>();
@@ -68,7 +68,7 @@ function choose<T>(items: T[]): T {
 }
 
 function pickObject(memory: LessonMemory): MassObject {
-  const obj = choose(OBJECTS.filter((o) => o.id !== memory.lastId));
+  const obj = choose(MASS_OBJECTS.filter((o) => o.id !== memory.lastId));
   memory.lastId = obj.id;
   return obj;
 }
@@ -115,7 +115,7 @@ function buildCountTask(memory: LessonMemory, reading: boolean): MassTask {
 // answer and students must count cubes. Falls back to any valid pair.
 function pickComparePair(memory: LessonMemory): [MassObject, MassObject] {
   const first = pickObject(memory);
-  const candidates = OBJECTS.filter((o) => o.id !== first.id && o.cubes !== first.cubes);
+  const candidates = MASS_OBJECTS.filter((o) => o.id !== first.id && o.cubes !== first.cubes);
   const busters = candidates.filter((o) => {
     const heavier = first.cubes > o.cubes ? first : o;
     const lighter = first.cubes > o.cubes ? o : first;

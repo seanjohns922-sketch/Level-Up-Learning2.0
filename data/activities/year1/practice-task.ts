@@ -613,17 +613,21 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "count" | "compare";
+      scene: "intro" | "count" | "compare" | "order" | "equal";
       /** "count": one object balancing this many cubes; MCQ on the cube count. */
       object?: { imageSrc?: string; label: string; cubes: number };
       options?: number[];
       correctAnswer?: number;
-      /** "compare": measured objects; tap the one matching the prompt. */
+      /** "compare"/"order"/"equal": measured objects shown on balance scales. */
       items?: Array<{ id: string; imageSrc?: string; label: string; cubes: number }>;
       compareMode?: "greater" | "less";
       correctOptionId?: string;
       /** "compare": hide the "· N cubes" labels (e.g. "which measures 5 cubes?"). */
       hideCounts?: boolean;
+      /** "order": correct order of item ids (lightest→heaviest or reverse). */
+      orderedIds?: string[];
+      /** "equal": the reference object the student matches by mass. */
+      target?: { imageSrc?: string; label: string; cubes: number };
       /** "intro": worked teaching scales shown during the teaching sequence. */
       teachingItems?: Array<{ imageSrc?: string; label: string; cubes: number; caption?: string }>;
       feedback?: { correct: string; wrong: string };

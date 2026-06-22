@@ -45,7 +45,7 @@ const YEAR1_MEASURELANDS_RAW: WeekPlan[] = [
     curriculum: ["AC9M1M01"],
     lessons: [
       buildLesson(2, 1, "Measuring Mass", "Mass: measure and compare mass using equal informal units (balance cubes) on a balance scale.", ["Measure with balance cubes", "Count the balance cubes", "Compare measured mass"], ["AC9M1M01"]),
-      buildLesson(2, 2, "Compare Measured Mass", "Mass: compare the mass of objects after measuring with the same informal unit.", ["Compare measured mass", "Which needs more bears?", "Same-unit mass comparisons"], ["AC9M1M01"]),
+      buildLesson(2, 2, "Compare Measured Mass", "Mass: compare and order objects by their measured mass in balance cubes.", ["Compare measured mass", "Order by mass", "Find equal mass"], ["AC9M1M01"]),
       buildLesson(2, 3, "Fair or Unfair Measure?", "Mass: decide whether a measuring method is fair and consistent.", ["Fair or unfair measure?", "Use the same unit", "Spot the measuring mistake"], ["AC9M1M01"]),
     ],
   },
