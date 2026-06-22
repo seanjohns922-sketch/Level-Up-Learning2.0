@@ -99,6 +99,21 @@ import {
   buildMeasurelandsWeek7Lesson3QuizTasks,
   resetPrepMeasurelandsWeek7Lesson3TaskSessionState,
 } from "@/data/activities/prepMeasurelands/week7Lesson3";
+import {
+  generatePrepMeasurelandsWeek8Lesson1Task,
+  buildMeasurelandsWeek8Lesson1QuizTasks,
+  resetPrepMeasurelandsWeek8Lesson1TaskSessionState,
+} from "@/data/activities/prepMeasurelands/week8Lesson1";
+import {
+  generatePrepMeasurelandsWeek8Lesson2Task,
+  buildMeasurelandsWeek8Lesson2QuizTasks,
+  resetPrepMeasurelandsWeek8Lesson2TaskSessionState,
+} from "@/data/activities/prepMeasurelands/week8Lesson2";
+import {
+  generatePrepMeasurelandsWeek8Lesson3Task,
+  buildMeasurelandsWeek8Lesson3QuizTasks,
+  resetPrepMeasurelandsWeek8Lesson3TaskSessionState,
+} from "@/data/activities/prepMeasurelands/week8Lesson3";
 
 type MeasurelandsLessonEntry = {
   prefix: string;
@@ -485,6 +500,60 @@ const PREP_MEASURELANDS_LESSONS: MeasurelandsLessonEntry[] = [
     unlockMessage: "Weekly Quiz unlocked.",
     returnRoute: "/program?year=Prep&week=7&legacy=1&realm_id=measurement",
     quizContributionBuilder: buildMeasurelandsWeek7Lesson3QuizTasks,
+  },
+  {
+    prefix: "y0-measurement-w8-l1",
+    week: 8,
+    lessonNumber: 1,
+    title: "Length, Mass and Capacity Challenge",
+    subtitle: "Timewielder Trial",
+    generate: generatePrepMeasurelandsWeek8Lesson1Task,
+    reset: resetPrepMeasurelandsWeek8Lesson1TaskSessionState,
+    practisedSkills: [
+      "Comparing length, mass and capacity",
+      "Ordering by size and amount",
+      "Reviewing measurement words",
+    ],
+    completionTitle: "Measurement Challenge Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+    returnRoute: "/program?year=Prep&week=8&legacy=1&realm_id=measurement",
+    quizContributionBuilder: buildMeasurelandsWeek8Lesson1QuizTasks,
+  },
+  {
+    prefix: "y0-measurement-w8-l2",
+    week: 8,
+    lessonNumber: 2,
+    title: "Duration and Time Challenge",
+    subtitle: "Timewielder Trial",
+    generate: generatePrepMeasurelandsWeek8Lesson2Task,
+    reset: resetPrepMeasurelandsWeek8Lesson2TaskSessionState,
+    practisedSkills: [
+      "Comparing how long things take",
+      "Matching activities to time of day",
+      "Sequencing daily events",
+    ],
+    completionTitle: "Time Challenge Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+    returnRoute: "/program?year=Prep&week=8&legacy=1&realm_id=measurement",
+    quizContributionBuilder: buildMeasurelandsWeek8Lesson2QuizTasks,
+  },
+  {
+    prefix: "y0-measurement-w8-l3",
+    week: 8,
+    lessonNumber: 3,
+    title: "Measurelands Adventure Challenge",
+    subtitle: "Timewielder Trial",
+    generate: generatePrepMeasurelandsWeek8Lesson3Task,
+    reset: resetPrepMeasurelandsWeek8Lesson3TaskSessionState,
+    practisedSkills: [
+      "Days, calendar and time review",
+      "Mixed measurement review",
+      "Putting it all together",
+    ],
+    completionTitle: "Timewielder Trial Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+    returnRoute: "/program?year=Prep&week=8&legacy=1&realm_id=measurement",
+    quizContributionBuilder: buildMeasurelandsWeek8Lesson3QuizTasks,
   },
 ];
 
