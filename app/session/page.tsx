@@ -1384,6 +1384,7 @@ type GroundQuizPracticeTask = Extract<
   | { kind: "measurePath" }
   | { kind: "measureValidity" }
   | { kind: "massMeasure" }
+  | { kind: "capacityMeasure" }
   | { kind: "balanceScale" }
 >;
 

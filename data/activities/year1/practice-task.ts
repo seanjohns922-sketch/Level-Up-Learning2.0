@@ -639,6 +639,28 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Year 1 W3 L1 — measuring capacity with uniform informal
+      // units (AC9M1M01). A container is measured as N identical "cups".
+      kind: "capacityMeasure";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "count" | "compare";
+      /** "count": one container holding this many cups; MCQ on the cup count. */
+      container?: { imageSrc?: string; label: string; cups: number };
+      options?: number[];
+      correctAnswer?: number;
+      /** "compare": measured containers; tap the one matching the prompt. */
+      items?: Array<{ id: string; imageSrc?: string; label: string; cups: number }>;
+      compareMode?: "more" | "less";
+      correctOptionId?: string;
+      /** "compare": hide the "· N cups" labels (e.g. "which holds 5 cups?"). */
+      hideCounts?: boolean;
+      /** "intro": worked teaching containers shown during the teaching sequence. */
+      teachingItems?: Array<{ imageSrc?: string; label: string; cups: number; caption?: string }>;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       // Generic, reusable interactive balance scale for equivalence activities
       // (Measurelands "Balance the Scales" and any future same-weight tasks).
       // The student fills/edits one pan; the scale is solved when both pans

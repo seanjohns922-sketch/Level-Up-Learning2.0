@@ -52,6 +52,7 @@ function formatPracticeTopicLabel(kind: PracticeTask["kind"]) {
   if (kind === "measurePath") return "Path Measurer";
   if (kind === "measureValidity") return "Measure Check";
   if (kind === "massMeasure") return "Mass Measurer";
+  if (kind === "capacityMeasure") return "Cup Counter";
   if (kind === "balanceScale") return "Balance Master";
   if (kind === "groundMatch") return "Ground Match";
   if (kind === "groundCollect") return "Ground Collect";
@@ -782,6 +783,7 @@ export function PracticeRunner({
     task.kind === "measurePath" ||
     task.kind === "measureValidity" ||
     task.kind === "massMeasure" ||
+    task.kind === "capacityMeasure" ||
     task.kind === "balanceScale" ||
     task.kind === "groundMatch" ||
     task.kind === "groundCollect" ||
