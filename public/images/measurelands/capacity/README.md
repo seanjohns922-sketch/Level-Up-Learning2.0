@@ -1,5 +1,12 @@
 # Measurelands — Capacity container images
 
+See also:
+
+- `public/images/measurelands/ART_SPEC.md`
+
+That file is the top-level production spec for all Measurelands visuals and the
+source of truth for style, naming, QA, and replacement rules.
+
 ## Canonical live set
 The shipped Week 3 capacity art lives in:
 
