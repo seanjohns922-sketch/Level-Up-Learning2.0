@@ -354,7 +354,7 @@ function CompareScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onC
             </div>
             <div className="rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-3">
               {path.objectImageSrc ? (
-                <MeasuredObject imageSrc={path.objectImageSrc} length={path.length} compact />
+                <MeasuredObject imageSrc={path.objectImageSrc} length={path.length} />
               ) : null}
               <UnitsDisplay length={path.length} unitLabel={path.unitLabel} unitEmoji={path.unitEmoji} />
               <MeasurementText length={path.length} unitLabel={path.unitLabel} />
