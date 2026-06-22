@@ -183,6 +183,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "groundSpatial",
   "measurementCompare",
   "measurePath",
+  "measureValidity",
   "balanceScale",
   "groundCollect",
   "groundBuild",

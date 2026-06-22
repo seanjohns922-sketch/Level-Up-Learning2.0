@@ -68,6 +68,7 @@ import { generatePrepWeek9TaskByKind } from "@/data/activities/prep/week9";
 import { generatePrepWeek10TaskByKind } from "@/data/activities/prep/week10";
 import { generatePrepWeek11TaskByKind } from "@/data/activities/prep/week11";
 import { buildMeasurelandsWeek1QuizTasks } from "@/data/activities/prepMeasurelands/week1Quiz";
+import { buildY1MeasurelandsWeek1QuizTasks } from "@/data/activities/year1Measurelands/week1Quiz";
 import { buildMeasurelandsWeek2QuizTasks } from "@/data/activities/prepMeasurelands/week2Quiz";
 import { buildMeasurelandsWeek3QuizTasks } from "@/data/activities/prepMeasurelands/week3Quiz";
 import { buildMeasurelandsWeek4QuizTasks } from "@/data/activities/prepMeasurelands/week4Quiz";
@@ -1380,6 +1381,7 @@ type GroundQuizPracticeTask = Extract<
   | { kind: "groundGrowingCount" }
   | { kind: "measurementCompare" }
   | { kind: "measurePath" }
+  | { kind: "measureValidity" }
   | { kind: "balanceScale" }
 >;
 
@@ -1589,6 +1591,29 @@ function buildMeasurelandsWeek1WeeklyQuizQuestions(
       `mq${index + 1}`,
       lessonNumber,
       `measurelands_w1_l${lessonNumber}_q${(index % questionsPerLesson) + 1}`,
+      task as GroundQuizPracticeTask
+    );
+  });
+}
+
+// Measurelands · Level 1 · Week 1 — 15 questions (5 per lesson):
+// measure (L1) → compare (L2) → evaluate gaps/overlaps (L3).
+function buildY1MeasurelandsWeek1WeeklyQuizQuestions(
+  questionsPerLesson: number
+): QuizQuestion[] {
+  const totalExpected = questionsPerLesson * 3;
+  const tasks = buildY1MeasurelandsWeek1QuizTasks();
+  if (tasks.length !== totalExpected) {
+    throw new Error(
+      `[MeasurelandsWeeklyQuiz] Y1 Week 1 expected ${totalExpected} questions, received ${tasks.length}.`
+    );
+  }
+  return tasks.map((task, index) => {
+    const lessonNumber = (Math.floor(index / questionsPerLesson) + 1) as 1 | 2 | 3;
+    return buildGroundQuizQuestion(
+      `y1mq${index + 1}`,
+      lessonNumber,
+      `y1_measurelands_w1_l${lessonNumber}_q${(index % questionsPerLesson) + 1}`,
       task as GroundQuizPracticeTask
     );
   });
@@ -6944,6 +6969,10 @@ function SessionPage({
     const qConfig = quizConfig;
     const questionsPerLesson = qConfig?.questionsPerLesson ?? 5;
     const weekPlan = quizWeekPlan;
+
+    if (isMeasurementRealm && year === "Year 1" && Number(week) === 1) {
+      return buildY1MeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson);
+    }
 
     if (isMeasurementRealm && year === "Prep" && Number(week) === 1) {
       return buildMeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson);
