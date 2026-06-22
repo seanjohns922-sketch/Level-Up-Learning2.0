@@ -39,7 +39,7 @@ import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent 
 import { recordStudentActivityDelta } from "@/lib/student-activity";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { prepareSpeechText, speak, useAutoReadSetting, useSpeakState, useSpeechInteractionReady } from "@/lib/speak";
-import { Volume2, Sparkles, Zap, Check, PartyPopper } from "lucide-react";
+import { Volume2, Sparkles, Zap, Check, PartyPopper, SkipForward } from "lucide-react";
 import { getSkillCoaching, resolveCoachingKey } from "@/lib/skill-coaching";
 import type { TeacherAttemptQuestion, TeacherInsight, TeacherInsightInput } from "@/lib/teacher-insights";
 import { ClickableDotGrid, ClickableDotRows } from "@/components/ClickableDots";
@@ -7435,6 +7435,54 @@ function SessionPage({
     ? quizWeekPlan?.lessons?.map((lesson) => lesson.title).filter(Boolean).join(" · ") || null
     : null;
 
+  // Realm-consistent theming for the quiz results screen. Measurelands uses the
+  // gold/violet Meazurex palette; everything else keeps Number Nexus teal.
+  const quizTheme = isMeasurementRealm
+    ? {
+        glow: "linear-gradient(135deg, rgba(214,184,108,0.5) 0%, rgba(109,40,217,0.24) 50%, rgba(214,184,108,0.4) 100%)",
+        heroBg: "linear-gradient(135deg, #1b1030 0%, #2a1b52 55%, #3a2470 100%)",
+        heroShadow: "inset 0 1px 0 rgba(214,184,108,0.22), inset 0 -10px 20px rgba(0,0,0,0.45)",
+        heroBorder: "border-amber-300/20",
+        badge: "border-amber-300/35 bg-amber-400/10 text-amber-100/90",
+        scoreAccent: "text-amber-300/70",
+        passRate: "text-amber-100/80",
+        message: "text-amber-50/90",
+        readActive: "border-amber-300/60 bg-amber-400/20 text-amber-50",
+        cardBorder: "border-amber-300/20 bg-amber-400/5",
+        cardInset: "inset 0 1px 0 rgba(214,184,108,0.14)",
+        cardLabel: "text-amber-200/70",
+        cardScore: "text-amber-100",
+        cardPct: "text-amber-200/80",
+        cardFeedback: "text-amber-50/85",
+        cardSkill: "text-amber-200/55",
+        recBorder: "border-violet-300/30 bg-violet-500/12",
+        recLabel: "text-violet-100/90",
+        recText: "text-violet-50",
+        goToWeek: "bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 hover:brightness-110",
+      }
+    : {
+        glow: "linear-gradient(135deg, rgba(94,234,212,0.4) 0%, rgba(15,118,110,0.2) 50%, rgba(94,234,212,0.3) 100%)",
+        heroBg: "linear-gradient(135deg, #021716 0%, #042925 50%, #053b35 100%)",
+        heroShadow: "inset 0 1px 0 rgba(94,234,212,0.18), inset 0 -10px 20px rgba(0,0,0,0.45)",
+        heroBorder: "border-teal-300/15",
+        badge: "border-teal-300/30 bg-teal-500/10 text-teal-200/90",
+        scoreAccent: "text-teal-300/70",
+        passRate: "text-teal-100/80",
+        message: "text-emerald-200/90",
+        readActive: "border-teal-300/60 bg-teal-400/20 text-teal-100",
+        cardBorder: "border-teal-300/20 bg-teal-500/5",
+        cardInset: "inset 0 1px 0 rgba(94,234,212,0.12)",
+        cardLabel: "text-teal-200/70",
+        cardScore: "text-teal-100",
+        cardPct: "text-teal-200/80",
+        cardFeedback: "text-teal-50/85",
+        cardSkill: "text-teal-200/55",
+        recBorder: "border-emerald-300/25 bg-emerald-500/10",
+        recLabel: "text-emerald-200/85",
+        recText: "text-emerald-50",
+        goToWeek: "bg-trust-blue text-white hover:opacity-90",
+      };
+
   const lessonBreakdown = useMemo(
     () =>
       buildLessonBreakdown(
@@ -7468,6 +7516,11 @@ function SessionPage({
   );
   const weakestLessonBreakdowns = useMemo(
     () => getLowestLessonBreakdowns(lessonBreakdown),
+    [lessonBreakdown]
+  );
+  // No remediation when every question was correct.
+  const quizHasMistakes = useMemo(
+    () => lessonBreakdown.some((b) => b.correct < b.total),
     [lessonBreakdown]
   );
 
@@ -8738,7 +8791,9 @@ function SessionPage({
                   "px-5 py-2.5 rounded-md font-extrabold tracking-[0.22em] text-sm transition active:scale-[0.97]",
                   quizIndex === 0
                     ? "text-white/30 border border-white/10 bg-[#0b1220]/60 cursor-not-allowed"
-                    : "text-white border border-teal-300/40 bg-[#0b1220]/80 hover:border-teal-200/70 hover:bg-[#0e1830]/80 shadow-[inset_0_0_0_1px_rgba(94,234,212,0.08)]",
+                    : isMeasurementRealm
+                      ? "text-white border border-amber-300/40 bg-[#1b1030]/80 hover:border-amber-200/70 hover:bg-[#241544]/80 shadow-[inset_0_0_0_1px_rgba(214,184,108,0.1)]"
+                      : "text-white border border-teal-300/40 bg-[#0b1220]/80 hover:border-teal-200/70 hover:bg-[#0e1830]/80 shadow-[inset_0_0_0_1px_rgba(94,234,212,0.08)]",
                 ].join(" ")}
               >
                 ← BACK
@@ -8765,7 +8820,7 @@ function SessionPage({
                       onClick={() =>
                         router.push(`/program?year=${encodeURIComponent(year)}&week=${encodeURIComponent(String(Math.min(12, Number(week) + 1)))}&legacy=1${realmParam}`)
                       }
-                      className="px-5 py-3 rounded-2xl font-bold transition bg-trust-blue text-white hover:opacity-90"
+                      className={`px-5 py-3 rounded-2xl font-bold transition ${quizTheme.goToWeek}`}
                     >
                       Go to Week {Math.min(12, Number(week) + 1)}
                     </button>
@@ -8782,7 +8837,9 @@ function SessionPage({
                    className={[
                     "px-6 py-3 rounded-2xl font-extrabold transition active:scale-[0.97]",
                     currentAnswered
-                      ? "bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-[0_8px_24px_-10px_rgba(0,229,195,0.7)] hover:brightness-110"
+                      ? isMeasurementRealm
+                        ? "bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 shadow-[0_8px_24px_-10px_rgba(251,191,36,0.7)] hover:brightness-110"
+                        : "bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-[0_8px_24px_-10px_rgba(0,229,195,0.7)] hover:brightness-110"
                       : "bg-muted text-muted-foreground cursor-not-allowed",
                   ].join(" ")}
                 >
@@ -8823,15 +8880,14 @@ function SessionPage({
                   style={{
                     clipPath:
                       "polygon(13px 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%, 0 13px)",
-                    background:
-                      "linear-gradient(135deg, #021716 0%, #042925 50%, #053b35 100%)",
+                    background: quizTheme.heroBg,
                     boxShadow:
                       "inset 0 1px 0 rgba(251,191,36,0.2), inset 0 -10px 20px rgba(0,0,0,0.45)",
                   }}
                 >
                   <span className="inline-flex items-center gap-1.5"><PartyPopper className="h-4 w-4" /> You passed! Week {Math.min(12, Number(week) + 1)} is unlocked.</span>
-                  <div className="mt-1 font-semibold text-amber-100/80">
-                    ⏭️ Next up: tap “Go to Week {Math.min(12, Number(week) + 1)}” below.
+                  <div className="mt-1 inline-flex items-center gap-1.5 font-semibold text-amber-100/80">
+                    <SkipForward className="h-4 w-4" /> Next up: tap “Go to Week {Math.min(12, Number(week) + 1)}” below.
                   </div>
                 </div>
               </div>
@@ -8845,8 +8901,7 @@ function SessionPage({
                   style={{
                     clipPath:
                       "polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px)",
-                    background:
-                      "linear-gradient(135deg, rgba(94,234,212,0.4) 0%, rgba(15,118,110,0.2) 50%, rgba(94,234,212,0.3) 100%)",
+                    background: quizTheme.glow,
                   }}
                 />
                 <div
@@ -8854,24 +8909,22 @@ function SessionPage({
                   style={{
                     clipPath:
                       "polygon(13px 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%, 0 13px)",
-                    background:
-                      "linear-gradient(135deg, #021716 0%, #042925 50%, #053b35 100%)",
-                    boxShadow:
-                      "inset 0 1px 0 rgba(94,234,212,0.18), inset 0 -10px 20px rgba(0,0,0,0.45)",
+                    background: quizTheme.heroBg,
+                    boxShadow: quizTheme.heroShadow,
                   }}
                 >
                   {/* Hero */}
-                  <div className="px-6 py-6 text-center border-b border-teal-300/15">
-                    <div className="inline-flex items-center gap-1.5 rounded-full border border-teal-300/30 bg-teal-500/10 px-2.5 py-1 text-[9px] font-mono font-bold uppercase tracking-[0.2em] text-teal-200/90">
+                  <div className={`px-6 py-6 text-center border-b ${quizTheme.heroBorder}`}>
+                    <div className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[9px] font-mono font-bold uppercase tracking-[0.2em] ${quizTheme.badge}`}>
                       {quizCompletionTitle}
                     </div>
                     <div className="mt-2 text-4xl font-black tracking-[-0.01em] text-white">
-                      {finalScore}<span className="text-teal-300/70">/{quizQuestions.length}</span>
+                      {finalScore}<span className={quizTheme.scoreAccent}>/{quizQuestions.length}</span>
                     </div>
-                    <div className="mt-1 text-sm font-semibold text-teal-100/80">
+                    <div className={`mt-1 text-sm font-semibold ${quizTheme.passRate}`}>
                       Pass Rate · {Math.round((finalScore / Math.max(1, quizQuestions.length)) * 100)}%
                     </div>
-                    <div className="mt-2 text-sm font-semibold text-emerald-200/90">
+                    <div className={`mt-2 text-sm font-semibold ${quizTheme.message}`}>
                       {quizCompletionMessage}
                     </div>
                     <div className="mt-3 flex justify-center">
@@ -8881,7 +8934,7 @@ function SessionPage({
                         className={[
                           "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition",
                           isReadingQuizReview
-                            ? "border-teal-300/60 bg-teal-400/20 text-teal-100"
+                            ? quizTheme.readActive
                             : "border-white/15 bg-white/5 text-white/80 hover:bg-white/10",
                         ].join(" ")}
                         aria-label="Read the quiz review aloud"
@@ -8898,10 +8951,10 @@ function SessionPage({
                       {lessonBreakdown.map((item) => (
                         <div
                           key={item.lessonNumber}
-                          className="rounded-lg border border-teal-300/20 bg-teal-500/5 px-3 py-3"
-                          style={{ boxShadow: "inset 0 1px 0 rgba(94,234,212,0.12)" }}
+                          className={`rounded-lg border px-3 py-3 ${quizTheme.cardBorder}`}
+                          style={{ boxShadow: quizTheme.cardInset }}
                         >
-                          <div className="text-[9px] font-mono font-bold uppercase tracking-[0.2em] text-teal-200/70">
+                          <div className={`text-[9px] font-mono font-bold uppercase tracking-[0.2em] ${quizTheme.cardLabel}`}>
                             Lesson {item.lessonNumber}
                           </div>
                           {item.lessonTitle ? (
@@ -8909,15 +8962,15 @@ function SessionPage({
                               {item.lessonTitle}
                             </div>
                           ) : null}
-                          <div className="mt-2 text-2xl font-black text-teal-100">
+                          <div className={`mt-2 text-2xl font-black ${quizTheme.cardScore}`}>
                             {item.correct}/{item.total}
                           </div>
-                          <div className="text-xs font-semibold text-teal-200/80">{item.percent}%</div>
-                          <div className="mt-1 text-xs font-semibold text-teal-50/85">
+                          <div className={`text-xs font-semibold ${quizTheme.cardPct}`}>{item.percent}%</div>
+                          <div className={`mt-1 text-xs font-semibold ${quizTheme.cardFeedback}`}>
                             {getLessonFeedback(item.correct, item.total)}
                           </div>
                           {item.skill ? (
-                            <div className="mt-1 text-[10px] font-mono uppercase tracking-[0.15em] text-teal-200/55">
+                            <div className={`mt-1 text-[10px] font-mono uppercase tracking-[0.15em] ${quizTheme.cardSkill}`}>
                               {item.skill.replace(/_/g, " ")}
                             </div>
                           ) : null}
@@ -8925,19 +8978,21 @@ function SessionPage({
                       ))}
                     </div>
 
-                    {/* Recommended Practice */}
-                    <div className="rounded-lg border border-emerald-300/25 bg-emerald-500/10 px-3 py-3">
-                      <div className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-emerald-200/85">
-                        Recommended Practice
+                    {/* Recommended Practice / Well Done */}
+                    <div className={`rounded-lg border px-3 py-3 ${quizTheme.recBorder}`}>
+                      <div className={`text-[10px] font-mono font-bold uppercase tracking-[0.2em] ${quizTheme.recLabel}`}>
+                        {quizHasMistakes ? "Recommended Practice" : "Well Done"}
                       </div>
-                      <div className="mt-1 text-sm font-semibold text-emerald-50">
-                        {weakestLessonBreakdowns.length > 1
-                          ? `Go back and practise ${weakestLessonBreakdowns
-                              .map((item) => `Lesson ${item.lessonNumber}${item.lessonTitle ? `: ${item.lessonTitle}` : ""}`)
-                              .join(" and ")}.`
-                          : weakestLessonBreakdown
-                            ? `Go back and practise Lesson ${weakestLessonBreakdown.lessonNumber}${weakestLessonBreakdown.lessonTitle ? `: ${weakestLessonBreakdown.lessonTitle}` : ""}.`
-                            : "Keep building across all three lessons."}
+                      <div className={`mt-1 text-sm font-semibold ${quizTheme.recText}`}>
+                        {!quizHasMistakes
+                          ? "Full marks — you've mastered every skill this week!"
+                          : weakestLessonBreakdowns.length > 1
+                            ? `Go back and practise ${weakestLessonBreakdowns
+                                .map((item) => `Lesson ${item.lessonNumber}${item.lessonTitle ? `: ${item.lessonTitle}` : ""}`)
+                                .join(" and ")}.`
+                            : weakestLessonBreakdown
+                              ? `Go back and practise Lesson ${weakestLessonBreakdown.lessonNumber}${weakestLessonBreakdown.lessonTitle ? `: ${weakestLessonBreakdown.lessonTitle}` : ""}.`
+                              : "Keep building across all three lessons."}
                       </div>
                     </div>
 
@@ -8946,7 +9001,9 @@ function SessionPage({
                       <div className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-white/55">
                         Coach Tip
                       </div>
-                      <div className="mt-1 text-sm font-bold text-white">{quizCoachTip}</div>
+                      <div className="mt-1 text-sm font-bold text-white">
+                        {quizHasMistakes ? quizCoachTip : "Outstanding measuring — you answered every question correctly!"}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -8970,8 +9027,7 @@ function SessionPage({
                   style={{
                     clipPath:
                       "polygon(13px 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%, 0 13px)",
-                    background:
-                      "linear-gradient(135deg, #021716 0%, #042925 50%, #053b35 100%)",
+                    background: quizTheme.heroBg,
                     boxShadow:
                       "inset 0 1px 0 rgba(251,191,36,0.2), inset 0 -10px 20px rgba(0,0,0,0.45)",
                   }}
