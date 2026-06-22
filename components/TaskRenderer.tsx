@@ -97,6 +97,7 @@ import {
 } from "@/components/ground/GroundMiniGameTask";
 import { MeasurelandsCompareTaskCard } from "@/components/measurelands/MeasurelandsCompareTaskCard";
 import { MeasurelandsPathTaskCard } from "@/components/measurelands/MeasurelandsPathTaskCard";
+import { MeasurelandsValidityTaskCard } from "@/components/measurelands/MeasurelandsValidityTaskCard";
 import { MeasurelandsBalanceScaleCard } from "@/components/measurelands/MeasurelandsBalanceScaleCard";
 import { isPracticeTaskSafe } from "@/lib/task-safety";
 
@@ -319,6 +320,8 @@ function TaskRendererInner({
       return <MeasurelandsCompareTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "measurePath":
       return <MeasurelandsPathTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "measureValidity":
+      return <MeasurelandsValidityTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "balanceScale":
       return <MeasurelandsBalanceScaleCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundCollect":

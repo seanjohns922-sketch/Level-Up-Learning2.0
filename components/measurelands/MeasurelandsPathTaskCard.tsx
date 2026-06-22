@@ -91,7 +91,7 @@ function UnitGlyph({ kind, size = 42 }: { kind: UnitKind; size?: number }) {
 }
 
 /* ── Shared gold/violet Meazurex shell (matches the Compare card) ── */
-function PathShell({
+export function PathShell({
   badge,
   prompt,
   speakText,
@@ -129,7 +129,7 @@ function PathShell({
 }
 
 // Shared unit width so the object image spans exactly the same length as the rod.
-const UNIT_PX = 40;
+export const UNIT_PX = 40;
 const COMPACT_UNIT_PX = 26;
 
 function rodDepth(unitPx: number) {
@@ -157,7 +157,7 @@ function visibleRatioForImage(imageSrc: string) {
 }
 
 /* ── A connected MAB-style rod: N unit cubes joined end-to-end ── */
-function BlockRod({ length, unitPx = UNIT_PX }: { length: number; unitPx?: number }) {
+export function BlockRod({ length, unitPx = UNIT_PX }: { length: number; unitPx?: number }) {
   if (length <= 0) return null;
   const u = unitPx;
   const d = rodDepth(u);
@@ -194,7 +194,7 @@ function BlockRod({ length, unitPx = UNIT_PX }: { length: number; unitPx?: numbe
 }
 
 /* ── The object being measured, sized to span its block length ── */
-function MeasuredObject({
+export function MeasuredObject({
   imageSrc,
   label,
   length,

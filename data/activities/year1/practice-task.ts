@@ -581,6 +581,31 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Year 1 W1 L3 — valid measurement (AC9M1M02): informal units
+      // must be uniform, end-to-end, with no gaps and no overlaps.
+      kind: "measureValidity";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "choose" | "diagnose" | "fix";
+      /** Object being measured (optional context image above the blocks). */
+      objectImageSrc?: string;
+      objectLabel?: string;
+      /** Number of blocks in the (intended) measurement. */
+      length: number;
+      /** "choose": several block arrangements; tap the correct (fair) one. */
+      arrangements?: Array<{ id: string; flaw: "none" | "gap" | "overlap"; flawIndex?: number }>;
+      correctArrangementId?: string;
+      /** "diagnose"/"fix": a single arrangement with this flaw. */
+      flaw?: "none" | "gap" | "overlap";
+      flawIndex?: number;
+      /** "diagnose": which flaw labels to offer. */
+      diagnoseOptions?: Array<"none" | "gap" | "overlap">;
+      /** "intro": worked teaching examples. */
+      teachingArrangements?: Array<{ flaw: "none" | "gap" | "overlap"; flawIndex?: number; caption: string }>;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       // Generic, reusable interactive balance scale for equivalence activities
       // (Measurelands "Balance the Scales" and any future same-weight tasks).
       // The student fills/edits one pan; the scale is solved when both pans

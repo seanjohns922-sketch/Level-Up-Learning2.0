@@ -9,6 +9,11 @@ import {
   resetY1MeasurelandsWeek1Lesson2TaskSessionState,
   buildY1MeasurelandsWeek1Lesson2QuizTasks,
 } from "@/data/activities/year1Measurelands/week1Lesson2";
+import {
+  generateY1MeasurelandsWeek1Lesson3Task,
+  resetY1MeasurelandsWeek1Lesson3TaskSessionState,
+  buildY1MeasurelandsWeek1Lesson3QuizTasks,
+} from "@/data/activities/year1Measurelands/week1Lesson3";
 
 // Level 1 (Year 1) Measurelands lesson registry. Mirrors the Prep registry so
 // app/lesson/page.tsx can resolve `y1-measurement-w{n}-l{m}` ids to tasks.
@@ -64,6 +69,25 @@ const Y1_MEASURELANDS_LESSONS: Y1MeasurelandsLessonEntry[] = [
     unlockMessage: "Lesson 3 unlocked.",
     returnRoute: "/program?year=Year 1&week=1&legacy=1&realm_id=measurement",
     quizContributionBuilder: buildY1MeasurelandsWeek1Lesson2QuizTasks,
+  },
+  {
+    prefix: "y1-measurement-w1-l3",
+    week: 1,
+    lessonNumber: 3,
+    title: "No Gaps, No Overlaps",
+    subtitle: "Length Trail",
+    generate: generateY1MeasurelandsWeek1Lesson3Task,
+    reset: resetY1MeasurelandsWeek1Lesson3TaskSessionState,
+    practisedSkills: [
+      "Spotting a correct measurement",
+      "Spotting gaps and overlaps",
+      "Fixing a measurement",
+      "Knowing why measurements must be fair",
+    ],
+    completionTitle: "Fair Measurer Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+    returnRoute: "/program?year=Year 1&week=1&legacy=1&realm_id=measurement",
+    quizContributionBuilder: buildY1MeasurelandsWeek1Lesson3QuizTasks,
   },
 ];
 
