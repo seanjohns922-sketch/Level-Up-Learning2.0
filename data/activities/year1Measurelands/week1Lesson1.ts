@@ -11,7 +11,7 @@ import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-
 
 type MeasurePathTask = Extract<PracticeTask, { kind: "measurePath" }>;
 
-const BASE = "/images/measurelands/week1-3d";
+const BASE = "/images/measurelands/measure-objects-3d";
 
 type MeasureObject = { id: string; label: string; image: string; blocks: number };
 
