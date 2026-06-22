@@ -130,13 +130,17 @@ function PathShell({
 
 // Shared unit width so the object image spans exactly the same length as the rod.
 const UNIT_PX = 40;
-const ROD_DEPTH = 13;
+const COMPACT_UNIT_PX = 26;
+
+function rodDepth(unitPx: number) {
+  return Math.round(unitPx * 0.32);
+}
 
 /* ── A connected MAB-style rod: N unit cubes joined end-to-end ── */
 function BlockRod({ length, unitPx = UNIT_PX }: { length: number; unitPx?: number }) {
   if (length <= 0) return null;
   const u = unitPx;
-  const d = Math.round(u * 0.32);
+  const d = rodDepth(u);
   const w = length * u + d;
   const h = u + d;
   const seams = Array.from({ length: length - 1 }, (_, i) => i + 1);
@@ -181,9 +185,9 @@ function MeasuredObject({
   length: number;
   compact?: boolean;
 }) {
-  const width = compact
-    ? Math.min(320, Math.max(140, length * 26 + ROD_DEPTH))
-    : Math.min(620, Math.max(240, length * 54 + ROD_DEPTH));
+  const unitPx = compact ? COMPACT_UNIT_PX : UNIT_PX;
+  const depth = rodDepth(unitPx);
+  const width = length * unitPx + depth;
   return (
     <div className="mb-1 flex flex-col items-center">
       <div style={{ width }}>
@@ -207,11 +211,13 @@ function UnitsDisplay({
   unitLabel,
   unitEmoji,
   highlight = false,
+  compact = false,
 }: {
   length: number;
   unitLabel?: string;
   unitEmoji?: string;
   highlight?: boolean;
+  compact?: boolean;
 }) {
   const kind = unitKindFromHints(unitLabel, unitEmoji);
   if (kind === "block") {
@@ -223,7 +229,7 @@ function UnitsDisplay({
           background: "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,248,232,0.96))",
         }}
       >
-        <BlockRod length={length} />
+        <BlockRod length={length} unitPx={compact ? COMPACT_UNIT_PX : UNIT_PX} />
       </div>
     );
   }
@@ -437,7 +443,7 @@ function OrderScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCor
                 {path.objectImageSrc ? (
                   <MeasuredObject imageSrc={path.objectImageSrc} label={path.objectLabel} length={path.length} compact />
                 ) : null}
-                <UnitsDisplay length={path.length} unitLabel={path.unitLabel} unitEmoji={path.unitEmoji} />
+                <UnitsDisplay length={path.length} unitLabel={path.unitLabel} unitEmoji={path.unitEmoji} compact />
                 <MeasurementText length={path.length} unitLabel={path.unitLabel} />
               </div>
             </button>
@@ -470,7 +476,7 @@ function SameScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorr
             {path.objectImageSrc ? (
               <MeasuredObject imageSrc={path.objectImageSrc} label={path.objectLabel} length={path.length} compact />
             ) : null}
-            <UnitsDisplay length={path.length} unitLabel={path.unitLabel} unitEmoji={path.unitEmoji} />
+            <UnitsDisplay length={path.length} unitLabel={path.unitLabel} unitEmoji={path.unitEmoji} compact />
             <MeasurementText length={path.length} unitLabel={path.unitLabel} />
           </button>
         ))}
