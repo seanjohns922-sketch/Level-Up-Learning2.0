@@ -4,7 +4,7 @@
 // is the next day). The star + glow carry the meaning so a non-reader finds
 // today without reading. No real date — "today" = the marked day.
 
-const base = "/images/measurelands/calendar";
+const base = "/images/measurelands/calendar-3d";
 
 export type CalendarCard = {
   id: string;
@@ -14,9 +14,9 @@ export type CalendarCard = {
 };
 
 export const WEEK7_CALENDAR: CalendarCard[] = [
-  { id: "yesterday", label: "Yesterday", imageSrc: `${base}/yesterday.svg`, isToday: false },
-  { id: "today", label: "Today", imageSrc: `${base}/today.svg`, isToday: true },
-  { id: "tomorrow", label: "Tomorrow", imageSrc: `${base}/tomorrow.svg`, isToday: false },
+  { id: "yesterday", label: "Yesterday", imageSrc: `${base}/yesterday.png`, isToday: false },
+  { id: "today", label: "Today", imageSrc: `${base}/today.png`, isToday: true },
+  { id: "tomorrow", label: "Tomorrow", imageSrc: `${base}/tomorrow.png`, isToday: false },
 ];
 
 export const CALENDAR_BY_ID: Record<string, CalendarCard> = Object.fromEntries(
