@@ -215,6 +215,12 @@ export default function RealmCarousel() {
 
   function enterRealm() {
     if (!isActive) return;
+    // Measurelands is level-aware: Ground Level keeps its world map; higher
+    // levels open that level's program directly (no Prep-only map detour).
+    if (current.id === "measurelands" && level !== "Prep") {
+      router.push(`/program?year=${encodeURIComponent(level)}&week=1&legacy=1&realm_id=measurement`);
+      return;
+    }
     const route = realmRoutes[current.id];
     if (route) {
       router.push(route);
