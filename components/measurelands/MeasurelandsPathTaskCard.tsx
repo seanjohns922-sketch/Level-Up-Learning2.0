@@ -174,13 +174,16 @@ function MeasuredObject({
   imageSrc,
   label,
   length,
+  compact = false,
 }: {
   imageSrc: string;
   label?: string;
   length: number;
+  compact?: boolean;
 }) {
-  // Wide measuring art should read like a real length target, not a small icon.
-  const width = Math.min(620, Math.max(240, length * 54 + ROD_DEPTH));
+  const width = compact
+    ? Math.min(320, Math.max(140, length * 26 + ROD_DEPTH))
+    : Math.min(620, Math.max(240, length * 54 + ROD_DEPTH));
   return (
     <div className="mb-1 flex flex-col items-center">
       <div style={{ width }}>
@@ -188,7 +191,7 @@ function MeasuredObject({
           src={imageSrc}
           alt={label ?? "Object to measure"}
           className="h-auto w-full object-contain drop-shadow-[0_8px_14px_rgba(76,40,10,0.18)]"
-          style={{ maxHeight: 108 }}
+          style={{ maxHeight: compact ? 64 : 108 }}
         />
       </div>
       {label ? (
@@ -351,7 +354,7 @@ function CompareScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onC
             </div>
             <div className="rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-3">
               {path.objectImageSrc ? (
-                <MeasuredObject imageSrc={path.objectImageSrc} length={path.length} />
+                <MeasuredObject imageSrc={path.objectImageSrc} length={path.length} compact />
               ) : null}
               <UnitsDisplay length={path.length} unitLabel={path.unitLabel} unitEmoji={path.unitEmoji} />
               <MeasurementText length={path.length} unitLabel={path.unitLabel} />
@@ -432,7 +435,7 @@ function OrderScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCor
                   </div>
                 ) : null}
                 {path.objectImageSrc ? (
-                  <MeasuredObject imageSrc={path.objectImageSrc} label={path.objectLabel} length={path.length} />
+                  <MeasuredObject imageSrc={path.objectImageSrc} label={path.objectLabel} length={path.length} compact />
                 ) : null}
                 <UnitsDisplay length={path.length} unitLabel={path.unitLabel} unitEmoji={path.unitEmoji} />
                 <MeasurementText length={path.length} unitLabel={path.unitLabel} />
@@ -465,7 +468,7 @@ function SameScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorr
             className="rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-3 text-left transition hover:-translate-y-1"
           >
             {path.objectImageSrc ? (
-              <MeasuredObject imageSrc={path.objectImageSrc} label={path.objectLabel} length={path.length} />
+              <MeasuredObject imageSrc={path.objectImageSrc} label={path.objectLabel} length={path.length} compact />
             ) : null}
             <UnitsDisplay length={path.length} unitLabel={path.unitLabel} unitEmoji={path.unitEmoji} />
             <MeasurementText length={path.length} unitLabel={path.unitLabel} />
