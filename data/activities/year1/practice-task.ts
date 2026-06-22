@@ -613,7 +613,7 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "count" | "compare" | "order" | "equal";
+      scene: "intro" | "count" | "compare" | "order" | "equal" | "fairChoose" | "fairJudge" | "fairFix";
       /** "count": one object balancing this many cubes; MCQ on the cube count. */
       object?: { imageSrc?: string; label: string; cubes: number };
       options?: number[];
@@ -628,6 +628,12 @@ export type PracticeTask = (
       orderedIds?: string[];
       /** "equal": the reference object the student matches by mass. */
       target?: { imageSrc?: string; label: string; cubes: number };
+      /** Fairness scenes — a measurement is FAIR when every cube is the same
+       *  size. `fairUnits` are the rendered cube sizes (uniform = fair). */
+      fairUnits?: number[];
+      fair?: boolean;
+      /** "fairChoose": several measurements; tap the fair one (correctOptionId). */
+      fairArrangements?: Array<{ id: string; imageSrc?: string; label: string; units: number[] }>;
       /** "intro": worked teaching scales shown during the teaching sequence. */
       teachingItems?: Array<{ imageSrc?: string; label: string; cubes: number; caption?: string }>;
       feedback?: { correct: string; wrong: string };

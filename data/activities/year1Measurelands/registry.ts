@@ -24,6 +24,11 @@ import {
   resetY1MeasurelandsWeek2Lesson2TaskSessionState,
   buildY1MeasurelandsWeek2Lesson2QuizTasks,
 } from "@/data/activities/year1Measurelands/week2Lesson2";
+import {
+  generateY1MeasurelandsWeek2Lesson3Task,
+  resetY1MeasurelandsWeek2Lesson3TaskSessionState,
+  buildY1MeasurelandsWeek2Lesson3QuizTasks,
+} from "@/data/activities/year1Measurelands/week2Lesson3";
 
 // Level 1 (Year 1) Measurelands lesson registry. Mirrors the Prep registry so
 // app/lesson/page.tsx can resolve `y1-measurement-w{n}-l{m}` ids to tasks.
@@ -136,6 +141,25 @@ const Y1_MEASURELANDS_LESSONS: Y1MeasurelandsLessonEntry[] = [
     unlockMessage: "Lesson 3 unlocked.",
     returnRoute: "/program?year=Year 1&week=2&legacy=1&realm_id=measurement",
     quizContributionBuilder: buildY1MeasurelandsWeek2Lesson2QuizTasks,
+  },
+  {
+    prefix: "y1-measurement-w2-l3",
+    week: 2,
+    lessonNumber: 3,
+    title: "Fair or Unfair Measure?",
+    subtitle: "Balance Basin",
+    generate: generateY1MeasurelandsWeek2Lesson3Task,
+    reset: resetY1MeasurelandsWeek2Lesson3TaskSessionState,
+    practisedSkills: [
+      "Spotting a fair measurement",
+      "Using the same unit every time",
+      "Fixing an unfair measurement",
+      "Knowing why units must match",
+    ],
+    completionTitle: "Fair Measurer Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+    returnRoute: "/program?year=Year 1&week=2&legacy=1&realm_id=measurement",
+    quizContributionBuilder: buildY1MeasurelandsWeek2Lesson3QuizTasks,
   },
 ];
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Compass } from "lucide-react";
+import { Compass, Check, Scale } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
@@ -79,15 +79,19 @@ function BalanceScale({
   cubes,
   showCount = false,
   compact = false,
+  unitSizes,
 }: {
   imageSrc?: string;
   label: string;
   cubes: number;
   showCount?: boolean;
   compact?: boolean;
+  /** Mixed cube sizes (unfair when not all equal). Overrides `cubes`. */
+  unitSizes?: number[];
 }) {
   const objSize = compact ? 52 : 66;
   const cubeSize = compact ? 22 : 28;
+  const sizes = unitSizes ?? Array.from({ length: cubes }, () => cubeSize);
   const Pan = ({ children }: { children: React.ReactNode }) => (
     <div className="flex w-[44%] flex-col items-center">
       <div
@@ -118,8 +122,8 @@ function BalanceScale({
           )}
         </Pan>
         <Pan>
-          {Array.from({ length: cubes }).map((_, i) => (
-            <BalanceCube key={i} size={cubeSize} />
+          {sizes.map((s, i) => (
+            <BalanceCube key={i} size={s} />
           ))}
         </Pan>
       </div>
@@ -310,6 +314,84 @@ function EqualScene({ task, onCorrect, onWrong }: { task: MassTask; onCorrect: (
   );
 }
 
+/* ── Lesson 3: which measurement is FAIR? (all cubes the same size) ── */
+function FairChooseScene({ task, onCorrect, onWrong }: { task: MassTask; onCorrect: () => void; onWrong: () => void }) {
+  const arrangements = task.fairArrangements ?? [];
+  return (
+    <Shell badge={task.badgeLabel ?? "Which Is Fair?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="grid gap-3 sm:grid-cols-3">
+        {arrangements.map((a) => (
+          <button
+            key={a.id}
+            type="button"
+            onClick={() => (a.id === task.correctOptionId ? onCorrect() : onWrong())}
+            className="rounded-[26px] text-left transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
+          >
+            <BalanceScale imageSrc={a.imageSrc} label={a.label} cubes={a.units.length} unitSizes={a.units} compact />
+          </button>
+        ))}
+      </div>
+    </Shell>
+  );
+}
+
+/* ── Lesson 3: is this one measurement fair or not? ── */
+function FairJudgeScene({ task, onCorrect, onWrong }: { task: MassTask; onCorrect: () => void; onWrong: () => void }) {
+  const obj = task.object;
+  return (
+    <Shell badge={task.badgeLabel ?? "Fair or Unfair?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">
+        <BalanceScale imageSrc={obj?.imageSrc} label={obj?.label ?? ""} cubes={(task.fairUnits ?? []).length} unitSizes={task.fairUnits} />
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        {[true, false].map((opt) => (
+          <button
+            key={String(opt)}
+            type="button"
+            onClick={() => (opt === !!task.fair ? onCorrect() : onWrong())}
+            className="flex min-h-[72px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+          >
+            {opt ? "Fair" : "Not fair"}
+          </button>
+        ))}
+      </div>
+    </Shell>
+  );
+}
+
+/* ── Lesson 3: fix an unfair measurement → use the same cubes ── */
+function FairFixScene({ task, onCorrect }: { task: MassTask; onCorrect: () => void }) {
+  const obj = task.object;
+  const units = task.fairUnits ?? [];
+  const [fixed, setFixed] = useState(false);
+  function fix() {
+    if (fixed) return;
+    setFixed(true);
+    window.setTimeout(() => onCorrect(), 550);
+  }
+  return (
+    <Shell badge={task.badgeLabel ?? "Fix the Measurement"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">
+        <BalanceScale
+          imageSrc={obj?.imageSrc}
+          label={obj?.label ?? ""}
+          cubes={units.length}
+          unitSizes={fixed ? undefined : units}
+        />
+      </div>
+      <button
+        type="button"
+        onClick={fix}
+        disabled={fixed}
+        className="flex min-h-[72px] w-full items-center justify-center gap-2 rounded-[22px] border-2 border-[rgba(214,184,108,0.6)] bg-[#fffaf0] text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-60"
+      >
+        {fixed ? <Check className="h-6 w-6 text-emerald-600" /> : <Scale className="h-6 w-6" />}
+        {fixed ? "Fair now!" : "Use the same cubes"}
+      </button>
+    </Shell>
+  );
+}
+
 export function MeasurelandsMassMeasureCard({
   task,
   onCorrect,
@@ -323,5 +405,8 @@ export function MeasurelandsMassMeasureCard({
   if (task.scene === "compare") return <CompareScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "order") return <OrderScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "equal") return <EqualScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "fairChoose") return <FairChooseScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "fairJudge") return <FairJudgeScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "fairFix") return <FairFixScene task={task} onCorrect={onCorrect} />;
   return <CountScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 }
