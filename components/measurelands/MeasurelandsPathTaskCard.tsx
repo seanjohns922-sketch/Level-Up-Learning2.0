@@ -1,11 +1,94 @@
 "use client";
 
 import { useState } from "react";
-import { Compass } from "lucide-react";
+import { Compass, Undo2 } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type MeasurePathTask = Extract<PracticeTask, { kind: "measurePath" }>;
+
+/* ── Illustrated measuring units (no emoji) ──
+ * The block is the hero of Year 1 ("measure with blocks"); footstep / star /
+ * flower / stone keep the Ground Level informal-unit variety. The kind is
+ * inferred from the unit label/emoji so existing data needs no changes. */
+type UnitKind = "block" | "footstep" | "star" | "flower" | "stone";
+
+function unitKindFromHints(label?: string, emoji?: string): UnitKind {
+  const hint = `${label ?? ""} ${emoji ?? ""}`.toLowerCase();
+  if (hint.includes("footstep") || hint.includes("👣")) return "footstep";
+  if (hint.includes("star") || hint.includes("⭐")) return "star";
+  if (hint.includes("flower") || hint.includes("🌸")) return "flower";
+  if (hint.includes("stone") || hint.includes("🪨")) return "stone";
+  return "block";
+}
+
+function UnitGlyph({ kind, size = 42 }: { kind: UnitKind; size?: number }) {
+  if (kind === "footstep") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 48 48" fill="none" aria-hidden>
+        <path d="M16 30c0-8 2-16 8-16s7 7 6 14c-1 6-4 9-8 9s-6-3-6-7Z" fill="#8b6f4e" />
+        <ellipse cx="14" cy="38" rx="4" ry="3" fill="#8b6f4e" />
+        <ellipse cx="20" cy="40" rx="3" ry="2.4" fill="#8b6f4e" />
+        <ellipse cx="26" cy="40" rx="2.6" ry="2.2" fill="#8b6f4e" />
+        <ellipse cx="31" cy="38" rx="2.3" ry="2" fill="#8b6f4e" />
+      </svg>
+    );
+  }
+  if (kind === "star") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 48 48" fill="none" aria-hidden>
+        <defs>
+          <linearGradient id="u-star" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#ffd75e" />
+            <stop offset="100%" stopColor="#f5a623" />
+          </linearGradient>
+        </defs>
+        <path d="M24 6l5.3 11.7 12.7 1-9.6 8.5 2.9 12.6L24 33.6 12.7 40.4l2.9-12.6L6 19.3l12.7-1Z" fill="url(#u-star)" stroke="#c97f12" strokeWidth="1.6" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+  if (kind === "flower") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 48 48" fill="none" aria-hidden>
+        {[0, 60, 120, 180, 240, 300].map((a) => (
+          <ellipse key={a} cx="24" cy="13" rx="5.5" ry="9" fill="#f9a8d4" transform={`rotate(${a} 24 24)`} />
+        ))}
+        <circle cx="24" cy="24" r="6" fill="#fbbf24" stroke="#d97706" strokeWidth="1.4" />
+      </svg>
+    );
+  }
+  if (kind === "stone") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 48 48" fill="none" aria-hidden>
+        <path d="M9 28c0-7 7-13 16-13s14 5 14 12-6 9-15 9S9 34 9 28Z" fill="#9ca3af" stroke="#6b7280" strokeWidth="1.5" />
+        <path d="M15 24c3-3 8-4 12-3" stroke="#cbd5e1" strokeWidth="2" strokeLinecap="round" />
+      </svg>
+    );
+  }
+  // Hero: premium isometric block.
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" aria-hidden>
+      <defs>
+        <linearGradient id="blk-top" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#7fd3f2" />
+          <stop offset="100%" stopColor="#5cb6e0" />
+        </linearGradient>
+        <linearGradient id="blk-left" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#3f93bd" />
+          <stop offset="100%" stopColor="#2f7aa0" />
+        </linearGradient>
+        <linearGradient id="blk-right" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#54aad6" />
+          <stop offset="100%" stopColor="#3f93bd" />
+        </linearGradient>
+      </defs>
+      <path d="M24 7l15 8.5-15 8.5-15-8.5Z" fill="url(#blk-top)" stroke="#2c6a8c" strokeWidth="1.3" strokeLinejoin="round" />
+      <path d="M9 15.5l15 8.5v15l-15-8.5Z" fill="url(#blk-left)" stroke="#2c6a8c" strokeWidth="1.3" strokeLinejoin="round" />
+      <path d="M39 15.5l-15 8.5v15l15-8.5Z" fill="url(#blk-right)" stroke="#2c6a8c" strokeWidth="1.3" strokeLinejoin="round" />
+      <path d="M13 17.7l11 6.3" stroke="#bfe8fa" strokeWidth="1.1" strokeLinecap="round" opacity="0.6" />
+    </svg>
+  );
+}
 
 /* ── Shared gold/violet Meazurex shell (matches the Compare card) ── */
 function PathShell({
@@ -45,19 +128,49 @@ function PathShell({
   );
 }
 
+/* ── The object being measured, sized to span its block length ── */
+function MeasuredObject({
+  imageSrc,
+  label,
+  length,
+}: {
+  imageSrc: string;
+  label?: string;
+  length: number;
+}) {
+  // Width tracks the block count so the object visibly spans its measurement.
+  const width = Math.min(360, Math.max(96, length * 44));
+  return (
+    <div className="mb-2 flex flex-col items-center">
+      <img
+        src={imageSrc}
+        alt={label ?? "Object to measure"}
+        className="h-20 object-contain drop-shadow-[0_8px_14px_rgba(76,40,10,0.18)] sm:h-24"
+        style={{ width }}
+      />
+      {label ? (
+        <div className="mt-1 text-sm font-black uppercase tracking-[0.14em] text-[#7c4a12]">{label}</div>
+      ) : null}
+    </div>
+  );
+}
+
 /* ── A path: a row of equal, evenly-spaced units on a track ── */
 function PathTrack({
   length,
+  unitLabel,
   unitEmoji,
   highlight = false,
 }: {
   length: number;
-  unitEmoji: string;
+  unitLabel?: string;
+  unitEmoji?: string;
   highlight?: boolean;
 }) {
+  const kind = unitKindFromHints(unitLabel, unitEmoji);
   return (
     <div
-      className="flex flex-wrap items-center justify-center gap-2 rounded-[22px] border-2 px-3 py-4"
+      className="flex flex-wrap items-center justify-center gap-1.5 rounded-[22px] border-2 px-3 py-4"
       style={{
         borderColor: highlight ? "rgba(94,234,212,0.8)" : "rgba(214,184,108,0.45)",
         background: "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,248,232,0.96))",
@@ -66,11 +179,10 @@ function PathTrack({
       {Array.from({ length }).map((_, i) => (
         <span
           key={i}
-          className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[#fffaf0] text-3xl shadow-sm sm:h-14 sm:w-14 sm:text-4xl"
+          className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[#fffaf0] shadow-sm sm:h-14 sm:w-14"
           style={{ border: "1px solid rgba(214,184,108,0.4)" }}
-          aria-hidden
         >
-          {unitEmoji}
+          <UnitGlyph kind={kind} size={40} />
         </span>
       ))}
     </div>
@@ -89,10 +201,10 @@ function IntroScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect: () 
           <div className="space-y-2">
             <div className="text-sm font-black uppercase tracking-[0.16em] text-[#5b21b6]">Meazurex</div>
             <p className="text-base font-semibold leading-relaxed text-[#2c1c07]">
-              We can measure paths using equal pieces.
+              We can measure things using equal blocks.
             </p>
             <p className="text-base font-semibold leading-relaxed text-[#5f4725]">
-              We count the pieces to find the length.
+              We line them up end-to-end and count the blocks.
             </p>
           </div>
         </div>
@@ -100,6 +212,9 @@ function IntroScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect: () 
         <div className="space-y-4">
           {(task.teachingPaths ?? []).map((path, idx) => (
             <div key={idx} className="rounded-[26px] border border-[rgba(214,184,108,0.28)] bg-[rgba(255,252,245,0.92)] p-4">
+              {path.objectImageSrc ? (
+                <MeasuredObject imageSrc={path.objectImageSrc} label={path.objectLabel} length={path.length} />
+              ) : null}
               <PathTrack length={path.length} unitEmoji={path.unitEmoji} />
               <div className="mt-3 text-center text-sm font-bold text-[#5f4725]">{path.caption}</div>
             </div>
@@ -124,9 +239,12 @@ function IntroScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect: () 
 /* ── Activity A: count the units along the path ── */
 function CountScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
   return (
-    <PathShell badge={task.badgeLabel ?? "Count the Footsteps"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+    <PathShell badge={task.badgeLabel ?? "Count the Blocks"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">
-        <PathTrack length={task.pathLength ?? 0} unitEmoji={task.unitEmoji ?? "👣"} />
+        {task.objectImageSrc ? (
+          <MeasuredObject imageSrc={task.objectImageSrc} label={task.objectLabel} length={task.pathLength ?? 0} />
+        ) : null}
+        <PathTrack length={task.pathLength ?? 0} unitLabel={task.unitLabel} unitEmoji={task.unitEmoji} />
       </div>
       <div className="grid grid-cols-3 gap-3">
         {(task.options ?? []).map((value) => (
@@ -148,7 +266,7 @@ function CountScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCor
 function CompareScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
   const paths = task.paths ?? [];
   return (
-    <PathShell badge={task.badgeLabel ?? "Which Path Is Longer?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+    <PathShell badge={task.badgeLabel ?? "Which Is Longer?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="grid gap-4">
         {paths.map((path, idx) => (
           <button
@@ -158,9 +276,14 @@ function CompareScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onC
             className="rounded-[26px] border border-transparent text-left transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
           >
             <div className="mb-1 px-1 text-xs font-black uppercase tracking-[0.16em] text-[#7c3aed]">
-              Path {idx === 0 ? "A" : "B"}
+              {path.objectLabel ?? `Path ${idx === 0 ? "A" : "B"}`}
             </div>
-            <PathTrack length={path.length} unitEmoji={path.unitEmoji} />
+            <div className="rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-3">
+              {path.objectImageSrc ? (
+                <MeasuredObject imageSrc={path.objectImageSrc} length={path.length} />
+              ) : null}
+              <PathTrack length={path.length} unitLabel={path.unitLabel} unitEmoji={path.unitEmoji} />
+            </div>
           </button>
         ))}
       </div>
@@ -175,7 +298,7 @@ function CompareScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onC
 function BuildScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
   const target = task.targetLength ?? 0;
   const maxUnits = task.maxUnits ?? target + 2;
-  const unitEmoji = task.unitEmoji ?? "🟦";
+  const kind = unitKindFromHints(task.unitLabel, task.unitEmoji);
   const [count, setCount] = useState(0);
   const [locked, setLocked] = useState(false);
 
@@ -202,19 +325,22 @@ function BuildScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect: () 
   return (
     <PathShell badge={task.badgeLabel ?? "Build the Path"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">
+        {task.objectImageSrc ? (
+          <MeasuredObject imageSrc={task.objectImageSrc} label={task.objectLabel} length={target} />
+        ) : null}
         <div className="mb-3 flex items-center justify-center gap-2 text-sm font-black uppercase tracking-[0.16em] text-[#5f4725]">
           <span className="text-2xl font-black text-[#2c1c07]">{count}</span>
           <span>/ {target} {task.unitLabel ?? "blocks"}</span>
         </div>
         <div
-          className="flex min-h-[88px] flex-wrap items-center justify-center gap-2 rounded-[22px] border-2 border-dashed px-3 py-4"
+          className="flex min-h-[88px] flex-wrap items-center justify-center gap-1.5 rounded-[22px] border-2 border-dashed px-3 py-4"
           style={{
             borderColor: complete ? "rgba(94,234,212,0.85)" : "rgba(214,184,108,0.6)",
             background: complete ? "rgba(204,251,241,0.5)" : "rgba(255,248,232,0.6)",
           }}
         >
           {count === 0 ? (
-            <span className="text-sm font-bold text-[#a98b52]">Tap “Add” to build your path</span>
+            <span className="text-sm font-bold text-[#a98b52]">Tap “Add” to lay the blocks</span>
           ) : (
             Array.from({ length: count }).map((_, i) => (
               <button
@@ -223,10 +349,10 @@ function BuildScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect: () 
                 onClick={removeUnit}
                 disabled={locked}
                 title="Tap to remove"
-                className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[#fffaf0] text-3xl shadow-sm sm:h-14 sm:w-14 sm:text-4xl"
+                className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[#fffaf0] shadow-sm sm:h-14 sm:w-14"
                 style={{ border: "1px solid rgba(214,184,108,0.4)" }}
               >
-                {unitEmoji}
+                <UnitGlyph kind={kind} size={40} />
               </button>
             ))
           )}
@@ -240,15 +366,15 @@ function BuildScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect: () 
           disabled={locked || count >= maxUnits}
           className="flex min-h-[72px] items-center justify-center gap-2 rounded-[22px] border-2 border-[rgba(214,184,108,0.6)] bg-[#fffaf0] text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-40"
         >
-          <span className="text-3xl">{unitEmoji}</span> Add
+          <UnitGlyph kind={kind} size={32} /> Add
         </button>
         <button
           type="button"
           onClick={removeUnit}
           disabled={locked || count <= 0}
-          className="flex min-h-[72px] items-center justify-center rounded-[22px] border-2 border-[rgba(214,184,108,0.45)] bg-white text-xl font-black text-[#5f4725] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-40"
+          className="flex min-h-[72px] items-center justify-center gap-2 rounded-[22px] border-2 border-[rgba(214,184,108,0.45)] bg-white text-xl font-black text-[#5f4725] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-40"
         >
-          ↩ Remove
+          <Undo2 className="h-6 w-6" /> Remove
         </button>
       </div>
     </PathShell>

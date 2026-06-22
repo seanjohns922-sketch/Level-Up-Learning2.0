@@ -543,21 +543,39 @@ export type PracticeTask = (
       speakText?: string;
       badgeLabel?: string;
       scene: "intro" | "count" | "compare" | "build";
-      /** Unit being used to measure (footstep / block / star / flower / stone). */
+      /** Unit being used to measure (footstep / block / star / flower / stone).
+       *  Rendered as an illustrated glyph; unitEmoji/unitLabel are hints only. */
       unitEmoji?: string;
       unitLabel?: string;
+      /** Year 1+: a real object illustration shown above the measuring blocks
+       *  ("measure this pencil"). Omit for abstract Prep paths. */
+      objectImageSrc?: string;
+      objectLabel?: string;
       /** "count" scene: a single path of this many equal units, MCQ on length. */
       pathLength?: number;
       options?: number[];
       correctAnswer?: number;
       /** "compare" scene: two paths; tap the longer one. */
-      paths?: Array<{ id: string; length: number; unitEmoji: string; unitLabel: string }>;
+      paths?: Array<{
+        id: string;
+        length: number;
+        unitEmoji: string;
+        unitLabel: string;
+        objectImageSrc?: string;
+        objectLabel?: string;
+      }>;
       correctPathId?: string;
       /** "build" scene: build a path exactly this many units long. */
       targetLength?: number;
       maxUnits?: number;
       /** "intro" scene: worked example paths shown during the teaching sequence. */
-      teachingPaths?: Array<{ length: number; unitEmoji: string; caption: string }>;
+      teachingPaths?: Array<{
+        length: number;
+        unitEmoji: string;
+        caption: string;
+        objectImageSrc?: string;
+        objectLabel?: string;
+      }>;
       feedback?: { correct: string; wrong: string };
     }
   | {

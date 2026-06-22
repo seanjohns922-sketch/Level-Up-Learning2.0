@@ -41,6 +41,13 @@ import {
   resetPrepMeasurelandsLessonSessionState,
   resolvePrepMeasurelandsLessonTask,
 } from "@/data/activities/prepMeasurelands/registry";
+import {
+  getY1MeasurelandsLessonMeta,
+  getY1MeasurelandsPractisedSkills,
+  isY1MeasurelandsLessonId,
+  resetY1MeasurelandsLessonSessionState,
+  resolveY1MeasurelandsLessonTask,
+} from "@/data/activities/year1Measurelands/registry";
 import { getProgramForYear } from "@/data/programs";
 import { getCurriculumPlan } from "@/data/programs/genres";
 import { DEMO_MODE } from "@/data/config";
@@ -142,7 +149,7 @@ function getPrepGroundTask(
 // Optional per-lesson reflection bullets ("Today you practised: ...").
 // Lessons not listed here fall back to the single "Today you practised <title>" line.
 function getLessonPractisedSkills(lessonId: string): string[] | undefined {
-  return getPrepMeasurelandsPractisedSkills(lessonId);
+  return getPrepMeasurelandsPractisedSkills(lessonId) ?? getY1MeasurelandsPractisedSkills(lessonId);
 }
 
 function LessonPage() {
@@ -156,13 +163,13 @@ function LessonPage() {
   const levelNumber = year === "Prep" ? 1 : yearNumber;
   const levelLabel = year === "Prep" ? "Ground Level" : `Level ${levelNumber}`;
   const defaultLessonId =
-    realmId === "measurement" && year === "Prep"
-      ? `y0-measurement-w${week}-l1`
+    realmId === "measurement"
+      ? `y${yearNumber}-measurement-w${week}-l1`
       : `y${yearNumber}-w${week}-l1`;
   const lessonId = params.get("lessonId") ?? defaultLessonId;
   const expectedPrefix =
-    realmId === "measurement" && year === "Prep"
-      ? `y0-measurement-w${week}-`
+    realmId === "measurement"
+      ? `y${yearNumber}-measurement-w${week}-`
       : `y${yearNumber}-w${week}-`;
   const previewMode = isDemoPreviewMode();
   const effectiveLessonId = lessonId.startsWith(expectedPrefix)
@@ -338,7 +345,10 @@ function LessonPage() {
     return weekPlan?.lessons.find((l) => l.id === effectiveLessonId) ?? null;
   }, [effectiveLessonId, lessonProgram, week]);
   const measurelandsMeta = useMemo(
-    () => (realmId === "measurement" ? getPrepMeasurelandsLessonMeta(effectiveLessonId) : null),
+    () =>
+      realmId === "measurement"
+        ? getPrepMeasurelandsLessonMeta(effectiveLessonId) ?? getY1MeasurelandsLessonMeta(effectiveLessonId)
+        : null,
     [effectiveLessonId, realmId]
   );
   const started = startedLessonId === effectiveLessonId;
@@ -1122,6 +1132,10 @@ function LessonPage() {
                       void trackLiveLearningEvent({ eventType: "lesson_started", level: liveLessonContext.level, strand: liveLessonContext.strand, week: liveLessonContext.week, lessonId: liveLessonContext.lessonId, lessonTitle: liveLessonContext.lessonTitle, progressPercent: 0, progressLabel: "Lesson started" });
                       if (year === "Year 1") resetYear1SessionTaskState();
                       if (isGroundCustomLesson) resetPrepSessionTaskState();
+                      if (realmId === "measurement") {
+                        resetY1MeasurelandsLessonSessionState();
+                        resetPrepMeasurelandsLessonSessionState();
+                      }
                       setStartedLessonId(effectiveLessonId);
                     }}
                     className="relative inline-flex items-center justify-center gap-2 font-bold tracking-tight px-7 py-3 text-sm md:text-base overflow-hidden hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200"
@@ -1197,6 +1211,13 @@ function LessonPage() {
                 const d = ctx?.difficulty ?? "easy";
                 if (isGroundCustomLesson) {
                   return getPrepGroundTask(effectiveLessonId, d, realmId);
+                }
+                if (realmId === "measurement") {
+                  return (
+                    resolveY1MeasurelandsLessonTask(effectiveLessonId, d) ??
+                    resolvePrepMeasurelandsLessonTask(effectiveLessonId, d) ??
+                    buildMissingMeasurelandsLessonTask(effectiveLessonId)
+                  );
                 }
                 if (effectiveLessonId.startsWith("y1-w2-")) {
                   return generateWeek2Task(effectiveLessonId, d);

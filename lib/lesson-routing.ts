@@ -27,8 +27,8 @@ export function buildLessonId(input: {
 }): string {
   const normalizedYear = normalizeStudentYearLabel(input.yearLabel);
   const normalizedRealm = input.realmId === "measurement" ? "measurement" : "number";
-  if (normalizedRealm === "measurement" && normalizedYear === "Prep") {
-    return `y0-measurement-w${input.week}-l${input.lessonNumber}`;
+  if (normalizedRealm === "measurement") {
+    return `y${parseStudentYearNumber(normalizedYear)}-measurement-w${input.week}-l${input.lessonNumber}`;
   }
   return `y${parseStudentYearNumber(normalizedYear)}-w${input.week}-l${input.lessonNumber}`;
 }
