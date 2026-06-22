@@ -18,17 +18,43 @@ import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import StudentAvatar from "@/components/avatar/StudentAvatar";
 import { supabase } from "@/lib/supabase";
 
-const YEAR = "Prep";
+type MeasurelandsYear = "Prep" | "Year 1";
 const REALM_ID = "measurement";
-const BG_IMAGE = "/images/measurelands-home-bg.jpg";
+const PREP_BG_IMAGE = "/images/measurelands-home-bg.jpg";
+const YEAR1_BG_IMAGE = "/images/measurelands-home-bg-y1.jpg";
 
-const DISTRICT_ZONES = [
+const PREP_ZONES = [
   { id: "length", name: "LENGTH LANDS", sub: "WEEKS 1–2", weekStart: 1, weekEnd: 2, left: "7%", top: "14%", color: "#67e8f9" },
   { id: "balance", name: "BALANCE BASIN", sub: "WEEKS 3–4", weekStart: 3, weekEnd: 4, left: "10%", top: "56%", color: "#86efac" },
   { id: "tower", name: "TIMEWIELDER TOWER", sub: "WEEK 8", weekStart: 8, weekEnd: 8, left: "50%", top: "30%", color: "#fde68a" },
   { id: "capacity", name: "CAPACITY SPRINGS", sub: "WEEKS 5–6", weekStart: 5, weekEnd: 6, left: "70%", top: "15%", color: "#c4b5fd" },
   { id: "clockwork", name: "CLOCKWORK CROSSING", sub: "WEEK 7", weekStart: 7, weekEnd: 7, left: "69%", top: "57%", color: "#f9a8d4" },
 ] as const;
+
+const YEAR1_ZONES = [
+  { id: "length", name: "LENGTH TRAIL", sub: "WEEK 1", weekStart: 1, weekEnd: 1, left: "7%", top: "14%", color: "#67e8f9" },
+  { id: "balance", name: "BALANCE BASIN", sub: "WEEK 2", weekStart: 2, weekEnd: 2, left: "10%", top: "56%", color: "#86efac" },
+  { id: "capacity", name: "CAPACITY SPRINGS", sub: "WEEK 3", weekStart: 3, weekEnd: 3, left: "70%", top: "15%", color: "#c4b5fd" },
+  { id: "duration", name: "DURATION DUNES", sub: "WEEK 4", weekStart: 4, weekEnd: 4, left: "50%", top: "30%", color: "#fde68a" },
+  { id: "calendar-grove", name: "CALENDAR GROVE", sub: "WEEK 5", weekStart: 5, weekEnd: 5, left: "50%", top: "30%", color: "#a7f3d0" },
+  { id: "calendar-quest", name: "CALENDAR QUEST", sub: "WEEK 6", weekStart: 6, weekEnd: 6, left: "50%", top: "30%", color: "#fcd34d" },
+  { id: "time-journey", name: "TIME JOURNEY", sub: "WEEK 7", weekStart: 7, weekEnd: 7, left: "69%", top: "57%", color: "#f9a8d4" },
+  { id: "time-builder", name: "TIME BUILDER", sub: "WEEK 8", weekStart: 8, weekEnd: 8, left: "50%", top: "30%", color: "#93c5fd" },
+] as const;
+
+function getMeasurelandsWorldConfig(year: MeasurelandsYear) {
+  return year === "Year 1"
+    ? {
+        bgImage: YEAR1_BG_IMAGE,
+        levelLabel: "LEVEL 1",
+        zones: YEAR1_ZONES,
+      }
+    : {
+        bgImage: PREP_BG_IMAGE,
+        levelLabel: "GROUND LEVEL",
+        zones: PREP_ZONES,
+      };
+}
 
 function useWorldCanvas() {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -147,26 +173,29 @@ function ProgressIcon() {
   );
 }
 
-export default function MeasurelandsMap() {
+export default function MeasurelandsMap({ year = "Prep" }: { year?: MeasurelandsYear }) {
   const router = useRouter();
+  const resolvedYear: MeasurelandsYear = year === "Year 1" ? "Year 1" : "Prep";
+  const world = useMemo(() => getMeasurelandsWorldConfig(resolvedYear), [resolvedYear]);
   const [progress] = useState(() => readProgress());
   const [store] = useState(() => readProgramStore());
   const [launching, setLaunching] = useState(false);
-  const [bestChain] = useState(() => readBestChain("measurement", YEAR));
+  const [bestChain] = useState(() => readBestChain("measurement", resolvedYear));
   const [classBestChain, setClassBestChain] = useState<number | null>(null);
   const canvasRef = useWorldCanvas();
   const fogProgress = useMemo(() => computeFogProgress(progress?.year, progress?.unlockedLegends), [progress?.year, progress?.unlockedLegends]);
 
-  const currentWeek = getRecommendedAssignedWeek(store, YEAR, progress?.assignedWeek, progress?.requiredWeeks);
+  const totalWeeks = world.zones[world.zones.length - 1]?.weekEnd ?? 8;
+  const currentWeek = getRecommendedAssignedWeek(store, resolvedYear, progress?.assignedWeek, progress?.requiredWeeks);
   const currentZone =
-    DISTRICT_ZONES.find((zone) => currentWeek >= zone.weekStart && currentWeek <= zone.weekEnd) ?? DISTRICT_ZONES[0];
+    world.zones.find((zone) => currentWeek >= zone.weekStart && currentWeek <= zone.weekEnd) ?? world.zones[0];
   const completedByWeek = useMemo(() => {
     const result: Record<number, boolean> = {};
-    for (let week = 1; week <= 8; week += 1) {
-      result[week] = isWeekComplete(getWeekProgress(store, YEAR, week));
+    for (let week = 1; week <= totalWeeks; week += 1) {
+      result[week] = isWeekComplete(getWeekProgress(store, resolvedYear, week));
     }
     return result;
-  }, [store]);
+  }, [resolvedYear, store, totalWeeks]);
 
   const highestDone = useMemo(
     () => Math.max(0, ...Object.entries(completedByWeek).filter(([, done]) => done).map(([week]) => Number(week))),
@@ -175,13 +204,13 @@ export default function MeasurelandsMap() {
 
   const totalXP = useMemo(() => {
     let xp = 0;
-    for (let week = 1; week <= 8; week += 1) {
-      const wp = getWeekProgress(store, YEAR, week);
+    for (let week = 1; week <= totalWeeks; week += 1) {
+      const wp = getWeekProgress(store, resolvedYear, week);
       xp += wp.lessonsCompleted.filter(Boolean).length * 40;
       if (wp.quizScore !== undefined) xp += Math.round((wp.quizScore / 100) * 60);
     }
     return xp;
-  }, [store]);
+  }, [resolvedYear, store, totalWeeks]);
 
   useEffect(() => {
     if (isDemoPreviewMode()) {
@@ -208,7 +237,7 @@ export default function MeasurelandsMap() {
             .eq("realm_id", "measurement");
 
           if (filterWorkingLevel) {
-            query = query.eq("working_level", YEAR);
+            query = query.eq("working_level", resolvedYear);
           }
 
           const { data, error } = await query;
@@ -243,19 +272,19 @@ export default function MeasurelandsMap() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [resolvedYear]);
 
   function launchGuidedAdventure() {
     if (launching) return;
     setLaunching(true);
     window.setTimeout(() => {
-      for (let week = 1; week <= 8; week += 1) {
+      for (let week = 1; week <= totalWeeks; week += 1) {
         if (!completedByWeek[week]) {
-          router.push(`/program?year=${encodeURIComponent(YEAR)}&week=${week}&legacy=1&realm_id=${REALM_ID}`);
+          router.push(`/program?year=${encodeURIComponent(resolvedYear)}&week=${week}&legacy=1&realm_id=${REALM_ID}`);
           return;
         }
       }
-      router.push(`/program?year=${encodeURIComponent(YEAR)}&week=${Math.max(1, currentWeek)}&legacy=1&realm_id=${REALM_ID}`);
+      router.push(`/program?year=${encodeURIComponent(resolvedYear)}&week=${Math.max(1, currentWeek)}&legacy=1&realm_id=${REALM_ID}`);
     }, 900);
   }
 
@@ -288,7 +317,7 @@ export default function MeasurelandsMap() {
       <FogOfForgetfulness progress={fogProgress} accent="#c8a030" glow="rgba(200,160,48,0.6)" />
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={BG_IMAGE}
+        src={world.bgImage}
         alt=""
         style={{
           position: "absolute",
@@ -408,7 +437,7 @@ export default function MeasurelandsMap() {
         }}
       >
         <button
-          onClick={() => router.push(`/realms?level=${encodeURIComponent(YEAR)}`)}
+          onClick={() => router.push(`/realms?level=${encodeURIComponent(resolvedYear)}`)}
           style={{ display: "flex", alignItems: "center", gap: 6, ...chip(), cursor: "pointer", color: "rgba(254,243,199,0.92)", fontSize: 12, fontWeight: 700 }}
         >
           <ArrowLeft size={14} /> Back
@@ -417,7 +446,7 @@ export default function MeasurelandsMap() {
           <span style={{ color: "#fde68a", fontSize: 10, fontWeight: 900, letterSpacing: "0.18em", fontFamily: "ui-monospace,monospace" }}>⚗ MEASURELANDS</span>
         </div>
         <div style={chip({ background: "rgba(109,40,217,0.2)", border: "1px solid rgba(167,139,250,0.28)" })}>
-          <span style={{ color: "#ddd6fe", fontSize: 9, fontWeight: 700, letterSpacing: "0.2em", fontFamily: "ui-monospace,monospace" }}>GROUND LEVEL</span>
+          <span style={{ color: "#ddd6fe", fontSize: 9, fontWeight: 700, letterSpacing: "0.2em", fontFamily: "ui-monospace,monospace" }}>{world.levelLabel}</span>
         </div>
         <div style={{ flex: 1 }} />
         <div style={{ display: "flex", alignItems: "center", gap: 5, ...chip() }}>
@@ -425,7 +454,7 @@ export default function MeasurelandsMap() {
           <span style={{ color: "#fef3c7", fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{totalXP} XP</span>
         </div>
         <div style={chip()}>
-          <span style={{ color: "#fde68a", fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{highestDone}/8 weeks</span>
+          <span style={{ color: "#fde68a", fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{highestDone}/{totalWeeks} weeks</span>
         </div>
         <button
           onClick={() => router.push("/profile")}
@@ -557,7 +586,7 @@ export default function MeasurelandsMap() {
             transition: "opacity 0.3s",
           }}
         >
-          WEEK {Math.max(1, currentWeek)} · LENGTH LANDS
+          WEEK {Math.max(1, currentWeek)} · {currentZone.name}
         </div>
       </div>
 

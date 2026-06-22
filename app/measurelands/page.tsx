@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { readProgress } from "@/data/progress";
@@ -51,11 +51,25 @@ const MeasurelandsMap = dynamic(
   }
 );
 
+const SUPPORTED_MEASURELANDS_YEARS = new Set(["Prep", "Year 1"]);
+
 export default function MeasurelandsPage() {
   const router = useRouter();
+  const previewMode = isDemoPreviewMode();
+  const progressYear = readProgress()?.year;
+  const [requestedYear, setRequestedYear] = useState<string | undefined>(undefined);
+  const resolvedYear = useMemo(() => {
+    const candidate = previewMode ? requestedYear ?? progressYear : progressYear ?? requestedYear;
+    return SUPPORTED_MEASURELANDS_YEARS.has(candidate ?? "") ? (candidate as "Prep" | "Year 1") : "Prep";
+  }, [previewMode, progressYear, requestedYear]);
 
   useEffect(() => {
-    if (isDemoPreviewMode()) return;
+    const params = new URLSearchParams(window.location.search);
+    setRequestedYear(params.get("level") ?? undefined);
+  }, []);
+
+  useEffect(() => {
+    if (previewMode) return;
 
     const progress = readProgress();
     const studentProfile = getActiveStudentProfile();
@@ -68,10 +82,10 @@ export default function MeasurelandsPage() {
       return;
     }
 
-    if (progress?.year !== "Prep") {
-      router.replace("/realms");
+    if (!SUPPORTED_MEASURELANDS_YEARS.has(progress?.year ?? "")) {
+      router.replace(`/realms?level=${encodeURIComponent(progress?.year ?? "Prep")}`);
     }
-  }, [router]);
+  }, [previewMode, router]);
 
-  return <MeasurelandsMap />;
+  return <MeasurelandsMap key={resolvedYear} year={resolvedYear} />;
 }

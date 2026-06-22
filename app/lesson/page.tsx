@@ -182,7 +182,9 @@ function LessonPage() {
     return match ? Number(match[1]) : 1;
   }, [effectiveLessonId]);
   const lessonChrome = useMemo(() => getLessonChrome(levelNumber), [levelNumber]);
-  const mapRoute = realmId === "measurement" ? "/measurelands" : "/number-nexus";
+  const mapRoute = realmId === "measurement"
+    ? `/measurelands?level=${encodeURIComponent(year)}`
+    : "/number-nexus";
   const isMeasurement = realmId === "measurement";
 
   // ── Lesson page theme — add a new entry here for future realms ────────────

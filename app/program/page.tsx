@@ -413,6 +413,9 @@ function ProgramPage() {
   const xp = lessonsDoneCount * 10 + (progress.quizCompleted ? 20 : 0);
   const totalXp = 50;
   const percent = Math.round((xp / totalXp) * 100);
+  const measurelandsHomeRoute = isMeasurementRealm
+    ? `/measurelands?level=${encodeURIComponent(curriculumYear)}`
+    : "/number-nexus";
 
   if (!legacyProgramMode) {
     return (
@@ -535,7 +538,7 @@ function ProgramPage() {
           <div className="flex items-start justify-between gap-3 mb-6">
             <div className="flex items-center gap-3">
               <button
-                onClick={() => router.push(isMeasurementRealm ? "/measurelands" : "/number-nexus")}
+                onClick={() => router.push(measurelandsHomeRoute)}
                 className={`px-4 py-2 text-xs font-mono font-black uppercase tracking-[0.14em] backdrop-blur-md transition focus:outline-none ${
                   isMeasurementRealm
                     ? "text-yellow-100/85 hover:bg-yellow-950/30"
@@ -1200,7 +1203,7 @@ function ProgramPage() {
                   Go to Week {lastAllowedWeek}
                 </button>
                 <button
-                  onClick={() => router.push(isMeasurementRealm ? "/measurelands" : "/number-nexus")}
+                  onClick={() => router.push(measurelandsHomeRoute)}
                   className="rounded-2xl bg-white/10 px-5 py-3 text-sm font-black text-white transition hover:bg-white/15"
                 >
                   Back to Map
