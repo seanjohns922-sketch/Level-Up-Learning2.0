@@ -12,23 +12,25 @@ type MassTask = Extract<PracticeTask, { kind: "massMeasure" }>;
 
 const BASE = "/images/measurelands/week2-3d";
 
-type MassObject = { id: string; label: string; image: string; cubes: number };
+// `look` = how big the object APPEARS on screen (1 small … 5 large), tracked
+// separately from `cubes` (its actual mass). Compare questions are built so the
+// heavier object never looks bigger — that forces students to count cubes
+// instead of guessing by picture size (breaks "bigger = heavier").
+type MassObject = { id: string; label: string; image: string; cubes: number; look: number };
 
-// Mass in balance cubes (2–10). Deliberately includes small-but-heavy (rock,
-// coin) and big-but-light (feather, leaf) objects to break "bigger = heavier".
 const OBJECTS: MassObject[] = [
-  { id: "feather", label: "Feather", image: `${BASE}/feather.png`, cubes: 2 },
-  { id: "leaf", label: "Leaf", image: `${BASE}/leaf.png`, cubes: 2 },
-  { id: "coin", label: "Coin", image: `${BASE}/coin.png`, cubes: 3 },
-  { id: "apple", label: "Apple", image: `${BASE}/apple.png`, cubes: 3 },
-  { id: "spoon", label: "Spoon", image: `${BASE}/spoon.png`, cubes: 4 },
-  { id: "boot", label: "Shoe", image: `${BASE}/boot.png`, cubes: 5 },
-  { id: "bucket", label: "Bucket", image: `${BASE}/bucket.png`, cubes: 5 },
-  { id: "backpack", label: "Backpack", image: `${BASE}/backpack.png`, cubes: 6 },
-  { id: "watermelon", label: "Watermelon", image: `${BASE}/watermelon.png`, cubes: 8 },
-  { id: "rock", label: "Rock", image: `${BASE}/rock.png`, cubes: 9 },
-  { id: "chair", label: "Chair", image: `${BASE}/chair.png`, cubes: 9 },
-  { id: "elephant", label: "Elephant", image: `${BASE}/elephant.png`, cubes: 10 },
+  { id: "feather", label: "Feather", image: `${BASE}/feather.png`, cubes: 2, look: 4 },
+  { id: "leaf", label: "Leaf", image: `${BASE}/leaf.png`, cubes: 2, look: 4 },
+  { id: "coin", label: "Coin", image: `${BASE}/coin.png`, cubes: 3, look: 1 },
+  { id: "apple", label: "Apple", image: `${BASE}/apple.png`, cubes: 3, look: 2 },
+  { id: "spoon", label: "Spoon", image: `${BASE}/spoon.png`, cubes: 4, look: 3 },
+  { id: "boot", label: "Shoe", image: `${BASE}/boot.png`, cubes: 5, look: 3 },
+  { id: "bucket", label: "Bucket", image: `${BASE}/bucket.png`, cubes: 5, look: 4 },
+  { id: "backpack", label: "Backpack", image: `${BASE}/backpack.png`, cubes: 6, look: 4 },
+  { id: "watermelon", label: "Watermelon", image: `${BASE}/watermelon.png`, cubes: 8, look: 5 },
+  { id: "rock", label: "Rock", image: `${BASE}/rock.png`, cubes: 9, look: 2 },
+  { id: "chair", label: "Chair", image: `${BASE}/chair.png`, cubes: 9, look: 5 },
+  { id: "elephant", label: "Elephant", image: `${BASE}/elephant.png`, cubes: 10, look: 5 },
 ];
 
 const BY_ID: Record<string, MassObject> = Object.fromEntries(OBJECTS.map((o) => [o.id, o]));
@@ -103,11 +105,25 @@ function buildCountTask(memory: LessonMemory, reading: boolean): MassTask {
   };
 }
 
+// Pick two objects with different mass where the HEAVIER one does not look
+// bigger (heavier.look <= lighter.look) — so picture size can't reveal the
+// answer and students must count cubes. Falls back to any valid pair.
+function pickComparePair(memory: LessonMemory): [MassObject, MassObject] {
+  const first = pickObject(memory);
+  const candidates = OBJECTS.filter((o) => o.id !== first.id && o.cubes !== first.cubes);
+  const busters = candidates.filter((o) => {
+    const heavier = first.cubes > o.cubes ? first : o;
+    const lighter = first.cubes > o.cubes ? o : first;
+    return heavier.look <= lighter.look; // heavier looks the same or smaller
+  });
+  const partner = busters.length ? choose(busters) : choose(candidates);
+  memory.lastId = partner.id;
+  return [first, partner];
+}
+
 // Activity C — who has greater / less mass?
 function buildCompareTask(memory: LessonMemory): MassTask {
-  let a = pickObject(memory);
-  let b = choose(OBJECTS.filter((o) => o.id !== a.id && o.cubes !== a.cubes));
-  memory.lastId = b.id;
+  const [a, b] = pickComparePair(memory);
   const greater = randInt(2) === 0;
   const winner = greater
     ? (a.cubes > b.cubes ? a : b)

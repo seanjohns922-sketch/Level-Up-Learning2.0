@@ -100,6 +100,12 @@ function BalanceScale({
   );
   return (
     <div className="relative mx-auto max-w-[440px] rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">
+      {/* balance indicator: a centred, upright needle = the scale is level/balanced */}
+      <div className="relative mx-auto mb-0.5 h-4 w-full">
+        <div className="absolute bottom-0 left-1/2 h-3 w-px -translate-x-1/2 bg-[rgba(180,120,20,0.3)]" />
+        <div className="absolute bottom-0 left-1/2 h-4 w-[3px] -translate-x-1/2 rounded-full bg-[#b45309]" />
+        <div className="absolute bottom-[13px] left-1/2 h-2 w-2 -translate-x-1/2 rounded-full border border-[#8a5a16] bg-[#d6b86c]" />
+      </div>
       {/* level beam (balanced) */}
       <div className="relative mx-auto h-3 w-[88%] rounded-full" style={{ background: "linear-gradient(90deg,#b45309,#d6b86c,#b45309)" }} />
       <div className="mt-1 flex items-start justify-between">
