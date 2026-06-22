@@ -245,6 +245,20 @@ function UnitsDisplay({
   );
 }
 
+function MeasurementText({
+  length,
+  unitLabel,
+}: {
+  length: number;
+  unitLabel?: string;
+}) {
+  return (
+    <div className="mt-2 text-center text-sm font-black uppercase tracking-[0.14em] text-[#7c4a12]">
+      {length} {unitLabel ?? "blocks"}
+    </div>
+  );
+}
+
 /* ── Intro / teaching sequence ── */
 function IntroScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect: () => void }) {
   return (
@@ -301,6 +315,7 @@ function CountScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCor
           <MeasuredObject imageSrc={task.objectImageSrc} label={task.objectLabel} length={task.pathLength ?? 0} />
         ) : null}
         <UnitsDisplay length={task.pathLength ?? 0} unitLabel={task.unitLabel} unitEmoji={task.unitEmoji} />
+        <MeasurementText length={task.pathLength ?? 0} unitLabel={task.unitLabel} />
       </div>
       <div className="grid grid-cols-3 gap-3">
         {(task.options ?? []).map((value) => (
@@ -339,7 +354,121 @@ function CompareScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onC
                 <MeasuredObject imageSrc={path.objectImageSrc} length={path.length} />
               ) : null}
               <UnitsDisplay length={path.length} unitLabel={path.unitLabel} unitEmoji={path.unitEmoji} />
+              <MeasurementText length={path.length} unitLabel={path.unitLabel} />
             </div>
+          </button>
+        ))}
+      </div>
+    </PathShell>
+  );
+}
+
+function OrderScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
+  const paths = task.paths ?? [];
+  const expected = task.correctOrderIds ?? [];
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [locked, setLocked] = useState(false);
+
+  function handlePick(id: string) {
+    if (locked || selectedIds.includes(id)) return;
+    const next = [...selectedIds, id];
+    setSelectedIds(next);
+    if (next.length !== expected.length) return;
+    const correct = expected.every((expectedId, idx) => next[idx] === expectedId);
+    setLocked(true);
+    window.setTimeout(() => {
+      if (correct) {
+        onCorrect();
+      } else {
+        setSelectedIds([]);
+        setLocked(false);
+        onWrong();
+      }
+    }, 350);
+  }
+
+  return (
+    <PathShell badge={task.badgeLabel ?? "Order the Measurements"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="mb-4 flex min-h-[56px] flex-wrap items-center justify-center gap-2 rounded-[22px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,248,232,0.75)] px-4 py-3">
+        {selectedIds.length === 0 ? (
+          <span className="text-sm font-bold text-[#a98b52]">Tap the cards from shortest to longest.</span>
+        ) : (
+          selectedIds.map((id, idx) => {
+            const path = paths.find((candidate) => candidate.id === id);
+            return (
+              <div
+                key={id}
+                className="inline-flex items-center gap-2 rounded-full border border-[rgba(214,184,108,0.4)] bg-white px-3 py-2 text-sm font-black text-[#5f4725]"
+              >
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#f5d791] text-[#2c1c07]">
+                  {idx + 1}
+                </span>
+                {path?.objectLabel}
+              </div>
+            );
+          })
+        )}
+      </div>
+      <div className="grid gap-4 md:grid-cols-3">
+        {paths.map((path) => {
+          const step = selectedIds.indexOf(path.id);
+          const chosen = step >= 0;
+          return (
+            <button
+              key={path.id}
+              type="button"
+              onClick={() => handlePick(path.id)}
+              disabled={locked || chosen}
+              className="rounded-[26px] border text-left transition hover:-translate-y-1 disabled:opacity-70"
+              style={{
+                borderColor: chosen ? "rgba(94,234,212,0.8)" : "rgba(214,184,108,0.3)",
+                background: chosen ? "rgba(204,251,241,0.45)" : "rgba(255,252,245,0.9)",
+              }}
+            >
+              <div className="relative p-3">
+                {chosen ? (
+                  <div className="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#0f766e] text-sm font-black text-white">
+                    {step + 1}
+                  </div>
+                ) : null}
+                {path.objectImageSrc ? (
+                  <MeasuredObject imageSrc={path.objectImageSrc} label={path.objectLabel} length={path.length} />
+                ) : null}
+                <UnitsDisplay length={path.length} unitLabel={path.unitLabel} unitEmoji={path.unitEmoji} />
+                <MeasurementText length={path.length} unitLabel={path.unitLabel} />
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </PathShell>
+  );
+}
+
+function SameScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
+  const paths = task.paths ?? [];
+  return (
+    <PathShell badge={task.badgeLabel ?? "Find the Same Length"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">
+        {task.objectImageSrc ? (
+          <MeasuredObject imageSrc={task.objectImageSrc} label={task.objectLabel} length={task.pathLength ?? 0} />
+        ) : null}
+        <UnitsDisplay length={task.pathLength ?? 0} unitLabel={task.unitLabel} unitEmoji={task.unitEmoji} />
+        <MeasurementText length={task.pathLength ?? 0} unitLabel={task.unitLabel} />
+      </div>
+      <div className="grid gap-4 md:grid-cols-3">
+        {paths.map((path) => (
+          <button
+            key={path.id}
+            type="button"
+            onClick={() => (path.id === task.correctPathId ? onCorrect() : onWrong())}
+            className="rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-3 text-left transition hover:-translate-y-1"
+          >
+            {path.objectImageSrc ? (
+              <MeasuredObject imageSrc={path.objectImageSrc} label={path.objectLabel} length={path.length} />
+            ) : null}
+            <UnitsDisplay length={path.length} unitLabel={path.unitLabel} unitEmoji={path.unitEmoji} />
+            <MeasurementText length={path.length} unitLabel={path.unitLabel} />
           </button>
         ))}
       </div>
@@ -453,5 +582,7 @@ export function MeasurelandsPathTaskCard({
   if (task.scene === "intro") return <IntroScene task={task} onCorrect={onCorrect} />;
   if (task.scene === "count") return <CountScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "compare") return <CompareScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "order") return <OrderScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "same") return <SameScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   return <BuildScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 }

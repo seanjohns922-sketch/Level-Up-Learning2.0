@@ -542,7 +542,7 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "count" | "compare" | "build";
+      scene: "intro" | "count" | "compare" | "build" | "order" | "same";
       /** Unit being used to measure (footstep / block / star / flower / stone).
        *  Rendered as an illustrated glyph; unitEmoji/unitLabel are hints only. */
       unitEmoji?: string;
@@ -565,6 +565,8 @@ export type PracticeTask = (
         objectLabel?: string;
       }>;
       correctPathId?: string;
+      /** "order" scene: tap cards from shortest to longest. */
+      correctOrderIds?: string[];
       /** "build" scene: build a path exactly this many units long. */
       targetLength?: number;
       maxUnits?: number;
