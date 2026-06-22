@@ -606,6 +606,29 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Year 1 W2 L1 — measuring mass with uniform informal units
+      // (AC9M1M01: compare mass indirectly using balance cubes). An object sits
+      // on a live balance scale against N identical "balance cubes".
+      kind: "massMeasure";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "count" | "compare";
+      /** "count": one object balancing this many cubes; MCQ on the cube count. */
+      object?: { imageSrc?: string; label: string; cubes: number };
+      options?: number[];
+      correctAnswer?: number;
+      /** "compare": measured objects; tap the one matching the prompt. */
+      items?: Array<{ id: string; imageSrc?: string; label: string; cubes: number }>;
+      compareMode?: "greater" | "less";
+      correctOptionId?: string;
+      /** "compare": hide the "· N cubes" labels (e.g. "which measures 5 cubes?"). */
+      hideCounts?: boolean;
+      /** "intro": worked teaching scales shown during the teaching sequence. */
+      teachingItems?: Array<{ imageSrc?: string; label: string; cubes: number; caption?: string }>;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       // Generic, reusable interactive balance scale for equivalence activities
       // (Measurelands "Balance the Scales" and any future same-weight tasks).
       // The student fills/edits one pan; the scale is solved when both pans

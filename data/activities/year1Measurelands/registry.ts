@@ -14,6 +14,11 @@ import {
   resetY1MeasurelandsWeek1Lesson3TaskSessionState,
   buildY1MeasurelandsWeek1Lesson3QuizTasks,
 } from "@/data/activities/year1Measurelands/week1Lesson3";
+import {
+  generateY1MeasurelandsWeek2Lesson1Task,
+  resetY1MeasurelandsWeek2Lesson1TaskSessionState,
+  buildY1MeasurelandsWeek2Lesson1QuizTasks,
+} from "@/data/activities/year1Measurelands/week2Lesson1";
 
 // Level 1 (Year 1) Measurelands lesson registry. Mirrors the Prep registry so
 // app/lesson/page.tsx can resolve `y1-measurement-w{n}-l{m}` ids to tasks.
@@ -88,6 +93,25 @@ const Y1_MEASURELANDS_LESSONS: Y1MeasurelandsLessonEntry[] = [
     unlockMessage: "Weekly Quiz unlocked.",
     returnRoute: "/program?year=Year 1&week=1&legacy=1&realm_id=measurement",
     quizContributionBuilder: buildY1MeasurelandsWeek1Lesson3QuizTasks,
+  },
+  {
+    prefix: "y1-measurement-w2-l1",
+    week: 2,
+    lessonNumber: 1,
+    title: "Measure with Balance Cubes",
+    subtitle: "Balance Basin",
+    generate: generateY1MeasurelandsWeek2Lesson1Task,
+    reset: resetY1MeasurelandsWeek2Lesson1TaskSessionState,
+    practisedSkills: [
+      "Measuring mass with balance cubes",
+      "Counting balance cubes",
+      "Comparing measured mass",
+      "Using the same unit fairly",
+    ],
+    completionTitle: "Mass Measurer Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+    returnRoute: "/program?year=Year 1&week=2&legacy=1&realm_id=measurement",
+    quizContributionBuilder: buildY1MeasurelandsWeek2Lesson1QuizTasks,
   },
 ];
 
