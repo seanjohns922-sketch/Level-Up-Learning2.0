@@ -94,6 +94,11 @@ import {
   buildMeasurelandsWeek7Lesson2QuizTasks,
   resetPrepMeasurelandsWeek7Lesson2TaskSessionState,
 } from "@/data/activities/prepMeasurelands/week7Lesson2";
+import {
+  generatePrepMeasurelandsWeek7Lesson3Task,
+  buildMeasurelandsWeek7Lesson3QuizTasks,
+  resetPrepMeasurelandsWeek7Lesson3TaskSessionState,
+} from "@/data/activities/prepMeasurelands/week7Lesson3";
 
 type MeasurelandsLessonEntry = {
   prefix: string;
@@ -462,6 +467,24 @@ const PREP_MEASURELANDS_LESSONS: MeasurelandsLessonEntry[] = [
     unlockMessage: "Lesson 3 unlocked.",
     returnRoute: "/program?year=Prep&week=7&legacy=1&realm_id=measurement",
     quizContributionBuilder: buildMeasurelandsWeek7Lesson2QuizTasks,
+  },
+  {
+    prefix: "y0-measurement-w7-l3",
+    week: 7,
+    lessonNumber: 3,
+    title: "What Day Comes Next?",
+    subtitle: "Calendar Keep",
+    generate: generatePrepMeasurelandsWeek7Lesson3Task,
+    reset: resetPrepMeasurelandsWeek7Lesson3TaskSessionState,
+    practisedSkills: [
+      "Finding what day comes next",
+      "Finding what day came before",
+      "Putting the days in order",
+    ],
+    completionTitle: "Calendar Keep Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+    returnRoute: "/program?year=Prep&week=7&legacy=1&realm_id=measurement",
+    quizContributionBuilder: buildMeasurelandsWeek7Lesson3QuizTasks,
   },
 ];
 
