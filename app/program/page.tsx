@@ -428,7 +428,13 @@ function ProgramPage() {
       <div className="fixed inset-0 z-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={isMeasurementRealm ? "/images/measurelands-home-bg.jpg" : getHomeBg(levelNum, isPrep)}
+          src={
+            isMeasurementRealm
+              ? !isPrep && levelNum === 1
+                ? "/images/measurelands-home-bg-y1.jpg"
+                : "/images/measurelands-home-bg.jpg"
+              : getHomeBg(levelNum, isPrep)
+          }
           alt=""
           className="w-full h-full object-cover"
           style={{
