@@ -89,6 +89,11 @@ import {
   buildMeasurelandsWeek7Lesson1QuizTasks,
   resetPrepMeasurelandsWeek7Lesson1TaskSessionState,
 } from "@/data/activities/prepMeasurelands/week7Lesson1";
+import {
+  generatePrepMeasurelandsWeek7Lesson2Task,
+  buildMeasurelandsWeek7Lesson2QuizTasks,
+  resetPrepMeasurelandsWeek7Lesson2TaskSessionState,
+} from "@/data/activities/prepMeasurelands/week7Lesson2";
 
 type MeasurelandsLessonEntry = {
   prefix: string;
@@ -439,6 +444,24 @@ const PREP_MEASURELANDS_LESSONS: MeasurelandsLessonEntry[] = [
     unlockMessage: "Lesson 2 unlocked.",
     returnRoute: "/program?year=Prep&week=7&legacy=1&realm_id=measurement",
     quizContributionBuilder: buildMeasurelandsWeek7Lesson1QuizTasks,
+  },
+  {
+    prefix: "y0-measurement-w7-l2",
+    week: 7,
+    lessonNumber: 2,
+    title: "Yesterday and Tomorrow",
+    subtitle: "Calendar Keep",
+    generate: generatePrepMeasurelandsWeek7Lesson2Task,
+    reset: resetPrepMeasurelandsWeek7Lesson2TaskSessionState,
+    practisedSkills: [
+      "Finding yesterday and tomorrow",
+      "Sorting yesterday, today and tomorrow",
+      "Telling what comes before and after today",
+    ],
+    completionTitle: "Yesterday and Tomorrow Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+    returnRoute: "/program?year=Prep&week=7&legacy=1&realm_id=measurement",
+    quizContributionBuilder: buildMeasurelandsWeek7Lesson2QuizTasks,
   },
 ];
 

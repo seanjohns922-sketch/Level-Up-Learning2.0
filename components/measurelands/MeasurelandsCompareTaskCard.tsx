@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Rabbit, Turtle, Volume2, School, House, Sunrise, Sun, Sunset, Moon, Star, CalendarDays } from "lucide-react";
+import { Rabbit, Turtle, Volume2, School, House, Sunrise, Sun, Sunset, Moon, Star, CalendarDays, ArrowLeft, ArrowRight } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { speak } from "@/lib/speak";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
@@ -574,6 +574,10 @@ function SortScene({
               <Star className="h-12 w-12 text-[#f6b93b]" fill="#f6b93b" />
             ) : bin.icon === "another-day" ? (
               <CalendarDays className="h-12 w-12 text-[#5f4725]" />
+            ) : bin.icon === "yesterday" ? (
+              <ArrowLeft className="h-12 w-12 text-[#7c8794]" />
+            ) : bin.icon === "tomorrow" ? (
+              <ArrowRight className="h-12 w-12 text-[#34616f]" />
             ) : (
               <span className="text-5xl sm:text-6xl">{bin.icon}</span>
             )}
