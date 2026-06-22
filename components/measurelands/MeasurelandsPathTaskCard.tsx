@@ -128,6 +128,47 @@ function PathShell({
   );
 }
 
+// Shared unit width so the object image spans exactly the same length as the rod.
+const UNIT_PX = 40;
+const ROD_DEPTH = 13;
+
+/* ── A connected MAB-style rod: N unit cubes joined end-to-end ── */
+function BlockRod({ length, unitPx = UNIT_PX }: { length: number; unitPx?: number }) {
+  if (length <= 0) return null;
+  const u = unitPx;
+  const d = Math.round(u * 0.32);
+  const w = length * u + d;
+  const h = u + d;
+  const seams = Array.from({ length: length - 1 }, (_, i) => i + 1);
+  return (
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="max-w-full" style={{ height: "auto" }} aria-hidden>
+      <defs>
+        <linearGradient id="rod-front" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#7fd3f2" />
+          <stop offset="100%" stopColor="#54aad6" />
+        </linearGradient>
+        <linearGradient id="rod-top" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#bfe8fa" />
+          <stop offset="100%" stopColor="#8fd0ef" />
+        </linearGradient>
+      </defs>
+      {/* top face */}
+      <path d={`M0 ${d} L${length * u} ${d} L${length * u + d} 0 L${d} 0 Z`} fill="url(#rod-top)" stroke="#2c6a8c" strokeWidth="1.6" strokeLinejoin="round" />
+      {/* front face */}
+      <rect x="0" y={d} width={length * u} height={u} fill="url(#rod-front)" stroke="#2c6a8c" strokeWidth="1.6" />
+      {/* right end cap */}
+      <path d={`M${length * u} ${d} L${length * u + d} 0 L${length * u + d} ${u} L${length * u} ${u + d} Z`} fill="#3f93bd" stroke="#2c6a8c" strokeWidth="1.6" strokeLinejoin="round" />
+      {/* seams between joined cubes */}
+      {seams.map((i) => (
+        <g key={i} stroke="#2c6a8c" strokeWidth="1.2" opacity="0.85">
+          <line x1={i * u} y1={d} x2={i * u} y2={d + u} />
+          <line x1={i * u} y1={d} x2={i * u + d} y2={0} />
+        </g>
+      ))}
+    </svg>
+  );
+}
+
 /* ── The object being measured, sized to span its block length ── */
 function MeasuredObject({
   imageSrc,
@@ -138,14 +179,14 @@ function MeasuredObject({
   label?: string;
   length: number;
 }) {
-  // Width tracks the block count so the object visibly spans its measurement.
-  const width = Math.min(360, Math.max(96, length * 44));
+  // Width matches the rod so the object visibly spans its measurement.
+  const width = Math.min(420, length * UNIT_PX + ROD_DEPTH);
   return (
-    <div className="mb-2 flex flex-col items-center">
+    <div className="mb-1 flex flex-col items-center">
       <img
         src={imageSrc}
         alt={label ?? "Object to measure"}
-        className="h-20 object-contain drop-shadow-[0_8px_14px_rgba(76,40,10,0.18)] sm:h-24"
+        className="h-16 object-contain drop-shadow-[0_8px_14px_rgba(76,40,10,0.18)] sm:h-20"
         style={{ width }}
       />
       {label ? (
@@ -155,8 +196,8 @@ function MeasuredObject({
   );
 }
 
-/* ── A path: a row of equal, evenly-spaced units on a track ── */
-function PathTrack({
+/* ── Units display: a joined MAB rod for blocks, a glyph row otherwise ── */
+function UnitsDisplay({
   length,
   unitLabel,
   unitEmoji,
@@ -168,6 +209,19 @@ function PathTrack({
   highlight?: boolean;
 }) {
   const kind = unitKindFromHints(unitLabel, unitEmoji);
+  if (kind === "block") {
+    return (
+      <div
+        className="flex items-center justify-center rounded-[22px] border-2 px-3 py-4"
+        style={{
+          borderColor: highlight ? "rgba(94,234,212,0.8)" : "rgba(214,184,108,0.45)",
+          background: "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,248,232,0.96))",
+        }}
+      >
+        <BlockRod length={length} />
+      </div>
+    );
+  }
   return (
     <div
       className="flex flex-wrap items-center justify-center gap-1.5 rounded-[22px] border-2 px-3 py-4"
@@ -215,7 +269,7 @@ function IntroScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect: () 
               {path.objectImageSrc ? (
                 <MeasuredObject imageSrc={path.objectImageSrc} label={path.objectLabel} length={path.length} />
               ) : null}
-              <PathTrack length={path.length} unitEmoji={path.unitEmoji} />
+              <UnitsDisplay length={path.length} unitEmoji={path.unitEmoji} />
               <div className="mt-3 text-center text-sm font-bold text-[#5f4725]">{path.caption}</div>
             </div>
           ))}
@@ -244,7 +298,7 @@ function CountScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCor
         {task.objectImageSrc ? (
           <MeasuredObject imageSrc={task.objectImageSrc} label={task.objectLabel} length={task.pathLength ?? 0} />
         ) : null}
-        <PathTrack length={task.pathLength ?? 0} unitLabel={task.unitLabel} unitEmoji={task.unitEmoji} />
+        <UnitsDisplay length={task.pathLength ?? 0} unitLabel={task.unitLabel} unitEmoji={task.unitEmoji} />
       </div>
       <div className="grid grid-cols-3 gap-3">
         {(task.options ?? []).map((value) => (
@@ -282,7 +336,7 @@ function CompareScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onC
               {path.objectImageSrc ? (
                 <MeasuredObject imageSrc={path.objectImageSrc} length={path.length} />
               ) : null}
-              <PathTrack length={path.length} unitLabel={path.unitLabel} unitEmoji={path.unitEmoji} />
+              <UnitsDisplay length={path.length} unitLabel={path.unitLabel} unitEmoji={path.unitEmoji} />
             </div>
           </button>
         ))}
@@ -340,7 +394,11 @@ function BuildScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect: () 
           }}
         >
           {count === 0 ? (
-            <span className="text-sm font-bold text-[#a98b52]">Tap “Add” to lay the blocks</span>
+            <span className="text-sm font-bold text-[#a98b52]">Tap “Add” to join the blocks</span>
+          ) : kind === "block" ? (
+            <button type="button" onClick={removeUnit} disabled={locked} title="Tap to remove a block" className="inline-flex items-center">
+              <BlockRod length={count} />
+            </button>
           ) : (
             Array.from({ length: count }).map((_, i) => (
               <button

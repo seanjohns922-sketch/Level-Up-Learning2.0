@@ -15,16 +15,14 @@ const BASE = "/images/measurelands/week1-3d";
 
 type MeasureObject = { id: string; label: string; image: string; blocks: number };
 
-// Horizontal length objects with a believable whole-block length (3–8 blocks).
+// Straight, horizontal length objects so each visibly spans its block rod.
+// (Curly art like snake/worm/vine is excluded until we have stretched versions.)
 const OBJECTS: MeasureObject[] = [
-  { id: "worm", label: "Worm", image: `${BASE}/worm.png`, blocks: 3 },
   { id: "crayon", label: "Crayon", image: `${BASE}/crayon.png`, blocks: 4 },
   { id: "carrot", label: "Carrot", image: `${BASE}/carrot.png`, blocks: 5 },
   { id: "pencil", label: "Pencil", image: `${BASE}/pencil.png`, blocks: 6 },
   { id: "cucumber", label: "Cucumber", image: `${BASE}/cucumber.png`, blocks: 7 },
-  { id: "vine", label: "Vine", image: `${BASE}/vine.png`, blocks: 7 },
   { id: "plank", label: "Plank", image: `${BASE}/plank.png`, blocks: 8 },
-  { id: "snake", label: "Snake", image: `${BASE}/snake.png`, blocks: 8 },
 ];
 
 type LessonMemory = { introShown: boolean; cursor: number; lastObjectId: string | null };
