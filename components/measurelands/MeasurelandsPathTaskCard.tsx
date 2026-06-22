@@ -179,16 +179,18 @@ function MeasuredObject({
   label?: string;
   length: number;
 }) {
-  // Width matches the rod so the object visibly spans its measurement.
-  const width = Math.min(420, length * UNIT_PX + ROD_DEPTH);
+  // Wide measuring art should read like a real length target, not a small icon.
+  const width = Math.min(620, Math.max(240, length * 54 + ROD_DEPTH));
   return (
     <div className="mb-1 flex flex-col items-center">
-      <img
-        src={imageSrc}
-        alt={label ?? "Object to measure"}
-        className="h-16 object-contain drop-shadow-[0_8px_14px_rgba(76,40,10,0.18)] sm:h-20"
-        style={{ width }}
-      />
+      <div style={{ width }}>
+        <img
+          src={imageSrc}
+          alt={label ?? "Object to measure"}
+          className="h-auto w-full object-contain drop-shadow-[0_8px_14px_rgba(76,40,10,0.18)]"
+          style={{ maxHeight: 108 }}
+        />
+      </div>
       {label ? (
         <div className="mt-1 text-sm font-black uppercase tracking-[0.14em] text-[#7c4a12]">{label}</div>
       ) : null}

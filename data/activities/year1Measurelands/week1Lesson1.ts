@@ -13,19 +13,43 @@ type MeasurePathTask = Extract<PracticeTask, { kind: "measurePath" }>;
 
 const BASE = "/images/measurelands/measure-objects-3d";
 
-type MeasureObject = { id: string; label: string; image: string; blocks: number };
+type MeasureObjectFamily = {
+  id: string;
+  label: string;
+  image: string;
+  lengths: number[];
+};
+
+type MeasureObject = {
+  id: string;
+  familyId: string;
+  label: string;
+  image: string;
+  blocks: number;
+};
 
 // Straight, horizontal length objects so each visibly spans its block rod.
-// (Curly art like snake/worm/vine is excluded until we have stretched versions.)
-const OBJECTS: MeasureObject[] = [
-  { id: "crayon", label: "Crayon", image: `${BASE}/crayon.png`, blocks: 4 },
-  { id: "carrot", label: "Carrot", image: `${BASE}/carrot.png`, blocks: 5 },
-  { id: "pencil", label: "Pencil", image: `${BASE}/pencil.png`, blocks: 6 },
-  { id: "cucumber", label: "Cucumber", image: `${BASE}/cucumber.png`, blocks: 7 },
-  { id: "plank", label: "Plank", image: `${BASE}/plank.png`, blocks: 8 },
+// Each family can now appear at multiple measured lengths, which gives the
+// lesson a real spread instead of "pencil is always 6" every time.
+const OBJECT_FAMILIES: MeasureObjectFamily[] = [
+  { id: "crayon", label: "Crayon", image: `${BASE}/crayon.png`, lengths: [3, 4, 5] },
+  { id: "carrot", label: "Carrot", image: `${BASE}/carrot.png`, lengths: [4, 5, 6] },
+  { id: "pencil", label: "Pencil", image: `${BASE}/pencil.png`, lengths: [5, 6, 7] },
+  { id: "cucumber", label: "Cucumber", image: `${BASE}/cucumber.png`, lengths: [6, 7, 8] },
+  { id: "plank", label: "Plank", image: `${BASE}/plank.png`, lengths: [7, 8, 9] },
 ];
 
-type LessonMemory = { introShown: boolean; cursor: number; lastObjectId: string | null };
+const OBJECTS: MeasureObject[] = OBJECT_FAMILIES.flatMap((family) =>
+  family.lengths.map((blocks) => ({
+    id: `${family.id}-${blocks}`,
+    familyId: family.id,
+    label: family.label,
+    image: family.image,
+    blocks,
+  })),
+);
+
+type LessonMemory = { introShown: boolean; cursor: number; lastObjectId: string | null; lastFamilyId: string | null };
 
 const lessonMemory = new Map<string, LessonMemory>();
 const ROTATION: Array<"A" | "B" | "C"> = ["A", "B", "C", "A", "C", "B"];
@@ -33,7 +57,7 @@ const ROTATION: Array<"A" | "B" | "C"> = ["A", "B", "C", "A", "C", "B"];
 function getMemory(lessonId: string): LessonMemory {
   const existing = lessonMemory.get(lessonId);
   if (existing) return existing;
-  const created: LessonMemory = { introShown: false, cursor: 0, lastObjectId: null };
+  const created: LessonMemory = { introShown: false, cursor: 0, lastObjectId: null, lastFamilyId: null };
   lessonMemory.set(lessonId, created);
   return created;
 }
@@ -56,14 +80,18 @@ function choose<T>(items: T[]): T {
 }
 
 function pickObject(memory: LessonMemory): MeasureObject {
-  const obj = choose(OBJECTS.filter((o) => o.id !== memory.lastObjectId));
+  const pool = OBJECTS.filter(
+    (o) => o.id !== memory.lastObjectId && o.familyId !== memory.lastFamilyId,
+  );
+  const obj = choose(pool.length > 0 ? pool : OBJECTS.filter((o) => o.id !== memory.lastObjectId));
   memory.lastObjectId = obj.id;
+  memory.lastFamilyId = obj.familyId;
   return obj;
 }
 
 function buildIntroTask(): MeasurePathTask {
-  const pencil = OBJECTS.find((o) => o.id === "pencil")!;
-  const cucumber = OBJECTS.find((o) => o.id === "cucumber")!;
+  const pencil = OBJECTS.find((o) => o.id === "pencil-6")!;
+  const cucumber = OBJECTS.find((o) => o.id === "cucumber-8")!;
   return {
     kind: "measurePath",
     scene: "intro",
@@ -108,14 +136,17 @@ function buildCountTask(memory: LessonMemory): MeasurePathTask {
 
 // Activity B — Who Is Longer? (two measured objects, tap the longer).
 function buildCompareTask(memory: LessonMemory): MeasurePathTask {
-  const [a, b] = shuffle(OBJECTS).slice(0, 2) as [MeasureObject, MeasureObject];
-  // Ensure a clear winner (different block lengths).
-  let first = a;
-  let second = b;
-  if (first.blocks === second.blocks) {
-    second = choose(OBJECTS.filter((o) => o.blocks !== first.blocks));
-  }
+  const first = pickObject(memory);
+  const secondPool = OBJECTS.filter(
+    (o) => o.familyId !== first.familyId && Math.abs(o.blocks - first.blocks) >= 2,
+  );
+  const second = choose(
+    secondPool.length > 0
+      ? secondPool
+      : OBJECTS.filter((o) => o.familyId !== first.familyId && o.blocks !== first.blocks),
+  );
   memory.lastObjectId = second.id;
+  memory.lastFamilyId = second.familyId;
 
   const longer = first.blocks > second.blocks ? first : second;
   const paths = shuffle([
@@ -178,7 +209,12 @@ export function resetY1MeasurelandsWeek1Lesson1TaskSessionState() {
 
 // 5 fixed tasks for the Week 1 weekly quiz (Lesson 1's contribution).
 export function buildY1MeasurelandsWeek1Lesson1QuizTasks(): PracticeTask[] {
-  const seed: LessonMemory = { introShown: true, cursor: 0, lastObjectId: null };
+  const seed: LessonMemory = {
+    introShown: true,
+    cursor: 0,
+    lastObjectId: null,
+    lastFamilyId: null,
+  };
   return [
     buildCountTask(seed),
     buildCountTask(seed),
