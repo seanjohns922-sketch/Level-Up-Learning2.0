@@ -27,8 +27,6 @@ const CONTAINERS: Container[] = [
   { id: "kettle", label: "Kettle", image: `${BASE}/kettle.png`, cups: 5, look: 3 },
   { id: "watering-can", label: "Watering Can", image: `${BASE}/watering-can.png`, cups: 6, look: 3 },
   { id: "bucket", label: "Bucket", image: `${BASE}/bucket.png`, cups: 7, look: 4 },
-  { id: "fish-tank", label: "Fish Tank", image: `${BASE}/fish-tank.png`, cups: 9, look: 5 },
-  { id: "bathtub", label: "Bathtub", image: `${BASE}/bathtub.png`, cups: 10, look: 5 },
 ];
 
 const BY_ID: Record<string, Container> = Object.fromEntries(CONTAINERS.map((c) => [c.id, c]));
@@ -161,7 +159,7 @@ export function buildY1MeasurelandsWeek3Lesson1QuizTasks(): PracticeTask[] {
   const seed: LessonMemory = { introShown: true, cursor: 0, lastId: null };
   const five = BY_ID.jug!; // holds 5
   const distractA = BY_ID.mug!;
-  const distractB = BY_ID.bathtub!;
+  const distractB = BY_ID.bucket!;
   const whichHolds: CapacityTask = {
     kind: "capacityMeasure",
     scene: "compare",
