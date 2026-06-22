@@ -346,7 +346,6 @@ function CountScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCor
           <MeasuredObject imageSrc={task.objectImageSrc} label={task.objectLabel} length={task.pathLength ?? 0} />
         ) : null}
         <UnitsDisplay length={task.pathLength ?? 0} unitLabel={task.unitLabel} unitEmoji={task.unitEmoji} />
-        <MeasurementText length={task.pathLength ?? 0} unitLabel={task.unitLabel} />
       </div>
       <div className="grid grid-cols-3 gap-3">
         {(task.options ?? []).map((value) => (
