@@ -2,7 +2,7 @@ import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-
 
 type MeasurePathTask = Extract<PracticeTask, { kind: "measurePath" }>;
 
-const BASE = "/images/measurelands/week1-3d";
+const BASE = "/images/measurelands/measure-objects-3d";
 
 type MeasureObject = {
   id: string;
@@ -17,7 +17,7 @@ const OBJECTS: MeasureObject[] = [
   { id: "carrot", label: "Carrot", image: `${BASE}/carrot.png`, blocks: [4, 5, 6, 7] },
   { id: "pencil", label: "Pencil", image: `${BASE}/pencil.png`, blocks: [5, 6, 7, 8] },
   { id: "cucumber", label: "Cucumber", image: `${BASE}/cucumber.png`, blocks: [6, 7, 8, 9] },
-  { id: "plank", label: "Plank", image: `${BASE}/plank.png`, blocks: [8, 9, 10] },
+  { id: "plank", label: "Plank", image: `${BASE}/plank.png`, blocks: [8, 9, 10, 11] },
   { id: "vine", label: "Vine", image: `${BASE}/vine.png`, blocks: [9, 10, 11] },
   { id: "snake", label: "Snake", image: `${BASE}/snake.png`, blocks: [10, 11, 12] },
 ];
@@ -79,12 +79,16 @@ const ORDER_SETS: Array<{ key: string; items: MeasuredOption[] }> = [
     items: [measure("crayon", 3), measure("pencil", 5), measure("cucumber", 8)],
   },
   {
-    key: "plank-vine-snake",
-    items: [measure("plank", 8), measure("vine", 10), measure("snake", 12)],
+    key: "carrot-cucumber-plank",
+    items: [measure("carrot", 4), measure("cucumber", 7), measure("plank", 10)],
   },
   {
     key: "worm-carrot-pencil",
     items: [measure("worm", 2), measure("carrot", 5), measure("pencil", 7)],
+  },
+  {
+    key: "plank-vine-snake",
+    items: [measure("plank", 8), measure("vine", 10), measure("snake", 12)],
   },
   {
     key: "crayon-cucumber-snake",
