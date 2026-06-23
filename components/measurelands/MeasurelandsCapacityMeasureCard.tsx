@@ -1,6 +1,7 @@
 "use client";
 
 import { Compass } from "lucide-react";
+import { useState } from "react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
@@ -190,6 +191,96 @@ function CompareScene({ task, onCorrect, onWrong }: { task: CapacityTask; onCorr
   );
 }
 
+function OrderScene({ task, onCorrect, onWrong }: { task: CapacityTask; onCorrect: () => void; onWrong: () => void }) {
+  const items = task.items ?? [];
+  const expected = task.orderedIds ?? [];
+  const [picked, setPicked] = useState<string[]>([]);
+  const [locked, setLocked] = useState(false);
+
+  function pick(id: string) {
+    if (locked || picked.includes(id)) return;
+    const next = [...picked, id];
+    setPicked(next);
+    if (next.length !== expected.length) return;
+    const correct = expected.every((eid, i) => next[i] === eid);
+    setLocked(true);
+    window.setTimeout(() => {
+      if (correct) onCorrect();
+      else {
+        setPicked([]);
+        setLocked(false);
+        onWrong();
+      }
+    }, 350);
+  }
+
+  return (
+    <Shell badge={task.badgeLabel ?? "Order the Capacities"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="mb-3 flex min-h-[52px] flex-wrap items-center justify-center gap-2 rounded-[22px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,248,232,0.75)] px-4 py-3">
+        {picked.length === 0 ? (
+          <span className="text-sm font-bold text-[#a98b52]">Tap the containers from smallest to largest capacity.</span>
+        ) : (
+          picked.map((id, idx) => {
+            const it = items.find((c) => c.id === id);
+            return (
+              <div key={id} className="inline-flex items-center gap-2 rounded-full border border-[rgba(214,184,108,0.4)] bg-white px-3 py-2 text-sm font-black text-[#5f4725]">
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#f5d791] text-[#2c1c07]">{idx + 1}</span>
+                {it?.label}
+              </div>
+            );
+          })
+        )}
+      </div>
+      <div className="grid gap-3 sm:grid-cols-3">
+        {items.map((item) => {
+          const step = picked.indexOf(item.id);
+          const chosen = step >= 0;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => pick(item.id)}
+              disabled={locked || chosen}
+              className="relative rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-3 text-left transition hover:-translate-y-1 disabled:opacity-70"
+            >
+              {chosen ? (
+                <div className="absolute right-2 top-2 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#0f766e] text-sm font-black text-white">{step + 1}</div>
+              ) : null}
+              <CapacityMeasure imageSrc={item.imageSrc} label={item.label} cups={item.cups} showCount compact />
+            </button>
+          );
+        })}
+      </div>
+    </Shell>
+  );
+}
+
+function EqualScene({ task, onCorrect, onWrong }: { task: CapacityTask; onCorrect: () => void; onWrong: () => void }) {
+  const items = task.items ?? [];
+  return (
+    <Shell badge={task.badgeLabel ?? "Find the Same Capacity"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      {task.target ? (
+        <div className="rounded-[24px] border border-[rgba(167,139,250,0.35)] bg-[rgba(109,40,217,0.06)] p-3">
+          <div className="mb-1 text-center text-xs font-black uppercase tracking-[0.16em] text-[#5b21b6]">Match this capacity</div>
+          <CapacityMeasure imageSrc={task.target.imageSrc} label={task.target.label} cups={task.target.cups} showCount compact />
+        </div>
+      ) : null}
+      <div className="grid gap-3 sm:grid-cols-3">
+        {items.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => (item.id === task.correctOptionId ? onCorrect() : onWrong())}
+            className="rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-3 text-left transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
+          >
+            <CapacityMeasure imageSrc={item.imageSrc} label={item.label} cups={item.cups} showCount compact />
+          </button>
+        ))}
+      </div>
+    </Shell>
+  );
+}
+
 export function MeasurelandsCapacityMeasureCard({
   task,
   onCorrect,
@@ -201,5 +292,7 @@ export function MeasurelandsCapacityMeasureCard({
 }) {
   if (task.scene === "intro") return <IntroScene task={task} onCorrect={onCorrect} />;
   if (task.scene === "compare") return <CompareScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "order") return <OrderScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "equal") return <EqualScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   return <CountScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 }

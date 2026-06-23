@@ -34,6 +34,11 @@ import {
   resetY1MeasurelandsWeek3Lesson1TaskSessionState,
   buildY1MeasurelandsWeek3Lesson1QuizTasks,
 } from "@/data/activities/year1Measurelands/week3Lesson1";
+import {
+  generateY1MeasurelandsWeek3Lesson2Task,
+  resetY1MeasurelandsWeek3Lesson2TaskSessionState,
+  buildY1MeasurelandsWeek3Lesson2QuizTasks,
+} from "@/data/activities/year1Measurelands/week3Lesson2";
 
 // Level 1 (Year 1) Measurelands lesson registry. Mirrors the Prep registry so
 // app/lesson/page.tsx can resolve `y1-measurement-w{n}-l{m}` ids to tasks.
@@ -184,6 +189,25 @@ const Y1_MEASURELANDS_LESSONS: Y1MeasurelandsLessonEntry[] = [
     unlockMessage: "Lesson 2 unlocked.",
     returnRoute: "/program?year=Year 1&week=3&legacy=1&realm_id=measurement",
     quizContributionBuilder: buildY1MeasurelandsWeek3Lesson1QuizTasks,
+  },
+  {
+    prefix: "y1-measurement-w3-l2",
+    week: 3,
+    lessonNumber: 2,
+    title: "Compare Measured Capacity",
+    subtitle: "Capacity Springs",
+    generate: generateY1MeasurelandsWeek3Lesson2Task,
+    reset: resetY1MeasurelandsWeek3Lesson2TaskSessionState,
+    practisedSkills: [
+      "Comparing capacity measurements",
+      "Identifying containers that hold more or less",
+      "Ordering measured capacities",
+      "Finding equal capacity",
+    ],
+    completionTitle: "Capacity Comparer Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+    returnRoute: "/program?year=Year 1&week=3&legacy=1&realm_id=measurement",
+    quizContributionBuilder: buildY1MeasurelandsWeek3Lesson2QuizTasks,
   },
 ];
 

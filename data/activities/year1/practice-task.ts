@@ -645,17 +645,21 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "count" | "compare";
+      scene: "intro" | "count" | "compare" | "order" | "equal";
       /** "count": one container holding this many cups; MCQ on the cup count. */
       container?: { imageSrc?: string; label: string; cups: number };
       options?: number[];
       correctAnswer?: number;
-      /** "compare": measured containers; tap the one matching the prompt. */
+      /** "compare"/"order"/"equal": measured containers shown with cup counts. */
       items?: Array<{ id: string; imageSrc?: string; label: string; cups: number }>;
       compareMode?: "more" | "less";
       correctOptionId?: string;
       /** "compare": hide the "· N cups" labels (e.g. "which holds 5 cups?"). */
       hideCounts?: boolean;
+      /** "order": correct order of item ids (smallest→largest or reverse). */
+      orderedIds?: string[];
+      /** "equal": the reference container the student matches by capacity. */
+      target?: { imageSrc?: string; label: string; cups: number };
       /** "intro": worked teaching containers shown during the teaching sequence. */
       teachingItems?: Array<{ imageSrc?: string; label: string; cups: number; caption?: string }>;
       feedback?: { correct: string; wrong: string };

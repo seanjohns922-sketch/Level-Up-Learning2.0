@@ -13,13 +13,13 @@ type CapacityTask = Extract<PracticeTask, { kind: "capacityMeasure" }>;
 
 const BASE = "/images/measurelands/containers-3d";
 
-type Container = { id: string; label: string; image: string; cups: number; look: number };
+export type CapacityContainer = { id: string; label: string; image: string; cups: number; look: number };
 
 // `cups` = capacity (2–10). `look` = how big the container APPEARS on screen
 // (1 small … 5 large), calibrated to the actual art. Compare questions pair
 // containers of SIMILAR apparent size with different cup counts, so size can't
 // reveal the answer — students must count the cups.
-const CONTAINERS: Container[] = [
+export const CONTAINERS: CapacityContainer[] = [
   { id: "cup", label: "Cup", image: `${BASE}/cup.png`, cups: 2, look: 1 },
   { id: "mug", label: "Mug", image: `${BASE}/mug.png`, cups: 3, look: 2 },
   { id: "bottle", label: "Bottle", image: `${BASE}/bottle.png`, cups: 4, look: 2 },
@@ -31,7 +31,7 @@ const CONTAINERS: Container[] = [
   { id: "pot", label: "Pot", image: `${BASE}/pot.png`, cups: 8, look: 4 },
 ];
 
-const BY_ID: Record<string, Container> = Object.fromEntries(CONTAINERS.map((c) => [c.id, c]));
+const BY_ID: Record<string, CapacityContainer> = Object.fromEntries(CONTAINERS.map((c) => [c.id, c]));
 
 type LessonMemory = { introShown: boolean; cursor: number; lastId: string | null };
 const lessonMemory = new Map<string, LessonMemory>();
@@ -60,7 +60,7 @@ function choose<T>(items: T[]): T {
   return items[randInt(items.length)]!;
 }
 
-function pickContainer(memory: LessonMemory): Container {
+function pickContainer(memory: LessonMemory): CapacityContainer {
   const c = choose(CONTAINERS.filter((o) => o.id !== memory.lastId));
   memory.lastId = c.id;
   return c;
@@ -71,13 +71,13 @@ function countOptions(value: number): number[] {
   return shuffle([value, ...shuffle(candidates).slice(0, 2)]);
 }
 
-const toItem = (c: Container) => ({ id: c.id, imageSrc: c.image, label: c.label, cups: c.cups });
+const toItem = (c: CapacityContainer) => ({ id: c.id, imageSrc: c.image, label: c.label, cups: c.cups });
 
 // Two containers of SIMILAR apparent size but different capacity, so the answer
 // can't be read off the picture — students must count the cups. (With this art,
 // apparent size roughly tracks capacity, so we make size ambiguous rather than
 // inverted.)
-function pickBusterPair(memory: LessonMemory): [Container, Container] {
+function pickBusterPair(memory: LessonMemory): [CapacityContainer, CapacityContainer] {
   const first = pickContainer(memory);
   const candidates = CONTAINERS.filter((o) => o.id !== first.id && o.cups !== first.cups);
   const ambiguous = candidates.filter((o) => Math.abs(o.look - first.look) <= 1);
