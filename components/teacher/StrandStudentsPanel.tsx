@@ -41,10 +41,11 @@ type InsightCarrier = {
     timeSpentSeconds?: number | null;
     accuracy?: number | null;
     questionsAnswered?: number | null;
+    totalQuestions?: number | null;
     correctAnswers?: number | null;
+    correctCount?: number | null;
     incorrectAnswers?: number | null;
     accuracyPercent?: number | null;
-    totalQuestions?: number | null;
     completedAt?: string | null;
     at?: string | null;
     title?: string | null;
@@ -113,6 +114,7 @@ type LessonCardPerformance = {
   correct: number | null;
   total: number | null;
   accuracy: number | null;
+  attemptCount: number;
 };
 
 type WeeklyPerformanceSummary = {
@@ -525,10 +527,27 @@ function buildStudentWeeklyPerformanceSummary({
 
   const lessonCards = lessons.map((lesson) => {
     const attempt = lessonAttempts[lesson.id];
-    const latestSummary = attempt?.latestSummary;
-    const summaryTotal = numberOrNull(latestSummary?.questionsAnswered);
-    const summaryCorrect = numberOrNull(latestSummary?.correctAnswers);
-    const summaryAccuracy = numberOrNull(latestSummary?.accuracy);
+    const attempts = Array.isArray(attempt?.attempts)
+      ? [...attempt.attempts].filter(
+          (entry): entry is NonNullable<InsightCarrier["latestSummary"]> =>
+            Boolean(entry) && typeof entry === "object",
+        )
+      : [];
+    const latestCompletedAttempt =
+      [...attempts]
+        .reverse()
+        .find((entry) => Boolean(entry.completedAt ?? entry.at)) ??
+      attempt?.latestSummary ??
+      null;
+    const summaryTotal = numberOrNull(
+      latestCompletedAttempt?.totalQuestions ?? latestCompletedAttempt?.questionsAnswered,
+    );
+    const summaryCorrect = numberOrNull(
+      latestCompletedAttempt?.correctCount ?? latestCompletedAttempt?.correctAnswers,
+    );
+    const summaryAccuracy = numberOrNull(
+      latestCompletedAttempt?.accuracy ?? latestCompletedAttempt?.accuracyPercent,
+    );
     const eventSummary = buildEventLessonSummary(liveEvents, yearLabel, weekNumber, lesson);
 
     const liveMatchesThisLesson =
@@ -547,6 +566,12 @@ function buildStudentWeeklyPerformanceSummary({
       liveAccuracy ??
       (total && correct != null ? Math.round((correct / total) * 100) : null);
 
+    const attemptCount =
+      attempts.length > 0
+        ? attempts.length
+        : latestCompletedAttempt
+          ? 1
+          : 0;
     const hasPersistedSummary = summaryTotal != null || summaryCorrect != null || summaryAccuracy != null;
     const status: LessonCardPerformance["status"] = completedIds.includes(lesson.id) || hasPersistedSummary || eventSummary.completed
       ? "Completed"
@@ -560,6 +585,7 @@ function buildStudentWeeklyPerformanceSummary({
       correct,
       total,
       accuracy,
+      attemptCount,
     };
   });
 
@@ -1419,7 +1445,14 @@ function StudentStrandDetail({
               const done = !isPlaceholder && ids.includes(lsn.id);
               const performance =
                 weekPerformance.lessonCards.find((card) => card.lessonId === lsn.id) ??
-                { lessonId: lsn.id, status: done ? "Completed" : "Not Started", correct: null, total: null, accuracy: null };
+                {
+                  lessonId: lsn.id,
+                  status: done ? "Completed" : "Not Started",
+                  correct: null,
+                  total: null,
+                  accuracy: null,
+                  attemptCount: 0,
+                };
               return (
                 <button
                   key={lsn.id}
@@ -1460,6 +1493,9 @@ function StudentStrandDetail({
                     </div>
                     <div className="font-semibold text-[#475569]">
                       {performance.accuracy != null ? `${performance.accuracy}% accuracy` : "— accuracy"}
+                    </div>
+                    <div className="font-semibold text-[#94A3B8]">
+                      Attempts: {performance.attemptCount}
                     </div>
                   </div>
                   <div className="flex items-center justify-between mt-auto pt-1">
