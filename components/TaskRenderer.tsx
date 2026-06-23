@@ -100,6 +100,7 @@ import { MeasurelandsPathTaskCard } from "@/components/measurelands/Measurelands
 import { MeasurelandsValidityTaskCard } from "@/components/measurelands/MeasurelandsValidityTaskCard";
 import { MeasurelandsMassMeasureCard } from "@/components/measurelands/MeasurelandsMassMeasureCard";
 import { MeasurelandsCapacityMeasureCard } from "@/components/measurelands/MeasurelandsCapacityMeasureCard";
+import { MeasurelandsDurationUnitCard } from "@/components/measurelands/MeasurelandsDurationUnitCard";
 import { MeasurelandsBalanceScaleCard } from "@/components/measurelands/MeasurelandsBalanceScaleCard";
 import { isPracticeTaskSafe } from "@/lib/task-safety";
 
@@ -328,6 +329,8 @@ function TaskRendererInner({
       return <MeasurelandsMassMeasureCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "capacityMeasure":
       return <MeasurelandsCapacityMeasureCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "durationUnit":
+      return <MeasurelandsDurationUnitCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "balanceScale":
       return <MeasurelandsBalanceScaleCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundCollect":

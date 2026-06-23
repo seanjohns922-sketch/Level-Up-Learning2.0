@@ -683,6 +683,26 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Year 1 W4 L1 — duration in hour/day/week (AC9M1M03).
+      // Activity scenes are matched to / ordered by their usual duration unit.
+      kind: "durationUnit";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "classify" | "compare" | "order";
+      /** "classify": one activity scene; tap Hour / Day / Week. */
+      activity?: { imageSrc?: string; label: string; unit: "hour" | "day" | "week" };
+      /** "compare"/"order": activity scenes shown side by side. */
+      items?: Array<{ id: string; imageSrc?: string; label: string; unit: "hour" | "day" | "week" }>;
+      compareMode?: "longer" | "shorter";
+      correctOptionId?: string;
+      /** "order": correct order of item ids (shortest→longest duration). */
+      orderedIds?: string[];
+      /** "intro": worked teaching scenes shown during the teaching sequence. */
+      teachingItems?: Array<{ imageSrc?: string; label: string; unit: "hour" | "day" | "week"; caption?: string }>;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       // Generic, reusable interactive balance scale for equivalence activities
       // (Measurelands "Balance the Scales" and any future same-weight tasks).
       // The student fills/edits one pan; the scale is solved when both pans
