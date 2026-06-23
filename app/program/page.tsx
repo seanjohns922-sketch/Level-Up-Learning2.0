@@ -706,7 +706,7 @@ function ProgramPage() {
               {weekUnlocked
                 ? weekComplete
                   ? "◆ Completed"
-                  : `${lessonsDoneCount}/3 Lessons · ${progress.quizCompleted ? "Quiz Done" : "Quiz Pending"}`
+                  : `${lessonsDoneCount}/3 Lessons · ${progress.quizCompleted ? (weekComplete ? "Quiz Passed" : "Quiz Attempted") : "Quiz Pending"}`
                 : "◆ Preview Locked"}
             </p>
 

@@ -7762,14 +7762,14 @@ function SessionPage({
         };
 
         try {
+          const nextAssignedWeek = passed ? Math.min(12, Number(week) + 1) : Number(week);
           await saveNumberWeeklyQuizAttempt(studentId, year, Number(week), attempt);
           const latestProgress = readProgress();
           await saveStudentProgressState(studentId, year, {
             status: latestProgress?.status ?? "ASSIGNED_PROGRAM",
-            week: passed ? Math.min(12, Number(week) + 1) : Number(week),
+            week: nextAssignedWeek,
             placement_complete: latestProgress?.placementComplete ?? false,
-            assigned_week:
-              latestProgress?.assignedWeek ?? (passed ? Math.min(12, Number(week) + 1) : Number(week)),
+            assigned_week: nextAssignedWeek,
             required_weeks: latestProgress?.requiredWeeks ?? [],
             optional_weeks: latestProgress?.optionalWeeks ?? [],
             unlocked_legends: latestProgress?.unlockedLegends ?? [],

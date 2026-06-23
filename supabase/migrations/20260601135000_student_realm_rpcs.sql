@@ -416,7 +416,10 @@ BEGIN
         WHEN next_passed THEN GREATEST(COALESCE(current_summary.current_week, p_week), p_week + 1)
         ELSE GREATEST(COALESCE(current_summary.current_week, p_week), p_week)
       END,
-      'assigned_week', COALESCE(current_summary.assigned_week, p_week),
+      'assigned_week', CASE
+        WHEN next_passed THEN GREATEST(COALESCE(current_summary.assigned_week, p_week), p_week + 1)
+        ELSE GREATEST(COALESCE(current_summary.assigned_week, p_week), p_week)
+      END,
       'placement_complete', COALESCE(current_summary.placement_complete, FALSE),
       'required_weeks', COALESCE(current_summary.required_weeks, '[]'::jsonb),
       'optional_weeks', COALESCE(current_summary.optional_weeks, '[]'::jsonb),
