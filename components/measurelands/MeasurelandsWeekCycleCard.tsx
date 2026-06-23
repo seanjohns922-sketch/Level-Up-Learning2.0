@@ -438,11 +438,9 @@ function WeekOrMonthScene({ task, onCorrect, onWrong }: { task: WeekTask; onCorr
   return (
     <Shell badge={task.badgeLabel ?? "Week or Month?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       {isMonth ? (
-        <CalendarPage rows={task.weekRows ?? 4} caption={task.visualLabel ?? "Many weeks together"} />
+        <CalendarPage rows={task.weekRows ?? 4} caption={task.visualLabel ?? "One month = several week rows"} />
       ) : (
-        <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">
-          <WeekStrip days={task.items ?? []} />
-        </div>
+        <CalendarPage rows={1} caption={task.visualLabel ?? "One week = one row"} />
       )}
       <TextChoiceButtons
         options={options}
@@ -482,10 +480,7 @@ function WhichBiggerScene({ task, onCorrect, onWrong }: { task: WeekTask; onCorr
   return (
     <Shell badge={task.badgeLabel ?? "Which Is Bigger?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="grid gap-3 sm:grid-cols-2">
-        <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">
-          <div className="mb-3 text-center text-[10px] font-black uppercase tracking-[0.18em] text-[#7c3aed]">1 Week</div>
-          <WeekStrip days={task.items ?? []} />
-        </div>
+        <CalendarPage rows={1} caption="1 Week" />
         <CalendarPage rows={task.weekRows ?? 4} caption="1 Month" />
       </div>
       <TextChoiceButtons
