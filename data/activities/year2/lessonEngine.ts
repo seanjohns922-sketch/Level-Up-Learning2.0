@@ -5397,6 +5397,18 @@ function partitionNumber(value: number) {
   };
 }
 
+function formatExpandedPartition(value: number) {
+  const partition = partitionNumber(value);
+  return [
+    partition.thousands,
+    partition.hundreds,
+    partition.tens,
+    partition.ones,
+  ]
+    .filter((part): part is number => typeof part === "number" && part > 0)
+    .join(" + ");
+}
+
 function placeMultiplier(place: PlaceValueName) {
   if (place === "hundred_thousands") return 100000;
   if (place === "ten_thousands") return 10000;
@@ -25134,11 +25146,21 @@ function generateGenericQuestion(
   if (sourceActivityType === "partition_expand") {
     const target = randInt(Math.max(100, min), Math.max(150, max || 999));
     const standard = partitionNumber(target);
-    const answerText = `${standard.hundreds} + ${standard.tens} + ${standard.ones}`;
+    const thousandsValue = standard.thousands ?? 0;
+    const hundredsCount = standard.hundreds / 100;
+    const tensCount = standard.tens / 10;
+    const answerText = formatExpandedPartition(target);
     const altText =
       standard.hundreds >= 100
-        ? `${standard.hundreds - 100} + ${standard.tens + 100} + ${standard.ones}`
-        : `${standard.hundreds} + ${Math.max(0, standard.tens - 10)} + ${standard.ones + 10}`;
+        ? formatExpandedPartition(
+            thousandsValue + (standard.hundreds - 100) + (standard.tens + 100) + standard.ones
+          )
+        : formatExpandedPartition(
+            thousandsValue +
+              standard.hundreds +
+              Math.max(0, standard.tens - 10) +
+              (standard.ones + 10)
+          );
 
     if (config.mode === "flexible_partition") {
       return asMultipleChoice
@@ -25148,16 +25170,19 @@ function generateGenericQuestion(
             options: shuffle([
               altText,
               answerText,
-              `${standard.hundreds + 100} + ${Math.max(0, standard.tens - 100)} + ${standard.ones}`,
+              formatExpandedPartition(
+                thousandsValue + (standard.hundreds + 100) + Math.max(0, standard.tens - 100) + standard.ones
+              ),
               `${target - 1} + 0 + 1`,
             ]),
             answer: altText,
           }
         : {
             kind: "typed_response",
-            prompt: `${target} = ${standard.hundreds} + ${standard.tens} + ${standard.ones}. If 1 hundred is regrouped into 10 tens, how many tens are there now?`,
-            answer: String(standard.tens / 10 + 10),
-            placeholder: "Type the number of tens",
+            prompt: `${target} = ${answerText}. ${target} has ${hundredsCount} ${hundredsCount === 1 ? "hundred" : "hundreds"} and ${tensCount} ${tensCount === 1 ? "ten" : "tens"}. If 1 hundred is regrouped into 10 tens, how many tens are there altogether?`,
+            answer: String(tensCount + 10),
+            helper: "1 hundred is the same as 10 tens, so add 10 to the tens already there.",
+            placeholder: "Type the total number of tens",
           };
     }
 
@@ -25167,8 +25192,12 @@ function generateGenericQuestion(
           prompt: `Which expanded form matches ${target}?`,
           options: shuffle([
             answerText,
-            `${standard.hundreds} + ${standard.tens + 10} + ${Math.max(0, standard.ones - 10)}`,
-            `${standard.hundreds - 100} + ${standard.tens + 100} + ${standard.ones}`,
+            formatExpandedPartition(
+              thousandsValue + standard.hundreds + (standard.tens + 10) + Math.max(0, standard.ones - 10)
+            ),
+            formatExpandedPartition(
+              thousandsValue + (standard.hundreds - 100) + (standard.tens + 100) + standard.ones
+            ),
             `${target - 10} + 10 + 0`,
           ]),
           answer: answerText,
