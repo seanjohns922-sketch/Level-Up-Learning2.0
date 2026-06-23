@@ -7,6 +7,7 @@ import { LessonTimer } from "@/components/lesson/LessonTimer";
 import { LessonStatStrip } from "@/components/lesson/LessonStatStrip";
 import { ComboCounter } from "@/components/lesson/ComboCounter";
 import { MathFormattedText } from "@/components/FractionText";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 export function LessonHUDRail({
   levelNumber,
@@ -219,6 +220,9 @@ export function LessonHUDRail({
                   color: "rgba(255,251,235,0.95)",
                 }}
               >
+                <div className="mb-2 flex justify-end">
+                  <ReadAloudBtn text={hint} />
+                </div>
                 <MathFormattedText text={hint} />
               </div>
             )}

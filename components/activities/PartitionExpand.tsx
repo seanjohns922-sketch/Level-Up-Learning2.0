@@ -162,8 +162,13 @@ export default function PartitionExpand({
 
       {isFlexible ? (
         <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4">
-          <div className="text-xs font-black uppercase tracking-wide text-amber-700">
-            How this works
+          <div className="flex items-center gap-2">
+            <div className="text-xs font-black uppercase tracking-wide text-amber-700">
+              How this works
+            </div>
+            <ReadAloudBtn
+              text={`How this works. You can move 1 from a bigger box into the next box as 10 — a box can hold more than 9. Example with ${example.number}. Usual way: ${example.usual}. Another way: ${example.other}. Both make ${example.number}. The usual way for ${questionData.target.toLocaleString()}: ${standardExpression}. Now make the same total a different way.`}
+            />
           </div>
           <p className="mt-2 text-sm font-semibold text-amber-900">
             You can move 1 from a bigger box into the next box as 10 — a box can hold more than 9!

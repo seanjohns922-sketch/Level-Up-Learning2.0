@@ -2,6 +2,7 @@
 
 import { Lightbulb } from "lucide-react";
 import { MathFormattedText } from "@/components/FractionText";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 export function LessonSupportPanel({
   hint,
@@ -65,6 +66,7 @@ export function LessonSupportPanel({
           >
             Hint
           </span>
+          <ReadAloudBtn text={hint} className="ml-auto" />
         </div>
         <p className="relative text-sm font-medium text-amber-50/95 leading-relaxed whitespace-pre-line md:text-[15px]">
           <MathFormattedText text={hint} />
