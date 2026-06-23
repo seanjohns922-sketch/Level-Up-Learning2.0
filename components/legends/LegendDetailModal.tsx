@@ -55,6 +55,24 @@ export default function LegendDetailModal({
     setEnlarged(false);
   }, [legend.id]);
 
+  // Realm-aware theming: Measurelands = gold/violet, Number Nexus = teal.
+  const isMeasure = legend.realmId === "measurelands";
+  const t = isMeasure
+    ? {
+        panelBg: "bg-gradient-to-br from-amber-50 via-yellow-50 to-violet-50",
+        glow: "from-amber-400/20 to-violet-400/20",
+        active: "bg-[#6d28d9] text-white",
+        pill: "rounded-full border border-violet-500/25 bg-white/80 px-3 py-1 text-xs font-black text-violet-700 transition hover:bg-white",
+        year: "text-violet-600",
+      }
+    : {
+        panelBg: "bg-gradient-to-br from-teal-50 via-emerald-50 to-cyan-50",
+        glow: "from-teal-400/20 to-emerald-400/20",
+        active: "bg-teal-600 text-white",
+        pill: "rounded-full border border-teal-600/20 bg-white/80 px-3 py-1 text-xs font-black text-teal-700 transition hover:bg-white",
+        year: "text-teal-600",
+      };
+
   return (
     <>
     <div
@@ -74,7 +92,7 @@ export default function LegendDetailModal({
         </button>
 
         {/* Card artwork */}
-        <div className="relative bg-gradient-to-br from-teal-50 via-emerald-50 to-cyan-50 flex flex-col items-center justify-center gap-4 py-8 px-6">
+        <div className={`relative ${t.panelBg} flex flex-col items-center justify-center gap-4 py-8 px-6`}>
           {videoMode && activeVideoUrl ? (
             <div className="w-full max-w-[420px]">
               <div className="relative overflow-hidden rounded-2xl border-2 border-white/70 bg-slate-950 shadow-xl">
@@ -110,7 +128,7 @@ export default function LegendDetailModal({
           ) : (
             <>
           <div className="relative">
-            <div className="absolute -inset-4 rounded-2xl bg-gradient-to-br from-teal-400/20 to-emerald-400/20 blur-xl" />
+            <div className={`absolute -inset-4 rounded-2xl bg-gradient-to-br ${t.glow} blur-xl`} />
             <button
               type="button"
               onClick={() => setShowBack((current) => !current)}
@@ -141,7 +159,7 @@ export default function LegendDetailModal({
               onClick={() => setShowBack(false)}
               className={`rounded-full px-3 py-1 text-xs font-black transition ${
                 !showBack
-                  ? "bg-teal-600 text-white"
+                  ? t.active
                   : "bg-white/70 text-slate-700 hover:bg-white"
               }`}
             >
@@ -152,7 +170,7 @@ export default function LegendDetailModal({
               onClick={() => setShowBack(true)}
               className={`rounded-full px-3 py-1 text-xs font-black transition ${
                 showBack
-                  ? "bg-teal-600 text-white"
+                  ? t.active
                   : "bg-white/70 text-slate-700 hover:bg-white"
               }`}
             >
@@ -161,14 +179,14 @@ export default function LegendDetailModal({
             <button
               type="button"
               onClick={() => setShowBack((current) => !current)}
-              className="rounded-full border border-teal-600/20 bg-white/80 px-3 py-1 text-xs font-black text-teal-700 transition hover:bg-white"
+              className={t.pill}
             >
               Flip Card
             </button>
             <button
               type="button"
               onClick={() => setEnlarged(true)}
-              className="inline-flex items-center gap-1 rounded-full border border-teal-600/20 bg-white/80 px-3 py-1 text-xs font-black text-teal-700 transition hover:bg-white"
+              className={`inline-flex items-center gap-1 ${t.pill}`}
             >
               <Maximize2 className="h-3.5 w-3.5" /> Enlarge
             </button>
@@ -179,7 +197,7 @@ export default function LegendDetailModal({
                   setVideoFailed(false);
                   setVideoMode("showcase");
                 }}
-                className="inline-flex items-center gap-1 rounded-full border border-teal-600/20 bg-white/80 px-3 py-1 text-xs font-black text-teal-700 transition hover:bg-white"
+                className={`inline-flex items-center gap-1 ${t.pill}`}
               >
                 <Play className="h-3.5 w-3.5" />
                 Watch Video
@@ -204,7 +222,7 @@ export default function LegendDetailModal({
         {/* Details */}
         <div className="p-5 space-y-3">
           <div>
-            <p className="text-[10px] font-extrabold text-teal-600 tracking-[0.15em]">
+            <p className={`text-[10px] font-extrabold ${t.year} tracking-[0.15em]`}>
               {legend.yearLabel.toUpperCase()}
             </p>
             <h3 className="text-xl font-black text-foreground">{legend.name}</h3>
