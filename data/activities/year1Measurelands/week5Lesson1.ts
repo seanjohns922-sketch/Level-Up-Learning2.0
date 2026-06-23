@@ -46,6 +46,12 @@ function buildIntroTask(): WeekTask {
     speakText:
       "Professor Gauge has reached Calendar Grove! A week is made of seven days, from Monday to Sunday. After Sunday, a new week begins — weeks repeat over and over.",
     badgeLabel: "Meazurex Mission",
+    introTitle: "Calendar Grove",
+    introBody: [
+      "A week is made of seven days.",
+      "After Sunday, a new week begins — weeks repeat over and over.",
+    ],
+    introVisual: "weekCycle",
     teachingDays: WEEK5_DAYS.map(toCard),
     feedback: { correct: "Let's build a week!", wrong: "Let's get ready." },
   };

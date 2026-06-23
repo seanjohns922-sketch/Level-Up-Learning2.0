@@ -735,6 +735,9 @@ export type PracticeTask = (
       correctOptionId?: string;
       /** "intro": worked week-strip examples. */
       teachingDays?: Array<{ id: string; imageSrc?: string; label: string }>;
+      introTitle?: string;
+      introBody?: string[];
+      introVisual?: "weekCycle" | "weekToMonth" | "monthCycle";
       feedback?: { correct: string; wrong: string };
     }
   | {

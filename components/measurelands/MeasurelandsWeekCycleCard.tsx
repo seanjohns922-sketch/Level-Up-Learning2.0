@@ -1,13 +1,38 @@
 "use client";
 
 import { useState } from "react";
-import { Compass, ArrowRight, RotateCw } from "lucide-react";
+import { Compass, ArrowRight, RotateCw, Sun, Leaf, Wind, Cloud, Snowflake, Sprout, TreePine, Gift } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type WeekTask = Extract<PracticeTask, { kind: "weekCycle" }>;
 type DayCard = { id: string; imageSrc?: string; label: string };
+
+const MONTH_VISUALS: Record<
+  string,
+  {
+    Icon: typeof Sun;
+    bg: string;
+    icon: string;
+    ring: string;
+    accent: string;
+    cue: string;
+  }
+> = {
+  January: { Icon: Sun, bg: "linear-gradient(135deg,#fde68a,#f59e0b)", icon: "#7c2d12", ring: "rgba(245,158,11,0.35)", accent: "#b45309", cue: "Summer" },
+  February: { Icon: Sun, bg: "linear-gradient(135deg,#fdba74,#f97316)", icon: "#7c2d12", ring: "rgba(249,115,22,0.35)", accent: "#c2410c", cue: "Sunny Days" },
+  March: { Icon: Leaf, bg: "linear-gradient(135deg,#fde68a,#84cc16)", icon: "#365314", ring: "rgba(132,204,22,0.35)", accent: "#4d7c0f", cue: "Autumn Begins" },
+  April: { Icon: Leaf, bg: "linear-gradient(135deg,#fcd34d,#65a30d)", icon: "#365314", ring: "rgba(101,163,13,0.35)", accent: "#4d7c0f", cue: "Falling Leaves" },
+  May: { Icon: Wind, bg: "linear-gradient(135deg,#c4b5fd,#93c5fd)", icon: "#4338ca", ring: "rgba(99,102,241,0.28)", accent: "#4f46e5", cue: "Cool Winds" },
+  June: { Icon: Cloud, bg: "linear-gradient(135deg,#cbd5e1,#94a3b8)", icon: "#334155", ring: "rgba(148,163,184,0.35)", accent: "#475569", cue: "Cloudy Days" },
+  July: { Icon: Snowflake, bg: "linear-gradient(135deg,#bfdbfe,#60a5fa)", icon: "#1d4ed8", ring: "rgba(96,165,250,0.35)", accent: "#2563eb", cue: "Winter" },
+  August: { Icon: Cloud, bg: "linear-gradient(135deg,#dbeafe,#93c5fd)", icon: "#1d4ed8", ring: "rgba(147,197,253,0.35)", accent: "#2563eb", cue: "Cold Mornings" },
+  September: { Icon: Sprout, bg: "linear-gradient(135deg,#bbf7d0,#4ade80)", icon: "#166534", ring: "rgba(74,222,128,0.35)", accent: "#16a34a", cue: "Spring" },
+  October: { Icon: TreePine, bg: "linear-gradient(135deg,#86efac,#22c55e)", icon: "#166534", ring: "rgba(34,197,94,0.35)", accent: "#15803d", cue: "Growing Green" },
+  November: { Icon: Sun, bg: "linear-gradient(135deg,#fef08a,#facc15)", icon: "#854d0e", ring: "rgba(250,204,21,0.35)", accent: "#ca8a04", cue: "Warm Spring" },
+  December: { Icon: Gift, bg: "linear-gradient(135deg,#fecaca,#f87171)", icon: "#991b1b", ring: "rgba(248,113,113,0.35)", accent: "#dc2626", cue: "Celebration Time" },
+};
 
 /* ── Gold/violet Meazurex shell ── */
 function Shell({
@@ -47,14 +72,28 @@ function Shell({
 }
 
 function Day({ day, size = 64, dim = false }: { day: DayCard; size?: number; dim?: boolean }) {
+  const monthVisual = !day.imageSrc ? MONTH_VISUALS[day.label] : null;
   return (
     <div className="flex flex-col items-center" style={{ opacity: dim ? 0.5 : 1 }}>
       {day.imageSrc ? (
         <img src={day.imageSrc} alt={day.label} className="object-contain" style={{ height: size, width: size }} />
+      ) : monthVisual ? (
+        <div
+          className="flex items-center justify-center rounded-[18px] border shadow-[0_10px_24px_rgba(120,53,15,0.08)]"
+          style={{
+            height: size,
+            width: size,
+            borderColor: monthVisual.ring,
+            background: monthVisual.bg,
+          }}
+        >
+          <monthVisual.Icon className="h-[55%] w-[55%]" style={{ color: monthVisual.icon }} />
+        </div>
       ) : (
         <div className="flex items-center justify-center rounded-xl bg-[rgba(214,184,108,0.15)]" style={{ height: size, width: size }} />
       )}
       <div className="mt-0.5 text-[10px] font-black uppercase tracking-[0.1em] text-[#7c4a12]">{day.label}</div>
+      {monthVisual ? <div className="text-[8px] font-black uppercase tracking-[0.12em]" style={{ color: monthVisual.accent }}>{monthVisual.cue}</div> : null}
     </div>
   );
 }
@@ -145,7 +184,9 @@ function WeekStrip({ days, brace = true }: { days: Array<DayCard | null>; brace?
 /* ── Intro / teaching ── */
 function IntroScene({ task, onCorrect }: { task: WeekTask; onCorrect: () => void }) {
   const days = task.teachingDays ?? [];
-  const showMonthPage = typeof task.weekRows === "number" && task.weekRows > 1;
+  const introTitle = task.introTitle ?? "Meazurex";
+  const introBody = task.introBody ?? ["A week is made of seven days.", "After Sunday, a new week begins — weeks repeat over and over."];
+  const introVisual = task.introVisual ?? (typeof task.weekRows === "number" && task.weekRows > 1 ? "weekToMonth" : "weekCycle");
   return (
     <Shell badge={task.badgeLabel ?? "Meazurex Mission"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="rounded-[30px] border border-[rgba(214,184,108,0.36)] bg-[rgba(255,248,232,0.98)] p-5 shadow-[0_18px_38px_rgba(180,120,20,0.08)]">
@@ -154,19 +195,43 @@ function IntroScene({ task, onCorrect }: { task: WeekTask; onCorrect: () => void
             <Compass className="h-8 w-8" />
           </div>
           <div className="space-y-2">
-            <div className="text-sm font-black uppercase tracking-[0.16em] text-[#5b21b6]">Meazurex</div>
-            <p className="text-base font-semibold leading-relaxed text-[#2c1c07]">A week is made of seven days.</p>
-            <p className="text-base font-semibold leading-relaxed text-[#5f4725]">After Sunday, a new week begins — weeks repeat over and over.</p>
+            <div className="text-sm font-black uppercase tracking-[0.16em] text-[#5b21b6]">{introTitle}</div>
+            {introBody.map((line, index) => (
+              <p
+                key={`${line}-${index}`}
+                className={`text-base font-semibold leading-relaxed ${index === 0 ? "text-[#2c1c07]" : "text-[#5f4725]"}`}
+              >
+                {line}
+              </p>
+            ))}
           </div>
         </div>
 
-        {showMonthPage ? (
+        {introVisual === "weekToMonth" ? (
           <div className="grid gap-3 lg:grid-cols-[0.95fr_1.05fr]">
             <div className="rounded-[26px] border border-[rgba(214,184,108,0.28)] bg-[rgba(255,252,245,0.92)] p-3">
               <div className="mb-2 text-center text-[10px] font-black uppercase tracking-[0.18em] text-[#7c3aed]">1 Week</div>
               <WeekStrip days={days} />
             </div>
             <CalendarPage rows={task.weekRows ?? 4} highlightRow={typeof task.highlightRow === "number" ? task.highlightRow : 0} caption="1 Month = several weeks" />
+          </div>
+        ) : introVisual === "monthCycle" ? (
+          <div className="rounded-[26px] border border-[rgba(214,184,108,0.28)] bg-[rgba(255,252,245,0.92)] p-4">
+            <div className="mb-3 text-center text-[10px] font-black uppercase tracking-[0.18em] text-[#7c3aed]">12 Months = 1 Year</div>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              {days.map((month, index) => (
+                <div key={month.id} className="flex items-center gap-2">
+                  <Day day={month} size={58} />
+                  {index < days.length - 1 ? <ArrowRight className="h-4 w-4 text-[#7c3aed]" /> : null}
+                </div>
+              ))}
+              {days.length > 0 ? (
+                <>
+                  <RotateCw className="mx-1 h-5 w-5 text-[#5b21b6]" />
+                  <Day day={days[0]!} size={58} />
+                </>
+              ) : null}
+            </div>
           </div>
         ) : (
           <div className="rounded-[26px] border border-[rgba(214,184,108,0.28)] bg-[rgba(255,252,245,0.92)] p-3">
@@ -220,7 +285,7 @@ function BuildScene({ task, onCorrect, onWrong }: { task: WeekTask; onCorrect: (
     <Shell badge={task.badgeLabel ?? "Build the Week"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="mb-3 flex min-h-[60px] flex-wrap items-center justify-center gap-1.5 rounded-[22px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,248,232,0.75)] p-3">
         {picked.length === 0 ? (
-          <span className="text-sm font-bold text-[#a98b52]">Tap the days in order, Monday first.</span>
+          <span className="text-sm font-bold text-[#a98b52]">{task.speakText ?? "Tap the items in order."}</span>
         ) : (
           picked.map((id, idx) => {
             const d = byId(id);
