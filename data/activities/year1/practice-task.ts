@@ -703,6 +703,33 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Year 1 W5 L1 — 7 days make a week, and weeks repeat
+      // (AC9M1M03). Reuses the Ground Level day cards.
+      kind: "weekCycle";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "build" | "count" | "next" | "missing" | "whichWeek";
+      /** "build": day cards (shuffled) to order Monday→Sunday. */
+      items?: Array<{ id: string; imageSrc?: string; label: string }>;
+      orderedIds?: string[];
+      /** "count": how many days in a week. */
+      options?: number[];
+      correctAnswer?: number;
+      /** "next": the day cards leading up to the "?" slot. */
+      sequence?: Array<{ id: string; imageSrc?: string; label: string }>;
+      /** "next"/"missing": day-card answer options. */
+      choices?: Array<{ id: string; imageSrc?: string; label: string }>;
+      /** "missing": the week strip with one slot null (the gap to fill). */
+      strip?: Array<{ id: string; imageSrc?: string; label: string } | null>;
+      /** "whichWeek": groups of day cards; tap the one that is a full week. */
+      groups?: Array<{ id: string; days: Array<{ id: string; imageSrc?: string; label: string }> }>;
+      correctOptionId?: string;
+      /** "intro": worked week-strip examples. */
+      teachingDays?: Array<{ id: string; imageSrc?: string; label: string }>;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       // Generic, reusable interactive balance scale for equivalence activities
       // (Measurelands "Balance the Scales" and any future same-weight tasks).
       // The student fills/edits one pan; the scale is solved when both pans

@@ -187,6 +187,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "massMeasure",
   "capacityMeasure",
   "durationUnit",
+  "weekCycle",
   "balanceScale",
   "groundCollect",
   "groundBuild",

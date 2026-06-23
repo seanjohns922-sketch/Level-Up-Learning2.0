@@ -54,6 +54,7 @@ function formatPracticeTopicLabel(kind: PracticeTask["kind"]) {
   if (kind === "massMeasure") return "Mass Measurer";
   if (kind === "capacityMeasure") return "Cup Counter";
   if (kind === "durationUnit") return "Time Explorer";
+  if (kind === "weekCycle") return "Calendar Keeper";
   if (kind === "balanceScale") return "Balance Master";
   if (kind === "groundMatch") return "Ground Match";
   if (kind === "groundCollect") return "Ground Collect";
@@ -786,6 +787,7 @@ export function PracticeRunner({
     task.kind === "massMeasure" ||
     task.kind === "capacityMeasure" ||
     task.kind === "durationUnit" ||
+    task.kind === "weekCycle" ||
     task.kind === "balanceScale" ||
     task.kind === "groundMatch" ||
     task.kind === "groundCollect" ||

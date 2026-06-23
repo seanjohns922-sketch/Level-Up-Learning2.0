@@ -1388,6 +1388,7 @@ type GroundQuizPracticeTask = Extract<
   | { kind: "massMeasure" }
   | { kind: "capacityMeasure" }
   | { kind: "durationUnit" }
+  | { kind: "weekCycle" }
   | { kind: "balanceScale" }
 >;
 
