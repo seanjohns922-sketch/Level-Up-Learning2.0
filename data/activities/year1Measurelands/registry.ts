@@ -64,6 +64,11 @@ import {
   resetY1MeasurelandsWeek5Lesson1TaskSessionState,
   buildY1MeasurelandsWeek5Lesson1QuizTasks,
 } from "@/data/activities/year1Measurelands/week5Lesson1";
+import {
+  generateY1MeasurelandsWeek5Lesson2Task,
+  resetY1MeasurelandsWeek5Lesson2TaskSessionState,
+  buildY1MeasurelandsWeek5Lesson2QuizTasks,
+} from "@/data/activities/year1Measurelands/week5Lesson2";
 
 // Level 1 (Year 1) Measurelands lesson registry. Mirrors the Prep registry so
 // app/lesson/page.tsx can resolve `y1-measurement-w{n}-l{m}` ids to tasks.
@@ -328,6 +333,25 @@ const Y1_MEASURELANDS_LESSONS: Y1MeasurelandsLessonEntry[] = [
     unlockMessage: "Lesson 2 unlocked.",
     returnRoute: "/program?year=Year 1&week=5&legacy=1&realm_id=measurement",
     quizContributionBuilder: buildY1MeasurelandsWeek5Lesson1QuizTasks,
+  },
+  {
+    prefix: "y1-measurement-w5-l2",
+    week: 5,
+    lessonNumber: 2,
+    title: "Weeks and Months",
+    subtitle: "Calendar Grove",
+    generate: generateY1MeasurelandsWeek5Lesson2Task,
+    reset: resetY1MeasurelandsWeek5Lesson2TaskSessionState,
+    practisedSkills: [
+      "Knowing months are made of several weeks",
+      "Recognising weeks inside a month",
+      "Comparing week and month",
+      "Ordering day, week and month",
+    ],
+    completionTitle: "Calendar Comparer Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+    returnRoute: "/program?year=Year 1&week=5&legacy=1&realm_id=measurement",
+    quizContributionBuilder: buildY1MeasurelandsWeek5Lesson2QuizTasks,
   },
 ];
 

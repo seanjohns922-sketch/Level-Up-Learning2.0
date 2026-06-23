@@ -73,6 +73,58 @@ function GapSlot({ size = 64 }: { size?: number }) {
   );
 }
 
+function MiniDayCell({ label }: { label: string }) {
+  return (
+    <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-[rgba(214,184,108,0.28)] bg-[rgba(255,252,245,0.96)] text-[10px] font-black uppercase tracking-[0.08em] text-[#7c4a12] shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
+      {label.slice(0, 1)}
+    </div>
+  );
+}
+
+function CalendarPage({
+  rows,
+  highlightRow,
+  caption,
+}: {
+  rows: number;
+  highlightRow?: number;
+  caption?: string;
+}) {
+  const dayLabels = ["M", "T", "W", "T", "F", "S", "S"];
+  return (
+    <div className="mx-auto max-w-[520px] rounded-[28px] border border-[rgba(214,184,108,0.4)] bg-[linear-gradient(180deg,rgba(255,252,245,0.98),rgba(252,244,225,0.98))] p-4 shadow-[0_18px_38px_rgba(180,120,20,0.08)]">
+      <div className="mb-3 flex items-center justify-between rounded-[18px] bg-[rgba(109,40,217,0.08)] px-4 py-2">
+        <div className="text-xs font-black uppercase tracking-[0.18em] text-[#5b21b6]">Calendar Page</div>
+        {caption ? <div className="text-[11px] font-bold text-[#7c4a12]">{caption}</div> : null}
+      </div>
+      <div className="grid gap-2">
+        {Array.from({ length: rows }, (_, rowIndex) => {
+          const isHighlighted = highlightRow === rowIndex;
+          return (
+            <div
+              key={`row-${rowIndex}`}
+              className="rounded-[18px] border px-2 py-2"
+              style={{
+                borderColor: isHighlighted ? "rgba(91,33,182,0.45)" : "rgba(214,184,108,0.24)",
+                background: isHighlighted ? "rgba(109,40,217,0.08)" : "rgba(255,255,255,0.72)",
+              }}
+            >
+              <div className="mb-1 text-left text-[9px] font-black uppercase tracking-[0.16em] text-[#a98b52]">
+                Week {rowIndex + 1}
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-1.5">
+                {dayLabels.map((label, cellIndex) => (
+                  <MiniDayCell key={`${rowIndex}-${cellIndex}-${label}`} label={label} />
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 /* ── A week strip with the "1 WEEK" brace underneath ── */
 function WeekStrip({ days, brace = true }: { days: Array<DayCard | null>; brace?: boolean }) {
   return (
@@ -93,6 +145,7 @@ function WeekStrip({ days, brace = true }: { days: Array<DayCard | null>; brace?
 /* ── Intro / teaching ── */
 function IntroScene({ task, onCorrect }: { task: WeekTask; onCorrect: () => void }) {
   const days = task.teachingDays ?? [];
+  const showMonthPage = typeof task.weekRows === "number" && task.weekRows > 1;
   return (
     <Shell badge={task.badgeLabel ?? "Meazurex Mission"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="rounded-[30px] border border-[rgba(214,184,108,0.36)] bg-[rgba(255,248,232,0.98)] p-5 shadow-[0_18px_38px_rgba(180,120,20,0.08)]">
@@ -107,15 +160,25 @@ function IntroScene({ task, onCorrect }: { task: WeekTask; onCorrect: () => void
           </div>
         </div>
 
-        <div className="rounded-[26px] border border-[rgba(214,184,108,0.28)] bg-[rgba(255,252,245,0.92)] p-3">
-          <WeekStrip days={days} />
-          <div className="mt-3 flex items-center justify-center gap-2">
-            {days[6] ? <Day day={days[6]} size={44} /> : null}
-            <RotateCw className="h-6 w-6 text-[#5b21b6]" />
-            {days[0] ? <Day day={days[0]} size={44} /> : null}
-            <span className="ml-1 text-sm font-bold text-[#5f4725]">the cycle repeats</span>
+        {showMonthPage ? (
+          <div className="grid gap-3 lg:grid-cols-[0.95fr_1.05fr]">
+            <div className="rounded-[26px] border border-[rgba(214,184,108,0.28)] bg-[rgba(255,252,245,0.92)] p-3">
+              <div className="mb-2 text-center text-[10px] font-black uppercase tracking-[0.18em] text-[#7c3aed]">1 Week</div>
+              <WeekStrip days={days} />
+            </div>
+            <CalendarPage rows={task.weekRows ?? 4} highlightRow={typeof task.highlightRow === "number" ? task.highlightRow : 0} caption="1 Month = several weeks" />
           </div>
-        </div>
+        ) : (
+          <div className="rounded-[26px] border border-[rgba(214,184,108,0.28)] bg-[rgba(255,252,245,0.92)] p-3">
+            <WeekStrip days={days} />
+            <div className="mt-3 flex items-center justify-center gap-2">
+              {days[6] ? <Day day={days[6]} size={44} /> : null}
+              <RotateCw className="h-6 w-6 text-[#5b21b6]" />
+              {days[0] ? <Day day={days[0]} size={44} /> : null}
+              <span className="ml-1 text-sm font-bold text-[#5f4725]">the cycle repeats</span>
+            </div>
+          </div>
+        )}
 
         <div className="mt-5 flex justify-center">
           <button
@@ -284,6 +347,90 @@ function WhichWeekScene({ task, onCorrect, onWrong }: { task: WeekTask; onCorrec
   );
 }
 
+function TextChoiceButtons({ options, onPick }: { options: string[]; onPick: (value: string) => void }) {
+  return (
+    <div className={`grid gap-3 ${options.length <= 2 ? "sm:grid-cols-2" : "sm:grid-cols-3"}`}>
+      {options.map((value) => (
+        <button
+          key={value}
+          type="button"
+          onClick={() => onPick(value)}
+          className="relative flex min-h-[88px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-4 py-3 text-center text-2xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+        >
+          <span className="absolute right-3 top-3 z-10">
+            <OptionReadAloudButton text={value} />
+          </span>
+          {value}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function WeekOrMonthScene({ task, onCorrect, onWrong }: { task: WeekTask; onCorrect: () => void; onWrong: () => void }) {
+  const options = task.textOptions ?? [];
+  const isMonth = task.visualMode === "month";
+  return (
+    <Shell badge={task.badgeLabel ?? "Week or Month?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      {isMonth ? (
+        <CalendarPage rows={task.weekRows ?? 4} caption={task.visualLabel ?? "Many weeks together"} />
+      ) : (
+        <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">
+          <WeekStrip days={task.items ?? []} />
+        </div>
+      )}
+      <TextChoiceButtons
+        options={options}
+        onPick={(value) => (value === task.correctTextOption ? onCorrect() : onWrong())}
+      />
+    </Shell>
+  );
+}
+
+function FindWeeksScene({ task, onCorrect, onWrong }: { task: WeekTask; onCorrect: () => void; onWrong: () => void }) {
+  return (
+    <Shell badge={task.badgeLabel ?? "Find the Weeks"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <CalendarPage
+        rows={task.weekRows ?? 4}
+        highlightRow={typeof task.highlightRow === "number" ? task.highlightRow : undefined}
+        caption={task.visualLabel ?? "A month has several week rows"}
+      />
+      <div className="grid grid-cols-3 gap-3">
+        {(task.options ?? []).map((value) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => (value === task.correctAnswer ? onCorrect() : onWrong())}
+            className="relative flex min-h-[88px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-5xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+          >
+            <span className="absolute right-3 top-3 z-10"><OptionReadAloudButton text={String(value)} /></span>
+            {value}
+          </button>
+        ))}
+      </div>
+    </Shell>
+  );
+}
+
+function WhichBiggerScene({ task, onCorrect, onWrong }: { task: WeekTask; onCorrect: () => void; onWrong: () => void }) {
+  const options = task.textOptions ?? [];
+  return (
+    <Shell badge={task.badgeLabel ?? "Which Is Bigger?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">
+          <div className="mb-3 text-center text-[10px] font-black uppercase tracking-[0.18em] text-[#7c3aed]">1 Week</div>
+          <WeekStrip days={task.items ?? []} />
+        </div>
+        <CalendarPage rows={task.weekRows ?? 4} caption="1 Month" />
+      </div>
+      <TextChoiceButtons
+        options={options}
+        onPick={(value) => (value === task.correctTextOption ? onCorrect() : onWrong())}
+      />
+    </Shell>
+  );
+}
+
 export function MeasurelandsWeekCycleCard({
   task,
   onCorrect,
@@ -298,5 +445,8 @@ export function MeasurelandsWeekCycleCard({
   if (task.scene === "count") return <CountScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "next") return <NextScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "missing") return <MissingScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "weekOrMonth") return <WeekOrMonthScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "findWeeks") return <FindWeeksScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "whichBigger") return <WhichBiggerScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   return <WhichWeekScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 }

@@ -704,18 +704,26 @@ export type PracticeTask = (
     }
   | {
       // Measurelands Year 1 W5 L1 — 7 days make a week, and weeks repeat
-      // (AC9M1M03). Reuses the Ground Level day cards.
+      // (AC9M1M03). Extended in W5 L2 to show that weeks sit inside months.
       kind: "weekCycle";
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "build" | "count" | "next" | "missing" | "whichWeek";
+      scene: "intro" | "build" | "count" | "next" | "missing" | "whichWeek" | "weekOrMonth" | "findWeeks" | "whichBigger";
       /** "build": day cards (shuffled) to order Monday→Sunday. */
       items?: Array<{ id: string; imageSrc?: string; label: string }>;
       orderedIds?: string[];
       /** "count": how many days in a week. */
       options?: number[];
       correctAnswer?: number;
+      /** "weekOrMonth"/"whichBigger": text answer options. */
+      textOptions?: string[];
+      correctTextOption?: string;
+      /** "weekOrMonth"/"findWeeks"/"whichBigger": one row = one week, many rows = a month. */
+      weekRows?: number;
+      highlightRow?: number;
+      visualMode?: "week" | "month";
+      visualLabel?: string;
       /** "next": the day cards leading up to the "?" slot. */
       sequence?: Array<{ id: string; imageSrc?: string; label: string }>;
       /** "next"/"missing": day-card answer options. */
