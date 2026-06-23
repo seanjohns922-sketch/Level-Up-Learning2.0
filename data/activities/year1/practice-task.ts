@@ -677,7 +677,7 @@ export type PracticeTask = (
       fair?: boolean;
       problemOptions?: string[];
       correctProblem?: string;
-      sensibleUnits?: Array<{ id: string; unit: "cup" | "spoon"; label: string }>;
+      sensibleUnits?: Array<{ id: string; unit: "cup" | "spoon" | "bucket"; label: string }>;
       /** "intro": worked teaching containers shown during the teaching sequence. */
       teachingItems?: Array<{ imageSrc?: string; label: string; cups: number; caption?: string }>;
       feedback?: { correct: string; wrong: string };

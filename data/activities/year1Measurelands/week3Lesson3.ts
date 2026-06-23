@@ -32,8 +32,13 @@ function choose<T>(items: T[]): T {
   return items[randInt(items.length)]!;
 }
 
-function pickContainer(memory: LessonMemory, filter?: (container: CapacityContainer) => boolean): CapacityContainer {
-  const pool = CONTAINERS.filter((container) => container.id !== memory.lastId && (filter ? filter(container) : true));
+function pickContainer(
+  memory: LessonMemory,
+  filter?: (container: CapacityContainer) => boolean,
+): CapacityContainer {
+  const pool = CONTAINERS.filter(
+    (container) => container.id !== memory.lastId && (filter ? filter(container) : true),
+  );
   const chosen = choose(pool.length ? pool : CONTAINERS);
   memory.lastId = chosen.id;
   return chosen;
@@ -57,90 +62,125 @@ function comparisonFor(container: CapacityContainer, fair: boolean) {
 }
 
 function buildIntroTask(): CapacityTask {
-  const bucket = CONTAINERS.find((container) => container.id === "bucket")!;
+  const bathtub = { image: "/images/measurelands/containers-3d/bathtub.png", label: "Bathtub", cups: 10 };
   return {
     kind: "capacityMeasure",
     scene: "intro",
-    prompt: "Using the same measuring unit makes capacity fair.",
+    prompt: "Better measuring units make capacity easier to measure.",
     speakText:
-      "Professor Gauge says: if two explorers use different measuring tools, they can get different numbers for the same container. Capacity comparisons are only fair when we use the same measuring unit each time.",
+      "Professor Gauge says: after we measure and compare capacity, we also need to choose measuring units that make sense. A bathtub is easier to measure with cups than with lots and lots of spoons. Good measuring units should make sense for the container.",
     badgeLabel: "Meazurex Mission",
     fairComparison: {
-      containerImageSrc: bucket.image,
-      label: "Bucket",
-      left: { unit: "cup", count: 5 },
-      right: { unit: "spoon", count: 12 },
+      containerImageSrc: bathtub.image,
+      label: bathtub.label,
+      left: { unit: "cup", count: 10 },
+      right: { unit: "spoon", count: 150 },
     },
-    feedback: { correct: "Let's check which measurements are fair!", wrong: "Let's get ready." },
+    feedback: { correct: "Let's choose better measuring units!", wrong: "Let's get ready." },
   };
 }
 
-function buildFairChooseTask(memory: LessonMemory): CapacityTask {
-  const fairContainer = pickContainer(memory);
-  const unfairContainer = pickContainer(memory, (container) => container.id !== fairContainer.id);
-  const options = shuffle([
-    { id: "fair", ...comparisonFor(fairContainer, true) },
-    { id: "unfair", ...comparisonFor(unfairContainer, false) },
-  ]);
-  return {
-    kind: "capacityMeasure",
-    scene: "fairChoose",
-    prompt: "Which comparison is fair?",
-    speakText: "Which comparison is fair? A fair comparison uses the same measuring unit both times.",
-    badgeLabel: "Which Measurement Is Fair?",
-    fairComparisons: options,
-    correctOptionId: "fair",
-    feedback: { correct: "Yes — both explorers used the same cup.", wrong: "A fair comparison uses the same measuring unit both times." },
-  };
-}
-
-function buildProblemTask(memory: LessonMemory): CapacityTask {
-  const left = pickContainer(memory, (container) => container.cups <= 5);
-  const right = pickContainer(memory, (container) => container.cups >= 6 && container.id !== left.id);
-  return {
-    kind: "capacityMeasure",
-    scene: "fairJudge",
-    prompt: "What is wrong with this measurement?",
-    speakText: "What is wrong? Listen carefully. The explorers used different measuring units.",
-    badgeLabel: "Find the Problem",
-    fairComparison: {
-      containerImageSrc: right.image,
-      label: right.label,
-      left: { unit: "cup", count: left.cups },
-      right: { unit: "spoon", count: right.cups + 4 },
-    },
-    fair: false,
-    problemOptions: [
-      "Different measuring units",
-      "Too much water",
-      "Wrong container",
-    ],
-    correctProblem: "Different measuring units",
-    feedback: { correct: "Right — the measuring units do not match.", wrong: "The problem is that the measuring units are different." },
-  };
-}
-
-function buildBetterUnitTask(memory: LessonMemory): CapacityTask {
+function buildChooseUnitTask(memory: LessonMemory): CapacityTask {
   const large = randInt(2) === 0;
   const target = large
     ? pickContainer(memory, (container) => container.cups >= 6)
     : pickContainer(memory, (container) => container.cups <= 3);
-  const correctUnit = large ? "cup" : "spoon";
+  const correctOptionId = large ? "cup" : "spoon";
   return {
     kind: "capacityMeasure",
     scene: "betterUnit",
-    prompt: `Which is the better unit to measure the ${target.label.toLowerCase()}?`,
-    speakText: `Which is the better measuring unit for the ${target.label.toLowerCase()}?`,
-    badgeLabel: "Choose the Better Unit",
+    prompt: `Which unit would you use to measure the ${target.label.toLowerCase()}?`,
+    speakText: `Which unit would you use to measure the ${target.label.toLowerCase()}?`,
+    badgeLabel: "Which Unit Would You Use?",
     target: { imageSrc: target.image, label: target.label, cups: target.cups },
     sensibleUnits: shuffle([
       { id: "cup", unit: "cup", label: "Cup" },
       { id: "spoon", unit: "spoon", label: "Spoon" },
     ]),
-    correctOptionId: correctUnit,
+    correctOptionId,
     feedback: {
-      correct: correctUnit === "cup" ? "Yes — a cup is a better unit for a larger container." : "Yes — a spoon is a sensible unit for a small container.",
-      wrong: correctUnit === "cup" ? "A cup is the better unit for a larger container." : "A spoon is the better unit for a small container.",
+      correct:
+        correctOptionId === "cup"
+          ? "Yes — a cup is a better unit for a larger container."
+          : "Yes — a spoon can be a sensible unit for a small container.",
+      wrong:
+        correctOptionId === "cup"
+          ? "A cup is the better unit for a larger container."
+          : "A spoon is the better unit for a small container.",
+    },
+  };
+}
+
+function buildLongerMeasureTask(memory: LessonMemory): CapacityTask {
+  const target = pickContainer(memory, (container) => container.cups >= 6);
+  return {
+    kind: "capacityMeasure",
+    scene: "betterUnit",
+    prompt: "Which is the better measuring tool?",
+    speakText:
+      "Look at the two measurements. Which is the better measuring tool? The better tool takes fewer repeated measures.",
+    badgeLabel: "Which Takes Longer?",
+    fairComparison: {
+      containerImageSrc: target.image,
+      label: target.label,
+      left: { unit: "cup", count: target.cups },
+      right: { unit: "spoon", count: target.cups * 18 + 6 },
+    },
+    sensibleUnits: shuffle([
+      { id: "cup", unit: "cup", label: "Cup" },
+      { id: "spoon", unit: "spoon", label: "Spoon" },
+    ]),
+    correctOptionId: "cup",
+    feedback: {
+      correct: "Yes — cups are the better measuring tool here because you need fewer of them.",
+      wrong: "The better measuring tool here is cups because the job takes fewer repeated measures.",
+    },
+  };
+}
+
+function buildFixProfessorTask(memory: LessonMemory): CapacityTask {
+  const largeTarget = pickContainer(memory, (container) => container.cups >= 7);
+  return {
+    kind: "capacityMeasure",
+    scene: "betterUnit",
+    prompt: "Fix Professor Gauge's measurement.",
+    speakText:
+      "Professor Gauge used spoons to measure a large container. Which unit should he use instead?",
+    badgeLabel: "Fix Professor Gauge",
+    fairComparison: {
+      containerImageSrc: largeTarget.image,
+      label: largeTarget.label,
+      left: { unit: "spoon", count: largeTarget.cups * 18 + 6 },
+      right: { unit: "cup", count: largeTarget.cups },
+    },
+    sensibleUnits: shuffle([
+      { id: "cup", unit: "cup", label: "Cup" },
+      { id: "bucket", unit: "bucket", label: "Bucket Unit" },
+    ]),
+    correctOptionId: "cup",
+    feedback: {
+      correct: "Yes — cups are the better unit here.",
+      wrong: "Cups are the better unit here. Bucket units would be too large and not very helpful.",
+    },
+  };
+}
+
+function buildFairSupportTask(memory: LessonMemory): CapacityTask {
+  const container = pickContainer(memory);
+  return {
+    kind: "capacityMeasure",
+    scene: "fairChoose",
+    prompt: "Which comparison is fair?",
+    speakText: "Which comparison is fair? A fair comparison uses the same measuring unit both times.",
+    badgeLabel: "Fair or Unfair?",
+    fairComparisons: shuffle([
+      { id: "fair", ...comparisonFor(container, true) },
+      { id: "unfair", ...comparisonFor(container, false) },
+    ]),
+    correctOptionId: "fair",
+    feedback: {
+      correct: "Yes — the fair comparison uses the same unit.",
+      wrong: "The fair comparison is the one that uses the same unit both times.",
     },
   };
 }
@@ -161,7 +201,10 @@ function buildWhySameUnitTask(memory: LessonMemory): CapacityTask {
       "It does not matter.",
     ],
     correctProblem: "It makes the comparison fair.",
-    feedback: { correct: "Yes — the same unit makes the comparison fair.", wrong: "We use the same unit to make comparisons fair." },
+    feedback: {
+      correct: "Yes — the same unit makes the comparison fair.",
+      wrong: "We use the same unit to make the comparison fair.",
+    },
   };
 }
 
@@ -176,9 +219,9 @@ export function generateY1MeasurelandsWeek3Lesson3Task(
   }
   const rotation = ROTATION[memory.cursor % ROTATION.length]!;
   memory.cursor += 1;
-  if (rotation === "A") return buildFairChooseTask(memory);
-  if (rotation === "B") return buildProblemTask(memory);
-  return buildBetterUnitTask(memory);
+  if (rotation === "A") return buildChooseUnitTask(memory);
+  if (rotation === "B") return buildLongerMeasureTask(memory);
+  return buildFixProfessorTask(memory);
 }
 
 export function resetY1MeasurelandsWeek3Lesson3TaskSessionState() {
@@ -187,28 +230,23 @@ export function resetY1MeasurelandsWeek3Lesson3TaskSessionState() {
 
 export function buildY1MeasurelandsWeek3Lesson3QuizTasks(): PracticeTask[] {
   const seed: LessonMemory = { introShown: true, cursor: 0, lastId: null };
-  const fair = buildFairChooseTask(seed);
-  const differentUnits = buildProblemTask(seed);
-  const betterUnitLarge = buildBetterUnitTask(seed);
-  const betterUnitSmall = buildBetterUnitTask(seed);
-  if (betterUnitSmall.correctOptionId === betterUnitLarge.correctOptionId) {
-    const small = CONTAINERS.find((container) => container.cups <= 3)!;
-    betterUnitSmall.target = { imageSrc: small.image, label: small.label, cups: small.cups };
-    betterUnitSmall.correctOptionId = "spoon";
-    betterUnitSmall.sensibleUnits = [
-      { id: "cup", unit: "cup", label: "Cup" },
-      { id: "spoon", unit: "spoon", label: "Spoon" },
-    ];
-  }
   return [
-    fair,
+    buildFairSupportTask(seed),
     {
-      ...differentUnits,
-      prompt: "Which measurement uses different units?",
-      speakText: "Which measurement uses different units?",
+      ...buildLongerMeasureTask(seed),
+      prompt: "Which measurement tool is better?",
+      speakText: "Which measurement tool is better?",
     },
-    buildProblemTask(seed),
-    betterUnitLarge,
+    {
+      ...buildFixProfessorTask(seed),
+      prompt: "Fix Professor Gauge's measurement.",
+      speakText: "Fix Professor Gauge's measurement.",
+    },
+    {
+      ...buildChooseUnitTask(seed),
+      prompt: "Choose the better measuring unit.",
+      speakText: "Choose the better measuring unit.",
+    },
     buildWhySameUnitTask(seed),
   ];
 }

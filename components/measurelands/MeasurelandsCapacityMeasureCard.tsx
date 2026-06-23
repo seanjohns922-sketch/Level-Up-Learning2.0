@@ -436,7 +436,9 @@ function FairJudgeScene({ task, onCorrect, onWrong }: { task: CapacityTask; onCo
 function BetterUnitScene({ task, onCorrect, onWrong }: { task: CapacityTask; onCorrect: () => void; onWrong: () => void }) {
   return (
     <Shell badge={task.badgeLabel ?? "Choose the Better Unit"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      {task.target ? (
+      {task.fairComparison ? (
+        <FairComparisonCard comparison={task.fairComparison} />
+      ) : task.target ? (
         <div className="rounded-[24px] border border-[rgba(167,139,250,0.35)] bg-[rgba(109,40,217,0.06)] p-3">
           <CapacityMeasure imageSrc={task.target.imageSrc} label={task.target.label} cups={task.target.cups} compact />
         </div>
@@ -449,7 +451,7 @@ function BetterUnitScene({ task, onCorrect, onWrong }: { task: CapacityTask; onC
               onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
               className="flex min-h-[140px] w-full flex-col items-center justify-center gap-3 rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-4 py-5 text-lg font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5"
             >
-              {option.unit === "cup" ? <CupUnit size={46} /> : <SpoonUnit size={46} />}
+              {option.unit === "cup" ? <CupUnit size={46} /> : option.unit === "spoon" ? <SpoonUnit size={46} /> : <span className="text-5xl">🪣</span>}
               <span>{option.label}</span>
             </button>
             <span className="absolute right-3 top-3 z-10">
