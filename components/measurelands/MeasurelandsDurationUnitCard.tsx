@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Compass } from "lucide-react";
+import { Compass, Clock, Sun, CalendarRange } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
@@ -53,14 +53,16 @@ function ActivityScene({
   imageSrc,
   label,
   compact = false,
+  tiny = false,
   showUnit,
 }: {
   imageSrc?: string;
   label: string;
   compact?: boolean;
+  tiny?: boolean;
   showUnit?: Unit;
 }) {
-  const h = compact ? 96 : 132;
+  const h = tiny ? 52 : compact ? 96 : 132;
   return (
     <div className="flex flex-col items-center">
       {imageSrc ? (
@@ -70,7 +72,7 @@ function ActivityScene({
           {label}
         </div>
       )}
-      <div className="mt-1 text-center text-sm font-black uppercase tracking-[0.14em] text-[#7c4a12]">
+      <div className={`mt-1 text-center font-black uppercase tracking-[0.14em] text-[#7c4a12] ${tiny ? "text-[10px]" : "text-sm"}`}>
         {label}{showUnit ? ` · about a ${showUnit}` : ""}
       </div>
     </div>
@@ -230,6 +232,97 @@ function OrderScene({ task, onCorrect, onWrong }: { task: DurationTask; onCorrec
   );
 }
 
+/* ── Activity A: sort each activity into its Hour / Day / Week bin ── */
+const BIN_ICON: Record<Unit, typeof Clock> = { hour: Clock, day: Sun, week: CalendarRange };
+
+function SortScene({ task, onCorrect, onWrong }: { task: DurationTask; onCorrect: () => void; onWrong: () => void }) {
+  const items = task.items ?? [];
+  const [placement, setPlacement] = useState<Record<string, Unit | null>>({});
+  const [selected, setSelected] = useState<string | null>(null);
+  const [locked, setLocked] = useState(false);
+
+  const tray = items.filter((it) => !placement[it.id]);
+
+  function placeInto(unit: Unit) {
+    if (locked || !selected) return;
+    const next = { ...placement, [selected]: unit };
+    setSelected(null);
+    setPlacement(next);
+    if (items.some((it) => !next[it.id])) return;
+    const allCorrect = items.every((it) => next[it.id] === it.unit);
+    setLocked(true);
+    window.setTimeout(() => {
+      if (allCorrect) onCorrect();
+      else { setPlacement({}); setLocked(false); onWrong(); }
+    }, 400);
+  }
+
+  function unplace(id: string) {
+    if (locked) return;
+    setPlacement((p) => ({ ...p, [id]: null }));
+  }
+
+  return (
+    <Shell badge={task.badgeLabel ?? "Sort the Activities"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      {/* tray of activities to sort */}
+      <div className="flex min-h-[96px] flex-wrap items-center justify-center gap-2 rounded-[22px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,248,232,0.75)] p-3">
+        {tray.length === 0 ? (
+          <span className="text-sm font-bold text-[#a98b52]">All sorted!</span>
+        ) : (
+          tray.map((it) => (
+            <button
+              key={it.id}
+              type="button"
+              onClick={() => setSelected(it.id)}
+              className="relative rounded-[18px] border-2 bg-white p-2 transition hover:-translate-y-0.5"
+              style={{ borderColor: selected === it.id ? "rgba(94,234,212,0.9)" : "rgba(214,184,108,0.4)" }}
+            >
+              <span className="absolute right-1 top-1 z-10"><OptionReadAloudButton text={it.label} /></span>
+              <ActivityScene imageSrc={it.imageSrc} label={it.label} tiny />
+            </button>
+          ))
+        )}
+      </div>
+
+      {/* the three duration bins */}
+      <div className="grid grid-cols-3 gap-3">
+        {(["hour", "day", "week"] as Unit[]).map((u) => {
+          const Icon = BIN_ICON[u];
+          const placed = items.filter((it) => placement[it.id] === u);
+          return (
+            <button
+              key={u}
+              type="button"
+              onClick={() => placeInto(u)}
+              disabled={locked || !selected}
+              className="flex min-h-[120px] flex-col items-center gap-1 rounded-[22px] border-2 border-dashed bg-[rgba(255,252,245,0.9)] p-2 transition disabled:opacity-90"
+              style={{ borderColor: selected ? "rgba(94,234,212,0.7)" : "rgba(214,184,108,0.5)" }}
+            >
+              <span className="inline-flex items-center gap-1.5 text-sm font-black uppercase tracking-[0.12em] text-[#5b21b6]">
+                <Icon className="h-5 w-5" /> {UNIT_LABEL[u]}
+                <OptionReadAloudButton text={UNIT_LABEL[u]} />
+              </span>
+              <div className="flex flex-wrap items-center justify-center gap-1">
+                {placed.map((it) => (
+                  <span
+                    key={it.id}
+                    role="button"
+                    onClick={(e) => { e.stopPropagation(); unplace(it.id); }}
+                    className="rounded-[14px] border border-[rgba(214,184,108,0.4)] bg-white p-1"
+                    title="Tap to take back"
+                  >
+                    <ActivityScene imageSrc={it.imageSrc} label={it.label} tiny />
+                  </span>
+                ))}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </Shell>
+  );
+}
+
 export function MeasurelandsDurationUnitCard({
   task,
   onCorrect,
@@ -242,5 +335,6 @@ export function MeasurelandsDurationUnitCard({
   if (task.scene === "intro") return <IntroScene task={task} onCorrect={onCorrect} />;
   if (task.scene === "classify") return <ClassifyScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "order") return <OrderScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "sort") return <SortScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   return <CompareScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 }

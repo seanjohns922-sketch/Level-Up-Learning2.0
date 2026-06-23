@@ -689,10 +689,10 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "classify" | "compare" | "order";
+      scene: "intro" | "classify" | "compare" | "order" | "sort";
       /** "classify": one activity scene; tap Hour / Day / Week. */
       activity?: { imageSrc?: string; label: string; unit: "hour" | "day" | "week" };
-      /** "compare"/"order": activity scenes shown side by side. */
+      /** "compare"/"order"/"sort": activity scenes (sort places each into its unit bin). */
       items?: Array<{ id: string; imageSrc?: string; label: string; unit: "hour" | "day" | "week" }>;
       compareMode?: "longer" | "shorter";
       correctOptionId?: string;

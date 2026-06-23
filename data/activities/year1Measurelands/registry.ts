@@ -54,6 +54,11 @@ import {
   resetY1MeasurelandsWeek4Lesson2TaskSessionState,
   buildY1MeasurelandsWeek4Lesson2QuizTasks,
 } from "@/data/activities/year1Measurelands/week4Lesson2";
+import {
+  generateY1MeasurelandsWeek4Lesson3Task,
+  resetY1MeasurelandsWeek4Lesson3TaskSessionState,
+  buildY1MeasurelandsWeek4Lesson3QuizTasks,
+} from "@/data/activities/year1Measurelands/week4Lesson3";
 
 // Level 1 (Year 1) Measurelands lesson registry. Mirrors the Prep registry so
 // app/lesson/page.tsx can resolve `y1-measurement-w{n}-l{m}` ids to tasks.
@@ -280,6 +285,25 @@ const Y1_MEASURELANDS_LESSONS: Y1MeasurelandsLessonEntry[] = [
     unlockMessage: "Lesson 3 unlocked.",
     returnRoute: "/program?year=Year 1&week=4&legacy=1&realm_id=measurement",
     quizContributionBuilder: buildY1MeasurelandsWeek4Lesson2QuizTasks,
+  },
+  {
+    prefix: "y1-measurement-w4-l3",
+    week: 4,
+    lessonNumber: 3,
+    title: "Sort by Duration",
+    subtitle: "Duration Dunes",
+    generate: generateY1MeasurelandsWeek4Lesson3Task,
+    reset: resetY1MeasurelandsWeek4Lesson3TaskSessionState,
+    practisedSkills: [
+      "Sorting activities into hour/day/week groups",
+      "Choosing the best duration unit",
+      "Ordering activities by duration",
+      "Reasoning about how long events take",
+    ],
+    completionTitle: "Duration Sorter Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+    returnRoute: "/program?year=Year 1&week=4&legacy=1&realm_id=measurement",
+    quizContributionBuilder: buildY1MeasurelandsWeek4Lesson3QuizTasks,
   },
 ];
 
