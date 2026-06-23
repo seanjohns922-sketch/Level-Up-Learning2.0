@@ -10,14 +10,17 @@ import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-
 //   C — Sort by Duration     (scene "order",   shortest → longest)
 
 type DurationTask = Extract<PracticeTask, { kind: "durationUnit" }>;
-type Unit = "hour" | "day" | "week";
+export type DurationUnit = "hour" | "day" | "week";
+type Unit = DurationUnit;
 
 const BASE = "/images/measurelands/duration-3d";
-const RANK: Record<Unit, number> = { hour: 1, day: 2, week: 3 };
+export const DURATION_RANK: Record<Unit, number> = { hour: 1, day: 2, week: 3 };
+const RANK = DURATION_RANK;
 
-type Activity = { id: string; label: string; image: string; unit: Unit };
+export type DurationActivity = { id: string; label: string; image: string; unit: Unit };
+type Activity = DurationActivity;
 
-const ACTIVITIES: Activity[] = [
+export const DURATION_ACTIVITIES: Activity[] = [
   // about an hour
   { id: "movie", label: "Movie Night", image: `${BASE}/movie.png`, unit: "hour" },
   { id: "swimming-lesson", label: "Swimming Lesson", image: `${BASE}/swimming-lesson.png`, unit: "hour" },
@@ -33,11 +36,11 @@ const ACTIVITIES: Activity[] = [
   { id: "festival", label: "Festival Week", image: `${BASE}/festival.png`, unit: "week" },
 ];
 
-const BY_ID: Record<string, Activity> = Object.fromEntries(ACTIVITIES.map((a) => [a.id, a]));
-const BY_UNIT: Record<Unit, Activity[]> = {
-  hour: ACTIVITIES.filter((a) => a.unit === "hour"),
-  day: ACTIVITIES.filter((a) => a.unit === "day"),
-  week: ACTIVITIES.filter((a) => a.unit === "week"),
+const BY_ID: Record<string, Activity> = Object.fromEntries(DURATION_ACTIVITIES.map((a) => [a.id, a]));
+export const DURATION_BY_UNIT: Record<Unit, Activity[]> = {
+  hour: DURATION_ACTIVITIES.filter((a) => a.unit === "hour"),
+  day: DURATION_ACTIVITIES.filter((a) => a.unit === "day"),
+  week: DURATION_ACTIVITIES.filter((a) => a.unit === "week"),
 };
 
 type LessonMemory = { introShown: boolean; cursor: number; lastId: string | null };
@@ -68,7 +71,7 @@ function choose<T>(items: T[]): T {
 }
 
 function pickActivity(memory: LessonMemory): Activity {
-  const a = choose(ACTIVITIES.filter((o) => o.id !== memory.lastId));
+  const a = choose(DURATION_ACTIVITIES.filter((o) => o.id !== memory.lastId));
   memory.lastId = a.id;
   return a;
 }
@@ -109,8 +112,8 @@ function buildClassifyTask(memory: LessonMemory): DurationTask {
 // Activity B — which lasts longer / shorter?
 function buildCompareTask(memory: LessonMemory): DurationTask {
   const units = shuffle(["hour", "day", "week"] as Unit[]).slice(0, 2) as [Unit, Unit];
-  const a = choose(BY_UNIT[units[0]]);
-  const b = choose(BY_UNIT[units[1]]);
+  const a = choose(DURATION_BY_UNIT[units[0]]);
+  const b = choose(DURATION_BY_UNIT[units[1]]);
   memory.lastId = b.id;
   const longer = randInt(2) === 0;
   const winner = longer
@@ -131,9 +134,9 @@ function buildCompareTask(memory: LessonMemory): DurationTask {
 
 // Activity C — order shortest → longest (hour → day → week).
 function buildOrderTask(memory: LessonMemory): DurationTask {
-  const hour = choose(BY_UNIT.hour);
-  const day = choose(BY_UNIT.day);
-  const week = choose(BY_UNIT.week);
+  const hour = choose(DURATION_BY_UNIT.hour);
+  const day = choose(DURATION_BY_UNIT.day);
+  const week = choose(DURATION_BY_UNIT.week);
   memory.lastId = week.id;
   const trio = [hour, day, week];
   return {
@@ -150,9 +153,9 @@ function buildOrderTask(memory: LessonMemory): DurationTask {
 
 // Quiz helper — "which activity takes about a <unit>?" (3 activities, one per unit).
 function buildPickByUnit(memory: LessonMemory, target: Unit): DurationTask {
-  const hour = choose(BY_UNIT.hour);
-  const day = choose(BY_UNIT.day);
-  const week = choose(BY_UNIT.week);
+  const hour = choose(DURATION_BY_UNIT.hour);
+  const day = choose(DURATION_BY_UNIT.day);
+  const week = choose(DURATION_BY_UNIT.week);
   const byUnit: Record<Unit, Activity> = { hour, day, week };
   return {
     kind: "durationUnit",
