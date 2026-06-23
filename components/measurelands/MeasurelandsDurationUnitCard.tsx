@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Compass } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
+import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type DurationTask = Extract<PracticeTask, { kind: "durationUnit" }>;
@@ -134,8 +135,9 @@ function ClassifyScene({ task, onCorrect, onWrong }: { task: DurationTask; onCor
             key={u}
             type="button"
             onClick={() => (u === a?.unit ? onCorrect() : onWrong())}
-            className="flex min-h-[76px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+            className="relative flex min-h-[76px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
           >
+            <span className="absolute right-2 top-2 z-10"><OptionReadAloudButton text={UNIT_LABEL[u]} /></span>
             {UNIT_LABEL[u]}
           </button>
         ))}
@@ -155,8 +157,9 @@ function CompareScene({ task, onCorrect, onWrong }: { task: DurationTask; onCorr
             key={item.id}
             type="button"
             onClick={() => (item.id === task.correctOptionId ? onCorrect() : onWrong())}
-            className="rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-3 text-left transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
+            className="relative rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-3 text-left transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
           >
+            <span className="absolute right-2 top-2 z-10"><OptionReadAloudButton text={item.label} /></span>
             <ActivityScene imageSrc={item.imageSrc} label={item.label} compact />
           </button>
         ))}
@@ -214,6 +217,7 @@ function OrderScene({ task, onCorrect, onWrong }: { task: DurationTask; onCorrec
               disabled={locked || chosen}
               className="relative rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-3 text-left transition hover:-translate-y-1 disabled:opacity-70"
             >
+              <span className="absolute left-2 top-2 z-10"><OptionReadAloudButton text={item.label} /></span>
               {chosen ? (
                 <div className="absolute right-2 top-2 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#0f766e] text-sm font-black text-white">{step + 1}</div>
               ) : null}
