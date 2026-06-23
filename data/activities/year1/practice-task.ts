@@ -645,7 +645,7 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "count" | "compare" | "order" | "equal";
+      scene: "intro" | "count" | "compare" | "order" | "equal" | "fairChoose" | "fairJudge" | "betterUnit";
       /** "count": one container holding this many cups; MCQ on the cup count. */
       container?: { imageSrc?: string; label: string; cups: number };
       options?: number[];
@@ -660,6 +660,24 @@ export type PracticeTask = (
       orderedIds?: string[];
       /** "equal": the reference container the student matches by capacity. */
       target?: { imageSrc?: string; label: string; cups: number };
+      /** Capacity fairness / sensible unit scenes. */
+      fairComparisons?: Array<{
+        id: string;
+        containerImageSrc?: string;
+        label: string;
+        left: { unit: "cup" | "spoon"; count: number };
+        right: { unit: "cup" | "spoon"; count: number };
+      }>;
+      fairComparison?: {
+        containerImageSrc?: string;
+        label: string;
+        left: { unit: "cup" | "spoon"; count: number };
+        right: { unit: "cup" | "spoon"; count: number };
+      };
+      fair?: boolean;
+      problemOptions?: string[];
+      correctProblem?: string;
+      sensibleUnits?: Array<{ id: string; unit: "cup" | "spoon"; label: string }>;
       /** "intro": worked teaching containers shown during the teaching sequence. */
       teachingItems?: Array<{ imageSrc?: string; label: string; cups: number; caption?: string }>;
       feedback?: { correct: string; wrong: string };

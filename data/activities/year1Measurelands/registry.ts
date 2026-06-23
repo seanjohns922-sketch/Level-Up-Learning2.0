@@ -39,6 +39,11 @@ import {
   resetY1MeasurelandsWeek3Lesson2TaskSessionState,
   buildY1MeasurelandsWeek3Lesson2QuizTasks,
 } from "@/data/activities/year1Measurelands/week3Lesson2";
+import {
+  generateY1MeasurelandsWeek3Lesson3Task,
+  resetY1MeasurelandsWeek3Lesson3TaskSessionState,
+  buildY1MeasurelandsWeek3Lesson3QuizTasks,
+} from "@/data/activities/year1Measurelands/week3Lesson3";
 
 // Level 1 (Year 1) Measurelands lesson registry. Mirrors the Prep registry so
 // app/lesson/page.tsx can resolve `y1-measurement-w{n}-l{m}` ids to tasks.
@@ -208,6 +213,25 @@ const Y1_MEASURELANDS_LESSONS: Y1MeasurelandsLessonEntry[] = [
     unlockMessage: "Lesson 3 unlocked.",
     returnRoute: "/program?year=Year 1&week=3&legacy=1&realm_id=measurement",
     quizContributionBuilder: buildY1MeasurelandsWeek3Lesson2QuizTasks,
+  },
+  {
+    prefix: "y1-measurement-w3-l3",
+    week: 3,
+    lessonNumber: 3,
+    title: "Better Measuring Units",
+    subtitle: "Capacity Springs",
+    generate: generateY1MeasurelandsWeek3Lesson3Task,
+    reset: resetY1MeasurelandsWeek3Lesson3TaskSessionState,
+    practisedSkills: [
+      "Recognising fair capacity measurements",
+      "Spotting different measuring units",
+      "Choosing a sensible measuring unit",
+      "Knowing why the same unit matters",
+    ],
+    completionTitle: "Fair Capacity Measurer Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+    returnRoute: "/program?year=Year 1&week=3&legacy=1&realm_id=measurement",
+    quizContributionBuilder: buildY1MeasurelandsWeek3Lesson3QuizTasks,
   },
 ];
 

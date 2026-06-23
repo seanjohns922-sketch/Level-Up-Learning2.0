@@ -8,6 +8,21 @@ import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type CapacityTask = Extract<PracticeTask, { kind: "capacityMeasure" }>;
 
+function SpoonUnit({ size = 30 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" aria-hidden>
+      <defs>
+        <linearGradient id="spoon-bowl" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#fff7db" />
+          <stop offset="100%" stopColor="#d4b06b" />
+        </linearGradient>
+      </defs>
+      <ellipse cx="16" cy="16" rx="10" ry="8" fill="url(#spoon-bowl)" stroke="#8a6121" strokeWidth="2" />
+      <path d="M22 18 L39 35" stroke="#8a6121" strokeWidth="4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 /* ── The Level 1 capacity unit: a measuring cup with water ── */
 function CupUnit({ size = 30 }: { size?: number }) {
   return (
@@ -103,6 +118,69 @@ function CapacityMeasure({
   );
 }
 
+function CapacityUnitRow({
+  unit,
+  count,
+  compact = false,
+}: {
+  unit: "cup" | "spoon";
+  count: number;
+  compact?: boolean;
+}) {
+  const size = compact ? 22 : 26;
+  return (
+    <div
+      className="mt-2 flex w-full flex-wrap items-center justify-center gap-1 rounded-[18px] border-2 px-2 py-2"
+      style={{ borderColor: "rgba(214,184,108,0.55)", background: "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(236,248,255,0.9))" }}
+    >
+      {Array.from({ length: count }).map((_, i) =>
+        unit === "cup" ? <CupUnit key={`${unit}-${i}`} size={size} /> : <SpoonUnit key={`${unit}-${i}`} size={size} />
+      )}
+    </div>
+  );
+}
+
+function FairComparisonCard({
+  comparison,
+  compact = false,
+}: {
+  comparison: NonNullable<CapacityTask["fairComparison"]> | NonNullable<CapacityTask["fairComparisons"]>[number];
+  compact?: boolean;
+}) {
+  const objH = compact ? 56 : 78;
+  return (
+    <div className="rounded-[24px] border border-[rgba(214,184,108,0.35)] bg-[rgba(255,252,245,0.94)] p-3">
+      {comparison.containerImageSrc ? (
+        <div className="mb-2 flex justify-center">
+          <img
+            src={comparison.containerImageSrc}
+            alt={comparison.label}
+            className="object-contain drop-shadow-[0_8px_14px_rgba(76,40,10,0.18)]"
+            style={{ height: objH }}
+          />
+        </div>
+      ) : null}
+      <div className="mb-2 text-center text-sm font-black uppercase tracking-[0.14em] text-[#7c4a12]">{comparison.label}</div>
+      <div className="grid gap-2 sm:grid-cols-2">
+        <div className="rounded-[18px] border border-[rgba(167,139,250,0.28)] bg-white p-2">
+          <div className="text-center text-[11px] font-black uppercase tracking-[0.14em] text-[#5b21b6]">Explorer A</div>
+          <CapacityUnitRow unit={comparison.left.unit} count={comparison.left.count} compact={compact} />
+          <div className="mt-1 text-center text-xs font-bold text-[#5f4725]">
+            {comparison.left.count} {comparison.left.unit === "cup" ? "cups" : "spoons"}
+          </div>
+        </div>
+        <div className="rounded-[18px] border border-[rgba(167,139,250,0.28)] bg-white p-2">
+          <div className="text-center text-[11px] font-black uppercase tracking-[0.14em] text-[#5b21b6]">Explorer B</div>
+          <CapacityUnitRow unit={comparison.right.unit} count={comparison.right.count} compact={compact} />
+          <div className="mt-1 text-center text-xs font-bold text-[#5f4725]">
+            {comparison.right.count} {comparison.right.unit === "cup" ? "cups" : "spoons"}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── Intro / teaching ── */
 function IntroScene({ task, onCorrect }: { task: CapacityTask; onCorrect: () => void }) {
   return (
@@ -123,14 +201,23 @@ function IntroScene({ task, onCorrect }: { task: CapacityTask; onCorrect: () => 
           </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          {(task.teachingItems ?? []).map((item, idx) => (
-            <div key={idx} className="rounded-[26px] border border-[rgba(214,184,108,0.28)] bg-[rgba(255,252,245,0.92)] p-3">
-              <CapacityMeasure imageSrc={item.imageSrc} label={item.label} cups={item.cups} showCount compact />
-              {item.caption ? <div className="mt-2 text-center text-sm font-bold text-[#5f4725]">{item.caption}</div> : null}
+        {task.fairComparison ? (
+          <div className="space-y-3">
+            <FairComparisonCard comparison={task.fairComparison} />
+            <div className="text-center text-sm font-bold text-[#5f4725]">
+              Same container. Different measuring tools. Different results.
             </div>
-          ))}
-        </div>
+          </div>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2">
+            {(task.teachingItems ?? []).map((item, idx) => (
+              <div key={idx} className="rounded-[26px] border border-[rgba(214,184,108,0.28)] bg-[rgba(255,252,245,0.92)] p-3">
+                <CapacityMeasure imageSrc={item.imageSrc} label={item.label} cups={item.cups} showCount compact />
+                {item.caption ? <div className="mt-2 text-center text-sm font-bold text-[#5f4725]">{item.caption}</div> : null}
+              </div>
+            ))}
+          </div>
+        )}
 
         <div className="mt-5 flex justify-center">
           <button
@@ -294,6 +381,87 @@ function EqualScene({ task, onCorrect, onWrong }: { task: CapacityTask; onCorrec
   );
 }
 
+function FairChooseScene({ task, onCorrect, onWrong }: { task: CapacityTask; onCorrect: () => void; onWrong: () => void }) {
+  return (
+    <Shell badge={task.badgeLabel ?? "Which Measurement Is Fair?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {(task.fairComparisons ?? []).map((comparison) => (
+          <div key={comparison.id} className="relative">
+            <button
+              type="button"
+              onClick={() => (comparison.id === task.correctOptionId ? onCorrect() : onWrong())}
+              className="w-full rounded-[26px] text-left transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
+            >
+              <FairComparisonCard comparison={comparison} compact />
+            </button>
+            <span className="absolute right-3 top-3 z-10">
+              <OptionReadAloudButton text={`${comparison.label}. Explorer A used ${comparison.left.count} ${comparison.left.unit === "cup" ? "cups" : "spoons"}. Explorer B used ${comparison.right.count} ${comparison.right.unit === "cup" ? "cups" : "spoons"}.`} />
+            </span>
+          </div>
+        ))}
+      </div>
+    </Shell>
+  );
+}
+
+function FairJudgeScene({ task, onCorrect, onWrong }: { task: CapacityTask; onCorrect: () => void; onWrong: () => void }) {
+  const comparison = task.fairComparison;
+  const problemOptions = task.problemOptions ?? [task.fair ? "Fair" : "Not fair", task.fair ? "Not fair" : "Fair"];
+  return (
+    <Shell badge={task.badgeLabel ?? "Find the Problem"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      {comparison ? <FairComparisonCard comparison={comparison} /> : null}
+      <div className="grid gap-3 sm:grid-cols-3">
+        {problemOptions.map((option) => {
+          const correct = task.correctProblem ? option === task.correctProblem : (task.fair ? option === "Fair" : option === "Not fair");
+          return (
+            <div key={option} className="relative">
+              <button
+                type="button"
+                onClick={() => (correct ? onCorrect() : onWrong())}
+                className="w-full rounded-[22px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-4 py-5 text-lg font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5"
+              >
+                {option}
+              </button>
+              <span className="absolute right-3 top-3 z-10">
+                <OptionReadAloudButton text={option} />
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </Shell>
+  );
+}
+
+function BetterUnitScene({ task, onCorrect, onWrong }: { task: CapacityTask; onCorrect: () => void; onWrong: () => void }) {
+  return (
+    <Shell badge={task.badgeLabel ?? "Choose the Better Unit"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      {task.target ? (
+        <div className="rounded-[24px] border border-[rgba(167,139,250,0.35)] bg-[rgba(109,40,217,0.06)] p-3">
+          <CapacityMeasure imageSrc={task.target.imageSrc} label={task.target.label} cups={task.target.cups} compact />
+        </div>
+      ) : null}
+      <div className="grid gap-3 sm:grid-cols-2">
+        {(task.sensibleUnits ?? []).map((option) => (
+          <div key={option.id} className="relative">
+            <button
+              type="button"
+              onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
+              className="flex min-h-[140px] w-full flex-col items-center justify-center gap-3 rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-4 py-5 text-lg font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5"
+            >
+              {option.unit === "cup" ? <CupUnit size={46} /> : <SpoonUnit size={46} />}
+              <span>{option.label}</span>
+            </button>
+            <span className="absolute right-3 top-3 z-10">
+              <OptionReadAloudButton text={option.label} />
+            </span>
+          </div>
+        ))}
+      </div>
+    </Shell>
+  );
+}
+
 export function MeasurelandsCapacityMeasureCard({
   task,
   onCorrect,
@@ -307,5 +475,8 @@ export function MeasurelandsCapacityMeasureCard({
   if (task.scene === "compare") return <CompareScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "order") return <OrderScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "equal") return <EqualScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "fairChoose") return <FairChooseScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "fairJudge") return <FairJudgeScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "betterUnit") return <BetterUnitScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   return <CountScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 }
