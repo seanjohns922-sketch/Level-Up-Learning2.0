@@ -54,6 +54,13 @@ function buildIntroTask(): WeekTask {
     speakText:
       "Professor Gauge says a week is made of seven days. A month is made of several weeks. On a calendar, one week is one row, and a month has many week rows. Months are bigger than weeks.",
     badgeLabel: "Meazurex Mission",
+    introTitle: "Calendar Grove",
+    introBody: [
+      "A week is made of seven days.",
+      "A month is made of several weeks.",
+      "Months are bigger than weeks.",
+    ],
+    introVisual: "weekToMonth",
     teachingDays: WEEK_STRIP,
     weekRows: 4,
     highlightRow: 0,
@@ -103,14 +110,14 @@ function buildWhichBiggerTask(memory: LessonMemory): WeekTask {
     return {
       kind: "weekCycle",
       scene: "whichBigger",
-      prompt: "Day, week, ... what comes next?",
-      speakText: "Day, week, what comes next?",
-      badgeLabel: "Calendar Order",
+      prompt: "Which is the longest?",
+      speakText: "A day, a week, or a month — which is the longest?",
+      badgeLabel: "Longest Time",
       items: WEEK_STRIP,
       weekRows: 4,
       textOptions: ["Day", "Week", "Month"],
       correctTextOption: "Month",
-      feedback: { correct: "Yes — day, then week, then month.", wrong: "A month is bigger than a week." },
+      feedback: { correct: "Yes — a day is short, a week is longer, a month is the longest.", wrong: "A day is short, a week is longer, a month is the longest." },
     };
   }
 
@@ -209,14 +216,14 @@ export function buildY1MeasurelandsWeek5Lesson2QuizTasks(): PracticeTask[] {
     {
       kind: "weekCycle",
       scene: "whichBigger",
-      prompt: "Day → Week → ?",
-      speakText: "Day, week, what comes next?",
-      badgeLabel: "Complete the Sequence",
+      prompt: "Which is the longest?",
+      speakText: "A day, a week, or a month — which is the longest?",
+      badgeLabel: "Longest Time",
       items: WEEK_STRIP,
       weekRows: 4,
       textOptions: ["Month", "Day", "Week"],
       correctTextOption: "Month",
-      feedback: { correct: "Day, week, month!", wrong: "A month comes after a week." },
+      feedback: { correct: "A month is the longest — day, week, month!", wrong: "A day is short, a week is longer, a month is the longest." },
     },
   ];
 }
