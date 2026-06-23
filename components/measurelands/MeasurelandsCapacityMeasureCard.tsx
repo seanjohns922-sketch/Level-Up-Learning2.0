@@ -7,6 +7,7 @@ import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type CapacityTask = Extract<PracticeTask, { kind: "capacityMeasure" }>;
+const SPOON_IMAGE_SRC = "/images/measurelands/week2-3d/spoon.png";
 
 function SpoonUnit({ size = 30 }: { size?: number }) {
   return (
@@ -451,7 +452,18 @@ function BetterUnitScene({ task, onCorrect, onWrong }: { task: CapacityTask; onC
               onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
               className="flex min-h-[140px] w-full flex-col items-center justify-center gap-3 rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-4 py-5 text-lg font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5"
             >
-              {option.unit === "cup" ? <CupUnit size={46} /> : option.unit === "spoon" ? <SpoonUnit size={46} /> : <span className="text-5xl">🪣</span>}
+              {option.unit === "cup" ? (
+                <CupUnit size={46} />
+              ) : option.unit === "spoon" ? (
+                <img
+                  src={SPOON_IMAGE_SRC}
+                  alt=""
+                  aria-hidden
+                  className="h-14 w-14 object-contain drop-shadow-[0_8px_14px_rgba(76,40,10,0.18)]"
+                />
+              ) : (
+                <span className="text-5xl">🪣</span>
+              )}
               <span>{option.label}</span>
             </button>
             <span className="absolute right-3 top-3 z-10">
