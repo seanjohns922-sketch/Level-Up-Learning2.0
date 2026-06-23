@@ -6,6 +6,7 @@ import { Zap, Clock, Mountain, Compass, Triangle, BarChart3, Dices, BookOpen, Fe
 import { getAllLegends, getEffectiveUnlockedLegendIds } from "@/data/legends";
 import { readProgress, type StudentProgress } from "@/data/progress";
 import RealmCard from "@/components/legends/RealmCard";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
 
 export type RealmDef = {
   id: string;
@@ -47,9 +48,10 @@ const REALMS: RealmDef[] = [
     legendLine: "Measure Titans",
     icon: <Mountain className="h-5 w-5" />,
     totalLegends: 7,
-    status: "locked",
-    glowColor: "transparent",
-    borderGlow: "rgba(255,255,255,0.15)",
+    status: "open",
+    route: "/legends/measurelands",
+    glowColor: "rgba(110, 231, 183, 0.25)",
+    borderGlow: "rgba(110, 231, 183, 0.6)",
   },
   {
     id: "starpath-realm",
@@ -126,6 +128,7 @@ const REALMS: RealmDef[] = [
 export default function LegendsPage() {
   const router = useRouter();
   const [progress] = useState<StudentProgress | null>(() => readProgress());
+  const demoPreview = isDemoPreviewMode();
 
   const unlockedIds = useMemo(
     () => getEffectiveUnlockedLegendIds(progress?.year, progress?.unlockedLegends),
@@ -133,12 +136,37 @@ export default function LegendsPage() {
   );
 
   const numbotCollected = useMemo(() => {
-    const all = getAllLegends();
-    return all.filter((l) => unlockedIds.includes(l.id)).length;
-  }, [unlockedIds]);
+    const all = getAllLegends("number-nexus");
+    const visibleIds = demoPreview ? all.map((legend) => legend.id) : unlockedIds;
+    return all.filter((legend) => visibleIds.includes(legend.id)).length;
+  }, [demoPreview, unlockedIds]);
 
-  const totalCollected = numbotCollected;
-  const totalLegends = REALMS.reduce((sum, r) => sum + r.totalLegends, 0);
+  const measurelandsCollected = useMemo(() => {
+    const all = getAllLegends("measurelands");
+    const visibleIds = demoPreview
+      ? all.map((legend) => legend.id)
+      : getEffectiveUnlockedLegendIds(progress?.year, progress?.unlockedLegends, "measurelands");
+    return all.filter((legend) => visibleIds.includes(legend.id)).length;
+  }, [demoPreview, progress?.unlockedLegends, progress?.year]);
+
+  const realms = useMemo(
+    () =>
+      REALMS.map((realm) =>
+        realm.id === "measurelands" && !demoPreview
+          ? {
+              ...realm,
+              status: "locked" as const,
+              route: undefined,
+              glowColor: "transparent",
+              borderGlow: "rgba(255,255,255,0.15)",
+            }
+          : realm
+      ),
+    [demoPreview]
+  );
+
+  const totalCollected = numbotCollected + measurelandsCollected;
+  const totalLegends = realms.reduce((sum, r) => sum + r.totalLegends, 0);
   const pct = totalLegends > 0 ? Math.round((totalCollected / totalLegends) * 100) : 0;
 
   return (
@@ -237,11 +265,17 @@ export default function LegendsPage() {
         {/* Realm Grid */}
         <div className="max-w-4xl mx-auto w-full px-5 py-6 flex-1">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {REALMS.map((realm) => (
+            {realms.map((realm) => (
               <RealmCard
                 key={realm.id}
                 realm={realm}
-                collected={realm.id === "number-nexus" ? numbotCollected : 0}
+                collected={
+                  realm.id === "number-nexus"
+                    ? numbotCollected
+                    : realm.id === "measurelands"
+                      ? measurelandsCollected
+                      : 0
+                }
                 onClick={realm.route ? () => router.push(realm.route!) : undefined}
               />
             ))}

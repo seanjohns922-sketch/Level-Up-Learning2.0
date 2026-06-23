@@ -4,7 +4,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getPosttestForYearLabel } from "@/data/assessments/api";
 import type { Question } from "@/data/assessments/posttests";
-import { getLegendForYear } from "@/data/legends";
+import { getLegendForYear, normalizeLegendRealmId } from "@/data/legends";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, writeProgress, type StudentProgress } from "@/data/progress";
 import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCard";
@@ -294,6 +294,7 @@ function PostTestPage() {
   const params = useSearchParams();
   const year = params.get("year") ?? "Year 3";
   const realmId = params.get("realm_id") ?? undefined;
+  const legendRealmId = normalizeLegendRealmId(realmId);
   const theme = getRealmTheme(realmId);
   const studentLevelLabel = formatStudentLevelLabel(year);
 
@@ -391,7 +392,7 @@ function PostTestPage() {
     const assignedWeek = profile.assignedWeek ?? prev?.assignedWeek;
     const unlockedLegends = prev?.unlockedLegends ?? [];
 
-    const legend = getLegendForYear(year);
+    const legend = getLegendForYear(year, legendRealmId);
     const didPass = percent >= PASS_THRESHOLD;
     const nextUnlocked = didPass
       ? Array.from(new Set([...unlockedLegends, legend.id]))

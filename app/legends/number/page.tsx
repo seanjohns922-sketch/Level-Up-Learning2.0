@@ -26,11 +26,11 @@ export default function NumbotCollectionPage() {
   }, []);
 
   const unlockedIds = useMemo(
-    () => getEffectiveUnlockedLegendIds(progress?.year, progress?.unlockedLegends),
+    () => getEffectiveUnlockedLegendIds(progress?.year, progress?.unlockedLegends, "number-nexus"),
     [progress]
   );
 
-  const allLegends = useMemo(() => getAllLegends(), []);
+  const allLegends = useMemo(() => getAllLegends("number-nexus"), []);
   const visibleUnlockedIds = useMemo(
     () => (demoPreview ? allLegends.map((legend) => legend.id) : unlockedIds),
     [allLegends, demoPreview, unlockedIds]

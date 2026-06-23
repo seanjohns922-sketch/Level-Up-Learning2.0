@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getLegendForYear } from "@/data/legends";
+import { getLegendForYear, normalizeLegendRealmId } from "@/data/legends";
 import { readProgress, StudentProgress, writeProgress, ACTIVE_STUDENT_KEY } from "@/data/progress";
 import { saveStudentProgressState } from "@/lib/student-progress-sync";
 import LegendUnlockReveal from "@/components/LegendUnlockReveal";
@@ -44,16 +44,16 @@ function getNextYearLabel(year: string) {
   return YEAR_SEQUENCE[index + 1] ?? null;
 }
 
-function getLegendIdsUpToYear(year: string) {
+function getLegendIdsUpToYear(year: string, realmId: "number-nexus" | "measurelands") {
   const yearIndex = YEAR_SEQUENCE.indexOf(year as (typeof YEAR_SEQUENCE)[number]);
-  if (yearIndex === -1) return [getLegendForYear(year).id];
-  return YEAR_SEQUENCE.slice(0, yearIndex + 1).map((label) => getLegendForYear(label).id);
+  if (yearIndex === -1) return [getLegendForYear(year, realmId).id];
+  return YEAR_SEQUENCE.slice(0, yearIndex + 1).map((label) => getLegendForYear(label, realmId).id);
 }
 
-function getLegendIdsBeforeYear(year: string) {
+function getLegendIdsBeforeYear(year: string, realmId: "number-nexus" | "measurelands") {
   const yearIndex = YEAR_SEQUENCE.indexOf(year as (typeof YEAR_SEQUENCE)[number]);
   if (yearIndex <= 0) return [];
-  return YEAR_SEQUENCE.slice(0, yearIndex).map((label) => getLegendForYear(label).id);
+  return YEAR_SEQUENCE.slice(0, yearIndex).map((label) => getLegendForYear(label, realmId).id);
 }
 
 function getStrandBadgeClass(strand?: string) {
@@ -244,6 +244,7 @@ function ResultsPage() {
 
   const year = sp.get("year") ?? "Year 3";
   const realmId = sp.get("realm_id") ?? undefined;
+  const legendRealmId = normalizeLegendRealmId(realmId);
   const theme = getRealmTheme(realmId);
   const realmParam = realmId ? `&realm_id=${encodeURIComponent(realmId)}` : "";
   const studentLevelLabel = formatStudentLevelLabel(year);
@@ -269,7 +270,7 @@ function ResultsPage() {
   const nextYear = getNextYearLabel(year);
   const nextStudentLevelLabel = nextYear ? formatStudentLevelLabel(nextYear) : null;
 
-  const legend = useMemo(() => getLegendForYear(year), [year]);
+  const legend = useMemo(() => getLegendForYear(year, legendRealmId), [legendRealmId, year]);
   const storedPosttestProfile: AssessmentResultProfile | null = useMemo(() => {
     const progress = readProgress();
     return isPostTest ? progress?.lastPostTestProfile ?? null : null;
@@ -299,19 +300,19 @@ function ResultsPage() {
   const initialProgress = useMemo(() => readProgress(), []);
   const [unlockDismissed, setUnlockDismissed] = useState(false);
   const unlockTargets = useMemo(() => {
-    if (passedByPretest) return getLegendIdsUpToYear(year);
-    if (!isPostTest) return getLegendIdsBeforeYear(year); // failed pretest → unlock all prior years
+    if (passedByPretest) return getLegendIdsUpToYear(year, legendRealmId);
+    if (!isPostTest) return getLegendIdsBeforeYear(year, legendRealmId); // failed pretest → unlock all prior years
     return [legend.id];
-  }, [passedByPretest, isPostTest, year, legend.id]);
+  }, [passedByPretest, isPostTest, year, legend.id, legendRealmId]);
 
   // For a failed pretest we unlock prior-year legends — show the highest one in the overlay
   const unlockDisplayLegend = useMemo(() => {
     if (!isPostTest && !passedByPretest && unlockTargets.length > 0) {
       const yearIndex = YEAR_SEQUENCE.indexOf(year as (typeof YEAR_SEQUENCE)[number]);
-      if (yearIndex > 0) return getLegendForYear(YEAR_SEQUENCE[yearIndex - 1]);
+      if (yearIndex > 0) return getLegendForYear(YEAR_SEQUENCE[yearIndex - 1], legendRealmId);
     }
     return legend;
-  }, [isPostTest, passedByPretest, unlockTargets, year, legend]);
+  }, [isPostTest, passedByPretest, unlockTargets, year, legend, legendRealmId]);
 
   const shouldShowUnlock =
     unlockTargets.length > 0 &&
@@ -363,7 +364,7 @@ function ResultsPage() {
       const assignedWeek = isPostTest
         ? getLowestRecommendedWeek(storedPosttestProfile) ?? 1
         : requiredWeeks[0] ?? getLowestRecommendedWeek(storedPretestProfile) ?? 1;
-      const lowerLegendUnlocks = isFailedPretest ? getLegendIdsBeforeYear(year) : [];
+      const lowerLegendUnlocks = isFailedPretest ? getLegendIdsBeforeYear(year, legendRealmId) : [];
       const unlocked = Array.from(new Set([...prevUnlocked, ...lowerLegendUnlocks]));
       next = {
         ...prev,
@@ -399,7 +400,7 @@ function ResultsPage() {
         console.warn("[Results] DB pretest save failed:", e);
       }
     })();
-  }, [passed, year, scorePercent, isPostTest, isFailedPretest, passedByProgram, storedPosttestProfile, storedPretestProfile, unlockTargets, requiredWeeks, optionalWeeks, nextYear]);
+  }, [passed, year, scorePercent, isPostTest, isFailedPretest, passedByProgram, storedPosttestProfile, storedPretestProfile, unlockTargets, requiredWeeks, optionalWeeks, nextYear, legendRealmId]);
 
   function goHome() { router.push(realmId === "measurement" ? "/measurelands" : "/levels"); }
   const assignedStartWeek = isPostTest

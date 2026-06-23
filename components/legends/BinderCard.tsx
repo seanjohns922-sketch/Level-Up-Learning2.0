@@ -14,6 +14,7 @@ export default function BinderCard({
   isDemoPreview?: boolean;
   onClick: () => void;
 }) {
+  const programLabel = legend.realmId === "measurelands" ? "Measurelands" : "Number";
   return (
     <button
       onClick={isUnlocked ? onClick : undefined}
@@ -22,7 +23,7 @@ export default function BinderCard({
       title={
         isUnlocked
           ? `View ${legend.name}`
-          : `Unlock by completing the ${legend.yearLabel} Number program.`
+          : `Unlock by completing the ${legend.yearLabel} ${programLabel} program.`
       }
     >
       <div
