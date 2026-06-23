@@ -2,6 +2,7 @@
 
 import { Compass } from "lucide-react";
 import { useState } from "react";
+import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
@@ -160,8 +161,11 @@ function CountScene({ task, onCorrect, onWrong }: { task: CapacityTask; onCorrec
             key={value}
             type="button"
             onClick={() => (value === task.correctAnswer ? onCorrect() : onWrong())}
-            className="flex min-h-[88px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-5xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+            className="relative flex min-h-[88px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-5xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
           >
+            <span className="absolute right-3 top-3 z-10">
+              <OptionReadAloudButton text={String(value)} />
+            </span>
             {value}
           </button>
         ))}
@@ -181,8 +185,11 @@ function CompareScene({ task, onCorrect, onWrong }: { task: CapacityTask; onCorr
             key={item.id}
             type="button"
             onClick={() => (item.id === task.correctOptionId ? onCorrect() : onWrong())}
-            className="rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-3 text-left transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
+            className="relative rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-3 text-left transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
           >
+            <span className="absolute right-3 top-3 z-10">
+              <OptionReadAloudButton text={`${item.label}, ${item.cups} cups`} />
+            </span>
             <CapacityMeasure imageSrc={item.imageSrc} label={item.label} cups={item.cups} showCount={!task.hideCounts} compact />
           </button>
         ))}
@@ -243,6 +250,9 @@ function OrderScene({ task, onCorrect, onWrong }: { task: CapacityTask; onCorrec
               disabled={locked || chosen}
               className="relative rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-3 text-left transition hover:-translate-y-1 disabled:opacity-70"
             >
+              <span className="absolute right-3 top-3 z-10">
+                <OptionReadAloudButton text={`${item.label}, ${item.cups} cups`} />
+              </span>
               {chosen ? (
                 <div className="absolute right-2 top-2 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#0f766e] text-sm font-black text-white">{step + 1}</div>
               ) : null}
@@ -271,8 +281,11 @@ function EqualScene({ task, onCorrect, onWrong }: { task: CapacityTask; onCorrec
             key={item.id}
             type="button"
             onClick={() => (item.id === task.correctOptionId ? onCorrect() : onWrong())}
-            className="rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-3 text-left transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
+            className="relative rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-3 text-left transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
           >
+            <span className="absolute right-3 top-3 z-10">
+              <OptionReadAloudButton text={`${item.label}, ${item.cups} cups`} />
+            </span>
             <CapacityMeasure imageSrc={item.imageSrc} label={item.label} cups={item.cups} showCount compact />
           </button>
         ))}

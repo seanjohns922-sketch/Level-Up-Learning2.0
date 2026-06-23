@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
@@ -201,16 +202,23 @@ function GroundToken({
 function GroundNumeralOption({
   numeral,
   onClick,
+  speakText,
 }: {
   numeral: number;
   onClick: () => void;
+  speakText?: string;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="flex min-h-[112px] items-center justify-center rounded-[24px] border-2 border-cyan-200 bg-white text-5xl font-black text-teal-900 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-[0_0_18px_rgba(34,211,238,0.14)] active:scale-[0.98]"
+      className="relative flex min-h-[112px] items-center justify-center rounded-[24px] border-2 border-cyan-200 bg-white text-5xl font-black text-teal-900 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-[0_0_18px_rgba(34,211,238,0.14)] active:scale-[0.98]"
     >
+      {speakText ? (
+        <span className="absolute right-3 top-3 z-10">
+          <OptionReadAloudButton text={speakText} />
+        </span>
+      ) : null}
       {numeral}
     </button>
   );
@@ -1085,8 +1093,11 @@ export function GroundFlashTaskCard({
             type="button"
             disabled={!answerEnabled}
             onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
-            className="flex min-h-[112px] items-center justify-center rounded-[24px] border-2 border-cyan-200 bg-white text-5xl font-black text-teal-900 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-[0_0_18px_rgba(34,211,238,0.14)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:border-cyan-200 disabled:hover:shadow-sm"
+            className="relative flex min-h-[112px] items-center justify-center rounded-[24px] border-2 border-cyan-200 bg-white text-5xl font-black text-teal-900 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-[0_0_18px_rgba(34,211,238,0.14)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:border-cyan-200 disabled:hover:shadow-sm"
           >
+            <span className="absolute right-3 top-3 z-10">
+              <OptionReadAloudButton text={String(option.numeral ?? "")} />
+            </span>
             {option.numeral}
           </button>
         ))}
@@ -1183,8 +1194,11 @@ export function GroundSequenceTaskCard({
               key={option.id}
               type="button"
               onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
-              className="flex min-h-[112px] items-center justify-center rounded-[24px] border-2 border-cyan-200 bg-white px-3 text-center text-3xl font-black text-teal-900 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:bg-cyan-50 hover:shadow-[0_0_18px_rgba(34,211,238,0.14)] active:scale-[0.98] sm:text-4xl"
+              className="relative flex min-h-[112px] items-center justify-center rounded-[24px] border-2 border-cyan-200 bg-white px-3 text-center text-3xl font-black text-teal-900 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:bg-cyan-50 hover:shadow-[0_0_18px_rgba(34,211,238,0.14)] active:scale-[0.98] sm:text-4xl"
             >
+              <span className="absolute right-3 top-3 z-10">
+                <OptionReadAloudButton text={label} />
+              </span>
               {label}
             </button>
           );
@@ -1233,10 +1247,11 @@ export function GroundTapCountTaskCard({
         </div>
         <div className="grid grid-cols-3 gap-3">
           {task.options.map((option) => (
-            <GroundNumeralOption
-              key={option.id}
-              numeral={option.numeral}
-              onClick={() => {
+              <GroundNumeralOption
+                key={option.id}
+                numeral={option.numeral}
+                speakText={String(option.numeral)}
+                onClick={() => {
                 if (!allTapped) {
                   onWrong();
                   return;
@@ -1308,10 +1323,11 @@ export function GroundMoveCountTaskCard({
         </div>
         <div className="grid grid-cols-3 gap-3">
           {task.options.map((option) => (
-            <GroundNumeralOption
-              key={option.id}
-              numeral={option.numeral}
-              onClick={() => {
+              <GroundNumeralOption
+                key={option.id}
+                numeral={option.numeral}
+                speakText={String(option.numeral)}
+                onClick={() => {
                 if (!allMoved) {
                   onWrong();
                   return;
@@ -1454,6 +1470,7 @@ export function GroundSoundCountTaskCard({
           <GroundNumeralOption
             key={option.id}
             numeral={option.numeral}
+            speakText={String(option.numeral)}
             onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
           />
         ))}
@@ -1580,6 +1597,7 @@ export function GroundGrowingCountTaskCard({
           <GroundNumeralOption
             key={option.id}
             numeral={option.numeral}
+            speakText={String(option.numeral)}
             onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
           />
         ))}

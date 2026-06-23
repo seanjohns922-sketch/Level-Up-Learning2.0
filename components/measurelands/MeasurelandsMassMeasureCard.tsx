@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Compass, Check, Scale } from "lucide-react";
+import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
@@ -195,8 +196,11 @@ function CountScene({ task, onCorrect, onWrong }: { task: MassTask; onCorrect: (
             key={value}
             type="button"
             onClick={() => (value === task.correctAnswer ? onCorrect() : onWrong())}
-            className="flex min-h-[88px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-5xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+            className="relative flex min-h-[88px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-5xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
           >
+            <span className="absolute right-3 top-3 z-10">
+              <OptionReadAloudButton text={String(value)} />
+            </span>
             {value}
           </button>
         ))}
@@ -216,8 +220,11 @@ function CompareScene({ task, onCorrect, onWrong }: { task: MassTask; onCorrect:
             key={item.id}
             type="button"
             onClick={() => (item.id === task.correctOptionId ? onCorrect() : onWrong())}
-            className="rounded-[26px] border border-transparent text-left transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
+            className="relative rounded-[26px] border border-transparent text-left transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
           >
+            <span className="absolute right-2 top-2 z-10">
+              <OptionReadAloudButton text={`${item.label}, ${item.cubes} cubes`} />
+            </span>
             <BalanceScale imageSrc={item.imageSrc} label={item.label} cubes={item.cubes} showCount={!task.hideCounts} compact />
           </button>
         ))}
@@ -275,6 +282,9 @@ function OrderScene({ task, onCorrect, onWrong }: { task: MassTask; onCorrect: (
               disabled={locked || chosen}
               className="relative rounded-[26px] text-left transition hover:-translate-y-1 disabled:opacity-70"
             >
+              <span className="absolute right-2 top-2 z-10">
+                <OptionReadAloudButton text={`${item.label}, ${item.cubes} cubes`} />
+              </span>
               {chosen ? (
                 <div className="absolute right-2 top-2 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#0f766e] text-sm font-black text-white">{step + 1}</div>
               ) : null}
@@ -304,8 +314,11 @@ function EqualScene({ task, onCorrect, onWrong }: { task: MassTask; onCorrect: (
             key={item.id}
             type="button"
             onClick={() => (item.id === task.correctOptionId ? onCorrect() : onWrong())}
-            className="rounded-[26px] text-left transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
+            className="relative rounded-[26px] text-left transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
           >
+            <span className="absolute right-2 top-2 z-10">
+              <OptionReadAloudButton text={`${item.label}, ${item.cubes} cubes`} />
+            </span>
             <BalanceScale imageSrc={item.imageSrc} label={item.label} cubes={item.cubes} showCount compact />
           </button>
         ))}
@@ -325,8 +338,11 @@ function FairChooseScene({ task, onCorrect, onWrong }: { task: MassTask; onCorre
             key={a.id}
             type="button"
             onClick={() => (a.id === task.correctOptionId ? onCorrect() : onWrong())}
-            className="rounded-[26px] text-left transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
+            className="relative rounded-[26px] text-left transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
           >
+            <span className="absolute right-2 top-2 z-10">
+              <OptionReadAloudButton text={`${a.label}, ${a.units.length} cubes`} />
+            </span>
             <BalanceScale imageSrc={a.imageSrc} label={a.label} cubes={a.units.length} unitSizes={a.units} compact />
           </button>
         ))}
@@ -349,8 +365,11 @@ function FairJudgeScene({ task, onCorrect, onWrong }: { task: MassTask; onCorrec
             key={String(opt)}
             type="button"
             onClick={() => (opt === !!task.fair ? onCorrect() : onWrong())}
-            className="flex min-h-[72px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+            className="relative flex min-h-[72px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
           >
+            <span className="absolute right-3 top-3 z-10">
+              <OptionReadAloudButton text={opt ? "Fair" : "Not fair"} />
+            </span>
             {opt ? "Fair" : "Not fair"}
           </button>
         ))}

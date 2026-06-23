@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
@@ -235,14 +236,16 @@ export function GroundSpatialTaskCard({ task, onCorrect, onWrong }: { task: Grou
             </ScenePanel>
             <div className="grid grid-cols-2 gap-3">
               {([true, false] as const).map((value) => (
-                <button
-                  key={String(value)}
-                  type="button"
-                  onClick={() => (value === task.correctBoolean ? onCorrect() : onWrong())}
-                  className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-5 text-xl font-black text-teal-900 shadow-sm transition hover:border-cyan-300 hover:bg-cyan-50"
-                >
-                  {value ? "Yes" : "No"}
-                </button>
+                <div key={String(value)} className="relative">
+                  <button
+                    type="button"
+                    onClick={() => (value === task.correctBoolean ? onCorrect() : onWrong())}
+                    className="w-full rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-5 text-xl font-black text-teal-900 shadow-sm transition hover:border-cyan-300 hover:bg-cyan-50"
+                  >
+                    {value ? "Yes" : "No"}
+                  </button>
+                  <OptionReadAloudButton text={value ? "Yes" : "No"} className="absolute right-3 top-3 z-10" />
+                </div>
               ))}
             </div>
           </div>
@@ -259,15 +262,17 @@ export function GroundSpatialTaskCard({ task, onCorrect, onWrong }: { task: Grou
                 const character = characterMap.get(id);
                 if (!character) return null;
                 return (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => (id === task.targetCharacterId ? onCorrect() : onWrong())}
-                    className="flex min-h-[96px] flex-col items-center justify-center rounded-[22px] border-2 border-cyan-200 bg-white px-3 py-3 text-center text-teal-900 shadow-sm transition hover:border-cyan-300 hover:bg-cyan-50"
-                  >
-                    <div className="text-4xl">{character.emoji}</div>
-                    <div className="mt-1 text-sm font-black">{character.label}</div>
-                  </button>
+                  <div key={id} className="relative">
+                    <button
+                      type="button"
+                      onClick={() => (id === task.targetCharacterId ? onCorrect() : onWrong())}
+                      className="flex min-h-[96px] w-full flex-col items-center justify-center rounded-[22px] border-2 border-cyan-200 bg-white px-3 py-3 text-center text-teal-900 shadow-sm transition hover:border-cyan-300 hover:bg-cyan-50"
+                    >
+                      <div className="text-4xl">{character.emoji}</div>
+                      <div className="mt-1 text-sm font-black">{character.label}</div>
+                    </button>
+                    <OptionReadAloudButton text={character.label} className="absolute right-3 top-3 z-10" />
+                  </div>
                 );
               })}
             </div>
@@ -284,17 +289,19 @@ export function GroundSpatialTaskCard({ task, onCorrect, onWrong }: { task: Grou
                   const character = characterMap.get(id);
                   if (!character) return null;
                   return (
-                    <button
-                      key={id}
-                      type="button"
-                      onClick={() => setSelectedBankId(id)}
-                      className={`flex min-h-[88px] flex-col items-center justify-center rounded-[22px] border-2 px-3 py-3 text-center shadow-sm transition ${
-                        selectedBankId === id ? "border-teal-400 bg-teal-100 text-teal-900" : "border-cyan-200 bg-white text-teal-900 hover:border-cyan-300 hover:bg-cyan-50"
-                      }`}
-                    >
-                      <div className="text-3xl">{character.emoji}</div>
-                      <div className="mt-1 text-sm font-black">{character.label}</div>
-                    </button>
+                    <div key={id} className="relative">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedBankId(id)}
+                        className={`flex min-h-[88px] w-full flex-col items-center justify-center rounded-[22px] border-2 px-3 py-3 text-center shadow-sm transition ${
+                          selectedBankId === id ? "border-teal-400 bg-teal-100 text-teal-900" : "border-cyan-200 bg-white text-teal-900 hover:border-cyan-300 hover:bg-cyan-50"
+                        }`}
+                      >
+                        <div className="text-3xl">{character.emoji}</div>
+                        <div className="mt-1 text-sm font-black">{character.label}</div>
+                      </button>
+                      <OptionReadAloudButton text={character.label} className="absolute right-3 top-3 z-10" />
+                    </div>
                   );
                 })}
               </div>

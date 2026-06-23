@@ -1,6 +1,7 @@
 "use client";
 
 import { Volume2 } from "lucide-react";
+import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
@@ -205,20 +206,39 @@ function GroundPairCard({
 
 function GroundOptionButton({
   onClick,
+  speakText,
   children,
 }: {
   onClick: () => void;
+  speakText?: string;
   children: React.ReactNode;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="flex min-h-[132px] w-full items-center justify-center rounded-[24px] border-2 border-cyan-200 bg-white px-3 py-3 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-[0_0_18px_rgba(34,211,238,0.14)] active:scale-[0.98] sm:min-h-[148px] sm:px-4 sm:py-4"
+      className="relative flex min-h-[132px] w-full items-center justify-center rounded-[24px] border-2 border-cyan-200 bg-white px-3 py-3 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-[0_0_18px_rgba(34,211,238,0.14)] active:scale-[0.98] sm:min-h-[148px] sm:px-4 sm:py-4"
     >
+      {speakText ? (
+        <span className="absolute right-3 top-3 z-10">
+          <OptionReadAloudButton text={speakText} />
+        </span>
+      ) : null}
       {children}
     </button>
   );
+}
+
+function getOptionSpeech(option: GroundOption): string {
+  if (option.kind === "word") return option.word ?? "";
+  if (option.kind === "numeral") return String(option.numeral ?? "");
+  if (option.kind === "quantity") return String(option.quantity ?? "");
+  if (option.kind === "pair") {
+    if (option.pairWord) return option.pairWord;
+    if (typeof option.pairNumeral === "number") return String(option.pairNumeral);
+    if (typeof option.pairQuantity === "number") return String(option.pairQuantity);
+  }
+  return "";
 }
 
 function renderQuestionVisual(task: GroundMatchTask) {
@@ -382,6 +402,7 @@ export default function GroundMatchTaskCard({
           <GroundOptionButton
             key={option.id}
             onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
+            speakText={getOptionSpeech(option)}
           >
             {renderOption(option)}
           </GroundOptionButton>

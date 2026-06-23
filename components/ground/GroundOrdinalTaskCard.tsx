@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
@@ -402,7 +403,12 @@ export function GroundOrdinalTaskCard({ task, onCorrect, onWrong }: { task: Grou
           if (!character) {
             return <EmptySlot key={`empty-${index}`} index={index} selected={selectedCharacterId !== null} onClick={() => assignToSlot(index)} />;
           }
-          return <CharacterToken key={`${character.id}-${index}`} character={character} index={index} onClick={interactive ? () => handleTapCharacter(character.id) : undefined} disabled={!raceComplete} />;
+          return (
+            <div key={`${character.id}-${index}`} className="relative">
+              <CharacterToken character={character} index={index} onClick={interactive ? () => handleTapCharacter(character.id) : undefined} disabled={!raceComplete} />
+              <OptionReadAloudButton text={character.label} className="absolute right-2 top-2 z-10" />
+            </div>
+          );
         })}
       </div>
     );
@@ -429,9 +435,12 @@ export function GroundOrdinalTaskCard({ task, onCorrect, onWrong }: { task: Grou
             <div className="rounded-[20px] border border-cyan-200 bg-cyan-50/70 p-3">{renderLine(task.secondaryOrder ?? task.order, false)}</div>
             <div className="grid grid-cols-2 gap-3">
               {([true, false] as const).map((value) => (
-                <button key={String(value)} type="button" disabled={!raceComplete} onClick={() => (value === task.correctBoolean ? onCorrect() : onWrong())} className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-5 text-xl font-black text-teal-900 shadow-sm transition enabled:hover:border-cyan-300 enabled:hover:bg-cyan-50 disabled:opacity-60">
-                  {value ? "Yes" : "No"}
-                </button>
+                <div key={String(value)} className="relative">
+                  <button type="button" disabled={!raceComplete} onClick={() => (value === task.correctBoolean ? onCorrect() : onWrong())} className="w-full rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-5 text-xl font-black text-teal-900 shadow-sm transition enabled:hover:border-cyan-300 enabled:hover:bg-cyan-50 disabled:opacity-60">
+                    {value ? "Yes" : "No"}
+                  </button>
+                  <OptionReadAloudButton text={value ? "Yes" : "No"} className="absolute right-3 top-3 z-10" />
+                </div>
               ))}
             </div>
           </div>
@@ -440,9 +449,12 @@ export function GroundOrdinalTaskCard({ task, onCorrect, onWrong }: { task: Grou
             {!hasRaceAnimation ? <div className="rounded-[20px] border border-cyan-200 bg-cyan-50/70 p-3">{renderLine(task.order, false)}</div> : null}
             <div className="grid grid-cols-3 gap-3">
               {(task.positionOptions ?? [1, 2, 3]).map((value) => (
-                <button key={value} type="button" disabled={!raceComplete} onClick={() => (value === positionAnswer ? onCorrect() : onWrong())} className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-5 text-xl font-black text-teal-900 shadow-sm transition enabled:hover:border-cyan-300 enabled:hover:bg-cyan-50 disabled:opacity-60">
-                  {ordinalWord(value)}
-                </button>
+                <div key={value} className="relative">
+                  <button type="button" disabled={!raceComplete} onClick={() => (value === positionAnswer ? onCorrect() : onWrong())} className="w-full rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-5 text-xl font-black text-teal-900 shadow-sm transition enabled:hover:border-cyan-300 enabled:hover:bg-cyan-50 disabled:opacity-60">
+                    {ordinalWord(value)}
+                  </button>
+                  <OptionReadAloudButton text={ordinalWord(value)} className="absolute right-3 top-3 z-10" />
+                </div>
               ))}
             </div>
           </div>
@@ -453,10 +465,13 @@ export function GroundOrdinalTaskCard({ task, onCorrect, onWrong }: { task: Grou
               <div className="mb-3 text-center text-[11px] font-black uppercase tracking-[0.18em] text-teal-700">Character Bank</div>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {placementBank.map((character, index) => (
-                  <button key={`${character.id}-${index}`} type="button" disabled={!raceComplete} onClick={() => setSelectedCharacterId(character.id)} className={`flex min-h-[88px] flex-col items-center justify-center rounded-[22px] border-2 px-3 py-3 text-center shadow-sm transition ${selectedCharacterId === character.id ? "border-teal-400 bg-teal-100 text-teal-900" : "border-cyan-200 bg-white text-teal-900 enabled:hover:border-cyan-300 enabled:hover:bg-cyan-50"} disabled:opacity-60`}>
-                    <div className="text-3xl">{character.emoji}</div>
-                    <div className="mt-1 text-sm font-black">{character.label}</div>
-                  </button>
+                  <div key={`${character.id}-${index}`} className="relative">
+                    <button type="button" disabled={!raceComplete} onClick={() => setSelectedCharacterId(character.id)} className={`flex min-h-[88px] w-full flex-col items-center justify-center rounded-[22px] border-2 px-3 py-3 text-center shadow-sm transition ${selectedCharacterId === character.id ? "border-teal-400 bg-teal-100 text-teal-900" : "border-cyan-200 bg-white text-teal-900 enabled:hover:border-cyan-300 enabled:hover:bg-cyan-50"} disabled:opacity-60`}>
+                      <div className="text-3xl">{character.emoji}</div>
+                      <div className="mt-1 text-sm font-black">{character.label}</div>
+                    </button>
+                    <OptionReadAloudButton text={character.label} className="absolute right-3 top-3 z-10" />
+                  </div>
                 ))}
               </div>
             </div>
@@ -469,15 +484,18 @@ export function GroundOrdinalTaskCard({ task, onCorrect, onWrong }: { task: Grou
             <div className="rounded-[20px] border border-cyan-200 bg-cyan-50 px-4 py-3 text-center text-sm font-black uppercase tracking-[0.18em] text-teal-700">Which one was in that position?</div>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {flashOptions.map((character, index) => (
-                <button key={`${character.id}-${index}`} type="button" disabled={!raceComplete} onClick={() => handleTapCharacter(character.id)} className="flex min-h-[102px] flex-col items-center justify-center rounded-[22px] border-2 border-cyan-200 bg-white px-3 py-3 text-center text-teal-900 shadow-sm transition enabled:hover:border-cyan-300 enabled:hover:bg-cyan-50 disabled:opacity-60">
-                  <div className="text-4xl">{character.emoji}</div>
-                  <div className="mt-1 text-sm font-black">{character.label}</div>
-                </button>
+                <div key={`${character.id}-${index}`} className="relative">
+                  <button type="button" disabled={!raceComplete} onClick={() => handleTapCharacter(character.id)} className="flex min-h-[102px] w-full flex-col items-center justify-center rounded-[22px] border-2 border-cyan-200 bg-white px-3 py-3 text-center text-teal-900 shadow-sm transition enabled:hover:border-cyan-300 enabled:hover:bg-cyan-50 disabled:opacity-60">
+                    <div className="text-4xl">{character.emoji}</div>
+                    <div className="mt-1 text-sm font-black">{character.label}</div>
+                  </button>
+                  <OptionReadAloudButton text={character.label} className="absolute right-3 top-3 z-10" />
+                </div>
               ))}
             </div>
           </div>
         ) : (
-          !hasRaceAnimation ? renderLine(task.order, true) : <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{task.order.filter(Boolean).map((id, index) => { const character = characterMap.get(id!); if (!character) return null; return <CharacterToken key={`${character.id}-${index}`} character={character} index={index} onClick={() => handleTapCharacter(character.id)} disabled={!raceComplete} />; })}</div>
+          !hasRaceAnimation ? renderLine(task.order, true) : <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{task.order.filter(Boolean).map((id, index) => { const character = characterMap.get(id!); if (!character) return null; return <div key={`${character.id}-${index}`} className="relative"><CharacterToken character={character} index={index} onClick={() => handleTapCharacter(character.id)} disabled={!raceComplete} /><OptionReadAloudButton text={character.label} className="absolute right-2 top-2 z-10" /></div>; })}</div>
         )}
       </div>
     </GroundMiniShell>

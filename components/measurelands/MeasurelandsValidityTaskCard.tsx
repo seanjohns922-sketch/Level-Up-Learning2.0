@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Compass, Check, MoveHorizontal } from "lucide-react";
+import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { BlockRod, MeasuredObject, PathShell, UNIT_PX } from "@/components/measurelands/MeasurelandsPathTaskCard";
 
@@ -148,8 +149,11 @@ function ChooseScene({ task, onCorrect, onWrong }: { task: ValidityTask; onCorre
             key={a.id}
             type="button"
             onClick={() => (a.id === task.correctArrangementId ? onCorrect() : onWrong())}
-            className="rounded-[26px] border border-transparent text-left transition hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
+            className="relative rounded-[26px] border border-transparent text-left transition hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
           >
+            <span className="absolute right-3 top-3 z-10">
+              <OptionReadAloudButton text={`Explorer ${String.fromCharCode(65 + idx)}`} />
+            </span>
             <div className="mb-1 px-1 text-xs font-black uppercase tracking-[0.16em] text-[#7c3aed]">
               Explorer {String.fromCharCode(65 + idx)}
             </div>
@@ -184,8 +188,11 @@ function DiagnoseScene({ task, onCorrect, onWrong }: { task: ValidityTask; onCor
             key={opt}
             type="button"
             onClick={() => (opt === (task.flaw ?? "none") ? onCorrect() : onWrong())}
-            className="flex min-h-[72px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-2 text-center text-lg font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+            className="relative flex min-h-[72px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-2 text-center text-lg font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
           >
+            <span className="absolute right-3 top-3 z-10">
+              <OptionReadAloudButton text={FLAW_LABEL[opt]} />
+            </span>
             {FLAW_LABEL[opt]}
           </button>
         ))}

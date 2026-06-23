@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { MultipleChoiceQuestion } from "@/data/activities/year2/lessonEngine";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
+import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import PlaceValueMABVisual from "@/components/activities/PlaceValueMABVisual";
 import DecimalModelVisual from "@/components/activities/DecimalModelVisual";
 import DecimalShiftVisual from "@/components/activities/DecimalShiftVisual";
@@ -466,6 +467,9 @@ export default function MultipleChoiceActivity({
                     : "border-slate-200 bg-white text-slate-800 hover:-translate-y-[1px] hover:border-teal-300 hover:bg-teal-50/30 hover:shadow-[0_4px_12px_rgba(13,148,136,0.08)]",
               ].join(" ")}
             >
+              <span className="absolute right-3 top-3 z-10">
+                <OptionReadAloudButton text={option} />
+              </span>
               {/* Left accent bar */}
               <span
                 aria-hidden
@@ -480,7 +484,9 @@ export default function MultipleChoiceActivity({
                       : "bg-teal-400 opacity-0 group-hover:opacity-60",
                 ].join(" ")}
               />
-              <MathFormattedText text={option} fractionSize="md" />
+              <div className="pr-10">
+                <MathFormattedText text={option} fractionSize="md" />
+              </div>
             </button>
           );
         })}

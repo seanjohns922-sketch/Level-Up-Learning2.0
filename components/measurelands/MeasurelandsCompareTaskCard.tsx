@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Rabbit, Turtle, Volume2, School, House, Sunrise, Sun, Sunset, Moon, Star, CalendarDays, ArrowLeft, ArrowRight } from "lucide-react";
+import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { speak } from "@/lib/speak";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
@@ -540,49 +541,51 @@ function SortScene({
           <CompareVisual item={item} showWater />
         </div>
       ) : null}
-      <div className={`mt-4 grid gap-4 ${bins.length >= 4 ? "grid-cols-2 md:grid-cols-4" : "grid-cols-2"}`}>
+        <div className={`mt-4 grid gap-4 ${bins.length >= 4 ? "grid-cols-2 md:grid-cols-4" : "grid-cols-2"}`}>
         {bins.map((bin) => (
-          <button
-            key={bin.id}
-            type="button"
-            onClick={() => (bin.id === task.correctOptionId ? onCorrect() : onWrong())}
-            className="flex min-h-[120px] flex-col items-center justify-center gap-2 rounded-[26px] border-2 transition hover:-translate-y-1 active:scale-[0.98]"
-            style={{
-              borderColor: "rgba(214,184,108,0.6)",
-              background: "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,248,232,0.96))",
-            }}
-          >
-            {typeof bin.fill === "number" ? (
-              <FillGlyph fill={bin.fill} />
-            ) : bin.icon === "quick" ? (
-              <Rabbit className="h-12 w-12 text-[#5f4725]" />
-            ) : bin.icon === "slow" ? (
-              <Turtle className="h-12 w-12 text-[#5f4725]" />
-            ) : bin.icon === "weekday" ? (
-              <School className="h-12 w-12 text-[#5f4725]" />
-            ) : bin.icon === "weekend" ? (
-              <House className="h-12 w-12 text-[#5f4725]" />
-            ) : bin.icon === "morning" ? (
-              <Sunrise className="h-12 w-12 text-[#5f4725]" />
-            ) : bin.icon === "afternoon" ? (
-              <Sun className="h-12 w-12 text-[#5f4725]" />
-            ) : bin.icon === "evening" ? (
-              <Sunset className="h-12 w-12 text-[#5f4725]" />
-            ) : bin.icon === "night" ? (
-              <Moon className="h-12 w-12 text-[#5f4725]" />
-            ) : bin.icon === "today" ? (
-              <Star className="h-12 w-12 text-[#f6b93b]" fill="#f6b93b" />
-            ) : bin.icon === "another-day" ? (
-              <CalendarDays className="h-12 w-12 text-[#5f4725]" />
-            ) : bin.icon === "yesterday" ? (
-              <ArrowLeft className="h-12 w-12 text-[#7c8794]" />
-            ) : bin.icon === "tomorrow" ? (
-              <ArrowRight className="h-12 w-12 text-[#34616f]" />
-            ) : (
-              <span className="text-5xl sm:text-6xl">{bin.icon}</span>
-            )}
-            <span className="text-base font-black uppercase tracking-[0.14em] text-[#5f4725]">{bin.label}</span>
-          </button>
+          <div key={bin.id} className="relative">
+            <button
+              type="button"
+              onClick={() => (bin.id === task.correctOptionId ? onCorrect() : onWrong())}
+              className="flex min-h-[120px] w-full flex-col items-center justify-center gap-2 rounded-[26px] border-2 transition hover:-translate-y-1 active:scale-[0.98]"
+              style={{
+                borderColor: "rgba(214,184,108,0.6)",
+                background: "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,248,232,0.96))",
+              }}
+            >
+              {typeof bin.fill === "number" ? (
+                <FillGlyph fill={bin.fill} />
+              ) : bin.icon === "quick" ? (
+                <Rabbit className="h-12 w-12 text-[#5f4725]" />
+              ) : bin.icon === "slow" ? (
+                <Turtle className="h-12 w-12 text-[#5f4725]" />
+              ) : bin.icon === "weekday" ? (
+                <School className="h-12 w-12 text-[#5f4725]" />
+              ) : bin.icon === "weekend" ? (
+                <House className="h-12 w-12 text-[#5f4725]" />
+              ) : bin.icon === "morning" ? (
+                <Sunrise className="h-12 w-12 text-[#5f4725]" />
+              ) : bin.icon === "afternoon" ? (
+                <Sun className="h-12 w-12 text-[#5f4725]" />
+              ) : bin.icon === "evening" ? (
+                <Sunset className="h-12 w-12 text-[#5f4725]" />
+              ) : bin.icon === "night" ? (
+                <Moon className="h-12 w-12 text-[#5f4725]" />
+              ) : bin.icon === "today" ? (
+                <Star className="h-12 w-12 text-[#f6b93b]" fill="#f6b93b" />
+              ) : bin.icon === "another-day" ? (
+                <CalendarDays className="h-12 w-12 text-[#5f4725]" />
+              ) : bin.icon === "yesterday" ? (
+                <ArrowLeft className="h-12 w-12 text-[#7c8794]" />
+              ) : bin.icon === "tomorrow" ? (
+                <ArrowRight className="h-12 w-12 text-[#34616f]" />
+              ) : (
+                <span className="text-5xl sm:text-6xl">{bin.icon}</span>
+              )}
+              <span className="text-base font-black uppercase tracking-[0.14em] text-[#5f4725]">{bin.label}</span>
+            </button>
+            <OptionReadAloudButton text={bin.label} className="absolute right-3 top-3 z-10" />
+          </div>
         ))}
       </div>
     </MeasurementShell>
@@ -724,15 +727,17 @@ function OrderScene({
         </div>
         <div className={`grid gap-3 ${slotCount === 4 ? "md:grid-cols-4" : "md:grid-cols-3"}`}>
           {bank.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => placeObject(item.id)}
-              disabled={locked}
-              className="rounded-[28px] border border-transparent transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)] disabled:opacity-50"
-            >
-              <CompareVisual item={item} showWater={isFill} />
-            </button>
+            <div key={item.id} className="relative">
+              <button
+                type="button"
+                onClick={() => placeObject(item.id)}
+                disabled={locked}
+                className="w-full rounded-[28px] border border-transparent transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)] disabled:opacity-50"
+              >
+                <CompareVisual item={item} showWater={isFill} />
+              </button>
+              <OptionReadAloudButton text={item.label} className="absolute right-3 top-3 z-10" />
+            </div>
           ))}
           {bank.length === 0 && !allCorrect ? (
             <div className="col-span-full text-center text-sm font-semibold text-[#9f1239]">
@@ -786,14 +791,16 @@ function SequenceScene({
       {/* Options */}
       <div className="mt-4 grid gap-4 md:grid-cols-3">
         {task.objects.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => (item.id === task.correctOptionId ? onCorrect() : onWrong())}
-            className="rounded-[28px] border border-transparent transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
-          >
-            <CompareVisual item={item} showWater={isFill} />
-          </button>
+          <div key={item.id} className="relative">
+            <button
+              type="button"
+              onClick={() => (item.id === task.correctOptionId ? onCorrect() : onWrong())}
+              className="w-full rounded-[28px] border border-transparent transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
+            >
+              <CompareVisual item={item} showWater={isFill} />
+            </button>
+            <OptionReadAloudButton text={item.label} className="absolute right-3 top-3 z-10" />
+          </div>
         ))}
       </div>
     </MeasurementShell>
@@ -883,14 +890,16 @@ export function MeasurelandsCompareTaskCard({
         className={`grid gap-4 ${task.scene === "trio" ? "md:grid-cols-3" : "md:grid-cols-2"}`}
       >
         {task.objects.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => (item.id === task.correctOptionId ? onCorrect() : onWrong())}
-            className="group rounded-[28px] border border-transparent text-left transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
-          >
-            <CompareVisual item={item} showWater={Boolean(task.fillState)} />
-          </button>
+          <div key={item.id} className="relative">
+            <button
+              type="button"
+              onClick={() => (item.id === task.correctOptionId ? onCorrect() : onWrong())}
+              className="group w-full rounded-[28px] border border-transparent text-left transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
+            >
+              <CompareVisual item={item} showWater={Boolean(task.fillState)} />
+            </button>
+            <OptionReadAloudButton text={item.label} className="absolute right-3 top-3 z-10" />
+          </div>
         ))}
       </div>
     </MeasurementShell>
