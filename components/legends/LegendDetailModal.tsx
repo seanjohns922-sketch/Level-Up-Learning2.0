@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Play, Star, X } from "lucide-react";
+import { Maximize2, Play, Star, X } from "lucide-react";
 import type { Legend } from "@/data/legends";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 
@@ -30,6 +30,7 @@ export default function LegendDetailModal({
   const [showBack, setShowBack] = useState(false);
   const [videoMode, setVideoMode] = useState<"showcase" | "unlock" | null>(null);
   const [videoFailed, setVideoFailed] = useState(false);
+  const [enlarged, setEnlarged] = useState(false);
 
   const frontImage = legend.images.cardFront;
   const backImage = legend.images.cardBack;
@@ -51,9 +52,11 @@ export default function LegendDetailModal({
     setVideoMode(null);
     setVideoFailed(false);
     setShowBack(false);
+    setEnlarged(false);
   }, [legend.id]);
 
   return (
+    <>
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
       onClick={onClose}
@@ -120,6 +123,14 @@ export default function LegendDetailModal({
                 className="relative h-56 w-auto rounded-xl shadow-lg border-2 border-white/60"
               />
             </button>
+            <button
+              type="button"
+              onClick={() => setEnlarged(true)}
+              aria-label="Enlarge card"
+              className="absolute right-2 top-2 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full bg-black/55 text-white shadow-md backdrop-blur-sm transition hover:bg-black/75"
+            >
+              <Maximize2 className="h-4 w-4" />
+            </button>
           </div>
             </>
           )}
@@ -153,6 +164,13 @@ export default function LegendDetailModal({
               className="rounded-full border border-teal-600/20 bg-white/80 px-3 py-1 text-xs font-black text-teal-700 transition hover:bg-white"
             >
               Flip Card
+            </button>
+            <button
+              type="button"
+              onClick={() => setEnlarged(true)}
+              className="inline-flex items-center gap-1 rounded-full border border-teal-600/20 bg-white/80 px-3 py-1 text-xs font-black text-teal-700 transition hover:bg-white"
+            >
+              <Maximize2 className="h-3.5 w-3.5" /> Enlarge
             </button>
             {showcaseVideoUrl ? (
               <button
@@ -212,5 +230,31 @@ export default function LegendDetailModal({
         </div>
       </div>
     </div>
+
+    {enlarged ? (
+      <div
+        className="fixed inset-0 z-[60] flex items-center justify-center bg-black/85 p-4"
+        onClick={() => setEnlarged(false)}
+      >
+        <button
+          type="button"
+          onClick={() => setEnlarged(false)}
+          aria-label="Close enlarged card"
+          className="absolute right-4 top-4 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm transition hover:bg-white/30"
+        >
+          <X className="h-6 w-6" />
+        </button>
+        <img
+          src={showBack ? backImage : frontImage}
+          alt={showBack ? `${legend.name} card back` : `${legend.name} card front`}
+          onClick={(e) => { e.stopPropagation(); setShowBack((c) => !c); }}
+          className="max-h-[90vh] w-auto cursor-pointer rounded-2xl border-2 border-white/40 shadow-2xl"
+        />
+        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 text-xs font-bold text-white/80">
+          Tap the card to flip &middot; Tap anywhere to close
+        </div>
+      </div>
+    ) : null}
+    </>
   );
 }
