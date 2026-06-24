@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ArrowRight, Compass } from "lucide-react";
+import { ArrowRight, Compass, Sunrise, Sun, Sunset, Moon, type LucideIcon } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import { MeasurelandsEventBadge } from "@/components/measurelands/MeasurelandsEventBadge";
@@ -241,6 +241,83 @@ function FixScene({ task, onCorrect, onWrong }: { task: RoutineTask; onCorrect: 
   );
 }
 
+const DAYPART_ICON: Record<string, LucideIcon> = {
+  Morning: Sunrise,
+  Afternoon: Sun,
+  Evening: Sunset,
+  Night: Moon,
+};
+
+/* ── Classify one event into morning / afternoon / evening / night ── */
+function PartOfDayScene({ task, onCorrect, onWrong }: { task: RoutineTask; onCorrect: () => void; onWrong: () => void }) {
+  const event = (task.items ?? [])[0];
+  const options = task.textOptions ?? [];
+  return (
+    <Shell badge={task.badgeLabel ?? "When Does It Happen?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      {event ? (
+        <div className="mx-auto max-w-[260px]">
+          <RoutineCard item={event} highlight />
+        </div>
+      ) : null}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {options.map((value) => {
+          const Icon = DAYPART_ICON[value];
+          return (
+            <button
+              key={value}
+              type="button"
+              onClick={() => (value === task.correctTextOption ? onCorrect() : onWrong())}
+              className="relative flex min-h-[96px] flex-col items-center justify-center gap-2 rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-3 text-center text-base font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+            >
+              <span className="absolute right-2 top-2 z-10"><OptionReadAloudButton text={value} /></span>
+              {Icon ? <Icon className="h-7 w-7 text-[#7c3aed]" /> : null}
+              {value}
+            </button>
+          );
+        })}
+      </div>
+    </Shell>
+  );
+}
+
+/* ── Continue a routine: chain shown so far, a "?" tile, pick the next event ── */
+function NextScene({ task, onCorrect, onWrong }: { task: RoutineTask; onCorrect: () => void; onWrong: () => void }) {
+  const chain = (task.items ?? []).slice().sort((a, b) => a.order - b.order);
+  const options = task.buildItems ?? [];
+  return (
+    <Shell badge={task.badgeLabel ?? "What Happens Next?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="mx-auto flex max-w-[560px] flex-wrap items-center justify-center gap-2 rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[linear-gradient(180deg,rgba(255,252,245,0.98),rgba(252,244,225,0.98))] p-4 shadow-[0_18px_38px_rgba(180,120,20,0.08)]">
+        {chain.map((item) => (
+          <div key={item.id} className="flex items-center gap-2">
+            <div className="w-[130px]"><RoutineCard item={item} compact /></div>
+            <ArrowRight className="h-6 w-6 shrink-0 text-[#b4781e]" strokeWidth={3} />
+          </div>
+        ))}
+        <div
+          className="flex min-h-[132px] w-[130px] flex-col items-center justify-center gap-2 rounded-[24px] border-2 border-dashed px-3 py-3 text-center shadow-[0_0_22px_rgba(124,58,237,0.3)]"
+          style={{ borderColor: "rgba(124,58,237,0.7)", background: "rgba(124,58,237,0.1)" }}
+        >
+          <span className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-[rgba(124,58,237,0.5)] bg-white text-3xl font-black text-[#7c3aed]">?</span>
+          <span className="text-xs font-black text-[#7c3aed]">Next</span>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        {options.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => (item.id === task.correctTextOption ? onCorrect() : onWrong())}
+            className="relative rounded-[24px] transition hover:-translate-y-0.5"
+          >
+            <span className="absolute right-3 top-3 z-10"><OptionReadAloudButton text={item.label} /></span>
+            <RoutineCard item={item} />
+          </button>
+        ))}
+      </div>
+    </Shell>
+  );
+}
+
 function MeaningScene({ task, onCorrect, onWrong }: { task: RoutineTask; onCorrect: () => void; onWrong: () => void }) {
   const options = task.textOptions ?? [];
   return (
@@ -277,5 +354,7 @@ export function MeasurelandsRoutineSequenceCard({
   if (task.scene === "first") return <FirstScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "build") return <BuildScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "fix") return <FixScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "partOfDay") return <PartOfDayScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "next") return <NextScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   return <MeaningScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 }

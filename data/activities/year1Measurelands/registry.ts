@@ -108,6 +108,10 @@ import {
   generateY1MeasurelandsWeek8Lesson1Task,
   resetY1MeasurelandsWeek8Lesson1TaskSessionState,
 } from "@/data/activities/year1Measurelands/week8Lesson1";
+import {
+  generateY1MeasurelandsWeek8Lesson2Task,
+  resetY1MeasurelandsWeek8Lesson2TaskSessionState,
+} from "@/data/activities/year1Measurelands/week8Lesson2";
 
 // Level 1 (Year 1) Measurelands lesson registry. Mirrors the Prep registry so
 // app/lesson/page.tsx can resolve `y1-measurement-w{n}-l{m}` ids to tasks.
@@ -541,6 +545,24 @@ const Y1_MEASURELANDS_LESSONS: Y1MeasurelandsLessonEntry[] = [
     ],
     completionTitle: "Routine Builder Complete!",
     unlockMessage: "Lesson 2 unlocked.",
+    returnRoute: "/program?year=Year 1&week=8&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y1-measurement-w8-l2",
+    week: 8,
+    lessonNumber: 2,
+    title: "Build My Day",
+    subtitle: "Time Builder",
+    generate: generateY1MeasurelandsWeek8Lesson2Task,
+    reset: resetY1MeasurelandsWeek8Lesson2TaskSessionState,
+    practisedSkills: [
+      "Identifying morning, afternoon, evening and night",
+      "Sequencing a full day of events",
+      "Continuing a daily routine",
+      "Organising events across a day",
+    ],
+    completionTitle: "Day Builder Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
     returnRoute: "/program?year=Year 1&week=8&legacy=1&realm_id=measurement",
   },
 ];

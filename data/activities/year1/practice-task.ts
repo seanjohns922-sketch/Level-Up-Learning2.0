@@ -859,13 +859,18 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "first" | "build" | "fix" | "meaning";
-      /** "first": routine cards shown for comparison. */
+      // W8 L2 "Build My Day" adds: "partOfDay" (classify one event as
+      // morning/afternoon/evening/night) and "next" (continue a routine chain).
+      scene: "intro" | "first" | "build" | "fix" | "meaning" | "partOfDay" | "next";
+      /** "first": cards to compare. "partOfDay": the single event to classify.
+       *  "next": the routine chain shown so far (in order), ending in a "?". */
       items?: Array<{ id: string; label: string; icon: string; order: number; imageSrc?: string }>;
-      /** "meaning": answer options; may also support future text choices. */
+      /** "meaning"/"partOfDay": answer options ("partOfDay" = day-part words).
+       *  "next": holds the correct option id in correctTextOption. */
       textOptions?: string[];
       correctTextOption?: string;
-      /** "build": shuffled cards to place into time order. */
+      /** "build": shuffled cards to place into time order.
+       *  "next": the answer option cards (correct one matches correctTextOption id). */
       buildItems?: Array<{ id: string; label: string; icon: string; order: number; imageSrc?: string }>;
       /** "fix": a visible wrong chain that the student repairs. */
       brokenItems?: Array<{ id: string; label: string; icon: string; order: number; imageSrc?: string }>;
