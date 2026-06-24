@@ -259,6 +259,62 @@ Folder:
 
 - `public/images/measurelands/days/`
 
+## Story Sequence Scenes
+
+Folder:
+
+- `public/images/measurelands/story-3d/`
+
+Purpose:
+
+- Year 1 Week 8 Lesson 3 uses short visual process stories
+- the visible stage is the full teaching signal
+- a child should be able to order the steps from the image alone
+
+Story rules:
+
+- each story uses the same character / props / color family across all steps
+- only the stage of the process changes
+- one clear action per image
+- no arrows
+- no text
+- no extra characters unless the process genuinely needs one child actor
+
+Current target filenames:
+
+- `story-seed-1.png`
+- `story-seed-2.png`
+- `story-seed-3.png`
+- `story-seed-4.png`
+- `story-butterfly-1.png`
+- `story-butterfly-2.png`
+- `story-butterfly-3.png`
+- `story-butterfly-4.png`
+- `story-toast-1.png`
+- `story-toast-2.png`
+- `story-toast-3.png`
+- `story-toast-4.png`
+- `story-teeth-1.png`
+- `story-teeth-2.png`
+- `story-teeth-3.png`
+- `story-teeth-4.png`
+
+Generation rules:
+
+- transparent PNG
+- centered subject
+- generous padding
+- subtle contact shadow only
+- slight front or 3/4 view
+- every step must still read clearly at lesson-card size
+
+Do not:
+
+- change costume / props randomly between steps
+- use decorative backgrounds
+- make two consecutive steps look nearly identical
+- hide the stage change in tiny details
+
 Live filenames:
 
 - `monday.svg`

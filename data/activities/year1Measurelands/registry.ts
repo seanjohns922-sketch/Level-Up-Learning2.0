@@ -112,6 +112,10 @@ import {
   generateY1MeasurelandsWeek8Lesson2Task,
   resetY1MeasurelandsWeek8Lesson2TaskSessionState,
 } from "@/data/activities/year1Measurelands/week8Lesson2";
+import {
+  generateY1MeasurelandsWeek8Lesson3Task,
+  resetY1MeasurelandsWeek8Lesson3TaskSessionState,
+} from "@/data/activities/year1Measurelands/week8Lesson3";
 
 // Level 1 (Year 1) Measurelands lesson registry. Mirrors the Prep registry so
 // app/lesson/page.tsx can resolve `y1-measurement-w{n}-l{m}` ids to tasks.
@@ -563,6 +567,24 @@ const Y1_MEASURELANDS_LESSONS: Y1MeasurelandsLessonEntry[] = [
     ],
     completionTitle: "Day Builder Complete!",
     unlockMessage: "Lesson 3 unlocked.",
+    returnRoute: "/program?year=Year 1&week=8&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y1-measurement-w8-l3",
+    week: 8,
+    lessonNumber: 3,
+    title: "Sequence Events",
+    subtitle: "Time Builder",
+    generate: generateY1MeasurelandsWeek8Lesson3Task,
+    reset: resetY1MeasurelandsWeek8Lesson3TaskSessionState,
+    practisedSkills: [
+      "Sequencing simple process stories",
+      "Identifying what happens first",
+      "Choosing what happens next",
+      "Using first, next and last",
+    ],
+    completionTitle: "Story Sequencer Complete!",
+    unlockMessage: "All lessons complete.",
     returnRoute: "/program?year=Year 1&week=8&legacy=1&realm_id=measurement",
   },
 ];
