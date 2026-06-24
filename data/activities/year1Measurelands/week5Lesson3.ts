@@ -8,21 +8,25 @@ import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-
 //   C — Find the Missing Month (fill the gap in a month sequence)
 
 type WeekTask = Extract<PracticeTask, { kind: "weekCycle" }>;
-type MonthCard = { id: string; label: string };
+type MonthCard = { id: string; label: string; imageSrc: string };
+
+function monthImageSrc(file: string) {
+  return `/images/measurelands/months-3d/${file}.png`;
+}
 
 export const YEAR1_MEASURELANDS_MONTHS: MonthCard[] = [
-  { id: "jan", label: "January" },
-  { id: "feb", label: "February" },
-  { id: "mar", label: "March" },
-  { id: "apr", label: "April" },
-  { id: "may", label: "May" },
-  { id: "jun", label: "June" },
-  { id: "jul", label: "July" },
-  { id: "aug", label: "August" },
-  { id: "sep", label: "September" },
-  { id: "oct", label: "October" },
-  { id: "nov", label: "November" },
-  { id: "dec", label: "December" },
+  { id: "jan", label: "January", imageSrc: monthImageSrc("january") },
+  { id: "feb", label: "February", imageSrc: monthImageSrc("february") },
+  { id: "mar", label: "March", imageSrc: monthImageSrc("march") },
+  { id: "apr", label: "April", imageSrc: monthImageSrc("april") },
+  { id: "may", label: "May", imageSrc: monthImageSrc("may") },
+  { id: "jun", label: "June", imageSrc: monthImageSrc("june") },
+  { id: "jul", label: "July", imageSrc: monthImageSrc("july") },
+  { id: "aug", label: "August", imageSrc: monthImageSrc("august") },
+  { id: "sep", label: "September", imageSrc: monthImageSrc("september") },
+  { id: "oct", label: "October", imageSrc: monthImageSrc("october") },
+  { id: "nov", label: "November", imageSrc: monthImageSrc("november") },
+  { id: "dec", label: "December", imageSrc: monthImageSrc("december") },
 ];
 
 const MONTH_IDS = YEAR1_MEASURELANDS_MONTHS.map((month) => month.id);
@@ -56,7 +60,7 @@ function monthAt(index: number): MonthCard {
   return YEAR1_MEASURELANDS_MONTHS[((index % 12) + 12) % 12]!;
 }
 
-const toCard = (month: MonthCard) => ({ id: month.id, label: month.label });
+const toCard = (month: MonthCard) => ({ id: month.id, label: month.label, imageSrc: month.imageSrc });
 
 function distinctMonths(indices: number[]): MonthCard[] {
   const seen = new Set<string>();
