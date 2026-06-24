@@ -86,6 +86,24 @@ function buildCountTask(): WeekTask {
   };
 }
 
+// Quiz — complete the week by choosing the missing final day.
+function buildCompleteWeekTask(): WeekTask {
+  const missing = WEEK5_DAYS[6]!;
+  const strip = WEEK5_DAYS.map((d) => (d.id === missing.id ? null : toCard(d)));
+  const distractors = shuffle(WEEK5_DAYS.filter((d) => d.id !== missing.id)).slice(0, 2);
+  return {
+    kind: "weekCycle",
+    scene: "missing",
+    prompt: "Which day completes the week?",
+    speakText: "Look at the week. Which day completes the week?",
+    badgeLabel: "Complete the Week",
+    strip,
+    choices: shuffle([toCard(missing), ...distractors.map(toCard)]),
+    correctOptionId: missing.id,
+    feedback: { correct: "Yes — Sunday completes the week!", wrong: "A full week ends with Sunday." },
+  };
+}
+
 // Activity C — what comes next? (cycle wraps Sunday → Monday).
 function buildNextTask(forceIndex?: number): WeekTask {
   const i = forceIndex ?? randInt(7);
@@ -168,7 +186,7 @@ export function resetY1MeasurelandsWeek5Lesson1TaskSessionState() {
 export function buildY1MeasurelandsWeek5Lesson1QuizTasks(): PracticeTask[] {
   return [
     buildCountTask(),
-    buildBuildTask(),
+    buildCompleteWeekTask(),
     buildNextTask(6), // after Sunday → Monday
     buildWhichWeekTask(),
     buildMissingTask(),
