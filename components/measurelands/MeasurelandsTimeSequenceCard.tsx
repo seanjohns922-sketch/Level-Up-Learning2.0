@@ -1,30 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Compass, ArrowRight, School, Cake, Waves, Palette, Bus, PartyPopper, Trophy, Home, CalendarClock } from "lucide-react";
+import { Compass, ArrowRight } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
+import { MeasurelandsEventBadge } from "@/components/measurelands/MeasurelandsEventBadge";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type TimeTask = Extract<PracticeTask, { kind: "timeSequence" }>;
 type When = "yesterday" | "today" | "tomorrow";
 
-const EVENT_ICON: Record<string, typeof Cake> = {
-  soccer: Trophy,
-  school: School,
-  birthday: Cake,
-  swimming: Waves,
-  art: Palette,
-  excursion: Bus,
-  celebration: PartyPopper,
-  family: Home,
-};
 const WHEN_LABEL: Record<When, string> = { yesterday: "Yesterday", today: "Today", tomorrow: "Tomorrow" };
 const WHEN_ORDER: Record<When, number> = { yesterday: 0, today: 1, tomorrow: 2 };
-
-function iconFor(key: string) {
-  return EVENT_ICON[key] ?? CalendarClock;
-}
 
 /* ── Gold/violet Meazurex shell (matches the Calendar Quest cards) ── */
 function Shell({
@@ -65,7 +52,6 @@ function Shell({
 
 /* ── A single event tile on the timeline ── */
 function EventTile({ when, label, icon, today }: { when: When; label: string; icon: string; today: boolean }) {
-  const Icon = iconFor(icon);
   return (
     <div
       className="flex w-[116px] shrink-0 flex-col items-center gap-2 rounded-[22px] border-2 px-3 py-3 text-center"
@@ -77,12 +63,7 @@ function EventTile({ when, label, icon, today }: { when: When; label: string; ic
       <span className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: today ? "#5b21b6" : "#a98b52" }}>
         {WHEN_LABEL[when]}
       </span>
-      <span
-        className="inline-flex h-12 w-12 items-center justify-center rounded-full shadow-md"
-        style={{ background: "linear-gradient(135deg,#fff,#fdeecb)", border: "2px solid rgba(124,58,237,0.5)" }}
-      >
-        <Icon className="h-7 w-7 text-[#7c3aed]" />
-      </span>
+      <MeasurelandsEventBadge iconKey={icon} label={label} size="lg" />
       <span className="text-sm font-black leading-tight text-[#2c1c07]">{label}</span>
     </div>
   );
@@ -120,7 +101,7 @@ function TextOptions({
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
       {options.map((value) => {
-        const Icon = iconByLabel?.[value] ? iconFor(iconByLabel[value]!) : null;
+        const iconKey = iconByLabel?.[value];
         return (
           <button
             key={value}
@@ -129,7 +110,7 @@ function TextOptions({
             className="relative flex min-h-[72px] items-center justify-center gap-2 rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-3 text-center text-lg font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
           >
             <span className="absolute right-2 top-2 z-10"><OptionReadAloudButton text={value} /></span>
-            {Icon ? <Icon className="h-6 w-6 shrink-0 text-[#7c3aed]" /> : null}
+            {iconKey ? <MeasurelandsEventBadge iconKey={iconKey} label={value} size="md" /> : null}
             {value}
           </button>
         );
@@ -194,6 +175,41 @@ function PickScene({ task, onCorrect, onWrong }: { task: TimeTask; onCorrect: ()
   return (
     <Shell badge={task.badgeLabel ?? "Time Journey"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <Timeline slots={task.slots} />
+      <TextOptions
+        options={task.textOptions ?? []}
+        correct={task.correctTextOption}
+        iconByLabel={iconByLabel}
+        onCorrect={onCorrect}
+        onWrong={onWrong}
+      />
+    </Shell>
+  );
+}
+
+/* ── What comes next? / Plan tomorrow (timeline + a glowing future tile + MCQ) ── */
+function NextScene({ task, onCorrect, onWrong }: { task: TimeTask; onCorrect: () => void; onWrong: () => void }) {
+  const iconByLabel = Object.fromEntries((task.buildItems ?? []).map((it) => [it.label, it.icon]));
+  return (
+    <Shell badge={task.badgeLabel ?? "What Comes Next?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="mx-auto flex max-w-[480px] flex-wrap items-center justify-center gap-2 rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[linear-gradient(180deg,rgba(255,252,245,0.98),rgba(252,244,225,0.98))] p-4 shadow-[0_18px_38px_rgba(180,120,20,0.08)]">
+        {[...(task.slots ?? [])]
+          .sort((a, b) => WHEN_ORDER[a.when] - WHEN_ORDER[b.when])
+          .map((s) => (
+            <div key={s.when} className="flex items-center gap-2">
+              <EventTile when={s.when} label={s.label} icon={s.icon} today={s.when === "today"} />
+              <ArrowRight className="h-7 w-7 shrink-0 text-[#b4781e]" strokeWidth={3} />
+            </div>
+          ))}
+        {/* glowing future "?" tile */}
+        <div
+          className="flex w-[116px] shrink-0 flex-col items-center gap-2 rounded-[22px] border-2 border-dashed px-3 py-3 text-center shadow-[0_0_22px_rgba(124,58,237,0.35)]"
+          style={{ borderColor: "rgba(124,58,237,0.7)", background: "rgba(124,58,237,0.12)" }}
+        >
+          <span className="text-[11px] font-black uppercase tracking-[0.14em] text-[#7c3aed]">Tomorrow</span>
+          <span className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-[rgba(124,58,237,0.5)] bg-white text-3xl font-black text-[#7c3aed]">?</span>
+          <span className="text-sm font-black leading-tight text-[#7c3aed]">Coming up</span>
+        </div>
+      </div>
       <TextOptions
         options={task.textOptions ?? []}
         correct={task.correctTextOption}
@@ -283,7 +299,6 @@ function BuildScene({ task, onCorrect, onWrong }: { task: TimeTask; onCorrect: (
           <div className="col-span-3 text-center text-sm font-black uppercase tracking-[0.14em] text-[#5b21b6]">Timeline complete!</div>
         ) : (
           tray.map((it) => {
-            const Icon = iconFor(it.icon);
             return (
               <button
                 key={it.label}
@@ -293,7 +308,7 @@ function BuildScene({ task, onCorrect, onWrong }: { task: TimeTask; onCorrect: (
                 className="flex min-h-[88px] flex-col items-center justify-center gap-1 rounded-[22px] border-2 border-[rgba(214,184,108,0.55)] bg-white px-2 py-2 text-center transition hover:-translate-y-0.5"
               >
                 <span className="text-[10px] font-black uppercase tracking-[0.12em] text-[#a98b52]">{WHEN_LABEL[it.when]}</span>
-                <Icon className="h-6 w-6 text-[#7c3aed]" />
+                <MeasurelandsEventBadge iconKey={it.icon} label={it.label} size="md" />
                 <span className="text-xs font-black leading-tight text-[#2c1c07]">{it.label}</span>
               </button>
             );
@@ -355,10 +370,9 @@ function SortScene({ task, onCorrect, onWrong }: { task: TimeTask; onCorrect: ()
                 {WHEN_LABEL[col]}
               </span>
               {here.map((it) => {
-                const Icon = iconFor(it.icon);
                 return (
                   <span key={it.label} className="flex flex-col items-center gap-1 rounded-[16px] border-2 border-[rgba(124,58,237,0.4)] bg-white px-2 py-1.5">
-                    <Icon className="h-6 w-6 text-[#7c3aed]" />
+                    <MeasurelandsEventBadge iconKey={it.icon} label={it.label} size="md" />
                     <span className="text-[11px] font-black leading-tight text-[#2c1c07]">{it.label}</span>
                   </span>
                 );
@@ -373,7 +387,6 @@ function SortScene({ task, onCorrect, onWrong }: { task: TimeTask; onCorrect: ()
           <div className="col-span-3 text-center text-sm font-black uppercase tracking-[0.14em] text-[#5b21b6]">All sorted!</div>
         ) : (
           tray.map((it) => {
-            const Icon = iconFor(it.icon);
             const isSel = selected === it.label;
             return (
               <button
@@ -387,7 +400,7 @@ function SortScene({ task, onCorrect, onWrong }: { task: TimeTask; onCorrect: ()
                   background: isSel ? "rgba(124,58,237,0.12)" : "white",
                 }}
               >
-                <Icon className="h-6 w-6 text-[#7c3aed]" />
+                <MeasurelandsEventBadge iconKey={it.icon} label={it.label} size="md" />
                 <span className="text-xs font-black leading-tight text-[#2c1c07]">{it.label}</span>
               </button>
             );
@@ -412,5 +425,6 @@ export function MeasurelandsTimeSequenceCard({
   if (task.scene === "meaning") return <MeaningScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "build") return <BuildScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "sort") return <SortScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "next") return <NextScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   return <PickScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 }

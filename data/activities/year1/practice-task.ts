@@ -837,15 +837,16 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "which" | "before" | "build" | "meaning" | "sort";
+      scene: "intro" | "which" | "before" | "build" | "meaning" | "sort" | "next";
       /** Events placed on the timeline, each tagged with when it happens. */
       slots?: Array<{ when: "yesterday" | "today" | "tomorrow"; label: string; icon: string }>;
       /** "which": which time slot the student must identify the event for. */
       askWhen?: "yesterday" | "today" | "tomorrow";
-      /** "which"/"before"/"meaning": text answer options. */
+      /** "which"/"before"/"meaning"/"next": text answer options. */
       textOptions?: string[];
       correctTextOption?: string;
-      /** "build"/"sort": shuffled event cards (each tagged with its day). */
+      /** "build"/"sort": shuffled event cards (each tagged with its day).
+       *  "next": the answer options (icons looked up here; correct = tomorrow). */
       buildItems?: Array<{ label: string; icon: string; when: "yesterday" | "today" | "tomorrow" }>;
       /** "build": the expected order; "sort": the columns to sort into. */
       orderedWhen?: Array<"yesterday" | "today" | "tomorrow">;

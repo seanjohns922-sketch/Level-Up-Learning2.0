@@ -99,6 +99,11 @@ import {
   resetY1MeasurelandsWeek7Lesson2TaskSessionState,
   buildY1MeasurelandsWeek7Lesson2QuizTasks,
 } from "@/data/activities/year1Measurelands/week7Lesson2";
+import {
+  generateY1MeasurelandsWeek7Lesson3Task,
+  resetY1MeasurelandsWeek7Lesson3TaskSessionState,
+  buildY1MeasurelandsWeek7Lesson3QuizTasks,
+} from "@/data/activities/year1Measurelands/week7Lesson3";
 
 // Level 1 (Year 1) Measurelands lesson registry. Mirrors the Prep registry so
 // app/lesson/page.tsx can resolve `y1-measurement-w{n}-l{m}` ids to tasks.
@@ -496,6 +501,25 @@ const Y1_MEASURELANDS_LESSONS: Y1MeasurelandsLessonEntry[] = [
     unlockMessage: "Lesson 3 unlocked.",
     returnRoute: "/program?year=Year 1&week=7&legacy=1&realm_id=measurement",
     quizContributionBuilder: buildY1MeasurelandsWeek7Lesson2QuizTasks,
+  },
+  {
+    prefix: "y1-measurement-w7-l3",
+    week: 7,
+    lessonNumber: 3,
+    title: "Tomorrow",
+    subtitle: "Time Journey",
+    generate: generateY1MeasurelandsWeek7Lesson3Task,
+    reset: resetY1MeasurelandsWeek7Lesson3TaskSessionState,
+    practisedSkills: [
+      "Knowing tomorrow is the day after today",
+      "Identifying events that happen tomorrow",
+      "Predicting what comes next",
+      "Placing future events on a timeline",
+    ],
+    completionTitle: "Future Planner Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+    returnRoute: "/program?year=Year 1&week=7&legacy=1&realm_id=measurement",
+    quizContributionBuilder: buildY1MeasurelandsWeek7Lesson3QuizTasks,
   },
 ];
 
