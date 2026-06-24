@@ -28,28 +28,19 @@ const ROUTINES: Array<RoutineItem & { daypart: DayPart }> = [
   { id: "bed", label: "Bed", icon: "bed", imageSrc: `${ROUTINE_IMAGE_BASE}/routine-bed.png`, order: 8, daypart: "Night" },
 ];
 
-// Unambiguous full-day routines (each spans morning -> night).
-const BUILD_SETS = [
-  ["wakeup", "breakfast", "school", "dinner", "bed"],
-  ["wakeup", "breakfast", "sport", "bath", "bed"],
-  ["wakeup", "school", "reading", "dinner", "bed"],
-  ["wakeup", "breakfast", "art", "dinner", "bed"],
-] as const;
+// Mid-day events (orders 1..7) that can sit between Wake Up (first) and Bed
+// (last). A "day" is Wake Up + 3 of these (in time order) + Bed — which gives
+// 35 distinct full-day routines for variety, all unambiguous morning -> night.
+const MIDDLES = ["breakfast", "school", "sport", "art", "reading", "dinner", "bath"] as const;
 
-// "What happens next?" — the canonical normal-day spine. We show a 2-event
-// contiguous slice, ask for the immediate next, and offer the other spine
-// events as distractors (each either already-done or clearly later — never an
-// event already on the shown chain, so the order stays unambiguous).
-const NEXT_SPINE = ["wakeup", "breakfast", "school", "dinner", "bed"] as const;
-
-type LessonMemory = { introShown: boolean; cursor: number; pod: number; build: number; next: number };
+type LessonMemory = { introShown: boolean; cursor: number; lastPodId: string | null; lastDayKey: string | null };
 const lessonMemory = new Map<string, LessonMemory>();
 const ROTATION: Array<"A" | "B" | "C"> = ["A", "B", "C", "A", "B", "C"];
 
 function getMemory(lessonId: string): LessonMemory {
   const existing = lessonMemory.get(lessonId);
   if (existing) return existing;
-  const created: LessonMemory = { introShown: false, cursor: 0, pod: 0, build: 0, next: 0 };
+  const created: LessonMemory = { introShown: false, cursor: 0, lastPodId: null, lastDayKey: null };
   lessonMemory.set(lessonId, created);
   return created;
 }
@@ -66,6 +57,21 @@ function byId(id: string) {
   const item = ROUTINES.find((candidate) => candidate.id === id);
   if (!item) throw new Error(`[Y1MeasurelandsW8L2] Unknown routine id: ${id}`);
   return item;
+}
+
+// A fresh, valid full-day routine: Wake Up + 3 ordered middles + Bed. Avoids
+// repeating the immediately-previous day so consecutive tasks feel different.
+function randomDay(memory: LessonMemory): string[] {
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    const middles = shuffle([...MIDDLES]).slice(0, 3).sort((a, b) => byId(a).order - byId(b).order);
+    const day = ["wakeup", ...middles, "bed"];
+    const key = day.join("-");
+    if (key !== memory.lastDayKey) {
+      memory.lastDayKey = key;
+      return day;
+    }
+  }
+  return ["wakeup", "breakfast", "school", "dinner", "bed"];
 }
 // Strip the daypart field — tasks carry plain RoutineItems.
 function asItem(r: RoutineItem & { daypart: DayPart }): RoutineItem {
@@ -88,8 +94,9 @@ function buildIntroTask(): RoutineTask {
 
 // Activity A — classify one event into its part of the day.
 function buildPartOfDayTask(memory: LessonMemory): RoutineTask {
-  const event = ROUTINES[memory.pod % ROUTINES.length]!;
-  memory.pod += 1;
+  const pool = ROUTINES.filter((r) => r.id !== memory.lastPodId);
+  const event = shuffle(pool)[0]!;
+  memory.lastPodId = event.id;
   return {
     kind: "routineSequence",
     scene: "partOfDay",
@@ -105,8 +112,7 @@ function buildPartOfDayTask(memory: LessonMemory): RoutineTask {
 
 // Activity B — build a full daily routine (5 events) in order.
 function buildBuildTask(memory: LessonMemory): RoutineTask {
-  const set = BUILD_SETS[memory.build % BUILD_SETS.length]!.map((id) => asItem(byId(id)));
-  memory.build += 1;
+  const set = randomDay(memory).map((id) => asItem(byId(id)));
   return {
     kind: "routineSequence",
     scene: "build",
@@ -120,12 +126,13 @@ function buildBuildTask(memory: LessonMemory): RoutineTask {
 
 // Activity C — continue the routine: pick the next event.
 function buildNextTask(memory: LessonMemory): RoutineTask {
-  // Show a 2-event contiguous slice of the spine; the answer is the next event.
-  const start = memory.next % (NEXT_SPINE.length - 2); // 0..2 -> always leaves 2 distractors
-  memory.next += 1;
-  const shownIds = [NEXT_SPINE[start]!, NEXT_SPINE[start + 1]!];
-  const answerId = NEXT_SPINE[start + 2]!;
-  const distractorIds = NEXT_SPINE.filter((id) => !shownIds.includes(id) && id !== answerId);
+  // Build a fresh day, then show a 2-event contiguous slice; the answer is the
+  // immediate next event, and the remaining day events are the distractors.
+  const spine = randomDay(memory);
+  const start = Math.floor(Math.random() * (spine.length - 2)); // 0..2 -> leaves 2 distractors
+  const shownIds = [spine[start]!, spine[start + 1]!];
+  const answerId = spine[start + 2]!;
+  const distractorIds = spine.filter((id) => !shownIds.includes(id) && id !== answerId);
   const options = shuffle([answerId, ...distractorIds].map((id) => asItem(byId(id))));
   return {
     kind: "routineSequence",
