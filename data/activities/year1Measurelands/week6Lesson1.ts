@@ -10,13 +10,21 @@ import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-
 
 type CalendarTask = Extract<PracticeTask, { kind: "calendarFind" }>;
 
-// A few simple month layouts (days, and the weekday day-1 falls on: 0=Mon..6=Sun).
+// Real named months so each calendar is a concrete example (days, and the
+// weekday day-1 falls on: 0=Mon..6=Sun).
 const MONTHS = [
-  { days: 30, start: 0 },
-  { days: 31, start: 2 },
-  { days: 28, start: 5 },
-  { days: 30, start: 3 },
-  { days: 31, start: 1 },
+  { name: "January", days: 31, start: 2 },
+  { name: "February", days: 28, start: 5 },
+  { name: "March", days: 31, start: 5 },
+  { name: "April", days: 30, start: 1 },
+  { name: "May", days: 31, start: 3 },
+  { name: "June", days: 30, start: 6 },
+  { name: "July", days: 31, start: 1 },
+  { name: "August", days: 31, start: 4 },
+  { name: "September", days: 30, start: 0 },
+  { name: "October", days: 31, start: 2 },
+  { name: "November", days: 30, start: 5 },
+  { name: "December", days: 31, start: 0 },
 ];
 
 const EVENTS = [
@@ -89,6 +97,7 @@ function buildIntroTask(): CalendarTask {
     badgeLabel: "Meazurex Mission",
     days: m.days,
     startWeekday: m.start,
+    monthLabel: m.name,
     highlightDate: 15,
     feedback: { correct: "Let's find some dates!", wrong: "Let's get ready." },
   };
@@ -106,6 +115,7 @@ function buildFindTask(memory: LessonMemory): CalendarTask {
     badgeLabel: "Find the Date",
     days: m.days,
     startWeekday: m.start,
+    monthLabel: m.name,
     targetDate: target,
     feedback: { correct: "You found the date!", wrong: "Look for that number on the calendar." },
   };
@@ -123,6 +133,7 @@ function buildReadTask(memory: LessonMemory): CalendarTask {
     badgeLabel: "What Date Is It?",
     days: m.days,
     startWeekday: m.start,
+    monthLabel: m.name,
     markedDate: marked,
     options: readOptions(marked),
     correctAnswer: marked,
@@ -144,6 +155,7 @@ function buildEventTask(memory: LessonMemory): CalendarTask {
     badgeLabel: "Find the Event",
     days: m.days,
     startWeekday: m.start,
+    monthLabel: m.name,
     events,
     askEventLabel: ask.label,
     feedback: { correct: `Yes — that's when ${ask.label} is!`, wrong: "Look for the matching picture, then tap its date." },
@@ -163,6 +175,7 @@ function buildMatchTask(): CalendarTask {
     badgeLabel: "What's On?",
     days: m.days,
     startWeekday: m.start,
+    monthLabel: m.name,
     events,
     markedDate: target.date,
     textOptions: shuffle(events.map((e) => e.label)),

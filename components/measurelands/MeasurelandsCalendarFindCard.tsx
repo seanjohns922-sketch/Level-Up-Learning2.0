@@ -109,10 +109,13 @@ function CalendarGrid({
                 boxShadow: tappable ? "0 2px 0 rgba(180,120,20,0.12)" : undefined,
               }}
             >
-              {date}
+              <span className={ev ? "text-sm leading-none text-[#5f4725]" : ""}>{date}</span>
               {Icon ? (
-                <span className="absolute -right-1 -top-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-white shadow" style={{ border: "1px solid rgba(214,184,108,0.5)" }}>
-                  <Icon className="h-3 w-3 text-[#b45309]" />
+                <span
+                  className="absolute -right-2 -top-2 inline-flex h-8 w-8 items-center justify-center rounded-full shadow-md"
+                  style={{ background: "linear-gradient(135deg,#fff,#fdeecb)", border: "2px solid rgba(124,58,237,0.5)" }}
+                >
+                  <Icon className="h-5 w-5 text-[#7c3aed]" />
                 </span>
               ) : null}
             </button>
