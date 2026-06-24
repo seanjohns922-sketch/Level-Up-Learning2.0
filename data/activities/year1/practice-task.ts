@@ -709,10 +709,14 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "build" | "count" | "next" | "missing" | "whichWeek" | "weekOrMonth" | "findWeeks" | "whichBigger";
+      scene: "intro" | "build" | "count" | "next" | "missing" | "whichWeek" | "weekOrMonth" | "findWeeks" | "whichBigger" | "buildMonth";
       /** "build": day cards (shuffled) to order Monday→Sunday. */
       items?: Array<{ id: string; imageSrc?: string; label: string }>;
       orderedIds?: string[];
+      /** "buildMonth": numbered week-rows to stack into a month (4 weeks). */
+      monthWeeks?: Array<{ id: string; label: string; dates: number[] }>;
+      /** render calendar cells with running dates instead of weekday letters. */
+      numbered?: boolean;
       /** "count": how many days in a week. */
       options?: number[];
       correctAnswer?: number;

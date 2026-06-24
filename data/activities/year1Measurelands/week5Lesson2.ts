@@ -2,26 +2,35 @@ import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-
 import { WEEK5_DAYS, type DayOfWeek } from "@/data/activities/prepMeasurelands/week5Days";
 
 // ── Measurelands · Level 1 · Week 5 · Lesson 2 — "Weeks and Months" ──
-// AC9M1M03: recognise that weeks fit inside months. Ground Level named days;
-// Lesson 1 established that 7 days make a week; Lesson 2 now connects one week
-// row to a bigger calendar month made of several week rows.
-//   A — Week or Month?    (compare a single week strip with a calendar page)
-//   B — Find the Weeks    (count obvious week rows inside a month page)
-//   C — Which Is Bigger?  (reason that month > week, and day < week < month)
+// AC9M1M03: weeks fit inside months. Hero fact: about 4 weeks make a month —
+// taught the way Lesson 1 taught "7 days make a week": by BUILDING it. A month
+// is shown as a numbered calendar (week 1 = days 1–7, week 2 = 8–14 …).
+//   A — Build the Month   (stack 4 week-rows in order to fill a month)
+//   B — Which Is Longest? (order day < week < month)
+//   C — Weeks in a Month  (about 4 weeks make a month)
 
 type WeekTask = Extract<PracticeTask, { kind: "weekCycle" }>;
 
 const toCard = (d: DayOfWeek) => ({ id: d.id, imageSrc: d.imageSrc, label: d.label });
 const WEEK_STRIP = WEEK5_DAYS.map(toCard);
 
-type LessonMemory = { introShown: boolean; cursor: number; lastRows: number | null };
+// The four week-rows of a (simplified) 28-day month.
+const MONTH_WEEKS = [
+  { id: "w1", label: "Week 1", dates: [1, 2, 3, 4, 5, 6, 7] },
+  { id: "w2", label: "Week 2", dates: [8, 9, 10, 11, 12, 13, 14] },
+  { id: "w3", label: "Week 3", dates: [15, 16, 17, 18, 19, 20, 21] },
+  { id: "w4", label: "Week 4", dates: [22, 23, 24, 25, 26, 27, 28] },
+];
+const MONTH_ORDER = MONTH_WEEKS.map((w) => w.id);
+
+type LessonMemory = { introShown: boolean; cursor: number };
 const lessonMemory = new Map<string, LessonMemory>();
 const ROTATION: Array<"A" | "B" | "C"> = ["A", "B", "C", "A", "C", "B"];
 
 function getMemory(lessonId: string): LessonMemory {
   const existing = lessonMemory.get(lessonId);
   if (existing) return existing;
-  const created: LessonMemory = { introShown: false, cursor: 0, lastRows: null };
+  const created: LessonMemory = { introShown: false, cursor: 0 };
   lessonMemory.set(lessonId, created);
   return created;
 }
@@ -29,7 +38,6 @@ function getMemory(lessonId: string): LessonMemory {
 function randInt(maxExclusive: number) {
   return Math.floor(Math.random() * maxExclusive);
 }
-
 function shuffle<T>(items: T[]): T[] {
   const next = [...items];
   for (let i = next.length - 1; i > 0; i -= 1) {
@@ -39,115 +47,93 @@ function shuffle<T>(items: T[]): T[] {
   return next;
 }
 
-function chooseRows(memory: LessonMemory, pool: number[]): number {
-  const options = pool.filter((value) => value !== memory.lastRows);
-  const picked = options[randInt(options.length)] ?? pool[0]!;
-  memory.lastRows = picked;
-  return picked;
-}
-
 function buildIntroTask(): WeekTask {
   return {
     kind: "weekCycle",
     scene: "intro",
-    prompt: "Weeks fit inside months.",
+    prompt: "About four weeks make a month.",
     speakText:
-      "Professor Gauge says a week is made of seven days. A month is made of several weeks. On a calendar, one week is one row, and a month has many week rows. Months are bigger than weeks.",
+      "Professor Gauge says: seven days make a week, and about four weeks make a month. On a calendar, each row is one week — week one is days one to seven, week two is eight to fourteen, and so on. A month is bigger than a week.",
     badgeLabel: "Meazurex Mission",
     introTitle: "Calendar Grove",
     introBody: [
-      "A week is made of seven days.",
-      "A month is made of several weeks.",
-      "Months are bigger than weeks.",
+      "Seven days make a week.",
+      "About four weeks make a month.",
+      "On a calendar, each row is one week.",
     ],
     introVisual: "weekToMonth",
     teachingDays: WEEK_STRIP,
     weekRows: 4,
     highlightRow: 0,
-    feedback: { correct: "Let's explore weeks and months!", wrong: "Let's get ready." },
+    numbered: true,
+    feedback: { correct: "Let's build a month!", wrong: "Let's get ready." },
   };
 }
 
-function buildWeekOrMonthTask(memory: LessonMemory): WeekTask {
-  const showMonth = randInt(2) === 0;
-  const rows = chooseRows(memory, [4, 5]);
+// Activity A — build the month by stacking the 4 week-rows in order.
+function buildMonthTask(): WeekTask {
   return {
     kind: "weekCycle",
-    scene: "weekOrMonth",
-    prompt: showMonth ? "Is this a week or a month?" : "What does this show?",
-    speakText: showMonth ? "Look carefully. Is this showing a week or a month?" : "Does this picture show one week or one month?",
-    badgeLabel: "Week or Month?",
-    visualMode: showMonth ? "month" : "week",
-    items: showMonth ? undefined : WEEK_STRIP,
-    weekRows: rows,
-    visualLabel: showMonth ? "Many weeks together" : "One row of seven days",
-    textOptions: ["Week", "Month"],
-    correctTextOption: showMonth ? "Month" : "Week",
-    feedback: { correct: "Yes — one row is a week, many rows make a month!", wrong: "Remember: a month has several week rows." },
+    scene: "buildMonth",
+    prompt: "Build the month. Add the weeks in order.",
+    speakText: "A month is made of four weeks. Tap the weeks in order to fill the month, starting with week one.",
+    badgeLabel: "Build the Month",
+    monthWeeks: shuffle(MONTH_WEEKS),
+    orderedIds: MONTH_ORDER,
+    numbered: true,
+    feedback: { correct: "Four weeks — that's a whole month!", wrong: "Start with days 1 to 7, then keep going in order." },
   };
 }
 
-function buildFindWeeksTask(memory: LessonMemory): WeekTask {
-  const rows = chooseRows(memory, [4, 5]);
-  const options = rows === 4 ? [3, 4, 5] : [4, 5, 6];
+// Activity B — order day < week < month.
+function buildWhichLongestTask(): WeekTask {
+  return {
+    kind: "weekCycle",
+    scene: "whichBigger",
+    prompt: "Which is the longest?",
+    speakText: "A day, a week, or a month — which is the longest?",
+    badgeLabel: "Longest Time",
+    weekRows: 4,
+    numbered: true,
+    textOptions: ["Day", "Week", "Month"],
+    correctTextOption: "Month",
+    feedback: { correct: "Yes — a day is short, a week is longer, a month is the longest.", wrong: "A day is short, a week is longer, a month is the longest." },
+  };
+}
+
+// Activity C — about how many weeks make a month? (fixed: 4)
+function buildWeeksInMonthTask(): WeekTask {
   return {
     kind: "weekCycle",
     scene: "findWeeks",
-    prompt: "How many weeks can you see in this month?",
-    speakText: "Count the week rows. How many weeks can you see in this month?",
-    badgeLabel: "Find the Weeks",
-    weekRows: rows,
-    options: shuffle(options),
-    correctAnswer: rows,
-    visualLabel: "Each row is one week",
-    feedback: { correct: "Great counting — those rows are the weeks!", wrong: "Count the rows. Each row is one week." },
+    prompt: "About how many weeks make a month?",
+    speakText: "About how many weeks make a month?",
+    badgeLabel: "Weeks in a Month",
+    weekRows: 4,
+    numbered: true,
+    options: shuffle([2, 4, 7]),
+    correctAnswer: 4,
+    visualLabel: "Count the week rows",
+    feedback: { correct: "About four weeks make a month!", wrong: "Count the rows — there are about four weeks." },
   };
 }
 
-function buildWhichBiggerTask(memory: LessonMemory): WeekTask {
-  const compareMode = randInt(2) === 0 ? "unit" : "sequence";
-  if (compareMode === "sequence") {
-    return {
-      kind: "weekCycle",
-      scene: "whichBigger",
-      prompt: "Which is the longest?",
-      speakText: "A day, a week, or a month — which is the longest?",
-      badgeLabel: "Longest Time",
-      items: WEEK_STRIP,
-      weekRows: 4,
-      textOptions: ["Day", "Week", "Month"],
-      correctTextOption: "Month",
-      feedback: { correct: "Yes — a day is short, a week is longer, a month is the longest.", wrong: "A day is short, a week is longer, a month is the longest." },
-    };
-  }
-
-  const askLonger = randInt(2) === 0;
+// Comparison helper for the quiz (week vs month).
+function buildWeekVsMonthTask(shorter: boolean): WeekTask {
   return {
     kind: "weekCycle",
     scene: "whichBigger",
-    prompt: askLonger ? "Which lasts longer?" : "Which is bigger?",
-    speakText: askLonger ? "Which lasts longer, a week or a month?" : "Which is bigger, a week or a month?",
-    badgeLabel: askLonger ? "Which Lasts Longer?" : "Which Is Bigger?",
-    items: WEEK_STRIP,
+    prompt: shorter ? "Which is shorter?" : "Which is longer?",
+    speakText: shorter ? "Which is shorter, a week or a month?" : "Which is longer, a week or a month?",
+    badgeLabel: shorter ? "Which Is Shorter?" : "Which Is Longer?",
     weekRows: 4,
+    numbered: true,
     textOptions: ["Week", "Month"],
-    correctTextOption: "Month",
-    feedback: { correct: "Correct — a month is bigger than a week.", wrong: "A month is made of several weeks, so it is bigger." },
-  };
-}
-
-function buildSevenDaysVsMonthTask(): WeekTask {
-  return {
-    kind: "weekCycle",
-    scene: "whichBigger",
-    prompt: "Which lasts longer: 7 days or a month?",
-    speakText: "Which lasts longer, 7 days or a month?",
-    badgeLabel: "Longer Time",
-    items: WEEK_STRIP,
-    weekRows: 4,
-    textOptions: ["7 Days", "Month"],
-    correctTextOption: "Month",
-    feedback: { correct: "Yes — 7 days is one week, and a month is longer.", wrong: "Seven days make one week. A month is longer than one week." },
+    correctTextOption: shorter ? "Week" : "Month",
+    feedback: {
+      correct: shorter ? "Yes — a week is shorter than a month." : "Yes — a month is longer than a week.",
+      wrong: "A month is made of about four weeks, so it is longer.",
+    },
   };
 }
 
@@ -162,9 +148,9 @@ export function generateY1MeasurelandsWeek5Lesson2Task(
   }
   const rotation = ROTATION[memory.cursor % ROTATION.length]!;
   memory.cursor += 1;
-  if (rotation === "A") return buildWeekOrMonthTask(memory);
-  if (rotation === "B") return buildFindWeeksTask(memory);
-  return buildWhichBiggerTask(memory);
+  if (rotation === "A") return buildMonthTask();
+  if (rotation === "B") return buildWhichLongestTask();
+  return buildWeeksInMonthTask();
 }
 
 export function resetY1MeasurelandsWeek5Lesson2TaskSessionState() {
@@ -172,58 +158,13 @@ export function resetY1MeasurelandsWeek5Lesson2TaskSessionState() {
 }
 
 // 5 fixed tasks for the Week 5 weekly quiz (Lesson 2's contribution):
-// week or month, count rows, which is bigger, 7 days vs month, day → week → month.
+// build a month, weeks in a month, which is longest, longer, shorter.
 export function buildY1MeasurelandsWeek5Lesson2QuizTasks(): PracticeTask[] {
-  const seed: LessonMemory = { introShown: true, cursor: 0, lastRows: null };
   return [
-    {
-      kind: "weekCycle",
-      scene: "weekOrMonth",
-      prompt: "What does this show?",
-      speakText: "What does this picture show, a week or a month?",
-      badgeLabel: "Week or Month?",
-      visualMode: "week",
-      items: WEEK_STRIP,
-      textOptions: ["Week", "Month"],
-      correctTextOption: "Week",
-      feedback: { correct: "One row shows a week.", wrong: "A single row of seven days is a week." },
-    },
-    {
-      kind: "weekCycle",
-      scene: "findWeeks",
-      prompt: "How many weeks can you see in this month?",
-      speakText: "How many weeks can you see in this month?",
-      badgeLabel: "Find the Weeks",
-      weekRows: 4,
-      options: shuffle([3, 4, 5]),
-      correctAnswer: 4,
-      visualLabel: "Each row is one week",
-      feedback: { correct: "Four week rows!", wrong: "Count the rows. There are four weeks shown." },
-    },
-    {
-      kind: "weekCycle",
-      scene: "whichBigger",
-      prompt: "Which is bigger?",
-      speakText: "Which is bigger, a week or a month?",
-      badgeLabel: "Which Is Bigger?",
-      items: WEEK_STRIP,
-      weekRows: 4,
-      textOptions: ["Week", "Month"],
-      correctTextOption: "Month",
-      feedback: { correct: "A month is bigger than a week.", wrong: "A month is made of several weeks." },
-    },
-    buildSevenDaysVsMonthTask(),
-    {
-      kind: "weekCycle",
-      scene: "whichBigger",
-      prompt: "Which is the longest?",
-      speakText: "A day, a week, or a month — which is the longest?",
-      badgeLabel: "Longest Time",
-      items: WEEK_STRIP,
-      weekRows: 4,
-      textOptions: ["Month", "Day", "Week"],
-      correctTextOption: "Month",
-      feedback: { correct: "A month is the longest — day, week, month!", wrong: "A day is short, a week is longer, a month is the longest." },
-    },
+    buildMonthTask(),
+    buildWeeksInMonthTask(),
+    buildWhichLongestTask(),
+    buildWeekVsMonthTask(false),
+    buildWeekVsMonthTask(true),
   ];
 }

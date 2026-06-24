@@ -87,13 +87,22 @@ function Shell({
 }
 
 function Day({ day, size = 64, dim = false }: { day: DayCard; size?: number; dim?: boolean }) {
-  const monthVisual = !day.imageSrc ? MONTH_VISUALS[day.label] : null;
+  const monthVisual = MONTH_VISUALS[day.label] ?? null;
   const monthIndex = monthVisual ? MONTH_ORDER.indexOf(day.label) : -1;
   const showMonthDots = monthIndex >= 0 && size >= 48;
   return (
     <div className="flex flex-col items-center" style={{ opacity: dim ? 0.5 : 1 }}>
       {day.imageSrc ? (
-        <img src={day.imageSrc} alt={day.label} className="object-contain" style={{ height: size, width: size }} />
+        <div
+          className="relative overflow-hidden rounded-[18px] border bg-white shadow-[0_10px_24px_rgba(120,53,15,0.08)]"
+          style={{
+            height: size,
+            width: size,
+            borderColor: monthVisual?.ring ?? "rgba(214,184,108,0.32)",
+          }}
+        >
+          <img src={day.imageSrc} alt={day.label} className="h-full w-full object-contain" style={{ height: size, width: size }} />
+        </div>
       ) : monthVisual ? (
         <div
           className="relative flex items-center justify-center overflow-hidden rounded-[18px] border shadow-[0_10px_24px_rgba(120,53,15,0.08)]"
@@ -159,10 +168,21 @@ function GapSlot({ size = 64 }: { size?: number }) {
   );
 }
 
-function MiniDayCell({ label }: { label: string }) {
+function MiniDayCell({ text }: { text: string }) {
   return (
-    <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-[rgba(214,184,108,0.28)] bg-[rgba(255,252,245,0.96)] text-[10px] font-black uppercase tracking-[0.08em] text-[#7c4a12] shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
-      {label.slice(0, 1)}
+    <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-[rgba(214,184,108,0.28)] bg-[rgba(255,252,245,0.96)] text-[11px] font-black uppercase tracking-[0.04em] text-[#7c4a12] shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
+      {text}
+    </div>
+  );
+}
+
+/* ── A single numbered week row (7 dated cells) ── */
+function NumberedWeekRow({ dates, dim = false }: { dates: number[]; dim?: boolean }) {
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-1.5" style={{ opacity: dim ? 0.55 : 1 }}>
+      {dates.map((d) => (
+        <MiniDayCell key={d} text={String(d)} />
+      ))}
     </div>
   );
 }
@@ -171,10 +191,12 @@ function CalendarPage({
   rows,
   highlightRow,
   caption,
+  numbered = false,
 }: {
   rows: number;
   highlightRow?: number;
   caption?: string;
+  numbered?: boolean;
 }) {
   const dayLabels = ["M", "T", "W", "T", "F", "S", "S"];
   return (
@@ -200,7 +222,10 @@ function CalendarPage({
               </div>
               <div className="flex flex-wrap items-center justify-center gap-1.5">
                 {dayLabels.map((label, cellIndex) => (
-                  <MiniDayCell key={`${rowIndex}-${cellIndex}-${label}`} label={label} />
+                  <MiniDayCell
+                    key={`${rowIndex}-${cellIndex}`}
+                    text={numbered ? String(rowIndex * 7 + cellIndex + 1) : label}
+                  />
                 ))}
               </div>
             </div>
@@ -260,25 +285,26 @@ function IntroScene({ task, onCorrect }: { task: WeekTask; onCorrect: () => void
               <div className="mb-2 text-center text-[10px] font-black uppercase tracking-[0.18em] text-[#7c3aed]">1 Week</div>
               <WeekStrip days={days} />
             </div>
-            <CalendarPage rows={task.weekRows ?? 4} highlightRow={typeof task.highlightRow === "number" ? task.highlightRow : 0} caption="1 Month = several weeks" />
+            <CalendarPage rows={task.weekRows ?? 4} highlightRow={typeof task.highlightRow === "number" ? task.highlightRow : 0} caption="1 Month = several weeks" numbered />
           </div>
         ) : introVisual === "monthCycle" ? (
           <div className="rounded-[26px] border border-[rgba(214,184,108,0.28)] bg-[rgba(255,252,245,0.92)] p-4">
             <div className="mb-3 text-center text-[10px] font-black uppercase tracking-[0.18em] text-[#7c3aed]">12 Months = 1 Year</div>
-            <div className="flex flex-wrap items-center justify-center gap-2">
-              {days.map((month, index) => (
-                <div key={month.id} className="flex items-center gap-2">
-                  <Day day={month} size={58} />
-                  {index < days.length - 1 ? <ArrowRight className="h-4 w-4 text-[#7c3aed]" /> : null}
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              {days.map((month) => (
+                <div key={month.id} className="flex justify-center">
+                  <Day day={month} size={76} />
                 </div>
               ))}
-              {days.length > 0 ? (
-                <>
-                  <RotateCw className="mx-1 h-5 w-5 text-[#5b21b6]" />
-                  <Day day={days[0]!} size={58} />
-                </>
-              ) : null}
             </div>
+            {days.length > 0 ? (
+              <div className="mt-4 flex items-center justify-center gap-2 text-center">
+                <Day day={days[days.length - 1]!} size={52} />
+                <RotateCw className="h-5 w-5 text-[#5b21b6]" />
+                <Day day={days[0]!} size={52} />
+                <span className="text-sm font-bold text-[#5f4725]">the year starts again</span>
+              </div>
+            ) : null}
           </div>
         ) : (
           <div className="rounded-[26px] border border-[rgba(214,184,108,0.28)] bg-[rgba(255,252,245,0.92)] p-3">
@@ -490,9 +516,9 @@ function WeekOrMonthScene({ task, onCorrect, onWrong }: { task: WeekTask; onCorr
   return (
     <Shell badge={task.badgeLabel ?? "Week or Month?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       {isMonth ? (
-        <CalendarPage rows={task.weekRows ?? 4} caption={task.visualLabel ?? "One month = several week rows"} />
+        <CalendarPage rows={task.weekRows ?? 4} caption={task.visualLabel ?? "One month = several week rows"} numbered={task.numbered} />
       ) : (
-        <CalendarPage rows={1} caption={task.visualLabel ?? "One week = one row"} />
+        <CalendarPage rows={1} caption={task.visualLabel ?? "One week = one row"} numbered={task.numbered} />
       )}
       <TextChoiceButtons
         options={options}
@@ -509,6 +535,7 @@ function FindWeeksScene({ task, onCorrect, onWrong }: { task: WeekTask; onCorrec
         rows={task.weekRows ?? 4}
         highlightRow={typeof task.highlightRow === "number" ? task.highlightRow : undefined}
         caption={task.visualLabel ?? "A month has several week rows"}
+        numbered={task.numbered}
       />
       <div className="grid grid-cols-3 gap-3">
         {(task.options ?? []).map((value) => (
@@ -532,13 +559,88 @@ function WhichBiggerScene({ task, onCorrect, onWrong }: { task: WeekTask; onCorr
   return (
     <Shell badge={task.badgeLabel ?? "Which Is Bigger?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="grid gap-3 sm:grid-cols-2">
-        <CalendarPage rows={1} caption="1 Week" />
-        <CalendarPage rows={task.weekRows ?? 4} caption="1 Month" />
+        <CalendarPage rows={1} caption="1 Week" numbered={task.numbered} />
+        <CalendarPage rows={task.weekRows ?? 4} caption="1 Month" numbered={task.numbered} />
       </div>
       <TextChoiceButtons
         options={options}
         onPick={(value) => (value === task.correctTextOption ? onCorrect() : onWrong())}
       />
+    </Shell>
+  );
+}
+
+/* ── Activity A: build a month by stacking 4 week-rows (in date order) ── */
+function MonthBuildScene({ task, onCorrect, onWrong }: { task: WeekTask; onCorrect: () => void; onWrong: () => void }) {
+  const weeks = task.monthWeeks ?? [];
+  const expected = task.orderedIds ?? [];
+  const [placed, setPlaced] = useState<string[]>([]);
+  const [locked, setLocked] = useState(false);
+  const byId = (id: string) => weeks.find((w) => w.id === id);
+  const tray = weeks.filter((w) => !placed.includes(w.id));
+
+  function pick(id: string) {
+    if (locked || placed.includes(id)) return;
+    const next = [...placed, id];
+    setPlaced(next);
+    if (next.length !== expected.length) return;
+    const ok = expected.every((eid, i) => next[i] === eid);
+    setLocked(true);
+    window.setTimeout(() => {
+      if (ok) onCorrect();
+      else { setPlaced([]); setLocked(false); onWrong(); }
+    }, 450);
+  }
+
+  return (
+    <Shell badge={task.badgeLabel ?? "Build the Month"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      {/* month frame */}
+      <div className="mx-auto max-w-[520px] rounded-[28px] border border-[rgba(214,184,108,0.4)] bg-[linear-gradient(180deg,rgba(255,252,245,0.98),rgba(252,244,225,0.98))] p-4 shadow-[0_18px_38px_rgba(180,120,20,0.08)]">
+        <div className="mb-3 flex items-center justify-between rounded-[18px] bg-[rgba(109,40,217,0.08)] px-4 py-2">
+          <div className="text-xs font-black uppercase tracking-[0.18em] text-[#5b21b6]">Calendar Page</div>
+          <div className="text-[11px] font-bold text-[#7c4a12]">1 Month = 4 weeks</div>
+        </div>
+        <div className="grid gap-2">
+          {expected.map((_, i) => {
+            const placedId = placed[i];
+            const wk = placedId ? byId(placedId) : null;
+            return (
+              <div
+                key={`slot-${i}`}
+                className="rounded-[18px] border-2 px-2 py-2"
+                style={{
+                  borderStyle: wk ? "solid" : "dashed",
+                  borderColor: wk ? "rgba(91,33,182,0.4)" : "rgba(214,184,108,0.6)",
+                  background: wk ? "rgba(109,40,217,0.06)" : "rgba(255,248,232,0.5)",
+                  minHeight: 52,
+                }}
+              >
+                <div className="mb-1 text-left text-[9px] font-black uppercase tracking-[0.16em] text-[#a98b52]">Week {i + 1}</div>
+                {wk ? <NumberedWeekRow dates={wk.dates} /> : <div className="text-center text-xs font-bold text-[#a98b52]">tap a week to add it</div>}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* tray of week rows to place */}
+      <div className="space-y-2">
+        {tray.length === 0 ? (
+          <div className="text-center text-sm font-black uppercase tracking-[0.14em] text-[#5b21b6]">A month is full!</div>
+        ) : (
+          tray.map((w) => (
+            <button
+              key={w.id}
+              type="button"
+              onClick={() => pick(w.id)}
+              disabled={locked}
+              className="w-full rounded-[18px] border-2 border-[rgba(214,184,108,0.5)] bg-white p-2 transition hover:-translate-y-0.5"
+            >
+              <NumberedWeekRow dates={w.dates} />
+            </button>
+          ))
+        )}
+      </div>
     </Shell>
   );
 }
@@ -553,6 +655,7 @@ export function MeasurelandsWeekCycleCard({
   onWrong: () => void;
 }) {
   if (task.scene === "intro") return <IntroScene task={task} onCorrect={onCorrect} />;
+  if (task.scene === "buildMonth") return <MonthBuildScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "build") return <BuildScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "count") return <CountScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "next") return <NextScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
