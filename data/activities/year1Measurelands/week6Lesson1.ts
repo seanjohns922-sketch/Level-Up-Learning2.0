@@ -32,7 +32,7 @@ const EVENTS = [
   { label: "Sports Day", icon: "trophy" },
   { label: "Party", icon: "gift" },
   { label: "Festival", icon: "music" },
-  { label: "Library Day", icon: "star" },
+  { label: "Library Day", icon: "book" },
 ];
 
 type LessonMemory = { introShown: boolean; cursor: number; lastDate: number | null };
@@ -60,6 +60,11 @@ function shuffle<T>(items: T[]): T[] {
 }
 function choose<T>(items: T[]): T {
   return items[randInt(items.length)]!;
+}
+function ordinal(n: number): string {
+  const s = ["th", "st", "nd", "rd"];
+  const v = n % 100;
+  return `${n}${s[(v - 20) % 10] ?? s[v] ?? s[0]}`;
 }
 function pickMonth() {
   return choose(MONTHS);
@@ -110,8 +115,8 @@ function buildFindTask(memory: LessonMemory): CalendarTask {
   return {
     kind: "calendarFind",
     scene: "find",
-    prompt: `Find ${target}.`,
-    speakText: `Find the date ${target}. Tap it on the calendar.`,
+    prompt: `Find the ${ordinal(target)} of ${m.name}.`,
+    speakText: `Find the ${ordinal(target)} of ${m.name}. Tap it on the calendar.`,
     badgeLabel: "Find the Date",
     days: m.days,
     startWeekday: m.start,
@@ -170,8 +175,8 @@ function buildMatchTask(): CalendarTask {
   return {
     kind: "calendarFind",
     scene: "match",
-    prompt: `What is on the ${target.date}?`,
-    speakText: `Look at the date ${target.date}. What is happening on that day?`,
+    prompt: `What is on the ${ordinal(target.date)} of ${m.name}?`,
+    speakText: `What is happening on the ${ordinal(target.date)} of ${m.name}?`,
     badgeLabel: "What's On?",
     days: m.days,
     startWeekday: m.start,

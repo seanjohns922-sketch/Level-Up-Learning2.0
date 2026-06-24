@@ -1,6 +1,6 @@
 "use client";
 
-import { Compass, Cake, Trophy, Gift, Music, Star } from "lucide-react";
+import { Compass, Cake, Trophy, Gift, Music, Star, BookOpen } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
@@ -14,6 +14,7 @@ const EVENT_ICON: Record<string, typeof Cake> = {
   gift: Gift,
   music: Music,
   star: Star,
+  book: BookOpen,
 };
 
 const WEEKDAYS = ["M", "T", "W", "T", "F", "S", "S"];
