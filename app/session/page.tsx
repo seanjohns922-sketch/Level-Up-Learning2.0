@@ -73,6 +73,7 @@ import { buildY1MeasurelandsWeek2QuizTasks } from "@/data/activities/year1Measur
 import { buildY1MeasurelandsWeek3QuizTasks } from "@/data/activities/year1Measurelands/week3Quiz";
 import { buildY1MeasurelandsWeek4QuizTasks } from "@/data/activities/year1Measurelands/week4Quiz";
 import { buildY1MeasurelandsWeek5QuizTasks } from "@/data/activities/year1Measurelands/week5Quiz";
+import { buildY1MeasurelandsWeek6QuizTasks } from "@/data/activities/year1Measurelands/week6Quiz";
 import { buildMeasurelandsWeek2QuizTasks } from "@/data/activities/prepMeasurelands/week2Quiz";
 import { buildMeasurelandsWeek3QuizTasks } from "@/data/activities/prepMeasurelands/week3Quiz";
 import { buildMeasurelandsWeek4QuizTasks } from "@/data/activities/prepMeasurelands/week4Quiz";
@@ -1713,6 +1714,29 @@ function buildY1MeasurelandsWeek5WeeklyQuizQuestions(
       `y1w5mq${index + 1}`,
       lessonNumber,
       `y1_measurelands_w5_l${lessonNumber}_q${(index % questionsPerLesson) + 1}`,
+      task as GroundQuizPracticeTask
+    );
+  });
+}
+
+// Measurelands · Level 1 · Week 6 — 15 questions (5 per lesson):
+// find dates (L1) → navigate dates (L2) → plan events (L3).
+function buildY1MeasurelandsWeek6WeeklyQuizQuestions(
+  questionsPerLesson: number
+): QuizQuestion[] {
+  const totalExpected = questionsPerLesson * 3;
+  const tasks = buildY1MeasurelandsWeek6QuizTasks();
+  if (tasks.length !== totalExpected) {
+    throw new Error(
+      `[MeasurelandsWeeklyQuiz] Y1 Week 6 expected ${totalExpected} questions, received ${tasks.length}.`
+    );
+  }
+  return tasks.map((task, index) => {
+    const lessonNumber = (Math.floor(index / questionsPerLesson) + 1) as 1 | 2 | 3;
+    return buildGroundQuizQuestion(
+      `y1w6mq${index + 1}`,
+      lessonNumber,
+      `y1_measurelands_w6_l${lessonNumber}_q${(index % questionsPerLesson) + 1}`,
       task as GroundQuizPracticeTask
     );
   });
@@ -7087,6 +7111,10 @@ function SessionPage({
 
     if (isMeasurementRealm && year === "Year 1" && Number(week) === 5) {
       return buildY1MeasurelandsWeek5WeeklyQuizQuestions(questionsPerLesson);
+    }
+
+    if (isMeasurementRealm && year === "Year 1" && Number(week) === 6) {
+      return buildY1MeasurelandsWeek6WeeklyQuizQuestions(questionsPerLesson);
     }
 
     if (isMeasurementRealm && year === "Prep" && Number(week) === 1) {

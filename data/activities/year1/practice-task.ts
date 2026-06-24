@@ -801,6 +801,35 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Year 1 W6 L3 — use a calendar to plan events (AC9M1M03):
+      // read when an event is, place an event on a date, and compare which event
+      // comes first/last. Heavy event icons; minimal reading. "Plan my week."
+      kind: "calendarEvent";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "when" | "place" | "compare";
+      /** Month grid: number of days, and which weekday (0=Mon..6=Sun) day 1 sits on. */
+      days: number;
+      startWeekday: number;
+      monthLabel?: string;
+      /** Events shown on the calendar (icon = cake|trophy|bus|party|book|palette|run). */
+      events?: Array<{ date: number; label: string; icon: string }>;
+      /** "when": which event's date the student reads, with number options. */
+      askEventLabel?: string;
+      options?: number[];
+      correctAnswer?: number;
+      /** "place": the event to drop onto the calendar, and the date to tap. */
+      placeLabel?: string;
+      placeIcon?: string;
+      targetDate?: number;
+      /** "compare": pick the event that happens first or last. */
+      compareMode?: "first" | "last";
+      textOptions?: string[];
+      correctTextOption?: string;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       // Generic, reusable interactive balance scale for equivalence activities
       // (Measurelands "Balance the Scales" and any future same-weight tasks).
       // The student fills/edits one pan; the scale is solved when both pans
