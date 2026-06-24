@@ -790,6 +790,7 @@ export function PracticeRunner({
     task.kind === "durationUnit" ||
     task.kind === "weekCycle" ||
     task.kind === "calendarFind" ||
+    task.kind === "routineSequence" ||
     task.kind === "balanceScale" ||
     task.kind === "groundMatch" ||
     task.kind === "groundCollect" ||

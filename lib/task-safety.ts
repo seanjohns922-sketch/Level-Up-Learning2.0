@@ -192,6 +192,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "calendarNavigate",
   "calendarEvent",
   "timeSequence",
+  "routineSequence",
   "balanceScale",
   "groundCollect",
   "groundBuild",

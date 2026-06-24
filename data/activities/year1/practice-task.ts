@@ -853,6 +853,25 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Year 1 W8 L1 — sequencing familiar routine events using
+      // first / next / last (AC9M1M03). Daily routine scenes are primary.
+      kind: "routineSequence";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "first" | "build" | "fix" | "meaning";
+      /** "first": routine cards shown for comparison. */
+      items?: Array<{ id: string; label: string; icon: string; order: number; imageSrc?: string }>;
+      /** "meaning": answer options; may also support future text choices. */
+      textOptions?: string[];
+      correctTextOption?: string;
+      /** "build": shuffled cards to place into time order. */
+      buildItems?: Array<{ id: string; label: string; icon: string; order: number; imageSrc?: string }>;
+      /** "fix": a visible wrong chain that the student repairs. */
+      brokenItems?: Array<{ id: string; label: string; icon: string; order: number; imageSrc?: string }>;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       // Generic, reusable interactive balance scale for equivalence activities
       // (Measurelands "Balance the Scales" and any future same-weight tasks).
       // The student fills/edits one pan; the scale is solved when both pans
