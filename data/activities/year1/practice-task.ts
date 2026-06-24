@@ -830,6 +830,28 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Year 1 W7 L1 — yesterday / today / tomorrow on a simple
+      // timeline (AC9M1M03). Time language, not calendar dates: yesterday = the
+      // day before today. Events sit on a Yesterday -> Today -> Tomorrow line.
+      kind: "timeSequence";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "which" | "before" | "build" | "meaning";
+      /** Events placed on the timeline, each tagged with when it happens. */
+      slots?: Array<{ when: "yesterday" | "today" | "tomorrow"; label: string; icon: string }>;
+      /** "which": which time slot the student must identify the event for. */
+      askWhen?: "yesterday" | "today" | "tomorrow";
+      /** "which"/"before"/"meaning": text answer options. */
+      textOptions?: string[];
+      correctTextOption?: string;
+      /** "build": shuffled event cards to tap into chronological order. */
+      buildItems?: Array<{ label: string; icon: string; when: "yesterday" | "today" | "tomorrow" }>;
+      /** "build": the expected order (yesterday -> today -> tomorrow). */
+      orderedWhen?: Array<"yesterday" | "today" | "tomorrow">;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       // Generic, reusable interactive balance scale for equivalence activities
       // (Measurelands "Balance the Scales" and any future same-weight tasks).
       // The student fills/edits one pan; the scale is solved when both pans
