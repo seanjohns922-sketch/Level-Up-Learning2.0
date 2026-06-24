@@ -775,6 +775,32 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Year 1 W6 L2 — move through a month calendar (AC9M1M03):
+      // find the next/previous date, and jump one week later/earlier. Dates move
+      // in a predictable pattern; a week is +7 / -7 (one row) on the grid.
+      kind: "calendarNavigate";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "next" | "before" | "explore";
+      /** Month grid: number of days, and which weekday (0=Mon..6=Sun) day 1 sits on. */
+      days: number;
+      startWeekday: number;
+      monthLabel?: string;
+      /** The date the student starts on (highlighted on the grid / path). */
+      fromDate?: number;
+      /** "next"/"before": which way the path points (visual + wording). */
+      direction?: "next" | "before" | "later" | "earlier";
+      /** Step size for the path strip/arrow: 1 for next/before, 7 for a week jump. */
+      stepDays?: number;
+      /** "explore": tap the cell this many days away — the answer date. */
+      targetDate?: number;
+      /** "next"/"before": number answer options. */
+      options?: number[];
+      correctAnswer?: number;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       // Generic, reusable interactive balance scale for equivalence activities
       // (Measurelands "Balance the Scales" and any future same-weight tasks).
       // The student fills/edits one pan; the scale is solved when both pans

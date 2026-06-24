@@ -79,6 +79,11 @@ import {
   resetY1MeasurelandsWeek6Lesson1TaskSessionState,
   buildY1MeasurelandsWeek6Lesson1QuizTasks,
 } from "@/data/activities/year1Measurelands/week6Lesson1";
+import {
+  generateY1MeasurelandsWeek6Lesson2Task,
+  resetY1MeasurelandsWeek6Lesson2TaskSessionState,
+  buildY1MeasurelandsWeek6Lesson2QuizTasks,
+} from "@/data/activities/year1Measurelands/week6Lesson2";
 
 // Level 1 (Year 1) Measurelands lesson registry. Mirrors the Prep registry so
 // app/lesson/page.tsx can resolve `y1-measurement-w{n}-l{m}` ids to tasks.
@@ -400,6 +405,25 @@ const Y1_MEASURELANDS_LESSONS: Y1MeasurelandsLessonEntry[] = [
     unlockMessage: "Lesson 2 unlocked.",
     returnRoute: "/program?year=Year 1&week=6&legacy=1&realm_id=measurement",
     quizContributionBuilder: buildY1MeasurelandsWeek6Lesson1QuizTasks,
+  },
+  {
+    prefix: "y1-measurement-w6-l2",
+    week: 6,
+    lessonNumber: 2,
+    title: "Calendar Navigation",
+    subtitle: "Calendar Quest",
+    generate: generateY1MeasurelandsWeek6Lesson2Task,
+    reset: resetY1MeasurelandsWeek6Lesson2TaskSessionState,
+    practisedSkills: [
+      "Finding the next date",
+      "Finding the previous date",
+      "Jumping one week later or earlier",
+      "Moving through a calendar in order",
+    ],
+    completionTitle: "Calendar Navigator Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+    returnRoute: "/program?year=Year 1&week=6&legacy=1&realm_id=measurement",
+    quizContributionBuilder: buildY1MeasurelandsWeek6Lesson2QuizTasks,
   },
 ];
 
