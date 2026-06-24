@@ -3,16 +3,18 @@ import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-
 type RoutineTask = Extract<PracticeTask, { kind: "routineSequence" }>;
 type RoutineItem = NonNullable<RoutineTask["items"]>[number];
 
+const ROUTINE_IMAGE_BASE = "/images/measurelands/routine-3d";
+
 const ROUTINES: RoutineItem[] = [
-  { id: "wakeup", label: "Wake Up", icon: "wakeup", order: 0 },
-  { id: "breakfast", label: "Breakfast", icon: "breakfast", order: 1 },
-  { id: "school", label: "School", icon: "school", order: 2 },
-  { id: "sport", label: "Sport", icon: "sport", order: 3 },
-  { id: "art", label: "Art", icon: "art", order: 4 },
-  { id: "reading", label: "Reading", icon: "reading", order: 5 },
-  { id: "dinner", label: "Dinner", icon: "dinner", order: 6 },
-  { id: "bath", label: "Bath", icon: "bath", order: 7 },
-  { id: "bed", label: "Bed", icon: "bed", order: 8 },
+  { id: "wakeup", label: "Wake Up", icon: "wakeup", imageSrc: `${ROUTINE_IMAGE_BASE}/routine-wakeup.png`, order: 0 },
+  { id: "breakfast", label: "Breakfast", icon: "breakfast", imageSrc: `${ROUTINE_IMAGE_BASE}/routine-breakfast.png`, order: 1 },
+  { id: "school", label: "School", icon: "school", imageSrc: `${ROUTINE_IMAGE_BASE}/routine-school.png`, order: 2 },
+  { id: "sport", label: "Sport", icon: "sport", imageSrc: `${ROUTINE_IMAGE_BASE}/routine-sport.png`, order: 3 },
+  { id: "art", label: "Art", icon: "art", imageSrc: `${ROUTINE_IMAGE_BASE}/routine-art.png`, order: 4 },
+  { id: "reading", label: "Reading", icon: "reading", imageSrc: `${ROUTINE_IMAGE_BASE}/routine-reading.png`, order: 5 },
+  { id: "dinner", label: "Dinner", icon: "dinner", imageSrc: `${ROUTINE_IMAGE_BASE}/routine-dinner.png`, order: 6 },
+  { id: "bath", label: "Bath", icon: "bath", imageSrc: `${ROUTINE_IMAGE_BASE}/routine-bath.png`, order: 7 },
+  { id: "bed", label: "Bed", icon: "bed", imageSrc: `${ROUTINE_IMAGE_BASE}/routine-bed.png`, order: 8 },
 ];
 
 const FIRST_SETS = [
