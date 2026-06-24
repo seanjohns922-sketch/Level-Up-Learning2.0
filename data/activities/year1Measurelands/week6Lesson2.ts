@@ -108,8 +108,8 @@ function buildNextTask(memory: LessonMemory): NavTask {
   return {
     kind: "calendarNavigate",
     scene: "next",
-    prompt: `Today is the ${ordinal(from)}. What comes next?`,
-    speakText: `Today is the ${ordinal(from)}. What date comes next?`,
+    prompt: `Today is the ${ordinal(from)}. What is the next date?`,
+    speakText: `Today is the ${ordinal(from)}. What is the next date?`,
     badgeLabel: "What Comes Next?",
     days: m.days,
     startWeekday: m.start,
@@ -131,8 +131,8 @@ function buildBeforeTask(memory: LessonMemory): NavTask {
   return {
     kind: "calendarNavigate",
     scene: "before",
-    prompt: `Today is the ${ordinal(from)}. What came before?`,
-    speakText: `Today is the ${ordinal(from)}. What date came before?`,
+    prompt: `Today is the ${ordinal(from)}. What was the date before?`,
+    speakText: `Today is the ${ordinal(from)}. What was the date before?`,
     badgeLabel: "What Came Before?",
     days: m.days,
     startWeekday: m.start,
@@ -154,7 +154,7 @@ function buildExploreTask(memory: LessonMemory, dir: "later" | "earlier"): NavTa
   return {
     kind: "calendarNavigate",
     scene: "explore",
-    prompt: `Professor Gauge is on the ${ordinal(from)}. Which date is one week ${dir}?`,
+    prompt: `Professor Gauge is on the ${ordinal(from)}. Tap the date one week ${dir}.`,
     speakText: `Professor Gauge is on the ${ordinal(from)}. Tap the date one week ${dir}.`,
     badgeLabel: "Calendar Explorer",
     days: m.days,
