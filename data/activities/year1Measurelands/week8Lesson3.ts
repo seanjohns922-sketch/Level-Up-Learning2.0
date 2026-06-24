@@ -151,13 +151,26 @@ function buildBuildTask(memory: LessonMemory): RoutineTask {
   };
 }
 
+// Step cards from every OTHER story, used to top up "next" distractors so the
+// question always has 3 options even when the current story can't supply enough.
+function otherStorySteps(excludeStoryId: string): RoutineItem[] {
+  return STORIES.filter((s) => s.id !== excludeStoryId).flatMap((s) => s.steps.map((step, index) => asItem(step, index)));
+}
+
 function buildNextTask(memory: LessonMemory): RoutineTask {
   const story = chooseStory(memory);
   const ordered = story.steps.map((step, index) => asItem(step, index));
-  const prefixLength = Math.random() < 0.5 ? 2 : 3;
+  // Prefix is 1 or 2 so the answer is never the last step (always >=1 later step).
+  const prefixLength = Math.random() < 0.5 ? 1 : 2;
   const shown = ordered.slice(0, prefixLength);
   const answer = ordered[prefixLength]!;
-  const distractors = shuffle(ordered.filter((item) => !shown.some((shownItem) => shownItem.id === item.id) && item.id !== answer.id)).slice(0, 2);
+  // Prefer same-story steps as distractors; top up from other stories to reach 2.
+  const sameStory = ordered.filter((item) => !shown.some((s) => s.id === item.id) && item.id !== answer.id);
+  let distractors = shuffle(sameStory).slice(0, 2);
+  if (distractors.length < 2) {
+    const topUp = shuffle(otherStorySteps(story.id)).filter((item) => item.id !== answer.id);
+    distractors = [...distractors, ...topUp].slice(0, 2);
+  }
   return {
     kind: "routineSequence",
     scene: "next",
