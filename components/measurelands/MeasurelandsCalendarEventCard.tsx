@@ -1,22 +1,13 @@
 "use client";
 
-import { Compass, Cake, Trophy, Bus, PartyPopper, BookOpen, Palette, Footprints, CalendarDays } from "lucide-react";
+import { Compass } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
+import { MeasurelandsEventBadge } from "@/components/measurelands/MeasurelandsEventBadge";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type EventTask = Extract<PracticeTask, { kind: "calendarEvent" }>;
 type EventMark = { date: number; label: string; icon: string };
-
-const EVENT_ICON: Record<string, typeof Cake> = {
-  cake: Cake,
-  trophy: Trophy,
-  bus: Bus,
-  party: PartyPopper,
-  book: BookOpen,
-  palette: Palette,
-  run: Footprints,
-};
 
 const WEEKDAYS = ["M", "T", "W", "T", "F", "S", "S"];
 
@@ -92,7 +83,6 @@ function CalendarGrid({
         {cells.map((date, i) => {
           if (date === null) return <div key={`blank-${i}`} />;
           const ev = eventByDate.get(date);
-          const Icon = ev ? EVENT_ICON[ev.icon] ?? PartyPopper : null;
           const isHi = highlightDate === date;
           const tappable = !!onTapDate;
           return (
@@ -110,12 +100,9 @@ function CalendarGrid({
               }}
             >
               <span className={ev ? "text-sm leading-none text-[#5f4725]" : ""}>{date}</span>
-              {Icon ? (
-                <span
-                  className="absolute -right-2 -top-2 inline-flex h-8 w-8 items-center justify-center rounded-full shadow-md"
-                  style={{ background: "linear-gradient(135deg,#fff,#fdeecb)", border: "2px solid rgba(124,58,237,0.5)" }}
-                >
-                  <Icon className="h-5 w-5 text-[#7c3aed]" />
+              {ev ? (
+                <span className="absolute -right-2 -top-2">
+                  <MeasurelandsEventBadge iconKey={ev.icon} label={ev.label} size="sm" />
                 </span>
               ) : null}
             </button>
@@ -181,16 +168,10 @@ function WhenScene({ task, onCorrect, onWrong }: { task: EventTask; onCorrect: (
 
 /* ── Activity B: place the event (tap the date to drop it on) ── */
 function PlaceScene({ task, onCorrect, onWrong }: { task: EventTask; onCorrect: () => void; onWrong: () => void }) {
-  const Icon = task.placeIcon ? EVENT_ICON[task.placeIcon] ?? PartyPopper : PartyPopper;
   return (
     <Shell badge={task.badgeLabel ?? "Place the Event"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="mx-auto mb-3 flex max-w-[480px] items-center justify-center gap-3 rounded-[22px] border-2 border-dashed border-[rgba(124,58,237,0.45)] bg-[rgba(124,58,237,0.06)] px-4 py-3">
-        <span
-          className="inline-flex h-12 w-12 items-center justify-center rounded-full shadow-md"
-          style={{ background: "linear-gradient(135deg,#fff,#fdeecb)", border: "2px solid rgba(124,58,237,0.5)" }}
-        >
-          <Icon className="h-7 w-7 text-[#7c3aed]" />
-        </span>
+        <MeasurelandsEventBadge iconKey={task.placeIcon ?? "party"} label={task.placeLabel ?? "Event"} size="lg" />
         <span className="text-lg font-black text-[#5b21b6]">{task.placeLabel}</span>
       </div>
       <CalendarGrid
@@ -211,7 +192,6 @@ function CompareScene({ task, onCorrect, onWrong }: { task: EventTask; onCorrect
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {(task.textOptions ?? []).map((value) => {
           const ev = task.events?.find((e) => e.label === value);
-          const Icon = ev ? EVENT_ICON[ev.icon] ?? CalendarDays : CalendarDays;
           return (
             <button
               key={value}
@@ -220,7 +200,7 @@ function CompareScene({ task, onCorrect, onWrong }: { task: EventTask; onCorrect
               className="relative flex min-h-[72px] items-center justify-center gap-2 rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-3 text-center text-lg font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
             >
               <span className="absolute right-2 top-2 z-10"><OptionReadAloudButton text={value} /></span>
-              <Icon className="h-6 w-6 shrink-0 text-[#7c3aed]" />
+              {ev ? <MeasurelandsEventBadge iconKey={ev.icon} label={ev.label} size="md" /> : null}
               {value}
             </button>
           );

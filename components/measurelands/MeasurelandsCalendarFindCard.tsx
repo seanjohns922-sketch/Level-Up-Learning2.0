@@ -1,21 +1,13 @@
 "use client";
 
-import { Compass, Cake, Trophy, Gift, Music, Star, BookOpen } from "lucide-react";
+import { Compass } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
+import { MeasurelandsEventBadge } from "@/components/measurelands/MeasurelandsEventBadge";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type CalendarTask = Extract<PracticeTask, { kind: "calendarFind" }>;
 type EventMark = { date: number; label: string; icon: string };
-
-const EVENT_ICON: Record<string, typeof Cake> = {
-  cake: Cake,
-  trophy: Trophy,
-  gift: Gift,
-  music: Music,
-  star: Star,
-  book: BookOpen,
-};
 
 const WEEKDAYS = ["M", "T", "W", "T", "F", "S", "S"];
 
@@ -93,7 +85,6 @@ function CalendarGrid({
         {cells.map((date, i) => {
           if (date === null) return <div key={`blank-${i}`} />;
           const ev = eventByDate.get(date);
-          const Icon = ev ? EVENT_ICON[ev.icon] ?? Star : null;
           const isMarked = marked === date || highlight === date;
           const tappable = !!onTapDate;
           return (
@@ -111,12 +102,9 @@ function CalendarGrid({
               }}
             >
               <span className={ev ? "text-sm leading-none text-[#5f4725]" : ""}>{date}</span>
-              {Icon ? (
-                <span
-                  className="absolute -right-2 -top-2 inline-flex h-8 w-8 items-center justify-center rounded-full shadow-md"
-                  style={{ background: "linear-gradient(135deg,#fff,#fdeecb)", border: "2px solid rgba(124,58,237,0.5)" }}
-                >
-                  <Icon className="h-5 w-5 text-[#7c3aed]" />
+              {ev ? (
+                <span className="absolute -right-2 -top-2">
+                  <MeasurelandsEventBadge iconKey={ev.icon} label={ev.label} size="sm" />
                 </span>
               ) : null}
             </button>
