@@ -745,6 +745,36 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Year 1 W6 L1 — find/read dates on a month calendar and
+      // connect events to dates (AC9M1M03). The date is the NUMBER in the cell.
+      kind: "calendarFind";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "find" | "read" | "event" | "match";
+      /** Month grid: number of days, and which weekday (0=Mon..6=Sun) day 1 sits on. */
+      days: number;
+      startWeekday: number;
+      monthLabel?: string;
+      /** "find"/"event": tap the cell with this date. */
+      targetDate?: number;
+      /** "read"/"match": the highlighted date the student reads. */
+      markedDate?: number;
+      /** "intro": a date highlighted for teaching. */
+      highlightDate?: number;
+      /** event icons placed on dates (icon = cake | trophy | gift | music | star). */
+      events?: Array<{ date: number; label: string; icon: string }>;
+      /** "event": the event the student must find on the calendar. */
+      askEventLabel?: string;
+      /** "read": number answer options. */
+      options?: number[];
+      correctAnswer?: number;
+      /** "match": event-name answer options. */
+      textOptions?: string[];
+      correctTextOption?: string;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       // Generic, reusable interactive balance scale for equivalence activities
       // (Measurelands "Balance the Scales" and any future same-weight tasks).
       // The student fills/edits one pan; the scale is solved when both pans

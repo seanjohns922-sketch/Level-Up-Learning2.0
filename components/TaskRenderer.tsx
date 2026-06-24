@@ -102,6 +102,7 @@ import { MeasurelandsMassMeasureCard } from "@/components/measurelands/Measurela
 import { MeasurelandsCapacityMeasureCard } from "@/components/measurelands/MeasurelandsCapacityMeasureCard";
 import { MeasurelandsDurationUnitCard } from "@/components/measurelands/MeasurelandsDurationUnitCard";
 import { MeasurelandsWeekCycleCard } from "@/components/measurelands/MeasurelandsWeekCycleCard";
+import { MeasurelandsCalendarFindCard } from "@/components/measurelands/MeasurelandsCalendarFindCard";
 import { MeasurelandsBalanceScaleCard } from "@/components/measurelands/MeasurelandsBalanceScaleCard";
 import { isPracticeTaskSafe } from "@/lib/task-safety";
 
@@ -334,6 +335,8 @@ function TaskRendererInner({
       return <MeasurelandsDurationUnitCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "weekCycle":
       return <MeasurelandsWeekCycleCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "calendarFind":
+      return <MeasurelandsCalendarFindCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "balanceScale":
       return <MeasurelandsBalanceScaleCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundCollect":
