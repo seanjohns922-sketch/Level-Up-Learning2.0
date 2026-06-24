@@ -34,6 +34,21 @@ const MONTH_VISUALS: Record<
   December: { Icon: Gift, bg: "linear-gradient(135deg,#fecaca,#f87171)", icon: "#991b1b", ring: "rgba(248,113,113,0.35)", accent: "#dc2626", cue: "Celebration Time" },
 };
 
+const MONTH_ORDER = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
 /* ── Gold/violet Meazurex shell ── */
 function Shell({
   badge,
@@ -73,13 +88,15 @@ function Shell({
 
 function Day({ day, size = 64, dim = false }: { day: DayCard; size?: number; dim?: boolean }) {
   const monthVisual = !day.imageSrc ? MONTH_VISUALS[day.label] : null;
+  const monthIndex = monthVisual ? MONTH_ORDER.indexOf(day.label) : -1;
+  const showMonthDots = monthIndex >= 0 && size >= 48;
   return (
     <div className="flex flex-col items-center" style={{ opacity: dim ? 0.5 : 1 }}>
       {day.imageSrc ? (
         <img src={day.imageSrc} alt={day.label} className="object-contain" style={{ height: size, width: size }} />
       ) : monthVisual ? (
         <div
-          className="flex items-center justify-center rounded-[18px] border shadow-[0_10px_24px_rgba(120,53,15,0.08)]"
+          className="relative flex items-center justify-center overflow-hidden rounded-[18px] border shadow-[0_10px_24px_rgba(120,53,15,0.08)]"
           style={{
             height: size,
             width: size,
@@ -87,13 +104,43 @@ function Day({ day, size = 64, dim = false }: { day: DayCard; size?: number; dim
             background: monthVisual.bg,
           }}
         >
-          <monthVisual.Icon className="h-[55%] w-[55%]" style={{ color: monthVisual.icon }} />
+          <div
+            className="absolute inset-x-0 bottom-0"
+            style={{
+              height: `${Math.max(12, Math.round(size * 0.22))}px`,
+              background: "linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,248,232,0.42))",
+            }}
+          />
+          <div
+            className="absolute left-[12%] top-[16%] rounded-full bg-white/30"
+            style={{ width: size * 0.16, height: size * 0.16 }}
+          />
+          <div
+            className="absolute right-[12%] bottom-[20%] rounded-full bg-white/20"
+            style={{ width: size * 0.12, height: size * 0.12 }}
+          />
+          <monthVisual.Icon className="relative h-[50%] w-[50%]" style={{ color: monthVisual.icon }} />
         </div>
       ) : (
         <div className="flex items-center justify-center rounded-xl bg-[rgba(214,184,108,0.15)]" style={{ height: size, width: size }} />
       )}
       <div className="mt-0.5 text-[10px] font-black uppercase tracking-[0.1em] text-[#7c4a12]">{day.label}</div>
       {monthVisual ? <div className="text-[8px] font-black uppercase tracking-[0.12em]" style={{ color: monthVisual.accent }}>{monthVisual.cue}</div> : null}
+      {showMonthDots ? (
+        <div className="mt-1 flex items-center justify-center gap-[2px]">
+          {MONTH_ORDER.map((month, index) => (
+            <span
+              key={`${day.id}-${month}`}
+              className="rounded-full"
+              style={{
+                width: index === monthIndex ? 8 : 4,
+                height: 4,
+                background: index === monthIndex ? monthVisual?.accent : "rgba(124,74,18,0.18)",
+              }}
+            />
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -346,17 +393,18 @@ function CountScene({ task, onCorrect, onWrong }: { task: WeekTask; onCorrect: (
 
 /* ── Pick a day card from choices (used by "next" and "missing") ── */
 function DayChoiceRow({ task, onCorrect, onWrong }: { task: WeekTask; onCorrect: () => void; onWrong: () => void }) {
+  const largeMonthChoices = (task.choices ?? []).every((choice) => !choice.imageSrc && MONTH_VISUALS[choice.label]);
   return (
-    <div className="grid grid-cols-3 gap-3">
+    <div className={`grid gap-3 ${largeMonthChoices ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-3"}`}>
       {(task.choices ?? []).map((d) => (
         <button
           key={d.id}
           type="button"
           onClick={() => (d.id === task.correctOptionId ? onCorrect() : onWrong())}
-          className="relative flex items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] p-2 shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+          className="relative flex items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] p-3 shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
         >
           <span className="absolute right-1 top-1 z-10"><OptionReadAloudButton text={d.label} /></span>
-          <Day day={d} size={56} />
+          <Day day={d} size={largeMonthChoices ? 74 : 56} />
         </button>
       ))}
     </div>
@@ -367,10 +415,10 @@ function DayChoiceRow({ task, onCorrect, onWrong }: { task: WeekTask; onCorrect:
 function NextScene({ task, onCorrect, onWrong }: { task: WeekTask; onCorrect: () => void; onWrong: () => void }) {
   return (
     <Shell badge={task.badgeLabel ?? "What Comes Next?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      <div className="flex flex-wrap items-center justify-center gap-1.5 rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">
-        {(task.sequence ?? []).map((d) => <Day key={d.id} day={d} size={52} />)}
+      <div className="flex flex-wrap items-center justify-center gap-3 rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">
+        {(task.sequence ?? []).map((d) => <Day key={d.id} day={d} size={78} />)}
         <ArrowRight className="mx-1 h-6 w-6 text-[#5b21b6]" />
-        <GapSlot size={52} />
+        <GapSlot size={78} />
       </div>
       <DayChoiceRow task={task} onCorrect={onCorrect} onWrong={onWrong} />
     </Shell>
@@ -382,7 +430,11 @@ function MissingScene({ task, onCorrect, onWrong }: { task: WeekTask; onCorrect:
   return (
     <Shell badge={task.badgeLabel ?? "Missing Day"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">
-        <WeekStrip days={task.strip ?? []} brace={false} />
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          {(task.strip ?? []).map((day, index) => (
+            day ? <Day key={day.id} day={day} size={70} /> : <GapSlot key={`missing-gap-${index}`} size={70} />
+          ))}
+        </div>
       </div>
       <DayChoiceRow task={task} onCorrect={onCorrect} onWrong={onWrong} />
     </Shell>

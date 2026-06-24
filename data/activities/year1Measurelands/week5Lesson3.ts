@@ -58,6 +58,18 @@ function monthAt(index: number): MonthCard {
 
 const toCard = (month: MonthCard) => ({ id: month.id, label: month.label });
 
+function distinctMonths(indices: number[]): MonthCard[] {
+  const seen = new Set<string>();
+  const months: MonthCard[] = [];
+  for (const index of indices) {
+    const month = monthAt(index);
+    if (seen.has(month.id)) continue;
+    seen.add(month.id);
+    months.push(month);
+  }
+  return months;
+}
+
 function chooseStart(memory: LessonMemory, maxStart: number) {
   const pool = Array.from({ length: maxStart + 1 }, (_, index) => index).filter((value) => value !== memory.lastStart);
   const picked = pool[randInt(pool.length)] ?? 0;
@@ -80,8 +92,8 @@ function buildIntroTask(): WeekTask {
       "After December, January begins a new year.",
     ],
     introVisual: "monthCycle",
-    teachingDays: [monthAt(0), monthAt(1), monthAt(2), monthAt(11)].map(toCard),
-    feedback: { correct: "Let's explore the months!", wrong: "Let's get ready." },
+    teachingDays: YEAR1_MEASURELANDS_MONTHS.map(toCard),
+    feedback: { correct: "Let's explore the months!", wrong: "Look at the year trail. The months always repeat in the same order." },
   };
 }
 
@@ -89,8 +101,7 @@ function buildNextMonthTask(memory: LessonMemory, forceIndex?: number): WeekTask
   const index = typeof forceIndex === "number" ? forceIndex : chooseStart(memory, 11);
   const current = monthAt(index);
   const answer = monthAt(index + 1);
-  const distractorPool = YEAR1_MEASURELANDS_MONTHS.filter((month) => month.id !== current.id && month.id !== answer.id);
-  const distractors = shuffle(distractorPool).slice(0, 2);
+  const distractors = distinctMonths([index - 1, index + 2]).filter((month) => month.id !== answer.id);
   return {
     kind: "weekCycle",
     scene: "next",
@@ -100,13 +111,14 @@ function buildNextMonthTask(memory: LessonMemory, forceIndex?: number): WeekTask
     sequence: [toCard(current)],
     choices: shuffle([toCard(answer), ...distractors.map(toCard)]),
     correctOptionId: answer.id,
-    feedback: { correct: "Yes — the months keep going in the same order.", wrong: "Say the months in order to find what comes next." },
+    feedback: { correct: "Yes — the months keep going in the same order.", wrong: `${current.label} comes before ${answer.label}. Say the months in order to find what comes next.` },
   };
 }
 
 function buildYearTrailTask(memory: LessonMemory): WeekTask {
-  const start = chooseStart(memory, 8);
-  const months = [monthAt(start), monthAt(start + 1), monthAt(start + 2), monthAt(start + 3)];
+  const length = memory.cursor <= 2 ? 3 : 4;
+  const start = chooseStart(memory, 12 - length);
+  const months = Array.from({ length }, (_, offset) => monthAt(start + offset));
   return {
     kind: "weekCycle",
     scene: "build",
@@ -115,17 +127,23 @@ function buildYearTrailTask(memory: LessonMemory): WeekTask {
     badgeLabel: "Build the Year Trail",
     items: shuffle(months.map(toCard)),
     orderedIds: months.map((month) => month.id),
-    feedback: { correct: "Great sequencing — the months stay in that order every year!", wrong: "Try the months in order from first to last." },
+    feedback: { correct: "Great sequencing — the months stay in that order every year!", wrong: "Start with the earliest month you can see, then keep moving forward through the year." },
   };
 }
 
 function buildMissingMonthTask(memory: LessonMemory, forceStart?: number, forceGap?: number): WeekTask {
-  const start = typeof forceStart === "number" ? forceStart : chooseStart(memory, 8);
-  const sequence = [monthAt(start), monthAt(start + 1), monthAt(start + 2), monthAt(start + 3)];
-  const gap = typeof forceGap === "number" ? forceGap : randInt(4);
+  const length = memory.cursor <= 4 ? 3 : 4;
+  const start = typeof forceStart === "number" ? forceStart : chooseStart(memory, 12 - length);
+  const sequence = Array.from({ length }, (_, offset) => monthAt(start + offset));
+  const gap = typeof forceGap === "number" ? forceGap : randInt(length);
   const missing = sequence[gap]!;
   const strip = sequence.map((month, index) => (index === gap ? null : toCard(month)));
-  const distractors = shuffle(YEAR1_MEASURELANDS_MONTHS.filter((month) => month.id !== missing.id)).slice(0, 2);
+  const distractors = distinctMonths([
+    start - 1,
+    start + length,
+    YEAR1_MEASURELANDS_MONTHS.findIndex((month) => month.id === missing.id) - 2,
+    YEAR1_MEASURELANDS_MONTHS.findIndex((month) => month.id === missing.id) + 2,
+  ]).filter((month) => month.id !== missing.id).slice(0, 2);
   return {
     kind: "weekCycle",
     scene: "missing",
@@ -135,7 +153,7 @@ function buildMissingMonthTask(memory: LessonMemory, forceStart?: number, forceG
     strip,
     choices: shuffle([toCard(missing), ...distractors.map(toCard)]),
     correctOptionId: missing.id,
-    feedback: { correct: "You found the missing month!", wrong: "Say the months in order to find the gap." },
+    feedback: { correct: "You found the missing month!", wrong: "Look at the months before and after the gap, then say the year trail in order." },
   };
 }
 
@@ -178,4 +196,3 @@ export function buildY1MeasurelandsWeek5Lesson3QuizTasks(): PracticeTask[] {
     buildNextMonthTask(seed, 11), // December -> January
   ];
 }
-
