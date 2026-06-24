@@ -837,7 +837,7 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "which" | "before" | "build" | "meaning";
+      scene: "intro" | "which" | "before" | "build" | "meaning" | "sort";
       /** Events placed on the timeline, each tagged with when it happens. */
       slots?: Array<{ when: "yesterday" | "today" | "tomorrow"; label: string; icon: string }>;
       /** "which": which time slot the student must identify the event for. */
@@ -845,9 +845,9 @@ export type PracticeTask = (
       /** "which"/"before"/"meaning": text answer options. */
       textOptions?: string[];
       correctTextOption?: string;
-      /** "build": shuffled event cards to tap into chronological order. */
+      /** "build"/"sort": shuffled event cards (each tagged with its day). */
       buildItems?: Array<{ label: string; icon: string; when: "yesterday" | "today" | "tomorrow" }>;
-      /** "build": the expected order (yesterday -> today -> tomorrow). */
+      /** "build": the expected order; "sort": the columns to sort into. */
       orderedWhen?: Array<"yesterday" | "today" | "tomorrow">;
       feedback?: { correct: string; wrong: string };
     }

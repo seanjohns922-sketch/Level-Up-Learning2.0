@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Compass, ArrowRight, School, Cake, Waves, Palette, Bus, PartyPopper, Trophy, CalendarClock } from "lucide-react";
+import { Compass, ArrowRight, School, Cake, Waves, Palette, Bus, PartyPopper, Trophy, Home, CalendarClock } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
@@ -17,6 +17,7 @@ const EVENT_ICON: Record<string, typeof Cake> = {
   art: Palette,
   excursion: Bus,
   celebration: PartyPopper,
+  family: Home,
 };
 const WHEN_LABEL: Record<When, string> = { yesterday: "Yesterday", today: "Today", tomorrow: "Tomorrow" };
 const WHEN_ORDER: Record<When, number> = { yesterday: 0, today: 1, tomorrow: 2 };
@@ -303,6 +304,101 @@ function BuildScene({ task, onCorrect, onWrong }: { task: TimeTask; onCorrect: (
   );
 }
 
+/* ── Sort the events into Yesterday / Today / Tomorrow columns ── */
+function SortScene({ task, onCorrect, onWrong }: { task: TimeTask; onCorrect: () => void; onWrong: () => void }) {
+  const items = task.buildItems ?? [];
+  const columns = task.orderedWhen ?? ["yesterday", "today", "tomorrow"];
+  const [selected, setSelected] = useState<string | null>(null);
+  const [placed, setPlaced] = useState<Record<string, When>>({});
+  const [locked, setLocked] = useState(false);
+  const byLabel = (label: string) => items.find((it) => it.label === label);
+  const tray = items.filter((it) => !(it.label in placed));
+
+  function tapColumn(col: When) {
+    if (locked || !selected) return;
+    const item = byLabel(selected);
+    if (!item) return;
+    if (item.when !== col) {
+      setSelected(null);
+      onWrong();
+      return;
+    }
+    const next = { ...placed, [selected]: col };
+    setSelected(null);
+    setPlaced(next);
+    if (Object.keys(next).length === items.length) {
+      setLocked(true);
+      window.setTimeout(onCorrect, 450);
+    }
+  }
+
+  return (
+    <Shell badge={task.badgeLabel ?? "Sort the Events"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      {/* columns */}
+      <div className="grid grid-cols-3 gap-2">
+        {columns.map((col) => {
+          const here = items.filter((it) => placed[it.label] === col);
+          return (
+            <button
+              key={col}
+              type="button"
+              onClick={() => tapColumn(col)}
+              disabled={locked || !selected}
+              className="flex min-h-[150px] flex-col items-center gap-2 rounded-[22px] border-2 px-2 py-3 transition disabled:cursor-default"
+              style={{
+                borderColor: col === "today" ? "rgba(91,33,182,0.7)" : "rgba(214,184,108,0.55)",
+                background: col === "today" ? "rgba(124,58,237,0.1)" : "rgba(255,252,245,0.9)",
+                boxShadow: selected && !locked ? "0 2px 0 rgba(180,120,20,0.12)" : undefined,
+              }}
+            >
+              <span className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: col === "today" ? "#5b21b6" : "#a98b52" }}>
+                {WHEN_LABEL[col]}
+              </span>
+              {here.map((it) => {
+                const Icon = iconFor(it.icon);
+                return (
+                  <span key={it.label} className="flex flex-col items-center gap-1 rounded-[16px] border-2 border-[rgba(124,58,237,0.4)] bg-white px-2 py-1.5">
+                    <Icon className="h-6 w-6 text-[#7c3aed]" />
+                    <span className="text-[11px] font-black leading-tight text-[#2c1c07]">{it.label}</span>
+                  </span>
+                );
+              })}
+            </button>
+          );
+        })}
+      </div>
+      {/* tray of events to sort */}
+      <div className="grid grid-cols-3 gap-3">
+        {tray.length === 0 ? (
+          <div className="col-span-3 text-center text-sm font-black uppercase tracking-[0.14em] text-[#5b21b6]">All sorted!</div>
+        ) : (
+          tray.map((it) => {
+            const Icon = iconFor(it.icon);
+            const isSel = selected === it.label;
+            return (
+              <button
+                key={it.label}
+                type="button"
+                onClick={() => setSelected(isSel ? null : it.label)}
+                disabled={locked}
+                className="flex min-h-[84px] flex-col items-center justify-center gap-1 rounded-[22px] border-2 px-2 py-2 text-center transition hover:-translate-y-0.5"
+                style={{
+                  borderColor: isSel ? "rgba(91,33,182,0.8)" : "rgba(214,184,108,0.55)",
+                  background: isSel ? "rgba(124,58,237,0.12)" : "white",
+                }}
+              >
+                <Icon className="h-6 w-6 text-[#7c3aed]" />
+                <span className="text-xs font-black leading-tight text-[#2c1c07]">{it.label}</span>
+              </button>
+            );
+          })
+        )}
+      </div>
+      <p className="text-center text-xs font-bold text-[#a98b52]">{selected ? "Now tap a column" : "Tap an event, then tap its column"}</p>
+    </Shell>
+  );
+}
+
 export function MeasurelandsTimeSequenceCard({
   task,
   onCorrect,
@@ -315,5 +411,6 @@ export function MeasurelandsTimeSequenceCard({
   if (task.scene === "intro") return <IntroScene task={task} onCorrect={onCorrect} />;
   if (task.scene === "meaning") return <MeaningScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "build") return <BuildScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "sort") return <SortScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   return <PickScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 }
