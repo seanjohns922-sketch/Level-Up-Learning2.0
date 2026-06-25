@@ -38,6 +38,16 @@ const STORIES: StoryDefinition[] = [
     ],
   },
   {
+    id: "teeth",
+    title: "Brushing Teeth",
+    steps: [
+      { id: "story-teeth-1", label: "Brush and Paste", image: "story-teeth-1.png" },
+      { id: "story-teeth-2", label: "Add Toothpaste", image: "story-teeth-2.png" },
+      { id: "story-teeth-3", label: "Brush Teeth", image: "story-teeth-3.png" },
+      { id: "story-teeth-4", label: "Rinse", image: "story-teeth-4.png" },
+    ],
+  },
+  {
     id: "toast",
     title: "Make Toast",
     steps: [
@@ -45,16 +55,6 @@ const STORIES: StoryDefinition[] = [
       { id: "story-toast-2", label: "Into the Toaster", image: "story-toast-2.png" },
       { id: "story-toast-3", label: "Toast Pops Up", image: "story-toast-3.png" },
       { id: "story-toast-4", label: "Buttered Toast", image: "story-toast-4.png" },
-    ],
-  },
-  {
-    id: "teeth",
-    title: "Brush Teeth",
-    steps: [
-      { id: "story-teeth-1", label: "Brush and Paste", image: "story-teeth-1.png" },
-      { id: "story-teeth-2", label: "Add Toothpaste", image: "story-teeth-2.png" },
-      { id: "story-teeth-3", label: "Brush Teeth", image: "story-teeth-3.png" },
-      { id: "story-teeth-4", label: "Rinse", image: "story-teeth-4.png" },
     ],
   },
 ];
