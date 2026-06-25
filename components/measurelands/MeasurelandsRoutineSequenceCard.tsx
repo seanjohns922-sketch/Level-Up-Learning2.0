@@ -18,7 +18,7 @@ const STORY_LABEL_IMAGE_OVERRIDES: Record<string, string> = {
   Egg: "/images/measurelands/story-3d/story-butterfly-1.png",
   Caterpillar: "/images/measurelands/story-3d/story-butterfly-2.png",
   Chrysalis: "/images/measurelands/story-3d/story-butterfly-3.png",
-  Butterfly: "/images/measurelands/story-3d/story-butterfly-4-v2.svg",
+  Butterfly: "/images/measurelands/story-3d/story-butterfly-4-v2.png",
   "Brush and Paste": "/images/measurelands/story-3d/story-teeth-1.png",
   "Add Toothpaste": "/images/measurelands/story-3d/story-teeth-2.png",
   "Brush Teeth": "/images/measurelands/story-3d/story-teeth-3.png",

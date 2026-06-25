@@ -34,7 +34,7 @@ const STORIES: StoryDefinition[] = [
       { id: "story-butterfly-1", label: "Egg", image: "story-butterfly-1.png" },
       { id: "story-butterfly-2", label: "Caterpillar", image: "story-butterfly-2.png" },
       { id: "story-butterfly-3", label: "Chrysalis", image: "story-butterfly-3.png" },
-      { id: "story-butterfly-4", label: "Butterfly", image: "story-butterfly-4-v2.svg" },
+      { id: "story-butterfly-4", label: "Butterfly", image: "story-butterfly-4-v2.png" },
     ],
   },
   {
