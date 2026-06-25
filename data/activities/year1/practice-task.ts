@@ -542,7 +542,9 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "count" | "compare" | "build" | "order" | "same";
+      // Year 2 adds "difference": two measured objects shown, MCQ on "how many
+      // more / fewer units" (quantifying the gap, not just "which is longer").
+      scene: "intro" | "count" | "compare" | "build" | "order" | "same" | "difference";
       /** Unit being used to measure (footstep / block / star / flower / stone).
        *  Rendered as an illustrated glyph; unitEmoji/unitLabel are hints only. */
       unitEmoji?: string;

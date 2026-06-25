@@ -48,6 +48,13 @@ import {
   resetY1MeasurelandsLessonSessionState,
   resolveY1MeasurelandsLessonTask,
 } from "@/data/activities/year1Measurelands/registry";
+import {
+  getY2MeasurelandsLessonMeta,
+  getY2MeasurelandsPractisedSkills,
+  isY2MeasurelandsLessonId,
+  resetY2MeasurelandsLessonSessionState,
+  resolveY2MeasurelandsLessonTask,
+} from "@/data/activities/year2Measurelands/registry";
 import { getProgramForYear } from "@/data/programs";
 import { getCurriculumPlan } from "@/data/programs/genres";
 import { DEMO_MODE } from "@/data/config";
@@ -149,7 +156,7 @@ function getPrepGroundTask(
 // Optional per-lesson reflection bullets ("Today you practised: ...").
 // Lessons not listed here fall back to the single "Today you practised <title>" line.
 function getLessonPractisedSkills(lessonId: string): string[] | undefined {
-  return getPrepMeasurelandsPractisedSkills(lessonId) ?? getY1MeasurelandsPractisedSkills(lessonId);
+  return getPrepMeasurelandsPractisedSkills(lessonId) ?? getY1MeasurelandsPractisedSkills(lessonId) ?? getY2MeasurelandsPractisedSkills(lessonId);
 }
 
 function LessonPage() {
@@ -349,7 +356,7 @@ function LessonPage() {
   const measurelandsMeta = useMemo(
     () =>
       realmId === "measurement"
-        ? getPrepMeasurelandsLessonMeta(effectiveLessonId) ?? getY1MeasurelandsLessonMeta(effectiveLessonId)
+        ? getPrepMeasurelandsLessonMeta(effectiveLessonId) ?? getY1MeasurelandsLessonMeta(effectiveLessonId) ?? getY2MeasurelandsLessonMeta(effectiveLessonId)
         : null,
     [effectiveLessonId, realmId]
   );
@@ -360,8 +367,12 @@ function LessonPage() {
     year === "Year 4" && week === 2 && lessonNumber === 1;
   const isGroundCustomLesson =
     year === "Prep" && isPrepGroundCustomLesson(effectiveLessonId, realmId);
+  const isYear2Measurelands =
+    realmId === "measurement" &&
+    year === "Year 2" &&
+    isY2MeasurelandsLessonId(effectiveLessonId);
   const invalidMeasurelandsLesson =
-    year === "Prep" &&
+    (year === "Prep" || year === "Year 2") &&
     realmId === "measurement" &&
     !measurelandsMeta;
 
@@ -1136,6 +1147,7 @@ function LessonPage() {
                       if (isGroundCustomLesson) resetPrepSessionTaskState();
                       if (realmId === "measurement") {
                         resetY1MeasurelandsLessonSessionState();
+                        resetY2MeasurelandsLessonSessionState();
                         resetPrepMeasurelandsLessonSessionState();
                       }
                       setStartedLessonId(effectiveLessonId);
@@ -1168,7 +1180,7 @@ function LessonPage() {
               </div>
             </div>
           </div>
-        ) : year === "Year 1" || isGroundCustomLesson ? (
+        ) : year === "Year 1" || isGroundCustomLesson || isYear2Measurelands ? (
           <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
             <LessonPageHero
                     levelNumber={levelNumber}
@@ -1186,7 +1198,7 @@ function LessonPage() {
               key={`${year}-${week}-${effectiveLessonId}`}
               minutes={9}
               lessonTitle={safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
-              completionMode={year === "Year 1" || isGroundCustomLesson ? "time_only" : "question_or_time"}
+              completionMode={year === "Year 1" || isGroundCustomLesson || isYear2Measurelands ? "time_only" : "question_or_time"}
               scoreCap={10}
               liveContext={liveLessonContext}
               realmId={realmId}
@@ -1216,6 +1228,7 @@ function LessonPage() {
                 }
                 if (realmId === "measurement") {
                   return (
+                    resolveY2MeasurelandsLessonTask(effectiveLessonId, d) ??
                     resolveY1MeasurelandsLessonTask(effectiveLessonId, d) ??
                     resolvePrepMeasurelandsLessonTask(effectiveLessonId, d) ??
                     buildMissingMeasurelandsLessonTask(effectiveLessonId)

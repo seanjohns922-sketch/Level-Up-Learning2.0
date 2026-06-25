@@ -613,6 +613,40 @@ function BuildScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect: () 
   );
 }
 
+/* ── Year 2: how many MORE / fewer units? (two measured objects + number MCQ) ── */
+function DifferenceScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
+  const paths = task.paths ?? [];
+  return (
+    <PathShell badge={task.badgeLabel ?? "How Many More?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="grid gap-3">
+        {paths.map((path, idx) => (
+          <div key={path.id} className="rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-3">
+            <div className="mb-1 px-1 text-xs font-black uppercase tracking-[0.16em] text-[#7c3aed]">
+              {path.objectLabel ?? `Path ${idx === 0 ? "A" : "B"}`}
+            </div>
+            {path.objectImageSrc ? <MeasuredObject imageSrc={path.objectImageSrc} length={path.length} /> : null}
+            <UnitsDisplay length={path.length} unitLabel={path.unitLabel} unitEmoji={path.unitEmoji} />
+            <MeasurementText length={path.length} unitLabel={path.unitLabel} />
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        {(task.options ?? []).map((value) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => (value === task.correctAnswer ? onCorrect() : onWrong())}
+            className="relative flex min-h-[88px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-5xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+          >
+            <span className="absolute right-3 top-3 z-10"><OptionReadAloudButton text={String(value)} /></span>
+            {value}
+          </button>
+        ))}
+      </div>
+    </PathShell>
+  );
+}
+
 export function MeasurelandsPathTaskCard({
   task,
   onCorrect,
@@ -627,5 +661,6 @@ export function MeasurelandsPathTaskCard({
   if (task.scene === "compare") return <CompareScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "order") return <OrderScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "same") return <SameScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "difference") return <DifferenceScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   return <BuildScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 }
