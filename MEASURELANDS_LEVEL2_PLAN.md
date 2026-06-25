@@ -40,8 +40,8 @@ Year 2 measurement does **not** include area, volume or temperature (Year 3+).
 
 | Week | Ground → Level 1 → **Level 2** |
 |---|---|
-| W1 Length | compare → measure → **count & order by units** |
-| W2 Length reasoning | measure → compare → **estimate, reason & choose the right tool** |
+| W1 Length | compare → measure → **count, order & choose the right tool** |
+| W2 Mass | heavy/light → balance → **count units & order "by how many"** |
 | W3 Capacity | more/less → fill → **count & order by capacity** |
 | **W4 Accuracy ★** | — → whole units → **smaller units for a closer count; choose the unit** |
 | W5 Clock I | time words → sequence → **read the clock (o'clock / half past)** |
@@ -56,20 +56,20 @@ Year 2 measurement does **not** include area, volume or temperature (Year 3+).
 > Default arc: **L1 introduce → L2 apply & compare → L3 reason/justify**, unless the curriculum suggests a stronger sequence. Highly visual, low-reading, audio-supported throughout (visual = primary, text = support, audio = accessibility).
 
 ### W1 · Unit Count Canyon — Length (AC9M2M01)
-*Year 2 thinking: measure → quantify & order by units.* **Wide, randomised object pool from day one.**
-- **L1 Count the Units** — lay uniform units end-to-end, count "how many units long".
-- **L2 Compare by Count** — measure and order 3 objects by unit count.
-- **L3 Fair Units** — same object, different unit sizes → why the count changes; pick the fair measure.
-- *Mechanics:* `measurePath`, `measurementCompare`, order/sort. *Art:* reuse `measure-objects-3d`. No new art.
+*Year 2 thinking: measure → quantify, order & choose the right tool.* **Wide, randomised object pool from day one.**
+- **L1 How Many More?** — measure two objects in units; find how many more/fewer units (the difference). `measurePath` `difference` scene.
+- **L2 Order by Count** — order 3 & 4 objects; trust-the-count compare; equal length; reasoning beat.
+- **L3 Measuring Detective** — choose the best measuring tool for an object and justify why (new `toolChoice` mechanic; lucide icons now, premium Codex art later).
+- *Mechanics:* `measurePath` (L1/L2) + `toolChoice` (L3). *Art:* L1/L2 reuse `measure-objects-3d`; L3 tool/object art via Codex brief (ships on icons).
 
-### W2 · Length Reasoning (AC9M2M01) — *restructured 2026-06-26 from Mass*
-*Year 2 thinking: measure → compare → estimate, reason, and choose the right tool/strategy.*
-- **L1 Compare Lengths** — compare measured lengths and reason about results.
-- **L2 Estimate & Reason** — estimate a length, then check by measuring.
-- **L3 Measuring Detective** — choose the best measuring tool for an object and justify why (cubes / ruler / tape measure / trundle wheel / footsteps). New `toolChoice` mechanic; icons now, premium Codex art later.
-- *Mechanics:* `measurePath` (L1/L2) + new `toolChoice` (L3). *Art:* tool + everyday-object set needed for L3 (Codex brief) — ships on lucide icons first.
+> **Note:** "Fair Units" (one object, two unit sizes → why the count changes) is re-homed — a candidate for a later Length/Accuracy week. Mass ("Balance Basin") stays at Week 2 per this plan.
 
-> **Re-sequencing note:** Mass ("Balance Basin") is re-homed to a later week. The downstream weeks (Capacity, Accuracy, Clock ×2, Calendar, Challenge) shift accordingly and will be re-confirmed before building. Week 2 L3 "Measuring Detective" also subsumes part of the old W4 L3 "Right Tool, Right Unit."
+### W2 · Balance Basin — Mass (AC9M2M01)
+*Year 2 thinking: compare → count units & order by how many.*
+- **L1 Count the Weights** — balance an object against uniform mass units; count to balance.
+- **L2 By How Many?** — compare/order objects by unit count.
+- **L3 Predict & Prove** — justify which is heavier; fix an unfair balance.
+- *Mechanics:* `balanceScale`, `massMeasure`. *Art:* reuse. No new art.
 
 ### W3 · Capacity Springs — Capacity (AC9M2M01)
 *Year 2 thinking: more/less → count & order by capacity.*

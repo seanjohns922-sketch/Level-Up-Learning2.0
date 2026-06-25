@@ -1,6 +1,6 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
 
-// ── Measurelands · Level 2 (Year 2) · Week 2 · Lesson 3 — "Measuring Detective" ──
+// ── Measurelands · Level 2 (Year 2) · Week 1 · Lesson 3 — "Measuring Detective" ──
 // AC9M2M01 (choose appropriate measuring strategies). Year 2 thinking: not just
 // "how long is it?" but "WHICH tool is best, and WHY?" — reasoning about
 // appropriate tools for an object's size.
@@ -151,7 +151,7 @@ function buildWhyBestTask(memory: LessonMemory): ToolTask {
   };
 }
 
-export function generateY2MeasurelandsWeek2Lesson3Task(
+export function generateY2MeasurelandsWeek1Lesson3Task(
   lessonId: string,
   _difficulty: Difficulty,
 ): PracticeTask {
@@ -167,6 +167,6 @@ export function generateY2MeasurelandsWeek2Lesson3Task(
   return buildWhyBestTask(memory);
 }
 
-export function resetY2MeasurelandsWeek2Lesson3TaskSessionState() {
+export function resetY2MeasurelandsWeek1Lesson3TaskSessionState() {
   lessonMemory.clear();
 }

@@ -38,18 +38,18 @@ const YEAR2_MEASURELANDS_RAW: WeekPlan[] = [
     lessons: [
       buildLesson(1, 1, "How Many More?", "Length: measure two objects in uniform units and find how many more units one is than the other.", ["How many more", "Measurement difference", "Quantify the gap"], ["AC9M2M01"]),
       buildLesson(1, 2, "Order by Count", "Length: measure and order three objects from shortest to longest by unit count.", ["Order by count", "Shortest to longest", "Three objects"], ["AC9M2M01"]),
-      buildLesson(1, 3, "Fair Units", "Length: measure one object with two unit sizes and reason why the count changes.", ["Fair units", "Unit size vs count", "Same object different units"], ["AC9M2M01"]),
+      buildLesson(1, 3, "Measuring Detective", "Length: choose the best measuring tool for an object and explain why.", ["Choose the best tool", "Why this tool", "Best tool for the job"], ["AC9M2M01"]),
     ],
   },
   {
     id: "y2-measurement-w2",
     week: 2,
-    topic: "Measuring Masters",
+    topic: "Balance Basin",
     curriculum: ["AC9M2M01"],
     lessons: [
-      buildLesson(2, 1, "Compare Lengths", "Length: compare measured lengths and reason about which is longer or shorter.", ["Compare lengths", "Longer or shorter", "Reason with measurements"], ["AC9M2M01"]),
-      buildLesson(2, 2, "Estimate and Reason", "Length: estimate a length, then check by measuring with units.", ["Estimate and reason", "Estimate then check", "Close to the count"], ["AC9M2M01"]),
-      buildLesson(2, 3, "Measuring Detective", "Length: choose the best measuring tool for an object and explain why.", ["Choose the best tool", "Why this tool", "Best tool for the job"], ["AC9M2M01"]),
+      buildLesson(2, 1, "Count the Weights", "Mass: balance an object against uniform mass units and count how many units it takes.", ["Count the weights", "Balance with units", "How many units"], ["AC9M2M01"]),
+      buildLesson(2, 2, "By How Many?", "Mass: compare and order objects by unit count, and find how many units heavier.", ["By how many", "Compare by count", "Order by mass"], ["AC9M2M01"]),
+      buildLesson(2, 3, "Predict and Prove", "Mass: predict which is heavier, justify, and fix an unfair balance.", ["Predict and prove", "Justify heavier", "Fix the balance"], ["AC9M2M01"]),
     ],
   },
   {
