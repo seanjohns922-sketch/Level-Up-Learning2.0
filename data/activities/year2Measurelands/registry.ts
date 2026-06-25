@@ -7,6 +7,10 @@ import {
   generateY2MeasurelandsWeek1Lesson2Task,
   resetY2MeasurelandsWeek1Lesson2TaskSessionState,
 } from "@/data/activities/year2Measurelands/week1Lesson2";
+import {
+  generateY2MeasurelandsWeek2Lesson3Task,
+  resetY2MeasurelandsWeek2Lesson3TaskSessionState,
+} from "@/data/activities/year2Measurelands/week2Lesson3";
 
 // Level 2 (Year 2) Measurelands lesson registry. Mirrors the Level 1 registry so
 // app/lesson/page.tsx can resolve `y2-measurement-w{n}-l{m}` ids to tasks.
@@ -62,6 +66,24 @@ const Y2_MEASURELANDS_LESSONS: Y2MeasurelandsLessonEntry[] = [
     completionTitle: "Measurement Comparer Complete!",
     unlockMessage: "Lesson 3 unlocked.",
     returnRoute: "/program?year=Year 2&week=1&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y2-measurement-w2-l3",
+    week: 2,
+    lessonNumber: 3,
+    title: "Measuring Detective",
+    subtitle: "Measuring Masters",
+    generate: generateY2MeasurelandsWeek2Lesson3Task,
+    reset: resetY2MeasurelandsWeek2Lesson3TaskSessionState,
+    practisedSkills: [
+      "Choosing the best measuring tool",
+      "Explaining why a tool is a poor fit",
+      "Justifying the best tool for the job",
+      "Matching tool size to object size",
+    ],
+    completionTitle: "Measuring Detective Complete!",
+    unlockMessage: "Week complete.",
+    returnRoute: "/program?year=Year 2&week=2&legacy=1&realm_id=measurement",
   },
 ];
 

@@ -107,6 +107,7 @@ import { MeasurelandsCalendarNavigateCard } from "@/components/measurelands/Meas
 import { MeasurelandsCalendarEventCard } from "@/components/measurelands/MeasurelandsCalendarEventCard";
 import { MeasurelandsTimeSequenceCard } from "@/components/measurelands/MeasurelandsTimeSequenceCard";
 import { MeasurelandsRoutineSequenceCard } from "@/components/measurelands/MeasurelandsRoutineSequenceCard";
+import { MeasurelandsToolChoiceCard } from "@/components/measurelands/MeasurelandsToolChoiceCard";
 import { MeasurelandsBalanceScaleCard } from "@/components/measurelands/MeasurelandsBalanceScaleCard";
 import { isPracticeTaskSafe } from "@/lib/task-safety";
 
@@ -345,6 +346,8 @@ function TaskRendererInner({
       return <MeasurelandsCalendarNavigateCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "calendarEvent":
       return <MeasurelandsCalendarEventCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "toolChoice":
+      return <MeasurelandsToolChoiceCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "timeSequence":
       return <MeasurelandsTimeSequenceCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "routineSequence":

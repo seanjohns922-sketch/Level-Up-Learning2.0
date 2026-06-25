@@ -44,12 +44,12 @@ const YEAR2_MEASURELANDS_RAW: WeekPlan[] = [
   {
     id: "y2-measurement-w2",
     week: 2,
-    topic: "Balance Basin",
+    topic: "Measuring Masters",
     curriculum: ["AC9M2M01"],
     lessons: [
-      buildLesson(2, 1, "Count the Weights", "Mass: balance an object against uniform mass units and count how many units it takes.", ["Count the weights", "Balance with units", "How many units"], ["AC9M2M01"]),
-      buildLesson(2, 2, "By How Many?", "Mass: compare and order objects by unit count, and find how many units heavier.", ["By how many", "Compare by count", "Order by mass"], ["AC9M2M01"]),
-      buildLesson(2, 3, "Predict and Prove", "Mass: predict which is heavier, justify, and fix an unfair balance.", ["Predict and prove", "Justify heavier", "Fix the balance"], ["AC9M2M01"]),
+      buildLesson(2, 1, "Compare Lengths", "Length: compare measured lengths and reason about which is longer or shorter.", ["Compare lengths", "Longer or shorter", "Reason with measurements"], ["AC9M2M01"]),
+      buildLesson(2, 2, "Estimate and Reason", "Length: estimate a length, then check by measuring with units.", ["Estimate and reason", "Estimate then check", "Close to the count"], ["AC9M2M01"]),
+      buildLesson(2, 3, "Measuring Detective", "Length: choose the best measuring tool for an object and explain why.", ["Choose the best tool", "Why this tool", "Best tool for the job"], ["AC9M2M01"]),
     ],
   },
   {

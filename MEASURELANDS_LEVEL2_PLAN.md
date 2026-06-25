@@ -41,7 +41,7 @@ Year 2 measurement does **not** include area, volume or temperature (Year 3+).
 | Week | Ground → Level 1 → **Level 2** |
 |---|---|
 | W1 Length | compare → measure → **count & order by units** |
-| W2 Mass | heavy/light → balance → **count units & order "by how many"** |
+| W2 Length reasoning | measure → compare → **estimate, reason & choose the right tool** |
 | W3 Capacity | more/less → fill → **count & order by capacity** |
 | **W4 Accuracy ★** | — → whole units → **smaller units for a closer count; choose the unit** |
 | W5 Clock I | time words → sequence → **read the clock (o'clock / half past)** |
@@ -62,12 +62,14 @@ Year 2 measurement does **not** include area, volume or temperature (Year 3+).
 - **L3 Fair Units** — same object, different unit sizes → why the count changes; pick the fair measure.
 - *Mechanics:* `measurePath`, `measurementCompare`, order/sort. *Art:* reuse `measure-objects-3d`. No new art.
 
-### W2 · Balance Basin — Mass (AC9M2M01)
-*Year 2 thinking: compare → count units & order by how many.*
-- **L1 Count the Weights** — balance an object against uniform mass units; count to balance.
-- **L2 By How Many?** — compare/order objects by unit count.
-- **L3 Predict & Prove** — justify which is heavier; fix an unfair balance.
-- *Mechanics:* `balanceScale`, `massMeasure`. *Art:* reuse. No new art.
+### W2 · Length Reasoning (AC9M2M01) — *restructured 2026-06-26 from Mass*
+*Year 2 thinking: measure → compare → estimate, reason, and choose the right tool/strategy.*
+- **L1 Compare Lengths** — compare measured lengths and reason about results.
+- **L2 Estimate & Reason** — estimate a length, then check by measuring.
+- **L3 Measuring Detective** — choose the best measuring tool for an object and justify why (cubes / ruler / tape measure / trundle wheel / footsteps). New `toolChoice` mechanic; icons now, premium Codex art later.
+- *Mechanics:* `measurePath` (L1/L2) + new `toolChoice` (L3). *Art:* tool + everyday-object set needed for L3 (Codex brief) — ships on lucide icons first.
+
+> **Re-sequencing note:** Mass ("Balance Basin") is re-homed to a later week. The downstream weeks (Capacity, Accuracy, Clock ×2, Calendar, Challenge) shift accordingly and will be re-confirmed before building. Week 2 L3 "Measuring Detective" also subsumes part of the old W4 L3 "Right Tool, Right Unit."
 
 ### W3 · Capacity Springs — Capacity (AC9M2M01)
 *Year 2 thinking: more/less → count & order by capacity.*

@@ -879,6 +879,29 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Year 2 W2 L3 — "Measuring Detective": choose the best
+      // measuring tool for an object and justify why (AC9M2M01, appropriate
+      // strategies). Tools = cubes / ruler / tape measure / trundle wheel /
+      // footsteps. Image-ready: each tool/object renders a premium image when
+      // `imageSrc` exists, else a lucide icon (iconKey).
+      kind: "toolChoice";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "best" | "whyBad" | "whyBest" | "reflection";
+      /** The object being measured (shown in the middle). */
+      object?: { label: string; iconKey: string; imageSrc?: string };
+      /** "best"/"whyBest": tool option cards; tap the best (correctToolId). */
+      tools?: Array<{ id: string; label: string; iconKey: string; imageSrc?: string }>;
+      correctToolId?: string;
+      /** "whyBad": a wrong tool shown with the object; pick why it's a bad fit. */
+      wrongTool?: { label: string; iconKey: string; imageSrc?: string };
+      /** "whyBad"/"whyBest"/"reflection": text reason options. */
+      reasonOptions?: string[];
+      correctReason?: string;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       // Generic, reusable interactive balance scale for equivalence activities
       // (Measurelands "Balance the Scales" and any future same-weight tasks).
       // The student fills/edits one pan; the scale is solved when both pans
