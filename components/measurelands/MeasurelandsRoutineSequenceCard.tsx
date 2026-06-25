@@ -10,6 +10,32 @@ import type { PracticeTask } from "@/data/activities/year1/practice-task";
 type RoutineTask = Extract<PracticeTask, { kind: "routineSequence" }>;
 type RoutineItem = NonNullable<RoutineTask["items"]>[number];
 
+const STORY_LABEL_IMAGE_OVERRIDES: Record<string, string> = {
+  Seed: "/images/measurelands/story-3d/story-seed-1.png",
+  "Water the Soil": "/images/measurelands/story-3d/story-seed-2.png",
+  Sprout: "/images/measurelands/story-3d/story-seed-3.png",
+  Flower: "/images/measurelands/story-3d/story-seed-4.png",
+  Egg: "/images/measurelands/story-3d/story-butterfly-1.png",
+  Caterpillar: "/images/measurelands/story-3d/story-butterfly-2.png",
+  Chrysalis: "/images/measurelands/story-3d/story-butterfly-3.png",
+  Butterfly: "/images/measurelands/story-3d/story-butterfly-4-v2.svg",
+  "Brush and Paste": "/images/measurelands/story-3d/story-teeth-1.png",
+  "Add Toothpaste": "/images/measurelands/story-3d/story-teeth-2.png",
+  "Brush Teeth": "/images/measurelands/story-3d/story-teeth-3.png",
+  Rinse: "/images/measurelands/story-3d/story-teeth-4.png",
+  Bread: "/images/measurelands/story-3d/story-toast-1-v2.png",
+  "Into the Toaster": "/images/measurelands/story-3d/story-toast-2-v2.png",
+  "Toast Pops Up": "/images/measurelands/story-3d/story-toast-3-v2.png",
+  "Buttered Toast": "/images/measurelands/story-3d/story-toast-4-v2.png",
+};
+
+function resolveRoutineImageSrc(item: RoutineItem): string | undefined {
+  if (item.icon === "story") {
+    return STORY_LABEL_IMAGE_OVERRIDES[item.label] ?? item.imageSrc;
+  }
+  return item.imageSrc;
+}
+
 function Shell({
   badge,
   prompt,
@@ -56,6 +82,7 @@ function RoutineCard({
   highlight?: boolean;
 }) {
   const imageSize = compact ? "h-14 w-14" : "h-20 w-20";
+  const imageSrc = resolveRoutineImageSrc(item);
   return (
     <div
       className="flex min-h-[132px] w-full flex-col items-center justify-center gap-2 rounded-[24px] border-2 px-3 py-3 text-center"
@@ -64,8 +91,8 @@ function RoutineCard({
         background: highlight ? "rgba(124,58,237,0.1)" : "rgba(255,255,255,0.94)",
       }}
     >
-      {item.imageSrc ? (
-        <img src={item.imageSrc} alt={item.label} className={`${imageSize} object-contain drop-shadow-[0_10px_16px_rgba(120,53,15,0.18)]`} />
+      {imageSrc ? (
+        <img src={imageSrc} alt={item.label} className={`${imageSize} object-contain drop-shadow-[0_10px_16px_rgba(120,53,15,0.18)]`} />
       ) : (
         <MeasurelandsEventBadge iconKey={item.icon} label={item.label} size={compact ? "md" : "lg"} />
       )}

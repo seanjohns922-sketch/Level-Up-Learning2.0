@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Butterfly">
+  <defs>
+    <radialGradient id="shadow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#000" stop-opacity=".18"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="wingLeftTop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffd45b"/>
+      <stop offset="100%" stop-color="#ff8a3d"/>
+    </linearGradient>
+    <linearGradient id="wingLeftBottom" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5fd2ff"/>
+      <stop offset="100%" stop-color="#3768ff"/>
+    </linearGradient>
+    <linearGradient id="wingRightTop" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffd45b"/>
+      <stop offset="100%" stop-color="#ff8a3d"/>
+    </linearGradient>
+    <linearGradient id="wingRightBottom" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#5fd2ff"/>
+      <stop offset="100%" stop-color="#3768ff"/>
+    </linearGradient>
+    <linearGradient id="body" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4d3422"/>
+      <stop offset="100%" stop-color="#2c1b11"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000" flood-opacity=".12"/>
+    </filter>
+  </defs>
+
+  <ellipse cx="256" cy="432" rx="130" ry="28" fill="url(#shadow)"/>
+
+  <g filter="url(#softShadow)" stroke="#243042" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <path fill="url(#wingLeftTop)" d="M241 220c-25-58-99-97-149-65-43 28-45 88-2 124 38 31 98 32 141-10 20-19 26-31 35-49z"/>
+    <path fill="url(#wingLeftBottom)" d="M238 268c-39-6-89 8-122 41-34 35-34 85-2 113 39 35 105 23 145-22 24-27 31-57 25-85z"/>
+    <path fill="url(#wingRightTop)" d="M271 220c25-58 99-97 149-65 43 28 45 88 2 124-38 31-98 32-141-10-20-19-26-31-35-49z"/>
+    <path fill="url(#wingRightBottom)" d="M274 268c39-6 89 8 122 41 34 35 34 85 2 113-39 35-105 23-145-22-24-27-31-57-25-85z"/>
+
+    <ellipse cx="256" cy="258" rx="26" ry="104" fill="url(#body)"/>
+    <circle cx="256" cy="145" r="21" fill="url(#body)"/>
+
+    <path d="M247 129c-18-29-43-43-69-46" fill="none"/>
+    <path d="M265 129c18-29 43-43 69-46" fill="none"/>
+    <circle cx="176" cy="82" r="8" fill="#243042"/>
+    <circle cx="336" cy="82" r="8" fill="#243042"/>
+
+    <g fill="#243042" stroke="none">
+      <circle cx="173" cy="211" r="10"/>
+      <circle cx="142" cy="270" r="10"/>
+      <circle cx="184" cy="334" r="10"/>
+      <circle cx="339" cy="211" r="10"/>
+      <circle cx="370" cy="270" r="10"/>
+      <circle cx="328" cy="334" r="10"/>
+    </g>
+  </g>
+</svg>
