@@ -89,7 +89,7 @@ function buildIntroTask(): ToolTask {
     scene: "intro",
     prompt: "Choose the best tool.",
     speakText:
-      "A pencil and a playground are both lengths, but we would not measure them the same way. Good measurers choose the best tool for the job! Small things need small tools. Big things need bigger tools.",
+      "A pencil and a playground are both lengths, but we would not measure them the same way. Here are our measuring tools: cubes for tiny things, a ruler for small things, a tape measure for rooms, footsteps for floors, and a trundle wheel for big spaces. Good measurers choose the best tool for the job!",
     badgeLabel: "Meazurex Mission",
     feedback: { correct: "Let's be measuring detectives!", wrong: "Let's get ready." },
   };

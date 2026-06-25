@@ -69,10 +69,12 @@ function ObjectCard({ object, big = true }: { object: NonNullable<ToolTask["obje
 
 /* ── Intro / teaching ── */
 function IntroScene({ task, onCorrect }: { task: ToolTask; onCorrect: () => void }) {
-  const pairs: Array<[string, string, string]> = [
-    ["pencil", "Pencil", "ruler"],
-    ["classroom", "Classroom", "tape"],
-    ["playground", "Playground", "wheel"],
+  const toolLegend: Array<{ k: string; n: string; f: string }> = [
+    { k: "cubes", n: "Cubes", f: "tiny things" },
+    { k: "ruler", n: "Ruler", f: "small things" },
+    { k: "tape", n: "Tape Measure", f: "rooms" },
+    { k: "feet", n: "Footsteps", f: "floors" },
+    { k: "wheel", n: "Trundle Wheel", f: "big spaces" },
   ];
   return (
     <Shell badge={task.badgeLabel ?? "Meazurex Mission"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
@@ -87,13 +89,13 @@ function IntroScene({ task, onCorrect }: { task: ToolTask; onCorrect: () => void
             <p className="text-base font-semibold leading-relaxed text-[#5f4725]">Good measurers choose the best tool for the job!</p>
           </div>
         </div>
-        <div className="grid grid-cols-3 gap-3">
-          {pairs.map(([oicon, olabel, ticon]) => (
-            <div key={olabel} className="flex flex-col items-center gap-2 rounded-[22px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.95)] p-3 text-center">
-              <Glyph label={olabel} iconKey={oicon} />
-              <span className="text-xs font-black text-[#2c1c07]">{olabel}</span>
-              <MoveHorizontal className="h-4 w-4 text-[#b4781e]" />
-              <Glyph label={ticon} iconKey={ticon} />
+        <div className="mb-2 text-center text-xs font-black uppercase tracking-[0.18em] text-[#5b21b6]">Meet your measuring tools</div>
+        <div className="grid grid-cols-5 gap-2">
+          {toolLegend.map((t) => (
+            <div key={t.k} className="flex flex-col items-center gap-1 rounded-[18px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.95)] px-1 py-3 text-center">
+              <Glyph label={t.n} iconKey={t.k} />
+              <span className="text-[11px] font-black leading-tight text-[#2c1c07]">{t.n}</span>
+              <span className="text-[10px] font-bold leading-tight text-[#a98b52]">for {t.f}</span>
             </div>
           ))}
         </div>
