@@ -18,7 +18,7 @@ import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import StudentAvatar from "@/components/avatar/StudentAvatar";
 import { supabase } from "@/lib/supabase";
 
-type MeasurelandsYear = "Prep" | "Year 1";
+type MeasurelandsYear = "Prep" | "Year 1" | "Year 2";
 const REALM_ID = "measurement";
 const PREP_BG_IMAGE = "/images/measurelands-home-bg.jpg";
 const YEAR1_BG_IMAGE = "/images/measurelands-home-bg-y1.jpg";
@@ -42,18 +42,25 @@ const YEAR1_ZONES = [
   { id: "time-builder", name: "TIME BUILDER", sub: "WEEK 8", weekStart: 8, weekEnd: 8, left: "50%", top: "30%", color: "#93c5fd" },
 ] as const;
 
+const YEAR2_ZONES = [
+  { id: "unit-count", name: "UNIT COUNT CANYON", sub: "WEEK 1", weekStart: 1, weekEnd: 1, left: "7%", top: "14%", color: "#67e8f9" },
+  { id: "balance", name: "BALANCE BASIN", sub: "WEEK 2", weekStart: 2, weekEnd: 2, left: "10%", top: "56%", color: "#86efac" },
+  { id: "capacity", name: "CAPACITY SPRINGS", sub: "WEEK 3", weekStart: 3, weekEnd: 3, left: "70%", top: "15%", color: "#c4b5fd" },
+  { id: "closer-count", name: "CLOSER COUNT", sub: "WEEK 4", weekStart: 4, weekEnd: 4, left: "50%", top: "30%", color: "#fde68a" },
+  { id: "clock-one", name: "CLOCK TOWER I", sub: "WEEK 5", weekStart: 5, weekEnd: 5, left: "50%", top: "30%", color: "#a7f3d0" },
+  { id: "clock-two", name: "CLOCK TOWER II", sub: "WEEK 6", weekStart: 6, weekEnd: 6, left: "50%", top: "30%", color: "#fcd34d" },
+  { id: "calendar-keep", name: "CALENDAR KEEP", sub: "WEEK 7", weekStart: 7, weekEnd: 7, left: "69%", top: "57%", color: "#f9a8d4" },
+  { id: "challenge", name: "MEASUREMENT CHALLENGE", sub: "WEEK 8", weekStart: 8, weekEnd: 8, left: "50%", top: "30%", color: "#93c5fd" },
+] as const;
+
 function getMeasurelandsWorldConfig(year: MeasurelandsYear) {
-  return year === "Year 1"
-    ? {
-        bgImage: YEAR1_BG_IMAGE,
-        levelLabel: "LEVEL 1",
-        zones: YEAR1_ZONES,
-      }
-    : {
-        bgImage: PREP_BG_IMAGE,
-        levelLabel: "GROUND LEVEL",
-        zones: PREP_ZONES,
-      };
+  if (year === "Year 2") {
+    return { bgImage: YEAR1_BG_IMAGE, levelLabel: "LEVEL 2", zones: YEAR2_ZONES };
+  }
+  if (year === "Year 1") {
+    return { bgImage: YEAR1_BG_IMAGE, levelLabel: "LEVEL 1", zones: YEAR1_ZONES };
+  }
+  return { bgImage: PREP_BG_IMAGE, levelLabel: "GROUND LEVEL", zones: PREP_ZONES };
 }
 
 function useWorldCanvas() {
@@ -175,7 +182,7 @@ function ProgressIcon() {
 
 export default function MeasurelandsMap({ year = "Prep" }: { year?: MeasurelandsYear }) {
   const router = useRouter();
-  const resolvedYear: MeasurelandsYear = year === "Year 1" ? "Year 1" : "Prep";
+  const resolvedYear: MeasurelandsYear = year === "Year 1" ? "Year 1" : year === "Year 2" ? "Year 2" : "Prep";
   const world = useMemo(() => getMeasurelandsWorldConfig(resolvedYear), [resolvedYear]);
   const [progress] = useState(() => readProgress());
   const [store] = useState(() => readProgramStore());
