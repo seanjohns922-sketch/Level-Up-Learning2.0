@@ -22,6 +22,7 @@ type MeasurelandsYear = "Prep" | "Year 1" | "Year 2";
 const REALM_ID = "measurement";
 const PREP_BG_IMAGE = "/images/measurelands-home-bg.jpg";
 const YEAR1_BG_IMAGE = "/images/measurelands-home-bg-y1.jpg";
+const YEAR2_BG_IMAGE = "/images/measurelands-home-bg-y2.jpg";
 
 const PREP_ZONES = [
   { id: "length", name: "LENGTH LANDS", sub: "WEEKS 1–2", weekStart: 1, weekEnd: 2, left: "7%", top: "14%", color: "#67e8f9" },
@@ -55,7 +56,7 @@ const YEAR2_ZONES = [
 
 function getMeasurelandsWorldConfig(year: MeasurelandsYear) {
   if (year === "Year 2") {
-    return { bgImage: YEAR1_BG_IMAGE, levelLabel: "LEVEL 2", zones: YEAR2_ZONES };
+    return { bgImage: YEAR2_BG_IMAGE, levelLabel: "LEVEL 2", zones: YEAR2_ZONES };
   }
   if (year === "Year 1") {
     return { bgImage: YEAR1_BG_IMAGE, levelLabel: "LEVEL 1", zones: YEAR1_ZONES };

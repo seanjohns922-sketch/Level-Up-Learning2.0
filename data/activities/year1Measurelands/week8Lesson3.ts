@@ -34,7 +34,7 @@ const STORIES: StoryDefinition[] = [
       { id: "story-butterfly-1", label: "Egg", image: "story-butterfly-1.png" },
       { id: "story-butterfly-2", label: "Caterpillar", image: "story-butterfly-2.png" },
       { id: "story-butterfly-3", label: "Chrysalis", image: "story-butterfly-3.png" },
-      { id: "story-butterfly-4", label: "Butterfly", image: "story-butterfly-4.png" },
+      { id: "story-butterfly-4", label: "Butterfly", image: "story-butterfly-4.svg" },
     ],
   },
   {
@@ -51,10 +51,10 @@ const STORIES: StoryDefinition[] = [
     id: "toast",
     title: "Make Toast",
     steps: [
-      { id: "story-toast-1", label: "Bread", image: "story-toast-1.png" },
-      { id: "story-toast-2", label: "Into the Toaster", image: "story-toast-2.png" },
-      { id: "story-toast-3", label: "Toast Pops Up", image: "story-toast-3.png" },
-      { id: "story-toast-4", label: "Buttered Toast", image: "story-toast-4.png" },
+      { id: "story-toast-1", label: "Bread", image: "story-toast-1-v2.png" },
+      { id: "story-toast-2", label: "Into the Toaster", image: "story-toast-2-v2.png" },
+      { id: "story-toast-3", label: "Toast Pops Up", image: "story-toast-3-v2.png" },
+      { id: "story-toast-4", label: "Buttered Toast", image: "story-toast-4-v2.png" },
     ],
   },
 ];
