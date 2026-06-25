@@ -3,6 +3,10 @@ import {
   generateY2MeasurelandsWeek1Lesson1Task,
   resetY2MeasurelandsWeek1Lesson1TaskSessionState,
 } from "@/data/activities/year2Measurelands/week1Lesson1";
+import {
+  generateY2MeasurelandsWeek1Lesson2Task,
+  resetY2MeasurelandsWeek1Lesson2TaskSessionState,
+} from "@/data/activities/year2Measurelands/week1Lesson2";
 
 // Level 2 (Year 2) Measurelands lesson registry. Mirrors the Level 1 registry so
 // app/lesson/page.tsx can resolve `y2-measurement-w{n}-l{m}` ids to tasks.
@@ -39,6 +43,24 @@ const Y2_MEASURELANDS_LESSONS: Y2MeasurelandsLessonEntry[] = [
     ],
     completionTitle: "Difference Finder Complete!",
     unlockMessage: "Lesson 2 unlocked.",
+    returnRoute: "/program?year=Year 2&week=1&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y2-measurement-w1-l2",
+    week: 1,
+    lessonNumber: 2,
+    title: "Order by Count",
+    subtitle: "Unit Count Canyon",
+    generate: generateY2MeasurelandsWeek1Lesson2Task,
+    reset: resetY2MeasurelandsWeek1Lesson2TaskSessionState,
+    practisedSkills: [
+      "Ordering objects by unit count",
+      "Comparing measured lengths (trust the count)",
+      "Identifying equal lengths",
+      "Reasoning about how much longer",
+    ],
+    completionTitle: "Measurement Comparer Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
     returnRoute: "/program?year=Year 2&week=1&legacy=1&realm_id=measurement",
   },
 ];
