@@ -79,8 +79,16 @@ function pickObject(memory: LessonMemory): Obj {
   memory.lastObjectId = obj.id;
   return obj;
 }
+const TOOLS_BASE = "/images/measurelands/tools-3d";
+const EVERYDAY_BASE = "/images/measurelands/everyday-3d";
+function toolImg(id: string) {
+  return `${TOOLS_BASE}/tool-${id}.png`;
+}
 function toolOption(id: string) {
-  return { id, label: TOOLS[id]!.label, iconKey: id };
+  return { id, label: TOOLS[id]!.label, iconKey: id, imageSrc: toolImg(id) };
+}
+function toObject(obj: Obj) {
+  return { label: obj.label, iconKey: obj.id, imageSrc: `${EVERYDAY_BASE}/object-${obj.id}.png` };
 }
 
 function buildIntroTask(): ToolTask {
@@ -106,7 +114,7 @@ function buildBestTask(memory: LessonMemory): ToolTask {
     prompt: `What is the best tool to measure the ${obj.label.toLowerCase()}?`,
     speakText: `What is the best tool to measure the ${obj.label.toLowerCase()}?`,
     badgeLabel: "Choose the Best Tool",
-    object: { label: obj.label, iconKey: obj.id },
+    object: toObject(obj),
     tools,
     correctToolId: best,
     feedback: { correct: `Yes — a ${TOOLS[best]!.label.toLowerCase()} is just right!`, wrong: "Think about the size of the object, then match the tool." },
@@ -126,8 +134,8 @@ function buildWhyBadTask(memory: LessonMemory): ToolTask {
     prompt: `Why is a ${TOOLS[wrongId]!.label.toLowerCase()} a bad tool for the ${obj.label.toLowerCase()}?`,
     speakText: `Why is a ${TOOLS[wrongId]!.label.toLowerCase()} a bad tool for the ${obj.label.toLowerCase()}?`,
     badgeLabel: "Why Is This Tool Bad?",
-    object: { label: obj.label, iconKey: obj.id },
-    wrongTool: { label: TOOLS[wrongId]!.label, iconKey: wrongId },
+    object: toObject(obj),
+    wrongTool: { label: TOOLS[wrongId]!.label, iconKey: wrongId, imageSrc: toolImg(wrongId) },
     reasonOptions: ["Too small", "Too big", "Hard to use"],
     correctReason: reason,
     feedback: { correct: "Good detective work!", wrong: "Think about the tool's size next to the object's size." },
@@ -144,7 +152,7 @@ function buildWhyBestTask(memory: LessonMemory): ToolTask {
     prompt: `A ${TOOLS[best]!.label.toLowerCase()} is the best tool for the ${obj.label.toLowerCase()}. Why?`,
     speakText: `A ${TOOLS[best]!.label.toLowerCase()} is the best tool for the ${obj.label.toLowerCase()}. Why is it the best?`,
     badgeLabel: "Measuring Detective",
-    object: { label: obj.label, iconKey: obj.id },
+    object: toObject(obj),
     reasonOptions: shuffle(["Just the right size", "Too small to reach", "Too big to use"]),
     correctReason: "Just the right size",
     feedback: { correct: "Yes — the right tool is fast and easy!", wrong: "The best tool fits the object just right." },

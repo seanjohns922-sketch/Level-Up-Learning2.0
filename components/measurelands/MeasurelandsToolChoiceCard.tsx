@@ -93,7 +93,7 @@ function IntroScene({ task, onCorrect }: { task: ToolTask; onCorrect: () => void
         <div className="grid grid-cols-5 gap-2">
           {toolLegend.map((t) => (
             <div key={t.k} className="flex flex-col items-center gap-1 rounded-[18px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.95)] px-1 py-3 text-center">
-              <Glyph label={t.n} iconKey={t.k} />
+              <Glyph label={t.n} iconKey={t.k} imageSrc={`/images/measurelands/tools-3d/tool-${t.k}.png`} />
               <span className="text-[11px] font-black leading-tight text-[#2c1c07]">{t.n}</span>
               <span className="text-[10px] font-bold leading-tight text-[#a98b52]">for {t.f}</span>
             </div>
