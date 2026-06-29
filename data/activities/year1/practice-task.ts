@@ -615,12 +615,15 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "count" | "compare" | "order" | "equal" | "fairChoose" | "fairJudge" | "fairFix";
-      /** "count": one object balancing this many cubes; MCQ on the cube count. */
+      // Year 2 adds "difference": two measured objects + MCQ on "how many more
+      // cubes" (reasoning about the gap between measured masses).
+      scene: "intro" | "count" | "compare" | "order" | "equal" | "fairChoose" | "fairJudge" | "fairFix" | "difference";
+      /** "count": one object balancing this many cubes; MCQ on the cube count.
+       *  "difference": MCQ answer is the cube difference between the two items. */
       object?: { imageSrc?: string; label: string; cubes: number };
       options?: number[];
       correctAnswer?: number;
-      /** "compare"/"order"/"equal": measured objects shown on balance scales. */
+      /** "compare"/"order"/"equal"/"difference": measured objects on balance scales. */
       items?: Array<{ id: string; imageSrc?: string; label: string; cubes: number }>;
       compareMode?: "greater" | "less";
       correctOptionId?: string;

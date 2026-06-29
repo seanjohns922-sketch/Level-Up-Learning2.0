@@ -427,5 +427,35 @@ export function MeasurelandsMassMeasureCard({
   if (task.scene === "fairChoose") return <FairChooseScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "fairJudge") return <FairJudgeScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "fairFix") return <FairFixScene task={task} onCorrect={onCorrect} />;
+  if (task.scene === "difference") return <DifferenceScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   return <CountScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+}
+
+/* ── Year 2: how many MORE cubes? (two measured masses + number MCQ) ── */
+function DifferenceScene({ task, onCorrect, onWrong }: { task: MassTask; onCorrect: () => void; onWrong: () => void }) {
+  const items = task.items ?? [];
+  return (
+    <Shell badge={task.badgeLabel ?? "How Many More?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {items.map((item) => (
+          <div key={item.id} className="rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-2">
+            <BalanceScale imageSrc={item.imageSrc} label={item.label} cubes={item.cubes} compact />
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        {(task.options ?? []).map((value) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => (value === task.correctAnswer ? onCorrect() : onWrong())}
+            className="relative flex min-h-[88px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-5xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+          >
+            <span className="absolute right-3 top-3 z-10"><OptionReadAloudButton text={String(value)} /></span>
+            {value}
+          </button>
+        ))}
+      </div>
+    </Shell>
+  );
 }
