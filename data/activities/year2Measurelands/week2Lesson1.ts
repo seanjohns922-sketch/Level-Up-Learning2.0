@@ -14,8 +14,8 @@ import { MASS_OBJECTS, type MassObject } from "@/data/activities/year1Measurelan
 
 type MassTask = Extract<PracticeTask, { kind: "massMeasure" }>;
 
-// Reuse the shared pool; keep masses in the Year-2 range 2..12.
-const POOL: MassObject[] = MASS_OBJECTS.filter((o) => o.cubes >= 2 && o.cubes <= 12);
+// Reuse the shared (mass-audited) pool, full 1..12 range.
+const POOL: MassObject[] = MASS_OBJECTS.filter((o) => o.cubes >= 1 && o.cubes <= 12);
 
 type LessonMemory = { introShown: boolean; cursor: number; lastKey: string | null };
 const lessonMemory = new Map<string, LessonMemory>();

@@ -19,23 +19,26 @@ const BASE = "/images/measurelands/week2-3d";
 export type MassObject = { id: string; label: string; image: string; cubes: number; look: number };
 
 export const MASS_OBJECTS: MassObject[] = [
-  { id: "feather", label: "Feather", image: `${BASE}/feather.png`, cubes: 2, look: 4 },
-  { id: "leaf", label: "Leaf", image: `${BASE}/leaf.png`, cubes: 2, look: 4 },
+  // `cubes` audited for real-life plausibility on a 1–12 scale (relative mass),
+  // keeping a few equal-mass pairs (for "find the same mass") and the size-vs-
+  // mass busters (`look` differs from `cubes`).
+  { id: "feather", label: "Feather", image: `${BASE}/feather.png`, cubes: 1, look: 4 },
+  { id: "leaf", label: "Leaf", image: `${BASE}/leaf.png`, cubes: 1, look: 4 },
+  { id: "spoon", label: "Spoon", image: `${BASE}/spoon.png`, cubes: 2, look: 3 },
   { id: "coin", label: "Coin", image: `${BASE}/coin.png`, cubes: 3, look: 1 },
-  { id: "apple", label: "Apple", image: `${BASE}/apple.png`, cubes: 3, look: 2 },
-  { id: "spoon", label: "Spoon", image: `${BASE}/spoon.png`, cubes: 4, look: 3 },
+  { id: "apple", label: "Apple", image: `${BASE}/apple.png`, cubes: 4, look: 2 },
   { id: "boot", label: "Shoe", image: `${BASE}/boot.png`, cubes: 5, look: 3 },
   { id: "bucket", label: "Bucket", image: `${BASE}/bucket.png`, cubes: 5, look: 4 },
-  { id: "backpack", label: "Backpack", image: `${BASE}/backpack.png`, cubes: 6, look: 4 },
-  { id: "watermelon", label: "Watermelon", image: `${BASE}/watermelon.png`, cubes: 8, look: 5 },
-  { id: "rock", label: "Rock", image: `${BASE}/rock.png`, cubes: 9, look: 2 },
-  { id: "chair", label: "Chair", image: `${BASE}/chair.png`, cubes: 9, look: 5 },
-  { id: "elephant", label: "Elephant", image: `${BASE}/elephant.png`, cubes: 10, look: 5 },
-  // New big-light / small-heavy busters.
+  { id: "backpack", label: "Backpack", image: `${BASE}/backpack.png`, cubes: 7, look: 4 },
+  { id: "watermelon", label: "Watermelon", image: `${BASE}/watermelon.png`, cubes: 9, look: 5 },
+  { id: "rock", label: "Rock", image: `${BASE}/rock.png`, cubes: 8, look: 2 },
+  { id: "chair", label: "Chair", image: `${BASE}/chair.png`, cubes: 10, look: 5 },
+  { id: "elephant", label: "Elephant", image: `${BASE}/elephant.png`, cubes: 12, look: 5 },
+  // Big-light / small-heavy busters (size on screen != mass).
   { id: "balloon", label: "Balloon", image: `${BASE}/balloon.png`, cubes: 2, look: 5 },
-  { id: "soccer-ball", label: "Soccer Ball", image: `${BASE}/soccer-ball.png`, cubes: 3, look: 5 },
-  { id: "pumpkin", label: "Pumpkin", image: `${BASE}/pumpkin.png`, cubes: 5, look: 5 },
-  { id: "book", label: "Book", image: `${BASE}/book.png`, cubes: 7, look: 2 },
+  { id: "soccer-ball", label: "Soccer Ball", image: `${BASE}/soccer-ball.png`, cubes: 2, look: 5 },
+  { id: "pumpkin", label: "Pumpkin", image: `${BASE}/pumpkin.png`, cubes: 8, look: 5 },
+  { id: "book", label: "Book", image: `${BASE}/book.png`, cubes: 4, look: 2 },
 ];
 
 const BY_ID: Record<string, MassObject> = Object.fromEntries(MASS_OBJECTS.map((o) => [o.id, o]));
