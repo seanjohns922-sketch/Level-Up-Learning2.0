@@ -15,6 +15,10 @@ import {
   generateY2MeasurelandsWeek2Lesson1Task,
   resetY2MeasurelandsWeek2Lesson1TaskSessionState,
 } from "@/data/activities/year2Measurelands/week2Lesson1";
+import {
+  generateY2MeasurelandsWeek2Lesson2Task,
+  resetY2MeasurelandsWeek2Lesson2TaskSessionState,
+} from "@/data/activities/year2Measurelands/week2Lesson2";
 
 // Level 2 (Year 2) Measurelands lesson registry. Mirrors the Level 1 registry so
 // app/lesson/page.tsx can resolve `y2-measurement-w{n}-l{m}` ids to tasks.
@@ -105,6 +109,24 @@ const Y2_MEASURELANDS_LESSONS: Y2MeasurelandsLessonEntry[] = [
     ],
     completionTitle: "Mass Measurer Complete!",
     unlockMessage: "Lesson 2 unlocked.",
+    returnRoute: "/program?year=Year 2&week=2&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y2-measurement-w2-l2",
+    week: 2,
+    lessonNumber: 2,
+    title: "By How Many?",
+    subtitle: "Balance Basin",
+    generate: generateY2MeasurelandsWeek2Lesson2Task,
+    reset: resetY2MeasurelandsWeek2Lesson2TaskSessionState,
+    practisedSkills: [
+      "Ordering objects by measured mass",
+      "Finding how many more cubes one object measures",
+      "Identifying equal masses",
+      "Reasoning with balance-cube counts",
+    ],
+    completionTitle: "Mass Comparer Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
     returnRoute: "/program?year=Year 2&week=2&legacy=1&realm_id=measurement",
   },
 ];
