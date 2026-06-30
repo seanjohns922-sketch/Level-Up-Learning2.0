@@ -74,6 +74,8 @@ import { buildY1MeasurelandsWeek3QuizTasks } from "@/data/activities/year1Measur
 import { buildY1MeasurelandsWeek4QuizTasks } from "@/data/activities/year1Measurelands/week4Quiz";
 import { buildY1MeasurelandsWeek5QuizTasks } from "@/data/activities/year1Measurelands/week5Quiz";
 import { buildY1MeasurelandsWeek6QuizTasks } from "@/data/activities/year1Measurelands/week6Quiz";
+import { buildY2MeasurelandsWeek1QuizTasks } from "@/data/activities/year2Measurelands/week1Quiz";
+import { buildY2MeasurelandsWeek2QuizTasks } from "@/data/activities/year2Measurelands/week2Quiz";
 import { buildY1MeasurelandsWeek7QuizTasks } from "@/data/activities/year1Measurelands/week7Quiz";
 import { buildMeasurelandsWeek2QuizTasks } from "@/data/activities/prepMeasurelands/week2Quiz";
 import { buildMeasurelandsWeek3QuizTasks } from "@/data/activities/prepMeasurelands/week3Quiz";
@@ -1738,6 +1740,41 @@ function buildY1MeasurelandsWeek6WeeklyQuizQuestions(
       `y1w6mq${index + 1}`,
       lessonNumber,
       `y1_measurelands_w6_l${lessonNumber}_q${(index % questionsPerLesson) + 1}`,
+      task as GroundQuizPracticeTask
+    );
+  });
+}
+
+// Measurelands · Level 2 (Year 2) weekly quizzes — 15 questions (5 per lesson).
+function buildY2MeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson: number): QuizQuestion[] {
+  const totalExpected = questionsPerLesson * 3;
+  const tasks = buildY2MeasurelandsWeek1QuizTasks();
+  if (tasks.length !== totalExpected) {
+    throw new Error(`[MeasurelandsWeeklyQuiz] Y2 Week 1 expected ${totalExpected} questions, received ${tasks.length}.`);
+  }
+  return tasks.map((task, index) => {
+    const lessonNumber = (Math.floor(index / questionsPerLesson) + 1) as 1 | 2 | 3;
+    return buildGroundQuizQuestion(
+      `y2w1mq${index + 1}`,
+      lessonNumber,
+      `y2_measurelands_w1_l${lessonNumber}_q${(index % questionsPerLesson) + 1}`,
+      task as GroundQuizPracticeTask
+    );
+  });
+}
+
+function buildY2MeasurelandsWeek2WeeklyQuizQuestions(questionsPerLesson: number): QuizQuestion[] {
+  const totalExpected = questionsPerLesson * 3;
+  const tasks = buildY2MeasurelandsWeek2QuizTasks();
+  if (tasks.length !== totalExpected) {
+    throw new Error(`[MeasurelandsWeeklyQuiz] Y2 Week 2 expected ${totalExpected} questions, received ${tasks.length}.`);
+  }
+  return tasks.map((task, index) => {
+    const lessonNumber = (Math.floor(index / questionsPerLesson) + 1) as 1 | 2 | 3;
+    return buildGroundQuizQuestion(
+      `y2w2mq${index + 1}`,
+      lessonNumber,
+      `y2_measurelands_w2_l${lessonNumber}_q${(index % questionsPerLesson) + 1}`,
       task as GroundQuizPracticeTask
     );
   });
@@ -7139,6 +7176,14 @@ function SessionPage({
 
     if (isMeasurementRealm && year === "Year 1" && Number(week) === 6) {
       return buildY1MeasurelandsWeek6WeeklyQuizQuestions(questionsPerLesson);
+    }
+
+    if (isMeasurementRealm && year === "Year 2" && Number(week) === 1) {
+      return buildY2MeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson);
+    }
+
+    if (isMeasurementRealm && year === "Year 2" && Number(week) === 2) {
+      return buildY2MeasurelandsWeek2WeeklyQuizQuestions(questionsPerLesson);
     }
 
     if (isMeasurementRealm && year === "Year 1" && Number(week) === 7) {
