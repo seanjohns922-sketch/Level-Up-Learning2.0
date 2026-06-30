@@ -11,18 +11,18 @@ const BASE = "/images/measurelands/containers-3d";
 type CapacityContainer = { id: string; label: string; image: string; cups: number; look: number };
 
 const POOL: CapacityContainer[] = [
-  { id: "cup", label: "Cup", image: `${BASE}/cup.png`, cups: 4, look: 1 },
-  { id: "mug", label: "Mug", image: `${BASE}/mug.png`, cups: 5, look: 2 },
-  { id: "bottle", label: "Bottle", image: `${BASE}/bottle.png`, cups: 7, look: 2 },
-  { id: "teapot", label: "Teapot", image: `${BASE}/teapot.png`, cups: 8, look: 3 },
-  { id: "kettle", label: "Kettle", image: `${BASE}/kettle.png`, cups: 9, look: 3 },
-  { id: "jug", label: "Jug", image: `${BASE}/jug.png`, cups: 10, look: 3 },
-  { id: "measuring-jug", label: "Measuring Jug", image: `${BASE}/measuring-jug.png`, cups: 11, look: 3 },
-  { id: "watering-can", label: "Watering Can", image: `${BASE}/watering-can.png`, cups: 13, look: 4 },
-  { id: "pot", label: "Pot", image: `${BASE}/pot.png`, cups: 14, look: 4 },
-  { id: "bucket", label: "Bucket", image: `${BASE}/bucket.png`, cups: 16, look: 4 },
-  { id: "fish-tank", label: "Fish Tank", image: `${BASE}/fish-tank.png`, cups: 18, look: 5 },
-  { id: "bathtub", label: "Bathtub", image: `${BASE}/bathtub.png`, cups: 20, look: 5 },
+  { id: "cup", label: "Cup", image: `${BASE}/cup.png`, cups: 2, look: 1 },
+  { id: "mug", label: "Mug", image: `${BASE}/mug.png`, cups: 3, look: 2 },
+  { id: "bottle", label: "Bottle", image: `${BASE}/bottle.png`, cups: 4, look: 2 },
+  { id: "measuring-jug", label: "Measuring Jug", image: `${BASE}/measuring-jug.png`, cups: 4, look: 3 },
+  { id: "teapot", label: "Teapot", image: `${BASE}/teapot.png`, cups: 6, look: 3 },
+  { id: "kettle", label: "Kettle", image: `${BASE}/kettle.png`, cups: 7, look: 3 },
+  { id: "jug", label: "Jug", image: `${BASE}/jug.png`, cups: 8, look: 3 },
+  { id: "pot", label: "Pot", image: `${BASE}/pot.png`, cups: 12, look: 4 },
+  { id: "watering-can", label: "Watering Can", image: `${BASE}/watering-can.png`, cups: 16, look: 4 },
+  { id: "bucket", label: "Bucket", image: `${BASE}/bucket.png`, cups: 20, look: 4 },
+  { id: "fish-tank", label: "Fish Tank", image: `${BASE}/fish-tank.png`, cups: 32, look: 5 },
+  { id: "bathtub", label: "Bathtub", image: `${BASE}/bathtub.png`, cups: 40, look: 5 },
 ];
 
 const BY_ID: Record<string, CapacityContainer> = Object.fromEntries(POOL.map((c) => [c.id, c]));
@@ -60,16 +60,16 @@ function item(c: CapacityContainer) {
   return { id: c.id, imageSrc: c.image, label: c.label, cups: c.cups };
 }
 
-function numberOptions(correct: number, max = 22): number[] {
-  const candidates = [correct - 2, correct - 1, correct + 1, correct + 2, correct + 3].filter(
+function numberOptions(correct: number, max = 44): number[] {
+  const candidates = [correct - 4, correct - 2, correct - 1, correct + 1, correct + 2, correct + 4].filter(
     (n) => n >= 1 && n <= max && n !== correct,
   );
   return shuffle([correct, ...shuffle([...new Set(candidates)]).slice(0, 2)]);
 }
 
 function differenceOptions(correct: number): number[] {
-  const candidates = [correct - 2, correct - 1, correct + 1, correct + 2, correct + 3].filter(
-    (n) => n >= 1 && n <= 10 && n !== correct,
+  const candidates = [correct - 4, correct - 2, correct - 1, correct + 1, correct + 2, correct + 4].filter(
+    (n) => n >= 1 && n <= 20 && n !== correct,
   );
   return shuffle([correct, ...shuffle([...new Set(candidates)]).slice(0, 2)]);
 }
@@ -85,7 +85,7 @@ function pickPair(memory: LessonMemory, misleading: boolean): [CapacityContainer
   let fallback: [CapacityContainer, CapacityContainer] | null = null;
   for (let attempt = 0; attempt < 80; attempt += 1) {
     const a = choose(POOL);
-    const b = choose(POOL.filter((c) => c.id !== a.id && c.cups !== a.cups && Math.abs(c.cups - a.cups) <= 8));
+    const b = choose(POOL.filter((c) => c.id !== a.id && c.cups !== a.cups && Math.abs(c.cups - a.cups) <= 16));
     if (!b) continue;
     const key = [a.id, b.id].sort().join("|");
     if (key === memory.lastKey) continue;
@@ -111,8 +111,8 @@ function buildIntroTask(): CapacityTask {
       "Professor Gauge says: Level Two measurers count larger cup measurements, compare them, and find how many more cups one container holds. The cups tell us the capacity, not just the container picture.",
     badgeLabel: "Meazurex Mission",
     teachingItems: [
-      { imageSrc: BY_ID.bottle!.image, label: "Bottle", cups: 7, caption: "The bottle holds 7 cups." },
-      { imageSrc: BY_ID.pot!.image, label: "Pot", cups: 14, caption: "The pot holds 14 cups — that is 7 more cups." },
+      { imageSrc: BY_ID.bottle!.image, label: "Bottle", cups: 4, caption: "The bottle holds 4 cups." },
+      { imageSrc: BY_ID.pot!.image, label: "Pot", cups: 12, caption: "The pot holds 12 cups — that is 8 more cups." },
     ],
     feedback: { correct: "Let's count the cups.", wrong: "Let's get ready." },
   };
