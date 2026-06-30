@@ -428,7 +428,37 @@ export function MeasurelandsMassMeasureCard({
   if (task.scene === "fairJudge") return <FairJudgeScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "fairFix") return <FairFixScene task={task} onCorrect={onCorrect} />;
   if (task.scene === "difference") return <DifferenceScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "reason") return <ReasonScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   return <CountScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+}
+
+/* ── Year 2: prove it — why does one object have greater mass? (text MCQ) ── */
+function ReasonScene({ task, onCorrect, onWrong }: { task: MassTask; onCorrect: () => void; onWrong: () => void }) {
+  const items = task.items ?? [];
+  return (
+    <Shell badge={task.badgeLabel ?? "Prove It"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {items.map((item) => (
+          <div key={item.id} className="rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-2">
+            <BalanceScale imageSrc={item.imageSrc} label={item.label} cubes={item.cubes} compact />
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-1 gap-3">
+        {(task.textOptions ?? []).map((value) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => (value === task.correctTextOption ? onCorrect() : onWrong())}
+            className="relative flex min-h-[64px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-4 text-center text-lg font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+          >
+            <span className="absolute right-2 top-2 z-10"><OptionReadAloudButton text={value} /></span>
+            {value}
+          </button>
+        ))}
+      </div>
+    </Shell>
+  );
 }
 
 /* ── Year 2: how many MORE cubes? (two measured masses + number MCQ) ── */

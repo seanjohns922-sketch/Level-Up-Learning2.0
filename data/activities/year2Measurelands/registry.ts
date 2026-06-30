@@ -2,27 +2,38 @@ import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-
 import {
   generateY2MeasurelandsWeek1Lesson1Task,
   resetY2MeasurelandsWeek1Lesson1TaskSessionState,
+  buildY2MeasurelandsWeek1Lesson1QuizTasks,
 } from "@/data/activities/year2Measurelands/week1Lesson1";
 import {
   generateY2MeasurelandsWeek1Lesson2Task,
   resetY2MeasurelandsWeek1Lesson2TaskSessionState,
+  buildY2MeasurelandsWeek1Lesson2QuizTasks,
 } from "@/data/activities/year2Measurelands/week1Lesson2";
 import {
   generateY2MeasurelandsWeek1Lesson3Task,
   resetY2MeasurelandsWeek1Lesson3TaskSessionState,
+  buildY2MeasurelandsWeek1Lesson3QuizTasks,
 } from "@/data/activities/year2Measurelands/week1Lesson3";
 import {
   generateY2MeasurelandsWeek2Lesson1Task,
   resetY2MeasurelandsWeek2Lesson1TaskSessionState,
+  buildY2MeasurelandsWeek2Lesson1QuizTasks,
 } from "@/data/activities/year2Measurelands/week2Lesson1";
 import {
   generateY2MeasurelandsWeek2Lesson2Task,
   resetY2MeasurelandsWeek2Lesson2TaskSessionState,
+  buildY2MeasurelandsWeek2Lesson2QuizTasks,
 } from "@/data/activities/year2Measurelands/week2Lesson2";
+import {
+  generateY2MeasurelandsWeek2Lesson3Task,
+  resetY2MeasurelandsWeek2Lesson3TaskSessionState,
+  buildY2MeasurelandsWeek2Lesson3QuizTasks,
+} from "@/data/activities/year2Measurelands/week2Lesson3";
 
 // Level 2 (Year 2) Measurelands lesson registry. Mirrors the Level 1 registry so
 // app/lesson/page.tsx can resolve `y2-measurement-w{n}-l{m}` ids to tasks.
-// No quizContributionBuilder in Level 2 — a post-test is coded last.
+// Each lesson contributes exactly 5 quiz/post-test questions via
+// quizContributionBuilder (the weekly-quiz/post-test UI is wired last).
 // See MEASURELANDS_LEVEL2_PLAN.md.
 type Y2MeasurelandsLessonEntry = {
   prefix: string;
@@ -36,6 +47,7 @@ type Y2MeasurelandsLessonEntry = {
   completionTitle: string;
   unlockMessage: string;
   returnRoute: string;
+  quizContributionBuilder?: () => PracticeTask[];
 };
 
 const Y2_MEASURELANDS_LESSONS: Y2MeasurelandsLessonEntry[] = [
@@ -47,6 +59,7 @@ const Y2_MEASURELANDS_LESSONS: Y2MeasurelandsLessonEntry[] = [
     subtitle: "Unit Count Canyon",
     generate: generateY2MeasurelandsWeek1Lesson1Task,
     reset: resetY2MeasurelandsWeek1Lesson1TaskSessionState,
+    quizContributionBuilder: buildY2MeasurelandsWeek1Lesson1QuizTasks,
     practisedSkills: [
       "Measuring length in uniform units",
       "Finding how many more units one object is",
@@ -65,6 +78,7 @@ const Y2_MEASURELANDS_LESSONS: Y2MeasurelandsLessonEntry[] = [
     subtitle: "Unit Count Canyon",
     generate: generateY2MeasurelandsWeek1Lesson2Task,
     reset: resetY2MeasurelandsWeek1Lesson2TaskSessionState,
+    quizContributionBuilder: buildY2MeasurelandsWeek1Lesson2QuizTasks,
     practisedSkills: [
       "Ordering objects by unit count",
       "Comparing measured lengths (trust the count)",
@@ -83,6 +97,7 @@ const Y2_MEASURELANDS_LESSONS: Y2MeasurelandsLessonEntry[] = [
     subtitle: "Unit Count Canyon",
     generate: generateY2MeasurelandsWeek1Lesson3Task,
     reset: resetY2MeasurelandsWeek1Lesson3TaskSessionState,
+    quizContributionBuilder: buildY2MeasurelandsWeek1Lesson3QuizTasks,
     practisedSkills: [
       "Choosing the best measuring tool",
       "Explaining why a tool is a poor fit",
@@ -101,6 +116,7 @@ const Y2_MEASURELANDS_LESSONS: Y2MeasurelandsLessonEntry[] = [
     subtitle: "Balance Basin",
     generate: generateY2MeasurelandsWeek2Lesson1Task,
     reset: resetY2MeasurelandsWeek2Lesson1TaskSessionState,
+    quizContributionBuilder: buildY2MeasurelandsWeek2Lesson1QuizTasks,
     practisedSkills: [
       "Reading a measured mass in balance cubes",
       "Comparing measured masses (trust the cubes)",
@@ -119,6 +135,7 @@ const Y2_MEASURELANDS_LESSONS: Y2MeasurelandsLessonEntry[] = [
     subtitle: "Balance Basin",
     generate: generateY2MeasurelandsWeek2Lesson2Task,
     reset: resetY2MeasurelandsWeek2Lesson2TaskSessionState,
+    quizContributionBuilder: buildY2MeasurelandsWeek2Lesson2QuizTasks,
     practisedSkills: [
       "Ordering objects by measured mass",
       "Finding how many more cubes one object measures",
@@ -127,6 +144,25 @@ const Y2_MEASURELANDS_LESSONS: Y2MeasurelandsLessonEntry[] = [
     ],
     completionTitle: "Mass Comparer Complete!",
     unlockMessage: "Lesson 3 unlocked.",
+    returnRoute: "/program?year=Year 2&week=2&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y2-measurement-w2-l3",
+    week: 2,
+    lessonNumber: 3,
+    title: "Predict & Prove",
+    subtitle: "Balance Basin",
+    generate: generateY2MeasurelandsWeek2Lesson3Task,
+    reset: resetY2MeasurelandsWeek2Lesson3TaskSessionState,
+    quizContributionBuilder: buildY2MeasurelandsWeek2Lesson3QuizTasks,
+    practisedSkills: [
+      "Proving which object has greater mass",
+      "Trusting the cubes over appearance",
+      "Reasoning with measured mass",
+      "Finding how many more cubes",
+    ],
+    completionTitle: "Mass Reasoner Complete!",
+    unlockMessage: "Week complete.",
     returnRoute: "/program?year=Year 2&week=2&legacy=1&realm_id=measurement",
   },
 ];

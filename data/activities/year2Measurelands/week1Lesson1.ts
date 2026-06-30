@@ -145,3 +145,15 @@ export function generateY2MeasurelandsWeek1Lesson1Task(
 export function resetY2MeasurelandsWeek1Lesson1TaskSessionState() {
   lessonMemory.clear();
 }
+
+// 5 fixed tasks for the weekly quiz / post-test: how-many-more / fewer.
+export function buildY2MeasurelandsWeek1Lesson1QuizTasks(): PracticeTask[] {
+  const seed: LessonMemory = { introShown: true, cursor: 0, lastKey: null };
+  return [
+    buildDifferenceTask(seed, "more"),
+    buildDifferenceTask(seed, "fewer"),
+    buildDifferenceTask(seed, "more"),
+    buildDifferenceTask(seed, "fewer"),
+    buildDifferenceTask(seed, "more"),
+  ];
+}

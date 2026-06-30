@@ -178,3 +178,15 @@ export function generateY2MeasurelandsWeek1Lesson3Task(
 export function resetY2MeasurelandsWeek1Lesson3TaskSessionState() {
   lessonMemory.clear();
 }
+
+// 5 fixed tasks for the weekly quiz / post-test: best, whyBad, whyBest, best, whyBad.
+export function buildY2MeasurelandsWeek1Lesson3QuizTasks(): PracticeTask[] {
+  const seed: LessonMemory = { introShown: true, cursor: 0, lastObjectId: null };
+  return [
+    buildBestTask(seed),
+    buildWhyBadTask(seed),
+    buildWhyBestTask(seed),
+    buildBestTask(seed),
+    buildWhyBadTask(seed),
+  ];
+}

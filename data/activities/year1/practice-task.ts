@@ -615,9 +615,9 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      // Year 2 adds "difference": two measured objects + MCQ on "how many more
-      // cubes" (reasoning about the gap between measured masses).
-      scene: "intro" | "count" | "compare" | "order" | "equal" | "fairChoose" | "fairJudge" | "fairFix" | "difference";
+      // Year 2 adds "difference" (MCQ on "how many more cubes") and "reason"
+      // (two measured objects + a text MCQ justifying which has greater mass).
+      scene: "intro" | "count" | "compare" | "order" | "equal" | "fairChoose" | "fairJudge" | "fairFix" | "difference" | "reason";
       /** "count": one object balancing this many cubes; MCQ on the cube count.
        *  "difference": MCQ answer is the cube difference between the two items. */
       object?: { imageSrc?: string; label: string; cubes: number };
@@ -627,6 +627,9 @@ export type PracticeTask = (
       items?: Array<{ id: string; imageSrc?: string; label: string; cubes: number }>;
       compareMode?: "greater" | "less";
       correctOptionId?: string;
+      /** "reason": text options justifying which object has greater mass. */
+      textOptions?: string[];
+      correctTextOption?: string;
       /** "compare": hide the "· N cubes" labels (e.g. "which measures 5 cubes?"). */
       hideCounts?: boolean;
       /** "order": correct order of item ids (lightest→heaviest or reverse). */

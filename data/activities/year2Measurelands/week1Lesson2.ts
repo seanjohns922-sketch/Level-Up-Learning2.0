@@ -230,3 +230,15 @@ export function generateY2MeasurelandsWeek1Lesson2Task(
 export function resetY2MeasurelandsWeek1Lesson2TaskSessionState() {
   lessonMemory.clear();
 }
+
+// 5 fixed tasks for the weekly quiz / post-test: order x2 (3 & 4), compare, same, difference.
+export function buildY2MeasurelandsWeek1Lesson2QuizTasks(): PracticeTask[] {
+  const seed: LessonMemory = { introShown: true, cursor: 0, orderSize: 3, lastKey: null };
+  return [
+    buildOrderTask(seed, 3),
+    buildOrderTask(seed, 4),
+    buildCompareTask(seed),
+    buildSameTask(seed),
+    buildDifferenceTask(seed),
+  ];
+}
