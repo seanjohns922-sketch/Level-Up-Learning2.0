@@ -8,9 +8,9 @@ type CapacityTask = Extract<PracticeTask, { kind: "capacityMeasure" }>;
 
 const BASE = "/images/measurelands/containers-3d";
 
-type CapacityContainer = { id: string; label: string; image: string; cups: number; look: number };
+export type Y2CapacityContainer = { id: string; label: string; image: string; cups: number; look: number };
 
-const POOL: CapacityContainer[] = [
+export const Y2_CAPACITY_CONTAINERS: Y2CapacityContainer[] = [
   { id: "cup", label: "Cup", image: `${BASE}/cup.png`, cups: 2, look: 1 },
   { id: "mug", label: "Mug", image: `${BASE}/mug.png`, cups: 3, look: 2 },
   { id: "bottle", label: "Bottle", image: `${BASE}/bottle.png`, cups: 4, look: 2 },
@@ -25,7 +25,8 @@ const POOL: CapacityContainer[] = [
   { id: "bathtub", label: "Bathtub", image: `${BASE}/bathtub.png`, cups: 40, look: 5 },
 ];
 
-const BY_ID: Record<string, CapacityContainer> = Object.fromEntries(POOL.map((c) => [c.id, c]));
+const POOL = Y2_CAPACITY_CONTAINERS;
+const BY_ID: Record<string, Y2CapacityContainer> = Object.fromEntries(POOL.map((c) => [c.id, c]));
 
 type LessonMemory = { introShown: boolean; cursor: number; lastKey: string | null };
 const lessonMemory = new Map<string, LessonMemory>();
@@ -56,7 +57,7 @@ function choose<T>(items: T[]): T {
   return items[randInt(items.length)]!;
 }
 
-function item(c: CapacityContainer) {
+export function toY2CapacityItem(c: Y2CapacityContainer) {
   return { id: c.id, imageSrc: c.image, label: c.label, cups: c.cups };
 }
 
@@ -74,15 +75,15 @@ function differenceOptions(correct: number): number[] {
   return shuffle([correct, ...shuffle([...new Set(candidates)]).slice(0, 2)]);
 }
 
-function pickContainer(memory: LessonMemory): CapacityContainer {
+function pickContainer(memory: LessonMemory): Y2CapacityContainer {
   const candidates = POOL.filter((c) => c.id !== memory.lastKey);
   const selected = choose(candidates.length ? candidates : POOL);
   memory.lastKey = selected.id;
   return selected;
 }
 
-function pickPair(memory: LessonMemory, misleading: boolean): [CapacityContainer, CapacityContainer] {
-  let fallback: [CapacityContainer, CapacityContainer] | null = null;
+function pickPair(memory: LessonMemory, misleading: boolean): [Y2CapacityContainer, Y2CapacityContainer] {
+  let fallback: [Y2CapacityContainer, Y2CapacityContainer] | null = null;
   for (let attempt = 0; attempt < 80; attempt += 1) {
     const a = choose(POOL);
     const b = choose(POOL.filter((c) => c.id !== a.id && c.cups !== a.cups && Math.abs(c.cups - a.cups) <= 16));
@@ -126,7 +127,7 @@ function buildCountTask(memory: LessonMemory): CapacityTask {
     prompt: `How many cups does the ${c.label.toLowerCase()} hold?`,
     speakText: `Count the cups in rows. How many cups does the ${c.label.toLowerCase()} hold?`,
     badgeLabel: "Count the Cups",
-    container: item(c),
+    container: toY2CapacityItem(c),
     options: numberOptions(c.cups),
     correctAnswer: c.cups,
     feedback: { correct: "You read the capacity measurement.", wrong: "Count the cups carefully. Try rows of five." },
@@ -143,7 +144,7 @@ function buildCompareTask(memory: LessonMemory): CapacityTask {
     prompt: mode === "more" ? "Which container holds more?" : "Which container holds less?",
     speakText: mode === "more" ? "Count the cups. Which container holds more?" : "Count the cups. Which container holds less?",
     badgeLabel: mode === "more" ? "Which Holds More?" : "Which Holds Less?",
-    items: shuffle([item(a), item(b)]),
+    items: shuffle([toY2CapacityItem(a), toY2CapacityItem(b)]),
     compareMode: mode,
     correctOptionId: target.id,
     feedback: { correct: "The cup count proves it.", wrong: "Use the cup count, not the container picture." },
@@ -161,7 +162,7 @@ function buildDifferenceTask(memory: LessonMemory): CapacityTask {
     prompt: `How many more cups does the ${larger.label.toLowerCase()} hold than the ${smaller.label.toLowerCase()}?`,
     speakText: `The ${larger.label.toLowerCase()} holds ${larger.cups} cups. The ${smaller.label.toLowerCase()} holds ${smaller.cups} cups. How many more cups does the ${larger.label.toLowerCase()} hold?`,
     badgeLabel: "How Many More Cups?",
-    items: [item(larger), item(smaller)],
+    items: [toY2CapacityItem(larger), toY2CapacityItem(smaller)],
     options: differenceOptions(diff),
     correctAnswer: diff,
     feedback: { correct: `Yes — ${diff} more ${diff === 1 ? "cup" : "cups"}.`, wrong: "Compare the two cup counts and find the difference." },

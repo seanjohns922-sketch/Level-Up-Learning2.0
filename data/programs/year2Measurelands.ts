@@ -59,7 +59,7 @@ const YEAR2_MEASURELANDS_RAW: WeekPlan[] = [
     curriculum: ["AC9M2M01"],
     lessons: [
       buildLesson(3, 1, "Count the Cups", "Capacity: fill a container with uniform cups and count how many it holds.", ["Count the cups", "Fill with units", "How many it holds"], ["AC9M2M01"]),
-      buildLesson(3, 2, "Holds More by How Many", "Capacity: compare and order containers by how many cups they hold.", ["Holds more", "Order by capacity", "How many more cups"], ["AC9M2M01"]),
+      buildLesson(3, 2, "Order by Capacity", "Capacity: compare and order containers by their measured cup counts.", ["Order measured capacities", "Which holds most", "Same capacity"], ["AC9M2M01"]),
       buildLesson(3, 3, "Choose and Reason", "Capacity: decide which container holds most, justify, and fix a wrong fill.", ["Choose and reason", "Which holds most", "Fix the fill"], ["AC9M2M01"]),
     ],
   },

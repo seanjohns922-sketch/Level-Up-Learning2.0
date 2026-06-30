@@ -291,6 +291,9 @@ function OrderScene({ task, onCorrect, onWrong }: { task: CapacityTask; onCorrec
   const expected = task.orderedIds ?? [];
   const [picked, setPicked] = useState<string[]>([]);
   const [locked, setLocked] = useState(false);
+  const orderHint = task.prompt.toLowerCase().includes("greatest to least")
+    ? "Tap the containers from greatest to least capacity."
+    : "Tap the containers from least to greatest capacity.";
 
   function pick(id: string) {
     if (locked || picked.includes(id)) return;
@@ -313,7 +316,7 @@ function OrderScene({ task, onCorrect, onWrong }: { task: CapacityTask; onCorrec
     <Shell badge={task.badgeLabel ?? "Order the Capacities"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="mb-3 flex min-h-[52px] flex-wrap items-center justify-center gap-2 rounded-[22px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,248,232,0.75)] px-4 py-3">
         {picked.length === 0 ? (
-          <span className="text-sm font-bold text-[#a98b52]">Tap the containers from smallest to largest capacity.</span>
+          <span className="text-sm font-bold text-[#a98b52]">{orderHint}</span>
         ) : (
           picked.map((id, idx) => {
             const it = items.find((c) => c.id === id);

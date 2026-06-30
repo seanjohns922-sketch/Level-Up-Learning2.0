@@ -34,6 +34,11 @@ import {
   resetY2MeasurelandsWeek3Lesson1TaskSessionState,
   buildY2MeasurelandsWeek3Lesson1QuizTasks,
 } from "@/data/activities/year2Measurelands/week3Lesson1";
+import {
+  generateY2MeasurelandsWeek3Lesson2Task,
+  resetY2MeasurelandsWeek3Lesson2TaskSessionState,
+  buildY2MeasurelandsWeek3Lesson2QuizTasks,
+} from "@/data/activities/year2Measurelands/week3Lesson2";
 
 // Level 2 (Year 2) Measurelands lesson registry. Mirrors the Level 1 registry so
 // app/lesson/page.tsx can resolve `y2-measurement-w{n}-l{m}` ids to tasks.
@@ -187,6 +192,25 @@ const Y2_MEASURELANDS_LESSONS: Y2MeasurelandsLessonEntry[] = [
     ],
     completionTitle: "Capacity Counter Complete!",
     unlockMessage: "Lesson 2 unlocked.",
+    returnRoute: "/program?year=Year 2&week=3&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y2-measurement-w3-l2",
+    week: 3,
+    lessonNumber: 2,
+    title: "Order by Capacity",
+    subtitle: "Capacity Springs",
+    generate: generateY2MeasurelandsWeek3Lesson2Task,
+    reset: resetY2MeasurelandsWeek3Lesson2TaskSessionState,
+    quizContributionBuilder: buildY2MeasurelandsWeek3Lesson2QuizTasks,
+    practisedSkills: [
+      "Ordering measured capacities",
+      "Identifying greatest and least capacity",
+      "Recognising equal capacity measurements",
+      "Using cup counts to justify comparisons",
+    ],
+    completionTitle: "Capacity Orderer Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
     returnRoute: "/program?year=Year 2&week=3&legacy=1&realm_id=measurement",
   },
 ];
