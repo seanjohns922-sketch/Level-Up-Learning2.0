@@ -33,7 +33,6 @@ export const WEEK2_MASS_OBJECTS = {
   chair: { id: "chair", label: "Chair", icon: "🪑", imageSrc: `${BASE}/chair.png`, weight: 8 },
   rock: { id: "rock", label: "Rock", icon: "🪨", imageSrc: `${BASE}/rock.png`, weight: 8 },
   watermelon: { id: "watermelon", label: "Watermelon", icon: "🍉", imageSrc: `${BASE}/watermelon.png`, weight: 9 },
-  elephant: { id: "elephant", label: "Elephant", icon: "🐘", imageSrc: `${BASE}/elephant.png`, weight: 10 },
 } as const satisfies Record<string, Week2MassThing>;
 
 export const WEEK2_LIGHT_OBJECTS: Week2MassThing[] = [
@@ -52,7 +51,6 @@ export const WEEK2_HEAVY_OBJECTS: Week2MassThing[] = [
   WEEK2_MASS_OBJECTS.chair,
   WEEK2_MASS_OBJECTS.rock,
   WEEK2_MASS_OBJECTS.watermelon,
-  WEEK2_MASS_OBJECTS.elephant,
 ];
 
 export const WEEK2_TRIO_SETS: Week2MassSet[] = [
@@ -69,8 +67,8 @@ export const WEEK2_TRIO_SETS: Week2MassSet[] = [
     items: [WEEK2_MASS_OBJECTS.coin, WEEK2_MASS_OBJECTS.spoon, WEEK2_MASS_OBJECTS.bucket],
   },
   {
-    setId: "pencil-chair-elephant",
-    items: [WEEK2_MASS_OBJECTS.pencil, WEEK2_MASS_OBJECTS.chair, WEEK2_MASS_OBJECTS.elephant],
+    setId: "pencil-chair-watermelon",
+    items: [WEEK2_MASS_OBJECTS.pencil, WEEK2_MASS_OBJECTS.chair, WEEK2_MASS_OBJECTS.watermelon],
   },
   {
     setId: "feather-apple-watermelon",
@@ -80,8 +78,8 @@ export const WEEK2_TRIO_SETS: Week2MassSet[] = [
 
 export const WEEK2_QUAD_SETS: Week2MassSet[] = [
   {
-    setId: "feather-apple-backpack-elephant",
-    items: [WEEK2_MASS_OBJECTS.feather, WEEK2_MASS_OBJECTS.apple, WEEK2_MASS_OBJECTS.backpack, WEEK2_MASS_OBJECTS.elephant],
+    setId: "feather-apple-backpack-watermelon",
+    items: [WEEK2_MASS_OBJECTS.feather, WEEK2_MASS_OBJECTS.apple, WEEK2_MASS_OBJECTS.backpack, WEEK2_MASS_OBJECTS.watermelon],
   },
   {
     setId: "leaf-spoon-boot-rock",
@@ -104,7 +102,6 @@ export const WEEK2_BALANCE_OBJECTS: Week2MassThing[] = [
   WEEK2_MASS_OBJECTS.bucket,
   WEEK2_MASS_OBJECTS.chair,
   WEEK2_MASS_OBJECTS.coin,
-  WEEK2_MASS_OBJECTS.elephant,
   WEEK2_MASS_OBJECTS.feather,
   WEEK2_MASS_OBJECTS.leaf,
   WEEK2_MASS_OBJECTS.pencil,

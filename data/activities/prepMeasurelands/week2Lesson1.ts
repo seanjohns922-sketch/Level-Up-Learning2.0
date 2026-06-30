@@ -58,11 +58,11 @@ const TEACHING_MOMENTS: NonNullable<CompareTask["teachingMoments"]> = [
     narration: "The rock is heavier. The feather is lighter.",
   },
   {
-    id: "elephant-apple",
+    id: "watermelon-apple",
     title: "Which Pushes Down More?",
-    left: { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.elephant, "leaf") },
+    left: { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.watermelon, "leaf") },
     right: { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.apple, "rose") },
-    narration: "The elephant is heavier. The apple is lighter.",
+    narration: "The watermelon is heavier. The apple is lighter.",
   },
   {
     id: "backpack-coin",

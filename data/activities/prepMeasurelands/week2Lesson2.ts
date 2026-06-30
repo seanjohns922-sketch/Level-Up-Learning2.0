@@ -99,16 +99,16 @@ const TEACHING_MOMENTS: NonNullable<CompareTask["teachingMoments"]> = [
     narration: "Leaf goes first. Boot goes next. Rock goes last because it is heaviest.",
   },
   {
-    id: "coin-chair-elephant",
+    id: "coin-chair-watermelon",
     title: "Heaviest Goes Last",
     objects: [
       { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.coin, "rose") },
       { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.chair, "gold") },
-      { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.elephant, "leaf") },
+      { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.watermelon, "leaf") },
     ],
     left: { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.coin, "rose") },
-    right: { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.elephant, "leaf") },
-    narration: "Coin is lightest. Elephant is heaviest. We line them up from lightest to heaviest.",
+    right: { ...toWeek2MassCompareObject(WEEK2_MASS_OBJECTS.watermelon, "leaf") },
+    narration: "Coin is lightest. Watermelon is heaviest. We line them up from lightest to heaviest.",
   },
 ];
 
