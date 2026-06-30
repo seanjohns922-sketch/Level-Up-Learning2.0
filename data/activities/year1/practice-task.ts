@@ -653,7 +653,7 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "count" | "compare" | "order" | "equal" | "fairChoose" | "fairJudge" | "betterUnit";
+      scene: "intro" | "count" | "compare" | "order" | "equal" | "difference" | "fairChoose" | "fairJudge" | "betterUnit";
       /** "count": one container holding this many cups; MCQ on the cup count. */
       container?: { imageSrc?: string; label: string; cups: number };
       options?: number[];
