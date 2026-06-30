@@ -228,6 +228,98 @@ export function MeasuredObject({
   );
 }
 
+/* ── Year 2 W4: a rod of N solid cubes + one faint "ghost" cube and a dashed
+ * boundary line, so a length that lands between N and N+1 reads clearly. ── */
+function BetweenRod({ wholeBlocks, unitPx = UNIT_PX }: { wholeBlocks: number; unitPx?: number }) {
+  if (wholeBlocks <= 0) return null;
+  const u = unitPx;
+  const d = rodDepth(u);
+  const solidW = wholeBlocks * u;
+  const ghostW = solidW + u;
+  const totalW = ghostW + d;
+  const h = u + d;
+  const seams = Array.from({ length: wholeBlocks - 1 }, (_, i) => i + 1);
+  return (
+    <svg width={totalW} height={h} viewBox={`0 0 ${totalW} ${h}`} className="max-w-full" style={{ height: "auto" }} aria-hidden>
+      <defs>
+        <linearGradient id="brod-front" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#7fd3f2" />
+          <stop offset="100%" stopColor="#54aad6" />
+        </linearGradient>
+        <linearGradient id="brod-top" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#bfe8fa" />
+          <stop offset="100%" stopColor="#8fd0ef" />
+        </linearGradient>
+      </defs>
+      {/* solid: top + front faces */}
+      <path d={`M0 ${d} L${solidW} ${d} L${solidW + d} 0 L${d} 0 Z`} fill="url(#brod-top)" stroke="#2c6a8c" strokeWidth="1.6" strokeLinejoin="round" />
+      <rect x="0" y={d} width={solidW} height={u} fill="url(#brod-front)" stroke="#2c6a8c" strokeWidth="1.6" />
+      {seams.map((i) => (
+        <g key={i} stroke="#2c6a8c" strokeWidth="1.2" opacity="0.85">
+          <line x1={i * u} y1={d} x2={i * u} y2={d + u} />
+          <line x1={i * u} y1={d} x2={i * u + d} y2={0} />
+        </g>
+      ))}
+      {/* ghost next cube: faded + dashed (this is the "…or is it N+1?" block) */}
+      <g opacity="0.5">
+        <path d={`M${solidW} ${d} L${ghostW} ${d} L${ghostW + d} 0 L${solidW + d} 0 Z`} fill="rgba(127,211,242,0.18)" stroke="#2c6a8c" strokeWidth="1.4" strokeDasharray="4 3" strokeLinejoin="round" />
+        <rect x={solidW} y={d} width={u} height={u} fill="rgba(127,211,242,0.14)" stroke="#2c6a8c" strokeWidth="1.4" strokeDasharray="4 3" />
+        <path d={`M${ghostW} ${d} L${ghostW + d} 0 L${ghostW + d} ${u} L${ghostW} ${u + d} Z`} fill="rgba(63,147,189,0.14)" stroke="#2c6a8c" strokeWidth="1.4" strokeDasharray="4 3" strokeLinejoin="round" />
+      </g>
+      {/* bold dashed boundary at the end of the last solid block */}
+      <line x1={solidW} y1={d} x2={solidW} y2={d + u} stroke="#b4540c" strokeWidth="2.4" strokeDasharray="5 4" />
+    </svg>
+  );
+}
+
+/* ── Year 2 W4: the object being measured, LEFT-aligned to the rod origin so an
+ * overhang shows only past the last block (centred sizing would split it). ── */
+function BetweenMeasure({
+  imageSrc,
+  label,
+  wholeBlocks,
+  overhang,
+  compact = false,
+}: {
+  imageSrc?: string;
+  label?: string;
+  wholeBlocks: number;
+  overhang: number;
+  compact?: boolean;
+}) {
+  const unitPx = compact ? COMPACT_UNIT_PX : UNIT_PX;
+  const depth = rodDepth(unitPx);
+  const containerWidth = (wholeBlocks + 1) * unitPx + depth;
+  const visibleSpan = (wholeBlocks + overhang) * unitPx;
+  const visibleRatio = imageSrc ? visibleRatioForImage(imageSrc) : 1;
+  const imgWidth = visibleSpan / visibleRatio;
+  // The visible art is centred in its canvas, so pull it left by half the
+  // transparent padding to land the visible LEFT edge on the rod origin.
+  const leftPad = (imgWidth - visibleSpan) / 2;
+  return (
+    <div className="flex flex-col items-center">
+      <div className="flex flex-col items-start" style={{ width: containerWidth }}>
+        {imageSrc ? (
+          <div style={{ width: visibleSpan }}>
+            <img
+              src={imageSrc}
+              alt={label ?? "Object to measure"}
+              className="h-auto object-contain drop-shadow-[0_8px_14px_rgba(76,40,10,0.18)]"
+              style={{ width: imgWidth, marginLeft: -leftPad, maxHeight: compact ? 56 : 100 }}
+            />
+          </div>
+        ) : null}
+        <div className="mt-1">
+          <BetweenRod wholeBlocks={wholeBlocks} unitPx={unitPx} />
+        </div>
+      </div>
+      {label ? (
+        <div className="mt-1 text-sm font-black uppercase tracking-[0.14em] text-[#7c4a12]">{label}</div>
+      ) : null}
+    </div>
+  );
+}
+
 /* ── Units display: a joined MAB rod for blocks, a glyph row otherwise ── */
 function UnitsDisplay({
   length,
@@ -321,6 +413,20 @@ function IntroScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect: () 
               <div className="mt-3 text-center text-sm font-bold text-[#5f4725]">{path.caption}</div>
             </div>
           ))}
+          {task.betweenItem ? (
+            <div className="rounded-[26px] border border-[rgba(214,184,108,0.28)] bg-[rgba(255,252,245,0.92)] p-4">
+              <BetweenMeasure
+                imageSrc={task.betweenItem.imageSrc}
+                label={task.betweenItem.label}
+                wholeBlocks={task.betweenItem.wholeBlocks}
+                overhang={task.betweenItem.overhang}
+              />
+              <div className="mt-3 text-center text-sm font-bold text-[#5f4725]">
+                Longer than {task.betweenItem.wholeBlocks} blocks… shorter than {task.betweenItem.wholeBlocks + 1}. It is{" "}
+                <span className="text-[#b4540c]">between {task.betweenItem.wholeBlocks} and {task.betweenItem.wholeBlocks + 1}</span>.
+              </div>
+            </div>
+          ) : null}
         </div>
 
         <div className="mt-5 flex justify-center">
@@ -647,6 +753,61 @@ function DifferenceScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; 
   );
 }
 
+/* ── Year 2 W4 Activity A/B: recognise exact vs between, and which two units a
+ * length lands between (one object with overhang + a text MCQ). ── */
+function BetweenScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
+  const item = task.betweenItem;
+  return (
+    <PathShell badge={task.badgeLabel ?? "Is It Exact?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">
+        {item ? (
+          <BetweenMeasure imageSrc={item.imageSrc} label={item.label} wholeBlocks={item.wholeBlocks} overhang={item.overhang} />
+        ) : null}
+      </div>
+      <div className="grid gap-3">
+        {(task.textOptions ?? []).map((opt) => (
+          <button
+            key={opt}
+            type="button"
+            onClick={() => (opt === task.correctTextOption ? onCorrect() : onWrong())}
+            className="relative flex min-h-[72px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-12 py-4 text-center text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+          >
+            <span className="absolute right-3 top-3 z-10"><OptionReadAloudButton text={opt} /></span>
+            {opt}
+          </button>
+        ))}
+      </div>
+    </PathShell>
+  );
+}
+
+/* ── Year 2 W4 Activity C: which object needs a smaller measuring unit? ── */
+function AccuracyScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
+  const items = task.betweenItems ?? [];
+  return (
+    <PathShell badge={task.badgeLabel ?? "Which Needs a Smaller Unit?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="grid gap-4 md:grid-cols-2">
+        {items.map((it, idx) => (
+          <button
+            key={it.id}
+            type="button"
+            onClick={() => (it.id === task.correctItemId ? onCorrect() : onWrong())}
+            className="relative rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-3 text-left transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
+          >
+            <span className="absolute right-3 top-3 z-10">
+              <OptionReadAloudButton text={`${it.label ?? `Object ${idx === 0 ? "A" : "B"}`}, ${it.overhang > 0 ? `between ${it.wholeBlocks} and ${it.wholeBlocks + 1}` : `exactly ${it.wholeBlocks}`} blocks`} />
+            </span>
+            <div className="mb-1 px-1 text-xs font-black uppercase tracking-[0.16em] text-[#7c3aed]">
+              {it.label ?? `Object ${idx === 0 ? "A" : "B"}`}
+            </div>
+            <BetweenMeasure imageSrc={it.imageSrc} wholeBlocks={it.wholeBlocks} overhang={it.overhang} compact />
+          </button>
+        ))}
+      </div>
+    </PathShell>
+  );
+}
+
 export function MeasurelandsPathTaskCard({
   task,
   onCorrect,
@@ -662,5 +823,7 @@ export function MeasurelandsPathTaskCard({
   if (task.scene === "order") return <OrderScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "same") return <SameScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "difference") return <DifferenceScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "between") return <BetweenScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "accuracy") return <AccuracyScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   return <BuildScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 }

@@ -544,7 +544,9 @@ export type PracticeTask = (
       badgeLabel?: string;
       // Year 2 adds "difference": two measured objects shown, MCQ on "how many
       // more / fewer units" (quantifying the gap, not just "which is longer").
-      scene: "intro" | "count" | "compare" | "build" | "order" | "same" | "difference";
+      // Year 2 W4 adds "between" (recognise a measure that lands between two
+      // whole units) and "accuracy" (tap which object needs a smaller unit).
+      scene: "intro" | "count" | "compare" | "build" | "order" | "same" | "difference" | "between" | "accuracy";
       /** Unit being used to measure (footstep / block / star / flower / stone).
        *  Rendered as an illustrated glyph; unitEmoji/unitLabel are hints only. */
       unitEmoji?: string;
@@ -580,6 +582,33 @@ export type PracticeTask = (
         objectImageSrc?: string;
         objectLabel?: string;
       }>;
+      /** Year 2 W4 ("between"/"accuracy", and an optional teaching example on
+       *  "intro"): an object measured over `wholeBlocks` whole units whose tip
+       *  may extend partway past the last block. `overhang` is 0 (exact) or a
+       *  fraction 0<x<1 of one unit poking past `wholeBlocks` (never reaches the
+       *  next whole unit). Renders a faint "ghost" of the next block + a dashed
+       *  boundary line so "between N and N+1" reads clearly. */
+      betweenItem?: {
+        id?: string;
+        imageSrc?: string;
+        label?: string;
+        wholeBlocks: number;
+        overhang: number;
+      };
+      /** "accuracy": two measured objects (one exact, one between); tap the one
+       *  that would measure more precisely with a smaller unit (correctItemId). */
+      betweenItems?: Array<{
+        id: string;
+        imageSrc?: string;
+        label?: string;
+        wholeBlocks: number;
+        overhang: number;
+      }>;
+      correctItemId?: string;
+      /** "between": text MCQ — exact vs between, or which two units it lands
+       *  between. (Mirrors the massMeasure "reason" text-option pattern.) */
+      textOptions?: string[];
+      correctTextOption?: string;
       feedback?: { correct: string; wrong: string };
     }
   | {

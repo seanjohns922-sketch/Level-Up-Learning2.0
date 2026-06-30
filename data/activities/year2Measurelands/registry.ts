@@ -44,6 +44,11 @@ import {
   resetY2MeasurelandsWeek3Lesson3TaskSessionState,
   buildY2MeasurelandsWeek3Lesson3QuizTasks,
 } from "@/data/activities/year2Measurelands/week3Lesson3";
+import {
+  generateY2MeasurelandsWeek4Lesson1Task,
+  resetY2MeasurelandsWeek4Lesson1TaskSessionState,
+  buildY2MeasurelandsWeek4Lesson1QuizTasks,
+} from "@/data/activities/year2Measurelands/week4Lesson1";
 
 // Level 2 (Year 2) Measurelands lesson registry. Mirrors the Level 1 registry so
 // app/lesson/page.tsx can resolve `y2-measurement-w{n}-l{m}` ids to tasks.
@@ -236,6 +241,25 @@ const Y2_MEASURELANDS_LESSONS: Y2MeasurelandsLessonEntry[] = [
     completionTitle: "Capacity Unit Expert Complete!",
     unlockMessage: "Week complete.",
     returnRoute: "/program?year=Year 2&week=3&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y2-measurement-w4-l1",
+    week: 4,
+    lessonNumber: 1,
+    title: "In Between",
+    subtitle: "Closer Count",
+    generate: generateY2MeasurelandsWeek4Lesson1Task,
+    reset: resetY2MeasurelandsWeek4Lesson1TaskSessionState,
+    quizContributionBuilder: buildY2MeasurelandsWeek4Lesson1QuizTasks,
+    practisedSkills: [
+      "Recognising when a measurement is exact or between units",
+      "Identifying the two whole units a length falls between",
+      "Explaining why a measurement is not always a whole number",
+      "Predicting when a smaller unit gives a closer measure",
+    ],
+    completionTitle: "Precision Spotter Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+    returnRoute: "/program?year=Year 2&week=4&legacy=1&realm_id=measurement",
   },
 ];
 
