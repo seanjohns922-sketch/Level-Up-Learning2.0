@@ -32,7 +32,7 @@ const OBJECTS: Obj[] = FAMILIES.flatMap((f) =>
 
 type LessonMemory = { introShown: boolean; cursor: number; lastKey: string | null };
 const lessonMemory = new Map<string, LessonMemory>();
-const ROTATION: Array<"more" | "fewer"> = ["more", "fewer", "more", "fewer"];
+const ROTATION: Array<"difference" | "compare" | "count"> = ["difference", "compare", "count", "difference", "count", "compare"];
 
 function getMemory(lessonId: string): LessonMemory {
   const existing = lessonMemory.get(lessonId);
@@ -128,6 +128,49 @@ function buildDifferenceTask(memory: LessonMemory, mode: "more" | "fewer"): Meas
   };
 }
 
+// Activity — count the blocks (read a measured length).
+function pickObject(memory: LessonMemory): Obj {
+  const pool = OBJECTS.filter((o) => o.id !== memory.lastKey);
+  const o = choose(pool.length ? pool : OBJECTS);
+  memory.lastKey = o.id;
+  return o;
+}
+function buildCountTask(memory: LessonMemory): MeasurePathTask {
+  const o = pickObject(memory);
+  return {
+    kind: "measurePath",
+    scene: "count",
+    prompt: `How many blocks long is the ${o.label.toLowerCase()}?`,
+    speakText: `How many blocks long is the ${o.label.toLowerCase()}?`,
+    badgeLabel: "Count the Blocks",
+    unitLabel: "blocks",
+    unitEmoji: "block",
+    objectImageSrc: o.image,
+    objectLabel: o.label,
+    pathLength: o.blocks,
+    options: diffOptions(o.blocks),
+    correctAnswer: o.blocks,
+    feedback: { correct: "You measured it!", wrong: "Count each block one by one." },
+  };
+}
+
+// Activity — which is longer / shorter? (trust the count)
+function buildCompareTask(memory: LessonMemory): MeasurePathTask {
+  const [longer, shorter] = pickPair(memory);
+  const asks = randInt(2) === 0 ? "longer" : "shorter";
+  const target = asks === "longer" ? longer : shorter;
+  return {
+    kind: "measurePath",
+    scene: "compare",
+    prompt: `Which is ${asks}?`,
+    speakText: `Look at the blocks. Which one is ${asks}?`,
+    badgeLabel: asks === "longer" ? "Which Is Longer?" : "Which Is Shorter?",
+    paths: shuffle([toPath(longer), toPath(shorter)]),
+    correctPathId: target.id,
+    feedback: { correct: `That one measured ${asks === "longer" ? "more" : "fewer"} blocks!`, wrong: "Count the blocks under each one." },
+  };
+}
+
 export function generateY2MeasurelandsWeek1Lesson1Task(
   lessonId: string,
   _difficulty: Difficulty,
@@ -137,23 +180,25 @@ export function generateY2MeasurelandsWeek1Lesson1Task(
     memory.introShown = true;
     return buildIntroTask();
   }
-  const mode = ROTATION[memory.cursor % ROTATION.length]!;
+  const rotation = ROTATION[memory.cursor % ROTATION.length]!;
   memory.cursor += 1;
-  return buildDifferenceTask(memory, mode);
+  if (rotation === "difference") return buildDifferenceTask(memory, randInt(2) === 0 ? "more" : "fewer");
+  if (rotation === "compare") return buildCompareTask(memory);
+  return buildCountTask(memory);
 }
 
 export function resetY2MeasurelandsWeek1Lesson1TaskSessionState() {
   lessonMemory.clear();
 }
 
-// 5 fixed tasks for the weekly quiz / post-test: how-many-more / fewer.
+// 5 fixed tasks for the weekly quiz: covers all 3 activities (difference hero).
 export function buildY2MeasurelandsWeek1Lesson1QuizTasks(): PracticeTask[] {
   const seed: LessonMemory = { introShown: true, cursor: 0, lastKey: null };
   return [
     buildDifferenceTask(seed, "more"),
+    buildCompareTask(seed),
+    buildCountTask(seed),
     buildDifferenceTask(seed, "fewer"),
-    buildDifferenceTask(seed, "more"),
-    buildDifferenceTask(seed, "fewer"),
-    buildDifferenceTask(seed, "more"),
+    buildCompareTask(seed),
   ];
 }
