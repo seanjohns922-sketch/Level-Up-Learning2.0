@@ -290,22 +290,27 @@ function BetweenMeasure({
   const unitPx = compact ? COMPACT_UNIT_PX : UNIT_PX;
   const depth = rodDepth(unitPx);
   const containerWidth = (wholeBlocks + 1) * unitPx + depth;
-  const visibleSpan = (wholeBlocks + overhang) * unitPx;
+  // Visible object span in px. The rod's last-block boundary sits at
+  // wholeBlocks*unitPx (front face, no isometric depth), so align to that.
+  const objVisible = (wholeBlocks + overhang) * unitPx;
   const visibleRatio = imageSrc ? visibleRatioForImage(imageSrc) : 1;
-  const imgWidth = visibleSpan / visibleRatio;
-  // The visible art is centred in its canvas, so pull it left by half the
-  // transparent padding to land the visible LEFT edge on the rod origin.
-  const leftPad = (imgWidth - visibleSpan) / 2;
+  // Same sizing as MeasuredObject: the WRAPPER is the larger box (visible /
+  // ratio) and the <img> is w-full inside it, so Tailwind's base
+  // `img { max-width: 100% }` never clamps it. Then shift the wrapper left by
+  // half its transparent padding so the visible LEFT edge lands on the rod
+  // origin and the overhang shows only on the right.
+  const imgBoxWidth = objVisible / visibleRatio;
+  const leftPad = (imgBoxWidth - objVisible) / 2;
   return (
     <div className="flex flex-col items-center">
       <div className="flex flex-col items-start" style={{ width: containerWidth }}>
         {imageSrc ? (
-          <div style={{ width: visibleSpan }}>
+          <div style={{ width: imgBoxWidth, marginLeft: -leftPad }}>
             <img
               src={imageSrc}
               alt={label ?? "Object to measure"}
-              className="h-auto object-contain drop-shadow-[0_8px_14px_rgba(76,40,10,0.18)]"
-              style={{ width: imgWidth, marginLeft: -leftPad, maxHeight: compact ? 56 : 100 }}
+              className="h-auto w-full object-contain drop-shadow-[0_8px_14px_rgba(76,40,10,0.18)]"
+              style={{ maxHeight: compact ? 64 : 108 }}
             />
           </div>
         ) : null}
