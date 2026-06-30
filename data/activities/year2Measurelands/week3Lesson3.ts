@@ -160,22 +160,24 @@ function buildWhatsWrongTask(memory: LessonMemory): CapacityTask {
 function buildProTask(memory: LessonMemory): CapacityTask {
   const target = pickContainer(memory, (c) => c.cups >= 8);
   const correct = sensibleUnit(target);
-  const options = shuffle([
-    unitOption("spoon", "Spoon"),
-    unitOption("cup", "Cup"),
-    unitOption("measuringJug", "Measuring Jug"),
-    ...(correct === "bucket" ? [unitOption("bucket", "Bucket")] : []),
-  ]).slice(0, 3);
-  if (!options.some((o) => o.id === correct)) options[0] = unitOption(correct, correct === "bucket" ? "Bucket" : "Measuring Jug");
+  const poorUnit: Unit = target.cups >= 20 ? "spoon" : "cup";
   return {
     kind: "capacityMeasure",
-    scene: "betterUnit",
-    prompt: `Professor Gauge needs to measure the ${target.label.toLowerCase()}. Choose the best tool.`,
-    speakText: `Professor Gauge needs to measure the ${target.label.toLowerCase()}. Choose the best tool, then think why it is best.`,
+    scene: "fairJudge",
+    prompt: `Why is the ${correct === "bucket" ? "bucket" : "measuring jug"} better for the ${target.label.toLowerCase()}?`,
+    speakText: `Professor Gauge needs to measure the ${target.label.toLowerCase()}. Why is the ${correct === "bucket" ? "bucket" : "measuring jug"} the better tool?`,
     badgeLabel: "Measure Like a Pro",
-    target: toY2CapacityItem(target),
-    sensibleUnits: shuffle(options),
-    correctOptionId: correct,
+    fairComparison: {
+      containerImageSrc: target.image,
+      label: target.label,
+      left: { unit: poorUnit, count: poorUnit === "spoon" ? spoonCount(target) : target.cups },
+      right: {
+        unit: correct,
+        count: correct === "bucket" ? Math.max(2, Math.round(target.cups / 8)) : Math.max(2, Math.round(target.cups / 4)),
+      },
+    },
+    problemOptions: ["It is quicker and easier.", "It makes a bigger number.", "It looks nicer."],
+    correctProblem: "It is quicker and easier.",
     feedback: {
       correct: "It is quicker and easier.",
       wrong: "The best tool is the one that makes measuring quicker and easier.",
