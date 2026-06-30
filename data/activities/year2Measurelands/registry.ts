@@ -39,6 +39,11 @@ import {
   resetY2MeasurelandsWeek3Lesson2TaskSessionState,
   buildY2MeasurelandsWeek3Lesson2QuizTasks,
 } from "@/data/activities/year2Measurelands/week3Lesson2";
+import {
+  generateY2MeasurelandsWeek3Lesson3Task,
+  resetY2MeasurelandsWeek3Lesson3TaskSessionState,
+  buildY2MeasurelandsWeek3Lesson3QuizTasks,
+} from "@/data/activities/year2Measurelands/week3Lesson3";
 
 // Level 2 (Year 2) Measurelands lesson registry. Mirrors the Level 1 registry so
 // app/lesson/page.tsx can resolve `y2-measurement-w{n}-l{m}` ids to tasks.
@@ -211,6 +216,25 @@ const Y2_MEASURELANDS_LESSONS: Y2MeasurelandsLessonEntry[] = [
     ],
     completionTitle: "Capacity Orderer Complete!",
     unlockMessage: "Lesson 3 unlocked.",
+    returnRoute: "/program?year=Year 2&week=3&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y2-measurement-w3-l3",
+    week: 3,
+    lessonNumber: 3,
+    title: "Better Measuring Units",
+    subtitle: "Capacity Springs",
+    generate: generateY2MeasurelandsWeek3Lesson3Task,
+    reset: resetY2MeasurelandsWeek3Lesson3TaskSessionState,
+    quizContributionBuilder: buildY2MeasurelandsWeek3Lesson3QuizTasks,
+    practisedSkills: [
+      "Choosing sensible capacity units",
+      "Explaining why a unit is too small or too large",
+      "Solving simple measuring-tool problems",
+      "Reasoning about efficient measurement",
+    ],
+    completionTitle: "Capacity Unit Expert Complete!",
+    unlockMessage: "Week complete.",
     returnRoute: "/program?year=Year 2&week=3&legacy=1&realm_id=measurement",
   },
 ];

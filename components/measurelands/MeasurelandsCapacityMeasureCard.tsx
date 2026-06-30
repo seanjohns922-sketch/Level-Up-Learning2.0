@@ -7,7 +7,10 @@ import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type CapacityTask = Extract<PracticeTask, { kind: "capacityMeasure" }>;
+type CapacityUnit = NonNullable<CapacityTask["sensibleUnits"]>[number]["unit"];
 const SPOON_IMAGE_SRC = "/images/measurelands/week2-3d/spoon.png";
+const MEASURING_JUG_IMAGE_SRC = "/images/measurelands/containers-3d/measuring-jug.png";
+const BUCKET_IMAGE_SRC = "/images/measurelands/containers-3d/bucket.png";
 
 function SpoonUnit({ size = 30 }: { size?: number }) {
   return (
@@ -119,24 +122,54 @@ function CapacityMeasure({
   );
 }
 
+function unitLabel(unit: CapacityUnit) {
+  if (unit === "measuringJug") return "measuring jugs";
+  if (unit === "bucket") return "bucket units";
+  return unit === "cup" ? "cups" : "spoons";
+}
+
+function UnitVisual({ unit, size = 46 }: { unit: CapacityUnit; size?: number }) {
+  if (unit === "cup") return <CupUnit size={size} />;
+  if (unit === "spoon") {
+    return (
+      <img
+        src={SPOON_IMAGE_SRC}
+        alt=""
+        aria-hidden
+        className="object-contain drop-shadow-[0_8px_14px_rgba(76,40,10,0.18)]"
+        style={{ height: size, width: size }}
+      />
+    );
+  }
+  return (
+    <img
+      src={unit === "measuringJug" ? MEASURING_JUG_IMAGE_SRC : BUCKET_IMAGE_SRC}
+      alt=""
+      aria-hidden
+      className="object-contain drop-shadow-[0_8px_14px_rgba(76,40,10,0.18)]"
+      style={{ height: size, width: size }}
+    />
+  );
+}
+
 function CapacityUnitRow({
   unit,
   count,
   compact = false,
 }: {
-  unit: "cup" | "spoon";
+  unit: CapacityUnit;
   count: number;
   compact?: boolean;
 }) {
   const size = compact ? 22 : 26;
+  const displayCount = Math.min(count, unit === "spoon" ? 24 : 18);
   return (
     <div
       className="mt-2 flex w-full flex-wrap items-center justify-center gap-1 rounded-[18px] border-2 px-2 py-2"
       style={{ borderColor: "rgba(214,184,108,0.55)", background: "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(236,248,255,0.9))" }}
     >
-      {Array.from({ length: count }).map((_, i) =>
-        unit === "cup" ? <CupUnit key={`${unit}-${i}`} size={size} /> : <SpoonUnit key={`${unit}-${i}`} size={size} />
-      )}
+      {Array.from({ length: displayCount }).map((_, i) => <UnitVisual key={`${unit}-${i}`} unit={unit} size={size} />)}
+      {count > displayCount ? <span className="px-1 text-sm font-black text-[#7c4a12]">+{count - displayCount}</span> : null}
     </div>
   );
 }
@@ -167,14 +200,14 @@ function FairComparisonCard({
           <div className="text-center text-[11px] font-black uppercase tracking-[0.14em] text-[#5b21b6]">Explorer A</div>
           <CapacityUnitRow unit={comparison.left.unit} count={comparison.left.count} compact={compact} />
           <div className="mt-1 text-center text-xs font-bold text-[#5f4725]">
-            {comparison.left.count} {comparison.left.unit === "cup" ? "cups" : "spoons"}
+            {comparison.left.count} {unitLabel(comparison.left.unit)}
           </div>
         </div>
         <div className="rounded-[18px] border border-[rgba(167,139,250,0.28)] bg-white p-2">
           <div className="text-center text-[11px] font-black uppercase tracking-[0.14em] text-[#5b21b6]">Explorer B</div>
           <CapacityUnitRow unit={comparison.right.unit} count={comparison.right.count} compact={compact} />
           <div className="mt-1 text-center text-xs font-bold text-[#5f4725]">
-            {comparison.right.count} {comparison.right.unit === "cup" ? "cups" : "spoons"}
+            {comparison.right.count} {unitLabel(comparison.right.unit)}
           </div>
         </div>
       </div>
@@ -429,7 +462,7 @@ function FairChooseScene({ task, onCorrect, onWrong }: { task: CapacityTask; onC
               <FairComparisonCard comparison={comparison} compact />
             </button>
             <span className="absolute right-3 top-3 z-10">
-              <OptionReadAloudButton text={`${comparison.label}. Explorer A used ${comparison.left.count} ${comparison.left.unit === "cup" ? "cups" : "spoons"}. Explorer B used ${comparison.right.count} ${comparison.right.unit === "cup" ? "cups" : "spoons"}.`} />
+              <OptionReadAloudButton text={`${comparison.label}. Explorer A used ${comparison.left.count} ${unitLabel(comparison.left.unit)}. Explorer B used ${comparison.right.count} ${unitLabel(comparison.right.unit)}.`} />
             </span>
           </div>
         ))}
@@ -485,18 +518,7 @@ function BetterUnitScene({ task, onCorrect, onWrong }: { task: CapacityTask; onC
               onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
               className="flex min-h-[140px] w-full flex-col items-center justify-center gap-3 rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-4 py-5 text-lg font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5"
             >
-              {option.unit === "cup" ? (
-                <CupUnit size={46} />
-              ) : option.unit === "spoon" ? (
-                <img
-                  src={SPOON_IMAGE_SRC}
-                  alt=""
-                  aria-hidden
-                  className="h-14 w-14 object-contain drop-shadow-[0_8px_14px_rgba(76,40,10,0.18)]"
-                />
-              ) : (
-                <span className="text-5xl">🪣</span>
-              )}
+              <UnitVisual unit={option.unit} size={54} />
               <span>{option.label}</span>
             </button>
             <span className="absolute right-3 top-3 z-10">

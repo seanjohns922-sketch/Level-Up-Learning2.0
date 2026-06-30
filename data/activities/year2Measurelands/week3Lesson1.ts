@@ -21,6 +21,7 @@ export const Y2_CAPACITY_CONTAINERS: Y2CapacityContainer[] = [
   { id: "pot", label: "Pot", image: `${BASE}/pot.png`, cups: 12, look: 4 },
   { id: "watering-can", label: "Watering Can", image: `${BASE}/watering-can.png`, cups: 16, look: 4 },
   { id: "bucket", label: "Bucket", image: `${BASE}/bucket.png`, cups: 20, look: 4 },
+  { id: "storage-tub", label: "Storage Tub", image: `${BASE}/storage-tub.png`, cups: 28, look: 5 },
   { id: "fish-tank", label: "Fish Tank", image: `${BASE}/fish-tank.png`, cups: 32, look: 5 },
   { id: "bathtub", label: "Bathtub", image: `${BASE}/bathtub.png`, cups: 40, look: 5 },
 ];

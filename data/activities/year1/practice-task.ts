@@ -673,19 +673,19 @@ export type PracticeTask = (
         id: string;
         containerImageSrc?: string;
         label: string;
-        left: { unit: "cup" | "spoon"; count: number };
-        right: { unit: "cup" | "spoon"; count: number };
+        left: { unit: "cup" | "spoon" | "measuringJug" | "bucket"; count: number };
+        right: { unit: "cup" | "spoon" | "measuringJug" | "bucket"; count: number };
       }>;
       fairComparison?: {
         containerImageSrc?: string;
         label: string;
-        left: { unit: "cup" | "spoon"; count: number };
-        right: { unit: "cup" | "spoon"; count: number };
+        left: { unit: "cup" | "spoon" | "measuringJug" | "bucket"; count: number };
+        right: { unit: "cup" | "spoon" | "measuringJug" | "bucket"; count: number };
       };
       fair?: boolean;
       problemOptions?: string[];
       correctProblem?: string;
-      sensibleUnits?: Array<{ id: string; unit: "cup" | "spoon" | "bucket"; label: string }>;
+      sensibleUnits?: Array<{ id: string; unit: "cup" | "spoon" | "measuringJug" | "bucket"; label: string }>;
       /** "intro": worked teaching containers shown during the teaching sequence. */
       teachingItems?: Array<{ imageSrc?: string; label: string; cups: number; caption?: string }>;
       feedback?: { correct: string; wrong: string };
