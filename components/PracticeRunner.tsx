@@ -113,6 +113,13 @@ function getPracticeTaskCorrectAnswer(task: PracticeTask) {
   if (task.kind === "measurementCompare") {
     return task.objects.find((item) => item.id === task.correctOptionId)?.label ?? task.correctOptionId;
   }
+  if (task.kind === "measurePath") {
+    if (task.scene === "estimateLonger") {
+      return task.estimatePair?.find((item) => item.id === task.correctItemId)?.label ?? task.correctItemId ?? null;
+    }
+    if (typeof task.correctAnswer === "number") return `${task.correctAnswer} small blocks`;
+    if (task.correctPathId) return task.correctPathId;
+  }
   return null;
 }
 

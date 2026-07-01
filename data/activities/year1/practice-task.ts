@@ -559,6 +559,20 @@ export type PracticeTask = (
       scene: "intro" | "count" | "compare" | "build" | "order" | "same" | "difference" | "reMeasure" | "moreOrFewer" | "countSmall" | "compareAccuracy" | "finishGap" | "fillSmall" | "measureYourWay" | "estimateGuess" | "estimateSlider" | "estimateLonger";
       /** W4 L2 estimate activities: real object photo(s) to estimate by eye. */
       estimatePair?: Array<{ id: string; imageSrc: string; label: string; blocks: number }>;
+      estimateMin?: number;
+      estimateMax?: number;
+      estimateStart?: number;
+      estimateTolerance?: number;
+      estimateMeasurement?: {
+        objectLengthUnits: number;
+        bigUnitSize: number;
+        smallUnitSize: number;
+        expectedBigCount: number;
+        expectedSmallCount: number;
+        gapAmount: number;
+        correctAnswer: number;
+        closeRange: [number, number];
+      };
       /** Unit being used to measure (footstep / block / star / flower / stone).
        *  Rendered as an illustrated glyph; unitEmoji/unitLabel are hints only. */
       unitEmoji?: string;

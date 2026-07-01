@@ -12,7 +12,6 @@ import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-
 type MeasurePathTask = Extract<PracticeTask, { kind: "measurePath" }>;
 
 const OBJ = "/images/measurelands/measure-objects-3d";
-const W1 = "/images/measurelands/week1-3d";
 
 // Big pool: label + real length in blocks. (Estimation only shows the photo, so
 // exact tip-alignment doesn't matter.)
@@ -26,10 +25,6 @@ const OBJECTS: EObj[] = [
   { id: "plank", label: "Plank", img: `${OBJ}/plank.png`, blocks: 8 },
   { id: "snake", label: "Snake", img: `${OBJ}/snake.png`, blocks: 9 },
   { id: "vine", label: "Vine", img: `${OBJ}/vine.png`, blocks: 11 },
-  { id: "sapling", label: "Sapling", img: `${W1}/sapling.png`, blocks: 6 },
-  { id: "ladder", label: "Ladder", img: `${W1}/ladder.png`, blocks: 8 },
-  { id: "tree", label: "Tree", img: `${W1}/tree.png`, blocks: 12 },
-  { id: "road", label: "Road", img: `${W1}/road.png`, blocks: 14 },
 ];
 
 type LessonMemory = { introShown: boolean; cursor: number; recent: string[] };
@@ -68,6 +63,91 @@ function pickObj(memory: LessonMemory): EObj {
   return o;
 }
 
+type EstimateMeasurement = NonNullable<MeasurePathTask["estimateMeasurement"]>;
+
+function buildMeasurementSpec(objectLengthUnits: number): EstimateMeasurement {
+  const bigUnitSize = 2;
+  const smallUnitSize = 1;
+  const expectedBigCount = Math.floor(objectLengthUnits / bigUnitSize);
+  const expectedSmallCount = objectLengthUnits / smallUnitSize;
+  const gapAmount = objectLengthUnits % bigUnitSize;
+  return {
+    objectLengthUnits,
+    bigUnitSize,
+    smallUnitSize,
+    expectedBigCount,
+    expectedSmallCount,
+    gapAmount,
+    correctAnswer: expectedSmallCount,
+    closeRange: [Math.max(1, expectedSmallCount - 1), expectedSmallCount + 1],
+  };
+}
+
+function buildCloseOptions(correct: number): number[] {
+  const options = new Set<number>([correct]);
+  const offsets = shuffle([-1, 1, -2, 2]);
+  for (const offset of offsets) {
+    if (options.size >= 3) break;
+    const next = correct + offset;
+    if (next >= 1) options.add(next);
+  }
+  return shuffle([...options]);
+}
+
+function closeFeedback(label: string, correct: number) {
+  return `Correct answer: ${correct} small blocks. Use the object length, then choose the estimate closest to ${label.toLowerCase()}.`;
+}
+
+function auditTask(task: MeasurePathTask): MeasurePathTask {
+  if (process.env.NODE_ENV === "production") return task;
+
+  const problems: string[] = [];
+  if (task.scene === "estimateGuess") {
+    const correct = task.correctAnswer;
+    const options = task.options ?? [];
+    const correctCount = options.filter((option) => option === correct).length;
+    if (correctCount !== 1) problems.push("estimateGuess must include exactly one correct answer option");
+    if (typeof correct === "number" && options.some((option) => Math.abs(option - correct) > 2)) {
+      problems.push("estimateGuess options must stay close to the correct estimate");
+    }
+  }
+
+  if (task.scene === "estimateSlider") {
+    const correct = task.correctAnswer;
+    if (typeof correct !== "number") problems.push("estimateSlider needs a numeric correctAnswer");
+    if (typeof correct === "number" && (task.estimateMin ?? 0) > correct) problems.push("estimateMin is above correctAnswer");
+    if (typeof correct === "number" && (task.estimateMax ?? 0) < correct) problems.push("estimateMax is below correctAnswer");
+    if (typeof correct === "number" && Math.abs((task.estimateStart ?? correct) - correct) > 1) {
+      problems.push("estimateStart should begin within one unit of the correct answer");
+    }
+    if (!task.feedback?.wrong?.includes("Correct answer:")) problems.push("wrong feedback must reveal the correct answer");
+  }
+
+  if (task.scene === "estimateLonger") {
+    const pair = task.estimatePair ?? [];
+    if (pair.length !== 2) problems.push("estimateLonger needs exactly two objects");
+    if (pair.length === 2 && Math.abs(pair[0]!.blocks - pair[1]!.blocks) < 2) {
+      problems.push("estimateLonger pair is too close to compare visually");
+    }
+    const correctCount = pair.filter((item) => item.id === task.correctItemId).length;
+    if (correctCount !== 1) problems.push("estimateLonger must have one matching correct item");
+    if (!task.feedback?.wrong?.includes("Correct answer:")) problems.push("wrong feedback must reveal the correct answer");
+  }
+
+  if (task.estimateMeasurement) {
+    const m = task.estimateMeasurement;
+    if (m.correctAnswer !== task.correctAnswer) problems.push("measurement spec correctAnswer must match task correctAnswer");
+    if (m.expectedSmallCount !== m.objectLengthUnits / m.smallUnitSize) problems.push("small-unit count mismatch");
+    if (m.expectedBigCount !== Math.floor(m.objectLengthUnits / m.bigUnitSize)) problems.push("big-unit count mismatch");
+    if (m.gapAmount !== m.objectLengthUnits % m.bigUnitSize) problems.push("gap amount mismatch");
+  }
+
+  if (problems.length) {
+    console.warn("[Measurelands W4 L2 audit]", task.scene, task.prompt, problems);
+  }
+  return task;
+}
+
 // ── Intro ──
 function buildIntroTask(): MeasurePathTask {
   return {
@@ -85,10 +165,9 @@ function buildIntroTask(): MeasurePathTask {
 // ── Activity 1 — best guess (pick the sensible estimate) ──
 function buildGuessTask(memory: LessonMemory): MeasurePathTask {
   const o = pickObj(memory);
-  const tooSmall = Math.max(1, Math.round(o.blocks / 2) - 1);
-  const tooBig = o.blocks + 5 + randInt(4);
-  const options = shuffle([tooSmall, o.blocks, tooBig]);
-  return {
+  const measurement = buildMeasurementSpec(o.blocks);
+  const options = buildCloseOptions(measurement.correctAnswer);
+  return auditTask({
     kind: "measurePath",
     scene: "estimateGuess",
     prompt: `About how many blocks long is the ${o.label.toLowerCase()}?`,
@@ -96,19 +175,22 @@ function buildGuessTask(memory: LessonMemory): MeasurePathTask {
     badgeLabel: "Best Guess",
     objectImageSrc: o.img,
     objectLabel: o.label,
+    estimateMeasurement: measurement,
     options,
-    correctAnswer: o.blocks,
+    correctAnswer: measurement.correctAnswer,
     feedback: {
-      correct: `Good estimate — about ${o.blocks} blocks!`,
-      wrong: `Look at its size — about ${o.blocks} blocks is the sensible guess.`,
+      correct: `Good estimate — about ${measurement.correctAnswer} small blocks!`,
+      wrong: closeFeedback(o.label, measurement.correctAnswer),
     },
-  };
+  });
 }
 
 // ── Activity 2 — guess & check (slider → reveal) ──
 function buildSliderTask(memory: LessonMemory): MeasurePathTask {
   const o = pickObj(memory);
-  return {
+  const measurement = buildMeasurementSpec(o.blocks);
+  const start = measurement.correctAnswer + (randInt(3) - 1);
+  return auditTask({
     kind: "measurePath",
     scene: "estimateSlider",
     prompt: `Estimate the ${o.label.toLowerCase()}, then check.`,
@@ -116,12 +198,17 @@ function buildSliderTask(memory: LessonMemory): MeasurePathTask {
     badgeLabel: "Guess & Check",
     objectImageSrc: o.img,
     objectLabel: o.label,
-    correctAnswer: o.blocks,
+    estimateMeasurement: measurement,
+    estimateMin: Math.max(1, measurement.correctAnswer - 2),
+    estimateMax: measurement.correctAnswer + 2,
+    estimateStart: start,
+    estimateTolerance: 1,
+    correctAnswer: measurement.correctAnswer,
     feedback: {
-      correct: "Great estimate — close!",
-      wrong: "Good try — estimating gets easier with practice.",
+      correct: `Great estimate — ${measurement.correctAnswer} small blocks is the exact measure.`,
+      wrong: `Correct answer: ${measurement.correctAnswer} small blocks. Smaller units help you estimate within 1 block.`,
     },
-  };
+  });
 }
 
 // ── Activity 3 — which is longer (estimate by eye) ──
@@ -129,9 +216,9 @@ function buildLongerTask(memory: LessonMemory): MeasurePathTask {
   const a = pickObj(memory);
   let b = pickObj(memory);
   let guard = 0;
-  while (b.blocks === a.blocks && guard < 10) { b = pickObj(memory); guard += 1; }
+  while (Math.abs(b.blocks - a.blocks) < 2 && guard < 20) { b = pickObj(memory); guard += 1; }
   const longer = a.blocks >= b.blocks ? a : b;
-  return {
+  return auditTask({
     kind: "measurePath",
     scene: "estimateLonger",
     prompt: "Which one looks longer?",
@@ -144,9 +231,9 @@ function buildLongerTask(memory: LessonMemory): MeasurePathTask {
     correctItemId: longer.id,
     feedback: {
       correct: `Yes — the ${longer.label.toLowerCase()} is longer!`,
-      wrong: `Look again — the ${longer.label.toLowerCase()} is longer.`,
+      wrong: `Correct answer: ${longer.label}. It measures ${longer.blocks} small blocks, which is longer.`,
     },
-  };
+  });
 }
 
 export function generateY2MeasurelandsWeek4Lesson2Task(
@@ -178,4 +265,15 @@ export function buildY2MeasurelandsWeek4Lesson2QuizTasks(): PracticeTask[] {
     buildGuessTask(seed),
     buildLongerTask(seed),
   ];
+}
+
+export function auditY2MeasurelandsWeek4Lesson2TaskGeneration(iterations = 120) {
+  if (process.env.NODE_ENV === "production") return;
+  const seed: LessonMemory = { introShown: true, cursor: 0, recent: [] };
+  for (let index = 0; index < iterations; index += 1) {
+    const activity = ROTATION[index % ROTATION.length]!;
+    if (activity === "estimateGuess") buildGuessTask(seed);
+    else if (activity === "estimateLonger") buildLongerTask(seed);
+    else buildSliderTask(seed);
+  }
 }
