@@ -57,6 +57,7 @@ function formatPracticeTopicLabel(kind: PracticeTask["kind"]) {
   if (kind === "weekCycle") return "Calendar Keeper";
   if (kind === "calendarFind") return "Calendar Quest";
   if (kind === "balanceScale") return "Balance Master";
+  if (kind === "analogClock") return "Clock Builder";
   if (kind === "groundMatch") return "Ground Match";
   if (kind === "groundCollect") return "Ground Collect";
   if (kind === "groundBuild") return "Ground Build";
@@ -126,6 +127,14 @@ function getPracticeTaskCorrectAnswer(task: PracticeTask) {
     }
     if (task.correctReason) return task.correctReason;
     if (typeof task.correctCount === "number") return String(task.correctCount);
+  }
+  if (task.kind === "analogClock") {
+    const option = task.options?.find((item) => item.id === task.correctOptionId);
+    if (option) return option.label;
+    if (task.targetMinute === 0) return `${task.targetHour} o'clock`;
+    if (task.targetMinute === 30) return `Half past ${task.targetHour}`;
+    if (task.targetMinute === 15) return `Quarter past ${task.targetHour}`;
+    return `Quarter to ${task.targetHour === 12 ? 1 : task.targetHour + 1}`;
   }
   return null;
 }
@@ -811,6 +820,7 @@ export function PracticeRunner({
     task.kind === "calendarFind" ||
     task.kind === "routineSequence" ||
     task.kind === "balanceScale" ||
+    task.kind === "analogClock" ||
     task.kind === "groundMatch" ||
     task.kind === "groundCollect" ||
     task.kind === "groundBuild" ||

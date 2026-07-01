@@ -109,6 +109,7 @@ import { MeasurelandsTimeSequenceCard } from "@/components/measurelands/Measurel
 import { MeasurelandsRoutineSequenceCard } from "@/components/measurelands/MeasurelandsRoutineSequenceCard";
 import { MeasurelandsToolChoiceCard } from "@/components/measurelands/MeasurelandsToolChoiceCard";
 import { MeasurelandsBalanceScaleCard } from "@/components/measurelands/MeasurelandsBalanceScaleCard";
+import { MeasurelandsAnalogClockCard } from "@/components/measurelands/MeasurelandsAnalogClockCard";
 import { isPracticeTaskSafe } from "@/lib/task-safety";
 
 type Callbacks = {
@@ -354,6 +355,8 @@ function TaskRendererInner({
       return <MeasurelandsRoutineSequenceCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "balanceScale":
       return <MeasurelandsBalanceScaleCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "analogClock":
+      return <MeasurelandsAnalogClockCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundCollect":
       return <GroundCollectTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundBuild":

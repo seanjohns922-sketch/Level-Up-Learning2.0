@@ -195,6 +195,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "routineSequence",
   "toolChoice",
   "balanceScale",
+  "analogClock",
   "groundCollect",
   "groundBuild",
   "groundCompare",

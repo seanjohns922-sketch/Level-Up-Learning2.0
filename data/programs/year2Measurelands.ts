@@ -80,9 +80,9 @@ const YEAR2_MEASURELANDS_RAW: WeekPlan[] = [
     topic: "Clock Tower I",
     curriculum: ["AC9M2M02"],
     lessons: [
-      buildLesson(5, 1, "Read O'Clock", "Time: read o'clock on an analog clock using the hour hand.", ["Read o'clock", "Hour hand", "On the hour"], ["AC9M2M02"]),
-      buildLesson(5, 2, "Half Past", "Time: read half past, with the minute hand at 6 and the hour hand between numbers.", ["Half past", "Minute hand at 6", "Hour hand drifts"], ["AC9M2M02"]),
-      buildLesson(5, 3, "Match and Set", "Time: match analog to digital/words and set the hands to a given time.", ["Match and set", "Analog to digital", "Set the hands"], ["AC9M2M02"]),
+      buildLesson(5, 1, "O'Clock Time", "Time: read o'clock on an analog clock using the minute hand at 12 and the hour hand.", ["O'clock time", "Minute hand at 12", "Hour hand names the time"], ["AC9M2M02"]),
+      buildLesson(5, 2, "Half Past Time", "Time: read half past, with the minute hand at 6 and the hour hand between numbers.", ["Half past time", "Minute hand at 6", "Hour hand halfway"], ["AC9M2M02"]),
+      buildLesson(5, 3, "Build the Time", "Time: build o'clock and half past times using large snapped hour and minute choices.", ["Build the time", "Choose the hour", "Choose o'clock or half past"], ["AC9M2M02"]),
     ],
   },
   {

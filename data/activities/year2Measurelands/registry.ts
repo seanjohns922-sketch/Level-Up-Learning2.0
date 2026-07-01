@@ -59,6 +59,21 @@ import {
   resetY2MeasurelandsWeek4Lesson3TaskSessionState,
   buildY2MeasurelandsWeek4Lesson3QuizTasks,
 } from "@/data/activities/year2Measurelands/week4Lesson3";
+import {
+  generateY2MeasurelandsWeek5Lesson1Task,
+  resetY2MeasurelandsWeek5Lesson1TaskSessionState,
+  buildY2MeasurelandsWeek5Lesson1QuizTasks,
+} from "@/data/activities/year2Measurelands/week5Lesson1";
+import {
+  generateY2MeasurelandsWeek5Lesson2Task,
+  resetY2MeasurelandsWeek5Lesson2TaskSessionState,
+  buildY2MeasurelandsWeek5Lesson2QuizTasks,
+} from "@/data/activities/year2Measurelands/week5Lesson2";
+import {
+  generateY2MeasurelandsWeek5Lesson3Task,
+  resetY2MeasurelandsWeek5Lesson3TaskSessionState,
+  buildY2MeasurelandsWeek5Lesson3QuizTasks,
+} from "@/data/activities/year2Measurelands/week5Lesson3";
 
 // Level 2 (Year 2) Measurelands lesson registry. Mirrors the Level 1 registry so
 // app/lesson/page.tsx can resolve `y2-measurement-w{n}-l{m}` ids to tasks.
@@ -306,6 +321,61 @@ const Y2_MEASURELANDS_LESSONS: Y2MeasurelandsLessonEntry[] = [
     completionTitle: "Different Units Complete!",
     unlockMessage: "Week complete.",
     returnRoute: "/program?year=Year 2&week=4&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y2-measurement-w5-l1",
+    week: 5,
+    lessonNumber: 1,
+    title: "O'Clock Time",
+    subtitle: "Clock Tower I",
+    generate: generateY2MeasurelandsWeek5Lesson1Task,
+    reset: resetY2MeasurelandsWeek5Lesson1TaskSessionState,
+    quizContributionBuilder: buildY2MeasurelandsWeek5Lesson1QuizTasks,
+    practisedSkills: [
+      "Reading o'clock on an analog clock",
+      "Recognising the minute hand at 12",
+      "Using the hour hand to name the time",
+    ],
+    completionTitle: "O'Clock Reader Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+    returnRoute: "/program?year=Year 2&week=5&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y2-measurement-w5-l2",
+    week: 5,
+    lessonNumber: 2,
+    title: "Half Past Time",
+    subtitle: "Clock Tower I",
+    generate: generateY2MeasurelandsWeek5Lesson2Task,
+    reset: resetY2MeasurelandsWeek5Lesson2TaskSessionState,
+    quizContributionBuilder: buildY2MeasurelandsWeek5Lesson2QuizTasks,
+    practisedSkills: [
+      "Reading half past on an analog clock",
+      "Recognising the minute hand at 6",
+      "Reading the hour hand between two numbers",
+    ],
+    completionTitle: "Half Past Reader Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+    returnRoute: "/program?year=Year 2&week=5&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y2-measurement-w5-l3",
+    week: 5,
+    lessonNumber: 3,
+    title: "Build the Time",
+    subtitle: "Clock Tower I",
+    generate: generateY2MeasurelandsWeek5Lesson3Task,
+    reset: resetY2MeasurelandsWeek5Lesson3TaskSessionState,
+    quizContributionBuilder: buildY2MeasurelandsWeek5Lesson3QuizTasks,
+    practisedSkills: [
+      "Building o'clock and half past times",
+      "Choosing the correct hour",
+      "Choosing the correct minute-hand position",
+      "Connecting clock hands to time words",
+    ],
+    completionTitle: "Clock Builder Complete!",
+    unlockMessage: "Week complete.",
+    returnRoute: "/program?year=Year 2&week=5&legacy=1&realm_id=measurement",
   },
 ];
 

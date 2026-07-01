@@ -923,6 +923,30 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Year 2 W5+ — reusable analog clock mechanic. The clock
+      // is controlled by snapped time states first; free hand dragging can be
+      // layered on later without changing the task data.
+      kind: "analogClock";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "read" | "build";
+      mode: "read" | "build";
+      granularity: "hour" | "halfHour" | "quarterHour";
+      targetHour: number;
+      targetMinute: 0 | 15 | 30 | 45;
+      options?: Array<{
+        id: string;
+        label: string;
+        hour: number;
+        minute: 0 | 15 | 30 | 45;
+      }>;
+      correctOptionId?: string;
+      teachingPoints?: string[];
+      showDigital?: boolean;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       // Measurelands Year 1 W8 L1 — sequencing familiar routine events using
       // first / next / last (AC9M1M03). Daily routine scenes are primary.
       kind: "routineSequence";
