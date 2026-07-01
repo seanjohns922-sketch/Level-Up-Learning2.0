@@ -1,52 +1,44 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
 
 // ── Measurelands · Level 2 (Year 2) · Week 4 · Lesson 3
-// "Measure with Different Informal Units"
-// AC9M2M01 — students measure and compare with uniform informal units, then
-// reason that different-sized units produce different counts.
+// "Different Units, Different Counts"
+// AC9M2M01 — same object, different uniform informal units. Students learn that
+// smaller units produce a bigger count and larger units produce a smaller count.
 
 type ToolTask = Extract<PracticeTask, { kind: "toolChoice" }>;
 
-type UnitId = "paperclips" | "crayons" | "blocks" | "pencils";
+type UnitId = "paperclips" | "blocks" | "crayons" | "pencils";
 type Unit = { id: UnitId; label: string; focus: string; iconKey: string; imageSrc?: string; unitSize: number };
-type Obj = {
-  id: string;
-  label: string;
-  imageSrc?: string;
-  iconKey: string;
-  lengthUnits: number;
-  bestUnitId: UnitId;
-};
+type Obj = { id: string; label: string; iconKey: string; imageSrc?: string; lengthUnits: number };
 
 const MEASURE_OBJECT_BASE = "/images/measurelands/measure-objects-3d";
 const EVERYDAY_BASE = "/images/measurelands/everyday-3d";
 const TOOL_BASE = "/images/measurelands/tools-3d";
 
 const UNITS: Record<UnitId, Unit> = {
-  paperclips: { id: "paperclips", label: "Paper Clips", focus: "small lengths", iconKey: "paperclips", unitSize: 1 },
-  crayons: { id: "crayons", label: "Crayons", focus: "books", iconKey: "crayons", imageSrc: `${MEASURE_OBJECT_BASE}/crayon.png`, unitSize: 2 },
-  blocks: { id: "blocks", label: "Blocks", focus: "short objects", iconKey: "blocks", imageSrc: `${TOOL_BASE}/tool-cubes.png`, unitSize: 2 },
-  pencils: { id: "pencils", label: "Pencils", focus: "longer objects", iconKey: "pencils", imageSrc: `${MEASURE_OBJECT_BASE}/pencil.png`, unitSize: 4 },
+  paperclips: { id: "paperclips", label: "Paper Clips", focus: "small units", iconKey: "paperclips", unitSize: 1 },
+  blocks: { id: "blocks", label: "Blocks", focus: "medium units", iconKey: "blocks", imageSrc: `${TOOL_BASE}/tool-cubes.png`, unitSize: 2 },
+  crayons: { id: "crayons", label: "Crayons", focus: "longer units", iconKey: "crayons", imageSrc: `${MEASURE_OBJECT_BASE}/crayon.png`, unitSize: 3 },
+  pencils: { id: "pencils", label: "Pencils", focus: "large units", iconKey: "pencils", imageSrc: `${MEASURE_OBJECT_BASE}/pencil.png`, unitSize: 4 },
 };
 
-const UNIT_ORDER: UnitId[] = ["paperclips", "crayons", "blocks", "pencils"];
+const UNIT_ORDER: UnitId[] = ["paperclips", "blocks", "crayons", "pencils"];
 
 const OBJECTS: Obj[] = [
-  { id: "pencil", label: "Pencil", imageSrc: `${MEASURE_OBJECT_BASE}/pencil.png`, iconKey: "pencil", lengthUnits: 6, bestUnitId: "paperclips" },
-  { id: "book", label: "Book", imageSrc: `${EVERYDAY_BASE}/object-book.png`, iconKey: "book", lengthUnits: 12, bestUnitId: "crayons" },
-  { id: "desk", label: "Desk", imageSrc: `${EVERYDAY_BASE}/object-desk.png`, iconKey: "desk", lengthUnits: 24, bestUnitId: "pencils" },
-  { id: "rope", label: "Rope", imageSrc: `${MEASURE_OBJECT_BASE}/vine.png`, iconKey: "rope", lengthUnits: 28, bestUnitId: "pencils" },
+  { id: "pencil", label: "Pencil", iconKey: "pencil", imageSrc: `${MEASURE_OBJECT_BASE}/pencil.png`, lengthUnits: 12 },
+  { id: "book", label: "Book", iconKey: "book", imageSrc: `${EVERYDAY_BASE}/object-book.png`, lengthUnits: 18 },
+  { id: "rope", label: "Rope", iconKey: "rope", imageSrc: `${MEASURE_OBJECT_BASE}/vine.png`, lengthUnits: 24 },
 ];
 
 type LessonMemory = { introShown: boolean; cursor: number; recent: string[] };
 const lessonMemory = new Map<string, LessonMemory>();
-const ROTATION: Array<"chooseUnit" | "differentCounts" | "bestUnit"> = [
-  "chooseUnit",
-  "differentCounts",
-  "bestUnit",
-  "chooseUnit",
-  "differentCounts",
-  "bestUnit",
+const ROTATION: Array<"measureUnit" | "sameObject" | "completeMeasure"> = [
+  "measureUnit",
+  "sameObject",
+  "completeMeasure",
+  "measureUnit",
+  "sameObject",
+  "completeMeasure",
 ];
 
 function getMemory(lessonId: string): LessonMemory {
@@ -73,7 +65,7 @@ function shuffle<T>(items: T[]): T[] {
 function pickObject(memory: LessonMemory): Obj {
   const pool = OBJECTS.filter((object) => !memory.recent.includes(object.id));
   const object = (pool.length ? pool : OBJECTS)[randInt((pool.length ? pool : OBJECTS).length)]!;
-  memory.recent = [object.id, ...memory.recent].slice(0, 3);
+  memory.recent = [object.id, ...memory.recent].slice(0, 2);
   return object;
 }
 
@@ -90,83 +82,103 @@ function countWithUnit(object: Obj, unitId: UnitId) {
   return Math.round(object.lengthUnits / UNITS[unitId].unitSize);
 }
 
+function measurementRow(object: Obj, unitId: UnitId) {
+  const unit = UNITS[unitId];
+  return {
+    id: unitId,
+    unitLabel: unit.label,
+    unitIconKey: unit.iconKey,
+    unitImageSrc: unit.imageSrc,
+    count: countWithUnit(object, unitId),
+  };
+}
+
+function introTools() {
+  return UNIT_ORDER.map((id) => {
+    const unit = UNITS[id];
+    return { id, label: unit.label, focus: unit.focus, iconKey: unit.iconKey, imageSrc: unit.imageSrc };
+  });
+}
+
 function buildIntroTask(): ToolTask {
   return {
     kind: "toolChoice",
     scene: "intro",
-    prompt: "Measure with different informal units.",
+    prompt: "Different units can measure the same object.",
     speakText:
-      "Professor Gauge says: You do not always need measuring blocks. Lots of everyday objects can be measuring units, like paper clips, crayons, blocks, and pencils.",
+      "Professor Gauge says: The same object can be measured with different informal units. Smaller units make a bigger count. Larger units make a smaller count.",
     badgeLabel: "Meazurex Mission",
-    introTools: UNIT_ORDER.map((id) => {
-      const unit = UNITS[id];
-      return { id, label: unit.label, focus: unit.focus, iconKey: unit.iconKey, imageSrc: unit.imageSrc };
-    }),
-    feedback: { correct: "Let's measure with different units.", wrong: "Let's get ready." },
+    introTools: introTools(),
+    feedback: { correct: "Let's measure the same object in different ways.", wrong: "Let's get ready." },
   };
 }
 
-function buildChooseUnitTask(memory: LessonMemory): ToolTask {
+function buildMeasureUnitTask(memory: LessonMemory): ToolTask {
   const object = pickObject(memory);
-  const correctUnit = object.bestUnitId;
-  const tools = shuffle(UNIT_ORDER.filter((id) => id !== correctUnit).slice(0, 2).concat(correctUnit).map(unitOption));
-  const count = countWithUnit(object, correctUnit);
+  const correctUnit: UnitId = "paperclips";
+  const options: UnitId[] = object.id === "pencil" ? ["paperclips", "blocks", "crayons"] : ["paperclips", "blocks", "pencils"];
   return {
     kind: "toolChoice",
-    scene: "best",
-    prompt: `Choose a measuring unit for the ${object.label.toLowerCase()}.`,
-    speakText: `Choose a measuring unit for the ${object.label.toLowerCase()}.`,
-    badgeLabel: "Choose the Unit",
+    scene: "measureUnit",
+    prompt: `Which unit gives the biggest count for the ${object.label.toLowerCase()}?`,
+    speakText: `The same ${object.label.toLowerCase()} is measured with different units. Which unit gives the biggest count?`,
+    badgeLabel: "How Many Long?",
     object: objectCard(object),
-    tools,
+    tools: shuffle(options.map(unitOption)),
     correctToolId: correctUnit,
+    measurementRows: options.map((id) => measurementRow(object, id)),
     feedback: {
-      correct: `Good choice. The ${object.label.toLowerCase()} measures about ${count} ${UNITS[correctUnit].label.toLowerCase()}.`,
-      wrong: `Correct answer: ${UNITS[correctUnit].label}. That unit is a sensible size for the ${object.label.toLowerCase()}.`,
+      correct: `Yes. Paper clips are the smallest unit, so they make the biggest count.`,
+      wrong: `Correct answer: Paper Clips. Smaller units make a bigger count for the same object.`,
     },
   };
 }
 
-function buildDifferentCountsTask(memory: LessonMemory): ToolTask {
+function buildSameObjectTask(memory: LessonMemory): ToolTask {
   const object = pickObject(memory);
-  const smallUnit: UnitId = object.id === "pencil" ? "paperclips" : "crayons";
-  const largeUnit: UnitId = object.id === "pencil" ? "crayons" : "pencils";
-  const smallCount = countWithUnit(object, smallUnit);
-  const largeCount = countWithUnit(object, largeUnit);
+  const first: UnitId = "blocks";
+  const second: UnitId = "paperclips";
   return {
     kind: "toolChoice",
-    scene: "whyBad",
-    prompt: `${object.label} = ${smallCount} ${UNITS[smallUnit].label.toLowerCase()} but ${largeCount} ${UNITS[largeUnit].label.toLowerCase()}. Why are the numbers different?`,
-    speakText: `${object.label} is ${smallCount} ${UNITS[smallUnit].label.toLowerCase()} but ${largeCount} ${UNITS[largeUnit].label.toLowerCase()}. Why are the numbers different?`,
-    badgeLabel: "How Many?",
+    scene: "sameObject",
+    prompt: `Could both measurements be correct?`,
+    speakText: `${object.label}: ${countWithUnit(object, first)} blocks and ${countWithUnit(object, second)} paper clips. Could both measurements be correct?`,
+    badgeLabel: "Same Object",
     object: objectCard(object),
-    wrongTool: unitOption(smallUnit),
-    reasonOptions: shuffle(["The units are different sizes", "The object changed size", "The numbers do not matter"]),
-    correctReason: "The units are different sizes",
+    measurementRows: [measurementRow(object, first), measurementRow(object, second)],
+    reasonOptions: shuffle(["Yes, the units are different sizes", "No, only one number can be right", "No, the object changed size"]),
+    correctReason: "Yes, the units are different sizes",
     feedback: {
-      correct: "Yes. Smaller units make a bigger count; larger units make a smaller count.",
-      wrong: "Correct answer: the units are different sizes. A smaller unit needs more repeats.",
+      correct: "Yes. Both can be correct because the units are different sizes.",
+      wrong: "Correct answer: yes. The same object can have different counts when the units are different sizes.",
     },
   };
 }
 
-function buildBestUnitTask(memory: LessonMemory): ToolTask {
+function buildCompleteMeasureTask(memory: LessonMemory): ToolTask {
   const object = pickObject(memory);
-  const correctUnit = object.bestUnitId;
-  const distractors = UNIT_ORDER.filter((id) => id !== correctUnit);
-  const tools = shuffle([correctUnit, ...shuffle(distractors).slice(0, 2)].map(unitOption));
+  const unitId: UnitId = "paperclips";
+  const targetCount = countWithUnit(object, unitId);
+  const shownCount = Math.max(3, targetCount - 3);
+  const unit = UNITS[unitId];
   return {
     kind: "toolChoice",
-    scene: "best",
-    prompt: `Best unit challenge: measure the ${object.label.toLowerCase()}.`,
-    speakText: `Best unit challenge. Which informal unit is most practical for measuring the ${object.label.toLowerCase()}?`,
-    badgeLabel: "Best Unit Challenge",
+    scene: "completeMeasure",
+    prompt: `Complete the ${object.label.toLowerCase()} measurement.`,
+    speakText: `Complete the ${object.label.toLowerCase()} measurement. Add paper clips until the measure is complete.`,
+    badgeLabel: "Complete the Measurement",
     object: objectCard(object),
-    tools,
-    correctToolId: correctUnit,
+    completeMeasurement: {
+      unitLabel: unit.label,
+      unitIconKey: unit.iconKey,
+      unitImageSrc: unit.imageSrc,
+      shownCount,
+      targetCount,
+    },
+    correctCount: targetCount,
     feedback: {
-      correct: `Yes. ${UNITS[correctUnit].label} are practical for measuring the ${object.label.toLowerCase()}.`,
-      wrong: `Correct answer: ${UNITS[correctUnit].label}. Choose a unit that is not too tiny and not too large.`,
+      correct: `Correct. The ${object.label.toLowerCase()} is ${targetCount} paper clips long.`,
+      wrong: `Correct answer: ${targetCount} paper clips. Fill every space with the same unit.`,
     },
   };
 }
@@ -182,9 +194,9 @@ export function generateY2MeasurelandsWeek4Lesson3Task(
   }
   const rotation = ROTATION[memory.cursor % ROTATION.length]!;
   memory.cursor += 1;
-  if (rotation === "differentCounts") return buildDifferentCountsTask(memory);
-  if (rotation === "bestUnit") return buildBestUnitTask(memory);
-  return buildChooseUnitTask(memory);
+  if (rotation === "sameObject") return buildSameObjectTask(memory);
+  if (rotation === "completeMeasure") return buildCompleteMeasureTask(memory);
+  return buildMeasureUnitTask(memory);
 }
 
 export function resetY2MeasurelandsWeek4Lesson3TaskSessionState() {
@@ -194,10 +206,10 @@ export function resetY2MeasurelandsWeek4Lesson3TaskSessionState() {
 export function buildY2MeasurelandsWeek4Lesson3QuizTasks(): PracticeTask[] {
   const seed: LessonMemory = { introShown: true, cursor: 0, recent: [] };
   return [
-    buildChooseUnitTask(seed),
-    buildDifferentCountsTask(seed),
-    buildBestUnitTask(seed),
-    buildChooseUnitTask(seed),
-    buildDifferentCountsTask(seed),
+    buildMeasureUnitTask(seed),
+    buildSameObjectTask(seed),
+    buildCompleteMeasureTask(seed),
+    buildMeasureUnitTask(seed),
+    buildSameObjectTask(seed),
   ];
 }

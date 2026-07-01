@@ -956,7 +956,7 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "best" | "whyBad" | "whyBest" | "reflection";
+      scene: "intro" | "best" | "whyBad" | "whyBest" | "reflection" | "measureUnit" | "sameObject" | "completeMeasure";
       /** Optional teaching-strip tools for intro scenes. */
       introTools?: Array<{ id: string; label: string; focus: string; iconKey: string; imageSrc?: string }>;
       /** The object being measured (shown in the middle). */
@@ -969,6 +969,11 @@ export type PracticeTask = (
       /** "whyBad"/"whyBest"/"reflection": text reason options. */
       reasonOptions?: string[];
       correctReason?: string;
+      /** W4 L3: show the same object measured by different informal units. */
+      measurementRows?: Array<{ id: string; unitLabel: string; unitIconKey: string; unitImageSrc?: string; count: number }>;
+      /** W4 L3 complete-measure task: student adds missing unit markers. */
+      completeMeasurement?: { unitLabel: string; unitIconKey: string; unitImageSrc?: string; shownCount: number; targetCount: number };
+      correctCount?: number;
       feedback?: { correct: string; wrong: string };
     }
   | {

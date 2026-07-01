@@ -125,6 +125,7 @@ function getPracticeTaskCorrectAnswer(task: PracticeTask) {
       return task.tools?.find((item) => item.id === task.correctToolId)?.label ?? task.correctToolId;
     }
     if (task.correctReason) return task.correctReason;
+    if (typeof task.correctCount === "number") return String(task.correctCount);
   }
   return null;
 }

@@ -5,6 +5,7 @@ import {
   Eraser, Pencil, BookOpen, Box, Armchair, DoorClosed, Bed, School, Car, Map, MoveHorizontal, TreePine,
   type LucideIcon,
 } from "lucide-react";
+import { useState } from "react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
@@ -64,6 +65,23 @@ function ObjectCard({ object, big = true }: { object: NonNullable<ToolTask["obje
       <span className="text-[11px] font-black uppercase tracking-[0.16em] text-[#5b21b6]">Measure the</span>
       <Glyph label={object.label} iconKey={object.iconKey} imageSrc={object.imageSrc} big={big} />
       <span className="text-lg font-black leading-tight text-[#2c1c07]">{object.label}</span>
+    </div>
+  );
+}
+
+function UnitStrip({ count, label, iconKey, imageSrc, blanks = 0 }: { count: number; label: string; iconKey: string; imageSrc?: string; blanks?: number }) {
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-1.5 rounded-[20px] border border-[rgba(214,184,108,0.5)] bg-[rgba(255,252,245,0.95)] px-3 py-3">
+      {Array.from({ length: count }).map((_, index) => (
+        <div key={`unit-${index}`} className="flex h-9 w-9 items-center justify-center rounded-xl border border-[rgba(214,184,108,0.35)] bg-white shadow-sm">
+          <Glyph label={label} iconKey={iconKey} imageSrc={imageSrc} />
+        </div>
+      ))}
+      {Array.from({ length: blanks }).map((_, index) => (
+        <div key={`blank-${index}`} className="flex h-9 w-9 items-center justify-center rounded-xl border-2 border-dashed border-[rgba(167,139,250,0.55)] bg-[rgba(167,139,250,0.08)] text-lg font-black text-[#7c3aed]">
+          ?
+        </div>
+      ))}
     </div>
   );
 }
@@ -143,6 +161,96 @@ function ToolGrid({ task, onCorrect, onWrong }: { task: ToolTask; onCorrect: () 
   );
 }
 
+function MeasureUnitScene({ task, onCorrect, onWrong }: { task: ToolTask; onCorrect: () => void; onWrong: () => void }) {
+  return (
+    <Shell badge={task.badgeLabel ?? "Measure the Object"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      {task.object ? <ObjectCard object={task.object} /> : null}
+      <div className="grid grid-cols-3 gap-3">
+        {(task.tools ?? []).map((tool) => {
+          const row = task.measurementRows?.find((item) => item.id === tool.id);
+          return (
+            <button
+              key={tool.id}
+              type="button"
+              onClick={() => (tool.id === task.correctToolId ? onCorrect() : onWrong())}
+              className="relative flex min-h-[160px] flex-col items-center justify-center gap-2 rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-2 text-center text-sm font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+            >
+              <span className="absolute right-2 top-2 z-10"><OptionReadAloudButton text={`${tool.label}${row ? `, ${row.count}` : ""}`} /></span>
+              <Glyph label={tool.label} iconKey={tool.iconKey} imageSrc={tool.imageSrc} />
+              <span>{tool.label}</span>
+              {row ? <span className="rounded-full bg-[#f7e7ba] px-3 py-1 text-xs text-[#7c4a12]">{row.count} {row.unitLabel.toLowerCase()}</span> : null}
+            </button>
+          );
+        })}
+      </div>
+    </Shell>
+  );
+}
+
+function SameObjectScene({ task, onCorrect, onWrong }: { task: ToolTask; onCorrect: () => void; onWrong: () => void }) {
+  return (
+    <Shell badge={task.badgeLabel ?? "Same Object"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      {task.object ? <ObjectCard object={task.object} big={false} /> : null}
+      <div className="grid gap-3">
+        {(task.measurementRows ?? []).map((row) => (
+          <div key={row.id} className="rounded-[24px] border border-[rgba(214,184,108,0.45)] bg-white p-3">
+            <div className="mb-2 text-center text-sm font-black uppercase tracking-[0.12em] text-[#7c4a12]">
+              {row.count} {row.unitLabel}
+            </div>
+            <UnitStrip count={row.count} label={row.unitLabel} iconKey={row.unitIconKey} imageSrc={row.unitImageSrc} />
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        {(task.reasonOptions ?? []).map((value) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => (value === task.correctReason ? onCorrect() : onWrong())}
+            className="relative flex min-h-[72px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-3 text-center text-base font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+          >
+            <span className="absolute right-2 top-2 z-10"><OptionReadAloudButton text={value} /></span>
+            {value}
+          </button>
+        ))}
+      </div>
+    </Shell>
+  );
+}
+
+function CompleteMeasureScene({ task, onCorrect, onWrong }: { task: ToolTask; onCorrect: () => void; onWrong: () => void }) {
+  const measure = task.completeMeasurement;
+  const shown = measure?.shownCount ?? 0;
+  const target = measure?.targetCount ?? task.correctCount ?? shown;
+  const [added, setAdded] = useState(0);
+  const total = shown + added;
+  const missing = Math.max(0, target - total);
+  return (
+    <Shell badge={task.badgeLabel ?? "Complete the Measure"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      {task.object ? <ObjectCard object={task.object} big={false} /> : null}
+      {measure ? (
+        <div className="rounded-[26px] border border-[rgba(214,184,108,0.45)] bg-white p-4">
+          <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.12em] text-[#7c4a12]">
+            {total} / {target} {measure.unitLabel}
+          </div>
+          <UnitStrip count={total} blanks={missing} label={measure.unitLabel} iconKey={measure.unitIconKey} imageSrc={measure.unitImageSrc} />
+        </div>
+      ) : null}
+      <div className="grid grid-cols-3 gap-3">
+        <button type="button" onClick={() => setAdded((value) => Math.max(0, value - 1))} className="rounded-[22px] border-2 border-[rgba(214,184,108,0.45)] bg-white px-4 py-4 font-black text-[#7c4a12]">
+          Remove
+        </button>
+        <button type="button" onClick={() => setAdded((value) => Math.min(target - shown + 2, value + 1))} className="rounded-[22px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-4 py-4 font-black text-[#2c1c07]">
+          Add {measure?.unitLabel ?? "Unit"}
+        </button>
+        <button type="button" onClick={() => (total === target ? onCorrect() : onWrong())} className="rounded-[22px] bg-[#7c3aed] px-4 py-4 font-black text-white shadow-[0_12px_24px_rgba(124,58,237,0.22)]">
+          Check
+        </button>
+      </div>
+    </Shell>
+  );
+}
+
 /* ── Text-reason questions (whyBad: object + a wrong tool) ── */
 function ReasonScene({ task, onCorrect, onWrong }: { task: ToolTask; onCorrect: () => void; onWrong: () => void }) {
   return (
@@ -178,6 +286,9 @@ function ReasonScene({ task, onCorrect, onWrong }: { task: ToolTask; onCorrect: 
 
 export function MeasurelandsToolChoiceCard({ task, onCorrect, onWrong }: { task: ToolTask; onCorrect: () => void; onWrong: () => void }) {
   if (task.scene === "intro") return <IntroScene task={task} onCorrect={onCorrect} />;
+  if (task.scene === "measureUnit") return <MeasureUnitScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "sameObject") return <SameObjectScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "completeMeasure") return <CompleteMeasureScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "whyBad" || task.scene === "whyBest" || task.scene === "reflection") {
     return <ReasonScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   }

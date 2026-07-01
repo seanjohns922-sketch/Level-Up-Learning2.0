@@ -71,7 +71,7 @@ const YEAR2_MEASURELANDS_RAW: WeekPlan[] = [
     lessons: [
       buildLesson(4, 1, "Measure It Your Way", "Accuracy: measure objects with big and small blocks — big units are quick but leave a bit over, small units fit exactly (smaller units = bigger, closer count). Open-ended: the child decides how to measure.", ["Measure your way", "Big and small blocks", "Smaller units are closer"], ["AC9M2M01"]),
       buildLesson(4, 2, "Estimate It", "Estimation: guess an object's length by eye before measuring — best guess, guess & check, and which looks longer. Real objects, endless variety.", ["Estimate it", "Best guess", "Guess and check"], ["AC9M2M01"]),
-      buildLesson(4, 3, "Measure with Different Informal Units", "Application: measure with everyday informal units and explain why different-sized units make different counts.", ["Choose the unit", "Different unit counts", "Best informal unit"], ["AC9M2M01"]),
+      buildLesson(4, 3, "Different Units, Different Counts", "Application: measure the same object with different informal units and explain why the counts change.", ["Same object", "Different unit counts", "Complete the measure"], ["AC9M2M01"]),
     ],
   },
   {
