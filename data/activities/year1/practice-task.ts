@@ -957,6 +957,8 @@ export type PracticeTask = (
       speakText?: string;
       badgeLabel?: string;
       scene: "intro" | "best" | "whyBad" | "whyBest" | "reflection";
+      /** Optional teaching-strip tools for intro scenes. */
+      introTools?: Array<{ id: string; label: string; focus: string; iconKey: string; imageSrc?: string }>;
       /** The object being measured (shown in the middle). */
       object?: { label: string; iconKey: string; imageSrc?: string };
       /** "best"/"whyBest": tool option cards; tap the best (correctToolId). */

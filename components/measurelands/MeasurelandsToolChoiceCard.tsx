@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  Compass, Boxes, Ruler, Scaling, LifeBuoy, Footprints,
+  Compass, Boxes, Ruler, Scaling, LifeBuoy, Footprints, Paperclip,
   Eraser, Pencil, BookOpen, Box, Armchair, DoorClosed, Bed, School, Car, Map, MoveHorizontal, TreePine,
   type LucideIcon,
 } from "lucide-react";
@@ -15,7 +15,8 @@ type ToolTask = Extract<PracticeTask, { kind: "toolChoice" }>;
 // art brief). Cards render `imageSrc` when present, else this icon.
 const ICONS: Record<string, LucideIcon> = {
   // tools
-  cubes: Boxes, ruler: Ruler, tape: Scaling, wheel: LifeBuoy, feet: Footprints,
+  cubes: Boxes, blocks: Boxes, ruler: Ruler, tape: Scaling, wheel: LifeBuoy, feet: Footprints,
+  paperclips: Paperclip, crayons: Pencil, pencils: Pencil,
   // objects
   eraser: Eraser, pencil: Pencil, book: BookOpen, crayon: Pencil, pencilcase: Box,
   bottle: Box, chair: Armchair, desk: Box, door: DoorClosed, bed: Bed,
@@ -69,12 +70,13 @@ function ObjectCard({ object, big = true }: { object: NonNullable<ToolTask["obje
 
 /* ── Intro / teaching ── */
 function IntroScene({ task, onCorrect }: { task: ToolTask; onCorrect: () => void }) {
-  const toolLegend: Array<{ k: string; n: string; f: string }> = [
-    { k: "cubes", n: "Cubes", f: "tiny things" },
-    { k: "ruler", n: "Ruler", f: "small things" },
-    { k: "tape", n: "Tape Measure", f: "rooms" },
-    { k: "feet", n: "Footsteps", f: "floors" },
-    { k: "wheel", n: "Trundle Wheel", f: "big spaces" },
+  const hasCustomIntroTools = Boolean(task.introTools?.length);
+  const toolLegend = task.introTools ?? [
+    { id: "cubes", label: "Cubes", focus: "tiny things", iconKey: "cubes", imageSrc: "/images/measurelands/tools-3d/tool-cubes.png" },
+    { id: "ruler", label: "Ruler", focus: "small things", iconKey: "ruler", imageSrc: "/images/measurelands/tools-3d/tool-ruler.png" },
+    { id: "tape", label: "Tape Measure", focus: "rooms", iconKey: "tape", imageSrc: "/images/measurelands/tools-3d/tool-tape.png" },
+    { id: "feet", label: "Footsteps", focus: "floors", iconKey: "feet", imageSrc: "/images/measurelands/tools-3d/tool-feet.png" },
+    { id: "wheel", label: "Trundle Wheel", focus: "big spaces", iconKey: "wheel", imageSrc: "/images/measurelands/tools-3d/tool-wheel.png" },
   ];
   return (
     <Shell badge={task.badgeLabel ?? "Meazurex Mission"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
@@ -85,17 +87,26 @@ function IntroScene({ task, onCorrect }: { task: ToolTask; onCorrect: () => void
           </div>
           <div className="space-y-2">
             <div className="text-sm font-black uppercase tracking-[0.16em] text-[#5b21b6]">Meazurex</div>
-            <p className="text-base font-semibold leading-relaxed text-[#2c1c07]">A pencil and a playground are both lengths — but we measure them differently.</p>
-            <p className="text-base font-semibold leading-relaxed text-[#5f4725]">Good measurers choose the best tool for the job!</p>
+            {hasCustomIntroTools ? (
+              <>
+                <p className="text-base font-semibold leading-relaxed text-[#2c1c07]">You don't always need measuring blocks.</p>
+                <p className="text-base font-semibold leading-relaxed text-[#5f4725]">Lots of everyday objects can be measuring units.</p>
+              </>
+            ) : (
+              <>
+                <p className="text-base font-semibold leading-relaxed text-[#2c1c07]">A pencil and a playground are both lengths — but we measure them differently.</p>
+                <p className="text-base font-semibold leading-relaxed text-[#5f4725]">Good measurers choose the best tool for the job!</p>
+              </>
+            )}
           </div>
         </div>
         <div className="mb-2 text-center text-xs font-black uppercase tracking-[0.18em] text-[#5b21b6]">Meet your measuring tools</div>
         <div className="grid grid-cols-5 gap-2">
           {toolLegend.map((t) => (
-            <div key={t.k} className="flex flex-col items-center gap-1 rounded-[18px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.95)] px-1 py-3 text-center">
-              <Glyph label={t.n} iconKey={t.k} imageSrc={`/images/measurelands/tools-3d/tool-${t.k}.png`} />
-              <span className="text-[11px] font-black leading-tight text-[#2c1c07]">{t.n}</span>
-              <span className="text-[10px] font-bold leading-tight text-[#a98b52]">for {t.f}</span>
+            <div key={t.id} className="flex flex-col items-center gap-1 rounded-[18px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.95)] px-1 py-3 text-center">
+              <Glyph label={t.label} iconKey={t.iconKey} imageSrc={t.imageSrc} />
+              <span className="text-[11px] font-black leading-tight text-[#2c1c07]">{t.label}</span>
+              <span className="text-[10px] font-bold leading-tight text-[#a98b52]">for {t.focus}</span>
             </div>
           ))}
         </div>

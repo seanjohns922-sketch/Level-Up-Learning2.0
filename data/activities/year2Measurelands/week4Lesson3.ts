@@ -1,56 +1,53 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
 
-// ── Measurelands · Level 2 (Year 2) · Week 4 · Lesson 3 — "Choose the Right Tool" ──
-// AC9M2M01 — the APPLY step of the accuracy arc: pick the sensible unit/tool for
-// the job (tiny cubes for a pencil, a trundle wheel for a playground) and say
-// why. Uses the existing `toolChoice` mechanic + real everyday-object and tool
-// art, so it looks nothing like L1/L2. THREE rotating activities, each drawing
-// from a big object pool (eraser → bridge), so the questions are endless:
-//   1. best    — object → tap the best tool of 3.
-//   2. whyBad  — object + a wrong tool → pick why it's a bad fit.
-//   3. whyBest — object + its best tool → justify "just right".
+// ── Measurelands · Level 2 (Year 2) · Week 4 · Lesson 3
+// "Measure with Different Informal Units"
+// AC9M2M01 — students measure and compare with uniform informal units, then
+// reason that different-sized units produce different counts.
 
 type ToolTask = Extract<PracticeTask, { kind: "toolChoice" }>;
 
-const TOOLS: Record<string, { label: string; reach: number }> = {
-  cubes: { label: "Cubes", reach: 0 },
-  ruler: { label: "Ruler", reach: 1 },
-  tape: { label: "Tape Measure", reach: 2 },
-  feet: { label: "Footsteps", reach: 2 },
-  wheel: { label: "Trundle Wheel", reach: 3 },
+type UnitId = "paperclips" | "crayons" | "blocks" | "pencils";
+type Unit = { id: UnitId; label: string; focus: string; iconKey: string; imageSrc?: string; unitSize: number };
+type Obj = {
+  id: string;
+  label: string;
+  imageSrc?: string;
+  iconKey: string;
+  lengthUnits: number;
+  bestUnitId: UnitId;
 };
 
-type Obj = { id: string; label: string; size: 1 | 2 | 3 };
+const MEASURE_OBJECT_BASE = "/images/measurelands/measure-objects-3d";
+const EVERYDAY_BASE = "/images/measurelands/everyday-3d";
+const TOOL_BASE = "/images/measurelands/tools-3d";
+
+const UNITS: Record<UnitId, Unit> = {
+  paperclips: { id: "paperclips", label: "Paper Clips", focus: "small lengths", iconKey: "paperclips", unitSize: 1 },
+  crayons: { id: "crayons", label: "Crayons", focus: "books", iconKey: "crayons", imageSrc: `${MEASURE_OBJECT_BASE}/crayon.png`, unitSize: 2 },
+  blocks: { id: "blocks", label: "Blocks", focus: "short objects", iconKey: "blocks", imageSrc: `${TOOL_BASE}/tool-cubes.png`, unitSize: 2 },
+  pencils: { id: "pencils", label: "Pencils", focus: "longer objects", iconKey: "pencils", imageSrc: `${MEASURE_OBJECT_BASE}/pencil.png`, unitSize: 4 },
+};
+
+const UNIT_ORDER: UnitId[] = ["paperclips", "crayons", "blocks", "pencils"];
+
 const OBJECTS: Obj[] = [
-  { id: "eraser", label: "Eraser", size: 1 },
-  { id: "pencil", label: "Pencil", size: 1 },
-  { id: "book", label: "Book", size: 1 },
-  { id: "crayon", label: "Crayon", size: 1 },
-  { id: "pencilcase", label: "Pencil Case", size: 1 },
-  { id: "bottle", label: "Drink Bottle", size: 1 },
-  { id: "chair", label: "Chair", size: 2 },
-  { id: "desk", label: "Desk", size: 2 },
-  { id: "door", label: "Door", size: 2 },
-  { id: "bed", label: "Bed", size: 2 },
-  { id: "classroom", label: "Classroom", size: 2 },
-  { id: "car", label: "Car", size: 2 },
-  { id: "playground", label: "Playground", size: 3 },
-  { id: "oval", label: "School Oval", size: 3 },
-  { id: "hallway", label: "Hallway", size: 3 },
-  { id: "court", label: "Basketball Court", size: 3 },
-  { id: "bridge", label: "Bridge", size: 3 },
+  { id: "pencil", label: "Pencil", imageSrc: `${MEASURE_OBJECT_BASE}/pencil.png`, iconKey: "pencil", lengthUnits: 6, bestUnitId: "paperclips" },
+  { id: "book", label: "Book", imageSrc: `${EVERYDAY_BASE}/object-book.png`, iconKey: "book", lengthUnits: 12, bestUnitId: "crayons" },
+  { id: "desk", label: "Desk", imageSrc: `${EVERYDAY_BASE}/object-desk.png`, iconKey: "desk", lengthUnits: 24, bestUnitId: "pencils" },
+  { id: "rope", label: "Rope", imageSrc: `${MEASURE_OBJECT_BASE}/vine.png`, iconKey: "rope", lengthUnits: 28, bestUnitId: "pencils" },
 ];
-
-const BEST_BY_SIZE: Record<1 | 2 | 3, string> = { 1: "ruler", 2: "tape", 3: "wheel" };
-const DISTRACTORS_BY_SIZE: Record<1 | 2 | 3, string[]> = {
-  1: ["wheel", "feet"],
-  2: ["ruler", "wheel"],
-  3: ["ruler", "cubes"],
-};
 
 type LessonMemory = { introShown: boolean; cursor: number; recent: string[] };
 const lessonMemory = new Map<string, LessonMemory>();
-const ROTATION: Array<"best" | "whyBad" | "whyBest"> = ["best", "whyBad", "best", "whyBest", "whyBad", "best"];
+const ROTATION: Array<"chooseUnit" | "differentCounts" | "bestUnit"> = [
+  "chooseUnit",
+  "differentCounts",
+  "bestUnit",
+  "chooseUnit",
+  "differentCounts",
+  "bestUnit",
+];
 
 function getMemory(lessonId: string): LessonMemory {
   const existing = lessonMemory.get(lessonId);
@@ -63,6 +60,7 @@ function getMemory(lessonId: string): LessonMemory {
 function randInt(maxExclusive: number) {
   return Math.floor(Math.random() * maxExclusive);
 }
+
 function shuffle<T>(items: T[]): T[] {
   const next = [...items];
   for (let i = next.length - 1; i > 0; i -= 1) {
@@ -71,87 +69,105 @@ function shuffle<T>(items: T[]): T[] {
   }
   return next;
 }
+
 function pickObject(memory: LessonMemory): Obj {
-  const pool = OBJECTS.filter((o) => !memory.recent.includes(o.id));
-  const obj = (pool.length ? pool : OBJECTS)[randInt((pool.length ? pool : OBJECTS).length)]!;
-  memory.recent = [obj.id, ...memory.recent].slice(0, 4);
-  return obj;
+  const pool = OBJECTS.filter((object) => !memory.recent.includes(object.id));
+  const object = (pool.length ? pool : OBJECTS)[randInt((pool.length ? pool : OBJECTS).length)]!;
+  memory.recent = [object.id, ...memory.recent].slice(0, 3);
+  return object;
 }
 
-const TOOLS_BASE = "/images/measurelands/tools-3d";
-const EVERYDAY_BASE = "/images/measurelands/everyday-3d";
-function toolImg(id: string) {
-  return `${TOOLS_BASE}/tool-${id}.png`;
+function unitOption(id: UnitId) {
+  const unit = UNITS[id];
+  return { id, label: unit.label, iconKey: unit.iconKey, imageSrc: unit.imageSrc };
 }
-function toolOption(id: string) {
-  return { id, label: TOOLS[id]!.label, iconKey: id, imageSrc: toolImg(id) };
+
+function objectCard(object: Obj) {
+  return { label: object.label, iconKey: object.iconKey, imageSrc: object.imageSrc };
 }
-function toObject(obj: Obj) {
-  return { label: obj.label, iconKey: obj.id, imageSrc: `${EVERYDAY_BASE}/object-${obj.id}.png` };
+
+function countWithUnit(object: Obj, unitId: UnitId) {
+  return Math.round(object.lengthUnits / UNITS[unitId].unitSize);
 }
 
 function buildIntroTask(): ToolTask {
   return {
     kind: "toolChoice",
     scene: "intro",
-    prompt: "Choose the right tool.",
+    prompt: "Measure with different informal units.",
     speakText:
-      "A pencil and a playground are both lengths, but we would not measure them the same way. Tiny things need small units; huge things need big ones. A good measurer chooses the right tool for the job!",
+      "Professor Gauge says: You do not always need measuring blocks. Lots of everyday objects can be measuring units, like paper clips, crayons, blocks, and pencils.",
     badgeLabel: "Meazurex Mission",
-    feedback: { correct: "Let's choose the right tool!", wrong: "Let's get ready." },
+    introTools: UNIT_ORDER.map((id) => {
+      const unit = UNITS[id];
+      return { id, label: unit.label, focus: unit.focus, iconKey: unit.iconKey, imageSrc: unit.imageSrc };
+    }),
+    feedback: { correct: "Let's measure with different units.", wrong: "Let's get ready." },
   };
 }
 
-function buildBestTask(memory: LessonMemory): ToolTask {
-  const obj = pickObject(memory);
-  const best = BEST_BY_SIZE[obj.size];
-  const tools = shuffle([best, ...DISTRACTORS_BY_SIZE[obj.size]].map(toolOption));
+function buildChooseUnitTask(memory: LessonMemory): ToolTask {
+  const object = pickObject(memory);
+  const correctUnit = object.bestUnitId;
+  const tools = shuffle(UNIT_ORDER.filter((id) => id !== correctUnit).slice(0, 2).concat(correctUnit).map(unitOption));
+  const count = countWithUnit(object, correctUnit);
   return {
     kind: "toolChoice",
     scene: "best",
-    prompt: `Which tool is best to measure the ${obj.label.toLowerCase()}?`,
-    speakText: `Which tool is best to measure the ${obj.label.toLowerCase()}?`,
-    badgeLabel: "Choose the Right Tool",
-    object: toObject(obj),
+    prompt: `Choose a measuring unit for the ${object.label.toLowerCase()}.`,
+    speakText: `Choose a measuring unit for the ${object.label.toLowerCase()}.`,
+    badgeLabel: "Choose the Unit",
+    object: objectCard(object),
     tools,
-    correctToolId: best,
-    feedback: { correct: `Yes — a ${TOOLS[best]!.label.toLowerCase()} is just right!`, wrong: "Think about the size of the object, then match the tool." },
+    correctToolId: correctUnit,
+    feedback: {
+      correct: `Good choice. The ${object.label.toLowerCase()} measures about ${count} ${UNITS[correctUnit].label.toLowerCase()}.`,
+      wrong: `Correct answer: ${UNITS[correctUnit].label}. That unit is a sensible size for the ${object.label.toLowerCase()}.`,
+    },
   };
 }
 
-function buildWhyBadTask(memory: LessonMemory): ToolTask {
-  const obj = pickObject(memory);
-  const best = BEST_BY_SIZE[obj.size];
-  const wrongId = shuffle(Object.keys(TOOLS).filter((id) => id !== best))[0]!;
-  const wrongReach = TOOLS[wrongId]!.reach;
-  const reason = wrongReach < obj.size ? "Too small" : wrongReach > obj.size ? "Too big" : "Hard to use";
+function buildDifferentCountsTask(memory: LessonMemory): ToolTask {
+  const object = pickObject(memory);
+  const smallUnit: UnitId = object.id === "pencil" ? "paperclips" : "crayons";
+  const largeUnit: UnitId = object.id === "pencil" ? "crayons" : "pencils";
+  const smallCount = countWithUnit(object, smallUnit);
+  const largeCount = countWithUnit(object, largeUnit);
   return {
     kind: "toolChoice",
     scene: "whyBad",
-    prompt: `Why is a ${TOOLS[wrongId]!.label.toLowerCase()} a bad tool for the ${obj.label.toLowerCase()}?`,
-    speakText: `Why is a ${TOOLS[wrongId]!.label.toLowerCase()} a bad tool for the ${obj.label.toLowerCase()}?`,
-    badgeLabel: "Why Not That One?",
-    object: toObject(obj),
-    wrongTool: { label: TOOLS[wrongId]!.label, iconKey: wrongId, imageSrc: toolImg(wrongId) },
-    reasonOptions: ["Too small", "Too big", "Hard to use"],
-    correctReason: reason,
-    feedback: { correct: "Good thinking!", wrong: "Think about the tool's size next to the object's size." },
+    prompt: `${object.label} = ${smallCount} ${UNITS[smallUnit].label.toLowerCase()} but ${largeCount} ${UNITS[largeUnit].label.toLowerCase()}. Why are the numbers different?`,
+    speakText: `${object.label} is ${smallCount} ${UNITS[smallUnit].label.toLowerCase()} but ${largeCount} ${UNITS[largeUnit].label.toLowerCase()}. Why are the numbers different?`,
+    badgeLabel: "How Many?",
+    object: objectCard(object),
+    wrongTool: unitOption(smallUnit),
+    reasonOptions: shuffle(["The units are different sizes", "The object changed size", "The numbers do not matter"]),
+    correctReason: "The units are different sizes",
+    feedback: {
+      correct: "Yes. Smaller units make a bigger count; larger units make a smaller count.",
+      wrong: "Correct answer: the units are different sizes. A smaller unit needs more repeats.",
+    },
   };
 }
 
-function buildWhyBestTask(memory: LessonMemory): ToolTask {
-  const obj = pickObject(memory);
-  const best = BEST_BY_SIZE[obj.size];
+function buildBestUnitTask(memory: LessonMemory): ToolTask {
+  const object = pickObject(memory);
+  const correctUnit = object.bestUnitId;
+  const distractors = UNIT_ORDER.filter((id) => id !== correctUnit);
+  const tools = shuffle([correctUnit, ...shuffle(distractors).slice(0, 2)].map(unitOption));
   return {
     kind: "toolChoice",
-    scene: "whyBest",
-    prompt: `A ${TOOLS[best]!.label.toLowerCase()} is the right tool for the ${obj.label.toLowerCase()}. Why?`,
-    speakText: `A ${TOOLS[best]!.label.toLowerCase()} is the right tool for the ${obj.label.toLowerCase()}. Why is it the best?`,
-    badgeLabel: "Why It's Best",
-    object: toObject(obj),
-    reasonOptions: shuffle(["Just the right size", "Too small to reach", "Too big to use"]),
-    correctReason: "Just the right size",
-    feedback: { correct: "Yes — the right tool is fast and easy!", wrong: "The best tool fits the object just right." },
+    scene: "best",
+    prompt: `Best unit challenge: measure the ${object.label.toLowerCase()}.`,
+    speakText: `Best unit challenge. Which informal unit is most practical for measuring the ${object.label.toLowerCase()}?`,
+    badgeLabel: "Best Unit Challenge",
+    object: objectCard(object),
+    tools,
+    correctToolId: correctUnit,
+    feedback: {
+      correct: `Yes. ${UNITS[correctUnit].label} are practical for measuring the ${object.label.toLowerCase()}.`,
+      wrong: `Correct answer: ${UNITS[correctUnit].label}. Choose a unit that is not too tiny and not too large.`,
+    },
   };
 }
 
@@ -166,9 +182,9 @@ export function generateY2MeasurelandsWeek4Lesson3Task(
   }
   const rotation = ROTATION[memory.cursor % ROTATION.length]!;
   memory.cursor += 1;
-  if (rotation === "whyBad") return buildWhyBadTask(memory);
-  if (rotation === "whyBest") return buildWhyBestTask(memory);
-  return buildBestTask(memory);
+  if (rotation === "differentCounts") return buildDifferentCountsTask(memory);
+  if (rotation === "bestUnit") return buildBestUnitTask(memory);
+  return buildChooseUnitTask(memory);
 }
 
 export function resetY2MeasurelandsWeek4Lesson3TaskSessionState() {
@@ -178,10 +194,10 @@ export function resetY2MeasurelandsWeek4Lesson3TaskSessionState() {
 export function buildY2MeasurelandsWeek4Lesson3QuizTasks(): PracticeTask[] {
   const seed: LessonMemory = { introShown: true, cursor: 0, recent: [] };
   return [
-    buildBestTask(seed),
-    buildWhyBadTask(seed),
-    buildWhyBestTask(seed),
-    buildBestTask(seed),
-    buildWhyBadTask(seed),
+    buildChooseUnitTask(seed),
+    buildDifferentCountsTask(seed),
+    buildBestUnitTask(seed),
+    buildChooseUnitTask(seed),
+    buildDifferentCountsTask(seed),
   ];
 }
