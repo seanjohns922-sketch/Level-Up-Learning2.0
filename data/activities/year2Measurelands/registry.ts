@@ -54,6 +54,11 @@ import {
   resetY2MeasurelandsWeek4Lesson2TaskSessionState,
   buildY2MeasurelandsWeek4Lesson2QuizTasks,
 } from "@/data/activities/year2Measurelands/week4Lesson2";
+import {
+  generateY2MeasurelandsWeek4Lesson3Task,
+  resetY2MeasurelandsWeek4Lesson3TaskSessionState,
+  buildY2MeasurelandsWeek4Lesson3QuizTasks,
+} from "@/data/activities/year2Measurelands/week4Lesson3";
 
 // Level 2 (Year 2) Measurelands lesson registry. Mirrors the Level 1 registry so
 // app/lesson/page.tsx can resolve `y2-measurement-w{n}-l{m}` ids to tasks.
@@ -281,6 +286,24 @@ const Y2_MEASURELANDS_LESSONS: Y2MeasurelandsLessonEntry[] = [
       "Comparing lengths by estimation",
     ],
     completionTitle: "Estimator Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+    returnRoute: "/program?year=Year 2&week=4&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y2-measurement-w4-l3",
+    week: 4,
+    lessonNumber: 3,
+    title: "Choose the Right Tool",
+    subtitle: "Closer Count",
+    generate: generateY2MeasurelandsWeek4Lesson3Task,
+    reset: resetY2MeasurelandsWeek4Lesson3TaskSessionState,
+    quizContributionBuilder: buildY2MeasurelandsWeek4Lesson3QuizTasks,
+    practisedSkills: [
+      "Choosing the sensible measuring tool for an object's size",
+      "Explaining why a tool is a poor fit (too big / too small)",
+      "Justifying the best tool for the job",
+    ],
+    completionTitle: "Tool Detective Complete!",
     unlockMessage: "Week complete.",
     returnRoute: "/program?year=Year 2&week=4&legacy=1&realm_id=measurement",
   },
