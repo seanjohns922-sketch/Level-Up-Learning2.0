@@ -69,9 +69,9 @@ const YEAR2_MEASURELANDS_RAW: WeekPlan[] = [
     topic: "Closer Count",
     curriculum: ["AC9M2M01"],
     lessons: [
-      buildLesson(4, 1, "Not Exact Yet", "Accuracy — notice the problem: some measurements don't finish exactly on a block, they stop in between.", ["Not exact yet", "Stops in between", "Exact or not"], ["AC9M2M01"]),
-      buildLesson(4, 2, "Measure More Accurately", "Accuracy — solve the problem: re-measure with smaller units so the length fits for a closer, exact count.", ["Measure more accurately", "Smaller units", "Closer count"], ["AC9M2M01"]),
-      buildLesson(4, 3, "Choose the Best Measuring Unit", "Accuracy — explain the solution: reason about which measuring unit gives the best measurement.", ["Best measuring unit", "Choose the unit", "Big or small unit"], ["AC9M2M01"]),
+      buildLesson(4, 1, "Measure More Accurately", "Accuracy — the skill: measure with big units, notice the leftover bit, re-measure with smaller units so it fits exactly (smaller units = bigger, closer count).", ["Measure more accurately", "Smaller units", "Bit left over"], ["AC9M2M01"]),
+      buildLesson(4, 2, "Which Measurement Is Closer?", "Accuracy — reason: compare a big-unit and small-unit measurement of the same object and decide which is more exact, and why.", ["Which is closer", "Big vs small units", "More exact"], ["AC9M2M01"]),
+      buildLesson(4, 3, "Choose the Best Measuring Unit", "Accuracy — apply: choose the best-sized unit for the job and justify the choice.", ["Best measuring unit", "Choose the unit", "Big or small unit"], ["AC9M2M01"]),
     ],
   },
   {

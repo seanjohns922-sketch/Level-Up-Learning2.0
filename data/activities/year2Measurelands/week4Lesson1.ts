@@ -1,44 +1,39 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
 
-// ── Measurelands · Level 2 (Year 2) · Week 4 · Lesson 1 — "Not Exact Yet" ──
-// AC9M2M01. The lightbulb moment of the accuracy arc (Notice → Solve → Explain):
-// students NOTICE that some measurements don't finish exactly on a block — they
-// stop in between. One idea, one question: "Does it finish exactly on a block?"
+// ── Measurelands · Level 2 (Year 2) · Week 4 · Lesson 1 — "Measure More Accurately" ──
+// AC9M2M01: "...using appropriate uniform informal units AND SMALLER UNITS FOR
+// ACCURACY WHEN NECESSARY." ACARA: when a measurement with larger units isn't
+// precise (a leftover part), re-measure with smaller units to increase accuracy.
 //
-// The coloured measurement BAR is the source of truth (full cells + a partial
-// last cell = "not exact"); the object illustration is engagement only. No
-// "between which two" and no "which needs a smaller unit" — those are L2/L3.
+// One active story per turn (Notice → Solve → Explain, all inside the task):
+//   1. Measure a rope with BIG blocks → it comes to "N blocks and a bit" (the
+//      leftover part is highlighted — it doesn't fit exactly).
+//   2. The child taps "Try smaller blocks" → half-size blocks tile the rope
+//      EXACTLY (2N+1 of them) → count them.
+// Payoff: smaller units fit better and give a bigger number. The rope is a
+// length WE control with units laid along it, so nothing floats/misaligns.
 
 type MeasurePathTask = Extract<PracticeTask, { kind: "measurePath" }>;
 
-const BASE = "/images/measurelands/measure-objects-3d";
-
-type Family = { id: string; label: string; image: string; min: number; max: number };
-const FAMILIES: Family[] = [
-  { id: "crayon", label: "Crayon", image: `${BASE}/crayon.png`, min: 3, max: 5 },
-  { id: "worm", label: "Worm", image: `${BASE}/worm.png`, min: 3, max: 5 },
-  { id: "carrot", label: "Carrot", image: `${BASE}/carrot.png`, min: 4, max: 6 },
-  { id: "pencil", label: "Pencil", image: `${BASE}/pencil.png`, min: 4, max: 6 },
-  { id: "plank", label: "Plank", image: `${BASE}/plank.png`, min: 5, max: 7 },
-  { id: "cucumber", label: "Cucumber", image: `${BASE}/cucumber.png`, min: 5, max: 7 },
-  { id: "snake", label: "Snake", image: `${BASE}/snake.png`, min: 5, max: 7 },
-  { id: "vine", label: "Vine", image: `${BASE}/vine.png`, min: 6, max: 8 },
+// Rope "objects" are simple named lengths (drawn, not photos) so big + small
+// units always tile cleanly. Each has a range of sensible big-block lengths.
+type Rope = { id: string; label: string; min: number; max: number };
+const ROPES: Rope[] = [
+  { id: "rope", label: "Rope", min: 4, max: 6 },
+  { id: "ribbon", label: "Ribbon", min: 3, max: 5 },
+  { id: "vine", label: "Vine", min: 5, max: 7 },
+  { id: "string", label: "String", min: 3, max: 5 },
+  { id: "snake", label: "Snake", min: 4, max: 6 },
+  { id: "cable", label: "Cable", min: 5, max: 7 },
 ];
 
-const OVERHANGS = [0.3, 0.4, 0.5, 0.6, 0.7];
-
-type LessonMemory = { introShown: boolean; cursor: number; lastKey: string | null };
+type LessonMemory = { introShown: boolean; lastId: string | null };
 const lessonMemory = new Map<string, LessonMemory>();
-// Mostly the single Yes/No judgement; an occasional "tap the exact one" keeps a
-// 9-minute lesson from being ten identical taps — same one concept throughout.
-const ROTATION: Array<"notExact" | "tapExact"> = [
-  "notExact", "notExact", "tapExact", "notExact", "notExact", "tapExact",
-];
 
 function getMemory(lessonId: string): LessonMemory {
   const existing = lessonMemory.get(lessonId);
   if (existing) return existing;
-  const created: LessonMemory = { introShown: false, cursor: 0, lastKey: null };
+  const created: LessonMemory = { introShown: false, lastId: null };
   lessonMemory.set(lessonId, created);
   return created;
 }
@@ -58,76 +53,46 @@ function shuffle<T>(items: T[]): T[] {
   return next;
 }
 
-function pickFamily(memory: LessonMemory): Family {
-  const pool = FAMILIES.filter((f) => f.id !== memory.lastKey);
-  const f = choose(pool.length ? pool : FAMILIES);
-  memory.lastKey = f.id;
-  return f;
+function pickRope(memory: LessonMemory): Rope {
+  const pool = ROPES.filter((r) => r.id !== memory.lastId);
+  const r = choose(pool.length ? pool : ROPES);
+  memory.lastId = r.id;
+  return r;
 }
 
-type Item = { id: string; imageSrc: string; label: string; wholeBlocks: number; overhang: number };
-
-// `between = true` → the bar stops part-way past the last block (overhang > 0);
-// `false` → an exact whole-block length that stops right on a gridline.
-function buildItem(f: Family, between: boolean): Item {
-  const whole = f.min + randInt(f.max - f.min + 1);
-  const overhang = between ? choose(OVERHANGS) : 0;
-  const id = between ? `${f.id}-${whole}-o${Math.round(overhang * 10)}` : `${f.id}-${whole}`;
-  return { id, imageSrc: f.image, label: f.label, wholeBlocks: whole, overhang };
-}
-
-// ── Intro: Professor Gauge shows a bar that stops in between ──
+// ── Intro: Professor Gauge shows big blocks with a bit left over ──
 function buildIntroTask(): MeasurePathTask {
   return {
     kind: "measurePath",
     scene: "intro",
-    prompt: "Does the measurement always finish on a block?",
+    prompt: "What if the blocks don't fit?",
     speakText:
-      "Professor Gauge says: sometimes our blocks don't fit perfectly. Watch the coloured bar. It doesn't stop on a block — it stops in between. Some measurements are not exact.",
+      "Professor Gauge says: sometimes the big blocks don't fit exactly — there's a little bit left over. When that happens, we can measure again with smaller blocks to get a closer, exact answer.",
     badgeLabel: "Meazurex Mission",
-    betweenItem: { imageSrc: `${BASE}/pencil.png`, label: "Pencil", wholeBlocks: 4, overhang: 0.5 },
-    feedback: { correct: "Let's spot the ones that stop in between!", wrong: "Let's get ready." },
+    betweenItem: { imageSrc: undefined, label: "Rope", wholeBlocks: 4, overhang: 0.5 },
+    feedback: { correct: "Let's measure more accurately!", wrong: "Let's get ready." },
   };
 }
 
-// ── Activity: Does it finish exactly on a block? (Yes / No · ~50/50) ──
-function buildNotExactTask(memory: LessonMemory): MeasurePathTask {
-  const between = randInt(2) === 0; // ~50% between
-  const f = pickFamily(memory);
-  const item = buildItem(f, between);
+// ── Activity: measure with big blocks, re-measure with small, count ──
+function buildReMeasureTask(memory: LessonMemory): MeasurePathTask {
+  const r = pickRope(memory);
+  const wholeBig = r.min + randInt(r.max - r.min + 1);
+  const smallCount = wholeBig * 2 + 1; // rope = wholeBig + a half → exact small count
+  const options = shuffle([smallCount - 1, smallCount, smallCount + 1]);
   return {
     kind: "measurePath",
-    scene: "notExact",
-    prompt: `Does the ${f.label.toLowerCase()} finish exactly on a block?`,
-    speakText: `Look at where the bar stops. Does the ${f.label.toLowerCase()} finish exactly on a block?`,
-    badgeLabel: "Exact or Not?",
-    betweenItem: item,
-    textOptions: ["Yes", "No"],
-    correctTextOption: between ? "No" : "Yes",
+    scene: "reMeasure",
+    prompt: `How many blocks long is the ${r.label.toLowerCase()}?`,
+    speakText: `Measure the ${r.label.toLowerCase()} with the big blocks. They don't fit exactly — there's a bit left over.`,
+    badgeLabel: "Measure More Accurately",
+    objectLabel: r.label,
+    pathLength: wholeBig,
+    options,
+    correctAnswer: smallCount,
     feedback: {
-      correct: between ? "That's right — it stops in between, not exactly." : "Yes — it stops right on a block!",
-      wrong: between ? "Look again — the bar stops in the gap, not on a line." : "Look again — the bar stops right on a line.",
-    },
-  };
-}
-
-// ── Variety: tap the object that finishes EXACTLY on a block ──
-function buildTapExactTask(memory: LessonMemory): MeasurePathTask {
-  const fa = pickFamily(memory);
-  const fb = choose(FAMILIES.filter((f) => f.id !== fa.id));
-  const exactItem = buildItem(fa, false);
-  const betweenItem = buildItem(fb, true);
-  return {
-    kind: "measurePath",
-    scene: "tapExact",
-    prompt: "Tap the one that finishes exactly on a block.",
-    speakText: "One bar stops right on a block. The other stops in between. Tap the one that finishes exactly on a block.",
-    badgeLabel: "Tap the Exact One",
-    betweenItems: shuffle([exactItem, betweenItem]),
-    correctItemId: exactItem.id,
-    feedback: {
-      correct: "Yes — that bar stops right on a block!",
-      wrong: "Look for the bar that stops right on a line, not in a gap.",
+      correct: `Yes — ${smallCount}! Smaller blocks fit exactly and give a bigger number.`,
+      wrong: "Count the small blocks along the rope one by one.",
     },
   };
 }
@@ -141,24 +106,21 @@ export function generateY2MeasurelandsWeek4Lesson1Task(
     memory.introShown = true;
     return buildIntroTask();
   }
-  const rotation = ROTATION[memory.cursor % ROTATION.length]!;
-  memory.cursor += 1;
-  if (rotation === "tapExact") return buildTapExactTask(memory);
-  return buildNotExactTask(memory);
+  return buildReMeasureTask(memory);
 }
 
 export function resetY2MeasurelandsWeek4Lesson1TaskSessionState() {
   lessonMemory.clear();
 }
 
-// 5 fixed tasks for the weekly quiz: mix of Yes/No and tap-the-exact-one.
+// 5 fixed tasks for the weekly quiz.
 export function buildY2MeasurelandsWeek4Lesson1QuizTasks(): PracticeTask[] {
-  const seed: LessonMemory = { introShown: true, cursor: 0, lastKey: null };
+  const seed: LessonMemory = { introShown: true, lastId: null };
   return [
-    buildNotExactTask(seed),
-    buildTapExactTask(seed),
-    buildNotExactTask(seed),
-    buildNotExactTask(seed),
-    buildTapExactTask(seed),
+    buildReMeasureTask(seed),
+    buildReMeasureTask(seed),
+    buildReMeasureTask(seed),
+    buildReMeasureTask(seed),
+    buildReMeasureTask(seed),
   ];
 }

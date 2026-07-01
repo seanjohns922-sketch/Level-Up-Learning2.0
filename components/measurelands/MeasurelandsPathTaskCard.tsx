@@ -228,101 +228,41 @@ export function MeasuredObject({
   );
 }
 
-/* ── Year 2 W4 "Not Exact Yet": a coloured segmented measurement bar — full
- * cells plus a partial last cell when the length lands between two blocks. The
- * BAR is the source of truth (students judge it, not the object's fuzzy tip). A
- * marker shows exactly where it stops: green ON a gridline (exact), amber IN a
- * gap (between). ── */
-function NotExactBar({ wholeBlocks, overhang, compact = false }: { wholeBlocks: number; overhang: number; compact?: boolean }) {
-  const cell = compact ? 34 : 46;
-  const maxCells = wholeBlocks + 1;
-  const filled = wholeBlocks + overhang;
-  const width = maxCells * cell;
-  const endX = filled * cell;
-  // Neutral marker on purpose: it points to WHERE the bar stops without
-  // colour-coding the answer, so the child must read on-a-line vs in-a-gap.
-  const markerColor = "#3a2a12";
-  return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-      <div style={{ position: "relative", width, height: cell }}>
-        <div style={{ display: "flex", width, height: cell }}>
-          {Array.from({ length: maxCells }).map((_, i) => {
-            const frac = Math.max(0, Math.min(1, filled - i));
-            return (
-              <div
-                key={i}
-                style={{
-                  position: "relative",
-                  width: cell,
-                  height: cell,
-                  boxSizing: "border-box",
-                  border: "2px solid #2c6a8c",
-                  borderLeft: i === 0 ? "2px solid #2c6a8c" : "none",
-                  background: "#eef8fd",
-                }}
-              >
-                {frac > 0 ? (
-                  <div
-                    style={{
-                      position: "absolute",
-                      left: 0,
-                      top: 0,
-                      bottom: 0,
-                      width: `${frac * 100}%`,
-                      background: "linear-gradient(180deg,#7fd3f2,#54aad6)",
-                      borderRight: frac < 1 ? "2px solid #3a2a12" : "none",
-                    }}
-                  />
-                ) : null}
-              </div>
-            );
-          })}
-        </div>
-        {/* stop marker: arrow + line at exactly where the bar ends */}
-        <div style={{ position: "absolute", left: endX, top: -16, transform: "translateX(-50%)", width: 0, height: 0, borderLeft: "7px solid transparent", borderRight: "7px solid transparent", borderTop: `10px solid ${markerColor}` }} />
-        <div style={{ position: "absolute", left: endX - 1.5, top: -6, height: cell + 12, width: 3, background: markerColor, borderRadius: 2 }} />
-      </div>
-      {/* ruler numbers under each gridline */}
-      <div style={{ position: "relative", width, height: 16, marginTop: 6 }}>
-        {Array.from({ length: maxCells + 1 }).map((_, i) => (
-          <span key={i} style={{ position: "absolute", left: i * cell, transform: "translateX(-50%)", fontSize: compact ? 10 : 12, fontWeight: 800, color: "#7c4a12" }}>{i}</span>
-        ))}
-      </div>
-    </div>
-  );
-}
+/* ── Year 2 W4 accuracy arc: a rope of a length WE control, with informal unit
+ * blocks laid directly along it (tiling — no gaps/overlaps). The units measure
+ * the actual rope, so nothing floats or misaligns.
+ *   mode "big"   → big blocks; the rope runs a bit past the last block (the
+ *                  leftover part is highlighted — "it doesn't fit exactly").
+ *   mode "small" → half-size blocks that tile the rope EXACTLY.
+ * ropeBigUnits is the rope length in big units (e.g. 5.5). Small units are half
+ * a big unit, so a 5.5-big rope tiles into exactly 11 small units. ── */
+const BIG_UNIT = 52;
 
-/* ── Year 2 W4: a small object illustration (engagement only — NOT measured)
- * above the coloured measurement bar the student actually judges. ── */
-function NotExactMeasure({
-  imageSrc,
-  label,
-  wholeBlocks,
-  overhang,
-  compact = false,
-}: {
-  imageSrc?: string;
-  label?: string;
-  wholeBlocks: number;
-  overhang: number;
-  compact?: boolean;
-}) {
+function MeasuredRope({ ropeBigUnits, mode }: { ropeBigUnits: number; mode: "big" | "small" }) {
+  const cell = mode === "big" ? BIG_UNIT : BIG_UNIT / 2;
+  const count = mode === "big" ? Math.floor(ropeBigUnits) : Math.round(ropeBigUnits * 2);
+  const ropeLen = ropeBigUnits * BIG_UNIT;
+  const blocksLen = count * cell;
+  const leftover = Math.max(0, ropeLen - blocksLen);
+  const blockH = Math.round(cell * 0.7);
   return (
-    <div className="flex flex-col items-center gap-3">
-      {imageSrc ? (
-        <div style={{ width: compact ? 110 : 170 }}>
-          <img
-            src={imageSrc}
-            alt={label ?? "Object"}
-            className="h-auto w-full object-contain drop-shadow-[0_8px_14px_rgba(76,40,10,0.18)]"
-            style={{ maxHeight: compact ? 48 : 72 }}
-          />
-        </div>
-      ) : null}
-      <NotExactBar wholeBlocks={wholeBlocks} overhang={overhang} compact={compact} />
-      {label ? (
-        <div className="text-sm font-black uppercase tracking-[0.14em] text-[#7c4a12]">{label}</div>
-      ) : null}
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, width: ropeLen, maxWidth: "100%" }}>
+      {/* the rope (the object being measured) */}
+      <div style={{ position: "relative", width: ropeLen, height: 24 }}>
+        <div style={{ position: "absolute", inset: 0, borderRadius: 12, background: "linear-gradient(180deg,#d8ad74,#b07f42)", boxShadow: "inset 0 -3px 4px rgba(0,0,0,0.22)" }} />
+        {mode === "big" && leftover > 1 ? (
+          <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: leftover, borderRadius: "0 12px 12px 0", background: "repeating-linear-gradient(45deg, rgba(232,130,12,0.55) 0 6px, rgba(232,130,12,0.30) 6px 12px)" }} />
+        ) : null}
+      </div>
+      {/* unit blocks tiled along the rope */}
+      <div style={{ display: "flex", width: ropeLen }}>
+        {Array.from({ length: count }).map((_, i) => (
+          <div key={i} style={{ width: cell, height: blockH, boxSizing: "border-box", border: "2px solid #2c6a8c", borderLeft: i === 0 ? "2px solid #2c6a8c" : "none", background: "linear-gradient(180deg,#7fd3f2,#54aad6)" }} />
+        ))}
+        {mode === "big" && leftover > 1 ? (
+          <div style={{ width: leftover, height: blockH, boxSizing: "border-box", border: "2px dashed rgba(180,84,12,0.7)", background: "rgba(232,130,12,0.14)" }} />
+        ) : null}
+      </div>
     </div>
   );
 }
@@ -422,15 +362,15 @@ function IntroScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect: () 
           ))}
           {task.betweenItem ? (
             <div className="rounded-[26px] border border-[rgba(214,184,108,0.28)] bg-[rgba(255,252,245,0.92)] p-4">
-              <NotExactMeasure
-                imageSrc={task.betweenItem.imageSrc}
-                label={task.betweenItem.label}
-                wholeBlocks={task.betweenItem.wholeBlocks}
-                overhang={task.betweenItem.overhang}
-              />
+              <div className="mb-2 text-center text-sm font-black uppercase tracking-[0.14em] text-[#7c4a12]">
+                {task.betweenItem.label ?? "Rope"}
+              </div>
+              <div className="flex justify-center">
+                <MeasuredRope ropeBigUnits={task.betweenItem.wholeBlocks + task.betweenItem.overhang} mode="big" />
+              </div>
               <div className="mt-3 text-center text-sm font-bold text-[#5f4725]">
-                The bar does not stop on a block. It stops{" "}
-                <span className="text-[#e8820c]">in between</span> — the measurement is not exact.
+                The big blocks don&apos;t fit — there&apos;s a{" "}
+                <span className="text-[#b4540c]">bit left over</span>. Smaller blocks can measure it more closely.
               </div>
             </div>
           ) : null}
@@ -760,58 +700,61 @@ function DifferenceScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; 
   );
 }
 
-/* ── Year 2 W4 L1 "Not Exact Yet": one object + its measurement bar; the child
- * judges whether it finishes exactly on a block (Yes / No). ── */
-function NotExactScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
-  const item = task.betweenItem;
-  const options = task.textOptions ?? ["Yes", "No"];
+/* ── Year 2 W4 L1 "Measure More Accurately" (AC9M2M01: smaller units for
+ * accuracy). ACTIVE two-step: measure the rope with big blocks → it doesn't fit
+ * (a bit left over) → the child taps to re-measure with smaller blocks → it
+ * tiles exactly → count them. The payoff: smaller units fit and give a bigger
+ * number. `pathLength` = whole big blocks; the rope is that + a half, so the
+ * exact small-block count is 2*pathLength + 1 (= correctAnswer). ── */
+function ReMeasureScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
+  const wholeBig = task.pathLength ?? 5;
+  const ropeBigUnits = wholeBig + 0.5;
+  const smallCount = task.correctAnswer ?? wholeBig * 2 + 1;
+  const [phase, setPhase] = useState<"big" | "small">("big");
+  const label = task.objectLabel ?? "Rope";
+  const prompt = phase === "big" ? `Measure the ${label.toLowerCase()} with the big blocks.` : `How many small blocks long is the ${label.toLowerCase()}?`;
   return (
-    <PathShell badge={task.badgeLabel ?? "Exact or Not?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+    <PathShell badge={task.badgeLabel ?? "Measure More Accurately"} prompt={prompt} speakText={prompt}>
       <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-5 shadow-sm">
-        {item ? (
-          <NotExactMeasure imageSrc={item.imageSrc} label={item.label} wholeBlocks={item.wholeBlocks} overhang={item.overhang} />
-        ) : null}
+        <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-[#7c4a12]">{label}</div>
+        <div className="flex justify-center overflow-x-auto">
+          <MeasuredRope ropeBigUnits={ropeBigUnits} mode={phase} />
+        </div>
+        <div className="mt-4 text-center text-base font-bold text-[#5f4725]">
+          {phase === "big" ? (
+            <>
+              <span className="text-[#2c1c07]">{wholeBig} big blocks</span> fit… but there&apos;s a{" "}
+              <span className="text-[#b4540c]">bit left over</span>. It doesn&apos;t fit exactly.
+            </>
+          ) : (
+            <>The small blocks fit <span className="text-[#0f766e]">exactly</span> — no bit left over!</>
+          )}
+        </div>
       </div>
-      <div className="grid grid-cols-2 gap-3">
-        {options.map((opt) => (
-          <button
-            key={opt}
-            type="button"
-            onClick={() => (opt === task.correctTextOption ? onCorrect() : onWrong())}
-            className="relative flex min-h-[84px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-8 py-4 text-center text-2xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
-          >
-            <span className="absolute right-3 top-3 z-10"><OptionReadAloudButton text={opt} /></span>
-            {opt}
-          </button>
-        ))}
-      </div>
-    </PathShell>
-  );
-}
 
-/* ── Year 2 W4 L1 variety: tap the object that finishes EXACTLY on a block. ── */
-function TapExactScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
-  const items = task.betweenItems ?? [];
-  return (
-    <PathShell badge={task.badgeLabel ?? "Tap the Exact One"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      <div className="grid gap-4 md:grid-cols-2">
-        {items.map((it, idx) => (
-          <button
-            key={it.id}
-            type="button"
-            onClick={() => (it.id === task.correctItemId ? onCorrect() : onWrong())}
-            className="relative rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-3 text-center transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
-          >
-            <span className="absolute right-3 top-3 z-10">
-              <OptionReadAloudButton text={`${it.label ?? `Object ${idx === 0 ? "A" : "B"}`}, ${it.overhang > 0 ? "stops in between" : "stops exactly on a block"}`} />
-            </span>
-            <div className="mb-2 px-1 text-xs font-black uppercase tracking-[0.16em] text-[#7c3aed]">
-              {it.label ?? `Object ${idx === 0 ? "A" : "B"}`}
-            </div>
-            <NotExactMeasure imageSrc={it.imageSrc} wholeBlocks={it.wholeBlocks} overhang={it.overhang} compact />
-          </button>
-        ))}
-      </div>
+      {phase === "big" ? (
+        <button
+          type="button"
+          onClick={() => setPhase("small")}
+          className="flex min-h-[76px] w-full items-center justify-center gap-2 rounded-[24px] border-2 border-[rgba(214,184,108,0.6)] bg-[#fffaf0] px-6 text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+        >
+          Try smaller blocks →
+        </button>
+      ) : (
+        <div className="grid grid-cols-3 gap-3">
+          {(task.options ?? [smallCount - 1, smallCount, smallCount + 1]).map((value) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => (value === smallCount ? onCorrect() : onWrong())}
+              className="relative flex min-h-[88px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-5xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+            >
+              <span className="absolute right-3 top-3 z-10"><OptionReadAloudButton text={String(value)} /></span>
+              {value}
+            </button>
+          ))}
+        </div>
+      )}
     </PathShell>
   );
 }
@@ -831,7 +774,6 @@ export function MeasurelandsPathTaskCard({
   if (task.scene === "order") return <OrderScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "same") return <SameScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "difference") return <DifferenceScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
-  if (task.scene === "notExact") return <NotExactScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
-  if (task.scene === "tapExact") return <TapExactScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "reMeasure") return <ReMeasureScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   return <BuildScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 }

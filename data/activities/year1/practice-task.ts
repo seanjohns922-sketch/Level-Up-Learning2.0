@@ -544,9 +544,9 @@ export type PracticeTask = (
       badgeLabel?: string;
       // Year 2 adds "difference": two measured objects shown, MCQ on "how many
       // more / fewer units" (quantifying the gap, not just "which is longer").
-      // Year 2 W4 L1 adds "notExact" (does the measurement finish exactly on a
-      // block? Yes/No) and "tapExact" (tap the object that finishes exactly).
-      scene: "intro" | "count" | "compare" | "build" | "order" | "same" | "difference" | "notExact" | "tapExact";
+      // Year 2 W4 L1 adds "reMeasure": measure a rope with big blocks (a bit
+      // left over), re-measure with smaller blocks that tile it exactly, count.
+      scene: "intro" | "count" | "compare" | "build" | "order" | "same" | "difference" | "reMeasure";
       /** Unit being used to measure (footstep / block / star / flower / stone).
        *  Rendered as an illustrated glyph; unitEmoji/unitLabel are hints only. */
       unitEmoji?: string;
