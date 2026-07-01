@@ -5,13 +5,12 @@ import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-
 // ACCURACY WHEN NECESSARY." ACARA: when a big-unit measurement isn't precise (a
 // leftover part), re-measure with smaller units. Verified vs ACARA + Twinkl.
 //
-// THREE rotating activities (house rule: every lesson has 3), all teaching
-// "smaller units measure more precisely":
-//   1. reMeasure   — measure with big blocks (a bit left over) → tap "try
-//                    smaller" → they tile exactly → count them.  (the skill)
-//   2. moreOrFewer — predict: with smaller blocks, more or fewer? (always more;
-//                    the inverse relationship)                    (reasoning)
-//   3. countSmall  — the small blocks already fit exactly; count them. (fluency)
+// The single Week-4 accuracy lesson. THREE rotating activities:
+//   1. measureYourWay — OPEN-ENDED: add big/small blocks however you like to
+//                       measure it exactly (many valid answers).       (hero)
+//   2. reMeasure      — big blocks leave a bit over → try smaller → count. (aha)
+//   3. sameLength     — N big vs 2N small measure the SAME object: same length
+//                       or longer? (bigger number ≠ longer — ACARA).  (reason)
 //
 // Objects are DRAWN lengths we control (so units tile exactly) and each has a
 // distinct look; the label always matches the drawing (no "Vine" over a rope).
@@ -34,8 +33,8 @@ const lessonMemory = new Map<string, LessonMemory>();
 // measureYourWay (open-ended: add big/small blocks however you like) is the
 // hero — it's a puzzle with many valid answers, so it never repeats. The other
 // two vary their number answers.
-const ROTATION: Array<"reMeasure" | "measureYourWay" | "countSmall"> = [
-  "measureYourWay", "reMeasure", "measureYourWay", "countSmall", "measureYourWay", "reMeasure",
+const ROTATION: Array<"reMeasure" | "measureYourWay" | "sameLength"> = [
+  "measureYourWay", "reMeasure", "measureYourWay", "sameLength", "measureYourWay", "reMeasure",
 ];
 
 function getMemory(lessonId: string): LessonMemory {
@@ -127,22 +126,26 @@ function buildMeasureYourWayTask(memory: LessonMemory): MeasurePathTask {
   };
 }
 
-// ── Activity 3 — count the small blocks that fit exactly ──
-function buildCountSmallTask(memory: LessonMemory): MeasurePathTask {
-  const { obj, wholeBig, smallCount } = pickObject(memory);
+// ── Activity 3 — same length? (bigger number ≠ longer). N big blocks and 2N
+//    small blocks measure the SAME object (both exact). ──
+function buildSameLengthTask(memory: LessonMemory): MeasurePathTask {
+  const { obj, wholeBig } = pickObject(memory);
+  const smallExact = wholeBig * 2;
+  const correct = "The same length";
   return {
     kind: "measurePath",
-    scene: "countSmall",
-    prompt: `How many small blocks long is the ${obj.label.toLowerCase()}?`,
-    speakText: `The small blocks fit the ${obj.label.toLowerCase()} exactly. Count them. How many small blocks long is it?`,
-    badgeLabel: "Count the Small Blocks",
+    scene: "compareAccuracy",
+    prompt: `${wholeBig} big blocks or ${smallExact} small blocks. Is the ${obj.label.toLowerCase()} the same length, or longer?`,
+    speakText: `The ${obj.label.toLowerCase()} is ${wholeBig} big blocks, or ${smallExact} small blocks. The small number is bigger. Is it the same length, or longer with the small blocks?`,
+    badgeLabel: "Same Length?",
     objectLabel: obj.label,
     pathLength: wholeBig,
-    options: countOptions(smallCount),
-    correctAnswer: smallCount,
+    accuracyMode: "sameLength",
+    textOptions: shuffle([correct, "Longer with the small blocks"]),
+    correctTextOption: correct,
     feedback: {
-      correct: `Yes — ${smallCount} small blocks, and they fit exactly!`,
-      wrong: "Count each small block along it, one by one.",
+      correct: "The same length! Smaller blocks make a bigger number, but the object didn't get longer.",
+      wrong: "It's the same object — the small blocks are just littler, so you need more of them.",
     },
   };
 }
@@ -159,7 +162,7 @@ export function generateY2MeasurelandsWeek4Lesson1Task(
   const activity = ROTATION[memory.cursor % ROTATION.length]!;
   memory.cursor += 1;
   if (activity === "measureYourWay") return buildMeasureYourWayTask(memory);
-  if (activity === "countSmall") return buildCountSmallTask(memory);
+  if (activity === "sameLength") return buildSameLengthTask(memory);
   return buildReMeasureTask(memory);
 }
 
@@ -173,8 +176,8 @@ export function buildY2MeasurelandsWeek4Lesson1QuizTasks(): PracticeTask[] {
   return [
     buildReMeasureTask(seed),
     buildMeasureYourWayTask(seed),
-    buildCountSmallTask(seed),
+    buildSameLengthTask(seed),
     buildReMeasureTask(seed),
-    buildCountSmallTask(seed),
+    buildSameLengthTask(seed),
   ];
 }
