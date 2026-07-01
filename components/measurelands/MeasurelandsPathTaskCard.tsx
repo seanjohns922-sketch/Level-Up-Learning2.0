@@ -1035,7 +1035,7 @@ function FinishGapScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect:
         <div className="mb-4 text-center text-sm font-black uppercase tracking-[0.16em] text-[#7c4a12]">{label}</div>
         <div className="flex justify-center">
           <div style={{ position: "relative", width: totalW, maxWidth: "100%" }}>
-            <div style={{ width: totalW, height: 20, borderRadius: 10, background: "linear-gradient(180deg,#d8ad74,#b07f42)", marginBottom: 8 }} />
+            <div style={{ width: totalW, height: 20, borderRadius: 10, background: styleFor(label).bg, marginBottom: 8 }} />
             <div style={{ display: "flex" }}>
               {Array.from({ length: wholeBig }).map((_, i) => (
                 <div key={i} style={block(BIG, { borderRadius: 0, borderLeft: i === 0 ? "2px solid #2c6a8c" : "none" })} />
@@ -1083,6 +1083,76 @@ function FinishGapScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect:
   );
 }
 
+/* ── Year 2 W4 L2 "Measure it yourself": TAP to lay small blocks along the
+ * object one at a time until it's fully measured, then it reveals the exact
+ * count. Interactive build-up (not answer-picking). ── */
+function FillSmallScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect: () => void }) {
+  const label = task.objectLabel ?? "Rope";
+  const target = task.correctAnswer ?? (task.pathLength ?? 4) * 2 + 1;
+  const SMALL = 30;
+  const H = 40;
+  const totalW = target * SMALL;
+  const [filled, setFilled] = useState(0);
+  const wonRef = useRef(false);
+  const done = filled >= target;
+
+  function add() {
+    if (done) return;
+    const n = filled + 1;
+    setFilled(n);
+    if (n >= target && !wonRef.current) {
+      wonRef.current = true;
+      window.setTimeout(onCorrect, 1100);
+    }
+  }
+
+  return (
+    <PathShell badge={task.badgeLabel ?? "Measure It Yourself"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-5 shadow-sm">
+        <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-[#7c4a12]">{label}</div>
+        <div className="flex justify-center">
+          <div style={{ position: "relative", width: totalW, maxWidth: "100%" }}>
+            <div style={{ width: totalW, height: 20, borderRadius: 10, background: styleFor(label).bg, marginBottom: 8 }} />
+            <button
+              type="button"
+              onClick={add}
+              disabled={done}
+              style={{ display: "flex", width: totalW, cursor: done ? "default" : "pointer" }}
+              aria-label="Add a small block"
+            >
+              {Array.from({ length: target }).map((_, i) => {
+                const isFilled = i < filled;
+                const isNext = i === filled && !done;
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      width: SMALL,
+                      height: H,
+                      boxSizing: "border-box",
+                      border: isFilled ? "2px solid #2c6a8c" : "2px dashed rgba(44,106,140,0.5)",
+                      borderLeft: i === 0 || isFilled ? "2px solid #2c6a8c" : "2px dashed rgba(44,106,140,0.5)",
+                      background: isFilled ? "linear-gradient(180deg,#7fd3f2,#54aad6)" : isNext ? "rgba(127,211,242,0.25)" : "rgba(0,0,0,0.02)",
+                      animation: isNext ? "bbTapPulse 0.9s ease-in-out infinite" : undefined,
+                      transition: "background 0.12s",
+                    }}
+                  />
+                );
+              })}
+            </button>
+          </div>
+        </div>
+        <div className="mt-4 text-center text-base font-bold" style={{ color: done ? "#0f766e" : "#5f4725" }}>
+          {done ? `${target} small blocks — you measured it exactly!` : `Tap to add small blocks. ${filled} so far…`}
+        </div>
+      </div>
+      <style jsx global>{`
+        @keyframes bbTapPulse { 0%,100%{ transform: scale(1);} 50%{ transform: scale(1.04);} }
+      `}</style>
+    </PathShell>
+  );
+}
+
 export function MeasurelandsPathTaskCard({
   task,
   onCorrect,
@@ -1103,5 +1173,6 @@ export function MeasurelandsPathTaskCard({
   if (task.scene === "countSmall") return <CountSmallScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "compareAccuracy") return <CompareAccuracyScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "finishGap") return <FinishGapScene task={task} onCorrect={onCorrect} />;
+  if (task.scene === "fillSmall") return <FillSmallScene task={task} onCorrect={onCorrect} />;
   return <BuildScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 }

@@ -5,13 +5,12 @@ import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-
 // The same object is shown measured two ways: big blocks (a bit left over) and
 // small blocks (exact). Students decide which is exact, and why.
 //
-// THREE rotating activities (house rule). Answers VARY (not the same reply
-// every time): only ONE fixed-answer concept check (sameLength):
-//   1. whichExact  — tap the exact measurement (card order shuffled).
-//   2. exactNumber — what is the exact measurement? (the small count — varies)
-//   3. sameLength  — N big blocks vs 2N small blocks measure the SAME object:
-//                    same length or longer? (bigger number ≠ longer — the
-//                    inverse-relationship misconception, ACARA).
+// THREE rotating activities (house rule), with one INTERACTIVE hands-on one:
+//   1. whichExact — tap the exact measurement (card order shuffled).
+//   2. fillSmall  — INTERACTIVE: tap to lay small blocks along the object and
+//                   measure it yourself; the count reveals (varies).
+//   3. sameLength — N big blocks vs 2N small blocks measure the SAME object:
+//                   same length or longer? (bigger number ≠ longer — ACARA).
 
 type MeasurePathTask = Extract<PracticeTask, { kind: "measurePath" }>;
 
@@ -28,8 +27,8 @@ const OBJECTS: Obj[] = [
 
 type LessonMemory = { introShown: boolean; cursor: number; recent: string[] };
 const lessonMemory = new Map<string, LessonMemory>();
-const ROTATION: Array<"whichExact" | "sameLength" | "exactNumber"> = [
-  "whichExact", "exactNumber", "sameLength", "exactNumber", "whichExact", "sameLength",
+const ROTATION: Array<"whichExact" | "sameLength" | "fillSmall"> = [
+  "whichExact", "fillSmall", "sameLength", "fillSmall", "whichExact", "sameLength",
 ];
 
 function getMemory(lessonId: string): LessonMemory {
@@ -122,23 +121,24 @@ function buildSameLengthTask(memory: LessonMemory): MeasurePathTask {
   };
 }
 
-// ── Activity 3 — pick the exact measurement (answer VARIES with the object) ──
-function buildExactNumberTask(memory: LessonMemory): MeasurePathTask {
-  const { obj, wholeBig, smallCount } = pickObject(memory);
+// ── Activity 3 — INTERACTIVE: tap to lay small blocks and measure it yourself
+//    (count varies; kept to ~7–9 blocks so it's not too many taps). ──
+function buildFillSmallTask(memory: LessonMemory): MeasurePathTask {
+  const { obj } = pickObject(memory);
+  const wholeBig = 3 + randInt(2); // 3–4 big → 7–9 small
+  const smallCount = wholeBig * 2 + 1;
   return {
     kind: "measurePath",
-    scene: "compareAccuracy",
-    prompt: `What is the exact measurement of the ${obj.label.toLowerCase()}?`,
-    speakText: `The small blocks fit the ${obj.label.toLowerCase()} exactly. What is the exact measurement?`,
-    badgeLabel: "The Exact Measurement",
+    scene: "fillSmall",
+    prompt: `Measure the ${obj.label.toLowerCase()} with small blocks.`,
+    speakText: `Measure the ${obj.label.toLowerCase()} yourself. Tap to lay a small block, then the next, all the way along.`,
+    badgeLabel: "Measure It Yourself",
     objectLabel: obj.label,
     pathLength: wholeBig,
-    accuracyMode: "exactNumber",
-    options: shuffle([wholeBig, smallCount, smallCount + 1]),
     correctAnswer: smallCount,
     feedback: {
-      correct: `Yes — ${smallCount}! The small blocks fit exactly, so that's the exact measurement.`,
-      wrong: "The exact measurement is the small-block count — the one with nothing left over.",
+      correct: `${smallCount} small blocks — measured exactly!`,
+      wrong: "Keep going — lay a small block all the way along.",
     },
   };
 }
@@ -155,7 +155,7 @@ export function generateY2MeasurelandsWeek4Lesson2Task(
   const activity = ROTATION[memory.cursor % ROTATION.length]!;
   memory.cursor += 1;
   if (activity === "sameLength") return buildSameLengthTask(memory);
-  if (activity === "exactNumber") return buildExactNumberTask(memory);
+  if (activity === "fillSmall") return buildFillSmallTask(memory);
   return buildWhichExactTask(memory);
 }
 
@@ -168,9 +168,9 @@ export function buildY2MeasurelandsWeek4Lesson2QuizTasks(): PracticeTask[] {
   const seed: LessonMemory = { introShown: true, cursor: 0, recent: [] };
   return [
     buildWhichExactTask(seed),
-    buildExactNumberTask(seed),
+    buildFillSmallTask(seed),
     buildSameLengthTask(seed),
     buildWhichExactTask(seed),
-    buildExactNumberTask(seed),
+    buildSameLengthTask(seed),
   ];
 }
