@@ -120,6 +120,12 @@ function getPracticeTaskCorrectAnswer(task: PracticeTask) {
     if (typeof task.correctAnswer === "number") return `${task.correctAnswer} small blocks`;
     if (task.correctPathId) return task.correctPathId;
   }
+  if (task.kind === "toolChoice") {
+    if (task.correctToolId) {
+      return task.tools?.find((item) => item.id === task.correctToolId)?.label ?? task.correctToolId;
+    }
+    if (task.correctReason) return task.correctReason;
+  }
   return null;
 }
 
@@ -715,7 +721,12 @@ export function PracticeRunner({
     if (nextQuestionsAnswered >= questionLimit) {
       return;
     }
-    timeoutRef.current = setTimeout(() => nextTask(), 1200);
+    const wrongRevealDelay =
+      task.kind === "measurePath" &&
+      (task.scene === "estimateGuess" || task.scene === "estimateSlider" || task.scene === "estimateLonger")
+        ? 3200
+        : 1200;
+    timeoutRef.current = setTimeout(() => nextTask(), wrongRevealDelay);
   }
 
   function markCorrect() {

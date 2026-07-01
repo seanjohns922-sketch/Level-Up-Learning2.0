@@ -18,13 +18,13 @@ const OBJ = "/images/measurelands/measure-objects-3d";
 type EObj = { id: string; label: string; img: string; blocks: number };
 const OBJECTS: EObj[] = [
   { id: "crayon", label: "Crayon", img: `${OBJ}/crayon.png`, blocks: 4 },
-  { id: "worm", label: "Worm", img: `${OBJ}/worm.png`, blocks: 4 },
-  { id: "carrot", label: "Carrot", img: `${OBJ}/carrot.png`, blocks: 5 },
-  { id: "pencil", label: "Pencil", img: `${OBJ}/pencil.png`, blocks: 6 },
-  { id: "cucumber", label: "Cucumber", img: `${OBJ}/cucumber.png`, blocks: 7 },
-  { id: "plank", label: "Plank", img: `${OBJ}/plank.png`, blocks: 8 },
-  { id: "snake", label: "Snake", img: `${OBJ}/snake.png`, blocks: 9 },
-  { id: "vine", label: "Vine", img: `${OBJ}/vine.png`, blocks: 11 },
+  { id: "worm", label: "Worm", img: `${OBJ}/worm.png`, blocks: 5 },
+  { id: "carrot", label: "Carrot", img: `${OBJ}/carrot.png`, blocks: 6 },
+  { id: "pencil", label: "Pencil", img: `${OBJ}/pencil.png`, blocks: 7 },
+  { id: "cucumber", label: "Cucumber", img: `${OBJ}/cucumber.png`, blocks: 8 },
+  { id: "plank", label: "Plank", img: `${OBJ}/plank.png`, blocks: 9 },
+  { id: "snake", label: "Snake", img: `${OBJ}/snake.png`, blocks: 10 },
+  { id: "vine", label: "Vine", img: `${OBJ}/vine.png`, blocks: 12 },
 ];
 
 type LessonMemory = { introShown: boolean; cursor: number; recent: string[] };

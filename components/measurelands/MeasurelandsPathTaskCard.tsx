@@ -1287,16 +1287,44 @@ function EstimateDebugOverlay({ task }: { task: MeasurePathTask }) {
 
 // Best guess — pick the sensible estimate (magnitude sense).
 function EstimateGuessScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
+  const [selected, setSelected] = useState<number | null>(null);
+  const isAnswered = selected !== null;
+  const isCorrect = selected === task.correctAnswer;
+  const correctAnswer = typeof task.correctAnswer === "number" ? task.correctAnswer : null;
+  useEffect(() => {
+    setSelected(null);
+  }, [task]);
+
+  function chooseEstimate(value: number) {
+    if (isAnswered) return;
+    setSelected(value);
+    if (value === task.correctAnswer) onCorrect();
+    else onWrong();
+  }
+
   return (
     <PathShell badge={task.badgeLabel ?? "Best Guess"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-5 shadow-sm">
         <EstObjectImage src={task.objectImageSrc} label={task.objectLabel} units={task.estimateMeasurement?.objectLengthUnits ?? task.correctAnswer} />
         <div className="mt-3 text-center text-base font-bold text-[#5f4725]">Don't measure — have a guess!</div>
+        {isAnswered && correctAnswer !== null ? (
+          <div className={`mt-3 rounded-2xl px-4 py-3 text-center text-sm font-black ${isCorrect ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>
+            {isCorrect
+              ? `Correct: about ${correctAnswer} small blocks.`
+              : `Correct answer: ${correctAnswer} small blocks. Your guess was ${selected}.`}
+          </div>
+        ) : null}
         <EstimateDebugOverlay task={task} />
       </div>
       <div className="grid grid-cols-3 gap-3">
         {(task.options ?? []).map((v) => (
-          <button key={v} type="button" onClick={() => (v === task.correctAnswer ? onCorrect() : onWrong())} className="relative flex min-h-[88px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-5xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]">
+          <button key={v} type="button" disabled={isAnswered} onClick={() => chooseEstimate(v)} className={`relative flex min-h-[88px] items-center justify-center rounded-[24px] border-2 text-5xl font-black shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98] disabled:cursor-default ${
+            isAnswered && v === task.correctAnswer
+              ? "border-emerald-300 bg-emerald-50 text-emerald-700"
+              : isAnswered && v === selected
+                ? "border-red-300 bg-red-50 text-red-700"
+                : "border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-[#2c1c07]"
+          }`}>
             <span className="absolute right-3 top-3 z-10"><OptionReadAloudButton text={String(v)} /></span>
             {v}
           </button>
@@ -1365,15 +1393,42 @@ function EstimateSliderScene({ task, onCorrect, onWrong }: { task: MeasurePathTa
 // Which is longer — estimate by eye, tap the longer object.
 function EstimateLongerScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
   const pair = task.estimatePair ?? [];
+  const [selected, setSelected] = useState<string | null>(null);
+  const isAnswered = selected !== null;
+  const correctItem = pair.find((item) => item.id === task.correctItemId);
+  useEffect(() => {
+    setSelected(null);
+  }, [task]);
+
+  function chooseItem(id: string) {
+    if (isAnswered) return;
+    setSelected(id);
+    if (id === task.correctItemId) onCorrect();
+    else onWrong();
+  }
+
   return (
     <PathShell badge={task.badgeLabel ?? "Which Is Longer?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="grid grid-cols-2 gap-4">
         {pair.map((it) => (
-          <button key={it.id} type="button" onClick={() => (it.id === task.correctItemId ? onCorrect() : onWrong())} className="rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-4 transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]">
+          <button key={it.id} type="button" disabled={isAnswered} onClick={() => chooseItem(it.id)} className={`rounded-[26px] border p-4 transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)] disabled:cursor-default ${
+            isAnswered && it.id === task.correctItemId
+              ? "border-emerald-300 bg-emerald-50"
+              : isAnswered && it.id === selected
+                ? "border-red-300 bg-red-50"
+                : "border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)]"
+          }`}>
             <EstObjectImage src={it.imageSrc} label={it.label} max={130} units={it.blocks} />
           </button>
         ))}
       </div>
+      {isAnswered && correctItem ? (
+        <div className={`rounded-2xl px-4 py-3 text-center text-sm font-black ${selected === task.correctItemId ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>
+          {selected === task.correctItemId
+            ? `Correct: ${correctItem.label} is longer.`
+            : `Correct answer: ${correctItem.label}. It measures ${correctItem.blocks} small blocks.`}
+        </div>
+      ) : null}
       <EstimateDebugOverlay task={task} />
     </PathShell>
   );
