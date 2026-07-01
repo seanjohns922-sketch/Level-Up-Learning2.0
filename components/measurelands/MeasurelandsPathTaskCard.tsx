@@ -1246,6 +1246,96 @@ function MeasureYourWayScene({ task, onCorrect }: { task: MeasurePathTask; onCor
   );
 }
 
+/* ── Year 2 W4 L2 "Estimate It": estimate a real object's length by eye. ── */
+function EstObjectImage({ src, label, max = 150 }: { src?: string; label?: string; max?: number }) {
+  if (!src) return null;
+  return (
+    <div className="flex flex-col items-center">
+      <img src={src} alt={label ?? "Object"} className="h-auto w-auto object-contain drop-shadow-[0_8px_14px_rgba(76,40,10,0.18)]" style={{ maxHeight: max, maxWidth: "80%" }} />
+      {label ? <div className="mt-2 text-sm font-black uppercase tracking-[0.14em] text-[#7c4a12]">{label}</div> : null}
+    </div>
+  );
+}
+
+// Best guess — pick the sensible estimate (magnitude sense).
+function EstimateGuessScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
+  return (
+    <PathShell badge={task.badgeLabel ?? "Best Guess"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-5 shadow-sm">
+        <EstObjectImage src={task.objectImageSrc} label={task.objectLabel} />
+        <div className="mt-3 text-center text-base font-bold text-[#5f4725]">Don't measure — have a guess!</div>
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        {(task.options ?? []).map((v) => (
+          <button key={v} type="button" onClick={() => (v === task.correctAnswer ? onCorrect() : onWrong())} className="relative flex min-h-[88px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-5xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]">
+            <span className="absolute right-3 top-3 z-10"><OptionReadAloudButton text={String(v)} /></span>
+            {v}
+          </button>
+        ))}
+      </div>
+    </PathShell>
+  );
+}
+
+// Guess & check — drag a slider to your estimate, then reveal the real length.
+function EstimateSliderScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
+  const actual = task.correctAnswer ?? 6;
+  const MAXV = 15;
+  const [guess, setGuess] = useState(Math.round(MAXV / 2));
+  const [checked, setChecked] = useState(false);
+  const wonRef = useRef(false);
+  const close = Math.abs(guess - actual) <= 2;
+  function check() {
+    if (checked) return;
+    setChecked(true);
+    if (!wonRef.current) {
+      wonRef.current = true;
+      window.setTimeout(() => (close ? onCorrect() : onWrong()), 1500);
+    }
+  }
+  return (
+    <PathShell badge={task.badgeLabel ?? "Guess & Check"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-5 shadow-sm">
+        <EstObjectImage src={task.objectImageSrc} label={task.objectLabel} max={120} />
+        {!checked ? (
+          <div className="mt-4">
+            <div className="mb-2 text-center text-lg font-black text-[#2c1c07]">Your guess: {guess} blocks</div>
+            <input type="range" min={1} max={MAXV} value={guess} onChange={(e) => setGuess(Number(e.target.value))} className="w-full" style={{ accentColor: "#b4540c" }} />
+            <div className="mt-4 flex justify-center">
+              <button type="button" onClick={check} className="rounded-full px-8 py-3 text-lg font-black uppercase tracking-[0.12em] text-[#fff8e1] shadow-[0_16px_32px_rgba(180,120,20,0.22)]" style={{ background: "linear-gradient(135deg, rgba(120,53,15,0.96), rgba(180,120,20,0.96), rgba(214,184,108,0.92))" }}>
+                Check it →
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-4 flex flex-col items-center gap-2">
+            <BlockRod length={actual} />
+            <div className="text-center text-base font-bold" style={{ color: close ? "#0f766e" : "#b4540c" }}>
+              You guessed {guess} — it's {actual} blocks. {close ? "Great estimate!" : "Good try!"}
+            </div>
+          </div>
+        )}
+      </div>
+    </PathShell>
+  );
+}
+
+// Which is longer — estimate by eye, tap the longer object.
+function EstimateLongerScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
+  const pair = task.estimatePair ?? [];
+  return (
+    <PathShell badge={task.badgeLabel ?? "Which Is Longer?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="grid grid-cols-2 gap-4">
+        {pair.map((it) => (
+          <button key={it.id} type="button" onClick={() => (it.id === task.correctItemId ? onCorrect() : onWrong())} className="rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-4 transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]">
+            <EstObjectImage src={it.imageSrc} label={it.label} max={130} />
+          </button>
+        ))}
+      </div>
+    </PathShell>
+  );
+}
+
 export function MeasurelandsPathTaskCard({
   task,
   onCorrect,
@@ -1268,5 +1358,8 @@ export function MeasurelandsPathTaskCard({
   if (task.scene === "finishGap") return <FinishGapScene task={task} onCorrect={onCorrect} />;
   if (task.scene === "fillSmall") return <FillSmallScene task={task} onCorrect={onCorrect} />;
   if (task.scene === "measureYourWay") return <MeasureYourWayScene task={task} onCorrect={onCorrect} />;
+  if (task.scene === "estimateGuess") return <EstimateGuessScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "estimateSlider") return <EstimateSliderScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "estimateLonger") return <EstimateLongerScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   return <BuildScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 }

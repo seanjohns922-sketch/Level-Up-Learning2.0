@@ -49,6 +49,11 @@ import {
   resetY2MeasurelandsWeek4Lesson1TaskSessionState,
   buildY2MeasurelandsWeek4Lesson1QuizTasks,
 } from "@/data/activities/year2Measurelands/week4Lesson1";
+import {
+  generateY2MeasurelandsWeek4Lesson2Task,
+  resetY2MeasurelandsWeek4Lesson2TaskSessionState,
+  buildY2MeasurelandsWeek4Lesson2QuizTasks,
+} from "@/data/activities/year2Measurelands/week4Lesson2";
 
 // Level 2 (Year 2) Measurelands lesson registry. Mirrors the Level 1 registry so
 // app/lesson/page.tsx can resolve `y2-measurement-w{n}-l{m}` ids to tasks.
@@ -258,6 +263,24 @@ const Y2_MEASURELANDS_LESSONS: Y2MeasurelandsLessonEntry[] = [
       "Recognising a bigger unit-count doesn't mean a longer object",
     ],
     completionTitle: "Measure Master Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+    returnRoute: "/program?year=Year 2&week=4&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y2-measurement-w4-l2",
+    week: 4,
+    lessonNumber: 2,
+    title: "Estimate It",
+    subtitle: "Closer Count",
+    generate: generateY2MeasurelandsWeek4Lesson2Task,
+    reset: resetY2MeasurelandsWeek4Lesson2TaskSessionState,
+    quizContributionBuilder: buildY2MeasurelandsWeek4Lesson2QuizTasks,
+    practisedSkills: [
+      "Estimating length by eye before measuring",
+      "Choosing a sensible estimate for an object's size",
+      "Comparing lengths by estimation",
+    ],
+    completionTitle: "Estimator Complete!",
     unlockMessage: "Week complete.",
     returnRoute: "/program?year=Year 2&week=4&legacy=1&realm_id=measurement",
   },

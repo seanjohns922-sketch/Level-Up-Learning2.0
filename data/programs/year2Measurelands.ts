@@ -70,6 +70,7 @@ const YEAR2_MEASURELANDS_RAW: WeekPlan[] = [
     curriculum: ["AC9M2M01"],
     lessons: [
       buildLesson(4, 1, "Measure It Your Way", "Accuracy: measure objects with big and small blocks — big units are quick but leave a bit over, small units fit exactly (smaller units = bigger, closer count). Open-ended: the child decides how to measure.", ["Measure your way", "Big and small blocks", "Smaller units are closer"], ["AC9M2M01"]),
+      buildLesson(4, 2, "Estimate It", "Estimation: guess an object's length by eye before measuring — best guess, guess & check, and which looks longer. Real objects, endless variety.", ["Estimate it", "Best guess", "Guess and check"], ["AC9M2M01"]),
     ],
   },
   {

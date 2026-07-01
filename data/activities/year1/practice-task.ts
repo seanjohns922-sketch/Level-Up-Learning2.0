@@ -554,7 +554,11 @@ export type PracticeTask = (
       // "measureYourWay": OPEN-ENDED — the child adds big and/or small blocks
       // however they like to measure the object exactly (many valid answers;
       // a big block won't fit a 1-unit gap, so small blocks finish it off).
-      scene: "intro" | "count" | "compare" | "build" | "order" | "same" | "difference" | "reMeasure" | "moreOrFewer" | "countSmall" | "compareAccuracy" | "finishGap" | "fillSmall" | "measureYourWay";
+      // W4 L2 "Estimate It": estimateGuess (pick a sensible guess), estimateSlider
+      // (drag your guess, then check), estimateLonger (guess which is longer).
+      scene: "intro" | "count" | "compare" | "build" | "order" | "same" | "difference" | "reMeasure" | "moreOrFewer" | "countSmall" | "compareAccuracy" | "finishGap" | "fillSmall" | "measureYourWay" | "estimateGuess" | "estimateSlider" | "estimateLonger";
+      /** W4 L2 estimate activities: real object photo(s) to estimate by eye. */
+      estimatePair?: Array<{ id: string; imageSrc: string; label: string; blocks: number }>;
       /** Unit being used to measure (footstep / block / star / flower / stone).
        *  Rendered as an illustrated glyph; unitEmoji/unitLabel are hints only. */
       unitEmoji?: string;
