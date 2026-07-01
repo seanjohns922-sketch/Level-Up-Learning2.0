@@ -550,10 +550,11 @@ export type PracticeTask = (
       // "countSmall" (count the small blocks that fit exactly).
       // W4 L2 adds "compareAccuracy": same object measured with big (leftover)
       // and small (exact) blocks — decide which is exact / the exact number / why.
-      // W4 "finishGap": DRAG a block into the leftover gap — only the small one
-      // fits. "fillSmall": TAP to lay small blocks along the object and measure
-      // it yourself (interactive, not answer-picking).
-      scene: "intro" | "count" | "compare" | "build" | "order" | "same" | "difference" | "reMeasure" | "moreOrFewer" | "countSmall" | "compareAccuracy" | "finishGap" | "fillSmall";
+      // W4 "finishGap"/"fillSmall": earlier single-answer fill activities.
+      // "measureYourWay": OPEN-ENDED — the child adds big and/or small blocks
+      // however they like to measure the object exactly (many valid answers;
+      // a big block won't fit a 1-unit gap, so small blocks finish it off).
+      scene: "intro" | "count" | "compare" | "build" | "order" | "same" | "difference" | "reMeasure" | "moreOrFewer" | "countSmall" | "compareAccuracy" | "finishGap" | "fillSmall" | "measureYourWay";
       /** Unit being used to measure (footstep / block / star / flower / stone).
        *  Rendered as an illustrated glyph; unitEmoji/unitLabel are hints only. */
       unitEmoji?: string;

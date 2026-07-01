@@ -31,10 +31,11 @@ const OBJECTS: Obj[] = [
 
 type LessonMemory = { introShown: boolean; cursor: number; recent: string[] };
 const lessonMemory = new Map<string, LessonMemory>();
-// Three activities per lesson (hard rule). finishGap is the interactive
-// (drag-a-block-into-the-gap) anchor; the other two vary their number answers.
-const ROTATION: Array<"reMeasure" | "finishGap" | "countSmall"> = [
-  "finishGap", "reMeasure", "finishGap", "countSmall", "finishGap", "reMeasure",
+// measureYourWay (open-ended: add big/small blocks however you like) is the
+// hero — it's a puzzle with many valid answers, so it never repeats. The other
+// two vary their number answers.
+const ROTATION: Array<"reMeasure" | "measureYourWay" | "countSmall"> = [
+  "measureYourWay", "reMeasure", "measureYourWay", "countSmall", "measureYourWay", "reMeasure",
 ];
 
 function getMemory(lessonId: string): LessonMemory {
@@ -105,20 +106,23 @@ function buildReMeasureTask(memory: LessonMemory): MeasurePathTask {
   };
 }
 
-// ── Activity 2 — DRAG a block into the leftover gap (only the small one fits) ──
-function buildFinishGapTask(memory: LessonMemory): MeasurePathTask {
-  const { obj, wholeBig } = pickObject(memory);
+// ── Activity 2 — OPEN-ENDED: add big and/or small blocks however you like to
+//    measure the object exactly (many valid answers; a big block won't fit a
+//    1-unit gap). Length is often odd so a small block is needed to finish. ──
+function buildMeasureYourWayTask(memory: LessonMemory): MeasurePathTask {
+  const { obj } = pickObject(memory);
+  const L = 7 + randInt(6); // 7–12 small units
   return {
     kind: "measurePath",
-    scene: "finishGap",
-    prompt: `Finish measuring the ${obj.label.toLowerCase()} — drag a block into the gap.`,
-    speakText: `The big blocks left a little gap. Drag a block into the gap. Which one fits — the big block or the small block?`,
-    badgeLabel: "Finish the Gap",
+    scene: "measureYourWay",
+    prompt: `Measure the ${obj.label.toLowerCase()} your way — add big and small blocks.`,
+    speakText: `Measure the ${obj.label.toLowerCase()} however you like. Add big blocks and small blocks until it is measured exactly, with no gap.`,
+    badgeLabel: "Measure It Your Way",
     objectLabel: obj.label,
-    pathLength: wholeBig,
+    correctAnswer: L,
     feedback: {
-      correct: "The small block fits the gap exactly!",
-      wrong: "The big block is too big for the little gap.",
+      correct: "Measured exactly! There's more than one way to do it.",
+      wrong: "Keep going until there's no gap left.",
     },
   };
 }
@@ -154,7 +158,7 @@ export function generateY2MeasurelandsWeek4Lesson1Task(
   }
   const activity = ROTATION[memory.cursor % ROTATION.length]!;
   memory.cursor += 1;
-  if (activity === "finishGap") return buildFinishGapTask(memory);
+  if (activity === "measureYourWay") return buildMeasureYourWayTask(memory);
   if (activity === "countSmall") return buildCountSmallTask(memory);
   return buildReMeasureTask(memory);
 }
@@ -168,7 +172,7 @@ export function buildY2MeasurelandsWeek4Lesson1QuizTasks(): PracticeTask[] {
   const seed: LessonMemory = { introShown: true, cursor: 0, recent: [] };
   return [
     buildReMeasureTask(seed),
-    buildFinishGapTask(seed),
+    buildMeasureYourWayTask(seed),
     buildCountSmallTask(seed),
     buildReMeasureTask(seed),
     buildCountSmallTask(seed),

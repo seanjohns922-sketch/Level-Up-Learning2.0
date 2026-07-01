@@ -1153,6 +1153,99 @@ function FillSmallScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect:
   );
 }
 
+/* ── Year 2 W4 "Measure It Your Way": OPEN-ENDED. The child adds big (2-unit)
+ * and/or small (1-unit) blocks however they like to measure the object exactly.
+ * Many valid answers (all small; big + a small to finish; …). A big block won't
+ * fit when only 1 unit of space is left — so small blocks finish it off. ── */
+function MeasureYourWayScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect: () => void }) {
+  const label = task.objectLabel ?? "Rope";
+  const L = task.correctAnswer ?? 11; // object length in small units
+  const SMALL = 30;
+  const BIG = SMALL * 2;
+  const H = 42;
+  const totalW = L * SMALL;
+  const [blocks, setBlocks] = useState<Array<"big" | "small">>([]);
+  const [msg, setMsg] = useState<string | null>(null);
+  const wonRef = useRef(false);
+  const fill = blocks.reduce((s, b) => s + (b === "big" ? 2 : 1), 0);
+  const remaining = L - fill;
+  const done = fill === L;
+
+  function place(type: "big" | "small") {
+    if (done) return;
+    const w = type === "big" ? 2 : 1;
+    if (fill + w > L) {
+      if (type === "big") setMsg("A big block is too big for the space left — use a small one to finish!");
+      return;
+    }
+    const nb = [...blocks, type];
+    setBlocks(nb);
+    setMsg(null);
+    if (fill + w === L && !wonRef.current) {
+      wonRef.current = true;
+      const big = nb.filter((b) => b === "big").length;
+      const small = nb.filter((b) => b === "small").length;
+      const parts = [big ? `${big} big` : "", small ? `${small} small` : ""].filter(Boolean).join(" + ");
+      setMsg(`Measured exactly! You used ${parts}.`);
+      window.setTimeout(onCorrect, 1400);
+    }
+  }
+  function undo() {
+    if (done || blocks.length === 0) return;
+    setBlocks(blocks.slice(0, -1));
+    setMsg(null);
+  }
+
+  const cell = (w: number, kind: "big" | "small"): React.CSSProperties => ({
+    width: w,
+    height: H,
+    boxSizing: "border-box",
+    border: "2px solid #2c6a8c",
+    borderRadius: 6,
+    background: kind === "big" ? "linear-gradient(180deg,#54aad6,#3f93bd)" : "linear-gradient(180deg,#9fe0f5,#7fd3f2)",
+  });
+
+  return (
+    <PathShell badge={task.badgeLabel ?? "Measure It Your Way"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-5 shadow-sm">
+        <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-[#7c4a12]">{label}</div>
+        <div className="flex justify-center">
+          <div style={{ position: "relative", width: totalW, maxWidth: "100%" }}>
+            <div style={{ width: totalW, height: 20, borderRadius: 10, background: styleFor(label).bg, marginBottom: 8 }} />
+            <div style={{ display: "flex" }}>
+              {blocks.map((b, i) => (
+                <div key={i} style={cell(b === "big" ? BIG : SMALL, b)} />
+              ))}
+              {Array.from({ length: Math.max(0, remaining) }).map((_, i) => (
+                <div key={`g${i}`} style={{ width: SMALL, height: H, boxSizing: "border-box", border: "2px dashed rgba(44,106,140,0.45)", background: "rgba(0,0,0,0.02)" }} />
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="mt-4 text-center text-base font-bold" style={{ color: done ? "#0f766e" : "#5f4725", minHeight: 24 }}>
+          {msg ?? (remaining > 0 ? `${remaining} more to fill…` : "")}
+        </div>
+      </div>
+
+      {!done ? (
+        <div className="flex items-center justify-center gap-4">
+          <button type="button" onClick={() => place("big")} className="flex flex-col items-center gap-1.5 rounded-[20px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-5 py-3 font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]">
+            <div style={cell(BIG, "big")} />
+            <span className="text-xs uppercase tracking-wide text-[#7c3aed]">Add big</span>
+          </button>
+          <button type="button" onClick={() => place("small")} className="flex flex-col items-center gap-1.5 rounded-[20px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-5 py-3 font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]">
+            <div style={cell(SMALL, "small")} />
+            <span className="text-xs uppercase tracking-wide text-[#7c3aed]">Add small</span>
+          </button>
+          <button type="button" onClick={undo} disabled={blocks.length === 0} className="flex items-center gap-2 rounded-[20px] border-2 border-[rgba(214,184,108,0.45)] bg-white px-4 py-6 font-black text-[#5f4725] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-40">
+            <Undo2 className="h-5 w-5" /> Undo
+          </button>
+        </div>
+      ) : null}
+    </PathShell>
+  );
+}
+
 export function MeasurelandsPathTaskCard({
   task,
   onCorrect,
@@ -1174,5 +1267,6 @@ export function MeasurelandsPathTaskCard({
   if (task.scene === "compareAccuracy") return <CompareAccuracyScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "finishGap") return <FinishGapScene task={task} onCorrect={onCorrect} />;
   if (task.scene === "fillSmall") return <FillSmallScene task={task} onCorrect={onCorrect} />;
+  if (task.scene === "measureYourWay") return <MeasureYourWayScene task={task} onCorrect={onCorrect} />;
   return <BuildScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 }
