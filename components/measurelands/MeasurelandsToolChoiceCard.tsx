@@ -32,7 +32,7 @@ function iconFor(key: string): LucideIcon {
 // tiles to the SAME total length for a given object — a block is drawn 2× a
 // paper clip, a crayon 3×, a pencil 4× — so "same object, different units" lines
 // up. Keep in sync with the unitSize values in week4Lesson3.ts.
-const UNIT_SIZE: Record<string, number> = { paperclips: 1, blocks: 2, crayons: 3, pencils: 4 };
+const UNIT_SIZE: Record<string, number> = { paperclips: 1, blocks: 2, cubes: 2, crayons: 3, dominoes: 3, pencils: 4 };
 
 function Shell({ badge, prompt, speakText, children }: { badge: string; prompt: string; speakText?: string; children: React.ReactNode }) {
   return (
