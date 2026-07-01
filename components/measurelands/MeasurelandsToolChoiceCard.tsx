@@ -28,6 +28,12 @@ function iconFor(key: string): LucideIcon {
   return ICONS[key] ?? Box;
 }
 
+// Relative width of each informal unit (paper clip = 1). A strip of any unit
+// tiles to the SAME total length for a given object — a block is drawn 2× a
+// paper clip, a crayon 3×, a pencil 4× — so "same object, different units" lines
+// up. Keep in sync with the unitSize values in week4Lesson3.ts.
+const UNIT_SIZE: Record<string, number> = { paperclips: 1, blocks: 2, crayons: 3, pencils: 4 };
+
 function Shell({ badge, prompt, speakText, children }: { badge: string; prompt: string; speakText?: string; children: React.ReactNode }) {
   return (
     <div className="space-y-4">
@@ -70,18 +76,36 @@ function ObjectCard({ object, big = true }: { object: NonNullable<ToolTask["obje
 }
 
 function UnitStrip({ count, label, iconKey, imageSrc, blanks = 0 }: { count: number; label: string; iconKey: string; imageSrc?: string; blanks?: number }) {
+  const size = UNIT_SIZE[iconKey] ?? 1;
+  const BASE = 20; // px per paper-clip-width
+  const cellW = size * BASE;
+  const H = 36;
+  const Icon = iconFor(iconKey);
+  const tile = (key: string, blank: boolean) => (
+    <div
+      key={key}
+      className="flex shrink-0 items-center justify-center rounded-lg"
+      style={{
+        width: cellW,
+        height: H,
+        padding: 3,
+        border: blank ? "2px dashed rgba(167,139,250,0.6)" : "1px solid rgba(214,184,108,0.45)",
+        background: blank ? "rgba(167,139,250,0.08)" : "#fff",
+      }}
+    >
+      {blank ? (
+        <span className="text-sm font-black text-[#7c3aed]">?</span>
+      ) : imageSrc ? (
+        <img src={imageSrc} alt={label} className="h-full w-full object-contain" />
+      ) : (
+        <Icon className="h-5 w-5 text-[#7c3aed]" strokeWidth={1.8} />
+      )}
+    </div>
+  );
   return (
-    <div className="flex flex-wrap items-center justify-center gap-1.5 rounded-[20px] border border-[rgba(214,184,108,0.5)] bg-[rgba(255,252,245,0.95)] px-3 py-3">
-      {Array.from({ length: count }).map((_, index) => (
-        <div key={`unit-${index}`} className="flex h-9 w-9 items-center justify-center rounded-xl border border-[rgba(214,184,108,0.35)] bg-white shadow-sm">
-          <Glyph label={label} iconKey={iconKey} imageSrc={imageSrc} />
-        </div>
-      ))}
-      {Array.from({ length: blanks }).map((_, index) => (
-        <div key={`blank-${index}`} className="flex h-9 w-9 items-center justify-center rounded-xl border-2 border-dashed border-[rgba(167,139,250,0.55)] bg-[rgba(167,139,250,0.08)] text-lg font-black text-[#7c3aed]">
-          ?
-        </div>
-      ))}
+    <div className="flex items-center gap-1 overflow-x-auto rounded-[20px] border border-[rgba(214,184,108,0.5)] bg-[rgba(255,252,245,0.95)] px-3 py-3">
+      {Array.from({ length: count }).map((_, index) => tile(`unit-${index}`, false))}
+      {Array.from({ length: blanks }).map((_, index) => tile(`blank-${index}`, true))}
     </div>
   );
 }

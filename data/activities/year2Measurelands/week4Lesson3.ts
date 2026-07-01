@@ -26,7 +26,7 @@ const UNIT_ORDER: UnitId[] = ["paperclips", "blocks", "crayons", "pencils"];
 
 const OBJECTS: Obj[] = [
   { id: "pencil", label: "Pencil", iconKey: "pencil", imageSrc: `${MEASURE_OBJECT_BASE}/pencil.png`, lengthUnits: 12 },
-  { id: "book", label: "Book", iconKey: "book", imageSrc: `${EVERYDAY_BASE}/object-book.png`, lengthUnits: 18 },
+  { id: "book", label: "Book", iconKey: "book", imageSrc: `${EVERYDAY_BASE}/object-book.png`, lengthUnits: 16 },
   { id: "rope", label: "Rope", iconKey: "rope", imageSrc: `${MEASURE_OBJECT_BASE}/vine.png`, lengthUnits: 24 },
 ];
 
