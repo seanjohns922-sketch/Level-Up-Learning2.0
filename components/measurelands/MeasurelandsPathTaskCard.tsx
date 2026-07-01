@@ -238,23 +238,39 @@ export function MeasuredObject({
  * a big unit, so a 5.5-big rope tiles into exactly 11 small units. ── */
 const BIG_UNIT = 52;
 
-function MeasuredRope({ ropeBigUnits, mode }: { ropeBigUnits: number; mode: "big" | "small" }) {
+// Distinct object styles so the drawing matches its label (never "Vine" over a
+// rope). Each is a length WE render, so big/small units still tile it exactly.
+type ObjStyle = { bg: string; height: number };
+const OBJECT_STYLES: Record<string, ObjStyle> = {
+  rope: { bg: "linear-gradient(180deg,#d8ad74,#b07f42)", height: 24 },
+  ribbon: { bg: "linear-gradient(180deg,#f4a6d2,#d3629f)", height: 20 },
+  tape: { bg: "linear-gradient(180deg,#ffe08a,#e6b022)", height: 22 },
+  chain: { bg: "repeating-linear-gradient(90deg,#aeb6bf 0 8px,#7f8890 8px 10px,#c7ced6 10px 18px,#7f8890 18px 20px)", height: 22 },
+  vine: { bg: "repeating-linear-gradient(90deg,#7cbf6b 0 16px,#5aa049 16px 20px)", height: 20 },
+  cord: { bg: "linear-gradient(180deg,#9a86e0,#6d55c9)", height: 22 },
+};
+function styleFor(label?: string): ObjStyle {
+  return OBJECT_STYLES[(label ?? "rope").toLowerCase()] ?? OBJECT_STYLES.rope;
+}
+
+function MeasuredRope({ ropeBigUnits, mode, label }: { ropeBigUnits: number; mode: "big" | "small"; label?: string }) {
   const cell = mode === "big" ? BIG_UNIT : BIG_UNIT / 2;
   const count = mode === "big" ? Math.floor(ropeBigUnits) : Math.round(ropeBigUnits * 2);
   const ropeLen = ropeBigUnits * BIG_UNIT;
   const blocksLen = count * cell;
   const leftover = Math.max(0, ropeLen - blocksLen);
   const blockH = Math.round(cell * 0.7);
+  const s = styleFor(label);
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, width: ropeLen, maxWidth: "100%" }}>
-      {/* the rope (the object being measured) */}
-      <div style={{ position: "relative", width: ropeLen, height: 24 }}>
-        <div style={{ position: "absolute", inset: 0, borderRadius: 12, background: "linear-gradient(180deg,#d8ad74,#b07f42)", boxShadow: "inset 0 -3px 4px rgba(0,0,0,0.22)" }} />
+      {/* the object being measured (styled to match its label) */}
+      <div style={{ position: "relative", width: ropeLen, height: s.height }}>
+        <div style={{ position: "absolute", inset: 0, borderRadius: s.height / 2, background: s.bg, boxShadow: "inset 0 -3px 4px rgba(0,0,0,0.20)" }} />
         {mode === "big" && leftover > 1 ? (
-          <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: leftover, borderRadius: "0 12px 12px 0", background: "repeating-linear-gradient(45deg, rgba(232,130,12,0.55) 0 6px, rgba(232,130,12,0.30) 6px 12px)" }} />
+          <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: leftover, borderRadius: `0 ${s.height / 2}px ${s.height / 2}px 0`, background: "repeating-linear-gradient(45deg, rgba(232,130,12,0.55) 0 6px, rgba(232,130,12,0.30) 6px 12px)" }} />
         ) : null}
       </div>
-      {/* unit blocks tiled along the rope */}
+      {/* unit blocks tiled along the object */}
       <div style={{ display: "flex", width: ropeLen }}>
         {Array.from({ length: count }).map((_, i) => (
           <div key={i} style={{ width: cell, height: blockH, boxSizing: "border-box", border: "2px solid #2c6a8c", borderLeft: i === 0 ? "2px solid #2c6a8c" : "none", background: "linear-gradient(180deg,#7fd3f2,#54aad6)" }} />
@@ -366,7 +382,7 @@ function IntroScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect: () 
                 {task.betweenItem.label ?? "Rope"}
               </div>
               <div className="flex justify-center">
-                <MeasuredRope ropeBigUnits={task.betweenItem.wholeBlocks + task.betweenItem.overhang} mode="big" />
+                <MeasuredRope ropeBigUnits={task.betweenItem.wholeBlocks + task.betweenItem.overhang} mode="big" label={task.betweenItem.label} />
               </div>
               <div className="mt-3 text-center text-sm font-bold text-[#5f4725]">
                 The big blocks don&apos;t fit — there&apos;s a{" "}
@@ -718,7 +734,7 @@ function ReMeasureScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; o
       <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-5 shadow-sm">
         <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-[#7c4a12]">{label}</div>
         <div className="flex justify-center overflow-x-auto">
-          <MeasuredRope ropeBigUnits={ropeBigUnits} mode={phase} />
+          <MeasuredRope ropeBigUnits={ropeBigUnits} mode={phase} label={label} />
         </div>
         <div className="mt-4 text-center text-base font-bold text-[#5f4725]">
           {phase === "big" ? (
@@ -759,6 +775,73 @@ function ReMeasureScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; o
   );
 }
 
+/* ── Year 2 W4 L1 activity 2 — "More or fewer?": predict the inverse
+ * relationship. Big blocks left a bit over; will SMALLER blocks give more or
+ * fewer? (Always more.) ── */
+function MoreOrFewerScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
+  const wholeBig = task.pathLength ?? 5;
+  const label = task.objectLabel ?? "Rope";
+  return (
+    <PathShell badge={task.badgeLabel ?? "More or Fewer?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-5 shadow-sm">
+        <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-[#7c4a12]">{label}</div>
+        <div className="flex justify-center overflow-x-auto">
+          <MeasuredRope ropeBigUnits={wholeBig + 0.5} mode="big" label={label} />
+        </div>
+        <div className="mt-4 text-center text-base font-bold text-[#5f4725]">
+          <span className="text-[#2c1c07]">{wholeBig} big blocks</span> and a bit left over. If we use{" "}
+          <span className="text-[#0f766e]">smaller blocks</span>…
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        {["More", "Fewer"].map((opt) => (
+          <button
+            key={opt}
+            type="button"
+            onClick={() => (opt === (task.correctTextOption ?? "More") ? onCorrect() : onWrong())}
+            className="relative flex min-h-[84px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-8 text-2xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+          >
+            <span className="absolute right-3 top-3 z-10"><OptionReadAloudButton text={opt} /></span>
+            {opt}
+          </button>
+        ))}
+      </div>
+    </PathShell>
+  );
+}
+
+/* ── Year 2 W4 L1 activity 3 — "Count the small blocks": fluency. The object is
+ * already tiled exactly with small blocks; count them. ── */
+function CountSmallScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
+  const wholeBig = task.pathLength ?? 5;
+  const smallCount = task.correctAnswer ?? wholeBig * 2 + 1;
+  const label = task.objectLabel ?? "Rope";
+  return (
+    <PathShell badge={task.badgeLabel ?? "Count the Small Blocks"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-5 shadow-sm">
+        <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-[#7c4a12]">{label}</div>
+        <div className="flex justify-center overflow-x-auto">
+          <MeasuredRope ropeBigUnits={wholeBig + 0.5} mode="small" label={label} />
+        </div>
+        <div className="mt-4 text-center text-base font-bold text-[#5f4725]">The small blocks fit exactly — count them.</div>
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        {(task.options ?? [smallCount - 1, smallCount, smallCount + 1]).map((value) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => (value === smallCount ? onCorrect() : onWrong())}
+            className="relative flex min-h-[88px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-5xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+          >
+            <span className="absolute right-3 top-3 z-10"><OptionReadAloudButton text={String(value)} /></span>
+            {value}
+          </button>
+        ))}
+      </div>
+    </PathShell>
+  );
+}
+
 export function MeasurelandsPathTaskCard({
   task,
   onCorrect,
@@ -775,5 +858,7 @@ export function MeasurelandsPathTaskCard({
   if (task.scene === "same") return <SameScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "difference") return <DifferenceScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "reMeasure") return <ReMeasureScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "moreOrFewer") return <MoreOrFewerScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "countSmall") return <CountSmallScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   return <BuildScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 }

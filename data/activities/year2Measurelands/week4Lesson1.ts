@@ -2,38 +2,44 @@ import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-
 
 // ── Measurelands · Level 2 (Year 2) · Week 4 · Lesson 1 — "Measure More Accurately" ──
 // AC9M2M01: "...using appropriate uniform informal units AND SMALLER UNITS FOR
-// ACCURACY WHEN NECESSARY." ACARA: when a measurement with larger units isn't
-// precise (a leftover part), re-measure with smaller units to increase accuracy.
+// ACCURACY WHEN NECESSARY." ACARA: when a big-unit measurement isn't precise (a
+// leftover part), re-measure with smaller units. Verified vs ACARA + Twinkl.
 //
-// One active story per turn (Notice → Solve → Explain, all inside the task):
-//   1. Measure a rope with BIG blocks → it comes to "N blocks and a bit" (the
-//      leftover part is highlighted — it doesn't fit exactly).
-//   2. The child taps "Try smaller blocks" → half-size blocks tile the rope
-//      EXACTLY (2N+1 of them) → count them.
-// Payoff: smaller units fit better and give a bigger number. The rope is a
-// length WE control with units laid along it, so nothing floats/misaligns.
+// THREE rotating activities (house rule: every lesson has 3), all teaching
+// "smaller units measure more precisely":
+//   1. reMeasure   — measure with big blocks (a bit left over) → tap "try
+//                    smaller" → they tile exactly → count them.  (the skill)
+//   2. moreOrFewer — predict: with smaller blocks, more or fewer? (always more;
+//                    the inverse relationship)                    (reasoning)
+//   3. countSmall  — the small blocks already fit exactly; count them. (fluency)
+//
+// Objects are DRAWN lengths we control (so units tile exactly) and each has a
+// distinct look; the label always matches the drawing (no "Vine" over a rope).
 
 type MeasurePathTask = Extract<PracticeTask, { kind: "measurePath" }>;
 
-// Rope "objects" are simple named lengths (drawn, not photos) so big + small
-// units always tile cleanly. Each has a range of sensible big-block lengths.
-type Rope = { id: string; label: string; min: number; max: number };
-const ROPES: Rope[] = [
-  { id: "rope", label: "Rope", min: 4, max: 6 },
-  { id: "ribbon", label: "Ribbon", min: 3, max: 5 },
-  { id: "vine", label: "Vine", min: 5, max: 7 },
-  { id: "string", label: "String", min: 3, max: 5 },
-  { id: "snake", label: "Snake", min: 4, max: 6 },
-  { id: "cable", label: "Cable", min: 5, max: 7 },
+// label MUST match a render style in MeasurelandsPathTaskCard (OBJECT_STYLES).
+type Obj = { label: string; min: number; max: number };
+const OBJECTS: Obj[] = [
+  { label: "Rope", min: 4, max: 6 },
+  { label: "Ribbon", min: 3, max: 5 },
+  { label: "Tape", min: 4, max: 6 },
+  { label: "Chain", min: 5, max: 7 },
+  { label: "Vine", min: 5, max: 7 },
+  { label: "Cord", min: 3, max: 5 },
 ];
 
-type LessonMemory = { introShown: boolean; lastId: string | null };
+type LessonMemory = { introShown: boolean; cursor: number; lastLabel: string | null };
 const lessonMemory = new Map<string, LessonMemory>();
+// Three activities per lesson (hard rule), reMeasure as the anchor.
+const ROTATION: Array<"reMeasure" | "moreOrFewer" | "countSmall"> = [
+  "reMeasure", "moreOrFewer", "countSmall", "reMeasure", "countSmall", "moreOrFewer",
+];
 
 function getMemory(lessonId: string): LessonMemory {
   const existing = lessonMemory.get(lessonId);
   if (existing) return existing;
-  const created: LessonMemory = { introShown: false, lastId: null };
+  const created: LessonMemory = { introShown: false, cursor: 0, lastLabel: null };
   lessonMemory.set(lessonId, created);
   return created;
 }
@@ -53,11 +59,15 @@ function shuffle<T>(items: T[]): T[] {
   return next;
 }
 
-function pickRope(memory: LessonMemory): Rope {
-  const pool = ROPES.filter((r) => r.id !== memory.lastId);
-  const r = choose(pool.length ? pool : ROPES);
-  memory.lastId = r.id;
-  return r;
+function pickObject(memory: LessonMemory): { obj: Obj; wholeBig: number; smallCount: number } {
+  const pool = OBJECTS.filter((o) => o.label !== memory.lastLabel);
+  const obj = choose(pool.length ? pool : OBJECTS);
+  memory.lastLabel = obj.label;
+  const wholeBig = obj.min + randInt(obj.max - obj.min + 1);
+  return { obj, wholeBig, smallCount: wholeBig * 2 + 1 }; // rope = wholeBig + a half
+}
+function countOptions(smallCount: number): number[] {
+  return shuffle([smallCount - 1, smallCount, smallCount + 1]);
 }
 
 // ── Intro: Professor Gauge shows big blocks with a bit left over ──
@@ -67,32 +77,68 @@ function buildIntroTask(): MeasurePathTask {
     scene: "intro",
     prompt: "What if the blocks don't fit?",
     speakText:
-      "Professor Gauge says: sometimes the big blocks don't fit exactly — there's a little bit left over. When that happens, we can measure again with smaller blocks to get a closer, exact answer.",
+      "Professor Gauge says: sometimes the big blocks don't fit exactly — there's a little bit left over. When that happens, we measure again with smaller blocks to get a closer, exact answer.",
     badgeLabel: "Meazurex Mission",
     betweenItem: { imageSrc: undefined, label: "Rope", wholeBlocks: 4, overhang: 0.5 },
     feedback: { correct: "Let's measure more accurately!", wrong: "Let's get ready." },
   };
 }
 
-// ── Activity: measure with big blocks, re-measure with small, count ──
+// ── Activity 1 — measure big, re-measure small, count ──
 function buildReMeasureTask(memory: LessonMemory): MeasurePathTask {
-  const r = pickRope(memory);
-  const wholeBig = r.min + randInt(r.max - r.min + 1);
-  const smallCount = wholeBig * 2 + 1; // rope = wholeBig + a half → exact small count
-  const options = shuffle([smallCount - 1, smallCount, smallCount + 1]);
+  const { obj, wholeBig, smallCount } = pickObject(memory);
   return {
     kind: "measurePath",
     scene: "reMeasure",
-    prompt: `How many blocks long is the ${r.label.toLowerCase()}?`,
-    speakText: `Measure the ${r.label.toLowerCase()} with the big blocks. They don't fit exactly — there's a bit left over.`,
+    prompt: `Measure the ${obj.label.toLowerCase()} with the big blocks.`,
+    speakText: `Measure the ${obj.label.toLowerCase()} with the big blocks. They don't fit exactly — there's a bit left over.`,
     badgeLabel: "Measure More Accurately",
-    objectLabel: r.label,
+    objectLabel: obj.label,
     pathLength: wholeBig,
-    options,
+    options: countOptions(smallCount),
     correctAnswer: smallCount,
     feedback: {
       correct: `Yes — ${smallCount}! Smaller blocks fit exactly and give a bigger number.`,
-      wrong: "Count the small blocks along the rope one by one.",
+      wrong: "Count the small blocks along it one by one.",
+    },
+  };
+}
+
+// ── Activity 2 — predict: smaller blocks → more or fewer? ──
+function buildMoreOrFewerTask(memory: LessonMemory): MeasurePathTask {
+  const { obj, wholeBig } = pickObject(memory);
+  return {
+    kind: "measurePath",
+    scene: "moreOrFewer",
+    prompt: `Smaller blocks — will there be MORE or FEWER?`,
+    speakText: `The ${obj.label.toLowerCase()} is ${wholeBig} big blocks and a bit. If we measure with smaller blocks, will there be more blocks or fewer blocks?`,
+    badgeLabel: "More or Fewer?",
+    objectLabel: obj.label,
+    pathLength: wholeBig,
+    correctTextOption: "More",
+    feedback: {
+      correct: "More! Smaller blocks means you need more of them to measure the same length.",
+      wrong: "Smaller blocks are little, so you need MORE of them to fill the same length.",
+    },
+  };
+}
+
+// ── Activity 3 — count the small blocks that fit exactly ──
+function buildCountSmallTask(memory: LessonMemory): MeasurePathTask {
+  const { obj, wholeBig, smallCount } = pickObject(memory);
+  return {
+    kind: "measurePath",
+    scene: "countSmall",
+    prompt: `How many small blocks long is the ${obj.label.toLowerCase()}?`,
+    speakText: `The small blocks fit the ${obj.label.toLowerCase()} exactly. Count them. How many small blocks long is it?`,
+    badgeLabel: "Count the Small Blocks",
+    objectLabel: obj.label,
+    pathLength: wholeBig,
+    options: countOptions(smallCount),
+    correctAnswer: smallCount,
+    feedback: {
+      correct: `Yes — ${smallCount} small blocks, and they fit exactly!`,
+      wrong: "Count each small block along it, one by one.",
     },
   };
 }
@@ -106,6 +152,10 @@ export function generateY2MeasurelandsWeek4Lesson1Task(
     memory.introShown = true;
     return buildIntroTask();
   }
+  const activity = ROTATION[memory.cursor % ROTATION.length]!;
+  memory.cursor += 1;
+  if (activity === "moreOrFewer") return buildMoreOrFewerTask(memory);
+  if (activity === "countSmall") return buildCountSmallTask(memory);
   return buildReMeasureTask(memory);
 }
 
@@ -113,14 +163,14 @@ export function resetY2MeasurelandsWeek4Lesson1TaskSessionState() {
   lessonMemory.clear();
 }
 
-// 5 fixed tasks for the weekly quiz.
+// 5 fixed tasks for the weekly quiz: covers all three activities.
 export function buildY2MeasurelandsWeek4Lesson1QuizTasks(): PracticeTask[] {
-  const seed: LessonMemory = { introShown: true, lastId: null };
+  const seed: LessonMemory = { introShown: true, cursor: 0, lastLabel: null };
   return [
     buildReMeasureTask(seed),
+    buildMoreOrFewerTask(seed),
+    buildCountSmallTask(seed),
     buildReMeasureTask(seed),
-    buildReMeasureTask(seed),
-    buildReMeasureTask(seed),
-    buildReMeasureTask(seed),
+    buildMoreOrFewerTask(seed),
   ];
 }
