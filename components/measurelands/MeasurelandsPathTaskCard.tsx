@@ -843,9 +843,12 @@ function CountSmallScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; 
 }
 
 /* ── Year 2 W4 L2 "Which Measurement Is Closer?": the same object measured with
- * big blocks (a bit left over) AND small blocks (exact). Three answer modes,
- * inferred from the task: tap the exact one (neither options set), pick the
- * exact number (options), or pick why it's exact (textOptions). ── */
+ * big blocks and small blocks. Four answer modes (task.accuracyMode):
+ *   tapExact    — tap the exact one (big has a bit left over, small fits),
+ *   exactNumber — pick the exact number,
+ *   whyExact    — pick why the small blocks are exact,
+ *   sameLength  — both fit exactly (N big / 2N small): same length or longer?
+ *                 (the bigger number doesn't mean a longer object). ── */
 function MeasurementRow({ label, mode, ropeUnits, caption }: { label: string; mode: "big" | "small"; ropeUnits: number; caption: React.ReactNode }) {
   return (
     <div className="w-full">
@@ -860,25 +863,33 @@ function MeasurementRow({ label, mode, ropeUnits, caption }: { label: string; mo
 
 function CompareAccuracyScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
   const wholeBig = task.pathLength ?? 6;
-  const smallCount = task.correctAnswer ?? wholeBig * 2 + 1;
   const label = task.objectLabel ?? "Rope";
-  const ropeUnits = wholeBig + 0.5;
-  const mode: "tapExact" | "number" | "why" = task.textOptions ? "why" : task.options ? "number" : "tapExact";
-  // In tap mode the child must judge from the blocks, so captions state the
-  // count only (no "fits exactly" giveaway). The number/why modes keep the
-  // verdict since it supports those questions.
-  const bigCaption = mode === "tapExact" ? <>{wholeBig} blocks, then a bit more</> : (
+  const accuracyMode = task.accuracyMode ?? (task.textOptions ? "whyExact" : task.options ? "exactNumber" : "tapExact");
+  const isSame = accuracyMode === "sameLength";
+  // sameLength: rope is a whole number of big units, so BOTH tile exactly
+  // (N big / 2N small). Other modes: a half left over in big, exact in small.
+  const ropeUnits = isSame ? wholeBig : wholeBig + 0.5;
+  const smallCount = isSame ? wholeBig * 2 : task.correctAnswer ?? wholeBig * 2 + 1;
+  // In tap/sameLength modes the child must judge from the blocks, so captions
+  // state the count only (no "fits exactly" giveaway).
+  const bigCaption = isSame ? (
+    <>{wholeBig} blocks</>
+  ) : accuracyMode === "tapExact" ? (
+    <>{wholeBig} blocks, then a bit more</>
+  ) : (
     <>
       {wholeBig} blocks and a <span className="text-[#b4540c]">bit left over</span>
     </>
   );
-  const smallCaption = mode === "tapExact" ? <>{smallCount} blocks</> : (
+  const smallCaption = isSame || accuracyMode === "tapExact" ? (
+    <>{smallCount} blocks</>
+  ) : (
     <>
       {smallCount} blocks — fits <span className="text-[#0f766e]">exactly</span>
     </>
   );
 
-  if (mode === "tapExact") {
+  if (accuracyMode === "tapExact") {
     return (
       <PathShell badge={task.badgeLabel ?? "Which Is Exact?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
         <div className="grid gap-4">
@@ -910,7 +921,7 @@ function CompareAccuracyScene({ task, onCorrect, onWrong }: { task: MeasurePathT
           <MeasurementRow label={label} mode="small" ropeUnits={ropeUnits} caption={smallCaption} />
         </div>
       </div>
-      {mode === "number" ? (
+      {accuracyMode === "exactNumber" ? (
         <div className="grid grid-cols-3 gap-3">
           {(task.options ?? [wholeBig, smallCount, smallCount + 1]).map((value) => (
             <button

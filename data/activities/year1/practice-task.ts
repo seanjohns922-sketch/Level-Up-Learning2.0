@@ -609,10 +609,17 @@ export type PracticeTask = (
         overhang: number;
       }>;
       correctItemId?: string;
-      /** "between": text MCQ — exact vs between, or which two units it lands
-       *  between. (Mirrors the massMeasure "reason" text-option pattern.) */
+      /** "between"/"compareAccuracy": text MCQ. (Mirrors the massMeasure
+       *  "reason" text-option pattern.) */
       textOptions?: string[];
       correctTextOption?: string;
+      /** "compareAccuracy" (W4 L2) answer mode:
+       *   tapExact    — tap the exact measurement (small blocks),
+       *   exactNumber — pick the exact number,
+       *   whyExact    — pick why it's exact,
+       *   sameLength  — same object as N big / 2N small (both exact): is it the
+       *                 same length, or longer? (teaches: bigger number ≠ longer). */
+      accuracyMode?: "tapExact" | "exactNumber" | "whyExact" | "sameLength";
       feedback?: { correct: string; wrong: string };
     }
   | {
