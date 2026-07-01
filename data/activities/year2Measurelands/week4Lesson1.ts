@@ -34,7 +34,7 @@ const lessonMemory = new Map<string, LessonMemory>();
 // hero — it's a puzzle with many valid answers, so it never repeats. The other
 // two vary their number answers.
 const ROTATION: Array<"reMeasure" | "measureYourWay" | "sameLength"> = [
-  "measureYourWay", "reMeasure", "measureYourWay", "sameLength", "measureYourWay", "reMeasure",
+  "measureYourWay", "sameLength", "reMeasure", "measureYourWay", "sameLength", "reMeasure",
 ];
 
 function getMemory(lessonId: string): LessonMemory {
