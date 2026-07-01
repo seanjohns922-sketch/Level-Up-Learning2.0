@@ -194,13 +194,13 @@ export default function MeasurelandsMap({ year = "Prep" }: { year?: Measurelands
   const fogProgress = useMemo(() => computeFogProgress(progress?.year, progress?.unlockedLegends), [progress?.year, progress?.unlockedLegends]);
 
   const totalWeeks = world.zones[world.zones.length - 1]?.weekEnd ?? 8;
-  const currentWeek = getRecommendedAssignedWeek(store, resolvedYear, progress?.assignedWeek, progress?.requiredWeeks);
+  const currentWeek = getRecommendedAssignedWeek(store, resolvedYear, progress?.assignedWeek, progress?.requiredWeeks, REALM_ID);
   const currentZone =
     world.zones.find((zone) => currentWeek >= zone.weekStart && currentWeek <= zone.weekEnd) ?? world.zones[0];
   const completedByWeek = useMemo(() => {
     const result: Record<number, boolean> = {};
     for (let week = 1; week <= totalWeeks; week += 1) {
-      result[week] = isWeekComplete(getWeekProgress(store, resolvedYear, week));
+      result[week] = isWeekComplete(getWeekProgress(store, resolvedYear, week, REALM_ID));
     }
     return result;
   }, [resolvedYear, store, totalWeeks]);
@@ -213,7 +213,7 @@ export default function MeasurelandsMap({ year = "Prep" }: { year?: Measurelands
   const totalXP = useMemo(() => {
     let xp = 0;
     for (let week = 1; week <= totalWeeks; week += 1) {
-      const wp = getWeekProgress(store, resolvedYear, week);
+      const wp = getWeekProgress(store, resolvedYear, week, REALM_ID);
       xp += wp.lessonsCompleted.filter(Boolean).length * 40;
       if (wp.quizScore !== undefined) xp += Math.round((wp.quizScore / 100) * 60);
     }

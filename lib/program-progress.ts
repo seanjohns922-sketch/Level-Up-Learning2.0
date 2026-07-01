@@ -17,6 +17,7 @@ export type WeekProgress = {
 
 export type ProgramProgressStore = Record<string, WeekProgress>;
 export const ALL_PROGRAM_WEEKS = Array.from({ length: 12 }, (_, index) => index + 1);
+export type ProgramRealmId = "number" | "measurement" | string;
 
 export const PROGRAM_STORE_KEY = "lul_program_progress_v1";
 
@@ -33,7 +34,15 @@ export function getScopedProgramStoreKey(scope = getActiveStudentScope()) {
   return `lul:${scope}:program_progress_v1`;
 }
 
-function makeKey(year: string, week: number | string) {
+function normalizeRealmId(realmId: ProgramRealmId | undefined): string {
+  return realmId === "measurement" ? "measurement" : "number";
+}
+
+export function makeProgramProgressKey(year: string, week: number | string, realmId: ProgramRealmId = "number") {
+  return `${normalizeRealmId(realmId)}|${year}|${week}`;
+}
+
+function legacyNumberKey(year: string, week: number | string) {
   return `${year}|${week}`;
 }
 
@@ -58,19 +67,27 @@ export function clearScopedProgramStore(scope = getActiveStudentScope()) {
   localStorage.removeItem(getScopedProgramStoreKey(scope));
 }
 
-export function clearYearProgress(year: string) {
+export function clearYearProgress(year: string, realmId: ProgramRealmId = "number") {
   if (typeof window === "undefined") return {};
   const store = readProgramStore();
+  const prefix = `${normalizeRealmId(realmId)}|${year}|`;
+  const legacyPrefix = `${year}|`;
   const nextStore = Object.fromEntries(
-    Object.entries(store).filter(([key]) => !key.startsWith(`${year}|`))
+    Object.entries(store).filter(([key]) => !key.startsWith(prefix) && !(normalizeRealmId(realmId) === "number" && key.startsWith(legacyPrefix)))
   ) as ProgramProgressStore;
   writeProgramStore(nextStore);
   return nextStore;
 }
 
-export function getWeekProgress(store: ProgramProgressStore, year: string, week: number | string): WeekProgress {
-  const key = makeKey(year, week);
-  return store[key] ?? { lessonsCompleted: [false, false, false], quizCompleted: false };
+export function getWeekProgress(
+  store: ProgramProgressStore,
+  year: string,
+  week: number | string,
+  realmId: ProgramRealmId = "number"
+): WeekProgress {
+  const key = makeProgramProgressKey(year, week, realmId);
+  const legacy = normalizeRealmId(realmId) === "number" ? store[legacyNumberKey(year, week)] : undefined;
+  return store[key] ?? legacy ?? { lessonsCompleted: [false, false, false], quizCompleted: false };
 }
 
 export function isWeekComplete(p: WeekProgress): boolean {
@@ -101,30 +118,33 @@ export function isFullRequiredPath(
 export function getCompletedRequiredWeeks(
   store: ProgramProgressStore,
   year: string,
-  requiredWeeks: number[] | undefined | null
+  requiredWeeks: number[] | undefined | null,
+  realmId: ProgramRealmId = "number"
 ): number[] {
-  return normalizeWeekList(requiredWeeks).filter((week) => isWeekComplete(getWeekProgress(store, year, week)));
+  return normalizeWeekList(requiredWeeks).filter((week) => isWeekComplete(getWeekProgress(store, year, week, realmId)));
 }
 
 export function hasCompletedRequiredWeeks(
   store: ProgramProgressStore,
   year: string,
-  requiredWeeks: number[] | undefined | null
+  requiredWeeks: number[] | undefined | null,
+  realmId: ProgramRealmId = "number"
 ): boolean {
   const normalized = normalizeWeekList(requiredWeeks);
   if (!normalized.length) return false;
-  return normalized.every((week) => isWeekComplete(getWeekProgress(store, year, week)));
+  return normalized.every((week) => isWeekComplete(getWeekProgress(store, year, week, realmId)));
 }
 
 export function getFirstIncompleteRequiredWeek(
   store: ProgramProgressStore,
   year: string,
-  requiredWeeks: number[] | undefined | null
+  requiredWeeks: number[] | undefined | null,
+  realmId: ProgramRealmId = "number"
 ): number | null {
   const normalized = normalizeWeekList(requiredWeeks);
   if (!normalized.length) return null;
   for (const week of normalized) {
-    if (!isWeekComplete(getWeekProgress(store, year, week))) return week;
+    if (!isWeekComplete(getWeekProgress(store, year, week, realmId))) return week;
   }
   return null;
 }
@@ -133,9 +153,10 @@ export function getRecommendedAssignedWeek(
   store: ProgramProgressStore,
   year: string,
   currentAssignedWeek: number | undefined,
-  requiredWeeks: number[] | undefined | null
+  requiredWeeks: number[] | undefined | null,
+  realmId: ProgramRealmId = "number"
 ): number {
-  const firstIncompleteRequired = getFirstIncompleteRequiredWeek(store, year, requiredWeeks);
+  const firstIncompleteRequired = getFirstIncompleteRequiredWeek(store, year, requiredWeeks, realmId);
   if (firstIncompleteRequired != null) return firstIncompleteRequired;
   return Math.max(1, Math.min(12, currentAssignedWeek ?? 1));
 }
@@ -144,18 +165,19 @@ export function getPlayableWeeks(
   store: ProgramProgressStore,
   year: string,
   requiredWeeks: number[] | undefined | null,
-  optionalWeeks: number[] | undefined | null
+  optionalWeeks: number[] | undefined | null,
+  realmId: ProgramRealmId = "number"
 ): number[] {
   void optionalWeeks;
   const normalizedRequired = normalizeWeekList(requiredWeeks);
   if (!normalizedRequired.length) return ALL_PROGRAM_WEEKS;
 
-  if (hasCompletedRequiredWeeks(store, year, normalizedRequired)) {
+  if (hasCompletedRequiredWeeks(store, year, normalizedRequired, realmId)) {
     return ALL_PROGRAM_WEEKS;
   }
 
-  const completedRequired = getCompletedRequiredWeeks(store, year, normalizedRequired);
-  const firstIncompleteRequired = getFirstIncompleteRequiredWeek(store, year, normalizedRequired);
+  const completedRequired = getCompletedRequiredWeeks(store, year, normalizedRequired, realmId);
+  const firstIncompleteRequired = getFirstIncompleteRequiredWeek(store, year, normalizedRequired, realmId);
 
   return normalizeWeekList([
     ...completedRequired,
@@ -168,19 +190,20 @@ export function isWeekPlayable(
   year: string,
   week: number,
   requiredWeeks: number[] | undefined | null,
-  optionalWeeks: number[] | undefined | null
+  optionalWeeks: number[] | undefined | null,
+  realmId: ProgramRealmId = "number"
 ): boolean {
-  return getPlayableWeeks(store, year, requiredWeeks, optionalWeeks).includes(week);
+  return getPlayableWeeks(store, year, requiredWeeks, optionalWeeks, realmId).includes(week);
 }
 
 /**
  * Mark a specific lesson as complete in the store and persist.
  * lessonNumber is 1-based (1, 2, or 3).
  */
-export function markLessonComplete(year: string, week: number, lessonNumber: number) {
+export function markLessonComplete(year: string, week: number, lessonNumber: number, realmId: ProgramRealmId = "number") {
   const store = readProgramStore();
-  const key = makeKey(year, week);
-  const current = getWeekProgress(store, year, week);
+  const key = makeProgramProgressKey(year, week, realmId);
+  const current = getWeekProgress(store, year, week, realmId);
   const nextLessons = [...current.lessonsCompleted];
   nextLessons[lessonNumber - 1] = true;
   store[key] = { ...current, lessonsCompleted: nextLessons };
@@ -191,10 +214,10 @@ export function markLessonComplete(year: string, week: number, lessonNumber: num
 /**
  * Record a quiz score and mark quiz as complete.
  */
-export function markQuizComplete(year: string, week: number, score: number) {
+export function markQuizComplete(year: string, week: number, score: number, realmId: ProgramRealmId = "number") {
   const store = readProgramStore();
-  const key = makeKey(year, week);
-  const current = getWeekProgress(store, year, week);
+  const key = makeProgramProgressKey(year, week, realmId);
+  const current = getWeekProgress(store, year, week, realmId);
   store[key] = { ...current, quizCompleted: true, quizScore: score };
   writeProgramStore(store);
   return store;

@@ -9,7 +9,7 @@ import { getLatestPosttestProfile } from "@/data/assessments/analysis";
 import CurriculumExplorer from "@/components/teacher/CurriculumExplorer";
 import LiveClassPanel from "@/components/teacher/LiveClassPanel";
 import StrandStudentsPanel from "@/components/teacher/StrandStudentsPanel";
-import { fetchNumberCompatProgressForClass } from "@/lib/realm-progress-compat";
+import { fetchRealmCompatProgressForClass } from "@/lib/realm-progress-compat";
 import {
   BRAIN_BREAK_FREQUENCIES,
   BRAIN_BREAK_FREQUENCY_LABEL,
@@ -22,6 +22,7 @@ type ClassRow = { id: string; class_code: string; name: string; year_level: stri
 type StudentRow = { id: string; display_name: string; username?: string | null; class_id: string; user_id: string; pin?: string | null; qr_token?: string | null; school_year_level?: string | null; working_level?: string | null; year_level?: string | null; brain_break_frequency?: string | null };
 type ProgressRow = {
   student_id: string;
+  realm_id?: string;
   year: string;
   week: number | null;
   status: string;
@@ -386,7 +387,11 @@ export default function TeacherDashboardPage() {
     let newLiveEvents: LiveActivityEventRow[] = [];
     if (newStuds.length > 0) {
       const ids = newStuds.map((s) => s.id);
-      newProg = await fetchNumberCompatProgressForClass(classId, ids);
+      const [numberProgress, measurementProgress] = await Promise.all([
+        fetchRealmCompatProgressForClass("number", classId, ids),
+        fetchRealmCompatProgressForClass("measurement", classId, ids),
+      ]);
+      newProg = [...numberProgress, ...measurementProgress];
 
       const { data: live } = await supabase
         .from("live_student_activity")

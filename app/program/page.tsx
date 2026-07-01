@@ -265,21 +265,21 @@ function ProgramPage() {
     [optionalWeeks, requiredWeeks]
   );
   const requiredWeeksComplete = useMemo(
-    () => hasCompletedRequiredWeeks(store, curriculumYear, requiredWeeks),
-    [store, curriculumYear, requiredWeeks]
+    () => hasCompletedRequiredWeeks(store, curriculumYear, requiredWeeks, realmId),
+    [store, curriculumYear, requiredWeeks, realmId]
   );
   const canTakePostTestEarly = hasPersonalizedPlan && requiredWeeksComplete;
   const currentWeekIsRequired = requiredWeeks.includes(weekNum);
   const playableWeeks = useMemo(
-    () => getPlayableWeeks(store, curriculumYear, requiredWeeks, optionalWeeks),
-    [store, curriculumYear, requiredWeeks, optionalWeeks]
+    () => getPlayableWeeks(store, curriculumYear, requiredWeeks, optionalWeeks, realmId),
+    [store, curriculumYear, requiredWeeks, optionalWeeks, realmId]
   );
   const weekIsPlayable = useMemo(
-    () => isWeekPlayable(store, curriculumYear, weekNum, requiredWeeks, optionalWeeks),
-    [store, curriculumYear, weekNum, requiredWeeks, optionalWeeks]
+    () => isWeekPlayable(store, curriculumYear, weekNum, requiredWeeks, optionalWeeks, realmId),
+    [store, curriculumYear, weekNum, requiredWeeks, optionalWeeks, realmId]
   );
 
-  const prevProgress = getWeekProgress(store, year, Math.max(1, weekNum - 1));
+  const prevProgress = getWeekProgress(store, year, Math.max(1, weekNum - 1), realmId);
   const weekUnlocked =
     DEMO_MODE || previewMode || teacherMode ? true : hasPersonalizedPlan ? weekIsPlayable : weekNum === 1 ? true : isWeekComplete(prevProgress);
 
@@ -287,13 +287,13 @@ function ProgramPage() {
     if (DEMO_MODE || previewMode || teacherMode || hasPersonalizedPlan) return lastWeek;
     let allowed = 1;
     for (let w = 2; w <= lastWeek; w++) {
-      if (isWeekComplete(getWeekProgress(store, year, w - 1))) allowed = w;
+      if (isWeekComplete(getWeekProgress(store, year, w - 1, realmId))) allowed = w;
       else break;
     }
     return allowed;
-  }, [hasPersonalizedPlan, lastWeek, previewMode, store, teacherMode, year]);
+  }, [hasPersonalizedPlan, lastWeek, previewMode, realmId, store, teacherMode, year]);
 
-  const progress = getWeekProgress(store, year, week);
+  const progress = getWeekProgress(store, year, week, realmId);
   const pathwayChipBase = isMeasurementRealm
     ? "border border-yellow-900/30 bg-[#2a1a06]/85 text-yellow-100"
     : "border border-teal-300/25 bg-black/35 text-teal-50";
@@ -402,7 +402,7 @@ function ProgramPage() {
     const savedWeek = student.assignedWeek ?? 1;
     let nextWeek = savedWeek;
     if (hasPersonalizedPlan) {
-      nextWeek = getRecommendedAssignedWeek(store, curriculumYear, savedWeek, student.requiredWeeks);
+      nextWeek = getRecommendedAssignedWeek(store, curriculumYear, savedWeek, student.requiredWeeks, realmId);
     } else {
       if (weekNum > savedWeek) nextWeek = weekNum;
       if (weekComplete) nextWeek = Math.max(nextWeek, Math.min(lastWeek, weekNum + 1));
@@ -618,7 +618,7 @@ function ProgramPage() {
                         const isUnlocked = DEMO_MODE || previewMode || teacherMode || (hasPersonalizedPlan ? playableWeeks.includes(targetWeek) : targetWeek <= lastAllowedWeek);
                         const isCurrent = targetWeek === weekNum;
                         const isRequiredWeek = requiredWeeks.includes(targetWeek);
-                        const isDoneWeek = isWeekComplete(getWeekProgress(store, year, targetWeek));
+                        const isDoneWeek = isWeekComplete(getWeekProgress(store, year, targetWeek, realmId));
                         const status = hasPersonalizedPlan
                           ? isCurrent ? "Current" : isRequiredWeek ? isDoneWeek ? "Required Done" : "Required" : isDoneWeek ? "Optional Done" : requiredWeeksComplete ? "Optional" : "Locked"
                           : isCurrent ? "Current" : isUnlocked ? "Open" : "Locked";
@@ -815,7 +815,7 @@ function ProgramPage() {
                           </div>
                           <div className="mt-3 flex flex-wrap gap-2">
                             {requiredWeeks.map((requiredWeek) => {
-                              const done = isWeekComplete(getWeekProgress(store, year, requiredWeek));
+                              const done = isWeekComplete(getWeekProgress(store, year, requiredWeek, realmId));
                               const unlocked = playableWeeks.includes(requiredWeek) || done || requiredWeek === weekNum;
                               return (
                                 <button
@@ -862,7 +862,7 @@ function ProgramPage() {
                                 No optional weeks in this pathway.
                               </div>
                             ) : optionalWeeks.map((optionalWeek) => {
-                              const done = isWeekComplete(getWeekProgress(store, year, optionalWeek));
+                              const done = isWeekComplete(getWeekProgress(store, year, optionalWeek, realmId));
                               const optionalPlayable = requiredWeeksComplete || done;
                               return (
                                 <button

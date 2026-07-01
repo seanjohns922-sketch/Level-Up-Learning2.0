@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 
 export type CompatProgressRow = {
   student_id: string;
+  realm_id: string;
   year: string;
   week: number | null;
   status: string;
@@ -322,6 +323,7 @@ function buildRowsFromRealmData(
 
     return {
       student_id: summary.student_id,
+      realm_id: summary.realm_id,
       year: summary.working_level,
       week: summary.current_week ?? summary.assigned_week ?? null,
       status: summary.status,
@@ -363,6 +365,7 @@ function mergeLegacyRows(baseRows: SnapshotLike[], legacyRows: LegacyProgressRow
 
     merged.push({
       student_id: legacyRow.student_id,
+      realm_id: "number",
       year: legacyRow.year,
       week: legacyRow.week,
       status: legacyRow.status ?? "ACTIVE",
@@ -406,48 +409,50 @@ async function fetchSnapshotFallbackForStudent(studentId: string) {
   return (data ?? []) as SnapshotLike[];
 }
 
-export async function fetchNumberCompatProgressForClass(classId: string, studentIds: string[]) {
+export async function fetchRealmCompatProgressForClass(realmId: string, classId: string, studentIds: string[]) {
   if (studentIds.length === 0) return [] as CompatProgressRow[];
 
   const { data: compatData, error: compatError } = await supabase.rpc("get_class_realm_progress_compat", {
     p_class_id: classId,
-    p_realm_id: "number",
+    p_realm_id: realmId,
     p_working_level: null,
   });
 
   if (compatError) {
     console.warn("[RealmProgressCompat] Failed to read class compat rows, falling back to progress_snapshot", compatError);
-    return fetchSnapshotFallbackForClass(studentIds);
+    return realmId === "number" ? fetchSnapshotFallbackForClass(studentIds) : [];
   }
 
   const summaries = (compatData ?? []) as RealmProgressSummaryRow[];
-  const realmRows = summaries.filter((row) => row.realm_id === "number");
+  const realmRows = summaries.filter((row) => row.realm_id === realmId);
 
   if (realmRows.length === 0) {
-    return fetchSnapshotFallbackForClass(studentIds);
+    return realmId === "number" ? fetchSnapshotFallbackForClass(studentIds) : [];
   }
 
   const [lessonAttemptsResponse, quizAttemptsResponse, assessmentsResponse, legacyProgResponse] = await Promise.all([
     supabase.rpc("get_class_realm_lesson_attempts", {
       p_class_id: classId,
-      p_realm_id: "number",
+      p_realm_id: realmId,
       p_working_level: null,
     }),
     supabase.rpc("get_class_realm_weekly_quiz_attempts", {
       p_class_id: classId,
-      p_realm_id: "number",
+      p_realm_id: realmId,
       p_working_level: null,
     }),
     supabase
       .from("student_realm_assessments")
       .select("student_id,realm_id,working_level,assessment_type,correct_count,total_questions,score_percent,passed,placement_result,question_results,completed_at")
       .eq("class_id", classId)
-      .eq("realm_id", "number"),
-    supabase
-      .from("progress")
-      .select("student_id,year,week,status,pretest_score,updated_at")
-      .in("student_id", studentIds)
-      .not("pretest_score", "is", null),
+      .eq("realm_id", realmId),
+    realmId === "number"
+      ? supabase
+          .from("progress")
+          .select("student_id,year,week,status,pretest_score,updated_at")
+          .in("student_id", studentIds)
+          .not("pretest_score", "is", null)
+      : Promise.resolve({ data: [], error: null }),
   ]);
 
   const builtRows = buildRowsFromRealmData(
@@ -457,48 +462,50 @@ export async function fetchNumberCompatProgressForClass(classId: string, student
     (assessmentsResponse.data ?? []) as RealmAssessmentRow[],
   );
 
-  return mergeLegacyRows(builtRows, (legacyProgResponse.data ?? []) as LegacyProgressRow[]);
+  return realmId === "number" ? mergeLegacyRows(builtRows, (legacyProgResponse.data ?? []) as LegacyProgressRow[]) : builtRows;
 }
 
-export async function fetchNumberCompatProgressForStudent(studentId: string) {
+export async function fetchRealmCompatProgressForStudent(realmId: string, studentId: string) {
   const { data: compatData, error: compatError } = await supabase.rpc("get_student_realm_progress_compat", {
     p_student_id: studentId,
-    p_realm_id: "number",
+    p_realm_id: realmId,
   });
 
   if (compatError) {
     console.warn("[RealmProgressCompat] Failed to read student compat rows, falling back to progress_snapshot", compatError);
-    return fetchSnapshotFallbackForStudent(studentId);
+    return realmId === "number" ? fetchSnapshotFallbackForStudent(studentId) : [];
   }
 
   const summaries = (compatData ?? []) as RealmProgressSummaryRow[];
-  const realmRows = summaries.filter((row) => row.realm_id === "number");
+  const realmRows = summaries.filter((row) => row.realm_id === realmId);
 
   if (realmRows.length === 0) {
-    return fetchSnapshotFallbackForStudent(studentId);
+    return realmId === "number" ? fetchSnapshotFallbackForStudent(studentId) : [];
   }
 
   const [lessonAttemptsResponse, quizAttemptsResponse, assessmentsResponse, legacyProgResponse] = await Promise.all([
     supabase.rpc("get_student_realm_lesson_attempts", {
       p_student_id: studentId,
-      p_realm_id: "number",
+      p_realm_id: realmId,
       p_working_level: null,
     }),
     supabase.rpc("get_student_realm_weekly_quiz_attempts", {
       p_student_id: studentId,
-      p_realm_id: "number",
+      p_realm_id: realmId,
       p_working_level: null,
     }),
     supabase.rpc("get_student_realm_assessments", {
       p_student_id: studentId,
-      p_realm_id: "number",
+      p_realm_id: realmId,
       p_working_level: null,
     }),
-    supabase
-      .from("progress")
-      .select("student_id,year,week,status,pretest_score,updated_at")
-      .eq("student_id", studentId)
-      .not("pretest_score", "is", null),
+    realmId === "number"
+      ? supabase
+          .from("progress")
+          .select("student_id,year,week,status,pretest_score,updated_at")
+          .eq("student_id", studentId)
+          .not("pretest_score", "is", null)
+      : Promise.resolve({ data: [], error: null }),
   ]);
 
   const builtRows = buildRowsFromRealmData(
@@ -508,5 +515,13 @@ export async function fetchNumberCompatProgressForStudent(studentId: string) {
     (assessmentsResponse.data ?? []) as RealmAssessmentRow[],
   );
 
-  return mergeLegacyRows(builtRows, (legacyProgResponse.data ?? []) as LegacyProgressRow[]);
+  return realmId === "number" ? mergeLegacyRows(builtRows, (legacyProgResponse.data ?? []) as LegacyProgressRow[]) : builtRows;
+}
+
+export async function fetchNumberCompatProgressForClass(classId: string, studentIds: string[]) {
+  return fetchRealmCompatProgressForClass("number", classId, studentIds);
+}
+
+export async function fetchNumberCompatProgressForStudent(studentId: string) {
+  return fetchRealmCompatProgressForStudent("number", studentId);
 }

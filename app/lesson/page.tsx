@@ -71,7 +71,7 @@ import { ActiveLearningTracker } from "@/components/student/ActiveLearningTracke
 import { supabase } from "@/lib/supabase";
 import { recordStudentActivityDelta } from "@/lib/student-activity";
 import type { TeacherInsight, TeacherInsightInput } from "@/lib/teacher-insights";
-import { saveNumberLessonAttempt, saveStudentProgressState } from "@/lib/student-progress-sync";
+import { saveRealmLessonAttempt, saveStudentProgressState } from "@/lib/student-progress-sync";
 import { buildLessonRoute, normalizeStudentYearLabel } from "@/lib/lesson-routing";
 
 export default function LessonPageWrapper() {
@@ -193,6 +193,8 @@ function LessonPage() {
     ? `/measurelands?level=${encodeURIComponent(year)}`
     : "/number-nexus";
   const isMeasurement = realmId === "measurement";
+  const lessonRealmId = isMeasurement ? "measurement" : "number";
+  const lessonStrand = isMeasurement ? "Measurement" : "Number";
 
   // ── Lesson page theme — add a new entry here for future realms ────────────
   const lt = isMeasurement ? {
@@ -400,13 +402,13 @@ function LessonPage() {
     if (previewMode || !p || p.status !== "ASSIGNED_PROGRAM" || p.year !== year) return;
 
     const store = readProgramStore();
-    const weekPlayable = isWeekPlayable(store, year, week, p.requiredWeeks, p.optionalWeeks);
+    const weekPlayable = isWeekPlayable(store, year, week, p.requiredWeeks, p.optionalWeeks, lessonRealmId);
     if (!weekPlayable) {
       router.replace(mapRoute);
       return;
     }
 
-    const weekProgress = getWeekProgress(store, year, week);
+    const weekProgress = getWeekProgress(store, year, week, lessonRealmId);
     if (lessonNumber > 1 && !weekProgress.lessonsCompleted[lessonNumber - 2]) {
       return;
     }
@@ -417,8 +419,8 @@ function LessonPage() {
     const p = readProgress();
     if (!p || p.status !== "ASSIGNED_PROGRAM" || p.year !== year) return null;
     const store = readProgramStore();
-    if (!isWeekPlayable(store, year, week, p.requiredWeeks, p.optionalWeeks)) return null;
-    const weekProgress = getWeekProgress(store, year, week);
+    if (!isWeekPlayable(store, year, week, p.requiredWeeks, p.optionalWeeks, lessonRealmId)) return null;
+    const weekProgress = getWeekProgress(store, year, week, lessonRealmId);
     if (lessonNumber > 1 && !weekProgress.lessonsCompleted[lessonNumber - 2]) {
       return lessonNumber - 1;
     }
@@ -446,7 +448,7 @@ function LessonPage() {
     }
     lessonFinalizedRef.current = true;
 
-    markLessonComplete(year, week, lessonNumber);
+    markLessonComplete(year, week, lessonNumber, lessonRealmId);
     const progress = readProgress();
     let nextAssignedWeek = progress?.assignedWeek;
     if (progress?.status === "ASSIGNED_PROGRAM" && progress.requiredWeeks?.length) {
@@ -454,7 +456,8 @@ function LessonPage() {
         readProgramStore(),
         year,
         progress.assignedWeek,
-        progress.requiredWeeks
+        progress.requiredWeeks,
+        lessonRealmId
       );
       if (nextAssignedWeek !== progress.assignedWeek) {
         updateProgress({ assignedWeek: nextAssignedWeek });
@@ -510,7 +513,7 @@ function LessonPage() {
             insight: null,
           };
 
-          await saveNumberLessonAttempt(studentId, year, week, lessonNumber, effectiveLessonId, fallbackAttempt);
+          await saveRealmLessonAttempt(studentId, year, week, lessonNumber, effectiveLessonId, fallbackAttempt, lessonRealmId);
         }
 
         const latest = readProgress();
@@ -522,7 +525,7 @@ function LessonPage() {
           required_weeks: latest?.requiredWeeks ?? progress?.requiredWeeks ?? [],
           optional_weeks: latest?.optionalWeeks ?? progress?.optionalWeeks ?? [],
           unlocked_legends: latest?.unlockedLegends ?? progress?.unlockedLegends ?? [],
-        });
+        }, lessonRealmId);
       } catch (error) {
         lessonFinalizedRef.current = false;
         console.warn("[Lesson] Final completion sync failed:", error);
@@ -546,7 +549,7 @@ function LessonPage() {
   const latestLessonSummaryRef = useRef<LessonPerformanceSummary | null>(null);
   const liveLessonContext = {
     level: year,
-    strand: "Number",
+    strand: lessonStrand,
     week,
     lessonId: effectiveLessonId,
     lessonTitle: safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`,
@@ -565,7 +568,7 @@ function LessonPage() {
       const input: TeacherInsightInput = {
         studentId,
         level: year,
-        strand: "Number",
+        strand: lessonStrand,
         week,
         lessonId: effectiveLessonId,
         title: summary.lessonTitle,
@@ -614,7 +617,7 @@ function LessonPage() {
         insight,
       };
 
-      await saveNumberLessonAttempt(studentId, year, week, lessonNumber, effectiveLessonId, attempt);
+      await saveRealmLessonAttempt(studentId, year, week, lessonNumber, effectiveLessonId, attempt, lessonRealmId);
 
       void recordStudentActivityDelta({
         questionsAnswered: summary.questionsAnswered,

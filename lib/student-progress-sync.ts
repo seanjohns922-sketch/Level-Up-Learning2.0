@@ -2,13 +2,14 @@
 
 import { YEAR_ORDER } from "@/data/yearOrder";
 import { type StudentProgress, writeProgress } from "@/data/progress";
-import { writeProgramStore, type ProgramProgressStore } from "@/lib/program-progress";
+import { makeProgramProgressKey, writeProgramStore, type ProgramProgressStore } from "@/lib/program-progress";
 import { markActiveStudentIntroSeen } from "@/lib/studentIdentity";
-import { fetchNumberCompatProgressForStudent } from "@/lib/realm-progress-compat";
+import { fetchRealmCompatProgressForStudent } from "@/lib/realm-progress-compat";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { supabase } from "@/lib/supabase";
 
 export type StudentProgressSnapshotRow = {
+  realm_id?: string | null;
   year: string | null;
   pretest_score: number | null;
   status: string | null;
@@ -36,6 +37,17 @@ type StudentRuntimeContextRow = {
 
 function numberProgramKey(year: string) {
   return `${year.toLowerCase().replace(/\s+/g, "")}-number`;
+}
+
+export type StudentProgressRealmId = "number" | "measurement";
+
+function realmProgramKey(year: string, realmId: StudentProgressRealmId) {
+  return `${year.toLowerCase().replace(/\s+/g, "")}-${realmId === "measurement" ? "measurelands" : "number"}`;
+}
+
+function quizIdForRealm(year: string, week: number, realmId: StudentProgressRealmId) {
+  const yearNumber = parseInt(year.replace(/\D/g, ""), 10) || 0;
+  return `y${yearNumber}-${realmId === "measurement" ? "measurement" : "number"}-w${week}-quiz`;
 }
 
 async function getStudentRuntimeContext(studentId: string) {
@@ -74,8 +86,8 @@ function parseRecord(value: unknown): Record<string, unknown> {
     : {};
 }
 
-function ensureWeek(store: ProgramProgressStore, year: string, week: number) {
-  const key = `${year}|${week}`;
+function ensureWeek(store: ProgramProgressStore, year: string, week: number, realmId = "number") {
+  const key = makeProgramProgressKey(year, week, realmId);
   if (!store[key]) {
     store[key] = { lessonsCompleted: [false, false, false], quizCompleted: false };
   }
@@ -88,6 +100,7 @@ function hydrateProgramStore(rows: StudentProgressSnapshotRow[]) {
   rows.forEach((row) => {
     const year = row.year;
     if (!year) return;
+    const realmId = row.realm_id === "measurement" ? "measurement" : "number";
 
     const completedLessonIds = parseStringArray(row.completed_lesson_ids);
     completedLessonIds.forEach((lessonId) => {
@@ -97,7 +110,7 @@ function hydrateProgramStore(rows: StudentProgressSnapshotRow[]) {
       const lessonNumber = Number(match[2]);
       if (!Number.isInteger(week) || week < 1 || week > 12) return;
       if (!Number.isInteger(lessonNumber) || lessonNumber < 1 || lessonNumber > 3) return;
-      const wp = ensureWeek(store, year, week);
+      const wp = ensureWeek(store, year, week, realmId);
       wp.lessonsCompleted[lessonNumber - 1] = true;
     });
 
@@ -107,7 +120,7 @@ function hydrateProgramStore(rows: StudentProgressSnapshotRow[]) {
       const week = Number(weekKey);
       if (!Number.isInteger(week) || week < 1 || week > 12) return;
       const quiz = parseRecord(value);
-      const wp = ensureWeek(store, year, week);
+      const wp = ensureWeek(store, year, week, realmId);
       wp.quizCompleted = true;
       const percent = Number(quiz.percent);
       const score = Number(quiz.score);
@@ -116,7 +129,7 @@ function hydrateProgramStore(rows: StudentProgressSnapshotRow[]) {
     });
 
     if (Number.isInteger(row.week) && row.week! >= 1 && row.week! <= 12) {
-      ensureWeek(store, year, row.week!);
+      ensureWeek(store, year, row.week!, realmId);
     }
   });
 
@@ -170,16 +183,17 @@ export async function restoreStudentStateFromServer(studentId: string) {
     return { rows: [] as StudentProgressSnapshotRow[], progress, introSeen: true };
   }
 
-  const [rows, studentResponse] = await Promise.all([
-    fetchNumberCompatProgressForStudent(studentId),
+  const [numberRows, measurementRows, studentResponse] = await Promise.all([
+    fetchRealmCompatProgressForStudent("number", studentId),
+    fetchRealmCompatProgressForStudent("measurement", studentId),
     getStudentRuntimeContext(studentId),
   ]);
 
-  const compatRows = rows as StudentProgressSnapshotRow[];
+  const compatRows = [...numberRows, ...measurementRows] as StudentProgressSnapshotRow[];
   const contextRow = studentResponse;
   const introSeenFromStudentFlag =
     contextRow?.has_seen_intro === true || compatRows.some((row) => row.has_seen_intro === true);
-  const introSeenFromHistoricalProgress = rows.some(
+  const introSeenFromHistoricalProgress = compatRows.some(
     (row) => row.pretest_score != null || row.placement_complete === true || row.status === "PASSED"
   );
   const introSeen = introSeenFromStudentFlag || introSeenFromHistoricalProgress;
@@ -204,7 +218,8 @@ export async function restoreStudentStateFromServer(studentId: string) {
 export async function saveStudentProgressState(
   studentId: string,
   year: string,
-  data: Record<string, unknown>
+  data: Record<string, unknown>,
+  realmId: StudentProgressRealmId = "number",
 ) {
   if (isDemoPreviewMode()) return;
 
@@ -224,13 +239,15 @@ export async function saveStudentProgressState(
   const { error } = await supabase.rpc("save_student_realm_progress", {
     p_student_id: studentId,
     p_class_id: studentRow?.class_id ?? null,
-    p_realm_id: "number",
-    p_program_key: numberProgramKey(year),
+    p_realm_id: realmId,
+    p_program_key: realmProgramKey(year, realmId),
     p_school_year_level: studentRow?.school_year_level ?? null,
     p_working_level: year,
     p_data: payload,
   });
   if (error) throw error;
+
+  if (realmId !== "number") return;
 
   const { error: legacyError } = await supabase.rpc("save_student_progress_state", {
     p_student_id: studentId,
@@ -242,13 +259,14 @@ export async function saveStudentProgressState(
   }
 }
 
-export async function saveNumberLessonAttempt(
+export async function saveRealmLessonAttempt(
   studentId: string,
   year: string,
   week: number,
   lessonNumber: number,
   lessonId: string,
   attempt: Record<string, unknown>,
+  realmId: StudentProgressRealmId = "number",
 ) {
   if (isDemoPreviewMode()) return;
 
@@ -257,8 +275,8 @@ export async function saveNumberLessonAttempt(
   const { error } = await supabase.rpc("save_realm_lesson_attempt", {
     p_student_id: studentId,
     p_class_id: studentRow?.class_id ?? null,
-    p_realm_id: "number",
-    p_program_key: numberProgramKey(year),
+    p_realm_id: realmId,
+    p_program_key: realmProgramKey(year, realmId),
     p_school_year_level: studentRow?.school_year_level ?? null,
     p_working_level: year,
     p_week: week,
@@ -267,6 +285,8 @@ export async function saveNumberLessonAttempt(
     p_attempt: attempt,
   });
   if (error) throw error;
+
+  if (realmId !== "number") return;
 
   const { error: legacyAttemptError } = await supabase.rpc("save_lesson_progress", {
     p_student_id: studentId,
@@ -293,24 +313,35 @@ export async function saveNumberLessonAttempt(
   }
 }
 
+export async function saveNumberLessonAttempt(
+  studentId: string,
+  year: string,
+  week: number,
+  lessonNumber: number,
+  lessonId: string,
+  attempt: Record<string, unknown>,
+) {
+  return saveRealmLessonAttempt(studentId, year, week, lessonNumber, lessonId, attempt, "number");
+}
+
 export async function saveNumberWeeklyQuizAttempt(
   studentId: string,
   year: string,
   week: number,
   attempt: Record<string, unknown>,
+  realmId: StudentProgressRealmId = "number",
 ) {
   if (isDemoPreviewMode()) return;
 
   const studentRow = await getStudentRuntimeContext(studentId);
 
-  const yearNumber = parseInt(year.replace(/\D/g, ""), 10) || 0;
-  const quizId = `y${yearNumber}-number-w${week}-quiz`;
+  const quizId = quizIdForRealm(year, week, realmId);
 
   const { error } = await supabase.rpc("save_realm_weekly_quiz_attempt", {
     p_student_id: studentId,
     p_class_id: studentRow?.class_id ?? null,
-    p_realm_id: "number",
-    p_program_key: numberProgramKey(year),
+    p_realm_id: realmId,
+    p_program_key: realmProgramKey(year, realmId),
     p_school_year_level: studentRow?.school_year_level ?? null,
     p_working_level: year,
     p_week: week,
@@ -318,6 +349,8 @@ export async function saveNumberWeeklyQuizAttempt(
     p_attempt: attempt,
   });
   if (error) throw error;
+
+  if (realmId !== "number") return;
 
   const nextWeek =
     typeof attempt.passed === "boolean"

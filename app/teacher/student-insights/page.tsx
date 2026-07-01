@@ -10,7 +10,7 @@ import { getLatestPosttestProfile } from "@/data/assessments/analysis";
 import { YEAR_ORDER } from "@/data/yearOrder";
 import { normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
 import { buildHeuristicTeacherInsight, type TeacherAttemptTopicSummary } from "@/lib/teacher-insights";
-import { fetchNumberCompatProgressForStudent } from "@/lib/realm-progress-compat";
+import { fetchRealmCompatProgressForStudent } from "@/lib/realm-progress-compat";
 
 type StudentRow = {
   id: string;
@@ -23,6 +23,7 @@ type StudentRow = {
 
 type ProgressRow = {
   student_id: string;
+  realm_id?: string;
   year: string;
   week: number | null;
   status: string;
@@ -147,6 +148,10 @@ function chooseCurrentRow(rows: ProgressRow[], fallbackYear?: string | null) {
   })[0] ?? null;
 }
 
+function strandLabelForRealm(realmId: string | undefined | null) {
+  return realmId === "measurement" ? "Measurement" : "Number";
+}
+
 function toIsoOrNull(value: unknown) {
   return typeof value === "string" && value ? value : null;
 }
@@ -265,7 +270,11 @@ function StudentInsightsPageInner() {
         .eq("id", studentRow.class_id)
         .maybeSingle();
 
-      const mergedProgress = await fetchNumberCompatProgressForStudent(activeStudentId);
+      const [numberProgress, measurementProgress] = await Promise.all([
+        fetchRealmCompatProgressForStudent("number", activeStudentId),
+        fetchRealmCompatProgressForStudent("measurement", activeStudentId),
+      ]);
+      const mergedProgress = [...numberProgress, ...measurementProgress];
 
       let nextReflections: LessonReflectionRow[] = [];
       const { data: reflectionRows, error: reflectionError } = await supabase
@@ -410,7 +419,7 @@ function StudentInsightsPageInner() {
     const heuristicInsight = buildHeuristicTeacherInsight({
       studentId: student.id,
       level: currentWorkingLevel,
-      strand: "Number",
+      strand: strandLabelForRealm(currentRow?.realm_id),
       week: currentRow?.week ?? 1,
       accuracy: currentAccuracy ?? 0,
       questionsAnswered: totalQuestions,

@@ -26,7 +26,7 @@ function yearOrdinal(yearLabel: string): number {
 /** Master genre catalogue. Future strands unlock from Year 3+. */
 const ALL_GENRES: GenreCatalogEntry[] = [
   { id: "number",      strand: "Number",      realm: "Number Nexus",    availableLevels: [0, 1, 2, 3, 4, 5, 6], unlocksFromLevel: 0 },
-  { id: "measurement", strand: "Measurement", realm: "Measurelands",    availableLevels: [0], unlocksFromLevel: 0 },
+  { id: "measurement", strand: "Measurement", realm: "Measurelands",    availableLevels: [0, 1, 2], unlocksFromLevel: 0 },
   { id: "space",       strand: "Space",       realm: "Geospin",         unlocksFromLevel: 0 },
   { id: "reading",     strand: "Reading",     realm: "Reading Ridge",   unlocksFromLevel: 0 },
   { id: "writing",     strand: "Writing",     realm: "Inkwell Wilds",   unlocksFromLevel: 0 },

@@ -4,7 +4,7 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "rea
 import { useRouter, useSearchParams } from "next/navigation";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, updateProgress } from "@/data/progress";
 import { supabase } from "@/lib/supabase";
-import { saveNumberLessonAttempt, saveNumberWeeklyQuizAttempt, saveStudentProgressState } from "@/lib/student-progress-sync";
+import { saveRealmLessonAttempt, saveNumberWeeklyQuizAttempt, saveStudentProgressState } from "@/lib/student-progress-sync";
 import { getProgramForYear } from "@/data/programs";
 import { getCurriculumPlan } from "@/data/programs/genres";
 import { getYear6WeeklyQuiz, type Year6WeeklyQuizQuestion } from "@/data/quizzes/year6";
@@ -76,6 +76,7 @@ import { buildY1MeasurelandsWeek5QuizTasks } from "@/data/activities/year1Measur
 import { buildY1MeasurelandsWeek6QuizTasks } from "@/data/activities/year1Measurelands/week6Quiz";
 import { buildY2MeasurelandsWeek1QuizTasks } from "@/data/activities/year2Measurelands/week1Quiz";
 import { buildY2MeasurelandsWeek2QuizTasks } from "@/data/activities/year2Measurelands/week2Quiz";
+import { buildY2MeasurelandsWeek3QuizTasks } from "@/data/activities/year2Measurelands/week3Quiz";
 import { buildY1MeasurelandsWeek7QuizTasks } from "@/data/activities/year1Measurelands/week7Quiz";
 import { buildMeasurelandsWeek2QuizTasks } from "@/data/activities/prepMeasurelands/week2Quiz";
 import { buildMeasurelandsWeek3QuizTasks } from "@/data/activities/prepMeasurelands/week3Quiz";
@@ -106,7 +107,15 @@ function getScopedSessionStoreKey() {
   return `lul:${scope}:session_program_progress_v1`;
 }
 
-function makeKey(year: string, week: string) {
+function normalizeProgramRealm(realmId: string | undefined) {
+  return realmId === "measurement" ? "measurement" : "number";
+}
+
+function makeKey(year: string, week: string, realmId = "number") {
+  return `${normalizeProgramRealm(realmId)}|${year}|${week}`;
+}
+
+function legacyNumberKey(year: string, week: string) {
   return `${year}|${week}`;
 }
 
@@ -129,11 +138,13 @@ function writeStore(store: ProgramProgressStore) {
 function getWeekProgress(
   store: ProgramProgressStore,
   year: string,
-  week: string
+  week: string,
+  realmId = "number"
 ): WeekProgress {
-  const key = makeKey(year, week);
+  const key = makeKey(year, week, realmId);
+  const legacy = normalizeProgramRealm(realmId) === "number" ? store[legacyNumberKey(year, week)] : undefined;
   return (
-    store[key] ?? {
+    store[key] ?? legacy ?? {
       lessonsCompleted: [false, false, false],
       quizCompleted: false,
     }
@@ -144,24 +155,25 @@ function setLessonComplete(
   store: ProgramProgressStore,
   year: string,
   week: string,
-  lessonNumber: number
+  lessonNumber: number,
+  realmId = "number"
 ) {
-  const key = makeKey(year, week);
-  const current = getWeekProgress(store, year, week);
+  const key = makeKey(year, week, realmId);
+  const current = getWeekProgress(store, year, week, realmId);
   const nextLessons = [...current.lessonsCompleted];
   nextLessons[lessonNumber - 1] = true;
   store[key] = { ...current, lessonsCompleted: nextLessons };
 }
 
-function setQuizComplete(store: ProgramProgressStore, year: string, week: string) {
-  const key = makeKey(year, week);
-  const current = getWeekProgress(store, year, week);
+function setQuizComplete(store: ProgramProgressStore, year: string, week: string, realmId = "number") {
+  const key = makeKey(year, week, realmId);
+  const current = getWeekProgress(store, year, week, realmId);
   store[key] = { ...current, quizCompleted: true };
 }
 
-function setQuizScore(store: ProgramProgressStore, year: string, week: string, score: number) {
-  const key = makeKey(year, week);
-  const current = getWeekProgress(store, year, week);
+function setQuizScore(store: ProgramProgressStore, year: string, week: string, score: number, realmId = "number") {
+  const key = makeKey(year, week, realmId);
+  const current = getWeekProgress(store, year, week, realmId);
   store[key] = { ...current, quizScore: score, quizCompleted: true };
 }
 
@@ -1775,6 +1787,23 @@ function buildY2MeasurelandsWeek2WeeklyQuizQuestions(questionsPerLesson: number)
       `y2w2mq${index + 1}`,
       lessonNumber,
       `y2_measurelands_w2_l${lessonNumber}_q${(index % questionsPerLesson) + 1}`,
+      task as GroundQuizPracticeTask
+    );
+  });
+}
+
+function buildY2MeasurelandsWeek3WeeklyQuizQuestions(questionsPerLesson: number): QuizQuestion[] {
+  const totalExpected = questionsPerLesson * 3;
+  const tasks = buildY2MeasurelandsWeek3QuizTasks();
+  if (tasks.length !== totalExpected) {
+    throw new Error(`[MeasurelandsWeeklyQuiz] Y2 Week 3 expected ${totalExpected} questions, received ${tasks.length}.`);
+  }
+  return tasks.map((task, index) => {
+    const lessonNumber = (Math.floor(index / questionsPerLesson) + 1) as 1 | 2 | 3;
+    return buildGroundQuizQuestion(
+      `y2w3mq${index + 1}`,
+      lessonNumber,
+      `y2_measurelands_w3_l${lessonNumber}_q${(index % questionsPerLesson) + 1}`,
       task as GroundQuizPracticeTask
     );
   });
@@ -6960,6 +6989,9 @@ function SessionPage({
 }) {
   const router = useRouter();
   const isMeasurementRealm = realmId === "measurement";
+  const quizRealmId = isMeasurementRealm ? "measurement" : "number";
+  const quizStrand = isMeasurementRealm ? "Measurement" : "Number";
+  const quizLessonId = `${year}-${quizRealmId}-w${week}-weekly-quiz`;
   const studentLevelLabel = formatStudentLevelLabel(year);
 
   const isLesson = type === "lesson";
@@ -7004,13 +7036,13 @@ function SessionPage({
 
     const store = readPersistedProgramStore();
     const numericWeek = Number(week);
-    if (!isWeekPlayable(store, year, numericWeek, progress.requiredWeeks, progress.optionalWeeks)) {
-      const fallbackWeek = getRecommendedAssignedWeek(store, year, progress.assignedWeek, progress.requiredWeeks);
+    if (!isWeekPlayable(store, year, numericWeek, progress.requiredWeeks, progress.optionalWeeks, quizRealmId)) {
+      const fallbackWeek = getRecommendedAssignedWeek(store, year, progress.assignedWeek, progress.requiredWeeks, quizRealmId);
       router.replace(`/number-nexus`);
       return;
     }
 
-    const weekProgress = getPersistedWeekProgress(store, year, numericWeek);
+    const weekProgress = getPersistedWeekProgress(store, year, numericWeek, quizRealmId);
     if (!DEMO_MODE && !previewMode && type === "quiz" && weekProgress.lessonsCompleted.filter(Boolean).length < 3) {
       router.replace(`/number-nexus`);
     }
@@ -7094,14 +7126,14 @@ function SessionPage({
 
   async function completeLesson() {
     const store = readStore();
-    setLessonComplete(store, year, week, n);
+    setLessonComplete(store, year, week, n, quizRealmId);
     writeStore(store);
 
     try {
       const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY) : null;
       if (studentId) {
         const yearNum = parseInt(year.replace(/\D/g, ""), 10) || 0;
-        const lessonId = `y${yearNum}-w${week}-l${n}`;
+        const lessonId = quizRealmId === "measurement" ? `y${yearNum}-measurement-w${week}-l${n}` : `y${yearNum}-w${week}-l${n}`;
         const fallbackAttempt = {
           at: new Date().toISOString(),
           completedAt: new Date().toISOString(),
@@ -7123,7 +7155,7 @@ function SessionPage({
           insight: null,
         };
 
-        await saveNumberLessonAttempt(studentId, year, Number(week), n, lessonId, fallbackAttempt);
+        await saveRealmLessonAttempt(studentId, year, Number(week), n, lessonId, fallbackAttempt, quizRealmId);
 
         void recordStudentActivityDelta({
           lessonsCompleted: 1,
@@ -7184,6 +7216,10 @@ function SessionPage({
 
     if (isMeasurementRealm && year === "Year 2" && Number(week) === 2) {
       return buildY2MeasurelandsWeek2WeeklyQuizQuestions(questionsPerLesson);
+    }
+
+    if (isMeasurementRealm && year === "Year 2" && Number(week) === 3) {
+      return buildY2MeasurelandsWeek3WeeklyQuizQuestions(questionsPerLesson);
     }
 
     if (isMeasurementRealm && year === "Year 1" && Number(week) === 7) {
@@ -7771,7 +7807,8 @@ function SessionPage({
       readPersistedProgramStore(),
       p.year,
       Math.min(12, currentWeek + 1),
-      p.requiredWeeks
+      p.requiredWeeks,
+      quizRealmId
     );
     updateProgress({ assignedWeek: nextWeek });
   }
@@ -7799,9 +7836,9 @@ function SessionPage({
     );
 
     const store = readStore();
-    setQuizScore(store, year, week, score);
+    setQuizScore(store, year, week, score, quizRealmId);
     writeStore(store);
-    persistProgramQuizComplete(year, Number(week), score);
+    persistProgramQuizComplete(year, Number(week), score, quizRealmId);
 
     if (passed) {
       completeWeek(Number(week));
@@ -7810,9 +7847,9 @@ function SessionPage({
     void trackLiveLearningEvent({
       eventType: "quiz_completed",
       level: year,
-      strand: "Number",
+      strand: quizStrand,
       week: Number(week),
-      lessonId: `${year}-w${week}-weekly-quiz`,
+      lessonId: quizLessonId,
       lessonTitle: "Weekly Quiz",
       progressPercent: 100,
       progressLabel: `Completed weekly quiz · ${score}/${total}`,
@@ -7841,9 +7878,9 @@ function SessionPage({
           const insightInput: TeacherInsightInput = {
             studentId,
             level: year,
-            strand: "Number",
+            strand: quizStrand,
             week: Number(week),
-            quizId: `${year}-w${week}-weekly-quiz`,
+            quizId: quizLessonId,
             title: "Weekly Quiz",
             score,
             accuracy: percent,
@@ -7893,7 +7930,7 @@ function SessionPage({
 
         try {
           const nextAssignedWeek = passed ? Math.min(12, Number(week) + 1) : Number(week);
-          await saveNumberWeeklyQuizAttempt(studentId, year, Number(week), attempt);
+          await saveNumberWeeklyQuizAttempt(studentId, year, Number(week), attempt, quizRealmId);
           const latestProgress = readProgress();
           await saveStudentProgressState(studentId, year, {
             status: latestProgress?.status ?? "ASSIGNED_PROGRAM",
@@ -7903,7 +7940,7 @@ function SessionPage({
             required_weeks: latestProgress?.requiredWeeks ?? [],
             optional_weeks: latestProgress?.optionalWeeks ?? [],
             unlocked_legends: latestProgress?.unlockedLegends ?? [],
-          });
+          }, quizRealmId);
           void recordStudentActivityDelta({
             questionsAnswered: total,
             correctAnswers: score,
@@ -8017,9 +8054,9 @@ function SessionPage({
     void trackLiveLearningEvent({
       eventType: "quiz_started",
       level: year,
-      strand: "Number",
+      strand: quizStrand,
       week: Number(week),
-      lessonId: `${year}-w${week}-weekly-quiz`,
+      lessonId: quizLessonId,
       lessonTitle: "Weekly Quiz",
       progressPercent: 0,
       progressLabel: "Quiz started",
@@ -8034,9 +8071,9 @@ function SessionPage({
     void trackLiveLearningEvent({
       eventType: "question_loaded",
       level: year,
-      strand: "Number",
+      strand: quizStrand,
       week: Number(week),
-      lessonId: `${year}-w${week}-weekly-quiz`,
+      lessonId: quizLessonId,
       lessonTitle: "Weekly Quiz",
       activityId: currentQuiz.lessonTag ? `lesson-${currentQuiz.lessonTag}` : currentQuiz.kind,
       activityLabel: currentQuiz.skill ?? currentQuiz.kind,
@@ -8051,9 +8088,9 @@ function SessionPage({
     });
     scheduleIdleLiveEvent({
       level: year,
-      strand: "Number",
+      strand: quizStrand,
       week: Number(week),
-      lessonId: `${year}-w${week}-weekly-quiz`,
+      lessonId: quizLessonId,
       lessonTitle: "Weekly Quiz",
       activityId: currentQuiz.lessonTag ? `lesson-${currentQuiz.lessonTag}` : currentQuiz.kind,
       activityLabel: currentQuiz.skill ?? currentQuiz.kind,
@@ -8087,9 +8124,9 @@ function SessionPage({
         ? "answer_correct"
         : "answer_incorrect",
       level: year,
-      strand: "Number",
+      strand: quizStrand,
       week: Number(week),
-      lessonId: `${year}-w${week}-weekly-quiz`,
+      lessonId: quizLessonId,
       lessonTitle: "Weekly Quiz",
       activityId: currentQuiz.lessonTag ? `lesson-${currentQuiz.lessonTag}` : currentQuiz.kind,
       activityLabel: currentQuiz.skill ?? currentQuiz.kind,

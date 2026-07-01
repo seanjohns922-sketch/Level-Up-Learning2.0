@@ -67,6 +67,7 @@ type InsightCarrier = {
 };
 type ProgressRow = {
   student_id: string;
+  realm_id?: string;
   year: string;
   week: number | null;
   status: string;
@@ -917,14 +918,14 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
 
   const genre = genres.find((g) => g.id === genreId)!;
   const isPlaceholder = !genre.available;
-  const isNumberGenre = genreId === "number";
+  const selectedRealmId = genreId === "measurement" ? "measurement" : "number";
 
   function getProg(studentId: string, year: string) {
-    return progress.find((p) => p.student_id === studentId && p.year === year);
+    return progress.find((p) => p.student_id === studentId && p.year === year && (p.realm_id ?? "number") === selectedRealmId);
   }
 
   function getStudentProgressRows(studentId: string) {
-    return progress.filter((p) => p.student_id === studentId);
+    return progress.filter((p) => p.student_id === studentId && (p.realm_id ?? "number") === selectedRealmId);
   }
 
   function getLatestPretestProgress(studentId: string): ProgressRow | undefined {
@@ -962,27 +963,27 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
       const nameParts = resolveStudentNameParts(s);
       const schoolYear = getSchoolYear(s);
       const workingYear = getWorkingYear(s);
-      const prog = isNumberGenre ? getProg(s.id, workingYear) : undefined;
+      const prog = isPlaceholder ? undefined : getProg(s.id, workingYear);
       const liveRow = getLiveRow(s.id);
       const studentEvents = getStudentEvents(s.id);
       const persistedIds = prog ? parseCompleted(prog.completed_lesson_ids) : [];
       const eventIds = buildCompletedLessonIdsFromEvents(studentEvents, workingYear);
       const ids = [...new Set([...persistedIds, ...eventIds])];
-      const sPrefix = isNumberGenre ? lessonIdPrefix(workingYear) : `${lessonIdPrefix(workingYear)}${genreId}-`;
+      const sPrefix = genreId === "measurement" ? `${lessonIdPrefix(workingYear)}measurement-` : lessonIdPrefix(workingYear);
       const strandIds = isPlaceholder ? [] : ids.filter((id) => id.startsWith(sPrefix));
       const planForStudentYear = getCurriculumPlan(workingYear, genreId);
-      const completedQuizzes = isNumberGenre && prog ? countCompletedQuizzes(prog.quiz_scores) : 0;
+      const completedQuizzes = prog ? countCompletedQuizzes(prog.quiz_scores) : 0;
       const pct = isPlaceholder ? 0 : overallProgramPercent(strandIds.length, completedQuizzes, planForStudentYear);
       const computedStatus = isPlaceholder ? "Not Started" : computeStatus(prog, strandIds.length, pct);
-      const status = isNumberGenre && computedStatus === "Not Started" && liveRow ? liveRowToStatus(liveRow) : computedStatus;
-      const week = isPlaceholder || !isNumberGenre ? null : (prog?.week ?? liveRow?.current_week ?? null);
+      const status = computedStatus === "Not Started" && liveRow ? liveRowToStatus(liveRow) : computedStatus;
+      const week = isPlaceholder ? null : (prog?.week ?? liveRow?.current_week ?? null);
       const activeWeek = week ?? 1;
       const activeWeekPlan = planForStudentYear.find((entry) => entry.week === activeWeek);
       const activeLessonIds = activeWeekPlan?.lessons.map((lesson) => lesson.id) ?? [];
-      const weekInsights = isNumberGenre ? getWeekInsightList(prog, activeWeek, activeLessonIds) : [];
-      const summary = buildWeekSummary(weekInsights, status, isNumberGenre ? liveRow : undefined);
+      const weekInsights = getWeekInsightList(prog, activeWeek, activeLessonIds);
+      const summary = buildWeekSummary(weekInsights, status, liveRow);
       const flag = deriveStudentFlag(pickPrimaryInsight(weekInsights), status);
-      const latestPretest = isNumberGenre ? getLatestPretestProgress(s.id) : undefined;
+      const latestPretest = getLatestPretestProgress(s.id);
 
       return { s, prog, liveRow, studentEvents, pct, status, week, schoolYear, workingYear, summary, flag, latestPretest, nameParts };
     })
