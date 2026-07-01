@@ -1,7 +1,7 @@
 // ── Skill coaching table (rule-based, authored once per skill) ───────────────
 // Powers the Lesson Coach Review. Short, positive, actionable lines keyed by a
-// "coaching key". Authored at the SKILL level (a dozen entries), never per
-// question. Tips stay under ~15 words. Unknown skills fall back safely.
+// "coaching key". Tips stay short, positive, and tied to the current lesson or
+// quiz objective. Unknown skills fall back safely.
 
 export type SkillCoaching = {
   /** One short rule/strategy ("Coach Tip"). Under 15 words. */
@@ -15,35 +15,50 @@ export type SkillCoaching = {
 const TABLE: Record<string, SkillCoaching> = {
   // Measurelands — length
   length_compare: {
-    tip: "Line up the start points before comparing length.",
+    tip: "Compare the ends after checking the starts are lined up.",
     strengthLine: "You were great at comparing lengths!",
-    focusLine: "Line up the start points before you compare.",
+    focusLine: "Check the starts, then compare the ends.",
   },
   length_order: {
-    tip: "Start with the shortest, then move to the longest.",
+    tip: "Use the shortest and longest objects to anchor your order.",
     strengthLine: "You ordered the lengths really well!",
-    focusLine: "Start with the shortest, then build up.",
+    focusLine: "Find the shortest first, then build the order.",
   },
   path_measure: {
-    tip: "Follow the path carefully from start to finish.",
+    tip: "Count each equal path unit once from start to finish.",
     strengthLine: "Nice careful counting along the path!",
-    focusLine: "Count each unit from start to finish.",
+    focusLine: "Count every path unit once.",
   },
   // Measurelands — mass
   mass_compare: {
-    tip: "Heavy objects make the scale go down.",
+    tip: "Use the scale result, not the object's picture size.",
     strengthLine: "You spotted the heavier objects really well!",
-    focusLine: "The heavier side pushes the scale down.",
+    focusLine: "Check which side of the scale goes down.",
   },
   mass_order: {
-    tip: "Start with the lightest, then move to the heaviest.",
+    tip: "Order mass by the scale or cube-count result.",
     strengthLine: "You ordered the weights really well!",
-    focusLine: "Start with the lightest, then build up.",
+    focusLine: "Find the lightest first, then build up.",
   },
   balance: {
-    tip: "A balanced scale means both sides weigh the same.",
+    tip: "Equal mass keeps the balance scale level.",
     strengthLine: "You balanced the scales really well!",
-    focusLine: "Look carefully at both sides of the scale.",
+    focusLine: "Check whether the scale is level or tilted.",
+  },
+  duration_compare: {
+    tip: "Compare activities by how long they usually take.",
+    strengthLine: "You compared durations well!",
+    focusLine: "Think about the real activity time.",
+  },
+  calendar_sequence: {
+    tip: "Use the calendar order before choosing what comes next.",
+    strengthLine: "You followed the calendar sequence well!",
+    focusLine: "Find the anchor day or month first.",
+  },
+  time_sequence: {
+    tip: "Use first, next, and last to build the sequence.",
+    strengthLine: "You sequenced the events well!",
+    focusLine: "Ask what must happen before the next step.",
   },
   // Number Nexus — Ground
   counting: {
@@ -125,9 +140,9 @@ const TABLE: Record<string, SkillCoaching> = {
 
   // Measurelands — capacity, area, perimeter
   capacity: {
-    tip: "Capacity is how much a container can hold.",
+    tip: "Use cup counts or fill clues, not container height.",
     strengthLine: "You compared how much each holds really well!",
-    focusLine: "Look at how high it fills the container.",
+    focusLine: "Compare the measured capacity clue first.",
   },
   area: {
     tip: "Area is the space inside — count the squares.",
@@ -139,6 +154,91 @@ const TABLE: Record<string, SkillCoaching> = {
     strengthLine: "You measured around the shape really well!",
     focusLine: "Add up every side, all the way around.",
   },
+
+  // Measurelands — Prep exact lesson and quiz tips
+  ml_prep_w1_l1: { tip: "Line up the starts, then compare which end reaches farther." },
+  ml_prep_w1_l2: { tip: "Find the shortest length first, then place the longer ones." },
+  ml_prep_w1_l3: { tip: "Count each equal path piece once from start to finish." },
+  ml_prep_w2_l1: { tip: "Use heavy or light from the object, not its card size." },
+  ml_prep_w2_l2: { tip: "Place the lightest object first and the heaviest last." },
+  ml_prep_w2_l3: { tip: "A level scale means both sides have equal mass." },
+  ml_prep_w3_l1: { tip: "Choose holds more by the container's real capacity." },
+  ml_prep_w3_l2: { tip: "Order containers by how much they can hold." },
+  ml_prep_w3_l3: { tip: "Look for empty, half full, nearly full, or full." },
+  ml_prep_w4_l1: { tip: "Choose the activity that usually takes more time." },
+  ml_prep_w4_l2: { tip: "Order activities from quickest to longest in real life." },
+  ml_prep_w4_l3: { tip: "Sort quick or slow by how long the activity takes." },
+  ml_prep_w5_l1: { tip: "Use the day name and week-trail cue together." },
+  ml_prep_w5_l2: { tip: "Days follow the same order every week." },
+  ml_prep_w5_l3: { tip: "Weekdays are school days; weekends are Saturday and Sunday." },
+  ml_prep_w6_l1: { tip: "Match the scene to morning, afternoon, evening, or night." },
+  ml_prep_w6_l2: { tip: "Choose when the activity usually happens in the day." },
+  ml_prep_w6_l3: { tip: "Put daily events in the order they happen." },
+  ml_prep_w7_l1: { tip: "Today is the calendar card with the special star." },
+  ml_prep_w7_l2: { tip: "Yesterday is before today; tomorrow is after today." },
+  ml_prep_w7_l3: { tip: "Move one day forward to find what comes next." },
+  ml_prep_w8_l1: { tip: "Identify length, mass, or capacity before choosing." },
+  ml_prep_w8_l2: { tip: "Use quick, slow, first, and next clues." },
+  ml_prep_w8_l3: { tip: "Choose the measurement strategy that matches the challenge." },
+  ml_prep_w1_quiz: { tip: "Use longer, shorter, and path-count strategies from Length Lands." },
+  ml_prep_w2_quiz: { tip: "Use heavy, light, order, and balance clues." },
+  ml_prep_w3_quiz: { tip: "Use holds-more, ordering, and fill-state clues." },
+  ml_prep_w4_quiz: { tip: "Use quicker, slower, and activity-order clues." },
+  ml_prep_w5_quiz: { tip: "Use day names, day order, and weekday clues." },
+  ml_prep_w6_quiz: { tip: "Use time-of-day scenes and routine order." },
+  ml_prep_w7_quiz: { tip: "Use today as the anchor, then move one day." },
+  ml_prep_w8_quiz: { tip: "Identify the measurement type before choosing your strategy." },
+
+  // Measurelands — Year 1 exact lesson and quiz tips
+  ml_y1_w1_l1: { tip: "Count equal blocks touching end-to-end to measure length." },
+  ml_y1_w1_l2: { tip: "Compare block numbers; more blocks means longer." },
+  ml_y1_w1_l3: { tip: "A fair length measure has no gaps or overlaps." },
+  ml_y1_w2_l1: { tip: "Count the equal balance cubes to measure mass." },
+  ml_y1_w2_l2: { tip: "Compare mass by cube counts, not object size." },
+  ml_y1_w2_l3: { tip: "Measurements are fair only when the unit stays the same." },
+  ml_y1_w3_l1: { tip: "Count the cups using the same cup each time." },
+  ml_y1_w3_l2: { tip: "Compare capacity by cup counts, not container height." },
+  ml_y1_w3_l3: { tip: "Choose a capacity unit that makes measuring sensible." },
+  ml_y1_w4_l1: { tip: "Choose hour, day, or week by the activity length." },
+  ml_y1_w4_l2: { tip: "Compare durations by usual time, not picture size." },
+  ml_y1_w4_l3: { tip: "Sort activities by about an hour, day, or week." },
+  ml_y1_w5_l1: { tip: "Seven days make one week; use the full strip." },
+  ml_y1_w5_l2: { tip: "A month is bigger because it has several weeks." },
+  ml_y1_w5_l3: { tip: "Months repeat in the same order after December." },
+  ml_y1_w6_l1: { tip: "Find the date by matching row and day position." },
+  ml_y1_w6_l2: { tip: "Start at the date, then count forward or back." },
+  ml_y1_w6_l3: { tip: "Check the calendar day and date together." },
+  ml_y1_w7_l1: { tip: "Yesterday is one day before today on the calendar." },
+  ml_y1_w7_l2: { tip: "Today is your anchor day on the calendar." },
+  ml_y1_w7_l3: { tip: "Tomorrow is one day after today on the calendar." },
+  ml_y1_w8_l1: { tip: "Use first, next, and last to order the routine." },
+  ml_y1_w8_l2: { tip: "Match each activity to when it happens in the day." },
+  ml_y1_w8_l3: { tip: "Sequence the story by what must happen next." },
+  ml_y1_w1_quiz: { tip: "Use block counts, fair alignment, and no-gap measuring." },
+  ml_y1_w2_quiz: { tip: "Use balance-cube counts and same-unit reasoning." },
+  ml_y1_w3_quiz: { tip: "Use cup counts and sensible units, not appearance." },
+  ml_y1_w4_quiz: { tip: "Use hour, day, and week duration clues." },
+  ml_y1_w5_quiz: { tip: "Use day, week, month, and year order." },
+  ml_y1_w6_quiz: { tip: "Find the date first, then count on the calendar." },
+  ml_y1_w7_quiz: { tip: "Use today as the anchor for yesterday and tomorrow." },
+  ml_y1_w8_quiz: { tip: "Use first, next, last, and story order." },
+
+  // Measurelands — Year 2 exact lesson and quiz tips
+  ml_y2_w1_l1: { tip: "Measure both lengths, then compare how many more units." },
+  ml_y2_w1_l2: { tip: "Order by unit count; the greatest count goes last." },
+  ml_y2_w1_l3: { tip: "Choose the tool that fits the object's size." },
+  ml_y2_w2_l1: { tip: "The balance cubes tell the answer, not object size." },
+  ml_y2_w2_l2: { tip: "Compare cube counts to find by how many." },
+  ml_y2_w2_l3: { tip: "Predict first, then prove it with cube counts." },
+  ml_y2_w3_l1: { tip: "Compare cup counts first, not container height." },
+  ml_y2_w3_l2: { tip: "Order capacities by cup count from least to greatest." },
+  ml_y2_w3_l3: { tip: "Choose the unit that makes measuring quickest and clearest." },
+  ml_y2_w4_l1: { tip: "Check whether the measure stops on or between units." },
+  ml_y2_w4_l2: { tip: "The closer measure has less leftover space." },
+  ml_y2_w1_quiz: { tip: "Use measured counts to compare, order, and choose tools." },
+  ml_y2_w2_quiz: { tip: "Use balance-cube counts to prove mass comparisons." },
+  ml_y2_w3_quiz: { tip: "Use cup counts and sensible capacity units to justify answers." },
+  ml_y2_w4_quiz: { tip: "Use exact and in-between measures to choose closer counts." },
 };
 
 const FALLBACK: SkillCoaching = {
@@ -147,13 +247,90 @@ const FALLBACK: SkillCoaching = {
 
 // Explicit lesson → coaching key (the lessons we control).
 const LESSON_KEY_MAP: Record<string, string> = {
-  "y0-measurement-w1-l1": "length_compare",
-  "y0-measurement-w1-l2": "length_order",
-  "y0-measurement-w1-l3": "path_measure",
-  "y0-measurement-w2-l1": "mass_compare",
-  "y0-measurement-w2-l2": "mass_order",
-  "y0-measurement-w2-l3": "balance",
+  "y0-measurement-w1-l1": "ml_prep_w1_l1",
+  "y0-measurement-w1-l2": "ml_prep_w1_l2",
+  "y0-measurement-w1-l3": "ml_prep_w1_l3",
+  "y0-measurement-w2-l1": "ml_prep_w2_l1",
+  "y0-measurement-w2-l2": "ml_prep_w2_l2",
+  "y0-measurement-w2-l3": "ml_prep_w2_l3",
+  "y0-measurement-w3-l1": "ml_prep_w3_l1",
+  "y0-measurement-w3-l2": "ml_prep_w3_l2",
+  "y0-measurement-w3-l3": "ml_prep_w3_l3",
+  "y0-measurement-w4-l1": "ml_prep_w4_l1",
+  "y0-measurement-w4-l2": "ml_prep_w4_l2",
+  "y0-measurement-w4-l3": "ml_prep_w4_l3",
+  "y0-measurement-w5-l1": "ml_prep_w5_l1",
+  "y0-measurement-w5-l2": "ml_prep_w5_l2",
+  "y0-measurement-w5-l3": "ml_prep_w5_l3",
+  "y0-measurement-w6-l1": "ml_prep_w6_l1",
+  "y0-measurement-w6-l2": "ml_prep_w6_l2",
+  "y0-measurement-w6-l3": "ml_prep_w6_l3",
+  "y0-measurement-w7-l1": "ml_prep_w7_l1",
+  "y0-measurement-w7-l2": "ml_prep_w7_l2",
+  "y0-measurement-w7-l3": "ml_prep_w7_l3",
+  "y0-measurement-w8-l1": "ml_prep_w8_l1",
+  "y0-measurement-w8-l2": "ml_prep_w8_l2",
+  "y0-measurement-w8-l3": "ml_prep_w8_l3",
+  "prep-measurement-w1-weekly-quiz": "ml_prep_w1_quiz",
+  "prep-measurement-w2-weekly-quiz": "ml_prep_w2_quiz",
+  "prep-measurement-w3-weekly-quiz": "ml_prep_w3_quiz",
+  "prep-measurement-w4-weekly-quiz": "ml_prep_w4_quiz",
+  "prep-measurement-w5-weekly-quiz": "ml_prep_w5_quiz",
+  "prep-measurement-w6-weekly-quiz": "ml_prep_w6_quiz",
+  "prep-measurement-w7-weekly-quiz": "ml_prep_w7_quiz",
+  "prep-measurement-w8-weekly-quiz": "ml_prep_w8_quiz",
+  "y1-measurement-w1-l1": "ml_y1_w1_l1",
+  "y1-measurement-w1-l2": "ml_y1_w1_l2",
+  "y1-measurement-w1-l3": "ml_y1_w1_l3",
+  "y1-measurement-w2-l1": "ml_y1_w2_l1",
+  "y1-measurement-w2-l2": "ml_y1_w2_l2",
+  "y1-measurement-w2-l3": "ml_y1_w2_l3",
+  "y1-measurement-w3-l1": "ml_y1_w3_l1",
+  "y1-measurement-w3-l2": "ml_y1_w3_l2",
+  "y1-measurement-w3-l3": "ml_y1_w3_l3",
+  "y1-measurement-w4-l1": "ml_y1_w4_l1",
+  "y1-measurement-w4-l2": "ml_y1_w4_l2",
+  "y1-measurement-w4-l3": "ml_y1_w4_l3",
+  "y1-measurement-w5-l1": "ml_y1_w5_l1",
+  "y1-measurement-w5-l2": "ml_y1_w5_l2",
+  "y1-measurement-w5-l3": "ml_y1_w5_l3",
+  "y1-measurement-w6-l1": "ml_y1_w6_l1",
+  "y1-measurement-w6-l2": "ml_y1_w6_l2",
+  "y1-measurement-w6-l3": "ml_y1_w6_l3",
+  "y1-measurement-w7-l1": "ml_y1_w7_l1",
+  "y1-measurement-w7-l2": "ml_y1_w7_l2",
+  "y1-measurement-w7-l3": "ml_y1_w7_l3",
+  "y1-measurement-w8-l1": "ml_y1_w8_l1",
+  "y1-measurement-w8-l2": "ml_y1_w8_l2",
+  "y1-measurement-w8-l3": "ml_y1_w8_l3",
+  "year1-measurement-w1-weekly-quiz": "ml_y1_w1_quiz",
+  "year1-measurement-w2-weekly-quiz": "ml_y1_w2_quiz",
+  "year1-measurement-w3-weekly-quiz": "ml_y1_w3_quiz",
+  "year1-measurement-w4-weekly-quiz": "ml_y1_w4_quiz",
+  "year1-measurement-w5-weekly-quiz": "ml_y1_w5_quiz",
+  "year1-measurement-w6-weekly-quiz": "ml_y1_w6_quiz",
+  "year1-measurement-w7-weekly-quiz": "ml_y1_w7_quiz",
+  "year1-measurement-w8-weekly-quiz": "ml_y1_w8_quiz",
+  "y2-measurement-w1-l1": "ml_y2_w1_l1",
+  "y2-measurement-w1-l2": "ml_y2_w1_l2",
+  "y2-measurement-w1-l3": "ml_y2_w1_l3",
+  "y2-measurement-w2-l1": "ml_y2_w2_l1",
+  "y2-measurement-w2-l2": "ml_y2_w2_l2",
+  "y2-measurement-w2-l3": "ml_y2_w2_l3",
+  "y2-measurement-w3-l1": "ml_y2_w3_l1",
+  "y2-measurement-w3-l2": "ml_y2_w3_l2",
+  "y2-measurement-w3-l3": "ml_y2_w3_l3",
+  "y2-measurement-w4-l1": "ml_y2_w4_l1",
+  "y2-measurement-w4-l2": "ml_y2_w4_l2",
+  "year2-measurement-w1-weekly-quiz": "ml_y2_w1_quiz",
+  "year2-measurement-w2-weekly-quiz": "ml_y2_w2_quiz",
+  "year2-measurement-w3-weekly-quiz": "ml_y2_w3_quiz",
+  "year2-measurement-w4-weekly-quiz": "ml_y2_w4_quiz",
 };
+
+function normalizeLessonId(lessonId: string): string {
+  return lessonId.toLowerCase().replace(/\s+/g, "");
+}
 
 /** Resolve a coaching key from the lesson + its observed topics/skills. */
 export function resolveCoachingKey(input: {
@@ -161,7 +338,9 @@ export function resolveCoachingKey(input: {
   topicLabels?: string[];
   practisedSkills?: string[];
 }): string {
-  const explicit = input.lessonId ? LESSON_KEY_MAP[input.lessonId] : undefined;
+  const explicit = input.lessonId
+    ? LESSON_KEY_MAP[input.lessonId] ?? LESSON_KEY_MAP[normalizeLessonId(input.lessonId)]
+    : undefined;
   if (explicit) return explicit;
 
   const hay = [...(input.practisedSkills ?? []), ...(input.topicLabels ?? [])]

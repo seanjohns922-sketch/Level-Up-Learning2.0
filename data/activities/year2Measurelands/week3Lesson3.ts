@@ -116,7 +116,7 @@ function buildChooseBetterUnitTask(memory: LessonMemory): CapacityTask {
     correctOptionId: correct,
     feedback: {
       correct: "Yes — that unit makes measuring easier.",
-      wrong: "Coach tip: the best measuring unit is not always the smallest. Choose the one that makes measuring easy.",
+      wrong: "Coach tip: match the unit size to the container so measuring is quick and clear.",
     },
   };
 }
@@ -152,7 +152,7 @@ function buildWhatsWrongTask(memory: LessonMemory): CapacityTask {
     correctProblem: spoonProblem ? "Too many measurements" : "The measuring unit is too large",
     feedback: {
       correct: "Yes — the unit makes the job harder.",
-      wrong: "Coach tip: choose the unit that makes the measurement sensible and easy.",
+      wrong: "Coach tip: if the unit gives too many counts or is too large, choose a better unit.",
     },
   };
 }

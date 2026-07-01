@@ -7782,8 +7782,8 @@ function SessionPage({
       ? [weakestLessonBreakdown.lessonTitle ?? "", (weakestLessonBreakdown.skill ?? "").replace(/_/g, " ")]
       : lessonBreakdown.map((b) => b.lessonTitle ?? "")
     ).filter(Boolean);
-    return getSkillCoaching(resolveCoachingKey({ topicLabels: labels })).tip;
-  }, [weakestLessonBreakdown, lessonBreakdown]);
+    return getSkillCoaching(resolveCoachingKey({ lessonId: quizLessonId, topicLabels: labels })).tip;
+  }, [weakestLessonBreakdown, lessonBreakdown, quizLessonId]);
 
   const quizReviewSpoken = useMemo(() => {
     const total = Math.max(1, quizQuestions.length);

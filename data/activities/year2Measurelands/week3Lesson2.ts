@@ -102,7 +102,7 @@ function buildOrderTask(memory: LessonMemory, count: 3 | 4 | 5): CapacityTask {
     orderedIds: ordered.map((c) => c.id),
     feedback: {
       correct: "You ordered the measured capacities.",
-      wrong: "Coach tip: compare the cup counts first. More cups means greater capacity.",
+      wrong: "Coach tip: order the containers by cup count; the smallest count goes first.",
     },
   };
 }
@@ -123,7 +123,7 @@ function buildMostLeastTask(memory: LessonMemory, mode: "most" | "least"): Capac
     correctOptionId: target.id,
     feedback: {
       correct: "The cup count proves it.",
-      wrong: "Coach tip: compare the cup counts first, not the container shape.",
+      wrong: "Coach tip: choose most or least by the cup count, not the container shape.",
     },
   };
 }
@@ -149,7 +149,7 @@ function buildEqualTask(memory: LessonMemory): CapacityTask {
     correctOptionId: match.id,
     feedback: {
       correct: "Same cup count means same capacity.",
-      wrong: "Coach tip: find the container with the matching cup count.",
+      wrong: "Coach tip: same capacity means the cup counts match exactly.",
     },
   };
 }

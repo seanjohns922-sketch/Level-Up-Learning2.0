@@ -185,7 +185,7 @@ function buildMassSortingLineTask(memory: LessonMemory): CompareTask {
     objects: shuffle(ordered),
     orderedIds: ordered.map((item) => item.id),
     correctOptionId: ordered[ordered.length - 1]!.id,
-    feedback: { correct: "Fantastic sorting!", wrong: "Start with the lightest object." },
+    feedback: { correct: "Fantastic sorting!", wrong: "Compare the mass cards first, then place the lightest object." },
   };
 }
 
@@ -257,7 +257,7 @@ export function buildMeasurelandsWeek2Lesson2QuizTasks(): PracticeTask[] {
       objects: shuffle(q5Set),
       orderedIds: q5Set.map((item) => item.id),
       correctOptionId: q5Set[3]!.id,
-      feedback: { correct: "Excellent ordering!", wrong: "Start with the lightest object." },
+      feedback: { correct: "Excellent ordering!", wrong: "Use the mass order from lightest to heaviest." },
     },
   ];
 }
