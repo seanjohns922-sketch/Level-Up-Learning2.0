@@ -28,7 +28,7 @@ const OBJECTS: Obj[] = [
 type LessonMemory = { introShown: boolean; cursor: number; recent: string[] };
 const lessonMemory = new Map<string, LessonMemory>();
 const ROTATION: Array<"whichExact" | "sameLength" | "fillSmall"> = [
-  "whichExact", "fillSmall", "sameLength", "fillSmall", "whichExact", "sameLength",
+  "fillSmall", "whichExact", "fillSmall", "sameLength", "fillSmall", "whichExact",
 ];
 
 function getMemory(lessonId: string): LessonMemory {

@@ -34,7 +34,7 @@ const lessonMemory = new Map<string, LessonMemory>();
 // Three activities per lesson (hard rule). finishGap is the interactive
 // (drag-a-block-into-the-gap) anchor; the other two vary their number answers.
 const ROTATION: Array<"reMeasure" | "finishGap" | "countSmall"> = [
-  "reMeasure", "finishGap", "countSmall", "finishGap", "reMeasure", "countSmall",
+  "finishGap", "reMeasure", "finishGap", "countSmall", "finishGap", "reMeasure",
 ];
 
 function getMemory(lessonId: string): LessonMemory {
