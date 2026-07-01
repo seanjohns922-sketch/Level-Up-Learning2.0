@@ -1,11 +1,11 @@
 "use client";
 
 import {
-  Compass, Boxes, Ruler, Scaling, LifeBuoy, Footprints, Paperclip,
+  Compass, Boxes, Ruler, Scaling, LifeBuoy, Footprints, Paperclip, Dices,
   Eraser, Pencil, BookOpen, Box, Armchair, DoorClosed, Bed, School, Car, Map, MoveHorizontal, TreePine,
   type LucideIcon,
 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
@@ -17,7 +17,7 @@ type ToolTask = Extract<PracticeTask, { kind: "toolChoice" }>;
 const ICONS: Record<string, LucideIcon> = {
   // tools
   cubes: Boxes, blocks: Boxes, ruler: Ruler, tape: Scaling, wheel: LifeBuoy, feet: Footprints,
-  paperclips: Paperclip, crayons: Pencil, pencils: Pencil,
+  paperclips: Paperclip, crayons: Pencil, pencils: Pencil, dominoes: Dices,
   // objects
   eraser: Eraser, pencil: Pencil, book: BookOpen, crayon: Pencil, pencilcase: Box,
   bottle: Box, chair: Armchair, desk: Box, door: DoorClosed, bed: Bed,
@@ -308,8 +308,134 @@ function ReasonScene({ task, onCorrect, onWrong }: { task: ToolTask; onCorrect: 
   );
 }
 
+/* ── Shared: a straight horizontal object + one continuous measurement line
+ * with end ticks (the "length to be measured"). ── */
+function ObjectWithLine({ object, widthPx }: { object?: ToolTask["object"]; widthPx: number }) {
+  const Icon = object ? iconFor(object.iconKey) : Box;
+  return (
+    <div className="mx-auto flex flex-col items-center" style={{ maxWidth: "100%" }}>
+      <div style={{ width: widthPx, maxWidth: "100%" }} className="flex justify-center">
+        {object?.imageSrc ? (
+          <img src={object.imageSrc} alt={object.label} className="h-auto w-full object-contain drop-shadow-[0_8px_14px_rgba(76,40,10,0.16)]" style={{ maxHeight: 110 }} />
+        ) : (
+          <Icon className="h-16 w-16 text-[#7c3aed]" strokeWidth={1.6} />
+        )}
+      </div>
+      {/* one continuous line with end ticks */}
+      <div style={{ position: "relative", width: widthPx, maxWidth: "100%", height: 18, marginTop: 8 }}>
+        <div style={{ position: "absolute", left: 0, right: 0, top: "50%", height: 3, transform: "translateY(-50%)", background: "#5b4636", borderRadius: 2 }} />
+        <div style={{ position: "absolute", left: 0, top: 2, bottom: 2, width: 3, background: "#5b4636", borderRadius: 2 }} />
+        <div style={{ position: "absolute", right: 0, top: 2, bottom: 2, width: 3, background: "#5b4636", borderRadius: 2 }} />
+      </div>
+      {object?.label ? <div className="mt-2 text-sm font-black uppercase tracking-[0.14em] text-[#7c4a12]">{object.label}</div> : null}
+    </div>
+  );
+}
+
+/* ── W4 L3 Activity 1: Estimate then Reveal (3 units, input boxes → actuals). ── */
+function EstimateRevealScene({ task, onCorrect }: { task: ToolTask; onCorrect: () => void }) {
+  const rows = task.measurementRows ?? [];
+  const lineW = Math.min(520, Math.max(220, (task.objectLengthUnits ?? 12) * 26));
+  const [estimates, setEstimates] = useState<number[]>(rows.map(() => 5));
+  const [revealed, setRevealed] = useState(false);
+  const setEst = (i: number, v: number) =>
+    setEstimates((prev) => prev.map((x, idx) => (idx === i ? Math.max(1, Math.min(40, v)) : x)));
+  return (
+    <Shell badge={task.badgeLabel ?? "Estimate Then Reveal"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">
+        <ObjectWithLine object={task.object} widthPx={lineW} />
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        {rows.map((row, i) => (
+          <div key={row.id} className="flex flex-col items-center gap-2 rounded-[22px] border-2 border-[rgba(214,184,108,0.5)] bg-[#fffaf0] p-3 text-center">
+            <Glyph label={row.unitLabel} iconKey={row.unitIconKey} imageSrc={row.unitImageSrc} />
+            <div className="text-sm font-black text-[#2c1c07]">{row.unitLabel}</div>
+            <div className="text-[11px] font-semibold leading-tight text-[#5f4725]">Estimate how many {row.unitLabel.toLowerCase()} long?</div>
+            <div className="flex items-center gap-2">
+              <button type="button" disabled={revealed} onClick={() => setEst(i, estimates[i]! - 1)} className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-[rgba(214,184,108,0.6)] bg-white text-xl font-black text-[#7c4a12] disabled:opacity-40">−</button>
+              <div className="flex h-11 w-12 items-center justify-center rounded-xl border-2 border-[rgba(214,184,108,0.6)] bg-white text-2xl font-black text-[#2c1c07]">{estimates[i]}</div>
+              <button type="button" disabled={revealed} onClick={() => setEst(i, estimates[i]! + 1)} className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-[rgba(214,184,108,0.6)] bg-white text-xl font-black text-[#7c4a12] disabled:opacity-40">+</button>
+            </div>
+            {revealed ? (
+              <div className="mt-1 w-full rounded-xl bg-[rgba(124,58,237,0.08)] py-1">
+                <div className="text-[10px] font-black uppercase tracking-[0.14em] text-[#5b21b6]">Actual</div>
+                <div className="text-2xl font-black text-[#2c1c07]">{row.count}</div>
+              </div>
+            ) : null}
+          </div>
+        ))}
+      </div>
+      {!revealed ? (
+        <button type="button" onClick={() => setRevealed(true)} className="w-full rounded-[22px] bg-[#7c3aed] px-4 py-4 font-black uppercase tracking-[0.12em] text-white shadow-[0_12px_24px_rgba(124,58,237,0.22)]">Reveal the actual counts →</button>
+      ) : (
+        <button type="button" onClick={onCorrect} className="w-full rounded-[22px] px-4 py-4 font-black uppercase tracking-[0.12em] text-[#fff8e1] shadow-sm" style={{ background: "linear-gradient(135deg, rgba(120,53,15,0.96), rgba(180,120,20,0.96), rgba(214,184,108,0.92))" }}>Smaller units, bigger count — continue →</button>
+      )}
+    </Shell>
+  );
+}
+
+/* ── W4 L3 Activity 2: Measure It (tap a unit to place it in the next slot,
+ * left to right, until the line is filled). ── */
+function MeasureItScene({ task, onCorrect }: { task: ToolTask; onCorrect: () => void }) {
+  const m = task.completeMeasurement;
+  const target = m?.targetCount ?? task.correctCount ?? task.objectLengthUnits ?? 10;
+  const SLOT = 30;
+  const lineW = target * SLOT;
+  const [placed, setPlaced] = useState(0);
+  const wonRef = useRef(false);
+  const done = placed >= target;
+  const Icon = iconFor(m?.unitIconKey ?? "paperclips");
+  const unitLabel = m?.unitLabel ?? "units";
+  function place() {
+    if (done) return;
+    const n = placed + 1;
+    setPlaced(n);
+    if (n >= target && !wonRef.current) {
+      wonRef.current = true;
+      window.setTimeout(onCorrect, 1300);
+    }
+  }
+  const unitInner = (dashed: boolean) =>
+    dashed ? null : m?.unitImageSrc ? <img src={m.unitImageSrc} alt={unitLabel} className="h-full w-full object-contain" /> : <Icon className="h-5 w-5 text-[#7c3aed]" strokeWidth={1.8} />;
+  return (
+    <Shell badge={task.badgeLabel ?? "Measure It"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">
+        <ObjectWithLine object={task.object} widthPx={lineW} />
+        <div className="mt-3 text-center text-sm font-bold text-[#5f4725]">
+          Use {unitLabel.toLowerCase()} to show how long the {task.object?.label?.toLowerCase() ?? "object"} is.
+        </div>
+        {/* drop targets */}
+        <div className="mt-3 flex justify-center">
+          <div className="flex items-center gap-1 overflow-x-auto">
+            {Array.from({ length: target }).map((_, i) => (
+              <div key={i} className="flex shrink-0 items-center justify-center rounded-lg" style={{ width: SLOT, height: 34, padding: 3, border: i < placed ? "1px solid rgba(214,184,108,0.5)" : "2px dashed rgba(167,139,250,0.55)", background: i < placed ? "#fff" : "rgba(167,139,250,0.06)" }}>
+                {unitInner(i >= placed)}
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="mt-3 text-center text-sm font-black uppercase tracking-[0.12em] text-[#7c4a12]">
+          {placed} / {target} {unitLabel}
+        </div>
+      </div>
+      {!done ? (
+        <button type="button" onClick={place} className="flex w-full items-center justify-center gap-3 rounded-[22px] border-2 border-[rgba(214,184,108,0.6)] bg-[#fffaf0] px-4 py-4 font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-[rgba(214,184,108,0.5)] bg-white">{unitInner(false)}</span>
+          Place a {unitLabel.replace(/s$/, "").toLowerCase()}
+        </button>
+      ) : (
+        <div className="rounded-[22px] bg-[rgba(15,118,110,0.1)] px-4 py-4 text-center text-lg font-black text-[#0f766e]">
+          The {task.object?.label?.toLowerCase() ?? "object"} is {target} {unitLabel.toLowerCase()} long!
+        </div>
+      )}
+    </Shell>
+  );
+}
+
 export function MeasurelandsToolChoiceCard({ task, onCorrect, onWrong }: { task: ToolTask; onCorrect: () => void; onWrong: () => void }) {
   if (task.scene === "intro") return <IntroScene task={task} onCorrect={onCorrect} />;
+  if (task.scene === "estimateReveal") return <EstimateRevealScene task={task} onCorrect={onCorrect} />;
+  if (task.scene === "measureIt") return <MeasureItScene task={task} onCorrect={onCorrect} />;
   if (task.scene === "measureUnit") return <MeasureUnitScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "sameObject") return <SameObjectScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "completeMeasure") return <CompleteMeasureScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;

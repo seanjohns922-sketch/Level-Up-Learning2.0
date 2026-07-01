@@ -956,7 +956,10 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "best" | "whyBad" | "whyBest" | "reflection" | "measureUnit" | "sameObject" | "completeMeasure";
+      scene: "intro" | "best" | "whyBad" | "whyBest" | "reflection" | "measureUnit" | "sameObject" | "completeMeasure" | "estimateReveal" | "measureIt";
+      /** W4 L3: object length in base units (paper clips), for sizing the
+       *  horizontal measurement line + drop targets. */
+      objectLengthUnits?: number;
       /** Optional teaching-strip tools for intro scenes. */
       introTools?: Array<{ id: string; label: string; focus: string; iconKey: string; imageSrc?: string }>;
       /** The object being measured (shown in the middle). */
