@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Compass, Undo2 } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
@@ -870,6 +870,9 @@ function CompareAccuracyScene({ task, onCorrect, onWrong }: { task: MeasurePathT
   // (N big / 2N small). Other modes: a half left over in big, exact in small.
   const ropeUnits = isSame ? wholeBig : wholeBig + 0.5;
   const smallCount = isSame ? wholeBig * 2 : task.correctAnswer ?? wholeBig * 2 + 1;
+  // Random card order for tap mode (stable per question) so the exact answer
+  // isn't always in the same position. Computed unconditionally (hooks rule).
+  const tapOrder = useMemo<[number, number]>(() => (Math.random() < 0.5 ? [0, 1] : [1, 0]), [task]);
   // In tap/sameLength modes the child must judge from the blocks, so captions
   // state the count only (no "fits exactly" giveaway).
   const bigCaption = isSame ? (
@@ -890,23 +893,29 @@ function CompareAccuracyScene({ task, onCorrect, onWrong }: { task: MeasurePathT
   );
 
   if (accuracyMode === "tapExact") {
+    // The exact (small) card must not always sit in the same place, or the
+    // answer is "always the bottom one". Random order, stable per question.
+    const cards = [
+      { key: "big", correct: false, node: <MeasurementRow label={label} mode="big" ropeUnits={ropeUnits} caption={bigCaption} /> },
+      { key: "small", correct: true, node: <MeasurementRow label={label} mode="small" ropeUnits={ropeUnits} caption={smallCaption} /> },
+    ];
+    const order = tapOrder;
     return (
       <PathShell badge={task.badgeLabel ?? "Which Is Exact?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
         <div className="grid gap-4">
-          <button
-            type="button"
-            onClick={onWrong}
-            className="rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-4 transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
-          >
-            <MeasurementRow label={label} mode="big" ropeUnits={ropeUnits} caption={bigCaption} />
-          </button>
-          <button
-            type="button"
-            onClick={onCorrect}
-            className="rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-4 transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
-          >
-            <MeasurementRow label={label} mode="small" ropeUnits={ropeUnits} caption={smallCaption} />
-          </button>
+          {order.map((i) => {
+            const c = cards[i]!;
+            return (
+              <button
+                key={c.key}
+                type="button"
+                onClick={() => (c.correct ? onCorrect() : onWrong())}
+                className="rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-4 transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
+              >
+                {c.node}
+              </button>
+            );
+          })}
         </div>
       </PathShell>
     );
@@ -917,8 +926,16 @@ function CompareAccuracyScene({ task, onCorrect, onWrong }: { task: MeasurePathT
       <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-5 shadow-sm">
         <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-[#7c4a12]">{label}</div>
         <div className="flex flex-col gap-4">
-          <MeasurementRow label={label} mode="big" ropeUnits={ropeUnits} caption={bigCaption} />
-          <MeasurementRow label={label} mode="small" ropeUnits={ropeUnits} caption={smallCaption} />
+          {/* whyExact shows just the exact (small) measurement so it looks
+              different from the two-bar comparison activities. */}
+          {accuracyMode === "whyExact" ? (
+            <MeasurementRow label={label} mode="small" ropeUnits={ropeUnits} caption={smallCaption} />
+          ) : (
+            <>
+              <MeasurementRow label={label} mode="big" ropeUnits={ropeUnits} caption={bigCaption} />
+              <MeasurementRow label={label} mode="small" ropeUnits={ropeUnits} caption={smallCaption} />
+            </>
+          )}
         </div>
       </div>
       {accuracyMode === "exactNumber" ? (

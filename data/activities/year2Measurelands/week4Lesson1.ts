@@ -29,7 +29,7 @@ const OBJECTS: Obj[] = [
   { label: "Cord", min: 3, max: 5 },
 ];
 
-type LessonMemory = { introShown: boolean; cursor: number; lastLabel: string | null };
+type LessonMemory = { introShown: boolean; cursor: number; recent: string[] };
 const lessonMemory = new Map<string, LessonMemory>();
 // Three activities per lesson (hard rule), reMeasure as the anchor.
 const ROTATION: Array<"reMeasure" | "moreOrFewer" | "countSmall"> = [
@@ -39,7 +39,7 @@ const ROTATION: Array<"reMeasure" | "moreOrFewer" | "countSmall"> = [
 function getMemory(lessonId: string): LessonMemory {
   const existing = lessonMemory.get(lessonId);
   if (existing) return existing;
-  const created: LessonMemory = { introShown: false, cursor: 0, lastLabel: null };
+  const created: LessonMemory = { introShown: false, cursor: 0, recent: [] };
   lessonMemory.set(lessonId, created);
   return created;
 }
@@ -60,9 +60,9 @@ function shuffle<T>(items: T[]): T[] {
 }
 
 function pickObject(memory: LessonMemory): { obj: Obj; wholeBig: number; smallCount: number } {
-  const pool = OBJECTS.filter((o) => o.label !== memory.lastLabel);
+  const pool = OBJECTS.filter((o) => !memory.recent.includes(o.label));
   const obj = choose(pool.length ? pool : OBJECTS);
-  memory.lastLabel = obj.label;
+  memory.recent = [obj.label, ...memory.recent].slice(0, 3);
   const wholeBig = obj.min + randInt(obj.max - obj.min + 1);
   return { obj, wholeBig, smallCount: wholeBig * 2 + 1 }; // rope = wholeBig + a half
 }
@@ -165,7 +165,7 @@ export function resetY2MeasurelandsWeek4Lesson1TaskSessionState() {
 
 // 5 fixed tasks for the weekly quiz: covers all three activities.
 export function buildY2MeasurelandsWeek4Lesson1QuizTasks(): PracticeTask[] {
-  const seed: LessonMemory = { introShown: true, cursor: 0, lastLabel: null };
+  const seed: LessonMemory = { introShown: true, cursor: 0, recent: [] };
   return [
     buildReMeasureTask(seed),
     buildMoreOrFewerTask(seed),
