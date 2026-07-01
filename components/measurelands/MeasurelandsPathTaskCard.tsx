@@ -842,6 +842,107 @@ function CountSmallScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; 
   );
 }
 
+/* ── Year 2 W4 L2 "Which Measurement Is Closer?": the same object measured with
+ * big blocks (a bit left over) AND small blocks (exact). Three answer modes,
+ * inferred from the task: tap the exact one (neither options set), pick the
+ * exact number (options), or pick why it's exact (textOptions). ── */
+function MeasurementRow({ label, mode, ropeUnits, caption }: { label: string; mode: "big" | "small"; ropeUnits: number; caption: React.ReactNode }) {
+  return (
+    <div className="w-full">
+      <div className="mb-1 text-center text-xs font-black uppercase tracking-[0.18em] text-[#7c3aed]">{mode === "big" ? "Big blocks" : "Small blocks"}</div>
+      <div className="flex justify-center overflow-x-auto">
+        <MeasuredRope ropeBigUnits={ropeUnits} mode={mode} label={label} />
+      </div>
+      <div className="mt-2 text-center text-sm font-bold text-[#5f4725]">{caption}</div>
+    </div>
+  );
+}
+
+function CompareAccuracyScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
+  const wholeBig = task.pathLength ?? 6;
+  const smallCount = task.correctAnswer ?? wholeBig * 2 + 1;
+  const label = task.objectLabel ?? "Rope";
+  const ropeUnits = wholeBig + 0.5;
+  const mode: "tapExact" | "number" | "why" = task.textOptions ? "why" : task.options ? "number" : "tapExact";
+  // In tap mode the child must judge from the blocks, so captions state the
+  // count only (no "fits exactly" giveaway). The number/why modes keep the
+  // verdict since it supports those questions.
+  const bigCaption = mode === "tapExact" ? <>{wholeBig} blocks, then a bit more</> : (
+    <>
+      {wholeBig} blocks and a <span className="text-[#b4540c]">bit left over</span>
+    </>
+  );
+  const smallCaption = mode === "tapExact" ? <>{smallCount} blocks</> : (
+    <>
+      {smallCount} blocks — fits <span className="text-[#0f766e]">exactly</span>
+    </>
+  );
+
+  if (mode === "tapExact") {
+    return (
+      <PathShell badge={task.badgeLabel ?? "Which Is Exact?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+        <div className="grid gap-4">
+          <button
+            type="button"
+            onClick={onWrong}
+            className="rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-4 transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
+          >
+            <MeasurementRow label={label} mode="big" ropeUnits={ropeUnits} caption={bigCaption} />
+          </button>
+          <button
+            type="button"
+            onClick={onCorrect}
+            className="rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-4 transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
+          >
+            <MeasurementRow label={label} mode="small" ropeUnits={ropeUnits} caption={smallCaption} />
+          </button>
+        </div>
+      </PathShell>
+    );
+  }
+
+  return (
+    <PathShell badge={task.badgeLabel ?? "Which Measurement Is Closer?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-5 shadow-sm">
+        <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-[#7c4a12]">{label}</div>
+        <div className="flex flex-col gap-4">
+          <MeasurementRow label={label} mode="big" ropeUnits={ropeUnits} caption={bigCaption} />
+          <MeasurementRow label={label} mode="small" ropeUnits={ropeUnits} caption={smallCaption} />
+        </div>
+      </div>
+      {mode === "number" ? (
+        <div className="grid grid-cols-3 gap-3">
+          {(task.options ?? [wholeBig, smallCount, smallCount + 1]).map((value) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => (value === smallCount ? onCorrect() : onWrong())}
+              className="relative flex min-h-[88px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-5xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+            >
+              <span className="absolute right-3 top-3 z-10"><OptionReadAloudButton text={String(value)} /></span>
+              {value}
+            </button>
+          ))}
+        </div>
+      ) : (
+        <div className="grid gap-3">
+          {(task.textOptions ?? []).map((opt) => (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => (opt === task.correctTextOption ? onCorrect() : onWrong())}
+              className="relative flex min-h-[72px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-12 py-4 text-center text-lg font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+            >
+              <span className="absolute right-3 top-3 z-10"><OptionReadAloudButton text={opt} /></span>
+              {opt}
+            </button>
+          ))}
+        </div>
+      )}
+    </PathShell>
+  );
+}
+
 export function MeasurelandsPathTaskCard({
   task,
   onCorrect,
@@ -860,5 +961,6 @@ export function MeasurelandsPathTaskCard({
   if (task.scene === "reMeasure") return <ReMeasureScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "moreOrFewer") return <MoreOrFewerScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "countSmall") return <CountSmallScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "compareAccuracy") return <CompareAccuracyScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   return <BuildScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 }

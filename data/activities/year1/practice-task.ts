@@ -548,7 +548,9 @@ export type PracticeTask = (
       // a bit left over → re-measure with smaller blocks that tile exactly →
       // count), "moreOrFewer" (predict: smaller blocks give more or fewer?),
       // "countSmall" (count the small blocks that fit exactly).
-      scene: "intro" | "count" | "compare" | "build" | "order" | "same" | "difference" | "reMeasure" | "moreOrFewer" | "countSmall";
+      // W4 L2 adds "compareAccuracy": same object measured with big (leftover)
+      // and small (exact) blocks — decide which is exact / the exact number / why.
+      scene: "intro" | "count" | "compare" | "build" | "order" | "same" | "difference" | "reMeasure" | "moreOrFewer" | "countSmall" | "compareAccuracy";
       /** Unit being used to measure (footstep / block / star / flower / stone).
        *  Rendered as an illustrated glyph; unitEmoji/unitLabel are hints only. */
       unitEmoji?: string;
