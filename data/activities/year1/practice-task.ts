@@ -544,9 +544,9 @@ export type PracticeTask = (
       badgeLabel?: string;
       // Year 2 adds "difference": two measured objects shown, MCQ on "how many
       // more / fewer units" (quantifying the gap, not just "which is longer").
-      // Year 2 W4 adds "between" (recognise a measure that lands between two
-      // whole units) and "accuracy" (tap which object needs a smaller unit).
-      scene: "intro" | "count" | "compare" | "build" | "order" | "same" | "difference" | "between" | "accuracy";
+      // Year 2 W4 L1 adds "notExact" (does the measurement finish exactly on a
+      // block? Yes/No) and "tapExact" (tap the object that finishes exactly).
+      scene: "intro" | "count" | "compare" | "build" | "order" | "same" | "difference" | "notExact" | "tapExact";
       /** Unit being used to measure (footstep / block / star / flower / stone).
        *  Rendered as an illustrated glyph; unitEmoji/unitLabel are hints only. */
       unitEmoji?: string;

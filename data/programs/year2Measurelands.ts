@@ -69,9 +69,9 @@ const YEAR2_MEASURELANDS_RAW: WeekPlan[] = [
     topic: "Closer Count",
     curriculum: ["AC9M2M01"],
     lessons: [
-      buildLesson(4, 1, "In Between", "Accuracy: recognise a measure that falls between two whole units.", ["In between", "Not a whole number", "Between 4 and 5"], ["AC9M2M01"]),
-      buildLesson(4, 2, "Re-measure Smaller", "Accuracy: re-measure with smaller units for a closer count and compare accuracy.", ["Re-measure smaller", "Smaller units", "Closer count"], ["AC9M2M01"]),
-      buildLesson(4, 3, "Right Tool, Right Unit", "Accuracy: choose the best unit for the job and justify the choice.", ["Right unit", "Choose the unit", "Big or small unit"], ["AC9M2M01"]),
+      buildLesson(4, 1, "Not Exact Yet", "Accuracy — notice the problem: some measurements don't finish exactly on a block, they stop in between.", ["Not exact yet", "Stops in between", "Exact or not"], ["AC9M2M01"]),
+      buildLesson(4, 2, "Measure More Accurately", "Accuracy — solve the problem: re-measure with smaller units so the length fits for a closer, exact count.", ["Measure more accurately", "Smaller units", "Closer count"], ["AC9M2M01"]),
+      buildLesson(4, 3, "Choose the Best Measuring Unit", "Accuracy — explain the solution: reason about which measuring unit gives the best measurement.", ["Best measuring unit", "Choose the unit", "Big or small unit"], ["AC9M2M01"]),
     ],
   },
   {
