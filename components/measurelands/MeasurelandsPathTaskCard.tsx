@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Compass, Undo2 } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
@@ -971,6 +971,118 @@ function CompareAccuracyScene({ task, onCorrect, onWrong }: { task: MeasurePathT
   );
 }
 
+/* ── Year 2 W4 "Finish the Gap": the big blocks leave a small gap; DRAG a block
+ * into it. Only the small block fits — the big one is too wide and bounces back.
+ * Interactive, not answer-picking. Works by drag (pointer) or a simple tap. ── */
+function FinishGapScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect: () => void }) {
+  const wholeBig = task.pathLength ?? 4;
+  const label = task.objectLabel ?? "Rope";
+  const BIG = 52;
+  const SMALL = 26;
+  const H = 40;
+  const filledW = wholeBig * BIG;
+  const totalW = filledW + SMALL;
+  const [placed, setPlaced] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [tooBig, setTooBig] = useState(false);
+  const [drag, setDrag] = useState<{ which: "big" | "small"; x: number; y: number; sx: number; sy: number; id: number } | null>(null);
+  const gapRef = useRef<HTMLDivElement>(null);
+  const wonRef = useRef(false);
+
+  function start(which: "big" | "small", e: React.PointerEvent) {
+    if (placed) return;
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    setTooBig(false);
+    setFeedback(null);
+    setDrag({ which, x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, id: e.pointerId });
+  }
+  function move(e: React.PointerEvent) {
+    setDrag((d) => (d && d.id === e.pointerId ? { ...d, x: e.clientX, y: e.clientY } : d));
+  }
+  function end(e: React.PointerEvent) {
+    const g = drag;
+    setDrag(null);
+    if (!g || g.id !== e.pointerId) return;
+    const rect = gapRef.current?.getBoundingClientRect();
+    const overGap = !!rect && e.clientX >= rect.left - 36 && e.clientX <= rect.right + 36 && e.clientY >= rect.top - 80 && e.clientY <= rect.bottom + 80;
+    const tapped = Math.hypot(e.clientX - g.sx, e.clientY - g.sy) < 10;
+    if (g.which === "small" && (overGap || tapped)) {
+      setPlaced(true);
+      setFeedback("It fits exactly! Now the whole thing is measured.");
+      if (!wonRef.current) {
+        wonRef.current = true;
+        window.setTimeout(onCorrect, 1100);
+      }
+    } else if (g.which === "big" && (overGap || tapped)) {
+      setTooBig(true);
+      setFeedback("Too big — the big block won't fit the little gap. Try the small one!");
+    }
+  }
+
+  const block = (w: number, extra?: React.CSSProperties): React.CSSProperties => ({
+    width: w,
+    height: H,
+    boxSizing: "border-box",
+    border: "2px solid #2c6a8c",
+    borderRadius: 6,
+    background: "linear-gradient(180deg,#7fd3f2,#54aad6)",
+    ...extra,
+  });
+
+  return (
+    <PathShell badge={task.badgeLabel ?? "Finish the Gap"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-5 shadow-sm">
+        <div className="mb-4 text-center text-sm font-black uppercase tracking-[0.16em] text-[#7c4a12]">{label}</div>
+        <div className="flex justify-center">
+          <div style={{ position: "relative", width: totalW, maxWidth: "100%" }}>
+            <div style={{ width: totalW, height: 20, borderRadius: 10, background: "linear-gradient(180deg,#d8ad74,#b07f42)", marginBottom: 8 }} />
+            <div style={{ display: "flex" }}>
+              {Array.from({ length: wholeBig }).map((_, i) => (
+                <div key={i} style={block(BIG, { borderRadius: 0, borderLeft: i === 0 ? "2px solid #2c6a8c" : "none" })} />
+              ))}
+              <div
+                ref={gapRef}
+                style={{
+                  width: SMALL,
+                  height: H,
+                  boxSizing: "border-box",
+                  borderRadius: 0,
+                  border: placed ? "2px solid #2c6a8c" : "2px dashed #b4540c",
+                  borderLeft: "none",
+                  background: placed ? "linear-gradient(180deg,#7fd3f2,#54aad6)" : tooBig ? "rgba(220,38,38,0.14)" : "rgba(232,130,12,0.12)",
+                  transition: "background 0.2s",
+                }}
+              />
+            </div>
+          </div>
+        </div>
+        <div className="mt-4 text-center text-base font-bold" style={{ color: placed ? "#0f766e" : tooBig ? "#b4540c" : "#5f4725" }}>
+          {feedback ?? "Drag a block into the gap. Which one fits?"}
+        </div>
+      </div>
+
+      {!placed ? (
+        <div className="flex items-end justify-center gap-10 py-3">
+          <div className="flex flex-col items-center gap-1.5">
+            <div onPointerDown={(e) => start("big", e)} onPointerMove={move} onPointerUp={end} style={{ ...block(BIG), touchAction: "none", cursor: "grab", opacity: drag?.which === "big" ? 0.3 : 1 }} />
+            <span className="text-[11px] font-black uppercase tracking-wide text-[#7c3aed]">Big block</span>
+          </div>
+          <div className="flex flex-col items-center gap-1.5">
+            <div onPointerDown={(e) => start("small", e)} onPointerMove={move} onPointerUp={end} style={{ ...block(SMALL), touchAction: "none", cursor: "grab", opacity: drag?.which === "small" ? 0.3 : 1 }} />
+            <span className="text-[11px] font-black uppercase tracking-wide text-[#7c3aed]">Small block</span>
+          </div>
+        </div>
+      ) : null}
+
+      {drag ? (
+        <div style={{ position: "fixed", left: drag.x, top: drag.y, transform: "translate(-50%,-50%)", pointerEvents: "none", zIndex: 60 }}>
+          <div style={block(drag.which === "big" ? BIG : SMALL, { boxShadow: "0 8px 20px rgba(0,0,0,0.25)" })} />
+        </div>
+      ) : null}
+    </PathShell>
+  );
+}
+
 export function MeasurelandsPathTaskCard({
   task,
   onCorrect,
@@ -990,5 +1102,6 @@ export function MeasurelandsPathTaskCard({
   if (task.scene === "moreOrFewer") return <MoreOrFewerScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "countSmall") return <CountSmallScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "compareAccuracy") return <CompareAccuracyScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "finishGap") return <FinishGapScene task={task} onCorrect={onCorrect} />;
   return <BuildScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 }

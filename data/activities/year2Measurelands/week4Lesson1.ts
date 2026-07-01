@@ -31,9 +31,10 @@ const OBJECTS: Obj[] = [
 
 type LessonMemory = { introShown: boolean; cursor: number; recent: string[] };
 const lessonMemory = new Map<string, LessonMemory>();
-// Three activities per lesson (hard rule), reMeasure as the anchor.
-const ROTATION: Array<"reMeasure" | "moreOrFewer" | "countSmall"> = [
-  "reMeasure", "moreOrFewer", "countSmall", "reMeasure", "countSmall", "moreOrFewer",
+// Three activities per lesson (hard rule). finishGap is the interactive
+// (drag-a-block-into-the-gap) anchor; the other two vary their number answers.
+const ROTATION: Array<"reMeasure" | "finishGap" | "countSmall"> = [
+  "reMeasure", "finishGap", "countSmall", "finishGap", "reMeasure", "countSmall",
 ];
 
 function getMemory(lessonId: string): LessonMemory {
@@ -104,21 +105,20 @@ function buildReMeasureTask(memory: LessonMemory): MeasurePathTask {
   };
 }
 
-// ── Activity 2 — predict: smaller blocks → more or fewer? ──
-function buildMoreOrFewerTask(memory: LessonMemory): MeasurePathTask {
+// ── Activity 2 — DRAG a block into the leftover gap (only the small one fits) ──
+function buildFinishGapTask(memory: LessonMemory): MeasurePathTask {
   const { obj, wholeBig } = pickObject(memory);
   return {
     kind: "measurePath",
-    scene: "moreOrFewer",
-    prompt: `Smaller blocks — will there be MORE or FEWER?`,
-    speakText: `The ${obj.label.toLowerCase()} is ${wholeBig} big blocks and a bit. If we measure with smaller blocks, will there be more blocks or fewer blocks?`,
-    badgeLabel: "More or Fewer?",
+    scene: "finishGap",
+    prompt: `Finish measuring the ${obj.label.toLowerCase()} — drag a block into the gap.`,
+    speakText: `The big blocks left a little gap. Drag a block into the gap. Which one fits — the big block or the small block?`,
+    badgeLabel: "Finish the Gap",
     objectLabel: obj.label,
     pathLength: wholeBig,
-    correctTextOption: "More",
     feedback: {
-      correct: "More! Smaller blocks means you need more of them to measure the same length.",
-      wrong: "Smaller blocks are little, so you need MORE of them to fill the same length.",
+      correct: "The small block fits the gap exactly!",
+      wrong: "The big block is too big for the little gap.",
     },
   };
 }
@@ -154,7 +154,7 @@ export function generateY2MeasurelandsWeek4Lesson1Task(
   }
   const activity = ROTATION[memory.cursor % ROTATION.length]!;
   memory.cursor += 1;
-  if (activity === "moreOrFewer") return buildMoreOrFewerTask(memory);
+  if (activity === "finishGap") return buildFinishGapTask(memory);
   if (activity === "countSmall") return buildCountSmallTask(memory);
   return buildReMeasureTask(memory);
 }
@@ -168,9 +168,9 @@ export function buildY2MeasurelandsWeek4Lesson1QuizTasks(): PracticeTask[] {
   const seed: LessonMemory = { introShown: true, cursor: 0, recent: [] };
   return [
     buildReMeasureTask(seed),
-    buildMoreOrFewerTask(seed),
+    buildFinishGapTask(seed),
     buildCountSmallTask(seed),
     buildReMeasureTask(seed),
-    buildMoreOrFewerTask(seed),
+    buildCountSmallTask(seed),
   ];
 }
