@@ -129,15 +129,21 @@ function buildMonthsTask(_memory: LessonMemory): NavTask {
     const month = MONTHS[i]!;
     const next = MONTHS[(i + 1) % MONTHS.length]!;
     const distractors = shuffle(MONTHS.filter((m) => m.name !== next.name && m.name !== month.name)).slice(0, 2);
+    // A short strip around the gap: …[prev, THIS (highlight), ? (answer), +2, +3]…
+    const monthStrip = [-1, 0, 1, 2, 3].map((off) => {
+      const m = MONTHS[(i + off + MONTHS.length) % MONTHS.length]!;
+      return { label: m.name.slice(0, 3), blank: m.name === next.name, highlight: m.name === month.name };
+    });
     return {
       kind: "calendarNavigate",
       scene: "months",
-      prompt: `Which month comes straight after ${month.name}?`,
-      speakText: `Which month comes straight after ${month.name}?`,
+      prompt: `Which month fills the gap after ${month.name}?`,
+      speakText: `Look at the months in order. Which month fills the gap straight after ${month.name}?`,
       badgeLabel: "Months of the Year",
       days: GRID.days,
       startWeekday: GRID.startWeekday,
       monthName: month.name,
+      monthStrip,
       textOptions: shuffle([next.name, ...distractors.map((m) => m.name)]),
       correctTextOption: next.name,
       feedback: { correct: `Yes — ${next.name} comes after ${month.name}.`, wrong: `${next.name} comes straight after ${month.name}.` },

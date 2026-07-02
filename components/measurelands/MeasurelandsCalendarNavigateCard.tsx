@@ -321,7 +321,26 @@ function MonthsScene({ task, onCorrect, onWrong }: { task: NavTask; onCorrect: (
   const useText = Boolean(task.textOptions?.length);
   return (
     <Shell badge={task.badgeLabel ?? "Months of the Year"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      {task.monthName ? (
+      {task.monthStrip?.length ? (
+        <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-4">
+          <div className="mb-2 text-center text-[11px] font-black uppercase tracking-[0.18em] text-[#a98b52]">The months in order</div>
+          <div className="flex items-stretch justify-center gap-2 overflow-x-auto">
+            {task.monthStrip.map((m, i) => (
+              <div
+                key={i}
+                className="flex min-w-[64px] flex-col items-center justify-center rounded-[16px] border-2 px-2 py-4 text-center"
+                style={{
+                  borderColor: m.blank ? "rgba(124,58,237,0.7)" : m.highlight ? "rgba(180,120,20,0.85)" : "rgba(214,184,108,0.5)",
+                  borderStyle: m.blank ? "dashed" : "solid",
+                  background: m.blank ? "rgba(124,58,237,0.07)" : m.highlight ? "rgba(214,184,108,0.34)" : "rgba(255,255,255,0.92)",
+                }}
+              >
+                <span className={`text-base font-black ${m.blank ? "text-[#7c3aed]" : "text-[#2c1c07]"}`}>{m.blank ? "?" : m.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : task.monthName ? (
         <div className="mx-auto flex max-w-[420px] items-center justify-center gap-3 rounded-[26px] border-2 border-[rgba(124,58,237,0.35)] bg-[rgba(124,58,237,0.06)] px-6 py-6">
           <Compass className="h-8 w-8 text-[#5b21b6]" />
           <span className="text-3xl font-black text-[#2c1c07]">{task.monthName}</span>

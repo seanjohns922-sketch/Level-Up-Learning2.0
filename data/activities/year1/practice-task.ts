@@ -878,6 +878,10 @@ export type PracticeTask = (
       monthName?: string;
       textOptions?: string[];
       correctTextOption?: string;
+      /** "months": a short strip of consecutive months to show the sequence —
+       *  the answer month is `blank` (a gap the child fills), with the months
+       *  around it visible (e.g. …March, [ ? ], May…). */
+      monthStrip?: Array<{ label: string; blank?: boolean; highlight?: boolean }>;
       feedback?: { correct: string; wrong: string };
     }
   | {
