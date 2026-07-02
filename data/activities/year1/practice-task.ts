@@ -943,6 +943,11 @@ export type PracticeTask = (
       }>;
       correctOptionId?: string;
       teachingPoints?: string[];
+      teachingSteps?: Array<{
+        label: string;
+        text: string;
+        focus: "minute" | "hour" | "time";
+      }>;
       showDigital?: boolean;
       feedback?: { correct: string; wrong: string };
     }

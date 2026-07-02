@@ -94,6 +94,7 @@ export function buildClockIntroTask({
   targetHour,
   targetMinute,
   teachingPoints,
+  teachingSteps,
   badgeLabel,
 }: {
   prompt: string;
@@ -101,6 +102,7 @@ export function buildClockIntroTask({
   targetHour: number;
   targetMinute: ClockMinute;
   teachingPoints: string[];
+  teachingSteps?: ClockTask["teachingSteps"];
   badgeLabel: string;
 }): ClockTask {
   return {
@@ -114,6 +116,7 @@ export function buildClockIntroTask({
     speakText,
     badgeLabel,
     teachingPoints,
+    teachingSteps,
     feedback: { correct: "Let's read the clock!", wrong: "Let's get ready." },
   };
 }

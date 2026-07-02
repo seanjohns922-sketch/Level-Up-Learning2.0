@@ -8,6 +8,7 @@ import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type AnalogClockTask = Extract<PracticeTask, { kind: "analogClock" }>;
 type ClockMinute = 0 | 15 | 30 | 45;
+type ClockFocus = "minute" | "hour" | "time";
 
 const HOUR_OPTIONS = Array.from({ length: 12 }, (_, index) => index + 1);
 
@@ -39,10 +40,12 @@ function ClockFace({
   hour,
   minute,
   size = 300,
+  focus = "time",
 }: {
   hour: number;
   minute: ClockMinute;
   size?: number;
+  focus?: ClockFocus;
 }) {
   const center = size / 2;
   const radius = size * 0.43;
@@ -57,6 +60,8 @@ function ClockFace({
   };
   const hourEnd = handEnd(hourAngle, size * 0.22);
   const minuteEnd = handEnd(minuteAngle, size * 0.33);
+  const highlightMinute = focus === "minute" || focus === "time";
+  const highlightHour = focus === "hour" || focus === "time";
 
   return (
     <svg
@@ -119,23 +124,49 @@ function ClockFace({
         );
       })}
 
+      {highlightMinute ? (
+        <line
+          x1={center}
+          y1={center}
+          x2={minuteEnd.x}
+          y2={minuteEnd.y}
+          stroke="#a78bfa"
+          strokeWidth="18"
+          strokeLinecap="round"
+          opacity="0.32"
+        />
+      ) : null}
+      {highlightHour ? (
+        <line
+          x1={center}
+          y1={center}
+          x2={hourEnd.x}
+          y2={hourEnd.y}
+          stroke="#f59e0b"
+          strokeWidth="24"
+          strokeLinecap="round"
+          opacity="0.28"
+        />
+      ) : null}
       <line
         x1={center}
         y1={center}
         x2={hourEnd.x}
         y2={hourEnd.y}
-        stroke="#5a3210"
-        strokeWidth="13"
+        stroke={highlightHour ? "#78350f" : "#9a7b54"}
+        strokeWidth={highlightHour ? "14" : "11"}
         strokeLinecap="round"
+        opacity={focus === "minute" ? "0.45" : "1"}
       />
       <line
         x1={center}
         y1={center}
         x2={minuteEnd.x}
         y2={minuteEnd.y}
-        stroke="#5b21b6"
-        strokeWidth="8"
+        stroke={highlightMinute ? "#5b21b6" : "#9a7b54"}
+        strokeWidth={highlightMinute ? "9" : "7"}
         strokeLinecap="round"
+        opacity={focus === "hour" ? "0.45" : "1"}
       />
       <circle cx={center} cy={center} r={13} fill="#7c4a12" stroke="#fff0c2" strokeWidth="5" />
     </svg>
@@ -175,6 +206,7 @@ function Shell({
 }
 
 function IntroScene({ task, onCorrect }: { task: AnalogClockTask; onCorrect: () => void }) {
+  const steps = task.teachingSteps;
   return (
     <Shell task={task}>
       <div className="grid gap-5 rounded-[30px] border border-[rgba(214,184,108,0.36)] bg-[rgba(255,248,232,0.98)] p-5 shadow-[0_18px_38px_rgba(180,120,20,0.08)] md:grid-cols-[340px_1fr]">
@@ -185,13 +217,29 @@ function IntroScene({ task, onCorrect }: { task: AnalogClockTask; onCorrect: () 
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[linear-gradient(135deg,#6d28d9,#4c1d95)] text-white shadow-[0_10px_24px_rgba(109,40,217,0.24)]">
             <Clock3 className="h-8 w-8" />
           </div>
-          <div className="space-y-3">
-            {(task.teachingPoints ?? []).map((point) => (
-              <p key={point} className="text-lg font-semibold leading-relaxed text-[#4a3412]">
-                {point}
-              </p>
-            ))}
-          </div>
+          {steps?.length ? (
+            <div className="grid gap-3">
+              {steps.map((step, index) => (
+                <div key={step.label} className="grid items-center gap-3 rounded-[24px] border border-[rgba(214,184,108,0.28)] bg-white/75 p-3 sm:grid-cols-[118px_1fr]">
+                  <div className="flex justify-center">
+                    <ClockFace hour={task.targetHour} minute={task.targetMinute} size={112} focus={step.focus} />
+                  </div>
+                  <div>
+                    <div className="text-xs font-black uppercase tracking-[0.16em] text-[#5b21b6]">Step {index + 1} · {step.label}</div>
+                    <div className="mt-1 text-lg font-black leading-tight text-[#3a2408]">{step.text}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {(task.teachingPoints ?? []).map((point) => (
+                <p key={point} className="text-lg font-semibold leading-relaxed text-[#4a3412]">
+                  {point}
+                </p>
+              ))}
+            </div>
+          )}
           <button
             type="button"
             onClick={onCorrect}
