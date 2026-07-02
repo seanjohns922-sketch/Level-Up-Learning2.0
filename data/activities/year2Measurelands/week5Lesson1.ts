@@ -25,7 +25,7 @@ function buildIntro(): PracticeTask {
   return buildClockIntroTask({
     prompt: "Read o'clock time.",
     speakText:
-      "Professor Gauge says: look at the long minute hand first. If it points to twelve, it is o'clock. Now look at the short hour hand. The short hand tells the hour. This clock shows three o'clock.",
+      "Professor Gauge says: look at the long minute hand first. If it points to twelve, it is o'clock. Now look at the short hour hand. The short hand tells the hour. Say the hour, then say o'clock.",
     badgeLabel: "Clockwork Crossing",
     targetHour: 3,
     targetMinute: 0,
@@ -33,13 +33,13 @@ function buildIntro(): PracticeTask {
       "Look at the long minute hand first.",
       "If it points to 12, it is o'clock.",
       "Now look at the short hour hand.",
-      "This clock shows 3 o'clock.",
+      "Say the hour. Then say o'clock.",
     ],
     teachingSteps: [
       { label: "Minute hand", text: "Look at the long hand first.", focus: "minute" },
       { label: "O'clock", text: "It points to 12. It is o'clock.", focus: "minute" },
       { label: "Hour hand", text: "Now look at the short hand.", focus: "hour" },
-      { label: "Read it", text: "This clock shows 3 o'clock.", focus: "time" },
+      { label: "Read it", text: "Say the hour. Then say o'clock.", focus: "time" },
     ],
   });
 }
