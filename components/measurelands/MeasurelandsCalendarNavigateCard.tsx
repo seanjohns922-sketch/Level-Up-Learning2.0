@@ -344,7 +344,7 @@ function WhichCountScene({ task, onCorrect, onWrong }: { task: NavTask; onCorrec
   const path = Array.from({ length: Math.max(0, to - from) }, (_, i) => from + 1 + i);
   return (
     <Shell badge={task.badgeLabel ?? "Which Count Is Correct?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      <CalendarGrid days={task.days} startWeekday={task.startWeekday} monthLabel={task.monthLabel} start={from} endDate={to} pathDates={path} />
+      <CalendarGrid days={task.days} startWeekday={task.startWeekday} monthLabel={task.monthLabel} start={from} endDate={to} pathDates={path} events={task.events} />
       <div className="grid grid-cols-2 gap-3">
         {(task.options ?? [answer, answer + 1]).map((value) => (
           <button
@@ -485,6 +485,26 @@ function EventChoiceScene({ task, onCorrect, onWrong }: { task: NavTask; onCorre
   );
 }
 
+/* ── W7 L3-B: missing date clues. Students tap the target date on the calendar
+ * after reasoning about before/after. ── */
+function MissingDateScene({ task, onCorrect, onWrong }: { task: NavTask; onCorrect: () => void; onWrong: () => void }) {
+  return (
+    <Shell badge={task.badgeLabel ?? "Missing Date"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <CalendarGrid
+        days={task.days}
+        startWeekday={task.startWeekday}
+        monthLabel={task.monthLabel}
+        start={task.fromDate}
+        events={task.events}
+        onTapDate={(date) => (date === task.targetDate ? onCorrect() : onWrong())}
+      />
+      <div className="text-center text-sm font-bold text-[#5f4725]">
+        Use the clue, then tap the date that solves the mystery.
+      </div>
+    </Shell>
+  );
+}
+
 // Southern-hemisphere seasons (Australian curriculum): summer Dec–Feb,
 // autumn Mar–May, winter Jun–Aug, spring Sep–Nov. Keyed by 3-letter month.
 const SEASON_BY_MONTH: Record<string, "summer" | "autumn" | "winter" | "spring"> = {
@@ -612,6 +632,7 @@ export function MeasurelandsCalendarNavigateCard({
   if (task.scene === "whichCount") return <WhichCountScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "until") return <UntilScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "eventCompare" || task.scene === "eventPlan") return <EventChoiceScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "missingDate") return <MissingDateScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "months") return <MonthsScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   return <StepScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 }

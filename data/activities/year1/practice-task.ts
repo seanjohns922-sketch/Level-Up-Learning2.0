@@ -854,9 +854,10 @@ export type PracticeTask = (
       badgeLabel?: string;
       // Year 2 W7 adds "between" (count the day-jumps between two dates —
       // exclusive of the start), "whichCount" (pick the correct between-count),
-      // "months" (months of the year / days in each month), and "until"/
-      // "eventCompare"/"eventPlan" (count forward to familiar calendar events).
-      scene: "intro" | "next" | "before" | "explore" | "between" | "whichCount" | "months" | "until" | "eventCompare" | "eventPlan";
+      // "months" (months of the year / days in each month), "until"/
+      // "eventCompare"/"eventPlan" (count forward to familiar calendar events),
+      // and "missingDate" (solve before/after calendar clues by tapping a date).
+      scene: "intro" | "next" | "before" | "explore" | "between" | "whichCount" | "months" | "until" | "eventCompare" | "eventPlan" | "missingDate";
       /** Month grid: number of days, and which weekday (0=Mon..6=Sun) day 1 sits on. */
       days: number;
       startWeekday: number;
