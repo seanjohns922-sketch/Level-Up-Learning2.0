@@ -36,24 +36,22 @@ const UNIT_SIZE: Record<string, number> = { paperclips: 1, blocks: 2, cubes: 2, 
 
 function PaperclipGlyph({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 44 22" aria-hidden="true" className={className}>
+    <svg viewBox="0 0 52 20" aria-hidden="true" className={className}>
       <path
-        d="M12.4 15.8 26.7 4.4c3.3-2.6 8.2-.3 8.2 4 0 1.6-.7 3.1-1.9 4.1L17.9 24.4c-4.9 3.9-12.1.4-12.1-5.9 0-2.3 1.1-4.5 2.9-5.9L24.4.2"
+        d="M15 5.5h24.5c4.1 0 7.5 3.3 7.5 7.4s-3.4 7.4-7.5 7.4H10.8C5.5 20.3 1.2 16 1.2 10.7S5.5 1.1 10.8 1.1h30.6"
         fill="none"
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="3.8"
-        transform="translate(1 -2)"
+        strokeWidth="3.2"
       />
       <path
-        d="M13.9 14.4 27 4.1c1.9-1.5 4.7-.2 4.7 2.3 0 .9-.4 1.8-1.1 2.4L15.8 20.4"
+        d="M15.3 14.6h22.8c1.4 0 2.6-1.1 2.6-2.5s-1.2-2.5-2.6-2.5H11.3"
         fill="none"
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="2.2"
-        transform="translate(1 -2)"
+        strokeWidth="2"
       />
     </svg>
   );
