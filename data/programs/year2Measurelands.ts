@@ -102,7 +102,7 @@ const YEAR2_MEASURELANDS_RAW: WeekPlan[] = [
     topic: "Calendar Keep",
     curriculum: ["AC9M2M03"],
     lessons: [
-      buildLesson(7, 1, "Count Days Between", "Calendar: determine the number of days between two events on a calendar.", ["Count days between", "Days between events", "Interval on a calendar"], ["AC9M2M03"]),
+      buildLesson(7, 1, "Count the Days", "Calendar: count the days between two dates (the jumps, not the start day), plus months of the year and days in each month.", ["Count the days", "Days between", "Months and days"], ["AC9M2M03"]),
       buildLesson(7, 2, "How Many Days Until?", "Calendar: work out how many days until an event, including weeks to days and across months.", ["Days until", "Weeks to days", "Across the month"], ["AC9M2M03"]),
       buildLesson(7, 3, "Calendar Problem Solving", "Calendar: solve multi-step day problems and explain the reasoning.", ["Calendar problems", "Multi-step days", "Explain the days"], ["AC9M2M03"]),
     ],

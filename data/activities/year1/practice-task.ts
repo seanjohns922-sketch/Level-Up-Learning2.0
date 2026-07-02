@@ -852,22 +852,32 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "next" | "before" | "explore";
+      // Year 2 W7 adds "between" (count the day-jumps between two dates —
+      // exclusive of the start), "whichCount" (pick the correct between-count),
+      // and "months" (months of the year / days in each month).
+      scene: "intro" | "next" | "before" | "explore" | "between" | "whichCount" | "months";
       /** Month grid: number of days, and which weekday (0=Mon..6=Sun) day 1 sits on. */
       days: number;
       startWeekday: number;
       monthLabel?: string;
       /** The date the student starts on (highlighted on the grid / path). */
       fromDate?: number;
+      /** "between"/"whichCount": the end date; the answer is the number of
+       *  day-jumps from fromDate to toDate (toDate - fromDate). */
+      toDate?: number;
       /** "next"/"before": which way the path points (visual + wording). */
       direction?: "next" | "before" | "later" | "earlier";
       /** Step size for the path strip/arrow: 1 for next/before, 7 for a week jump. */
       stepDays?: number;
       /** "explore": tap the cell this many days away — the answer date. */
       targetDate?: number;
-      /** "next"/"before": number answer options. */
+      /** "next"/"before"/"whichCount": number answer options. */
       options?: number[];
       correctAnswer?: number;
+      /** "months": month-name text options (e.g. which month comes next). */
+      monthName?: string;
+      textOptions?: string[];
+      correctTextOption?: string;
       feedback?: { correct: string; wrong: string };
     }
   | {
