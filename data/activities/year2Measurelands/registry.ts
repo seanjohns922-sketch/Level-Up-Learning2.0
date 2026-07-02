@@ -74,6 +74,21 @@ import {
   resetY2MeasurelandsWeek5Lesson3TaskSessionState,
   buildY2MeasurelandsWeek5Lesson3QuizTasks,
 } from "@/data/activities/year2Measurelands/week5Lesson3";
+import {
+  generateY2MeasurelandsWeek6Lesson1Task,
+  resetY2MeasurelandsWeek6Lesson1TaskSessionState,
+  buildY2MeasurelandsWeek6Lesson1QuizTasks,
+} from "@/data/activities/year2Measurelands/week6Lesson1";
+import {
+  generateY2MeasurelandsWeek6Lesson2Task,
+  resetY2MeasurelandsWeek6Lesson2TaskSessionState,
+  buildY2MeasurelandsWeek6Lesson2QuizTasks,
+} from "@/data/activities/year2Measurelands/week6Lesson2";
+import {
+  generateY2MeasurelandsWeek6Lesson3Task,
+  resetY2MeasurelandsWeek6Lesson3TaskSessionState,
+  buildY2MeasurelandsWeek6Lesson3QuizTasks,
+} from "@/data/activities/year2Measurelands/week6Lesson3";
 
 // Level 2 (Year 2) Measurelands lesson registry. Mirrors the Level 1 registry so
 // app/lesson/page.tsx can resolve `y2-measurement-w{n}-l{m}` ids to tasks.
@@ -376,6 +391,63 @@ const Y2_MEASURELANDS_LESSONS: Y2MeasurelandsLessonEntry[] = [
     completionTitle: "Clock Builder Complete!",
     unlockMessage: "Week complete.",
     returnRoute: "/program?year=Year 2&week=5&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y2-measurement-w6-l1",
+    week: 6,
+    lessonNumber: 1,
+    title: "Quarter Past Time",
+    subtitle: "Clock Tower II",
+    generate: generateY2MeasurelandsWeek6Lesson1Task,
+    reset: resetY2MeasurelandsWeek6Lesson1TaskSessionState,
+    quizContributionBuilder: buildY2MeasurelandsWeek6Lesson1QuizTasks,
+    practisedSkills: [
+      "Reading quarter past on an analog clock",
+      "Recognising the minute hand at 3",
+      "Using the hour hand to name quarter past times",
+      "Building quarter past times with snapped controls",
+    ],
+    completionTitle: "Quarter Past Reader Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+    returnRoute: "/program?year=Year 2&week=6&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y2-measurement-w6-l2",
+    week: 6,
+    lessonNumber: 2,
+    title: "Quarter To Time",
+    subtitle: "Clock Tower II",
+    generate: generateY2MeasurelandsWeek6Lesson2Task,
+    reset: resetY2MeasurelandsWeek6Lesson2TaskSessionState,
+    quizContributionBuilder: buildY2MeasurelandsWeek6Lesson2QuizTasks,
+    practisedSkills: [
+      "Reading quarter to on an analog clock",
+      "Recognising the minute hand at 9",
+      "Identifying the hour the short hand is nearly reaching",
+      "Building quarter to times with snapped controls",
+    ],
+    completionTitle: "Quarter To Reader Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+    returnRoute: "/program?year=Year 2&week=6&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y2-measurement-w6-l3",
+    week: 6,
+    lessonNumber: 3,
+    title: "Build Any Time",
+    subtitle: "Clock Tower II",
+    generate: generateY2MeasurelandsWeek6Lesson3Task,
+    reset: resetY2MeasurelandsWeek6Lesson3TaskSessionState,
+    quizContributionBuilder: buildY2MeasurelandsWeek6Lesson3QuizTasks,
+    practisedSkills: [
+      "Reading mixed analog times",
+      "Matching time words to clock faces",
+      "Building o'clock, half past, quarter past and quarter to",
+      "Checking the minute hand before the hour hand",
+    ],
+    completionTitle: "Clock Builder Complete!",
+    unlockMessage: "Week complete.",
+    returnRoute: "/program?year=Year 2&week=6&legacy=1&realm_id=measurement",
   },
 ];
 

@@ -9,6 +9,7 @@ export type ClockSpec = {
   prompt?: string;
   badgeLabel?: string;
   showDigital?: boolean;
+  speakText?: string;
 };
 
 export function normalizeHour(hour: number) {
@@ -24,6 +25,14 @@ export function timeLabel(hour: number, minute: ClockMinute) {
   return `Quarter to ${normalizeHour(h + 1)}`;
 }
 
+export function displayHourForTime(hour: number, minute: ClockMinute) {
+  return minute === 45 ? normalizeHour(hour + 1) : normalizeHour(hour);
+}
+
+export function internalHourForDisplay(displayHour: number, minute: ClockMinute) {
+  return minute === 45 ? normalizeHour(displayHour - 1) : normalizeHour(displayHour);
+}
+
 function option(id: string, hour: number, minute: ClockMinute) {
   return { id, label: timeLabel(hour, minute), hour: normalizeHour(hour), minute };
 }
@@ -36,28 +45,30 @@ function distractorHours(targetHour: number) {
 export function buildReadClockTask(spec: ClockSpec): ClockTask {
   const [nextHour, prevHour] = distractorHours(spec.hour);
   const correct = option("correct", spec.hour, spec.minute);
-  const options =
-    spec.minute === 0
-      ? [
-          correct,
-          option("next-hour", nextHour, 0),
-          option("prev-hour", prevHour, 0),
-        ]
-      : [
-          correct,
-          option("wrong-minute", spec.hour, 0),
-          option("next-half", nextHour, 30),
-        ];
+  let options: ClockTask["options"];
+  if (spec.minute === 0) {
+    options = [correct, option("next-hour", nextHour, 0), option("prev-hour", prevHour, 0)];
+  } else if (spec.minute === 15) {
+    options = [correct, option("half-past", spec.hour, 30), option("oclock", spec.hour, 0)];
+  } else if (spec.minute === 45) {
+    options = [
+      correct,
+      option("quarter-past-next", displayHourForTime(spec.hour, spec.minute), 15),
+      option("half-past-next", displayHourForTime(spec.hour, spec.minute), 30),
+    ];
+  } else {
+    options = [correct, option("wrong-minute", spec.hour, 0), option("next-hour", nextHour, 30)];
+  }
 
   return {
     kind: "analogClock",
     scene: "read",
     mode: "read",
-    granularity: spec.minute === 0 ? "hour" : "halfHour",
+    granularity: spec.minute === 0 ? "hour" : spec.minute === 30 ? "halfHour" : "quarterHour",
     targetHour: normalizeHour(spec.hour),
     targetMinute: spec.minute,
     prompt: spec.prompt ?? "What time does the clock show?",
-    speakText: spec.prompt ?? "What time does the clock show?",
+    speakText: spec.speakText ?? spec.prompt ?? "What time does the clock show?",
     badgeLabel: spec.badgeLabel ?? "Read the Clock",
     options,
     correctOptionId: correct.id,
@@ -75,15 +86,53 @@ export function buildBuildClockTask(spec: ClockSpec): ClockTask {
     kind: "analogClock",
     scene: "build",
     mode: "build",
-    granularity: "halfHour",
+    granularity: spec.minute === 0 || spec.minute === 30 ? "halfHour" : "quarterHour",
     targetHour: normalizeHour(spec.hour),
     targetMinute: spec.minute,
     prompt: spec.prompt ?? `Build ${label}.`,
-    speakText: spec.prompt ?? `Build ${label}. Choose the hour, then choose o'clock or half past.`,
+    speakText: spec.speakText ?? spec.prompt ?? `Build ${label}. Choose the hour, then choose the minute hand position.`,
     badgeLabel: spec.badgeLabel ?? "Build the Time",
     feedback: {
       correct: `Yes — you built ${label}.`,
-      wrong: `Correct answer: ${label}. Choose the hour, then choose ${spec.minute === 0 ? "o'clock" : "half past"}.`,
+      wrong: `Correct answer: ${label}. Choose the hour, then choose the matching minute hand position.`,
+    },
+  };
+}
+
+export function buildChooseClockTask({
+  prompt,
+  speakText,
+  badgeLabel,
+  clocks,
+  correctIndex,
+}: {
+  prompt: string;
+  speakText?: string;
+  badgeLabel: string;
+  clocks: ClockSpec[];
+  correctIndex: number;
+}): ClockTask {
+  const correct = clocks[correctIndex]!;
+  return {
+    kind: "analogClock",
+    scene: "chooseClock",
+    mode: "read",
+    granularity: "quarterHour",
+    targetHour: normalizeHour(correct.hour),
+    targetMinute: correct.minute,
+    prompt,
+    speakText: speakText ?? prompt,
+    badgeLabel,
+    options: clocks.map((clock, index) => ({
+      id: index === correctIndex ? "correct" : `clock-${index + 1}`,
+      label: timeLabel(clock.hour, clock.minute),
+      hour: normalizeHour(clock.hour),
+      minute: clock.minute,
+    })),
+    correctOptionId: "correct",
+    feedback: {
+      correct: `Yes — that clock shows ${timeLabel(correct.hour, correct.minute)}.`,
+      wrong: `Correct answer: ${timeLabel(correct.hour, correct.minute)}. Check the long minute hand first.`,
     },
   };
 }

@@ -91,9 +91,9 @@ const YEAR2_MEASURELANDS_RAW: WeekPlan[] = [
     topic: "Clock Tower II",
     curriculum: ["AC9M2M02"],
     lessons: [
-      buildLesson(6, 1, "Quarter Past", "Time: read quarter past, with the minute hand at 3.", ["Quarter past", "Minute hand at 3", "Fifteen minutes past"], ["AC9M2M02"]),
-      buildLesson(6, 2, "Quarter To", "Time: read quarter to, with the minute hand at 9 and the hour hand nearly at the next number.", ["Quarter to", "Minute hand at 9", "Names the next hour"], ["AC9M2M02"]),
-      buildLesson(6, 3, "Time Master", "Time: mix o'clock, half and quarter times; match, set and sequence.", ["Time master", "Mixed times", "Match set sequence"], ["AC9M2M02"]),
+      buildLesson(6, 1, "Quarter Past Time", "Time: read quarter past, with the minute hand at 3.", ["Quarter past", "Minute hand at 3", "Fifteen minutes past"], ["AC9M2M02"]),
+      buildLesson(6, 2, "Quarter To Time", "Time: read quarter to, with the minute hand at 9 and the hour hand nearly at the next number.", ["Quarter to", "Minute hand at 9", "Names the next hour"], ["AC9M2M02"]),
+      buildLesson(6, 3, "Build Any Time", "Time: build o'clock, half past, quarter past and quarter to using large snapped choices.", ["Build any time", "Mixed times", "Snapped clock controls"], ["AC9M2M02"]),
     ],
   },
   {

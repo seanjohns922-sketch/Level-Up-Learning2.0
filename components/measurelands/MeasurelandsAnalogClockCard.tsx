@@ -32,6 +32,14 @@ function timeLabel(hour: number, minute: ClockMinute) {
   return `Quarter to ${normalizeHour(h + 1)}`;
 }
 
+function displayHourForTime(hour: number, minute: ClockMinute) {
+  return minute === 45 ? normalizeHour(hour + 1) : normalizeHour(hour);
+}
+
+function internalHourForDisplay(displayHour: number, minute: ClockMinute) {
+  return minute === 45 ? normalizeHour(displayHour - 1) : normalizeHour(displayHour);
+}
+
 function digitalLabel(hour: number, minute: ClockMinute) {
   return `${normalizeHour(hour)}:${String(minute).padStart(2, "0")}`;
 }
@@ -284,26 +292,51 @@ function ReadScene({ task, onCorrect, onWrong }: { task: AnalogClockTask; onCorr
   );
 }
 
+function ChooseClockScene({ task, onCorrect, onWrong }: { task: AnalogClockTask; onCorrect: () => void; onWrong: () => void }) {
+  return (
+    <Shell task={task}>
+      <div className="measurelands-option-bank grid gap-3 sm:grid-cols-3">
+        {(task.options ?? []).map((option) => (
+          <button
+            key={option.id}
+            type="button"
+            onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
+            className="relative rounded-[26px] border-2 border-[rgba(214,184,108,0.5)] bg-[#fffaf0] px-3 py-4 text-center shadow-sm transition hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)] active:scale-[0.98]"
+          >
+            <span className="absolute right-2 top-2 z-10"><OptionReadAloudButton text={option.label} /></span>
+            <div className="measurelands-clock-face-wrap flex justify-center">
+              <ClockFace hour={option.hour} minute={option.minute} size={190} />
+            </div>
+            <div className="mt-2 text-lg font-black text-[#2c1c07]">{option.label}</div>
+          </button>
+        ))}
+      </div>
+    </Shell>
+  );
+}
+
 function BuildScene({ task, onCorrect, onWrong }: { task: AnalogClockTask; onCorrect: () => void; onWrong: () => void }) {
   const minuteChoices = useMemo<ClockMinute[]>(() => {
     if (task.granularity === "hour") return [0];
     if (task.granularity === "halfHour") return [0, 30];
     return [0, 15, 30, 45];
   }, [task.granularity]);
-  const initialHour = normalizeHour(task.targetHour) === 12 ? 1 : 12;
+  const targetDisplayHour = displayHourForTime(task.targetHour, task.targetMinute);
+  const initialHour = targetDisplayHour === 12 ? 1 : 12;
   const initialMinute = minuteChoices.includes(30) && task.targetMinute === 0 ? 30 : 0;
   const [selectedHour, setSelectedHour] = useState<number>(initialHour);
   const [selectedMinute, setSelectedMinute] = useState<ClockMinute>(initialMinute);
+  const renderHour = internalHourForDisplay(selectedHour, selectedMinute);
 
-  const isCorrect = normalizeHour(selectedHour) === normalizeHour(task.targetHour) && selectedMinute === task.targetMinute;
+  const isCorrect = normalizeHour(selectedHour) === targetDisplayHour && selectedMinute === task.targetMinute;
 
   return (
     <Shell task={task}>
       <div className="measurelands-clock-build grid gap-5 rounded-[30px] border border-[rgba(214,184,108,0.34)] bg-white/90 p-5 lg:grid-cols-[360px_1fr]">
         <div className="measurelands-clock-face-wrap flex flex-col items-center justify-center">
-          <ClockFace hour={selectedHour} minute={selectedMinute} />
+          <ClockFace hour={renderHour} minute={selectedMinute} />
           <div className="mt-3 rounded-full bg-[rgba(91,33,182,0.08)] px-5 py-2 text-sm font-black uppercase tracking-[0.16em] text-[#5b21b6]">
-            {timeLabel(selectedHour, selectedMinute)}
+            {timeLabel(renderHour, selectedMinute)}
           </div>
         </div>
 
@@ -362,7 +395,7 @@ function BuildScene({ task, onCorrect, onWrong }: { task: AnalogClockTask; onCor
 
       {process.env.NODE_ENV === "development" ? (
         <div className="rounded-2xl border border-dashed border-amber-400 bg-amber-50/70 p-3 text-xs font-mono text-amber-950">
-          Target: {digitalLabel(task.targetHour, task.targetMinute)} | Current: {digitalLabel(selectedHour, selectedMinute)} | Mode: {task.mode} | Granularity: {task.granularity} | Hour: {selectedHour} | Minute: {selectedMinute}
+          Target: {digitalLabel(task.targetHour, task.targetMinute)} ({timeLabel(task.targetHour, task.targetMinute)}) | Current: {digitalLabel(renderHour, selectedMinute)} ({timeLabel(renderHour, selectedMinute)}) | Mode: {task.mode} | Granularity: {task.granularity} | Display hour: {selectedHour} | Internal hour: {renderHour} | Minute: {selectedMinute}
         </div>
       ) : null}
     </Shell>
@@ -380,5 +413,6 @@ export function MeasurelandsAnalogClockCard({
 }) {
   if (task.scene === "intro") return <IntroScene task={task} onCorrect={onCorrect} />;
   if (task.scene === "build") return <BuildScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "chooseClock") return <ChooseClockScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   return <ReadScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 }

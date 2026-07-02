@@ -930,7 +930,7 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "read" | "build";
+      scene: "intro" | "read" | "build" | "chooseClock";
       mode: "read" | "build";
       granularity: "hour" | "halfHour" | "quarterHour";
       targetHour: number;
