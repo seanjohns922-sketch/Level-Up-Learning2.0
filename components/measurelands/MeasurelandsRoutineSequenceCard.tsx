@@ -48,9 +48,9 @@ function Shell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-4">
+    <div className="measurelands-shell space-y-4">
       <div
-        className="rounded-[30px] border px-5 py-5 shadow-[0_14px_42px_rgba(76,29,149,0.1)]"
+        className="measurelands-prompt-card rounded-[30px] border px-5 py-5 shadow-[0_14px_42px_rgba(76,29,149,0.1)]"
         style={{
           borderColor: "rgba(214,184,108,0.38)",
           background: "linear-gradient(145deg, rgba(255,248,232,0.98) 0%, rgba(250,243,228,0.98) 52%, rgba(244,232,205,0.96) 100%)",
@@ -63,7 +63,7 @@ function Shell({
           {badge}
         </div>
         <div className="flex items-start gap-3">
-          <div className="flex-1 text-2xl font-black leading-tight text-[#2c1c07] sm:text-3xl">{prompt}</div>
+          <div className="measurelands-prompt-text flex-1 text-2xl font-black leading-tight text-[#2c1c07] sm:text-3xl">{prompt}</div>
           <ReadAloudBtn text={speakText ?? prompt} size="md" className="shrink-0" />
         </div>
       </div>
@@ -85,7 +85,7 @@ function RoutineCard({
   const imageSrc = resolveRoutineImageSrc(item);
   return (
     <div
-      className="flex min-h-[132px] w-full flex-col items-center justify-center gap-2 rounded-[24px] border-2 px-3 py-3 text-center"
+      className="measurelands-routine-card flex min-h-[132px] w-full flex-col items-center justify-center gap-2 rounded-[24px] border-2 px-3 py-3 text-center"
       style={{
         borderColor: highlight ? "rgba(91,33,182,0.72)" : "rgba(214,184,108,0.5)",
         background: highlight ? "rgba(124,58,237,0.1)" : "rgba(255,255,255,0.94)",
@@ -160,7 +160,7 @@ function FirstScene({ task, onCorrect, onWrong }: { task: RoutineTask; onCorrect
             <span className="absolute right-3 top-3 z-10">
               <OptionReadAloudButton text={item.label} />
             </span>
-            <RoutineCard item={item} />
+            <RoutineCard item={item} compact />
           </button>
         ))}
       </div>
@@ -201,7 +201,7 @@ function BuildContent({
 
   return (
     <>
-      <div className="mx-auto rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[linear-gradient(180deg,rgba(255,252,245,0.98),rgba(252,244,225,0.98))] p-4 shadow-[0_18px_38px_rgba(180,120,20,0.08)]">
+      <div className="measurelands-routine-slots mx-auto rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[linear-gradient(180deg,rgba(255,252,245,0.98),rgba(252,244,225,0.98))] p-4 shadow-[0_18px_38px_rgba(180,120,20,0.08)]">
         <div className="grid grid-cols-1 gap-3 lg:grid-cols-4">
           {expected.map((slot, index) => {
             const filled = placedIds[index] ? byId(placedIds[index]!) : null;
@@ -210,7 +210,7 @@ function BuildContent({
             ) : (
               <div
                 key={slot.id}
-                className="flex min-h-[132px] flex-col items-center justify-center rounded-[24px] border-2 border-dashed px-3 py-3 text-center"
+                className="measurelands-routine-slot flex min-h-[132px] flex-col items-center justify-center rounded-[24px] border-2 border-dashed px-3 py-3 text-center"
                 style={{ borderColor: "rgba(214,184,108,0.6)", background: "rgba(255,248,232,0.45)" }}
               >
                 <div className="text-[11px] font-black uppercase tracking-[0.14em] text-[#a98b52]">
@@ -222,7 +222,7 @@ function BuildContent({
           })}
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="measurelands-option-bank grid grid-cols-2 gap-3 lg:grid-cols-4">
         {tray.map((item) => (
           <button
             key={item.id}
@@ -282,11 +282,11 @@ function PartOfDayScene({ task, onCorrect, onWrong }: { task: RoutineTask; onCor
   return (
     <Shell badge={task.badgeLabel ?? "When Does It Happen?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       {event ? (
-        <div className="mx-auto max-w-[260px]">
+        <div className="measurelands-routine-focus mx-auto max-w-[260px]">
           <RoutineCard item={event} highlight />
         </div>
       ) : null}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="measurelands-option-bank grid grid-cols-2 gap-3 sm:grid-cols-4">
         {options.map((value) => {
           const Icon = DAYPART_ICON[value];
           return (
@@ -313,7 +313,7 @@ function NextScene({ task, onCorrect, onWrong }: { task: RoutineTask; onCorrect:
   const options = task.buildItems ?? [];
   return (
     <Shell badge={task.badgeLabel ?? "What Happens Next?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      <div className="mx-auto flex max-w-[560px] flex-wrap items-center justify-center gap-2 rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[linear-gradient(180deg,rgba(255,252,245,0.98),rgba(252,244,225,0.98))] p-4 shadow-[0_18px_38px_rgba(180,120,20,0.08)]">
+      <div className="measurelands-routine-chain mx-auto flex max-w-[560px] flex-wrap items-center justify-center gap-2 rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[linear-gradient(180deg,rgba(255,252,245,0.98),rgba(252,244,225,0.98))] p-4 shadow-[0_18px_38px_rgba(180,120,20,0.08)]">
         {chain.map((item) => (
           <div key={item.id} className="flex items-center gap-2">
             <div className="w-[130px]"><RoutineCard item={item} compact /></div>
@@ -321,14 +321,14 @@ function NextScene({ task, onCorrect, onWrong }: { task: RoutineTask; onCorrect:
           </div>
         ))}
         <div
-          className="flex min-h-[132px] w-[130px] flex-col items-center justify-center gap-2 rounded-[24px] border-2 border-dashed px-3 py-3 text-center shadow-[0_0_22px_rgba(124,58,237,0.3)]"
+          className="measurelands-routine-slot flex min-h-[132px] w-[130px] flex-col items-center justify-center gap-2 rounded-[24px] border-2 border-dashed px-3 py-3 text-center shadow-[0_0_22px_rgba(124,58,237,0.3)]"
           style={{ borderColor: "rgba(124,58,237,0.7)", background: "rgba(124,58,237,0.1)" }}
         >
           <span className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-[rgba(124,58,237,0.5)] bg-white text-3xl font-black text-[#7c3aed]">?</span>
           <span className="text-xs font-black text-[#7c3aed]">Next</span>
         </div>
       </div>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="measurelands-option-bank grid grid-cols-1 gap-3 sm:grid-cols-3">
         {options.map((item) => (
           <button
             key={item.id}
@@ -337,7 +337,7 @@ function NextScene({ task, onCorrect, onWrong }: { task: RoutineTask; onCorrect:
             className="relative rounded-[24px] transition hover:-translate-y-0.5"
           >
             <span className="absolute right-3 top-3 z-10"><OptionReadAloudButton text={item.label} /></span>
-            <RoutineCard item={item} />
+            <RoutineCard item={item} compact />
           </button>
         ))}
       </div>

@@ -24,9 +24,9 @@ function Shell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-4">
+    <div className="measurelands-shell space-y-4">
       <div
-        className="rounded-[30px] border px-5 py-5 shadow-[0_14px_42px_rgba(76,29,149,0.1)]"
+        className="measurelands-prompt-card rounded-[30px] border px-5 py-5 shadow-[0_14px_42px_rgba(76,29,149,0.1)]"
         style={{
           borderColor: "rgba(214,184,108,0.38)",
           background: "linear-gradient(145deg, rgba(255,248,232,0.98) 0%, rgba(250,243,228,0.98) 52%, rgba(244,232,205,0.96) 100%)",
@@ -39,7 +39,7 @@ function Shell({
           {badge}
         </div>
         <div className="flex items-start gap-3">
-          <div className="flex-1 text-2xl font-black leading-tight text-[#2c1c07] sm:text-3xl">{prompt}</div>
+          <div className="measurelands-prompt-text flex-1 text-2xl font-black leading-tight text-[#2c1c07] sm:text-3xl">{prompt}</div>
           <ReadAloudBtn text={speakText ?? prompt} size="md" className="shrink-0" />
         </div>
       </div>

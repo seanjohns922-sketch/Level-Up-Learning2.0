@@ -210,3 +210,214 @@ body {
   60% { transform: translateX(-4px); }
   80% { transform: translateX(4px); }
 }
+
+/* Measurelands fullscreen compact mode.
+   Fullscreen should behave like one complete game screen, not a scrolling page. */
+.measurelands-task-frame {
+  --measurelands-shell-gap: 1rem;
+  --measurelands-prompt-padding-y: 1.25rem;
+  --measurelands-prompt-padding-x: 1.25rem;
+  --measurelands-prompt-font: clamp(1.5rem, 2.5vw, 1.875rem);
+  --measurelands-inner-padding: 1.25rem;
+  --measurelands-bank-gap: 0.75rem;
+  --measurelands-bank-padding: 0.75rem;
+  --measurelands-order-slot-height: 210px;
+  --measurelands-empty-slot-height: 200px;
+  --measurelands-sequence-slot-height: 220px;
+  --measurelands-visual-stage-height: 160px;
+  --measurelands-card-padding: 1rem;
+  --measurelands-routine-card-min: 132px;
+  --measurelands-clock-size: 300px;
+}
+
+.measurelands-shell > :not([hidden]) ~ :not([hidden]) {
+  margin-top: var(--measurelands-shell-gap) !important;
+}
+
+.measurelands-prompt-card {
+  padding: var(--measurelands-prompt-padding-y) var(--measurelands-prompt-padding-x) !important;
+}
+
+.measurelands-prompt-card .mb-3 {
+  margin-bottom: min(0.75rem, var(--measurelands-shell-gap)) !important;
+}
+
+.measurelands-prompt-text {
+  font-size: var(--measurelands-prompt-font) !important;
+  line-height: 1.08 !important;
+}
+
+.measurelands-option-bank {
+  gap: var(--measurelands-bank-gap) !important;
+  padding: var(--measurelands-bank-padding) !important;
+}
+
+.measurelands-compare-visual,
+.measurelands-capacity-fair-card,
+.measurelands-balance-scale {
+  padding: var(--measurelands-card-padding) !important;
+}
+
+.measurelands-visual-stage {
+  height: var(--measurelands-visual-stage-height) !important;
+}
+
+.measurelands-empty-slot {
+  height: var(--measurelands-empty-slot-height) !important;
+}
+
+.measurelands-sequence-slot {
+  height: var(--measurelands-sequence-slot-height) !important;
+}
+
+.measurelands-routine-card,
+.measurelands-routine-slot {
+  min-height: var(--measurelands-routine-card-min) !important;
+}
+
+.measurelands-clock-face-wrap svg {
+  height: auto !important;
+  max-height: var(--measurelands-clock-size) !important;
+  max-width: var(--measurelands-clock-size) !important;
+  width: min(100%, var(--measurelands-clock-size)) !important;
+}
+
+html:fullscreen .measurelands-task-frame {
+  --measurelands-shell-gap: 0.55rem;
+  --measurelands-prompt-padding-y: 0.75rem;
+  --measurelands-prompt-padding-x: 1rem;
+  --measurelands-prompt-font: clamp(1.25rem, 2.1vw, 1.75rem);
+  --measurelands-inner-padding: 0.85rem;
+  --measurelands-bank-gap: 0.55rem;
+  --measurelands-bank-padding: 0.55rem;
+  --measurelands-order-slot-height: 148px;
+  --measurelands-empty-slot-height: 136px;
+  --measurelands-sequence-slot-height: 150px;
+  --measurelands-visual-stage-height: 112px;
+  --measurelands-card-padding: 0.55rem;
+  --measurelands-routine-card-min: 96px;
+  --measurelands-clock-size: min(34vh, 260px);
+}
+
+html:fullscreen .measurelands-task-frame .rounded-\[30px\],
+html:fullscreen .measurelands-task-frame .rounded-\[28px\],
+html:fullscreen .measurelands-task-frame .rounded-\[26px\] {
+  border-radius: 20px !important;
+}
+
+html:fullscreen .measurelands-task-frame .p-5 {
+  padding: var(--measurelands-inner-padding) !important;
+}
+
+html:fullscreen .measurelands-task-frame .p-4 {
+  padding: 0.7rem !important;
+}
+
+html:fullscreen .measurelands-task-frame .gap-5,
+html:fullscreen .measurelands-task-frame .gap-4,
+html:fullscreen .measurelands-task-frame .gap-3 {
+  gap: var(--measurelands-bank-gap) !important;
+}
+
+html:fullscreen .measurelands-task-frame .mt-5,
+html:fullscreen .measurelands-task-frame .mt-4,
+html:fullscreen .measurelands-task-frame .mb-4 {
+  margin-top: 0.65rem !important;
+  margin-bottom: 0.65rem !important;
+}
+
+html:fullscreen .measurelands-task-frame .min-h-\[140px\],
+html:fullscreen .measurelands-task-frame .min-h-\[132px\],
+html:fullscreen .measurelands-task-frame .min-h-\[96px\],
+html:fullscreen .measurelands-task-frame .min-h-\[88px\],
+html:fullscreen .measurelands-task-frame .min-h-\[84px\],
+html:fullscreen .measurelands-task-frame .min-h-\[76px\],
+html:fullscreen .measurelands-task-frame .min-h-\[72px\] {
+  min-height: 64px !important;
+}
+
+html:fullscreen .measurelands-clock-step-preview {
+  display: none !important;
+}
+
+html:fullscreen .measurelands-clock-step {
+  grid-template-columns: 1fr !important;
+  padding: 0.65rem !important;
+}
+
+html:fullscreen .measurelands-path-compare-list,
+html:fullscreen .measurelands-path-difference-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+html:fullscreen .measurelands-month-build-grid,
+html:fullscreen .measurelands-week-month-grid {
+  align-items: start;
+}
+
+html:fullscreen .measurelands-month-grid {
+  gap: 0.45rem !important;
+}
+
+@media (max-height: 820px), (max-width: 900px) {
+  .measurelands-task-frame {
+    --measurelands-shell-gap: 0.6rem;
+    --measurelands-prompt-padding-y: 0.8rem;
+    --measurelands-prompt-padding-x: 1rem;
+    --measurelands-prompt-font: clamp(1.25rem, 4vw, 1.7rem);
+    --measurelands-inner-padding: 0.85rem;
+    --measurelands-bank-gap: 0.55rem;
+    --measurelands-bank-padding: 0.55rem;
+    --measurelands-order-slot-height: 150px;
+    --measurelands-empty-slot-height: 138px;
+    --measurelands-sequence-slot-height: 150px;
+    --measurelands-visual-stage-height: 112px;
+    --measurelands-card-padding: 0.6rem;
+    --measurelands-routine-card-min: 96px;
+    --measurelands-clock-size: min(32vh, 250px);
+  }
+
+  .measurelands-task-frame .rounded-\[30px\],
+  .measurelands-task-frame .rounded-\[28px\],
+  .measurelands-task-frame .rounded-\[26px\] {
+    border-radius: 20px !important;
+  }
+
+  .measurelands-task-frame .p-5 {
+    padding: var(--measurelands-inner-padding) !important;
+  }
+
+  .measurelands-task-frame .p-4 {
+    padding: 0.7rem !important;
+  }
+
+  .measurelands-task-frame .gap-5,
+  .measurelands-task-frame .gap-4,
+  .measurelands-task-frame .gap-3 {
+    gap: var(--measurelands-bank-gap) !important;
+  }
+
+  .measurelands-task-frame .min-h-\[140px\],
+  .measurelands-task-frame .min-h-\[132px\],
+  .measurelands-task-frame .min-h-\[96px\],
+  .measurelands-task-frame .min-h-\[88px\],
+  .measurelands-task-frame .min-h-\[84px\],
+  .measurelands-task-frame .min-h-\[76px\],
+  .measurelands-task-frame .min-h-\[72px\] {
+    min-height: 64px !important;
+  }
+
+  .measurelands-clock-step-preview {
+    display: none !important;
+  }
+
+  .measurelands-clock-step {
+    grid-template-columns: 1fr !important;
+    padding: 0.65rem !important;
+  }
+
+  .measurelands-path-compare-list,
+  .measurelands-path-difference-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useEffect, useRef } from "react";
+import { memo, useEffect, useRef, type ReactNode } from "react";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import MatchThePair from "@/components/MatchThePair";
 import CountObjects from "@/components/CountObjects";
@@ -141,6 +141,59 @@ function TaskRecoveryCard({
   );
 }
 
+function MeasurelandsTaskFrame({
+  taskKey,
+  taskKind,
+  children,
+}: {
+  taskKey: string;
+  taskKind: string;
+  children: ReactNode;
+}) {
+  const frameRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (process.env.NODE_ENV !== "development") return;
+
+    let animationFrame = 0;
+    const checkOverflow = () => {
+      window.cancelAnimationFrame(animationFrame);
+      animationFrame = window.requestAnimationFrame(() => {
+        const frame = frameRef.current;
+        if (!frame || !document.fullscreenElement) return;
+        const rect = frame.getBoundingClientRect();
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+        const overflows = rect.bottom > viewportHeight - 8 || frame.scrollHeight > frame.clientHeight + 8;
+        if (overflows) {
+          console.warn("[Measurelands fullscreen overflow]", {
+            taskKind,
+            taskKey,
+            rectBottom: Math.round(rect.bottom),
+            viewportHeight,
+            scrollHeight: frame.scrollHeight,
+            clientHeight: frame.clientHeight,
+          });
+        }
+      });
+    };
+
+    checkOverflow();
+    window.addEventListener("resize", checkOverflow);
+    document.addEventListener("fullscreenchange", checkOverflow);
+    return () => {
+      window.cancelAnimationFrame(animationFrame);
+      window.removeEventListener("resize", checkOverflow);
+      document.removeEventListener("fullscreenchange", checkOverflow);
+    };
+  }, [taskKey, taskKind]);
+
+  return (
+    <div ref={frameRef} className="measurelands-task-frame" data-measurelands-task-kind={taskKind}>
+      {children}
+    </div>
+  );
+}
+
 /**
  * Renders the active task component using a direct lookup instead of 60+ conditional branches.
  * Only the matched component is instantiated — zero wasted DOM nodes.
@@ -167,6 +220,12 @@ function TaskRendererInner({
   if (!isPracticeTaskSafe(task)) {
     return <TaskRecoveryCard onRecover={onW} />;
   }
+
+  const wrapMeasurelands = (children: ReactNode) => (
+    <MeasurelandsTaskFrame taskKey={k} taskKind={task.kind}>
+      {children}
+    </MeasurelandsTaskFrame>
+  );
 
   switch (task.kind) {
     case "matchPairs":
@@ -328,35 +387,35 @@ function TaskRendererInner({
     case "groundSpatial":
       return <GroundSpatialTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "measurementCompare":
-      return <MeasurelandsCompareTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return wrapMeasurelands(<MeasurelandsCompareTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "measurePath":
-      return <MeasurelandsPathTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return wrapMeasurelands(<MeasurelandsPathTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "measureValidity":
-      return <MeasurelandsValidityTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return wrapMeasurelands(<MeasurelandsValidityTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "massMeasure":
-      return <MeasurelandsMassMeasureCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return wrapMeasurelands(<MeasurelandsMassMeasureCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "capacityMeasure":
-      return <MeasurelandsCapacityMeasureCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return wrapMeasurelands(<MeasurelandsCapacityMeasureCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "durationUnit":
-      return <MeasurelandsDurationUnitCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return wrapMeasurelands(<MeasurelandsDurationUnitCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "weekCycle":
-      return <MeasurelandsWeekCycleCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return wrapMeasurelands(<MeasurelandsWeekCycleCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "calendarFind":
-      return <MeasurelandsCalendarFindCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return wrapMeasurelands(<MeasurelandsCalendarFindCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "calendarNavigate":
-      return <MeasurelandsCalendarNavigateCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return wrapMeasurelands(<MeasurelandsCalendarNavigateCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "calendarEvent":
-      return <MeasurelandsCalendarEventCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return wrapMeasurelands(<MeasurelandsCalendarEventCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "toolChoice":
-      return <MeasurelandsToolChoiceCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return wrapMeasurelands(<MeasurelandsToolChoiceCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "timeSequence":
-      return <MeasurelandsTimeSequenceCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return wrapMeasurelands(<MeasurelandsTimeSequenceCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "routineSequence":
-      return <MeasurelandsRoutineSequenceCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return wrapMeasurelands(<MeasurelandsRoutineSequenceCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "balanceScale":
-      return <MeasurelandsBalanceScaleCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return wrapMeasurelands(<MeasurelandsBalanceScaleCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "analogClock":
-      return <MeasurelandsAnalogClockCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return wrapMeasurelands(<MeasurelandsAnalogClockCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "groundCollect":
       return <GroundCollectTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundBuild":

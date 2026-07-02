@@ -104,9 +104,9 @@ export function PathShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-4">
+    <div className="measurelands-shell space-y-4">
       <div
-        className="rounded-[30px] border px-5 py-5 shadow-[0_14px_42px_rgba(76,29,149,0.1)]"
+        className="measurelands-prompt-card rounded-[30px] border px-5 py-5 shadow-[0_14px_42px_rgba(76,29,149,0.1)]"
         style={{
           borderColor: "rgba(214,184,108,0.38)",
           background:
@@ -120,7 +120,7 @@ export function PathShell({
           {badge}
         </div>
         <div className="flex items-start gap-3">
-          <div className="flex-1 text-2xl font-black leading-tight text-[#2c1c07] sm:text-3xl">{prompt}</div>
+          <div className="measurelands-prompt-text flex-1 text-2xl font-black leading-tight text-[#2c1c07] sm:text-3xl">{prompt}</div>
           <ReadAloudBtn text={speakText ?? prompt} size="md" className="shrink-0" />
         </div>
       </div>
@@ -441,7 +441,7 @@ function CompareScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onC
   const paths = task.paths ?? [];
   return (
     <PathShell badge={task.badgeLabel ?? "Which Is Longer?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      <div className="grid gap-4">
+      <div className="measurelands-path-compare-list grid gap-4">
         {paths.map((path, idx) => (
           <button
             key={path.id}
@@ -495,7 +495,7 @@ function OrderScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCor
 
   return (
     <PathShell badge={task.badgeLabel ?? "Order the Measurements"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      <div className="mb-4 flex min-h-[56px] flex-wrap items-center justify-center gap-2 rounded-[22px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,248,232,0.75)] px-4 py-3">
+      <div className="measurelands-selected-strip mb-4 flex min-h-[56px] flex-wrap items-center justify-center gap-2 rounded-[22px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,248,232,0.75)] px-4 py-3">
         {selectedIds.length === 0 ? (
           <span className="text-sm font-bold text-[#a98b52]">Tap the cards from shortest to longest.</span>
         ) : (
@@ -515,7 +515,7 @@ function OrderScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCor
           })
         )}
       </div>
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="measurelands-option-bank grid gap-4 md:grid-cols-3">
         {paths.map((path) => {
           const step = selectedIds.indexOf(path.id);
           const chosen = step >= 0;
@@ -558,14 +558,14 @@ function SameScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorr
   const paths = task.paths ?? [];
   return (
     <PathShell badge={task.badgeLabel ?? "Find the Same Length"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">
+      <div className="measurelands-path-target rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">
         {task.objectImageSrc ? (
           <MeasuredObject imageSrc={task.objectImageSrc} label={task.objectLabel} length={task.pathLength ?? 0} />
         ) : null}
         <UnitsDisplay length={task.pathLength ?? 0} unitLabel={task.unitLabel} unitEmoji={task.unitEmoji} />
         <MeasurementText length={task.pathLength ?? 0} unitLabel={task.unitLabel} />
       </div>
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="measurelands-option-bank grid gap-4 md:grid-cols-3">
         {paths.map((path) => (
           <button
             key={path.id}
@@ -687,7 +687,7 @@ function DifferenceScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; 
   const paths = task.paths ?? [];
   return (
     <PathShell badge={task.badgeLabel ?? "How Many More?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      <div className="grid gap-3">
+      <div className="measurelands-path-difference-list grid gap-3">
         {paths.map((path, idx) => (
           <div key={path.id} className="rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-3">
             <div className="mb-1 px-1 text-xs font-black uppercase tracking-[0.16em] text-[#7c3aed]">
@@ -699,7 +699,7 @@ function DifferenceScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; 
           </div>
         ))}
       </div>
-      <div className="grid grid-cols-3 gap-3">
+      <div className="measurelands-number-options grid grid-cols-3 gap-3">
         {(task.options ?? []).map((value) => (
           <button
             key={value}

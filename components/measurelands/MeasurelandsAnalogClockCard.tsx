@@ -181,9 +181,9 @@ function Shell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-4">
+    <div className="measurelands-shell space-y-4">
       <div
-        className="rounded-[30px] border px-5 py-5 shadow-[0_14px_42px_rgba(76,29,149,0.1)]"
+        className="measurelands-prompt-card rounded-[30px] border px-5 py-5 shadow-[0_14px_42px_rgba(76,29,149,0.1)]"
         style={{
           borderColor: "rgba(214,184,108,0.38)",
           background: "linear-gradient(145deg, rgba(255,248,232,0.98) 0%, rgba(250,243,228,0.98) 52%, rgba(244,232,205,0.96) 100%)",
@@ -196,7 +196,7 @@ function Shell({
           {task.badgeLabel ?? "Clockwork Crossing"}
         </div>
         <div className="flex items-start gap-3">
-          <div className="flex-1 text-2xl font-black leading-tight text-[#2c1c07] sm:text-3xl">{task.prompt}</div>
+          <div className="measurelands-prompt-text flex-1 text-2xl font-black leading-tight text-[#2c1c07] sm:text-3xl">{task.prompt}</div>
           <ReadAloudBtn text={task.speakText ?? task.prompt} size="md" className="shrink-0" />
         </div>
       </div>
@@ -209,19 +209,19 @@ function IntroScene({ task, onCorrect }: { task: AnalogClockTask; onCorrect: () 
   const steps = task.teachingSteps;
   return (
     <Shell task={task}>
-      <div className="grid gap-5 rounded-[30px] border border-[rgba(214,184,108,0.36)] bg-[rgba(255,248,232,0.98)] p-5 shadow-[0_18px_38px_rgba(180,120,20,0.08)] md:grid-cols-[340px_1fr]">
-        <div className="flex justify-center">
+      <div className="measurelands-clock-intro grid gap-5 rounded-[30px] border border-[rgba(214,184,108,0.36)] bg-[rgba(255,248,232,0.98)] p-5 shadow-[0_18px_38px_rgba(180,120,20,0.08)] md:grid-cols-[340px_1fr]">
+        <div className="measurelands-clock-face-wrap flex justify-center">
           <ClockFace hour={task.targetHour} minute={task.targetMinute} />
         </div>
-        <div className="flex flex-col justify-center gap-4">
+        <div className="measurelands-clock-steps flex flex-col justify-center gap-4">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[linear-gradient(135deg,#6d28d9,#4c1d95)] text-white shadow-[0_10px_24px_rgba(109,40,217,0.24)]">
             <Clock3 className="h-8 w-8" />
           </div>
           {steps?.length ? (
             <div className="grid gap-3">
               {steps.map((step, index) => (
-                <div key={step.label} className="grid items-center gap-3 rounded-[24px] border border-[rgba(214,184,108,0.28)] bg-white/75 p-3 sm:grid-cols-[118px_1fr]">
-                  <div className="flex justify-center">
+                <div key={step.label} className="measurelands-clock-step grid items-center gap-3 rounded-[24px] border border-[rgba(214,184,108,0.28)] bg-white/75 p-3 sm:grid-cols-[118px_1fr]">
+                  <div className="measurelands-clock-step-preview flex justify-center">
                     <ClockFace hour={task.targetHour} minute={task.targetMinute} size={112} focus={step.focus} />
                   </div>
                   <div>
@@ -257,8 +257,8 @@ function IntroScene({ task, onCorrect }: { task: AnalogClockTask; onCorrect: () 
 function ReadScene({ task, onCorrect, onWrong }: { task: AnalogClockTask; onCorrect: () => void; onWrong: () => void }) {
   return (
     <Shell task={task}>
-      <div className="rounded-[30px] border border-[rgba(214,184,108,0.34)] bg-white/90 p-5">
-        <div className="flex justify-center">
+      <div className="measurelands-clock-read rounded-[30px] border border-[rgba(214,184,108,0.34)] bg-white/90 p-5">
+        <div className="measurelands-clock-face-wrap flex justify-center">
           <ClockFace hour={task.targetHour} minute={task.targetMinute} />
         </div>
         {task.showDigital ? (
@@ -267,7 +267,7 @@ function ReadScene({ task, onCorrect, onWrong }: { task: AnalogClockTask; onCorr
           </div>
         ) : null}
       </div>
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="measurelands-option-bank grid gap-3 sm:grid-cols-3">
         {(task.options ?? []).map((option) => (
           <button
             key={option.id}
@@ -299,8 +299,8 @@ function BuildScene({ task, onCorrect, onWrong }: { task: AnalogClockTask; onCor
 
   return (
     <Shell task={task}>
-      <div className="grid gap-5 rounded-[30px] border border-[rgba(214,184,108,0.34)] bg-white/90 p-5 lg:grid-cols-[360px_1fr]">
-        <div className="flex flex-col items-center justify-center">
+      <div className="measurelands-clock-build grid gap-5 rounded-[30px] border border-[rgba(214,184,108,0.34)] bg-white/90 p-5 lg:grid-cols-[360px_1fr]">
+        <div className="measurelands-clock-face-wrap flex flex-col items-center justify-center">
           <ClockFace hour={selectedHour} minute={selectedMinute} />
           <div className="mt-3 rounded-full bg-[rgba(91,33,182,0.08)] px-5 py-2 text-sm font-black uppercase tracking-[0.16em] text-[#5b21b6]">
             {timeLabel(selectedHour, selectedMinute)}

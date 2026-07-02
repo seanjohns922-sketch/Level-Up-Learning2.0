@@ -81,9 +81,9 @@ function MeasurementShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-4">
+    <div className="measurelands-shell space-y-4">
       <div
-        className="rounded-[30px] border px-5 py-5 shadow-[0_14px_42px_rgba(76,29,149,0.1)]"
+        className="measurelands-prompt-card rounded-[30px] border px-5 py-5 shadow-[0_14px_42px_rgba(76,29,149,0.1)]"
         style={{
           borderColor: "rgba(214,184,108,0.38)",
           background:
@@ -101,7 +101,7 @@ function MeasurementShell({
           {badge}
         </div>
         <div className="flex items-start gap-3">
-          <div className="flex-1 text-2xl font-black leading-tight text-[#2c1c07] sm:text-3xl">
+          <div className="measurelands-prompt-text flex-1 text-2xl font-black leading-tight text-[#2c1c07] sm:text-3xl">
             {prompt}
           </div>
           <ReadAloudBtn text={speakText ?? prompt} size="md" className="shrink-0" />
@@ -187,7 +187,7 @@ function CompareVisual({
       const gaugeWaterHeight = Math.round(capacityGaugeHeight * Math.max(0, Math.min(1, waterLevel)));
       return (
         <div
-          className="rounded-[26px] border px-4 py-4 text-center"
+          className="measurelands-compare-visual rounded-[26px] border px-4 py-4 text-center"
           style={{
             borderColor: accent.border,
             background: "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,248,232,0.96))",
@@ -197,7 +197,7 @@ function CompareVisual({
           <div className="mb-3 text-sm font-black uppercase tracking-[0.14em] text-[#5f4725]">
             {item.label}
           </div>
-          <div className="flex h-[160px] items-end justify-center">
+          <div className="measurelands-visual-stage flex h-[160px] items-end justify-center">
             <div
               className="relative flex items-end justify-center overflow-hidden rounded-[24px] border-[3px] border-[#ead6a8] bg-[#fffaf0] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]"
               style={{
@@ -236,7 +236,7 @@ function CompareVisual({
     // Compare (A) / order (B) / sequence / intro: ONLY the flat container image.
     return (
       <div
-        className="rounded-[26px] border px-4 py-4 text-center"
+        className="measurelands-compare-visual rounded-[26px] border px-4 py-4 text-center"
         style={{
           borderColor: accent.border,
           background: "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,248,232,0.96))",
@@ -244,7 +244,7 @@ function CompareVisual({
         }}
       >
         <div className="mb-3 text-sm font-black uppercase tracking-[0.14em] text-[#5f4725]">{item.label}</div>
-        <div className="flex h-[160px] items-end justify-center">
+        <div className="measurelands-visual-stage flex h-[160px] items-end justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={item.imageSrc}
@@ -311,7 +311,7 @@ function CompareVisual({
 
   return (
     <div
-      className="rounded-[26px] border px-4 py-4 text-center"
+      className="measurelands-compare-visual rounded-[26px] border px-4 py-4 text-center"
       style={{
         borderColor: accent.border,
         background: "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,248,232,0.96))",
@@ -321,7 +321,7 @@ function CompareVisual({
       {axis === "mass" ? (
         // For mass, use the bar and pan position as a gentle clue:
         // heavier objects get a longer weight bar and sit slightly lower.
-        <div className="flex h-[160px] flex-col items-center justify-end">
+        <div className="measurelands-visual-stage flex h-[160px] flex-col items-center justify-end">
           <div
             className={compact ? "text-6xl" : "text-7xl sm:text-8xl"}
             style={{ transform: `translateY(${massPanDrop}px)` }}
@@ -363,7 +363,7 @@ function CompareVisual({
           <div className="mb-3 text-sm font-black uppercase tracking-[0.14em] text-[#5f4725]">
             {item.label}
           </div>
-          <div className="flex h-[160px] items-end justify-center">
+          <div className="measurelands-visual-stage flex h-[160px] items-end justify-center">
             <div
               className="relative flex items-end justify-center overflow-hidden rounded-[24px] border-[3px] border-[#ead6a8] bg-[#fffaf0] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]"
               style={{
@@ -413,7 +413,7 @@ function CompareVisual({
               />
             </div>
           ) : (
-            <div className="flex h-[160px] items-end justify-center">
+            <div className="measurelands-visual-stage flex h-[160px] items-end justify-center">
               <div className="relative flex h-[150px] w-20 items-end justify-center rounded-[22px] border border-[#ead6a8] bg-[#fffaf0] pb-2">
                 <div
                   className="rounded-t-[20px] rounded-b-[10px]"
@@ -680,7 +680,7 @@ function OrderScene({
     >
       {/* Ordered slots */}
       <div
-        className={`grid gap-3 ${slotCount === 4 ? "md:grid-cols-4" : "md:grid-cols-3"} ${shake ? "animate-[shake_0.4s_ease-in-out]" : ""}`}
+        className={`measurelands-order-slots grid gap-3 ${slotCount === 4 ? "md:grid-cols-4" : "md:grid-cols-3"} ${shake ? "animate-[shake_0.4s_ease-in-out]" : ""}`}
       >
         {Array.from({ length: slotCount }).map((_, index) => {
           const id = placed[index];
@@ -695,7 +695,7 @@ function OrderScene({
               <button
                 type="button"
                 onClick={() => id && removeFromSlot(index)}
-                className="w-full rounded-[26px] border-2 border-dashed p-1 transition"
+                className="measurelands-order-slot w-full rounded-[26px] border-2 border-dashed p-1 transition"
                 style={{
                   borderColor:
                     slotState === "right"
@@ -704,13 +704,13 @@ function OrderScene({
                       ? "rgba(244,63,94,0.8)"
                       : "rgba(167,139,250,0.5)",
                   background: id ? "transparent" : "rgba(167,139,250,0.06)",
-                  minHeight: 210,
+                  minHeight: "var(--measurelands-order-slot-height, 210px)",
                 }}
               >
                 {item ? (
-                  <CompareVisual item={item} showWater={isFill} />
+                  <CompareVisual item={item} compact showWater={isFill} />
                 ) : (
-                  <div className="flex h-[200px] items-center justify-center text-5xl text-[#c4b5fd]">
+                  <div className="measurelands-empty-slot flex h-[200px] items-center justify-center text-5xl text-[#c4b5fd]">
                     {index + 1}
                   </div>
                 )}
@@ -721,7 +721,7 @@ function OrderScene({
       </div>
 
       {/* Object bank */}
-      <div className="mt-4 rounded-[26px] border border-[rgba(214,184,108,0.34)] bg-[rgba(255,252,245,0.92)] p-3">
+      <div className="measurelands-option-bank mt-4 rounded-[26px] border border-[rgba(214,184,108,0.34)] bg-[rgba(255,252,245,0.92)] p-3">
         <div className="mb-2 text-center text-[11px] font-black uppercase tracking-[0.16em] text-[#5f4725]">
           {bank.length > 0 ? "Tap an object to place it" : allCorrect ? "Perfect order!" : "Tap a slot to undo"}
         </div>
@@ -734,7 +734,7 @@ function OrderScene({
                 disabled={locked}
                 className="w-full rounded-[28px] border border-transparent transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)] disabled:opacity-50"
               >
-                <CompareVisual item={item} showWater={isFill} />
+                <CompareVisual item={item} compact showWater={isFill} />
               </button>
               <OptionReadAloudButton text={item.label} className="absolute right-3 top-3 z-10" />
             </div>
@@ -780,7 +780,7 @@ function SequenceScene({
             <CompareVisual key={item.id} item={item} compact showWater={isFill} />
           ))}
           <div
-            className="flex h-[220px] items-center justify-center rounded-[26px] border-2 border-dashed text-6xl font-black text-[#c4b5fd]"
+            className="measurelands-sequence-slot flex h-[220px] items-center justify-center rounded-[26px] border-2 border-dashed text-6xl font-black text-[#c4b5fd]"
             style={{ borderColor: "rgba(167,139,250,0.5)", background: "rgba(167,139,250,0.06)" }}
           >
             ?
@@ -789,7 +789,7 @@ function SequenceScene({
       </div>
 
       {/* Options */}
-      <div className="mt-4 grid gap-4 md:grid-cols-3">
+      <div className="measurelands-option-bank mt-4 grid gap-4 md:grid-cols-3">
         {task.objects.map((item) => (
           <div key={item.id} className="relative">
             <button
@@ -797,7 +797,7 @@ function SequenceScene({
               onClick={() => (item.id === task.correctOptionId ? onCorrect() : onWrong())}
               className="w-full rounded-[28px] border border-transparent transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
             >
-              <CompareVisual item={item} showWater={isFill} />
+              <CompareVisual item={item} compact showWater={isFill} />
             </button>
             <OptionReadAloudButton text={item.label} className="absolute right-3 top-3 z-10" />
           </div>
