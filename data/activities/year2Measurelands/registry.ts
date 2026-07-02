@@ -104,6 +104,11 @@ import {
   resetY2MeasurelandsWeek7Lesson3TaskSessionState,
   buildY2MeasurelandsWeek7Lesson3QuizTasks,
 } from "@/data/activities/year2Measurelands/week7Lesson3";
+import {
+  generateY2MeasurelandsWeek8Lesson1Task,
+  resetY2MeasurelandsWeek8Lesson1TaskSessionState,
+  buildY2MeasurelandsWeek8Lesson1QuizTasks,
+} from "@/data/activities/year2Measurelands/week8Lesson1";
 
 // Level 2 (Year 2) Measurelands lesson registry. Mirrors the Level 1 registry so
 // app/lesson/page.tsx can resolve `y2-measurement-w{n}-l{m}` ids to tasks.
@@ -519,6 +524,25 @@ const Y2_MEASURELANDS_LESSONS: Y2MeasurelandsLessonEntry[] = [
     completionTitle: "Calendar Detective Complete!",
     unlockMessage: "Week complete.",
     returnRoute: "/program?year=Year 2&week=7&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y2-measurement-w8-l1",
+    week: 8,
+    lessonNumber: 1,
+    title: "Measurement Mission",
+    subtitle: "Master Measurer's Quest",
+    generate: generateY2MeasurelandsWeek8Lesson1Task,
+    reset: resetY2MeasurelandsWeek8Lesson1TaskSessionState,
+    quizContributionBuilder: buildY2MeasurelandsWeek8Lesson1QuizTasks,
+    practisedSkills: [
+      "Choosing the measurement skill for a situation",
+      "Choosing the best measuring strategy",
+      "Applying mixed length, mass, capacity, clock and calendar skills",
+      "Explaining measurement reasoning",
+    ],
+    completionTitle: "Master Measurer Mission Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+    returnRoute: "/program?year=Year 2&week=8&legacy=1&realm_id=measurement",
   },
 ];
 

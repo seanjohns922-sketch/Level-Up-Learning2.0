@@ -110,10 +110,10 @@ const YEAR2_MEASURELANDS_RAW: WeekPlan[] = [
   {
     id: "y2-measurement-w8",
     week: 8,
-    topic: "Measurement Challenge",
+    topic: "Master Measurer's Quest",
     curriculum: ["AC9M2M01", "AC9M2M02", "AC9M2M03"],
     lessons: [
-      buildLesson(8, 1, "Which Attribute?", "Challenge: choose the right attribute (length, mass, capacity, time, calendar) for a task.", ["Which attribute", "Choose the skill", "Length mass capacity time"], ["AC9M2M01", "AC9M2M02", "AC9M2M03"]),
+      buildLesson(8, 1, "Measurement Mission", "Capstone mission: choose the right measurement skill, pick the best strategy, and solve mixed mini challenges.", ["Choose the skill", "Best strategy", "Mixed measurement mission"], ["AC9M2M01", "AC9M2M02", "AC9M2M03"]),
       buildLesson(8, 2, "Which Unit?", "Challenge: pick the right unit for the job, and when to go smaller.", ["Which unit", "Right unit", "When to go smaller"], ["AC9M2M01"]),
       buildLesson(8, 3, "Mixed Measurement Problems", "Challenge: solve real-world problems spanning all measurement strands.", ["Mixed problems", "Real-world measurement", "All strands"], ["AC9M2M01", "AC9M2M02", "AC9M2M03"]),
     ],
