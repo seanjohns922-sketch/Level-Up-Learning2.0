@@ -1,7 +1,7 @@
 "use client";
 
 import { Compass, ArrowRight, ArrowDown, ArrowUp } from "lucide-react";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
@@ -308,30 +308,58 @@ function ExploreScene({ task, onCorrect, onWrong }: { task: NavTask; onCorrect: 
 
 /* ── W7 L1‑B: count the days BETWEEN two dates. Tap each day from the start+1 to
  * the finish — you count the JUMPS, not the start date (exclusive). ── */
-function BetweenScene({ task, onCorrect }: { task: NavTask; onCorrect: () => void }) {
+function BetweenScene({ task, onCorrect, onWrong }: { task: NavTask; onCorrect: () => void; onWrong: () => void }) {
   const from = task.fromDate ?? 1;
   const to = task.toDate ?? from + 1;
   const answer = Math.max(0, to - from);
   const path = Array.from({ length: answer }, (_, i) => from + 1 + i);
   const [tapped, setTapped] = useState<number[]>([]);
-  const wonRef = useRef(false);
+  const [response, setResponse] = useState("");
   const done = tapped.length >= answer;
   function tap(date: number) {
-    if (wonRef.current || !path.includes(date) || tapped.includes(date)) return;
-    const next = [...tapped, date];
-    setTapped(next);
-    if (next.length >= answer && !wonRef.current) {
-      wonRef.current = true;
-      window.setTimeout(onCorrect, 1300);
-    }
+    if (!path.includes(date) || tapped.includes(date)) return;
+    const nextExpected = path[tapped.length];
+    if (date !== nextExpected) return;
+    setTapped([...tapped, date]);
+  }
+  function submitAnswer() {
+    const value = Number(response);
+    if (Number.isNaN(value)) return;
+    if (value === answer) onCorrect();
+    else onWrong();
   }
   return (
     <Shell badge={task.badgeLabel ?? "Count the Days Between"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="mx-auto max-w-[480px] rounded-full border border-[rgba(214,184,108,0.5)] bg-[rgba(255,252,245,0.95)] px-4 py-2 text-center text-base font-black text-[#7c4a12]">
-        {done ? `${answer} days between the ${from} and the ${to}!` : `Days counted: ${tapped.length}`}
+        {done ? "Now type how many days you counted." : `Days counted: ${tapped.length}`}
       </div>
       <CalendarGrid days={task.days} startWeekday={task.startWeekday} monthLabel={task.monthLabel} start={from} endDate={to} pathDates={path} tappedOrder={tapped} onTapDate={tap} />
       <div className="text-center text-sm font-bold text-[#5f4725]">Start on the {from}. Tap each day after it, up to the {to} — count the jumps.</div>
+      <div className="mx-auto flex max-w-[520px] items-center justify-center gap-3 rounded-[24px] border border-[rgba(214,184,108,0.45)] bg-[#fffaf0] p-3">
+        <label className="text-sm font-black uppercase tracking-[0.12em] text-[#7c4a12]" htmlFor="days-between-answer">
+          Days
+        </label>
+        <input
+          id="days-between-answer"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          value={response}
+          onChange={(event) => setResponse(event.target.value.replace(/\D/g, ""))}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") submitAnswer();
+          }}
+          placeholder="Type days"
+          className="h-12 w-32 rounded-[16px] border-2 border-[rgba(214,184,108,0.65)] bg-white text-center text-2xl font-black text-[#2c1c07] outline-none focus:border-[#7c3aed]"
+        />
+        <button
+          type="button"
+          onClick={submitAnswer}
+          disabled={!response}
+          className="h-12 rounded-full bg-[#7c3aed] px-5 text-sm font-black uppercase tracking-[0.12em] text-white shadow-[0_10px_20px_rgba(124,58,237,0.22)] transition enabled:hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-45"
+        >
+          Check
+        </button>
+      </div>
     </Shell>
   );
 }
@@ -658,7 +686,7 @@ export function MeasurelandsCalendarNavigateCard({
 }) {
   if (task.scene === "intro") return <IntroScene task={task} onCorrect={onCorrect} />;
   if (task.scene === "explore") return <ExploreScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
-  if (task.scene === "between") return <BetweenScene task={task} onCorrect={onCorrect} />;
+  if (task.scene === "between") return <BetweenScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "whichCount") return <WhichCountScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "until") return <UntilScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "eventCompare" || task.scene === "eventPlan") return <EventChoiceScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
