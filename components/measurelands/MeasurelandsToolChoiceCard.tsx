@@ -365,6 +365,23 @@ function EstimateRevealScene({ task, onCorrect }: { task: ToolTask; onCorrect: (
           </div>
         ))}
       </div>
+      {revealed ? (
+        <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">
+          <div className="mb-3 text-center text-sm font-bold text-[#5f4725]">
+            Same {task.object?.label?.toLowerCase() ?? "object"} — different-sized units, so the count changes but the length stays the same:
+          </div>
+          <div className="flex flex-col items-center gap-3">
+            {rows.map((row) => (
+              <div key={row.id} className="w-full">
+                <div className="mb-1 text-center text-xs font-black uppercase tracking-[0.12em] text-[#7c4a12]">{row.count} {row.unitLabel}</div>
+                <div className="flex justify-center">
+                  <UnitStrip count={row.count} label={row.unitLabel} iconKey={row.unitIconKey} imageSrc={row.unitImageSrc} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
       {!revealed ? (
         <button type="button" onClick={() => setRevealed(true)} className="w-full rounded-[22px] bg-[#7c3aed] px-4 py-4 font-black uppercase tracking-[0.12em] text-white shadow-[0_12px_24px_rgba(124,58,237,0.22)]">Reveal the actual counts →</button>
       ) : (
