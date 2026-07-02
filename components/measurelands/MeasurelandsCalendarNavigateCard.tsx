@@ -9,6 +9,20 @@ import type { PracticeTask } from "@/data/activities/year1/practice-task";
 type NavTask = Extract<PracticeTask, { kind: "calendarNavigate" }>;
 
 const WEEKDAYS = ["M", "T", "W", "T", "F", "S", "S"];
+const EVENT_ICON: Record<string, string> = {
+  birthday: "🎂",
+  library: "📚",
+  swimming: "🏊",
+  sport: "⚽",
+  excursion: "🚌",
+  assembly: "🎤",
+  music: "🎵",
+  holiday: "⭐",
+  grandparent: "👵",
+  disco: "🎉",
+  soccer: "⚽",
+  bookfair: "📖",
+};
 
 /* ── Gold/violet Meazurex shell (matches the Find-the-Date card) ── */
 function Shell({
@@ -56,6 +70,7 @@ function CalendarGrid({
   endDate,
   pathDates,
   tappedOrder,
+  events,
   onTapDate,
 }: {
   days: number;
@@ -69,6 +84,8 @@ function CalendarGrid({
   pathDates?: number[];
   /** W7 "between": path dates already tapped, in order (shows the count badge). */
   tappedOrder?: number[];
+  /** Familiar events shown on the calendar. */
+  events?: Array<{ date: number; label: string; icon: string }>;
   onTapDate?: (date: number) => void;
 }) {
   const cells: Array<number | null> = [
@@ -76,6 +93,7 @@ function CalendarGrid({
     ...Array.from({ length: days }, (_, i) => i + 1),
   ];
   const pathSet = new Set(pathDates ?? []);
+  const eventByDate = new Map((events ?? []).map((event) => [event.date, event]));
   return (
     <div className="mx-auto max-w-[480px] rounded-[28px] border border-[rgba(214,184,108,0.4)] bg-[linear-gradient(180deg,rgba(255,252,245,0.98),rgba(252,244,225,0.98))] p-4 shadow-[0_18px_38px_rgba(180,120,20,0.08)]">
       <div className="mb-3 rounded-[18px] bg-[rgba(109,40,217,0.1)] px-4 py-2 text-center text-sm font-black uppercase tracking-[0.18em] text-[#5b21b6]">
@@ -92,6 +110,7 @@ function CalendarGrid({
           const isStart = start === date;
           const isEnd = endDate === date;
           const inPath = pathSet.has(date);
+          const event = eventByDate.get(date);
           const order = tappedOrder ? tappedOrder.indexOf(date) : -1;
           const isTapped = order >= 0;
           // If pathDates is given we're in "count the jumps" mode: only path
@@ -131,6 +150,15 @@ function CalendarGrid({
               }}
             >
               {date}
+              {event ? (
+                <span
+                  className="absolute -top-2 left-1/2 flex h-6 min-w-6 -translate-x-1/2 items-center justify-center rounded-full bg-white px-1 text-sm shadow-[0_4px_10px_rgba(76,29,149,0.16)]"
+                  aria-label={event.label}
+                  title={event.label}
+                >
+                  {EVENT_ICON[event.icon] ?? event.icon}
+                </span>
+              ) : null}
               {isStart ? (
                 <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-[#b4781e] px-2 py-0.5 text-[9px] font-black uppercase tracking-wide text-[#fff8e1] shadow">start</span>
               ) : null}
@@ -171,6 +199,9 @@ function NumberPath({ from, direction }: { from: number; direction: "next" | "be
 
 /* ── Intro / teaching ── */
 function IntroScene({ task, onCorrect }: { task: NavTask; onCorrect: () => void }) {
+  const from = task.fromDate ?? 10;
+  const to = task.toDate;
+  const path = to ? Array.from({ length: Math.max(0, to - from) }, (_, i) => from + 1 + i) : undefined;
   return (
     <Shell badge={task.badgeLabel ?? "Meazurex Mission"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="rounded-[30px] border border-[rgba(214,184,108,0.36)] bg-[rgba(255,248,232,0.98)] p-5 shadow-[0_18px_38px_rgba(180,120,20,0.08)]">
@@ -180,26 +211,42 @@ function IntroScene({ task, onCorrect }: { task: NavTask; onCorrect: () => void 
           </div>
           <div className="space-y-2">
             <div className="text-sm font-black uppercase tracking-[0.16em] text-[#5b21b6]">Meazurex</div>
-            <p className="text-base font-semibold leading-relaxed text-[#2c1c07]">Dates move in order. We can step forward and back.</p>
-            <p className="text-base font-semibold leading-relaxed text-[#5f4725]">If today is the 10th, the next date is 11.</p>
+            <p className="text-base font-semibold leading-relaxed text-[#2c1c07]">
+              {task.events?.length ? "Start at today. Count forward to the event." : "Dates move in order. We can step forward and back."}
+            </p>
+            <p className="text-base font-semibold leading-relaxed text-[#5f4725]">
+              {task.events?.length ? "Do not count today as day one." : "If today is the 10th, the next date is 11."}
+            </p>
           </div>
         </div>
-        <div className="flex items-center justify-center gap-3 rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-5">
-          {[9, 10, 11].map((n, i) => (
-            <div key={n} className="flex items-center gap-3">
-              <div
-                className="flex h-16 w-16 items-center justify-center rounded-[18px] border-2 text-3xl font-black text-[#2c1c07]"
-                style={{
-                  borderColor: n === 10 ? "rgba(180,120,20,0.85)" : "rgba(214,184,108,0.5)",
-                  background: n === 10 ? "rgba(214,184,108,0.34)" : "rgba(255,255,255,0.9)",
-                }}
-              >
-                {n}
+        {task.events?.length ? (
+          <CalendarGrid
+            days={task.days}
+            startWeekday={task.startWeekday}
+            monthLabel={task.monthLabel}
+            start={from}
+            endDate={to}
+            pathDates={path}
+            events={task.events}
+          />
+        ) : (
+          <div className="flex items-center justify-center gap-3 rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-5">
+            {[9, 10, 11].map((n, i) => (
+              <div key={n} className="flex items-center gap-3">
+                <div
+                  className="flex h-16 w-16 items-center justify-center rounded-[18px] border-2 text-3xl font-black text-[#2c1c07]"
+                  style={{
+                    borderColor: n === 10 ? "rgba(180,120,20,0.85)" : "rgba(214,184,108,0.5)",
+                    background: n === 10 ? "rgba(214,184,108,0.34)" : "rgba(255,255,255,0.9)",
+                  }}
+                >
+                  {n}
+                </div>
+                {i < 2 ? <ArrowRight className="h-7 w-7 text-[#b4781e]" strokeWidth={3} /> : null}
               </div>
-              {i < 2 ? <ArrowRight className="h-7 w-7 text-[#b4781e]" strokeWidth={3} /> : null}
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
         <div className="mt-5 flex justify-center">
           <button
             type="button"
@@ -310,6 +357,107 @@ function WhichCountScene({ task, onCorrect, onWrong }: { task: NavTask; onCorrec
             {value} days
           </button>
         ))}
+      </div>
+    </Shell>
+  );
+}
+
+/* ── W7 L2-A: count forward from today until a familiar event. Count the days
+ * after today; do not count today as day 1. ── */
+function UntilScene({ task, onCorrect }: { task: NavTask; onCorrect: () => void }) {
+  const from = task.fromDate ?? 1;
+  const to = task.toDate ?? from + 1;
+  const answer = Math.max(0, to - from);
+  const path = Array.from({ length: answer }, (_, i) => from + 1 + i);
+  const event = (task.events ?? []).find((item) => item.label === task.askEventLabel) ?? task.events?.[0];
+  const [tapped, setTapped] = useState<number[]>([]);
+  const wonRef = useRef(false);
+  const done = tapped.length >= answer;
+  function tap(date: number) {
+    if (wonRef.current || !path.includes(date) || tapped.includes(date)) return;
+    const nextExpected = path[tapped.length];
+    if (date !== nextExpected) return;
+    const next = [...tapped, date];
+    setTapped(next);
+    if (next.length >= answer && !wonRef.current) {
+      wonRef.current = true;
+      window.setTimeout(onCorrect, 1200);
+    }
+  }
+  return (
+    <Shell badge={task.badgeLabel ?? "Count the Days Until"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="mx-auto max-w-[520px] rounded-full border border-[rgba(214,184,108,0.5)] bg-[rgba(255,252,245,0.95)] px-4 py-2 text-center text-base font-black text-[#7c4a12]">
+        {done ? `${answer} days until ${event?.label ?? "the event"}!` : `Start at today. Days counted: ${tapped.length}`}
+      </div>
+      <CalendarGrid
+        days={task.days}
+        startWeekday={task.startWeekday}
+        monthLabel={task.monthLabel}
+        start={from}
+        endDate={to}
+        pathDates={path}
+        tappedOrder={tapped}
+        events={task.events}
+        onTapDate={tap}
+      />
+      <div className="text-center text-sm font-bold text-[#5f4725]">
+        Do not count today. Tap the next date first, then count forward to the event.
+      </div>
+    </Shell>
+  );
+}
+
+function EventOptionButton({
+  label,
+  icon,
+  onClick,
+}: {
+  label: string;
+  icon?: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="relative flex min-h-[76px] items-center justify-center gap-3 rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-3 text-center text-lg font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+    >
+      <span className="absolute right-2 top-2 z-10"><OptionReadAloudButton text={label} /></span>
+      {icon ? <span className="text-2xl leading-none" aria-hidden>{EVENT_ICON[icon] ?? icon}</span> : null}
+      <span>{label}</span>
+    </button>
+  );
+}
+
+/* ── W7 L2-B/C: compare event dates and choose the event matching a calendar
+ * clue (next, furthest away, or exact days until). ── */
+function EventChoiceScene({ task, onCorrect, onWrong }: { task: NavTask; onCorrect: () => void; onWrong: () => void }) {
+  const from = task.fromDate ?? 1;
+  const selected = (task.events ?? []).find((event) => event.label === task.correctTextOption);
+  const path = selected ? Array.from({ length: Math.max(0, selected.date - from) }, (_, i) => from + 1 + i) : undefined;
+  return (
+    <Shell badge={task.badgeLabel ?? "Plan My Week"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <CalendarGrid
+        days={task.days}
+        startWeekday={task.startWeekday}
+        monthLabel={task.monthLabel}
+        start={from}
+        endDate={selected?.date}
+        pathDates={path}
+        events={task.events}
+      />
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        {(task.textOptions ?? []).map((label) => {
+          const event = (task.events ?? []).find((item) => item.label === label);
+          return (
+            <EventOptionButton
+              key={label}
+              label={label}
+              icon={event?.icon}
+              onClick={() => (label === task.correctTextOption ? onCorrect() : onWrong())}
+            />
+          );
+        })}
       </div>
     </Shell>
   );
@@ -440,6 +588,8 @@ export function MeasurelandsCalendarNavigateCard({
   if (task.scene === "explore") return <ExploreScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "between") return <BetweenScene task={task} onCorrect={onCorrect} />;
   if (task.scene === "whichCount") return <WhichCountScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "until") return <UntilScene task={task} onCorrect={onCorrect} />;
+  if (task.scene === "eventCompare" || task.scene === "eventPlan") return <EventChoiceScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "months") return <MonthsScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   return <StepScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 }

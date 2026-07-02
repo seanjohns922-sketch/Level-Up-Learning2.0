@@ -854,8 +854,9 @@ export type PracticeTask = (
       badgeLabel?: string;
       // Year 2 W7 adds "between" (count the day-jumps between two dates —
       // exclusive of the start), "whichCount" (pick the correct between-count),
-      // and "months" (months of the year / days in each month).
-      scene: "intro" | "next" | "before" | "explore" | "between" | "whichCount" | "months";
+      // "months" (months of the year / days in each month), and "until"/
+      // "eventCompare"/"eventPlan" (count forward to familiar calendar events).
+      scene: "intro" | "next" | "before" | "explore" | "between" | "whichCount" | "months" | "until" | "eventCompare" | "eventPlan";
       /** Month grid: number of days, and which weekday (0=Mon..6=Sun) day 1 sits on. */
       days: number;
       startWeekday: number;
@@ -874,6 +875,10 @@ export type PracticeTask = (
       /** "next"/"before"/"whichCount": number answer options. */
       options?: number[];
       correctAnswer?: number;
+      /** Year 2 W7 L2: familiar events placed on a monthly calendar. */
+      events?: Array<{ date: number; label: string; icon: string }>;
+      /** Year 2 W7 L2: event the student is counting toward. */
+      askEventLabel?: string;
       /** "months": month-name text options (e.g. which month comes next). */
       monthName?: string;
       textOptions?: string[];
