@@ -107,8 +107,11 @@ import {
 import {
   generateY2MeasurelandsWeek8Lesson1Task,
   resetY2MeasurelandsWeek8Lesson1TaskSessionState,
-  buildY2MeasurelandsWeek8Lesson1QuizTasks,
 } from "@/data/activities/year2Measurelands/week8Lesson1";
+import {
+  generateY2MeasurelandsWeek8Lesson2Task,
+  resetY2MeasurelandsWeek8Lesson2TaskSessionState,
+} from "@/data/activities/year2Measurelands/week8Lesson2";
 
 // Level 2 (Year 2) Measurelands lesson registry. Mirrors the Level 1 registry so
 // app/lesson/page.tsx can resolve `y2-measurement-w{n}-l{m}` ids to tasks.
@@ -533,7 +536,6 @@ const Y2_MEASURELANDS_LESSONS: Y2MeasurelandsLessonEntry[] = [
     subtitle: "Master Measurer's Quest",
     generate: generateY2MeasurelandsWeek8Lesson1Task,
     reset: resetY2MeasurelandsWeek8Lesson1TaskSessionState,
-    quizContributionBuilder: buildY2MeasurelandsWeek8Lesson1QuizTasks,
     practisedSkills: [
       "Choosing the measurement skill for a situation",
       "Choosing the best measuring strategy",
@@ -542,6 +544,24 @@ const Y2_MEASURELANDS_LESSONS: Y2MeasurelandsLessonEntry[] = [
     ],
     completionTitle: "Master Measurer Mission Complete!",
     unlockMessage: "Lesson 2 unlocked.",
+    returnRoute: "/program?year=Year 2&week=8&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y2-measurement-w8-l2",
+    week: 8,
+    lessonNumber: 2,
+    title: "Measurement Missions",
+    subtitle: "Master Measurer's Quest",
+    generate: generateY2MeasurelandsWeek8Lesson2Task,
+    reset: resetY2MeasurelandsWeek8Lesson2TaskSessionState,
+    practisedSkills: [
+      "Reading real-world measurement problems",
+      "Choosing the correct measurement strategy",
+      "Solving mixed length, mass, capacity, clock and calendar challenges",
+      "Explaining which measurement skill helps solve the problem",
+    ],
+    completionTitle: "Measurement Missions Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
     returnRoute: "/program?year=Year 2&week=8&legacy=1&realm_id=measurement",
   },
 ];

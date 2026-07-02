@@ -114,7 +114,7 @@ const YEAR2_MEASURELANDS_RAW: WeekPlan[] = [
     curriculum: ["AC9M2M01", "AC9M2M02", "AC9M2M03"],
     lessons: [
       buildLesson(8, 1, "Measurement Mission", "Capstone mission: choose the right measurement skill, pick the best strategy, and solve mixed mini challenges.", ["Choose the skill", "Best strategy", "Mixed measurement mission"], ["AC9M2M01", "AC9M2M02", "AC9M2M03"]),
-      buildLesson(8, 2, "Which Unit?", "Challenge: pick the right unit for the job, and when to go smaller.", ["Which unit", "Right unit", "When to go smaller"], ["AC9M2M01"]),
+      buildLesson(8, 2, "Measurement Missions", "Capstone missions: read real-world problems, choose the right measurement strategy, and solve mixed challenges.", ["Real-world missions", "Choose the strategy", "Solve mixed challenges"], ["AC9M2M01", "AC9M2M02", "AC9M2M03"]),
       buildLesson(8, 3, "Mixed Measurement Problems", "Challenge: solve real-world problems spanning all measurement strands.", ["Mixed problems", "Real-world measurement", "All strands"], ["AC9M2M01", "AC9M2M02", "AC9M2M03"]),
     ],
   },

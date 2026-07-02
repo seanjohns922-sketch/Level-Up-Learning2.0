@@ -282,13 +282,3 @@ export function generateY2MeasurelandsWeek8Lesson1Task(
 export function resetY2MeasurelandsWeek8Lesson1TaskSessionState() {
   lessonMemory.clear();
 }
-
-export function buildY2MeasurelandsWeek8Lesson1QuizTasks(): PracticeTask[] {
-  return [
-    SKILL_TASKS[0]!,
-    METHOD_TASKS[1]!,
-    buildY2MeasurelandsWeek1Lesson1QuizTasks()[1]!,
-    buildY2MeasurelandsWeek6Lesson3QuizTasks()[0]!,
-    buildY2MeasurelandsWeek7Lesson2QuizTasks()[0]!,
-  ];
-}
