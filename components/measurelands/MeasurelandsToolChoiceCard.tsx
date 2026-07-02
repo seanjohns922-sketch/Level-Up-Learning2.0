@@ -75,10 +75,29 @@ function ObjectCard({ object, big = true }: { object: NonNullable<ToolTask["obje
   );
 }
 
-function UnitStrip({ count, label, iconKey, imageSrc, blanks = 0 }: { count: number; label: string; iconKey: string; imageSrc?: string; blanks?: number }) {
+function UnitStrip({
+  count,
+  label,
+  iconKey,
+  imageSrc,
+  blanks = 0,
+  totalBaseUnits,
+}: {
+  count: number;
+  label: string;
+  iconKey: string;
+  imageSrc?: string;
+  blanks?: number;
+  totalBaseUnits?: number;
+}) {
   const size = UNIT_SIZE[iconKey] ?? 1;
   const BASE = 20; // px per paper-clip-width
-  const cellW = size * BASE;
+  const totalTiles = count + blanks;
+  const gapPx = 4;
+  const targetW = Math.max(0, (totalBaseUnits ?? totalTiles * size) * BASE);
+  // Keep every measurement row the same total visual length. Without this,
+  // rows with more small units become longer because they have more gaps.
+  const cellW = totalTiles > 0 ? Math.max(18, (targetW - gapPx * Math.max(0, totalTiles - 1)) / totalTiles) : size * BASE;
   const H = 36;
   const Icon = iconFor(iconKey);
   const tile = (key: string, blank: boolean) => (
@@ -103,9 +122,11 @@ function UnitStrip({ count, label, iconKey, imageSrc, blanks = 0 }: { count: num
     </div>
   );
   return (
-    <div className="flex items-center gap-1 overflow-x-auto rounded-[20px] border border-[rgba(214,184,108,0.5)] bg-[rgba(255,252,245,0.95)] px-3 py-3">
+    <div className="overflow-x-auto rounded-[20px] border border-[rgba(214,184,108,0.5)] bg-[rgba(255,252,245,0.95)] px-3 py-3">
+      <div className="mx-auto flex items-center" style={{ gap: gapPx, width: targetW, minWidth: targetW }}>
       {Array.from({ length: count }).map((_, index) => tile(`unit-${index}`, false))}
       {Array.from({ length: blanks }).map((_, index) => tile(`blank-${index}`, true))}
+      </div>
     </div>
   );
 }
@@ -221,7 +242,13 @@ function SameObjectScene({ task, onCorrect, onWrong }: { task: ToolTask; onCorre
             <div className="mb-2 text-center text-sm font-black uppercase tracking-[0.12em] text-[#7c4a12]">
               {row.count} {row.unitLabel}
             </div>
-            <UnitStrip count={row.count} label={row.unitLabel} iconKey={row.unitIconKey} imageSrc={row.unitImageSrc} />
+            <UnitStrip
+              count={row.count}
+              label={row.unitLabel}
+              iconKey={row.unitIconKey}
+              imageSrc={row.unitImageSrc}
+              totalBaseUnits={task.objectLengthUnits}
+            />
           </div>
         ))}
       </div>
@@ -375,7 +402,13 @@ function EstimateRevealScene({ task, onCorrect }: { task: ToolTask; onCorrect: (
               <div key={row.id} className="w-full">
                 <div className="mb-1 text-center text-xs font-black uppercase tracking-[0.12em] text-[#7c4a12]">{row.count} {row.unitLabel}</div>
                 <div className="flex justify-center">
-                  <UnitStrip count={row.count} label={row.unitLabel} iconKey={row.unitIconKey} imageSrc={row.unitImageSrc} />
+                  <UnitStrip
+                    count={row.count}
+                    label={row.unitLabel}
+                    iconKey={row.unitIconKey}
+                    imageSrc={row.unitImageSrc}
+                    totalBaseUnits={task.objectLengthUnits}
+                  />
                 </div>
               </div>
             ))}
