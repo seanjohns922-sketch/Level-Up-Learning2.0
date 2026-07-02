@@ -34,6 +34,62 @@ function iconFor(key: string): LucideIcon {
 // up. Keep in sync with the unitSize values in week4Lesson3.ts.
 const UNIT_SIZE: Record<string, number> = { paperclips: 1, blocks: 2, cubes: 2, crayons: 3, dominoes: 3, pencils: 4 };
 
+function PaperclipGlyph({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 44 22" aria-hidden="true" className={className}>
+      <path
+        d="M12.4 15.8 26.7 4.4c3.3-2.6 8.2-.3 8.2 4 0 1.6-.7 3.1-1.9 4.1L17.9 24.4c-4.9 3.9-12.1.4-12.1-5.9 0-2.3 1.1-4.5 2.9-5.9L24.4.2"
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="3.8"
+        transform="translate(1 -2)"
+      />
+      <path
+        d="M13.9 14.4 27 4.1c1.9-1.5 4.7-.2 4.7 2.3 0 .9-.4 1.8-1.1 2.4L15.8 20.4"
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2.2"
+        transform="translate(1 -2)"
+      />
+    </svg>
+  );
+}
+
+function DominoGlyph({ className = "" }: { className?: string }) {
+  const pip = (cx: number, cy: number, key: string) => <circle key={key} cx={cx} cy={cy} r="2.1" fill="rgba(255,255,255,0.92)" />;
+  return (
+    <svg viewBox="0 0 72 32" aria-hidden="true" className={className}>
+      <rect x="1.5" y="1.5" width="69" height="29" rx="4.5" fill="#141414" stroke="#3a3a3a" strokeWidth="3" />
+      <line x1="36" y1="4" x2="36" y2="28" stroke="#595959" strokeWidth="1.5" />
+      {[pip(11, 9, "a"), pip(20, 16, "b"), pip(29, 23, "c"), pip(49, 9, "d"), pip(60, 23, "e")]}
+    </svg>
+  );
+}
+
+function CubeGlyph({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 40 34" aria-hidden="true" className={className}>
+      <path d="M6 10h24v18H6z" fill="#e53935" stroke="#a31312" strokeWidth="2" />
+      <path d="M6 10 12 4h24l-6 6z" fill="#ff6b5f" stroke="#a31312" strokeWidth="2" />
+      <path d="M30 10 36 4v18l-6 6z" fill="#b91c1c" stroke="#a31312" strokeWidth="2" />
+      <path d="M10 14h16" stroke="rgba(255,255,255,0.35)" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function UnitGlyph({ iconKey, imageSrc, label }: { iconKey: string; imageSrc?: string; label: string }) {
+  const Icon = iconFor(iconKey);
+  if (iconKey === "paperclips") return <PaperclipGlyph className="h-full w-full text-[#dc2626]" />;
+  if (iconKey === "dominoes") return <DominoGlyph className="h-full w-full" />;
+  if (iconKey === "cubes" || iconKey === "blocks") return <CubeGlyph className="h-full w-full" />;
+  if (imageSrc) return <img src={imageSrc} alt={label} className="h-full w-full object-contain" />;
+  return <Icon className="h-5 w-5 text-[#7c3aed]" strokeWidth={1.8} />;
+}
+
 function Shell({ badge, prompt, speakText, children }: { badge: string; prompt: string; speakText?: string; children: React.ReactNode }) {
   return (
     <div className="measurelands-shell space-y-4">
@@ -58,6 +114,9 @@ function Shell({ badge, prompt, speakText, children }: { badge: string; prompt: 
 function Glyph({ label, iconKey, imageSrc, big = false }: { label: string; iconKey: string; imageSrc?: string; big?: boolean }) {
   const Icon = iconFor(iconKey);
   const size = big ? "h-24 w-24" : "h-12 w-12";
+  if (iconKey === "paperclips") return <PaperclipGlyph className={`${size} text-[#dc2626]`} />;
+  if (iconKey === "dominoes") return <DominoGlyph className={`${big ? "h-16 w-24" : "h-10 w-16"}`} />;
+  if (iconKey === "cubes" || iconKey === "blocks") return <CubeGlyph className={size} />;
   return imageSrc ? (
     <img src={imageSrc} alt={label} className={`${size} object-contain drop-shadow-[0_10px_16px_rgba(120,53,15,0.18)]`} />
   ) : (
@@ -93,31 +152,41 @@ function UnitStrip({
   const size = UNIT_SIZE[iconKey] ?? 1;
   const BASE = 20; // px per paper-clip-width
   const totalTiles = count + blanks;
-  const gapPx = 4;
+  const gapPx = iconKey === "cubes" || iconKey === "blocks" ? 0 : 4;
   const targetW = Math.max(0, (totalBaseUnits ?? totalTiles * size) * BASE);
   // Keep every measurement row the same total visual length. Without this,
   // rows with more small units become longer because they have more gaps.
-  const cellW = totalTiles > 0 ? Math.max(18, (targetW - gapPx * Math.max(0, totalTiles - 1)) / totalTiles) : size * BASE;
+  const cellW = totalTiles > 0 ? Math.max(iconKey === "paperclips" ? 12 : 18, (targetW - gapPx * Math.max(0, totalTiles - 1)) / totalTiles) : size * BASE;
   const H = 36;
-  const Icon = iconFor(iconKey);
   const tile = (key: string, blank: boolean) => (
     <div
       key={key}
-      className="flex shrink-0 items-center justify-center rounded-lg"
+      className="flex shrink-0 items-center justify-center"
       style={{
         width: cellW,
         height: H,
-        padding: 3,
-        border: blank ? "2px dashed rgba(167,139,250,0.6)" : "1px solid rgba(214,184,108,0.45)",
-        background: blank ? "rgba(167,139,250,0.08)" : "#fff",
+        padding: iconKey === "paperclips" ? 0 : 3,
+        borderRadius: iconKey === "cubes" || iconKey === "blocks" ? 0 : 8,
+        border: blank
+          ? "2px dashed rgba(167,139,250,0.6)"
+          : iconKey === "paperclips"
+            ? "none"
+            : iconKey === "cubes" || iconKey === "blocks"
+              ? "1px solid rgba(120,53,15,0.3)"
+              : "1px solid rgba(214,184,108,0.45)",
+        background: blank
+          ? "rgba(167,139,250,0.08)"
+          : iconKey === "paperclips"
+            ? "transparent"
+            : iconKey === "cubes" || iconKey === "blocks"
+              ? "#ef4444"
+              : "#fff",
       }}
     >
       {blank ? (
         <span className="text-sm font-black text-[#7c3aed]">?</span>
-      ) : imageSrc ? (
-        <img src={imageSrc} alt={label} className="h-full w-full object-contain" />
       ) : (
-        <Icon className="h-5 w-5 text-[#7c3aed]" strokeWidth={1.8} />
+        <UnitGlyph iconKey={iconKey} imageSrc={imageSrc} label={label} />
       )}
     </div>
   );
