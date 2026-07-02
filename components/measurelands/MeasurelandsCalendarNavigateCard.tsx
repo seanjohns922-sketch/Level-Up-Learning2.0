@@ -485,6 +485,36 @@ function EventChoiceScene({ task, onCorrect, onWrong }: { task: NavTask; onCorre
   );
 }
 
+/* ── W7 L3: label a marked event date under a real month title. The student
+ * reads the date number only; full written dates come later. ── */
+function DateLabelScene({ task, onCorrect, onWrong }: { task: NavTask; onCorrect: () => void; onWrong: () => void }) {
+  const event = task.events?.[0];
+  const answer = task.correctAnswer ?? event?.date;
+  return (
+    <Shell badge={task.badgeLabel ?? "Label the Date"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <CalendarGrid
+        days={task.days}
+        startWeekday={task.startWeekday}
+        monthLabel={task.monthLabel}
+        events={task.events}
+      />
+      <div className="grid grid-cols-3 gap-3">
+        {(task.options ?? []).map((value) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => (value === answer ? onCorrect() : onWrong())}
+            className="relative flex min-h-[76px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-3xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+          >
+            <span className="absolute right-2 top-2 z-10"><OptionReadAloudButton text={String(value)} /></span>
+            {value}
+          </button>
+        ))}
+      </div>
+    </Shell>
+  );
+}
+
 /* ── W7 L3-B: missing date clues. Students tap the target date on the calendar
  * after reasoning about before/after. ── */
 function MissingDateScene({ task, onCorrect, onWrong }: { task: NavTask; onCorrect: () => void; onWrong: () => void }) {
@@ -632,6 +662,7 @@ export function MeasurelandsCalendarNavigateCard({
   if (task.scene === "whichCount") return <WhichCountScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "until") return <UntilScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "eventCompare" || task.scene === "eventPlan") return <EventChoiceScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "dateLabel") return <DateLabelScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "missingDate") return <MissingDateScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "months") return <MonthsScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   return <StepScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;

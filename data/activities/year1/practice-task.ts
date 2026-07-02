@@ -856,8 +856,9 @@ export type PracticeTask = (
       // exclusive of the start), "whichCount" (pick the correct between-count),
       // "months" (months of the year / days in each month), "until"/
       // "eventCompare"/"eventPlan" (count forward to familiar calendar events),
-      // and "missingDate" (solve before/after calendar clues by tapping a date).
-      scene: "intro" | "next" | "before" | "explore" | "between" | "whichCount" | "months" | "until" | "eventCompare" | "eventPlan" | "missingDate";
+      // "dateLabel" (read the date number under a month title), and
+      // "missingDate" (solve before/after calendar clues by tapping a date).
+      scene: "intro" | "next" | "before" | "explore" | "between" | "whichCount" | "months" | "until" | "eventCompare" | "eventPlan" | "dateLabel" | "missingDate";
       /** Month grid: number of days, and which weekday (0=Mon..6=Sun) day 1 sits on. */
       days: number;
       startWeekday: number;

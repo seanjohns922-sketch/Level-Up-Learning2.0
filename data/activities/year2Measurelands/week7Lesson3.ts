@@ -5,7 +5,7 @@ import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-
 
 type NavTask = Extract<PracticeTask, { kind: "calendarNavigate" }>;
 
-const GRID = { days: 30, startWeekday: 0, monthLabel: "Calendar Keep Month" };
+const GRID = { days: 30, startWeekday: 0, monthLabel: "July" };
 
 const EVENTS = [
   { label: "Birthday", icon: "birthday" },
@@ -25,12 +25,14 @@ type CalendarEvent = { date: number; label: string; icon: string };
 type LessonMemory = { introShown: boolean; cursor: number; lastKey: string | null };
 
 const lessonMemory = new Map<string, LessonMemory>();
-const ROTATION: Array<"mystery" | "missingDate" | "busyWeek"> = [
+const ROTATION: Array<"mystery" | "dateLabel" | "missingDate" | "busyWeek"> = [
   "mystery",
+  "dateLabel",
   "missingDate",
   "busyWeek",
   "mystery",
   "busyWeek",
+  "dateLabel",
   "missingDate",
 ];
 
@@ -135,6 +137,30 @@ function buildCalendarMysteryTask(memory: LessonMemory): NavTask {
   };
 }
 
+function buildDateLabelTask(memory: LessonMemory): NavTask {
+  const date = uniqueStart(memory, 9, 24);
+  const event = chooseEvents(1)[0]!;
+  const near = shuffle([date - 2, date - 1, date + 1, date + 2].filter((value) => value >= 1 && value <= GRID.days));
+  const options = shuffle([date, ...near.slice(0, 2)]);
+  return {
+    kind: "calendarNavigate",
+    scene: "dateLabel",
+    prompt: `${event.label} is on ${GRID.monthLabel} __.`,
+    speakText: `${event.label} is on ${GRID.monthLabel} blank. Look at the event marker and choose the date number.`,
+    badgeLabel: "Label the Date",
+    days: GRID.days,
+    startWeekday: GRID.startWeekday,
+    monthLabel: GRID.monthLabel,
+    events: [{ date, label: event.label, icon: event.icon }],
+    options,
+    correctAnswer: date,
+    feedback: {
+      correct: `${event.label} is on ${GRID.monthLabel} ${date}.`,
+      wrong: `${event.label} is on ${GRID.monthLabel} ${date}. Find the event marker, then read the date number.`,
+    },
+  };
+}
+
 function buildMissingDateTask(memory: LessonMemory): NavTask {
   const libraryDate = uniqueStart(memory, 7, 18);
   const afterMode = randInt(2) === 0;
@@ -227,6 +253,7 @@ export function generateY2MeasurelandsWeek7Lesson3Task(
   }
   const activity = ROTATION[memory.cursor % ROTATION.length]!;
   memory.cursor += 1;
+  if (activity === "dateLabel") return buildDateLabelTask(memory);
   if (activity === "missingDate") return buildMissingDateTask(memory);
   if (activity === "busyWeek") return buildBusyWeekTask(memory);
   return buildCalendarMysteryTask(memory);
@@ -240,7 +267,7 @@ export function buildY2MeasurelandsWeek7Lesson3QuizTasks(): PracticeTask[] {
   const seed: LessonMemory = { introShown: true, cursor: 0, lastKey: null };
   return [
     buildCalendarMysteryTask(seed),
-    buildCalendarMysteryTask(seed),
+    buildDateLabelTask(seed),
     buildMissingDateTask(seed),
     buildBusyWeekTask(seed),
     buildBusyWeekTask(seed),
