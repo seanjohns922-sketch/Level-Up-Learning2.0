@@ -315,35 +315,83 @@ function WhichCountScene({ task, onCorrect, onWrong }: { task: NavTask; onCorrec
   );
 }
 
+// Southern-hemisphere seasons (Australian curriculum): summer Dec–Feb,
+// autumn Mar–May, winter Jun–Aug, spring Sep–Nov. Keyed by 3-letter month.
+const SEASON_BY_MONTH: Record<string, "summer" | "autumn" | "winter" | "spring"> = {
+  Dec: "summer", Jan: "summer", Feb: "summer",
+  Mar: "autumn", Apr: "autumn", May: "autumn",
+  Jun: "winter", Jul: "winter", Aug: "winter",
+  Sep: "spring", Oct: "spring", Nov: "spring",
+};
+const SEASON_STYLE: Record<string, { label: string; emoji: string; bg: string; border: string }> = {
+  summer: { label: "Summer", emoji: "☀️", bg: "rgba(251,191,36,0.16)", border: "rgba(245,158,11,0.55)" },
+  autumn: { label: "Autumn", emoji: "🍂", bg: "rgba(234,88,12,0.12)", border: "rgba(234,88,12,0.5)" },
+  winter: { label: "Winter", emoji: "❄️", bg: "rgba(56,189,248,0.16)", border: "rgba(14,165,233,0.55)" },
+  spring: { label: "Spring", emoji: "🌸", bg: "rgba(236,72,153,0.12)", border: "rgba(236,72,153,0.5)" },
+};
+function seasonFor(monthLabel?: string) {
+  const key = (monthLabel ?? "").slice(0, 3);
+  const s = SEASON_BY_MONTH[key];
+  return s ? SEASON_STYLE[s] : undefined;
+}
+
 /* ── W7 L1‑A: months of the year / days in each month (the AC9M2M03 months
- * beat). Text options (which month next) or number options (days in month). ── */
+ * beat), with southern-hemisphere season visuals. Text options (which month
+ * next, shown on a season-tinted strip) or number options (days in a month,
+ * with a calendar grid to count). ── */
 function MonthsScene({ task, onCorrect, onWrong }: { task: NavTask; onCorrect: () => void; onWrong: () => void }) {
   const useText = Boolean(task.textOptions?.length);
+  const bannerSeason = seasonFor(task.monthName);
   return (
     <Shell badge={task.badgeLabel ?? "Months of the Year"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       {task.monthStrip?.length ? (
         <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-4">
           <div className="mb-2 text-center text-[11px] font-black uppercase tracking-[0.18em] text-[#a98b52]">The months in order</div>
           <div className="flex items-stretch justify-center gap-2 overflow-x-auto">
-            {task.monthStrip.map((m, i) => (
-              <div
-                key={i}
-                className="flex min-w-[64px] flex-col items-center justify-center rounded-[16px] border-2 px-2 py-4 text-center"
-                style={{
-                  borderColor: m.blank ? "rgba(124,58,237,0.7)" : m.highlight ? "rgba(180,120,20,0.85)" : "rgba(214,184,108,0.5)",
-                  borderStyle: m.blank ? "dashed" : "solid",
-                  background: m.blank ? "rgba(124,58,237,0.07)" : m.highlight ? "rgba(214,184,108,0.34)" : "rgba(255,255,255,0.92)",
-                }}
-              >
-                <span className={`text-base font-black ${m.blank ? "text-[#7c3aed]" : "text-[#2c1c07]"}`}>{m.blank ? "?" : m.label}</span>
-              </div>
-            ))}
+            {task.monthStrip.map((m, i) => {
+              const season = seasonFor(m.label);
+              return (
+                <div
+                  key={i}
+                  className="flex min-w-[64px] flex-col items-center justify-center gap-1 rounded-[16px] border-2 px-2 py-3 text-center"
+                  style={{
+                    borderColor: m.blank ? "rgba(124,58,237,0.7)" : m.highlight ? "rgba(180,120,20,0.85)" : season?.border ?? "rgba(214,184,108,0.5)",
+                    borderStyle: m.blank ? "dashed" : "solid",
+                    background: m.blank ? "rgba(124,58,237,0.07)" : m.highlight ? "rgba(214,184,108,0.34)" : season?.bg ?? "rgba(255,255,255,0.92)",
+                  }}
+                >
+                  <span className="text-xl leading-none" aria-hidden>{m.blank ? "❓" : season?.emoji ?? ""}</span>
+                  <span className={`text-base font-black ${m.blank ? "text-[#7c3aed]" : "text-[#2c1c07]"}`}>{m.blank ? "?" : m.label}</span>
+                  {!m.blank && season ? (
+                    <span className="text-[9px] font-black uppercase tracking-wide text-[#7a5b28]">{season.label}</span>
+                  ) : null}
+                </div>
+              );
+            })}
           </div>
         </div>
       ) : task.monthName ? (
-        <div className="mx-auto flex max-w-[420px] items-center justify-center gap-3 rounded-[26px] border-2 border-[rgba(124,58,237,0.35)] bg-[rgba(124,58,237,0.06)] px-6 py-6">
-          <Compass className="h-8 w-8 text-[#5b21b6]" />
-          <span className="text-3xl font-black text-[#2c1c07]">{task.monthName}</span>
+        <div className="flex flex-col items-center gap-3">
+          <div
+            className="mx-auto flex w-full max-w-[480px] items-center justify-center gap-3 rounded-[26px] border-2 px-6 py-4"
+            style={{
+              borderColor: bannerSeason?.border ?? "rgba(124,58,237,0.35)",
+              background: bannerSeason?.bg ?? "rgba(124,58,237,0.06)",
+            }}
+          >
+            {bannerSeason ? (
+              <span className="text-3xl leading-none" aria-hidden>{bannerSeason.emoji}</span>
+            ) : (
+              <Compass className="h-8 w-8 text-[#5b21b6]" />
+            )}
+            <span className="text-3xl font-black text-[#2c1c07]">{task.monthName}</span>
+            {bannerSeason ? (
+              <span className="rounded-full bg-white/70 px-3 py-1 text-xs font-black uppercase tracking-wide text-[#7a5b28]">{bannerSeason.label}</span>
+            ) : null}
+          </div>
+          {typeof task.days === "number" ? (
+            <CalendarGrid days={task.days} startWeekday={task.startWeekday ?? 0} monthLabel={task.monthName} />
+          ) : null}
         </div>
       ) : null}
       {useText ? (

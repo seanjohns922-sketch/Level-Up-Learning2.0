@@ -157,7 +157,7 @@ function buildMonthsTask(_memory: LessonMemory): NavTask {
     prompt: `How many days are in ${month.name}?`,
     speakText: `How many days are in ${month.name}?`,
     badgeLabel: "Days in the Month",
-    days: GRID.days,
+    days: month.days,
     startWeekday: GRID.startWeekday,
     monthName: month.name,
     options: shuffle([month.days, ...distractors].slice(0, 3)),
