@@ -18,11 +18,12 @@ import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import StudentAvatar from "@/components/avatar/StudentAvatar";
 import { supabase } from "@/lib/supabase";
 
-type MeasurelandsYear = "Prep" | "Year 1" | "Year 2";
+type MeasurelandsYear = "Prep" | "Year 1" | "Year 2" | "Year 3";
 const REALM_ID = "measurement";
 const PREP_BG_IMAGE = "/images/measurelands-home-bg.jpg";
 const YEAR1_BG_IMAGE = "/images/measurelands-home-bg-y1.jpg";
 const YEAR2_BG_IMAGE = "/images/measurelands-home-bg-y2.jpg";
+const YEAR3_BG_IMAGE = YEAR2_BG_IMAGE;
 
 const PREP_ZONES = [
   { id: "length", name: "LENGTH LANDS", sub: "WEEKS 1–2", weekStart: 1, weekEnd: 2, left: "7%", top: "14%", color: "#67e8f9" },
@@ -54,7 +55,21 @@ const YEAR2_ZONES = [
   { id: "challenge", name: "MEASUREMENT CHALLENGE", sub: "WEEK 8", weekStart: 8, weekEnd: 8, left: "50%", top: "30%", color: "#93c5fd" },
 ] as const;
 
+const YEAR3_ZONES = [
+  { id: "ruler-ridge", name: "RULER RIDGE", sub: "WEEK 1", weekStart: 1, weekEnd: 1, left: "7%", top: "14%", color: "#67e8f9" },
+  { id: "metre-mountain", name: "METRE MOUNTAIN", sub: "WEEK 2", weekStart: 2, weekEnd: 2, left: "10%", top: "56%", color: "#86efac" },
+  { id: "mass-works", name: "MASS WORKS", sub: "WEEK 3", weekStart: 3, weekEnd: 3, left: "70%", top: "15%", color: "#c4b5fd" },
+  { id: "capacity-lab", name: "CAPACITY LAB", sub: "WEEK 4", weekStart: 4, weekEnd: 4, left: "50%", top: "30%", color: "#fde68a" },
+  { id: "duration-lab", name: "DURATION LAB", sub: "WEEK 5", weekStart: 5, weekEnd: 5, left: "50%", top: "30%", color: "#a7f3d0" },
+  { id: "minute-clockworks", name: "MINUTE CLOCKWORKS", sub: "WEEK 6", weekStart: 6, weekEnd: 6, left: "50%", top: "30%", color: "#fcd34d" },
+  { id: "perimeter-preview", name: "PERIMETER PREVIEW", sub: "WEEK 7", weekStart: 7, weekEnd: 7, left: "69%", top: "57%", color: "#f9a8d4" },
+  { id: "area-preview", name: "AREA PREVIEW", sub: "WEEK 8", weekStart: 8, weekEnd: 8, left: "50%", top: "30%", color: "#93c5fd" },
+] as const;
+
 function getMeasurelandsWorldConfig(year: MeasurelandsYear) {
+  if (year === "Year 3") {
+    return { bgImage: YEAR3_BG_IMAGE, levelLabel: "LEVEL 3", zones: YEAR3_ZONES };
+  }
   if (year === "Year 2") {
     return { bgImage: YEAR2_BG_IMAGE, levelLabel: "LEVEL 2", zones: YEAR2_ZONES };
   }
@@ -183,7 +198,8 @@ function ProgressIcon() {
 
 export default function MeasurelandsMap({ year = "Prep" }: { year?: MeasurelandsYear }) {
   const router = useRouter();
-  const resolvedYear: MeasurelandsYear = year === "Year 1" ? "Year 1" : year === "Year 2" ? "Year 2" : "Prep";
+  const resolvedYear: MeasurelandsYear =
+    year === "Year 1" ? "Year 1" : year === "Year 2" ? "Year 2" : year === "Year 3" ? "Year 3" : "Prep";
   const world = useMemo(() => getMeasurelandsWorldConfig(resolvedYear), [resolvedYear]);
   const [progress] = useState(() => readProgress());
   const [store] = useState(() => readProgramStore());

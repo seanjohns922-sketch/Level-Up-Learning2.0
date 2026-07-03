@@ -51,7 +51,8 @@ const MeasurelandsMap = dynamic(
   }
 );
 
-const SUPPORTED_MEASURELANDS_YEARS = new Set(["Prep", "Year 1", "Year 2"]);
+const SUPPORTED_MEASURELANDS_YEARS = new Set(["Prep", "Year 1", "Year 2", "Year 3"]);
+type SupportedMeasurelandsYear = "Prep" | "Year 1" | "Year 2" | "Year 3";
 
 export default function MeasurelandsPage() {
   const router = useRouter();
@@ -60,7 +61,7 @@ export default function MeasurelandsPage() {
   const [requestedYear, setRequestedYear] = useState<string | undefined>(undefined);
   const resolvedYear = useMemo(() => {
     const candidate = previewMode ? requestedYear ?? progressYear : progressYear ?? requestedYear;
-    return SUPPORTED_MEASURELANDS_YEARS.has(candidate ?? "") ? (candidate as "Prep" | "Year 1" | "Year 2") : "Prep";
+    return SUPPORTED_MEASURELANDS_YEARS.has(candidate ?? "") ? (candidate as SupportedMeasurelandsYear) : "Prep";
   }, [previewMode, progressYear, requestedYear]);
 
   useEffect(() => {
