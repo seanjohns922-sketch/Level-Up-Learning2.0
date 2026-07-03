@@ -30,6 +30,9 @@ const OBJECT_FILL: Record<string, [string, string]> = {
   "🔑": ["#C79A3C", "#A87C22"],
   "🍃": ["#7FB07A", "#5C8E57"],
   "🎀": ["#D08AB0", "#B0688F"],
+  "🖌️": ["#9FB4D0", "#5F7CA8"],
+  "🪥": ["#8FD0C4", "#4FA89A"],
+  "✂️": ["#CBD0D8", "#9AA1AC"],
 };
 
 const TIMBER = { top: "#EBCFA2", mid: "#DCB77C", bot: "#C79A57", edge: "#A67B3C" };
@@ -773,7 +776,7 @@ export function MeasurelandsMetreCard({ task, onCorrect, onWrong }: { task: Unit
   const options = task.options ?? [];
   const withGlyph = task.scene === "whichTool" || task.scene === "whichUnit";
   const showReference = task.scene === "aboutMetre" || task.scene === "compareMetre";
-  const cols = task.scene === "compareMetre" ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-2";
+  const cols = task.scene === "compareMetre" || task.scene === "bestEstimate" ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-2";
   return (
     <Shell badge={task.badgeLabel ?? "Metre Mountain"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       {task.object ? <ObjectHero object={task.object} /> : null}
@@ -786,4 +789,131 @@ export function MeasurelandsMetreCard({ task, onCorrect, onWrong }: { task: Unit
       <UnitChoices options={options} correct={task.correctOption} cols={cols} withTool={withGlyph} onCorrect={onCorrect} onWrong={onWrong} />
     </Shell>
   );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * W2 L3 "Estimate then Measure" — the full cycle. Estimation is rewarded by
+ * CLOSENESS, not right/wrong: reuses the ruler / metre stick for the reveal.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+type EstimateTask = Extract<PracticeTask, { kind: "estimateMeasure" }>;
+
+function estimateMedal(diff: number, unit: "cm" | "m") {
+  if (diff === 0) return { emoji: "🎯", title: "Exact!", sub: "Spot on — you nailed it!" };
+  if (diff === 1) return { emoji: "👏", title: "Very close!", sub: `Only 1 ${unit} away!` };
+  if (diff <= (unit === "cm" ? 3 : 2)) return { emoji: "👍", title: "Close!", sub: `Just ${diff} ${unit} away.` };
+  return { emoji: "🙂", title: "Good estimate!", sub: `${diff} ${unit} away — picture it next time.` };
+}
+
+function EstimateIntroScene({ task, onCorrect }: { task: EstimateTask; onCorrect: () => void }) {
+  const steps = [
+    { icon: "🧐", text: "Look at the object." },
+    { icon: "💭", text: "Estimate — a sensible guess, not a random one." },
+    { icon: "📏", text: "Measure with the ruler or metre stick." },
+    { icon: "✅", text: "Compare — how close were you?" },
+  ];
+  return (
+    <Shell badge={task.badgeLabel ?? "Meazurex Mission"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[24px] border border-[rgba(214,184,108,0.45)] bg-[rgba(255,250,240,0.96)] p-4">
+        <div className="mb-2 text-[12px] font-black uppercase tracking-[0.16em] text-[#a98b52]">Estimate first, measure second</div>
+        <ul className="space-y-2.5">
+          {steps.map((s, i) => (
+            <li key={i} className="flex items-center gap-3">
+              <span className="text-2xl leading-none" aria-hidden>{s.icon}</span>
+              <span className="text-[17px] font-bold leading-snug text-[#2c1c07]">{s.text}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <button
+        type="button"
+        onClick={onCorrect}
+        className="mx-auto flex min-h-[60px] items-center justify-center gap-2 rounded-[24px] border-2 border-[rgba(180,120,20,0.55)] bg-[#fffaf0] px-8 text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+      >
+        Start estimating! →
+      </button>
+    </Shell>
+  );
+}
+
+function EstimateFlowScene({ task, onCorrect, onWrong }: { task: EstimateTask; onCorrect: () => void; onWrong: () => void }) {
+  const unit = task.unit ?? "cm";
+  const object = task.object ?? { label: "object", icon: "📦", length: 10 };
+  const unitWord = unit === "cm" ? "Centimetres" : "Metres";
+  const [phase, setPhase] = useState<"unit" | "estimate" | "reveal">(task.chooseUnitFirst ? "unit" : "estimate");
+  const [estimate, setEstimate] = useState<number | null>(null);
+
+  const diff = estimate === null ? 0 : Math.abs(estimate - object.length);
+  const medal = estimateMedal(diff, unit);
+
+  return (
+    <Shell badge={task.badgeLabel ?? "Estimate then Measure"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <ObjectHero object={{ label: object.label, icon: object.icon }} />
+
+      {phase === "unit" ? (
+        <>
+          <p className="text-center text-base font-black text-[#5b21b6]">Step 1 — which unit would you use?</p>
+          <UnitChoices
+            options={["Centimetres", "Metres"]}
+            correct={unitWord}
+            cols="grid-cols-2"
+            withTool
+            onCorrect={() => setPhase("estimate")}
+            onWrong={onWrong}
+          />
+        </>
+      ) : null}
+
+      {phase === "estimate" ? (
+        <>
+          <p className="text-center text-base font-black text-[#5b21b6]">How long do you think it is?</p>
+          <div className="grid grid-cols-3 gap-3">
+            {(task.estimateOptions ?? []).map((value) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => {
+                  setEstimate(value);
+                  setPhase("reveal");
+                }}
+                className="flex min-h-[76px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-2xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98] sm:text-3xl"
+              >
+                {value} {unit}
+              </button>
+            ))}
+          </div>
+        </>
+      ) : null}
+
+      {phase === "reveal" ? (
+        <>
+          <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-4">
+            {unit === "cm" ? (
+              <RulerWithObject rulerCm={Math.min(20, object.length + 3)} object={{ label: object.label, icon: object.icon, lengthCm: object.length }} showZeroHero />
+            ) : (
+              <MetreStick full />
+            )}
+          </div>
+          <div className="flex flex-col items-center gap-1 rounded-[24px] border-2 border-[rgba(15,118,110,0.35)] bg-[rgba(15,118,110,0.08)] px-5 py-4 text-center">
+            <div className="text-4xl leading-none" aria-hidden>{medal.emoji}</div>
+            <div className="text-xl font-black text-[#0f766e]">{medal.title}</div>
+            <div className="text-base font-bold text-[#2c1c07]">
+              You guessed <b>{estimate} {unit}</b> — it&apos;s actually <b>{object.length} {unit}</b>. {medal.sub}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onCorrect}
+            className="mx-auto flex min-h-[56px] items-center justify-center gap-2 rounded-[24px] border-2 border-[rgba(180,120,20,0.55)] bg-[#fffaf0] px-8 text-lg font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+          >
+            Next →
+          </button>
+        </>
+      ) : null}
+    </Shell>
+  );
+}
+
+export function MeasurelandsEstimateCard({ task, onCorrect, onWrong }: { task: EstimateTask; onCorrect: () => void; onWrong: () => void }) {
+  if (task.scene === "intro") return <EstimateIntroScene task={task} onCorrect={onCorrect} />;
+  return <EstimateFlowScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 }

@@ -110,7 +110,7 @@ import { MeasurelandsRoutineSequenceCard } from "@/components/measurelands/Measu
 import { MeasurelandsToolChoiceCard } from "@/components/measurelands/MeasurelandsToolChoiceCard";
 import { MeasurelandsBalanceScaleCard } from "@/components/measurelands/MeasurelandsBalanceScaleCard";
 import { MeasurelandsAnalogClockCard } from "@/components/measurelands/MeasurelandsAnalogClockCard";
-import { MeasurelandsRulerCard, MeasurelandsMetreCard } from "@/components/measurelands/MeasurelandsRulerCard";
+import { MeasurelandsRulerCard, MeasurelandsMetreCard, MeasurelandsEstimateCard } from "@/components/measurelands/MeasurelandsRulerCard";
 import { isPracticeTaskSafe } from "@/lib/task-safety";
 
 type Callbacks = {
@@ -397,6 +397,8 @@ function TaskRendererInner({
       return wrapMeasurelands(<MeasurelandsRulerCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "unitChoice":
       return wrapMeasurelands(<MeasurelandsMetreCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
+    case "estimateMeasure":
+      return wrapMeasurelands(<MeasurelandsEstimateCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "massMeasure":
       return wrapMeasurelands(<MeasurelandsMassMeasureCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "capacityMeasure":

@@ -1122,7 +1122,8 @@ export type PracticeTask = (
       // W2 L1 scenes: aboutMetre / whichTool / compareMetre.
       // W2 L2 scenes: whichUnit (cm vs m), sort (tap objects into cm/m bins),
       //               spotMistake (is Professor Gauge's unit sensible?).
-      scene: "intro" | "aboutMetre" | "whichTool" | "compareMetre" | "whichUnit" | "sort" | "spotMistake";
+      // W2 L3 adds bestEstimate (pick the most sensible estimate, cm/m options).
+      scene: "intro" | "aboutMetre" | "whichTool" | "compareMetre" | "whichUnit" | "sort" | "spotMistake" | "bestEstimate";
       /** The familiar object being judged (emoji MATCHES the label). */
       object?: { label: string; icon: string };
       /** Choice labels in display order; correctOption must be one of them. */
@@ -1132,6 +1133,29 @@ export type PracticeTask = (
       items?: Array<{ label: string; icon: string; unit: "cm" | "m" }>;
       /** "spotMistake": Professor Gauge's claim, e.g. "The tree is 4 centimetres tall." */
       statement?: string;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
+      // Measurelands Year 3 W2 L3 "Estimate then Measure" (AC9M3M01): the full
+      // measuring cycle — estimate first, measure with the ruler / metre stick,
+      // then compare. Estimation is rewarded by CLOSENESS (🎯 exact / 👏 very
+      // close / 👍 close), not marked right/wrong. Scenes:
+      //   "intro"    — Professor Gauge: estimate first, measure second, check.
+      //   "estimate" — (optionally choose cm/m first) → pick an estimate → reveal
+      //                the real length on the ruler/metre stick → closeness medal.
+      kind: "estimateMeasure";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "estimate";
+      /** The unit this object is measured in. */
+      unit?: "cm" | "m";
+      /** The object + its real whole-number length in `unit`. Emoji MATCHES label. */
+      object?: { label: string; icon: string; length: number };
+      /** Estimate choices (in `unit`); the real length may be one of them. */
+      estimateOptions?: number[];
+      /** Activity C: ask the student to choose cm or m before estimating. */
+      chooseUnitFirst?: boolean;
       feedback?: { correct: string; wrong: string };
     }
   | {
