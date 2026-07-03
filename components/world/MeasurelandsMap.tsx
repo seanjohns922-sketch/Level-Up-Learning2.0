@@ -512,7 +512,12 @@ export default function MeasurelandsMap({ year = "Prep" }: { year?: Measurelands
 
   return (
     <div style={{ position: "relative", width: "100vw", height: "100vh", overflow: "hidden", background: "#1a0d00" }}>
-      <FogOfForgetfulness progress={fogProgress} accent="#c8a030" glow="rgba(200,160,48,0.6)" />
+      <FogOfForgetfulness
+        progress={fogProgress}
+        accent="#c8a030"
+        glow="rgba(200,160,48,0.6)"
+        badgeClassName={isDistrictMode ? "bottom-6 left-4" : undefined}
+      />
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={world.bgImage}
@@ -566,48 +571,49 @@ export default function MeasurelandsMap({ year = "Prep" }: { year?: Measurelands
           pointerEvents: "none",
         }}
       >
-        {/* Meazurex mentor card */}
-        <div
-          style={{
-            position: "absolute",
-            left: "4%",
-            bottom: "10%",
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            padding: "10px 16px 10px 12px",
-            borderRadius: 18,
-            background: "linear-gradient(180deg, rgba(76,29,149,0.78) 0%, rgba(30,27,75,0.85) 100%)",
-            border: "1.5px solid rgba(253,230,138,0.45)",
-            boxShadow: "0 0 24px rgba(251,191,36,0.28), 0 10px 28px rgba(0,0,0,0.55)",
-            backdropFilter: "blur(10px)",
-            maxWidth: 260,
-          }}
-        >
+        {!isDistrictMode ? (
           <div
             style={{
-              width: 46,
-              height: 46,
-              borderRadius: "50%",
-              background: "radial-gradient(circle at 50% 35%, #fde68a 0%, #b45309 75%)",
+              position: "absolute",
+              left: "4%",
+              bottom: "10%",
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
-              fontSize: 26,
-              boxShadow: "inset 0 -3px 6px rgba(0,0,0,0.3)",
+              gap: 12,
+              padding: "10px 16px 10px 12px",
+              borderRadius: 18,
+              background: "linear-gradient(180deg, rgba(76,29,149,0.78) 0%, rgba(30,27,75,0.85) 100%)",
+              border: "1.5px solid rgba(253,230,138,0.45)",
+              boxShadow: "0 0 24px rgba(251,191,36,0.28), 0 10px 28px rgba(0,0,0,0.55)",
+              backdropFilter: "blur(10px)",
+              maxWidth: 260,
             }}
           >
-            🧙
+            <div
+              style={{
+                width: 46,
+                height: 46,
+                borderRadius: "50%",
+                background: "radial-gradient(circle at 50% 35%, #fde68a 0%, #b45309 75%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 26,
+                boxShadow: "inset 0 -3px 6px rgba(0,0,0,0.3)",
+              }}
+            >
+              🧙
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <span style={{ color: "#fde68a", fontSize: 9, fontWeight: 900, letterSpacing: "0.2em", fontFamily: "ui-monospace,monospace" }}>
+                MEAZUREX
+              </span>
+              <span style={{ color: "#f5f3ff", fontSize: 12, fontWeight: 600, lineHeight: 1.25 }}>
+                Welcome, young measurer! Your adventure begins.
+              </span>
+            </div>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <span style={{ color: "#fde68a", fontSize: 9, fontWeight: 900, letterSpacing: "0.2em", fontFamily: "ui-monospace,monospace" }}>
-              MEAZUREX
-            </span>
-            <span style={{ color: "#f5f3ff", fontSize: 12, fontWeight: 600, lineHeight: 1.25 }}>
-              Welcome, young measurer! Your adventure begins.
-            </span>
-          </div>
-        </div>
+        ) : null}
 
         <div
           style={{
