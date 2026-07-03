@@ -4,6 +4,11 @@ import {
   generateY3MeasurelandsWeek1Lesson1Task,
   resetY3MeasurelandsWeek1Lesson1TaskSessionState,
 } from "@/data/activities/year3Measurelands/week1Lesson1";
+import {
+  buildY3MeasurelandsWeek1Lesson2QuizTasks,
+  generateY3MeasurelandsWeek1Lesson2Task,
+  resetY3MeasurelandsWeek1Lesson2TaskSessionState,
+} from "@/data/activities/year3Measurelands/week1Lesson2";
 
 type Y3MeasurelandsLessonEntry = {
   prefix: string;
@@ -37,6 +42,25 @@ const Y3_MEASURELANDS_LESSONS: Y3MeasurelandsLessonEntry[] = [
     ],
     completionTitle: "Meet the Ruler Complete!",
     unlockMessage: "Lesson 2 unlocked.",
+    returnRoute: "/program?year=Year 3&week=1&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y3-measurement-w1-l2",
+    week: 1,
+    lessonNumber: 2,
+    title: "Measure in Centimetres",
+    subtitle: "Ruler Ridge",
+    generate: generateY3MeasurelandsWeek1Lesson2Task,
+    reset: resetY3MeasurelandsWeek1Lesson2TaskSessionState,
+    quizContributionBuilder: buildY3MeasurelandsWeek1Lesson2QuizTasks,
+    practisedSkills: [
+      "Line objects up with zero",
+      "Read whole centimetres on a ruler",
+      "Measure classroom objects in cm",
+      "Compare measured lengths",
+    ],
+    completionTitle: "Centimetre Measurer Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
     returnRoute: "/program?year=Year 3&week=1&legacy=1&realm_id=measurement",
   },
 ];

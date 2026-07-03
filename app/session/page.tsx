@@ -81,6 +81,7 @@ import { buildY2MeasurelandsWeek5QuizTasks } from "@/data/activities/year2Measur
 import { buildY2MeasurelandsWeek6QuizTasks } from "@/data/activities/year2Measurelands/week6Quiz";
 import { buildY2MeasurelandsWeek7QuizTasks } from "@/data/activities/year2Measurelands/week7Quiz";
 import { buildY3MeasurelandsWeek1Lesson1QuizTasks } from "@/data/activities/year3Measurelands/week1Lesson1";
+import { buildY3MeasurelandsWeek1Lesson2QuizTasks } from "@/data/activities/year3Measurelands/week1Lesson2";
 import { buildY1MeasurelandsWeek7QuizTasks } from "@/data/activities/year1Measurelands/week7Quiz";
 import { buildMeasurelandsWeek2QuizTasks } from "@/data/activities/prepMeasurelands/week2Quiz";
 import { buildMeasurelandsWeek3QuizTasks } from "@/data/activities/prepMeasurelands/week3Quiz";
@@ -1867,16 +1868,31 @@ function buildY2MeasurelandsWeek7WeeklyQuizQuestions(questionsPerLesson: number)
 }
 
 // Measurelands · Level 3 · Week 1 scaffolding.
-// Lesson 1 contributes five ruler questions now; Lessons 2/3 will expand this
-// to the standard 15-question weekly quiz when their generators are built.
+// Lessons 1/2 contribute ruler questions now; Lesson 3 will expand this to the
+// standard 15-question weekly quiz when its generator is built.
 function buildY3MeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson: number): QuizQuestion[] {
-  const tasks = buildY3MeasurelandsWeek1Lesson1QuizTasks().slice(0, questionsPerLesson);
-  return tasks.map((task, index) =>
-    buildGroundQuizQuestion(
-      `y3w1mq${index + 1}`,
-      1,
-      `y3_measurelands_w1_l1_q${index + 1}`,
-      task as GroundQuizPracticeTask
+  const lessonTasks: Array<{
+    lessonNumber: 1 | 2 | 3;
+    tasks: PracticeTask[];
+  }> = [
+    {
+      lessonNumber: 1,
+      tasks: buildY3MeasurelandsWeek1Lesson1QuizTasks().slice(0, questionsPerLesson),
+    },
+    {
+      lessonNumber: 2,
+      tasks: buildY3MeasurelandsWeek1Lesson2QuizTasks().slice(0, questionsPerLesson),
+    },
+  ];
+
+  return lessonTasks.flatMap(({ lessonNumber, tasks }, lessonIndex) =>
+    tasks.map((task, questionIndex) =>
+      buildGroundQuizQuestion(
+        `y3w1mq${lessonIndex * questionsPerLesson + questionIndex + 1}`,
+        lessonNumber,
+        `y3_measurelands_w1_l${lessonNumber}_q${questionIndex + 1}`,
+        task as GroundQuizPracticeTask
+      )
     )
   );
 }
