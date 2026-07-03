@@ -9,6 +9,11 @@ import {
   generateY3MeasurelandsWeek1Lesson2Task,
   resetY3MeasurelandsWeek1Lesson2TaskSessionState,
 } from "@/data/activities/year3Measurelands/week1Lesson2";
+import {
+  buildY3MeasurelandsWeek1Lesson3QuizTasks,
+  generateY3MeasurelandsWeek1Lesson3Task,
+  resetY3MeasurelandsWeek1Lesson3TaskSessionState,
+} from "@/data/activities/year3Measurelands/week1Lesson3";
 
 type Y3MeasurelandsLessonEntry = {
   prefix: string;
@@ -61,6 +66,25 @@ const Y3_MEASURELANDS_LESSONS: Y3MeasurelandsLessonEntry[] = [
     ],
     completionTitle: "Centimetre Measurer Complete!",
     unlockMessage: "Lesson 3 unlocked.",
+    returnRoute: "/program?year=Year 3&week=1&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y3-measurement-w1-l3",
+    week: 1,
+    lessonNumber: 3,
+    title: "Measurement Detective",
+    subtitle: "Ruler Ridge",
+    generate: generateY3MeasurelandsWeek1Lesson3Task,
+    reset: resetY3MeasurelandsWeek1Lesson3TaskSessionState,
+    quizContributionBuilder: buildY3MeasurelandsWeek1Lesson3QuizTasks,
+    practisedSkills: [
+      "Compare centimetre measurements",
+      "Find the difference between lengths",
+      "Choose the correct ruler reading",
+      "Check measurement mistakes",
+    ],
+    completionTitle: "Measurement Detective Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
     returnRoute: "/program?year=Year 3&week=1&legacy=1&realm_id=measurement",
   },
 ];

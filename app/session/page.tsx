@@ -82,6 +82,7 @@ import { buildY2MeasurelandsWeek6QuizTasks } from "@/data/activities/year2Measur
 import { buildY2MeasurelandsWeek7QuizTasks } from "@/data/activities/year2Measurelands/week7Quiz";
 import { buildY3MeasurelandsWeek1Lesson1QuizTasks } from "@/data/activities/year3Measurelands/week1Lesson1";
 import { buildY3MeasurelandsWeek1Lesson2QuizTasks } from "@/data/activities/year3Measurelands/week1Lesson2";
+import { buildY3MeasurelandsWeek1Lesson3QuizTasks } from "@/data/activities/year3Measurelands/week1Lesson3";
 import { buildY1MeasurelandsWeek7QuizTasks } from "@/data/activities/year1Measurelands/week7Quiz";
 import { buildMeasurelandsWeek2QuizTasks } from "@/data/activities/prepMeasurelands/week2Quiz";
 import { buildMeasurelandsWeek3QuizTasks } from "@/data/activities/prepMeasurelands/week3Quiz";
@@ -1867,9 +1868,7 @@ function buildY2MeasurelandsWeek7WeeklyQuizQuestions(questionsPerLesson: number)
   });
 }
 
-// Measurelands · Level 3 · Week 1 scaffolding.
-// Lessons 1/2 contribute ruler questions now; Lesson 3 will expand this to the
-// standard 15-question weekly quiz when its generator is built.
+// Measurelands · Level 3 · Week 1 — 15 ruler questions (5 per lesson).
 function buildY3MeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson: number): QuizQuestion[] {
   const lessonTasks: Array<{
     lessonNumber: 1 | 2 | 3;
@@ -1883,7 +1882,19 @@ function buildY3MeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson: number)
       lessonNumber: 2,
       tasks: buildY3MeasurelandsWeek1Lesson2QuizTasks().slice(0, questionsPerLesson),
     },
+    {
+      lessonNumber: 3,
+      tasks: buildY3MeasurelandsWeek1Lesson3QuizTasks().slice(0, questionsPerLesson),
+    },
   ];
+
+  lessonTasks.forEach(({ lessonNumber, tasks }) => {
+    if (tasks.length !== questionsPerLesson) {
+      throw new Error(
+        `[MeasurelandsWeeklyQuiz] Y3 Week 1 Lesson ${lessonNumber} expected ${questionsPerLesson} questions, received ${tasks.length}.`,
+      );
+    }
+  });
 
   return lessonTasks.flatMap(({ lessonNumber, tasks }, lessonIndex) =>
     tasks.map((task, questionIndex) =>

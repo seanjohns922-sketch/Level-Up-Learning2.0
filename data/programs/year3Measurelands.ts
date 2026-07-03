@@ -47,7 +47,7 @@ const YEAR3_MEASURELANDS_RAW: WeekPlan[] = [
     lessons: [
       buildLesson(1, 1, "Meet the Ruler", "Length: learn how a ruler works, including zero, centimetre spaces and labelled markings.", ["Ruler parts", "Start at zero", "Centimetre spaces"], ["AC9M3M01", "AC9M3M02"]),
       buildLesson(1, 2, "Measure in Centimetres", "Length: measure objects in centimetres using a marked ruler.", ["Measure with a ruler", "Read centimetres", "Line up the object"], ["AC9M3M01"]),
-      buildLesson(1, 3, "Compare Lengths in cm", "Length: compare measured lengths using centimetre counts.", ["Compare cm", "Longer by how many", "Trust the measurement"], ["AC9M3M02"]),
+      buildLesson(1, 3, "Measurement Detective", "Length: use ruler measurements to compare, find differences and check mistakes.", ["Find the difference", "Choose the correct measurement", "Check the ruler"], ["AC9M3M01"]),
     ],
   },
   {
