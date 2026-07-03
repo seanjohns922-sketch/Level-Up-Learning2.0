@@ -715,8 +715,9 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "chooseUnit" | "sort" | "sensibleMeasure";
+      scene: "intro" | "chooseUnit" | "sort" | "sensibleMeasure" | "mistakeCheck";
       object?: { imageSrc?: string; label: string; unit: "g" | "kg"; sensibleMass?: string };
+      statement?: string;
       options?: string[];
       correctOption?: string;
       items?: Array<{ imageSrc?: string; label: string; unit: "g" | "kg" }>;

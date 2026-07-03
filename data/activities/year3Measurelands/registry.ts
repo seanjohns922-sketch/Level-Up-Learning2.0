@@ -34,6 +34,11 @@ import {
   generateY3MeasurelandsWeek3Lesson1Task,
   resetY3MeasurelandsWeek3Lesson1TaskSessionState,
 } from "@/data/activities/year3Measurelands/week3Lesson1";
+import {
+  buildY3MeasurelandsWeek3Lesson2QuizTasks,
+  generateY3MeasurelandsWeek3Lesson2Task,
+  resetY3MeasurelandsWeek3Lesson2TaskSessionState,
+} from "@/data/activities/year3Measurelands/week3Lesson2";
 
 type Y3MeasurelandsLessonEntry = {
   prefix: string;
@@ -177,6 +182,24 @@ const Y3_MEASURELANDS_LESSONS: Y3MeasurelandsLessonEntry[] = [
     ],
     completionTitle: "Grams and Kilograms Complete!",
     unlockMessage: "Lesson 2 unlocked.",
+    returnRoute: "/program?year=Year 3&week=3&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y3-measurement-w3-l2",
+    week: 3,
+    lessonNumber: 2,
+    title: "Choose g or kg",
+    subtitle: "Mass Works",
+    generate: generateY3MeasurelandsWeek3Lesson2Task,
+    reset: resetY3MeasurelandsWeek3Lesson2TaskSessionState,
+    quizContributionBuilder: buildY3MeasurelandsWeek3Lesson2QuizTasks,
+    practisedSkills: [
+      "Choose grams or kilograms",
+      "Sort objects by sensible mass unit",
+      "Identify unrealistic mass statements",
+    ],
+    completionTitle: "Choose g or kg Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
     returnRoute: "/program?year=Year 3&week=3&legacy=1&realm_id=measurement",
   },
 ];

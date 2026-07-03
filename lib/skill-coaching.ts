@@ -242,6 +242,7 @@ const TABLE: Record<string, SkillCoaching> = {
 
   // Measurelands — Year 3 exact lesson tips
   ml_y3_w3_l1: { tip: "Use grams for lighter objects and kilograms for heavier objects." },
+  ml_y3_w3_l2: { tip: "Think how heavy it feels, then choose grams or kilograms." },
 };
 
 const FALLBACK: SkillCoaching = {
@@ -330,6 +331,7 @@ const LESSON_KEY_MAP: Record<string, string> = {
   "year2-measurement-w3-weekly-quiz": "ml_y2_w3_quiz",
   "year2-measurement-w4-weekly-quiz": "ml_y2_w4_quiz",
   "y3-measurement-w3-l1": "ml_y3_w3_l1",
+  "y3-measurement-w3-l2": "ml_y3_w3_l2",
 };
 
 function normalizeLessonId(lessonId: string): string {

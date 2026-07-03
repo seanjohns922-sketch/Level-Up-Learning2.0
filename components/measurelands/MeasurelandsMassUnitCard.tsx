@@ -135,16 +135,30 @@ function ChoiceGrid({
 }
 
 function IntroScene({ task, onCorrect }: { task: MassUnitTask; onCorrect: () => void }) {
+  const isUnitChoiceIntro = Boolean(task.statement);
+
   return (
     <Shell badge={task.badgeLabel ?? "Mass Works"} prompt={task.prompt} speakText={task.speakText}>
       <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
         <div className="rounded-[28px] border border-[rgba(214,184,108,0.45)] bg-white p-5 shadow-sm">
-          <div className="text-center text-lg font-black text-[#2c1c07]">1 kilogram</div>
-          <div className="mx-auto my-3 grid h-28 w-28 place-items-center rounded-[28px] border-2 border-[#8a5a16] bg-gradient-to-br from-[#f3dd9b] to-[#9c7a35] text-3xl font-black text-[#2c1c07] shadow-lg">
-            1 kg
-          </div>
-          <div className="text-center text-xl font-black text-[#5b21b6]">= 1000 g</div>
-          <p className="mt-2 text-center text-sm font-bold text-[#6b5a3f]">Just a benchmark today. No converting yet.</p>
+          {isUnitChoiceIntro ? (
+            <>
+              <div className="text-center text-lg font-black uppercase tracking-[0.12em] text-[#5b21b6]">Choose the Unit</div>
+              <div className="mx-auto my-3 grid h-28 w-28 place-items-center rounded-[28px] border-2 border-[#8a5a16] bg-gradient-to-br from-[#f8e7b5] to-[#c28b28] text-4xl shadow-lg">
+                ⚖️
+              </div>
+              <p className="text-center text-xl font-black leading-snug text-[#2c1c07]">{task.statement}</p>
+            </>
+          ) : (
+            <>
+              <div className="text-center text-lg font-black text-[#2c1c07]">1 kilogram</div>
+              <div className="mx-auto my-3 grid h-28 w-28 place-items-center rounded-[28px] border-2 border-[#8a5a16] bg-gradient-to-br from-[#f3dd9b] to-[#9c7a35] text-3xl font-black text-[#2c1c07] shadow-lg">
+                1 kg
+              </div>
+              <div className="text-center text-xl font-black text-[#5b21b6]">= 1000 g</div>
+              <p className="mt-2 text-center text-sm font-bold text-[#6b5a3f]">Just a benchmark today. No converting yet.</p>
+            </>
+          )}
         </div>
         <div className="grid grid-cols-2 gap-3">
           <ObjectTile imageSrc="/images/measurelands/week2-3d/feather-v2.png" label="Feather" unit="g" compact />
@@ -173,6 +187,17 @@ function ChooseUnitScene({ task, onCorrect, onWrong }: { task: MassUnitTask; onC
           label={task.object.label}
           sensibleMass={task.object.sensibleMass}
         />
+      ) : null}
+      {task.statement ? (
+        <div
+          className="rounded-[24px] border-2 px-4 py-4 text-center text-xl font-black text-[#7c2d12] shadow-sm"
+          style={{
+            borderColor: "rgba(251,146,60,0.34)",
+            background: "linear-gradient(145deg, rgba(255,247,237,0.98), rgba(254,226,226,0.9))",
+          }}
+        >
+          {task.statement}
+        </div>
       ) : null}
       <ChoiceGrid options={task.options ?? []} correct={task.correctOption} onCorrect={onCorrect} onWrong={onWrong} />
     </Shell>
