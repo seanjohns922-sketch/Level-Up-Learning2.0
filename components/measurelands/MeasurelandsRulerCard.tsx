@@ -582,8 +582,10 @@ function MetreStick({ full }: { full?: boolean }) {
 function ObjectHero({ object }: { object: { label: string; icon: string } }) {
   return (
     <div className="flex flex-col items-center gap-2 rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] px-6 py-5">
-      <MeasurelandsObjectArt name={object.label} emoji={object.icon} size={80} />
-      <span className="rounded-full bg-[rgba(91,33,182,0.08)] px-4 py-1 text-xl font-black text-[#2c1c07]">{object.label}</span>
+      <div className="flex h-[124px] w-[124px] items-center justify-center rounded-full bg-[rgba(214,184,108,0.16)] ring-1 ring-[rgba(214,184,108,0.45)] shadow-[inset_0_2px_10px_rgba(180,120,20,0.08)]">
+        <MeasurelandsObjectArt name={object.label} emoji={object.icon} size={88} />
+      </div>
+      <span className="rounded-full bg-[rgba(91,33,182,0.08)] px-4 py-1.5 text-xl font-black text-[#2c1c07]">{object.label}</span>
     </div>
   );
 }
