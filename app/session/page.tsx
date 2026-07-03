@@ -80,6 +80,7 @@ import { buildY2MeasurelandsWeek3QuizTasks } from "@/data/activities/year2Measur
 import { buildY2MeasurelandsWeek5QuizTasks } from "@/data/activities/year2Measurelands/week5Quiz";
 import { buildY2MeasurelandsWeek6QuizTasks } from "@/data/activities/year2Measurelands/week6Quiz";
 import { buildY2MeasurelandsWeek7QuizTasks } from "@/data/activities/year2Measurelands/week7Quiz";
+import { buildY3MeasurelandsWeek1Lesson1QuizTasks } from "@/data/activities/year3Measurelands/week1Lesson1";
 import { buildY1MeasurelandsWeek7QuizTasks } from "@/data/activities/year1Measurelands/week7Quiz";
 import { buildMeasurelandsWeek2QuizTasks } from "@/data/activities/prepMeasurelands/week2Quiz";
 import { buildMeasurelandsWeek3QuizTasks } from "@/data/activities/prepMeasurelands/week3Quiz";
@@ -1863,6 +1864,21 @@ function buildY2MeasurelandsWeek7WeeklyQuizQuestions(questionsPerLesson: number)
       task as GroundQuizPracticeTask
     );
   });
+}
+
+// Measurelands · Level 3 · Week 1 scaffolding.
+// Lesson 1 contributes five ruler questions now; Lessons 2/3 will expand this
+// to the standard 15-question weekly quiz when their generators are built.
+function buildY3MeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson: number): QuizQuestion[] {
+  const tasks = buildY3MeasurelandsWeek1Lesson1QuizTasks().slice(0, questionsPerLesson);
+  return tasks.map((task, index) =>
+    buildGroundQuizQuestion(
+      `y3w1mq${index + 1}`,
+      1,
+      `y3_measurelands_w1_l1_q${index + 1}`,
+      task as GroundQuizPracticeTask
+    )
+  );
 }
 
 // Measurelands · Level 1 · Week 7 — 15 questions (5 per lesson):
@@ -7288,6 +7304,10 @@ function SessionPage({
 
     if (isMeasurementRealm && year === "Year 2" && Number(week) === 7) {
       return buildY2MeasurelandsWeek7WeeklyQuizQuestions(questionsPerLesson);
+    }
+
+    if (isMeasurementRealm && year === "Year 3" && Number(week) === 1) {
+      return buildY3MeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson);
     }
 
     if (isMeasurementRealm && year === "Year 1" && Number(week) === 7) {
