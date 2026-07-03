@@ -185,6 +185,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "measurePath",
   "measureValidity",
   "rulerMeasure",
+  "unitChoice",
   "massMeasure",
   "capacityMeasure",
   "durationUnit",
