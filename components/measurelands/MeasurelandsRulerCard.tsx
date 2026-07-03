@@ -13,143 +13,287 @@ type RulerTask = Extract<PracticeTask, { kind: "rulerMeasure" }>;
  * the scale and its left edge sits on the 0 mark. Reused Level 3 → Level 6.
  * Do NOT introduce a second ruler system — extend this one.
  * ───────────────────────────────────────────────────────────────────────────*/
-const CM_PX = 26; // pixels per centimetre (fixed = accurate; SVG scales to fit)
-const PAD = 20; // left/right padding inside the ruler so 0 isn't at the edge
-const OBJ_TOP = 12;
-const OBJ_H = 38;
-const RULER_TOP = 62;
-const RULER_H = 62;
-const SVG_H = RULER_TOP + RULER_H + 4;
+// Fixed cm→px scale: ruler and object share it, so lengths read exactly and the
+// object's left edge sits on the 0 mark by construction. SVG scales to fit.
+const CM_PX = 30;
+const PAD = 44; // timber before the 0 mark and after the last mark
+const OBJ_H = 30;
+const RULER_H = 60;
 
+// Muted, material-like object tones (not candy colours). Emoji MATCHES the label.
 const OBJECT_FILL: Record<string, [string, string]> = {
-  "✏️": ["#fde68a", "#f59e0b"],
-  "🖍️": ["#fca5a5", "#ef4444"],
-  "🖊️": ["#a5b4fc", "#6366f1"],
-  "🥄": ["#e2e8f0", "#94a3b8"],
-  "🚗": ["#bae6fd", "#38bdf8"],
-  "🔑": ["#fcd34d", "#d97706"],
-  "🍃": ["#bbf7d0", "#22c55e"],
-  "🎀": ["#f9a8d4", "#ec4899"],
+  "✏️": ["#E3B23C", "#C98A1A"],
+  "🖍️": ["#C56B6B", "#A34747"],
+  "🖊️": ["#5B6B9E", "#3F4E7E"],
+  "🥄": ["#CBD0D8", "#9AA1AC"],
+  "🚗": ["#6FA8C7", "#4E86A6"],
+  "🔑": ["#C79A3C", "#A87C22"],
+  "🍃": ["#7FB07A", "#5C8E57"],
+  "🎀": ["#D08AB0", "#B0688F"],
 };
+
+const TIMBER = { top: "#EBCFA2", mid: "#DCB77C", bot: "#C79A57", edge: "#A67B3C" };
+const MARK = "#3B2A14"; // engraved dark-brown markings
+const BRASS = { lo: "#B8860B", hi: "#F0D888", mid: "#D9B25A" };
+const GOLD = "rgba(226,178,58,0.55)"; // Measurelands interaction gold
 
 function xForCm(cm: number) {
   return PAD + cm * CM_PX;
 }
 
-/** The ruler body + cm ticks + numbers, with the hero 0 line. */
-function RulerBody({ rulerCm }: { rulerCm: number }) {
-  const rightX = xForCm(rulerCm);
-  const ticks = [];
+type ObjModel = { label: string; icon: string; lengthCm: number };
+type Taps = {
+  marks: number[];
+  includeEdge?: boolean;
+  wrongValue: number | "edge" | null;
+  onPick: (v: number | "edge") => void;
+};
+
+/**
+ * The one reusable Measurelands Ruler (Level 3–6). A handcrafted timber rule with
+ * fine grain, a bevelled edge, engraved cm marks + numbers, and an elegant brass
+ * zero marker. Objects rest naturally on the ruler, aligned to the 0 mark. When a
+ * "Where do we start?" question is asked, small glowing tap targets float ABOVE
+ * the ruler — the ruler face itself stays clean and never gets covered.
+ */
+function RulerWithObject({
+  rulerCm,
+  object,
+  showZeroHero,
+  taps,
+}: {
+  rulerCm: number;
+  object?: ObjModel;
+  showZeroHero?: boolean;
+  taps?: Taps;
+}) {
+  const [uid] = useState(() => Math.random().toString(36).slice(2, 9));
+  const [hover, setHover] = useState<number | "edge" | null>(null);
+
+  const withTaps = !!taps;
+  const objTop = 8;
+  const tapGap = withTaps ? 40 : 0;
+  const rulerTop = objTop + OBJ_H + tapGap;
+  const tapCy = rulerTop - 20;
+  const svgH = rulerTop + RULER_H + 6;
+
+  const bodyX = PAD - 26;
+  const bodyW = xForCm(rulerCm) + 16 - bodyX;
+  const w = xForCm(rulerCm) + PAD;
+
+  // Engraved centimetre marks. Majors (every 5) are longer/bolder; every cm is
+  // numbered for readability. The 0 is handled separately as a brass marker.
+  const marks = [];
   for (let i = 0; i <= rulerCm; i += 1) {
     const x = xForCm(i);
     const major = i % 5 === 0;
-    const isZero = i === 0;
-    ticks.push(
+    marks.push(
       <g key={i}>
         <line
           x1={x}
           x2={x}
-          y1={RULER_TOP}
-          y2={RULER_TOP + (major ? 22 : 14)}
-          stroke={isZero ? "#b91c1c" : major ? "#7c4a12" : "#a9803a"}
-          strokeWidth={isZero ? 3 : major ? 2 : 1.4}
+          y1={rulerTop + 1}
+          y2={rulerTop + (major ? 20 : 12)}
+          stroke={MARK}
+          strokeWidth={major ? 1.8 : 1.1}
           strokeLinecap="round"
+          opacity={i === 0 ? 0 : 0.92}
         />
         <text
           x={x}
-          y={RULER_TOP + 40}
+          y={rulerTop + 40}
           textAnchor="middle"
-          fontSize={major ? 14 : 11}
-          fontWeight={isZero ? 900 : major ? 800 : 600}
-          fill={isZero ? "#b91c1c" : "#5b3a11"}
+          fontSize={major ? 13 : 11}
+          fontWeight={major ? 800 : 600}
+          fill={MARK}
+          opacity={i === 0 ? 0 : 0.95}
         >
           {i}
         </text>
       </g>,
     );
   }
-  return (
-    <g>
-      {/* timber body */}
-      <defs>
-        <linearGradient id="timber" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#f3d9a4" />
-          <stop offset="0.5" stopColor="#e7bf7d" />
-          <stop offset="1" stopColor="#d8a860" />
-        </linearGradient>
-      </defs>
-      <rect
-        x={PAD - 12}
-        y={RULER_TOP - 6}
-        width={rightX - PAD + 24}
-        height={RULER_H}
-        rx={12}
-        fill="url(#timber)"
-        stroke="#a9803a"
-        strokeWidth={2}
-      />
-      {/* brass top edge */}
-      <rect x={PAD - 12} y={RULER_TOP - 6} width={rightX - PAD + 24} height={6} rx={3} fill="#c9922f" opacity={0.5} />
-      {ticks}
-      {/* ZERO flag — the hero of the lesson */}
-      <g>
-        <rect x={xForCm(0) - 15} y={RULER_TOP - 24} width={30} height={16} rx={5} fill="#b91c1c" />
-        <text x={xForCm(0)} y={RULER_TOP - 12} textAnchor="middle" fontSize={10} fontWeight={900} fill="#fff">
-          0
-        </text>
-      </g>
-    </g>
-  );
-}
 
-/** An object silhouette drawn on the ruler scale, left edge on the 0 mark. */
-function ObjectBar({ object, showZeroHero }: { object: { label: string; icon: string; lengthCm: number }; showZeroHero?: boolean }) {
   const x0 = xForCm(0);
-  const w = object.lengthCm * CM_PX;
-  const [c1, c2] = OBJECT_FILL[object.icon] ?? ["#ddd6fe", "#8b5cf6"];
-  const gid = `obj-${object.icon}-${object.lengthCm}`;
-  return (
-    <g>
-      <defs>
-        <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor={c1} />
-          <stop offset="1" stopColor={c2} />
-        </linearGradient>
-      </defs>
-      <rect x={x0} y={OBJ_TOP} width={w} height={OBJ_H} rx={10} fill={`url(#${gid})`} stroke="#00000022" strokeWidth={1} />
-      <rect x={x0} y={OBJ_TOP + 3} width={w} height={7} rx={4} fill="#ffffff55" />
-      <text x={x0 + w / 2} y={OBJ_TOP + OBJ_H / 2 + 8} textAnchor="middle" fontSize={22}>
-        {object.icon}
-      </text>
-      {/* dashed guide connecting the object's start to the 0 mark */}
-      {showZeroHero ? (
-        <line x1={x0} x2={x0} y1={OBJ_TOP} y2={RULER_TOP + 22} stroke="#b91c1c" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.7} />
-      ) : null}
-    </g>
-  );
-}
+  const objW = object ? object.lengthCm * CM_PX : 0;
+  const [oc1, oc2] = object ? OBJECT_FILL[object.icon] ?? ["#B9A6D6", "#8B76B4"] : ["", ""];
 
-/** Full ruler with an object aligned to zero. Scales to fit its container. */
-function RulerWithObject({
-  rulerCm,
-  object,
-  showZeroHero,
-  children,
-}: {
-  rulerCm: number;
-  object?: { label: string; icon: string; lengthCm: number };
-  showZeroHero?: boolean;
-  children?: React.ReactNode;
-}) {
-  const w = xForCm(rulerCm) + PAD;
   return (
-    <div className="mx-auto w-full" style={{ maxWidth: Math.min(w, 560) }}>
-      <svg viewBox={`0 0 ${w} ${SVG_H}`} width="100%" role="img" aria-label={object ? `${object.label} on a ruler` : "A ruler"}>
-        <RulerBody rulerCm={rulerCm} />
-        {object ? <ObjectBar object={object} showZeroHero={showZeroHero} /> : null}
-        {children}
+    <div className="mx-auto w-full" style={{ maxWidth: Math.min(w, 580) }}>
+      <svg viewBox={`0 0 ${w} ${svgH}`} width="100%" role="img" aria-label={object ? `${object.label} on a ruler` : "A ruler"}>
+        <defs>
+          <linearGradient id={`timber-${uid}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor={TIMBER.top} />
+            <stop offset="0.45" stopColor={TIMBER.mid} />
+            <stop offset="1" stopColor={TIMBER.bot} />
+          </linearGradient>
+          <linearGradient id={`brass-${uid}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor={BRASS.hi} />
+            <stop offset="0.5" stopColor={BRASS.mid} />
+            <stop offset="1" stopColor={BRASS.lo} />
+          </linearGradient>
+          {object ? (
+            <linearGradient id={`obj-${uid}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor={oc1} />
+              <stop offset="1" stopColor={oc2} />
+            </linearGradient>
+          ) : null}
+          <clipPath id={`body-${uid}`}>
+            <rect x={bodyX} y={rulerTop - 4} width={bodyW} height={RULER_H} rx={8} />
+          </clipPath>
+          <filter id={`soft-${uid}`} x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="2.2" />
+          </filter>
+        </defs>
+
+        {/* ── Timber body with fine grain + bevelled edge ── */}
+        <g>
+          <rect x={bodyX} y={rulerTop - 4} width={bodyW} height={RULER_H} rx={8} fill={`url(#timber-${uid})`} stroke={TIMBER.edge} strokeWidth={1.4} />
+          <g clipPath={`url(#body-${uid})`} opacity={0.5}>
+            {[0.24, 0.42, 0.6, 0.78].map((f, gi) => {
+              const gy = rulerTop - 4 + RULER_H * f;
+              return (
+                <path
+                  key={gi}
+                  d={`M ${bodyX} ${gy} C ${bodyX + bodyW * 0.3} ${gy - 3}, ${bodyX + bodyW * 0.7} ${gy + 3}, ${bodyX + bodyW} ${gy}`}
+                  fill="none"
+                  stroke="rgba(90,58,20,0.16)"
+                  strokeWidth={1}
+                />
+              );
+            })}
+          </g>
+          {/* bevel: light top edge, soft bottom shadow */}
+          <rect x={bodyX + 1.5} y={rulerTop - 3} width={bodyW - 3} height={3} rx={2} fill="#FFFFFF" opacity={0.35} />
+          <rect x={bodyX + 1.5} y={rulerTop - 4 + RULER_H - 4} width={bodyW - 3} height={3} rx={2} fill="#5A3A14" opacity={0.14} />
+        </g>
+
+        {marks}
+
+        {/* ── Elegant brass ZERO marker (special, but not a cartoon flag) ── */}
+        <g>
+          <rect x={x0 - 2} y={rulerTop} width={4} height={24} rx={2} fill={`url(#brass-${uid})`} stroke={BRASS.lo} strokeWidth={0.5} />
+          <path d={`M ${x0 - 5} ${rulerTop - 1} L ${x0 + 5} ${rulerTop - 1} L ${x0} ${rulerTop + 6} Z`} fill={`url(#brass-${uid})`} />
+          <text x={x0} y={rulerTop + 40} textAnchor="middle" fontSize={13} fontWeight={900} fill={BRASS.lo}>
+            0
+          </text>
+          {/* zero glows gold when its tap target is hovered */}
+          {hover === 0 ? <rect x={x0 - 4} y={rulerTop - 3} width={8} height={28} rx={4} fill={GOLD} filter={`url(#soft-${uid})`} /> : null}
+        </g>
+
+        {/* ── Object resting on the ruler, left edge on the selected start mark ── */}
+        {object ? (
+          <g>
+            <ellipse cx={x0 + objW / 2} cy={objTop + OBJ_H + 1} rx={objW / 2} ry={4} fill="#3A2712" opacity={0.14} filter={`url(#soft-${uid})`} />
+            <rect x={x0} y={objTop} width={objW} height={OBJ_H} rx={8} fill={`url(#obj-${uid})`} stroke="rgba(0,0,0,0.16)" strokeWidth={1} />
+            <rect x={x0 + 1.5} y={objTop + 2} width={objW - 3} height={5} rx={3} fill="#FFFFFF" opacity={0.32} />
+            <text x={x0 + Math.min(objW / 2, 18)} y={objTop + OBJ_H / 2 + 6} textAnchor="middle" fontSize={17}>
+              {object.icon}
+            </text>
+            {showZeroHero ? <line x1={x0} x2={x0} y1={objTop + OBJ_H} y2={rulerTop} stroke={BRASS.lo} strokeWidth={1.2} opacity={0.6} /> : null}
+          </g>
+        ) : null}
+
+        {/* ── Tap targets ABOVE the clean ruler (Start-at-Zero interaction) ── */}
+        {taps ? (
+          <g>
+            {taps.includeEdge ? (
+              <g
+                style={{ cursor: "pointer" }}
+                onClick={() => taps.onPick("edge")}
+                onMouseEnter={() => setHover("edge")}
+                onMouseLeave={() => setHover(null)}
+              >
+                {/* the physical left END of the ruler — a common wrong start */}
+                <rect
+                  x={bodyX - 5}
+                  y={rulerTop + 8}
+                  width={13}
+                  height={RULER_H - 22}
+                  rx={4}
+                  fill={taps.wrongValue === "edge" ? "#FCE0E0" : hover === "edge" ? GOLD : "rgba(184,134,11,0.16)"}
+                  stroke={taps.wrongValue === "edge" ? "#C0564E" : hover === "edge" ? BRASS.lo : "#C7A15A"}
+                  strokeWidth={hover === "edge" ? 2.2 : 1.4}
+                />
+                <text x={bodyX + 1.5} y={rulerTop + RULER_H / 2 + 2} textAnchor="middle" fontSize={12} fontWeight={800} fill={taps.wrongValue === "edge" ? "#C0564E" : "#8A6A2E"}>
+                  ↤
+                </text>
+              </g>
+            ) : null}
+            {taps.marks.map((cm) => (
+              <TapDot
+                key={cm}
+                cx={xForCm(cm)}
+                cy={tapCy}
+                label={String(cm)}
+                value={cm}
+                wrong={taps.wrongValue === cm}
+                hovered={hover === cm}
+                onHover={setHover}
+                onPick={taps.onPick}
+                rulerTop={rulerTop}
+                uid={uid}
+              />
+            ))}
+          </g>
+        ) : null}
       </svg>
     </div>
+  );
+}
+
+/** A small glowing tap target that floats above the ruler with a fine stem to a mark. */
+function TapDot({
+  cx,
+  cy,
+  label,
+  value,
+  small,
+  wrong,
+  hovered,
+  onHover,
+  onPick,
+  rulerTop,
+  uid,
+}: {
+  cx: number;
+  cy: number;
+  label: string;
+  value: number | "edge";
+  small?: boolean;
+  wrong: boolean;
+  hovered: boolean;
+  onHover: (v: number | "edge" | null) => void;
+  onPick: (v: number | "edge") => void;
+  rulerTop: number;
+  uid: string;
+}) {
+  const r = small ? 11 : 13;
+  return (
+    <g
+      style={{ cursor: "pointer" }}
+      onClick={() => onPick(value)}
+      onMouseEnter={() => onHover(value)}
+      onMouseLeave={() => onHover(null)}
+    >
+      {/* fine stem from dot down to the mark */}
+      <line x1={cx} x2={cx} y1={cy + r} y2={rulerTop} stroke={BRASS.lo} strokeWidth={1} opacity={hovered ? 0.7 : 0.32} />
+      {/* soft gold halo, gently pulsing */}
+      <circle cx={cx} cy={cy} r={r + (hovered ? 8 : 5)} fill={GOLD} filter={`url(#soft-${uid})`} opacity={hovered ? 0.9 : 0.5}>
+        <animate attributeName="opacity" values={hovered ? "0.7;1;0.7" : "0.35;0.6;0.35"} dur="1.8s" repeatCount="indefinite" />
+      </circle>
+      <circle
+        cx={cx}
+        cy={cy}
+        r={r}
+        fill={wrong ? "#FCE0E0" : "#FFFDF7"}
+        stroke={wrong ? "#C0564E" : hovered ? BRASS.lo : "#C7A15A"}
+        strokeWidth={hovered ? 2.4 : 1.8}
+      />
+      <text x={cx} y={cy + 4} textAnchor="middle" fontSize={small ? 11 : 12} fontWeight={800} fill={wrong ? "#C0564E" : MARK}>
+        {label}
+      </text>
+    </g>
   );
 }
 
@@ -200,49 +344,25 @@ function IntroScene({ task, onCorrect }: { task: RulerTask; onCorrect: () => voi
 
 /* ── Activity A — Start at Zero: tap the mark we start measuring from ── */
 function StartZeroScene({ task, onCorrect, onWrong }: { task: RulerTask; onCorrect: () => void; onWrong: () => void }) {
-  const [wrongTick, setWrongTick] = useState<number | "edge" | null>(null);
-  const ticks = task.tickOptions ?? [0, 1, 2];
-  const w = xForCm(task.rulerCm) + PAD;
+  const [wrongValue, setWrongValue] = useState<number | "edge" | null>(null);
+  const marks = task.tickOptions ?? [0, 1, 2];
   const handle = (value: number | "edge") => {
     if (value === task.correctTick) {
       onCorrect();
     } else {
-      setWrongTick(value);
+      setWrongValue(value);
       onWrong();
     }
   };
   return (
     <Shell badge={task.badgeLabel ?? "Start at Zero"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-4">
-        <RulerWithObject rulerCm={task.rulerCm} object={task.object}>
-          {/* the physical left edge distractor */}
-          {task.includeEdgeOption ? (
-            <g onClick={() => handle("edge")} style={{ cursor: "pointer" }}>
-              <circle cx={PAD - 12} cy={RULER_TOP + 8} r={12} fill={wrongTick === "edge" ? "#fecaca" : "#ffffff"} stroke="#7c4a12" strokeWidth={2} />
-              <text x={PAD - 12} y={RULER_TOP + 12} textAnchor="middle" fontSize={12} fontWeight={800} fill="#7c4a12">
-                ↤
-              </text>
-            </g>
-          ) : null}
-          {ticks.map((cm) => (
-            <g key={cm} onClick={() => handle(cm)} style={{ cursor: "pointer" }}>
-              <circle
-                cx={xForCm(cm)}
-                cy={RULER_TOP + 8}
-                r={13}
-                fill={wrongTick === cm ? "#fecaca" : "#ffffff"}
-                stroke={cm === 0 ? "#b91c1c" : "#7c4a12"}
-                strokeWidth={2.5}
-              />
-              <text x={xForCm(cm)} y={RULER_TOP + 13} textAnchor="middle" fontSize={13} fontWeight={900} fill={cm === 0 ? "#b91c1c" : "#5b3a11"}>
-                {cm}
-              </text>
-            </g>
-          ))}
-          <text x={w / 2} y={SVG_H - 2} textAnchor="middle" fontSize={11} fontWeight={700} fill="#a98b52">
-            Tap where we start measuring
-          </text>
-        </RulerWithObject>
+        <RulerWithObject
+          rulerCm={task.rulerCm}
+          object={task.object}
+          taps={{ marks, includeEdge: task.includeEdgeOption, wrongValue, onPick: handle }}
+        />
+        <p className="mt-2 text-center text-[12px] font-bold uppercase tracking-[0.14em] text-[#a98b52]">Tap where we start measuring</p>
       </div>
     </Shell>
   );
