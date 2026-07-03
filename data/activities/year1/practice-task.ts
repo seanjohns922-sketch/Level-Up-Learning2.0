@@ -1083,8 +1083,8 @@ export type PracticeTask = (
       scene: "intro" | "startZero" | "measure" | "compare";
       /** Length of the drawn ruler in whole centimetres (e.g. 12, 20). */
       rulerCm: number;
-      /** Single-object scenes: the object measured, aligned to 0. */
-      object?: { label: string; icon: string; lengthCm: number };
+      /** Single-object scenes: the object measured on the ruler. Defaults to starting at 0. */
+      object?: { label: string; icon: string; lengthCm: number; startCm?: number };
       /** "startZero": the cm marks offered as taps (correct = 0). */
       tickOptions?: number[];
       correctTick?: number;
@@ -1094,7 +1094,7 @@ export type PracticeTask = (
       options?: number[];
       correctAnswer?: number;
       /** "compare": two measured objects; tap the longer (or shorter). */
-      compareObjects?: Array<{ label: string; icon: string; lengthCm: number }>;
+      compareObjects?: Array<{ label: string; icon: string; lengthCm: number; startCm?: number }>;
       compareMode?: "longer" | "shorter";
       correctLabel?: string;
       /** "compare": optional numeric comparison question (for difference tasks). */
@@ -1119,12 +1119,19 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "aboutMetre" | "whichTool" | "compareMetre";
+      // W2 L1 scenes: aboutMetre / whichTool / compareMetre.
+      // W2 L2 scenes: whichUnit (cm vs m), sort (tap objects into cm/m bins),
+      //               spotMistake (is Professor Gauge's unit sensible?).
+      scene: "intro" | "aboutMetre" | "whichTool" | "compareMetre" | "whichUnit" | "sort" | "spotMistake";
       /** The familiar object being judged (emoji MATCHES the label). */
       object?: { label: string; icon: string };
       /** Choice labels in display order; correctOption must be one of them. */
       options?: string[];
       correctOption?: string;
+      /** "sort": the objects to sort into the cm / m bins. */
+      items?: Array<{ label: string; icon: string; unit: "cm" | "m" }>;
+      /** "spotMistake": Professor Gauge's claim, e.g. "The tree is 4 centimetres tall." */
+      statement?: string;
       feedback?: { correct: string; wrong: string };
     }
   | {

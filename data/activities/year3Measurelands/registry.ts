@@ -19,6 +19,11 @@ import {
   generateY3MeasurelandsWeek2Lesson1Task,
   resetY3MeasurelandsWeek2Lesson1TaskSessionState,
 } from "@/data/activities/year3Measurelands/week2Lesson1";
+import {
+  buildY3MeasurelandsWeek2Lesson2QuizTasks,
+  generateY3MeasurelandsWeek2Lesson2Task,
+  resetY3MeasurelandsWeek2Lesson2TaskSessionState,
+} from "@/data/activities/year3Measurelands/week2Lesson2";
 
 type Y3MeasurelandsLessonEntry = {
   prefix: string;
@@ -108,6 +113,24 @@ const Y3_MEASURELANDS_LESSONS: Y3MeasurelandsLessonEntry[] = [
     ],
     completionTitle: "Meet the Metre Complete!",
     unlockMessage: "Lesson 2 unlocked.",
+    returnRoute: "/program?year=Year 3&week=2&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y3-measurement-w2-l2",
+    week: 2,
+    lessonNumber: 2,
+    title: "Choose cm or m",
+    subtitle: "Metre Mountain",
+    generate: generateY3MeasurelandsWeek2Lesson2Task,
+    reset: resetY3MeasurelandsWeek2Lesson2TaskSessionState,
+    quizContributionBuilder: buildY3MeasurelandsWeek2Lesson2QuizTasks,
+    practisedSkills: [
+      "Choose centimetres or metres",
+      "Sort objects by measuring unit",
+      "Spot an unsensible unit choice",
+    ],
+    completionTitle: "Choose cm or m Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
     returnRoute: "/program?year=Year 3&week=2&legacy=1&realm_id=measurement",
   },
 ];

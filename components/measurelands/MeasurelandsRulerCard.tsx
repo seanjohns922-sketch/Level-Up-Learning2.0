@@ -42,7 +42,7 @@ function xForCm(cm: number) {
   return PAD + cm * CM_PX;
 }
 
-type ObjModel = { label: string; icon: string; lengthCm: number };
+type ObjModel = { label: string; icon: string; lengthCm: number; startCm?: number };
 type Taps = {
   marks: number[];
   includeEdge?: boolean;
@@ -116,6 +116,7 @@ function RulerWithObject({
   }
 
   const x0 = xForCm(0);
+  const objX = xForCm(object?.startCm ?? 0);
   const objW = object ? object.lengthCm * CM_PX : 0;
   const [oc1, oc2] = object ? OBJECT_FILL[object.icon] ?? ["#B9A6D6", "#8B76B4"] : ["", ""];
 
@@ -185,13 +186,13 @@ function RulerWithObject({
         {/* ── Object resting on the ruler, left edge on the selected start mark ── */}
         {object ? (
           <g>
-            <ellipse cx={x0 + objW / 2} cy={objTop + OBJ_H + 1} rx={objW / 2} ry={4} fill="#3A2712" opacity={0.14} filter={`url(#soft-${uid})`} />
-            <rect x={x0} y={objTop} width={objW} height={OBJ_H} rx={8} fill={`url(#obj-${uid})`} stroke="rgba(0,0,0,0.16)" strokeWidth={1} />
-            <rect x={x0 + 1.5} y={objTop + 2} width={objW - 3} height={5} rx={3} fill="#FFFFFF" opacity={0.32} />
-            <text x={x0 + Math.min(objW / 2, 18)} y={objTop + OBJ_H / 2 + 6} textAnchor="middle" fontSize={17}>
+            <ellipse cx={objX + objW / 2} cy={objTop + OBJ_H + 1} rx={objW / 2} ry={4} fill="#3A2712" opacity={0.14} filter={`url(#soft-${uid})`} />
+            <rect x={objX} y={objTop} width={objW} height={OBJ_H} rx={8} fill={`url(#obj-${uid})`} stroke="rgba(0,0,0,0.16)" strokeWidth={1} />
+            <rect x={objX + 1.5} y={objTop + 2} width={objW - 3} height={5} rx={3} fill="#FFFFFF" opacity={0.32} />
+            <text x={objX + Math.min(objW / 2, 18)} y={objTop + OBJ_H / 2 + 6} textAnchor="middle" fontSize={17}>
               {object.icon}
             </text>
-            {showZeroHero ? <line x1={x0} x2={x0} y1={objTop + OBJ_H} y2={rulerTop} stroke={BRASS.lo} strokeWidth={1.2} opacity={0.6} /> : null}
+            {showZeroHero ? <line x1={objX} x2={objX} y1={objTop + OBJ_H} y2={rulerTop} stroke={BRASS.lo} strokeWidth={1.2} opacity={0.6} /> : null}
           </g>
         ) : null}
 
@@ -584,8 +585,9 @@ function ObjectHero({ object }: { object: { label: string; icon: string } }) {
 }
 
 function toolGlyph(option: string) {
-  if (/metre/i.test(option)) return "📐";
-  if (/ruler/i.test(option)) return "📏";
+  // Test cm first — "Centimetres" also contains the substring "metre".
+  if (/centi|\bcm\b|ruler/i.test(option)) return "📏";
+  if (/metre|\bm\b/i.test(option)) return "📐";
   return null;
 }
 
@@ -660,11 +662,117 @@ function MetreIntroScene({ task, onCorrect }: { task: UnitTask; onCorrect: () =>
   );
 }
 
+/* ── W2 L2 Activity B — Sort objects into the cm / m bins (tap-to-sort) ── */
+function UnitSortScene({ task, onCorrect, onWrong }: { task: UnitTask; onCorrect: () => void; onWrong: () => void }) {
+  const items = task.items ?? [];
+  const [placed, setPlaced] = useState<Record<string, "cm" | "m">>({});
+  const [selected, setSelected] = useState<string | null>(null);
+  const [wrong, setWrong] = useState<string | null>(null);
+  const unplaced = items.filter((it) => !(it.label in placed));
+
+  const pickBin = (bin: "cm" | "m") => {
+    if (!selected) return;
+    const item = items.find((i) => i.label === selected);
+    if (!item) return;
+    if (item.unit === bin) {
+      const next = { ...placed, [selected]: bin };
+      setPlaced(next);
+      setSelected(null);
+      setWrong(null);
+      if (Object.keys(next).length === items.length) onCorrect();
+    } else {
+      setWrong(selected);
+      setSelected(null);
+      onWrong();
+      window.setTimeout(() => setWrong(null), 600);
+    }
+  };
+
+  const Bin = ({ bin, glyph, title }: { bin: "cm" | "m"; glyph: string; title: string }) => {
+    const chips = items.filter((it) => placed[it.label] === bin);
+    return (
+      <button
+        type="button"
+        onClick={() => pickBin(bin)}
+        className={`flex min-h-[150px] flex-col gap-2 rounded-[24px] border-2 p-3 text-left transition ${
+          selected ? "border-[#b4781e] bg-[rgba(214,184,108,0.14)]" : "border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)]"
+        }`}
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-2xl" aria-hidden>{glyph}</span>
+          <span className="text-sm font-black uppercase tracking-[0.12em] text-[#5b21b6]">{title}</span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {chips.map((it) => (
+            <span key={it.label} className="flex items-center gap-1 rounded-full border border-[rgba(15,118,110,0.4)] bg-[rgba(15,118,110,0.12)] px-3 py-1 text-sm font-black text-[#0f766e]">
+              <span aria-hidden>{it.icon}</span> {it.label}
+            </span>
+          ))}
+        </div>
+      </button>
+    );
+  };
+
+  return (
+    <Shell badge={task.badgeLabel ?? "Sort the Objects"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="grid grid-cols-2 gap-3">
+        <Bin bin="cm" glyph="📏" title="Centimetres" />
+        <Bin bin="m" glyph="📐" title="Metres" />
+      </div>
+      <div className="rounded-[22px] border border-[rgba(214,184,108,0.45)] bg-[rgba(255,250,240,0.96)] p-3">
+        <p className="mb-2 text-center text-[12px] font-bold uppercase tracking-[0.14em] text-[#a98b52]">
+          {unplaced.length ? "Tap an object, then tap its bin" : "All sorted!"}
+        </p>
+        <div className="flex flex-wrap justify-center gap-2">
+          {unplaced.map((it) => (
+            <button
+              key={it.label}
+              type="button"
+              onClick={() => setSelected((cur) => (cur === it.label ? null : it.label))}
+              className={`flex items-center gap-1.5 rounded-full border-2 px-4 py-2 text-base font-black text-[#2c1c07] transition ${
+                wrong === it.label
+                  ? "border-[#C0564E] bg-[#FCE0E0]"
+                  : selected === it.label
+                    ? "-translate-y-0.5 border-[#b4781e] bg-[rgba(214,184,108,0.3)] shadow"
+                    : "border-[rgba(214,184,108,0.6)] bg-[#fffaf0]"
+              }`}
+            >
+              <span className="text-xl" aria-hidden>{it.icon}</span> {it.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    </Shell>
+  );
+}
+
+/* ── W2 L2 Activity C — Spot Professor Gauge's wrong unit ── */
+function SpotMistakeScene({ task, onCorrect, onWrong }: { task: UnitTask; onCorrect: () => void; onWrong: () => void }) {
+  return (
+    <Shell badge={task.badgeLabel ?? "Professor Gauge's Mistake"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      {task.object ? <ObjectHero object={task.object} /> : null}
+      <div className="flex items-start gap-3 rounded-[24px] border-2 border-[rgba(124,58,237,0.28)] bg-[rgba(124,58,237,0.06)] px-5 py-4">
+        <span className="text-3xl leading-none" aria-hidden>🧑‍🏫</span>
+        <p className="text-xl font-black italic leading-snug text-[#2c1c07]">&ldquo;{task.statement}&rdquo;</p>
+      </div>
+      <UnitChoices
+        options={task.options ?? []}
+        correct={task.correctOption}
+        cols="grid-cols-1 sm:grid-cols-2"
+        onCorrect={onCorrect}
+        onWrong={onWrong}
+      />
+    </Shell>
+  );
+}
+
 export function MeasurelandsMetreCard({ task, onCorrect, onWrong }: { task: UnitTask; onCorrect: () => void; onWrong: () => void }) {
   if (task.scene === "intro") return <MetreIntroScene task={task} onCorrect={onCorrect} />;
+  if (task.scene === "sort") return <UnitSortScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "spotMistake") return <SpotMistakeScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   const options = task.options ?? [];
-  const showReference = task.scene !== "whichTool";
-  const isWhichTool = task.scene === "whichTool";
+  const withGlyph = task.scene === "whichTool" || task.scene === "whichUnit";
+  const showReference = task.scene === "aboutMetre" || task.scene === "compareMetre";
   const cols = task.scene === "compareMetre" ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-2";
   return (
     <Shell badge={task.badgeLabel ?? "Metre Mountain"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
@@ -675,7 +783,7 @@ export function MeasurelandsMetreCard({ task, onCorrect, onWrong }: { task: Unit
           <p className="mt-1 text-center text-[12px] font-bold uppercase tracking-[0.14em] text-[#a98b52]">One metre to compare against</p>
         </div>
       ) : null}
-      <UnitChoices options={options} correct={task.correctOption} cols={cols} withTool={isWhichTool} onCorrect={onCorrect} onWrong={onWrong} />
+      <UnitChoices options={options} correct={task.correctOption} cols={cols} withTool={withGlyph} onCorrect={onCorrect} onWrong={onWrong} />
     </Shell>
   );
 }
