@@ -1,0 +1,3 @@
+Measurelands object art. Drop transparent PNGs here named by object label, kebab-case:
+pencil.png, marker.png, crayon.png, spoon.png, toothbrush.png, paintbrush.png, toy-car.png, key.png, pair-of-scissors.png, leaf.png, ribbon.png, book.png, door.png, tree.png, ...
+They auto-appear in the cards via MeasurelandsObjectArt (emoji fallback until the file exists).
