@@ -1068,6 +1068,38 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Year 3 W1 "Ruler Ridge" — the reusable Ruler mechanic
+      // (AC9M3M01/M02). Measure objects in WHOLE centimetres against a premium
+      // ruler that ALWAYS starts at 0. Objects are rendered (not photos) so their
+      // width maps exactly to the ruler scale and lines up on the 0 mark. Scenes:
+      //   "intro"     — Professor Gauge introduces the ruler (teaching demo).
+      //   "startZero" — tap the mark we start measuring from (correct = 0 cm).
+      //   "measure"   — read the length of one object aligned to 0 (cm options).
+      //   "compare"   — two measured objects; tap the longer/shorter one.
+      kind: "rulerMeasure";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "startZero" | "measure" | "compare";
+      /** Length of the drawn ruler in whole centimetres (e.g. 12, 20). */
+      rulerCm: number;
+      /** Single-object scenes: the object measured, aligned to 0. */
+      object?: { label: string; icon: string; lengthCm: number };
+      /** "startZero": the cm marks offered as taps (correct = 0). */
+      tickOptions?: number[];
+      correctTick?: number;
+      /** "startZero": also offer a non-number "edge of the ruler" distractor. */
+      includeEdgeOption?: boolean;
+      /** "measure": whole-cm answer options; correct = object.lengthCm. */
+      options?: number[];
+      correctAnswer?: number;
+      /** "compare": two measured objects; tap the longer (or shorter). */
+      compareObjects?: Array<{ label: string; icon: string; lengthCm: number }>;
+      compareMode?: "longer" | "shorter";
+      correctLabel?: string;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       kind: "tensOnesMcq";
       prompt: string;
       min: number;
