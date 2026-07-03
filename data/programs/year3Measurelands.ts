@@ -78,9 +78,9 @@ const YEAR3_MEASURELANDS_RAW: WeekPlan[] = [
     topic: "Capacity Lab",
     curriculum: ["AC9M3M01", "AC9M3M02"],
     lessons: [
-      buildLesson(4, 1, "Meet mL and L", "Capacity: recognise millilitres and litres and use familiar benchmarks.", ["Millilitres", "Litres", "Capacity benchmarks"], ["AC9M3M01"]),
+      buildLesson(4, 1, "Meet ml and L", "Capacity: recognise millilitres and litres and use familiar benchmarks.", ["Millilitres", "Litres", "Capacity benchmarks"], ["AC9M3M01"]),
       buildLesson(4, 2, "Compare Capacity", "Capacity: compare measured capacities using millilitres and litres.", ["Compare capacity", "Read the unit", "Marked measuring jugs"], ["AC9M3M02"]),
-      buildLesson(4, 3, "Choose mL or L", "Capacity: choose the sensible metric unit for measuring containers and liquids.", ["Choose millilitres", "Choose litres", "Best capacity unit"], ["AC9M3M01", "AC9M3M02"]),
+      buildLesson(4, 3, "Choose ml or L", "Capacity: choose the sensible metric unit for measuring containers and liquids.", ["Choose millilitres", "Choose litres", "Best capacity unit"], ["AC9M3M01", "AC9M3M02"]),
     ],
   },
   {
