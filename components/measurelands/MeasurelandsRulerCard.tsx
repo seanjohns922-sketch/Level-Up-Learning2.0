@@ -36,6 +36,7 @@ const TIMBER = { top: "#EBCFA2", mid: "#DCB77C", bot: "#C79A57", edge: "#A67B3C"
 const MARK = "#3B2A14"; // engraved dark-brown markings
 const BRASS = { lo: "#B8860B", hi: "#F0D888", mid: "#D9B25A" };
 const GOLD = "rgba(226,178,58,0.55)"; // Measurelands interaction gold
+const ZERO_RED = "#C81E1E"; // the "start at 0" hero colour
 
 function xForCm(cm: number) {
   return PAD + cm * CM_PX;
@@ -170,11 +171,11 @@ function RulerWithObject({
 
         {marks}
 
-        {/* ── Elegant brass ZERO marker (special, but not a cartoon flag) ── */}
+        {/* ── ZERO marker — red so the "start at 0" hero stands out ── */}
         <g>
-          <rect x={x0 - 2} y={rulerTop} width={4} height={24} rx={2} fill={`url(#brass-${uid})`} stroke={BRASS.lo} strokeWidth={0.5} />
-          <path d={`M ${x0 - 5} ${rulerTop - 1} L ${x0 + 5} ${rulerTop - 1} L ${x0} ${rulerTop + 6} Z`} fill={`url(#brass-${uid})`} />
-          <text x={x0} y={rulerTop + 40} textAnchor="middle" fontSize={13} fontWeight={900} fill={BRASS.lo}>
+          <rect x={x0 - 2} y={rulerTop} width={4} height={24} rx={2} fill={ZERO_RED} stroke="#8E1111" strokeWidth={0.5} />
+          <path d={`M ${x0 - 5} ${rulerTop - 1} L ${x0 + 5} ${rulerTop - 1} L ${x0} ${rulerTop + 6} Z`} fill={ZERO_RED} />
+          <text x={x0} y={rulerTop + 40} textAnchor="middle" fontSize={13} fontWeight={900} fill={ZERO_RED}>
             0
           </text>
           {/* zero glows gold when its tap target is hovered */}
@@ -326,10 +327,31 @@ function Shell({ badge, prompt, speakText, children }: { badge: string; prompt: 
 
 /* ── Teaching intro: Professor Gauge unveils the ruler ── */
 function IntroScene({ task, onCorrect }: { task: RulerTask; onCorrect: () => void }) {
+  const steps: Array<{ n: string; text: React.ReactNode }> = [
+    { n: "1", text: <>Line your object up with the <span className="font-black text-[#C81E1E]">red 0</span> mark.</> },
+    { n: "2", text: <>Count the centimetres along to the other end of the object.</> },
+    { n: "3", text: <>The last number you reach is how many centimetres long it is.</> },
+  ];
   return (
     <Shell badge={task.badgeLabel ?? "Meazurex Mission"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-4">
         <RulerWithObject rulerCm={task.rulerCm} object={task.object} showZeroHero />
+      </div>
+      <div className="rounded-[24px] border border-[rgba(214,184,108,0.45)] bg-[rgba(255,250,240,0.96)] p-4">
+        <div className="mb-3 flex items-center gap-2">
+          <span className="text-[12px] font-black uppercase tracking-[0.16em] text-[#a98b52]">How to use your ruler</span>
+          <span className="rounded-full bg-[rgba(200,30,30,0.1)] px-2 py-0.5 text-[11px] font-black text-[#C81E1E]">Always start at 0</span>
+        </div>
+        <ul className="space-y-2.5">
+          {steps.map((s) => (
+            <li key={s.n} className="flex items-start gap-3">
+              <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#C81E1E] text-sm font-black text-white shadow-sm">
+                {s.n}
+              </span>
+              <span className="text-[17px] font-bold leading-snug text-[#2c1c07]">{s.text}</span>
+            </li>
+          ))}
+        </ul>
       </div>
       <button
         type="button"
