@@ -9,39 +9,38 @@ import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-
 
 type UnitTask = Extract<PracticeTask, { kind: "unitChoice" }>;
 
-// Familiar objects tagged with the unit a good measurer would choose. Emoji
+// Familiar objects tagged with the unit a good measurer would choose, PLUS a
+// realistic whole-number size range in that unit and a natural verb — so every
+// "spot the mistake" statement matches real life (a key is 6 cm, not 23). Emoji
 // MATCHES the label. ~half cm, ~half m for a balanced mix.
-const OBJECTS: Array<{ label: string; icon: string; unit: "cm" | "m" }> = [
-  // small → centimetres
-  { label: "pencil", icon: "✏️", unit: "cm" },
-  { label: "crayon", icon: "🖍️", unit: "cm" },
-  { label: "ruler", icon: "📏", unit: "cm" },
-  { label: "spoon", icon: "🥄", unit: "cm" },
-  { label: "toothbrush", icon: "🪥", unit: "cm" },
-  { label: "marker", icon: "🖊️", unit: "cm" },
-  { label: "paintbrush", icon: "🖌️", unit: "cm" },
-  { label: "pair of scissors", icon: "✂️", unit: "cm" },
-  { label: "key", icon: "🔑", unit: "cm" },
-  { label: "book", icon: "📖", unit: "cm" },
-  // long → metres
-  { label: "door", icon: "🚪", unit: "m" },
-  { label: "broom", icon: "🧹", unit: "m" },
-  { label: "ladder", icon: "🪜", unit: "m" },
-  { label: "tree", icon: "🌳", unit: "m" },
-  { label: "goal post", icon: "🥅", unit: "m" },
-  { label: "guitar", icon: "🎸", unit: "m" },
-  { label: "bicycle", icon: "🚲", unit: "m" },
-  { label: "canoe", icon: "🛶", unit: "m" },
-  { label: "bed", icon: "🛏️", unit: "m" },
-  { label: "sofa", icon: "🛋️", unit: "m" },
+type ObjectSpec = { label: string; icon: string; unit: "cm" | "m"; size: [number, number]; verb: "long" | "tall" };
+const OBJECTS: ObjectSpec[] = [
+  // small → centimetres (real cm sizes)
+  { label: "pencil", icon: "✏️", unit: "cm", size: [14, 18], verb: "long" },
+  { label: "crayon", icon: "🖍️", unit: "cm", size: [8, 11], verb: "long" },
+  { label: "ruler", icon: "📏", unit: "cm", size: [20, 30], verb: "long" },
+  { label: "spoon", icon: "🥄", unit: "cm", size: [15, 20], verb: "long" },
+  { label: "toothbrush", icon: "🪥", unit: "cm", size: [15, 19], verb: "long" },
+  { label: "marker", icon: "🖊️", unit: "cm", size: [12, 15], verb: "long" },
+  { label: "paintbrush", icon: "🖌️", unit: "cm", size: [18, 24], verb: "long" },
+  { label: "pair of scissors", icon: "✂️", unit: "cm", size: [14, 20], verb: "long" },
+  { label: "key", icon: "🔑", unit: "cm", size: [5, 8], verb: "long" },
+  { label: "book", icon: "📖", unit: "cm", size: [20, 28], verb: "long" },
+  // long → metres (real whole-metre sizes)
+  { label: "door", icon: "🚪", unit: "m", size: [2, 2], verb: "tall" },
+  { label: "broom", icon: "🧹", unit: "m", size: [1, 2], verb: "long" },
+  { label: "ladder", icon: "🪜", unit: "m", size: [2, 3], verb: "tall" },
+  { label: "tree", icon: "🌳", unit: "m", size: [3, 7], verb: "tall" },
+  { label: "goal post", icon: "🥅", unit: "m", size: [2, 3], verb: "tall" },
+  { label: "guitar", icon: "🎸", unit: "m", size: [1, 1], verb: "long" },
+  { label: "bicycle", icon: "🚲", unit: "m", size: [1, 2], verb: "long" },
+  { label: "canoe", icon: "🛶", unit: "m", size: [3, 4], verb: "long" },
+  { label: "bed", icon: "🛏️", unit: "m", size: [2, 2], verb: "long" },
+  { label: "sofa", icon: "🛋️", unit: "m", size: [2, 2], verb: "long" },
 ];
 
 const CM_OBJECTS = OBJECTS.filter((o) => o.unit === "cm");
 const M_OBJECTS = OBJECTS.filter((o) => o.unit === "m");
-
-// Sensible whole-number sizes for the "spot the mistake" statements.
-const CM_SIZE: [number, number] = [8, 30]; // small things in cm
-const M_SIZE: [number, number] = [1, 4]; //  long things in m
 
 type LessonMemory = { introShown: boolean; cursor: number; recent: string[] };
 const lessonMemory = new Map<string, LessonMemory>();
@@ -72,7 +71,7 @@ function shuffle<T>(items: T[]): T[] {
   return next;
 }
 
-function pickObject(memory: LessonMemory, pool = OBJECTS): { label: string; icon: string; unit: "cm" | "m" } {
+function pickObject(memory: LessonMemory, pool = OBJECTS): ObjectSpec {
   for (let attempt = 0; attempt < 30; attempt += 1) {
     const obj = pool[randInt(pool.length)]!;
     if (!memory.recent.includes(obj.label)) {
@@ -139,10 +138,11 @@ function buildSpotMistakeTask(memory: LessonMemory): UnitTask {
   const rightWord = object.unit === "cm" ? "centimetres" : "metres";
   const wrongWord = object.unit === "cm" ? "metres" : "centimetres";
   const professorCorrect = randInt(2) === 0;
-  const verb = object.unit === "m" ? "tall" : "long";
+  const verb = object.verb;
 
   if (professorCorrect) {
-    const size = object.unit === "cm" ? between(CM_SIZE) : between(M_SIZE);
+    // A believable size in the object's real unit (a key = 6 cm, a door = 2 m).
+    const size = between(object.size);
     return {
       kind: "unitChoice",
       scene: "spotMistake",
@@ -159,8 +159,9 @@ function buildSpotMistakeTask(memory: LessonMemory): UnitTask {
       },
     };
   }
-  // Wrong claim: state the object in the WRONG unit (an absurd size).
-  const size = object.unit === "cm" ? between(M_SIZE) : between(CM_SIZE);
+  // Wrong claim: state the object in the WRONG unit with a clearly-silly size
+  // (a small object in metres, or a long object in centimetres).
+  const size = object.unit === "cm" ? 2 + randInt(8) /* 2–9 metres */ : 8 + randInt(33); /* 8–40 cm */
   return {
     kind: "unitChoice",
     scene: "spotMistake",
