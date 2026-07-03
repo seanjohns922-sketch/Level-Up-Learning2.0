@@ -781,35 +781,6 @@ export default function MeasurelandsMap({ year = "Prep" }: { year?: Measurelands
               </div>
             ))}
 
-            <button
-              onClick={launchGuidedAdventure}
-              disabled={launching}
-              style={{
-                position: "absolute",
-                left: "50%",
-                bottom: "13%",
-                transform: launching ? "translateX(-50%) scale(1.08)" : "translateX(-50%) scale(1)",
-                pointerEvents: "auto",
-                cursor: launching ? "default" : "pointer",
-                padding: "14px 34px",
-                borderRadius: 999,
-                border: "1.5px solid rgba(200,160,48,0.68)",
-                background: "linear-gradient(135deg, #2a1a04 0%, #5c3d0e 45%, #c8a030 100%)",
-                color: "#faf0d0",
-                fontSize: 13,
-                fontWeight: 900,
-                letterSpacing: "0.2em",
-                fontFamily: "ui-monospace, monospace",
-                textShadow: "0 1px 4px rgba(0,0,0,0.6)",
-                boxShadow: "0 0 0 3px rgba(200,160,48,0.16), 0 0 28px rgba(200,160,48,0.38), 0 12px 26px rgba(0,0,0,0.48)",
-                transition: "transform 0.25s ease, opacity 0.3s",
-                opacity: launching ? 0.92 : 1,
-                whiteSpace: "nowrap",
-              }}
-            >
-              ✦ CONTINUE QUEST
-            </button>
-
             <div
               style={{
                 position: "absolute",
