@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, User, Zap } from "lucide-react";
+import { ArrowLeft, Lock, User, Zap } from "lucide-react";
 import { readProgress } from "@/data/progress";
 import { computeFogProgress } from "@/lib/fog-progress";
 import FogOfForgetfulness from "@/components/world/FogOfForgetfulness";
@@ -65,6 +65,56 @@ const YEAR3_ZONES = [
   { id: "perimeter-preview", name: "PERIMETER PREVIEW", sub: "WEEK 7", weekStart: 7, weekEnd: 7, left: "69%", top: "57%", color: "#f9a8d4" },
   { id: "area-preview", name: "AREA PREVIEW", sub: "WEEK 8", weekStart: 8, weekEnd: 8, left: "50%", top: "30%", color: "#93c5fd" },
 ] as const;
+
+const YEAR3_DISTRICTS = [
+  {
+    id: "ruler-district",
+    name: "RULER DISTRICT",
+    sub: "WEEKS 1–2",
+    weekStart: 1,
+    weekEnd: 2,
+    left: "4%",
+    top: "14%",
+    color: "#67e8f9",
+    tagline: "length, metres, and measured paths",
+  },
+  {
+    id: "measure-lab",
+    name: "MEASURE LAB",
+    sub: "WEEKS 3–4",
+    weekStart: 3,
+    weekEnd: 4,
+    left: "5%",
+    top: "58%",
+    color: "#c4b5fd",
+    tagline: "mass, capacity, and accuracy",
+  },
+  {
+    id: "timeworks",
+    name: "TIMEWORKS",
+    sub: "WEEKS 5–6",
+    weekStart: 5,
+    weekEnd: 6,
+    left: "68%",
+    top: "14%",
+    color: "#fde68a",
+    tagline: "duration, minutes, and clockwork",
+  },
+  {
+    id: "explorer-district",
+    name: "EXPLORER DISTRICT",
+    sub: "WEEKS 7–8",
+    weekStart: 7,
+    weekEnd: 8,
+    left: "68%",
+    top: "58%",
+    color: "#f9a8d4",
+    tagline: "perimeter and area previews",
+  },
+] as const;
+
+type Year3District = (typeof YEAR3_DISTRICTS)[number];
+type DistrictState = "complete" | "current" | "locked";
 
 function getMeasurelandsWorldConfig(year: MeasurelandsYear) {
   if (year === "Year 3") {
@@ -196,6 +246,103 @@ function ProgressIcon() {
   );
 }
 
+function MeasurelandsDistrictLabel({
+  district,
+  state,
+  active,
+  onClick,
+}: {
+  district: Year3District;
+  state: DistrictState;
+  active: boolean;
+  onClick: () => void;
+}) {
+  const locked = state === "locked";
+  const complete = state === "complete";
+  const accent = locked ? "rgba(254,243,199,0.42)" : district.color;
+
+  return (
+    <button
+      type="button"
+      onClick={locked ? undefined : onClick}
+      disabled={locked}
+      style={{
+        width: 380,
+        maxWidth: "29vw",
+        textAlign: "left",
+        cursor: locked ? "default" : "pointer",
+        opacity: locked ? 0.56 : 1,
+        padding: "14px 16px 12px",
+        borderRadius: 18,
+        border: `1.5px solid ${active ? accent : "rgba(253,230,138,0.22)"}`,
+        background: active
+          ? "linear-gradient(135deg, rgba(62,32,4,0.82), rgba(83,39,8,0.62))"
+          : "linear-gradient(135deg, rgba(19,9,2,0.68), rgba(36,16,3,0.42))",
+        boxShadow: active
+          ? `0 0 0 3px ${district.color}24, 0 0 28px ${district.color}44, 0 12px 28px rgba(0,0,0,0.46)`
+          : "0 10px 22px rgba(0,0,0,0.36), inset 0 1px 0 rgba(255,255,255,0.06)",
+        backdropFilter: "blur(10px)",
+        transition: "transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <span
+          style={{
+            width: 9,
+            height: 9,
+            borderRadius: "50%",
+            background: locked ? "rgba(254,243,199,0.36)" : district.color,
+            boxShadow: locked ? "none" : `0 0 14px ${district.color}`,
+            flexShrink: 0,
+          }}
+        />
+        <span
+          style={{
+            color: "#fff7ed",
+            fontSize: 22,
+            fontWeight: 900,
+            letterSpacing: "0.22em",
+            fontFamily: "ui-monospace, monospace",
+            textShadow: locked ? "none" : `0 0 16px ${district.color}66, 0 2px 10px rgba(0,0,0,0.9)`,
+            lineHeight: 1.05,
+          }}
+        >
+          {district.name}
+        </span>
+        {locked ? <Lock size={18} color="rgba(254,243,199,0.72)" style={{ marginLeft: "auto" }} /> : null}
+      </div>
+
+      <div
+        style={{
+          color: accent,
+          fontSize: 11,
+          fontWeight: 900,
+          letterSpacing: "0.22em",
+          fontFamily: "ui-monospace, monospace",
+          marginTop: 8,
+          textShadow: locked ? "none" : `0 0 12px ${district.color}55`,
+        }}
+      >
+        {district.sub} {complete ? "· MASTERED" : locked ? "· LOCKED" : "· OPEN DISTRICT"}
+      </div>
+
+      <div
+        style={{
+          color: "rgba(254,243,199,0.78)",
+          fontSize: 11,
+          fontWeight: 700,
+          letterSpacing: "0.08em",
+          fontFamily: "ui-monospace, monospace",
+          marginTop: 8,
+          textTransform: "uppercase",
+        }}
+      >
+        {district.tagline}
+      </div>
+    </button>
+  );
+}
+
 export default function MeasurelandsMap({ year = "Prep" }: { year?: MeasurelandsYear }) {
   const router = useRouter();
   const resolvedYear: MeasurelandsYear =
@@ -235,6 +382,20 @@ export default function MeasurelandsMap({ year = "Prep" }: { year?: Measurelands
     }
     return xp;
   }, [resolvedYear, store, totalWeeks]);
+
+  const isDistrictMode = resolvedYear === "Year 3";
+  const currentDistrict =
+    YEAR3_DISTRICTS.find((district) => currentWeek >= district.weekStart && currentWeek <= district.weekEnd) ??
+    YEAR3_DISTRICTS[0];
+  const activeDistrictId = isDistrictMode ? currentDistrict.id : null;
+  const getDistrictState = (district: Year3District): DistrictState => {
+    const allWeeksDone = Array.from({ length: district.weekEnd - district.weekStart + 1 }, (_, index) => district.weekStart + index).every(
+      (week) => completedByWeek[week]
+    );
+    if (allWeeksDone) return "complete";
+    if (currentWeek >= district.weekStart) return "current";
+    return "locked";
+  };
 
   useEffect(() => {
     if (isDemoPreviewMode()) {
@@ -298,17 +459,30 @@ export default function MeasurelandsMap({ year = "Prep" }: { year?: Measurelands
     };
   }, [resolvedYear]);
 
+  function goToFirstIncompleteWeek(weekStart = 1, weekEnd = totalWeeks) {
+    for (let week = weekStart; week <= weekEnd; week += 1) {
+      if (!completedByWeek[week]) {
+        router.push(`/program?year=${encodeURIComponent(resolvedYear)}&week=${week}&legacy=1&realm_id=${REALM_ID}`);
+        return;
+      }
+    }
+    router.push(`/program?year=${encodeURIComponent(resolvedYear)}&week=${Math.max(weekStart, Math.min(currentWeek, weekEnd))}&legacy=1&realm_id=${REALM_ID}`);
+  }
+
+  function openDistrict(district: Year3District) {
+    if (getDistrictState(district) === "locked") return;
+    goToFirstIncompleteWeek(district.weekStart, district.weekEnd);
+  }
+
   function launchGuidedAdventure() {
     if (launching) return;
     setLaunching(true);
     window.setTimeout(() => {
-      for (let week = 1; week <= totalWeeks; week += 1) {
-        if (!completedByWeek[week]) {
-          router.push(`/program?year=${encodeURIComponent(resolvedYear)}&week=${week}&legacy=1&realm_id=${REALM_ID}`);
-          return;
-        }
+      if (isDistrictMode) {
+        openDistrict(currentDistrict);
+        return;
       }
-      router.push(`/program?year=${encodeURIComponent(resolvedYear)}&week=${Math.max(1, currentWeek)}&legacy=1&realm_id=${REALM_ID}`);
+      goToFirstIncompleteWeek();
     }, 900);
   }
 
@@ -545,73 +719,188 @@ export default function MeasurelandsMap({ year = "Prep" }: { year?: Measurelands
             pointerEvents: "none",
           }}
         />
-        {/* Main adventure button — warm gold, round, magical */}
-        <button
-          onClick={launchGuidedAdventure}
-          disabled={launching}
-          style={{
-            position: "relative",
-            pointerEvents: "auto",
-            cursor: launching ? "default" : "pointer",
-            padding: "22px 60px",
-            borderRadius: 999,
-            border: "2px solid rgba(200,160,48,0.65)",
-            background: "linear-gradient(135deg, #2a1a04 0%, #5c3d0e 38%, #8b6520 72%, #c8a030 100%)",
-            color: "#faf0d0",
-            fontSize: 20,
-            fontWeight: 900,
-            letterSpacing: "0.2em",
-            fontFamily: "ui-monospace, monospace",
-            textShadow: "0 1px 4px rgba(0,0,0,0.5)",
-            boxShadow: [
-              "0 0 0 4px rgba(200,160,48,0.18)",
-              "0 0 40px rgba(200,160,48,0.42)",
-              "0 0 90px rgba(109,40,217,0.18)",
-              "0 14px 32px rgba(0,0,0,0.55)",
-              "inset 0 2px 0 rgba(200,160,48,0.3)",
-              "inset 0 -4px 0 rgba(0,0,0,0.3)",
-            ].join(", "),
-            transform: launching ? "scale(1.08)" : "scale(1)",
-            transition: "transform 0.25s ease",
-            animation: "ml-guided-pulse 2.4s ease-in-out infinite",
-            whiteSpace: "nowrap",
-          }}
-        >
-          ✦ {highestDone === 0 ? "START ADVENTURE" : "CONTINUE ADVENTURE"}
-        </button>
+        {isDistrictMode ? (
+          <>
+            <div
+              style={{
+                position: "absolute",
+                left: "50%",
+                top: "14%",
+                transform: "translateX(-50%)",
+                textAlign: "center",
+                opacity: launching ? 0 : 1,
+                transition: "opacity 0.3s",
+              }}
+            >
+              <div
+                style={{
+                  color: "#fff7ed",
+                  fontSize: 28,
+                  fontWeight: 900,
+                  letterSpacing: "0.28em",
+                  fontFamily: "ui-monospace, monospace",
+                  textShadow: "0 0 24px rgba(253,230,138,0.58), 0 3px 14px rgba(0,0,0,0.85)",
+                }}
+              >
+                MEASURELANDS
+              </div>
+              <div
+                style={{
+                  color: "#fde68a",
+                  fontSize: 11,
+                  fontWeight: 900,
+                  letterSpacing: "0.28em",
+                  fontFamily: "ui-monospace, monospace",
+                  marginTop: 8,
+                  textShadow: "0 0 14px rgba(251,191,36,0.46)",
+                }}
+              >
+                LEVEL 3 · FORMAL MEASUREMENT DISTRICTS
+              </div>
+            </div>
 
-        <div
-          style={{
-            position: "relative",
-            color: "rgba(253,230,138,0.85)",
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: "0.22em",
-            fontFamily: "ui-monospace, monospace",
-            marginTop: 14,
-            opacity: launching ? 0 : 1,
-            transition: "opacity 0.3s",
-          }}
-        >
-          MASTER MEASUREMENT · BALANCE THE WORLD
-        </div>
+            {YEAR3_DISTRICTS.map((district) => (
+              <div
+                key={district.id}
+                style={{
+                  position: "absolute",
+                  left: district.left,
+                  top: district.top,
+                  zIndex: 2,
+                  pointerEvents: "auto",
+                  opacity: launching ? 0 : 1,
+                  transition: "opacity 0.3s",
+                }}
+              >
+                <MeasurelandsDistrictLabel
+                  district={district}
+                  state={getDistrictState(district)}
+                  active={activeDistrictId === district.id}
+                  onClick={() => openDistrict(district)}
+                />
+              </div>
+            ))}
 
-        <div
-          style={{
-            position: "relative",
-            color: "rgba(186,230,253,0.9)",
-            fontSize: 12,
-            fontWeight: 800,
-            letterSpacing: "0.28em",
-            fontFamily: "ui-monospace, monospace",
-            textShadow: `0 0 14px ${currentZone.color}, 0 2px 8px rgba(0,0,0,0.9)`,
-            marginTop: 12,
-            opacity: launching ? 0 : 1,
-            transition: "opacity 0.3s",
-          }}
-        >
-          WEEK {Math.max(1, currentWeek)} · {currentZone.name}
-        </div>
+            <button
+              onClick={launchGuidedAdventure}
+              disabled={launching}
+              style={{
+                position: "absolute",
+                left: "50%",
+                bottom: "13%",
+                transform: launching ? "translateX(-50%) scale(1.08)" : "translateX(-50%) scale(1)",
+                pointerEvents: "auto",
+                cursor: launching ? "default" : "pointer",
+                padding: "14px 34px",
+                borderRadius: 999,
+                border: "1.5px solid rgba(200,160,48,0.68)",
+                background: "linear-gradient(135deg, #2a1a04 0%, #5c3d0e 45%, #c8a030 100%)",
+                color: "#faf0d0",
+                fontSize: 13,
+                fontWeight: 900,
+                letterSpacing: "0.2em",
+                fontFamily: "ui-monospace, monospace",
+                textShadow: "0 1px 4px rgba(0,0,0,0.6)",
+                boxShadow: "0 0 0 3px rgba(200,160,48,0.16), 0 0 28px rgba(200,160,48,0.38), 0 12px 26px rgba(0,0,0,0.48)",
+                transition: "transform 0.25s ease, opacity 0.3s",
+                opacity: launching ? 0.92 : 1,
+                whiteSpace: "nowrap",
+              }}
+            >
+              ✦ CONTINUE QUEST
+            </button>
+
+            <div
+              style={{
+                position: "absolute",
+                left: "50%",
+                bottom: "7.5%",
+                transform: "translateX(-50%)",
+                color: "rgba(186,230,253,0.9)",
+                fontSize: 11,
+                fontWeight: 900,
+                letterSpacing: "0.24em",
+                fontFamily: "ui-monospace, monospace",
+                textShadow: `0 0 14px ${currentZone.color}, 0 2px 8px rgba(0,0,0,0.9)`,
+                opacity: launching ? 0 : 1,
+                transition: "opacity 0.3s",
+                textAlign: "center",
+              }}
+            >
+              CURRENT PATH · WEEK {Math.max(1, currentWeek)} · {currentZone.name}
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Main adventure button — warm gold, round, magical */}
+            <button
+              onClick={launchGuidedAdventure}
+              disabled={launching}
+              style={{
+                position: "relative",
+                pointerEvents: "auto",
+                cursor: launching ? "default" : "pointer",
+                padding: "22px 60px",
+                borderRadius: 999,
+                border: "2px solid rgba(200,160,48,0.65)",
+                background: "linear-gradient(135deg, #2a1a04 0%, #5c3d0e 38%, #8b6520 72%, #c8a030 100%)",
+                color: "#faf0d0",
+                fontSize: 20,
+                fontWeight: 900,
+                letterSpacing: "0.2em",
+                fontFamily: "ui-monospace, monospace",
+                textShadow: "0 1px 4px rgba(0,0,0,0.5)",
+                boxShadow: [
+                  "0 0 0 4px rgba(200,160,48,0.18)",
+                  "0 0 40px rgba(200,160,48,0.42)",
+                  "0 0 90px rgba(109,40,217,0.18)",
+                  "0 14px 32px rgba(0,0,0,0.55)",
+                  "inset 0 2px 0 rgba(200,160,48,0.3)",
+                  "inset 0 -4px 0 rgba(0,0,0,0.3)",
+                ].join(", "),
+                transform: launching ? "scale(1.08)" : "scale(1)",
+                transition: "transform 0.25s ease",
+                animation: "ml-guided-pulse 2.4s ease-in-out infinite",
+                whiteSpace: "nowrap",
+              }}
+            >
+              ✦ {highestDone === 0 ? "START ADVENTURE" : "CONTINUE ADVENTURE"}
+            </button>
+
+            <div
+              style={{
+                position: "relative",
+                color: "rgba(253,230,138,0.85)",
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: "0.22em",
+                fontFamily: "ui-monospace, monospace",
+                marginTop: 14,
+                opacity: launching ? 0 : 1,
+                transition: "opacity 0.3s",
+              }}
+            >
+              MASTER MEASUREMENT · BALANCE THE WORLD
+            </div>
+
+            <div
+              style={{
+                position: "relative",
+                color: "rgba(186,230,253,0.9)",
+                fontSize: 12,
+                fontWeight: 800,
+                letterSpacing: "0.28em",
+                fontFamily: "ui-monospace, monospace",
+                textShadow: `0 0 14px ${currentZone.color}, 0 2px 8px rgba(0,0,0,0.9)`,
+                marginTop: 12,
+                opacity: launching ? 0 : 1,
+                transition: "opacity 0.3s",
+              }}
+            >
+              WEEK {Math.max(1, currentWeek)} · {currentZone.name}
+            </div>
+          </>
+        )}
       </div>
 
       <div
