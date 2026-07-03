@@ -33,6 +33,7 @@ const ROTATION: Array<"difference" | "correctMeasurement" | "detective"> = [
 ];
 
 type LessonMemory = { introShown: boolean; cursor: number; recent: string[] };
+type DetectiveMode = "wrongNumber" | "wrongStart";
 const lessonMemory = new Map<string, LessonMemory>();
 
 function getMemory(lessonId: string): LessonMemory {
@@ -171,28 +172,54 @@ function buildCorrectMeasurementTask(memory: LessonMemory): RulerTask {
   };
 }
 
-function buildDetectiveTask(memory: LessonMemory): RulerTask {
+function buildDetectiveTask(memory: LessonMemory, forcedMode?: DetectiveMode): RulerTask {
   const object = pickObject(memory);
+  const mode = forcedMode ?? (randInt(2) === 0 ? "wrongNumber" : "wrongStart");
+
+  if (mode === "wrongStart") {
+    const startCm = 1 + randInt(2);
+    const measuredObject = {
+      ...object,
+      lengthCm: Math.min(object.lengthCm, MAX_RULER - startCm),
+      startCm,
+    };
+    const displayedMeasurement = measuredObject.startCm + measuredObject.lengthCm;
+    const correctAnswer = "Started at the wrong mark.";
+
+    return {
+      kind: "rulerMeasure",
+      scene: "measure",
+      prompt: "What's wrong?",
+      speakText: `Professor Gauge wrote ${displayedMeasurement} centimetres. Check the start mark. What's wrong?`,
+      badgeLabel: "Detective",
+      rulerCm: rulerFor(displayedMeasurement),
+      object: measuredObject,
+      displayedMeasurement,
+      detectiveOptions: shuffle([correctAnswer, "The ruler is broken.", "Nothing is wrong."]),
+      correctDetectiveAnswer: correctAnswer,
+      feedback: {
+        correct: `Correct — start at 0, not ${startCm}.`,
+        wrong: `Check the start mark. The object should start at 0, not ${startCm}.`,
+      },
+    };
+  }
+
   const displayedMeasurement =
     object.lengthCm + (object.lengthCm <= 16 ? 3 + randInt(2) : -(3 + randInt(2)));
   return {
     kind: "rulerMeasure",
     scene: "measure",
-    prompt: "Professor Gauge says something isn't right. What's wrong?",
-    speakText: `Professor Gauge wrote ${displayedMeasurement} centimetres for the ${object.label}. Check the ruler. What's wrong?`,
-    badgeLabel: "Detective Challenge",
+    prompt: "What's wrong?",
+    speakText: `Professor Gauge wrote ${displayedMeasurement} centimetres. Check the ruler. What's wrong?`,
+    badgeLabel: "Detective",
     rulerCm: rulerFor(object.lengthCm),
     object,
     displayedMeasurement,
-    detectiveOptions: shuffle([
-      "The measurement is incorrect.",
-      "The ruler is broken.",
-      "The object is upside down.",
-    ]),
-    correctDetectiveAnswer: "The measurement is incorrect.",
+    detectiveOptions: shuffle(["The number is wrong.", "The ruler is broken.", "Nothing is wrong."]),
+    correctDetectiveAnswer: "The number is wrong.",
     feedback: {
       correct: `Correct — the ${object.label} reaches ${object.lengthCm} cm, not ${displayedMeasurement} cm.`,
-      wrong: `Check the start and the finish. The ${object.label} reaches ${object.lengthCm} cm, so the written measurement is incorrect.`,
+      wrong: `Check the finish. The ${object.label} reaches ${object.lengthCm} cm, not ${displayedMeasurement} cm.`,
     },
   };
 }
@@ -223,7 +250,7 @@ export function buildY3MeasurelandsWeek1Lesson3QuizTasks(): PracticeTask[] {
   return [
     buildDifferenceTask(seed),
     buildCorrectMeasurementTask(seed),
-    buildDetectiveTask(seed),
+    buildDetectiveTask(seed, "wrongStart"),
     buildDifferenceTask(seed),
     buildCorrectMeasurementTask(seed),
   ];
