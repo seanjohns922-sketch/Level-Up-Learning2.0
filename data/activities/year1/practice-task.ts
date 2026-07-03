@@ -1097,6 +1097,34 @@ export type PracticeTask = (
       compareObjects?: Array<{ label: string; icon: string; lengthCm: number }>;
       compareMode?: "longer" | "shorter";
       correctLabel?: string;
+      /** "compare": optional numeric comparison question (for difference tasks). */
+      differenceOptions?: number[];
+      correctDifference?: number;
+      /** "measure": optional detective wording for checking a bad measurement. */
+      detectiveOptions?: string[];
+      correctDetectiveAnswer?: string;
+      displayedMeasurement?: number;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
+      // Measurelands Year 3 W2 "Metre Mountain" — unit sense (AC9M3M01): a metre
+      // is 100 cm, and you CHOOSE the sensible unit for a length. No calculation,
+      // no reading a scale — intuition + tool choice. Reuses the ruler/metre-stick
+      // visual language (extension of the ruler component). Scenes:
+      //   "intro"        — Professor Gauge shows the metre stick (100 cm = 1 m).
+      //   "aboutMetre"   — is this object about one metre? (yes / no)
+      //   "whichTool"    — measure it with the ruler (cm) or the metre stick (m)?
+      //   "compareMetre" — is it shorter / about / longer than one metre?
+      kind: "unitChoice";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "aboutMetre" | "whichTool" | "compareMetre";
+      /** The familiar object being judged (emoji MATCHES the label). */
+      object?: { label: string; icon: string };
+      /** Choice labels in display order; correctOption must be one of them. */
+      options?: string[];
+      correctOption?: string;
       feedback?: { correct: string; wrong: string };
     }
   | {

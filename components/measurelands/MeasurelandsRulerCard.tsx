@@ -392,12 +392,34 @@ function StartZeroScene({ task, onCorrect, onWrong }: { task: RulerTask; onCorre
 
 /* ── Activity B — Measure the Object: read the length in whole cm ── */
 function MeasureScene({ task, onCorrect, onWrong }: { task: RulerTask; onCorrect: () => void; onWrong: () => void }) {
+  const detectiveOptions = task.detectiveOptions ?? [];
+  const isDetective = detectiveOptions.length > 0;
   return (
     <Shell badge={task.badgeLabel ?? "Measure the Object"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-4">
         <RulerWithObject rulerCm={task.rulerCm} object={task.object} showZeroHero />
+        {typeof task.displayedMeasurement === "number" ? (
+          <div className="mt-3 rounded-[18px] border border-[rgba(192,86,78,0.28)] bg-[rgba(252,224,224,0.5)] px-4 py-2 text-center text-lg font-black text-[#7c2d12]">
+            Professor Gauge wrote: {task.displayedMeasurement} cm
+          </div>
+        ) : null}
       </div>
-      <div className="grid grid-cols-3 gap-3">
+      <div className={`grid gap-3 ${isDetective ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-3"}`}>
+        {isDetective
+          ? detectiveOptions.map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={() => (option === task.correctDetectiveAnswer ? onCorrect() : onWrong())}
+                className="relative flex min-h-[76px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-4 text-center text-lg font-black leading-tight text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+              >
+                <span className="absolute right-2 top-2 z-10">
+                  <OptionReadAloudButton text={option} />
+                </span>
+                {option}
+              </button>
+            ))
+          : null}
         {(task.options ?? []).map((value) => (
           <button
             key={value}
@@ -419,15 +441,30 @@ function MeasureScene({ task, onCorrect, onWrong }: { task: RulerTask; onCorrect
 /* ── Activity C — Which Is Longer?: compare two measured objects ── */
 function CompareScene({ task, onCorrect, onWrong }: { task: RulerTask; onCorrect: () => void; onWrong: () => void }) {
   const objects = task.compareObjects ?? [];
+  const differenceOptions = task.differenceOptions ?? [];
+  const isDifferenceQuestion = differenceOptions.length > 0;
   return (
     <Shell badge={task.badgeLabel ?? "Which Is Longer?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="grid grid-cols-1 gap-3">
         {objects.map((obj) => (
-          <button
+          <div
             key={obj.label}
-            type="button"
-            onClick={() => (obj.label === task.correctLabel ? onCorrect() : onWrong())}
-            className="rounded-[26px] border-2 border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)] p-3 text-left transition hover:-translate-y-0.5 active:scale-[0.99]"
+            role={isDifferenceQuestion ? undefined : "button"}
+            tabIndex={isDifferenceQuestion ? undefined : 0}
+            onClick={() => {
+              if (!isDifferenceQuestion) {
+                obj.label === task.correctLabel ? onCorrect() : onWrong();
+              }
+            }}
+            onKeyDown={(event) => {
+              if (!isDifferenceQuestion && (event.key === "Enter" || event.key === " ")) {
+                event.preventDefault();
+                obj.label === task.correctLabel ? onCorrect() : onWrong();
+              }
+            }}
+            className={`rounded-[26px] border-2 border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)] p-3 text-left ${
+              isDifferenceQuestion ? "" : "cursor-pointer transition hover:-translate-y-0.5 active:scale-[0.99]"
+            }`}
           >
             <div className="mb-1 flex items-center justify-between px-2">
               <span className="text-lg font-black text-[#2c1c07]">
@@ -436,9 +473,26 @@ function CompareScene({ task, onCorrect, onWrong }: { task: RulerTask; onCorrect
               <span className="rounded-full bg-[rgba(91,33,182,0.1)] px-3 py-0.5 text-sm font-black text-[#5b21b6]">{obj.lengthCm} cm</span>
             </div>
             <RulerWithObject rulerCm={task.rulerCm} object={obj} />
-          </button>
+          </div>
         ))}
       </div>
+      {isDifferenceQuestion ? (
+        <div className="grid grid-cols-3 gap-3">
+          {differenceOptions.map((value) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => (value === task.correctDifference ? onCorrect() : onWrong())}
+              className="relative flex min-h-[76px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-2xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98] sm:text-3xl"
+            >
+              <span className="absolute right-2 top-2 z-10">
+                <OptionReadAloudButton text={`${value} centimetres`} />
+              </span>
+              {value} cm
+            </button>
+          ))}
+        </div>
+      ) : null}
     </Shell>
   );
 }
@@ -448,4 +502,180 @@ export function MeasurelandsRulerCard({ task, onCorrect, onWrong }: { task: Rule
   if (task.scene === "startZero") return <StartZeroScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "compare") return <CompareScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   return <MeasureScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Measurelands METRE STICK (Week 2 "Metre Mountain") — an extension of the ruler
+ * visual language (same timber, brass, engraved marks), NOT a second system.
+ * A metre stick with brass end caps; in full mode it shows 0–100 with "1 metre".
+ * ═══════════════════════════════════════════════════════════════════════════ */
+type UnitTask = Extract<PracticeTask, { kind: "unitChoice" }>;
+
+function MetreStick({ full }: { full?: boolean }) {
+  const [uid] = useState(() => Math.random().toString(36).slice(2, 9));
+  const W = 600;
+  const capW = 15;
+  const bodyX = capW + 4;
+  const bodyR = W - capW - 4;
+  const bodyW = bodyR - bodyX;
+  const topY = full ? 30 : 16;
+  const bodyH = 34;
+  const H = topY + bodyH + (full ? 26 : 12);
+
+  const marks = [];
+  if (full) {
+    for (let i = 0; i <= 10; i += 1) {
+      const x = bodyX + (i / 10) * bodyW;
+      const isZero = i === 0;
+      const major = i % 5 === 0;
+      marks.push(
+        <g key={i}>
+          <line x1={x} x2={x} y1={topY + 1} y2={topY + (major ? 18 : 11)} stroke={isZero ? ZERO_RED : MARK} strokeWidth={major ? 1.8 : 1.1} strokeLinecap="round" />
+          <text x={x} y={topY + bodyH + 14} textAnchor="middle" fontSize={11} fontWeight={isZero ? 900 : major ? 800 : 600} fill={isZero ? ZERO_RED : MARK}>
+            {i * 10}
+          </text>
+        </g>,
+      );
+    }
+  }
+
+  return (
+    <div className="mx-auto w-full" style={{ maxWidth: full ? 560 : 420 }}>
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="A one metre stick">
+        <defs>
+          <linearGradient id={`ms-timber-${uid}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor={TIMBER.top} />
+            <stop offset="0.45" stopColor={TIMBER.mid} />
+            <stop offset="1" stopColor={TIMBER.bot} />
+          </linearGradient>
+          <linearGradient id={`ms-brass-${uid}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor={BRASS.hi} />
+            <stop offset="0.5" stopColor={BRASS.mid} />
+            <stop offset="1" stopColor={BRASS.lo} />
+          </linearGradient>
+        </defs>
+        {/* timber body */}
+        <rect x={bodyX} y={topY} width={bodyW} height={bodyH} fill={`url(#ms-timber-${uid})`} stroke={TIMBER.edge} strokeWidth={1.2} rx={3} />
+        <rect x={bodyX + 1.5} y={topY + 1.5} width={bodyW - 3} height={3} rx={2} fill="#FFFFFF" opacity={0.32} />
+        {/* brass end caps */}
+        <rect x={4} y={topY - 3} width={capW} height={bodyH + 6} rx={4} fill={`url(#ms-brass-${uid})`} stroke={BRASS.lo} strokeWidth={0.6} />
+        <rect x={W - capW - 4} y={topY - 3} width={capW} height={bodyH + 6} rx={4} fill={`url(#ms-brass-${uid})`} stroke={BRASS.lo} strokeWidth={0.6} />
+        {marks}
+        {/* centre plaque */}
+        <g>
+          <rect x={W / 2 - 52} y={full ? 4 : topY + 9} width={104} height={full ? 20 : 16} rx={8} fill={`url(#ms-brass-${uid})`} stroke={BRASS.lo} strokeWidth={0.6} />
+          <text x={W / 2} y={full ? 18 : topY + 20} textAnchor="middle" fontSize={full ? 13 : 11} fontWeight={900} fill="#4A3208">
+            1 metre
+          </text>
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+/* The big familiar object being judged. */
+function ObjectHero({ object }: { object: { label: string; icon: string } }) {
+  return (
+    <div className="flex flex-col items-center gap-2 rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] px-6 py-5">
+      <span className="text-[64px] leading-none" aria-hidden>{object.icon}</span>
+      <span className="rounded-full bg-[rgba(91,33,182,0.08)] px-4 py-1 text-xl font-black text-[#2c1c07]">{object.label}</span>
+    </div>
+  );
+}
+
+function toolGlyph(option: string) {
+  if (/metre/i.test(option)) return "📐";
+  if (/ruler/i.test(option)) return "📏";
+  return null;
+}
+
+function UnitChoices({
+  options,
+  correct,
+  cols,
+  withTool,
+  onCorrect,
+  onWrong,
+}: {
+  options: string[];
+  correct?: string;
+  cols: string;
+  withTool?: boolean;
+  onCorrect: () => void;
+  onWrong: () => void;
+}) {
+  return (
+    <div className={`grid gap-3 ${cols}`}>
+      {options.map((option) => {
+        const glyph = withTool ? toolGlyph(option) : null;
+        return (
+          <button
+            key={option}
+            type="button"
+            onClick={() => (option === correct ? onCorrect() : onWrong())}
+            className="relative flex min-h-[76px] flex-col items-center justify-center gap-1 rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-4 text-center text-lg font-black leading-tight text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+          >
+            <span className="absolute right-2 top-2 z-10">
+              <OptionReadAloudButton text={option} />
+            </span>
+            {glyph ? <span className="text-3xl leading-none" aria-hidden>{glyph}</span> : null}
+            <span>{option}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function MetreIntroScene({ task, onCorrect }: { task: UnitTask; onCorrect: () => void }) {
+  return (
+    <Shell badge={task.badgeLabel ?? "Meazurex Mission"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-4">
+        <MetreStick full />
+        <p className="mt-2 text-center text-lg font-black text-[#2c1c07]">
+          100 centimetres <span className="text-[#a98b52]">=</span> <span className="text-[#C81E1E]">1 metre</span>
+        </p>
+      </div>
+      <div className="rounded-[24px] border border-[rgba(214,184,108,0.45)] bg-[rgba(255,250,240,0.96)] p-4">
+        <div className="mb-2 text-[12px] font-black uppercase tracking-[0.16em] text-[#a98b52]">Which unit do I use?</div>
+        <ul className="space-y-2.5">
+          <li className="flex items-start gap-3">
+            <span className="text-2xl leading-none" aria-hidden>📏</span>
+            <span className="text-[17px] font-bold leading-snug text-[#2c1c07]">Use <b>centimetres</b> for shorter things — a pencil, a book.</span>
+          </li>
+          <li className="flex items-start gap-3">
+            <span className="text-2xl leading-none" aria-hidden>📐</span>
+            <span className="text-[17px] font-bold leading-snug text-[#2c1c07]">Use <b>metres</b> for longer things — a door, a whiteboard.</span>
+          </li>
+        </ul>
+      </div>
+      <button
+        type="button"
+        onClick={onCorrect}
+        className="mx-auto flex min-h-[60px] items-center justify-center gap-2 rounded-[24px] border-2 border-[rgba(180,120,20,0.55)] bg-[#fffaf0] px-8 text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+      >
+        Let&apos;s choose! →
+      </button>
+    </Shell>
+  );
+}
+
+export function MeasurelandsMetreCard({ task, onCorrect, onWrong }: { task: UnitTask; onCorrect: () => void; onWrong: () => void }) {
+  if (task.scene === "intro") return <MetreIntroScene task={task} onCorrect={onCorrect} />;
+  const options = task.options ?? [];
+  const showReference = task.scene !== "whichTool";
+  const isWhichTool = task.scene === "whichTool";
+  const cols = task.scene === "compareMetre" ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-2";
+  return (
+    <Shell badge={task.badgeLabel ?? "Metre Mountain"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      {task.object ? <ObjectHero object={task.object} /> : null}
+      {showReference ? (
+        <div className="rounded-[22px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] px-4 py-3">
+          <MetreStick />
+          <p className="mt-1 text-center text-[12px] font-bold uppercase tracking-[0.14em] text-[#a98b52]">One metre to compare against</p>
+        </div>
+      ) : null}
+      <UnitChoices options={options} correct={task.correctOption} cols={cols} withTool={isWhichTool} onCorrect={onCorrect} onWrong={onWrong} />
+    </Shell>
+  );
 }
