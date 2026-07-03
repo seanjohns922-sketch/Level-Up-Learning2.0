@@ -15,12 +15,12 @@ const CM_OBJECTS: Array<{ label: string; icon: string; length: number }> = [
   { label: "pencil", icon: "✏️", length: 15 },
   { label: "marker", icon: "🖊️", length: 13 },
   { label: "crayon", icon: "🖍️", length: 9 },
-  { label: "spoon", icon: "🥄", length: 17 },
-  { label: "toothbrush", icon: "🪥", length: 18 },
+  { label: "spoon", icon: "🥄", length: 13 },
+  { label: "toothbrush", icon: "🪥", length: 16 },
   { label: "paintbrush", icon: "🖌️", length: 16 },
   { label: "toy car", icon: "🚗", length: 8 },
   { label: "key", icon: "🔑", length: 6 },
-  { label: "pair of scissors", icon: "✂️", length: 14 },
+  { label: "pair of scissors", icon: "✂️", length: 13 },
 ];
 
 // Long objects measured in whole metres.
