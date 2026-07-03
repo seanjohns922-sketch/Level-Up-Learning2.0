@@ -67,7 +67,7 @@ const YEAR3_MEASURELANDS_RAW: WeekPlan[] = [
     topic: "Mass Works",
     curriculum: ["AC9M3M01", "AC9M3M02"],
     lessons: [
-      buildLesson(3, 1, "Meet g and kg", "Mass: recognise grams and kilograms and use familiar benchmarks.", ["Grams", "Kilograms", "Mass benchmarks"], ["AC9M3M01"]),
+      buildLesson(3, 1, "Meet Grams and Kilograms", "Mass: recognise grams and kilograms and use familiar benchmarks.", ["Grams", "Kilograms", "Mass benchmarks"], ["AC9M3M01"]),
       buildLesson(3, 2, "Compare Mass", "Mass: compare measured masses using grams and kilograms.", ["Compare mass", "Read the unit", "Greater mass"], ["AC9M3M02"]),
       buildLesson(3, 3, "Choose g or kg", "Mass: choose the sensible metric unit for measuring an object's mass.", ["Choose grams", "Choose kilograms", "Best mass unit"], ["AC9M3M01", "AC9M3M02"]),
     ],

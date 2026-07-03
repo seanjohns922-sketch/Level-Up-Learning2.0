@@ -29,6 +29,11 @@ import {
   generateY3MeasurelandsWeek2Lesson3Task,
   resetY3MeasurelandsWeek2Lesson3TaskSessionState,
 } from "@/data/activities/year3Measurelands/week2Lesson3";
+import {
+  buildY3MeasurelandsWeek3Lesson1QuizTasks,
+  generateY3MeasurelandsWeek3Lesson1Task,
+  resetY3MeasurelandsWeek3Lesson1TaskSessionState,
+} from "@/data/activities/year3Measurelands/week3Lesson1";
 
 type Y3MeasurelandsLessonEntry = {
   prefix: string;
@@ -155,6 +160,24 @@ const Y3_MEASURELANDS_LESSONS: Y3MeasurelandsLessonEntry[] = [
     completionTitle: "Estimate then Measure Complete!",
     unlockMessage: "Weekly Quiz unlocked.",
     returnRoute: "/program?year=Year 3&week=2&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y3-measurement-w3-l1",
+    week: 3,
+    lessonNumber: 1,
+    title: "Meet Grams and Kilograms",
+    subtitle: "Mass Works",
+    generate: generateY3MeasurelandsWeek3Lesson1Task,
+    reset: resetY3MeasurelandsWeek3Lesson1TaskSessionState,
+    quizContributionBuilder: buildY3MeasurelandsWeek3Lesson1QuizTasks,
+    practisedSkills: [
+      "Recognise grams and kilograms",
+      "Choose sensible mass units",
+      "Match familiar objects to g or kg",
+    ],
+    completionTitle: "Grams and Kilograms Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+    returnRoute: "/program?year=Year 3&week=3&legacy=1&realm_id=measurement",
   },
 ];
 

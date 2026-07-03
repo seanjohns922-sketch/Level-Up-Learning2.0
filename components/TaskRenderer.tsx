@@ -99,6 +99,7 @@ import { MeasurelandsCompareTaskCard } from "@/components/measurelands/Measurela
 import { MeasurelandsPathTaskCard } from "@/components/measurelands/MeasurelandsPathTaskCard";
 import { MeasurelandsValidityTaskCard } from "@/components/measurelands/MeasurelandsValidityTaskCard";
 import { MeasurelandsMassMeasureCard } from "@/components/measurelands/MeasurelandsMassMeasureCard";
+import { MeasurelandsMassUnitCard } from "@/components/measurelands/MeasurelandsMassUnitCard";
 import { MeasurelandsCapacityMeasureCard } from "@/components/measurelands/MeasurelandsCapacityMeasureCard";
 import { MeasurelandsDurationUnitCard } from "@/components/measurelands/MeasurelandsDurationUnitCard";
 import { MeasurelandsWeekCycleCard } from "@/components/measurelands/MeasurelandsWeekCycleCard";
@@ -401,6 +402,8 @@ function TaskRendererInner({
       return wrapMeasurelands(<MeasurelandsEstimateCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "massMeasure":
       return wrapMeasurelands(<MeasurelandsMassMeasureCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
+    case "massUnit":
+      return wrapMeasurelands(<MeasurelandsMassUnitCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "capacityMeasure":
       return wrapMeasurelands(<MeasurelandsCapacityMeasureCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "durationUnit":

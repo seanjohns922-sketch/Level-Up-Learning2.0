@@ -709,6 +709,20 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Year 3 W3 L1 — first formal mass units. Students recognise
+      // when grams (g) or kilograms (kg) are the sensible unit, without conversion.
+      kind: "massUnit";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "chooseUnit" | "sort" | "sensibleMeasure";
+      object?: { imageSrc?: string; label: string; unit: "g" | "kg"; sensibleMass?: string };
+      options?: string[];
+      correctOption?: string;
+      items?: Array<{ imageSrc?: string; label: string; unit: "g" | "kg" }>;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       // Measurelands Year 1 W3 L1 — measuring capacity with uniform informal
       // units (AC9M1M01). A container is measured as N identical "cups".
       kind: "capacityMeasure";

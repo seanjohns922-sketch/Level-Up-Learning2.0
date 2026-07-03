@@ -239,6 +239,9 @@ const TABLE: Record<string, SkillCoaching> = {
   ml_y2_w2_quiz: { tip: "Use balance-cube counts to prove mass comparisons." },
   ml_y2_w3_quiz: { tip: "Use cup counts and sensible capacity units to justify answers." },
   ml_y2_w4_quiz: { tip: "Use exact and in-between measures to choose closer counts." },
+
+  // Measurelands — Year 3 exact lesson tips
+  ml_y3_w3_l1: { tip: "Use grams for lighter objects and kilograms for heavier objects." },
 };
 
 const FALLBACK: SkillCoaching = {
@@ -326,6 +329,7 @@ const LESSON_KEY_MAP: Record<string, string> = {
   "year2-measurement-w2-weekly-quiz": "ml_y2_w2_quiz",
   "year2-measurement-w3-weekly-quiz": "ml_y2_w3_quiz",
   "year2-measurement-w4-weekly-quiz": "ml_y2_w4_quiz",
+  "y3-measurement-w3-l1": "ml_y3_w3_l1",
 };
 
 function normalizeLessonId(lessonId: string): string {
