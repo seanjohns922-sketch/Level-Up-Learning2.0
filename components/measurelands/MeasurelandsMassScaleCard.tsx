@@ -125,6 +125,124 @@ function ChoiceGrid({
   );
 }
 
+function DifferenceNumberPad({
+  task,
+  onCorrect,
+  onWrong,
+}: {
+  task: MassScaleTask;
+  onCorrect: () => void;
+  onWrong: () => void;
+}) {
+  const [typed, setTyped] = useState("");
+  const [status, setStatus] = useState<"idle" | "wrong">("idle");
+  const unit = task.answerUnit ?? task.items?.[0]?.unit ?? "kg";
+
+  const addDigit = (digit: string) => {
+    setStatus("idle");
+    setTyped((current) => {
+      if (current === "0") return digit;
+      if (current.length >= 3) return current;
+      return `${current}${digit}`;
+    });
+  };
+
+  const clear = () => {
+    setStatus("idle");
+    setTyped("");
+  };
+
+  const backspace = () => {
+    setStatus("idle");
+    setTyped((current) => current.slice(0, -1));
+  };
+
+  const check = () => {
+    if (!typed) return;
+    if (Number(typed) === task.answerValue) {
+      onCorrect();
+      return;
+    }
+    setStatus("wrong");
+    onWrong();
+  };
+
+  return (
+    <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="grid gap-3 sm:grid-cols-2">
+        {task.items?.map((item) => (
+          <ObjectBadge key={item.label} item={item} showMass />
+        ))}
+      </div>
+
+      <div className="rounded-[28px] border-2 border-[rgba(214,184,108,0.52)] bg-white p-4 shadow-sm">
+        <div className="mb-3 text-center text-xs font-black uppercase tracking-[0.18em] text-[#7c4a12]">
+          Type the difference
+        </div>
+        <div
+          className={`mb-3 flex items-center justify-center gap-3 rounded-[24px] border-2 px-4 py-3 ${
+            status === "wrong"
+              ? "border-[#C0564E] bg-[#FCE0E0]"
+              : "border-[rgba(214,184,108,0.58)] bg-[#fffaf0]"
+          }`}
+        >
+          <div className="min-w-[90px] text-center text-4xl font-black tabular-nums text-[#2c1c07]">
+            {typed || "?"}
+          </div>
+          <div className="text-2xl font-black uppercase tracking-[0.12em] text-[#7c4a12]">{unit}</div>
+        </div>
+        {status === "wrong" ? (
+          <div className="mb-3 text-center text-sm font-black text-[#9f3128]">Try the subtraction again.</div>
+        ) : (
+          <div className="mb-3 text-center text-sm font-bold text-[#6b4d23]">Subtract the smaller mass from the larger mass.</div>
+        )}
+
+        <div className="grid grid-cols-3 gap-2">
+          {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((digit) => (
+            <button
+              key={digit}
+              type="button"
+              onClick={() => addDigit(digit)}
+              className="rounded-[18px] border-2 border-[rgba(214,184,108,0.58)] bg-[#fff7df] py-3 text-2xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5"
+            >
+              {digit}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={clear}
+            className="rounded-[18px] border-2 border-[rgba(214,184,108,0.58)] bg-white py-3 text-sm font-black uppercase tracking-[0.08em] text-[#7c4a12] shadow-sm transition hover:-translate-y-0.5"
+          >
+            Clear
+          </button>
+          <button
+            type="button"
+            onClick={() => addDigit("0")}
+            className="rounded-[18px] border-2 border-[rgba(214,184,108,0.58)] bg-[#fff7df] py-3 text-2xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5"
+          >
+            0
+          </button>
+          <button
+            type="button"
+            onClick={backspace}
+            className="rounded-[18px] border-2 border-[rgba(214,184,108,0.58)] bg-white py-3 text-sm font-black uppercase tracking-[0.08em] text-[#7c4a12] shadow-sm transition hover:-translate-y-0.5"
+          >
+            Delete
+          </button>
+        </div>
+        <button
+          type="button"
+          onClick={check}
+          disabled={!typed}
+          className="mt-3 w-full rounded-[20px] border-2 border-[#b4781e] bg-[#fff7df] px-4 py-3 text-lg font-black uppercase tracking-[0.12em] text-[#7c4a12] shadow-sm transition enabled:hover:-translate-y-0.5 disabled:opacity-45"
+        >
+          Check
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function IntroScene({ task, onCorrect }: { task: MassScaleTask; onCorrect: () => void }) {
   return (
     <Shell badge={task.badgeLabel ?? "Mass Works"} prompt={task.prompt} speakText={task.speakText}>
@@ -207,6 +325,13 @@ function MatchScene({ task, onCorrect, onWrong }: { task: MassScaleTask; onCorre
 
 function MultiObjectScene({ task, onCorrect, onWrong }: { task: MassScaleTask; onCorrect: () => void; onWrong: () => void }) {
   if (task.scene === "order") return <OrderScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "difference" && typeof task.answerValue === "number") {
+    return (
+      <Shell badge={task.badgeLabel ?? "How Much Heavier?"} prompt={task.prompt} speakText={task.speakText}>
+        <DifferenceNumberPad task={task} onCorrect={onCorrect} onWrong={onWrong} />
+      </Shell>
+    );
+  }
   return (
     <Shell badge={task.badgeLabel ?? "Compare Mass"} prompt={task.prompt} speakText={task.speakText}>
       {task.items?.length ? (

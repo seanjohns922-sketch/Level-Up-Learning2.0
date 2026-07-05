@@ -145,6 +145,8 @@ function buildDifferenceTask(memory: LessonMemory): MassScaleTask {
     items: [heavier, lighter],
     options,
     correctOption: `${difference} ${heavier.unit}`,
+    answerValue: difference,
+    answerUnit: heavier.unit,
     feedback: {
       correct: `Yes — ${heavier.mass} minus ${lighter.mass} is ${difference} ${heavier.unit}.`,
       wrong: `Subtract the smaller mass from the larger mass. The difference is ${difference} ${heavier.unit}.`,
@@ -173,6 +175,12 @@ export function resetY3MeasurelandsWeek3Lesson3TaskSessionState() {
   lessonMemory.clear();
 }
 
+function asQuizTask(task: MassScaleTask): MassScaleTask {
+  if (task.scene !== "difference") return task;
+  const { answerValue: _answerValue, answerUnit: _answerUnit, ...quizTask } = task;
+  return quizTask;
+}
+
 export function buildY3MeasurelandsWeek3Lesson3QuizTasks(): PracticeTask[] {
   const seed: LessonMemory = { introShown: true, cursor: 0, recent: [] };
   return [
@@ -181,5 +189,5 @@ export function buildY3MeasurelandsWeek3Lesson3QuizTasks(): PracticeTask[] {
     buildDifferenceTask(seed),
     buildCompareTask(seed),
     buildDifferenceTask(seed),
-  ];
+  ].map(asQuizTask);
 }
