@@ -33,6 +33,16 @@ function edgeLine(c: number, r: number, side: Side): [number, number, number, nu
   return [x, y, x, y + U];
 }
 
+function edgeBar(c: number, r: number, side: Side) {
+  const x = PAD + c * U;
+  const y = PAD + r * U;
+  const thickness = 10;
+  if (side === "top") return { x, y: y - thickness / 2, width: U, height: thickness };
+  if (side === "right") return { x: x + U - thickness / 2, y, width: thickness, height: U };
+  if (side === "bottom") return { x, y: y + U - thickness / 2, width: U, height: thickness };
+  return { x: x - thickness / 2, y, width: thickness, height: U };
+}
+
 function ShapeSVG({
   cells, gridW, gridH, uid, children, size,
 }: { cells: Array<[number, number]>; gridW: number; gridH: number; uid: string; children?: React.ReactNode; size?: number }) {
@@ -73,18 +83,19 @@ function TraceScene({ task, onCorrect, onWrong }: { task: PerimTask; onCorrect: 
             const k = edgeKey(c, r, s);
             const [x1, y1, x2, y2] = edgeLine(c, r, s);
             const on = walked.has(k);
+            const bar = edgeBar(c, r, s);
             return (
               <g key={k}>
                 {on ? (
-                  <line
-                    x1={x1}
-                    y1={y1}
-                    x2={x2}
-                    y2={y2}
-                    stroke="#84cc16"
-                    strokeWidth={9}
-                    strokeLinecap="round"
-                    filter={`url(#glow-${uid})`}
+                  <rect
+                    x={bar.x}
+                    y={bar.y}
+                    width={bar.width}
+                    height={bar.height}
+                    rx={5}
+                    fill="#84cc16"
+                    stroke="#3f7d12"
+                    strokeWidth={1.5}
                   />
                 ) : null}
                 {!done ? <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="transparent" strokeWidth={26} strokeLinecap="round" style={{ cursor: "pointer" }} onClick={() => tap(k)} /> : null}
