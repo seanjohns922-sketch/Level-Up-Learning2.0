@@ -1264,6 +1264,7 @@ export type PracticeTask = (
         | "spotMistake"
         | "estimate"
         | "bestEstimate"
+        | "contextEstimate"
         | "compareLonger"
         | "order"
         | "howMuchLonger";
@@ -1272,6 +1273,8 @@ export type PracticeTask = (
       /** Text MCQ options + the correct one (chooseUnit / spotMistake / bestEstimate). */
       options?: string[];
       correctOption?: string;
+      /** "contextEstimate": a real-world cloze sentence with a ___ blank to fill. */
+      sentence?: string;
       /** "sort": activities to sort into the seconds / minutes / hours bins. */
       items?: Array<{ label: string; emoji: string; unit: "s" | "min" | "hr" }>;
       /** "spotMistake": Professor Gauge's duration claim. */

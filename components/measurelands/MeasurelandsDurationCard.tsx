@@ -146,6 +146,35 @@ function EstimateScene({ task, onCorrect, onWrong }: { task: DurTask; onCorrect:
   );
 }
 
+function ContextEstimateScene({ task, onCorrect, onWrong }: { task: DurTask; onCorrect: () => void; onWrong: () => void }) {
+  const [chosen, setChosen] = useState<string | null>(null);
+  const [wrong, setWrong] = useState<string | null>(null);
+  const parts = (task.sentence ?? "It takes about ___.").split("___");
+  const pick = (o: string) => {
+    if (o === task.correctOption) { setChosen(o); setWrong(null); onCorrect(); }
+    else { setWrong(o); onWrong(); window.setTimeout(() => setWrong(null), 600); }
+  };
+  return (
+    <Shell badge={task.badgeLabel ?? "Complete the Estimation"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      {task.activity ? (
+        <div className="mx-auto flex h-[96px] w-[96px] items-center justify-center rounded-full bg-[rgba(214,184,108,0.16)] ring-1 ring-[rgba(214,184,108,0.45)]"><span className="text-[60px] leading-none" aria-hidden>{task.activity.emoji}</span></div>
+      ) : null}
+      <div className="grid grid-cols-2 gap-3">
+        {(task.options ?? []).map((o) => (
+          <button key={o} type="button" onClick={() => pick(o)} className={`relative flex min-h-[64px] items-center justify-center rounded-[22px] border-2 px-3 text-center text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98] ${wrong === o ? "border-[#C0564E] bg-[#FCE0E0]" : chosen === o ? "border-[#0f766e] bg-[rgba(15,118,110,0.12)]" : "border-[rgba(214,184,108,0.55)] bg-[#fffaf0]"}`}>
+            <span className="absolute right-2 top-2 z-10"><OptionReadAloudButton text={o} /></span>{o}
+          </button>
+        ))}
+      </div>
+      <div className="rounded-[22px] border border-[rgba(214,184,108,0.45)] bg-[rgba(255,250,240,0.96)] px-5 py-4 text-center text-xl font-black leading-relaxed text-[#2c1c07]">
+        {parts[0]}
+        <span className={`mx-1 inline-block min-w-[110px] rounded-[12px] border-2 px-3 py-1 ${chosen ? "border-[#0f766e] bg-[rgba(15,118,110,0.12)] text-[#0f766e]" : "border-dashed border-[#c9b27e] bg-white text-[#a98b52]"}`}>{chosen ?? "?"}</span>
+        {parts[1]}
+      </div>
+    </Shell>
+  );
+}
+
 function CompareScene({ task, onCorrect, onWrong }: { task: DurTask; onCorrect: () => void; onWrong: () => void }) {
   const items = task.compareItems ?? [];
   return (
@@ -195,6 +224,7 @@ export function MeasurelandsDurationCard({ task, onCorrect, onWrong }: { task: D
     case "sort": return <SortScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "spotMistake": return <SpotMistakeScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "estimate": return <EstimateScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+    case "contextEstimate": return <ContextEstimateScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "compareLonger": return <CompareScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "order": return <OrderScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "howMuchLonger": return <HowMuchLongerScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
