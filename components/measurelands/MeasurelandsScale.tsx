@@ -76,7 +76,7 @@ export function MeasurelandsScale({
 
   return (
     <div className="mx-auto w-full" style={{ maxWidth: size }}>
-      <svg viewBox="0 0 260 300" width="100%" role="img" aria-label={`A scale reading ${value} ${unit}`}>
+      <svg viewBox="0 -34 260 334" width="100%" role="img" aria-label={`A scale reading ${value} ${unit}`}>
         <defs>
           <linearGradient id={`body-${uid}`} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stopColor={BODY.top} />
@@ -93,11 +93,15 @@ export function MeasurelandsScale({
         <rect x={62} y={250} width={36} height={18} rx={7} fill={FEET} />
         <rect x={162} y={250} width={36} height={18} rx={7} fill={FEET} />
 
-        {/* pan + object */}
-        {object ? <text x={CX} y={34} textAnchor="middle" fontSize={44}>{object.emoji}</text> : null}
+        {/* neck + pan, then the object resting ON TOP of the pan */}
         <rect x={CX - 11} y={40} width={22} height={16} fill={NECK} />
         <ellipse cx={CX} cy={40} rx={94} ry={12} fill={`url(#pan-${uid})`} stroke="#7FB9D6" strokeWidth={1} />
         <ellipse cx={CX} cy={37} rx={80} ry={8} fill="#ffffff" opacity={0.4} />
+        {object ? (
+          <text x={CX} y={34} textAnchor="middle" fontSize={48} style={{ dominantBaseline: "alphabetic" }}>
+            {object.emoji}
+          </text>
+        ) : null}
 
         {/* body */}
         <path d="M40 74 Q40 54 62 54 H198 Q220 54 220 74 L226 236 Q228 258 206 258 H54 Q32 258 34 236 Z" fill={`url(#body-${uid})`} stroke="#4E90C4" strokeWidth={1.5} />
