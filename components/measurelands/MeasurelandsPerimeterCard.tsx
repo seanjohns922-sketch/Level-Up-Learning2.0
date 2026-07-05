@@ -75,7 +75,18 @@ function TraceScene({ task, onCorrect, onWrong }: { task: PerimTask; onCorrect: 
             const on = walked.has(k);
             return (
               <g key={k}>
-                <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={on ? "#16a34a" : "#c99a4a"} strokeWidth={on ? 9 : 7} strokeLinecap="round" filter={on ? `url(#glow-${uid})` : undefined} opacity={on ? 1 : 0.85} />
+                {on ? (
+                  <line
+                    x1={x1}
+                    y1={y1}
+                    x2={x2}
+                    y2={y2}
+                    stroke="#84cc16"
+                    strokeWidth={9}
+                    strokeLinecap="round"
+                    filter={`url(#glow-${uid})`}
+                  />
+                ) : null}
                 {!done ? <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="transparent" strokeWidth={26} strokeLinecap="round" style={{ cursor: "pointer" }} onClick={() => tap(k)} /> : null}
               </g>
             );
