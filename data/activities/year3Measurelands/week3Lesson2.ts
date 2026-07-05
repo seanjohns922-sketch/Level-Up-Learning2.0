@@ -1,52 +1,32 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
 
-// ── Measurelands · Level 3 (Year 3) · Week 3 · Lesson 2 — "Choose g or kg" ──
-// AC9M3M01: choose the most sensible formal mass unit for familiar objects.
-// No conversions. Students reason from real-world mass intuition.
+// Measurelands · Level 3 · Week 3 · Lesson 2 — Read the Scale.
+// AC9M3M01/AC9M3M02: read formal mass from marked scales.
 
-type MassUnitTask = Extract<PracticeTask, { kind: "massUnit" }>;
-type Unit = "g" | "kg";
-type ObjectSpec = {
-  label: string;
-  imageSrc: string;
-  unit: Unit;
-  sensibleMass: string;
-  distractorMass: string;
-};
-
-const GRAM_OBJECTS: ObjectSpec[] = [
-  { label: "coin", imageSrc: "/images/measurelands/week2-3d/coin.png", unit: "g", sensibleMass: "6 g", distractorMass: "6 kg" },
-  { label: "feather", imageSrc: "/images/measurelands/week2-3d/feather-v2.png", unit: "g", sensibleMass: "3 g", distractorMass: "3 kg" },
-  { label: "pencil", imageSrc: "/images/measurelands/week2-3d/pencil.png", unit: "g", sensibleMass: "8 g", distractorMass: "8 kg" },
-  { label: "eraser", imageSrc: "/images/measurelands/everyday-3d/object-eraser.png", unit: "g", sensibleMass: "25 g", distractorMass: "25 kg" },
-  { label: "spoon", imageSrc: "/images/measurelands/week2-3d/spoon.png", unit: "g", sensibleMass: "40 g", distractorMass: "40 kg" },
-  { label: "apple", imageSrc: "/images/measurelands/week2-3d/apple.png", unit: "g", sensibleMass: "180 g", distractorMass: "180 kg" },
-  { label: "orange", imageSrc: "/images/measurelands/week2-3d/orange.png", unit: "g", sensibleMass: "160 g", distractorMass: "160 kg" },
-  { label: "toy car", imageSrc: "/images/measurelands/everyday-3d/object-car.png", unit: "g", sensibleMass: "300 g", distractorMass: "300 kg" },
-];
-
-const KILOGRAM_OBJECTS: ObjectSpec[] = [
-  { label: "lunchbox", imageSrc: "/images/measurelands/week2-3d/lunchbox.png", unit: "kg", sensibleMass: "1 kg", distractorMass: "1 g" },
-  { label: "rock", imageSrc: "/images/measurelands/week2-3d/rock.png", unit: "kg", sensibleMass: "2 kg", distractorMass: "2 g" },
-  { label: "brick", imageSrc: "/images/measurelands/week2-3d/brick.png", unit: "kg", sensibleMass: "3 kg", distractorMass: "3 g" },
-  { label: "watermelon", imageSrc: "/images/measurelands/week2-3d/watermelon.png", unit: "kg", sensibleMass: "4 kg", distractorMass: "4 g" },
-  { label: "pumpkin", imageSrc: "/images/measurelands/week2-3d/pumpkin.png", unit: "kg", sensibleMass: "5 kg", distractorMass: "5 g" },
-  { label: "backpack", imageSrc: "/images/measurelands/week2-3d/backpack.png", unit: "kg", sensibleMass: "5 kg", distractorMass: "5 g" },
-  { label: "chair", imageSrc: "/images/measurelands/week2-3d/chair.png", unit: "kg", sensibleMass: "6 kg", distractorMass: "6 g" },
-  { label: "desk", imageSrc: "/images/measurelands/everyday-3d/object-desk.png", unit: "kg", sensibleMass: "20 kg", distractorMass: "20 g" },
-];
-
-const OBJECTS = [...GRAM_OBJECTS, ...KILOGRAM_OBJECTS];
-const ROTATION: Array<"chooseUnit" | "sort" | "mistakeCheck"> = [
-  "chooseUnit",
-  "sort",
-  "mistakeCheck",
-  "chooseUnit",
-  "mistakeCheck",
-  "sort",
-];
-
+type MassScaleTask = Extract<PracticeTask, { kind: "massScale" }>;
+type MassItem = NonNullable<MassScaleTask["object"]>;
 type LessonMemory = { introShown: boolean; cursor: number; recent: string[] };
+
+const SCALE_OBJECTS: MassItem[] = [
+  { label: "apple", emoji: "🍎", mass: 250, unit: "g" },
+  { label: "loaf of bread", emoji: "🍞", mass: 500, unit: "g" },
+  { label: "small book", emoji: "📕", mass: 750, unit: "g" },
+  { label: "bag of sugar", emoji: "🛍️", mass: 1, unit: "kg" },
+  { label: "rock", emoji: "🪨", mass: 2, unit: "kg" },
+  { label: "backpack", emoji: "🎒", mass: 5, unit: "kg" },
+  { label: "suitcase", emoji: "🧳", mass: 12, unit: "kg" },
+  { label: "dog", emoji: "🐕", mass: 18, unit: "kg" },
+];
+
+const ROTATION: Array<"read" | "match" | "realistic"> = [
+  "read",
+  "match",
+  "realistic",
+  "read",
+  "match",
+  "realistic",
+];
+
 const lessonMemory = new Map<string, LessonMemory>();
 
 function getMemory(lessonId: string): LessonMemory {
@@ -70,114 +50,102 @@ function shuffle<T>(items: T[]): T[] {
   return next;
 }
 
-function pickObject(memory: LessonMemory, pool = OBJECTS): ObjectSpec {
-  for (let attempt = 0; attempt < 40; attempt += 1) {
+function massLabel(item: Pick<MassItem, "mass" | "unit">) {
+  return `${item.mass} ${item.unit}`;
+}
+
+function pickObject(memory: LessonMemory, pool = SCALE_OBJECTS): MassItem {
+  for (let attempt = 0; attempt < 50; attempt += 1) {
     const object = pool[randInt(pool.length)]!;
     if (!memory.recent.includes(object.label)) {
       memory.recent.push(object.label);
-      if (memory.recent.length > 6) memory.recent.shift();
+      if (memory.recent.length > 8) memory.recent.shift();
       return object;
     }
   }
   return pool[randInt(pool.length)]!;
 }
 
-function taskObject(object: ObjectSpec, showMass = false) {
-  return {
-    imageSrc: object.imageSrc,
-    label: object.label,
-    unit: object.unit,
-    sensibleMass: showMass ? object.sensibleMass : undefined,
-  };
+function distractorMasses(object: MassItem): MassItem[] {
+  const masses =
+    object.unit === "g"
+      ? shuffle([object.mass - 250, object.mass + 250, object.mass + 500].filter((mass) => mass > 0 && mass <= 1000))
+      : shuffle([object.mass - 1, object.mass + 1, object.mass + 3].filter((mass) => mass > 0 && mass <= 20));
+  return masses.slice(0, 2).map((mass) => ({ ...object, mass }));
 }
 
-function unitOption(unit: Unit) {
-  return unit === "kg" ? "Kilograms (kg)" : "Grams (g)";
-}
-
-function buildIntroTask(): MassUnitTask {
+function buildIntroTask(): MassScaleTask {
   return {
-    kind: "massUnit",
+    kind: "massScale",
     scene: "intro",
-    prompt: "Choose g or kg.",
-    speakText:
-      "Professor Gauge says: good measurers choose the unit that makes the most sense. Use grams for lighter objects and kilograms for heavier objects.",
+    prompt: "Read the scale.",
+    speakText: "Professor Gauge says: real measurers do not guess. They read the number on the scale.",
     badgeLabel: "Mass Works",
-    statement: "Small, lighter objects use grams. Heavier objects use kilograms.",
-    feedback: { correct: "Choose the sensible unit.", wrong: "Choose the sensible unit." },
+    feedback: { correct: "Let's read scales.", wrong: "Let's read scales." },
   };
 }
 
-function buildChooseUnitTask(memory: LessonMemory): MassUnitTask {
+function buildReadTask(memory: LessonMemory): MassScaleTask {
   const object = pickObject(memory);
+  const options = shuffle([object, ...distractorMasses(object)]).map(massLabel);
   return {
-    kind: "massUnit",
-    scene: "chooseUnit",
-    prompt: `Which unit for a ${object.label}?`,
-    speakText: `Would you measure a ${object.label} in grams or kilograms?`,
-    badgeLabel: "Which Unit?",
-    object: taskObject(object),
-    options: ["Grams (g)", "Kilograms (kg)"],
-    correctOption: unitOption(object.unit),
+    kind: "massScale",
+    scene: "read",
+    prompt: "What mass is shown?",
+    speakText: `Read the scale. What mass is shown for the ${object.label}?`,
+    badgeLabel: "Read the Scale",
+    object,
+    options,
+    correctOption: massLabel(object),
     feedback: {
-      correct: object.unit === "kg" ? `Yes — kilograms suit a ${object.label}.` : `Yes — grams suit a ${object.label}.`,
-      wrong: object.unit === "kg" ? `A ${object.label} is heavier, so kilograms is more sensible.` : `A ${object.label} is lighter, so grams is more sensible.`,
+      correct: `Yes — the scale reads ${massLabel(object)}.`,
+      wrong: `Read the scale carefully. It shows ${massLabel(object)}.`,
     },
   };
 }
 
-function buildSortTask(memory: LessonMemory): MassUnitTask {
-  const grams = shuffle(GRAM_OBJECTS).slice(0, 3);
-  const kilograms = shuffle(KILOGRAM_OBJECTS).slice(0, 3);
-  const items = shuffle([...grams, ...kilograms]).map((object) => ({
-    imageSrc: object.imageSrc,
-    label: object.label,
-    unit: object.unit,
+function buildMatchTask(memory: LessonMemory): MassScaleTask {
+  const object = pickObject(memory);
+  const scales = shuffle([object, ...distractorMasses(object)]).map((scale, index) => ({
+    id: `${scale.mass}-${scale.unit}-${index}`,
+    mass: scale.mass,
+    unit: scale.unit,
+    scaleType: scale.unit === "g" ? ("dial" as const) : ("digital" as const),
   }));
-  memory.recent = items.map((item) => item.label).slice(-6);
+  const correct = scales.find((scale) => scale.mass === object.mass && scale.unit === object.unit)!;
   return {
-    kind: "massUnit",
-    scene: "sort",
-    prompt: "Sort into g or kg.",
-    speakText: "Sort each object into grams or kilograms. Choose the unit that makes sense for its mass.",
-    badgeLabel: "Sort the Objects",
-    items,
+    kind: "massScale",
+    scene: "match",
+    prompt: `Find ${massLabel(object)}.`,
+    speakText: `Which scale shows ${massLabel(object)} for the ${object.label}?`,
+    badgeLabel: "Match the Scale",
+    object,
+    scales,
+    correctOptionId: correct.id,
     feedback: {
-      correct: "Good sorting — those units make sense.",
-      wrong: "Think about how heavy the object would be.",
+      correct: `Yes — that scale shows ${massLabel(object)}.`,
+      wrong: `Look for the scale that reads ${massLabel(object)}.`,
     },
   };
 }
 
-function buildMistakeTask(memory: LessonMemory, forceCorrectStatement = false): MassUnitTask {
+function buildRealisticTask(memory: LessonMemory): MassScaleTask {
   const object = pickObject(memory);
-  const statementIsCorrect = forceCorrectStatement || randInt(4) === 0;
-  const shownMass = statementIsCorrect ? object.sensibleMass : object.distractorMass;
-  const noGrams = "No — grams would be more sensible.";
-  const noKilograms = "No — kilograms would be more sensible.";
-  const correctOption = statementIsCorrect
-    ? "Yes."
-    : object.unit === "g"
-      ? noGrams
-      : noKilograms;
-
+  const wrongUnit = object.unit === "g" ? "kg" : "g";
+  const wrongMass = `${object.mass} ${wrongUnit}`;
+  const wildMass = object.unit === "g" ? `${Math.max(2, Math.round(object.mass / 100))} kg` : `${object.mass} g`;
   return {
-    kind: "massUnit",
-    scene: "mistakeCheck",
-    prompt: "Is Professor Gauge correct?",
-    speakText: `Professor Gauge says: this ${object.label} weighs ${shownMass}. Is he correct?`,
-    badgeLabel: "Gauge's Mistake",
-    object: taskObject(object),
-    statement: `This ${object.label} weighs ${shownMass}.`,
-    options: shuffle(["Yes.", noGrams, noKilograms]),
-    correctOption,
+    kind: "massScale",
+    scene: "realistic",
+    prompt: `Which mass feels right for a ${object.label}?`,
+    speakText: `Which mass feels right for a ${object.label}?`,
+    badgeLabel: "Feels Right",
+    object,
+    options: shuffle([massLabel(object), wrongMass, wildMass]),
+    correctOption: massLabel(object),
     feedback: {
-      correct: statementIsCorrect
-        ? `Yes — ${shownMass} is sensible for a ${object.label}.`
-        : `Correct — a ${object.label} should use ${unitOption(object.unit).toLowerCase()}.`,
-      wrong: statementIsCorrect
-        ? `${shownMass} is sensible for a ${object.label}.`
-        : `${shownMass} is not sensible for a ${object.label}. Choose ${unitOption(object.unit).toLowerCase()}.`,
+      correct: `Yes — ${massLabel(object)} is sensible for a ${object.label}.`,
+      wrong: `Think about the object. ${massLabel(object)} is the sensible mass.`,
     },
   };
 }
@@ -194,9 +162,9 @@ export function generateY3MeasurelandsWeek3Lesson2Task(
 
   const activity = ROTATION[memory.cursor % ROTATION.length]!;
   memory.cursor += 1;
-  if (activity === "sort") return buildSortTask(memory);
-  if (activity === "mistakeCheck") return buildMistakeTask(memory);
-  return buildChooseUnitTask(memory);
+  if (activity === "match") return buildMatchTask(memory);
+  if (activity === "realistic") return buildRealisticTask(memory);
+  return buildReadTask(memory);
 }
 
 export function resetY3MeasurelandsWeek3Lesson2TaskSessionState() {
@@ -206,10 +174,10 @@ export function resetY3MeasurelandsWeek3Lesson2TaskSessionState() {
 export function buildY3MeasurelandsWeek3Lesson2QuizTasks(): PracticeTask[] {
   const seed: LessonMemory = { introShown: true, cursor: 0, recent: [] };
   return [
-    buildChooseUnitTask(seed),
-    buildMistakeTask(seed),
-    buildSortTask(seed),
-    buildChooseUnitTask(seed),
-    buildMistakeTask(seed, true),
+    buildReadTask(seed),
+    buildMatchTask(seed),
+    buildRealisticTask(seed),
+    buildReadTask(seed),
+    buildMatchTask(seed),
   ];
 }

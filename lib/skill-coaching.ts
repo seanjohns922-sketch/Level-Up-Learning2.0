@@ -241,8 +241,9 @@ const TABLE: Record<string, SkillCoaching> = {
   ml_y2_w4_quiz: { tip: "Use exact and in-between measures to choose closer counts." },
 
   // Measurelands — Year 3 exact lesson tips
-  ml_y3_w3_l1: { tip: "Use grams for lighter objects and kilograms for heavier objects." },
-  ml_y3_w3_l2: { tip: "Think how heavy it feels, then choose grams or kilograms." },
+  ml_y3_w3_l1: { tip: "Think about how heavy the object would feel, then choose grams or kilograms." },
+  ml_y3_w3_l2: { tip: "Read the number and unit on the scale before choosing the mass." },
+  ml_y3_w3_l3: { tip: "Compare the mass measurements first; the greater measurement is heavier." },
 };
 
 const FALLBACK: SkillCoaching = {
@@ -332,6 +333,7 @@ const LESSON_KEY_MAP: Record<string, string> = {
   "year2-measurement-w4-weekly-quiz": "ml_y2_w4_quiz",
   "y3-measurement-w3-l1": "ml_y3_w3_l1",
   "y3-measurement-w3-l2": "ml_y3_w3_l2",
+  "y3-measurement-w3-l3": "ml_y3_w3_l3",
 };
 
 function normalizeLessonId(lessonId: string): string {

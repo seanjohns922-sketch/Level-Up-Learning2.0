@@ -709,18 +709,41 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
-      // Measurelands Year 3 W3 L1 — first formal mass units. Students recognise
-      // when grams (g) or kilograms (kg) are the sensible unit, without conversion.
+      // Measurelands Year 3 W3 — first formal mass units. Lesson 1 introduces
+      // grams (g) and kilograms (kg) through sensible unit choices.
       kind: "massUnit";
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "chooseUnit" | "sort" | "sensibleMeasure" | "mistakeCheck";
-      object?: { imageSrc?: string; label: string; unit: "g" | "kg"; sensibleMass?: string };
+      scene:
+        | "intro"
+        | "chooseUnit"
+        | "sort"
+        | "sensibleMeasure"
+        | "mistakeCheck";
+      object?: { imageSrc?: string; emoji?: string; label: string; unit: "g" | "kg"; sensibleMass?: string };
       statement?: string;
       options?: string[];
       correctOption?: string;
-      items?: Array<{ imageSrc?: string; label: string; unit: "g" | "kg" }>;
+      items?: Array<{ imageSrc?: string; emoji?: string; label: string; unit: "g" | "kg" }>;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
+      // Measurelands Year 3 W3 — reusable formal mass scale tasks.
+      kind: "massScale";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "read" | "match" | "realistic" | "compare" | "order" | "difference";
+      scaleType?: "dial" | "digital";
+      object?: { label: string; emoji: string; mass: number; unit: "g" | "kg" };
+      items?: Array<{ label: string; emoji: string; mass: number; unit: "g" | "kg" }>;
+      scales?: Array<{ id: string; mass: number; unit: "g" | "kg"; scaleType?: "dial" | "digital" }>;
+      options?: string[];
+      correctOption?: string;
+      correctOptionId?: string;
+      orderedLabels?: string[];
+      statement?: string;
       feedback?: { correct: string; wrong: string };
     }
   | {

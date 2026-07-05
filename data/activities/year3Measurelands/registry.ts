@@ -39,6 +39,11 @@ import {
   generateY3MeasurelandsWeek3Lesson2Task,
   resetY3MeasurelandsWeek3Lesson2TaskSessionState,
 } from "@/data/activities/year3Measurelands/week3Lesson2";
+import {
+  buildY3MeasurelandsWeek3Lesson3QuizTasks,
+  generateY3MeasurelandsWeek3Lesson3Task,
+  resetY3MeasurelandsWeek3Lesson3TaskSessionState,
+} from "@/data/activities/year3Measurelands/week3Lesson3";
 
 type Y3MeasurelandsLessonEntry = {
   prefix: string;
@@ -177,8 +182,8 @@ const Y3_MEASURELANDS_LESSONS: Y3MeasurelandsLessonEntry[] = [
     quizContributionBuilder: buildY3MeasurelandsWeek3Lesson1QuizTasks,
     practisedSkills: [
       "Recognise grams and kilograms",
-      "Choose sensible mass units",
-      "Match familiar objects to g or kg",
+      "Choose sensible formal mass units",
+      "Identify unrealistic mass statements",
     ],
     completionTitle: "Grams and Kilograms Complete!",
     unlockMessage: "Lesson 2 unlocked.",
@@ -188,18 +193,36 @@ const Y3_MEASURELANDS_LESSONS: Y3MeasurelandsLessonEntry[] = [
     prefix: "y3-measurement-w3-l2",
     week: 3,
     lessonNumber: 2,
-    title: "Choose g or kg",
+    title: "Read the Scale",
     subtitle: "Mass Works",
     generate: generateY3MeasurelandsWeek3Lesson2Task,
     reset: resetY3MeasurelandsWeek3Lesson2TaskSessionState,
     quizContributionBuilder: buildY3MeasurelandsWeek3Lesson2QuizTasks,
     practisedSkills: [
-      "Choose grams or kilograms",
-      "Sort objects by sensible mass unit",
-      "Identify unrealistic mass statements",
+      "Read gram and kilogram scales",
+      "Match an object to a scale reading",
+      "Choose realistic mass measurements",
     ],
-    completionTitle: "Choose g or kg Complete!",
+    completionTitle: "Read the Scale Complete!",
     unlockMessage: "Lesson 3 unlocked.",
+    returnRoute: "/program?year=Year 3&week=3&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y3-measurement-w3-l3",
+    week: 3,
+    lessonNumber: 3,
+    title: "Compare Mass",
+    subtitle: "Mass Works",
+    generate: generateY3MeasurelandsWeek3Lesson3Task,
+    reset: resetY3MeasurelandsWeek3Lesson3TaskSessionState,
+    quizContributionBuilder: buildY3MeasurelandsWeek3Lesson3QuizTasks,
+    practisedSkills: [
+      "Compare measured masses",
+      "Order masses from lightest to heaviest",
+      "Find how much heavier an object is",
+    ],
+    completionTitle: "Compare Mass Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
     returnRoute: "/program?year=Year 3&week=3&legacy=1&realm_id=measurement",
   },
 ];

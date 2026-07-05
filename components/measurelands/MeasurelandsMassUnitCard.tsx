@@ -63,12 +63,14 @@ function UnitPill({ unit }: { unit: Unit }) {
 
 function ObjectTile({
   imageSrc,
+  emoji,
   label,
   unit,
   sensibleMass,
   compact = false,
 }: {
   imageSrc?: string;
+  emoji?: string;
   label: string;
   unit?: Unit;
   sensibleMass?: string;
@@ -83,6 +85,18 @@ function ObjectTile({
           className="object-contain"
           style={{ width: compact ? 92 : 132, height: compact ? 92 : 132 }}
         />
+      ) : emoji ? (
+        <div
+          className="grid place-items-center rounded-[28px] border-2 text-5xl shadow-sm"
+          style={{
+            width: compact ? 92 : 132,
+            height: compact ? 92 : 132,
+            borderColor: "rgba(214,184,108,0.42)",
+            background: "linear-gradient(145deg, rgba(255,251,235,0.98), rgba(248,239,215,0.94))",
+          }}
+        >
+          {emoji}
+        </div>
       ) : (
         <div className="grid h-24 w-24 place-items-center rounded-[24px] bg-[rgba(214,184,108,0.16)] text-4xl">⚖️</div>
       )}
@@ -135,7 +149,7 @@ function ChoiceGrid({
 }
 
 function IntroScene({ task, onCorrect }: { task: MassUnitTask; onCorrect: () => void }) {
-  const isUnitChoiceIntro = Boolean(task.statement);
+  const isUnitChoiceIntro = task.statement === "Choose the unit that fits the object.";
 
   return (
     <Shell badge={task.badgeLabel ?? "Mass Works"} prompt={task.prompt} speakText={task.speakText}>
@@ -151,20 +165,20 @@ function IntroScene({ task, onCorrect }: { task: MassUnitTask; onCorrect: () => 
             </>
           ) : (
             <>
-              <div className="text-center text-lg font-black text-[#2c1c07]">1 kilogram</div>
+              <div className="text-center text-lg font-black uppercase tracking-[0.12em] text-[#5b21b6]">1 kg Benchmark</div>
               <div className="mx-auto my-3 grid h-28 w-28 place-items-center rounded-[28px] border-2 border-[#8a5a16] bg-gradient-to-br from-[#f3dd9b] to-[#9c7a35] text-3xl font-black text-[#2c1c07] shadow-lg">
                 1 kg
               </div>
-              <div className="text-center text-xl font-black text-[#5b21b6]">= 1000 g</div>
-              <p className="mt-2 text-center text-sm font-bold text-[#6b5a3f]">Just a benchmark today. No converting yet.</p>
+              <div className="text-center text-xl font-black text-[#5b21b6]">Use it as an anchor</div>
+              <p className="mt-2 text-center text-sm font-bold text-[#6b5a3f]">Think: lighter than, about, or heavier than 1 kg.</p>
             </>
           )}
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <ObjectTile imageSrc="/images/measurelands/week2-3d/feather-v2.png" label="Feather" unit="g" compact />
-          <ObjectTile imageSrc="/images/measurelands/week2-3d/apple.png" label="Apple" unit="g" compact />
-          <ObjectTile imageSrc="/images/measurelands/week2-3d/backpack.png" label="Backpack" unit="kg" compact />
-          <ObjectTile imageSrc="/images/measurelands/week2-3d/chair.png" label="Chair" unit="kg" compact />
+          <ObjectTile emoji="🪶" label="Feather" unit="g" compact />
+          <ObjectTile emoji="🍎" label="Apple" unit="g" compact />
+          <ObjectTile emoji="🎒" label="Backpack" unit="kg" compact />
+          <ObjectTile emoji="🪑" label="Chair" unit="kg" compact />
         </div>
       </div>
       <button
@@ -184,9 +198,23 @@ function ChooseUnitScene({ task, onCorrect, onWrong }: { task: MassUnitTask; onC
       {task.object ? (
         <ObjectTile
           imageSrc={task.object.imageSrc}
+          emoji={task.object.emoji}
           label={task.object.label}
           sensibleMass={task.object.sensibleMass}
         />
+      ) : null}
+      {task.items?.length ? (
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {task.items.map((item) => (
+            <ObjectTile
+              key={item.label}
+              imageSrc={item.imageSrc}
+              emoji={item.emoji}
+              label={item.label}
+              compact
+            />
+          ))}
+        </div>
       ) : null}
       {task.statement ? (
         <div
@@ -276,6 +304,7 @@ function SortScene({ task, onCorrect, onWrong }: { task: MassUnitTask; onCorrect
               }`}
             >
               {item.imageSrc ? <img src={item.imageSrc} alt="" className="h-9 w-9 object-contain" /> : null}
+              {item.emoji && !item.imageSrc ? <span className="text-xl">{item.emoji}</span> : null}
               {item.label}
             </button>
           ))}
