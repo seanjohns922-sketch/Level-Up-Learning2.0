@@ -59,6 +59,21 @@ import {
   generateY3MeasurelandsWeek4Lesson3Task,
   resetY3MeasurelandsWeek4Lesson3TaskSessionState,
 } from "@/data/activities/year3Measurelands/week4Lesson3";
+import {
+  buildY3MeasurelandsWeek5Lesson1QuizTasks,
+  generateY3MeasurelandsWeek5Lesson1Task,
+  resetY3MeasurelandsWeek5Lesson1TaskSessionState,
+} from "@/data/activities/year3Measurelands/week5Lesson1";
+import {
+  buildY3MeasurelandsWeek5Lesson2QuizTasks,
+  generateY3MeasurelandsWeek5Lesson2Task,
+  resetY3MeasurelandsWeek5Lesson2TaskSessionState,
+} from "@/data/activities/year3Measurelands/week5Lesson2";
+import {
+  buildY3MeasurelandsWeek5Lesson3QuizTasks,
+  generateY3MeasurelandsWeek5Lesson3Task,
+  resetY3MeasurelandsWeek5Lesson3TaskSessionState,
+} from "@/data/activities/year3Measurelands/week5Lesson3";
 
 type Y3MeasurelandsLessonEntry = {
   prefix: string;
@@ -281,6 +296,48 @@ const Y3_MEASURELANDS_LESSONS: Y3MeasurelandsLessonEntry[] = [
     completionTitle: "Compare Capacity Complete!",
     unlockMessage: "Weekly Quiz unlocked.",
     returnRoute: "/program?year=Year 3&week=4&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y3-measurement-w5-l1",
+    week: 5,
+    lessonNumber: 1,
+    title: "Minutes and Seconds",
+    subtitle: "Time Trails",
+    generate: generateY3MeasurelandsWeek5Lesson1Task,
+    reset: resetY3MeasurelandsWeek5Lesson1TaskSessionState,
+    quizContributionBuilder: buildY3MeasurelandsWeek5Lesson1QuizTasks,
+    practisedSkills: ["Recognise seconds, minutes and hours", "Sort activities by duration unit", "Spot an unrealistic duration"],
+    completionTitle: "Minutes and Seconds Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+    returnRoute: "/program?year=Year 3&week=5&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y3-measurement-w5-l2",
+    week: 5,
+    lessonNumber: 2,
+    title: "Estimate a Duration",
+    subtitle: "Time Trails",
+    generate: generateY3MeasurelandsWeek5Lesson2Task,
+    reset: resetY3MeasurelandsWeek5Lesson2TaskSessionState,
+    quizContributionBuilder: buildY3MeasurelandsWeek5Lesson2QuizTasks,
+    practisedSkills: ["Estimate how long an activity takes", "Choose the best estimate", "Reason from time benchmarks"],
+    completionTitle: "Estimate a Duration Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+    returnRoute: "/program?year=Year 3&week=5&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y3-measurement-w5-l3",
+    week: 5,
+    lessonNumber: 3,
+    title: "Compare Duration",
+    subtitle: "Time Trails",
+    generate: generateY3MeasurelandsWeek5Lesson3Task,
+    reset: resetY3MeasurelandsWeek5Lesson3TaskSessionState,
+    quizContributionBuilder: buildY3MeasurelandsWeek5Lesson3QuizTasks,
+    practisedSkills: ["Compare how long activities take", "Order activities by duration", "Find how much longer"],
+    completionTitle: "Compare Duration Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+    returnRoute: "/program?year=Year 3&week=5&legacy=1&realm_id=measurement",
   },
 ];
 

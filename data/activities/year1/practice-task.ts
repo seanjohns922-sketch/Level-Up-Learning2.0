@@ -1248,6 +1248,49 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Year 3 W5 "Time Trails" (AC9M3M03) — Understand → Estimate → Compare.
+      // Duration reasoning with seconds/minutes/hours; NOT reading a clock.
+      // L1: chooseUnit / sort / spotMistake.  L2: estimate / bestEstimate / (challenge).
+      // L3: compareLonger / order / howMuchLonger (typed).
+      kind: "duration";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene:
+        | "intro"
+        | "chooseUnit"
+        | "sort"
+        | "spotMistake"
+        | "estimate"
+        | "bestEstimate"
+        | "compareLonger"
+        | "order"
+        | "howMuchLonger";
+      /** The familiar activity (emoji MATCHES the label). */
+      activity?: { label: string; emoji: string };
+      /** Text MCQ options + the correct one (chooseUnit / spotMistake / bestEstimate). */
+      options?: string[];
+      correctOption?: string;
+      /** "sort": activities to sort into the seconds / minutes / hours bins. */
+      items?: Array<{ label: string; emoji: string; unit: "s" | "min" | "hr" }>;
+      /** "spotMistake": Professor Gauge's duration claim. */
+      statement?: string;
+      /** "estimate": the activity's real duration + estimate choices (in `estimateUnit`). */
+      estimateValue?: number;
+      estimateUnit?: "s" | "min" | "hr";
+      estimateOptions?: number[];
+      /** Ask the student to choose the unit before estimating (challenge). */
+      chooseUnitFirst?: boolean;
+      /** "compareLonger"/"order"/"howMuchLonger": activities with durations. */
+      compareItems?: Array<{ label: string; emoji: string; value: number; unit: "s" | "min" | "hr" }>;
+      correctLabel?: string;
+      orderedLabels?: string[];
+      /** "howMuchLonger": the typed numeric answer + unit (same unit, no conversions). */
+      answerValue?: number;
+      answerUnit?: "s" | "min" | "hr";
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       kind: "tensOnesMcq";
       prompt: string;
       min: number;
