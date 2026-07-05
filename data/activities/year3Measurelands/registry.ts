@@ -74,6 +74,21 @@ import {
   generateY3MeasurelandsWeek5Lesson3Task,
   resetY3MeasurelandsWeek5Lesson3TaskSessionState,
 } from "@/data/activities/year3Measurelands/week5Lesson3";
+import {
+  buildY3MeasurelandsWeek6Lesson1QuizTasks,
+  generateY3MeasurelandsWeek6Lesson1Task,
+  resetY3MeasurelandsWeek6Lesson1TaskSessionState,
+} from "@/data/activities/year3Measurelands/week6Lesson1";
+import {
+  buildY3MeasurelandsWeek6Lesson2QuizTasks,
+  generateY3MeasurelandsWeek6Lesson2Task,
+  resetY3MeasurelandsWeek6Lesson2TaskSessionState,
+} from "@/data/activities/year3Measurelands/week6Lesson2";
+import {
+  buildY3MeasurelandsWeek6Lesson3QuizTasks,
+  generateY3MeasurelandsWeek6Lesson3Task,
+  resetY3MeasurelandsWeek6Lesson3TaskSessionState,
+} from "@/data/activities/year3Measurelands/week6Lesson3";
 
 type Y3MeasurelandsLessonEntry = {
   prefix: string;
@@ -338,6 +353,48 @@ const Y3_MEASURELANDS_LESSONS: Y3MeasurelandsLessonEntry[] = [
     completionTitle: "Compare Duration Complete!",
     unlockMessage: "Weekly Quiz unlocked.",
     returnRoute: "/program?year=Year 3&week=5&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y3-measurement-w6-l1",
+    week: 6,
+    lessonNumber: 1,
+    title: "Five-Minute Time",
+    subtitle: "Minute Clockworks",
+    generate: generateY3MeasurelandsWeek6Lesson1Task,
+    reset: resetY3MeasurelandsWeek6Lesson1TaskSessionState,
+    quizContributionBuilder: buildY3MeasurelandsWeek6Lesson1QuizTasks,
+    practisedSkills: ["Read clocks in five-minute steps", "Match a time to the right clock", "Build a five-minute time"],
+    completionTitle: "Five-Minute Time Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+    returnRoute: "/program?year=Year 3&week=6&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y3-measurement-w6-l2",
+    week: 6,
+    lessonNumber: 2,
+    title: "Read to the Minute",
+    subtitle: "Minute Clockworks",
+    generate: generateY3MeasurelandsWeek6Lesson2Task,
+    reset: resetY3MeasurelandsWeek6Lesson2TaskSessionState,
+    quizContributionBuilder: buildY3MeasurelandsWeek6Lesson2QuizTasks,
+    practisedSkills: ["Read clocks to the nearest minute", "Match analog and digital time", "Spot an incorrect reading"],
+    completionTitle: "Read to the Minute Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+    returnRoute: "/program?year=Year 3&week=6&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y3-measurement-w6-l3",
+    week: 6,
+    lessonNumber: 3,
+    title: "Build Any Time",
+    subtitle: "Minute Clockworks",
+    generate: generateY3MeasurelandsWeek6Lesson3Task,
+    reset: resetY3MeasurelandsWeek6Lesson3TaskSessionState,
+    quizContributionBuilder: buildY3MeasurelandsWeek6Lesson3QuizTasks,
+    practisedSkills: ["Build any time on a clock", "Match analog and digital time", "Read to the nearest minute"],
+    completionTitle: "Build Any Time Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+    returnRoute: "/program?year=Year 3&week=6&legacy=1&realm_id=measurement",
   },
 ];
 

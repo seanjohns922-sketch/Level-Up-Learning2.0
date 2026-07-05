@@ -1295,6 +1295,31 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Year 3 W6 "Minute Clockworks" (AC9M3M04) — read/build analog
+      // and digital time to the nearest minute. Reuses the ClockFace mechanic.
+      // L1 five-minute (step 5), L2 to-the-minute (step 1), L3 build any time.
+      kind: "clockMinute";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "read" | "matchClock" | "spotTime" | "build";
+      /** The target time (hour 1–12, minute 0–59). Hour hand is proportional. */
+      targetHour: number;
+      targetMinute: number;
+      /** Build/step granularity: 5 (five-minute) or 1 (to the minute). */
+      minuteStep?: number;
+      /** "read": analog shown → pick the digital time. "spotTime": Yes/No options. */
+      options?: string[];
+      correctOption?: string;
+      /** "matchClock": pick the analog clock matching the asked digital time. */
+      clockOptions?: Array<{ id: string; hour: number; minute: number }>;
+      correctClockId?: string;
+      askDigital?: string;
+      /** "spotTime": the digital time Professor Gauge claims. */
+      claimedTime?: string;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       kind: "tensOnesMcq";
       prompt: string;
       min: number;

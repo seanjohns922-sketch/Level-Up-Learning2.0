@@ -44,14 +44,14 @@ function digitalLabel(hour: number, minute: ClockMinute) {
   return `${normalizeHour(hour)}:${String(minute).padStart(2, "0")}`;
 }
 
-function ClockFace({
+export function ClockFace({
   hour,
   minute,
   size = 300,
   focus = "time",
 }: {
   hour: number;
-  minute: ClockMinute;
+  minute: number;
   size?: number;
   focus?: ClockFocus;
 }) {
@@ -76,7 +76,7 @@ function ClockFace({
       viewBox={`0 0 ${size} ${size}`}
       className="drop-shadow-[0_20px_34px_rgba(92,56,14,0.22)]"
       role="img"
-      aria-label={`Analog clock showing ${timeLabel(hour, minute)}`}
+      aria-label={`Analog clock showing ${normalizeHour(hour)}:${String(minute).padStart(2, "0")}`}
     >
       <defs>
         <radialGradient id="ml-clock-face" cx="42%" cy="32%" r="70%">
