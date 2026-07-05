@@ -741,6 +741,10 @@ export type PracticeTask = (
       scales?: Array<{ id: string; mass: number; unit: "g" | "kg"; scaleType?: "dial" | "digital" }>;
       options?: string[];
       correctOption?: string;
+      /** Practice-only typed numeric response for "how much heavier" tasks.
+       *  MCQ quiz rendering still uses options/correctOption. */
+      answerValue?: number;
+      answerUnit?: "g" | "kg";
       correctOptionId?: string;
       orderedLabels?: string[];
       statement?: string;
@@ -1194,6 +1198,53 @@ export type PracticeTask = (
       estimateOptions?: number[];
       /** Activity C: ask the student to choose cm or m before estimating. */
       chooseUnitFirst?: boolean;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
+      // Measurelands Year 3 W4 "Capacity Lab" (AC9M3M01/M02) — Learn → Read → Apply.
+      // L1 (unit sense): chooseUnit / sort / spotMistake.
+      // L2 (read the jug): readJug / matchJug / whichJug.
+      // L3 (apply): compareMore / order / howMuchMore (typed difference).
+      kind: "capacity";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene:
+        | "intro"
+        | "chooseUnit"
+        | "sort"
+        | "spotMistake"
+        | "readJug"
+        | "matchJug"
+        | "whichJug"
+        | "compareMore"
+        | "order"
+        | "howMuchMore";
+      /** The familiar container being judged (emoji MATCHES the label). */
+      object?: { label: string; emoji: string };
+      /** Text MCQ options + the correct one (chooseUnit / spotMistake / whichJug). */
+      options?: string[];
+      correctOption?: string;
+      /** "sort": containers to sort into the mL / L bins. */
+      items?: Array<{ label: string; emoji: string; unit: "mL" | "L" }>;
+      /** "spotMistake": Professor Gauge's capacity claim. */
+      statement?: string;
+      /** "readJug": a single jug to read; number options are in `numberOptions`. */
+      jug?: { value: number; unit: "mL" | "L"; max: number; majorStep: number };
+      numberOptions?: number[];
+      correctNumber?: number;
+      readUnit?: "mL" | "L";
+      /** "matchJug": several jugs; tap the one that matches the asked amount. */
+      jugs?: Array<{ id: string; value: number; unit: "mL" | "L"; max: number; majorStep: number }>;
+      correctJugId?: string;
+      /** "compareMore"/"order"/"howMuchMore": measured containers to reason about. */
+      compareItems?: Array<{ label: string; emoji: string; value: number; unit: "mL" | "L" }>;
+      compareMode?: "more" | "less";
+      correctLabel?: string;
+      orderedLabels?: string[];
+      /** "howMuchMore": the typed numeric answer + its unit (same unit, no conversions). */
+      answerValue?: number;
+      answerUnit?: "mL" | "L";
       feedback?: { correct: string; wrong: string };
     }
   | {

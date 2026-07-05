@@ -44,6 +44,21 @@ import {
   generateY3MeasurelandsWeek3Lesson3Task,
   resetY3MeasurelandsWeek3Lesson3TaskSessionState,
 } from "@/data/activities/year3Measurelands/week3Lesson3";
+import {
+  buildY3MeasurelandsWeek4Lesson1QuizTasks,
+  generateY3MeasurelandsWeek4Lesson1Task,
+  resetY3MeasurelandsWeek4Lesson1TaskSessionState,
+} from "@/data/activities/year3Measurelands/week4Lesson1";
+import {
+  buildY3MeasurelandsWeek4Lesson2QuizTasks,
+  generateY3MeasurelandsWeek4Lesson2Task,
+  resetY3MeasurelandsWeek4Lesson2TaskSessionState,
+} from "@/data/activities/year3Measurelands/week4Lesson2";
+import {
+  buildY3MeasurelandsWeek4Lesson3QuizTasks,
+  generateY3MeasurelandsWeek4Lesson3Task,
+  resetY3MeasurelandsWeek4Lesson3TaskSessionState,
+} from "@/data/activities/year3Measurelands/week4Lesson3";
 
 type Y3MeasurelandsLessonEntry = {
   prefix: string;
@@ -224,6 +239,48 @@ const Y3_MEASURELANDS_LESSONS: Y3MeasurelandsLessonEntry[] = [
     completionTitle: "Compare Mass Complete!",
     unlockMessage: "Weekly Quiz unlocked.",
     returnRoute: "/program?year=Year 3&week=3&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y3-measurement-w4-l1",
+    week: 4,
+    lessonNumber: 1,
+    title: "Meet mL and L",
+    subtitle: "Capacity Lab",
+    generate: generateY3MeasurelandsWeek4Lesson1Task,
+    reset: resetY3MeasurelandsWeek4Lesson1TaskSessionState,
+    quizContributionBuilder: buildY3MeasurelandsWeek4Lesson1QuizTasks,
+    practisedSkills: ["Recognise millilitres and litres", "Choose mL or L", "Spot an unrealistic capacity"],
+    completionTitle: "Meet mL and L Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+    returnRoute: "/program?year=Year 3&week=4&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y3-measurement-w4-l2",
+    week: 4,
+    lessonNumber: 2,
+    title: "Read the Jug",
+    subtitle: "Capacity Lab",
+    generate: generateY3MeasurelandsWeek4Lesson2Task,
+    reset: resetY3MeasurelandsWeek4Lesson2TaskSessionState,
+    quizContributionBuilder: buildY3MeasurelandsWeek4Lesson2QuizTasks,
+    practisedSkills: ["Read a measuring jug", "Match a jug to an amount", "Choose a realistic capacity"],
+    completionTitle: "Read the Jug Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+    returnRoute: "/program?year=Year 3&week=4&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y3-measurement-w4-l3",
+    week: 4,
+    lessonNumber: 3,
+    title: "Compare Capacity",
+    subtitle: "Capacity Lab",
+    generate: generateY3MeasurelandsWeek4Lesson3Task,
+    reset: resetY3MeasurelandsWeek4Lesson3TaskSessionState,
+    quizContributionBuilder: buildY3MeasurelandsWeek4Lesson3QuizTasks,
+    practisedSkills: ["Compare capacities", "Order by capacity", "Find how much more"],
+    completionTitle: "Compare Capacity Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+    returnRoute: "/program?year=Year 3&week=4&legacy=1&realm_id=measurement",
   },
 ];
 

@@ -187,6 +187,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "rulerMeasure",
   "unitChoice",
   "estimateMeasure",
+  "capacity",
   "massMeasure",
   "massUnit",
   "massScale",
