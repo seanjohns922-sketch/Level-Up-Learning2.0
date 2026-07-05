@@ -89,6 +89,21 @@ import {
   generateY3MeasurelandsWeek6Lesson3Task,
   resetY3MeasurelandsWeek6Lesson3TaskSessionState,
 } from "@/data/activities/year3Measurelands/week6Lesson3";
+import {
+  buildY3MeasurelandsWeek7Lesson1QuizTasks,
+  generateY3MeasurelandsWeek7Lesson1Task,
+  resetY3MeasurelandsWeek7Lesson1TaskSessionState,
+} from "@/data/activities/year3Measurelands/week7Lesson1";
+import {
+  buildY3MeasurelandsWeek7Lesson2QuizTasks,
+  generateY3MeasurelandsWeek7Lesson2Task,
+  resetY3MeasurelandsWeek7Lesson2TaskSessionState,
+} from "@/data/activities/year3Measurelands/week7Lesson2";
+import {
+  buildY3MeasurelandsWeek7Lesson3QuizTasks,
+  generateY3MeasurelandsWeek7Lesson3Task,
+  resetY3MeasurelandsWeek7Lesson3TaskSessionState,
+} from "@/data/activities/year3Measurelands/week7Lesson3";
 
 type Y3MeasurelandsLessonEntry = {
   prefix: string;
@@ -395,6 +410,48 @@ const Y3_MEASURELANDS_LESSONS: Y3MeasurelandsLessonEntry[] = [
     completionTitle: "Build Any Time Complete!",
     unlockMessage: "Weekly Quiz unlocked.",
     returnRoute: "/program?year=Year 3&week=6&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y3-measurement-w7-l1",
+    week: 7,
+    lessonNumber: 1,
+    title: "Around the Edge",
+    subtitle: "Perimeter",
+    generate: generateY3MeasurelandsWeek7Lesson1Task,
+    reset: resetY3MeasurelandsWeek7Lesson1TaskSessionState,
+    quizContributionBuilder: buildY3MeasurelandsWeek7Lesson1QuizTasks,
+    practisedSkills: ["Recognise the perimeter", "Walk around the outside", "Find a missing edge"],
+    completionTitle: "Around the Edge Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+    returnRoute: "/program?year=Year 3&week=7&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y3-measurement-w7-l2",
+    week: 7,
+    lessonNumber: 2,
+    title: "Trace the Boundary",
+    subtitle: "Perimeter",
+    generate: generateY3MeasurelandsWeek7Lesson2Task,
+    reset: resetY3MeasurelandsWeek7Lesson2TaskSessionState,
+    quizContributionBuilder: buildY3MeasurelandsWeek7Lesson2QuizTasks,
+    practisedSkills: ["Trace a complete perimeter", "Find the missing side", "Stay on the outside"],
+    completionTitle: "Trace the Boundary Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+    returnRoute: "/program?year=Year 3&week=7&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y3-measurement-w7-l3",
+    week: 7,
+    lessonNumber: 3,
+    title: "Explore Perimeter",
+    subtitle: "Perimeter",
+    generate: generateY3MeasurelandsWeek7Lesson3Task,
+    reset: resetY3MeasurelandsWeek7Lesson3TaskSessionState,
+    quizContributionBuilder: buildY3MeasurelandsWeek7Lesson3QuizTasks,
+    practisedSkills: ["Compare perimeters", "Recognise perimeter in real life", "Trace around objects"],
+    completionTitle: "Explore Perimeter Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+    returnRoute: "/program?year=Year 3&week=7&legacy=1&realm_id=measurement",
   },
 ];
 

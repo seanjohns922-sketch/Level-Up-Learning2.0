@@ -1320,6 +1320,37 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Year 3 W7 "Perimeter" — CONCEPTUAL preview (no formulas, no
+      // calculation): perimeter = the distance all the way around the outside.
+      // The reusable "Perimeter Trace" mechanic: tap each outside edge to walk the
+      // boundary; it glows. Shapes are grid polyominoes (list of filled cells).
+      kind: "perimeter";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "trace" | "missingSide" | "whichPath" | "compareWalk";
+      /** Filled grid cells [col, row] defining the shape. */
+      cells?: Array<[number, number]>;
+      gridW?: number;
+      gridH?: number;
+      label?: string;
+      emoji?: string;
+      /** "trace": boundary edges already walked at the start (finish-the-path). */
+      prefilled?: Array<[number, number, "top" | "right" | "bottom" | "left"]>;
+      /** "missingSide": the correct missing boundary edge + tappable decoys. */
+      missingSide?: [number, number, "top" | "right" | "bottom" | "left"];
+      decoySides?: Array<[number, number, "top" | "right" | "bottom" | "left"]>;
+      /** "whichPath": path variants on the same shape; correct = the full outside. */
+      pathOptions?: Array<{ id: string; pathType: "full" | "cut" | "incomplete" }>;
+      correctPathId?: string;
+      /** "compareWalk": two shapes; pick the one with the longer perimeter. */
+      compareShapes?: {
+        a: { cells: Array<[number, number]>; label: string; emoji: string; gridW: number; gridH: number };
+        b: { cells: Array<[number, number]>; label: string; emoji: string; gridW: number; gridH: number };
+      };
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       kind: "tensOnesMcq";
       prompt: string;
       min: number;

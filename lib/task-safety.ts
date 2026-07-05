@@ -190,6 +190,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "capacity",
   "duration",
   "clockMinute",
+  "perimeter",
   "massMeasure",
   "massUnit",
   "massScale",
