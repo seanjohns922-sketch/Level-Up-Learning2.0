@@ -104,6 +104,21 @@ import {
   generateY3MeasurelandsWeek7Lesson3Task,
   resetY3MeasurelandsWeek7Lesson3TaskSessionState,
 } from "@/data/activities/year3Measurelands/week7Lesson3";
+import {
+  buildY3MeasurelandsWeek8Lesson1QuizTasks,
+  generateY3MeasurelandsWeek8Lesson1Task,
+  resetY3MeasurelandsWeek8Lesson1TaskSessionState,
+} from "@/data/activities/year3Measurelands/week8Lesson1";
+import {
+  buildY3MeasurelandsWeek8Lesson2QuizTasks,
+  generateY3MeasurelandsWeek8Lesson2Task,
+  resetY3MeasurelandsWeek8Lesson2TaskSessionState,
+} from "@/data/activities/year3Measurelands/week8Lesson2";
+import {
+  buildY3MeasurelandsWeek8Lesson3QuizTasks,
+  generateY3MeasurelandsWeek8Lesson3Task,
+  resetY3MeasurelandsWeek8Lesson3TaskSessionState,
+} from "@/data/activities/year3Measurelands/week8Lesson3";
 
 type Y3MeasurelandsLessonEntry = {
   prefix: string;
@@ -452,6 +467,48 @@ const Y3_MEASURELANDS_LESSONS: Y3MeasurelandsLessonEntry[] = [
     completionTitle: "Explore Perimeter Complete!",
     unlockMessage: "Weekly Quiz unlocked.",
     returnRoute: "/program?year=Year 3&week=7&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y3-measurement-w8-l1",
+    week: 8,
+    lessonNumber: 1,
+    title: "Cover the Space",
+    subtitle: "Area",
+    generate: generateY3MeasurelandsWeek8Lesson1Task,
+    reset: resetY3MeasurelandsWeek8Lesson1TaskSessionState,
+    quizContributionBuilder: buildY3MeasurelandsWeek8Lesson1QuizTasks,
+    practisedSkills: ["Recognise area as the inside space", "Cover a shape with tiles", "Count square units"],
+    completionTitle: "Cover the Space Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+    returnRoute: "/program?year=Year 3&week=8&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y3-measurement-w8-l2",
+    week: 8,
+    lessonNumber: 2,
+    title: "Count the Squares",
+    subtitle: "Area",
+    generate: generateY3MeasurelandsWeek8Lesson2Task,
+    reset: resetY3MeasurelandsWeek8Lesson2TaskSessionState,
+    quizContributionBuilder: buildY3MeasurelandsWeek8Lesson2QuizTasks,
+    practisedSkills: ["Count square units", "Compare areas", "Order shapes by area"],
+    completionTitle: "Count the Squares Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+    returnRoute: "/program?year=Year 3&week=8&legacy=1&realm_id=measurement",
+  },
+  {
+    prefix: "y3-measurement-w8-l3",
+    week: 8,
+    lessonNumber: 3,
+    title: "Build the Area",
+    subtitle: "Area",
+    generate: generateY3MeasurelandsWeek8Lesson3Task,
+    reset: resetY3MeasurelandsWeek8Lesson3TaskSessionState,
+    quizContributionBuilder: buildY3MeasurelandsWeek8Lesson3QuizTasks,
+    practisedSkills: ["Build a given area", "Make same area, different shape", "Cover shapes with tiles"],
+    completionTitle: "Build the Area Complete!",
+    unlockMessage: "Level 3 Post-Test unlocked.",
+    returnRoute: "/program?year=Year 3&week=8&legacy=1&realm_id=measurement",
   },
 ];
 

@@ -1351,6 +1351,40 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Year 3 W8 "Area" — CONCEPTUAL preview (no formulas): area =
+      // the space inside, measured by counting equal square units. Area Builder:
+      // tap square tiles to fill a shape. Understand → Count → Build.
+      kind: "area";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "whichPart" | "cover" | "countSquares" | "compareArea" | "orderArea" | "buildArea" | "sameArea";
+      cells?: Array<[number, number]>;
+      gridW?: number;
+      gridH?: number;
+      label?: string;
+      emoji?: string;
+      /** "whichPart": one option fills the inside (area); decoys = edge / partial. */
+      partOptions?: Array<{ id: string; fillType: "inside" | "edge" | "partial" }>;
+      correctPartId?: string;
+      /** "countSquares": number options; correct = number of cells. */
+      options?: number[];
+      correctNumber?: number;
+      /** "buildArea": tap tiles on an empty grid until exactly this many are placed. */
+      targetSquares?: number;
+      /** "compareArea": two shapes; pick the greater area. */
+      compareShapes?: {
+        a: { cells: Array<[number, number]>; label: string; emoji: string; gridW: number; gridH: number };
+        b: { cells: Array<[number, number]>; label: string; emoji: string; gridW: number; gridH: number };
+      };
+      /** "orderArea": shapes to order smallest → largest by area. */
+      orderShapes?: Array<{ cells: Array<[number, number]>; label: string; emoji: string; gridW: number; gridH: number }>;
+      /** "sameArea": pick the option shape with the same number of squares. */
+      sameOptions?: Array<{ id: string; cells: Array<[number, number]>; gridW: number; gridH: number }>;
+      correctSameId?: string;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       kind: "tensOnesMcq";
       prompt: string;
       min: number;
