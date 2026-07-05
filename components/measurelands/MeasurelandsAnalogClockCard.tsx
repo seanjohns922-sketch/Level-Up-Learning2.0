@@ -101,7 +101,7 @@ export function ClockFace({
         const isHour = index % 5 === 0;
         const angle = index * 6;
         const outer = handEnd(angle, radius);
-        const inner = handEnd(angle, radius - (isHour ? 14 : 7));
+        const inner = handEnd(angle, radius - (isHour ? size * 0.047 : size * 0.023));
         return (
           <line
             key={index}
@@ -110,22 +110,24 @@ export function ClockFace({
             x2={outer.x}
             y2={outer.y}
             stroke={isHour ? "#7c4a12" : "rgba(124,74,18,0.42)"}
-            strokeWidth={isHour ? 4 : 1.7}
+            strokeWidth={isHour ? size * 0.013 : size * 0.0057}
             strokeLinecap="round"
           />
         );
       })}
 
       {HOUR_OPTIONS.map((value) => {
-        const pos = handEnd(value * 30, size * 0.305);
+        const pos = handEnd(value * 30, size * 0.285);
         return (
           <text
             key={value}
             x={pos.x}
-            y={pos.y + 7}
+            y={pos.y + size * 0.026}
             textAnchor="middle"
-            className="fill-[#3a2408] text-[22px] font-black"
-            style={{ fontFamily: "inherit", letterSpacing: "0.02em" }}
+            fill="#3a2408"
+            fontSize={size * 0.07}
+            fontWeight={900}
+            style={{ fontFamily: "inherit" }}
           >
             {value}
           </text>
@@ -139,7 +141,7 @@ export function ClockFace({
           x2={minuteEnd.x}
           y2={minuteEnd.y}
           stroke="#a78bfa"
-          strokeWidth="18"
+          strokeWidth={size * 0.06}
           strokeLinecap="round"
           opacity="0.32"
         />
@@ -151,7 +153,7 @@ export function ClockFace({
           x2={hourEnd.x}
           y2={hourEnd.y}
           stroke="#f59e0b"
-          strokeWidth="24"
+          strokeWidth={size * 0.08}
           strokeLinecap="round"
           opacity="0.28"
         />
@@ -162,7 +164,7 @@ export function ClockFace({
         x2={hourEnd.x}
         y2={hourEnd.y}
         stroke={highlightHour ? "#78350f" : "#9a7b54"}
-        strokeWidth={highlightHour ? "14" : "11"}
+        strokeWidth={highlightHour ? size * 0.047 : size * 0.037}
         strokeLinecap="round"
         opacity={focus === "minute" ? "0.45" : "1"}
       />
@@ -172,11 +174,11 @@ export function ClockFace({
         x2={minuteEnd.x}
         y2={minuteEnd.y}
         stroke={highlightMinute ? "#5b21b6" : "#9a7b54"}
-        strokeWidth={highlightMinute ? "9" : "7"}
+        strokeWidth={highlightMinute ? size * 0.03 : size * 0.023}
         strokeLinecap="round"
         opacity={focus === "hour" ? "0.45" : "1"}
       />
-      <circle cx={center} cy={center} r={13} fill="#7c4a12" stroke="#fff0c2" strokeWidth="5" />
+      <circle cx={center} cy={center} r={size * 0.043} fill="#7c4a12" stroke="#fff0c2" strokeWidth={size * 0.017} />
     </svg>
   );
 }
