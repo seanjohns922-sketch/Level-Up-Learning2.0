@@ -9,7 +9,14 @@ type DurTask = Extract<PracticeTask, { kind: "duration" }>;
 
 type Mem = { introShown: boolean; cursor: number; recent: string[] };
 const mem = new Map<string, Mem>();
-const ROTATION: Array<"chooseUnit" | "sort" | "spotMistake"> = ["chooseUnit", "sort", "spotMistake", "chooseUnit", "spotMistake", "sort"];
+const ROTATION: Array<"unitFact" | "sort" | "spotMistake"> = ["unitFact", "sort", "spotMistake", "unitFact", "spotMistake", "sort"];
+
+// AC9M3M03 "use the relationship between units": recall the time facts.
+const FACTS = [
+  { q: "How many seconds are in one minute?", correct: "60 seconds", distractors: ["100 seconds", "30 seconds", "20 seconds"], fact: "60 seconds make 1 minute" },
+  { q: "How many minutes are in one hour?", correct: "60 minutes", distractors: ["100 minutes", "30 minutes", "24 minutes"], fact: "60 minutes make 1 hour" },
+  { q: "How many hours are in one day?", correct: "24 hours", distractors: ["12 hours", "10 hours", "60 hours"], fact: "24 hours make 1 day" },
+];
 
 function get(id: string): Mem { const e = mem.get(id); if (e) return e; const c: Mem = { introShown: false, cursor: 0, recent: [] }; mem.set(id, c); return c; }
 function randInt(n: number) { return Math.floor(Math.random() * n); }
@@ -21,17 +28,16 @@ function buildIntro(): DurTask {
   return { kind: "duration", scene: "intro", prompt: "Not every activity takes the same time!", speakText: "Professor Gauge says: not every activity takes the same amount of time. A blink takes seconds, brushing your teeth takes minutes, and a school day takes hours.", badgeLabel: "Meazurex Mission", feedback: { correct: "Let's go!", wrong: "Let's go!" } };
 }
 
-function buildChooseUnit(m: Mem): DurTask {
-  const a = pick(m);
+function buildUnitFact(): DurTask {
+  const f = FACTS[randInt(FACTS.length)]!;
   return {
-    kind: "duration", scene: "chooseUnit",
-    prompt: `Would you measure "${a.label}" in seconds, minutes or hours?`,
-    speakText: `Would you measure ${a.label} in seconds, minutes or hours?`,
-    badgeLabel: "Which Unit?",
-    activity: { label: a.label, emoji: a.emoji },
-    options: ["Seconds", "Minutes", "Hours"],
-    correctOption: cap(UNIT_WORD[a.unit]),
-    feedback: { correct: `Yes — ${a.label} takes ${UNIT_WORD[a.unit]}.`, wrong: `Think how quickly it finishes — ${a.label} takes ${UNIT_WORD[a.unit]}.` },
+    kind: "duration", scene: "unitFact",
+    prompt: f.q,
+    speakText: f.q,
+    badgeLabel: "Time Facts",
+    options: shuffle([f.correct, ...f.distractors]),
+    correctOption: f.correct,
+    feedback: { correct: `Yes — ${f.fact}.`, wrong: `Remember: ${f.fact}.` },
   };
 }
 
@@ -59,10 +65,10 @@ export function generateY3MeasurelandsWeek5Lesson1Task(lessonId: string, _d: Dif
   const a = ROTATION[m.cursor % ROTATION.length]!; m.cursor += 1;
   if (a === "sort") return buildSort(m);
   if (a === "spotMistake") return buildSpotMistake(m);
-  return buildChooseUnit(m);
+  return buildUnitFact();
 }
 export function resetY3MeasurelandsWeek5Lesson1TaskSessionState() { mem.clear(); }
 export function buildY3MeasurelandsWeek5Lesson1QuizTasks(): PracticeTask[] {
   const s: Mem = { introShown: true, cursor: 0, recent: [] };
-  return [buildChooseUnit(s), buildSpotMistake(s), buildChooseUnit(s), buildSpotMistake(s), buildChooseUnit(s)];
+  return [buildUnitFact(), buildSpotMistake(s), buildUnitFact(), buildSpotMistake(s), buildUnitFact()];
 }

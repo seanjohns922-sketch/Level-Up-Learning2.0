@@ -56,7 +56,22 @@ function IntroScene({ task, onCorrect }: { task: DurTask; onCorrect: () => void 
         <div className="mb-2 text-[12px] font-black uppercase tracking-[0.16em] text-[#a98b52]">Different activities take different times</div>
         <ul className="space-y-2.5">{rows.map((r, i) => (<li key={i} className="flex items-center gap-3"><span className="text-2xl">{r.emoji}</span><span className="text-[17px] font-bold text-[#2c1c07]">{r.text}</span></li>))}</ul>
       </div>
+      <div className="flex flex-wrap items-center justify-center gap-2 rounded-[22px] border border-[rgba(91,33,182,0.2)] bg-[rgba(91,33,182,0.05)] px-4 py-3 text-center text-base font-black text-[#5b21b6]">
+        <span>⚡ 60 seconds = 1 minute</span><span className="text-[#c9b27e]">·</span><span>⏱️ 60 minutes = 1 hour</span><span className="text-[#c9b27e]">·</span><span>🕐 24 hours = 1 day</span>
+      </div>
       <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[60px] items-center justify-center rounded-[24px] border-2 border-[rgba(180,120,20,0.55)] bg-[#fffaf0] px-8 text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]">Let&apos;s go! →</button>
+    </Shell>
+  );
+}
+
+function UnitFactScene({ task, onCorrect, onWrong }: { task: DurTask; onCorrect: () => void; onWrong: () => void }) {
+  return (
+    <Shell badge={task.badgeLabel ?? "Time Facts"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="flex items-center justify-center gap-3 rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] px-6 py-5">
+        <span className="text-[64px] leading-none" aria-hidden>⏱️</span>
+        <span className="text-lg font-black text-[#a98b52]">Remember your time facts</span>
+      </div>
+      <Choices options={task.options ?? []} correct={task.correctOption} cols="grid-cols-2" onCorrect={onCorrect} onWrong={onWrong} />
     </Shell>
   );
 }
@@ -176,6 +191,7 @@ function HowMuchLongerScene({ task, onCorrect, onWrong }: { task: DurTask; onCor
 export function MeasurelandsDurationCard({ task, onCorrect, onWrong }: { task: DurTask; onCorrect: () => void; onWrong: () => void }) {
   switch (task.scene) {
     case "intro": return <IntroScene task={task} onCorrect={onCorrect} />;
+    case "unitFact": return <UnitFactScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "sort": return <SortScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "spotMistake": return <SpotMistakeScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "estimate": return <EstimateScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;

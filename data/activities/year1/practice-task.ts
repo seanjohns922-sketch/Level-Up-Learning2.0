@@ -1258,6 +1258,7 @@ export type PracticeTask = (
       badgeLabel?: string;
       scene:
         | "intro"
+        | "unitFact"
         | "chooseUnit"
         | "sort"
         | "spotMistake"
