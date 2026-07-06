@@ -14,6 +14,28 @@ const THEME: Record<string, { fillHi: string; fillLo: string; icon: string }> = 
   pool: { fillHi: "#8FD3F4", fillLo: "#4FA9DC", icon: "🏊" },
   park: { fillHi: "#9FD98F", fillLo: "#6FB35C", icon: "🌳" },
 };
+
+// The centre icon must match the LABEL, not just the theme — a "basketball
+// court" on a playground-themed patch must not show a slide. Keyed by shapeName;
+// falls back to the theme icon for any unmapped name.
+const NAME_ICON: Record<string, string> = {
+  garden: "🌿",
+  "garden bed": "🌿",
+  "vegetable patch": "🥕",
+  "flower bed": "🌷",
+  playground: "🛝",
+  "basketball court": "🏀",
+  sandpit: "🏖️",
+  "cricket pitch": "🏏",
+  paddock: "🐄",
+  "dog park": "🐕",
+  "swimming pool": "🏊",
+  "fish pond": "🐟",
+  "animal enclosure": "🦒",
+  "picnic rug": "🧺",
+  park: "🌳",
+  pool: "🏊",
+};
 const FENCE = "#7A5325";
 const FENCE_HI = "#9E7038";
 
@@ -88,8 +110,8 @@ function SurveyorShape({
         {/* land fill */}
         <path d={path} fill={`url(#fill-${uid})`} stroke={FENCE} strokeWidth={9} strokeLinejoin="round" />
         <path d={path} fill="none" stroke={FENCE_HI} strokeWidth={2.4} strokeLinejoin="round" opacity={0.7} />
-        {/* theme icon in the centre */}
-        <text x={geo.svgW / 2} y={geo.svgH / 2 + 8} textAnchor="middle" fontSize={26} opacity={0.9}>{theme.icon}</text>
+        {/* centre icon — matches the labelled place, not just the theme */}
+        <text x={geo.svgW / 2} y={geo.svgH / 2 + 8} textAnchor="middle" fontSize={26} opacity={0.9}>{(task.shapeName && NAME_ICON[task.shapeName]) ?? theme.icon}</text>
 
         {/* edges: tap targets + labels */}
         {geo.edges.map((e, i) => {
