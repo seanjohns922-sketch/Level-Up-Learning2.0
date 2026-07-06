@@ -2,10 +2,22 @@
 
 const heroNumberNexus = { src: "/images/lesson-hero-number-nexus.jpg" };
 const heroMeasurelands = { src: "/images/measurelands-home-bg.jpg" };
+const heroMeasurelandsByYear: Record<number, string> = {
+  1: "/images/measurelands-home-bg-y1.jpg",
+  2: "/images/measurelands-home-bg-y2.jpg",
+  3: "/images/measurelands-home-bg-y3.jpg",
+  4: "/images/measurelands-home-bg-y4.jpg",
+};
+
+function getMeasurelandsHeroSrc(year?: number | string) {
+  const numericYear = typeof year === "number" ? year : Number(String(year ?? "").match(/\d+/)?.[0] ?? NaN);
+  return heroMeasurelandsByYear[numericYear] ?? heroMeasurelands.src;
+}
 
 type LessonPageHeroProps = {
   levelNumber: number;
   levelLabel?: string;
+  year?: number | string;
   week: number;
   lessonNumber: number;
   breadcrumbText?: string;
@@ -19,6 +31,7 @@ type LessonPageHeroProps = {
 export function LessonPageHero({
   levelNumber,
   levelLabel,
+  year,
   week,
   lessonNumber,
   breadcrumbText,
@@ -28,6 +41,7 @@ export function LessonPageHero({
   realmId,
 }: LessonPageHeroProps) {
   const isMeasurement = realmId === "measurement";
+  const measurementHeroSrc = getMeasurelandsHeroSrc(year ?? levelNumber);
 
   return (
     <div
@@ -38,7 +52,7 @@ export function LessonPageHero({
       <div className="pointer-events-none absolute inset-0" aria-hidden>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={isMeasurement ? heroMeasurelands.src : heroNumberNexus.src}
+          src={isMeasurement ? measurementHeroSrc : heroNumberNexus.src}
           alt=""
           className="h-full w-full object-cover"
           style={isMeasurement ? {

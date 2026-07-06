@@ -128,7 +128,54 @@ const YEAR3_DISTRICTS = [
   },
 ] as const;
 
-type Year3District = (typeof YEAR3_DISTRICTS)[number];
+const YEAR4_DISTRICTS = [
+  {
+    id: "measure-forge",
+    name: "MEASURE FORGE",
+    sub: "WEEKS 1–2",
+    weekStart: 1,
+    weekEnd: 2,
+    left: "4%",
+    top: "14%",
+    color: "#67e8f9",
+    tagline: "formal length and scaled measuring",
+  },
+  {
+    id: "scale-works",
+    name: "SCALE WORKS",
+    sub: "WEEKS 3–4",
+    weekStart: 3,
+    weekEnd: 4,
+    left: "5%",
+    top: "58%",
+    color: "#c4b5fd",
+    tagline: "mass, capacity, and metric tools",
+  },
+  {
+    id: "timeworks",
+    name: "TIMEWORKS",
+    sub: "WEEKS 5–6",
+    weekStart: 5,
+    weekEnd: 6,
+    left: "68%",
+    top: "14%",
+    color: "#fde68a",
+    tagline: "time, duration, and calendar reasoning",
+  },
+  {
+    id: "design-grounds",
+    name: "DESIGN GROUNDS",
+    sub: "WEEKS 7–8",
+    weekStart: 7,
+    weekEnd: 8,
+    left: "68%",
+    top: "58%",
+    color: "#f9a8d4",
+    tagline: "perimeter, area, and measured spaces",
+  },
+] as const;
+
+type MeasurelandsDistrict = (typeof YEAR3_DISTRICTS)[number] | (typeof YEAR4_DISTRICTS)[number];
 type DistrictState = "complete" | "current" | "locked";
 
 function getMeasurelandsWorldConfig(year: MeasurelandsYear) {
@@ -270,7 +317,7 @@ function MeasurelandsDistrictLabel({
   active,
   onClick,
 }: {
-  district: Year3District;
+  district: MeasurelandsDistrict;
   state: DistrictState;
   active: boolean;
   onClick: () => void;
@@ -401,12 +448,13 @@ export default function MeasurelandsMap({ year = "Prep" }: { year?: Measurelands
     return xp;
   }, [resolvedYear, store, totalWeeks]);
 
-  const isDistrictMode = resolvedYear === "Year 3";
+  const districts = resolvedYear === "Year 4" ? YEAR4_DISTRICTS : YEAR3_DISTRICTS;
+  const isDistrictMode = resolvedYear === "Year 3" || resolvedYear === "Year 4";
   const currentDistrict =
-    YEAR3_DISTRICTS.find((district) => currentWeek >= district.weekStart && currentWeek <= district.weekEnd) ??
-    YEAR3_DISTRICTS[0];
+    districts.find((district) => currentWeek >= district.weekStart && currentWeek <= district.weekEnd) ??
+    districts[0];
   const activeDistrictId = isDistrictMode ? currentDistrict.id : null;
-  const getDistrictState = (district: Year3District): DistrictState => {
+  const getDistrictState = (district: MeasurelandsDistrict): DistrictState => {
     const allWeeksDone = Array.from({ length: district.weekEnd - district.weekStart + 1 }, (_, index) => district.weekStart + index).every(
       (week) => completedByWeek[week]
     );
@@ -487,7 +535,7 @@ export default function MeasurelandsMap({ year = "Prep" }: { year?: Measurelands
     router.push(`/program?year=${encodeURIComponent(resolvedYear)}&week=${Math.max(weekStart, Math.min(currentWeek, weekEnd))}&legacy=1&realm_id=${REALM_ID}`);
   }
 
-  function openDistrict(district: Year3District) {
+  function openDistrict(district: MeasurelandsDistrict) {
     if (getDistrictState(district) === "locked") return;
     goToFirstIncompleteWeek(district.weekStart, district.weekEnd);
   }
@@ -779,11 +827,11 @@ export default function MeasurelandsMap({ year = "Prep" }: { year?: Measurelands
                   textShadow: "0 0 14px rgba(251,191,36,0.46)",
                 }}
               >
-                LEVEL 3 · FORMAL MEASUREMENT DISTRICTS
+                {world.levelLabel} · FORMAL MEASUREMENT DISTRICTS
               </div>
             </div>
 
-            {YEAR3_DISTRICTS.map((district) => (
+            {districts.map((district) => (
               <div
                 key={district.id}
                 style={{

@@ -797,6 +797,7 @@ function LessonPage() {
             <LessonPageHero
               levelNumber={levelNumber}
               levelLabel={levelLabel}
+              year={year}
               week={week}
               lessonNumber={lessonNumber}
               pageTitle="Lesson Locked"
@@ -851,6 +852,7 @@ function LessonPage() {
             <LessonPageHero
               levelNumber={levelNumber}
               levelLabel={levelLabel}
+              year={year}
               week={week}
               lessonNumber={lessonNumber}
               pageTitle={`Lesson ${lessonNumber} Practise`}
@@ -892,6 +894,7 @@ function LessonPage() {
             <LessonPageHero
               levelNumber={levelNumber}
               levelLabel={levelLabel}
+              year={year}
               week={week}
               lessonNumber={lessonNumber}
               pageTitle={`Lesson ${lessonNumber}`}
@@ -932,6 +935,7 @@ function LessonPage() {
             <LessonPageHero
               levelNumber={levelNumber}
               levelLabel={levelLabel}
+              year={year}
               week={week}
               lessonNumber={lessonNumber}
               pageTitle={`Lesson ${lessonNumber} Practise`}
@@ -1268,6 +1272,7 @@ function LessonPage() {
             <LessonPageHero
                     levelNumber={levelNumber}
                     levelLabel={levelLabel}
+                    year={year}
                     week={week}
                     lessonNumber={lessonNumber}
               pageTitle={`Lesson ${lessonNumber} Practise`}
@@ -1367,6 +1372,7 @@ function LessonPage() {
             <LessonPageHero
               levelNumber={levelNumber}
               levelLabel={levelLabel}
+              year={year}
               week={week}
               lessonNumber={lessonNumber}
               pageTitle={`Lesson ${lessonNumber} Practise`}
