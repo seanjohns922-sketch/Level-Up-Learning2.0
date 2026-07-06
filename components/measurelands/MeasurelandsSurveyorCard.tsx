@@ -123,14 +123,26 @@ function SurveyorShape({
   );
 }
 
-/* ── Keypad for typed perimeter ── */
-function Keypad({ answer, unit, hint, onCorrect, onWrong }: { answer: number; unit: string; hint: string; onCorrect: () => void; onWrong: () => void }) {
+/* ── Keypad for typed perimeter (with an add-the-sides working strip) ── */
+function Keypad({ answer, unit, hint, addends, onCorrect, onWrong }: { answer: number; unit: string; hint: string; addends?: number[]; onCorrect: () => void; onWrong: () => void }) {
   const [typed, setTyped] = useState("");
   const [status, setStatus] = useState<"idle" | "wrong">("idle");
   const add = (d: string) => { setStatus("idle"); setTyped((c) => (c === "0" ? d : c.length >= 4 ? c : `${c}${d}`)); };
   const check = () => { if (!typed) return; if (Number(typed) === answer) onCorrect(); else { setStatus("wrong"); onWrong(); } };
   return (
     <div className="rounded-[24px] border-2 border-[rgba(214,184,108,0.52)] bg-white p-3 shadow-sm">
+      {addends && addends.length > 0 ? (
+        <div className="mb-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-[18px] border border-[rgba(214,184,108,0.5)] bg-[rgba(255,250,240,0.9)] px-3 py-2">
+          {addends.map((n, i) => (
+            <span key={i} className="flex items-center gap-2">
+              <span className="rounded-[10px] bg-white px-2.5 py-1 text-lg font-black text-[#2c1c07] shadow-[inset_0_0_0_1px_rgba(214,184,108,0.6)]">{n}</span>
+              {i < addends.length - 1 ? <span className="text-lg font-black text-[#a98b52]">+</span> : null}
+            </span>
+          ))}
+          <span className="text-lg font-black text-[#a98b52]">=</span>
+          <span className="min-w-[42px] rounded-[10px] border-2 border-dashed border-[#5b21b6]/50 px-2 py-1 text-center text-lg font-black text-[#5b21b6]">{typed || "?"}</span>
+        </div>
+      ) : null}
       <div className={`mb-2 flex items-center justify-center gap-2 rounded-[20px] border-2 px-4 py-2 ${status === "wrong" ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.58)] bg-[#fffaf0]"}`}>
         <div className="min-w-[70px] text-center text-3xl font-black tabular-nums text-[#2c1c07]">{typed || "?"}</div>
         <div className="text-xl font-black uppercase tracking-[0.12em] text-[#7c4a12]">{unit}</div>
@@ -217,7 +229,7 @@ function CalcScene({ task, onCorrect, onWrong }: { task: SurveyorTask; onCorrect
     <Shell badge={task.badgeLabel ?? "Find the Perimeter"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_300px]">
         <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3"><SurveyorShape task={task} /></div>
-        <Keypad answer={task.answerValue ?? task.perimeter ?? 0} unit={task.answerUnit ?? task.unit} hint="Add every outside side once." onCorrect={onCorrect} onWrong={onWrong} />
+        <Keypad answer={task.answerValue ?? task.perimeter ?? 0} unit={task.answerUnit ?? task.unit} hint="Add every side to find the total." addends={task.sideLabels} onCorrect={onCorrect} onWrong={onWrong} />
       </div>
     </Shell>
   );
@@ -264,7 +276,7 @@ function ProblemScene({ task, onCorrect, onWrong }: { task: SurveyorTask; onCorr
       ) : (
         <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_300px]">
           <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3"><SurveyorShape task={task} /></div>
-          <Keypad answer={task.answerValue ?? task.perimeter ?? 0} unit={task.answerUnit ?? task.unit} hint="Measure all the way around." onCorrect={onCorrect} onWrong={onWrong} />
+          <Keypad answer={task.answerValue ?? task.perimeter ?? 0} unit={task.answerUnit ?? task.unit} hint="Add every side to find the total." addends={task.sideLabels} onCorrect={onCorrect} onWrong={onWrong} />
         </div>
       )}
     </Shell>
