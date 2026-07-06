@@ -32,7 +32,7 @@ function buildIntroTask(): SurveyorTask {
     scene: "intro",
     prompt: "Before we find the perimeter, we measure every side.",
     speakText:
-      "Professor Gauge says: before we can find the perimeter, we must measure every side. A good surveyor measures the whole boundary — no side left out.",
+      "Professor Gauge says: perimeter is the total distance all the way around the outside of a shape. Before we can find it, we measure every side, then add them together. A good surveyor measures the whole boundary — no side left out.",
     badgeLabel: "Meazurex Mission",
     poly: [[0, 0], [6, 0], [6, 4], [0, 4]],
     sideLabels: [6, 4, 6, 4],

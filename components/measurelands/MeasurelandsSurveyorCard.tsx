@@ -163,10 +163,29 @@ function McqRow({ options, correct, unit, onCorrect, onWrong }: { options: numbe
 }
 
 function IntroScene({ task, onCorrect }: { task: SurveyorTask; onCorrect: () => void }) {
+  const sum = task.sideLabels.reduce((a, b) => a + b, 0);
+  const sumStr = task.sideLabels.join(" + ");
   return (
     <Shell badge={task.badgeLabel ?? "Meazurex Mission"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
-        <SurveyorShape task={task} />
+      <div className="grid gap-3 md:grid-cols-2">
+        <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
+          <SurveyorShape task={task} size={260} />
+        </div>
+        <div className="rounded-[24px] border border-[rgba(214,184,108,0.45)] bg-[rgba(255,250,240,0.96)] p-4">
+          <div className="mb-2 flex items-center gap-2">
+            <span className="text-[12px] font-black uppercase tracking-[0.16em] text-[#a98b52]">What is perimeter?</span>
+            <span className="rounded-full bg-[rgba(91,33,182,0.1)] px-2 py-0.5 text-[11px] font-black text-[#5b21b6]">all the way around</span>
+          </div>
+          <p className="text-[17px] font-bold leading-snug text-[#2c1c07]">
+            Perimeter is the total distance <span className="font-black text-[#5b21b6]">around the outside</span> of a shape.
+          </p>
+          <p className="mt-2 text-[15px] font-semibold leading-snug text-[#5a4423]">
+            Measure every side, then <span className="font-black">add them all together</span>. It is a length — not the space inside.
+          </p>
+          <div className="mt-3 rounded-[16px] border border-[rgba(214,184,108,0.5)] bg-white px-3 py-2 text-center text-lg font-black text-[#2c1c07]">
+            {sumStr} = <span className="text-[#5b21b6]">{sum} {task.unit}</span>
+          </div>
+        </div>
       </div>
       <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[60px] items-center justify-center rounded-[24px] border-2 border-[rgba(180,120,20,0.55)] bg-[#fffaf0] px-8 text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]">Let&apos;s survey! →</button>
     </Shell>
