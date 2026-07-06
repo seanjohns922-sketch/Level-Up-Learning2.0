@@ -7632,6 +7632,15 @@ function SessionPage({
       return buildPrepWeek11WeeklyQuizQuestions(questionsPerLesson);
     }
 
+    // Level 4 Measurelands weekly quiz plumbing (Weeks 1–7). Real per-week
+    // builders (mirroring buildY3MeasurelandsWeekNWeeklyQuizQuestions) land with
+    // the Level 4 curriculum. Until then this returns no questions rather than
+    // falling through to the Number Nexus structured quiz below — Level 4
+    // Measurement must never render Number Nexus content.
+    if (isMeasurementRealm && year === "Year 4") {
+      return [];
+    }
+
     if (
       year === "Year 2" ||
       year === "Year 3" ||

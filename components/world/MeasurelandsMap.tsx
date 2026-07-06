@@ -18,12 +18,14 @@ import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import StudentAvatar from "@/components/avatar/StudentAvatar";
 import { supabase } from "@/lib/supabase";
 
-type MeasurelandsYear = "Prep" | "Year 1" | "Year 2" | "Year 3";
+type MeasurelandsYear = "Prep" | "Year 1" | "Year 2" | "Year 3" | "Year 4";
 const REALM_ID = "measurement";
 const PREP_BG_IMAGE = "/images/measurelands-home-bg.jpg";
 const YEAR1_BG_IMAGE = "/images/measurelands-home-bg-y1.jpg";
 const YEAR2_BG_IMAGE = "/images/measurelands-home-bg-y2.jpg";
 const YEAR3_BG_IMAGE = "/images/measurelands-home-bg-y3.jpg";
+// TODO: swap for a bespoke Level 4 background once art is dropped in.
+const YEAR4_BG_IMAGE = "/images/measurelands-home-bg-y3.jpg";
 
 const PREP_ZONES = [
   { id: "length", name: "LENGTH LANDS", sub: "WEEKS 1–2", weekStart: 1, weekEnd: 2, left: "7%", top: "14%", color: "#67e8f9" },
@@ -64,6 +66,20 @@ const YEAR3_ZONES = [
   { id: "minute-clockworks", name: "MINUTE CLOCKWORKS", sub: "WEEK 6", weekStart: 6, weekEnd: 6, left: "50%", top: "30%", color: "#fcd34d" },
   { id: "perimeter-preview", name: "PERIMETER PREVIEW", sub: "WEEK 7", weekStart: 7, weekEnd: 7, left: "69%", top: "57%", color: "#f9a8d4" },
   { id: "area-preview", name: "AREA PREVIEW", sub: "WEEK 8", weekStart: 8, weekEnd: 8, left: "50%", top: "30%", color: "#93c5fd" },
+] as const;
+
+// PLACEHOLDER Level 4 zones — generic Week 1–8 markers so the world map routes
+// into the Level 4 program before the curriculum plan is approved. Real topic
+// names/positions replace these once Level 4 is built.
+const YEAR4_ZONES = [
+  { id: "w1", name: "MEASURE WEEK 1", sub: "WEEK 1", weekStart: 1, weekEnd: 1, left: "7%", top: "14%", color: "#67e8f9" },
+  { id: "w2", name: "MEASURE WEEK 2", sub: "WEEK 2", weekStart: 2, weekEnd: 2, left: "10%", top: "56%", color: "#86efac" },
+  { id: "w3", name: "MEASURE WEEK 3", sub: "WEEK 3", weekStart: 3, weekEnd: 3, left: "70%", top: "15%", color: "#c4b5fd" },
+  { id: "w4", name: "MEASURE WEEK 4", sub: "WEEK 4", weekStart: 4, weekEnd: 4, left: "50%", top: "30%", color: "#fde68a" },
+  { id: "w5", name: "MEASURE WEEK 5", sub: "WEEK 5", weekStart: 5, weekEnd: 5, left: "50%", top: "30%", color: "#a7f3d0" },
+  { id: "w6", name: "MEASURE WEEK 6", sub: "WEEK 6", weekStart: 6, weekEnd: 6, left: "50%", top: "30%", color: "#fcd34d" },
+  { id: "w7", name: "MEASURE WEEK 7", sub: "WEEK 7", weekStart: 7, weekEnd: 7, left: "69%", top: "57%", color: "#f9a8d4" },
+  { id: "w8", name: "MEASURE WEEK 8", sub: "WEEK 8", weekStart: 8, weekEnd: 8, left: "50%", top: "30%", color: "#93c5fd" },
 ] as const;
 
 const YEAR3_DISTRICTS = [
@@ -117,6 +133,9 @@ type Year3District = (typeof YEAR3_DISTRICTS)[number];
 type DistrictState = "complete" | "current" | "locked";
 
 function getMeasurelandsWorldConfig(year: MeasurelandsYear) {
+  if (year === "Year 4") {
+    return { bgImage: YEAR4_BG_IMAGE, levelLabel: "LEVEL 4", zones: YEAR4_ZONES };
+  }
   if (year === "Year 3") {
     return { bgImage: YEAR3_BG_IMAGE, levelLabel: "LEVEL 3", zones: YEAR3_ZONES };
   }
@@ -346,7 +365,7 @@ function MeasurelandsDistrictLabel({
 export default function MeasurelandsMap({ year = "Prep" }: { year?: MeasurelandsYear }) {
   const router = useRouter();
   const resolvedYear: MeasurelandsYear =
-    year === "Year 1" ? "Year 1" : year === "Year 2" ? "Year 2" : year === "Year 3" ? "Year 3" : "Prep";
+    year === "Year 1" ? "Year 1" : year === "Year 2" ? "Year 2" : year === "Year 3" ? "Year 3" : year === "Year 4" ? "Year 4" : "Prep";
   const world = useMemo(() => getMeasurelandsWorldConfig(resolvedYear), [resolvedYear]);
   const [progress] = useState(() => readProgress());
   const [store] = useState(() => readProgramStore());

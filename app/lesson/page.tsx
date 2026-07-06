@@ -62,6 +62,14 @@ import {
   resetY3MeasurelandsLessonSessionState,
   resolveY3MeasurelandsLessonTask,
 } from "@/data/activities/year3Measurelands/registry";
+import {
+  getY4MeasurelandsLessonMeta,
+  getY4MeasurelandsPractisedSkills,
+  isY4MeasurelandsLessonId,
+  isY4MeasurelandsPlaceholderLesson,
+  resetY4MeasurelandsLessonSessionState,
+  resolveY4MeasurelandsLessonTask,
+} from "@/data/activities/year4Measurelands/registry";
 import { getProgramForYear } from "@/data/programs";
 import { getCurriculumPlan } from "@/data/programs/genres";
 import { DEMO_MODE } from "@/data/config";
@@ -167,7 +175,8 @@ function getLessonPractisedSkills(lessonId: string): string[] | undefined {
     getPrepMeasurelandsPractisedSkills(lessonId) ??
     getY1MeasurelandsPractisedSkills(lessonId) ??
     getY2MeasurelandsPractisedSkills(lessonId) ??
-    getY3MeasurelandsPractisedSkills(lessonId)
+    getY3MeasurelandsPractisedSkills(lessonId) ??
+    getY4MeasurelandsPractisedSkills(lessonId)
   );
 }
 
@@ -373,7 +382,8 @@ function LessonPage() {
         ? getPrepMeasurelandsLessonMeta(effectiveLessonId) ??
           getY1MeasurelandsLessonMeta(effectiveLessonId) ??
           getY2MeasurelandsLessonMeta(effectiveLessonId) ??
-          getY3MeasurelandsLessonMeta(effectiveLessonId)
+          getY3MeasurelandsLessonMeta(effectiveLessonId) ??
+          getY4MeasurelandsLessonMeta(effectiveLessonId)
         : null,
     [effectiveLessonId, realmId]
   );
@@ -392,10 +402,19 @@ function LessonPage() {
     realmId === "measurement" &&
     year === "Year 3" &&
     isY3MeasurelandsLessonId(effectiveLessonId);
+  const isYear4Measurelands =
+    realmId === "measurement" &&
+    year === "Year 4" &&
+    isY4MeasurelandsLessonId(effectiveLessonId);
   const invalidMeasurelandsLesson =
-    (year === "Prep" || year === "Year 2" || year === "Year 3") &&
+    (year === "Prep" || year === "Year 2" || year === "Year 3" || year === "Year 4") &&
     realmId === "measurement" &&
     !measurelandsMeta;
+  // Unbuilt scaffold lessons (e.g. Level 4 placeholders) render a "Coming Soon"
+  // screen and are never runnable — no XP, save, completion, unlocks, teacher
+  // data or quiz progression until a real generator replaces the placeholder.
+  const isPlaceholderMeasurelandsLesson =
+    realmId === "measurement" && isY4MeasurelandsPlaceholderLesson(effectiveLessonId);
 
   useEffect(() => {
     const p = readProgress();
@@ -868,6 +887,46 @@ function LessonPage() {
               </div>
             </div>
           </div>
+        ) : isPlaceholderMeasurelandsLesson ? (
+          <div className="rounded-[24px] overflow-hidden shadow-[0_2px_6px_rgba(0,0,0,0.04),0_16px_40px_rgba(0,0,0,0.08)] border border-border/40 bg-card">
+            <LessonPageHero
+              levelNumber={levelNumber}
+              levelLabel={levelLabel}
+              week={week}
+              lessonNumber={lessonNumber}
+              pageTitle={`Lesson ${lessonNumber}`}
+              lessonTitle={safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
+              focus="This Level 4 Measurelands lesson is still being built."
+              heroClass={lessonChrome.heroClass}
+              realmId={realmId}
+            />
+            <div className="bg-background px-6 py-8">
+              <div className="mx-auto max-w-2xl rounded-[28px] border border-amber-200 bg-amber-50 p-8 shadow-[0_12px_30px_rgba(180,120,20,0.12)]">
+                <div className="text-center">
+                  <div className="text-6xl">🚧</div>
+                  <div className="mt-4 inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-amber-800">
+                    Coming Soon
+                  </div>
+                  <h2 className="mt-3 text-3xl font-black text-slate-900">
+                    This lesson is still being built
+                  </h2>
+                  <p className="mt-2 text-base text-slate-700">
+                    Level 4 Measurelands is on its way. There’s nothing to complete here
+                    yet — no progress is recorded.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      router.push(`/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1&realm_id=${encodeURIComponent(realmId)}`)
+                    }
+                    className="mt-6 w-full rounded-[22px] bg-gradient-to-r from-amber-700 to-orange-500 px-6 py-4 text-lg font-black text-white shadow-[0_10px_24px_rgba(180,120,20,0.22)] transition hover:brightness-110"
+                  >
+                    Back to Program →
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         ) : !started ? (
           <div className="rounded-[24px] overflow-hidden shadow-[0_2px_6px_rgba(0,0,0,0.04),0_16px_40px_rgba(0,0,0,0.08)] border border-border/40 bg-card">
             <LessonPageHero
@@ -1171,6 +1230,7 @@ function LessonPage() {
                         resetY1MeasurelandsLessonSessionState();
                         resetY2MeasurelandsLessonSessionState();
                         resetY3MeasurelandsLessonSessionState();
+                        resetY4MeasurelandsLessonSessionState();
                         resetPrepMeasurelandsLessonSessionState();
                       }
                       setStartedLessonId(effectiveLessonId);
@@ -1203,7 +1263,7 @@ function LessonPage() {
               </div>
             </div>
           </div>
-        ) : year === "Year 1" || isGroundCustomLesson || isYear2Measurelands || isYear3Measurelands ? (
+        ) : year === "Year 1" || isGroundCustomLesson || isYear2Measurelands || isYear3Measurelands || isYear4Measurelands ? (
           <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
             <LessonPageHero
                     levelNumber={levelNumber}
@@ -1221,7 +1281,7 @@ function LessonPage() {
               key={`${year}-${week}-${effectiveLessonId}`}
               minutes={9}
               lessonTitle={safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
-              completionMode={year === "Year 1" || isGroundCustomLesson || isYear2Measurelands || isYear3Measurelands ? "time_only" : "question_or_time"}
+              completionMode={year === "Year 1" || isGroundCustomLesson || isYear2Measurelands || isYear3Measurelands || isYear4Measurelands ? "time_only" : "question_or_time"}
               scoreCap={10}
               liveContext={liveLessonContext}
               realmId={realmId}
@@ -1251,6 +1311,7 @@ function LessonPage() {
                 }
                 if (realmId === "measurement") {
                   return (
+                    resolveY4MeasurelandsLessonTask(effectiveLessonId, d) ??
                     resolveY3MeasurelandsLessonTask(effectiveLessonId, d) ??
                     resolveY2MeasurelandsLessonTask(effectiveLessonId, d) ??
                     resolveY1MeasurelandsLessonTask(effectiveLessonId, d) ??

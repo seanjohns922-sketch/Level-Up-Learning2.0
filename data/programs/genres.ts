@@ -4,6 +4,7 @@ import { PREP_MEASURELANDS_PROGRAM } from "./prepMeasurelands";
 import { YEAR1_MEASURELANDS_PROGRAM } from "./year1Measurelands";
 import { YEAR2_MEASURELANDS_PROGRAM } from "./year2Measurelands";
 import { YEAR3_MEASURELANDS_PROGRAM } from "./year3Measurelands";
+import { YEAR4_MEASURELANDS_PROGRAM } from "./year4Measurelands";
 
 export type Genre = {
   id: string;
@@ -27,7 +28,7 @@ function yearOrdinal(yearLabel: string): number {
 /** Master genre catalogue. Future strands unlock from Year 3+. */
 const ALL_GENRES: GenreCatalogEntry[] = [
   { id: "number",      strand: "Number",      realm: "Number Nexus",    availableLevels: [0, 1, 2, 3, 4, 5, 6], unlocksFromLevel: 0 },
-  { id: "measurement", strand: "Measurement", realm: "Measurelands",    availableLevels: [0, 1, 2, 3], unlocksFromLevel: 0 },
+  { id: "measurement", strand: "Measurement", realm: "Measurelands",    availableLevels: [0, 1, 2, 3, 4], unlocksFromLevel: 0 },
   { id: "space",       strand: "Space",       realm: "Geospin",         unlocksFromLevel: 0 },
   { id: "reading",     strand: "Reading",     realm: "Reading Ridge",   unlocksFromLevel: 0 },
   { id: "writing",     strand: "Writing",     realm: "Inkwell Wilds",   unlocksFromLevel: 0 },
@@ -146,6 +147,10 @@ export function getCurriculumPlan(yearLabel: string, genreId: string): WeekPlan[
 
   if (genreId === "measurement" && yearLabel === "Year 3") {
     return YEAR3_MEASURELANDS_PROGRAM;
+  }
+
+  if (genreId === "measurement" && yearLabel === "Year 4") {
+    return YEAR4_MEASURELANDS_PROGRAM;
   }
 
   return placeholderWeeks(yearLabel, genre);
