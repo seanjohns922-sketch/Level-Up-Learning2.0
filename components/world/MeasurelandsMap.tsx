@@ -24,8 +24,7 @@ const PREP_BG_IMAGE = "/images/measurelands-home-bg.jpg";
 const YEAR1_BG_IMAGE = "/images/measurelands-home-bg-y1.jpg";
 const YEAR2_BG_IMAGE = "/images/measurelands-home-bg-y2.jpg";
 const YEAR3_BG_IMAGE = "/images/measurelands-home-bg-y3.jpg";
-// TODO: swap for a bespoke Level 4 background once art is dropped in.
-const YEAR4_BG_IMAGE = "/images/measurelands-home-bg-y3.jpg";
+const YEAR4_BG_IMAGE = "/images/measurelands-home-bg-y4.jpg";
 
 const PREP_ZONES = [
   { id: "length", name: "LENGTH LANDS", sub: "WEEKS 1–2", weekStart: 1, weekEnd: 2, left: "7%", top: "14%", color: "#67e8f9" },
