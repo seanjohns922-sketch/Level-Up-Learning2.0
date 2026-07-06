@@ -39,27 +39,37 @@ function AngleTile({ fig, benchmark, size = 170 }: { fig: NonNullable<AngleTask[
 }
 
 /* ── Intro ── */
+const ANGLE_GALLERY: Array<{ turn: number; name: string; desc: string; rightMark?: boolean }> = [
+  { turn: 45, name: "Acute", desc: "smaller than a right angle" },
+  { turn: 90, name: "Right", desc: "a square corner — a quarter turn", rightMark: true },
+  { turn: 130, name: "Obtuse", desc: "bigger than a right angle" },
+  { turn: 180, name: "Straight", desc: "a half turn — a flat line" },
+  { turn: 250, name: "Reflex", desc: "bigger than a straight angle" },
+  { turn: 359, name: "Revolution", desc: "a full turn, right around" },
+];
+
 function IntroScene({ task, onCorrect }: { task: AngleTask; onCorrect: () => void }) {
   return (
     <Shell badge={task.badgeLabel ?? "Meazurex Mission"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      <div className="grid gap-3 md:grid-cols-2">
-        <div className="flex items-center justify-center rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
-          <MeasurelandsAngle turn={70} arm1={100} arm2={100} size={220} />
+      <div className="rounded-[24px] border border-[rgba(214,184,108,0.45)] bg-[rgba(255,250,240,0.96)] p-4">
+        <div className="mb-1 flex items-center gap-2">
+          <span className="text-[12px] font-black uppercase tracking-[0.16em] text-[#a98b52]">What is an angle?</span>
+          <span className="rounded-full bg-[rgba(91,33,182,0.1)] px-2 py-0.5 text-[11px] font-black text-[#5b21b6]">a measure of turn</span>
         </div>
-        <div className="rounded-[24px] border border-[rgba(214,184,108,0.45)] bg-[rgba(255,250,240,0.96)] p-4">
-          <div className="mb-2 flex items-center gap-2">
-            <span className="text-[12px] font-black uppercase tracking-[0.16em] text-[#a98b52]">What is an angle?</span>
-            <span className="rounded-full bg-[rgba(91,33,182,0.1)] px-2 py-0.5 text-[11px] font-black text-[#5b21b6]">a measure of turn</span>
-          </div>
-          <p className="text-[17px] font-bold leading-snug text-[#2c1c07]">
-            An angle is the amount of <span className="font-black text-[#5b21b6]">turn</span> between two lines that meet at a point.
-          </p>
-          <p className="mt-2 text-[15px] font-semibold leading-snug text-[#5a4423]">
-            It is the <span className="font-black">opening</span> — <span className="font-black">not</span> the length of the lines. Longer lines do not make a bigger angle.
-          </p>
-          <div className="mt-3 rounded-[16px] border border-[rgba(214,184,108,0.5)] bg-white px-3 py-2 text-center text-[14px] font-black text-[#2c1c07]">
-            Recognise <span className="text-[#a98b52]">→</span> Compare <span className="text-[#a98b52]">→</span> Apply
-          </div>
+        <p className="text-[16px] font-bold leading-snug text-[#2c1c07]">
+          An angle is the amount of <span className="font-black text-[#5b21b6]">turn</span> between two lines that meet at a point — the <span className="font-black">opening</span>, not the length of the lines.
+        </p>
+      </div>
+      <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
+        <div className="mb-1 text-center text-[12px] font-black uppercase tracking-[0.16em] text-[#a98b52]">The types of angles</div>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {ANGLE_GALLERY.map((t) => (
+            <div key={t.name} className="flex flex-col items-center rounded-[18px] border border-[rgba(214,184,108,0.5)] bg-white p-1.5">
+              <MeasurelandsAngle turn={t.turn} arm1={82} arm2={82} rightMark={t.rightMark} size={116} />
+              <div className="text-[15px] font-black text-[#5b21b6]">{t.name}</div>
+              <div className="text-center text-[11px] font-semibold leading-tight text-[#5a4423]">{t.desc}</div>
+            </div>
+          ))}
         </div>
       </div>
       <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[60px] items-center justify-center rounded-[24px] border-2 border-[rgba(180,120,20,0.55)] bg-[#fffaf0] px-8 text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]">Let&apos;s explore! →</button>
