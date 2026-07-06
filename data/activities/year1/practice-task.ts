@@ -1268,6 +1268,38 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Year 4 W3 "Temperature" (AC9M4M01) — read a thermometer in
+      // degrees Celsius (whole numbers, 0–40, no negatives/decimals) and use the
+      // readings. Reuses the reusable MeasurelandsThermometer (analog + digital).
+      //   read    — read one thermometer (number options; optional Gauge claim).
+      //   match   — several thermometers; tap the one showing the target temp.
+      //   compare — tap the warmest / weather-appropriate item.
+      //   order   — arrange items coldest → warmest.
+      kind: "temperature";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "read" | "match" | "compare" | "order";
+      display?: "analog" | "digital";
+      /** "read": the thermometer's reading + bracketing number options. */
+      value?: number;
+      options?: number[];
+      correctNumber?: number;
+      /** "read" (verify): Professor Gauge's stated reading. */
+      statement?: string;
+      /** "match": tap the thermometer showing this temperature. */
+      targetValue?: number;
+      thermometers?: Array<{ id: string; value: number; display?: "analog" | "digital" }>;
+      correctId?: string;
+      /** "compare"/"order": labelled items with a temperature (city/day). */
+      items?: Array<{ id: string; label: string; emoji?: string; value: number }>;
+      correctLabel?: string;
+      orderedLabels?: string[];
+      /** Intro visual. */
+      introValue?: number;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       // Measurelands Year 3 W5 "Time Trails" (AC9M3M03) — Understand → Estimate → Compare.
       // Duration reasoning with seconds/minutes/hours; NOT reading a clock.
       // L1: chooseUnit / sort / spotMistake.  L2: estimate / bestEstimate / (challenge).

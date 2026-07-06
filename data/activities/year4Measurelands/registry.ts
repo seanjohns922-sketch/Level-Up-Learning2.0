@@ -30,6 +30,21 @@ import {
   generateY4MeasurelandsWeek2Lesson3Task,
   resetY4MeasurelandsWeek2Lesson3TaskSessionState,
 } from "@/data/activities/year4Measurelands/week2Lesson3";
+import {
+  buildY4MeasurelandsWeek3Lesson1QuizTasks,
+  generateY4MeasurelandsWeek3Lesson1Task,
+  resetY4MeasurelandsWeek3Lesson1TaskSessionState,
+} from "@/data/activities/year4Measurelands/week3Lesson1";
+import {
+  buildY4MeasurelandsWeek3Lesson2QuizTasks,
+  generateY4MeasurelandsWeek3Lesson2Task,
+  resetY4MeasurelandsWeek3Lesson2TaskSessionState,
+} from "@/data/activities/year4Measurelands/week3Lesson2";
+import {
+  buildY4MeasurelandsWeek3Lesson3QuizTasks,
+  generateY4MeasurelandsWeek3Lesson3Task,
+  resetY4MeasurelandsWeek3Lesson3TaskSessionState,
+} from "@/data/activities/year4Measurelands/week3Lesson3";
 
 // Built lessons replace their placeholder entry (real generator, no "Coming
 // Soon" gate). Add a row here as each Level 4 lesson ships.
@@ -116,6 +131,43 @@ const BUILT_LESSONS: Record<
       "Use measurements, not guesses, to solve problems",
     ],
     completionTitle: "Measurement Investigations Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+  },
+  "y4-measurement-w3-l1": {
+    generate: generateY4MeasurelandsWeek3Lesson1Task,
+    reset: resetY4MeasurelandsWeek3Lesson1TaskSessionState,
+    quizContributionBuilder: buildY4MeasurelandsWeek3Lesson1QuizTasks,
+    practisedSkills: [
+      "Read temperature in degrees Celsius",
+      "Match a thermometer to a temperature",
+      "Know that higher means warmer",
+      "Compare hotter and colder",
+    ],
+    completionTitle: "Meet the Thermometer Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+  },
+  "y4-measurement-w3-l2": {
+    generate: generateY4MeasurelandsWeek3Lesson2Task,
+    reset: resetY4MeasurelandsWeek3Lesson2TaskSessionState,
+    quizContributionBuilder: buildY4MeasurelandsWeek3Lesson2QuizTasks,
+    practisedSkills: [
+      "Read a thermometer between the labelled marks",
+      "Choose the correct temperature reading",
+      "Check a temperature reading for accuracy",
+    ],
+    completionTitle: "Read the Temperature Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+  },
+  "y4-measurement-w3-l3": {
+    generate: generateY4MeasurelandsWeek3Lesson3Task,
+    reset: resetY4MeasurelandsWeek3Lesson3TaskSessionState,
+    quizContributionBuilder: buildY4MeasurelandsWeek3Lesson3QuizTasks,
+    practisedSkills: [
+      "Compare temperatures to find the warmest",
+      "Order temperatures from coldest to warmest",
+      "Use temperatures to solve weather problems",
+    ],
+    completionTitle: "Temperature Investigations Complete!",
     unlockMessage: "Weekly Quiz unlocked.",
   },
 };

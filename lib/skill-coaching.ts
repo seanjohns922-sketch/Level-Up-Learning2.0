@@ -252,6 +252,9 @@ const TABLE: Record<string, SkillCoaching> = {
   ml_y4_w2_l1: { tip: "Read the measurement carefully before choosing your answer." },
   ml_y4_w2_l2: { tip: "Read the liquid level where it meets the markings." },
   ml_y4_w2_l3: { tip: "Good scientists use measurements to solve problems—not guesses." },
+  ml_y4_w3_l1: { tip: "Higher temperatures mean warmer weather." },
+  ml_y4_w3_l2: { tip: "Read every marking before choosing your answer." },
+  ml_y4_w3_l3: { tip: "Compare the numbers carefully to solve the problem." },
 };
 
 const FALLBACK: SkillCoaching = {
@@ -348,6 +351,9 @@ const LESSON_KEY_MAP: Record<string, string> = {
   "y4-measurement-w2-l1": "ml_y4_w2_l1",
   "y4-measurement-w2-l2": "ml_y4_w2_l2",
   "y4-measurement-w2-l3": "ml_y4_w2_l3",
+  "y4-measurement-w3-l1": "ml_y4_w3_l1",
+  "y4-measurement-w3-l2": "ml_y4_w3_l2",
+  "y4-measurement-w3-l3": "ml_y4_w3_l3",
 };
 
 function normalizeLessonId(lessonId: string): string {
