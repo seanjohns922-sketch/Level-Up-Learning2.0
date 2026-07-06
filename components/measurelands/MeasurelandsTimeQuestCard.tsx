@@ -72,22 +72,46 @@ function ChoiceGrid({ options, correct, onCorrect, onWrong, spokenSuffix }: { op
 
 /* ── Intro ── */
 function IntroScene({ task, onCorrect }: { task: TimeTask; onCorrect: () => void }) {
-  const chart: Array<[string, string]> = [
-    ["60 seconds", "1 minute"],
-    ["60 minutes", "1 hour"],
-    ["24 hours", "1 day"],
-    ["7 days", "1 week"],
+  // A "ladder" of units building up: seconds → minutes → hours → days → weeks.
+  const ladder: Array<{ small: string; big: string }> = [
+    { small: "60 seconds", big: "1 minute" },
+    { small: "60 minutes", big: "1 hour" },
+    { small: "24 hours", big: "1 day" },
+    { small: "7 days", big: "1 week" },
   ];
   return (
     <Shell badge={task.badgeLabel ?? "Meazurex Mission"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      <div className="rounded-[24px] border border-[rgba(214,184,108,0.45)] bg-[rgba(255,250,240,0.96)] p-4">
-        <div className="mb-2 text-[12px] font-black uppercase tracking-[0.16em] text-[#a98b52]">Time is connected</div>
-        <div className="grid grid-cols-2 gap-2">
-          {chart.map(([a, b]) => (
-            <div key={a} className="flex items-center justify-center gap-2 rounded-[16px] border border-[rgba(214,184,108,0.5)] bg-white px-2 py-2 text-[15px] font-black text-[#2c1c07]">
-              <span>{a}</span><span className="text-[#5b21b6]">=</span><span className="text-[#5b21b6]">{b}</span>
-            </div>
-          ))}
+      <div className="grid gap-3 md:grid-cols-2">
+        {/* the conversion ladder */}
+        <div className="rounded-[24px] border border-[rgba(214,184,108,0.45)] bg-[rgba(255,250,240,0.96)] p-4">
+          <div className="mb-2 text-[12px] font-black uppercase tracking-[0.16em] text-[#a98b52]">Small units build bigger ones</div>
+          <div className="space-y-1.5">
+            {ladder.map((row, i) => (
+              <div key={row.big}>
+                <div className="flex items-center justify-between rounded-[16px] border border-[rgba(214,184,108,0.5)] bg-white px-3 py-2 text-[15px] font-black text-[#2c1c07]">
+                  <span>{row.small}</span>
+                  <span className="text-[#5b21b6]">→ {row.big}</span>
+                </div>
+                {i < ladder.length - 1 ? <div className="text-center text-sm font-black text-[#a98b52]">↓</div> : null}
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* what the week is about */}
+        <div className="rounded-[24px] border border-[rgba(214,184,108,0.45)] bg-[rgba(255,250,240,0.96)] p-4">
+          <div className="mb-2 flex items-center gap-2">
+            <span className="text-[12px] font-black uppercase tracking-[0.16em] text-[#a98b52]">Using time</span>
+            <span className="rounded-full bg-[rgba(91,33,182,0.1)] px-2 py-0.5 text-[11px] font-black text-[#5b21b6]">Time Explorer</span>
+          </div>
+          <p className="text-[17px] font-bold leading-snug text-[#2c1c07]">
+            Small units of time <span className="font-black text-[#5b21b6]">join together</span> to make bigger ones.
+          </p>
+          <p className="mt-2 text-[15px] font-semibold leading-snug text-[#5a4423]">
+            This week you&apos;ll <span className="font-black">convert</span> time, work out <span className="font-black">how long</span> things take, and <span className="font-black">solve</span> real time problems.
+          </p>
+          <div className="mt-3 rounded-[16px] border border-[rgba(214,184,108,0.5)] bg-white px-3 py-2 text-center text-[14px] font-black text-[#2c1c07]">
+            Convert <span className="text-[#a98b52]">→</span> Calculate <span className="text-[#a98b52]">→</span> Solve
+          </div>
         </div>
       </div>
       <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[60px] items-center justify-center rounded-[24px] border-2 border-[rgba(180,120,20,0.55)] bg-[#fffaf0] px-8 text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]">Let&apos;s explore! →</button>
