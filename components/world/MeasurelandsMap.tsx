@@ -67,18 +67,15 @@ const YEAR3_ZONES = [
   { id: "area-preview", name: "AREA PREVIEW", sub: "WEEK 8", weekStart: 8, weekEnd: 8, left: "50%", top: "30%", color: "#93c5fd" },
 ] as const;
 
-// PLACEHOLDER Level 4 zones — generic Week 1–8 markers so the world map routes
-// into the Level 4 program before the curriculum plan is approved. Real topic
-// names/positions replace these once Level 4 is built.
 const YEAR4_ZONES = [
-  { id: "w1", name: "MEASURE WEEK 1", sub: "WEEK 1", weekStart: 1, weekEnd: 1, left: "7%", top: "14%", color: "#67e8f9" },
-  { id: "w2", name: "MEASURE WEEK 2", sub: "WEEK 2", weekStart: 2, weekEnd: 2, left: "10%", top: "56%", color: "#86efac" },
-  { id: "w3", name: "MEASURE WEEK 3", sub: "WEEK 3", weekStart: 3, weekEnd: 3, left: "70%", top: "15%", color: "#c4b5fd" },
-  { id: "w4", name: "MEASURE WEEK 4", sub: "WEEK 4", weekStart: 4, weekEnd: 4, left: "50%", top: "30%", color: "#fde68a" },
-  { id: "w5", name: "MEASURE WEEK 5", sub: "WEEK 5", weekStart: 5, weekEnd: 5, left: "50%", top: "30%", color: "#a7f3d0" },
-  { id: "w6", name: "MEASURE WEEK 6", sub: "WEEK 6", weekStart: 6, weekEnd: 6, left: "50%", top: "30%", color: "#fcd34d" },
-  { id: "w7", name: "MEASURE WEEK 7", sub: "WEEK 7", weekStart: 7, weekEnd: 7, left: "69%", top: "57%", color: "#f9a8d4" },
-  { id: "w8", name: "MEASURE WEEK 8", sub: "WEEK 8", weekStart: 8, weekEnd: 8, left: "50%", top: "30%", color: "#93c5fd" },
+  { id: "precision", name: "PRECISION MEASURING", sub: "WEEK 1", weekStart: 1, weekEnd: 1, left: "7%", top: "14%", color: "#67e8f9" },
+  { id: "scales-jugs", name: "SCALES & JUGS", sub: "WEEK 2", weekStart: 2, weekEnd: 2, left: "10%", top: "56%", color: "#86efac" },
+  { id: "temperature", name: "TEMPERATURE", sub: "WEEK 3", weekStart: 3, weekEnd: 3, left: "70%", top: "15%", color: "#c4b5fd" },
+  { id: "perimeter", name: "PERIMETER", sub: "WEEK 4", weekStart: 4, weekEnd: 4, left: "50%", top: "30%", color: "#fde68a" },
+  { id: "area", name: "AREA", sub: "WEEK 5", weekStart: 5, weekEnd: 5, left: "50%", top: "30%", color: "#a7f3d0" },
+  { id: "time-problems", name: "TIME PROBLEMS", sub: "WEEK 6", weekStart: 6, weekEnd: 6, left: "50%", top: "30%", color: "#fcd34d" },
+  { id: "angles", name: "ANGLES", sub: "WEEK 7", weekStart: 7, weekEnd: 7, left: "69%", top: "57%", color: "#f9a8d4" },
+  { id: "investigations", name: "MEASUREMENT INVESTIGATIONS", sub: "WEEK 8", weekStart: 8, weekEnd: 8, left: "50%", top: "30%", color: "#93c5fd" },
 ] as const;
 
 const YEAR3_DISTRICTS = [
@@ -130,48 +127,48 @@ const YEAR3_DISTRICTS = [
 
 const YEAR4_DISTRICTS = [
   {
-    id: "measure-forge",
-    name: "MEASURE FORGE",
+    id: "precision-forge",
+    name: "PRECISION FORGE",
     sub: "WEEKS 1–2",
     weekStart: 1,
     weekEnd: 2,
     left: "4%",
     top: "14%",
     color: "#67e8f9",
-    tagline: "formal length and scaled measuring",
+    tagline: "precision, scales, and measuring jugs",
   },
   {
-    id: "scale-works",
-    name: "SCALE WORKS",
+    id: "boundary-lab",
+    name: "BOUNDARY LAB",
     sub: "WEEKS 3–4",
     weekStart: 3,
     weekEnd: 4,
     left: "5%",
     top: "58%",
     color: "#c4b5fd",
-    tagline: "mass, capacity, and metric tools",
+    tagline: "temperature and perimeter",
   },
   {
-    id: "timeworks",
-    name: "TIMEWORKS",
+    id: "space-timeworks",
+    name: "SPACE TIMEWORKS",
     sub: "WEEKS 5–6",
     weekStart: 5,
     weekEnd: 6,
     left: "68%",
     top: "14%",
     color: "#fde68a",
-    tagline: "time, duration, and calendar reasoning",
+    tagline: "area and time problems",
   },
   {
-    id: "design-grounds",
-    name: "DESIGN GROUNDS",
+    id: "explorer-trials",
+    name: "EXPLORER TRIALS",
     sub: "WEEKS 7–8",
     weekStart: 7,
     weekEnd: 8,
     left: "68%",
     top: "58%",
     color: "#f9a8d4",
-    tagline: "perimeter, area, and measured spaces",
+    tagline: "angles and investigations",
   },
 ] as const;
 

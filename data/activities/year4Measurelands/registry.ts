@@ -1,4 +1,5 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
+import { YEAR4_MEASURELANDS_PROGRAM } from "@/data/programs/year4Measurelands";
 
 // Measurelands Level 4 (Year 4) — registry SHELL.
 //
@@ -35,18 +36,31 @@ type Y4MeasurelandsLessonEntry = {
 
 // Shared placeholder task — renders a clear "not built yet" Measurelands scene
 // (never a Number Nexus fallback). Real generators replace this per lesson.
+function getPlannedWeek(week: number) {
+  return YEAR4_MEASURELANDS_PROGRAM.find((candidate) => candidate.week === week);
+}
+
+function getPlannedLesson(week: number, lessonNumber: number) {
+  return getPlannedWeek(week)?.lessons.find((candidate) => candidate.lesson === lessonNumber);
+}
+
 function buildPlaceholderTask(lessonId: string, week: number, lessonNumber: number): PracticeTask {
+  const plannedWeek = getPlannedWeek(week);
+  const plannedLesson = getPlannedLesson(week, lessonNumber);
+  const lessonTitle = plannedLesson?.title ?? `Week ${week} Lesson ${lessonNumber}`;
+  const weekTopic = plannedWeek?.topic ?? `Week ${week}`;
+
   return {
     kind: "measurementCompare",
     scene: "intro",
-    prompt: "This Level 4 Measurelands lesson is coming soon.",
+    prompt: `${lessonTitle} is coming soon.`,
     speakText:
-      "This Level 4 Measurelands lesson is being built. The curriculum plan is on its way.",
+      `${lessonTitle} is being built for Measurelands Level 4.`,
     badgeLabel: "Measurelands · Level 4",
     introIcon: "🧭",
     introBody: [
-      `Week ${week}, Lesson ${lessonNumber}.`,
-      "Level 4 measurement content is coming soon.",
+      `${weekTopic}: ${lessonTitle}.`,
+      plannedLesson?.focus ?? "Level 4 measurement content is coming soon.",
       "This lesson stays in Measurelands — it will not fall back to Number Nexus.",
     ],
     objects: [],
@@ -58,18 +72,23 @@ function buildPlaceholderTask(lessonId: string, week: number, lessonNumber: numb
 function makePlaceholderEntry(week: number, lessonNumber: number): Y4MeasurelandsLessonEntry {
   const isLastLessonOfWeek = lessonNumber === 3;
   const isLastWeek = week === 8;
+  const plannedWeek = getPlannedWeek(week);
+  const plannedLesson = getPlannedLesson(week, lessonNumber);
+  const title = plannedLesson?.title ?? `Lesson ${lessonNumber}`;
+  const subtitle = plannedWeek?.topic ?? `Level 4 — Week ${week}`;
+
   return {
     prefix: `y4-measurement-w${week}-l${lessonNumber}`,
     week,
     lessonNumber,
-    title: `Lesson ${lessonNumber}`,
-    subtitle: `Level 4 — Week ${week}`,
+    title,
+    subtitle,
     generate: (lessonId) => buildPlaceholderTask(lessonId, week, lessonNumber),
     reset: () => {},
     quizContributionBuilder: () => [],
-    practisedSkills: undefined,
+    practisedSkills: plannedLesson?.activityIdeas,
     placeholder: true,
-    completionTitle: `Week ${week} Lesson ${lessonNumber} Complete!`,
+    completionTitle: `${title} Complete!`,
     unlockMessage: !isLastLessonOfWeek
       ? `Lesson ${lessonNumber + 1} unlocked.`
       : isLastWeek
