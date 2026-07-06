@@ -105,6 +105,21 @@ import {
   generateY4MeasurelandsWeek7Lesson3Task,
   resetY4MeasurelandsWeek7Lesson3TaskSessionState,
 } from "@/data/activities/year4Measurelands/week7Lesson3";
+import {
+  buildY4MeasurelandsWeek8Lesson1QuizTasks,
+  generateY4MeasurelandsWeek8Lesson1Task,
+  resetY4MeasurelandsWeek8Lesson1TaskSessionState,
+} from "@/data/activities/year4Measurelands/week8Lesson1";
+import {
+  buildY4MeasurelandsWeek8Lesson2QuizTasks,
+  generateY4MeasurelandsWeek8Lesson2Task,
+  resetY4MeasurelandsWeek8Lesson2TaskSessionState,
+} from "@/data/activities/year4Measurelands/week8Lesson2";
+import {
+  buildY4MeasurelandsWeek8Lesson3QuizTasks,
+  generateY4MeasurelandsWeek8Lesson3Task,
+  resetY4MeasurelandsWeek8Lesson3TaskSessionState,
+} from "@/data/activities/year4Measurelands/week8Lesson3";
 
 // Built lessons replace their placeholder entry (real generator, no "Coming
 // Soon" gate). Add a row here as each Level 4 lesson ships.
@@ -373,6 +388,45 @@ const BUILT_LESSONS: Record<
     ],
     completionTitle: "Angle Explorer Complete!",
     unlockMessage: "Weekly Quiz unlocked.",
+  },
+  "y4-measurement-w8-l1": {
+    generate: generateY4MeasurelandsWeek8Lesson1Task,
+    reset: resetY4MeasurelandsWeek8Lesson1TaskSessionState,
+    quizContributionBuilder: buildY4MeasurelandsWeek8Lesson1QuizTasks,
+    practisedSkills: [
+      "Choose the correct measuring tool for the job",
+      "Decide what to measure before starting",
+      "Use perimeter to work out fencing",
+      "Use area to work out grass or turf",
+    ],
+    completionTitle: "Design the Park Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+  },
+  "y4-measurement-w8-l2": {
+    generate: generateY4MeasurelandsWeek8Lesson2Task,
+    reset: resetY4MeasurelandsWeek8Lesson2TaskSessionState,
+    quizContributionBuilder: buildY4MeasurelandsWeek8Lesson2QuizTasks,
+    practisedSkills: [
+      "Read a scale, a jug and a thermometer",
+      "Compare measurements to make a decision",
+      "Use the right instrument for each measurement",
+      "Solve a science investigation",
+    ],
+    completionTitle: "Science Investigation Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+  },
+  "y4-measurement-w8-l3": {
+    generate: generateY4MeasurelandsWeek8Lesson3Task,
+    reset: resetY4MeasurelandsWeek8Lesson3TaskSessionState,
+    quizContributionBuilder: buildY4MeasurelandsWeek8Lesson3QuizTasks,
+    practisedSkills: [
+      "Combine two or more measurement skills in one problem",
+      "Choose the right measurement for real-world situations",
+      "Solve authentic mixed measurement missions",
+      "Explain which measurement a problem needs",
+    ],
+    completionTitle: "Master Surveyor Mission Complete!",
+    unlockMessage: "Level 4 Post-Test unlocked.",
   },
 };
 

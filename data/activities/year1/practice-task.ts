@@ -1057,6 +1057,8 @@ export type PracticeTask = (
       objectLengthUnits?: number;
       /** Optional teaching-strip tools for intro scenes. */
       introTools?: Array<{ id: string; label: string; focus: string; iconKey: string; imageSrc?: string }>;
+      /** Optional intro briefing lines (overrides the default teaching copy). */
+      introLines?: string[];
       /** The object being measured (shown in the middle). */
       object?: { label: string; iconKey: string; imageSrc?: string };
       /** "best"/"whyBest": tool option cards; tap the best (correctToolId). */

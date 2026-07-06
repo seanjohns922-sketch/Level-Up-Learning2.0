@@ -267,6 +267,9 @@ const TABLE: Record<string, SkillCoaching> = {
   ml_y4_w7_l1: { tip: "An angle measures how much something turns." },
   ml_y4_w7_l2: { tip: "Compare every angle to a right angle first." },
   ml_y4_w7_l3: { tip: "Look for angles in everyday objects—you'll find them everywhere." },
+  ml_y4_w8_l1: { tip: "Choose the best measuring tool before you start." },
+  ml_y4_w8_l2: { tip: "Scientists compare measurements to make decisions." },
+  ml_y4_w8_l3: { tip: "Real-world problems often need more than one measurement skill." },
 };
 
 const FALLBACK: SkillCoaching = {
@@ -378,6 +381,9 @@ const LESSON_KEY_MAP: Record<string, string> = {
   "y4-measurement-w7-l1": "ml_y4_w7_l1",
   "y4-measurement-w7-l2": "ml_y4_w7_l2",
   "y4-measurement-w7-l3": "ml_y4_w7_l3",
+  "y4-measurement-w8-l1": "ml_y4_w8_l1",
+  "y4-measurement-w8-l2": "ml_y4_w8_l2",
+  "y4-measurement-w8-l3": "ml_y4_w8_l3",
 };
 
 function normalizeLessonId(lessonId: string): string {

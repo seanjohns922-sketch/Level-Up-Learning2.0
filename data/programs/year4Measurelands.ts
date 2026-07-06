@@ -6,14 +6,17 @@ import type { CurriculumCode, Lesson, WeekPlan } from "./year1";
 // Level 4 identity: students move from using tools to solving real measurement
 // problems. The program flow is Interpret -> Solve -> Apply.
 //
-// Core AC v9 alignment (indicative — finalised during curriculum planning):
-// AC9M4M01 — measure and compare using scaled instruments and appropriate units.
-// AC9M4M02 — units of time and conversions; solve problems involving duration.
-// AC9M4M03 — length, area and perimeter of shapes using appropriate metric units.
+// Core AC v9 alignment:
+// AC9M4M01 — measure and compare with scaled instruments and appropriate units
+//            (length, mass, capacity, temperature).
+// AC9M4M02 — measure and approximate perimeter and area of shapes/enclosed spaces.
+// AC9M4M03 — convert between units of time; solve problems involving duration.
+// AC9M4M04 — estimate, compare and classify angles relative to a right angle.
 const YEAR4_MEASURELANDS_CURRICULUM: CurriculumCode[] = [
   "AC9M4M01",
   "AC9M4M02",
   "AC9M4M03",
+  "AC9M4M04",
 ];
 
 function buildLesson(
@@ -116,12 +119,12 @@ const YEAR4_MEASURELANDS_RAW: WeekPlan[] = [
   {
     id: "y4-measurement-w8",
     week: 8,
-    topic: "Measurement Investigations",
+    topic: "Measurement Missions",
     curriculum: YEAR4_MEASURELANDS_CURRICULUM,
     lessons: [
-      buildLesson(8, 1, "Design a Playground", "Investigation: use perimeter, area and length in a playground design problem.", ["Design problem", "Perimeter", "Area and length"], YEAR4_MEASURELANDS_CURRICULUM),
-      buildLesson(8, 2, "Science Lab", "Investigation: use temperature, capacity and mass in a science lab problem.", ["Temperature", "Capacity", "Mass"], YEAR4_MEASURELANDS_CURRICULUM),
-      buildLesson(8, 3, "Measurement Mission", "Investigation: solve mixed real-world problems using all Level 4 measurement skills.", ["Mixed measurement", "Choose strategies", "Apply learning"], YEAR4_MEASURELANDS_CURRICULUM),
+      buildLesson(8, 1, "Design the Park", "Investigation: choose the right tool, then use perimeter and area to design a park.", ["Choose the tool", "Perimeter", "Area"], YEAR4_MEASURELANDS_CURRICULUM),
+      buildLesson(8, 2, "Science Investigation", "Investigation: read scales, jugs and thermometers, then compare the measurements.", ["Read instruments", "Compare readings", "Explain results"], YEAR4_MEASURELANDS_CURRICULUM),
+      buildLesson(8, 3, "Master Surveyor Mission", "Investigation: solve mixed real-world problems using every Level 4 measurement skill.", ["Mixed measurement", "Choose strategies", "Apply learning"], YEAR4_MEASURELANDS_CURRICULUM),
     ],
   },
 ];
