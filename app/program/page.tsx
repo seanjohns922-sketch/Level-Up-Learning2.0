@@ -441,6 +441,8 @@ function ProgramPage() {
                 ? "/images/measurelands-home-bg-y2.jpg"
                 : levelNum === 3
                 ? "/images/measurelands-home-bg-y3.jpg"
+                : levelNum === 4
+                ? "/images/measurelands-home-bg-y4.jpg"
                 : "/images/measurelands-home-bg.jpg"
               : getHomeBg(levelNum, isPrep)
           }
