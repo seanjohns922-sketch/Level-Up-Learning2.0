@@ -1367,6 +1367,30 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Year 4 W7 "Angle Adventures" (AC9M4M04) — Recognise → Compare
+      // → Apply. Angles as measures of turn; compare to a right-angle benchmark;
+      // name acute/right/obtuse/straight/reflex/revolution. No degrees, no
+      // protractors, no unknown-angle calculation. Reuses MeasurelandsAngle.
+      kind: "angleQuest";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "pickAngle" | "compareRight" | "order" | "classify";
+      /** "pickAngle"/"order": the figures to choose/arrange. */
+      figures?: Array<{ id: string; kind?: "angle" | "line" | "ray"; turn?: number; rot?: number; arm1?: number; arm2?: number; label?: string; emoji?: string }>;
+      correctId?: string;
+      /** "compareRight"/"classify": a single angle. */
+      angle?: { turn: number; rot?: number; arm1?: number; arm2?: number };
+      /** "compareRight": smaller / equal / larger than a right angle. */
+      correctCompare?: "smaller" | "equal" | "larger";
+      /** "classify": angle-name options + the correct name. */
+      options?: string[];
+      correctOption?: string;
+      /** Optional real-world object framing. */
+      context?: { label: string; emoji: string };
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       // Measurelands Year 3 W5 "Time Trails" (AC9M3M03) — Understand → Estimate → Compare.
       // Duration reasoning with seconds/minutes/hours; NOT reading a clock.
       // L1: chooseUnit / sort / spotMistake.  L2: estimate / bestEstimate / (challenge).

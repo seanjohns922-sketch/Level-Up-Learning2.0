@@ -106,11 +106,11 @@ const YEAR4_MEASURELANDS_RAW: WeekPlan[] = [
     id: "y4-measurement-w7",
     week: 7,
     topic: "Angles",
-    curriculum: ["AC9M4M03"],
+    curriculum: ["AC9M4M04"],
     lessons: [
-      buildLesson(7, 1, "Meet Angles", "Angles: recognise angles as turns and corners.", ["Angles", "Turns", "Corners"], ["AC9M4M03"]),
-      buildLesson(7, 2, "Compare Angles", "Angles: compare angles to right angles.", ["Right angle", "Smaller angles", "Larger angles"], ["AC9M4M03"]),
-      buildLesson(7, 3, "Angle Explorer", "Angles: identify and reason about angles in familiar shapes and spaces.", ["Find angles", "Compare angles", "Angle reasoning"], ["AC9M4M03"]),
+      buildLesson(7, 1, "Meet Angles", "Angles: recognise angles as measures of turn.", ["Angles", "Turns", "Right angle"], ["AC9M4M04"]),
+      buildLesson(7, 2, "Compare Angles", "Angles: compare angles to a right angle and name them.", ["Right angle", "Smaller angles", "Larger angles"], ["AC9M4M04"]),
+      buildLesson(7, 3, "Angle Explorer", "Angles: identify and classify angles in familiar objects.", ["Find angles", "Compare angles", "Classify angles"], ["AC9M4M04"]),
     ],
   },
   {

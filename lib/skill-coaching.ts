@@ -264,6 +264,9 @@ const TABLE: Record<string, SkillCoaching> = {
   ml_y4_w6_l1: { tip: "Small time units join together to make bigger ones." },
   ml_y4_w6_l2: { tip: "Elapsed time is the time between the start and the finish." },
   ml_y4_w6_l3: { tip: "Draw or imagine a timeline before solving a time problem." },
+  ml_y4_w7_l1: { tip: "An angle measures how much something turns." },
+  ml_y4_w7_l2: { tip: "Compare every angle to a right angle first." },
+  ml_y4_w7_l3: { tip: "Look for angles in everyday objects—you'll find them everywhere." },
 };
 
 const FALLBACK: SkillCoaching = {
@@ -372,6 +375,9 @@ const LESSON_KEY_MAP: Record<string, string> = {
   "y4-measurement-w6-l1": "ml_y4_w6_l1",
   "y4-measurement-w6-l2": "ml_y4_w6_l2",
   "y4-measurement-w6-l3": "ml_y4_w6_l3",
+  "y4-measurement-w7-l1": "ml_y4_w7_l1",
+  "y4-measurement-w7-l2": "ml_y4_w7_l2",
+  "y4-measurement-w7-l3": "ml_y4_w7_l3",
 };
 
 function normalizeLessonId(lessonId: string): string {

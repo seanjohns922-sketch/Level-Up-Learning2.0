@@ -21,6 +21,7 @@ export type CurriculumCode =
   | "AC9M4M01"
   | "AC9M4M02"
   | "AC9M4M03"
+  | "AC9M4M04"
   | "AC9M1N01"
   | "AC9M1N02"
   | "AC9M1N03"

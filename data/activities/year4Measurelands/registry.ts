@@ -90,6 +90,21 @@ import {
   generateY4MeasurelandsWeek6Lesson3Task,
   resetY4MeasurelandsWeek6Lesson3TaskSessionState,
 } from "@/data/activities/year4Measurelands/week6Lesson3";
+import {
+  buildY4MeasurelandsWeek7Lesson1QuizTasks,
+  generateY4MeasurelandsWeek7Lesson1Task,
+  resetY4MeasurelandsWeek7Lesson1TaskSessionState,
+} from "@/data/activities/year4Measurelands/week7Lesson1";
+import {
+  buildY4MeasurelandsWeek7Lesson2QuizTasks,
+  generateY4MeasurelandsWeek7Lesson2Task,
+  resetY4MeasurelandsWeek7Lesson2TaskSessionState,
+} from "@/data/activities/year4Measurelands/week7Lesson2";
+import {
+  buildY4MeasurelandsWeek7Lesson3QuizTasks,
+  generateY4MeasurelandsWeek7Lesson3Task,
+  resetY4MeasurelandsWeek7Lesson3TaskSessionState,
+} from "@/data/activities/year4Measurelands/week7Lesson3";
 
 // Built lessons replace their placeholder entry (real generator, no "Coming
 // Soon" gate). Add a row here as each Level 4 lesson ships.
@@ -321,6 +336,42 @@ const BUILT_LESSONS: Record<
       "Order a day's events by time",
     ],
     completionTitle: "Solve Time Problems Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+  },
+  "y4-measurement-w7-l1": {
+    generate: generateY4MeasurelandsWeek7Lesson1Task,
+    reset: resetY4MeasurelandsWeek7Lesson1TaskSessionState,
+    quizContributionBuilder: buildY4MeasurelandsWeek7Lesson1QuizTasks,
+    practisedSkills: [
+      "Recognise an angle as a measure of turn",
+      "Tell an angle from a line or a ray",
+      "Find angles in real objects",
+    ],
+    completionTitle: "Meet Angles Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+  },
+  "y4-measurement-w7-l2": {
+    generate: generateY4MeasurelandsWeek7Lesson2Task,
+    reset: resetY4MeasurelandsWeek7Lesson2TaskSessionState,
+    quizContributionBuilder: buildY4MeasurelandsWeek7Lesson2QuizTasks,
+    practisedSkills: [
+      "Compare an angle to a right angle",
+      "Order angles by size",
+      "Name acute, right, obtuse, straight and reflex angles",
+    ],
+    completionTitle: "Compare Angles Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+  },
+  "y4-measurement-w7-l3": {
+    generate: generateY4MeasurelandsWeek7Lesson3Task,
+    reset: resetY4MeasurelandsWeek7Lesson3TaskSessionState,
+    quizContributionBuilder: buildY4MeasurelandsWeek7Lesson3QuizTasks,
+    practisedSkills: [
+      "Find right angles",
+      "Classify angles in everyday objects",
+      "Compare and sort angles",
+    ],
+    completionTitle: "Angle Explorer Complete!",
     unlockMessage: "Weekly Quiz unlocked.",
   },
 };

@@ -98,6 +98,9 @@ import { buildY4MeasurelandsWeek5Lesson3QuizTasks } from "@/data/activities/year
 import { buildY4MeasurelandsWeek6Lesson1QuizTasks } from "@/data/activities/year4Measurelands/week6Lesson1";
 import { buildY4MeasurelandsWeek6Lesson2QuizTasks } from "@/data/activities/year4Measurelands/week6Lesson2";
 import { buildY4MeasurelandsWeek6Lesson3QuizTasks } from "@/data/activities/year4Measurelands/week6Lesson3";
+import { buildY4MeasurelandsWeek7Lesson1QuizTasks } from "@/data/activities/year4Measurelands/week7Lesson1";
+import { buildY4MeasurelandsWeek7Lesson2QuizTasks } from "@/data/activities/year4Measurelands/week7Lesson2";
+import { buildY4MeasurelandsWeek7Lesson3QuizTasks } from "@/data/activities/year4Measurelands/week7Lesson3";
 import { buildY3MeasurelandsWeek1Lesson1QuizTasks } from "@/data/activities/year3Measurelands/week1Lesson1";
 import { buildY3MeasurelandsWeek1Lesson2QuizTasks } from "@/data/activities/year3Measurelands/week1Lesson2";
 import { buildY3MeasurelandsWeek1Lesson3QuizTasks } from "@/data/activities/year3Measurelands/week1Lesson3";
@@ -1938,6 +1941,35 @@ function buildY4MeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson: number)
 // Measurelands · Level 4 · Week 2 (Mass & Capacity) — 15 questions (5 per
 // lesson): read the scale (L1) → read the measuring jug (L2) → measurement
 // investigations (L3).
+// Measurelands · Level 4 · Week 7 (Angle Adventures) — 15 questions (5 per lesson):
+// meet angles (L1) → compare angles (L2) → angle explorer (L3).
+function buildY4MeasurelandsWeek7WeeklyQuizQuestions(questionsPerLesson: number): QuizQuestion[] {
+  const lessonTasks: Array<{ lessonNumber: 1 | 2 | 3; tasks: PracticeTask[] }> = [
+    { lessonNumber: 1, tasks: buildY4MeasurelandsWeek7Lesson1QuizTasks().slice(0, questionsPerLesson) },
+    { lessonNumber: 2, tasks: buildY4MeasurelandsWeek7Lesson2QuizTasks().slice(0, questionsPerLesson) },
+    { lessonNumber: 3, tasks: buildY4MeasurelandsWeek7Lesson3QuizTasks().slice(0, questionsPerLesson) },
+  ];
+
+  lessonTasks.forEach(({ lessonNumber, tasks }) => {
+    if (tasks.length !== questionsPerLesson) {
+      throw new Error(
+        `[MeasurelandsWeeklyQuiz] Y4 Week 7 Lesson ${lessonNumber} expected ${questionsPerLesson} questions, received ${tasks.length}.`,
+      );
+    }
+  });
+
+  return lessonTasks.flatMap(({ lessonNumber, tasks }, lessonIndex) =>
+    tasks.map((task, questionIndex) =>
+      buildGroundQuizQuestion(
+        `y4w7mq${lessonIndex * questionsPerLesson + questionIndex + 1}`,
+        lessonNumber,
+        `y4_measurelands_w7_l${lessonNumber}_q${questionIndex + 1}`,
+        task as GroundQuizPracticeTask
+      )
+    )
+  );
+}
+
 // Measurelands · Level 4 · Week 6 (Time Quest) — 15 questions (5 per lesson):
 // convert time (L1) → elapsed time (L2) → solve time problems (L3).
 function buildY4MeasurelandsWeek6WeeklyQuizQuestions(questionsPerLesson: number): QuizQuestion[] {
@@ -7848,6 +7880,9 @@ function SessionPage({
       }
       if (Number(week) === 6) {
         return buildY4MeasurelandsWeek6WeeklyQuizQuestions(questionsPerLesson);
+      }
+      if (Number(week) === 7) {
+        return buildY4MeasurelandsWeek7WeeklyQuizQuestions(questionsPerLesson);
       }
       return [];
     }
