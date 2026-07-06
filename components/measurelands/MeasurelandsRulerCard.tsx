@@ -529,7 +529,7 @@ function CompareScene({ task, onCorrect, onWrong }: { task: RulerTask; onCorrect
               </span>
               <span className="rounded-full bg-[rgba(91,33,182,0.1)] px-3 py-0.5 text-sm font-black text-[#5b21b6]">{obj.lengthCm} cm</span>
             </div>
-            <RulerWithObject rulerCm={task.rulerCm} object={obj} />
+            <RulerWithObject rulerCm={task.rulerCm} object={obj} precision={task.precision} />
           </div>
         ))}
       </div>
@@ -554,10 +554,158 @@ function CompareScene({ task, onCorrect, onWrong }: { task: RulerTask; onCorrect
   );
 }
 
+/* ── L4 W1 L2 — Which Ruler Is Correct?: the same object on several rulers ── */
+function WhichRulerScene({ task, onCorrect, onWrong }: { task: RulerTask; onCorrect: () => void; onWrong: () => void }) {
+  const options = task.rulerOptions ?? [];
+  const [wrongId, setWrongId] = useState<string | null>(null);
+  const object = task.object;
+  return (
+    <Shell badge={task.badgeLabel ?? "Which Ruler Is Correct?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="grid grid-cols-1 gap-2.5">
+        {options.map((opt) => {
+          const picked = wrongId === opt.id;
+          return (
+            <div
+              key={opt.id}
+              role="button"
+              tabIndex={0}
+              onClick={() => (opt.correct ? onCorrect() : (setWrongId(opt.id), onWrong()))}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  opt.correct ? onCorrect() : (setWrongId(opt.id), onWrong());
+                }
+              }}
+              className={`cursor-pointer rounded-[22px] border-2 p-2.5 transition hover:-translate-y-0.5 active:scale-[0.99] ${
+                picked ? "border-[#c0564e] bg-[rgba(252,224,224,0.6)]" : "border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)]"
+              }`}
+            >
+              <div className="mb-0.5 flex items-center justify-between px-1">
+                <span className="text-[13px] font-bold uppercase tracking-[0.12em] text-[#a98b52]">Reads</span>
+                <span className="rounded-full bg-[rgba(91,33,182,0.1)] px-3 py-0.5 text-sm font-black text-[#5b21b6]">{opt.claim} cm</span>
+              </div>
+              <RulerWithObject
+                rulerCm={task.rulerCm}
+                object={object ? { ...object, startCm: opt.startCm } : undefined}
+                precision={task.precision}
+              />
+            </div>
+          );
+        })}
+      </div>
+      <p className="text-center text-[12px] font-bold uppercase tracking-[0.14em] text-[#a98b52]">Tap the ruler that is measured correctly</p>
+    </Shell>
+  );
+}
+
+/* ── L4 W1 L3 — Order the Measurements: tap shortest → longest ── */
+function OrderScene({ task, onCorrect, onWrong }: { task: RulerTask; onCorrect: () => void; onWrong: () => void }) {
+  const objects = task.orderObjects ?? [];
+  const target = [...objects].sort((a, b) => a.lengthCm - b.lengthCm).map((o) => o.label);
+  const [picked, setPicked] = useState<string[]>([]);
+  const [bad, setBad] = useState(false);
+
+  const handle = (label: string) => {
+    if (picked.includes(label)) return;
+    const next = [...picked, label];
+    const idx = next.length - 1;
+    if (target[idx] !== label) {
+      setBad(true);
+      onWrong();
+      setTimeout(() => { setPicked([]); setBad(false); }, 700);
+      return;
+    }
+    setPicked(next);
+    if (next.length === objects.length) onCorrect();
+  };
+
+  return (
+    <Shell badge={task.badgeLabel ?? "Order the Measurements"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="flex items-center justify-between px-1 text-[12px] font-black uppercase tracking-[0.14em] text-[#a98b52]">
+        <span>◄ Shortest</span>
+        <span>Longest ►</span>
+      </div>
+      <div className="grid grid-cols-1 gap-2.5">
+        {objects.map((obj) => {
+          const order = picked.indexOf(obj.label);
+          const done = order >= 0;
+          return (
+            <button
+              key={obj.label}
+              type="button"
+              onClick={() => handle(obj.label)}
+              className={`relative flex items-center justify-between rounded-[22px] border-2 px-4 py-3 text-left transition active:scale-[0.99] ${
+                done
+                  ? "border-[#5b21b6] bg-[rgba(91,33,182,0.08)]"
+                  : bad
+                  ? "border-[#c0564e] bg-[rgba(252,224,224,0.4)]"
+                  : "border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)] hover:-translate-y-0.5"
+              }`}
+            >
+              <span className="flex items-center gap-2 text-xl font-black text-[#2c1c07]">
+                <span className="text-2xl">{obj.icon}</span> {obj.label}
+              </span>
+              <span className="flex items-center gap-2">
+                <span className="rounded-full bg-[rgba(91,33,182,0.1)] px-3 py-0.5 text-base font-black text-[#5b21b6]">{obj.lengthCm} cm</span>
+                {done ? (
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#5b21b6] text-sm font-black text-white">{order + 1}</span>
+                ) : null}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      <p className="text-center text-[12px] font-bold uppercase tracking-[0.14em] text-[#a98b52]">Use the measurements — tap from shortest to longest</p>
+    </Shell>
+  );
+}
+
+/* ── L4 W1 L3 — Measurement Detective: tap the reading that is wrong ── */
+function SpotWrongScene({ task, onCorrect, onWrong }: { task: RulerTask; onCorrect: () => void; onWrong: () => void }) {
+  const objects = task.claimObjects ?? [];
+  const [wrongPick, setWrongPick] = useState<string | null>(null);
+  return (
+    <Shell badge={task.badgeLabel ?? "Measurement Detective"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="grid grid-cols-1 gap-2.5">
+        {objects.map((obj) => {
+          const picked = wrongPick === obj.label;
+          return (
+            <div
+              key={obj.label}
+              role="button"
+              tabIndex={0}
+              onClick={() => (obj.isWrong ? onCorrect() : (setWrongPick(obj.label), onWrong()))}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  obj.isWrong ? onCorrect() : (setWrongPick(obj.label), onWrong());
+                }
+              }}
+              className={`cursor-pointer rounded-[22px] border-2 p-2.5 transition hover:-translate-y-0.5 active:scale-[0.99] ${
+                picked ? "border-[#c0564e] bg-[rgba(252,224,224,0.6)]" : "border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)]"
+              }`}
+            >
+              <div className="mb-0.5 flex items-center justify-between px-1">
+                <span className="text-lg font-black text-[#2c1c07]">{obj.icon} {obj.label}</span>
+                <span className="rounded-full bg-[rgba(200,30,30,0.1)] px-3 py-0.5 text-sm font-black text-[#7c2d12]">Gauge: {obj.claim} cm</span>
+              </div>
+              <RulerWithObject rulerCm={task.rulerCm} object={{ label: obj.label, icon: obj.icon, lengthCm: obj.lengthCm }} precision={task.precision} />
+            </div>
+          );
+        })}
+      </div>
+      <p className="text-center text-[12px] font-bold uppercase tracking-[0.14em] text-[#a98b52]">Tap the measurement that doesn&apos;t match its ruler</p>
+    </Shell>
+  );
+}
+
 export function MeasurelandsRulerCard({ task, onCorrect, onWrong }: { task: RulerTask; onCorrect: () => void; onWrong: () => void }) {
   if (task.scene === "intro") return <IntroScene task={task} onCorrect={onCorrect} />;
   if (task.scene === "startZero") return <StartZeroScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "compare") return <CompareScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "whichRuler") return <WhichRulerScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "order") return <OrderScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "spotWrong") return <SpotWrongScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   return <MeasureScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 }
 

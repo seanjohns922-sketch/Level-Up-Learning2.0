@@ -5,6 +5,16 @@ import {
   generateY4MeasurelandsWeek1Lesson1Task,
   resetY4MeasurelandsWeek1Lesson1TaskSessionState,
 } from "@/data/activities/year4Measurelands/week1Lesson1";
+import {
+  buildY4MeasurelandsWeek1Lesson2QuizTasks,
+  generateY4MeasurelandsWeek1Lesson2Task,
+  resetY4MeasurelandsWeek1Lesson2TaskSessionState,
+} from "@/data/activities/year4Measurelands/week1Lesson2";
+import {
+  buildY4MeasurelandsWeek1Lesson3QuizTasks,
+  generateY4MeasurelandsWeek1Lesson3Task,
+  resetY4MeasurelandsWeek1Lesson3TaskSessionState,
+} from "@/data/activities/year4Measurelands/week1Lesson3";
 
 // Built lessons replace their placeholder entry (real generator, no "Coming
 // Soon" gate). Add a row here as each Level 4 lesson ships.
@@ -27,6 +37,32 @@ const BUILT_LESSONS: Record<
     ],
     completionTitle: "Reading Between the Marks Complete!",
     unlockMessage: "Lesson 2 unlocked.",
+  },
+  "y4-measurement-w1-l2": {
+    generate: generateY4MeasurelandsWeek1Lesson2Task,
+    reset: resetY4MeasurelandsWeek1Lesson2TaskSessionState,
+    quizContributionBuilder: buildY4MeasurelandsWeek1Lesson2QuizTasks,
+    practisedSkills: [
+      "Measure objects accurately from zero",
+      "Choose the correctly aligned ruler",
+      "Read to the correct graduation",
+      "Check the start and finish points",
+    ],
+    completionTitle: "Measure Precisely Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+  },
+  "y4-measurement-w1-l3": {
+    generate: generateY4MeasurelandsWeek1Lesson3Task,
+    reset: resetY4MeasurelandsWeek1Lesson3TaskSessionState,
+    quizContributionBuilder: buildY4MeasurelandsWeek1Lesson3QuizTasks,
+    practisedSkills: [
+      "Compare measurements to find the longer object",
+      "Work out how much longer",
+      "Order objects by measured length",
+      "Spot an inaccurate measurement",
+    ],
+    completionTitle: "Solve Measurement Problems Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
   },
 };
 

@@ -1122,7 +1122,7 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "startZero" | "measure" | "compare";
+      scene: "intro" | "startZero" | "measure" | "compare" | "whichRuler" | "order" | "spotWrong";
       /**
        * Level 4 precision reading (AC9M4M01): render fine millimetre graduations
        * with a longer 5 mm mark so readings can fall on a half centimetre. Object
@@ -1153,6 +1153,14 @@ export type PracticeTask = (
       detectiveOptions?: string[];
       correctDetectiveAnswer?: string;
       displayedMeasurement?: number;
+      /** "whichRuler" (L4 W1 L2): the same object shown on several rulers with a
+       *  claimed reading; pick the one aligned to 0 AND read correctly. */
+      rulerOptions?: Array<{ id: string; startCm: number; claim: number; correct: boolean }>;
+      /** "order" (L4 W1 L3): measured objects to arrange shortest → longest. */
+      orderObjects?: Array<{ label: string; icon: string; lengthCm: number }>;
+      /** "spotWrong" (L4 W1 L3): objects each with Professor Gauge's claimed
+       *  reading; tap the one whose claim doesn't match its ruler. */
+      claimObjects?: Array<{ label: string; icon: string; lengthCm: number; claim: number; isWrong: boolean }>;
       feedback?: { correct: string; wrong: string };
     }
   | {

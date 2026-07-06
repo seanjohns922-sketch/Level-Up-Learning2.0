@@ -80,6 +80,9 @@ import { buildY2MeasurelandsWeek3QuizTasks } from "@/data/activities/year2Measur
 import { buildY2MeasurelandsWeek5QuizTasks } from "@/data/activities/year2Measurelands/week5Quiz";
 import { buildY2MeasurelandsWeek6QuizTasks } from "@/data/activities/year2Measurelands/week6Quiz";
 import { buildY2MeasurelandsWeek7QuizTasks } from "@/data/activities/year2Measurelands/week7Quiz";
+import { buildY4MeasurelandsWeek1Lesson1QuizTasks } from "@/data/activities/year4Measurelands/week1Lesson1";
+import { buildY4MeasurelandsWeek1Lesson2QuizTasks } from "@/data/activities/year4Measurelands/week1Lesson2";
+import { buildY4MeasurelandsWeek1Lesson3QuizTasks } from "@/data/activities/year4Measurelands/week1Lesson3";
 import { buildY3MeasurelandsWeek1Lesson1QuizTasks } from "@/data/activities/year3Measurelands/week1Lesson1";
 import { buildY3MeasurelandsWeek1Lesson2QuizTasks } from "@/data/activities/year3Measurelands/week1Lesson2";
 import { buildY3MeasurelandsWeek1Lesson3QuizTasks } from "@/data/activities/year3Measurelands/week1Lesson3";
@@ -1887,6 +1890,36 @@ function buildY2MeasurelandsWeek7WeeklyQuizQuestions(questionsPerLesson: number)
 }
 
 // Measurelands · Level 3 · Week 1 — 15 ruler questions (5 per lesson).
+// Measurelands · Level 4 · Week 1 (Precision Measuring) — 15 questions (5 per
+// lesson): read between the marks (L1) → measure precisely (L2) → solve
+// measurement problems (L3).
+function buildY4MeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson: number): QuizQuestion[] {
+  const lessonTasks: Array<{ lessonNumber: 1 | 2 | 3; tasks: PracticeTask[] }> = [
+    { lessonNumber: 1, tasks: buildY4MeasurelandsWeek1Lesson1QuizTasks().slice(0, questionsPerLesson) },
+    { lessonNumber: 2, tasks: buildY4MeasurelandsWeek1Lesson2QuizTasks().slice(0, questionsPerLesson) },
+    { lessonNumber: 3, tasks: buildY4MeasurelandsWeek1Lesson3QuizTasks().slice(0, questionsPerLesson) },
+  ];
+
+  lessonTasks.forEach(({ lessonNumber, tasks }) => {
+    if (tasks.length !== questionsPerLesson) {
+      throw new Error(
+        `[MeasurelandsWeeklyQuiz] Y4 Week 1 Lesson ${lessonNumber} expected ${questionsPerLesson} questions, received ${tasks.length}.`,
+      );
+    }
+  });
+
+  return lessonTasks.flatMap(({ lessonNumber, tasks }, lessonIndex) =>
+    tasks.map((task, questionIndex) =>
+      buildGroundQuizQuestion(
+        `y4w1mq${lessonIndex * questionsPerLesson + questionIndex + 1}`,
+        lessonNumber,
+        `y4_measurelands_w1_l${lessonNumber}_q${questionIndex + 1}`,
+        task as GroundQuizPracticeTask
+      )
+    )
+  );
+}
+
 function buildY3MeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson: number): QuizQuestion[] {
   const lessonTasks: Array<{
     lessonNumber: 1 | 2 | 3;
@@ -7632,12 +7665,14 @@ function SessionPage({
       return buildPrepWeek11WeeklyQuizQuestions(questionsPerLesson);
     }
 
-    // Level 4 Measurelands weekly quiz plumbing (Weeks 1–7). Real per-week
-    // builders (mirroring buildY3MeasurelandsWeekNWeeklyQuizQuestions) land with
-    // the Level 4 curriculum. Until then this returns no questions rather than
-    // falling through to the Number Nexus structured quiz below — Level 4
-    // Measurement must never render Number Nexus content.
+    // Level 4 Measurelands weekly quizzes. Built weeks return their 15-question
+    // quiz; unbuilt weeks return no questions rather than falling through to the
+    // Number Nexus structured quiz below — Level 4 Measurement must never render
+    // Number Nexus content.
     if (isMeasurementRealm && year === "Year 4") {
+      if (Number(week) === 1) {
+        return buildY4MeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson);
+      }
       return [];
     }
 

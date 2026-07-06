@@ -247,6 +247,8 @@ const TABLE: Record<string, SkillCoaching> = {
 
   // Measurelands — Year 4 exact lesson tips
   ml_y4_w1_l1: { tip: "If the object finishes between two whole numbers, read the smaller marks carefully before choosing your answer." },
+  ml_y4_w1_l2: { tip: "Measure twice, answer once. Accurate measurers always check where the object starts and finishes." },
+  ml_y4_w1_l3: { tip: "Always use the measurement — not just your eyes — to solve the problem." },
 };
 
 const FALLBACK: SkillCoaching = {
@@ -338,6 +340,8 @@ const LESSON_KEY_MAP: Record<string, string> = {
   "y3-measurement-w3-l2": "ml_y3_w3_l2",
   "y3-measurement-w3-l3": "ml_y3_w3_l3",
   "y4-measurement-w1-l1": "ml_y4_w1_l1",
+  "y4-measurement-w1-l2": "ml_y4_w1_l2",
+  "y4-measurement-w1-l3": "ml_y4_w1_l3",
 };
 
 function normalizeLessonId(lessonId: string): string {
