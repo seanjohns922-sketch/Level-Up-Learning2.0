@@ -381,7 +381,7 @@ function IntroScene({ task, onCorrect }: { task: RulerTask; onCorrect: () => voi
   const steps: Array<{ n: string; text: React.ReactNode }> = task.precision
     ? [
         { n: "1", text: <>Line your object up with the <span className="font-black text-[#C81E1E]">red 0</span> mark, just like before.</> },
-        { n: "2", text: <>Look at the <span className="font-black text-[#5b21b6]">small marks</span> between the numbers — the longer one is the <span className="font-black">half</span>.</> },
+        { n: "2", text: <>The tiny marks are <span className="font-black text-[#5b21b6]">millimetres</span> — <span className="font-black">10 make 1&nbsp;cm</span>. The longer one in the middle is the <span className="font-black">half</span>.</> },
         { n: "3", text: <>If the end lands on that middle mark, read it as a <span className="font-black">.5</span> — like <span className="font-black">7.5&nbsp;cm</span>.</> },
       ]
     : [

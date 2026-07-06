@@ -95,7 +95,7 @@ function buildIntroTask(): RulerTask {
     precision: true,
     prompt: "Real measurements aren't always whole numbers.",
     speakText:
-      "Professor Gauge says: last level we measured whole centimetres. But real objects don't always finish exactly on a whole number. The ruler hasn't changed — we're just reading the smaller marks more carefully. The longer middle mark is the half.",
+      "Professor Gauge says: last level we measured whole centimetres. But real objects don't always finish exactly on a whole number. The small marks are millimetres — ten of them make one centimetre. The longer mark in the middle is the half. If the end lands there, read it as a point five.",
     badgeLabel: "Meazurex Mission",
     rulerCm: 12,
     object: { label: "pencil", icon: "✏️", lengthCm: 8.5 },
