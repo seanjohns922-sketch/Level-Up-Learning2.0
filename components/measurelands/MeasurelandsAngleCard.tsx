@@ -158,12 +158,14 @@ function OrderScene({ task, onCorrect, onWrong }: { task: AngleTask; onCorrect: 
 /* ── Classify (name the angle) ── */
 function ClassifyScene({ task, onCorrect, onWrong }: { task: AngleTask; onCorrect: () => void; onWrong: () => void }) {
   const [wrong, setWrong] = useState<string | null>(null);
+  const [bench, setBench] = useState(false);
   const a = task.angle ?? { turn: 45 };
   return (
     <Shell badge={task.badgeLabel ?? "Name the Angle"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="flex flex-col items-center rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
         {task.context ? <div className="text-lg font-black text-[#2c1c07]">{task.context.emoji} {task.context.label}</div> : null}
-        <MeasurelandsAngle turn={a.turn} rot={a.rot ?? 0} arm1={a.arm1 ?? 95} arm2={a.arm2 ?? 95} rightMark={Math.abs(a.turn - 90) < 0.5} size={220} />
+        <MeasurelandsAngle turn={a.turn} rot={a.rot ?? 0} arm1={a.arm1 ?? 95} arm2={a.arm2 ?? 95} benchmark={bench} rightMark={!bench && Math.abs(a.turn - 90) < 0.5} size={220} />
+        <button type="button" onClick={() => setBench((b) => !b)} className="mt-1 rounded-full border-2 border-[#b45309] bg-[#fff7df] px-4 py-1.5 text-sm font-black text-[#b45309] shadow-sm transition hover:-translate-y-0.5">{bench ? "Hide" : "Show"} the right-angle marker</button>
       </div>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {(task.options ?? []).map((o) => (
