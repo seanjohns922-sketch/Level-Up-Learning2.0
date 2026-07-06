@@ -51,27 +51,21 @@ const ANGLE_GALLERY: Array<{ turn: number; name: string; desc: string; rightMark
 /* ── Hold-to-reveal angle-types hint ── */
 function AngleTypesHint() {
   const [show, setShow] = useState(false);
-  const hide = () => setShow(false);
   return (
     <>
       <button
         type="button"
-        onPointerDown={(e) => { e.preventDefault(); setShow(true); }}
-        onPointerUp={hide}
-        onPointerLeave={hide}
-        onPointerCancel={hide}
-        onContextMenu={(e) => e.preventDefault()}
+        onClick={() => setShow(true)}
         className="inline-flex select-none items-center gap-1.5 rounded-full border-2 border-[#b45309] bg-[#fff7df] px-4 py-1.5 text-sm font-black text-[#b45309] shadow-sm transition hover:-translate-y-0.5"
       >
-        💡 Hold for a hint
+        💡 Show a hint
       </button>
       {show ? (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(44,28,7,0.55)] p-4"
-          onPointerUp={hide}
-          onPointerLeave={hide}
+          onClick={() => setShow(false)}
         >
-          <div className="w-full max-w-2xl rounded-[26px] border-2 border-[rgba(214,184,108,0.6)] bg-[rgba(255,252,245,0.99)] p-4 shadow-[0_24px_64px_rgba(44,28,7,0.4)]">
+          <div className="w-full max-w-2xl rounded-[26px] border-2 border-[rgba(214,184,108,0.6)] bg-[rgba(255,252,245,0.99)] p-4 shadow-[0_24px_64px_rgba(44,28,7,0.4)]" onClick={(e) => e.stopPropagation()}>
             <div className="mb-2 text-center text-[13px] font-black uppercase tracking-[0.16em] text-[#a98b52]">The types of angles</div>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {ANGLE_GALLERY.map((t) => (
@@ -82,7 +76,7 @@ function AngleTypesHint() {
                 </div>
               ))}
             </div>
-            <div className="mt-2 text-center text-[12px] font-bold text-[#8a6d3b]">Let go to close</div>
+            <button type="button" onClick={() => setShow(false)} className="mx-auto mt-3 flex items-center justify-center rounded-full border-2 border-[#b45309] bg-[#fff7df] px-6 py-1.5 text-sm font-black text-[#b45309] shadow-sm transition hover:-translate-y-0.5">Got it — close</button>
           </div>
         </div>
       ) : null}
