@@ -58,11 +58,23 @@ export default function MeasurelandsPage() {
   const router = useRouter();
   const previewMode = isDemoPreviewMode();
   const progressYear = readProgress()?.year;
-  const [requestedYear, setRequestedYear] = useState<string | undefined>(undefined);
+  // Read the explicit ?level= choice from the Tower/realm picker up front (lazy
+  // init) so the correct level renders on first paint with no Ground-Level flash.
+  const [requestedYear, setRequestedYear] = useState<string | undefined>(() => {
+    if (typeof window === "undefined") return undefined;
+    return new URLSearchParams(window.location.search).get("level") ?? undefined;
+  });
   const resolvedYear = useMemo(() => {
-    const candidate = previewMode ? requestedYear ?? progressYear : progressYear ?? requestedYear;
+    // The level the user actually clicked (?level=) is authoritative whenever it
+    // is a supported Measurelands level — in both preview and normal mode.
+    // Only fall back to the saved progress year when no valid level was chosen,
+    // so clicking "Level 4 → Measurelands" never snaps back to Ground Level.
+    const requested = SUPPORTED_MEASURELANDS_YEARS.has(requestedYear ?? "")
+      ? requestedYear
+      : undefined;
+    const candidate = requested ?? progressYear;
     return SUPPORTED_MEASURELANDS_YEARS.has(candidate ?? "") ? (candidate as SupportedMeasurelandsYear) : "Prep";
-  }, [previewMode, progressYear, requestedYear]);
+  }, [progressYear, requestedYear]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
