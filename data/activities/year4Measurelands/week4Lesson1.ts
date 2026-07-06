@@ -69,7 +69,7 @@ function buildMeasureSideTask(): RulerTask {
 
 // Activity B — Measure Every Side (tap each side).
 function buildMeasureEveryTask(): SurveyorTask {
-  const shape = randomShape("cm", { allowL: true, min: 3, max: 8 });
+  const shape = randomShape("cm", { min: 3, max: 8 });
   return {
     kind: "perimeterCalc",
     scene: "measureEvery",

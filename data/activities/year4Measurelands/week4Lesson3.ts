@@ -1,5 +1,5 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
-import { makeRect, makeSquare, makeL, perimeterOptions, randRange, choose, randInt, type Shape } from "@/data/activities/year4Measurelands/week4Common";
+import { makeRect, makeSquare, perimeterOptions, randRange, choose, randInt, type Shape } from "@/data/activities/year4Measurelands/week4Common";
 
 // ── Measurelands · Level 4 · Week 4 · Lesson 3 — "Perimeter Problems" (AC9M4M02) ──
 // Real-world surveying: fences, paths and enclosures, in metres.
@@ -27,12 +27,11 @@ function shapeCore(shape: Shape) {
 }
 
 function landShape(theme: Shape["theme"], name: string): Shape {
-  const kind = randInt(3);
+  // Level 4 perimeter stays on rectangles and squares; composite (L) shapes
+  // are a Level 5 skill.
   let s: Shape;
-  if (kind === 1) s = makeSquare(randRange(6, 20), "m");
-  else if (kind === 2) {
-    const W = randRange(10, 22), H = randRange(10, 22);
-    s = makeL(W, H, randRange(3, W - 3), randRange(3, H - 3), "m");
+  if (randInt(2) === 0) {
+    s = makeSquare(randRange(6, 20), "m");
   } else {
     let w = randRange(6, 22), h = randRange(6, 22);
     if (w === h) h += 1;

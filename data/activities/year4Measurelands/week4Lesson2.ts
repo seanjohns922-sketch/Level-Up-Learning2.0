@@ -54,7 +54,7 @@ function buildIntroTask(): SurveyorTask {
 
 // Activity A — Calculate the Perimeter (typed).
 function buildCalcTask(): SurveyorTask {
-  const shape = randomShape("cm", { allowL: randInt(3) === 0, min: 3, max: 9 });
+  const shape = randomShape("cm", { min: 3, max: 9 });
   return {
     kind: "perimeterCalc",
     scene: "calc",
@@ -73,7 +73,7 @@ function buildCalcTask(): SurveyorTask {
 
 // Activity B — Choose the Correct Perimeter.
 function buildChooseTask(): SurveyorTask {
-  const shape = randomShape("cm", { allowL: randInt(2) === 0, min: 3, max: 9 });
+  const shape = randomShape("cm", { min: 3, max: 9 });
   const { options, correct } = perimeterOptions(shape);
   return {
     kind: "perimeterCalc",
@@ -93,7 +93,7 @@ function buildChooseTask(): SurveyorTask {
 
 // Activity C — Professor Gauge's Mistake (did he miss a side?).
 function buildSpotMissedTask(): SurveyorTask {
-  const shape = randomShape("cm", { allowL: randInt(3) === 0, min: 3, max: 9 });
+  const shape = randomShape("cm", { min: 3, max: 9 });
   const gaugeRight = randInt(2) === 0;
   const claim = gaugeRight ? shape.perimeter : shape.perimeter - choose(shape.sideLabels);
   return {
