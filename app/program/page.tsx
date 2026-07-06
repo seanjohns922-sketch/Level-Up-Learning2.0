@@ -450,7 +450,9 @@ function ProgramPage() {
           className="w-full h-full object-cover"
           style={{
             filter: isMeasurementRealm
-              ? "brightness(0.97) contrast(1.16) saturate(1.08)"
+              ? levelNum === 4
+                ? "brightness(0.90) contrast(1.16) saturate(1.05)"
+                : "brightness(0.97) contrast(1.16) saturate(1.08)"
               : isPrep
               ? "brightness(1.22) contrast(1.05) saturate(1.18)"
               : getHomeBgFilter(levelNum),
@@ -477,16 +479,20 @@ function ProgramPage() {
             className="absolute inset-0 pointer-events-none"
             style={{
               background:
-                "radial-gradient(ellipse at 50% 70%, rgba(251,191,36,0.14), transparent 60%), linear-gradient(180deg, rgba(5,8,24,0.30) 0%, transparent 45%)",
+                levelNum === 4
+                  ? "radial-gradient(ellipse at 50% 70%, rgba(251,191,36,0.06), transparent 62%), linear-gradient(180deg, rgba(5,8,24,0.38) 0%, transparent 45%)"
+                  : "radial-gradient(ellipse at 50% 70%, rgba(251,191,36,0.14), transparent 60%), linear-gradient(180deg, rgba(5,8,24,0.30) 0%, transparent 45%)",
             }}
           />
         )}
-        {/* Soft top glow for premium polish */}
+        {/* Soft top glow for premium polish (dialled back on Level 4's brighter art) */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              "radial-gradient(circle at top, rgba(255,255,255,0.10), transparent 60%)",
+              isMeasurementRealm && levelNum === 4
+                ? "radial-gradient(circle at top, rgba(255,255,255,0.04), transparent 60%)"
+                : "radial-gradient(circle at top, rgba(255,255,255,0.10), transparent 60%)",
           }}
         />
         {isPrep && !isMeasurementRealm && (
