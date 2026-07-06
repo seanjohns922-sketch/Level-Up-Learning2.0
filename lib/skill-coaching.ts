@@ -258,6 +258,9 @@ const TABLE: Record<string, SkillCoaching> = {
   ml_y4_w4_l1: { tip: "Measure every side before you calculate." },
   ml_y4_w4_l2: { tip: "Add every outside side exactly once." },
   ml_y4_w4_l3: { tip: "Perimeter tells us how far it is all the way around." },
+  ml_y4_w5_l1: { tip: "Cover every part of the shape using equal square tiles." },
+  ml_y4_w5_l2: { tip: "Compare the number of square units, not just the shape." },
+  ml_y4_w5_l3: { tip: "Area helps us work out how much space we have." },
 };
 
 const FALLBACK: SkillCoaching = {
@@ -360,6 +363,9 @@ const LESSON_KEY_MAP: Record<string, string> = {
   "y4-measurement-w4-l1": "ml_y4_w4_l1",
   "y4-measurement-w4-l2": "ml_y4_w4_l2",
   "y4-measurement-w4-l3": "ml_y4_w4_l3",
+  "y4-measurement-w5-l1": "ml_y4_w5_l1",
+  "y4-measurement-w5-l2": "ml_y4_w5_l2",
+  "y4-measurement-w5-l3": "ml_y4_w5_l3",
 };
 
 function normalizeLessonId(lessonId: string): string {

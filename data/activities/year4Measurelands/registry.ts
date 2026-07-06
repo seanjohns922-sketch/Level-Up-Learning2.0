@@ -60,6 +60,21 @@ import {
   generateY4MeasurelandsWeek4Lesson3Task,
   resetY4MeasurelandsWeek4Lesson3TaskSessionState,
 } from "@/data/activities/year4Measurelands/week4Lesson3";
+import {
+  buildY4MeasurelandsWeek5Lesson1QuizTasks,
+  generateY4MeasurelandsWeek5Lesson1Task,
+  resetY4MeasurelandsWeek5Lesson1TaskSessionState,
+} from "@/data/activities/year4Measurelands/week5Lesson1";
+import {
+  buildY4MeasurelandsWeek5Lesson2QuizTasks,
+  generateY4MeasurelandsWeek5Lesson2Task,
+  resetY4MeasurelandsWeek5Lesson2TaskSessionState,
+} from "@/data/activities/year4Measurelands/week5Lesson2";
+import {
+  buildY4MeasurelandsWeek5Lesson3QuizTasks,
+  generateY4MeasurelandsWeek5Lesson3Task,
+  resetY4MeasurelandsWeek5Lesson3TaskSessionState,
+} from "@/data/activities/year4Measurelands/week5Lesson3";
 
 // Built lessons replace their placeholder entry (real generator, no "Coming
 // Soon" gate). Add a row here as each Level 4 lesson ships.
@@ -219,6 +234,42 @@ const BUILT_LESSONS: Record<
       "Solve real-world perimeter problems",
     ],
     completionTitle: "Perimeter Problems Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+  },
+  "y4-measurement-w5-l1": {
+    generate: generateY4MeasurelandsWeek5Lesson1Task,
+    reset: resetY4MeasurelandsWeek5Lesson1TaskSessionState,
+    quizContributionBuilder: buildY4MeasurelandsWeek5Lesson1QuizTasks,
+    practisedSkills: [
+      "Cover a rectangle with equal square units",
+      "Count square units to measure area",
+      "Recognise area as the inside space",
+    ],
+    completionTitle: "Measure Area Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+  },
+  "y4-measurement-w5-l2": {
+    generate: generateY4MeasurelandsWeek5Lesson2Task,
+    reset: resetY4MeasurelandsWeek5Lesson2TaskSessionState,
+    quizContributionBuilder: buildY4MeasurelandsWeek5Lesson2QuizTasks,
+    practisedSkills: [
+      "Compare areas by counting square units",
+      "Order shapes by area",
+      "Recognise equal areas in different shapes",
+    ],
+    completionTitle: "Compare Area Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+  },
+  "y4-measurement-w5-l3": {
+    generate: generateY4MeasurelandsWeek5Lesson3Task,
+    reset: resetY4MeasurelandsWeek5Lesson3TaskSessionState,
+    quizContributionBuilder: buildY4MeasurelandsWeek5Lesson3QuizTasks,
+    practisedSkills: [
+      "Use area to compare real spaces",
+      "Count square tiles to cover a floor",
+      "Solve real-world area problems",
+    ],
+    completionTitle: "Area Problems Complete!",
     unlockMessage: "Weekly Quiz unlocked.",
   },
 };

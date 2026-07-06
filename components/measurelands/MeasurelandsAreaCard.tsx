@@ -217,9 +217,37 @@ function IntroScene({ task, onCorrect }: { task: AreaTask; onCorrect: () => void
   );
 }
 
+/* ── Equal or Different? — two shapes; same area or different area ── */
+function SameDiffScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect: () => void; onWrong: () => void }) {
+  const cmp = task.compareShapes!;
+  const same = cmp.a.cells.length === cmp.b.cells.length;
+  const [wrong, setWrong] = useState<string | null>(null);
+  const pick = (choice: "same" | "diff") => {
+    if ((choice === "same") === same) onCorrect();
+    else { setWrong(choice); onWrong(); window.setTimeout(() => setWrong(null), 600); }
+  };
+  const ShapeCard = ({ s }: { s: typeof cmp.a }) => (
+    <div className="flex flex-col items-center gap-1 rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)] p-3">
+      <span className="text-2xl">{s.emoji}</span>
+      <Tiles cells={s.cells} gridW={s.gridW} gridH={s.gridH} filled={new Set(s.cells.map(([c, r]) => cellKey(c, r)))} outline size={200} />
+      <span className="text-base font-black text-[#2c1c07]">{s.label}</span>
+    </div>
+  );
+  return (
+    <Shell badge={task.badgeLabel ?? "Equal or Different?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="grid grid-cols-2 gap-3"><ShapeCard s={cmp.a} /><ShapeCard s={cmp.b} /></div>
+      <div className="grid grid-cols-2 gap-3">
+        <button type="button" onClick={() => pick("same")} className={`min-h-[68px] rounded-[24px] border-2 px-4 text-lg font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 ${wrong === "same" ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[#fffaf0]"}`}>Same area</button>
+        <button type="button" onClick={() => pick("diff")} className={`min-h-[68px] rounded-[24px] border-2 px-4 text-lg font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 ${wrong === "diff" ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[#fffaf0]"}`}>Different area</button>
+      </div>
+    </Shell>
+  );
+}
+
 export function MeasurelandsAreaCard({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect: () => void; onWrong: () => void }) {
   switch (task.scene) {
     case "intro": return <IntroScene task={task} onCorrect={onCorrect} />;
+    case "sameDiff": return <SameDiffScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "whichPart": return <WhichPartScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "cover": return <CoverScene task={task} onCorrect={onCorrect} />;
     case "countSquares": return <CountScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;

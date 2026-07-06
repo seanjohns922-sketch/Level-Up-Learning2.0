@@ -92,6 +92,9 @@ import { buildY4MeasurelandsWeek3Lesson3QuizTasks } from "@/data/activities/year
 import { buildY4MeasurelandsWeek4Lesson1QuizTasks } from "@/data/activities/year4Measurelands/week4Lesson1";
 import { buildY4MeasurelandsWeek4Lesson2QuizTasks } from "@/data/activities/year4Measurelands/week4Lesson2";
 import { buildY4MeasurelandsWeek4Lesson3QuizTasks } from "@/data/activities/year4Measurelands/week4Lesson3";
+import { buildY4MeasurelandsWeek5Lesson1QuizTasks } from "@/data/activities/year4Measurelands/week5Lesson1";
+import { buildY4MeasurelandsWeek5Lesson2QuizTasks } from "@/data/activities/year4Measurelands/week5Lesson2";
+import { buildY4MeasurelandsWeek5Lesson3QuizTasks } from "@/data/activities/year4Measurelands/week5Lesson3";
 import { buildY3MeasurelandsWeek1Lesson1QuizTasks } from "@/data/activities/year3Measurelands/week1Lesson1";
 import { buildY3MeasurelandsWeek1Lesson2QuizTasks } from "@/data/activities/year3Measurelands/week1Lesson2";
 import { buildY3MeasurelandsWeek1Lesson3QuizTasks } from "@/data/activities/year3Measurelands/week1Lesson3";
@@ -1932,6 +1935,35 @@ function buildY4MeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson: number)
 // Measurelands · Level 4 · Week 2 (Mass & Capacity) — 15 questions (5 per
 // lesson): read the scale (L1) → read the measuring jug (L2) → measurement
 // investigations (L3).
+// Measurelands · Level 4 · Week 5 (Area Acres) — 15 questions (5 per lesson):
+// measure area (L1) → compare area (L2) → area problems (L3).
+function buildY4MeasurelandsWeek5WeeklyQuizQuestions(questionsPerLesson: number): QuizQuestion[] {
+  const lessonTasks: Array<{ lessonNumber: 1 | 2 | 3; tasks: PracticeTask[] }> = [
+    { lessonNumber: 1, tasks: buildY4MeasurelandsWeek5Lesson1QuizTasks().slice(0, questionsPerLesson) },
+    { lessonNumber: 2, tasks: buildY4MeasurelandsWeek5Lesson2QuizTasks().slice(0, questionsPerLesson) },
+    { lessonNumber: 3, tasks: buildY4MeasurelandsWeek5Lesson3QuizTasks().slice(0, questionsPerLesson) },
+  ];
+
+  lessonTasks.forEach(({ lessonNumber, tasks }) => {
+    if (tasks.length !== questionsPerLesson) {
+      throw new Error(
+        `[MeasurelandsWeeklyQuiz] Y4 Week 5 Lesson ${lessonNumber} expected ${questionsPerLesson} questions, received ${tasks.length}.`,
+      );
+    }
+  });
+
+  return lessonTasks.flatMap(({ lessonNumber, tasks }, lessonIndex) =>
+    tasks.map((task, questionIndex) =>
+      buildGroundQuizQuestion(
+        `y4w5mq${lessonIndex * questionsPerLesson + questionIndex + 1}`,
+        lessonNumber,
+        `y4_measurelands_w5_l${lessonNumber}_q${questionIndex + 1}`,
+        task as GroundQuizPracticeTask
+      )
+    )
+  );
+}
+
 // Measurelands · Level 4 · Week 4 (Perimeter Path) — 15 questions (5 per lesson):
 // measure the outside (L1) → find the perimeter (L2) → perimeter problems (L3).
 function buildY4MeasurelandsWeek4WeeklyQuizQuestions(questionsPerLesson: number): QuizQuestion[] {
@@ -7778,6 +7810,9 @@ function SessionPage({
       }
       if (Number(week) === 4) {
         return buildY4MeasurelandsWeek4WeeklyQuizQuestions(questionsPerLesson);
+      }
+      if (Number(week) === 5) {
+        return buildY4MeasurelandsWeek5WeeklyQuizQuestions(questionsPerLesson);
       }
       return [];
     }
