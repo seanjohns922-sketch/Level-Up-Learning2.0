@@ -194,6 +194,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "area",
   "temperature",
   "perimeterCalc",
+  "timeQuest",
   "massMeasure",
   "massUnit",
   "massScale",

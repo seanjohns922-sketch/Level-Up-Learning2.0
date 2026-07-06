@@ -261,6 +261,9 @@ const TABLE: Record<string, SkillCoaching> = {
   ml_y4_w5_l1: { tip: "Cover every part of the shape using equal square tiles." },
   ml_y4_w5_l2: { tip: "Compare the number of square units, not just the shape." },
   ml_y4_w5_l3: { tip: "Area helps us work out how much space we have." },
+  ml_y4_w6_l1: { tip: "Small time units join together to make bigger ones." },
+  ml_y4_w6_l2: { tip: "Elapsed time is the time between the start and the finish." },
+  ml_y4_w6_l3: { tip: "Draw or imagine a timeline before solving a time problem." },
 };
 
 const FALLBACK: SkillCoaching = {
@@ -366,6 +369,9 @@ const LESSON_KEY_MAP: Record<string, string> = {
   "y4-measurement-w5-l1": "ml_y4_w5_l1",
   "y4-measurement-w5-l2": "ml_y4_w5_l2",
   "y4-measurement-w5-l3": "ml_y4_w5_l3",
+  "y4-measurement-w6-l1": "ml_y4_w6_l1",
+  "y4-measurement-w6-l2": "ml_y4_w6_l2",
+  "y4-measurement-w6-l3": "ml_y4_w6_l3",
 };
 
 function normalizeLessonId(lessonId: string): string {

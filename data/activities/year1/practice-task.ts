@@ -1332,6 +1332,41 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Year 4 W6 "Time Quest" (AC9M4M03) — Convert → Calculate → Solve.
+      // Convert time units, calculate elapsed time / finish time (12-hour am/pm,
+      // no 24-hour, no midday crossing) and solve real-world time problems.
+      // Reuses the ClockFace; adds the reusable MeasurelandsTimeline.
+      kind: "timeQuest";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "matchUnits" | "convert" | "convertBuild" | "howLong" | "finishTime" | "timeline" | "compare" | "order";
+      /** "matchUnits": pairs of equivalent units to connect. */
+      unitPairs?: Array<{ id: string; small: string; big: string }>;
+      /** "convert"/"compare": text MCQ options + the correct one. */
+      options?: string[];
+      correctOption?: string;
+      /** "convertBuild": set a number (e.g. 1 hour = ? minutes). */
+      answerNumber?: number;
+      answerUnitWord?: string;
+      stepUnit?: number;
+      stepMax?: number;
+      /** Clock times as minutes since midnight (0–1439). */
+      startMin?: number;
+      finishMin?: number;
+      /** "howLong": the elapsed answer (minutes). "finishTime"/"timeline": start+duration. */
+      durationMin?: number;
+      answerMin?: number;
+      /** "timeline": axis range (minutes since midnight). */
+      rangeStartMin?: number;
+      rangeEndMin?: number;
+      /** "compare"/"order": events with times. */
+      events?: Array<{ id: string; label: string; emoji?: string; startMin?: number; finishMin?: number; min?: number }>;
+      correctId?: string;
+      orderedIds?: string[];
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       // Measurelands Year 3 W5 "Time Trails" (AC9M3M03) — Understand → Estimate → Compare.
       // Duration reasoning with seconds/minutes/hours; NOT reading a clock.
       // L1: chooseUnit / sort / spotMistake.  L2: estimate / bestEstimate / (challenge).

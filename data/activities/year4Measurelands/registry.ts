@@ -75,6 +75,21 @@ import {
   generateY4MeasurelandsWeek5Lesson3Task,
   resetY4MeasurelandsWeek5Lesson3TaskSessionState,
 } from "@/data/activities/year4Measurelands/week5Lesson3";
+import {
+  buildY4MeasurelandsWeek6Lesson1QuizTasks,
+  generateY4MeasurelandsWeek6Lesson1Task,
+  resetY4MeasurelandsWeek6Lesson1TaskSessionState,
+} from "@/data/activities/year4Measurelands/week6Lesson1";
+import {
+  buildY4MeasurelandsWeek6Lesson2QuizTasks,
+  generateY4MeasurelandsWeek6Lesson2Task,
+  resetY4MeasurelandsWeek6Lesson2TaskSessionState,
+} from "@/data/activities/year4Measurelands/week6Lesson2";
+import {
+  buildY4MeasurelandsWeek6Lesson3QuizTasks,
+  generateY4MeasurelandsWeek6Lesson3Task,
+  resetY4MeasurelandsWeek6Lesson3TaskSessionState,
+} from "@/data/activities/year4Measurelands/week6Lesson3";
 
 // Built lessons replace their placeholder entry (real generator, no "Coming
 // Soon" gate). Add a row here as each Level 4 lesson ships.
@@ -270,6 +285,42 @@ const BUILT_LESSONS: Record<
       "Solve real-world area problems",
     ],
     completionTitle: "Area Problems Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+  },
+  "y4-measurement-w6-l1": {
+    generate: generateY4MeasurelandsWeek6Lesson1Task,
+    reset: resetY4MeasurelandsWeek6Lesson1TaskSessionState,
+    quizContributionBuilder: buildY4MeasurelandsWeek6Lesson1QuizTasks,
+    practisedSkills: [
+      "Match equal units of time",
+      "Choose the correct time conversion",
+      "Convert between seconds, minutes, hours and days",
+    ],
+    completionTitle: "Convert Time Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+  },
+  "y4-measurement-w6-l2": {
+    generate: generateY4MeasurelandsWeek6Lesson2Task,
+    reset: resetY4MeasurelandsWeek6Lesson2TaskSessionState,
+    quizContributionBuilder: buildY4MeasurelandsWeek6Lesson2QuizTasks,
+    practisedSkills: [
+      "Work out how long something takes",
+      "Work out the finish time",
+      "Use a timeline to show elapsed time",
+    ],
+    completionTitle: "Elapsed Time Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+  },
+  "y4-measurement-w6-l3": {
+    generate: generateY4MeasurelandsWeek6Lesson3Task,
+    reset: resetY4MeasurelandsWeek6Lesson3TaskSessionState,
+    quizContributionBuilder: buildY4MeasurelandsWeek6Lesson3QuizTasks,
+    practisedSkills: [
+      "Work out the length of a journey",
+      "Compare event times and durations",
+      "Order a day's events by time",
+    ],
+    completionTitle: "Solve Time Problems Complete!",
     unlockMessage: "Weekly Quiz unlocked.",
   },
 };
