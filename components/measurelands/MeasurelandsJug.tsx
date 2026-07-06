@@ -27,6 +27,7 @@ export function MeasurelandsJug({
   unit,
   max,
   majorStep,
+  minorStep: minorStepProp,
   pointer,
   size = 240,
 }: {
@@ -34,13 +35,17 @@ export function MeasurelandsJug({
   unit: "mL" | "L";
   max: number;
   majorStep: number;
+  /** Distance between minor (unlabelled) ticks. Defaults to majorStep/5. Level 4
+   *  passes a coarser value so partial readings land on a minor mark (e.g.
+   *  0.5 L, or 250 mL). */
+  minorStep?: number;
   /** Optional bold arrow pointing at a level (e.g. the top, for "how much more"). */
   pointer?: number;
   size?: number;
 }) {
   const [uid] = useState(() => Math.random().toString(36).slice(2, 9));
   const yFor = (v: number) => Y_BOT - (Math.max(0, Math.min(max, v)) / max) * (Y_BOT - Y_TOP);
-  const minorStep = majorStep / 5;
+  const minorStep = minorStepProp ?? majorStep / 5;
   const steps = Math.round(max / minorStep);
   const waterY = yFor(value);
 

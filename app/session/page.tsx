@@ -83,6 +83,9 @@ import { buildY2MeasurelandsWeek7QuizTasks } from "@/data/activities/year2Measur
 import { buildY4MeasurelandsWeek1Lesson1QuizTasks } from "@/data/activities/year4Measurelands/week1Lesson1";
 import { buildY4MeasurelandsWeek1Lesson2QuizTasks } from "@/data/activities/year4Measurelands/week1Lesson2";
 import { buildY4MeasurelandsWeek1Lesson3QuizTasks } from "@/data/activities/year4Measurelands/week1Lesson3";
+import { buildY4MeasurelandsWeek2Lesson1QuizTasks } from "@/data/activities/year4Measurelands/week2Lesson1";
+import { buildY4MeasurelandsWeek2Lesson2QuizTasks } from "@/data/activities/year4Measurelands/week2Lesson2";
+import { buildY4MeasurelandsWeek2Lesson3QuizTasks } from "@/data/activities/year4Measurelands/week2Lesson3";
 import { buildY3MeasurelandsWeek1Lesson1QuizTasks } from "@/data/activities/year3Measurelands/week1Lesson1";
 import { buildY3MeasurelandsWeek1Lesson2QuizTasks } from "@/data/activities/year3Measurelands/week1Lesson2";
 import { buildY3MeasurelandsWeek1Lesson3QuizTasks } from "@/data/activities/year3Measurelands/week1Lesson3";
@@ -1914,6 +1917,36 @@ function buildY4MeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson: number)
         `y4w1mq${lessonIndex * questionsPerLesson + questionIndex + 1}`,
         lessonNumber,
         `y4_measurelands_w1_l${lessonNumber}_q${questionIndex + 1}`,
+        task as GroundQuizPracticeTask
+      )
+    )
+  );
+}
+
+// Measurelands · Level 4 · Week 2 (Mass & Capacity) — 15 questions (5 per
+// lesson): read the scale (L1) → read the measuring jug (L2) → measurement
+// investigations (L3).
+function buildY4MeasurelandsWeek2WeeklyQuizQuestions(questionsPerLesson: number): QuizQuestion[] {
+  const lessonTasks: Array<{ lessonNumber: 1 | 2 | 3; tasks: PracticeTask[] }> = [
+    { lessonNumber: 1, tasks: buildY4MeasurelandsWeek2Lesson1QuizTasks().slice(0, questionsPerLesson) },
+    { lessonNumber: 2, tasks: buildY4MeasurelandsWeek2Lesson2QuizTasks().slice(0, questionsPerLesson) },
+    { lessonNumber: 3, tasks: buildY4MeasurelandsWeek2Lesson3QuizTasks().slice(0, questionsPerLesson) },
+  ];
+
+  lessonTasks.forEach(({ lessonNumber, tasks }) => {
+    if (tasks.length !== questionsPerLesson) {
+      throw new Error(
+        `[MeasurelandsWeeklyQuiz] Y4 Week 2 Lesson ${lessonNumber} expected ${questionsPerLesson} questions, received ${tasks.length}.`,
+      );
+    }
+  });
+
+  return lessonTasks.flatMap(({ lessonNumber, tasks }, lessonIndex) =>
+    tasks.map((task, questionIndex) =>
+      buildGroundQuizQuestion(
+        `y4w2mq${lessonIndex * questionsPerLesson + questionIndex + 1}`,
+        lessonNumber,
+        `y4_measurelands_w2_l${lessonNumber}_q${questionIndex + 1}`,
         task as GroundQuizPracticeTask
       )
     )
@@ -7672,6 +7705,9 @@ function SessionPage({
     if (isMeasurementRealm && year === "Year 4") {
       if (Number(week) === 1) {
         return buildY4MeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson);
+      }
+      if (Number(week) === 2) {
+        return buildY4MeasurelandsWeek2WeeklyQuizQuestions(questionsPerLesson);
       }
       return [];
     }

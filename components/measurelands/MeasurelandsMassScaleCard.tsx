@@ -13,7 +13,13 @@ function massLabel(item: Pick<MassItem, "mass" | "unit">) {
   return `${item.mass} ${item.unit}`;
 }
 
-function scaleConfig(unit: "g" | "kg", mass: number) {
+function scaleConfig(unit: "g" | "kg", mass: number, precision?: boolean) {
+  if (precision) {
+    // Level 4 partial graduations: g dial reads to 50 g (100 g majors), kg dial
+    // reads to 0.5 kg (1 kg majors). One minor between labelled majors.
+    if (unit === "g") return { max: 1000, majorStep: 100, minorStep: 50 };
+    return { max: 5, majorStep: 1, minorStep: 0.5 };
+  }
   if (unit === "g") return { max: 1000, majorStep: 250 };
   return { max: mass > 10 ? 20 : 10, majorStep: mass > 10 ? 5 : 1 };
 }
@@ -69,15 +75,29 @@ function ObjectBadge({ item, showMass = false }: { item: MassItem; showMass?: bo
   );
 }
 
-function ScaleView({ item, size = 230 }: { item: MassItem; size?: number }) {
-  const config = scaleConfig(item.unit, item.mass);
+function ScaleView({
+  item,
+  size = 230,
+  precision,
+  display,
+}: {
+  item: MassItem;
+  size?: number;
+  precision?: boolean;
+  display?: "dial" | "digital";
+}) {
+  const config = scaleConfig(item.unit, item.mass, precision);
+  // Level 4 reads the analog dial by default (the interpreting skill); a digital
+  // readout is used only as an explicit cross-check.
+  const resolvedDisplay = display ?? (precision ? "dial" : item.unit === "g" ? "dial" : "digital");
   return (
     <MeasurelandsScale
       value={item.mass}
       unit={item.unit}
       max={config.max}
       majorStep={config.majorStep}
-      display={item.unit === "g" ? "dial" : "digital"}
+      minorStep={config.minorStep}
+      display={resolvedDisplay}
       object={{ label: item.label, emoji: item.emoji }}
       size={size}
     />
@@ -253,7 +273,7 @@ function IntroScene({ task, onCorrect }: { task: MassScaleTask; onCorrect: () =>
           { label: "luggage scale", emoji: "🧳", mass: 12, unit: "kg" as const },
         ].map((item) => (
           <div key={item.label} className="rounded-[28px] border border-[rgba(214,184,108,0.45)] bg-white p-4 shadow-sm">
-            <ScaleView item={item} size={210} />
+            <ScaleView item={item} size={210} precision={task.precision} display={task.scaleType} />
             <div className="mt-1 text-center text-lg font-black text-[#2c1c07]">{item.label}</div>
           </div>
         ))}
@@ -275,8 +295,13 @@ function ReadScene({ task, onCorrect, onWrong }: { task: MassScaleTask; onCorrec
   return (
     <Shell badge={task.badgeLabel ?? "Read the Scale"} prompt={task.prompt} speakText={task.speakText}>
       <div className="rounded-[28px] border border-[rgba(214,184,108,0.45)] bg-white p-4 shadow-sm">
-        <ScaleView item={item} />
+        <ScaleView item={item} precision={task.precision} display={task.scaleType} />
       </div>
+      {task.statement ? (
+        <div className="rounded-[18px] border border-[rgba(192,86,78,0.28)] bg-[rgba(252,224,224,0.5)] px-4 py-2 text-center text-lg font-black text-[#7c2d12]">
+          {task.statement}
+        </div>
+      ) : null}
       <ChoiceGrid options={task.options ?? []} correct={task.correctOption} onCorrect={onCorrect} onWrong={onWrong} />
     </Shell>
   );
@@ -296,6 +321,7 @@ function MatchScene({ task, onCorrect, onWrong }: { task: MassScaleTask; onCorre
         {scales.map((scale) => {
           const candidate = { label: item.label, emoji: item.emoji, mass: scale.mass, unit: scale.unit };
           const label = massLabel(candidate);
+          const scaleDisplay = scale.scaleType;
           return (
             <button
               key={scale.id}
@@ -312,7 +338,7 @@ function MatchScene({ task, onCorrect, onWrong }: { task: MassScaleTask; onCorre
                 wrong === scale.id ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.58)]"
               }`}
             >
-              <ScaleView item={candidate} size={170} />
+              <ScaleView item={candidate} size={170} precision={task.precision} display={scaleDisplay} />
               <div className="text-center text-lg font-black text-[#2c1c07]">{label}</div>
               <OptionReadAloudButton text={label} className="absolute right-2 top-2" />
             </button>

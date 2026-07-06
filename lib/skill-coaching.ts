@@ -249,6 +249,9 @@ const TABLE: Record<string, SkillCoaching> = {
   ml_y4_w1_l1: { tip: "If the object finishes between two whole numbers, read the smaller marks carefully before choosing your answer." },
   ml_y4_w1_l2: { tip: "Measure twice, answer once. Accurate measurers always check where the object starts and finishes." },
   ml_y4_w1_l3: { tip: "Always use the measurement — not just your eyes — to solve the problem." },
+  ml_y4_w2_l1: { tip: "Read the measurement carefully before choosing your answer." },
+  ml_y4_w2_l2: { tip: "Read the liquid level where it meets the markings." },
+  ml_y4_w2_l3: { tip: "Good scientists use measurements to solve problems—not guesses." },
 };
 
 const FALLBACK: SkillCoaching = {
@@ -342,6 +345,9 @@ const LESSON_KEY_MAP: Record<string, string> = {
   "y4-measurement-w1-l1": "ml_y4_w1_l1",
   "y4-measurement-w1-l2": "ml_y4_w1_l2",
   "y4-measurement-w1-l3": "ml_y4_w1_l3",
+  "y4-measurement-w2-l1": "ml_y4_w2_l1",
+  "y4-measurement-w2-l2": "ml_y4_w2_l2",
+  "y4-measurement-w2-l3": "ml_y4_w2_l3",
 };
 
 function normalizeLessonId(lessonId: string): string {

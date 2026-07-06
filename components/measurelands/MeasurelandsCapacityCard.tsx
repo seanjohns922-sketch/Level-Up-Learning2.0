@@ -12,6 +12,13 @@ function toMl(v: number, unit: "mL" | "L") {
   return unit === "L" ? v * 1000 : v;
 }
 
+// Level 4 partial graduations: litre jugs read to 0.5 L, millilitre jugs to
+// 250 mL (minors unlabelled). Level 3 keeps the default majorStep/5 spacing.
+function jugMinorStep(unit: "mL" | "L", precision?: boolean): number | undefined {
+  if (!precision) return undefined;
+  return unit === "L" ? 0.5 : 250;
+}
+
 /* ── Gold/violet Meazurex shell (matches the other Measurelands cards) ── */
 function Shell({ badge, prompt, speakText, children }: { badge: string; prompt: string; speakText?: string; children: React.ReactNode }) {
   return (
@@ -157,8 +164,13 @@ function ReadJugScene({ task, onCorrect, onWrong }: { task: CapTask; onCorrect: 
   return (
     <Shell badge={task.badgeLabel ?? "Read the Jug"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
-        <MeasurelandsJug value={jug.value} unit={jug.unit} max={jug.max} majorStep={jug.majorStep} size={190} />
+        <MeasurelandsJug value={jug.value} unit={jug.unit} max={jug.max} majorStep={jug.majorStep} minorStep={jugMinorStep(jug.unit, task.precision)} size={190} />
       </div>
+      {task.statement ? (
+        <div className="rounded-[18px] border border-[rgba(192,86,78,0.28)] bg-[rgba(252,224,224,0.5)] px-4 py-2 text-center text-lg font-black text-[#7c2d12]">
+          {task.statement}
+        </div>
+      ) : null}
       <div className="grid grid-cols-3 gap-3">
         {(task.numberOptions ?? []).map((n) => (
           <button key={n} type="button" onClick={() => (n === task.correctNumber ? onCorrect() : onWrong())} className="relative flex min-h-[72px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-2xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]">
@@ -183,7 +195,7 @@ function MatchJugScene({ task, onCorrect, onWrong }: { task: CapTask; onCorrect:
             onClick={() => (j.id === task.correctJugId ? onCorrect() : (setWrong(j.id), onWrong(), window.setTimeout(() => setWrong(null), 600)))}
             className={`rounded-[24px] border-2 p-2 transition hover:-translate-y-0.5 active:scale-[0.98] ${wrong === j.id ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)]"}`}
           >
-            <MeasurelandsJug value={j.value} unit={j.unit} max={j.max} majorStep={j.majorStep} size={150} />
+            <MeasurelandsJug value={j.value} unit={j.unit} max={j.max} majorStep={j.majorStep} minorStep={jugMinorStep(j.unit, task.precision)} size={150} />
           </button>
         ))}
       </div>

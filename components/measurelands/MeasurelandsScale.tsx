@@ -32,6 +32,7 @@ export function MeasurelandsScale({
   unit,
   max,
   majorStep,
+  minorStep,
   display = "dial",
   object,
   size = 260,
@@ -40,6 +41,10 @@ export function MeasurelandsScale({
   unit: "g" | "kg";
   max: number;
   majorStep: number;
+  /** Distance between minor ticks. Defaults to majorStep/5 (Level 3). Level 4
+   *  passes a coarser value so readings land cleanly on a partial graduation
+   *  (e.g. 0.5 kg with one minor between each labelled kilogram). */
+  minorStep?: number;
   display?: "dial" | "digital";
   object?: { label: string; emoji: string };
   size?: number;
@@ -47,15 +52,17 @@ export function MeasurelandsScale({
   const [uid] = useState(() => Math.random().toString(36).slice(2, 9));
   const unitWord = unit === "g" ? "grams" : "kilograms";
   const majorCount = Math.round(max / majorStep);
-  const minorTicks = majorCount * 5;
+  const step = minorStep ?? majorStep / 5;
+  const minorTicks = Math.round(max / step);
 
   const ticks = [];
   for (let m = 0; m < minorTicks; m += 1) {
-    const a = (m / minorTicks) * 360;
-    const isMajor = m % 5 === 0;
+    const v = m * step;
+    const a = (v / max) * 360;
+    const isMajor = Math.abs(v / majorStep - Math.round(v / majorStep)) < 1e-6;
     const [x1, y1] = pointFor(a, R - 3);
-    const [x2, y2] = pointFor(a, R - (isMajor ? 12 : 6));
-    ticks.push(<line key={`t${m}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke={MARK} strokeWidth={isMajor ? 2 : 1} strokeLinecap="round" opacity={isMajor ? 0.95 : 0.55} />);
+    const [x2, y2] = pointFor(a, R - (isMajor ? 12 : 7));
+    ticks.push(<line key={`t${m}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke={MARK} strokeWidth={isMajor ? 2 : 1} strokeLinecap="round" opacity={isMajor ? 0.95 : 0.6} />);
   }
   const numbers = [];
   for (let k = 0; k < majorCount; k += 1) {

@@ -15,6 +15,21 @@ import {
   generateY4MeasurelandsWeek1Lesson3Task,
   resetY4MeasurelandsWeek1Lesson3TaskSessionState,
 } from "@/data/activities/year4Measurelands/week1Lesson3";
+import {
+  buildY4MeasurelandsWeek2Lesson1QuizTasks,
+  generateY4MeasurelandsWeek2Lesson1Task,
+  resetY4MeasurelandsWeek2Lesson1TaskSessionState,
+} from "@/data/activities/year4Measurelands/week2Lesson1";
+import {
+  buildY4MeasurelandsWeek2Lesson2QuizTasks,
+  generateY4MeasurelandsWeek2Lesson2Task,
+  resetY4MeasurelandsWeek2Lesson2TaskSessionState,
+} from "@/data/activities/year4Measurelands/week2Lesson2";
+import {
+  buildY4MeasurelandsWeek2Lesson3QuizTasks,
+  generateY4MeasurelandsWeek2Lesson3Task,
+  resetY4MeasurelandsWeek2Lesson3TaskSessionState,
+} from "@/data/activities/year4Measurelands/week2Lesson3";
 
 // Built lessons replace their placeholder entry (real generator, no "Coming
 // Soon" gate). Add a row here as each Level 4 lesson ships.
@@ -62,6 +77,45 @@ const BUILT_LESSONS: Record<
       "Spot an inaccurate measurement",
     ],
     completionTitle: "Solve Measurement Problems Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+  },
+  "y4-measurement-w2-l1": {
+    generate: generateY4MeasurelandsWeek2Lesson1Task,
+    reset: resetY4MeasurelandsWeek2Lesson1TaskSessionState,
+    quizContributionBuilder: buildY4MeasurelandsWeek2Lesson1QuizTasks,
+    practisedSkills: [
+      "Read analog and digital mass scales",
+      "Read between the graduations (0.5 kg, 50 g)",
+      "Match an object to the correct scale",
+      "Check a reading for accuracy",
+    ],
+    completionTitle: "Read the Scale Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+  },
+  "y4-measurement-w2-l2": {
+    generate: generateY4MeasurelandsWeek2Lesson2Task,
+    reset: resetY4MeasurelandsWeek2Lesson2TaskSessionState,
+    quizContributionBuilder: buildY4MeasurelandsWeek2Lesson2QuizTasks,
+    practisedSkills: [
+      "Read a measuring jug accurately",
+      "Read partial capacity graduations (0.5 L, 250 mL)",
+      "Choose the jug that matches an amount",
+      "Check a capacity reading for accuracy",
+    ],
+    completionTitle: "Read the Measuring Jug Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+  },
+  "y4-measurement-w2-l3": {
+    generate: generateY4MeasurelandsWeek2Lesson3Task,
+    reset: resetY4MeasurelandsWeek2Lesson3TaskSessionState,
+    quizContributionBuilder: buildY4MeasurelandsWeek2Lesson3QuizTasks,
+    practisedSkills: [
+      "Compare masses using scale readings",
+      "Compare capacities using jug readings",
+      "Work out how much heavier or how much more",
+      "Use measurements, not guesses, to solve problems",
+    ],
+    completionTitle: "Measurement Investigations Complete!",
     unlockMessage: "Weekly Quiz unlocked.",
   },
 };

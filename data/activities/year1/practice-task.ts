@@ -736,6 +736,9 @@ export type PracticeTask = (
       badgeLabel?: string;
       scene: "intro" | "read" | "match" | "realistic" | "compare" | "order" | "difference";
       scaleType?: "dial" | "digital";
+      /** Level 4: read partial graduations (0.5 kg, 50 g) with a coarser minor
+       *  step and an analog dial by default. */
+      precision?: boolean;
       object?: { label: string; emoji: string; mass: number; unit: "g" | "kg" };
       items?: Array<{ label: string; emoji: string; mass: number; unit: "g" | "kg" }>;
       scales?: Array<{ id: string; mass: number; unit: "g" | "kg"; scaleType?: "dial" | "digital" }>;
@@ -1235,6 +1238,8 @@ export type PracticeTask = (
         | "compareMore"
         | "order"
         | "howMuchMore";
+      /** Level 4: read partial jug graduations (0.5 L, 250 mL) — minors unlabelled. */
+      precision?: boolean;
       /** The familiar container being judged (emoji MATCHES the label). */
       object?: { label: string; emoji: string };
       /** Text MCQ options + the correct one (chooseUnit / spotMistake / whichJug). */
