@@ -51,11 +51,11 @@ function buildIntroTask(): ToolTask {
       "These challenges mix everything — length, area, capacity, temperature, time and angles. Read each one, decide what to measure, then solve it.",
     ],
     introTools: [
-      { id: "length", label: "Length", focus: "How long?", iconKey: "ruler" },
-      { id: "area", label: "Area", focus: "Space covered", iconKey: "oval" },
-      { id: "capacity", label: "Capacity", focus: "How much fits?", iconKey: "bottle" },
-      { id: "time", label: "Time", focus: "How long it takes", iconKey: "wheel" },
-      { id: "perimeter", label: "Perimeter", focus: "Around the edge", iconKey: "tape" },
+      { id: "length", label: "Length", focus: "How long?", iconKey: "m-length" },
+      { id: "area", label: "Area", focus: "Space covered", iconKey: "m-area" },
+      { id: "capacity", label: "Capacity", focus: "How much fits?", iconKey: "m-capacity" },
+      { id: "time", label: "Time", focus: "How long it takes", iconKey: "m-time" },
+      { id: "perimeter", label: "Perimeter", focus: "Around the edge", iconKey: "m-perimeter" },
     ],
     feedback: {
       correct: "Mission accepted!",

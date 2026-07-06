@@ -108,10 +108,81 @@ function Shell({ badge, prompt, speakText, children }: { badge: string; prompt: 
   );
 }
 
+/* Premium concept glyphs for the Week 8 "measuring tools" strip and the
+ * perimeter / area / mass / capacity answer options. Each SVG actually depicts
+ * the quantity being measured, rather than a generic stand-in icon. */
+function MeasureGlyph({ kind, className = "" }: { kind: string; className?: string }) {
+  const S = "#6d28d9";
+  const F = "#ede9fe";
+  const common = { className, viewBox: "0 0 48 48", fill: "none" as const };
+  if (kind === "m-length") {
+    return (
+      <svg {...common} aria-hidden="true">
+        <path d="M9 13h30" stroke={S} strokeWidth="2.4" strokeLinecap="round" />
+        <path d="M9 13l4-3.2M9 13l4 3.2M39 13l-4-3.2M39 13l-4 3.2" stroke={S} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+        <rect x="8" y="21" width="32" height="14" rx="3" fill={F} stroke={S} strokeWidth="2.4" />
+        {[14, 20, 26, 32].map((x) => <line key={x} x1={x} y1="21" x2={x} y2="27" stroke={S} strokeWidth="2" strokeLinecap="round" />)}
+      </svg>
+    );
+  }
+  if (kind === "m-perimeter") {
+    return (
+      <svg {...common} aria-hidden="true">
+        <rect x="10" y="12" width="28" height="24" rx="4" stroke={S} strokeWidth="3.2" strokeDasharray="5 3.4" strokeLinecap="round" />
+        {([[10, 12], [38, 12], [10, 36], [38, 36]] as const).map(([cx, cy], i) => <circle key={i} cx={cx} cy={cy} r="2.8" fill="#d6a84a" stroke={S} strokeWidth="1.4" />)}
+      </svg>
+    );
+  }
+  if (kind === "m-area") {
+    return (
+      <svg {...common} aria-hidden="true">
+        <rect x="10" y="13" width="28" height="22" rx="3" fill={F} stroke={S} strokeWidth="2.6" />
+        <line x1="19.3" y1="13" x2="19.3" y2="35" stroke={S} strokeWidth="1.8" />
+        <line x1="28.6" y1="13" x2="28.6" y2="35" stroke={S} strokeWidth="1.8" />
+        <line x1="10" y1="24" x2="38" y2="24" stroke={S} strokeWidth="1.8" />
+        <rect x="10" y="13" width="9.3" height="11" fill="rgba(109,40,217,0.28)" />
+        <rect x="28.7" y="24" width="9.3" height="11" fill="rgba(109,40,217,0.28)" />
+      </svg>
+    );
+  }
+  if (kind === "m-mass") {
+    return (
+      <svg {...common} aria-hidden="true">
+        <path d="M18.5 17c0-4.5 11-4.5 11 0" stroke={S} strokeWidth="3" strokeLinecap="round" />
+        <path d="M15 18.5h18l3.2 19.5H11.8z" fill={F} stroke={S} strokeWidth="2.6" strokeLinejoin="round" />
+        <text x="24" y="32.5" textAnchor="middle" fontSize="9" fontWeight="800" fill={S}>kg</text>
+      </svg>
+    );
+  }
+  if (kind === "m-capacity") {
+    return (
+      <svg {...common} aria-hidden="true">
+        <path d="M15 13h18l-2.2 22.5a3 3 0 0 1-3 2.7H20.2a3 3 0 0 1-3-2.7z" fill="#fff" stroke={S} strokeWidth="2.4" strokeLinejoin="round" />
+        <path d="M16.7 25.5h14.6l-1 10.9a3 3 0 0 1-3 2.7H20.7a3 3 0 0 1-3-2.7z" fill="#5ec5e8" opacity="0.55" />
+        <path d="M33 15.5l4-1.6" stroke={S} strokeWidth="2.4" strokeLinecap="round" />
+        {[20, 26, 32].map((y) => <line key={y} x1="15.8" y1={y} x2="19.8" y2={y} stroke={S} strokeWidth="1.6" strokeLinecap="round" />)}
+      </svg>
+    );
+  }
+  if (kind === "m-time") {
+    return (
+      <svg {...common} aria-hidden="true">
+        <circle cx="24" cy="26" r="14" fill={F} stroke={S} strokeWidth="2.6" />
+        <line x1="24" y1="8.5" x2="24" y2="12" stroke={S} strokeWidth="2.6" strokeLinecap="round" />
+        <line x1="24" y1="26" x2="24" y2="17.5" stroke={S} strokeWidth="2.6" strokeLinecap="round" />
+        <line x1="24" y1="26" x2="30.5" y2="29" stroke={S} strokeWidth="2.6" strokeLinecap="round" />
+        <circle cx="24" cy="26" r="1.9" fill={S} />
+      </svg>
+    );
+  }
+  return null;
+}
+
 /* A glyph tile (object or tool) — image when available, else lucide icon. */
 function Glyph({ label, iconKey, imageSrc, big = false }: { label: string; iconKey: string; imageSrc?: string; big?: boolean }) {
   const Icon = iconFor(iconKey);
   const size = big ? "h-24 w-24" : "h-12 w-12";
+  if (iconKey.startsWith("m-")) return <MeasureGlyph kind={iconKey} className={size} />;
   if (iconKey === "paperclips") return <PaperclipGlyph className={`${size} text-[#dc2626]`} />;
   if (iconKey === "dominoes") return <DominoGlyph className={`${big ? "h-16 w-24" : "h-10 w-16"}`} />;
   if (iconKey === "cubes" || iconKey === "blocks") return <CubeGlyph className={size} />;
