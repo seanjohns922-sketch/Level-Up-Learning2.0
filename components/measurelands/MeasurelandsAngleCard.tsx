@@ -48,6 +48,48 @@ const ANGLE_GALLERY: Array<{ turn: number; name: string; desc: string; rightMark
   { turn: 359, name: "Revolution", desc: "a full turn, right around" },
 ];
 
+/* ── Hold-to-reveal angle-types hint ── */
+function AngleTypesHint() {
+  const [show, setShow] = useState(false);
+  const hide = () => setShow(false);
+  return (
+    <>
+      <button
+        type="button"
+        onPointerDown={(e) => { e.preventDefault(); setShow(true); }}
+        onPointerUp={hide}
+        onPointerLeave={hide}
+        onPointerCancel={hide}
+        onContextMenu={(e) => e.preventDefault()}
+        className="inline-flex select-none items-center gap-1.5 rounded-full border-2 border-[#b45309] bg-[#fff7df] px-4 py-1.5 text-sm font-black text-[#b45309] shadow-sm transition hover:-translate-y-0.5"
+      >
+        💡 Hold for a hint
+      </button>
+      {show ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(44,28,7,0.55)] p-4"
+          onPointerUp={hide}
+          onPointerLeave={hide}
+        >
+          <div className="w-full max-w-2xl rounded-[26px] border-2 border-[rgba(214,184,108,0.6)] bg-[rgba(255,252,245,0.99)] p-4 shadow-[0_24px_64px_rgba(44,28,7,0.4)]">
+            <div className="mb-2 text-center text-[13px] font-black uppercase tracking-[0.16em] text-[#a98b52]">The types of angles</div>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {ANGLE_GALLERY.map((t) => (
+                <div key={t.name} className="flex flex-col items-center rounded-[18px] border border-[rgba(214,184,108,0.5)] bg-white p-1.5">
+                  <MeasurelandsAngle turn={t.turn} arm1={82} arm2={82} rightMark={t.rightMark} size={116} />
+                  <div className="text-[15px] font-black text-[#5b21b6]">{t.name}</div>
+                  <div className="text-center text-[11px] font-semibold leading-tight text-[#5a4423]">{t.desc}</div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-2 text-center text-[12px] font-bold text-[#8a6d3b]">Let go to close</div>
+          </div>
+        </div>
+      ) : null}
+    </>
+  );
+}
+
 function IntroScene({ task, onCorrect }: { task: AngleTask; onCorrect: () => void }) {
   return (
     <Shell badge={task.badgeLabel ?? "Meazurex Mission"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
@@ -113,7 +155,10 @@ function CompareRightScene({ task, onCorrect, onWrong }: { task: AngleTask; onCo
       <div className="flex flex-col items-center rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
         {task.context ? <div className="text-lg font-black text-[#2c1c07]">{task.context.emoji} {task.context.label}</div> : null}
         <MeasurelandsAngle turn={a.turn} rot={a.rot ?? 0} arm1={a.arm1 ?? 95} arm2={a.arm2 ?? 95} benchmark={bench} size={230} />
-        <button type="button" onClick={() => setBench((b) => !b)} className="mt-1 rounded-full border-2 border-[#b45309] bg-[#fff7df] px-4 py-1.5 text-sm font-black text-[#b45309] shadow-sm transition hover:-translate-y-0.5">{bench ? "Hide" : "Show"} the right-angle marker</button>
+        <div className="mt-1 flex flex-wrap items-center justify-center gap-2">
+          <button type="button" onClick={() => setBench((b) => !b)} className="rounded-full border-2 border-[#b45309] bg-[#fff7df] px-4 py-1.5 text-sm font-black text-[#b45309] shadow-sm transition hover:-translate-y-0.5">{bench ? "Hide" : "Show"} the right-angle marker</button>
+          <AngleTypesHint />
+        </div>
       </div>
       <div className="grid grid-cols-3 gap-3">
         {btn("smaller", "Smaller")}
@@ -165,7 +210,10 @@ function ClassifyScene({ task, onCorrect, onWrong }: { task: AngleTask; onCorrec
       <div className="flex flex-col items-center rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
         {task.context ? <div className="text-lg font-black text-[#2c1c07]">{task.context.emoji} {task.context.label}</div> : null}
         <MeasurelandsAngle turn={a.turn} rot={a.rot ?? 0} arm1={a.arm1 ?? 95} arm2={a.arm2 ?? 95} benchmark={bench} rightMark={!bench && Math.abs(a.turn - 90) < 0.5} size={220} />
-        <button type="button" onClick={() => setBench((b) => !b)} className="mt-1 rounded-full border-2 border-[#b45309] bg-[#fff7df] px-4 py-1.5 text-sm font-black text-[#b45309] shadow-sm transition hover:-translate-y-0.5">{bench ? "Hide" : "Show"} the right-angle marker</button>
+        <div className="mt-1 flex flex-wrap items-center justify-center gap-2">
+          <button type="button" onClick={() => setBench((b) => !b)} className="rounded-full border-2 border-[#b45309] bg-[#fff7df] px-4 py-1.5 text-sm font-black text-[#b45309] shadow-sm transition hover:-translate-y-0.5">{bench ? "Hide" : "Show"} the right-angle marker</button>
+          <AngleTypesHint />
+        </div>
       </div>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {(task.options ?? []).map((o) => (
