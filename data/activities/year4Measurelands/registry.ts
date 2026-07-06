@@ -45,6 +45,21 @@ import {
   generateY4MeasurelandsWeek3Lesson3Task,
   resetY4MeasurelandsWeek3Lesson3TaskSessionState,
 } from "@/data/activities/year4Measurelands/week3Lesson3";
+import {
+  buildY4MeasurelandsWeek4Lesson1QuizTasks,
+  generateY4MeasurelandsWeek4Lesson1Task,
+  resetY4MeasurelandsWeek4Lesson1TaskSessionState,
+} from "@/data/activities/year4Measurelands/week4Lesson1";
+import {
+  buildY4MeasurelandsWeek4Lesson2QuizTasks,
+  generateY4MeasurelandsWeek4Lesson2Task,
+  resetY4MeasurelandsWeek4Lesson2TaskSessionState,
+} from "@/data/activities/year4Measurelands/week4Lesson2";
+import {
+  buildY4MeasurelandsWeek4Lesson3QuizTasks,
+  generateY4MeasurelandsWeek4Lesson3Task,
+  resetY4MeasurelandsWeek4Lesson3TaskSessionState,
+} from "@/data/activities/year4Measurelands/week4Lesson3";
 
 // Built lessons replace their placeholder entry (real generator, no "Coming
 // Soon" gate). Add a row here as each Level 4 lesson ships.
@@ -168,6 +183,42 @@ const BUILT_LESSONS: Record<
       "Use temperatures to solve weather problems",
     ],
     completionTitle: "Temperature Investigations Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+  },
+  "y4-measurement-w4-l1": {
+    generate: generateY4MeasurelandsWeek4Lesson1Task,
+    reset: resetY4MeasurelandsWeek4Lesson1TaskSessionState,
+    quizContributionBuilder: buildY4MeasurelandsWeek4Lesson1QuizTasks,
+    practisedSkills: [
+      "Measure the sides of a shape accurately",
+      "Measure every side without missing one",
+      "Choose the correctly measured side",
+    ],
+    completionTitle: "Measure the Outside Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+  },
+  "y4-measurement-w4-l2": {
+    generate: generateY4MeasurelandsWeek4Lesson2Task,
+    reset: resetY4MeasurelandsWeek4Lesson2TaskSessionState,
+    quizContributionBuilder: buildY4MeasurelandsWeek4Lesson2QuizTasks,
+    practisedSkills: [
+      "Find perimeter by adding every side",
+      "Choose the correct perimeter",
+      "Spot a missed side in a perimeter",
+    ],
+    completionTitle: "Find the Perimeter Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+  },
+  "y4-measurement-w4-l3": {
+    generate: generateY4MeasurelandsWeek4Lesson3Task,
+    reset: resetY4MeasurelandsWeek4Lesson3TaskSessionState,
+    quizContributionBuilder: buildY4MeasurelandsWeek4Lesson3QuizTasks,
+    practisedSkills: [
+      "Work out how much fencing a garden needs",
+      "Find the distance around a path",
+      "Solve real-world perimeter problems",
+    ],
+    completionTitle: "Perimeter Problems Complete!",
     unlockMessage: "Weekly Quiz unlocked.",
   },
 };

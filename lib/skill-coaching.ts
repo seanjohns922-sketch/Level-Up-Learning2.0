@@ -255,6 +255,9 @@ const TABLE: Record<string, SkillCoaching> = {
   ml_y4_w3_l1: { tip: "Higher temperatures mean warmer weather." },
   ml_y4_w3_l2: { tip: "Read every marking before choosing your answer." },
   ml_y4_w3_l3: { tip: "Compare the numbers carefully to solve the problem." },
+  ml_y4_w4_l1: { tip: "Measure every side before you calculate." },
+  ml_y4_w4_l2: { tip: "Add every outside side exactly once." },
+  ml_y4_w4_l3: { tip: "Perimeter tells us how far it is all the way around." },
 };
 
 const FALLBACK: SkillCoaching = {
@@ -354,6 +357,9 @@ const LESSON_KEY_MAP: Record<string, string> = {
   "y4-measurement-w3-l1": "ml_y4_w3_l1",
   "y4-measurement-w3-l2": "ml_y4_w3_l2",
   "y4-measurement-w3-l3": "ml_y4_w3_l3",
+  "y4-measurement-w4-l1": "ml_y4_w4_l1",
+  "y4-measurement-w4-l2": "ml_y4_w4_l2",
+  "y4-measurement-w4-l3": "ml_y4_w4_l3",
 };
 
 function normalizeLessonId(lessonId: string): string {

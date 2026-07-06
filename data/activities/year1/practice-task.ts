@@ -1300,6 +1300,38 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Year 4 W4 "Perimeter Path" (AC9M4M02) — CALCULATE perimeter by
+      // adding the side lengths of themed land (gardens/paddocks/playgrounds/pools).
+      // Whole-number sides, one metric unit, no formula (add the sides), no algebra.
+      //   measureEvery — tap every side to measure it (don't miss one).
+      //   calc         — type the total perimeter.
+      //   choose       — pick the correct perimeter (misconception distractors).
+      //   spotMissed   — Professor Gauge's total forgot a side; is he right?
+      //   problem      — real-world surveyor problem (fence/path/enclosure).
+      kind: "perimeterCalc";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "measureEvery" | "calc" | "choose" | "spotMissed" | "problem";
+      /** Vertices of the rectilinear outline, in unit space (y up), closed. */
+      poly: Array<[number, number]>;
+      /** Length of each edge, in poly-edge order. */
+      sideLabels: number[];
+      unit: "cm" | "m";
+      theme?: "garden" | "paddock" | "playground" | "pool" | "park";
+      shapeName?: string;
+      perimeter?: number;
+      /** "calc"/"problem": typed numeric answer. */
+      answerValue?: number;
+      answerUnit?: "cm" | "m";
+      /** "choose"/"problem": MCQ options + correct. */
+      options?: number[];
+      correctNumber?: number;
+      /** "spotMissed": Professor Gauge's (wrong) total. */
+      statement?: string;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       // Measurelands Year 3 W5 "Time Trails" (AC9M3M03) — Understand → Estimate → Compare.
       // Duration reasoning with seconds/minutes/hours; NOT reading a clock.
       // L1: chooseUnit / sort / spotMistake.  L2: estimate / bestEstimate / (challenge).

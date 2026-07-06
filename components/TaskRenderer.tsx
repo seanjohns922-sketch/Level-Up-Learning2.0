@@ -119,6 +119,7 @@ import { MeasurelandsClockMinuteCard } from "@/components/measurelands/Measurela
 import { MeasurelandsPerimeterCard } from "@/components/measurelands/MeasurelandsPerimeterCard";
 import { MeasurelandsAreaCard } from "@/components/measurelands/MeasurelandsAreaCard";
 import { MeasurelandsTemperatureCard } from "@/components/measurelands/MeasurelandsTemperatureCard";
+import { MeasurelandsSurveyorCard } from "@/components/measurelands/MeasurelandsSurveyorCard";
 import { isPracticeTaskSafe } from "@/lib/task-safety";
 
 type Callbacks = {
@@ -419,6 +420,8 @@ function TaskRendererInner({
       return wrapMeasurelands(<MeasurelandsAreaCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "temperature":
       return wrapMeasurelands(<MeasurelandsTemperatureCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
+    case "perimeterCalc":
+      return wrapMeasurelands(<MeasurelandsSurveyorCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "massMeasure":
       return wrapMeasurelands(<MeasurelandsMassMeasureCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "massUnit":

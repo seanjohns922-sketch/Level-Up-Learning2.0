@@ -36,6 +36,7 @@ const OBJECT_FILL: Record<string, [string, string]> = {
   "✂️": ["#CBD0D8", "#9AA1AC"],
   "🪶": ["#A9C7D6", "#7BA2B5"],
   "🧽": ["#E7D57A", "#C9B24E"],
+  "🪵": ["#C89A5B", "#9A6E38"],
 };
 
 const TIMBER = { top: "#EBCFA2", mid: "#DCB77C", bot: "#C79A57", edge: "#A67B3C" };
