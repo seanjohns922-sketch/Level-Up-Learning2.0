@@ -12,15 +12,17 @@ export type AreaShape = {
 };
 
 export type Theme = { label: string; emoji: string };
+// Small shapes on centimetre grid paper — each square is 1 cm² (Lessons 1–2).
+// Real land in square metres lives in Lesson 3.
 export const THEMES: Theme[] = [
-  { label: "garden", emoji: "🌱" },
-  { label: "lawn", emoji: "🌿" },
-  { label: "classroom", emoji: "🪑" },
-  { label: "playground", emoji: "🛝" },
-  { label: "picnic rug", emoji: "🧺" },
-  { label: "veggie patch", emoji: "🥕" },
-  { label: "sandpit", emoji: "🏖️" },
-  { label: "dog park", emoji: "🐕" },
+  { label: "sticker", emoji: "⭐" },
+  { label: "tile", emoji: "🔲" },
+  { label: "card", emoji: "🃏" },
+  { label: "stamp", emoji: "📮" },
+  { label: "chocolate", emoji: "🍫" },
+  { label: "biscuit", emoji: "🍪" },
+  { label: "coaster", emoji: "🟫" },
+  { label: "notepad", emoji: "📝" },
 ];
 
 export function randInt(maxExclusive: number) {

@@ -30,11 +30,11 @@ function buildIntroTask(): AreaTask {
   return {
     kind: "area",
     scene: "intro",
-    prompt: "Two shapes can cover the same amount of space.",
+    prompt: "Two shapes can cover the same area.",
     speakText:
-      "Professor Gauge says: two shapes can look different but still cover the same amount of space. To compare areas, count the square units — not just how big the shape looks.",
+      "Professor Gauge says: two shapes can look different but still cover the same area. To compare areas, count the square centimetres — not just how big the shape looks.",
     badgeLabel: "Meazurex Mission",
-    cells: s.cells, gridW: s.gridW, gridH: s.gridH, label: s.label, emoji: s.emoji,
+    cells: s.cells, gridW: s.gridW, gridH: s.gridH, label: s.label, emoji: s.emoji, areaUnit: "cm²",
     feedback: { correct: "Let's compare!", wrong: "Let's compare!" },
   };
 }
@@ -50,7 +50,7 @@ function buildCompareTask(): AreaTask {
     speakText: "Count the square units. Which shape covers more space?",
     badgeLabel: "Which Has Greater Area?",
     compareShapes: { a: asShape(a!), b: asShape(b!) },
-    feedback: { correct: `Yes — the ${bigger.label} has ${bigger.area} square units.`, wrong: `Count the squares — the ${bigger.label} covers more.` },
+    feedback: { correct: `Yes — the ${bigger.label} has ${bigger.area} cm².`, wrong: `Count the squares — the ${bigger.label} covers more.` },
   };
 }
 
@@ -87,7 +87,7 @@ function buildSameDiffTask(): AreaTask {
     badgeLabel: "Equal or Different?",
     compareShapes: { a: asShape(a), b: asShape(b) },
     feedback: {
-      correct: same ? `Yes — both cover ${a.area} square units.` : `Right — ${a.area} and ${b.area} are different.`,
+      correct: same ? `Yes — both cover ${a.area} cm².` : `Right — ${a.area} cm² and ${b.area} cm² are different.`,
       wrong: "Count the squares in each shape and compare.",
     },
   };

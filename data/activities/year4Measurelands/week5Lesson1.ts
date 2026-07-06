@@ -30,9 +30,9 @@ function buildIntroTask(): AreaTask {
     scene: "intro",
     prompt: "What is area?",
     speakText:
-      "Professor Gauge says: area is the amount of flat surface inside a shape. We measure it by covering the shape with equal square units and counting them. Area is different from perimeter — perimeter is the distance around the edge, and area is the space inside.",
+      "Professor Gauge says: area is the amount of flat surface inside a shape. We measure it by covering the shape with equal squares and counting them. On grid paper each square is one square centimetre — one c m squared. Area is different from perimeter: perimeter is the distance around the edge, and area is the space inside.",
     badgeLabel: "Meazurex Mission",
-    cells: s.cells, gridW: s.gridW, gridH: s.gridH, label: s.label, emoji: s.emoji,
+    cells: s.cells, gridW: s.gridW, gridH: s.gridH, label: s.label, emoji: s.emoji, areaUnit: "cm²",
     feedback: { correct: "Let's build!", wrong: "Let's build!" },
   };
 }
@@ -46,7 +46,7 @@ function buildCoverTask(): AreaTask {
     prompt: `Cover the ${s.label} with square tiles.`,
     speakText: `Cover the whole ${s.label} with square tiles — no gaps, no overlaps.`,
     badgeLabel: "Cover the Rectangle",
-    cells: s.cells, gridW: s.gridW, gridH: s.gridH, label: s.label, emoji: s.emoji,
+    cells: s.cells, gridW: s.gridW, gridH: s.gridH, label: s.label, emoji: s.emoji, areaUnit: "cm²",
     feedback: { correct: "Fully covered — that's the area!", wrong: "Fill every square." },
   };
 }
@@ -59,13 +59,13 @@ function buildCountTask(): AreaTask {
   return {
     kind: "area",
     scene: "countSquares",
-    prompt: `How many square units cover the ${s.label}?`,
-    speakText: `Count the square units in the ${s.label}.`,
+    prompt: `What is the area of the ${s.label}?`,
+    speakText: `Count the square centimetres to find the area of the ${s.label}.`,
     badgeLabel: "Count the Squares",
-    cells: s.cells, gridW: s.gridW, gridH: s.gridH, label: s.label, emoji: s.emoji,
+    cells: s.cells, gridW: s.gridW, gridH: s.gridH, label: s.label, emoji: s.emoji, areaUnit: "cm²",
     options: shuffle([...opts]).slice(0, 4),
     correctNumber: s.area,
-    feedback: { correct: `Yes — ${s.area} square units.`, wrong: `Count every square once — there are ${s.area}.` },
+    feedback: { correct: `Yes — ${s.area} cm².`, wrong: `Count every square once — there are ${s.area} cm².` },
   };
 }
 
@@ -83,7 +83,7 @@ function buildWhichPartTask(): AreaTask {
     prompt: `Which picture shows the area of the ${s.label}?`,
     speakText: `Which picture shows the area — the whole space inside the ${s.label}?`,
     badgeLabel: "Which Is the Area?",
-    cells: s.cells, gridW: s.gridW, gridH: s.gridH, label: s.label, emoji: s.emoji,
+    cells: s.cells, gridW: s.gridW, gridH: s.gridH, label: s.label, emoji: s.emoji, areaUnit: "cm²",
     partOptions: options, correctPartId: "inside",
     feedback: { correct: "Yes — area fills the whole inside space.", wrong: "Area is the whole inside, not the edge or just part." },
   };

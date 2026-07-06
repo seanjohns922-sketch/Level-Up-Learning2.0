@@ -100,17 +100,26 @@ function BuildAreaScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrec
   );
 }
 
+function areaUnitLabel(task: AreaTask): string {
+  return task.areaUnit ?? "square units";
+}
+function areaUnitSpoken(task: AreaTask): string {
+  return task.areaUnit === "cm²" ? "square centimetres" : task.areaUnit === "m²" ? "square metres" : "square units";
+}
+
 function CountScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect: () => void; onWrong: () => void }) {
   const cells = task.cells ?? [];
+  const unit = areaUnitLabel(task);
+  const spoken = areaUnitSpoken(task);
   return (
     <Shell badge={task.badgeLabel ?? "Count the Squares"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
         <Tiles cells={cells} gridW={task.gridW ?? 4} gridH={task.gridH ?? 3} filled={new Set(cells.map(([c, r]) => cellKey(c, r)))} outline size={330} />
       </div>
-      <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-3 gap-3">
         {(task.options ?? []).map((n) => (
-          <button key={n} type="button" onClick={() => (n === task.correctNumber ? onCorrect() : onWrong())} className="relative flex min-h-[66px] items-center justify-center rounded-[22px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-2xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]">
-            <span className="absolute right-1 top-1 z-10"><OptionReadAloudButton text={`${n} squares`} /></span>{n}
+          <button key={n} type="button" onClick={() => (n === task.correctNumber ? onCorrect() : onWrong())} className="relative flex min-h-[66px] items-center justify-center rounded-[22px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98] sm:text-2xl">
+            <span className="absolute right-1 top-1 z-10"><OptionReadAloudButton text={`${n} ${spoken}`} /></span>{n} {unit}
           </button>
         ))}
       </div>
@@ -211,7 +220,7 @@ function IntroScene({ task, onCorrect }: { task: AreaTask; onCorrect: () => void
       <div className="grid gap-3 md:grid-cols-2">
         <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
           <Tiles cells={cells} gridW={task.gridW ?? 4} gridH={task.gridH ?? 3} filled={new Set(cells.map(([c, r]) => cellKey(c, r)))} outline size={240} />
-          <p className="mt-1 text-center text-sm font-black text-[#7c3aed]">{cells.length} equal square units</p>
+          <p className="mt-1 text-center text-sm font-black text-[#7c3aed]">{cells.length} {areaUnitLabel(task)}</p>
         </div>
         <div className="rounded-[24px] border border-[rgba(214,184,108,0.45)] bg-[rgba(255,250,240,0.96)] p-4">
           <div className="mb-2 flex items-center gap-2">
@@ -222,7 +231,7 @@ function IntroScene({ task, onCorrect }: { task: AreaTask; onCorrect: () => void
             Area is the amount of <span className="font-black text-[#7c3aed]">surface inside</span> a shape.
           </p>
           <p className="mt-2 text-[15px] font-semibold leading-snug text-[#5a4423]">
-            We measure it by covering the shape with <span className="font-black">equal square units</span> and counting them.
+            We measure it by covering the shape with <span className="font-black">equal squares</span>{task.areaUnit ? <> — each one a <span className="font-black text-[#7c3aed]">{task.areaUnit}</span></> : null} and counting them.
           </p>
           <div className="mt-3 rounded-[16px] border border-[rgba(214,184,108,0.5)] bg-white px-3 py-2 text-center text-[14px] font-bold text-[#2c1c07]">
             <span className="font-black text-[#5b21b6]">Perimeter</span> is the distance around the edge. <span className="font-black text-[#7c3aed]">Area</span> is the space inside.

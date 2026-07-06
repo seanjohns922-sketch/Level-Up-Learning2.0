@@ -1448,6 +1448,9 @@ export type PracticeTask = (
       gridH?: number;
       label?: string;
       emoji?: string;
+      /** Formal square unit for Level 4 (each tile = 1 cm² or 1 m²). Level 3
+       *  preview leaves this unset and reads "square units". */
+      areaUnit?: "cm²" | "m²";
       /** "whichPart": one option fills the inside (area); decoys = edge / partial. */
       partOptions?: Array<{ id: string; fillType: "inside" | "edge" | "partial" }>;
       correctPartId?: string;

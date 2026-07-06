@@ -42,9 +42,9 @@ function buildIntroTask(): AreaTask {
     scene: "intro",
     prompt: "Builders and gardeners measure area before they start.",
     speakText:
-      "Professor Gauge says: builders and gardeners measure area before they begin. Counting the square units tells us how much grass, or how many tiles, a space needs.",
+      "Professor Gauge says: builders and gardeners measure area before they begin. Real land is measured in square metres. Counting the square metres tells us how much grass, or how many tiles, a space needs.",
     badgeLabel: "Meazurex Mission",
-    cells: s.cells, gridW: s.gridW, gridH: s.gridH, label: s.label, emoji: s.emoji,
+    cells: s.cells, gridW: s.gridW, gridH: s.gridH, label: s.label, emoji: s.emoji, areaUnit: "m²",
     feedback: { correct: "Let's design!", wrong: "Let's design!" },
   };
 }
@@ -60,7 +60,7 @@ function buildGardenTask(): AreaTask {
     speakText: "The bigger area needs more grass. Count the square units — which garden needs more?",
     badgeLabel: "Garden Beds",
     compareShapes: { a: asShape(a!), b: asShape(b!) },
-    feedback: { correct: `Yes — the ${bigger.label} has ${bigger.area} square units of grass.`, wrong: `Count the squares — the ${bigger.label} is bigger.` },
+    feedback: { correct: `Yes — the ${bigger.label} has ${bigger.area} m² of grass.`, wrong: `Count the squares — the ${bigger.label} is bigger.` },
   };
 }
 
@@ -71,12 +71,12 @@ function buildFloorTask(): AreaTask {
   return {
     kind: "area",
     scene: "countSquares",
-    prompt: "How many square tiles cover the classroom floor?",
-    speakText: "Each square is one floor tile. How many tiles cover the whole floor?",
+    prompt: "What is the area of the classroom floor?",
+    speakText: "Each floor tile is one square metre. Count them — what is the area of the whole floor?",
     badgeLabel: "Floor Tiles",
-    cells: s.cells, gridW: s.gridW, gridH: s.gridH, label: s.label, emoji: s.emoji,
+    cells: s.cells, gridW: s.gridW, gridH: s.gridH, label: s.label, emoji: s.emoji, areaUnit: "m²",
     options, correctNumber: correct,
-    feedback: { correct: `Yes — ${correct} tiles cover the floor.`, wrong: `Count every square once — it needs ${correct} tiles.` },
+    feedback: { correct: `Yes — ${correct} m² of floor.`, wrong: `Count every square once — it is ${correct} m².` },
   };
 }
 
