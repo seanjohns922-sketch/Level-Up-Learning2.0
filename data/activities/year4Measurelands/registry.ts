@@ -1,5 +1,34 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
 import { YEAR4_MEASURELANDS_PROGRAM } from "@/data/programs/year4Measurelands";
+import {
+  buildY4MeasurelandsWeek1Lesson1QuizTasks,
+  generateY4MeasurelandsWeek1Lesson1Task,
+  resetY4MeasurelandsWeek1Lesson1TaskSessionState,
+} from "@/data/activities/year4Measurelands/week1Lesson1";
+
+// Built lessons replace their placeholder entry (real generator, no "Coming
+// Soon" gate). Add a row here as each Level 4 lesson ships.
+const BUILT_LESSONS: Record<
+  string,
+  Pick<
+    Y4MeasurelandsLessonEntry,
+    "generate" | "reset" | "quizContributionBuilder" | "practisedSkills" | "completionTitle" | "unlockMessage"
+  >
+> = {
+  "y4-measurement-w1-l1": {
+    generate: generateY4MeasurelandsWeek1Lesson1Task,
+    reset: resetY4MeasurelandsWeek1Lesson1TaskSessionState,
+    quizContributionBuilder: buildY4MeasurelandsWeek1Lesson1QuizTasks,
+    practisedSkills: [
+      "Read measurements between whole centimetres",
+      "Read the half-centimetre mark accurately",
+      "Choose the correct reading instead of rounding",
+      "Check a measurement for accuracy",
+    ],
+    completionTitle: "Reading Between the Marks Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+  },
+};
 
 // Measurelands Level 4 (Year 4) — registry SHELL.
 //
@@ -101,7 +130,9 @@ function makePlaceholderEntry(week: number, lessonNumber: number): Y4Measureland
 const Y4_MEASURELANDS_LESSONS: Y4MeasurelandsLessonEntry[] = [];
 for (let week = 1; week <= 8; week += 1) {
   for (let lessonNumber = 1; lessonNumber <= 3; lessonNumber += 1) {
-    Y4_MEASURELANDS_LESSONS.push(makePlaceholderEntry(week, lessonNumber));
+    const entry = makePlaceholderEntry(week, lessonNumber);
+    const built = BUILT_LESSONS[entry.prefix];
+    Y4_MEASURELANDS_LESSONS.push(built ? { ...entry, ...built, placeholder: false } : entry);
   }
 }
 

@@ -1123,6 +1123,13 @@ export type PracticeTask = (
       speakText?: string;
       badgeLabel?: string;
       scene: "intro" | "startZero" | "measure" | "compare";
+      /**
+       * Level 4 precision reading (AC9M4M01): render fine millimetre graduations
+       * with a longer 5 mm mark so readings can fall on a half centimetre. Object
+       * lengths and answer options may be halves (e.g. 7.5). Off = whole-cm ruler
+       * (Level 3). Same ruler component either way — do not build a second ruler.
+       */
+      precision?: boolean;
       /** Length of the drawn ruler in whole centimetres (e.g. 12, 20). */
       rulerCm: number;
       /** Single-object scenes: the object measured on the ruler. Defaults to starting at 0. */

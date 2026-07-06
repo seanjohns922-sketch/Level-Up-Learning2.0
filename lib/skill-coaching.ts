@@ -244,6 +244,9 @@ const TABLE: Record<string, SkillCoaching> = {
   ml_y3_w3_l1: { tip: "Think about how heavy the object would feel, then choose grams or kilograms." },
   ml_y3_w3_l2: { tip: "Read the number and unit on the scale before choosing the mass." },
   ml_y3_w3_l3: { tip: "Compare the mass measurements first; the greater measurement is heavier." },
+
+  // Measurelands — Year 4 exact lesson tips
+  ml_y4_w1_l1: { tip: "If the object finishes between two whole numbers, read the smaller marks carefully before choosing your answer." },
 };
 
 const FALLBACK: SkillCoaching = {
@@ -334,6 +337,7 @@ const LESSON_KEY_MAP: Record<string, string> = {
   "y3-measurement-w3-l1": "ml_y3_w3_l1",
   "y3-measurement-w3-l2": "ml_y3_w3_l2",
   "y3-measurement-w3-l3": "ml_y3_w3_l3",
+  "y4-measurement-w1-l1": "ml_y4_w1_l1",
 };
 
 function normalizeLessonId(lessonId: string): string {
