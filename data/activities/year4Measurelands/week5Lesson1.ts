@@ -28,9 +28,9 @@ function buildIntroTask(): AreaTask {
   return {
     kind: "area",
     scene: "intro",
-    prompt: "Area is how much space something covers.",
+    prompt: "What is area?",
     speakText:
-      "Professor Gauge says: area tells us how much space something covers. To measure it, we cover every part of the shape with equal square tiles, then count them. Area is the space inside — measured in square units.",
+      "Professor Gauge says: area is the amount of flat surface inside a shape. We measure it by covering the shape with equal square units and counting them. Area is different from perimeter — perimeter is the distance around the edge, and area is the space inside.",
     badgeLabel: "Meazurex Mission",
     cells: s.cells, gridW: s.gridW, gridH: s.gridH, label: s.label, emoji: s.emoji,
     feedback: { correct: "Let's build!", wrong: "Let's build!" },
