@@ -390,8 +390,9 @@ function LessonPage() {
   const started = startedLessonId === effectiveLessonId;
   const safeLessonTitle = lessonMeta?.displayTitle ?? lessonMeta?.title ?? null;
   const safeLessonFocus = lessonMeta?.focus ?? null;
+  // Number Nexus only — the embedded lesson video is not part of Measurelands.
   const hasEmbeddedLessonVideo =
-    year === "Year 4" && week === 2 && lessonNumber === 1;
+    realmId !== "measurement" && year === "Year 4" && week === 2 && lessonNumber === 1;
   const isGroundCustomLesson =
     year === "Prep" && isPrepGroundCustomLesson(effectiveLessonId, realmId);
   const isYear2Measurelands =
