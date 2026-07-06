@@ -7887,6 +7887,12 @@ function SessionPage({
       return [];
     }
 
+    // Level 5 Measurelands is a plumbing shell only for now. Weekly quizzes must
+    // not fall through to Number Nexus or generic structured quiz content.
+    if (isMeasurementRealm && year === "Year 5") {
+      return [];
+    }
+
     if (
       year === "Year 2" ||
       year === "Year 3" ||

@@ -51,8 +51,8 @@ const MeasurelandsMap = dynamic(
   }
 );
 
-const SUPPORTED_MEASURELANDS_YEARS = new Set(["Prep", "Year 1", "Year 2", "Year 3", "Year 4"]);
-type SupportedMeasurelandsYear = "Prep" | "Year 1" | "Year 2" | "Year 3" | "Year 4";
+const SUPPORTED_MEASURELANDS_YEARS = new Set(["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5"]);
+type SupportedMeasurelandsYear = "Prep" | "Year 1" | "Year 2" | "Year 3" | "Year 4" | "Year 5";
 
 export default function MeasurelandsPage() {
   const router = useRouter();
