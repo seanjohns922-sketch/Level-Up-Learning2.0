@@ -270,9 +270,194 @@ function SameDiffScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect
   );
 }
 
+/* ── Level 5 W4: rows / columns / arrays ── */
+const ROW_HL = "rgba(245,158,11,0.5)";
+const COL_HL = "rgba(13,148,136,0.45)";
+
+function ArrayGrid({ gridW, gridH, rowsOn, colsOn, onRowTap, onColTap, reveal, banded, size }: {
+  gridW: number; gridH: number;
+  rowsOn?: Set<number>; colsOn?: Set<number>;
+  onRowTap?: (r: number) => void; onColTap?: (c: number) => void;
+  reveal?: boolean; banded?: boolean; size?: number;
+}) {
+  const w = gridW * U + PAD * 2, h = gridH * U + PAD * 2;
+  const R = Array.from({ length: gridH }, (_, i) => i);
+  const C = Array.from({ length: gridW }, (_, i) => i);
+  const showBand = banded || reveal;
+  const colDelayBase = gridH * 0.24 + 0.6; // columns pulse after the rows finish
+  return (
+    <div className="mx-auto" style={{ maxWidth: size ?? Math.min(w, 360) }}>
+      <svg viewBox={`0 0 ${w} ${h}`} width="100%" role="img" aria-label={`${gridH} rows by ${gridW} columns`}>
+        <style>{"@keyframes mlPulse{0%{opacity:0}35%{opacity:1}75%{opacity:1}100%{opacity:0}}"}</style>
+        {R.map((r) => C.map((c) => (
+          <rect key={`b${c}-${r}`} x={PAD + c * U} y={PAD + r * U} width={U} height={U} rx={5} fill={showBand && r % 2 === 1 ? "rgba(245,158,11,0.16)" : TILE_BG} stroke={TILE} strokeWidth={1.4} />
+        )))}
+        {R.map((r) => (rowsOn?.has(r) ? <rect key={`r${r}`} x={PAD} y={PAD + r * U} width={gridW * U} height={U} rx={6} fill={ROW_HL} /> : null))}
+        {C.map((c) => (colsOn?.has(c) ? <rect key={`c${c}`} x={PAD + c * U} y={PAD} width={U} height={gridH * U} rx={6} fill={COL_HL} /> : null))}
+        {reveal ? (
+          <>
+            {R.map((r) => <rect key={`rr${r}`} x={PAD} y={PAD + r * U} width={gridW * U} height={U} rx={6} fill={ROW_HL} style={{ opacity: 0, animation: "mlPulse 1.1s ease forwards", animationDelay: `${r * 0.24}s` }} />)}
+            {C.map((c) => <rect key={`cc${c}`} x={PAD + c * U} y={PAD} width={U} height={gridH * U} rx={6} fill={COL_HL} style={{ opacity: 0, animation: "mlPulse 1.1s ease forwards", animationDelay: `${colDelayBase + c * 0.2}s` }} />)}
+          </>
+        ) : null}
+        {R.map((r) => C.map((c) => (
+          <rect key={`g${c}-${r}`} x={PAD + c * U} y={PAD + r * U} width={U} height={U} rx={5} fill="none" stroke="rgba(124,58,237,0.55)" strokeWidth={1.3} />
+        )))}
+        {onRowTap ? R.map((r) => <rect key={`tr${r}`} x={PAD} y={PAD + r * U} width={gridW * U} height={U} fill="transparent" style={{ cursor: "pointer" }} onClick={() => onRowTap(r)} />) : null}
+        {onColTap ? C.map((c) => <rect key={`tc${c}`} x={PAD + c * U} y={PAD} width={U} height={gridH * U} fill="transparent" style={{ cursor: "pointer" }} onClick={() => onColTap(c)} />) : null}
+      </svg>
+    </div>
+  );
+}
+
+function ArrayReadout({ gridH, gridW, unit, showTotal }: { gridH: number; gridW: number; unit: string; showTotal?: boolean }) {
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-2 rounded-[18px] border border-[rgba(214,184,108,0.5)] bg-white px-3 py-2 text-lg font-black">
+      <span className="rounded-[10px] px-2 py-0.5 text-[#b45309]" style={{ background: "rgba(245,158,11,0.16)" }}>{gridH} rows</span>
+      <span className="text-[#a98b52]">×</span>
+      <span className="rounded-[10px] px-2 py-0.5 text-[#0f766e]" style={{ background: "rgba(13,148,136,0.14)" }}>{gridW} columns</span>
+      {showTotal ? <><span className="text-[#a98b52]">=</span><span className="text-[#7c3aed]">{gridW * gridH} {unit}</span></> : null}
+    </div>
+  );
+}
+
+function RowColScene({ task, dir, onCorrect }: { task: AreaTask; dir: "rows" | "columns"; onCorrect: () => void }) {
+  const gridW = task.gridW ?? 4, gridH = task.gridH ?? 3;
+  const total = dir === "rows" ? gridH : gridW;
+  const [on, setOn] = useState<Set<number>>(new Set());
+  const done = on.size === total;
+  const tap = (i: number) => { if (on.has(i)) return; const n = new Set(on); n.add(i); setOn(n); };
+  const word = dir === "rows" ? "row" : "column";
+  return (
+    <Shell badge={task.badgeLabel ?? (dir === "rows" ? "Count the Rows" : "Count the Columns")} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
+        {task.context ? <div className="mb-1 text-center text-[12px] font-black uppercase tracking-[0.14em] text-[#a98b52]">{task.emoji} {task.context}</div> : null}
+        <ArrayGrid gridW={gridW} gridH={gridH} rowsOn={dir === "rows" ? on : undefined} colsOn={dir === "columns" ? on : undefined} onRowTap={dir === "rows" && !done ? tap : undefined} onColTap={dir === "columns" && !done ? tap : undefined} />
+        <p className={`mt-2 text-center text-base font-black ${done ? "text-[#16a34a]" : "text-[#a98b52]"}`}>{done ? `🎉 ${total} ${dir}!` : `Tap each ${word} to light it up — ${on.size}/${total}`}</p>
+      </div>
+      {done ? (
+        <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[58px] items-center justify-center rounded-[24px] border-2 border-[#5b21b6] bg-[#5b21b6] px-8 text-lg font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5">Confirm — {total} {dir}</button>
+      ) : null}
+    </Shell>
+  );
+}
+
+function ArrayAreaScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect: () => void; onWrong: () => void }) {
+  const gridW = task.gridW ?? 4, gridH = task.gridH ?? 3;
+  const unit = areaUnitLabel(task);
+  const spoken = areaUnitSpoken(task);
+  return (
+    <Shell badge={task.badgeLabel ?? "How Many Squares?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3 space-y-2">
+        {task.context ? <div className="text-center text-[12px] font-black uppercase tracking-[0.14em] text-[#a98b52]">{task.emoji} {task.context}</div> : null}
+        <ArrayGrid gridW={gridW} gridH={gridH} banded size={320} />
+        <ArrayReadout gridH={gridH} gridW={gridW} unit={unit} />
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        {(task.options ?? []).map((n) => (
+          <button key={n} type="button" onClick={() => (n === task.correctNumber ? onCorrect() : onWrong())} className="relative flex min-h-[64px] items-center justify-center rounded-[22px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]">
+            <span className="absolute right-1 top-1 z-10"><OptionReadAloudButton text={`${n} ${spoken}`} /></span>{n} {unit}
+          </button>
+        ))}
+      </div>
+    </Shell>
+  );
+}
+
+function AreaKeypad({ answer, unit, onCorrect, onWrong }: { answer: number; unit: string; onCorrect: () => void; onWrong: () => void }) {
+  const [typed, setTyped] = useState("");
+  const [status, setStatus] = useState<"idle" | "wrong">("idle");
+  const add = (d: string) => { setStatus("idle"); setTyped((c) => (c === "0" ? d : c.length >= 3 ? c : `${c}${d}`)); };
+  const check = () => { if (!typed) return; if (Number(typed) === answer) onCorrect(); else { setStatus("wrong"); onWrong(); } };
+  return (
+    <div className="rounded-[24px] border-2 border-[rgba(214,184,108,0.52)] bg-white p-3 shadow-sm">
+      <div className={`mb-2 flex items-center justify-center gap-2 rounded-[20px] border-2 px-4 py-2 ${status === "wrong" ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.58)] bg-[#fffaf0]"}`}>
+        <div className="min-w-[64px] text-center text-3xl font-black tabular-nums text-[#2c1c07]">{typed || "?"}</div>
+        <div className="text-xl font-black text-[#7c3aed]">{unit}</div>
+      </div>
+      <div className="mb-2 text-center text-xs font-bold text-[#6b4d23]">{status === "wrong" ? "Rows × columns — try again." : "Rows × columns = area."}</div>
+      <div className="grid grid-cols-3 gap-2">
+        {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((d) => (
+          <button key={d} type="button" onClick={() => add(d)} className="rounded-[16px] border-2 border-[rgba(214,184,108,0.58)] bg-[#fff7df] py-2.5 text-2xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5">{d}</button>
+        ))}
+        <button type="button" onClick={() => { setStatus("idle"); setTyped(""); }} className="rounded-[16px] border-2 border-[rgba(214,184,108,0.58)] bg-white py-2.5 text-sm font-black uppercase text-[#7c4a12] shadow-sm">Clear</button>
+        <button type="button" onClick={() => add("0")} className="rounded-[16px] border-2 border-[rgba(214,184,108,0.58)] bg-[#fff7df] py-2.5 text-2xl font-black text-[#2c1c07] shadow-sm">0</button>
+        <button type="button" onClick={check} className="rounded-[16px] border-2 border-[#7c3aed] bg-[#7c3aed] py-2.5 text-lg font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5">Go</button>
+      </div>
+    </div>
+  );
+}
+
+function CalcAreaScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect: () => void; onWrong: () => void }) {
+  const gridW = task.gridW ?? 4, gridH = task.gridH ?? 3;
+  return (
+    <Shell badge={task.badgeLabel ?? "Find the Area"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_280px]">
+        <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3 space-y-2">
+          {task.context ? <div className="text-center text-[12px] font-black uppercase tracking-[0.14em] text-[#a98b52]">{task.emoji} {task.context}</div> : null}
+          <ArrayGrid gridW={gridW} gridH={gridH} banded />
+          <ArrayReadout gridH={gridH} gridW={gridW} unit={areaUnitLabel(task)} />
+        </div>
+        <AreaKeypad answer={task.answerValue ?? gridW * gridH} unit={areaUnitLabel(task)} onCorrect={onCorrect} onWrong={onWrong} />
+      </div>
+    </Shell>
+  );
+}
+
+function SpotMistakeScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect: () => void; onWrong: () => void }) {
+  const gridW = task.gridW ?? 4, gridH = task.gridH ?? 3;
+  const unit = areaUnitLabel(task);
+  const spoken = areaUnitSpoken(task);
+  return (
+    <Shell badge={task.badgeLabel ?? "Professor Gauge's Mistake"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3 space-y-2">
+        <ArrayGrid gridW={gridW} gridH={gridH} banded size={320} />
+        <ArrayReadout gridH={gridH} gridW={gridW} unit={unit} />
+      </div>
+      {task.statement ? <div className="rounded-[18px] border border-[rgba(192,86,78,0.28)] bg-[rgba(252,224,224,0.5)] px-4 py-2 text-center text-lg font-black text-[#7c2d12]">{task.statement}</div> : null}
+      <div className="grid grid-cols-3 gap-3">
+        {(task.options ?? []).map((n) => (
+          <button key={n} type="button" onClick={() => (n === task.correctNumber ? onCorrect() : onWrong())} className="relative flex min-h-[64px] items-center justify-center rounded-[22px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]">
+            <span className="absolute right-1 top-1 z-10"><OptionReadAloudButton text={`${n} ${spoken}`} /></span>{n} {unit}
+          </button>
+        ))}
+      </div>
+    </Shell>
+  );
+}
+
+function ArrayIntroScene({ task, onCorrect }: { task: AreaTask; onCorrect: () => void }) {
+  const gridW = task.gridW ?? 5, gridH = task.gridH ?? 3;
+  return (
+    <Shell badge={task.badgeLabel ?? "Meazurex Mission"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="grid gap-3 md:grid-cols-2">
+        <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
+          <ArrayGrid gridW={gridW} gridH={gridH} reveal size={300} />
+        </div>
+        <div className="rounded-[24px] border border-[rgba(214,184,108,0.45)] bg-[rgba(255,250,240,0.96)] p-4">
+          <div className="mb-2 text-[12px] font-black uppercase tracking-[0.16em] text-[#a98b52]">Look for the pattern</div>
+          <p className="text-[17px] font-bold leading-snug text-[#2c1c07]">
+            Instead of counting every tile, see the <span className="font-black text-[#b45309]">rows</span> and <span className="font-black text-[#0f766e]">columns</span>.
+          </p>
+          <p className="mt-2 text-[15px] font-semibold leading-snug text-[#5a4423]">
+            Every row has the same number of squares — so <span className="font-black">rows × columns</span> tells you the total.
+          </p>
+          <div className="mt-3"><ArrayReadout gridH={gridH} gridW={gridW} unit={areaUnitLabel(task)} showTotal /></div>
+        </div>
+      </div>
+      <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[60px] items-center justify-center rounded-[24px] border-2 border-[rgba(180,120,20,0.55)] bg-[#fffaf0] px-8 text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]">Let&apos;s build! →</button>
+    </Shell>
+  );
+}
+
 export function MeasurelandsAreaCard({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect: () => void; onWrong: () => void }) {
   switch (task.scene) {
-    case "intro": return <IntroScene task={task} onCorrect={onCorrect} />;
+    case "intro": return task.arrayReveal ? <ArrayIntroScene task={task} onCorrect={onCorrect} /> : <IntroScene task={task} onCorrect={onCorrect} />;
+    case "rows": return <RowColScene task={task} dir="rows" onCorrect={onCorrect} />;
+    case "columns": return <RowColScene task={task} dir="columns" onCorrect={onCorrect} />;
+    case "arrayArea": return <ArrayAreaScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+    case "calcArea": return <CalcAreaScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+    case "spotMistake": return <SpotMistakeScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "sameDiff": return <SameDiffScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "whichPart": return <WhichPartScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "cover": return <CoverScene task={task} onCorrect={onCorrect} />;

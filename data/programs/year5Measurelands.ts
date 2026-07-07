@@ -71,12 +71,12 @@ const YEAR5_MEASURELANDS_RAW: WeekPlan[] = [
   {
     id: "y5-measurement-w4",
     week: 4,
-    topic: "Area Problems",
+    topic: "Area Architects",
     curriculum: ["AC9M5M02"],
     lessons: [
-      buildLesson(4, 1, "Area of Rectangles", "Area: calculate the area of rectangles using metric units.", ["Rectangle area", "Rows and columns", "Square units"], ["AC9M5M02"]),
-      buildLesson(4, 2, "Irregular Areas", "Area: work out the area of irregular shapes using known parts.", ["Irregular area", "Split shapes", "Combine areas"], ["AC9M5M02"]),
-      buildLesson(4, 3, "Area Design Problems", "Area: solve design problems that require area reasoning.", ["Design problems", "Covered space", "Area decisions"], ["AC9M5M02"]),
+      buildLesson(4, 1, "Rows and Columns", "Area: see a rectangle as equal rows and columns (the array model).", ["Rows and columns", "Arrays", "Square units"], ["AC9M5M02"]),
+      buildLesson(4, 2, "Find the Area", "Area: calculate rectangle area efficiently as rows × columns.", ["Rows × columns", "Efficient area", "Explain thinking"], ["AC9M5M02"]),
+      buildLesson(4, 3, "Area Problems", "Area: solve practical design problems using the array strategy.", ["Design problems", "Covered space", "Architect missions"], ["AC9M5M02"]),
     ],
   },
   {

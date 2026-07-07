@@ -1579,12 +1579,21 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "whichPart" | "cover" | "countSquares" | "compareArea" | "orderArea" | "buildArea" | "sameArea" | "sameDiff";
+      scene: "intro" | "whichPart" | "cover" | "countSquares" | "compareArea" | "orderArea" | "buildArea" | "sameArea" | "sameDiff" | "rows" | "columns" | "arrayArea" | "calcArea" | "spotMistake";
       cells?: Array<[number, number]>;
       gridW?: number;
       gridH?: number;
       label?: string;
       emoji?: string;
+      /** L5 W4 (Area Architects): a short design context line, e.g. "classroom
+       *  carpet". Shown above the rectangle. */
+      context?: string;
+      /** L5 W4: animate the rows-then-columns array reveal in the intro. */
+      arrayReveal?: boolean;
+      /** L5 W4 "calcArea": typed answer (rows × columns). */
+      answerValue?: number;
+      /** L5 W4 "spotMistake": Professor Gauge's wrong area claim. */
+      statement?: string;
       /** Formal square unit for Level 4 (each tile = 1 cm² or 1 m²). Level 3
        *  preview leaves this unset and reads "square units". */
       areaUnit?: "cm²" | "m²";

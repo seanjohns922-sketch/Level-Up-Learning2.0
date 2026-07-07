@@ -45,6 +45,21 @@ import {
   generateY5MeasurelandsWeek3Lesson3Task,
   resetY5MeasurelandsWeek3Lesson3TaskSessionState,
 } from "@/data/activities/year5Measurelands/week3Lesson3";
+import {
+  buildY5MeasurelandsWeek4Lesson1QuizTasks,
+  generateY5MeasurelandsWeek4Lesson1Task,
+  resetY5MeasurelandsWeek4Lesson1TaskSessionState,
+} from "@/data/activities/year5Measurelands/week4Lesson1";
+import {
+  buildY5MeasurelandsWeek4Lesson2QuizTasks,
+  generateY5MeasurelandsWeek4Lesson2Task,
+  resetY5MeasurelandsWeek4Lesson2TaskSessionState,
+} from "@/data/activities/year5Measurelands/week4Lesson2";
+import {
+  buildY5MeasurelandsWeek4Lesson3QuizTasks,
+  generateY5MeasurelandsWeek4Lesson3Task,
+  resetY5MeasurelandsWeek4Lesson3TaskSessionState,
+} from "@/data/activities/year5Measurelands/week4Lesson3";
 
 // Measurelands Level 5 (Year 5) — registry.
 //
@@ -167,6 +182,42 @@ const BUILT_LESSONS: Record<
       "Use perimeter to solve survey missions",
     ],
     completionTitle: "Perimeter Problems Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+  },
+  "y5-measurement-w4-l1": {
+    generate: generateY5MeasurelandsWeek4Lesson1Task,
+    reset: resetY5MeasurelandsWeek4Lesson1TaskSessionState,
+    quizContributionBuilder: buildY5MeasurelandsWeek4Lesson1QuizTasks,
+    practisedSkills: [
+      "Recognise the rows in a rectangle",
+      "Recognise the columns in a rectangle",
+      "Use rows and columns to find how many squares",
+    ],
+    completionTitle: "Rows and Columns Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+  },
+  "y5-measurement-w4-l2": {
+    generate: generateY5MeasurelandsWeek4Lesson2Task,
+    reset: resetY5MeasurelandsWeek4Lesson2TaskSessionState,
+    quizContributionBuilder: buildY5MeasurelandsWeek4Lesson2QuizTasks,
+    practisedSkills: [
+      "Calculate area as rows × columns",
+      "Choose the correct area",
+      "Spot the add-instead-of-multiply mistake",
+    ],
+    completionTitle: "Find the Area Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+  },
+  "y5-measurement-w4-l3": {
+    generate: generateY5MeasurelandsWeek4Lesson3Task,
+    reset: resetY5MeasurelandsWeek4Lesson3TaskSessionState,
+    quizContributionBuilder: buildY5MeasurelandsWeek4Lesson3QuizTasks,
+    practisedSkills: [
+      "Solve practical area problems",
+      "Use area to work out surfaces and carpet",
+      "Apply the array strategy to real spaces",
+    ],
+    completionTitle: "Area Problems Complete!",
     unlockMessage: "Weekly Quiz unlocked.",
   },
 };

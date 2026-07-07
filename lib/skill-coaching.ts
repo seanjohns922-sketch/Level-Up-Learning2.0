@@ -279,6 +279,9 @@ const TABLE: Record<string, SkillCoaching> = {
   ml_y5_w3_l1: { tip: "If opposite sides are equal, measure once and use the value twice." },
   ml_y5_w3_l2: { tip: "Follow the entire outside boundary before you begin adding." },
   ml_y5_w3_l3: { tip: "Perimeter helps us work out the length of fences, paths and boundaries." },
+  ml_y5_w4_l1: { tip: "Look for rows and columns before you start counting." },
+  ml_y5_w4_l2: { tip: "Every row has the same number of squares." },
+  ml_y5_w4_l3: { tip: "Architects use area to work out how much space needs to be covered." },
 };
 
 const FALLBACK: SkillCoaching = {
@@ -402,6 +405,9 @@ const LESSON_KEY_MAP: Record<string, string> = {
   "y5-measurement-w3-l1": "ml_y5_w3_l1",
   "y5-measurement-w3-l2": "ml_y5_w3_l2",
   "y5-measurement-w3-l3": "ml_y5_w3_l3",
+  "y5-measurement-w4-l1": "ml_y5_w4_l1",
+  "y5-measurement-w4-l2": "ml_y5_w4_l2",
+  "y5-measurement-w4-l3": "ml_y5_w4_l3",
 };
 
 function normalizeLessonId(lessonId: string): string {
