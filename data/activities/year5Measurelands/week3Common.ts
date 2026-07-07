@@ -31,42 +31,40 @@ function withContext(s: Shape): Shape {
   return { ...s, theme: c.theme, shapeName: c.name };
 }
 
-/** A 2-step staircase (top-right), 8 labelled sides, perimeter = 2·(W+H). */
-export function makeStep(W: number, H: number, t: number, r: number, unit: Unit): Shape {
-  return withContext({
-    poly: [[0, 0], [W, 0], [W, H - 2 * r], [W - t, H - 2 * r], [W - t, H - r], [W - 2 * t, H - r], [W - 2 * t, H], [0, H]],
-    sideLabels: [W, H - 2 * r, t, r, t, r, W - 2 * t, H],
-    perimeter: 2 * (W + H),
-    unit,
-    theme: "garden",
-    shapeName: "garden",
-  });
+// Keep the bounding box within a pleasant aspect ratio so shapes read clearly.
+function balancedWH(min: number, max: number): [number, number] {
+  for (let i = 0; i < 12; i += 1) {
+    const w = randRange(min, max), h = randRange(min, max);
+    if (Math.max(w, h) / Math.min(w, h) <= 1.7) return [w, h];
+  }
+  const s = randRange(min, max);
+  return [s, s];
 }
 
 /** A regular shape (rectangle or square) with an L5 survey context. */
-export function regularShape(min = 6, max = 22): Shape {
+export function regularShape(min = 8, max = 18): Shape {
   if (randInt(3) === 0) return withContext(makeSquare(randRange(min, max), "m"));
-  let w = randRange(min, max), h = randRange(min, max);
-  if (w === h) h = h + 1 <= max ? h + 1 : h - 1;
+  const [w, h0] = balancedWH(min, max);
+  const h = w === h0 ? (h0 + 1 <= max ? h0 + 1 : h0 - 1) : h0;
   return withContext(makeRect(w, h, "m"));
 }
 
 /** A non-square rectangle (for "measure once, use twice"). */
-export function rectShape(min = 6, max = 20): Shape {
-  let w = randRange(min, max), h = randRange(min, max);
-  if (w === h) h = h + 1 <= max ? h + 1 : h - 1;
+export function rectShape(min = 8, max = 16): Shape {
+  const [w, h0] = balancedWH(min, max);
+  const h = w === h0 ? (h0 + 1 <= max ? h0 + 1 : h0 - 1) : h0;
   return withContext(makeRect(w, h, "m"));
 }
 
-/** An irregular shape: an L-shape or a 2-step staircase, all sides labelled. */
-export function irregularShape(min = 8, max = 20): Shape {
-  if (randInt(2) === 0) {
-    const W = randRange(min, max), H = randRange(min, max);
-    const a = randRange(2, Math.max(2, Math.floor(W / 2)));
-    const b = randRange(2, Math.max(2, Math.floor(H / 2)));
-    return withContext(makeL(W, H, a, b, "m"));
-  }
-  const t = randRange(2, 4), r = randRange(2, 4);
-  const W = randRange(2 * t + 3, max), H = randRange(2 * r + 3, max);
-  return makeStep(W, H, t, r, "m");
+/** An L-shape (6 sides, all a good size) with the notch bitten from any corner
+ *  — proportionate and clean, so every side is easy to read. */
+export function irregularShape(min = 12, max = 18): Shape {
+  const [W, H] = balancedWH(min, max);
+  const a = randRange(3, Math.min(7, W - 4));
+  const b = randRange(3, Math.min(7, H - 4));
+  const base = makeL(W, H, a, b, "m");
+  // Mirror into one of four corner orientations (edge lengths are unchanged).
+  const flipX = randInt(2) === 0, flipY = randInt(2) === 0;
+  const poly = base.poly.map(([x, y]) => [flipX ? W - x : x, flipY ? H - y : y] as [number, number]);
+  return withContext({ ...base, poly });
 }

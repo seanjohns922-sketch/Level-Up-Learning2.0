@@ -91,8 +91,23 @@ function useGeometry(poly: Array<[number, number]>, maxW = 300, maxH = 210) {
       const len = Math.hypot(ex, ey) || 1;
       let nx = -ey / len, ny = ex / len; // perpendicular
       if (inside(mx + nx * 3, my + ny * 3)) { nx = -nx; ny = -ny; } // flip to point outward
-      return { a, b, mx, my, ox: mx + nx * 20, oy: my + ny * 20 };
+      return { a, b, mx, my, ox: mx + nx * 24, oy: my + ny * 24 };
     });
+    // Nudge overlapping labels apart (concave notches push two labels together).
+    for (let iter = 0; iter < 4; iter += 1) {
+      for (let i = 0; i < edges.length; i += 1) {
+        for (let j = i + 1; j < edges.length; j += 1) {
+          const dx = edges[j]!.ox - edges[i]!.ox, dy = edges[j]!.oy - edges[i]!.oy;
+          const d = Math.hypot(dx, dy);
+          const minGap = Math.abs(dx) > Math.abs(dy) ? 40 : 26;
+          if (d > 0.01 && d < minGap) {
+            const push = (minGap - d) / 2, ux = dx / d, uy = dy / d;
+            edges[i]!.ox -= ux * push; edges[i]!.oy -= uy * push;
+            edges[j]!.ox += ux * push; edges[j]!.oy += uy * push;
+          }
+        }
+      }
+    }
     return { pts, edges, svgW, svgH };
   }, [poly, maxW, maxH]);
 }
@@ -150,9 +165,9 @@ function SurveyorShape({
                 />
               ) : null}
               {shown ? (
-                <g>
-                  <rect x={e.ox - 20} y={e.oy - 11} width={40} height={22} rx={7} fill="#fffaf0" stroke="rgba(214,184,108,0.7)" strokeWidth={1} />
-                  <text x={e.ox} y={e.oy + 5} textAnchor="middle" fontSize={12} fontWeight={900} fill="#2c1c07">{task.sideLabels[i]}{task.unit}</text>
+                <g style={{ filter: "drop-shadow(0 1.5px 1.5px rgba(120,80,20,0.22))" }}>
+                  <rect x={e.ox - 19} y={e.oy - 12} width={38} height={24} rx={11} fill="#fffdf8" stroke="rgba(201,150,42,0.85)" strokeWidth={1.5} />
+                  <text x={e.ox} y={e.oy + 5} textAnchor="middle" fontSize={12.5} fontWeight={900} fill="#2c1c07">{task.sideLabels[i]}{task.unit}</text>
                 </g>
               ) : tappable && !revealed?.has(i) ? (
                 <text x={e.ox} y={e.oy + 5} textAnchor="middle" fontSize={16} fontWeight={900} fill="#7c4a12">?</text>
