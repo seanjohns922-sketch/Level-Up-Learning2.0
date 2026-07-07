@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import { MeasurelandsAngle } from "@/components/measurelands/MeasurelandsAngle";
@@ -169,204 +169,101 @@ function LearnScene({ task, onCorrect }: { task: ProtractorTask; onCorrect: () =
 }
 
 function IntroScene({ task, onCorrect }: { task: ProtractorTask; onCorrect: () => void }) {
-  const marks = [30, 45, 90, 135, 180];
   return (
     <Shell badge={task.badgeLabel ?? "Meazurex Mission"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      <style>{"@keyframes mlSlideIn{0%{opacity:0;transform:translateY(16px) scale(.88)}100%{opacity:1;transform:none}}"}</style>
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
-        {marks.map((a, i) => (
-          <div key={a} style={{ animation: "mlSlideIn .45s ease-out both", animationDelay: `${i * 130}ms` }} className="flex flex-col items-center rounded-[18px] border border-[rgba(214,184,108,0.5)] bg-[rgba(255,252,245,0.96)] p-2">
-            <MeasurelandsAngle turn={a} arm1={60} arm2={60} rightMark={a === 90} size={112} />
-            <span className="text-base font-black text-[#5b21b6]">{a}°</span>
+      <div className="grid gap-3 sm:grid-cols-3">
+        {[30, 90, 135].map((a) => (
+          <div key={a} className="flex flex-col items-center rounded-[20px] border border-[rgba(214,184,108,0.5)] bg-[rgba(255,252,245,0.96)] p-2">
+            <MeasurelandsAngle turn={a} arm1={80} arm2={80} rightMark={a === 90} size={150} />
+            <span className="text-lg font-black text-[#5b21b6]">{a}°</span>
           </div>
         ))}
       </div>
-      <p className="text-center text-[15px] font-bold text-[#2c1c07]">Professor Gauge: engineers don&apos;t guess randomly — they compare new angles to <span className="font-black text-[#5b21b6]">benchmark angles</span>.</p>
+      <p className="text-center text-[15px] font-bold text-[#2c1c07]">Before engineers measure, they <span className="font-black text-[#5b21b6]">estimate</span> — compare to a right angle (90°) and a straight angle (180°).</p>
       <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[60px] items-center justify-center rounded-[24px] border-2 border-[rgba(180,120,20,0.55)] bg-[#fffaf0] px-8 text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]">Let&apos;s estimate! →</button>
     </Shell>
   );
 }
 
-/* ── L1 estimation game (Alien-Angles style): stepper + closeness feedback ── */
-function starCount(diff: number): number { return diff <= 5 ? 3 : diff <= 10 ? 2 : diff <= 15 ? 1 : 0; }
-function closenessMsg(diff: number): string { return diff === 0 ? "Bang on!" : diff <= 5 ? "Brilliant!" : diff <= 10 ? "Great estimating!" : diff <= 15 ? "Close!" : "Good try — keep going!"; }
-function avgMsg(avg: number): string { return avg <= 5 ? "Master estimator! 🏅" : avg <= 10 ? "Excellent estimating!" : avg <= 15 ? "Good work!" : "Keep practising — you'll get sharper!"; }
-
-function StarRow({ n }: { n: number }) {
-  return (
-    <div className="flex gap-1 text-2xl leading-none">
-      {[0, 1, 2].map((i) => <span key={i} className={i < n ? "text-[#f59e0b]" : "text-[rgba(214,184,108,0.35)]"}>★</span>)}
-    </div>
-  );
+/* ── L3 Estimate — Alien Angles: aim the beam blind, then reveal the protractor ── */
+// Shared geometry with MeasurelandsProtractor so the protractor lines up exactly
+// with the aimed ray when it appears on reveal.
+const AVX = 240, AVY = 236, AR = 196;
+function apt(deg: number, len: number): [number, number] {
+  const r = (deg * Math.PI) / 180;
+  return [AVX + len * Math.cos(r), AVY - len * Math.sin(r)];
 }
+function alienStars(diff: number): number { return diff <= 3 ? 3 : diff <= 8 ? 2 : diff <= 15 ? 1 : 0; }
+function alienMedal(diff: number): string { return diff === 0 ? "🎯 Bullseye!" : diff <= 3 ? "🎯 Brilliant aim!" : diff <= 8 ? "👏 Great estimating!" : diff <= 15 ? "👍 Close!" : "Keep practising your angle sense!"; }
 
-function AngleStepper({ value, set }: { value: number; set: (n: number) => void }) {
-  const clamp = (n: number) => Math.max(0, Math.min(180, n));
-  const btn = "flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#5b21b6] bg-white text-3xl font-black text-[#5b21b6] shadow-sm transition hover:-translate-y-0.5 active:scale-95";
-  return (
-    <div className="flex w-full flex-col items-center gap-2">
-      <div className="flex items-center gap-4">
-        <button type="button" onClick={() => set(clamp(value - 5))} className={btn} aria-label="Decrease">−</button>
-        <div className="w-[150px] text-center text-5xl font-black tabular-nums text-[#5b21b6]">{value}°</div>
-        <button type="button" onClick={() => set(clamp(value + 5))} className={btn} aria-label="Increase">+</button>
-      </div>
-      <input type="range" min={0} max={180} step={1} value={value} onChange={(e) => set(Number(e.target.value))} className="h-2 w-full max-w-[420px] cursor-pointer appearance-none rounded-full bg-[rgba(91,33,182,0.18)] accent-[#5b21b6]" />
-      <div className="flex w-full max-w-[420px] justify-between text-[11px] font-black text-[#a98b52]"><span>0°</span><span>90°</span><span>180°</span></div>
-    </div>
-  );
-}
+function AlienScene({ task, onCorrect }: { task: ProtractorTask; onCorrect: () => void }) {
+  const target = task.targetDeg ?? 45;
+  const [deg, setDeg] = useState(90);
+  const [revealed, setRevealed] = useState(false);
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  const dragging = useRef(false);
 
-function EstimateReveal({ guess, actual }: { guess: number; actual: number }) {
-  const diff = Math.abs(guess - actual);
-  return (
-    <div className="flex flex-col items-center gap-1.5 rounded-[22px] border-2 border-[#16a34a] bg-[rgba(22,163,74,0.08)] px-4 py-3 text-center">
-      <StarRow n={starCount(diff)} />
-      <div className="text-lg font-black text-[#2c1c07]">You guessed <span className="text-[#5b21b6]">{guess}°</span> · it was <span className="text-[#16a34a]">{actual}°</span></div>
-      <div className="text-base font-black text-[#16a34a]">{diff === 0 ? "Spot on!" : `You were ${diff}° away — ${closenessMsg(diff)}`}</div>
-    </div>
-  );
-}
-
-function PrimaryBtn({ label, onClick, tone = "purple" }: { label: string; onClick: () => void; tone?: "purple" | "green" }) {
-  const c = tone === "green" ? "border-[#16a34a] bg-[#16a34a]" : "border-[#5b21b6] bg-[#5b21b6]";
-  return <button type="button" onClick={onClick} className={`mx-auto flex min-h-[58px] items-center justify-center rounded-[24px] border-2 ${c} px-10 text-xl font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5`}>{label}</button>;
-}
-
-function EstimateStepperScene({ task, onCorrect, badge }: { task: ProtractorTask; onCorrect: () => void; badge: string }) {
-  const actual = task.angle ?? 45;
-  const [guess, setGuess] = useState(90);
-  const [locked, setLocked] = useState(false);
-  return (
-    <Shell badge={task.badgeLabel ?? badge} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      <div className="flex flex-col items-center rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
-        <MeasurelandsAngle turn={actual} arm1={120} arm2={120} rightMark={locked && actual === 90} size={224} />
-      </div>
-      {!locked ? (
-        <>
-          <AngleStepper value={guess} set={setGuess} />
-          <PrimaryBtn label={`Lock in ${guess}° →`} onClick={() => setLocked(true)} />
-        </>
-      ) : (
-        <>
-          <EstimateReveal guess={guess} actual={actual} />
-          <PrimaryBtn label="Next →" onClick={onCorrect} tone="green" />
-        </>
-      )}
-    </Shell>
-  );
-}
-
-function CompareEstimateScene({ task, onCorrect, onWrong }: { task: ProtractorTask; onCorrect: () => void; onWrong: () => void }) {
-  const actual = task.angle ?? 60;
-  const bench = task.benchmark ?? 90;
-  const correctCmp = actual < bench ? "smaller" : actual > bench ? "larger" : "equal";
-  const [phase, setPhase] = useState<"cmp" | "est">("cmp");
-  const [wrong, setWrong] = useState<string | null>(null);
-  const [guess, setGuess] = useState(90);
-  const [locked, setLocked] = useState(false);
-  const pick = (c: string) => {
-    if (c === correctCmp) { setWrong(null); setPhase("est"); }
-    else { setWrong(c); onWrong(); window.setTimeout(() => setWrong(null), 600); }
+  const degFromEvent = (e: React.PointerEvent) => {
+    const svg = svgRef.current;
+    if (!svg) return deg;
+    const rect = svg.getBoundingClientRect();
+    const px = ((e.clientX - rect.left) / rect.width) * 480;
+    const py = ((e.clientY - rect.top) / rect.height) * 300;
+    const d = (Math.atan2(AVY - py, px - AVX) * 180) / Math.PI;
+    return Math.max(0, Math.min(180, Math.round(d)));
   };
+  const move = (e: React.PointerEvent) => { if (dragging.current && !revealed) setDeg(degFromEvent(e)); };
+
+  const diff = Math.abs(deg - target);
+  const [bx, by] = apt(0, AR);
+  const [ax, ay] = apt(deg, AR - 6);
+  const [tx, ty] = apt(target, AR - 6);
+  const [lx, ly] = apt(target, AR + 30);
+
   return (
-    <Shell badge={task.badgeLabel ?? "Bigger or Smaller?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      <div className="flex items-center justify-center gap-4 rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
-        <div className="flex flex-col items-center">
-          <MeasurelandsAngle turn={actual} arm1={95} arm2={95} size={168} />
-          <span className="text-[12px] font-black text-[#5b21b6]">this angle</span>
-        </div>
-        <div className="text-2xl font-black text-[#a98b52]">vs</div>
-        <div className="flex flex-col items-center opacity-90">
-          <MeasurelandsAngle turn={bench} arm1={95} arm2={95} rightMark size={168} />
-          <span className="text-[12px] font-black text-[#a98b52]">{bench}° · right angle</span>
-        </div>
+    <Shell badge={task.badgeLabel ?? "Alien Angles"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="mx-auto flex items-center gap-2 rounded-full border-2 border-[#5b21b6] bg-white px-5 py-1.5 text-xl font-black text-[#5b21b6] shadow-sm">
+        🎯 Aim for {target}°
       </div>
-      {phase === "cmp" ? (
-        <div className="grid grid-cols-3 gap-3">
-          {(["smaller", "equal", "larger"] as const).map((c) => (
-            <button key={c} type="button" onClick={() => pick(c)} className={`min-h-[60px] rounded-[22px] border-2 px-3 text-base font-black capitalize text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 ${wrong === c ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[#fffaf0]"}`}>{c}</button>
-          ))}
+
+      {!revealed ? (
+        <div className="flex justify-center rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-2">
+          <svg ref={svgRef} viewBox="0 0 480 300" width="100%" style={{ maxWidth: 460, touchAction: "none" }} role="img" aria-label="aim the beam"
+            onPointerMove={move} onPointerUp={() => { dragging.current = false; }} onPointerLeave={() => { dragging.current = false; }}>
+            {/* baseline (launch pad) */}
+            <line x1={AVX} y1={AVY} x2={bx} y2={by} stroke="#2c1c07" strokeWidth={6} strokeLinecap="round" />
+            {/* wedge near vertex */}
+            <path d={`M ${apt(0, 46)[0]} ${apt(0, 46)[1]} A 46 46 0 0 0 ${apt(deg, 46)[0]} ${apt(deg, 46)[1]}`} fill="none" stroke="#7c3aed" strokeWidth={3} />
+            {/* aimed beam */}
+            <line x1={AVX} y1={AVY} x2={ax} y2={ay} stroke="#7c3aed" strokeWidth={7} strokeLinecap="round" />
+            {/* drag handle */}
+            <circle cx={ax} cy={ay} r={17} fill="#7c3aed" stroke="#fff" strokeWidth={3} style={{ cursor: "grab" }}
+              onPointerDown={(e) => { dragging.current = true; (e.target as Element).setPointerCapture?.(e.pointerId); }} />
+            <circle cx={AVX} cy={AVY} r={7} fill="#5b21b6" stroke="#fff" strokeWidth={2} />
+          </svg>
         </div>
-      ) : !locked ? (
-        <>
-          <p className="text-center text-sm font-black text-[#16a34a]">✓ {correctCmp} than {bench}°. Now estimate its size.</p>
-          <AngleStepper value={guess} set={setGuess} />
-          <PrimaryBtn label={`Lock in ${guess}° →`} onClick={() => setLocked(true)} />
-        </>
       ) : (
-        <>
-          <EstimateReveal guess={guess} actual={actual} />
-          <PrimaryBtn label="Next →" onClick={onCorrect} tone="green" />
-        </>
+        <div className="relative mx-auto" style={{ maxWidth: 460 }}>
+          <MeasurelandsProtractor angle={deg} baselineSide="right" guidance="full" showReading size={460} />
+          <svg viewBox="0 0 480 300" width="100%" className="pointer-events-none absolute inset-0" style={{ maxWidth: 460 }}>
+            {/* target ray */}
+            <line x1={AVX} y1={AVY} x2={tx} y2={ty} stroke="#16a34a" strokeWidth={4} strokeDasharray="8 6" strokeLinecap="round" />
+            <rect x={lx - 27} y={ly - 15} width={54} height={26} rx={8} fill="#16a34a" />
+            <text x={lx} y={ly + 4} textAnchor="middle" fontSize={15} fontWeight={900} fill="#fff">{target}°</text>
+          </svg>
+        </div>
       )}
-    </Shell>
-  );
-}
 
-function StreakScene({ task, onCorrect }: { task: ProtractorTask; onCorrect: () => void }) {
-  const angles = task.angles && task.angles.length ? task.angles : [30, 60, 90, 120, 45];
-  const total = task.rounds ?? angles.length;
-  const [round, setRound] = useState(0);
-  const [guess, setGuess] = useState(90);
-  const [locked, setLocked] = useState(false);
-  const [diffs, setDiffs] = useState<number[]>([]);
-  const [best, setBest] = useState<number | null>(null);
-  const [isNewBest, setIsNewBest] = useState(false);
-
-  if (round >= total) {
-    const avg = diffs.length ? Math.round(diffs.reduce((s, x) => s + x, 0) / diffs.length) : 0;
-    const totalStars = diffs.reduce((s, d) => s + starCount(d), 0);
-    return (
-      <Shell badge={task.badgeLabel ?? "Beat Your Best"} prompt="Mission complete!" speakText={`You finished. Your average was ${avg} degrees away.`}>
-        <div className="flex flex-col items-center gap-3 rounded-[26px] border-2 border-[#16a34a] bg-[rgba(22,163,74,0.08)] p-5 text-center">
-          <div className="text-3xl">{totalStars > 0 ? "⭐".repeat(Math.min(totalStars, 5)) : "✨"}</div>
-          <div className="text-3xl font-black text-[#5b21b6]">Average: {avg}° away</div>
-          <div className="text-lg font-black text-[#2c1c07]">{totalStars} / {total * 3} stars · {avgMsg(avg)}</div>
-          {isNewBest ? (
-            <div className="rounded-full bg-[#16a34a] px-4 py-1.5 text-base font-black text-white">🏆 New best!</div>
-          ) : best !== null ? (
-            <div className="text-sm font-black text-[#a98b52]">Your best: {best}° away</div>
-          ) : null}
-        </div>
-        <PrimaryBtn label="Finish →" onClick={onCorrect} tone="green" />
-      </Shell>
-    );
-  }
-
-  const actual = angles[round % angles.length] ?? 90;
-  const starsSoFar = diffs.reduce((s, d) => s + starCount(d), 0);
-  const next = () => {
-    const nextDiffs = [...diffs, Math.abs(guess - actual)];
-    setDiffs(nextDiffs);
-    setLocked(false);
-    setGuess(90);
-    if (round + 1 >= total) {
-      const avg = Math.round(nextDiffs.reduce((s, x) => s + x, 0) / nextDiffs.length);
-      let prev: number | null = null;
-      try { const raw = window.localStorage.getItem("ml_y5_angle_best_avg"); prev = raw ? Number(raw) : null; } catch { prev = null; }
-      if (prev === null || avg < prev) { try { window.localStorage.setItem("ml_y5_angle_best_avg", String(avg)); } catch { /* ignore */ } setIsNewBest(true); setBest(avg); }
-      else setBest(prev);
-    }
-    setRound(round + 1);
-  };
-  return (
-    <Shell badge={task.badgeLabel ?? "Beat Your Best"} prompt={`Round ${round + 1} of ${total} — estimate!`} speakText={task.speakText ?? task.prompt}>
-      <div className="flex items-center justify-between px-1">
-        <div className="flex gap-1">{Array.from({ length: total }).map((_, i) => <span key={i} className={`h-2.5 w-6 rounded-full ${i < round ? "bg-[#16a34a]" : i === round ? "bg-[#5b21b6]" : "bg-[rgba(124,58,237,0.2)]"}`} />)}</div>
-        <div className="text-sm font-black text-[#f59e0b]">★ {starsSoFar}</div>
-      </div>
-      <div className="flex flex-col items-center rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
-        <MeasurelandsAngle turn={actual} arm1={116} arm2={116} rightMark={locked && actual === 90} size={204} />
-      </div>
-      {!locked ? (
-        <>
-          <AngleStepper value={guess} set={setGuess} />
-          <PrimaryBtn label={`Lock in ${guess}° →`} onClick={() => setLocked(true)} />
-        </>
+      {!revealed ? (
+        <button type="button" onClick={() => setRevealed(true)} className="mx-auto flex min-h-[60px] items-center justify-center rounded-[24px] border-2 border-[#5b21b6] bg-[#5b21b6] px-10 text-xl font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5">Estimate! →</button>
       ) : (
         <>
-          <EstimateReveal guess={guess} actual={actual} />
-          <PrimaryBtn label={round + 1 >= total ? "See results →" : "Next angle →"} onClick={next} tone="green" />
+          <div className="flex flex-col items-center gap-1.5 rounded-[22px] border-2 border-[#16a34a] bg-[rgba(22,163,74,0.08)] px-4 py-3 text-center">
+            <div className="flex gap-1 text-2xl leading-none">{[0, 1, 2].map((i) => <span key={i} className={i < alienStars(diff) ? "text-[#f59e0b]" : "text-[rgba(214,184,108,0.35)]"}>★</span>)}</div>
+            <div className="text-lg font-black text-[#2c1c07]">Target <span className="text-[#16a34a]">{target}°</span> · you aimed <span className="text-[#7c3aed]">{deg}°</span></div>
+            <div className="text-base font-black text-[#16a34a]">{diff === 0 ? "Spot on!" : `${diff}° away`} — {alienMedal(diff)}</div>
+          </div>
+          <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[60px] items-center justify-center rounded-[24px] border-2 border-[#16a34a] bg-[#16a34a] px-10 text-xl font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5">Next →</button>
         </>
       )}
     </Shell>
@@ -377,9 +274,7 @@ export function MeasurelandsProtractorCard({ task, onCorrect, onWrong }: { task:
   switch (task.scene) {
     case "intro": return <IntroScene task={task} onCorrect={onCorrect} />;
     case "learn": return <LearnScene task={task} onCorrect={onCorrect} />;
-    case "estimateStepper": return <EstimateStepperScene task={task} onCorrect={onCorrect} badge="Estimate It" />;
-    case "compareEstimate": return <CompareEstimateScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
-    case "streak": return <StreakScene task={task} onCorrect={onCorrect} />;
+    case "alien": return <AlienScene task={task} onCorrect={onCorrect} />;
     case "estimate": return <EstimateScene task={task} onCorrect={onCorrect} onWrong={onWrong} badge="Estimate the Angle" />;
     case "closest": return <EstimateScene task={task} onCorrect={onCorrect} onWrong={onWrong} badge="Which Is Closest?" />;
     case "guess": return <GuessScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;

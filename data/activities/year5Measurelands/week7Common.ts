@@ -117,63 +117,22 @@ export function guessTask(): ProtractorTask {
   };
 }
 
-// ── Lesson 1 (game): estimate with a stepper — Alien-Angles style ──────────────
-// Whole angles that read cleanly and give a satisfying spread of benchmarks.
-const GAME_ANGLES = [20, 30, 35, 40, 45, 55, 60, 65, 70, 75, 80, 100, 110, 115, 120, 125, 130, 135, 145, 150, 160];
+// ── Lesson 3 (Alien Angles game): aim the beam at a target angle ──────────────
+// Given a target in degrees, the student drags a bare ray to where they think
+// that angle is — NO protractor, NO markings, NO help. On "Estimate" the
+// protractor appears behind the angle so they see visually how close they were.
+const ALIEN_ANGLES = [20, 25, 30, 35, 40, 50, 55, 60, 65, 70, 75, 80, 100, 105, 110, 115, 120, 125, 130, 135, 140, 150, 155, 160];
 
-// Benchmark angles taught in the intro and used as reference throughout.
-export function angleIntroTask(): ProtractorTask {
+export function alienTask(): ProtractorTask {
+  const target = choose(ALIEN_ANGLES);
   return {
     kind: "protractor",
-    scene: "intro",
-    prompt: "Meet the benchmark angles.",
-    speakText:
-      "Professor Gauge says: engineers don't guess randomly. They compare new angles to familiar benchmark angles — 30, 45, 90, 135 and 180 degrees. Learn these, then estimate.",
-    badgeLabel: "Meazurex Mission",
-    feedback: { correct: "Let's estimate!", wrong: "Let's estimate!" },
-  };
-}
-
-// Activity A — Estimate It: one angle, a stepper, reveal the difference.
-export function estimateStepperTask(): ProtractorTask {
-  const angle = choose(GAME_ANGLES);
-  return {
-    kind: "protractor",
-    scene: "estimateStepper",
-    angle,
-    prompt: "What angle do you think this is?",
-    speakText: "Estimate this angle. Compare it to a right angle — 90 degrees — then lock in your guess.",
-    badgeLabel: "Estimate It",
-    feedback: { correct: `It was ${angle}°.`, wrong: `It was ${angle}°.` },
-  };
-}
-
-// Activity B — Bigger or Smaller?: judge against 90°, then estimate.
-export function compareEstimateTask(): ProtractorTask {
-  const angle = choose(GAME_ANGLES.filter((a) => Math.abs(a - 90) >= 15));
-  return {
-    kind: "protractor",
-    scene: "compareEstimate",
-    angle,
-    benchmark: 90,
-    prompt: "Smaller, equal, or larger than a right angle?",
-    speakText: "Is this angle smaller than, equal to, or larger than a right angle — 90 degrees? Then estimate its size.",
-    badgeLabel: "Bigger or Smaller?",
-    feedback: { correct: `It was ${angle}°.`, wrong: `Compare it to the square corner — it's ${angle}°.` },
-  };
-}
-
-// Activity C — Beat Your Best: 5 angles in a row, score by closeness.
-export function streakTask(): ProtractorTask {
-  return {
-    kind: "protractor",
-    scene: "streak",
-    rounds: 5,
-    angles: shuffle(GAME_ANGLES).slice(0, 5),
-    prompt: "Beat your best — estimate 5 angles!",
-    speakText: "Estimate five angles in a row. The closer you are, the more stars you earn. Try to beat your best average!",
-    badgeLabel: "Beat Your Best",
-    feedback: { correct: "Great estimating!", wrong: "Great estimating!" },
+    scene: "alien",
+    targetDeg: target,
+    prompt: "Aim the beam at the target angle.",
+    speakText: `Aim the beam at ${target} degrees. Drag the ray to where you think ${target} degrees is, then press Estimate to reveal the protractor and see how close you were.`,
+    badgeLabel: "Alien Angles",
+    feedback: { correct: `The target was ${target}°.`, wrong: `The target was ${target}°.` },
   };
 }
 
