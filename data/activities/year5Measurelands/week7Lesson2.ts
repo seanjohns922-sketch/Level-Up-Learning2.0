@@ -1,14 +1,15 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
-import { readTask, whichScaleTask, mistakeTask } from "@/data/activities/year5Measurelands/week7Common";
+import { constructTask, CONTEXTS, choose } from "@/data/activities/year5Measurelands/week7Common";
 
-// ── Measurelands · Level 5 · Week 7 · Lesson 2 — "Measure Angles" (AC9M5M04) ──
-//   A. read       — read the protractor (correct scale glowing).
-//   B. whichScale — read from the glowing baseline (student picks the scale).
-//   C. mistake    — what mistake did Professor Gauge make?
+// ── Measurelands · Level 5 · Week 7 · Lesson 2 — "Construct Angles" (AC9M5M04) ──
+// Now that they can read a protractor, they build angles with it.
+//   A. build 45° — drag the arm to build a 45° angle.
+//   B. build 120° — build a 120° angle.
+//   C. engineer challenge — construct an angle for a bridge / roof / ramp / road.
 
 type LessonMemory = { cursor: number };
 const lessonMemory = new Map<string, LessonMemory>();
-const ROTATION: Array<"read" | "whichScale" | "mistake"> = ["read", "whichScale", "mistake", "read", "whichScale", "mistake"];
+const ROTATION: Array<"build45" | "build120" | "challenge"> = ["build45", "build120", "challenge", "build45", "build120", "challenge"];
 
 function getMemory(lessonId: string): LessonMemory {
   const existing = lessonMemory.get(lessonId);
@@ -22,15 +23,17 @@ export function generateY5MeasurelandsWeek7Lesson2Task(lessonId: string, _diffic
   const memory = getMemory(lessonId);
   const activity = ROTATION[memory.cursor % ROTATION.length]!;
   memory.cursor += 1;
-  if (activity === "whichScale") return whichScaleTask();
-  if (activity === "mistake") return mistakeTask();
-  return readTask();
+  if (activity === "build45") return constructTask(45, choose(CONTEXTS));
+  if (activity === "build120") return constructTask(120, choose(CONTEXTS));
+  return constructTask();
 }
 
 export function resetY5MeasurelandsWeek7Lesson2TaskSessionState() {
   lessonMemory.clear();
 }
 
+// Construct is interactive but determinate (must hit the target to Build), so it
+// is quiz-safe.
 export function buildY5MeasurelandsWeek7Lesson2QuizTasks(): PracticeTask[] {
-  return [readTask(), whichScaleTask(), mistakeTask(), readTask(), whichScaleTask()];
+  return [constructTask(45), constructTask(90), constructTask(120), constructTask(60), constructTask(135)];
 }

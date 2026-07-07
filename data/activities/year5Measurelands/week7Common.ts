@@ -117,7 +117,23 @@ export function guessTask(): ProtractorTask {
   };
 }
 
-// ── Lesson 2: measure ─────────────────────────────────────────────────────────
+// ── Meet the protractor (guided walkthrough) ──────────────────────────────────
+export function learnTask(): ProtractorTask {
+  const angle = choose([40, 60, 120, 130]);
+  const side: "left" | "right" = randInt(2) === 0 ? "left" : "right";
+  return {
+    kind: "protractor",
+    scene: "learn",
+    angle,
+    baselineSide: side,
+    prompt: "How to use a protractor.",
+    speakText: "Professor Gauge shows you how to use a protractor. Centre on the vertex, line the baseline up with zero, then read the scale that starts at zero.",
+    badgeLabel: "Meet the Protractor",
+    feedback: { correct: "Now you try!", wrong: "Now you try!" },
+  };
+}
+
+// ── Lesson 1: measure ─────────────────────────────────────────────────────────
 export function readTask(): ProtractorTask {
   const angle = choose(READ_ANGLES);
   const side: "left" | "right" = randInt(2) === 0 ? "left" : "right";

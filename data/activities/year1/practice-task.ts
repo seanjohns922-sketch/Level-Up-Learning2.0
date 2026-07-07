@@ -1319,7 +1319,7 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "estimate" | "closest" | "guess" | "read" | "whichScale" | "mistake" | "construct";
+      scene: "intro" | "learn" | "estimate" | "closest" | "guess" | "read" | "whichScale" | "mistake" | "construct";
       /** The angle in whole degrees (0-180). */
       angle?: number;
       /** Which arm sits on 0° — decides the correct scale (measure scenes). */

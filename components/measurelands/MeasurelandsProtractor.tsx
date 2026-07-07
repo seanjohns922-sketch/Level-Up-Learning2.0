@@ -22,6 +22,8 @@ export function MeasurelandsProtractor({
   targetDeg,
   currentDeg,
   onDeg,
+  highlightCentre = false,
+  showReading = false,
   size = 460,
 }: {
   angle?: number;
@@ -31,6 +33,8 @@ export function MeasurelandsProtractor({
   targetDeg?: number;
   currentDeg?: number;
   onDeg?: (deg: number) => void;
+  highlightCentre?: boolean;
+  showReading?: boolean;
   size?: number;
 }) {
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -86,7 +90,7 @@ export function MeasurelandsProtractor({
       onPointerUp={interactive ? () => { dragging.current = false; } : undefined}
       onPointerLeave={interactive ? () => { dragging.current = false; } : undefined}
     >
-      <style>{"@keyframes mlGlowArc{0%,100%{opacity:.5}50%{opacity:1}}"}</style>
+      <style>{"@keyframes mlGlowArc{0%,100%{opacity:.5}50%{opacity:1}}@keyframes mlRing{0%{r:10;opacity:1}100%{r:26;opacity:0}}"}</style>
       {/* protractor body */}
       <path d={`M ${VX - R} ${VY} A ${R} ${R} 0 0 1 ${VX + R} ${VY} Z`} fill="rgba(124,58,237,0.07)" stroke="#c9962a" strokeWidth={3} />
       <line x1={VX - R} y1={VY} x2={VX + R} y2={VY} stroke="#c9962a" strokeWidth={3} />
@@ -109,7 +113,14 @@ export function MeasurelandsProtractor({
           onPointerDown={(e) => { dragging.current = true; (e.target as Element).setPointerCapture?.(e.pointerId); }} />
       ) : null}
       {/* vertex + live value */}
-      <circle cx={VX} cy={VY} r={7} fill="#5b21b6" stroke="#fff" strokeWidth={2} />
+      {highlightCentre ? <circle cx={VX} cy={VY} r={10} fill="none" stroke="#16a34a" strokeWidth={3} style={{ animation: "mlRing 1.1s ease-out infinite" }} /> : null}
+      <circle cx={VX} cy={VY} r={7} fill={highlightCentre ? "#16a34a" : "#5b21b6"} stroke="#fff" strokeWidth={2} />
+      {showReading ? (
+        <g>
+          <rect x={pt(armDeg, R - 44)[0] - 30} y={pt(armDeg, R - 44)[1] - 17} width={60} height={30} rx={9} fill="#b45309" />
+          <text x={pt(armDeg, R - 44)[0]} y={pt(armDeg, R - 44)[1] + 4} textAnchor="middle" fontSize={17} fontWeight={900} fill="#fff">{shownAngle}°</text>
+        </g>
+      ) : null}
       {interactive ? (
         <g>
           <rect x={VX - 44} y={VY + 14} width={88} height={34} rx={10} fill={atTarget ? "#16a34a" : "#5b21b6"} />

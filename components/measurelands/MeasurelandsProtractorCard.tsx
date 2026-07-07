@@ -139,6 +139,35 @@ function ConstructScene({ task, onCorrect }: { task: ProtractorTask; onCorrect: 
   );
 }
 
+/* ── Meet the Protractor: guided walkthrough (Centre → Align → Read) ── */
+function LearnScene({ task, onCorrect }: { task: ProtractorTask; onCorrect: () => void }) {
+  const angle = task.angle ?? 60;
+  const side = task.baselineSide ?? "right";
+  const [step, setStep] = useState(0);
+  const steps = [
+    { cap: "① Place the centre hole exactly on the vertex — the corner of the angle.", centre: true, guidance: "none" as const, reading: false },
+    { cap: "② Line the flat baseline up with the 0° on your arm.", centre: false, guidance: "baseline" as const, reading: false },
+    { cap: `③ Read where the other arm crosses — on the scale that starts at 0. It reads ${angle}°.`, centre: false, guidance: "full" as const, reading: true },
+  ];
+  const s = steps[step]!;
+  return (
+    <Shell badge={task.badgeLabel ?? "Meet the Protractor"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="flex flex-col items-center gap-2 rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-2">
+        <div className="flex gap-1.5">
+          {steps.map((_, i) => <span key={i} className={`h-2.5 w-8 rounded-full ${i <= step ? "bg-[#5b21b6]" : "bg-[rgba(124,58,237,0.2)]"}`} />)}
+        </div>
+        <MeasurelandsProtractor angle={angle} baselineSide={side} guidance={s.guidance} highlightCentre={s.centre} showReading={s.reading} />
+        <div className="rounded-[18px] border-2 border-[rgba(91,33,182,0.25)] bg-[rgba(91,33,182,0.06)] px-4 py-3 text-center text-[16px] font-bold text-[#2c1c07]">{s.cap}</div>
+      </div>
+      {step < steps.length - 1 ? (
+        <button type="button" onClick={() => setStep((v) => v + 1)} className="mx-auto flex min-h-[58px] items-center justify-center rounded-[24px] border-2 border-[#5b21b6] bg-[#5b21b6] px-8 text-lg font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5">Next step →</button>
+      ) : (
+        <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[58px] items-center justify-center rounded-[24px] border-2 border-[#16a34a] bg-[#16a34a] px-8 text-lg font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5">Got it — let&apos;s measure! →</button>
+      )}
+    </Shell>
+  );
+}
+
 function IntroScene({ task, onCorrect }: { task: ProtractorTask; onCorrect: () => void }) {
   return (
     <Shell badge={task.badgeLabel ?? "Meazurex Mission"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
@@ -159,6 +188,7 @@ function IntroScene({ task, onCorrect }: { task: ProtractorTask; onCorrect: () =
 export function MeasurelandsProtractorCard({ task, onCorrect, onWrong }: { task: ProtractorTask; onCorrect: () => void; onWrong: () => void }) {
   switch (task.scene) {
     case "intro": return <IntroScene task={task} onCorrect={onCorrect} />;
+    case "learn": return <LearnScene task={task} onCorrect={onCorrect} />;
     case "estimate": return <EstimateScene task={task} onCorrect={onCorrect} onWrong={onWrong} badge="Estimate the Angle" />;
     case "closest": return <EstimateScene task={task} onCorrect={onCorrect} onWrong={onWrong} badge="Which Is Closest?" />;
     case "guess": return <GuessScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
