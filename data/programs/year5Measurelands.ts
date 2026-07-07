@@ -115,12 +115,12 @@ const YEAR5_MEASURELANDS_RAW: WeekPlan[] = [
   {
     id: "y5-measurement-w8",
     week: 8,
-    topic: "Measurement Project",
+    topic: "Master Measurement Missions",
     curriculum: YEAR5_MEASURELANDS_CURRICULUM,
     lessons: [
-      buildLesson(8, 1, "Plan a Sports Carnival", "Project: use time, length and area to plan a sports carnival.", ["Sports carnival", "Time and length", "Area planning"], YEAR5_MEASURELANDS_CURRICULUM),
-      buildLesson(8, 2, "Design a Classroom", "Project: use area, perimeter and units to design a classroom.", ["Classroom design", "Area and perimeter", "Metric units"], YEAR5_MEASURELANDS_CURRICULUM),
-      buildLesson(8, 3, "Measurement Master Project", "Project: solve a mixed practical challenge using all Level 5 skills.", ["Mixed measurement", "Practical challenge", "Master project"], YEAR5_MEASURELANDS_CURRICULUM),
+      buildLesson(8, 1, "Design the Adventure Park", "Project: choose tools and measurements to design an adventure park.", ["Choose the tool", "Area and perimeter", "Park design"], YEAR5_MEASURELANDS_CURRICULUM),
+      buildLesson(8, 2, "Engineering Challenge", "Project: measure materials and plan with area, perimeter and angles.", ["Measure materials", "Construction planning", "Engineering"], YEAR5_MEASURELANDS_CURRICULUM),
+      buildLesson(8, 3, "Master Builder Mission", "Project: combine every Level 5 skill in authentic multi-step missions.", ["Mixed measurement", "Choose the strategy", "Master mission"], YEAR5_MEASURELANDS_CURRICULUM),
     ],
   },
 ];

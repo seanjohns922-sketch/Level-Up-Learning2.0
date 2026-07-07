@@ -105,6 +105,21 @@ import {
   generateY5MeasurelandsWeek7Lesson3Task,
   resetY5MeasurelandsWeek7Lesson3TaskSessionState,
 } from "@/data/activities/year5Measurelands/week7Lesson3";
+import {
+  buildY5MeasurelandsWeek8Lesson1QuizTasks,
+  generateY5MeasurelandsWeek8Lesson1Task,
+  resetY5MeasurelandsWeek8Lesson1TaskSessionState,
+} from "@/data/activities/year5Measurelands/week8Lesson1";
+import {
+  buildY5MeasurelandsWeek8Lesson2QuizTasks,
+  generateY5MeasurelandsWeek8Lesson2Task,
+  resetY5MeasurelandsWeek8Lesson2TaskSessionState,
+} from "@/data/activities/year5Measurelands/week8Lesson2";
+import {
+  buildY5MeasurelandsWeek8Lesson3QuizTasks,
+  generateY5MeasurelandsWeek8Lesson3Task,
+  resetY5MeasurelandsWeek8Lesson3TaskSessionState,
+} from "@/data/activities/year5Measurelands/week8Lesson3";
 
 // Measurelands Level 5 (Year 5) — registry.
 //
@@ -372,6 +387,42 @@ const BUILT_LESSONS: Record<
     ],
     completionTitle: "Construct Angles Complete!",
     unlockMessage: "Weekly Quiz unlocked.",
+  },
+  "y5-measurement-w8-l1": {
+    generate: generateY5MeasurelandsWeek8Lesson1Task,
+    reset: resetY5MeasurelandsWeek8Lesson1TaskSessionState,
+    quizContributionBuilder: buildY5MeasurelandsWeek8Lesson1QuizTasks,
+    practisedSkills: [
+      "Choose the right tool and measurement for a project",
+      "Decide area or perimeter for a real layout",
+      "Solve authentic park-design problems",
+    ],
+    completionTitle: "Design the Adventure Park Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+  },
+  "y5-measurement-w8-l2": {
+    generate: generateY5MeasurelandsWeek8Lesson2Task,
+    reset: resetY5MeasurelandsWeek8Lesson2TaskSessionState,
+    quizContributionBuilder: buildY5MeasurelandsWeek8Lesson2QuizTasks,
+    practisedSkills: [
+      "Choose units and read instruments precisely",
+      "Plan with area, perimeter and angles",
+      "Combine measurements to solve engineering problems",
+    ],
+    completionTitle: "Engineering Challenge Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+  },
+  "y5-measurement-w8-l3": {
+    generate: generateY5MeasurelandsWeek8Lesson3Task,
+    reset: resetY5MeasurelandsWeek8Lesson3TaskSessionState,
+    quizContributionBuilder: buildY5MeasurelandsWeek8Lesson3QuizTasks,
+    practisedSkills: [
+      "Combine time, capacity, area, perimeter and angles",
+      "Choose the correct strategy before solving",
+      "Solve multi-step measurement missions",
+    ],
+    completionTitle: "Master Builder Mission Complete!",
+    unlockMessage: "Level 5 Post-Test unlocked.",
   },
 };
 

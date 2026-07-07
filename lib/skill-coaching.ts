@@ -291,6 +291,9 @@ const TABLE: Record<string, SkillCoaching> = {
   ml_y5_w7_l1: { tip: "Estimate first — then check with a protractor." },
   ml_y5_w7_l2: { tip: "Always place the centre of the protractor exactly on the vertex." },
   ml_y5_w7_l3: { tip: "Start at zero before marking the angle." },
+  ml_y5_w8_l1: { tip: "Choose the measurement before choosing the calculation." },
+  ml_y5_w8_l2: { tip: "Professionals rely on accurate measurements, not guesses." },
+  ml_y5_w8_l3: { tip: "The best problem solvers plan first, then calculate." },
 };
 
 const FALLBACK: SkillCoaching = {
@@ -426,6 +429,9 @@ const LESSON_KEY_MAP: Record<string, string> = {
   "y5-measurement-w7-l1": "ml_y5_w7_l1",
   "y5-measurement-w7-l2": "ml_y5_w7_l2",
   "y5-measurement-w7-l3": "ml_y5_w7_l3",
+  "y5-measurement-w8-l1": "ml_y5_w8_l1",
+  "y5-measurement-w8-l2": "ml_y5_w8_l2",
+  "y5-measurement-w8-l3": "ml_y5_w8_l3",
 };
 
 function normalizeLessonId(lessonId: string): string {
