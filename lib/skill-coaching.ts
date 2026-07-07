@@ -276,6 +276,9 @@ const TABLE: Record<string, SkillCoaching> = {
   ml_y5_w2_l1: { tip: "When a whole unit isn't accurate enough, use a smaller unit as well." },
   ml_y5_w2_l2: { tip: "Read both parts of the measurement before comparing." },
   ml_y5_w2_l3: { tip: "Accurate measurements help us make better decisions." },
+  ml_y5_w3_l1: { tip: "If opposite sides are equal, measure once and use the value twice." },
+  ml_y5_w3_l2: { tip: "Follow the entire outside boundary before you begin adding." },
+  ml_y5_w3_l3: { tip: "Perimeter helps us work out the length of fences, paths and boundaries." },
 };
 
 const FALLBACK: SkillCoaching = {
@@ -396,6 +399,9 @@ const LESSON_KEY_MAP: Record<string, string> = {
   "y5-measurement-w2-l1": "ml_y5_w2_l1",
   "y5-measurement-w2-l2": "ml_y5_w2_l2",
   "y5-measurement-w2-l3": "ml_y5_w2_l3",
+  "y5-measurement-w3-l1": "ml_y5_w3_l1",
+  "y5-measurement-w3-l2": "ml_y5_w3_l2",
+  "y5-measurement-w3-l3": "ml_y5_w3_l3",
 };
 
 function normalizeLessonId(lessonId: string): string {

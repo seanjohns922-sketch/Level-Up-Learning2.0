@@ -107,6 +107,9 @@ import { buildY5MeasurelandsWeek1Lesson3QuizTasks } from "@/data/activities/year
 import { buildY5MeasurelandsWeek2Lesson1QuizTasks } from "@/data/activities/year5Measurelands/week2Lesson1";
 import { buildY5MeasurelandsWeek2Lesson2QuizTasks } from "@/data/activities/year5Measurelands/week2Lesson2";
 import { buildY5MeasurelandsWeek2Lesson3QuizTasks } from "@/data/activities/year5Measurelands/week2Lesson3";
+import { buildY5MeasurelandsWeek3Lesson1QuizTasks } from "@/data/activities/year5Measurelands/week3Lesson1";
+import { buildY5MeasurelandsWeek3Lesson2QuizTasks } from "@/data/activities/year5Measurelands/week3Lesson2";
+import { buildY5MeasurelandsWeek3Lesson3QuizTasks } from "@/data/activities/year5Measurelands/week3Lesson3";
 import { buildY3MeasurelandsWeek1Lesson1QuizTasks } from "@/data/activities/year3Measurelands/week1Lesson1";
 import { buildY3MeasurelandsWeek1Lesson2QuizTasks } from "@/data/activities/year3Measurelands/week1Lesson2";
 import { buildY3MeasurelandsWeek1Lesson3QuizTasks } from "@/data/activities/year3Measurelands/week1Lesson3";
@@ -1997,6 +2000,35 @@ function buildY5MeasurelandsWeek2WeeklyQuizQuestions(questionsPerLesson: number)
         `y5w2mq${lessonIndex * questionsPerLesson + questionIndex + 1}`,
         lessonNumber,
         `y5_measurelands_w2_l${lessonNumber}_q${questionIndex + 1}`,
+        task as GroundQuizPracticeTask
+      )
+    )
+  );
+}
+
+// Measurelands · Level 5 · Week 3 (Perimeter Pro) — 15 questions (5 per lesson):
+// efficient perimeter (L1) → irregular perimeters (L2) → perimeter problems (L3).
+function buildY5MeasurelandsWeek3WeeklyQuizQuestions(questionsPerLesson: number): QuizQuestion[] {
+  const lessonTasks: Array<{ lessonNumber: 1 | 2 | 3; tasks: PracticeTask[] }> = [
+    { lessonNumber: 1, tasks: buildY5MeasurelandsWeek3Lesson1QuizTasks().slice(0, questionsPerLesson) },
+    { lessonNumber: 2, tasks: buildY5MeasurelandsWeek3Lesson2QuizTasks().slice(0, questionsPerLesson) },
+    { lessonNumber: 3, tasks: buildY5MeasurelandsWeek3Lesson3QuizTasks().slice(0, questionsPerLesson) },
+  ];
+
+  lessonTasks.forEach(({ lessonNumber, tasks }) => {
+    if (tasks.length !== questionsPerLesson) {
+      throw new Error(
+        `[MeasurelandsWeeklyQuiz] Y5 Week 3 Lesson ${lessonNumber} expected ${questionsPerLesson} questions, received ${tasks.length}.`,
+      );
+    }
+  });
+
+  return lessonTasks.flatMap(({ lessonNumber, tasks }, lessonIndex) =>
+    tasks.map((task, questionIndex) =>
+      buildGroundQuizQuestion(
+        `y5w3mq${lessonIndex * questionsPerLesson + questionIndex + 1}`,
+        lessonNumber,
+        `y5_measurelands_w3_l${lessonNumber}_q${questionIndex + 1}`,
         task as GroundQuizPracticeTask
       )
     )
@@ -7961,6 +7993,9 @@ function SessionPage({
       }
       if (Number(week) === 2) {
         return buildY5MeasurelandsWeek2WeeklyQuizQuestions(questionsPerLesson);
+      }
+      if (Number(week) === 3) {
+        return buildY5MeasurelandsWeek3WeeklyQuizQuestions(questionsPerLesson);
       }
       return [];
     }

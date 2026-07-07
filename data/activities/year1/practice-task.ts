@@ -1384,7 +1384,7 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "measureEvery" | "calc" | "choose" | "spotMissed" | "problem";
+      scene: "intro" | "measureEvery" | "calc" | "choose" | "spotMissed" | "problem" | "measureOnce";
       /** Vertices of the rectilinear outline, in unit space (y up), closed. */
       poly: Array<[number, number]>;
       /** Length of each edge, in poly-edge order. */
@@ -1393,6 +1393,12 @@ export type PracticeTask = (
       theme?: "garden" | "paddock" | "playground" | "pool" | "park";
       shapeName?: string;
       perimeter?: number;
+      /** "measureOnce" (L5 W3): edge indices already measured (shown labelled).
+       *  The remaining sides are tapped and their equal length chosen — teaching
+       *  "measure once, use twice" for opposite sides. */
+      measuredSides?: number[];
+      /** "intro": override the default "What is perimeter?" teaching copy (L5+). */
+      introLines?: string[];
       /** "calc"/"problem": typed numeric answer. */
       answerValue?: number;
       answerUnit?: "cm" | "m";

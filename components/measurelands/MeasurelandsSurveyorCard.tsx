@@ -35,6 +35,14 @@ const NAME_ICON: Record<string, string> = {
   "picnic rug": "🧺",
   park: "🌳",
   pool: "🏊",
+  // Level 5 survey contexts
+  "farm field": "🚜",
+  "sports oval": "🏟️",
+  "school oval": "🏟️",
+  "vegetable garden": "🥕",
+  "castle wall": "🏰",
+  "walking track": "🥾",
+  "animal pen": "🐑",
 };
 const FENCE = "#7A5325";
 const FENCE_HI = "#9E7038";
@@ -64,16 +72,26 @@ function useGeometry(poly: Array<[number, number]>, maxW = 300, maxH = 210) {
     const scale = Math.min((maxW - 2 * pad) / w, (maxH - 2 * pad) / h);
     const toPx = ([x, y]: [number, number]): [number, number] => [pad + (x - minX) * scale, pad + (maxY - y) * scale];
     const pts = poly.map(toPx);
-    const cx = pts.reduce((s, p) => s + p[0], 0) / pts.length;
-    const cy = pts.reduce((s, p) => s + p[1], 0) / pts.length;
     const svgW = pad * 2 + w * scale;
     const svgH = pad * 2 + h * scale;
+    // Point-in-polygon (ray cast) so labels sit on the TRUE outward side of each
+    // edge — works for concave (L / step) shapes, unlike a centroid offset.
+    const inside = (px: number, py: number) => {
+      let hit = false;
+      for (let i = 0, j = pts.length - 1; i < pts.length; j = i, i += 1) {
+        const xi = pts[i]![0], yi = pts[i]![1], xj = pts[j]![0], yj = pts[j]![1];
+        if ((yi > py) !== (yj > py) && px < ((xj - xi) * (py - yi)) / (yj - yi) + xi) hit = !hit;
+      }
+      return hit;
+    };
     const edges = pts.map((a, i) => {
       const b = pts[(i + 1) % pts.length]!;
       const mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
-      const dx = mx - cx, dy = my - cy;
-      const d = Math.hypot(dx, dy) || 1;
-      return { a, b, mx, my, ox: mx + (dx / d) * 20, oy: my + (dy / d) * 20 };
+      const ex = b[0] - a[0], ey = b[1] - a[1];
+      const len = Math.hypot(ex, ey) || 1;
+      let nx = -ey / len, ny = ex / len; // perpendicular
+      if (inside(mx + nx * 3, my + ny * 3)) { nx = -nx; ny = -ny; } // flip to point outward
+      return { a, b, mx, my, ox: mx + nx * 20, oy: my + ny * 20 };
     });
     return { pts, edges, svgW, svgH };
   }, [poly, maxW, maxH]);
@@ -85,12 +103,14 @@ function SurveyorShape({
   revealed,
   onEdgeTap,
   showLabels = true,
+  selecting = null,
 }: {
   task: SurveyorTask;
   size?: number;
   revealed?: Set<number>;
   onEdgeTap?: (i: number) => void;
   showLabels?: boolean;
+  selecting?: number | null;
 }) {
   const [uid] = useState(() => Math.random().toString(36).slice(2, 9));
   const geo = useGeometry(task.poly, size);
@@ -121,11 +141,11 @@ function SurveyorShape({
               {tappable ? (
                 <line
                   x1={e.a[0]} y1={e.a[1]} x2={e.b[0]} y2={e.b[1]}
-                  stroke={revealed?.has(i) ? "#5b21b6" : "rgba(226,178,58,0.9)"}
+                  stroke={selecting === i ? "#C0564E" : revealed?.has(i) ? "#5b21b6" : "rgba(226,178,58,0.9)"}
                   strokeWidth={12}
                   strokeLinecap="round"
                   style={{ cursor: "pointer" }}
-                  opacity={revealed?.has(i) ? 0.5 : 0.55}
+                  opacity={selecting === i ? 0.75 : revealed?.has(i) ? 0.5 : 0.55}
                   onClick={() => onEdgeTap?.(i)}
                 />
               ) : null}
@@ -206,16 +226,27 @@ function IntroScene({ task, onCorrect }: { task: SurveyorTask; onCorrect: () => 
           <SurveyorShape task={task} size={260} />
         </div>
         <div className="rounded-[24px] border border-[rgba(214,184,108,0.45)] bg-[rgba(255,250,240,0.96)] p-4">
-          <div className="mb-2 flex items-center gap-2">
-            <span className="text-[12px] font-black uppercase tracking-[0.16em] text-[#a98b52]">What is perimeter?</span>
-            <span className="rounded-full bg-[rgba(91,33,182,0.1)] px-2 py-0.5 text-[11px] font-black text-[#5b21b6]">all the way around</span>
-          </div>
-          <p className="text-[17px] font-bold leading-snug text-[#2c1c07]">
-            Perimeter is the total distance <span className="font-black text-[#5b21b6]">around the outside</span> of a shape.
-          </p>
-          <p className="mt-2 text-[15px] font-semibold leading-snug text-[#5a4423]">
-            Measure every side, then <span className="font-black">add them all together</span>. It is a length — not the space inside.
-          </p>
+          {task.introLines?.length ? (
+            <>
+              <div className="mb-2 text-[12px] font-black uppercase tracking-[0.16em] text-[#a98b52]">Survey engineer</div>
+              {task.introLines.map((line, i) => (
+                <p key={i} className={`${i === 0 ? "text-[17px] font-bold text-[#2c1c07]" : "mt-2 text-[15px] font-semibold text-[#5a4423]"} leading-snug`}>{line}</p>
+              ))}
+            </>
+          ) : (
+            <>
+              <div className="mb-2 flex items-center gap-2">
+                <span className="text-[12px] font-black uppercase tracking-[0.16em] text-[#a98b52]">What is perimeter?</span>
+                <span className="rounded-full bg-[rgba(91,33,182,0.1)] px-2 py-0.5 text-[11px] font-black text-[#5b21b6]">all the way around</span>
+              </div>
+              <p className="text-[17px] font-bold leading-snug text-[#2c1c07]">
+                Perimeter is the total distance <span className="font-black text-[#5b21b6]">around the outside</span> of a shape.
+              </p>
+              <p className="mt-2 text-[15px] font-semibold leading-snug text-[#5a4423]">
+                Measure every side, then <span className="font-black">add them all together</span>. It is a length — not the space inside.
+              </p>
+            </>
+          )}
           <div className="mt-3 rounded-[16px] border border-[rgba(214,184,108,0.5)] bg-white px-3 py-2 text-center text-lg font-black text-[#2c1c07]">
             {sumStr} = <span className="text-[#5b21b6]">{sum} {task.unit}</span>
           </div>
@@ -305,9 +336,69 @@ function ProblemScene({ task, onCorrect, onWrong }: { task: SurveyorTask; onCorr
   );
 }
 
+/* "Measure once, use twice" — two adjacent sides are pre-measured; tap each
+ * opposite "?" side and choose its (equal) length, then confirm the perimeter. */
+function MeasureOnceScene({ task, onCorrect, onWrong }: { task: SurveyorTask; onCorrect: () => void; onWrong: () => void }) {
+  const measured = task.measuredSides ?? [0, 1];
+  const total = task.sideLabels.length;
+  const [revealed, setRevealed] = useState<Set<number>>(() => new Set(measured));
+  const [sel, setSel] = useState<number | null>(null);
+  const [wrong, setWrong] = useState<number | null>(null);
+  const options = useMemo(() => {
+    const map: Record<number, number[]> = {};
+    task.sideLabels.forEach((c, i) => {
+      if (measured.includes(i)) return;
+      const deltas = [-2, -1, 1, 2];
+      let d = c + deltas[Math.floor(Math.random() * deltas.length)]!;
+      if (d < 1 || d === c) d = c + 3;
+      map[i] = Math.random() < 0.5 ? [c, d] : [d, c];
+    });
+    return map;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [task]);
+  const done = revealed.size === total;
+  const sum = task.sideLabels.reduce((a, b) => a + b, 0);
+
+  const pick = (i: number, val: number) => {
+    if (val === task.sideLabels[i]) {
+      const next = new Set(revealed); next.add(i); setRevealed(next); setSel(null);
+    } else { setWrong(val); onWrong(); window.setTimeout(() => setWrong(null), 500); }
+  };
+
+  return (
+    <Shell badge={task.badgeLabel ?? "Measure Once, Use Twice"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
+        <SurveyorShape task={task} onEdgeTap={(i) => { if (!revealed.has(i)) setSel(i); }} revealed={revealed} selecting={sel} />
+        {!done ? (
+          <p className="text-center text-[12px] font-bold uppercase tracking-[0.14em] text-[#a98b52]">Opposite sides are equal — tap a <span className="text-[#7c4a12]">?</span> side, then choose its length</p>
+        ) : null}
+      </div>
+      {sel !== null && !done ? (
+        <div className="grid grid-cols-2 gap-3">
+          {(options[sel] ?? []).map((v) => (
+            <button key={v} type="button" onClick={() => pick(sel, v)} className={`min-h-[64px] rounded-[22px] border-2 text-2xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 ${wrong === v ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[#fffaf0]"}`}>{v} {task.unit}</button>
+          ))}
+        </div>
+      ) : null}
+      {done ? (
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-[18px] border border-[rgba(214,184,108,0.5)] bg-[rgba(255,250,240,0.9)] px-3 py-2 text-lg font-black text-[#2c1c07]">
+            {task.sideLabels.map((n, i) => (
+              <span key={i} className="flex items-center gap-2"><span className="rounded-[10px] bg-white px-2.5 py-1 shadow-[inset_0_0_0_1px_rgba(214,184,108,0.6)]">{n}</span>{i < total - 1 ? <span className="text-[#a98b52]">+</span> : null}</span>
+            ))}
+            <span className="text-[#a98b52]">=</span><span className="text-[#5b21b6]">{sum} {task.unit}</span>
+          </div>
+          <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[58px] items-center justify-center rounded-[24px] border-2 border-[#5b21b6] bg-[#5b21b6] px-8 text-lg font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5">Confirm — {sum} {task.unit}</button>
+        </div>
+      ) : null}
+    </Shell>
+  );
+}
+
 export function MeasurelandsSurveyorCard({ task, onCorrect, onWrong }: { task: SurveyorTask; onCorrect: () => void; onWrong: () => void }) {
   if (task.scene === "intro") return <IntroScene task={task} onCorrect={onCorrect} />;
   if (task.scene === "measureEvery") return <MeasureEveryScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "measureOnce") return <MeasureOnceScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "choose") return <ChooseScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "spotMissed") return <SpotMissedScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "problem") return <ProblemScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;

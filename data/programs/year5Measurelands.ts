@@ -60,12 +60,12 @@ const YEAR5_MEASURELANDS_RAW: WeekPlan[] = [
   {
     id: "y5-measurement-w3",
     week: 3,
-    topic: "Perimeter Problems",
+    topic: "Perimeter Pro",
     curriculum: ["AC9M5M02"],
     lessons: [
-      buildLesson(3, 1, "Efficient Perimeter", "Perimeter: choose efficient strategies for regular shapes.", ["Perimeter strategies", "Regular shapes", "Add side lengths"], ["AC9M5M02"]),
-      buildLesson(3, 2, "Irregular Perimeters", "Perimeter: find the distance around irregular shapes.", ["Irregular shapes", "Boundary distance", "Missing sides"], ["AC9M5M02"]),
-      buildLesson(3, 3, "Real-World Perimeter Problems", "Perimeter: solve practical boundary measurement problems.", ["Real-world perimeter", "Fences and borders", "Problem solving"], ["AC9M5M02"]),
+      buildLesson(3, 1, "Efficient Perimeter", "Perimeter: use efficient strategies — measure once, use twice.", ["Efficient strategies", "Equal opposite sides", "Regular shapes"], ["AC9M5M02"]),
+      buildLesson(3, 2, "Irregular Perimeters", "Perimeter: find the distance around L and step shapes.", ["Irregular shapes", "Every outside side", "Accurate totals"], ["AC9M5M02"]),
+      buildLesson(3, 3, "Perimeter Problems", "Perimeter: solve authentic fencing, path and survey problems.", ["Real-world perimeter", "Fences and tracks", "Survey missions"], ["AC9M5M02"]),
     ],
   },
   {

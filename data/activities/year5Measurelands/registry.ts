@@ -30,6 +30,21 @@ import {
   generateY5MeasurelandsWeek2Lesson3Task,
   resetY5MeasurelandsWeek2Lesson3TaskSessionState,
 } from "@/data/activities/year5Measurelands/week2Lesson3";
+import {
+  buildY5MeasurelandsWeek3Lesson1QuizTasks,
+  generateY5MeasurelandsWeek3Lesson1Task,
+  resetY5MeasurelandsWeek3Lesson1TaskSessionState,
+} from "@/data/activities/year5Measurelands/week3Lesson1";
+import {
+  buildY5MeasurelandsWeek3Lesson2QuizTasks,
+  generateY5MeasurelandsWeek3Lesson2Task,
+  resetY5MeasurelandsWeek3Lesson2TaskSessionState,
+} from "@/data/activities/year5Measurelands/week3Lesson2";
+import {
+  buildY5MeasurelandsWeek3Lesson3QuizTasks,
+  generateY5MeasurelandsWeek3Lesson3Task,
+  resetY5MeasurelandsWeek3Lesson3TaskSessionState,
+} from "@/data/activities/year5Measurelands/week3Lesson3";
 
 // Measurelands Level 5 (Year 5) — registry.
 //
@@ -116,6 +131,42 @@ const BUILT_LESSONS: Record<
       "Justify a measurement decision",
     ],
     completionTitle: "Precision Challenges Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+  },
+  "y5-measurement-w3-l1": {
+    generate: generateY5MeasurelandsWeek3Lesson1Task,
+    reset: resetY5MeasurelandsWeek3Lesson1TaskSessionState,
+    quizContributionBuilder: buildY5MeasurelandsWeek3Lesson1QuizTasks,
+    practisedSkills: [
+      "Recognise equal opposite sides (measure once, use twice)",
+      "Calculate perimeter efficiently",
+      "Find the perimeter of squares and rectangles",
+    ],
+    completionTitle: "Efficient Perimeter Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+  },
+  "y5-measurement-w3-l2": {
+    generate: generateY5MeasurelandsWeek3Lesson2Task,
+    reset: resetY5MeasurelandsWeek3Lesson2TaskSessionState,
+    quizContributionBuilder: buildY5MeasurelandsWeek3Lesson2QuizTasks,
+    practisedSkills: [
+      "Find every outside side of an irregular shape",
+      "Calculate the perimeter of L and step shapes",
+      "Avoid missing or double-counting sides",
+    ],
+    completionTitle: "Irregular Perimeters Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+  },
+  "y5-measurement-w3-l3": {
+    generate: generateY5MeasurelandsWeek3Lesson3Task,
+    reset: resetY5MeasurelandsWeek3Lesson3TaskSessionState,
+    quizContributionBuilder: buildY5MeasurelandsWeek3Lesson3QuizTasks,
+    practisedSkills: [
+      "Solve real-world fencing and path problems",
+      "Calculate perimeter of regular and irregular land",
+      "Use perimeter to solve survey missions",
+    ],
+    completionTitle: "Perimeter Problems Complete!",
     unlockMessage: "Weekly Quiz unlocked.",
   },
 };
