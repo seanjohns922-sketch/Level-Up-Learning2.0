@@ -270,6 +270,9 @@ const TABLE: Record<string, SkillCoaching> = {
   ml_y4_w8_l1: { tip: "Choose the best measuring tool before you start." },
   ml_y4_w8_l2: { tip: "Scientists compare measurements to make decisions." },
   ml_y4_w8_l3: { tip: "Real-world problems often need more than one measurement skill." },
+  ml_y5_w1_l1: { tip: "Choose the unit that best matches the size of the object." },
+  ml_y5_w1_l2: { tip: "Smaller units help when you need greater accuracy." },
+  ml_y5_w1_l3: { tip: "Great measurers explain why they chose a particular unit." },
 };
 
 const FALLBACK: SkillCoaching = {
@@ -384,6 +387,9 @@ const LESSON_KEY_MAP: Record<string, string> = {
   "y4-measurement-w8-l1": "ml_y4_w8_l1",
   "y4-measurement-w8-l2": "ml_y4_w8_l2",
   "y4-measurement-w8-l3": "ml_y4_w8_l3",
+  "y5-measurement-w1-l1": "ml_y5_w1_l1",
+  "y5-measurement-w1-l2": "ml_y5_w1_l2",
+  "y5-measurement-w1-l3": "ml_y5_w1_l3",
 };
 
 function normalizeLessonId(lessonId: string): string {

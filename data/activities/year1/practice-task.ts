@@ -1198,6 +1198,40 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Level 5 (Year 5) W1 "Metric Mastery" (AC9M5M01): choosing the
+      // most appropriate metric unit — and smaller units when accuracy matters.
+      // A new Level-5 DECISION mechanic: students choose the unit (and sometimes
+      // the instrument) BEFORE measuring, then justify it. Decimal reading is
+      // Week 2, not here — Week 1 stays whole-unit and decision-focused.
+      kind: "metricUnit";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "chooseUnit" | "sortBins" | "spotMistake" | "accuracyPick" | "toolAndUnit" | "justify";
+      attribute?: "length" | "mass" | "capacity" | "temperature";
+      /** The object being measured (emoji MUST match the label). */
+      object?: { label: string; emoji: string; context?: string };
+      /** Unit chip options in display order; correctOption is one of them. */
+      options?: string[];
+      correctOption?: string;
+      /** "intro": the unit ladder to teach (small -> large), with an example each. */
+      ladder?: Array<{ unit: string; example: string; emoji: string }>;
+      /** "sortBins": the unit bins and the objects to sort into them. */
+      bins?: Array<{ unit: string; label: string }>;
+      metricItems?: Array<{ id: string; label: string; emoji: string; unit: string }>;
+      /** "spotMistake": Professor Gauge's claim with a silly unit. */
+      statement?: string;
+      /** "toolAndUnit": the instrument options + the correct instrument. */
+      tools?: Array<{ id: string; label: string; emoji: string }>;
+      correctTool?: string;
+      /** "justify": reason options + the correct reason. */
+      reasonOptions?: string[];
+      correctReason?: string;
+      /** Optional teaching sub-note under the object (e.g. accuracy framing). */
+      note?: string;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       // Measurelands Year 3 W2 L3 "Estimate then Measure" (AC9M3M01): the full
       // measuring cycle — estimate first, measure with the ruler / metre stick,
       // then compare. Estimation is rewarded by CLOSENESS (🎯 exact / 👏 very

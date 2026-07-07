@@ -1,11 +1,73 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
 import { YEAR5_MEASURELANDS_PROGRAM } from "@/data/programs/year5Measurelands";
+import {
+  buildY5MeasurelandsWeek1Lesson1QuizTasks,
+  generateY5MeasurelandsWeek1Lesson1Task,
+  resetY5MeasurelandsWeek1Lesson1TaskSessionState,
+} from "@/data/activities/year5Measurelands/week1Lesson1";
+import {
+  buildY5MeasurelandsWeek1Lesson2QuizTasks,
+  generateY5MeasurelandsWeek1Lesson2Task,
+  resetY5MeasurelandsWeek1Lesson2TaskSessionState,
+} from "@/data/activities/year5Measurelands/week1Lesson2";
+import {
+  buildY5MeasurelandsWeek1Lesson3QuizTasks,
+  generateY5MeasurelandsWeek1Lesson3Task,
+  resetY5MeasurelandsWeek1Lesson3TaskSessionState,
+} from "@/data/activities/year5Measurelands/week1Lesson3";
 
-// Measurelands Level 5 (Year 5) — registry shell only.
+// Measurelands Level 5 (Year 5) — registry.
 //
-// Every lesson resolves inside realm_id=measurement with a non-runnable
-// placeholder until the real Level 5 curriculum is built. Placeholders must not
-// award XP, save completion, unlock progression, or feed teacher/quiz data.
+// Every lesson resolves inside realm_id=measurement. Unbuilt weeks use a
+// non-runnable placeholder (no XP, save, completion, unlock or quiz data);
+// built lessons replace their placeholder via BUILT_LESSONS below.
+
+// Built lessons replace their placeholder entry with a real generator. Add a row
+// here as each Level 5 lesson ships.
+const BUILT_LESSONS: Record<
+  string,
+  Pick<
+    Y5MeasurelandsLessonEntry,
+    "generate" | "reset" | "quizContributionBuilder" | "practisedSkills" | "completionTitle" | "unlockMessage"
+  >
+> = {
+  "y5-measurement-w1-l1": {
+    generate: generateY5MeasurelandsWeek1Lesson1Task,
+    reset: resetY5MeasurelandsWeek1Lesson1TaskSessionState,
+    quizContributionBuilder: buildY5MeasurelandsWeek1Lesson1QuizTasks,
+    practisedSkills: [
+      "Choose the most appropriate metric unit",
+      "Sort objects by the best measuring unit",
+      "Spot an unsuitable unit and correct it",
+    ],
+    completionTitle: "Choose the Best Unit Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+  },
+  "y5-measurement-w1-l2": {
+    generate: generateY5MeasurelandsWeek1Lesson2Task,
+    reset: resetY5MeasurelandsWeek1Lesson2TaskSessionState,
+    quizContributionBuilder: buildY5MeasurelandsWeek1Lesson2QuizTasks,
+    practisedSkills: [
+      "Choose a smaller unit when accuracy matters",
+      "Pick the better unit for a task",
+      "Recognise which unit gives more detail",
+    ],
+    completionTitle: "Smaller Units for Accuracy Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+  },
+  "y5-measurement-w1-l3": {
+    generate: generateY5MeasurelandsWeek1Lesson3Task,
+    reset: resetY5MeasurelandsWeek1Lesson3TaskSessionState,
+    quizContributionBuilder: buildY5MeasurelandsWeek1Lesson3QuizTasks,
+    practisedSkills: [
+      "Choose the right tool and unit together",
+      "Select appropriate units in science contexts",
+      "Justify a measurement choice",
+    ],
+    completionTitle: "Metric Decisions Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+  },
+};
 
 type Y5MeasurelandsLessonEntry = {
   prefix: string;
@@ -87,7 +149,9 @@ function makePlaceholderEntry(week: number, lessonNumber: number): Y5Measureland
 const Y5_MEASURELANDS_LESSONS: Y5MeasurelandsLessonEntry[] = [];
 for (let week = 1; week <= 8; week += 1) {
   for (let lessonNumber = 1; lessonNumber <= 3; lessonNumber += 1) {
-    Y5_MEASURELANDS_LESSONS.push(makePlaceholderEntry(week, lessonNumber));
+    const entry = makePlaceholderEntry(week, lessonNumber);
+    const built = BUILT_LESSONS[entry.prefix];
+    Y5_MEASURELANDS_LESSONS.push(built ? { ...entry, ...built, placeholder: false } : entry);
   }
 }
 

@@ -101,6 +101,9 @@ import { buildY4MeasurelandsWeek6Lesson3QuizTasks } from "@/data/activities/year
 import { buildY4MeasurelandsWeek7Lesson1QuizTasks } from "@/data/activities/year4Measurelands/week7Lesson1";
 import { buildY4MeasurelandsWeek7Lesson2QuizTasks } from "@/data/activities/year4Measurelands/week7Lesson2";
 import { buildY4MeasurelandsWeek7Lesson3QuizTasks } from "@/data/activities/year4Measurelands/week7Lesson3";
+import { buildY5MeasurelandsWeek1Lesson1QuizTasks } from "@/data/activities/year5Measurelands/week1Lesson1";
+import { buildY5MeasurelandsWeek1Lesson2QuizTasks } from "@/data/activities/year5Measurelands/week1Lesson2";
+import { buildY5MeasurelandsWeek1Lesson3QuizTasks } from "@/data/activities/year5Measurelands/week1Lesson3";
 import { buildY3MeasurelandsWeek1Lesson1QuizTasks } from "@/data/activities/year3Measurelands/week1Lesson1";
 import { buildY3MeasurelandsWeek1Lesson2QuizTasks } from "@/data/activities/year3Measurelands/week1Lesson2";
 import { buildY3MeasurelandsWeek1Lesson3QuizTasks } from "@/data/activities/year3Measurelands/week1Lesson3";
@@ -1932,6 +1935,35 @@ function buildY4MeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson: number)
         `y4w1mq${lessonIndex * questionsPerLesson + questionIndex + 1}`,
         lessonNumber,
         `y4_measurelands_w1_l${lessonNumber}_q${questionIndex + 1}`,
+        task as GroundQuizPracticeTask
+      )
+    )
+  );
+}
+
+// Measurelands · Level 5 · Week 1 (Metric Mastery) — 15 questions (5 per lesson):
+// choose the best unit (L1) → smaller units for accuracy (L2) → metric decisions (L3).
+function buildY5MeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson: number): QuizQuestion[] {
+  const lessonTasks: Array<{ lessonNumber: 1 | 2 | 3; tasks: PracticeTask[] }> = [
+    { lessonNumber: 1, tasks: buildY5MeasurelandsWeek1Lesson1QuizTasks().slice(0, questionsPerLesson) },
+    { lessonNumber: 2, tasks: buildY5MeasurelandsWeek1Lesson2QuizTasks().slice(0, questionsPerLesson) },
+    { lessonNumber: 3, tasks: buildY5MeasurelandsWeek1Lesson3QuizTasks().slice(0, questionsPerLesson) },
+  ];
+
+  lessonTasks.forEach(({ lessonNumber, tasks }) => {
+    if (tasks.length !== questionsPerLesson) {
+      throw new Error(
+        `[MeasurelandsWeeklyQuiz] Y5 Week 1 Lesson ${lessonNumber} expected ${questionsPerLesson} questions, received ${tasks.length}.`,
+      );
+    }
+  });
+
+  return lessonTasks.flatMap(({ lessonNumber, tasks }, lessonIndex) =>
+    tasks.map((task, questionIndex) =>
+      buildGroundQuizQuestion(
+        `y5w1mq${lessonIndex * questionsPerLesson + questionIndex + 1}`,
+        lessonNumber,
+        `y5_measurelands_w1_l${lessonNumber}_q${questionIndex + 1}`,
         task as GroundQuizPracticeTask
       )
     )
@@ -7887,9 +7919,13 @@ function SessionPage({
       return [];
     }
 
-    // Level 5 Measurelands is a plumbing shell only for now. Weekly quizzes must
-    // not fall through to Number Nexus or generic structured quiz content.
+    // Level 5 Measurelands weekly quizzes must never fall through to Number Nexus
+    // or generic structured quiz content. Built weeks dispatch here; unbuilt weeks
+    // return no quiz.
     if (isMeasurementRealm && year === "Year 5") {
+      if (Number(week) === 1) {
+        return buildY5MeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson);
+      }
       return [];
     }
 
