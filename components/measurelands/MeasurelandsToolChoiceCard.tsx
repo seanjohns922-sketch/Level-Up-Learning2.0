@@ -145,6 +145,16 @@ function MeasureGlyph({ kind, className = "" }: { kind: string; className?: stri
       </svg>
     );
   }
+  if (kind === "m-both") {
+    return (
+      <svg {...common} aria-hidden="true">
+        <rect x="8" y="12" width="32" height="24" rx="4" stroke="#d6a84a" strokeWidth="3" strokeDasharray="5 3.2" />
+        <rect x="15" y="18" width="18" height="12" rx="2" fill={F} stroke={S} strokeWidth="2" />
+        <line x1="24" y1="18" x2="24" y2="30" stroke={S} strokeWidth="1.6" />
+        <line x1="15" y1="24" x2="33" y2="24" stroke={S} strokeWidth="1.6" />
+      </svg>
+    );
+  }
   if (kind === "m-mass") {
     return (
       <svg {...common} aria-hidden="true">
@@ -332,17 +342,18 @@ function ToolGrid({ task, onCorrect, onWrong }: { task: ToolTask; onCorrect: () 
   return (
     <Shell badge={task.badgeLabel ?? "Choose the Best Tool"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       {task.object ? <ObjectCard object={task.object} /> : null}
-      <div className="grid grid-cols-3 gap-3">
+      <div className={`grid gap-3 ${(task.tools ?? []).length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
         {(task.tools ?? []).map((tool) => (
           <button
             key={tool.id}
             type="button"
             onClick={() => (tool.id === task.correctToolId ? onCorrect() : onWrong())}
-            className="relative flex min-h-[110px] flex-col items-center justify-center gap-2 rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-2 text-center text-sm font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+            className="relative flex min-h-[110px] flex-col items-center justify-center gap-1.5 rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-3 py-3 text-center text-sm font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
           >
-            <span className="absolute right-2 top-2 z-10"><OptionReadAloudButton text={tool.label} /></span>
+            <span className="absolute right-2 top-2 z-10"><OptionReadAloudButton text={tool.focus ? `${tool.label}. ${tool.focus}` : tool.label} /></span>
             <Glyph label={tool.label} iconKey={tool.iconKey} imageSrc={tool.imageSrc} />
-            {tool.label}
+            <span className="text-base">{tool.label}</span>
+            {tool.focus ? <span className="text-[12px] font-semibold leading-tight text-[#5a4423]">{tool.focus}</span> : null}
           </button>
         ))}
       </div>

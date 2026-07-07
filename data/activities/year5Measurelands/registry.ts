@@ -60,6 +60,21 @@ import {
   generateY5MeasurelandsWeek4Lesson3Task,
   resetY5MeasurelandsWeek4Lesson3TaskSessionState,
 } from "@/data/activities/year5Measurelands/week4Lesson3";
+import {
+  buildY5MeasurelandsWeek5Lesson1QuizTasks,
+  generateY5MeasurelandsWeek5Lesson1Task,
+  resetY5MeasurelandsWeek5Lesson1TaskSessionState,
+} from "@/data/activities/year5Measurelands/week5Lesson1";
+import {
+  buildY5MeasurelandsWeek5Lesson2QuizTasks,
+  generateY5MeasurelandsWeek5Lesson2Task,
+  resetY5MeasurelandsWeek5Lesson2TaskSessionState,
+} from "@/data/activities/year5Measurelands/week5Lesson2";
+import {
+  buildY5MeasurelandsWeek5Lesson3QuizTasks,
+  generateY5MeasurelandsWeek5Lesson3Task,
+  resetY5MeasurelandsWeek5Lesson3TaskSessionState,
+} from "@/data/activities/year5Measurelands/week5Lesson3";
 
 // Measurelands Level 5 (Year 5) — registry.
 //
@@ -218,6 +233,42 @@ const BUILT_LESSONS: Record<
       "Apply the array strategy to real spaces",
     ],
     completionTitle: "Area Problems Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+  },
+  "y5-measurement-w5-l1": {
+    generate: generateY5MeasurelandsWeek5Lesson1Task,
+    reset: resetY5MeasurelandsWeek5Lesson1TaskSessionState,
+    quizContributionBuilder: buildY5MeasurelandsWeek5Lesson1QuizTasks,
+    practisedSkills: [
+      "Decide whether a job needs area or perimeter",
+      "Sort jobs by the measurement they need",
+      "Recognise when a job needs both",
+    ],
+    completionTitle: "Area or Perimeter? Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+  },
+  "y5-measurement-w5-l2": {
+    generate: generateY5MeasurelandsWeek5Lesson2Task,
+    reset: resetY5MeasurelandsWeek5Lesson2TaskSessionState,
+    quizContributionBuilder: buildY5MeasurelandsWeek5Lesson2QuizTasks,
+    practisedSkills: [
+      "Discover that same area can have different perimeter",
+      "Compare which shape needs more fencing",
+      "Understand area and perimeter are different",
+    ],
+    completionTitle: "Same Area, Different Perimeter Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+  },
+  "y5-measurement-w5-l3": {
+    generate: generateY5MeasurelandsWeek5Lesson3Task,
+    reset: resetY5MeasurelandsWeek5Lesson3TaskSessionState,
+    quizContributionBuilder: buildY5MeasurelandsWeek5Lesson3QuizTasks,
+    practisedSkills: [
+      "Choose the correct measurement for a design job",
+      "Solve area problems (covering a space)",
+      "Solve perimeter problems (fencing a space)",
+    ],
+    completionTitle: "Design Challenge Complete!",
     unlockMessage: "Weekly Quiz unlocked.",
   },
 };

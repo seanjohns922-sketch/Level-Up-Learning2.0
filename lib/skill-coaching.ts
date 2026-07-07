@@ -282,6 +282,9 @@ const TABLE: Record<string, SkillCoaching> = {
   ml_y5_w4_l1: { tip: "Look for rows and columns before you start counting." },
   ml_y5_w4_l2: { tip: "Every row has the same number of squares." },
   ml_y5_w4_l3: { tip: "Architects use area to work out how much space needs to be covered." },
+  ml_y5_w5_l1: { tip: "Ask yourself: am I measuring around it, or covering it?" },
+  ml_y5_w5_l2: { tip: "Shapes can have the same area but different perimeters." },
+  ml_y5_w5_l3: { tip: "Good mathematicians choose the correct measurement before they calculate." },
 };
 
 const FALLBACK: SkillCoaching = {
@@ -408,6 +411,9 @@ const LESSON_KEY_MAP: Record<string, string> = {
   "y5-measurement-w4-l1": "ml_y5_w4_l1",
   "y5-measurement-w4-l2": "ml_y5_w4_l2",
   "y5-measurement-w4-l3": "ml_y5_w4_l3",
+  "y5-measurement-w5-l1": "ml_y5_w5_l1",
+  "y5-measurement-w5-l2": "ml_y5_w5_l2",
+  "y5-measurement-w5-l3": "ml_y5_w5_l3",
 };
 
 function normalizeLessonId(lessonId: string): string {

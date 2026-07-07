@@ -12,6 +12,11 @@ const PAD = 14;
 const TILE = "#7c3aed";
 const TILE_BG = "rgba(124,58,237,0.28)";
 
+/** Choose a render width that keeps a tall/thin rectangle from getting too tall. */
+function fitSize(gridW: number, gridH: number, maxW = 210, maxHpx = 300): number {
+  return Math.min(maxW, Math.round(gridW * (maxHpx / gridH)) + 2 * PAD);
+}
+
 function Shell({ badge, prompt, speakText, children }: { badge: string; prompt: string; speakText?: string; children: React.ReactNode }) {
   return (
     <div className="measurelands-shell space-y-4">
@@ -37,11 +42,12 @@ function edgeLine(c: number, r: number, side: Side): [number, number, number, nu
 
 /** Renders a set of cells; `filled` cells show a tile, others show an empty slot.
  *  If onTap given, cells are tappable. `outline` draws the shape boundary. */
-function Tiles({ cells, gridW, gridH, filled, onTap, outline, size }: { cells: Array<[number, number]>; gridW: number; gridH: number; filled: Set<string>; onTap?: (k: string) => void; outline?: boolean; size?: number }) {
+function Tiles({ cells, gridW, gridH, filled, onTap, outline, glow, size }: { cells: Array<[number, number]>; gridW: number; gridH: number; filled: Set<string>; onTap?: (k: string) => void; outline?: boolean; glow?: boolean; size?: number }) {
   const w = gridW * U + PAD * 2, h = gridH * U + PAD * 2;
   return (
     <div className="mx-auto" style={{ maxWidth: size ?? Math.min(w, 400) }}>
       <svg viewBox={`0 0 ${w} ${h}`} width="100%" role="img" aria-label="A shape made of square units">
+        <style>{"@keyframes mlGlow{0%,100%{opacity:0.55}50%{opacity:1}}"}</style>
         {cells.map(([c, r]) => {
           const k = cellKey(c, r);
           const on = filled.has(k);
@@ -52,7 +58,11 @@ function Tiles({ cells, gridW, gridH, filled, onTap, outline, size }: { cells: A
             </g>
           );
         })}
-        {outline ? boundaryEdges(cells).map(([c, r, s], i) => { const [x1, y1, x2, y2] = edgeLine(c, r, s); return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#5b21b6" strokeWidth={4} strokeLinecap="round" />; }) : null}
+        {glow ? (
+          <g style={{ filter: "drop-shadow(0 0 3px rgba(245,158,11,0.85))" }}>
+            {boundaryEdges(cells).map(([c, r, s], i) => { const [x1, y1, x2, y2] = edgeLine(c, r, s); return <line key={`gl${i}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#f59e0b" strokeWidth={6} strokeLinecap="round" style={{ animation: "mlGlow 1.2s ease infinite" }} />; })}
+          </g>
+        ) : outline ? boundaryEdges(cells).map(([c, r, s], i) => { const [x1, y1, x2, y2] = edgeLine(c, r, s); return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#5b21b6" strokeWidth={4} strokeLinecap="round" />; }) : null}
       </svg>
     </div>
   );
@@ -127,13 +137,20 @@ function CountScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect: (
   );
 }
 
+function shapePerimeter(s: { gridW: number; gridH: number }): number {
+  return 2 * (s.gridW + s.gridH);
+}
+
 function CompareScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect: () => void; onWrong: () => void }) {
   const cmp = task.compareShapes!;
-  const longer = cmp.a.cells.length >= cmp.b.cells.length ? cmp.a.label : cmp.b.label;
+  const metric = task.compareMode === "perimeter"
+    ? (s: typeof cmp.a) => shapePerimeter(s)
+    : (s: typeof cmp.a) => s.cells.length;
+  const longer = metric(cmp.a) >= metric(cmp.b) ? cmp.a.label : cmp.b.label;
   const Card = ({ s }: { s: typeof cmp.a }) => (
     <button type="button" onClick={() => (s.label === longer ? onCorrect() : onWrong())} className="flex flex-col items-center gap-2 rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)] p-3 transition hover:-translate-y-0.5 active:scale-[0.98]">
       <span className="text-2xl">{s.emoji}</span>
-      <Tiles cells={s.cells} gridW={s.gridW} gridH={s.gridH} filled={new Set(s.cells.map(([c, r]) => cellKey(c, r)))} outline size={200} />
+      <Tiles cells={s.cells} gridW={s.gridW} gridH={s.gridH} filled={new Set(s.cells.map(([c, r]) => cellKey(c, r)))} outline size={fitSize(s.gridW, s.gridH)} />
       <span className="text-base font-black text-[#2c1c07]">{s.label}</span>
     </button>
   );
@@ -255,7 +272,7 @@ function SameDiffScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect
   const ShapeCard = ({ s }: { s: typeof cmp.a }) => (
     <div className="flex flex-col items-center gap-1 rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)] p-3">
       <span className="text-2xl">{s.emoji}</span>
-      <Tiles cells={s.cells} gridW={s.gridW} gridH={s.gridH} filled={new Set(s.cells.map(([c, r]) => cellKey(c, r)))} outline size={200} />
+      <Tiles cells={s.cells} gridW={s.gridW} gridH={s.gridH} filled={new Set(s.cells.map(([c, r]) => cellKey(c, r)))} outline size={fitSize(s.gridW, s.gridH)} />
       <span className="text-base font-black text-[#2c1c07]">{s.label}</span>
     </div>
   );
@@ -449,9 +466,68 @@ function ArrayIntroScene({ task, onCorrect }: { task: AreaTask; onCorrect: () =>
   );
 }
 
+/* ── L5 W5: same area, different perimeter (discover → reveal → Gauge) ── */
+function InvestigateScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect: () => void; onWrong: () => void }) {
+  const cmp = task.compareShapes!;
+  const areaA = cmp.a.cells.length, areaB = cmp.b.cells.length;
+  const periA = shapePerimeter(cmp.a), periB = shapePerimeter(cmp.b);
+  const sameArea = areaA === areaB, samePeri = periA === periB;
+  const correct = sameArea && samePeri ? "both" : sameArea ? "area" : "perimeter";
+  const [phase, setPhase] = useState<"notice" | "reveal">("notice");
+  const [wrong, setWrong] = useState<string | null>(null);
+  const pick = (c: string) => {
+    if (c === correct) setPhase("reveal");
+    else { setWrong(c); onWrong(); window.setTimeout(() => setWrong(null), 600); }
+  };
+  const bigger = periA >= periB ? cmp.a.label : cmp.b.label;
+  const Card = ({ s, area, peri }: { s: typeof cmp.a; area: number; peri: number }) => (
+    <div className="flex flex-col items-center gap-1 rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)] p-3">
+      <span className="text-base font-black text-[#2c1c07]">{s.emoji} {s.label}</span>
+      <Tiles cells={s.cells} gridW={s.gridW} gridH={s.gridH} filled={new Set(s.cells.map(([c, r]) => cellKey(c, r)))} outline={phase === "notice"} glow={phase === "reveal"} size={fitSize(s.gridW, s.gridH)} />
+      {phase === "reveal" ? (
+        <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+          <span className="rounded-full px-3 py-1 text-sm font-black text-[#7c3aed]" style={{ background: "rgba(124,58,237,0.14)" }}>Area {area} m²</span>
+          <span className="rounded-full px-3 py-1 text-sm font-black text-[#b45309]" style={{ background: "rgba(245,158,11,0.16)" }}>Perimeter {peri} m</span>
+        </div>
+      ) : null}
+    </div>
+  );
+  const btn = (id: string, label: string) => (
+    <button type="button" onClick={() => pick(id)} className={`min-h-[62px] rounded-[22px] border-2 px-3 text-base font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 ${wrong === id ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[#fffaf0]"}`}>{label}</button>
+  );
+  return (
+    <Shell badge={task.badgeLabel ?? "What Do You Notice?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="grid grid-cols-2 gap-3">
+        <Card s={cmp.a} area={areaA} peri={periA} />
+        <Card s={cmp.b} area={areaB} peri={periB} />
+      </div>
+      {phase === "notice" ? (
+        <>
+          <p className="text-center text-base font-black text-[#5b21b6]">Which is true?</p>
+          <div className="grid grid-cols-3 gap-3">
+            {btn("area", "Same area")}
+            {btn("perimeter", "Same perimeter")}
+            {btn("both", "Both")}
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="rounded-[18px] border border-[rgba(214,184,108,0.5)] bg-[rgba(255,250,240,0.96)] px-4 py-3 text-center text-[15px] font-bold text-[#2c1c07]">
+            {sameArea
+              ? <>Same space covered — but the <span className="font-black text-[#b45309]">{bigger}</span> needs more fencing!</>
+              : <>Same fence all the way around — but they cover a different amount of space!</>}
+          </div>
+          <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[58px] items-center justify-center rounded-[24px] border-2 border-[#5b21b6] bg-[#5b21b6] px-8 text-lg font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5">Got it →</button>
+        </>
+      )}
+    </Shell>
+  );
+}
+
 export function MeasurelandsAreaCard({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect: () => void; onWrong: () => void }) {
   switch (task.scene) {
     case "intro": return task.arrayReveal ? <ArrayIntroScene task={task} onCorrect={onCorrect} /> : <IntroScene task={task} onCorrect={onCorrect} />;
+    case "investigate": return <InvestigateScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "rows": return <RowColScene task={task} dir="rows" onCorrect={onCorrect} />;
     case "columns": return <RowColScene task={task} dir="columns" onCorrect={onCorrect} />;
     case "arrayArea": return <ArrayAreaScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;

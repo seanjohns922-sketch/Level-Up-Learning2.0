@@ -1061,8 +1061,9 @@ export type PracticeTask = (
       introLines?: string[];
       /** The object being measured (shown in the middle). */
       object?: { label: string; iconKey: string; imageSrc?: string };
-      /** "best"/"whyBest": tool option cards; tap the best (correctToolId). */
-      tools?: Array<{ id: string; label: string; iconKey: string; imageSrc?: string }>;
+      /** "best"/"whyBest": tool option cards; tap the best (correctToolId).
+       *  `focus` is an optional one-line description under the label (L5 W5). */
+      tools?: Array<{ id: string; label: string; iconKey: string; imageSrc?: string; focus?: string }>;
       correctToolId?: string;
       /** "whyBad": a wrong tool shown with the object; pick why it's a bad fit. */
       wrongTool?: { label: string; iconKey: string; imageSrc?: string };
@@ -1579,7 +1580,9 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "whichPart" | "cover" | "countSquares" | "compareArea" | "orderArea" | "buildArea" | "sameArea" | "sameDiff" | "rows" | "columns" | "arrayArea" | "calcArea" | "spotMistake";
+      scene: "intro" | "whichPart" | "cover" | "countSquares" | "compareArea" | "orderArea" | "buildArea" | "sameArea" | "sameDiff" | "rows" | "columns" | "arrayArea" | "calcArea" | "spotMistake" | "investigate";
+      /** "compareArea" (L5 W5): compare by "area" (default) or "perimeter". */
+      compareMode?: "area" | "perimeter";
       cells?: Array<[number, number]>;
       gridW?: number;
       gridH?: number;

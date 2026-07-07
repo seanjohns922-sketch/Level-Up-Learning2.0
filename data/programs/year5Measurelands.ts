@@ -82,12 +82,12 @@ const YEAR5_MEASURELANDS_RAW: WeekPlan[] = [
   {
     id: "y5-measurement-w5",
     week: 5,
-    topic: "Area and Perimeter Together",
+    topic: "Area or Perimeter?",
     curriculum: ["AC9M5M02"],
     lessons: [
-      buildLesson(5, 1, "Area or Perimeter?", "Measurement reasoning: decide whether a problem needs area, perimeter, or both.", ["Area vs perimeter", "Choose the strategy", "Read the context"], ["AC9M5M02"]),
-      buildLesson(5, 2, "Same Area, Different Perimeter", "Measurement reasoning: compare shapes with the same area and different perimeters.", ["Same area", "Different perimeter", "Shape comparison"], ["AC9M5M02"]),
-      buildLesson(5, 3, "Design the Garden", "Measurement reasoning: use area and perimeter together in a garden design.", ["Garden design", "Area and boundary", "Practical planning"], ["AC9M5M02"]),
+      buildLesson(5, 1, "Area or Perimeter?", "Measurement reasoning: decide whether a job needs area, perimeter, or both.", ["Area vs perimeter", "Choose the measurement", "Read the context"], ["AC9M5M02"]),
+      buildLesson(5, 2, "Same Area, Different Perimeter", "Measurement reasoning: discover that shapes can share an area yet differ in perimeter.", ["Same area", "Different perimeter", "Investigate"], ["AC9M5M02"]),
+      buildLesson(5, 3, "Design Challenge", "Measurement reasoning: choose the correct measurement, then solve the design problem.", ["Design decisions", "Area and perimeter", "Then solve"], ["AC9M5M02"]),
     ],
   },
   {
