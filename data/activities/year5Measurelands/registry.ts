@@ -357,11 +357,11 @@ const BUILT_LESSONS: Record<
     reset: resetY5MeasurelandsWeek7Lesson1TaskSessionState,
     quizContributionBuilder: buildY5MeasurelandsWeek7Lesson1QuizTasks,
     practisedSkills: [
-      "Use a protractor: centre, align, read",
-      "Read an angle from the correct scale",
-      "Spot a protractor reading mistake",
+      "Estimate the size of an angle",
+      "Compare angles to benchmark angles",
+      "Improve estimates with closeness feedback",
     ],
-    completionTitle: "Measure Angles Complete!",
+    completionTitle: "Estimate the Angle Complete!",
     unlockMessage: "Lesson 2 unlocked.",
   },
   "y5-measurement-w7-l2": {
@@ -369,11 +369,11 @@ const BUILT_LESSONS: Record<
     reset: resetY5MeasurelandsWeek7Lesson2TaskSessionState,
     quizContributionBuilder: buildY5MeasurelandsWeek7Lesson2QuizTasks,
     practisedSkills: [
-      "Construct an angle with a protractor",
-      "Build common benchmark angles",
-      "Create accurate angles for engineering designs",
+      "Use a protractor: centre, align, read",
+      "Read an angle from the correct scale",
+      "Spot a protractor reading mistake",
     ],
-    completionTitle: "Construct Angles Complete!",
+    completionTitle: "Measure the Angle Complete!",
     unlockMessage: "Lesson 3 unlocked.",
   },
   "y5-measurement-w7-l3": {
@@ -381,11 +381,11 @@ const BUILT_LESSONS: Record<
     reset: resetY5MeasurelandsWeek7Lesson3TaskSessionState,
     quizContributionBuilder: buildY5MeasurelandsWeek7Lesson3QuizTasks,
     practisedSkills: [
-      "Estimate the size of an angle",
-      "Compare angles to benchmark angles",
-      "Judge whether an estimate is sensible",
+      "Construct an angle with a protractor",
+      "Build common benchmark angles",
+      "Create accurate angles for engineering designs",
     ],
-    completionTitle: "Estimate Angles Complete!",
+    completionTitle: "Construct Angles Complete!",
     unlockMessage: "Weekly Quiz unlocked.",
   },
   "y5-measurement-w8-l1": {

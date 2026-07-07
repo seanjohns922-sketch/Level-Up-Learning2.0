@@ -1319,9 +1319,26 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "learn" | "estimate" | "closest" | "guess" | "read" | "whichScale" | "mistake" | "construct";
+      scene:
+        | "intro"
+        | "learn"
+        | "estimate"
+        | "closest"
+        | "guess"
+        | "estimateStepper"
+        | "compareEstimate"
+        | "streak"
+        | "read"
+        | "whichScale"
+        | "mistake"
+        | "construct";
       /** The angle in whole degrees (0-180). */
       angle?: number;
+      /** "compareEstimate": the benchmark angle to compare against (e.g. 90). */
+      benchmark?: number;
+      /** "streak": how many rounds (default 5) and the angles to estimate. */
+      rounds?: number;
+      angles?: number[];
       /** Which arm sits on 0° — decides the correct scale (measure scenes). */
       baselineSide?: "left" | "right";
       /** Scaffolding: highlight the correct scale (full) / just the baseline / none. */

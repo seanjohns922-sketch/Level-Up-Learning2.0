@@ -1,54 +1,40 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
-import { estimateTask, closestTask, guessTask } from "@/data/activities/year5Measurelands/week7Common";
+import { constructTask, CONTEXTS, choose } from "@/data/activities/year5Measurelands/week7Common";
 
-// ── Measurelands · Level 5 · Week 7 · Lesson 3 — "Estimate Angles" (AC9M5M04) ──
-// Estimate LAST — now students know what real degrees look like from measuring
-// and constructing, so estimation is grounded, not guessing.
-//   Intro: benchmark angles (30 / 90 / 135).
-//   A. estimate — estimate the angle.
-//   B. closest  — which estimate is closest?
-//   C. guess    — is Professor Gauge's estimate sensible?
+// ── Measurelands · Level 5 · Week 7 · Lesson 3 — "Construct the Angle" (AC9M5M04) ──
+// The payoff: students estimate (L1), measure (L2), and now build angles with the
+// protractor to an exact target.
+//   A. build 45° — drag the arm to build a 45° angle.
+//   B. build 120° — build a 120° angle.
+//   C. engineer challenge — construct an angle for a bridge / roof / ramp / road.
 
-type ProtractorTask = Extract<PracticeTask, { kind: "protractor" }>;
-
-type LessonMemory = { introShown: boolean; cursor: number };
+type LessonMemory = { cursor: number };
 const lessonMemory = new Map<string, LessonMemory>();
-const ROTATION: Array<"estimate" | "closest" | "guess"> = ["estimate", "closest", "guess", "estimate", "closest", "guess"];
+const ROTATION: Array<"build45" | "build120" | "challenge"> = ["build45", "build120", "challenge", "build45", "build120", "challenge"];
 
 function getMemory(lessonId: string): LessonMemory {
   const existing = lessonMemory.get(lessonId);
   if (existing) return existing;
-  const created: LessonMemory = { introShown: false, cursor: 0 };
+  const created: LessonMemory = { cursor: 0 };
   lessonMemory.set(lessonId, created);
   return created;
 }
 
-function buildIntroTask(): ProtractorTask {
-  return {
-    kind: "protractor",
-    scene: "intro",
-    prompt: "Now estimate — you know what degrees look like.",
-    speakText:
-      "Professor Gauge says: now you've measured with a protractor, you know what angles look like. Estimate first, then you could check with the protractor. Compare to a right angle — 90 degrees.",
-    badgeLabel: "Meazurex Mission",
-    feedback: { correct: "Let's estimate!", wrong: "Let's estimate!" },
-  };
-}
-
 export function generateY5MeasurelandsWeek7Lesson3Task(lessonId: string, _difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
-  if (!memory.introShown) { memory.introShown = true; return buildIntroTask(); }
   const activity = ROTATION[memory.cursor % ROTATION.length]!;
   memory.cursor += 1;
-  if (activity === "closest") return closestTask();
-  if (activity === "guess") return guessTask();
-  return estimateTask();
+  if (activity === "build45") return constructTask(45, choose(CONTEXTS));
+  if (activity === "build120") return constructTask(120, choose(CONTEXTS));
+  return constructTask();
 }
 
 export function resetY5MeasurelandsWeek7Lesson3TaskSessionState() {
   lessonMemory.clear();
 }
 
+// Construct is interactive but determinate (must hit the target to Build), so it
+// is quiz-safe.
 export function buildY5MeasurelandsWeek7Lesson3QuizTasks(): PracticeTask[] {
-  return [estimateTask(), closestTask(), guessTask(), estimateTask(), closestTask()];
+  return [constructTask(45), constructTask(90), constructTask(120), constructTask(60), constructTask(135)];
 }
