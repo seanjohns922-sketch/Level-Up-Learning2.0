@@ -75,6 +75,21 @@ import {
   generateY5MeasurelandsWeek5Lesson3Task,
   resetY5MeasurelandsWeek5Lesson3TaskSessionState,
 } from "@/data/activities/year5Measurelands/week5Lesson3";
+import {
+  buildY5MeasurelandsWeek6Lesson1QuizTasks,
+  generateY5MeasurelandsWeek6Lesson1Task,
+  resetY5MeasurelandsWeek6Lesson1TaskSessionState,
+} from "@/data/activities/year5Measurelands/week6Lesson1";
+import {
+  buildY5MeasurelandsWeek6Lesson2QuizTasks,
+  generateY5MeasurelandsWeek6Lesson2Task,
+  resetY5MeasurelandsWeek6Lesson2TaskSessionState,
+} from "@/data/activities/year5Measurelands/week6Lesson2";
+import {
+  buildY5MeasurelandsWeek6Lesson3QuizTasks,
+  generateY5MeasurelandsWeek6Lesson3Task,
+  resetY5MeasurelandsWeek6Lesson3TaskSessionState,
+} from "@/data/activities/year5Measurelands/week6Lesson3";
 
 // Measurelands Level 5 (Year 5) — registry.
 //
@@ -269,6 +284,42 @@ const BUILT_LESSONS: Record<
       "Solve perimeter problems (fencing a space)",
     ],
     completionTitle: "Design Challenge Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+  },
+  "y5-measurement-w6-l1": {
+    generate: generateY5MeasurelandsWeek6Lesson1Task,
+    reset: resetY5MeasurelandsWeek6Lesson1TaskSessionState,
+    quizContributionBuilder: buildY5MeasurelandsWeek6Lesson1QuizTasks,
+    practisedSkills: [
+      "Convert 12-hour time to 24-hour time",
+      "Match analog and digital clocks to 24-hour time",
+      "Spot an incorrect 24-hour conversion",
+    ],
+    completionTitle: "24-Hour Time Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+  },
+  "y5-measurement-w6-l2": {
+    generate: generateY5MeasurelandsWeek6Lesson2Task,
+    reset: resetY5MeasurelandsWeek6Lesson2TaskSessionState,
+    quizContributionBuilder: buildY5MeasurelandsWeek6Lesson2QuizTasks,
+    practisedSkills: [
+      "Find a service in a timetable",
+      "Compare departure and arrival times",
+      "Work out how long a journey takes",
+    ],
+    completionTitle: "Read Timetables Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+  },
+  "y5-measurement-w6-l3": {
+    generate: generateY5MeasurelandsWeek6Lesson3Task,
+    reset: resetY5MeasurelandsWeek6Lesson3TaskSessionState,
+    quizContributionBuilder: buildY5MeasurelandsWeek6Lesson3QuizTasks,
+    practisedSkills: [
+      "Choose the service that arrives in time",
+      "Plan a journey using a timetable",
+      "Combine 24-hour time with elapsed time",
+    ],
+    completionTitle: "Plan the Journey Complete!",
     unlockMessage: "Weekly Quiz unlocked.",
   },
 };

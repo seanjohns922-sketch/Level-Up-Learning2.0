@@ -285,6 +285,9 @@ const TABLE: Record<string, SkillCoaching> = {
   ml_y5_w5_l1: { tip: "Ask yourself: am I measuring around it, or covering it?" },
   ml_y5_w5_l2: { tip: "Shapes can have the same area but different perimeters." },
   ml_y5_w5_l3: { tip: "Good mathematicians choose the correct measurement before they calculate." },
+  ml_y5_w6_l1: { tip: "24-hour time removes the need for am and pm." },
+  ml_y5_w6_l2: { tip: "Read every row carefully before choosing your answer." },
+  ml_y5_w6_l3: { tip: "The best plan isn't always the earliest — check every option." },
 };
 
 const FALLBACK: SkillCoaching = {
@@ -414,6 +417,9 @@ const LESSON_KEY_MAP: Record<string, string> = {
   "y5-measurement-w5-l1": "ml_y5_w5_l1",
   "y5-measurement-w5-l2": "ml_y5_w5_l2",
   "y5-measurement-w5-l3": "ml_y5_w5_l3",
+  "y5-measurement-w6-l1": "ml_y5_w6_l1",
+  "y5-measurement-w6-l2": "ml_y5_w6_l2",
+  "y5-measurement-w6-l3": "ml_y5_w6_l3",
 };
 
 function normalizeLessonId(lessonId: string): string {

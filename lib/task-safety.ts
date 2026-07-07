@@ -198,6 +198,8 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "angleQuest",
   "metricUnit",
   "precisionMeasure",
+  "time24",
+  "timetable",
   "massMeasure",
   "massUnit",
   "massScale",

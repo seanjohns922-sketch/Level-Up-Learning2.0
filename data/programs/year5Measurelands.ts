@@ -93,12 +93,12 @@ const YEAR5_MEASURELANDS_RAW: WeekPlan[] = [
   {
     id: "y5-measurement-w6",
     week: 6,
-    topic: "12 and 24 Hour Time",
+    topic: "Time Travellers",
     curriculum: ["AC9M5M03"],
     lessons: [
-      buildLesson(6, 1, "Meet 24-Hour Time", "Time: recognise and interpret 24-hour time.", ["24-hour time", "am and pm", "Time systems"], ["AC9M5M03"]),
-      buildLesson(6, 2, "Convert Time Systems", "Time: convert between 12-hour and 24-hour time.", ["Time conversion", "12-hour time", "24-hour time"], ["AC9M5M03"]),
-      buildLesson(6, 3, "Timetable Problems", "Time: solve timetable problems using 12-hour and 24-hour time.", ["Timetables", "Elapsed time", "Schedule reasoning"], ["AC9M5M03"]),
+      buildLesson(6, 1, "24-Hour Time", "Time: read and convert between 12-hour and 24-hour time.", ["24-hour time", "Convert", "am and pm"], ["AC9M5M03"]),
+      buildLesson(6, 2, "Read Timetables", "Time: interpret departures, arrivals and journeys in a timetable.", ["Timetables", "Departures", "Journey time"], ["AC9M5M03"]),
+      buildLesson(6, 3, "Plan the Journey", "Time: plan journeys using timetables, 24-hour time and elapsed time.", ["Plan journeys", "Choose services", "Elapsed time"], ["AC9M5M03"]),
     ],
   },
   {

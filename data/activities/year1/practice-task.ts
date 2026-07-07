@@ -1269,6 +1269,49 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Level 5 (Year 5) W6 "Time Travellers" (AC9M5M03): compare 12-
+      // and 24-hour time. Times are stored as MINUTES from midnight (0-1439).
+      // Handles the classic traps (13:00 vs 3:00, midnight/noon).
+      kind: "time24";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "convert" | "match" | "mistake";
+      /** The time being read, minutes from midnight. */
+      minutes?: number;
+      /** "convert": which way — 12→24 (default) or 24→12. */
+      direction?: "to24" | "to12";
+      /** Show the analog clock alongside (match / convert). */
+      showClock?: boolean;
+      /** MCQ options (already formatted strings) + correct. */
+      options?: string[];
+      correctOption?: string;
+      /** "mistake": Professor Gauge's wrong conversion claim. */
+      statement?: string;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
+      // Measurelands Level 5 (Year 5) W6 "Time Travellers" (AC9M5M03): interpret and
+      // use timetables. An interactive table of services with 24-hour departs/
+      // arrives, filter chips, tap-to-select a row, and MCQ for computed answers.
+      kind: "timetable";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "find" | "compare" | "mcq";
+      context?: { label: string; emoji: string };
+      /** Services. Times are minutes from midnight; shown as 24-hour HH:MM. */
+      rows: Array<{ id: string; route: string; emoji?: string; dest: string; departMin: number; arriveMin: number }>;
+      /** Filter chips (by destination) to narrow the table. */
+      filters?: Array<{ id: string; label: string; dest: string }>;
+      /** "find"/"compare": the correct service row to tap. */
+      answerRowId?: string;
+      /** "mcq": options + correct (e.g. elapsed time). */
+      options?: string[];
+      correctOption?: string;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       // Measurelands Year 3 W2 L3 "Estimate then Measure" (AC9M3M01): the full
       // measuring cycle — estimate first, measure with the ruler / metre stick,
       // then compare. Estimation is rewarded by CLOSENESS (🎯 exact / 👏 very
