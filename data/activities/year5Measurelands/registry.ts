@@ -15,6 +15,21 @@ import {
   generateY5MeasurelandsWeek1Lesson3Task,
   resetY5MeasurelandsWeek1Lesson3TaskSessionState,
 } from "@/data/activities/year5Measurelands/week1Lesson3";
+import {
+  buildY5MeasurelandsWeek2Lesson1QuizTasks,
+  generateY5MeasurelandsWeek2Lesson1Task,
+  resetY5MeasurelandsWeek2Lesson1TaskSessionState,
+} from "@/data/activities/year5Measurelands/week2Lesson1";
+import {
+  buildY5MeasurelandsWeek2Lesson2QuizTasks,
+  generateY5MeasurelandsWeek2Lesson2Task,
+  resetY5MeasurelandsWeek2Lesson2TaskSessionState,
+} from "@/data/activities/year5Measurelands/week2Lesson2";
+import {
+  buildY5MeasurelandsWeek2Lesson3QuizTasks,
+  generateY5MeasurelandsWeek2Lesson3Task,
+  resetY5MeasurelandsWeek2Lesson3TaskSessionState,
+} from "@/data/activities/year5Measurelands/week2Lesson3";
 
 // Measurelands Level 5 (Year 5) — registry.
 //
@@ -65,6 +80,42 @@ const BUILT_LESSONS: Record<
       "Justify a measurement choice",
     ],
     completionTitle: "Metric Decisions Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+  },
+  "y5-measurement-w2-l1": {
+    generate: generateY5MeasurelandsWeek2Lesson1Task,
+    reset: resetY5MeasurelandsWeek2Lesson1TaskSessionState,
+    quizContributionBuilder: buildY5MeasurelandsWeek2Lesson1QuizTasks,
+    practisedSkills: [
+      "Read a mixed-unit measurement off an instrument",
+      "Recognise when a smaller unit adds accuracy",
+      "Choose the more accurate measurement",
+    ],
+    completionTitle: "Measure More Accurately Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+  },
+  "y5-measurement-w2-l2": {
+    generate: generateY5MeasurelandsWeek2Lesson2Task,
+    reset: resetY5MeasurelandsWeek2Lesson2TaskSessionState,
+    quizContributionBuilder: buildY5MeasurelandsWeek2Lesson2QuizTasks,
+    practisedSkills: [
+      "Read mixed-unit measurements",
+      "Compare mixed measurements (both parts)",
+      "Match objects to realistic measurements",
+    ],
+    completionTitle: "Mixed Metric Units Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+  },
+  "y5-measurement-w2-l3": {
+    generate: generateY5MeasurelandsWeek2Lesson3Task,
+    reset: resetY5MeasurelandsWeek2Lesson3TaskSessionState,
+    quizContributionBuilder: buildY5MeasurelandsWeek2Lesson3QuizTasks,
+    practisedSkills: [
+      "Use precise measurements to solve problems",
+      "Compare accurate measurements",
+      "Justify a measurement decision",
+    ],
+    completionTitle: "Precision Challenges Complete!",
     unlockMessage: "Weekly Quiz unlocked.",
   },
 };

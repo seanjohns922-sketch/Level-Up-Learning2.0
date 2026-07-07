@@ -273,6 +273,9 @@ const TABLE: Record<string, SkillCoaching> = {
   ml_y5_w1_l1: { tip: "Choose the unit that best matches the size of the object." },
   ml_y5_w1_l2: { tip: "Smaller units help when you need greater accuracy." },
   ml_y5_w1_l3: { tip: "Great measurers explain why they chose a particular unit." },
+  ml_y5_w2_l1: { tip: "When a whole unit isn't accurate enough, use a smaller unit as well." },
+  ml_y5_w2_l2: { tip: "Read both parts of the measurement before comparing." },
+  ml_y5_w2_l3: { tip: "Accurate measurements help us make better decisions." },
 };
 
 const FALLBACK: SkillCoaching = {
@@ -390,6 +393,9 @@ const LESSON_KEY_MAP: Record<string, string> = {
   "y5-measurement-w1-l1": "ml_y5_w1_l1",
   "y5-measurement-w1-l2": "ml_y5_w1_l2",
   "y5-measurement-w1-l3": "ml_y5_w1_l3",
+  "y5-measurement-w2-l1": "ml_y5_w2_l1",
+  "y5-measurement-w2-l2": "ml_y5_w2_l2",
+  "y5-measurement-w2-l3": "ml_y5_w2_l3",
 };
 
 function normalizeLessonId(lessonId: string): string {

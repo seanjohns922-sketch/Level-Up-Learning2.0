@@ -1232,6 +1232,42 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Level 5 (Year 5) W2 "Precision Measurement" (AC9M5M01): use a
+      // COMBINATION of units (m + cm, kg + g, L + mL) for a more accurate measure.
+      // A drawn graduated instrument (tape measure for length; readout gauge for
+      // mass/capacity) plus reading, comparing and matching mixed-unit values.
+      // Reading + comparing only — no conversions. This is the permanent Level
+      // 5-6 precision measurement mechanic.
+      kind: "precisionMeasure";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "readMixed" | "whichAccurate" | "compareMixed" | "matchMixed" | "problem";
+      attribute?: "length" | "mass" | "capacity";
+      /** The value shown on the instrument, in SMALL units (cm / g / mL). */
+      valueSmall?: number;
+      /** readMixed / whichAccurate / matchMixed / problem: string options + correct. */
+      options?: string[];
+      correctOption?: string;
+      /** The object being measured (emoji matches label). */
+      object?: { label: string; emoji: string; context?: string };
+      /** compareMixed: two measurements (small-unit values) to compare. */
+      pair?: {
+        a: { valueSmall: number; label: string; emoji: string };
+        b: { valueSmall: number; label: string; emoji: string };
+      };
+      compareMode?: "larger" | "smaller";
+      correctSide?: "a" | "b";
+      /** intro: a rough vs precise reading to contrast. */
+      beforeAfter?: { before: string; after: string };
+      /** problem: reason options + the correct reason. */
+      reasonOptions?: string[];
+      correctReason?: string;
+      /** Optional teaching sub-note. */
+      note?: string;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       // Measurelands Year 3 W2 L3 "Estimate then Measure" (AC9M3M01): the full
       // measuring cycle — estimate first, measure with the ruler / metre stick,
       // then compare. Estimation is rewarded by CLOSENESS (🎯 exact / 👏 very

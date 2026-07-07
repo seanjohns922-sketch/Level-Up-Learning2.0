@@ -49,12 +49,12 @@ const YEAR5_MEASURELANDS_RAW: WeekPlan[] = [
   {
     id: "y5-measurement-w2",
     week: 2,
-    topic: "Decimal Measurements",
+    topic: "Precision Measurement",
     curriculum: ["AC9M5M01"],
     lessons: [
-      buildLesson(2, 1, "Decimal Lengths", "Decimal measurement: read and compare decimal length measures.", ["Decimal lengths", "Metric scales", "Compare lengths"], ["AC9M5M01"]),
-      buildLesson(2, 2, "Decimal Mass and Capacity", "Decimal measurement: read and compare decimal mass and capacity measures.", ["Decimal mass", "Decimal capacity", "Instrument readings"], ["AC9M5M01"]),
-      buildLesson(2, 3, "Compare Decimal Measurements", "Decimal measurement: compare and order mixed decimal measurements.", ["Compare decimals", "Order measurements", "Reason with units"], ["AC9M5M01"]),
+      buildLesson(2, 1, "Measure More Accurately", "Precision: use a smaller unit as well when one unit isn't accurate enough.", ["Mixed units", "Read graduations", "Accurate measuring"], ["AC9M5M01"]),
+      buildLesson(2, 2, "Mixed Metric Units", "Precision: read, compare and match mixed-unit measurements.", ["Read mixed units", "Compare measurements", "Match measurements"], ["AC9M5M01"]),
+      buildLesson(2, 3, "Precision Challenges", "Precision: solve practical problems using accurate mixed-unit measurements.", ["Precise problems", "Compare accurately", "Justify choices"], ["AC9M5M01"]),
     ],
   },
   {
