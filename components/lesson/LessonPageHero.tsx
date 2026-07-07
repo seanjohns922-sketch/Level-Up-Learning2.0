@@ -8,6 +8,7 @@ const heroMeasurelandsByYear: Record<number, string> = {
   3: "/images/measurelands-home-bg-y3.jpg",
   4: "/images/measurelands-home-bg-y4.jpg",
   5: "/images/measurelands-home-bg-y5.png",
+  6: "/images/measurelands-home-bg-y5.png",
 };
 
 function getMeasurelandsHeroSrc(year?: number | string) {

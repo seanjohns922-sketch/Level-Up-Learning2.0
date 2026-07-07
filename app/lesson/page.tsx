@@ -78,6 +78,14 @@ import {
   resetY5MeasurelandsLessonSessionState,
   resolveY5MeasurelandsLessonTask,
 } from "@/data/activities/year5Measurelands/registry";
+import {
+  getY6MeasurelandsLessonMeta,
+  getY6MeasurelandsPractisedSkills,
+  isY6MeasurelandsLessonId,
+  isY6MeasurelandsPlaceholderLesson,
+  resetY6MeasurelandsLessonSessionState,
+  resolveY6MeasurelandsLessonTask,
+} from "@/data/activities/year6Measurelands/registry";
 import { getProgramForYear } from "@/data/programs";
 import { getCurriculumPlan } from "@/data/programs/genres";
 import { DEMO_MODE } from "@/data/config";
@@ -185,7 +193,8 @@ function getLessonPractisedSkills(lessonId: string): string[] | undefined {
     getY2MeasurelandsPractisedSkills(lessonId) ??
     getY3MeasurelandsPractisedSkills(lessonId) ??
     getY4MeasurelandsPractisedSkills(lessonId) ??
-    getY5MeasurelandsPractisedSkills(lessonId)
+    getY5MeasurelandsPractisedSkills(lessonId) ??
+    getY6MeasurelandsPractisedSkills(lessonId)
   );
 }
 
@@ -393,7 +402,8 @@ function LessonPage() {
           getY2MeasurelandsLessonMeta(effectiveLessonId) ??
           getY3MeasurelandsLessonMeta(effectiveLessonId) ??
           getY4MeasurelandsLessonMeta(effectiveLessonId) ??
-          getY5MeasurelandsLessonMeta(effectiveLessonId)
+          getY5MeasurelandsLessonMeta(effectiveLessonId) ??
+          getY6MeasurelandsLessonMeta(effectiveLessonId)
         : null,
     [effectiveLessonId, realmId]
   );
@@ -421,8 +431,12 @@ function LessonPage() {
     realmId === "measurement" &&
     year === "Year 5" &&
     isY5MeasurelandsLessonId(effectiveLessonId);
+  const isYear6Measurelands =
+    realmId === "measurement" &&
+    year === "Year 6" &&
+    isY6MeasurelandsLessonId(effectiveLessonId);
   const invalidMeasurelandsLesson =
-    (year === "Prep" || year === "Year 2" || year === "Year 3" || year === "Year 4" || year === "Year 5") &&
+    (year === "Prep" || year === "Year 2" || year === "Year 3" || year === "Year 4" || year === "Year 5" || year === "Year 6") &&
     realmId === "measurement" &&
     !measurelandsMeta;
   // Unbuilt scaffold lessons (e.g. Level 4 placeholders) render a "Coming Soon"
@@ -431,7 +445,8 @@ function LessonPage() {
   const isPlaceholderMeasurelandsLesson =
     realmId === "measurement" &&
     (isY4MeasurelandsPlaceholderLesson(effectiveLessonId) ||
-      isY5MeasurelandsPlaceholderLesson(effectiveLessonId));
+      isY5MeasurelandsPlaceholderLesson(effectiveLessonId) ||
+      isY6MeasurelandsPlaceholderLesson(effectiveLessonId));
 
   useEffect(() => {
     const p = readProgress();
@@ -1253,6 +1268,7 @@ function LessonPage() {
                         resetY3MeasurelandsLessonSessionState();
                         resetY4MeasurelandsLessonSessionState();
                         resetY5MeasurelandsLessonSessionState();
+                        resetY6MeasurelandsLessonSessionState();
                         resetPrepMeasurelandsLessonSessionState();
                       }
                       setStartedLessonId(effectiveLessonId);
@@ -1285,7 +1301,7 @@ function LessonPage() {
               </div>
             </div>
           </div>
-        ) : year === "Year 1" || isGroundCustomLesson || isYear2Measurelands || isYear3Measurelands || isYear4Measurelands || isYear5Measurelands ? (
+        ) : year === "Year 1" || isGroundCustomLesson || isYear2Measurelands || isYear3Measurelands || isYear4Measurelands || isYear5Measurelands || isYear6Measurelands ? (
           <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
             <LessonPageHero
                     levelNumber={levelNumber}
@@ -1304,7 +1320,7 @@ function LessonPage() {
               key={`${year}-${week}-${effectiveLessonId}`}
               minutes={9}
               lessonTitle={safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
-              completionMode={year === "Year 1" || isGroundCustomLesson || isYear2Measurelands || isYear3Measurelands || isYear4Measurelands || isYear5Measurelands ? "time_only" : "question_or_time"}
+              completionMode={year === "Year 1" || isGroundCustomLesson || isYear2Measurelands || isYear3Measurelands || isYear4Measurelands || isYear5Measurelands || isYear6Measurelands ? "time_only" : "question_or_time"}
               scoreCap={10}
               liveContext={liveLessonContext}
               realmId={realmId}
@@ -1334,6 +1350,7 @@ function LessonPage() {
                 }
                 if (realmId === "measurement") {
                   return (
+                    resolveY6MeasurelandsLessonTask(effectiveLessonId, d) ??
                     resolveY5MeasurelandsLessonTask(effectiveLessonId, d) ??
                     resolveY4MeasurelandsLessonTask(effectiveLessonId, d) ??
                     resolveY3MeasurelandsLessonTask(effectiveLessonId, d) ??

@@ -8140,6 +8140,13 @@ function SessionPage({
       return [];
     }
 
+    // Level 6 Measurelands is architecture-only for now. Keep quiz routes
+    // realm-safe and empty so they never fall through to Number Nexus or generic
+    // structured quiz content before real lesson generators exist.
+    if (isMeasurementRealm && year === "Year 6") {
+      return [];
+    }
+
     if (
       year === "Year 2" ||
       year === "Year 3" ||
