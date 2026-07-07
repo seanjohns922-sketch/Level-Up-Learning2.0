@@ -104,12 +104,12 @@ const YEAR5_MEASURELANDS_RAW: WeekPlan[] = [
   {
     id: "y5-measurement-w7",
     week: 7,
-    topic: "Angles in Degrees",
+    topic: "Angle Masters",
     curriculum: ["AC9M5M04"],
     lessons: [
-      buildLesson(7, 1, "Estimate Angles", "Angles: estimate angles measured in degrees.", ["Angle estimates", "Degrees", "Benchmark angles"], ["AC9M5M04"]),
-      buildLesson(7, 2, "Measure Angles", "Angles: measure angles accurately with a protractor.", ["Protractor", "Angle measurement", "Degrees"], ["AC9M5M04"]),
-      buildLesson(7, 3, "Construct Angles", "Angles: construct angles using degree measurements.", ["Construct angles", "Use a protractor", "Angle accuracy"], ["AC9M5M04"]),
+      buildLesson(7, 1, "Estimate Angles", "Angles: estimate angle sizes using benchmark angles.", ["Angle estimates", "Benchmark angles", "Degrees"], ["AC9M5M04"]),
+      buildLesson(7, 2, "Measure Angles", "Angles: measure angles accurately with a dual-scale protractor.", ["Protractor", "Read the scale", "Degrees"], ["AC9M5M04"]),
+      buildLesson(7, 3, "Construct Angles", "Angles: construct angles with a protractor by dragging to the degree.", ["Construct angles", "Use a protractor", "Engineering"], ["AC9M5M04"]),
     ],
   },
   {

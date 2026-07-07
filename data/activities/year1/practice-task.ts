@@ -1312,6 +1312,37 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Level 5 (Year 5) W7 "Angle Masters" (AC9M5M04): estimate,
+      // measure and construct angles with a protractor. Whole degrees, 0-180 (no
+      // reflex). The dual-scale protractor is the permanent L5-L6 instrument.
+      kind: "protractor";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "estimate" | "closest" | "guess" | "read" | "whichScale" | "mistake" | "construct";
+      /** The angle in whole degrees (0-180). */
+      angle?: number;
+      /** Which arm sits on 0° — decides the correct scale (measure scenes). */
+      baselineSide?: "left" | "right";
+      /** Scaffolding: highlight the correct scale (full) / just the baseline / none. */
+      guidance?: "full" | "baseline" | "none";
+      /** Engineering context (bridge / ramp / roof ...). */
+      context?: { label: string; emoji: string };
+      /** MCQ degree options + correct (estimate / closest / read / whichScale). */
+      options?: number[];
+      correctOption?: number;
+      /** "guess": Gauge's estimate and whether it's sensible. */
+      guessValue?: number;
+      sensible?: boolean;
+      /** "mistake": Gauge's wrong reading + reasoning options. */
+      statement?: string;
+      reasonOptions?: string[];
+      correctReason?: string;
+      /** "construct": the target angle to build. */
+      targetDeg?: number;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       // Measurelands Year 3 W2 L3 "Estimate then Measure" (AC9M3M01): the full
       // measuring cycle — estimate first, measure with the ruler / metre stick,
       // then compare. Estimation is rewarded by CLOSENESS (🎯 exact / 👏 very

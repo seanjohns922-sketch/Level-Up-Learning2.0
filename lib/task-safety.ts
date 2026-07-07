@@ -200,6 +200,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "precisionMeasure",
   "time24",
   "timetable",
+  "protractor",
   "massMeasure",
   "massUnit",
   "massScale",

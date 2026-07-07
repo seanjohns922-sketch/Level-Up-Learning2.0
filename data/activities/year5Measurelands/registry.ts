@@ -90,6 +90,21 @@ import {
   generateY5MeasurelandsWeek6Lesson3Task,
   resetY5MeasurelandsWeek6Lesson3TaskSessionState,
 } from "@/data/activities/year5Measurelands/week6Lesson3";
+import {
+  buildY5MeasurelandsWeek7Lesson1QuizTasks,
+  generateY5MeasurelandsWeek7Lesson1Task,
+  resetY5MeasurelandsWeek7Lesson1TaskSessionState,
+} from "@/data/activities/year5Measurelands/week7Lesson1";
+import {
+  buildY5MeasurelandsWeek7Lesson2QuizTasks,
+  generateY5MeasurelandsWeek7Lesson2Task,
+  resetY5MeasurelandsWeek7Lesson2TaskSessionState,
+} from "@/data/activities/year5Measurelands/week7Lesson2";
+import {
+  buildY5MeasurelandsWeek7Lesson3QuizTasks,
+  generateY5MeasurelandsWeek7Lesson3Task,
+  resetY5MeasurelandsWeek7Lesson3TaskSessionState,
+} from "@/data/activities/year5Measurelands/week7Lesson3";
 
 // Measurelands Level 5 (Year 5) — registry.
 //
@@ -320,6 +335,42 @@ const BUILT_LESSONS: Record<
       "Combine 24-hour time with elapsed time",
     ],
     completionTitle: "Plan the Journey Complete!",
+    unlockMessage: "Weekly Quiz unlocked.",
+  },
+  "y5-measurement-w7-l1": {
+    generate: generateY5MeasurelandsWeek7Lesson1Task,
+    reset: resetY5MeasurelandsWeek7Lesson1TaskSessionState,
+    quizContributionBuilder: buildY5MeasurelandsWeek7Lesson1QuizTasks,
+    practisedSkills: [
+      "Estimate the size of an angle",
+      "Compare angles to benchmark angles",
+      "Judge whether an estimate is sensible",
+    ],
+    completionTitle: "Estimate Angles Complete!",
+    unlockMessage: "Lesson 2 unlocked.",
+  },
+  "y5-measurement-w7-l2": {
+    generate: generateY5MeasurelandsWeek7Lesson2Task,
+    reset: resetY5MeasurelandsWeek7Lesson2TaskSessionState,
+    quizContributionBuilder: buildY5MeasurelandsWeek7Lesson2QuizTasks,
+    practisedSkills: [
+      "Read an angle on a protractor",
+      "Read from the correct scale",
+      "Spot a protractor reading mistake",
+    ],
+    completionTitle: "Measure Angles Complete!",
+    unlockMessage: "Lesson 3 unlocked.",
+  },
+  "y5-measurement-w7-l3": {
+    generate: generateY5MeasurelandsWeek7Lesson3Task,
+    reset: resetY5MeasurelandsWeek7Lesson3TaskSessionState,
+    quizContributionBuilder: buildY5MeasurelandsWeek7Lesson3QuizTasks,
+    practisedSkills: [
+      "Construct an angle with a protractor",
+      "Build common benchmark angles",
+      "Create accurate angles for engineering designs",
+    ],
+    completionTitle: "Construct Angles Complete!",
     unlockMessage: "Weekly Quiz unlocked.",
   },
 };
