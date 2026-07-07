@@ -31,13 +31,24 @@ function ContextLine({ task }: { task: ProtractorTask }) {
 
 function DegRow({ options, correct, onCorrect, onWrong, onWrongPick }: { options: number[]; correct: number; onCorrect: () => void; onWrong: () => void; onWrongPick?: () => void }) {
   const [wrong, setWrong] = useState<number | null>(null);
+  const [reveal, setReveal] = useState(false);
+  const pick = (n: number) => {
+    if (n === correct) onCorrect();
+    else { setWrong(n); setReveal(true); onWrong(); onWrongPick?.(); }
+  };
   return (
-    <div className="grid grid-cols-3 gap-3">
-      {options.map((n) => (
-        <button key={n} type="button" onClick={() => (n === correct ? onCorrect() : (setWrong(n), onWrong(), onWrongPick?.(), window.setTimeout(() => setWrong(null), 800)))} className={`relative flex min-h-[64px] items-center justify-center rounded-[22px] border-2 px-3 text-2xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 ${wrong === n ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[#fffaf0]"}`}>
-          <span className="absolute right-2 top-2 z-10"><OptionReadAloudButton text={`${n} degrees`} /></span>{n}°
-        </button>
-      ))}
+    <div className="space-y-2">
+      <div className="grid grid-cols-3 gap-3">
+        {options.map((n) => {
+          const showCorrect = reveal && n === correct;
+          return (
+            <button key={n} type="button" onClick={() => pick(n)} className={`relative flex min-h-[64px] items-center justify-center rounded-[22px] border-2 px-3 text-2xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 ${wrong === n ? "border-[#C0564E] bg-[#FCE0E0]" : showCorrect ? "border-[#16a34a] bg-[rgba(22,163,74,0.14)]" : "border-[rgba(214,184,108,0.55)] bg-[#fffaf0]"}`}>
+              <span className="absolute right-2 top-2 z-10"><OptionReadAloudButton text={`${n} degrees`} /></span>{n}°{showCorrect ? " ✓" : ""}
+            </button>
+          );
+        })}
+      </div>
+      {reveal ? <p className="text-center text-sm font-black text-[#16a34a]">It was {correct}° — tap the green answer to continue.</p> : null}
     </div>
   );
 }
