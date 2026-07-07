@@ -274,23 +274,22 @@ function SameDiffScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect
 const ROW_HL = "rgba(245,158,11,0.5)";
 const COL_HL = "rgba(13,148,136,0.45)";
 
-function ArrayGrid({ gridW, gridH, rowsOn, colsOn, onRowTap, onColTap, reveal, banded, size }: {
+function ArrayGrid({ gridW, gridH, rowsOn, colsOn, onRowTap, onColTap, reveal, size }: {
   gridW: number; gridH: number;
   rowsOn?: Set<number>; colsOn?: Set<number>;
   onRowTap?: (r: number) => void; onColTap?: (c: number) => void;
-  reveal?: boolean; banded?: boolean; size?: number;
+  reveal?: boolean; size?: number;
 }) {
   const w = gridW * U + PAD * 2, h = gridH * U + PAD * 2;
   const R = Array.from({ length: gridH }, (_, i) => i);
   const C = Array.from({ length: gridW }, (_, i) => i);
-  const showBand = banded || reveal;
   const colDelayBase = gridH * 0.24 + 0.6; // columns pulse after the rows finish
   return (
     <div className="mx-auto" style={{ maxWidth: size ?? Math.min(w, 360) }}>
       <svg viewBox={`0 0 ${w} ${h}`} width="100%" role="img" aria-label={`${gridH} rows by ${gridW} columns`}>
         <style>{"@keyframes mlPulse{0%{opacity:0}35%{opacity:1}75%{opacity:1}100%{opacity:0}}"}</style>
         {R.map((r) => C.map((c) => (
-          <rect key={`b${c}-${r}`} x={PAD + c * U} y={PAD + r * U} width={U} height={U} rx={5} fill={showBand && r % 2 === 1 ? "rgba(245,158,11,0.16)" : TILE_BG} stroke={TILE} strokeWidth={1.4} />
+          <rect key={`b${c}-${r}`} x={PAD + c * U} y={PAD + r * U} width={U} height={U} rx={5} fill={TILE_BG} stroke={TILE} strokeWidth={1.4} />
         )))}
         {R.map((r) => (rowsOn?.has(r) ? <rect key={`r${r}`} x={PAD} y={PAD + r * U} width={gridW * U} height={U} rx={6} fill={ROW_HL} /> : null))}
         {C.map((c) => (colsOn?.has(c) ? <rect key={`c${c}`} x={PAD + c * U} y={PAD} width={U} height={gridH * U} rx={6} fill={COL_HL} /> : null))}
@@ -350,7 +349,7 @@ function ArrayAreaScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrec
     <Shell badge={task.badgeLabel ?? "How Many Squares?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3 space-y-2">
         {task.context ? <div className="text-center text-[12px] font-black uppercase tracking-[0.14em] text-[#a98b52]">{task.emoji} {task.context}</div> : null}
-        <ArrayGrid gridW={gridW} gridH={gridH} banded size={320} />
+        <ArrayGrid gridW={gridW} gridH={gridH} size={320} />
         <ArrayReadout gridH={gridH} gridW={gridW} unit={unit} />
       </div>
       <div className="grid grid-cols-3 gap-3">
@@ -395,7 +394,7 @@ function CalcAreaScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect
       <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_280px]">
         <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3 space-y-2">
           {task.context ? <div className="text-center text-[12px] font-black uppercase tracking-[0.14em] text-[#a98b52]">{task.emoji} {task.context}</div> : null}
-          <ArrayGrid gridW={gridW} gridH={gridH} banded />
+          <ArrayGrid gridW={gridW} gridH={gridH} />
           <ArrayReadout gridH={gridH} gridW={gridW} unit={areaUnitLabel(task)} />
         </div>
         <AreaKeypad answer={task.answerValue ?? gridW * gridH} unit={areaUnitLabel(task)} onCorrect={onCorrect} onWrong={onWrong} />
@@ -411,7 +410,7 @@ function SpotMistakeScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorr
   return (
     <Shell badge={task.badgeLabel ?? "Professor Gauge's Mistake"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3 space-y-2">
-        <ArrayGrid gridW={gridW} gridH={gridH} banded size={320} />
+        <ArrayGrid gridW={gridW} gridH={gridH} size={320} />
         <ArrayReadout gridH={gridH} gridW={gridW} unit={unit} />
       </div>
       {task.statement ? <div className="rounded-[18px] border border-[rgba(192,86,78,0.28)] bg-[rgba(252,224,224,0.5)] px-4 py-2 text-center text-lg font-black text-[#7c2d12]">{task.statement}</div> : null}
