@@ -813,38 +813,29 @@ function WholeShape({ gridW, gridH, rects, candidates, wrongId, onPick, size }: 
 }
 
 /** The decomposed shape — coloured rectangles that separate, with dim/area labels. */
-function Decomposed({ gridW, gridH, rects, separated, activeIndex, showDims, showArea, lin, size }: {
-  gridW: number; gridH: number; rects: CRect[]; separated?: boolean; activeIndex?: number;
-  showDims?: boolean; showArea?: boolean; lin?: string; size?: number;
+// The shape stays whole — the two rectangles just get different colours so the
+// split is visible in place. Each rectangle carries its own "w × h = area" label.
+function Decomposed({ gridW, gridH, rects, activeIndex, showArea, lin, size }: {
+  gridW: number; gridH: number; rects: CRect[]; activeIndex?: number; showArea?: boolean; lin?: string; size?: number;
 }) {
   const cell = cxCell(gridW, gridH, size);
-  const PAD = 40, W = gridW * cell + PAD * 2, H = gridH * cell + PAD * 2;
-  const cxAll = (gridW * cell) / 2, cyAll = (gridH * cell) / 2, gap = separated ? Math.max(10, cell * 0.4) : 0;
-  const dimText = (n: number) => `${n}${lin ? ` ${lin}` : ""}`;
+  const PAD = 26, W = gridW * cell + PAD * 2, H = gridH * cell + PAD * 2;
   return (
     <div className="mx-auto" style={{ maxWidth: W }}>
-      <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="shape split into rectangles">
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="shape split into rectangles by colour">
         {rects.map((r, i) => {
-          const rx = r.x * cell, ry = r.y * cell, rcx = rx + (r.w * cell) / 2, rcy = ry + (r.h * cell) / 2;
-          const dx = separated ? Math.sign(rcx - cxAll || 1) * gap : 0;
-          const dy = separated ? Math.sign(rcy - cyAll || 1) * gap : 0;
+          const rx = PAD + r.x * cell, ry = PAD + r.y * cell, rw = r.w * cell, rh = r.h * cell;
           const dim = activeIndex != null && activeIndex !== i;
           const stroke = CX_STROKE[i % 3]!, fill = CX_FILL[i % 3]!;
           const cells: React.ReactNode[] = [];
-          for (let cc = 0; cc < r.w; cc++) for (let rr = 0; rr < r.h; rr++) cells.push(<rect key={`${cc}-${rr}`} x={PAD + (r.x + cc) * cell} y={PAD + (r.y + rr) * cell} width={cell} height={cell} fill="none" stroke={stroke} strokeOpacity={0.35} strokeWidth={1} />);
+          for (let cc = 0; cc < r.w; cc++) for (let rr = 0; rr < r.h; rr++) cells.push(<rect key={`${cc}-${rr}`} x={rx + cc * cell} y={ry + rr * cell} width={cell} height={cell} fill="none" stroke={stroke} strokeOpacity={0.3} strokeWidth={1} />);
           return (
-            <g key={i} style={{ transform: `translate(${dx}px, ${dy}px)`, transition: "transform .5s ease", opacity: dim ? 0.28 : 1 }}>
-              <rect x={PAD + rx} y={PAD + ry} width={r.w * cell} height={r.h * cell} rx={6} fill={fill} stroke={stroke} strokeWidth={3} />
+            <g key={i} style={{ opacity: dim ? 0.32 : 1 }}>
+              <rect x={rx} y={ry} width={rw} height={rh} rx={5} fill={fill} stroke={stroke} strokeWidth={3.5} />
               {cells}
-              {showArea ? <text x={PAD + rcx} y={PAD + rcy + 6} textAnchor="middle" fontSize={17} fontWeight={900} fill={stroke}>{r.w * r.h}{lin ? " " + lin + "²" : ""}</text> : null}
-              {showDims ? (
-                <>
-                  <rect x={PAD + rx + (r.w * cell) / 2 - 24} y={PAD + ry - 24} width={48} height={20} rx={7} fill={stroke} />
-                  <text x={PAD + rx + (r.w * cell) / 2} y={PAD + ry - 10} textAnchor="middle" fontSize={12} fontWeight={900} fill="#fff">{dimText(r.w)}</text>
-                  <rect x={PAD + rx - 30} y={PAD + ry + (r.h * cell) / 2 - 10} width={44} height={20} rx={7} fill={stroke} />
-                  <text x={PAD + rx - 8} y={PAD + ry + (r.h * cell) / 2 + 4} textAnchor="middle" fontSize={12} fontWeight={900} fill="#fff">{dimText(r.h)}</text>
-                </>
-              ) : null}
+              <rect x={rx + rw / 2 - 34} y={ry + rh / 2 - 17} width={68} height={34} rx={9} fill="#fff" stroke={stroke} strokeWidth={2} />
+              <text x={rx + rw / 2} y={ry + rh / 2 - 2} textAnchor="middle" fontSize={13} fontWeight={900} fill={stroke}>{r.w} × {r.h}</text>
+              <text x={rx + rw / 2} y={ry + rh / 2 + 14} textAnchor="middle" fontSize={13} fontWeight={900} fill={stroke}>{showArea ? `= ${r.w * r.h}${lin ? ` ${lin}²` : ""}` : "= ?"}</text>
             </g>
           );
         })}
@@ -866,20 +857,45 @@ function SplitOption({ gridW, gridH, cells, orient, pos, size }: { gridW: number
   );
 }
 
+/** The whole shape with ONE candidate cut line drawn (for the chooser cards). */
+function CutPreview({ gridW, gridH, cells, orient, pos, size }: { gridW: number; gridH: number; cells: Array<[number, number]>; orient: "h" | "v"; pos: number; size?: number }) {
+  const cell = cxCell(gridW, gridH, size);
+  const PAD = 12, W = gridW * cell + PAD * 2, H = gridH * cell + PAD * 2;
+  const el = ([c, r, s]: [number, number, Side]): [number, number, number, number] => {
+    const x = PAD + c * cell, y = PAD + r * cell;
+    if (s === "top") return [x, y, x + cell, y]; if (s === "right") return [x + cell, y, x + cell, y + cell];
+    if (s === "bottom") return [x, y + cell, x + cell, y + cell]; return [x, y, x, y + cell];
+  };
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="candidate cut">
+      {cells.map(([c, r]) => <rect key={`${c},${r}`} x={PAD + c * cell} y={PAD + r * cell} width={cell} height={cell} fill="rgba(124,58,237,0.12)" stroke="rgba(124,58,237,0.3)" strokeWidth={1} />)}
+      {boundaryEdges(cells).map((e, i) => { const [x1, y1, x2, y2] = el(e); return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#5b21b6" strokeWidth={3} strokeLinecap="round" />; })}
+      {orient === "h"
+        ? <line x1={PAD} y1={PAD + pos * cell} x2={PAD + gridW * cell} y2={PAD + pos * cell} stroke="#c026d3" strokeWidth={4} strokeDasharray="7 5" />
+        : <line x1={PAD + pos * cell} y1={PAD} x2={PAD + pos * cell} y2={PAD + gridH * cell} stroke="#c026d3" strokeWidth={4} strokeDasharray="7 5" />}
+    </svg>
+  );
+}
+
 function SplitChooseScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect: () => void; onWrong: () => void }) {
   const comp = task.composite!;
-  const [chosen, setChosen] = useState(false);
+  const cells = cxUnion(comp.rects);
   const [wrong, setWrong] = useState<string | null>(null);
+  const [okId, setOkId] = useState<string | null>(null);
   const pick = (c: { id: string; valid: boolean }) => {
-    if (c.valid) { setChosen(true); window.setTimeout(onCorrect, 950); }
+    if (c.valid) { setOkId(c.id); window.setTimeout(onCorrect, 850); }
     else { setWrong(c.id); onWrong(); window.setTimeout(() => setWrong(null), 600); }
   };
   return (
     <Shell badge={task.badgeLabel ?? "Where to Split"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
-        {chosen ? <Decomposed gridW={comp.gridW} gridH={comp.gridH} rects={comp.rects} separated showDims lin={cxLin(task)} /> : <WholeShape gridW={comp.gridW} gridH={comp.gridH} rects={comp.rects} candidates={task.splitCandidates} wrongId={wrong} onPick={pick} />}
-        <p className={`mt-2 text-center text-sm font-black ${chosen ? "text-[#16a34a]" : "text-[#a98b52]"}`}>{chosen ? "🎉 Two clean rectangles!" : "Tap a dotted cut line."}</p>
+      <div className="grid grid-cols-3 gap-3">
+        {(task.splitCandidates ?? []).map((c) => (
+          <button key={c.id} type="button" onClick={() => pick(c)} className={`rounded-[22px] border-2 p-2 transition hover:-translate-y-0.5 active:scale-[0.98] ${okId === c.id ? "border-[#16a34a] bg-[rgba(22,163,74,0.14)]" : wrong === c.id ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)]"}`}>
+            <CutPreview gridW={comp.gridW} gridH={comp.gridH} cells={cells} orient={c.orient} pos={c.pos} />
+          </button>
+        ))}
       </div>
+      <p className="text-center text-[13px] font-black text-[#a98b52]">Tap the cut that makes TWO rectangles.</p>
     </Shell>
   );
 }
@@ -894,7 +910,7 @@ function SplitDragScene({ task, onCorrect }: { task: AreaTask; onCorrect: () => 
   return (
     <Shell badge={task.badgeLabel ?? "Split the Shape"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
-        {done ? <Decomposed gridW={comp.gridW} gridH={comp.gridH} rects={comp.rects} separated showDims lin={cxLin(task)} /> : <WholeShape gridW={comp.gridW} gridH={comp.gridH} rects={comp.rects} candidates={[{ id: "d", orient, pos, valid: atValid }]} />}
+        {done ? <Decomposed gridW={comp.gridW} gridH={comp.gridH} rects={comp.rects} showArea lin={cxLin(task)} /> : <WholeShape gridW={comp.gridW} gridH={comp.gridH} rects={comp.rects} candidates={[{ id: "d", orient, pos, valid: atValid }]} />}
       </div>
       {!done ? (
         <div className="space-y-2">
@@ -932,7 +948,7 @@ function CompositeSolveScene({ task, onCorrect, onWrong }: { task: AreaTask; onC
   const aArea = rects[0]!.w * rects[0]!.h, bArea = rects[1] ? rects[1].w * rects[1].h : 0;
   const total = task.answerValue ?? aArea + bArea;
   const [phase, setPhase] = useState<"intro" | "a" | "b" | "total">("intro");
-  const fig = (active?: number, sep = true) => <Decomposed gridW={comp.gridW} gridH={comp.gridH} rects={rects} separated={sep} activeIndex={active} showDims showArea={phase === "total"} lin={lin} />;
+  const fig = (active?: number) => <Decomposed gridW={comp.gridW} gridH={comp.gridH} rects={rects} activeIndex={active} showArea={phase === "total"} lin={lin} />;
   return (
     <Shell badge={task.badgeLabel ?? "Break & Solve"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       {phase === "intro" ? (
@@ -968,7 +984,7 @@ function CompositeTotalScene({ task, onCorrect, onWrong }: { task: AreaTask; onC
     <Shell badge={task.badgeLabel ?? "Total Area"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
         {task.context ? <ContextLine task={task} /> : null}
-        <Decomposed gridW={comp.gridW} gridH={comp.gridH} rects={comp.rects} separated showDims showArea lin={cxLin(task)} />
+        <Decomposed gridW={comp.gridW} gridH={comp.gridH} rects={comp.rects} showArea lin={cxLin(task)} />
       </div>
       <div className="grid grid-cols-3 gap-3">
         {(task.options ?? []).map((n) => (
@@ -988,7 +1004,7 @@ function CompositeMistakeScene({ task, onCorrect, onWrong }: { task: AreaTask; o
     <Shell badge={task.badgeLabel ?? "Professor Gauge's Mistake"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
         {task.context ? <ContextLine task={task} /> : null}
-        <Decomposed gridW={comp.gridW} gridH={comp.gridH} rects={comp.rects} separated showDims showArea lin={cxLin(task)} />
+        <Decomposed gridW={comp.gridW} gridH={comp.gridH} rects={comp.rects} showArea lin={cxLin(task)} />
       </div>
       {task.statement ? <div className="rounded-[18px] border border-[rgba(192,86,78,0.28)] bg-[rgba(252,224,224,0.5)] px-4 py-2 text-center text-lg font-black text-[#7c2d12]">{task.statement}</div> : null}
       <div className="grid gap-3">
@@ -1010,7 +1026,7 @@ function BreakIntroScene({ task, onCorrect }: { task: AreaTask; onCorrect: () =>
     <Shell badge={task.badgeLabel ?? "The Strategy"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="grid gap-3 md:grid-cols-2">
         <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
-          <Decomposed gridW={comp.gridW} gridH={comp.gridH} rects={rects} separated showDims showArea lin={cxLin(task)} />
+          <Decomposed gridW={comp.gridW} gridH={comp.gridH} rects={rects} showArea lin={cxLin(task)} />
         </div>
         <div className="rounded-[24px] border border-[rgba(214,184,108,0.45)] bg-[rgba(255,250,240,0.96)] p-4">
           <div className="mb-2 text-[12px] font-black uppercase tracking-[0.16em] text-[#a98b52]">The strategy</div>
