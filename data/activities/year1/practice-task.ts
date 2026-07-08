@@ -1654,7 +1654,7 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "whichPart" | "cover" | "countSquares" | "compareArea" | "orderArea" | "buildArea" | "sameArea" | "sameDiff" | "rows" | "columns" | "arrayArea" | "calcArea" | "spotMistake" | "investigate" | "predictArray" | "formulaReveal" | "calcDims" | "chooseArea" | "mistakeDims";
+      scene: "intro" | "whichPart" | "cover" | "countSquares" | "compareArea" | "orderArea" | "buildArea" | "sameArea" | "sameDiff" | "rows" | "columns" | "arrayArea" | "calcArea" | "spotMistake" | "investigate" | "predictArray" | "formulaReveal" | "formulaIntro" | "calcDims" | "chooseArea" | "mistakeDims";
       /** "compareArea" (L5 W5): compare by "area" (default) or "perimeter". */
       compareMode?: "area" | "perimeter";
       /** L6 W1 "mistakeDims": pick why Professor Gauge's area is wrong. */

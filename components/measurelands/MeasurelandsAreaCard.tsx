@@ -649,6 +649,43 @@ function FormulaRevealScene({ task, onCorrect }: { task: AreaTask; onCorrect: ()
   );
 }
 
+/* L2/L3 opener — teach the formula before using it. */
+function FormulaIntroScene({ task, onCorrect }: { task: AreaTask; onCorrect: () => void }) {
+  const length = task.gridW ?? 5, width = task.gridH ?? 3;
+  const unit = task.areaUnit ?? "m²";
+  const lin = unit === "cm²" ? "cm" : "m";
+  return (
+    <Shell badge={task.badgeLabel ?? "The Area Formula"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="grid gap-3 md:grid-cols-2">
+        <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
+          <DimRect length={length} width={width} unit={lin} showGrid />
+          <div className="mt-2 rounded-[16px] border border-[rgba(214,184,108,0.5)] bg-white px-3 py-2 text-center text-lg font-black">
+            <span className="text-[#0f766e]">{length}</span>
+            <span className="text-[#a98b52]"> × </span>
+            <span className="text-[#b45309]">{width}</span>
+            <span className="text-[#a98b52]"> = </span>
+            <span className="text-[#7c3aed]">{length * width} {unit}</span>
+          </div>
+        </div>
+        <div className="rounded-[24px] border border-[rgba(214,184,108,0.45)] bg-[rgba(255,250,240,0.96)] p-4">
+          <div className="mb-2 text-[12px] font-black uppercase tracking-[0.16em] text-[#a98b52]">How the formula works</div>
+          <div className="rounded-[16px] border-2 border-[#5b21b6] bg-[rgba(91,33,182,0.06)] px-4 py-3 text-center text-2xl font-black text-[#5b21b6]">Area = length × width</div>
+          <p className="mt-3 text-[15px] font-semibold leading-snug text-[#2c1c07]">
+            The <span className="font-black text-[#0f766e]">length</span> is how far across. The <span className="font-black text-[#b45309]">width</span> is how far down.
+          </p>
+          <p className="mt-2 text-[15px] font-semibold leading-snug text-[#5a4423]">
+            Multiply them to count <span className="font-black">every square at once</span> — no counting one by one.
+          </p>
+          <p className="mt-2 text-[14px] font-semibold leading-snug text-[#5a4423]">
+            Real spaces are measured in <span className="font-black text-[#7c3aed]">square units</span>: square metres (<span className="font-black">m²</span>) or square centimetres (<span className="font-black">cm²</span>).
+          </p>
+        </div>
+      </div>
+      <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[60px] items-center justify-center rounded-[24px] border-2 border-[rgba(180,120,20,0.55)] bg-[#fffaf0] px-8 text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]">Let&apos;s calculate! →</button>
+    </Shell>
+  );
+}
+
 /* L2/L3 — calculate area from labelled dimensions (grid appears only on a miss). */
 function CalcDimsScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect: () => void; onWrong: () => void }) {
   const length = task.gridW ?? 5, width = task.gridH ?? 3;
@@ -719,6 +756,7 @@ export function MeasurelandsAreaCard({ task, onCorrect, onWrong }: { task: AreaT
   switch (task.scene) {
     case "predictArray": return <PredictScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "formulaReveal": return <FormulaRevealScene task={task} onCorrect={onCorrect} />;
+    case "formulaIntro": return <FormulaIntroScene task={task} onCorrect={onCorrect} />;
     case "calcDims": return <CalcDimsScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "chooseArea": return <ChooseAreaScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "mistakeDims": return <MistakeDimsScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;

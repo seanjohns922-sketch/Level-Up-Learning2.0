@@ -118,6 +118,17 @@ export function arrayMcqTask(): AreaTask {
   };
 }
 
+// Instructional opener for Lessons 2 & 3 — teach Area = length × width first.
+export function formulaIntroTask(): AreaTask {
+  return {
+    kind: "area", scene: "formulaIntro", gridW: 5, gridH: 3, areaUnit: "m²",
+    prompt: "Area = length × width",
+    speakText: "Here's the rule. The area of a rectangle is length times width. The length is how far across, the width is how far down. Multiply them to count every square at once. We measure area in square units, like square metres.",
+    badgeLabel: "The Area Formula",
+    feedback: { correct: "Let's calculate!", wrong: "Let's calculate!" },
+  };
+}
+
 // ── Lessons 2 & 3: calculate / choose / spot-mistake from labelled dimensions ──
 type Ctx = { label: string; emoji: string };
 
