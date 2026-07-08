@@ -49,6 +49,25 @@ export function makeL(min = 4, max = 8): LData {
   return { gridW, gridH, notchW, notchH, corner, total: gridW * gridH - notchW * notchH, hSplit, vSplit, hRects, vRects };
 }
 
+// A T-shape = a full-width bar + a narrower stem below it (two rectangles, split
+// horizontally at the bar's base). Both decompositions are the same pair.
+export function makeT(min = 5, max = 9): LData {
+  const gridW = between(Math.max(5, min), max);
+  const barH = between(1, 3);
+  const stemW = between(2, gridW - 2);
+  const stemX = Math.max(1, Math.min(gridW - 1 - stemW, Math.floor((gridW - stemW) / 2)));
+  const stemH = between(2, 5);
+  const gridH = barH + stemH;
+  const bar: Rect = { x: 0, y: 0, w: gridW, h: barH };
+  const stem: Rect = { x: stemX, y: barH, w: stemW, h: stemH };
+  const rects: [Rect, Rect] = [bar, stem];
+  return {
+    gridW, gridH, notchW: 0, notchH: 0, corner: "TR",
+    total: gridW * barH + stemW * stemH,
+    hSplit: barH, vSplit: stemX, hRects: rects, vRects: rects,
+  };
+}
+
 function pickDecomp(l: LData): [Rect, Rect] { return randInt(2) === 0 ? l.hRects : l.vRects; }
 const rectArea = (r: Rect) => r.w * r.h;
 
@@ -132,8 +151,8 @@ function baseComposite(l: LData, rects: [Rect, Rect], mode: "cells" | "dims", un
   };
 }
 
-export function compositeSolveTask(mode: "cells" | "dims", unit?: "cm²" | "m²", ctx?: { label: string; emoji: string }): AreaTask {
-  const l = mode === "dims" ? makeL(5, 9) : makeL(4, 7);
+export function compositeSolveTask(mode: "cells" | "dims", unit?: "cm²" | "m²", ctx?: { label: string; emoji: string }, shape?: LData): AreaTask {
+  const l = shape ?? (mode === "dims" ? makeL(5, 9) : makeL(4, 7));
   const rects = pickDecomp(l);
   return {
     kind: "area", scene: "compositeSolve", ...baseComposite(l, rects, mode, unit, ctx),
@@ -145,8 +164,8 @@ export function compositeSolveTask(mode: "cells" | "dims", unit?: "cm²" | "m²"
   } as AreaTask;
 }
 
-export function compositeTotalTask(mode: "cells" | "dims", unit?: "cm²" | "m²", ctx?: { label: string; emoji: string }): AreaTask {
-  const l = mode === "dims" ? makeL(5, 9) : makeL(4, 7);
+export function compositeTotalTask(mode: "cells" | "dims", unit?: "cm²" | "m²", ctx?: { label: string; emoji: string }, shape?: LData): AreaTask {
+  const l = shape ?? (mode === "dims" ? makeL(5, 9) : makeL(4, 7));
   const rects = pickDecomp(l);
   const correct = l.total;
   const box = l.gridW * l.gridH;                    // counted the missing corner
@@ -164,8 +183,8 @@ export function compositeTotalTask(mode: "cells" | "dims", unit?: "cm²" | "m²"
   } as AreaTask;
 }
 
-export function compositeMistakeTask(mode: "cells" | "dims", unit?: "cm²" | "m²", ctx?: { label: string; emoji: string }): AreaTask {
-  const l = mode === "dims" ? makeL(5, 9) : makeL(4, 7);
+export function compositeMistakeTask(mode: "cells" | "dims", unit?: "cm²" | "m²", ctx?: { label: string; emoji: string }, shape?: LData): AreaTask {
+  const l = shape ?? (mode === "dims" ? makeL(5, 9) : makeL(4, 7));
   const rects = pickDecomp(l);
   const box = l.gridW * l.gridH;
   const forgot = Math.max(rectArea(rects[0]), rectArea(rects[1]));
@@ -200,7 +219,8 @@ export function breakIntroTask(): AreaTask {
   };
 }
 
-// Lesson 3 real-context wrappers.
-export function l3Solve(): AreaTask { return compositeSolveTask("dims", "m²", choose(L3_CONTEXTS)); }
-export function l3Total(): AreaTask { return compositeTotalTask("dims", "m²", choose(L3_CONTEXTS)); }
-export function l3Mistake(): AreaTask { return compositeMistakeTask("dims", "m²", choose(L3_CONTEXTS)); }
+// Lesson 3 real-context wrappers — mix L-shapes and T-shapes for variety.
+function l3Shape(): LData { return randInt(2) === 0 ? makeT(5, 9) : makeL(5, 9); }
+export function l3Solve(): AreaTask { return compositeSolveTask("dims", "m²", choose(L3_CONTEXTS), l3Shape()); }
+export function l3Total(): AreaTask { return compositeTotalTask("dims", "m²", choose(L3_CONTEXTS), l3Shape()); }
+export function l3Mistake(): AreaTask { return compositeMistakeTask("dims", "m²", choose(L3_CONTEXTS), l3Shape()); }
