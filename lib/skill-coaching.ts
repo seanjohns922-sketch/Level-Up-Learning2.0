@@ -294,6 +294,9 @@ const TABLE: Record<string, SkillCoaching> = {
   ml_y5_w8_l1: { tip: "Choose the measurement before choosing the calculation." },
   ml_y5_w8_l2: { tip: "Professionals rely on accurate measurements, not guesses." },
   ml_y5_w8_l3: { tip: "The best problem solvers plan first, then calculate." },
+  ml_y6_w1_l1: { tip: "Look for the pattern before looking for the formula." },
+  ml_y6_w1_l2: { tip: "Length tells you how many columns; width tells you how many rows." },
+  ml_y6_w1_l3: { tip: "The area formula saves time — it counts every square without counting one by one." },
 };
 
 const FALLBACK: SkillCoaching = {
@@ -432,6 +435,9 @@ const LESSON_KEY_MAP: Record<string, string> = {
   "y5-measurement-w8-l1": "ml_y5_w8_l1",
   "y5-measurement-w8-l2": "ml_y5_w8_l2",
   "y5-measurement-w8-l3": "ml_y5_w8_l3",
+  "y6-measurement-w1-l1": "ml_y6_w1_l1",
+  "y6-measurement-w1-l2": "ml_y6_w1_l2",
+  "y6-measurement-w1-l3": "ml_y6_w1_l3",
 };
 
 function normalizeLessonId(lessonId: string): string {

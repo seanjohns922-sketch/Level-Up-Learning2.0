@@ -1,5 +1,8 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
 import { YEAR6_MEASURELANDS_PROGRAM } from "@/data/programs/year6Measurelands";
+import { generateY6MeasurelandsWeek1Lesson1Task, resetY6MeasurelandsWeek1Lesson1TaskSessionState, buildY6MeasurelandsWeek1Lesson1QuizTasks } from "@/data/activities/year6Measurelands/week1Lesson1";
+import { generateY6MeasurelandsWeek1Lesson2Task, resetY6MeasurelandsWeek1Lesson2TaskSessionState, buildY6MeasurelandsWeek1Lesson2QuizTasks } from "@/data/activities/year6Measurelands/week1Lesson2";
+import { generateY6MeasurelandsWeek1Lesson3Task, resetY6MeasurelandsWeek1Lesson3TaskSessionState, buildY6MeasurelandsWeek1Lesson3QuizTasks } from "@/data/activities/year6Measurelands/week1Lesson3";
 
 // Measurelands Level 6 (Year 6) — placeholder registry only.
 //
@@ -84,10 +87,42 @@ function makePlaceholderEntry(week: number, lessonNumber: number): Y6Measureland
   };
 }
 
+// Real, runnable lessons override the placeholders (placeholder: false → records
+// XP, completion, unlock, attempts and quiz progress in realm_id=measurement).
+type BuiltOverride = Partial<Y6MeasurelandsLessonEntry> &
+  Pick<Y6MeasurelandsLessonEntry, "generate" | "reset" | "quizContributionBuilder" | "practisedSkills" | "completionTitle">;
+
+const BUILT_LESSONS: Record<string, BuiltOverride> = {
+  "y6-measurement-w1-l1": {
+    generate: generateY6MeasurelandsWeek1Lesson1Task,
+    reset: resetY6MeasurelandsWeek1Lesson1TaskSessionState,
+    quizContributionBuilder: buildY6MeasurelandsWeek1Lesson1QuizTasks,
+    practisedSkills: ["Recognise rows and columns", "Predict rows × columns", "Discover Area = length × width"],
+    completionTitle: "Discover the Formula Complete!",
+  },
+  "y6-measurement-w1-l2": {
+    generate: generateY6MeasurelandsWeek1Lesson2Task,
+    reset: resetY6MeasurelandsWeek1Lesson2TaskSessionState,
+    quizContributionBuilder: buildY6MeasurelandsWeek1Lesson2QuizTasks,
+    practisedSkills: ["Identify length and width", "Use Area = length × width", "Tell area apart from perimeter"],
+    completionTitle: "Calculate Area Complete!",
+  },
+  "y6-measurement-w1-l3": {
+    generate: generateY6MeasurelandsWeek1Lesson3Task,
+    reset: resetY6MeasurelandsWeek1Lesson3TaskSessionState,
+    quizContributionBuilder: buildY6MeasurelandsWeek1Lesson3QuizTasks,
+    practisedSkills: ["Choose the correct dimensions", "Calculate area in m²", "Solve practical area problems"],
+    completionTitle: "Area Investigations Complete!",
+  },
+};
+
 const Y6_MEASURELANDS_LESSONS: Y6MeasurelandsLessonEntry[] = [];
 for (let week = 1; week <= 8; week += 1) {
   for (let lessonNumber = 1; lessonNumber <= 3; lessonNumber += 1) {
-    Y6_MEASURELANDS_LESSONS.push(makePlaceholderEntry(week, lessonNumber));
+    const entry = makePlaceholderEntry(week, lessonNumber);
+    const built = BUILT_LESSONS[entry.prefix];
+    if (built) Object.assign(entry, built, { placeholder: false });
+    Y6_MEASURELANDS_LESSONS.push(entry);
   }
 }
 

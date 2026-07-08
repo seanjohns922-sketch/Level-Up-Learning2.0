@@ -524,8 +524,204 @@ function InvestigateScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorr
   );
 }
 
+/* ── Level 6 W1: the area formula (discover → generalise → apply) ── */
+const LEN_COLOR = "#0f766e"; // length = columns (teal)
+const WID_COLOR = "#b45309"; // width = rows (amber)
+
+function linearUnit(task: AreaTask): string {
+  return task.areaUnit === "cm²" ? "cm" : task.areaUnit === "m²" ? "m" : "units";
+}
+function allSet(n: number): Set<number> { return new Set(Array.from({ length: n }, (_, i) => i)); }
+
+/** A plain labelled rectangle (length × width) — no grid until `showGrid`. */
+function DimRect({ length, width, unit, showGrid, size }: { length: number; width: number; unit: string; showGrid?: boolean; size?: number }) {
+  const cell = Math.max(12, Math.min((size ?? 300) / length, 200 / width, 40));
+  const w = cell * length, h = cell * width;
+  const PADX = 58, PADY = 42, x0 = PADX, y0 = PADY;
+  const VW = w + PADX * 2, VH = h + PADY * 2;
+  const cols = Array.from({ length: length - 1 }, (_, i) => i + 1);
+  const rows = Array.from({ length: width - 1 }, (_, i) => i + 1);
+  return (
+    <div className="mx-auto" style={{ maxWidth: VW }}>
+      <svg viewBox={`0 0 ${VW} ${VH}`} width="100%" role="img" aria-label={`rectangle ${length} by ${width} ${unit}`}>
+        <rect x={x0} y={y0} width={w} height={h} rx={7} fill="rgba(124,58,237,0.13)" stroke="#7c3aed" strokeWidth={3} />
+        {showGrid ? (
+          <g>
+            {cols.map((c) => <line key={`vc${c}`} x1={x0 + c * cell} y1={y0} x2={x0 + c * cell} y2={y0 + h} stroke="rgba(124,58,237,0.4)" strokeWidth={1.2} />)}
+            {rows.map((r) => <line key={`hr${r}`} x1={x0} y1={y0 + r * cell} x2={x0 + w} y2={y0 + r * cell} stroke="rgba(124,58,237,0.4)" strokeWidth={1.2} />)}
+          </g>
+        ) : null}
+        {/* top length dimension */}
+        <line x1={x0} y1={y0 - 16} x2={x0 + w} y2={y0 - 16} stroke={LEN_COLOR} strokeWidth={2} />
+        <line x1={x0} y1={y0 - 21} x2={x0} y2={y0 - 11} stroke={LEN_COLOR} strokeWidth={2} />
+        <line x1={x0 + w} y1={y0 - 21} x2={x0 + w} y2={y0 - 11} stroke={LEN_COLOR} strokeWidth={2} />
+        <g>
+          <rect x={x0 + w / 2 - 34} y={y0 - 30} width={68} height={27} rx={9} fill={LEN_COLOR} />
+          <text x={x0 + w / 2} y={y0 - 11} textAnchor="middle" fontSize={15} fontWeight={900} fill="#fff">{length} {unit}</text>
+        </g>
+        {/* left width dimension */}
+        <line x1={x0 - 16} y1={y0} x2={x0 - 16} y2={y0 + h} stroke={WID_COLOR} strokeWidth={2} />
+        <line x1={x0 - 21} y1={y0} x2={x0 - 11} y2={y0} stroke={WID_COLOR} strokeWidth={2} />
+        <line x1={x0 - 21} y1={y0 + h} x2={x0 - 11} y2={y0 + h} stroke={WID_COLOR} strokeWidth={2} />
+        <g>
+          <rect x={x0 - 50} y={y0 + h / 2 - 13} width={68} height={27} rx={9} fill={WID_COLOR} />
+          <text x={x0 - 16} y={y0 + h / 2 + 6} textAnchor="middle" fontSize={15} fontWeight={900} fill="#fff">{width} {unit}</text>
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+function ContextLine({ task }: { task: AreaTask }) {
+  if (!task.context) return null;
+  return <div className="text-center text-[12px] font-black uppercase tracking-[0.14em] text-[#a98b52]">{task.emoji} {task.context}</div>;
+}
+
+/* L1-C — Predict rows × columns, then the grid reveals to confirm the pattern. */
+function PredictScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect: () => void; onWrong: () => void }) {
+  const gridW = task.gridW ?? 4, gridH = task.gridH ?? 3;
+  const unit = areaUnitLabel(task);
+  const answer = task.answerValue ?? gridW * gridH;
+  const [revealed, setRevealed] = useState(false);
+  return (
+    <Shell badge={task.badgeLabel ?? "Discover the Pattern"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      {!revealed ? (
+        <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_280px]">
+          <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3 space-y-2">
+            <ArrayGrid gridW={gridW} gridH={gridH} rowsOn={allSet(gridH)} colsOn={allSet(gridW)} />
+            <div className="flex flex-wrap items-center justify-center gap-2 rounded-[18px] border border-[rgba(214,184,108,0.5)] bg-white px-3 py-2 text-lg font-black">
+              <span className="rounded-[10px] px-2 py-0.5 text-[#b45309]" style={{ background: "rgba(245,158,11,0.16)" }}>{gridH} rows</span>
+              <span className="text-[#a98b52]">×</span>
+              <span className="rounded-[10px] px-2 py-0.5 text-[#0f766e]" style={{ background: "rgba(13,148,136,0.14)" }}>{gridW} columns</span>
+              <span className="text-[#a98b52]">= ?</span>
+            </div>
+          </div>
+          <AreaKeypad answer={answer} unit={unit} onCorrect={() => setRevealed(true)} onWrong={onWrong} />
+        </div>
+      ) : (
+        <>
+          <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3 space-y-2">
+            <ArrayGrid gridW={gridW} gridH={gridH} reveal size={320} />
+            <ArrayReadout gridH={gridH} gridW={gridW} unit={unit} showTotal />
+          </div>
+          <p className="text-center text-base font-black text-[#16a34a]">🎉 You predicted it — {gridH} × {gridW} = {answer} {unit}!</p>
+          <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[58px] items-center justify-center rounded-[24px] border-2 border-[#16a34a] bg-[#16a34a] px-10 text-xl font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5">Next →</button>
+        </>
+      )}
+    </Shell>
+  );
+}
+
+/* L1 formula reveal — the earned generalisation, revealed step by step. */
+function FormulaRevealScene({ task, onCorrect }: { task: AreaTask; onCorrect: () => void }) {
+  const gridW = task.gridW ?? 5, gridH = task.gridH ?? 3;
+  const unit = areaUnitLabel(task);
+  const [step, setStep] = useState(0);
+  const steps: Array<{ cap: React.ReactNode; rows?: boolean; cols?: boolean; total?: boolean; formula?: boolean }> = [
+    { cap: <>You&apos;ve been counting every square. Watch a faster way…</> },
+    { cap: <>The <span className="font-black text-[#b45309]">width</span> is the number of <span className="font-black text-[#b45309]">rows</span> down.</>, rows: true },
+    { cap: <>The <span className="font-black text-[#0f766e]">length</span> is the number of <span className="font-black text-[#0f766e]">columns</span> across.</>, cols: true },
+    { cap: <>Every row holds the same squares — so <span className="font-black">rows × columns</span> counts them all.</>, rows: true, cols: true, total: true },
+    { cap: <>That&apos;s the rule for every rectangle:</>, formula: true },
+  ];
+  const s = steps[step]!;
+  return (
+    <Shell badge={task.badgeLabel ?? "You Discovered It!"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <style>{"@keyframes mlSlideIn{0%{opacity:0;transform:translateY(14px) scale(.9)}100%{opacity:1;transform:none}}"}</style>
+      <div className="flex flex-col items-center gap-3 rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
+        <div className="flex gap-1.5">{steps.map((_, i) => <span key={i} className={`h-2.5 w-7 rounded-full ${i <= step ? "bg-[#5b21b6]" : "bg-[rgba(124,58,237,0.2)]"}`} />)}</div>
+        <ArrayGrid gridW={gridW} gridH={gridH} rowsOn={s.rows ? allSet(gridH) : undefined} colsOn={s.cols ? allSet(gridW) : undefined} size={300} />
+        {s.total ? <ArrayReadout gridH={gridH} gridW={gridW} unit={unit} showTotal /> : null}
+        {s.formula ? (
+          <div style={{ animation: "mlSlideIn .5s ease-out both" }} className="rounded-[20px] border-2 border-[#5b21b6] bg-[rgba(91,33,182,0.06)] px-6 py-4 text-center">
+            <div className="text-2xl font-black text-[#5b21b6] sm:text-3xl">Area = length × width</div>
+            <div className="mt-1 text-sm font-black text-[#a98b52]">{gridW} × {gridH} = {gridW * gridH} {unit}</div>
+          </div>
+        ) : null}
+        <div className="rounded-[18px] border-2 border-[rgba(91,33,182,0.22)] bg-[rgba(91,33,182,0.05)] px-4 py-3 text-center text-[16px] font-bold text-[#2c1c07]">{s.cap}</div>
+      </div>
+      {step < steps.length - 1 ? (
+        <button type="button" onClick={() => setStep((v) => v + 1)} className="mx-auto flex min-h-[58px] items-center justify-center rounded-[24px] border-2 border-[#5b21b6] bg-[#5b21b6] px-8 text-lg font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5">Next →</button>
+      ) : (
+        <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[58px] items-center justify-center rounded-[24px] border-2 border-[#16a34a] bg-[#16a34a] px-8 text-lg font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5">Got it — let&apos;s use it! →</button>
+      )}
+    </Shell>
+  );
+}
+
+/* L2/L3 — calculate area from labelled dimensions (grid appears only on a miss). */
+function CalcDimsScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect: () => void; onWrong: () => void }) {
+  const length = task.gridW ?? 5, width = task.gridH ?? 3;
+  const [missed, setMissed] = useState(false);
+  const [peek, setPeek] = useState(false);
+  return (
+    <Shell badge={task.badgeLabel ?? "Find the Area"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_280px]">
+        <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3 space-y-2">
+          <ContextLine task={task} />
+          <DimRect length={length} width={width} unit={linearUnit(task)} showGrid={peek} />
+          {missed ? (
+            <button type="button" onClick={() => setPeek(true)} className="mx-auto block rounded-full border-2 border-[rgba(214,184,108,0.6)] bg-white px-4 py-1 text-[12px] font-black uppercase tracking-wide text-[#7c4a12] shadow-sm">{peek ? "Count the squares — length × width" : "Peek the squares"}</button>
+          ) : null}
+        </div>
+        <AreaKeypad answer={task.answerValue ?? length * width} unit={areaUnitLabel(task)} onCorrect={onCorrect} onWrong={() => { setMissed(true); onWrong(); }} />
+      </div>
+    </Shell>
+  );
+}
+
+/* L2/L3 — choose the correct area (distractors = perimeter / wrong sides). */
+function ChooseAreaScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect: () => void; onWrong: () => void }) {
+  const length = task.gridW ?? 5, width = task.gridH ?? 3;
+  const unit = areaUnitLabel(task);
+  const spoken = areaUnitSpoken(task);
+  const [wrong, setWrong] = useState<number | null>(null);
+  return (
+    <Shell badge={task.badgeLabel ?? "Choose the Area"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3 space-y-1">
+        <ContextLine task={task} />
+        <DimRect length={length} width={width} unit={linearUnit(task)} />
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        {(task.options ?? []).map((n) => (
+          <button key={n} type="button" onClick={() => (n === task.correctNumber ? onCorrect() : (setWrong(n), onWrong(), window.setTimeout(() => setWrong(null), 600)))} className={`relative flex min-h-[66px] items-center justify-center rounded-[22px] border-2 text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98] ${wrong === n ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[#fffaf0]"}`}>
+            <span className="absolute right-1 top-1 z-10"><OptionReadAloudButton text={`${n} ${spoken}`} /></span>{n} {unit}
+          </button>
+        ))}
+      </div>
+    </Shell>
+  );
+}
+
+/* L2/L3 — Professor Gauge's mistake: identify the error in his working. */
+function MistakeDimsScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect: () => void; onWrong: () => void }) {
+  const length = task.gridW ?? 5, width = task.gridH ?? 3;
+  const [wrong, setWrong] = useState<string | null>(null);
+  return (
+    <Shell badge={task.badgeLabel ?? "Professor Gauge's Mistake"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3 space-y-1">
+        <ContextLine task={task} />
+        <DimRect length={length} width={width} unit={linearUnit(task)} />
+      </div>
+      {task.statement ? <div className="rounded-[18px] border border-[rgba(192,86,78,0.28)] bg-[rgba(252,224,224,0.5)] px-4 py-2 text-center text-lg font-black text-[#7c2d12]">{task.statement}</div> : null}
+      <div className="grid gap-3">
+        {(task.reasonOptions ?? []).map((r) => (
+          <button key={r} type="button" onClick={() => (r === task.correctReason ? onCorrect() : (setWrong(r), onWrong(), window.setTimeout(() => setWrong(null), 600)))} className={`relative flex min-h-[56px] items-center justify-center rounded-[22px] border-2 px-4 text-base font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 ${wrong === r ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[#fffaf0]"}`}>
+            <span className="absolute right-2 top-2 z-10"><OptionReadAloudButton text={r} /></span>{r}
+          </button>
+        ))}
+      </div>
+    </Shell>
+  );
+}
+
 export function MeasurelandsAreaCard({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect: () => void; onWrong: () => void }) {
   switch (task.scene) {
+    case "predictArray": return <PredictScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+    case "formulaReveal": return <FormulaRevealScene task={task} onCorrect={onCorrect} />;
+    case "calcDims": return <CalcDimsScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+    case "chooseArea": return <ChooseAreaScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+    case "mistakeDims": return <MistakeDimsScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "intro": return task.arrayReveal ? <ArrayIntroScene task={task} onCorrect={onCorrect} /> : <IntroScene task={task} onCorrect={onCorrect} />;
     case "investigate": return <InvestigateScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "rows": return <RowColScene task={task} dir="rows" onCorrect={onCorrect} />;
