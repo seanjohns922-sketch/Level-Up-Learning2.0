@@ -1,31 +1,114 @@
 import { normalizeWeekPlans } from "./buildProgram";
 import type { CurriculumCode, Lesson, WeekPlan } from "./year1";
 
-// Measurelands Level 6 (Year 6) — architecture shell only.
+// Measurelands Level 6 (Year 6) — program plan shell only.
 //
-// Curriculum content is intentionally not planned here yet. These placeholders
-// let routing, world selection, registries and program cards resolve safely
-// inside realm_id=measurement without falling back to Ground Level or Number.
+// This stores the 8-week "Master Measurement" flow without implementing lesson
+// generators yet. Placeholder lessons still resolve safely inside
+// realm_id=measurement and record no progress until real generators replace them.
 const YEAR6_MEASURELANDS_CURRICULUM: CurriculumCode[] = ["ALL"];
 
+const WEEK_PLANS = [
+  {
+    topic: "Area Formula",
+    focus: "Discover and use Area = Length × Width.",
+    lessons: [
+      ["Discover the Formula", "Rows and columns become length × width."],
+      ["Calculate Area", "Use the rectangle area formula."],
+      ["Area Investigations", "Solve practical rectangle area problems."],
+    ],
+  },
+  {
+    topic: "Composite Area",
+    focus: "Split composite rectangles, calculate each part, then combine.",
+    lessons: [
+      ["Split the Shape", "Break composite rectangles into simpler parts."],
+      ["Find Composite Area", "Calculate and combine rectangle areas."],
+      ["Design Problems", "Use composite area in gardens, buildings and playgrounds."],
+    ],
+  },
+  {
+    topic: "Volume",
+    focus: "Understand volume using cubic units and cube arrays.",
+    lessons: [
+      ["Meet Volume", "Introduce cubic units as 3D measurement."],
+      ["Build Volume", "Build and count cube arrays."],
+      ["Volume Problems", "Solve box, storage and container problems."],
+    ],
+  },
+  {
+    topic: "Circles",
+    focus: "Explore circle parts and radius-diameter relationships.",
+    lessons: [
+      ["Parts of a Circle", "Identify radius, diameter, centre and circumference."],
+      ["Measure Circles", "Measure radius and diameter relationships."],
+      ["Circle Investigations", "Reason about real-world circles without formulas."],
+    ],
+  },
+  {
+    topic: "Advanced Time",
+    focus: "Solve timetable, elapsed time and travel planning problems.",
+    lessons: [
+      ["Complex Timetables", "Read and reason with detailed schedules."],
+      ["Multi-Step Elapsed Time", "Solve elapsed time problems with more than one step."],
+      ["Travel Planner", "Plan journeys using flights, connections and decisions."],
+    ],
+  },
+  {
+    topic: "Angle Reasoning",
+    focus: "Use angle facts to solve missing-angle problems.",
+    lessons: [
+      ["Missing Angles", "Find simple adjacent missing angles."],
+      ["Angles on a Straight Line", "Use straight-line angle reasoning."],
+      ["Angle Investigations", "Apply angle reasoning to real-world contexts."],
+    ],
+  },
+  {
+    topic: "Measurement Optimisation",
+    focus: "Choose the best tool, unit and strategy for professional problems.",
+    lessons: [
+      ["Best Tool", "Choose efficient tools for measurement jobs."],
+      ["Best Strategy", "Choose the strategy that fits the problem."],
+      ["Professional Decisions", "Justify measurement decisions as builders, surveyors and scientists."],
+    ],
+  },
+  {
+    topic: "Master Engineer Project",
+    focus: "Complete authentic multi-skill engineering investigations.",
+    lessons: [
+      ["Design a Community Park", "Use length, area, perimeter, volume, angles and time."],
+      ["Engineer Challenge", "Solve a large connected design project."],
+      ["Master Measurelands Mission", "Complete the final Level 6 engineering challenge."],
+    ],
+  },
+] as const;
+
 function buildLesson(week: number, lesson: number): Lesson {
+  const weekPlan = WEEK_PLANS[week - 1];
+  const lessonPlan = weekPlan.lessons[lesson - 1];
   return {
     id: `y6-measurement-w${week}-l${lesson}`,
     week,
     lesson,
-    title: `Lesson ${lesson}`,
-    focus: "Measurelands Level 6 lesson details will appear here once this level is built.",
-    activityIdeas: [],
+    title: lessonPlan[0],
+    focus: lessonPlan[1],
+    activityIdeas: [
+      "Reason about the problem.",
+      "Choose an efficient strategy.",
+      "Solve and justify the measurement decision.",
+    ],
     curriculum: YEAR6_MEASURELANDS_CURRICULUM,
   };
 }
 
 const YEAR6_MEASURELANDS_RAW: WeekPlan[] = Array.from({ length: 8 }, (_, index) => {
   const week = index + 1;
+  const weekPlan = WEEK_PLANS[index];
   return {
     id: `y6-measurement-w${week}`,
     week,
-    topic: `Level 6 — Week ${week}`,
+    topic: weekPlan.topic,
+    focus: weekPlan.focus,
     curriculum: YEAR6_MEASURELANDS_CURRICULUM,
     lessons: [1, 2, 3].map((lesson) => buildLesson(week, lesson)),
   };
