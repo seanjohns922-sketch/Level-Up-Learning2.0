@@ -1654,12 +1654,25 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "whichPart" | "cover" | "countSquares" | "compareArea" | "orderArea" | "buildArea" | "sameArea" | "sameDiff" | "rows" | "columns" | "arrayArea" | "calcArea" | "spotMistake" | "investigate" | "predictArray" | "formulaReveal" | "formulaIntro" | "calcDims" | "chooseArea" | "mistakeDims";
+      scene: "intro" | "whichPart" | "cover" | "countSquares" | "compareArea" | "orderArea" | "buildArea" | "sameArea" | "sameDiff" | "rows" | "columns" | "arrayArea" | "calcArea" | "spotMistake" | "investigate" | "predictArray" | "formulaReveal" | "formulaIntro" | "calcDims" | "chooseArea" | "mistakeDims" | "breakIntro" | "splitChoose" | "splitDrag" | "splitWorks" | "compositeSolve" | "compositeTotal" | "compositeMistake";
       /** "compareArea" (L5 W5): compare by "area" (default) or "perimeter". */
       compareMode?: "area" | "perimeter";
-      /** L6 W1 "mistakeDims": pick why Professor Gauge's area is wrong. */
+      /** L6 W1 "mistakeDims" / W2 "compositeMistake": pick the error. */
       reasonOptions?: string[];
       correctReason?: string;
+      /** L6 W2 (Breaking Apart Shapes): a composite shape as a decomposition into
+       *  labelled rectangles (grid coords, top-left origin). */
+      composite?: { gridW: number; gridH: number; rects: Array<{ x: number; y: number; w: number; h: number }> };
+      /** L6 W2: draw with unit squares ("cells") or plain labelled rects ("dims"). */
+      figureMode?: "cells" | "dims";
+      /** "splitChoose": candidate cut lines (pos = row for "h", col for "v"). */
+      splitCandidates?: Array<{ id: string; orient: "h" | "v"; pos: number; valid: boolean }>;
+      /** "splitWorks": candidate splits rendered as coloured pieces; one is valid. */
+      splitWorksOptions?: Array<{ id: string; orient: "h" | "v"; pos: number }>;
+      correctSplitId?: string;
+      /** "splitDrag": the axis to slide + the valid position that yields rectangles. */
+      dragOrient?: "h" | "v";
+      dragValidPos?: number;
       cells?: Array<[number, number]>;
       gridW?: number;
       gridH?: number;

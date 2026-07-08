@@ -107,6 +107,9 @@ import { buildY5MeasurelandsWeek1Lesson3QuizTasks } from "@/data/activities/year
 import { buildY6MeasurelandsWeek1Lesson1QuizTasks } from "@/data/activities/year6Measurelands/week1Lesson1";
 import { buildY6MeasurelandsWeek1Lesson2QuizTasks } from "@/data/activities/year6Measurelands/week1Lesson2";
 import { buildY6MeasurelandsWeek1Lesson3QuizTasks } from "@/data/activities/year6Measurelands/week1Lesson3";
+import { buildY6MeasurelandsWeek2Lesson1QuizTasks } from "@/data/activities/year6Measurelands/week2Lesson1";
+import { buildY6MeasurelandsWeek2Lesson2QuizTasks } from "@/data/activities/year6Measurelands/week2Lesson2";
+import { buildY6MeasurelandsWeek2Lesson3QuizTasks } from "@/data/activities/year6Measurelands/week2Lesson3";
 import { buildY5MeasurelandsWeek2Lesson1QuizTasks } from "@/data/activities/year5Measurelands/week2Lesson1";
 import { buildY5MeasurelandsWeek2Lesson2QuizTasks } from "@/data/activities/year5Measurelands/week2Lesson2";
 import { buildY5MeasurelandsWeek2Lesson3QuizTasks } from "@/data/activities/year5Measurelands/week2Lesson3";
@@ -1965,25 +1968,30 @@ function buildY4MeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson: number)
 // Measurelands · Level 5 · Week 1 (Metric Mastery) — 15 questions (5 per lesson):
 // choose the best unit (L1) → smaller units for accuracy (L2) → metric decisions (L3).
 function buildY6MeasurelandsWeeklyQuizQuestions(weekNumber: number, questionsPerLesson: number): QuizQuestion[] {
-  // Level 6 is being built week by week. Only Week 1 has real generators; other
+  // Level 6 is being built week by week. Weeks 1–2 have real generators; other
   // weeks stay realm-safe and empty (never fall through to Number Nexus).
-  if (weekNumber !== 1) return [];
+  const perWeek: Record<number, [() => PracticeTask[], () => PracticeTask[], () => PracticeTask[]]> = {
+    1: [buildY6MeasurelandsWeek1Lesson1QuizTasks, buildY6MeasurelandsWeek1Lesson2QuizTasks, buildY6MeasurelandsWeek1Lesson3QuizTasks],
+    2: [buildY6MeasurelandsWeek2Lesson1QuizTasks, buildY6MeasurelandsWeek2Lesson2QuizTasks, buildY6MeasurelandsWeek2Lesson3QuizTasks],
+  };
+  const builders = perWeek[weekNumber];
+  if (!builders) return [];
   const lessonTasks: Array<{ lessonNumber: 1 | 2 | 3; tasks: PracticeTask[] }> = [
-    { lessonNumber: 1, tasks: buildY6MeasurelandsWeek1Lesson1QuizTasks().slice(0, questionsPerLesson) },
-    { lessonNumber: 2, tasks: buildY6MeasurelandsWeek1Lesson2QuizTasks().slice(0, questionsPerLesson) },
-    { lessonNumber: 3, tasks: buildY6MeasurelandsWeek1Lesson3QuizTasks().slice(0, questionsPerLesson) },
+    { lessonNumber: 1, tasks: builders[0]().slice(0, questionsPerLesson) },
+    { lessonNumber: 2, tasks: builders[1]().slice(0, questionsPerLesson) },
+    { lessonNumber: 3, tasks: builders[2]().slice(0, questionsPerLesson) },
   ];
   lessonTasks.forEach(({ lessonNumber, tasks }) => {
     if (tasks.length !== questionsPerLesson) {
-      throw new Error(`[MeasurelandsWeeklyQuiz] Y6 Week 1 Lesson ${lessonNumber} expected ${questionsPerLesson} questions, received ${tasks.length}.`);
+      throw new Error(`[MeasurelandsWeeklyQuiz] Y6 Week ${weekNumber} Lesson ${lessonNumber} expected ${questionsPerLesson} questions, received ${tasks.length}.`);
     }
   });
   return lessonTasks.flatMap(({ lessonNumber, tasks }, lessonIndex) =>
     tasks.map((task, questionIndex) =>
       buildGroundQuizQuestion(
-        `y6w1mq${lessonIndex * questionsPerLesson + questionIndex + 1}`,
+        `y6w${weekNumber}mq${lessonIndex * questionsPerLesson + questionIndex + 1}`,
         lessonNumber,
-        `y6_measurelands_w1_l${lessonNumber}_q${questionIndex + 1}`,
+        `y6_measurelands_w${weekNumber}_l${lessonNumber}_q${questionIndex + 1}`,
         task as GroundQuizPracticeTask
       )
     )

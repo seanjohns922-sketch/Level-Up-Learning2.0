@@ -3,6 +3,9 @@ import { YEAR6_MEASURELANDS_PROGRAM } from "@/data/programs/year6Measurelands";
 import { generateY6MeasurelandsWeek1Lesson1Task, resetY6MeasurelandsWeek1Lesson1TaskSessionState, buildY6MeasurelandsWeek1Lesson1QuizTasks } from "@/data/activities/year6Measurelands/week1Lesson1";
 import { generateY6MeasurelandsWeek1Lesson2Task, resetY6MeasurelandsWeek1Lesson2TaskSessionState, buildY6MeasurelandsWeek1Lesson2QuizTasks } from "@/data/activities/year6Measurelands/week1Lesson2";
 import { generateY6MeasurelandsWeek1Lesson3Task, resetY6MeasurelandsWeek1Lesson3TaskSessionState, buildY6MeasurelandsWeek1Lesson3QuizTasks } from "@/data/activities/year6Measurelands/week1Lesson3";
+import { generateY6MeasurelandsWeek2Lesson1Task, resetY6MeasurelandsWeek2Lesson1TaskSessionState, buildY6MeasurelandsWeek2Lesson1QuizTasks } from "@/data/activities/year6Measurelands/week2Lesson1";
+import { generateY6MeasurelandsWeek2Lesson2Task, resetY6MeasurelandsWeek2Lesson2TaskSessionState, buildY6MeasurelandsWeek2Lesson2QuizTasks } from "@/data/activities/year6Measurelands/week2Lesson2";
+import { generateY6MeasurelandsWeek2Lesson3Task, resetY6MeasurelandsWeek2Lesson3TaskSessionState, buildY6MeasurelandsWeek2Lesson3QuizTasks } from "@/data/activities/year6Measurelands/week2Lesson3";
 
 // Measurelands Level 6 (Year 6) — placeholder registry only.
 //
@@ -113,6 +116,27 @@ const BUILT_LESSONS: Record<string, BuiltOverride> = {
     quizContributionBuilder: buildY6MeasurelandsWeek1Lesson3QuizTasks,
     practisedSkills: ["Choose the correct dimensions", "Calculate area in m²", "Solve practical area problems"],
     completionTitle: "Area Investigations Complete!",
+  },
+  "y6-measurement-w2-l1": {
+    generate: generateY6MeasurelandsWeek2Lesson1Task,
+    reset: resetY6MeasurelandsWeek2Lesson1TaskSessionState,
+    quizContributionBuilder: buildY6MeasurelandsWeek2Lesson1QuizTasks,
+    practisedSkills: ["Recognise rectangles inside a shape", "Split shapes sensibly", "Reject splits that leave non-rectangles"],
+    completionTitle: "Break the Shape Complete!",
+  },
+  "y6-measurement-w2-l2": {
+    generate: generateY6MeasurelandsWeek2Lesson2Task,
+    reset: resetY6MeasurelandsWeek2Lesson2TaskSessionState,
+    quizContributionBuilder: buildY6MeasurelandsWeek2Lesson2QuizTasks,
+    practisedSkills: ["Calculate each rectangle's area", "Add the areas for the total", "Measure every part exactly once"],
+    completionTitle: "Calculate Composite Area Complete!",
+  },
+  "y6-measurement-w2-l3": {
+    generate: generateY6MeasurelandsWeek2Lesson3Task,
+    reset: resetY6MeasurelandsWeek2Lesson3TaskSessionState,
+    quizContributionBuilder: buildY6MeasurelandsWeek2Lesson3QuizTasks,
+    practisedSkills: ["Choose a split strategy", "Split a real space into rectangles", "Solve practical composite-area problems"],
+    completionTitle: "Architect Challenges Complete!",
   },
 };
 

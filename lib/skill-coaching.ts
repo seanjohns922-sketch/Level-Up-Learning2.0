@@ -297,6 +297,9 @@ const TABLE: Record<string, SkillCoaching> = {
   ml_y6_w1_l1: { tip: "Look for the pattern before looking for the formula." },
   ml_y6_w1_l2: { tip: "Length tells you how many columns; width tells you how many rows." },
   ml_y6_w1_l3: { tip: "The area formula saves time — it counts every square without counting one by one." },
+  ml_y6_w2_l1: { tip: "When a shape looks difficult, look for rectangles hiding inside it." },
+  ml_y6_w2_l2: { tip: "Find each rectangle's area first, then combine the totals." },
+  ml_y6_w2_l3: { tip: "Breaking a big problem into smaller ones is a powerful strategy." },
 };
 
 const FALLBACK: SkillCoaching = {
@@ -438,6 +441,9 @@ const LESSON_KEY_MAP: Record<string, string> = {
   "y6-measurement-w1-l1": "ml_y6_w1_l1",
   "y6-measurement-w1-l2": "ml_y6_w1_l2",
   "y6-measurement-w1-l3": "ml_y6_w1_l3",
+  "y6-measurement-w2-l1": "ml_y6_w2_l1",
+  "y6-measurement-w2-l2": "ml_y6_w2_l2",
+  "y6-measurement-w2-l3": "ml_y6_w2_l3",
 };
 
 function normalizeLessonId(lessonId: string): string {

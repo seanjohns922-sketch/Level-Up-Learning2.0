@@ -380,18 +380,19 @@ function ArrayAreaScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrec
   );
 }
 
-function AreaKeypad({ answer, unit, onCorrect, onWrong }: { answer: number; unit: string; onCorrect: () => void; onWrong: () => void }) {
+function AreaKeypad({ answer, unit, onCorrect, onWrong, hint }: { answer: number; unit: string; onCorrect: () => void; onWrong: () => void; hint?: string }) {
   const [typed, setTyped] = useState("");
   const [status, setStatus] = useState<"idle" | "wrong">("idle");
   const add = (d: string) => { setStatus("idle"); setTyped((c) => (c === "0" ? d : c.length >= 3 ? c : `${c}${d}`)); };
   const check = () => { if (!typed) return; if (Number(typed) === answer) onCorrect(); else { setStatus("wrong"); onWrong(); } };
+  const hintText = hint ?? "Rows × columns = area.";
   return (
     <div className="rounded-[24px] border-2 border-[rgba(214,184,108,0.52)] bg-white p-3 shadow-sm">
       <div className={`mb-2 flex items-center justify-center gap-2 rounded-[20px] border-2 px-4 py-2 ${status === "wrong" ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.58)] bg-[#fffaf0]"}`}>
         <div className="min-w-[64px] text-center text-3xl font-black tabular-nums text-[#2c1c07]">{typed || "?"}</div>
         <div className="text-xl font-black text-[#7c3aed]">{unit}</div>
       </div>
-      <div className="mb-2 text-center text-xs font-bold text-[#6b4d23]">{status === "wrong" ? "Rows × columns — try again." : "Rows × columns = area."}</div>
+      <div className="mb-2 text-center text-xs font-bold text-[#6b4d23]">{status === "wrong" ? "Try again." : hintText}</div>
       <div className="grid grid-cols-3 gap-2">
         {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((d) => (
           <button key={d} type="button" onClick={() => add(d)} className="rounded-[16px] border-2 border-[rgba(214,184,108,0.58)] bg-[#fff7df] py-2.5 text-2xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5">{d}</button>
@@ -752,8 +753,290 @@ function MistakeDimsScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorr
   );
 }
 
+/* ── Level 6 W2: Breaking Apart Shapes (composite decomposition) ── */
+type CRect = { x: number; y: number; w: number; h: number };
+const CX_STROKE = ["#2563eb", "#16a34a", "#d97706"];
+const CX_FILL = ["rgba(37,99,235,0.18)", "rgba(22,163,74,0.18)", "rgba(217,119,6,0.18)"];
+
+function cxRectCells(r: CRect): Array<[number, number]> {
+  const out: Array<[number, number]> = [];
+  for (let rr = 0; rr < r.h; rr++) for (let cc = 0; cc < r.w; cc++) out.push([r.x + cc, r.y + rr]);
+  return out;
+}
+function cxUnion(rects: CRect[]): Array<[number, number]> {
+  const seen = new Set<string>(); const cells: Array<[number, number]> = [];
+  rects.forEach((r) => cxRectCells(r).forEach(([c, rr]) => { const k = `${c},${rr}`; if (!seen.has(k)) { seen.add(k); cells.push([c, rr]); } }));
+  return cells;
+}
+function cxCell(gridW: number, gridH: number, size = 360): number { return Math.max(15, Math.min(size / gridW, 224 / gridH, 42)); }
+function cxLin(task: AreaTask): string { return task.areaUnit === "cm²" ? "cm" : task.areaUnit === "m²" ? "m" : ""; }
+
+/** The whole composite shape as one figure (unit squares + bold outline), with
+ *  optional tappable candidate cut lines. */
+function WholeShape({ gridW, gridH, rects, candidates, wrongId, onPick, size }: {
+  gridW: number; gridH: number; rects: CRect[];
+  candidates?: Array<{ id: string; orient: "h" | "v"; pos: number; valid: boolean }>;
+  wrongId?: string | null; onPick?: (c: { id: string; orient: "h" | "v"; pos: number; valid: boolean }) => void; size?: number;
+}) {
+  const cell = cxCell(gridW, gridH, size);
+  const PAD = 30, W = gridW * cell + PAD * 2, H = gridH * cell + PAD * 2;
+  const cells = cxUnion(rects);
+  const el = ([c, r, s]: [number, number, Side]): [number, number, number, number] => {
+    const x = PAD + c * cell, y = PAD + r * cell;
+    if (s === "top") return [x, y, x + cell, y]; if (s === "right") return [x + cell, y, x + cell, y + cell];
+    if (s === "bottom") return [x, y + cell, x + cell, y + cell]; return [x, y, x, y + cell];
+  };
+  return (
+    <div className="mx-auto" style={{ maxWidth: W }}>
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="composite shape">
+        {cells.map(([c, r]) => <rect key={`${c},${r}`} x={PAD + c * cell} y={PAD + r * cell} width={cell} height={cell} fill="rgba(124,58,237,0.12)" stroke="rgba(124,58,237,0.35)" strokeWidth={1} />)}
+        {boundaryEdges(cells).map((e, i) => { const [x1, y1, x2, y2] = el(e); return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#5b21b6" strokeWidth={4} strokeLinecap="round" />; })}
+        {(candidates ?? []).map((c) => {
+          const isWrong = wrongId === c.id;
+          const stroke = isWrong ? "#C0564E" : "#7c3aed";
+          if (c.orient === "h") {
+            const y = PAD + c.pos * cell;
+            return <g key={c.id} style={{ cursor: onPick ? "pointer" : "default" }} onClick={onPick ? () => onPick(c) : undefined}>
+              <line x1={PAD - 8} y1={y} x2={PAD + gridW * cell + 8} y2={y} stroke={stroke} strokeWidth={4} strokeDasharray="8 6" />
+              <line x1={PAD - 8} y1={y} x2={PAD + gridW * cell + 8} y2={y} stroke="transparent" strokeWidth={22} />
+            </g>;
+          }
+          const x = PAD + c.pos * cell;
+          return <g key={c.id} style={{ cursor: onPick ? "pointer" : "default" }} onClick={onPick ? () => onPick(c) : undefined}>
+            <line x1={x} y1={PAD - 8} x2={x} y2={PAD + gridH * cell + 8} stroke={stroke} strokeWidth={4} strokeDasharray="8 6" />
+            <line x1={x} y1={PAD - 8} x2={x} y2={PAD + gridH * cell + 8} stroke="transparent" strokeWidth={22} />
+          </g>;
+        })}
+      </svg>
+    </div>
+  );
+}
+
+/** The decomposed shape — coloured rectangles that separate, with dim/area labels. */
+function Decomposed({ gridW, gridH, rects, separated, activeIndex, showDims, showArea, lin, size }: {
+  gridW: number; gridH: number; rects: CRect[]; separated?: boolean; activeIndex?: number;
+  showDims?: boolean; showArea?: boolean; lin?: string; size?: number;
+}) {
+  const cell = cxCell(gridW, gridH, size);
+  const PAD = 40, W = gridW * cell + PAD * 2, H = gridH * cell + PAD * 2;
+  const cxAll = (gridW * cell) / 2, cyAll = (gridH * cell) / 2, gap = separated ? Math.max(10, cell * 0.4) : 0;
+  const dimText = (n: number) => `${n}${lin ? ` ${lin}` : ""}`;
+  return (
+    <div className="mx-auto" style={{ maxWidth: W }}>
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="shape split into rectangles">
+        {rects.map((r, i) => {
+          const rx = r.x * cell, ry = r.y * cell, rcx = rx + (r.w * cell) / 2, rcy = ry + (r.h * cell) / 2;
+          const dx = separated ? Math.sign(rcx - cxAll || 1) * gap : 0;
+          const dy = separated ? Math.sign(rcy - cyAll || 1) * gap : 0;
+          const dim = activeIndex != null && activeIndex !== i;
+          const stroke = CX_STROKE[i % 3]!, fill = CX_FILL[i % 3]!;
+          const cells: React.ReactNode[] = [];
+          for (let cc = 0; cc < r.w; cc++) for (let rr = 0; rr < r.h; rr++) cells.push(<rect key={`${cc}-${rr}`} x={PAD + (r.x + cc) * cell} y={PAD + (r.y + rr) * cell} width={cell} height={cell} fill="none" stroke={stroke} strokeOpacity={0.35} strokeWidth={1} />);
+          return (
+            <g key={i} style={{ transform: `translate(${dx}px, ${dy}px)`, transition: "transform .5s ease", opacity: dim ? 0.28 : 1 }}>
+              <rect x={PAD + rx} y={PAD + ry} width={r.w * cell} height={r.h * cell} rx={6} fill={fill} stroke={stroke} strokeWidth={3} />
+              {cells}
+              {showArea ? <text x={PAD + rcx} y={PAD + rcy + 6} textAnchor="middle" fontSize={17} fontWeight={900} fill={stroke}>{r.w * r.h}{lin ? " " + lin + "²" : ""}</text> : null}
+              {showDims ? (
+                <>
+                  <rect x={PAD + rx + (r.w * cell) / 2 - 24} y={PAD + ry - 24} width={48} height={20} rx={7} fill={stroke} />
+                  <text x={PAD + rx + (r.w * cell) / 2} y={PAD + ry - 10} textAnchor="middle" fontSize={12} fontWeight={900} fill="#fff">{dimText(r.w)}</text>
+                  <rect x={PAD + rx - 30} y={PAD + ry + (r.h * cell) / 2 - 10} width={44} height={20} rx={7} fill={stroke} />
+                  <text x={PAD + rx - 8} y={PAD + ry + (r.h * cell) / 2 + 4} textAnchor="middle" fontSize={12} fontWeight={900} fill="#fff">{dimText(r.h)}</text>
+                </>
+              ) : null}
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
+/** One candidate split rendered as two coloured pieces (for "which split works?"). */
+function SplitOption({ gridW, gridH, cells, orient, pos, size }: { gridW: number; gridH: number; cells: Array<[number, number]>; orient: "h" | "v"; pos: number; size?: number }) {
+  const cell = cxCell(gridW, gridH, size);
+  const PAD = 8, W = gridW * cell + PAD * 2, H = gridH * cell + PAD * 2;
+  const sideA = ([c, r]: [number, number]) => (orient === "h" ? r < pos : c < pos);
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="candidate split">
+      {cells.map(([c, r]) => { const a = sideA([c, r]); return <rect key={`${c},${r}`} x={PAD + c * cell} y={PAD + r * cell} width={cell} height={cell} fill={a ? CX_FILL[0] : CX_FILL[1]} stroke={a ? CX_STROKE[0] : CX_STROKE[1]} strokeWidth={1.4} />; })}
+      {orient === "h" ? <line x1={PAD} y1={PAD + pos * cell} x2={PAD + gridW * cell} y2={PAD + pos * cell} stroke="#2c1c07" strokeWidth={2.5} /> : <line x1={PAD + pos * cell} y1={PAD} x2={PAD + pos * cell} y2={PAD + gridH * cell} stroke="#2c1c07" strokeWidth={2.5} />}
+    </svg>
+  );
+}
+
+function SplitChooseScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect: () => void; onWrong: () => void }) {
+  const comp = task.composite!;
+  const [chosen, setChosen] = useState(false);
+  const [wrong, setWrong] = useState<string | null>(null);
+  const pick = (c: { id: string; valid: boolean }) => {
+    if (c.valid) { setChosen(true); window.setTimeout(onCorrect, 950); }
+    else { setWrong(c.id); onWrong(); window.setTimeout(() => setWrong(null), 600); }
+  };
+  return (
+    <Shell badge={task.badgeLabel ?? "Where to Split"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
+        {chosen ? <Decomposed gridW={comp.gridW} gridH={comp.gridH} rects={comp.rects} separated showDims lin={cxLin(task)} /> : <WholeShape gridW={comp.gridW} gridH={comp.gridH} rects={comp.rects} candidates={task.splitCandidates} wrongId={wrong} onPick={pick} />}
+        <p className={`mt-2 text-center text-sm font-black ${chosen ? "text-[#16a34a]" : "text-[#a98b52]"}`}>{chosen ? "🎉 Two clean rectangles!" : "Tap a dotted cut line."}</p>
+      </div>
+    </Shell>
+  );
+}
+
+function SplitDragScene({ task, onCorrect }: { task: AreaTask; onCorrect: () => void }) {
+  const comp = task.composite!;
+  const orient = task.dragOrient ?? "v";
+  const max = orient === "h" ? comp.gridH : comp.gridW;
+  const [pos, setPos] = useState(Math.max(1, Math.round(max / 2)));
+  const [done, setDone] = useState(false);
+  const atValid = pos === task.dragValidPos;
+  return (
+    <Shell badge={task.badgeLabel ?? "Split the Shape"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
+        {done ? <Decomposed gridW={comp.gridW} gridH={comp.gridH} rects={comp.rects} separated showDims lin={cxLin(task)} /> : <WholeShape gridW={comp.gridW} gridH={comp.gridH} rects={comp.rects} candidates={[{ id: "d", orient, pos, valid: atValid }]} />}
+      </div>
+      {!done ? (
+        <div className="space-y-2">
+          <input type="range" min={1} max={max - 1} step={1} value={pos} onChange={(e) => setPos(Number(e.target.value))} className="h-2 w-full cursor-pointer appearance-none rounded-full bg-[rgba(124,58,237,0.18)] accent-[#7c3aed]" />
+          <button type="button" disabled={!atValid} onClick={() => { setDone(true); window.setTimeout(onCorrect, 950); }} className={`mx-auto flex min-h-[56px] items-center justify-center rounded-[24px] border-2 px-10 text-lg font-black uppercase shadow-sm transition ${atValid ? "border-[#16a34a] bg-[#16a34a] text-white hover:-translate-y-0.5" : "border-[rgba(214,184,108,0.5)] bg-[#f3ead2] text-[#a98b52]"}`}>{atValid ? "Split here ✓" : "Slide to a rectangle cut"}</button>
+        </div>
+      ) : <p className="text-center text-sm font-black text-[#16a34a]">🎉 Perfect split!</p>}
+    </Shell>
+  );
+}
+
+function SplitWorksScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect: () => void; onWrong: () => void }) {
+  const comp = task.composite!;
+  const cells = cxUnion(comp.rects);
+  const [wrong, setWrong] = useState<string | null>(null);
+  return (
+    <Shell badge={task.badgeLabel ?? "Which Split Works?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="grid grid-cols-3 gap-3">
+        {(task.splitWorksOptions ?? []).map((o) => (
+          <button key={o.id} type="button" onClick={() => (o.id === task.correctSplitId ? onCorrect() : (setWrong(o.id), onWrong(), window.setTimeout(() => setWrong(null), 600)))} className={`rounded-[22px] border-2 p-2 transition hover:-translate-y-0.5 active:scale-[0.98] ${wrong === o.id ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)]"}`}>
+            <SplitOption gridW={comp.gridW} gridH={comp.gridH} cells={cells} orient={o.orient} pos={o.pos} />
+          </button>
+        ))}
+      </div>
+      <p className="text-center text-[13px] font-black text-[#a98b52]">Pick the split where BOTH parts are rectangles.</p>
+    </Shell>
+  );
+}
+
+function CompositeSolveScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect: () => void; onWrong: () => void }) {
+  const comp = task.composite!;
+  const rects = comp.rects;
+  const lin = cxLin(task);
+  const unit = areaUnitLabel(task);
+  const aArea = rects[0]!.w * rects[0]!.h, bArea = rects[1] ? rects[1].w * rects[1].h : 0;
+  const total = task.answerValue ?? aArea + bArea;
+  const [phase, setPhase] = useState<"intro" | "a" | "b" | "total">("intro");
+  const fig = (active?: number, sep = true) => <Decomposed gridW={comp.gridW} gridH={comp.gridH} rects={rects} separated={sep} activeIndex={active} showDims showArea={phase === "total"} lin={lin} />;
+  return (
+    <Shell badge={task.badgeLabel ?? "Break & Solve"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      {phase === "intro" ? (
+        <>
+          <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
+            {task.context ? <ContextLine task={task} /> : null}
+            <WholeShape gridW={comp.gridW} gridH={comp.gridH} rects={rects} />
+          </div>
+          <button type="button" onClick={() => setPhase("a")} className="mx-auto flex min-h-[56px] items-center justify-center rounded-[24px] border-2 border-[#5b21b6] bg-[#5b21b6] px-10 text-lg font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5">Break it apart →</button>
+        </>
+      ) : (
+        <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_280px]">
+          <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
+            {task.context ? <ContextLine task={task} /> : null}
+            {fig(phase === "a" ? 0 : phase === "b" ? 1 : undefined)}
+            <p className="mt-1 text-center text-sm font-black text-[#5b21b6]">{phase === "a" ? "Area of the blue rectangle?" : phase === "b" ? "Area of the green rectangle?" : `Total = ${aArea} + ${bArea}?`}</p>
+          </div>
+          {phase === "a" ? <AreaKeypad key="a" answer={aArea} unit={unit} hint="Length × width of this part." onCorrect={() => setPhase("b")} onWrong={onWrong} />
+            : phase === "b" ? <AreaKeypad key="b" answer={bArea} unit={unit} hint="Length × width of this part." onCorrect={() => setPhase("total")} onWrong={onWrong} />
+              : <AreaKeypad key="t" answer={total} unit={unit} hint="Add the two areas." onCorrect={onCorrect} onWrong={onWrong} />}
+        </div>
+      )}
+    </Shell>
+  );
+}
+
+function CompositeTotalScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect: () => void; onWrong: () => void }) {
+  const comp = task.composite!;
+  const unit = areaUnitLabel(task);
+  const spoken = areaUnitSpoken(task);
+  const [wrong, setWrong] = useState<number | null>(null);
+  return (
+    <Shell badge={task.badgeLabel ?? "Total Area"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
+        {task.context ? <ContextLine task={task} /> : null}
+        <Decomposed gridW={comp.gridW} gridH={comp.gridH} rects={comp.rects} separated showDims showArea lin={cxLin(task)} />
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        {(task.options ?? []).map((n) => (
+          <button key={n} type="button" onClick={() => (n === task.correctNumber ? onCorrect() : (setWrong(n), onWrong(), window.setTimeout(() => setWrong(null), 600)))} className={`relative flex min-h-[64px] items-center justify-center rounded-[22px] border-2 text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 ${wrong === n ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[#fffaf0]"}`}>
+            <span className="absolute right-1 top-1 z-10"><OptionReadAloudButton text={`${n} ${spoken}`} /></span>{n} {unit}
+          </button>
+        ))}
+      </div>
+    </Shell>
+  );
+}
+
+function CompositeMistakeScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect: () => void; onWrong: () => void }) {
+  const comp = task.composite!;
+  const [wrong, setWrong] = useState<string | null>(null);
+  return (
+    <Shell badge={task.badgeLabel ?? "Professor Gauge's Mistake"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
+        {task.context ? <ContextLine task={task} /> : null}
+        <Decomposed gridW={comp.gridW} gridH={comp.gridH} rects={comp.rects} separated showDims showArea lin={cxLin(task)} />
+      </div>
+      {task.statement ? <div className="rounded-[18px] border border-[rgba(192,86,78,0.28)] bg-[rgba(252,224,224,0.5)] px-4 py-2 text-center text-lg font-black text-[#7c2d12]">{task.statement}</div> : null}
+      <div className="grid gap-3">
+        {(task.reasonOptions ?? []).map((r) => (
+          <button key={r} type="button" onClick={() => (r === task.correctReason ? onCorrect() : (setWrong(r), onWrong(), window.setTimeout(() => setWrong(null), 600)))} className={`relative flex min-h-[54px] items-center justify-center rounded-[22px] border-2 px-4 text-base font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 ${wrong === r ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[#fffaf0]"}`}>
+            <span className="absolute right-2 top-2 z-10"><OptionReadAloudButton text={r} /></span>{r}
+          </button>
+        ))}
+      </div>
+    </Shell>
+  );
+}
+
+function BreakIntroScene({ task, onCorrect }: { task: AreaTask; onCorrect: () => void }) {
+  const comp = task.composite!;
+  const rects = comp.rects;
+  const aArea = rects[0]!.w * rects[0]!.h, bArea = rects[1] ? rects[1].w * rects[1].h : 0;
+  return (
+    <Shell badge={task.badgeLabel ?? "The Strategy"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="grid gap-3 md:grid-cols-2">
+        <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
+          <Decomposed gridW={comp.gridW} gridH={comp.gridH} rects={rects} separated showDims showArea lin={cxLin(task)} />
+        </div>
+        <div className="rounded-[24px] border border-[rgba(214,184,108,0.45)] bg-[rgba(255,250,240,0.96)] p-4">
+          <div className="mb-2 text-[12px] font-black uppercase tracking-[0.16em] text-[#a98b52]">The strategy</div>
+          <p className="text-[17px] font-bold leading-snug text-[#2c1c07]">If a shape looks hard, <span className="font-black text-[#5b21b6]">break it into rectangles</span>.</p>
+          <ol className="mt-2 space-y-1 text-[15px] font-semibold text-[#5a4423]">
+            <li>1. Split into rectangles.</li>
+            <li>2. Find each area (length × width).</li>
+            <li>3. Add them: <span className="font-black text-[#7c3aed]">{aArea} + {bArea} = {aArea + bArea}</span>.</li>
+          </ol>
+          <div className="mt-3 rounded-[14px] border border-[rgba(214,184,108,0.5)] bg-white px-3 py-2 text-center text-[13px] font-black text-[#2c1c07]">Measure every part exactly once.</div>
+        </div>
+      </div>
+      <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[58px] items-center justify-center rounded-[24px] border-2 border-[rgba(180,120,20,0.55)] bg-[#fffaf0] px-8 text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]">Let&apos;s solve! →</button>
+    </Shell>
+  );
+}
+
 export function MeasurelandsAreaCard({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect: () => void; onWrong: () => void }) {
   switch (task.scene) {
+    case "breakIntro": return <BreakIntroScene task={task} onCorrect={onCorrect} />;
+    case "splitChoose": return <SplitChooseScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+    case "splitDrag": return <SplitDragScene task={task} onCorrect={onCorrect} />;
+    case "splitWorks": return <SplitWorksScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+    case "compositeSolve": return <CompositeSolveScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+    case "compositeTotal": return <CompositeTotalScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+    case "compositeMistake": return <CompositeMistakeScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "predictArray": return <PredictScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "formulaReveal": return <FormulaRevealScene task={task} onCorrect={onCorrect} />;
     case "formulaIntro": return <FormulaIntroScene task={task} onCorrect={onCorrect} />;
