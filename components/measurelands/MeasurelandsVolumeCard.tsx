@@ -162,10 +162,48 @@ function TotalScene({ task, onCorrect, onWrong }: { task: VolumeTask; onCorrect:
             <span className="text-[#a98b52]">×</span>
             <span className="rounded-[10px] px-2 py-0.5 text-[#b45309]" style={{ background: "rgba(245,158,11,0.16)" }}>{dims.h} layers</span>
           </div>
+          <p className="mt-1 text-center text-[12px] font-black text-[#a98b52]">or use the formula: length × width × height = {dims.l} × {dims.w} × {dims.h}</p>
           <div className="mt-1"><LayerToggle on={lift} set={setLift} /></div>
         </div>
         <Keypad answer={total} unit={unitLabel(task)} hint="Cubes per layer × number of layers." onCorrect={onCorrect} onWrong={onWrong} />
       </div>
+    </Shell>
+  );
+}
+
+/* ── L2 formula reveal — expose Volume = length × width × height ── */
+function FormulaScene({ task, onCorrect }: { task: VolumeTask; onCorrect: () => void }) {
+  const dims = task.dims ?? { l: 4, w: 3, h: 2 };
+  const { l, w, h } = dims;
+  const per = l * w, total = l * w * h;
+  const [step, setStep] = useState(0);
+  const steps = [
+    { cap: <>You&apos;ve been counting <span className="font-black text-[#7c3aed]">layers</span>. Here&apos;s the pattern…</>, lift: false, lit: null as number | null },
+    { cap: <>One layer = <span className="font-black text-[#7c3aed]">length × width</span> = {l} × {w} = {per} cubes.</>, lift: false, lit: 0 },
+    { cap: <>Stacked <span className="font-black text-[#b45309]">{h} layers</span> high — that&apos;s the <span className="font-black text-[#b45309]">height</span>.</>, lift: true, lit: h - 1 },
+    { cap: <>So the shortcut is:</>, lift: false, lit: null, formula: true },
+  ];
+  const s = steps[step]!;
+  return (
+    <Shell badge={task.badgeLabel ?? "The Volume Formula"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <style>{"@keyframes mlSlideIn{0%{opacity:0;transform:translateY(14px) scale(.9)}100%{opacity:1;transform:none}}"}</style>
+      <div className="flex flex-col items-center gap-3 rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
+        <div className="flex gap-1.5">{steps.map((_, i) => <span key={i} className={`h-2.5 w-7 rounded-full ${i <= step ? "bg-[#5b21b6]" : "bg-[rgba(124,58,237,0.2)]"}`} />)}</div>
+        <MeasurelandsVolumeBuilder dims={dims} cubes={prismCubes(dims)} lift={s.lift} litLayer={s.lit} />
+        {s.formula ? (
+          <div style={{ animation: "mlSlideIn .5s ease-out both" }} className="rounded-[20px] border-2 border-[#5b21b6] bg-[rgba(91,33,182,0.06)] px-5 py-4 text-center">
+            <div className="text-xl font-black text-[#5b21b6] sm:text-2xl">Volume = length × width × height</div>
+            <div className="mt-1 text-sm font-black text-[#a98b52]">{l} × {w} × {h} = {total} cubic units</div>
+          </div>
+        ) : null}
+        <div className="rounded-[18px] border-2 border-[rgba(91,33,182,0.22)] bg-[rgba(91,33,182,0.05)] px-4 py-3 text-center text-[16px] font-bold text-[#2c1c07]">{s.cap}</div>
+        {s.formula ? <p className="text-center text-[13px] font-black text-[#a98b52]">Count the layers OR use the formula — both work!</p> : null}
+      </div>
+      {step < steps.length - 1 ? (
+        <button type="button" onClick={() => setStep((v) => v + 1)} className="mx-auto flex min-h-[56px] items-center justify-center rounded-[24px] border-2 border-[#5b21b6] bg-[#5b21b6] px-8 text-lg font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5">Next →</button>
+      ) : (
+        <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[56px] items-center justify-center rounded-[24px] border-2 border-[#16a34a] bg-[#16a34a] px-8 text-lg font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5">Got it — my way or the formula! →</button>
+      )}
     </Shell>
   );
 }
@@ -232,6 +270,7 @@ export function MeasurelandsVolumeCard({ task, onCorrect, onWrong }: { task: Vol
     case "layers": return <McqScene task={task} onCorrect={onCorrect} onWrong={onWrong} kind="layers" />;
     case "perLayer": return <McqScene task={task} onCorrect={onCorrect} onWrong={onWrong} kind="perLayer" />;
     case "total": return <TotalScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+    case "formula": return <FormulaScene task={task} onCorrect={onCorrect} />;
     case "compare": return <CompareScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     default: return <CapacityScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   }

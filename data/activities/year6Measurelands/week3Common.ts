@@ -85,6 +85,18 @@ export function countTask(): VolumeTask {
   };
 }
 
+// The formula reveal — exposure, not a requirement (count layers OR use it).
+export function formulaTask(): VolumeTask {
+  const dims = { l: between(3, 5), w: between(2, 4), h: between(2, 3) };
+  return {
+    kind: "volume", scene: "formula", dims, answerValue: vol(dims),
+    prompt: "The volume shortcut",
+    speakText: "You've been counting cubes per layer, then multiplying by the number of layers. That's the same as length times width times height. Some builders use this formula — you can count layers or use it, both work.",
+    badgeLabel: "The Volume Formula",
+    feedback: { correct: "Now you know both ways!", wrong: "Now you know both ways!" },
+  };
+}
+
 // ── Lesson 2: layers / cubes per layer / total ────────────────────────────────
 export function layersTask(): VolumeTask {
   const dims = calcDims();

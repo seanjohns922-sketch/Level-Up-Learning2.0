@@ -1718,7 +1718,7 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "build" | "count" | "layers" | "perLayer" | "total" | "compare" | "capacity";
+      scene: "intro" | "build" | "count" | "layers" | "perLayer" | "total" | "formula" | "compare" | "capacity";
       /** Prism dimensions: l = width (x), w = depth (y), h = height (layers, z). */
       dims?: { l: number; w: number; h: number };
       /** Second prism (for "compare"). */
