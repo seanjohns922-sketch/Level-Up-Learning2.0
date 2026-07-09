@@ -255,6 +255,10 @@ function IntroScene({ task, onCorrect }: { task: VolumeTask; onCorrect: () => vo
           <div className="mb-2 text-[12px] font-black uppercase tracking-[0.16em] text-[#a98b52]">Area → Volume</div>
           <p className="text-[17px] font-bold leading-snug text-[#2c1c07]">Area covers a <span className="font-black text-[#7c3aed]">surface</span>. Volume fills a <span className="font-black text-[#5b21b6]">space</span>.</p>
           <p className="mt-2 text-[15px] font-semibold leading-snug text-[#5a4423]">We measure volume with <span className="font-black">cubic units</span> — little cubes that fill the shape, including the ones you can&apos;t see.</p>
+          <div className="mt-3 rounded-[16px] border-2 border-[#5b21b6] bg-[rgba(91,33,182,0.06)] px-4 py-3 text-center">
+            <div className="text-lg font-black text-[#5b21b6] sm:text-xl">Volume = length × width × height</div>
+            <div className="mt-0.5 text-[12px] font-black text-[#a98b52]">count the cubes, or use the formula</div>
+          </div>
         </div>
       </div>
       <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[60px] items-center justify-center rounded-[24px] border-2 border-[rgba(180,120,20,0.55)] bg-[#fffaf0] px-8 text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]">Let&apos;s build! →</button>
