@@ -6,6 +6,9 @@ import { generateY6MeasurelandsWeek1Lesson3Task, resetY6MeasurelandsWeek1Lesson3
 import { generateY6MeasurelandsWeek2Lesson1Task, resetY6MeasurelandsWeek2Lesson1TaskSessionState, buildY6MeasurelandsWeek2Lesson1QuizTasks } from "@/data/activities/year6Measurelands/week2Lesson1";
 import { generateY6MeasurelandsWeek2Lesson2Task, resetY6MeasurelandsWeek2Lesson2TaskSessionState, buildY6MeasurelandsWeek2Lesson2QuizTasks } from "@/data/activities/year6Measurelands/week2Lesson2";
 import { generateY6MeasurelandsWeek2Lesson3Task, resetY6MeasurelandsWeek2Lesson3TaskSessionState, buildY6MeasurelandsWeek2Lesson3QuizTasks } from "@/data/activities/year6Measurelands/week2Lesson3";
+import { generateY6MeasurelandsWeek3Lesson1Task, resetY6MeasurelandsWeek3Lesson1TaskSessionState, buildY6MeasurelandsWeek3Lesson1QuizTasks } from "@/data/activities/year6Measurelands/week3Lesson1";
+import { generateY6MeasurelandsWeek3Lesson2Task, resetY6MeasurelandsWeek3Lesson2TaskSessionState, buildY6MeasurelandsWeek3Lesson2QuizTasks } from "@/data/activities/year6Measurelands/week3Lesson2";
+import { generateY6MeasurelandsWeek3Lesson3Task, resetY6MeasurelandsWeek3Lesson3TaskSessionState, buildY6MeasurelandsWeek3Lesson3QuizTasks } from "@/data/activities/year6Measurelands/week3Lesson3";
 
 // Measurelands Level 6 (Year 6) — placeholder registry only.
 //
@@ -137,6 +140,27 @@ const BUILT_LESSONS: Record<string, BuiltOverride> = {
     quizContributionBuilder: buildY6MeasurelandsWeek2Lesson3QuizTasks,
     practisedSkills: ["Choose a split strategy", "Split a real space into rectangles", "Solve practical composite-area problems"],
     completionTitle: "Architect Challenges Complete!",
+  },
+  "y6-measurement-w3-l1": {
+    generate: generateY6MeasurelandsWeek3Lesson1Task,
+    reset: resetY6MeasurelandsWeek3Lesson1TaskSessionState,
+    quizContributionBuilder: buildY6MeasurelandsWeek3Lesson1QuizTasks,
+    practisedSkills: ["Recognise cubic units", "Build 3D prisms cube by cube", "Count cubes including hidden ones"],
+    completionTitle: "Build Volume Complete!",
+  },
+  "y6-measurement-w3-l2": {
+    generate: generateY6MeasurelandsWeek3Lesson2Task,
+    reset: resetY6MeasurelandsWeek3Lesson2TaskSessionState,
+    quizContributionBuilder: buildY6MeasurelandsWeek3Lesson2QuizTasks,
+    practisedSkills: ["Identify layers", "Count cubes per layer", "Find volume as cubes-per-layer × layers"],
+    completionTitle: "Count the Layers Complete!",
+  },
+  "y6-measurement-w3-l3": {
+    generate: generateY6MeasurelandsWeek3Lesson3Task,
+    reset: resetY6MeasurelandsWeek3Lesson3TaskSessionState,
+    quizContributionBuilder: buildY6MeasurelandsWeek3Lesson3QuizTasks,
+    practisedSkills: ["Compare volumes", "Solve packing problems", "Connect volume and capacity (cm³ = mL)"],
+    completionTitle: "Volume Problems Complete!",
   },
 };
 

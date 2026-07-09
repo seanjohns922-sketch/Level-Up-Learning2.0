@@ -1711,6 +1711,35 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Level 6 (Year 6) W3 "Volume Vault" (AC9M6M03): volume of
+      // rectangular prisms by building/counting cubic units and layers. No formula
+      // named (that is Year 7). Isometric Volume Builder mechanic.
+      kind: "volume";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "build" | "count" | "layers" | "perLayer" | "total" | "compare" | "capacity";
+      /** Prism dimensions: l = width (x), w = depth (y), h = height (layers, z). */
+      dims?: { l: number; w: number; h: number };
+      /** Second prism (for "compare"). */
+      dimsB?: { l: number; w: number; h: number };
+      /** Full layers already built when the scene opens (build "complete"). */
+      prefill?: number;
+      /** "build": ask the student to predict the cube count first. */
+      predict?: boolean;
+      /** Cubic unit for real contexts (else generic "cubic units"). */
+      unit?: "cm³" | "m³";
+      /** MCQ options + correct (count / layers / perLayer / compare / capacity). */
+      options?: number[];
+      correctNumber?: number;
+      /** Typed answer (build target / total volume). */
+      answerValue?: number;
+      /** Real build context (crate / tank / toy box …). Emoji MATCHES label. */
+      context?: string;
+      emoji?: string;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       kind: "tensOnesMcq";
       prompt: string;
       min: number;

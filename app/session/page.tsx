@@ -110,6 +110,9 @@ import { buildY6MeasurelandsWeek1Lesson3QuizTasks } from "@/data/activities/year
 import { buildY6MeasurelandsWeek2Lesson1QuizTasks } from "@/data/activities/year6Measurelands/week2Lesson1";
 import { buildY6MeasurelandsWeek2Lesson2QuizTasks } from "@/data/activities/year6Measurelands/week2Lesson2";
 import { buildY6MeasurelandsWeek2Lesson3QuizTasks } from "@/data/activities/year6Measurelands/week2Lesson3";
+import { buildY6MeasurelandsWeek3Lesson1QuizTasks } from "@/data/activities/year6Measurelands/week3Lesson1";
+import { buildY6MeasurelandsWeek3Lesson2QuizTasks } from "@/data/activities/year6Measurelands/week3Lesson2";
+import { buildY6MeasurelandsWeek3Lesson3QuizTasks } from "@/data/activities/year6Measurelands/week3Lesson3";
 import { buildY5MeasurelandsWeek2Lesson1QuizTasks } from "@/data/activities/year5Measurelands/week2Lesson1";
 import { buildY5MeasurelandsWeek2Lesson2QuizTasks } from "@/data/activities/year5Measurelands/week2Lesson2";
 import { buildY5MeasurelandsWeek2Lesson3QuizTasks } from "@/data/activities/year5Measurelands/week2Lesson3";
@@ -1973,6 +1976,7 @@ function buildY6MeasurelandsWeeklyQuizQuestions(weekNumber: number, questionsPer
   const perWeek: Record<number, [() => PracticeTask[], () => PracticeTask[], () => PracticeTask[]]> = {
     1: [buildY6MeasurelandsWeek1Lesson1QuizTasks, buildY6MeasurelandsWeek1Lesson2QuizTasks, buildY6MeasurelandsWeek1Lesson3QuizTasks],
     2: [buildY6MeasurelandsWeek2Lesson1QuizTasks, buildY6MeasurelandsWeek2Lesson2QuizTasks, buildY6MeasurelandsWeek2Lesson3QuizTasks],
+    3: [buildY6MeasurelandsWeek3Lesson1QuizTasks, buildY6MeasurelandsWeek3Lesson2QuizTasks, buildY6MeasurelandsWeek3Lesson3QuizTasks],
   };
   const builders = perWeek[weekNumber];
   if (!builders) return [];
