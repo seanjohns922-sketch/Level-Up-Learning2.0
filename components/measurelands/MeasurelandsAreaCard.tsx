@@ -881,16 +881,27 @@ function SplitChooseScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorr
   const comp = task.composite!;
   const cells = cxUnion(comp.rects);
   const [wrong, setWrong] = useState<string | null>(null);
-  const [okId, setOkId] = useState<string | null>(null);
+  const [chosen, setChosen] = useState(false);
   const pick = (c: { id: string; valid: boolean }) => {
-    if (c.valid) { setOkId(c.id); window.setTimeout(onCorrect, 850); }
+    if (c.valid) setChosen(true);
     else { setWrong(c.id); onWrong(); window.setTimeout(() => setWrong(null), 600); }
   };
+  if (chosen) {
+    return (
+      <Shell badge={task.badgeLabel ?? "Where to Split"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+        <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
+          <Decomposed gridW={comp.gridW} gridH={comp.gridH} rects={comp.rects} showArea lin={cxLin(task)} />
+          <p className="mt-2 text-center text-sm font-black text-[#16a34a]">🎉 Two rectangles! Each one is length × width.</p>
+        </div>
+        <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[56px] items-center justify-center rounded-[24px] border-2 border-[#16a34a] bg-[#16a34a] px-10 text-lg font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5">Next →</button>
+      </Shell>
+    );
+  }
   return (
     <Shell badge={task.badgeLabel ?? "Where to Split"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="grid grid-cols-3 gap-3">
         {(task.splitCandidates ?? []).map((c) => (
-          <button key={c.id} type="button" onClick={() => pick(c)} className={`rounded-[22px] border-2 p-2 transition hover:-translate-y-0.5 active:scale-[0.98] ${okId === c.id ? "border-[#16a34a] bg-[rgba(22,163,74,0.14)]" : wrong === c.id ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)]"}`}>
+          <button key={c.id} type="button" onClick={() => pick(c)} className={`rounded-[22px] border-2 p-2 transition hover:-translate-y-0.5 active:scale-[0.98] ${wrong === c.id ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)]"}`}>
             <CutPreview gridW={comp.gridW} gridH={comp.gridH} cells={cells} orient={c.orient} pos={c.pos} />
           </button>
         ))}
@@ -915,9 +926,14 @@ function SplitDragScene({ task, onCorrect }: { task: AreaTask; onCorrect: () => 
       {!done ? (
         <div className="space-y-2">
           <input type="range" min={1} max={max - 1} step={1} value={pos} onChange={(e) => setPos(Number(e.target.value))} className="h-2 w-full cursor-pointer appearance-none rounded-full bg-[rgba(124,58,237,0.18)] accent-[#7c3aed]" />
-          <button type="button" disabled={!atValid} onClick={() => { setDone(true); window.setTimeout(onCorrect, 950); }} className={`mx-auto flex min-h-[56px] items-center justify-center rounded-[24px] border-2 px-10 text-lg font-black uppercase shadow-sm transition ${atValid ? "border-[#16a34a] bg-[#16a34a] text-white hover:-translate-y-0.5" : "border-[rgba(214,184,108,0.5)] bg-[#f3ead2] text-[#a98b52]"}`}>{atValid ? "Split here ✓" : "Slide to a rectangle cut"}</button>
+          <button type="button" disabled={!atValid} onClick={() => setDone(true)} className={`mx-auto flex min-h-[56px] items-center justify-center rounded-[24px] border-2 px-10 text-lg font-black uppercase shadow-sm transition ${atValid ? "border-[#16a34a] bg-[#16a34a] text-white hover:-translate-y-0.5" : "border-[rgba(214,184,108,0.5)] bg-[#f3ead2] text-[#a98b52]"}`}>{atValid ? "Split here ✓" : "Slide to a rectangle cut"}</button>
         </div>
-      ) : <p className="text-center text-sm font-black text-[#16a34a]">🎉 Perfect split!</p>}
+      ) : (
+        <>
+          <p className="text-center text-sm font-black text-[#16a34a]">🎉 Two rectangles! Each one is length × width.</p>
+          <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[56px] items-center justify-center rounded-[24px] border-2 border-[#16a34a] bg-[#16a34a] px-10 text-lg font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5">Next →</button>
+        </>
+      )}
     </Shell>
   );
 }
