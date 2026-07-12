@@ -119,6 +119,7 @@ import { MeasurelandsClockMinuteCard } from "@/components/measurelands/Measurela
 import { MeasurelandsPerimeterCard } from "@/components/measurelands/MeasurelandsPerimeterCard";
 import { MeasurelandsAreaCard } from "@/components/measurelands/MeasurelandsAreaCard";
 import { MeasurelandsVolumeCard } from "@/components/measurelands/MeasurelandsVolumeCard";
+import { MeasurelandsMetricConvertCard } from "@/components/measurelands/MeasurelandsMetricConvertCard";
 import { MeasurelandsTemperatureCard } from "@/components/measurelands/MeasurelandsTemperatureCard";
 import { MeasurelandsSurveyorCard } from "@/components/measurelands/MeasurelandsSurveyorCard";
 import { MeasurelandsTimeQuestCard } from "@/components/measurelands/MeasurelandsTimeQuestCard";
@@ -428,6 +429,8 @@ function TaskRendererInner({
       return wrapMeasurelands(<MeasurelandsAreaCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "volume":
       return wrapMeasurelands(<MeasurelandsVolumeCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
+    case "metricConvert":
+      return wrapMeasurelands(<MeasurelandsMetricConvertCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "temperature":
       return wrapMeasurelands(<MeasurelandsTemperatureCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "perimeterCalc":

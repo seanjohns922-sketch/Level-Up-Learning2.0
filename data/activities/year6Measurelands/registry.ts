@@ -9,6 +9,9 @@ import { generateY6MeasurelandsWeek2Lesson3Task, resetY6MeasurelandsWeek2Lesson3
 import { generateY6MeasurelandsWeek3Lesson1Task, resetY6MeasurelandsWeek3Lesson1TaskSessionState, buildY6MeasurelandsWeek3Lesson1QuizTasks } from "@/data/activities/year6Measurelands/week3Lesson1";
 import { generateY6MeasurelandsWeek3Lesson2Task, resetY6MeasurelandsWeek3Lesson2TaskSessionState, buildY6MeasurelandsWeek3Lesson2QuizTasks } from "@/data/activities/year6Measurelands/week3Lesson2";
 import { generateY6MeasurelandsWeek3Lesson3Task, resetY6MeasurelandsWeek3Lesson3TaskSessionState, buildY6MeasurelandsWeek3Lesson3QuizTasks } from "@/data/activities/year6Measurelands/week3Lesson3";
+import { generateY6MeasurelandsWeek4Lesson1Task, resetY6MeasurelandsWeek4Lesson1TaskSessionState, buildY6MeasurelandsWeek4Lesson1QuizTasks } from "@/data/activities/year6Measurelands/week4Lesson1";
+import { generateY6MeasurelandsWeek4Lesson2Task, resetY6MeasurelandsWeek4Lesson2TaskSessionState, buildY6MeasurelandsWeek4Lesson2QuizTasks } from "@/data/activities/year6Measurelands/week4Lesson2";
+import { generateY6MeasurelandsWeek4Lesson3Task, resetY6MeasurelandsWeek4Lesson3TaskSessionState, buildY6MeasurelandsWeek4Lesson3QuizTasks } from "@/data/activities/year6Measurelands/week4Lesson3";
 
 // Measurelands Level 6 (Year 6) — placeholder registry only.
 //
@@ -161,6 +164,27 @@ const BUILT_LESSONS: Record<string, BuiltOverride> = {
     quizContributionBuilder: buildY6MeasurelandsWeek3Lesson3QuizTasks,
     practisedSkills: ["Compare volumes", "Solve packing problems", "Connect volume and capacity (cm³ = mL)"],
     completionTitle: "Volume Problems Complete!",
+  },
+  "y6-measurement-w4-l1": {
+    generate: generateY6MeasurelandsWeek4Lesson1Task,
+    reset: resetY6MeasurelandsWeek4Lesson1TaskSessionState,
+    quizContributionBuilder: buildY6MeasurelandsWeek4Lesson1QuizTasks,
+    practisedSkills: ["Use the metric ladder (powers of 10)", "Convert length units (mm–km)", "Convert the right way (× or ÷)"],
+    completionTitle: "The Metric Ladder Complete!",
+  },
+  "y6-measurement-w4-l2": {
+    generate: generateY6MeasurelandsWeek4Lesson2Task,
+    reset: resetY6MeasurelandsWeek4Lesson2TaskSessionState,
+    quizContributionBuilder: buildY6MeasurelandsWeek4Lesson2QuizTasks,
+    practisedSkills: ["Convert mass units (g–t)", "Convert capacity units (mL–L)", "Compare measures across units"],
+    completionTitle: "Mass & Capacity Complete!",
+  },
+  "y6-measurement-w4-l3": {
+    generate: generateY6MeasurelandsWeek4Lesson3Task,
+    reset: resetY6MeasurelandsWeek4Lesson3TaskSessionState,
+    quizContributionBuilder: buildY6MeasurelandsWeek4Lesson3QuizTasks,
+    practisedSkills: ["Use decimal representations", "Solve real conversion problems", "Choose a sensible unit"],
+    completionTitle: "Convert & Solve Complete!",
   },
 };
 

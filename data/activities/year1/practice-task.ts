@@ -1740,6 +1740,32 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Level 6 (Year 6) W4 "Metric Conversions" (AC9M6M01): convert
+      // between metric units of length, mass and capacity using powers of 10, with
+      // decimal representations. The Metric Ladder mechanic.
+      kind: "metricConvert";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "climb" | "convert" | "compare" | "mistake";
+      measure?: "length" | "mass" | "capacity";
+      fromUnit?: string;
+      toUnit?: string;
+      fromValue?: number;
+      /** The converted value (climb / convert). */
+      answerValue?: number;
+      /** "compare": two measures in different units — pick the greater. */
+      pairA?: { value: number; unit: string };
+      pairB?: { value: number; unit: string };
+      /** "mistake": Gauge's wrong conversion + why it's wrong. */
+      statement?: string;
+      reasonOptions?: string[];
+      correctReason?: string;
+      context?: string;
+      emoji?: string;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       kind: "tensOnesMcq";
       prompt: string;
       min: number;

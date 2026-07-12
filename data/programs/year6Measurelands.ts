@@ -37,12 +37,12 @@ const WEEK_PLANS = [
     ],
   },
   {
-    topic: "Circles",
-    focus: "Explore circle parts and radius-diameter relationships.",
+    topic: "Metric Conversions",
+    focus: "Convert between metric units using the metric ladder (powers of 10).",
     lessons: [
-      ["Parts of a Circle", "Identify radius, diameter, centre and circumference."],
-      ["Measure Circles", "Measure radius and diameter relationships."],
-      ["Circle Investigations", "Reason about real-world circles without formulas."],
+      ["The Metric Ladder", "Convert length units with the powers-of-10 ladder."],
+      ["Mass & Capacity", "Convert mass and capacity units both ways."],
+      ["Convert & Solve", "Use decimals to solve real conversion problems."],
     ],
   },
   {
