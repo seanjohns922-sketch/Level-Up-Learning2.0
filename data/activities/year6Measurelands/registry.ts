@@ -169,22 +169,22 @@ const BUILT_LESSONS: Record<string, BuiltOverride> = {
     generate: generateY6MeasurelandsWeek4Lesson1Task,
     reset: resetY6MeasurelandsWeek4Lesson1TaskSessionState,
     quizContributionBuilder: buildY6MeasurelandsWeek4Lesson1QuizTasks,
-    practisedSkills: ["Use the metric ladder (powers of 10)", "Convert length units (mm–km)", "Convert the right way (× or ÷)"],
-    completionTitle: "The Metric Ladder Complete!",
+    practisedSkills: ["Read a tape measure in cm", "Convert length (cm↔m)", "Set a target length by converting"],
+    completionTitle: "Length Lab Complete!",
   },
   "y6-measurement-w4-l2": {
     generate: generateY6MeasurelandsWeek4Lesson2Task,
     reset: resetY6MeasurelandsWeek4Lesson2TaskSessionState,
     quizContributionBuilder: buildY6MeasurelandsWeek4Lesson2QuizTasks,
-    practisedSkills: ["Convert mass units (g–t)", "Convert capacity units (mL–L)", "Compare measures across units"],
-    completionTitle: "Mass & Capacity Complete!",
+    practisedSkills: ["Convert mass on a scale (g↔kg)", "Convert capacity on a jug (mL↔L)", "Compare measures across units"],
+    completionTitle: "Mass & Capacity Lab Complete!",
   },
   "y6-measurement-w4-l3": {
     generate: generateY6MeasurelandsWeek4Lesson3Task,
     reset: resetY6MeasurelandsWeek4Lesson3TaskSessionState,
     quizContributionBuilder: buildY6MeasurelandsWeek4Lesson3QuizTasks,
-    practisedSkills: ["Use decimal representations", "Solve real conversion problems", "Choose a sensible unit"],
-    completionTitle: "Convert & Solve Complete!",
+    practisedSkills: ["Read decimal amounts", "Solve real conversion problems", "Compare and check conversions"],
+    completionTitle: "Lab Challenges Complete!",
   },
 };
 

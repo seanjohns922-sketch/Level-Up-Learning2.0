@@ -1,16 +1,16 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
-import { introTask, climbTask, convertTask, mistakeTask } from "@/data/activities/year6Measurelands/week4Common";
+import { introTask, labSetTask, labReadTask, compareTask } from "@/data/activities/year6Measurelands/week4Common";
 
-// ── Measurelands · Level 6 · Week 4 · Lesson 1 — "The Metric Ladder" (Length) ──
-// AC9M6M01. Build the ×10/×100/×1000 structure with length units.
-//   Intro: the metric ladder (powers of 10).
-//   A. climb   — step up/down the ladder to the goal unit.
-//   B. convert — type the converted value (ladder as support).
-//   C. mistake — spot Gauge's wrong-power / wrong-direction conversion.
+// ── Measurelands · Level 6 · Week 4 · Lesson 1 — "Length Lab" (AC9M6M01) ──────
+// Convert length by USING a tape measure marked in cm.
+//   Intro: welcome to the Measurement Lab.
+//   A. set     — drag the tape to a length given in m ("Set 1.5 m").
+//   B. read    — read the tape in cm, convert to m.
+//   C. compare — which length is greater (across units)?
 
 type LessonMemory = { introShown: boolean; cursor: number };
 const lessonMemory = new Map<string, LessonMemory>();
-const ROTATION: Array<() => PracticeTask> = [() => climbTask("length"), () => convertTask("length"), () => mistakeTask("length")];
+const ROTATION: Array<() => PracticeTask> = [() => labSetTask("length"), () => labReadTask("length"), () => compareTask("length")];
 
 function getMemory(lessonId: string): LessonMemory {
   const existing = lessonMemory.get(lessonId);
@@ -32,7 +32,7 @@ export function resetY6MeasurelandsWeek4Lesson1TaskSessionState() {
   lessonMemory.clear();
 }
 
-// Weekly quiz — convert + mistake are determinate (climb is a guided tool).
+// Weekly quiz — read + compare are determinate (set is a hands-on tool).
 export function buildY6MeasurelandsWeek4Lesson1QuizTasks(): PracticeTask[] {
-  return [convertTask("length"), mistakeTask("length"), convertTask("length"), mistakeTask("length"), convertTask("length")];
+  return [labReadTask("length"), compareTask("length"), labReadTask("length"), compareTask("length"), labReadTask("length")];
 }

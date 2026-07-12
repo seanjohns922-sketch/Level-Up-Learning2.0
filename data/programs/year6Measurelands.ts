@@ -37,12 +37,12 @@ const WEEK_PLANS = [
     ],
   },
   {
-    topic: "Metric Conversions",
-    focus: "Convert between metric units using the metric ladder (powers of 10).",
+    topic: "Measurement Lab",
+    focus: "Convert metric units by using instruments (tape, scale, jug).",
     lessons: [
-      ["The Metric Ladder", "Convert length units with the powers-of-10 ladder."],
-      ["Mass & Capacity", "Convert mass and capacity units both ways."],
-      ["Convert & Solve", "Use decimals to solve real conversion problems."],
+      ["Length Lab", "Convert length on a tape measure (cm↔m)."],
+      ["Mass & Capacity Lab", "Convert mass and capacity on a scale and jug."],
+      ["Lab Challenges", "Use decimals to solve real conversion problems."],
     ],
   },
   {

@@ -303,8 +303,8 @@ const TABLE: Record<string, SkillCoaching> = {
   ml_y6_w3_l1: { tip: "Volume is built one cube at a time." },
   ml_y6_w3_l2: { tip: "Look for layers before counting every cube." },
   ml_y6_w3_l3: { tip: "Volume tells us how much space something can hold." },
-  ml_y6_w4_l1: { tip: "Down the ladder to a smaller unit means multiply; up to a larger unit means divide." },
-  ml_y6_w4_l2: { tip: "g to kg and mL to L are both jumps of 1000 — check the ladder." },
+  ml_y6_w4_l1: { tip: "The tape is in cm; 1 m is 100 cm — a smaller unit means a bigger number." },
+  ml_y6_w4_l2: { tip: "g to kg and mL to L are both jumps of 1000." },
   ml_y6_w4_l3: { tip: "To compare, convert both amounts to the same unit first." },
 };
 

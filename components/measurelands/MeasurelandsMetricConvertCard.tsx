@@ -3,11 +3,14 @@
 import { useState } from "react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
-import { MeasurelandsMetricLadder } from "@/components/measurelands/MeasurelandsMetricLadder";
-import { LADDERS, convert, fmt, measureOf, unitIndex, type Measure } from "@/data/activities/year6Measurelands/metricLadders";
+import { MeasurelandsLabInstrument, type LabKind } from "@/components/measurelands/MeasurelandsLabInstrument";
+import { convert, fmt, measureOf, type Measure } from "@/data/activities/year6Measurelands/metricLadders";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type ConvertTask = Extract<PracticeTask, { kind: "metricConvert" }>;
+
+const KIND: Record<Measure, LabKind> = { capacity: "jug", mass: "scale", length: "tape" };
+const VERB: Record<Measure, string> = { capacity: "Pour", mass: "Weigh", length: "Measure" };
 
 function Shell({ badge, prompt, speakText, children }: { badge: string; prompt: string; speakText?: string; children: React.ReactNode }) {
   return (
@@ -26,90 +29,72 @@ function Shell({ badge, prompt, speakText, children }: { badge: string; prompt: 
 const panel = "rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3";
 function ctxLine(t: ConvertTask) { return t.context ? <div className="text-center text-[12px] font-black uppercase tracking-[0.14em] text-[#a98b52]">{t.emoji} {t.context}</div> : null; }
 
-function DecimalKeypad({ answer, unit, hint, onCorrect, onWrong }: { answer: number; unit: string; hint: string; onCorrect: () => void; onWrong: () => void }) {
-  const [typed, setTyped] = useState("");
-  const [status, setStatus] = useState<"idle" | "wrong">("idle");
-  const add = (d: string) => { setStatus("idle"); setTyped((c) => { if (d === "." && c.includes(".")) return c; if (c.length >= 6) return c; return c + d; }); };
-  const check = () => { if (!typed || typed === ".") return; if (Math.abs(Number(typed) - answer) < 1e-6) onCorrect(); else { setStatus("wrong"); onWrong(); } };
+function OptionRow({ options, correct, unit, onCorrect, onWrong }: { options: number[]; correct: number; unit: string; onCorrect: () => void; onWrong: () => void }) {
+  const [wrong, setWrong] = useState<number | null>(null);
   return (
-    <div className="rounded-[24px] border-2 border-[rgba(214,184,108,0.52)] bg-white p-3 shadow-sm">
-      <div className={`mb-2 flex items-center justify-center gap-2 rounded-[20px] border-2 px-4 py-2 ${status === "wrong" ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.58)] bg-[#fffaf0]"}`}>
-        <div className="min-w-[80px] text-center text-3xl font-black tabular-nums text-[#2c1c07]">{typed || "?"}</div>
-        <div className="text-lg font-black text-[#7c3aed]">{unit}</div>
-      </div>
-      <div className="mb-2 text-center text-xs font-bold text-[#6b4d23]">{status === "wrong" ? "Check the direction and the power of 10." : hint}</div>
-      <div className="grid grid-cols-3 gap-2">
-        {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((d) => (
-          <button key={d} type="button" onClick={() => add(d)} className="rounded-[16px] border-2 border-[rgba(214,184,108,0.58)] bg-[#fff7df] py-2.5 text-2xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5">{d}</button>
-        ))}
-        <button type="button" onClick={() => add(".")} className="rounded-[16px] border-2 border-[rgba(214,184,108,0.58)] bg-[#fff7df] py-2.5 text-2xl font-black text-[#2c1c07] shadow-sm">.</button>
-        <button type="button" onClick={() => add("0")} className="rounded-[16px] border-2 border-[rgba(214,184,108,0.58)] bg-[#fff7df] py-2.5 text-2xl font-black text-[#2c1c07] shadow-sm">0</button>
-        <button type="button" onClick={() => { setStatus("idle"); setTyped(""); }} className="rounded-[16px] border-2 border-[rgba(214,184,108,0.58)] bg-white py-2.5 text-sm font-black uppercase text-[#7c4a12] shadow-sm">Clear</button>
-      </div>
-      <button type="button" onClick={check} className="mt-2 w-full rounded-[16px] border-2 border-[#7c3aed] bg-[#7c3aed] py-2.5 text-lg font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5">Go</button>
+    <div className="grid grid-cols-3 gap-3">
+      {options.map((n) => (
+        <button key={n} type="button" onClick={() => (Math.abs(n - correct) < 1e-9 ? onCorrect() : (setWrong(n), onWrong(), window.setTimeout(() => setWrong(null), 600)))} className={`relative flex min-h-[64px] items-center justify-center rounded-[22px] border-2 text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 ${wrong === n ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[#fffaf0]"}`}>
+          <span className="absolute right-1 top-1 z-10"><OptionReadAloudButton text={`${fmt(n)} ${unit}`} /></span>{fmt(n)} {unit}
+        </button>
+      ))}
     </div>
   );
 }
 
-/* ── L1 Climb — step the value up/down the ladder to the goal unit ── */
-function ClimbScene({ task, onCorrect }: { task: ConvertTask; onCorrect: () => void }) {
-  const measure = task.measure ?? "length";
-  const rungs = LADDERS[measure];
-  const fromIdx = unitIndex(measure, task.fromUnit ?? rungs[0]!.u);
-  const toIdx = unitIndex(measure, task.toUnit ?? rungs[rungs.length - 1]!.u);
-  const [cur, setCur] = useState(fromIdx);
-  const [val, setVal] = useState(task.fromValue ?? 1);
-  const atGoal = cur === toIdx;
-  const down = () => { if (cur < rungs.length - 1) { setVal((v) => v * rungs[cur]!.f); setCur(cur + 1); } };
-  const up = () => { if (cur > 0) { setVal((v) => v / rungs[cur - 1]!.f); setCur(cur - 1); } };
+/* ── Lab Set — drag the instrument to hit a target given in the other unit ── */
+function LabSetScene({ task, onCorrect }: { task: ConvertTask; onCorrect: () => void }) {
+  const measure = task.measure ?? "capacity";
+  const smallU = task.scaleUnit ?? "mL";
+  const bigU = task.fromUnit ?? "L";
+  const factor = convert(measure, 1, bigU, smallU);
+  const target = task.targetOnScale ?? 0;
+  const [val, setVal] = useState(0);
+  const done = val === target;
   return (
-    <Shell badge={task.badgeLabel ?? "Climb the Ladder"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+    <Shell badge={task.badgeLabel ?? "Measurement Lab"} prompt={`${VERB[measure]} ${fmt(task.fromValue ?? 0)} ${bigU}.`} speakText={task.speakText ?? `${VERB[measure]} ${fmt(task.fromValue ?? 0)} ${bigU}. Drag to the right amount on the ${smallU} scale.`}>
       <div className={panel}>
         {ctxLine(task)}
-        <MeasurelandsMetricLadder measure={measure} fromU={task.fromUnit} toU={task.toUnit} currentU={rungs[cur]!.u} currentValue={val} />
+        <MeasurelandsLabInstrument kind={KIND[measure]} value={val} onChange={setVal} max={task.scaleMax ?? 2000} step={task.scaleStep ?? 50} smallUnit={smallU} target={done ? target : null} />
+        <div className={`mx-auto mt-1 w-fit rounded-full px-4 py-1.5 text-lg font-black ${done ? "bg-[rgba(22,163,74,0.14)] text-[#16a34a]" : "bg-[rgba(124,58,237,0.1)] text-[#5b21b6]"}`}>{fmt(val)} {smallU} = {fmt(val / factor)} {bigU}</div>
       </div>
-      {atGoal ? (
-        <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[58px] items-center justify-center rounded-[24px] border-2 border-[#16a34a] bg-[#16a34a] px-8 text-lg font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5">Confirm {fmt(val)} {task.toUnit} ✓</button>
+      {done ? (
+        <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[58px] items-center justify-center rounded-[24px] border-2 border-[#16a34a] bg-[#16a34a] px-10 text-lg font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5">Done — {fmt(task.fromValue ?? 0)} {bigU} ✓</button>
       ) : (
-        <div className="grid grid-cols-2 gap-3">
-          <button type="button" onClick={up} disabled={cur === 0} className={`min-h-[58px] rounded-[22px] border-2 text-lg font-black shadow-sm transition ${cur === 0 ? "border-[rgba(214,184,108,0.4)] bg-[#f3ead2] text-[#c9b48a]" : "border-[#0f766e] bg-white text-[#0f766e] hover:-translate-y-0.5"}`}>↑ up ÷{cur > 0 ? rungs[cur - 1]!.f : ""}</button>
-          <button type="button" onClick={down} disabled={cur === rungs.length - 1} className={`min-h-[58px] rounded-[22px] border-2 text-lg font-black shadow-sm transition ${cur === rungs.length - 1 ? "border-[rgba(214,184,108,0.4)] bg-[#f3ead2] text-[#c9b48a]" : "border-[#b45309] bg-white text-[#b45309] hover:-translate-y-0.5"}`}>down ×{cur < rungs.length - 1 ? rungs[cur]!.f : ""} ↓</button>
-        </div>
+        <p className="text-center text-[13px] font-black text-[#a98b52]">Drag the handle. {fmt(task.fromValue ?? 0)} {bigU} = ? {smallU}</p>
       )}
     </Shell>
   );
 }
 
-/* ── L1/L2 Convert — ladder as reference, type the answer ── */
-function ConvertScene({ task, onCorrect, onWrong }: { task: ConvertTask; onCorrect: () => void; onWrong: () => void }) {
-  const measure = task.measure ?? "length";
-  const answer = task.answerValue ?? convert(measure, task.fromValue ?? 1, task.fromUnit ?? "m", task.toUnit ?? "cm");
+/* ── Lab Read — read the instrument, convert to the other unit ── */
+function LabReadScene({ task, onCorrect, onWrong }: { task: ConvertTask; onCorrect: () => void; onWrong: () => void }) {
+  const measure = task.measure ?? "capacity";
+  const smallU = task.scaleUnit ?? task.fromUnit ?? "mL";
+  const reading = task.fromValue ?? 0;
   return (
-    <Shell badge={task.badgeLabel ?? "Convert It"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_280px]">
-        <div className={panel}>
-          {ctxLine(task)}
-          <div className="mb-2 text-center text-lg font-black text-[#2c1c07]"><span className="text-[#b45309]">{fmt(task.fromValue ?? 0)} {task.fromUnit}</span> = <span className="text-[#16a34a]">? {task.toUnit}</span></div>
-          <MeasurelandsMetricLadder measure={measure} fromU={task.fromUnit} toU={task.toUnit} currentU={task.fromUnit} currentValue={task.fromValue} size={260} />
-        </div>
-        <DecimalKeypad answer={answer} unit={task.toUnit ?? ""} hint="Smaller unit → ×, larger unit → ÷." onCorrect={onCorrect} onWrong={onWrong} />
+    <Shell badge={task.badgeLabel ?? "Read the Instrument"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className={panel}>
+        {ctxLine(task)}
+        <MeasurelandsLabInstrument kind={KIND[measure]} value={reading} max={task.scaleMax ?? 2000} step={task.scaleStep ?? 50} smallUnit={smallU} />
+        <div className="mx-auto mt-1 w-fit rounded-full bg-[rgba(124,58,237,0.1)] px-4 py-1.5 text-lg font-black text-[#5b21b6]">it reads {fmt(reading)} {smallU}</div>
       </div>
+      <p className="text-center text-[13px] font-black text-[#a98b52]">Convert to {task.toUnit}:</p>
+      <OptionRow options={task.options ?? []} correct={task.answerValue ?? 0} unit={task.toUnit ?? ""} onCorrect={onCorrect} onWrong={onWrong} />
     </Shell>
   );
 }
 
-/* ── L2 Compare — which measure is greater ── */
+/* ── Compare — which is greater ── */
 function CompareScene({ task, onCorrect, onWrong }: { task: ConvertTask; onCorrect: () => void; onWrong: () => void }) {
   const a = task.pairA!, b = task.pairB!;
   const measure = measureOf(a.unit);
-  const base = LADDERS[measure][LADDERS[measure].length - 1]!.u;
-  const va = convert(measure, a.value, a.unit, base), vb = convert(measure, b.value, b.unit, base);
-  const bigger = va >= vb ? "a" : "b";
+  const base = measure === "length" ? "mm" : measure === "mass" ? "g" : "mL";
+  const bigger = convert(measure, a.value, a.unit, base) >= convert(measure, b.value, b.unit, base) ? "a" : "b";
   const [wrong, setWrong] = useState<string | null>(null);
   const Btn = ({ id, p }: { id: string; p: { value: number; unit: string } }) => (
-    <button type="button" onClick={() => (id === bigger ? onCorrect() : (setWrong(id), onWrong(), window.setTimeout(() => setWrong(null), 600)))} className={`flex min-h-[92px] flex-col items-center justify-center gap-1 rounded-[24px] border-2 text-2xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 ${wrong === id ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)]"}`}>
-      <span className="tabular-nums">{fmt(p.value)} {p.unit}</span>
-      <span className="text-[11px] font-black uppercase tracking-wide text-[#a98b52]"><OptionReadAloudButton text={`${fmt(p.value)} ${p.unit}`} /></span>
+    <button type="button" onClick={() => (id === bigger ? onCorrect() : (setWrong(id), onWrong(), window.setTimeout(() => setWrong(null), 600)))} className={`flex min-h-[92px] items-center justify-center gap-2 rounded-[24px] border-2 text-2xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 ${wrong === id ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)]"}`}>
+      {fmt(p.value)} {p.unit}<OptionReadAloudButton text={`${fmt(p.value)} ${p.unit}`} />
     </button>
   );
   return (
@@ -120,7 +105,6 @@ function CompareScene({ task, onCorrect, onWrong }: { task: ConvertTask; onCorre
   );
 }
 
-/* ── Spot Professor Gauge's conversion mistake ── */
 function MistakeScene({ task, onCorrect, onWrong }: { task: ConvertTask; onCorrect: () => void; onWrong: () => void }) {
   const [wrong, setWrong] = useState<string | null>(null);
   return (
@@ -141,19 +125,18 @@ function MistakeScene({ task, onCorrect, onWrong }: { task: ConvertTask; onCorre
 }
 
 function IntroScene({ task, onCorrect }: { task: ConvertTask; onCorrect: () => void }) {
-  const measure = (task.measure ?? "length") as Measure;
   return (
     <Shell badge={task.badgeLabel ?? "Meazurex Mission"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="grid gap-3 md:grid-cols-2">
-        <div className={panel}><MeasurelandsMetricLadder measure={measure} /></div>
+        <div className={panel}><MeasurelandsLabInstrument kind="jug" value={1500} max={2000} step={50} smallUnit="mL" /></div>
         <div className="rounded-[24px] border border-[rgba(214,184,108,0.45)] bg-[rgba(255,250,240,0.96)] p-4">
-          <div className="mb-2 text-[12px] font-black uppercase tracking-[0.16em] text-[#a98b52]">The metric ladder</div>
-          <p className="text-[17px] font-bold leading-snug text-[#2c1c07]">The metric system is built on <span className="font-black text-[#5b21b6]">powers of 10</span>.</p>
-          <p className="mt-2 text-[15px] font-semibold leading-snug text-[#5a4423]">Step <span className="font-black text-[#b45309]">down</span> to a smaller unit → <span className="font-black">multiply</span>. Step <span className="font-black text-[#0f766e]">up</span> to a larger unit → <span className="font-black">divide</span>.</p>
-          <p className="mt-2 text-[14px] font-semibold leading-snug text-[#5a4423]">Each step is ×10, ×100 or ×1000 — check the ladder!</p>
+          <div className="mb-2 text-[12px] font-black uppercase tracking-[0.16em] text-[#a98b52]">Welcome to the Lab</div>
+          <p className="text-[17px] font-bold leading-snug text-[#2c1c07]">The same amount can be read in <span className="font-black text-[#5b21b6]">two units</span>.</p>
+          <p className="mt-2 text-[15px] font-semibold leading-snug text-[#5a4423]">This jug reads <span className="font-black">1500 mL</span> — that&apos;s the same as <span className="font-black text-[#7c3aed]">1.5 L</span>. A smaller unit means a bigger number (×), a larger unit means a smaller number (÷).</p>
+          <p className="mt-2 text-[14px] font-semibold leading-snug text-[#5a4423]">Length ×100 (cm↔m), mass &amp; capacity ×1000.</p>
         </div>
       </div>
-      <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[60px] items-center justify-center rounded-[24px] border-2 border-[rgba(180,120,20,0.55)] bg-[#fffaf0] px-8 text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]">Let&apos;s convert! →</button>
+      <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[60px] items-center justify-center rounded-[24px] border-2 border-[rgba(180,120,20,0.55)] bg-[#fffaf0] px-8 text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]">Enter the Lab! →</button>
     </Shell>
   );
 }
@@ -161,8 +144,8 @@ function IntroScene({ task, onCorrect }: { task: ConvertTask; onCorrect: () => v
 export function MeasurelandsMetricConvertCard({ task, onCorrect, onWrong }: { task: ConvertTask; onCorrect: () => void; onWrong: () => void }) {
   switch (task.scene) {
     case "intro": return <IntroScene task={task} onCorrect={onCorrect} />;
-    case "climb": return <ClimbScene task={task} onCorrect={onCorrect} />;
-    case "convert": return <ConvertScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+    case "labSet": return <LabSetScene task={task} onCorrect={onCorrect} />;
+    case "labRead": return <LabReadScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "compare": return <CompareScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     default: return <MistakeScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   }

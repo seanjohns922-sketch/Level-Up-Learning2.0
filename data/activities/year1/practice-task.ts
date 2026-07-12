@@ -1747,8 +1747,16 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "climb" | "convert" | "compare" | "mistake";
+      scene: "intro" | "climb" | "convert" | "labSet" | "labRead" | "compare" | "mistake";
       measure?: "length" | "mass" | "capacity";
+      /** "labSet"/"labRead": the instrument scale (small unit) + range. */
+      scaleUnit?: string;
+      scaleMax?: number;
+      scaleStep?: number;
+      /** "labSet": the value to drag the instrument to (in scaleUnit). */
+      targetOnScale?: number;
+      /** "labRead": MCQ answer options (in the target unit). */
+      options?: number[];
       fromUnit?: string;
       toUnit?: string;
       fromValue?: number;
