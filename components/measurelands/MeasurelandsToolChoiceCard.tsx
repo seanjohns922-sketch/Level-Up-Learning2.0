@@ -111,7 +111,7 @@ function Shell({ badge, prompt, speakText, children }: { badge: string; prompt: 
 /* Premium concept glyphs for the Week 8 "measuring tools" strip and the
  * perimeter / area / mass / capacity answer options. Each SVG actually depicts
  * the quantity being measured, rather than a generic stand-in icon. */
-function MeasureGlyph({ kind, className = "" }: { kind: string; className?: string }) {
+export function MeasureGlyph({ kind, className = "" }: { kind: string; className?: string }) {
   const S = "#6d28d9", L = "#c4b5fd", F = "#ede9fe", G = "#f59e0b", Wt = "#7dd3fc";
   const c = { className, viewBox: "0 0 48 48", fill: "none" as const, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
   if (kind === "m-length") {

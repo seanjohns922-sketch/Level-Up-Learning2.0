@@ -73,12 +73,12 @@ const WEEK_PLANS = [
     ],
   },
   {
-    topic: "Master Engineer Project",
-    focus: "Complete authentic multi-skill engineering investigations.",
+    topic: "Master Measurement Project",
+    focus: "Use everything you've learned to complete authentic engineering projects.",
     lessons: [
-      ["Design a Community Park", "Use length, area, perimeter, volume, angles and time."],
-      ["Engineer Challenge", "Solve a large connected design project."],
-      ["Master Measurelands Mission", "Complete the final Level 6 engineering challenge."],
+      ["Design the Community Park", "Plan a real project — choose the right measurement for each need."],
+      ["Engineer the School", "Combine area, perimeter and volume to design real spaces."],
+      ["Master Measurelands Mission", "One coherent project across every strand — then graduate."],
     ],
   },
 ] as const;

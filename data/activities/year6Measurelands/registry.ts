@@ -21,6 +21,9 @@ import { generateY6MeasurelandsWeek6Lesson3Task, resetY6MeasurelandsWeek6Lesson3
 import { generateY6MeasurelandsWeek7Lesson1Task, resetY6MeasurelandsWeek7Lesson1TaskSessionState, buildY6MeasurelandsWeek7Lesson1QuizTasks } from "@/data/activities/year6Measurelands/week7Lesson1";
 import { generateY6MeasurelandsWeek7Lesson2Task, resetY6MeasurelandsWeek7Lesson2TaskSessionState, buildY6MeasurelandsWeek7Lesson2QuizTasks } from "@/data/activities/year6Measurelands/week7Lesson2";
 import { generateY6MeasurelandsWeek7Lesson3Task, resetY6MeasurelandsWeek7Lesson3TaskSessionState, buildY6MeasurelandsWeek7Lesson3QuizTasks } from "@/data/activities/year6Measurelands/week7Lesson3";
+import { generateY6MeasurelandsWeek8Lesson1Task, resetY6MeasurelandsWeek8Lesson1TaskSessionState, buildY6MeasurelandsWeek8Lesson1QuizTasks } from "@/data/activities/year6Measurelands/week8Lesson1";
+import { generateY6MeasurelandsWeek8Lesson2Task, resetY6MeasurelandsWeek8Lesson2TaskSessionState, buildY6MeasurelandsWeek8Lesson2QuizTasks } from "@/data/activities/year6Measurelands/week8Lesson2";
+import { generateY6MeasurelandsWeek8Lesson3Task, resetY6MeasurelandsWeek8Lesson3TaskSessionState, buildY6MeasurelandsWeek8Lesson3QuizTasks } from "@/data/activities/year6Measurelands/week8Lesson3";
 
 // Measurelands Level 6 (Year 6) — placeholder registry only.
 //
@@ -257,6 +260,30 @@ const BUILT_LESSONS: Record<string, BuiltOverride> = {
     quizContributionBuilder: buildY6MeasurelandsWeek7Lesson3QuizTasks,
     practisedSkills: ["Combine multiple measurement ideas", "Choose the right maths for each part", "Solve authentic investigations"],
     completionTitle: "Master Engineer Challenge Complete!",
+  },
+  // Week 8 — Master Measurement Project (the finale). No weekly quiz: each
+  // quizContributionBuilder returns []; completing W8-L3 unlocks the Post-Test
+  // (unlockMessage stays the placeholder's "Level 6 Post-Test unlocked.").
+  "y6-measurement-w8-l1": {
+    generate: generateY6MeasurelandsWeek8Lesson1Task,
+    reset: resetY6MeasurelandsWeek8Lesson1TaskSessionState,
+    quizContributionBuilder: buildY6MeasurelandsWeek8Lesson1QuizTasks,
+    practisedSkills: ["Identify the measurement each need requires", "Choose the correct units", "Justify the design decisions"],
+    completionTitle: "Design the Community Park Complete!",
+  },
+  "y6-measurement-w8-l2": {
+    generate: generateY6MeasurelandsWeek8Lesson2Task,
+    reset: resetY6MeasurelandsWeek8Lesson2TaskSessionState,
+    quizContributionBuilder: buildY6MeasurelandsWeek8Lesson2QuizTasks,
+    practisedSkills: ["Combine area, perimeter and volume", "Interpret and compare measurements", "Optimise a real design"],
+    completionTitle: "Engineer the School Complete!",
+  },
+  "y6-measurement-w8-l3": {
+    generate: generateY6MeasurelandsWeek8Lesson3Task,
+    reset: resetY6MeasurelandsWeek8Lesson3TaskSessionState,
+    quizContributionBuilder: buildY6MeasurelandsWeek8Lesson3QuizTasks,
+    practisedSkills: ["Apply every measurement strand", "Choose the best strategy for each part", "Justify a complete project"],
+    completionTitle: "Master Measurelands Mission Complete!",
   },
 };
 

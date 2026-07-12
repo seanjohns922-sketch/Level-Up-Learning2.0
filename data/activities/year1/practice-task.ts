@@ -1815,8 +1815,16 @@ export type PracticeTask = (
       title?: string;
       emoji?: string;
       facts?: string[];
-      /** The parts, answered one at a time. `strategy` labels the maths used. */
-      parts?: Array<{ q: string; strategy: string; options: string[]; answer: string }>;
+      /** The parts, answered one at a time. `strategy` labels the maths used.
+       *  `note` (W8) carries context forward before the question; `spec` labels
+       *  the solved value in the running "spec so far" strip. */
+      parts?: Array<{ q: string; strategy: string; options: string[]; answer: string; note?: string; spec?: string }>;
+      /** W8 graduation close: pick the skill that helped most → celebration → unlock. */
+      reflection?: {
+        prompt: string;
+        speakText?: string;
+        skills: Array<{ label: string; iconKey: string; message: string }>;
+      };
       feedback?: { correct: string; wrong: string };
     }
   | {

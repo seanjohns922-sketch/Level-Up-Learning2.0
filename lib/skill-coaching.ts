@@ -315,6 +315,9 @@ const TABLE: Record<string, SkillCoaching> = {
   ml_y6_w7_l1: { tip: "Before you calculate, decide what you're actually measuring." },
   ml_y6_w7_l2: { tip: "Sometimes the smartest solution is also the simplest." },
   ml_y6_w7_l3: { tip: "Master mathematicians justify their thinking — not just their answers." },
+  ml_y6_w8_l1: { tip: "Every great design begins with the right measurements." },
+  ml_y6_w8_l2: { tip: "Good engineers compare several solutions before choosing the best one." },
+  ml_y6_w8_l3: { tip: "The best mathematicians can explain why their solution works." },
 };
 
 const FALLBACK: SkillCoaching = {
@@ -474,6 +477,9 @@ const LESSON_KEY_MAP: Record<string, string> = {
   "y6-measurement-w7-l1": "ml_y6_w7_l1",
   "y6-measurement-w7-l2": "ml_y6_w7_l2",
   "y6-measurement-w7-l3": "ml_y6_w7_l3",
+  "y6-measurement-w8-l1": "ml_y6_w8_l1",
+  "y6-measurement-w8-l2": "ml_y6_w8_l2",
+  "y6-measurement-w8-l3": "ml_y6_w8_l3",
 };
 
 function normalizeLessonId(lessonId: string): string {
