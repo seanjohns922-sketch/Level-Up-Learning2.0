@@ -31,8 +31,8 @@ const S: Record<string, Opt> = {
   convert: { id: "convert", label: "Convert", iconKey: "m-convert", focus: "change units" },
 };
 const TOOL: Record<string, Opt> = {
-  tape: { id: "tape", label: "Tape Measure", iconKey: "tape", imageSrc: "/images/measurelands/tools-3d/tool-tape.png", focus: "lengths" },
-  protractor: { id: "protractor", label: "Protractor", iconKey: "compass", focus: "angles" },
+  tape: { id: "tape", label: "Tape Measure", iconKey: "m-tape", focus: "lengths" },
+  protractor: { id: "protractor", label: "Protractor", iconKey: "m-protractor", focus: "angles" },
   scale: { id: "scale", label: "Scales", iconKey: "m-mass", focus: "mass" },
   jug: { id: "jug", label: "Measuring Jug", iconKey: "m-capacity", focus: "capacity" },
 };
@@ -54,9 +54,9 @@ const TOOL_SCENARIOS = [
   { p: "You need to measure how much water fills a bucket.", c: "jug", d: ["scale", "tape"] },
 ];
 const EFFICIENCY: Array<{ p: string; opts: Opt[]; c: string; why: string }> = [
-  { p: "To find the area of a 12 m × 8 m hall, what's the smartest way?", opts: [{ id: "formula", label: "Length × width", iconKey: "m-area", focus: "12 × 8" }, { id: "count", label: "Count every square", iconKey: "cubes", focus: "slow" }, { id: "tape", label: "Re-measure each tile", iconKey: "tape", focus: "slow" }], c: "formula", why: "Length × width gives it instantly — counting 96 squares is slow." },
-  { p: "To find a missing angle on a straight line, what's smartest?", opts: [{ id: "reason", label: "Use 180°", iconKey: "m-angle", focus: "reason" }, { id: "protractor", label: "Measure it", iconKey: "compass", focus: "slower" }, { id: "guess", label: "Estimate it", iconKey: "m-length", focus: "risky" }], c: "reason", why: "Know 180° and one angle? Just subtract — no measuring needed." },
-  { p: "To find the perimeter of a square with side 9 m, what's smartest?", opts: [{ id: "mult", label: "4 × side", iconKey: "m-perimeter", focus: "4 × 9" }, { id: "add", label: "Add all four sides", iconKey: "m-length", focus: "longer" }, { id: "wheel", label: "Roll a trundle wheel", iconKey: "wheel", focus: "slow" }], c: "mult", why: "For a square, 4 × side is quickest." },
+  { p: "To find the area of a 12 m × 8 m hall, what's the smartest way?", opts: [{ id: "formula", label: "Length × width", iconKey: "m-area", focus: "12 × 8" }, { id: "count", label: "Count every square", iconKey: "m-volume", focus: "slow" }, { id: "tape", label: "Re-measure each tile", iconKey: "m-tape", focus: "slow" }], c: "formula", why: "Length × width gives it instantly — counting 96 squares is slow." },
+  { p: "To find a missing angle on a straight line, what's smartest?", opts: [{ id: "reason", label: "Use 180°", iconKey: "m-angle", focus: "reason" }, { id: "protractor", label: "Measure it", iconKey: "m-protractor", focus: "slower" }, { id: "guess", label: "Estimate it", iconKey: "m-length", focus: "risky" }], c: "reason", why: "Know 180° and one angle? Just subtract — no measuring needed." },
+  { p: "To find the perimeter of a square with side 9 m, what's smartest?", opts: [{ id: "mult", label: "4 × side", iconKey: "m-perimeter", focus: "4 × 9" }, { id: "add", label: "Add all four sides", iconKey: "m-length", focus: "longer" }, { id: "wheel", label: "Roll a trundle wheel", iconKey: "m-time", focus: "slow" }], c: "mult", why: "For a square, 4 × side is quickest." },
 ];
 
 // ── L1/L2 strategy selection (toolChoice) ─────────────────────────────────────

@@ -112,104 +112,121 @@ function Shell({ badge, prompt, speakText, children }: { badge: string; prompt: 
  * perimeter / area / mass / capacity answer options. Each SVG actually depicts
  * the quantity being measured, rather than a generic stand-in icon. */
 function MeasureGlyph({ kind, className = "" }: { kind: string; className?: string }) {
-  const S = "#6d28d9";
-  const F = "#ede9fe";
-  const common = { className, viewBox: "0 0 48 48", fill: "none" as const };
+  const S = "#6d28d9", L = "#c4b5fd", F = "#ede9fe", G = "#f59e0b", Wt = "#7dd3fc";
+  const c = { className, viewBox: "0 0 48 48", fill: "none" as const, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
   if (kind === "m-length") {
     return (
-      <svg {...common} aria-hidden="true">
-        <path d="M9 13h30" stroke={S} strokeWidth="2.4" strokeLinecap="round" />
-        <path d="M9 13l4-3.2M9 13l4 3.2M39 13l-4-3.2M39 13l-4 3.2" stroke={S} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-        <rect x="8" y="21" width="32" height="14" rx="3" fill={F} stroke={S} strokeWidth="2.4" />
-        {[14, 20, 26, 32].map((x) => <line key={x} x1={x} y1="21" x2={x} y2="27" stroke={S} strokeWidth="2" strokeLinecap="round" />)}
+      <svg {...c} aria-hidden="true">
+        <path d="M9 14h30M9 14l3.4-2.8M9 14l3.4 2.8M39 14l-3.4-2.8M39 14l-3.4 2.8" stroke={G} strokeWidth="2.4" />
+        <rect x="7" y="20" width="34" height="13" rx="4" fill={F} stroke={S} strokeWidth="2.4" />
+        {[14, 20, 26, 32].map((x) => <line key={x} x1={x} y1="20" x2={x} y2="26.5" stroke={S} strokeWidth="1.8" />)}
       </svg>
     );
   }
   if (kind === "m-perimeter") {
     return (
-      <svg {...common} aria-hidden="true">
-        <rect x="10" y="12" width="28" height="24" rx="4" stroke={S} strokeWidth="3.2" strokeDasharray="5 3.4" strokeLinecap="round" />
-        {([[10, 12], [38, 12], [10, 36], [38, 36]] as const).map(([cx, cy], i) => <circle key={i} cx={cx} cy={cy} r="2.8" fill="#d6a84a" stroke={S} strokeWidth="1.4" />)}
+      <svg {...c} aria-hidden="true">
+        <rect x="11" y="13" width="26" height="22" rx="6" fill={F} stroke={S} strokeWidth="3.4" />
+        {([[11, 13], [37, 13], [11, 35], [37, 35]] as const).map(([cx, cy], i) => <circle key={i} cx={cx} cy={cy} r="3" fill={G} stroke={S} strokeWidth="1.4" />)}
       </svg>
     );
   }
   if (kind === "m-area") {
     return (
-      <svg {...common} aria-hidden="true">
-        <rect x="10" y="13" width="28" height="22" rx="3" fill={F} stroke={S} strokeWidth="2.6" />
-        <line x1="19.3" y1="13" x2="19.3" y2="35" stroke={S} strokeWidth="1.8" />
-        <line x1="28.6" y1="13" x2="28.6" y2="35" stroke={S} strokeWidth="1.8" />
-        <line x1="10" y1="24" x2="38" y2="24" stroke={S} strokeWidth="1.8" />
-        <rect x="10" y="13" width="9.3" height="11" fill="rgba(109,40,217,0.28)" />
-        <rect x="28.7" y="24" width="9.3" height="11" fill="rgba(109,40,217,0.28)" />
+      <svg {...c} aria-hidden="true">
+        <rect x="10" y="13" width="28" height="22" rx="4" fill={F} stroke={S} strokeWidth="2.6" />
+        <rect x="10.2" y="13.2" width="9.1" height="10.7" fill={L} opacity="0.85" />
+        <rect x="28.7" y="24" width="9.1" height="10.8" fill={L} opacity="0.85" />
+        <path d="M19.3 13v22M28.6 13v22M10 24h28" stroke={S} strokeWidth="1.7" opacity="0.75" />
       </svg>
     );
   }
   if (kind === "m-both") {
     return (
-      <svg {...common} aria-hidden="true">
-        <rect x="8" y="12" width="32" height="24" rx="4" stroke="#d6a84a" strokeWidth="3" strokeDasharray="5 3.2" />
-        <rect x="15" y="18" width="18" height="12" rx="2" fill={F} stroke={S} strokeWidth="2" />
-        <line x1="24" y1="18" x2="24" y2="30" stroke={S} strokeWidth="1.6" />
-        <line x1="15" y1="24" x2="33" y2="24" stroke={S} strokeWidth="1.6" />
+      <svg {...c} aria-hidden="true">
+        <rect x="8" y="12" width="32" height="24" rx="6" stroke={G} strokeWidth="3" strokeDasharray="5 3.2" />
+        <rect x="15" y="18" width="18" height="12" rx="3" fill={F} stroke={S} strokeWidth="2" />
+        <path d="M24 18v12M15 24h18" stroke={S} strokeWidth="1.6" />
       </svg>
     );
   }
   if (kind === "m-mass") {
     return (
-      <svg {...common} aria-hidden="true">
-        <path d="M18.5 17c0-4.5 11-4.5 11 0" stroke={S} strokeWidth="3" strokeLinecap="round" />
-        <path d="M15 18.5h18l3.2 19.5H11.8z" fill={F} stroke={S} strokeWidth="2.6" strokeLinejoin="round" />
-        <text x="24" y="32.5" textAnchor="middle" fontSize="9" fontWeight="800" fill={S}>kg</text>
+      <svg {...c} aria-hidden="true">
+        <path d="M18.5 17c0-4.5 11-4.5 11 0" stroke={S} strokeWidth="2.8" />
+        <path d="M15 18h18l3 18H12z" fill={F} stroke={S} strokeWidth="2.4" />
+        <text x="24" y="31.5" textAnchor="middle" fontSize="8.5" fontWeight="800" fill={S}>kg</text>
+        <line x1="12.6" y1="36" x2="35.4" y2="36" stroke={G} strokeWidth="2.6" />
       </svg>
     );
   }
   if (kind === "m-capacity") {
     return (
-      <svg {...common} aria-hidden="true">
-        <path d="M15 13h18l-2.2 22.5a3 3 0 0 1-3 2.7H20.2a3 3 0 0 1-3-2.7z" fill="#fff" stroke={S} strokeWidth="2.4" strokeLinejoin="round" />
-        <path d="M16.7 25.5h14.6l-1 10.9a3 3 0 0 1-3 2.7H20.7a3 3 0 0 1-3-2.7z" fill="#5ec5e8" opacity="0.55" />
-        <path d="M33 15.5l4-1.6" stroke={S} strokeWidth="2.4" strokeLinecap="round" />
-        {[20, 26, 32].map((y) => <line key={y} x1="15.8" y1={y} x2="19.8" y2={y} stroke={S} strokeWidth="1.6" strokeLinecap="round" />)}
+      <svg {...c} aria-hidden="true">
+        <path d="M15 13h18l-2 21.6a3 3 0 0 1-3 2.6H20a3 3 0 0 1-3-2.6z" fill="#fff" stroke={S} strokeWidth="2.4" />
+        <path d="M16.6 24.5h14.8l-1 10.1a3 3 0 0 1-3 2.6H20.6a3 3 0 0 1-3-2.6z" fill={Wt} opacity="0.7" />
+        <path d="M33 15.5l4-1.6" stroke={S} strokeWidth="2.4" />
+        {[19, 25, 31].map((y) => <line key={y} x1="15.7" y1={y} x2="19.7" y2={y} stroke={S} strokeWidth="1.6" />)}
       </svg>
     );
   }
   if (kind === "m-time") {
     return (
-      <svg {...common} aria-hidden="true">
-        <circle cx="24" cy="26" r="14" fill={F} stroke={S} strokeWidth="2.6" />
-        <line x1="24" y1="8.5" x2="24" y2="12" stroke={S} strokeWidth="2.6" strokeLinecap="round" />
-        <line x1="24" y1="26" x2="24" y2="17.5" stroke={S} strokeWidth="2.6" strokeLinecap="round" />
-        <line x1="24" y1="26" x2="30.5" y2="29" stroke={S} strokeWidth="2.6" strokeLinecap="round" />
-        <circle cx="24" cy="26" r="1.9" fill={S} />
+      <svg {...c} aria-hidden="true">
+        <circle cx="24" cy="25" r="13.5" fill={F} stroke={S} strokeWidth="2.6" />
+        <line x1="24" y1="12.5" x2="24" y2="15.5" stroke={G} strokeWidth="2.6" />
+        <line x1="24" y1="25" x2="24" y2="17" stroke={S} strokeWidth="2.6" />
+        <line x1="24" y1="25" x2="30" y2="28" stroke={S} strokeWidth="2.6" />
+        <circle cx="24" cy="25" r="2" fill={S} />
       </svg>
     );
   }
   if (kind === "m-volume") {
     return (
-      <svg {...common} aria-hidden="true">
-        <path d="M12 18h18v16H12z" fill={F} stroke={S} strokeWidth="2.4" />
-        <path d="M12 18 18 12h18l-6 6z" fill="rgba(109,40,217,0.28)" stroke={S} strokeWidth="2.4" strokeLinejoin="round" />
-        <path d="M30 18 36 12v16l-6 6z" fill="rgba(109,40,217,0.18)" stroke={S} strokeWidth="2.4" strokeLinejoin="round" />
-        <path d="M21 18v16M12 26h18" stroke={S} strokeWidth="1.5" opacity="0.6" />
+      <svg {...c} aria-hidden="true">
+        <path d="M14 21h16v13H14z" fill={L} stroke={S} strokeWidth="2.4" />
+        <path d="M14 21 20 15h16l-6 6z" fill="#ddd6fe" stroke={S} strokeWidth="2.4" />
+        <path d="M30 21 36 15v13l-6 6z" fill="#a78bfa" stroke={S} strokeWidth="2.4" />
       </svg>
     );
   }
   if (kind === "m-angle") {
     return (
-      <svg {...common} aria-hidden="true">
-        <path d="M11 34h26" stroke={S} strokeWidth="2.8" strokeLinecap="round" />
-        <path d="M11 34 33 16" stroke={S} strokeWidth="2.8" strokeLinecap="round" />
-        <path d="M23 34a12 12 0 0 0-3.6-8.6" fill="none" stroke="#d6a84a" strokeWidth="2.4" />
+      <svg {...c} aria-hidden="true">
+        <path d="M12 33h24M12 33 33 16" stroke={S} strokeWidth="2.8" />
+        <path d="M24 33a12 12 0 0 0-3.7-8.7" stroke={G} strokeWidth="2.6" />
       </svg>
     );
   }
   if (kind === "m-convert") {
     return (
-      <svg {...common} aria-hidden="true">
-        <text x="15" y="21" textAnchor="middle" fontSize="9" fontWeight="900" fill={S}>cm</text>
-        <text x="33" y="35" textAnchor="middle" fontSize="9" fontWeight="900" fill={S}>m</text>
-        <path d="M20 17h9l-3-3M28 31h-9l3 3" stroke={S} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+      <svg {...c} aria-hidden="true">
+        <rect x="7" y="11" width="16" height="12.5" rx="4.5" fill={F} stroke={S} strokeWidth="2" />
+        <text x="15" y="20" textAnchor="middle" fontSize="8" fontWeight="900" fill={S}>cm</text>
+        <rect x="25" y="24.5" width="15" height="12.5" rx="4.5" fill={F} stroke={S} strokeWidth="2" />
+        <text x="32.5" y="33.5" textAnchor="middle" fontSize="8" fontWeight="900" fill={S}>m</text>
+        <path d="M25 17h4.5M29.5 17l-2.2-1.9M29.5 17l-2.2 1.9M23 31h-4.5M18.5 31l2.2-1.9M18.5 31l2.2 1.9" stroke={G} strokeWidth="2.2" />
+      </svg>
+    );
+  }
+  if (kind === "m-protractor") {
+    return (
+      <svg {...c} aria-hidden="true">
+        <path d="M11 32 A13 13 0 0 1 37 32 Z" fill={F} stroke={S} strokeWidth="2.4" />
+        {[30, 60, 90, 120, 150].map((a) => { const r = (a * Math.PI) / 180; return <line key={a} x1={24 + 13 * Math.cos(r)} y1={32 - 13 * Math.sin(r)} x2={24 + 10 * Math.cos(r)} y2={32 - 10 * Math.sin(r)} stroke={S} strokeWidth="1.5" />; })}
+        <line x1="24" y1="32" x2="33.2" y2="23.8" stroke={G} strokeWidth="2.6" />
+        <circle cx="24" cy="32" r="2.2" fill={S} />
+      </svg>
+    );
+  }
+  if (kind === "m-tape") {
+    return (
+      <svg {...c} aria-hidden="true">
+        <path d="M28 22h11v6H29z" fill="#fef3c7" stroke={S} strokeWidth="2" />
+        <line x1="39" y1="20.5" x2="39" y2="29.5" stroke={S} strokeWidth="2.4" />
+        <rect x="8" y="17" width="21" height="19" rx="7" fill={G} stroke={S} strokeWidth="2.4" />
+        <circle cx="18" cy="26.5" r="4.6" fill="#fff" stroke={S} strokeWidth="2" />
+        <circle cx="18" cy="26.5" r="1.3" fill={S} />
       </svg>
     );
   }
