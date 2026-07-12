@@ -489,9 +489,9 @@ function CompleteMeasureScene({ task, onCorrect, onWrong }: { task: ToolTask; on
 function ReasonScene({ task, onCorrect, onWrong }: { task: ToolTask; onCorrect: () => void; onWrong: () => void }) {
   return (
     <Shell badge={task.badgeLabel ?? "Why Is This Tool Bad?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      {task.object || task.wrongTool ? (
+      {task.object ? (
         <div className="mx-auto flex max-w-[420px] items-center justify-center gap-3">
-          {task.object ? <ObjectCard object={task.object} big={false} /> : null}
+          <ObjectCard object={task.object} big={false} />
           {task.wrongTool ? (
             <div className="flex w-[150px] flex-col items-center gap-2 rounded-[26px] border-2 border-dashed border-[rgba(220,80,80,0.6)] bg-[rgba(220,80,80,0.06)] px-3 py-4 text-center">
               <span className="text-[11px] font-black uppercase tracking-[0.16em] text-[#b91c1c]">This tool</span>
@@ -500,6 +500,18 @@ function ReasonScene({ task, onCorrect, onWrong }: { task: ToolTask; onCorrect: 
             </div>
           ) : null}
         </div>
+      ) : task.wrongTool ? (
+        <div className="mx-auto flex max-w-[460px] items-center gap-4 rounded-[26px] border-2 border-[rgba(220,80,80,0.35)] px-5 py-4 shadow-[0_10px_30px_rgba(190,50,50,0.12)]" style={{ background: "linear-gradient(135deg, rgba(255,241,238,0.98), rgba(252,224,224,0.9))" }}>
+          <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-[22px] border border-[rgba(220,80,80,0.28)] bg-white shadow-inner">
+            <Glyph label={task.wrongTool.label} iconKey={task.wrongTool.iconKey} imageSrc={task.wrongTool.imageSrc} big />
+          </div>
+          <div className="flex-1">
+            <div className="text-[11px] font-black uppercase tracking-[0.18em] text-[#b91c1c]">Professor Gauge picked</div>
+            <div className="text-2xl font-black leading-tight text-[#2c1c07] sm:text-3xl">{task.wrongTool.label}</div>
+            <div className="mt-1 text-[13px] font-bold text-[#a16207]">Is that the right strategy?</div>
+          </div>
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#dc2626] text-2xl font-black text-white shadow-md">✗</div>
+        </div>
       ) : null}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {(task.reasonOptions ?? []).map((value) => (
@@ -507,10 +519,10 @@ function ReasonScene({ task, onCorrect, onWrong }: { task: ToolTask; onCorrect: 
             key={value}
             type="button"
             onClick={() => (value === task.correctReason ? onCorrect() : onWrong())}
-            className="relative flex min-h-[72px] items-center justify-center rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-3 text-center text-base font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
+            className="flex min-h-[84px] flex-col items-center justify-center gap-1.5 rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-4 py-3 text-center text-base font-black leading-tight text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"
           >
-            <span className="absolute right-2 top-2 z-10"><OptionReadAloudButton text={value} /></span>
-            {value}
+            <span>{value}</span>
+            <OptionReadAloudButton text={value} />
           </button>
         ))}
       </div>
