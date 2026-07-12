@@ -1777,6 +1777,33 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Level 6 (Year 6) W6 "Angle Reasoning" (enrichment; foundation
+      // for Year 7 AC9M7SP03): find unknown angles using angles on a straight line
+      // (180°) and around a point (360°). Reason first, check with the protractor.
+      kind: "angleReason";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "intro" | "find" | "which" | "mistake";
+      /** The angle diagram: sectors that sum to 180 (line) or 360 (point). */
+      diagram?: { type: "line" | "point"; sectors: Array<{ deg: number; label: string; unknown?: boolean }> };
+      /** "find": the unknown angle (degrees) + the total (180 / 360). */
+      answerDeg?: number;
+      total?: number;
+      /** "which": MCQ degree options + correct. */
+      options?: number[];
+      correctNumber?: number;
+      /** "mistake": Gauge's wrong claim + why. */
+      statement?: string;
+      reasonOptions?: string[];
+      correctReason?: string;
+      /** Offer a "check with the protractor" step (answer ≤ 180). */
+      allowCheck?: boolean;
+      context?: string;
+      emoji?: string;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       kind: "tensOnesMcq";
       prompt: string;
       min: number;

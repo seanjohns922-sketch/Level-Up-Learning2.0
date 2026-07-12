@@ -56,11 +56,11 @@ const WEEK_PLANS = [
   },
   {
     topic: "Angle Reasoning",
-    focus: "Use angle facts to solve missing-angle problems.",
+    focus: "Find missing angles by reasoning with 180° and 360°.",
     lessons: [
-      ["Missing Angles", "Find simple adjacent missing angles."],
-      ["Angles on a Straight Line", "Use straight-line angle reasoning."],
-      ["Angle Investigations", "Apply angle reasoning to real-world contexts."],
+      ["Angles on a Straight Line", "Find missing angles that total 180°."],
+      ["Angles Around a Point", "Find missing angles that total 360°."],
+      ["Angle Investigations", "Reason about angles in real structures."],
     ],
   },
   {

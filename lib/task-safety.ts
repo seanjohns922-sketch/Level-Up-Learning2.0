@@ -194,6 +194,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "area",
   "volume",
   "metricConvert",
+  "angleReason",
   "temperature",
   "perimeterCalc",
   "timeQuest",
