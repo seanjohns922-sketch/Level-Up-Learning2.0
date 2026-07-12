@@ -18,6 +18,9 @@ import { generateY6MeasurelandsWeek5Lesson3Task, resetY6MeasurelandsWeek5Lesson3
 import { generateY6MeasurelandsWeek6Lesson1Task, resetY6MeasurelandsWeek6Lesson1TaskSessionState, buildY6MeasurelandsWeek6Lesson1QuizTasks } from "@/data/activities/year6Measurelands/week6Lesson1";
 import { generateY6MeasurelandsWeek6Lesson2Task, resetY6MeasurelandsWeek6Lesson2TaskSessionState, buildY6MeasurelandsWeek6Lesson2QuizTasks } from "@/data/activities/year6Measurelands/week6Lesson2";
 import { generateY6MeasurelandsWeek6Lesson3Task, resetY6MeasurelandsWeek6Lesson3TaskSessionState, buildY6MeasurelandsWeek6Lesson3QuizTasks } from "@/data/activities/year6Measurelands/week6Lesson3";
+import { generateY6MeasurelandsWeek7Lesson1Task, resetY6MeasurelandsWeek7Lesson1TaskSessionState, buildY6MeasurelandsWeek7Lesson1QuizTasks } from "@/data/activities/year6Measurelands/week7Lesson1";
+import { generateY6MeasurelandsWeek7Lesson2Task, resetY6MeasurelandsWeek7Lesson2TaskSessionState, buildY6MeasurelandsWeek7Lesson2QuizTasks } from "@/data/activities/year6Measurelands/week7Lesson2";
+import { generateY6MeasurelandsWeek7Lesson3Task, resetY6MeasurelandsWeek7Lesson3TaskSessionState, buildY6MeasurelandsWeek7Lesson3QuizTasks } from "@/data/activities/year6Measurelands/week7Lesson3";
 
 // Measurelands Level 6 (Year 6) — placeholder registry only.
 //
@@ -233,6 +236,27 @@ const BUILT_LESSONS: Record<string, BuiltOverride> = {
     quizContributionBuilder: buildY6MeasurelandsWeek6Lesson3QuizTasks,
     practisedSkills: ["Choose 180° or 360° reasoning", "Solve angle problems in real structures", "Reason before measuring"],
     completionTitle: "Angle Investigations Complete!",
+  },
+  "y6-measurement-w7-l1": {
+    generate: generateY6MeasurelandsWeek7Lesson1Task,
+    reset: resetY6MeasurelandsWeek7Lesson1TaskSessionState,
+    quizContributionBuilder: buildY6MeasurelandsWeek7Lesson1QuizTasks,
+    practisedSkills: ["Identify what a problem measures", "Choose the correct strategy", "Choose the right tool"],
+    completionTitle: "Choose the Strategy Complete!",
+  },
+  "y6-measurement-w7-l2": {
+    generate: generateY6MeasurelandsWeek7Lesson2Task,
+    reset: resetY6MeasurelandsWeek7Lesson2TaskSessionState,
+    quizContributionBuilder: buildY6MeasurelandsWeek7Lesson2QuizTasks,
+    practisedSkills: ["Compare different approaches", "Choose the most efficient method", "Justify the reasoning"],
+    completionTitle: "Optimise the Solution Complete!",
+  },
+  "y6-measurement-w7-l3": {
+    generate: generateY6MeasurelandsWeek7Lesson3Task,
+    reset: resetY6MeasurelandsWeek7Lesson3TaskSessionState,
+    quizContributionBuilder: buildY6MeasurelandsWeek7Lesson3QuizTasks,
+    practisedSkills: ["Combine multiple measurement ideas", "Choose the right maths for each part", "Solve authentic investigations"],
+    completionTitle: "Master Engineer Challenge Complete!",
   },
 };
 

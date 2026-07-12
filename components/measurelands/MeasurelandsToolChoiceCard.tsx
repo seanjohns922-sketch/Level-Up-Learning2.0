@@ -16,7 +16,7 @@ type ToolTask = Extract<PracticeTask, { kind: "toolChoice" }>;
 // art brief). Cards render `imageSrc` when present, else this icon.
 const ICONS: Record<string, LucideIcon> = {
   // tools
-  cubes: Boxes, blocks: Boxes, ruler: Ruler, tape: Scaling, wheel: LifeBuoy, feet: Footprints,
+  cubes: Boxes, blocks: Boxes, ruler: Ruler, tape: Scaling, wheel: LifeBuoy, feet: Footprints, compass: Compass,
   paperclips: Paperclip, crayons: Pencil, pencils: Pencil, dominoes: Dices,
   // objects
   eraser: Eraser, pencil: Pencil, book: BookOpen, crayon: Pencil, pencilcase: Box,
@@ -182,6 +182,34 @@ function MeasureGlyph({ kind, className = "" }: { kind: string; className?: stri
         <line x1="24" y1="26" x2="24" y2="17.5" stroke={S} strokeWidth="2.6" strokeLinecap="round" />
         <line x1="24" y1="26" x2="30.5" y2="29" stroke={S} strokeWidth="2.6" strokeLinecap="round" />
         <circle cx="24" cy="26" r="1.9" fill={S} />
+      </svg>
+    );
+  }
+  if (kind === "m-volume") {
+    return (
+      <svg {...common} aria-hidden="true">
+        <path d="M12 18h18v16H12z" fill={F} stroke={S} strokeWidth="2.4" />
+        <path d="M12 18 18 12h18l-6 6z" fill="rgba(109,40,217,0.28)" stroke={S} strokeWidth="2.4" strokeLinejoin="round" />
+        <path d="M30 18 36 12v16l-6 6z" fill="rgba(109,40,217,0.18)" stroke={S} strokeWidth="2.4" strokeLinejoin="round" />
+        <path d="M21 18v16M12 26h18" stroke={S} strokeWidth="1.5" opacity="0.6" />
+      </svg>
+    );
+  }
+  if (kind === "m-angle") {
+    return (
+      <svg {...common} aria-hidden="true">
+        <path d="M11 34h26" stroke={S} strokeWidth="2.8" strokeLinecap="round" />
+        <path d="M11 34 33 16" stroke={S} strokeWidth="2.8" strokeLinecap="round" />
+        <path d="M23 34a12 12 0 0 0-3.6-8.6" fill="none" stroke="#d6a84a" strokeWidth="2.4" />
+      </svg>
+    );
+  }
+  if (kind === "m-convert") {
+    return (
+      <svg {...common} aria-hidden="true">
+        <text x="15" y="21" textAnchor="middle" fontSize="9" fontWeight="900" fill={S}>cm</text>
+        <text x="33" y="35" textAnchor="middle" fontSize="9" fontWeight="900" fill={S}>m</text>
+        <path d="M20 17h9l-3-3M28 31h-9l3 3" stroke={S} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     );
   }

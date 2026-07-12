@@ -312,6 +312,9 @@ const TABLE: Record<string, SkillCoaching> = {
   ml_y6_w6_l1: { tip: "Angles on a straight line always add to 180°." },
   ml_y6_w6_l2: { tip: "Angles around one point always add to 360°." },
   ml_y6_w6_l3: { tip: "Look for relationships before reaching for the protractor." },
+  ml_y6_w7_l1: { tip: "Before you calculate, decide what you're actually measuring." },
+  ml_y6_w7_l2: { tip: "Sometimes the smartest solution is also the simplest." },
+  ml_y6_w7_l3: { tip: "Master mathematicians justify their thinking — not just their answers." },
 };
 
 const FALLBACK: SkillCoaching = {
@@ -468,6 +471,9 @@ const LESSON_KEY_MAP: Record<string, string> = {
   "y6-measurement-w6-l1": "ml_y6_w6_l1",
   "y6-measurement-w6-l2": "ml_y6_w6_l2",
   "y6-measurement-w6-l3": "ml_y6_w6_l3",
+  "y6-measurement-w7-l1": "ml_y6_w7_l1",
+  "y6-measurement-w7-l2": "ml_y6_w7_l2",
+  "y6-measurement-w7-l3": "ml_y6_w7_l3",
 };
 
 function normalizeLessonId(lessonId: string): string {

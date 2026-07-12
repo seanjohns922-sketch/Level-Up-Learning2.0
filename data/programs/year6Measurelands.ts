@@ -64,12 +64,12 @@ const WEEK_PLANS = [
     ],
   },
   {
-    topic: "Measurement Optimisation",
-    focus: "Choose the best tool, unit and strategy for professional problems.",
+    topic: "Measurement Mastery",
+    focus: "Choose the best mathematical strategy, then combine strands to solve.",
     lessons: [
-      ["Best Tool", "Choose efficient tools for measurement jobs."],
-      ["Best Strategy", "Choose the strategy that fits the problem."],
-      ["Professional Decisions", "Justify measurement decisions as builders, surveyors and scientists."],
+      ["Choose the Strategy", "Analyse a problem and pick the right strategy and tool."],
+      ["Optimise the Solution", "Compare approaches and choose the most efficient."],
+      ["Master Engineer Challenge", "Combine strands in an authentic investigation."],
     ],
   },
   {

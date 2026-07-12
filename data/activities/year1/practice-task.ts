@@ -1804,6 +1804,22 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      // Measurelands Level 6 (Year 6) W7 "Measurement Mastery": a bespoke, multi-
+      // part engineering investigation that combines strands (area, perimeter,
+      // volume, time, conversion, angle) — solved step by step.
+      kind: "investigation";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      /** Scenario heading + emoji + the given facts. */
+      title?: string;
+      emoji?: string;
+      facts?: string[];
+      /** The parts, answered one at a time. `strategy` labels the maths used. */
+      parts?: Array<{ q: string; strategy: string; options: string[]; answer: string }>;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       kind: "tensOnesMcq";
       prompt: string;
       min: number;

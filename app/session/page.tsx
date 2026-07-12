@@ -122,6 +122,9 @@ import { buildY6MeasurelandsWeek5Lesson3QuizTasks } from "@/data/activities/year
 import { buildY6MeasurelandsWeek6Lesson1QuizTasks } from "@/data/activities/year6Measurelands/week6Lesson1";
 import { buildY6MeasurelandsWeek6Lesson2QuizTasks } from "@/data/activities/year6Measurelands/week6Lesson2";
 import { buildY6MeasurelandsWeek6Lesson3QuizTasks } from "@/data/activities/year6Measurelands/week6Lesson3";
+import { buildY6MeasurelandsWeek7Lesson1QuizTasks } from "@/data/activities/year6Measurelands/week7Lesson1";
+import { buildY6MeasurelandsWeek7Lesson2QuizTasks } from "@/data/activities/year6Measurelands/week7Lesson2";
+import { buildY6MeasurelandsWeek7Lesson3QuizTasks } from "@/data/activities/year6Measurelands/week7Lesson3";
 import { buildY5MeasurelandsWeek2Lesson1QuizTasks } from "@/data/activities/year5Measurelands/week2Lesson1";
 import { buildY5MeasurelandsWeek2Lesson2QuizTasks } from "@/data/activities/year5Measurelands/week2Lesson2";
 import { buildY5MeasurelandsWeek2Lesson3QuizTasks } from "@/data/activities/year5Measurelands/week2Lesson3";
@@ -1989,6 +1992,7 @@ function buildY6MeasurelandsWeeklyQuizQuestions(weekNumber: number, questionsPer
     4: [buildY6MeasurelandsWeek4Lesson1QuizTasks, buildY6MeasurelandsWeek4Lesson2QuizTasks, buildY6MeasurelandsWeek4Lesson3QuizTasks],
     5: [buildY6MeasurelandsWeek5Lesson1QuizTasks, buildY6MeasurelandsWeek5Lesson2QuizTasks, buildY6MeasurelandsWeek5Lesson3QuizTasks],
     6: [buildY6MeasurelandsWeek6Lesson1QuizTasks, buildY6MeasurelandsWeek6Lesson2QuizTasks, buildY6MeasurelandsWeek6Lesson3QuizTasks],
+    7: [buildY6MeasurelandsWeek7Lesson1QuizTasks, buildY6MeasurelandsWeek7Lesson2QuizTasks, buildY6MeasurelandsWeek7Lesson3QuizTasks],
   };
   const builders = perWeek[weekNumber];
   if (!builders) return [];

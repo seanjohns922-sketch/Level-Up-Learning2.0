@@ -121,6 +121,7 @@ import { MeasurelandsAreaCard } from "@/components/measurelands/MeasurelandsArea
 import { MeasurelandsVolumeCard } from "@/components/measurelands/MeasurelandsVolumeCard";
 import { MeasurelandsMetricConvertCard } from "@/components/measurelands/MeasurelandsMetricConvertCard";
 import { MeasurelandsAngleReasonCard } from "@/components/measurelands/MeasurelandsAngleReasonCard";
+import { MeasurelandsInvestigationCard } from "@/components/measurelands/MeasurelandsInvestigationCard";
 import { MeasurelandsTemperatureCard } from "@/components/measurelands/MeasurelandsTemperatureCard";
 import { MeasurelandsSurveyorCard } from "@/components/measurelands/MeasurelandsSurveyorCard";
 import { MeasurelandsTimeQuestCard } from "@/components/measurelands/MeasurelandsTimeQuestCard";
@@ -434,6 +435,8 @@ function TaskRendererInner({
       return wrapMeasurelands(<MeasurelandsMetricConvertCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "angleReason":
       return wrapMeasurelands(<MeasurelandsAngleReasonCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
+    case "investigation":
+      return wrapMeasurelands(<MeasurelandsInvestigationCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "temperature":
       return wrapMeasurelands(<MeasurelandsTemperatureCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "perimeterCalc":
