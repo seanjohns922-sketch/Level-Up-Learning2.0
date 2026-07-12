@@ -295,8 +295,55 @@ function OrderScene({ task, onCorrect, onWrong }: { task: TimeTask; onCorrect: (
   );
 }
 
+/* ── L6 W5 — Itinerary (multi-leg plan, step-by-step) ── */
+const LEG_STYLE: Record<string, { color: string; bg: string }> = {
+  travel: { color: "#5b21b6", bg: "rgba(91,33,182,0.1)" },
+  wait: { color: "#b45309", bg: "rgba(245,158,11,0.14)" },
+  activity: { color: "#0f766e", bg: "rgba(13,148,136,0.12)" },
+};
+function ItineraryScene({ task, onCorrect, onWrong }: { task: TimeTask; onCorrect: () => void; onWrong: () => void }) {
+  const it = task.itinerary!;
+  const steps = task.steps ?? [];
+  const [idx, setIdx] = useState(0);
+  let t = it.startMin;
+  const rows = it.legs.map((leg) => { const from = t; t += leg.minutes; return { leg, from, to: t }; });
+  const step = steps[idx];
+  return (
+    <Shell badge={task.badgeLabel ?? "Expedition Planner"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
+      <div className="rounded-[24px] border border-[rgba(214,184,108,0.45)] bg-[rgba(255,252,245,0.96)] p-3">
+        <div className="mb-2 flex items-center justify-between">
+          <span className="rounded-full bg-[rgba(91,33,182,0.1)] px-3 py-1 text-sm font-black text-[#5b21b6]">Depart {fmtTime(it.startMin)}</span>
+          <div className="flex gap-1.5">{steps.map((_, i) => <span key={i} className={`h-2.5 w-6 rounded-full ${i < idx ? "bg-[#16a34a]" : i === idx ? "bg-[#5b21b6]" : "bg-[rgba(124,58,237,0.2)]"}`} />)}</div>
+        </div>
+        <div className="space-y-1.5">
+          {rows.map(({ leg, from, to }, i) => {
+            const s = LEG_STYLE[leg.type]!;
+            return (
+              <div key={i} className="flex items-center gap-3 rounded-[16px] border px-3 py-2" style={{ borderColor: "rgba(214,184,108,0.4)", background: s.bg }}>
+                <span className="text-xl">{leg.emoji}</span>
+                <div className="flex-1">
+                  <div className="text-[15px] font-black text-[#2c1c07]">{leg.label}</div>
+                  <div className="text-[12px] font-bold text-[#a98b52]">{fmtTime(from)} → {fmtTime(to)}</div>
+                </div>
+                <span className="rounded-full px-2.5 py-1 text-[13px] font-black" style={{ color: s.color, background: "rgba(255,255,255,0.7)" }}>{fmtDur(leg.minutes)}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      {step ? (
+        <>
+          <p className="text-center text-base font-black text-[#5b21b6]">{step.q}</p>
+          <ChoiceGrid options={step.options} correct={step.answer} onCorrect={() => (idx + 1 < steps.length ? setIdx(idx + 1) : onCorrect())} onWrong={onWrong} />
+        </>
+      ) : null}
+    </Shell>
+  );
+}
+
 export function MeasurelandsTimeQuestCard({ task, onCorrect, onWrong }: { task: TimeTask; onCorrect: () => void; onWrong: () => void }) {
   switch (task.scene) {
+    case "itinerary": return <ItineraryScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "intro": return <IntroScene task={task} onCorrect={onCorrect} />;
     case "matchUnits": return <MatchUnitsScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "convert": return <Shell badge={task.badgeLabel ?? "Which Conversion Is Correct?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}><ChoiceGrid options={task.options ?? []} correct={task.correctOption} onCorrect={onCorrect} onWrong={onWrong} /></Shell>;

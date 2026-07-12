@@ -1493,7 +1493,10 @@ export type PracticeTask = (
       prompt: string;
       speakText?: string;
       badgeLabel?: string;
-      scene: "intro" | "matchUnits" | "convert" | "convertBuild" | "howLong" | "finishTime" | "timeline" | "compare" | "order";
+      scene: "intro" | "matchUnits" | "convert" | "convertBuild" | "howLong" | "finishTime" | "timeline" | "compare" | "order" | "itinerary";
+      /** L6 W5 "itinerary": a multi-leg plan + step-by-step MCQ questions. */
+      itinerary?: { startMin: number; legs: Array<{ type: "travel" | "wait" | "activity"; label: string; emoji: string; minutes: number }> };
+      steps?: Array<{ q: string; options: string[]; answer: string }>;
       /** "matchUnits": pairs of equivalent units to connect. */
       unitPairs?: Array<{ id: string; small: string; big: string }>;
       /** "convert"/"compare": text MCQ options + the correct one. */

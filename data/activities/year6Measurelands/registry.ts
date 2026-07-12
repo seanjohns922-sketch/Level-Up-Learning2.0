@@ -12,6 +12,9 @@ import { generateY6MeasurelandsWeek3Lesson3Task, resetY6MeasurelandsWeek3Lesson3
 import { generateY6MeasurelandsWeek4Lesson1Task, resetY6MeasurelandsWeek4Lesson1TaskSessionState, buildY6MeasurelandsWeek4Lesson1QuizTasks } from "@/data/activities/year6Measurelands/week4Lesson1";
 import { generateY6MeasurelandsWeek4Lesson2Task, resetY6MeasurelandsWeek4Lesson2TaskSessionState, buildY6MeasurelandsWeek4Lesson2QuizTasks } from "@/data/activities/year6Measurelands/week4Lesson2";
 import { generateY6MeasurelandsWeek4Lesson3Task, resetY6MeasurelandsWeek4Lesson3TaskSessionState, buildY6MeasurelandsWeek4Lesson3QuizTasks } from "@/data/activities/year6Measurelands/week4Lesson3";
+import { generateY6MeasurelandsWeek5Lesson1Task, resetY6MeasurelandsWeek5Lesson1TaskSessionState, buildY6MeasurelandsWeek5Lesson1QuizTasks } from "@/data/activities/year6Measurelands/week5Lesson1";
+import { generateY6MeasurelandsWeek5Lesson2Task, resetY6MeasurelandsWeek5Lesson2TaskSessionState, buildY6MeasurelandsWeek5Lesson2QuizTasks } from "@/data/activities/year6Measurelands/week5Lesson2";
+import { generateY6MeasurelandsWeek5Lesson3Task, resetY6MeasurelandsWeek5Lesson3TaskSessionState, buildY6MeasurelandsWeek5Lesson3QuizTasks } from "@/data/activities/year6Measurelands/week5Lesson3";
 
 // Measurelands Level 6 (Year 6) — placeholder registry only.
 //
@@ -185,6 +188,27 @@ const BUILT_LESSONS: Record<string, BuiltOverride> = {
     quizContributionBuilder: buildY6MeasurelandsWeek4Lesson3QuizTasks,
     practisedSkills: ["Read decimal amounts", "Solve real conversion problems", "Compare and check conversions"],
     completionTitle: "Lab Challenges Complete!",
+  },
+  "y6-measurement-w5-l1": {
+    generate: generateY6MeasurelandsWeek5Lesson1Task,
+    reset: resetY6MeasurelandsWeek5Lesson1TaskSessionState,
+    quizContributionBuilder: buildY6MeasurelandsWeek5Lesson1QuizTasks,
+    practisedSkills: ["Interpret 24-hour timetables", "Compare travel options", "Choose the best service by a requirement"],
+    completionTitle: "Plan the Journey Complete!",
+  },
+  "y6-measurement-w5-l2": {
+    generate: generateY6MeasurelandsWeek5Lesson2Task,
+    reset: resetY6MeasurelandsWeek5Lesson2TaskSessionState,
+    quizContributionBuilder: buildY6MeasurelandsWeek5Lesson2QuizTasks,
+    practisedSkills: ["Plan a multi-leg itinerary", "Calculate elapsed time", "Find start, finish and total duration"],
+    completionTitle: "Multi-Step Time Problems Complete!",
+  },
+  "y6-measurement-w5-l3": {
+    generate: generateY6MeasurelandsWeek5Lesson3Task,
+    reset: resetY6MeasurelandsWeek5Lesson3TaskSessionState,
+    quizContributionBuilder: buildY6MeasurelandsWeek5Lesson3QuizTasks,
+    practisedSkills: ["Combine 24-hour, elapsed and timetables", "Plan a complete journey", "Justify the best plan"],
+    completionTitle: "Master Time Mission Complete!",
   },
 };
 

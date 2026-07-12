@@ -306,6 +306,9 @@ const TABLE: Record<string, SkillCoaching> = {
   ml_y6_w4_l1: { tip: "The tape is in cm; 1 m is 100 cm — a smaller unit means a bigger number." },
   ml_y6_w4_l2: { tip: "g to kg and mL to L are both jumps of 1000." },
   ml_y6_w4_l3: { tip: "To compare, convert both amounts to the same unit first." },
+  ml_y6_w5_l1: { tip: "Compare every travel option before choosing — the earliest isn't always the best." },
+  ml_y6_w5_l2: { tip: "Break long problems into smaller time calculations, one leg at a time." },
+  ml_y6_w5_l3: { tip: "The best plan is the one that meets every requirement, not just the fastest." },
 };
 
 const FALLBACK: SkillCoaching = {
@@ -456,6 +459,9 @@ const LESSON_KEY_MAP: Record<string, string> = {
   "y6-measurement-w4-l1": "ml_y6_w4_l1",
   "y6-measurement-w4-l2": "ml_y6_w4_l2",
   "y6-measurement-w4-l3": "ml_y6_w4_l3",
+  "y6-measurement-w5-l1": "ml_y6_w5_l1",
+  "y6-measurement-w5-l2": "ml_y6_w5_l2",
+  "y6-measurement-w5-l3": "ml_y6_w5_l3",
 };
 
 function normalizeLessonId(lessonId: string): string {

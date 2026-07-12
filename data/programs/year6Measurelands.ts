@@ -46,12 +46,12 @@ const WEEK_PLANS = [
     ],
   },
   {
-    topic: "Advanced Time",
-    focus: "Solve timetable, elapsed time and travel planning problems.",
+    topic: "Time Master",
+    focus: "Combine 24-hour time, elapsed time and timetables in real investigations.",
     lessons: [
-      ["Complex Timetables", "Read and reason with detailed schedules."],
-      ["Multi-Step Elapsed Time", "Solve elapsed time problems with more than one step."],
-      ["Travel Planner", "Plan journeys using flights, connections and decisions."],
+      ["Plan the Journey", "Compare 24-hour timetables and pick the best service."],
+      ["Multi-Step Time Problems", "Plan multi-leg trips: start, finish and total time."],
+      ["Master Time Mission", "Combine every time skill in a rich investigation."],
     ],
   },
   {
