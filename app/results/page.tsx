@@ -58,6 +58,9 @@ function getLegendIdsBeforeYear(year: string, realmId: "number-nexus" | "measure
 
 function getStrandBadgeClass(strand?: string) {
   switch (strand) {
+    case "Measurement":
+    case "measurement":
+      return "bg-amber-500/15 text-amber-300 border-amber-400/30";
     case "fractions":
       return "bg-violet-500/15 text-violet-300 border-violet-400/30";
     case "patterns":
@@ -73,6 +76,9 @@ function getStrandBadgeClass(strand?: string) {
 
 function getStrandLabel(strand?: string) {
   switch (strand) {
+    case "Measurement":
+    case "measurement":
+      return "Measurement";
     case "fractions":
       return "Fractions";
     case "patterns":
@@ -244,6 +250,7 @@ function ResultsPage() {
 
   const year = sp.get("year") ?? "Year 3";
   const realmId = sp.get("realm_id") ?? undefined;
+  const progressRealmId = realmId === "measurement" ? "measurement" : "number";
   const legendRealmId = normalizeLegendRealmId(realmId);
   const theme = getRealmTheme(realmId);
   const realmParam = realmId ? `&realm_id=${encodeURIComponent(realmId)}` : "";
@@ -395,12 +402,12 @@ function ResultsPage() {
           required_weeks: next.requiredWeeks ?? [],
           optional_weeks: next.optionalWeeks ?? [],
           unlocked_legends: next.unlockedLegends ?? [],
-        });
+        }, progressRealmId);
       } catch (e) {
         console.warn("[Results] DB pretest save failed:", e);
       }
     })();
-  }, [passed, year, scorePercent, isPostTest, isFailedPretest, passedByProgram, storedPosttestProfile, storedPretestProfile, unlockTargets, requiredWeeks, optionalWeeks, nextYear, legendRealmId]);
+  }, [passed, year, scorePercent, isPostTest, isFailedPretest, passedByProgram, storedPosttestProfile, storedPretestProfile, unlockTargets, requiredWeeks, optionalWeeks, nextYear, legendRealmId, progressRealmId]);
 
   function goHome() { router.push(realmId === "measurement" ? "/measurelands" : "/levels"); }
   const assignedStartWeek = isPostTest

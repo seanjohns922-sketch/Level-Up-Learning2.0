@@ -4,7 +4,7 @@
 // to localStorage, scoped per active student, and offer a "Resume" entry point
 // on return. Snapshots are cleared once the assessment / lesson is completed.
 
-import { ACTIVE_STUDENT_KEY } from "@/data/progress";
+import { ACTIVE_STUDENT_KEY, type ProgressRealmScope } from "@/data/progress";
 
 function activeStudentScope(): string {
   if (typeof window === "undefined") return "anon";
@@ -15,6 +15,7 @@ function activeStudentScope(): string {
 
 export type PretestResumeState = {
   year: string;
+  realmId?: ProgressRealmScope;
   index: number;
   answers: Array<string | null>;
   /** Question ids the student tapped "I Don't Know" on (for later analytics). */
@@ -22,23 +23,36 @@ export type PretestResumeState = {
   updatedAt: number;
 };
 
-function pretestKey(year: string): string {
-  return `lul:pretest-resume:${activeStudentScope()}:${year}`;
+function currentRealmScope(): ProgressRealmScope {
+  if (typeof window === "undefined") return "number";
+  const searchRealm = new URLSearchParams(window.location.search).get("realm_id");
+  if (searchRealm === "measurement") return "measurement";
+  const pathname = window.location.pathname.toLowerCase();
+  if (pathname.startsWith("/measurelands")) return "measurement";
+  return "number";
+}
+
+function pretestKey(year: string, realmId: ProgressRealmScope = currentRealmScope()): string {
+  return `lul:pretest-resume:${activeStudentScope()}:${realmId}:${year}`;
 }
 
 export function savePretestResume(state: PretestResumeState): void {
   if (typeof window === "undefined") return;
   try {
-    localStorage.setItem(pretestKey(state.year), JSON.stringify(state));
+    const realmId = state.realmId ?? currentRealmScope();
+    localStorage.setItem(pretestKey(state.year, realmId), JSON.stringify({ ...state, realmId }));
   } catch {
     /* storage full / unavailable — non-fatal */
   }
 }
 
-export function loadPretestResume(year: string): PretestResumeState | null {
+export function loadPretestResume(
+  year: string,
+  realmId: ProgressRealmScope = currentRealmScope()
+): PretestResumeState | null {
   if (typeof window === "undefined") return null;
   try {
-    const raw = localStorage.getItem(pretestKey(year));
+    const raw = localStorage.getItem(pretestKey(year, realmId));
     if (!raw) return null;
     const parsed = JSON.parse(raw) as PretestResumeState;
     if (!parsed || parsed.year !== year || !Array.isArray(parsed.answers)) return null;
@@ -48,10 +62,13 @@ export function loadPretestResume(year: string): PretestResumeState | null {
   }
 }
 
-export function clearPretestResume(year: string): void {
+export function clearPretestResume(
+  year: string,
+  realmId: ProgressRealmScope = currentRealmScope()
+): void {
   if (typeof window === "undefined") return;
   try {
-    localStorage.removeItem(pretestKey(year));
+    localStorage.removeItem(pretestKey(year, realmId));
   } catch {
     /* non-fatal */
   }

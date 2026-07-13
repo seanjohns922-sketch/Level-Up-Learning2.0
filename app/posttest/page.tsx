@@ -15,7 +15,7 @@ import { DEMO_MODE } from "@/data/config";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { getWeekProgress, hasCompletedRequiredWeeks, readProgramStore } from "@/lib/program-progress";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
-import { saveNumberAssessment, saveStudentProgressState } from "@/lib/student-progress-sync";
+import { saveRealmAssessment, saveStudentProgressState } from "@/lib/student-progress-sync";
 import { getRealmTheme } from "@/lib/useRealmTheme";
 
 const PASS_THRESHOLD = 85;
@@ -294,13 +294,14 @@ function PostTestPage() {
   const params = useSearchParams();
   const year = params.get("year") ?? "Year 3";
   const realmId = params.get("realm_id") ?? undefined;
+  const progressRealmId = realmId === "measurement" ? "measurement" : "number";
   const legendRealmId = normalizeLegendRealmId(realmId);
   const theme = getRealmTheme(realmId);
   const studentLevelLabel = formatStudentLevelLabel(year);
 
   const test = useMemo(() => {
-    return getPosttestForYearLabel(year);
-  }, [year]);
+    return getPosttestForYearLabel(year, progressRealmId);
+  }, [year, progressRealmId]);
 
   const questions: Question[] = test?.questions ?? [];
 
@@ -420,7 +421,7 @@ function PostTestPage() {
         if (!studentId) return;
 
         const latest = { ...profile, assignedWeek, at: new Date().toISOString() };
-        await saveNumberAssessment(studentId, year, "posttest", {
+        await saveRealmAssessment(studentId, year, "posttest", {
           correct_count: correct,
           total_questions: questions.length,
           score_percent: percent,
@@ -428,7 +429,7 @@ function PostTestPage() {
           placement_result: latest,
           question_results: [],
           completed_at: new Date().toISOString(),
-        });
+        }, progressRealmId);
         await saveStudentProgressState(studentId, year, {
           status: didPass ? "PASSED" : "ASSIGNED_PROGRAM",
           week: didPass ? prev?.assignedWeek ?? null : assignedWeek ?? prev?.assignedWeek ?? 1,
@@ -437,7 +438,7 @@ function PostTestPage() {
           required_weeks: prev?.requiredWeeks ?? [],
           optional_weeks: prev?.optionalWeeks ?? [],
           unlocked_legends: nextUnlocked,
-        });
+        }, progressRealmId);
       } catch (error) {
         console.warn("[PostTest] DB save failed:", error);
       }

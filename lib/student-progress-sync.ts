@@ -368,11 +368,12 @@ export async function saveNumberWeeklyQuizAttempt(
   }
 }
 
-export async function saveNumberAssessment(
+export async function saveRealmAssessment(
   studentId: string,
   year: string,
   assessmentType: "pretest" | "posttest",
   attempt: Record<string, unknown>,
+  realmId: StudentProgressRealmId = "number",
 ) {
   if (isDemoPreviewMode()) return;
 
@@ -381,14 +382,16 @@ export async function saveNumberAssessment(
   const { error } = await supabase.rpc("save_realm_assessment", {
     p_student_id: studentId,
     p_class_id: studentRow?.class_id ?? null,
-    p_realm_id: "number",
-    p_program_key: numberProgramKey(year),
+    p_realm_id: realmId,
+    p_program_key: realmProgramKey(year, realmId),
     p_school_year_level: studentRow?.school_year_level ?? null,
     p_working_level: year,
     p_assessment_type: assessmentType,
     p_attempt: attempt,
   });
   if (error) throw error;
+
+  if (realmId !== "number") return;
 
   if (assessmentType === "pretest") {
     const placementResult =
@@ -453,6 +456,15 @@ export async function saveNumberAssessment(
   if (legacyError) {
     warnLegacyWrite("post-test", legacyError);
   }
+}
+
+export async function saveNumberAssessment(
+  studentId: string,
+  year: string,
+  assessmentType: "pretest" | "posttest",
+  attempt: Record<string, unknown>,
+) {
+  return saveRealmAssessment(studentId, year, assessmentType, attempt, "number");
 }
 
 export async function markStudentIntroSeen(studentId: string) {

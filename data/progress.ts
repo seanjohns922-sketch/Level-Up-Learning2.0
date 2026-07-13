@@ -19,6 +19,16 @@ export type StudentProgress = {
 
 export const STORAGE_KEY = "lul_student_progress_v1";
 export const ACTIVE_STUDENT_KEY = "lul_active_student_v1";
+export type ProgressRealmScope = "number" | "measurement";
+
+function getActiveRealmScope(): ProgressRealmScope {
+  if (typeof window === "undefined") return "number";
+  const searchRealm = new URLSearchParams(window.location.search).get("realm_id");
+  if (searchRealm === "measurement") return "measurement";
+  const pathname = window.location.pathname.toLowerCase();
+  if (pathname.startsWith("/measurelands")) return "measurement";
+  return "number";
+}
 
 function getActiveStudentScope() {
   if (typeof window === "undefined") return "server";
@@ -29,8 +39,11 @@ function getActiveStudentScope() {
   return isDemo ? "demo" : "anon";
 }
 
-export function getScopedProgressKey(scope = getActiveStudentScope()) {
-  return `lul:${scope}:student_progress_v1`;
+export function getScopedProgressKey(
+  scope = getActiveStudentScope(),
+  realmId: ProgressRealmScope = getActiveRealmScope()
+) {
+  return `lul:${scope}:${realmId}:student_progress_v1`;
 }
 
 export function readProgress(): StudentProgress | null {
@@ -49,9 +62,17 @@ export function writeProgress(next: StudentProgress) {
   localStorage.setItem(getScopedProgressKey(), JSON.stringify(next));
 }
 
-export function clearScopedProgress(scope = getActiveStudentScope()) {
+export function clearScopedProgress(
+  scope = getActiveStudentScope(),
+  realmId?: ProgressRealmScope
+) {
   if (typeof window === "undefined") return;
-  localStorage.removeItem(getScopedProgressKey(scope));
+  if (realmId) {
+    localStorage.removeItem(getScopedProgressKey(scope, realmId));
+    return;
+  }
+  localStorage.removeItem(getScopedProgressKey(scope, "number"));
+  localStorage.removeItem(getScopedProgressKey(scope, "measurement"));
 }
 
 export function updateProgress(patch: Partial<StudentProgress>) {

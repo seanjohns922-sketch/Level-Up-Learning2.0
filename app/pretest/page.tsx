@@ -12,7 +12,7 @@ import { ActiveLearningTracker } from "@/components/student/ActiveLearningTracke
 import { analyzeAssessmentResult, isAssessmentAnswerCorrect } from "@/data/assessments/analysis";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, type StudentProgress, writeProgress } from "@/data/progress";
 import { ALL_PROGRAM_WEEKS, clearYearProgress, getOptionalWeeks, normalizeWeekList } from "@/lib/program-progress";
-import { saveNumberAssessment, saveStudentProgressState } from "@/lib/student-progress-sync";
+import { saveRealmAssessment, saveStudentProgressState } from "@/lib/student-progress-sync";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { getRealmTheme } from "@/lib/useRealmTheme";
 import {
@@ -321,6 +321,7 @@ function PretestPage() {
   const searchParams = useSearchParams();
   const year = searchParams.get("year") ?? "Year 3";
   const realmId = searchParams.get("realm_id") ?? "number";
+  const progressRealmId = realmId === "measurement" ? "measurement" : "number";
   const theme = getRealmTheme(realmId);
   const studentLevelLabel = formatStudentLevelLabel(year);
 
@@ -335,8 +336,8 @@ function PretestPage() {
   }
 
   const questions: Question[] = useMemo(
-    () => getPretestForYearLabel(year),
-    [year]
+    () => getPretestForYearLabel(year, progressRealmId),
+    [year, progressRealmId]
   );
 
   const [index, setIndex] = useState(0);
@@ -378,9 +379,9 @@ function PretestPage() {
     }
 
     if (progress?.year && progress.year !== year) {
-      router.replace(`/pretest?year=${encodeURIComponent(progress.year)}`);
+      router.replace(`/pretest?year=${encodeURIComponent(progress.year)}&realm_id=${encodeURIComponent(progressRealmId)}`);
     }
-  }, [router, year]);
+  }, [progressRealmId, router, year]);
 
   useEffect(() => {
     setMab({ tens: 0, ones: 0 });
@@ -388,16 +389,16 @@ function PretestPage() {
 
   // ── Load any saved snapshot once; offer to resume rather than auto-restart ──
   useEffect(() => {
-    const snapshot = loadPretestResume(year);
+    const snapshot = loadPretestResume(year, progressRealmId);
     if (pretestResumeHasProgress(snapshot)) {
       setShowResumePrompt(true);
     }
     setResumeReady(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [year]);
+  }, [progressRealmId, year]);
 
   function resumeFromSnapshot() {
-    const snapshot = loadPretestResume(year);
+    const snapshot = loadPretestResume(year, progressRealmId);
     if (snapshot) {
       const restored = [...Array(questions.length).fill(null)];
       snapshot.answers.forEach((a, i) => {
@@ -411,7 +412,7 @@ function PretestPage() {
   }
 
   function restartAssessment() {
-    clearPretestResume(year);
+    clearPretestResume(year, progressRealmId);
     setAnswers(Array(questions.length).fill(null));
     setIdkResponses([]);
     setIndex(0);
@@ -423,12 +424,13 @@ function PretestPage() {
     if (!resumeReady || showResumePrompt) return;
     savePretestResume({
       year,
+      realmId: progressRealmId,
       index,
       answers,
       idkResponses,
       updatedAt: Date.now(),
     });
-  }, [resumeReady, showResumePrompt, year, index, answers, idkResponses]);
+  }, [resumeReady, showResumePrompt, year, progressRealmId, index, answers, idkResponses]);
 
   function choose(value: string) {
     const next = [...answers];
@@ -462,7 +464,7 @@ function PretestPage() {
 
   // ── Exit options — every path saves the snapshot first so nothing is lost ──
   function persistSnapshot() {
-    savePretestResume({ year, index, answers, idkResponses, updatedAt: Date.now() });
+    savePretestResume({ year, realmId: progressRealmId, index, answers, idkResponses, updatedAt: Date.now() });
   }
   function exitToHome() {
     persistSnapshot();
@@ -580,7 +582,7 @@ function PretestPage() {
 
     if (studentId) {
       try {
-        await saveNumberAssessment(studentId, year, "pretest", {
+        await saveRealmAssessment(studentId, year, "pretest", {
           correct_count: score,
           total_questions: questions.length,
           score_percent: profile.percentage,
@@ -588,7 +590,7 @@ function PretestPage() {
           placement_result: profile,
           question_results: [],
           completed_at: new Date().toISOString(),
-        });
+        }, progressRealmId);
         await saveStudentProgressState(studentId, year, {
           pretest_score: profile.percentage,
           status: nextProgress.status === "PASSED" ? "PASSED" : "ASSIGNED_PROGRAM",
@@ -598,7 +600,7 @@ function PretestPage() {
           required_weeks: nextProgress.requiredWeeks ?? [],
           optional_weeks: nextProgress.optionalWeeks ?? [],
           unlocked_legends: nextProgress.unlockedLegends ?? [],
-        });
+        }, progressRealmId);
       } catch (error) {
         console.warn("[Pretest] DB save failed:", error);
         window.alert("We couldn't save your pre-test result yet. Please try again.");
@@ -608,7 +610,7 @@ function PretestPage() {
     }
 
     // Assessment complete — clear the resume snapshot so we don't re-offer it.
-    clearPretestResume(year);
+    clearPretestResume(year, progressRealmId);
 
     // 85%+ → celebrate the level advancement before showing the full results.
     if (passed) {
