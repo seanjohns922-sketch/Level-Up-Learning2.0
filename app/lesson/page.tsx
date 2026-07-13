@@ -702,7 +702,9 @@ function LessonPage() {
   }
 
   function startPostTest() {
-    router.push(`/posttest?year=${encodeURIComponent(year)}`);
+    // Preserve the realm so a Measurelands student never lands on the Number
+    // post-test (the resolver defaults to Number when realm_id is absent).
+    router.push(`/posttest?year=${encodeURIComponent(year)}${realmId === "measurement" ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`);
   }
 
   function practiseWeakAreas() {

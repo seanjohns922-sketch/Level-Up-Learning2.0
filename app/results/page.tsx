@@ -10,7 +10,7 @@ import FogClearCinematic from "@/components/lesson/FogClearCinematic";
 import { getFogProgress } from "@/lib/fog-progress";
 import type { AssessmentResultProfile } from "@/data/assessments/analysis";
 import { hasSeenLegendUnlockVideo } from "@/lib/legend-video-state";
-import { ALL_PROGRAM_WEEKS, getOptionalWeeks, normalizeWeekList } from "@/lib/program-progress";
+import { getOptionalWeeks, getProgramWeeks, normalizeWeekList } from "@/lib/program-progress";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { getRealmTheme, type RealmTheme } from "@/lib/useRealmTheme";
 const POSTTEST_PASS_THRESHOLD = 85;
@@ -332,17 +332,19 @@ function ResultsPage() {
     () => (!isPostTest ? normalizeWeekList(storedPretestProfile?.recommendedWeeks) : []),
     [isPostTest, storedPretestProfile]
   );
+  // Full-pathway weeks are realm-specific (Measurelands = 8, Number = 12).
+  const allProgramWeeks = useMemo(() => getProgramWeeks(progressRealmId), [progressRealmId]);
   const requiredWeeks = useMemo(() => {
     if (isPostTest) return [];
     if (!isFailedPretest) return [];
-    if (requiresFullPathway || diagnosticRequiredWeeks.length === 0) return ALL_PROGRAM_WEEKS;
+    if (requiresFullPathway || diagnosticRequiredWeeks.length === 0) return allProgramWeeks;
     return diagnosticRequiredWeeks;
-  }, [diagnosticRequiredWeeks, isFailedPretest, isPostTest, requiresFullPathway]);
+  }, [allProgramWeeks, diagnosticRequiredWeeks, isFailedPretest, isPostTest, requiresFullPathway]);
   const optionalWeeks = useMemo(() => {
-    if (isPostTest) return ALL_PROGRAM_WEEKS;
-    if (!isFailedPretest) return ALL_PROGRAM_WEEKS;
-    return requiresFullPathway ? [] : getOptionalWeeks(requiredWeeks);
-  }, [isFailedPretest, isPostTest, requiredWeeks, requiresFullPathway]);
+    if (isPostTest) return allProgramWeeks;
+    if (!isFailedPretest) return allProgramWeeks;
+    return requiresFullPathway ? [] : getOptionalWeeks(requiredWeeks, progressRealmId);
+  }, [allProgramWeeks, isFailedPretest, isPostTest, progressRealmId, requiredWeeks, requiresFullPathway]);
 
   useEffect(() => {
     const prev = readProgress();
@@ -364,7 +366,7 @@ function ResultsPage() {
         assignedWeek: prev?.assignedWeek,
         assignedWeeksHistory: prev?.assignedWeeksHistory,
         requiredWeeks: [],
-        optionalWeeks: ALL_PROGRAM_WEEKS,
+        optionalWeeks: allProgramWeeks,
         unlockedLegends: unlocked,
       };
     } else {
@@ -381,7 +383,7 @@ function ResultsPage() {
         placementComplete: true,
         assignedWeek,
         requiredWeeks: isPostTest ? prev?.requiredWeeks ?? [] : requiredWeeks,
-        optionalWeeks: isPostTest ? prev?.optionalWeeks ?? ALL_PROGRAM_WEEKS : optionalWeeks,
+        optionalWeeks: isPostTest ? prev?.optionalWeeks ?? allProgramWeeks : optionalWeeks,
         unlockedLegends: unlocked,
       };
     }
@@ -407,7 +409,7 @@ function ResultsPage() {
         console.warn("[Results] DB pretest save failed:", e);
       }
     })();
-  }, [passed, year, scorePercent, isPostTest, isFailedPretest, passedByProgram, storedPosttestProfile, storedPretestProfile, unlockTargets, requiredWeeks, optionalWeeks, nextYear, legendRealmId, progressRealmId]);
+  }, [passed, year, scorePercent, isPostTest, isFailedPretest, passedByProgram, storedPosttestProfile, storedPretestProfile, unlockTargets, requiredWeeks, optionalWeeks, allProgramWeeks, nextYear, legendRealmId, progressRealmId]);
 
   function goHome() { router.push(realmId === "measurement" ? "/measurelands" : "/levels"); }
   const assignedStartWeek = isPostTest

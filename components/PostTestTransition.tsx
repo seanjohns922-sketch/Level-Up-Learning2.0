@@ -6,12 +6,14 @@ import { PartyPopper, Star, Trophy, Sparkles, Award, Dumbbell, Rocket, Clipboard
 
 const FLOAT_ICONS = [PartyPopper, Star, Trophy, Sparkles, Award, Dumbbell];
 
-export default function PostTestTransition({ year }: { year: string }) {
+export default function PostTestTransition({ year, realmId }: { year: string; realmId?: string }) {
   const router = useRouter();
   const [mounted] = useState(true);
 
   function startPostTest() {
-    router.push(`/posttest?year=${encodeURIComponent(year)}`);
+    // Preserve the realm so a Measurelands student never lands on the Number
+    // post-test (the resolver defaults to Number when realm_id is absent).
+    router.push(`/posttest?year=${encodeURIComponent(year)}${realmId === "measurement" ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`);
   }
 
   return (

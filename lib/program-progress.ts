@@ -19,6 +19,17 @@ export type ProgramProgressStore = Record<string, WeekProgress>;
 export const ALL_PROGRAM_WEEKS = Array.from({ length: 12 }, (_, index) => index + 1);
 export type ProgramRealmId = "number" | "measurement" | string;
 
+// Realm-specific program length lives in a dependency-free module so scripts can
+// import it too. Re-exported here so existing "@/lib/program-progress" imports work.
+export {
+  NUMBER_PROGRAM_WEEK_COUNT,
+  MEASURELANDS_PROGRAM_WEEK_COUNT,
+  getProgramWeekCount,
+  getProgramWeeks,
+  getLastProgramWeek,
+} from "./program-weeks";
+import { getProgramWeeks } from "./program-weeks";
+
 export const PROGRAM_STORE_KEY = "lul_program_progress_v1";
 
 function getActiveStudentScope() {
@@ -101,9 +112,12 @@ export function normalizeWeekList(weeks: number[] | undefined | null): number[] 
   );
 }
 
-export function getOptionalWeeks(requiredWeeks: number[] | undefined | null): number[] {
+export function getOptionalWeeks(
+  requiredWeeks: number[] | undefined | null,
+  realmId?: ProgramRealmId | null,
+): number[] {
   const required = new Set(normalizeWeekList(requiredWeeks));
-  return ALL_PROGRAM_WEEKS.filter((week) => !required.has(week));
+  return getProgramWeeks(realmId).filter((week) => !required.has(week));
 }
 
 export function isFullRequiredPath(

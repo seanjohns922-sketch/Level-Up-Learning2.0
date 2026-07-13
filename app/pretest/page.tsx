@@ -11,7 +11,7 @@ import AssessmentShell from "@/components/assessment/AssessmentShell";
 import { ActiveLearningTracker } from "@/components/student/ActiveLearningTracker";
 import { analyzeAssessmentResult, isAssessmentAnswerCorrect } from "@/data/assessments/analysis";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, type StudentProgress, writeProgress } from "@/data/progress";
-import { ALL_PROGRAM_WEEKS, clearYearProgress, getOptionalWeeks, normalizeWeekList } from "@/lib/program-progress";
+import { clearYearProgress, getOptionalWeeks, getProgramWeeks, normalizeWeekList } from "@/lib/program-progress";
 import { saveRealmAssessment, saveStudentProgressState } from "@/lib/student-progress-sync";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { getRealmTheme } from "@/lib/useRealmTheme";
@@ -523,16 +523,18 @@ function PretestPage() {
     const passed = profile.percentage >= PRETEST_PASS_THRESHOLD;
     const diagnosticRequiredWeeks = normalizeWeekList(profile.recommendedWeeks);
     const requiresFullPathway = !passed && profile.percentage < PRETEST_PASS_THRESHOLD;
+    // Full-pathway weeks are realm-specific (Measurelands = 8, Number = 12).
+    const allProgramWeeks = getProgramWeeks(progressRealmId);
     const requiredWeeks = passed
       ? []
       : requiresFullPathway || diagnosticRequiredWeeks.length === 0
-        ? ALL_PROGRAM_WEEKS
+        ? allProgramWeeks
         : diagnosticRequiredWeeks;
     const optionalWeeks = passed
-      ? ALL_PROGRAM_WEEKS
+      ? allProgramWeeks
       : requiresFullPathway
         ? []
-        : getOptionalWeeks(requiredWeeks);
+        : getOptionalWeeks(requiredWeeks, progressRealmId);
 
     let nextProgress: StudentProgress;
 
@@ -551,7 +553,7 @@ function PretestPage() {
         assignedWeek: prev?.assignedWeek,
         assignedWeeksHistory: prev?.assignedWeeksHistory,
         requiredWeeks: [],
-        optionalWeeks: ALL_PROGRAM_WEEKS,
+        optionalWeeks: allProgramWeeks,
         unlockedLegends: prevUnlocked,
         lastPreTestPercent: profile.percentage,
         lastPreTestProfile: profile,

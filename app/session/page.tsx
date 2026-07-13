@@ -9100,7 +9100,7 @@ function SessionPage({
   // UI
   // ---------------------------
   if (showPostTestTransition) {
-    return <PostTestTransition year={year} />;
+    return <PostTestTransition year={year} realmId={realmId} />;
   }
 
   return (

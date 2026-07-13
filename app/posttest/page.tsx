@@ -13,7 +13,8 @@ import { analyzeAssessmentResult } from "@/data/assessments/analysis";
 import { ActiveLearningTracker } from "@/components/student/ActiveLearningTracker";
 import { DEMO_MODE } from "@/data/config";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
-import { getWeekProgress, hasCompletedRequiredWeeks, readProgramStore } from "@/lib/program-progress";
+import { getLastProgramWeek, getWeekProgress, hasCompletedRequiredWeeks, readProgramStore } from "@/lib/program-progress";
+import { buildAssessmentReturnRoute } from "@/lib/assessment-routes";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { saveRealmAssessment, saveStudentProgressState } from "@/lib/student-progress-sync";
 import { getRealmTheme } from "@/lib/useRealmTheme";
@@ -295,6 +296,9 @@ function PostTestPage() {
   const year = params.get("year") ?? "Year 3";
   const realmId = params.get("realm_id") ?? undefined;
   const progressRealmId = realmId === "measurement" ? "measurement" : "number";
+  // Final week is realm-specific: Measurelands = 8, Number Nexus = 12. Never
+  // hardcode 12 for a realm-aware assessment (that leaks a Number assumption).
+  const lastWeek = getLastProgramWeek(progressRealmId);
   const legendRealmId = normalizeLegendRealmId(realmId);
   const theme = getRealmTheme(realmId);
   const studentLevelLabel = formatStudentLevelLabel(year);
@@ -336,10 +340,10 @@ function PostTestPage() {
       const hasRequiredPlan = Array.isArray(progress.requiredWeeks) && progress.requiredWeeks.length > 0;
       const eligibleForPostTest = hasRequiredPlan
         ? hasCompletedRequiredWeeks(store, year, progress.requiredWeeks)
-        : getWeekProgress(store, year, 12).lessonsCompleted.filter(Boolean).length === 3;
+        : getWeekProgress(store, year, lastWeek, progressRealmId).lessonsCompleted.filter(Boolean).length === 3;
 
       if (!eligibleForPostTest) {
-        const fallbackWeek = Math.max(1, Math.min(12, progress.assignedWeek ?? 1));
+        const fallbackWeek = Math.max(1, Math.min(lastWeek, progress.assignedWeek ?? 1));
         router.replace(`/program?year=${encodeURIComponent(year)}&week=${fallbackWeek}&legacy=1${realmId ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`);
       }
     }
@@ -461,7 +465,7 @@ function PostTestPage() {
             is not available yet.
           </p>
           <button
-            onClick={() => router.push(`/program?year=${encodeURIComponent(year)}&week=12&legacy=1${realmId ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`)}
+            onClick={() => router.push(buildAssessmentReturnRoute({ year, realmId }))}
             className="w-full py-3 rounded-xl text-white font-bold transition" style={{ background: theme.ctaGradientCss }}
           >
             Back to Home
@@ -603,7 +607,7 @@ function PostTestPage() {
         onBack={back}
         onNext={next}
         onSubmit={submit}
-        onExit={() => router.push(`/program?year=${encodeURIComponent(year)}&week=12&legacy=1${realmId ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`)}
+        onExit={() => router.push(buildAssessmentReturnRoute({ year, realmId }))}
         realmId={realmId}
       />
     </>
