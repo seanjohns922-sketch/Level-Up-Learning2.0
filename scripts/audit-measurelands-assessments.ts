@@ -69,8 +69,8 @@ type Question = {
 
 // Every Measurelands assessment question must carry a rendered visual.
 const KNOWN_VISUAL_KINDS = new Set([
-  "ruler", "scaleDial", "jug", "clock", "thermometer", "rectangle", "grid",
-  "cubes", "angle", "convert", "bars", "objects", "concept",
+  "ruler", "scaleDial", "jug", "clock", "thermometer", "rectangle",
+  "cubes", "angle", "convert", "objects", "concept",
 ]);
 
 function listDuplicates(values: string[]): string[] {

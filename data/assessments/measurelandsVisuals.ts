@@ -24,11 +24,9 @@ export type MzVisual =
   | { kind: "clock"; hour: number; minute: number; digital?: string }
   | { kind: "thermometer"; value: number; from?: number; min?: number; max?: number }
   | { kind: "rectangle"; w: number; h: number; mode: "perimeter" | "area"; unit?: string }
-  | { kind: "grid"; cols: number; rows: number; unit?: string }
   | { kind: "cubes"; l: number; w: number; h: number }
   | { kind: "angle"; single?: number; known?: number; unknown?: number; total?: 180 | 360 }
   | { kind: "convert"; fromValue: number; fromUnit: string; toValue: number; toUnit: string }
-  | { kind: "bars"; unit?: string; items: Array<{ label: string; value: number; emoji?: string }> }
   | { kind: "objects"; items: Array<{ label: string; emoji: string }>; caption?: string }
   | { kind: "concept"; icon: string; label: string; sub?: string };
 
@@ -76,22 +74,32 @@ function measurementsIn(s: string): Array<{ label: string; value: number; base: 
   }
   return out;
 }
-// Bars for a genuine two-item comparison: exactly two numeric OPTIONS
-// (the rest being decoys like "same"/"cannot tell"), normalised across units.
-function compareBars(q: Q, unit = ""): MzVisual | undefined {
+// A measurement value's instrument emoji (fallback only — real art via ObjectArt).
+function unitEmoji(label: string): string {
+  const l = label.toLowerCase();
+  if (/\bl\b|ml/.test(l)) return "🫙";
+  if (/kg|\bg\b/.test(l)) return "⚖️";
+  if (/cm|mm|km|\bm\b/.test(l)) return "📏";
+  if (/cube/.test(l)) return "🧊";
+  if (/square/.test(l)) return "🔲";
+  if (/°c/.test(l)) return "🌡️";
+  if (/cup/.test(l)) return "🥤";
+  if (/block/.test(l)) return "🧱";
+  return "📦";
+}
+// Two labelled instrument cards for a genuine two-item comparison (exactly two
+// numeric OPTIONS, the rest decoys). Shows the two GIVEN measurements as cards —
+// no magnitude bar, so it never points at the answer.
+function compareCards(q: Q): MzVisual | undefined {
   const numeric = optionLabels(q).filter((l) => /\d/.test(l));
   if (numeric.length !== 2) return undefined;
-  const items = numeric.map((l) => {
-    const vu = valueWithUnit(l);
-    return { label: l, value: vu ? toBase(vu.value, vu.unit) : firstNum(l) ?? 0 };
-  });
-  return { kind: "bars", unit, items };
+  return { kind: "objects", items: numeric.map((l) => ({ label: l, emoji: unitEmoji(l) })), caption: "Compare the measurements" };
 }
-// Bars for a measured/difference PROMPT that names two quantities.
-function promptBars(q: Q, unit = ""): MzVisual | undefined {
+// Same, from a measured PROMPT that names two quantities.
+function promptCards(q: Q): MzVisual | undefined {
   const found = measurementsIn(q.prompt ?? "");
   if (found.length !== 2) return undefined;
-  return { kind: "bars", unit, items: found.map((f) => ({ label: f.label, value: f.base })) };
+  return { kind: "objects", items: found.map((f) => ({ label: f.label, emoji: unitEmoji(f.label) })), caption: "Compare the measurements" };
 }
 
 // Time words → an analog clock position. Handles "half past 3", "quarter to 5",
@@ -165,15 +173,16 @@ export function deriveMeasurelandsAssessmentVisual(q: Q): MzVisual | undefined {
   const answer = q.correctAnswer ?? "";
   const promptA = `${prompt} ${answer}`;
 
-  // ── Metric conversions ──
+  // ── Metric conversions ── show the GIVEN measurement + the target unit as "?"
+  // (never the converted answer).
   if (has(skill, "convert")) {
     const from = valueWithUnit(prompt);
-    const to = valueWithUnit(answer);
-    if (from && to) return { kind: "convert", fromValue: from.value, fromUnit: from.unit, toValue: to.value, toUnit: to.unit };
+    const toUnit = valueWithUnit(answer)?.unit;
+    if (from && toUnit) return { kind: "convert", fromValue: from.value, fromUnit: from.unit, toValue: 0, toUnit };
     return concept("convert", "Metric Conversion");
   }
 
-  // ── Angles ──
+  // ── Angles ── show the GIVEN angle; the unknown stays a "?".
   if (has(skill, "angle") || has(skill, "straight_line", "missing_angle")) {
     if (has(skill, "straight_line", "missing_angle")) {
       const known = firstNum(prompt);
@@ -184,32 +193,30 @@ export function deriveMeasurelandsAssessmentVisual(q: Q): MzVisual | undefined {
       }
     }
     if (has(skill, "right_angle")) return { kind: "angle", single: 90 };
-    const a = firstNum(answer);
-    if (a !== undefined && /°/.test(answer)) return { kind: "angle", single: a };
     return concept("angle", "Angles");
   }
 
-  // ── Volume ──
+  // ── Volume ── an OUTLINE prism (Year 6 reasons with l×w×h; no countable cubes).
   if (has(skill, "volume")) {
     if (has(skill, "array")) {
       const n = nums(prompt);
       if (n.length >= 3) return { kind: "cubes", l: n[1], w: n[0], h: n[2] };
     }
-    if (has(skill, "compare")) return compareBars(q, "cubes") ?? concept("volume", "Volume");
+    if (has(skill, "compare")) return compareCards(q) ?? concept("volume", "Volume");
     return concept("volume", "Volume");
   }
 
-  // ── Area ──
+  // ── Area ── labelled rectangle with its dimensions (no countable grid → no free answer).
   if (has(skill, "area") && !has(skill, "area_or_perimeter")) {
     const dims = nums(prompt).filter((n) => n <= 30);
     if ((has(skill, "formula", "rectangle") || /rows of|by/.test(prompt)) && dims.length >= 2) {
-      return { kind: "grid", cols: dims[1] ?? dims[0], rows: dims[0], unit: /m²/.test(answer) ? "m²" : /cm/.test(answer) ? "cm²" : "units²" };
+      return { kind: "rectangle", w: dims[0], h: dims[1], mode: "area", unit: /m²|m\b/.test(promptA) ? "m" : /cm/.test(promptA) ? "cm" : "" };
     }
-    if (has(skill, "compare")) return compareBars(q, "squares") ?? concept("area", "Area");
+    if (has(skill, "compare")) return compareCards(q) ?? concept("area", "Area");
     return concept("area", "Area");
   }
 
-  // ── Perimeter ──
+  // ── Perimeter ── labelled rectangle, edge highlighted; dimensions given, not the total.
   if (has(skill, "perimeter")) {
     if (has(skill, "find", "reasoning")) {
       const dims = nums(prompt).filter((n) => n <= 50);
@@ -218,25 +225,22 @@ export function deriveMeasurelandsAssessmentVisual(q: Q): MzVisual | undefined {
     return concept("perimeter", "Perimeter");
   }
 
-  // ── Temperature ──
+  // ── Temperature ── the two GIVEN temps for a difference; else a neutral thermometer.
   if (has(skill, "temperature")) {
     const t = nums(promptA).filter((n) => n <= 60);
     if (has(skill, "difference") && t.length >= 2) return { kind: "thermometer", from: Math.min(t[0], t[1]), value: Math.max(t[0], t[1]) };
-    const av = firstNum(answer);
-    if (av !== undefined && /°c/i.test(answer)) return { kind: "thermometer", value: av };
-    if (t.length) return { kind: "thermometer", value: t[0] };
-    return concept("temperature", "Temperature");
+    return concept("thermometer", "Temperature");
   }
 
-  // ── Clock / 24-hour time ──
+  // ── Clock ── reading the clock IS the task; the hands are the stimulus.
   if (has(skill, "clock", "time_24")) {
     const clock = parseClock(answer, prompt);
     if (clock) return { kind: "clock", ...clock };
     return concept("clock", "Time");
   }
 
-  // ── Ruler / precise length reading ──
-  if (has(skill, "read_ruler", "measure_precisely", "partial_units") || (has(skill, "ruler") && /\d\s*cm/.test(answer))) {
+  // ── Ruler ── reading the ruler IS the task.
+  if (has(skill, "read_ruler", "measure_precisely")) {
     const cm = firstNum(answer);
     if (cm !== undefined && /cm/.test(answer)) return { kind: "ruler", toCm: cm };
     return concept("ruler", "Reading a Ruler");
@@ -249,8 +253,8 @@ export function deriveMeasurelandsAssessmentVisual(q: Q): MzVisual | undefined {
       const v = valueWithUnit(prompt) ?? valueWithUnit(answer);
       if (v && (v.unit === "g" || v.unit === "kg")) return { kind: "scaleDial", value: v.value, unit: v.unit, max: v.unit === "kg" ? Math.max(5, Math.ceil(v.value)) : 1000 };
     }
-    if (has(skill, "compare")) return compareBars(q) ?? promptBars(q) ?? concept("scale", "Mass");
-    if (has(skill, "measure")) return promptBars(q) ?? concept("scale", "Mass");
+    if (has(skill, "compare")) return compareCards(q) ?? promptCards(q) ?? concept("scale", "Mass");
+    if (has(skill, "measure")) return promptCards(q) ?? concept("scale", "Mass");
     return concept("scale", "Mass");
   }
 
@@ -260,17 +264,17 @@ export function deriveMeasurelandsAssessmentVisual(q: Q): MzVisual | undefined {
       const v = valueWithUnit(promptA);
       if (v && (v.unit === "mL" || v.unit === "L")) return { kind: "jug", value: v.value, unit: v.unit, max: v.unit === "L" ? Math.max(2, Math.ceil(v.value)) : 1000 };
     }
-    if (has(skill, "compare")) return compareBars(q, /cup/.test(prompt) ? "cups" : "") ?? promptBars(q, /cup/.test(prompt) ? "cups" : "") ?? concept("jug", "Capacity");
-    if (has(skill, "order", "measure")) return promptBars(q, /cup/.test(prompt) ? "cups" : "") ?? concept("jug", "Capacity");
+    if (has(skill, "compare")) return compareCards(q) ?? promptCards(q) ?? concept("jug", "Capacity");
+    if (has(skill, "order", "measure")) return promptCards(q) ?? concept("jug", "Capacity");
     return concept("jug", "Capacity");
   }
 
   // ── Length (non-ruler) ──
   if (has(skill, "length", "metre", "cm", "formal_units", "informal_units", "fair_units", "accuracy")) {
-    if (has(skill, "difference")) return promptBars(q) ?? concept("ruler", "Length");
+    if (has(skill, "difference")) return promptCards(q) ?? concept("ruler", "Length");
     if (has(skill, "compare", "order", "height")) {
-      const bars = compareBars(q);
-      if (bars) return bars;
+      const cards = compareCards(q);
+      if (cards) return cards;
       const labels = optionLabels(q).slice(0, 4);
       if (labels.length && !labels.some((l) => /\d/.test(l) || l.includes(","))) return { kind: "objects", items: labels.map((l) => ({ label: l, emoji: emojiFor(l) })) };
     }
