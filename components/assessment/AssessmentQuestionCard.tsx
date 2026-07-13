@@ -10,6 +10,8 @@ import ExpressionFlowVisual from "@/components/activities/ExpressionFlowVisual";
 import InputOutputTableVisual from "@/components/activities/InputOutputTableVisual";
 import FunctionMachineCardVisual from "@/components/activities/FunctionMachineCardVisual";
 import { BalanceEquationCardVisual } from "@/components/activities/EquationVisualCards";
+import MeasurelandsAssessmentVisual from "@/components/assessment/MeasurelandsAssessmentVisual";
+import type { MzVisual } from "@/data/assessments/measurelandsVisuals";
 import { getRealmTheme } from "@/lib/useRealmTheme";
 
 type GenericQuestion = {
@@ -268,6 +270,7 @@ export default function AssessmentQuestionCard({
 
   const renderedVisual = visual ? (
     <>
+      {typeof visual.kind === "string" ? <MeasurelandsAssessmentVisual visual={visual as unknown as MzVisual} /> : null}
       {visual.type === "decimal_model" ? <DecimalModelVisual visual={visual as never} title="Decimal model" /> : null}
       {visual.type === "rule_box" ? <RuleBoxVisual visual={{ ...(visual as Record<string, unknown>), decisionLabel: undefined } as never} title="Given information" /> : null}
       {visual.type === "best_buy_card_comparison" ? (

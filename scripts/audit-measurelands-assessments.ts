@@ -64,7 +64,14 @@ type Question = {
   skillLabel?: string;
   strand?: string;
   linkedWeeks?: number[];
+  visual?: { kind?: string } | unknown;
 };
+
+// Every Measurelands assessment question must carry a rendered visual.
+const KNOWN_VISUAL_KINDS = new Set([
+  "ruler", "scaleDial", "jug", "clock", "thermometer", "rectangle", "grid",
+  "cubes", "angle", "convert", "bars", "objects", "concept",
+]);
 
 function listDuplicates(values: string[]): string[] {
   const seen = new Set<string>();
@@ -151,6 +158,10 @@ for (const year of YEARS) {
       if (!q.id.includes("-measurement-")) fail(`${qScope} id is not a measurement id.`);
       // Metadata: every question maps to at least one source week.
       if (!(q.linkedWeeks && q.linkedWeeks.length)) fail(`${qScope} has no source week.`);
+      // Every question must carry a rendered visual of a known kind.
+      const vk = (q.visual as { kind?: string } | undefined)?.kind;
+      if (!vk) fail(`${qScope} has no visual.`);
+      else if (!KNOWN_VISUAL_KINDS.has(vk)) fail(`${qScope} has an unknown visual kind "${vk}".`);
 
       const skillId = (q.skillId ?? "").toLowerCase();
       const skillLabel = (q.skillLabel ?? "").toLowerCase();

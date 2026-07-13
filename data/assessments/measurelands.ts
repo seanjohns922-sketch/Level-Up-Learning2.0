@@ -1,4 +1,5 @@
 import type { PostTest, Question } from "./posttests";
+import { deriveMeasurelandsAssessmentVisual } from "./measurelandsVisuals";
 
 type YearLabel = "Prep" | "Year 1" | "Year 2" | "Year 3" | "Year 4" | "Year 5" | "Year 6";
 
@@ -13,7 +14,7 @@ function buildQuestion(
   difficultyBand: string,
   linkedLessons: number[] = [1, 2, 3],
 ): Question {
-  return {
+  const base: Question = {
     id,
     type: "mcq",
     prompt,
@@ -27,6 +28,9 @@ function buildQuestion(
     strand: "Measurement",
     difficultyBand,
   };
+  // Every Measurelands assessment question carries a visual that echoes the real
+  // lesson instrument and never contradicts the correct answer.
+  return { ...base, visual: deriveMeasurelandsAssessmentVisual(base) };
 }
 
 function buildPostTest(yearLabel: YearLabel, questions: Question[]): PostTest {
