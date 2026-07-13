@@ -77,12 +77,13 @@ function Objects({ items, caption }: { items: Array<{ label: string; emoji: stri
 }
 
 const CONCEPT_ICON: Record<string, string> = {
-  clock: "🕐", calendar: "📅", duration: "⏱️", convert: "🔁", tools: "🛠️", angle: "📐",
+  ruler: "📏", clock: "🕐", calendar: "📅", duration: "⏱️", convert: "🔁", tools: "🛠️",
+  angle: "📐", area: "▦", volume: "🧊", perimeter: "🔲",
 };
-// Concept cards reuse the REAL instrument (shown neutral) where one exists, so
-// "choose the unit / what does X measure" still looks like the lessons.
+// Concept cards reuse the REAL instrument (shown neutral) where one reads fine
+// empty — scale / jug / thermometer. A ruler needs an object to look right, so
+// ruler & abstract concepts use a premium gold-ringed crest instead.
 function Concept({ icon, label }: { icon: string; label: string }) {
-  if (icon === "ruler") return <RulerWithObject rulerCm={12} precision />;
   if (icon === "scale") return <MeasurelandsScale value={0} unit="kg" max={5} majorStep={1} minorStep={0.5} size={210} />;
   if (icon === "jug") return <MeasurelandsJug value={0} unit="L" max={2} majorStep={1} minorStep={0.5} size={190} />;
   if (icon === "thermometer") return <MeasurelandsThermometer value={22} max={50} size={140} />;
