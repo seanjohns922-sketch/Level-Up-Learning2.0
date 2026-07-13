@@ -7,6 +7,15 @@
 // Golden rule: a visual must NEVER contradict the stored correct answer. When an
 // exact value can't be parsed with confidence, we fall back to a themed "concept"
 // instrument card (correct-answer-neutral) rather than assert a wrong reading.
+//
+// ── Future direction (seed, do not build yet) ────────────────────────────────
+// Generalise this into `realmVisuals.ts`: a registry keyed by realm, where each
+// realm registers `{ derive(question) -> RealmVisual, render(visual) }`. Number,
+// Measurement, Space, Algebra and Statistics would all derive visuals the same
+// way; this file becomes the "measurement" entry. The MzVisual union below is the
+// measurement realm's visual vocabulary — a separate concern from the artwork,
+// so emojis can later be swapped for real Measurelands art without touching the
+// deriver.
 
 export type MzVisual =
   | { kind: "ruler"; toCm: number; label?: string; emoji?: string }
