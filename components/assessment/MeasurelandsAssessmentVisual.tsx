@@ -8,6 +8,7 @@ import { MeasurelandsAngle } from "@/components/measurelands/MeasurelandsAngle";
 import { ClockFace } from "@/components/measurelands/MeasurelandsAnalogClockCard";
 import { MeasurelandsVolumeBuilder } from "@/components/measurelands/MeasurelandsVolumeBuilder";
 import { MeasurelandsObjectArt } from "@/components/measurelands/MeasurelandsObjectArt";
+import { RulerWithObject } from "@/components/measurelands/MeasurelandsRulerCard";
 
 // Assessment visuals REUSE the real Measurelands lesson instruments so pre/post
 // tests look and feel exactly like the lessons — on a parchment panel (the lesson
@@ -26,33 +27,20 @@ function Panel({ label, children }: { label?: string; children: React.ReactNode 
   );
 }
 
-// ── Ruler (parchment, lesson palette) — the object to read, no printed number ──
-function Ruler({ toCm }: { toCm: number }) {
-  const span = Math.max(10, Math.ceil(toCm) + 2);
-  const W = 520, x0 = 26, x1 = W - 26, unit = (x1 - x0) / span, objEnd = x0 + toCm * unit;
-  return (
-    <svg viewBox={`0 0 ${W} 120`} className="w-full">
-      <rect x={x0} y={60} width={objEnd - x0} height={22} rx={5} fill={GOLD} />
-      <rect x={x0} y={86} width={x1 - x0} height={26} rx={4} fill="#fff8e8" stroke={GOLD_DEEP} />
-      {Array.from({ length: span + 1 }).map((_, i) => {
-        const x = x0 + i * unit;
-        return <g key={i}><line x1={x} y1={86} x2={x} y2={99} stroke={GOLD_DEEP} strokeWidth={1} /><text x={x} y={110} fontSize={9} textAnchor="middle" fill={GOLD_DEEP}>{i}</text></g>;
-      })}
-      <line x1={objEnd} y1={40} x2={objEnd} y2={86} stroke="#b4552e" strokeDasharray="3 3" />
-      <text x={x1} y={119} fontSize={9} textAnchor="end" fill={GOLD_DEEP}>cm</text>
-    </svg>
-  );
-}
-
-// ── Rectangle (area/perimeter) — dimensions labelled, never the total ──────────
-function RectShape({ w, h, mode, unit = "" }: { w: number; h: number; mode: string; unit?: string }) {
+// ── Rectangle (area/perimeter) — dimensions labelled, never the total. Sample
+//    shapes (for "what is area/perimeter?") render label-free. ──────────────────
+function RectShape({ w, h, mode, unit = "", sample = false }: { w: number; h: number; mode: string; unit?: string; sample?: boolean }) {
   const scale = 110 / Math.max(w, h), rw = w * scale, rh = h * scale, ox = (260 - rw) / 2, oy = (150 - rh) / 2;
   const u = unit ? ` ${unit}` : "";
   return (
     <svg viewBox="0 0 260 150" style={{ maxHeight: 170 }} className="w-full">
       <rect x={ox} y={oy} width={rw} height={rh} rx={3} fill={mode === "area" ? "rgba(199,154,62,0.2)" : "none"} stroke={GOLD} strokeWidth={mode === "perimeter" ? 5 : 3} />
-      <text x={ox + rw / 2} y={oy - 8} fontSize={13} fontWeight={800} textAnchor="middle" fill={INK}>{w}{u}</text>
-      <text x={ox - 10} y={oy + rh / 2} fontSize={13} fontWeight={800} textAnchor="middle" fill={INK} transform={`rotate(-90 ${ox - 10} ${oy + rh / 2})`}>{h}{u}</text>
+      {sample ? null : (
+        <>
+          <text x={ox + rw / 2} y={oy - 8} fontSize={13} fontWeight={800} textAnchor="middle" fill={INK}>{w}{u}</text>
+          <text x={ox - 10} y={oy + rh / 2} fontSize={13} fontWeight={800} textAnchor="middle" fill={INK} transform={`rotate(-90 ${ox - 10} ${oy + rh / 2})`}>{h}{u}</text>
+        </>
+      )}
     </svg>
   );
 }
@@ -89,14 +77,21 @@ function Objects({ items, caption }: { items: Array<{ label: string; emoji: stri
 }
 
 const CONCEPT_ICON: Record<string, string> = {
-  ruler: "📏", scale: "⚖️", jug: "🧪", clock: "🕐", thermometer: "🌡️", perimeter: "🔲",
-  area: "▦", volume: "🧊", angle: "📐", convert: "🔁", calendar: "📅", duration: "⏱️", tools: "🛠️",
+  clock: "🕐", calendar: "📅", duration: "⏱️", convert: "🔁", tools: "🛠️", angle: "📐",
 };
+// Concept cards reuse the REAL instrument (shown neutral) where one exists, so
+// "choose the unit / what does X measure" still looks like the lessons.
 function Concept({ icon, label }: { icon: string; label: string }) {
+  if (icon === "ruler") return <RulerWithObject rulerCm={12} precision />;
+  if (icon === "scale") return <MeasurelandsScale value={0} unit="kg" max={5} majorStep={1} minorStep={0.5} size={210} />;
+  if (icon === "jug") return <MeasurelandsJug value={0} unit="L" max={2} majorStep={1} minorStep={0.5} size={190} />;
+  if (icon === "thermometer") return <MeasurelandsThermometer value={22} max={50} size={140} />;
   return (
-    <div className="flex items-center gap-4">
-      <span className="text-5xl">{CONCEPT_ICON[icon] ?? "📐"}</span>
-      <div className="text-lg font-black" style={{ color: INK }}>{label}</div>
+    <div className="flex items-center gap-4 py-2">
+      <div className="flex h-16 w-16 items-center justify-center rounded-full" style={{ background: "#fff8e8", border: `2px solid ${GOLD}` }}>
+        <span className="text-4xl">{CONCEPT_ICON[icon] ?? "📐"}</span>
+      </div>
+      <div className="text-xl font-black" style={{ color: INK }}>{label}</div>
     </div>
   );
 }
@@ -112,7 +107,15 @@ function jugSteps(unit: string, max: number) {
 export default function MeasurelandsAssessmentVisual({ visual }: { visual: MzVisual }) {
   switch (visual.kind) {
     case "ruler":
-      return <Panel label="Measure the length"><Ruler toCm={visual.toCm} /></Panel>;
+      return (
+        <Panel label="Measure the length">
+          <RulerWithObject
+            rulerCm={Math.max(10, Math.ceil(visual.toCm) + 2)}
+            object={{ label: "pencil", icon: "✏️", lengthCm: visual.toCm, startCm: 0 }}
+            precision
+          />
+        </Panel>
+      );
     case "scaleDial": {
       const s = scaleSteps(visual.unit, visual.max);
       return <Panel label="Read the scale"><MeasurelandsScale value={visual.value} unit={visual.unit} max={visual.max} majorStep={s.majorStep} minorStep={s.minorStep} size={230} /></Panel>;
@@ -134,7 +137,7 @@ export default function MeasurelandsAssessmentVisual({ visual }: { visual: MzVis
     case "cubes":
       return <Panel label="Picture the prism"><MeasurelandsVolumeBuilder dims={{ l: visual.l, w: visual.w, h: visual.h }} cubes={[]} outline size={240} /></Panel>;
     case "rectangle":
-      return <Panel label={visual.mode === "perimeter" ? "Distance around the edge" : "Space inside"}><RectShape w={visual.w} h={visual.h} mode={visual.mode} unit={visual.unit} /></Panel>;
+      return <Panel label={visual.mode === "perimeter" ? "Distance around the edge" : "Space inside"}><RectShape w={visual.w} h={visual.h} mode={visual.mode} unit={visual.unit} sample={visual.sample} /></Panel>;
     case "convert":
       return <Panel label="Convert the unit"><Convert fromValue={visual.fromValue} fromUnit={visual.fromUnit} toUnit={visual.toUnit} /></Panel>;
     case "objects":

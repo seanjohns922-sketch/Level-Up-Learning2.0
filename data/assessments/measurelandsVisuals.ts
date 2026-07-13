@@ -23,7 +23,7 @@ export type MzVisual =
   | { kind: "jug"; value: number; unit: "mL" | "L"; max: number }
   | { kind: "clock"; hour: number; minute: number; digital?: string }
   | { kind: "thermometer"; value: number; from?: number; min?: number; max?: number }
-  | { kind: "rectangle"; w: number; h: number; mode: "perimeter" | "area"; unit?: string }
+  | { kind: "rectangle"; w: number; h: number; mode: "perimeter" | "area"; unit?: string; sample?: boolean }
   | { kind: "cubes"; l: number; w: number; h: number }
   | { kind: "angle"; single?: number; known?: number; unknown?: number; total?: 180 | 360 }
   | { kind: "convert"; fromValue: number; fromUnit: string; toValue: number; toUnit: string }
@@ -87,19 +87,24 @@ function unitEmoji(label: string): string {
   if (/block/.test(l)) return "🧱";
   return "📦";
 }
+// Prefer the named object (e.g. "12.4 cm ribbon" → 🎀) over the bare unit.
+function pickEmoji(label: string): string {
+  const e = emojiFor(label);
+  return e !== "📦" ? e : unitEmoji(label);
+}
 // Two labelled instrument cards for a genuine two-item comparison (exactly two
 // numeric OPTIONS, the rest decoys). Shows the two GIVEN measurements as cards —
 // no magnitude bar, so it never points at the answer.
 function compareCards(q: Q): MzVisual | undefined {
   const numeric = optionLabels(q).filter((l) => /\d/.test(l));
   if (numeric.length !== 2) return undefined;
-  return { kind: "objects", items: numeric.map((l) => ({ label: l, emoji: unitEmoji(l) })), caption: "Compare the measurements" };
+  return { kind: "objects", items: numeric.map((l) => ({ label: l, emoji: pickEmoji(l) })), caption: "Compare the measurements" };
 }
 // Same, from a measured PROMPT that names two quantities.
 function promptCards(q: Q): MzVisual | undefined {
   const found = measurementsIn(q.prompt ?? "");
   if (found.length !== 2) return undefined;
-  return { kind: "objects", items: found.map((f) => ({ label: f.label, emoji: unitEmoji(f.label) })), caption: "Compare the measurements" };
+  return { kind: "objects", items: found.map((f) => ({ label: f.label, emoji: pickEmoji(f.label) })), caption: "Compare the measurements" };
 }
 
 // Time words → an analog clock position. Handles "half past 3", "quarter to 5",
@@ -202,8 +207,8 @@ export function deriveMeasurelandsAssessmentVisual(q: Q): MzVisual | undefined {
       const n = nums(prompt);
       if (n.length >= 3) return { kind: "cubes", l: n[1], w: n[0], h: n[2] };
     }
-    if (has(skill, "compare")) return compareCards(q) ?? concept("volume", "Volume");
-    return concept("volume", "Volume");
+    if (has(skill, "compare")) return compareCards(q) ?? { kind: "cubes", l: 3, w: 2, h: 2 };
+    return { kind: "cubes", l: 3, w: 2, h: 2 }; // "what is volume" → a sample prism
   }
 
   // ── Area ── labelled rectangle with its dimensions (no countable grid → no free answer).
@@ -212,8 +217,8 @@ export function deriveMeasurelandsAssessmentVisual(q: Q): MzVisual | undefined {
     if ((has(skill, "formula", "rectangle") || /rows of|by/.test(prompt)) && dims.length >= 2) {
       return { kind: "rectangle", w: dims[0], h: dims[1], mode: "area", unit: /m²|m\b/.test(promptA) ? "m" : /cm/.test(promptA) ? "cm" : "" };
     }
-    if (has(skill, "compare")) return compareCards(q) ?? concept("area", "Area");
-    return concept("area", "Area");
+    if (has(skill, "compare")) return compareCards(q) ?? { kind: "rectangle", w: 4, h: 3, mode: "area", sample: true };
+    return { kind: "rectangle", w: 4, h: 3, mode: "area", sample: true }; // "what is area" → a sample surface
   }
 
   // ── Perimeter ── labelled rectangle, edge highlighted; dimensions given, not the total.
@@ -222,7 +227,7 @@ export function deriveMeasurelandsAssessmentVisual(q: Q): MzVisual | undefined {
       const dims = nums(prompt).filter((n) => n <= 50);
       if (dims.length >= 2) return { kind: "rectangle", w: dims[0], h: dims[1], mode: "perimeter", unit: /m\b/.test(promptA) ? "m" : "units" };
     }
-    return concept("perimeter", "Perimeter");
+    return { kind: "rectangle", w: 4, h: 3, mode: "perimeter", sample: true }; // "what is perimeter" → a sample edge
   }
 
   // ── Temperature ── the two GIVEN temps for a difference; else a neutral thermometer.
@@ -232,12 +237,15 @@ export function deriveMeasurelandsAssessmentVisual(q: Q): MzVisual | undefined {
     return concept("thermometer", "Temperature");
   }
 
-  // ── Clock ── reading the clock IS the task; the hands are the stimulus.
-  if (has(skill, "clock", "time_24")) {
+  // ── Clock reading ── the hands ARE the stimulus (like reading a ruler).
+  if (has(skill, "clock")) {
     const clock = parseClock(answer, prompt);
     if (clock) return { kind: "clock", ...clock };
     return concept("clock", "Time");
   }
+  // ── 24-hour conversion ── an analog clock would reveal the 12-hour answer, so
+  // show a neutral clock crest instead.
+  if (has(skill, "time_24")) return concept("clock", "24-Hour Time");
 
   // ── Ruler ── reading the ruler IS the task.
   if (has(skill, "read_ruler", "measure_precisely")) {
@@ -248,7 +256,7 @@ export function deriveMeasurelandsAssessmentVisual(q: Q): MzVisual | undefined {
   if (has(skill, "ruler")) return concept("ruler", "Reading a Ruler");
 
   // ── Scales / mass ──
-  if (has(skill, "scale") || (has(skill, "mass") && /\d\s*k?g/.test(answer))) {
+  if (has(skill, "scale", "mass", "gram", "kilogram", "weigh")) {
     if (has(skill, "read_scale", "scale_reasoning")) {
       const v = valueWithUnit(prompt) ?? valueWithUnit(answer);
       if (v && (v.unit === "g" || v.unit === "kg")) return { kind: "scaleDial", value: v.value, unit: v.unit, max: v.unit === "kg" ? Math.max(5, Math.ceil(v.value)) : 1000 };
@@ -259,7 +267,7 @@ export function deriveMeasurelandsAssessmentVisual(q: Q): MzVisual | undefined {
   }
 
   // ── Jugs / capacity ──
-  if (has(skill, "jug") || has(skill, "ml_l") || has(skill, "capacity")) {
+  if (has(skill, "jug", "ml_l", "capacity", "litre")) {
     if (has(skill, "read_jug")) {
       const v = valueWithUnit(promptA);
       if (v && (v.unit === "mL" || v.unit === "L")) return { kind: "jug", value: v.value, unit: v.unit, max: v.unit === "L" ? Math.max(2, Math.ceil(v.value)) : 1000 };
@@ -281,18 +289,23 @@ export function deriveMeasurelandsAssessmentVisual(q: Q): MzVisual | undefined {
     return concept("ruler", "Length");
   }
 
-  // ── Time of day / duration / calendar / sequencing ──
-  if (has(skill, "time_of_day", "duration", "sequenc", "calendar", "days", "months", "week", "time_units", "elapsed", "advanced_time", "timetable", "time_problems", "compare_times")) {
-    if (has(skill, "elapsed", "advanced_time", "timetable", "time_problems", "compare_times")) {
-      const clock = parseClock(answer, prompt);
-      if (clock && /\d/.test(answer)) return { kind: "clock", ...clock };
-      return concept("duration", "Elapsed Time");
-    }
-    const labels = optionLabels(q).slice(0, 4);
-    if (labels.length && labels.every((l) => l.length <= 22) && !labels.some((l) => l.includes(","))) {
+  // ── Elapsed / timetable / advanced time ── the computed time IS the answer, so
+  // never draw it; a neutral duration crest.
+  if (has(skill, "elapsed", "advanced_time", "timetable", "time_problems", "compare_times")) {
+    return concept("duration", "Elapsed Time");
+  }
+  // ── Time of day / duration comparisons ── real activity/time-of-day cards.
+  if (has(skill, "time_of_day", "duration")) {
+    const labels = optionLabels(q).slice(0, 4).filter((l) => !/^\d+$/.test(l.trim()));
+    if (labels.length >= 2 && labels.every((l) => l.length <= 22 && !l.includes(","))) {
       return { kind: "objects", items: labels.map((l) => ({ label: l, emoji: emojiFor(l) })) };
     }
-    return concept("calendar", "Time");
+    return concept("duration", "Duration");
+  }
+  // ── Calendar / weeks / months / days / sequencing ── a calendar crest (these
+  // are day/date questions with no meaningful instrument).
+  if (has(skill, "calendar", "days", "months", "week", "sequenc", "time_units", "season")) {
+    return concept("calendar", "Calendar");
   }
 
   // ── Mass / capacity qualitative compare (named objects) ──

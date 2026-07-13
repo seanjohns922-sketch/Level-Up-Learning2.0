@@ -64,7 +64,7 @@ type Taps = {
  * "Where do we start?" question is asked, small glowing tap targets float ABOVE
  * the ruler — the ruler face itself stays clean and never gets covered.
  */
-function RulerWithObject({
+export function RulerWithObject({
   rulerCm,
   object,
   showZeroHero,
