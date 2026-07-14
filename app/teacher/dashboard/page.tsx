@@ -268,6 +268,7 @@ export default function TeacherDashboardPage() {
   const [activeYear, setActiveYear] = useState("Year 1");
   const [activeTab, setActiveTab] = useState<"live" | "students" | "curriculum">("live");
   const [showPlacements, setShowPlacements] = useState(false);
+  const [pinToast, setPinToast] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState(false);
   const [showLoginMenu, setShowLoginMenu] = useState(false);
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
@@ -542,17 +543,24 @@ export default function TeacherDashboardPage() {
   }
 
   async function handleResetPin(student: StudentRow) {
-    const newPin = prompt(`Reset PIN for ${student.display_name}.\nEnter new 4-digit PIN:`);
-    if (!newPin || newPin.length !== 4 || !/^\d{4}$/.test(newPin)) {
-      alert("PIN must be exactly 4 digits.");
-      return;
-    }
+    // One-click random passcode (avoids collisions within the class).
+    const existing = new Set(
+      students
+        .filter((s) => s.class_id === student.class_id && s.id !== student.id)
+        .map((s) => s.pin)
+        .filter((value): value is string => Boolean(value))
+    );
+    let newPin = "";
+    do {
+      newPin = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
+    } while (existing.has(newPin));
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await supabase.from("students").update({ pin: newPin } as any).eq("id", student.id);
     setStudents((prev) =>
       prev.map((s) => (s.id === student.id ? { ...s, pin: newPin } : s))
     );
-    alert(`PIN for ${student.display_name} reset to ${newPin}.`);
+    setPinToast(`New passcode for ${student.display_name}: ${newPin}`);
+    window.setTimeout(() => setPinToast(null), 2600);
   }
 
   // Brain-break frequency: class default + per-student override (null = inherit).
@@ -1276,6 +1284,12 @@ export default function TeacherDashboardPage() {
           students={classStudents}
           onClose={() => setShowPlacements(false)}
         />
+      )}
+
+      {pinToast && (
+        <div className="fixed bottom-6 left-1/2 z-[70] -translate-x-1/2 rounded-xl bg-[#0F172A] px-4 py-2.5 text-sm font-bold text-white shadow-[0_12px_32px_-8px_rgba(15,23,42,0.5)]">
+          {pinToast}
+        </div>
       )}
     </main>
   );

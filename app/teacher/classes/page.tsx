@@ -99,6 +99,7 @@ export default function TeacherClassesPage() {
   } | null>(null);
   // Student edit/archive state
   const [editingStudentId, setEditingStudentId] = useState<string | null>(null);
+  const [pinCopied, setPinCopied] = useState(false);
   const [editForm, setEditForm] = useState<EditForm>({
     first_name: "",
     last_name: "",
@@ -312,6 +313,29 @@ export default function TeacherClassesPage() {
     setNewStudentSchoolYears((current) => ({ ...current, [classId]: "" }));
     setNewStudentWorkingLevels((current) => ({ ...current, [classId]: "AUTO_PLACEMENT" }));
     if (authUser?.id) await loadClasses(authUser.id);
+  }
+
+  function regeneratePin() {
+    const editing = students.find((s) => s.id === editingStudentId);
+    const classId = editing?.class_id;
+    const existing = new Set(
+      students
+        .filter((s) => s.class_id === classId && s.id !== editingStudentId)
+        .map((s) => s.pin)
+        .filter((value): value is string => Boolean(value))
+    );
+    setEditForm((f) => ({ ...f, pin: generateFallbackPin(existing) }));
+  }
+
+  function copyPin() {
+    if (!editForm.pin || typeof navigator === "undefined" || !navigator.clipboard) return;
+    navigator.clipboard
+      .writeText(editForm.pin)
+      .then(() => {
+        setPinCopied(true);
+        window.setTimeout(() => setPinCopied(false), 1500);
+      })
+      .catch(() => {});
   }
 
   function startEdit(student: StudentRow) {
@@ -785,13 +809,32 @@ export default function TeacherClassesPage() {
                                       </div>
                                       <div>
                                         <label className="text-xs font-bold text-gray-500 mb-1 block">Password (4-digit)</label>
-                                        <input
-                                          value={editForm.pin}
-                                          onChange={(e) => setEditForm((f) => ({ ...f, pin: e.target.value.replace(/\D/g, "").slice(0, 4) }))}
-                                          className="w-full rounded-xl border border-white bg-white px-3 py-2 text-sm font-mono font-bold text-gray-900 tracking-widest outline-none focus:border-blue-300"
-                                          placeholder="1234"
-                                          inputMode="numeric"
-                                        />
+                                        <div className="flex items-center gap-1.5">
+                                          <input
+                                            value={editForm.pin}
+                                            onChange={(e) => setEditForm((f) => ({ ...f, pin: e.target.value.replace(/\D/g, "").slice(0, 4) }))}
+                                            className="w-full rounded-xl border border-white bg-white px-3 py-2 text-sm font-mono font-bold text-gray-900 tracking-widest outline-none focus:border-blue-300"
+                                            placeholder="1234"
+                                            inputMode="numeric"
+                                          />
+                                          <button
+                                            type="button"
+                                            onClick={regeneratePin}
+                                            title="Generate a random passcode"
+                                            className="shrink-0 rounded-xl border border-blue-200 bg-blue-50 px-2.5 py-2 text-xs font-bold text-blue-700 hover:bg-blue-100"
+                                          >
+                                            Regenerate
+                                          </button>
+                                          <button
+                                            type="button"
+                                            onClick={copyPin}
+                                            disabled={!editForm.pin}
+                                            title="Copy passcode"
+                                            className="shrink-0 rounded-xl border border-gray-200 bg-white px-2.5 py-2 text-xs font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-40"
+                                          >
+                                            {pinCopied ? "Copied!" : "Copy"}
+                                          </button>
+                                        </div>
                                       </div>
                                     </div>
                                   </div>
