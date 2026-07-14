@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Check, ChevronDown, Eye, Lock } from "lucide-react";
 import type { StudentProgress } from "@/data/progress";
 import type { LegendRealmId } from "@/data/legends";
@@ -25,7 +24,6 @@ export default function LevelsDrawer({
   isPreview: boolean;
   accent?: string;
 }) {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
 
@@ -63,7 +61,9 @@ export default function LevelsDrawer({
     // navigation; clear it when switching to a non-review (current) level.
     if (review) enterReviewMode(realmId, targetYear);
     else exitReviewMode();
-    router.push(href);
+    // Full navigation (not router.push): the realm maps read their level once on
+    // mount, so switching levels must re-initialise the world from the new URL.
+    window.location.assign(href);
   }
 
   return (
