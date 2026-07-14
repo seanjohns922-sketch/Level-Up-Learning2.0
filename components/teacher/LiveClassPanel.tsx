@@ -347,17 +347,6 @@ function rowStatusMeta(card: LiveStudentCard, group: LiveCardDisplayGroup) {
   return { dot: "bg-emerald-500", text: "text-emerald-700", label: "On track" };
 }
 
-function compactLocation(card: LiveStudentCard) {
-  return [
-    "NN",
-    card.workingLevelBadge || null,
-    card.currentWeek ? `W${card.currentWeek}` : null,
-    card.currentLesson ? card.currentLesson.replace(/^.*-/, "").toUpperCase() : null,
-  ]
-    .filter(Boolean)
-    .join(" · ");
-}
-
 function statusFilterLabel(filter: LiveStatusFilter) {
   switch (filter) {
     case "live":
@@ -682,21 +671,33 @@ export default function LiveClassPanel({
           </div>
         ) : (
           <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_10px_28px_-16px_rgba(15,23,42,0.18)]">
-            {filteredCards.map((card, idx) => {
+            {/* Column headers */}
+            <div className="grid grid-cols-[1.5fr_0.6fr_0.7fr_0.5fr_0.7fr_0.7fr_0.7fr_1fr] items-center gap-3 border-b border-slate-200 bg-slate-50 px-4 py-2 text-[10px] font-extrabold uppercase tracking-[0.12em] text-slate-400">
+              <span>Student</span>
+              <span>Realm</span>
+              <span>Level</span>
+              <span>Week</span>
+              <span>Lesson</span>
+              <span className="text-right">Score</span>
+              <span className="text-right">%</span>
+              <span className="text-right">Last active</span>
+            </div>
+            {filteredCards.map((card) => {
               const displayGroup = getCardDisplayGroup(card);
               const meta = rowStatusMeta(card, displayGroup);
               const answered = Math.max(0, card.questionsAnswered ?? 0);
               const correct = Math.max(0, card.correctCount ?? 0);
               const accuracy = answered > 0 ? Math.max(0, card.accuracyPercent ?? 0) : null;
+              const notStarted = displayGroup === "waiting_to_start";
+              const levelTag = notStarted ? "—" : (card.workingLevelBadge ?? "—");
+              const weekTag = notStarted ? "—" : (card.currentWeek ? `W${card.currentWeek}` : "—");
+              const lessonTag = notStarted ? "—" : (card.currentLesson ? card.currentLesson.replace(/^.*-/, "").toUpperCase() : "—");
               return (
                 <button
                   key={card.id}
                   type="button"
                   onClick={() => setSelectedStudentId(card.id)}
-                  className={[
-                    "grid w-full grid-cols-[1.6fr_2fr_0.7fr_0.7fr_0.9fr] items-center gap-3 px-4 py-2.5 text-left transition hover:bg-slate-50",
-                    idx > 0 ? "border-t border-slate-100" : "",
-                  ].join(" ")}
+                  className="grid w-full grid-cols-[1.5fr_0.6fr_0.7fr_0.5fr_0.7fr_0.7fr_0.7fr_1fr] items-center gap-3 border-t border-slate-100 px-4 py-2.5 text-left transition hover:bg-slate-50"
                   title="Open student detail"
                 >
                   {/* status dot + name */}
@@ -704,10 +705,10 @@ export default function LiveClassPanel({
                     <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${meta.dot}`} />
                     <span className="truncate text-sm font-bold text-slate-900">{card.displayName}</span>
                   </div>
-                  {/* location: NN · LVL 3 · W1 · L2 */}
-                  <span className="truncate text-xs font-semibold text-slate-500">
-                    {displayGroup === "waiting_to_start" ? "Not started yet" : compactLocation(card)}
-                  </span>
+                  <span className="text-xs font-bold text-slate-500">NN</span>
+                  <span className="text-xs font-semibold text-slate-600">{levelTag}</span>
+                  <span className="text-xs font-semibold text-slate-500 tabular-nums">{weekTag}</span>
+                  <span className="truncate text-xs font-semibold text-slate-600">{lessonTag}</span>
                   {/* score */}
                   <span className="text-right text-sm font-bold tabular-nums text-slate-700">
                     {answered > 0 ? `${correct}/${answered}` : "—"}
