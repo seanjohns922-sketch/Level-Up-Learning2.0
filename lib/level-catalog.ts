@@ -20,6 +20,31 @@ export function levelIndexForYear(year: string | null | undefined): number {
   return LEVEL_CATALOG.findIndex((level) => level.id === year);
 }
 
+const REALM_ROUTES: Record<string, string> = {
+  "number-nexus": "/number-nexus",
+  measurelands: "/measurelands",
+};
+
+// Build the URL for entering a realm at a given level. Entering an EARLIER level
+// than the placed one (real mode) is a read-only Review (?review=1); the current
+// level (or preview) resolves normally.
+export function buildRealmLevelHref(
+  realmId: string,
+  targetYear: string,
+  currentYear: string | null | undefined,
+  isPreview: boolean
+): { href: string; review: boolean } {
+  const route = REALM_ROUTES[realmId] ?? "/number-nexus";
+  const review =
+    !isPreview &&
+    !!currentYear &&
+    targetYear !== currentYear &&
+    levelIndexForYear(targetYear) < levelIndexForYear(currentYear);
+  const params = new URLSearchParams({ level: targetYear });
+  if (review) params.set("review", "1");
+  return { href: `${route}?${params.toString()}`, review };
+}
+
 export function levelLabelForYear(year: string | null | undefined): string {
   const match = LEVEL_CATALOG.find((level) => level.id === year);
   if (match) return match.label;

@@ -1,15 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Check, Lock } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { DEMO_MODE } from "@/data/config";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import RealmPortalPreview from "@/components/realms/RealmPortalPreview";
-import { getScopedProgressKey, readProgress, type ProgressRealmScope, type StudentProgress } from "@/data/progress";
-import { LEVEL_CATALOG, isLevelUnlocked, levelIndexForYear, levelLabelForYear } from "@/lib/level-catalog";
+import { getScopedProgressKey, type ProgressRealmScope, type StudentProgress } from "@/data/progress";
 import { setLastRealm } from "@/lib/last-realm";
-import { enterReviewMode, exitReviewMode } from "@/lib/review-mode";
+import { exitReviewMode } from "@/lib/review-mode";
 
 // Read a specific realm's scoped progress (the carousel lives on /realms where
 // the default scope is "number", so the focused realm's scope is passed
@@ -44,20 +42,11 @@ function isRealmAccessible(realmId: string, previewMode: boolean) {
 
 export default function RealmCarousel() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const previewMode = isDemoPreviewMode();
-  // Realm-first: no level is chosen before this screen. Seed from any explicit
-  // ?level override, else the student's saved (number-scoped) level, else L1.
-  const initialLevelSeed = searchParams.get("level") ?? readProgress()?.year ?? "Year 1";
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [entered, setEntered] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
-  const [isLevelMenuOpen, setIsLevelMenuOpen] = useState(false);
-  // A level the student explicitly picked from the Levels drawer (overrides the
-  // focused realm's saved level). Reset whenever the focused realm changes.
-  const [overrideLevel, setOverrideLevel] = useState<string | null>(null);
-  const levelMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     // Back at the Tower means any review session is over — restore write access.
@@ -66,30 +55,9 @@ export default function RealmCarousel() {
     return () => clearTimeout(t);
   }, []);
 
-  useEffect(() => {
-    function onPointerDown(event: MouseEvent) {
-      if (!levelMenuRef.current) return;
-      if (!levelMenuRef.current.contains(event.target as Node)) {
-        setIsLevelMenuOpen(false);
-      }
-    }
-
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") setIsLevelMenuOpen(false);
-    }
-
-    window.addEventListener("mousedown", onPointerDown);
-    window.addEventListener("keydown", onKeyDown);
-    return () => {
-      window.removeEventListener("mousedown", onPointerDown);
-      window.removeEventListener("keydown", onKeyDown);
-    };
-  }, []);
-
   const navigate = useCallback((dir: 1 | -1) => {
     if (transitioning) return;
     setTransitioning(true);
-    setOverrideLevel(null); // a level pick only applies to the realm it was made in
     setCurrentIndex((prev) => (prev + dir + REALMS.length) % REALMS.length);
     setTimeout(() => setTransitioning(false), 400);
   }, [transitioning]);
@@ -127,18 +95,14 @@ export default function RealmCarousel() {
   // Use the cathedral/tower-interior aesthetic across all levels.
   const isTopChamber = true;
 
-  // The focused realm resolves its OWN level from its scoped progress. The
-  // Levels drawer can override it. This is what the "Levels" chip reflects and
-  // what Enter Realm carries through so the realm resumes/pre-tests correctly.
+  // The Tower only picks the realm — the level lives inside each realm now. The
+  // focused realm's scoped progress just drives the portal art (its placed level).
   const focusedScope: ProgressRealmScope = current.id === "measurelands" ? "measurement" : "number";
-  const focusedLegendRealm = current.id === "measurelands" ? "measurelands" : "number-nexus";
   const focusedProgress = useMemo(
     () => readScopedProgress(focusedScope),
     [focusedScope, currentIndex]
   );
-  const activeYear = overrideLevel ?? focusedProgress?.year ?? initialLevelSeed;
-  const levelLabel = levelLabelForYear(activeYear);
-  const levelNumber = Number(activeYear.replace(/[^0-9]/g, "")) || 1;
+  const levelNumber = Number((focusedProgress?.year ?? "Year 1").replace(/[^0-9]/g, "")) || 1;
 
   const realmRoutes: Record<string, string> = {
     "number-nexus": "/number-nexus",
@@ -149,27 +113,12 @@ export default function RealmCarousel() {
     if (!isActive) return;
     const route = realmRoutes[current.id];
     if (!route) return;
+    // Entering a realm always drops the student on their PLACED level (or a
+    // pre-test if new). The realm resolves that from its own scoped progress —
+    // no level is chosen here, and any prior review session is cleared.
     setLastRealm(current.id);
-
-    // Entering an EARLIER level than the realm's current one (real mode) is a
-    // read-only Review: never persist it or touch progression. Entering the
-    // current level (or in preview) resolves/persists normally.
-    const isPreview = DEMO_MODE || previewMode;
-    const currentYear = focusedProgress?.year;
-    const isReview =
-      !isPreview &&
-      !!currentYear &&
-      activeYear !== currentYear &&
-      levelIndexForYear(activeYear) < levelIndexForYear(currentYear);
-
-    if (isReview) {
-      enterReviewMode(current.id, activeYear);
-      router.push(`${route}?level=${encodeURIComponent(activeYear)}&review=1`);
-      return;
-    }
-
     exitReviewMode();
-    router.push(`${route}?level=${encodeURIComponent(activeYear)}`);
+    router.push(route);
   }
 
   return (
@@ -211,85 +160,18 @@ export default function RealmCarousel() {
           >
             ← Back
           </button>
-          <div ref={levelMenuRef} className="relative flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setIsLevelMenuOpen((currentValue) => !currentValue)}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-white/90 px-3.5 py-1.5 rounded-full transition hover:scale-[1.02] hover:bg-white/15"
-              style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)" }}
-            >
-              <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-              Levels
-            </button>
-            <button
-              type="button"
-              onClick={() => router.push("/realm-stats")}
-              title="View Progress"
-              aria-label="View Progress"
-              className="h-10 w-10 rounded-full border border-white/20 bg-white/10 text-white/90 backdrop-blur-md transition hover:scale-105 hover:bg-white/15 hover:shadow-[0_0_18px_rgba(255,255,255,0.18)] cursor-pointer"
-            >
-              <svg viewBox="0 0 24 24" className="mx-auto h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20 21a8 8 0 0 0-16 0" />
-                <circle cx="12" cy="8" r="4" />
-              </svg>
-            </button>
-
-            {isLevelMenuOpen ? (
-              <div
-                className="absolute right-0 top-[calc(100%+10px)] w-[300px] rounded-3xl border border-white/15 bg-[rgba(10,12,18,0.88)] p-4 backdrop-blur-xl shadow-[0_12px_40px_rgba(0,0,0,0.35)]"
-                style={{ zIndex: 40 }}
-              >
-                <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.22em] text-white/45">
-                  {current.name} · Levels
-                </div>
-                <div className="mb-3 text-xs text-white/50">
-                  Revisit an earlier level any time — you can&apos;t jump ahead.
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  {LEVEL_CATALOG.map((lvl) => {
-                    const unlocked = isLevelUnlocked(lvl.id, focusedProgress, {
-                      forceOpen: DEMO_MODE || previewMode,
-                      realmId: focusedLegendRealm,
-                    });
-                    const isCurrent = lvl.id === activeYear;
-                    return (
-                      <button
-                        key={lvl.id}
-                        type="button"
-                        disabled={!unlocked}
-                        onClick={() => {
-                          if (!unlocked) return;
-                          setOverrideLevel(lvl.id);
-                          setIsLevelMenuOpen(false);
-                        }}
-                        className={[
-                          "flex w-full items-center justify-between rounded-xl px-3.5 py-2.5 text-left transition",
-                          !unlocked ? "cursor-not-allowed opacity-45" : "cursor-pointer hover:bg-white/10",
-                        ].join(" ")}
-                        style={
-                          isCurrent
-                            ? { background: "rgba(212,175,110,0.16)", border: "1px solid rgba(212,175,110,0.5)" }
-                            : { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }
-                        }
-                      >
-                        <span className={`text-sm font-semibold ${isCurrent ? "text-amber-50" : "text-white/80"}`}>
-                          {lvl.label}
-                        </span>
-                        {isCurrent ? (
-                          <Check size={15} className="text-amber-300" />
-                        ) : !unlocked ? (
-                          <Lock size={13} className="text-white/40" />
-                        ) : null}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : null}
-          </div>
+          <button
+            type="button"
+            onClick={() => router.push("/realm-stats")}
+            title="View Progress"
+            aria-label="View Progress"
+            className="h-10 w-10 rounded-full border border-white/20 bg-white/10 text-white/90 backdrop-blur-md transition hover:scale-105 hover:bg-white/15 hover:shadow-[0_0_18px_rgba(255,255,255,0.18)] cursor-pointer"
+          >
+            <svg viewBox="0 0 24 24" className="mx-auto h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 21a8 8 0 0 0-16 0" />
+              <circle cx="12" cy="8" r="4" />
+            </svg>
+          </button>
         </div>
 
         {/* Title */}

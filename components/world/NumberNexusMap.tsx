@@ -17,6 +17,7 @@ import {
 } from "@/lib/program-progress";
 import { readBestChain } from "@/lib/best-chain";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
+import LevelsDrawer from "@/components/realms/LevelsDrawer";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import { supabase } from "@/lib/supabase";
 import StudentAvatar from "@/components/avatar/StudentAvatar";
@@ -488,14 +489,11 @@ export default function NumberNexusMap() {
     const p = new URLSearchParams(window.location.search);
     return p.get("review") === "1" ? p.get("level") : null;
   });
-  const isReviewing = !!reviewYear;
   const year       = reviewYear ?? progress?.year ?? "Year 1";
   const fogProgress = useMemo(() => computeFogProgress(year, progress?.unlockedLegends), [year, progress?.unlockedLegends]);
   const [bestChain] = useState(() => readBestChain("number", year));
   const [classBestChain, setClassBestChain] = useState<number | null>(null);
   const isPrep     = year === "Prep";
-  const levelNum   = isPrep ? 0 : parseInt(year.replace(/\D/g, ""), 10) || 1;
-  const levelLabel = isPrep ? "PREP" : `LV ${levelNum}`;
   const eraIdx     = getEra(year);
   const era        = ERA_CONFIGS[eraIdx];
   const isGuided   = eraIdx <= 1; // Prep, Year 1, Year 2 — single big button, no menu decisions
@@ -816,15 +814,7 @@ export default function NumberNexusMap() {
         <div style={chip()}>
           <span style={{ color: "#5eead4", fontSize: 10, fontWeight: 900, letterSpacing: "0.18em", fontFamily: "ui-monospace,monospace" }}>⚡ NUMBER NEXUS</span>
         </div>
-        {isReviewing ? (
-          <div style={chip({ background: "rgba(245,158,11,0.16)", border: "1px solid rgba(245,158,11,0.45)" })}>
-            <span style={{ color: "#fbbf24", fontSize: 9, fontWeight: 800, letterSpacing: "0.16em", fontFamily: "ui-monospace,monospace" }}>👁 REVIEW · {levelLabel}</span>
-          </div>
-        ) : (
-          <div style={chip({ background: "rgba(94,234,212,0.07)", border: "1px solid rgba(94,234,212,0.14)" })}>
-            <span style={{ color: "#2dd4bf", fontSize: 9, fontWeight: 700, letterSpacing: "0.2em", fontFamily: "ui-monospace,monospace" }}>{levelLabel}</span>
-          </div>
-        )}
+        <LevelsDrawer realmId="number-nexus" progress={progress} viewingYear={year} isPreview={isDemoPreviewMode()} accent="#5eead4" />
         <div style={{ flex: 1 }} />
         <div style={{ display: "flex", alignItems: "center", gap: 5, ...chip() }}>
           <Zap size={11} color="#14b8a6" />
