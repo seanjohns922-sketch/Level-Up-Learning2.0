@@ -72,6 +72,8 @@ type ProgressRow = {
   week: number | null;
   status: string;
   pretest_score: number | null;
+  placement_complete?: boolean | null;
+  required_weeks?: unknown;
   completed_lesson_ids: unknown;
   unlocked_legends: unknown;
   quiz_scores: unknown;
@@ -360,6 +362,51 @@ function computeStatus(prog: ProgressRow | undefined, completedCount: number, pc
 }
 
 const ASSESSMENT_PASS_THRESHOLD = 85;
+
+// Teacher-facing placement status for the overview column. Never surfaces the
+// internal `placement_complete` flag — only these plain-language stages.
+type PlacementStatus =
+  | "Not Placed"
+  | "Ready for Pre-Test"
+  | "Learning"
+  | "Targeted Pathway"
+  | "Post-Test Ready"
+  | "Complete";
+
+const PLACEMENT_STATUS_RANK: Record<PlacementStatus, number> = {
+  "Not Placed": 0,
+  "Ready for Pre-Test": 1,
+  "Learning": 2,
+  "Targeted Pathway": 3,
+  "Post-Test Ready": 4,
+  "Complete": 5,
+};
+
+const PLACEMENT_STATUS_STYLE: Record<PlacementStatus, string> = {
+  "Not Placed": "bg-[#F1F5F9] text-[#64748B]",
+  "Ready for Pre-Test": "bg-[#FEF3C7] text-[#B45309]",
+  "Learning": "bg-[#E0F2FE] text-[#0369A1]",
+  "Targeted Pathway": "bg-[#EDE9FE] text-[#6D28D9]",
+  "Post-Test Ready": "bg-[#DCFCE7] text-[#15803D]",
+  "Complete": "bg-[#D1FAE5] text-[#047857]",
+};
+
+function computePlacementStatus(
+  prog: ProgressRow | undefined,
+  pct: number,
+  isPlaceholder: boolean,
+): PlacementStatus {
+  if (isPlaceholder || !prog) return "Not Placed";
+  const latestPost = getLatestPosttestProfile(prog.quiz_scores);
+  if (latestPost?.passed) return "Complete";
+  if (prog.placement_complete !== true) {
+    return prog.pretest_score == null ? "Ready for Pre-Test" : "Learning";
+  }
+  if (pct >= 100) return "Post-Test Ready";
+  const req = Array.isArray(prog.required_weeks) ? prog.required_weeks : [];
+  if (req.length > 0 && req.length < 12) return "Targeted Pathway";
+  return "Learning";
+}
 
 const INSIGHT_SEVERITY: Record<TeacherInsightStatus, number> = {
   "Needs Support": 3,
@@ -976,6 +1023,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
       const pct = isPlaceholder ? 0 : overallProgramPercent(strandIds.length, completedQuizzes, planForStudentYear);
       const computedStatus = isPlaceholder ? "Not Started" : computeStatus(prog, strandIds.length, pct);
       const status = computedStatus === "Not Started" && liveRow ? liveRowToStatus(liveRow) : computedStatus;
+      const placementStatus = computePlacementStatus(prog, pct, isPlaceholder);
       const week = isPlaceholder ? null : (prog?.week ?? liveRow?.current_week ?? null);
       const activeWeek = week ?? 1;
       const activeWeekPlan = planForStudentYear.find((entry) => entry.week === activeWeek);
@@ -985,11 +1033,10 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
       const flag = deriveStudentFlag(pickPrimaryInsight(weekInsights), status);
       const latestPretest = getLatestPretestProgress(s.id);
 
-      return { s, prog, liveRow, studentEvents, pct, status, week, schoolYear, workingYear, summary, flag, latestPretest, nameParts };
+      return { s, prog, liveRow, studentEvents, pct, status, placementStatus, week, schoolYear, workingYear, summary, flag, latestPretest, nameParts };
     })
     .sort((a, b) => {
       const dir = sortDir === "asc" ? 1 : -1;
-      const rank: Record<string, number> = { "Not Started": 0, "In Progress": 1, "Needs Support": 2, "Completed": 3 };
       const displayNameCmp = a.nameParts.displayName.localeCompare(b.nameParts.displayName);
       const firstNameCmp = a.nameParts.firstName.localeCompare(b.nameParts.firstName) || displayNameCmp;
       const lastNameCmp =
@@ -1008,7 +1055,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
         case "week":
           return dir * ((a.week ?? -1) - (b.week ?? -1)) || lastNameCmp;
         case "status":
-          return dir * (rank[a.status] - rank[b.status]) || lastNameCmp;
+          return dir * (PLACEMENT_STATUS_RANK[a.placementStatus] - PLACEMENT_STATUS_RANK[b.placementStatus]) || lastNameCmp;
         case "tower":
           return dir * (a.pct - b.pct) || lastNameCmp;
       }
@@ -1098,7 +1145,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
 
       {/* Student table */}
       <div className="bg-white rounded-2xl border border-[#E6E8EC] overflow-hidden shadow-[0_4px_16px_-12px_rgba(15,23,42,0.18)]">
-        <div className="grid grid-cols-[2fr_0.7fr_0.7fr_0.7fr_1.1fr] px-5 py-3 bg-gradient-to-b from-[#F8FAFC] to-[#F1F5F9] border-b border-[#E6E8EC]">
+        <div className="grid grid-cols-[2fr_0.7fr_0.7fr_0.55fr_0.95fr_1.1fr] px-5 py-3 bg-gradient-to-b from-[#F8FAFC] to-[#F1F5F9] border-b border-[#E6E8EC]">
           <div className="flex items-center gap-3">
             {([
               ["name", "Student"],
@@ -1126,7 +1173,8 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
             ["schoolYear", "School Year"],
             ["workingLevel", "Working Level"],
             ["week", "Week"],
-            ["tower", "Tower"],
+            ["status", "Status"],
+            ["tower", "Progress"],
           ] as [SortKey, string][]).map(([key, label], idx) => {
             const active = sortKey === key;
             return (
@@ -1152,7 +1200,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
             No students enrolled yet.
           </div>
         ) : (
-          studentRows.map(({ s, prog, liveRow, studentEvents, pct, week, schoolYear, workingYear, latestPretest }) => {
+          studentRows.map(({ s, prog, liveRow, studentEvents, pct, placementStatus, week, schoolYear, workingYear, latestPretest }) => {
               const isOpen = expandedId === s.id;
 
             return (
@@ -1160,7 +1208,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                 <button
                   onClick={() => setExpandedId(isOpen ? null : s.id)}
                   className={[
-                    "w-full grid grid-cols-[2fr_0.7fr_0.7fr_0.7fr_1.1fr] items-center px-5 py-3.5 text-left transition",
+                    "w-full grid grid-cols-[2fr_0.7fr_0.7fr_0.55fr_0.95fr_1.1fr] items-center px-5 py-3.5 text-left transition",
                     isOpen ? "bg-[#FAFBFC]" : "hover:bg-[#FAFBFC]",
                   ].join(" ")}
                 >
@@ -1177,6 +1225,11 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                   <span className="text-xs font-bold text-[#475569] tabular-nums">
                     {week ? `W${week}` : "—"}
                   </span>
+                  <div className="min-w-0">
+                    <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.04em] ${PLACEMENT_STATUS_STYLE[placementStatus]}`}>
+                      {placementStatus}
+                    </span>
+                  </div>
                   <div className="flex items-center gap-2">
                     <div className="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
                       <div className="h-full bg-[#00C2A8] shadow-[0_0_8px_rgba(0,229,195,0.55)] transition-all" style={{ width: `${pct}%` }} />
