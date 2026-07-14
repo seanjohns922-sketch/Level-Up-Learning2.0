@@ -321,7 +321,7 @@ export default function TeacherDashboardPage() {
       if (currentClassId) {
         void loadClassData(currentClassId, true);
       }
-    }, 10000);
+    }, 30000);
 
     return () => window.clearInterval(intervalId);
   }, [selectedClassId]);

@@ -408,7 +408,8 @@ export default function LiveClassPanel({
         }
         return;
       }
-      if (!cancelled) setLoading(true);
+      // Note: don't flip `loading` on refreshes — only the initial load shows the
+      // spinner, so periodic polls update in place without flashing the panel.
       const { data, error } = await supabase
         .from("live_student_activity")
         .select("*")
@@ -442,7 +443,7 @@ export default function LiveClassPanel({
 
     void ensureLiveSession();
     void loadRows();
-    intervalId = setInterval(loadRows, 8000);
+    intervalId = setInterval(loadRows, 30000);
     return () => {
       cancelled = true;
       if (intervalId) clearInterval(intervalId);
@@ -473,7 +474,7 @@ export default function LiveClassPanel({
     }
 
     void loadStudentEvents();
-    const intervalId = setInterval(loadStudentEvents, 8000);
+    const intervalId = setInterval(loadStudentEvents, 30000);
     return () => {
       cancelled = true;
       clearInterval(intervalId);
