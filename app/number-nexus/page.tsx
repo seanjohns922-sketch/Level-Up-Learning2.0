@@ -7,6 +7,7 @@ import { isPlacementComplete, readProgress, updateProgress, writeProgress } from
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { LEVEL_CATALOG } from "@/lib/level-catalog";
 import { buildDefaultStudentProgress } from "@/lib/student-destination";
+import { enterReviewMode, exitReviewMode } from "@/lib/review-mode";
 
 const NumberNexusMap = dynamic(
   () => import("@/components/world/NumberNexusMap"),
@@ -56,23 +57,33 @@ export default function NumberNexusPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // The Levels drawer carries the chosen level via ?level=. Persist it into
-    // Number Nexus's (number-scoped) progress so the map renders that level.
-    const requestedLevel = new URLSearchParams(window.location.search).get("level");
+    const params = new URLSearchParams(window.location.search);
+    const requestedLevel = params.get("level");
+    const isReview = params.get("review") === "1";
+    const validLevel = !!requestedLevel && LEVEL_CATALOG.some((lvl) => lvl.id === requestedLevel);
     const progress = readProgress();
     const preview = isDemoPreviewMode();
-    if (
-      requestedLevel &&
-      LEVEL_CATALOG.some((lvl) => lvl.id === requestedLevel) &&
-      (preview || isPlacementComplete(progress)) &&
-      progress?.year !== requestedLevel
-    ) {
-      if (progress) updateProgress({ year: requestedLevel });
-      else writeProgress(buildDefaultStudentProgress(requestedLevel));
+
+    if (isReview && validLevel) {
+      // Read-only review of an earlier level — set the flag (robust on refresh)
+      // and persist nothing.
+      enterReviewMode("number-nexus", requestedLevel!);
+    } else {
+      // Normal entry: the Levels drawer's chosen level (usually the current one)
+      // resolves into Number Nexus's (number-scoped) progress so the map renders it.
+      exitReviewMode();
+      if (
+        validLevel &&
+        (preview || isPlacementComplete(progress)) &&
+        progress?.year !== requestedLevel
+      ) {
+        if (progress) updateProgress({ year: requestedLevel! });
+        else writeProgress(buildDefaultStudentProgress(requestedLevel!));
+      }
     }
 
     if (preview) return;
-    if (!isPlacementComplete(readProgress())) {
+    if (!isReview && !isPlacementComplete(readProgress())) {
       router.replace("/home");
     }
   }, [router]);

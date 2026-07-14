@@ -1,5 +1,6 @@
 import type { AssessmentResultProfile } from "@/data/assessments/analysis";
 import { DEMO_PREVIEW_SCOPE, isDemoPreviewMode } from "@/lib/demo-mode";
+import { isReviewMode } from "@/lib/review-mode";
 
 export type StudentProgress = {
   year: string; // "Year 3"
@@ -59,6 +60,8 @@ export function readProgress(): StudentProgress | null {
 
 export function writeProgress(next: StudentProgress) {
   if (typeof window === "undefined") return;
+  // Reviewing a previous level is read-only — never touch stored progress.
+  if (isReviewMode()) return;
   localStorage.setItem(getScopedProgressKey(), JSON.stringify(next));
 }
 

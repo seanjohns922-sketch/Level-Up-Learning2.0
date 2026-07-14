@@ -7,8 +7,9 @@ import { DEMO_MODE } from "@/data/config";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import RealmPortalPreview from "@/components/realms/RealmPortalPreview";
 import { getScopedProgressKey, readProgress, type ProgressRealmScope, type StudentProgress } from "@/data/progress";
-import { LEVEL_CATALOG, isLevelUnlocked, levelLabelForYear } from "@/lib/level-catalog";
+import { LEVEL_CATALOG, isLevelUnlocked, levelIndexForYear, levelLabelForYear } from "@/lib/level-catalog";
 import { setLastRealm } from "@/lib/last-realm";
+import { enterReviewMode, exitReviewMode } from "@/lib/review-mode";
 
 // Read a specific realm's scoped progress (the carousel lives on /realms where
 // the default scope is "number", so the focused realm's scope is passed
@@ -59,6 +60,8 @@ export default function RealmCarousel() {
   const levelMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    // Back at the Tower means any review session is over — restore write access.
+    exitReviewMode();
     const t = setTimeout(() => setEntered(true), 80);
     return () => clearTimeout(t);
   }, []);
@@ -147,7 +150,25 @@ export default function RealmCarousel() {
     const route = realmRoutes[current.id];
     if (!route) return;
     setLastRealm(current.id);
-    // Carry the level the drawer is showing so the realm persists/resolves it.
+
+    // Entering an EARLIER level than the realm's current one (real mode) is a
+    // read-only Review: never persist it or touch progression. Entering the
+    // current level (or in preview) resolves/persists normally.
+    const isPreview = DEMO_MODE || previewMode;
+    const currentYear = focusedProgress?.year;
+    const isReview =
+      !isPreview &&
+      !!currentYear &&
+      activeYear !== currentYear &&
+      levelIndexForYear(activeYear) < levelIndexForYear(currentYear);
+
+    if (isReview) {
+      enterReviewMode(current.id, activeYear);
+      router.push(`${route}?level=${encodeURIComponent(activeYear)}&review=1`);
+      return;
+    }
+
+    exitReviewMode();
     router.push(`${route}?level=${encodeURIComponent(activeYear)}`);
   }
 

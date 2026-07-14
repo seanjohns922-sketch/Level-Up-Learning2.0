@@ -8,6 +8,7 @@
 
 import { ACTIVE_STUDENT_KEY } from "@/data/progress";
 import { DEMO_PREVIEW_SCOPE, isDemoPreviewMode } from "@/lib/demo-mode";
+import { isReviewMode } from "@/lib/review-mode";
 
 export type WeekProgress = {
   lessonsCompleted: boolean[];   // [L1, L2, L3]
@@ -70,6 +71,8 @@ export function readProgramStore(): ProgramProgressStore {
 
 export function writeProgramStore(store: ProgramProgressStore) {
   if (typeof window === "undefined") return;
+  // Reviewing a previous level is read-only — no lesson/quiz completions persist.
+  if (isReviewMode()) return;
   localStorage.setItem(getScopedProgramStoreKey(), JSON.stringify(store));
 }
 

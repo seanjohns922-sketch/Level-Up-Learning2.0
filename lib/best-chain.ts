@@ -2,6 +2,7 @@
 
 import { ACTIVE_STUDENT_KEY } from "@/data/progress";
 import { DEMO_PREVIEW_SCOPE, isDemoPreviewMode } from "@/lib/demo-mode";
+import { isReviewMode } from "@/lib/review-mode";
 
 const LEGACY_BEST_CHAIN_KEYS = [
   "lul_best_nexus_chain_v1",
@@ -41,6 +42,8 @@ export function readBestChain(realmId: string, workingLevel: string) {
 
 export function writeBestChain(realmId: string, workingLevel: string, chain: number) {
   if (typeof window === "undefined") return;
+  // Reviewing a previous level is read-only — chains don't progress.
+  if (isReviewMode()) return;
   try {
     window.localStorage.setItem(getBestChainStorageKey(realmId, workingLevel), String(chain));
   } catch {
