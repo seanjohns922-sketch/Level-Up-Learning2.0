@@ -175,6 +175,14 @@ function optionLabels(q: Q): string[] {
   return (q.options ?? []).map((o) => (typeof o === "string" ? o : String((o as { label?: string }).label ?? ""))).filter(Boolean);
 }
 
+function qualitativeOptionObjects(q: Q, max = 4): MzVisual | undefined {
+  const labels = optionLabels(q)
+    .slice(0, max)
+    .filter((l) => l.length <= 28 && !/\d/.test(l) && !l.includes(","));
+  const items = recognizedItems(labels);
+  return items ? { kind: "objects", items } : undefined;
+}
+
 const has = (s: string | undefined, ...keys: string[]) => !!s && keys.some((k) => s.includes(k));
 
 // Domain concept fallbacks — premium instrument icon, answer-neutral.
@@ -271,8 +279,9 @@ export function deriveMeasurelandsAssessmentVisual(q: Q): MzVisual | undefined {
       const v = valueWithUnit(prompt) ?? valueWithUnit(answer);
       if (v && (v.unit === "g" || v.unit === "kg")) return { kind: "scaleDial", value: v.value, unit: v.unit, max: v.unit === "kg" ? Math.max(5, Math.ceil(v.value)) : 1000 };
     }
-    if (has(skill, "compare")) return compareCards(q) ?? promptCards(q) ?? concept("scale", "Mass");
-    if (has(skill, "measure")) return promptCards(q) ?? concept("scale", "Mass");
+    if (has(skill, "compare")) return compareCards(q) ?? promptCards(q) ?? qualitativeOptionObjects(q) ?? concept("scale", "Mass");
+    if (has(skill, "measure")) return promptCards(q) ?? qualitativeOptionObjects(q) ?? concept("scale", "Mass");
+    if (has(skill, "gram", "kilogram")) return qualitativeOptionObjects(q) ?? concept("scale", "Mass");
     return concept("scale", "Mass");
   }
 
@@ -282,8 +291,8 @@ export function deriveMeasurelandsAssessmentVisual(q: Q): MzVisual | undefined {
       const v = valueWithUnit(promptA);
       if (v && (v.unit === "mL" || v.unit === "L")) return { kind: "jug", value: v.value, unit: v.unit, max: v.unit === "L" ? Math.max(2, Math.ceil(v.value)) : 1000 };
     }
-    if (has(skill, "compare")) return compareCards(q) ?? promptCards(q) ?? concept("jug", "Capacity");
-    if (has(skill, "order", "measure")) return promptCards(q) ?? concept("jug", "Capacity");
+    if (has(skill, "compare")) return compareCards(q) ?? promptCards(q) ?? qualitativeOptionObjects(q) ?? concept("jug", "Capacity");
+    if (has(skill, "order", "measure")) return promptCards(q) ?? qualitativeOptionObjects(q) ?? concept("jug", "Capacity");
     return concept("jug", "Capacity");
   }
 
@@ -293,9 +302,8 @@ export function deriveMeasurelandsAssessmentVisual(q: Q): MzVisual | undefined {
     if (has(skill, "compare", "order", "height")) {
       const cards = compareCards(q);
       if (cards) return cards;
-      const labels = optionLabels(q).slice(0, 4).filter((l) => !l.includes(","));
-      const items = recognizedItems(labels);
-      if (items) return { kind: "objects", items };
+      const items = qualitativeOptionObjects(q);
+      if (items) return items;
     }
     return concept("ruler", "Length");
   }
@@ -321,10 +329,8 @@ export function deriveMeasurelandsAssessmentVisual(q: Q): MzVisual | undefined {
 
   // ── Mass / capacity qualitative compare (named objects) ──
   if (has(skill, "mass", "capacity")) {
-    const labels = optionLabels(q).slice(0, 4);
-    if (labels.length && !labels.some((l) => /\d/.test(l) || l.includes(","))) {
-      return { kind: "objects", items: labels.map((l) => ({ label: l, emoji: emojiFor(l) })) };
-    }
+    const items = qualitativeOptionObjects(q);
+    if (items) return items;
     return concept(has(skill, "capacity") ? "jug" : "scale", has(skill, "capacity") ? "Capacity" : "Mass");
   }
 
