@@ -44,29 +44,30 @@ function buildPostTest(yearLabel: YearLabel, questions: Question[]): PostTest {
 }
 
 // ═══════════════════════ PREP — Ground Measurelands ═══════════════════════════
-// W1 Length · W2 Mass · W3 Capacity · W4 Duration · W5 Time of day · W6 Clock ·
-// W7 Calendar · W8 Mixed review.
+// Foundation only: direct comparison of length, mass, capacity and duration,
+// plus days of the week and times of day. No clocks, months, formal dates,
+// indirect ordering of 3 items, or informal/formal measurement units.
 const PREP_POSTTEST: Question[] = [
   buildQuestion("y0-measurement-pt-01", "Which object is longer?", ["Short pencil", "Long ribbon", "Tiny peg", "Small block"], "Long ribbon", "length_compare", "Length", [1], "prep-measurement"),
-  buildQuestion("y0-measurement-pt-02", "Put these from shortest to longest.", ["straw, string, rope", "rope, string, straw", "string, rope, straw", "rope, straw, string"], "straw, string, rope", "length_order", "Length", [1], "prep-measurement"),
-  buildQuestion("y0-measurement-pt-03", "Which is tallest?", ["Cup", "Tree", "Book", "Leaf"], "Tree", "height_compare", "Length", [1], "prep-measurement"),
-  buildQuestion("y0-measurement-pt-04", "Which object is heavier?", ["Feather", "Rock", "Leaf", "Paper clip"], "Rock", "mass_compare", "Mass", [2], "prep-measurement"),
-  buildQuestion("y0-measurement-pt-05", "Put these from lightest to heaviest.", ["feather, apple, chair", "chair, apple, feather", "apple, feather, chair", "chair, feather, apple"], "feather, apple, chair", "mass_order", "Mass", [2], "prep-measurement"),
-  buildQuestion("y0-measurement-pt-06", "Which object is lighter?", ["Brick", "Feather", "Book", "Rock"], "Feather", "mass_compare", "Mass", [2], "prep-measurement"),
-  buildQuestion("y0-measurement-pt-07", "Which container holds more?", ["Tiny cup", "Large bucket", "Small bowl", "Short jar"], "Large bucket", "capacity_compare", "Capacity", [3], "prep-measurement"),
-  buildQuestion("y0-measurement-pt-08", "Which container holds less?", ["Bucket", "Fish tank", "Bottle", "Bathtub"], "Bottle", "capacity_compare", "Capacity", [3], "prep-measurement"),
-  buildQuestion("y0-measurement-pt-09", "Which would hold the most water?", ["Cup", "Bathtub", "Mug", "Bottle"], "Bathtub", "capacity_compare", "Capacity", [3], "prep-measurement"),
-  buildQuestion("y0-measurement-pt-10", "Which takes longer?", ["Blinking", "Reading a book", "Clapping once", "Jumping once"], "Reading a book", "duration_compare", "Duration", [4], "prep-measurement"),
-  buildQuestion("y0-measurement-pt-11", "Which is quickest?", ["Sleeping", "Watching a movie", "Washing hands", "Travelling to school"], "Washing hands", "duration_compare", "Duration", [4], "prep-measurement"),
-  buildQuestion("y0-measurement-pt-12", "Which time of day matches eating breakfast?", ["Morning", "Afternoon", "Evening", "Night"], "Morning", "time_of_day", "Time of Day", [5], "prep-measurement"),
-  buildQuestion("y0-measurement-pt-13", "Which time of day matches going to bed?", ["Morning", "Afternoon", "Evening", "Night"], "Night", "time_of_day", "Time of Day", [5], "prep-measurement"),
-  buildQuestion("y0-measurement-pt-14", "The long hand points to 12 and the short hand to 8. What o'clock is it?", ["7 o'clock", "8 o'clock", "9 o'clock", "12 o'clock"], "8 o'clock", "clock_reading", "O'clock Time", [6], "prep-measurement"),
-  buildQuestion("y0-measurement-pt-15", "The long hand points to 12 and the short hand to 3. What o'clock is it?", ["2 o'clock", "3 o'clock", "4 o'clock", "12 o'clock"], "3 o'clock", "clock_reading", "O'clock Time", [6], "prep-measurement"),
-  buildQuestion("y0-measurement-pt-16", "What day comes after Monday?", ["Sunday", "Tuesday", "Wednesday", "Friday"], "Tuesday", "days_of_week", "Days of the Week", [7], "prep-measurement"),
-  buildQuestion("y0-measurement-pt-17", "What day comes before Friday?", ["Thursday", "Saturday", "Wednesday", "Monday"], "Thursday", "days_of_week", "Days of the Week", [7], "prep-measurement"),
-  buildQuestion("y0-measurement-pt-18", "If today is Wednesday, what is tomorrow?", ["Tuesday", "Thursday", "Friday", "Sunday"], "Thursday", "calendar_language", "Days of the Week", [7], "prep-measurement"),
-  buildQuestion("y0-measurement-pt-19", "Which order makes sense for a day?", ["wake up, eat lunch, go to bed", "go to bed, wake up, eat lunch", "eat lunch, go to bed, wake up", "go to bed, eat lunch, wake up"], "wake up, eat lunch, go to bed", "sequencing_events", "Sequencing", [8], "prep-measurement"),
-  buildQuestion("y0-measurement-pt-20", "Which takes the longest time?", ["Putting on shoes", "Sleeping", "Washing hands", "Tying laces"], "Sleeping", "duration_compare", "Sequencing", [8], "prep-measurement"),
+  buildQuestion("y0-measurement-pt-02", "Which object is shorter?", ["Long rope", "Tall straw", "Little button", "Big ruler"], "Little button", "length_compare", "Length", [1], "prep-measurement"),
+  buildQuestion("y0-measurement-pt-03", "Which person is taller?", ["Baby", "Tall teacher", "Cat", "Book"], "Tall teacher", "height_compare", "Length", [1], "prep-measurement"),
+  buildQuestion("y0-measurement-pt-04", "What are we comparing?", ["Length", "Mass", "Capacity", "Duration"], "Length", "length_compare", "Length", [1], "prep-measurement"),
+  buildQuestion("y0-measurement-pt-05", "Which picture shows a fair length comparison?", ["Both objects start at the same end", "One object starts later", "One object is bent away", "The ruler is upside down"], "Both objects start at the same end", "length_compare", "Length", [1], "prep-measurement"),
+  buildQuestion("y0-measurement-pt-06", "Which object is heavier?", ["Feather", "Rock", "Leaf", "Paper clip"], "Rock", "mass_compare", "Mass", [2], "prep-measurement"),
+  buildQuestion("y0-measurement-pt-07", "Which object is lighter?", ["Brick", "Feather", "Book", "Rock"], "Feather", "mass_compare", "Mass", [2], "prep-measurement"),
+  buildQuestion("y0-measurement-pt-08", "What are we comparing?", ["Length", "Mass", "Capacity", "Duration"], "Mass", "mass_compare", "Mass", [2], "prep-measurement"),
+  buildQuestion("y0-measurement-pt-09", "Which picture helps us compare mass?", ["Holding one object in each hand", "Putting both objects in a line", "Pouring water into cups", "Pointing to a calendar"], "Holding one object in each hand", "mass_compare", "Mass", [2], "prep-measurement"),
+  buildQuestion("y0-measurement-pt-10", "Which container holds more?", ["Tiny cup", "Large bucket", "Small bowl", "Short jar"], "Large bucket", "capacity_compare", "Capacity", [3], "prep-measurement"),
+  buildQuestion("y0-measurement-pt-11", "Which container holds less?", ["Bucket", "Fish tank", "Bottle", "Bathtub"], "Bottle", "capacity_compare", "Capacity", [3], "prep-measurement"),
+  buildQuestion("y0-measurement-pt-12", "What are we comparing?", ["Length", "Mass", "Capacity", "Duration"], "Capacity", "capacity_compare", "Capacity", [3], "prep-measurement"),
+  buildQuestion("y0-measurement-pt-13", "Which picture shows a direct capacity comparison?", ["Pouring from one container into another", "Putting containers in a row", "Reading a clock", "Standing on a scale"], "Pouring from one container into another", "capacity_compare", "Capacity", [3], "prep-measurement"),
+  buildQuestion("y0-measurement-pt-14", "Which activity takes longer?", ["Blinking", "Reading a book", "Clapping once", "Jumping once"], "Reading a book", "duration_compare", "Duration", [4], "prep-measurement"),
+  buildQuestion("y0-measurement-pt-15", "Which activity takes less time?", ["Sleeping", "Watching a movie", "Washing hands", "Travelling to school"], "Washing hands", "duration_compare", "Duration", [4], "prep-measurement"),
+  buildQuestion("y0-measurement-pt-16", "What are we comparing?", ["Length", "Mass", "Capacity", "Duration"], "Duration", "duration_compare", "Duration", [4], "prep-measurement"),
+  buildQuestion("y0-measurement-pt-17", "What day comes after Monday?", ["Sunday", "Tuesday", "Wednesday", "Friday"], "Tuesday", "days_of_week", "Days of the Week", [5, 7], "prep-measurement"),
+  buildQuestion("y0-measurement-pt-18", "Which days are the weekend?", ["Monday and Tuesday", "Friday and Monday", "Saturday and Sunday", "Wednesday and Thursday"], "Saturday and Sunday", "days_of_week", "Days of the Week", [5, 7], "prep-measurement"),
+  buildQuestion("y0-measurement-pt-19", "Which time of day matches eating breakfast?", ["Morning", "Lunchtime", "Afternoon", "Night"], "Morning", "time_of_day", "Time of Day", [5, 6], "prep-measurement"),
+  buildQuestion("y0-measurement-pt-20", "Which order makes sense for a day?", ["wake up, eat lunch, go to bed", "go to bed, wake up, eat lunch", "eat lunch, go to bed, wake up", "go to bed, eat lunch, wake up"], "wake up, eat lunch, go to bed", "sequencing_events", "Sequencing", [6, 8], "prep-measurement"),
 ];
 
 // ═══════════════════════ YEAR 1 ══════════════════════════════════════════════
