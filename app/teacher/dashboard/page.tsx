@@ -9,6 +9,7 @@ import { getLatestPosttestProfile } from "@/data/assessments/analysis";
 import CurriculumExplorer from "@/components/teacher/CurriculumExplorer";
 import LiveClassPanel from "@/components/teacher/LiveClassPanel";
 import StrandStudentsPanel from "@/components/teacher/StrandStudentsPanel";
+import PlacementManager from "@/components/teacher/PlacementManager";
 import { fetchRealmCompatProgressForClass } from "@/lib/realm-progress-compat";
 import {
   BRAIN_BREAK_FREQUENCIES,
@@ -266,6 +267,7 @@ export default function TeacherDashboardPage() {
   const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
   const [activeYear, setActiveYear] = useState("Year 1");
   const [activeTab, setActiveTab] = useState<"live" | "students" | "curriculum">("live");
+  const [showPlacements, setShowPlacements] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
   const [showLoginMenu, setShowLoginMenu] = useState(false);
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
@@ -1025,6 +1027,15 @@ export default function TeacherDashboardPage() {
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.25"><path d="M17 21v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2" /><circle cx="10" cy="7" r="4" /><path d="M19 8v6M16 11h6" /></svg>
               Add / Edit Students
             </button>
+            {selectedClass && classStudents.length > 0 ? (
+              <button
+                onClick={() => setShowPlacements(true)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#0EA5A4]/40 bg-[#0EA5A4]/10 text-[#0F766E] font-bold text-sm hover:bg-[#0EA5A4]/15 transition active:scale-[0.98]"
+              >
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.25"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg>
+                Manage Placements
+              </button>
+            ) : null}
             <button
               onClick={() => router.push("/teacher/classes/new")}
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#0F172A] text-white font-bold text-sm hover:bg-[#1E293B] transition active:scale-[0.98]"
@@ -1257,6 +1268,14 @@ export default function TeacherDashboardPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {showPlacements && (
+        <PlacementManager
+          selectedClass={selectedClass ? { id: selectedClass.id, name: selectedClass.name } : null}
+          students={classStudents}
+          onClose={() => setShowPlacements(false)}
+        />
       )}
     </main>
   );
