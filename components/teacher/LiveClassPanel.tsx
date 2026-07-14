@@ -7,7 +7,6 @@ import {
   buildLiveClassInsight,
   buildLiveStudentInsight,
   formatRelativeTime,
-  getLearningStateMeta,
   type LearningState,
   type LiveStudentStatus,
 } from "@/lib/live-class";
@@ -302,29 +301,6 @@ function toLiveCard(
   };
 }
 
-function formatLocation(card: LiveStudentCard) {
-  const parts = [
-    card.currentWeek ? `Week ${card.currentWeek}` : null,
-    card.currentLesson ? card.currentLesson.replace(/^.*-/, "").toUpperCase() : null,
-    card.currentActivityLabel ? card.currentActivityLabel : null,
-  ].filter(Boolean);
-  return parts.length > 0 ? parts.join(" · ") : "No live lesson yet";
-}
-
-const LESSON_DURATION_SECS = 9 * 60;
-
-function formatLessonTimer(lessonStartedAt: string | null | undefined, now: number): string | null {
-  if (!lessonStartedAt) return null;
-  const elapsed = Math.floor((now - new Date(lessonStartedAt).getTime()) / 1000);
-  if (elapsed < 0) return null;
-  const mins = Math.floor(elapsed / 60);
-  const secs = elapsed % 60;
-  if (elapsed >= LESSON_DURATION_SECS) {
-    return `${mins}m (over 9min)`;
-  }
-  return `${mins}m ${secs}s / 9min`;
-}
-
 function hasLiveTelemetry(card: LiveStudentCard) {
   return Boolean(
     card.lastActiveAt ||
@@ -335,14 +311,6 @@ function hasLiveTelemetry(card: LiveStudentCard) {
     card.correctCount ||
     card.progressPercent > 0
   );
-}
-
-function getDisplayStatusLabel(card: LiveStudentCard, group: LiveCardDisplayGroup) {
-  if (group === "needs_support") return "Needs Support";
-  if (group === "waiting_to_start") return "Waiting To Start";
-  if (group === "idle") return "Idle";
-  if (card.currentLessonStatus === "completed") return "Completed";
-  return "Active Now";
 }
 
 function getDisplayStatusSubtext(card: LiveStudentCard, group: LiveCardDisplayGroup) {
@@ -368,26 +336,26 @@ function getCardDisplayGroup(card: LiveStudentCard): LiveCardDisplayGroup {
   return "live";
 }
 
-function getCardTone(group: LiveCardDisplayGroup) {
-  if (group === "live") {
-    return {
-      dot: "bg-emerald-500",
-      badge: "bg-emerald-50 text-emerald-700 border-emerald-200",
-      border: "border-slate-200 bg-white",
-    };
-  }
-  if (group === "needs_support") {
-    return {
-      dot: "bg-rose-500",
-      badge: "bg-rose-50 text-rose-700 border-rose-200",
-      border: "border-rose-200 bg-white",
-    };
-  }
-  return {
-    dot: "bg-slate-400",
-    badge: "bg-slate-100 text-slate-600 border-slate-200",
-    border: "border-slate-200 bg-white",
-  };
+// Compact-row status: red struggling / amber needs attention / green on track /
+// grey idle — finer than the group by splitting the "live" group on card.status.
+function rowStatusMeta(card: LiveStudentCard, group: LiveCardDisplayGroup) {
+  if (group === "needs_support") return { dot: "bg-rose-500", text: "text-rose-700", label: "Struggling" };
+  if (group === "idle") return { dot: "bg-slate-400", text: "text-slate-500", label: "Idle" };
+  if (group === "waiting_to_start") return { dot: "bg-slate-300", text: "text-slate-400", label: "Not started" };
+  if (card.currentLessonStatus === "completed") return { dot: "bg-teal-500", text: "text-teal-700", label: "Completed" };
+  if (card.status === "check_in") return { dot: "bg-amber-500", text: "text-amber-700", label: "Needs attention" };
+  return { dot: "bg-emerald-500", text: "text-emerald-700", label: "On track" };
+}
+
+function compactLocation(card: LiveStudentCard) {
+  return [
+    "NN",
+    card.workingLevelBadge || null,
+    card.currentWeek ? `W${card.currentWeek}` : null,
+    card.currentLesson ? card.currentLesson.replace(/^.*-/, "").toUpperCase() : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 }
 
 function statusFilterLabel(filter: LiveStatusFilter) {
@@ -416,13 +384,8 @@ export default function LiveClassPanel({
   const [events, setEvents] = useState<LiveActivityEventRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<LiveStatusFilter>("all");
-  const [now, setNow] = useState(() => Date.now());
-
-  useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(id);
-  }, []);
   const [spotlightMode, setSpotlightMode] = useState(false);
+  const [activeOnly, setActiveOnly] = useState(false);
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [selectedStudentEvents, setSelectedStudentEvents] = useState<LiveStudentEventRow[]>([]);
 
@@ -544,19 +507,29 @@ export default function LiveClassPanel({
   }, [events, rows, students]);
 
   const filteredCards = useMemo(() => {
-    const base =
-      filter === "all" ? cards : cards.filter((card) => getCardDisplayGroup(card) === filter);
+    let base = filter === "all" ? cards : cards.filter((card) => getCardDisplayGroup(card) === filter);
+    if (activeOnly) {
+      // Hide idle / not-yet-started students during a live rotation.
+      base = base.filter((card) => {
+        const g = getCardDisplayGroup(card);
+        return g === "live" || g === "needs_support";
+      });
+    }
     const sorted = [...base].sort((left, right) => {
       const leftGroup = getCardDisplayGroup(left);
       const rightGroup = getCardDisplayGroup(right);
       const statusGap = STATUS_PRIORITY[leftGroup] - STATUS_PRIORITY[rightGroup];
       if (statusGap !== 0) return statusGap;
+      // Within a group, surface lower accuracy first (needs attention), then recency.
+      const leftAcc = (left.questionsAnswered ?? 0) > 0 ? (left.accuracyPercent ?? 100) : 200;
+      const rightAcc = (right.questionsAnswered ?? 0) > 0 ? (right.accuracyPercent ?? 100) : 200;
+      if (leftAcc !== rightAcc) return leftAcc - rightAcc;
       const leftTime = left.lastActiveAt ? new Date(left.lastActiveAt).getTime() : 0;
       const rightTime = right.lastActiveAt ? new Date(right.lastActiveAt).getTime() : 0;
       return rightTime - leftTime;
     });
     return spotlightMode ? sorted.slice(0, 6) : sorted;
-  }, [cards, filter, spotlightMode]);
+  }, [cards, filter, spotlightMode, activeOnly]);
 
   const selectedStudent = useMemo<LiveStudentDrawerData | null>(
     () => filteredCards.concat(cards).find((card) => card.id === selectedStudentId) ?? null,
@@ -579,6 +552,13 @@ export default function LiveClassPanel({
   }, [cards]);
 
   const activeStudentCount = cards.filter((card) => getCardDisplayGroup(card) === "live").length;
+  const classAccuracy = useMemo(() => {
+    const answered = cards.filter((card) => (card.questionsAnswered ?? 0) > 0);
+    if (answered.length === 0) return null;
+    return Math.round(
+      answered.reduce((sum, card) => sum + Math.max(0, card.accuracyPercent ?? 0), 0) / answered.length
+    );
+  }, [cards]);
   const classInsight = useMemo(
     () =>
       buildLiveClassInsight(
@@ -616,31 +596,41 @@ export default function LiveClassPanel({
                   See who is working right now, who needs support, and who is idle.
                 </p>
               </div>
-              <label className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700">
-                <input
-                  type="checkbox"
-                  checked={spotlightMode}
-                  onChange={(event) => setSpotlightMode(event.target.checked)}
-                  className="h-4 w-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
-                />
-                Spotlight Mode
-              </label>
+              <div className="flex items-center gap-2">
+                <label className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700">
+                  <input
+                    type="checkbox"
+                    checked={activeOnly}
+                    onChange={(event) => setActiveOnly(event.target.checked)}
+                    className="h-4 w-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
+                  />
+                  Active only
+                </label>
+                <label className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700">
+                  <input
+                    type="checkbox"
+                    checked={spotlightMode}
+                    onChange={(event) => setSpotlightMode(event.target.checked)}
+                    className="h-4 w-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
+                  />
+                  Spotlight
+                </label>
+              </div>
             </div>
 
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              {[
-                { label: "Active Now", value: activeStudentCount, tone: "text-emerald-700" },
-                { label: "Needs Support", value: statusCounts.needs_support, tone: "text-rose-700" },
-                { label: "Idle", value: statusCounts.idle, tone: "text-slate-600" },
-                { label: "Waiting To Start", value: statusCounts.waiting_to_start, tone: "text-slate-500" },
-              ].map((item) => (
-                <div key={item.label} className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                  <div className="text-[11px] font-mono font-bold uppercase tracking-[0.18em] text-slate-500">
-                    {item.label}
-                  </div>
-                  <div className={`mt-2 text-3xl font-black ${item.tone}`}>{item.value}</div>
-                </div>
-              ))}
+            {/* Compact class total — not another set of big widgets */}
+            <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-bold">
+              <span className="inline-flex items-center gap-1.5 text-emerald-700">
+                <span className="h-2 w-2 rounded-full bg-emerald-500" />{activeStudentCount} active
+              </span>
+              <span className="text-slate-300">·</span>
+              <span className="inline-flex items-center gap-1.5 text-rose-700">
+                <span className="h-2 w-2 rounded-full bg-rose-500" />{statusCounts.needs_support} need help
+              </span>
+              <span className="text-slate-300">·</span>
+              <span className="text-slate-600">{classAccuracy == null ? "—" : `${classAccuracy}%`} class accuracy</span>
+              <span className="text-slate-300">·</span>
+              <span className="text-slate-500">{statusCounts.idle} idle</span>
             </div>
           </div>
 
@@ -691,128 +681,50 @@ export default function LiveClassPanel({
             No students match the current filter yet.
           </div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {filteredCards.map((card) => {
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_10px_28px_-16px_rgba(15,23,42,0.18)]">
+            {filteredCards.map((card, idx) => {
               const displayGroup = getCardDisplayGroup(card);
-              const tone = getCardTone(displayGroup);
+              const meta = rowStatusMeta(card, displayGroup);
               const answered = Math.max(0, card.questionsAnswered ?? 0);
               const correct = Math.max(0, card.correctCount ?? 0);
-              const accuracy = answered > 0 ? Math.max(0, card.accuracyPercent ?? 0) : 0;
+              const accuracy = answered > 0 ? Math.max(0, card.accuracyPercent ?? 0) : null;
               return (
                 <button
                   key={card.id}
                   type="button"
                   onClick={() => setSelectedStudentId(card.id)}
-                  className={`group rounded-3xl border p-4 text-left shadow-[0_14px_36px_rgba(15,23,42,0.07)] transition hover:-translate-y-0.5 hover:shadow-[0_18px_48px_rgba(15,23,42,0.12)] ${tone.border}`}
+                  className={[
+                    "grid w-full grid-cols-[1.6fr_2fr_0.7fr_0.7fr_0.9fr] items-center gap-3 px-4 py-2.5 text-left transition hover:bg-slate-50",
+                    idx > 0 ? "border-t border-slate-100" : "",
+                  ].join(" ")}
+                  title="Open student detail"
                 >
-                  {/* Header: name + badges */}
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <div className="text-lg font-black text-slate-900">{card.displayName}</div>
-                        {card.workingLevelBadge ? (
-                          <span className="inline-flex items-center rounded-full border border-teal-200 bg-teal-50 px-2.5 py-1 text-[11px] font-black uppercase tracking-[0.12em] text-teal-700">
-                            {card.workingLevelBadge}
-                          </span>
-                        ) : null}
-                      </div>
-                      <div className="mt-1 text-sm text-slate-500">
-                        {card.currentLessonTitle ?? formatLocation(card)}
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-end gap-1.5">
-                      <span className={`inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-[11px] font-bold ${tone.badge}`}>
-                        <span className={`h-2 w-2 rounded-full ${tone.dot}`} />
-                        {getDisplayStatusLabel(card, displayGroup)}
-                      </span>
-                      {card.learningState && card.learningState !== "confident" && displayGroup !== "idle" && displayGroup !== "waiting_to_start" ? (() => {
-                        const meta = getLearningStateMeta(card.learningState);
-                        return (
-                          <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-bold ${meta.badge}`}>
-                            <span className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} />
-                            {meta.label}
-                          </span>
-                        );
-                      })() : null}
-                    </div>
+                  {/* status dot + name */}
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${meta.dot}`} />
+                    <span className="truncate text-sm font-bold text-slate-900">{card.displayName}</span>
                   </div>
-
-                  {/* Current lesson score */}
-                  <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3">
-                    <div>
-                      <div className="text-[10px] font-mono font-bold uppercase tracking-[0.18em] text-slate-500">
-                        {card.currentLessonStatus === "completed" ? "Final Lesson Score" : "Current Lesson Score"}
-                      </div>
-                      <div className="mt-1 flex items-end gap-2">
-                        <span className="text-3xl font-black leading-none text-slate-900">
-                          {correct}/{answered}
-                        </span>
-                        <span className="pb-0.5 text-[11px] font-bold text-slate-500">correct</span>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-[10px] font-mono font-bold uppercase tracking-[0.18em] text-slate-500">
-                        {card.currentLessonStatus === "completed" ? "Final Accuracy" : "Accuracy"}
-                      </div>
-                      <span className={`mt-1 inline-flex rounded-full px-2.5 py-1 text-sm font-black ${
-                        card.currentLessonStatus === "completed"
-                          ? "bg-slate-100 text-slate-700"
-                          : accuracy >= 80
-                          ? "bg-emerald-50 text-emerald-700"
-                          : accuracy >= 60
-                          ? "bg-amber-50 text-amber-700"
-                          : "bg-rose-50 text-rose-700"
-                      }`}>
-                        {accuracy}%
-                      </span>
-                    </div>
-                    {formatLessonTimer(card.lessonStartedAt, now) ? (
-                      <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-bold text-slate-500 tabular-nums">
-                        {formatLessonTimer(card.lessonStartedAt, now)}
-                      </span>
-                    ) : null}
-                  </div>
-
-                  {/* Current question */}
-                  <div className="mt-3 grid gap-1.5 text-sm">
-                    <div className="font-semibold text-slate-700">
-                      {card.currentLesson ? card.currentLesson.replace(/^.*-/, "").toUpperCase() : "No lesson yet"}
-                    </div>
-                    <div className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">
-                      {displayGroup === "waiting_to_start"
-                        ? "Waiting To Start"
-                        : card.currentLessonStatus === "completed"
-                        ? "Lesson complete"
-                        : card.progressLabel ?? formatLocation(card)}
-                    </div>
-                    <div className="font-semibold text-slate-700">
-                      {displayGroup === "waiting_to_start"
-                        ? "No activity or lesson telemetry yet"
-                        : card.currentLessonStatus === "completed"
-                        ? "Ready for next lesson / quiz"
-                        : (card.currentActivityLabel ?? "No activity yet")}
-                    </div>
-                    <div className="line-clamp-2 text-slate-500 text-xs">
-                      {displayGroup === "waiting_to_start"
-                        ? "This student has not opened a live lesson or quiz yet."
-                        : card.currentLessonStatus === "completed"
-                        ? `${card.currentLessonTitle ?? card.currentLesson ?? "Lesson"} completed`
-                        : (card.currentQuestionText ?? card.lastEventText)}
-                    </div>
-                  </div>
-
-                  {/* Footer: last event + time */}
-                  <div className="mt-3 flex items-center justify-between text-xs text-slate-400">
-                    <span>{displayGroup === "waiting_to_start" ? "No live activity yet" : card.currentLessonStatus === "completed" ? "Completed lesson" : card.lastEventText}</span>
-                    <span>{getDisplayStatusSubtext(card, displayGroup)}</span>
-                  </div>
-
-                  {/* AI insight — alert states only */}
-                  {card.aiIssue && displayGroup !== "live" && displayGroup !== "waiting_to_start" ? (
-                    <div className={`mt-3 rounded-xl border px-3 py-2 text-xs font-semibold ${tone.badge}`}>
-                      {card.aiIssue}
-                    </div>
-                  ) : null}
+                  {/* location: NN · LVL 3 · W1 · L2 */}
+                  <span className="truncate text-xs font-semibold text-slate-500">
+                    {displayGroup === "waiting_to_start" ? "Not started yet" : compactLocation(card)}
+                  </span>
+                  {/* score */}
+                  <span className="text-right text-sm font-bold tabular-nums text-slate-700">
+                    {answered > 0 ? `${correct}/${answered}` : "—"}
+                  </span>
+                  {/* accuracy */}
+                  <span className={`text-right text-sm font-black tabular-nums ${
+                    accuracy == null ? "text-slate-300"
+                    : accuracy >= 70 ? "text-emerald-700"
+                    : accuracy >= 50 ? "text-amber-700"
+                    : "text-rose-700"
+                  }`}>
+                    {accuracy == null ? "—" : `${accuracy}%`}
+                  </span>
+                  {/* last active */}
+                  <span className="text-right text-[11px] font-semibold text-slate-400">
+                    {getDisplayStatusSubtext(card, displayGroup)}
+                  </span>
                 </button>
               );
             })}
