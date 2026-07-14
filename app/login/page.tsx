@@ -572,7 +572,7 @@ export default function LoginPage() {
       });
       setShowDemoModal(false);
       setDemoCode("");
-      router.push("/levels");
+      router.push("/realms");
     } catch {
       setDemoError("Demo access could not be activated.");
     } finally {

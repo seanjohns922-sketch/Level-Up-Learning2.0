@@ -18,7 +18,7 @@ export default function Page() {
     async function routeUser() {
       if (typeof window !== "undefined") {
         if (isDemoPreviewMode()) {
-          if (!cancelled) router.replace("/levels");
+          if (!cancelled) router.replace("/realms");
           return;
         }
         const activeStudentId = window.localStorage.getItem(ACTIVE_STUDENT_KEY)?.trim();
