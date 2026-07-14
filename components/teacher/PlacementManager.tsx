@@ -311,15 +311,6 @@ export default function PlacementManager({
                   <option key={y} value={y}>{y}</option>
                 ))}
               </select>
-              {pendingCount > 0 ? (
-                <button
-                  onClick={savePlacements}
-                  disabled={saving}
-                  className="ml-auto rounded-lg bg-[#F59E0B] px-4 py-2 text-sm font-extrabold text-[#0F172A] hover:bg-[#FBBF24] disabled:opacity-60"
-                >
-                  {saving ? "Saving…" : `Save Placements (${pendingCount})`}
-                </button>
-              ) : null}
             </div>
 
             {/* Table */}
@@ -401,6 +392,22 @@ export default function PlacementManager({
           </div>
         )}
       </div>
+
+      {/* Persistent save bar (per-realm view) */}
+      {realmId ? (
+        <div className="flex items-center justify-between gap-3 border-t border-[#E6E8EC] bg-white px-6 py-3">
+          <span className="text-sm font-semibold text-[#64748B]">
+            {pendingCount > 0 ? `${pendingCount} change${pendingCount === 1 ? "" : "s"} ready to save` : "No changes to save"}
+          </span>
+          <button
+            onClick={savePlacements}
+            disabled={saving || pendingCount === 0}
+            className="rounded-lg bg-[#F59E0B] px-5 py-2.5 text-sm font-extrabold text-[#0F172A] transition hover:bg-[#FBBF24] disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {saving ? "Saving…" : pendingCount > 0 ? `Save Placements (${pendingCount})` : "Save Placements"}
+          </button>
+        </div>
+      ) : null}
 
       {/* Destructive: reset this realm — typed confirmation */}
       {resetRealmFor ? (
