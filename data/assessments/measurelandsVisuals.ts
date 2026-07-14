@@ -230,10 +230,10 @@ export function deriveMeasurelandsAssessmentVisual(q: Q): MzVisual | undefined {
     return { kind: "rectangle", w: 4, h: 3, mode: "perimeter", sample: true }; // "what is perimeter" → a sample edge
   }
 
-  // ── Temperature ── the two GIVEN temps for a difference; else a neutral thermometer.
+  // ── Temperature ── all Y4 temperature questions are compare/arithmetic with the
+  // values in the text; a tall thermometer neither fits one screen nor points at
+  // an answer, so use a compact topic crest.
   if (has(skill, "temperature")) {
-    const t = nums(promptA).filter((n) => n <= 60);
-    if (has(skill, "difference") && t.length >= 2) return { kind: "thermometer", from: Math.min(t[0], t[1]), value: Math.max(t[0], t[1]) };
     return concept("thermometer", "Temperature");
   }
 

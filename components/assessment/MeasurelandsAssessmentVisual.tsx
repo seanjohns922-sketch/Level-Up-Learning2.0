@@ -18,11 +18,14 @@ const INK = "#4a3611";
 const GOLD_DEEP = "#9a7328";
 const GOLD = "#c79a3e";
 
+// Assessment visuals must stay COMPACT so the question + visual + all options fit
+// one screen (no scrolling). The inner box caps every visual — SVG instruments
+// scale down to fit ~132px tall.
 function Panel({ label, children }: { label?: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-[22px] border px-4 py-4" style={{ borderColor: "rgba(184,137,58,0.4)", background: "linear-gradient(150deg,#fdf6e6,#f7ecd2)" }}>
-      {label ? <div className="mb-2 text-[11px] font-black uppercase tracking-[0.18em]" style={{ color: GOLD_DEEP }}>{label}</div> : null}
-      <div className="flex items-center justify-center">{children}</div>
+    <div className="rounded-[20px] border px-4 py-3" style={{ borderColor: "rgba(184,137,58,0.4)", background: "linear-gradient(150deg,#fdf6e6,#f7ecd2)" }}>
+      {label ? <div className="mb-1.5 text-[11px] font-black uppercase tracking-[0.18em]" style={{ color: GOLD_DEEP }}>{label}</div> : null}
+      <div className="flex items-center justify-center [&_svg]:max-h-[132px] [&_svg]:w-auto">{children}</div>
     </div>
   );
 }
@@ -77,22 +80,19 @@ function Objects({ items, caption }: { items: Array<{ label: string; emoji: stri
 }
 
 const CONCEPT_ICON: Record<string, string> = {
-  ruler: "📏", clock: "🕐", calendar: "📅", duration: "⏱️", convert: "🔁", tools: "🛠️",
-  angle: "📐", area: "▦", volume: "🧊", perimeter: "🔲",
+  ruler: "📏", scale: "⚖️", jug: "🧪", thermometer: "🌡️", clock: "🕐", calendar: "📅",
+  duration: "⏱️", convert: "🔁", tools: "🛠️", angle: "📐", area: "▦", volume: "🧊", perimeter: "🔲",
 };
-// Concept cards reuse the REAL instrument (shown neutral) where one reads fine
-// empty — scale / jug / thermometer. A ruler needs an object to look right, so
-// ruler & abstract concepts use a premium gold-ringed crest instead.
+// A conceptual question ("which is warmest?", "which unit?", "what is precise?")
+// has no single reading to show — a big neutral instrument would be misleading
+// and too tall. Use a compact gold-ringed topic crest instead.
 function Concept({ icon, label }: { icon: string; label: string }) {
-  if (icon === "scale") return <MeasurelandsScale value={0} unit="kg" max={5} majorStep={1} minorStep={0.5} size={210} />;
-  if (icon === "jug") return <MeasurelandsJug value={0} unit="L" max={2} majorStep={1} minorStep={0.5} size={190} />;
-  if (icon === "thermometer") return <MeasurelandsThermometer value={22} max={50} size={140} />;
   return (
-    <div className="flex items-center gap-4 py-2">
-      <div className="flex h-16 w-16 items-center justify-center rounded-full" style={{ background: "#fff8e8", border: `2px solid ${GOLD}` }}>
-        <span className="text-4xl">{CONCEPT_ICON[icon] ?? "📐"}</span>
+    <div className="flex items-center gap-3 py-1">
+      <div className="flex h-14 w-14 items-center justify-center rounded-full" style={{ background: "#fff8e8", border: `2px solid ${GOLD}` }}>
+        <span className="text-3xl">{CONCEPT_ICON[icon] ?? "📐"}</span>
       </div>
-      <div className="text-xl font-black" style={{ color: INK }}>{label}</div>
+      <div className="text-lg font-black" style={{ color: INK }}>{label}</div>
     </div>
   );
 }
