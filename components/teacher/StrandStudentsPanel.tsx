@@ -954,6 +954,22 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
   type SortKey = "name" | "lastName" | "schoolYear" | "workingLevel" | "week" | "status" | "tower";
   const [sortKey, setSortKey] = useState<SortKey>("name");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+  // Class Insight is collapsible; remember each teacher's preference.
+  const [insightCollapsed, setInsightCollapsed] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return window.localStorage.getItem("lul_teacher_insight_collapsed") === "1";
+  });
+  function toggleInsight() {
+    setInsightCollapsed((prev) => {
+      const next = !prev;
+      try {
+        window.localStorage.setItem("lul_teacher_insight_collapsed", next ? "1" : "0");
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+  }
 
   function toggleSort(k: SortKey) {
     if (sortKey === k) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
@@ -1119,27 +1135,42 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
       )}
 
       <div className="grid grid-cols-1 gap-4">
-        <div className="relative overflow-hidden rounded-2xl p-5 bg-white border border-[#E6E8EC] shadow-[0_4px_18px_-12px_rgba(15,23,42,0.18)]">
+        <div className={`relative overflow-hidden rounded-2xl bg-white border border-[#E6E8EC] shadow-[0_4px_18px_-12px_rgba(15,23,42,0.18)] ${insightCollapsed ? "px-5 py-3" : "p-5"}`}>
           <div className="absolute inset-y-0 left-0 w-[3px] bg-[#00C2A8] shadow-[0_0_14px_1px_rgba(0,229,195,0.45)]" />
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2">
             <span className="text-[10px] font-extrabold text-[#0A2F2A] uppercase tracking-[0.18em]">
               Class Insight
             </span>
             <span className="h-1.5 w-1.5 rounded-full bg-[#00E5C3] shadow-[0_0_6px_rgba(0,229,195,0.8)]" />
             <span className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider">planning</span>
+            {insightCollapsed ? (
+              <span className="ml-1 truncate text-[11px] font-semibold text-[#64748B]">· {classInsight.title}</span>
+            ) : null}
+            <button
+              type="button"
+              onClick={toggleInsight}
+              className="ml-auto shrink-0 rounded-md px-2 py-1 text-[11px] font-bold text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A]"
+              title={insightCollapsed ? "Show class insight" : "Hide class insight"}
+            >
+              {insightCollapsed ? "Show" : "Hide"}
+            </button>
           </div>
-          <div className="text-2xl font-black text-[#0F172A] tracking-tight leading-snug">
-            {classInsight.title}
-          </div>
-          <div className="mt-2 text-base font-bold text-[#0A2F2A]">
-            {classInsight.headline}
-          </div>
-          <div className="mt-3 text-sm font-medium text-[#475569] tracking-wide">
-            {classInsight.detail}
-          </div>
-          <div className="mt-3 text-sm font-semibold text-[#0F172A]">
-            Suggested Action: {classInsight.action}
-          </div>
+          {insightCollapsed ? null : (
+            <>
+              <div className="mt-2 text-2xl font-black text-[#0F172A] tracking-tight leading-snug">
+                {classInsight.title}
+              </div>
+              <div className="mt-2 text-base font-bold text-[#0A2F2A]">
+                {classInsight.headline}
+              </div>
+              <div className="mt-3 text-sm font-medium text-[#475569] tracking-wide">
+                {classInsight.detail}
+              </div>
+              <div className="mt-3 text-sm font-semibold text-[#0F172A]">
+                Suggested Action: {classInsight.action}
+              </div>
+            </>
+          )}
         </div>
       </div>
 
