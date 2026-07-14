@@ -92,19 +92,29 @@ function pickEmoji(label: string): string {
   const e = emojiFor(label);
   return e !== "📦" ? e : unitEmoji(label);
 }
+// Object cards may ONLY be used when EVERY item maps to a real image. If any
+// item would fall back to a generic box (e.g. a duration like "30 minutes"),
+// return undefined so the caller shows a topic crest instead — never a box that
+// doesn't match the question.
+function recognizedItems(labels: string[]): Array<{ label: string; emoji: string }> | undefined {
+  const items = labels.map((l) => ({ label: l, emoji: pickEmoji(l) }));
+  return items.length >= 2 && items.every((it) => it.emoji !== "📦") ? items : undefined;
+}
 // Two labelled instrument cards for a genuine two-item comparison (exactly two
 // numeric OPTIONS, the rest decoys). Shows the two GIVEN measurements as cards —
 // no magnitude bar, so it never points at the answer.
 function compareCards(q: Q): MzVisual | undefined {
   const numeric = optionLabels(q).filter((l) => /\d/.test(l));
   if (numeric.length !== 2) return undefined;
-  return { kind: "objects", items: numeric.map((l) => ({ label: l, emoji: pickEmoji(l) })), caption: "Compare the measurements" };
+  const items = recognizedItems(numeric);
+  return items ? { kind: "objects", items, caption: "Compare the measurements" } : undefined;
 }
 // Same, from a measured PROMPT that names two quantities.
 function promptCards(q: Q): MzVisual | undefined {
   const found = measurementsIn(q.prompt ?? "");
   if (found.length !== 2) return undefined;
-  return { kind: "objects", items: found.map((f) => ({ label: f.label, emoji: pickEmoji(f.label) })), caption: "Compare the measurements" };
+  const items = recognizedItems(found.map((f) => f.label));
+  return items ? { kind: "objects", items, caption: "Compare the measurements" } : undefined;
 }
 
 // Time words → an analog clock position. Handles "half past 3", "quarter to 5",
@@ -283,8 +293,9 @@ export function deriveMeasurelandsAssessmentVisual(q: Q): MzVisual | undefined {
     if (has(skill, "compare", "order", "height")) {
       const cards = compareCards(q);
       if (cards) return cards;
-      const labels = optionLabels(q).slice(0, 4);
-      if (labels.length && !labels.some((l) => /\d/.test(l) || l.includes(","))) return { kind: "objects", items: labels.map((l) => ({ label: l, emoji: emojiFor(l) })) };
+      const labels = optionLabels(q).slice(0, 4).filter((l) => !l.includes(","));
+      const items = recognizedItems(labels);
+      if (items) return { kind: "objects", items };
     }
     return concept("ruler", "Length");
   }
@@ -294,12 +305,12 @@ export function deriveMeasurelandsAssessmentVisual(q: Q): MzVisual | undefined {
   if (has(skill, "elapsed", "advanced_time", "timetable", "time_problems", "compare_times")) {
     return concept("duration", "Elapsed Time");
   }
-  // ── Time of day / duration comparisons ── real activity/time-of-day cards.
+  // ── Time of day / duration comparisons ── real activity/time-of-day cards, but
+  // only when the options are recognisable things (not durations like "45 min").
   if (has(skill, "time_of_day", "duration")) {
-    const labels = optionLabels(q).slice(0, 4).filter((l) => !/^\d+$/.test(l.trim()));
-    if (labels.length >= 2 && labels.every((l) => l.length <= 22 && !l.includes(","))) {
-      return { kind: "objects", items: labels.map((l) => ({ label: l, emoji: emojiFor(l) })) };
-    }
+    const labels = optionLabels(q).slice(0, 4).filter((l) => l.length <= 22 && !l.includes(","));
+    const items = recognizedItems(labels);
+    if (items) return { kind: "objects", items };
     return concept("duration", "Duration");
   }
   // ── Calendar / weeks / months / days / sequencing ── a calendar crest (these

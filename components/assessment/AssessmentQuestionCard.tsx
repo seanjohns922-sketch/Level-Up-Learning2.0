@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import { FractionText, MathFormattedText } from "@/components/FractionText";
+import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import DecimalModelVisual from "@/components/activities/DecimalModelVisual";
 import RuleBoxVisual from "@/components/activities/RuleBoxVisual";
 import BestBuyCardComparisonVisual from "@/components/activities/BestBuyCardComparisonVisual";
@@ -669,13 +670,15 @@ export default function AssessmentQuestionCard({
             type="button"
             onClick={() => onChange(String(optionId ?? label))}
             className={[
-              "text-left rounded-2xl border p-5 transition font-semibold text-white",
+              "flex items-center justify-between gap-3 text-left rounded-2xl border p-5 transition font-semibold text-white",
               isSelected
                 ? selectedCard
                 : "border-slate-600 bg-slate-700/50 hover:bg-slate-700 hover:border-slate-500",
             ].join(" ")}
           >
             <MathFormattedText text={String(label)} compactFractions />
+            {/* Per-option voiceover so children can hear each answer read aloud. */}
+            <OptionReadAloudButton text={String(label)} className="shrink-0" />
           </button>
         );
       })}

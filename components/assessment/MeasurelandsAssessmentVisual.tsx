@@ -25,7 +25,7 @@ function Panel({ label, children }: { label?: string; children: React.ReactNode 
   return (
     <div className="rounded-[20px] border px-4 py-3" style={{ borderColor: "rgba(184,137,58,0.4)", background: "linear-gradient(150deg,#fdf6e6,#f7ecd2)" }}>
       {label ? <div className="mb-1.5 text-[11px] font-black uppercase tracking-[0.18em]" style={{ color: GOLD_DEEP }}>{label}</div> : null}
-      <div className="flex items-center justify-center [&_svg]:max-h-[132px] [&_svg]:w-auto">{children}</div>
+      <div className="flex items-center justify-center [&_svg]:max-h-[168px] [&_svg]:w-auto">{children}</div>
     </div>
   );
 }
