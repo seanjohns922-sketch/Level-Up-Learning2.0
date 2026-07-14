@@ -525,3 +525,47 @@ export async function fetchNumberCompatProgressForClass(classId: string, student
 export async function fetchNumberCompatProgressForStudent(studentId: string) {
   return fetchRealmCompatProgressForStudent("number", studentId);
 }
+
+// ── Teacher placement & reset write-path (RPCs from 20260714120000) ─────────
+// Teacher intent is kept separate from live progress. Each RPC verifies the
+// teacher owns the student's class and writes a teacher_realm_actions audit row.
+export type PlacementEntryMode = "pretest" | "full_level" | "ground_week1";
+
+export async function teacherChangeStartingLevel(
+  studentId: string,
+  realmId: string,
+  assignedLevel: string,
+  entryMode: PlacementEntryMode = "pretest",
+) {
+  const { error } = await supabase.rpc("teacher_change_starting_level", {
+    p_student_id: studentId,
+    p_realm_id: realmId,
+    p_assigned_level: assignedLevel,
+    p_entry_mode: entryMode,
+  });
+  if (error) throw error;
+}
+
+export async function teacherResetPretest(studentId: string, realmId: string) {
+  const { error } = await supabase.rpc("teacher_reset_pretest", {
+    p_student_id: studentId,
+    p_realm_id: realmId,
+  });
+  if (error) throw error;
+}
+
+export async function teacherResetWeek(studentId: string, realmId: string) {
+  const { error } = await supabase.rpc("teacher_reset_week", {
+    p_student_id: studentId,
+    p_realm_id: realmId,
+  });
+  if (error) throw error;
+}
+
+export async function teacherResetRealm(studentId: string, realmId: string) {
+  const { error } = await supabase.rpc("teacher_reset_realm", {
+    p_student_id: studentId,
+    p_realm_id: realmId,
+  });
+  if (error) throw error;
+}
