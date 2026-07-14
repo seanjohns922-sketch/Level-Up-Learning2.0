@@ -1,11 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowLeft, ChevronRight, Lock, Users, X } from "lucide-react";
+import { ArrowLeft, ChevronRight, Lock, MoreHorizontal, Users, X } from "lucide-react";
 import { LEVEL_CATALOG } from "@/lib/level-catalog";
 import {
   fetchRealmCompatProgressForClass,
   teacherChangeStartingLevel,
+  teacherResetPretest,
+  teacherResetRealm,
+  teacherResetWeek,
   type CompatProgressRow,
   type PlacementEntryMode,
 } from "@/lib/realm-progress-compat";
@@ -159,6 +162,45 @@ export default function PlacementManager({
     }
   }
 
+  // ── Reset actions (each explicit, confirmed, audited server-side) ──────────
+  const [menuFor, setMenuFor] = useState<string | null>(null);
+  const [resetRealmFor, setResetRealmFor] = useState<PMStudent | null>(null);
+  const [resetConfirmText, setResetConfirmText] = useState("");
+  const [busyStudent, setBusyStudent] = useState<string | null>(null);
+
+  async function runReset(studentId: string, fn: () => Promise<void>) {
+    setMenuFor(null);
+    setBusyStudent(studentId);
+    try {
+      await fn();
+      await load();
+    } catch (err) {
+      console.warn("[PlacementManager] reset failed", err);
+      alert("Could not complete that action. Please try again.");
+    } finally {
+      setBusyStudent(null);
+    }
+  }
+
+  function onResetPretest(s: PMStudent) {
+    if (!realmId) return;
+    if (!window.confirm(`Reset ${s.display_name}'s pre-test for ${activeRealm?.name}?\n\nThis clears the pre-test attempt and the pathway it generated, and returns them to "Ready for Pre-Test". Completed lesson history is kept.`)) return;
+    void runReset(s.id, () => teacherResetPretest(s.id, realmId));
+  }
+  function onResetWeek(s: PMStudent) {
+    if (!realmId) return;
+    if (!window.confirm(`Reset ${s.display_name}'s current week to Week 1 for ${activeRealm?.name}?\n\nThis moves the week pointer only — lesson, quiz and assessment records are preserved.`)) return;
+    void runReset(s.id, () => teacherResetWeek(s.id, realmId));
+  }
+  function confirmResetRealm() {
+    const s = resetRealmFor;
+    if (!s || !realmId) return;
+    if (resetConfirmText.trim().toUpperCase() !== "RESET") return;
+    void runReset(s.id, () => teacherResetRealm(s.id, realmId));
+    setResetRealmFor(null);
+    setResetConfirmText("");
+  }
+
   const activeRealm = PLACEMENT_REALMS.find((r) => r.id === realmId);
 
   return (
@@ -282,12 +324,13 @@ export default function PlacementManager({
 
             {/* Table */}
             <div className="overflow-hidden rounded-2xl border border-[#E6E8EC] bg-white">
-              <div className="grid grid-cols-[1.6fr_0.8fr_1.2fr_1.3fr_1.3fr] gap-3 border-b border-[#E6E8EC] bg-[#F8FAFC] px-5 py-3 text-[10px] font-extrabold uppercase tracking-[0.12em] text-[#94A3B8]">
+              <div className="grid grid-cols-[1.6fr_0.7fr_1.1fr_1.2fr_1.2fr_0.4fr] gap-3 border-b border-[#E6E8EC] bg-[#F8FAFC] px-5 py-3 text-[10px] font-extrabold uppercase tracking-[0.12em] text-[#94A3B8]">
                 <span>Student</span>
                 <span>School Year</span>
                 <span>Assigned Start</span>
                 <span>Entry Method</span>
                 <span>Current Progress</span>
+                <span className="text-right">Actions</span>
               </div>
               {visibleStudents.length === 0 ? (
                 <div className="px-5 py-10 text-center text-sm text-[#64748B]">No students match this filter.</div>
@@ -300,7 +343,7 @@ export default function PlacementManager({
                   return (
                     <div
                       key={s.id}
-                      className={`grid grid-cols-[1.6fr_0.8fr_1.2fr_1.3fr_1.3fr] items-center gap-3 border-b border-[#F1F5F9] px-5 py-2.5 last:border-0 ${changed ? "bg-amber-50/50" : ""}`}
+                      className={`grid grid-cols-[1.6fr_0.7fr_1.1fr_1.2fr_1.2fr_0.4fr] items-center gap-3 border-b border-[#F1F5F9] px-5 py-2.5 last:border-0 ${changed ? "bg-amber-50/50" : ""}`}
                     >
                       <span className="truncate text-sm font-bold text-[#0F172A]">{s.display_name}</span>
                       <span className="text-xs font-bold text-[#475569]">{schoolYearOf(s)}</span>
@@ -325,6 +368,27 @@ export default function PlacementManager({
                       <span className="text-xs font-semibold text-[#64748B]">
                         {cur ? `Currently ${levelLabel(cur.year)}${cur.week ? ` · W${cur.week}` : ""}` : "No progress yet"}
                       </span>
+                      <div className="relative flex justify-end">
+                        <button
+                          onClick={() => setMenuFor((m) => (m === s.id ? null : s.id))}
+                          disabled={busyStudent === s.id}
+                          className="flex h-7 w-7 items-center justify-center rounded-lg text-[#94A3B8] hover:bg-[#F1F5F9] hover:text-[#475569] disabled:opacity-50"
+                          aria-label="Student actions"
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                        </button>
+                        {menuFor === s.id ? (
+                          <>
+                            <div className="fixed inset-0 z-10" onClick={() => setMenuFor(null)} />
+                            <div className="absolute right-0 top-8 z-20 w-52 overflow-hidden rounded-xl border border-[#E6E8EC] bg-white py-1 shadow-[0_12px_32px_-12px_rgba(15,23,42,0.35)]">
+                              <button onClick={() => onResetPretest(s)} className="block w-full px-3 py-2 text-left text-sm font-semibold text-[#475569] hover:bg-[#F8FAFC]">Reset pre-test</button>
+                              <button onClick={() => onResetWeek(s)} className="block w-full px-3 py-2 text-left text-sm font-semibold text-[#475569] hover:bg-[#F8FAFC]">Reset current week</button>
+                              <div className="my-1 h-px bg-[#F1F5F9]" />
+                              <button onClick={() => { setMenuFor(null); setResetRealmFor(s); setResetConfirmText(""); }} className="block w-full px-3 py-2 text-left text-sm font-bold text-[#DC2626] hover:bg-[#FEF2F2]">Reset this realm…</button>
+                            </div>
+                          </>
+                        ) : null}
+                      </div>
                     </div>
                   );
                 })
@@ -337,6 +401,42 @@ export default function PlacementManager({
           </div>
         )}
       </div>
+
+      {/* Destructive: reset this realm — typed confirmation */}
+      {resetRealmFor ? (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <h3 className="text-lg font-black text-[#0F172A]">Reset {activeRealm?.name} for {resetRealmFor.display_name}?</h3>
+            <p className="mt-2 text-sm text-[#475569]">
+              This permanently clears this student&apos;s <strong>{activeRealm?.name}</strong> progress, assessments and
+              unlocks. Other realms are not affected. This cannot be undone.
+            </p>
+            <label className="mt-4 block text-xs font-bold uppercase tracking-wide text-[#94A3B8]">Type RESET to confirm</label>
+            <input
+              value={resetConfirmText}
+              onChange={(e) => setResetConfirmText(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-[#E6E8EC] px-3 py-2 text-sm font-semibold text-[#0F172A]"
+              placeholder="RESET"
+              autoFocus
+            />
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                onClick={() => { setResetRealmFor(null); setResetConfirmText(""); }}
+                className="rounded-lg border border-[#E6E8EC] px-4 py-2 text-sm font-bold text-[#475569] hover:bg-[#F1F5F9]"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmResetRealm}
+                disabled={resetConfirmText.trim().toUpperCase() !== "RESET"}
+                className="rounded-lg bg-[#DC2626] px-4 py-2 text-sm font-extrabold text-white hover:bg-[#B91C1C] disabled:opacity-40"
+              >
+                Reset realm
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
