@@ -30,6 +30,41 @@ export type MzVisual =
   | { kind: "objects"; items: Array<{ label: string; emoji: string }>; caption?: string }
   | { kind: "concept"; icon: string; label: string; sub?: string };
 
+const DESCRIPTOR_PREFIXES = [
+  "short",
+  "long",
+  "tiny",
+  "small",
+  "little",
+  "big",
+  "tall",
+  "large",
+];
+
+export function objectBaseNameForLabel(label: string): string {
+  const words = label
+    .trim()
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean);
+  while (words.length > 1 && DESCRIPTOR_PREFIXES.includes(words[0] ?? "")) {
+    words.shift();
+  }
+  return words.join(" ");
+}
+
+export function visualScaleForLabel(label: string): number {
+  const l = label.toLowerCase();
+  if (/\btiny\b|\blittle\b/.test(l)) return 0.56;
+  if (/\bsmall\b|\bshort\b/.test(l)) return 0.7;
+  if (/\bbig\b|\blong\b|\btall\b|\blarge\b/.test(l)) return 1.12;
+  if (/\bbaby\b/.test(l)) return 0.62;
+  if (/\bteacher\b|\badult\b/.test(l)) return 1.14;
+  if (/\bcat\b/.test(l)) return 0.78;
+  if (/\bbook\b/.test(l)) return 0.72;
+  return 0.9;
+}
+
 type Q = {
   prompt: string;
   options?: unknown[];
@@ -164,10 +199,11 @@ const EMOJI: Array<[RegExp, string]> = [
   [/clap/, "👏"], [/jump/, "🤸"], [/sleep/, "😴"], [/movie|watch/, "🎬"], [/read/, "📖"],
   [/wash/, "🧼"], [/wake/, "🌅"], [/lunch|dinner|eat/, "🍽️"], [/bed/, "🛏️"], [/brush/, "🪥"],
   [/school/, "🏫"], [/camp/, "⛺"], [/train/, "🚆"], [/bus/, "🚌"], [/flight|plane/, "✈️"],
+  [/teacher/, "🧑‍🏫"], [/baby/, "👶"], [/cat/, "🐈"], [/person|child/, "🧒"],
   [/morning/, "🌅"], [/afternoon/, "☀️"], [/evening/, "🌆"], [/night/, "🌙"],
 ];
-function emojiFor(label: string): string {
-  const l = label.toLowerCase();
+export function emojiFor(label: string): string {
+  const l = objectBaseNameForLabel(label);
   for (const [re, e] of EMOJI) if (re.test(l)) return e;
   return "📦";
 }

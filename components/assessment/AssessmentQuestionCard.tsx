@@ -12,7 +12,13 @@ import InputOutputTableVisual from "@/components/activities/InputOutputTableVisu
 import FunctionMachineCardVisual from "@/components/activities/FunctionMachineCardVisual";
 import { BalanceEquationCardVisual } from "@/components/activities/EquationVisualCards";
 import MeasurelandsAssessmentVisual from "@/components/assessment/MeasurelandsAssessmentVisual";
+import { MeasurelandsObjectArt } from "@/components/measurelands/MeasurelandsObjectArt";
 import type { MzVisual } from "@/data/assessments/measurelandsVisuals";
+import {
+  emojiFor as measurelandsEmojiFor,
+  objectBaseNameForLabel,
+  visualScaleForLabel,
+} from "@/data/assessments/measurelandsVisuals";
 import { getRealmTheme } from "@/lib/useRealmTheme";
 
 type GenericQuestion = {
@@ -236,6 +242,31 @@ function PrepSpatialSceneVisual({
       })}
     </div>
   );
+}
+
+function measurelandsConceptIcon(label: string): string | null {
+  switch (label.trim().toLowerCase()) {
+    case "length":
+      return "📏";
+    case "mass":
+      return "⚖️";
+    case "capacity":
+      return "🫙";
+    case "duration":
+      return "⏱️";
+    case "morning":
+      return "🌅";
+    case "afternoon":
+      return "☀️";
+    case "night":
+      return "🌙";
+    default:
+      return null;
+  }
+}
+
+function isMeasurelandsVisualOption(label: string) {
+  return measurelandsEmojiFor(label) !== "📦" || measurelandsConceptIcon(label) !== null;
 }
 
 export default function AssessmentQuestionCard({
@@ -657,6 +688,65 @@ export default function AssessmentQuestionCard({
   }
 
   const options = (question.options ?? []) as Array<string | { id?: string; label?: string }>;
+  const useMeasurelandsVisualOptions =
+    theme.isMeasurement &&
+    options.length > 0 &&
+    options.every((option) => {
+      const label = typeof option === "string" ? option : option.label ?? option.id ?? "";
+      return isMeasurelandsVisualOption(String(label));
+    });
+
+  if (useMeasurelandsVisualOptions) {
+    return (
+      <div className="mt-6 grid gap-3">
+        {renderedVisual ? <div className="mb-1">{renderedVisual}</div> : null}
+        <div className="grid gap-3 sm:grid-cols-2">
+          {options.map((option) => {
+            const label = typeof option === "string" ? option : option.label ?? option.id;
+            const optionId = typeof option === "string" ? undefined : option.id;
+            const isSelected = value === label || value === optionId;
+            const conceptIcon = measurelandsConceptIcon(String(label));
+            return (
+              <button
+                key={String(label)}
+                type="button"
+                onClick={() => onChange(String(optionId ?? label))}
+                className={[
+                  "rounded-2xl border px-4 py-4 text-left transition",
+                  isSelected
+                    ? selectedCard
+                    : "border-slate-600 bg-slate-700/50 hover:bg-slate-700 hover:border-slate-500",
+                ].join(" ")}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex min-w-0 flex-1 items-center gap-3">
+                    <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl border border-[#b8893a]/50 bg-[#fff8e8]">
+                      {conceptIcon ? (
+                        <span className="text-4xl" aria-hidden>
+                          {conceptIcon}
+                        </span>
+                      ) : (
+                        <MeasurelandsObjectArt
+                          name={objectBaseNameForLabel(String(label))}
+                          emoji={measurelandsEmojiFor(String(label))}
+                          size={Math.round(56 * visualScaleForLabel(String(label)))}
+                        />
+                      )}
+                    </div>
+                    <div className="min-w-0 text-lg font-semibold text-white">
+                      <MathFormattedText text={String(label)} compactFractions />
+                    </div>
+                  </div>
+                  <OptionReadAloudButton text={String(label)} className="shrink-0" />
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-6 grid gap-3">
       {renderedVisual ? <div className="mb-1">{renderedVisual}</div> : null}

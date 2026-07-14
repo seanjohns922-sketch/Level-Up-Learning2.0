@@ -1,6 +1,7 @@
 "use client";
 
 import type { MzVisual } from "@/data/assessments/measurelandsVisuals";
+import { objectBaseNameForLabel, visualScaleForLabel } from "@/data/assessments/measurelandsVisuals";
 import { MeasurelandsScale } from "@/components/measurelands/MeasurelandsScale";
 import { MeasurelandsJug } from "@/components/measurelands/MeasurelandsJug";
 import { MeasurelandsThermometer } from "@/components/measurelands/MeasurelandsThermometer";
@@ -71,7 +72,11 @@ function Objects({ items, caption }: { items: Array<{ label: string; emoji: stri
     <div className={`grid w-full gap-3 ${items.length <= 2 ? "grid-cols-2" : items.length === 3 ? "grid-cols-3" : "grid-cols-2 sm:grid-cols-4"}`}>
       {items.map((it, i) => (
         <div key={i} className="flex flex-col items-center gap-1 rounded-2xl px-2 py-3 text-center" style={{ background: "#fff8e8", border: `1px solid ${GOLD_DEEP}` }}>
-          <MeasurelandsObjectArt name={it.label} emoji={it.emoji} size={54} />
+          <MeasurelandsObjectArt
+            name={objectBaseNameForLabel(it.label)}
+            emoji={it.emoji}
+            size={Math.round(54 * visualScaleForLabel(it.label))}
+          />
           <span className="text-[12px] font-bold" style={{ color: INK }}>{it.label}</span>
         </div>
       ))}
