@@ -34,5 +34,8 @@ export function resolveStudentDestination(args: {
     return `/pretest?year=${encodeURIComponent(resolvedYear)}`;
   }
 
-  return "/levels";
+  // Realm-first: after placement, students land on the Tower of Knowledge (the
+  // realm selector) — not a level-choice screen. Each realm resolves its own
+  // level and resumes/pre-tests from there.
+  return "/realms";
 }

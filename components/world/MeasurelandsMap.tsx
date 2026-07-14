@@ -870,7 +870,7 @@ export default function MeasurelandsMap({ year = "Prep" }: { year?: Measurelands
       <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", zIndex: 20, display: "flex", flexDirection: "column", gap: 10 }}>
         {[
           { key: "legends", label: "LEGENDS", route: "/legends", icon: <LegendsIcon /> },
-          { key: "worlds", label: "WORLDS", route: "/levels", icon: <WorldsIcon /> },
+          { key: "worlds", label: "WORLDS", route: "/realms", icon: <WorldsIcon /> },
           { key: "progress", label: "PROGRESS", route: "/realm-stats", icon: <ProgressIcon /> },
         ].map(({ key, label, route, icon }) => (
           <button key={key} onClick={() => router.push(route)} style={hudBtn}>

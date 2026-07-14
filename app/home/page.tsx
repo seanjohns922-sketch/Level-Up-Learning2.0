@@ -18,7 +18,7 @@ export default function StudentHomePage() {
 
   useEffect(() => {
     if (isDemoPreviewMode()) {
-      router.replace("/levels");
+      router.replace("/realms");
       return;
     }
     if (studentProfile?.studentId && hasActiveStudentSeenIntro(studentProfile.studentId)) {

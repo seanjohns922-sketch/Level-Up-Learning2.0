@@ -3,8 +3,10 @@
 import dynamic from "next/dynamic";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { isPlacementComplete, readProgress } from "@/data/progress";
+import { isPlacementComplete, readProgress, updateProgress, writeProgress } from "@/data/progress";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
+import { LEVEL_CATALOG } from "@/lib/level-catalog";
+import { buildDefaultStudentProgress } from "@/lib/student-destination";
 
 const NumberNexusMap = dynamic(
   () => import("@/components/world/NumberNexusMap"),
@@ -54,9 +56,23 @@ export default function NumberNexusPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (isDemoPreviewMode()) return;
+    // The Levels drawer carries the chosen level via ?level=. Persist it into
+    // Number Nexus's (number-scoped) progress so the map renders that level.
+    const requestedLevel = new URLSearchParams(window.location.search).get("level");
     const progress = readProgress();
-    if (!isPlacementComplete(progress)) {
+    const preview = isDemoPreviewMode();
+    if (
+      requestedLevel &&
+      LEVEL_CATALOG.some((lvl) => lvl.id === requestedLevel) &&
+      (preview || isPlacementComplete(progress)) &&
+      progress?.year !== requestedLevel
+    ) {
+      if (progress) updateProgress({ year: requestedLevel });
+      else writeProgress(buildDefaultStudentProgress(requestedLevel));
+    }
+
+    if (preview) return;
+    if (!isPlacementComplete(readProgress())) {
       router.replace("/home");
     }
   }, [router]);

@@ -2,11 +2,27 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Check, Lock } from "lucide-react";
 import { DEMO_MODE } from "@/data/config";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import RealmPortalPreview from "@/components/realms/RealmPortalPreview";
-import { readProgress } from "@/data/progress";
-import { getWeekProgress, readProgramStore } from "@/lib/program-progress";
+import { getScopedProgressKey, readProgress, type ProgressRealmScope, type StudentProgress } from "@/data/progress";
+import { LEVEL_CATALOG, isLevelUnlocked, levelLabelForYear } from "@/lib/level-catalog";
+import { setLastRealm } from "@/lib/last-realm";
+
+// Read a specific realm's scoped progress (the carousel lives on /realms where
+// the default scope is "number", so the focused realm's scope is passed
+// explicitly). Passing undefined for the student scope keeps the active-student
+// default from getScopedProgressKey.
+function readScopedProgress(scope: ProgressRealmScope): StudentProgress | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(getScopedProgressKey(undefined, scope));
+    return raw ? (JSON.parse(raw) as StudentProgress) : null;
+  } catch {
+    return null;
+  }
+}
 
 const REALMS = [
   { id: "number-nexus", name: "Number Nexus", symbol: "⚡", description: "Master numbers, operations & place value", color: "rgb(52,211,153)", colorDim: "rgba(52,211,153,0.25)", active: true },
@@ -21,16 +37,6 @@ const REALMS = [
   { id: "runehaven-peaks", name: "Runehaven Peaks", symbol: "♦", description: "Advanced literacy & lore", color: "rgb(248,113,113)", colorDim: "rgba(248,113,113,0.2)", active: false },
 ];
 
-const DROPDOWN_REALM_IDS = [
-  "number-nexus",
-  "reading-ridge",
-  "inkwell-wilds",
-  "measurelands",
-  "statistica",
-  "chance-hollow",
-  "pattern-peaks",
-] as const;
-
 function isRealmAccessible(realmId: string, previewMode: boolean) {
   return realmId === "number-nexus" || (previewMode && realmId === "measurelands");
 }
@@ -38,42 +44,24 @@ function isRealmAccessible(realmId: string, previewMode: boolean) {
 export default function RealmCarousel() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const level = searchParams.get("level") ?? "Year 1";
   const previewMode = isDemoPreviewMode();
+  // Realm-first: no level is chosen before this screen. Seed from any explicit
+  // ?level override, else the student's saved (number-scoped) level, else L1.
+  const initialLevelSeed = searchParams.get("level") ?? readProgress()?.year ?? "Year 1";
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [entered, setEntered] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
   const [isLevelMenuOpen, setIsLevelMenuOpen] = useState(false);
-  const [studentYear, setStudentYear] = useState(() => readProgress()?.year ?? level);
-  const [programStore, setProgramStore] = useState<ReturnType<typeof readProgramStore>>(() => readProgramStore());
+  // A level the student explicitly picked from the Levels drawer (overrides the
+  // focused realm's saved level). Reset whenever the focused realm changes.
+  const [overrideLevel, setOverrideLevel] = useState<string | null>(null);
   const levelMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setEntered(true), 80);
     return () => clearTimeout(t);
   }, []);
-
-  useEffect(() => {
-    const t = window.setTimeout(() => {
-      const progress = readProgress();
-      setStudentYear(progress?.year ?? level);
-      setProgramStore(readProgramStore());
-    }, 0);
-    return () => window.clearTimeout(t);
-  }, [level]);
-
-  useEffect(() => {
-    const progress = readProgress();
-    if (!DEMO_MODE && !previewMode && progress?.year && level !== progress.year) {
-      router.replace(`/realms?level=${encodeURIComponent(progress.year)}`);
-    }
-  }, [level, previewMode, router]);
-
-  const levelLabel = level.startsWith("Year")
-    ? `Level ${level.replace("Year ", "")}`
-    : level;
-  const levelNumber = Number(levelLabel.replace(/[^0-9]/g, "")) || 1;
 
   useEffect(() => {
     function onPointerDown(event: MouseEvent) {
@@ -95,82 +83,10 @@ export default function RealmCarousel() {
     };
   }, []);
 
-  const realmProgressRows = useMemo(() => {
-    const totalLessonSlots = 12 * 3;
-    let completedLessonSlots = 0;
-    let completedQuizSlots = 0;
-
-    for (let week = 1; week <= 12; week += 1) {
-      const weekProgress = getWeekProgress(programStore, studentYear, week);
-      completedLessonSlots += weekProgress.lessonsCompleted.filter(Boolean).length;
-      if (weekProgress.quizCompleted || typeof weekProgress.quizScore === "number") {
-        completedQuizSlots += 1;
-      }
-    }
-
-    const nexusPercent = Math.round(
-      ((completedLessonSlots + completedQuizSlots) / Math.max(totalLessonSlots + 12, 1)) * 100
-    );
-
-    return DROPDOWN_REALM_IDS.map((realmId) => {
-      const realm = REALMS.find((item) => item.id === realmId);
-      if (!realm) return null;
-
-      if (realm.id === "number-nexus") {
-        return {
-          id: realm.id,
-          name: realm.name,
-          percent: Math.max(0, Math.min(100, nexusPercent)),
-          status: nexusPercent >= 100 ? "Complete" : `${Math.max(0, nexusPercent)}%`,
-          barClass:
-            nexusPercent >= 100
-              ? "from-emerald-400 to-teal-300"
-              : "from-emerald-500 to-cyan-400",
-        };
-      }
-
-      if (realm.id === "measurelands" && previewMode) {
-        return {
-          id: realm.id,
-          name: realm.name,
-          percent: 0,
-          status: "Preview",
-          barClass: "from-sky-400 to-cyan-300",
-        };
-      }
-
-      if (realm.comingSoon) {
-        return {
-          id: realm.id,
-          name: realm.name,
-          percent: 0,
-          status: "Soon",
-          barClass: "from-white/20 to-white/10",
-        };
-      }
-
-      const levelLocked =
-        (realm.id === "pattern-peaks" || realm.id === "statistica") && levelNumber < 3;
-
-      return {
-        id: realm.id,
-        name: realm.name,
-        percent: 0,
-        status: levelLocked ? "Locked" : "Locked",
-        barClass: "from-white/15 to-white/10",
-      };
-    }).filter(Boolean) as Array<{
-      id: string;
-      name: string;
-      percent: number;
-      status: string;
-      barClass: string;
-    }>;
-  }, [levelNumber, previewMode, programStore, studentYear]);
-
   const navigate = useCallback((dir: 1 | -1) => {
     if (transitioning) return;
     setTransitioning(true);
+    setOverrideLevel(null); // a level pick only applies to the realm it was made in
     setCurrentIndex((prev) => (prev + dir + REALMS.length) % REALMS.length);
     setTimeout(() => setTransitioning(false), 400);
   }, [transitioning]);
@@ -208,6 +124,19 @@ export default function RealmCarousel() {
   // Use the cathedral/tower-interior aesthetic across all levels.
   const isTopChamber = true;
 
+  // The focused realm resolves its OWN level from its scoped progress. The
+  // Levels drawer can override it. This is what the "Levels" chip reflects and
+  // what Enter Realm carries through so the realm resumes/pre-tests correctly.
+  const focusedScope: ProgressRealmScope = current.id === "measurelands" ? "measurement" : "number";
+  const focusedLegendRealm = current.id === "measurelands" ? "measurelands" : "number-nexus";
+  const focusedProgress = useMemo(
+    () => readScopedProgress(focusedScope),
+    [focusedScope, currentIndex]
+  );
+  const activeYear = overrideLevel ?? focusedProgress?.year ?? initialLevelSeed;
+  const levelLabel = levelLabelForYear(activeYear);
+  const levelNumber = Number(activeYear.replace(/[^0-9]/g, "")) || 1;
+
   const realmRoutes: Record<string, string> = {
     "number-nexus": "/number-nexus",
     "measurelands": "/measurelands",
@@ -216,14 +145,10 @@ export default function RealmCarousel() {
   function enterRealm() {
     if (!isActive) return;
     const route = realmRoutes[current.id];
-    if (route) {
-      if (current.id === "measurelands") {
-        router.push(`${route}?level=${encodeURIComponent(level)}`);
-        return;
-      }
-      router.push(route);
-      return;
-    }
+    if (!route) return;
+    setLastRealm(current.id);
+    // Carry the level the drawer is showing so the realm persists/resolves it.
+    router.push(`${route}?level=${encodeURIComponent(activeYear)}`);
   }
 
   return (
@@ -259,28 +184,23 @@ export default function RealmCarousel() {
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-5 pb-2">
           <button
-            onClick={() => router.push("/levels")}
+            onClick={() => router.push("/profile")}
             className="text-sm text-white/70 hover:text-white transition font-medium"
             type="button"
           >
-            ← Back to Levels
+            ← Back
           </button>
           <div ref={levelMenuRef} className="relative flex items-center gap-2">
             <button
               type="button"
-              onClick={() => router.push("/tower")}
-              className="inline-flex items-center gap-1.5 text-xs font-black text-[#1a0e00] px-3.5 py-1.5 rounded-full transition hover:brightness-105"
-              style={{ background: "linear-gradient(135deg, #fff8e8, #e8c878 60%, #c8a030)", boxShadow: "0 2px 10px rgba(200,160,48,0.35)" }}
-            >
-              🏰 Tower of Knowledge
-            </button>
-            <button
-              type="button"
               onClick={() => setIsLevelMenuOpen((currentValue) => !currentValue)}
-              className="text-xs font-bold text-white/90 px-3.5 py-1.5 rounded-full transition hover:scale-[1.02] hover:bg-white/15"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-white/90 px-3.5 py-1.5 rounded-full transition hover:scale-[1.02] hover:bg-white/15"
               style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)" }}
             >
-              {levelLabel}
+              <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+              Levels
             </button>
             <button
               type="button"
@@ -297,37 +217,54 @@ export default function RealmCarousel() {
 
             {isLevelMenuOpen ? (
               <div
-                className="absolute right-0 top-[calc(100%+10px)] w-[320px] rounded-3xl border border-white/15 bg-[rgba(10,12,18,0.82)] p-4 backdrop-blur-xl shadow-[0_12px_40px_rgba(0,0,0,0.35)]"
+                className="absolute right-0 top-[calc(100%+10px)] w-[300px] rounded-3xl border border-white/15 bg-[rgba(10,12,18,0.88)] p-4 backdrop-blur-xl shadow-[0_12px_40px_rgba(0,0,0,0.35)]"
                 style={{ zIndex: 40 }}
               >
-                <div className="mb-3">
-                  <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/45">
-                    Current Level
-                  </div>
-                  <div className="mt-1 text-lg font-black text-white">{levelLabel}</div>
+                <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.22em] text-white/45">
+                  {current.name} · Levels
+                </div>
+                <div className="mb-3 text-xs text-white/50">
+                  Revisit an earlier level any time — you can&apos;t jump ahead.
                 </div>
 
-                <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.22em] text-white/45">
-                  Realm Progress
-                </div>
-
-                <div className="space-y-3">
-                  {realmProgressRows.map((realm) => (
-                    <div key={realm.id} className="rounded-2xl border border-white/8 bg-white/[0.04] px-3 py-2.5">
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="text-sm font-bold text-white/90">{realm.name}</div>
-                        <div className="text-xs font-extrabold uppercase tracking-wide text-white/55">
-                          {realm.status}
-                        </div>
-                      </div>
-                      <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/8">
-                        <div
-                          className={`h-full rounded-full bg-gradient-to-r ${realm.barClass}`}
-                          style={{ width: `${realm.percent}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
+                <div className="flex flex-col gap-1.5">
+                  {LEVEL_CATALOG.map((lvl) => {
+                    const unlocked = isLevelUnlocked(lvl.id, focusedProgress, {
+                      forceOpen: DEMO_MODE || previewMode,
+                      realmId: focusedLegendRealm,
+                    });
+                    const isCurrent = lvl.id === activeYear;
+                    return (
+                      <button
+                        key={lvl.id}
+                        type="button"
+                        disabled={!unlocked}
+                        onClick={() => {
+                          if (!unlocked) return;
+                          setOverrideLevel(lvl.id);
+                          setIsLevelMenuOpen(false);
+                        }}
+                        className={[
+                          "flex w-full items-center justify-between rounded-xl px-3.5 py-2.5 text-left transition",
+                          !unlocked ? "cursor-not-allowed opacity-45" : "cursor-pointer hover:bg-white/10",
+                        ].join(" ")}
+                        style={
+                          isCurrent
+                            ? { background: "rgba(212,175,110,0.16)", border: "1px solid rgba(212,175,110,0.5)" }
+                            : { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }
+                        }
+                      >
+                        <span className={`text-sm font-semibold ${isCurrent ? "text-amber-50" : "text-white/80"}`}>
+                          {lvl.label}
+                        </span>
+                        {isCurrent ? (
+                          <Check size={15} className="text-amber-300" />
+                        ) : !unlocked ? (
+                          <Lock size={13} className="text-white/40" />
+                        ) : null}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             ) : null}

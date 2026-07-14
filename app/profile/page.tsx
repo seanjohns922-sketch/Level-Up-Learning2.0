@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { readProgress } from "@/data/progress";
+import { getLastRealm } from "@/lib/last-realm";
 import { getWeekProgress, isWeekComplete, readProgramStore } from "@/lib/program-progress";
 import { useAutoReadSetting } from "@/lib/speak";
 import { fetchStudentActivityDaily, type StudentActivityDailyRow } from "@/lib/student-activity";
@@ -46,6 +47,16 @@ const REALMS = [
 ];
 
 const DAYS = ["M", "T", "W", "T", "F", "S", "S"];
+
+// Realm-first: the dashboard "Continue" offers the realm the student last played.
+const REALM_LABELS: Record<string, string> = {
+  "number-nexus": "Number Nexus",
+  measurelands: "Measurelands",
+};
+const REALM_ROUTES: Record<string, string> = {
+  "number-nexus": "/number-nexus",
+  measurelands: "/measurelands",
+};
 
 const SOCIAL_TEASERS = [
   {
@@ -238,6 +249,14 @@ export default function ProfilePage() {
   const [activityRows, setActivityRows] = useState<StudentActivityDailyRow[]>([]);
   const [persistedAccuracy, setPersistedAccuracy] = useState<number | null>(null);
   const [openTooltip, setOpenTooltip] = useState<string | null>(null);
+  // Resolved after mount to avoid an SSR/client hydration mismatch on localStorage.
+  const [lastRealm, setLastRealmState] = useState("number-nexus");
+
+  useEffect(() => {
+    setLastRealmState(getLastRealm());
+  }, []);
+  const lastRealmLabel = REALM_LABELS[lastRealm] ?? "Number Nexus";
+  const lastRealmRoute = REALM_ROUTES[lastRealm] ?? "/number-nexus";
 
   const year = progress?.year ?? "Year 1";
   const levelNum = parseInt(year.replace(/\D/g, ""), 10) || 1;
@@ -428,13 +447,13 @@ export default function ProfilePage() {
                 Welcome back, {studentName}!
               </h1>
               <p className="mt-1.5 max-w-md text-sm text-[#CBD5E1]">
-                Your Number Nexus journey continues. {stats.realmProgress}% through Level {levelNum}.
+                Your {lastRealmLabel} journey continues. {stats.realmProgress}% through Level {levelNum}.
               </p>
               <button
-                onClick={() => router.push("/home")}
+                onClick={() => router.push(lastRealmRoute)}
                 className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#F59E0B] px-5 py-2.5 text-sm font-extrabold text-[#0F172A] transition-all hover:bg-[#FBBF24] active:scale-95"
               >
-                Continue Lessons <ChevronRight className="h-4 w-4" />
+                Continue {lastRealmLabel} <ChevronRight className="h-4 w-4" />
               </button>
             </div>
           </div>
